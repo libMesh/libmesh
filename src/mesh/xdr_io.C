@@ -129,7 +129,7 @@ XdrIO::XdrIO (MeshBase & mesh, const bool binary_in) :
   _write_unique_id    (false),
 #endif
   _field_width        (4),   // In 0.7.0, all fields are 4 bytes, in 0.9.2+ they can vary
-  _version            ("libMesh-0.9.6+"),
+  _version            ("libMesh-1.1.0"),
   _bc_file_name       ("n/a"),
   _partition_map_file ("n/a"),
   _subdomain_map_file ("n/a"),
@@ -180,7 +180,9 @@ void XdrIO::write (const std::string & name)
   libmesh_assert(n_elem == mesh.n_elem());
   libmesh_assert(n_nodes == mesh.n_nodes());
 
-  header_id_type n_bcs = cast_int<header_id_type>(mesh.get_boundary_info().n_boundary_conds());
+  header_id_type n_side_bcs = cast_int<header_id_type>(mesh.get_boundary_info().n_boundary_conds());
+  header_id_type n_edge_bcs = cast_int<header_id_type>(mesh.get_boundary_info().n_edge_conds());
+  header_id_type n_shellface_bcs = cast_int<header_id_type>(mesh.get_boundary_info().n_shellface_conds());
   header_id_type n_nodesets = cast_int<header_id_type>(mesh.get_boundary_info().n_nodeset_conds());
   unsigned int n_p_levels = MeshTools::n_p_levels (mesh);
 
@@ -192,7 +194,7 @@ void XdrIO::write (const std::string & name)
 
   // If there are BCs and the user has not already provided a
   // file name then write to "."
-  if ((n_bcs || n_nodesets) &&
+  if ((n_side_bcs || n_edge_bcs || n_shellface_bcs || n_nodesets) &&
       this->boundary_condition_file_name() == "n/a")
     this->boundary_condition_file_name() = ".";
 
@@ -260,11 +262,17 @@ void XdrIO::write (const std::string & name)
       // write the nodal locations
       this->write_serialized_nodes (io, n_nodes);
 
-      // write the boundary condition information
-      this->write_serialized_bcs (io, n_bcs);
+      // write the side boundary condition information
+      this->write_serialized_side_bcs (io, n_side_bcs);
 
       // write the nodeset information
       this->write_serialized_nodesets (io, n_nodesets);
+
+      // write the edge boundary condition information
+      this->write_serialized_edge_bcs (io, n_edge_bcs);
+
+      // write the "shell face" boundary condition information
+      this->write_serialized_shellface_bcs (io, n_shellface_bcs);
     }
   else
     {
@@ -277,18 +285,17 @@ void XdrIO::write (const std::string & name)
       // write the nodal locations
       this->write_serialized_nodes (io, n_nodes);
 
-      // write the boundary condition information
-      this->write_serialized_bcs (io, n_bcs);
+      // write the side boundary condition information
+      this->write_serialized_side_bcs (io, n_side_bcs);
 
       // write the nodeset information
       this->write_serialized_nodesets (io, n_nodesets);
-    }
 
-  if(mesh.get_boundary_info().n_edge_conds() > 0)
-    {
-      libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
-                   << "are not supported by the XDR format."
-                   << std::endl;
+      // write the edge boundary condition information
+      this->write_serialized_edge_bcs (io, n_edge_bcs);
+
+      // write the "shell face" boundary condition information
+      this->write_serialized_shellface_bcs (io, n_shellface_bcs);
     }
 
   STOP_LOG("write()","XdrIO");
@@ -1034,7 +1041,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
 
 
 
-void XdrIO::write_serialized_bcs (Xdr & io, const header_id_type n_bcs) const
+void XdrIO::write_serialized_bcs_helper (Xdr & io, const header_id_type n_bcs, const std::string bc_type) const
 {
   libmesh_assert (io.writing());
 
@@ -1049,7 +1056,11 @@ void XdrIO::write_serialized_bcs (Xdr & io, const header_id_type n_bcs) const
 
   header_id_type n_bcs_out = n_bcs;
   if (this->processor_id() == 0)
-    io.data (n_bcs_out, "# number of boundary conditions");
+    {
+      std::stringstream comment_string;
+      comment_string << "# number of " << bc_type << " boundary conditions";
+      io.data (n_bcs_out, comment_string.str().c_str());
+    }
   n_bcs_out = 0;
 
   if (!n_bcs) return;
@@ -1070,19 +1081,60 @@ void XdrIO::write_serialized_bcs (Xdr & io, const header_id_type n_bcs) const
     {
       const Elem * elem = *it;
 
-      for (unsigned short s=0; s<elem->n_sides(); s++)
+      if(bc_type == "side")
         {
-          boundary_info.boundary_ids (elem, s, bc_ids);
-          for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+          for (unsigned short s=0; s<elem->n_sides(); s++)
             {
-              const boundary_id_type bc_id = *id_it;
-              if (bc_id != BoundaryInfo::invalid_id)
+              boundary_info.boundary_ids (elem, s, bc_ids);
+              for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
                 {
-                  xfer_bcs.push_back (n_local_level_0_elem);
-                  xfer_bcs.push_back (s) ;
-                  xfer_bcs.push_back (bc_id);
+                  const boundary_id_type bc_id = *id_it;
+                  if (bc_id != BoundaryInfo::invalid_id)
+                    {
+                      xfer_bcs.push_back (n_local_level_0_elem);
+                      xfer_bcs.push_back (s) ;
+                      xfer_bcs.push_back (bc_id);
+                    }
                 }
             }
+        }
+      else if(bc_type == "edge")
+        {
+          for (unsigned short e=0; e<elem->n_edges(); e++)
+            {
+              boundary_info.edge_boundary_ids (elem, e, bc_ids);
+              for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+                {
+                  const boundary_id_type bc_id = *id_it;
+                  if (bc_id != BoundaryInfo::invalid_id)
+                    {
+                      xfer_bcs.push_back (n_local_level_0_elem);
+                      xfer_bcs.push_back (e) ;
+                      xfer_bcs.push_back (bc_id);
+                    }
+                }
+            }
+        }
+      else if(bc_type == "shellface")
+        {
+          for (unsigned short sf=0; sf<2; sf++)
+            {
+              boundary_info.shellface_boundary_ids (elem, sf, bc_ids);
+              for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+                {
+                  const boundary_id_type bc_id = *id_it;
+                  if (bc_id != BoundaryInfo::invalid_id)
+                    {
+                      xfer_bcs.push_back (n_local_level_0_elem);
+                      xfer_bcs.push_back (sf) ;
+                      xfer_bcs.push_back (bc_id);
+                    }
+                }
+            }
+        }
+      else
+        {
+          libmesh_error_msg("bc_type not recognized: " + bc_type);
         }
     }
 
@@ -1118,6 +1170,27 @@ void XdrIO::write_serialized_bcs (Xdr & io, const header_id_type n_bcs) const
     }
   else
     this->comm().send (0, xfer_bcs);
+}
+
+
+
+void XdrIO::write_serialized_side_bcs (Xdr & io, const header_id_type n_side_bcs) const
+{
+  write_serialized_bcs_helper(io, n_side_bcs, "side");
+}
+
+
+
+void XdrIO::write_serialized_edge_bcs (Xdr & io, const header_id_type n_edge_bcs) const
+{
+  write_serialized_bcs_helper(io, n_edge_bcs, "edge");
+}
+
+
+
+void XdrIO::write_serialized_shellface_bcs (Xdr & io, const header_id_type n_shellface_bcs) const
+{
+  write_serialized_bcs_helper(io, n_shellface_bcs, "shellface");
 }
 
 
@@ -1277,10 +1350,6 @@ void XdrIO::read (const std::string & name)
   // type_size, uid_size, pid_size, sid_size, p_level_size, eid_size, side_size, bid_size;
   header_id_type pos=0;
 
-  const bool exceeds_version_0_9_2 =
-    (this->version().find("0.9.2") != std::string::npos) ||
-    (this->version().find("0.9.6") != std::string::npos);
-
   if (this->processor_id() == 0)
     {
       io.data (meta_data[pos++]);
@@ -1290,7 +1359,7 @@ void XdrIO::read (const std::string & name)
       io.data (this->partition_map_file_name());      // libMesh::out << "pid_file=" << this->partition_map_file_name()      << std::endl;
       io.data (this->polynomial_level_file_name());   // libMesh::out << "pl_file="  << this->polynomial_level_file_name()   << std::endl;
 
-      if (exceeds_version_0_9_2)
+      if (exceeds_version_0_9_2())
         {
           io.data (meta_data[pos++], "# type size");
           io.data (meta_data[pos++], "# uid size");
@@ -1328,7 +1397,7 @@ void XdrIO::read (const std::string & name)
    * TODO: All types are stored as the same size. Use the size information to pack things efficiently.
    * For now we will assume that "type size" is how the entire file will be encoded.
    */
-  if (exceeds_version_0_9_2)
+  if (exceeds_version_0_9_2())
     _field_width = meta_data[2];
 
   if (_field_width == 4)
@@ -1344,12 +1413,21 @@ void XdrIO::read (const std::string & name)
       // read the nodal locations
       this->read_serialized_nodes (io, n_nodes);
 
-      // read the boundary conditions
-      this->read_serialized_bcs (io, type_size);
+      // read the side boundary conditions
+      this->read_serialized_side_bcs (io, type_size);
 
-      if (exceeds_version_0_9_2)
+      if (exceeds_version_0_9_2())
         // read the nodesets
         this->read_serialized_nodesets (io, type_size);
+
+      if (exceeds_version_1_1_0())
+        {
+          // read the edge boundary conditions
+          this->read_serialized_edge_bcs (io, type_size);
+
+          // read the "shell face" boundary conditions
+          this->read_serialized_shellface_bcs (io, type_size);
+        }
     }
   else if (_field_width == 8)
     {
@@ -1365,11 +1443,20 @@ void XdrIO::read (const std::string & name)
       this->read_serialized_nodes (io, n_nodes);
 
       // read the boundary conditions
-      this->read_serialized_bcs (io, type_size);
+      this->read_serialized_side_bcs (io, type_size);
 
-      if (exceeds_version_0_9_2)
+      if (exceeds_version_0_9_2())
         // read the nodesets
         this->read_serialized_nodesets (io, type_size);
+
+      if (exceeds_version_1_1_0())
+        {
+          // read the edge boundary conditions
+          this->read_serialized_edge_bcs (io, type_size);
+
+          // read the "shell face" boundary conditions
+          this->read_serialized_shellface_bcs (io, type_size);
+        }
     }
 
 
@@ -1383,9 +1470,7 @@ void XdrIO::read (const std::string & name)
 
 void XdrIO::read_serialized_subdomain_names(Xdr & io)
 {
-  const bool read_entity_info =
-    (this->version().find("0.9.2") != std::string::npos) ||
-    (this->version().find("0.9.6") != std::string::npos);
+  const bool read_entity_info = exceeds_version_0_9_2();
   if (read_entity_info)
     {
       MeshBase & mesh = MeshInput<MeshBase>::mesh();
@@ -1453,9 +1538,9 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
 
   // Version 0.9.2+ introduces unique ids
   const size_t unique_id_size_index = 3;
+  
   const bool read_unique_id =
-    ((this->version().find("0.9.2") != std::string::npos) ||
-     (this->version().find("0.9.6") != std::string::npos)) &&
+    (exceeds_version_0_9_2()) &&
     sizes[unique_id_size_index];
 
   T n_elem_at_level=0, n_processed_at_level=0;
@@ -1692,10 +1777,7 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
         }
     }
 
-  const bool exceeds_version_0_9_6 =
-    (this->version().find("0.9.6") != std::string::npos);
-
-  if (exceeds_version_0_9_6)
+  if (exceeds_version_0_9_6())
     {
       // Check for node unique ids
       unsigned short read_unique_ids;
@@ -1769,7 +1851,7 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
 
 
 template <typename T>
-void XdrIO::read_serialized_bcs (Xdr & io, T)
+void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
 {
   if (this->boundary_condition_file_name() == "n/a") return;
 
@@ -1840,9 +1922,51 @@ void XdrIO::read_serialized_bcs (Xdr & io, T)
               libmesh_assert_equal_to (pos.first->dof_id, (*it)->id());
               libmesh_assert_less (pos.first->side, (*it)->n_sides());
 
-              boundary_info.add_side (*it, pos.first->side, pos.first->bc_id);
+              if(bc_type == "side")
+                {
+                  boundary_info.add_side (*it, pos.first->side, pos.first->bc_id);
+                }
+              else if(bc_type == "edge")
+                {
+                  boundary_info.add_edge (*it, pos.first->side, pos.first->bc_id);
+                }
+              else if(bc_type == "shellface")
+                {
+                  // Shell face IDs can only be 0 or 1.
+                  libmesh_assert_less(pos.first->side, 2);
+
+                  boundary_info.add_shellface (*it, pos.first->side, pos.first->bc_id);
+                }
+              else
+                {
+                  libmesh_error_msg("bc_type not recognized: " + bc_type);
+                }
             }
     }
+}
+
+
+
+template <typename T>
+void XdrIO::read_serialized_side_bcs (Xdr & io, T value)
+{
+  read_serialized_bcs_helper(io, value, "side");
+}
+
+
+
+template <typename T>
+void XdrIO::read_serialized_edge_bcs (Xdr & io, T value)
+{
+  read_serialized_bcs_helper(io, value, "edge");
+}
+
+
+
+template <typename T>
+void XdrIO::read_serialized_shellface_bcs (Xdr & io, T value)
+{
+  read_serialized_bcs_helper(io, value, "shellface");
 }
 
 
@@ -1927,9 +2051,7 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
 
 void XdrIO::read_serialized_bc_names(Xdr & io, BoundaryInfo & info, bool is_sideset)
 {
-  const bool read_entity_info =
-    (this->version().find("0.9.2") != std::string::npos) ||
-    (this->version().find("0.9.6") != std::string::npos);
+  const bool read_entity_info = exceeds_version_0_9_2();
   if (read_entity_info)
     {
       header_id_type n_boundary_names = 0;
@@ -2003,6 +2125,27 @@ void XdrIO::pack_element (std::vector<xdr_id_type> & conn, const Elem * elem,
 
   for (unsigned int n=0; n<elem->n_nodes(); n++)
     conn.push_back (elem->node_id(n));
+}
+
+bool XdrIO::exceeds_version_0_9_2() const
+{
+  return
+    (this->version().find("0.9.2") != std::string::npos) ||
+    (this->version().find("0.9.6") != std::string::npos) ||
+    (this->version().find("1.1.0") != std::string::npos);
+}
+
+bool XdrIO::exceeds_version_0_9_6() const
+{
+  return
+    (this->version().find("0.9.6") != std::string::npos) ||
+    (this->version().find("1.1.0") != std::string::npos);
+}
+
+bool XdrIO::exceeds_version_1_1_0() const
+{
+  return
+    (this->version().find("1.1.0") != std::string::npos);
 }
 
 } // namespace libMesh

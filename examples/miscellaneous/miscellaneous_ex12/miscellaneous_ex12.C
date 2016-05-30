@@ -96,10 +96,18 @@ int main (int argc, char ** argv)
   if (command_line.search(1, "-distributed_load"))
     distributed_load = command_line.next(distributed_load);
 
-  // Create a mesh distributed across the default MPI communicator.
-  Mesh mesh (init.comm(), 3);
+  {
+    Mesh mesh (init.comm(), 3);
 
-  mesh.read("cylinder.exo");
+    // To confirm that both ExodusII and Xdr formats work for shell
+    // meshes, we read in cylinder.exo, then write out cylinder.xdr,
+    // then read in cylinder.exo again below and use that for the rest
+    // of the example.
+    mesh.read("cylinder.exo");
+    mesh.write("cylinder.xdr");
+  }
+  Mesh mesh (init.comm(), 3);
+  mesh.read("cylinder.xdr");
 
   // Print information about the mesh to the screen.
   mesh.print_info();
