@@ -161,6 +161,23 @@ public:
   const std::string & polynomial_level_file_name() const { return _p_level_file; }
   std::string &       polynomial_level_file_name()       { return _p_level_file; }
 
+  /**
+   * @return true if the current file has an XDR/XDA version that
+   * matches or exceeds 0.9.2.
+   */
+  bool version_at_least_0_9_2() const;
+
+  /**
+   * @return true if the current file has an XDR/XDA version that
+   * matches or exceeds 0.9.6. 
+   */
+  bool version_at_least_0_9_6() const;
+
+  /**
+   * @return true if the current file has an XDR/XDA version that
+   * matches or exceeds 1.1.0.
+   */
+  bool version_at_least_1_1_0() const;
 
 private:
 
@@ -183,9 +200,27 @@ private:
   void write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const;
 
   /**
-   * Write the boundary conditions for a parallel, distributed mesh
+   * Helper function used in write_serialized_side_bcs, write_serialized_edge_bcs, and
+   * write_serialized_shellface_bcs.
    */
-  void write_serialized_bcs (Xdr & io, const header_id_type n_bcs) const;
+  void write_serialized_bcs_helper (Xdr & io, const header_id_type n_side_bcs, const std::string bc_type) const;
+
+  /**
+   * Write the side boundary conditions for a parallel, distributed mesh
+   */
+  void write_serialized_side_bcs (Xdr & io, const header_id_type n_side_bcs) const;
+
+  /**
+   * Write the edge boundary conditions for a parallel, distributed mesh.
+   * NEW in 1.1.0 format.
+   */
+  void write_serialized_edge_bcs (Xdr & io, const header_id_type n_edge_bcs) const;
+
+  /**
+   * Write the "shell face" boundary conditions for a parallel, distributed mesh.
+   * NEW in 1.1.0 format.
+   */
+  void write_serialized_shellface_bcs (Xdr & io, const header_id_type n_shellface_bcs) const;
 
   /**
    * Write the boundary conditions for a parallel, distributed mesh
@@ -217,11 +252,34 @@ private:
   void read_serialized_nodes (Xdr & io, const dof_id_type n_nodes);
 
   /**
-   * Read the boundary conditions for a parallel, distributed mesh
+   * Helper function used in read_serialized_side_bcs, read_serialized_edge_bcs, and
+   * read_serialized_shellface_bcs.
+   */
+  template <typename T>
+  void read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type);
+
+  /**
+   * Read the side boundary conditions for a parallel, distributed mesh
    * @return the number of bcs read
    */
   template <typename T>
-  void read_serialized_bcs (Xdr & io, T);
+  void read_serialized_side_bcs (Xdr & io, T);
+
+  /**
+   * Read the edge boundary conditions for a parallel, distributed mesh.
+   * NEW in 1.1.0 format.
+   * @return the number of bcs read
+   */
+  template <typename T>
+  void read_serialized_edge_bcs (Xdr & io, T);
+
+  /**
+   * Read the "shell face" boundary conditions for a parallel, distributed mesh.
+   * NEW in 1.1.0 format.
+   * @return the number of bcs read
+   */
+  template <typename T>
+  void read_serialized_shellface_bcs (Xdr & io, T);
 
   /**
    * Read the nodeset conditions for a parallel, distributed mesh
