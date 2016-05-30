@@ -1359,7 +1359,7 @@ void XdrIO::read (const std::string & name)
       io.data (this->partition_map_file_name());      // libMesh::out << "pid_file=" << this->partition_map_file_name()      << std::endl;
       io.data (this->polynomial_level_file_name());   // libMesh::out << "pl_file="  << this->polynomial_level_file_name()   << std::endl;
 
-      if (exceeds_version_0_9_2())
+      if (version_at_least_0_9_2())
         {
           io.data (meta_data[pos++], "# type size");
           io.data (meta_data[pos++], "# uid size");
@@ -1397,7 +1397,7 @@ void XdrIO::read (const std::string & name)
    * TODO: All types are stored as the same size. Use the size information to pack things efficiently.
    * For now we will assume that "type size" is how the entire file will be encoded.
    */
-  if (exceeds_version_0_9_2())
+  if (version_at_least_0_9_2())
     _field_width = meta_data[2];
 
   if (_field_width == 4)
@@ -1416,11 +1416,11 @@ void XdrIO::read (const std::string & name)
       // read the side boundary conditions
       this->read_serialized_side_bcs (io, type_size);
 
-      if (exceeds_version_0_9_2())
+      if (version_at_least_0_9_2())
         // read the nodesets
         this->read_serialized_nodesets (io, type_size);
 
-      if (exceeds_version_1_1_0())
+      if (version_at_least_1_1_0())
         {
           // read the edge boundary conditions
           this->read_serialized_edge_bcs (io, type_size);
@@ -1445,11 +1445,11 @@ void XdrIO::read (const std::string & name)
       // read the boundary conditions
       this->read_serialized_side_bcs (io, type_size);
 
-      if (exceeds_version_0_9_2())
+      if (version_at_least_0_9_2())
         // read the nodesets
         this->read_serialized_nodesets (io, type_size);
 
-      if (exceeds_version_1_1_0())
+      if (version_at_least_1_1_0())
         {
           // read the edge boundary conditions
           this->read_serialized_edge_bcs (io, type_size);
@@ -1470,7 +1470,7 @@ void XdrIO::read (const std::string & name)
 
 void XdrIO::read_serialized_subdomain_names(Xdr & io)
 {
-  const bool read_entity_info = exceeds_version_0_9_2();
+  const bool read_entity_info = version_at_least_0_9_2();
   if (read_entity_info)
     {
       MeshBase & mesh = MeshInput<MeshBase>::mesh();
@@ -1540,7 +1540,7 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
   const size_t unique_id_size_index = 3;
   
   const bool read_unique_id =
-    (exceeds_version_0_9_2()) &&
+    (version_at_least_0_9_2()) &&
     sizes[unique_id_size_index];
 
   T n_elem_at_level=0, n_processed_at_level=0;
@@ -1777,7 +1777,7 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
         }
     }
 
-  if (exceeds_version_0_9_6())
+  if (version_at_least_0_9_6())
     {
       // Check for node unique ids
       unsigned short read_unique_ids;
@@ -2051,7 +2051,7 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
 
 void XdrIO::read_serialized_bc_names(Xdr & io, BoundaryInfo & info, bool is_sideset)
 {
-  const bool read_entity_info = exceeds_version_0_9_2();
+  const bool read_entity_info = version_at_least_0_9_2();
   if (read_entity_info)
     {
       header_id_type n_boundary_names = 0;
@@ -2127,7 +2127,7 @@ void XdrIO::pack_element (std::vector<xdr_id_type> & conn, const Elem * elem,
     conn.push_back (elem->node_id(n));
 }
 
-bool XdrIO::exceeds_version_0_9_2() const
+bool XdrIO::version_at_least_0_9_2() const
 {
   return
     (this->version().find("0.9.2") != std::string::npos) ||
@@ -2135,14 +2135,14 @@ bool XdrIO::exceeds_version_0_9_2() const
     (this->version().find("1.1.0") != std::string::npos);
 }
 
-bool XdrIO::exceeds_version_0_9_6() const
+bool XdrIO::version_at_least_0_9_6() const
 {
   return
     (this->version().find("0.9.6") != std::string::npos) ||
     (this->version().find("1.1.0") != std::string::npos);
 }
 
-bool XdrIO::exceeds_version_1_1_0() const
+bool XdrIO::version_at_least_1_1_0() const
 {
   return
     (this->version().find("1.1.0") != std::string::npos);

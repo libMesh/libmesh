@@ -165,19 +165,19 @@ public:
    * @return true if the current file has an XDR/XDA version that
    * matches or exceeds 0.9.2.
    */
-  bool exceeds_version_0_9_2() const;
+  bool version_at_least_0_9_2() const;
 
   /**
    * @return true if the current file has an XDR/XDA version that
    * matches or exceeds 0.9.6. 
    */
-  bool exceeds_version_0_9_6() const;
+  bool version_at_least_0_9_6() const;
 
   /**
    * @return true if the current file has an XDR/XDA version that
    * matches or exceeds 1.1.0.
    */
-  bool exceeds_version_1_1_0() const;
+  bool version_at_least_1_1_0() const;
 
 private:
 
