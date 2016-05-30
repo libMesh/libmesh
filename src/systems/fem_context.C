@@ -209,7 +209,6 @@ template<typename OutputType,
 void FEMContext::some_value(unsigned int var, unsigned int qp, OutputType & u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -239,7 +238,6 @@ template<typename OutputType,
 void FEMContext::some_gradient(unsigned int var, unsigned int qp, OutputType & du) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -273,7 +271,6 @@ template<typename OutputType,
 void FEMContext::some_hessian(unsigned int var, unsigned int qp, OutputType & d2u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -328,7 +325,6 @@ void FEMContext::interior_values (unsigned int var,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -393,7 +389,6 @@ void FEMContext::interior_gradients(unsigned int var,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -458,7 +453,6 @@ void FEMContext::interior_hessians(unsigned int var,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -498,7 +492,6 @@ void FEMContext::interior_curl(unsigned int var, unsigned int qp,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -532,7 +525,6 @@ void FEMContext::interior_div(unsigned int var, unsigned int qp,
     <typename TensorTools::MakeReal<OutputType>::type>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -587,7 +579,6 @@ void FEMContext::side_values(unsigned int var,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -635,7 +626,6 @@ void FEMContext::side_gradient(unsigned int var, unsigned int qp,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -671,7 +661,6 @@ void FEMContext::side_gradients(unsigned int var,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -741,7 +730,6 @@ void FEMContext::side_hessians(unsigned int var,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -794,7 +782,6 @@ void FEMContext::point_value(unsigned int var,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -845,7 +832,6 @@ void FEMContext::point_gradient(unsigned int var,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -899,7 +885,6 @@ void FEMContext::point_hessian(unsigned int var,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -938,7 +923,6 @@ void FEMContext::point_curl(unsigned int var,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -1135,7 +1119,6 @@ void FEMContext::fixed_point_value(unsigned int var,
   typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -1186,7 +1169,6 @@ void FEMContext::fixed_point_gradient(unsigned int var,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
@@ -1240,7 +1222,6 @@ void FEMContext::fixed_point_hessian(unsigned int var,
     OutputShape;
 
   // Get local-to-global dof index lookup
-  libmesh_assert_greater (this->get_dof_indices().size(), var);
   const unsigned int n_dofs = cast_int<unsigned int>
     (this->get_dof_indices(var).size());
 
