@@ -92,7 +92,7 @@ void RBConstructionBase<Base>::init_data ()
 
 template <class Base>
 void RBConstructionBase<Base>::get_global_max_error_pair(const Parallel::Communicator & communicator,
-                                                         std::pair<unsigned int, Real> & error_pair)
+                                                         std::pair<numeric_index_type, Real> & error_pair)
 {
   // Set error_pair.second to the maximum global value and also
   // find which processor contains the maximum value

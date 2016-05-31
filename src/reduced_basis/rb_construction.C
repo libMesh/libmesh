@@ -1325,7 +1325,7 @@ Real RBConstruction::compute_max_error_bound()
   unsigned int max_err_index = 0;
   Real max_err = 0.;
 
-  unsigned int first_index = get_first_local_training_index();
+  numeric_index_type first_index = get_first_local_training_index();
   for(unsigned int i=0; i<get_local_n_training_samples(); i++)
     {
       // Load training parameter i, this is only loaded
@@ -1341,7 +1341,7 @@ Real RBConstruction::compute_max_error_bound()
         }
     }
 
-  std::pair<unsigned int,Real> error_pair(first_index+max_err_index, max_err);
+  std::pair<numeric_index_type, Real> error_pair(first_index+max_err_index, max_err);
   get_global_max_error_pair(this->comm(),error_pair);
 
   // If we have a serial training set (i.e. a training set that is the same on all processors)
