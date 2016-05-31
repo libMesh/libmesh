@@ -1309,7 +1309,12 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
         {
           std::vector<boundary_id_type> bcids;
           if (elem)
-            boundary_info.boundary_ids(elem->node_ptr(n), bcids);
+            {
+              boundary_info.boundary_ids(elem->node_ptr(n), bcids);
+
+              // Ordering of boundary ids shouldn't matter
+              std::sort(bcids.begin(), bcids.end());
+            }
           libmesh_assert(mesh.comm().semiverify
                          (elem ? &bcids : libmesh_nullptr));
         }
@@ -1317,12 +1322,26 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
       for (unsigned short e=0; e != n_edges; ++e)
         {
           std::vector<boundary_id_type> bcids;
+
           if (elem)
-            boundary_info.edge_boundary_ids(elem, e, bcids);
+            {
+              boundary_info.edge_boundary_ids(elem, e, bcids);
+
+              // Ordering of boundary ids shouldn't matter
+              std::sort(bcids.begin(), bcids.end());
+            }
+
           libmesh_assert(mesh.comm().semiverify
                          (elem ? &bcids : libmesh_nullptr));
+
           if (elem)
-            boundary_info.raw_edge_boundary_ids(elem, e, bcids);
+            {
+              boundary_info.raw_edge_boundary_ids(elem, e, bcids);
+
+              // Ordering of boundary ids shouldn't matter
+              std::sort(bcids.begin(), bcids.end());
+            }
+
           libmesh_assert(mesh.comm().semiverify
                          (elem ? &bcids : libmesh_nullptr));
         }
@@ -1330,12 +1349,26 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
       for (unsigned short s=0; s != n_sides; ++s)
         {
           std::vector<boundary_id_type> bcids;
+
           if (elem)
-            boundary_info.boundary_ids(elem, s, bcids);
+            {
+              boundary_info.boundary_ids(elem, s, bcids);
+
+              // Ordering of boundary ids shouldn't matter
+              std::sort(bcids.begin(), bcids.end());
+            }
+
           libmesh_assert(mesh.comm().semiverify
                          (elem ? &bcids : libmesh_nullptr));
+
           if (elem)
-            boundary_info.raw_boundary_ids(elem, s, bcids);
+            {
+              boundary_info.raw_boundary_ids(elem, s, bcids);
+
+              // Ordering of boundary ids shouldn't matter
+              std::sort(bcids.begin(), bcids.end());
+            }
+
           libmesh_assert(mesh.comm().semiverify
                          (elem ? &bcids : libmesh_nullptr));
         }
