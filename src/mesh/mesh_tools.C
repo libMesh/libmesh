@@ -1372,6 +1372,33 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
           libmesh_assert(mesh.comm().semiverify
                          (elem ? &bcids : libmesh_nullptr));
         }
+
+      for (unsigned short sf=0; sf != 2; ++sf)
+        {
+          std::vector<boundary_id_type> bcids;
+
+          if (elem)
+            {
+              boundary_info.shellface_boundary_ids(elem, sf, bcids);
+
+              // Ordering of boundary ids shouldn't matter
+              std::sort(bcids.begin(), bcids.end());
+            }
+
+          libmesh_assert(mesh.comm().semiverify
+                         (elem ? &bcids : libmesh_nullptr));
+
+          if (elem)
+            {
+              boundary_info.raw_shellface_boundary_ids(elem, sf, bcids);
+
+              // Ordering of boundary ids shouldn't matter
+              std::sort(bcids.begin(), bcids.end());
+            }
+
+          libmesh_assert(mesh.comm().semiverify
+                         (elem ? &bcids : libmesh_nullptr));
+        }
     }
 }
 
