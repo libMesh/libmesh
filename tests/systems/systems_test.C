@@ -134,7 +134,9 @@ public:
 
   void testProjectCubeWithMeshFunction(const ElemType elem_type)
   {
-    Mesh mesh(*TestCommWorld);
+    // The source mesh needs to exist everywhere it's queried, so we
+    // use a ReplicatedMesh
+    ReplicatedMesh mesh(*TestCommWorld);
 
     EquationSystems es(mesh);
     System &sys = es.add_system<System> ("SimpleSystem");
