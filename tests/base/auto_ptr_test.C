@@ -17,6 +17,9 @@ public:
   // Test that we can call if (!foo) for AutoPtr
   CPPUNIT_TEST( testComparison );
 
+  // Test that the libmesh_make_unique macro works.
+  CPPUNIT_TEST( testMakeUnique );
+
   CPPUNIT_TEST_SUITE_END();
 
   // Note: this "extra" public declaration needs to be here, otherwise
@@ -71,6 +74,15 @@ public:
     // AutoPtr<int> bar(new int(21));
     // if (foo == bar)
     //   std::cerr << "This should not compile." << std::endl;
+  }
+
+  void testMakeUnique ()
+  {
+    // If the compiler supports one of the ways of calling
+    // make_unique, test that our macro works for calling it works.
+#if defined(LIBMESH_HAVE_CXX14_MAKE_UNIQUE) || defined(LIBMESH_HAVE_CXX11_MAKE_UNIQUE_WORKAROUND)
+    std::unique_ptr<int> foo = libmesh_make_unique<int>(42);
+#endif
   }
 };
 
