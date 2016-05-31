@@ -240,11 +240,11 @@ void RBSCMConstruction::perform_SCM_greedy()
   rb_scm_eval->initialize_parameters(*this);
 
   // Get a list of constrained dofs from rb_system
-  std::set<unsigned int> constrained_dofs_set;
+  std::set<dof_id_type> constrained_dofs_set;
   EquationSystems & es = this->get_equation_systems();
   RBConstruction & rb_system = es.get_system<RBConstruction>(RB_system_name);
 
-  for(unsigned int i=0; i<rb_system.n_dofs(); i++)
+  for(dof_id_type i=0; i<rb_system.n_dofs(); i++)
     {
       if( rb_system.get_dof_map().is_constrained_dof(i) )
         {
@@ -433,7 +433,7 @@ std::pair<unsigned int,Real> RBSCMConstruction::compute_SCM_bounds_on_training_s
   unsigned int new_C_J_index = 0;
   Real max_SCM_error = 0.;
 
-  unsigned int first_index = get_first_local_training_index();
+  numeric_index_type first_index = get_first_local_training_index();
   for(unsigned int i=0; i<get_local_n_training_samples(); i++)
     {
       set_params_from_training_set(first_index+i);
@@ -450,8 +450,8 @@ std::pair<unsigned int,Real> RBSCMConstruction::compute_SCM_bounds_on_training_s
         }
     }
 
-  unsigned int global_index = first_index + new_C_J_index;
-  std::pair<unsigned int,Real> error_pair(global_index, max_SCM_error);
+  numeric_index_type global_index = first_index + new_C_J_index;
+  std::pair<numeric_index_type,Real> error_pair(global_index, max_SCM_error);
   get_global_max_error_pair(this->comm(),error_pair);
 
   return error_pair;
