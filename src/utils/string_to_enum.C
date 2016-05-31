@@ -587,6 +587,7 @@ void init_linear_convergence_reason_to_enum ()
       linear_convergence_reason_to_enum["DIVERGED_INDEFINITE_PC"]    = DIVERGED_INDEFINITE_PC;
       linear_convergence_reason_to_enum["DIVERGED_NAN"]              = DIVERGED_NAN;
       linear_convergence_reason_to_enum["DIVERGED_INDEFINITE_MAT"]   = DIVERGED_INDEFINITE_MAT;
+      linear_convergence_reason_to_enum["DIVERGED_PCSETUP_FAILED"]   = DIVERGED_PCSETUP_FAILED;
       linear_convergence_reason_to_enum["CONVERGED_ITERATING"]       = CONVERGED_ITERATING;
       linear_convergence_reason_to_enum["UNKNOWN_FLAG"]              = UNKNOWN_FLAG;
     }
