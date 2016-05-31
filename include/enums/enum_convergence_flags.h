@@ -48,6 +48,7 @@ enum LinearConvergenceReason {
   DIVERGED_INDEFINITE_PC       = -8,
   DIVERGED_NAN                 = -9,
   DIVERGED_INDEFINITE_MAT      = -10,
+  DIVERGED_PCSETUP_FAILED      = -11,
 
   CONVERGED_ITERATING          =  0,
 

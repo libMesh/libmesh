@@ -1679,6 +1679,9 @@ LinearConvergenceReason PetscLinearSolver<T>::get_converged_reason() const
 #endif
     case KSP_DIVERGED_INDEFINITE_MAT   : return DIVERGED_INDEFINITE_MAT;
     case KSP_CONVERGED_ITERATING       : return CONVERGED_ITERATING;
+#if !PETSC_VERSION_LESS_THAN(3,7,0)
+    case KSP_DIVERGED_PCSETUP_FAILED   : return DIVERGED_PCSETUP_FAILED;
+#endif
     default :
       libMesh::err << "Unknown convergence flag!" << std::endl;
       return UNKNOWN_FLAG;
