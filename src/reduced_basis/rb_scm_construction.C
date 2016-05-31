@@ -240,11 +240,11 @@ void RBSCMConstruction::perform_SCM_greedy()
   rb_scm_eval->initialize_parameters(*this);
 
   // Get a list of constrained dofs from rb_system
-  std::set<unsigned int> constrained_dofs_set;
+  std::set<dof_id_type> constrained_dofs_set;
   EquationSystems & es = this->get_equation_systems();
   RBConstruction & rb_system = es.get_system<RBConstruction>(RB_system_name);
 
-  for(unsigned int i=0; i<rb_system.n_dofs(); i++)
+  for(dof_id_type i=0; i<rb_system.n_dofs(); i++)
     {
       if( rb_system.get_dof_map().is_constrained_dof(i) )
         {
