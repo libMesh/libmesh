@@ -65,6 +65,37 @@ using boost::unique_ptr;
 #define UniquePtr AutoPtr
 #endif
 
+
+
+// Set up the libmesh_make_unique macro. This is not yet used in the
+// library since it requires at least C++11, but it is provided in the
+// hope that it will be useful to application codes.  The different
+// cases are:
+// 1.) If the compiler supports C++14 std::make_unique, use that.
+// 2.) If the C++11 workaround is available, use that instead. See also:
+// http://stackoverflow.com/questions/7038357/make-unique-and-perfect-forwarding
+// 3.) Otherwise, make libmesh_make_unique something innocuous that
+// produces a somewhat understandable compiler error.
+#ifdef LIBMESH_HAVE_CXX14_MAKE_UNIQUE
+#define libmesh_make_unique std::make_unique
+
+#elif LIBMESH_HAVE_CXX11_MAKE_UNIQUE_WORKAROUND
+namespace libMesh
+{
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args)
+{
+  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+}
+#define libmesh_make_unique make_unique
+
+#else
+#define libmesh_make_unique ; Error: You cannot use libmesh_make_unique with this compiler!
+#endif
+
+
+
 namespace libMesh
 {
 
