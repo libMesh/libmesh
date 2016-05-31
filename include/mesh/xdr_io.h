@@ -169,7 +169,7 @@ public:
 
   /**
    * @return true if the current file has an XDR/XDA version that
-   * matches or exceeds 0.9.6. 
+   * matches or exceeds 0.9.6.
    */
   bool version_at_least_0_9_6() const;
 

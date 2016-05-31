@@ -1538,7 +1538,7 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
 
   // Version 0.9.2+ introduces unique ids
   const size_t unique_id_size_index = 3;
-  
+
   const bool read_unique_id =
     (version_at_least_0_9_2()) &&
     sizes[unique_id_size_index];
