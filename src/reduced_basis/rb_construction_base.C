@@ -168,7 +168,7 @@ void RBConstructionBase<Base>::set_params_from_training_set_and_broadcast(unsign
 {
   libmesh_assert(training_parameters_initialized);
 
-  unsigned int root_id = 0;
+  processor_id_type root_id = 0;
   if( (this->get_first_local_training_index() <= index) &&
       (index < this->get_last_local_training_index()) )
     {
