@@ -473,6 +473,48 @@ AC_DEFUN([LIBMESH_TEST_CXX11_UNIQUE_PTR],
   ])
 
 
+AC_DEFUN([LIBMESH_TEST_CXX14_MAKE_UNIQUE],
+  [
+    have_cxx14_make_unique=no
+
+    AC_MSG_CHECKING(for C++11 std::make_unique support)
+    AC_LANG_PUSH([C++])
+
+    # std::make_unique is actually part of the C++14 standard, but some
+    # compilers might (?) support it via the -std=c++11 flag, or eventually
+    # with no flag at all.
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <memory>
+        ]], [[
+    {
+      // Normally, you would use "auto" on the LHS here to avoid
+      // repeating the type name, but we are not testing auto here.
+      std::unique_ptr<int> up = std::make_unique<int>(42);
+    } // Foo deleted when up goes out of scope
+    ]])],[
+      if (test "x$enablecxx11" = "xyes"); then
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX14_MAKE_UNIQUE, 1, [Flag indicating whether compiler supports std::make_unique])
+        have_cxx14_make_unique=yes
+      else
+        AC_MSG_RESULT([yes, but disabled.])
+        AC_DEFINE(HAVE_CXX14_MAKE_UNIQUE_BUT_DISABLED, 1, [Compiler supports std::make_unique, but it is disabled in libmesh])
+      fi
+    ],[
+      AC_MSG_RESULT(no)
+    ])
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+
+    AM_CONDITIONAL(HAVE_CXX14_MAKE_UNIQUE, test x$have_cxx14_make_unique == xyes)
+  ])
+
+
 
 
 AC_DEFUN([LIBMESH_TEST_CXX11_REGEX],
