@@ -266,14 +266,36 @@ struct Local : abstract_multi_predicate<T>
  * Used to iterate over non-NULL, semi-local entries (i.e. are not
  * subactive and have are owned by an attached processor) in a
  * container.
+ *
+ * FIXME: This is not currently safe to use on adaptively-refined
+ * grids, it should be added back when Elem::is_semilocal() has been
+ * patched to not require the Elem to be active.
+ */
+// template <typename T>
+// struct SemiLocal : abstract_multi_predicate<T>
+// {
+//   // Constructor, pushes back two single predicates
+//   SemiLocal(processor_id_type my_pid)
+//   {
+//     this->_predicates.push_back(new not_null<T>);
+//     this->_predicates.push_back(new not_subactive<T>);
+//     this->_predicates.push_back(new semilocal_pid<T>(my_pid));
+//   }
+// };
+
+
+/**
+ * Used to iterate over non-NULL, active, non sub-active, semi-local
+ * elements in a container.
  */
 template <typename T>
-struct SemiLocal : abstract_multi_predicate<T>
+struct ActiveSemiLocal : abstract_multi_predicate<T>
 {
   // Constructor, pushes back two single predicates
-  SemiLocal(processor_id_type my_pid)
+  ActiveSemiLocal(processor_id_type my_pid)
   {
     this->_predicates.push_back(new not_null<T>);
+    this->_predicates.push_back(new active<T>);
     this->_predicates.push_back(new not_subactive<T>);
     this->_predicates.push_back(new semilocal_pid<T>(my_pid));
   }

@@ -947,6 +947,11 @@ public:
   virtual const_element_iterator local_elements_begin () const = 0;
   virtual const_element_iterator local_elements_end () const = 0;
 
+  virtual element_iterator active_semilocal_elements_begin () = 0;
+  virtual element_iterator active_semilocal_elements_end () = 0;
+  virtual const_element_iterator active_semilocal_elements_begin () const = 0;
+  virtual const_element_iterator active_semilocal_elements_end () const = 0;
+
   virtual element_iterator active_type_elements_begin (ElemType type) = 0;
   virtual element_iterator active_type_elements_end (ElemType type) = 0;
   virtual const_element_iterator active_type_elements_begin (ElemType type) const = 0;
