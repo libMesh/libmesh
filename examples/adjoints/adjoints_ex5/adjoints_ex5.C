@@ -258,6 +258,9 @@ int main (int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+  // This doesn't converge with Trilinos for some reason...
+  libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
+
   libMesh::out << "Started " << argv[0] << std::endl;
 
   // Make sure the general input file exists, and parse it
