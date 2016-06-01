@@ -1963,6 +1963,40 @@ void MeshTools::Modification::change_boundary_id (MeshBase & mesh,
   }
 
   {
+    // Build a list of all shell-faces that have boundary IDs
+    std::vector<dof_id_type> elem_list;
+    std::vector<unsigned short int> shellface_list;
+    std::vector<boundary_id_type> bc_id_list;
+    bi.build_shellface_list (elem_list, shellface_list, bc_id_list);
+
+    // Temporary vector to hold ids
+    std::vector<boundary_id_type> bndry_ids;
+
+    // For each shellface with the old_id...
+    for (unsigned idx=0; idx<elem_list.size(); ++idx)
+      if (bc_id_list[idx] == old_id)
+        {
+          // Get the elem in question
+          const Elem * elem = mesh.elem_ptr(elem_list[idx]);
+
+          // The shellface of the elem in question
+          unsigned short int shellface = shellface_list[idx];
+
+          // Get all the current IDs for the shellface in question.
+          bi.shellface_boundary_ids(elem, shellface, bndry_ids);
+
+          // Update the IDs accordingly
+          std::replace(bndry_ids.begin(), bndry_ids.end(), old_id, new_id);
+
+          // Remove all traces of that shellface from the BoundaryInfo object
+          bi.remove_shellface(elem, shellface);
+
+          // Add it back with the updated IDs
+          bi.add_shellface(elem, shellface, bndry_ids);
+        }
+  }
+
+  {
     // Build a list of all sides that have boundary IDs
     std::vector<dof_id_type> elem_list;
     std::vector<unsigned short int> side_list;
