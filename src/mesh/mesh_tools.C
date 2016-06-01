@@ -1278,6 +1278,130 @@ void MeshTools::libmesh_assert_connected_nodes (const MeshBase & mesh)
 
 namespace MeshTools {
 
+void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
+{
+  if (mesh.n_processors() == 1)
+    return;
+
+  libmesh_parallel_only(mesh.comm());
+
+  const BoundaryInfo & boundary_info = mesh.get_boundary_info();
+
+  dof_id_type pmax_elem_id = mesh.max_elem_id();
+  mesh.comm().max(pmax_elem_id);
+
+  for (dof_id_type i=0; i != pmax_elem_id; ++i)
+    {
+      const Elem *elem = mesh.query_elem_ptr(i);
+      unsigned int n_nodes = elem ? elem->n_nodes() : 0;
+      unsigned int n_edges = elem ? elem->n_edges() : 0;
+      unsigned int n_sides = elem ? elem->n_sides() : 0;
+      libmesh_assert(mesh.comm().semiverify
+                     (elem ? &n_nodes : libmesh_nullptr));
+      libmesh_assert(mesh.comm().semiverify
+                     (elem ? &n_edges : libmesh_nullptr));
+      libmesh_assert(mesh.comm().semiverify
+                     (elem ? &n_sides : libmesh_nullptr));
+      mesh.comm().max(n_nodes);
+      mesh.comm().max(n_edges);
+      mesh.comm().max(n_sides);
+      for (unsigned int n=0; n != n_nodes; ++n)
+        {
+          std::vector<boundary_id_type> bcids;
+          if (elem)
+            {
+              boundary_info.boundary_ids(elem->node_ptr(n), bcids);
+
+              // Ordering of boundary ids shouldn't matter
+              std::sort(bcids.begin(), bcids.end());
+            }
+          libmesh_assert(mesh.comm().semiverify
+                         (elem ? &bcids : libmesh_nullptr));
+        }
+
+      for (unsigned short e=0; e != n_edges; ++e)
+        {
+          std::vector<boundary_id_type> bcids;
+
+          if (elem)
+            {
+              boundary_info.edge_boundary_ids(elem, e, bcids);
+
+              // Ordering of boundary ids shouldn't matter
+              std::sort(bcids.begin(), bcids.end());
+            }
+
+          libmesh_assert(mesh.comm().semiverify
+                         (elem ? &bcids : libmesh_nullptr));
+
+          if (elem)
+            {
+              boundary_info.raw_edge_boundary_ids(elem, e, bcids);
+
+              // Ordering of boundary ids shouldn't matter
+              std::sort(bcids.begin(), bcids.end());
+            }
+
+          libmesh_assert(mesh.comm().semiverify
+                         (elem ? &bcids : libmesh_nullptr));
+        }
+
+      for (unsigned short s=0; s != n_sides; ++s)
+        {
+          std::vector<boundary_id_type> bcids;
+
+          if (elem)
+            {
+              boundary_info.boundary_ids(elem, s, bcids);
+
+              // Ordering of boundary ids shouldn't matter
+              std::sort(bcids.begin(), bcids.end());
+            }
+
+          libmesh_assert(mesh.comm().semiverify
+                         (elem ? &bcids : libmesh_nullptr));
+
+          if (elem)
+            {
+              boundary_info.raw_boundary_ids(elem, s, bcids);
+
+              // Ordering of boundary ids shouldn't matter
+              std::sort(bcids.begin(), bcids.end());
+            }
+
+          libmesh_assert(mesh.comm().semiverify
+                         (elem ? &bcids : libmesh_nullptr));
+        }
+
+      for (unsigned short sf=0; sf != 2; ++sf)
+        {
+          std::vector<boundary_id_type> bcids;
+
+          if (elem)
+            {
+              boundary_info.shellface_boundary_ids(elem, sf, bcids);
+
+              // Ordering of boundary ids shouldn't matter
+              std::sort(bcids.begin(), bcids.end());
+            }
+
+          libmesh_assert(mesh.comm().semiverify
+                         (elem ? &bcids : libmesh_nullptr));
+
+          if (elem)
+            {
+              boundary_info.raw_shellface_boundary_ids(elem, sf, bcids);
+
+              // Ordering of boundary ids shouldn't matter
+              std::sort(bcids.begin(), bcids.end());
+            }
+
+          libmesh_assert(mesh.comm().semiverify
+                         (elem ? &bcids : libmesh_nullptr));
+        }
+    }
+}
+
 void libmesh_assert_valid_dof_ids(const MeshBase & mesh)
 {
   if (mesh.n_processors() == 1)

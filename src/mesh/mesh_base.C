@@ -194,6 +194,14 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   if(!skip_find_neighbors)
     this->find_neighbors();
 
+  // The user may have set boundary conditions.  We require that the
+  // boundary conditions were set consistently.  Because we examine
+  // neighbors when evaluating non-raw boundary condition IDs, this
+  // assert is only valid when our neighbor links are in place.
+#ifdef DEBUG
+  MeshTools::libmesh_assert_valid_boundary_ids(*this);
+#endif
+
   // Search the mesh for all the dimensions of the elements
   // and cache them.
   this->cache_elem_dims();
