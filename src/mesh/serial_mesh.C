@@ -1271,6 +1271,14 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
               other_mesh->get_boundary_info().boundary_ids(other_elem, s, bc_ids);
               this->get_boundary_info().add_side(this_elem, s, bc_ids);
             }
+
+          // Copy shellface boundary ids
+          unsigned int n_shellfaces = 2;
+          for (unsigned short shellface=0; shellface != n_shellfaces; ++shellface)
+            {
+              other_mesh->get_boundary_info().shellface_boundary_ids(other_elem, shellface, bc_ids);
+              this->get_boundary_info().add_shellface(this_elem, shellface, bc_ids);
+            }
         }
 
     } // end if(other_mesh)
