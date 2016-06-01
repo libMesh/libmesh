@@ -189,7 +189,7 @@ protected:
    * processors.
    */
   static void get_global_max_error_pair(const Parallel::Communicator & communicator,
-                                        std::pair<unsigned int, Real> & error_pair);
+                                        std::pair<numeric_index_type, Real> & error_pair);
 
   /**
    * Static helper function for generating a randomized set of parameters.
