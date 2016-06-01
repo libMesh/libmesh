@@ -297,6 +297,14 @@
 /* Compiler supports lambdas, but they are disabled in libmesh */
 #undef HAVE_CXX11_LAMBDA_BUT_DISABLED
 
+/* Flag indicating whether compiler supports C++11 std::make_unique workaround
+   */
+#undef HAVE_CXX11_MAKE_UNIQUE_WORKAROUND
+
+/* Compiler supports C++11 std::make_unique workaround, but it is disabled in
+   libmesh */
+#undef HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_BUT_DISABLED
+
 /* Flag indicating whether compiler supports std::move */
 #undef HAVE_CXX11_MOVE
 
@@ -371,6 +379,12 @@
 
 /* Compiler supports variadic templates, but it is disabled in libmesh */
 #undef HAVE_CXX11_VARIADIC_TEMPLATES_BUT_DISABLED
+
+/* Flag indicating whether compiler supports std::make_unique */
+#undef HAVE_CXX14_MAKE_UNIQUE
+
+/* Compiler supports std::make_unique, but it is disabled in libmesh */
+#undef HAVE_CXX14_MAKE_UNIQUE_BUT_DISABLED
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
