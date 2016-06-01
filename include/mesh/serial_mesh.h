@@ -264,6 +264,11 @@ public:
   virtual const_element_iterator semilocal_elements_begin () const libmesh_override;
   virtual const_element_iterator semilocal_elements_end () const libmesh_override;
 
+  virtual element_iterator active_semilocal_elements_begin () libmesh_override;
+  virtual element_iterator active_semilocal_elements_end () libmesh_override;
+  virtual const_element_iterator active_semilocal_elements_begin () const libmesh_override;
+  virtual const_element_iterator active_semilocal_elements_end () const libmesh_override;
+
   virtual element_iterator facelocal_elements_begin () libmesh_override;
   virtual element_iterator facelocal_elements_end () libmesh_override;
   virtual const_element_iterator facelocal_elements_begin () const libmesh_override;
