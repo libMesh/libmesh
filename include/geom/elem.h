@@ -322,7 +322,7 @@ public:
    * of a child of this element, this returns a pointer
    * to that child.  Otherwise it returns NULL.
    */
-  Elem * child_neighbor (Elem * elem) const;
+  Elem * child_neighbor (Elem * elem);
 
   /**
    * If the element \p elem in question is a neighbor
@@ -1766,7 +1766,7 @@ bool Elem::has_neighbor (const Elem * elem) const
 
 
 inline
-Elem * Elem::child_neighbor (Elem * elem) const
+Elem * Elem::child_neighbor (Elem * elem)
 {
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
     if (elem->neighbor(n) &&
