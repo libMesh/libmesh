@@ -629,7 +629,18 @@ public:
    * you want the full-ordered face (i.e. a 9-noded quad face for a 27-noded
    * hexahedral) use the build_side method.
    */
-  virtual UniquePtr<Elem> side (const unsigned int i) const = 0;
+  virtual UniquePtr<Elem> side_ptr (unsigned int i) = 0;
+  UniquePtr<const Elem> side_ptr (unsigned int i) const;
+
+  /**
+   * @returns a proxy element coincident with side \p i.
+   *
+   * This method will eventually be deprecated/removed, since it
+   * returns a non-const pointer to a side that could be used to
+   * indirectly modify this.  Please use the the const-correct
+   * side_ptr() function instead.
+   */
+  UniquePtr<Elem> side (const unsigned int i) const;
 
   /**
    * Creates an element coincident with side \p i. The element returned is
@@ -1710,6 +1721,28 @@ const Elem * Elem::child_neighbor (const Elem * elem) const
       return elem->neighbor(n);
 
   return libmesh_nullptr;
+}
+
+
+
+inline
+UniquePtr<const Elem> Elem::side_ptr (unsigned int i) const
+{
+  // Call the non-const version of this function, return the result as
+  // a UniquePtr<const Elem>.
+  Elem * me = const_cast<Elem *>(this);
+  const Elem * s = const_cast<const Elem *>(me->side_ptr(i).release());
+  return UniquePtr<const Elem>(s);
+}
+
+
+
+inline
+UniquePtr<Elem> Elem::side (const unsigned int i) const
+{
+  // Call the const version of side_ptr(), and const_cast the result.
+  Elem * s = const_cast<Elem *>(this->side_ptr(i).release());
+  return UniquePtr<Elem>(s);
 }
 
 

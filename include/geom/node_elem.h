@@ -114,7 +114,7 @@ public:
   /**
    * The \p Elem::side() member makes no sense for nodes.
    */
-  virtual UniquePtr<Elem> side (const unsigned int) const libmesh_override
+  virtual UniquePtr<Elem> side_ptr (const unsigned int) libmesh_override
   { libmesh_not_implemented(); return UniquePtr<Elem>(); }
 
   /**

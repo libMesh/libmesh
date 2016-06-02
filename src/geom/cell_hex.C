@@ -83,7 +83,7 @@ dof_id_type Hex::key (const unsigned int s) const
 
 
 
-UniquePtr<Elem> Hex::side (const unsigned int i) const
+UniquePtr<Elem> Hex::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 

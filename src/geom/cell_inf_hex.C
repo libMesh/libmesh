@@ -83,7 +83,7 @@ dof_id_type InfHex::key (const unsigned int s) const
 
 
 
-UniquePtr<Elem> InfHex::side (const unsigned int i) const
+UniquePtr<Elem> InfHex::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 

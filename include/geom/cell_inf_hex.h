@@ -125,7 +125,7 @@ public:
    * @returns a primitive (4-noded) quad or infquad for
    * face i.
    */
-  virtual UniquePtr<Elem> side (const unsigned int i) const libmesh_override;
+  virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;
 
   /**
    * Based on the quality metric q specified by the user,

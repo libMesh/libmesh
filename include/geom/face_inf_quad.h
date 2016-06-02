@@ -144,7 +144,7 @@ public:
    * @returns a primitive (2-noded) edge or infedge for
    * edge \p i.
    */
-  virtual UniquePtr<Elem> side (const unsigned int i) const libmesh_override;
+  virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;
 
   /**
    * build_edge and build_side are identical in 2D

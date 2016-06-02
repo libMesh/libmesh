@@ -138,7 +138,7 @@ public:
    * @returns a primitive (2-noded) edge for
    * edge i.
    */
-  virtual UniquePtr<Elem> side (const unsigned int i) const libmesh_override;
+  virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;
 
   /**
    * Based on the quality metric q specified by the user,

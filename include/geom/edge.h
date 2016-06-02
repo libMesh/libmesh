@@ -137,7 +137,7 @@ public:
    * The \p Elem::side() member returns
    * an auto pointer to a NodeElem for the specified node.
    */
-  virtual UniquePtr<Elem> side (const unsigned int i) const libmesh_override;
+  virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;
 
   /**
    * The \p Elem::side() member returns

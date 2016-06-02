@@ -148,7 +148,7 @@ public:
   virtual unsigned int n_sub_elem () const libmesh_override
   { libmesh_not_implemented(); return 0; }
 
-  virtual UniquePtr<Elem> side (const unsigned int) const libmesh_override
+  virtual UniquePtr<Elem> side_ptr (const unsigned int) libmesh_override
   { libmesh_not_implemented(); return UniquePtr<Elem>(); }
 
   virtual UniquePtr<Elem> build_side (const unsigned int,
