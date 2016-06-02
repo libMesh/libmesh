@@ -35,7 +35,7 @@ UniquePtr<Elem> Edge::side_ptr (const unsigned int i)
 }
 
 
-UniquePtr<Elem> Edge::build_side (const unsigned int i, bool) const
+UniquePtr<Elem> Edge::build_side_ptr (const unsigned int i, bool)
 {
   libmesh_assert_less (i, 2);
   const Elem * the_parent = this;

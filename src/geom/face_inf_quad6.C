@@ -133,8 +133,8 @@ dof_id_type InfQuad6::key (const unsigned int s) const
 
 
 
-UniquePtr<Elem> InfQuad6::build_side (const unsigned int i,
-                                      bool proxy) const
+UniquePtr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
+                                          bool proxy)
 {
   // libmesh_assert_less (i, this->n_sides());
 

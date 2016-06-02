@@ -135,15 +135,15 @@ public:
    * built coincident with faces 1 to 4. Note that the \p UniquePtr<Elem>
    * takes care of freeing memory.
    */
-  virtual UniquePtr<Elem> build_side (const unsigned int i,
-                                      bool proxy) const libmesh_override;
+  virtual UniquePtr<Elem> build_side_ptr (const unsigned int i,
+                                          bool proxy) libmesh_override;
 
   /**
    * Returns a \p EDGE3 built coincident with edges 0 to 3, or \p INFEDGE2
    * built coincident with edges 4 to 11. Note that the \p UniquePtr<Elem>
    * takes care of freeing memory.
    */
-  virtual UniquePtr<Elem> build_edge (const unsigned int i) const libmesh_override;
+  virtual UniquePtr<Elem> build_edge_ptr (const unsigned int i) libmesh_override;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,

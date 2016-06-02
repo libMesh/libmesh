@@ -658,8 +658,18 @@ public:
    * If you really need a full-ordered, non-proxy side object, call
    * this function with proxy=false.
    */
-  virtual UniquePtr<Elem> build_side (const unsigned int i,
-                                      bool proxy=true) const = 0;
+  virtual UniquePtr<Elem> build_side_ptr (const unsigned int i, bool proxy=true) = 0;
+  UniquePtr<const Elem> build_side_ptr (const unsigned int i, bool proxy=true) const;
+
+  /**
+   * @returns a proxy element coincident with side \p i.
+   *
+   * This method will eventually be deprecated/removed, since it
+   * returns a non-const pointer to a side that could be used to
+   * indirectly modify this.  Please use the the const-correct
+   * build_side_ptr() function instead.
+   */
+  UniquePtr<Elem> build_side (const unsigned int i, bool proxy=true) const;
 
   /**
    * Creates an element coincident with edge \p i. The element returned is
@@ -669,7 +679,18 @@ public:
    * A \p UniquePtr<Elem> is returned to prevent a memory leak.
    * This way the user need not remember to delete the object.
    */
-  virtual UniquePtr<Elem> build_edge (const unsigned int i) const = 0;
+  virtual UniquePtr<Elem> build_edge_ptr (const unsigned int i) = 0;
+  UniquePtr<const Elem> build_edge_ptr (const unsigned int i) const;
+
+  /**
+   * Creates an element coincident with edge \p i.
+   *
+   * This method will eventually be deprecated/removed, since it
+   * returns a non-const pointer to an edge that could be used to
+   * indirectly modify this.  Please use the the const-correct
+   * build_edge_ptr() function instead.
+   */
+  UniquePtr<Elem> build_edge (const unsigned int i) const;
 
   /**
    * @returns the default approximation order for this element type.
@@ -1743,6 +1764,54 @@ UniquePtr<Elem> Elem::side (const unsigned int i) const
   // Call the const version of side_ptr(), and const_cast the result.
   Elem * s = const_cast<Elem *>(this->side_ptr(i).release());
   return UniquePtr<Elem>(s);
+}
+
+
+
+inline
+UniquePtr<const Elem>
+Elem::build_side_ptr (const unsigned int i, bool proxy) const
+{
+  // Call the non-const version of this function, return the result as
+  // a UniquePtr<const Elem>.
+  Elem * me = const_cast<Elem *>(this);
+  const Elem * s = const_cast<const Elem *>(me->build_side_ptr(i, proxy).release());
+  return UniquePtr<const Elem>(s);
+}
+
+
+
+inline
+UniquePtr<Elem>
+Elem::build_side (const unsigned int i, bool proxy) const
+{
+  // Call the const version of build_side_ptr(), and const_cast the result.
+  Elem * s = const_cast<Elem *>(this->build_side_ptr(i, proxy).release());
+  return UniquePtr<Elem>(s);
+}
+
+
+
+inline
+UniquePtr<const Elem>
+Elem::build_edge_ptr (const unsigned int i) const
+{
+  // Call the non-const version of this function, return the result as
+  // a UniquePtr<const Elem>.
+  Elem * me = const_cast<Elem *>(this);
+  const Elem * e = const_cast<const Elem *>(me->build_edge_ptr(i).release());
+  return UniquePtr<const Elem>(e);
+}
+
+
+
+inline
+UniquePtr<Elem>
+Elem::build_edge (const unsigned int i) const
+{
+  // Call the const version of build_edge_ptr(), and const_cast the result.
+  Elem * e = const_cast<Elem *>(this->build_edge_ptr(i).release());
+  return UniquePtr<Elem>(e);
 }
 
 
