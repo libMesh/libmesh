@@ -47,7 +47,7 @@ const boundary_id_type BoundaryInfo::invalid_id = -123;
 
 //------------------------------------------------------
 // BoundaryInfo functions
-BoundaryInfo::BoundaryInfo(const MeshBase & m) :
+BoundaryInfo::BoundaryInfo(MeshBase & m) :
   ParallelObject(m.comm()),
   _mesh (m)
 {
@@ -412,12 +412,12 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
     {
       const dof_id_type elem_id = it->first;
       const unsigned char s = it->second;
-      const Elem * elem = _mesh.elem_ptr(elem_id);
+      Elem * elem = _mesh.elem_ptr(elem_id);
 
       // Build the side - do not use a "proxy" element here:
       // This will be going into the boundary_mesh and needs to
       // stand on its own.
-      UniquePtr<Elem> side (elem->build_side(s, false));
+      UniquePtr<Elem> side (elem->build_side_ptr(s, false));
 
       side->processor_id() = elem->processor_id();
 

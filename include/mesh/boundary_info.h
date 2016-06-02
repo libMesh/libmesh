@@ -62,7 +62,7 @@ protected:
    * by the Mesh class.  A user should never instantiate
    * this class.  Therefore the constructor is protected.
    */
-  BoundaryInfo (const MeshBase & m);
+  BoundaryInfo (MeshBase & m);
 
 public:
   /**
@@ -724,7 +724,7 @@ private:
   /**
    * The Mesh this boundary info pertains to.
    */
-  const MeshBase & _mesh;
+  MeshBase & _mesh;
 
   /**
    * Data structure that maps nodes in the mesh
