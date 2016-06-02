@@ -551,12 +551,14 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
    * them with an equivalent second-order element.  Don't
    * forget to delete the low-order element, or else it will leak!
    */
-  const_element_iterator endit = elements_end();
-  for (const_element_iterator it = elements_begin();
-       it != endit; ++it)
+  element_iterator
+    it = elements_begin(),
+    endit = elements_end();
+
+  for (; it != endit; ++it)
     {
       // the linear-order element
-      const Elem * lo_elem = *it;
+      Elem * lo_elem = *it;
 
       libmesh_assert(lo_elem);
 
