@@ -1010,10 +1010,10 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
 
           for ( ; it != end_elem; ++it)
             {
-              if (variable.active_on_subdomain((*it)->subdomain_id()))
-                {
-                  const Elem * elem = *it;
+              const Elem * elem = *it;
 
+              if (variable.active_on_subdomain(elem->subdomain_id()))
+                {
                   dof_map.dof_indices (elem, dof_indices, var);
 
                   libmesh_assert_equal_to (1, dof_indices.size());
