@@ -144,6 +144,12 @@ public:
    */
   std::pair<Real, Real> min_and_max_angle() const;
 
+  /**
+   * Specialization for tri3 elements. These elements are guaranteed to be planar
+   * so a simple linear geometric test can be used.
+   */
+  virtual bool contains_point (const Point & p, Real tol) const libmesh_override;
+
 protected:
 
   /**
