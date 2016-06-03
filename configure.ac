@@ -223,6 +223,7 @@ LIBMESH_TEST_CXX11_DELETED_FUNCTIONS
 LIBMESH_TEST_CXX11_FINAL
 LIBMESH_TEST_CXX11_NULLPTR
 LIBMESH_TEST_CXX11_TO_STRING
+LIBMESH_TEST_CXX11_NOEXCEPT
 
 #-----------------------------------------------------
 # Initialize libtool.  By default, we will build
