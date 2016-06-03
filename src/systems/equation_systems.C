@@ -914,14 +914,18 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
   dof_id_type nv = 0;
 
   // Find the total number of variables to output
+  std::vector<std::vector<unsigned> > do_output(_systems.size());
   {
     const_system_iterator       pos = _systems.begin();
     const const_system_iterator end = _systems.end();
+    unsigned sys_ctr = 0;
 
-    for (; pos != end; ++pos)
+    for (; pos != end; ++pos, ++sys_ctr)
       {
         const System & system = *(pos->second);
         const unsigned int nv_sys = system.n_vars();
+
+        do_output[sys_ctr].resize(nv_sys);
 
         for (unsigned int var=0; var < nv_sys; ++var)
           {
@@ -929,7 +933,9 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
                  (is_filter_names && std::find(filter_names.begin(), filter_names.end(), system.variable_name(var)) == filter_names.end()))
               continue;
 
+            // Otherwise, this variable should be output
             nv++;
+            do_output[sys_ctr][var] = 1;
           }
       }
   }
@@ -968,8 +974,9 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
   // format.
   const_system_iterator       pos = _systems.begin();
   const const_system_iterator end = _systems.end();
+  unsigned sys_ctr = 0;
 
-  for (; pos != end; ++pos)
+  for (; pos != end; ++pos, ++sys_ctr)
     {
       const System & system  = *(pos->second);
       const unsigned int nv_sys = system.n_vars();
@@ -996,8 +1003,8 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
       // Loop over the variable names and load them in order
       for (unsigned int var=0; var < nv_sys; ++var)
         {
-          if (system.variable_type(var) != type ||
-               (is_filter_names && std::find(filter_names.begin(), filter_names.end(), system.variable_name(var)) == filter_names.end()))
+          // Skip this variable if we are not outputting it.
+          if (!do_output[sys_ctr][var])
             continue;
 
           names.push_back(system.variable_name(var));
