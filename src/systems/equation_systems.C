@@ -889,14 +889,14 @@ void EquationSystems::build_solution_vector (std::vector<Number> & soln,
 
 
 void EquationSystems::get_solution (std::vector<Number> & soln,
-                                    std::vector<std::string> & names ) const
+                                    std::vector<std::string> & names) const
 {
   // This function must be run on all processors at once
   parallel_object_only();
 
   libmesh_assert (this->n_systems());
 
-  const dof_id_type ne  = _mesh.n_elem();
+  const dof_id_type ne = _mesh.n_elem();
 
   libmesh_assert_equal_to (ne, _mesh.max_elem_id());
 
@@ -904,7 +904,7 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
   // with names included in that list.  Note: The names vector may be
   // reordered upon exiting this function
   std::vector<std::string> filter_names = names;
-  bool is_filter_names = ! filter_names.empty();
+  bool is_filter_names = !filter_names.empty();
 
   soln.clear();
   names.clear();
@@ -914,27 +914,34 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
   dof_id_type nv = 0;
 
   // Find the total number of variables to output
+  std::vector<std::vector<unsigned> > do_output(_systems.size());
   {
     const_system_iterator       pos = _systems.begin();
     const const_system_iterator end = _systems.end();
+    unsigned sys_ctr = 0;
 
-    for (; pos != end; ++pos)
+    for (; pos != end; ++pos, ++sys_ctr)
       {
-        const System & system  = *(pos->second);
+        const System & system = *(pos->second);
         const unsigned int nv_sys = system.n_vars();
+
+        do_output[sys_ctr].resize(nv_sys);
 
         for (unsigned int var=0; var < nv_sys; ++var)
           {
-            if ( system.variable_type( var ) != type ||
-                 ( is_filter_names && std::find(filter_names.begin(), filter_names.end(), system.variable_name( var )) == filter_names.end()) )
+            if (system.variable_type(var) != type ||
+                 (is_filter_names && std::find(filter_names.begin(), filter_names.end(), system.variable_name(var)) == filter_names.end()))
               continue;
 
+            // Otherwise, this variable should be output
             nv++;
+            do_output[sys_ctr][var] = 1;
           }
       }
   }
 
-  if(!nv) // If there are no variables to write out don't do anything...
+  // If there are no variables to write out don't do anything...
+  if (!nv)
     return;
 
   // We can handle the case where there are NULLs in the Elem vector
@@ -967,8 +974,9 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
   // format.
   const_system_iterator       pos = _systems.begin();
   const const_system_iterator end = _systems.end();
+  unsigned sys_ctr = 0;
 
-  for (; pos != end; ++pos)
+  for (; pos != end; ++pos, ++sys_ctr)
     {
       const System & system  = *(pos->second);
       const unsigned int nv_sys = system.n_vars();
@@ -989,16 +997,17 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
 
       NumericVector<Number> & sys_soln(*system.current_local_solution);
 
-      std::vector<dof_id_type> dof_indices; // The DOF indices for the finite element
+      // The DOF indices for the finite element
+      std::vector<dof_id_type> dof_indices;
 
       // Loop over the variable names and load them in order
       for (unsigned int var=0; var < nv_sys; ++var)
         {
-          if ( system.variable_type( var ) != type ||
-               ( is_filter_names && std::find(filter_names.begin(), filter_names.end(), system.variable_name( var )) == filter_names.end()) )
+          // Skip this variable if we are not outputting it.
+          if (!do_output[sys_ctr][var])
             continue;
 
-          names.push_back( system.variable_name( var ) );
+          names.push_back(system.variable_name(var));
 
           const Variable & variable = system.variable(var);
           const DofMap & dof_map = system.get_dof_map();
@@ -1008,13 +1017,13 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
 
           for ( ; it != end_elem; ++it)
             {
-              if (variable.active_on_subdomain((*it)->subdomain_id()))
-                {
-                  const Elem * elem = *it;
+              const Elem * elem = *it;
 
+              if (variable.active_on_subdomain(elem->subdomain_id()))
+                {
                   dof_map.dof_indices (elem, dof_indices, var);
 
-                  libmesh_assert_equal_to ( 1, dof_indices.size() );
+                  libmesh_assert_equal_to (1, dof_indices.size());
 
                   parallel_soln.set((ne*var_num)+elem->id(), sys_soln(dof_indices[0]));
                 }
