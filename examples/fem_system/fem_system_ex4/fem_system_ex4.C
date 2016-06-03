@@ -66,6 +66,9 @@ int main (int argc, char ** argv)
   // This doesn't converge with Eigen BICGSTAB for some reason...
   libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc");
 
+  // This doesn't converge without at least double precision
+  libmesh_example_requires(sizeof(Real) > 4, "--disable-singleprecision");
+
   // Parse the input file
   GetPot infile("fem_system_ex4.in");
 

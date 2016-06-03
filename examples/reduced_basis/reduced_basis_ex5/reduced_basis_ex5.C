@@ -95,6 +95,14 @@ int main(int argc, char ** argv)
   libmesh_example_requires(false, "double precision");
 #endif
 
+  // Eigen can take forever to solve the offline mode portion of this
+  // example
+  libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc or --enable-laspack");
+
+  // Trilinos reports "true residual is too large" in the offline mode
+  // portion of this example
+  libmesh_example_requires(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc or --enable-laspack");
+
   // This example only works if libMesh was compiled for 3D
   const unsigned int dim = 3;
   libmesh_example_requires(dim == LIBMESH_DIM, "3D support");
