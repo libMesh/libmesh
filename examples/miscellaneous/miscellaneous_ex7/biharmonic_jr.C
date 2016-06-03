@@ -269,8 +269,8 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
   // compute the element matrix and right-hand-side contribution.  See
   // example 3 for a discussion of the element iterators.
 
-  MeshBase::const_element_iterator       el     = _biharmonic._mesh->active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = _biharmonic._mesh->active_local_elements_end();
+  MeshBase::const_element_iterator       el     = _biharmonic._mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = _biharmonic._mesh.active_local_elements_end();
 
   for ( ; el != end_el; ++el)
     {
@@ -533,8 +533,8 @@ void Biharmonic::JR::bounds(NumericVector<Number> & XL,
   // the element degrees of freedom get mapped.
   std::vector<dof_id_type> dof_indices;
 
-  MeshBase::const_element_iterator       el     = _biharmonic._mesh->active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = _biharmonic._mesh->active_local_elements_end();
+  MeshBase::const_element_iterator       el     = _biharmonic._mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = _biharmonic._mesh.active_local_elements_end();
 
   for ( ; el != end_el; ++el)
     {
