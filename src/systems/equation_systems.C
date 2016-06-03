@@ -900,11 +900,6 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
 
   libmesh_assert_equal_to (ne, _mesh.max_elem_id());
 
-  // Get the number of local elements
-  dof_id_type n_local_elems = cast_int<dof_id_type>
-    (std::distance(_mesh.local_elements_begin(),
-                   _mesh.local_elements_end()));
-
   // If the names vector has entries, we will only populate the soln vector
   // with names included in that list.  Note: The names vector may be
   // reordered upon exiting this function
@@ -942,10 +937,27 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
   if(!nv) // If there are no variables to write out don't do anything...
     return;
 
+  // We can handle the case where there are NULLs in the Elem vector
+  // by just having extra zeros in the solution vector.
+  numeric_index_type parallel_soln_global_size = ne*nv;
+
+  numeric_index_type div = parallel_soln_global_size / this->n_processors();
+  numeric_index_type mod = parallel_soln_global_size % this->n_processors();
+
+  // Initialize all processors to the average size.
+  numeric_index_type parallel_soln_local_size = div;
+
+  // The first "mod" processors get an extra entry.
+  if (this->processor_id() < mod)
+    parallel_soln_local_size = div+1;
+
   // Create a NumericVector to hold the parallel solution
   UniquePtr<NumericVector<Number> > parallel_soln_ptr = NumericVector<Number>::build(_communicator);
   NumericVector<Number> & parallel_soln = *parallel_soln_ptr;
-  parallel_soln.init(ne*nv, n_local_elems*nv, false, PARALLEL);
+  parallel_soln.init(parallel_soln_global_size,
+                     parallel_soln_local_size,
+                     /*fast=*/false,
+                     /*ParallelType=*/PARALLEL);
 
   dof_id_type var_num = 0;
 
