@@ -1309,7 +1309,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                       boundary_id_type b_id = boundary_info.boundary_id(*el, s);
 
                       // Need to build the full-ordered side!
-                      UniquePtr<Elem> side = base_hex->build_side(s);
+                      UniquePtr<Elem> side = base_hex->build_side_ptr(s);
 
                       if ((type == TET4) || (type == TET10))
                         {
@@ -1880,9 +1880,9 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
           Elem * elem = *it;
 
           for (unsigned int s=0; s<elem->n_sides(); s++)
-            if (elem->neighbor(s) == libmesh_nullptr || (mesh.mesh_dimension() == 2 && !flat))
+            if (elem->neighbor_ptr(s) == libmesh_nullptr || (mesh.mesh_dimension() == 2 && !flat))
               {
-                UniquePtr<Elem> side(elem->build_side(s));
+                UniquePtr<Elem> side(elem->build_side_ptr(s));
 
                 // Pop each point to the sphere boundary
                 for (unsigned int n=0; n<side->n_nodes(); n++)
@@ -1927,9 +1927,9 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
           Elem * elem = *it;
 
           for (unsigned int s=0; s<elem->n_sides(); s++)
-            if (elem->neighbor(s) == libmesh_nullptr)
+            if (elem->neighbor_ptr(s) == libmesh_nullptr)
               {
-                UniquePtr<Elem> side(elem->build_side(s));
+                UniquePtr<Elem> side(elem->build_side_ptr(s));
 
                 // Pop each point to the sphere boundary
                 for (unsigned int n=0; n<side->n_nodes(); n++)
@@ -1953,7 +1953,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
       {
         Elem * elem = *it;
         for (unsigned short s=0; s != elem->n_sides(); ++s)
-          if (!elem->neighbor(s))
+          if (!elem->neighbor_ptr(s))
             boundary_info.add_side(elem, s, 0);
       }
   }
@@ -2290,9 +2290,9 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
       const Elem * elem = *el;
 
       for (unsigned int s=0; s<elem->n_sides(); s++)
-        if (elem->neighbor(s) == libmesh_nullptr)
+        if (elem->neighbor_ptr(s) == libmesh_nullptr)
           {
-            UniquePtr<Elem> side (elem->build_side(s));
+            UniquePtr<const Elem> side (elem->build_side_ptr(s));
 
             // Check the location of the side's midpoint.  Since
             // the square has straight sides, the midpoint is not

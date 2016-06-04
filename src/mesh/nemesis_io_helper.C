@@ -1261,9 +1261,9 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
       // Loop over element's neighbors, see if it has a neighbor which is off-processor
       for (unsigned int n=0; n<elem->n_neighbors(); ++n)
         {
-          if (elem->neighbor(n) != libmesh_nullptr)
+          if (elem->neighbor_ptr(n) != libmesh_nullptr)
             {
-              unsigned neighbor_proc_id = elem->neighbor(n)->processor_id();
+              unsigned neighbor_proc_id = elem->neighbor_ptr(n)->processor_id();
 
               // If my neighbor has a different processor ID, I must be a border element.
               // Also track the neighboring processor ID if it is are different from our processor ID

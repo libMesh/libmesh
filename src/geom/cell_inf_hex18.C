@@ -131,8 +131,8 @@ dof_id_type InfHex18::key (const unsigned int s) const
 
 
 
-UniquePtr<Elem> InfHex18::build_side (const unsigned int i,
-                                      bool proxy) const
+UniquePtr<Elem> InfHex18::build_side_ptr (const unsigned int i,
+                                          bool proxy)
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -200,7 +200,7 @@ UniquePtr<Elem> InfHex18::build_side (const unsigned int i,
 
 
 
-UniquePtr<Elem> InfHex18::build_edge (const unsigned int i) const
+UniquePtr<Elem> InfHex18::build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());
 

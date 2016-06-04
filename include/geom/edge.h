@@ -137,19 +137,19 @@ public:
    * The \p Elem::side() member returns
    * an auto pointer to a NodeElem for the specified node.
    */
-  virtual UniquePtr<Elem> side (const unsigned int i) const libmesh_override;
+  virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;
 
   /**
    * The \p Elem::side() member returns
    * an auto pointer to a NodeElem for the specified node.
    */
-  virtual UniquePtr<Elem> build_side (const unsigned int i,
-                                      bool proxy) const libmesh_override;
+  virtual UniquePtr<Elem> build_side_ptr (const unsigned int i,
+                                          bool proxy) libmesh_override;
 
   /**
-   * The \p Elem::build_edge() member makes no sense for edges.
+   * The \p Elem::build_edge_ptr() member makes no sense for edges.
    */
-  virtual UniquePtr<Elem> build_edge (const unsigned int) const libmesh_override
+  virtual UniquePtr<Elem> build_edge_ptr (const unsigned int) libmesh_override
   { libmesh_not_implemented(); return UniquePtr<Elem>(); }
 
 

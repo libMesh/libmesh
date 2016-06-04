@@ -531,7 +531,7 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
 
             for (unsigned int c=0; c<parent->n_children(); c++, my_next_elem++)
               {
-                const Elem * child = parent->child(c);
+                const Elem * child = parent->child_ptr(c);
                 pack_element (xfer_conn, child, parent_id, parent_pid);
 
                 // this aproach introduces the possibility that we write

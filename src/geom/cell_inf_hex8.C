@@ -102,8 +102,8 @@ bool InfHex8::is_node_on_edge(const unsigned int n,
   return false;
 }
 
-UniquePtr<Elem> InfHex8::build_side (const unsigned int i,
-                                     bool proxy) const
+UniquePtr<Elem> InfHex8::build_side_ptr (const unsigned int i,
+                                         bool proxy)
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -169,7 +169,7 @@ UniquePtr<Elem> InfHex8::build_side (const unsigned int i,
 }
 
 
-UniquePtr<Elem> InfHex8::build_edge (const unsigned int i) const
+UniquePtr<Elem> InfHex8::build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());
 

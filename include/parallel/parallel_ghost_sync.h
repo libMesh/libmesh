@@ -421,7 +421,7 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
         {
           Elem & parent = mesh.elem_ref(request_to_fill_parent_id[i]);
           libmesh_assert(parent.has_children());
-          Elem * child = parent.child(request_to_fill_child_num[i]);
+          Elem * child = parent.child_ptr(request_to_fill_child_num[i]);
           libmesh_assert(child);
           libmesh_assert(child->active());
           request_to_fill_id[i] = child->id();
@@ -585,7 +585,7 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
           const unsigned int n = request_to_fill_node_num[i];
           libmesh_assert_less (n, elem.n_nodes());
 
-          Node & node = elem.node_ref(n);
+          const Node & node = elem.node_ref(n);
 
           // This isn't a safe assertion in the case where we're
           // synching processor ids

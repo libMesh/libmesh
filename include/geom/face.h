@@ -66,8 +66,8 @@ public:
   /**
    * build_side and build_edge are identical for faces
    */
-  virtual UniquePtr<Elem> build_edge (const unsigned int i) const libmesh_override
-  { return build_side(i); }
+  virtual UniquePtr<Elem> build_edge_ptr (const unsigned int i) libmesh_override
+  { return build_side_ptr(i); }
 
   /*
    * is_edge_on_side is trivial in 2D

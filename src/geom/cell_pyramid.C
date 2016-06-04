@@ -84,7 +84,7 @@ dof_id_type Pyramid::key (const unsigned int s) const
 
 
 
-UniquePtr<Elem> Pyramid::side (const unsigned int i) const
+UniquePtr<Elem> Pyramid::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 

@@ -52,7 +52,7 @@ void Elem::refine (MeshRefinement & mesh_refinement)
       for (unsigned int c=0; c<this->n_children(); c++)
         {
           _children[c] = Elem::build(this->type(), this).release();
-          Elem * current_child = this->child(c);
+          Elem * current_child = this->child_ptr(c);
 
           current_child->set_refinement_flag(Elem::JUST_REFINED);
           current_child->set_p_level(parent_p_level);
@@ -76,7 +76,7 @@ void Elem::refine (MeshRefinement & mesh_refinement)
       unsigned int parent_p_level = this->p_level();
       for (unsigned int c=0; c<this->n_children(); c++)
         {
-          Elem * current_child = this->child(c);
+          Elem * current_child = this->child_ptr(c);
           libmesh_assert(current_child->subactive());
           current_child->set_refinement_flag(Elem::JUST_REFINED);
           current_child->set_p_level(parent_p_level);
@@ -93,8 +93,8 @@ void Elem::refine (MeshRefinement & mesh_refinement)
 
   for (unsigned int c=0; c<this->n_children(); c++)
     {
-      libmesh_assert_equal_to (this->child(c)->parent(), this);
-      libmesh_assert(this->child(c)->active());
+      libmesh_assert_equal_to (this->child_ptr(c)->parent(), this);
+      libmesh_assert(this->child_ptr(c)->active());
     }
   libmesh_assert (this->ancestor());
 }
@@ -115,7 +115,7 @@ void Elem::coarsen()
   // re-compute hanging node nodal locations
   for (unsigned int c=0; c<this->n_children(); c++)
     {
-      Elem * mychild = this->child(c);
+      Elem * mychild = this->child_ptr(c);
       if (mychild == remote_elem)
         continue;
       for (unsigned int nc=0; nc<mychild->n_nodes(); nc++)
@@ -150,7 +150,7 @@ void Elem::coarsen()
 
   for (unsigned int c=0; c<this->n_children(); c++)
     {
-      Elem * mychild = this->child(c);
+      Elem * mychild = this->child_ptr(c);
       if (mychild == remote_elem)
         continue;
       libmesh_assert_equal_to (mychild->refinement_flag(), Elem::COARSEN);

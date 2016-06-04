@@ -160,14 +160,24 @@ public:
   const Node * const * get_nodes () const;
 
   /**
-   * @returns the pointer to local \p Node \p i.
+   * @returns a const pointer to local \p Node \p i.
    */
-  Node * node_ptr (const unsigned int i) const;
+  const Node * node_ptr (const unsigned int i) const;
 
   /**
-   * @returns a reference to local \p Node \p i.
+   * @returns a non-const pointer to local \p Node \p i.
    */
-  Node & node_ref (const unsigned int i) const;
+  Node * node_ptr (const unsigned int i);
+
+  /**
+   * @returns a const reference to local \p Node \p i.
+   */
+  const Node & node_ref (const unsigned int i) const;
+
+  /**
+   * @returns a writable reference to local \p Node \p i.
+   */
+  Node & node_ref (const unsigned int i);
 
   /**
    * @returns the pointer to local \p Node \p i.
@@ -243,13 +253,25 @@ public:
   bool operator == (const Elem & rhs) const;
 
   /**
-   * @returns a pointer to the \f$ i^{th} \f$ neighbor of this element.
+   * @returns a const pointer to the \f$ i^{th} \f$ neighbor of this element.
    * If \p MeshBase::find_neighbors() has not been called this
    * simply returns \p NULL.  If \p MeshBase::find_neighbors()
    * has been called and this returns \p NULL then the side is on
    * a boundary of the domain.
    */
+  const Elem * neighbor_ptr (unsigned int i) const;
+
+  /**
+   * @returns a non-const pointer to the \f$ i^{th} \f$ neighbor of this element.
+   */
+  Elem * neighbor_ptr (unsigned int i);
+
+  /**
+   * This function is deprecated.  Use the more specifically named and
+   * const-correct neighbor_ptr() functions instead.
+   */
   Elem * neighbor (const unsigned int i) const;
+
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   /**
@@ -300,7 +322,7 @@ public:
    * of a child of this element, this returns a pointer
    * to that child.  Otherwise it returns NULL.
    */
-  Elem * child_neighbor (Elem * elem) const;
+  Elem * child_neighbor (Elem * elem);
 
   /**
    * If the element \p elem in question is a neighbor
@@ -331,7 +353,7 @@ public:
 
   /**
    * This function tells you which side the boundary element \p e is.
-   * I.e. if e = a->build_side(s) or e = a->side(s); then
+   * I.e. if e = a->build_side_ptr(s) or e = a->side_ptr(s); then
    * a->which_side_am_i(e) will be s.
    *
    * Returns \p invalid_uint if \p e is not a side of \p this
@@ -619,12 +641,23 @@ public:
    * you want the full-ordered face (i.e. a 9-noded quad face for a 27-noded
    * hexahedral) use the build_side method.
    */
-  virtual UniquePtr<Elem> side (const unsigned int i) const = 0;
+  virtual UniquePtr<Elem> side_ptr (unsigned int i) = 0;
+  UniquePtr<const Elem> side_ptr (unsigned int i) const;
+
+  /**
+   * @returns a proxy element coincident with side \p i.
+   *
+   * This method will eventually be deprecated/removed, since it
+   * returns a non-const pointer to a side that could be used to
+   * indirectly modify this.  Please use the the const-correct
+   * side_ptr() function instead.
+   */
+  UniquePtr<Elem> side (const unsigned int i) const;
 
   /**
    * Creates an element coincident with side \p i. The element returned is
    * full-ordered, in contrast to the side method.  For example, calling
-   * build_side(0) on a 20-noded hex will build a 8-noded quadrilateral
+   * build_side_ptr(0) on a 20-noded hex will build a 8-noded quadrilateral
    * coincident with face 0 and pass back the pointer.
    *
    * A \p UniquePtr<Elem> is returned to prevent a memory leak.
@@ -637,18 +670,39 @@ public:
    * If you really need a full-ordered, non-proxy side object, call
    * this function with proxy=false.
    */
-  virtual UniquePtr<Elem> build_side (const unsigned int i,
-                                      bool proxy=true) const = 0;
+  virtual UniquePtr<Elem> build_side_ptr (const unsigned int i, bool proxy=true) = 0;
+  UniquePtr<const Elem> build_side_ptr (const unsigned int i, bool proxy=true) const;
+
+  /**
+   * @returns a proxy element coincident with side \p i.
+   *
+   * This method will eventually be deprecated/removed, since it
+   * returns a non-const pointer to a side that could be used to
+   * indirectly modify this.  Please use the the const-correct
+   * build_side_ptr() function instead.
+   */
+  UniquePtr<Elem> build_side (const unsigned int i, bool proxy=true) const;
 
   /**
    * Creates an element coincident with edge \p i. The element returned is
-   * full-ordered.  For example, calling build_edge(0) on a 20-noded hex will
+   * full-ordered.  For example, calling build_edge_ptr(0) on a 20-noded hex will
    * build a 3-noded edge coincident with edge 0 and pass back the pointer.
    *
    * A \p UniquePtr<Elem> is returned to prevent a memory leak.
    * This way the user need not remember to delete the object.
    */
-  virtual UniquePtr<Elem> build_edge (const unsigned int i) const = 0;
+  virtual UniquePtr<Elem> build_edge_ptr (const unsigned int i) = 0;
+  UniquePtr<const Elem> build_edge_ptr (const unsigned int i) const;
+
+  /**
+   * Creates an element coincident with edge \p i.
+   *
+   * This method will eventually be deprecated/removed, since it
+   * returns a non-const pointer to an edge that could be used to
+   * indirectly modify this.  Please use the the const-correct
+   * build_edge_ptr() function instead.
+   */
+  UniquePtr<Elem> build_edge (const unsigned int i) const;
 
   /**
    * @returns the default approximation order for this element type.
@@ -871,10 +925,10 @@ public:
    * @returns the child number \p c and element-local index \p v of the
    * \f$ n^{th} \f$ second-order node on the parent element.  Note that
    * the return values are always less \p this->n_children() and
-   * \p this->child(c)->n_vertices(), while \p n has to be greater or equal
+   * \p this->child_ptr(c)->n_vertices(), while \p n has to be greater or equal
    * to \p * this->n_vertices().  For linear elements this returns 0,0.
    * On refined second order elements, the return value will satisfy
-   * \p this->node_ptr(n)==this->child(c)->node_ptr(v)
+   * \p this->node_ptr(n)==this->child_ptr(c)->node_ptr(v)
    */
   virtual std::pair<unsigned short int, unsigned short int>
   second_order_child_vertex (const unsigned int n) const;
@@ -940,10 +994,23 @@ public:
                          INVALID_REFINEMENTSTATE };
 
   /**
-   * @returns a pointer to the \f$ i^{th} \f$ child for this element.
+   * @returns a constant pointer to the \f$ i^{th} \f$ child for this element.
    * Do not call if this element has no children, i.e. is active.
    */
+  const Elem * child_ptr (unsigned int i) const;
+
+  /**
+   * @returns a non-constant pointer to the \f$ i^{th} \f$ child for this element.
+   * Do not call if this element has no children, i.e. is active.
+   */
+  Elem * child_ptr (unsigned int i);
+
+  /**
+   * This function is now deprecated, use the more accurately-named and
+   * const correct child_ptr() function instead.
+   */
   Elem * child (const unsigned int i) const;
+
 
 private:
   /**
@@ -956,7 +1023,7 @@ public:
   /**
    * This function tells you which child you \p (e) are.
    * I.e. if c = a->which_child_am_i(e); then
-   * a->child(c) will be e;
+   * a->child_ptr(c) will be e;
    */
   unsigned int which_child_am_i(const Elem * e) const;
 
@@ -1557,7 +1624,7 @@ const Node * const * Elem::get_nodes () const
 
 
 inline
-Node * Elem::node_ptr (const unsigned int i) const
+const Node * Elem::node_ptr (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -1568,7 +1635,26 @@ Node * Elem::node_ptr (const unsigned int i) const
 
 
 inline
-Node & Elem::node_ref (const unsigned int i) const
+Node * Elem::node_ptr (const unsigned int i)
+{
+  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert(_nodes[i]);
+
+  return _nodes[i];
+}
+
+
+
+inline
+const Node & Elem::node_ref (const unsigned int i) const
+{
+  return *this->node_ptr(i);
+}
+
+
+
+inline
+Node & Elem::node_ref (const unsigned int i)
 {
   return *this->node_ptr(i);
 }
@@ -1578,7 +1664,13 @@ Node & Elem::node_ref (const unsigned int i) const
 inline
 Node * Elem::get_node (const unsigned int i) const
 {
-  return this->node_ptr(i);
+  // This const function has incorrectly returned a non-const pointer
+  // for years.  Now that it is reimplemented in terms of the new
+  // interface which does return a const pointer, we need to use a
+  // const_cast to mimic the old (incorrect) behavior.  This function
+  // will be officially deprecated (hopefully soon) and eventually
+  // removed entirely, obviating the need for this ugly cast.
+  return const_cast<Node *>(this->node_ptr(i));
 }
 
 
@@ -1622,11 +1714,31 @@ subdomain_id_type & Elem::subdomain_id ()
 
 
 inline
-Elem * Elem::neighbor (const unsigned int i) const
+const Elem * Elem::neighbor_ptr (unsigned int i) const
 {
   libmesh_assert_less (i, this->n_neighbors());
 
   return _elemlinks[i+1];
+}
+
+
+
+inline
+Elem * Elem::neighbor_ptr (unsigned int i)
+{
+  libmesh_assert_less (i, this->n_neighbors());
+
+  return _elemlinks[i+1];
+}
+
+
+
+inline
+Elem * Elem::neighbor (const unsigned int i) const
+{
+  // Support the deprecated interface by calling the new,
+  // const-correct interface and casting the result to an Elem *.
+  return const_cast<Elem *>(this->neighbor_ptr(i));
 }
 
 
@@ -1645,7 +1757,7 @@ inline
 bool Elem::has_neighbor (const Elem * elem) const
 {
   for (unsigned int n=0; n<this->n_neighbors(); n++)
-    if (this->neighbor(n) == elem)
+    if (this->neighbor_ptr(n) == elem)
       return true;
 
   return false;
@@ -1654,12 +1766,12 @@ bool Elem::has_neighbor (const Elem * elem) const
 
 
 inline
-Elem * Elem::child_neighbor (Elem * elem) const
+Elem * Elem::child_neighbor (Elem * elem)
 {
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
-    if (elem->neighbor(n) &&
-        elem->neighbor(n)->parent() == this)
-      return elem->neighbor(n);
+    if (elem->neighbor_ptr(n) &&
+        elem->neighbor_ptr(n)->parent() == this)
+      return elem->neighbor_ptr(n);
 
   return libmesh_nullptr;
 }
@@ -1670,11 +1782,81 @@ inline
 const Elem * Elem::child_neighbor (const Elem * elem) const
 {
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
-    if (elem->neighbor(n) &&
-        elem->neighbor(n)->parent() == this)
-      return elem->neighbor(n);
+    if (elem->neighbor_ptr(n) &&
+        elem->neighbor_ptr(n)->parent() == this)
+      return elem->neighbor_ptr(n);
 
   return libmesh_nullptr;
+}
+
+
+
+inline
+UniquePtr<const Elem> Elem::side_ptr (unsigned int i) const
+{
+  // Call the non-const version of this function, return the result as
+  // a UniquePtr<const Elem>.
+  Elem * me = const_cast<Elem *>(this);
+  const Elem * s = const_cast<const Elem *>(me->side_ptr(i).release());
+  return UniquePtr<const Elem>(s);
+}
+
+
+
+inline
+UniquePtr<Elem> Elem::side (const unsigned int i) const
+{
+  // Call the const version of side_ptr(), and const_cast the result.
+  Elem * s = const_cast<Elem *>(this->side_ptr(i).release());
+  return UniquePtr<Elem>(s);
+}
+
+
+
+inline
+UniquePtr<const Elem>
+Elem::build_side_ptr (const unsigned int i, bool proxy) const
+{
+  // Call the non-const version of this function, return the result as
+  // a UniquePtr<const Elem>.
+  Elem * me = const_cast<Elem *>(this);
+  const Elem * s = const_cast<const Elem *>(me->build_side_ptr(i, proxy).release());
+  return UniquePtr<const Elem>(s);
+}
+
+
+
+inline
+UniquePtr<Elem>
+Elem::build_side (const unsigned int i, bool proxy) const
+{
+  // Call the const version of build_side_ptr(), and const_cast the result.
+  Elem * s = const_cast<Elem *>(this->build_side_ptr(i, proxy).release());
+  return UniquePtr<Elem>(s);
+}
+
+
+
+inline
+UniquePtr<const Elem>
+Elem::build_edge_ptr (const unsigned int i) const
+{
+  // Call the non-const version of this function, return the result as
+  // a UniquePtr<const Elem>.
+  Elem * me = const_cast<Elem *>(this);
+  const Elem * e = const_cast<const Elem *>(me->build_edge_ptr(i).release());
+  return UniquePtr<const Elem>(e);
+}
+
+
+
+inline
+UniquePtr<Elem>
+Elem::build_edge (const unsigned int i) const
+{
+  // Call the const version of build_edge_ptr(), and const_cast the result.
+  Elem * e = const_cast<Elem *>(this->build_edge_ptr(i).release());
+  return UniquePtr<Elem>(e);
 }
 
 
@@ -1703,7 +1885,7 @@ unsigned int Elem::which_neighbor_am_i (const Elem * e) const
     }
 
   for (unsigned int s=0; s<this->n_neighbors(); s++)
-    if (this->neighbor(s) == eparent)
+    if (this->neighbor_ptr(s) == eparent)
       return s;
 
   return libMesh::invalid_uint;
@@ -1822,7 +2004,7 @@ bool Elem::has_ancestor_children() const
     return false;
   else
     for (unsigned int c=0; c != this->n_children(); c++)
-      if (this->child(c)->has_children())
+      if (this->child_ptr(c)->has_children())
         return true;
 #endif
   return false;
@@ -1942,12 +2124,30 @@ unsigned int Elem::p_level() const
 #ifdef LIBMESH_ENABLE_AMR
 
 inline
-Elem * Elem::child (const unsigned int i) const
+const Elem * Elem::child_ptr (unsigned int i) const
 {
   libmesh_assert(_children);
   libmesh_assert(_children[i]);
 
   return _children[i];
+}
+
+inline
+Elem * Elem::child_ptr (unsigned int i)
+{
+  libmesh_assert(_children);
+  libmesh_assert(_children[i]);
+
+  return _children[i];
+}
+
+
+inline
+Elem * Elem::child (const unsigned int i) const
+{
+  // Support the deprecated interface by calling the new,
+  // const-correct interface and casting the result to an Elem *.
+  return const_cast<Elem *>(this->child_ptr(i));
 }
 
 
@@ -1969,7 +2169,7 @@ unsigned int Elem::which_child_am_i (const Elem * e) const
   libmesh_assert (this->has_children());
 
   for (unsigned int c=0; c<this->n_children(); c++)
-    if (this->child(c) == e)
+    if (this->child_ptr(c) == e)
       return c;
 
   libmesh_error_msg("ERROR:  which_child_am_i() was called with a non-child!");
@@ -2027,7 +2227,7 @@ unsigned int Elem::max_descendant_p_level () const
   unsigned int max_p_level = _p_level;
   for (unsigned int c=0; c != this->n_children(); c++)
     max_p_level = std::max(max_p_level,
-                           this->child(c)->max_descendant_p_level());
+                           this->child_ptr(c)->max_descendant_p_level());
   return max_p_level;
 }
 
@@ -2058,7 +2258,7 @@ void Elem::set_p_level(unsigned int p)
           parent_p_level = cast_int<unsigned char>(p);
           for (unsigned int c=0; c != this->parent()->n_children(); c++)
             parent_p_level = std::min(parent_p_level,
-                                      this->parent()->child(c)->p_level());
+                                      this->parent()->child_ptr(c)->p_level());
 
           // When its children all have a higher p level, the parent's
           // should rise
@@ -2253,7 +2453,7 @@ public:
   // this could possibly change in the future?
   bool side_on_boundary() const
   {
-    return this->_parent->neighbor(_side_number) == libmesh_nullptr;
+    return this->_parent->neighbor_ptr(_side_number) == libmesh_nullptr;
   }
 
 private:
@@ -2262,7 +2462,7 @@ private:
   void _update_side_ptr() const
   {
     // Construct new side, store in UniquePtr
-    this->_side = this->_parent->build_side(this->_side_number);
+    this->_side = this->_parent->build_side_ptr(this->_side_number);
 
     // Also set our internal naked pointer.  Memory is still owned
     // by the UniquePtr.

@@ -90,7 +90,7 @@ dof_id_type Prism::key (const unsigned int s) const
 
 
 
-UniquePtr<Elem> Prism::side (const unsigned int i) const
+UniquePtr<Elem> Prism::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 

@@ -160,7 +160,7 @@ void ElemCutter::find_intersection_points(const Elem & elem,
 
   for (unsigned int e=0; e<elem.n_edges(); e++)
     {
-      UniquePtr<Elem> edge (elem.build_edge(e));
+      UniquePtr<const Elem> edge (elem.build_edge_ptr(e));
 
       // find the element nodes el0, el1 that map
       unsigned int

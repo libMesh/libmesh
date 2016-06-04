@@ -213,9 +213,9 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType & fet,
     }
 #endif
 
-  const Order        o_radial (fet.radial_order);
-  const Real         v        (p(Dim-1));
-  UniquePtr<Elem>      base_el  (inf_elem->build_side(0));
+  const Order o_radial (fet.radial_order);
+  const Real v (p(Dim-1));
+  UniquePtr<const Elem> base_el (inf_elem->build_side_ptr(0));
 
   unsigned int i_base, i_radial;
   compute_shape_indices(fet, inf_elem->type(), i, i_base, i_radial);
@@ -245,9 +245,9 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
 
   const Order        o_radial             (fet.radial_order);
   const Order        radial_mapping_order (Radial::mapping_order());
-  const Point &       p                    (data.p);
+  const Point &      p                    (data.p);
   const Real         v                    (p(Dim-1));
-  UniquePtr<Elem>      base_el              (inf_elem->build_side(0));
+  UniquePtr<const Elem> base_el (inf_elem->build_side_ptr(0));
 
   /*
    * compute \p interpolated_dist containing the mapping-interpolated

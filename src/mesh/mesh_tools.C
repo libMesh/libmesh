@@ -402,9 +402,9 @@ void MeshTools::find_boundary_nodes (const MeshBase & mesh,
 
   for (; el != end; ++el)
     for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
-      if ((*el)->neighbor(s) == libmesh_nullptr) // on the boundary
+      if ((*el)->neighbor_ptr(s) == libmesh_nullptr) // on the boundary
         {
-          const UniquePtr<Elem> side((*el)->build_side(s));
+          const UniquePtr<const Elem> side((*el)->build_side_ptr(s));
 
           for (unsigned int n=0; n<side->n_nodes(); n++)
             on_boundary[side->node_id(n)] = true;
@@ -841,7 +841,7 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
               // Did we find one?
               if (found_edge)
                 {
-                  Node * node_to_save = libmesh_nullptr;
+                  const Node * node_to_save = libmesh_nullptr;
 
                   // Find another node in this element on this edge
                   for (unsigned other_node_this_edge = 0; other_node_this_edge<elem->n_nodes(); other_node_this_edge++)
@@ -894,10 +894,10 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
           for (unsigned int s=0; s<elem->n_sides(); s++)
             {
               //If not a boundary node
-              if (elem->neighbor(s) != libmesh_nullptr)
+              if (elem->neighbor_ptr(s) != libmesh_nullptr)
                 {
                   // Get pointers to the element's neighbor.
-                  const Elem * neigh = elem->neighbor(s);
+                  const Elem * neigh = elem->neighbor_ptr(s);
 
                   //Is there a coarser element next to this one?
                   if (neigh->level() < elem->level())
@@ -1104,9 +1104,9 @@ void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase & mesh)
         {
           elem->libmesh_assert_valid_node_pointers();
           for (unsigned int n=0; n != elem->n_neighbors(); ++n)
-            if (elem->neighbor(n) &&
-                elem->neighbor(n) != remote_elem)
-              elem->neighbor(n)->libmesh_assert_valid_node_pointers();
+            if (elem->neighbor_ptr(n) &&
+                elem->neighbor_ptr(n) != remote_elem)
+              elem->neighbor_ptr(n)->libmesh_assert_valid_node_pointers();
 
           libmesh_assert_not_equal_to (elem->parent(), remote_elem);
           elem = elem->parent();
@@ -1125,14 +1125,14 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase & mesh)
       const Elem * elem = *el;
       libmesh_assert (elem);
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
-        libmesh_assert_not_equal_to (elem->neighbor(n), remote_elem);
+        libmesh_assert_not_equal_to (elem->neighbor_ptr(n), remote_elem);
 #ifdef LIBMESH_ENABLE_AMR
       const Elem * parent = elem->parent();
       if (parent)
         {
           libmesh_assert_not_equal_to (parent, remote_elem);
           for (unsigned int c=0; c != elem->n_children(); ++c)
-            libmesh_assert_not_equal_to (parent->child(c), remote_elem);
+            libmesh_assert_not_equal_to (parent->child_ptr(c), remote_elem);
         }
 #endif
     }
@@ -1151,11 +1151,11 @@ void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase & mesh,
       libmesh_assert (elem);
       libmesh_assert_not_equal_to (elem->parent(), bad_elem);
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
-        libmesh_assert_not_equal_to (elem->neighbor(n), bad_elem);
+        libmesh_assert_not_equal_to (elem->neighbor_ptr(n), bad_elem);
 #ifdef LIBMESH_ENABLE_AMR
       if (elem->has_children())
         for (unsigned int c=0; c != elem->n_children(); ++c)
-          libmesh_assert_not_equal_to (elem->child(c), bad_elem);
+          libmesh_assert_not_equal_to (elem->child_ptr(c), bad_elem);
 #endif
     }
 }
@@ -1520,7 +1520,7 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase & mesh)
           bool matching_child_id = false;
           for (unsigned int c = 0; c != parent->n_children(); ++c)
             {
-              const Elem * child = parent->child(c);
+              const Elem * child = parent->child_ptr(c);
               libmesh_assert(child);
 
               // If we've got a remote_elem then we don't know whether
@@ -1675,9 +1675,9 @@ void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase & mesh)
       if (elem->has_children())
         for (unsigned int n=0; n != elem->n_children(); ++n)
           {
-            libmesh_assert(elem->child(n));
-            if (elem->child(n) != remote_elem)
-              libmesh_assert_equal_to (elem->child(n)->parent(), elem);
+            libmesh_assert(elem->child_ptr(n));
+            if (elem->child_ptr(n) != remote_elem)
+              libmesh_assert_equal_to (elem->child_ptr(n)->parent(), elem);
           }
       if (elem->active())
         {
@@ -1737,17 +1737,17 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
 
           // If we have a non-remote_elem neighbor link, then we can
           // verify it.
-          if (elem && elem->neighbor(n) != remote_elem)
+          if (elem && elem->neighbor_ptr(n) != remote_elem)
             {
               p_my_neighbor = &my_neighbor;
-              if (elem->neighbor(n))
-                my_neighbor = elem->neighbor(n)->id();
+              if (elem->neighbor_ptr(n))
+                my_neighbor = elem->neighbor_ptr(n)->id();
 
               // But wait - if we haven't set remote_elem links yet then
               // some NULL links on ghost elements might be
               // future-remote_elem links, so we can't verify those.
               if (!assert_valid_remote_elems &&
-                  !elem->neighbor(n) &&
+                  !elem->neighbor_ptr(n) &&
                   elem->processor_id() != mesh.processor_id())
                 p_my_neighbor = libmesh_nullptr;
             }

@@ -138,7 +138,7 @@ void assemble_unconstrained_element_system(const FEMSystem & _sys,
     {
       // Don't compute on non-boundary sides unless requested
       if (!_sys.get_physics()->compute_internal_sides &&
-          _femcontext.get_elem().neighbor(_femcontext.side) != libmesh_nullptr)
+          _femcontext.get_elem().neighbor_ptr(_femcontext.side) != libmesh_nullptr)
         continue;
 
       // Any mesh movement has already been done (and restored,
@@ -425,7 +425,7 @@ public:
             // Don't compute on non-boundary sides unless requested
             if (!_sys.postprocess_sides ||
                 (!_sys.get_physics()->compute_internal_sides &&
-                 _femcontext.get_elem().neighbor(_femcontext.side) != libmesh_nullptr))
+                 _femcontext.get_elem().neighbor_ptr(_femcontext.side) != libmesh_nullptr))
               continue;
 
             // Optionally initialize all the FE objects on this side.
@@ -553,7 +553,7 @@ public:
             // Don't compute on non-boundary sides unless requested
             if (!_diff_qoi.assemble_qoi_sides ||
                 (!_diff_qoi.assemble_qoi_internal_sides &&
-                 _femcontext.get_elem().neighbor(_femcontext.side) != libmesh_nullptr))
+                 _femcontext.get_elem().neighbor_ptr(_femcontext.side) != libmesh_nullptr))
               continue;
 
             _femcontext.side_fe_reinit();
@@ -724,7 +724,7 @@ public:
             // Don't compute on non-boundary sides unless requested
             if (!_qoi.assemble_qoi_sides ||
                 (!_qoi.assemble_qoi_internal_sides &&
-                 _femcontext.get_elem().neighbor(_femcontext.side) != libmesh_nullptr))
+                 _femcontext.get_elem().neighbor_ptr(_femcontext.side) != libmesh_nullptr))
               continue;
 
             _femcontext.side_fe_reinit();

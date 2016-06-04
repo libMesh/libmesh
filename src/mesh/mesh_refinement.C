@@ -102,7 +102,7 @@ void MeshRefinement::clear ()
 
 
 
-Node * MeshRefinement::add_node(const Elem & parent,
+Node * MeshRefinement::add_node(Elem & parent,
                                 unsigned int child,
                                 unsigned int node,
                                 processor_id_type proc_id)
@@ -1030,7 +1030,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                               libmesh_assert(neighbor->has_children());
                               for (unsigned int c=0; c!=neighbor->n_children(); c++)
                                 {
-                                  Elem * subneighbor = neighbor->child(c);
+                                  const Elem * subneighbor = neighbor->child_ptr(c);
                                   if (subneighbor != remote_elem &&
                                       subneighbor->active() &&
                                       has_topological_neighbor(subneighbor, point_locator.get(), elem))
@@ -1080,8 +1080,8 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
                     // test all descendants
                     if (neigh->has_children())
                       for (unsigned int c=0; c != neigh->n_children(); ++c)
-                        if (neigh->child(c) == remote_elem ||
-                            neigh->child(c)->processor_id() !=
+                        if (neigh->child_ptr(c) == remote_elem ||
+                            neigh->child_ptr(c)->processor_id() !=
                             this->processor_id())
                           {
                             compatible_with_refinement = false;
@@ -1118,7 +1118,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
               for (unsigned int c=0; c<elem->n_children(); c++)
                 {
-                  Elem * child = elem->child(c);
+                  Elem * child = elem->child_ptr(c);
                   if (child == remote_elem)
                     found_remote_child = true;
                   else if ((child->refinement_flag() != Elem::COARSEN) ||
@@ -1132,7 +1132,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
                   for (unsigned int c=0; c<elem->n_children(); c++)
                     {
-                      Elem * child = elem->child(c);
+                      Elem * child = elem->child_ptr(c);
                       if (child == remote_elem)
                         continue;
                       if (child->refinement_flag() == Elem::COARSEN)
@@ -1166,7 +1166,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
           for (unsigned int c=0; c<elem->n_children(); c++)
             {
-              Elem * child = elem->child(c);
+              Elem * child = elem->child_ptr(c);
               if (child == remote_elem)
                 found_remote_child = true;
               else if (child->refinement_flag() != Elem::COARSEN)
@@ -1342,7 +1342,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
                               libmesh_assert(neighbor->has_children());
                               for (unsigned int c=0; c!=neighbor->n_children(); c++)
                                 {
-                                  Elem * subneighbor = neighbor->child(c);
+                                  Elem * subneighbor = neighbor->child_ptr(c);
                                   if (subneighbor == remote_elem)
                                     continue;
                                   if (subneighbor->active() &&
@@ -1770,14 +1770,14 @@ Elem * MeshRefinement::topological_neighbor(Elem * elem,
       return elem->topological_neighbor(side, _mesh, *point_locator, _periodic_boundaries);
     }
 #endif
-  return elem->neighbor(side);
+  return elem->neighbor_ptr(side);
 }
 
 
 
-bool MeshRefinement::has_topological_neighbor(Elem * elem,
+bool MeshRefinement::has_topological_neighbor(const Elem * elem,
                                               const PointLocatorBase * point_locator,
-                                              Elem * neighbor)
+                                              const Elem * neighbor)
 {
 #ifdef LIBMESH_ENABLE_PERIODIC
   if (_periodic_boundaries && !_periodic_boundaries->empty())

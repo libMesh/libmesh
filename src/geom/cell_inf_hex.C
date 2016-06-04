@@ -83,7 +83,7 @@ dof_id_type InfHex::key (const unsigned int s) const
 
 
 
-UniquePtr<Elem> InfHex::side (const unsigned int i) const
+UniquePtr<Elem> InfHex::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -103,7 +103,7 @@ UniquePtr<Elem> InfHex::side (const unsigned int i) const
         // elements point outwards -- and this is the exception:
         // For the side built from the base face,
         // the normal is pointing _into_ the element!
-        // Why is that? - In agreement with build_side(),
+        // Why is that? - In agreement with build_side_ptr(),
         // which in turn _has_ to build the face in this
         // way as to enable the cool way \p InfFE re-uses \p FE.
         face = new Quad4;

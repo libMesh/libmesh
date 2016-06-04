@@ -697,7 +697,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
            ++context.side )
         {
           // May not need to apply fluxes on non-boundary elements
-          if( (context.get_elem().neighbor(context.get_side()) != libmesh_nullptr) && !impose_internal_fluxes )
+          if( (context.get_elem().neighbor_ptr(context.get_side()) != libmesh_nullptr) && !impose_internal_fluxes )
             continue;
 
           // Impose boundary (e.g. Neumann) term

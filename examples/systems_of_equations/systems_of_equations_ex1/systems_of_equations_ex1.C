@@ -358,9 +358,9 @@ void assemble_stokes (EquationSystems & es,
         // If the element has no neighbor on a side then that
         // side MUST live on a boundary of the domain.
         for (unsigned int s=0; s<elem->n_sides(); s++)
-          if (elem->neighbor(s) == libmesh_nullptr)
+          if (elem->neighbor_ptr(s) == libmesh_nullptr)
             {
-              UniquePtr<Elem> side (elem->build_side(s));
+              UniquePtr<const Elem> side (elem->build_side_ptr(s));
 
               // Loop over the nodes on the side.
               for (unsigned int ns=0; ns<side->n_nodes(); ns++)

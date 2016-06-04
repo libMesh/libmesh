@@ -134,14 +134,14 @@ public:
    * Builds a \p TRI3 built coincident with face i.
    * The \p UniquePtr<Elem> handles the memory aspect.
    */
-  virtual UniquePtr<Elem> build_side (const unsigned int i,
-                                      bool proxy) const libmesh_override;
+  virtual UniquePtr<Elem> build_side_ptr (const unsigned int i,
+                                          bool proxy) libmesh_override;
 
   /**
    * Builds a \p EDGE2 built coincident with face i.
    * The \p UniquePtr<Elem> handles the memory aspect.
    */
-  virtual UniquePtr<Elem> build_edge (const unsigned int i) const libmesh_override;
+  virtual UniquePtr<Elem> build_edge_ptr (const unsigned int i) libmesh_override;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,

@@ -189,7 +189,7 @@ void JumpErrorEstimator::estimate_error (const System & system,
         compute_on_parent = false;
       else
         for (unsigned int c=0; c != parent->n_children(); ++c)
-          if (!parent->child(c)->active())
+          if (!parent->child_ptr(c)->active())
             compute_on_parent = false;
 
       if (compute_on_parent &&
@@ -203,11 +203,11 @@ void JumpErrorEstimator::estimate_error (const System & system,
           // Loop over the neighbors of the parent
           for (unsigned int n_p=0; n_p<parent->n_neighbors(); n_p++)
             {
-              if (parent->neighbor(n_p) != libmesh_nullptr) // parent has a neighbor here
+              if (parent->neighbor_ptr(n_p) != libmesh_nullptr) // parent has a neighbor here
                 {
                   // Find the active neighbors in this direction
                   std::vector<const Elem *> active_neighbors;
-                  parent->neighbor(n_p)->
+                  parent->neighbor_ptr(n_p)->
                     active_family_tree_by_neighbor(active_neighbors,
                                                    parent);
                   // Compute the flux to each active neighbor
@@ -292,16 +292,16 @@ void JumpErrorEstimator::estimate_error (const System & system,
       // Loop over the neighbors of element e
       for (unsigned int n_e=0; n_e<e->n_neighbors(); n_e++)
         {
-          if ((e->neighbor(n_e) != libmesh_nullptr) ||
+          if ((e->neighbor_ptr(n_e) != libmesh_nullptr) ||
               integrate_boundary_sides)
             {
               fine_context->side = n_e;
               fine_context->side_fe_reinit();
             }
 
-          if (e->neighbor(n_e) != libmesh_nullptr) // e is not on the boundary
+          if (e->neighbor_ptr(n_e) != libmesh_nullptr) // e is not on the boundary
             {
-              const Elem * f           = e->neighbor(n_e);
+              const Elem * f           = e->neighbor_ptr(n_e);
               const dof_id_type f_id = f->id();
 
               // Compute flux jumps if we are in case 1 or case 2.
@@ -359,7 +359,7 @@ void JumpErrorEstimator::estimate_error (const System & system,
 
               if (scale_by_n_flux_faces && found_boundary_flux)
                 n_flux_faces[fine_context->get_elem().id()]++;
-            } // end if (e->neighbor(n_e) == libmesh_nullptr)
+            } // end if (e->neighbor_ptr(n_e) == libmesh_nullptr)
         } // end loop over neighbors
     } // End loop over active local elements
 

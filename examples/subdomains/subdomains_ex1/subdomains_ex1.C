@@ -594,8 +594,8 @@ void assemble_poisson(EquationSystems & es,
             // is different from 1, the side is also located on the
             // boundary.
             for (unsigned int side=0; side<elem->n_sides(); side++)
-              if ((elem->neighbor(side) == libmesh_nullptr) ||
-                  (elem->neighbor(side)->subdomain_id()!=1))
+              if ((elem->neighbor_ptr(side) == libmesh_nullptr) ||
+                  (elem->neighbor_ptr(side)->subdomain_id()!=1))
                 {
 
                   // The penalty value.  \frac{1}{\epsilon}

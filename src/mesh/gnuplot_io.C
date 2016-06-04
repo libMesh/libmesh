@@ -120,12 +120,12 @@ void GnuPlotIO::write_solution(const std::string & fname,
           const Elem * el = *it;
 
           // if el is the left edge of the mesh, print its left node position
-          if(el->neighbor(0) == libmesh_nullptr)
+          if (el->neighbor_ptr(0) == libmesh_nullptr)
             {
               x_min = (el->point(0))(0);
               xtics_stream << "\"\" " << x_min << ", \\\n";
             }
-          if(el->neighbor(1) == libmesh_nullptr)
+          if (el->neighbor_ptr(1) == libmesh_nullptr)
             {
               x_max = (el->point(1))(0);
             }

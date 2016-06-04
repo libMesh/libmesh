@@ -299,7 +299,7 @@ public:
    * if necessary.
    * The processor_id is assigned to any newly created node.
    */
-  Node * add_node (const Elem & parent,
+  Node * add_node (Elem & parent,
                    unsigned int child,
                    unsigned int node,
                    processor_id_type proc_id);
@@ -706,9 +706,9 @@ private:
    * Local dispatch function for checking the correct has_neighbor
    * function from the Elem class
    */
-  bool has_topological_neighbor (Elem * elem,
+  bool has_topological_neighbor (const Elem * elem,
                                  const PointLocatorBase * point_locator,
-                                 Elem * neighbor);
+                                 const Elem * neighbor);
 
   /**
    * Data structure that holds the new nodes information.

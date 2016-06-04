@@ -59,7 +59,7 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
   libmesh_assert_not_equal_to (s, 0);
 
   // Build the side of interest
-  const UniquePtr<Elem> side(inf_elem->build_side(s));
+  const UniquePtr<const Elem> side(inf_elem->build_side_ptr(s));
 
   // set the element type
   elem_type = inf_elem->type();

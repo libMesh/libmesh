@@ -131,8 +131,8 @@ public:
    * Creates and returns an \p Edge3 for the base (0) side, and an \p InfEdge2 for
    * the sides 1, 2.
    */
-  virtual UniquePtr<Elem> build_side (const unsigned int i,
-                                      bool proxy) const libmesh_override;
+  virtual UniquePtr<Elem> build_side_ptr (const unsigned int i,
+                                          bool proxy) libmesh_override;
 
   virtual void connectivity(const unsigned int sf,
                             const IOPackage iop,
@@ -153,13 +153,9 @@ public:
                                                            const unsigned int v) const libmesh_override;
 
   /**
-   * @returns the child number \p c and element-local index \p v of the
-   * \f$ n^{th} \f$ second-order node on the parent element.  Note that
-   * the return values are always less \p this->n_children() and
-   * \p this->child(c)->n_vertices(), while \p n has to be greater or equal
-   * to \p * this->n_vertices().  For linear elements this returns 0,0.
-   * On refined second order elements, the return value will satisfy
-   * \p this->node_ptr(n)==this->child(c)->node_ptr(v)
+   * @returns the child number \p c and element-local index \p v of
+   * the \f$ n^{th} \f$ second-order node on the parent element.  See
+   * elem.h for further details.
    */
   virtual std::pair<unsigned short int, unsigned short int>
   second_order_child_vertex (const unsigned int n) const libmesh_override;

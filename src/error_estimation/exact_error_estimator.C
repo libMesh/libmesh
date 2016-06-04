@@ -339,7 +339,7 @@ void ExactErrorEstimator::estimate_error (const System & system,
             compute_on_parent = false;
           else
             for (unsigned int c=0; c != parent->n_children(); ++c)
-              if (!parent->child(c)->active())
+              if (!parent->child_ptr(c)->active())
                 compute_on_parent = false;
 
           if (compute_on_parent &&

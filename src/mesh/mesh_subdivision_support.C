@@ -28,7 +28,8 @@ namespace libMesh
 {
 
 
-void MeshTools::Subdivision::find_one_ring(const Tri3Subdivision * elem, std::vector<Node *> & nodes)
+void MeshTools::Subdivision::find_one_ring(const Tri3Subdivision * elem,
+                                           std::vector<const Node *> & nodes)
 {
   libmesh_assert(elem->is_subdivision_updated());
   libmesh_assert(elem->get_ordered_node(0));
@@ -43,7 +44,7 @@ void MeshTools::Subdivision::find_one_ring(const Tri3Subdivision * elem, std::ve
 
   const unsigned int nn0 = elem->local_node_number(nodes[0]->id());
 
-  Tri3Subdivision * nb = dynamic_cast<Tri3Subdivision *>(elem->neighbor(nn0));
+  const Tri3Subdivision * nb = dynamic_cast<const Tri3Subdivision *>(elem->neighbor_ptr(nn0));
   libmesh_assert(nb);
 
   unsigned int j, i = 1;
@@ -53,32 +54,32 @@ void MeshTools::Subdivision::find_one_ring(const Tri3Subdivision * elem, std::ve
       ++i;
       j = nb->local_node_number(nodes[0]->id());
       nodes[i] = nb->node_ptr(next[j]);
-      nb = static_cast<Tri3Subdivision *>(nb->neighbor(j));
+      nb = static_cast<const Tri3Subdivision *>(nb->neighbor_ptr(j));
     } while (nb != elem);
 
   /* for nodes connected with N (= valence[0]) */
-  nb = static_cast<Tri3Subdivision *>(elem->neighbor(next[nn0]));
+  nb = static_cast<const Tri3Subdivision *>(elem->neighbor_ptr(next[nn0]));
   j = nb->local_node_number(nodes[1]->id());
   nodes[valence+1] = nb->node_ptr(next[j]);
 
-  nb = static_cast<Tri3Subdivision *>(nb->neighbor(next[j]));
+  nb = static_cast<const Tri3Subdivision *>(nb->neighbor_ptr(next[j]));
   j = nb->local_node_number(nodes[valence+1]->id());
   nodes[valence+4] = nb->node_ptr(next[j]);
 
-  nb = static_cast<Tri3Subdivision *>(nb->neighbor(next[j]));
+  nb = static_cast<const Tri3Subdivision *>(nb->neighbor_ptr(next[j]));
   j = nb->local_node_number(nodes[valence+4]->id());
   nodes[valence+5] = nb->node_ptr(next[j]);
 
   /* for nodes connected with 1 */
-  nb = static_cast<Tri3Subdivision *>(elem->neighbor(next[nn0]));
+  nb = static_cast<const Tri3Subdivision *>(elem->neighbor_ptr(next[nn0]));
   j = nb->local_node_number(nodes[1]->id());
   // nodes[valence+1] has been determined already
 
-  nb = static_cast<Tri3Subdivision *>(nb->neighbor(j));
+  nb = static_cast<const Tri3Subdivision *>(nb->neighbor_ptr(j));
   j = nb->local_node_number(nodes[1]->id());
   nodes[valence+2] = nb->node_ptr(next[j]);
 
-  nb = static_cast<Tri3Subdivision *>(nb->neighbor(j));
+  nb = static_cast<const Tri3Subdivision *>(nb->neighbor_ptr(j));
   j = nb->local_node_number(nodes[1]->id());
   nodes[valence+3] = nb->node_ptr(next[j]);
 
@@ -217,18 +218,18 @@ void MeshTools::Subdivision::tag_boundary_ghosts(MeshBase & mesh)
       Tri3Subdivision * sd_elem = static_cast<Tri3Subdivision *>(elem);
       for (unsigned int i = 0; i < elem->n_sides(); ++i)
         {
-          if (elem->neighbor(i) == libmesh_nullptr)
+          if (elem->neighbor_ptr(i) == libmesh_nullptr)
             {
               sd_elem->set_ghost(true);
               // set all other neighbors to ghosts as well
-              if (elem->neighbor(next[i]))
+              if (elem->neighbor_ptr(next[i]))
                 {
-                  Tri3Subdivision * nb = static_cast<Tri3Subdivision *>(elem->neighbor(next[i]));
+                  Tri3Subdivision * nb = static_cast<Tri3Subdivision *>(elem->neighbor_ptr(next[i]));
                   nb->set_ghost(true);
                 }
-              if (elem->neighbor(prev[i]))
+              if (elem->neighbor_ptr(prev[i]))
                 {
-                  Tri3Subdivision * nb = static_cast<Tri3Subdivision *>(elem->neighbor(prev[i]));
+                  Tri3Subdivision * nb = static_cast<Tri3Subdivision *>(elem->neighbor_ptr(prev[i]));
                   nb->set_ghost(true);
                 }
             }
@@ -258,10 +259,10 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
       // loop is of valence=6.
       for (unsigned int i = 0; i < elem->n_sides(); ++i)
         {
-          libmesh_assert_not_equal_to(elem->neighbor(i), elem);
+          libmesh_assert_not_equal_to(elem->neighbor_ptr(i), elem);
 
-          if (elem->neighbor(i) == libmesh_nullptr &&
-              elem->neighbor(next[i]) == libmesh_nullptr)
+          if (elem->neighbor_ptr(i) == libmesh_nullptr &&
+              elem->neighbor_ptr(next[i]) == libmesh_nullptr)
             {
               Elem * nelem = elem;
               unsigned int k = i;
@@ -337,8 +338,8 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
 
       for (unsigned int i = 0; i < elem->n_sides(); ++i)
         {
-          libmesh_assert_not_equal_to(elem->neighbor(i), elem);
-          if (elem->neighbor(i) == libmesh_nullptr)
+          libmesh_assert_not_equal_to(elem->neighbor_ptr(i), elem);
+          if (elem->neighbor_ptr(i) == libmesh_nullptr)
             {
               // this is the vertex to be mirrored
               Point point = elem->point(i) + elem->point(next[i]) - elem->point(prev[i]);
@@ -395,11 +396,11 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
 
       for (unsigned int i = 0; i < elem->n_sides(); ++i)
         {
-          if (elem->neighbor(i) == libmesh_nullptr &&
-              elem->neighbor(prev[i]) != libmesh_nullptr)
+          if (elem->neighbor_ptr(i) == libmesh_nullptr &&
+              elem->neighbor_ptr(prev[i]) != libmesh_nullptr)
             {
               // go around counter-clockwise
-              Tri3Subdivision * nb1 = static_cast<Tri3Subdivision *>(elem->neighbor(prev[i]));
+              Tri3Subdivision * nb1 = static_cast<Tri3Subdivision *>(elem->neighbor_ptr(prev[i]));
               Tri3Subdivision * nb2 = nb1;
               unsigned int j = i;
               unsigned int n_nb = 0;
@@ -407,7 +408,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                 {
                   j = nb1->local_node_number(elem->node_id(i));
                   nb2 = nb1;
-                  nb1 = static_cast<Tri3Subdivision *>(nb1->neighbor(prev[j]));
+                  nb1 = static_cast<Tri3Subdivision *>(nb1->neighbor_ptr(prev[j]));
                   libmesh_assert(nb1 == libmesh_nullptr || nb1->id() != nb2->id());
                   n_nb++;
                 }

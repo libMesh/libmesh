@@ -208,8 +208,8 @@ dof_id_type Quad9::key () const
 
 
 
-UniquePtr<Elem> Quad9::build_side (const unsigned int i,
-                                   bool proxy) const
+UniquePtr<Elem> Quad9::build_side_ptr (const unsigned int i,
+                                       bool proxy)
 {
   libmesh_assert_less (i, this->n_sides());
 

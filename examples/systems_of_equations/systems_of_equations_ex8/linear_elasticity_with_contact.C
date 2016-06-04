@@ -165,7 +165,7 @@ void LinearElasticityWithContact::initialize_contact_load_paths()
 
       for (unsigned int side=0; side<elem->n_sides(); side++)
         {
-          if (elem->neighbor(side) == libmesh_nullptr)
+          if (elem->neighbor_ptr(side) == libmesh_nullptr)
             {
               bool on_lower_contact_surface =
                 mesh.get_boundary_info().has_boundary_id (elem, side, CONTACT_BOUNDARY_LOWER);

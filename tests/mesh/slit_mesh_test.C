@@ -389,8 +389,8 @@ public:
 
             for (unsigned int n=0; n != elem->n_nodes(); ++n)
               {
-                Node & node       = elem->node_ref(n);
-                Node & mesh1_node = mesh1_elem->node_ref(n);
+                const Node & node       = elem->node_ref(n);
+                const Node & mesh1_node = mesh1_elem->node_ref(n);
                 CPPUNIT_ASSERT_EQUAL( node.unique_id(),
                                       mesh1_node.unique_id() );
               }

@@ -87,7 +87,7 @@ dof_id_type InfPrism::key (const unsigned int s) const
 
 
 
-UniquePtr<Elem> InfPrism::side (const unsigned int i) const
+UniquePtr<Elem> InfPrism::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
