@@ -9,180 +9,10 @@
 
 using namespace libMesh;
 
-void Biharmonic::Create(Biharmonic ** b, const Parallel::Communicator & comm)
-{
-  // ParallelMesh doesn't yet understand periodic BCs
-  SerialMesh * mesh = new SerialMesh(comm);
-  Biharmonic * biharmonic = new Biharmonic(mesh);
-  *b = biharmonic;
-}
-
-
-
-
-
-void Biharmonic::Destroy(Biharmonic ** b)
-{
-  Biharmonic * biharmonic = *b;
-  UnstructuredMesh * mesh = biharmonic->_mesh;
-  delete biharmonic;
-  delete mesh;
-  *b = libmesh_nullptr;
-}
-
-
-
-void Biharmonic::viewParameters()
-{
-  libMesh::out << "Biharmonic parameters:\n";
-
-  // Print verbosity status
-  if (_verbose)
-    libMesh::out << "verbose mode is on\n";
-  else
-    libMesh::out << "verbose mode is off\n";
-
-  // Print parameters
-  libMesh::out << "mesh dimension           = " << _dim <<               "\n";
-  libMesh::out << "initial linear mesh size = " << _N   <<               "\n";
-  libMesh::out << "kappa                    = " << _kappa <<             "\n";
-  libMesh::out << "growth                   = " << (int)_growth <<       "\n";
-  libMesh::out << "degenerate               = " << (int)_degenerate <<   "\n";
-  libMesh::out << "Cahn-Hillard             = " << (int)_cahn_hillard << "\n";
-  libMesh::out << "netforce                 = " << (int)_netforce <<     "\n";
-  libMesh::out << "energy                   = " << _energy        <<     "\n";
-  libMesh::out << "tol                      = " << _tol           <<     "\n";
-  libMesh::out << "theta                    = " << _theta         <<     "\n";
-  libMesh::out << "theta_c                  = " << _theta_c       <<     "\n";
-  libMesh::out << "log truncation           = " << _log_truncation <<    "\n";
-  libMesh::out << "initial timestep size    = " << _dt0            <<    "\n";
-
-  if (_initialState == STRIP)
-    libMesh::out << "initial state:             strip\n";
-
-  if (_initialState == ROD)
-    libMesh::out << "initial state:             rod\n";
-
-  if (_initialState == BALL)
-    libMesh::out << "initial state:             ball\n";
-
-  libMesh::out << "initial state center     = " << _initialCenter(0) << "\n";
-  libMesh::out << "initial state width      = " << _initialWidth << "\n";
-  libMesh::out << "initial time (min_time)  = " << _t0 << "\n";
-  libMesh::out << "integration time         = " << _T  << "\n";
-  libMesh::out << "final time   (max_time)  = " << _t1 << "\n";
-  libMesh::out << "Crank-Nicholson weight   = " << _cnWeight << "\n";
-  libMesh::out << "Output timestep          = " << _o_dt << "\n";
-  libMesh::out << "Output filename base:      " <<  _ofile_base << "\n";
-}
-
-
-
-
-void Biharmonic::init()
-{
-  if (_verbose)
-    libMesh::out << ">>> Initializing Biharmonic\n";
-
-  _dt  =  0;
-  _o_count = 0;
-  this->EquationSystems::init();
-
-  if (_verbose)
-    libMesh::out << "<<< Initializing Biharmonic\n";
-}
-
-
-
-
-
-void Biharmonic::step(const Real & dt_in)
-{
-  // We need to update the old solution vector.
-  // The old solution vector will be the current solution vector from the
-  // previous time step. We use vector assignment.  Only TransientSystems
-  // (and systems derived from them) contain old solutions.
-  if (dt_in < 0)
-    _dt = _dt0;
-  else
-    _dt = dt_in;
-
-  *(_jr->old_local_solution) = *(_jr->current_local_solution);
-
-  // this will localize the current solution, resulting in a current_local_solution with correct ghost values
-  _jr->solve();
-}
-
-
-
-void Biharmonic::output(int timestep,
-                        const Real & t,
-                        Real & o_t,
-                        bool force)
-{
-#ifdef LIBMESH_HAVE_EXODUS_API
-  if (!force && t - o_t < _o_dt)
-    return;
-
-  ++_o_count;
-
-  if (_verbose)
-    libMesh::out << "Writing state "
-                 << timestep
-                 << " at time "
-                 << t
-                 << " to file "
-                 << _ofile
-                 << "; output a total of "
-                 << _o_count
-                 << " states so far\n";
-
-  _exio->write_timestep(_ofile, *this, timestep, t);
-
-  if (!force)
-    o_t = t;
-#endif // #ifdef LIBMESH_HAVE_EXODUS_API
-}
-
-
-
-void Biharmonic::run()
-{
-  Real t = _t0, o_t = 0.0;
-  int timestep = 1;
-
-  // Force-write the initial timestep
-  output(timestep, t, o_t, true);
-
-  while (t < _t1)
-    {
-      ++timestep;
-
-      // A pretty update message
-      if (_verbose)
-        libMesh::out << "Solving for state " << timestep << ", time " << t << "\n";
-
-      // Move biharmonic one timestep forward
-      step();
-
-      // Keep track of time and timestep
-      t += _dt;
-
-      // Output
-      output(timestep, t, o_t);
-    } // while(t < _t1)
-
-  // Force-write the final timestep
-  output(timestep, t, o_t, true);
-}
-
-
-
-
-
-Biharmonic::Biharmonic(UnstructuredMesh * m) :
-  EquationSystems(*m),
-  _mesh(m)
+// Constructor
+Biharmonic::Biharmonic(ReplicatedMesh & mesh) :
+  EquationSystems(mesh),
+  _mesh(mesh)
 {
   // Retrieve parameters and set defaults
   _verbose      = false;
@@ -242,13 +72,13 @@ Biharmonic::Biharmonic(UnstructuredMesh * m) :
   switch (_dim)
     {
     case 1:
-      MeshTools::Generation::build_line(*_mesh, _N, 0.0, 1.0, EDGE2);
+      MeshTools::Generation::build_line(_mesh, _N, 0.0, 1.0, EDGE2);
       break;
     case 2:
-      MeshTools::Generation::build_square(*_mesh, _N, _N, 0.0, 1.0, 0.0, 1.0, QUAD4);
+      MeshTools::Generation::build_square(_mesh, _N, _N, 0.0, 1.0, 0.0, 1.0, QUAD4);
       break;
     case 3:
-      MeshTools::Generation::build_cube(*_mesh, _N, _N, _N, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, HEX8);
+      MeshTools::Generation::build_cube(_mesh, _N, _N, _N, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, HEX8);
       break;
     default:
       libmesh_assert_msg((_dim <= 3) && (_dim > 0), "Invalid mesh dimension");
@@ -325,7 +155,154 @@ Biharmonic::Biharmonic(UnstructuredMesh * m) :
         }
     }
   _ofile = _ofile_base + ".e";
-  _exio = new ExodusII_IO(*_mesh);
+  _exio.reset(new ExodusII_IO(_mesh));
   _o_dt = command_line_value("output_dt", 0.0);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 } // constructor
+
+
+
+void Biharmonic::viewParameters()
+{
+  libMesh::out << "Biharmonic parameters:\n";
+
+  // Print verbosity status
+  if (_verbose)
+    libMesh::out << "verbose mode is on\n";
+  else
+    libMesh::out << "verbose mode is off\n";
+
+  // Print parameters
+  libMesh::out << "mesh dimension           = " << _dim <<               "\n";
+  libMesh::out << "initial linear mesh size = " << _N   <<               "\n";
+  libMesh::out << "kappa                    = " << _kappa <<             "\n";
+  libMesh::out << "growth                   = " << (int)_growth <<       "\n";
+  libMesh::out << "degenerate               = " << (int)_degenerate <<   "\n";
+  libMesh::out << "Cahn-Hillard             = " << (int)_cahn_hillard << "\n";
+  libMesh::out << "netforce                 = " << (int)_netforce <<     "\n";
+  libMesh::out << "energy                   = " << _energy        <<     "\n";
+  libMesh::out << "tol                      = " << _tol           <<     "\n";
+  libMesh::out << "theta                    = " << _theta         <<     "\n";
+  libMesh::out << "theta_c                  = " << _theta_c       <<     "\n";
+  libMesh::out << "log truncation           = " << _log_truncation <<    "\n";
+  libMesh::out << "initial timestep size    = " << _dt0            <<    "\n";
+
+  if (_initialState == STRIP)
+    libMesh::out << "initial state:             strip\n";
+
+  if (_initialState == ROD)
+    libMesh::out << "initial state:             rod\n";
+
+  if (_initialState == BALL)
+    libMesh::out << "initial state:             ball\n";
+
+  libMesh::out << "initial state center     = " << _initialCenter(0) << "\n";
+  libMesh::out << "initial state width      = " << _initialWidth << "\n";
+  libMesh::out << "initial time (min_time)  = " << _t0 << "\n";
+  libMesh::out << "integration time         = " << _T  << "\n";
+  libMesh::out << "final time   (max_time)  = " << _t1 << "\n";
+  libMesh::out << "Crank-Nicholson weight   = " << _cnWeight << "\n";
+  libMesh::out << "Output timestep          = " << _o_dt << "\n";
+  libMesh::out << "Output filename base:      " <<  _ofile_base << "\n";
+}
+
+
+
+
+void Biharmonic::init()
+{
+  if (_verbose)
+    libMesh::out << ">>> Initializing Biharmonic\n";
+
+  _dt  =  0;
+  _o_count = 0;
+  EquationSystems::init();
+
+  if (_verbose)
+    libMesh::out << "<<< Initializing Biharmonic\n";
+}
+
+
+
+
+
+void Biharmonic::step(const Real & dt_in)
+{
+  // We need to update the old solution vector.
+  // The old solution vector will be the current solution vector from the
+  // previous time step. We use vector assignment.  Only TransientSystems
+  // (and systems derived from them) contain old solutions.
+  if (dt_in < 0)
+    _dt = _dt0;
+  else
+    _dt = dt_in;
+
+  *(_jr->old_local_solution) = *(_jr->current_local_solution);
+
+  // this will localize the current solution, resulting in a
+  // current_local_solution with correct ghost values
+  _jr->solve();
+}
+
+
+
+void Biharmonic::output(int timestep,
+                        const Real & t,
+                        Real & o_t,
+                        bool force)
+{
+#ifdef LIBMESH_HAVE_EXODUS_API
+  if (!force && t - o_t < _o_dt)
+    return;
+
+  ++_o_count;
+
+  if (_verbose)
+    libMesh::out << "Writing state "
+                 << timestep
+                 << " at time "
+                 << t
+                 << " to file "
+                 << _ofile
+                 << "; output a total of "
+                 << _o_count
+                 << " states so far\n";
+
+  _exio->write_timestep(_ofile, *this, timestep, t);
+
+  if (!force)
+    o_t = t;
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
+}
+
+
+
+void Biharmonic::run()
+{
+  Real t = _t0, o_t = 0.0;
+  int timestep = 1;
+
+  // Force-write the initial timestep
+  output(timestep, t, o_t, true);
+
+  while (t < _t1)
+    {
+      ++timestep;
+
+      // A pretty update message
+      if (_verbose)
+        libMesh::out << "Solving for state " << timestep << ", time " << t << "\n";
+
+      // Move biharmonic one timestep forward
+      step();
+
+      // Keep track of time and timestep
+      t += _dt;
+
+      // Output
+      output(timestep, t, o_t);
+    } // while(t < _t1)
+
+  // Force-write the final timestep
+  output(timestep, t, o_t, true);
+}

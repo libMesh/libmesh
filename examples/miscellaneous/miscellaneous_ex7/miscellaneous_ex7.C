@@ -57,12 +57,12 @@ int main(int argc, char ** argv)
       // Skip higher-dimensional examples on a lower-dimensional libMesh build
       libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
 
-      Biharmonic * biharmonic;
-      Biharmonic::Create(&biharmonic, init.comm());
-      biharmonic->viewParameters();
-      biharmonic->init();
-      biharmonic->run();
-      Biharmonic::Destroy(&biharmonic);
+      // This example only works with ReplicatedMesh.
+      ReplicatedMesh mesh(init.comm());
+      Biharmonic biharmonic(mesh);
+      biharmonic.viewParameters();
+      biharmonic.init();
+      biharmonic.run();
     }
   return 0;
 }
