@@ -1920,14 +1920,15 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
 #endif
             {
               libmesh_assert_equal_to (pos.first->dof_id, (*it)->id());
-              libmesh_assert_less (pos.first->side, (*it)->n_sides());
 
               if(bc_type == "side")
                 {
+                  libmesh_assert_less (pos.first->side, (*it)->n_sides());
                   boundary_info.add_side (*it, pos.first->side, pos.first->bc_id);
                 }
               else if(bc_type == "edge")
                 {
+                  libmesh_assert_less (pos.first->side, (*it)->n_edges());
                   boundary_info.add_edge (*it, pos.first->side, pos.first->bc_id);
                 }
               else if(bc_type == "shellface")
