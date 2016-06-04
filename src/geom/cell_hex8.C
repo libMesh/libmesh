@@ -331,28 +331,25 @@ Real Hex8::volume () const
   // \vec{x}_{\eta}  = \vec{a2}*xi*zeta  + \vec{b2}*xi  + \vec{c2}*zeta + \vec{d2}
   // \vec{x}_{\zeta} = \vec{a3}*xi*eta   + \vec{b3}*xi  + \vec{c3}*eta  + \vec{d3}
   // but it turns out that a1, a2, and a3 are not needed for the volume calculation.
-  // This is copy-pasted directly from the output of a Python script, other
-  // than division by 8, which is done at the end when the volume is returned.
-  Point
-    b1 = x0 - x1 + x2 - x3 + x4 - x5 + x6 - x7,
-    c1 = x0 - x1 - x2 + x3 - x4 + x5 + x6 - x7,
-    d1 = -x0 + x1 + x2 - x3 - x4 + x5 + x6 - x7,
 
-    b2 = b1,
-    c2 = x0 + x1 - x2 - x3 - x4 - x5 + x6 + x7,
-    d2 = -x0 - x1 + x2 + x3 - x4 - x5 + x6 + x7,
+  // Build up the 6 unique vectors which make up dx/dxi, dx/deta, and dx/dzeta.
+  Point q[6] =
+    {
+      /*b1*/  x0 - x1 + x2 - x3 + x4 - x5 + x6 - x7, /*=b2*/
+      /*c1*/  x0 - x1 - x2 + x3 - x4 + x5 + x6 - x7, /*=b3*/
+      /*d1*/ -x0 + x1 + x2 - x3 - x4 + x5 + x6 - x7,
+      /*c2*/  x0 + x1 - x2 - x3 - x4 - x5 + x6 + x7, /*=c3*/
+      /*d2*/ -x0 - x1 + x2 + x3 - x4 - x5 + x6 + x7,
+      /*d3*/ -x0 - x1 - x2 - x3 + x4 + x5 + x6 + x7
+    };
 
-    b3 = c1,
-    c3 = c2,
-    d3 = -x0 - x1 - x2 - x3 + x4 + x5 + x6 + x7;
-
-  // We could check for a quick return, but it's almost faster to just
-  // compute the result...
+  // We could check for a linear element, but it's probably faster to
+  // just compute the result...
   return
-    (triple_product(b1,d2,c3) +
-     triple_product(d1,b2,b3) +
-     triple_product(c1,c2,d3)) / 192. +
-    triple_product(d1,d2,d3) / 64.;
+    (triple_product(q[0], q[4], q[3]) +
+     triple_product(q[2], q[0], q[1]) +
+     triple_product(q[1], q[3], q[5])) / 192. +
+    triple_product(q[2], q[4], q[5]) / 64.;
 }
 
 } // namespace libMesh
