@@ -1478,3 +1478,52 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TO_STRING],
 
     AM_CONDITIONAL(HAVE_CXX11_TO_STRING, test x$have_cxx11_to_string == xyes)
   ])
+
+
+
+AC_DEFUN([LIBMESH_TEST_CXX11_NOEXCEPT],
+  [
+    have_cxx11_noexcept=no
+
+    AC_MSG_CHECKING(for C++11 noexcept support)
+    AC_LANG_PUSH([C++])
+
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+      @%:@include <stdexcept>
+
+      class MyException : public std::exception
+      {
+      public:
+        virtual const char * what() const noexcept
+        {
+          return "MyException description";
+        }
+      };
+    ]], [[
+      throw MyException();
+      return 0;
+    ]])],[
+      if (test "x$enablecxx11" = "xyes"); then
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_NOEXCEPT, 1, [Flag indicating whether compiler supports noexcept])
+        have_cxx11_noexcept=yes
+      else
+        AC_MSG_RESULT([yes, but disabled.])
+        AC_DEFINE(HAVE_CXX11_NOEXCEPT_BUT_DISABLED, 1, [Compiler supports noexcept, but it is disabled in libmesh])
+      fi
+    ],[
+      AC_MSG_RESULT(no)
+    ])
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+
+    AM_CONDITIONAL(HAVE_CXX11_NOEXCEPT, test x$have_cxx11_noexcept == xyes)
+  ])

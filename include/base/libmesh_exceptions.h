@@ -27,6 +27,12 @@
 #include <string>
 #include <sstream>
 
+#ifdef LIBMESH_HAVE_CXX11_NOEXCEPT
+#define libmesh_noexcept noexcept
+#else
+#define libmesh_noexcept throw()
+#endif
+
 namespace libMesh {
 
 /**
@@ -116,12 +122,12 @@ public:
   /**
    * Virtual destructor, gotta have one of those.
    */
-  virtual ~SolverException() throw() {};
+  virtual ~SolverException() libmesh_noexcept {};
 
   /**
    * Override the what() function to provide a generic error message.
    */
-  virtual const char * what() const throw()
+  virtual const char * what() const libmesh_noexcept
   {
     // std::string::c_str() is noexcept in C++11, so it's safe to call
     // in what() because it can't throw.
