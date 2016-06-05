@@ -680,9 +680,14 @@ class PlotClones(PlotData):
       '2016-May-26',   34,   17,
       '2016-May-27',   25,   19,
       '2016-May-28',    8,    5,
-      '2016-May-29',    0,    0,
-      '2016-May-30',    0,    0,
-      '2016-May-31',    0,    0,
+      '2016-May-29',    0,    0, # Something went wrong
+      '2016-May-30',    0,    0, # with Github's clone
+      '2016-May-31',    0,    0, # data recording...
+      '2016-Jun-01',    0,    0,
+      '2016-Jun-02',    0,    0,
+      '2016-Jun-03',    0,    0,
+      '2016-Jun-04',    0,    0,
+      '2016-Jun-05',    0,    0,
     ]
 
 # Local Variables:
