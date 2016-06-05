@@ -2121,7 +2121,9 @@ void RBConstruction::check_convergence(LinearSolver<Number> & input_solver)
 
   if (conv_flag < 0)
     {
-      libmesh_error_msg("Error, conv_flag < 0!");
+      std::stringstream err_msg;
+      err_msg << "Convergence error. Error id: " << conv_flag;
+      libmesh_error_msg(err_msg.str());
     }
 }
 
