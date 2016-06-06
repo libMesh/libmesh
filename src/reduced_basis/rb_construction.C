@@ -233,8 +233,11 @@ void RBConstruction::process_parameters_file (const std::string & parameters_fil
                                                 rel_training_tolerance);
   const Real abs_training_tolerance_in = infile("abs_training_tolerance",
                                                 abs_training_tolerance);
+
+  // Initialize value to false, let the input file value override.
+  bool normalize_rb_bound_in_greedy = false;
   const bool normalize_rb_bound_in_greedy_in = infile("normalize_rb_bound_in_greedy",
-                                                      normalize_rb_bound_in_greedy_in);
+                                                      normalize_rb_bound_in_greedy);
 
   // Read in the parameters from the input file too
   unsigned int n_continuous_parameters = infile.vector_variable_size("parameter_names");
