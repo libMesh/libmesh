@@ -745,7 +745,7 @@ void System::read_serialized_data (Xdr & io,
   // 11.)
   // Only read additional vectors if the user requested them and
   // data is available
-  bool is_eof;
+  bool is_eof = false;
   if (this->processor_id() == 0)
     is_eof = io.is_eof();
   this->comm().broadcast(is_eof);
