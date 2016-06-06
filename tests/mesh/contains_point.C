@@ -23,6 +23,8 @@ public:
 
   CPPUNIT_TEST( testContainsPointTri3 );
 
+  CPPUNIT_TEST( testContainsPointTet4 );
+
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -64,6 +66,76 @@ public:
     CPPUNIT_ASSERT (!elem->contains_point(a + va * TOLERANCE * 10));
     CPPUNIT_ASSERT (!elem->contains_point(b + vb * TOLERANCE * 10));
     CPPUNIT_ASSERT (!elem->contains_point(c - (va + vb) * TOLERANCE * 10));
+  }
+
+
+
+  // TET4 test
+  void testContainsPointTet4()
+  {
+    // Construct unit Tet.
+    {
+      Node zero  (0., 0., 0., 0);
+      Node one   (1., 0., 0., 1);
+      Node two   (0., 1., 0., 2);
+      Node three (0., 0., 1., 3);
+
+      UniquePtr<Elem> elem = Elem::build(TET4);
+      elem->set_node(0) = &zero;
+      elem->set_node(1) = &one;
+      elem->set_node(2) = &two;
+      elem->set_node(3) = &three;
+
+      // The centroid must be inside the element.
+      CPPUNIT_ASSERT (elem->contains_point(elem->centroid()));
+
+      // The vertices must be contained in the element.
+      CPPUNIT_ASSERT (elem->contains_point(zero));
+      CPPUNIT_ASSERT (elem->contains_point(one));
+      CPPUNIT_ASSERT (elem->contains_point(two));
+      CPPUNIT_ASSERT (elem->contains_point(three));
+
+      // Make sure that outside points are not contained.
+      CPPUNIT_ASSERT (!elem->contains_point(Point(.34, .34, .34)));
+      CPPUNIT_ASSERT (!elem->contains_point(Point(.33, .33, -.1)));
+      CPPUNIT_ASSERT (!elem->contains_point(Point(0., -.1, .5)));
+    }
+
+
+    // Construct a nearly degenerate (sliver) tet.  A unit tet with
+    // nodes "one" and "two" moved to within a distance of epsilon
+    // from the origin.
+    {
+      Real epsilon = 1.e-4;
+
+      Node zero  (0., 0., 0., 0);
+      Node one   (epsilon, 0., 0., 1);
+      Node two   (0., epsilon, 0., 2);
+      Node three (0., 0., 1., 3);
+
+      UniquePtr<Elem> elem = Elem::build(TET4);
+      elem->set_node(0) = &zero;
+      elem->set_node(1) = &one;
+      elem->set_node(2) = &two;
+      elem->set_node(3) = &three;
+
+      // The centroid must be inside the element.
+      CPPUNIT_ASSERT (elem->contains_point(elem->centroid()));
+
+      // The vertices must be contained in the element.
+      CPPUNIT_ASSERT (elem->contains_point(zero));
+      CPPUNIT_ASSERT (elem->contains_point(one));
+      CPPUNIT_ASSERT (elem->contains_point(two));
+      CPPUNIT_ASSERT (elem->contains_point(three));
+
+      // Verify that a point which is on a mid-edge is contained in the element.
+      CPPUNIT_ASSERT (elem->contains_point(Point(epsilon/2, 0, 0.5)));
+
+      // Make sure that "just barely" outside points are outside.
+      CPPUNIT_ASSERT (!elem->contains_point(Point(epsilon, epsilon, epsilon/2)));
+      CPPUNIT_ASSERT (!elem->contains_point(Point(epsilon/10, epsilon/10, 1.0)));
+      CPPUNIT_ASSERT (!elem->contains_point(Point(epsilon/2, -epsilon/10, 0.5)));
+    }
   }
 };
 

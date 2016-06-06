@@ -187,6 +187,12 @@ public:
    */
   virtual dof_id_type key () const libmesh_override;
 
+  /**
+   * Uses simple geometric tests to determine if the point p is inside
+   * the tetrahedron.
+   */
+  virtual bool contains_point (const Point & p, Real tol) const libmesh_override;
+
 protected:
 
   /**
