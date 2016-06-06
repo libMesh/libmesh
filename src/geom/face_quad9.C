@@ -390,8 +390,9 @@ Real Quad9::volume () const
   Real vol=0.;
   for (unsigned int i=0; i<N; ++i)
     for (unsigned int j=0; j<N; ++j)
-      vol += (q[i]*q[j]*q[j]*a1 + q[j]*q[j]*b1 + q[j]*q[i]*c1 + q[i]*d1 + q[j]*e1 + f1).
-        cross(q[i]*q[i]*q[j]*a2 + q[i]*q[i]*b2 + q[j]*q[i]*c2 + q[i]*d2 + q[j]*e2 + f2).norm() * w[i] * w[j];
+      vol += w[i] * w[j] *
+        cross_norm(q[i]*q[j]*q[j]*a1 + q[j]*q[j]*b1 + q[j]*q[i]*c1 + q[i]*d1 + q[j]*e1 + f1,
+                   q[i]*q[i]*q[j]*a2 + q[i]*q[i]*b2 + q[j]*q[i]*c2 + q[i]*d2 + q[j]*e2 + f2);
 
   return vol;
 }

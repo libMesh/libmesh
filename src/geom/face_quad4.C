@@ -220,7 +220,8 @@ Real Quad4::volume () const
   Real vol=0.;
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<2; ++j)
-      vol += (q[j]*a1 + b1).cross(q[i]*a2 + b2).norm();
+      vol += cross_norm(q[j]*a1 + b1,
+                        q[i]*a2 + b2);
 
   return vol;
 }
