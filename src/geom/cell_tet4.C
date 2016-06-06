@@ -23,6 +23,7 @@
 #include "libmesh/cell_tet4.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/face_tri3.h"
+#include "libmesh/tensor_value.h"
 
 namespace libMesh
 {
@@ -332,6 +333,31 @@ dof_id_type Tet4::key () const
                            this->node_id(1),
                            this->node_id(2),
                            this->node_id(3));
+}
+
+
+
+bool Tet4::contains_point (const Point & p, Real tol) const
+{
+  // See the response by Tony Noe on this thread.
+  // http://bbs.dartmouth.edu/~fangq/MATH/download/source/Point_in_Tetrahedron.htm
+  Point
+    col1 = point(1) - point(0),
+    col2 = point(2) - point(0),
+    col3 = point(3) - point(0);
+
+  RealTensorValue V(col1(0), col2(0), col3(0),
+                    col1(1), col2(1), col3(1),
+                    col1(2), col2(2), col3(2));
+  Point r = V.inverse() * (p - point(0));
+
+  // The point p is inside the tetrahedron if r1 + r2 + r3 < 1 and
+  // 0 <= ri <= 1 for i = 1,2,3.
+  return
+    r(0) > -tol &&
+    r(1) > -tol &&
+    r(2) > -tol &&
+    r(0) + r(1) + r(2) < 1.0 + tol;
 }
 
 
