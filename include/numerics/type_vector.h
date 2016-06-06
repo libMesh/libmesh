@@ -1036,6 +1036,43 @@ T triple_product(const TypeVector<T> & a,
     a(2)*(b(0)*c(1) - b(1)*c(0));
 }
 
+
+
+/**
+ * Compute |b x c|^2 without creating the extra temporary produced by
+ * calling b.cross(c).norm_sq().
+ */
+template <typename T>
+inline
+T cross_norm_sq(const TypeVector<T> & b,
+                const TypeVector<T> & c)
+{
+  // We only support cross products when LIBMESH_DIM==3, same goes for this.
+  libmesh_assert_equal_to (LIBMESH_DIM, 3);
+
+  T x = b(1)*c(2) - b(2)*c(1),
+    y = b(0)*c(2) - b(2)*c(0),
+    z = b(0)*c(1) - b(1)*c(0);
+
+  return x*x + y*y + z*z;
+}
+
+
+
+/**
+ * Calls cross_norm_sq() and takes the square root of the result.
+ */
+template <typename T>
+inline
+T cross_norm(const TypeVector<T> & b,
+             const TypeVector<T> & c)
+{
+  // We only support cross products when LIBMESH_DIM==3, same goes for this.
+  libmesh_assert_equal_to (LIBMESH_DIM, 3);
+
+  return std::sqrt(cross_norm_sq(b,c));
+}
+
 } // namespace libMesh
 
 #endif // LIBMESH_TYPE_VECTOR_H
