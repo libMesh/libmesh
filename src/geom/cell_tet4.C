@@ -346,10 +346,10 @@ bool Tet4::contains_point (const Point & p, Real tol) const
     col2 = point(2) - point(0),
     col3 = point(3) - point(0);
 
-  RealTensorValue V(col1(0), col2(0), col3(0),
-                    col1(1), col2(1), col3(1),
-                    col1(2), col2(2), col3(2));
-  Point r = V.inverse() * (p - point(0));
+  Point r;
+  RealTensorValue(col1(0), col2(0), col3(0),
+                  col1(1), col2(1), col3(1),
+                  col1(2), col2(2), col3(2)).solve(p - point(0), r);
 
   // The point p is inside the tetrahedron if r1 + r2 + r3 < 1 and
   // 0 <= ri <= 1 for i = 1,2,3.
