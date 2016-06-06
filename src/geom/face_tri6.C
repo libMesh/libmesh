@@ -318,42 +318,48 @@ void Tri6::connectivity(const unsigned int sf,
 
 Real Tri6::volume () const
 {
+  // Make copies of our points.  It makes the subsequent calculations a bit
+  // shorter and avoids dereferencing the same pointer multiple times.
+  Point
+    x0 = point(0), x1 = point(1), x2 = point(2),
+    x3 = point(3), x4 = point(4), x5 = point(5);
+
   // Construct constant data vectors.
   // \vec{x}_{\xi}  = \vec{a1}*xi + \vec{b1}*eta + \vec{c1}
   // \vec{x}_{\eta} = \vec{a2}*xi + \vec{b2}*eta + \vec{c2}
   Point
-    a1 =  4*point(0) + 4*point(1) - 8*point(3),
-    b1 =  4*point(0) - 4*point(3) + 4*point(4) - 4*point(5),
-    c1 = -3*point(0) - 1*point(1) + 4*point(3),
-    a2 =  b1,
-    b2 =  4*point(0) + 4*point(2) - 8*point(5),
-    c2 = -3*point(0) - 1*point(2) + 4*point(5);
+    a1 =  4*x0 + 4*x1 - 8*x3,
+    b1 =  4*x0 - 4*x3 + 4*x4 - 4*x5, /*=a2*/
+    c1 = -3*x0 - 1*x1 + 4*x3,
+    b2 =  4*x0 + 4*x2 - 8*x5,
+    c2 = -3*x0 - 1*x2 + 4*x5;
 
   // If a1 == b1 == a2 == b2 == 0, this is a TRI6 with straight sides,
   // and we can use the TRI3 formula to compute the volume.
   if (a1.relative_fuzzy_equals(Point(0,0,0)) &&
       b1.relative_fuzzy_equals(Point(0,0,0)) &&
       b2.relative_fuzzy_equals(Point(0,0,0)))
-    return 0.5 * c1.cross(c2).norm();
+    return 0.5 * cross_norm(c1, c2);
 
   // 7-point rule, exact for quintics.
   const unsigned int N = 7;
 
   // Parameters of the quadrature rule
-  Real
+  const static Real
     w1 = Real(31)/480 + std::sqrt(15.0L)/2400,
     w2 = Real(31)/480 - std::sqrt(15.0L)/2400,
     q1 = Real(2)/7 + std::sqrt(15.0L)/21,
     q2 = Real(2)/7 - std::sqrt(15.0L)/21;
 
-  const Real xi[N]  = {Real(1)/3,  q1, q1,     1-2*q1, q2, q2,     1-2*q2};
-  const Real eta[N] = {Real(1)/3,  q1, 1-2*q1, q1,     q2, 1-2*q2, q2};
-  const Real wts[N] = {Real(9)/80, w1, w1,     w1,     w2, w2,     w2};
+  const static Real xi[N]  = {Real(1)/3,  q1, q1,     1-2*q1, q2, q2,     1-2*q2};
+  const static Real eta[N] = {Real(1)/3,  q1, 1-2*q1, q1,     q2, 1-2*q2, q2};
+  const static Real wts[N] = {Real(9)/80, w1, w1,     w1,     w2, w2,     w2};
 
   // Approximate the area with quadrature
   Real vol=0.;
   for (unsigned int q=0; q<N; ++q)
-    vol += wts[q] * (xi[q]*a1 + eta[q]*b1 + c1).cross(xi[q]*a2 + eta[q]*b2 + c2).norm();
+    vol += wts[q] * cross_norm(xi[q]*a1 + eta[q]*b1 + c1,
+                               xi[q]*b1 + eta[q]*b2 + c2);
 
   return vol;
 }
