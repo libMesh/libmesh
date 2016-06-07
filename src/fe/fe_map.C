@@ -1761,9 +1761,9 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
             //  {dp} = [J]^-1 ({X} - {X_n})
             //
             //  which involves the inversion of the 3x3 matrix [J]
-            dp = RealTensorValue(dxi(0), deta(0), dzeta(0),
-                                 dxi(1), deta(1), dzeta(1),
-                                 dxi(2), deta(2), dzeta(2)).inverse() * delta;
+            RealTensorValue(dxi(0), deta(0), dzeta(0),
+                            dxi(1), deta(1), dzeta(1),
+                            dxi(2), deta(2), dzeta(2)).solve(delta, dp);
 
             // No master elements have radius > 4, but sometimes we
             // can take a step that big while still converging
