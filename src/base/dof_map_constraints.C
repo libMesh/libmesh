@@ -955,7 +955,8 @@ private:
 
               // A shellface has the same dof indices as the element itself
               std::vector<unsigned int> shellface_dofs(dof_indices.size());
-              std::iota (std::begin(shellface_dofs), std::end(shellface_dofs), 0); 
+              for (unsigned int i=0; i != shellface_dofs.size(); ++i)
+                shellface_dofs[i]=i;
 
               // Some shellface dofs are on nodes/edges and already
               // fixed, others are free to calculate
