@@ -20,7 +20,9 @@ private:
 
   class ADTest {
   public:
-    ADTest(const std::string & _func, double _min, double _max, double _dx = 1e-6, double _reltol = 1e-5, int _steps = 20, double _abstol = 1e-10) :
+    ADTest(const std::string & _func,
+           double _min, double _max, double _dx = 1e-6,
+           double _reltol = 1e-5, int _steps = 20, double _abstol = 1e-10) :
         func(_func),
         min(_min),
         max(_max),
@@ -32,11 +34,15 @@ private:
       CPPUNIT_ASSERT_MESSAGE ("Failed to parse test function", F.Parse(func, "x") == -1);
       dF.Parse(func, "x");
       dFopt.Parse(func, "x");
+      dFaopt.Parse(func, "x");
 
       CPPUNIT_ASSERT_MESSAGE ("Failed to take derivative of function", dF.AutoDiff("x") == -1);
 
       dFopt.Optimize();
       CPPUNIT_ASSERT_MESSAGE ("Failed to take derivative of optimized function", dFopt.AutoDiff("x") == -1);
+
+      dFaopt.SetADFlags(FunctionParserAD::ADAutoOptimize, true);
+      CPPUNIT_ASSERT_MESSAGE ("Failed to take derivative of auto-optimized function", dFaopt.AutoDiff("x") == -1);
     }
 
     bool run()
@@ -66,6 +72,13 @@ private:
           std::cout << "Error in opt " << func << ": " << fd << "!=" << vdF << " at x=" << x << '\n';
           return false;
         }
+
+        vdF = dFaopt.Eval(&x);
+        if (std::abs(vdF) > abstol && std::abs((fd - vdF)/vdF) > reltol && std::abs(fd - vdF)> abstol)
+        {
+          std::cout << "Error in auto opt " << func << ": " << fd << "!=" << vdF << " at x=" << x << '\n';
+          return false;
+        }
       }
 
       return true;
@@ -76,7 +89,7 @@ private:
     double min, max, dx, reltol, abstol;
     int steps;
 
-    FunctionParserAD F, dF, dFopt;
+    FunctionParserAD F, dF, dFopt, dFaopt;
   };
 
   std::vector<ADTest> tests;
@@ -104,6 +117,7 @@ public:
     tests.push_back(ADTest("atan2(x,1) + atan2(2,x)", -0.99, 0.99));
     tests.push_back(ADTest("0.767^sin(x)", -1.5, 1.5));
     tests.push_back(ADTest("A := sin(x) + tanh(x); A + sqrt(A) - x", -1.5, 1.5));
+    tests.push_back(ADTest("3*sin(2*x)*sin(2*x)", -5.0, 5.0, 1e-7, 1e-5, 100));
   }
 
   void runTests()
