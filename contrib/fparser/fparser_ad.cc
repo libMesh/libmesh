@@ -397,7 +397,7 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
 
     // should and can we load a cached derivative?
     std::string cache_file;
-    const std::string jitdir = ".jitdir";
+    const std::string jitdir = ".jitcache";
     if (cached)
     {
       // generate a sha1 hash of the Value type size, byte code, and immediate list
