@@ -348,6 +348,7 @@ private:
     // Prepare variables for projection
     UniquePtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
     UniquePtr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
+    UniquePtr<QBase> qrule (fe_type.default_quadrature_rule(dim));
 
     // The values of the shape functions at the quadrature
     // points
@@ -431,11 +432,12 @@ private:
         if (f_system && context.get())
           context->pre_fe_reinit(*f_system, elem);
 
-        // Find out which nodes, edges and sides are on a requested
+        // Find out which nodes, edges, sides and shellfaces are on a requested
         // boundary:
         std::vector<bool> is_boundary_node(elem->n_nodes(), false),
           is_boundary_edge(elem->n_edges(), false),
-          is_boundary_side(elem->n_sides(), false);
+          is_boundary_side(elem->n_sides(), false),
+          is_boundary_shellface(2, false);
 
         // We also maintain a separate list of nodeset-based boundary nodes
         std::vector<bool> is_boundary_nodeset(elem->n_nodes(), false);
@@ -496,6 +498,18 @@ private:
                  bc_it != ids_vec.end(); ++bc_it)
               if (b.count(*bc_it))
                 is_boundary_edge[e] = true;
+          }
+
+        // We can also impose Dirichlet boundary conditions on shellfaces, so we should
+        // also independently check whether the shellfaces have been requested
+        for (unsigned short shellface=0; shellface != 2; ++shellface)
+          {
+            boundary_info.shellface_boundary_ids (elem, shellface, ids_vec);
+
+            for (std::vector<boundary_id_type>::iterator bc_it = ids_vec.begin();
+                 bc_it != ids_vec.end(); ++bc_it)
+              if (b.count(*bc_it))
+                is_boundary_shellface[shellface] = true;
           }
 
         // Update the DOF indices for this element based on
@@ -929,6 +943,130 @@ private:
                                  std::abs(ui - Uside(i)) < TOLERANCE);
                   ui = Uside(i);
                   dof_is_fixed[side_dofs[free_dof[i]]] = true;
+                }
+            }
+
+        // Project any shellface values
+        if (dim == 2 && cont != DISCONTINUOUS)
+          for (unsigned int shellface=0; shellface != 2; ++shellface)
+            {
+              if (!is_boundary_shellface[shellface])
+                continue;
+
+              // A shellface has the same dof indices as the element itself
+              std::vector<unsigned int> shellface_dofs(dof_indices.size());
+              for (unsigned int i=0; i != shellface_dofs.size(); ++i)
+                shellface_dofs[i]=i;
+
+              // Some shellface dofs are on nodes/edges and already
+              // fixed, others are free to calculate
+              unsigned int free_dofs = 0;
+              for (unsigned int i=0; i != shellface_dofs.size(); ++i)
+                if (!dof_is_fixed[shellface_dofs[i]])
+                  free_dof[free_dofs++] = i;
+
+              // There may be nothing to project
+              if (!free_dofs)
+                continue;
+
+              Ke.resize (free_dofs, free_dofs); Ke.zero();
+              Fe.resize (free_dofs); Fe.zero();
+              // The new shellface coefficients
+              DenseVector<Number> Ushellface(free_dofs);
+
+              // Initialize FE data on the element
+              fe->attach_quadrature_rule (qrule.get());
+              fe->reinit (elem);
+              const unsigned int n_qp = qrule->n_points();
+
+              // Loop over the quadrature points
+              for (unsigned int qp=0; qp<n_qp; qp++)
+                {
+                  // solution at the quadrature point
+                  OutputNumber fineval(0);
+                  libMesh::RawAccessor<OutputNumber> f_accessor( fineval, dim );
+
+                  for( unsigned int c = 0; c < n_vec_dim; c++)
+                    f_accessor(c) =
+                      f_component(f, f_fem, context.get(), var_component+c,
+                                  xyz_values[qp], time);
+
+                  // solution grad at the quadrature point
+                  OutputNumberGradient finegrad;
+                  libMesh::RawAccessor<OutputNumberGradient> g_accessor( finegrad, dim );
+
+                  unsigned int g_rank;
+                  switch( FEInterface::field_type( fe_type ) )
+                    {
+                    case TYPE_SCALAR:
+                      {
+                        g_rank = 1;
+                        break;
+                      }
+                    case TYPE_VECTOR:
+                      {
+                        g_rank = 2;
+                        break;
+                      }
+                    default:
+                      libmesh_error_msg("Unknown field type!");
+                    }
+
+                  if (cont == C_ONE)
+                    for( unsigned int c = 0; c < n_vec_dim; c++)
+                      for( unsigned int d = 0; d < g_rank; d++ )
+                        g_accessor(c + d*dim ) =
+                          g_component(g, g_fem, context.get(), var_component,
+                                      xyz_values[qp], time)(c);
+
+                  // Form shellface projection matrix
+                  for (unsigned int shellfacei=0, freei=0;
+                       shellfacei != shellface_dofs.size(); ++shellfacei)
+                    {
+                      unsigned int i = shellface_dofs[shellfacei];
+                      // fixed DoFs aren't test functions
+                      if (dof_is_fixed[i])
+                        continue;
+                      for (unsigned int shellfacej=0, freej=0;
+                           shellfacej != shellface_dofs.size(); ++shellfacej)
+                        {
+                          unsigned int j = shellface_dofs[shellfacej];
+                          if (dof_is_fixed[j])
+                            Fe(freei) -= phi[i][qp] * phi[j][qp] *
+                              JxW[qp] * Ue(j);
+                          else
+                            Ke(freei,freej) += phi[i][qp] *
+                              phi[j][qp] * JxW[qp];
+                          if (cont == C_ONE)
+                            {
+                              if (dof_is_fixed[j])
+                                Fe(freei) -= ((*dphi)[i][qp].contract((*dphi)[j][qp])) *
+                                  JxW[qp] * Ue(j);
+                              else
+                                Ke(freei,freej) += ((*dphi)[i][qp].contract((*dphi)[j][qp]))
+                                  * JxW[qp];
+                            }
+                          if (!dof_is_fixed[j])
+                            freej++;
+                        }
+                      Fe(freei) += (fineval * phi[i][qp]) * JxW[qp];
+                      if (cont == C_ONE)
+                        Fe(freei) += (finegrad.contract((*dphi)[i][qp])) *
+                          JxW[qp];
+                      freei++;
+                    }
+                }
+
+              Ke.cholesky_solve(Fe, Ushellface);
+
+              // Transfer new shellface solutions to element
+              for (unsigned int i=0; i != free_dofs; ++i)
+                {
+                  Number & ui = Ue(shellface_dofs[free_dof[i]]);
+                  libmesh_assert(std::abs(ui) < TOLERANCE ||
+                                 std::abs(ui - Ushellface(i)) < TOLERANCE);
+                  ui = Ushellface(i);
+                  dof_is_fixed[shellface_dofs[free_dof[i]]] = true;
                 }
             }
 
