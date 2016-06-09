@@ -8,6 +8,11 @@
 #include <libmesh/mesh_generation.h>
 #include <libmesh/boundary_info.h>
 #include <libmesh/elem.h>
+#include <libmesh/face_quad4_shell.h>
+#include <libmesh/equation_systems.h>
+#include <libmesh/zero_function.h>
+#include <libmesh/dirichlet_boundaries.h>
+#include <libmesh/dof_map.h>
 
 #include "test_comm.h"
 
@@ -22,6 +27,7 @@ public:
 
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testEdgeBoundaryConditions );
+  CPPUNIT_TEST( testShellFaceConstraints );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -154,6 +160,85 @@ public:
     BoundaryInfo & bi = mesh.get_boundary_info();
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(n_elem), bi.n_edge_conds());
   }
+
+  void testShellFaceConstraints()
+  {
+    // Make a simple two element mesh that we can use to test constraints
+    ReplicatedMesh mesh(*TestCommWorld, 3);
+
+    /*
+      (0,1)           (1,1)
+        x---------------x
+        |               |
+        |               |
+        |               |
+        |               |
+        |               |
+        x---------------x
+       (0,0)           (1,0)
+        |               |
+        |               |
+        |               |
+        |               |
+        x---------------x
+       (0,-1)          (1,-1)
+     */
+
+    mesh.add_point( Point(0.0,-1.0), 4 );
+    mesh.add_point( Point(1.0,-1.0), 5 );
+    mesh.add_point( Point(1.0, 0.0), 1 );
+    mesh.add_point( Point(1.0, 1.0), 2 );
+    mesh.add_point( Point(0.0, 1.0), 3 );
+    mesh.add_point( Point(0.0, 0.0), 0 );
+
+    Elem* elem_top = mesh.add_elem( new QuadShell4 );
+    elem_top->set_node(0) = mesh.node_ptr(0);
+    elem_top->set_node(1) = mesh.node_ptr(1);
+    elem_top->set_node(2) = mesh.node_ptr(2);
+    elem_top->set_node(3) = mesh.node_ptr(3);
+
+    Elem* elem_bottom = mesh.add_elem( new QuadShell4 );
+    elem_bottom->set_node(0) = mesh.node_ptr(4);
+    elem_bottom->set_node(1) = mesh.node_ptr(5);
+    elem_bottom->set_node(2) = mesh.node_ptr(1);
+    elem_bottom->set_node(3) = mesh.node_ptr(0);
+
+    mesh.prepare_for_use(false /*skip_renumber*/);
+
+    BoundaryInfo & bi = mesh.get_boundary_info();
+    bi.add_shellface(elem_top, 0, 10);
+    bi.add_shellface(elem_bottom, 1, 20);
+    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), bi.n_shellface_conds());
+
+    EquationSystems es(mesh);
+    System & system = es.add_system<System> ("SimpleSystem");
+    system.add_variable("u", FIRST);
+
+    // Add a Dirichlet constraint to check that we impose constraints
+    // correctly on shell faces.
+    std::vector<unsigned int> variables;
+    variables.push_back(0);
+    std::set<boundary_id_type> shellface_ids;
+    shellface_ids.insert(20);
+    ZeroFunction<> zf;
+    DirichletBoundary dirichlet_bc(shellface_ids,
+                                   variables,
+                                   &zf);
+    system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
+    es.init();
+
+    // We expect to have a dof constraint on all four dofs of elem_bottom
+    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(4), static_cast<std::size_t>(system.n_constrained_dofs()));
+    std::vector<dof_id_type> dof_indices;
+    system.get_dof_map().dof_indices(elem_bottom, dof_indices);
+    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(4), dof_indices.size());
+    for(unsigned int i=0; i<dof_indices.size(); i++)
+      {
+        dof_id_type dof_id = dof_indices[i];
+        CPPUNIT_ASSERT( system.get_dof_map().is_constrained_dof(dof_id) );
+      }
+  }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( BoundaryInfoTest );
