@@ -59,14 +59,14 @@ private:
 
     for (unsigned i=0; i<U.m(); ++i)
       for (unsigned j=0; j<U.n(); ++j)
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(U(i,j), true_U(i,j), 1.e-12);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(U(i,j), true_U(i,j), TOLERANCE*TOLERANCE);
 
     for (unsigned i=0; i<VT.m(); ++i)
       for (unsigned j=0; j<VT.n(); ++j)
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(VT(i,j), true_VT(i,j), 1.e-12);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(VT(i,j), true_VT(i,j), TOLERANCE*TOLERANCE);
 
     for (unsigned i=0; i<sigma.size(); ++i)
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(sigma(i), true_sigma(i), 1.e-12);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(sigma(i), true_sigma(i), TOLERANCE*TOLERANCE);
   }
 
 };
