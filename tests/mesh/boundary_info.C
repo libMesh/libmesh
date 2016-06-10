@@ -5,6 +5,7 @@
 #include <libmesh/restore_warnings.h>
 
 #include <libmesh/mesh.h>
+#include <libmesh/serial_mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/boundary_info.h>
 #include <libmesh/elem.h>
