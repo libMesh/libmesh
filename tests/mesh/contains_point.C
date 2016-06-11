@@ -51,11 +51,11 @@ public:
     elem->set_node(2) = &c;
 
     // midpoint
-    Point mid = 1.0/3.0 * (a + b + c);
+    Point mid = (a + b + c) / 3;
     CPPUNIT_ASSERT (elem->contains_point(mid));
 
     // out of plane from the mid point
-    CPPUNIT_ASSERT (!elem->contains_point(mid + 0.1 * oop));
+    CPPUNIT_ASSERT (!elem->contains_point(mid + oop/10));
 
     // check all corners
     CPPUNIT_ASSERT (elem->contains_point(a));
