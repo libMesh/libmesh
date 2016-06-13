@@ -33,7 +33,8 @@ public:
   void tearDown() {}
 
   // TRI3 test
-  void testContainsPointTri3() {
+  void testContainsPointTri3()
+  {
     // tri corner nodes
     Node a(3,1,2, 0);
     Node b(1,2,3, 1);
@@ -50,12 +51,11 @@ public:
     elem->set_node(1) = &b;
     elem->set_node(2) = &c;
 
-    // midpoint
-    Point mid = (a + b + c) / 3;
-    CPPUNIT_ASSERT (elem->contains_point(mid));
+    // centroid
+    CPPUNIT_ASSERT (elem->contains_point(elem->centroid()));
 
-    // out of plane from the mid point
-    CPPUNIT_ASSERT (!elem->contains_point(mid + oop/10));
+    // out of plane from the centroid
+    CPPUNIT_ASSERT (!elem->contains_point(elem->centroid() + oop/10));
 
     // check all corners
     CPPUNIT_ASSERT (elem->contains_point(a));
