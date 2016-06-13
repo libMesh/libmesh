@@ -52,6 +52,7 @@
 #include "libmesh/system.h" // needed by enforce_constraints_exactly()
 #include "libmesh/threads.h"
 #include "libmesh/tensor_tools.h"
+#include "libmesh/utility.h" // Utility::iota()
 
 
 // Anonymous namespace to hold helper classes
@@ -955,8 +956,7 @@ private:
 
               // A shellface has the same dof indices as the element itself
               std::vector<unsigned int> shellface_dofs(dof_indices.size());
-              for (unsigned int i=0; i != shellface_dofs.size(); ++i)
-                shellface_dofs[i]=i;
+              Utility::iota(shellface_dofs.begin(), shellface_dofs.end(), 0);
 
               // Some shellface dofs are on nodes/edges and already
               // fixed, others are free to calculate
