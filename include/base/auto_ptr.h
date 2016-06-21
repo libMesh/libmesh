@@ -46,7 +46,15 @@ template<typename T>
 using UniquePtr = std::unique_ptr<T>;
 }
 #elif LIBMESH_HAVE_BOOST_MOVELIB_UNIQUE_PTR
+// Disable warnings from boost header files under clang
+#  ifdef __clang__
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wunused-local-typedef"
+#  endif
 #  include "boost/move/unique_ptr.hpp"
+#  ifdef __clang__
+#    pragma clang diagnostic pop
+#  endif
 #  define UniquePtr unique_ptr
 namespace libMesh
 {
