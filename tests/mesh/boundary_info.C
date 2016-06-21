@@ -5,7 +5,6 @@
 #include <libmesh/restore_warnings.h>
 
 #include <libmesh/mesh.h>
-#include <libmesh/serial_mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/boundary_info.h>
 #include <libmesh/elem.h>
@@ -165,7 +164,7 @@ public:
   void testShellFaceConstraints()
   {
     // Make a simple two element mesh that we can use to test constraints
-    ReplicatedMesh mesh(*TestCommWorld, 3);
+    Mesh mesh(*TestCommWorld, 3);
 
     /*
       (0,1)           (1,1)
@@ -233,11 +232,15 @@ public:
     std::vector<dof_id_type> dof_indices;
     system.get_dof_map().dof_indices(elem_bottom, dof_indices);
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(4), dof_indices.size());
-    for(unsigned int i=0; i<dof_indices.size(); i++)
-      {
-        dof_id_type dof_id = dof_indices[i];
-        CPPUNIT_ASSERT( system.get_dof_map().is_constrained_dof(dof_id) );
-      }
+
+    // But we may only know about that constraint on the processor
+    // which owns elem_bottom
+    if (elem_bottom->processor_id() == mesh.processor_id())
+      for(unsigned int i=0; i<dof_indices.size(); i++)
+        {
+          dof_id_type dof_id = dof_indices[i];
+          CPPUNIT_ASSERT( system.get_dof_map().is_constrained_dof(dof_id) );
+        }
   }
 
 };
