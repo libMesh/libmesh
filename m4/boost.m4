@@ -63,3 +63,24 @@ AC_DEFUN([CONFIGURE_BOOST],
 
   AM_CONDITIONAL(LIBMESH_INSTALL_INTERNAL_BOOST, test x$install_internal_boost = xyes)
 ])
+
+AC_DEFUN([LIBMESH_TEST_BOOST_MOVELIB_UNIQUE_PTR],
+[
+  have_boost_unique_ptr=no
+  if (test x$enableboost = xyes); then
+    AC_MSG_CHECKING(for boost::movelib::unique_ptr support)
+    AC_LANG_PUSH([C++])
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include "boost/move/unique_ptr.hpp"
+    ]], [[
+        boost::movelib::unique_ptr<double> x(new double);
+    ]])],[
+        have_boost_unique_ptr=yes
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_BOOST_MOVELIB_UNIQUE_PTR, 1, [Flag indicating whether the library will use Boost Move's unique_ptr implementation])
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+  fi
+])

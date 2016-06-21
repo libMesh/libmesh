@@ -190,6 +190,10 @@
 /* define if the Boost library is available */
 #undef HAVE_BOOST
 
+/* Flag indicating whether the library will use Boost Move's unique_ptr
+   implementation */
+#undef HAVE_BOOST_MOVELIB_UNIQUE_PTR
+
 /* Flag indicating bzip2/bunzip2 are available for handling compressed .bz2
    files */
 #undef HAVE_BZIP

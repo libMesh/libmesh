@@ -33768,6 +33768,51 @@ else
 fi
 
 
+
+  have_boost_unique_ptr=no
+  if (test x$enableboost = xyes); then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for boost::movelib::unique_ptr support" >&5
+$as_echo_n "checking for boost::movelib::unique_ptr support... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include "boost/move/unique_ptr.hpp"
+
+int
+main ()
+{
+
+        boost::movelib::unique_ptr<double> x(new double);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        have_boost_unique_ptr=yes
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_BOOST_MOVELIB_UNIQUE_PTR 1" >>confdefs.h
+
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  fi
+
 ac_config_files="$ac_config_files contrib/boost/include/Makefile"
 
 # --------------------------------------------------------------
@@ -33792,6 +33837,10 @@ fi
 
   # Shell variable that will eventually be used to set the AM_CONDITIONAL
   install_hinnant_unique_ptr=no
+
+  if (test x$have_boost_unique_ptr = xyes); then
+    enablehinnant=no
+  fi
 
   # If the user did not explicitly disable it, do some more testing
   if (test x$enablehinnant = xyes); then

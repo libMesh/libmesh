@@ -45,6 +45,14 @@ namespace libMesh
 template<typename T>
 using UniquePtr = std::unique_ptr<T>;
 }
+#elif LIBMESH_HAVE_BOOST_MOVELIB_UNIQUE_PTR
+#  include "boost/move/unique_ptr.hpp"
+#  define UniquePtr unique_ptr
+namespace libMesh
+{
+// Declare that we are using boost Move's unique_ptr type
+using boost::movelib::unique_ptr;
+}
 #elif LIBMESH_HAVE_HINNANT_UNIQUE_PTR
 // As per Roy's suggestion, use a combination of a macro and a 'using'
 // statement to make libMesh's UniquePtr type equivalent to the
