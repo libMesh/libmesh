@@ -71,6 +71,11 @@ AC_DEFUN([LIBMESH_TEST_BOOST_MOVELIB_UNIQUE_PTR],
     AC_MSG_CHECKING(for boost::movelib::unique_ptr support)
     AC_LANG_PUSH([C++])
 
+    # Store the old value of CXXFLAGS, then append BOOST_CPPFLAGS which was
+    # determined by AX_BOOST_BASE.
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $BOOST_CPPFLAGS"
+
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include "boost/move/unique_ptr.hpp"
     ]], [[
@@ -82,5 +87,9 @@ AC_DEFUN([LIBMESH_TEST_BOOST_MOVELIB_UNIQUE_PTR],
     ],[
         AC_MSG_RESULT(no)
     ])
+
+    # Reset old flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
   fi
 ])
