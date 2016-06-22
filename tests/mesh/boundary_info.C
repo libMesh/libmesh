@@ -227,20 +227,35 @@ public:
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
     es.init();
 
-    // We expect to have a dof constraint on all four dofs of elem_bottom
-    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(4), static_cast<std::size_t>(system.n_constrained_dofs()));
-    std::vector<dof_id_type> dof_indices;
-    system.get_dof_map().dof_indices(elem_bottom, dof_indices);
-    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(4), dof_indices.size());
+    // Find elem_bottom again if we have it (it may have been deleted
+    // in a DistributedMesh or renumbered in theory)
+    elem_bottom = NULL;
+    for (unsigned int e = 0; e != mesh.max_elem_id(); ++e)
+      {
+        Elem *elem = mesh.query_elem_ptr(e);
+        if (elem && elem->point(3) == Point(0,0))
+          elem_bottom = elem;
+      }
 
-    // But we may only know about that constraint on the processor
-    // which owns elem_bottom
-    if (elem_bottom->processor_id() == mesh.processor_id())
-      for(unsigned int i=0; i<dof_indices.size(); i++)
-        {
-          dof_id_type dof_id = dof_indices[i];
-          CPPUNIT_ASSERT( system.get_dof_map().is_constrained_dof(dof_id) );
-        }
+    // We expect to have a dof constraint on all four dofs of
+    // elem_bottom
+    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(4), static_cast<std::size_t>(system.n_constrained_dofs()));
+
+    // But we may only know the details of that
+    // constraint on the processor which owns elem_bottom.
+    if (elem_bottom &&
+        elem_bottom->processor_id() == mesh.processor_id())
+      {
+        std::vector<dof_id_type> dof_indices;
+        system.get_dof_map().dof_indices(elem_bottom, dof_indices);
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(4), dof_indices.size());
+
+        for(unsigned int i=0; i<dof_indices.size(); i++)
+          {
+            dof_id_type dof_id = dof_indices[i];
+            CPPUNIT_ASSERT( system.get_dof_map().is_constrained_dof(dof_id) );
+          }
+      }
   }
 
 };
