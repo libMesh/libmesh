@@ -501,18 +501,14 @@ void set_system_parameters(FEMSystem & system,
           timesolver->upper_tolerance  = param.timesolver_upper_tolerance;
           timesolver->component_norm   = SystemNorm(param.timesolver_norm);
 
-          timesolver->core_time_solver =
-            UniquePtr<UnsteadySolver>(innersolver);
-          system.time_solver =
-            UniquePtr<UnsteadySolver>(timesolver);
+          timesolver->core_time_solver.reset(innersolver);
+          system.time_solver.reset(timesolver);
         }
       else
-        system.time_solver =
-          UniquePtr<TimeSolver>(innersolver);
+        system.time_solver.reset(innersolver);
     }
   else
-    system.time_solver =
-      UniquePtr<TimeSolver>(new SteadySolver(system));
+    system.time_solver.reset(new SteadySolver(system));
 
   system.time_solver->reduce_deltat_on_diffsolver_failure =
     param.deltat_reductions;
@@ -529,7 +525,7 @@ void set_system_parameters(FEMSystem & system,
     {
 #ifdef LIBMESH_HAVE_PETSC
       PetscDiffSolver *solver = new PetscDiffSolver(system);
-      system.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver);
+      system.time_solver->diff_solver().reset(solver);
 #else
       libmesh_error_msg("This example requires libMesh to be compiled with PETSc support.");
 #endif
@@ -537,7 +533,7 @@ void set_system_parameters(FEMSystem & system,
   else
     {
       NewtonSolver *solver = new NewtonSolver(system);
-      system.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver);
+      system.time_solver->diff_solver().reset(solver);
 
       solver->quiet                       = param.solver_quiet;
       solver->verbose                     = !param.solver_quiet;

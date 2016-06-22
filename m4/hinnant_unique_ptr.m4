@@ -18,6 +18,10 @@ AC_DEFUN([CONFIGURE_HINNANT_UNIQUE_PTR],
   # Shell variable that will eventually be used to set the AM_CONDITIONAL
   install_hinnant_unique_ptr=no
 
+  if (test x$have_boost_unique_ptr = xyes); then
+    enablehinnant=no
+  fi
+
   # If the user did not explicitly disable it, do some more testing
   if (test x$enablehinnant = xyes); then
 

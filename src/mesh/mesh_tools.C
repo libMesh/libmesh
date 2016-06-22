@@ -402,13 +402,17 @@ void MeshTools::find_boundary_nodes (const MeshBase & mesh,
 
   for (; el != end; ++el)
     for (unsigned int s=0; s<(*el)->n_neighbors(); s++)
-      if ((*el)->neighbor_ptr(s) == libmesh_nullptr) // on the boundary
-        {
-          const UniquePtr<const Elem> side((*el)->build_side_ptr(s));
+      {
+        const Elem * elem = *el;
 
-          for (unsigned int n=0; n<side->n_nodes(); n++)
-            on_boundary[side->node_id(n)] = true;
-        }
+        if (elem->neighbor_ptr(s) == libmesh_nullptr) // on the boundary
+          {
+            const UniquePtr<const Elem> side = elem->build_side_ptr(s);
+
+            for (unsigned int n=0; n<side->n_nodes(); n++)
+              on_boundary[side->node_id(n)] = true;
+          }
+      }
 }
 
 
