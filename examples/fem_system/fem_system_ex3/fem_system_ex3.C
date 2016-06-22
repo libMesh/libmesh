@@ -174,12 +174,10 @@ int main (int argc, char ** argv)
 
   // Solve this as a time-dependent or steady system
   if (transient)
-    system.time_solver =
-      UniquePtr<NewmarkSolver>(new NewmarkSolver(system));
+    system.time_solver.reset(new NewmarkSolver(system));
   else
     {
-      system.time_solver =
-        UniquePtr<TimeSolver>(new SteadySolver(system));
+      system.time_solver.reset(new SteadySolver(system));
       libmesh_assert_equal_to (n_timesteps, 1);
     }
 
