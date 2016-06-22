@@ -52,23 +52,41 @@ public:
                                         0., 1.,
                                         QUAD4);
 
-    // build_square adds boundary_ids 0,1,2,3 for the bottom, right,
-    // top, and left sides, respectively.  Let's test that we can
-    // remove them successfully.
     BoundaryInfo & bi = mesh.get_boundary_info();
+
+    // Side lists should be cleared and refilled by each call
+    std::vector<dof_id_type> element_id_list;
+    std::vector<unsigned short int> side_list;
+    std::vector<boundary_id_type> bc_id_list;
+
+    // build_square adds boundary_ids 0,1,2,3 for the bottom, right,
+    // top, and left sides, respectively.
+    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(4), bi.n_boundary_ids());
+
+    // Build the side list
+    bi.build_side_list (element_id_list, side_list, bc_id_list);
+
+    // Check that there are exactly 8 sides in the BoundaryInfo for a
+    // replicated mesh
+    if (mesh.is_serial())
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(8), element_id_list.size());
+
+    // Let's test that we can remove them successfully.
     bi.remove_id(0);
 
     // Check that there are now only 3 boundary ids total on the Mesh.
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(3), bi.n_boundary_ids());
 
-    // Build the side list
-    std::vector<dof_id_type> element_id_list;
-    std::vector<unsigned short int> side_list;
-    std::vector<boundary_id_type> bc_id_list;
+    // Build the side list again
     bi.build_side_list (element_id_list, side_list, bc_id_list);
 
-    // Check that there are now exactly 6 sides left in the BoundaryInfo
-    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(6), element_id_list.size());
+    // Check that there are now exactly 6 sides left in the
+    // BoundaryInfo on a replicated mesh
+    if (mesh.is_serial())
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(6), element_id_list.size());
+
+    // Check that the removed ID is really removed
+    CPPUNIT_ASSERT(std::find(bc_id_list.begin(), bc_id_list.end(), 0) == bc_id_list.end());
 
     // Remove the same id again, make sure nothing changes.
     bi.remove_id(0);
