@@ -221,11 +221,12 @@ public:
     elem_bottom->set_node(2) = mesh.node_ptr(1);
     elem_bottom->set_node(3) = mesh.node_ptr(0);
 
-    mesh.prepare_for_use(false /*skip_renumber*/);
-
     BoundaryInfo & bi = mesh.get_boundary_info();
     bi.add_shellface(elem_top, 0, 10);
     bi.add_shellface(elem_bottom, 1, 20);
+
+    mesh.prepare_for_use(false /*skip_renumber*/);
+
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), bi.n_shellface_conds());
 
     EquationSystems es(mesh);
