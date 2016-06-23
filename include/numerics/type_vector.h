@@ -311,8 +311,8 @@ public:
                              Real tol = TOLERANCE) const;
 
   /**
-   * @returns \p true iff two vectors occupy the same physical location in space,
-   * to within tolerance of the type T. For floating point types, the function
+   * @returns \p true iff this(i)==rhs(i) for each component of the
+   * vector. For floating point types T, the function
    * absolute_fuzzy_equals may be a more appropriate choice.
    */
   bool operator == (const TypeVector<T> & rhs) const;
