@@ -164,7 +164,7 @@ AC_DEFUN([CONFIGURE_VTK],
            VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
 
          dnl VTK 6.1.x
-         elif (test $vtkmajor -eq 6 -a $vtkminor -eq 1); then
+         elif (test $vtkmajor -eq 6 -a $vtkminor -le 1); then
            VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
                                      -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
                                      -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor"
