@@ -123,6 +123,15 @@ public:
                      const Real time=0.) libmesh_override;
 
   /**
+   * @returns a map of values of variable 0 at point
+   * \p p and for \p time.
+   * map is from element to Number and accounts for double defined
+   * values on faces if discontinuous variables are used
+   */
+  std::map<const Elem *, Number> discontinuous_value (const Point & p,
+                                                      const Real time=0.);
+
+  /**
    * @returns the first derivatives of variable 0 at point
    * \p p and for \p time, which defaults to zero.
    */
@@ -157,6 +166,25 @@ public:
                    const Real time,
                    DenseVector<Number> & output,
                    const std::set<subdomain_id_type> * subdomain_ids);
+
+  /**
+   * Similar to operator() with the same parameter list, but with the difference
+   * that multiple values on faces are explicitly permitted. This is useful for
+   * discontinuous shape functions that are evaluated on faces.
+   */
+  void discontinuous_value (const Point & p,
+                            const Real time,
+                            std::map<const Elem *, DenseVector<Number> > & output);
+
+  /**
+   * Similar to operator() with the same parameter list, but with the difference
+   * that multiple values on faces are explicitly permitted. This is useful for
+   * discontinuous shape functions that are evaluated on faces.
+   */
+  void discontinuous_value (const Point & p,
+                            const Real time,
+                            std::map<const Elem *, DenseVector<Number> > & output,
+                            const std::set<subdomain_id_type> * subdomain_ids);
 
   /**
    * Computes gradients at coordinate \p p and for time \p time, which
@@ -236,6 +264,13 @@ protected:
    */
   const Elem * find_element(const Point & p,
                             const std::set<subdomain_id_type> * subdomain_ids = libmesh_nullptr) const;
+
+  /**
+   * Similar to find_element but returns all elements that are close to a point
+   * to cover cases where p is on the boundary
+   */
+  std::set<const Elem *> find_elements(const Point & p,
+                                       const std::set<subdomain_id_type> * subdomain_ids = libmesh_nullptr) const;
 
   /**
    * The equation systems handler, from which
