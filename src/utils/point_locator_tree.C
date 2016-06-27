@@ -255,6 +255,19 @@ const Elem * PointLocatorTree::operator() (const Point & p,
 }
 
 
+void PointLocatorTree::operator() (const Point & p,
+                                   std::set<const Elem *> & candidate_elements,
+                                   const std::set<subdomain_id_type> * allowed_subdomains) const
+{
+  libmesh_assert (this->_initialized);
+
+  LOG_SCOPE("operator() - Version 2", "PointLocatorTree");
+
+  // forward call to perform_linear_search
+  candidate_elements = this->perform_fuzzy_linear_search(p, allowed_subdomains, _close_to_point_tol);
+}
+
+
 
 const Elem * PointLocatorTree::perform_linear_search(const Point & p,
                                                      const std::set<subdomain_id_type> * allowed_subdomains,
@@ -295,6 +308,38 @@ const Elem * PointLocatorTree::perform_linear_search(const Point & p,
 
   return libmesh_nullptr;
 }
+
+
+std::set<const Elem *> PointLocatorTree::perform_fuzzy_linear_search(const Point & p,
+                                                                     const std::set<subdomain_id_type> * allowed_subdomains,
+                                                                     Real close_to_point_tolerance) const
+{
+  LOG_SCOPE("perform_fuzzy_linear_search", "PointLocatorTree");
+
+  std::set<const Elem *> candidate_elements;
+
+  // The type of iterator depends on the Trees::BuildType
+  // used for this PointLocator.  If it's
+  // TREE_LOCAL_ELEMENTS, we only want to double check
+  // local elements during this linear search.
+  MeshBase::const_element_iterator pos =
+    this->_build_type == Trees::LOCAL_ELEMENTS ?
+    this->_mesh.active_local_elements_begin() : this->_mesh.active_elements_begin();
+
+  const MeshBase::const_element_iterator end_pos =
+    this->_build_type == Trees::LOCAL_ELEMENTS ?
+    this->_mesh.active_local_elements_end() : this->_mesh.active_elements_end();
+
+  for ( ; pos != end_pos; ++pos)
+    {
+      if ((!allowed_subdomains || allowed_subdomains->count((*pos)->subdomain_id())) &&
+          (*pos)->close_to_point(p, close_to_point_tolerance))
+          candidate_elements.insert(*pos);
+    }
+
+  return candidate_elements;
+}
+
 
 
 void PointLocatorTree::enable_out_of_mesh_mode ()

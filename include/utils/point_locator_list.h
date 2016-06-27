@@ -103,6 +103,14 @@ public:
                                    const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const libmesh_override;
 
   /**
+   * Locates a set of elements in proximity to the point with global coordinates
+   * \p p  Pure virtual. Optionally allows the user to restrict the subdomains searched.
+   */
+  virtual void operator() (const Point & p,
+                           std::set<const Elem *> & candidate_elements,
+                           const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const libmesh_override;
+
+  /**
    * Enables out-of-mesh mode.  In this mode, if asked to find a point
    * that is contained in no mesh at all, the point locator will
    * return a NULL pointer instead of crashing.  Per default, this
