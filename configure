@@ -40029,7 +40029,7 @@ _ACEOF
                   if (test $vtkmajor -eq 5); then
            VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
 
-                  elif (test $vtkmajor -eq 6 -a $vtkminor -eq 1); then
+                  elif (test $vtkmajor -eq 6 -a $vtkminor -le 1); then
            VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
                                      -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
                                      -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor"
