@@ -66,8 +66,10 @@ public:
     std::vector<boundary_id_type> bc_id_list;
     bi.build_side_list (element_id_list, side_list, bc_id_list);
 
-    // Check that there are now exactly 6 sides left in the BoundaryInfo
-    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(6), element_id_list.size());
+    // Check that there are now exactly 6 sides left in the
+    // BoundaryInfo for a replicated mesh
+    if (_mesh->is_serial())
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(6), element_id_list.size());
 
     // Remove the same id again, make sure nothing changes.
     bi.remove_id(0);
