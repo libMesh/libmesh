@@ -331,7 +331,9 @@ unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
     case EDGE3:
       return 0;
     case TRI3:
+    case TRISHELL3:
     case QUAD4:
+    case QUADSHELL4:
       return 0;
     case TRI6:
       return ((o-1)*(o-2)/2);

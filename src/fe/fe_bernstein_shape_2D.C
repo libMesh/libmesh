@@ -515,6 +515,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem * elem,
       }
 
     case TRI3:
+    case TRISHELL3:
       libmesh_assert_less (totalorder, 2);
     case TRI6:
       {
