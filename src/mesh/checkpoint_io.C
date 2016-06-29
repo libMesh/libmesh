@@ -28,7 +28,6 @@
 
 // Local includes
 #include "libmesh/xdr_io.h"
-#include "libmesh/legacy_xdr_io.h"
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/enum_xdr_mode.h"
 #include "libmesh/mesh_base.h"

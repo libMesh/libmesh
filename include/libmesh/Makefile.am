@@ -147,7 +147,6 @@ BUILT_SOURCES = \
         boundary_info.h \
         boundary_mesh.h \
         checkpoint_io.h \
-        diva_io.h \
         ensight_io.h \
         exodusII_io.h \
         exodusII_io_helper.h \
@@ -156,7 +155,6 @@ BUILT_SOURCES = \
         gmv_io.h \
         gnuplot_io.h \
         inf_elem_builder.h \
-        legacy_xdr_io.h \
         matlab_io.h \
         medit_io.h \
         mesh.h \
@@ -195,13 +193,7 @@ BUILT_SOURCES = \
         unstructured_mesh.h \
         unv_io.h \
         vtk_io.h \
-        xdr_head.h \
         xdr_io.h \
-        xdr_mesh.h \
-        xdr_mgf.h \
-        xdr_mhead.h \
-        xdr_shead.h \
-        xdr_soln.h \
         analytic_function.h \
         composite_fem_function.h \
         composite_function.h \
@@ -950,9 +942,6 @@ boundary_mesh.h: $(top_srcdir)/include/mesh/boundary_mesh.h
 checkpoint_io.h: $(top_srcdir)/include/mesh/checkpoint_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-diva_io.h: $(top_srcdir)/include/mesh/diva_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 ensight_io.h: $(top_srcdir)/include/mesh/ensight_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -975,9 +964,6 @@ gnuplot_io.h: $(top_srcdir)/include/mesh/gnuplot_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 inf_elem_builder.h: $(top_srcdir)/include/mesh/inf_elem_builder.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-legacy_xdr_io.h: $(top_srcdir)/include/mesh/legacy_xdr_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 matlab_io.h: $(top_srcdir)/include/mesh/matlab_io.h
@@ -1094,25 +1080,7 @@ unv_io.h: $(top_srcdir)/include/mesh/unv_io.h
 vtk_io.h: $(top_srcdir)/include/mesh/vtk_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-xdr_head.h: $(top_srcdir)/include/mesh/xdr_head.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 xdr_io.h: $(top_srcdir)/include/mesh/xdr_io.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-xdr_mesh.h: $(top_srcdir)/include/mesh/xdr_mesh.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-xdr_mgf.h: $(top_srcdir)/include/mesh/xdr_mgf.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-xdr_mhead.h: $(top_srcdir)/include/mesh/xdr_mhead.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-xdr_shead.h: $(top_srcdir)/include/mesh/xdr_shead.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-xdr_soln.h: $(top_srcdir)/include/mesh/xdr_soln.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 analytic_function.h: $(top_srcdir)/include/numerics/analytic_function.h
