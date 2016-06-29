@@ -21,7 +21,6 @@
 
 #include "libmesh/libmesh_config.h"
 
-#ifndef NDEBUG
 // TODO: icpc options
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -30,12 +29,14 @@
 #endif
 
 #if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(__clang__)
-#if __GNUC__ > 3 && __GNUC_MINOR__ > 1
+// GCC > 4.1 supports diagnostic pragmas
+#if (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ > 1)
 // These two don't work?
 #pragma GCC diagnostic ignored "-pedantic"
 #pragma GCC diagnostic ignored "-Wdeprecated"
 // But this is helpful with some MPI stacks
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif //__GNUC__ > 3 && __GNUC_MINOR__ > 1
+// Ignore warnings from code that uses deprecated members of std, like std::auto_ptr.
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif // GCC > 4.1
 #endif // __GNUC__ && !__INTEL_COMPILER
-#endif // NDEBUG
