@@ -6,62 +6,57 @@ with libmesh:
 
 .) Using the test_boost.cc file located in this directory, run
 
-   $CXX -MM -MF foo.d -I/path/to/unpacked/boost/boost_1_XY_Z test_boost.cc
+   $CXX -I/path/to/unpacked/boost/boost_1_XY_Z test_boost.cc
 
-   where $CXX is the C++ compiler you want to use to build boost
-   dependencies.  Note that different compilers will generate
-   different subsets of boost headers, and therefore the process
-   described here must be repeated with any new compiler you wish to
-   use with libmesh.  If your compiler does not support -MM, you will
-   need to figure out which dependency generation flag it uses that
-   skips system headers.
+   where $CXX is any C++ compiler, for example the one that you will
+   use to build libmesh.  If this step does not work, then something
+   has changed in boost (for example, the header-only requirement
+   might have changed) and you will need to investigate further before
+   upgrading libmesh to this version.
 
-.) Repeat the previous step, adding the appropriate -std=c++0x flag
-   for your compiler, to determine the subset of required headers in this
-   compilation mode as well!
+.) Use bcp to copy just the header files that libmesh requires to a
+   separate "boostcopy" directory
+   cd /path/to/unpacked/boost/boost_1_XY_Z
+   ./b2 tools/bcp
+   mkdir ./boostcopy
+   ./dist/bin/bcp boost/move/unique_ptr.hpp \
+                  boost/shared_ptr.hpp \
+                  boost/pool/pool.hpp \
+                  boost/pool/object_pool.hpp \
+                  boost/pool/pool_alloc.hpp \
+                  ./boostcopy
 
-.) Repeat the previous two steps, while removing the "-MM -MF foo.d"
-   part.  This will ensure that the test_boost.cc file actually gets
-   compiled into an executable for the compiler in question.
-
-.) Inspect the contents of the foo.d dependency file. It should contain all
-   the headers from the boost distro that are required to build the subset of
-   boost used by libmesh.
-
-.) If you are updating to a brand new version of Boost, remove all the
-   existing boost headers.  Otherwise, if you are just generating
-   dependencies for a new compiler, skip this step and continue with
-   copying files in the next step.
+.) Remove all the existing boost headers from libmesh.
    git rm -r contrib/boost/include/boost
+
+.) Copy the header files from boostcopy into libmesh.
+   cp -R /path/to/unpacked/boost/boost_1_XY_Z/boostcopy/boost contrib/boost/include/
+
+.) Verify that test_boost.cc can be compiled with the subset of boost
+   headers we just copied in.
+   $CXX -I$LIBMESH_ROOT/contrib/boost/include test_boost.cc
+
+.) Currently there are .hpp, .ipp, and .h files in the copy of boost.  You can
+   verify this is the case by running the two commands:
+   find . -name "*.hpp" -or -name "*.ipp" -or -name "*.h" | wc -l
+   find . -type f | wc -l
+   and comparing the resulting number of files.  When I did this,
+   there was also a single .pl file, but I ended up removing that
+   from the distribution before committing the headers.
+
+.) Delete trailing whitespace from the boost headers.
+   find . -type f | xargs perl -pli -e 's/\s+$//'
+
+.) Commit these changes.
    git ci -a -m"Updating boost."
 
-.) Copy all the required boost header filenames (with relative paths,
-   omitting everything up to and including the final "boost/"
-   directory, and without the line continuation characters) into the
-   boost_copy.sh script in this directory on the 'files='
-   line, and then run the script to actually copy files out of the
-   boost distribution and into libmesh's contrib/boost/include/boost
-   directory.
-
-.) When adding new Boost features or generating dependencies for a new
-   compiler, carefully inspect the files which are modified and added
-   by boost_copy.sh.  Make sure that any local boost patches by
-   libmesh are not overwritten in the process.  Delete trailing
-   whitespace (find . -name "*.hpp" | xargs perl -pli -e 's/\s+$//')
-   from modified files to avoid spurious diffs.
-
-.) Revert the local changes made to boost_copy.sh. Commit the new
-   headers, squash with the previous removal patch.
-   git add include/boost
-   git ci --amend
-
-.) Update contrib/boost/include/Makefile.am with the list of files
-   from foo.d as well.  Commit Makefile.am.  Currently there are only
-   .hpp and .ipp files that need to be installed, and you can get a
-   list of all of these by doing:
-
+.) Update contrib/boost/include/Makefile.am with the list of files:
    cd $LIBMESH_ROOT/contrib/boost/include
-   find . -name "*.hpp" -or -name "*.ipp"
+   find boost -type f > file_list.txt
+   (copy the list of files into Makefile.am with trailing backslashes)
+
+.) If you are bumping the minimum required version of Boost for libmesh,
+   set the new minimum version in two places in m4/boost.m4.
 
 .) Run boostrap in the top level of the libmesh source distribution to
    regenerate Makefile.in.  Commit Makefile.in.
