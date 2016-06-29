@@ -8,12 +8,9 @@
 #include <boost/throw_exception.hpp>
 #include <boost/version.hpp>
 
-// Headers required by Howard Hinnant's C++03 unique_ptr
-// implementation that we distribute with libmesh.
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits.hpp>
-#include <boost/static_assert.hpp>
-#include <boost/mpl/if.hpp>
+// Boost >= 1.57 comes with a unique_ptr implementation.  We now
+// require at least this version of Boost in libmesh.
+#include <boost/move/unique_ptr.hpp>
 
 // Workaround to avoid the following linking errors:
 // Undefined symbols for architecture x86_64:
@@ -42,7 +39,7 @@ void test_pool();
 int main (int, char**)
 {
   boost::shared_ptr<int> p1( new int(1) );
-  boost::unique_ptr<int> p2( new int(2) );
+  boost::movelib::unique_ptr<int> p2( new int(2) );
 
   BOOST_ASSERT(true);
 
