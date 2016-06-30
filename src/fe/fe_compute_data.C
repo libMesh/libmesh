@@ -64,9 +64,11 @@ void FEComputeData::init ()
    // ensure that the wavenumber k=2. * libMesh::pi * this->frequency / this->speed
    // in src/fe/inf_fe_static.C: 310
    // is well-defined. 0 as well as NaN will lead to problems here.
-#if defined (LIBMESH_ENABLE_INFINITE_ELEMENTS) 
-   libmesh_assert_not_equal_to(this->frequency,0);
-   libmesh_assert_not_equal_to(this->speed,0 );
+#if defined(LIBMESH_ENABLE_INFINITE_ELEMENTS) && defined(LIBMESH_USE_COMPLEX_NUMBERS)
+   libmesh_assert_not_equal_to(this->frequency, 0);
+#endif
+#if defined(LIBMESH_ENABLE_INFINITE_ELEMENTS)
+   libmesh_assert_not_equal_to(this->speed, 0);
 #endif
 
 }
