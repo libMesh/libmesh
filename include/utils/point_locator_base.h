@@ -99,6 +99,14 @@ public:
                                    const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const = 0;
 
   /**
+   * Locates a set of elements in proximity to the point with global coordinates
+   * \p p  Pure virtual. Optionally allows the user to restrict the subdomains searched.
+   */
+  virtual void operator() (const Point & p,
+                           std::set<const Elem *> & candidate_elements,
+                           const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const = 0;
+
+  /**
    * @returns \p true when this object is properly initialized
    * and ready for use, \p false otherwise.
    */

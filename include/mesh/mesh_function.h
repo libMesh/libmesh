@@ -123,11 +123,29 @@ public:
                      const Real time=0.) libmesh_override;
 
   /**
+   * @returns a map of values of variable 0 at point
+   * \p p and for \p time.
+   * map is from element to Number and accounts for double defined
+   * values on faces if discontinuous variables are used
+   */
+  std::map<const Elem *, Number> discontinuous_value (const Point & p,
+                                                      const Real time=0.);
+
+  /**
    * @returns the first derivatives of variable 0 at point
    * \p p and for \p time, which defaults to zero.
    */
   Gradient gradient (const Point & p,
                      const Real time=0.);
+
+  /**
+   * @returns a map of first derivatives (gradients) of variable 0 at point
+   * \p p and for \p time.
+   * map is from element to Gradient and accounts for double defined
+   * values on faces if the gradient is discontinuous
+   */
+  std::map<const Elem *, Gradient> discontinuous_gradient (const Point & p,
+                                                           const Real time=0.);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
@@ -159,6 +177,25 @@ public:
                    const std::set<subdomain_id_type> * subdomain_ids);
 
   /**
+   * Similar to operator() with the same parameter list, but with the difference
+   * that multiple values on faces are explicitly permitted. This is useful for
+   * discontinuous shape functions that are evaluated on faces.
+   */
+  void discontinuous_value (const Point & p,
+                            const Real time,
+                            std::map<const Elem *, DenseVector<Number> > & output);
+
+  /**
+   * Similar to operator() with the same parameter list, but with the difference
+   * that multiple values on faces are explicitly permitted. This is useful for
+   * discontinuous shape functions that are evaluated on faces.
+   */
+  void discontinuous_value (const Point & p,
+                            const Real time,
+                            std::map<const Elem *, DenseVector<Number> > & output,
+                            const std::set<subdomain_id_type> * subdomain_ids);
+
+  /**
    * Computes gradients at coordinate \p p and for time \p time, which
    * defaults to zero, optionally restricting the point to the passed
    * subdomain_ids. This is useful in cases where there are multiple
@@ -168,6 +205,25 @@ public:
                  const Real time,
                  std::vector<Gradient> & output,
                  const std::set<subdomain_id_type> * subdomain_ids = libmesh_nullptr);
+
+  /**
+   * Similar to gradient, but with the difference
+   * that multiple values on faces are explicitly permitted. This is useful for
+   * evaluating gradients on faces where the values to the left and right are different.
+   */
+  void discontinuous_gradient (const Point & p,
+                               const Real time,
+                               std::map<const Elem *, std::vector<Gradient> > & output);
+
+  /**
+   * Similar to gradient, but with the difference
+   * that multiple values on faces are explicitly permitted. This is useful for
+   * evaluating gradients on faces where the values to the left and right are different.
+   */
+  void discontinuous_gradient (const Point & p,
+                               const Real time,
+                               std::map<const Elem *, std::vector<Gradient> > & output,
+                               const std::set<subdomain_id_type> * subdomain_ids);
 
   /**
    * Computes gradients at coordinate \p p and for time \p time, which
@@ -236,6 +292,13 @@ protected:
    */
   const Elem * find_element(const Point & p,
                             const std::set<subdomain_id_type> * subdomain_ids = libmesh_nullptr) const;
+
+  /**
+   * Similar to find_element but returns all elements that are close to a point
+   * to cover cases where p is on the boundary
+   */
+  std::set<const Elem *> find_elements(const Point & p,
+                                       const std::set<subdomain_id_type> * subdomain_ids = libmesh_nullptr) const;
 
   /**
    * The equation systems handler, from which

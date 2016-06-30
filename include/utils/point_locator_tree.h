@@ -108,6 +108,14 @@ public:
                                    const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const libmesh_override;
 
   /**
+   * Locates a set of elements in proximity to the point with global coordinates
+   * \p p  Pure virtual. Optionally allows the user to restrict the subdomains searched.
+   */
+  virtual void operator() (const Point & p,
+                           std::set<const Elem *> & candidate_elements,
+                           const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const libmesh_override;
+
+  /**
    * As a fallback option, it's helpful to be able to do a linear
    * search over the entire mesh. This can be used if operator()
    * fails to find an element that contains \p p, for example.
@@ -119,6 +127,15 @@ public:
                                      const std::set<subdomain_id_type> * allowed_subdomains,
                                      bool use_close_to_point,
                                      Real close_to_point_tolerance=TOLERANCE) const;
+
+  /**
+  * A method to check if "fat" point p is in multiple elements. This would happen
+  * if p is close to a face or node. This is important for evaluating MeshFunction
+  * on faces when discontinuous shape functions are used.
+  */
+  std::set<const Elem *> perform_fuzzy_linear_search(const Point & p,
+                                                     const std::set<subdomain_id_type> * allowed_subdomains,
+                                                     Real close_to_point_tolerance=TOLERANCE) const;
 
   /**
    * Enables out-of-mesh mode.  In this mode, if asked to find a point
