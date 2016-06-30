@@ -212,7 +212,20 @@ Gradient MeshFunction::gradient (const Point & p,
   return buf[0];
 }
 
+std::map<const Elem *, Gradient> MeshFunction::discontinuous_gradient (const Point & p,
+                                                                       const Real time)
+{
+  libmesh_assert (this->initialized());
 
+  std::map<const Elem *, std::vector<Gradient> > buffer;
+  this->discontinuous_gradient (p, time, buffer);
+  std::map<const Elem *, Gradient> return_value;
+  for (std::map<const Elem *, std::vector<Gradient> >::const_iterator it = buffer.begin(); it != buffer.end(); ++it)
+    return_value[it->first] = it->second[0];
+  // NOTE: If no suitable element is found, then the map return_value is empty. This
+  // puts burden on the user of this function but I don't really see a better way.
+  return return_value;
+}
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 Tensor MeshFunction::hessian (const Point & p,
@@ -320,7 +333,7 @@ void MeshFunction::discontinuous_value (const Point & p,
 
 
 void MeshFunction::discontinuous_value (const Point & p,
-                                        const Real time,
+                                        const Real,
                                         std::map<const Elem *, DenseVector<Number> > & output,
                                         const std::set<subdomain_id_type> * subdomain_ids)
 {
@@ -460,6 +473,84 @@ void MeshFunction::gradient (const Point & p,
             output[index] = grad;
           }
       }
+    }
+}
+
+
+void MeshFunction::discontinuous_gradient (const Point & p,
+                                           const Real time,
+                                           std::map<const Elem *, std::vector<Gradient> > & output)
+{
+  this->discontinuous_gradient (p, time, output, libmesh_nullptr);
+}
+
+
+
+void MeshFunction::discontinuous_gradient (const Point & p,
+                                           const Real,
+                                           std::map<const Elem *, std::vector<Gradient> > & output,
+                                           const std::set<subdomain_id_type> * subdomain_ids)
+{
+  libmesh_assert (this->initialized());
+
+  // clear the output map
+  output.clear();
+
+  // get the candidate elements
+  std::set<const Elem *> candidate_element = this->find_elements(p,subdomain_ids);
+
+  // loop through all candidates, if the set is empty this function will return an
+  // empty map
+  for (std::set<const Elem *>::const_iterator it = candidate_element.begin(); it != candidate_element.end(); ++it)
+    {
+      const Elem * element = (*it);
+
+      const unsigned int dim = element->dim();
+
+      // define a temporary vector to store all values
+      std::vector<Gradient> temp_output (cast_int<unsigned int>(this->_system_vars.size()));
+
+      /*
+       * Get local coordinates to feed these into compute_data().
+       * Note that the fe_type can safely be used from the 0-variable,
+       * since the inverse mapping is the same for all FEFamilies
+       */
+      const Point mapped_point (FEInterface::inverse_map (dim,
+                                                          this->_dof_map.variable_type(0),
+                                                          element,
+                                                          p));
+
+
+      // loop over all vars
+      std::vector<Point> point_list (1, mapped_point);
+      for (unsigned int index = 0 ; index < this->_system_vars.size(); ++index)
+        {
+          /*
+           * the data for this variable
+           */
+          const unsigned int var = _system_vars[index];
+          const FEType & fe_type = this->_dof_map.variable_type(var);
+
+          UniquePtr<FEBase> point_fe (FEBase::build(dim, fe_type));
+          const std::vector<std::vector<RealGradient> > & dphi = point_fe->get_dphi();
+          point_fe->reinit(element, &point_list);
+
+          // where the solution values for the var-th variable are stored
+          std::vector<dof_id_type> dof_indices;
+          this->_dof_map.dof_indices (element, dof_indices, var);
+
+          Gradient grad(0.);
+
+          for (unsigned int i = 0; i < dof_indices.size(); ++i)
+            grad.add_scaled(dphi[i][0], this->_vector(dof_indices[i]));
+
+          temp_output[index] = grad;
+
+          // next variable
+        }
+
+      // Insert temp_output into output
+      output[element] = temp_output;
     }
 }
 

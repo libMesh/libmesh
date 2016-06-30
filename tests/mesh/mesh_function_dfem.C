@@ -32,6 +32,17 @@ Number position_function (const Point& p,
     return 1.0;
 }
 
+Number position_function2 (const Point& p,
+                           const Parameters&,
+                           const std::string&,
+                           const std::string&)
+{
+  if (p(1) > 0.0)
+    return 2.0 * p(1) + 1.0;
+  else
+    return p(1) + 1.0;
+}
+
 class MeshfunctionDFEM : public CppUnit::TestCase
 {
   /**
@@ -44,6 +55,8 @@ public:
   CPPUNIT_TEST( test_point_locator_dfem );
 
   CPPUNIT_TEST( test_mesh_function_dfem );
+
+  CPPUNIT_TEST( test_mesh_function_dfem_grad );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -213,6 +226,73 @@ public:
       else
         CPPUNIT_ASSERT (false);
 
+  }
+
+  // test that gradient function works correctly
+  void test_mesh_function_dfem_grad()
+  {
+    // this point is in top element only
+    Point top(0.5, 0.5, 0.0);
+
+    // this point is in bottom element only
+    Point bottom(0.5, -0.5, 0.0);
+
+    // this point is on the face between bottom and top
+    Point face(0.5, 0.0, 0.0);
+
+    // set up some necessary objects
+    EquationSystems es(*_mesh);
+    System & sys = es.add_system<System> ("SimpleSystem");
+    sys.add_variable("u", FIRST, LAGRANGE);
+
+    es.init();
+    sys.project_solution(position_function2, NULL, es.parameters);
+
+    std::vector<unsigned int> variables;
+    sys.get_all_variable_numbers(variables);
+    UniquePtr< NumericVector<Number> > mesh_function_vector =
+      NumericVector<Number>::build(es.comm());
+    mesh_function_vector->init(sys.n_dofs(), false, SERIAL);
+    sys.solution->localize(*mesh_function_vector);
+
+    MeshFunction mesh_function (es, *mesh_function_vector,
+                                sys.get_dof_map(), variables);
+    mesh_function.init();
+
+    // test mesh function in top
+    std::map<const Elem *, Gradient> top_val = mesh_function.discontinuous_gradient(top);
+
+    // check that there is only one value
+    CPPUNIT_ASSERT (top_val.size() == 1);
+
+    // check that this one value is the right one
+    for (std::map<const Elem *, Gradient>::const_iterator it = top_val.begin(); it != top_val.end(); ++it)
+      CPPUNIT_ASSERT (it->first->id() == 0 && std::abs(it->second(1) - 2.0) < 1.0e-10);
+
+    // test mesh function in bottom
+    std::map<const Elem *, Gradient> bottom_val = mesh_function.discontinuous_gradient(bottom);
+
+    // check that there is only one value
+    CPPUNIT_ASSERT (bottom_val.size() == 1);
+
+    // check that this one value is the right one
+    for (std::map<const Elem *, Gradient>::const_iterator it = bottom_val.begin(); it != bottom_val.end(); ++it)
+      CPPUNIT_ASSERT (it->first->id() == 1 && std::abs(it->second(1) - 1.0) < 1.0e-10);
+
+    // test mesh function in face
+    std::map<const Elem *, Gradient> face_val = mesh_function.discontinuous_gradient(face);
+
+    // check that there are two values
+    CPPUNIT_ASSERT (face_val.size() == 2);
+
+    // check that the two values are attached to the right element
+    for (std::map<const Elem *, Gradient>::const_iterator it = face_val.begin(); it != face_val.end(); ++it)
+      if (it->first->id() == 0)
+        CPPUNIT_ASSERT (std::abs(it->second(1) - 2.0) < 1.0e-10);
+      else if (it->first->id() == 1)
+        CPPUNIT_ASSERT (std::abs(it->second(1) - 1.0) < 1.0e-10);
+      else
+        CPPUNIT_ASSERT (false);
   }
 };
 
