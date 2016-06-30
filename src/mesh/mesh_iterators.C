@@ -23,6 +23,7 @@
 #include "libmesh/serial_mesh.h"
 #include "libmesh/parallel_mesh.h"
 #include "libmesh/elem.h"
+#include "libmesh/ignore_warnings.h" // Ignore warnings about variadic macros
 
 namespace libMesh
 {
