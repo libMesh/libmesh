@@ -22,7 +22,7 @@ AC_DEFUN([CONFIGURE_BOOST],
     # one available then use the minimal ./contrib/boost provided.
     # --------------------------------------------------------------
     external_boost_found=yes
-    AX_BOOST_BASE([1.55.0],
+    AX_BOOST_BASE([1.57.0],
                   [AC_MSG_RESULT(<<< Using external boost installation >>>)],
                   [external_boost_found=no],
                   [])
@@ -33,7 +33,7 @@ AC_DEFUN([CONFIGURE_BOOST],
 
       # Note: 4th argument is libmesh's builtin boost.
       internal_boost_found=yes
-      AX_BOOST_BASE([1.55.0],
+      AX_BOOST_BASE([1.57.0],
                     [AC_MSG_RESULT(<<< Using libmesh-provided boost in ./contrib >>>)],
                     [internal_boost_found=no],
                     [$top_srcdir/contrib/boost])

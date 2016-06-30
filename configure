@@ -33224,7 +33224,7 @@ fi
 
 
 if test "x$want_boost" = "xyes"; then
-    boost_lib_version_req=1.55.0
+    boost_lib_version_req=1.57.0
     boost_lib_version_req_shorten=`expr $boost_lib_version_req : '\([0-9]*\.[0-9]*\)'`
     boost_lib_version_req_major=`expr $boost_lib_version_req : '\([0-9]*\)'`
     boost_lib_version_req_minor=`expr $boost_lib_version_req : '[0-9]*\.\([0-9]*\)'`
@@ -33505,7 +33505,7 @@ fi
 
 
 if test "x$want_boost" = "xyes"; then
-    boost_lib_version_req=1.55.0
+    boost_lib_version_req=1.57.0
     boost_lib_version_req_shorten=`expr $boost_lib_version_req : '\([0-9]*\.[0-9]*\)'`
     boost_lib_version_req_major=`expr $boost_lib_version_req : '\([0-9]*\)'`
     boost_lib_version_req_minor=`expr $boost_lib_version_req : '[0-9]*\.\([0-9]*\)'`

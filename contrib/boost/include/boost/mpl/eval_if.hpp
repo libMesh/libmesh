@@ -10,9 +10,9 @@
 //
 // See http://www.boost.org/libs/mpl for documentation.
 
-// $Id: eval_if.hpp 61921 2010-05-11 21:33:24Z neilgroves $
-// $Date: 2010-05-11 14:33:24 -0700 (Tue, 11 May 2010) $
-// $Revision: 61921 $
+// $Id$
+// $Date$
+// $Revision$
 
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/aux_/na_spec.hpp>
