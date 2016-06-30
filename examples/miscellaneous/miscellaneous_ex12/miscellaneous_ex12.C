@@ -84,6 +84,10 @@ int main (int argc, char ** argv)
   libmesh_example_requires (false, "ExodusII support");
 #endif
 
+#ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  libmesh_example_requires (false, "second derivatives enabled");
+#endif
+
   // This example does a bunch of linear algebra during assembly, and
   // therefore requires Eigen.
 #ifndef LIBMESH_HAVE_EIGEN
