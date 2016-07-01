@@ -53,8 +53,7 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
   : Parent(es, name_in, number_in),
     best_fit_type_flag(PROJECTION_BEST_FIT),
     _parametrized_functions_in_training_set_initialized(false),
-    _mesh_function(libmesh_nullptr),
-    _performing_extra_greedy_step(false)
+    _mesh_function(libmesh_nullptr)
 {
   _explicit_system_name = name_in + "_explicit_sys";
 
@@ -405,55 +404,46 @@ void RBEIMConstruction::enrich_RB_space()
   get_explicit_system().solution->scale(1./optimal_value);
 
   // Store optimal point in interpolation_points
-  if(!_performing_extra_greedy_step)
+  eim_eval.interpolation_points.push_back(optimal_point);
+  eim_eval.interpolation_points_var.push_back(optimal_var);
+  Elem * elem_ptr = mesh.elem_ptr(optimal_elem_id);
+  eim_eval.interpolation_points_elem.push_back( elem_ptr );
+
+  NumericVector<Number> * new_bf = NumericVector<Number>::build(this->comm()).release();
+  new_bf->init (get_explicit_system().n_dofs(), get_explicit_system().n_local_dofs(), false, PARALLEL);
+  *new_bf = *get_explicit_system().solution;
+  get_rb_evaluation().basis_functions.push_back( new_bf );
+
+  if(best_fit_type_flag == PROJECTION_BEST_FIT)
     {
-      eim_eval.interpolation_points.push_back(optimal_point);
-      eim_eval.interpolation_points_var.push_back(optimal_var);
-      Elem * elem_ptr = mesh.elem_ptr(optimal_elem_id);
-      eim_eval.interpolation_points_elem.push_back( elem_ptr );
+      // In order to speed up dot products, we store the product
+      // of the basis function and the inner product matrix
 
-      NumericVector<Number> * new_bf = NumericVector<Number>::build(this->comm()).release();
-      new_bf->init (get_explicit_system().n_dofs(), get_explicit_system().n_local_dofs(), false, PARALLEL);
-      *new_bf = *get_explicit_system().solution;
-      get_rb_evaluation().basis_functions.push_back( new_bf );
+      UniquePtr< NumericVector<Number> > implicit_sys_temp1 = this->solution->zero_clone();
+      UniquePtr< NumericVector<Number> > implicit_sys_temp2 = this->solution->zero_clone();
+      NumericVector<Number>* matrix_times_new_bf =
+        get_explicit_system().solution->zero_clone().release();
 
-      if(best_fit_type_flag == PROJECTION_BEST_FIT)
+      // We must localize new_bf before calling get_explicit_sys_subvector
+      UniquePtr<NumericVector<Number> > localized_new_bf =
+        NumericVector<Number>::build(this->comm());
+      localized_new_bf->init(get_explicit_system().n_dofs(), false, SERIAL);
+      new_bf->localize(*localized_new_bf);
+
+      for (unsigned int var=0; var<get_explicit_system().n_vars(); var++)
         {
-          // In order to speed up dot products, we store the product
-          // of the basis function and the inner product matrix
+          get_explicit_sys_subvector(*implicit_sys_temp1,
+                                      var,
+                                      *localized_new_bf);
 
-          UniquePtr< NumericVector<Number> > implicit_sys_temp1 = this->solution->zero_clone();
-          UniquePtr< NumericVector<Number> > implicit_sys_temp2 = this->solution->zero_clone();
-          NumericVector<Number>* matrix_times_new_bf =
-            get_explicit_system().solution->zero_clone().release();
+          inner_product_matrix->vector_mult(*implicit_sys_temp2, *implicit_sys_temp1);
 
-          // We must localize new_bf before calling get_explicit_sys_subvector
-          UniquePtr<NumericVector<Number> > localized_new_bf =
-            NumericVector<Number>::build(this->comm());
-          localized_new_bf->init(get_explicit_system().n_dofs(), false, SERIAL);
-          new_bf->localize(*localized_new_bf);
-
-          for (unsigned int var=0; var<get_explicit_system().n_vars(); var++)
-            {
-              get_explicit_sys_subvector(*implicit_sys_temp1,
-                                         var,
-                                         *localized_new_bf);
-
-              inner_product_matrix->vector_mult(*implicit_sys_temp2, *implicit_sys_temp1);
-
-              set_explicit_sys_subvector(*matrix_times_new_bf,
-                                         var,
-                                         *implicit_sys_temp2);
-            }
-
-          _matrix_times_bfs.push_back(matrix_times_new_bf);
+          set_explicit_sys_subvector(*matrix_times_new_bf,
+                                      var,
+                                      *implicit_sys_temp2);
         }
-    }
-  else
-    {
-      eim_eval.extra_interpolation_point = optimal_point;
-      eim_eval.extra_interpolation_point_var = optimal_var;
-      eim_eval.extra_interpolation_point_elem = mesh.elem_ptr(optimal_elem_id);
+
+      _matrix_times_bfs.push_back(matrix_times_new_bf);
     }
 }
 
@@ -785,18 +775,9 @@ void RBEIMConstruction::update_RB_system_matrices()
       get_rb_evaluation().get_basis_function(j).localize(*_ghosted_meshfunction_vector,
                                                          get_explicit_system().get_dof_map().get_send_list());
 
-      if(!_performing_extra_greedy_step)
-        {
-          eim_eval.interpolation_matrix(RB_size-1,j) =
-            evaluate_mesh_function( eim_eval.interpolation_points_var[RB_size-1],
-                                    eim_eval.interpolation_points[RB_size-1] );
-        }
-      else
-        {
-          eim_eval.extra_interpolation_matrix_row(j) =
-            evaluate_mesh_function( eim_eval.extra_interpolation_point_var,
-                                    eim_eval.extra_interpolation_point );
-        }
+      eim_eval.interpolation_matrix(RB_size-1,j) =
+        evaluate_mesh_function( eim_eval.interpolation_points_var[RB_size-1],
+                                eim_eval.interpolation_points[RB_size-1] );
     }
 }
 
@@ -816,39 +797,24 @@ bool RBEIMConstruction::greedy_termination_test(Real abs_greedy_error,
                                                 Real initial_error,
                                                 int)
 {
-  if(_performing_extra_greedy_step)
-    {
-      libMesh::out << "Extra Greedy iteration finished." << std::endl;
-      _performing_extra_greedy_step = false;
-      return true;
-    }
-
-  _performing_extra_greedy_step = false;
-
   if(abs_greedy_error < get_abs_training_tolerance())
     {
-      libMesh::out << "Absolute error tolerance reached." << std::endl
-                   << "Perform one more Greedy iteration for error bounds." << std::endl;
-      _performing_extra_greedy_step = true;
-      return false;
+      libMesh::out << "Absolute error tolerance reached." << std::endl;
+      return true;
     }
 
   Real rel_greedy_error = abs_greedy_error/initial_error;
   if(rel_greedy_error < get_rel_training_tolerance())
     {
-      libMesh::out << "Relative error tolerance reached." << std::endl
-                   << "Perform one more Greedy iteration for error bounds." << std::endl;
-      _performing_extra_greedy_step = true;
-      return false;
+      libMesh::out << "Relative error tolerance reached." << std::endl;
+      return true;
     }
 
   if(get_rb_evaluation().get_n_basis_functions() >= this->get_Nmax())
     {
       libMesh::out << "Maximum number of basis functions reached: Nmax = "
-                   << get_Nmax() << "." << std::endl
-                   << "Perform one more Greedy iteration for error bounds." << std::endl;
-      _performing_extra_greedy_step = true;
-      return false;
+                   << get_Nmax() << "." << std::endl;
+      return true;
     }
 
   return false;

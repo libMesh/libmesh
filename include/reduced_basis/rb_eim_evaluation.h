@@ -192,21 +192,6 @@ public:
    */
   std::vector<Elem *> interpolation_points_elem;
 
-  /**
-   * We also need an extra interpolation point and associated
-   * variable and Elem for the "extra" solve we do at the end of
-   * the Greedy algorithm.
-   */
-  Point extra_interpolation_point;
-  unsigned int extra_interpolation_point_var;
-  Elem * extra_interpolation_point_elem;
-
-  /**
-   * We also need a DenseVector to represent the corresponding
-   * "extra" row of the interpolation matrix.
-   */
-  DenseVector<Number> extra_interpolation_matrix_row;
-
 private:
 
   /**

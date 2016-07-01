@@ -116,10 +116,6 @@ struct RBEIMEvaluationReal @0xf8121d2237427a80 {
   interpolationPointsElems    @3 :List(MeshElem);
   interpolationPointsVar      @4 :List(Integer);
   interpolationPoints         @5 :List(Point3D);
-  extraInterpolationMatrixRow @6 :List(Real);
-  extraInterpolationPointElem @7 :MeshElem;
-  extraInterpolationPointVar  @8 :Integer;
-  extraInterpolationPoint     @9 :Point3D;
 }
 struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
   rbEvaluation                @0 :RBEvaluationComplex;
@@ -128,8 +124,4 @@ struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
   interpolationPointsElems    @3 :List(MeshElem);
   interpolationPointsVar      @4 :List(Integer);
   interpolationPoints         @5 :List(Point3D);
-  extraInterpolationMatrixRow @6 :List(Complex);
-  extraInterpolationPointElem @7 :MeshElem;
-  extraInterpolationPointVar  @8 :Integer;
-  extraInterpolationPoint     @9 :Point3D;
 }
