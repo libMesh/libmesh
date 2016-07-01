@@ -636,7 +636,7 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
 
   unsigned int n_bfs = rb_eim_evaluation.get_n_basis_functions();
 
-  // EIM interpolation matrix (with extra row for EIM error bound)
+  // EIM interpolation matrix
   {
     auto interpolation_matrix_list = rb_eim_evaluation_reader.getInterpolationMatrix();
 
@@ -650,19 +650,9 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
           rb_eim_evaluation.interpolation_matrix(i,j) =
             load_scalar_value(interpolation_matrix_list[offset]);
         }
-
-    auto extra_interpolation_matrix_row_list =
-      rb_eim_evaluation_reader.getExtraInterpolationMatrixRow();
-
-    if (extra_interpolation_matrix_row_list.size() != n_bfs)
-      libmesh_error_msg("Size error while reading the eim inner product matrix.");
-
-    for(unsigned int j=0; j<n_bfs; ++j)
-      rb_eim_evaluation.extra_interpolation_matrix_row(j) =
-        load_scalar_value(extra_interpolation_matrix_row_list[j]);
   }
 
-  // Interpolation points (including the extra point)
+  // Interpolation points
   {
     auto interpolation_points_list =
       rb_eim_evaluation_reader.getInterpolationPoints();
@@ -676,14 +666,9 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
         load_point(interpolation_points_list[i],
                    rb_eim_evaluation.interpolation_points[i]);
       }
-
-    auto extra_interpolation_point_reader =
-      rb_eim_evaluation_reader.getExtraInterpolationPoint();
-    load_point(extra_interpolation_point_reader,
-               rb_eim_evaluation.extra_interpolation_point);
   }
 
-  // Interpolation points variables (including the "extra one")
+  // Interpolation points variables
   {
     auto interpolation_points_var_list =
       rb_eim_evaluation_reader.getInterpolationPointsVar();
@@ -697,12 +682,9 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
         rb_eim_evaluation.interpolation_points_var[i] =
           interpolation_points_var_list[i];
       }
-
-    rb_eim_evaluation.extra_interpolation_point_var =
-      rb_eim_evaluation_reader.getExtraInterpolationPointVar();
   }
 
-  // Interpolation elements (including the "extra one")
+  // Interpolation elements
   {
     libMesh::dof_id_type elem_id = 0;
     libMesh::ReplicatedMesh & interpolation_points_mesh =
@@ -731,21 +713,6 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
 
         rb_eim_evaluation.interpolation_points_elem[i] = elem;
       }
-
-    auto extra_interpolation_point_elem_reader =
-      rb_eim_evaluation_reader.getExtraInterpolationPointElem();
-    std::string elem_type_name =
-      extra_interpolation_point_elem_reader.getType().cStr();
-    libMesh::ElemType elem_type =
-      libMesh::Utility::string_to_enum<libMesh::ElemType>(elem_type_name);
-
-    libMesh::Elem * elem = libMesh::Elem::build(elem_type).release();
-    elem->set_id(elem_id++);
-    load_elem_into_mesh(extra_interpolation_point_elem_reader,
-                        elem,
-                        interpolation_points_mesh);
-
-    rb_eim_evaluation.extra_interpolation_point_elem = elem;
   }
 }
 

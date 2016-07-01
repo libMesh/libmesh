@@ -606,7 +606,7 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
 
   unsigned int n_bfs = rb_eim_evaluation.get_n_basis_functions();
 
-  // EIM interpolation matrix (with extra row for EIM error bound)
+  // EIM interpolation matrix
   {
     // We store the lower triangular part of an NxN matrix, the size of which is given by
     // (N(N + 1))/2
@@ -622,41 +622,27 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
                              offset,
                              rb_eim_evaluation.interpolation_matrix(i,j));
         }
-
-    auto extra_interpolation_matrix_row_list =
-      rb_eim_evaluation_builder.initExtraInterpolationMatrixRow(n_bfs);
-    for(unsigned int j=0; j < n_bfs; ++j)
-      set_scalar_in_list(extra_interpolation_matrix_row_list,
-                         j,
-                         rb_eim_evaluation.extra_interpolation_matrix_row(j));
   }
 
-  // Interpolation points (including the extra point)
+  // Interpolation points
   {
     auto interpolation_points_list =
       rb_eim_evaluation_builder.initInterpolationPoints(n_bfs);
     for(unsigned int i=0; i < n_bfs; ++i)
       add_point_to_builder(rb_eim_evaluation.interpolation_points[i],
                            interpolation_points_list[i]);
-
-    auto extra_interpolation_point_builder =
-      rb_eim_evaluation_builder.initExtraInterpolationPoint();
-    add_point_to_builder(rb_eim_evaluation.extra_interpolation_point,
-                         extra_interpolation_point_builder);
   }
 
-  // Interpolation points variables (including the "extra one")
+  // Interpolation points variables
   {
     auto interpolation_points_var_list =
       rb_eim_evaluation_builder.initInterpolationPointsVar(n_bfs);
     for(unsigned int i=0; i<n_bfs; ++i)
       interpolation_points_var_list.set(i,
                                         rb_eim_evaluation.interpolation_points_var[i]);
-
-    rb_eim_evaluation_builder.setExtraInterpolationPointVar(rb_eim_evaluation.extra_interpolation_point_var);
   }
 
-  // Interpolation elements (including the "extra one")
+  // Interpolation elements
   {
     unsigned int n_interpolation_elems =
       rb_eim_evaluation.interpolation_points_elem.size();
@@ -672,11 +658,6 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
         auto mesh_elem_builder = interpolation_points_elem_list[i];
         add_elem_to_builder(elem, mesh_elem_builder);
       }
-
-    auto extra_interpolation_point_elem_builder =
-      rb_eim_evaluation_builder.initExtraInterpolationPointElem();
-    add_elem_to_builder(*rb_eim_evaluation.extra_interpolation_point_elem,
-                        extra_interpolation_point_elem_builder);
   }
 }
 
