@@ -1575,6 +1575,14 @@ public:
   Number point_value(unsigned int var, const Point & p, const Elem & e) const;
 
   /**
+   * Calls the version of point_value() which takes a reference.
+   * This function exists only to prevent people from calling the
+   * version of point_value() that has a boolean third argument, which
+   * would result in unnecessary PointLocator calls.
+   */
+  Number point_value(unsigned int var, const Point & p, const Elem * e) const;
+
+  /**
    * Returns the gradient of the solution variable \p var at the physical
    * point \p p in the mesh, similarly to point_value.
    */
@@ -1586,6 +1594,14 @@ public:
    * point \p p in local Elem \p e in the mesh, similarly to point_value.
    */
   Gradient point_gradient(unsigned int var, const Point & p, const Elem & e) const;
+
+  /**
+   * Calls the version of point_gradient() which takes a reference.
+   * This function exists only to prevent people from calling the
+   * version of point_gradient() that has a boolean third argument, which
+   * would result in unnecessary PointLocator calls.
+   */
+  Gradient point_gradient(unsigned int var, const Point & p, const Elem * e) const;
 
   /**
    * Returns the second derivative tensor of the solution variable \p var
@@ -1600,6 +1616,14 @@ public:
    * point_value.
    */
   Tensor point_hessian(unsigned int var, const Point & p, const Elem & e) const;
+
+  /**
+   * Calls the version of point_hessian() which takes a reference.
+   * This function exists only to prevent people from calling the
+   * version of point_hessian() that has a boolean third argument, which
+   * would result in unnecessary PointLocator calls.
+   */
+  Tensor point_hessian(unsigned int var, const Point & p, const Elem * e) const;
 
   /**
    * Fills the std::set with the degrees of freedom on the local

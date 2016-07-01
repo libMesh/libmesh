@@ -2124,6 +2124,14 @@ Number System::point_value(unsigned int var, const Point & p, const Elem & e) co
 
 
 
+Number System::point_value(unsigned int var, const Point & p, const Elem * e) const
+{
+  libmesh_assert(e);
+  return this->point_value(var, p, *e);
+}
+
+
+
 Gradient System::point_gradient(unsigned int var, const Point & p, const bool insist_on_success) const
 {
   // This function must be called on every processor; there's no
@@ -2225,6 +2233,15 @@ Gradient System::point_gradient(unsigned int var, const Point & p, const Elem & 
 
   return grad_u;
 }
+
+
+
+Gradient System::point_gradient(unsigned int var, const Point & p, const Elem * e) const
+{
+  libmesh_assert(e);
+  return this->point_gradient(var, p, *e);
+}
+
 
 
 // We can only accumulate a hessian with --enable-second
@@ -2329,6 +2346,17 @@ Tensor System::point_hessian(unsigned int var, const Point & p, const Elem & e) 
 
   return hess_u;
 }
+
+
+
+Tensor System::point_hessian(unsigned int var, const Point & p, const Elem * e) const
+{
+  libmesh_assert(e);
+  return this->point_hessian(var, p, *e);
+}
+
+
+
 #else
 Tensor System::point_hessian(unsigned int, const Point &, const bool) const
 {
@@ -2345,6 +2373,15 @@ Tensor System::point_hessian(unsigned int, const Point &, const Elem &) const
   // Avoid compiler warnings
   return Tensor();
 }
+
+Tensor System::point_hessian(unsigned int var, const Point & p, const Elem * e) const
+{
+  libmesh_error_msg("We can only accumulate a hessian with --enable-second");
+
+  // Avoid compiler warnings
+  return Tensor();
+}
+
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 } // namespace libMesh
