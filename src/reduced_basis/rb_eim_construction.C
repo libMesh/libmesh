@@ -53,7 +53,8 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
   : Parent(es, name_in, number_in),
     best_fit_type_flag(PROJECTION_BEST_FIT),
     _parametrized_functions_in_training_set_initialized(false),
-    _mesh_function(libmesh_nullptr)
+    _mesh_function(libmesh_nullptr),
+    _point_locator_tol(TOLERANCE)
 {
   _explicit_system_name = name_in + "_explicit_sys";
 
@@ -220,6 +221,8 @@ Real RBEIMConstruction::train_reduced_basis(const bool resize_rb_eval_data)
 Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
                                                  Point p)
 {
+  _mesh_function->set_point_locator_tolerance( get_point_locator_tol() );
+
   DenseVector<Number> values;
   (*_mesh_function)(p,
                     /*time*/ 0.,
@@ -230,10 +233,20 @@ Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
   // to all processors.
   Number value = 0;
   unsigned int root_id=0;
+  unsigned int check_for_valid_value = 0;
   if(values.size() != 0)
     {
       root_id = this->processor_id();
       value = values(var_number);
+      check_for_valid_value = 1;
+    }
+
+  // If this sum is zero, then we didn't enter the if block above on any processor. In that
+  // case we should throw an error.
+  this->comm().sum(check_for_valid_value);
+  if(check_for_valid_value == 0)
+    {
+      libmesh_error_msg("MeshFunction evaluation failed on all processors");
     }
 
   // root_id may be non-zero on more than one processor due to ghost elements
@@ -244,6 +257,16 @@ Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
   this->comm().broadcast(value, root_id);
 
   return value;
+}
+
+void RBEIMConstruction::set_point_locator_tol(Real point_locator_tol)
+{
+  _point_locator_tol = point_locator_tol;
+}
+
+Real RBEIMConstruction::get_point_locator_tol() const
+{
+  return _point_locator_tol;
 }
 
 void RBEIMConstruction::initialize_eim_assembly_objects()

@@ -151,6 +151,17 @@ public:
                                 Point p);
 
   /**
+   * Set a point locator tolerance to be used in this class's MeshFunction, and
+   * other operations that require a PointLocator.
+   */
+  void set_point_locator_tol(Real point_locator_tol);
+
+  /**
+   * @return the point locator tolerance.
+   */
+  Real get_point_locator_tol() const;
+
+  /**
    * Build a vector of ElemAssembly objects that accesses the basis
    * functions stored in this RBEIMConstruction object. This is useful
    * for performing the Offline stage of the Reduced Basis method where
@@ -333,6 +344,11 @@ private:
    * since we frequently use this data.
    */
   std::vector< NumericVector<Number>* > _matrix_times_bfs;
+
+  /**
+   * The point locator tolerance.
+   */
+  Real _point_locator_tol;
 
 };
 
