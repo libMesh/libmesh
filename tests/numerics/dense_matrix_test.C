@@ -22,8 +22,6 @@
 // file since it's not a header.
 #include <libmesh/ignore_warnings.h>
 
-#ifdef LIBMESH_USE_REAL_NUMBERS
-
 using namespace libMesh;
 
 class DenseMatrixTest : public CppUnit::TestCase
@@ -44,7 +42,7 @@ private:
   void testSVD()
   {
     DenseMatrix<Number> U, VT;
-    DenseVector<Number> sigma;
+    DenseVector<Real> sigma;
     DenseMatrix<Number> A;
 
     A.resize(3, 2);
@@ -56,7 +54,7 @@ private:
 
     // Solution for this case is (verified with numpy)
     DenseMatrix<Number> true_U(3,2), true_VT(2,2);
-    DenseVector<Number> true_sigma(2);
+    DenseVector<Real> true_sigma(2);
     true_U(0,0) = -2.298476964000715e-01; true_U(0,1) = 8.834610176985250e-01;
     true_U(1,0) = -5.247448187602936e-01; true_U(1,1) = 2.407824921325463e-01;
     true_U(2,0) = -8.196419411205157e-01; true_U(2,1) = -4.018960334334318e-01;
@@ -69,11 +67,11 @@ private:
 
     for (unsigned i=0; i<U.m(); ++i)
       for (unsigned j=0; j<U.n(); ++j)
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(U(i,j), true_U(i,j), TOLERANCE*TOLERANCE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( libmesh_real(U(i,j)), libmesh_real(true_U(i,j)), TOLERANCE*TOLERANCE);
 
     for (unsigned i=0; i<VT.m(); ++i)
       for (unsigned j=0; j<VT.n(); ++j)
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(VT(i,j), true_VT(i,j), TOLERANCE*TOLERANCE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( libmesh_real(VT(i,j)), libmesh_real(true_VT(i,j)), TOLERANCE*TOLERANCE);
 
     for (unsigned i=0; i<sigma.size(); ++i)
       CPPUNIT_ASSERT_DOUBLES_EQUAL(sigma(i), true_sigma(i), TOLERANCE*TOLERANCE);
@@ -87,5 +85,3 @@ private:
   CPPUNIT_TEST_SUITE_REGISTRATION(DenseMatrixTest);
 #endif
 #endif
-
-#endif // LIBMESH_USE_REAL_NUMBERS

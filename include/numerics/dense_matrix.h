@@ -379,7 +379,7 @@ public:
    * The implementation uses PETSc's interface to blas/lapack.
    * If this is not available, this function throws an error.
    */
-  void svd(DenseVector<T> & sigma);
+  void svd(DenseVector<Real> & sigma);
 
 
   /**
@@ -393,9 +393,9 @@ public:
    * The implementation uses PETSc's interface to blas/lapack.
    * If this is not available, this function throws an error.
    */
-  void svd(DenseVector<T> & sigma,
-           DenseMatrix<T> & U,
-           DenseMatrix<T> & VT);
+  void svd(DenseVector<Real> & sigma,
+           DenseMatrix<Number> & U,
+           DenseMatrix<Number> & VT);
 
   /**
    * Solve the system of equations A*x = rhs for x in the
@@ -544,16 +544,16 @@ private:
    * Lapack routine "getsvd".
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
-  void _svd_lapack(DenseVector<T> & sigma);
+  void _svd_lapack(DenseVector<Real> & sigma);
 
   /**
    * Computes a "reduced" SVD of the matrix using the
    * Lapack routine "getsvd".
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
-  void _svd_lapack(DenseVector<T> & sigma,
-                   DenseMatrix<T> & U,
-                   DenseMatrix<T> & VT);
+  void _svd_lapack(DenseVector<Real> & sigma,
+                   DenseMatrix<Number> & U,
+                   DenseMatrix<Number> & VT);
 
   /**
    * Called by svd_solve(rhs).
@@ -568,9 +568,9 @@ private:
    */
   void _svd_helper (char JOBU,
                     char JOBVT,
-                    std::vector<T> & sigma_val,
-                    std::vector<T> & U_val,
-                    std::vector<T> & VT_val);
+                    std::vector<Real> & sigma_val,
+                    std::vector<Number> & U_val,
+                    std::vector<Number> & VT_val);
 
   /**
    * Computes the eigenvalues of the matrix using the
