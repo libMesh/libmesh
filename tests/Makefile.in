@@ -110,6 +110,11 @@ noinst_PROGRAMS = $(am__EXEEXT_7)
 @LIBMESH_DEVEL_MODE_TRUE@am__append_6 = unit_tests-devel
 @LIBMESH_PROF_MODE_TRUE@am__append_7 = unit_tests-prof
 @LIBMESH_OPROF_MODE_TRUE@am__append_8 = unit_tests-oprof
+
+######################################################################
+#
+# Don't leave code coverage outputs lying around
+@CODE_COVERAGE_ENABLED_TRUE@am__append_9 = */*.gcda */*.gcno
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -958,11 +963,7 @@ unit_tests_sources = driver.C test_comm.h base/dof_object_test.h \
 @LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
 @LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_LDADD = $(top_builddir)/libmesh_oprof.la
 TESTS = run_unit_tests.sh
-
-######################################################################
-#
-# Don't leave code coverage outputs lying around
-@CODE_COVERAGE_ENABLED_TRUE@CLEANFILES = */*.gcda */*.gcno
+CLEANFILES = cube_mesh.xdr $(am__append_9)
 all: all-am
 
 .SUFFIXES:

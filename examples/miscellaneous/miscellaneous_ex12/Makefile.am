@@ -4,7 +4,7 @@ data          = miscellaneous_ex12.C run.sh cylinder.exo
 sources       = $(data) run.sh
 check_SCRIPTS = run.sh
 
-CLEANFILES = out.e
+CLEANFILES = out.e cylinder.xdr
 
 # also need to link files for VPATH builds
 if LIBMESH_VPATH_BUILD

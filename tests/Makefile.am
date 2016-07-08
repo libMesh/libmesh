@@ -147,9 +147,11 @@ $(top_builddir)/libmesh_oprof.la: FORCE
 
 TESTS = run_unit_tests.sh
 
+CLEANFILES = cube_mesh.xdr
+
 ######################################################################
 #
 # Don't leave code coverage outputs lying around
 if CODE_COVERAGE_ENABLED
-  CLEANFILES = */*.gcda */*.gcno
+  CLEANFILES += */*.gcda */*.gcno
 endif
