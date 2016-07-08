@@ -21,12 +21,12 @@
 #include "libmesh/dense_vector.h"
 
 
-#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
+#if (LIBMESH_HAVE_PETSC)
 # include "libmesh/petsc_macro.h"
 # include <petscblaslapack.h>
 #endif
 
-#if (LIBMESH_HAVE_SLEPC && LIBMESH_USE_REAL_NUMBERS)
+#if (LIBMESH_HAVE_SLEPC)
 # include <slepcblaslapack.h>
 #endif
 
@@ -270,7 +270,7 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
 
 
 template<typename T>
-void DenseMatrix<T>::_svd_lapack (DenseVector<T> & sigma)
+void DenseMatrix<T>::_svd_lapack (DenseVector<Real> & sigma)
 {
   // The calling sequence for dgetrf is:
   // DGESVD( JOBU, JOBVT, M, N, A, LDA, S, U, LDU, VT, LDVT, WORK, LWORK, INFO )
@@ -299,9 +299,9 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T> & sigma)
   //                  computed.
   char JOBVT = 'N';
 
-  std::vector<T> sigma_val;
-  std::vector<T> U_val;
-  std::vector<T> VT_val;
+  std::vector<Real> sigma_val;
+  std::vector<Number> U_val;
+  std::vector<Number> VT_val;
 
   _svd_helper(JOBU, JOBVT, sigma_val, U_val, VT_val);
 
@@ -313,9 +313,9 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T> & sigma)
 }
 
 template<typename T>
-void DenseMatrix<T>::_svd_lapack (DenseVector<T> & sigma,
-                                  DenseMatrix<T> & U,
-                                  DenseMatrix<T> & VT)
+void DenseMatrix<T>::_svd_lapack (DenseVector<Real> & sigma,
+                                  DenseMatrix<Number> & U,
+                                  DenseMatrix<Number> & VT)
 {
   // The calling sequence for dgetrf is:
   // DGESVD( JOBU, JOBVT, M, N, A, LDA, S, U, LDU, VT, LDVT, WORK, LWORK, INFO )
@@ -350,7 +350,7 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T> & sigma,
   // entries of the V matrix, and the values returned in the VT_val
   // array actually correspond to the entries of U^T.  Therefore, we
   // pass VT in the place of U and U in the place of VT below!
-  std::vector<T> sigma_val;
+  std::vector<Real> sigma_val;
   int M = this->n();
   int N = this->m();
   int min_MN = (M < N) ? M : N;
@@ -377,14 +377,14 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T> & sigma,
     sigma(i) = sigma_val[i];
 }
 
-#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
+#if (LIBMESH_HAVE_PETSC)
 
 template<typename T>
 void DenseMatrix<T>::_svd_helper (char JOBU,
                                   char JOBVT,
-                                  std::vector<T> & sigma_val,
-                                  std::vector<T> & U_val,
-                                  std::vector<T> & VT_val)
+                                  std::vector<Real> & sigma_val,
+                                  std::vector<Number> & U_val,
+                                  std::vector<Number> & VT_val)
 {
 
   //    M       (input) int *
@@ -472,7 +472,7 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
   //          whose diagonal is in S (not necessarily sorted). B
   //          satisfies A = U * B * VT, so it has the same singular values
   //          as A, and singular vectors related by U and VT.
-  std::vector<T> WORK( LWORK );
+  std::vector<Number> WORK( LWORK );
 
   //  INFO    (output) INTEGER
   //          = 0:  successful exit.
@@ -484,8 +484,22 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
   int INFO = 0;
 
   // Ready to call the actual factorization routine through PETSc's interface
+#ifdef LIBMESH_USE_REAL_NUMBERS
   LAPACKgesvd_(&JOBU, &JOBVT, &M, &N, &(_val[0]), &LDA, &(sigma_val[0]), &(U_val[0]),
                &LDU, &(VT_val[0]), &LDVT, &(WORK[0]), &LWORK, &INFO);
+#else
+  // In this case _val may store Reals since it is defined to be a template type T.
+  // Hence we must convert to Numbers before calling LAPACKgesvd_.
+  std::vector<Number> number_val(_val.size());
+  for(unsigned int i=0; i<_val.size(); i++)
+    {
+      number_val[i] = _val[i];
+    }
+
+  Real RWORK = 0;
+  LAPACKgesvd_(&JOBU, &JOBVT, &M, &N, &(number_val[0]), &LDA, &(sigma_val[0]), &(U_val[0]),
+               &LDU, &(VT_val[0]), &LDVT, &(WORK[0]), &LWORK, &RWORK, &INFO);
+#endif
 
   // Check return value for errors
   if (INFO != 0)
@@ -498,9 +512,9 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
 template<typename T>
 void DenseMatrix<T>::_svd_helper (char,
                                   char,
-                                  std::vector<T> &,
-                                  std::vector<T> &,
-                                  std::vector<T> &)
+                                  std::vector<Real> &,
+                                  std::vector<Number> &,
+                                  std::vector<Number> &)
 {
   libmesh_error_msg("No PETSc-provided BLAS/LAPACK available!");
 }
@@ -1068,13 +1082,13 @@ template void DenseMatrix<Real>::_matvec_blas(Real,
                                               bool) const;
 template void DenseMatrix<Real>::_svd_lapack(DenseVector<Real> &);
 template void DenseMatrix<Real>::_svd_lapack(DenseVector<Real> &,
-                                             DenseMatrix<Real> &,
-                                             DenseMatrix<Real> &);
+                                             DenseMatrix<Number> &,
+                                             DenseMatrix<Number> &);
 template void DenseMatrix<Real>::_svd_helper (char,
                                               char,
                                               std::vector<Real> &,
-                                              std::vector<Real> &,
-                                              std::vector<Real> &);
+                                              std::vector<Number> &,
+                                              std::vector<Number> &);
 template void DenseMatrix<Real>::_svd_solve_lapack (const DenseVector<Real> &, DenseVector<Real> &, Real) const;
 template void DenseMatrix<Real>::_evd_lapack(DenseVector<Real> &, DenseVector<Real> &);
 
@@ -1088,13 +1102,13 @@ template void DenseMatrix<Number>::_matvec_blas(Number,
                                                 DenseVector<Number> &,
                                                 const DenseVector<Number> &,
                                                 bool) const;
-template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number> &);
-template void DenseMatrix<Number>::_svd_lapack(DenseVector<Number> &,
+template void DenseMatrix<Number>::_svd_lapack(DenseVector<Real> &);
+template void DenseMatrix<Number>::_svd_lapack(DenseVector<Real> &,
                                                DenseMatrix<Number> &,
                                                DenseMatrix<Number> &);
 template void DenseMatrix<Number>::_svd_helper (char,
                                                 char,
-                                                std::vector<Number> &,
+                                                std::vector<Real> &,
                                                 std::vector<Number> &,
                                                 std::vector<Number> &);
 template void DenseMatrix<Number>::_svd_solve_lapack (const DenseVector<Number> &, DenseVector<Number> &, Real) const;
