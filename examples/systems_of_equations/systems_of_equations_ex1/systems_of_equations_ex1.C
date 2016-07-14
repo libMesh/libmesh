@@ -100,7 +100,7 @@ int main (int argc, char ** argv)
   EquationSystems equation_systems (mesh);
 
   // Declare the system and its variables.
-  // Create a transient system named "Convection-Diffusion"
+  // Create a transient system named "Stokes"
   LinearImplicitSystem & system =
     equation_systems.add_system<LinearImplicitSystem> ("Stokes");
 
