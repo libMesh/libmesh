@@ -657,7 +657,9 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
   LIBMESH_CHKERR(ierr);
 
   //Pull in command-line options
+#ifdef PETSC_VERSION_LESS_THAN(3,7,0)
   KSPSetFromOptions(ksp);
+#endif
   SNESSetFromOptions(_snes);
 
   if (this->user_presolve)
