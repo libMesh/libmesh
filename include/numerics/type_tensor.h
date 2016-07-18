@@ -989,7 +989,8 @@ inline
 TypeTensor<T> TypeTensor<T>::inverse() const
 {
 #if LIBMESH_DIM == 1
-  libmesh_assert_not_equal_to(_coords[0], static_cast<T>(0.));
+  if (_coords[0] == static_cast<T>(0.))
+    libmesh_convergence_failure();
   return TypeTensor(1. / _coords[0]);
 #endif
 
@@ -1003,7 +1004,9 @@ TypeTensor<T> TypeTensor<T>::inverse() const
 
   // Make sure det = ad - bc is not zero
   T my_det = a*d - b*c;
-  libmesh_assert_not_equal_to(my_det, static_cast<T>(0.));
+
+  if (my_det == static_cast<T>(0.))
+    libmesh_convergence_failure();
 
   return TypeTensor(d/my_det, -b/my_det, -c/my_det, a/my_det);
 #endif
@@ -1017,7 +1020,9 @@ TypeTensor<T> TypeTensor<T>::inverse() const
     a31 = A(2,0), a32 = A(2,1), a33 = A(2,2);
 
   T my_det = a11*(a33*a22-a32*a23) - a21*(a33*a12-a32*a13) + a31*(a23*a12-a22*a13);
-  libmesh_assert_not_equal_to(my_det, static_cast<T>(0.));
+
+  if (my_det == static_cast<T>(0.))
+    libmesh_convergence_failure();
 
   // Inline comment characters are for lining up columns.
   return TypeTensor(/**/  (a33*a22-a32*a23)/my_det, -(a33*a12-a32*a13)/my_det,  (a23*a12-a22*a13)/my_det,
@@ -1033,14 +1038,16 @@ inline
 void TypeTensor<T>::solve(const TypeVector<T> & b, TypeVector<T> & x) const
 {
 #if LIBMESH_DIM == 1
-  libmesh_assert_not_equal_to(_coords[0], static_cast<T>(0.));
+  if (_coords[0] == static_cast<T>(0.))
+    libmesh_convergence_failure();
   x(0) = b(0) / _coords[0];
 #endif
 
 #if LIBMESH_DIM == 2
   T my_det = _coords[0]*_coords[3] - _coords[1]*_coords[2];
 
-  libmesh_assert_not_equal_to(my_det, static_cast<T>(0.));
+  if (my_det == static_cast<T>(0.))
+    libmesh_convergence_failure();
 
   T my_det_inv = 1./my_det;
 
@@ -1057,7 +1064,8 @@ void TypeTensor<T>::solve(const TypeVector<T> & b, TypeVector<T> & x) const
     //          +a31*(a23       *a12        - a22       *a13)
     /**/ +_coords[6]*(_coords[5]*_coords[1] - _coords[4]*_coords[2]);
 
-  libmesh_assert_not_equal_to(my_det, static_cast<T>(0.));
+  if (my_det == static_cast<T>(0.))
+    libmesh_convergence_failure();
 
   T my_det_inv = 1./my_det;
   x(0) = my_det_inv*((_coords[8]*_coords[4] - _coords[7]*_coords[5])*b(0) -
