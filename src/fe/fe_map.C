@@ -1761,9 +1761,44 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
             //  {dp} = [J]^-1 ({X} - {X_n})
             //
             //  which involves the inversion of the 3x3 matrix [J]
-            RealTensorValue(dxi(0), deta(0), dzeta(0),
-                            dxi(1), deta(1), dzeta(1),
-                            dxi(2), deta(2), dzeta(2)).solve(delta, dp);
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+            try
+              {
+#endif
+                RealTensorValue(dxi(0), deta(0), dzeta(0),
+                                dxi(1), deta(1), dzeta(1),
+                                dxi(2), deta(2), dzeta(2)).solve(delta, dp);
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+              }
+            catch (ConvergenceFailure &)
+              {
+                // We encountered a singular Jacobian.  The value of
+                // dp is zero, since it was never changed during the
+                // call to RealTensorValue::solve().  We don't want to
+                // continue iterating until max_cnt since there is no
+                // update to the Newton iterate, and we don't want to
+                // print the inverse_map_error value since it will
+                // confusingly be 0.  Therefore, in the secure case we
+                // need to throw an error message while in the !secure
+                // case we can just return a far away point.
+                if (secure)
+                  {
+                    libMesh::err << "ERROR: Newton scheme encountered a singular Jacobian in element: "
+                                 << elem->id()
+                                 << std::endl;
+
+                    elem->print_info(libMesh::err);
+
+                    libmesh_error_msg("Exiting...");
+                  }
+                else
+                  {
+                    for (unsigned int i=0; i != Dim; ++i)
+                      p(i) = 1e6;
+                    return p;
+                  }
+              }
+#endif
 
             // No master elements have radius > 4, but sometimes we
             // can take a step that big while still converging
