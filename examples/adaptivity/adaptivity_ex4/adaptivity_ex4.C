@@ -561,7 +561,7 @@ Number forcing_function_3D(const Point & p)
 // account the boundary conditions, which will be handled
 // via a penalty method.
 void assemble_biharmonic(EquationSystems & es,
-                         const std::string & system_name)
+                         const std::string & libmesh_dbg_var(system_name))
 {
 #ifdef LIBMESH_ENABLE_AMR
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES

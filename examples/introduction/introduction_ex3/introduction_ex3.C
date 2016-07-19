@@ -172,13 +172,12 @@ int main (int argc, char ** argv)
 // account the boundary conditions, which will be handled
 // via a penalty method.
 void assemble_poisson(EquationSystems & es,
-                      const std::string & system_name)
+                      const std::string & libmesh_dbg_var(system_name))
 {
 
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Poisson");
-
 
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();

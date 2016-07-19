@@ -139,7 +139,7 @@ Gradient exact_derivative(const Point & p,
 // conditions and the flux integrals, which will be handled
 // via an interior penalty method.
 void assemble_ellipticdg(EquationSystems & es,
-                         const std::string & system_name)
+                         const std::string & libmesh_dbg_var(system_name))
 {
   libMesh::out << " assembling elliptic dg system... ";
   libMesh::out.flush();

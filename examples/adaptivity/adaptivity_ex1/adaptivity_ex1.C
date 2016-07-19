@@ -177,7 +177,7 @@ int main(int argc, char ** argv)
 
 // Define the matrix assembly function for the 1D PDE we are solving
 void assemble_1D(EquationSystems & es,
-                 const std::string & system_name)
+                 const std::string & libmesh_dbg_var(system_name))
 {
 
 #ifdef LIBMESH_ENABLE_AMR
