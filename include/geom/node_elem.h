@@ -58,7 +58,7 @@ public:
    * @returns the \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  virtual Point master_point (const unsigned int i) const libmesh_override
+  virtual Point master_point (const unsigned int libmesh_dbg_var(i)) const libmesh_override
   {
     libmesh_assert_equal_to (i, 0);
     return Point(0,0,0);
