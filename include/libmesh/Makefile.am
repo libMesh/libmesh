@@ -398,7 +398,6 @@ BUILT_SOURCES = \
         perfmon.h \
         plt_loader.h \
         point_locator_base.h \
-        point_locator_list.h \
         point_locator_tree.h \
         pool_allocator.h \
         restore_warnings.h \
@@ -1693,9 +1692,6 @@ plt_loader.h: $(top_srcdir)/include/utils/plt_loader.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 point_locator_base.h: $(top_srcdir)/include/utils/point_locator_base.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-point_locator_list.h: $(top_srcdir)/include/utils/point_locator_list.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 point_locator_tree.h: $(top_srcdir)/include/utils/point_locator_tree.h
