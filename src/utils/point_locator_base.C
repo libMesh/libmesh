@@ -23,7 +23,6 @@
 // Local Includes
 #include "libmesh/point_locator_base.h"
 #include "libmesh/point_locator_tree.h"
-#include "libmesh/point_locator_list.h"
 
 namespace libMesh
 {
@@ -75,9 +74,6 @@ UniquePtr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
 
     case TREE_LOCAL_ELEMENTS:
       return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, Trees::LOCAL_ELEMENTS, master));
-
-    case LIST:
-      return UniquePtr<PointLocatorBase>(new PointLocatorList(mesh, master));
 
     default:
       libmesh_error_msg("ERROR: Bad PointLocatorType = " << t);

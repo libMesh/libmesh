@@ -32,7 +32,6 @@ namespace libMesh {
 enum PointLocatorType {TREE = 0,
                        TREE_ELEMENTS,
                        TREE_LOCAL_ELEMENTS,
-                       LIST,
                        INVALID_LOCATOR};
 }
 

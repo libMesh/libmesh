@@ -176,36 +176,6 @@ public:
     CPPUNIT_ASSERT_EQUAL( top_quad_dof_indices[1], bottom_quad_dof_indices[2] );
   }
 
-  void testPointLocatorList()
-  {
-    UniquePtr<PointLocatorBase> locator = PointLocatorBase::build(LIST,*_mesh);
-
-    Point top_point(0.4, 0.5);
-    const Elem* top_elem = (*locator)(top_point);
-    CPPUNIT_ASSERT(top_elem);
-
-    // We should have gotten back the top quad
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)0, top_elem->id() );
-
-    Point bottom_point(0.5, -0.5);
-    const Elem* bottom_elem = (*locator)(bottom_point);
-    CPPUNIT_ASSERT(bottom_elem);
-
-    // We should have gotten back the bottom quad
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)1, bottom_elem->id() );
-
-    // Test getting back the edge
-    {
-      std::set<subdomain_id_type> subdomain_id; subdomain_id.insert(1);
-      Point interface_point( 0.2, 0.0 );
-      const Elem* interface_elem = (*locator)(interface_point, &subdomain_id);
-      CPPUNIT_ASSERT(interface_elem);
-
-      // We should have gotten back the overlapping edge element
-      CPPUNIT_ASSERT_EQUAL( (dof_id_type)2, interface_elem->id() );
-    }
-  }
-
   void testPointLocatorTree()
   {
     UniquePtr<PointLocatorBase> locator = _mesh->sub_point_locator();
