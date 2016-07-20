@@ -234,7 +234,7 @@ void assemble_and_solve(MeshBase & mesh,
 }
 
 void assemble_poisson(EquationSystems & es,
-                      const std::string & system_name)
+                      const std::string & libmesh_dbg_var(system_name))
 {
   libmesh_assert_equal_to (system_name, "Poisson");
 

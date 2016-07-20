@@ -595,13 +595,12 @@ Gradient exact_derivative(const Point & p,
 // account the boundary conditions, which will be handled
 // via a penalty method.
 void assemble_laplace(EquationSystems & es,
-                      const std::string & system_name)
+                      const std::string & libmesh_dbg_var(system_name))
 {
 #ifdef LIBMESH_ENABLE_AMR
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Laplace");
-
 
   // Declare a performance log.  Give it a descriptive
   // string to identify what part of the code we are

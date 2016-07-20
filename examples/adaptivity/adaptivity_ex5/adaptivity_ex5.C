@@ -540,7 +540,7 @@ int main (int argc, char ** argv)
 // responsible for applying the initial conditions to
 // the system.
 void init_cd (EquationSystems & es,
-              const std::string & system_name)
+              const std::string & libmesh_dbg_var(system_name))
 {
   // It is a good idea to make sure we are initializing
   // the proper system.
@@ -567,7 +567,7 @@ void init_cd (EquationSystems & es,
 // element stiffness matrices and right-hand sides.
 #ifdef LIBMESH_ENABLE_AMR
 void assemble_cd (EquationSystems & es,
-                  const std::string & system_name)
+                  const std::string & libmesh_dbg_var(system_name))
 {
   // It is a good idea to make sure we are assembling
   // the proper system.

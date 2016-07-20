@@ -56,7 +56,7 @@ ElemCutter::~ElemCutter()
 
 
 
-bool ElemCutter::is_inside (const Elem & elem,
+bool ElemCutter::is_inside (const Elem & libmesh_dbg_var(elem),
                             const std::vector<Real> & vertex_distance_func) const
 {
   libmesh_assert_equal_to (elem.n_vertices(), vertex_distance_func.size());
@@ -71,7 +71,7 @@ bool ElemCutter::is_inside (const Elem & elem,
 
 
 
-bool ElemCutter::is_outside (const Elem & elem,
+bool ElemCutter::is_outside (const Elem & libmesh_dbg_var(elem),
                              const std::vector<Real> & vertex_distance_func) const
 {
   libmesh_assert_equal_to (elem.n_vertices(), vertex_distance_func.size());
@@ -86,7 +86,7 @@ bool ElemCutter::is_outside (const Elem & elem,
 
 
 
-bool ElemCutter::is_cut (const Elem & elem,
+bool ElemCutter::is_cut (const Elem & libmesh_dbg_var(elem),
                          const std::vector<Real> & vertex_distance_func) const
 {
   libmesh_assert_equal_to (elem.n_vertices(), vertex_distance_func.size());

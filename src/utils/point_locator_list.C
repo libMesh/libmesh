@@ -192,9 +192,9 @@ const Elem * PointLocatorList::operator() (const Point & p,
 }
 
 
-void PointLocatorList::operator() (const Point & p,
-                                   std::set<const Elem *> & candidate_elements,
-                                   const std::set<subdomain_id_type> * allowed_subdomains) const
+void PointLocatorList::operator() (const Point & /*p*/,
+                                   std::set<const Elem *> & /*candidate_elements*/,
+                                   const std::set<subdomain_id_type> * /*allowed_subdomains*/) const
 {
   // This functionality is not yet implemented for PointLocatorList (and will never be...).
   libmesh_not_implemented();

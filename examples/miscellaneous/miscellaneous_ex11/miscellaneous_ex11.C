@@ -251,7 +251,7 @@ int main (int argc, char ** argv)
 // end we also take into account the boundary conditions
 // here, using the penalty method.
 void assemble_shell (EquationSystems & es,
-                     const std::string & system_name)
+                     const std::string & libmesh_dbg_var(system_name))
 {
   // It is a good idea to make sure we are assembling
   // the proper system.

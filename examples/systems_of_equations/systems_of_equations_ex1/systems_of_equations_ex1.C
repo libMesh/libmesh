@@ -141,7 +141,7 @@ int main (int argc, char ** argv)
 }
 
 void assemble_stokes (EquationSystems & es,
-                      const std::string & system_name)
+                      const std::string & libmesh_dbg_var(system_name))
 {
   // It is a good idea to make sure we are assembling
   // the proper system.

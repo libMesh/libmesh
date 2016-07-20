@@ -1303,10 +1303,19 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                   // Get a pointer to the node located at the HEX27 centroid
                   Node * apex_node = base_hex->node_ptr(26);
 
+                  // Container to catch ids handed back from BoundaryInfo
+                  std::vector<boundary_id_type> ids;
+
                   for (unsigned short s=0; s<base_hex->n_sides(); ++s)
                     {
-                      // Get the boundary ID for this side
-                      boundary_id_type b_id = boundary_info.boundary_id(*el, s);
+                      // Get the boundary ID(s) for this side
+                      boundary_info.boundary_ids(*el, s, ids);
+
+                      // We're creating this Mesh, so there should be 0 or 1 boundary IDs.
+                      libmesh_assert(ids.size() <= 1);
+
+                      // A convenient name for the side's ID.
+                      boundary_id_type b_id = ids.empty() ? BoundaryInfo::invalid_id : ids[0];
 
                       // Need to build the full-ordered side!
                       UniquePtr<Elem> side = base_hex->build_side_ptr(s);

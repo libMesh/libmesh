@@ -146,6 +146,10 @@ int main(int argc, char ** argv)
     {
       Elem * elem = *el;
       unsigned int n_sides = elem->n_sides();
+
+      // Container to catch ids handed back from BoundaryInfo
+      std::vector<boundary_id_type> ids;
+
       for (unsigned short s=0; s != n_sides; ++s)
         {
           if (elem->neighbor_ptr(s))
@@ -167,9 +171,19 @@ int main(int argc, char ** argv)
               n(1) > minnormal(1) && n(1) < maxnormal(1) &&
               n(2) > minnormal(2) && n(2) < maxnormal(2))
             {
-              if (matcholdbcid &&
-                  mesh.get_boundary_info().boundary_id(elem, s) != oldbcid)
+              // Get the list of boundary ids for this side
+              mesh.get_boundary_info().boundary_ids(elem, s, ids);
+
+              // There should be at most one value present, otherwise the
+              // logic here won't work.
+              libmesh_assert(ids.size() <= 1);
+
+              // A convenient name for the side's ID.
+              boundary_id_type b_id = ids.empty() ? BoundaryInfo::invalid_id : ids[0];
+
+              if (matcholdbcid && b_id != oldbcid)
                 continue;
+
               mesh.get_boundary_info().remove_side(elem, s);
               mesh.get_boundary_info().add_side(elem, s, bcid);
               //libMesh::out << "Set element " << elem->id() << " side " << s <<

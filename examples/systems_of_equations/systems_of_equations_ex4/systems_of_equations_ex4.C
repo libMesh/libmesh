@@ -150,7 +150,7 @@ int main (int argc, char ** argv)
 
 
 void assemble_elasticity(EquationSystems & es,
-                         const std::string & system_name)
+                         const std::string & libmesh_dbg_var(system_name))
 {
   libmesh_assert_equal_to (system_name, "Elasticity");
 

@@ -98,6 +98,9 @@ void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
   std::vector<short int> new_boundary_sides;
   std::vector<boundary_id_type> new_boundary_ids;
 
+  // Container to catch ids handed back from BoundaryInfo
+  std::vector<boundary_id_type> ids;
+
   MeshBase::const_element_iterator       el     = mesh.elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.elements_end();
   for (; el != end_el; ++el)
@@ -116,12 +119,12 @@ void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
         {
           for (unsigned short side = 0; side < elem->n_sides(); ++side)
             {
-              const boundary_id_type boundary_id =
-                mesh.get_boundary_info().boundary_id(elem, side);
-              if (boundary_id != BoundaryInfo::invalid_id)
+              mesh.get_boundary_info().boundary_ids(elem, side, ids);
+
+              for (unsigned id=0; id<ids.size(); ++id)
                 {
                   // add the boundary id to the list of new boundary ids
-                  new_boundary_ids.push_back(boundary_id);
+                  new_boundary_ids.push_back(ids[id]);
                   new_boundary_elements.push_back(tri);
                   new_boundary_sides.push_back(side);
                 }

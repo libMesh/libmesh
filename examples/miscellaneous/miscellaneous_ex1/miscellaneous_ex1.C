@@ -229,12 +229,11 @@ int main (int argc, char ** argv)
 // This function assembles the system matrix and right-hand-side
 // for the discrete form of our wave equation.
 void assemble_wave(EquationSystems & es,
-                   const std::string & system_name)
+                   const std::string & libmesh_dbg_var(system_name))
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Wave");
-
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

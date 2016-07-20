@@ -347,9 +347,23 @@ bool Tet4::contains_point (const Point & p, Real tol) const
     col3 = point(3) - point(0);
 
   Point r;
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+            try
+              {
+#endif
   RealTensorValue(col1(0), col2(0), col3(0),
                   col1(1), col2(1), col3(1),
                   col1(2), col2(2), col3(2)).solve(p - point(0), r);
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+              }
+            catch (ConvergenceFailure &)
+              {
+                // The Jacobian was singular, therefore the Tet had
+                // zero volume.  In this degenerate case, it is not
+                // possible for the Tet to contain any points.
+                return false;
+              }
+#endif
 
   // The point p is inside the tetrahedron if r1 + r2 + r3 < 1 and
   // 0 <= ri <= 1 for i = 1,2,3.
