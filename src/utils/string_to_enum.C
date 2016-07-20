@@ -508,7 +508,6 @@ void init_point_locator_type_to_enum ()
   if (point_locator_type_to_enum.empty())
     {
       point_locator_type_to_enum["TREE" ]=TREE;
-      point_locator_type_to_enum["LIST" ]=LIST;
       point_locator_type_to_enum["INVALID_LOCATOR" ]=INVALID_LOCATOR;
     }
 }

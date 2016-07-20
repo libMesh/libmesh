@@ -402,7 +402,6 @@ include_HEADERS =  \
         utils/perfmon.h \
         utils/plt_loader.h \
         utils/point_locator_base.h \
-        utils/point_locator_list.h \
         utils/point_locator_tree.h \
         utils/pool_allocator.h \
         utils/restore_warnings.h \

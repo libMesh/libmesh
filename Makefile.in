@@ -480,11 +480,10 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/utils/number_lookups.C src/utils/perf_log.C \
 	src/utils/plt_loader.C src/utils/plt_loader_read.C \
 	src/utils/plt_loader_write.C src/utils/point_locator_base.C \
-	src/utils/point_locator_list.C src/utils/point_locator_tree.C \
-	src/utils/statistics.C src/utils/string_to_enum.C \
-	src/utils/timestamp.C src/utils/topology_map.C \
-	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
-	src/utils/xdr_cxx.C
+	src/utils/point_locator_tree.C src/utils/statistics.C \
+	src/utils/string_to_enum.C src/utils/timestamp.C \
+	src/utils/topology_map.C src/utils/tree.C \
+	src/utils/tree_node.C src/utils/utility.C src/utils/xdr_cxx.C
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/base/libmesh_dbg_la-dof_map_constraints.lo \
@@ -892,7 +891,6 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/utils/libmesh_dbg_la-plt_loader_read.lo \
 	src/utils/libmesh_dbg_la-plt_loader_write.lo \
 	src/utils/libmesh_dbg_la-point_locator_base.lo \
-	src/utils/libmesh_dbg_la-point_locator_list.lo \
 	src/utils/libmesh_dbg_la-point_locator_tree.lo \
 	src/utils/libmesh_dbg_la-statistics.lo \
 	src/utils/libmesh_dbg_la-string_to_enum.lo \
@@ -1190,11 +1188,10 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/utils/number_lookups.C src/utils/perf_log.C \
 	src/utils/plt_loader.C src/utils/plt_loader_read.C \
 	src/utils/plt_loader_write.C src/utils/point_locator_base.C \
-	src/utils/point_locator_list.C src/utils/point_locator_tree.C \
-	src/utils/statistics.C src/utils/string_to_enum.C \
-	src/utils/timestamp.C src/utils/topology_map.C \
-	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
-	src/utils/xdr_cxx.C
+	src/utils/point_locator_tree.C src/utils/statistics.C \
+	src/utils/string_to_enum.C src/utils/timestamp.C \
+	src/utils/topology_map.C src/utils/tree.C \
+	src/utils/tree_node.C src/utils/utility.C src/utils/xdr_cxx.C
 am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/base/libmesh_devel_la-dof_map_constraints.lo \
 	src/base/libmesh_devel_la-dof_object.lo \
@@ -1601,7 +1598,6 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/utils/libmesh_devel_la-plt_loader_read.lo \
 	src/utils/libmesh_devel_la-plt_loader_write.lo \
 	src/utils/libmesh_devel_la-point_locator_base.lo \
-	src/utils/libmesh_devel_la-point_locator_list.lo \
 	src/utils/libmesh_devel_la-point_locator_tree.lo \
 	src/utils/libmesh_devel_la-statistics.lo \
 	src/utils/libmesh_devel_la-string_to_enum.lo \
@@ -1896,11 +1892,10 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/utils/number_lookups.C src/utils/perf_log.C \
 	src/utils/plt_loader.C src/utils/plt_loader_read.C \
 	src/utils/plt_loader_write.C src/utils/point_locator_base.C \
-	src/utils/point_locator_list.C src/utils/point_locator_tree.C \
-	src/utils/statistics.C src/utils/string_to_enum.C \
-	src/utils/timestamp.C src/utils/topology_map.C \
-	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
-	src/utils/xdr_cxx.C
+	src/utils/point_locator_tree.C src/utils/statistics.C \
+	src/utils/string_to_enum.C src/utils/timestamp.C \
+	src/utils/topology_map.C src/utils/tree.C \
+	src/utils/tree_node.C src/utils/utility.C src/utils/xdr_cxx.C
 am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/base/libmesh_oprof_la-dof_map_constraints.lo \
 	src/base/libmesh_oprof_la-dof_object.lo \
@@ -2307,7 +2302,6 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/utils/libmesh_oprof_la-plt_loader_read.lo \
 	src/utils/libmesh_oprof_la-plt_loader_write.lo \
 	src/utils/libmesh_oprof_la-point_locator_base.lo \
-	src/utils/libmesh_oprof_la-point_locator_list.lo \
 	src/utils/libmesh_oprof_la-point_locator_tree.lo \
 	src/utils/libmesh_oprof_la-statistics.lo \
 	src/utils/libmesh_oprof_la-string_to_enum.lo \
@@ -2602,11 +2596,10 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/utils/number_lookups.C src/utils/perf_log.C \
 	src/utils/plt_loader.C src/utils/plt_loader_read.C \
 	src/utils/plt_loader_write.C src/utils/point_locator_base.C \
-	src/utils/point_locator_list.C src/utils/point_locator_tree.C \
-	src/utils/statistics.C src/utils/string_to_enum.C \
-	src/utils/timestamp.C src/utils/topology_map.C \
-	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
-	src/utils/xdr_cxx.C
+	src/utils/point_locator_tree.C src/utils/statistics.C \
+	src/utils/string_to_enum.C src/utils/timestamp.C \
+	src/utils/topology_map.C src/utils/tree.C \
+	src/utils/tree_node.C src/utils/utility.C src/utils/xdr_cxx.C
 am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/base/libmesh_opt_la-dof_map_constraints.lo \
 	src/base/libmesh_opt_la-dof_object.lo \
@@ -3013,7 +3006,6 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/utils/libmesh_opt_la-plt_loader_read.lo \
 	src/utils/libmesh_opt_la-plt_loader_write.lo \
 	src/utils/libmesh_opt_la-point_locator_base.lo \
-	src/utils/libmesh_opt_la-point_locator_list.lo \
 	src/utils/libmesh_opt_la-point_locator_tree.lo \
 	src/utils/libmesh_opt_la-statistics.lo \
 	src/utils/libmesh_opt_la-string_to_enum.lo \
@@ -3307,11 +3299,10 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/utils/number_lookups.C src/utils/perf_log.C \
 	src/utils/plt_loader.C src/utils/plt_loader_read.C \
 	src/utils/plt_loader_write.C src/utils/point_locator_base.C \
-	src/utils/point_locator_list.C src/utils/point_locator_tree.C \
-	src/utils/statistics.C src/utils/string_to_enum.C \
-	src/utils/timestamp.C src/utils/topology_map.C \
-	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
-	src/utils/xdr_cxx.C
+	src/utils/point_locator_tree.C src/utils/statistics.C \
+	src/utils/string_to_enum.C src/utils/timestamp.C \
+	src/utils/topology_map.C src/utils/tree.C \
+	src/utils/tree_node.C src/utils/utility.C src/utils/xdr_cxx.C
 am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/base/libmesh_prof_la-dof_map_constraints.lo \
 	src/base/libmesh_prof_la-dof_object.lo \
@@ -3718,7 +3709,6 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/utils/libmesh_prof_la-plt_loader_read.lo \
 	src/utils/libmesh_prof_la-plt_loader_write.lo \
 	src/utils/libmesh_prof_la-point_locator_base.lo \
-	src/utils/libmesh_prof_la-point_locator_list.lo \
 	src/utils/libmesh_prof_la-point_locator_tree.lo \
 	src/utils/libmesh_prof_la-statistics.lo \
 	src/utils/libmesh_prof_la-string_to_enum.lo \
@@ -5089,7 +5079,6 @@ libmesh_SOURCES = \
         src/utils/plt_loader_read.C \
         src/utils/plt_loader_write.C \
         src/utils/point_locator_base.C \
-        src/utils/point_locator_list.C \
         src/utils/point_locator_tree.C \
         src/utils/statistics.C \
         src/utils/string_to_enum.C \
@@ -6537,8 +6526,6 @@ src/utils/libmesh_dbg_la-plt_loader_write.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_dbg_la-point_locator_base.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libmesh_dbg_la-point_locator_list.lo:  \
-	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_dbg_la-point_locator_tree.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_dbg_la-statistics.lo: src/utils/$(am__dirstamp) \
@@ -7556,8 +7543,6 @@ src/utils/libmesh_devel_la-plt_loader_read.lo:  \
 src/utils/libmesh_devel_la-plt_loader_write.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_devel_la-point_locator_base.lo:  \
-	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libmesh_devel_la-point_locator_list.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_devel_la-point_locator_tree.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
@@ -8577,8 +8562,6 @@ src/utils/libmesh_oprof_la-plt_loader_write.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_oprof_la-point_locator_base.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libmesh_oprof_la-point_locator_list.lo:  \
-	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_oprof_la-point_locator_tree.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_oprof_la-statistics.lo: src/utils/$(am__dirstamp) \
@@ -9593,8 +9576,6 @@ src/utils/libmesh_opt_la-plt_loader_read.lo:  \
 src/utils/libmesh_opt_la-plt_loader_write.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_opt_la-point_locator_base.lo:  \
-	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libmesh_opt_la-point_locator_list.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_opt_la-point_locator_tree.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
@@ -10611,8 +10592,6 @@ src/utils/libmesh_prof_la-plt_loader_read.lo:  \
 src/utils/libmesh_prof_la-plt_loader_write.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_prof_la-point_locator_base.lo:  \
-	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libmesh_prof_la-point_locator_list.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_prof_la-point_locator_tree.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
@@ -13130,7 +13109,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-plt_loader_read.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-plt_loader_write.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-point_locator_base.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-point_locator_list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-point_locator_tree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-statistics.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-string_to_enum.Plo@am__quote@
@@ -13149,7 +13127,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-plt_loader_read.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-plt_loader_write.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-point_locator_base.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-point_locator_list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-point_locator_tree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-statistics.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-string_to_enum.Plo@am__quote@
@@ -13168,7 +13145,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-plt_loader_read.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-plt_loader_write.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-point_locator_base.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-point_locator_list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-point_locator_tree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-statistics.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-string_to_enum.Plo@am__quote@
@@ -13187,7 +13163,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-plt_loader_read.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-plt_loader_write.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-point_locator_base.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-point_locator_list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-point_locator_tree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-statistics.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-string_to_enum.Plo@am__quote@
@@ -13206,7 +13181,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-plt_loader_read.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-plt_loader_write.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-point_locator_base.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-point_locator_list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-point_locator_tree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-statistics.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-string_to_enum.Plo@am__quote@
@@ -16075,13 +16049,6 @@ src/utils/libmesh_dbg_la-point_locator_base.lo: src/utils/point_locator_base.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/point_locator_base.C' object='src/utils/libmesh_dbg_la-point_locator_base.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_dbg_la-point_locator_base.lo `test -f 'src/utils/point_locator_base.C' || echo '$(srcdir)/'`src/utils/point_locator_base.C
-
-src/utils/libmesh_dbg_la-point_locator_list.lo: src/utils/point_locator_list.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_dbg_la-point_locator_list.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_dbg_la-point_locator_list.Tpo -c -o src/utils/libmesh_dbg_la-point_locator_list.lo `test -f 'src/utils/point_locator_list.C' || echo '$(srcdir)/'`src/utils/point_locator_list.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_dbg_la-point_locator_list.Tpo src/utils/$(DEPDIR)/libmesh_dbg_la-point_locator_list.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/point_locator_list.C' object='src/utils/libmesh_dbg_la-point_locator_list.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_dbg_la-point_locator_list.lo `test -f 'src/utils/point_locator_list.C' || echo '$(srcdir)/'`src/utils/point_locator_list.C
 
 src/utils/libmesh_dbg_la-point_locator_tree.lo: src/utils/point_locator_tree.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_dbg_la-point_locator_tree.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_dbg_la-point_locator_tree.Tpo -c -o src/utils/libmesh_dbg_la-point_locator_tree.lo `test -f 'src/utils/point_locator_tree.C' || echo '$(srcdir)/'`src/utils/point_locator_tree.C
@@ -18981,13 +18948,6 @@ src/utils/libmesh_devel_la-point_locator_base.lo: src/utils/point_locator_base.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_devel_la-point_locator_base.lo `test -f 'src/utils/point_locator_base.C' || echo '$(srcdir)/'`src/utils/point_locator_base.C
 
-src/utils/libmesh_devel_la-point_locator_list.lo: src/utils/point_locator_list.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_devel_la-point_locator_list.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_devel_la-point_locator_list.Tpo -c -o src/utils/libmesh_devel_la-point_locator_list.lo `test -f 'src/utils/point_locator_list.C' || echo '$(srcdir)/'`src/utils/point_locator_list.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_devel_la-point_locator_list.Tpo src/utils/$(DEPDIR)/libmesh_devel_la-point_locator_list.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/point_locator_list.C' object='src/utils/libmesh_devel_la-point_locator_list.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_devel_la-point_locator_list.lo `test -f 'src/utils/point_locator_list.C' || echo '$(srcdir)/'`src/utils/point_locator_list.C
-
 src/utils/libmesh_devel_la-point_locator_tree.lo: src/utils/point_locator_tree.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_devel_la-point_locator_tree.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_devel_la-point_locator_tree.Tpo -c -o src/utils/libmesh_devel_la-point_locator_tree.lo `test -f 'src/utils/point_locator_tree.C' || echo '$(srcdir)/'`src/utils/point_locator_tree.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_devel_la-point_locator_tree.Tpo src/utils/$(DEPDIR)/libmesh_devel_la-point_locator_tree.Plo
@@ -21885,13 +21845,6 @@ src/utils/libmesh_oprof_la-point_locator_base.lo: src/utils/point_locator_base.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/point_locator_base.C' object='src/utils/libmesh_oprof_la-point_locator_base.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_oprof_la-point_locator_base.lo `test -f 'src/utils/point_locator_base.C' || echo '$(srcdir)/'`src/utils/point_locator_base.C
-
-src/utils/libmesh_oprof_la-point_locator_list.lo: src/utils/point_locator_list.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_oprof_la-point_locator_list.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_oprof_la-point_locator_list.Tpo -c -o src/utils/libmesh_oprof_la-point_locator_list.lo `test -f 'src/utils/point_locator_list.C' || echo '$(srcdir)/'`src/utils/point_locator_list.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_oprof_la-point_locator_list.Tpo src/utils/$(DEPDIR)/libmesh_oprof_la-point_locator_list.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/point_locator_list.C' object='src/utils/libmesh_oprof_la-point_locator_list.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_oprof_la-point_locator_list.lo `test -f 'src/utils/point_locator_list.C' || echo '$(srcdir)/'`src/utils/point_locator_list.C
 
 src/utils/libmesh_oprof_la-point_locator_tree.lo: src/utils/point_locator_tree.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_oprof_la-point_locator_tree.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_oprof_la-point_locator_tree.Tpo -c -o src/utils/libmesh_oprof_la-point_locator_tree.lo `test -f 'src/utils/point_locator_tree.C' || echo '$(srcdir)/'`src/utils/point_locator_tree.C
@@ -24791,13 +24744,6 @@ src/utils/libmesh_opt_la-point_locator_base.lo: src/utils/point_locator_base.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_opt_la-point_locator_base.lo `test -f 'src/utils/point_locator_base.C' || echo '$(srcdir)/'`src/utils/point_locator_base.C
 
-src/utils/libmesh_opt_la-point_locator_list.lo: src/utils/point_locator_list.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_opt_la-point_locator_list.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_opt_la-point_locator_list.Tpo -c -o src/utils/libmesh_opt_la-point_locator_list.lo `test -f 'src/utils/point_locator_list.C' || echo '$(srcdir)/'`src/utils/point_locator_list.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_opt_la-point_locator_list.Tpo src/utils/$(DEPDIR)/libmesh_opt_la-point_locator_list.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/point_locator_list.C' object='src/utils/libmesh_opt_la-point_locator_list.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_opt_la-point_locator_list.lo `test -f 'src/utils/point_locator_list.C' || echo '$(srcdir)/'`src/utils/point_locator_list.C
-
 src/utils/libmesh_opt_la-point_locator_tree.lo: src/utils/point_locator_tree.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_opt_la-point_locator_tree.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_opt_la-point_locator_tree.Tpo -c -o src/utils/libmesh_opt_la-point_locator_tree.lo `test -f 'src/utils/point_locator_tree.C' || echo '$(srcdir)/'`src/utils/point_locator_tree.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_opt_la-point_locator_tree.Tpo src/utils/$(DEPDIR)/libmesh_opt_la-point_locator_tree.Plo
@@ -27695,13 +27641,6 @@ src/utils/libmesh_prof_la-point_locator_base.lo: src/utils/point_locator_base.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/point_locator_base.C' object='src/utils/libmesh_prof_la-point_locator_base.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_prof_la-point_locator_base.lo `test -f 'src/utils/point_locator_base.C' || echo '$(srcdir)/'`src/utils/point_locator_base.C
-
-src/utils/libmesh_prof_la-point_locator_list.lo: src/utils/point_locator_list.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_prof_la-point_locator_list.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_prof_la-point_locator_list.Tpo -c -o src/utils/libmesh_prof_la-point_locator_list.lo `test -f 'src/utils/point_locator_list.C' || echo '$(srcdir)/'`src/utils/point_locator_list.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_prof_la-point_locator_list.Tpo src/utils/$(DEPDIR)/libmesh_prof_la-point_locator_list.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/point_locator_list.C' object='src/utils/libmesh_prof_la-point_locator_list.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_prof_la-point_locator_list.lo `test -f 'src/utils/point_locator_list.C' || echo '$(srcdir)/'`src/utils/point_locator_list.C
 
 src/utils/libmesh_prof_la-point_locator_tree.lo: src/utils/point_locator_tree.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_prof_la-point_locator_tree.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_prof_la-point_locator_tree.Tpo -c -o src/utils/libmesh_prof_la-point_locator_tree.lo `test -f 'src/utils/point_locator_tree.C' || echo '$(srcdir)/'`src/utils/point_locator_tree.C
