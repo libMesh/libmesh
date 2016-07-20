@@ -235,6 +235,10 @@ void assemble_wave(EquationSystems & es,
   // the proper system.
   libmesh_assert_equal_to (system_name, "Wave");
 
+  // Avoid unused variable warnings when compiling without infinite
+  // elements enabled.
+  libmesh_ignore(es);
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   // Get a constant reference to the mesh object.

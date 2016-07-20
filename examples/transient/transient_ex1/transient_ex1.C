@@ -264,7 +264,7 @@ int main (int argc, char ** argv)
 // system.  This handles things like setting initial
 // conditions and boundary conditions.
 void init_cd (EquationSystems & es,
-              const std::string & system_name)
+              const std::string & libmesh_dbg_var(system_name))
 {
   // It is a good idea to make sure we are initializing
   // the proper system.
@@ -286,7 +286,7 @@ void init_cd (EquationSystems & es,
 // by the EquationSystems object at each timestep to assemble
 // the linear system for solution.
 void assemble_cd (EquationSystems & es,
-                  const std::string & system_name)
+                  const std::string & libmesh_dbg_var(system_name))
 {
 #ifdef LIBMESH_ENABLE_AMR
   // It is a good idea to make sure we are assembling
