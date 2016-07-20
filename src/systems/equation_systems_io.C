@@ -94,21 +94,19 @@ void EquationSystems::read (const std::string & name,
                             const unsigned int read_flags,
                             bool partition_agnostic)
 {
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-
   // If we have exceptions enabled we can be considerate and try
   // to read old restart files which contain infinite element
   // information but do not have the " with infinite elements"
   // string in the version information.
 
   // First try the read the user requested
-  try
+  libmesh_try
     {
       this->_read_impl<InValType> (name, mode, read_flags, partition_agnostic);
     }
 
   // If that fails, try it again but explicitly request we look for infinite element info
-  catch (...)
+  libmesh_catch (...)
     {
       libMesh::out << "\n*********************************************************************\n"
                    << "READING THE FILE \"" << name << "\" FAILED.\n"
@@ -118,29 +116,22 @@ void EquationSystems::read (const std::string & name,
                    << "*********************************************************************\n"
                    << std::endl;
 
-      try
+      libmesh_try
         {
           this->_read_impl<InValType> (name, mode, read_flags | EquationSystems::TRY_READ_IFEMS, partition_agnostic);
         }
 
       // If all that failed, we are out of ideas here...
-      catch (...)
+      libmesh_catch (...)
         {
           libMesh::out << "\n*********************************************************************\n"
                        << "Well, at least we tried!\n"
                        << "Good Luck!!\n"
                        << "*********************************************************************\n"
                        << std::endl;
-          throw;
+          LIBMESH_THROW();
         }
     }
-
-#else
-
-  // no exceptions - cross your fingers...
-  this->_read_impl<InValType> (name, mode, read_flags, partition_agnostic);
-
-#endif // #ifdef LIBMESH_ENABLE_EXCEPTIONS
 
 #ifdef LIBMESH_ENABLE_AMR
   MeshRefinement mesh_refine(_mesh);

@@ -148,10 +148,14 @@ public:
 }
 
 #define LIBMESH_THROW(e) do { throw e; } while (0)
+#define libmesh_try try
+#define libmesh_catch(e) catch(e)
 
 #else
 
 #define LIBMESH_THROW(e) do { std::abort(); } while (0)
+#define libmesh_try
+#define libmesh_catch(e) if (0)
 
 #endif // LIBMESH_ENABLE_EXCEPTIONS
 
