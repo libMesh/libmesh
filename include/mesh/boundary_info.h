@@ -526,43 +526,63 @@ public:
 
   /**
    * Builds the list of unique node boundary ids.
+   *
+   * On a ReplicatedMesh this will be all ids; on a DistributedMesh
+   * only ids on semilocal nodes will be included.
    */
   void build_node_boundary_ids(std::vector<boundary_id_type> & b_ids) const;
 
   /**
    * Builds the list of unique side boundary ids.
+   *
+   * On a ReplicatedMesh this will be all ids; on a DistributedMesh
+   * only ids on sides of semilocal elements will be included.
    */
   void build_side_boundary_ids(std::vector<boundary_id_type> & b_ids) const;
 
   /**
-   * Builds the list of unique side boundary ids.
+   * Builds the list of unique shellface boundary ids.
+   *
+   * On a ReplicatedMesh this will be all ids; on a DistributedMesh
+   * only ids on shellfaces of semilocal elements will be included.
    */
   void build_shellface_boundary_ids(std::vector<boundary_id_type> & b_ids) const;
 
   /**
    * @returns the number of element-side-based boundary conditions.
+   *
+   * This will be the correct global count even on a distributed mesh.
    */
   std::size_t n_boundary_conds () const;
 
   /**
    * @returns the number of edge-based boundary conditions.
    * Edge-based boundary IDs should only be used in 3D.
+   *
+   * This will be the correct global count even on a distributed mesh.
    */
   std::size_t n_edge_conds () const;
 
   /**
    * @returns the number of shellface-based boundary conditions.
    * This is only relevant on shell elements.
+   *
+   * This will be the correct global count even on a distributed mesh.
    */
   std::size_t n_shellface_conds () const;
 
   /**
    * @returns the number of node-based boundary conditions.
+   *
+   * This will be the correct global count even on a distributed mesh.
    */
   std::size_t n_nodeset_conds () const;
 
   /**
    * Creates a list of nodes and ids for those nodes.
+   *
+   * On a ReplicatedMesh this will include all nodes; on a
+   * DistributedMesh only semilocal nodes will be included.
    */
   void build_node_list (std::vector<dof_id_type> &      node_id_list,
                         std::vector<boundary_id_type> & bc_id_list) const;
@@ -581,12 +601,20 @@ public:
 
   /**
    * Creates a list of element numbers, sides, and ids for those sides.
+   *
+   * On a ReplicatedMesh this will include all sides; on a
+   * DistributedMesh only sides of semilocal elements will be
+   * included.
    */
   void build_side_list (std::vector<dof_id_type> &        element_id_list,
                         std::vector<unsigned short int> & side_list,
                         std::vector<boundary_id_type> &   bc_id_list) const;
   /**
    * Creates a list of active element numbers, sides, and ids for those sides.
+   *
+   * On a ReplicatedMesh this will include all sides; on a
+   * DistributedMesh only sides of semilocal elements will be
+   * included.
    */
   void build_active_side_list (std::vector<dof_id_type> &        element_id_list,
                                std::vector<unsigned short int> & side_list,
@@ -594,6 +622,10 @@ public:
 
   /**
    * Creates a list of element numbers, edges, and boundary ids for those edges.
+   *
+   * On a ReplicatedMesh this will include all edges; on a
+   * DistributedMesh only edges of semilocal elements will be
+   * included.
    */
   void build_edge_list (std::vector<dof_id_type> &        element_id_list,
                         std::vector<unsigned short int> & edge_list,
@@ -601,6 +633,10 @@ public:
 
   /**
    * Creates a list of element numbers, shellfaces, and boundary ids for those shellfaces.
+   *
+   * On a ReplicatedMesh this will include all shellfaces; on a
+   * DistributedMesh only shellfaces of semilocal elements will be
+   * included.
    */
   void build_shellface_list (std::vector<dof_id_type> &        element_id_list,
                              std::vector<unsigned short int> & shellface_list,
