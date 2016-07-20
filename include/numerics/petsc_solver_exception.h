@@ -28,6 +28,9 @@
 namespace libMesh
 {
 
+// The SolverException class is only defined when exceptions are enabled.
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+
 /**
  * A specialization of the SolverException class for PETSc.
  */
@@ -48,8 +51,6 @@ public:
 
 
 // Macro which we call after every PETSc function that returns an error code.
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-
 #define LIBMESH_CHKERR(ierr)                    \
   do {                                          \
     if (ierr != 0) {                            \
