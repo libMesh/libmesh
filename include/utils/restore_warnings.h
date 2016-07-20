@@ -31,7 +31,7 @@
 // TODO: use the gcc 4.6 push/pop when available
 #pragma GCC diagnostic warning "-Wunused-parameter"
 #pragma GCC diagnostic warning "-Wdeprecated"
-#pragma GCC diagnostic warning "-pedantic"
+#pragma GCC diagnostic warning "-Wpedantic"
 #pragma GCC diagnostic warning "-Wdeprecated-declarations"
 #endif // GCC > 4.1
 #endif // __GNUC__ && !__INTEL_COMPILER
