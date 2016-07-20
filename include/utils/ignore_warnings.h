@@ -34,7 +34,7 @@
 // GCC > 4.1 supports diagnostic pragmas
 #if (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ > 1)
 // These two don't work?
-#pragma GCC diagnostic ignored "-pedantic"
+#pragma GCC diagnostic ignored "-Wpedantic"
 #pragma GCC diagnostic ignored "-Wdeprecated"
 // But this is helpful with some MPI stacks
 #pragma GCC diagnostic ignored "-Wunused-parameter"
