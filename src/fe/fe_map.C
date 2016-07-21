@@ -1761,16 +1761,13 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
             //  {dp} = [J]^-1 ({X} - {X_n})
             //
             //  which involves the inversion of the 3x3 matrix [J]
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-            try
+            libmesh_try
               {
-#endif
                 RealTensorValue(dxi(0), deta(0), dzeta(0),
                                 dxi(1), deta(1), dzeta(1),
                                 dxi(2), deta(2), dzeta(2)).solve(delta, dp);
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
               }
-            catch (ConvergenceFailure &)
+            libmesh_catch (ConvergenceFailure &)
               {
                 // We encountered a singular Jacobian.  The value of
                 // dp is zero, since it was never changed during the
@@ -1798,7 +1795,6 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
                     return p;
                   }
               }
-#endif
 
             // No master elements have radius > 4, but sometimes we
             // can take a step that big while still converging

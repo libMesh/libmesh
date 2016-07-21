@@ -131,7 +131,7 @@ bool gdb_backtrace(std::ostream & out_stream)
 
       int exit_status = 1;
 
-      try
+      libmesh_try
         {
           std::string gdb_command =
             libMesh::command_line_value("gdb",std::string(LIBMESH_GDB_COMMAND));
@@ -144,7 +144,7 @@ bool gdb_backtrace(std::ostream & out_stream)
                   << temp_file;
           exit_status = std::system(command.str().c_str());
         }
-      catch (...)
+      libmesh_catch (...)
         {
           std::cerr << "Unable to run gdb" << std::endl;
         }
