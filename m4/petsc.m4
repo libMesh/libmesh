@@ -206,6 +206,8 @@ AC_DEFUN([CONFIGURE_PETSC],
             HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`
           elif (test -r $PETSC_DIR/conf/petscvariables) ; then # 3.0.x
             HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`
+          elif (test -r $PETSC_DIR/lib/petsc/conf/petscvariables) ; then # 3.6.x
+            HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/lib/petsc/conf/petscvariables`
           fi
 
           if test "x$HYPRE_LIB" != x ; then
