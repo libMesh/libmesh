@@ -461,11 +461,21 @@ void EquationSystems::write(const std::string & name,
   // always write parallel files if we're instructed to write in
   // parallel
   const bool write_parallel_files  =
-    (write_flags & EquationSystems::WRITE_PARALLEL_FILES) ||
+    (write_flags & EquationSystems::WRITE_PARALLEL_FILES)
+
+  // Even if we're on a distributed mesh, we may or may not have a
+  // consistent way of reconstructing the same mesh partitioning
+  // later, but we need the same mesh partitioning if we want to
+  // reread the parallel solution safely, so let's write a serial file
+  // unless specifically requested not to.
+;
+/*
+ ||
     // but also write parallel files if we haven't been instructed to
     // write in serial and we're on a distributed mesh
     (!(write_flags & EquationSystems::WRITE_SERIAL_FILES) &&
      !this->get_mesh().is_serial());
+*/
 
   // New scope so that io will close before we try to zip the file
   {
