@@ -155,7 +155,7 @@ protected:
    * \p error_per_cell from each processor and combines
    * them to get the global error vector.
    */
-  void reduce_error (std::vector<float> & error_per_cell,
+  void reduce_error (std::vector<ErrorVectorReal> & error_per_cell,
                      const Parallel::Communicator & comm
                      LIBMESH_CAN_DEFAULT_TO_COMMWORLD) const;
 };
