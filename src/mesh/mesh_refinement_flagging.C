@@ -481,7 +481,7 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector & error_p
   libmesh_assert_less_equal (_coarsen_fraction, 1);
 
   // The number of active elements in the mesh
-  const dof_id_type n_active_elem  = _mesh.n_elem();
+  const dof_id_type n_active_elem  = _mesh.n_active_elem();
 
   // The number of elements to flag for coarsening
   const dof_id_type n_elem_coarsen =
