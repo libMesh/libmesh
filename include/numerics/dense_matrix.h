@@ -540,37 +540,11 @@ private:
   void _lu_decompose_lapack();
 
   /**
-   * Computes an SVD of the matrix using the
-   * Lapack routine "getsvd".
-   * [ Implementation in dense_matrix_blas_lapack.C ]
-   */
-  void _svd_lapack(DenseVector<Real> & sigma);
-
-  /**
-   * Computes a "reduced" SVD of the matrix using the
-   * Lapack routine "getsvd".
-   * [ Implementation in dense_matrix_blas_lapack.C ]
-   */
-  void _svd_lapack(DenseVector<Real> & sigma,
-                   DenseMatrix<Number> & U,
-                   DenseMatrix<Number> & VT);
-
-  /**
    * Called by svd_solve(rhs).
    */
   void _svd_solve_lapack(const DenseVector<T> & rhs,
                          DenseVector<T> & x,
                          Real rcond) const;
-
-  /**
-   * Helper function that actually performs the SVD.
-   * [ Implementation in dense_matrix_blas_lapack.C ]
-   */
-  void _svd_helper (char JOBU,
-                    char JOBVT,
-                    std::vector<Real> & sigma_val,
-                    std::vector<Number> & U_val,
-                    std::vector<Number> & VT_val);
 
   /**
    * Computes the eigenvalues of the matrix using the
