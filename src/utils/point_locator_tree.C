@@ -205,25 +205,8 @@ const Elem * PointLocatorTree::operator() (const Point & p,
 
       if (this->_element == libmesh_nullptr)
         {
-          // No element seems to contain this point. Thus:
-          // 1.) If _out_of_mesh_mode == true, we can just return NULL
-          //     without searching further.
-          // 2.) If _out_of_mesh_mode == false, we perform a linear
-          //     search over all active (possibly local) elements.
-          //     The idea here is that, in the case of curved elements,
-          //     the bounding box computed in \p TreeNode::insert(const
-          //     Elem *) might be slightly inaccurate and therefore we may
-          //     have generated a false negative.
-          if (_out_of_mesh_mode == false)
-            {
-              this->_element = this->perform_linear_search(p, allowed_subdomains, /*use_close_to_point*/ false);
-              return this->_element;
-            }
-
           // If we haven't found the element, we may want to do a linear
-          // search using a tolerance. We only do this if _out_of_mesh_mode == true,
-          // since we're looking for a point that may be outside of the mesh (within the
-          // specified tolerance).
+          // search using a tolerance.
           if( _use_close_to_point_tol )
             {
               if(_verbose)
@@ -239,6 +222,24 @@ const Elem * PointLocatorTree::operator() (const Point & p,
                                             /*use_close_to_point*/ true,
                                             _close_to_point_tol);
 
+              return this->_element;
+            }
+
+          // No element seems to contain this point. Thus:
+          // 1.) If _out_of_mesh_mode == true, we can just return NULL
+          //     without searching further.
+          // 2.) If _out_of_mesh_mode == false, we perform a linear
+          //     search over all active (possibly local) elements.
+          //     The idea here is that, in the case of curved elements,
+          //     the bounding box computed in \p TreeNode::insert(const
+          //     Elem *) might be slightly inaccurate and therefore we may
+          //     have generated a false negative.
+          //
+          // Note that we skip the _use_close_to_point_tol case below, because
+          // we already did a linear search in that case above.
+          if (_out_of_mesh_mode == false && !_use_close_to_point_tol)
+            {
+              this->_element = this->perform_linear_search(p, allowed_subdomains, /*use_close_to_point*/ false);
               return this->_element;
             }
         }
