@@ -758,11 +758,6 @@ void MeshFunction::disable_out_of_mesh_mode(void)
 
 void MeshFunction::set_point_locator_tolerance(Real tol)
 {
-  // We need to enable out_of_mesh mode in the point_locator
-  // in order for the point locator tolerance to be used.
-  _point_locator->enable_out_of_mesh_mode();
-
-  // Set the tolerance
   _point_locator->set_close_to_point_tol(tol);
 }
 
