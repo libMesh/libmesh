@@ -772,25 +772,6 @@ void DenseMatrix<T>::_lu_decompose ()
 
 
 template<typename T>
-void DenseMatrix<T>::svd (DenseVector<Real> & sigma)
-{
-  // We use the LAPACK svd implementation
-  _svd_lapack(sigma);
-}
-
-
-template<typename T>
-void DenseMatrix<T>::svd (DenseVector<Real> & sigma,
-                          DenseMatrix<Number> & U,
-                          DenseMatrix<Number> & VT)
-{
-  // We use the LAPACK svd implementation
-  _svd_lapack(sigma, U, VT);
-}
-
-
-
-template<typename T>
 void DenseMatrix<T>::svd_solve(const DenseVector<T> & rhs,
                                DenseVector<T> & x,
                                Real rcond) const
