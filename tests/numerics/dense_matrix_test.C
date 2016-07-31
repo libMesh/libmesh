@@ -34,6 +34,7 @@ public:
   CPPUNIT_TEST_SUITE(DenseMatrixTest);
 
   CPPUNIT_TEST(testSVD);
+  CPPUNIT_TEST(testComplexSVD);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -75,6 +76,28 @@ private:
 
     for (unsigned i=0; i<sigma.size(); ++i)
       CPPUNIT_ASSERT_DOUBLES_EQUAL(sigma(i), true_sigma(i), TOLERANCE*TOLERANCE);
+  }
+
+  void testComplexSVD()
+  {
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+    DenseMatrix<Complex> A(3,3);
+
+    A(0,0) = Complex(2.18904,4.44523e-18); A(0,1) = Complex(-3.20491,-0.136699);   A(0,2) = Complex(0.716316,-0.964802);
+    A(1,0) = Complex(-3.20491,0.136699);   A(1,1) = Complex(4.70076,-3.25261e-18); A(1,2) = Complex(-0.98849,1.45727);
+    A(2,0) = Complex(0.716316,0.964802);   A(2,1) = Complex(-0.98849,-1.45727);    A(2,2) = Complex(0.659629,-4.01155e-18);
+
+    DenseVector<Real> sigma;
+    A.svd(sigma);
+
+    DenseVector<Real> true_sigma(3);
+    true_sigma(0) = 7.54942516052;
+    true_sigma(1) = 3.17479511368e-06;
+    true_sigma(2) = 6.64680908281e-07;
+
+    for (unsigned i=0; i<sigma.size(); ++i)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(sigma(i), true_sigma(i), 1.e-10);
+#endif
   }
 
 };

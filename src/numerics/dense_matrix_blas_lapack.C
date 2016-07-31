@@ -483,22 +483,24 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
   //                above for details.
   int INFO = 0;
 
-  // Ready to call the actual factorization routine through PETSc's interface
+  // Ready to call the actual factorization routine through PETSc's interface.
 #ifdef LIBMESH_USE_REAL_NUMBERS
+  // Note that the call to LAPACKgesvd_ may modify _val
   LAPACKgesvd_(&JOBU, &JOBVT, &M, &N, &(_val[0]), &LDA, &(sigma_val[0]), &(U_val[0]),
                &LDU, &(VT_val[0]), &LDVT, &(WORK[0]), &LWORK, &INFO);
 #else
-  // In this case _val may store Reals since it is defined to be a template type T.
-  // Hence we must convert to Numbers before calling LAPACKgesvd_.
-  std::vector<Number> number_val(_val.size());
+  // When we have LIBMESH_USE_COMPLEX_NUMBERS then we must pass an array of Complex
+  // numbers to LAPACKgesvd_, but _val may contain Reals so we copy to Number below to
+  // handle both the real-valued and complex-valued cases.
+  std::vector<Number> val_copy(_val.size());
   for(unsigned int i=0; i<_val.size(); i++)
     {
-      number_val[i] = _val[i];
+      val_copy[i] = _val[i];
     }
 
-  Real RWORK = 0;
-  LAPACKgesvd_(&JOBU, &JOBVT, &M, &N, &(number_val[0]), &LDA, &(sigma_val[0]), &(U_val[0]),
-               &LDU, &(VT_val[0]), &LDVT, &(WORK[0]), &LWORK, &RWORK, &INFO);
+  std::vector<Real> RWORK(5 * min_MN);
+  LAPACKgesvd_(&JOBU, &JOBVT, &M, &N, &(val_copy[0]), &LDA, &(sigma_val[0]), &(U_val[0]),
+               &LDU, &(VT_val[0]), &LDVT, &(WORK[0]), &LWORK, &(RWORK[0]), &INFO);
 #endif
 
   // Check return value for errors
