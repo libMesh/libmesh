@@ -303,7 +303,7 @@ void assemble_matrices(EquationSystems & es,
   const unsigned int dim = mesh.mesh_dimension();
 
   // Get a reference to our system.
-  EigenSystem & eigen_system = es.get_system<EigenSystem> (system_name);
+  EigenSystem & eigen_system = es.get_system<EigenSystem> ("Eigensystem");
 
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
