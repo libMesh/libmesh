@@ -27,8 +27,8 @@
 #include "libmesh/trilinos_epetra_vector.h"
 #include "libmesh/libmesh_common.h"
 
-#ifdef LIBMESH_TRILINOS_HAVE_IFPACK
 #include "libmesh/ignore_warnings.h"
+#ifdef LIBMESH_TRILINOS_HAVE_IFPACK
 #include "Ifpack.h"
 #include "Ifpack_DiagPreconditioner.h"
 #include "Ifpack_AdditiveSchwarz.h"
@@ -36,12 +36,12 @@
 #include "Ifpack_ILUT.h"
 #include "Ifpack_IC.h"
 #include "Ifpack_ICT.h"
-#include "libmesh/ignore_warnings.h"
 #endif
 
 #ifdef LIBMESH_TRILINOS_HAVE_ML
 #include "ml_MultiLevelPreconditioner.h"
 #endif
+#include "libmesh/restore_warnings.h"
 
 namespace libMesh
 {

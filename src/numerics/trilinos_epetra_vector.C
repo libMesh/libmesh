@@ -30,6 +30,7 @@
 #include "libmesh/utility.h"
 
 // Trilinos Includes
+#include "libmesh/ignore_warnings.h"
 #include <Epetra_LocalMap.h>
 #include <Epetra_Comm.h>
 #include <Epetra_Map.h>
@@ -40,6 +41,7 @@
 #include <Epetra_IntSerialDenseVector.h>
 #include <Epetra_SerialDenseVector.h>
 #include <Epetra_Vector.h>
+#include "libmesh/restore_warnings.h"
 
 namespace libMesh
 {

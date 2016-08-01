@@ -29,11 +29,13 @@
 #include "libmesh/parallel.h"
 
 // Trilinos includes
+#include "libmesh/ignore_warnings.h"
 #include <Epetra_CombineMode.h>
 #include <Epetra_Map.h>
 #include <Epetra_MultiVector.h>
 #include <Epetra_Vector.h>
 #include <Epetra_MpiComm.h>
+#include "libmesh/restore_warnings.h"
 
 // C++ includes
 #include <cstddef>
