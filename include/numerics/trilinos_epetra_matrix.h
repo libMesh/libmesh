@@ -25,6 +25,7 @@
 #ifdef LIBMESH_HAVE_TRILINOS
 
 // Trilinos includes
+#include "libmesh/ignore_warnings.h"
 #include <Epetra_FECrsMatrix.h>
 #include <Epetra_Map.h>
 #include <Epetra_MpiComm.h>
@@ -33,6 +34,7 @@
 #ifdef LIBMESH_TRILINOS_HAVE_EPETRAEXT
 #  include <EpetraExt_MatrixMatrix.h>
 #endif
+#include "libmesh/restore_warnings.h"
 
 // Local includes
 #include "libmesh/sparse_matrix.h"
