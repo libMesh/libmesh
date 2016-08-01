@@ -66,8 +66,11 @@
 #include "libmesh/petscdmlibmesh.h"
 #endif
 # if defined(LIBMESH_HAVE_SLEPC)
+// Ignore unused variable warnings from SLEPc
+#  include "libmesh/ignore_warnings.h"
 #  include "libmesh/slepc_macro.h"
 #  include <slepc.h>
+#  include "libmesh/restore_warnings.h"
 # endif // #if defined(LIBMESH_HAVE_SLEPC)
 #endif // #if defined(LIBMESH_HAVE_PETSC)
 
