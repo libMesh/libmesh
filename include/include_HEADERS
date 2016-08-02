@@ -24,6 +24,7 @@ include_HEADERS =  \
         base/dof_object.h \
         base/factory.h \
         base/getpot.h \
+        base/ghosting_functor.h \
         base/id_types.h \
         base/libmesh.h \
         base/libmesh_C_isnan.h \

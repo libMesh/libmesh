@@ -12,6 +12,7 @@ BUILT_SOURCES = \
         dof_object.h \
         factory.h \
         getpot.h \
+        ghosting_functor.h \
         id_types.h \
         libmesh.h \
         libmesh_C_isnan.h \
@@ -534,6 +535,9 @@ factory.h: $(top_srcdir)/include/base/factory.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 getpot.h: $(top_srcdir)/include/base/getpot.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+ghosting_functor.h: $(top_srcdir)/include/base/ghosting_functor.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 id_types.h: $(top_srcdir)/include/base/id_types.h
