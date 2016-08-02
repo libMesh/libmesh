@@ -555,6 +555,18 @@ void MeshCommunication::redistribute (DistributedMesh & mesh) const
 
   MeshTools::libmesh_assert_valid_refinement_tree(mesh);
 #endif
+
+  // We now have all elements and nodes redistributed; our ghosting
+  // functors should be ready to redistribute and/or recompute any
+  // cached data they use too.
+  std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
+  const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
+  for (; gf_it != gf_end; ++gf_it)
+    {
+      GhostingFunctor *gf = *gf_it;
+      gf->redistribute();
+    }
+
 }
 #endif // LIBMESH_HAVE_MPI
 
