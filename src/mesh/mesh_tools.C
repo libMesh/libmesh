@@ -1128,8 +1128,13 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase & mesh)
     {
       const Elem * elem = *el;
       libmesh_assert (elem);
-      for (unsigned int n=0; n != elem->n_neighbors(); ++n)
-        libmesh_assert_not_equal_to (elem->neighbor_ptr(n), remote_elem);
+
+      // We currently don't allow active_local_elements to have
+      // remote_elem neighbors
+      if (elem->active())
+        for (unsigned int n=0; n != elem->n_neighbors(); ++n)
+          libmesh_assert_not_equal_to (elem->neighbor_ptr(n), remote_elem);
+
 #ifdef LIBMESH_ENABLE_AMR
       const Elem * parent = elem->parent();
       if (parent)
