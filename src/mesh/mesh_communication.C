@@ -19,6 +19,7 @@
 
 // C++ Includes   -----------------------------------
 #include <numeric>
+#include <set>
 
 // Local Includes -----------------------------------
 #include "libmesh/boundary_info.h"
