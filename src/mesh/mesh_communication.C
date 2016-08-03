@@ -245,7 +245,35 @@ void connect_elements_on_nodes (const MeshBase & mesh,
     }
 }
 
-void connect_families (std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+void query_ghosting_functors
+  (MeshBase & mesh,
+   processor_id_type pid,
+   std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+{
+  MeshBase::const_element_iterator       elem_it  = mesh.active_pid_elements_begin(pid);
+  const MeshBase::const_element_iterator elem_end = mesh.active_pid_elements_end(pid);
+
+  std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
+  const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
+  for (; gf_it != gf_end; ++gf_it)
+    {
+      GhostingFunctor::map_type elements_to_ghost;
+
+      GhostingFunctor *gf = *gf_it;
+      libmesh_assert(gf);
+      (*gf)(elem_it, elem_end, pid, elements_to_ghost);
+
+      // We can ignore the CouplingMatrix in ->second, but we
+      // need to ghost all the elements in ->first.
+      GhostingFunctor::map_type::iterator        etg_it = elements_to_ghost.begin();
+      const GhostingFunctor::map_type::iterator etg_end = elements_to_ghost.end();
+      for (; etg_it != etg_end; ++etg_it)
+        connected_elements.insert(etg_it->first);
+    }
+}
+
+void connect_families
+  (std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
   // Because our set is sorted by ascending level, we can traverse it
   // in reverse order, adding parents as we go, and end up with all
@@ -420,28 +448,8 @@ void MeshCommunication::redistribute (DistributedMesh & mesh) const
         // subactive children present too.
         connect_families(elements_to_send);
 
-        {
-          MeshBase::const_element_iterator       elem_it  = mesh.active_pid_elements_begin(pid);
-          const MeshBase::const_element_iterator elem_end = mesh.active_pid_elements_end(pid);
-
-          std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
-          const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
-          for (; gf_it != gf_end; ++gf_it)
-            {
-              GhostingFunctor::map_type elements_to_ghost;
-
-              GhostingFunctor *gf = *gf_it;
-              libmesh_assert(gf);
-              (*gf)(elem_it, elem_end, pid, elements_to_ghost);
-
-              // We can ignore the CouplingMatrix in ->second, but we
-              // need to ghost all the elements in ->first.
-              GhostingFunctor::map_type::iterator        etg_it = elements_to_ghost.begin();
-              const GhostingFunctor::map_type::iterator etg_end = elements_to_ghost.end();
-              for (; etg_it != etg_end; ++etg_it)
-                elements_to_send.insert(etg_it->first);
-            }
-        }
+        // See which to-be-ghosted elements we need to send
+        query_ghosting_functors(mesh, pid, elements_to_send);
 
         reconnect_nodes(elements_to_send, connected_nodes);
 
@@ -1449,6 +1457,13 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   // The elements we need should have their ancestors and their
   // subactive children present too.
   connect_families(elements_to_keep);
+
+  // See which elements we still need to keep ghosted, given that
+  // we're keeping local and unpartitioned elements.
+  query_ghosting_functors(mesh, mesh.processor_id(),
+                          elements_to_keep);
+  query_ghosting_functors(mesh, DofObject::invalid_processor_id,
+                          elements_to_keep);
 
   // Don't delete nodes that our semilocal elements need
   reconnect_nodes(elements_to_keep, connected_nodes);
