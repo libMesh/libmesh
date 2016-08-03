@@ -334,6 +334,11 @@ public:
   virtual const_element_iterator unpartitioned_elements_begin () const libmesh_override;
   virtual const_element_iterator unpartitioned_elements_end () const libmesh_override;
 
+  virtual element_iterator active_unpartitioned_elements_begin () libmesh_override;
+  virtual element_iterator active_unpartitioned_elements_end () libmesh_override;
+  virtual const_element_iterator active_unpartitioned_elements_begin () const libmesh_override;
+  virtual const_element_iterator active_unpartitioned_elements_end () const libmesh_override;
+
   virtual element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) libmesh_override;
   virtual element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) libmesh_override;
   virtual const_element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) const libmesh_override;

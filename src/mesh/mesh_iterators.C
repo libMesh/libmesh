@@ -151,6 +151,7 @@ INSTANTIATE_ELEM_ACCESSORS(active_pid_elements,             ActivePID,          
 INSTANTIATE_ELEM_ACCESSORS(active_subdomain_elements,       ActiveSubdomain,      subdomain_id_type subdomain_id, subdomain_id)
 INSTANTIATE_ELEM_ACCESSORS(ghost_elements,                  Ghost,                EMPTY,                          this->processor_id())
 INSTANTIATE_ELEM_ACCESSORS(unpartitioned_elements,          PID,                  EMPTY,                          DofObject::invalid_processor_id)
+INSTANTIATE_ELEM_ACCESSORS(active_unpartitioned_elements,   ActivePID,            EMPTY,                          DofObject::invalid_processor_id)
 INSTANTIATE_ELEM_ACCESSORS(local_level_elements,            LocalLevel,           unsigned int level,             this->processor_id(), level)
 INSTANTIATE_ELEM_ACCESSORS(local_not_level_elements,        LocalNotLevel,        unsigned int level,             this->processor_id(), level)
 INSTANTIATE_ELEM_ACCESSORS(active_local_subdomain_elements, ActiveLocalSubdomain, subdomain_id_type subdomain_id, this->processor_id(), subdomain_id)
