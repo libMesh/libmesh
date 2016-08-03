@@ -143,6 +143,194 @@ struct SyncNeighbors
   }
 };
 
+
+void connect_elements
+  (const MeshBase & mesh,
+   const MeshBase::const_element_iterator & range_begin,
+   const MeshBase::const_element_iterator & range_end,
+   std::set<const Node *> & connected_nodes,
+   std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+{
+  // Using the connected_nodes set rather than point_neighbors() gives
+  // us correct results even in corner cases, such as where two
+  // elements meet only at a corner.  ;-)
+
+  // Links between boundary and interior elements on mixed
+  // dimensional meshes also give us correct ghosting in this way.
+  std::set<const Elem *> interior_parents;
+
+  // We also preserve neighbors and their neighboring children for
+  // active local elements - in most cases this is redundant with the
+  // node check, but for non-conforming Tet4 meshes and
+  // non-level-one-conforming 2D+3D meshes it is possible for an
+  // element and its coarse neighbor to not share any vertices.
+  //
+  // We also preserve interior parents for active pid elements
+
+  for (MeshBase::const_element_iterator elem_it = range_begin;
+       elem_it!=range_end; ++elem_it)
+    {
+      const Elem * elem = *elem_it;
+
+      connected_elements.insert (elem);
+
+      for (unsigned int s=0; s != elem->n_sides(); ++s)
+        {
+          const Elem * neigh = elem->neighbor_ptr(s);
+          if (neigh && neigh != remote_elem)
+            {
+#ifdef LIBMESH_ENABLE_AMR
+              if (!neigh->active())
+                {
+                  std::vector<const Elem*> family;
+                  neigh->active_family_tree_by_neighbor(family, elem);
+
+                  for (dof_id_type i=0; i!=family.size(); ++i)
+                    connected_elements.insert(family[i]);
+                }
+              else
+#endif
+                connected_elements.insert(neigh);
+            }
+        }
+
+      // It is possible that a refined boundary element will not
+      // touch any nodes of its interior_parent, in TRI3/TET4 and in
+      // non-level-one rule cases.  So we can't just rely on node
+      // connections to preserve interior_parent().  However, trying
+      // to preserve interior_parent() manually only works if it's on
+      // the same Mesh, which is *not* guaranteed!  So we'll
+      // double-check later to make sure our interior parents are in
+      // the mesh before we connect them.
+      if (elem->dim() < LIBMESH_DIM && elem->interior_parent())
+        interior_parents.insert (elem->interior_parent());
+
+      // Add nodes connected to active local elements
+      for (unsigned int n=0; n<elem->n_nodes(); n++)
+        connected_nodes.insert (elem->node_ptr(n));
+    }
+
+  // Connect any interior_parents who are really in our mesh
+  MeshBase::const_element_iterator       elem_it  = mesh.elements_begin();
+  const MeshBase::const_element_iterator elem_end = mesh.elements_end();
+  for (; elem_it != elem_end; ++elem_it)
+    {
+      const Elem * elem = *elem_it;
+      std::set<const Elem *>::iterator ip_it =
+        interior_parents.find(elem);
+
+      if (ip_it != interior_parents.end())
+        {
+          connected_elements.insert(elem);
+          interior_parents.erase(ip_it);
+        }
+    }
+}
+
+void connect_elements_on_nodes
+  (const MeshBase & mesh,
+   const std::set<const Node *> & connected_nodes,
+   std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+{
+  MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
+  const MeshBase::const_element_iterator elem_end = mesh.active_elements_end();
+
+  for (; elem_it!=elem_end; ++elem_it)
+    {
+      const Elem * elem = *elem_it;
+
+      // Add elements connected to nodes on active local elements
+      for (unsigned int n=0; n<elem->n_nodes(); n++)
+        if (connected_nodes.count(elem->node_ptr(n)))
+          connected_elements.insert (elem);
+    }
+}
+
+void connect_families
+  (std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+{
+  // Because our set is sorted by ascending level, we can traverse it
+  // in reverse order, adding parents as we go, and end up with all
+  // ancestors added.  This is safe for std::set where insert doesn't
+  // invalidate iterators.
+  //
+  // This only works because we do *not* cache
+  // connected_elements.rend(), whose value can change when we insert
+  // elements which are sorted before the original rend.
+  //
+  // We're also going to get subactive descendents here, when any
+  // exist.  We're iterating in the wrong direction to do that
+  // non-recursively, so we'll cop out and rely on total_family_tree.
+  // Iterating backwards does mean that we won't be querying the newly
+  // inserted subactive elements redundantly.
+
+  std::set<const Elem *, CompareElemIdsByLevel>::reverse_iterator
+    elem_rit  = connected_elements.rbegin();
+
+  for (; elem_rit != connected_elements.rend(); ++elem_rit)
+    {
+      const Elem *elem = *elem_rit;
+      libmesh_assert(elem);
+      const Elem *parent = elem->parent();
+
+      // We let ghosting functors worry about only active elements,
+      // but the remote processor needs all its semilocal elements'
+      // ancestors and active semilocal elements' descendants too.
+      if (parent)
+        connected_elements.insert (parent);
+
+      if (elem->active() && elem->has_children())
+        {
+          std::vector<const Elem *> subactive_family;
+          elem->total_family_tree(subactive_family);
+          for (unsigned int i=0; i != subactive_family.size();
+               ++i)
+            connected_elements.insert(subactive_family[i]);
+        }
+    }
+
+#ifdef DEBUG
+  // Let's be paranoid and make sure that all our ancestors
+  // really did get inserted.  I screwed this up the first time
+  // by caching rend, and I can easily imagine screwing it up in
+  // the future by changing containers.
+  std::set<const Elem *, CompareElemIdsByLevel>::iterator
+    elem_it  = connected_elements.begin(),
+    elem_end = connected_elements.end();
+
+  for (; elem_it != elem_end; ++elem_it)
+    {
+      const Elem *elem = *elem_it;
+      libmesh_assert(elem);
+      const Elem *parent = elem->parent();
+      if (parent)
+        libmesh_assert(connected_elements.count(parent));
+    }
+#endif
+}
+
+
+void reconnect_nodes
+  (const std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
+   std::set<const Node *> & connected_nodes)
+{
+  // We're done using the nodes list for element decisions; now
+  // let's reuse it for nodes of the elements we've decided on.
+  connected_nodes.clear();
+
+  std::set<const Elem *, CompareElemIdsByLevel>::iterator
+    elem_it  = connected_elements.begin(),
+    elem_end = connected_elements.end();
+
+  for (; elem_it!=elem_end; ++elem_it)
+    {
+      const Elem * elem = *elem_it;
+
+      for (unsigned int n=0; n<elem->n_nodes(); n++)
+        connected_nodes.insert(elem->node_ptr(n));
+    }
+}
+
 }
 
 
@@ -219,143 +407,23 @@ void MeshCommunication::redistribute (DistributedMesh & mesh) const
         // but we will also ship off any elements which are required
         // to be ghosted and any nodes which are used by any of the
         // above.
-        //
-        // We also preserve neighbors and their children for active
-        // local elements - in most cases this is redundant with the
-        // node check, but for non-conforming Tet4 meshes and
-        // non-level-one-conforming 2D+3D meshes it is possible for an
-        // element and its coarse neighbor to not share any vertices.
 
         std::set<const Node *> connected_nodes;
-
         std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
 
-        {
-          MeshBase::const_element_iterator       elem_it  = mesh.active_pid_elements_begin(pid);
-          const MeshBase::const_element_iterator elem_end = mesh.active_pid_elements_end(pid);
+        connect_elements(mesh,
+                         mesh.active_pid_elements_begin(pid),
+                         mesh.active_pid_elements_end(pid),
+                         connected_nodes, elements_to_send);
 
-          for (; elem_it!=elem_end; ++elem_it)
-            {
-              const Elem * elem = *elem_it;
+        connect_elements_on_nodes(mesh, connected_nodes,
+                                  elements_to_send);
 
-              elements_to_send.insert (elem);
-              for (unsigned int s=0; s != elem->n_sides(); ++s)
-                {
-                  const Elem * neigh = elem->neighbor_ptr(s);
-                  if (neigh && neigh != remote_elem)
-                    {
-#ifdef LIBMESH_ENABLE_AMR
-                      if (!neigh->active())
-                        {
-                          std::vector<const Elem*> family;
-                          neigh->active_family_tree_by_neighbor(family, elem);
+        // The elements we need should have their ancestors and their
+        // subactive children present too.
+        connect_families(elements_to_send);
 
-                          for (dof_id_type i=0; i!=family.size(); ++i)
-                            elements_to_send.insert(family[i]);
-                        }
-                      else
-#endif
-                        elements_to_send.insert(neigh);
-                    }
-                }
-
-              for (unsigned int n=0; n<elem->n_nodes(); n++)
-                connected_nodes.insert (elem->node_ptr(n));
-            }
-        }
-
-        {
-          MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator elem_end = mesh.active_elements_end();
-
-          for (; elem_it!=elem_end; ++elem_it)
-            {
-              const Elem * elem = *elem_it;
-
-              for (unsigned int n=0; n<elem->n_nodes(); n++)
-                if (connected_nodes.count(elem->node_ptr(n)))
-                  elements_to_send.insert (elem);
-            }
-        }
-
-        // Because our set is sorted by ascending level, we can
-        // traverse it in reverse order, adding parents as we go, and
-        // end up with all ancestors added.  This is safe for std::set
-        // where insert doesn't invalidate iterators.
-        //
-        // This only works because we do *not* cache
-        // elements_to_send.rend(), whose value can change when we
-        // insert elements which are sorted before the original rend.
-        //
-        // We're also going to get subactive descendents here, when
-        // any exist.  We're iterating in the wrong direction to do
-        // that non-recursively, so we'll cop out and rely on
-        // total_family_tree.  Iterating backwards does mean that we
-        // won't be querying the newly inserted subactive elements
-        // redundantly.
-        {
-          std::set<const Elem *, CompareElemIdsByLevel>::reverse_iterator
-            elem_rit  = elements_to_send.rbegin();
-
-          for (; elem_rit != elements_to_send.rend(); ++elem_rit)
-            {
-              const Elem *elem = *elem_rit;
-              libmesh_assert(elem);
-              const Elem *parent = elem->parent();
-
-              // We let ghosting functors worry about only active
-              // elements, but the remote processor needs all its
-              // semilocal elements' ancestors and active semilocal
-              // elements' descendants too.
-              if (parent)
-                elements_to_send.insert (parent);
-
-              if (elem->active() && elem->has_children())
-                {
-                  std::vector<const Elem *> subactive_family;
-                  elem->total_family_tree(subactive_family);
-                  for (unsigned int i=0; i != subactive_family.size();
-                       ++i)
-                    elements_to_send.insert(subactive_family[i]);
-                }
-            }
-        }
-
-#ifdef DEBUG
-        // Let's be paranoid and make sure that all our ancestors
-        // really did get inserted.  I screwed this up the first time
-        // by caching rend, and I can easily imagine screwing it up in
-        // the future by changing containers.
-        {
-          std::set<const Elem *, CompareElemIdsByLevel>::iterator
-            elem_it  = elements_to_send.begin(),
-            elem_end = elements_to_send.end();
-
-          for (; elem_it != elem_end; ++elem_it)
-            {
-              const Elem *elem = *elem_it;
-              libmesh_assert(elem);
-              const Elem *parent = elem->parent();
-              if (parent)
-                libmesh_assert(elements_to_send.count(parent));
-            }
-        }
-#endif
-
-        connected_nodes.clear();
-        {
-          std::set<const Elem *, CompareElemIdsByLevel>::iterator
-            elem_it  = elements_to_send.begin(),
-            elem_end = elements_to_send.end();
-
-          for (; elem_it!=elem_end; ++elem_it)
-            {
-              const Elem * elem = *elem_it;
-
-              for (unsigned int n=0; n<elem->n_nodes(); n++)
-                connected_nodes.insert(elem->node_ptr(n));
-            }
-        }
+        reconnect_nodes(elements_to_send, connected_nodes);
 
         // the number of nodes we will ship to pid
         send_n_nodes_and_elem_per_proc[2*pid+0] =
@@ -1319,141 +1387,39 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   libmesh_assert_equal_to (par_max_elem_id, mesh.max_elem_id());
 #endif
 
-  // FIXME - should these be "unsorted_set"s?  O(N) is O(N)...
-  std::vector<bool> local_nodes(mesh.max_node_id(), false);
-  std::vector<bool> semilocal_nodes(mesh.max_node_id(), false);
-  std::vector<bool> semilocal_elems(mesh.max_elem_id(), false);
+  std::set<const Node *> connected_nodes;
+  std::set<const Elem *, CompareElemIdsByLevel> elements_to_keep;
 
   // We don't want to delete any element that shares a node
-  // with or is an ancestor of a local element.
+  // with or is an ancestor of an active local or unpartitioned
+  // element.
 
-  // Using the local_nodes vector rather than e.g. point_neighbors()
-  // gives us correct results even in corner cases, such as where two
-  // elements meet only at a corner.  ;-)  Links between boundary and
-  // interior elements on mixed dimensional meshes also give us
-  // correct ghosting in this way.
+  connect_elements(mesh,
+                   mesh.active_local_elements_begin(),
+                   mesh.active_local_elements_end(),
+                   connected_nodes, elements_to_keep);
 
-  // We also preserve neighbors and their children for active local
-  // elements - in most cases this is redundant with the node check,
-  // but for non-conforming Tet4 meshes and non-level-one-conforming
-  // 2D+3D meshes it is possible for an element and its coarse
-  // neighbor to not share any vertices.
+  connect_elements(mesh,
+                   mesh.active_unpartitioned_elements_begin(),
+                   mesh.active_unpartitioned_elements_end(),
+                   connected_nodes, elements_to_keep);
 
-  MeshBase::const_element_iterator l_elem_it = mesh.active_local_elements_begin(),
-    l_end     = mesh.active_local_elements_end();
-  for (; l_elem_it != l_end; ++l_elem_it)
-    {
-      const Elem * elem = *l_elem_it;
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        {
-          dof_id_type nodeid = elem->node_id(n);
-          libmesh_assert_less (nodeid, local_nodes.size());
-          local_nodes[nodeid] = true;
-        }
-
-      for (unsigned int s=0; s != elem->n_sides(); ++s)
-        {
-          const Elem * neigh = elem->neighbor_ptr(s);
-          if (neigh && neigh != remote_elem)
-            {
-#ifdef LIBMESH_ENABLE_AMR
-              if (!neigh->active())
-                {
-                  std::vector<const Elem*> family;
-                  neigh->active_family_tree_by_neighbor(family, elem);
-
-                  for (dof_id_type i=0; i!=family.size(); ++i)
-                    semilocal_elems[family[i]->id()] = true;
-                }
-              else
-#endif
-                semilocal_elems[neigh->id()] = true;
-            }
-        }
-
-      while (elem)
-        {
-          dof_id_type elemid = elem->id();
-          libmesh_assert_less (elemid, semilocal_elems.size());
-          semilocal_elems[elemid] = true;
-
-          for (unsigned int n=0; n != elem->n_nodes(); ++n)
-            semilocal_nodes[elem->node_id(n)] = true;
-
-          const Elem * parent = elem->parent();
-          // Don't proceed from a boundary mesh to an interior mesh
-          if (parent && parent->dim() != elem->dim())
-            break;
-
-          elem = parent;
-        }
-    }
-
-  // We don't want to delete any element that shares a node
-  // with or is an ancestor of an unpartitioned element either.
-  MeshBase::const_element_iterator
-    u_elem_it = mesh.unpartitioned_elements_begin(),
-    u_end     = mesh.unpartitioned_elements_end();
-
-  for (; u_elem_it != u_end; ++u_elem_it)
-    {
-      const Elem * elem = *u_elem_it;
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        local_nodes[elem->node_id(n)] = true;
-      while (elem)
-        {
-          semilocal_elems[elem->id()] = true;
-
-          for (unsigned int n=0; n != elem->n_nodes(); ++n)
-            semilocal_nodes[elem->node_id(n)] = true;
-
-          const Elem * parent = elem->parent();
-          // Don't proceed from a boundary mesh to an interior mesh
-          if (parent && parent->dim() != elem->dim())
-            break;
-
-          elem = parent;
-        }
-    }
-
-  // Flag all the elements that share nodes with
-  // local and unpartitioned elements, along with their ancestors
-  MeshBase::element_iterator nl_elem_it = mesh.not_local_elements_begin(),
-    nl_end     = mesh.not_local_elements_end();
-  for (; nl_elem_it != nl_end; ++nl_elem_it)
-    {
-      const Elem * elem = *nl_elem_it;
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        if (local_nodes[elem->node_id(n)])
-          {
-            while (elem)
-              {
-                semilocal_elems[elem->id()] = true;
-
-                for (unsigned int nn=0; nn != elem->n_nodes(); ++nn)
-                  semilocal_nodes[elem->node_id(nn)] = true;
-
-                const Elem * parent = elem->parent();
-                // Don't proceed from a boundary mesh to an interior mesh
-                if (parent && parent->dim() != elem->dim())
-                  break;
-
-                elem = parent;
-              }
-            break;
-          }
-    }
+  connect_elements_on_nodes(mesh, connected_nodes, elements_to_keep);
 
   // Don't delete elements that we were explicitly told not to
   for(std::set<Elem *>::iterator it = extra_ghost_elem_ids.begin();
-      it != extra_ghost_elem_ids.end();
-      ++it)
+      it != extra_ghost_elem_ids.end(); ++it)
     {
       const Elem * elem = *it;
-      semilocal_elems[elem->id()] = true;
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        semilocal_nodes[elem->node_id(n)] = true;
+      elements_to_keep.insert(elem);
     }
+
+  // The elements we need should have their ancestors and their
+  // subactive children present too.
+  connect_families(elements_to_keep);
+
+  // Don't delete nodes that our semilocal elements need
+  reconnect_nodes(elements_to_keep, connected_nodes);
 
   // Delete all the elements we have no reason to save,
   // starting with the most refined so that the mesh
@@ -1469,7 +1435,9 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
           Elem * elem = *lev_elem_it;
           libmesh_assert (elem);
           // Make sure we don't leave any invalid pointers
-          if (!semilocal_elems[elem->id()])
+          const bool keep_me = elements_to_keep.count(elem);
+
+          if (!keep_me)
             elem->make_links_to_me_remote();
 
           // Subactive neighbor pointers aren't preservable here
@@ -1479,7 +1447,7 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
 
           // delete_elem doesn't currently invalidate element
           // iterators... that had better not change
-          if (!semilocal_elems[elem->id()])
+          if (!keep_me)
             mesh.delete_elem(elem);
         }
     }
@@ -1491,7 +1459,7 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
     {
       Node * node = *node_it;
       libmesh_assert(node);
-      if (!semilocal_nodes[node->id()])
+      if (!connected_nodes.count(node))
         mesh.delete_node(node);
     }
 
