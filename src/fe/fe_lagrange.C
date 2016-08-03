@@ -22,6 +22,7 @@
 #include "libmesh/fe.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/elem.h"
+#include "libmesh/remote_elem.h"
 #include "libmesh/threads.h"
 #include "libmesh/string_to_enum.h"
 
@@ -694,7 +695,8 @@ void lagrange_compute_constraints (DofConstraints & constraints,
   // Look at the element faces.  Check to see if we need to
   // build constraints.
   for (unsigned int s=0; s<elem->n_sides(); s++)
-    if (elem->neighbor_ptr(s) != libmesh_nullptr)
+    if (elem->neighbor_ptr(s) != libmesh_nullptr &&
+        elem->neighbor_ptr(s) != remote_elem)
       if (elem->neighbor_ptr(s)->level() < elem->level()) // constrain dofs shared between
         {                                                 // this element and ones coarser
           // than this element.

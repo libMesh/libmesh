@@ -445,9 +445,10 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                       libmesh_assert(neigh_has_remote_children);
 
                       // And let's double-check that we don't have
-                      // a remote_elem neighboring a local element
-                      libmesh_assert_not_equal_to (current_elem->processor_id(),
-                                                   this->processor_id());
+                      // a remote_elem neighboring an active local element
+                      if (current_elem->active())
+                        libmesh_assert_not_equal_to (current_elem->processor_id(),
+                                                     this->processor_id());
 #endif // DEBUG
                       neigh = const_cast<RemoteElem *>(remote_elem);
                     }
