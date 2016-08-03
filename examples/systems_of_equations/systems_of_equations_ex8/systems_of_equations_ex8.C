@@ -31,8 +31,12 @@
 // Simo & Laursen (1992). For the sake of simplicity, in this example we assume that contact
 // nodes are perfectly aligned (this assumption can be eliminated relatively easily).
 //
-// The mesh in this example consists of two disconnected cylinders. We impose a displacement
-// boundary condition of -1 in the z-direction on the top cylinder in order to impose contact.
+// The mesh in this example consists of two disconnected cylinders. We add edge elements into
+// the mesh in order to ensure correct parallel communication of data on contact surfaces,
+// and also so that we do not have to manually augment the sparsity pattern.
+
+//  We impose a displacement boundary condition of -1 in the z-direction on the top cylinder
+// in order to impose contact.
 
 // C++ include files that we need
 #include <iostream>
@@ -180,8 +184,12 @@ int main (int argc, char ** argv)
 
   le.initialize_contact_load_paths();
 
-  // The augment_sparsity object was initialized in initialize_contact_load_paths.
-  system.get_dof_map().attach_extra_sparsity_object(le.get_augment_sparsity());
+  libMesh::out << "Mesh before adding edge connectors" << std::endl;
+  mesh.print_info();
+  le.add_contact_edge_elements();
+
+  libMesh::out << "Mesh after adding edge connectors" << std::endl;
+  mesh.print_info();
 
   equation_systems.init();
   equation_systems.print_info();
@@ -196,7 +204,7 @@ int main (int argc, char ** argv)
     {
       if (current_max_gap_function <= gap_function_tol)
         {
-          libMesh::out << "Outer iterative loop converged!" << std::endl;
+          libMesh::out << "Outer loop converged" << std::endl;
           break;
         }
 

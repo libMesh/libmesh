@@ -155,11 +155,9 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = example-oprof$(EXEEXT)
 am__example_dbg_SOURCES_DIST = systems_of_equations_ex8.C run.sh \
 	systems_of_equations_ex8.in systems_of_equations_ex8.exo \
-	augment_sparsity_on_contact.h augment_sparsity_on_contact.C \
 	linear_elasticity_with_contact.h \
 	linear_elasticity_with_contact.C
 am__objects_1 = example_dbg-systems_of_equations_ex8.$(OBJEXT) \
-	example_dbg-augment_sparsity_on_contact.$(OBJEXT) \
 	example_dbg-linear_elasticity_with_contact.$(OBJEXT)
 am__objects_2 = $(am__objects_1)
 @LIBMESH_DBG_MODE_TRUE@am_example_dbg_OBJECTS = $(am__objects_2)
@@ -175,11 +173,9 @@ example_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_devel_SOURCES_DIST = systems_of_equations_ex8.C run.sh \
 	systems_of_equations_ex8.in systems_of_equations_ex8.exo \
-	augment_sparsity_on_contact.h augment_sparsity_on_contact.C \
 	linear_elasticity_with_contact.h \
 	linear_elasticity_with_contact.C
 am__objects_3 = example_devel-systems_of_equations_ex8.$(OBJEXT) \
-	example_devel-augment_sparsity_on_contact.$(OBJEXT) \
 	example_devel-linear_elasticity_with_contact.$(OBJEXT)
 am__objects_4 = $(am__objects_3)
 @LIBMESH_DEVEL_MODE_TRUE@am_example_devel_OBJECTS = $(am__objects_4)
@@ -192,11 +188,9 @@ example_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	-o $@
 am__example_oprof_SOURCES_DIST = systems_of_equations_ex8.C run.sh \
 	systems_of_equations_ex8.in systems_of_equations_ex8.exo \
-	augment_sparsity_on_contact.h augment_sparsity_on_contact.C \
 	linear_elasticity_with_contact.h \
 	linear_elasticity_with_contact.C
 am__objects_5 = example_oprof-systems_of_equations_ex8.$(OBJEXT) \
-	example_oprof-augment_sparsity_on_contact.$(OBJEXT) \
 	example_oprof-linear_elasticity_with_contact.$(OBJEXT)
 am__objects_6 = $(am__objects_5)
 @LIBMESH_OPROF_MODE_TRUE@am_example_oprof_OBJECTS = $(am__objects_6)
@@ -209,11 +203,9 @@ example_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	-o $@
 am__example_opt_SOURCES_DIST = systems_of_equations_ex8.C run.sh \
 	systems_of_equations_ex8.in systems_of_equations_ex8.exo \
-	augment_sparsity_on_contact.h augment_sparsity_on_contact.C \
 	linear_elasticity_with_contact.h \
 	linear_elasticity_with_contact.C
 am__objects_7 = example_opt-systems_of_equations_ex8.$(OBJEXT) \
-	example_opt-augment_sparsity_on_contact.$(OBJEXT) \
 	example_opt-linear_elasticity_with_contact.$(OBJEXT)
 am__objects_8 = $(am__objects_7)
 @LIBMESH_OPT_MODE_TRUE@am_example_opt_OBJECTS = $(am__objects_8)
@@ -225,11 +217,9 @@ example_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_prof_SOURCES_DIST = systems_of_equations_ex8.C run.sh \
 	systems_of_equations_ex8.in systems_of_equations_ex8.exo \
-	augment_sparsity_on_contact.h augment_sparsity_on_contact.C \
 	linear_elasticity_with_contact.h \
 	linear_elasticity_with_contact.C
 am__objects_9 = example_prof-systems_of_equations_ex8.$(OBJEXT) \
-	example_prof-augment_sparsity_on_contact.$(OBJEXT) \
 	example_prof-linear_elasticity_with_contact.$(OBJEXT)
 am__objects_10 = $(am__objects_9)
 @LIBMESH_PROF_MODE_TRUE@am_example_prof_OBJECTS = $(am__objects_10)
@@ -680,7 +670,7 @@ vtkversion = @vtkversion@
 example_name = systems_of_equations_ex8
 check_SCRIPTS = run.sh
 install_dir = $(examples_install_path)/systems_of_equations/ex8
-data = systems_of_equations_ex8.C run.sh systems_of_equations_ex8.in systems_of_equations_ex8.exo augment_sparsity_on_contact.h augment_sparsity_on_contact.C linear_elasticity_with_contact.h linear_elasticity_with_contact.C
+data = systems_of_equations_ex8.C run.sh systems_of_equations_ex8.in systems_of_equations_ex8.exo linear_elasticity_with_contact.h linear_elasticity_with_contact.C
 sources = $(data) run.sh
 
 ######################################################################
@@ -821,19 +811,14 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_dbg-augment_sparsity_on_contact.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_dbg-linear_elasticity_with_contact.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_dbg-systems_of_equations_ex8.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_devel-augment_sparsity_on_contact.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_devel-linear_elasticity_with_contact.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_devel-systems_of_equations_ex8.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_oprof-augment_sparsity_on_contact.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_oprof-linear_elasticity_with_contact.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_oprof-systems_of_equations_ex8.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_opt-augment_sparsity_on_contact.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_opt-linear_elasticity_with_contact.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_opt-systems_of_equations_ex8.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_prof-augment_sparsity_on_contact.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_prof-linear_elasticity_with_contact.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_prof-systems_of_equations_ex8.Po@am__quote@
 
@@ -875,20 +860,6 @@ example_dbg-systems_of_equations_ex8.obj: systems_of_equations_ex8.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o example_dbg-systems_of_equations_ex8.obj `if test -f 'systems_of_equations_ex8.C'; then $(CYGPATH_W) 'systems_of_equations_ex8.C'; else $(CYGPATH_W) '$(srcdir)/systems_of_equations_ex8.C'; fi`
 
-example_dbg-augment_sparsity_on_contact.o: augment_sparsity_on_contact.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT example_dbg-augment_sparsity_on_contact.o -MD -MP -MF $(DEPDIR)/example_dbg-augment_sparsity_on_contact.Tpo -c -o example_dbg-augment_sparsity_on_contact.o `test -f 'augment_sparsity_on_contact.C' || echo '$(srcdir)/'`augment_sparsity_on_contact.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_dbg-augment_sparsity_on_contact.Tpo $(DEPDIR)/example_dbg-augment_sparsity_on_contact.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='augment_sparsity_on_contact.C' object='example_dbg-augment_sparsity_on_contact.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o example_dbg-augment_sparsity_on_contact.o `test -f 'augment_sparsity_on_contact.C' || echo '$(srcdir)/'`augment_sparsity_on_contact.C
-
-example_dbg-augment_sparsity_on_contact.obj: augment_sparsity_on_contact.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT example_dbg-augment_sparsity_on_contact.obj -MD -MP -MF $(DEPDIR)/example_dbg-augment_sparsity_on_contact.Tpo -c -o example_dbg-augment_sparsity_on_contact.obj `if test -f 'augment_sparsity_on_contact.C'; then $(CYGPATH_W) 'augment_sparsity_on_contact.C'; else $(CYGPATH_W) '$(srcdir)/augment_sparsity_on_contact.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_dbg-augment_sparsity_on_contact.Tpo $(DEPDIR)/example_dbg-augment_sparsity_on_contact.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='augment_sparsity_on_contact.C' object='example_dbg-augment_sparsity_on_contact.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -c -o example_dbg-augment_sparsity_on_contact.obj `if test -f 'augment_sparsity_on_contact.C'; then $(CYGPATH_W) 'augment_sparsity_on_contact.C'; else $(CYGPATH_W) '$(srcdir)/augment_sparsity_on_contact.C'; fi`
-
 example_dbg-linear_elasticity_with_contact.o: linear_elasticity_with_contact.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT example_dbg-linear_elasticity_with_contact.o -MD -MP -MF $(DEPDIR)/example_dbg-linear_elasticity_with_contact.Tpo -c -o example_dbg-linear_elasticity_with_contact.o `test -f 'linear_elasticity_with_contact.C' || echo '$(srcdir)/'`linear_elasticity_with_contact.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_dbg-linear_elasticity_with_contact.Tpo $(DEPDIR)/example_dbg-linear_elasticity_with_contact.Po
@@ -916,20 +887,6 @@ example_devel-systems_of_equations_ex8.obj: systems_of_equations_ex8.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems_of_equations_ex8.C' object='example_devel-systems_of_equations_ex8.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o example_devel-systems_of_equations_ex8.obj `if test -f 'systems_of_equations_ex8.C'; then $(CYGPATH_W) 'systems_of_equations_ex8.C'; else $(CYGPATH_W) '$(srcdir)/systems_of_equations_ex8.C'; fi`
-
-example_devel-augment_sparsity_on_contact.o: augment_sparsity_on_contact.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT example_devel-augment_sparsity_on_contact.o -MD -MP -MF $(DEPDIR)/example_devel-augment_sparsity_on_contact.Tpo -c -o example_devel-augment_sparsity_on_contact.o `test -f 'augment_sparsity_on_contact.C' || echo '$(srcdir)/'`augment_sparsity_on_contact.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_devel-augment_sparsity_on_contact.Tpo $(DEPDIR)/example_devel-augment_sparsity_on_contact.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='augment_sparsity_on_contact.C' object='example_devel-augment_sparsity_on_contact.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o example_devel-augment_sparsity_on_contact.o `test -f 'augment_sparsity_on_contact.C' || echo '$(srcdir)/'`augment_sparsity_on_contact.C
-
-example_devel-augment_sparsity_on_contact.obj: augment_sparsity_on_contact.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT example_devel-augment_sparsity_on_contact.obj -MD -MP -MF $(DEPDIR)/example_devel-augment_sparsity_on_contact.Tpo -c -o example_devel-augment_sparsity_on_contact.obj `if test -f 'augment_sparsity_on_contact.C'; then $(CYGPATH_W) 'augment_sparsity_on_contact.C'; else $(CYGPATH_W) '$(srcdir)/augment_sparsity_on_contact.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_devel-augment_sparsity_on_contact.Tpo $(DEPDIR)/example_devel-augment_sparsity_on_contact.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='augment_sparsity_on_contact.C' object='example_devel-augment_sparsity_on_contact.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o example_devel-augment_sparsity_on_contact.obj `if test -f 'augment_sparsity_on_contact.C'; then $(CYGPATH_W) 'augment_sparsity_on_contact.C'; else $(CYGPATH_W) '$(srcdir)/augment_sparsity_on_contact.C'; fi`
 
 example_devel-linear_elasticity_with_contact.o: linear_elasticity_with_contact.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -MT example_devel-linear_elasticity_with_contact.o -MD -MP -MF $(DEPDIR)/example_devel-linear_elasticity_with_contact.Tpo -c -o example_devel-linear_elasticity_with_contact.o `test -f 'linear_elasticity_with_contact.C' || echo '$(srcdir)/'`linear_elasticity_with_contact.C
@@ -959,20 +916,6 @@ example_oprof-systems_of_equations_ex8.obj: systems_of_equations_ex8.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o example_oprof-systems_of_equations_ex8.obj `if test -f 'systems_of_equations_ex8.C'; then $(CYGPATH_W) 'systems_of_equations_ex8.C'; else $(CYGPATH_W) '$(srcdir)/systems_of_equations_ex8.C'; fi`
 
-example_oprof-augment_sparsity_on_contact.o: augment_sparsity_on_contact.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT example_oprof-augment_sparsity_on_contact.o -MD -MP -MF $(DEPDIR)/example_oprof-augment_sparsity_on_contact.Tpo -c -o example_oprof-augment_sparsity_on_contact.o `test -f 'augment_sparsity_on_contact.C' || echo '$(srcdir)/'`augment_sparsity_on_contact.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_oprof-augment_sparsity_on_contact.Tpo $(DEPDIR)/example_oprof-augment_sparsity_on_contact.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='augment_sparsity_on_contact.C' object='example_oprof-augment_sparsity_on_contact.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o example_oprof-augment_sparsity_on_contact.o `test -f 'augment_sparsity_on_contact.C' || echo '$(srcdir)/'`augment_sparsity_on_contact.C
-
-example_oprof-augment_sparsity_on_contact.obj: augment_sparsity_on_contact.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT example_oprof-augment_sparsity_on_contact.obj -MD -MP -MF $(DEPDIR)/example_oprof-augment_sparsity_on_contact.Tpo -c -o example_oprof-augment_sparsity_on_contact.obj `if test -f 'augment_sparsity_on_contact.C'; then $(CYGPATH_W) 'augment_sparsity_on_contact.C'; else $(CYGPATH_W) '$(srcdir)/augment_sparsity_on_contact.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_oprof-augment_sparsity_on_contact.Tpo $(DEPDIR)/example_oprof-augment_sparsity_on_contact.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='augment_sparsity_on_contact.C' object='example_oprof-augment_sparsity_on_contact.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -c -o example_oprof-augment_sparsity_on_contact.obj `if test -f 'augment_sparsity_on_contact.C'; then $(CYGPATH_W) 'augment_sparsity_on_contact.C'; else $(CYGPATH_W) '$(srcdir)/augment_sparsity_on_contact.C'; fi`
-
 example_oprof-linear_elasticity_with_contact.o: linear_elasticity_with_contact.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_oprof_CPPFLAGS) $(CPPFLAGS) $(example_oprof_CXXFLAGS) $(CXXFLAGS) -MT example_oprof-linear_elasticity_with_contact.o -MD -MP -MF $(DEPDIR)/example_oprof-linear_elasticity_with_contact.Tpo -c -o example_oprof-linear_elasticity_with_contact.o `test -f 'linear_elasticity_with_contact.C' || echo '$(srcdir)/'`linear_elasticity_with_contact.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_oprof-linear_elasticity_with_contact.Tpo $(DEPDIR)/example_oprof-linear_elasticity_with_contact.Po
@@ -1001,20 +944,6 @@ example_opt-systems_of_equations_ex8.obj: systems_of_equations_ex8.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o example_opt-systems_of_equations_ex8.obj `if test -f 'systems_of_equations_ex8.C'; then $(CYGPATH_W) 'systems_of_equations_ex8.C'; else $(CYGPATH_W) '$(srcdir)/systems_of_equations_ex8.C'; fi`
 
-example_opt-augment_sparsity_on_contact.o: augment_sparsity_on_contact.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT example_opt-augment_sparsity_on_contact.o -MD -MP -MF $(DEPDIR)/example_opt-augment_sparsity_on_contact.Tpo -c -o example_opt-augment_sparsity_on_contact.o `test -f 'augment_sparsity_on_contact.C' || echo '$(srcdir)/'`augment_sparsity_on_contact.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_opt-augment_sparsity_on_contact.Tpo $(DEPDIR)/example_opt-augment_sparsity_on_contact.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='augment_sparsity_on_contact.C' object='example_opt-augment_sparsity_on_contact.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o example_opt-augment_sparsity_on_contact.o `test -f 'augment_sparsity_on_contact.C' || echo '$(srcdir)/'`augment_sparsity_on_contact.C
-
-example_opt-augment_sparsity_on_contact.obj: augment_sparsity_on_contact.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT example_opt-augment_sparsity_on_contact.obj -MD -MP -MF $(DEPDIR)/example_opt-augment_sparsity_on_contact.Tpo -c -o example_opt-augment_sparsity_on_contact.obj `if test -f 'augment_sparsity_on_contact.C'; then $(CYGPATH_W) 'augment_sparsity_on_contact.C'; else $(CYGPATH_W) '$(srcdir)/augment_sparsity_on_contact.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_opt-augment_sparsity_on_contact.Tpo $(DEPDIR)/example_opt-augment_sparsity_on_contact.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='augment_sparsity_on_contact.C' object='example_opt-augment_sparsity_on_contact.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -c -o example_opt-augment_sparsity_on_contact.obj `if test -f 'augment_sparsity_on_contact.C'; then $(CYGPATH_W) 'augment_sparsity_on_contact.C'; else $(CYGPATH_W) '$(srcdir)/augment_sparsity_on_contact.C'; fi`
-
 example_opt-linear_elasticity_with_contact.o: linear_elasticity_with_contact.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_opt_CPPFLAGS) $(CPPFLAGS) $(example_opt_CXXFLAGS) $(CXXFLAGS) -MT example_opt-linear_elasticity_with_contact.o -MD -MP -MF $(DEPDIR)/example_opt-linear_elasticity_with_contact.Tpo -c -o example_opt-linear_elasticity_with_contact.o `test -f 'linear_elasticity_with_contact.C' || echo '$(srcdir)/'`linear_elasticity_with_contact.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_opt-linear_elasticity_with_contact.Tpo $(DEPDIR)/example_opt-linear_elasticity_with_contact.Po
@@ -1042,20 +971,6 @@ example_prof-systems_of_equations_ex8.obj: systems_of_equations_ex8.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems_of_equations_ex8.C' object='example_prof-systems_of_equations_ex8.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o example_prof-systems_of_equations_ex8.obj `if test -f 'systems_of_equations_ex8.C'; then $(CYGPATH_W) 'systems_of_equations_ex8.C'; else $(CYGPATH_W) '$(srcdir)/systems_of_equations_ex8.C'; fi`
-
-example_prof-augment_sparsity_on_contact.o: augment_sparsity_on_contact.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT example_prof-augment_sparsity_on_contact.o -MD -MP -MF $(DEPDIR)/example_prof-augment_sparsity_on_contact.Tpo -c -o example_prof-augment_sparsity_on_contact.o `test -f 'augment_sparsity_on_contact.C' || echo '$(srcdir)/'`augment_sparsity_on_contact.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_prof-augment_sparsity_on_contact.Tpo $(DEPDIR)/example_prof-augment_sparsity_on_contact.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='augment_sparsity_on_contact.C' object='example_prof-augment_sparsity_on_contact.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o example_prof-augment_sparsity_on_contact.o `test -f 'augment_sparsity_on_contact.C' || echo '$(srcdir)/'`augment_sparsity_on_contact.C
-
-example_prof-augment_sparsity_on_contact.obj: augment_sparsity_on_contact.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT example_prof-augment_sparsity_on_contact.obj -MD -MP -MF $(DEPDIR)/example_prof-augment_sparsity_on_contact.Tpo -c -o example_prof-augment_sparsity_on_contact.obj `if test -f 'augment_sparsity_on_contact.C'; then $(CYGPATH_W) 'augment_sparsity_on_contact.C'; else $(CYGPATH_W) '$(srcdir)/augment_sparsity_on_contact.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example_prof-augment_sparsity_on_contact.Tpo $(DEPDIR)/example_prof-augment_sparsity_on_contact.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='augment_sparsity_on_contact.C' object='example_prof-augment_sparsity_on_contact.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -c -o example_prof-augment_sparsity_on_contact.obj `if test -f 'augment_sparsity_on_contact.C'; then $(CYGPATH_W) 'augment_sparsity_on_contact.C'; else $(CYGPATH_W) '$(srcdir)/augment_sparsity_on_contact.C'; fi`
 
 example_prof-linear_elasticity_with_contact.o: linear_elasticity_with_contact.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_prof_CPPFLAGS) $(CPPFLAGS) $(example_prof_CXXFLAGS) $(CXXFLAGS) -MT example_prof-linear_elasticity_with_contact.o -MD -MP -MF $(DEPDIR)/example_prof-linear_elasticity_with_contact.Tpo -c -o example_prof-linear_elasticity_with_contact.o `test -f 'linear_elasticity_with_contact.C' || echo '$(srcdir)/'`linear_elasticity_with_contact.C

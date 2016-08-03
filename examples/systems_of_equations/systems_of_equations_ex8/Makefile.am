@@ -1,7 +1,7 @@
 example_name  = systems_of_equations_ex8
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/systems_of_equations/ex8
-data          = systems_of_equations_ex8.C run.sh systems_of_equations_ex8.in systems_of_equations_ex8.exo augment_sparsity_on_contact.h augment_sparsity_on_contact.C linear_elasticity_with_contact.h linear_elasticity_with_contact.C
+data          = systems_of_equations_ex8.C run.sh systems_of_equations_ex8.in systems_of_equations_ex8.exo linear_elasticity_with_contact.h linear_elasticity_with_contact.C
 sources       = $(data) run.sh
 
 CLEANFILES = solution.exo

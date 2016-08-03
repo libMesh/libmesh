@@ -21,6 +21,7 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
 #include "libmesh/petsc_matrix.h"
+#include "libmesh/edge_edge2.h"
 #include LIBMESH_INCLUDE_UNORDERED_SET
 
 // The nonlinear solver and system we will be using
@@ -32,14 +33,8 @@ using namespace libMesh;
 LinearElasticityWithContact::LinearElasticityWithContact (NonlinearImplicitSystem & sys_in,
                                                           Real contact_penalty_in) :
   _sys(sys_in),
-  _augment_sparsity(_sys),
   _contact_penalty(contact_penalty_in)
 {
-}
-
-AugmentSparsityOnContact & LinearElasticityWithContact::get_augment_sparsity()
-{
-  return _augment_sparsity;
 }
 
 void LinearElasticityWithContact::set_contact_penalty(Real contact_penalty_in)
@@ -199,7 +194,7 @@ void LinearElasticityWithContact::initialize_contact_load_paths()
   libmesh_assert(nodes_on_lower_surface.size() == nodes_on_upper_surface.size());
 
   // Do an N^2 search to match the contact nodes
-  _augment_sparsity.clear_contact_node_map();
+  _contact_node_map.clear();
   for (unsigned int i=0; i<nodes_on_lower_surface.size(); i++)
     {
       dof_id_type lower_node_id = nodes_on_lower_surface[i];
@@ -216,12 +211,35 @@ void LinearElasticityWithContact::initialize_contact_load_paths()
 
           if (distance < min_distance)
             {
-              _augment_sparsity.add_contact_node(lower_node_id, upper_node_id);
+              _contact_node_map[lower_node_id] = upper_node_id;
               min_distance = distance;
             }
         }
     }
+}
 
+void LinearElasticityWithContact::add_contact_edge_elements()
+{
+  MeshBase & mesh = _sys.get_mesh();
+
+  std::map<dof_id_type, dof_id_type>::iterator it = _contact_node_map.begin();
+  std::map<dof_id_type, dof_id_type>::iterator it_end = _contact_node_map.end();
+  for( ; it != it_end ; ++it )
+    {
+      dof_id_type master_node_id = it->first;
+      dof_id_type slave_node_id = it->second;
+
+      Node& master_node = mesh.node(master_node_id);
+      Node& slave_node = mesh.node(slave_node_id);
+
+      Elem* connector_elem = mesh.add_elem (new Edge2);
+      connector_elem->set_node(0) = &master_node;
+      connector_elem->set_node(1) = &slave_node;
+
+      connector_elem->subdomain_id() = 10;
+    }
+
+  mesh.prepare_for_use();
 }
 
 void LinearElasticityWithContact::residual_and_jacobian (const NumericVector<Number> & soln,
@@ -287,6 +305,13 @@ void LinearElasticityWithContact::residual_and_jacobian (const NumericVector<Num
     {
       const Elem * elem = *el;
 
+      if( elem->type() == EDGE2 )
+        {
+          // We do not do any assembly on the contact connector elements.
+          // The contact force assembly is handled in a separate loop.
+          continue;
+        }
+
       dof_map.dof_indices (elem, dof_indices);
       for (unsigned int var=0; var<3; var++)
         dof_map.dof_indices (elem, dof_indices_var[var], var);
@@ -344,7 +369,11 @@ void LinearElasticityWithContact::residual_and_jacobian (const NumericVector<Num
     }
 
   // Move a copy of the mesh based on the solution. This is used to get
-  // the contact forces.
+  // the contact forces. We could compute the contact forces based on the
+  // current displacement solution, which would not require a clone of the
+  // mesh. Avoiding the mesh clone would be important for production-scale
+  // contact solves, but for the sake of this example, using the clone is
+  // simple and fast enough.
   UniquePtr<MeshBase> mesh_clone = mesh.clone();
   move_mesh(*mesh_clone, soln);
 
@@ -352,10 +381,8 @@ void LinearElasticityWithContact::residual_and_jacobian (const NumericVector<Num
   // one processor.
   _lambda_plus_penalty_values.clear();
 
-  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, dof_id_type>::iterator it =
-    _augment_sparsity._contact_node_map.begin();
-  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, dof_id_type>::iterator it_end =
-    _augment_sparsity._contact_node_map.end();
+  std::map<dof_id_type, dof_id_type>::iterator it = _contact_node_map.begin();
+  std::map<dof_id_type, dof_id_type>::iterator it_end = _contact_node_map.end();
 
   for ( ; it != it_end; ++it)
     {
@@ -520,6 +547,12 @@ void LinearElasticityWithContact::compute_stresses()
     {
       const Elem * elem = *el;
 
+      if( elem->type() == EDGE2 )
+        {
+          // We do not compute stress on the contact connector elements.
+          continue;
+        }
+
       for (unsigned int var=0; var<3; var++)
         dof_map.dof_indices (elem, dof_indices_var[var], displacement_vars[var]);
 
@@ -634,10 +667,8 @@ std::pair<Real, Real> LinearElasticityWithContact::get_least_and_max_gap_functio
   Real least_value = std::numeric_limits<Real>::max();
   Real max_value = std::numeric_limits<Real>::min();
 
-  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, dof_id_type>::iterator it =
-    _augment_sparsity._contact_node_map.begin();
-  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, dof_id_type>::iterator it_end =
-    _augment_sparsity._contact_node_map.end();
+  std::map<dof_id_type, dof_id_type>::iterator it = _contact_node_map.begin();
+  std::map<dof_id_type, dof_id_type>::iterator it_end = _contact_node_map.end();
   for ( ; it != it_end; ++it)
     {
       dof_id_type lower_point_id = it->first;
