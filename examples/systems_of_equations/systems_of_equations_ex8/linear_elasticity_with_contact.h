@@ -3,7 +3,6 @@
 
 #include "libmesh/dof_map.h"
 #include "libmesh/nonlinear_implicit_system.h"
-#include "augment_sparsity_on_contact.h"
 
 // define the subdomain IDs
 #define TOP_SUBDOMAIN 2
@@ -40,11 +39,6 @@ private:
   NonlinearImplicitSystem & _sys;
 
   /**
-   * The object that handles augmenting the sparsity pattern.
-   */
-  AugmentSparsityOnContact _augment_sparsity;
-
-  /**
    * Penalize overlapping elements.
    */
   Real _contact_penalty;
@@ -61,6 +55,11 @@ private:
    */
   std::map<dof_id_type, Real> _lambdas;
 
+  /**
+   * This provides a map between contact nodes.
+   */
+  std::map<dof_id_type, dof_id_type> _contact_node_map;
+
 public:
 
   /**
@@ -68,11 +67,6 @@ public:
    */
   LinearElasticityWithContact(NonlinearImplicitSystem & sys_in,
                               Real contact_penalty_in);
-
-  /**
-   * @return a reference to the object for augmenting the sparsity pattern.
-   */
-  AugmentSparsityOnContact & get_augment_sparsity();
 
   /**
    * Update the penalty parameter.
@@ -111,6 +105,15 @@ public:
    * Set up the load paths on the contact surfaces.
    */
   void initialize_contact_load_paths();
+
+  /**
+   * Add edge elements into the mesh based on the contact load paths.
+   * This ensure proper parallel communication of data, e.g. if a node
+   * on one side of the contact surface has a constraint on it, then
+   * adding contact elements into the mesh ensures that the constraint
+   * will be enforced properly.
+   */
+  void add_contact_edge_elements();
 
   /**
    * Evaluate the Jacobian of the nonlinear system.
