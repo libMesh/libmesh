@@ -3,6 +3,7 @@ libmesh_SOURCES =  \
         src/base/dof_map.C \
         src/base/dof_map_constraints.C \
         src/base/dof_object.C \
+        src/base/ghost_point_neighbors.C \
         src/base/libmesh.C \
         src/base/libmesh_common.C \
         src/base/libmesh_isnan.c \
