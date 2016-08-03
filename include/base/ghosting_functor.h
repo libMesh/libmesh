@@ -144,6 +144,10 @@ public:
    * currently living (whether local or ghosted) on this processor
    * need to be coupled/ghosted to accomodate them?  Don't bother to
    * return any results which already have processor_id p.
+   *
+   * This API is new, and we should replace "ignoring those on
+   * processor p" with "ignoring those which match a predicate
+   * functor" eventually.
    */
   virtual void operator() (const MeshBase::const_element_iterator & range_begin,
                            const MeshBase::const_element_iterator & range_end,
