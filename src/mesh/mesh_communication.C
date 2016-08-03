@@ -23,6 +23,7 @@
 // Local Includes -----------------------------------
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
+#include "libmesh/ghosting_functor.h"
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh_logging.h"
@@ -418,6 +419,29 @@ void MeshCommunication::redistribute (DistributedMesh & mesh) const
         // The elements we need should have their ancestors and their
         // subactive children present too.
         connect_families(elements_to_send);
+
+        {
+          MeshBase::const_element_iterator       elem_it  = mesh.active_pid_elements_begin(pid);
+          const MeshBase::const_element_iterator elem_end = mesh.active_pid_elements_end(pid);
+
+          std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
+          const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
+          for (; gf_it != gf_end; ++gf_it)
+            {
+              GhostingFunctor::map_type elements_to_ghost;
+
+              GhostingFunctor *gf = *gf_it;
+              libmesh_assert(gf);
+              (*gf)(elem_it, elem_end, pid, elements_to_ghost);
+
+              // We can ignore the CouplingMatrix in ->second, but we
+              // need to ghost all the elements in ->first.
+              GhostingFunctor::map_type::iterator        etg_it = elements_to_ghost.begin();
+              const GhostingFunctor::map_type::iterator etg_end = elements_to_ghost.end();
+              for (; etg_it != etg_end; ++etg_it)
+                elements_to_send.insert(etg_it->first);
+            }
+        }
 
         reconnect_nodes(elements_to_send, connected_nodes);
 
