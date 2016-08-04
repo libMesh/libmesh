@@ -792,20 +792,20 @@ void assemble_shell (EquationSystems & es,
         } // end of the quadrature point qp-loop
 
       if (distributed_load)
-      {
-        //Loop on shell faces
-        for (unsigned int shellface=0; shellface<2; shellface++)
-          {
-            std::vector<boundary_id_type> bids;
-            mesh.get_boundary_info().shellface_boundary_ids(elem,shellface,bids);
+        {
+          // Loop on shell faces
+          for (unsigned int shellface=0; shellface<2; shellface++)
+            {
+              std::vector<boundary_id_type> bids;
+              mesh.get_boundary_info().shellface_boundary_ids(elem, shellface, bids);
 
-            for (unsigned int k=0;k<bids.size();k++)
-              if(bids[k]==11) //sideset id for surface load
-                for (unsigned int qp=0; qp<qrule.n_points(); ++qp)
-                  for (unsigned int i=0; i<n_var_dofs; ++i)
-                    Fe_w(i) -= JxW[qp] * phi[i][qp];
-          }
-      }
+              for (unsigned int k=0; k<bids.size(); k++)
+                if (bids[k]==11) // sideset id for surface load
+                  for (unsigned int qp=0; qp<qrule.n_points(); ++qp)
+                    for (unsigned int i=0; i<n_var_dofs; ++i)
+                      Fe_w(i) -= JxW[qp] * phi[i][qp];
+            }
+        }
 
       // The element matrix is now built for this element.
       // Add it to the global matrix.

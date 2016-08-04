@@ -315,39 +315,39 @@ void ExodusII_IO::read (const std::string & fname)
         unsigned int side_index_offset = conv.get_shellface_index_offset();
 
         if(raw_side_index < side_index_offset)
-        {
-          // We assume this is a "shell face"
-          int mapped_shellface = raw_side_index;
+          {
+            // We assume this is a "shell face"
+            int mapped_shellface = raw_side_index;
 
-          // Check for errors
-          if (mapped_shellface == ExodusII_IO_Helper::Conversion::invalid_id)
-            libmesh_error_msg("Invalid 1-based side id: "                 \
-                              << mapped_shellface                         \
-                              << " detected for "                         \
-                              << Utility::enum_to_string(elem.type()));
+            // Check for errors
+            if (mapped_shellface == ExodusII_IO_Helper::Conversion::invalid_id)
+              libmesh_error_msg("Invalid 1-based side id: "                 \
+                                << mapped_shellface                         \
+                                << " detected for "                         \
+                                << Utility::enum_to_string(elem.type()));
 
-          // Add this (elem,shellface,id) triplet to the BoundaryInfo object.
-          mesh.get_boundary_info().add_shellface (libmesh_elem_id,
-                                                  cast_int<unsigned short>(mapped_shellface),
-                                                  cast_int<boundary_id_type>(exio_helper->id_list[e]));
-        }
+            // Add this (elem,shellface,id) triplet to the BoundaryInfo object.
+            mesh.get_boundary_info().add_shellface (libmesh_elem_id,
+                                                    cast_int<unsigned short>(mapped_shellface),
+                                                    cast_int<boundary_id_type>(exio_helper->id_list[e]));
+          }
         else
-        {
-          unsigned int side_index = static_cast<unsigned int>(raw_side_index - side_index_offset);
-          int mapped_side = conv.get_side_map(side_index);
+          {
+            unsigned int side_index = static_cast<unsigned int>(raw_side_index - side_index_offset);
+            int mapped_side = conv.get_side_map(side_index);
 
-          // Check for errors
-          if (mapped_side == ExodusII_IO_Helper::Conversion::invalid_id)
-            libmesh_error_msg("Invalid 1-based side id: "                 \
-                              << side_index                               \
-                              << " detected for "                         \
-                              << Utility::enum_to_string(elem.type()));
+            // Check for errors
+            if (mapped_side == ExodusII_IO_Helper::Conversion::invalid_id)
+              libmesh_error_msg("Invalid 1-based side id: "                 \
+                                << side_index                               \
+                                << " detected for "                         \
+                                << Utility::enum_to_string(elem.type()));
 
-          // Add this (elem,side,id) triplet to the BoundaryInfo object.
-          mesh.get_boundary_info().add_side (libmesh_elem_id,
-                                            cast_int<unsigned short>(mapped_side),
-                                            cast_int<boundary_id_type>(exio_helper->id_list[e]));
-        }
+            // Add this (elem,side,id) triplet to the BoundaryInfo object.
+            mesh.get_boundary_info().add_side (libmesh_elem_id,
+                                               cast_int<unsigned short>(mapped_side),
+                                               cast_int<boundary_id_type>(exio_helper->id_list[e]));
+          }
       }
   }
 

@@ -73,19 +73,6 @@ Biharmonic::JR::JR(EquationSystems & eqSys,
     }
 #endif // LIBMESH_ENABLE_PERIODIC
 
-  // Adaptivity stuff is commented out for now...
-  // #ifndef   LIBMESH_ENABLE_AMR
-  //   libmesh_example_requires(false, "--enable-amr");
-  // #else
-  //   // In case we ever get around to doing mesh refinement.
-  //   _biharmonic._meshRefinement = new MeshRefinement(_mesh);
-  //
-  //   // Tell the MeshRefinement object about the periodic boundaries
-  //   // so that it can get heuristics like level-one conformity and unrefined
-  //   // island elimination right.
-  //   _biharmonic._mesh_refinement->set_periodic_boundaries_ptr(dof_map.get_periodic_boundaries());
-  // #endif // LIBMESH_ENABLE_AMR
-
   // Adds the variable "u" to the system.
   // u will be approximated using Hermite elements
   add_variable("u", THIRD, HERMITE);

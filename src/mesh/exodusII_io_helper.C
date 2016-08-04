@@ -1515,9 +1515,9 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
         std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
         /**
-        * We need to build up active elements if AMR is enabled and add
-        * them to the exodus sidesets instead of the potentially inactive "parent" elements
-        */
+         * We need to build up active elements if AMR is enabled and add
+         * them to the exodus sidesets instead of the potentially inactive "parent" elements
+         */
         mesh.elem_ref(el[i]).active_family_tree_by_side(family, sl[i], false);
 #else
         family.push_back(mesh.elem_ptr(el[i]));
@@ -1553,9 +1553,9 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
         std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
         /**
-        * We need to build up active elements if AMR is enabled and add
-        * them to the exodus sidesets instead of the potentially inactive "parent" elements
-        */
+         * We need to build up active elements if AMR is enabled and add
+         * them to the exodus sidesets instead of the potentially inactive "parent" elements
+         */
         mesh.elem_ref(el[i]).active_family_tree_by_side(family, sl[i], false);
 #else
         family.push_back(mesh.elem_ptr(el[i]));

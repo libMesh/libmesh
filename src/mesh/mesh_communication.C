@@ -144,12 +144,11 @@ struct SyncNeighbors
 };
 
 
-void connect_elements
-  (const MeshBase & mesh,
-   const MeshBase::const_element_iterator & range_begin,
-   const MeshBase::const_element_iterator & range_end,
-   std::set<const Node *> & connected_nodes,
-   std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+void connect_elements (const MeshBase & mesh,
+                       const MeshBase::const_element_iterator & range_begin,
+                       const MeshBase::const_element_iterator & range_end,
+                       std::set<const Node *> & connected_nodes,
+                       std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
   // Using the connected_nodes set rather than point_neighbors() gives
   // us correct results even in corner cases, such as where two
@@ -227,10 +226,9 @@ void connect_elements
     }
 }
 
-void connect_elements_on_nodes
-  (const MeshBase & mesh,
-   const std::set<const Node *> & connected_nodes,
-   std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+void connect_elements_on_nodes (const MeshBase & mesh,
+                                const std::set<const Node *> & connected_nodes,
+                                std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
   MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
   const MeshBase::const_element_iterator elem_end = mesh.active_elements_end();
@@ -246,8 +244,7 @@ void connect_elements_on_nodes
     }
 }
 
-void connect_families
-  (std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+void connect_families (std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
   // Because our set is sorted by ascending level, we can traverse it
   // in reverse order, adding parents as we go, and end up with all
@@ -310,9 +307,8 @@ void connect_families
 }
 
 
-void reconnect_nodes
-  (const std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
-   std::set<const Node *> & connected_nodes)
+void reconnect_nodes (const std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
+                      std::set<const Node *> & connected_nodes)
 {
   // We're done using the nodes list for element decisions; now
   // let's reuse it for nodes of the elements we've decided on.

@@ -335,7 +335,7 @@ std::set<const Elem *> PointLocatorTree::perform_fuzzy_linear_search(const Point
     {
       if ((!allowed_subdomains || allowed_subdomains->count((*pos)->subdomain_id())) &&
           (*pos)->close_to_point(p, close_to_point_tolerance))
-          candidate_elements.insert(*pos);
+        candidate_elements.insert(*pos);
     }
 
   return candidate_elements;

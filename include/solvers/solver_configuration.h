@@ -72,9 +72,9 @@ public:
    * recover from a failure.
    */
   virtual void respond_to_solve_failure(unsigned int /*solve_failure_count*/)
-    {
-      libmesh_error_msg("Solver error"); // by default just throw an error
-    }
+  {
+    libmesh_error_msg("Solver error"); // by default just throw an error
+  }
 
   /**
    * Store real-valued solver parameters in this map, e.g. solver tolerances.

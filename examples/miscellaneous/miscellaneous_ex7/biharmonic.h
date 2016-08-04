@@ -111,9 +111,6 @@ private:
   friend class JR;
   class JR;       // forward
   ReplicatedMesh & _mesh;
-// #ifdef LIBMESH_ENABLE_AMR
-//   MeshRefinement * _meshRefinement;
-// #endif
   JR * _jr;
 };
 

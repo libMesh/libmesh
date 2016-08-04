@@ -160,7 +160,7 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
       // First, sample the parametrized function at x_{N+1}
       Number g_at_next_x = evaluate_parametrized_function(interpolation_points_var[N],
                                                           interpolation_points[N],
-                                                         *interpolation_points_elem[N]);
+                                                          *interpolation_points_elem[N]);
 
       // Next, evaluate the EIM approximation at x_{N+1}
       Number EIM_approx_at_next_x = 0.;

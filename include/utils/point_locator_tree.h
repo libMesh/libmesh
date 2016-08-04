@@ -129,10 +129,10 @@ public:
                                      Real close_to_point_tolerance=TOLERANCE) const;
 
   /**
-  * A method to check if "fat" point p is in multiple elements. This would happen
-  * if p is close to a face or node. This is important for evaluating MeshFunction
-  * on faces when discontinuous shape functions are used.
-  */
+   * A method to check if "fat" point p is in multiple elements. This would happen
+   * if p is close to a face or node. This is important for evaluating MeshFunction
+   * on faces when discontinuous shape functions are used.
+   */
   std::set<const Elem *> perform_fuzzy_linear_search(const Point & p,
                                                      const std::set<subdomain_id_type> * allowed_subdomains,
                                                      Real close_to_point_tolerance=TOLERANCE) const;
