@@ -161,7 +161,7 @@ public:
 
     // One More Check that we can manually index dofs of variables based on the first dof in a variable group
     // Using: id = base + var_in_vg*ncomp + comp
-    CPPUNIT_ASSERT_EQUAL(aobject.vg_dof_base(1, 1) + 0*3 + 1, aobject.dof_number(1, 2, 1));
+    CPPUNIT_ASSERT_EQUAL(aobject.vg_dof_base(1, 1) + 0*3 + 0, aobject.dof_number(1, 2, 0));
   }
 
   void testJensEftangBug()
