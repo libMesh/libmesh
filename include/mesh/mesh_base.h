@@ -1224,6 +1224,13 @@ protected:
   unsigned char _spatial_dimension;
 
   /**
+   * The default geometric GhostingFunctor, used to implement standard
+   * libMesh element ghosting behavior.  We use a base class pointer
+   * here to avoid dragging in more header dependencies.
+   */
+  UniquePtr<GhostingFunctor> _default_ghosting;
+
+  /**
    * The list of all GhostingFunctor objects to be used when
    * distributing a DistributedMesh.
    *
