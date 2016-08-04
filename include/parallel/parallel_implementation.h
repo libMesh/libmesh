@@ -464,10 +464,10 @@ inline Iter pack_range (const Context * context,
                         Iter range_begin,
                         const Iter range_end,
                         std::vector<buffertype> & buffer,
-  // When we serialize into buffers, we need to use large buffers to optimize MPI
-  // bandwidth, but not so large as to risk allocation failures.  max_buffer_size
-  // is measured in number of buffer type entries; number of bytes may be 4 or 8
-  // times larger depending on configuration.
+                        // When we serialize into buffers, we need to use large buffers to optimize MPI
+                        // bandwidth, but not so large as to risk allocation failures.  max_buffer_size
+                        // is measured in number of buffer type entries; number of bytes may be 4 or 8
+                        // times larger depending on configuration.
                         std::size_t max_buffer_size)
 {
   typedef typename std::iterator_traits<Iter>::value_type T;

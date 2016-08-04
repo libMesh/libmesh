@@ -2525,8 +2525,7 @@ Elem::side_iterator : variant_filter_iterator<Elem::Predicate, Elem *>
   side_iterator (const IterType & d,
                  const IterType & e,
                  const PredType & p ) :
-    variant_filter_iterator<Elem::Predicate,
-                            Elem *>(d,e,p) {}
+    variant_filter_iterator<Elem::Predicate, Elem *>(d,e,p) {}
 };
 
 

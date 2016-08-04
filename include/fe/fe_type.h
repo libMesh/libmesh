@@ -129,7 +129,7 @@ inline bool operator>=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return
 OrderWrapperOperators(int)
 OrderWrapperOperators(unsigned int)
 #if LIBMESH_SIZEOF_SIZE_T != LIBMESH_SIZEOF_UNSIGNED_INT
-  OrderWrapperOperators(std::size_t)
+OrderWrapperOperators(std::size_t)
 #endif
 
 // Now disambiguate all the things
