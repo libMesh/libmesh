@@ -445,12 +445,12 @@ void MeshCommunication::redistribute (DistributedMesh & mesh) const
         connect_elements_on_nodes(mesh, connected_nodes,
                                   elements_to_send);
 
+        // See which to-be-ghosted elements we need to send
+        query_ghosting_functors(mesh, pid, elements_to_send);
+
         // The elements we need should have their ancestors and their
         // subactive children present too.
         connect_families(elements_to_send);
-
-        // See which to-be-ghosted elements we need to send
-        query_ghosting_functors(mesh, pid, elements_to_send);
 
         reconnect_nodes(elements_to_send, connected_nodes);
 
@@ -1455,16 +1455,16 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
       elements_to_keep.insert(elem);
     }
 
-  // The elements we need should have their ancestors and their
-  // subactive children present too.
-  connect_families(elements_to_keep);
-
   // See which elements we still need to keep ghosted, given that
   // we're keeping local and unpartitioned elements.
   query_ghosting_functors(mesh, mesh.processor_id(),
                           elements_to_keep);
   query_ghosting_functors(mesh, DofObject::invalid_processor_id,
                           elements_to_keep);
+
+  // The elements we need should have their ancestors and their
+  // subactive children present too.
+  connect_families(elements_to_keep);
 
   // Don't delete nodes that our semilocal elements need
   reconnect_nodes(elements_to_keep, connected_nodes);
