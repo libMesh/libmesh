@@ -13,6 +13,7 @@
   CPPUNIT_TEST( testInvalidateProcId );         \
   CPPUNIT_TEST( testSetNSystems );              \
   CPPUNIT_TEST( testSetNVariableGroups );       \
+  CPPUNIT_TEST( testManualDofCalculation );     \
   CPPUNIT_TEST( testJensEftangBug );
 
 using namespace libMesh;
@@ -119,6 +120,48 @@ public:
         for (unsigned int vg=0; vg<3; vg++)
           CPPUNIT_ASSERT_EQUAL( nvpg[vg], aobject.n_vars(s,vg) );
       }
+  }
+
+  void testManualDofCalculation()
+  {
+    DofObject aobject(*instance);
+
+    aobject.set_n_systems (2);
+
+    std::vector<unsigned int> nvpg;
+
+    nvpg.push_back(2);
+    nvpg.push_back(3);
+
+    aobject.set_n_vars_per_group (0, nvpg);
+    aobject.set_n_vars_per_group (1, nvpg);
+
+    aobject.set_n_comp_group (0, 0, 1);
+    aobject.set_n_comp_group (0, 1, 3);
+
+    aobject.set_n_comp_group (1, 0, 2);
+    aobject.set_n_comp_group (1, 1, 1);
+
+    aobject.set_vg_dof_base(0, 0, 0);
+    aobject.set_vg_dof_base(0, 1, 120);
+
+    aobject.set_vg_dof_base(1, 0, 20);
+    aobject.set_vg_dof_base(1, 1, 220);
+
+    // Make sure the first dof is sane
+    CPPUNIT_ASSERT_EQUAL((dof_id_type)0, aobject.dof_number(0, 0, 0));
+
+    // Check that we can manually index dofs of variables based on the first dof in a variable group
+    // Using: id = base + var_in_vg*ncomp + comp
+    CPPUNIT_ASSERT_EQUAL(aobject.vg_dof_base(0, 0) + 1*1 + 0, aobject.dof_number(0, 1, 0));
+
+    // Another Check that we can manually index dofs of variables based on the first dof in a variable group
+    // Using: id = base + var_in_vg*ncomp + comp
+    CPPUNIT_ASSERT_EQUAL(aobject.vg_dof_base(0, 1) + 2*3 + 2, aobject.dof_number(0, 4, 2));
+
+    // One More Check that we can manually index dofs of variables based on the first dof in a variable group
+    // Using: id = base + var_in_vg*ncomp + comp
+    CPPUNIT_ASSERT_EQUAL(aobject.vg_dof_base(1, 1) + 0*3 + 1, aobject.dof_number(1, 2, 1));
   }
 
   void testJensEftangBug()
