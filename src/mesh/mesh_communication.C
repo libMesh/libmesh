@@ -1392,6 +1392,17 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
         mesh.delete_node(node);
     }
 
+  // We now have all remote elements and nodes deleted; our ghosting
+  // functors should be ready to delete any now-redundant cached data
+  // they use too.
+  std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
+  const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
+  for (; gf_it != gf_end; ++gf_it)
+    {
+      GhostingFunctor *gf = *gf_it;
+      gf->delete_remote_elements();
+    }
+
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_refinement_tree(mesh);
 #endif
