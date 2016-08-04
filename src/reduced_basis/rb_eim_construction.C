@@ -456,14 +456,14 @@ void RBEIMConstruction::enrich_RB_space()
       for (unsigned int var=0; var<get_explicit_system().n_vars(); var++)
         {
           get_explicit_sys_subvector(*implicit_sys_temp1,
-                                      var,
-                                      *localized_new_bf);
+                                     var,
+                                     *localized_new_bf);
 
           inner_product_matrix->vector_mult(*implicit_sys_temp2, *implicit_sys_temp1);
 
           set_explicit_sys_subvector(*matrix_times_new_bf,
-                                      var,
-                                      *implicit_sys_temp2);
+                                     var,
+                                     *implicit_sys_temp2);
         }
 
       _matrix_times_bfs.push_back(matrix_times_new_bf);

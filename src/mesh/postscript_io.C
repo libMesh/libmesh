@@ -273,9 +273,8 @@ void PostscriptIO::_compute_edge_bezier_coeffs(const Elem * elem)
 
   // Get x-coordinates into an array, transform them,
   // and repeat for y.
-  float
-    phys_coords[3] = {0., 0., 0.},
-    bez_coords[3]  = {0., 0., 0.};
+  float phys_coords[3] = {0., 0., 0.};
+  float bez_coords[3]  = {0., 0., 0.};
 
   for (unsigned int i=0; i<2; ++i)
     {

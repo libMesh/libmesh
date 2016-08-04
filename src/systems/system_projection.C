@@ -1160,8 +1160,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
       context.pre_fe_reinit(system, elem);
 
-// If we're doing AMR, this might be a grid projection with a cheap
-// early exit.
+      // If we're doing AMR, this might be a grid projection with a cheap
+      // early exit.
 #ifdef LIBMESH_ENABLE_AMR
       // If this element doesn't have an old_dof_object, but it
       // wasn't just refined or just coarsened into activity, then
@@ -1674,9 +1674,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               if (cont == C_ONE)
 #ifdef LIBMESH_ENABLE_AMR
                 dphi = (elem->refinement_flag() != Elem::JUST_COARSENED) ?
-                &(fe->get_dphi()) :
+                  &(fe->get_dphi()) :
 #endif // LIBMESH_ENABLE_AMR
-                &(side_fe->get_dphi());
+                  &(side_fe->get_dphi());
 
               for (unsigned char s=0; s != elem->n_sides(); ++s)
                 {

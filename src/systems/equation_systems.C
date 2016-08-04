@@ -930,7 +930,7 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
         for (unsigned int var=0; var < nv_sys; ++var)
           {
             if (system.variable_type(var) != type ||
-                 (is_filter_names && std::find(filter_names.begin(), filter_names.end(), system.variable_name(var)) == filter_names.end()))
+                (is_filter_names && std::find(filter_names.begin(), filter_names.end(), system.variable_name(var)) == filter_names.end()))
               continue;
 
             // Otherwise, this variable should be output
