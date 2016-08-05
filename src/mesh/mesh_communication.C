@@ -19,10 +19,12 @@
 
 // C++ Includes   -----------------------------------
 #include <numeric>
+#include <set>
 
 // Local Includes -----------------------------------
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
+#include "libmesh/ghosting_functor.h"
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh_logging.h"
@@ -144,107 +146,40 @@ struct SyncNeighbors
 };
 
 
-void connect_elements (const MeshBase & mesh,
-                       const MeshBase::const_element_iterator & range_begin,
-                       const MeshBase::const_element_iterator & range_end,
-                       std::set<const Node *> & connected_nodes,
-                       std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+void query_ghosting_functors
+  (MeshBase & mesh,
+   processor_id_type pid,
+   std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
-  // Using the connected_nodes set rather than point_neighbors() gives
-  // us correct results even in corner cases, such as where two
-  // elements meet only at a corner.  ;-)
+  MeshBase::const_element_iterator       elem_it  = mesh.active_pid_elements_begin(pid);
+  const MeshBase::const_element_iterator elem_end = mesh.active_pid_elements_end(pid);
 
-  // Links between boundary and interior elements on mixed
-  // dimensional meshes also give us correct ghosting in this way.
-  std::set<const Elem *> interior_parents;
-
-  // We also preserve neighbors and their neighboring children for
-  // active local elements - in most cases this is redundant with the
-  // node check, but for non-conforming Tet4 meshes and
-  // non-level-one-conforming 2D+3D meshes it is possible for an
-  // element and its coarse neighbor to not share any vertices.
-  //
-  // We also preserve interior parents for active pid elements
-
-  for (MeshBase::const_element_iterator elem_it = range_begin;
-       elem_it!=range_end; ++elem_it)
+  std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
+  const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
+  for (; gf_it != gf_end; ++gf_it)
     {
-      const Elem * elem = *elem_it;
+      GhostingFunctor::map_type elements_to_ghost;
 
-      connected_elements.insert (elem);
+      GhostingFunctor *gf = *gf_it;
+      libmesh_assert(gf);
+      (*gf)(elem_it, elem_end, pid, elements_to_ghost);
 
-      for (unsigned int s=0; s != elem->n_sides(); ++s)
-        {
-          const Elem * neigh = elem->neighbor_ptr(s);
-          if (neigh && neigh != remote_elem)
-            {
-#ifdef LIBMESH_ENABLE_AMR
-              if (!neigh->active())
-                {
-                  std::vector<const Elem*> family;
-                  neigh->active_family_tree_by_neighbor(family, elem);
-
-                  for (dof_id_type i=0; i!=family.size(); ++i)
-                    connected_elements.insert(family[i]);
-                }
-              else
-#endif
-                connected_elements.insert(neigh);
-            }
-        }
-
-      // It is possible that a refined boundary element will not
-      // touch any nodes of its interior_parent, in TRI3/TET4 and in
-      // non-level-one rule cases.  So we can't just rely on node
-      // connections to preserve interior_parent().  However, trying
-      // to preserve interior_parent() manually only works if it's on
-      // the same Mesh, which is *not* guaranteed!  So we'll
-      // double-check later to make sure our interior parents are in
-      // the mesh before we connect them.
-      if (elem->dim() < LIBMESH_DIM && elem->interior_parent())
-        interior_parents.insert (elem->interior_parent());
-
-      // Add nodes connected to active local elements
-      for (unsigned int n=0; n<elem->n_nodes(); n++)
-        connected_nodes.insert (elem->node_ptr(n));
+      // We can ignore the CouplingMatrix in ->second, but we
+      // need to ghost all the elements in ->first.
+      GhostingFunctor::map_type::iterator        etg_it = elements_to_ghost.begin();
+      const GhostingFunctor::map_type::iterator etg_end = elements_to_ghost.end();
+      for (; etg_it != etg_end; ++etg_it)
+        connected_elements.insert(etg_it->first);
     }
 
-  // Connect any interior_parents who are really in our mesh
-  MeshBase::const_element_iterator       elem_it  = mesh.elements_begin();
-  const MeshBase::const_element_iterator elem_end = mesh.elements_end();
+  // The GhostingFunctors won't be telling us about the elements from
+  // pid; we need to add those ourselves.
   for (; elem_it != elem_end; ++elem_it)
-    {
-      const Elem * elem = *elem_it;
-      std::set<const Elem *>::iterator ip_it =
-        interior_parents.find(elem);
-
-      if (ip_it != interior_parents.end())
-        {
-          connected_elements.insert(elem);
-          interior_parents.erase(ip_it);
-        }
-    }
+    connected_elements.insert(*elem_it);
 }
 
-void connect_elements_on_nodes (const MeshBase & mesh,
-                                const std::set<const Node *> & connected_nodes,
-                                std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
-{
-  MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator elem_end = mesh.active_elements_end();
-
-  for (; elem_it!=elem_end; ++elem_it)
-    {
-      const Elem * elem = *elem_it;
-
-      // Add elements connected to nodes on active local elements
-      for (unsigned int n=0; n<elem->n_nodes(); n++)
-        if (connected_nodes.count(elem->node_ptr(n)))
-          connected_elements.insert (elem);
-    }
-}
-
-void connect_families (std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+void connect_families
+  (std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
   // Because our set is sorted by ascending level, we can traverse it
   // in reverse order, adding parents as we go, and end up with all
@@ -404,21 +339,16 @@ void MeshCommunication::redistribute (DistributedMesh & mesh) const
         // to be ghosted and any nodes which are used by any of the
         // above.
 
-        std::set<const Node *> connected_nodes;
         std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
 
-        connect_elements(mesh,
-                         mesh.active_pid_elements_begin(pid),
-                         mesh.active_pid_elements_end(pid),
-                         connected_nodes, elements_to_send);
-
-        connect_elements_on_nodes(mesh, connected_nodes,
-                                  elements_to_send);
+        // See which to-be-ghosted elements we need to send
+        query_ghosting_functors(mesh, pid, elements_to_send);
 
         // The elements we need should have their ancestors and their
         // subactive children present too.
         connect_families(elements_to_send);
 
+        std::set<const Node *> connected_nodes;
         reconnect_nodes(elements_to_send, connected_nodes);
 
         // the number of nodes we will ship to pid
@@ -531,6 +461,18 @@ void MeshCommunication::redistribute (DistributedMesh & mesh) const
 
   MeshTools::libmesh_assert_valid_refinement_tree(mesh);
 #endif
+
+  // We now have all elements and nodes redistributed; our ghosting
+  // functors should be ready to redistribute and/or recompute any
+  // cached data they use too.
+  std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
+  const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
+  for (; gf_it != gf_end; ++gf_it)
+    {
+      GhostingFunctor *gf = *gf_it;
+      gf->redistribute();
+    }
+
 }
 #endif // LIBMESH_HAVE_MPI
 
@@ -1383,24 +1325,7 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   libmesh_assert_equal_to (par_max_elem_id, mesh.max_elem_id());
 #endif
 
-  std::set<const Node *> connected_nodes;
   std::set<const Elem *, CompareElemIdsByLevel> elements_to_keep;
-
-  // We don't want to delete any element that shares a node
-  // with or is an ancestor of an active local or unpartitioned
-  // element.
-
-  connect_elements(mesh,
-                   mesh.active_local_elements_begin(),
-                   mesh.active_local_elements_end(),
-                   connected_nodes, elements_to_keep);
-
-  connect_elements(mesh,
-                   mesh.active_unpartitioned_elements_begin(),
-                   mesh.active_unpartitioned_elements_end(),
-                   connected_nodes, elements_to_keep);
-
-  connect_elements_on_nodes(mesh, connected_nodes, elements_to_keep);
 
   // Don't delete elements that we were explicitly told not to
   for(std::set<Elem *>::iterator it = extra_ghost_elem_ids.begin();
@@ -1410,11 +1335,19 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
       elements_to_keep.insert(elem);
     }
 
+  // See which elements we still need to keep ghosted, given that
+  // we're keeping local and unpartitioned elements.
+  query_ghosting_functors(mesh, mesh.processor_id(),
+                          elements_to_keep);
+  query_ghosting_functors(mesh, DofObject::invalid_processor_id,
+                          elements_to_keep);
+
   // The elements we need should have their ancestors and their
   // subactive children present too.
   connect_families(elements_to_keep);
 
   // Don't delete nodes that our semilocal elements need
+  std::set<const Node *> connected_nodes;
   reconnect_nodes(elements_to_keep, connected_nodes);
 
   // Delete all the elements we have no reason to save,
@@ -1457,6 +1390,17 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
       libmesh_assert(node);
       if (!connected_nodes.count(node))
         mesh.delete_node(node);
+    }
+
+  // We now have all remote elements and nodes deleted; our ghosting
+  // functors should be ready to delete any now-redundant cached data
+  // they use too.
+  std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
+  const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
+  for (; gf_it != gf_end; ++gf_it)
+    {
+      GhostingFunctor *gf = *gf_it;
+      gf->delete_remote_elements();
     }
 
 #ifdef DEBUG

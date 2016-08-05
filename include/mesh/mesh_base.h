@@ -43,6 +43,7 @@ namespace libMesh
 
 // forward declarations
 class Elem;
+class GhostingFunctor;
 class Node;
 class Point;
 class MeshData;
@@ -694,6 +695,37 @@ public:
   bool skip_partitioning() const { return _skip_partitioning; }
 
   /**
+   * Adds a functor which can specify ghosting requirements for use on
+   * distributed meshes.  Multiple ghosting functors can be added; any
+   * element which is required by any functor will be ghosted.
+   *
+   * GhostingFunctor memory must be managed by the code which calls
+   * this function; the GhostingFunctor lifetime is expected to extend
+   * until either the functor is removed or the Mesh is destructed.
+   */
+  void add_ghosting_functor(GhostingFunctor *ghosting_functor)
+  { _ghosting_functors.insert(ghosting_functor); }
+
+  /**
+   * Removes a functor which was previously added to the set of
+   * ghosting functors.
+   */
+  void remove_ghosting_functor(GhostingFunctor *ghosting_functor)
+  { _ghosting_functors.erase(ghosting_functor); }
+
+  /**
+   * Beginning of range of ghosting functors
+   */
+  std::set<GhostingFunctor *>::iterator ghosting_functors_begin()
+  { return _ghosting_functors.begin(); }
+
+  /**
+   * End of range of ghosting functors
+   */
+  std::set<GhostingFunctor *>::iterator ghosting_functors_end()
+  { return _ghosting_functors.end(); }
+
+  /**
    * Constructs a list of all subdomain identifiers in the global mesh.
    * Subdomains correspond to separate subsets of the mesh which could correspond
    * e.g. to different materials in a solid mechanics application,
@@ -1190,6 +1222,22 @@ protected:
    * Mesh::spatial_dimension() for more information.
    */
   unsigned char _spatial_dimension;
+
+  /**
+   * The default geometric GhostingFunctor, used to implement standard
+   * libMesh element ghosting behavior.  We use a base class pointer
+   * here to avoid dragging in more header dependencies.
+   */
+  UniquePtr<GhostingFunctor> _default_ghosting;
+
+  /**
+   * The list of all GhostingFunctor objects to be used when
+   * distributing a DistributedMesh.
+   *
+   * Basically unused by ReplicatedMesh for now, but belongs to
+   * MeshBase because the cost is trivial.
+   */
+  std::set<GhostingFunctor *> _ghosting_functors;
 
   /**
    * The partitioner class is a friend so that it can set

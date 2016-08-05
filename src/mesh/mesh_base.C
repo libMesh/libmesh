@@ -29,6 +29,7 @@
 // Local includes
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
+#include "libmesh/ghost_point_neighbors.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_tools.h"
@@ -59,9 +60,11 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
 #endif
   _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
-  _spatial_dimension(d)
+  _spatial_dimension(d),
+  _default_ghosting(new GhostPointNeighbors(*this))
 {
   _elem_dims.insert(d);
+  _ghosting_functors.insert(_default_ghosting.get());
   libmesh_assert_less_equal (LIBMESH_DIM, 3);
   libmesh_assert_greater_equal (LIBMESH_DIM, d);
   libmesh_assert (libMesh::initialized());
@@ -81,9 +84,11 @@ MeshBase::MeshBase (unsigned char d) :
 #endif
   _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
-  _spatial_dimension(d)
+  _spatial_dimension(d),
+  _default_ghosting(new GhostPointNeighbors(*this))
 {
   _elem_dims.insert(d);
+  _ghosting_functors.insert(_default_ghosting.get());
   libmesh_assert_less_equal (LIBMESH_DIM, 3);
   libmesh_assert_greater_equal (LIBMESH_DIM, d);
   libmesh_assert (libMesh::initialized());
@@ -105,8 +110,19 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
   _elem_dims(other_mesh._elem_dims),
-  _spatial_dimension(other_mesh._spatial_dimension)
+  _spatial_dimension(other_mesh._spatial_dimension),
+  _default_ghosting(new GhostPointNeighbors(*this)),
+  _ghosting_functors(other_mesh._ghosting_functors)
 {
+  // Make sure we don't accidentally delete the other mesh's default
+  // ghosting functor; we'll use our own if that's needed.
+  if (other_mesh._ghosting_functors.count
+        (other_mesh._default_ghosting.get()))
+    {
+      _ghosting_functors.erase(other_mesh._default_ghosting.get());
+      _ghosting_functors.insert(_default_ghosting.get());
+    }
+
   if(other_mesh._partitioner.get())
     {
       _partitioner = other_mesh._partitioner->clone();
