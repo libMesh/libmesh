@@ -53,6 +53,7 @@ class DofMap;
 class DofObject;
 class Elem;
 class FEType;
+class GhostingFunctor;
 class MeshBase;
 class PeriodicBoundaryBase;
 class PeriodicBoundaries;
@@ -243,6 +244,78 @@ public:
    * Clears the sparsity pattern
    */
   void clear_sparsity();
+
+  /**
+   * Adds a functor which can specify coupling requirements for
+   * creation of sparse matrices.
+   * Degree of freedom pairs which match the elements and variables
+   * returned by these functors will be added to the sparsity pattern,
+   * and the degrees of freedom which live on other processors will be
+   * added to the send_list for use on ghosted vectors, and the
+   * elements which live on other processors will be ghosted on a
+   * distributed mesh.
+   *
+   * GhostingFunctor memory must be managed by the code which calls
+   * this function; the GhostingFunctor lifetime is expected to extend
+   * until either the functor is removed or the DofMap is destructed.
+   */
+  void add_coupling_functor(GhostingFunctor *ghosting_functor)
+  { _coupling_functors.insert(ghosting_functor); }
+
+  /**
+   * Removes a functor which was previously added to the set of
+   * coupling functors.
+   */
+  void remove_coupling_functor(GhostingFunctor *ghosting_functor)
+  { _coupling_functors.erase(ghosting_functor); }
+
+
+  /**
+   * Beginning of range of coupling functors
+   */
+  std::set<GhostingFunctor *>::iterator coupling_functors_begin()
+  { return _coupling_functors.begin(); }
+
+  /**
+   * End of range of coupling functors
+   */
+  std::set<GhostingFunctor *>::iterator coupling_functors_end()
+  { return _coupling_functors.end(); }
+
+
+  /**
+   * Adds a functor which can specify algebraic ghosting requirements
+   * for use with distributed vectors.  Degrees of freedom on other
+   * processors which match the elements and variables returned by
+   * these functors will be added to the send_list, and the elements
+   * on other processors will be ghosted on a distributed mesh.
+   *
+   * GhostingFunctor memory must be managed by the code which calls
+   * this function; the GhostingFunctor lifetime is expected to extend
+   * until either the functor is removed or the DofMap is destructed.
+   */
+  void add_algebraic_ghosting_functor(GhostingFunctor *ghosting_functor)
+  { _algebraic_ghosting_functors.insert(ghosting_functor); }
+
+  /**
+   * Removes a functor which was previously added to the set of
+   * algebraic ghosting functors.
+   */
+  void remove_algebraic_ghosting_functor(GhostingFunctor *ghosting_functor)
+  { _algebraic_ghosting_functors.erase(ghosting_functor); }
+
+  /**
+   * Beginning of range of algebraic ghosting functors
+   */
+  std::set<GhostingFunctor *>::iterator algebraic_ghosting_functors_begin()
+  { return _algebraic_ghosting_functors.begin(); }
+
+  /**
+   * End of range of algebraic ghosting functors
+   */
+  std::set<GhostingFunctor *>::iterator algebraic_ghosting_functors_end()
+  { return _algebraic_ghosting_functors.end(); }
+
 
   /**
    * Attach an object to use to populate the
@@ -1316,6 +1389,36 @@ private:
    * A pointer associcated with the extra send list that can optionally be passed in
    */
   void * _extra_send_list_context;
+
+  /**
+   * The default coupling GhostingFunctor, used to implement standard
+   * libMesh sparsity pattern construction.  We use a base class
+   * pointer here to avoid dragging in more header dependencies.
+   */
+  UniquePtr<GhostingFunctor> _default_coupling;
+
+  /**
+   * The list of all GhostingFunctor objects to be used when
+   * distributing ghosted vectors.
+   *
+   * The library should automatically copy these functors to the
+   * MeshBase, too, so any algebraically ghosted dofs will live on
+   * geometrically ghosted elements.
+   */
+  std::set<GhostingFunctor *> _algebraic_ghosting_functors;
+
+  /**
+   * The list of all GhostingFunctor objects to be used when
+   * coupling degrees of freedom in matrix sparsity patterns.
+   *
+   * These objects will *also* be used as algebraic ghosting functors,
+   * but not vice-versa.
+   *
+   * The library should automatically copy these functors to the
+   * MeshBase, too, so any dofs coupled to local dofs will live on
+   * geometrically ghosted elements.
+   */
+  std::set<GhostingFunctor *> _coupling_functors;
 
   /**
    * Default false; set to true if any attached matrix requires a full

@@ -32,6 +32,7 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_base.h" // FEBase::build() for continuity test
+#include "libmesh/ghosting_functor.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_tools.h"
