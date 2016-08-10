@@ -299,64 +299,10 @@ void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T> & V_
 template <typename T>
 void PetscVector<T>::add (const T v_in)
 {
-  this->_restore_array();
+  this->_get_array(false);
 
-  PetscErrorCode ierr=0;
-  PetscScalar * values;
-  const PetscScalar v = static_cast<PetscScalar>(v_in);
-
-  if(this->type() != GHOSTED)
-    {
-      const PetscInt n   = static_cast<PetscInt>(this->local_size());
-      const PetscInt fli = static_cast<PetscInt>(this->first_local_index());
-
-      for (PetscInt i=0; i<n; i++)
-        {
-          ierr = VecGetArray (_vec, &values);
-          LIBMESH_CHKERR(ierr);
-
-          PetscInt ig = fli + i;
-
-          PetscScalar value = (values[i] + v);
-
-          ierr = VecRestoreArray (_vec, &values);
-          LIBMESH_CHKERR(ierr);
-
-          ierr = VecSetValues (_vec, 1, &ig, &value, INSERT_VALUES);
-          LIBMESH_CHKERR(ierr);
-        }
-    }
-  else
-    {
-      /* Vectors that include ghost values require a special
-         handling.  */
-      Vec loc_vec;
-      ierr = VecGhostGetLocalForm (_vec,&loc_vec);
-      LIBMESH_CHKERR(ierr);
-
-      PetscInt n=0;
-      ierr = VecGetSize(loc_vec, &n);
-      LIBMESH_CHKERR(ierr);
-
-      for (PetscInt i=0; i<n; i++)
-        {
-          ierr = VecGetArray (loc_vec, &values);
-          LIBMESH_CHKERR(ierr);
-
-          PetscScalar value = (values[i] + v);
-
-          ierr = VecRestoreArray (loc_vec, &values);
-          LIBMESH_CHKERR(ierr);
-
-          ierr = VecSetValues (loc_vec, 1, &i, &value, INSERT_VALUES);
-          LIBMESH_CHKERR(ierr);
-        }
-
-      ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
-      LIBMESH_CHKERR(ierr);
-    }
-
-  this->_is_closed = false;
+  for (numeric_index_type i=0; i<_local_size; i++)
+    _values[i] += v_in;
 }
 
 
@@ -655,12 +601,7 @@ template <typename T>
 NumericVector<T> &
 PetscVector<T>::operator = (const std::vector<T> & v)
 {
-  this->_restore_array();
-
-  const numeric_index_type nl   = this->local_size();
-  const numeric_index_type ioff = this->first_local_index();
-  PetscErrorCode ierr=0;
-  PetscScalar * values;
+  this->_get_array(false);
 
   /**
    * Case 1:  The vector is the same size of
@@ -668,14 +609,8 @@ PetscVector<T>::operator = (const std::vector<T> & v)
    */
   if (this->size() == v.size())
     {
-      ierr = VecGetArray (_vec, &values);
-      LIBMESH_CHKERR(ierr);
-
-      for (numeric_index_type i=0; i<nl; i++)
-        values[i] =  static_cast<PetscScalar>(v[i+ioff]);
-
-      ierr = VecRestoreArray (_vec, &values);
-      LIBMESH_CHKERR(ierr);
+      for (numeric_index_type i=0; i<_local_size; i++)
+        _values[i] =  static_cast<PetscScalar>(v[_first + i]);
     }
 
   /**
@@ -684,16 +619,8 @@ PetscVector<T>::operator = (const std::vector<T> & v)
    */
   else
     {
-      libmesh_assert_equal_to (this->local_size(), v.size());
-
-      ierr = VecGetArray (_vec, &values);
-      LIBMESH_CHKERR(ierr);
-
-      for (numeric_index_type i=0; i<nl; i++)
-        values[i] = static_cast<PetscScalar>(v[i]);
-
-      ierr = VecRestoreArray (_vec, &values);
-      LIBMESH_CHKERR(ierr);
+      for (numeric_index_type i=0; i<_local_size; i++)
+        _values[i] = static_cast<PetscScalar>(v[i]);
     }
 
   // Make sure ghost dofs are up to date
@@ -1395,7 +1322,7 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
 
 
 template <typename T>
-void PetscVector<T>::_get_array() const
+void PetscVector<T>::_get_array(bool read_only) const
 {
   libmesh_assert (this->initialized());
 
@@ -1404,6 +1331,18 @@ void PetscVector<T>::_get_array() const
 #else
   Threads::spin_mutex::scoped_lock lock(_petsc_vector_mutex);
 #endif
+
+  // If the values have already been retrieved and we're currently
+  // trying to get a non-read only view (ie read/write) and the
+  // values are currently read only... then we need to restore
+  // the array first... and then retrieve it again.
+  if (_array_is_present && !read_only && _values_read_only)
+    _restore_array();
+
+  // If we already have a read/write array - and we're trying
+  // to get a read only array - let's just use the read write
+  if (_array_is_present && read_only && !_values_read_only)
+    _read_only_values = _values;
 
   if (!_array_is_present)
     {
@@ -1420,10 +1359,21 @@ void PetscVector<T>::_get_array() const
               // have an older PETSc than that, we'll do an ugly
               // const_cast and call VecGetArray() instead.
               ierr = VecGetArray(_vec, const_cast<PetscScalar **>(&_values));
+              _values_read_only = false;
 #else
-              ierr = VecGetArrayRead(_vec, &_values);
+              if (read_only)
+              {
+                ierr = VecGetArrayRead(_vec, &_read_only_values);
+                _values_read_only = true;
+              }
+              else
+              {
+                ierr = VecGetArray(_vec, &_values);
+                _values_read_only = false;
+              }
 #endif
               LIBMESH_CHKERR(ierr);
+              _local_size = this->local_size();
             }
           else
             {
@@ -1435,16 +1385,25 @@ void PetscVector<T>::_get_array() const
               // have an older PETSc than that, we'll do an ugly
               // const_cast and call VecGetArray() instead.
               ierr = VecGetArray(_local_form, const_cast<PetscScalar **>(&_values));
+              _values_read_only = false;
 #else
-              ierr = VecGetArrayRead(_local_form, &_values);
+              if (read_only)
+              {
+                ierr = VecGetArrayRead(_local_form, &_read_only_values);
+                _values_read_only = true;
+              }
+              else
+              {
+                ierr = VecGetArray(_local_form, &_values);
+                _values_read_only = false;
+              }
 #endif
               LIBMESH_CHKERR(ierr);
-#ifndef NDEBUG
+
               PetscInt my_local_size = 0;
               ierr = VecGetLocalSize(_local_form, &my_local_size);
               LIBMESH_CHKERR(ierr);
               _local_size = static_cast<numeric_index_type>(my_local_size);
-#endif
             }
 
           { // cache ownership range
@@ -1469,6 +1428,9 @@ void PetscVector<T>::_get_array() const
 template <typename T>
 void PetscVector<T>::_restore_array() const
 {
+  if (_values_manually_retrieved)
+    libmesh_error_msg("PetscVector values were manually retrieved but are being automatically restored!");
+
 #ifdef LIBMESH_HAVE_CXX11_THREAD
   std::atomic_thread_fence(std::memory_order_acquire);
 #else
@@ -1493,7 +1455,10 @@ void PetscVector<T>::_restore_array() const
               // const_cast and call VecRestoreArray() instead.
               ierr = VecRestoreArray (_vec, const_cast<PetscScalar **>(&_values));
 #else
-              ierr = VecRestoreArrayRead (_vec, &_values);
+              if (_values_read_only)
+                ierr = VecRestoreArrayRead (_vec, &_read_only_values);
+              else
+                ierr = VecRestoreArray (_vec, &_values);
 #endif
 
               LIBMESH_CHKERR(ierr);
@@ -1507,16 +1472,17 @@ void PetscVector<T>::_restore_array() const
               // const_cast and call VecRestoreArray() instead.
               ierr = VecRestoreArray (_local_form, const_cast<PetscScalar **>(&_values));
 #else
-              ierr = VecRestoreArrayRead (_local_form, &_values);
+              if (_values_read_only)
+                ierr = VecRestoreArrayRead (_local_form, &_read_only_values);
+              else
+                ierr = VecRestoreArray (_local_form, &_values);
 #endif
               LIBMESH_CHKERR(ierr);
               _values = libmesh_nullptr;
               ierr = VecGhostRestoreLocalForm (_vec,&_local_form);
               LIBMESH_CHKERR(ierr);
               _local_form = libmesh_nullptr;
-#ifndef NDEBUG
               _local_size = 0;
-#endif
             }
 #ifdef LIBMESH_HAVE_CXX11_THREAD
           std::atomic_thread_fence(std::memory_order_release);

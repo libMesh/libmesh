@@ -294,6 +294,30 @@ public:
                    T * values) const libmesh_override;
 
   /**
+   * Get read/write access to the raw PETSc Vector data array
+   *
+   * Note: This is an extremely advanced interface.
+   * In general you should avoid using it!
+   */
+  PetscScalar * get_array();
+
+  /**
+   * Get read only access to the raw PETSc Vector data array
+   *
+   * Note: This is an extremely advanced interface.
+   * In general you should avoid using it!
+   */
+  const PetscScalar * get_array_read() const;
+
+  /**
+   * Restore the data array.
+   *
+   * MUST be called after get_array() or get_array_read() and before using
+   * any other interface functions on PetscVector.
+   */
+  void restore_array();
+
+  /**
    * Addition operator.
    * Fast equivalent to \p U.add(1, V).
    */
@@ -540,14 +564,10 @@ private:
    */
   mutable numeric_index_type _last;
 
-#ifndef NDEBUG
   /**
-   * Size of the local form, for being used in assertations.  The
-   * contents of this field are only valid if the vector is ghosted
-   * and \p _array_is_present is \p true.
+   * Size of the local values from _get_array()
    */
   mutable numeric_index_type _local_size;
-#endif
 
   /**
    * Petsc vector datatype to hold the local form of a ghosted vector.
@@ -564,7 +584,17 @@ private:
    * const member functions, so _values also needs to be mutable
    * (otherwise it is a "const PetscScalar * const" in that context).
    */
-  mutable const PetscScalar * _values;
+  mutable const PetscScalar * _read_only_values;
+
+  /**
+   * Pointer to the actual Petsc array of the values of the vector.
+   * This pointer is only valid if \p _array_is_present is \p true.
+   * We're using Petsc's VecGetArrayRead() function, which requires a
+   * constant PetscScalar *, but _get_array and _restore_array are
+   * const member functions, so _values also needs to be mutable
+   * (otherwise it is a "const PetscScalar * const" in that context).
+   */
+  mutable PetscScalar * _values;
 
   /**
    * Mutex for _get_array and _restore_array.  This is part of the
@@ -580,8 +610,10 @@ private:
   /**
    * Queries the array (and the local form if the vector is ghosted)
    * from Petsc.
+   *
+   * @param read_only Whether or not a read only copy of the raw data
    */
-  void _get_array() const;
+  void _get_array(bool read_only) const;
 
   /**
    * Restores the array (and the local form if the vector is ghosted)
@@ -605,6 +637,17 @@ private:
    * for the constructor which takes a PETSc Vec object.
    */
   bool _destroy_vec_on_exit;
+
+  /**
+   * Whether or not the data array has been manually retrieved using
+   * get_array() or get_array_read()
+   */
+  mutable bool _values_manually_retrieved;
+
+  /**
+   * Whether or not the data array is for read only access
+   */
+  mutable bool _values_read_only;
 };
 
 
@@ -622,7 +665,9 @@ PetscVector<T>::PetscVector (const Parallel::Communicator & comm_in, const Paral
   _local_form(libmesh_nullptr),
   _values(libmesh_nullptr),
   _global_to_local_map(),
-  _destroy_vec_on_exit(true)
+  _destroy_vec_on_exit(true),
+  _values_manually_retrieved(false),
+  _values_read_only(false)
 {
   this->_type = ptype;
 }
@@ -639,7 +684,9 @@ PetscVector<T>::PetscVector (const Parallel::Communicator & comm_in,
   _local_form(libmesh_nullptr),
   _values(libmesh_nullptr),
   _global_to_local_map(),
-  _destroy_vec_on_exit(true)
+  _destroy_vec_on_exit(true),
+  _values_manually_retrieved(false),
+  _values_read_only(false)
 {
   this->init(n, n, false, ptype);
 }
@@ -657,7 +704,9 @@ PetscVector<T>::PetscVector (const Parallel::Communicator & comm_in,
   _local_form(libmesh_nullptr),
   _values(libmesh_nullptr),
   _global_to_local_map(),
-  _destroy_vec_on_exit(true)
+  _destroy_vec_on_exit(true),
+  _values_manually_retrieved(false),
+  _values_read_only(false)
 {
   this->init(n, n_local, false, ptype);
 }
@@ -676,7 +725,9 @@ PetscVector<T>::PetscVector (const Parallel::Communicator & comm_in,
   _local_form(libmesh_nullptr),
   _values(libmesh_nullptr),
   _global_to_local_map(),
-  _destroy_vec_on_exit(true)
+  _destroy_vec_on_exit(true),
+  _values_manually_retrieved(false),
+  _values_read_only(false)
 {
   this->init(n, n_local, ghost, false, ptype);
 }
@@ -694,7 +745,9 @@ PetscVector<T>::PetscVector (Vec v,
   _local_form(libmesh_nullptr),
   _values(libmesh_nullptr),
   _global_to_local_map(),
-  _destroy_vec_on_exit(false)
+  _destroy_vec_on_exit(false),
+  _values_manually_retrieved(false),
+  _values_read_only(false)
 {
   this->_vec = v;
   this->_is_closed = true;
@@ -1219,7 +1272,7 @@ template <typename T>
 inline
 T PetscVector<T>::operator() (const numeric_index_type i) const
 {
-  this->_get_array();
+  this->_get_array(true);
 
   const numeric_index_type local_index = this->map_global_to_local_index(i);
 
@@ -1230,7 +1283,7 @@ T PetscVector<T>::operator() (const numeric_index_type i) const
     }
 #endif
 
-  return static_cast<T>(_values[local_index]);
+  return static_cast<T>(_read_only_values[local_index]);
 }
 
 
@@ -1240,7 +1293,7 @@ inline
 void PetscVector<T>::get(const std::vector<numeric_index_type> & index,
                          T * values) const
 {
-  this->_get_array();
+  this->_get_array(true);
 
   const std::size_t num = index.size();
 
@@ -1253,11 +1306,41 @@ void PetscVector<T>::get(const std::vector<numeric_index_type> & index,
           libmesh_assert_less (local_index, _local_size);
         }
 #endif
-      values[i] = static_cast<T>(_values[local_index]);
+      values[i] = static_cast<T>(_read_only_values[local_index]);
     }
 }
 
 
+template <typename T>
+inline
+PetscScalar * PetscVector<T>::get_array()
+{
+  _values_manually_retrieved = true;
+  _get_array(false);
+
+  return _values;
+}
+
+
+template <typename T>
+inline
+const PetscScalar * PetscVector<T>::get_array_read() const
+{
+  _values_manually_retrieved = true;
+  _get_array(true);
+
+  return _read_only_values;
+}
+
+template <typename T>
+inline
+void PetscVector<T>::restore_array()
+{
+  // Note _values_manually_retrieved needs to be set to false
+  // BEFORE calling _restore_array()!
+  _values_manually_retrieved = false;
+  _restore_array();
+}
 
 template <typename T>
 inline
