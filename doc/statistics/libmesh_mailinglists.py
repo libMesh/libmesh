@@ -78,6 +78,7 @@ membership_data = [
     'May 2016', 110, 245,
     'Jun 2016', 110, 244,
     'Jul 2016', 112, 243,
+    'Aug 2016', 112, 245,
 ]
 
 # Strip out the dates from membership_data
@@ -132,7 +133,7 @@ plt.savefig('libmesh_mailinglists_membership.pdf')
 
 
 # libmesh-devel
-# https://sourceforge.net/mailarchive/forum.php?forum_name=libmesh-devel
+# https://sourceforge.net/p/libmesh/mailman/libmesh-devel/
 #            jan  feb  mar  apr  may  jun  jul  aug  sep  oct  nov  dec
 devel_data = [
     '2003',    4,   1,   9,   2,   7,   1,   1,   4,  12,   8,   3,   4,
@@ -148,11 +149,11 @@ devel_data = [
     '2013',  168, 151,  30, 145,  26,  53,  76,  33,  23,  72, 125,  38,
     '2014',   47,  62,  27,   8,  12,   2,  22,  22,   0,  17,  20,  12,
     '2015',   25,   2,  16,  13,  21,   5,   1,   8,   9,  30,   8,   0,
-    '2016',   16,  31,  43,  18,  21,  10,
+    '2016',   16,  31,  43,  18,  21,  11,  17,
 ]
 
 # libmesh-users starts in Sept 2003!
-# https://sourceforge.net/mailarchive/forum.php?forum_name=libmesh-users
+# https://sourceforge.net/p/libmesh/mailman/libmesh-users/
 #            jan  feb  mar  apr  may  jun  jul  aug  sep  oct  nov     dec
 users_data = [
     '2003',    0,   0,   0,   0,   0,   0,   0,   0,   2,   2,  27,  31,
@@ -168,7 +169,7 @@ users_data = [
     '2013',  108, 104, 171, 133, 108, 100,  93, 126,  74,  59, 145,  93,
     '2014',   38,  45,  26,  41, 125,  70,  61,  66,  60, 110,  27,  30,
     '2015',   43,  67,  71,  92,  39,  15,  46,  63,  84,  82,  69,  45,
-    '2016',   92,  91, 148,  43,  58, 117,
+    '2016',   92,  91, 148,  43,  58, 117,  92,
 ]
 
 # Make plot of monthly data
