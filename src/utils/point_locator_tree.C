@@ -81,6 +81,9 @@ void PointLocatorTree::clear ()
       else
         // someone else owns and therefore deletes the tree
         this->_tree = libmesh_nullptr;
+
+      // make sure operator () throws an assertion
+      this->_initialized = false;
     }
 }
 
