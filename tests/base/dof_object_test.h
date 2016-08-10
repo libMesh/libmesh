@@ -166,17 +166,11 @@ public:
 
   void testJensEftangBug()
   {
-    std::cout << "Debugging DofObject buffer\n"
-              << " https://sourceforge.net/mailarchive/forum.php?thread_name=50C8EE7C.8090405%40gmail.com&forum_name=libmesh-users\n";
-
+    // For more information on this bug, see the following email thread:
+    // https://sourceforge.net/p/libmesh/mailman/libmesh-users/thread/50C8EE7C.8090405@gmail.com/
     DofObject aobject(*instance);
     dof_id_type buf0[] = {2, 8, 257, 0, 257, 96, 257, 192, 257, 0};
     aobject.set_buffer(std::vector<dof_id_type>(buf0, buf0+10));
-    aobject.debug_buffer();
-    std::cout << "aobject.dof_number(0,0,0)=" << aobject.dof_number(0,0,0) << '\n'
-              << "aobject.dof_number(0,1,0)=" << aobject.dof_number(0,1,0) << '\n'
-              << "aobject.dof_number(0,2,0)=" << aobject.dof_number(0,2,0) << '\n'
-              << "aobject.dof_number(1,0,0)=" << aobject.dof_number(1,0,0) << '\n';
 
     CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,0,0), (dof_id_type)   0);
     CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,1,0), (dof_id_type)  96);
@@ -185,11 +179,6 @@ public:
 
     dof_id_type buf1[] = {2, 8, 257, 1, 257, 97, 257, 193, 257, 1};
     aobject.set_buffer(std::vector<dof_id_type>(buf1, buf1+10));
-    aobject.debug_buffer();
-    std::cout << "aobject.dof_number(0,0,0)=" << aobject.dof_number(0,0,0) << '\n'
-              << "aobject.dof_number(0,1,0)=" << aobject.dof_number(0,1,0) << '\n'
-              << "aobject.dof_number(0,2,0)=" << aobject.dof_number(0,2,0) << '\n'
-              << "aobject.dof_number(1,0,0)=" << aobject.dof_number(1,0,0) << '\n';
 
     CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,0,0), (dof_id_type)   1);
     CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,1,0), (dof_id_type)  97);

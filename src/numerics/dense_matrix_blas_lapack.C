@@ -26,10 +26,6 @@
 # include <petscblaslapack.h>
 #endif
 
-#if (LIBMESH_HAVE_SLEPC)
-# include <slepcblaslapack.h>
-#endif
-
 namespace libMesh
 {
 
@@ -703,23 +699,27 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T>& /*rhs*/,
 
 
 
-#if (LIBMESH_HAVE_SLEPC && LIBMESH_USE_REAL_NUMBERS)
+#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
 
 template<typename T>
 void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
                                   DenseVector<T> & lambda_imag)
 {
   // The calling sequence for dgeev is:
-  // DGEEVX( BALANC, JOBVL, JOBVR, SENSE, N, A, LDA, WR, WI, VL, LDVL, VR,
-  //         LDVR, ILO, IHI, SCALE, ABNRM, RCONDE, RCONDV, WORK, LWORK, IWORK, INFO )
-
-
-  //  BALANC  (input) CHARACTER*1
-  //          Indicates how the input matrix should be diagonally scaled
-  //          and/or permuted to improve the conditioning of its
-  //          eigenvalues.
-  //          = 'N': Do not diagonally scale or permute;
-  char BALANC = 'N';
+  // DGEEV (character  JOBVL,
+  //        character  JOBVR,
+  //        integer N,
+  //        double precision, dimension( lda, * )  A,
+  //        integer  LDA,
+  //        double precision, dimension( * )  WR,
+  //        double precision, dimension( * )  WI,
+  //        double precision, dimension( ldvl, * )  VL,
+  //        integer  LDVL,
+  //        double precision, dimension( ldvr, * )  VR,
+  //        integer  LDVR,
+  //        double precision, dimension( * )  WORK,
+  //        integer  LWORK,
+  //        integer  INFO)
 
   //  JOBVL   (input) CHARACTER*1
   //          = 'N': left eigenvectors of A are not computed;
@@ -731,17 +731,9 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   //          = 'V': right eigenvectors of A are computed.
   char JOBVR = 'N';
 
-  //  SENSE   (input) CHARACTER*1
-  //          Determines which reciprocal condition numbers are computed.
-  //          = 'N': None are computed;
-  //          = 'E': Computed for eigenvalues only;
-  //          = 'V': Computed for right eigenvectors only;
-  //          = 'B': Computed for eigenvalues and right eigenvectors.
-  char SENSE = 'N';
-
   //    N       (input) int *
   //            The number of rows/cols of the matrix A.  N >= 0.
-  libmesh_assert( this->m() == this->n() );
+  libmesh_assert(this->m() == this->n());
   int N = this->m();
 
   //  A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)
@@ -797,26 +789,24 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   //          JOBVR = 'V', LDVR >= N.
   int LDVR = 1;
 
-  // Outputs (unused)
-  int ILO = 0;
-  int IHI = 0;
-  std::vector<T> SCALE(N);
-  T ABNRM;
-  std::vector<T> RCONDE(N);
-  std::vector<T> RCONDV(N);
-
   //  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK))
   //          On exit, if INFO = 0, WORK(1) returns the optimal LWORK.
   //
   //  LWORK   (input) INTEGER
-  //          The dimension of the array WORK.
+  //          The dimension of the array WORK.  LWORK >= max(1,3*N), and
+  //          if JOBVL = 'V' or JOBVR = 'V', LWORK >= 4*N.  For good
+  //          performance, LWORK must generally be larger.
+  //
+  //          If LWORK = -1, then a workspace query is assumed; the routine
+  //          only calculates the optimal size of the WORK array, returns
+  //          this value as the first entry of the WORK array, and no error
+  //          message related to LWORK is issued by XERBLA.
   int LWORK = 3*N;
-  std::vector<T> WORK( LWORK );
+  std::vector<T> WORK(LWORK);
 
   //  IWORK   (workspace) INTEGER array, dimension (2*N-2)
   //          If SENSE = 'N' or 'E', not referenced.
   // Just set to NULL
-
 
   //  INFO    (output) INTEGER
   //          = 0:  successful exit
@@ -831,10 +821,21 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   std::vector<T> & lambda_real_val = lambda_real.get_values();
   std::vector<T> & lambda_imag_val = lambda_imag.get_values();
 
-  // Ready to call the actual factorization routine through SLEPc's interface
-  LAPACKgeevx_( &BALANC, &JOBVL, &JOBVR, &SENSE, &N, &(_val[0]), &LDA, &lambda_real_val[0],
-                &lambda_imag_val[0], libmesh_nullptr, &LDVL, libmesh_nullptr, &LDVR, &ILO, &IHI, &SCALE[0], &ABNRM,
-                &RCONDE[0], &RCONDV[0], &WORK[0], &LWORK, libmesh_nullptr, &INFO );
+  // Ready to call the Lapack routine through PETSc's interface
+  LAPACKgeev_(&JOBVL,
+              &JOBVR,
+              &N,
+              &(_val[0]),
+              &LDA,
+              &lambda_real_val[0],
+              &lambda_imag_val[0],
+              /*VL=*/libmesh_nullptr,
+              &LDVL,
+              /*VR=*/libmesh_nullptr,
+              &LDVR,
+              &WORK[0],
+              &LWORK,
+              &INFO);
 
   // Check return value for errors
   if (INFO != 0)

@@ -34,12 +34,15 @@ public:
   CPPUNIT_TEST_SUITE(DenseMatrixTest);
 
   CPPUNIT_TEST(testSVD);
+  CPPUNIT_TEST(testEVDreal);
+  CPPUNIT_TEST(testEVDcomplex);
   CPPUNIT_TEST(testComplexSVD);
 
   CPPUNIT_TEST_SUITE_END();
 
 
 private:
+
   void testSVD()
   {
     DenseMatrix<Number> U, VT;
@@ -76,6 +79,80 @@ private:
 
     for (unsigned i=0; i<sigma.size(); ++i)
       CPPUNIT_ASSERT_DOUBLES_EQUAL(sigma(i), true_sigma(i), TOLERANCE*TOLERANCE);
+  }
+
+  // This function is called by testEVD for different matrices.  The
+  // Lapack results are compared to known eigenvalue real and
+  // imaginary parts for the matrix in question, which must also be
+  // passed in by non-const value, since this routine will sort them
+  // in-place.
+  void testEVD_helper(DenseMatrix<Real> & A,
+                      std::vector<Real> true_lambda_real,
+                      std::vector<Real> true_lambda_imag)
+  {
+    // Note: see bottom of this file, we only do this test if PETSc is
+    // available, but this function currently only exists if we're
+    // using real numbers.
+#ifdef LIBMESH_USE_REAL_NUMBERS
+    DenseVector<Real> lambda_real, lambda_imag;
+    A.evd(lambda_real, lambda_imag);
+
+    // Sort the results from Lapack *individually*.
+    std::sort(lambda_real.get_values().begin(), lambda_real.get_values().end());
+    std::sort(lambda_imag.get_values().begin(), lambda_imag.get_values().end());
+
+    // Sort the true eigenvalues *individually*.
+    std::sort(true_lambda_real.begin(), true_lambda_real.end());
+    std::sort(true_lambda_imag.begin(), true_lambda_imag.end());
+
+    // Compare the individually-sorted values.
+    for (unsigned i=0; i<lambda_real.size(); ++i)
+      {
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(lambda_real(i), true_lambda_real[i], TOLERANCE*TOLERANCE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(lambda_imag(i), true_lambda_imag[i], TOLERANCE*TOLERANCE);
+      }
+#endif
+  }
+
+  void testEVDreal()
+  {
+    // This is an example from Matlab's gallery(3) which is a
+    // non-symmetric 3x3 matrix with eigen values lambda = 1, 2, 3.
+    DenseMatrix<Real> A(3, 3);
+    A(0,0) = -149; A(0,1) = -50; A(0,2) = -154;
+    A(1,0) =  537; A(1,1) = 180; A(1,2) =  546;
+    A(2,0) =  -27; A(2,1) =  -9; A(2,2) =  -25;
+
+    std::vector<Real> true_lambda_real(3);
+    true_lambda_real[0] = 1.;
+    true_lambda_real[1] = 2.;
+    true_lambda_real[2] = 3.;
+    std::vector<Real> true_lambda_imag(3); // all zero
+
+    // call helper function to compute and verify results
+    testEVD_helper(A, true_lambda_real, true_lambda_imag);
+  }
+
+  void testEVDcomplex()
+  {
+    // This test is also from a Matlab example, and has complex eigenvalues.
+    // http://www.mathworks.com/help/matlab/math/eigenvalues.html?s_tid=gn_loc_drop
+    DenseMatrix<Real> A(3, 3);
+    A(0,0) =  0; A(0,1) = -6; A(0,2) =  -1;
+    A(1,0) =  6; A(1,1) =  2; A(1,2) = -16;
+    A(2,0) = -5; A(2,1) = 20; A(2,2) = -10;
+
+    std::vector<Real> true_lambda_real(3);
+    true_lambda_real[0] = -3.070950351248293;
+    true_lambda_real[1] = -2.464524824375853;
+    true_lambda_real[2] = -2.464524824375853;
+    std::vector<Real> true_lambda_imag(3);
+    true_lambda_imag[0] = 0.;
+    true_lambda_imag[1] = 17.60083096447099;
+    true_lambda_imag[2] = -17.60083096447099;
+
+    // call helper function to compute and verify results
+    testEVD_helper(A, true_lambda_real, true_lambda_imag);
   }
 
   void testComplexSVD()
