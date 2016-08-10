@@ -421,8 +421,7 @@ public:
   /**
    * Compute the eigenvalues (both real and imaginary parts) of a general matrix.
    *
-   * The implementation requires the LAPACKgeevx_ which is wrapped by
-   * SLEPc, and throws an error if called when SLEPc is not available.
+   * The implementation requires the LAPACKgeev_ which is wrapped by PETSc.
    */
   void evd(DenseVector<T> & lambda_real,
            DenseVector<T> & lambda_imag);
