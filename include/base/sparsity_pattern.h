@@ -82,6 +82,7 @@ private:
   const MeshBase & mesh;
   const DofMap & dof_map;
   const CouplingMatrix * dof_coupling;
+  const std::set<GhostingFunctor *> & coupling_functors;
   const bool implicit_neighbor_dofs;
   const bool need_full_sparsity_pattern;
 
@@ -96,6 +97,7 @@ public:
   Build (const MeshBase & mesh_in,
          const DofMap & dof_map_in,
          const CouplingMatrix * dof_coupling_in,
+         std::set<GhostingFunctor *> coupling_functors_in,
          const bool implicit_neighbor_dofs_in,
          const bool need_full_sparsity_pattern_in);
 

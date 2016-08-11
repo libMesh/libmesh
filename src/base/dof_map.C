@@ -83,6 +83,7 @@ DofMap::build_sparsity (const MeshBase & mesh) const
     (new SparsityPattern::Build (mesh,
                                  *this,
                                  this->_dof_coupling,
+                                 this->_coupling_functors,
                                  implicit_neighbor_dofs,
                                  need_full_sparsity_pattern));
 
