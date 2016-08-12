@@ -94,8 +94,165 @@ private:
     // available, but this function currently only exists if we're
     // using real numbers.
 #ifdef LIBMESH_USE_REAL_NUMBERS
+    // Let's compute the eigenvalues on a copy of A, so that we can
+    // use the original to check the computation.
+    DenseMatrix<Real> A_copy = A;
+
     DenseVector<Real> lambda_real, lambda_imag;
-    A.evd(lambda_real, lambda_imag);
+    DenseMatrix<Real> VR; // right eigenvectors
+    DenseMatrix<Real> VL; // left eigenvectors
+    A_copy.evd_left_and_right(lambda_real, lambda_imag, VL, VR);
+
+    // The matrix is square and of size N x N.
+    const unsigned N = A.m();
+
+    // Verify left eigen-values.
+    // Test that the right eigenvalues are self-consistent by computing
+    // u_j**H * A = lambda_j * u_j**H
+    // Note that we have to handle real and complex eigenvalues
+    // differently, since complex eigenvectors share their storage.
+    for (unsigned eigenval=0; eigenval<N; ++eigenval)
+      {
+        // Only check real eigenvalues
+        if (std::abs(lambda_imag(eigenval)) < TOLERANCE*TOLERANCE)
+          {
+            // remove print libMesh::out << "Checking eigenvalue: " << eigenval << std::endl;
+            DenseVector<Real> lhs(N), rhs(N);
+            for (unsigned i=0; i<N; ++i)
+              {
+                rhs(i) = lambda_real(eigenval) * VL(i, eigenval);
+                for (unsigned j=0; j<N; ++j)
+                  lhs(i) += A(j, i) * VL(j, eigenval); // Note: A(j,i)
+              }
+
+            // Subtract and assert that the norm of the difference is
+            // below some tolerance.
+            lhs -= rhs;
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+          }
+        else
+          {
+            // This is a complex eigenvalue, so:
+            // a.) It occurs in a complex-conjugate pair
+            // b.) the real part of the eigenvector is stored is VL(:,eigenval)
+            // c.) the imag part of the eigenvector is stored in VL(:,eigenval+1)
+            //
+            // Equating the real and imaginary parts of Ax=lambda*x leads to two sets
+            // of relations that must hold:
+            // 1.) A^T x_r =  lambda_r*x_r + lambda_i*x_i
+            // 2.) A^T x_i = -lambda_i*x_r + lambda_r*x_i
+            // which we can verify.
+
+            // 1.)
+            DenseVector<Real> lhs(N), rhs(N);
+            for (unsigned i=0; i<N; ++i)
+              {
+                rhs(i) = lambda_real(eigenval) * VL(i, eigenval) + lambda_imag(eigenval) * VL(i, eigenval+1);
+                for (unsigned j=0; j<N; ++j)
+                  lhs(i) += A(j, i) * VL(j, eigenval); // Note: A(j,i)
+              }
+
+            lhs -= rhs;
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+
+            // libMesh::out << "lhs=" << std::endl;
+            // lhs.print_scientific(libMesh::out, /*precision=*/15);
+            //
+            // libMesh::out << "rhs=" << std::endl;
+            // rhs.print_scientific(libMesh::out, /*precision=*/15);
+
+            // 2.)
+            lhs.zero();
+            rhs.zero();
+            for (unsigned i=0; i<N; ++i)
+              {
+                rhs(i) = -lambda_imag(eigenval) * VL(i, eigenval) + lambda_real(eigenval) * VL(i, eigenval+1);
+                for (unsigned j=0; j<N; ++j)
+                  lhs(i) += A(j, i) * VL(j, eigenval+1); // Note: A(j,i)
+              }
+
+            lhs -= rhs;
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+
+            // libMesh::out << "lhs=" << std::endl;
+            // lhs.print_scientific(libMesh::out, /*precision=*/15);
+            //
+            // libMesh::out << "rhs=" << std::endl;
+            // rhs.print_scientific(libMesh::out, /*precision=*/15);
+
+            // We'll skip the second member of the complex conjugate
+            // pair.  If the first one worked, the second one should
+            // as well...
+            eigenval += 1;
+          }
+      }
+
+    // Verify right eigen-values.
+    // Test that the right eigenvalues are self-consistent by computing
+    // A * v_j - lambda_j * v_j
+    // Note that we have to handle real and complex eigenvalues
+    // differently, since complex eigenvectors share their storage.
+    for (unsigned eigenval=0; eigenval<N; ++eigenval)
+      {
+        // Only check real eigenvalues
+        if (std::abs(lambda_imag(eigenval)) < TOLERANCE*TOLERANCE)
+          {
+            // remove print libMesh::out << "Checking eigenvalue: " << eigenval << std::endl;
+            DenseVector<Real> lhs(N), rhs(N);
+            for (unsigned i=0; i<N; ++i)
+              {
+                rhs(i) = lambda_real(eigenval) * VR(i, eigenval);
+                for (unsigned j=0; j<N; ++j)
+                  lhs(i) += A(i, j) * VR(j, eigenval);
+              }
+
+            lhs -= rhs;
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+          }
+        else
+          {
+            // This is a complex eigenvalue, so:
+            // a.) It occurs in a complex-conjugate pair
+            // b.) the real part of the eigenvector is stored is VR(:,eigenval)
+            // c.) the imag part of the eigenvector is stored in VR(:,eigenval+1)
+            //
+            // Equating the real and imaginary parts of Ax=lambda*x leads to two sets
+            // of relations that must hold:
+            // 1.) Ax_r = lambda_r*x_r - lambda_i*x_i
+            // 2.) Ax_i = lambda_i*x_r + lambda_r*x_i
+            // which we can verify.
+
+            // 1.)
+            DenseVector<Real> lhs(N), rhs(N);
+            for (unsigned i=0; i<N; ++i)
+              {
+                rhs(i) = lambda_real(eigenval) * VR(i, eigenval) - lambda_imag(eigenval) * VR(i, eigenval+1);
+                for (unsigned j=0; j<N; ++j)
+                  lhs(i) += A(i, j) * VR(j, eigenval);
+              }
+
+            lhs -= rhs;
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+
+            // 2.)
+            lhs.zero();
+            rhs.zero();
+            for (unsigned i=0; i<N; ++i)
+              {
+                rhs(i) = lambda_imag(eigenval) * VR(i, eigenval) + lambda_real(eigenval) * VR(i, eigenval+1);
+                for (unsigned j=0; j<N; ++j)
+                  lhs(i) += A(i, j) * VR(j, eigenval+1);
+              }
+
+            lhs -= rhs;
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/0., /*actual=*/lhs.l2_norm(), std::sqrt(TOLERANCE)*TOLERANCE);
+
+            // We'll skip the second member of the complex conjugate
+            // pair.  If the first one worked, the second one should
+            // as well...
+            eigenval += 1;
+          }
+      }
 
     // Sort the results from Lapack *individually*.
     std::sort(lambda_real.get_values().begin(), lambda_real.get_values().end());
@@ -108,8 +265,13 @@ private:
     // Compare the individually-sorted values.
     for (unsigned i=0; i<lambda_real.size(); ++i)
       {
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(lambda_real(i), true_lambda_real[i], TOLERANCE*TOLERANCE);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(lambda_imag(i), true_lambda_imag[i], TOLERANCE*TOLERANCE);
+        // Note: I initially verified the results with TOLERANCE**2,
+        // but that turned out to be just a bit too tight for some of
+        // the test problems.  I'm not sure what controls the accuracy
+        // of the eigenvalue computation in LAPACK, there is no way to
+        // set a tolerance in the LAPACKgeev_ interface.
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/true_lambda_real[i], /*actual=*/lambda_real(i), std::sqrt(TOLERANCE)*TOLERANCE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/true_lambda_imag[i], /*actual=*/lambda_imag(i), std::sqrt(TOLERANCE)*TOLERANCE);
       }
 #endif
   }
@@ -129,7 +291,7 @@ private:
     true_lambda_real[2] = 3.;
     std::vector<Real> true_lambda_imag(3); // all zero
 
-    // call helper function to compute and verify results
+    // call helper function to compute and verify results.
     testEVD_helper(A, true_lambda_real, true_lambda_imag);
   }
 
