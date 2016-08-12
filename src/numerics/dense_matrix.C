@@ -811,6 +811,40 @@ void DenseMatrix<T>::evd (DenseVector<T> & lambda_real,
 
 
 template<typename T>
+void DenseMatrix<T>::evd_left(DenseVector<T> & lambda_real,
+                              DenseVector<T> & lambda_imag,
+                              DenseMatrix<T> & VL)
+{
+  // We use the LAPACK eigenvalue problem implementation
+  _evd_lapack(lambda_real, lambda_imag, &VL, libmesh_nullptr);
+}
+
+
+
+template<typename T>
+void DenseMatrix<T>::evd_right(DenseVector<T> & lambda_real,
+                               DenseVector<T> & lambda_imag,
+                               DenseMatrix<T> & VR)
+{
+  // We use the LAPACK eigenvalue problem implementation
+  _evd_lapack(lambda_real, lambda_imag, libmesh_nullptr, &VR);
+}
+
+
+
+template<typename T>
+void DenseMatrix<T>::evd_left_and_right(DenseVector<T> & lambda_real,
+                                        DenseVector<T> & lambda_imag,
+                                        DenseMatrix<T> & VL,
+                                        DenseMatrix<T> & VR)
+{
+  // We use the LAPACK eigenvalue problem implementation
+  _evd_lapack(lambda_real, lambda_imag, &VL, &VR);
+}
+
+
+
+template<typename T>
 T DenseMatrix<T>::det ()
 {
   switch(this->_decomposition_type)
