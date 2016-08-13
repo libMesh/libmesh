@@ -7,6 +7,7 @@ EXTRA_DIST = rebuild_makefile.sh
 
 BUILT_SOURCES = \
         auto_ptr.h \
+        default_coupling.h \
         dirichlet_boundaries.h \
         dof_map.h \
         dof_object.h \
@@ -522,6 +523,9 @@ libmesh_config.h: $(top_builddir)/include/libmesh_config.h
 #
 # libMesh header rules
 auto_ptr.h: $(top_srcdir)/include/base/auto_ptr.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+default_coupling.h: $(top_srcdir)/include/base/default_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dirichlet_boundaries.h: $(top_srcdir)/include/base/dirichlet_boundaries.h
