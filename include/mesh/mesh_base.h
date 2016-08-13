@@ -716,13 +716,13 @@ public:
   /**
    * Beginning of range of ghosting functors
    */
-  std::set<GhostingFunctor *>::iterator ghosting_functors_begin()
+  std::set<GhostingFunctor *>::const_iterator ghosting_functors_begin() const
   { return _ghosting_functors.begin(); }
 
   /**
    * End of range of ghosting functors
    */
-  std::set<GhostingFunctor *>::iterator ghosting_functors_end()
+  std::set<GhostingFunctor *>::const_iterator ghosting_functors_end() const
   { return _ghosting_functors.end(); }
 
   /**

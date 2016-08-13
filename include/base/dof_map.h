@@ -273,13 +273,13 @@ public:
   /**
    * Beginning of range of coupling functors
    */
-  std::set<GhostingFunctor *>::iterator coupling_functors_begin()
+  std::set<GhostingFunctor *>::const_iterator coupling_functors_begin() const
   { return _coupling_functors.begin(); }
 
   /**
    * End of range of coupling functors
    */
-  std::set<GhostingFunctor *>::iterator coupling_functors_end()
+  std::set<GhostingFunctor *>::const_iterator coupling_functors_end() const
   { return _coupling_functors.end(); }
 
 
@@ -307,13 +307,13 @@ public:
   /**
    * Beginning of range of algebraic ghosting functors
    */
-  std::set<GhostingFunctor *>::iterator algebraic_ghosting_functors_begin()
+  std::set<GhostingFunctor *>::const_iterator algebraic_ghosting_functors_begin() const
   { return _algebraic_ghosting_functors.begin(); }
 
   /**
    * End of range of algebraic ghosting functors
    */
-  std::set<GhostingFunctor *>::iterator algebraic_ghosting_functors_end()
+  std::set<GhostingFunctor *>::const_iterator algebraic_ghosting_functors_end() const
   { return _algebraic_ghosting_functors.end(); }
 
 
