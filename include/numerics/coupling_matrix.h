@@ -92,6 +92,8 @@ public:
    */
   bool empty() const;
 
+  CouplingMatrix & operator&= (const CouplingMatrix & other);
+
 private:
 
   friend class ConstCouplingAccessor;
