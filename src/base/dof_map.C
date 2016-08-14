@@ -23,6 +23,7 @@
 #include <sstream>
 
 // Local Includes -----------------------------------
+#include "libmesh/default_coupling.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector_base.h"
 #include "libmesh/dirichlet_boundaries.h"
@@ -142,6 +143,7 @@ DofMap::DofMap(const unsigned int number,
   _augment_send_list(libmesh_nullptr),
   _extra_send_list_function(libmesh_nullptr),
   _extra_send_list_context(libmesh_nullptr),
+  _default_coupling(new DefaultCoupling()),
   need_full_sparsity_pattern(false),
   _n_nz(libmesh_nullptr),
   _n_oz(libmesh_nullptr),
@@ -173,6 +175,7 @@ DofMap::DofMap(const unsigned int number,
   _implicit_neighbor_dofs(false)
 {
   _matrices.clear();
+  this->add_coupling_functor(_default_coupling.get());
 }
 
 
@@ -440,6 +443,11 @@ void DofMap::reinit(MeshBase & mesh)
   libmesh_assert (mesh.is_prepared());
 
   LOG_SCOPE("reinit()", "DofMap");
+
+  // We need to reconfigure our default coupling functor.
+  _default_coupling->set_dof_coupling(this->_dof_coupling);
+  _default_coupling->set_coupled_neighbor_dofs
+    (this->use_coupled_neighbor_dofs(mesh));
 
   const unsigned int
     sys_num      = this->sys_number(),

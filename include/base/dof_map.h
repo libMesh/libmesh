@@ -47,6 +47,7 @@ namespace libMesh
 
 // Forward Declarations
 class CouplingMatrix;
+class DefaultCoupling;
 class DirichletBoundary;
 class DirichletBoundaries;
 class DofMap;
@@ -1392,10 +1393,9 @@ private:
 
   /**
    * The default coupling GhostingFunctor, used to implement standard
-   * libMesh sparsity pattern construction.  We use a base class
-   * pointer here to avoid dragging in more header dependencies.
+   * libMesh sparsity pattern construction.
    */
-  UniquePtr<GhostingFunctor> _default_coupling;
+  UniquePtr<DefaultCoupling> _default_coupling;
 
   /**
    * The list of all GhostingFunctor objects to be used when
