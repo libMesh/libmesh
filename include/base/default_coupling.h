@@ -40,11 +40,17 @@ public:
   /**
    * Constructor.
    */
-  DefaultCoupling(const MeshBase & mesh,
-                  const CouplingMatrix * dof_coupling,
-                  bool couple_neighbor_dofs) :
-    _mesh(mesh), _dof_coupling(dof_coupling),
-    _couple_neighbor_dofs(couple_neighbor_dofs) {}
+  DefaultCoupling() :
+    _dof_coupling(libmesh_nullptr),
+    _couple_neighbor_dofs(false) {}
+
+  // Change coupling matrix after construction
+  void set_dof_coupling(const CouplingMatrix * dof_coupling)
+  { _dof_coupling = dof_coupling; }
+
+  // Decide whether to couple to neighbors after construction
+  void set_coupled_neighbor_dofs(bool couple_neighbor_dofs)
+  { _couple_neighbor_dofs = couple_neighbor_dofs; }
 
   /**
    * For the specified range of active elements, find the elements
@@ -63,7 +69,6 @@ public:
 
 private:
 
-  const MeshBase & _mesh;
   const CouplingMatrix * _dof_coupling;
   bool _couple_neighbor_dofs;
 };
