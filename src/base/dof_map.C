@@ -175,7 +175,9 @@ DofMap::DofMap(const unsigned int number,
   _implicit_neighbor_dofs(false)
 {
   _matrices.clear();
-  this->add_coupling_functor(_default_coupling.get());
+
+// We can't do this yet because we don't know what MeshBase to add to?
+//  this->add_coupling_functor(*_default_coupling);
 }
 
 
@@ -444,7 +446,10 @@ void DofMap::reinit(MeshBase & mesh)
 
   LOG_SCOPE("reinit()", "DofMap");
 
-  // We need to reconfigure our default coupling functor.
+  // We ought to reconfigure our default coupling functor.
+  //
+  // The user might have removed it from our coupling functors set,
+  // but if so, who cares, this reconfiguration is cheap.
   _default_coupling->set_dof_coupling(this->_dof_coupling);
   _default_coupling->set_coupled_neighbor_dofs
     (this->use_coupled_neighbor_dofs(mesh));
@@ -1707,6 +1712,49 @@ void DofMap::clear_sparsity()
     }
   _n_nz = libmesh_nullptr;
   _n_oz = libmesh_nullptr;
+}
+
+
+
+void DofMap::add_coupling_functor
+  (GhostingFunctor & coupling_functor,
+   MeshBase & mesh)
+{
+  _coupling_functors.insert(&coupling_functor);
+  mesh.add_ghosting_functor(coupling_functor);
+}
+
+
+
+void DofMap::remove_coupling_functor
+  (GhostingFunctor & coupling_functor,
+   MeshBase & mesh)
+{
+  libmesh_assert(_coupling_functors.count(&coupling_functor));
+  _coupling_functors.erase(&coupling_functor);
+  mesh.remove_ghosting_functor(coupling_functor);
+}
+
+
+
+void DofMap::add_algebraic_ghosting_functor
+  (GhostingFunctor & algebraic_ghosting_functor,
+   MeshBase & mesh)
+{
+  _algebraic_ghosting_functors.insert(&algebraic_ghosting_functor);
+  mesh.add_ghosting_functor(algebraic_ghosting_functor);
+}
+
+
+
+void DofMap::remove_algebraic_ghosting_functor
+  (GhostingFunctor & algebraic_ghosting_functor,
+   MeshBase & mesh)
+{
+  libmesh_assert(_algebraic_ghosting_functors.count
+                   (&algebraic_ghosting_functor));
+  _algebraic_ghosting_functors.erase(&algebraic_ghosting_functor);
+  mesh.remove_ghosting_functor(algebraic_ghosting_functor);
 }
 
 

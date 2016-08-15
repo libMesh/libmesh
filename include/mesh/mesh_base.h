@@ -703,15 +703,15 @@ public:
    * this function; the GhostingFunctor lifetime is expected to extend
    * until either the functor is removed or the Mesh is destructed.
    */
-  void add_ghosting_functor(GhostingFunctor *ghosting_functor)
-  { _ghosting_functors.insert(ghosting_functor); }
+  void add_ghosting_functor(GhostingFunctor & ghosting_functor)
+  { _ghosting_functors.insert(&ghosting_functor); }
 
   /**
    * Removes a functor which was previously added to the set of
    * ghosting functors.
    */
-  void remove_ghosting_functor(GhostingFunctor *ghosting_functor)
-  { _ghosting_functors.erase(ghosting_functor); }
+  void remove_ghosting_functor(GhostingFunctor & ghosting_functor)
+  { _ghosting_functors.erase(&ghosting_functor); }
 
   /**
    * Beginning of range of ghosting functors
