@@ -177,8 +177,7 @@ DofMap::DofMap(const unsigned int number,
 {
   _matrices.clear();
 
-// We can't do this yet because we don't know what MeshBase to add to?
-//  this->add_coupling_functor(*_default_coupling);
+  this->add_coupling_functor(*_default_coupling, _mesh);
 }
 
 
@@ -187,6 +186,11 @@ DofMap::DofMap(const unsigned int number,
 DofMap::~DofMap()
 {
   this->clear();
+
+  // clear() resets all but the default DofMap-based functors.  We
+  // need to remove those from the mesh too before we die.
+  _mesh.remove_ghosting_functor(*_default_coupling);
+
 #ifdef LIBMESH_ENABLE_PERIODIC
   delete _periodic_boundaries;
 #endif
@@ -845,7 +849,7 @@ void DofMap::clear()
   _default_coupling->set_coupled_neighbor_dofs
     (this->use_coupled_neighbor_dofs(this->_mesh));
 
-  // this->_coupling_functors.insert(*_default_coupling);
+  this->add_coupling_functor(*_default_coupling, _mesh);
   }
 
 
