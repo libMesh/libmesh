@@ -421,11 +421,71 @@ public:
   /**
    * Compute the eigenvalues (both real and imaginary parts) of a general matrix.
    *
+   * Warning: the contents of A are overwritten by this function!
+   *
    * The implementation requires the LAPACKgeev_ which is wrapped by PETSc.
    */
   void evd(DenseVector<T> & lambda_real,
            DenseVector<T> & lambda_imag);
 
+  /**
+   * Compute the eigenvalues (both real and imaginary parts) and left
+   * eigenvectors of a general matrix.
+   *
+   * Warning: the contents of A are overwritten by this function!
+   *
+   * The left eigenvector u_j of A satisfies:
+   * u_j**H * A = lambda_j * u_j**H
+   * where u_j**H denotes the conjugate-transpose of u_j.
+   *
+   * If the j-th and (j+1)-st eigenvalues form a complex conjugate
+   * pair, then the j-th and (j+1)-st columns of VL "share" their
+   * real-valued storage in the following way:
+   * u_j     = VL(:,j) + i*VL(:,j+1) and
+   * u_{j+1} = VL(:,j) - i*VL(:,j+1).
+   *
+   * The implementation requires the LAPACKgeev_ which is wrapped by PETSc.
+   */
+  void evd_left(DenseVector<T> & lambda_real,
+                DenseVector<T> & lambda_imag,
+                DenseMatrix<T> & VL);
+
+  /**
+   * Compute the eigenvalues (both real and imaginary parts) and right
+   * eigenvectors of a general matrix.
+   *
+   * Warning: the contents of A are overwritten by this function!
+   *
+   * The right eigenvector v_j of A satisfies:
+   * A * v_j = lambda_j * v_j
+   * where lambda_j is its corresponding eigenvalue.
+   *
+   * Note: If the j-th and (j+1)-st eigenvalues form a complex
+   * conjugate pair, then the j-th and (j+1)-st columns of VR "share"
+   * their real-valued storage in the following way:
+   * v_j     = VR(:,j) + i*VR(:,j+1) and
+   * v_{j+1} = VR(:,j) - i*VR(:,j+1).
+   *
+   * The implementation requires the LAPACKgeev_ which is wrapped by PETSc.
+   */
+  void evd_right(DenseVector<T> & lambda_real,
+                 DenseVector<T> & lambda_imag,
+                 DenseMatrix<T> & VR);
+
+  /**
+   * Compute the eigenvalues (both real and imaginary parts) as well as the left
+   * and right eigenvectors of a general matrix.
+   *
+   * Warning: the contents of A are overwritten by this function!
+   *
+   * See the documentation of the evd_left() and evd_right() functions
+   * for more information.  The implementation requires the
+   * LAPACKgeev_ which is wrapped by PETSc.
+   */
+  void evd_left_and_right(DenseVector<T> & lambda_real,
+                          DenseVector<T> & lambda_imag,
+                          DenseMatrix<T> & VL,
+                          DenseMatrix<T> & VR);
 
   /**
    * @returns the determinant of the matrix.  Note that this means
@@ -572,11 +632,17 @@ private:
                     std::vector<Number> & VT_val);
 
   /**
-   * Computes the eigenvalues of the matrix using the
-   * Lapack routine "DGEEV".
+   * Computes the eigenvalues of the matrix using the Lapack routine
+   * "DGEEV".  If VR and/or VL are non-NULL, then the matrix of right
+   * and/or left eigenvectors is also computed and returned by this
+   * function.
+   *
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
-  void _evd_lapack(DenseVector<T> & lambda_real, DenseVector<T> & lambda_imag);
+  void _evd_lapack(DenseVector<T> & lambda_real,
+                   DenseVector<T> & lambda_imag,
+                   DenseMatrix<T> * VL = libmesh_nullptr,
+                   DenseMatrix<T> * VR = libmesh_nullptr);
 
   /**
    * This array is used to store pivot indices.  May be used

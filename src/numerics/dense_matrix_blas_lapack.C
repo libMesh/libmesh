@@ -703,8 +703,28 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T>& /*rhs*/,
 
 template<typename T>
 void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
-                                  DenseVector<T> & lambda_imag)
+                                  DenseVector<T> & lambda_imag,
+                                  DenseMatrix<T> * VL,
+                                  DenseMatrix<T> * VR)
 {
+  // This algorithm only works for square matrices, so verify this up front.
+  if (this->m() != this->n())
+    libmesh_error_msg("Can only compute eigen-decompositions for square matrices.");
+
+  // If the user requests left or right eigenvectors, we have to make
+  // sure and pass the transpose of this matrix to Lapack, otherwise
+  // it will compute the inverse transpose of what we are
+  // after... since we know the matrix is square, we can just swap
+  // entries in place.  If the user does not request eigenvectors, we
+  // can skip this extra step, since the eigenvalues for A and A^T are
+  // the same.
+  if (VL || VR)
+    {
+      for (unsigned int i=0; i<this->_m; ++i)
+        for (unsigned int j=0; j<i; ++j)
+          std::swap((*this)(i,j), (*this)(j,i));
+    }
+
   // The calling sequence for dgeev is:
   // DGEEV (character  JOBVL,
   //        character  JOBVR,
@@ -724,16 +744,15 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   //  JOBVL   (input) CHARACTER*1
   //          = 'N': left eigenvectors of A are not computed;
   //          = 'V': left eigenvectors of A are computed.
-  char JOBVL = 'N';
+  char JOBVL = VL ? 'V' : 'N';
 
   //  JOBVR   (input) CHARACTER*1
   //          = 'N': right eigenvectors of A are not computed;
   //          = 'V': right eigenvectors of A are computed.
-  char JOBVR = 'N';
+  char JOBVR = VR ? 'V' : 'N';
 
   //    N       (input) int *
   //            The number of rows/cols of the matrix A.  N >= 0.
-  libmesh_assert(this->m() == this->n());
   int N = this->m();
 
   //  A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)
@@ -765,12 +784,12 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   //          If the j-th and (j+1)-st eigenvalues form a complex
   //          conjugate pair, then u(j) = VL(:,j) + i*VL(:,j+1) and
   //          u(j+1) = VL(:,j) - i*VL(:,j+1).
-  // Just set to NULL here.
+  // Will be set below if needed.
 
   //  LDVL    (input) INTEGER
   //          The leading dimension of the array VL.  LDVL >= 1; if
   //          JOBVL = 'V', LDVL >= N.
-  int LDVL = 1;
+  int LDVL = VL ? N : 1;
 
   //  VR      (output) DOUBLE PRECISION array, dimension (LDVR,N)
   //          If JOBVR = 'V', the right eigenvectors v(j) are stored one
@@ -782,12 +801,12 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   //          If the j-th and (j+1)-st eigenvalues form a complex
   //          conjugate pair, then v(j) = VR(:,j) + i*VR(:,j+1) and
   //          v(j+1) = VR(:,j) - i*VR(:,j+1).
-  // Just set to NULL here.
+  // Will be set below if needed.
 
   //  LDVR    (input) INTEGER
   //          The leading dimension of the array VR.  LDVR >= 1; if
   //          JOBVR = 'V', LDVR >= N.
-  int LDVR = 1;
+  int LDVR = VR ? N : 1;
 
   //  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK))
   //          On exit, if INFO = 0, WORK(1) returns the optimal LWORK.
@@ -801,12 +820,8 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   //          only calculates the optimal size of the WORK array, returns
   //          this value as the first entry of the WORK array, and no error
   //          message related to LWORK is issued by XERBLA.
-  int LWORK = 3*N;
+  int LWORK = (VR || VL) ? 4*N : 3*N;
   std::vector<T> WORK(LWORK);
-
-  //  IWORK   (workspace) INTEGER array, dimension (2*N-2)
-  //          If SENSE = 'N' or 'E', not referenced.
-  // Just set to NULL
 
   //  INFO    (output) INTEGER
   //          = 0:  successful exit
@@ -821,6 +836,21 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   std::vector<T> & lambda_real_val = lambda_real.get_values();
   std::vector<T> & lambda_imag_val = lambda_imag.get_values();
 
+  // Set up eigenvector storage if necessary.
+  T * VR_ptr = libmesh_nullptr;
+  if (VR)
+    {
+      VR->resize(N, N);
+      VR_ptr = &(VR->get_values()[0]);
+    }
+
+  T * VL_ptr = libmesh_nullptr;
+  if (VL)
+    {
+      VL->resize(N, N);
+      VL_ptr = &(VL->get_values()[0]);
+    }
+
   // Ready to call the Lapack routine through PETSc's interface
   LAPACKgeev_(&JOBVL,
               &JOBVR,
@@ -829,9 +859,9 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
               &LDA,
               &lambda_real_val[0],
               &lambda_imag_val[0],
-              /*VL=*/libmesh_nullptr,
+              VL_ptr,
               &LDVL,
-              /*VR=*/libmesh_nullptr,
+              VR_ptr,
               &LDVR,
               &WORK[0],
               &LWORK,
@@ -840,15 +870,36 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   // Check return value for errors
   if (INFO != 0)
     libmesh_error_msg("INFO=" << INFO << ", Error during Lapack eigenvalue calculation!");
+
+  // If the user requested either right or left eigenvectors, LAPACK
+  // has now computed the transpose of the desired matrix, i.e. V^T
+  // instead of V.  We could leave this up to user code to handle, but
+  // rather than risking getting very unexpected results, we'll just
+  // transpose it in place before handing it back.
+  if (VR)
+    {
+      for (unsigned int i=0; i<static_cast<unsigned int>(N); ++i)
+        for (unsigned int j=0; j<i; ++j)
+          std::swap((*VR)(i,j), (*VR)(j,i));
+    }
+
+ if (VL)
+   {
+     for (unsigned int i=0; i<static_cast<unsigned int>(N); ++i)
+       for (unsigned int j=0; j<i; ++j)
+         std::swap((*VL)(i,j), (*VL)(j,i));
+   }
 }
 
 #else
 
 template<typename T>
 void DenseMatrix<T>::_evd_lapack (DenseVector<T> &,
-                                  DenseVector<T> &)
+                                  DenseVector<T> &,
+                                  DenseMatrix<T> *,
+                                  DenseMatrix<T> *)
 {
-  libmesh_error_msg("No PETSc-provided BLAS/LAPACK available!");
+  libmesh_error_msg("_evd_lapack is currently only available when LIBMESH_USE_REAL_NUMBERS is defined!");
 }
 
 #endif
@@ -1093,7 +1144,10 @@ template void DenseMatrix<Real>::_svd_helper (char,
                                               std::vector<Number> &,
                                               std::vector<Number> &);
 template void DenseMatrix<Real>::_svd_solve_lapack (const DenseVector<Real> &, DenseVector<Real> &, Real) const;
-template void DenseMatrix<Real>::_evd_lapack(DenseVector<Real> &, DenseVector<Real> &);
+template void DenseMatrix<Real>::_evd_lapack(DenseVector<Real> &,
+                                             DenseVector<Real> &,
+                                             DenseMatrix<Real> *,
+                                             DenseMatrix<Real> *);
 
 #if !(LIBMESH_USE_REAL_NUMBERS)
 template void DenseMatrix<Number>::_multiply_blas(const DenseMatrixBase<Number> &, _BLAS_Multiply_Flag);
@@ -1115,7 +1169,10 @@ template void DenseMatrix<Number>::_svd_helper (char,
                                                 std::vector<Number> &,
                                                 std::vector<Number> &);
 template void DenseMatrix<Number>::_svd_solve_lapack (const DenseVector<Number> &, DenseVector<Number> &, Real) const;
-template void DenseMatrix<Number>::_evd_lapack(DenseVector<Number> &, DenseVector<Number> &);
+template void DenseMatrix<Number>::_evd_lapack(DenseVector<Number> &,
+                                               DenseVector<Number> &,
+                                               DenseMatrix<Number> *,
+                                               DenseMatrix<Number> *);
 
 #endif
 
