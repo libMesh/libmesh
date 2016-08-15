@@ -822,6 +822,10 @@ void DofMap::clear()
   // the coupling matrix!
   // It should not change...
   //_dof_coupling->clear();
+  //
+  // But it would be inconsistent to leave our coupling settings
+  // through a clear()...
+  _dof_coupling = NULL;
 
   _variables.clear();
   _variable_groups.clear();
