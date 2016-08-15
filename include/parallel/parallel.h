@@ -1163,6 +1163,39 @@ public:
 
   //-------------------------------------------------------------------
   /**
+   * Take a vector of local variables and scatter the ith item to the ith
+   * processor in the communicator. The result is saved into recv.
+   */
+  template <typename T>
+  inline void scatter(const std::vector<T> & data,
+                      T & recv,
+                      const unsigned int root_id=0) const;
+
+  /**
+   * Take a vector of local variables and scatter the ith equal-sized chunk
+   * to the ith processor in the communicator. The data size must be a
+   * multiple of the communicator size. The result is saved into recv buffer.
+   * The recv buffer does not have to be sized prior to this operation.
+   */
+  template <typename T>
+  inline void scatter(const std::vector<T> & data,
+                      std::vector<T> & recv,
+                      const unsigned int root_id=0) const;
+
+  /**
+   * Take a vector of local variables and scatter the ith variable-sized chunk
+   * to the ith processor in the communicator. The counts vector should contain
+   * the number of items for each processor. The result is saved into recv buffer.
+   * The recv buffer does not have to be sized prior to this operation.
+   */
+  template <typename T>
+  inline void scatter(const std::vector<T> & data,
+                      const std::vector<int> counts,
+                      std::vector<T> & recv,
+                      const unsigned int root_id=0) const;
+
+  //-------------------------------------------------------------------
+  /**
    * Take a range of local variables, combine it with ranges from all
    * processors, and write the output to the output iterator on rank root.
    */
