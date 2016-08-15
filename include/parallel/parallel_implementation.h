@@ -3094,7 +3094,7 @@ void Communicator::scatter(const std::vector<T> & data,
 
   LOG_SCOPE("scatter()", "Parallel");
 
-  T * data_ptr = data.empty() ? libmesh_nullptr : &data[0];
+  const T * data_ptr = data.empty() ? libmesh_nullptr : &data[0];
 
   libmesh_call_mpi
     (MPI_Scatter (data_ptr, 1, StandardType<T>(data_ptr),
