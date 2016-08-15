@@ -126,12 +126,13 @@ DofMap::build_sparsity (const MeshBase & mesh) const
 
 
 DofMap::DofMap(const unsigned int number,
-               const ParallelObject & parent_decomp) :
-  ParallelObject (parent_decomp),
+               MeshBase & mesh) :
+  ParallelObject (mesh.comm()),
   _dof_coupling(libmesh_nullptr),
   _variables(),
   _variable_groups(),
   _sys_number(number),
+  _mesh(mesh),
   _matrices(),
   _first_df(),
   _end_df(),

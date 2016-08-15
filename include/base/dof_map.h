@@ -175,7 +175,7 @@ public:
    */
   explicit
   DofMap(const unsigned int sys_number,
-         const ParallelObject & parent_decomp);
+         MeshBase & mesh);
 
   /**
    * Destructor.
@@ -1329,6 +1329,11 @@ private:
    * The number of the system we manage DOFs for.
    */
   const unsigned int _sys_number;
+
+  /**
+   * The mesh that system uses.
+   */
+  MeshBase & _mesh;
 
   /**
    * Additional matrices handled by this object.  These pointers do @e
