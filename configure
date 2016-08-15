@@ -1185,6 +1185,7 @@ with_boost
 with_boost_libdir
 enable_hinnant_unique_ptr
 enable_petsc
+enable_petsc_required
 with_mpi
 with_gm
 enable_slepc
@@ -1981,6 +1982,7 @@ Optional Features:
                           build without Howard Hinnant's unique_ptr
                           implementation
   --disable-petsc         build without PETSc iterative solver suppport
+  --enable-petsc-required Error if PETSc is not detected by configure
   --disable-slepc         build without SLEPc eigen solver support
   --disable-trilinos      build without Trilinos support
   --disable-tbb           build without threading support via Threading
@@ -34125,6 +34127,25 @@ else
 fi
 
 
+  # Setting --enable-petsc-required causes an error to be emitted
+  # during configure if PETSc is not detected successfully during
+  # configure.  This is useful for app codes which require PETSc (like
+  # MOOSE-based apps), since it prevents situations where libmesh is
+  # accidentally built without PETSc support (which may take a very
+  # long time), and then the app fails to compile, requiring you to
+  # redo everything.
+  # Check whether --enable-petsc-required was given.
+if test "${enable_petsc_required+set}" = set; then :
+  enableval=$enable_petsc_required; case "${enableval}" in
+                     yes) petscrequired=yes ;;
+                     no)  petscrequired=no ;;
+                     *)   as_fn_error $? "bad value ${enableval} for --enable-petsc-required" "$LINENO" 5 ;;
+                     esac
+else
+  petscrequired=no
+fi
+
+
   # Trump --enable-petsc with --disable-mpi
   if (test "x$enablempi" = xno); then
     enablepetsc=no
@@ -36661,6 +36682,12 @@ $as_echo "#define HAVE_PETSC 1" >>confdefs.h
 $as_echo "#define HAVE_PETSC_TAO 1" >>confdefs.h
 
     fi
+  fi
+
+  # If PETSc is not enabled, but it *was* required, error out now
+  # instead of compiling libmesh in an invalid configuration.
+  if (test $enablepetsc = no -a $petscrequired = yes) ; then
+                    as_fn_error 3 "*** PETSc was not found, but --enable-petsc-required was specified." "$LINENO" 5
   fi
 
 if (test $enablempi != no) ; then

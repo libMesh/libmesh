@@ -13,6 +13,23 @@ AC_DEFUN([CONFIGURE_PETSC],
                  esac],
                 [enablepetsc=$enableoptional])
 
+  # Setting --enable-petsc-required causes an error to be emitted
+  # during configure if PETSc is not detected successfully during
+  # configure.  This is useful for app codes which require PETSc (like
+  # MOOSE-based apps), since it prevents situations where libmesh is
+  # accidentally built without PETSc support (which may take a very
+  # long time), and then the app fails to compile, requiring you to
+  # redo everything.
+  AC_ARG_ENABLE(petsc-required,
+                AC_HELP_STRING([--enable-petsc-required],
+                               [Error if PETSc is not detected by configure]),
+                               [case "${enableval}" in
+                     yes) petscrequired=yes ;;
+                     no)  petscrequired=no ;;
+                     *)   AC_MSG_ERROR(bad value ${enableval} for --enable-petsc-required) ;;
+                     esac],
+                     [petscrequired=no])
+
   # Trump --enable-petsc with --disable-mpi
   if (test "x$enablempi" = xno); then
     enablepetsc=no
@@ -378,5 +395,15 @@ AC_DEFUN([CONFIGURE_PETSC],
     if (test $petsc_have_tao != no) ; then
       AC_DEFINE(HAVE_PETSC_TAO, 1, [Flag indicating whether or not the Toolkit for Advanced Optimization (TAO) is available via PETSc])
     fi
+  fi
+
+  # If PETSc is not enabled, but it *was* required, error out now
+  # instead of compiling libmesh in an invalid configuration.
+  if (test $enablepetsc = no -a $petscrequired = yes) ; then
+    dnl We return error code 3 here, since 0 means success and 1 is
+    dnl indistinguishable from other errors.  Ideally, all of the
+    dnl AC_MSG_ERROR calls in our m4 files would return a different
+    dnl error code, but currently this is not implemented.
+    AC_MSG_ERROR([*** PETSc was not found, but --enable-petsc-required was specified.], 3)
   fi
 ])
