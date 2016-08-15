@@ -827,6 +827,40 @@ void DofMap::clear()
   // through a clear()...
   _dof_coupling = NULL;
 
+  // Reset ghosting functor statuses
+  {
+  std::set<GhostingFunctor *>::iterator        gf_it = this->coupling_functors_begin();
+  const std::set<GhostingFunctor *>::iterator gf_end = this->coupling_functors_end();
+  for (; gf_it != gf_end; ++gf_it)
+    {
+      GhostingFunctor *gf = *gf_it;
+      libmesh_assert(gf);
+      _mesh.remove_ghosting_functor(*gf);
+    }
+  this->_coupling_functors.clear();
+
+  // Go back to default coupling
+
+  _default_coupling->set_dof_coupling(this->_dof_coupling);
+  _default_coupling->set_coupled_neighbor_dofs
+    (this->use_coupled_neighbor_dofs(this->_mesh));
+
+  // this->_coupling_functors.insert(*_default_coupling);
+  }
+
+
+  {
+  std::set<GhostingFunctor *>::iterator        gf_it = this->algebraic_ghosting_functors_begin();
+  const std::set<GhostingFunctor *>::iterator gf_end = this->algebraic_ghosting_functors_end();
+  for (; gf_it != gf_end; ++gf_it)
+    {
+      GhostingFunctor *gf = *gf_it;
+      libmesh_assert(gf);
+      _mesh.remove_ghosting_functor(*gf);
+    }
+  this->_algebraic_ghosting_functors.clear();
+  }
+
   _variables.clear();
   _variable_groups.clear();
   _first_df.clear();
