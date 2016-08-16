@@ -3129,9 +3129,12 @@ void Communicator::scatter(const std::vector<T> & data,
   this->broadcast(recv_buffer_size);
   recv.resize(recv_buffer_size);
 
+  const T * data_ptr = data.empty() ? libmesh_nullptr : &data[0];
+  T * recv_ptr = recv.empty() ? libmesh_nullptr : &recv[0];
+
   libmesh_call_mpi
-    (MPI_Scatter (&data[0], recv_buffer_size, StandardType<T>(&data[0]),
-                  &recv[0], recv_buffer_size, StandardType<T>(&recv[0]), root_id, this->get()));
+    (MPI_Scatter (data_ptr, recv_buffer_size, StandardType<T>(data_ptr),
+                  recv_ptr, recv_buffer_size, StandardType<T>(recv_ptr), root_id, this->get()));
 }
 
 
@@ -3175,10 +3178,14 @@ void Communicator::scatter(const std::vector<T> & data,
   this->scatter(counts, recv_buffer_size, root_id);
   recv.resize(recv_buffer_size);
 
+  const T * data_ptr = data.empty() ? libmesh_nullptr : &data[0];
+  const int * count_ptr = counts.empty() ? libmesh_nullptr : &counts[0];
+  T * recv_ptr = recv.empty() ? libmesh_nullptr : &recv[0];
+
   // Scatter the non-uniform chunks
   libmesh_call_mpi
-    (MPI_Scatterv (&data[0], &counts[0], &displacements[0], StandardType<T>(&data[0]),
-                   &recv[0], recv_buffer_size, StandardType<T>(&recv[0]), root_id, this->get()));
+    (MPI_Scatterv (data_ptr, count_ptr, &displacements[0], StandardType<T>(data_ptr),
+                   recv_ptr, recv_buffer_size, StandardType<T>(recv_ptr), root_id, this->get()));
 }
 
 
