@@ -169,7 +169,11 @@ void query_ghosting_functors
       GhostingFunctor::map_type::iterator        etg_it = elements_to_ghost.begin();
       const GhostingFunctor::map_type::iterator etg_end = elements_to_ghost.end();
       for (; etg_it != etg_end; ++etg_it)
-        connected_elements.insert(etg_it->first);
+        {
+          const Elem * elem = etg_it->first;
+          libmesh_assert(elem != remote_elem);
+          connected_elements.insert(elem);
+        }
     }
 
   // The GhostingFunctors won't be telling us about the elements from
@@ -242,7 +246,10 @@ void connect_families
           elem->total_family_tree(subactive_family);
           for (unsigned int i=0; i != subactive_family.size();
                ++i)
-            connected_elements.insert(subactive_family[i]);
+            {
+              libmesh_assert(subactive_family[i] != remote_elem);
+              connected_elements.insert(subactive_family[i]);
+            }
         }
     }
 
