@@ -1194,6 +1194,17 @@ public:
                       std::vector<T> & recv,
                       const unsigned int root_id=0) const;
 
+  /**
+   * Take a vector of vectors and scatter the ith inner vector
+   * to the ith processor in the communicator. The result is saved into recv buffer.
+   * The recv buffer does not have to be sized prior to this operation.
+   */
+  template <typename T>
+  inline void scatter(const std::vector<std::vector<T> > & data,
+                      std::vector<T> & recv,
+                      const unsigned int root_id=0,
+                      const bool identical_buffer_sizes=false) const;
+
   //-------------------------------------------------------------------
   /**
    * Take a range of local variables, combine it with ranges from all
