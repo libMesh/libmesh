@@ -50,6 +50,14 @@ void DefaultCoupling::operator()
           if (elem->neighbor_ptr(s) != libmesh_nullptr)
             {
               const Elem * const neighbor_0 = elem->neighbor_ptr(s);
+
+              // Mesh ghosting might ask us about what we want to
+              // distribute along with non-local elements, and those
+              // non-local elements might have remote neighbors, and
+              // if they do then we can't say anything about them.
+              if (neighbor_0 == remote_elem)
+                continue;
+
 #ifdef LIBMESH_ENABLE_AMR
               neighbor_0->active_family_tree_by_neighbor(active_neighbors,elem);
 #else
@@ -60,13 +68,6 @@ void DefaultCoupling::operator()
               for (std::size_t a=0; a != active_neighbors.size(); ++a)
                 {
                   const Elem * neighbor = active_neighbors[a];
-
-                  // We might be queried regarding non-local elements
-                  // during redistribution, and non-local elements can
-                  // have remote neighbors, but ghosting functors
-                  // should never return remote neighbors.
-                  if (neighbor == remote_elem)
-                    continue;
 
                   if (neighbor->processor_id() != p)
                     coupled_elements.insert
