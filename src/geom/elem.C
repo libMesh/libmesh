@@ -1668,8 +1668,9 @@ void Elem::active_family_tree_by_side (std::vector<const Elem *> & family,
                                        const unsigned int s,
                                        const bool reset) const
 {
-  // The "family tree" doesn't include subactive elements
+  // The "family tree" doesn't include subactive or remote elements
   libmesh_assert(!this->subactive());
+  libmesh_assert(this != remote_elem);
 
   // Clear the vector if the flag reset tells us to.
   if (reset)
@@ -1773,8 +1774,10 @@ void Elem::active_family_tree_by_neighbor (std::vector<const Elem *> & family,
                                            const Elem * neighbor_in,
                                            const bool reset) const
 {
-  // The "family tree" doesn't include subactive elements
+  // The "family tree" doesn't include subactive elements or
+  // remote_elements
   libmesh_assert(!this->subactive());
+  libmesh_assert(this != remote_elem);
 
   // Clear the vector if the flag reset tells us to.
   if (reset)
