@@ -1509,19 +1509,151 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 
   const unsigned int sys_num = this->sys_number();
 
-  //-------------------------------------------------------------------------
-  // We need to add the DOFs from elements that live on neighboring processors
-  // that are neighbors of the elements on the local processor
-  //-------------------------------------------------------------------------
+  const unsigned int n_var  = this->n_variables();
 
   MeshBase::const_element_iterator       local_elem_it
     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator local_elem_end
     = mesh.active_local_elements_end();
 
+  GhostingFunctor::map_type elements_to_send;
+
+  // Man, I wish we had guaranteed unique_ptr availability...
+  std::set<CouplingMatrix*> temporary_coupling_matrices;
+
+  // We need to add dofs to the send list if they've been directly
+  // requested by an algebraic ghosting functor or they've been
+  // indirectly requested by a coupling functor.
+  this->merge_ghost_functor_outputs
+    (elements_to_send,
+     temporary_coupling_matrices,
+     this->algebraic_ghosting_functors_begin(),
+     this->algebraic_ghosting_functors_end(),
+     local_elem_it, local_elem_end, mesh.processor_id());
+
+  this->merge_ghost_functor_outputs
+    (elements_to_send,
+     temporary_coupling_matrices,
+     this->coupling_functors_begin(),
+     this->coupling_functors_end(),
+     local_elem_it, local_elem_end, mesh.processor_id());
+
+  // Making a list of non-zero coupling matrix columns is an
+  // O(N_var^2) operation.  We cache it so we only have to do it once
+  // per CouplingMatrix and not once per element.
+  std::map<const CouplingMatrix*, std::vector<unsigned int> >
+    column_variable_lists;
+
+  GhostingFunctor::map_type::iterator        etg_it = elements_to_send.begin();
+  const GhostingFunctor::map_type::iterator etg_end = elements_to_send.end();
+  for (; etg_it != etg_end; ++etg_it)
+    {
+      const Elem * const partner = etg_it->first;
+
+      // We asked ghosting functors not to give us local elements
+      libmesh_assert_not_equal_to
+        (partner->processor_id(), this->processor_id());
+
+      const CouplingMatrix *ghost_coupling = etg_it->second;
+
+      // Loop over any present coupling matrix column variables if we
+      // have a coupling matrix, or just add all variables to
+      // send_list if not.
+      if (ghost_coupling)
+        {
+          libmesh_assert_equal_to (ghost_coupling->size(), n_var);
+
+          // Try to find a cached list of column variables.
+          std::map<const CouplingMatrix*,
+		   std::vector<unsigned int> >::const_iterator
+	    column_variable_list =
+              column_variable_lists.find(ghost_coupling);
+
+          // If we didn't find it, then we need to create it.
+          if (column_variable_list == column_variable_lists.end())
+            {
+              std::pair<
+                std::map<const CouplingMatrix*,
+		         std::vector<unsigned int> >::iterator,
+                bool>
+		inserted_variable_list_pair =
+                column_variable_lists.insert
+                  (std::pair<const CouplingMatrix*,
+                             std::vector<unsigned int> >
+		    (ghost_coupling, std::vector<unsigned int>()));
+              column_variable_list = inserted_variable_list_pair.first;
+
+	      std::vector<unsigned int> & new_variable_list =
+                inserted_variable_list_pair.first->second;
+
+              std::vector<unsigned char> has_variable(n_var, false);
+
+              for (unsigned int vi = 0; vi != n_var; ++vi)
+                {
+                  ConstCouplingRow ccr(vi, *ghost_coupling);
+
+                  for (ConstCouplingRow::const_iterator  it = ccr.begin(),
+                                                        end = ccr.end();
+                       it != end; ++it)
+                    {
+                      const unsigned int vj = *it;
+                      has_variable[vj] = true;
+                    }
+                }
+              for (unsigned int vj = 0; vj != n_var; ++vj)
+                {
+                  if (has_variable[vj])
+                    new_variable_list.push_back(vj);
+                }
+            }
+
+	  const std::vector<unsigned int> & variable_list =
+            column_variable_list->second;
+
+          for (unsigned int j=0; j != variable_list.size(); ++j)
+            {
+              const unsigned int vj=variable_list[j];
+
+              std::vector<dof_id_type> di;
+              this->dof_indices (partner, di, vj);
+
+              // Insert the remote DOF indices into the send list
+              for (std::size_t j=0; j != di.size(); ++j)
+                if (di[j] < this->first_dof() ||
+                    di[j] >= this->end_dof())
+                  _send_list.push_back(di[j]);
+            }
+        }
+      else
+        {
+          std::vector<dof_id_type> di;
+          this->dof_indices (partner, di);
+
+          // Insert the remote DOF indices into the send list
+          for (std::size_t j=0; j != di.size(); ++j)
+            if (di[j] < this->first_dof() ||
+                di[j] >= this->end_dof())
+              _send_list.push_back(di[j]);
+        }
+
+    }
+
+  // We're now done with any merged coupling matrices we had to create.
+  for (std::set<CouplingMatrix*>::iterator
+         it  = temporary_coupling_matrices.begin(),
+         end = temporary_coupling_matrices.begin();
+       it != end; ++it)
+    delete *it;
+
+  //-------------------------------------------------------------------------
+  // We need to add the DOFs from elements that live on neighboring processors
+  // that are neighbors of the elements on the local processor
+  //-------------------------------------------------------------------------
+
   std::vector<bool> node_on_processor(mesh.max_node_id(), false);
   std::vector<dof_id_type> di;
   std::vector<const Elem *> family;
+
 
   // Loop over the active local elements, adding all active elements
   // that neighbor an active local element to the send list.
