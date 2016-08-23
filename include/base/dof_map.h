@@ -30,6 +30,7 @@
 #include "libmesh/threads.h"
 #include "libmesh/threads_allocators.h"
 #include "libmesh/elem_range.h"
+#include "libmesh/ghosting_functor.h"
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/point.h"
@@ -54,7 +55,6 @@ class DofMap;
 class DofObject;
 class Elem;
 class FEType;
-class GhostingFunctor;
 class MeshBase;
 class PeriodicBoundaryBase;
 class PeriodicBoundaries;
@@ -1250,6 +1250,19 @@ private:
    */
   void distribute_local_dofs_node_major (dof_id_type & next_free_dof,
                                          MeshBase & mesh);
+
+  /*
+   * A utility method for obtaining a set of elements to ghost along
+   * with merged coupling matrices.
+   */
+  static void merge_ghost_functor_outputs
+    (GhostingFunctor::map_type & elements_to_ghost,
+     std::set<CouplingMatrix*> & temporary_coupling_matrices,
+     const std::set<GhostingFunctor *>::iterator & gf_begin,
+     const std::set<GhostingFunctor *>::iterator & gf_end,
+     const MeshBase::const_element_iterator & elems_begin,
+     const MeshBase::const_element_iterator & elems_end,
+     processor_id_type p);
 
   /**
    * Adds entries to the \p _send_list vector corresponding to DoFs

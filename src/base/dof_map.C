@@ -23,6 +23,7 @@
 #include <sstream>
 
 // Local Includes -----------------------------------
+#include "libmesh/coupling_matrix.h"
 #include "libmesh/default_coupling.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector_base.h"
@@ -1442,6 +1443,62 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
       }
   }
 #endif // DEBUG
+}
+
+
+
+void DofMap::merge_ghost_functor_outputs
+  (GhostingFunctor::map_type & elements_to_ghost,
+   std::set<CouplingMatrix*> & temporary_coupling_matrices,
+   const std::set<GhostingFunctor *>::iterator & gf_begin,
+   const std::set<GhostingFunctor *>::iterator & gf_end,
+   const MeshBase::const_element_iterator & elems_begin,
+   const MeshBase::const_element_iterator & elems_end,
+   processor_id_type p)
+{
+  std::set<GhostingFunctor *>::iterator gf_it = gf_begin;
+  for (; gf_it != gf_end; ++gf_it)
+    {
+      GhostingFunctor::map_type more_elements_to_ghost;
+
+      GhostingFunctor *gf = *gf_it;
+      libmesh_assert(gf);
+      (*gf)(elems_begin, elems_end, p, more_elements_to_ghost);
+
+      GhostingFunctor::map_type::iterator        metg_it = more_elements_to_ghost.begin();
+      const GhostingFunctor::map_type::iterator metg_end = more_elements_to_ghost.end();
+      for (; metg_it != metg_end; ++metg_it)
+        {
+          GhostingFunctor::map_type::iterator existing_it =
+            elements_to_ghost.find (metg_it->first);
+          if (existing_it == elements_to_ghost.end())
+            elements_to_ghost.insert(*metg_it);
+          else
+            {
+              if (existing_it->second)
+                {
+                  if (metg_it->second)
+                    {
+                      // If this isn't already a temporary
+                      // then we need to make one so we'll
+                      // have a non-const matrix to merge
+                      if (temporary_coupling_matrices.empty() ||
+                          temporary_coupling_matrices.find
+                            (const_cast<CouplingMatrix*>(existing_it->second)) ==
+                          temporary_coupling_matrices.end())
+                        {
+                          CouplingMatrix *cm = new CouplingMatrix(*existing_it->second);
+                          temporary_coupling_matrices.insert(cm);
+                          existing_it->second = cm;
+                        }
+                      const_cast<CouplingMatrix&>(*existing_it->second) &= *metg_it->second;
+                    }
+                }
+              else
+                existing_it->second = metg_it->second;
+            }
+        }
+    }
 }
 
 
