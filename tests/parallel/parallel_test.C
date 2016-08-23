@@ -27,6 +27,7 @@ public:
   CPPUNIT_TEST( testGather );
   CPPUNIT_TEST( testAllGather );
   CPPUNIT_TEST( testBroadcast );
+  CPPUNIT_TEST( testScatter );
   CPPUNIT_TEST( testBarrier );
   CPPUNIT_TEST( testMin );
   CPPUNIT_TEST( testMax );
@@ -88,6 +89,97 @@ public:
 
     for (unsigned int i=0; i<src.size(); i++)
       CPPUNIT_ASSERT_EQUAL( src[i] , dest[i] );
+  }
+
+
+
+  void testScatter()
+  {
+    // Test Scalar scatter
+    {
+      std::vector<unsigned int> src;
+      unsigned int dest;
+
+      if (TestCommWorld->rank() == 0)
+      {
+        src.resize(TestCommWorld->size());
+        for (unsigned int i=0; i<src.size(); i++)
+          src[i] = i;
+      }
+
+      TestCommWorld->scatter(src, dest);
+
+      CPPUNIT_ASSERT_EQUAL( TestCommWorld->rank(), dest );
+    }
+
+    // Test Vector Scatter (equal-sized chunks)
+    {
+      std::vector<unsigned int> src;
+      std::vector<unsigned int> dest;
+      static const unsigned int CHUNK_SIZE = 3;
+
+      if (TestCommWorld->rank() == 0)
+      {
+        src.resize(TestCommWorld->size() * CHUNK_SIZE);
+        for (unsigned int i=0; i<src.size(); i++)
+          src[i] = i;
+      }
+
+      TestCommWorld->scatter(src, dest);
+
+      for (unsigned int i=0; i<CHUNK_SIZE; i++)
+        CPPUNIT_ASSERT_EQUAL( TestCommWorld->rank() * CHUNK_SIZE + i, dest[i] );
+    }
+
+    // Test Vector Scatter (jagged chunks)
+    {
+      std::vector<unsigned int> src;
+      std::vector<unsigned int> dest;
+      std::vector<int> counts;
+
+      if (TestCommWorld->rank() == 0)
+      {
+        // Give each processor "rank" number of items ( Sum i=1..n == (n * (n + 1))/2 )
+        src.resize((TestCommWorld->size() * (TestCommWorld->size() + 1)) / 2);
+        counts.resize(TestCommWorld->size());
+
+        for (unsigned int i=0; i<src.size(); i++)
+          src[i] = i;
+        for (unsigned int i=0; i<src.size(); i++)
+          counts[i] = static_cast<int>(i+1);
+      }
+
+      TestCommWorld->scatter(src, counts, dest);
+
+      unsigned int start_value = (TestCommWorld->rank() * (TestCommWorld->rank() + 1)) / 2;
+      for (unsigned int i=0; i<=TestCommWorld->rank(); i++)
+        CPPUNIT_ASSERT_EQUAL( start_value + i, dest[i] );
+    }
+
+    // Test Vector of Vector Scatter
+    {
+      std::vector<std::vector<unsigned int> > src;
+      std::vector<unsigned int> dest;
+
+      if (TestCommWorld->rank() == 0)
+      {
+        // Give each processor "rank" number of items ( Sum i=1..n == (n * (n + 1))/2 )
+        src.resize(TestCommWorld->size());
+        for (unsigned int i=0; i<src.size(); ++i)
+          src[i].resize(i+1);
+
+        unsigned int global_counter = 0;
+        for (unsigned int i=0; i<src.size(); i++)
+          for (unsigned int j=0; j<src[i].size(); j++)
+            src[i][j] = global_counter++;
+      }
+
+      TestCommWorld->scatter(src, dest);
+
+      unsigned int start_value = (TestCommWorld->rank() * (TestCommWorld->rank() + 1)) / 2;
+      for (unsigned int i=0; i<=TestCommWorld->rank(); i++)
+        CPPUNIT_ASSERT_EQUAL( start_value + i, dest[i] );
+    }
   }
 
 

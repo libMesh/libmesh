@@ -3078,19 +3078,26 @@ inline void Communicator::allgather(std::vector<T> & r,
                      &displacements[0], send_type, this->get()));
 }
 
+
+
 template <typename T>
 void Communicator::scatter(const std::vector<T> & data,
                            T & recv,
                            const unsigned int root_id) const
 {
+  libmesh_assert_less (root_id, this->size());
+
+  // Do not allow the root_id to scatter a NULL vector.
+  // That would leave recv in an indeterminate state.
+  libmesh_assert (this->rank() != root_id || this->size() == data.size());
+
   if (this->size() == 1)
     {
       libmesh_assert (!this->rank());
       libmesh_assert (!root_id);
+      recv = data[0];
       return;
     }
-
-  libmesh_assert_less (root_id, this->size());
 
   LOG_SCOPE("scatter()", "Parallel");
 
@@ -3108,14 +3115,15 @@ void Communicator::scatter(const std::vector<T> & data,
                            std::vector<T> & recv,
                            const unsigned int root_id) const
 {
+  libmesh_assert_less (root_id, this->size());
+
   if (this->size() == 1)
     {
       libmesh_assert (!this->rank());
       libmesh_assert (!root_id);
+      recv.assign(data.begin(), data.end());
       return;
     }
-
-  libmesh_assert_less (root_id, this->size());
 
   LOG_SCOPE("scatter()", "Parallel");
 
@@ -3145,19 +3153,18 @@ void Communicator::scatter(const std::vector<T> & data,
                            std::vector<T> & recv,
                            const unsigned int root_id) const
 {
+  libmesh_assert_less (root_id, this->size());
+
   if (this->size() == 1)
     {
       libmesh_assert (!this->rank());
       libmesh_assert (!root_id);
+      libmesh_assert (counts.size() == this->size());
+      recv.assign(data.begin(), data.begin() + counts[0]);
       return;
     }
 
-  libmesh_assert_less (root_id, this->size());
-
-  LOG_SCOPE("scatter()", "Parallel");
-
   std::vector<int> displacements(this->size(), 0);
-
   if (root_id == this->rank())
     {
       libmesh_assert(counts.size() == this->size());
@@ -3173,6 +3180,8 @@ void Communicator::scatter(const std::vector<T> & data,
       libmesh_assert(data.size() == globalsize);
     }
 
+  LOG_SCOPE("scatter()", "Parallel");
+
   // Scatter the buffer sizes to size remote buffers
   int recv_buffer_size;
   this->scatter(counts, recv_buffer_size, root_id);
@@ -3186,6 +3195,54 @@ void Communicator::scatter(const std::vector<T> & data,
   libmesh_call_mpi
     (MPI_Scatterv (data_ptr, count_ptr, &displacements[0], StandardType<T>(data_ptr),
                    recv_ptr, recv_buffer_size, StandardType<T>(recv_ptr), root_id, this->get()));
+}
+
+
+
+template <typename T>
+void Communicator::scatter(const std::vector<std::vector<T> > & data,
+                           std::vector<T> & recv,
+                           const unsigned int root_id,
+                           const bool identical_buffer_sizes) const
+{
+  libmesh_assert_less (root_id, this->size());
+
+  if (this->size() == 1)
+    {
+      libmesh_assert (!this->rank());
+      libmesh_assert (!root_id);
+      libmesh_assert (data.size() == this->size());
+      recv.assign(data[0].begin(), data[0].end());
+      return;
+    }
+
+  std::vector<T> stacked_data;
+  std::vector<int> counts;
+
+  if (root_id == this->rank())
+    {
+      libmesh_assert (data.size() == this->size());
+
+      if (!identical_buffer_sizes)
+        counts.resize(this->size());
+
+      for (unsigned int i=0; i < data.size(); ++i)
+        {
+          if (!identical_buffer_sizes)
+            counts[i] = data[i].size();
+#ifndef NDEBUG
+          else
+            // Check that buffer sizes are indeed equal
+            libmesh_assert(!i || data[i-1].size() == data[i].size());
+#endif
+          std::copy(data[i].begin(), data[i].end(), std::back_inserter(stacked_data));
+        }
+    }
+
+  if (identical_buffer_sizes)
+    this->scatter(stacked_data, recv, root_id);
+  else
+    this->scatter(stacked_data, counts, recv, root_id);
 }
 
 
