@@ -237,52 +237,12 @@ void Build::operator()(const ConstElemRange & range)
           // Man, I wish we had guaranteed unique_ptr availability...
           std::set<CouplingMatrix*> temporary_coupling_matrices;
 
-
-          std::set<GhostingFunctor *>::iterator        gf_it = dof_map.coupling_functors_begin();
-          const std::set<GhostingFunctor *>::iterator gf_end = dof_map.coupling_functors_end();
-          for (; gf_it != gf_end; ++gf_it)
-            {
-              GhostingFunctor::map_type more_elements_to_couple;
-
-              GhostingFunctor *gf = *gf_it;
-              libmesh_assert(gf);
-              (*gf)(fake_elem_it, fake_elem_end, DofObject::invalid_processor_id, more_elements_to_couple);
-
-              GhostingFunctor::map_type::iterator        metg_it = more_elements_to_couple.begin();
-              const GhostingFunctor::map_type::iterator metg_end = more_elements_to_couple.end();
-              for (; metg_it != metg_end; ++metg_it)
-                {
-                  GhostingFunctor::map_type::iterator existing_it =
-                    elements_to_couple.find (metg_it->first);
-                  if (existing_it == elements_to_couple.end())
-                    elements_to_couple.insert(*metg_it);
-                  else
-                    {
-                      if (existing_it->second)
-                        {
-                          if (metg_it->second)
-                            {
-                              // If this isn't already a temporary
-                              // then we need to make one so we'll
-                              // have a non-const matrix to merge
-                              if (temporary_coupling_matrices.empty() ||
-                                  temporary_coupling_matrices.find
-                                    (const_cast<CouplingMatrix*>(existing_it->second)) ==
-                                  temporary_coupling_matrices.end())
-                                {
-                                  CouplingMatrix *cm = new CouplingMatrix(*existing_it->second);
-                                  temporary_coupling_matrices.insert(cm);
-                                  existing_it->second = cm;
-                                }
-                              const_cast<CouplingMatrix&>(*existing_it->second) &= *metg_it->second;
-                            }
-                        }
-                      else
-                        existing_it->second = metg_it->second;
-                    }
-                }
-            }
-
+          dof_map.merge_ghost_functor_outputs
+            (elements_to_couple,
+             temporary_coupling_matrices,
+             dof_map.coupling_functors_begin(),
+             dof_map.coupling_functors_end(),
+             fake_elem_it, fake_elem_end, DofObject::invalid_processor_id);
 
           for (unsigned int vi=0; vi<n_var; vi++)
             {
