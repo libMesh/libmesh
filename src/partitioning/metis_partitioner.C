@@ -408,13 +408,11 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
                     // when partitioning a BoundaryMesh, whose
                     // elements all have interior_parents() that
                     // belong to some other Mesh.
-                    //
-                    // TODO: Add vector_map::find() which can return
-                    // an end iterator instead of asserting like
-                    // operator[].
-                    if (global_index_map.count(neighbor->id()))
-                      csr_graph(elem_global_index, connection++) =
-                        global_index_map[neighbor->id()];
+                    vectormap<dof_id_type, dof_id_type>::iterator global_index_map_it =
+                      global_index_map.find(neighbor->id());
+
+                    if (global_index_map_it != global_index_map.end())
+                      csr_graph(elem_global_index, connection++) = global_index_map_it->second;
                   }
               }
 
