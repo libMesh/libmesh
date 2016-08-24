@@ -158,6 +158,46 @@ public:
   }
 
   /**
+   * Returns an iterator corresponding to key, or the end iterator if
+   * not found.
+   */
+  iterator find (const key_type & key)
+  {
+    if (!_sorted)
+      this->sort();
+
+    libmesh_assert (_sorted);
+
+    value_type to_find;
+    to_find.first = key;
+
+    FirstOrder order;
+
+    return std::lower_bound (this->begin(), this->end(), to_find, order);
+  }
+
+  /**
+   * Returns an iterator corresponding to key, or the end iterator if
+   * not found.
+   */
+  const_iterator find (const key_type & key) const
+  {
+    // This function isn't really const, we might have to sort the
+    // underlying container before we can search in it.
+    if (!_sorted)
+      const_cast<vectormap<Key, Tp> *>(this)->sort();
+
+    libmesh_assert (_sorted);
+
+    value_type to_find;
+    to_find.first = key;
+
+    FirstOrder order;
+
+    return std::lower_bound (this->begin(), this->end(), to_find, order);
+  }
+
+  /**
    * *returns the number of occurances of \p key.  For a map-like object, this should
    * be 1 or 0.
    */
