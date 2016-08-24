@@ -192,7 +192,8 @@ protected:
                                   ResFuncType mass,
                                   ResFuncType damping,
                                   ResFuncType time_deriv,
-                                  ResFuncType constraint);
+                                  ResFuncType constraint,
+                                  ReinitFuncType reinit);
 };
 
 } // namespace libMesh
