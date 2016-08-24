@@ -138,3 +138,82 @@ public:
 protected:
   unsigned int _u_var;
 };
+
+//! FEMSystem-based class for testing of TimeSolvers using second order SCALARs
+/**
+ *  We're assuming the ODEs are only dependent on time, so no Jacobian
+ *  functions are needed, just F, C, and M.
+ */
+class SecondOrderScalarSystemBase : public FirstOrderScalarSystemBase
+{
+public:
+  SecondOrderScalarSystemBase(EquationSystems & es,
+                              const std::string & name_in,
+                              const unsigned int number_in)
+    : FirstOrderScalarSystemBase(es, name_in, number_in)
+  {}
+
+  //! Value of C(u).
+  virtual Number C( FEMContext & context, unsigned int qp ) =0;
+
+  //! Note the nonlinear residual is M(u)\ddot{u} + C(u)\dot{u} + F(u)
+  virtual bool damping_residual (bool request_jacobian,
+                                 DiffContext & context)
+  {
+    FEMContext & c = cast_ref<FEMContext &>(context);
+    DenseSubVector<Number> & Fu = c.get_elem_residual(_u_var);
+    DenseSubMatrix<Number> & Kuu = c.get_elem_jacobian(_u_var, _u_var);
+
+    const unsigned int n_u_dofs = c.get_dof_indices(_u_var).size();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
+
+    for (unsigned int qp=0; qp != n_qpoints; qp++)
+      {
+        libMesh::Number udot;
+        c.interior_rate(_u_var,qp,udot);
+
+        Number Cval = this->C(c,qp);
+
+        for (unsigned int i=0; i != n_u_dofs; i++)
+          {
+            Fu(i) += Cval*udot;
+
+            if (request_jacobian)
+              for (unsigned int j=0; j != n_u_dofs; j++)
+                Kuu(i,j) += Cval*context.get_elem_solution_rate_derivative();
+          }
+      }
+
+    return request_jacobian;
+  }
+
+  virtual bool mass_residual (bool request_jacobian,
+                              DiffContext & context)
+  {
+    FEMContext & c = cast_ref<FEMContext &>(context);
+    DenseSubVector<Number> & Fu = c.get_elem_residual(_u_var);
+    DenseSubMatrix<Number> & Kuu = c.get_elem_jacobian(_u_var, _u_var);
+
+    const unsigned int n_u_dofs = c.get_dof_indices(_u_var).size();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
+
+    for (unsigned int qp=0; qp != n_qpoints; qp++)
+      {
+        libMesh::Number uddot;
+        c.interior_accel(_u_var,qp,uddot);
+
+        Number Mval = this->M(c,qp);
+
+        for (unsigned int i=0; i != n_u_dofs; i++)
+          {
+            Fu(i) += Mval*uddot;
+
+            if (request_jacobian)
+              for (unsigned int j=0; j != n_u_dofs; j++)
+                Kuu(i,j) += Mval*context.get_elem_solution_accel_derivative();
+          }
+      }
+
+    return request_jacobian;
+  }
+};
