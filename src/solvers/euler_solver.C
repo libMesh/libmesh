@@ -129,7 +129,7 @@ bool EulerSolver::_general_residual (bool request_jacobian,
   // Move theta_->elem_, elem_->theta_
   context.get_elem_solution().swap(theta_solution);
 
-  // Move the mesh into place first if necessary
+  // Move the mesh into place first if necessary, set t = t_{\theta}
   (context.*reinit_func)(theta);
 
   // Get the time derivative at t_theta
@@ -139,7 +139,7 @@ bool EulerSolver::_general_residual (bool request_jacobian,
   jacobian_computed = (_system.*mass)(jacobian_computed, context) &&
     jacobian_computed;
 
-  // Restore the elem position if necessary
+  // Restore the elem position if necessary, set t = t_{n+1}
   (context.*reinit_func)(1);
 
   // Move elem_->elem_, theta_->theta_

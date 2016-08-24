@@ -134,6 +134,9 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
   context.get_elem_solution_rate() *=
     context.elem_solution_rate_derivative;
 
+  // Move the mesh into place first if necessary, set t = t_{n+1}
+  (context.*reinit_func)(1.);
+
   // First, evaluate time derivative at the new timestep.
   // The element should already be in the proper place
   // even for a moving mesh problem.
@@ -167,7 +170,7 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
   context.get_elem_solution().swap(old_elem_solution);
   context.elem_solution_derivative = 0.0;
 
-  // Move the mesh into place first if necessary
+  // Move the mesh into place if necessary, set t = t_{n}
   (context.*reinit_func)(0.);
 
   jacobian_computed =
@@ -194,7 +197,7 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
   context.get_elem_solution().swap(old_elem_solution);
   context.elem_solution_derivative = 1;
 
-  // Restore the elem position if necessary
+  // Restore the elem position if necessary, set t = t_{n+1}
   (context.*reinit_func)(1.);
 
   // Add back (or restore) the old residual/jacobian
