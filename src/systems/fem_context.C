@@ -1305,18 +1305,20 @@ void FEMContext::elem_reinit(Real theta)
 
   // Handle a moving element if necessary.
   if (_mesh_sys)
-    // We assume that the ``default'' state
-    // of the mesh is its final, theta=1.0
-    // position, so we don't bother with
-    // mesh motion in that case.
-    if (theta != 1.0)
-      {
-        // FIXME - ALE is not threadsafe yet!
-        libmesh_assert_equal_to (libMesh::n_threads(), 1);
+    {
+      // We assume that the ``default'' state
+      // of the mesh is its final, theta=1.0
+      // position, so we don't bother with
+      // mesh motion in that case.
+      if (theta != 1.0)
+        {
+          // FIXME - ALE is not threadsafe yet!
+          libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
-        elem_position_set(theta);
-      }
-  elem_fe_reinit();
+          elem_position_set(theta);
+        }
+      elem_fe_reinit();
+   }
 }
 
 
