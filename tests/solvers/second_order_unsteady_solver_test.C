@@ -1,0 +1,76 @@
+// Ignore unused parameter warnings coming from cppunit headers
+#include <libmesh/ignore_warnings.h>
+#include <cppunit/extensions/HelperMacros.h>
+#include <cppunit/TestCase.h>
+#include <libmesh/restore_warnings.h>
+
+#include <libmesh/equation_systems.h>
+#include <libmesh/mesh.h>
+#include <libmesh/mesh_generation.h>
+#include <libmesh/fem_system.h>
+#include <libmesh/quadrature.h>
+#include <libmesh/diff_solver.h>
+#include <libmesh/newmark_solver.h>
+
+#include "test_comm.h"
+
+#include "solvers/time_solver_test_common.h"
+
+// THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
+// std::auto_ptr, which in turn produces -Wdeprecated-declarations
+// warnings.  These can be ignored in GCC as long as we wrap the
+// offending code in appropriate pragmas.  We can't get away with a
+// single ignore_warnings.h inclusion at the beginning of this file,
+// since the libmesh headers pull in a restore_warnings.h at some
+// point.  We also don't bother restoring warnings at the end of this
+// file since it's not a header.
+#include <libmesh/ignore_warnings.h>
+
+//! Implements ODE: 3.14\ddot{u} = 2.71, u(0) = 0, \dot{u}(0) = 0
+class ConstantSecondOrderODE : public SecondOrderScalarSystemBase
+{
+public:
+  ConstantSecondOrderODE(EquationSystems & es,
+                         const std::string & name_in,
+                         const unsigned int number_in)
+    : SecondOrderScalarSystemBase(es, name_in, number_in)
+  {}
+
+  virtual Number F( FEMContext & /*context*/, unsigned int /*qp*/ )
+  { return -2.71; }
+
+  virtual Number C( FEMContext & /*context*/, unsigned int /*qp*/ )
+  { return 0.0; }
+
+  virtual Number M( FEMContext & /*context*/, unsigned int /*qp*/ )
+  { return 3.14; }
+
+  virtual Number u( Real t )
+  { return 2.71/3.14*0.5*t*t; }
+};
+
+class NewmarkSolverTest : public CppUnit::TestCase,
+                          public TimeSolverTestImplementation<NewmarkSolver>
+{
+public:
+  CPPUNIT_TEST_SUITE( NewmarkSolverTest );
+
+  CPPUNIT_TEST( testNewmarkSolverConstantSecondOrderODE );
+
+  CPPUNIT_TEST_SUITE_END();
+
+public:
+
+  void testNewmarkSolverConstantSecondOrderODE()
+  {
+    this->run_test_with_exact_soln<ConstantSecondOrderODE>(0.5,10);
+  }
+
+protected:
+
+  virtual void aux_time_solver_init( NewmarkSolver & time_solver )
+  { time_solver.compute_initial_accel(); }
+
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION( NewmarkSolverTest );

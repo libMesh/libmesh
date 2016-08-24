@@ -45,6 +45,9 @@ unit_tests_sources = \
   parallel/parallel_test.C \
   parallel/parallel_point_test.C \
   quadrature/quadrature_test.C \
+  solvers/time_solver_test_common.h \
+  solvers/first_order_unsteady_solver_test.C \
+  solvers/second_order_unsteady_solver_test.C \
   systems/equation_systems_test.C \
   systems/systems_test.C \
   utils/vectormap_test.C
