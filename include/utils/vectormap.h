@@ -68,6 +68,8 @@ public:
   typedef std::pair<Key, Tp>                    value_type;
   typedef std::vector<value_type>               vector_type;
   typedef typename vector_type::difference_type difference_type;
+  typedef typename vector_type::iterator        iterator;
+  typedef typename vector_type::const_iterator  const_iterator;
 
 private:
 
@@ -147,8 +149,7 @@ public:
 
     FirstOrder order;
 
-    typename vectormap<Key,Tp>::const_iterator
-      lower_bound = std::lower_bound (this->begin(), this->end(), to_find, order);
+    const_iterator lower_bound = std::lower_bound (this->begin(), this->end(), to_find, order);
 
     libmesh_assert (lower_bound != this->end());
     libmesh_assert_equal_to (lower_bound->first, key);
@@ -173,8 +174,7 @@ public:
 
     FirstOrder order;
 
-    std::pair<typename vectormap<Key,Tp>::const_iterator,
-              typename vectormap<Key,Tp>::const_iterator>
+    std::pair<const_iterator, const_iterator>
       bounds = std::equal_range (this->begin(), this->end(), to_find, order);
 
     return std::distance (bounds.first, bounds.second);
