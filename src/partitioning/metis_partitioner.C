@@ -403,8 +403,18 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
                     // would be nice
                     Elem * neighbor = const_cast<Elem *>(*n_it);
 
-                    csr_graph(elem_global_index, connection++) =
-                      global_index_map[neighbor->id()];
+                    // Not all interior neighbors are necessarily in
+                    // the global_index_map.  This will be the case
+                    // when partitioning a BoundaryMesh, whose
+                    // elements all have interior_parents() that
+                    // belong to some other Mesh.
+                    //
+                    // TODO: Add vector_map::find() which can return
+                    // an end iterator instead of asserting like
+                    // operator[].
+                    if (global_index_map.count(neighbor->id()))
+                      csr_graph(elem_global_index, connection++) =
+                        global_index_map[neighbor->id()];
                   }
               }
 
