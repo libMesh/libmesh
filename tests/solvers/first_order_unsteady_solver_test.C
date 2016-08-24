@@ -125,6 +125,7 @@ public:
   CPPUNIT_TEST_SUITE( Euler2SolverTest );
 
   CPPUNIT_TEST( testEuler2SolverConstantFirstOrderODE );
+  CPPUNIT_TEST( testEuler2SolverLinearTimeFirstOrderODE );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -138,6 +139,12 @@ public:
     this->run_test_with_exact_soln<ConstantFirstOrderODE>(0.5,10);
   }
 
+  void testEuler2SolverLinearTimeFirstOrderODE()
+  {
+    // Need \theta = 0.5 since this has t in F.
+    this->set_theta(0.5);
+    this->run_test_with_exact_soln<LinearTimeFirstOrderODE>(0.5,10);
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( EulerSolverTest );
