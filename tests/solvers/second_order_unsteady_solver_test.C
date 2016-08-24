@@ -49,8 +49,28 @@ public:
   { return 2.71/3.14*0.5*t*t; }
 };
 
+class NewmarkSolverTestBase : public TimeSolverTestImplementation<NewmarkSolver>
+{
+public:
+  NewmarkSolverTestBase()
+    : TimeSolverTestImplementation<NewmarkSolver>(),
+    _beta(0.25)
+  {}
+
+protected:
+
+  virtual void aux_time_solver_init( NewmarkSolver & time_solver )
+  { time_solver.set_beta(_beta);
+    time_solver.compute_initial_accel(); }
+
+  void set_beta( Real beta )
+  { _beta = beta; }
+
+  Real _beta;
+};
+
 class NewmarkSolverTest : public CppUnit::TestCase,
-                          public TimeSolverTestImplementation<NewmarkSolver>
+                          public NewmarkSolverTestBase
 {
 public:
   CPPUNIT_TEST_SUITE( NewmarkSolverTest );
@@ -66,10 +86,6 @@ public:
     this->run_test_with_exact_soln<ConstantSecondOrderODE>(0.5,10);
   }
 
-protected:
-
-  virtual void aux_time_solver_init( NewmarkSolver & time_solver )
-  { time_solver.compute_initial_accel(); }
 
 };
 
