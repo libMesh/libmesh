@@ -399,12 +399,31 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
                 std::set<const Elem *>::iterator n_it = neighbor_set.begin();
                 for (; n_it != neighbor_set.end(); ++n_it)
                   {
-                    // FIXME - non-const versions of the Elem set methods
-                    // would be nice
-                    Elem * neighbor = const_cast<Elem *>(*n_it);
+                    const Elem * neighbor = *n_it;
 
-                    csr_graph(elem_global_index, connection++) =
-                      global_index_map[neighbor->id()];
+                    // Not all interior neighbors are necessarily in
+                    // the same Mesh (hence not in the global_index_map).
+                    // This will be the case when partitioning a
+                    // BoundaryMesh, whose elements all have
+                    // interior_parents() that belong to some other
+                    // Mesh.
+                    const Elem * queried_elem = mesh.query_elem_ptr(neighbor->id());
+
+                    // Compare the neighbor and the queried_elem
+                    // pointers, make sure they are the same.
+                    if (queried_elem && queried_elem == neighbor)
+                      {
+                        vectormap<dof_id_type, dof_id_type>::iterator global_index_map_it =
+                          global_index_map.find(neighbor->id());
+
+                        // If the interior_neighbor is in the Mesh but
+                        // not in the global_index_map, we have other issues.
+                        if (global_index_map_it == global_index_map.end())
+                          libmesh_error_msg("Interior neighbor with id " << neighbor->id() << " not found in global_index_map.");
+
+                        else
+                          csr_graph(elem_global_index, connection++) = global_index_map_it->second;
+                      }
                   }
               }
 

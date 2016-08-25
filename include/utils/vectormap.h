@@ -68,6 +68,8 @@ public:
   typedef std::pair<Key, Tp>                    value_type;
   typedef std::vector<value_type>               vector_type;
   typedef typename vector_type::difference_type difference_type;
+  typedef typename vector_type::iterator        iterator;
+  typedef typename vector_type::const_iterator  const_iterator;
 
 private:
 
@@ -147,13 +149,52 @@ public:
 
     FirstOrder order;
 
-    typename vectormap<Key,Tp>::const_iterator
-      lower_bound = std::lower_bound (this->begin(), this->end(), to_find, order);
+    const_iterator lower_bound = std::lower_bound (this->begin(), this->end(), to_find, order);
 
     libmesh_assert (lower_bound != this->end());
     libmesh_assert_equal_to (lower_bound->first, key);
 
     return lower_bound->second;
+  }
+
+  /**
+   * Returns an iterator corresponding to key, or the end iterator if
+   * not found.
+   */
+  iterator find (const key_type & key)
+  {
+    if (!_sorted)
+      this->sort();
+
+    libmesh_assert (_sorted);
+
+    value_type to_find;
+    to_find.first = key;
+
+    FirstOrder order;
+
+    return std::lower_bound (this->begin(), this->end(), to_find, order);
+  }
+
+  /**
+   * Returns an iterator corresponding to key, or the end iterator if
+   * not found.
+   */
+  const_iterator find (const key_type & key) const
+  {
+    // This function isn't really const, we might have to sort the
+    // underlying container before we can search in it.
+    if (!_sorted)
+      const_cast<vectormap<Key, Tp> *>(this)->sort();
+
+    libmesh_assert (_sorted);
+
+    value_type to_find;
+    to_find.first = key;
+
+    FirstOrder order;
+
+    return std::lower_bound (this->begin(), this->end(), to_find, order);
   }
 
   /**
@@ -173,8 +214,7 @@ public:
 
     FirstOrder order;
 
-    std::pair<typename vectormap<Key,Tp>::const_iterator,
-              typename vectormap<Key,Tp>::const_iterator>
+    std::pair<const_iterator, const_iterator>
       bounds = std::equal_range (this->begin(), this->end(), to_find, order);
 
     return std::distance (bounds.first, bounds.second);
