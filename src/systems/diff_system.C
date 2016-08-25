@@ -19,6 +19,7 @@
 #include "libmesh/diff_solver.h"
 #include "libmesh/diff_system.h"
 #include "libmesh/time_solver.h"
+#include "libmesh/unsteady_solver.h"
 
 namespace libMesh
 {
@@ -120,13 +121,31 @@ void DifferentiableSystem::init_data ()
 void DifferentiableSystem::time_evolving (unsigned int var)
 {
   libmesh_deprecated();
+  libmesh_assert(time_solver);
 
   DifferentiablePhysics::time_evolving(var);
+
+  UnsteadySolver * unsteady_solver = dynamic_cast<UnsteadySolver *>(time_solver.get());
+  if (unsteady_solver)
+    unsteady_solver->add_first_order_var(var);
 }
 
 void DifferentiableSystem::time_evolving (unsigned int var, unsigned int order)
 {
+  libmesh_assert(time_solver);
+
   DifferentiablePhysics::time_evolving(var,order);
+
+  UnsteadySolver * unsteady_solver = dynamic_cast<UnsteadySolver *>(time_solver.get());
+  if (unsteady_solver)
+    {
+      if (order==1)
+        unsteady_solver->add_first_order_var(var);
+      else if(order==2)
+        unsteady_solver->add_second_order_var(var);
+      else
+        libmesh_error_msg("Input order must be 1 or 2!");
+    }
 }
 
 UniquePtr<DiffContext> DifferentiableSystem::build_context ()
