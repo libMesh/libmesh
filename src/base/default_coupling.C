@@ -32,6 +32,8 @@ void DefaultCoupling::operator()
    processor_id_type p,
    map_type & coupled_elements)
 {
+  LOG_SCOPE("operator()", "DefaultCoupling");
+
   for (MeshBase::const_element_iterator elem_it = range_begin;
        elem_it != range_end; ++elem_it)
     {
