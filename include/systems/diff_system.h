@@ -92,6 +92,45 @@ public:
   virtual void reinit () libmesh_override;
 
   /**
+   * Tells the DiffSystem that variable var is evolving with
+   * respect to time.  In general, the user's init() function
+   * should call time_evolving() for any variables which
+   * behave like du/dt = F(u), and should not call time_evolving()
+   * for any variables which behave like 0 = G(u).
+   *
+   * This will then notify the TimeSolver which variables are first order.
+   * Thus, the TimeSolver must have been added
+   * to the DiffSystem *before* this method is called.
+   *
+   * Most derived systems will not have to reimplment this function; however
+   * any system which reimplements mass_residual() may have to reimplement
+   * time_evolving() to prepare data structures.
+   *
+   * This method is deprecated. Instead, use the time_evolving override
+   * and specify the order-in-time of the variable, either 1 or 2. This method
+   * assumes the variable is first order for backward compatibility.
+   */
+  virtual void time_evolving (unsigned int var);
+
+  /**
+   * Tells the DiffSystem that variable var is evolving with
+   * respect to time.  In general, the user's init() function
+   * should call time_evolving() with order 1 for any variables which
+   * behave like du/dt = F(u), with order 2 for any variables that
+   * behave like d^2u/dt^2 = F(u), and should not call time_evolving()
+   * for any variables which behave like 0 = G(u).
+   *
+   * This will then notify the TimeSolver which variables are first order
+   * and which are second order. Thus, the TimeSolver must have been added
+   * to the DiffSystem *before* this method is called.
+   *
+   * Most derived systems will not have to reimplment this function; however
+   * any system which reimplements mass_residual() may have to reimplement
+   * time_evolving() to prepare data structures.
+   */
+  virtual void time_evolving (unsigned int var, unsigned int order);
+
+  /**
    * Prepares \p matrix and \p rhs for matrix assembly.
    * Users should not reimplement this
    */
