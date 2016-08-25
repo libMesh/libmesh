@@ -1659,14 +1659,10 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
     delete *it;
 
   //-------------------------------------------------------------------------
-  // We need to add the DOFs from elements that live on neighboring processors
-  // that are neighbors of the elements on the local processor
+  // Our coupling functors added dofs from neighboring elements to the
+  // send list, but we may still need to add non-local dofs from local
+  // elements.
   //-------------------------------------------------------------------------
-
-  std::vector<bool> node_on_processor(mesh.max_node_id(), false);
-  std::vector<dof_id_type> di;
-  std::vector<const Elem *> family;
-
 
   // Loop over the active local elements, adding all active elements
   // that neighbor an active local element to the send list.
@@ -1675,9 +1671,6 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
       const Elem * elem = *local_elem_it;
 
       // We may have non-local SCALAR dofs on a local element.
-      // Normally we'd catch those on neighboring elements, but it's
-      // possible that the neighbors are of different subdomains and
-      // the SCALAR isn't supported on them.
       for (unsigned int v=0; v<this->n_variables(); v++)
         if(this->variable(v).type().family == SCALAR &&
            this->variable(v).active_on_subdomain(elem->subdomain_id()))
@@ -1698,10 +1691,6 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
       // We may have non-local nodes on a local element.
       for (unsigned int n=0; n!=elem->n_nodes(); n++)
         {
-          // Flag all the nodes of active local elements as seen, so
-          // we can add nodal neighbor dofs to the send_list later.
-          node_on_processor[elem->node_id(n)] = true;
-
           // Add all remote dofs on these nodes to the send_list.
           // This is necessary in case those dofs are *not* also dofs
           // on neighbors; e.g. in the case of a HIERARCHIC's local
@@ -1717,86 +1706,9 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
                   if (dof_index < this->first_dof() || dof_index >= this->end_dof())
                     {
                       _send_list.push_back(dof_index);
-                      // libmesh_here();
-                      // libMesh::out << "sys_num,v,c,dof_index="
-                      // << sys_num << ", "
-                      // << v << ", "
-                      // << c << ", "
-                      // << dof_index << '\n';
-                      // node.debug_buffer();
                     }
                 }
             }
-        }
-
-      // Loop over the neighbors of those elements
-      for (unsigned int s=0; s<elem->n_neighbors(); s++)
-        if (elem->neighbor_ptr(s) != libmesh_nullptr)
-          {
-            family.clear();
-
-            // Find all the active elements that neighbor elem
-#ifdef LIBMESH_ENABLE_AMR
-            if (!elem->neighbor_ptr(s)->active())
-              elem->neighbor_ptr(s)->active_family_tree_by_neighbor(family, elem);
-            else
-#endif
-              family.push_back(elem->neighbor_ptr(s));
-
-            for (dof_id_type i=0; i!=family.size(); ++i)
-              // If the neighbor lives on a different processor
-              if (family[i]->processor_id() != this->processor_id())
-                {
-                  // Get the DOF indices for this neighboring element
-                  this->dof_indices (family[i], di);
-
-                  // Insert the remote DOF indices into the send list
-                  for (std::size_t j=0; j != di.size(); ++j)
-                    if (di[j] < this->first_dof() ||
-                        di[j] >= this->end_dof())
-                      _send_list.push_back(di[j]);
-                }
-          }
-    }
-
-  // Now loop over all non_local active elements and add any missing
-  // nodal-only neighbors.  This will also get any dofs from nonlocal
-  // nodes on local elements, because every nonlocal node exists on a
-  // nonlocal nodal neighbor element.
-  MeshBase::const_element_iterator       elem_it
-    = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator elem_end
-    = mesh.active_elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
-    {
-      const Elem * elem = *elem_it;
-
-      // If this is one of our elements, we've already added it
-      if (elem->processor_id() == this->processor_id())
-        continue;
-
-      // Do we need to add the element DOFs?
-      bool add_elem_dofs = false;
-
-      // Check all the nodes of the element to see if it
-      // shares a node with us
-      for (unsigned int n=0; n!=elem->n_nodes(); n++)
-        if (node_on_processor[elem->node_id(n)])
-          add_elem_dofs = true;
-
-      // Add the element degrees of freedom if it shares at
-      // least one node.
-      if (add_elem_dofs)
-        {
-          // Get the DOF indices for this neighboring element
-          this->dof_indices (elem, di);
-
-          // Insert the remote DOF indices into the send list
-          for (std::size_t j=0; j != di.size(); ++j)
-            if (di[j] < this->first_dof() ||
-                di[j] >= this->end_dof())
-              _send_list.push_back(di[j]);
         }
     }
 }
