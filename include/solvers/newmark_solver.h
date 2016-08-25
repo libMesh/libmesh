@@ -141,6 +141,19 @@ public:
                                   DiffContext &) libmesh_override;
 
 
+  /**
+   * Setter for \f$ \beta \f$
+   */
+  void set_beta ( Real beta )
+  { _beta = beta; }
+
+  /**
+   * Setter for \f$ \gamma \f$. Note method is second order
+   * only for \f$ \gamma = 1/2 \f$
+   */
+  void set_gamma ( Real gamma )
+  { _gamma = gamma; }
+
 protected:
 
   /**
@@ -179,7 +192,8 @@ protected:
                                   ResFuncType mass,
                                   ResFuncType damping,
                                   ResFuncType time_deriv,
-                                  ResFuncType constraint);
+                                  ResFuncType constraint,
+                                  ReinitFuncType reinit);
 };
 
 } // namespace libMesh

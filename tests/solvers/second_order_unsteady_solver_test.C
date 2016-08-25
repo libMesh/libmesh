@@ -49,13 +49,57 @@ public:
   { return 2.71/3.14*0.5*t*t; }
 };
 
+//! Implements ODE: 1.0\ddot{u} = 6.0*t+2.0, u(0) = 0, \dot{u}(0) = 0
+class LinearTimeSecondOrderODE : public SecondOrderScalarSystemBase
+{
+public:
+  LinearTimeSecondOrderODE(EquationSystems & es,
+                           const std::string & name_in,
+                           const unsigned int number_in)
+    : SecondOrderScalarSystemBase(es, name_in, number_in)
+  {}
+
+  virtual Number F( FEMContext & context, unsigned int /*qp*/ )
+  { return -6.0*context.get_time()-2.0; }
+
+  virtual Number C( FEMContext & /*context*/, unsigned int /*qp*/ )
+  { return 0.0; }
+
+  virtual Number M( FEMContext & /*context*/, unsigned int /*qp*/ )
+  { return 1.0; }
+
+  virtual Number u( Real t )
+  { return t*t*t+t*t; }
+};
+
+class NewmarkSolverTestBase : public TimeSolverTestImplementation<NewmarkSolver>
+{
+public:
+  NewmarkSolverTestBase()
+    : TimeSolverTestImplementation<NewmarkSolver>(),
+    _beta(0.25)
+  {}
+
+protected:
+
+  virtual void aux_time_solver_init( NewmarkSolver & time_solver )
+  { time_solver.set_beta(_beta);
+    time_solver.compute_initial_accel(); }
+
+  void set_beta( Real beta )
+  { _beta = beta; }
+
+  Real _beta;
+};
+
 class NewmarkSolverTest : public CppUnit::TestCase,
-                          public TimeSolverTestImplementation<NewmarkSolver>
+                          public NewmarkSolverTestBase
 {
 public:
   CPPUNIT_TEST_SUITE( NewmarkSolverTest );
 
   CPPUNIT_TEST( testNewmarkSolverConstantSecondOrderODE );
+  CPPUNIT_TEST( testNewmarkSolverLinearTimeSecondOrderODE );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -66,10 +110,14 @@ public:
     this->run_test_with_exact_soln<ConstantSecondOrderODE>(0.5,10);
   }
 
-protected:
-
-  virtual void aux_time_solver_init( NewmarkSolver & time_solver )
-  { time_solver.compute_initial_accel(); }
+  void testNewmarkSolverLinearTimeSecondOrderODE()
+  {
+    // For \beta = 1/6, we have the "linear acceleration method" for which
+    // we should be able to exactly integrate linear (in time) acceleration
+    // functions.
+    this->set_beta(1.0/6.0);
+    this->run_test_with_exact_soln<LinearTimeSecondOrderODE>(0.5,10);
+  }
 
 };
 

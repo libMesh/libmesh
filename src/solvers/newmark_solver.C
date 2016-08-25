@@ -168,7 +168,8 @@ bool NewmarkSolver::element_residual (bool request_jacobian,
                                  &DifferentiablePhysics::mass_residual,
                                  &DifferentiablePhysics::damping_residual,
                                  &DifferentiablePhysics::_eulerian_time_deriv,
-                                 &DifferentiablePhysics::element_constraint);
+                                 &DifferentiablePhysics::element_constraint,
+                                 &DiffContext::elem_reinit);
 }
 
 
@@ -181,7 +182,8 @@ bool NewmarkSolver::side_residual (bool request_jacobian,
                                  &DifferentiablePhysics::side_mass_residual,
                                  &DifferentiablePhysics::side_damping_residual,
                                  &DifferentiablePhysics::side_time_derivative,
-                                 &DifferentiablePhysics::side_constraint);
+                                 &DifferentiablePhysics::side_constraint,
+                                 &DiffContext::elem_side_reinit);
 }
 
 
@@ -194,7 +196,8 @@ bool NewmarkSolver::nonlocal_residual (bool request_jacobian,
                                  &DifferentiablePhysics::nonlocal_mass_residual,
                                  &DifferentiablePhysics::nonlocal_damping_residual,
                                  &DifferentiablePhysics::nonlocal_time_derivative,
-                                 &DifferentiablePhysics::nonlocal_constraint);
+                                 &DifferentiablePhysics::nonlocal_constraint,
+                                 &DiffContext::nonlocal_reinit);
 }
 
 
@@ -204,7 +207,8 @@ bool NewmarkSolver::_general_residual (bool request_jacobian,
                                        ResFuncType mass,
                                        ResFuncType damping,
                                        ResFuncType time_deriv,
-                                       ResFuncType constraint)
+                                       ResFuncType constraint,
+                                       ReinitFuncType reinit_func)
 {
   unsigned int n_dofs = context.get_elem_solution().size();
 
@@ -303,6 +307,9 @@ bool NewmarkSolver::_general_residual (bool request_jacobian,
       context.get_elem_solution_accel() *= context.elem_solution_accel_derivative;
       context.get_elem_solution_accel().add(-1.0/(_beta*dt), old_elem_solution_rate);
       context.get_elem_solution_accel().add(-(1.0/(2.0*_beta)-1.0), old_elem_solution_accel);
+
+      // Move the mesh into place first if necessary, set t = t_{n+1}
+      (context.*reinit_func)(1.);
     }
 
   // If a fixed solution is requested, we'll use x_{n+1}
