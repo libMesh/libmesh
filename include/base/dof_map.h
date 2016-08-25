@@ -1416,6 +1416,12 @@ private:
   UniquePtr<DefaultCoupling> _default_coupling;
 
   /**
+   * The default algebraic GhostingFunctor, used to implement standard
+   * libMesh send_list construction.
+   */
+  UniquePtr<DefaultCoupling> _default_evaluating;
+
+  /**
    * The list of all GhostingFunctor objects to be used when
    * distributing ghosted vectors.
    *

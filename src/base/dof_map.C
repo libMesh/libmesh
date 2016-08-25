@@ -146,6 +146,7 @@ DofMap::DofMap(const unsigned int number,
   _extra_send_list_function(libmesh_nullptr),
   _extra_send_list_context(libmesh_nullptr),
   _default_coupling(new DefaultCoupling()),
+  _default_evaluating(new DefaultCoupling()),
   need_full_sparsity_pattern(false),
   _n_nz(libmesh_nullptr),
   _n_oz(libmesh_nullptr),
@@ -179,6 +180,9 @@ DofMap::DofMap(const unsigned int number,
   _matrices.clear();
 
   this->add_coupling_functor(*_default_coupling, _mesh);
+
+  _default_evaluating->set_coupled_neighbor_dofs(true);
+  this->add_algebraic_ghosting_functor(*_default_evaluating, _mesh);
 }
 
 
@@ -191,6 +195,7 @@ DofMap::~DofMap()
   // clear() resets all but the default DofMap-based functors.  We
   // need to remove those from the mesh too before we die.
   _mesh.remove_ghosting_functor(*_default_coupling);
+  _mesh.remove_ghosting_functor(*_default_evaluating);
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   delete _periodic_boundaries;
@@ -459,6 +464,8 @@ void DofMap::reinit(MeshBase & mesh)
   _default_coupling->set_dof_coupling(this->_dof_coupling);
   _default_coupling->set_coupled_neighbor_dofs
     (this->use_coupled_neighbor_dofs(mesh));
+
+  _default_evaluating->set_dof_coupling(this->_dof_coupling);
 
   const unsigned int
     sys_num      = this->sys_number(),
@@ -864,6 +871,12 @@ void DofMap::clear()
       _mesh.remove_ghosting_functor(*gf);
     }
   this->_algebraic_ghosting_functors.clear();
+
+  // Go back to default send_list generation
+
+  _default_evaluating->set_dof_coupling(this->_dof_coupling);
+  _default_evaluating->set_coupled_neighbor_dofs(true);
+  this->add_algebraic_ghosting_functor(*_default_evaluating, _mesh);
   }
 
   _variables.clear();
