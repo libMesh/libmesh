@@ -53,6 +53,18 @@ public:
 
   virtual unsigned int time_order() const libmesh_override
   { return 1; }
+
+  /**
+   * The initialization function.  This method is used to
+   * initialize internal data structures before a simulation begins.
+   * We check for second order in time variables and then add them
+   * to the System as dot_<varname>. Then, during assembly, we'll
+   * populate the elem_accel vectors with the dot_<varname> values
+   * so the user's element assembly function can still treat the
+   * variable as a second order in time variable.
+   */
+  virtual void init () libmesh_override;
+
 };
 
 } // end namespace libMesh
