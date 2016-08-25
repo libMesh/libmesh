@@ -1670,46 +1670,14 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
     {
       const Elem * elem = *local_elem_it;
 
-      // We may have non-local SCALAR dofs on a local element.
-      for (unsigned int v=0; v<this->n_variables(); v++)
-        if(this->variable(v).type().family == SCALAR &&
-           this->variable(v).active_on_subdomain(elem->subdomain_id()))
-          {
-            // We asked for this variable, so add it to the vector.
-            std::vector<dof_id_type> di_new;
-            this->SCALAR_dof_indices(di_new,v);
-            for (unsigned int i=0; i != di_new.size(); ++i)
-              {
-                const dof_id_type dof_index = di_new[i];
+      std::vector<dof_id_type> di;
+      this->dof_indices (elem, di);
 
-                if (dof_index < this->first_dof() ||
-                    dof_index >= this->end_dof())
-                  _send_list.push_back(dof_index);
-              }
-          }
-
-      // We may have non-local nodes on a local element.
-      for (unsigned int n=0; n!=elem->n_nodes(); n++)
-        {
-          // Add all remote dofs on these nodes to the send_list.
-          // This is necessary in case those dofs are *not* also dofs
-          // on neighbors; e.g. in the case of a HIERARCHIC's local
-          // side which is only a vertex on the neighbor that owns it.
-          const Node & node = elem->node_ref(n);
-          const unsigned n_vars = node.n_vars(sys_num);
-          for (unsigned int v=0; v != n_vars; ++v)
-            {
-              const unsigned int n_comp = node.n_comp(sys_num, v);
-              for (unsigned int c=0; c != n_comp; ++c)
-                {
-                  const dof_id_type dof_index = node.dof_number(sys_num, v, c);
-                  if (dof_index < this->first_dof() || dof_index >= this->end_dof())
-                    {
-                      _send_list.push_back(dof_index);
-                    }
-                }
-            }
-        }
+      // Insert the remote DOF indices into the send list
+      for (std::size_t j=0; j != di.size(); ++j)
+        if (di[j] < this->first_dof() ||
+            di[j] >= this->end_dof())
+          _send_list.push_back(di[j]);
     }
 }
 
