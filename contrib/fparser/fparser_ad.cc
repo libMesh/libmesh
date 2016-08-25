@@ -449,14 +449,19 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
       if (mkdir(jitdir.c_str(), 0700) == 0 || errno == EEXIST)
       {
         // save to a temporary name and rename only when the file is fully written
-        std::string cache_file_tmp = cache_file + ".tmp";
-        std::ofstream ostr;
-        ostr.open(cache_file_tmp.c_str(), std::ios::out | std::ios::binary);
-        if (ostr)
+        char cache_file_tmp[] = "./tmp_adc_XXXXXX";
+        if (mkstemp(cache_file_tmp) == -1)
+          std::cerr << "Error creating AD cache tmp file " << cache_file_tmp << ".\n";
+        else
         {
-          Serialize(ostr);
-          ostr.close();
-          std::rename(cache_file_tmp.c_str(), cache_file.c_str());
+          std::ofstream ostr;
+          ostr.open(cache_file_tmp, std::ios::out | std::ios::binary);
+          if (ostr)
+          {
+            Serialize(ostr);
+            ostr.close();
+            std::rename(cache_file_tmp, cache_file.c_str());
+          }
         }
       }
     }
