@@ -26,9 +26,6 @@
 namespace libMesh
 {
 
-//-------------------------------------------------------
-// we need to implement these constructors here so that
-// a full DofMap definition is available.
 void DefaultCoupling::operator()
   (const MeshBase::const_element_iterator & range_begin,
    const MeshBase::const_element_iterator & range_end,
