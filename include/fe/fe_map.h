@@ -884,6 +884,11 @@ private:
    * compute second derivatives of the inverse map.
    */
   void compute_inverse_map_second_derivs(unsigned p);
+
+  /**
+   * Work vector for compute_affine_map()
+   */
+  std::vector<const Node *> elem_nodes;
 };
 
 }
