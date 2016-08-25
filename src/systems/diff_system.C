@@ -117,7 +117,17 @@ void DifferentiableSystem::init_data ()
   time_solver->init_data();
 }
 
+void DifferentiableSystem::time_evolving (unsigned int var)
+{
+  libmesh_deprecated();
 
+  DifferentiablePhysics::time_evolving(var);
+}
+
+void DifferentiableSystem::time_evolving (unsigned int var, unsigned int order)
+{
+  DifferentiablePhysics::time_evolving(var,order);
+}
 
 UniquePtr<DiffContext> DifferentiableSystem::build_context ()
 {
