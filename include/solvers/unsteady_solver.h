@@ -150,6 +150,38 @@ public:
    */
   virtual bool is_steady() const libmesh_override { return false; }
 
+  /**
+   * Indicate to the UnsteadySolver which variables are first order in time.
+   * Subclasses may use this information in different ways.
+   */
+  void add_first_order_var(unsigned int var)
+  { _first_order_vars.insert(var); }
+
+  bool have_first_order_vars() const
+  { return !_first_order_vars.empty(); }
+
+  /**
+   * Returns the set of first order in time variable indices. May be empty.
+   */
+  const std::set<unsigned int> & get_first_order_vars() const
+  { return _first_order_vars; }
+
+  /**
+   * Indicate to the UnsteadySolver which variables are second order in time.
+   * Subclasses may use this information in different ways.
+   */
+  void add_second_order_var(unsigned int var)
+  { _second_order_vars.insert(var); }
+
+  bool have_second_order_vars() const
+  { return !_second_order_vars.empty(); }
+
+  /**
+   * Returns the set of second order in time variable indices. May be empty.
+   */
+  const std::set<unsigned int> & get_second_order_vars() const
+  { return _second_order_vars; }
+
 protected:
 
   /**
@@ -163,6 +195,16 @@ protected:
    * (when the primal solution is to be used to set adjoint boundary conditions) and false thereafter
    */
   bool first_adjoint_step;
+
+  /**
+   * Variable indices for those variables that are first order in time.
+   */
+  std::set<unsigned int> _first_order_vars;
+
+  /**
+   * Variable indices for those variables that are second order in time.
+   */
+  std::set<unsigned int> _second_order_vars;
 };
 
 
