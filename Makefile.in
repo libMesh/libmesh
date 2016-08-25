@@ -441,7 +441,9 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/solvers/eigen_solver.C \
 	src/solvers/eigen_sparse_linear_solver.C \
 	src/solvers/eigen_time_solver.C src/solvers/euler2_solver.C \
-	src/solvers/euler_solver.C src/solvers/laspack_linear_solver.C \
+	src/solvers/euler_solver.C \
+	src/solvers/first_order_unsteady_solver.C \
+	src/solvers/laspack_linear_solver.C \
 	src/solvers/linear_solver.C \
 	src/solvers/memory_solution_history.C \
 	src/solvers/newmark_solver.C src/solvers/newton_solver.C \
@@ -840,6 +842,7 @@ am__objects_1 = src/base/libmesh_dbg_la-default_coupling.lo \
 	src/solvers/libmesh_dbg_la-eigen_time_solver.lo \
 	src/solvers/libmesh_dbg_la-euler2_solver.lo \
 	src/solvers/libmesh_dbg_la-euler_solver.lo \
+	src/solvers/libmesh_dbg_la-first_order_unsteady_solver.lo \
 	src/solvers/libmesh_dbg_la-laspack_linear_solver.lo \
 	src/solvers/libmesh_dbg_la-linear_solver.lo \
 	src/solvers/libmesh_dbg_la-memory_solution_history.lo \
@@ -1157,7 +1160,9 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/solvers/eigen_solver.C \
 	src/solvers/eigen_sparse_linear_solver.C \
 	src/solvers/eigen_time_solver.C src/solvers/euler2_solver.C \
-	src/solvers/euler_solver.C src/solvers/laspack_linear_solver.C \
+	src/solvers/euler_solver.C \
+	src/solvers/first_order_unsteady_solver.C \
+	src/solvers/laspack_linear_solver.C \
 	src/solvers/linear_solver.C \
 	src/solvers/memory_solution_history.C \
 	src/solvers/newmark_solver.C src/solvers/newton_solver.C \
@@ -1555,6 +1560,7 @@ am__objects_2 = src/base/libmesh_devel_la-default_coupling.lo \
 	src/solvers/libmesh_devel_la-eigen_time_solver.lo \
 	src/solvers/libmesh_devel_la-euler2_solver.lo \
 	src/solvers/libmesh_devel_la-euler_solver.lo \
+	src/solvers/libmesh_devel_la-first_order_unsteady_solver.lo \
 	src/solvers/libmesh_devel_la-laspack_linear_solver.lo \
 	src/solvers/libmesh_devel_la-linear_solver.lo \
 	src/solvers/libmesh_devel_la-memory_solution_history.lo \
@@ -1869,7 +1875,9 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/solvers/eigen_solver.C \
 	src/solvers/eigen_sparse_linear_solver.C \
 	src/solvers/eigen_time_solver.C src/solvers/euler2_solver.C \
-	src/solvers/euler_solver.C src/solvers/laspack_linear_solver.C \
+	src/solvers/euler_solver.C \
+	src/solvers/first_order_unsteady_solver.C \
+	src/solvers/laspack_linear_solver.C \
 	src/solvers/linear_solver.C \
 	src/solvers/memory_solution_history.C \
 	src/solvers/newmark_solver.C src/solvers/newton_solver.C \
@@ -2267,6 +2275,7 @@ am__objects_3 = src/base/libmesh_oprof_la-default_coupling.lo \
 	src/solvers/libmesh_oprof_la-eigen_time_solver.lo \
 	src/solvers/libmesh_oprof_la-euler2_solver.lo \
 	src/solvers/libmesh_oprof_la-euler_solver.lo \
+	src/solvers/libmesh_oprof_la-first_order_unsteady_solver.lo \
 	src/solvers/libmesh_oprof_la-laspack_linear_solver.lo \
 	src/solvers/libmesh_oprof_la-linear_solver.lo \
 	src/solvers/libmesh_oprof_la-memory_solution_history.lo \
@@ -2581,7 +2590,9 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/solvers/eigen_solver.C \
 	src/solvers/eigen_sparse_linear_solver.C \
 	src/solvers/eigen_time_solver.C src/solvers/euler2_solver.C \
-	src/solvers/euler_solver.C src/solvers/laspack_linear_solver.C \
+	src/solvers/euler_solver.C \
+	src/solvers/first_order_unsteady_solver.C \
+	src/solvers/laspack_linear_solver.C \
 	src/solvers/linear_solver.C \
 	src/solvers/memory_solution_history.C \
 	src/solvers/newmark_solver.C src/solvers/newton_solver.C \
@@ -2979,6 +2990,7 @@ am__objects_4 = src/base/libmesh_opt_la-default_coupling.lo \
 	src/solvers/libmesh_opt_la-eigen_time_solver.lo \
 	src/solvers/libmesh_opt_la-euler2_solver.lo \
 	src/solvers/libmesh_opt_la-euler_solver.lo \
+	src/solvers/libmesh_opt_la-first_order_unsteady_solver.lo \
 	src/solvers/libmesh_opt_la-laspack_linear_solver.lo \
 	src/solvers/libmesh_opt_la-linear_solver.lo \
 	src/solvers/libmesh_opt_la-memory_solution_history.lo \
@@ -3292,7 +3304,9 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/solvers/eigen_solver.C \
 	src/solvers/eigen_sparse_linear_solver.C \
 	src/solvers/eigen_time_solver.C src/solvers/euler2_solver.C \
-	src/solvers/euler_solver.C src/solvers/laspack_linear_solver.C \
+	src/solvers/euler_solver.C \
+	src/solvers/first_order_unsteady_solver.C \
+	src/solvers/laspack_linear_solver.C \
 	src/solvers/linear_solver.C \
 	src/solvers/memory_solution_history.C \
 	src/solvers/newmark_solver.C src/solvers/newton_solver.C \
@@ -3690,6 +3704,7 @@ am__objects_5 = src/base/libmesh_prof_la-default_coupling.lo \
 	src/solvers/libmesh_prof_la-eigen_time_solver.lo \
 	src/solvers/libmesh_prof_la-euler2_solver.lo \
 	src/solvers/libmesh_prof_la-euler_solver.lo \
+	src/solvers/libmesh_prof_la-first_order_unsteady_solver.lo \
 	src/solvers/libmesh_prof_la-laspack_linear_solver.lo \
 	src/solvers/libmesh_prof_la-linear_solver.lo \
 	src/solvers/libmesh_prof_la-memory_solution_history.lo \
@@ -5086,6 +5101,7 @@ libmesh_SOURCES = \
         src/solvers/eigen_time_solver.C \
         src/solvers/euler2_solver.C \
         src/solvers/euler_solver.C \
+        src/solvers/first_order_unsteady_solver.C \
         src/solvers/laspack_linear_solver.C \
         src/solvers/linear_solver.C \
         src/solvers/memory_solution_history.C \
@@ -6439,6 +6455,9 @@ src/solvers/libmesh_dbg_la-euler2_solver.lo:  \
 src/solvers/libmesh_dbg_la-euler_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_dbg_la-first_order_unsteady_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_dbg_la-laspack_linear_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
@@ -7476,6 +7495,9 @@ src/solvers/libmesh_devel_la-euler2_solver.lo:  \
 src/solvers/libmesh_devel_la-euler_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_devel_la-first_order_unsteady_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_devel_la-laspack_linear_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
@@ -8501,6 +8523,9 @@ src/solvers/libmesh_oprof_la-euler2_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_oprof_la-euler_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_oprof_la-first_order_unsteady_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_oprof_la-laspack_linear_solver.lo:  \
@@ -9529,6 +9554,9 @@ src/solvers/libmesh_opt_la-euler2_solver.lo:  \
 src/solvers/libmesh_opt_la-euler_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_opt_la-first_order_unsteady_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_opt_la-laspack_linear_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
@@ -10551,6 +10579,9 @@ src/solvers/libmesh_prof_la-euler2_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_prof_la-euler_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_prof_la-first_order_unsteady_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_prof_la-laspack_linear_solver.lo:  \
@@ -12988,6 +13019,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-eigen_time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-euler2_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-euler_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-first_order_unsteady_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-laspack_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-memory_solution_history.Plo@am__quote@
@@ -13019,6 +13051,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-eigen_time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-euler2_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-euler_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-first_order_unsteady_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-laspack_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-memory_solution_history.Plo@am__quote@
@@ -13050,6 +13083,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-eigen_time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-euler2_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-euler_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-first_order_unsteady_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-laspack_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-memory_solution_history.Plo@am__quote@
@@ -13081,6 +13115,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-eigen_time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-euler2_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-euler_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-first_order_unsteady_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-laspack_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-memory_solution_history.Plo@am__quote@
@@ -13112,6 +13147,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-eigen_time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-euler2_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-euler_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-first_order_unsteady_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-laspack_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-memory_solution_history.Plo@am__quote@
@@ -15830,6 +15866,13 @@ src/solvers/libmesh_dbg_la-euler_solver.lo: src/solvers/euler_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/euler_solver.C' object='src/solvers/libmesh_dbg_la-euler_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_dbg_la-euler_solver.lo `test -f 'src/solvers/euler_solver.C' || echo '$(srcdir)/'`src/solvers/euler_solver.C
+
+src/solvers/libmesh_dbg_la-first_order_unsteady_solver.lo: src/solvers/first_order_unsteady_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_dbg_la-first_order_unsteady_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_dbg_la-first_order_unsteady_solver.Tpo -c -o src/solvers/libmesh_dbg_la-first_order_unsteady_solver.lo `test -f 'src/solvers/first_order_unsteady_solver.C' || echo '$(srcdir)/'`src/solvers/first_order_unsteady_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_dbg_la-first_order_unsteady_solver.Tpo src/solvers/$(DEPDIR)/libmesh_dbg_la-first_order_unsteady_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/first_order_unsteady_solver.C' object='src/solvers/libmesh_dbg_la-first_order_unsteady_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_dbg_la-first_order_unsteady_solver.lo `test -f 'src/solvers/first_order_unsteady_solver.C' || echo '$(srcdir)/'`src/solvers/first_order_unsteady_solver.C
 
 src/solvers/libmesh_dbg_la-laspack_linear_solver.lo: src/solvers/laspack_linear_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_dbg_la-laspack_linear_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_dbg_la-laspack_linear_solver.Tpo -c -o src/solvers/libmesh_dbg_la-laspack_linear_solver.lo `test -f 'src/solvers/laspack_linear_solver.C' || echo '$(srcdir)/'`src/solvers/laspack_linear_solver.C
@@ -18757,6 +18800,13 @@ src/solvers/libmesh_devel_la-euler_solver.lo: src/solvers/euler_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_devel_la-euler_solver.lo `test -f 'src/solvers/euler_solver.C' || echo '$(srcdir)/'`src/solvers/euler_solver.C
 
+src/solvers/libmesh_devel_la-first_order_unsteady_solver.lo: src/solvers/first_order_unsteady_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_devel_la-first_order_unsteady_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_devel_la-first_order_unsteady_solver.Tpo -c -o src/solvers/libmesh_devel_la-first_order_unsteady_solver.lo `test -f 'src/solvers/first_order_unsteady_solver.C' || echo '$(srcdir)/'`src/solvers/first_order_unsteady_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_devel_la-first_order_unsteady_solver.Tpo src/solvers/$(DEPDIR)/libmesh_devel_la-first_order_unsteady_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/first_order_unsteady_solver.C' object='src/solvers/libmesh_devel_la-first_order_unsteady_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_devel_la-first_order_unsteady_solver.lo `test -f 'src/solvers/first_order_unsteady_solver.C' || echo '$(srcdir)/'`src/solvers/first_order_unsteady_solver.C
+
 src/solvers/libmesh_devel_la-laspack_linear_solver.lo: src/solvers/laspack_linear_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_devel_la-laspack_linear_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_devel_la-laspack_linear_solver.Tpo -c -o src/solvers/libmesh_devel_la-laspack_linear_solver.lo `test -f 'src/solvers/laspack_linear_solver.C' || echo '$(srcdir)/'`src/solvers/laspack_linear_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_devel_la-laspack_linear_solver.Tpo src/solvers/$(DEPDIR)/libmesh_devel_la-laspack_linear_solver.Plo
@@ -21682,6 +21732,13 @@ src/solvers/libmesh_oprof_la-euler_solver.lo: src/solvers/euler_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/euler_solver.C' object='src/solvers/libmesh_oprof_la-euler_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_oprof_la-euler_solver.lo `test -f 'src/solvers/euler_solver.C' || echo '$(srcdir)/'`src/solvers/euler_solver.C
+
+src/solvers/libmesh_oprof_la-first_order_unsteady_solver.lo: src/solvers/first_order_unsteady_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_oprof_la-first_order_unsteady_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_oprof_la-first_order_unsteady_solver.Tpo -c -o src/solvers/libmesh_oprof_la-first_order_unsteady_solver.lo `test -f 'src/solvers/first_order_unsteady_solver.C' || echo '$(srcdir)/'`src/solvers/first_order_unsteady_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_oprof_la-first_order_unsteady_solver.Tpo src/solvers/$(DEPDIR)/libmesh_oprof_la-first_order_unsteady_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/first_order_unsteady_solver.C' object='src/solvers/libmesh_oprof_la-first_order_unsteady_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_oprof_la-first_order_unsteady_solver.lo `test -f 'src/solvers/first_order_unsteady_solver.C' || echo '$(srcdir)/'`src/solvers/first_order_unsteady_solver.C
 
 src/solvers/libmesh_oprof_la-laspack_linear_solver.lo: src/solvers/laspack_linear_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_oprof_la-laspack_linear_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_oprof_la-laspack_linear_solver.Tpo -c -o src/solvers/libmesh_oprof_la-laspack_linear_solver.lo `test -f 'src/solvers/laspack_linear_solver.C' || echo '$(srcdir)/'`src/solvers/laspack_linear_solver.C
@@ -24609,6 +24666,13 @@ src/solvers/libmesh_opt_la-euler_solver.lo: src/solvers/euler_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_opt_la-euler_solver.lo `test -f 'src/solvers/euler_solver.C' || echo '$(srcdir)/'`src/solvers/euler_solver.C
 
+src/solvers/libmesh_opt_la-first_order_unsteady_solver.lo: src/solvers/first_order_unsteady_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_opt_la-first_order_unsteady_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_opt_la-first_order_unsteady_solver.Tpo -c -o src/solvers/libmesh_opt_la-first_order_unsteady_solver.lo `test -f 'src/solvers/first_order_unsteady_solver.C' || echo '$(srcdir)/'`src/solvers/first_order_unsteady_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_opt_la-first_order_unsteady_solver.Tpo src/solvers/$(DEPDIR)/libmesh_opt_la-first_order_unsteady_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/first_order_unsteady_solver.C' object='src/solvers/libmesh_opt_la-first_order_unsteady_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_opt_la-first_order_unsteady_solver.lo `test -f 'src/solvers/first_order_unsteady_solver.C' || echo '$(srcdir)/'`src/solvers/first_order_unsteady_solver.C
+
 src/solvers/libmesh_opt_la-laspack_linear_solver.lo: src/solvers/laspack_linear_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_opt_la-laspack_linear_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_opt_la-laspack_linear_solver.Tpo -c -o src/solvers/libmesh_opt_la-laspack_linear_solver.lo `test -f 'src/solvers/laspack_linear_solver.C' || echo '$(srcdir)/'`src/solvers/laspack_linear_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_opt_la-laspack_linear_solver.Tpo src/solvers/$(DEPDIR)/libmesh_opt_la-laspack_linear_solver.Plo
@@ -27534,6 +27598,13 @@ src/solvers/libmesh_prof_la-euler_solver.lo: src/solvers/euler_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/euler_solver.C' object='src/solvers/libmesh_prof_la-euler_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_prof_la-euler_solver.lo `test -f 'src/solvers/euler_solver.C' || echo '$(srcdir)/'`src/solvers/euler_solver.C
+
+src/solvers/libmesh_prof_la-first_order_unsteady_solver.lo: src/solvers/first_order_unsteady_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_prof_la-first_order_unsteady_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_prof_la-first_order_unsteady_solver.Tpo -c -o src/solvers/libmesh_prof_la-first_order_unsteady_solver.lo `test -f 'src/solvers/first_order_unsteady_solver.C' || echo '$(srcdir)/'`src/solvers/first_order_unsteady_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_prof_la-first_order_unsteady_solver.Tpo src/solvers/$(DEPDIR)/libmesh_prof_la-first_order_unsteady_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/first_order_unsteady_solver.C' object='src/solvers/libmesh_prof_la-first_order_unsteady_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_prof_la-first_order_unsteady_solver.lo `test -f 'src/solvers/first_order_unsteady_solver.C' || echo '$(srcdir)/'`src/solvers/first_order_unsteady_solver.C
 
 src/solvers/libmesh_prof_la-laspack_linear_solver.lo: src/solvers/laspack_linear_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_prof_la-laspack_linear_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_prof_la-laspack_linear_solver.Tpo -c -o src/solvers/libmesh_prof_la-laspack_linear_solver.lo `test -f 'src/solvers/laspack_linear_solver.C' || echo '$(srcdir)/'`src/solvers/laspack_linear_solver.C
