@@ -638,10 +638,6 @@ LibMeshInit::~LibMeshInit()
   // Clear the thread task manager we started
   task_scheduler.reset();
 
-  // Let's be sure we properly close on every processor at once:
-  libmesh_parallel_only(this->comm());
-
-
   // Force the \p ReferenceCounter to print
   // its reference count information.  This allows
   // us to find memory leaks.  By default the
