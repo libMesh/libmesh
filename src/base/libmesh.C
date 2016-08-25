@@ -595,6 +595,14 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
     if (!libMesh::on_command_line ("--keep-cout"))
       libMesh::out.rdbuf (libmesh_nullptr);
 
+  // Similarly, the user can request to drop cerr on all non-0 ranks.
+  // By default, errors are printed on all ranks, but this can lead to
+  // interleaved/unpredictable outputs when doing parallel regression
+  // testing, which this option is designed to support.
+  if (libMesh::global_processor_id() != 0)
+    if (libMesh::on_command_line ("--drop-cerr"))
+      libMesh::err.rdbuf (libmesh_nullptr);
+
   // Check command line to override printing
   // of reference count information.
   if(libMesh::on_command_line("--disable-refcount-printing") )
