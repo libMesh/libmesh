@@ -644,23 +644,23 @@ public:
 
   // should be protected:
   /**
-   * Reinitialize Elem and FE objects if necessary for integration at a new
-   * point in time: specifically, handle moving elements in moving mesh
-   * schemes.
+   * Resets the current time in the context. Additionally, reinitialize Elem
+   * and FE objects if there's a moving mesh present in the system such that
+   * the mesh is deformed to its position at t_{\theta}.
    */
   virtual void elem_reinit(Real theta) libmesh_override;
 
   /**
-   * Reinitialize Elem and side FE objects if necessary for integration at a
-   * new point in time: specifically, handle moving elements in moving mesh
-   * schemes.
+   * Resets the current time in the context. Additionally, reinitialize Elem
+   * and FE objects if there's a moving mesh present in the system such that
+   * the mesh is deformed to its position at t_{\theta}.
    */
   virtual void elem_side_reinit(Real theta) libmesh_override;
 
   /**
-   * Reinitialize Elem and edge FE objects if necessary for
-   * integration at a new point in time: specifically, handle moving
-   * elements in moving mesh schemes.
+   * Resets the current time in the context. Additionally, reinitialize Elem
+   * and FE objects if there's a moving mesh present in the system such that
+   * the mesh is deformed to its position at t_{\theta}.
    */
   virtual void elem_edge_reinit(Real theta) libmesh_override;
 
