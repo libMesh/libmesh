@@ -2308,6 +2308,40 @@ bool DofMap::all_semilocal_indices (const std::vector<dof_id_type> & dof_indices
 }
 
 
+bool DofMap::is_evaluable(const Elem & elem,
+                          unsigned int var_num) const
+{
+  // Everything is evaluable on a local element
+  if (elem.processor_id() == this->processor_id())
+    return true;
+
+  std::vector<dof_id_type> di;
+
+  if (var_num == libMesh::invalid_uint)
+    this->dof_indices(&elem, di);
+  else
+    this->dof_indices(&elem, di, var_num);
+
+  // We're all semilocal unless we find a counterexample
+  for (std::size_t i=0; i != di.size(); ++i)
+    {
+      const dof_id_type dof_id = di[i];
+      // If it's not in the local indices
+      if (dof_id < this->first_dof() ||
+          dof_id >= this->end_dof())
+        {
+          // and if it's not in the ghost indices, then we're not
+          // evaluable
+          if (!std::binary_search(_send_list.begin(), _send_list.end(), dof_id))
+            return false;
+        }
+    }
+
+  return true;
+}
+
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
 void DofMap::old_dof_indices (const Elem * const elem,

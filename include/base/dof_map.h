@@ -618,6 +618,14 @@ public:
   bool all_semilocal_indices (const std::vector<dof_id_type> & dof_indices) const;
 
   /**
+   * @returns \p true iff our solutions can be locally evaluated on \p
+   * elem for variable number \p var_num (for all variables, if \p
+   * var_num is invalid_uint)
+   */
+  bool is_evaluable(const Elem & elem,
+                    unsigned int var_num = libMesh::invalid_uint) const;
+
+  /**
    * Allow the implicit_neighbor_dofs flag to be set programmatically.
    * This overrides the --implicit_neighbor_dofs commandline option.
    * We can use this to set the implicit neighbor dofs option differently
