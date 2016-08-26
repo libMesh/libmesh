@@ -1520,8 +1520,6 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 {
   LOG_SCOPE("add_neighbors_to_send_list()", "DofMap");
 
-  const unsigned int sys_num = this->sys_number();
-
   const unsigned int n_var  = this->n_variables();
 
   MeshBase::const_element_iterator       local_elem_it
