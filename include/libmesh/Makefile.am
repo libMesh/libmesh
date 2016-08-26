@@ -311,6 +311,7 @@ BUILT_SOURCES = \
         transient_rb_construction.h \
         transient_rb_evaluation.h \
         transient_rb_theta_expansion.h \
+        boundary_volume_solution_transfer.h \
         direct_solution_transfer.h \
         dtk_adapter.h \
         dtk_evaluator.h \
@@ -1433,6 +1434,9 @@ transient_rb_evaluation.h: $(top_srcdir)/include/reduced_basis/transient_rb_eval
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 transient_rb_theta_expansion.h: $(top_srcdir)/include/reduced_basis/transient_rb_theta_expansion.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+boundary_volume_solution_transfer.h: $(top_srcdir)/include/solution_transfer/boundary_volume_solution_transfer.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 direct_solution_transfer.h: $(top_srcdir)/include/solution_transfer/direct_solution_transfer.h
