@@ -198,6 +198,8 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
 void ParmetisPartitioner::initialize (const MeshBase & mesh,
                                       const unsigned int n_sbdmns)
 {
+  LOG_SCOPE("initialize()", "ParmetisPartitioner");
+
   const dof_id_type n_active_local_elem = mesh.n_active_local_elem();
 
   // Set parameters.
@@ -405,6 +407,8 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
 
 void ParmetisPartitioner::build_graph (const MeshBase & mesh)
 {
+  LOG_SCOPE("build_graph()", "ParmetisPartitioner");
+
   // build the graph in distributed CSR format.  Note that
   // the edges in the graph will correspond to
   // face neighbors
@@ -627,6 +631,8 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
 
 void ParmetisPartitioner::assign_partitioning (MeshBase & mesh)
 {
+  LOG_SCOPE("assign_partitioning()", "ParmetisPartitioner");
+
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
