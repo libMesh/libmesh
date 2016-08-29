@@ -236,6 +236,18 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   MeshTools::libmesh_assert_valid_unique_ids(*this);
 #endif
 
+  // Allow our GhostingFunctor objects to reinit if necessary.
+  // Do this before partitioning and redistributing, and before
+  // deleting remote elements.
+  std::set<GhostingFunctor *>::iterator        gf_it = this->ghosting_functors_begin();
+  const std::set<GhostingFunctor *>::iterator gf_end = this->ghosting_functors_end();
+  for (; gf_it != gf_end; ++gf_it)
+    {
+      GhostingFunctor *gf = *gf_it;
+      libmesh_assert(gf);
+      gf->mesh_reinit();
+    }
+
   // Partition the mesh.
   this->partition();
 

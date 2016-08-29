@@ -1060,6 +1060,29 @@ void DofMap::distribute_dofs (MeshBase & mesh)
         current_SCALAR_dof_index += this->variable(v).type().order.get_order();
       }
 
+  // Allow our GhostingFunctor objects to reinit if necessary
+  {
+    std::set<GhostingFunctor *>::iterator        gf_it = this->algebraic_ghosting_functors_begin();
+    const std::set<GhostingFunctor *>::iterator gf_end = this->algebraic_ghosting_functors_end();
+    for (; gf_it != gf_end; ++gf_it)
+      {
+        GhostingFunctor *gf = *gf_it;
+        libmesh_assert(gf);
+        gf->dofmap_reinit();
+      }
+  }
+
+  {
+    std::set<GhostingFunctor *>::iterator        gf_it = this->coupling_functors_begin();
+    const std::set<GhostingFunctor *>::iterator gf_end = this->coupling_functors_end();
+    for (; gf_it != gf_end; ++gf_it)
+      {
+        GhostingFunctor *gf = *gf_it;
+        libmesh_assert(gf);
+        gf->dofmap_reinit();
+      }
+  }
+
   // Note that in the add_neighbors_to_send_list nodes on processor
   // boundaries that are shared by multiple elements are added for
   // each element.
