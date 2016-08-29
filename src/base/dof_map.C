@@ -179,10 +179,10 @@ DofMap::DofMap(const unsigned int number,
 {
   _matrices.clear();
 
-  this->add_coupling_functor(*_default_coupling, _mesh);
+  this->add_coupling_functor(*_default_coupling);
 
   _default_evaluating->set_coupled_neighbor_dofs(true);
-  this->add_algebraic_ghosting_functor(*_default_evaluating, _mesh);
+  this->add_algebraic_ghosting_functor(*_default_evaluating);
 }
 
 
@@ -857,7 +857,7 @@ void DofMap::clear()
   _default_coupling->set_coupled_neighbor_dofs
     (this->use_coupled_neighbor_dofs(this->_mesh));
 
-  this->add_coupling_functor(*_default_coupling, _mesh);
+  this->add_coupling_functor(*_default_coupling);
   }
 
 
@@ -876,7 +876,7 @@ void DofMap::clear()
 
   _default_evaluating->set_dof_coupling(this->_dof_coupling);
   _default_evaluating->set_coupled_neighbor_dofs(true);
-  this->add_algebraic_ghosting_functor(*_default_evaluating, _mesh);
+  this->add_algebraic_ghosting_functor(*_default_evaluating);
   }
 
   _variables.clear();
@@ -1840,44 +1840,40 @@ void DofMap::clear_sparsity()
 
 
 void DofMap::add_coupling_functor
-  (GhostingFunctor & coupling_functor,
-   MeshBase & mesh)
+  (GhostingFunctor & coupling_functor)
 {
   _coupling_functors.insert(&coupling_functor);
-  mesh.add_ghosting_functor(coupling_functor);
+  _mesh.add_ghosting_functor(coupling_functor);
 }
 
 
 
 void DofMap::remove_coupling_functor
-  (GhostingFunctor & coupling_functor,
-   MeshBase & mesh)
+  (GhostingFunctor & coupling_functor)
 {
   libmesh_assert(_coupling_functors.count(&coupling_functor));
   _coupling_functors.erase(&coupling_functor);
-  mesh.remove_ghosting_functor(coupling_functor);
+  _mesh.remove_ghosting_functor(coupling_functor);
 }
 
 
 
 void DofMap::add_algebraic_ghosting_functor
-  (GhostingFunctor & algebraic_ghosting_functor,
-   MeshBase & mesh)
+  (GhostingFunctor & algebraic_ghosting_functor)
 {
   _algebraic_ghosting_functors.insert(&algebraic_ghosting_functor);
-  mesh.add_ghosting_functor(algebraic_ghosting_functor);
+  _mesh.add_ghosting_functor(algebraic_ghosting_functor);
 }
 
 
 
 void DofMap::remove_algebraic_ghosting_functor
-  (GhostingFunctor & algebraic_ghosting_functor,
-   MeshBase & mesh)
+  (GhostingFunctor & algebraic_ghosting_functor)
 {
   libmesh_assert(_algebraic_ghosting_functors.count
                    (&algebraic_ghosting_functor));
   _algebraic_ghosting_functors.erase(&algebraic_ghosting_functor);
-  mesh.remove_ghosting_functor(algebraic_ghosting_functor);
+  _mesh.remove_ghosting_functor(algebraic_ghosting_functor);
 }
 
 

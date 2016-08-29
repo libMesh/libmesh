@@ -260,16 +260,13 @@ public:
    * this function; the GhostingFunctor lifetime is expected to extend
    * until either the functor is removed or the DofMap is destructed.
    */
-  void add_coupling_functor(GhostingFunctor & coupling_functor,
-                            MeshBase & mesh);
+  void add_coupling_functor(GhostingFunctor & coupling_functor);
 
   /**
    * Removes a functor which was previously added to the set of
    * coupling functors.
    */
-  void remove_coupling_functor(GhostingFunctor & coupling_functor,
-                               MeshBase & mesh);
-
+  void remove_coupling_functor(GhostingFunctor & coupling_functor);
 
   /**
    * Beginning of range of coupling functors
@@ -295,15 +292,13 @@ public:
    * this function; the GhostingFunctor lifetime is expected to extend
    * until either the functor is removed or the DofMap is destructed.
    */
-  void add_algebraic_ghosting_functor(GhostingFunctor & ghosting_functor,
-                                      MeshBase & mesh);
+  void add_algebraic_ghosting_functor(GhostingFunctor & ghosting_functor);
 
   /**
    * Removes a functor which was previously added to the set of
    * algebraic ghosting functors.
    */
-  void remove_algebraic_ghosting_functor(GhostingFunctor & ghosting_functor,
-                                         MeshBase & mesh);
+  void remove_algebraic_ghosting_functor(GhostingFunctor & ghosting_functor);
 
   /**
    * Beginning of range of algebraic ghosting functors
