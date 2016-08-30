@@ -39,8 +39,6 @@ RBParametrized::RBParametrized()
   verbose_mode(false),
   parameters_initialized(false)
 {
-  libmesh_experimental();
-
   parameters.clear();
   parameters_min.clear();
   parameters_max.clear();
