@@ -180,7 +180,7 @@ transfer_boundary_volume(const Variable & from_var, const Variable & to_var)
 
   // In order to get solution vectors from BoundaryMesh
   std::vector<dof_id_type> from_dof_indices;
-  std::vector<Real> value;
+  std::vector<Number> value;
 
   // Loop through all boundary elements.
   for (; el != end_el; ++el)
