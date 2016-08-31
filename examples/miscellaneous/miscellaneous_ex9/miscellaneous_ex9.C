@@ -168,6 +168,36 @@ int main (int argc, char ** argv)
                                              equation_systems);
 #endif
 
+#ifdef LIBMESH_ENABLE_AMR
+  // Possibly solve on a refined mesh next.
+  MeshRefinement mesh_refinement (mesh);
+  unsigned int n_refinements = 0;
+  if (command_line.search("-n_refinements"))
+    n_refinements = command_line.next(0);
+
+  for (unsigned int r = 0; r != n_refinements; ++r)
+    {
+      std::cout << "Refining the mesh" << std::endl;
+
+      mesh_refinement.uniformly_refine ();
+      equation_systems.reinit();
+
+      assemble_poisson(equation_systems,
+                       augment_sparsity.get_lower_to_upper());
+      system.solve();
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+      // Plot the refined solution
+      std::ostringstream out;
+      out << "solution_" << r << ".exo";
+      ExodusII_IO (mesh).write_equation_systems (out.str(),
+                                                 equation_systems);
+#endif
+
+    }
+
+#endif
+
   return 0;
 }
 
