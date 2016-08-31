@@ -67,9 +67,12 @@ void AugmentSparsityOnInterface::mesh_reinit ()
             }
       }
     }
-  std::size_t n_lower_centroids = lower_centroids.size();
-  std::size_t n_upper_centroids = upper_centroids.size();
-  libmesh_assert(n_lower_centroids == n_upper_centroids);
+
+  // If we're doing a reinit on a distributed mesh then we may not see
+  // all the centroids, or even a matching number of centroids.
+  // std::size_t n_lower_centroids = lower_centroids.size();
+  // std::size_t n_upper_centroids = upper_centroids.size();
+  // libmesh_assert(n_lower_centroids == n_upper_centroids);
 
   // Clear _lower_to_upper. This map will be used for matrix assembly later on.
   _lower_to_upper.clear();
@@ -88,11 +91,12 @@ void AugmentSparsityOnInterface::mesh_reinit ()
       {
         Point lower_centroid = it->second;
 
-        // find centroid in upper_centroids
+        // find closest centroid in upper_centroids
+        Real min_distance = std::numeric_limits<Real>::max();
+
         std::map< std::pair<const Elem *, unsigned char>, Point>::iterator inner_it     = upper_centroids.begin();
         std::map< std::pair<const Elem *, unsigned char>, Point>::iterator inner_it_end = upper_centroids.end();
 
-        Real min_distance = std::numeric_limits<Real>::max();
         for ( ; inner_it != inner_it_end; ++inner_it)
           {
             Point upper_centroid = inner_it->second;
@@ -105,14 +109,39 @@ void AugmentSparsityOnInterface::mesh_reinit ()
               }
           }
 
-        // We should've found matching elements on either side of the crack by now
-        libmesh_assert_less(min_distance, TOLERANCE);
-
-        // fill up the inverse map
+	// For pairs with local elements, we should have found a
+	// matching pair by now.
         const Elem * elem     = it->first.first;
         const Elem * neighbor = _lower_to_upper[it->first];
-        _upper_to_lower[neighbor] = elem;
+        if (min_distance < TOLERANCE)
+          {
+            // fill up the inverse map
+            _upper_to_lower[neighbor] = elem;
+          }
+        else
+          {
+            libmesh_assert_not_equal_to(elem->processor_id(), _mesh.processor_id());
+	    // This must have a false positive; a remote element would
+	    // have been closer.
+	    _lower_to_upper.erase(it->first);
+          }
       }
+
+    // Let's make sure we didn't miss any upper elements either
+#ifndef NDEBUG
+    std::map< std::pair<const Elem *, unsigned char>, Point>::iterator inner_it     = upper_centroids.begin();
+    std::map< std::pair<const Elem *, unsigned char>, Point>::iterator inner_it_end = upper_centroids.end();
+
+    for ( ; inner_it != inner_it_end; ++inner_it)
+      {
+        const Elem * neighbor = inner_it->first.first;
+        if (neighbor->processor_id() != _mesh.processor_id())
+          continue;
+        ElementMap::const_iterator utl_it =
+          _upper_to_lower.find(neighbor);
+        libmesh_assert(utl_it != _upper_to_lower.end());
+      }
+#endif
   }
 }
 
