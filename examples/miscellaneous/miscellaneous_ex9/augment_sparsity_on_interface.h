@@ -75,6 +75,13 @@ public:
    */
   virtual void mesh_reinit () libmesh_override;
 
+  /**
+   * Update the cached _lower_to_upper map whenever our Mesh has been
+   * redistributed.  We'll be lazy and just recalculate from scratch.
+   */
+  virtual void redistribute () libmesh_override
+  { this->mesh_reinit(); }
+
 
 };
 
