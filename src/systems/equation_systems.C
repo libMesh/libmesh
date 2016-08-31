@@ -230,9 +230,11 @@ void EquationSystems::reinit ()
     dof_constraints_created = true;
   }
 
-  // FIXME: Where should the user set maintain_level_one now??
-  // Don't override previous settings, for now
+  // Don't override any user refinement settings
   MeshRefinement mesh_refine(_mesh);
+  mesh_refine.face_level_mismatch_limit() = 0; // unlimited
+  mesh_refine.overrefined_boundary_limit() = -1; // unlimited
+  mesh_refine.underrefined_boundary_limit() = -1; // unlimited
 
   // Try to coarsen the mesh, then restrict each system's vectors
   // if necessary
