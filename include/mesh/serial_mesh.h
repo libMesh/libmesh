@@ -354,6 +354,19 @@ public:
   virtual const_element_iterator ghost_elements_begin () const libmesh_override;
   virtual const_element_iterator ghost_elements_end () const libmesh_override;
 
+  virtual element_iterator evaluable_elements_begin
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) libmesh_override;
+  virtual element_iterator evaluable_elements_end
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) libmesh_override;
+  virtual const_element_iterator evaluable_elements_begin
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) const libmesh_override;
+  virtual const_element_iterator evaluable_elements_end
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) const libmesh_override;
+
   /**
    * Node iterator accessor functions.
    */

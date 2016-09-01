@@ -972,6 +972,24 @@ public:
   virtual const_element_iterator ghost_elements_end () const = 0;
 
   /**
+   * Iterate over elements in the Mesh where the solution (as
+   * distributed by the given DofMap) can be evaluated, for the given
+   * variable var_num, or for all variables by default.
+   */
+  virtual element_iterator evaluable_elements_begin
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) = 0;
+  virtual element_iterator evaluable_elements_end
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) = 0;
+  virtual const_element_iterator evaluable_elements_begin
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) const = 0;
+  virtual const_element_iterator evaluable_elements_end
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) const = 0;
+
+  /**
    * Active, local, and negation forms of the element iterators described above.
    * An "active" element is an element without children (i.e. has not been refined).
    * A "local" element is one whose processor_id() matches the current processor.
