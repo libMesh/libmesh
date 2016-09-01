@@ -24,6 +24,10 @@
 // C++ includes
 #include <vector>
 
+namespace libMesh {
+class Elem;
+}
+
 namespace libMesh
 {
 
@@ -633,6 +637,26 @@ struct Ghost : abstract_multi_predicate<T>
     this->_predicates.push_back(new active<T>);
     this->_predicates.push_back(new not_pid<T>(my_pid));
     this->_predicates.push_back(new semilocal_pid<T>(my_pid));
+  }
+};
+
+
+
+/**
+ * Used to iterate over elements where solutions indexed by a given
+ * DofMap are evaluable for a given variable var_num.
+ */
+template <typename T>
+struct Evaluable: abstract_multi_predicate<T>
+{
+  Evaluable(processor_id_type my_pid,
+            const DofMap & dof_map,
+            unsigned int var_num = libMesh::invalid_uint)
+  {
+    this->_predicates.push_back(new not_null<T>);
+    this->_predicates.push_back(new active<T>);
+    this->_predicates.push_back(new pid<T>(my_pid));
+    this->_predicates.push_back(new evaluable<T>(dof_map, var_num));
   }
 };
 
