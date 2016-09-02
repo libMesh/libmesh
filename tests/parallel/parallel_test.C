@@ -145,7 +145,7 @@ public:
 
         for (unsigned int i=0; i<src.size(); i++)
           src[i] = i;
-        for (unsigned int i=0; i<src.size(); i++)
+        for (unsigned int i=0; i<TestCommWorld->size(); i++)
           counts[i] = static_cast<int>(i+1);
       }
 
