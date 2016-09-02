@@ -178,6 +178,31 @@ void query_ghosting_functors
     connected_elements.insert(*elem_it);
 }
 
+
+void connect_children
+  (MeshBase & mesh,
+   processor_id_type pid,
+   std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+{
+  // Our XdrIO output needs inactive local elements to not have any
+  // remote_elem children.  Let's make sure that doesn't happen.
+  //
+  MeshBase::const_element_iterator       elem_it  = mesh.pid_elements_begin(pid);
+  const MeshBase::const_element_iterator elem_end = mesh.pid_elements_end(pid);
+  for (; elem_it != elem_end; ++elem_it)
+    {
+      const Elem *elem = *elem_it;
+      if (elem->has_children())
+        for (unsigned int c=0; c != elem->n_children(); ++c)
+          {
+            const Elem *child = elem->child_ptr(c);
+            if (child != remote_elem)
+              connected_elements.insert(child);
+          }
+    }
+}
+
+
 void connect_families
   (std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
@@ -343,6 +368,10 @@ void MeshCommunication::redistribute (DistributedMesh & mesh) const
 
         // See which to-be-ghosted elements we need to send
         query_ghosting_functors(mesh, pid, elements_to_send);
+
+        // The inactive elements we need to send should have their
+        // immediate children present.
+        connect_children(mesh, pid, elements_to_send);
 
         // The elements we need should have their ancestors and their
         // subactive children present too.
@@ -1341,6 +1370,11 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
                           elements_to_keep);
   query_ghosting_functors(mesh, DofObject::invalid_processor_id,
                           elements_to_keep);
+
+  // The inactive elements we need to send should have their
+  // immediate children present.
+  connect_children(mesh, mesh.processor_id(), elements_to_keep);
+  connect_children(mesh, DofObject::invalid_processor_id, elements_to_keep);
 
   // The elements we need should have their ancestors and their
   // subactive children present too.
