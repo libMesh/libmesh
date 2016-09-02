@@ -303,7 +303,7 @@ public:
   bool has_topological_neighbor (const Elem * elem,
                                  const MeshBase & mesh,
                                  const PointLocatorBase & point_locator,
-                                 PeriodicBoundaries * pb) const;
+                                 const PeriodicBoundaries * pb) const;
 #endif
 
   /**

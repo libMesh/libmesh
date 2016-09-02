@@ -1089,7 +1089,7 @@ const Elem * Elem::topological_neighbor (const unsigned int i,
 bool Elem::has_topological_neighbor (const Elem * elem,
                                      const MeshBase & mesh,
                                      const PointLocatorBase & point_locator,
-                                     PeriodicBoundaries * pb) const
+                                     const PeriodicBoundaries * pb) const
 {
   // First see if this is a normal "interior" neighbor
   if (has_neighbor(elem))
