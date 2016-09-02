@@ -26,9 +26,14 @@
 namespace libMesh
 {
 
+// Forward declarations
+class PeriodicBoundaries;
+
+
 /**
- * This class implements the default geometry ghosting in libMesh:
- * point neighbors and interior_parent elements are ghosted.
+ * This class implements the default algebraic coupling in libMesh:
+ * elements couple to themselves, but may also couple to neighbors
+ * both locally and across periodic boundary conditions.
  *
  * \author Roy H. Stogner
  * \date 2016
@@ -42,7 +47,12 @@ public:
    */
   DefaultCoupling() :
     _dof_coupling(libmesh_nullptr),
-    _couple_neighbor_dofs(false) {}
+    _couple_neighbor_dofs(false),
+#ifdef LIBMESH_ENABLE_PERIODIC
+    _periodic_bcs(libmesh_nullptr),
+#endif
+    _mesh(libmesh_nullptr)
+ {}
 
   // Change coupling matrix after construction
   void set_dof_coupling(const CouplingMatrix * dof_coupling)
@@ -51,6 +61,29 @@ public:
   // Decide whether to couple to neighbors after construction
   void set_coupled_neighbor_dofs(bool couple_neighbor_dofs)
   { _couple_neighbor_dofs = couple_neighbor_dofs; }
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // Set PeriodicBoundaries to couple
+  void set_periodic_boundaries(const PeriodicBoundaries * periodic_bcs)
+  { _periodic_bcs = periodic_bcs; }
+#endif
+
+  // Set MeshBase for use in checking for periodic boundary ids
+  void set_mesh(const MeshBase * mesh)
+  { _mesh = mesh; }
+
+  /**
+   * If we have periodic boundaries, then we'll need the mesh to have
+   * an updated point locator whenever we're about to query them.
+   */
+  virtual void mesh_reinit () libmesh_override;
+
+  /**
+   * If we have periodic boundaries, then we'll need the mesh to have
+   * an updated point locator whenever we're about to query them.
+   */
+  virtual void redistribute () libmesh_override
+  { this->mesh_reinit(); }
 
   /**
    * For the specified range of active elements, find the elements
@@ -71,6 +104,10 @@ private:
 
   const CouplingMatrix * _dof_coupling;
   bool _couple_neighbor_dofs;
+#ifdef LIBMESH_ENABLE_PERIODIC
+  const PeriodicBoundaries * _periodic_bcs;
+#endif
+  const MeshBase * _mesh;
 };
 
 } // namespace libMesh

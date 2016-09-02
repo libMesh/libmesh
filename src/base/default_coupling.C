@@ -21,10 +21,29 @@
 #include "libmesh/default_coupling.h"
 
 #include "libmesh/elem.h"
+#include "libmesh/periodic_boundaries.h"
 #include "libmesh/remote_elem.h"
 
 namespace libMesh
 {
+
+void DefaultCoupling::mesh_reinit()
+{
+  // Unless we have periodic boundary conditions, we don't need
+  // to cache anything.
+  if (!_periodic_bcs || _periodic_bcs->empty())
+    return;
+
+  // If we do have periodic boundary conditions, we'll need a master
+  // point locator, so we'd better have a mesh to build it on.
+  libmesh_assert(_mesh);
+
+  // Make sure a master point locator has been constructed; we'll need
+  // to grab sub-locators soon.
+  _mesh->sub_point_locator();
+}
+
+
 
 void DefaultCoupling::operator()
   (const MeshBase::const_element_iterator & range_begin,
@@ -33,6 +52,13 @@ void DefaultCoupling::operator()
    map_type & coupled_elements)
 {
   LOG_SCOPE("operator()", "DefaultCoupling");
+
+  UniquePtr<PointLocatorBase> point_locator;
+  if (_periodic_bcs)
+    {
+      libmesh_assert(_mesh);
+      point_locator = _mesh->sub_point_locator();
+    }
 
   for (MeshBase::const_element_iterator elem_it = range_begin;
        elem_it != range_end; ++elem_it)
@@ -46,33 +72,53 @@ void DefaultCoupling::operator()
 
       if (_couple_neighbor_dofs)
         for (unsigned int s=0; s<elem->n_sides(); s++)
-          if (elem->neighbor_ptr(s) != libmesh_nullptr)
-            {
-              const Elem * const neighbor_0 = elem->neighbor_ptr(s);
+          {
+            const Elem *neigh = elem->neighbor_ptr(s);
 
-              // Mesh ghosting might ask us about what we want to
-              // distribute along with non-local elements, and those
-              // non-local elements might have remote neighbors, and
-              // if they do then we can't say anything about them.
-              if (neighbor_0 == remote_elem)
-                continue;
+            // If we have a neighbor here
+            if (neigh)
+              {
+                // Mesh ghosting might ask us about what we want to
+                // distribute along with non-local elements, and those
+                // non-local elements might have remote neighbors, and
+                // if they do then we can't say anything about them.
+                if (neigh == remote_elem)
+                  continue;
+              }
+#ifdef LIBMESH_ENABLE_PERIODIC
+            // We might still have a periodic neighbor here
+            else if (_periodic_bcs)
+              {
+                libmesh_assert(_mesh);
 
-#ifdef LIBMESH_ENABLE_AMR
-              neighbor_0->active_family_tree_by_neighbor(active_neighbors,elem);
-#else
-              active_neighbors.clear();
-              active_neighbors.push_back(neighbor_0);
+                neigh = elem->topological_neighbor
+                  (s, *_mesh, *point_locator, _periodic_bcs);
+              }
 #endif
 
-              for (std::size_t a=0; a != active_neighbors.size(); ++a)
-                {
-                  const Elem * neighbor = active_neighbors[a];
+            // With no regular *or* periodic neighbors we have nothing
+            // to do.
+            if (!neigh)
+              continue;
 
-                  if (neighbor->processor_id() != p)
-                    coupled_elements.insert
-                      (std::make_pair(neighbor, _dof_coupling));
-                }
-            }
+	    // With any kind of neighbor, we need to couple to all the
+	    // active descendants on our side.
+#ifdef LIBMESH_ENABLE_AMR
+            neigh->active_family_tree_by_neighbor(active_neighbors,elem);
+#else
+            active_neighbors.clear();
+            active_neighbors.push_back(neigh);
+#endif
+
+            for (std::size_t a=0; a != active_neighbors.size(); ++a)
+              {
+                const Elem * neighbor = active_neighbors[a];
+
+                if (neighbor->processor_id() != p)
+                  coupled_elements.insert
+                    (std::make_pair(neighbor, _dof_coupling));
+              }
+          }
     }
 }
 
