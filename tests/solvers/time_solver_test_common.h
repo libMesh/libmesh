@@ -1,3 +1,4 @@
+#include <libmesh/dof_map.h>
 #include <libmesh/fem_system.h>
 
 using namespace libMesh;
@@ -35,18 +36,29 @@ protected:
     TimeSolverType * time_solver = cast_ptr<TimeSolverType *>(system.time_solver.get());
     this->aux_time_solver_init(*time_solver);
 
+    // We're going to want to check our solution, and when we run
+    // "make check" with LIBMESH_RUN='mpirun -np N" for N>1 then we'll
+    // need to avoid checking on the processors that are just
+    // twiddling their thumbs, not owning our mesh point.
+    std::vector<dof_id_type> solution_index;
+    solution_index.push_back(0);
+    const bool has_solution = system.get_dof_map().all_semilocal_indices(solution_index);
+
     for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
       {
         system.solve();
         system.time_solver->advance_timestep();
 
-        // Use relative error for comparison, so "exact" is 0
-        Number exact_soln = system.u(system.time);
-        Number rel_error =  std::abs((exact_soln - (*system.solution)(0))/exact_soln);
+        if (has_solution)
+          {
+            // Use relative error for comparison, so "exact" is 0
+            Number exact_soln = system.u(system.time);
+            Number rel_error =  std::abs((exact_soln - (*system.solution)(0))/exact_soln);
 
-        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0,
-                                      rel_error,
-                                      std::numeric_limits<Number>::epsilon()*10 );
+            CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0,
+                                          rel_error,
+                                          std::numeric_limits<Number>::epsilon()*10 );
+          }
       }
   }
 
