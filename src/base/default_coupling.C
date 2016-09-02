@@ -53,8 +53,10 @@ void DefaultCoupling::operator()
 {
   LOG_SCOPE("operator()", "DefaultCoupling");
 
+  bool check_periodic_bcs =
+    (_periodic_bcs && !_periodic_bcs->empty());
   UniquePtr<PointLocatorBase> point_locator;
-  if (_periodic_bcs)
+  if (check_periodic_bcs)
     {
       libmesh_assert(_mesh);
       point_locator = _mesh->sub_point_locator();
@@ -87,7 +89,7 @@ void DefaultCoupling::operator()
               }
 #ifdef LIBMESH_ENABLE_PERIODIC
             // We might still have a periodic neighbor here
-            else if (_periodic_bcs)
+            else if (check_periodic_bcs)
               {
                 libmesh_assert(_mesh);
 
