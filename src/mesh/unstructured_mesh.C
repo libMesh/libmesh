@@ -28,6 +28,7 @@
 
 // Local includes
 #include "libmesh/boundary_info.h"
+#include "libmesh/ghosting_functor.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
@@ -826,6 +827,16 @@ bool UnstructuredMesh::contract ()
   // FIXME: Need to understand why deleting subactive children
   // invalidates the point locator.  For now we will clear it explicitly
   this->clear_point_locator();
+
+  // Allow our GhostingFunctor objects to reinit if necessary.
+  std::set<GhostingFunctor *>::iterator        gf_it = this->ghosting_functors_begin();
+  const std::set<GhostingFunctor *>::iterator gf_end = this->ghosting_functors_end();
+  for (; gf_it != gf_end; ++gf_it)
+    {
+      GhostingFunctor *gf = *gf_it;
+      libmesh_assert(gf);
+      gf->mesh_reinit();
+    }
 
   return mesh_changed;
 }
