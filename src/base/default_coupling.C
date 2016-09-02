@@ -104,7 +104,11 @@ void DefaultCoupling::operator()
 	    // With any kind of neighbor, we need to couple to all the
 	    // active descendants on our side.
 #ifdef LIBMESH_ENABLE_AMR
-            neigh->active_family_tree_by_neighbor(active_neighbors,elem);
+            if (neigh == elem->neighbor_ptr(s))
+              neigh->active_family_tree_by_neighbor(active_neighbors,elem);
+            else
+              neigh->active_family_tree_by_topological_neighbor
+                (active_neighbors,elem,*_mesh,*point_locator,_periodic_bcs);
 #else
             active_neighbors.clear();
             active_neighbors.push_back(neigh);
