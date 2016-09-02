@@ -236,6 +236,11 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   MeshTools::libmesh_assert_valid_unique_ids(*this);
 #endif
 
+  // Reset our PointLocator.  Any old locator is invalidated any time
+  // the elements in the underlying elements in the mesh have changed,
+  // so we clear it here.
+  this->clear_point_locator();
+
   // Allow our GhostingFunctor objects to reinit if necessary.
   // Do this before partitioning and redistributing, and before
   // deleting remote elements.
@@ -256,10 +261,6 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
 
   if(!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
-
-  // Reset our PointLocator.  This needs to happen any time the elements
-  // in the underlying elements in the mesh have changed, so we do it here.
-  this->clear_point_locator();
 
   // The mesh is now prepared for use.
   _is_prepared = true;
