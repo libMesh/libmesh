@@ -78,11 +78,10 @@ public:
    */
   virtual void mesh_reinit () libmesh_override;
 
-  /**
-   * If we have periodic boundaries, then we'll need the mesh to have
-   * an updated point locator whenever we're about to query them.
-   */
   virtual void redistribute () libmesh_override
+  { this->mesh_reinit(); }
+
+  virtual void delete_remote_elements() libmesh_override
   { this->mesh_reinit(); }
 
   /**
