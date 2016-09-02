@@ -44,6 +44,7 @@ include_HEADERS =  \
         base/print_trace.h \
         base/reference_counted_object.h \
         base/reference_counter.h \
+        base/sibling_coupling.h \
         base/single_predicates.h \
         base/sparsity_pattern.h \
         base/variable.h \

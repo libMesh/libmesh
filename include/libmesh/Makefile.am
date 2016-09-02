@@ -33,6 +33,7 @@ BUILT_SOURCES = \
         print_trace.h \
         reference_counted_object.h \
         reference_counter.h \
+        sibling_coupling.h \
         single_predicates.h \
         sparsity_pattern.h \
         variable.h \
@@ -601,6 +602,9 @@ reference_counted_object.h: $(top_srcdir)/include/base/reference_counted_object.
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 reference_counter.h: $(top_srcdir)/include/base/reference_counter.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+sibling_coupling.h: $(top_srcdir)/include/base/sibling_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 single_predicates.h: $(top_srcdir)/include/base/single_predicates.h
