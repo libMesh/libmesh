@@ -1784,8 +1784,10 @@ void Elem::active_family_tree_by_neighbor (std::vector<const Elem *> & family,
     family.clear();
 
   // This only makes sense if we're already a neighbor
+#ifndef NDEBUG
   if (this->level() >= neighbor_in->level())
     libmesh_assert (this->has_neighbor(neighbor_in));
+#endif
 
   // Add an active element to the family tree.
   if (this->active())
