@@ -30,7 +30,7 @@ namespace libMesh
 void DefaultCoupling::mesh_reinit()
 {
   // Unless we have periodic boundary conditions, we don't need
-  // to cache anything.
+  // anything precomputed.
   if (!_periodic_bcs || _periodic_bcs->empty())
     return;
 
@@ -38,8 +38,8 @@ void DefaultCoupling::mesh_reinit()
   // point locator, so we'd better have a mesh to build it on.
   libmesh_assert(_mesh);
 
-  // Make sure a master point locator has been constructed; we'll need
-  // to grab sub-locators soon.
+  // Make sure an up-to-date master point locator has been
+  // constructed; we'll need to grab sub-locators soon.
   _mesh->sub_point_locator();
 }
 
