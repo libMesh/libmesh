@@ -65,6 +65,7 @@
 #include "libmesh/uniform_refinement_estimator.h"
 #include "libmesh/hp_coarsentest.h"
 #include "libmesh/hp_singular.h"
+#include "libmesh/sibling_coupling.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/mesh_modification.h"
 #include "libmesh/perf_log.h"
@@ -185,6 +186,23 @@ int main(int argc, char ** argv)
   // default MPI communicator.
   Mesh mesh(init.comm());
 
+  // Create an equation systems object.
+  EquationSystems equation_systems (mesh);
+
+  // Declare the system we will solve, named Laplace
+  LinearImplicitSystem & system =
+    equation_systems.add_system<LinearImplicitSystem> ("Laplace");
+
+  // If we're doing HP refinement, then we'll need to be able to
+  // evaluate data on elements' siblings in HPCoarsenTest, which means
+  // we should instruct our system's DofMap to distribute that data.
+  // Create and add (and keep around! the DofMap will only be holding
+  // a pointer to it!) a SiblingCoupling functor to provide that
+  // instruction.
+  SiblingCoupling sibling_coupling;
+  if (refine_type == "hp")
+    system.get_dof_map().add_algebraic_ghosting_functor(sibling_coupling);
+
   // Read in the mesh
   if (dim == 1)
     MeshTools::Generation::build_line(mesh, 1, -1., 0.);
@@ -208,14 +226,6 @@ int main(int argc, char ** argv)
   mesh_refinement.refine_fraction() = refine_percentage;
   mesh_refinement.coarsen_fraction() = coarsen_percentage;
   mesh_refinement.max_h_level() = max_r_level;
-
-  // Create an equation systems object.
-  EquationSystems equation_systems (mesh);
-
-  // Declare the system and its variables.
-  // Creates a system named "Laplace"
-  LinearImplicitSystem & system =
-    equation_systems.add_system<LinearImplicitSystem> ("Laplace");
 
   // Adds the variable "u" to "Laplace", using
   // the finite element type and order specified
