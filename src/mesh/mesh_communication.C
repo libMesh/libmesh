@@ -498,6 +498,10 @@ void MeshCommunication::redistribute (DistributedMesh & mesh) const
   MeshTools::libmesh_assert_valid_refinement_tree(mesh);
 #endif
 
+  // If we had a point locator, it's invalid now that there are new
+  // elements it can't locate.
+  mesh.clear_point_locator();
+
   // We now have all elements and nodes redistributed; our ghosting
   // functors should be ready to redistribute and/or recompute any
   // cached data they use too.
@@ -870,6 +874,10 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
   // allow any pending requests to complete
   Parallel::wait (send_requests);
 
+  // If we had a point locator, it's invalid now that there are new
+  // elements it can't locate.
+  mesh.clear_point_locator();
+
   // We can now find neighbor information for the interfaces between
   // local elements and ghost elements.
   mesh.find_neighbors (/* reset_remote_elements = */ true,
@@ -937,6 +945,10 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
   mesh.comm().broadcast(mesh.set_subdomain_name_map());
   mesh.comm().broadcast(mesh.get_boundary_info().set_sideset_name_map());
   mesh.comm().broadcast(mesh.get_boundary_info().set_nodeset_name_map());
+
+  // If we had a point locator, it's invalid now that there are new
+  // elements it can't locate.
+  mesh.clear_point_locator();
 
   libmesh_assert (mesh.comm().verify(mesh.n_elem()));
   libmesh_assert (mesh.comm().verify(mesh.n_nodes()));
@@ -1007,6 +1019,9 @@ void MeshCommunication::gather (const processor_id_type root_id, DistributedMesh
                                        mesh.level_elements_end(l),
                                        mesh_inserter_iterator<Elem>(mesh));
 
+  // If we had a point locator, it's invalid now that there are new
+  // elements it can't locate.
+  mesh.clear_point_locator();
 
   // If we are doing an allgather(), perform sanity check on the result.
   if (root_id == DofObject::invalid_processor_id)
@@ -1432,6 +1447,10 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
       if (!connected_nodes.count(node))
         mesh.delete_node(node);
     }
+
+  // If we had a point locator, it's invalid now that some of the
+  // elements it pointed to have been deleted.
+  mesh.clear_point_locator();
 
   // We now have all remote elements and nodes deleted; our ghosting
   // functors should be ready to delete any now-redundant cached data
