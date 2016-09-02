@@ -1770,6 +1770,50 @@ void Elem::family_tree_by_subneighbor (std::vector<const Elem *> & family,
 
 
 
+void Elem::active_family_tree_by_topological_neighbor
+  (std::vector<const Elem *> & family,
+   const Elem * neighbor_in,
+   const MeshBase & mesh,
+   const PointLocatorBase & point_locator,
+   const PeriodicBoundaries * pb,
+   const bool reset) const
+{
+  // The "family tree" doesn't include subactive elements or
+  // remote_elements
+  libmesh_assert(!this->subactive());
+  libmesh_assert(this != remote_elem);
+
+  // Clear the vector if the flag reset tells us to.
+  if (reset)
+    family.clear();
+
+  // This only makes sense if we're already a topological neighbor
+#ifndef NDEBUG
+  if (this->level() >= neighbor_in->level())
+    libmesh_assert (this->has_topological_neighbor
+                      (neighbor_in, mesh, point_locator, pb));
+#endif
+
+  // Add an active element to the family tree.
+  if (this->active())
+    family.push_back(this);
+
+  // Or recurse into an ancestor element's children.
+  // Do not clear the vector any more.
+  else if (!this->active())
+    for (unsigned int c=0; c<this->n_children(); c++)
+      {
+        const Elem * current_child = this->child_ptr(c);
+        if (current_child != remote_elem &&
+            current_child->has_topological_neighbor
+              (neighbor_in, mesh, point_locator, pb))
+          current_child->active_family_tree_by_topological_neighbor
+            (family, neighbor_in, mesh, point_locator, pb, false);
+      }
+}
+
+
+
 void Elem::active_family_tree_by_neighbor (std::vector<const Elem *> & family,
                                            const Elem * neighbor_in,
                                            const bool reset) const

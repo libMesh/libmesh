@@ -1130,6 +1130,19 @@ public:
                                        const bool reset=true) const;
 
   /**
+   * Same as the \p active_family_tree_by_neighbor() member, but the
+   * \p neighbor here may be a topological (e.g. periodic boundary
+   * condition) neighbor, not just a local neighbor.
+   */
+  void active_family_tree_by_topological_neighbor
+    (std::vector<const Elem *> & family,
+     const Elem * neighbor,
+     const MeshBase & mesh,
+     const PointLocatorBase & point_locator,
+     const PeriodicBoundaries * pb,
+     const bool reset=true) const;
+
+  /**
    * Returns the value of the refinement flag for the element.
    */
   RefinementState refinement_flag () const;
