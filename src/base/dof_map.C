@@ -179,8 +179,12 @@ DofMap::DofMap(const unsigned int number,
 {
   _matrices.clear();
 
+  _default_coupling->set_periodic_boundaries(_periodic_boundaries);
+  _default_coupling->set_mesh(&_mesh);
   this->add_coupling_functor(*_default_coupling);
 
+  _default_evaluating->set_periodic_boundaries(_periodic_boundaries);
+  _default_evaluating->set_mesh(&_mesh);
   _default_evaluating->set_coupled_neighbor_dofs(true);
   this->add_algebraic_ghosting_functor(*_default_evaluating);
 }
