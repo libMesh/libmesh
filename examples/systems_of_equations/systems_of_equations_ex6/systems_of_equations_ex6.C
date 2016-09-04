@@ -571,10 +571,8 @@ int main (int argc, char ** argv)
   // First plot the displacement field using a nodal plot
   std::set<std::string> system_names;
   system_names.insert("Elasticity");
-  exo_io.write_equation_systems("displacement_and_stress.exo", equation_systems, &system_names);
-
-  // then append element-based discontinuous plots of the stresses
-  exo_io.write_element_data(equation_systems);
+  system_names.insert("StressSystem");
+  exo_io.write_discontinuous_exodusII("displacement_and_stress.exo", equation_systems, &system_names);
 
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
