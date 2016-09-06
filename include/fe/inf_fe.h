@@ -352,6 +352,14 @@ public:
                          const Elem * elem,
                          const std::vector<Number> & elem_soln,
                          std::vector<Number> & nodal_soln);
+  
+  /**
+   * @returns the location (in physical space) of the point
+   * \p p located on the reference element. 
+   * // I don't see a reason why it should be protected.
+   */
+  static Point map (const Elem * inf_elem,
+                    const Point & reference_point);
 
   /**
    * @returns the location (on the reference element) of the
@@ -564,13 +572,6 @@ protected:
 
   //-------------------------------------------------------------
   // Miscellaneous static members
-
-  /**
-   * @returns the location (in physical space) of the point
-   * \p p located on the reference element.
-   */
-  static Point map (const Elem * inf_elem,
-                    const Point & reference_point);
 
   /**
    * Computes the indices in the base \p base_node and in radial

@@ -642,6 +642,10 @@ void InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * elem,
 
 //INSTANTIATE_INF_FE(3,CARTESIAN);
 
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Point, map(const Elem *, const Point &));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Point, map(const Elem *, const Point &));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Point, map(const Elem *, const Point &));
+
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Point, inverse_map(const Elem *, const Point &, const Real, const bool, const bool));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Point, inverse_map(const Elem *, const Point &, const Real, const bool, const bool));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Point, inverse_map(const Elem *, const Point &, const Real, const bool, const bool));
