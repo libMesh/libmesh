@@ -2339,7 +2339,7 @@ inline void Communicator::send_packed_range (const unsigned int dest_processor_i
       std::vector<buffer_t> * buffer = new std::vector<buffer_t>();
 
       const Iter next_range_begin =
-	Parallel::pack_range(context, range_begin, range_end,
+        Parallel::pack_range(context, range_begin, range_end,
                              *buffer);
 
       libmesh_assert_greater (std::distance(range_begin, next_range_begin), 0);
