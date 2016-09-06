@@ -293,6 +293,7 @@ public:
     fe->attach_quadrature_rule (&qrule);
 
     const std::vector<Real> & JxW = fe->get_JxW();
+    const std::vector<std::vector<Real> > & phi = fe->get_phi();
     const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
     // Also, get a reference to the ExplicitSystem
@@ -310,9 +311,7 @@ public:
     // Storage for the stress dof indices on each element
     std::vector< std::vector<dof_id_type> > dof_indices_var(system.n_vars());
     std::vector<dof_id_type> stress_dof_indices_var;
-
-    // To store the stress tensor on each element
-    DenseMatrix<Number> elem_avg_stress_tensor(3, 3);
+    std::vector<dof_id_type> vonmises_dof_indices_var;
 
     MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
     const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
@@ -328,68 +327,96 @@ public:
 
         fe->reinit (elem);
 
-        // clear the stress tensor
-        elem_avg_stress_tensor.resize(3, 3);
-
+        std::vector< DenseMatrix<Number> > stress_tensor_qp(qrule.n_points());
         for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-          {
-            DenseMatrix<Number> grad_u(3, 3);
+        {
+          stress_tensor_qp[qp].resize(3,3);
 
-            // Row is variable u1, u2, or u3, column is x, y, or z
-            for (unsigned int var_i=0; var_i<3; var_i++)
-              for (unsigned int var_j=0; var_j<3; var_j++)
-                for (unsigned int j=0; j<n_var_dofs; j++)
-                  grad_u(var_i,var_j) += dphi[j][qp](var_j) * system.current_solution(dof_indices_var[var_i][j]);
+          // Row is variable u1, u2, or u3, column is x, y, or z
+          DenseMatrix<Number> grad_u(3,3);
+          for (unsigned int var_i=0; var_i<3; var_i++)
+            for (unsigned int var_j=0; var_j<3; var_j++)
+              for (unsigned int j=0; j<n_var_dofs; j++)
+                grad_u(var_i,var_j) += dphi[j][qp](var_j) * system.current_solution(dof_indices_var[var_i][j]);
 
-            DenseMatrix<Number> stress_tensor(3, 3);
+          for (unsigned int var_i=0; var_i<3; var_i++)
+            for (unsigned int var_j=0; var_j<3; var_j++)
+              for (unsigned int k=0; k<3; k++)
+                for (unsigned int l=0; l<3; l++)
+                  stress_tensor_qp[qp](var_i,var_j) += elasticity_tensor(var_i,var_j,k,l) * grad_u(k,l);
+        }
 
-            for (unsigned int i=0; i<3; i++)
-              for (unsigned int j=0; j<3; j++)
-                for (unsigned int k=0; k<3; k++)
-                  for (unsigned int l=0; l<3; l++)
-                    stress_tensor(i,j) += elasticity_tensor(i,j,k,l) * grad_u(k,l);
+        stress_dof_map.dof_indices (elem, vonmises_dof_indices_var, vonMises_var);
+        std::vector< DenseMatrix<Real> > elem_sigma_vec(vonmises_dof_indices_var.size());
+        for(unsigned int index=0; index<elem_sigma_vec.size(); index++)
+        {
+          elem_sigma_vec[index].resize(3,3);
+        }
 
-            // stress_tensor now holds the stress at point qp.
-            // We want to plot the average stress on each element, hence
-            // we integrate stress_tensor
-            elem_avg_stress_tensor.add(JxW[qp], stress_tensor);
-          }
-
-        // Get the average stress per element by dividing by volume
-        elem_avg_stress_tensor.scale(1./elem->volume());
-
-        // load elem_sigma data into stress_system
+        // Below we project each component of the stress tensor onto a L2_LAGRANGE discretization.
+        // Note that this gives a discontinuous stress plot on element boundaries, which is
+        // appropriate. We then also get the von Mises stress from the projected stress tensor.
         unsigned int stress_var_index = 0;
-        for (unsigned int i=0; i<3; i++)
-          for (unsigned int j=i; j<3; j++)
+        for (unsigned int var_i=0; var_i<3; var_i++)
+          for (unsigned int var_j=var_i; var_j<3; var_j++)
+          {
+            stress_dof_map.dof_indices (elem, stress_dof_indices_var, sigma_vars[stress_var_index]);
+
+            const unsigned int n_proj_dofs = stress_dof_indices_var.size();
+
+            DenseMatrix<Real> Me(n_proj_dofs, n_proj_dofs);
+            for (unsigned int qp=0; qp<qrule.n_points(); qp++)
             {
-              stress_dof_map.dof_indices (elem, stress_dof_indices_var, sigma_vars[stress_var_index]);
-
-              // We are using CONSTANT MONOMIAL basis functions, hence we only need to get
-              // one dof index per variable
-              dof_id_type dof_index = stress_dof_indices_var[0];
-
-              if ((stress_system.solution->first_local_index() <= dof_index) &&
-                  (dof_index < stress_system.solution->last_local_index()))
-                stress_system.solution->set(dof_index, elem_avg_stress_tensor(i,j));
-
-              stress_var_index++;
+              for(unsigned int i=0; i<n_proj_dofs; i++)
+                for(unsigned int j=0; j<n_proj_dofs; j++)
+                {
+                  Me(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp]);
+                }
             }
 
-        // Also, the von Mises stress
-        Number vonMises_value = std::sqrt(0.5*(pow(elem_avg_stress_tensor(0,0) - elem_avg_stress_tensor(1,1), 2.) +
-                                               pow(elem_avg_stress_tensor(1,1) - elem_avg_stress_tensor(2,2), 2.) +
-                                               pow(elem_avg_stress_tensor(2,2) - elem_avg_stress_tensor(0,0), 2.) +
-                                               6.*(pow(elem_avg_stress_tensor(0,1), 2.) +
-                                                   pow(elem_avg_stress_tensor(1,2), 2.) +
-                                                   pow(elem_avg_stress_tensor(2,0), 2.))));
+            DenseVector<Real> Fe(n_proj_dofs);
+            for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+              for(unsigned int i=0; i<n_proj_dofs; i++)
+              {
+                Fe(i) += JxW[qp] * stress_tensor_qp[qp](var_i,var_j) * phi[i][qp];
+              }
 
-        stress_dof_map.dof_indices (elem, stress_dof_indices_var, vonMises_var);
-        dof_id_type dof_index = stress_dof_indices_var[0];
+            DenseVector<Real> projected_data;
+            Me.cholesky_solve(Fe, projected_data);
 
-        if ((stress_system.solution->first_local_index() <= dof_index) &&
-            (dof_index < stress_system.solution->last_local_index()))
-          stress_system.solution->set(dof_index, vonMises_value);
+            for(unsigned int index=0; index<n_proj_dofs; index++)
+            {
+              dof_id_type dof_index = stress_dof_indices_var[index];
+              if ((stress_system.solution->first_local_index() <= dof_index) &&
+                  (dof_index < stress_system.solution->last_local_index()))
+                stress_system.solution->set(dof_index, projected_data(index));
+
+              elem_sigma_vec[index](var_i,var_j) = projected_data(index);
+            }
+
+            stress_var_index++;
+          }
+
+        for(unsigned int index=0; index<elem_sigma_vec.size(); index++)
+        {
+          elem_sigma_vec[index](1,0) = elem_sigma_vec[index](0,1);
+          elem_sigma_vec[index](2,0) = elem_sigma_vec[index](0,2);
+          elem_sigma_vec[index](2,1) = elem_sigma_vec[index](1,2);
+
+          // Get the von Mises stress from the projected stress tensor
+          Number vonMises_value = std::sqrt(0.5*(pow(elem_sigma_vec[index](0,0) - elem_sigma_vec[index](1,1), 2.) +
+                                                 pow(elem_sigma_vec[index](1,1) - elem_sigma_vec[index](2,2), 2.) +
+                                                 pow(elem_sigma_vec[index](2,2) - elem_sigma_vec[index](0,0), 2.) +
+                                                6.*(pow(elem_sigma_vec[index](0,1), 2.) +
+                                                    pow(elem_sigma_vec[index](1,2), 2.) +
+                                                    pow(elem_sigma_vec[index](2,0), 2.))));
+
+          dof_id_type dof_index = vonmises_dof_indices_var[index];
+
+          if ((stress_system.solution->first_local_index() <= dof_index) &&
+              (dof_index < stress_system.solution->last_local_index()))
+            stress_system.solution->set(dof_index, vonMises_value);
+        }
       }
 
     // Should call close and update when we set vector entries directly
@@ -421,7 +448,6 @@ int main (int argc, char ** argv)
                                      0., 0.3,
                                      0., 0.1,
                                      HEX8);
-
 
   // Print information about the mesh to the screen.
   mesh.print_info();
@@ -542,13 +568,13 @@ int main (int argc, char ** argv)
   ExplicitSystem & stress_system =
     equation_systems.add_system<ExplicitSystem> ("StressSystem");
 
-  stress_system.add_variable("sigma_00", CONSTANT, MONOMIAL);
-  stress_system.add_variable("sigma_01", CONSTANT, MONOMIAL);
-  stress_system.add_variable("sigma_02", CONSTANT, MONOMIAL);
-  stress_system.add_variable("sigma_11", CONSTANT, MONOMIAL);
-  stress_system.add_variable("sigma_12", CONSTANT, MONOMIAL);
-  stress_system.add_variable("sigma_22", CONSTANT, MONOMIAL);
-  stress_system.add_variable("vonMises", CONSTANT, MONOMIAL);
+  stress_system.add_variable("sigma_00", FIRST, L2_LAGRANGE);
+  stress_system.add_variable("sigma_01", FIRST, L2_LAGRANGE);
+  stress_system.add_variable("sigma_02", FIRST, L2_LAGRANGE);
+  stress_system.add_variable("sigma_11", FIRST, L2_LAGRANGE);
+  stress_system.add_variable("sigma_12", FIRST, L2_LAGRANGE);
+  stress_system.add_variable("sigma_22", FIRST, L2_LAGRANGE);
+  stress_system.add_variable("vonMises", FIRST, L2_LAGRANGE);
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
@@ -567,12 +593,7 @@ int main (int argc, char ** argv)
 
   // Use single precision in this case (reduces the size of the exodus file)
   ExodusII_IO exo_io(mesh, /*single_precision=*/true);
-
-  // First plot the displacement field using a nodal plot
-  std::set<std::string> system_names;
-  system_names.insert("Elasticity");
-  system_names.insert("StressSystem");
-  exo_io.write_discontinuous_exodusII("displacement_and_stress.exo", equation_systems, &system_names);
+  exo_io.write_discontinuous_exodusII("displacement_and_stress.exo", equation_systems);
 
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
