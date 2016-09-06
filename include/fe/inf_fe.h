@@ -352,11 +352,10 @@ public:
                          const Elem * elem,
                          const std::vector<Number> & elem_soln,
                          std::vector<Number> & nodal_soln);
-  
+
   /**
    * @returns the location (in physical space) of the point
-   * \p p located on the reference element. 
-   * // I don't see a reason why it should be protected.
+   * \p p located on the reference element.
    */
   static Point map (const Elem * inf_elem,
                     const Point & reference_point);

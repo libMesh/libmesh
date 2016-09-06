@@ -425,14 +425,15 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
 
 
 
-Point FEInterface::ifem_map (const unsigned int dim, 
-                             const FEType& fe_t,
+Point FEInterface::ifem_map (const unsigned int dim,
+                             const FEType & fe_t,
                              const Elem * elem,
                              const Point & p)
 {
    switch (fe_t.inf_map)
    {
-      case CARTESIAN:{
+      case CARTESIAN:
+      {
          switch (dim)
          {
          case 1:

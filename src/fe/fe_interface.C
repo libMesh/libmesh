@@ -540,9 +540,8 @@ Point FEInterface::map(unsigned int dim,
                        const Point & p)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
   if (is_InfFE_elem(elem->type()))
-     return ifem_map(dim, fe_t, elem, p); //new function now.
+    return ifem_map(dim, fe_t, elem, p);
 #endif
   fe_with_vec_switch(map(elem, p));
 

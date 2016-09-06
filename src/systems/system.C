@@ -2374,7 +2374,7 @@ Tensor System::point_hessian(unsigned int, const Point &, const Elem &) const
   return Tensor();
 }
 
-Tensor System::point_hessian(unsigned int , const Point &, const Elem *) const
+Tensor System::point_hessian(unsigned int, const Point &, const Elem *) const
 {
   libmesh_error_msg("We can only accumulate a hessian with --enable-second");
 
