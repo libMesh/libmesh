@@ -394,6 +394,11 @@ private:
                               const std::vector<Number> & elem_soln,
                               std::vector<Number> & nodal_soln);
 
+  static Point ifem_map (const unsigned int dim,
+                         const FEType& fe_t,
+                         const Elem * elem,
+                         const Point & p);
+
   static Point ifem_inverse_map (const unsigned int dim,
                                  const FEType & fe_t,
                                  const Elem * elem,

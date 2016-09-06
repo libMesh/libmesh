@@ -354,6 +354,13 @@ public:
                          std::vector<Number> & nodal_soln);
 
   /**
+   * @returns the location (in physical space) of the point
+   * \p p located on the reference element.
+   */
+  static Point map (const Elem * inf_elem,
+                    const Point & reference_point);
+
+  /**
    * @returns the location (on the reference element) of the
    * point \p p located in physical space.  First, the location
    * in the base face is computed. This requires inverting the
@@ -564,13 +571,6 @@ protected:
 
   //-------------------------------------------------------------
   // Miscellaneous static members
-
-  /**
-   * @returns the location (in physical space) of the point
-   * \p p located on the reference element.
-   */
-  static Point map (const Elem * inf_elem,
-                    const Point & reference_point);
 
   /**
    * Computes the indices in the base \p base_node and in radial
