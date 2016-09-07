@@ -349,7 +349,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
 
       // determine the error in computing the local coordinates
       // in the base: ||P_n+1 - P_n||
-      inverse_map_error = dp.size();
+      inverse_map_error = dp.norm();
 
 
       // P_n+1 = P_n + dp
@@ -404,7 +404,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
       case 1:
         {
           Real a_interpolated = Point( inf_elem->point(0)
-                                       - inf_elem->point(n_base_mapping_sf) ).size();
+                                       - inf_elem->point(n_base_mapping_sf) ).norm();
 
           p(0) = 1. - 2*a_interpolated/physical_point(0);
 
@@ -429,13 +429,13 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
           Real a_interpolated = 0.;
 
           // the distance between the origin and the physical point
-          const Real fp_o_dist = Point(o-physical_point).size();
+          const Real fp_o_dist = Point(o-physical_point).norm();
 
           for (unsigned int i=0; i<n_base_mapping_sf; i++)
             {
               // the radial distance of the i-th base mapping point
               const Real dist_i = Point( inf_elem->point(i)
-                                         - inf_elem->point(i+n_base_mapping_sf) ).size();
+                                         - inf_elem->point(i+n_base_mapping_sf) ).norm();
               // weight with the corresponding shape function
               a_interpolated += dist_i * FE<1,LAGRANGE>::shape(base_mapping_elem_type,
                                                                base_mapping_order,
@@ -467,13 +467,13 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
 
 
           // the distance between the origin and the physical point
-          const Real fp_o_dist = Point(o-physical_point).size();
+          const Real fp_o_dist = Point(o-physical_point).norm();
 
           for (unsigned int i=0; i<n_base_mapping_sf; i++)
             {
               // the radial distance of the i-th base mapping point
               const Real dist_i = Point( inf_elem->point(i)
-                                         - inf_elem->point(i+n_base_mapping_sf) ).size();
+                                         - inf_elem->point(i+n_base_mapping_sf) ).norm();
 
               // weight with the corresponding shape function
               a_interpolated += dist_i * FE<2,LAGRANGE>::shape(base_mapping_elem_type,
@@ -511,11 +511,11 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
   else
     {
       // distance from the physical point to the ifem origin
-      const Real fp_o_dist = Point(o-physical_point).size();
+      const Real fp_o_dist = Point(o-physical_point).norm();
 
       // the distance from the intersection on the
       // base to the origin
-      const Real a_dist = intersection.size();
+      const Real a_dist = intersection.norm();
 
       // element coordinate in radial direction
       // here our first guess is 0.
@@ -596,11 +596,11 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
     const Point check = InfFE<Dim,T_radial,T_map>::map (inf_elem, p);
     const Point diff  = physical_point - check;
 
-    if (diff.size() > tolerance)
+    if (diff.norm() > tolerance)
     {
     libmesh_here();
     libMesh::err << "WARNING:  diff is "
-    << diff.size()
+    << diff.norm()
     << std::endl;
     }
   */
