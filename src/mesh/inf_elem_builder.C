@@ -387,7 +387,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
                     //find the node most distant from origin
 
-                    Real r = dist_from_origin.size();
+                    Real r = dist_from_origin.norm();
                     if (r > max_r)
                       {
                         max_r = r;
