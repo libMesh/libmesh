@@ -423,7 +423,7 @@ void AbaqusIO::read_nodes(std::string nset_name)
 
   // Temporary variables for parsing lines of text
   char c;
-  std::string dummy;
+  std::string line;
 
   // Defines the sequential node numbering used by libmesh.  Since
   // there can be multiple *NODE sections in an Abaqus file, we always
@@ -443,30 +443,38 @@ void AbaqusIO::read_nodes(std::string nset_name)
   // TODO: Is Abaqus guaranteed to start the line with '*' or can there be leading white space?
   while (_in.peek() != '*' && _in.peek() != EOF)
     {
-      // Re-Initialize variables to be read in from file
+      // Read an entire line which corresponds to a single point's id
+      // and (x,y,z) values.
+      std::getline(_in, line);
+
+      // Remove all whitespace characters from the line.  This way we
+      // can do the remaining parsing without worrying about tabs,
+      // different numbers of spaces, etc.
+      line.erase(std::remove_if(line.begin(), line.end(), isspace), line.end());
+
+      // Make a stream out of the modified line so we can stream values
+      // from it in the usual way.
+      std::stringstream ss(line);
+
+      // Values to be read in from file
       dof_id_type abaqus_node_id=0;
       Real x=0, y=0, z=0;
 
       // Note: we assume *at least* 2D points here, should we worry about
       // trying to read 1D Abaqus meshes?
-      _in >> abaqus_node_id >> c >> x >> c >> y;
+      ss >> abaqus_node_id >> c >> x >> c >> y;
 
       // Peek at the next character.  If it is a comma, then there is another
       // value to read!
-      if (_in.peek() == ',')
-        _in >> c >> z;
-
-      // Read (and discard) the rest of the line, including the newline.
-      // This is required so that our 'peek()' at the beginning of this
-      // loop doesn't read the newline character, for example.
-      std::getline(_in, dummy);
+      if (ss.peek() == ',')
+        ss >> c >> z;
 
       // If this *NODE section defines an NSET, also store the abaqus ID in id_storage
       if (id_storage)
         id_storage->push_back(abaqus_node_id);
 
       // Set up the abaqus -> libmesh node mapping.  This is usually just the
-      // "off-by-one" map.
+      // "off-by-one" map, but it doesn't have to be.
       _abaqus_to_libmesh_node_mapping[abaqus_node_id] = libmesh_node_id;
 
       // Add the point to the mesh using libmesh's numbering,
