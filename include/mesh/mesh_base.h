@@ -990,6 +990,15 @@ public:
      unsigned int var_num = libMesh::invalid_uint) const = 0;
 
   /**
+   * Iterate over all elements with a specified refinement flag.
+   */
+  virtual element_iterator flagged_elements_begin (unsigned char rflag) = 0;
+  virtual element_iterator flagged_elements_end (unsigned char rflag) = 0;
+  virtual const_element_iterator flagged_elements_begin (unsigned char rflag) const = 0;
+  virtual const_element_iterator flagged_elements_end (unsigned char rflag) const = 0;
+
+
+  /**
    * Active, local, and negation forms of the element iterators described above.
    * An "active" element is an element without children (i.e. has not been refined).
    * A "local" element is one whose processor_id() matches the current processor.

@@ -396,6 +396,11 @@ public:
     (const DofMap & dof_map,
      unsigned int var_num = libMesh::invalid_uint) const libmesh_override;
 
+  virtual element_iterator flagged_elements_begin (unsigned char rflag);
+  virtual element_iterator flagged_elements_end (unsigned char rflag);
+  virtual const_element_iterator flagged_elements_begin (unsigned char rflag) const;
+  virtual const_element_iterator flagged_elements_end (unsigned char rflag) const;
+
   /**
    * Node iterator accessor functions.
    */
