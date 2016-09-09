@@ -281,9 +281,9 @@ protected:
 };
 
 
-// The elem_type predicate returns true if the pointers
-// type matches the given type.  Of course, this one can only
-// be instantiated for objects which return Elem pointers when dereferened.
+// The elem_type predicate returns true if the pointers type matches
+// the given type.  Of course, this one can only be instantiated for
+// objects which return Elem pointers when dereferenced.
 template <typename T>
 struct elem_type : predicate<T>
 {
@@ -297,6 +297,27 @@ protected:
   virtual predicate<T> * clone() const libmesh_override { return new elem_type<T>(*this); }
   const ElemType _elem_type;
 };
+
+
+
+// The flagged predicate returns true if the pointers refinement flag
+// matches the given rflag.  Of course, this one can only be
+// instantiated for objects which return Elem pointers when
+// dereferenced.
+template <typename T>
+struct flagged : predicate<T>
+{
+  // Constructor
+  flagged (unsigned char rflag) : _rflag(rflag) {}
+  virtual ~flagged() {}
+
+  virtual bool operator()(const T & it) const libmesh_override { return (*it)->refinement_flag() == _rflag; }
+
+protected:
+  virtual predicate<T> * clone() const libmesh_override { return new flagged<T>(*this); }
+  const unsigned char _rflag;
+};
+
 
 
 
