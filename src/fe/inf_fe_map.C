@@ -454,26 +454,8 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
     }
   while (inverse_map_error > tolerance);
 
-  switch (Dim)
-    {
-    case 1:
-      {
-        p(0) = v;
-        break;
-      }
-    case 2:
-      {
-        p(1) = v;
-        break;
-      }
-    case 3:
-      {
-        p(2) = v;
-        break;
-      }
-    default:
-      libmesh_error_msg("Unknown Dim = " << Dim);
-    }
+  // Set the last coordinate of the Point to v.
+  p(Dim-1) = v;
 
   // If we are in debug mode do a sanity check.  Make sure
   // the point \p p on the reference element actually does
