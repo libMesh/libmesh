@@ -111,17 +111,14 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
       inf_elem_type != INFPRISM6)
     libmesh_error_msg("ERROR: InfFE::inverse_map is currently implemented only for \ninfinite elments of type InfHex8 and InfPrism6.");
 
-
   // 2.)
   // just like in FE<Dim-1,LAGRANGE>::inverse_map(): compute
   // the local coordinates, but only in the base element.
   // The radial part can then be computed directly later on.
 
-
   // How much did the point on the reference
   // element change by in this Newton step?
   Real inverse_map_error = 0.;
-
 
   // The point on the reference element.  This is
   // the "initial guess" for Newton's method.  The
@@ -133,8 +130,6 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
   // for "good" elements.
   Point p; // the zero point.  No computation required
 
-
-
   // Now find the intersection of a plane represented by the base
   // element nodes and the line given by the origin of the infinite
   // element and the physical point.
@@ -145,7 +140,6 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
 
   switch (Dim)
     {
-
       // unnecessary for 1D
     case 1:
       {
@@ -218,13 +212,11 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
    */
   unsigned int cnt = 0;
 
-
   /**
    * Newton iteration loop.
    */
   do
     {
-
       // Increment in current iterate \p p, will be computed.
       // Automatically initialized to all zero.  Note that
       // in 3D, actually only the first two entries are
@@ -235,7 +227,6 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
       // on the dimension that we are in.
       switch (Dim)
         {
-
           //------------------------------------------------------------------
           // 1D infinite element - no map inversion necessary
         case 1:
@@ -252,17 +243,13 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
           // uniquely determined, and there is no need to iterate in that direction.
         case 2:
           {
-
             // Where our current iterate \p p maps to.
             const Point physical_guess = FE<1,LAGRANGE>::map (base_elem.get(), p);
-
 
             // How far our current iterate is from the actual point.
             const Point delta = physical_point - physical_guess;
 
-
             const Point dxi = FE<1,LAGRANGE>::map_xi (base_elem.get(), p);
-
 
             // For details on Newton's method see fe_map.C
             const Real G = dxi*dxi;
@@ -290,8 +277,6 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
           // coordinate zeta may directly computed.
         case 3:
           {
-
-
             // Where our current iterate \p p maps to.
             const Point physical_guess = FE<2,LAGRANGE>::map (base_elem.get(), p);
 
@@ -302,12 +287,10 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
             const Point dxi  = FE<2,LAGRANGE>::map_xi  (base_elem.get(), p);
             const Point deta = FE<2,LAGRANGE>::map_eta (base_elem.get(), p);
 
-
             // For details on Newton's method see fe_map.C
             const Real
               G11 = dxi*dxi,  G12 = dxi*deta,
               G21 = dxi*deta, G22 = deta*deta;
-
 
             const Real det = (G11*G22 - G12*G21);
 
@@ -326,7 +309,6 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
               Ginv21 = -G21*inv_det,
               Ginv22 =  G11*inv_det;
 
-
             const Real  dxidelta  = dxi*delta;
             const Real  detadelta = deta*delta;
 
@@ -337,27 +319,20 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
             break;
           }
 
-
-
           // Some other dimension?
         default:
           libmesh_error_msg("Unknown Dim = " << Dim);
         } // end switch(Dim), dp now computed
 
-
-
       // determine the error in computing the local coordinates
       // in the base: ||P_n+1 - P_n||
       inverse_map_error = dp.norm();
 
-
       // P_n+1 = P_n + dp
       p.add (dp);
 
-
       // Increment the iteration count.
       cnt++;
-
 
       // Watch for divergence of Newton's
       // method.
@@ -382,11 +357,6 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
 
           if (cnt > 20)
             libmesh_error_msg("ERROR: Newton scheme FAILED to converge in " << cnt << " iterations!");
-
-          // else
-          //  {
-          //    break;
-          //  }
         }
     }
   while (inverse_map_error > tolerance);
@@ -449,8 +419,6 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
       cnt2 ++;
       if (cnt2 > 20)
         libmesh_error_msg("ERROR: 1D Newton scheme FAILED to converge");
-
-
     }
   while (inverse_map_error > tolerance);
 
@@ -475,6 +443,8 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
 
   return p;
 }
+
+
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * elem,
