@@ -396,7 +396,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
       if (v >= 1.)
         v = .9999;
 
-      inverse_map_error = std::fabs(dp);
+      inverse_map_error = std::abs(dp);
 
       // increment iteration count
       cnt2 ++;
