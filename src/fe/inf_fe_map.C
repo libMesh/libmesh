@@ -142,13 +142,10 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
     {
       // unnecessary for 1D
     case 1:
-      {
-        break;
-      }
+      break;
 
     case 2:
       libmesh_error_msg("ERROR: InfFE::inverse_map is not yet implemented in 2d");
-
 
     case 3:
       {
@@ -225,9 +222,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
         {
           // 1D infinite element - no map inversion necessary
         case 1:
-          {
-            break;
-          }
+          break;
 
           // 2D infinite element - 1D map inversion
           //
