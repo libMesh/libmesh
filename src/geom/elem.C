@@ -1034,12 +1034,16 @@ Elem * Elem::topological_neighbor (const unsigned int i,
           {
             // Since the point locator inside of periodic boundaries
             // returns a const pointer we will retrieve the proper
-            // pointer directly from the mesh object.  Also since coarse
-            // elements do not have more refined neighbors we need to make
-            // sure that we don't return one of these types of neighbors.
-            neighbor_i = mesh.elem_ptr(pb->neighbor(*j, point_locator, this, i)->id());
-            if (level() < neighbor_i->level())
-              neighbor_i = neighbor_i->parent();
+            // pointer directly from the mesh object.
+            const Elem * const cn = pb->neighbor(*j, point_locator, this, i);
+            neighbor_i = const_cast<Elem *>(cn);
+
+	    // Since coarse elements do not have more refined
+	    // neighbors we need to make sure that we don't return one
+	    // of these types of neighbors.
+	    if (neighbor_i)
+              while (level() < neighbor_i->level())
+                neighbor_i = neighbor_i->parent();
             return neighbor_i;
           }
     }
@@ -1070,14 +1074,14 @@ const Elem * Elem::topological_neighbor (const unsigned int i,
       for (std::vector<boundary_id_type>::iterator j = bc_ids.begin(); j != bc_ids.end(); ++j)
         if (pb->boundary(*j))
           {
-            // Since the point locator inside of periodic boundaries
-            // returns a const pointer we will retrieve the proper
-            // pointer directly from the mesh object.  Also since coarse
-            // elements do not have more refined neighbors we need to make
-            // sure that we don't return one of these types of neighbors.
-            neighbor_i = mesh.elem_ptr(pb->neighbor(*j, point_locator, this, i)->id());
-            if (level() < neighbor_i->level())
-              neighbor_i = neighbor_i->parent();
+            neighbor_i = pb->neighbor(*j, point_locator, this, i);
+
+	    // Since coarse elements do not have more refined
+	    // neighbors we need to make sure that we don't return one
+	    // of these types of neighbors.
+	    if (neighbor_i)
+              while (level() < neighbor_i->level())
+                neighbor_i = neighbor_i->parent();
             return neighbor_i;
           }
     }
