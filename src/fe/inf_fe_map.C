@@ -416,12 +416,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
     const Point diff  = physical_point - check;
 
     if (diff.norm() > tolerance)
-    {
-    libmesh_here();
-    libMesh::err << "WARNING:  diff is "
-    << diff.norm()
-    << std::endl;
-    }
+      libmesh_warning("WARNING:  diff is " << diff.norm());
 #endif
 
   return p;
