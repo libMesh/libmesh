@@ -207,14 +207,10 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
       libmesh_error_msg("Invalid dim = " << Dim);
     }
 
-  /**
-   * The number of iterations in the map inversion process.
-   */
+  // The number of iterations in the map inversion process.
   unsigned int cnt = 0;
 
-  /**
-   * Newton iteration loop.
-   */
+  // Newton iteration loop.
   do
     {
       // Increment in current iterate \p p, will be computed.
@@ -227,15 +223,12 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
       // on the dimension that we are in.
       switch (Dim)
         {
-          //------------------------------------------------------------------
           // 1D infinite element - no map inversion necessary
         case 1:
           {
             break;
           }
 
-
-          //------------------------------------------------------------------
           // 2D infinite element - 1D map inversion
           //
           // In this iteration scheme only search for the local coordinate
@@ -267,9 +260,6 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
             break;
           }
 
-
-
-          //------------------------------------------------------------------
           // 3D infinite element - 2D map inversion
           //
           // In this iteration scheme only search for the local coordinates
@@ -360,8 +350,6 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
         }
     }
   while (inverse_map_error > tolerance);
-
-
 
   // 4.
   //
