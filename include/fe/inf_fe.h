@@ -378,8 +378,7 @@ public:
   static Point inverse_map (const Elem * elem,
                             const Point & p,
                             const Real tolerance = TOLERANCE,
-                            const bool secure = true,
-                            const bool interpolated = true);
+                            const bool secure = true);
 
 
   /**

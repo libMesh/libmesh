@@ -89,8 +89,7 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
                                               const Point & physical_point,
                                               const Real tolerance,
-                                              const bool secure,
-                                              const bool interpolated)
+                                              const bool secure)
 {
   libmesh_assert(inf_elem);
   libmesh_assert_greater_equal (tolerance, 0.);
@@ -397,202 +396,89 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
   // 4.
   //
   // Now that we have the local coordinates in the base,
-  // compute the interpolated radial distance a(s,t) \p a_interpolated
-  if (interpolated)
-    switch (Dim)
-      {
-      case 1:
-        {
-          Real a_interpolated = Point( inf_elem->point(0)
-                                       - inf_elem->point(n_base_mapping_sf) ).norm();
+  // we compute the radial distance with Newton iteration.
 
-          p(0) = 1. - 2*a_interpolated/physical_point(0);
+  // distance from the physical point to the ifem origin
+  const Real fp_o_dist = Point(o-physical_point).norm();
 
-#ifdef DEBUG
-          // the radial distance should always be >= -1.
+  // the distance from the intersection on the
+  // base to the origin
+  const Real a_dist = intersection.norm();
 
-          if (p(0)+1 < tolerance)
-            {
-              libmesh_here();
-              libMesh::err << "WARNING: radial distance p(0) is "
-                           << p(0)
-                           << std::endl;
-            }
-#endif
+  // element coordinate in radial direction
+  // here our first guess is 0.
+  Real v = 0.;
 
-          break;
-        }
+  // the order of the radial mapping
+  const Order radial_mapping_order (Radial::mapping_order());
 
+  unsigned int cnt2 = 0;
+  inverse_map_error = 0.;
 
-      case 2:
-        {
-          Real a_interpolated = 0.;
-
-          // the distance between the origin and the physical point
-          const Real fp_o_dist = Point(o-physical_point).norm();
-
-          for (unsigned int i=0; i<n_base_mapping_sf; i++)
-            {
-              // the radial distance of the i-th base mapping point
-              const Real dist_i = Point( inf_elem->point(i)
-                                         - inf_elem->point(i+n_base_mapping_sf) ).norm();
-              // weight with the corresponding shape function
-              a_interpolated += dist_i * FE<1,LAGRANGE>::shape(base_mapping_elem_type,
-                                                               base_mapping_order,
-                                                               i,
-                                                               p);
-            }
-
-          p(1) = 1. - 2*a_interpolated/fp_o_dist;
-
-#ifdef DEBUG
-          // the radial distance should always be >= -1.
-
-          // if (p(1)+1 < tolerance)
-          //  {
-          //    libmesh_here();
-          //    libMesh::err << "WARNING: radial distance p(1) is "
-          //      << p(1)
-          //      << std::endl;
-          //  }
-#endif
-
-          break;
-        }
-
-
-      case 3:
-        {
-          Real a_interpolated = 0.;
-
-
-          // the distance between the origin and the physical point
-          const Real fp_o_dist = Point(o-physical_point).norm();
-
-          for (unsigned int i=0; i<n_base_mapping_sf; i++)
-            {
-              // the radial distance of the i-th base mapping point
-              const Real dist_i = Point( inf_elem->point(i)
-                                         - inf_elem->point(i+n_base_mapping_sf) ).norm();
-
-              // weight with the corresponding shape function
-              a_interpolated += dist_i * FE<2,LAGRANGE>::shape(base_mapping_elem_type,
-                                                               base_mapping_order,
-                                                               i,
-                                                               p);
-
-            }
-
-          p(2) = 1. - 2*a_interpolated/fp_o_dist;
-
-#ifdef DEBUG
-
-
-          // the radial distance should always be >= -1.
-
-          // if (p(2)+1 < tolerance)
-          //  {
-          // libmesh_here();
-          // libMesh::err << "WARNING: radial distance p(2) is "
-          //      << p(2)
-          //      << std::endl;
-          //  }
-#endif
-
-          break;
-        }
-
-      default:
-        libmesh_error_msg("Unknown Dim = " << Dim);
-      } // end switch(Dim), p fully computed, including radial part
-
-  // if we do not want the interpolated distance, then
-  // use newton iteration to get the actual distance
-  else
+  // Newton iteration in 1-D
+  do
     {
-      // distance from the physical point to the ifem origin
-      const Real fp_o_dist = Point(o-physical_point).norm();
+      // the mapping in radial direction
+      // note that we only have two mapping functions in
+      // radial direction
+      const Real r = a_dist * InfFE<Dim,INFINITE_MAP,T_map>::eval (v, radial_mapping_order, 0)
+        + 2. * a_dist * InfFE<Dim,INFINITE_MAP,T_map>::eval (v, radial_mapping_order, 1);
 
-      // the distance from the intersection on the
-      // base to the origin
-      const Real a_dist = intersection.norm();
+      const Real dr = a_dist * InfFE<Dim,INFINITE_MAP,T_map>::eval_deriv (v, radial_mapping_order, 0)
+        + 2. * a_dist * InfFE<Dim,INFINITE_MAP,T_map>::eval_deriv (v, radial_mapping_order, 1);
 
-      // element coordinate in radial direction
-      // here our first guess is 0.
-      Real v = 0.;
+      const Real G = dr*dr;
+      const Real Ginv = 1./G;
 
-      // the order of the radial mapping
-      const Order radial_mapping_order (Radial::mapping_order());
+      const Real delta = fp_o_dist - r;
+      const Real drdelta = dr*delta;
 
-      unsigned int cnt2 = 0;
-      inverse_map_error = 0.;
+      Real dp = Ginv*drdelta;
 
-      // Newton iteration in 1-D
-      do
-        {
-          // the mapping in radial direction
-          // note that we only have two mapping functions in
-          // radial direction
-          const Real r = a_dist * InfFE<Dim,INFINITE_MAP,T_map>::eval (v, radial_mapping_order, 0)
-            + 2. * a_dist * InfFE<Dim,INFINITE_MAP,T_map>::eval (v, radial_mapping_order, 1);
+      // update the radial coordinate
+      v += dp;
 
-          const Real dr = a_dist * InfFE<Dim,INFINITE_MAP,T_map>::eval_deriv (v, radial_mapping_order, 0)
-            + 2. * a_dist * InfFE<Dim,INFINITE_MAP,T_map>::eval_deriv (v, radial_mapping_order, 1);
+      // note that v should be smaller than 1,
+      // since radial mapping function tends to infinity
+      if (v >= 1.)
+        v = .9999;
 
-          const Real G = dr*dr;
-          const Real Ginv = 1./G;
+      inverse_map_error = std::fabs(dp);
 
-          const Real delta = fp_o_dist - r;
-          const Real drdelta = dr*delta;
-
-          Real dp = Ginv*drdelta;
-
-          // update the radial coordinate
-          v += dp;
-
-          // note that v should be smaller than 1,
-          // since radial mapping function tends to infinity
-          if (v >= 1.)
-            v = .9999;
-
-          inverse_map_error = std::fabs(dp);
-
-          // increment iteration count
-          cnt2 ++;
-          if (cnt2 > 20)
-            libmesh_error_msg("ERROR: 1D Newton scheme FAILED to converge");
+      // increment iteration count
+      cnt2 ++;
+      if (cnt2 > 20)
+        libmesh_error_msg("ERROR: 1D Newton scheme FAILED to converge");
 
 
-        }
-      while (inverse_map_error > tolerance);
+    }
+  while (inverse_map_error > tolerance);
 
-      switch (Dim)
-        {
-        case 1:
-          {
-            p(0) = v;
-            break;
-          }
-        case 2:
-          {
-            p(1) = v;
-            break;
-          }
-        case 3:
-          {
-            p(2) = v;
-            break;
-          }
-        default:
-          libmesh_error_msg("Unknown Dim = " << Dim);
-        }
+  switch (Dim)
+    {
+    case 1:
+      {
+        p(0) = v;
+        break;
+      }
+    case 2:
+      {
+        p(1) = v;
+        break;
+      }
+    case 3:
+      {
+        p(2) = v;
+        break;
+      }
+    default:
+      libmesh_error_msg("Unknown Dim = " << Dim);
     }
 
   // If we are in debug mode do a sanity check.  Make sure
   // the point \p p on the reference element actually does
   // map to the point \p physical_point within a tolerance.
 #ifdef DEBUG
-  /*
     const Point check = InfFE<Dim,T_radial,T_map>::map (inf_elem, p);
     const Point diff  = physical_point - check;
 
@@ -603,7 +489,6 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
     << diff.norm()
     << std::endl;
     }
-  */
 #endif
 
   return p;
@@ -628,7 +513,7 @@ void InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * elem,
   // element of each point in physical space
   for (unsigned int p=0; p<n_points; p++)
     reference_points[p] =
-      InfFE<Dim,T_radial,T_map>::inverse_map (elem, physical_points[p], tolerance, secure, false);
+      InfFE<Dim,T_radial,T_map>::inverse_map (elem, physical_points[p], tolerance, secure);
 }
 
 
@@ -646,9 +531,9 @@ INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Point, map(const Elem *, const Point &));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Point, map(const Elem *, const Point &));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Point, map(const Elem *, const Point &));
 
-INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Point, inverse_map(const Elem *, const Point &, const Real, const bool, const bool));
-INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Point, inverse_map(const Elem *, const Point &, const Real, const bool, const bool));
-INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Point, inverse_map(const Elem *, const Point &, const Real, const bool, const bool));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Point, inverse_map(const Elem *, const Point &, const Real, const bool));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Point, inverse_map(const Elem *, const Point &, const Real, const bool));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Point, inverse_map(const Elem *, const Point &, const Real, const bool));
 
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, inverse_map(const Elem *, const std::vector<Point> &, std::vector<Point> &, const Real,  const bool));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, inverse_map(const Elem *, const std::vector<Point> &, std::vector<Point> &, const Real,  const bool));
