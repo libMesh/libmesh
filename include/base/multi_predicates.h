@@ -390,6 +390,22 @@ struct ActiveType : abstract_multi_predicate<T>
 
 
 /**
+ * Used to iterate over non-NULL, elements with a given refinement
+ * flag.
+ */
+template <typename T>
+struct Flagged : abstract_multi_predicate<T>
+{
+  Flagged(unsigned char rflag)
+  {
+    this->_predicates.push_back(new not_null<T>);
+    this->_predicates.push_back(new flagged<T>(rflag));
+  }
+};
+
+
+
+/**
  * Used to iterate over non-NULL, active elements owned by a given
  * processor.
  */
