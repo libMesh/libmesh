@@ -67,6 +67,24 @@ public:
   virtual ~Nemesis_IO ();
 
   /**
+   * Used to set the processor_id to use when reading writing.
+   *
+   * By default the processor_id will be set from the communicator.
+   * This is used to override that behavior so you can write the
+   * mesh for any processor.
+   */
+  void set_processor_id(processor_id_type processor_id);
+
+  /**
+   * Used to set the number of processors to use when reading writing.
+   *
+   * The default will be set from the communicator.
+   * This is used to override that behavior so you can write the
+   * mesh for any processor.
+   */
+  void set_n_processors(processor_id_type n_processors);
+
+  /**
    * Implements reading the mesh from several different files.
    * You provide the basename, then LibMesh appends the ".size.rank"
    * depending on this->n_processors() and this->processor_id().
