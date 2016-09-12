@@ -749,7 +749,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem * inf_elem)
 
   // for each new infinite element, compute the radial distances
   for (unsigned int n=0; n<n_base_mapping_sf; n++)
-    dist[n] =  Point(base_elem->point(n) - origin).size();
+    dist[n] =  Point(base_elem->point(n) - origin).norm();
 
 
   switch (Dim)
