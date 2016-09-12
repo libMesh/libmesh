@@ -104,7 +104,15 @@ INT_TYPE(unsigned int,MPI_UNSIGNED);
 INT_TYPE(long,MPI_LONG);
 INT_TYPE(long long,MPI_LONG_LONG_INT);
 INT_TYPE(unsigned long,MPI_UNSIGNED_LONG);
-INT_TYPE(unsigned long long,MPI_LONG_LONG_INT);
+#if MPI_VERSION > 1
+INT_TYPE(unsigned long long,MPI_UNSIGNED_LONG_LONG);
+#else
+// MPI 1.0 did not have an unsigned long long type, so we have to use
+// MPI_UNSIGNED_LONG in this case.  If "unsigned long" and "unsigned
+// long long" are different sizes on your system, we detect this and
+// throw an error rather than communicating values incorrectly.
+INT_TYPE(unsigned long long,MPI_UNSIGNED_LONG);
+#endif
 FLOAT_TYPE(float,MPI_FLOAT);
 FLOAT_TYPE(double,MPI_DOUBLE);
 FLOAT_TYPE(long double,MPI_LONG_DOUBLE);
