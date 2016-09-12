@@ -1346,8 +1346,8 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
 #ifdef DEBUG
   // We expect maximum ids to be in sync so we can use them to size
   // vectors
-  mesh.comm().verify(mesh.max_node_id());
-  mesh.comm().verify(mesh.max_elem_id());
+  libmesh_assert(mesh.comm().verify(mesh.max_node_id()));
+  libmesh_assert(mesh.comm().verify(mesh.max_elem_id()));
   const dof_id_type par_max_node_id = mesh.parallel_max_node_id();
   const dof_id_type par_max_elem_id = mesh.parallel_max_elem_id();
   libmesh_assert_equal_to (par_max_node_id, mesh.max_node_id());
