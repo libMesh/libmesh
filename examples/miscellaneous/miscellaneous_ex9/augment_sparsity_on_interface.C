@@ -96,7 +96,7 @@ void AugmentSparsityOnInterface::augment_sparsity_pattern (SparsityPattern::Grap
           {
             Point upper_centroid = inner_it->second;
 
-            Real distance = (upper_centroid - lower_centroid).size();
+            Real distance = (upper_centroid - lower_centroid).norm();
             if (distance < min_distance)
               {
                 min_distance = distance;

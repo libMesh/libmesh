@@ -49,7 +49,7 @@ const Real radius = 0.5;
 Real distance (const Point & p)
 {
   Point cent(0.8, 0.9);
-  return ((p-cent).size() - radius);
+  return ((p-cent).norm() - radius);
 }
 
 Real integrand (const Point & p)

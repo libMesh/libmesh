@@ -207,7 +207,7 @@ void LinearElasticityWithContact::initialize_contact_load_paths()
           dof_id_type upper_node_id = nodes_on_upper_surface[j];
           Point p_upper = mesh.point(upper_node_id);
 
-          Real distance = (p_upper - p_lower).size();
+          Real distance = (p_upper - p_lower).norm();
 
           if (distance < min_distance)
             {
