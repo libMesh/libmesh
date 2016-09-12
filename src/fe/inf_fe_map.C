@@ -101,11 +101,6 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
   // build a base element to do the map inversion in the base face
   UniquePtr<Elem> base_elem (Base::build_elem (inf_elem));
 
-  const Order    base_mapping_order     (base_elem->default_order());
-  const ElemType base_mapping_elem_type (base_elem->type());
-  const unsigned int n_base_mapping_sf = Base::n_base_mapping_sf (base_mapping_elem_type,
-                                                                  base_mapping_order);
-
   const ElemType inf_elem_type = inf_elem->type();
   if (inf_elem_type != INFHEX8 &&
       inf_elem_type != INFPRISM6)
