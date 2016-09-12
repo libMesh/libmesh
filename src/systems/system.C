@@ -2030,12 +2030,12 @@ Number System::point_value(unsigned int var, const Point & p, const bool insist_
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  this->comm().verify(p(0));
+  libmesh_assert(this->comm().verify(p(0)));
 #if LIBMESH_DIM > 1
-  this->comm().verify(p(1));
+  libmesh_assert(this->comm().verify(p(1)));
 #endif
 #if LIBMESH_DIM > 2
-  this->comm().verify(p(2));
+  libmesh_assert(this->comm().verify(p(2)));
 #endif
 #endif // NDEBUG
 
@@ -2141,12 +2141,12 @@ Gradient System::point_gradient(unsigned int var, const Point & p, const bool in
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  this->comm().verify(p(0));
+  libmesh_assert(this->comm().verify(p(0)));
 #if LIBMESH_DIM > 1
-  this->comm().verify(p(1));
+  libmesh_assert(this->comm().verify(p(1)));
 #endif
 #if LIBMESH_DIM > 2
-  this->comm().verify(p(2));
+  libmesh_assert(this->comm().verify(p(2)));
 #endif
 #endif // NDEBUG
 
@@ -2255,12 +2255,12 @@ Tensor System::point_hessian(unsigned int var, const Point & p, const bool insis
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  this->comm().verify(p(0));
+  libmesh_assert(this->comm().verify(p(0)));
 #if LIBMESH_DIM > 1
-  this->comm().verify(p(1));
+  libmesh_assert(this->comm().verify(p(1)));
 #endif
 #if LIBMESH_DIM > 2
-  this->comm().verify(p(2));
+  libmesh_assert(this->comm().verify(p(2)));
 #endif
 #endif // NDEBUG
 

@@ -4034,13 +4034,13 @@ void DofMap::check_dirichlet_bcid_consistency (const MeshBase & mesh,
   const std::set<boundary_id_type>& dbc_bcids = boundary.b;
 
   // DirichletBoundary id sets should be consistent across all ranks
-  mesh.comm().verify(dbc_bcids.size());
+  libmesh_assert(mesh.comm().verify(dbc_bcids.size()));
 
   for (std::set<boundary_id_type>::const_iterator bid = dbc_bcids.begin();
        bid != dbc_bcids.end(); ++bid)
     {
       // DirichletBoundary id sets should be consistent across all ranks
-      mesh.comm().verify(*bid);
+      libmesh_assert(mesh.comm().verify(*bid));
 
       bool found_bcid = (mesh_bcids.find(*bid) != mesh_bcids.end());
 

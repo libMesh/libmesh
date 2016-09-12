@@ -2933,7 +2933,7 @@ void SparsityPattern::Build::join (const SparsityPattern::Build & other)
 void SparsityPattern::Build::parallel_sync ()
 {
   parallel_object_only();
-  this->comm().verify(need_full_sparsity_pattern);
+  libmesh_assert(this->comm().verify(need_full_sparsity_pattern));
 
   const dof_id_type n_global_dofs   = dof_map.n_dofs();
   const dof_id_type n_dofs_on_proc  = dof_map.n_dofs_on_processor(this->processor_id());
