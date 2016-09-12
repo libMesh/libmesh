@@ -261,7 +261,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
     case 1:
       {
         libmesh_assert_equal_to (inf_elem->type(), INFEDGE2);
-        interpolated_dist =  Point(inf_elem->point(0) - inf_elem->point(1)).size();
+        interpolated_dist =  Point(inf_elem->point(0) - inf_elem->point(1)).norm();
         break;
       }
 
@@ -275,7 +275,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
 
         // interpolate the base nodes' distances
         for (unsigned int n=0; n<n_base_nodes; n++)
-          interpolated_dist += Point(base_el->point(n) - origin).size()
+          interpolated_dist += Point(base_el->point(n) - origin).norm()
             * FE<1,LAGRANGE>::shape (base_mapping_elem_type, base_mapping_order, n, p);
         break;
       }
@@ -290,7 +290,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
 
         // interpolate the base nodes' distances
         for (unsigned int n=0; n<n_base_nodes; n++)
-          interpolated_dist += Point(base_el->point(n) - origin).size()
+          interpolated_dist += Point(base_el->point(n) - origin).norm()
             * FE<2,LAGRANGE>::shape (base_mapping_elem_type, base_mapping_order, n, p);
         break;
       }

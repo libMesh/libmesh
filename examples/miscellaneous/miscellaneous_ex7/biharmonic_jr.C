@@ -130,7 +130,7 @@ Number Biharmonic::JR::InitialDensityBall(const Point & p,
   Point center = parameters.get<Point>("center");
   Real width = parameters.get<Real>("width");
   Point pc = p-center;
-  Real r = pc.size();
+  Real r = pc.norm();
   return (r < width) ? 1.0 : -0.5;
 }
 

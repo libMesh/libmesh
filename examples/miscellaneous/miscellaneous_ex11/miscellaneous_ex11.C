@@ -202,10 +202,10 @@ int main (int argc, char ** argv)
 
   // Find the center node to measure the maximum deformation of the plate.
   Node * center_node = 0;
-  Real nearest_dist_sq = mesh.point(0).size_sq();
+  Real nearest_dist_sq = mesh.point(0).norm_sq();
   for (unsigned int nid=1; nid<mesh.n_nodes(); ++nid)
     {
-      const Real dist_sq = mesh.point(nid).size_sq();
+      const Real dist_sq = mesh.point(nid).norm_sq();
       if (dist_sq < nearest_dist_sq)
         {
           nearest_dist_sq = dist_sq;
@@ -436,7 +436,7 @@ void assemble_shell (EquationSystems & es,
           const RealVectorValue & a1 = dxyzdxi[qp];
           const RealVectorValue & a2 = dxyzdeta[qp];
           RealVectorValue   a3 = a1.cross(a2);
-          const Real jac = a3.size(); // the surface Jacobian
+          const Real jac = a3.norm(); // the surface Jacobian
           libmesh_assert_greater (jac, 0);
           a3 /= jac; // the shell director a3 is normalized to unit length
 
