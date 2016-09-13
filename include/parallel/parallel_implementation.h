@@ -2951,7 +2951,8 @@ inline void Communicator::gather(const unsigned int root_id,
 template <typename T>
 inline void Communicator::gather(const unsigned int root_id,
                                  std::basic_string<T> sendval,
-                                 std::vector<std::basic_string<T> > & recv) const
+                                 std::vector<std::basic_string<T> > & recv,
+                                 const bool identical_buffer_sizes) const
 {
   libmesh_assert_less (root_id, this->size());
 
@@ -2966,9 +2967,13 @@ inline void Communicator::gather(const unsigned int root_id,
         sendlengths  (this->size(), 0),
         displacements(this->size(), 0);
 
-      // first comm step to determine buffer sizes from all processors
       const int mysize = static_cast<int>(sendval.size());
-      this->gather(root_id, mysize, sendlengths);
+
+      if (identical_buffer_sizes)
+        sendlengths.assign(this->size(), mysize);
+      else
+        // first comm step to determine buffer sizes from all processors
+        this->gather(root_id, mysize, sendlengths);
 
       // Find the total size of the final array and
       // set up the displacement offsets for each processor
@@ -3080,7 +3085,8 @@ inline void Communicator::allgather(T sendval,
 
 template <typename T>
 inline void Communicator::allgather(std::basic_string<T> sendval,
-                                    std::vector<std::basic_string<T> > & recv) const
+                                    std::vector<std::basic_string<T> > & recv,
+                                    const bool identical_buffer_sizes) const
 {
   LOG_SCOPE ("allgather()","Parallel");
 
@@ -3099,9 +3105,13 @@ inline void Communicator::allgather(std::basic_string<T> sendval,
     sendlengths  (this->size(), 0),
     displacements(this->size(), 0);
 
-  // first comm step to determine buffer sizes from all processors
   const int mysize = static_cast<int>(sendval.size());
-  this->allgather(mysize, sendlengths);
+
+  if (identical_buffer_sizes)
+    sendlengths.assign(this->size(), mysize);
+  else
+    // first comm step to determine buffer sizes from all processors
+    this->allgather(mysize, sendlengths);
 
   // Find the total size of the final array and
   // set up the displacement offsets for each processor

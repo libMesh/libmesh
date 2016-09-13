@@ -1104,7 +1104,8 @@ public:
    template <typename T>
    inline void gather(const unsigned int root_id,
                       std::basic_string<T> send,
-                      std::vector<std::basic_string<T> > & recv) const;
+                      std::vector<std::basic_string<T> > & recv,
+                      const bool identical_buffer_sizes=false) const;
 
   /**
    * Take a vector of local variables and expand it on processor root_id
@@ -1145,7 +1146,8 @@ public:
    */
   template <typename T>
   inline void allgather(std::basic_string<T> send,
-                        std::vector<std::basic_string<T> > & recv) const;
+                        std::vector<std::basic_string<T> > & recv,
+                        const bool identical_buffer_sizes=false) const;
 
 
   /**
