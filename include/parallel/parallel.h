@@ -1103,7 +1103,7 @@ public:
     */
    template <typename T>
    inline void gather(const unsigned int root_id,
-                      std::basic_string<T> send,
+                      const std::basic_string<T> & send,
                       std::vector<std::basic_string<T> > & recv,
                       const bool identical_buffer_sizes=false) const;
 
@@ -1145,7 +1145,7 @@ public:
   * AllGather overload for string types
    */
   template <typename T>
-  inline void allgather(std::basic_string<T> send,
+  inline void allgather(const std::basic_string<T> & send,
                         std::vector<std::basic_string<T> > & recv,
                         const bool identical_buffer_sizes=false) const;
 

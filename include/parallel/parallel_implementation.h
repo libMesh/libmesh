@@ -2950,7 +2950,7 @@ inline void Communicator::gather(const unsigned int root_id,
 
 template <typename T>
 inline void Communicator::gather(const unsigned int root_id,
-                                 std::basic_string<T> sendval,
+                                 const std::basic_string<T> & sendval,
                                  std::vector<std::basic_string<T> > & recv,
                                  const bool identical_buffer_sizes) const
 {
@@ -3084,7 +3084,7 @@ inline void Communicator::allgather(T sendval,
 
 
 template <typename T>
-inline void Communicator::allgather(std::basic_string<T> sendval,
+inline void Communicator::allgather(const std::basic_string<T> & sendval,
                                     std::vector<std::basic_string<T> > & recv,
                                     const bool identical_buffer_sizes) const
 {
