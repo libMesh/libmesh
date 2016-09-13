@@ -26,6 +26,8 @@ public:
 
   CPPUNIT_TEST( testGather );
   CPPUNIT_TEST( testAllGather );
+  CPPUNIT_TEST( testGatherString );
+  CPPUNIT_TEST( testAllGatherString );
   CPPUNIT_TEST( testBroadcast );
   CPPUNIT_TEST( testScatter );
   CPPUNIT_TEST( testBarrier );
@@ -41,10 +43,23 @@ public:
   CPPUNIT_TEST_SUITE_END();
 
 private:
+  std::vector<std::string> _number;
 
 public:
   void setUp()
-  {}
+  {
+    _number.resize(10);
+    _number[0] = "Zero";
+    _number[1] = "One";
+    _number[2] = "Two";
+    _number[3] = "Three";
+    _number[4] = "Four";
+    _number[5] = "Five";
+    _number[6] = "Six";
+    _number[7] = "Seven";
+    _number[8] = "Eight";
+    _number[9] = "Nine";
+  }
 
   void tearDown()
   {}
@@ -63,6 +78,18 @@ public:
 
 
 
+  void testGatherString()
+  {
+    std::vector<std::string> vals;
+    TestCommWorld->gather(0, "Processor" + _number[TestCommWorld->rank() % 10], vals);
+
+    if (TestCommWorld->rank() == 0)
+      for (processor_id_type i=0; i<vals.size(); i++)
+        CPPUNIT_ASSERT_EQUAL( "Processor" + _number[i % 10] , vals[i] );
+  }
+
+
+
   void testAllGather()
   {
     std::vector<processor_id_type> vals;
@@ -70,6 +97,17 @@ public:
 
     for (processor_id_type i=0; i<vals.size(); i++)
       CPPUNIT_ASSERT_EQUAL( i , vals[i] );
+  }
+
+
+
+  void testAllGatherString()
+  {
+    std::vector<std::string> vals;
+    TestCommWorld->gather(0, "Processor" + _number[TestCommWorld->rank() % 10], vals);
+
+    for (processor_id_type i=0; i<vals.size(); i++)
+      CPPUNIT_ASSERT_EQUAL( "Processor" + _number[i % 10] , vals[i] );
   }
 
 
