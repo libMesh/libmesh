@@ -579,13 +579,17 @@ inline void unpack_range (const typename std::vector<buffertype> & buffer,
 /**
  * Encode a range of potentially-variable-size objects to a data
  * array.
+ *
+ * The data will be buffered in vectors with lengths that do not
+ * exceed the sum of \p approx_buffer_size and the size of an
+ * individual packed object.
  */
 template <typename Context, typename buffertype, typename Iter>
 inline Iter pack_range (const Context * context,
                         Iter range_begin,
                         const Iter range_end,
                         typename std::vector<buffertype> & buffer,
-                        std::size_t max_buffer_size = 1000000);
+                        std::size_t approx_buffer_size = 1000000);
 
 /**
  * Return the total buffer size needed to encode a range of
