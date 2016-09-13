@@ -476,7 +476,7 @@ inline Iter pack_range (const Context * context,
                         // bandwidth, but not so large as to risk allocation failures.  max_buffer_size
                         // is measured in number of buffer type entries; number of bytes may be 4 or 8
                         // times larger depending on configuration.
-                        std::size_t max_buffer_size)
+                        std::size_t approx_buffer_size)
 {
   typedef typename std::iterator_traits<Iter>::value_type T;
 
@@ -484,14 +484,12 @@ inline Iter pack_range (const Context * context,
   // Prepare to stop early if the buffer would be too large.
   std::size_t buffer_size = 0;
   Iter range_stop = range_begin;
-  for (; range_stop != range_end; ++range_stop)
+  for (; range_stop != range_end && buffer_size < approx_buffer_size;
+       ++range_stop)
     {
       std::size_t next_buffer_size =
         Parallel::Packing<T>::packable_size(*range_stop, context);
-      if (buffer_size + next_buffer_size >= max_buffer_size)
-        break;
-      else
-        buffer_size += next_buffer_size;
+      buffer_size += next_buffer_size;
     }
   buffer.reserve(buffer.size() + buffer_size);
 
