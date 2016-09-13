@@ -373,13 +373,18 @@ void Nemesis_IO_Helper::get_node_cmap()
       node_cmap_node_ids[i].resize(node_cmap_node_cnts[i]);
       node_cmap_proc_ids[i].resize(node_cmap_node_cnts[i]);
 
-      nemesis_err_flag =
-        Nemesis::ne_get_node_cmap(ex_id,
-                                  node_cmap_ids.empty()         ? 0    : node_cmap_ids[i],
-                                  node_cmap_node_ids[i].empty() ? libmesh_nullptr : &node_cmap_node_ids[i][0],
-                                  node_cmap_proc_ids[i].empty() ? libmesh_nullptr : &node_cmap_proc_ids[i][0],
-                                  this->processor_id());
-      EX_CHECK_ERR(nemesis_err_flag, "Error reading node cmap node and processor ids!");
+      // Don't call ne_get_node_cmap() if there is nothing there to
+      // get, Nemesis throws an error in this case.
+      if (node_cmap_node_cnts[i] > 0)
+        {
+          nemesis_err_flag =
+            Nemesis::ne_get_node_cmap(ex_id,
+                                      node_cmap_ids[i],
+                                      &node_cmap_node_ids[i][0],
+                                      &node_cmap_proc_ids[i][0],
+                                      this->processor_id());
+          EX_CHECK_ERR(nemesis_err_flag, "Error reading node cmap node and processor ids!");
+        }
 
       if (verbose)
         {
