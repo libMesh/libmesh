@@ -2950,6 +2950,60 @@ inline void Communicator::gather(const unsigned int root_id,
 
 template <typename T>
 inline void Communicator::gather(const unsigned int root_id,
+                                 std::basic_string<T> sendval,
+                                 std::vector<std::basic_string<T> > & recv) const
+{
+  libmesh_assert_less (root_id, this->size());
+
+  if (this->rank() == root_id)
+    recv.resize(this->size());
+
+  if (this->size() > 1)
+    {
+      LOG_SCOPE ("gather()","Parallel");
+
+      std::vector<int>
+        sendlengths  (this->size(), 0),
+        displacements(this->size(), 0);
+
+      // first comm step to determine buffer sizes from all processors
+      const int mysize = static_cast<int>(sendval.size());
+      this->gather(root_id, mysize, sendlengths);
+
+      // Find the total size of the final array and
+      // set up the displacement offsets for each processor
+      unsigned int globalsize = 0;
+      for (unsigned int i=0; i < this->size(); ++i)
+        {
+          displacements[i] = globalsize;
+          globalsize += sendlengths[i];
+        }
+
+      // monolithic receive buffer
+      std::string r;
+      if (this->rank() == root_id)
+        r.resize(globalsize, 0);
+
+      // and get the data from the remote processors.
+      libmesh_call_mpi
+        (MPI_Gatherv (&sendval[0], mysize, StandardType<T>(),
+                      this->rank() == root_id ? &r[0] : libmesh_nullptr,
+                      &sendlengths[0], &displacements[0],
+                      StandardType<T>(), root_id, this->get()));
+
+      // slice receive buffer up
+      if (this->rank() == root_id)
+        for (unsigned int i=0; i != this->size(); ++i)
+          recv[i] = r.substr(displacements[i], sendlengths[i]);
+    }
+  else
+    recv[0] = sendval;
+}
+
+
+
+template <typename T>
+inline void Communicator::gather(const unsigned int root_id,
                                  std::vector<T> & r) const
 {
   if (this->size() == 1)
@@ -3020,6 +3074,60 @@ inline void Communicator::allgather(T sendval,
     }
   else if (comm_size > 0)
     recv[0] = sendval;
+}
+
+
+
+template <typename T>
+inline void Communicator::allgather(std::basic_string<T> sendval,
+                                    std::vector<std::basic_string<T> > & recv) const
+{
+  LOG_SCOPE ("allgather()","Parallel");
+
+  libmesh_assert(this->size());
+  recv.assign(this->size(), "");
+
+  // serial case
+  if (this->size() < 2)
+    {
+      recv.resize(1);
+      recv[0] = sendval;
+      return;
+    }
+
+  std::vector<int>
+    sendlengths  (this->size(), 0),
+    displacements(this->size(), 0);
+
+  // first comm step to determine buffer sizes from all processors
+  const int mysize = static_cast<int>(sendval.size());
+  this->allgather(mysize, sendlengths);
+
+  // Find the total size of the final array and
+  // set up the displacement offsets for each processor
+  unsigned int globalsize = 0;
+  for (unsigned int i=0; i != this->size(); ++i)
+    {
+      displacements[i] = globalsize;
+      globalsize += sendlengths[i];
+    }
+
+  // Check for quick return
+  if (globalsize == 0)
+    return;
+
+  // monolithic receive buffer
+  std::string r(globalsize, 0);
+
+  // and get the data from the remote processors.
+  libmesh_call_mpi
+    (MPI_Allgatherv (&sendval[0], mysize, StandardType<T>(),
+                     &r[0], &sendlengths[0], &displacements[0],
+                     StandardType<T>(), this->get()));
+
+  // slice receive buffer up
+  for (unsigned int i=0; i != this->size(); ++i)
+    recv[i] = r.substr(displacements[i], sendlengths[i]);
 }
 
 
