@@ -3,6 +3,7 @@
 #include "libmesh/parameter_vector.h"
 #include "libmesh/qoi_set.h"
 #include "libmesh/system.h"
+#include "libmesh/parameter_pointer.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -33,9 +34,10 @@ public:
 
   ParameterVector & get_parameter_vector()
   {
-    parameter_vector.resize(parameters.size());
+    typedef ParameterPointer<Number> PP;
+    parameter_vector.clear();
     for (unsigned int i = 0; i != parameters.size(); ++i)
-      parameter_vector[i] = &parameters[i];
+      parameter_vector.push_back(UniquePtr<ParameterAccessor<Number> >(new PP(&parameters[i])));
 
     return parameter_vector;
   }
