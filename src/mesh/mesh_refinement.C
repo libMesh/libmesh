@@ -533,10 +533,8 @@ bool MeshRefinement::refine_and_coarsen_elements ()
   // invalidated by _coarsen_elements() and hasn't yet been cleared by
   // prepare_for_use().
 
-  //  if (_maintain_level_one)
-  //    libmesh_assert(test_level_one(true));
-  //  libmesh_assert(this->make_coarsening_compatible(maintain_level_one));
-  //  libmesh_assert(this->make_refinement_compatible(maintain_level_one));
+  //  libmesh_assert(this->make_coarsening_compatible());
+  //  libmesh_assert(this->make_refinement_compatible());
 
   // FIXME: This won't pass unless we add a redundant find_neighbors()
   // call or replace find_neighbors() with on-the-fly neighbor updating
@@ -565,8 +563,8 @@ bool MeshRefinement::refine_and_coarsen_elements ()
       if (_face_level_mismatch_limit)
         libmesh_assert(test_level_one(true));
       libmesh_assert(test_unflagged(true));
-      libmesh_assert(this->make_coarsening_compatible(_face_level_mismatch_limit));
-      libmesh_assert(this->make_refinement_compatible(_face_level_mismatch_limit));
+      libmesh_assert(this->make_coarsening_compatible());
+      libmesh_assert(this->make_refinement_compatible());
       // FIXME: This won't pass unless we add a redundant find_neighbors()
       // call or replace find_neighbors() with on-the-fly neighbor updating
       // libmesh_assert(!this->eliminate_unrefined_patches());
@@ -578,8 +576,8 @@ bool MeshRefinement::refine_and_coarsen_elements ()
       if (_face_level_mismatch_limit)
         libmesh_assert(test_level_one(true));
       libmesh_assert(test_unflagged(true));
-      libmesh_assert(this->make_coarsening_compatible(_face_level_mismatch_limit));
-      libmesh_assert(this->make_refinement_compatible(_face_level_mismatch_limit));
+      libmesh_assert(this->make_coarsening_compatible());
+      libmesh_assert(this->make_refinement_compatible());
     }
 
   // Otherwise there was no change in the mesh,
@@ -654,7 +652,7 @@ bool MeshRefinement::coarsen_elements ()
 
   if (_face_level_mismatch_limit)
     libmesh_assert(test_level_one(true));
-  libmesh_assert(this->make_coarsening_compatible(_face_level_mismatch_limit));
+  libmesh_assert(this->make_coarsening_compatible());
   // FIXME: This won't pass unless we add a redundant find_neighbors()
   // call or replace find_neighbors() with on-the-fly neighbor updating
   // libmesh_assert(!this->eliminate_unrefined_patches());
@@ -737,7 +735,7 @@ bool MeshRefinement::refine_elements ()
 
   if (_face_level_mismatch_limit)
     libmesh_assert(test_level_one(true));
-  libmesh_assert(this->make_refinement_compatible(_face_level_mismatch_limit));
+  libmesh_assert(this->make_refinement_compatible());
   // FIXME: This won't pass unless we add a redundant find_neighbors()
   // call or replace find_neighbors() with on-the-fly neighbor updating
   // libmesh_assert(!this->eliminate_unrefined_patches());
@@ -850,7 +848,7 @@ bool MeshRefinement::make_flags_parallel_consistent()
 
 
 
-bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
+bool MeshRefinement::make_coarsening_compatible()
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -870,18 +868,6 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 #endif
 
   LOG_SCOPE ("make_coarsening_compatible()", "MeshRefinement");
-
-  bool _maintain_level_one = maintain_level_one;
-
-  // If the user used non-default parameters, let's warn that they're
-  // deprecated
-  if (!maintain_level_one)
-    {
-      libmesh_deprecated();
-    }
-  else
-    _maintain_level_one = _face_level_mismatch_limit;
-
 
   // Unless we encounter a specific situation level-one
   // will be satisfied after executing this loop just once
@@ -940,7 +926,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
   // conflict.  By convention refinement wins, so we un-mark the element for
   // coarsening.  Level-one would be violated in this case so we need to re-run
   // the loop.
-  if (_maintain_level_one)
+  if (_face_level_mismatch_limit)
     {
 
     repeat:
@@ -1092,7 +1078,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
         }
       while (!level_one_satisfied);
 
-    } // end if (_maintain_level_one)
+    } // end if (_face_level_mismatch_limit)
 
 
   // Next we look at all of the ancestor cells.
@@ -1146,7 +1132,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
         }
     }
 
-  if (!level_one_satisfied && _maintain_level_one) goto repeat;
+  if (!level_one_satisfied && _face_level_mismatch_limit) goto repeat;
 
 
   // If all the children of a parent are set to be coarsened
@@ -1195,7 +1181,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
 
 
-bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
+bool MeshRefinement::make_refinement_compatible()
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -1216,24 +1202,13 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 
   LOG_SCOPE ("make_refinement_compatible()", "MeshRefinement");
 
-  bool _maintain_level_one = maintain_level_one;
-
-  // If the user used non-default parameters, let's warn that they're
-  // deprecated
-  if (!maintain_level_one)
-    {
-      libmesh_deprecated();
-    }
-  else
-    _maintain_level_one = _face_level_mismatch_limit;
-
   // Unless we encounter a specific situation we will be compatible
   // with any selected coarsening flags
   bool compatible_with_coarsening = true;
 
   // This loop enforces the level-1 rule.  We should only
   // execute it if the user indeed wants level-1 satisfied!
-  if (_maintain_level_one)
+  if (_face_level_mismatch_limit)
     {
       // Unless we encounter a specific situation level-one
       // will be satisfied after executing this loop just once
@@ -1376,7 +1351,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
         }
 
       while (!level_one_satisfied);
-    } // end if (_maintain_level_one)
+    } // end if (_face_level_mismatch_limit)
 
   // If we're not compatible on one processor, we're globally not
   // compatible
@@ -1616,11 +1591,11 @@ void MeshRefinement::_smooth_flags(bool refining, bool coarsening)
           // face level test code.  Short-circuiting || is our friend
           const bool coarsening_satisfied =
             !coarsening ||
-            this->make_coarsening_compatible(_face_level_mismatch_limit);
+            this->make_coarsening_compatible();
 
           const bool refinement_satisfied =
             !refining ||
-            this->make_refinement_compatible(_face_level_mismatch_limit);
+            this->make_refinement_compatible();
 
           bool smoothing_satisfied =
             !this->eliminate_unrefined_patches();// &&

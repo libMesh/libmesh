@@ -685,14 +685,20 @@ private:
   /**
    * Take user-specified coarsening flags and augment them
    * so that level-one dependency is satisfied.
+   *
+   * This function used to take an argument, \p maintain_level_one -
+   * new code should use face_level_mismatch_limit() instead.
    */
-  bool make_coarsening_compatible (const bool);
+  bool make_coarsening_compatible ();
 
   /**
    * Take user-specified refinement flags and augment them
    * so that level-one dependency is satisfied.
+   *
+   * This function used to take an argument, \p maintain_level_one -
+   * new code should use face_level_mismatch_limit() instead.
    */
-  bool make_refinement_compatible (const bool);
+  bool make_refinement_compatible ();
 
   /**
    * Local dispatch function for getting the correct topological
