@@ -165,7 +165,7 @@ inline
 void
 ParameterVector::clear()
 {
-  if (_is_shallow_copy)
+  if (!_is_shallow_copy)
     for (unsigned int i=0; i != _params.size(); ++i)
       delete _params[i];
 
@@ -178,6 +178,8 @@ ParameterVector::clear()
 inline
 void ParameterVector::push_back(UniquePtr<ParameterAccessor<Number> > new_accessor)
 {
+  // Can't append stuff we are responsible for if we're already a shallow copy.
+  libmesh_assert(!_is_shallow_copy);
   libmesh_assert(new_accessor.get());
   _params.push_back(new_accessor.release());
 }
