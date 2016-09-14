@@ -565,8 +565,8 @@ bool MeshRefinement::refine_and_coarsen_elements ()
       if (_face_level_mismatch_limit)
         libmesh_assert(test_level_one(true));
       libmesh_assert(test_unflagged(true));
-      libmesh_assert(this->make_coarsening_compatible(_face_level_mismatch_limit));
-      libmesh_assert(this->make_refinement_compatible(_face_level_mismatch_limit));
+      libmesh_assert(this->make_coarsening_compatible());
+      libmesh_assert(this->make_refinement_compatible());
       // FIXME: This won't pass unless we add a redundant find_neighbors()
       // call or replace find_neighbors() with on-the-fly neighbor updating
       // libmesh_assert(!this->eliminate_unrefined_patches());
@@ -578,8 +578,8 @@ bool MeshRefinement::refine_and_coarsen_elements ()
       if (_face_level_mismatch_limit)
         libmesh_assert(test_level_one(true));
       libmesh_assert(test_unflagged(true));
-      libmesh_assert(this->make_coarsening_compatible(_face_level_mismatch_limit));
-      libmesh_assert(this->make_refinement_compatible(_face_level_mismatch_limit));
+      libmesh_assert(this->make_coarsening_compatible());
+      libmesh_assert(this->make_refinement_compatible());
     }
 
   // Otherwise there was no change in the mesh,
@@ -654,7 +654,7 @@ bool MeshRefinement::coarsen_elements ()
 
   if (_face_level_mismatch_limit)
     libmesh_assert(test_level_one(true));
-  libmesh_assert(this->make_coarsening_compatible(_face_level_mismatch_limit));
+  libmesh_assert(this->make_coarsening_compatible());
   // FIXME: This won't pass unless we add a redundant find_neighbors()
   // call or replace find_neighbors() with on-the-fly neighbor updating
   // libmesh_assert(!this->eliminate_unrefined_patches());
@@ -737,7 +737,7 @@ bool MeshRefinement::refine_elements ()
 
   if (_face_level_mismatch_limit)
     libmesh_assert(test_level_one(true));
-  libmesh_assert(this->make_refinement_compatible(_face_level_mismatch_limit));
+  libmesh_assert(this->make_refinement_compatible());
   // FIXME: This won't pass unless we add a redundant find_neighbors()
   // call or replace find_neighbors() with on-the-fly neighbor updating
   // libmesh_assert(!this->eliminate_unrefined_patches());
@@ -1616,11 +1616,11 @@ void MeshRefinement::_smooth_flags(bool refining, bool coarsening)
           // face level test code.  Short-circuiting || is our friend
           const bool coarsening_satisfied =
             !coarsening ||
-            this->make_coarsening_compatible(_face_level_mismatch_limit);
+            this->make_coarsening_compatible();
 
           const bool refinement_satisfied =
             !refining ||
-            this->make_refinement_compatible(_face_level_mismatch_limit);
+            this->make_refinement_compatible();
 
           bool smoothing_satisfied =
             !this->eliminate_unrefined_patches();// &&
