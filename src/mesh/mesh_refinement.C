@@ -848,7 +848,7 @@ bool MeshRefinement::make_flags_parallel_consistent()
 
 
 
-bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
+bool MeshRefinement::make_coarsening_compatible()
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -868,18 +868,6 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 #endif
 
   LOG_SCOPE ("make_coarsening_compatible()", "MeshRefinement");
-
-  bool _maintain_level_one = maintain_level_one;
-
-  // If the user used non-default parameters, let's warn that they're
-  // deprecated
-  if (!maintain_level_one)
-    {
-      libmesh_deprecated();
-    }
-  else
-    _maintain_level_one = _face_level_mismatch_limit;
-
 
   // Unless we encounter a specific situation level-one
   // will be satisfied after executing this loop just once
@@ -938,7 +926,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
   // conflict.  By convention refinement wins, so we un-mark the element for
   // coarsening.  Level-one would be violated in this case so we need to re-run
   // the loop.
-  if (_maintain_level_one)
+  if (_face_level_mismatch_limit)
     {
 
     repeat:
@@ -1090,7 +1078,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
         }
       while (!level_one_satisfied);
 
-    } // end if (_maintain_level_one)
+    } // end if (_face_level_mismatch_limit)
 
 
   // Next we look at all of the ancestor cells.
@@ -1144,7 +1132,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
         }
     }
 
-  if (!level_one_satisfied && _maintain_level_one) goto repeat;
+  if (!level_one_satisfied && _face_level_mismatch_limit) goto repeat;
 
 
   // If all the children of a parent are set to be coarsened
@@ -1193,7 +1181,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
 
 
-bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
+bool MeshRefinement::make_refinement_compatible()
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -1214,24 +1202,13 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 
   LOG_SCOPE ("make_refinement_compatible()", "MeshRefinement");
 
-  bool _maintain_level_one = maintain_level_one;
-
-  // If the user used non-default parameters, let's warn that they're
-  // deprecated
-  if (!maintain_level_one)
-    {
-      libmesh_deprecated();
-    }
-  else
-    _maintain_level_one = _face_level_mismatch_limit;
-
   // Unless we encounter a specific situation we will be compatible
   // with any selected coarsening flags
   bool compatible_with_coarsening = true;
 
   // This loop enforces the level-1 rule.  We should only
   // execute it if the user indeed wants level-1 satisfied!
-  if (_maintain_level_one)
+  if (_face_level_mismatch_limit)
     {
       // Unless we encounter a specific situation level-one
       // will be satisfied after executing this loop just once
@@ -1374,7 +1351,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
         }
 
       while (!level_one_satisfied);
-    } // end if (_maintain_level_one)
+    } // end if (_face_level_mismatch_limit)
 
   // If we're not compatible on one processor, we're globally not
   // compatible
