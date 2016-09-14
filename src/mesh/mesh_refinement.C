@@ -533,10 +533,8 @@ bool MeshRefinement::refine_and_coarsen_elements ()
   // invalidated by _coarsen_elements() and hasn't yet been cleared by
   // prepare_for_use().
 
-  //  if (_maintain_level_one)
-  //    libmesh_assert(test_level_one(true));
-  //  libmesh_assert(this->make_coarsening_compatible(maintain_level_one));
-  //  libmesh_assert(this->make_refinement_compatible(maintain_level_one));
+  //  libmesh_assert(this->make_coarsening_compatible());
+  //  libmesh_assert(this->make_refinement_compatible());
 
   // FIXME: This won't pass unless we add a redundant find_neighbors()
   // call or replace find_neighbors() with on-the-fly neighbor updating
