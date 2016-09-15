@@ -949,6 +949,17 @@ void Nemesis_IO::read (const std::string & base_filename)
 
       libMesh::out << "[" << this->processor_id() << "] "
                    << "nemhelper->num_elem_all_sidesets = " << nemhelper->num_elem_all_sidesets << std::endl;
+
+      if (nemhelper->num_side_sets > 0)
+        {
+          libMesh::out << "Sideset names are: ";
+          std::map<int, std::string>::iterator
+            it = nemhelper->id_to_ss_names.begin(),
+            end = nemhelper->id_to_ss_names.end();
+          for (; it != end; ++it)
+            libMesh::out << "(" << it->first << "," << it->second << ") ";
+          libMesh::out << std::endl;
+        }
     }
 
 #ifdef DEBUG
