@@ -27,6 +27,7 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/rb_construction.h"
+#include "libmesh/eigen_system.h"
 
 namespace libMesh
 {
@@ -205,5 +206,8 @@ template class TransientSystem<NonlinearImplicitSystem>;
 template class TransientSystem<ExplicitSystem>;
 template class TransientSystem<System>;
 template class TransientSystem<RBConstruction>;
+#ifdef LIBMESH_HAVE_SLEPC
+template class TransientSystem<EigenSystem>;
+#endif
 
 } // namespace libMesh

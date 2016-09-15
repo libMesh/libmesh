@@ -22,6 +22,7 @@
 
 // Local Includes
 #include "libmesh/system.h"
+#include "libmesh/libmesh_config.h"
 
 // C++ includes
 
@@ -33,6 +34,9 @@ namespace libMesh
 class LinearImplicitSystem;
 class NonlinearImplicitSystem;
 class ExplicitSystem;
+#ifdef LIBMESH_HAVE_SLEPC
+class EigenSystem;
+#endif
 
 /**
  * This class provides a specific system class.  It aims
@@ -146,6 +150,9 @@ typedef TransientSystem<LinearImplicitSystem> TransientLinearImplicitSystem;
 typedef TransientSystem<NonlinearImplicitSystem> TransientNonlinearImplicitSystem;
 typedef TransientSystem<ExplicitSystem> TransientExplicitSystem;
 typedef TransientSystem<System> TransientBaseSystem;
+#ifdef LIBMESH_HAVE_SLEPC
+typedef TransientSystem<EigenSystem> TransientEigenSystem;
+#endif
 
 
 

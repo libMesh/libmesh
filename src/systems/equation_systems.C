@@ -410,6 +410,8 @@ System & EquationSystems::add_system (const std::string & sys_type,
   // build an eigen system
   else if (sys_type == "Eigen")
     this->add_system<EigenSystem> (name);
+  else if (sys_type == "TransientEigenSystem")
+    this->add_system<TransientEigenSystem> (name);
 #endif
 
 #if defined(LIBMESH_USE_COMPLEX_NUMBERS)
