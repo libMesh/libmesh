@@ -2452,11 +2452,24 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool /*us
 
 void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discontinuous*/)
 {
+  // Only write elements if there are elements blocks available.
+  if (this->num_elem_blks_global > 0) {
+
+  // Data structure to store element block names that will be used to
+  // write the element block names to file.
+  NamesData names_table(this->num_elem_blks_global, MAX_STR_LENGTH);
 
   // Loop over all blocks, even if we don't have elements in each block.
   // If we don't have elements we need to write out a 0 for that block...
   for (unsigned int i=0; i<static_cast<unsigned>(this->num_elem_blks_global); ++i)
     {
+      // Even if there are no elements for this block on the current
+      // processor, we still want to write its name to file, if
+      // possible. MeshBase::subdomain_name() will just return an
+      // empty string if there is no name associated with the current
+      // block.
+      names_table.push_back_entry(mesh.subdomain_name(this->global_elem_blk_ids[i]));
+
       // Search for the current global block ID in the map
       std::map<int, std::vector<int> >::iterator it =
         this->block_id_to_elem_connectivity.find( this->global_elem_blk_ids[i] );
@@ -2512,6 +2525,11 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discont
   ex_err = exII::ex_put_elem_num_map(ex_id,
                                      exodus_elem_num_to_libmesh.empty() ? libmesh_nullptr : &exodus_elem_num_to_libmesh[0]);
   EX_CHECK_ERR(ex_err, "Error writing element map");
+
+  // Write the element block names to file.
+  ex_err = exII::ex_put_names(ex_id, exII::EX_ELEM_BLOCK, names_table.get_char_star_star());
+  EX_CHECK_ERR(ex_err, "Error writing element block names");
+  } // end if (this->num_elem_blks_global > 0)
 }
 
 
