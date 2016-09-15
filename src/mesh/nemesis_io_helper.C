@@ -2137,12 +2137,24 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
 
   // Loop over *global* nodeset IDs, call the Exodus API.  Note that some nodesets may be empty
   // for a given processor.
+  if (global_nodeset_ids.size() > 0) {
+  NamesData names_table(global_nodeset_ids.size(), MAX_STR_LENGTH);
+
   for (unsigned i=0; i<this->global_nodeset_ids.size(); ++i)
     {
+      const std::string & current_ns_name =
+        mesh.get_boundary_info().get_nodeset_name(global_nodeset_ids[i]);
+
+      // Store this name in a data structure that will be used to
+      // write sideset names to file.
+      names_table.push_back_entry(current_ns_name);
+
       if (verbose)
         {
           libMesh::out << "[" << this->processor_id()
-                       << "] Writing out Exodus nodeset info for ID: " << global_nodeset_ids[i] << std::endl;
+                       << "] Writing out Exodus nodeset info for ID: " << global_nodeset_ids[i]
+                       << ", Name: " << current_ns_name
+                       << std::endl;
         }
 
       // Convert current global_nodeset_id into an exodus ID, which can't be zero...
@@ -2197,6 +2209,13 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
 
         }
     } // end loop over global nodeset IDs
+
+  // Write out the nodeset names
+  ex_err = exII::ex_put_names(ex_id,
+                              exII::EX_NODE_SET,
+                              names_table.get_char_star_star());
+  EX_CHECK_ERR(ex_err, "Error writing nodeset names");
+  } // end for loop over global nodeset IDs
 }
 
 
