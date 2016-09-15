@@ -2279,13 +2279,20 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
 
   // Loop over *global* sideset IDs, call the Exodus API.  Note that some sidesets may be empty
   // for a given processor.
+  if (global_sideset_ids.size() > 0) {
+  NamesData names_table(global_sideset_ids.size(), MAX_STR_LENGTH);
+
   for (unsigned i=0; i<this->global_sideset_ids.size(); ++i)
     {
+      const std::string & current_ss_name =
+        mesh.get_boundary_info().get_sideset_name(global_sideset_ids[i]);
+
+      // Store this name in a data structure that will be used to
+      // write sideset names to file.
+      names_table.push_back_entry(current_ss_name);
+
       if (verbose)
         {
-          const std::string & current_ss_name =
-            mesh.get_boundary_info().get_sideset_name(global_sideset_ids[i]);
-
           libMesh::out << "[" << this->processor_id()
                        << "] Writing out Exodus sideset info for ID: " << global_sideset_ids[i]
                        << ", Name: " << current_ss_name
@@ -2353,6 +2360,16 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
           EX_CHECK_ERR(this->ex_err, "Error writing sidesets in Nemesis");
         }
     } // end for loop over global sideset IDs
+
+  // Write sideset names to file.  Some of these may be blank strings
+  // if the current processor didn't have all the sideset names for
+  // any reason...
+  ex_err = exII::ex_put_names(this->ex_id,
+                              exII::EX_SIDE_SET,
+                              names_table.get_char_star_star());
+  EX_CHECK_ERR(ex_err, "Error writing sideset names");
+
+  } // end if (global_sideset_ids.size() > 0)
 }
 
 
