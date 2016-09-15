@@ -34,7 +34,7 @@ namespace libMesh
 class LinearImplicitSystem;
 class NonlinearImplicitSystem;
 class ExplicitSystem;
-#if LIBMESH_HAVE_SLEPC
+#ifdef LIBMESH_HAVE_SLEPC
 class EigenSystem;
 #endif
 
@@ -150,9 +150,10 @@ typedef TransientSystem<LinearImplicitSystem> TransientLinearImplicitSystem;
 typedef TransientSystem<NonlinearImplicitSystem> TransientNonlinearImplicitSystem;
 typedef TransientSystem<ExplicitSystem> TransientExplicitSystem;
 typedef TransientSystem<System> TransientBaseSystem;
-#if LIBMESH_HAVE_SLEPC
+#ifdef LIBMESH_HAVE_SLEPC
 typedef TransientSystem<EigenSystem> TransientEigenSystem;
 #endif
+
 
 
 // ------------------------------------------------------------

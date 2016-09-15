@@ -206,7 +206,7 @@ template class TransientSystem<NonlinearImplicitSystem>;
 template class TransientSystem<ExplicitSystem>;
 template class TransientSystem<System>;
 template class TransientSystem<RBConstruction>;
-#if LIBMESH_HAVE_SLEPC
+#ifdef LIBMESH_HAVE_SLEPC
 template class TransientSystem<EigenSystem>;
 #endif
 
