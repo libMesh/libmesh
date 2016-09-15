@@ -2137,12 +2137,24 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
 
   // Loop over *global* nodeset IDs, call the Exodus API.  Note that some nodesets may be empty
   // for a given processor.
+  if (global_nodeset_ids.size() > 0) {
+  NamesData names_table(global_nodeset_ids.size(), MAX_STR_LENGTH);
+
   for (unsigned i=0; i<this->global_nodeset_ids.size(); ++i)
     {
+      const std::string & current_ns_name =
+        mesh.get_boundary_info().get_nodeset_name(global_nodeset_ids[i]);
+
+      // Store this name in a data structure that will be used to
+      // write sideset names to file.
+      names_table.push_back_entry(current_ns_name);
+
       if (verbose)
         {
           libMesh::out << "[" << this->processor_id()
-                       << "] Writing out Exodus nodeset info for ID: " << global_nodeset_ids[i] << std::endl;
+                       << "] Writing out Exodus nodeset info for ID: " << global_nodeset_ids[i]
+                       << ", Name: " << current_ns_name
+                       << std::endl;
         }
 
       // Convert current global_nodeset_id into an exodus ID, which can't be zero...
@@ -2197,6 +2209,13 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
 
         }
     } // end loop over global nodeset IDs
+
+  // Write out the nodeset names
+  ex_err = exII::ex_put_names(ex_id,
+                              exII::EX_NODE_SET,
+                              names_table.get_char_star_star());
+  EX_CHECK_ERR(ex_err, "Error writing nodeset names");
+  } // end for loop over global nodeset IDs
 }
 
 
@@ -2279,12 +2298,24 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
 
   // Loop over *global* sideset IDs, call the Exodus API.  Note that some sidesets may be empty
   // for a given processor.
+  if (global_sideset_ids.size() > 0) {
+  NamesData names_table(global_sideset_ids.size(), MAX_STR_LENGTH);
+
   for (unsigned i=0; i<this->global_sideset_ids.size(); ++i)
     {
+      const std::string & current_ss_name =
+        mesh.get_boundary_info().get_sideset_name(global_sideset_ids[i]);
+
+      // Store this name in a data structure that will be used to
+      // write sideset names to file.
+      names_table.push_back_entry(current_ss_name);
+
       if (verbose)
         {
           libMesh::out << "[" << this->processor_id()
-                       << "] Writing out Exodus sideset info for ID: " << global_sideset_ids[i] << std::endl;
+                       << "] Writing out Exodus sideset info for ID: " << global_sideset_ids[i]
+                       << ", Name: " << current_ss_name
+                       << std::endl;
         }
 
       // Convert current global_sideset_id into an exodus ID, which can't be zero...
@@ -2348,6 +2379,16 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
           EX_CHECK_ERR(this->ex_err, "Error writing sidesets in Nemesis");
         }
     } // end for loop over global sideset IDs
+
+  // Write sideset names to file.  Some of these may be blank strings
+  // if the current processor didn't have all the sideset names for
+  // any reason...
+  ex_err = exII::ex_put_names(this->ex_id,
+                              exII::EX_SIDE_SET,
+                              names_table.get_char_star_star());
+  EX_CHECK_ERR(ex_err, "Error writing sideset names");
+
+  } // end if (global_sideset_ids.size() > 0)
 }
 
 
@@ -2411,11 +2452,24 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool /*us
 
 void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discontinuous*/)
 {
+  // Only write elements if there are elements blocks available.
+  if (this->num_elem_blks_global > 0) {
+
+  // Data structure to store element block names that will be used to
+  // write the element block names to file.
+  NamesData names_table(this->num_elem_blks_global, MAX_STR_LENGTH);
 
   // Loop over all blocks, even if we don't have elements in each block.
   // If we don't have elements we need to write out a 0 for that block...
   for (unsigned int i=0; i<static_cast<unsigned>(this->num_elem_blks_global); ++i)
     {
+      // Even if there are no elements for this block on the current
+      // processor, we still want to write its name to file, if
+      // possible. MeshBase::subdomain_name() will just return an
+      // empty string if there is no name associated with the current
+      // block.
+      names_table.push_back_entry(mesh.subdomain_name(this->global_elem_blk_ids[i]));
+
       // Search for the current global block ID in the map
       std::map<int, std::vector<int> >::iterator it =
         this->block_id_to_elem_connectivity.find( this->global_elem_blk_ids[i] );
@@ -2471,6 +2525,11 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discont
   ex_err = exII::ex_put_elem_num_map(ex_id,
                                      exodus_elem_num_to_libmesh.empty() ? libmesh_nullptr : &exodus_elem_num_to_libmesh[0]);
   EX_CHECK_ERR(ex_err, "Error writing element map");
+
+  // Write the element block names to file.
+  ex_err = exII::ex_put_names(ex_id, exII::EX_ELEM_BLOCK, names_table.get_char_star_star());
+  EX_CHECK_ERR(ex_err, "Error writing element block names");
+  } // end if (this->num_elem_blks_global > 0)
 }
 
 
