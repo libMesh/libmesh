@@ -104,14 +104,33 @@ INT_TYPE(unsigned int,MPI_UNSIGNED);
 INT_TYPE(long,MPI_LONG);
 INT_TYPE(long long,MPI_LONG_LONG_INT);
 INT_TYPE(unsigned long,MPI_UNSIGNED_LONG);
-#if MPI_VERSION > 1
+#if MPI_VERSION > 1 || !defined(LIBMESH_HAVE_MPI)
 INT_TYPE(unsigned long long,MPI_UNSIGNED_LONG_LONG);
 #else
 // MPI 1.0 did not have an unsigned long long type, so we have to use
 // MPI_UNSIGNED_LONG in this case.  If "unsigned long" and "unsigned
 // long long" are different sizes on your system, we detect this and
-// throw an error rather than communicating values incorrectly.
-INT_TYPE(unsigned long long,MPI_UNSIGNED_LONG);
+// throw an error in dbg mode rather than communicating values
+// incorrectly.
+template<>
+class StandardType<unsigned long long> : public DataType
+{
+public:
+  explicit
+  StandardType(const cxxtype * = libmesh_nullptr) :
+    DataType(MPI_UNSIGNED_LONG) {
+  libmesh_assert_equal_to
+    (sizeof(unsigned long long), sizeof(unsigned long));
+  }
+}
+
+template<>
+struct Attributes<unsigned long long>
+{
+  static const bool has_min_max = true;
+  static void set_lowest(unsigned long long & x) { x = std::numeric_limits<unsigned long long>::min(); }
+  static void set_highest(unsigned long long & x) { x = std::numeric_limits<unsigned long long>::max(); }
+}
 #endif
 FLOAT_TYPE(float,MPI_FLOAT);
 FLOAT_TYPE(double,MPI_DOUBLE);
