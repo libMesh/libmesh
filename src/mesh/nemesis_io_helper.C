@@ -2283,8 +2283,13 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
     {
       if (verbose)
         {
+          const std::string & current_ss_name =
+            mesh.get_boundary_info().get_sideset_name(global_sideset_ids[i]);
+
           libMesh::out << "[" << this->processor_id()
-                       << "] Writing out Exodus sideset info for ID: " << global_sideset_ids[i] << std::endl;
+                       << "] Writing out Exodus sideset info for ID: " << global_sideset_ids[i]
+                       << ", Name: " << current_ss_name
+                       << std::endl;
         }
 
       // Convert current global_sideset_id into an exodus ID, which can't be zero...
