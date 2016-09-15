@@ -1063,6 +1063,16 @@ void Nemesis_IO::read (const std::string & base_filename)
     {
       libMesh::out << "[" << this->processor_id() << "] ";
       libMesh::out << "nemhelper->num_node_sets=" << nemhelper->num_node_sets << std::endl;
+      if (nemhelper->num_node_sets > 0)
+        {
+          libMesh::out << "Nodeset names are: ";
+          std::map<int, std::string>::iterator
+            it = nemhelper->id_to_ns_names.begin(),
+            end = nemhelper->id_to_ns_names.end();
+          for (; it != end; ++it)
+            libMesh::out << "(" << it->first << "," << it->second << ") ";
+          libMesh::out << std::endl;
+        }
     }
 
   //  // Debugging, what is currently in nemhelper->node_num_map anyway?
