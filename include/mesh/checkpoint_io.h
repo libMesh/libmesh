@@ -99,6 +99,11 @@ public:
   bool   binary() const { return _binary; }
   bool & binary()       { return _binary; }
 
+  /**
+   * Get/Set the flag indicating if we should read/write binary.
+   */
+  bool   parallel() const { return _parallel; }
+  bool & parallel()       { return _parallel; }
 
   /**
    * Get/Set the version string.
@@ -109,6 +114,17 @@ public:
 private:
   //---------------------------------------------------------------------------
   // Write Implementation
+
+  /**
+   * Build up the elem list
+   */
+  void build_elem_list();
+
+  /**
+   * Build up the node list
+   */
+  void build_node_list();
+
   /**
    * Write subdomain name information - NEW in 0.9.2 format
    */
@@ -181,7 +197,11 @@ private:
   unsigned int n_active_levels_on_processor(const MeshBase & mesh) const;
 
   bool _binary;
+  bool _parallel;
   std::string _version;
+  unsigned int _mesh_dimension;
+  std::set<largest_id_type> _local_elements;
+  std::set<largest_id_type> _nodes_connected_to_local_elements;
 };
 
 
