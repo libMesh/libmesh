@@ -89,16 +89,16 @@ void CheckpointIO::write (const std::string & name)
   // Try to dynamic cast the mesh to see if it's a DistributedMesh object
   // Note: Just using is_serial() is not good enough because the Mesh won't
   // have been prepared yet when is when that flag gets set to false... sigh.
-  bool parallel_mesh = dynamic_cast<const DistributedMesh *>(&mesh);
+  _parallel = _parallel || dynamic_cast<const DistributedMesh *>(&mesh);
 
   // If this is a serial mesh then we're only going to write it on processor 0
-  if(_parallel || parallel_mesh || _my_processor_id == 0)
+  if(_parallel || _my_processor_id == 0)
     {
       std::ostringstream file_name_stream;
 
       file_name_stream << name;
 
-      if(_parallel || parallel_mesh)
+      if(_parallel)
         file_name_stream << "-" << _my_processor_id;
 
       Xdr io (file_name_stream.str(), this->binary() ? ENCODE : WRITE);
@@ -114,13 +114,13 @@ void CheckpointIO::write (const std::string & name)
 
       // Write out whether or not this is a serial mesh (helps with error checking on read)
       {
-        unsigned int parallel = _parallel || parallel_mesh;
+        unsigned int parallel = _parallel;
         io.data(parallel, "# parallel");
       }
 
       // If we're writing out a parallel mesh then we need to write the number of processors
       // so we can check it upon reading the file
-      if(_parallel || parallel_mesh)
+      if(_parallel)
         {
           largest_id_type n_procs = _my_n_processors;
           io.data(n_procs, "# n_procs");
@@ -158,8 +158,14 @@ void CheckpointIO::build_elem_list()
 {
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  MeshBase::const_element_iterator it  = mesh.local_elements_begin();
-  MeshBase::const_element_iterator end = mesh.local_elements_end();
+  MeshBase::const_element_iterator it = mesh.elements_begin();
+  MeshBase::const_element_iterator end = mesh.elements_end();
+
+  if (_parallel)
+  {
+    it  = mesh.pid_elements_begin(_my_processor_id);
+    end = mesh.pid_elements_end(_my_processor_id);
+  }
 
   for (; it != end; ++it)
   {
@@ -173,8 +179,14 @@ void CheckpointIO::build_node_list()
 {
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  MeshBase::const_element_iterator it  = mesh.local_elements_begin();
-  MeshBase::const_element_iterator end = mesh.local_elements_end();
+  MeshBase::const_element_iterator it  = mesh.elements_begin();
+  MeshBase::const_element_iterator end = mesh.elements_end();
+
+  if (_parallel)
+  {
+    it  = mesh.pid_elements_begin(_my_processor_id);
+    end = mesh.pid_elements_end(_my_processor_id);
+  }
 
   for (; it != end; ++it)
   {
@@ -282,15 +294,17 @@ void CheckpointIO::write_connectivity (Xdr & io) const
   // We will only write active elements and their parents.
   unsigned int n_active_levels = n_active_levels_on_processor(mesh);
 
-  std::vector<xdr_id_type> n_elem_at_level(n_active_levels);
+  std::vector<xdr_id_type> n_elem_at_level(n_active_levels, 0);
 
   // Find the number of elements at each level
   for (unsigned int level=0; level<n_active_levels; level++)
     {
-      MeshBase::const_element_iterator it  = mesh.local_level_elements_begin(level);
-      MeshBase::const_element_iterator end = mesh.local_level_elements_end(level);
+      MeshBase::const_element_iterator it  = mesh.level_elements_begin(level);
+      MeshBase::const_element_iterator end = mesh.level_elements_end(level);
 
-      n_elem_at_level[level] = MeshTools::n_elem(it, end);
+      for (; it != end; ++it)
+        if (!_parallel || (*it)->processor_id() == _my_processor_id)
+          n_elem_at_level[level]++;
     }
 
   io.data(n_active_levels, "# n_active_levels");
@@ -302,11 +316,14 @@ void CheckpointIO::write_connectivity (Xdr & io) const
       comment << level ;
       io.data (n_elem_at_level[level], comment.str().c_str());
 
-      MeshBase::const_element_iterator it  = mesh.local_level_elements_begin(level);
-      MeshBase::const_element_iterator end = mesh.local_level_elements_end(level);
+      MeshBase::const_element_iterator it  = mesh.level_elements_begin(level);
+      MeshBase::const_element_iterator end = mesh.level_elements_end(level);
       for (; it != end; ++it)
         {
           Elem & elem = *(*it);
+
+          if (_parallel && elem.processor_id() != _my_processor_id)
+            continue;
 
           unsigned int n_nodes = elem.n_nodes();
 
@@ -486,16 +503,16 @@ void CheckpointIO::read (const std::string & name)
   // Try to dynamic cast the mesh to see if it's a DistributedMesh object
   // Note: Just using is_serial() is not good enough because the Mesh won't
   // have been prepared yet when is when that flag gets set to false... sigh.
-  bool parallel_mesh = dynamic_cast<DistributedMesh *>(&mesh);
+  _parallel = _parallel || dynamic_cast<DistributedMesh *>(&mesh);
 
   // If this is a serial mesh then we're going to only read it on processor 0 and broadcast it
-  if(parallel_mesh || _my_processor_id == 0)
+  if(_parallel || _my_processor_id == 0)
     {
       std::ostringstream file_name_stream;
 
       file_name_stream << name;
 
-      if(parallel_mesh)
+      if(_parallel)
         file_name_stream << "-" << _my_processor_id;
 
       {
@@ -519,12 +536,12 @@ void CheckpointIO::read (const std::string & name)
         unsigned int parallel;
         io.data(parallel, "# parallel");
 
-        if(static_cast<unsigned int>(parallel_mesh) != parallel)
+        if(_parallel != parallel)
           libmesh_error_msg("Attempted to utilize a checkpoint file with an incompatible mesh distribution!");
       }
 
       // If this is a parallel mesh then we need to check to ensure we're reading this on the same number of procs
-      if(parallel_mesh)
+      if(_parallel)
         {
           largest_id_type n_procs;
           io.data(n_procs, "# n_procs");
@@ -552,7 +569,7 @@ void CheckpointIO::read (const std::string & name)
     }
 
   // If the mesh is serial then we only read it on processor 0 so we need to broadcast it
-  if(!parallel_mesh)
+  if(!_parallel)
     MeshCommunication().broadcast(mesh);
 }
 
@@ -814,8 +831,8 @@ unsigned int CheckpointIO::n_active_levels_on_processor(const MeshBase & mesh) c
 {
   unsigned int max_level = 0;
 
-  MeshBase::const_element_iterator el = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_elements_end();
+  MeshBase::const_element_iterator el = mesh.active_pid_elements_begin(_my_processor_id);
+  const MeshBase::const_element_iterator end_el = mesh.active_pid_elements_end(_my_processor_id);
 
   for( ; el != end_el; ++el)
     max_level = std::max((*el)->level(), max_level);
