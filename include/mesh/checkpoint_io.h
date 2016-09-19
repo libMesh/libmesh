@@ -111,6 +111,18 @@ public:
   const std::string & version () const { return _version; }
   std::string &       version ()       { return _version; }
 
+  /**
+   * Get/Set the processor_id to use
+   */
+  const processor_id_type & current_processor_id() const { return _my_processor_id; }
+  processor_id_type & current_processor_id() { return _my_processor_id; }
+
+  /**
+   * Get/Set the n_processors to use
+   */
+  const processor_id_type & current_n_processors() const { return _my_n_processors; }
+  processor_id_type & current_n_processors() { return _my_n_processors; }
+
 private:
   //---------------------------------------------------------------------------
   // Write Implementation
@@ -202,6 +214,12 @@ private:
   unsigned int _mesh_dimension;
   std::set<largest_id_type> _local_elements;
   std::set<largest_id_type> _nodes_connected_to_local_elements;
+
+  /// The processor_id to use
+  processor_id_type _my_processor_id;
+
+  /// The number of processors to use
+  processor_id_type _my_n_processors;
 };
 
 

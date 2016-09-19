@@ -52,7 +52,9 @@ CheckpointIO::CheckpointIO (MeshBase & mesh, const bool binary_in) :
   ParallelObject      (mesh),
   _binary             (binary_in),
   _parallel           (false),
-  _version            ("checkpoint-1.1")
+  _version            ("checkpoint-1.1"),
+  _my_processor_id    (processor_id()),
+  _my_n_processors    (n_processors())
 {
 }
 
@@ -61,8 +63,10 @@ CheckpointIO::CheckpointIO (MeshBase & mesh, const bool binary_in) :
 CheckpointIO::CheckpointIO (const MeshBase & mesh, const bool binary_in) :
   MeshOutput<MeshBase>(mesh,/* is_parallel_format = */ true),
   ParallelObject      (mesh),
-  _binary (binary_in),
-  _parallel (false)
+  _binary             (binary_in),
+  _parallel           (false),
+  _my_processor_id    (processor_id()),
+  _my_n_processors    (n_processors())
 {
 }
 
@@ -88,14 +92,14 @@ void CheckpointIO::write (const std::string & name)
   bool parallel_mesh = dynamic_cast<const DistributedMesh *>(&mesh);
 
   // If this is a serial mesh then we're only going to write it on processor 0
-  if(_parallel || parallel_mesh || this->processor_id() == 0)
+  if(_parallel || parallel_mesh || _my_processor_id == 0)
     {
       std::ostringstream file_name_stream;
 
       file_name_stream << name;
 
       if(_parallel || parallel_mesh)
-        file_name_stream << "-" << this->processor_id();
+        file_name_stream << "-" << _my_processor_id;
 
       Xdr io (file_name_stream.str(), this->binary() ? ENCODE : WRITE);
 
@@ -118,7 +122,7 @@ void CheckpointIO::write (const std::string & name)
       // so we can check it upon reading the file
       if(_parallel || parallel_mesh)
         {
-          largest_id_type n_procs = this->n_processors();
+          largest_id_type n_procs = _my_n_processors;
           io.data(n_procs, "# n_procs");
         }
 
@@ -143,14 +147,11 @@ void CheckpointIO::write (const std::string & name)
       // write the nodeset information
       this->write_nodesets (io);
 
-      // pause all processes until the writing ends -- this will
-      // protect for the pathological case where a write is
-      // followed immediately by a read.  The write must be
-      // guaranteed to complete first.
+      // close it up
       io.close();
     }
 
-  this->comm().barrier();
+  // this->comm().barrier();
 }
 
 void CheckpointIO::build_elem_list()
@@ -488,14 +489,14 @@ void CheckpointIO::read (const std::string & name)
   bool parallel_mesh = dynamic_cast<DistributedMesh *>(&mesh);
 
   // If this is a serial mesh then we're going to only read it on processor 0 and broadcast it
-  if(parallel_mesh || this->processor_id() == 0)
+  if(parallel_mesh || _my_processor_id == 0)
     {
       std::ostringstream file_name_stream;
 
       file_name_stream << name;
 
       if(parallel_mesh)
-        file_name_stream << "-" << this->processor_id();
+        file_name_stream << "-" << _my_processor_id;
 
       {
         std::ifstream in (file_name_stream.str().c_str());
@@ -528,8 +529,8 @@ void CheckpointIO::read (const std::string & name)
           largest_id_type n_procs;
           io.data(n_procs, "# n_procs");
 
-          if(n_procs != this->n_processors())
-            libmesh_error_msg("Attempted to utilize a checkpoint file on " << this->n_processors() << " processors but it was written using " << n_procs << "!!");
+          if(n_procs != _my_n_processors)
+            libmesh_error_msg("Attempted to utilize a checkpoint file on " << _my_n_processors << " processors but it was written using " << n_procs << "!!");
         }
 
       // read subdomain names
