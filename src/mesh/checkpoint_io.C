@@ -99,7 +99,7 @@ void CheckpointIO::write (const std::string & name)
       file_name_stream << name;
 
       if(_parallel)
-        file_name_stream << "-" << _my_processor_id;
+        file_name_stream << "-" << _my_n_processors << "-" << _my_processor_id;
 
       Xdr io (file_name_stream.str(), this->binary() ? ENCODE : WRITE);
 
@@ -167,11 +167,21 @@ void CheckpointIO::build_elem_list()
     end = mesh.pid_elements_end(_my_processor_id);
   }
 
+  std::set<const Elem *> neighbors;
+
   for (; it != end; ++it)
   {
     Elem * elem = *it;
 
     _local_elements.insert(elem->id());
+
+    // Also need to add in all the point neighbors of this element
+    elem->find_point_neighbors(neighbors);
+
+    for (std::set<const Elem *>::iterator it = neighbors.begin();
+         it != neighbors.end();
+         ++it)
+      _local_elements.insert((*it)->id());
   }
 }
 
@@ -179,18 +189,12 @@ void CheckpointIO::build_node_list()
 {
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  MeshBase::const_element_iterator it  = mesh.elements_begin();
-  MeshBase::const_element_iterator end = mesh.elements_end();
-
-  if (_parallel)
-  {
-    it  = mesh.pid_elements_begin(_my_processor_id);
-    end = mesh.pid_elements_end(_my_processor_id);
-  }
+  std::set<largest_id_type>::iterator it  = _local_elements.begin();
+  const std::set<largest_id_type>::iterator end  = _local_elements.end();
 
   for (; it != end; ++it)
   {
-    Elem * elem = *it;
+    const Elem * elem = mesh.elem_ptr(*it);
 
     for (unsigned int n = 0; n < elem->n_nodes(); n++)
       _nodes_connected_to_local_elements.insert(elem->node(n));
@@ -405,6 +409,11 @@ void CheckpointIO::write_bcs (Xdr & io) const
   {
     if (_local_elements.find(orig_element_id_list[i]) != _local_elements.end())
     {
+      // Only write out BCs for truly local elements
+      if (_parallel &&
+          mesh.elem_ptr(orig_element_id_list[i])->processor_id() != _my_processor_id)
+          continue;
+
       element_id_list.push_back(orig_element_id_list[i]);
       side_list.push_back(orig_side_list[i]);
       bc_id_list.push_back(orig_bc_id_list[i]);
@@ -446,6 +455,11 @@ void CheckpointIO::write_nodesets (Xdr & io) const
   {
     if (_nodes_connected_to_local_elements.find(orig_node_id_list[i]) != _nodes_connected_to_local_elements.end())
     {
+      // Only write out BCs for truly local nodes
+      if (_parallel &&
+          mesh.node_ptr(orig_node_id_list[i])->processor_id() != _my_processor_id)
+          continue;
+
       node_id_list.push_back(orig_node_id_list[i]);
       bc_id_list.push_back(orig_bc_id_list[i]);
     }
@@ -513,7 +527,7 @@ void CheckpointIO::read (const std::string & name)
       file_name_stream << name;
 
       if(_parallel)
-        file_name_stream << "-" << _my_processor_id;
+        file_name_stream << "-" << _my_n_processors << "-" << _my_processor_id;
 
       {
         std::ifstream in (file_name_stream.str().c_str());
