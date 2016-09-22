@@ -17,11 +17,6 @@
 
 
 
-// C++ includes
-#include <limits>
-#include <numeric> // for std::accumulate
-#include <set>
-
 // Local includes
 #include "libmesh/elem.h"
 #include "libmesh/elem_range.h"
@@ -30,6 +25,7 @@
 #include "libmesh/mesh_tools.h"
 #include "libmesh/node_range.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/parallel_mesh.h"
 #include "libmesh/serial_mesh.h"
 #include "libmesh/sphere.h"
@@ -39,6 +35,14 @@
 #ifdef DEBUG
 #  include "libmesh/remote_elem.h"
 #endif
+
+#include LIBMESH_INCLUDE_UNORDERED_MAP
+#include LIBMESH_INCLUDE_UNORDERED_SET
+
+// C++ includes
+#include <limits>
+#include <numeric> // for std::accumulate
+#include <set>
 
 
 
@@ -981,52 +985,6 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
 
 
 
-void MeshTools::correct_node_proc_ids (MeshBase & mesh)
-{
-  // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.comm());
-
-  // Fix all nodes' processor ids.  Coarsening may have left us with
-  // nodes which are no longer touched by any elements of the same
-  // processor id, and for DofMap to work we need to fix that.
-
-  // In the first pass, invalidate processor ids for nodes on active
-  // elements.  We avoid touching subactive-only nodes.
-  MeshBase::element_iterator       e_it  = mesh.active_elements_begin();
-  const MeshBase::element_iterator e_end = mesh.active_elements_end();
-  for (; e_it != e_end; ++e_it)
-    {
-      Elem * elem = *e_it;
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        {
-          Node & node = elem->node_ref(n);
-          node.invalidate_processor_id();
-        }
-    }
-
-  // In the second pass, find the lowest processor ids on active
-  // elements touching each node, and set the node processor id.
-  for (e_it = mesh.active_elements_begin(); e_it != e_end; ++e_it)
-    {
-      Elem * elem = *e_it;
-      processor_id_type proc_id = elem->processor_id();
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        {
-          Node & node = elem->node_ref(n);
-          if (node.processor_id() == DofObject::invalid_processor_id ||
-              node.processor_id() > proc_id)
-            node.processor_id() = proc_id;
-        }
-    }
-
-  // Those two passes will correct every node that touches a local
-  // element, but we can't be sure about nodes touching remote
-  // elements.  Fix those now.
-  MeshCommunication().make_node_proc_ids_parallel_consistent (mesh);
-}
-
-
-
 #ifdef DEBUG
 void MeshTools::libmesh_assert_equal_n_systems (const MeshBase & mesh)
 {
@@ -1816,6 +1774,206 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
 
 
 #endif // DEBUG
+
+
+
+// Functors for correct_node_proc_ids
+namespace {
+
+typedef LIBMESH_BEST_UNORDERED_MAP<dof_id_type, processor_id_type> proc_id_map_type;
+
+struct SyncProcIdsFromMap
+{
+  typedef processor_id_type datum;
+
+  SyncProcIdsFromMap(const proc_id_map_type & _map,
+                     MeshBase & _mesh) :
+    new_proc_ids(_map), mesh(_mesh) {}
+
+  const proc_id_map_type & new_proc_ids;
+
+  MeshBase & mesh;
+
+  // ------------------------------------------------------------
+  void gather_data (const std::vector<dof_id_type> & ids,
+                    std::vector<datum> & data)
+  {
+    // Find the new processor id of each requested node
+    data.resize(ids.size());
+
+    for (std::size_t i=0; i != ids.size(); ++i)
+      {
+        const dof_id_type id = ids[i];
+        const proc_id_map_type::const_iterator it = new_proc_ids.find(id);
+
+        // Return the node's new processor id if it has one, or its
+        // old processor id if not.
+        if (it != new_proc_ids.end())
+          data[i] = it->second;
+        else
+          {
+            // We'd better find every node we're asked for
+            const Node & node = mesh.node_ref(id);
+            data[i] = node.processor_id();
+          }
+      }
+  }
+
+  // ------------------------------------------------------------
+  void act_on_data (const std::vector<dof_id_type> & ids,
+                    std::vector<datum> proc_ids)
+  {
+    // Set the node processor ids we've now been informed of
+    for (std::size_t i=0; i != ids.size(); ++i)
+      {
+        Node & node = mesh.node_ref(ids[i]);
+        node.processor_id() = proc_ids[i];
+      }
+  }
+};
+}
+
+
+
+void MeshTools::correct_node_proc_ids (MeshBase & mesh)
+{
+  // This function must be run on all processors at once
+  libmesh_parallel_only(mesh.comm());
+
+  // Fix all nodes' processor ids.  Coarsening may have left us with
+  // nodes which are no longer touched by any elements of the same
+  // processor id, and for DofMap to work we need to fix that.
+
+  // This is harder now that libMesh no longer requires a distributed
+  // mesh to ghost all nodal neighbors: it is possible for two active
+  // elements on two different processors to share the same node in
+  // such a way that neither processor knows the others' element
+  // exists!
+
+  // We require all processors to agree on nodal processor ids before
+  // going into this algorithm.
+#ifdef DEBUG
+  MeshTools::libmesh_assert_parallel_consistent_procids<Node>(mesh);
+#endif
+
+  // We build up a set of compatible processor ids for each node
+  proc_id_map_type new_proc_ids;
+
+  MeshBase::element_iterator       e_it  = mesh.active_elements_begin();
+  const MeshBase::element_iterator e_end = mesh.active_elements_end();
+  for (; e_it != e_end; ++e_it)
+    {
+      Elem * elem = *e_it;
+      processor_id_type pid = elem->processor_id();
+
+      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        {
+          const Node & node = elem->node_ref(n);
+          const dof_id_type id = node.id();
+          const proc_id_map_type::iterator it = new_proc_ids.find(id);
+          if (it == new_proc_ids.end())
+            new_proc_ids.insert(std::make_pair(id,pid));
+          else
+            it->second = std::min(it->second, pid);
+        }
+    }
+
+  // Sort the new pids to push to each processor
+  std::vector<std::vector<std::pair<dof_id_type, processor_id_type> > >
+    ids_to_push(mesh.n_processors());
+
+  for (MeshBase::const_node_iterator n_it = mesh.nodes_begin(),
+       n_end = mesh.nodes_end(); n_it != n_end; ++n_it)
+    {
+      const Node *node = *n_it;
+      const dof_id_type id = node->id();
+      const proc_id_map_type::iterator it = new_proc_ids.find(id);
+      if (it == new_proc_ids.end())
+        continue;
+      const processor_id_type pid = it->second;
+      ids_to_push[node->processor_id()].push_back(std::make_pair(id, pid));
+    }
+
+  // Push using non-blocking I/O
+  std::vector<Parallel::Request> push_requests(mesh.n_processors());
+
+  for (processor_id_type p=1; p != mesh.n_processors(); ++p)
+    {
+      const processor_id_type procup =
+        cast_int<processor_id_type>
+        ((mesh.comm().rank() + p) % mesh.comm().size());
+
+      mesh.comm().send(procup, ids_to_push[procup], push_requests[procup]);
+    }
+
+  for (processor_id_type p=0; p != mesh.n_processors(); ++p)
+    {
+      const processor_id_type procdown =
+        cast_int<processor_id_type>
+	((mesh.comm().size() + mesh.comm().rank() - p) %
+         mesh.comm().size());
+
+      std::vector<std::pair<dof_id_type, processor_id_type> >
+        ids_to_pull;
+
+      if (p)
+        mesh.comm().receive(procdown, ids_to_pull);
+      else
+        ids_to_pull.swap(ids_to_push[procdown]);
+
+      std::vector<std::pair<dof_id_type, processor_id_type> >::iterator
+        pulled_ids_it = ids_to_pull.begin(),
+        pulled_ids_end = ids_to_pull.end();
+      for (; pulled_ids_it != pulled_ids_end; ++pulled_ids_it)
+        {
+          const dof_id_type id = pulled_ids_it->first;
+          const processor_id_type pid = pulled_ids_it->second;
+          const proc_id_map_type::iterator it = new_proc_ids.find(id);
+          if (it == new_proc_ids.end())
+            new_proc_ids.insert(std::make_pair(id,pid));
+          else
+            it->second = std::min(it->second, pid);
+        }
+    }
+
+  // Now new_proc_ids is correct for every node we used to own.  Let's
+  // ask every other processor about the nodes they used to own.  But
+  // first we'll need to keep track of which nodes we used to own,
+  // lest we get them confused with nodes we newly own.
+  LIBMESH_BEST_UNORDERED_SET<Node *> ex_local_nodes;
+  for (MeshBase::node_iterator n_it = mesh.local_nodes_begin(),
+       n_end = mesh.local_nodes_end(); n_it != n_end; ++n_it)
+    {
+      Node *node = *n_it;
+      const proc_id_map_type::iterator it = new_proc_ids.find(node->id());
+      if (it != new_proc_ids.end() && it->second != mesh.processor_id())
+        ex_local_nodes.insert(node);
+    }
+
+  // Let's finish with previous I/O before we start more.
+  Parallel::wait(push_requests);
+
+  SyncProcIdsFromMap sync(new_proc_ids, mesh);
+  Parallel::sync_dofobject_data_by_id
+    (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync);
+
+  // And finally let's update the nodes we used to own.
+  for (LIBMESH_BEST_UNORDERED_SET<Node *>::iterator n_it = ex_local_nodes.begin(),
+       n_end = ex_local_nodes.end(); n_it != n_end; ++n_it)
+    {
+      Node *node = *n_it;
+      const dof_id_type id = node->id();
+      const proc_id_map_type::iterator it = new_proc_ids.find(id);
+      libmesh_assert(it != new_proc_ids.end());
+      node->processor_id() = it->second;
+    }
+
+  // We should still have consistent nodal processor ids coming out of
+  // this algorithm.
+#ifdef DEBUG
+  MeshTools::libmesh_assert_valid_procids<Node>(mesh);
+#endif
+}
 
 
 
