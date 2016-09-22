@@ -997,6 +997,18 @@ public:
   virtual const_element_iterator flagged_elements_begin (unsigned char rflag) const = 0;
   virtual const_element_iterator flagged_elements_end (unsigned char rflag) const = 0;
 
+  /**
+   * Iterate over all elements with a specified refinement flag on a
+   * specified processor.
+   */
+  virtual element_iterator flagged_pid_elements_begin (unsigned char rflag,
+                                                       processor_id_type pid) = 0;
+  virtual element_iterator flagged_pid_elements_end (unsigned char rflag,
+                                                     processor_id_type pid) = 0;
+  virtual const_element_iterator flagged_pid_elements_begin (unsigned char rflag,
+                                                             processor_id_type pid) const = 0;
+  virtual const_element_iterator flagged_pid_elements_end (unsigned char rflag,
+                                                           processor_id_type pid) const = 0;
 
   /**
    * Active, local, and negation forms of the element iterators described above.

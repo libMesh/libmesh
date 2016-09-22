@@ -372,6 +372,15 @@ public:
   virtual const_element_iterator flagged_elements_begin (unsigned char rflag) const;
   virtual const_element_iterator flagged_elements_end (unsigned char rflag) const;
 
+  virtual element_iterator flagged_pid_elements_begin (unsigned char rflag,
+                                                       processor_id_type pid);
+  virtual element_iterator flagged_pid_elements_end (unsigned char rflag,
+                                                     processor_id_type pid);
+  virtual const_element_iterator flagged_pid_elements_begin (unsigned char rflag,
+                                                             processor_id_type pid) const;
+  virtual const_element_iterator flagged_pid_elements_end (unsigned char rflag,
+                                                           processor_id_type pid) const;
+
   /**
    * Node iterator accessor functions.
    */
