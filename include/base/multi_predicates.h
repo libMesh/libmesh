@@ -406,6 +406,24 @@ struct Flagged : abstract_multi_predicate<T>
 
 
 /**
+ * Used to iterate over non-NULL, elements with a given refinement
+ * flag belonging to a given processor.
+ */
+template <typename T>
+struct FlaggedPID : abstract_multi_predicate<T>
+{
+  FlaggedPID(unsigned char rflag, processor_id_type proc_id)
+  {
+    this->_predicates.push_back(new not_null<T>);
+    this->_predicates.push_back(new flagged<T>(rflag));
+    this->_predicates.push_back(new pid<T>(proc_id));
+  }
+};
+
+
+
+
+/**
  * Used to iterate over non-NULL, active elements owned by a given
  * processor.
  */
