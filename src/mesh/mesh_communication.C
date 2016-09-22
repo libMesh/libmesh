@@ -1353,6 +1353,32 @@ void MeshCommunication::make_node_proc_ids_parallel_consistent(MeshBase & mesh)
 
 
 // ------------------------------------------------------------
+void MeshCommunication::make_new_node_proc_ids_parallel_consistent(MeshBase & mesh)
+{
+  LOG_SCOPE ("make_new_node_proc_ids_parallel_consistent()", "MeshCommunication");
+
+  // This function must be run on all processors at once
+  libmesh_parallel_only(mesh.comm());
+
+  // When this function is called, each section of a parallelized mesh
+  // should be in the following state:
+  //
+  // Local nodes should have unique authoritative ids,
+  // and processor ids consistent with all processors which own
+  // an element touching them.
+  //
+  // Ghost nodes touching local elements should have processor ids
+  // consistent with all processors which own an element touching
+  // them.
+  SyncProcIds sync(mesh);
+  Parallel::sync_node_data_by_element_id
+    (mesh, mesh.elements_begin(), mesh.elements_end(),
+     ElemJustRefined(), NodeMaybeNew(), sync);
+}
+
+
+
+// ------------------------------------------------------------
 void MeshCommunication::make_nodes_parallel_consistent (MeshBase & mesh)
 {
   // This function must be run on all processors at once
@@ -1380,6 +1406,48 @@ void MeshCommunication::make_nodes_parallel_consistent (MeshBase & mesh)
   // that they'll tell us who has the authoritative dofobject ids for
   // each node.
   this->make_node_proc_ids_parallel_consistent(mesh);
+
+  // Second, sync up dofobject ids.
+  this->make_node_ids_parallel_consistent(mesh);
+
+  // Third, sync up dofobject unique_ids if applicable.
+  this->make_node_unique_ids_parallel_consistent(mesh);
+
+  // Finally, correct the processor ids to make DofMap happy
+  MeshTools::correct_node_proc_ids(mesh);
+}
+
+
+
+// ------------------------------------------------------------
+void MeshCommunication::make_new_nodes_parallel_consistent (MeshBase & mesh)
+{
+  // This function must be run on all processors at once
+  libmesh_parallel_only(mesh.comm());
+
+  // When this function is called, each section of a parallelized mesh
+  // should be in the following state:
+  //
+  // All nodes should have the exact same physical location on every
+  // processor where they exist.
+  //
+  // Local nodes should have unique authoritative ids,
+  // and processor ids consistent with all processors which own
+  // an element touching them.
+  //
+  // Ghost nodes touching local elements should have processor ids
+  // consistent with all processors which own an element touching
+  // them.
+  //
+  // Ghost nodes should have ids which are either already correct
+  // or which are in the "unpartitioned" id space.
+
+  // First, let's sync up processor ids.  Some of these processor ids
+  // may be "wrong" from coarsening, but they're right in the sense
+  // that they'll tell us who has the authoritative dofobject ids for
+  // each node.
+
+  this->make_new_node_proc_ids_parallel_consistent(mesh);
 
   // Second, sync up dofobject ids.
   this->make_node_ids_parallel_consistent(mesh);
