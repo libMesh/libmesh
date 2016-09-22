@@ -307,7 +307,7 @@ void CheckpointIO::write_connectivity (Xdr & io) const
       MeshBase::const_element_iterator end = mesh.level_elements_end(level);
 
       for (; it != end; ++it)
-        if (!_parallel || (*it)->processor_id() == _my_processor_id)
+        if (!_parallel || _local_elements.find((*it)->id()) != _local_elements.end())
           n_elem_at_level[level]++;
     }
 
@@ -326,8 +326,8 @@ void CheckpointIO::write_connectivity (Xdr & io) const
         {
           Elem & elem = *(*it);
 
-          if (_parallel && elem.processor_id() != _my_processor_id)
-            continue;
+          if (_parallel && _local_elements.find(elem.id()) == _local_elements.end())
+              continue;
 
           unsigned int n_nodes = elem.n_nodes();
 
@@ -364,7 +364,6 @@ void CheckpointIO::write_connectivity (Xdr & io) const
 
           io.data(p_level, "# p_level");
 #endif
-
           io.data_stream(&conn_data[0],
                          cast_int<unsigned int>(conn_data.size()),
                          cast_int<unsigned int>(conn_data.size()));
