@@ -1466,44 +1466,8 @@ void libmesh_assert_valid_unique_ids(const MeshBase &mesh)
 #endif
 
 template <>
-void libmesh_assert_valid_procids<Elem>(const MeshBase & mesh)
+void libmesh_assert_topology_consistent_procids<Elem>(const MeshBase & mesh)
 {
-  if (mesh.n_processors() == 1)
-    return;
-
-  libmesh_parallel_only(mesh.comm());
-
-  // We want this test to be valid even when called even after nodes
-  // have been added asynchonously but before they're renumbered
-  dof_id_type parallel_max_elem_id = mesh.max_elem_id();
-  mesh.comm().max(parallel_max_elem_id);
-
-  // Check processor ids for consistency between processors
-
-  for (dof_id_type i=0; i != parallel_max_elem_id; ++i)
-    {
-      const Elem * elem = mesh.query_elem_ptr(i);
-
-      processor_id_type min_id =
-        elem ? elem->processor_id() :
-        std::numeric_limits<processor_id_type>::max();
-      mesh.comm().min(min_id);
-
-      processor_id_type max_id =
-        elem ? elem->processor_id() :
-        std::numeric_limits<processor_id_type>::min();
-      mesh.comm().max(max_id);
-
-      if (elem)
-        {
-          libmesh_assert_equal_to (min_id, elem->processor_id());
-          libmesh_assert_equal_to (max_id, elem->processor_id());
-        }
-
-      if (min_id == mesh.processor_id())
-        libmesh_assert(elem);
-    }
-
   // If we're adaptively refining, check processor ids for consistency
   // between parents and children.
 #ifdef LIBMESH_ENABLE_AMR
@@ -1551,7 +1515,49 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase & mesh)
 
 
 template <>
-void libmesh_assert_valid_procids<Node>(const MeshBase & mesh)
+void libmesh_assert_parallel_consistent_procids<Elem>(const MeshBase & mesh)
+{
+  if (mesh.n_processors() == 1)
+    return;
+
+  libmesh_parallel_only(mesh.comm());
+
+  // We want this test to be valid even when called even after nodes
+  // have been added asynchonously but before they're renumbered
+  dof_id_type parallel_max_elem_id = mesh.max_elem_id();
+  mesh.comm().max(parallel_max_elem_id);
+
+  // Check processor ids for consistency between processors
+
+  for (dof_id_type i=0; i != parallel_max_elem_id; ++i)
+    {
+      const Elem * elem = mesh.query_elem_ptr(i);
+
+      processor_id_type min_id =
+        elem ? elem->processor_id() :
+        std::numeric_limits<processor_id_type>::max();
+      mesh.comm().min(min_id);
+
+      processor_id_type max_id =
+        elem ? elem->processor_id() :
+        std::numeric_limits<processor_id_type>::min();
+      mesh.comm().max(max_id);
+
+      if (elem)
+        {
+          libmesh_assert_equal_to (min_id, elem->processor_id());
+          libmesh_assert_equal_to (max_id, elem->processor_id());
+        }
+
+      if (min_id == mesh.processor_id())
+        libmesh_assert(elem);
+    }
+}
+
+
+
+template <>
+void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
 {
   if (mesh.n_processors() == 1)
     return;
@@ -1563,38 +1569,12 @@ void libmesh_assert_valid_procids<Node>(const MeshBase & mesh)
   dof_id_type parallel_max_node_id = mesh.max_node_id();
   mesh.comm().max(parallel_max_node_id);
 
-  // Check processor ids for consistency between processors
-
-  for (dof_id_type i=0; i != parallel_max_node_id; ++i)
-    {
-      const Node * node = mesh.query_node_ptr(i);
-
-      processor_id_type min_id =
-        node ? node->processor_id() :
-        std::numeric_limits<processor_id_type>::max();
-      mesh.comm().min(min_id);
-
-      processor_id_type max_id =
-        node ? node->processor_id() :
-        std::numeric_limits<processor_id_type>::min();
-      mesh.comm().max(max_id);
-
-      if (node)
-        {
-          libmesh_assert_equal_to (min_id, node->processor_id());
-          libmesh_assert_equal_to (max_id, node->processor_id());
-        }
-
-      if (min_id == mesh.processor_id())
-        libmesh_assert(node);
-    }
-
   std::vector<bool> node_touched_by_me(parallel_max_node_id, false);
 
   const MeshBase::const_element_iterator el_end =
-    mesh.active_local_elements_end();
+    mesh.local_elements_end();
   for (MeshBase::const_element_iterator el =
-         mesh.active_local_elements_begin(); el != el_end; ++el)
+         mesh.local_elements_begin(); el != el_end; ++el)
     {
       const Elem * elem = *el;
       libmesh_assert (elem);
@@ -1621,6 +1601,72 @@ void libmesh_assert_valid_procids<Node>(const MeshBase & mesh)
                      node_touched_by_me[nodeid]);
     }
 }
+
+
+
+template <>
+void libmesh_assert_parallel_consistent_procids<Node>(const MeshBase & mesh)
+{
+  if (mesh.n_processors() == 1)
+    return;
+
+  libmesh_parallel_only(mesh.comm());
+
+  // We want this test to be valid even when called even after nodes
+  // have been added asynchonously but before they're renumbered
+  dof_id_type parallel_max_node_id = mesh.max_node_id();
+  mesh.comm().max(parallel_max_node_id);
+
+  std::vector<bool> node_touched_by_anyone(parallel_max_node_id, false);
+
+  const MeshBase::const_element_iterator el_end =
+    mesh.local_elements_end();
+  for (MeshBase::const_element_iterator el =
+         mesh.local_elements_begin(); el != el_end; ++el)
+    {
+      const Elem * elem = *el;
+      libmesh_assert (elem);
+
+      for (unsigned int i=0; i != elem->n_nodes(); ++i)
+        {
+          const Node & node = elem->node_ref(i);
+          dof_id_type nodeid = node.id();
+          node_touched_by_anyone[nodeid] = true;
+        }
+    }
+  mesh.comm().max(node_touched_by_anyone);
+
+  // Check processor ids for consistency between processors
+  // on any node an element touches
+  for (dof_id_type i=0; i != parallel_max_node_id; ++i)
+    {
+      if (!node_touched_by_anyone[i])
+        continue;
+
+      const Node * node = mesh.query_node_ptr(i);
+
+      processor_id_type min_id =
+        node ? node->processor_id() :
+        std::numeric_limits<processor_id_type>::max();
+      mesh.comm().min(min_id);
+
+      processor_id_type max_id =
+        node ? node->processor_id() :
+        std::numeric_limits<processor_id_type>::min();
+      mesh.comm().max(max_id);
+
+      if (node)
+        {
+          libmesh_assert_equal_to (min_id, node->processor_id());
+          libmesh_assert_equal_to (max_id, node->processor_id());
+        }
+
+      if (min_id == mesh.processor_id())
+        libmesh_assert(node);
+    }
+}
+
+
 
 } // namespace MeshTools
 
