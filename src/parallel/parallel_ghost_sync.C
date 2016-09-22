@@ -10,7 +10,7 @@ SyncNodalPositions::SyncNodalPositions(MeshBase & m)
 
 
 void SyncNodalPositions::gather_data (const std::vector<dof_id_type> & ids,
-                                      std::vector<datum> & data)
+                                      std::vector<datum> & data) const
 {
   data.resize(ids.size());
 
@@ -29,7 +29,7 @@ void SyncNodalPositions::gather_data (const std::vector<dof_id_type> & ids,
 
 
 void SyncNodalPositions::act_on_data (const std::vector<dof_id_type> & ids,
-                                      std::vector<datum> & data)
+                                      std::vector<datum> & data) const
 {
   for (std::size_t i=0; i<ids.size(); ++i)
     {

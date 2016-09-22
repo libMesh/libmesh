@@ -81,7 +81,7 @@ struct SyncNeighbors
 
   // Find the neighbor ids for each requested element
   void gather_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> & neighbors)
+                    std::vector<datum> & neighbors) const
   {
     neighbors.resize(ids.size());
 
@@ -109,7 +109,7 @@ struct SyncNeighbors
   }
 
   void act_on_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> & neighbors)
+                    std::vector<datum> & neighbors) const
   {
     for (std::size_t i=0; i != ids.size(); ++i)
       {
@@ -1063,13 +1063,13 @@ struct SyncIds
   // Find the id of each requested DofObject -
   // Parallel::sync_* already did the work for us
   void gather_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> & ids_out)
+                    std::vector<datum> & ids_out) const
   {
     ids_out = ids;
   }
 
   void act_on_data (const std::vector<dof_id_type> & old_ids,
-                    std::vector<datum> & new_ids)
+                    std::vector<datum> & new_ids) const
   {
     for (unsigned int i=0; i != old_ids.size(); ++i)
       if (old_ids[i] != new_ids[i])
@@ -1090,7 +1090,7 @@ struct SyncPLevels
 
   // Find the p_level of each requested Elem
   void gather_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> & ids_out)
+                    std::vector<datum> & ids_out) const
   {
     ids_out.reserve(ids.size());
 
@@ -1103,7 +1103,7 @@ struct SyncPLevels
   }
 
   void act_on_data (const std::vector<dof_id_type> & old_ids,
-                    std::vector<datum> & new_p_levels)
+                    std::vector<datum> & new_p_levels) const
   {
     for (unsigned int i=0; i != old_ids.size(); ++i)
       {
@@ -1133,7 +1133,7 @@ struct SyncUniqueIds
   // Find the id of each requested DofObject -
   // Parallel::sync_* already did the work for us
   void gather_data (const std::vector<dof_id_type>& ids,
-                    std::vector<datum>& ids_out)
+                    std::vector<datum>& ids_out) const
   {
     ids_out.reserve(ids.size());
 
@@ -1147,7 +1147,7 @@ struct SyncUniqueIds
   }
 
   void act_on_data (const std::vector<dof_id_type>& ids,
-                    std::vector<datum>& unique_ids)
+                    std::vector<datum>& unique_ids) const
   {
     for (unsigned int i=0; i != ids.size(); ++i)
       {

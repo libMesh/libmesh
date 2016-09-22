@@ -631,11 +631,11 @@ struct SyncNodalPositions
 
   // First required interface.  This function must fill up the data vector for the
   // ids specified in the ids vector.
-  void gather_data (const std::vector<dof_id_type> & ids, std::vector<datum> & data);
+  void gather_data (const std::vector<dof_id_type> & ids, std::vector<datum> & data) const;
 
   // Second required interface.  This function must do something with the data in
   // the data vector for the ids in the ids vector.
-  void act_on_data (const std::vector<dof_id_type> & ids, std::vector<datum> & data);
+  void act_on_data (const std::vector<dof_id_type> & ids, std::vector<datum> & data) const;
 
   MeshBase & mesh;
 };

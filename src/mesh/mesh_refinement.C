@@ -773,7 +773,7 @@ struct SyncRefinementFlags
 
   // Find the refinement flag on each requested element
   void gather_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> & flags)
+                    std::vector<datum> & flags) const
   {
     flags.resize(ids.size());
 
