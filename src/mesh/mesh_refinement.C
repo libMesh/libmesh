@@ -1555,7 +1555,7 @@ bool MeshRefinement::_refine_elements ()
   if (mesh_changed && !_mesh.is_serial())
     {
       MeshCommunication().make_elems_parallel_consistent (_mesh);
-      MeshCommunication().make_nodes_parallel_consistent (_mesh);
+      MeshCommunication().make_new_nodes_parallel_consistent (_mesh);
 #ifdef DEBUG
       _mesh.libmesh_assert_valid_parallel_ids();
 #endif
