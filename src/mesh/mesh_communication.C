@@ -1172,10 +1172,9 @@ void MeshCommunication::make_node_ids_parallel_consistent (MeshBase & mesh)
   LOG_SCOPE ("make_node_ids_parallel_consistent()", "MeshCommunication");
 
   SyncIds syncids(mesh, &MeshBase::renumber_node);
-  Parallel::sync_node_data_by_element_id(mesh,
-                                         mesh.elements_begin(),
-                                         mesh.elements_end(),
-                                         syncids);
+  Parallel::sync_node_data_by_element_id
+    (mesh, mesh.elements_begin(), mesh.elements_end(),
+     Parallel::SyncEverything(), Parallel::SyncEverything(), syncids);
 }
 
 
@@ -1282,6 +1281,44 @@ struct SyncProcIds
       }
   }
 };
+
+
+struct ElemJustRefined
+{
+  ElemJustRefined() {}
+
+  bool operator() (const Elem * elem) const
+  {
+#ifdef LIBMESH_ENABLE_AMR
+    return (elem->refinement_flag() == Elem::JUST_REFINED);
+#else
+    return false;
+#endif
+  }
+};
+
+
+struct NodeMaybeNew
+{
+  NodeMaybeNew() {}
+
+  bool operator() (const Elem * elem, unsigned int local_node_num) const
+  {
+#ifdef LIBMESH_ENABLE_AMR
+    // This should only be called on just-refined elements
+    const Elem * parent = elem->parent();
+    libmesh_assert(parent);
+
+    // If this node wasn't already a parent node then it might be a
+    // new node we need to work on.
+    const unsigned int c = parent->which_child_am_i(elem);
+    return (parent->as_parent_node(c, local_node_num) == libMesh::invalid_uint);
+#else
+    return false;
+#endif
+  }
+};
+
 }
 
 
@@ -1309,7 +1346,8 @@ void MeshCommunication::make_node_proc_ids_parallel_consistent(MeshBase & mesh)
   // them.
   SyncProcIds sync(mesh);
   Parallel::sync_node_data_by_element_id
-    (mesh, mesh.elements_begin(), mesh.elements_end(), sync);
+    (mesh, mesh.elements_begin(), mesh.elements_end(),
+     Parallel::SyncEverything(), Parallel::SyncEverything(), sync);
 }
 
 
