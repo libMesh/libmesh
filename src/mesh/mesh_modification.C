@@ -721,9 +721,9 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
   // In a DistributedMesh our ghost node processor ids may be bad,
   // the ids of nodes touching remote elements may be inconsistent,
   // and unique_ids of newly added non-local nodes remain unset.
-  // make_nodes_parallel_consistent() will fix all this.
+  // make_new_nodes_parallel_consistent() will fix all this.
   if (!this->is_serial())
-    MeshCommunication().make_nodes_parallel_consistent (*this);
+    MeshCommunication().make_new_nodes_parallel_consistent (*this);
 
   // renumber nodes, elements etc
   this->prepare_for_use(/*skip_renumber =*/ false);
