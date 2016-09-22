@@ -149,10 +149,15 @@ struct SyncNeighbors
 void query_ghosting_functors
   (MeshBase & mesh,
    processor_id_type pid,
+   bool newly_coarsened_only,
    std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
-  MeshBase::const_element_iterator       elem_it  = mesh.active_pid_elements_begin(pid);
-  const MeshBase::const_element_iterator elem_end = mesh.active_pid_elements_end(pid);
+  MeshBase::const_element_iterator       elem_it  =
+    newly_coarsened_only ? mesh.flagged_pid_elements_begin(Elem::JUST_COARSENED, pid) :
+                           mesh.active_pid_elements_begin(pid);
+  const MeshBase::const_element_iterator elem_end =
+    newly_coarsened_only ? mesh.flagged_pid_elements_end(Elem::JUST_COARSENED, pid) :
+                           mesh.active_pid_elements_end(pid);
 
   std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
   const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
@@ -312,14 +317,16 @@ void MeshCommunication::clear ()
 
 #ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
 // ------------------------------------------------------------
-void MeshCommunication::redistribute (DistributedMesh &) const
+void MeshCommunication::redistribute (DistributedMesh &, bool) const
 {
   // no MPI == one processor, no redistribution
   return;
 }
+
 #else
 // ------------------------------------------------------------
-void MeshCommunication::redistribute (DistributedMesh & mesh) const
+void MeshCommunication::redistribute (DistributedMesh & mesh,
+                                      bool newly_coarsened_only) const
 {
   // This method will be called after a new partitioning has been
   // assigned to the elements.  This partitioning was defined in
@@ -331,9 +338,15 @@ void MeshCommunication::redistribute (DistributedMesh & mesh) const
   // local may now be assigned to other processors, so we need to
   // send those off.  Similarly, we need to accept elements from
   // other processors.
-  //
+
+  // This method is also useful in the more limited case of
+  // post-coarsening redistribution: if elements are only ghosting
+  // neighbors of their active elements, but adaptive coarsening
+  // causes an inactive element to become active, then we may need a
+  // copy of that inactive element's neighbors.
+
   // The approach is as follows:
-  // (1) send all elements we have stored to their proper homes
+  // (1) send all relevant elements we have stored to their proper homes
   // (2) receive elements from all processors, watching for duplicates
   // (3) deleting all nonlocal elements elements
   // (4) obtaining required ghost elements from neighboring processors
@@ -374,7 +387,7 @@ void MeshCommunication::redistribute (DistributedMesh & mesh) const
         std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
 
         // See which to-be-ghosted elements we need to send
-        query_ghosting_functors(mesh, pid, elements_to_send);
+        query_ghosting_functors(mesh, pid, newly_coarsened_only, elements_to_send);
 
         // The inactive elements we need to send should have their
         // immediate children present.
@@ -1405,6 +1418,7 @@ void MeshCommunication::make_nodes_parallel_consistent (MeshBase & mesh)
   // may be "wrong" from coarsening, but they're right in the sense
   // that they'll tell us who has the authoritative dofobject ids for
   // each node.
+
   this->make_node_proc_ids_parallel_consistent(mesh);
 
   // Second, sync up dofobject ids.
@@ -1495,9 +1509,9 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   // See which elements we still need to keep ghosted, given that
   // we're keeping local and unpartitioned elements.
   query_ghosting_functors(mesh, mesh.processor_id(),
-                          elements_to_keep);
+                          false, elements_to_keep);
   query_ghosting_functors(mesh, DofObject::invalid_processor_id,
-                          elements_to_keep);
+                          false, elements_to_keep);
 
   // The inactive elements we need to send should have their
   // immediate children present.

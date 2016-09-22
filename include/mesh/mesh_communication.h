@@ -94,8 +94,12 @@ public:
    * only the elements it actually owns and any ghost elements required
    * to satisfy data dependencies. This method can be invoked after a
    * partitioning step to affect the new partitioning.
+   *
+   * Redistribution can also be done with newly coarsened elements'
+   * neighbors only.
    */
-  void redistribute (DistributedMesh &) const;
+  void redistribute (DistributedMesh & mesh,
+                     bool newly_coarsened_only = false) const;
 
   /**
    *
