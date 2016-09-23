@@ -58,6 +58,10 @@ public:
   void set_dof_coupling(const CouplingMatrix * dof_coupling)
   { _dof_coupling = dof_coupling; }
 
+  // Return number of levels of neighbors we will couple.
+  unsigned int n_levels()
+  { return _n_levels; }
+
   // Change number of levels of neighbors to couple.
   void set_n_levels(unsigned int n_levels)
   { _n_levels = n_levels; }
