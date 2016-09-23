@@ -301,17 +301,20 @@ void CheckpointIO::write_connectivity (Xdr & io) const
   std::vector<xdr_id_type> n_elem_at_level(n_active_levels, 0);
 
   // Find the number of elements at each level
-  for (unsigned int level=0; level<n_active_levels; level++)
-    {
-      MeshBase::const_element_iterator it  = mesh.level_elements_begin(level);
-      MeshBase::const_element_iterator end = mesh.level_elements_end(level);
+  {
+    std::set<largest_id_type>::iterator it = _local_elements.begin();
+    const std::set<largest_id_type>::iterator end = _local_elements.end();
 
-      for (; it != end; ++it)
-        if (!_parallel || _local_elements.find((*it)->id()) != _local_elements.end())
-          n_elem_at_level[level]++;
-    }
+    for( ; it != end; ++it)
+      n_elem_at_level[mesh.elem_ptr(*it)->level()]++;
+  }
 
   io.data(n_active_levels, "# n_active_levels");
+
+  // Put these out here to reduce memory churn
+  // id type pid subdomain_id parent_id
+  std::vector<largest_id_type> elem_data(5);
+  std::vector<largest_id_type> conn_data;
 
   for(unsigned int level=0; level < n_active_levels; level++)
     {
@@ -320,19 +323,14 @@ void CheckpointIO::write_connectivity (Xdr & io) const
       comment << level ;
       io.data (n_elem_at_level[level], comment.str().c_str());
 
-      MeshBase::const_element_iterator it  = mesh.level_elements_begin(level);
-      MeshBase::const_element_iterator end = mesh.level_elements_end(level);
-      for (; it != end; ++it)
-        {
-          Elem & elem = *(*it);
+      std::set<largest_id_type>::iterator it = _local_elements.begin();
+      const std::set<largest_id_type>::iterator end = _local_elements.end();
 
-          if (_parallel && _local_elements.find(elem.id()) == _local_elements.end())
-              continue;
+      for( ; it != end; ++it)
+        {
+          const Elem & elem = mesh.elem_ref(*it);
 
           unsigned int n_nodes = elem.n_nodes();
-
-          // id type pid subdomain_id parent_id
-          std::vector<largest_id_type> elem_data(5);
 
           elem_data[0] = elem.id();
           elem_data[1] = elem.type();
@@ -344,7 +342,7 @@ void CheckpointIO::write_connectivity (Xdr & io) const
           else
             elem_data[4] = DofObject::invalid_processor_id;
 
-          std::vector<largest_id_type> conn_data(n_nodes);
+          conn_data.resize(n_nodes);
 
           for(unsigned int i=0; i<n_nodes; i++)
             conn_data[i] = elem.node_id(i);
@@ -844,11 +842,11 @@ unsigned int CheckpointIO::n_active_levels_on_processor(const MeshBase & mesh) c
 {
   unsigned int max_level = 0;
 
-  MeshBase::const_element_iterator el = mesh.active_pid_elements_begin(_my_processor_id);
-  const MeshBase::const_element_iterator end_el = mesh.active_pid_elements_end(_my_processor_id);
+  std::set<largest_id_type>::iterator it = _local_elements.begin();
+  const std::set<largest_id_type>::iterator end = _local_elements.end();
 
-  for( ; el != end_el; ++el)
-    max_level = std::max((*el)->level(), max_level);
+  for( ; it != end; ++it)
+    max_level = std::max(mesh.elem_ptr((*it))->level(), max_level);
 
   return max_level + 1;
 }
