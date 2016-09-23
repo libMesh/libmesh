@@ -24,6 +24,9 @@
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/remote_elem.h"
 
+// C++ Includes   -----------------------------------
+#include LIBMESH_INCLUDE_UNORDERED_SET
+
 namespace libMesh
 {
 
@@ -62,69 +65,87 @@ void DefaultCoupling::operator()
       point_locator = _mesh->sub_point_locator();
     }
 
-  for (MeshBase::const_element_iterator elem_it = range_begin;
-       elem_it != range_end; ++elem_it)
+  typedef LIBMESH_BEST_UNORDERED_SET<const Elem*> set_type;
+  set_type next_elements_to_check(range_begin, range_end);
+  set_type elements_to_check;
+  set_type elements_checked;
+
+  const unsigned int n_levels = 1;
+
+  for (unsigned int i=0; i != n_levels; ++i)
     {
-      std::vector<const Elem *> active_neighbors;
+      elements_to_check.swap(next_elements_to_check);
+      next_elements_to_check.clear();
+      elements_checked.insert(elements_to_check.begin(), elements_to_check.end());
 
-      const Elem * const elem = *elem_it;
+      for (set_type::const_iterator elem_it  = elements_to_check.begin(),
+                                    elem_end = elements_to_check.end();
+           elem_it != elem_end; ++elem_it)
+        {
+          std::vector<const Elem *> active_neighbors;
 
-      if (elem->processor_id() != p)
-        coupled_elements.insert (std::make_pair(elem,_dof_coupling));
+          const Elem * const elem = *elem_it;
 
-      if (_couple_neighbor_dofs)
-        for (unsigned int s=0; s<elem->n_sides(); s++)
-          {
-            const Elem *neigh = elem->neighbor_ptr(s);
+          if (elem->processor_id() != p)
+            coupled_elements.insert (std::make_pair(elem,_dof_coupling));
 
-            // If we have a neighbor here
-            if (neigh)
+          if (_couple_neighbor_dofs)
+            for (unsigned int s=0; s<elem->n_sides(); s++)
               {
-                // Mesh ghosting might ask us about what we want to
-                // distribute along with non-local elements, and those
-                // non-local elements might have remote neighbors, and
-                // if they do then we can't say anything about them.
-                if (neigh == remote_elem)
-                  continue;
-              }
+                const Elem *neigh = elem->neighbor_ptr(s);
+
+                // If we have a neighbor here
+                if (neigh)
+                  {
+                    // Mesh ghosting might ask us about what we want to
+                    // distribute along with non-local elements, and those
+                    // non-local elements might have remote neighbors, and
+                    // if they do then we can't say anything about them.
+                    if (neigh == remote_elem)
+                      continue;
+                  }
 #ifdef LIBMESH_ENABLE_PERIODIC
-            // We might still have a periodic neighbor here
-            else if (check_periodic_bcs)
-              {
-                libmesh_assert(_mesh);
+                // We might still have a periodic neighbor here
+                else if (check_periodic_bcs)
+                  {
+                    libmesh_assert(_mesh);
 
-                neigh = elem->topological_neighbor
-                  (s, *_mesh, *point_locator, _periodic_bcs);
-              }
+                    neigh = elem->topological_neighbor
+                      (s, *_mesh, *point_locator, _periodic_bcs);
+                  }
 #endif
 
-            // With no regular *or* periodic neighbors we have nothing
-            // to do.
-            if (!neigh)
-              continue;
+                // With no regular *or* periodic neighbors we have nothing
+                // to do.
+                if (!neigh)
+                  continue;
 
-	    // With any kind of neighbor, we need to couple to all the
-	    // active descendants on our side.
+	        // With any kind of neighbor, we need to couple to all the
+	        // active descendants on our side.
 #ifdef LIBMESH_ENABLE_AMR
-            if (neigh == elem->neighbor_ptr(s))
-              neigh->active_family_tree_by_neighbor(active_neighbors,elem);
-            else
-              neigh->active_family_tree_by_topological_neighbor
-                (active_neighbors,elem,*_mesh,*point_locator,_periodic_bcs);
+                if (neigh == elem->neighbor_ptr(s))
+                  neigh->active_family_tree_by_neighbor(active_neighbors,elem);
+                else
+                  neigh->active_family_tree_by_topological_neighbor
+                    (active_neighbors,elem,*_mesh,*point_locator,_periodic_bcs);
 #else
-            active_neighbors.clear();
-            active_neighbors.push_back(neigh);
+                active_neighbors.clear();
+                active_neighbors.push_back(neigh);
 #endif
 
-            for (std::size_t a=0; a != active_neighbors.size(); ++a)
-              {
-                const Elem * neighbor = active_neighbors[a];
+                for (std::size_t a=0; a != active_neighbors.size(); ++a)
+                  {
+                    const Elem * neighbor = active_neighbors[a];
 
-                if (neighbor->processor_id() != p)
-                  coupled_elements.insert
-                    (std::make_pair(neighbor, _dof_coupling));
+                    if (!elements_checked.count(neighbor))
+                      next_elements_to_check.insert(neighbor);
+
+                    if (neighbor->processor_id() != p)
+                      coupled_elements.insert
+                        (std::make_pair(neighbor, _dof_coupling));
+                  }
               }
-          }
+        }
     }
 }
 
