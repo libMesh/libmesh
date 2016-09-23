@@ -468,8 +468,10 @@ void DofMap::reinit(MeshBase & mesh)
   _default_coupling->set_dof_coupling(this->_dof_coupling);
 
   // By default we may want 0 or 1 levels of coupling
+  unsigned int standard_n_levels =
+    this->use_coupled_neighbor_dofs(mesh);
   _default_coupling->set_n_levels
-    (this->use_coupled_neighbor_dofs(mesh));
+    (std::max(_default_coupling->n_levels(), standard_n_levels));
 
   _default_evaluating->set_dof_coupling(this->_dof_coupling);
 
