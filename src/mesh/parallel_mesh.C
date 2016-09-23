@@ -1349,14 +1349,14 @@ void DistributedMesh::delete_remote_elements()
 {
 #ifdef DEBUG
   // Make sure our neighbor links are all fine
-  //MeshTools::libmesh_assert_valid_neighbors(*this);
+  MeshTools::libmesh_assert_valid_neighbors(*this);
 
   // And our child/parent links, and our flags
-  //MeshTools::libmesh_assert_valid_refinement_tree(*this);
+  MeshTools::libmesh_assert_valid_refinement_tree(*this);
 
   // Make sure our ids and flags are consistent
-  //this->libmesh_assert_valid_parallel_ids();
-  //this->libmesh_assert_valid_parallel_flags();
+  this->libmesh_assert_valid_parallel_ids();
+  this->libmesh_assert_valid_parallel_flags();
 
   libmesh_assert_equal_to (this->n_nodes(), this->parallel_n_nodes());
   libmesh_assert_equal_to (this->n_elem(), this->parallel_n_elem());

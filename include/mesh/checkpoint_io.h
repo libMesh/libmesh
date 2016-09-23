@@ -113,12 +113,20 @@ public:
 
   /**
    * Get/Set the processor_id to use
+   *
+   * This is used for m->n parallel checkpoint file writing:
+   * You can force CheckpointIO to view the world as if it is on a particular
+   * processor_id by setting it here
    */
   const processor_id_type & current_processor_id() const { return _my_processor_id; }
   processor_id_type & current_processor_id() { return _my_processor_id; }
 
   /**
    * Get/Set the n_processors to use
+   *
+   * This is used for m->n parallel checkpoint file writing:
+   * You can force CheckpointIO to view the world as if it contains this number of
+   * processors by setting it here
    */
   const processor_id_type & current_n_processors() const { return _my_n_processors; }
   processor_id_type & current_n_processors() { return _my_n_processors; }
@@ -212,6 +220,8 @@ private:
   bool _parallel;
   std::string _version;
   unsigned int _mesh_dimension;
+
+  /// These are sets of IDs to make the lookup for boundary conditions simpler
   std::set<largest_id_type> _local_elements;
   std::set<largest_id_type> _nodes_connected_to_local_elements;
 
