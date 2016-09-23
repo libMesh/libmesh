@@ -185,7 +185,7 @@ DofMap::DofMap(const unsigned int number,
 
   _default_evaluating->set_periodic_boundaries(_periodic_boundaries);
   _default_evaluating->set_mesh(&_mesh);
-  _default_evaluating->set_coupled_neighbor_dofs(true);
+  _default_evaluating->set_n_levels(1);
   this->add_algebraic_ghosting_functor(*_default_evaluating);
 }
 
@@ -466,7 +466,9 @@ void DofMap::reinit(MeshBase & mesh)
   // The user might have removed it from our coupling functors set,
   // but if so, who cares, this reconfiguration is cheap.
   _default_coupling->set_dof_coupling(this->_dof_coupling);
-  _default_coupling->set_coupled_neighbor_dofs
+
+  // By default we may want 0 or 1 levels of coupling
+  _default_coupling->set_n_levels
     (this->use_coupled_neighbor_dofs(mesh));
 
   _default_evaluating->set_dof_coupling(this->_dof_coupling);
@@ -858,7 +860,7 @@ void DofMap::clear()
   // Go back to default coupling
 
   _default_coupling->set_dof_coupling(this->_dof_coupling);
-  _default_coupling->set_coupled_neighbor_dofs
+  _default_coupling->set_n_levels
     (this->use_coupled_neighbor_dofs(this->_mesh));
 
   this->add_coupling_functor(*_default_coupling);
@@ -879,7 +881,7 @@ void DofMap::clear()
   // Go back to default send_list generation
 
   _default_evaluating->set_dof_coupling(this->_dof_coupling);
-  _default_evaluating->set_coupled_neighbor_dofs(true);
+  _default_evaluating->set_n_levels(1);
   this->add_algebraic_ghosting_functor(*_default_evaluating);
   }
 

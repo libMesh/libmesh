@@ -47,20 +47,20 @@ public:
    */
   DefaultCoupling() :
     _dof_coupling(libmesh_nullptr),
-    _couple_neighbor_dofs(false),
 #ifdef LIBMESH_ENABLE_PERIODIC
     _periodic_bcs(libmesh_nullptr),
 #endif
-    _mesh(libmesh_nullptr)
+    _mesh(libmesh_nullptr),
+    _n_levels(0)
  {}
 
   // Change coupling matrix after construction
   void set_dof_coupling(const CouplingMatrix * dof_coupling)
   { _dof_coupling = dof_coupling; }
 
-  // Decide whether to couple to neighbors after construction
-  void set_coupled_neighbor_dofs(bool couple_neighbor_dofs)
-  { _couple_neighbor_dofs = couple_neighbor_dofs; }
+  // Change number of levels of neighbors to couple.
+  void set_n_levels(unsigned int n_levels)
+  { _n_levels = n_levels; }
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   // Set PeriodicBoundaries to couple
@@ -102,11 +102,11 @@ public:
 private:
 
   const CouplingMatrix * _dof_coupling;
-  bool _couple_neighbor_dofs;
 #ifdef LIBMESH_ENABLE_PERIODIC
   const PeriodicBoundaries * _periodic_bcs;
 #endif
   const MeshBase * _mesh;
+  unsigned int _n_levels;
 };
 
 } // namespace libMesh
