@@ -280,6 +280,10 @@ public:
   std::set<GhostingFunctor *>::const_iterator coupling_functors_end() const
   { return _coupling_functors.end(); }
 
+  /**
+   * Default coupling functor
+   */
+  DefaultCoupling & default_coupling() { return *_default_coupling; }
 
   /**
    * Adds a functor which can specify algebraic ghosting requirements
@@ -312,6 +316,10 @@ public:
   std::set<GhostingFunctor *>::const_iterator algebraic_ghosting_functors_end() const
   { return _algebraic_ghosting_functors.end(); }
 
+  /**
+   * Default algebraic ghosting functor
+   */
+  DefaultCoupling & default_algebraic_ghosting() { return *_default_evaluating; }
 
   /**
    * Attach an object to use to populate the
@@ -1415,12 +1423,16 @@ private:
   /**
    * The default coupling GhostingFunctor, used to implement standard
    * libMesh sparsity pattern construction.
+   *
+   * We use a UniquePtr here to reduce header dependencies.
    */
   UniquePtr<DefaultCoupling> _default_coupling;
 
   /**
    * The default algebraic GhostingFunctor, used to implement standard
    * libMesh send_list construction.
+   *
+   * We use a UniquePtr here to reduce header dependencies.
    */
   UniquePtr<DefaultCoupling> _default_evaluating;
 
