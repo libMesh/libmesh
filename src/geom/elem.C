@@ -1038,10 +1038,10 @@ Elem * Elem::topological_neighbor (const unsigned int i,
             const Elem * const cn = pb->neighbor(*j, point_locator, this, i);
             neighbor_i = const_cast<Elem *>(cn);
 
-	    // Since coarse elements do not have more refined
-	    // neighbors we need to make sure that we don't return one
-	    // of these types of neighbors.
-	    if (neighbor_i)
+            // Since coarse elements do not have more refined
+            // neighbors we need to make sure that we don't return one
+            // of these types of neighbors.
+            if (neighbor_i)
               while (level() < neighbor_i->level())
                 neighbor_i = neighbor_i->parent();
             return neighbor_i;
@@ -1076,10 +1076,10 @@ const Elem * Elem::topological_neighbor (const unsigned int i,
           {
             neighbor_i = pb->neighbor(*j, point_locator, this, i);
 
-	    // Since coarse elements do not have more refined
-	    // neighbors we need to make sure that we don't return one
-	    // of these types of neighbors.
-	    if (neighbor_i)
+            // Since coarse elements do not have more refined
+            // neighbors we need to make sure that we don't return one
+            // of these types of neighbors.
+            if (neighbor_i)
               while (level() < neighbor_i->level())
                 neighbor_i = neighbor_i->parent();
             return neighbor_i;

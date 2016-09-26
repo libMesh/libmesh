@@ -1910,7 +1910,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
     {
       const processor_id_type procdown =
         cast_int<processor_id_type>
-	((mesh.comm().size() + mesh.comm().rank() - p) %
+        ((mesh.comm().size() + mesh.comm().rank() - p) %
          mesh.comm().size());
 
       std::vector<std::pair<dof_id_type, processor_id_type> >

@@ -138,8 +138,8 @@ void Build::handle_vi_vj
               row = &nonlocal_pattern[ig];
             }
 
-	  // If the row is empty we will add *all*
-	  // the element j DOFs, so just do that.
+          // If the row is empty we will add *all*
+          // the element j DOFs, so just do that.
           if (row->empty())
             {
               row->insert(row->end(),

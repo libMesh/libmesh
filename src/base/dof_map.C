@@ -1607,8 +1607,8 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 
           // Try to find a cached list of column variables.
           std::map<const CouplingMatrix*,
-		   std::vector<unsigned int> >::const_iterator
-	    column_variable_list =
+                   std::vector<unsigned int> >::const_iterator
+            column_variable_list =
               column_variable_lists.find(ghost_coupling);
 
           // If we didn't find it, then we need to create it.
@@ -1616,16 +1616,16 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
             {
               std::pair<
                 std::map<const CouplingMatrix*,
-		         std::vector<unsigned int> >::iterator,
+                         std::vector<unsigned int> >::iterator,
                 bool>
-		inserted_variable_list_pair =
+                inserted_variable_list_pair =
                 column_variable_lists.insert
                   (std::pair<const CouplingMatrix*,
                              std::vector<unsigned int> >
-		    (ghost_coupling, std::vector<unsigned int>()));
+                    (ghost_coupling, std::vector<unsigned int>()));
               column_variable_list = inserted_variable_list_pair.first;
 
-	      std::vector<unsigned int> & new_variable_list =
+              std::vector<unsigned int> & new_variable_list =
                 inserted_variable_list_pair.first->second;
 
               std::vector<unsigned char> has_variable(n_var, false);
@@ -1649,7 +1649,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
                 }
             }
 
-	  const std::vector<unsigned int> & variable_list =
+          const std::vector<unsigned int> & variable_list =
             column_variable_list->second;
 
           for (unsigned int j=0; j != variable_list.size(); ++j)
