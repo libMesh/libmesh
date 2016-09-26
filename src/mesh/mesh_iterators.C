@@ -127,6 +127,10 @@ namespace libMesh
 // still warn about empty macro arguments.
 #define EMPTY
 
+// Use a second macro layer to allow us to pass commas into a macro
+// argument
+#define LIBMESH_COMMA ,
+
 // Instantiate various element iterator accessor functions.
 INSTANTIATE_ELEM_ACCESSORS(elements,                        NotNull,              EMPTY,                          EMPTY)
 INSTANTIATE_ELEM_ACCESSORS(active_elements,                 Active,               EMPTY,                          EMPTY)
@@ -150,8 +154,11 @@ INSTANTIATE_ELEM_ACCESSORS(active_type_elements,            ActiveType,         
 INSTANTIATE_ELEM_ACCESSORS(active_pid_elements,             ActivePID,            processor_id_type proc_id,      proc_id)
 INSTANTIATE_ELEM_ACCESSORS(active_subdomain_elements,       ActiveSubdomain,      subdomain_id_type subdomain_id, subdomain_id)
 INSTANTIATE_ELEM_ACCESSORS(ghost_elements,                  Ghost,                EMPTY,                          this->processor_id())
+INSTANTIATE_ELEM_ACCESSORS(evaluable_elements,              Evaluable,            const DofMap & dof_map LIBMESH_COMMA unsigned int var_num, this->processor_id(), dof_map, var_num)
 INSTANTIATE_ELEM_ACCESSORS(unpartitioned_elements,          PID,                  EMPTY,                          DofObject::invalid_processor_id)
 INSTANTIATE_ELEM_ACCESSORS(active_unpartitioned_elements,   ActivePID,            EMPTY,                          DofObject::invalid_processor_id)
+INSTANTIATE_ELEM_ACCESSORS(flagged_elements,                Flagged,              unsigned char rflag,            rflag)
+INSTANTIATE_ELEM_ACCESSORS(flagged_pid_elements,            FlaggedPID,           unsigned char rflag LIBMESH_COMMA processor_id_type pid,    rflag, pid)
 INSTANTIATE_ELEM_ACCESSORS(local_level_elements,            LocalLevel,           unsigned int level,             this->processor_id(), level)
 INSTANTIATE_ELEM_ACCESSORS(local_not_level_elements,        LocalNotLevel,        unsigned int level,             this->processor_id(), level)
 INSTANTIATE_ELEM_ACCESSORS(active_local_subdomain_elements, ActiveLocalSubdomain, subdomain_id_type subdomain_id, this->processor_id(), subdomain_id)

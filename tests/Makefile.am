@@ -12,6 +12,7 @@ unit_tests_sources = \
   driver.C \
   test_comm.h \
   base/dof_object_test.h \
+  base/default_coupling_test.C \
   base/getpot_test.C \
   base/auto_ptr_test.C \
   geom/node_test.C \

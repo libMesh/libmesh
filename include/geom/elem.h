@@ -303,7 +303,7 @@ public:
   bool has_topological_neighbor (const Elem * elem,
                                  const MeshBase & mesh,
                                  const PointLocatorBase & point_locator,
-                                 PeriodicBoundaries * pb) const;
+                                 const PeriodicBoundaries * pb) const;
 #endif
 
   /**
@@ -1128,6 +1128,19 @@ public:
   void active_family_tree_by_neighbor (std::vector<const Elem *> & family,
                                        const Elem * neighbor,
                                        const bool reset=true) const;
+
+  /**
+   * Same as the \p active_family_tree_by_neighbor() member, but the
+   * \p neighbor here may be a topological (e.g. periodic boundary
+   * condition) neighbor, not just a local neighbor.
+   */
+  void active_family_tree_by_topological_neighbor
+    (std::vector<const Elem *> & family,
+     const Elem * neighbor,
+     const MeshBase & mesh,
+     const PointLocatorBase & point_locator,
+     const PeriodicBoundaries * pb,
+     const bool reset=true) const;
 
   /**
    * Returns the value of the refinement flag for the element.

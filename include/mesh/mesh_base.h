@@ -703,26 +703,25 @@ public:
    * this function; the GhostingFunctor lifetime is expected to extend
    * until either the functor is removed or the Mesh is destructed.
    */
-  void add_ghosting_functor(GhostingFunctor *ghosting_functor)
-  { _ghosting_functors.insert(ghosting_functor); }
+  void add_ghosting_functor(GhostingFunctor & ghosting_functor)
+  { _ghosting_functors.insert(&ghosting_functor); }
 
   /**
    * Removes a functor which was previously added to the set of
    * ghosting functors.
    */
-  void remove_ghosting_functor(GhostingFunctor *ghosting_functor)
-  { _ghosting_functors.erase(ghosting_functor); }
+  void remove_ghosting_functor(GhostingFunctor & ghosting_functor);
 
   /**
    * Beginning of range of ghosting functors
    */
-  std::set<GhostingFunctor *>::iterator ghosting_functors_begin()
+  std::set<GhostingFunctor *>::const_iterator ghosting_functors_begin() const
   { return _ghosting_functors.begin(); }
 
   /**
    * End of range of ghosting functors
    */
-  std::set<GhostingFunctor *>::iterator ghosting_functors_end()
+  std::set<GhostingFunctor *>::const_iterator ghosting_functors_end() const
   { return _ghosting_functors.end(); }
 
   /**
@@ -971,6 +970,45 @@ public:
   virtual element_iterator ghost_elements_end () = 0;
   virtual const_element_iterator ghost_elements_begin () const = 0;
   virtual const_element_iterator ghost_elements_end () const = 0;
+
+  /**
+   * Iterate over elements in the Mesh where the solution (as
+   * distributed by the given DofMap) can be evaluated, for the given
+   * variable var_num, or for all variables by default.
+   */
+  virtual element_iterator evaluable_elements_begin
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) = 0;
+  virtual element_iterator evaluable_elements_end
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) = 0;
+  virtual const_element_iterator evaluable_elements_begin
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) const = 0;
+  virtual const_element_iterator evaluable_elements_end
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) const = 0;
+
+  /**
+   * Iterate over all elements with a specified refinement flag.
+   */
+  virtual element_iterator flagged_elements_begin (unsigned char rflag) = 0;
+  virtual element_iterator flagged_elements_end (unsigned char rflag) = 0;
+  virtual const_element_iterator flagged_elements_begin (unsigned char rflag) const = 0;
+  virtual const_element_iterator flagged_elements_end (unsigned char rflag) const = 0;
+
+  /**
+   * Iterate over all elements with a specified refinement flag on a
+   * specified processor.
+   */
+  virtual element_iterator flagged_pid_elements_begin (unsigned char rflag,
+                                                       processor_id_type pid) = 0;
+  virtual element_iterator flagged_pid_elements_end (unsigned char rflag,
+                                                     processor_id_type pid) = 0;
+  virtual const_element_iterator flagged_pid_elements_begin (unsigned char rflag,
+                                                             processor_id_type pid) const = 0;
+  virtual const_element_iterator flagged_pid_elements_end (unsigned char rflag,
+                                                           processor_id_type pid) const = 0;
 
   /**
    * Active, local, and negation forms of the element iterators described above.

@@ -156,10 +156,19 @@ public:
 
   /**
    * GhostingFunctor subclasses which cache data will need to
-   * initialize that cache.  We call reinit() whenever the relevant
-   * Mesh or DofMap has changed.
+   * initialize that cache.  We call mesh_reinit() whenever the
+   * relevant Mesh has changed, but before remote elements on a
+   * distributed mesh are deleted.
    */
-  virtual void reinit () {};
+  virtual void mesh_reinit () {};
+
+  /**
+   * For algebraic ghosting or coupling functors we also call
+   * dofmap_reinit() later, after dofs have been distributed on the
+   * new mesh but before the functors have been queried for send_list
+   * or sparsity pattern calculations.
+   */
+  virtual void dofmap_reinit () {};
 
   /**
    * GhostingFunctor subclasses with relatively long-lasting caches

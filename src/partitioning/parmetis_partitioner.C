@@ -198,6 +198,8 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
 void ParmetisPartitioner::initialize (const MeshBase & mesh,
                                       const unsigned int n_sbdmns)
 {
+  LOG_SCOPE("initialize()", "ParmetisPartitioner");
+
   const dof_id_type n_active_local_elem = mesh.n_active_local_elem();
 
   // Set parameters.
@@ -288,7 +290,9 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
         for (dof_id_type cnt=0; it != end; ++it)
           {
             const Elem * elem = *it;
-            libmesh_assert (!_global_index_by_pid_map.count(elem->id()));
+            // vectormap::count forces a sort, which is too expensive
+            // in a loop
+            // libmesh_assert (!_global_index_by_pid_map.count(elem->id()));
             libmesh_assert_less (cnt, global_index.size());
             libmesh_assert_less (global_index[cnt], _n_active_elem_on_proc[pid]);
 
@@ -312,7 +316,9 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
       for (dof_id_type cnt=0; it != end; ++it)
         {
           const Elem * elem = *it;
-          libmesh_assert (!global_index_map.count(elem->id()));
+          // vectormap::count forces a sort, which is too expensive
+          // in a loop
+          // libmesh_assert (!global_index_map.count(elem->id()));
           libmesh_assert_less (cnt, global_index.size());
           libmesh_assert_less (global_index[cnt], n_active_elem);
 
@@ -405,6 +411,8 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
 
 void ParmetisPartitioner::build_graph (const MeshBase & mesh)
 {
+  LOG_SCOPE("build_graph()", "ParmetisPartitioner");
+
   // build the graph in distributed CSR format.  Note that
   // the edges in the graph will correspond to
   // face neighbors
@@ -627,11 +635,17 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
 
 void ParmetisPartitioner::assign_partitioning (MeshBase & mesh)
 {
+  LOG_SCOPE("assign_partitioning()", "ParmetisPartitioner");
+
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
   const dof_id_type
     first_local_elem = _pmetis->vtxdist[mesh.processor_id()];
+
+#ifndef NDEBUG
+  const dof_id_type n_active_local_elem = mesh.n_active_local_elem();
+#endif
 
   std::vector<std::vector<dof_id_type> >
     requested_ids(mesh.n_processors()),
@@ -677,7 +691,7 @@ void ParmetisPartitioner::assign_partitioning (MeshBase & mesh)
             global_index_by_pid - first_local_elem;
 
           libmesh_assert_less (local_index, _pmetis->part.size());
-          libmesh_assert_less (local_index, mesh.n_active_local_elem());
+          libmesh_assert_less (local_index, n_active_local_elem);
 
           const unsigned int elem_procid =
             static_cast<unsigned int>(_pmetis->part[local_index]);

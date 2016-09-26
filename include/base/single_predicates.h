@@ -20,16 +20,20 @@
 
 // Local includes
 #include <cstddef>         // for NULL with gcc 4.6.2 - I'm serious!
+#include "libmesh/libmesh_common.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/id_types.h"
-#include "libmesh/boundary_info.h"
 
 // C++ includes
-#include <cstddef>
 #include <vector>
 
 namespace libMesh
 {
+
+// Forward declarations
+class BoundaryInfo;
+class DofMap;
+
 
 /**
  * This file declares several predicates in the Predicates namespace.  They
@@ -184,10 +188,7 @@ struct bid : predicate<T>
   virtual ~bid() {}
 
   // op()
-  virtual bool operator()(const T & it) const libmesh_override
-  {
-    return _bndry_info.has_boundary_id(*it, _bid);
-  }
+  virtual bool operator()(const T & it) const libmesh_override;
 
 protected:
   virtual predicate<T> * clone() const libmesh_override { return new bid<T>(*this); }
@@ -208,10 +209,7 @@ struct bnd : predicate<T>
   virtual ~bnd() {}
 
   // op()
-  virtual bool operator()(const T & it) const libmesh_override
-  {
-    return (_bndry_info.n_boundary_ids(*it) > 0);
-  }
+  virtual bool operator()(const T & it) const libmesh_override;
 
 protected:
   virtual predicate<T> * clone() const libmesh_override { return new bnd<T>(*this); }
@@ -283,9 +281,9 @@ protected:
 };
 
 
-// The elem_type predicate returns true if the pointers
-// type matches the given type.  Of course, this one can only
-// be instantiated for objects which return Elem pointers when dereferened.
+// The elem_type predicate returns true if the pointers type matches
+// the given type.  Of course, this one can only be instantiated for
+// objects which return Elem pointers when dereferenced.
 template <typename T>
 struct elem_type : predicate<T>
 {
@@ -299,6 +297,27 @@ protected:
   virtual predicate<T> * clone() const libmesh_override { return new elem_type<T>(*this); }
   const ElemType _elem_type;
 };
+
+
+
+// The flagged predicate returns true if the pointers refinement flag
+// matches the given rflag.  Of course, this one can only be
+// instantiated for objects which return Elem pointers when
+// dereferenced.
+template <typename T>
+struct flagged : predicate<T>
+{
+  // Constructor
+  flagged (unsigned char rflag) : _rflag(rflag) {}
+  virtual ~flagged() {}
+
+  virtual bool operator()(const T & it) const libmesh_override { return (*it)->refinement_flag() == _rflag; }
+
+protected:
+  virtual predicate<T> * clone() const libmesh_override { return new flagged<T>(*this); }
+  const unsigned char _rflag;
+};
+
 
 
 
@@ -389,7 +408,30 @@ protected:
   const subdomain_id_type _subdomain;
 };
 
-}
+
+// The evaluable predicate returns true if the pointer (which must be
+// a local element) has degrees of freedom which can be evaluated for
+// the specified DofMap and variable.
+template <typename T>
+struct evaluable : predicate<T>
+{
+  // Constructor
+  evaluable(const DofMap & dof_map,
+            unsigned int var_num) :
+            _dof_map(dof_map), _var_num(var_num) {}
+  virtual ~evaluable() {}
+
+  // op()
+  virtual bool operator()(const T & it) const libmesh_override;
+
+protected:
+  virtual predicate<T> * clone() const libmesh_override { return new evaluable<T>(*this); }
+  const DofMap & _dof_map;
+  unsigned int _var_num;
+};
+
+
+} // namespace Predicates
 
 
 } // namespace libMesh

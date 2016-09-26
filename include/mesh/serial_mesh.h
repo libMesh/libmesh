@@ -354,6 +354,33 @@ public:
   virtual const_element_iterator ghost_elements_begin () const libmesh_override;
   virtual const_element_iterator ghost_elements_end () const libmesh_override;
 
+  virtual element_iterator evaluable_elements_begin
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) libmesh_override;
+  virtual element_iterator evaluable_elements_end
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) libmesh_override;
+  virtual const_element_iterator evaluable_elements_begin
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) const libmesh_override;
+  virtual const_element_iterator evaluable_elements_end
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) const libmesh_override;
+
+  virtual element_iterator flagged_elements_begin (unsigned char rflag);
+  virtual element_iterator flagged_elements_end (unsigned char rflag);
+  virtual const_element_iterator flagged_elements_begin (unsigned char rflag) const;
+  virtual const_element_iterator flagged_elements_end (unsigned char rflag) const;
+
+  virtual element_iterator flagged_pid_elements_begin (unsigned char rflag,
+                                                       processor_id_type pid);
+  virtual element_iterator flagged_pid_elements_end (unsigned char rflag,
+                                                     processor_id_type pid);
+  virtual const_element_iterator flagged_pid_elements_begin (unsigned char rflag,
+                                                             processor_id_type pid) const;
+  virtual const_element_iterator flagged_pid_elements_end (unsigned char rflag,
+                                                           processor_id_type pid) const;
+
   /**
    * Node iterator accessor functions.
    */

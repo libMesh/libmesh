@@ -46,9 +46,7 @@
 //
 // In order to implement the interface condition, we need to augment
 // the matrix sparsity pattern, which is handled by the class
-// AugmentSparsityPatternOnInterface. (We do not need to augment the
-// send-list in this case since the PDE is linear and hence there is
-// no need to broadcast non-local solution values).
+// AugmentSparsityPatternOnInterface.
 
 
 // C++ include files that we need
@@ -57,7 +55,7 @@
 
 // libMesh includes
 #include "libmesh/libmesh.h"
-#include "libmesh/serial_mesh.h"
+#include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/exodusII_io.h"
@@ -93,7 +91,7 @@ using namespace libMesh;
  * Assemble the system matrix and rhs vector.
  */
 void assemble_poisson(EquationSystems & es,
-                      const ElementIdMap & lower_to_upper);
+                      const ElementSideMap & lower_to_upper);
 
 // The main program.
 int main (int argc, char ** argv)
@@ -118,10 +116,7 @@ int main (int argc, char ** argv)
   if (command_line.search(1, "-R"))
     R = command_line.next(R);
 
-  // Maintaining the right ghost elements on a ParallelMesh is
-  // trickier.
-  SerialMesh mesh(init.comm());
-  mesh.read("miscellaneous_ex9.exo");
+  Mesh mesh(init.comm());
 
   EquationSystems equation_systems (mesh);
 
@@ -146,10 +141,15 @@ int main (int argc, char ** argv)
 
   // Attach an object to the DofMap that will augment the sparsity pattern
   // due to the degrees-of-freedom on the "crack"
-  AugmentSparsityOnInterface augment_sparsity(equation_systems,
-                                              CRACK_BOUNDARY_LOWER,
-                                              CRACK_BOUNDARY_UPPER);
-  system.get_dof_map().attach_extra_sparsity_object(augment_sparsity);
+  //
+  // By attaching this object *before* reading our mesh, we also
+  // ensure that the connected elements will not be deleted on a
+  // distributed mesh.
+  AugmentSparsityOnInterface augment_sparsity
+    (mesh, CRACK_BOUNDARY_LOWER, CRACK_BOUNDARY_UPPER);
+  system.get_dof_map().add_coupling_functor(augment_sparsity);
+
+  mesh.read("miscellaneous_ex9.exo");
 
   equation_systems.init();
   equation_systems.print_info();
@@ -168,11 +168,41 @@ int main (int argc, char ** argv)
                                              equation_systems);
 #endif
 
+#ifdef LIBMESH_ENABLE_AMR
+  // Possibly solve on a refined mesh next.
+  MeshRefinement mesh_refinement (mesh);
+  unsigned int n_refinements = 0;
+  if (command_line.search("-n_refinements"))
+    n_refinements = command_line.next(0);
+
+  for (unsigned int r = 0; r != n_refinements; ++r)
+    {
+      std::cout << "Refining the mesh" << std::endl;
+
+      mesh_refinement.uniformly_refine ();
+      equation_systems.reinit();
+
+      assemble_poisson(equation_systems,
+                       augment_sparsity.get_lower_to_upper());
+      system.solve();
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+      // Plot the refined solution
+      std::ostringstream out;
+      out << "solution_" << r << ".exo";
+      ExodusII_IO (mesh).write_equation_systems (out.str(),
+                                                 equation_systems);
+#endif
+
+    }
+
+#endif
+
   return 0;
 }
 
 void assemble_poisson(EquationSystems & es,
-                      const ElementIdMap & lower_to_upper)
+                      const ElementSideMap & lower_to_upper)
 {
   const MeshBase & mesh = es.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();
@@ -265,10 +295,11 @@ void assemble_poisson(EquationSystems & es,
                 {
                   fe_elem_face->reinit(elem, side);
 
-                  ElementIdMap::const_iterator ltu_it =
-                    lower_to_upper.find(std::make_pair(elem->id(), side));
-                  dof_id_type upper_elem_id = ltu_it->second;
-                  const Elem * neighbor = mesh.elem_ptr(upper_elem_id);
+                  ElementSideMap::const_iterator ltu_it =
+                    lower_to_upper.find(std::make_pair(elem, side));
+                  libmesh_assert(ltu_it != lower_to_upper.end());
+
+                  const Elem * neighbor = ltu_it->second;
 
                   std::vector<Point> qface_neighbor_points;
                   FEInterface::inverse_map (elem->dim(), fe->get_fe_type(),

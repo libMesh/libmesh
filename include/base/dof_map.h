@@ -30,6 +30,7 @@
 #include "libmesh/threads.h"
 #include "libmesh/threads_allocators.h"
 #include "libmesh/elem_range.h"
+#include "libmesh/ghosting_functor.h"
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/point.h"
@@ -47,6 +48,7 @@ namespace libMesh
 
 // Forward Declarations
 class CouplingMatrix;
+class DefaultCoupling;
 class DirichletBoundary;
 class DirichletBoundaries;
 class DofMap;
@@ -173,7 +175,7 @@ public:
    */
   explicit
   DofMap(const unsigned int sys_number,
-         const ParallelObject & parent_decomp);
+         MeshBase & mesh);
 
   /**
    * Destructor.
@@ -243,6 +245,81 @@ public:
    * Clears the sparsity pattern
    */
   void clear_sparsity();
+
+  /**
+   * Adds a functor which can specify coupling requirements for
+   * creation of sparse matrices.
+   * Degree of freedom pairs which match the elements and variables
+   * returned by these functors will be added to the sparsity pattern,
+   * and the degrees of freedom which live on other processors will be
+   * added to the send_list for use on ghosted vectors, and the
+   * elements which live on other processors will be ghosted on a
+   * distributed mesh.
+   *
+   * GhostingFunctor memory must be managed by the code which calls
+   * this function; the GhostingFunctor lifetime is expected to extend
+   * until either the functor is removed or the DofMap is destructed.
+   */
+  void add_coupling_functor(GhostingFunctor & coupling_functor);
+
+  /**
+   * Removes a functor which was previously added to the set of
+   * coupling functors.
+   */
+  void remove_coupling_functor(GhostingFunctor & coupling_functor);
+
+  /**
+   * Beginning of range of coupling functors
+   */
+  std::set<GhostingFunctor *>::const_iterator coupling_functors_begin() const
+  { return _coupling_functors.begin(); }
+
+  /**
+   * End of range of coupling functors
+   */
+  std::set<GhostingFunctor *>::const_iterator coupling_functors_end() const
+  { return _coupling_functors.end(); }
+
+  /**
+   * Default coupling functor
+   */
+  DefaultCoupling & default_coupling() { return *_default_coupling; }
+
+  /**
+   * Adds a functor which can specify algebraic ghosting requirements
+   * for use with distributed vectors.  Degrees of freedom on other
+   * processors which match the elements and variables returned by
+   * these functors will be added to the send_list, and the elements
+   * on other processors will be ghosted on a distributed mesh.
+   *
+   * GhostingFunctor memory must be managed by the code which calls
+   * this function; the GhostingFunctor lifetime is expected to extend
+   * until either the functor is removed or the DofMap is destructed.
+   */
+  void add_algebraic_ghosting_functor(GhostingFunctor & ghosting_functor);
+
+  /**
+   * Removes a functor which was previously added to the set of
+   * algebraic ghosting functors.
+   */
+  void remove_algebraic_ghosting_functor(GhostingFunctor & ghosting_functor);
+
+  /**
+   * Beginning of range of algebraic ghosting functors
+   */
+  std::set<GhostingFunctor *>::const_iterator algebraic_ghosting_functors_begin() const
+  { return _algebraic_ghosting_functors.begin(); }
+
+  /**
+   * End of range of algebraic ghosting functors
+   */
+  std::set<GhostingFunctor *>::const_iterator algebraic_ghosting_functors_end() const
+  { return _algebraic_ghosting_functors.end(); }
+
+  /**
+   * Default algebraic ghosting functor
+   */
+  DefaultCoupling & default_algebraic_ghosting() { return *_default_evaluating; }
 
   /**
    * Attach an object to use to populate the
@@ -542,6 +619,14 @@ public:
    * enough information for O(1) right now.
    */
   bool all_semilocal_indices (const std::vector<dof_id_type> & dof_indices) const;
+
+  /**
+   * @returns \p true iff our solutions can be locally evaluated on \p
+   * elem for variable number \p var_num (for all variables, if \p
+   * var_num is invalid_uint)
+   */
+  bool is_evaluable(const Elem & elem,
+                    unsigned int var_num = libMesh::invalid_uint) const;
 
   /**
    * Allow the implicit_neighbor_dofs flag to be set programmatically.
@@ -1177,6 +1262,19 @@ private:
   void distribute_local_dofs_node_major (dof_id_type & next_free_dof,
                                          MeshBase & mesh);
 
+  /*
+   * A utility method for obtaining a set of elements to ghost along
+   * with merged coupling matrices.
+   */
+  static void merge_ghost_functor_outputs
+    (GhostingFunctor::map_type & elements_to_ghost,
+     std::set<CouplingMatrix*> & temporary_coupling_matrices,
+     const std::set<GhostingFunctor *>::iterator & gf_begin,
+     const std::set<GhostingFunctor *>::iterator & gf_end,
+     const MeshBase::const_element_iterator & elems_begin,
+     const MeshBase::const_element_iterator & elems_end,
+     processor_id_type p);
+
   /**
    * Adds entries to the \p _send_list vector corresponding to DoFs
    * on elements neighboring the current processor.
@@ -1257,6 +1355,11 @@ private:
   const unsigned int _sys_number;
 
   /**
+   * The mesh that system uses.
+   */
+  MeshBase & _mesh;
+
+  /**
    * Additional matrices handled by this object.  These pointers do @e
    * not handle the memory, instead, \p System, who
    * told \p DofMap about them, owns them.
@@ -1316,6 +1419,45 @@ private:
    * A pointer associcated with the extra send list that can optionally be passed in
    */
   void * _extra_send_list_context;
+
+  /**
+   * The default coupling GhostingFunctor, used to implement standard
+   * libMesh sparsity pattern construction.
+   *
+   * We use a UniquePtr here to reduce header dependencies.
+   */
+  UniquePtr<DefaultCoupling> _default_coupling;
+
+  /**
+   * The default algebraic GhostingFunctor, used to implement standard
+   * libMesh send_list construction.
+   *
+   * We use a UniquePtr here to reduce header dependencies.
+   */
+  UniquePtr<DefaultCoupling> _default_evaluating;
+
+  /**
+   * The list of all GhostingFunctor objects to be used when
+   * distributing ghosted vectors.
+   *
+   * The library should automatically copy these functors to the
+   * MeshBase, too, so any algebraically ghosted dofs will live on
+   * geometrically ghosted elements.
+   */
+  std::set<GhostingFunctor *> _algebraic_ghosting_functors;
+
+  /**
+   * The list of all GhostingFunctor objects to be used when
+   * coupling degrees of freedom in matrix sparsity patterns.
+   *
+   * These objects will *also* be used as algebraic ghosting functors,
+   * but not vice-versa.
+   *
+   * The library should automatically copy these functors to the
+   * MeshBase, too, so any dofs coupled to local dofs will live on
+   * geometrically ghosted elements.
+   */
+  std::set<GhostingFunctor *> _coupling_functors;
 
   /**
    * Default false; set to true if any attached matrix requires a full

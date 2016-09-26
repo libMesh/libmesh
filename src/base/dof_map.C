@@ -24,6 +24,7 @@
 
 // Local Includes -----------------------------------
 #include "libmesh/coupling_matrix.h"
+#include "libmesh/default_coupling.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector_base.h"
 #include "libmesh/dirichlet_boundaries.h"
@@ -32,6 +33,7 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_base.h" // FEBase::build() for continuity test
+#include "libmesh/ghosting_functor.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_tools.h"
@@ -83,6 +85,7 @@ DofMap::build_sparsity (const MeshBase & mesh) const
     (new SparsityPattern::Build (mesh,
                                  *this,
                                  this->_dof_coupling,
+                                 this->_coupling_functors,
                                  implicit_neighbor_dofs,
                                  need_full_sparsity_pattern));
 
@@ -124,12 +127,13 @@ DofMap::build_sparsity (const MeshBase & mesh) const
 
 
 DofMap::DofMap(const unsigned int number,
-               const ParallelObject & parent_decomp) :
-  ParallelObject (parent_decomp),
+               MeshBase & mesh) :
+  ParallelObject (mesh.comm()),
   _dof_coupling(libmesh_nullptr),
   _variables(),
   _variable_groups(),
   _sys_number(number),
+  _mesh(mesh),
   _matrices(),
   _first_df(),
   _end_df(),
@@ -141,6 +145,8 @@ DofMap::DofMap(const unsigned int number,
   _augment_send_list(libmesh_nullptr),
   _extra_send_list_function(libmesh_nullptr),
   _extra_send_list_context(libmesh_nullptr),
+  _default_coupling(new DefaultCoupling()),
+  _default_evaluating(new DefaultCoupling()),
   need_full_sparsity_pattern(false),
   _n_nz(libmesh_nullptr),
   _n_oz(libmesh_nullptr),
@@ -172,6 +178,15 @@ DofMap::DofMap(const unsigned int number,
   _implicit_neighbor_dofs(false)
 {
   _matrices.clear();
+
+  _default_coupling->set_periodic_boundaries(_periodic_boundaries);
+  _default_coupling->set_mesh(&_mesh);
+  this->add_coupling_functor(*_default_coupling);
+
+  _default_evaluating->set_periodic_boundaries(_periodic_boundaries);
+  _default_evaluating->set_mesh(&_mesh);
+  _default_evaluating->set_n_levels(1);
+  this->add_algebraic_ghosting_functor(*_default_evaluating);
 }
 
 
@@ -180,6 +195,12 @@ DofMap::DofMap(const unsigned int number,
 DofMap::~DofMap()
 {
   this->clear();
+
+  // clear() resets all but the default DofMap-based functors.  We
+  // need to remove those from the mesh too before we die.
+  _mesh.remove_ghosting_functor(*_default_coupling);
+  _mesh.remove_ghosting_functor(*_default_evaluating);
+
 #ifdef LIBMESH_ENABLE_PERIODIC
   delete _periodic_boundaries;
 #endif
@@ -439,6 +460,20 @@ void DofMap::reinit(MeshBase & mesh)
   libmesh_assert (mesh.is_prepared());
 
   LOG_SCOPE("reinit()", "DofMap");
+
+  // We ought to reconfigure our default coupling functor.
+  //
+  // The user might have removed it from our coupling functors set,
+  // but if so, who cares, this reconfiguration is cheap.
+  _default_coupling->set_dof_coupling(this->_dof_coupling);
+
+  // By default we may want 0 or 1 levels of coupling
+  unsigned int standard_n_levels =
+    this->use_coupled_neighbor_dofs(mesh);
+  _default_coupling->set_n_levels
+    (std::max(_default_coupling->n_levels(), standard_n_levels));
+
+  _default_evaluating->set_dof_coupling(this->_dof_coupling);
 
   const unsigned int
     sys_num      = this->sys_number(),
@@ -807,6 +842,50 @@ void DofMap::clear()
   // the coupling matrix!
   // It should not change...
   //_dof_coupling->clear();
+  //
+  // But it would be inconsistent to leave our coupling settings
+  // through a clear()...
+  _dof_coupling = NULL;
+
+  // Reset ghosting functor statuses
+  {
+  std::set<GhostingFunctor *>::iterator        gf_it = this->coupling_functors_begin();
+  const std::set<GhostingFunctor *>::iterator gf_end = this->coupling_functors_end();
+  for (; gf_it != gf_end; ++gf_it)
+    {
+      GhostingFunctor *gf = *gf_it;
+      libmesh_assert(gf);
+      _mesh.remove_ghosting_functor(*gf);
+    }
+  this->_coupling_functors.clear();
+
+  // Go back to default coupling
+
+  _default_coupling->set_dof_coupling(this->_dof_coupling);
+  _default_coupling->set_n_levels
+    (this->use_coupled_neighbor_dofs(this->_mesh));
+
+  this->add_coupling_functor(*_default_coupling);
+  }
+
+
+  {
+  std::set<GhostingFunctor *>::iterator        gf_it = this->algebraic_ghosting_functors_begin();
+  const std::set<GhostingFunctor *>::iterator gf_end = this->algebraic_ghosting_functors_end();
+  for (; gf_it != gf_end; ++gf_it)
+    {
+      GhostingFunctor *gf = *gf_it;
+      libmesh_assert(gf);
+      _mesh.remove_ghosting_functor(*gf);
+    }
+  this->_algebraic_ghosting_functors.clear();
+
+  // Go back to default send_list generation
+
+  _default_evaluating->set_dof_coupling(this->_dof_coupling);
+  _default_evaluating->set_n_levels(1);
+  this->add_algebraic_ghosting_functor(*_default_evaluating);
+  }
 
   _variables.clear();
   _variable_groups.clear();
@@ -988,6 +1067,29 @@ void DofMap::distribute_dofs (MeshBase & mesh)
         _first_scalar_df[v] = current_SCALAR_dof_index;
         current_SCALAR_dof_index += this->variable(v).type().order.get_order();
       }
+
+  // Allow our GhostingFunctor objects to reinit if necessary
+  {
+    std::set<GhostingFunctor *>::iterator        gf_it = this->algebraic_ghosting_functors_begin();
+    const std::set<GhostingFunctor *>::iterator gf_end = this->algebraic_ghosting_functors_end();
+    for (; gf_it != gf_end; ++gf_it)
+      {
+        GhostingFunctor *gf = *gf_it;
+        libmesh_assert(gf);
+        gf->dofmap_reinit();
+      }
+  }
+
+  {
+    std::set<GhostingFunctor *>::iterator        gf_it = this->coupling_functors_begin();
+    const std::set<GhostingFunctor *>::iterator gf_end = this->coupling_functors_end();
+    for (; gf_it != gf_end; ++gf_it)
+      {
+        GhostingFunctor *gf = *gf_it;
+        libmesh_assert(gf);
+        gf->dofmap_reinit();
+      }
+  }
 
   // Note that in the add_neighbors_to_send_list nodes on processor
   // boundaries that are shared by multiple elements are added for
@@ -1389,149 +1491,185 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
 
 
 
+void DofMap::merge_ghost_functor_outputs
+  (GhostingFunctor::map_type & elements_to_ghost,
+   std::set<CouplingMatrix*> & temporary_coupling_matrices,
+   const std::set<GhostingFunctor *>::iterator & gf_begin,
+   const std::set<GhostingFunctor *>::iterator & gf_end,
+   const MeshBase::const_element_iterator & elems_begin,
+   const MeshBase::const_element_iterator & elems_end,
+   processor_id_type p)
+{
+  std::set<GhostingFunctor *>::iterator gf_it = gf_begin;
+  for (; gf_it != gf_end; ++gf_it)
+    {
+      GhostingFunctor::map_type more_elements_to_ghost;
+
+      GhostingFunctor *gf = *gf_it;
+      libmesh_assert(gf);
+      (*gf)(elems_begin, elems_end, p, more_elements_to_ghost);
+
+      GhostingFunctor::map_type::iterator        metg_it = more_elements_to_ghost.begin();
+      const GhostingFunctor::map_type::iterator metg_end = more_elements_to_ghost.end();
+      for (; metg_it != metg_end; ++metg_it)
+        {
+          GhostingFunctor::map_type::iterator existing_it =
+            elements_to_ghost.find (metg_it->first);
+          if (existing_it == elements_to_ghost.end())
+            elements_to_ghost.insert(*metg_it);
+          else
+            {
+              if (existing_it->second)
+                {
+                  if (metg_it->second)
+                    {
+                      // If this isn't already a temporary
+                      // then we need to make one so we'll
+                      // have a non-const matrix to merge
+                      if (temporary_coupling_matrices.empty() ||
+                          temporary_coupling_matrices.find
+                            (const_cast<CouplingMatrix*>(existing_it->second)) ==
+                          temporary_coupling_matrices.end())
+                        {
+                          CouplingMatrix *cm = new CouplingMatrix(*existing_it->second);
+                          temporary_coupling_matrices.insert(cm);
+                          existing_it->second = cm;
+                        }
+                      const_cast<CouplingMatrix&>(*existing_it->second) &= *metg_it->second;
+                    }
+                }
+              else
+                existing_it->second = metg_it->second;
+            }
+        }
+    }
+}
+
+
+
 void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
 {
   LOG_SCOPE("add_neighbors_to_send_list()", "DofMap");
 
-  const unsigned int sys_num = this->sys_number();
-
-  //-------------------------------------------------------------------------
-  // We need to add the DOFs from elements that live on neighboring processors
-  // that are neighbors of the elements on the local processor
-  //-------------------------------------------------------------------------
+  const unsigned int n_var  = this->n_variables();
 
   MeshBase::const_element_iterator       local_elem_it
     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator local_elem_end
     = mesh.active_local_elements_end();
 
-  std::vector<bool> node_on_processor(mesh.max_node_id(), false);
-  std::vector<dof_id_type> di;
-  std::vector<const Elem *> family;
+  GhostingFunctor::map_type elements_to_send;
 
-  // Loop over the active local elements, adding all active elements
-  // that neighbor an active local element to the send list.
-  for ( ; local_elem_it != local_elem_end; ++local_elem_it)
+  // Man, I wish we had guaranteed unique_ptr availability...
+  std::set<CouplingMatrix*> temporary_coupling_matrices;
+
+  // We need to add dofs to the send list if they've been directly
+  // requested by an algebraic ghosting functor or they've been
+  // indirectly requested by a coupling functor.
+  this->merge_ghost_functor_outputs
+    (elements_to_send,
+     temporary_coupling_matrices,
+     this->algebraic_ghosting_functors_begin(),
+     this->algebraic_ghosting_functors_end(),
+     local_elem_it, local_elem_end, mesh.processor_id());
+
+  this->merge_ghost_functor_outputs
+    (elements_to_send,
+     temporary_coupling_matrices,
+     this->coupling_functors_begin(),
+     this->coupling_functors_end(),
+     local_elem_it, local_elem_end, mesh.processor_id());
+
+  // Making a list of non-zero coupling matrix columns is an
+  // O(N_var^2) operation.  We cache it so we only have to do it once
+  // per CouplingMatrix and not once per element.
+  std::map<const CouplingMatrix*, std::vector<unsigned int> >
+    column_variable_lists;
+
+  GhostingFunctor::map_type::iterator        etg_it = elements_to_send.begin();
+  const GhostingFunctor::map_type::iterator etg_end = elements_to_send.end();
+  for (; etg_it != etg_end; ++etg_it)
     {
-      const Elem * elem = *local_elem_it;
+      const Elem * const partner = etg_it->first;
 
-      // We may have non-local SCALAR dofs on a local element.
-      // Normally we'd catch those on neighboring elements, but it's
-      // possible that the neighbors are of different subdomains and
-      // the SCALAR isn't supported on them.
-      for (unsigned int v=0; v<this->n_variables(); v++)
-        if(this->variable(v).type().family == SCALAR &&
-           this->variable(v).active_on_subdomain(elem->subdomain_id()))
-          {
-            // We asked for this variable, so add it to the vector.
-            std::vector<dof_id_type> di_new;
-            this->SCALAR_dof_indices(di_new,v);
-            for (unsigned int i=0; i != di_new.size(); ++i)
-              {
-                const dof_id_type dof_index = di_new[i];
+      // We asked ghosting functors not to give us local elements
+      libmesh_assert_not_equal_to
+        (partner->processor_id(), this->processor_id());
 
-                if (dof_index < this->first_dof() ||
-                    dof_index >= this->end_dof())
-                  _send_list.push_back(dof_index);
-              }
-          }
+      const CouplingMatrix *ghost_coupling = etg_it->second;
 
-      // We may have non-local nodes on a local element.
-      for (unsigned int n=0; n!=elem->n_nodes(); n++)
+      // Loop over any present coupling matrix column variables if we
+      // have a coupling matrix, or just add all variables to
+      // send_list if not.
+      if (ghost_coupling)
         {
-          // Flag all the nodes of active local elements as seen, so
-          // we can add nodal neighbor dofs to the send_list later.
-          node_on_processor[elem->node_id(n)] = true;
+          libmesh_assert_equal_to (ghost_coupling->size(), n_var);
 
-          // Add all remote dofs on these nodes to the send_list.
-          // This is necessary in case those dofs are *not* also dofs
-          // on neighbors; e.g. in the case of a HIERARCHIC's local
-          // side which is only a vertex on the neighbor that owns it.
-          const Node & node = elem->node_ref(n);
-          const unsigned n_vars = node.n_vars(sys_num);
-          for (unsigned int v=0; v != n_vars; ++v)
+          // Try to find a cached list of column variables.
+          std::map<const CouplingMatrix*,
+		   std::vector<unsigned int> >::const_iterator
+	    column_variable_list =
+              column_variable_lists.find(ghost_coupling);
+
+          // If we didn't find it, then we need to create it.
+          if (column_variable_list == column_variable_lists.end())
             {
-              const unsigned int n_comp = node.n_comp(sys_num, v);
-              for (unsigned int c=0; c != n_comp; ++c)
+              std::pair<
+                std::map<const CouplingMatrix*,
+		         std::vector<unsigned int> >::iterator,
+                bool>
+		inserted_variable_list_pair =
+                column_variable_lists.insert
+                  (std::pair<const CouplingMatrix*,
+                             std::vector<unsigned int> >
+		    (ghost_coupling, std::vector<unsigned int>()));
+              column_variable_list = inserted_variable_list_pair.first;
+
+	      std::vector<unsigned int> & new_variable_list =
+                inserted_variable_list_pair.first->second;
+
+              std::vector<unsigned char> has_variable(n_var, false);
+
+              for (unsigned int vi = 0; vi != n_var; ++vi)
                 {
-                  const dof_id_type dof_index = node.dof_number(sys_num, v, c);
-                  if (dof_index < this->first_dof() || dof_index >= this->end_dof())
+                  ConstCouplingRow ccr(vi, *ghost_coupling);
+
+                  for (ConstCouplingRow::const_iterator  it = ccr.begin(),
+                                                        end = ccr.end();
+                       it != end; ++it)
                     {
-                      _send_list.push_back(dof_index);
-                      // libmesh_here();
-                      // libMesh::out << "sys_num,v,c,dof_index="
-                      // << sys_num << ", "
-                      // << v << ", "
-                      // << c << ", "
-                      // << dof_index << '\n';
-                      // node.debug_buffer();
+                      const unsigned int vj = *it;
+                      has_variable[vj] = true;
                     }
                 }
+              for (unsigned int vj = 0; vj != n_var; ++vj)
+                {
+                  if (has_variable[vj])
+                    new_variable_list.push_back(vj);
+                }
+            }
+
+	  const std::vector<unsigned int> & variable_list =
+            column_variable_list->second;
+
+          for (unsigned int j=0; j != variable_list.size(); ++j)
+            {
+              const unsigned int vj=variable_list[j];
+
+              std::vector<dof_id_type> di;
+              this->dof_indices (partner, di, vj);
+
+              // Insert the remote DOF indices into the send list
+              for (std::size_t j=0; j != di.size(); ++j)
+                if (di[j] < this->first_dof() ||
+                    di[j] >= this->end_dof())
+                  _send_list.push_back(di[j]);
             }
         }
-
-      // Loop over the neighbors of those elements
-      for (unsigned int s=0; s<elem->n_neighbors(); s++)
-        if (elem->neighbor_ptr(s) != libmesh_nullptr)
-          {
-            family.clear();
-
-            // Find all the active elements that neighbor elem
-#ifdef LIBMESH_ENABLE_AMR
-            if (!elem->neighbor_ptr(s)->active())
-              elem->neighbor_ptr(s)->active_family_tree_by_neighbor(family, elem);
-            else
-#endif
-              family.push_back(elem->neighbor_ptr(s));
-
-            for (dof_id_type i=0; i!=family.size(); ++i)
-              // If the neighbor lives on a different processor
-              if (family[i]->processor_id() != this->processor_id())
-                {
-                  // Get the DOF indices for this neighboring element
-                  this->dof_indices (family[i], di);
-
-                  // Insert the remote DOF indices into the send list
-                  for (std::size_t j=0; j != di.size(); ++j)
-                    if (di[j] < this->first_dof() ||
-                        di[j] >= this->end_dof())
-                      _send_list.push_back(di[j]);
-                }
-          }
-    }
-
-  // Now loop over all non_local active elements and add any missing
-  // nodal-only neighbors.  This will also get any dofs from nonlocal
-  // nodes on local elements, because every nonlocal node exists on a
-  // nonlocal nodal neighbor element.
-  MeshBase::const_element_iterator       elem_it
-    = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator elem_end
-    = mesh.active_elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
-    {
-      const Elem * elem = *elem_it;
-
-      // If this is one of our elements, we've already added it
-      if (elem->processor_id() == this->processor_id())
-        continue;
-
-      // Do we need to add the element DOFs?
-      bool add_elem_dofs = false;
-
-      // Check all the nodes of the element to see if it
-      // shares a node with us
-      for (unsigned int n=0; n!=elem->n_nodes(); n++)
-        if (node_on_processor[elem->node_id(n)])
-          add_elem_dofs = true;
-
-      // Add the element degrees of freedom if it shares at
-      // least one node.
-      if (add_elem_dofs)
+      else
         {
-          // Get the DOF indices for this neighboring element
-          this->dof_indices (elem, di);
+          std::vector<dof_id_type> di;
+          this->dof_indices (partner, di);
 
           // Insert the remote DOF indices into the send list
           for (std::size_t j=0; j != di.size(); ++j)
@@ -1539,6 +1677,36 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
                 di[j] >= this->end_dof())
               _send_list.push_back(di[j]);
         }
+
+    }
+
+  // We're now done with any merged coupling matrices we had to create.
+  for (std::set<CouplingMatrix*>::iterator
+         it  = temporary_coupling_matrices.begin(),
+         end = temporary_coupling_matrices.begin();
+       it != end; ++it)
+    delete *it;
+
+  //-------------------------------------------------------------------------
+  // Our coupling functors added dofs from neighboring elements to the
+  // send list, but we may still need to add non-local dofs from local
+  // elements.
+  //-------------------------------------------------------------------------
+
+  // Loop over the active local elements, adding all active elements
+  // that neighbor an active local element to the send list.
+  for ( ; local_elem_it != local_elem_end; ++local_elem_it)
+    {
+      const Elem * elem = *local_elem_it;
+
+      std::vector<dof_id_type> di;
+      this->dof_indices (elem, di);
+
+      // Insert the remote DOF indices into the send list
+      for (std::size_t j=0; j != di.size(); ++j)
+        if (di[j] < this->first_dof() ||
+            di[j] >= this->end_dof())
+          _send_list.push_back(di[j]);
     }
 }
 
@@ -1698,6 +1866,45 @@ void DofMap::clear_sparsity()
     }
   _n_nz = libmesh_nullptr;
   _n_oz = libmesh_nullptr;
+}
+
+
+
+void DofMap::add_coupling_functor
+  (GhostingFunctor & coupling_functor)
+{
+  _coupling_functors.insert(&coupling_functor);
+  _mesh.add_ghosting_functor(coupling_functor);
+}
+
+
+
+void DofMap::remove_coupling_functor
+  (GhostingFunctor & coupling_functor)
+{
+  libmesh_assert(_coupling_functors.count(&coupling_functor));
+  _coupling_functors.erase(&coupling_functor);
+  _mesh.remove_ghosting_functor(coupling_functor);
+}
+
+
+
+void DofMap::add_algebraic_ghosting_functor
+  (GhostingFunctor & algebraic_ghosting_functor)
+{
+  _algebraic_ghosting_functors.insert(&algebraic_ghosting_functor);
+  _mesh.add_ghosting_functor(algebraic_ghosting_functor);
+}
+
+
+
+void DofMap::remove_algebraic_ghosting_functor
+  (GhostingFunctor & algebraic_ghosting_functor)
+{
+  libmesh_assert(_algebraic_ghosting_functors.count
+                   (&algebraic_ghosting_functor));
+  _algebraic_ghosting_functors.erase(&algebraic_ghosting_functor);
+  _mesh.remove_ghosting_functor(algebraic_ghosting_functor);
 }
 
 
@@ -2128,6 +2335,40 @@ bool DofMap::all_semilocal_indices (const std::vector<dof_id_type> & dof_indices
 }
 
 
+bool DofMap::is_evaluable(const Elem & elem,
+                          unsigned int var_num) const
+{
+  // Everything is evaluable on a local element
+  if (elem.processor_id() == this->processor_id())
+    return true;
+
+  std::vector<dof_id_type> di;
+
+  if (var_num == libMesh::invalid_uint)
+    this->dof_indices(&elem, di);
+  else
+    this->dof_indices(&elem, di, var_num);
+
+  // We're all semilocal unless we find a counterexample
+  for (std::size_t i=0; i != di.size(); ++i)
+    {
+      const dof_id_type dof_id = di[i];
+      // If it's not in the local indices
+      if (dof_id < this->first_dof() ||
+          dof_id >= this->end_dof())
+        {
+          // and if it's not in the ghost indices, then we're not
+          // evaluable
+          if (!std::binary_search(_send_list.begin(), _send_list.end(), dof_id))
+            return false;
+        }
+    }
+
+  return true;
+}
+
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
 void DofMap::old_dof_indices (const Elem * const elem,
@@ -2421,641 +2662,6 @@ void DofMap::find_connected_dofs (std::vector<dof_id_type> & elem_dofs) const
 }
 
 #endif // LIBMESH_ENABLE_CONSTRAINTS
-
-
-
-#if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
-
-void SparsityPattern::_dummy_function(void)
-{
-}
-
-#endif
-
-
-
-void SparsityPattern::Build::operator()(const ConstElemRange & range)
-{
-  // Compute the sparsity structure of the global matrix.  This can be
-  // fed into a PetscMatrix to allocate exacly the number of nonzeros
-  // necessary to store the matrix.  This algorithm should be linear
-  // in the (# of elements)*(# nodes per element)
-  const processor_id_type proc_id           = mesh.processor_id();
-  const dof_id_type n_dofs_on_proc    = dof_map.n_dofs_on_processor(proc_id);
-  const dof_id_type first_dof_on_proc = dof_map.first_dof(proc_id);
-  const dof_id_type end_dof_on_proc   = dof_map.end_dof(proc_id);
-
-  sparsity_pattern.resize(n_dofs_on_proc);
-
-  // If the user did not explicitly specify the DOF coupling
-  // then all the DOFS are coupled to each other.  Furthermore,
-  // we can take a shortcut and do this more quickly here.  So
-  // we use an if-test.
-  if ((dof_coupling == libmesh_nullptr) || (dof_coupling->empty()))
-    {
-      std::vector<dof_id_type>
-        element_dofs,
-        neighbor_dofs,
-        dofs_to_add;
-
-      std::vector<const Elem *> active_neighbors;
-
-      for (ConstElemRange::const_iterator elem_it = range.begin() ; elem_it != range.end(); ++elem_it)
-        {
-          const Elem * const elem = *elem_it;
-
-          // Get the global indices of the DOFs with support on this element
-          dof_map.dof_indices (elem, element_dofs);
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-          dof_map.find_connected_dofs (element_dofs);
-#endif
-
-          // We can be more efficient if we sort the element DOFs
-          // into increasing order
-          std::sort(element_dofs.begin(), element_dofs.end());
-
-          const unsigned int n_dofs_on_element =
-            cast_int<unsigned int>(element_dofs.size());
-
-          for (unsigned int i=0; i<n_dofs_on_element; i++)
-            {
-              const dof_id_type ig = element_dofs[i];
-
-              SparsityPattern::Row * row;
-
-              // We save non-local row components for now so we can
-              // communicate them to other processors later.
-
-              if ((ig >= first_dof_on_proc) &&
-                  (ig <  end_dof_on_proc))
-                {
-                  // This is what I mean
-                  // libmesh_assert_greater_equal ((ig - first_dof_on_proc), 0);
-                  // but do the test like this because ig and
-                  // first_dof_on_proc are unsigned ints
-                  libmesh_assert_greater_equal (ig, first_dof_on_proc);
-                  libmesh_assert_less ((ig - first_dof_on_proc), sparsity_pattern.size());
-
-                  row = &sparsity_pattern[ig - first_dof_on_proc];
-                }
-              else
-                {
-                  row = &nonlocal_pattern[ig];
-                }
-
-              // If the row is empty we will add *all* the element DOFs,
-              // so just do that.
-              if (row->empty())
-                {
-                  row->insert(row->end(),
-                              element_dofs.begin(),
-                              element_dofs.end());
-                }
-              else
-                {
-                  // Build a list of the DOF indices not found in the
-                  // sparsity pattern
-                  dofs_to_add.clear();
-
-                  // Cache iterators.  Low will move forward, subsequent
-                  // searches will be on smaller ranges
-                  SparsityPattern::Row::iterator
-                    low  = std::lower_bound (row->begin(), row->end(), element_dofs.front()),
-                    high = std::upper_bound (low,          row->end(), element_dofs.back());
-
-                  for (unsigned int j=0; j<n_dofs_on_element; j++)
-                    {
-                      const dof_id_type jg = element_dofs[j];
-
-                      // See if jg is in the sorted range
-                      std::pair<SparsityPattern::Row::iterator,
-                                SparsityPattern::Row::iterator>
-                        pos = std::equal_range (low, high, jg);
-
-                      // Must add jg if it wasn't found
-                      if (pos.first == pos.second)
-                        dofs_to_add.push_back(jg);
-
-                      // pos.first is now a valid lower bound for any
-                      // remaining element DOFs. (That's why we sorted them.)
-                      // Use it for the next search
-                      low = pos.first;
-                    }
-
-                  // Add to the sparsity pattern
-                  if (!dofs_to_add.empty())
-                    {
-                      const std::size_t old_size = row->size();
-
-                      row->insert (row->end(),
-                                   dofs_to_add.begin(),
-                                   dofs_to_add.end());
-
-                      SparsityPattern::sort_row
-                        (row->begin(), row->begin()+old_size, row->end());
-                    }
-                }
-
-              // Now (possibly) add dofs from neighboring elements
-              // TODO:[BSK] optimize this like above!
-              if (implicit_neighbor_dofs)
-                for (unsigned int s=0; s<elem->n_sides(); s++)
-                  if (elem->neighbor_ptr(s) != libmesh_nullptr)
-                    {
-                      const Elem * const neighbor_0 = elem->neighbor_ptr(s);
-#ifdef LIBMESH_ENABLE_AMR
-                      neighbor_0->active_family_tree_by_neighbor(active_neighbors,elem);
-#else
-                      active_neighbors.clear();
-                      active_neighbors.push_back(neighbor_0);
-#endif
-
-                      for (std::size_t a=0; a != active_neighbors.size(); ++a)
-                        {
-                          const Elem * neighbor = active_neighbors[a];
-
-                          dof_map.dof_indices (neighbor, neighbor_dofs);
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-                          dof_map.find_connected_dofs (neighbor_dofs);
-#endif
-                          const std::size_t n_dofs_on_neighbor = neighbor_dofs.size();
-
-                          for (std::size_t j=0; j<n_dofs_on_neighbor; j++)
-                            {
-                              const dof_id_type jg = neighbor_dofs[j];
-
-                              // See if jg is in the sorted range
-                              std::pair<SparsityPattern::Row::iterator,
-                                        SparsityPattern::Row::iterator>
-                                pos = std::equal_range (row->begin(), row->end(), jg);
-
-                              // Insert jg if it wasn't found
-                              if (pos.first == pos.second)
-                                row->insert (pos.first, jg);
-                            }
-                        }
-                    }
-            }
-        }
-    }
-
-  // This is what we do in the case that the user has specified
-  // explicit DOF coupling.
-  else
-    {
-      libmesh_assert(dof_coupling);
-      libmesh_assert_equal_to (dof_coupling->size(),
-                               dof_map.n_variables());
-
-      const unsigned int n_var = dof_map.n_variables();
-
-      std::vector<dof_id_type>
-        element_dofs_i,
-        element_dofs_j,
-        neighbor_dofs_j,
-        dofs_to_add;
-
-
-      std::vector<const Elem *> active_neighbors;
-      for (ConstElemRange::const_iterator elem_it = range.begin() ; elem_it != range.end(); ++elem_it)
-        for (unsigned int vi=0; vi<n_var; vi++)
-          {
-            const Elem * const elem = *elem_it;
-
-            // Find element dofs for variable vi
-            dof_map.dof_indices (elem, element_dofs_i, vi);
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-            dof_map.find_connected_dofs (element_dofs_i);
-#endif
-
-            // We can be more efficient if we sort the element DOFs
-            // into increasing order
-            std::sort(element_dofs_i.begin(), element_dofs_i.end());
-            const unsigned int n_dofs_on_element_i =
-              cast_int<unsigned int>(element_dofs_i.size());
-
-            ConstCouplingRow ccr(vi, *dof_coupling);
-            ConstCouplingRow::const_iterator end = ccr.end();
-            for (ConstCouplingRow::const_iterator it = ccr.begin(); it != end; ++it)
-              {
-                unsigned int vj = *it;
-
-                // Find element dofs for variable vj, note that
-                // if vi==vj we already have the dofs.
-                if (vi != vj)
-                  {
-                    dof_map.dof_indices (elem, element_dofs_j, vj);
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-                    dof_map.find_connected_dofs (element_dofs_j);
-#endif
-
-                    // We can be more efficient if we sort the element DOFs
-                    // into increasing order
-                    std::sort (element_dofs_j.begin(), element_dofs_j.end());
-                  }
-                else
-                  element_dofs_j = element_dofs_i;
-
-                const unsigned int n_dofs_on_element_j =
-                  cast_int<unsigned int>(element_dofs_j.size());
-
-                // there might be 0 dofs for the other variable on the same element (when subdomain variables do not overlap) and that's when we do not do anything
-                if (n_dofs_on_element_j > 0)
-                  {
-                    for (unsigned int i=0; i<n_dofs_on_element_i; i++)
-                      {
-                        const dof_id_type ig = element_dofs_i[i];
-
-                        SparsityPattern::Row * row;
-
-                        // We save non-local row components for now so we can
-                        // communicate them to other processors later.
-
-                        if ((ig >= first_dof_on_proc) &&
-                            (ig <  end_dof_on_proc))
-                          {
-                            // This is what I mean
-                            // libmesh_assert_greater_equal ((ig - first_dof_on_proc), 0);
-                            // but do the test like this because ig and
-                            // first_dof_on_proc are unsigned ints
-                            libmesh_assert_greater_equal (ig, first_dof_on_proc);
-                            libmesh_assert_less (ig, (sparsity_pattern.size() +
-                                                      first_dof_on_proc));
-
-                            row = &sparsity_pattern[ig - first_dof_on_proc];
-                          }
-                        else
-                          {
-                            row = &nonlocal_pattern[ig];
-                          }
-
-                        // If the row is empty we will add *all* the element j DOFs,
-                        // so just do that.
-                        if (row->empty())
-                          {
-                            row->insert(row->end(),
-                                        element_dofs_j.begin(),
-                                        element_dofs_j.end());
-                          }
-                        else
-                          {
-                            // Build a list of the DOF indices not found in the
-                            // sparsity pattern
-                            dofs_to_add.clear();
-
-                            // Cache iterators.  Low will move forward, subsequent
-                            // searches will be on smaller ranges
-                            SparsityPattern::Row::iterator
-                              low  = std::lower_bound
-                              (row->begin(), row->end(), element_dofs_j.front()),
-                              high = std::upper_bound
-                              (low,          row->end(), element_dofs_j.back());
-
-                            for (unsigned int j=0; j<n_dofs_on_element_j; j++)
-                              {
-                                const dof_id_type jg = element_dofs_j[j];
-
-                                // See if jg is in the sorted range
-                                std::pair<SparsityPattern::Row::iterator,
-                                          SparsityPattern::Row::iterator>
-                                  pos = std::equal_range (low, high, jg);
-
-                                // Must add jg if it wasn't found
-                                if (pos.first == pos.second)
-                                  dofs_to_add.push_back(jg);
-
-                                // pos.first is now a valid lower bound for any
-                                // remaining element j DOFs. (That's why we sorted them.)
-                                // Use it for the next search
-                                low = pos.first;
-                              }
-
-                            // Add to the sparsity pattern
-                            if (!dofs_to_add.empty())
-                              {
-                                const std::size_t old_size = row->size();
-
-                                row->insert (row->end(),
-                                             dofs_to_add.begin(),
-                                             dofs_to_add.end());
-
-                                SparsityPattern::sort_row
-                                  (row->begin(), row->begin()+old_size,
-                                   row->end());
-                              }
-                          }
-                        // Now (possibly) add dofs from neighboring elements
-                        // TODO:[BSK] optimize this like above!
-                        if (implicit_neighbor_dofs)
-                          for (unsigned int s=0; s<elem->n_sides(); s++)
-                            if (elem->neighbor_ptr(s) != libmesh_nullptr)
-                              {
-                                const Elem * const neighbor_0 = elem->neighbor_ptr(s);
-#ifdef LIBMESH_ENABLE_AMR
-                                neighbor_0->active_family_tree_by_neighbor(active_neighbors,elem);
-#else
-                                active_neighbors.clear();
-                                active_neighbors.push_back(neighbor_0);
-#endif
-
-                                for (std::size_t a=0; a != active_neighbors.size(); ++a)
-                                  {
-                                    const Elem * neighbor = active_neighbors[a];
-
-                                    dof_map.dof_indices
-                                      (neighbor, neighbor_dofs_j, vj);
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-                                    dof_map.find_connected_dofs(neighbor_dofs_j);
-#endif
-                                    const unsigned int n_dofs_on_neighbor =
-                                      cast_int<unsigned int>(neighbor_dofs_j.size());
-
-                                    for (unsigned int j=0; j<n_dofs_on_neighbor; j++)
-                                      {
-                                        const dof_id_type jg =
-                                          neighbor_dofs_j[j];
-
-                                        // See if jg is in the sorted range
-                                        std::pair<SparsityPattern::Row::iterator,
-                                                  SparsityPattern::Row::iterator>
-                                          pos = std::equal_range (row->begin(), row->end(), jg);
-
-                                        // Insert jg if it wasn't found
-                                        if (pos.first == pos.second)
-                                          row->insert (pos.first, jg);
-                                      }
-                                  }
-                              }
-                      }
-                  }
-              } // End vj loop
-          } // End vi loop
-    } // End explicit DoF coupling case
-
-  // Now a new chunk of sparsity structure is built for all of the
-  // DOFs connected to our rows of the matrix.
-
-  // If we're building a full sparsity pattern, then we've got
-  // complete rows to work with, so we can just count them from
-  // scratch.
-  if (need_full_sparsity_pattern)
-    {
-      n_nz.clear();
-      n_oz.clear();
-    }
-
-  n_nz.resize (n_dofs_on_proc, 0);
-  n_oz.resize (n_dofs_on_proc, 0);
-
-  for (dof_id_type i=0; i<n_dofs_on_proc; i++)
-    {
-      // Get the row of the sparsity pattern
-      SparsityPattern::Row & row = sparsity_pattern[i];
-
-      for (dof_id_type j=0; j<row.size(); j++)
-        if ((row[j] < first_dof_on_proc) || (row[j] >= end_dof_on_proc))
-          n_oz[i]++;
-        else
-          n_nz[i]++;
-
-      // If we're not building a full sparsity pattern, then we want
-      // to avoid overcounting these entries as much as possible.
-      if (!need_full_sparsity_pattern)
-        row.clear();
-    }
-}
-
-
-
-void SparsityPattern::Build::join (const SparsityPattern::Build & other)
-{
-  const processor_id_type proc_id           = mesh.processor_id();
-  const dof_id_type       n_global_dofs     = dof_map.n_dofs();
-  const dof_id_type       n_dofs_on_proc    = dof_map.n_dofs_on_processor(proc_id);
-  const dof_id_type       first_dof_on_proc = dof_map.first_dof(proc_id);
-  const dof_id_type       end_dof_on_proc   = dof_map.end_dof(proc_id);
-
-  libmesh_assert_equal_to (sparsity_pattern.size(), other.sparsity_pattern.size());
-  libmesh_assert_equal_to (n_nz.size(), sparsity_pattern.size());
-  libmesh_assert_equal_to (n_oz.size(), sparsity_pattern.size());
-
-  for (dof_id_type r=0; r<n_dofs_on_proc; r++)
-    {
-      // increment the number of on and off-processor nonzeros in this row
-      // (note this will be an upper bound unless we need the full sparsity pattern)
-      if (need_full_sparsity_pattern)
-        {
-          SparsityPattern::Row       & my_row    = sparsity_pattern[r];
-          const SparsityPattern::Row & their_row = other.sparsity_pattern[r];
-
-          // simple copy if I have no dofs
-          if (my_row.empty())
-            my_row = their_row;
-
-          // otherwise add their DOFs to mine, resort, and re-unique the row
-          else if (!their_row.empty()) // do nothing for the trivial case where
-            {                          // their row is empty
-              my_row.insert (my_row.end(),
-                             their_row.begin(),
-                             their_row.end());
-
-              // We cannot use SparsityPattern::sort_row() here because it expects
-              // the [begin,middle) [middle,end) to be non-overlapping.  This is not
-              // necessarily the case here, so use std::sort()
-              std::sort (my_row.begin(), my_row.end());
-
-              my_row.erase(std::unique (my_row.begin(), my_row.end()), my_row.end());
-            }
-
-          // fix the number of on and off-processor nonzeros in this row
-          n_nz[r] = n_oz[r] = 0;
-
-          for (std::size_t j=0; j<my_row.size(); j++)
-            if ((my_row[j] < first_dof_on_proc) || (my_row[j] >= end_dof_on_proc))
-              n_oz[r]++;
-            else
-              n_nz[r]++;
-        }
-      else
-        {
-          n_nz[r] += other.n_nz[r];
-          n_nz[r] = std::min(n_nz[r], n_dofs_on_proc);
-          n_oz[r] += other.n_oz[r];
-          n_oz[r] =std::min(n_oz[r], static_cast<dof_id_type>(n_global_dofs-n_nz[r]));
-        }
-    }
-
-  // Move nonlocal row information to ourselves; the other thread
-  // won't need it in the map after that.
-  NonlocalGraph::const_iterator it = other.nonlocal_pattern.begin();
-  for (; it != other.nonlocal_pattern.end(); ++it)
-    {
-#ifndef NDEBUG
-      const dof_id_type dof_id = it->first;
-
-      processor_id_type dbg_proc_id = 0;
-      while (dof_id >= dof_map.end_dof(dbg_proc_id))
-        dbg_proc_id++;
-      libmesh_assert (dbg_proc_id != this->processor_id());
-#endif
-
-      const SparsityPattern::Row & their_row = it->second;
-
-      // We should have no empty values in a map
-      libmesh_assert (!their_row.empty());
-
-      NonlocalGraph::iterator my_it = nonlocal_pattern.find(it->first);
-      if (my_it == nonlocal_pattern.end())
-        {
-          //          nonlocal_pattern[it->first].swap(their_row);
-          nonlocal_pattern[it->first] = their_row;
-        }
-      else
-        {
-          SparsityPattern::Row & my_row = my_it->second;
-
-          my_row.insert (my_row.end(),
-                         their_row.begin(),
-                         their_row.end());
-
-          // We cannot use SparsityPattern::sort_row() here because it expects
-          // the [begin,middle) [middle,end) to be non-overlapping.  This is not
-          // necessarily the case here, so use std::sort()
-          std::sort (my_row.begin(), my_row.end());
-
-          my_row.erase(std::unique (my_row.begin(), my_row.end()), my_row.end());
-        }
-    }
-}
-
-
-
-void SparsityPattern::Build::parallel_sync ()
-{
-  parallel_object_only();
-  libmesh_assert(this->comm().verify(need_full_sparsity_pattern));
-
-  const dof_id_type n_global_dofs   = dof_map.n_dofs();
-  const dof_id_type n_dofs_on_proc  = dof_map.n_dofs_on_processor(this->processor_id());
-  const dof_id_type local_first_dof = dof_map.first_dof();
-  const dof_id_type local_end_dof   = dof_map.end_dof();
-
-  // Trade sparsity rows with other processors
-  for (processor_id_type p=1; p != this->n_processors(); ++p)
-    {
-      // Push to processor procup while receiving from procdown
-      processor_id_type procup =
-        cast_int<processor_id_type>((this->processor_id() + p) %
-                                    this->n_processors());
-      processor_id_type procdown =
-        cast_int<processor_id_type>((this->n_processors() + this->processor_id() - p) %
-                                    this->n_processors());
-
-      // Pack the sparsity pattern rows to push to procup
-      std::vector<dof_id_type> pushed_row_ids,
-        pushed_row_ids_to_me;
-      std::vector<std::vector<dof_id_type> > pushed_rows,
-        pushed_rows_to_me;
-
-      // Move nonlocal row information to a structure to send it from;
-      // we don't need it in the map after that.
-      NonlocalGraph::iterator it = nonlocal_pattern.begin();
-      while (it != nonlocal_pattern.end())
-        {
-          const dof_id_type dof_id = it->first;
-          processor_id_type proc_id = 0;
-          while (dof_id >= dof_map.end_dof(proc_id))
-            proc_id++;
-
-          libmesh_assert (proc_id != this->processor_id());
-
-          if (proc_id == procup)
-            {
-              pushed_row_ids.push_back(dof_id);
-
-              // We can't just do the swap trick here, thanks to the
-              // differing vector allocators?
-              pushed_rows.push_back(std::vector<dof_id_type>());
-              pushed_rows.back().assign
-                (it->second.begin(), it->second.end());
-
-              nonlocal_pattern.erase(it++);
-            }
-          else
-            ++it;
-        }
-
-      this->comm().send_receive(procup, pushed_row_ids,
-                                procdown, pushed_row_ids_to_me);
-      this->comm().send_receive(procup, pushed_rows,
-                                procdown, pushed_rows_to_me);
-      pushed_row_ids.clear();
-      pushed_rows.clear();
-
-      const std::size_t n_rows = pushed_row_ids_to_me.size();
-      for (std::size_t i=0; i != n_rows; ++i)
-        {
-          const dof_id_type r = pushed_row_ids_to_me[i];
-          const dof_id_type my_r = r - local_first_dof;
-
-          std::vector<dof_id_type> & their_row = pushed_rows_to_me[i];
-
-          if (need_full_sparsity_pattern)
-            {
-              SparsityPattern::Row & my_row =
-                sparsity_pattern[my_r];
-
-              // They wouldn't have sent an empty row
-              libmesh_assert(!their_row.empty());
-
-              // We can end up with an empty row on a dof that touches our
-              // inactive elements but not our active ones
-              if (my_row.empty())
-                {
-                  my_row.assign (their_row.begin(),
-                                 their_row.end());
-                }
-              else
-                {
-                  my_row.insert (my_row.end(),
-                                 their_row.begin(),
-                                 their_row.end());
-
-                  // We cannot use SparsityPattern::sort_row() here because it expects
-                  // the [begin,middle) [middle,end) to be non-overlapping.  This is not
-                  // necessarily the case here, so use std::sort()
-                  std::sort (my_row.begin(), my_row.end());
-
-                  my_row.erase(std::unique (my_row.begin(), my_row.end()), my_row.end());
-                }
-
-              // fix the number of on and off-processor nonzeros in this row
-              n_nz[my_r] = n_oz[my_r] = 0;
-
-              for (std::size_t j=0; j<my_row.size(); j++)
-                if ((my_row[j] < local_first_dof) || (my_row[j] >= local_end_dof))
-                  n_oz[my_r]++;
-                else
-                  n_nz[my_r]++;
-            }
-          else
-            {
-              for (std::size_t j=0; j<their_row.size(); j++)
-                if ((their_row[j] < local_first_dof) || (their_row[j] >= local_end_dof))
-                  n_oz[my_r]++;
-                else
-                  n_nz[my_r]++;
-
-              n_nz[my_r] = std::min(n_nz[my_r], n_dofs_on_proc);
-              n_oz[my_r] = std::min(n_oz[my_r],
-                                    static_cast<dof_id_type>(n_global_dofs-n_nz[my_r]));
-            }
-        }
-    }
-
-  // We should have sent everything at this point.
-  libmesh_assert (nonlocal_pattern.empty());
-}
 
 
 

@@ -1034,12 +1034,16 @@ Elem * Elem::topological_neighbor (const unsigned int i,
           {
             // Since the point locator inside of periodic boundaries
             // returns a const pointer we will retrieve the proper
-            // pointer directly from the mesh object.  Also since coarse
-            // elements do not have more refined neighbors we need to make
-            // sure that we don't return one of these types of neighbors.
-            neighbor_i = mesh.elem_ptr(pb->neighbor(*j, point_locator, this, i)->id());
-            if (level() < neighbor_i->level())
-              neighbor_i = neighbor_i->parent();
+            // pointer directly from the mesh object.
+            const Elem * const cn = pb->neighbor(*j, point_locator, this, i);
+            neighbor_i = const_cast<Elem *>(cn);
+
+	    // Since coarse elements do not have more refined
+	    // neighbors we need to make sure that we don't return one
+	    // of these types of neighbors.
+	    if (neighbor_i)
+              while (level() < neighbor_i->level())
+                neighbor_i = neighbor_i->parent();
             return neighbor_i;
           }
     }
@@ -1070,14 +1074,14 @@ const Elem * Elem::topological_neighbor (const unsigned int i,
       for (std::vector<boundary_id_type>::iterator j = bc_ids.begin(); j != bc_ids.end(); ++j)
         if (pb->boundary(*j))
           {
-            // Since the point locator inside of periodic boundaries
-            // returns a const pointer we will retrieve the proper
-            // pointer directly from the mesh object.  Also since coarse
-            // elements do not have more refined neighbors we need to make
-            // sure that we don't return one of these types of neighbors.
-            neighbor_i = mesh.elem_ptr(pb->neighbor(*j, point_locator, this, i)->id());
-            if (level() < neighbor_i->level())
-              neighbor_i = neighbor_i->parent();
+            neighbor_i = pb->neighbor(*j, point_locator, this, i);
+
+	    // Since coarse elements do not have more refined
+	    // neighbors we need to make sure that we don't return one
+	    // of these types of neighbors.
+	    if (neighbor_i)
+              while (level() < neighbor_i->level())
+                neighbor_i = neighbor_i->parent();
             return neighbor_i;
           }
     }
@@ -1089,7 +1093,7 @@ const Elem * Elem::topological_neighbor (const unsigned int i,
 bool Elem::has_topological_neighbor (const Elem * elem,
                                      const MeshBase & mesh,
                                      const PointLocatorBase & point_locator,
-                                     PeriodicBoundaries * pb) const
+                                     const PeriodicBoundaries * pb) const
 {
   // First see if this is a normal "interior" neighbor
   if (has_neighbor(elem))
@@ -1668,8 +1672,9 @@ void Elem::active_family_tree_by_side (std::vector<const Elem *> & family,
                                        const unsigned int s,
                                        const bool reset) const
 {
-  // The "family tree" doesn't include subactive elements
+  // The "family tree" doesn't include subactive or remote elements
   libmesh_assert(!this->subactive());
+  libmesh_assert(this != remote_elem);
 
   // Clear the vector if the flag reset tells us to.
   if (reset)
@@ -1769,20 +1774,68 @@ void Elem::family_tree_by_subneighbor (std::vector<const Elem *> & family,
 
 
 
+void Elem::active_family_tree_by_topological_neighbor
+  (std::vector<const Elem *> & family,
+   const Elem * neighbor_in,
+   const MeshBase & mesh,
+   const PointLocatorBase & point_locator,
+   const PeriodicBoundaries * pb,
+   const bool reset) const
+{
+  // The "family tree" doesn't include subactive elements or
+  // remote_elements
+  libmesh_assert(!this->subactive());
+  libmesh_assert(this != remote_elem);
+
+  // Clear the vector if the flag reset tells us to.
+  if (reset)
+    family.clear();
+
+  // This only makes sense if we're already a topological neighbor
+#ifndef NDEBUG
+  if (this->level() >= neighbor_in->level())
+    libmesh_assert (this->has_topological_neighbor
+                      (neighbor_in, mesh, point_locator, pb));
+#endif
+
+  // Add an active element to the family tree.
+  if (this->active())
+    family.push_back(this);
+
+  // Or recurse into an ancestor element's children.
+  // Do not clear the vector any more.
+  else if (!this->active())
+    for (unsigned int c=0; c<this->n_children(); c++)
+      {
+        const Elem * current_child = this->child_ptr(c);
+        if (current_child != remote_elem &&
+            current_child->has_topological_neighbor
+              (neighbor_in, mesh, point_locator, pb))
+          current_child->active_family_tree_by_topological_neighbor
+            (family, neighbor_in, mesh, point_locator, pb, false);
+      }
+}
+
+
+
 void Elem::active_family_tree_by_neighbor (std::vector<const Elem *> & family,
                                            const Elem * neighbor_in,
                                            const bool reset) const
 {
-  // The "family tree" doesn't include subactive elements
+  // The "family tree" doesn't include subactive elements or
+  // remote_elements
   libmesh_assert(!this->subactive());
+  libmesh_assert(this != remote_elem);
 
   // Clear the vector if the flag reset tells us to.
   if (reset)
     family.clear();
 
   // This only makes sense if we're already a neighbor
+#ifndef NDEBUG
   if (this->level() >= neighbor_in->level())
     libmesh_assert (this->has_neighbor(neighbor_in));
+#endif
 
   // Add an active element to the family tree.
   if (this->active())

@@ -94,8 +94,12 @@ public:
    * only the elements it actually owns and any ghost elements required
    * to satisfy data dependencies. This method can be invoked after a
    * partitioning step to affect the new partitioning.
+   *
+   * Redistribution can also be done with newly coarsened elements'
+   * neighbors only.
    */
-  void redistribute (DistributedMesh &) const;
+  void redistribute (DistributedMesh & mesh,
+                     bool newly_coarsened_only = false) const;
 
   /**
    *
@@ -204,12 +208,24 @@ public:
   void make_node_proc_ids_parallel_consistent (MeshBase &);
 
   /**
+   * Assuming all processor ids on nodes touching local elements
+   * are parallel consistent, this function makes processor ids
+   * on new nodes on other processors parallel consistent as well.
+   */
+  void make_new_node_proc_ids_parallel_consistent (MeshBase &);
+
+  /**
    * Copy processor_ids and ids on ghost nodes from their
-   * local processors.  This is an internal function of MeshRefinement
-   * which turns out to be useful for other code which wants to add
+   * local processors.  This is useful for code which wants to add
    * nodes to a distributed mesh.
    */
   void make_nodes_parallel_consistent (MeshBase &);
+
+  /**
+   * Copy processor_ids and ids on new nodes from their local
+   * processors.
+   */
+  void make_new_nodes_parallel_consistent (MeshBase &);
 };
 
 

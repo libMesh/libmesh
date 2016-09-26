@@ -112,6 +112,13 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
  * an element id and local node id.
  * Data for all nodes connected to elements in the given range of
  * *element* iterators will be requested.
+ *
+ * Elements can be further excluded from the request by returning
+ * false from element_check(elem)
+ *
+ * Nodes can be further excluded from the request by returning false
+ * from node_check(elem, local_node_num)
+ *
  * Fulfill requests with
  * sync.gather_data(const std::vector<unsigned int> & ids,
  *                  std::vector<sync::datum> & data),
@@ -122,10 +129,14 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
  * The user must define Parallel::StandardType<sync::datum> if
  * sync::datum isn't a built-in type.
  */
-template <typename SyncFunctor>
+template <typename ElemCheckFunctor,
+          typename NodeCheckFunctor,
+          typename SyncFunctor>
 void sync_node_data_by_element_id(MeshBase & mesh,
                                   const MeshBase::const_element_iterator & range_begin,
                                   const MeshBase::const_element_iterator & range_end,
+                                  ElemCheckFunctor & elem_check,
+                                  NodeCheckFunctor & node_check,
                                   SyncFunctor & sync);
 
 
@@ -454,11 +465,27 @@ void sync_element_data_by_parent_id(MeshBase &,
 #endif // LIBMESH_ENABLE_AMR
 
 
-template <typename SyncFunctor>
+struct SyncEverything
+{
+  SyncEverything() {}
+
+  bool operator() (const Elem *) const { return true; }
+
+  bool operator() (const Elem *, unsigned int) const
+  { return true; }
+};
+
+
+
+template <typename ElemCheckFunctor,
+          typename NodeCheckFunctor,
+          typename SyncFunctor>
 void sync_node_data_by_element_id(MeshBase &       mesh,
                                   const MeshBase::const_element_iterator & range_begin,
                                   const MeshBase::const_element_iterator & range_end,
-                                  SyncFunctor &    sync)
+                                  const ElemCheckFunctor & elem_check,
+                                  const NodeCheckFunctor & node_check,
+                                  SyncFunctor & sync)
 {
   const Communicator & comm (mesh.comm());
 
@@ -479,8 +506,14 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
       const Elem * elem = *it;
       libmesh_assert (elem);
 
+      if (!elem_check(elem))
+        continue;
+
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
+          if (!node_check(elem, n))
+            continue;
+
           const Node & node = elem->node_ref(n);
 
           const processor_id_type proc_id = node.processor_id();
@@ -526,10 +559,16 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
       const Elem * elem = *it;
       libmesh_assert (elem);
 
+      if (!elem_check(elem))
+        continue;
+
       const dof_id_type elem_id = elem->id();
 
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
+          if (!node_check(elem, n))
+            continue;
+
           const Node & node = elem->node_ref(n);
           const dof_id_type node_id = node.id();
 
@@ -631,11 +670,11 @@ struct SyncNodalPositions
 
   // First required interface.  This function must fill up the data vector for the
   // ids specified in the ids vector.
-  void gather_data (const std::vector<dof_id_type> & ids, std::vector<datum> & data);
+  void gather_data (const std::vector<dof_id_type> & ids, std::vector<datum> & data) const;
 
   // Second required interface.  This function must do something with the data in
   // the data vector for the ids in the ids vector.
-  void act_on_data (const std::vector<dof_id_type> & ids, std::vector<datum> & data);
+  void act_on_data (const std::vector<dof_id_type> & ids, std::vector<datum> & data) const;
 
   MeshBase & mesh;
 };

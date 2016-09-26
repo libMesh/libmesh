@@ -425,15 +425,31 @@ void libmesh_assert_valid_unique_ids (const MeshBase &mesh);
 #endif
 
 /**
- * A function for verifying that processor assignment is
- * self-consistent on nodes (each node part of an active element on
- * its processor) or elements (each parent has the processor id of
- * one of its children), and verifying that assignment is consistent
- * (every processor agrees on the processor id of each dof object it
- * can see)
+ * A function for verifying that processor assignment is parallel
+ * consistent (every processor agrees on the processor id of each dof
+ * object it can see)
  */
 template <typename DofObjectSubclass>
-void libmesh_assert_valid_procids (const MeshBase & mesh);
+void libmesh_assert_parallel_consistent_procids (const MeshBase & mesh);
+
+/**
+ * A function for verifying that processor assignment is
+ * topologically consistent on nodes (each node part of an active
+ * element on its processor) or elements (each parent has the
+ * processor id of one of its children).
+ */
+template <typename DofObjectSubclass>
+void libmesh_assert_topology_consistent_procids (const MeshBase & mesh);
+
+/**
+ * A function for verifying that processor assignment is
+ * both parallel and topologically consistent.
+ */
+template <typename DofObjectSubclass>
+void libmesh_assert_valid_procids (const MeshBase & mesh) {
+  libmesh_assert_parallel_consistent_procids<DofObjectSubclass>(mesh);
+  libmesh_assert_topology_consistent_procids<DofObjectSubclass>(mesh);
+}
 
 /**
  * A function for verifying that refinement flags on elements
