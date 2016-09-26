@@ -8,6 +8,9 @@
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/numeric_vector.h>
+#include <libmesh/dof_map.h>
+#include <libmesh/elem.h>
+#include <libmesh/default_coupling.h>
 
 #include "test_comm.h"
 
@@ -25,10 +28,10 @@ using namespace libMesh;
 
 
 
-Number cubic_test (const Point& p,
-                   const Parameters&,
-                   const std::string&,
-                   const std::string&)
+Number cubic_default_coupling_test (const Point& p,
+                                    const Parameters&,
+                                    const std::string&,
+                                    const std::string&)
 {
   const Real & x = p(0);
   const Real & y = p(1);
@@ -66,7 +69,7 @@ public:
     EquationSystems es(mesh);
     System &sys = es.add_system<System> ("SimpleSystem");
     sys.add_variable("u", THIRD, HIERARCHIC);
-    dof_map.default_algebraic_ghosting().set_n_levels(3);
+    sys.get_dof_map().default_algebraic_ghosting().set_n_levels(3);
 
     const UniquePtr<Elem> test_elem = Elem::build(elem_type);
     const Real ymax = test_elem->dim() > 1;
@@ -75,19 +78,20 @@ public:
     const unsigned int nz = zmax * 15;
 
     MeshTools::Generation::build_cube (mesh,
-                                       15, ny, nz
+                                       15, ny, nz,
                                        0., 1.,
                                        0., ymax,
                                        0., zmax,
                                        elem_type);
 
     es.init();
-    sys.project_solution(cubic_test, NULL, es.parameters);
+    sys.project_solution(cubic_default_coupling_test, NULL, es.parameters);
 
     for (MeshBase::const_element_iterator elem_it  = mesh.active_local_elements_begin(),
                                           elem_end = mesh.active_local_elements_end();
          elem_it != elem_end; ++elem_it)
       {
+        const Elem * elem = *elem_it;
         for (unsigned int s1=0; s1 != elem->n_neighbors(); ++s1)
           {
             const Elem *n1 = elem->neighbor(s1);
@@ -116,7 +120,7 @@ public:
                     Point p = n3->centroid();
 
                     CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p,n3)),
-                                                 libmesh_real(cubic_test(p,es.parameters,"","")),
+                                                 libmesh_real(cubic_default_coupling_test(p,es.parameters,"","")),
                                                  TOLERANCE*TOLERANCE);
                   }
               }
