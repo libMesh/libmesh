@@ -643,7 +643,7 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = out_*.e $(example_name).html stdout.log
+CLEANFILES = out.e $(example_name).html stdout.log
 
 ######################################################################
 #
