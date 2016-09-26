@@ -109,8 +109,8 @@ void AugmentSparsityOnInterface::mesh_reinit ()
               }
           }
 
-	// For pairs with local elements, we should have found a
-	// matching pair by now.
+        // For pairs with local elements, we should have found a
+        // matching pair by now.
         const Elem * elem     = it->first.first;
         const Elem * neighbor = _lower_to_upper[it->first];
         if (min_distance < TOLERANCE)
@@ -121,9 +121,9 @@ void AugmentSparsityOnInterface::mesh_reinit ()
         else
           {
             libmesh_assert_not_equal_to(elem->processor_id(), _mesh.processor_id());
-	    // This must have a false positive; a remote element would
-	    // have been closer.
-	    _lower_to_upper.erase(it->first);
+            // This must have a false positive; a remote element would
+            // have been closer.
+            _lower_to_upper.erase(it->first);
           }
       }
 
