@@ -101,7 +101,7 @@ public:
   virtual void operator() (const MeshBase::const_element_iterator & range_begin,
                            const MeshBase::const_element_iterator & range_end,
                            processor_id_type p,
-                           map_type & coupled_elements);
+                           map_type & coupled_elements) libmesh_override;
 
 private:
 
