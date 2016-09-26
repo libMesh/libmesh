@@ -33,7 +33,7 @@ Number cubic_test (const Point& p,
   const Real & x = p(0);
   const Real & y = p(1);
   const Real & z = p(2);
-  
+
   return x*(1-x)*(1-x) + x*x*(1-y) + x*(1-y)*(1-z) + y*(1-y)*z + z*(1-z)*(1-z);
 }
 
