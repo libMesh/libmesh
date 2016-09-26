@@ -367,19 +367,19 @@ public:
     (const DofMap & dof_map,
      unsigned int var_num = libMesh::invalid_uint) const libmesh_override;
 
-  virtual element_iterator flagged_elements_begin (unsigned char rflag);
-  virtual element_iterator flagged_elements_end (unsigned char rflag);
-  virtual const_element_iterator flagged_elements_begin (unsigned char rflag) const;
-  virtual const_element_iterator flagged_elements_end (unsigned char rflag) const;
+  virtual element_iterator flagged_elements_begin (unsigned char rflag) libmesh_override;
+  virtual element_iterator flagged_elements_end (unsigned char rflag) libmesh_override;
+  virtual const_element_iterator flagged_elements_begin (unsigned char rflag) const libmesh_override;
+  virtual const_element_iterator flagged_elements_end (unsigned char rflag) const libmesh_override;
 
   virtual element_iterator flagged_pid_elements_begin (unsigned char rflag,
-                                                       processor_id_type pid);
+                                                       processor_id_type pid) libmesh_override;
   virtual element_iterator flagged_pid_elements_end (unsigned char rflag,
-                                                     processor_id_type pid);
+                                                     processor_id_type pid) libmesh_override;
   virtual const_element_iterator flagged_pid_elements_begin (unsigned char rflag,
-                                                             processor_id_type pid) const;
+                                                             processor_id_type pid) const libmesh_override;
   virtual const_element_iterator flagged_pid_elements_end (unsigned char rflag,
-                                                           processor_id_type pid) const;
+                                                           processor_id_type pid) const libmesh_override;
 
   /**
    * Node iterator accessor functions.
