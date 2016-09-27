@@ -111,6 +111,19 @@ Nemesis_IO::~Nemesis_IO ()
 }
 
 
+void
+Nemesis_IO::set_processor_id(processor_id_type processor_id)
+{
+  nemhelper->set_processor_id(processor_id);
+}
+
+
+void
+Nemesis_IO::set_n_processors(processor_id_type n_processors)
+{
+  nemhelper->set_n_processors(n_processors);
+}
+
 
 void Nemesis_IO::verbose (bool set_verbosity)
 {
@@ -1031,7 +1044,7 @@ void Nemesis_IO::read (const std::string & base_filename)
       // mesh, we would have to search the (unsorted) elem_list vector
       // for each entry!  We'll settle for doing some error checking instead.
       Elem * elem = mesh.elem_ptr
-        (my_elem_offset + 
+        (my_elem_offset +
          (nemhelper->elem_list[e]-1)/*Exodus numbering is 1-based!*/);
 
       // The side numberings in libmesh and exodus are not 1:1, so we need to map

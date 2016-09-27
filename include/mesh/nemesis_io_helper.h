@@ -77,6 +77,24 @@ public:
   virtual ~Nemesis_IO_Helper();
 
   /**
+   * Used to set the processor_id to use when reading writing.
+   *
+   * By default the processor_id will be set from the communicator.
+   * This is used to override that behavior so you can write the
+   * mesh for any processor.
+   */
+  void set_processor_id(processor_id_type processor_id);
+
+  /**
+   * Used to set the number of processors to use when reading writing.
+   *
+   * The default will be set from the communicator.
+   * This is used to override that behavior so you can write the
+   * mesh for any processor.
+   */
+  void set_n_processors(processor_id_type n_processors);
+
+  /**
    * Reading functions.  These just allocate memory for you and call the Nemesis
    * routines of the same name.  They also handle error checking for the Nemesis
    * return value.  Be careful calling these at random, some depend on others
@@ -329,6 +347,16 @@ public:
   /**
    * Member data
    */
+
+  /**
+   * The current processor_id this object should work with.  Use this instead of processor_id()
+   */
+  processor_id_type current_processor_id;
+
+  /**
+   * The current number of processors this object should use.  Use this instead of n_processors()
+   */
+  processor_id_type current_n_processors;
 
   /**
    * All (?) Nemesis functions return an int.  If it's negative that signals an error!
