@@ -2442,11 +2442,18 @@ std::string Elem::get_info () const
 
   oss << "  Elem Information"                                      << '\n'
       << "   id()=";
-
   if (this->valid_id())
     oss << this->id();
   else
     oss << "invalid";
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  oss << ", unique_id()=";
+  if (this->valid_unique_id())
+    oss << this->unique_id();
+  else
+    oss << "invalid";
+#endif
 
   oss << ", processor_id()=" << this->processor_id()               << '\n';
 
