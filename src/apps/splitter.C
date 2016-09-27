@@ -96,7 +96,7 @@ int main (int argc, char ** argv)
 
     processor_id_type my_num_chunks = num_chunks;
 
-    processor_id_type my_first_chunk = decltype(num_chunks)(0);
+    processor_id_type my_first_chunk = 0;
 
     processor_id_type rank = comm.rank();
     processor_id_type comm_size = comm.size();
@@ -136,7 +136,7 @@ int main (int argc, char ** argv)
       else
       {
         my_num_chunks = 0;
-        my_first_chunk = std::numeric_limits<decltype(my_first_chunk)>::max();
+        my_first_chunk = std::numeric_limits<processor_id_type>::max();
       }
     }
 
