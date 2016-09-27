@@ -71,14 +71,17 @@ public:
     sys.add_variable("u", THIRD, HIERARCHIC);
     sys.get_dof_map().default_algebraic_ghosting().set_n_levels(3);
 
+    const unsigned n_elem_per_side = 5;
     const UniquePtr<Elem> test_elem = Elem::build(elem_type);
     const Real ymax = test_elem->dim() > 1;
     const Real zmax = test_elem->dim() > 2;
-    const unsigned int ny = ymax * 15;
-    const unsigned int nz = zmax * 15;
+    const unsigned int ny = ymax * n_elem_per_side;
+    const unsigned int nz = zmax * n_elem_per_side;
 
     MeshTools::Generation::build_cube (mesh,
-                                       15, ny, nz,
+                                       n_elem_per_side,
+                                       ny,
+                                       nz,
                                        0., 1.,
                                        0., ymax,
                                        0., zmax,
