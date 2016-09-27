@@ -3771,7 +3771,7 @@ am__EXEEXT_1 = fparser_parse-opt$(EXEEXT) getpot_parse-opt$(EXEEXT) \
 	meshavg-opt$(EXEEXT) meshdiff-opt$(EXEEXT) \
 	meshnorm-opt$(EXEEXT) projection-opt$(EXEEXT) \
 	output_libmesh_version-opt$(EXEEXT) meshplot-opt$(EXEEXT) \
-	solution_components-opt$(EXEEXT)
+	solution_components-opt$(EXEEXT) splitter-opt$(EXEEXT)
 @LIBMESH_OPT_MODE_TRUE@am__EXEEXT_2 = $(am__EXEEXT_1)
 am__EXEEXT_3 = fparser_parse-devel$(EXEEXT) \
 	getpot_parse-devel$(EXEEXT) meshtool-devel$(EXEEXT) \
@@ -3780,7 +3780,7 @@ am__EXEEXT_3 = fparser_parse-devel$(EXEEXT) \
 	meshavg-devel$(EXEEXT) meshdiff-devel$(EXEEXT) \
 	meshnorm-devel$(EXEEXT) projection-devel$(EXEEXT) \
 	output_libmesh_version-devel$(EXEEXT) meshplot-devel$(EXEEXT) \
-	solution_components-devel$(EXEEXT)
+	solution_components-devel$(EXEEXT) splitter-devel$(EXEEXT)
 @LIBMESH_DEVEL_MODE_TRUE@am__EXEEXT_4 = $(am__EXEEXT_3)
 am__EXEEXT_5 = fparser_parse-dbg$(EXEEXT) getpot_parse-dbg$(EXEEXT) \
 	meshtool-dbg$(EXEEXT) calculator-dbg$(EXEEXT) \
@@ -3788,7 +3788,7 @@ am__EXEEXT_5 = fparser_parse-dbg$(EXEEXT) getpot_parse-dbg$(EXEEXT) \
 	meshavg-dbg$(EXEEXT) meshdiff-dbg$(EXEEXT) \
 	meshnorm-dbg$(EXEEXT) projection-dbg$(EXEEXT) \
 	output_libmesh_version-dbg$(EXEEXT) meshplot-dbg$(EXEEXT) \
-	solution_components-dbg$(EXEEXT)
+	solution_components-dbg$(EXEEXT) splitter-dbg$(EXEEXT)
 @LIBMESH_DBG_MODE_TRUE@am__EXEEXT_6 = $(am__EXEEXT_5)
 PROGRAMS = $(bin_PROGRAMS)
 am_calculator_dbg_OBJECTS =  \
@@ -4094,6 +4094,26 @@ solution_components_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(solution_components_opt_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
+am_splitter_dbg_OBJECTS = src/apps/splitter_dbg-splitter.$(OBJEXT)
+splitter_dbg_OBJECTS = $(am_splitter_dbg_OBJECTS)
+splitter_dbg_DEPENDENCIES = libmesh_dbg.la
+splitter_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(splitter_dbg_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+am_splitter_devel_OBJECTS =  \
+	src/apps/splitter_devel-splitter.$(OBJEXT)
+splitter_devel_OBJECTS = $(am_splitter_devel_OBJECTS)
+splitter_devel_DEPENDENCIES = libmesh_devel.la
+splitter_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(splitter_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+am_splitter_opt_OBJECTS = src/apps/splitter_opt-splitter.$(OBJEXT)
+splitter_opt_OBJECTS = $(am_splitter_opt_OBJECTS)
+splitter_opt_DEPENDENCIES = libmesh_opt.la
+splitter_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(splitter_opt_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SCRIPTS = $(bin_SCRIPTS) $(contribbin_SCRIPTS) \
 	$(libmesh_config_SCRIPTS)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -4173,7 +4193,8 @@ SOURCES = $(libmesh_dbg_la_SOURCES) $(libmesh_devel_la_SOURCES) \
 	$(projection_dbg_SOURCES) $(projection_devel_SOURCES) \
 	$(projection_opt_SOURCES) $(solution_components_dbg_SOURCES) \
 	$(solution_components_devel_SOURCES) \
-	$(solution_components_opt_SOURCES)
+	$(solution_components_opt_SOURCES) $(splitter_dbg_SOURCES) \
+	$(splitter_devel_SOURCES) $(splitter_opt_SOURCES)
 DIST_SOURCES = $(am__libmesh_dbg_la_SOURCES_DIST) \
 	$(am__libmesh_devel_la_SOURCES_DIST) \
 	$(am__libmesh_oprof_la_SOURCES_DIST) \
@@ -4201,7 +4222,8 @@ DIST_SOURCES = $(am__libmesh_dbg_la_SOURCES_DIST) \
 	$(projection_dbg_SOURCES) $(projection_devel_SOURCES) \
 	$(projection_opt_SOURCES) $(solution_components_dbg_SOURCES) \
 	$(solution_components_devel_SOURCES) \
-	$(solution_components_opt_SOURCES)
+	$(solution_components_opt_SOURCES) $(splitter_dbg_SOURCES) \
+	$(splitter_devel_SOURCES) $(splitter_opt_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -5198,21 +5220,23 @@ CLEANFILES = $(am__append_11)
 # meshplot
 
 # solution_components
+
+# splitter
 opt_programs = fparser_parse-opt getpot_parse-opt meshtool-opt \
 	calculator-opt compare-opt meshbcid-opt meshid-opt meshavg-opt \
 	meshdiff-opt meshnorm-opt projection-opt \
 	output_libmesh_version-opt meshplot-opt \
-	solution_components-opt
+	solution_components-opt splitter-opt
 devel_programs = fparser_parse-devel getpot_parse-devel meshtool-devel \
 	calculator-devel compare-devel meshbcid-devel meshid-devel \
 	meshavg-devel meshdiff-devel meshnorm-devel projection-devel \
 	output_libmesh_version-devel meshplot-devel \
-	solution_components-devel
+	solution_components-devel splitter-devel
 dbg_programs = fparser_parse-dbg getpot_parse-dbg meshtool-dbg \
 	calculator-dbg compare-dbg meshbcid-dbg meshid-dbg meshavg-dbg \
 	meshdiff-dbg meshnorm-dbg projection-dbg \
 	output_libmesh_version-dbg meshplot-dbg \
-	solution_components-dbg
+	solution_components-dbg splitter-dbg
 prof_programs = # empty, append below
 oprof_programs = # empty, append below
 fparser_parse_opt_SOURCES = src/apps/fparser_parse.C
@@ -5386,6 +5410,18 @@ solution_components_dbg_SOURCES = src/apps/solution_components.C
 solution_components_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 solution_components_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
 solution_components_dbg_LDADD = libmesh_dbg.la
+splitter_opt_SOURCES = src/apps/splitter.C
+splitter_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+splitter_opt_CXXFLAGS = $(CXXFLAGS_OPT)
+splitter_opt_LDADD = libmesh_opt.la
+splitter_devel_SOURCES = src/apps/splitter.C
+splitter_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+splitter_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
+splitter_devel_LDADD = libmesh_devel.la
+splitter_dbg_SOURCES = src/apps/splitter.C
+splitter_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+splitter_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
+splitter_dbg_LDADD = libmesh_dbg.la
 
 # -------------------------------------------
 # Optional support for code coverage analysis
@@ -11027,6 +11063,24 @@ src/apps/solution_components_opt-solution_components.$(OBJEXT):  \
 solution_components-opt$(EXEEXT): $(solution_components_opt_OBJECTS) $(solution_components_opt_DEPENDENCIES) $(EXTRA_solution_components_opt_DEPENDENCIES) 
 	@rm -f solution_components-opt$(EXEEXT)
 	$(AM_V_CXXLD)$(solution_components_opt_LINK) $(solution_components_opt_OBJECTS) $(solution_components_opt_LDADD) $(LIBS)
+src/apps/splitter_dbg-splitter.$(OBJEXT): src/apps/$(am__dirstamp) \
+	src/apps/$(DEPDIR)/$(am__dirstamp)
+
+splitter-dbg$(EXEEXT): $(splitter_dbg_OBJECTS) $(splitter_dbg_DEPENDENCIES) $(EXTRA_splitter_dbg_DEPENDENCIES) 
+	@rm -f splitter-dbg$(EXEEXT)
+	$(AM_V_CXXLD)$(splitter_dbg_LINK) $(splitter_dbg_OBJECTS) $(splitter_dbg_LDADD) $(LIBS)
+src/apps/splitter_devel-splitter.$(OBJEXT): src/apps/$(am__dirstamp) \
+	src/apps/$(DEPDIR)/$(am__dirstamp)
+
+splitter-devel$(EXEEXT): $(splitter_devel_OBJECTS) $(splitter_devel_DEPENDENCIES) $(EXTRA_splitter_devel_DEPENDENCIES) 
+	@rm -f splitter-devel$(EXEEXT)
+	$(AM_V_CXXLD)$(splitter_devel_LINK) $(splitter_devel_OBJECTS) $(splitter_devel_LDADD) $(LIBS)
+src/apps/splitter_opt-splitter.$(OBJEXT): src/apps/$(am__dirstamp) \
+	src/apps/$(DEPDIR)/$(am__dirstamp)
+
+splitter-opt$(EXEEXT): $(splitter_opt_OBJECTS) $(splitter_opt_DEPENDENCIES) $(EXTRA_splitter_opt_DEPENDENCIES) 
+	@rm -f splitter-opt$(EXEEXT)
+	$(AM_V_CXXLD)$(splitter_opt_LINK) $(splitter_opt_OBJECTS) $(splitter_opt_LDADD) $(LIBS)
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	@list='$(bin_SCRIPTS)'; test -n "$(bindir)" || list=; \
@@ -11215,6 +11269,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/solution_components_dbg-solution_components.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/solution_components_devel-solution_components.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/solution_components_opt-solution_components.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/splitter_dbg-splitter.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/splitter_devel-splitter.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/splitter_opt-splitter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-default_coupling.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-dof_map.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-dof_map_constraints.Plo@am__quote@
@@ -28634,6 +28691,48 @@ src/apps/solution_components_opt-solution_components.obj: src/apps/solution_comp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/solution_components.C' object='src/apps/solution_components_opt-solution_components.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(solution_components_opt_CPPFLAGS) $(CPPFLAGS) $(solution_components_opt_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/solution_components_opt-solution_components.obj `if test -f 'src/apps/solution_components.C'; then $(CYGPATH_W) 'src/apps/solution_components.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/solution_components.C'; fi`
+
+src/apps/splitter_dbg-splitter.o: src/apps/splitter.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(splitter_dbg_CPPFLAGS) $(CPPFLAGS) $(splitter_dbg_CXXFLAGS) $(CXXFLAGS) -MT src/apps/splitter_dbg-splitter.o -MD -MP -MF src/apps/$(DEPDIR)/splitter_dbg-splitter.Tpo -c -o src/apps/splitter_dbg-splitter.o `test -f 'src/apps/splitter.C' || echo '$(srcdir)/'`src/apps/splitter.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/splitter_dbg-splitter.Tpo src/apps/$(DEPDIR)/splitter_dbg-splitter.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/splitter.C' object='src/apps/splitter_dbg-splitter.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(splitter_dbg_CPPFLAGS) $(CPPFLAGS) $(splitter_dbg_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/splitter_dbg-splitter.o `test -f 'src/apps/splitter.C' || echo '$(srcdir)/'`src/apps/splitter.C
+
+src/apps/splitter_dbg-splitter.obj: src/apps/splitter.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(splitter_dbg_CPPFLAGS) $(CPPFLAGS) $(splitter_dbg_CXXFLAGS) $(CXXFLAGS) -MT src/apps/splitter_dbg-splitter.obj -MD -MP -MF src/apps/$(DEPDIR)/splitter_dbg-splitter.Tpo -c -o src/apps/splitter_dbg-splitter.obj `if test -f 'src/apps/splitter.C'; then $(CYGPATH_W) 'src/apps/splitter.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/splitter.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/splitter_dbg-splitter.Tpo src/apps/$(DEPDIR)/splitter_dbg-splitter.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/splitter.C' object='src/apps/splitter_dbg-splitter.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(splitter_dbg_CPPFLAGS) $(CPPFLAGS) $(splitter_dbg_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/splitter_dbg-splitter.obj `if test -f 'src/apps/splitter.C'; then $(CYGPATH_W) 'src/apps/splitter.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/splitter.C'; fi`
+
+src/apps/splitter_devel-splitter.o: src/apps/splitter.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(splitter_devel_CPPFLAGS) $(CPPFLAGS) $(splitter_devel_CXXFLAGS) $(CXXFLAGS) -MT src/apps/splitter_devel-splitter.o -MD -MP -MF src/apps/$(DEPDIR)/splitter_devel-splitter.Tpo -c -o src/apps/splitter_devel-splitter.o `test -f 'src/apps/splitter.C' || echo '$(srcdir)/'`src/apps/splitter.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/splitter_devel-splitter.Tpo src/apps/$(DEPDIR)/splitter_devel-splitter.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/splitter.C' object='src/apps/splitter_devel-splitter.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(splitter_devel_CPPFLAGS) $(CPPFLAGS) $(splitter_devel_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/splitter_devel-splitter.o `test -f 'src/apps/splitter.C' || echo '$(srcdir)/'`src/apps/splitter.C
+
+src/apps/splitter_devel-splitter.obj: src/apps/splitter.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(splitter_devel_CPPFLAGS) $(CPPFLAGS) $(splitter_devel_CXXFLAGS) $(CXXFLAGS) -MT src/apps/splitter_devel-splitter.obj -MD -MP -MF src/apps/$(DEPDIR)/splitter_devel-splitter.Tpo -c -o src/apps/splitter_devel-splitter.obj `if test -f 'src/apps/splitter.C'; then $(CYGPATH_W) 'src/apps/splitter.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/splitter.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/splitter_devel-splitter.Tpo src/apps/$(DEPDIR)/splitter_devel-splitter.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/splitter.C' object='src/apps/splitter_devel-splitter.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(splitter_devel_CPPFLAGS) $(CPPFLAGS) $(splitter_devel_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/splitter_devel-splitter.obj `if test -f 'src/apps/splitter.C'; then $(CYGPATH_W) 'src/apps/splitter.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/splitter.C'; fi`
+
+src/apps/splitter_opt-splitter.o: src/apps/splitter.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(splitter_opt_CPPFLAGS) $(CPPFLAGS) $(splitter_opt_CXXFLAGS) $(CXXFLAGS) -MT src/apps/splitter_opt-splitter.o -MD -MP -MF src/apps/$(DEPDIR)/splitter_opt-splitter.Tpo -c -o src/apps/splitter_opt-splitter.o `test -f 'src/apps/splitter.C' || echo '$(srcdir)/'`src/apps/splitter.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/splitter_opt-splitter.Tpo src/apps/$(DEPDIR)/splitter_opt-splitter.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/splitter.C' object='src/apps/splitter_opt-splitter.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(splitter_opt_CPPFLAGS) $(CPPFLAGS) $(splitter_opt_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/splitter_opt-splitter.o `test -f 'src/apps/splitter.C' || echo '$(srcdir)/'`src/apps/splitter.C
+
+src/apps/splitter_opt-splitter.obj: src/apps/splitter.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(splitter_opt_CPPFLAGS) $(CPPFLAGS) $(splitter_opt_CXXFLAGS) $(CXXFLAGS) -MT src/apps/splitter_opt-splitter.obj -MD -MP -MF src/apps/$(DEPDIR)/splitter_opt-splitter.Tpo -c -o src/apps/splitter_opt-splitter.obj `if test -f 'src/apps/splitter.C'; then $(CYGPATH_W) 'src/apps/splitter.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/splitter.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/apps/$(DEPDIR)/splitter_opt-splitter.Tpo src/apps/$(DEPDIR)/splitter_opt-splitter.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/apps/splitter.C' object='src/apps/splitter_opt-splitter.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(splitter_opt_CPPFLAGS) $(CPPFLAGS) $(splitter_opt_CXXFLAGS) $(CXXFLAGS) -c -o src/apps/splitter_opt-splitter.obj `if test -f 'src/apps/splitter.C'; then $(CYGPATH_W) 'src/apps/splitter.C'; else $(CYGPATH_W) '$(srcdir)/src/apps/splitter.C'; fi`
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
