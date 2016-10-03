@@ -1570,7 +1570,7 @@ public:
    * point \p p contained in local Elem \p e
    *
    * This version of point_value can be run in serial, but assumes \p e is in
-   * the local mesh partition.
+   * the local mesh partition or is algebraically ghosted.
    */
   Number point_value(unsigned int var, const Point & p, const Elem & e) const;
 
