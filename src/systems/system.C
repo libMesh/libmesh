@@ -2054,7 +2054,7 @@ Number System::point_value(unsigned int var, const Point & p, const bool insist_
 
   Number u = 0;
 
-  if (e && e->processor_id() == this->processor_id())
+  if (e && this->get_dof_map().is_evaluable(*e, var))
     u = point_value(var, p, *e);
 
   // If I have an element containing p, then let's let everyone know
@@ -2166,7 +2166,7 @@ Gradient System::point_gradient(unsigned int var, const Point & p, const bool in
 
   Gradient grad_u;
 
-  if (e && e->processor_id() == this->processor_id())
+  if (e && this->get_dof_map().is_evaluable(*e, var))
     grad_u = point_gradient(var, p, *e);
 
   // If I have an element containing p, then let's let everyone know
@@ -2281,7 +2281,7 @@ Tensor System::point_hessian(unsigned int var, const Point & p, const bool insis
 
   Tensor hess_u;
 
-  if (e && e->processor_id() == this->processor_id())
+  if (e && this->get_dof_map().is_evaluable(*e, var))
     hess_u = point_hessian(var, p, *e);
 
   // If I have an element containing p, then let's let everyone know
