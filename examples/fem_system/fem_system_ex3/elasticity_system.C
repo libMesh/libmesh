@@ -48,9 +48,9 @@ void ElasticitySystem::init_data()
 
   ZeroFunction<> zf;
 
-  DirichletBoundary dirichlet_bc(boundary_ids,
-                                 variables,
-                                 &zf);
+  // Most DirichletBoundary users should use this style of
+  // constructor, which takes a "locally indexed" functor
+  DirichletBoundary dirichlet_bc(zf, boundary_ids, variables);
 
   this->get_dof_map().add_dirichlet_boundary(dirichlet_bc);
 
