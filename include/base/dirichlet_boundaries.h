@@ -43,12 +43,31 @@ namespace libMesh
 {
 
 /**
- * This class allows one to associate dirichlet boundary values with
+ * This class allows one to associate Dirichlet boundary values with
  * a given set of mesh boundary ids and system variable ids.
  *
  * Dirichlet values must be supplied as the input function "f"; when
  * using some specialized elements, gradient values must be supplied
  * via the input function "g".
+ *
+ * Dirichlet functions may be indexed either by "system variable
+ * order" or "local variable order", depending on how the
+ * DirichletBoundary object is constructed.  For example, suppose a
+ * system has variables {a, b, c, d}, and a DirichletBoundary is set
+ * for variables {b, d} (i.e. variables_in is {1, 3}).  If the
+ * boundary is constructed to use "system variable order", input
+ * function(s) will be queried for components 1 and 3; this is useful
+ * for reusing input functions as both exact solutions and Dirichlet
+ * boundaries in benchmark problems.  If the boundary is constructed
+ * to use "local variable order", input function(s) will be queried
+ * for components 0 and 1; this is useful for flexibly constructing
+ * Dirichlet boundaries in multiphysics codes or from user input
+ * files.
+ *
+ * Dirichlet functions may be subclasses of FunctionBase or
+ * FEMFunctionBase; in the latter case the user must also supply a
+ * reference to the System on which the FEMFunctionBase will be
+ * evaluated.
  *
  * Dirichlet functions are allowed to return NaN; if this is
  * encountered, then the degree of freedom values in a patch around
@@ -60,6 +79,11 @@ namespace libMesh
 class DirichletBoundary
 {
 public:
+
+  /**
+   * Constructor for a system-variable-order boundary using
+   * pointers-to-functors.
+   */
   DirichletBoundary(const std::set<boundary_id_type> & b_in,
                     const std::vector<unsigned int> & variables_in,
                     const FunctionBase<Number> * f_in,
@@ -78,6 +102,10 @@ public:
       g->init();
   }
 
+  /**
+   * Constructor for a system-variable-order boundary from
+   * reference-to-functor.
+   */
   DirichletBoundary(const std::set<boundary_id_type> & b_in,
                     const std::vector<unsigned int> & variables_in,
                     const FunctionBase<Number> & f_in) :
@@ -93,6 +121,10 @@ public:
   }
 
 
+  /**
+   * Constructor for a system-variable-order boundary from
+   * references-to-functors.
+   */
   DirichletBoundary(const std::set<boundary_id_type> & b_in,
                     const std::vector<unsigned int> & variables_in,
                     const FunctionBase<Number> & f_in,
@@ -109,7 +141,10 @@ public:
     g->init();
   }
 
-
+  /**
+   * Constructor for a system-variable-order boundary from
+   * pointers-to-fem-functors.
+   */
   DirichletBoundary(const std::set<boundary_id_type> & b_in,
                     const std::vector<unsigned int> & variables_in,
                     const System & f_sys_in,
@@ -126,6 +161,10 @@ public:
     libmesh_assert(f_fem.get());
   }
 
+  /**
+   * Constructor for a system-variable-order boundary from
+   * reference-to-fem-functor.
+   */
   DirichletBoundary(const std::set<boundary_id_type> & b_in,
                     const std::vector<unsigned int> & variables_in,
                     const System & f_sys_in,
@@ -140,7 +179,10 @@ public:
   {
   }
 
-
+  /**
+   * Constructor for a system-variable-order boundary from
+   * references-to-fem-functors.
+   */
   DirichletBoundary(const std::set<boundary_id_type> & b_in,
                     const std::vector<unsigned int> & variables_in,
                     const System & f_sys_in,
@@ -156,9 +198,10 @@ public:
   {
   }
 
-
-
-
+  /**
+   * Copy constructor.  Deep copies (clones) functors; shallow copies
+   * any System reference
+   */
   DirichletBoundary (const DirichletBoundary & dirichlet_in) :
     b(dirichlet_in.b),
     variables(dirichlet_in.variables),
