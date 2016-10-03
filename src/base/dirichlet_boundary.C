@@ -22,19 +22,10 @@
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
 // Local Includes -----------------------------------
-#include "libmesh/fem_function_base.h"
-#include "libmesh/function_base.h"
-#include "libmesh/id_types.h"
-#include "libmesh/system.h"
+#include "libmesh/composite_fem_function.h"
+#include "libmesh/composite_function.h"
 #include "libmesh/vector_value.h"
 
-// C++ Includes   -----------------------------------
-#include <algorithm>
-#include <cstddef>
-#include <iterator>
-#include <set>
-#include <string>
-#include <vector>
 
 namespace libMesh
 {

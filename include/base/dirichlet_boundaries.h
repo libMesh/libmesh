@@ -25,22 +25,23 @@
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
 // Local Includes -----------------------------------
-#include "libmesh/fem_function_base.h"
-#include "libmesh/function_base.h"
+#include "libmesh/auto_ptr.h"
 #include "libmesh/id_types.h"
-#include "libmesh/system.h"
 #include "libmesh/vector_value.h"
 
 // C++ Includes   -----------------------------------
-#include <algorithm>
 #include <cstddef>
-#include <iterator>
 #include <set>
-#include <string>
 #include <vector>
 
 namespace libMesh
 {
+
+// Forward declarations
+class System;
+
+template <typename Output> class FEMFunctionBase;
+template <typename Output> class FunctionBase;
 
 /**
  * This class allows one to associate Dirichlet boundary values with
