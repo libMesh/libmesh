@@ -156,10 +156,11 @@ int main (int argc, char ** argv)
 
     ZeroFunction<Number> zero;
 
-    // Most DirichletBoundary users should use this style of
-    // constructor, which takes a "locally indexed" functor
+    // Most DirichletBoundary users will want to supply a "locally
+    // indexed" functor
     system.get_dof_map().add_dirichlet_boundary
-      (DirichletBoundary (zero, clamped_boundaries, uvw));
+      (DirichletBoundary (clamped_boundaries, uvw, zero,
+                          LOCAL_VARIABLE_ORDER));
   }
   {
     std::set<boundary_id_type> clamped_boundaries;
@@ -171,7 +172,9 @@ int main (int argc, char ** argv)
 
     ZeroFunction<Number> zero;
 
-    system.get_dof_map().add_dirichlet_boundary(DirichletBoundary (clamped_boundaries, uv, &zero));
+    system.get_dof_map().add_dirichlet_boundary
+      (DirichletBoundary (clamped_boundaries, uv, zero,
+                          LOCAL_VARIABLE_ORDER));
   }
   {
     std::set<boundary_id_type> clamped_boundaries;
@@ -182,7 +185,9 @@ int main (int argc, char ** argv)
 
     ConstFunction<Number> neg_one(-1.);
 
-    system.get_dof_map().add_dirichlet_boundary(DirichletBoundary (clamped_boundaries, w, &neg_one));
+    system.get_dof_map().add_dirichlet_boundary
+      (DirichletBoundary (clamped_boundaries, w, neg_one,
+                          LOCAL_VARIABLE_ORDER));
   }
 
   le.initialize_contact_load_paths();

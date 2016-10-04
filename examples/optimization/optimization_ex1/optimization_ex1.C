@@ -337,9 +337,10 @@ int main (int argc, char ** argv)
   variables.push_back(u_var);
   ZeroFunction<> zf;
 
-  // Most DirichletBoundary users should use this style of
-  // constructor, which takes a "locally indexed" functor
-  DirichletBoundary dirichlet_bc(zf, boundary_ids, variables);
+  // Most DirichletBoundary users will want to supply a "locally
+  // indexed" functor
+  DirichletBoundary dirichlet_bc(boundary_ids, variables, zf,
+                                 LOCAL_VARIABLE_ORDER);
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
 
 

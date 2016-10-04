@@ -167,11 +167,12 @@ int main (int argc, char ** argv)
     unsigned int variables[] = {2, 3, 4};
     ZeroFunction<> zf;
 
-    // Most DirichletBoundary users should use this style of
-    // constructor, which takes a "locally indexed" functor
+    // Most DirichletBoundary users will want to supply a "locally
+    // indexed" functor
     DirichletBoundary dirichlet_bc 
-      (zf, boundary_ids,
-       std::vector<unsigned int>(variables, variables+3));
+      (boundary_ids,
+       std::vector<unsigned int>(variables, variables+3), zf,
+       LOCAL_VARIABLE_ORDER);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
   // BC v, theta_x, theta_z
@@ -181,11 +182,10 @@ int main (int argc, char ** argv)
     unsigned int variables[] = {1, 3, 5};
     ZeroFunction<> zf;
 
-    // Most DirichletBoundary users should use this style of
-    // constructor, which takes a "locally indexed" functor
     DirichletBoundary dirichlet_bc
-      (zf, boundary_ids,
-       std::vector<unsigned int>(variables, variables+3));
+      (boundary_ids,
+       std::vector<unsigned int>(variables, variables+3), zf,
+       LOCAL_VARIABLE_ORDER);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
   // CD u, theta_y, theta_z
@@ -195,11 +195,10 @@ int main (int argc, char ** argv)
     unsigned int variables[] = {0, 4, 5};
     ZeroFunction<> zf;
 
-    // Most DirichletBoundary users should use this style of
-    // constructor, which takes a "locally indexed" functor
     DirichletBoundary dirichlet_bc
-      (zf, boundary_ids,
-       std::vector<unsigned int>(variables, variables+3));
+      (boundary_ids,
+       std::vector<unsigned int>(variables, variables+3), zf,
+       LOCAL_VARIABLE_ORDER);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
   // AD u, w, theta_y
@@ -209,11 +208,10 @@ int main (int argc, char ** argv)
     unsigned int variables[] = {0, 2, 4};
     ZeroFunction<> zf;
 
-    // Most DirichletBoundary users should use this style of
-    // constructor, which takes a "locally indexed" functor
     DirichletBoundary dirichlet_bc
-      (zf, boundary_ids,
-       std::vector<unsigned int>(variables, variables+3));
+      (boundary_ids,
+       std::vector<unsigned int>(variables, variables+3), zf,
+       LOCAL_VARIABLE_ORDER);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
 

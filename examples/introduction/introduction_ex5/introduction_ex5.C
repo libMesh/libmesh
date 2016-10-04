@@ -176,9 +176,10 @@ int main (int argc, char ** argv)
   AnalyticFunction<> exact_solution_object(exact_solution_wrapper);
 
   // In general, when reusing a system-indexed exact solution, we want
-  // to use the system-ordering constructor for DirichletBoundary, so
-  // we demonstrate that here.  In this case, though, we have only one
-  // variable, so system- and local- orderings are the same.
+  // to use the default system-ordering constructor for
+  // DirichletBoundary, so we demonstrate that here.  In this case,
+  // though, we have only one variable, so system- and local-
+  // orderings are the same.
   DirichletBoundary dirichlet_bc
     (boundary_ids, variables, exact_solution_object);
 

@@ -62,10 +62,11 @@ void HeatSystem::init_data ()
 
   ZeroFunction<Number> zero;
 
-  // Most DirichletBoundary users should use this style of
-  // constructor, which takes a "locally indexed" functor
+  // Most DirichletBoundary users will want to supply a "locally
+  // indexed" functor
   this->get_dof_map().add_dirichlet_boundary
-    (DirichletBoundary (zero, all_bdys, T_only));
+    (DirichletBoundary (all_bdys, T_only, zero,
+                        LOCAL_VARIABLE_ORDER));
 
   FEMSystem::init_data();
 }
