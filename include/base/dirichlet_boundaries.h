@@ -86,42 +86,6 @@ class DirichletBoundary
 public:
 
   /**
-   * Constructor for a local-variable-order boundary from
-   * reference-to-functor.
-   */
-  DirichletBoundary(const FunctionBase<Number> & f_in,
-                    const std::set<boundary_id_type> & b_in,
-                    const std::vector<unsigned int> & variables_in);
-
-  /**
-   * Constructor for a local-variable-order boundary from
-   * references-to-functors.
-   */
-  DirichletBoundary(const FunctionBase<Number> & f_in,
-                    const FunctionBase<Gradient> & g_in,
-                    const std::set<boundary_id_type> & b_in,
-                    const std::vector<unsigned int> & variables_in);
-
-  /**
-   * Constructor for a local-variable-order boundary from
-   * reference-to-fem-functor.
-   */
-  DirichletBoundary(const std::set<boundary_id_type> & b_in,
-                    const FEMFunctionBase<Number> & f_in,
-                    const std::vector<unsigned int> & variables_in,
-                    const System & f_sys_in);
-
-  /**
-   * Constructor for a local-variable-order boundary from
-   * references-to-fem-functors.
-   */
-  DirichletBoundary(const std::set<boundary_id_type> & b_in,
-                    const FEMFunctionBase<Number> & f_in,
-                    const FEMFunctionBase<Gradient> & g_in,
-                    const std::vector<unsigned int> & variables_in,
-                    const System & f_sys_in);
-
-  /**
    * Constructor for a system-variable-order boundary using
    * pointers-to-functors.
    */
