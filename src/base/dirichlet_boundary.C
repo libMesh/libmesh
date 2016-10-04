@@ -121,15 +121,27 @@ DirichletBoundary::DirichletBoundary
 DirichletBoundary::DirichletBoundary
   (const std::set<boundary_id_type> & b_in,
    const std::vector<unsigned int> & variables_in,
-   const FunctionBase<Number> & f_in) :
+   const FunctionBase<Number> & f_in,
+   VariableIndexing type) :
   b(b_in),
   variables(variables_in),
-  f(f_in.clone()),
+  f(UniquePtr<FunctionBase<Number> >()),
   g(UniquePtr<FunctionBase<Gradient> >()),
   f_fem(UniquePtr<FEMFunctionBase<Number> >()),
   g_fem(UniquePtr<FEMFunctionBase<Gradient> >()),
   f_system(libmesh_nullptr)
 {
+  if (type == LOCAL_VARIABLE_ORDER)
+    {
+      CompositeFunction<Number> * c =
+        new CompositeFunction<Number>();
+      c->attach_subfunction(f_in, variables_in);
+      f.reset(c);
+    }
+  else
+    {
+      f.reset(f_in.clone().release());
+    }
   f->init();
 }
 
@@ -138,15 +150,33 @@ DirichletBoundary::DirichletBoundary
   (const std::set<boundary_id_type> & b_in,
    const std::vector<unsigned int> & variables_in,
    const FunctionBase<Number> & f_in,
-   const FunctionBase<Gradient> & g_in) :
+   const FunctionBase<Gradient> & g_in,
+   VariableIndexing type) :
   b(b_in),
   variables(variables_in),
-  f(f_in.clone()),
-  g(g_in.clone()),
+  f(UniquePtr<FunctionBase<Number> >()),
+  g(UniquePtr<FunctionBase<Gradient> >()),
   f_fem(UniquePtr<FEMFunctionBase<Number> >()),
   g_fem(UniquePtr<FEMFunctionBase<Gradient> >()),
   f_system(libmesh_nullptr)
 {
+  if (type == LOCAL_VARIABLE_ORDER)
+    {
+      CompositeFunction<Number> * cf =
+        new CompositeFunction<Number>();
+      cf->attach_subfunction(f_in, variables_in);
+      f.reset(cf);
+      CompositeFunction<Gradient> * cg =
+        new CompositeFunction<Gradient>();
+      cg->attach_subfunction(g_in, variables_in);
+      g.reset(cg);
+    }
+  else
+    {
+      f.reset(f_in.clone().release());
+      g.reset(g_in.clone().release());
+    }
+
   f->init();
   g->init();
 }
@@ -174,15 +204,26 @@ DirichletBoundary::DirichletBoundary
   (const std::set<boundary_id_type> & b_in,
    const std::vector<unsigned int> & variables_in,
    const System & f_sys_in,
-   const FEMFunctionBase<Number> & f_in) :
+   const FEMFunctionBase<Number> & f_in,
+   VariableIndexing type) :
   b(b_in),
   variables(variables_in),
   f(UniquePtr<FunctionBase<Number> >()),
   g(UniquePtr<FunctionBase<Gradient> >()),
-  f_fem(f_in.clone()),
+  f_fem(UniquePtr<FEMFunctionBase<Number> >()),
   g_fem(UniquePtr<FEMFunctionBase<Gradient> >()),
   f_system(&f_sys_in)
 {
+  if (type == LOCAL_VARIABLE_ORDER)
+    {
+      CompositeFEMFunction<Number> * c = new CompositeFEMFunction<Number>();
+      c->attach_subfunction(f_in, variables_in);
+      f_fem.reset(c);
+    }
+  else
+    {
+      f_fem.reset(f_in.clone().release());
+    }
 }
 
 
@@ -191,15 +232,32 @@ DirichletBoundary::DirichletBoundary
    const std::vector<unsigned int> & variables_in,
    const System & f_sys_in,
    const FEMFunctionBase<Number> & f_in,
-   const FEMFunctionBase<Gradient> & g_in) :
+   const FEMFunctionBase<Gradient> & g_in,
+   VariableIndexing type) :
   b(b_in),
   variables(variables_in),
   f(UniquePtr<FunctionBase<Number> >()),
   g(UniquePtr<FunctionBase<Gradient> >()),
-  f_fem(f_in.clone()),
-  g_fem(g_in.clone()),
+  f_fem(UniquePtr<FEMFunctionBase<Number> >()),
+  g_fem(UniquePtr<FEMFunctionBase<Gradient> >()),
   f_system(&f_sys_in)
 {
+  if (type == LOCAL_VARIABLE_ORDER)
+    {
+      CompositeFEMFunction<Number> * cf =
+        new CompositeFEMFunction<Number>();
+      cf->attach_subfunction(f_in, variables_in);
+      f_fem.reset(cf);
+      CompositeFEMFunction<Gradient> * cg =
+        new CompositeFEMFunction<Gradient>();
+      cg->attach_subfunction(g_in, variables_in);
+      g_fem.reset(cg);
+    }
+  else
+    {
+      f_fem.reset(f_in.clone().release());
+      g_fem.reset(g_in.clone().release());
+    }
 }
 
 
