@@ -27,9 +27,9 @@ protected:
     es.init();
 
     DiffSolver & solver = *(system.time_solver->diff_solver().get());
-    solver.relative_step_tolerance = std::numeric_limits<Number>::epsilon()*10;
-    solver.relative_residual_tolerance = std::numeric_limits<Number>::epsilon()*10;
-    solver.absolute_residual_tolerance = std::numeric_limits<Number>::epsilon()*10;
+    solver.relative_step_tolerance = std::numeric_limits<Real>::epsilon()*10;
+    solver.relative_residual_tolerance = std::numeric_limits<Real>::epsilon()*10;
+    solver.absolute_residual_tolerance = std::numeric_limits<Real>::epsilon()*10;
 
     system.deltat = deltat;
 
@@ -53,11 +53,11 @@ protected:
           {
             // Use relative error for comparison, so "exact" is 0
             Number exact_soln = system.u(system.time);
-            Number rel_error =  std::abs((exact_soln - (*system.solution)(0))/exact_soln);
+            Real rel_error =  std::abs((exact_soln - (*system.solution)(0))/exact_soln);
 
             CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0,
                                           rel_error,
-                                          std::numeric_limits<Number>::epsilon()*10 );
+                                          std::numeric_limits<Real>::epsilon()*10 );
           }
       }
   }

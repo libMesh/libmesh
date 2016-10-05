@@ -55,13 +55,13 @@ public:
 
     // Check the values through the interface
     for (unsigned int i=0; i<local_size; i++)
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(v(my_comm->rank()*2 + i), i, TOLERANCE*TOLERANCE);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(std::abs(v(my_comm->rank()*2 + i)), i, TOLERANCE*TOLERANCE);
 
     // Check that we can see the same thing with get_array_read
     const PetscScalar * read_only_values = v.get_array_read();
 
     for (unsigned int i=0; i<local_size; i++)
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(read_only_values[i], i, TOLERANCE*TOLERANCE);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(std::abs(read_only_values[i]), i, TOLERANCE*TOLERANCE);
 
     v.restore_array();
 
