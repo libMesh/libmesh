@@ -3939,6 +3939,17 @@ inline void Communicator::gather(const unsigned int root_id,
 
 template <typename T>
 inline void Communicator::gather(const unsigned int root_id,
+                                 const std::basic_string<T> & sendval,
+                                 std::vector<std::basic_string<T> > & recv,
+                                 const bool identical_buffer_sizes) const
+{
+  libmesh_assert_equal_to (root_id, 0);
+  recv.resize(1);
+  recv[0] = sendval;
+}
+
+template <typename T>
+inline void Communicator::gather(const unsigned int root_id,
                                  std::vector<T> &) const
 { libmesh_assert_equal_to(root_id, 0); }
 
@@ -3953,6 +3964,51 @@ inline void Communicator::allgather(T send_val,
 template <typename T>
 inline void Communicator::allgather(std::vector<T> &,
                                     const bool) const {}
+
+template <typename T>
+inline void Communicator::scatter(const std::vector<T> & data,
+                                  T & recv,
+                                  const unsigned int root_id) const
+{
+  libmesh_assert_equal_to (root_id, 0);
+  recv = data[0];
+}
+
+
+template <typename T>
+inline void Communicator::scatter(const std::vector<T> & data,
+                                  std::vector<T> & recv,
+                                  const unsigned int root_id) const
+{
+  libmesh_assert_equal_to (root_id, 0);
+  recv.assign(data.begin(), data.end());
+}
+
+
+template <typename T>
+inline void Communicator::scatter(const std::vector<T> & data,
+                      const std::vector<int> counts,
+                      std::vector<T> & recv,
+                      const unsigned int root_id) const
+{
+  libmesh_assert_equal_to (root_id, 0);
+  libmesh_assert_equal_to (counts.size(), 1);
+  recv.assign(data.begin(), data.begin() + counts[0]);
+}
+
+
+template <typename T>
+inline void Communicator::scatter(const std::vector<std::vector<T> > & data,
+                                  std::vector<T> & recv,
+                                  const unsigned int root_id,
+                                  const bool identical_buffer_sizes) const
+{
+  libmesh_assert_equal_to (root_id, 0);
+  libmesh_assert_equal_to (data.size(), 1);
+  recv.assign(data[0].begin(), data[0].end());
+}
+
+
 
 template <typename T>
 inline void Communicator::alltoall(std::vector<T> &) const {}
