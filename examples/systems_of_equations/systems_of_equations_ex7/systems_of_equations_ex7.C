@@ -630,7 +630,11 @@ int main (int argc, char ** argv)
 
   ZeroFunction<Number> zero;
 
-  system.get_dof_map().add_dirichlet_boundary(DirichletBoundary (clamped_boundaries, uvw, &zero));
+  // Most DirichletBoundary users will want to supply a "locally
+  // indexed" functor
+  system.get_dof_map().add_dirichlet_boundary
+    (DirichletBoundary (clamped_boundaries, uvw, zero,
+                        LOCAL_VARIABLE_ORDER));
 
   equation_systems.init();
   equation_systems.print_info();

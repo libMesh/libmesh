@@ -336,9 +336,11 @@ int main (int argc, char ** argv)
   std::vector<unsigned int> variables;
   variables.push_back(u_var);
   ZeroFunction<> zf;
-  DirichletBoundary dirichlet_bc(boundary_ids,
-                                 variables,
-                                 &zf);
+
+  // Most DirichletBoundary users will want to supply a "locally
+  // indexed" functor
+  DirichletBoundary dirichlet_bc(boundary_ids, variables, zf,
+                                 LOCAL_VARIABLE_ORDER);
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
 
 

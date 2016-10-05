@@ -175,9 +175,13 @@ int main (int argc, char ** argv)
   // This function just calls the function exact_solution via exact_solution_wrapper
   AnalyticFunction<> exact_solution_object(exact_solution_wrapper);
 
-  DirichletBoundary dirichlet_bc(boundary_ids,
-                                 variables,
-                                 &exact_solution_object);
+  // In general, when reusing a system-indexed exact solution, we want
+  // to use the default system-ordering constructor for
+  // DirichletBoundary, so we demonstrate that here.  In this case,
+  // though, we have only one variable, so system- and local-
+  // orderings are the same.
+  DirichletBoundary dirichlet_bc
+    (boundary_ids, variables, exact_solution_object);
 
   // We must add the Dirichlet boundary condition _before_
   // we call equation_systems.init()

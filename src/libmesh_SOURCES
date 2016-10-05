@@ -1,6 +1,7 @@
 # Do not edit - automatically generated from ./rebuild_libmesh_SOURCES.sh
 libmesh_SOURCES =  \
         src/base/default_coupling.C \
+        src/base/dirichlet_boundary.C \
         src/base/dof_map.C \
         src/base/dof_map_constraints.C \
         src/base/dof_object.C \

@@ -30,8 +30,10 @@ void HeatSystem::init_data ()
   std::vector<unsigned int> T_only(1, T_var);
   ZeroFunction<Number> zero;
 
+  // Most DirichletBoundary users will want to supply a "locally
+  // indexed" functor
   this->get_dof_map().add_dirichlet_boundary
-    (DirichletBoundary (nonyplus_bdys, T_only, &zero));
+    (DirichletBoundary (nonyplus_bdys, T_only, zero, LOCAL_VARIABLE_ORDER));
 
   // Do the parent's initialization after variables are defined
   FEMSystem::init_data();

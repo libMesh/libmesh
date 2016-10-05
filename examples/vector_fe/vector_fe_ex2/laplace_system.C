@@ -73,7 +73,13 @@ void LaplaceSystem::init_dirichlet_bcs()
   // only two components should be returned.
   SolutionFunction func(u_var);
 
-  this->get_dof_map().add_dirichlet_boundary(libMesh::DirichletBoundary(boundary_ids, vars, &func));
+  // In general, when reusing a system-indexed exact solution, we want
+  // to use the default system-ordering constructor for
+  // DirichletBoundary, so we demonstrate that here.  In this case,
+  // though, we have only one (vector-valued!) variable, so system-
+  // and local- orderings are the same.
+  this->get_dof_map().add_dirichlet_boundary
+    (libMesh::DirichletBoundary(boundary_ids, vars, func));
 }
 
 void LaplaceSystem::init_context(DiffContext & context)

@@ -166,9 +166,13 @@ int main (int argc, char ** argv)
     boundary_ids.insert(7);
     unsigned int variables[] = {2, 3, 4};
     ZeroFunction<> zf;
-    DirichletBoundary dirichlet_bc(boundary_ids,
-                                   std::vector<unsigned int>(variables, variables+3),
-                                   &zf);
+
+    // Most DirichletBoundary users will want to supply a "locally
+    // indexed" functor
+    DirichletBoundary dirichlet_bc 
+      (boundary_ids,
+       std::vector<unsigned int>(variables, variables+3), zf,
+       LOCAL_VARIABLE_ORDER);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
   // BC v, theta_x, theta_z
@@ -177,9 +181,11 @@ int main (int argc, char ** argv)
     boundary_ids.insert(8);
     unsigned int variables[] = {1, 3, 5};
     ZeroFunction<> zf;
-    DirichletBoundary dirichlet_bc(boundary_ids,
-                                   std::vector<unsigned int>(variables, variables+3),
-                                   &zf);
+
+    DirichletBoundary dirichlet_bc
+      (boundary_ids,
+       std::vector<unsigned int>(variables, variables+3), zf,
+       LOCAL_VARIABLE_ORDER);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
   // CD u, theta_y, theta_z
@@ -188,9 +194,11 @@ int main (int argc, char ** argv)
     boundary_ids.insert(9);
     unsigned int variables[] = {0, 4, 5};
     ZeroFunction<> zf;
-    DirichletBoundary dirichlet_bc(boundary_ids,
-                                   std::vector<unsigned int>(variables, variables+3),
-                                   &zf);
+
+    DirichletBoundary dirichlet_bc
+      (boundary_ids,
+       std::vector<unsigned int>(variables, variables+3), zf,
+       LOCAL_VARIABLE_ORDER);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
   // AD u, w, theta_y
@@ -199,9 +207,11 @@ int main (int argc, char ** argv)
     boundary_ids.insert(10);
     unsigned int variables[] = {0, 2, 4};
     ZeroFunction<> zf;
-    DirichletBoundary dirichlet_bc(boundary_ids,
-                                   std::vector<unsigned int>(variables, variables+3),
-                                   &zf);
+
+    DirichletBoundary dirichlet_bc
+      (boundary_ids,
+       std::vector<unsigned int>(variables, variables+3), zf,
+       LOCAL_VARIABLE_ORDER);
     system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   }
 

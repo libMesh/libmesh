@@ -33,6 +33,7 @@
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_type.h"
+#include "libmesh/function_base.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_inserter_iterator.h"

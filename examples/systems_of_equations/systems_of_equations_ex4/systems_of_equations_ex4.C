@@ -122,9 +122,10 @@ int main (int argc, char ** argv)
   // Create a ZeroFunction to initialize dirichlet_bc
   ZeroFunction<> zf;
 
-  DirichletBoundary dirichlet_bc(boundary_ids,
-                                 variables,
-                                 &zf);
+  // Most DirichletBoundary users will want to supply a "locally
+  // indexed" functor
+  DirichletBoundary dirichlet_bc(boundary_ids, variables, zf,
+                                 LOCAL_VARIABLE_ORDER);
 
   // We must add the Dirichlet boundary condition _before_
   // we call equation_systems.init()
