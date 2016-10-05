@@ -6,6 +6,7 @@
 
 // libMesh includes
 #include <libmesh/parallel.h>
+#include <libmesh/auto_ptr.h>
 
 // Ignore unused parameter warnings coming from cppuint headers
 #include <libmesh/ignore_warnings.h>
@@ -52,7 +53,8 @@ public:
       global_size += (block_size + static_cast<unsigned int>(p));
 
     {
-      Base & v = *(new Derived(*my_comm, global_size, local_size));
+      libMesh::UniquePtr<Base> v_ptr(new Derived(*my_comm, global_size, local_size));
+      Base & v = *v_ptr;
       std::vector<libMesh::Number> l(global_size);
 
       const libMesh::dof_id_type
@@ -63,19 +65,17 @@ public:
         v.set (n, static_cast<libMesh::Number>(n));
       v.close();
 
-      if(!to_one)
+      if (!to_one)
         v.localize(l);
       else
         v.localize_to_one(l,root_pid);
 
-      if(!to_one || my_comm->rank() == root_pid)
-        //Yes I really mean v.size()
+      if (!to_one || my_comm->rank() == root_pid)
+        // Yes I really mean v.size()
         for (libMesh::dof_id_type i=0; i<v.size(); i++)
-          CPPUNIT_ASSERT_DOUBLES_EQUAL
-            ( libMesh::libmesh_real(i), libMesh::libmesh_real(l[i]),
-              libMesh::TOLERANCE*libMesh::TOLERANCE );
-
-      delete &v;
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(libMesh::libmesh_real(i),
+                                       libMesh::libmesh_real(l[i]),
+                                       libMesh::TOLERANCE*libMesh::TOLERANCE);
     }
   }
 
