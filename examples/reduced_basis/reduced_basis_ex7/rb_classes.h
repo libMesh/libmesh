@@ -39,6 +39,7 @@ using libMesh::RBConstruction;
 using libMesh::RBEvaluation;
 using libMesh::Real;
 using libMesh::SECOND;
+using libMesh::UniquePtr;
 
 
 // A simple subclass of RBEvaluation, which just needs to specify
@@ -87,7 +88,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~SimpleRBConstruction () { delete acoustics_rb_assembly_expansion; }
+  virtual ~SimpleRBConstruction () {}
 
   /**
    * The type of system.
@@ -108,7 +109,8 @@ public:
 
     Parent::init_data();
 
-    acoustics_rb_assembly_expansion = new AcousticsRBAssemblyExpansion;
+    acoustics_rb_assembly_expansion.reset
+      (new AcousticsRBAssemblyExpansion);
 
     // Set the rb_assembly_expansion for this Construction object.
     // The theta expansion comes from the RBEvaluation object.
@@ -148,7 +150,7 @@ public:
    * i.e. the objects that define how to assemble the set of parameter-independent
    * operators in the affine expansion of the PDE.
    */
-  AcousticsRBAssemblyExpansion * acoustics_rb_assembly_expansion;
+  UniquePtr<AcousticsRBAssemblyExpansion> acoustics_rb_assembly_expansion;
 };
 
 #endif
