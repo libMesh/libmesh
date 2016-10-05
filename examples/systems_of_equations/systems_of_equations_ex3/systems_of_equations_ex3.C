@@ -50,6 +50,9 @@
 #include "libmesh/perf_log.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/utility.h"
+#include "libmesh/dirichlet_boundaries.h"
+#include "libmesh/zero_function.h"
+#include "libmesh/const_function.h"
 
 // For systems of equations the DenseSubMatrix
 // and DenseSubVector provide convenient ways for
@@ -68,6 +71,9 @@ using namespace libMesh;
 // matrix and right-hand-side.
 void assemble_stokes (EquationSystems & es,
                       const std::string & system_name);
+
+// Function which sets Dirichlet BCs for the lid-driven cavity.
+void set_lid_driven_bcs(TransientLinearImplicitSystem & system);
 
 // The main program.
 int main (int argc, char ** argv)
@@ -110,10 +116,10 @@ int main (int argc, char ** argv)
   TransientLinearImplicitSystem & system =
     equation_systems.add_system<TransientLinearImplicitSystem> ("Navier-Stokes");
 
-  // Add the variables "u" & "v" to "Navier-Stokes".  They
+  // Add the variables "vel_x" & "vel_y" to "Navier-Stokes".  They
   // will be approximated using second-order approximation.
-  system.add_variable ("u", SECOND);
-  system.add_variable ("v", SECOND);
+  system.add_variable ("vel_x", SECOND);
+  system.add_variable ("vel_y", SECOND);
 
   // Add the variable "p" to "Navier-Stokes". This will
   // be approximated with a first-order basis,
@@ -127,6 +133,9 @@ int main (int argc, char ** argv)
   // Give the system a pointer to the matrix assembly
   // function.
   system.attach_assemble_function (assemble_stokes);
+
+  // Set Dirichlet boundary conditions.
+  set_lid_driven_bcs(system);
 
   // Initialize the data structures for the equation system.
   equation_systems.init ();
@@ -143,14 +152,14 @@ int main (int argc, char ** argv)
 
   // Now we begin the timestep loop to compute the time-accurate
   // solution of the equations.
-  const Real dt = 0.01;
+  const Real dt = 0.1;
   navier_stokes_system.time = 0.0;
   const unsigned int n_timesteps = 15;
 
   // The number of steps and the stopping criterion are also required
   // for the nonlinear iterations.
   const unsigned int n_nonlinear_steps = 15;
-  const Real nonlinear_tolerance = 1.e-3;
+  const Real nonlinear_tolerance = 1.e-5;
 
   // We also set a standard linear solver flag in the EquationSystems object
   // which controls the maxiumum number of linear solver iterations allowed.
@@ -161,13 +170,22 @@ int main (int argc, char ** argv)
   // then reference this parameter.
   equation_systems.parameters.set<Real> ("dt") = dt;
 
+  // The kinematic viscosity, nu = mu/rho, units of length**2/time.
+  equation_systems.parameters.set<Real> ("nu") = .007;
+
   // The first thing to do is to get a copy of the solution at
   // the current nonlinear iteration.  This value will be used to
   // determine if we can exit the nonlinear loop.
   UniquePtr<NumericVector<Number> >
     last_nonlinear_soln (navier_stokes_system.solution->clone());
 
-  for (unsigned int t_step=0; t_step<n_timesteps; ++t_step)
+  // Since we are not doing adaptivity, write all solutions to a single Exodus file.
+  ExodusII_IO exo_io(mesh);
+
+  // Write out the initial condition
+  exo_io.write_equation_systems ("out.e", equation_systems);
+
+  for (unsigned int t_step=1; t_step<=n_timesteps; ++t_step)
     {
       // Incremenet the time counter, set the time and the
       // time step size as parameters in the EquationSystem.
@@ -190,6 +208,9 @@ int main (int argc, char ** argv)
       // to a "reasonable" starting value.
       const Real initial_linear_solver_tol = 1.e-6;
       equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
+
+      // We'll set this flag when convergence is (hopefully) achieved.
+      bool converged = false;
 
       // Now we begin the nonlinear loop
       for (unsigned int l=0; l<n_nonlinear_steps; ++l)
@@ -219,6 +240,27 @@ int main (int argc, char ** argv)
           // What was the final residual of the linear system?
           const Real final_linear_residual = navier_stokes_system.final_linear_residual();
 
+          // If the solver did no work (sometimes -ksp_converged_reason
+          // says "Linear solve converged due to CONVERGED_RTOL
+          // iterations 0") but the nonlinear residual norm is above
+          // the tolerance, we need to pick an even lower linear
+          // solver tolerance and try again.  Note that the tolerance
+          // is relative to the norm of the RHS, which for this
+          // particular problem does not go to zero, since we are
+          // solving for the full solution rather than the update.
+          //
+          // Similarly, if the solver did no work and this is the 0th
+          // nonlinear step, it means that the delta between solutions
+          // is being inaccurately measured as "0" since the solution
+          // did not change.  Decrease the tolerance and try again.
+          if (n_linear_iterations == 0 &&
+              (navier_stokes_system.final_linear_residual() >= nonlinear_tolerance || l==0))
+            {
+              Real old_linear_solver_tolerance = equation_systems.parameters.get<Real> ("linear solver tolerance");
+              equation_systems.parameters.set<Real> ("linear solver tolerance") = 1.e-3 * old_linear_solver_tolerance;
+              continue;
+            }
+
           // Print out convergence information for the linear and
           // nonlinear iterations.
           libMesh::out << "Linear solver converged at step: "
@@ -238,6 +280,7 @@ int main (int argc, char ** argv)
               libMesh::out << " Nonlinear solver converged at step "
                            << l
                            << std::endl;
+              converged = true;
               break;
             }
 
@@ -246,10 +289,13 @@ int main (int argc, char ** argv)
           // the solution to ensure quadratic convergence.  The new linear solver tolerance
           // is chosen (heuristically) as the square of the previous linear system residual norm.
           //Real flr2 = final_linear_residual*final_linear_residual;
-          equation_systems.parameters.set<Real> ("linear solver tolerance") =
-            std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
-
+          Real new_linear_solver_tolerance = std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
+          equation_systems.parameters.set<Real> ("linear solver tolerance") = new_linear_solver_tolerance;
         } // end nonlinear loop
+
+      // Don't keep going if we failed to converge.
+      if (!converged)
+        libmesh_error_msg("Error: Newton iterations failed to converge!");
 
 #ifdef LIBMESH_HAVE_EXODUS_API
       // Write out every nth timestep to file.
@@ -257,18 +303,10 @@ int main (int argc, char ** argv)
 
       if ((t_step+1)%write_interval == 0)
         {
-          std::ostringstream file_name;
-
-          // We write the file in the ExodusII format.
-          file_name << "out_"
-                    << std::setw(3)
-                    << std::setfill('0')
-                    << std::right
-                    << t_step + 1
-                    << ".e";
-
-          ExodusII_IO(mesh).write_equation_systems (file_name.str(),
-                                                    equation_systems);
+          exo_io.write_timestep("out.e",
+                                equation_systems,
+                                t_step+1, // we're off by one since we wrote the IC and the Exodus numbering is 1-based.
+                                navier_stokes_system.time);
         }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
     } // end timestep loop.
@@ -302,13 +340,13 @@ void assemble_stokes (EquationSystems & es,
     es.get_system<TransientLinearImplicitSystem> ("Navier-Stokes");
 
   // Numeric ids corresponding to each variable in the system
-  const unsigned int u_var = navier_stokes_system.variable_number ("u");
-  const unsigned int v_var = navier_stokes_system.variable_number ("v");
+  const unsigned int u_var = navier_stokes_system.variable_number ("vel_x");
+  const unsigned int v_var = navier_stokes_system.variable_number ("vel_y");
   const unsigned int p_var = navier_stokes_system.variable_number ("p");
   const unsigned int alpha_var = navier_stokes_system.variable_number ("alpha");
 
-  // Get the Finite Element type for "u".  Note this will be
-  // the same as the type for "v".
+  // Get the Finite Element type for "vel_x".  Note this will be
+  // the same as the type for "vel_y".
   FEType fe_vel_type = navier_stokes_system.variable_type(u_var);
 
   // Get the Finite Element type for "p".
@@ -394,8 +432,10 @@ void assemble_stokes (EquationSystems & es,
   // timesteps.  If you monitor the initial nonlinear residual for this
   // simulation, you should see that it is monotonically decreasing in time.
   const Real dt    = es.parameters.get<Real>("dt");
-  // const Real time  = es.parameters.get<Real>("time");
   const Real theta = 1.;
+
+  // The kinematic viscosity, multiplies the "viscous" terms.
+  const Real nu = es.parameters.get<Real>("nu");
 
   // Now we will loop over all the elements in the mesh that
   // live on the local processor. We will compute the element
@@ -529,14 +569,14 @@ void assemble_stokes (EquationSystems & es,
               Fu(i) += JxW[qp]*(u_old*phi[i][qp] -                            // mass-matrix term
                                 (1.-theta)*dt*(U_old*grad_u_old)*phi[i][qp] + // convection term
                                 (1.-theta)*dt*p_old*dphi[i][qp](0)  -         // pressure term on rhs
-                                (1.-theta)*dt*(grad_u_old*dphi[i][qp]) +      // diffusion term on rhs
+                                (1.-theta)*dt*nu*(grad_u_old*dphi[i][qp]) +   // diffusion term on rhs
                                 theta*dt*(U*grad_u)*phi[i][qp]);              // Newton term
 
 
               Fv(i) += JxW[qp]*(v_old*phi[i][qp] -                             // mass-matrix term
                                 (1.-theta)*dt*(U_old*grad_v_old)*phi[i][qp] +  // convection term
                                 (1.-theta)*dt*p_old*dphi[i][qp](1) -           // pressure term on rhs
-                                (1.-theta)*dt*(grad_v_old*dphi[i][qp]) +       // diffusion term on rhs
+                                (1.-theta)*dt*nu*(grad_v_old*dphi[i][qp]) +    // diffusion term on rhs
                                 theta*dt*(U*grad_v)*phi[i][qp]);               // Newton term
 
 
@@ -546,19 +586,19 @@ void assemble_stokes (EquationSystems & es,
               // Matrix contributions for the uu and vv couplings.
               for (unsigned int j=0; j<n_u_dofs; j++)
                 {
-                  Kuu(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                // mass matrix term
-                                       theta*dt*(dphi[i][qp]*dphi[j][qp]) +   // diffusion term
-                                       theta*dt*(U*dphi[j][qp])*phi[i][qp] +  // convection term
-                                       theta*dt*u_x*phi[i][qp]*phi[j][qp]);   // Newton term
+                  Kuu(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                 // mass matrix term
+                                       theta*dt*nu*(dphi[i][qp]*dphi[j][qp]) + // diffusion term
+                                       theta*dt*(U*dphi[j][qp])*phi[i][qp] +   // convection term
+                                       theta*dt*u_x*phi[i][qp]*phi[j][qp]);    // Newton term
 
-                  Kuv(i,j) += JxW[qp]*theta*dt*u_y*phi[i][qp]*phi[j][qp];     // Newton term
+                  Kuv(i,j) += JxW[qp]*theta*dt*u_y*phi[i][qp]*phi[j][qp];      // Newton term
 
-                  Kvv(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                // mass matrix term
-                                       theta*dt*(dphi[i][qp]*dphi[j][qp]) +   // diffusion term
-                                       theta*dt*(U*dphi[j][qp])*phi[i][qp] +  // convection term
-                                       theta*dt*v_y*phi[i][qp]*phi[j][qp]);   // Newton term
+                  Kvv(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                 // mass matrix term
+                                       theta*dt*nu*(dphi[i][qp]*dphi[j][qp]) + // diffusion term
+                                       theta*dt*(U*dphi[j][qp])*phi[i][qp] +   // convection term
+                                       theta*dt*v_y*phi[i][qp]*phi[j][qp]);    // Newton term
 
-                  Kvu(i,j) += JxW[qp]*theta*dt*v_x*phi[i][qp]*phi[j][qp];     // Newton term
+                  Kvu(i,j) += JxW[qp]*theta*dt*v_x*phi[i][qp]*phi[j][qp];      // Newton term
                 }
 
               // Matrix contributions for the up and vp couplings.
@@ -585,66 +625,10 @@ void assemble_stokes (EquationSystems & es,
             }
         } // end of the quadrature point qp-loop
 
-
-      // At this point the interior element integration has
-      // been completed.  However, we have not yet addressed
-      // boundary conditions.  For this example we will only
-      // consider simple Dirichlet boundary conditions imposed
-      // via the penalty method. The penalty method used here
-      // is equivalent (for Lagrange basis functions) to lumping
-      // the matrix resulting from the L2 projection penalty
-      // approach introduced in example 3.
-      {
-        // The penalty value.  \f$ \frac{1}{\epsilon} \f$
-        const Real penalty = 1.e10;
-
-        // The following loops over the sides of the element.
-        // If the element has no neighbor on a side then that
-        // side MUST live on a boundary of the domain.
-        for (unsigned int s=0; s<elem->n_sides(); s++)
-          if (elem->neighbor_ptr(s) == libmesh_nullptr)
-            {
-              UniquePtr<const Elem> side (elem->build_side_ptr(s));
-
-              // Loop over the nodes on the side.
-              for (unsigned int ns=0; ns<side->n_nodes(); ns++)
-                {
-                  // Boundary ids are set internally by
-                  // build_square().
-                  // 0=bottom
-                  // 1=right
-                  // 2=top
-                  // 3=left
-
-                  // Set u = 1 on the top boundary, 0 everywhere else
-                  const Real u_value =
-                    (mesh.get_boundary_info().has_boundary_id(elem, s, 2))
-                    ? 1. : 0.;
-
-                  // Set v = 0 everywhere
-                  const Real v_value = 0.;
-
-                  // Find the node on the element matching this node on
-                  // the side.  That defined where in the element matrix
-                  // the boundary condition will be applied.
-                  for (unsigned int n=0; n<elem->n_nodes(); n++)
-                    if (elem->node_id(n) == side->node_id(ns))
-                      {
-                        // Matrix contribution.
-                        Kuu(n,n) += penalty;
-                        Kvv(n,n) += penalty;
-
-                        // Right-hand-side contribution.
-                        Fu(n) += penalty*u_value;
-                        Fv(n) += penalty*v_value;
-                      }
-                } // end face node loop
-            } // end if (elem->neighbor(side) == libmesh_nullptr)
-      } // end boundary condition section
-
-      // If this assembly program were to be used on an adaptive mesh,
-      // we would have to apply any hanging node constraint equations
-      dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+      // Since we're using heterogeneous DirichletBoundary objects for
+      // the boundary conditions, we need to call a specific function
+      // to constrain the element stiffness matrix.
+      dof_map.heterogenously_constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
@@ -654,6 +638,59 @@ void assemble_stokes (EquationSystems & es,
       navier_stokes_system.rhs->add_vector    (Fe, dof_indices);
     } // end of element loop
 
-  // We can set the mean of the pressure by setting Falpha
+  // We can set the mean of the pressure by setting Falpha.  Typically
+  // a value of zero is chosen, but the value should be arbitrary.
   navier_stokes_system.rhs->add(navier_stokes_system.rhs->size()-1, 10.);
+}
+
+
+
+void set_lid_driven_bcs(TransientLinearImplicitSystem & system)
+{
+  unsigned short int
+    u_var = system.variable_number("vel_x"),
+    v_var = system.variable_number("vel_y");
+
+  // Get a convenient reference to the System's DofMap
+  DofMap & dof_map = system.get_dof_map();
+
+  {
+    // u=v=0 on bottom, left, right
+    std::set<boundary_id_type> boundary_ids;
+    boundary_ids.insert(0);
+    boundary_ids.insert(1);
+    boundary_ids.insert(3);
+
+    std::vector<unsigned int> variables;
+    variables.push_back(u_var);
+    variables.push_back(v_var);
+
+    dof_map.add_dirichlet_boundary(DirichletBoundary(boundary_ids,
+                                                     variables,
+                                                     ZeroFunction<Number>()));
+  }
+  {
+    // u=1 on top
+    std::set<boundary_id_type> boundary_ids;
+    boundary_ids.insert(2);
+
+    std::vector<unsigned int> variables;
+    variables.push_back(u_var);
+
+    dof_map.add_dirichlet_boundary(DirichletBoundary(boundary_ids,
+                                                     variables,
+                                                     ConstFunction<Number>(1.)));
+  }
+  {
+    // v=0 on top
+    std::set<boundary_id_type> boundary_ids;
+    boundary_ids.insert(2);
+
+    std::vector<unsigned int> variables;
+    variables.push_back(v_var);
+
+    dof_map.add_dirichlet_boundary(DirichletBoundary(boundary_ids,
+                                                     variables,
+                                                     ZeroFunction<Number>()));
+  }
 }
