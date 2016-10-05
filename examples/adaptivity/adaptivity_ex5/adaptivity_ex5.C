@@ -111,7 +111,7 @@ Number exact_value (const Point & p,
 
 // With --enable-fparser, the user can also optionally set their own
 // exact solution equations.
-FunctionBase<Number> * parsed_solution = libmesh_nullptr;
+UniquePtr<FunctionBase<Number> > parsed_solution;
 
 
 // Returns a string with 'number' formatted and placed directly
@@ -213,7 +213,8 @@ int main (int argc, char ** argv)
   const bool have_expression = false;
 #endif
   if (have_expression)
-    parsed_solution = new ParsedFunction<Number>(command_line.next(std::string()));
+    parsed_solution.reset
+      (new ParsedFunction<Number>(command_line.next(std::string())));
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
@@ -526,9 +527,6 @@ int main (int argc, char ** argv)
     }
 #endif // #ifndef LIBMESH_ENABLE_AMR
 
-  // We might have a parser to clean up
-  delete parsed_solution;
-
   return 0;
 }
 
@@ -550,8 +548,8 @@ void init_cd (EquationSystems & es,
   // Project initial conditions at time 0
   es.parameters.set<Real> ("time") = system.time = 0;
 
-  if (parsed_solution)
-    system.project_solution(parsed_solution, libmesh_nullptr);
+  if (parsed_solution.get())
+    system.project_solution(parsed_solution.get(), libmesh_nullptr);
   else
     system.project_solution(exact_value, libmesh_nullptr, es.parameters);
 }
