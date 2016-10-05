@@ -347,7 +347,7 @@ public:
         }
 
         stress_dof_map.dof_indices (elem, vonmises_dof_indices_var, vonMises_var);
-        std::vector< DenseMatrix<Real> > elem_sigma_vec(vonmises_dof_indices_var.size());
+        std::vector< DenseMatrix<Number> > elem_sigma_vec(vonmises_dof_indices_var.size());
         for(unsigned int index=0; index<elem_sigma_vec.size(); index++)
         {
           elem_sigma_vec[index].resize(3,3);
@@ -374,14 +374,14 @@ public:
                 }
             }
 
-            DenseVector<Real> Fe(n_proj_dofs);
+            DenseVector<Number> Fe(n_proj_dofs);
             for (unsigned int qp=0; qp<qrule.n_points(); qp++)
               for(unsigned int i=0; i<n_proj_dofs; i++)
               {
                 Fe(i) += JxW[qp] * stress_tensor_qp[qp](var_i,var_j) * phi[i][qp];
               }
 
-            DenseVector<Real> projected_data;
+            DenseVector<Number> projected_data;
             Me.cholesky_solve(Fe, projected_data);
 
             for(unsigned int index=0; index<n_proj_dofs; index++)
