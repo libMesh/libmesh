@@ -773,7 +773,7 @@ protected:
    * the \p InfFE class is not required to be templated w.r.t.
    * to the base approximation shape.
    */
-  FEBase * base_fe;
+  UniquePtr<FEBase> base_fe;
 
   /**
    * This \p FEType stores the characteristics for which

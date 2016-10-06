@@ -43,8 +43,6 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType & fet) :
   _n_total_approx_sf (0),
   _n_total_qp        (0),
 
-  base_fe      (libmesh_nullptr),
-
   // initialize the current_fe_type to all the same
   // values as \p fet (since the FE families and coordinate
   // map type should @e not change), but use an invalid order
@@ -63,12 +61,9 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType & fet) :
   libmesh_assert_equal_to (T_radial, fe_type.radial_family);
   libmesh_assert_equal_to (T_map, fe_type.inf_map);
 
-  // build the base_fe object, handle the UniquePtr
+  // build the base_fe object
   if (Dim != 1)
-    {
-      UniquePtr<FEBase> ap_fb(FEBase::build(Dim-1, fet));
-      base_fe = ap_fb.release();
-    }
+    base_fe.reset(FEBase::build(Dim-1, fet).release());
 }
 
 
@@ -78,9 +73,6 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType & fet) :
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 InfFE<Dim,T_radial,T_map>::~InfFE ()
 {
-  // delete pointers, if necessary
-  delete base_fe;
-  base_fe = libmesh_nullptr;
 }
 
 
@@ -91,7 +83,7 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase * q)
 {
   libmesh_assert(q);
-  libmesh_assert(base_fe);
+  libmesh_assert(base_fe.get());
 
   const Order base_int_order   = q->get_order();
   const Order radial_int_order = static_cast<Order>(2 * (static_cast<unsigned int>(fe_type.radial_order.get_order()) + 1) +2);
@@ -132,7 +124,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
                                        const std::vector<Point> * const pts,
                                        const std::vector<Real> * const weights)
 {
-  libmesh_assert(base_fe);
+  libmesh_assert(base_fe.get());
   libmesh_assert(base_fe->qrule);
   libmesh_assert_equal_to (base_fe->qrule, base_qrule.get());
   libmesh_assert(radial_qrule.get());
@@ -239,12 +231,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       this->update_base_elem(inf_elem);
 
       // the finite element on the ifem base
-      {
-        UniquePtr<FEBase> ap_fb(FEBase::build(Dim-1, this->fe_type));
-        if (base_fe != libmesh_nullptr)
-          delete base_fe;
-        base_fe = ap_fb.release();
-      }
+      base_fe.reset(FEBase::build(Dim-1, this->fe_type).release());
 
       // init base shapes
       base_fe->init_base_shape_functions(*pts,
