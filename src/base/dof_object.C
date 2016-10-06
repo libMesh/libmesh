@@ -273,7 +273,7 @@ void DofObject::set_n_vars_per_group(const unsigned int s,
   // better not have any now!
   libmesh_assert_equal_to (this->n_var_groups(s), 0);
 
-  // had better not screwed up any of our sizes!
+  // Make sure we didn't screw up any of our sizes!
 #ifdef DEBUG
   for (unsigned int s_ctr=0; s_ctr<this->n_systems(); s_ctr++)
     if (s_ctr != s)
@@ -304,7 +304,6 @@ void DofObject::set_n_vars_per_group(const unsigned int s,
     DofObject::index_buffer_t(_idx_buf).swap(_idx_buf);
   }
 
-  // that better had worked.  Assert stuff.
   libmesh_assert_equal_to (nvg, this->n_var_groups(s));
 
 #ifdef DEBUG

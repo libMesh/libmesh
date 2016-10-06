@@ -107,8 +107,8 @@ public:
    * \f$ [ \texttt{n\_start, n\_stop} ]^{th} \f$
    * frequencies. The solution vectors are stored in automatically
    * allocated vectors named \p solution_nnnn.  For access to these vectors,
-   * see \p System. When calling this, the frequency range should better
-   * be already set.
+   * see \p System. When calling this, the frequency range should
+   * already be set.
    */
   void solve (const unsigned int n_start,
               const unsigned int n_stop);

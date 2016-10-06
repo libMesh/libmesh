@@ -125,7 +125,7 @@ public:
    * Once the data is properly read from file, the id
    * maps can safely be cleared.  However, if this object
    * should remain able to @e write nodal or element oriented
-   * data to file, this method should better @e not be used.
+   * data to file, this method should @e not be used.
    * Use the appropriate \p bool to select the id map that
    * should be cleared.  By default, both id maps are deleted.
    */

@@ -86,8 +86,6 @@ class InfFE;
  * request the number of dof's through this interface class.
  * Note that this also enables the co-existence of various
  * element-based schemes.
- * This class is well 'at the heart' of the library, so
- * things in here should better remain unchanged.
  *
  * \author Benjamin S. Kirk
  * \date 2002

@@ -1321,7 +1321,7 @@ MessageTag Communicator::get_unique_tag(int tagvalue) const
 inline
 void Communicator::reference_unique_tag(int tagvalue) const
 {
-  // This has better be an already-acquired tag.
+  // This had better be an already-acquired tag.
   libmesh_assert(used_tag_values.count(tagvalue));
 
   used_tag_values[tagvalue]++;
@@ -1331,7 +1331,7 @@ void Communicator::reference_unique_tag(int tagvalue) const
 inline
 void Communicator::dereference_unique_tag(int tagvalue) const
 {
-  // This has better be an already-acquired tag.
+  // This had better be an already-acquired tag.
   libmesh_assert(used_tag_values.count(tagvalue));
 
   used_tag_values[tagvalue]--;

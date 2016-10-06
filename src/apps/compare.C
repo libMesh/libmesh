@@ -277,7 +277,7 @@ int main (int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
 
-  // these should better be not contained in the following braces
+  // these should not be contained in the following braces
   bool quiet = false;
   bool are_equal;
 
