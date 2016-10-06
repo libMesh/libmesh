@@ -753,7 +753,7 @@ protected:
    * The quadrature rule for the base element associated
    * with the current infinite element
    */
-  QBase * base_qrule;
+  UniquePtr<QBase> base_qrule;
 
   /**
    * The quadrature rule for the base element associated

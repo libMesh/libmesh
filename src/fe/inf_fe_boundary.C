@@ -150,7 +150,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 
     delete base_fe;
     base_fe = ap_fb.release();
-    base_fe->attach_quadrature_rule(base_qrule);
+    base_fe->attach_quadrature_rule(base_qrule.get());
   }
 
   // initialize the shape functions on the base

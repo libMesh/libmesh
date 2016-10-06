@@ -43,7 +43,6 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType & fet) :
   _n_total_approx_sf (0),
   _n_total_qp        (0),
 
-  base_qrule   (libmesh_nullptr),
   radial_qrule (libmesh_nullptr),
   base_elem    (libmesh_nullptr),
   base_fe      (libmesh_nullptr),
@@ -82,9 +81,6 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 InfFE<Dim,T_radial,T_map>::~InfFE ()
 {
   // delete pointers, if necessary
-  delete base_qrule;
-  base_qrule = libmesh_nullptr;
-
   delete radial_qrule;
   radial_qrule = libmesh_nullptr;
 
@@ -112,9 +108,8 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase * q)
   if (Dim != 1)
     {
       // build a Dim-1 quadrature rule of the type that we received
-      UniquePtr<QBase> apq( QBase::build(q->type(), qrule_dim-1, base_int_order) );
-      base_qrule = apq.release();
-      base_fe->attach_quadrature_rule(base_qrule);
+      base_qrule.reset(QBase::build(q->type(), qrule_dim-1, base_int_order).release());
+      base_fe->attach_quadrature_rule(base_qrule.get());
     }
 
   // in radial direction, always use Gauss quadrature
@@ -149,7 +144,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
 {
   libmesh_assert(base_fe);
   libmesh_assert(base_fe->qrule);
-  libmesh_assert_equal_to (base_fe->qrule, base_qrule);
+  libmesh_assert_equal_to (base_fe->qrule, base_qrule.get());
   libmesh_assert(radial_qrule);
   libmesh_assert(inf_elem);
 
