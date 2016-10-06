@@ -153,15 +153,15 @@ public:
 
     // Check that we can manually index dofs of variables based on the first dof in a variable group
     // Using: id = base + var_in_vg*ncomp + comp
-    CPPUNIT_ASSERT_EQUAL(aobject.vg_dof_base(0, 0) + 1*1 + 0, aobject.dof_number(0, 1, 0));
+    CPPUNIT_ASSERT_EQUAL((dof_id_type)(aobject.vg_dof_base(0, 0) + 1*1 + 0), aobject.dof_number(0, 1, 0));
 
     // Another Check that we can manually index dofs of variables based on the first dof in a variable group
     // Using: id = base + var_in_vg*ncomp + comp
-    CPPUNIT_ASSERT_EQUAL(aobject.vg_dof_base(0, 1) + 2*3 + 2, aobject.dof_number(0, 4, 2));
+    CPPUNIT_ASSERT_EQUAL((dof_id_type)(aobject.vg_dof_base(0, 1) + 2*3 + 2), aobject.dof_number(0, 4, 2));
 
     // One More Check that we can manually index dofs of variables based on the first dof in a variable group
     // Using: id = base + var_in_vg*ncomp + comp
-    CPPUNIT_ASSERT_EQUAL(aobject.vg_dof_base(1, 1) + 0*3 + 0, aobject.dof_number(1, 2, 0));
+    CPPUNIT_ASSERT_EQUAL((dof_id_type)(aobject.vg_dof_base(1, 1) + 0*3 + 0), aobject.dof_number(1, 2, 0));
   }
 
   void testJensEftangBug()
