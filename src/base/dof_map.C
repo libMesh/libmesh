@@ -179,13 +179,16 @@ DofMap::DofMap(const unsigned int number,
 {
   _matrices.clear();
 
-  _default_coupling->set_periodic_boundaries(_periodic_boundaries);
   _default_coupling->set_mesh(&_mesh);
-  this->add_coupling_functor(*_default_coupling);
-
-  _default_evaluating->set_periodic_boundaries(_periodic_boundaries);
   _default_evaluating->set_mesh(&_mesh);
   _default_evaluating->set_n_levels(1);
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  _default_coupling->set_periodic_boundaries(_periodic_boundaries);
+  _default_evaluating->set_periodic_boundaries(_periodic_boundaries);
+#endif
+
+  this->add_coupling_functor(*_default_coupling);
   this->add_algebraic_ghosting_functor(*_default_evaluating);
 }
 
