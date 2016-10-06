@@ -225,7 +225,7 @@ public:
   // InfFE continued
 
   /**
-   * Constructor.
+   * Constructor and empty destructor.
    * Initializes some data structures.  Builds a \p FE<Dim-1,T_base>
    * object to handle  approximation in the base, so that
    * there is no need to template \p InfFE<Dim,T_radial,T_map> also with
@@ -239,15 +239,7 @@ public:
    */
   explicit
   InfFE(const FEType & fet);
-
-  /**
-   * Desctructor.  Clean up.
-   */
-  ~InfFE();
-
-
-
-
+  ~InfFE() {}
 
   //-------------------------------------------------------------
   // The static public members for access from FEInterface etc
