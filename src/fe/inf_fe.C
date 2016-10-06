@@ -43,7 +43,6 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType & fet) :
   _n_total_approx_sf (0),
   _n_total_qp        (0),
 
-  radial_qrule (libmesh_nullptr),
   base_elem    (libmesh_nullptr),
   base_fe      (libmesh_nullptr),
 
@@ -81,9 +80,6 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 InfFE<Dim,T_radial,T_map>::~InfFE ()
 {
   // delete pointers, if necessary
-  delete radial_qrule;
-  radial_qrule = libmesh_nullptr;
-
   delete base_elem;
   base_elem = libmesh_nullptr;
 
@@ -113,7 +109,7 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase * q)
     }
 
   // in radial direction, always use Gauss quadrature
-  radial_qrule = new QGauss(1, radial_int_order);
+  radial_qrule.reset(new QGauss(1, radial_int_order));
 
   // currently not used. But maybe helpful to store the QBase *
   // with which we initialized our own quadrature rules
@@ -145,7 +141,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
   libmesh_assert(base_fe);
   libmesh_assert(base_fe->qrule);
   libmesh_assert_equal_to (base_fe->qrule, base_qrule.get());
-  libmesh_assert(radial_qrule);
+  libmesh_assert(radial_qrule.get());
   libmesh_assert(inf_elem);
 
   // I don't understand infinite elements well enough to risk
@@ -295,7 +291,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem * libmesh_dbg_var(inf_elem))
 {
-  libmesh_assert(radial_qrule);
+  libmesh_assert(radial_qrule.get());
   libmesh_assert(inf_elem);
 
   // Start logging the radial shape function initialization
@@ -877,7 +873,7 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem *,
                                                         const std::vector<Point> &)
 {
-  libmesh_assert(radial_qrule);
+  libmesh_assert(radial_qrule.get());
 
   // Start logging the overall computation of shape functions
   LOG_SCOPE("compute_shape_functions()", "InfFE");
