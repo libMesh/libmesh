@@ -389,6 +389,7 @@ struct ActiveType : abstract_multi_predicate<T>
 
 
 
+#ifdef LIBMESH_ENABLE_AMR
 /**
  * Used to iterate over non-NULL, elements with a given refinement
  * flag.
@@ -419,6 +420,8 @@ struct FlaggedPID : abstract_multi_predicate<T>
     this->_predicates.push_back(new pid<T>(proc_id));
   }
 };
+
+#endif // LIBMESH_ENABLE_AMR
 
 
 

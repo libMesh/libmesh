@@ -989,6 +989,7 @@ public:
     (const DofMap & dof_map,
      unsigned int var_num = libMesh::invalid_uint) const = 0;
 
+#ifdef LIBMESH_ENABLE_AMR
   /**
    * Iterate over all elements with a specified refinement flag.
    */
@@ -1009,6 +1010,7 @@ public:
                                                              processor_id_type pid) const = 0;
   virtual const_element_iterator flagged_pid_elements_end (unsigned char rflag,
                                                            processor_id_type pid) const = 0;
+#endif
 
   /**
    * Active, local, and negation forms of the element iterators described above.
