@@ -599,7 +599,7 @@ protected:
   /**
    * the radial distance of the base nodes from the origin
    */
-  std::vector<Real>  dist;
+  std::vector<Real> dist;
 
   /**
    * the additional radial weight \f$ 1/{r^2} \f$ in local coordinates,
@@ -607,7 +607,7 @@ protected:
    * direction.  However, for uniform access to the data fields from the
    * outside, this data field is expanded to @e all quadrature points.
    */
-  std::vector<Real>  dweightdv;
+  std::vector<Real> dweightdv;
 
   /**
    * the radial decay \f$ 1/r \f$ in local coordinates.
@@ -615,56 +615,56 @@ protected:
    * Note that it is this decay which assures to satisfy
    * the Sommerfeld radiation condition in advance.
    */
-  std::vector<Real>  som;
+  std::vector<Real> som;
   /**
    * the first local derivative of the radial decay \f$ 1/r \f$ in local
    * coordinates.  Needed when setting up the overall shape functions.
    */
-  std::vector<Real>  dsomdv;
+  std::vector<Real> dsomdv;
 
   /**
    * the radial approximation shapes in local coordinates
    * Needed when setting up the overall shape functions.
    */
-  std::vector<std::vector<Real> >   mode;
+  std::vector<std::vector<Real> > mode;
 
   /**
    * the first local derivative of the radial approximation shapes.
    * Needed when setting up the overall shape functions.
    */
-  std::vector<std::vector<Real> >   dmodedv;
+  std::vector<std::vector<Real> > dmodedv;
 
   /**
    * the radial mapping shapes in local coordinates
    */
-  std::vector<std::vector<Real> >   radial_map;
+  std::vector<std::vector<Real> > radial_map;
 
 
   /**
    * the first local derivative of the radial mapping shapes
    */
-  std::vector<std::vector<Real> >   dradialdv_map;
+  std::vector<std::vector<Real> > dradialdv_map;
 
   /**
    * the first local derivative (for 3D, the first in the base)
    * of the phase term in local coordinates.
    * Needed in the overall weak form of infinite element formulations.
    */
-  std::vector<Real>  dphasedxi;
+  std::vector<Real> dphasedxi;
 
   /**
    * the second local derivative (for 3D, the second in the base)
    * of the phase term in local coordinates.
    * Needed in the overall weak form of infinite element formulations.
    */
-  std::vector<Real>  dphasedeta;
+  std::vector<Real> dphasedeta;
 
   /**
    * the third local derivative (for 3D, the derivative in radial
    * direction) of the phase term in local coordinates.
    * Needed in the overall weak form of infinite element formulations.
    */
-  std::vector<Real>  dphasedzeta;
+  std::vector<Real> dphasedzeta;
 
 
 
@@ -732,7 +732,7 @@ protected:
    * this vector contains the combined integration weights, so
    * that \p FEAbstract::compute_map() can still be used
    */
-  std::vector<Real>  _total_qrule_weights;
+  std::vector<Real> _total_qrule_weights;
 
   /**
    * The quadrature rule for the base element associated
