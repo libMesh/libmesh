@@ -49,7 +49,7 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType & fet) :
   // for the radial part (since this is the only order
   // that may change!).
   // the data structures like \p phi etc are not initialized
-  // through the constructor, but throught reinit()
+  // through the constructor, but through reinit()
   current_fe_type ( FEType(fet.order,
                            fet.family,
                            INVALID_ORDER,
@@ -353,7 +353,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem * inf_elem)
   LOG_SCOPE("init_shape_functions()", "InfFE");
 
   // -----------------------------------------------------------------
-  // fast access to some const int's for the radial data
+  // fast access to some const ints for the radial data
   const unsigned int n_radial_mapping_sf =
     cast_int<unsigned int>(radial_map.size());
   const unsigned int n_radial_approx_sf  =
@@ -760,8 +760,8 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem * inf_elem)
         // compute the phase term derivatives
         {
           unsigned int tp=0;
-          for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
-            for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
+          for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qps
+            for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qps
               {
                 // sum over all base shapes, to get the average distance
                 for (unsigned int i=0; i<n_base_mapping_sf; i++)
@@ -773,7 +773,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem * inf_elem)
 
                 tp++;
 
-              } // loop radial and base qp's
+              } // loop radial and base qps
 
         }
 
@@ -785,8 +785,8 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem * inf_elem)
         // compute the overall approximation shape functions,
         // pick the appropriate radial and base shapes through using
         // _base_shape_index and _radial_shape_index
-        for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
-          for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
+        for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qps
+          for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qps
             for (unsigned int ti=0; ti<n_total_approx_sf; ti++)  // over _all_ approx_sf
               {
                 // let the index vectors take care of selecting the appropriate base/radial shape
@@ -812,8 +812,8 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem * inf_elem)
         // compute the overall mapping functions,
         // pick the appropriate radial and base entries through using
         // _base_node_index and _radial_node_index
-        for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
-          for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
+        for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qps
+          for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qps
             for (unsigned int ti=0; ti<n_total_mapping_sf; ti++)  // over all mapping shapes
               {
                 // let the index vectors take care of selecting the appropriate base/radial mapping shape

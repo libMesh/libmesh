@@ -41,7 +41,7 @@ class FEComputeData;
 
 
 /**
- * A specific instatiation of the \p FEBase class. This
+ * A specific instantiation of the \p FEBase class. This
  * class is templated, and specific template instantiations
  * will result in different Infinite Element families, similar
  * to the \p FE class.  \p InfFE builds a \p FE<Dim-1,T_base>,
@@ -101,7 +101,7 @@ protected:
   public:
 
     /**
-     * @returns the decay in radial direction of
+     * @returns the decay in the radial direction of
      * the \p Dim dimensional infinite element.
      */
     static Real decay (const Real v);
@@ -125,7 +125,7 @@ protected:
 
     /**
      * @returns the Order of the mapping functions
-     * in radial direction. Currently, this is @e always \p FIRST.
+     * in the radial direction. Currently, this is @e always \p FIRST.
      */
     static Order mapping_order() { return FIRST; }
 

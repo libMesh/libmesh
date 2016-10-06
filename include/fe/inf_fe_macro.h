@@ -29,8 +29,8 @@
 
 /**
  * This macro helps in instantiating specific versions
- * of the \p InfFE class.  Better do not use this macro
- * directly, but instantiate through #include`ing the
+ * of the \p InfFE class.  Do not use this macro
+ * directly.  Instead, instantiate through #include'ing the
  * file(s) \p inf_fe_instantiate_1D.h, \p inf_fe_instantiate_2D.h,
  * and \p inf_fe_instantiate_3D.h for 1D, 2D and 3D, respectively.
  */
