@@ -74,7 +74,7 @@ void MeshData::read_xdr (const std::string & name,
    */
 
 
-  // we should better be active or in compatibility mode
+  // Better be active or in compatibility mode
   libmesh_assert (_active || _compatibility_mode);
 
 

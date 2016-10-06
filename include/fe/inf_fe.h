@@ -41,7 +41,7 @@ class FEComputeData;
 
 
 /**
- * A specific instatiation of the \p FEBase class. This
+ * A specific instantiation of the \p FEBase class. This
  * class is templated, and specific template instantiations
  * will result in different Infinite Element families, similar
  * to the \p FE class.  \p InfFE builds a \p FE<Dim-1,T_base>,
@@ -101,7 +101,7 @@ protected:
   public:
 
     /**
-     * @returns the decay in radial direction of
+     * @returns the decay in the radial direction of
      * the \p Dim dimensional infinite element.
      */
     static Real decay (const Real v);
@@ -125,7 +125,7 @@ protected:
 
     /**
      * @returns the Order of the mapping functions
-     * in radial direction. Currently, this is @e always \p FIRST.
+     * in the radial direction. Currently, this is @e always \p FIRST.
      */
     static Order mapping_order() { return FIRST; }
 
@@ -221,11 +221,10 @@ protected:
 
 public:
 
-  //-------------------------------------------------------------
   // InfFE continued
 
   /**
-   * Constructor.
+   * Constructor and empty destructor.
    * Initializes some data structures.  Builds a \p FE<Dim-1,T_base>
    * object to handle  approximation in the base, so that
    * there is no need to template \p InfFE<Dim,T_radial,T_map> also with
@@ -239,18 +238,10 @@ public:
    */
   explicit
   InfFE(const FEType & fet);
+  ~InfFE() {}
 
-  /**
-   * Desctructor.  Clean up.
-   */
-  ~InfFE();
-
-
-
-
-
-  //-------------------------------------------------------------
   // The static public members for access from FEInterface etc
+
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p.  This method lets you specify the relevant
@@ -394,8 +385,8 @@ public:
                            const bool secure = true);
 
 
-  //-------------------------------------------------------------
-  // The work-horses of InfFE. These are often used during matrix assembly
+  // The workhorses of InfFE. These are often used during matrix assembly.
+
   /**
    * This is at the core of this class. Use this for each
    * new element in the mesh.  Reinitializes all the physical
@@ -472,8 +463,7 @@ public:
 
 protected:
 
-  //-------------------------------------------------------------
-  // static members used by the "work-horses"
+  // static members used by the workhorses
 
   /**
    * @returns the value of the \f$ i^{th} \f$ polynomial evaluated
@@ -506,8 +496,8 @@ protected:
 
 
 
-  //-------------------------------------------------------------
-  // Non-static members used by the "work-horses"
+  // Non-static members used by the workhorses
+
   /**
    * Updates the protected member \p base_elem to the appropriate base element
    * for the given \p inf_elem.
@@ -568,7 +558,6 @@ protected:
 
 
 
-  //-------------------------------------------------------------
   // Miscellaneous static members
 
   /**
@@ -607,12 +596,10 @@ protected:
                                      unsigned int & base_shape,
                                      unsigned int & radial_shape);
 
-  //--------------------------------------------------------------
-  // protected members, which are not to be accessed from outside
   /**
    * the radial distance of the base nodes from the origin
    */
-  std::vector<Real>  dist;
+  std::vector<Real> dist;
 
   /**
    * the additional radial weight \f$ 1/{r^2} \f$ in local coordinates,
@@ -620,7 +607,7 @@ protected:
    * direction.  However, for uniform access to the data fields from the
    * outside, this data field is expanded to @e all quadrature points.
    */
-  std::vector<Real>  dweightdv;
+  std::vector<Real> dweightdv;
 
   /**
    * the radial decay \f$ 1/r \f$ in local coordinates.
@@ -628,61 +615,60 @@ protected:
    * Note that it is this decay which assures to satisfy
    * the Sommerfeld radiation condition in advance.
    */
-  std::vector<Real>  som;
+  std::vector<Real> som;
   /**
    * the first local derivative of the radial decay \f$ 1/r \f$ in local
    * coordinates.  Needed when setting up the overall shape functions.
    */
-  std::vector<Real>  dsomdv;
+  std::vector<Real> dsomdv;
 
   /**
    * the radial approximation shapes in local coordinates
    * Needed when setting up the overall shape functions.
    */
-  std::vector<std::vector<Real> >   mode;
+  std::vector<std::vector<Real> > mode;
 
   /**
    * the first local derivative of the radial approximation shapes.
    * Needed when setting up the overall shape functions.
    */
-  std::vector<std::vector<Real> >   dmodedv;
+  std::vector<std::vector<Real> > dmodedv;
 
   /**
    * the radial mapping shapes in local coordinates
    */
-  std::vector<std::vector<Real> >   radial_map;
+  std::vector<std::vector<Real> > radial_map;
 
 
   /**
    * the first local derivative of the radial mapping shapes
    */
-  std::vector<std::vector<Real> >   dradialdv_map;
+  std::vector<std::vector<Real> > dradialdv_map;
 
   /**
    * the first local derivative (for 3D, the first in the base)
    * of the phase term in local coordinates.
    * Needed in the overall weak form of infinite element formulations.
    */
-  std::vector<Real>  dphasedxi;
+  std::vector<Real> dphasedxi;
 
   /**
    * the second local derivative (for 3D, the second in the base)
    * of the phase term in local coordinates.
    * Needed in the overall weak form of infinite element formulations.
    */
-  std::vector<Real>  dphasedeta;
+  std::vector<Real> dphasedeta;
 
   /**
    * the third local derivative (for 3D, the derivative in radial
    * direction) of the phase term in local coordinates.
    * Needed in the overall weak form of infinite element formulations.
    */
-  std::vector<Real>  dphasedzeta;
+  std::vector<Real> dphasedzeta;
 
 
 
 
-  //--------------------------------------------------------------
   // numbering scheme maps
 
   /**
@@ -728,7 +714,6 @@ protected:
 
 
 
-  //--------------------------------------------------------------
   // some more protected members
 
   /**
@@ -747,25 +732,25 @@ protected:
    * this vector contains the combined integration weights, so
    * that \p FEAbstract::compute_map() can still be used
    */
-  std::vector<Real>  _total_qrule_weights;
+  std::vector<Real> _total_qrule_weights;
 
   /**
    * The quadrature rule for the base element associated
    * with the current infinite element
    */
-  QBase * base_qrule;
+  UniquePtr<QBase> base_qrule;
 
   /**
    * The quadrature rule for the base element associated
    * with the current infinite element
    */
-  QBase * radial_qrule;
+  UniquePtr<QBase> radial_qrule;
 
   /**
    * The base element associated with the
    * current infinite element
    */
-  Elem * base_elem;
+  UniquePtr<Elem> base_elem;
 
   /**
    * Have a \p FE<Dim-1,T_base> handy for base approximation.
@@ -773,7 +758,7 @@ protected:
    * the \p InfFE class is not required to be templated w.r.t.
    * to the base approximation shape.
    */
-  FEBase * base_fe;
+  UniquePtr<FEBase> base_fe;
 
   /**
    * This \p FEType stores the characteristics for which
@@ -824,16 +809,7 @@ private:
 
 
 
-
-// ------------------------------------------------------------
-// InfFE class inline members
-
-
-
-
-// ------------------------------------------------------------
 // InfFE::Radial class inline members
-
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 inline
 Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
@@ -854,12 +830,6 @@ Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
       libmesh_error_msg("Invalid Dim = " << Dim);
     }
 }
-
-
-
-// ------------------------------------------------------------
-// InfFE::Base class inline members
-
 
 } // namespace libMesh
 

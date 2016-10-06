@@ -31,10 +31,6 @@
 namespace libMesh
 {
 
-
-
-
-//-------------------------------------------------------
 // Method for 2D, 3D -- see inf_fe_1D.C for a 1D version of this
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
@@ -103,7 +99,6 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
 
 
 
-//-------------------------------------------------------
 // Method for 2D, 3D -- see inf_fe_1D.C for a 1D version of this
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::edge_reinit(const Elem *,
@@ -132,30 +127,26 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
   // Currently, this makes only sense in 3-D!
   libmesh_assert_equal_to (Dim, 3);
 
-  // Initialiize the radial shape functions
+  // Initialize the radial shape functions
   this->init_radial_shape_functions(inf_side);
 
   // Initialize the base shape functions
   this->update_base_elem(inf_side);
 
-  // Initialize the base quadratur rule
+  // Initialize the base quadrature rule
   base_qrule->init(base_elem->type(), inf_side->p_level());
 
   // base_fe still corresponds to the (dim-1)-dimensional base of the InfFE object,
   // so update the fe_base.
   {
     libmesh_assert_equal_to (Dim, 3);
-
-    UniquePtr<FEBase> ap_fb(FEBase::build(Dim-2, this->fe_type));
-
-    delete base_fe;
-    base_fe = ap_fb.release();
-    base_fe->attach_quadrature_rule(base_qrule);
+    base_fe.reset(FEBase::build(Dim-2, this->fe_type).release());
+    base_fe->attach_quadrature_rule(base_qrule.get());
   }
 
   // initialize the shape functions on the base
   base_fe->init_base_shape_functions(base_fe->qrule->get_points(),
-                                     base_elem);
+                                     base_elem.get());
 
   // the number of quadrature points
   const unsigned int n_radial_qp =
@@ -163,10 +154,10 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
   const unsigned int n_base_qp   = base_qrule->n_points();
   const unsigned int n_total_qp  = n_radial_qp * n_base_qp;
 
-  // the quadratur weigths
+  // the quadrature weights
   _total_qrule_weights.resize(n_total_qp);
 
-  // now inite the shapes for boundary work
+  // now init the shapes for boundary work
   {
 
     // The element type and order to use in the base map
@@ -205,7 +196,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 
     }
 
-    // rezise map data fields
+    // resize map data fields
     {
       std::vector<std::vector<Real> > & psi_map = this->_fe_map->get_psi();
       std::vector<std::vector<Real> > & dpsidxi_map = this->_fe_map->get_dpsidxi();
@@ -252,8 +243,8 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
       std::vector<std::vector<Real> > & dpsidxi_map = this->_fe_map->get_dpsidxi();
       std::vector<std::vector<Real> > & dpsideta_map = this->_fe_map->get_dpsideta();
 
-      for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
-        for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's
+      for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qps
+        for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qps
           for (unsigned int ti=0; ti<n_total_mapping_shape_functions; ti++)  // over all mapping shapes
             {
               // let the index vectors take care of selecting the appropriate base/radial mapping shape
@@ -293,7 +284,6 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 
 
 
-//--------------------------------------------------------------
 // Explicit instantiations - doesn't make sense in 1D, but as
 // long as we only return errors, we are fine... ;-)
 //#include "libmesh/inf_fe_instantiate_1D.h"

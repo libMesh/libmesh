@@ -39,7 +39,7 @@ namespace libMesh
 void MeshData::read_unv (const std::string & file_name)
 {
   /*
-   * we should better be active or in compatibility mode
+   * We better be active or in compatibility mode
    */
   libmesh_assert (this->_active || this->_compatibility_mode);
 
@@ -382,7 +382,7 @@ void MeshData::read_unv_implementation (std::istream & in_file)
 void MeshData::write_unv (const std::string & file_name)
 {
   /*
-   * we should better be active or in compatibility mode
+   * We better be active or in compatibility mode
    */
   libmesh_assert (this->_active || this->_compatibility_mode);
 
