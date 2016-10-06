@@ -43,7 +43,6 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType & fet) :
   _n_total_approx_sf (0),
   _n_total_qp        (0),
 
-  base_elem    (libmesh_nullptr),
   base_fe      (libmesh_nullptr),
 
   // initialize the current_fe_type to all the same
@@ -80,9 +79,6 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 InfFE<Dim,T_radial,T_map>::~InfFE ()
 {
   // delete pointers, if necessary
-  delete base_elem;
-  base_elem = libmesh_nullptr;
-
   delete base_fe;
   base_fe = libmesh_nullptr;
 }
@@ -123,9 +119,7 @@ void InfFE<Dim,T_radial,T_map>:: attach_quadrature_rule (QBase * q)
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::update_base_elem (const Elem * inf_elem)
 {
-  if (base_elem != libmesh_nullptr)
-    delete base_elem;
-  base_elem = Base::build_elem(inf_elem);
+  base_elem.reset(Base::build_elem(inf_elem));
 }
 
 
@@ -198,13 +192,13 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
 
           // initialize the shape functions in the base
           base_fe->init_base_shape_functions(base_fe->qrule->get_points(),
-                                             base_elem);
+                                             base_elem.get());
 
           // compute the shape functions and map functions of base_fe
           // before using them later in combine_base_radial.
           base_fe->_fe_map->compute_map (base_fe->dim, base_fe->qrule->get_weights(),
-                                         base_elem, base_fe->calculate_d2phi);
-          base_fe->compute_shape_functions(base_elem, base_fe->qrule->get_points());
+                                         base_elem.get(), base_fe->calculate_d2phi);
+          base_fe->compute_shape_functions(base_elem.get(), base_fe->qrule->get_points());
 
           init_shape_functions_required=true;
         }
@@ -254,13 +248,13 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
 
       // init base shapes
       base_fe->init_base_shape_functions(*pts,
-                                         base_elem);
+                                         base_elem.get());
 
       // compute the shape functions and map functions of base_fe
       // before using them later in combine_base_radial.
       base_fe->_fe_map->compute_map (base_fe->dim, base_fe->qrule->get_weights(),
-                                     base_elem, base_fe->calculate_d2phi);
-      base_fe->compute_shape_functions(base_elem, base_fe->qrule->get_points());
+                                     base_elem.get(), base_fe->calculate_d2phi);
+      base_fe->compute_shape_functions(base_elem.get(), base_fe->qrule->get_points());
 
       this->init_shape_functions (inf_elem);
 

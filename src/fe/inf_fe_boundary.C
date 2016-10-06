@@ -155,7 +155,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 
   // initialize the shape functions on the base
   base_fe->init_base_shape_functions(base_fe->qrule->get_points(),
-                                     base_elem);
+                                     base_elem.get());
 
   // the number of quadrature points
   const unsigned int n_radial_qp =

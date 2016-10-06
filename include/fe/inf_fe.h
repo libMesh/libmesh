@@ -765,7 +765,7 @@ protected:
    * The base element associated with the
    * current infinite element
    */
-  Elem * base_elem;
+  UniquePtr<Elem> base_elem;
 
   /**
    * Have a \p FE<Dim-1,T_base> handy for base approximation.
