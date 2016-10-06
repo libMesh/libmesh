@@ -221,7 +221,6 @@ protected:
 
 public:
 
-  //-------------------------------------------------------------
   // InfFE continued
 
   /**
@@ -241,8 +240,8 @@ public:
   InfFE(const FEType & fet);
   ~InfFE() {}
 
-  //-------------------------------------------------------------
   // The static public members for access from FEInterface etc
+
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p.  This method lets you specify the relevant
@@ -386,8 +385,8 @@ public:
                            const bool secure = true);
 
 
-  //-------------------------------------------------------------
-  // The work-horses of InfFE. These are often used during matrix assembly
+  // The workhorses of InfFE. These are often used during matrix assembly.
+
   /**
    * This is at the core of this class. Use this for each
    * new element in the mesh.  Reinitializes all the physical
@@ -464,8 +463,7 @@ public:
 
 protected:
 
-  //-------------------------------------------------------------
-  // static members used by the "work-horses"
+  // static members used by the workhorses
 
   /**
    * @returns the value of the \f$ i^{th} \f$ polynomial evaluated
@@ -498,8 +496,8 @@ protected:
 
 
 
-  //-------------------------------------------------------------
-  // Non-static members used by the "work-horses"
+  // Non-static members used by the workhorses
+
   /**
    * Updates the protected member \p base_elem to the appropriate base element
    * for the given \p inf_elem.
@@ -560,7 +558,6 @@ protected:
 
 
 
-  //-------------------------------------------------------------
   // Miscellaneous static members
 
   /**
@@ -599,8 +596,6 @@ protected:
                                      unsigned int & base_shape,
                                      unsigned int & radial_shape);
 
-  //--------------------------------------------------------------
-  // protected members, which are not to be accessed from outside
   /**
    * the radial distance of the base nodes from the origin
    */
@@ -674,7 +669,6 @@ protected:
 
 
 
-  //--------------------------------------------------------------
   // numbering scheme maps
 
   /**
@@ -720,7 +714,6 @@ protected:
 
 
 
-  //--------------------------------------------------------------
   // some more protected members
 
   /**
@@ -816,16 +809,7 @@ private:
 
 
 
-
-// ------------------------------------------------------------
-// InfFE class inline members
-
-
-
-
-// ------------------------------------------------------------
 // InfFE::Radial class inline members
-
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 inline
 Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
@@ -846,12 +830,6 @@ Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
       libmesh_error_msg("Invalid Dim = " << Dim);
     }
 }
-
-
-
-// ------------------------------------------------------------
-// InfFE::Base class inline members
-
 
 } // namespace libMesh
 

@@ -31,10 +31,6 @@
 namespace libMesh
 {
 
-
-
-
-//-------------------------------------------------------
 // Method for 2D, 3D -- see inf_fe_1D.C for a 1D version of this
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
@@ -103,7 +99,6 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
 
 
 
-//-------------------------------------------------------
 // Method for 2D, 3D -- see inf_fe_1D.C for a 1D version of this
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 void InfFE<Dim,T_radial,T_base>::edge_reinit(const Elem *,
@@ -289,7 +284,6 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 
 
 
-//--------------------------------------------------------------
 // Explicit instantiations - doesn't make sense in 1D, but as
 // long as we only return errors, we are fine... ;-)
 //#include "libmesh/inf_fe_instantiate_1D.h"
