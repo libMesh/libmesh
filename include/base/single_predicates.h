@@ -300,6 +300,7 @@ protected:
 
 
 
+#ifdef LIBMESH_ENABLE_AMR
 // The flagged predicate returns true if the pointers refinement flag
 // matches the given rflag.  Of course, this one can only be
 // instantiated for objects which return Elem pointers when
@@ -317,6 +318,7 @@ protected:
   virtual predicate<T> * clone() const libmesh_override { return new flagged<T>(*this); }
   const unsigned char _rflag;
 };
+#endif // LIBMESH_ENABLE_AMR
 
 
 

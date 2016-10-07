@@ -35,7 +35,7 @@ public:
     DofObject aobject(*instance);
 
     aobject.set_id(1);
-    CPPUNIT_ASSERT_EQUAL( (dof_id_type)1 , aobject.id() );
+    CPPUNIT_ASSERT_EQUAL( static_cast<dof_id_type>(1) , aobject.id() );
   }
 
   void testValidId()
@@ -149,19 +149,19 @@ public:
     aobject.set_vg_dof_base(1, 1, 220);
 
     // Make sure the first dof is sane
-    CPPUNIT_ASSERT_EQUAL((dof_id_type)0, aobject.dof_number(0, 0, 0));
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(0), aobject.dof_number(0, 0, 0));
 
     // Check that we can manually index dofs of variables based on the first dof in a variable group
     // Using: id = base + var_in_vg*ncomp + comp
-    CPPUNIT_ASSERT_EQUAL(aobject.vg_dof_base(0, 0) + 1*1 + 0, aobject.dof_number(0, 1, 0));
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(aobject.vg_dof_base(0, 0) + 1*1 + 0), aobject.dof_number(0, 1, 0));
 
     // Another Check that we can manually index dofs of variables based on the first dof in a variable group
     // Using: id = base + var_in_vg*ncomp + comp
-    CPPUNIT_ASSERT_EQUAL(aobject.vg_dof_base(0, 1) + 2*3 + 2, aobject.dof_number(0, 4, 2));
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(aobject.vg_dof_base(0, 1) + 2*3 + 2), aobject.dof_number(0, 4, 2));
 
     // One More Check that we can manually index dofs of variables based on the first dof in a variable group
     // Using: id = base + var_in_vg*ncomp + comp
-    CPPUNIT_ASSERT_EQUAL(aobject.vg_dof_base(1, 1) + 0*3 + 0, aobject.dof_number(1, 2, 0));
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(aobject.vg_dof_base(1, 1) + 0*3 + 0), aobject.dof_number(1, 2, 0));
   }
 
   void testJensEftangBug()
@@ -172,18 +172,18 @@ public:
     dof_id_type buf0[] = {2, 8, 257, 0, 257, 96, 257, 192, 257, 0};
     aobject.set_buffer(std::vector<dof_id_type>(buf0, buf0+10));
 
-    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,0,0), (dof_id_type)   0);
-    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,1,0), (dof_id_type)  96);
-    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,2,0), (dof_id_type) 192);
-    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(1,0,0), (dof_id_type)   0);
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,0,0), static_cast<dof_id_type>(  0));
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,1,0), static_cast<dof_id_type>( 96));
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,2,0), static_cast<dof_id_type>(192));
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(1,0,0), static_cast<dof_id_type>(  0));
 
     dof_id_type buf1[] = {2, 8, 257, 1, 257, 97, 257, 193, 257, 1};
     aobject.set_buffer(std::vector<dof_id_type>(buf1, buf1+10));
 
-    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,0,0), (dof_id_type)   1);
-    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,1,0), (dof_id_type)  97);
-    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,2,0), (dof_id_type) 193);
-    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(1,0,0), (dof_id_type)   1);
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,0,0), static_cast<dof_id_type>(  1));
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,1,0), static_cast<dof_id_type>( 97));
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,2,0), static_cast<dof_id_type>(193));
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(1,0,0), static_cast<dof_id_type>(  1));
   }
 };
 

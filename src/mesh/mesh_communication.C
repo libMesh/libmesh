@@ -152,11 +152,19 @@ void query_ghosting_functors
    bool newly_coarsened_only,
    std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
+#ifndef LIBMESH_ENABLE_AMR
+  libmesh_assert(!newly_coarsened_only);
+#endif
+
   MeshBase::const_element_iterator       elem_it  =
+#ifndef LIBMESH_ENABLE_AMR
     newly_coarsened_only ? mesh.flagged_pid_elements_begin(Elem::JUST_COARSENED, pid) :
+#endif
                            mesh.active_pid_elements_begin(pid);
   const MeshBase::const_element_iterator elem_end =
+#ifndef LIBMESH_ENABLE_AMR
     newly_coarsened_only ? mesh.flagged_pid_elements_end(Elem::JUST_COARSENED, pid) :
+#endif
                            mesh.active_pid_elements_end(pid);
 
   std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
@@ -193,6 +201,7 @@ void connect_children
    processor_id_type pid,
    std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
+#ifdef LIBMESH_ENABLE_AMR
   // Our XdrIO output needs inactive local elements to not have any
   // remote_elem children.  Let's make sure that doesn't happen.
   //
@@ -209,12 +218,15 @@ void connect_children
               connected_elements.insert(child);
           }
     }
+#endif // LIBMESH_ENABLE_AMR
 }
 
 
 void connect_families
   (std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
+#ifdef LIBMESH_ENABLE_AMR
+
   // Because our set is sorted by ascending level, we can traverse it
   // in reverse order, adding parents as we go, and end up with all
   // ancestors added.  This is safe for std::set where insert doesn't
@@ -258,7 +270,7 @@ void connect_families
         }
     }
 
-#ifdef DEBUG
+#  ifdef DEBUG
   // Let's be paranoid and make sure that all our ancestors
   // really did get inserted.  I screwed this up the first time
   // by caching rend, and I can easily imagine screwing it up in
@@ -275,7 +287,9 @@ void connect_families
       if (parent)
         libmesh_assert(connected_elements.count(parent));
     }
-#endif
+#  endif // DEBUG
+
+#endif // LIBMESH_ENABLE_AMR
 }
 
 

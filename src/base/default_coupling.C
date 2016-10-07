@@ -34,8 +34,10 @@ void DefaultCoupling::mesh_reinit()
 {
   // Unless we have periodic boundary conditions, we don't need
   // anything precomputed.
+#ifdef LIBMESH_ENABLE_PERIODIC
   if (!_periodic_bcs || _periodic_bcs->empty())
     return;
+#endif
 
   // If we do have periodic boundary conditions, we'll need a master
   // point locator, so we'd better have a mesh to build it on.
@@ -56,14 +58,17 @@ void DefaultCoupling::operator()
 {
   LOG_SCOPE("operator()", "DefaultCoupling");
 
+#ifdef LIBMESH_ENABLE_PERIODIC
   bool check_periodic_bcs =
     (_periodic_bcs && !_periodic_bcs->empty());
+
   UniquePtr<PointLocatorBase> point_locator;
   if (check_periodic_bcs)
     {
       libmesh_assert(_mesh);
       point_locator = _mesh->sub_point_locator();
     }
+#endif
 
   if (!this->_n_levels)
     {
@@ -135,9 +140,11 @@ void DefaultCoupling::operator()
 #ifdef LIBMESH_ENABLE_AMR
               if (neigh == elem->neighbor_ptr(s))
                 neigh->active_family_tree_by_neighbor(active_neighbors,elem);
+#  ifdef LIBMESH_ENABLE_PERIODIC
               else
                 neigh->active_family_tree_by_topological_neighbor
                   (active_neighbors,elem,*_mesh,*point_locator,_periodic_bcs);
+#  endif
 #else
               active_neighbors.clear();
               active_neighbors.push_back(neigh);
