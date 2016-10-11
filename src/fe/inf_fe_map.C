@@ -351,11 +351,15 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
 
   // the distance from the intersection on the
   // base to the origin
-  const Real a_dist = intersection.norm();
+  const Real a_dist = Point(o-intersection).norm();
 
   // element coordinate in radial direction
   // here our first guess is 0.
   Real v = 0.;
+  if (T_map==CARTESIAN)
+    // we know the analytic answer to this:
+    v=1.-2.*a_dist/fp_o_dist;
+  //other schemes than CARTESIAN are not yet defined.
 
   // the order of the radial mapping
   const Order radial_mapping_order (Radial::mapping_order());
@@ -366,6 +370,12 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
   // Newton iteration in 1-D
   do
     {
+      if (v<-1.){
+         // in this case, physical_point is not in this element.
+         // We therefore give back the best approximation:
+         p(Dim-1)=-1;
+         return p;
+      }
       // the mapping in radial direction
       // note that we only have two mapping functions in
       // radial direction
