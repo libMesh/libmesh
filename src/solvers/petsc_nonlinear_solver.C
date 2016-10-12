@@ -625,6 +625,21 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
         }
     }
 
+  // Only set the transpose nullspace if we have a way of computing it and the result is non-empty.
+  if (this->transpose_nullspace || this->transpose_nullspace_object)
+    {
+      MatNullSpace msp = PETSC_NULL;
+      this->build_mat_null_space(this->transpose_nullspace_object, this->transpose_nullspace, &msp);
+      if (msp)
+        {
+          ierr = MatSetTransposeNullSpace(jac->mat(), msp);
+          LIBMESH_CHKERR(ierr);
+
+          ierr = MatNullSpaceDestroy(&msp);
+          LIBMESH_CHKERR(ierr);
+        }
+    }
+
   // Only set the nearnullspace if we have a way of computing it and the result is non-empty.
   if (this->nearnullspace || this->nearnullspace_object)
     {
