@@ -2530,6 +2530,11 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 
 
 
+/*
+ * No non-blocking receives of std::set until we figure out how to
+ * resize the temporary buffer
+ */
+#if 0
 template <typename T>
 inline void Communicator::receive (const unsigned int src_processor_id,
                                    std::set<T> & buf,
@@ -2539,6 +2544,7 @@ inline void Communicator::receive (const unsigned int src_processor_id,
   this->receive (src_processor_id, buf,
                  StandardType<T>(buf.empty() ? libmesh_nullptr : &(*buf.begin())), req, tag);
 }
+#endif // 0
 
 
 
@@ -2560,6 +2566,11 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 
 
 
+/*
+ * No non-blocking receives of std::set until we figure out how to
+ * resize the temporary buffer
+ */
+#if 0
 template <typename T>
 inline void Communicator::receive (const unsigned int src_processor_id,
                                    std::set<T> & buf,
@@ -2588,6 +2599,7 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 
   this->receive(src_processor_id, *vecbuf, type, req, tag);
 }
+#endif // 0
 
 
 
