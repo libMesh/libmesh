@@ -3008,7 +3008,8 @@ inline void Communicator::gather(const unsigned int root_id,
 
       // and get the data from the remote processors.
       libmesh_call_mpi
-        (MPI_Gatherv (&sendval[0], mysize, StandardType<T>(),
+        (MPI_Gatherv (const_cast<T*>(&sendval[0]),
+                      mysize, StandardType<T>(),
                       this->rank() == root_id ? &r[0] : libmesh_nullptr,
                       &sendlengths[0], &displacements[0],
                       StandardType<T>(), root_id, this->get()));
@@ -3148,7 +3149,8 @@ inline void Communicator::allgather(const std::basic_string<T> & sendval,
 
   // and get the data from the remote processors.
   libmesh_call_mpi
-    (MPI_Allgatherv (&sendval[0], mysize, StandardType<T>(),
+    (MPI_Allgatherv (const_cast<T*>(mysize ? &sendval[0] : libmesh_nullptr),
+                     mysize, StandardType<T>(),
                      &r[0], &sendlengths[0], &displacements[0],
                      StandardType<T>(), this->get()));
 
@@ -3244,7 +3246,7 @@ void Communicator::scatter(const std::vector<T> & data,
 
   LOG_SCOPE("scatter()", "Parallel");
 
-  const T * data_ptr = data.empty() ? libmesh_nullptr : &data[0];
+  T * data_ptr = const_cast<T*>(data.empty() ? libmesh_nullptr : &data[0]);
 
   libmesh_call_mpi
     (MPI_Scatter (data_ptr, 1, StandardType<T>(data_ptr),
@@ -3280,7 +3282,7 @@ void Communicator::scatter(const std::vector<T> & data,
   this->broadcast(recv_buffer_size);
   recv.resize(recv_buffer_size);
 
-  const T * data_ptr = data.empty() ? libmesh_nullptr : &data[0];
+  T * data_ptr = const_cast<T*>(data.empty() ? libmesh_nullptr : &data[0]);
   T * recv_ptr = recv.empty() ? libmesh_nullptr : &recv[0];
 
   libmesh_call_mpi
@@ -3330,8 +3332,8 @@ void Communicator::scatter(const std::vector<T> & data,
   this->scatter(counts, recv_buffer_size, root_id);
   recv.resize(recv_buffer_size);
 
-  const T * data_ptr = data.empty() ? libmesh_nullptr : &data[0];
-  const int * count_ptr = counts.empty() ? libmesh_nullptr : &counts[0];
+  T * data_ptr = const_cast<T*>(data.empty() ? libmesh_nullptr : &data[0]);
+  int * count_ptr = const_cast<int*>(counts.empty() ? libmesh_nullptr : &counts[0]);
   T * recv_ptr = recv.empty() ? libmesh_nullptr : &recv[0];
 
   // Scatter the non-uniform chunks
