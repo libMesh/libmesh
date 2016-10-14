@@ -710,6 +710,23 @@ public:
   void scatter_constraints (MeshBase &);
 
   /**
+   * Helper function for querying about constraint equations on other
+   * processors.  If any id in \p requested_dof_ids is constrained on
+   * another processor, its constraint will be added on this processor
+   * as well.  If \p look_for_constrainees is true, then constraints
+   * will also be returned if the id appears as a constraining value
+   * not just if it appears as a constrained value.
+   *
+   * This function operates recursively: if the constraint for a
+   * constrained dof is newly added locally, then any other dofs which
+   * constrain it are queried to see if they are in turn constrained,
+   * and so on.
+   */
+  void gather_constraints (MeshBase & mesh,
+                           std::set<dof_id_type> & unexpanded_dofs,
+                           bool look_for_constrainees);
+
+  /**
    * Postprocesses any constrained degrees of freedom
    * to be constrained only in terms of unconstrained dofs, then adds
    * unconstrained dofs to the send_list and prepares that for use.
