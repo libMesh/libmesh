@@ -2156,7 +2156,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 const MessageTag & tag) const
 {
   this->send(dest_processor_id, buf,
-             StandardType<T>(buf.empty() ? libmesh_nullptr : &buf.front()), tag);
+             StandardType<T>(buf.empty() ? libmesh_nullptr : &(*buf.begin())), tag);
 }
 
 
@@ -2168,7 +2168,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 const MessageTag & tag) const
 {
   this->send(dest_processor_id, buf,
-             StandardType<T>(buf.empty() ? libmesh_nullptr : &buf.front()), req, tag);
+             StandardType<T>(buf.empty() ? libmesh_nullptr : &(*buf.begin())), req, tag);
 }
 
 
@@ -2525,7 +2525,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 {
   return this->receive
     (src_processor_id, buf,
-     StandardType<T>(buf.empty() ? libmesh_nullptr : &buf.front()), tag);
+     StandardType<T>(buf.empty() ? libmesh_nullptr : &(*buf.begin())), tag);
 }
 
 
@@ -2537,7 +2537,7 @@ inline void Communicator::receive (const unsigned int src_processor_id,
                                    const MessageTag & tag) const
 {
   this->receive (src_processor_id, buf,
-                 StandardType<T>(buf.empty() ? libmesh_nullptr : &buf.front()), req, tag);
+                 StandardType<T>(buf.empty() ? libmesh_nullptr : &(*buf.begin())), req, tag);
 }
 
 
@@ -2579,8 +2579,8 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 
   req.add_post_wait_work
     (new Parallel::PostWaitCopyBuffer<std::vector<T>,
-     std::back_insert_iterator<std::set<T> > >
-     (vecbuf, std::back_inserter(buf)));
+     std::insert_iterator<std::set<T> > >
+     (*vecbuf, std::inserter(buf,buf.end())));
 
   // Make the Request::wait() then handle deleting the buffer
   req.add_post_wait_work
@@ -2598,7 +2598,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 {
   return this->receive
     (src_processor_id, buf,
-     StandardType<T>(buf.empty() ? libmesh_nullptr : &buf.front()), tag);
+     StandardType<T>(buf.empty() ? libmesh_nullptr : &(*buf.begin())), tag);
 }
 
 
@@ -2610,7 +2610,7 @@ inline void Communicator::receive (const unsigned int src_processor_id,
                                    const MessageTag & tag) const
 {
   this->receive (src_processor_id, buf,
-                 StandardType<T>(buf.empty() ? libmesh_nullptr : &buf.front()), req, tag);
+                 StandardType<T>(buf.empty() ? libmesh_nullptr : &(*buf.begin())), req, tag);
 }
 
 
