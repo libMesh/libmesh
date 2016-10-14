@@ -2155,7 +2155,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 const std::set<T> & buf,
                                 const MessageTag & tag) const
 {
-  this->send(dest_processor_id,
+  this->send(dest_processor_id, buf,
              StandardType<T>(buf.empty() ? libmesh_nullptr : &buf.front()), tag);
 }
 
@@ -2167,7 +2167,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 Request & req,
                                 const MessageTag & tag) const
 {
-  this->send(dest_processor_id,
+  this->send(dest_processor_id, buf,
              StandardType<T>(buf.empty() ? libmesh_nullptr : &buf.front()), req, tag);
 }
 
