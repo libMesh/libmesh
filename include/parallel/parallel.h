@@ -839,7 +839,7 @@ public:
    */
   template <typename T>
   void send (const unsigned int dest_processor_id,
-             T & buf,
+             const T & buf,
              const MessageTag & tag=no_tag) const;
 
   /**
@@ -847,7 +847,7 @@ public:
    */
   template <typename T>
   void send (const unsigned int dest_processor_id,
-             T & buf,
+             const T & buf,
              Request & req,
              const MessageTag & tag=no_tag) const;
 
@@ -856,7 +856,7 @@ public:
    */
   template <typename T>
   void send (const unsigned int dest_processor_id,
-             T & buf,
+             const T & buf,
              const DataType & type,
              const MessageTag & tag=no_tag) const;
 
@@ -865,7 +865,7 @@ public:
    */
   template <typename T>
   void send (const unsigned int dest_processor_id,
-             T & buf,
+             const T & buf,
              const DataType & type,
              Request & req,
              const MessageTag & tag=no_tag) const;
@@ -1023,7 +1023,7 @@ public:
    */
   template <typename T1, typename T2>
   void send_receive(const unsigned int dest_processor_id,
-                    T1 & send,
+                    const T1 & send,
                     const unsigned int source_processor_id,
                     T2 & recv,
                     const MessageTag & send_tag = no_tag,
@@ -1085,7 +1085,7 @@ public:
    */
   template <typename T1, typename T2>
   void send_receive(const unsigned int dest_processor_id,
-                    T1 & send,
+                    const T1 & send,
                     const DataType & type1,
                     const unsigned int source_processor_id,
                     T2 & recv,
@@ -1099,7 +1099,7 @@ public:
    */
   template <typename T>
   inline void gather(const unsigned int root_id,
-                     T send,
+                     const T & send,
                      std::vector<T> & recv) const;
 
    /**
@@ -1142,7 +1142,7 @@ public:
    * \p recv[processor_id] = the value of \p send on that processor
    */
   template <typename T>
-  inline void allgather(T send,
+  inline void allgather(const T & send,
                         std::vector<T> & recv) const;
 
   /**
