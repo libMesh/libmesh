@@ -37,6 +37,7 @@ public:
   CPPUNIT_TEST( testInfinityMax );
   CPPUNIT_TEST( testIsendRecv );
   CPPUNIT_TEST( testIrecvSend );
+  CPPUNIT_TEST( testRecvIsendSets );
   CPPUNIT_TEST( testSemiVerify );
   CPPUNIT_TEST( testSplit );
 
@@ -403,6 +404,43 @@ public:
 
         // Restore default communication
         TestCommWorld->send_mode(Parallel::Communicator::DEFAULT);
+      }
+  }
+
+
+  void testRecvIsendSets ()
+  {
+    unsigned int procup = (TestCommWorld->rank() + 1) %
+      TestCommWorld->size();
+    unsigned int procdown = (TestCommWorld->size() +
+                             TestCommWorld->rank() - 1) %
+      TestCommWorld->size();
+
+    std::set<unsigned int> src_val, recv_val;
+
+    src_val.insert(4);  // Chosen by fair dice roll
+    src_val.insert(42);
+    src_val.insert(1337);
+
+    Parallel::Request request;
+
+    if (TestCommWorld->size() > 1)
+      {
+        TestCommWorld->send (procup, src_val, request);
+
+        TestCommWorld->receive (procdown,
+                                recv_val);
+
+        CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
+
+        for (std::set<unsigned int>::const_iterator
+               it = src_val.begin(), end = src_val.end(); it != end;
+             ++it)
+          CPPUNIT_ASSERT ( recv_val.count(*it) );
+
+        Parallel::wait (request);
+
+        recv_val.clear();
       }
   }
 
