@@ -229,4 +229,22 @@ public:
 
 };
 
+// THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
+// std::auto_ptr, which in turn produces -Wdeprecated-declarations
+// warnings.  These can be ignored in GCC as long as we wrap the
+// offending code in appropriate pragmas.  We'll put an
+// ignore_warnings at the end of this file so it's the last warnings
+// related header that our including code sees.
+#include <libmesh/ignore_warnings.h>
+
+#define INSTANTIATE_FETEST(order, family, elemtype) \
+class FETest_##order##_##family##_##elemtype : public FETest<order, family, elemtype> { \
+public: \
+  CPPUNIT_TEST_SUITE( FETest_##order##_##family##_##elemtype ); \
+  FETEST \
+  CPPUNIT_TEST_SUITE_END(); \
+}; \
+ \
+CPPUNIT_TEST_SUITE_REGISTRATION( FETest_##order##_##family##_##elemtype );
+
 #endif // #ifdef __fe_test_h__
