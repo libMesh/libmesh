@@ -1109,7 +1109,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
           return 6;
         case QUAD4:
         case QUADSHELL4:
-          return 0;
+          return 1;
         case QUAD8:
         case QUAD9:
           return unlimited;
