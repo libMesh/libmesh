@@ -385,7 +385,7 @@ inline void send_receive_vec_of_vec(const unsigned int dest_processor_id,
       // ... the contents of the ith inner buffer
       if (!send[i].empty())
         libmesh_call_mpi
-          (MPI_Pack (&send[i][0],
+          (MPI_Pack (const_cast<T1*>(&send[i][0]),
                      libMesh::cast_int<int>(send[i].size()),
                      libMesh::Parallel::StandardType<T1>(&send[i][0]),
                      &sendbuf[0],
