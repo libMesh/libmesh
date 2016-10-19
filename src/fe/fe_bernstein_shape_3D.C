@@ -1468,6 +1468,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
 
 
             // Bernstein shape functions on the hexahedral.
+          case HEX8:
           case HEX20:
           case HEX27:
             {
