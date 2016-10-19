@@ -196,6 +196,20 @@ public:
   NonlinearImplicitSystem::ComputeVectorSubspace * nullspace_object;
 
   /**
+   * Function that computes a basis for the transpose Jacobian's nullspace --
+   * when solving a degenerate problem iteratively, if the solver supports it
+   * (e.g., PETSc's KSP), it is used to remove contributions outside of R(jac)
+   */
+  void (* transpose_nullspace) (std::vector<NumericVector<Number> *> & sp, sys_type & S);
+
+  /**
+   * A callable object that computes a basis for the transpose Jacobian's nullspace --
+   * when solving a degenerate problem iteratively, if the solver supports it
+   * (e.g., PETSc's KSP), it is used to remove contributions outside of R(jac)
+   */
+  NonlinearImplicitSystem::ComputeVectorSubspace * transpose_nullspace_object;
+
+  /**
    * Function that computes a basis for the Jacobian's near nullspace --
    * the set of "low energy modes" -- that can be used for AMG coarsening,
    * if the solver supports it (e.g., ML, PETSc's GAMG).
@@ -356,6 +370,8 @@ NonlinearSolver<T>::NonlinearSolver (sys_type & s) :
   bounds_object                (libmesh_nullptr),
   nullspace                    (libmesh_nullptr),
   nullspace_object             (libmesh_nullptr),
+  transpose_nullspace          (libmesh_nullptr),
+  transpose_nullspace_object   (libmesh_nullptr),
   nearnullspace                (libmesh_nullptr),
   nearnullspace_object         (libmesh_nullptr),
   user_presolve                (libmesh_nullptr),
