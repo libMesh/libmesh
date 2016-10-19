@@ -157,12 +157,12 @@ void query_ghosting_functors
 #endif
 
   MeshBase::const_element_iterator       elem_it  =
-#ifndef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
     newly_coarsened_only ? mesh.flagged_pid_elements_begin(Elem::JUST_COARSENED, pid) :
 #endif
                            mesh.active_pid_elements_begin(pid);
   const MeshBase::const_element_iterator elem_end =
-#ifndef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_ENABLE_AMR
     newly_coarsened_only ? mesh.flagged_pid_elements_end(Elem::JUST_COARSENED, pid) :
 #endif
                            mesh.active_pid_elements_end(pid);
