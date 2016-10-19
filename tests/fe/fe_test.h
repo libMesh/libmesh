@@ -25,6 +25,7 @@
 
 using namespace libMesh;
 
+inline
 Number linear_test (const Point& p,
                     const Parameters&,
                     const std::string&,
