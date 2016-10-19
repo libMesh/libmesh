@@ -15,6 +15,7 @@ unit_tests_sources = \
   base/default_coupling_test.C \
   base/getpot_test.C \
   base/auto_ptr_test.C \
+  fe/fe_lagrange_test.C \
   geom/node_test.C \
   geom/point_test.C \
   geom/point_test.h \
