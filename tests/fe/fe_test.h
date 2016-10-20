@@ -38,6 +38,21 @@ Number linear_test (const Point& p,
   return x + 0.25*y + 0.0625*z;
 }
 
+inline
+Gradient linear_test_grad (const Point&,
+                           const Parameters&,
+                           const std::string&,
+                           const std::string&)
+{
+  Gradient grad = 1;
+  if (LIBMESH_DIM > 1)
+    grad(1) = 0.25;
+  if (LIBMESH_DIM > 2)
+    grad(2) = 0.0625;
+
+  return grad;
+}
+
 
 template <Order order, FEFamily family, ElemType elem_type>
 class FETest : public CppUnit::TestCase {
@@ -69,7 +84,7 @@ public:
     _sys = &(_es->add_system<System> ("SimpleSystem"));
     _sys->add_variable("u", order, family);
     _es->init();
-    _sys->project_solution(linear_test, NULL, _es->parameters);
+    _sys->project_solution(linear_test, linear_test_grad, _es->parameters);
 
     FEType fe_type = _sys->variable_type(0);
     _fe = FEBase::build(_dim, fe_type).release();
