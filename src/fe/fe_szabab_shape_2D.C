@@ -223,7 +223,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
@@ -324,7 +325,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
@@ -438,7 +440,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
@@ -562,7 +565,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
@@ -702,7 +706,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
@@ -918,7 +923,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
 
@@ -1024,7 +1030,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
 
@@ -1133,7 +1140,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
 
@@ -1240,7 +1248,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
 
@@ -1351,7 +1360,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
 
