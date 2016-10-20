@@ -1138,17 +1138,18 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
       switch (el_t)
         {
         case EDGE2:
+          return 1;
         case EDGE3:
         case EDGE4:
           return 7;
         case TRI3:
         case TRISHELL3:
-          return 0;
+          return 1;
         case TRI6:
           return 7;
         case QUAD4:
         case QUADSHELL4:
-          return 0;
+          return 1;
         case QUAD8:
         case QUAD9:
           return 7;
