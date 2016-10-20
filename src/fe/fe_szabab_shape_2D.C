@@ -87,6 +87,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           {
 
             // Szabo-Babuska shape functions on the triangle.
+          case TRI3:
           case TRI6:
             {
               const Real l1 = 1-p(0)-p(1);
@@ -112,6 +113,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
 
 
             // Szabo-Babuska shape functions on the quadrilateral.
+          case QUAD4:
           case QUAD8:
           case QUAD9:
             {
