@@ -1104,7 +1104,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
           return unlimited;
         case TRI3:
         case TRISHELL3:
-          return 0;
+          return 1;
         case TRI6:
           return 6;
         case QUAD4:
