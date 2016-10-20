@@ -176,9 +176,13 @@ CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
 am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/default_coupling_test.C \
-	base/getpot_test.C base/auto_ptr_test.C geom/node_test.C \
-	geom/point_test.C geom/point_test.h mesh/all_tri.C \
-	mesh/boundary_mesh.C mesh/boundary_info.C \
+	base/getpot_test.C base/auto_ptr_test.C fe/fe_bernstein_test.C \
+	fe/fe_clough_test.C fe/fe_hermite_test.C \
+	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
+	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
+	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_xyz_test.C \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
@@ -205,6 +209,16 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	base/unit_tests_dbg-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_dbg-getpot_test.$(OBJEXT) \
 	base/unit_tests_dbg-auto_ptr_test.$(OBJEXT) \
+	fe/unit_tests_dbg-fe_bernstein_test.$(OBJEXT) \
+	fe/unit_tests_dbg-fe_clough_test.$(OBJEXT) \
+	fe/unit_tests_dbg-fe_hermite_test.$(OBJEXT) \
+	fe/unit_tests_dbg-fe_hierarchic_test.$(OBJEXT) \
+	fe/unit_tests_dbg-fe_l2_hierarchic_test.$(OBJEXT) \
+	fe/unit_tests_dbg-fe_l2_lagrange_test.$(OBJEXT) \
+	fe/unit_tests_dbg-fe_lagrange_test.$(OBJEXT) \
+	fe/unit_tests_dbg-fe_monomial_test.$(OBJEXT) \
+	fe/unit_tests_dbg-fe_szabab_test.$(OBJEXT) \
+	fe/unit_tests_dbg-fe_xyz_test.$(OBJEXT) \
 	geom/unit_tests_dbg-node_test.$(OBJEXT) \
 	geom/unit_tests_dbg-point_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-all_tri.$(OBJEXT) \
@@ -252,9 +266,13 @@ unit_tests_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(LDFLAGS) -o $@
 am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/default_coupling_test.C \
-	base/getpot_test.C base/auto_ptr_test.C geom/node_test.C \
-	geom/point_test.C geom/point_test.h mesh/all_tri.C \
-	mesh/boundary_mesh.C mesh/boundary_info.C \
+	base/getpot_test.C base/auto_ptr_test.C fe/fe_bernstein_test.C \
+	fe/fe_clough_test.C fe/fe_hermite_test.C \
+	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
+	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
+	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_xyz_test.C \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
@@ -280,6 +298,16 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	base/unit_tests_devel-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_devel-getpot_test.$(OBJEXT) \
 	base/unit_tests_devel-auto_ptr_test.$(OBJEXT) \
+	fe/unit_tests_devel-fe_bernstein_test.$(OBJEXT) \
+	fe/unit_tests_devel-fe_clough_test.$(OBJEXT) \
+	fe/unit_tests_devel-fe_hermite_test.$(OBJEXT) \
+	fe/unit_tests_devel-fe_hierarchic_test.$(OBJEXT) \
+	fe/unit_tests_devel-fe_l2_hierarchic_test.$(OBJEXT) \
+	fe/unit_tests_devel-fe_l2_lagrange_test.$(OBJEXT) \
+	fe/unit_tests_devel-fe_lagrange_test.$(OBJEXT) \
+	fe/unit_tests_devel-fe_monomial_test.$(OBJEXT) \
+	fe/unit_tests_devel-fe_szabab_test.$(OBJEXT) \
+	fe/unit_tests_devel-fe_xyz_test.$(OBJEXT) \
 	geom/unit_tests_devel-node_test.$(OBJEXT) \
 	geom/unit_tests_devel-point_test.$(OBJEXT) \
 	mesh/unit_tests_devel-all_tri.$(OBJEXT) \
@@ -325,9 +353,13 @@ unit_tests_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(LDFLAGS) -o $@
 am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/default_coupling_test.C \
-	base/getpot_test.C base/auto_ptr_test.C geom/node_test.C \
-	geom/point_test.C geom/point_test.h mesh/all_tri.C \
-	mesh/boundary_mesh.C mesh/boundary_info.C \
+	base/getpot_test.C base/auto_ptr_test.C fe/fe_bernstein_test.C \
+	fe/fe_clough_test.C fe/fe_hermite_test.C \
+	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
+	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
+	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_xyz_test.C \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
@@ -353,6 +385,16 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	base/unit_tests_oprof-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_oprof-getpot_test.$(OBJEXT) \
 	base/unit_tests_oprof-auto_ptr_test.$(OBJEXT) \
+	fe/unit_tests_oprof-fe_bernstein_test.$(OBJEXT) \
+	fe/unit_tests_oprof-fe_clough_test.$(OBJEXT) \
+	fe/unit_tests_oprof-fe_hermite_test.$(OBJEXT) \
+	fe/unit_tests_oprof-fe_hierarchic_test.$(OBJEXT) \
+	fe/unit_tests_oprof-fe_l2_hierarchic_test.$(OBJEXT) \
+	fe/unit_tests_oprof-fe_l2_lagrange_test.$(OBJEXT) \
+	fe/unit_tests_oprof-fe_lagrange_test.$(OBJEXT) \
+	fe/unit_tests_oprof-fe_monomial_test.$(OBJEXT) \
+	fe/unit_tests_oprof-fe_szabab_test.$(OBJEXT) \
+	fe/unit_tests_oprof-fe_xyz_test.$(OBJEXT) \
 	geom/unit_tests_oprof-node_test.$(OBJEXT) \
 	geom/unit_tests_oprof-point_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-all_tri.$(OBJEXT) \
@@ -398,9 +440,13 @@ unit_tests_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(LDFLAGS) -o $@
 am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/default_coupling_test.C \
-	base/getpot_test.C base/auto_ptr_test.C geom/node_test.C \
-	geom/point_test.C geom/point_test.h mesh/all_tri.C \
-	mesh/boundary_mesh.C mesh/boundary_info.C \
+	base/getpot_test.C base/auto_ptr_test.C fe/fe_bernstein_test.C \
+	fe/fe_clough_test.C fe/fe_hermite_test.C \
+	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
+	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
+	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_xyz_test.C \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
@@ -426,6 +472,16 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	base/unit_tests_opt-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_opt-getpot_test.$(OBJEXT) \
 	base/unit_tests_opt-auto_ptr_test.$(OBJEXT) \
+	fe/unit_tests_opt-fe_bernstein_test.$(OBJEXT) \
+	fe/unit_tests_opt-fe_clough_test.$(OBJEXT) \
+	fe/unit_tests_opt-fe_hermite_test.$(OBJEXT) \
+	fe/unit_tests_opt-fe_hierarchic_test.$(OBJEXT) \
+	fe/unit_tests_opt-fe_l2_hierarchic_test.$(OBJEXT) \
+	fe/unit_tests_opt-fe_l2_lagrange_test.$(OBJEXT) \
+	fe/unit_tests_opt-fe_lagrange_test.$(OBJEXT) \
+	fe/unit_tests_opt-fe_monomial_test.$(OBJEXT) \
+	fe/unit_tests_opt-fe_szabab_test.$(OBJEXT) \
+	fe/unit_tests_opt-fe_xyz_test.$(OBJEXT) \
 	geom/unit_tests_opt-node_test.$(OBJEXT) \
 	geom/unit_tests_opt-point_test.$(OBJEXT) \
 	mesh/unit_tests_opt-all_tri.$(OBJEXT) \
@@ -469,9 +525,13 @@ unit_tests_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(LDFLAGS) -o $@
 am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/default_coupling_test.C \
-	base/getpot_test.C base/auto_ptr_test.C geom/node_test.C \
-	geom/point_test.C geom/point_test.h mesh/all_tri.C \
-	mesh/boundary_mesh.C mesh/boundary_info.C \
+	base/getpot_test.C base/auto_ptr_test.C fe/fe_bernstein_test.C \
+	fe/fe_clough_test.C fe/fe_hermite_test.C \
+	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
+	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
+	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_xyz_test.C \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
@@ -497,6 +557,16 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	base/unit_tests_prof-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_prof-getpot_test.$(OBJEXT) \
 	base/unit_tests_prof-auto_ptr_test.$(OBJEXT) \
+	fe/unit_tests_prof-fe_bernstein_test.$(OBJEXT) \
+	fe/unit_tests_prof-fe_clough_test.$(OBJEXT) \
+	fe/unit_tests_prof-fe_hermite_test.$(OBJEXT) \
+	fe/unit_tests_prof-fe_hierarchic_test.$(OBJEXT) \
+	fe/unit_tests_prof-fe_l2_hierarchic_test.$(OBJEXT) \
+	fe/unit_tests_prof-fe_l2_lagrange_test.$(OBJEXT) \
+	fe/unit_tests_prof-fe_lagrange_test.$(OBJEXT) \
+	fe/unit_tests_prof-fe_monomial_test.$(OBJEXT) \
+	fe/unit_tests_prof-fe_szabab_test.$(OBJEXT) \
+	fe/unit_tests_prof-fe_xyz_test.$(OBJEXT) \
 	geom/unit_tests_prof-node_test.$(OBJEXT) \
 	geom/unit_tests_prof-point_test.$(OBJEXT) \
 	mesh/unit_tests_prof-all_tri.$(OBJEXT) \
@@ -958,13 +1028,17 @@ AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
 AM_LDFLAGS = $(libmesh_LDFLAGS)
 unit_tests_sources = driver.C test_comm.h base/dof_object_test.h \
 	base/default_coupling_test.C base/getpot_test.C \
-	base/auto_ptr_test.C geom/node_test.C geom/point_test.C \
-	geom/point_test.h mesh/all_tri.C mesh/boundary_mesh.C \
-	mesh/boundary_info.C mesh/contains_point.C \
-	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
-	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
-	mesh/spatial_dimension_test.C mesh/mesh_function_dfem.C \
-	numerics/composite_function_test.C \
+	base/auto_ptr_test.C fe/fe_bernstein_test.C \
+	fe/fe_clough_test.C fe/fe_hermite_test.C \
+	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
+	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
+	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_xyz_test.C \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
+	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
+	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
+	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
+	mesh/mesh_function_dfem.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -1068,6 +1142,32 @@ base/unit_tests_dbg-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_dbg-auto_ptr_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
+fe/$(am__dirstamp):
+	@$(MKDIR_P) fe
+	@: > fe/$(am__dirstamp)
+fe/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) fe/$(DEPDIR)
+	@: > fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_dbg-fe_bernstein_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_dbg-fe_clough_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_dbg-fe_hermite_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_dbg-fe_hierarchic_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_dbg-fe_l2_hierarchic_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_dbg-fe_l2_lagrange_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_dbg-fe_lagrange_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_dbg-fe_monomial_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_dbg-fe_szabab_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_dbg-fe_xyz_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
 geom/$(am__dirstamp):
 	@$(MKDIR_P) geom
 	@: > geom/$(am__dirstamp)
@@ -1201,6 +1301,26 @@ base/unit_tests_devel-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_devel-auto_ptr_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_devel-fe_bernstein_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_devel-fe_clough_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_devel-fe_hermite_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_devel-fe_hierarchic_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_devel-fe_l2_hierarchic_test.$(OBJEXT):  \
+	fe/$(am__dirstamp) fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_devel-fe_l2_lagrange_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_devel-fe_lagrange_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_devel-fe_monomial_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_devel-fe_szabab_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_devel-fe_xyz_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-point_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -1280,6 +1400,26 @@ base/unit_tests_oprof-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_oprof-auto_ptr_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_oprof-fe_bernstein_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_oprof-fe_clough_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_oprof-fe_hermite_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_oprof-fe_hierarchic_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_oprof-fe_l2_hierarchic_test.$(OBJEXT):  \
+	fe/$(am__dirstamp) fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_oprof-fe_l2_lagrange_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_oprof-fe_lagrange_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_oprof-fe_monomial_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_oprof-fe_szabab_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_oprof-fe_xyz_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -1359,6 +1499,26 @@ base/unit_tests_opt-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_opt-auto_ptr_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_opt-fe_bernstein_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_opt-fe_clough_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_opt-fe_hermite_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_opt-fe_hierarchic_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_opt-fe_l2_hierarchic_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_opt-fe_l2_lagrange_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_opt-fe_lagrange_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_opt-fe_monomial_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_opt-fe_szabab_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_opt-fe_xyz_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-point_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -1438,6 +1598,26 @@ base/unit_tests_prof-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_prof-auto_ptr_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_prof-fe_bernstein_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_prof-fe_clough_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_prof-fe_hermite_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_prof-fe_hierarchic_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_prof-fe_l2_hierarchic_test.$(OBJEXT):  \
+	fe/$(am__dirstamp) fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_prof-fe_l2_lagrange_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_prof-fe_lagrange_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_prof-fe_monomial_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_prof-fe_szabab_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
+fe/unit_tests_prof-fe_xyz_test.$(OBJEXT): fe/$(am__dirstamp) \
+	fe/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
@@ -1515,6 +1695,7 @@ unit_tests-prof$(EXEEXT): $(unit_tests_prof_OBJECTS) $(unit_tests_prof_DEPENDENC
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f base/*.$(OBJEXT)
+	-rm -f fe/*.$(OBJEXT)
 	-rm -f fparser/*.$(OBJEXT)
 	-rm -f geom/*.$(OBJEXT)
 	-rm -f mesh/*.$(OBJEXT)
@@ -1548,6 +1729,56 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-auto_ptr_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-default_coupling_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-getpot_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_bernstein_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_clough_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_hermite_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_hierarchic_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_l2_hierarchic_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_l2_lagrange_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_lagrange_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_monomial_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_szabab_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_xyz_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-fe_bernstein_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-fe_clough_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-fe_hermite_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-fe_hierarchic_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-fe_l2_hierarchic_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-fe_l2_lagrange_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-fe_lagrange_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-fe_monomial_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-fe_szabab_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_devel-fe_xyz_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-fe_bernstein_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-fe_clough_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-fe_hermite_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-fe_hierarchic_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-fe_l2_hierarchic_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-fe_l2_lagrange_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-fe_lagrange_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-fe_monomial_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-fe_szabab_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_oprof-fe_xyz_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-fe_bernstein_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-fe_clough_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-fe_hermite_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-fe_hierarchic_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-fe_l2_hierarchic_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-fe_l2_lagrange_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-fe_lagrange_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-fe_monomial_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-fe_szabab_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_opt-fe_xyz_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_prof-fe_bernstein_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_prof-fe_clough_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_prof-fe_hermite_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_prof-fe_hierarchic_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_prof-fe_l2_hierarchic_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_prof-fe_l2_lagrange_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_prof-fe_lagrange_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_prof-fe_monomial_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_prof-fe_szabab_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_prof-fe_xyz_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@fparser/$(DEPDIR)/unit_tests_dbg-autodiff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@fparser/$(DEPDIR)/unit_tests_devel-autodiff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@fparser/$(DEPDIR)/unit_tests_oprof-autodiff.Po@am__quote@
@@ -1798,6 +2029,146 @@ base/unit_tests_dbg-auto_ptr_test.obj: base/auto_ptr_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/auto_ptr_test.C' object='base/unit_tests_dbg-auto_ptr_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_dbg-auto_ptr_test.obj `if test -f 'base/auto_ptr_test.C'; then $(CYGPATH_W) 'base/auto_ptr_test.C'; else $(CYGPATH_W) '$(srcdir)/base/auto_ptr_test.C'; fi`
+
+fe/unit_tests_dbg-fe_bernstein_test.o: fe/fe_bernstein_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_bernstein_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_bernstein_test.Tpo -c -o fe/unit_tests_dbg-fe_bernstein_test.o `test -f 'fe/fe_bernstein_test.C' || echo '$(srcdir)/'`fe/fe_bernstein_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_bernstein_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_bernstein_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_bernstein_test.C' object='fe/unit_tests_dbg-fe_bernstein_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_bernstein_test.o `test -f 'fe/fe_bernstein_test.C' || echo '$(srcdir)/'`fe/fe_bernstein_test.C
+
+fe/unit_tests_dbg-fe_bernstein_test.obj: fe/fe_bernstein_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_bernstein_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_bernstein_test.Tpo -c -o fe/unit_tests_dbg-fe_bernstein_test.obj `if test -f 'fe/fe_bernstein_test.C'; then $(CYGPATH_W) 'fe/fe_bernstein_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_bernstein_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_bernstein_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_bernstein_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_bernstein_test.C' object='fe/unit_tests_dbg-fe_bernstein_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_bernstein_test.obj `if test -f 'fe/fe_bernstein_test.C'; then $(CYGPATH_W) 'fe/fe_bernstein_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_bernstein_test.C'; fi`
+
+fe/unit_tests_dbg-fe_clough_test.o: fe/fe_clough_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_clough_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_clough_test.Tpo -c -o fe/unit_tests_dbg-fe_clough_test.o `test -f 'fe/fe_clough_test.C' || echo '$(srcdir)/'`fe/fe_clough_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_clough_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_clough_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_clough_test.C' object='fe/unit_tests_dbg-fe_clough_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_clough_test.o `test -f 'fe/fe_clough_test.C' || echo '$(srcdir)/'`fe/fe_clough_test.C
+
+fe/unit_tests_dbg-fe_clough_test.obj: fe/fe_clough_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_clough_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_clough_test.Tpo -c -o fe/unit_tests_dbg-fe_clough_test.obj `if test -f 'fe/fe_clough_test.C'; then $(CYGPATH_W) 'fe/fe_clough_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_clough_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_clough_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_clough_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_clough_test.C' object='fe/unit_tests_dbg-fe_clough_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_clough_test.obj `if test -f 'fe/fe_clough_test.C'; then $(CYGPATH_W) 'fe/fe_clough_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_clough_test.C'; fi`
+
+fe/unit_tests_dbg-fe_hermite_test.o: fe/fe_hermite_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_hermite_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_hermite_test.Tpo -c -o fe/unit_tests_dbg-fe_hermite_test.o `test -f 'fe/fe_hermite_test.C' || echo '$(srcdir)/'`fe/fe_hermite_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_hermite_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_hermite_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hermite_test.C' object='fe/unit_tests_dbg-fe_hermite_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_hermite_test.o `test -f 'fe/fe_hermite_test.C' || echo '$(srcdir)/'`fe/fe_hermite_test.C
+
+fe/unit_tests_dbg-fe_hermite_test.obj: fe/fe_hermite_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_hermite_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_hermite_test.Tpo -c -o fe/unit_tests_dbg-fe_hermite_test.obj `if test -f 'fe/fe_hermite_test.C'; then $(CYGPATH_W) 'fe/fe_hermite_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hermite_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_hermite_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_hermite_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hermite_test.C' object='fe/unit_tests_dbg-fe_hermite_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_hermite_test.obj `if test -f 'fe/fe_hermite_test.C'; then $(CYGPATH_W) 'fe/fe_hermite_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hermite_test.C'; fi`
+
+fe/unit_tests_dbg-fe_hierarchic_test.o: fe/fe_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_hierarchic_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_hierarchic_test.Tpo -c -o fe/unit_tests_dbg-fe_hierarchic_test.o `test -f 'fe/fe_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hierarchic_test.C' object='fe/unit_tests_dbg-fe_hierarchic_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_hierarchic_test.o `test -f 'fe/fe_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_hierarchic_test.C
+
+fe/unit_tests_dbg-fe_hierarchic_test.obj: fe/fe_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_hierarchic_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_hierarchic_test.Tpo -c -o fe/unit_tests_dbg-fe_hierarchic_test.obj `if test -f 'fe/fe_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hierarchic_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hierarchic_test.C' object='fe/unit_tests_dbg-fe_hierarchic_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_hierarchic_test.obj `if test -f 'fe/fe_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hierarchic_test.C'; fi`
+
+fe/unit_tests_dbg-fe_l2_hierarchic_test.o: fe/fe_l2_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_l2_hierarchic_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_l2_hierarchic_test.Tpo -c -o fe/unit_tests_dbg-fe_l2_hierarchic_test.o `test -f 'fe/fe_l2_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_l2_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_l2_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_l2_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_hierarchic_test.C' object='fe/unit_tests_dbg-fe_l2_hierarchic_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_l2_hierarchic_test.o `test -f 'fe/fe_l2_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_l2_hierarchic_test.C
+
+fe/unit_tests_dbg-fe_l2_hierarchic_test.obj: fe/fe_l2_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_l2_hierarchic_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_l2_hierarchic_test.Tpo -c -o fe/unit_tests_dbg-fe_l2_hierarchic_test.obj `if test -f 'fe/fe_l2_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_l2_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_hierarchic_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_l2_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_l2_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_hierarchic_test.C' object='fe/unit_tests_dbg-fe_l2_hierarchic_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_l2_hierarchic_test.obj `if test -f 'fe/fe_l2_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_l2_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_hierarchic_test.C'; fi`
+
+fe/unit_tests_dbg-fe_l2_lagrange_test.o: fe/fe_l2_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_l2_lagrange_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_l2_lagrange_test.Tpo -c -o fe/unit_tests_dbg-fe_l2_lagrange_test.o `test -f 'fe/fe_l2_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_l2_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_l2_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_l2_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_lagrange_test.C' object='fe/unit_tests_dbg-fe_l2_lagrange_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_l2_lagrange_test.o `test -f 'fe/fe_l2_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_l2_lagrange_test.C
+
+fe/unit_tests_dbg-fe_l2_lagrange_test.obj: fe/fe_l2_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_l2_lagrange_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_l2_lagrange_test.Tpo -c -o fe/unit_tests_dbg-fe_l2_lagrange_test.obj `if test -f 'fe/fe_l2_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_l2_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_lagrange_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_l2_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_l2_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_lagrange_test.C' object='fe/unit_tests_dbg-fe_l2_lagrange_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_l2_lagrange_test.obj `if test -f 'fe/fe_l2_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_l2_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_lagrange_test.C'; fi`
+
+fe/unit_tests_dbg-fe_lagrange_test.o: fe/fe_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_lagrange_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_lagrange_test.Tpo -c -o fe/unit_tests_dbg-fe_lagrange_test.o `test -f 'fe/fe_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_lagrange_test.C' object='fe/unit_tests_dbg-fe_lagrange_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_lagrange_test.o `test -f 'fe/fe_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_lagrange_test.C
+
+fe/unit_tests_dbg-fe_lagrange_test.obj: fe/fe_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_lagrange_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_lagrange_test.Tpo -c -o fe/unit_tests_dbg-fe_lagrange_test.obj `if test -f 'fe/fe_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_lagrange_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_lagrange_test.C' object='fe/unit_tests_dbg-fe_lagrange_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_lagrange_test.obj `if test -f 'fe/fe_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_lagrange_test.C'; fi`
+
+fe/unit_tests_dbg-fe_monomial_test.o: fe/fe_monomial_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_monomial_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_monomial_test.Tpo -c -o fe/unit_tests_dbg-fe_monomial_test.o `test -f 'fe/fe_monomial_test.C' || echo '$(srcdir)/'`fe/fe_monomial_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_monomial_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_monomial_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_monomial_test.C' object='fe/unit_tests_dbg-fe_monomial_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_monomial_test.o `test -f 'fe/fe_monomial_test.C' || echo '$(srcdir)/'`fe/fe_monomial_test.C
+
+fe/unit_tests_dbg-fe_monomial_test.obj: fe/fe_monomial_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_monomial_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_monomial_test.Tpo -c -o fe/unit_tests_dbg-fe_monomial_test.obj `if test -f 'fe/fe_monomial_test.C'; then $(CYGPATH_W) 'fe/fe_monomial_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_monomial_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_monomial_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_monomial_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_monomial_test.C' object='fe/unit_tests_dbg-fe_monomial_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_monomial_test.obj `if test -f 'fe/fe_monomial_test.C'; then $(CYGPATH_W) 'fe/fe_monomial_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_monomial_test.C'; fi`
+
+fe/unit_tests_dbg-fe_szabab_test.o: fe/fe_szabab_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_szabab_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_szabab_test.Tpo -c -o fe/unit_tests_dbg-fe_szabab_test.o `test -f 'fe/fe_szabab_test.C' || echo '$(srcdir)/'`fe/fe_szabab_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_szabab_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_szabab_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_szabab_test.C' object='fe/unit_tests_dbg-fe_szabab_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_szabab_test.o `test -f 'fe/fe_szabab_test.C' || echo '$(srcdir)/'`fe/fe_szabab_test.C
+
+fe/unit_tests_dbg-fe_szabab_test.obj: fe/fe_szabab_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_szabab_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_szabab_test.Tpo -c -o fe/unit_tests_dbg-fe_szabab_test.obj `if test -f 'fe/fe_szabab_test.C'; then $(CYGPATH_W) 'fe/fe_szabab_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_szabab_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_szabab_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_szabab_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_szabab_test.C' object='fe/unit_tests_dbg-fe_szabab_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_szabab_test.obj `if test -f 'fe/fe_szabab_test.C'; then $(CYGPATH_W) 'fe/fe_szabab_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_szabab_test.C'; fi`
+
+fe/unit_tests_dbg-fe_xyz_test.o: fe/fe_xyz_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_xyz_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_xyz_test.Tpo -c -o fe/unit_tests_dbg-fe_xyz_test.o `test -f 'fe/fe_xyz_test.C' || echo '$(srcdir)/'`fe/fe_xyz_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_xyz_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_xyz_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_xyz_test.C' object='fe/unit_tests_dbg-fe_xyz_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_xyz_test.o `test -f 'fe/fe_xyz_test.C' || echo '$(srcdir)/'`fe/fe_xyz_test.C
+
+fe/unit_tests_dbg-fe_xyz_test.obj: fe/fe_xyz_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_dbg-fe_xyz_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_dbg-fe_xyz_test.Tpo -c -o fe/unit_tests_dbg-fe_xyz_test.obj `if test -f 'fe/fe_xyz_test.C'; then $(CYGPATH_W) 'fe/fe_xyz_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_xyz_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_dbg-fe_xyz_test.Tpo fe/$(DEPDIR)/unit_tests_dbg-fe_xyz_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_xyz_test.C' object='fe/unit_tests_dbg-fe_xyz_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_dbg-fe_xyz_test.obj `if test -f 'fe/fe_xyz_test.C'; then $(CYGPATH_W) 'fe/fe_xyz_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_xyz_test.C'; fi`
 
 geom/unit_tests_dbg-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-node_test.Tpo -c -o geom/unit_tests_dbg-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
@@ -2331,6 +2702,146 @@ base/unit_tests_devel-auto_ptr_test.obj: base/auto_ptr_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_devel-auto_ptr_test.obj `if test -f 'base/auto_ptr_test.C'; then $(CYGPATH_W) 'base/auto_ptr_test.C'; else $(CYGPATH_W) '$(srcdir)/base/auto_ptr_test.C'; fi`
 
+fe/unit_tests_devel-fe_bernstein_test.o: fe/fe_bernstein_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_bernstein_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_bernstein_test.Tpo -c -o fe/unit_tests_devel-fe_bernstein_test.o `test -f 'fe/fe_bernstein_test.C' || echo '$(srcdir)/'`fe/fe_bernstein_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_bernstein_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_bernstein_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_bernstein_test.C' object='fe/unit_tests_devel-fe_bernstein_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_bernstein_test.o `test -f 'fe/fe_bernstein_test.C' || echo '$(srcdir)/'`fe/fe_bernstein_test.C
+
+fe/unit_tests_devel-fe_bernstein_test.obj: fe/fe_bernstein_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_bernstein_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_bernstein_test.Tpo -c -o fe/unit_tests_devel-fe_bernstein_test.obj `if test -f 'fe/fe_bernstein_test.C'; then $(CYGPATH_W) 'fe/fe_bernstein_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_bernstein_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_bernstein_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_bernstein_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_bernstein_test.C' object='fe/unit_tests_devel-fe_bernstein_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_bernstein_test.obj `if test -f 'fe/fe_bernstein_test.C'; then $(CYGPATH_W) 'fe/fe_bernstein_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_bernstein_test.C'; fi`
+
+fe/unit_tests_devel-fe_clough_test.o: fe/fe_clough_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_clough_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_clough_test.Tpo -c -o fe/unit_tests_devel-fe_clough_test.o `test -f 'fe/fe_clough_test.C' || echo '$(srcdir)/'`fe/fe_clough_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_clough_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_clough_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_clough_test.C' object='fe/unit_tests_devel-fe_clough_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_clough_test.o `test -f 'fe/fe_clough_test.C' || echo '$(srcdir)/'`fe/fe_clough_test.C
+
+fe/unit_tests_devel-fe_clough_test.obj: fe/fe_clough_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_clough_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_clough_test.Tpo -c -o fe/unit_tests_devel-fe_clough_test.obj `if test -f 'fe/fe_clough_test.C'; then $(CYGPATH_W) 'fe/fe_clough_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_clough_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_clough_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_clough_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_clough_test.C' object='fe/unit_tests_devel-fe_clough_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_clough_test.obj `if test -f 'fe/fe_clough_test.C'; then $(CYGPATH_W) 'fe/fe_clough_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_clough_test.C'; fi`
+
+fe/unit_tests_devel-fe_hermite_test.o: fe/fe_hermite_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_hermite_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_hermite_test.Tpo -c -o fe/unit_tests_devel-fe_hermite_test.o `test -f 'fe/fe_hermite_test.C' || echo '$(srcdir)/'`fe/fe_hermite_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_hermite_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_hermite_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hermite_test.C' object='fe/unit_tests_devel-fe_hermite_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_hermite_test.o `test -f 'fe/fe_hermite_test.C' || echo '$(srcdir)/'`fe/fe_hermite_test.C
+
+fe/unit_tests_devel-fe_hermite_test.obj: fe/fe_hermite_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_hermite_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_hermite_test.Tpo -c -o fe/unit_tests_devel-fe_hermite_test.obj `if test -f 'fe/fe_hermite_test.C'; then $(CYGPATH_W) 'fe/fe_hermite_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hermite_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_hermite_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_hermite_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hermite_test.C' object='fe/unit_tests_devel-fe_hermite_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_hermite_test.obj `if test -f 'fe/fe_hermite_test.C'; then $(CYGPATH_W) 'fe/fe_hermite_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hermite_test.C'; fi`
+
+fe/unit_tests_devel-fe_hierarchic_test.o: fe/fe_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_hierarchic_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_hierarchic_test.Tpo -c -o fe/unit_tests_devel-fe_hierarchic_test.o `test -f 'fe/fe_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hierarchic_test.C' object='fe/unit_tests_devel-fe_hierarchic_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_hierarchic_test.o `test -f 'fe/fe_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_hierarchic_test.C
+
+fe/unit_tests_devel-fe_hierarchic_test.obj: fe/fe_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_hierarchic_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_hierarchic_test.Tpo -c -o fe/unit_tests_devel-fe_hierarchic_test.obj `if test -f 'fe/fe_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hierarchic_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hierarchic_test.C' object='fe/unit_tests_devel-fe_hierarchic_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_hierarchic_test.obj `if test -f 'fe/fe_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hierarchic_test.C'; fi`
+
+fe/unit_tests_devel-fe_l2_hierarchic_test.o: fe/fe_l2_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_l2_hierarchic_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_l2_hierarchic_test.Tpo -c -o fe/unit_tests_devel-fe_l2_hierarchic_test.o `test -f 'fe/fe_l2_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_l2_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_l2_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_l2_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_hierarchic_test.C' object='fe/unit_tests_devel-fe_l2_hierarchic_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_l2_hierarchic_test.o `test -f 'fe/fe_l2_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_l2_hierarchic_test.C
+
+fe/unit_tests_devel-fe_l2_hierarchic_test.obj: fe/fe_l2_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_l2_hierarchic_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_l2_hierarchic_test.Tpo -c -o fe/unit_tests_devel-fe_l2_hierarchic_test.obj `if test -f 'fe/fe_l2_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_l2_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_hierarchic_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_l2_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_l2_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_hierarchic_test.C' object='fe/unit_tests_devel-fe_l2_hierarchic_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_l2_hierarchic_test.obj `if test -f 'fe/fe_l2_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_l2_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_hierarchic_test.C'; fi`
+
+fe/unit_tests_devel-fe_l2_lagrange_test.o: fe/fe_l2_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_l2_lagrange_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_l2_lagrange_test.Tpo -c -o fe/unit_tests_devel-fe_l2_lagrange_test.o `test -f 'fe/fe_l2_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_l2_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_l2_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_l2_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_lagrange_test.C' object='fe/unit_tests_devel-fe_l2_lagrange_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_l2_lagrange_test.o `test -f 'fe/fe_l2_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_l2_lagrange_test.C
+
+fe/unit_tests_devel-fe_l2_lagrange_test.obj: fe/fe_l2_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_l2_lagrange_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_l2_lagrange_test.Tpo -c -o fe/unit_tests_devel-fe_l2_lagrange_test.obj `if test -f 'fe/fe_l2_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_l2_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_lagrange_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_l2_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_l2_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_lagrange_test.C' object='fe/unit_tests_devel-fe_l2_lagrange_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_l2_lagrange_test.obj `if test -f 'fe/fe_l2_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_l2_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_lagrange_test.C'; fi`
+
+fe/unit_tests_devel-fe_lagrange_test.o: fe/fe_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_lagrange_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_lagrange_test.Tpo -c -o fe/unit_tests_devel-fe_lagrange_test.o `test -f 'fe/fe_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_lagrange_test.C' object='fe/unit_tests_devel-fe_lagrange_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_lagrange_test.o `test -f 'fe/fe_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_lagrange_test.C
+
+fe/unit_tests_devel-fe_lagrange_test.obj: fe/fe_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_lagrange_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_lagrange_test.Tpo -c -o fe/unit_tests_devel-fe_lagrange_test.obj `if test -f 'fe/fe_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_lagrange_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_lagrange_test.C' object='fe/unit_tests_devel-fe_lagrange_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_lagrange_test.obj `if test -f 'fe/fe_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_lagrange_test.C'; fi`
+
+fe/unit_tests_devel-fe_monomial_test.o: fe/fe_monomial_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_monomial_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_monomial_test.Tpo -c -o fe/unit_tests_devel-fe_monomial_test.o `test -f 'fe/fe_monomial_test.C' || echo '$(srcdir)/'`fe/fe_monomial_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_monomial_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_monomial_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_monomial_test.C' object='fe/unit_tests_devel-fe_monomial_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_monomial_test.o `test -f 'fe/fe_monomial_test.C' || echo '$(srcdir)/'`fe/fe_monomial_test.C
+
+fe/unit_tests_devel-fe_monomial_test.obj: fe/fe_monomial_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_monomial_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_monomial_test.Tpo -c -o fe/unit_tests_devel-fe_monomial_test.obj `if test -f 'fe/fe_monomial_test.C'; then $(CYGPATH_W) 'fe/fe_monomial_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_monomial_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_monomial_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_monomial_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_monomial_test.C' object='fe/unit_tests_devel-fe_monomial_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_monomial_test.obj `if test -f 'fe/fe_monomial_test.C'; then $(CYGPATH_W) 'fe/fe_monomial_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_monomial_test.C'; fi`
+
+fe/unit_tests_devel-fe_szabab_test.o: fe/fe_szabab_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_szabab_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_szabab_test.Tpo -c -o fe/unit_tests_devel-fe_szabab_test.o `test -f 'fe/fe_szabab_test.C' || echo '$(srcdir)/'`fe/fe_szabab_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_szabab_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_szabab_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_szabab_test.C' object='fe/unit_tests_devel-fe_szabab_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_szabab_test.o `test -f 'fe/fe_szabab_test.C' || echo '$(srcdir)/'`fe/fe_szabab_test.C
+
+fe/unit_tests_devel-fe_szabab_test.obj: fe/fe_szabab_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_szabab_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_szabab_test.Tpo -c -o fe/unit_tests_devel-fe_szabab_test.obj `if test -f 'fe/fe_szabab_test.C'; then $(CYGPATH_W) 'fe/fe_szabab_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_szabab_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_szabab_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_szabab_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_szabab_test.C' object='fe/unit_tests_devel-fe_szabab_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_szabab_test.obj `if test -f 'fe/fe_szabab_test.C'; then $(CYGPATH_W) 'fe/fe_szabab_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_szabab_test.C'; fi`
+
+fe/unit_tests_devel-fe_xyz_test.o: fe/fe_xyz_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_xyz_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_xyz_test.Tpo -c -o fe/unit_tests_devel-fe_xyz_test.o `test -f 'fe/fe_xyz_test.C' || echo '$(srcdir)/'`fe/fe_xyz_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_xyz_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_xyz_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_xyz_test.C' object='fe/unit_tests_devel-fe_xyz_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_xyz_test.o `test -f 'fe/fe_xyz_test.C' || echo '$(srcdir)/'`fe/fe_xyz_test.C
+
+fe/unit_tests_devel-fe_xyz_test.obj: fe/fe_xyz_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_devel-fe_xyz_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_devel-fe_xyz_test.Tpo -c -o fe/unit_tests_devel-fe_xyz_test.obj `if test -f 'fe/fe_xyz_test.C'; then $(CYGPATH_W) 'fe/fe_xyz_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_xyz_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_devel-fe_xyz_test.Tpo fe/$(DEPDIR)/unit_tests_devel-fe_xyz_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_xyz_test.C' object='fe/unit_tests_devel-fe_xyz_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_devel-fe_xyz_test.obj `if test -f 'fe/fe_xyz_test.C'; then $(CYGPATH_W) 'fe/fe_xyz_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_xyz_test.C'; fi`
+
 geom/unit_tests_devel-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-node_test.Tpo -c -o geom/unit_tests_devel-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-node_test.Tpo geom/$(DEPDIR)/unit_tests_devel-node_test.Po
@@ -2862,6 +3373,146 @@ base/unit_tests_oprof-auto_ptr_test.obj: base/auto_ptr_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/auto_ptr_test.C' object='base/unit_tests_oprof-auto_ptr_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_oprof-auto_ptr_test.obj `if test -f 'base/auto_ptr_test.C'; then $(CYGPATH_W) 'base/auto_ptr_test.C'; else $(CYGPATH_W) '$(srcdir)/base/auto_ptr_test.C'; fi`
+
+fe/unit_tests_oprof-fe_bernstein_test.o: fe/fe_bernstein_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_bernstein_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_bernstein_test.Tpo -c -o fe/unit_tests_oprof-fe_bernstein_test.o `test -f 'fe/fe_bernstein_test.C' || echo '$(srcdir)/'`fe/fe_bernstein_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_bernstein_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_bernstein_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_bernstein_test.C' object='fe/unit_tests_oprof-fe_bernstein_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_bernstein_test.o `test -f 'fe/fe_bernstein_test.C' || echo '$(srcdir)/'`fe/fe_bernstein_test.C
+
+fe/unit_tests_oprof-fe_bernstein_test.obj: fe/fe_bernstein_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_bernstein_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_bernstein_test.Tpo -c -o fe/unit_tests_oprof-fe_bernstein_test.obj `if test -f 'fe/fe_bernstein_test.C'; then $(CYGPATH_W) 'fe/fe_bernstein_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_bernstein_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_bernstein_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_bernstein_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_bernstein_test.C' object='fe/unit_tests_oprof-fe_bernstein_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_bernstein_test.obj `if test -f 'fe/fe_bernstein_test.C'; then $(CYGPATH_W) 'fe/fe_bernstein_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_bernstein_test.C'; fi`
+
+fe/unit_tests_oprof-fe_clough_test.o: fe/fe_clough_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_clough_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_clough_test.Tpo -c -o fe/unit_tests_oprof-fe_clough_test.o `test -f 'fe/fe_clough_test.C' || echo '$(srcdir)/'`fe/fe_clough_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_clough_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_clough_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_clough_test.C' object='fe/unit_tests_oprof-fe_clough_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_clough_test.o `test -f 'fe/fe_clough_test.C' || echo '$(srcdir)/'`fe/fe_clough_test.C
+
+fe/unit_tests_oprof-fe_clough_test.obj: fe/fe_clough_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_clough_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_clough_test.Tpo -c -o fe/unit_tests_oprof-fe_clough_test.obj `if test -f 'fe/fe_clough_test.C'; then $(CYGPATH_W) 'fe/fe_clough_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_clough_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_clough_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_clough_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_clough_test.C' object='fe/unit_tests_oprof-fe_clough_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_clough_test.obj `if test -f 'fe/fe_clough_test.C'; then $(CYGPATH_W) 'fe/fe_clough_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_clough_test.C'; fi`
+
+fe/unit_tests_oprof-fe_hermite_test.o: fe/fe_hermite_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_hermite_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_hermite_test.Tpo -c -o fe/unit_tests_oprof-fe_hermite_test.o `test -f 'fe/fe_hermite_test.C' || echo '$(srcdir)/'`fe/fe_hermite_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_hermite_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_hermite_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hermite_test.C' object='fe/unit_tests_oprof-fe_hermite_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_hermite_test.o `test -f 'fe/fe_hermite_test.C' || echo '$(srcdir)/'`fe/fe_hermite_test.C
+
+fe/unit_tests_oprof-fe_hermite_test.obj: fe/fe_hermite_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_hermite_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_hermite_test.Tpo -c -o fe/unit_tests_oprof-fe_hermite_test.obj `if test -f 'fe/fe_hermite_test.C'; then $(CYGPATH_W) 'fe/fe_hermite_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hermite_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_hermite_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_hermite_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hermite_test.C' object='fe/unit_tests_oprof-fe_hermite_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_hermite_test.obj `if test -f 'fe/fe_hermite_test.C'; then $(CYGPATH_W) 'fe/fe_hermite_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hermite_test.C'; fi`
+
+fe/unit_tests_oprof-fe_hierarchic_test.o: fe/fe_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_hierarchic_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_hierarchic_test.Tpo -c -o fe/unit_tests_oprof-fe_hierarchic_test.o `test -f 'fe/fe_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hierarchic_test.C' object='fe/unit_tests_oprof-fe_hierarchic_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_hierarchic_test.o `test -f 'fe/fe_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_hierarchic_test.C
+
+fe/unit_tests_oprof-fe_hierarchic_test.obj: fe/fe_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_hierarchic_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_hierarchic_test.Tpo -c -o fe/unit_tests_oprof-fe_hierarchic_test.obj `if test -f 'fe/fe_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hierarchic_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hierarchic_test.C' object='fe/unit_tests_oprof-fe_hierarchic_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_hierarchic_test.obj `if test -f 'fe/fe_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hierarchic_test.C'; fi`
+
+fe/unit_tests_oprof-fe_l2_hierarchic_test.o: fe/fe_l2_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_l2_hierarchic_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_l2_hierarchic_test.Tpo -c -o fe/unit_tests_oprof-fe_l2_hierarchic_test.o `test -f 'fe/fe_l2_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_l2_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_l2_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_l2_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_hierarchic_test.C' object='fe/unit_tests_oprof-fe_l2_hierarchic_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_l2_hierarchic_test.o `test -f 'fe/fe_l2_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_l2_hierarchic_test.C
+
+fe/unit_tests_oprof-fe_l2_hierarchic_test.obj: fe/fe_l2_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_l2_hierarchic_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_l2_hierarchic_test.Tpo -c -o fe/unit_tests_oprof-fe_l2_hierarchic_test.obj `if test -f 'fe/fe_l2_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_l2_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_hierarchic_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_l2_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_l2_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_hierarchic_test.C' object='fe/unit_tests_oprof-fe_l2_hierarchic_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_l2_hierarchic_test.obj `if test -f 'fe/fe_l2_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_l2_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_hierarchic_test.C'; fi`
+
+fe/unit_tests_oprof-fe_l2_lagrange_test.o: fe/fe_l2_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_l2_lagrange_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_l2_lagrange_test.Tpo -c -o fe/unit_tests_oprof-fe_l2_lagrange_test.o `test -f 'fe/fe_l2_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_l2_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_l2_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_l2_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_lagrange_test.C' object='fe/unit_tests_oprof-fe_l2_lagrange_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_l2_lagrange_test.o `test -f 'fe/fe_l2_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_l2_lagrange_test.C
+
+fe/unit_tests_oprof-fe_l2_lagrange_test.obj: fe/fe_l2_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_l2_lagrange_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_l2_lagrange_test.Tpo -c -o fe/unit_tests_oprof-fe_l2_lagrange_test.obj `if test -f 'fe/fe_l2_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_l2_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_lagrange_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_l2_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_l2_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_lagrange_test.C' object='fe/unit_tests_oprof-fe_l2_lagrange_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_l2_lagrange_test.obj `if test -f 'fe/fe_l2_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_l2_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_lagrange_test.C'; fi`
+
+fe/unit_tests_oprof-fe_lagrange_test.o: fe/fe_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_lagrange_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_lagrange_test.Tpo -c -o fe/unit_tests_oprof-fe_lagrange_test.o `test -f 'fe/fe_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_lagrange_test.C' object='fe/unit_tests_oprof-fe_lagrange_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_lagrange_test.o `test -f 'fe/fe_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_lagrange_test.C
+
+fe/unit_tests_oprof-fe_lagrange_test.obj: fe/fe_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_lagrange_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_lagrange_test.Tpo -c -o fe/unit_tests_oprof-fe_lagrange_test.obj `if test -f 'fe/fe_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_lagrange_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_lagrange_test.C' object='fe/unit_tests_oprof-fe_lagrange_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_lagrange_test.obj `if test -f 'fe/fe_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_lagrange_test.C'; fi`
+
+fe/unit_tests_oprof-fe_monomial_test.o: fe/fe_monomial_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_monomial_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_monomial_test.Tpo -c -o fe/unit_tests_oprof-fe_monomial_test.o `test -f 'fe/fe_monomial_test.C' || echo '$(srcdir)/'`fe/fe_monomial_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_monomial_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_monomial_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_monomial_test.C' object='fe/unit_tests_oprof-fe_monomial_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_monomial_test.o `test -f 'fe/fe_monomial_test.C' || echo '$(srcdir)/'`fe/fe_monomial_test.C
+
+fe/unit_tests_oprof-fe_monomial_test.obj: fe/fe_monomial_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_monomial_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_monomial_test.Tpo -c -o fe/unit_tests_oprof-fe_monomial_test.obj `if test -f 'fe/fe_monomial_test.C'; then $(CYGPATH_W) 'fe/fe_monomial_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_monomial_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_monomial_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_monomial_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_monomial_test.C' object='fe/unit_tests_oprof-fe_monomial_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_monomial_test.obj `if test -f 'fe/fe_monomial_test.C'; then $(CYGPATH_W) 'fe/fe_monomial_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_monomial_test.C'; fi`
+
+fe/unit_tests_oprof-fe_szabab_test.o: fe/fe_szabab_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_szabab_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_szabab_test.Tpo -c -o fe/unit_tests_oprof-fe_szabab_test.o `test -f 'fe/fe_szabab_test.C' || echo '$(srcdir)/'`fe/fe_szabab_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_szabab_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_szabab_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_szabab_test.C' object='fe/unit_tests_oprof-fe_szabab_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_szabab_test.o `test -f 'fe/fe_szabab_test.C' || echo '$(srcdir)/'`fe/fe_szabab_test.C
+
+fe/unit_tests_oprof-fe_szabab_test.obj: fe/fe_szabab_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_szabab_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_szabab_test.Tpo -c -o fe/unit_tests_oprof-fe_szabab_test.obj `if test -f 'fe/fe_szabab_test.C'; then $(CYGPATH_W) 'fe/fe_szabab_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_szabab_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_szabab_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_szabab_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_szabab_test.C' object='fe/unit_tests_oprof-fe_szabab_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_szabab_test.obj `if test -f 'fe/fe_szabab_test.C'; then $(CYGPATH_W) 'fe/fe_szabab_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_szabab_test.C'; fi`
+
+fe/unit_tests_oprof-fe_xyz_test.o: fe/fe_xyz_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_xyz_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_xyz_test.Tpo -c -o fe/unit_tests_oprof-fe_xyz_test.o `test -f 'fe/fe_xyz_test.C' || echo '$(srcdir)/'`fe/fe_xyz_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_xyz_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_xyz_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_xyz_test.C' object='fe/unit_tests_oprof-fe_xyz_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_xyz_test.o `test -f 'fe/fe_xyz_test.C' || echo '$(srcdir)/'`fe/fe_xyz_test.C
+
+fe/unit_tests_oprof-fe_xyz_test.obj: fe/fe_xyz_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_oprof-fe_xyz_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_oprof-fe_xyz_test.Tpo -c -o fe/unit_tests_oprof-fe_xyz_test.obj `if test -f 'fe/fe_xyz_test.C'; then $(CYGPATH_W) 'fe/fe_xyz_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_xyz_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_oprof-fe_xyz_test.Tpo fe/$(DEPDIR)/unit_tests_oprof-fe_xyz_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_xyz_test.C' object='fe/unit_tests_oprof-fe_xyz_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_oprof-fe_xyz_test.obj `if test -f 'fe/fe_xyz_test.C'; then $(CYGPATH_W) 'fe/fe_xyz_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_xyz_test.C'; fi`
 
 geom/unit_tests_oprof-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-node_test.Tpo -c -o geom/unit_tests_oprof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
@@ -3395,6 +4046,146 @@ base/unit_tests_opt-auto_ptr_test.obj: base/auto_ptr_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_opt-auto_ptr_test.obj `if test -f 'base/auto_ptr_test.C'; then $(CYGPATH_W) 'base/auto_ptr_test.C'; else $(CYGPATH_W) '$(srcdir)/base/auto_ptr_test.C'; fi`
 
+fe/unit_tests_opt-fe_bernstein_test.o: fe/fe_bernstein_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_bernstein_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_bernstein_test.Tpo -c -o fe/unit_tests_opt-fe_bernstein_test.o `test -f 'fe/fe_bernstein_test.C' || echo '$(srcdir)/'`fe/fe_bernstein_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_bernstein_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_bernstein_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_bernstein_test.C' object='fe/unit_tests_opt-fe_bernstein_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_bernstein_test.o `test -f 'fe/fe_bernstein_test.C' || echo '$(srcdir)/'`fe/fe_bernstein_test.C
+
+fe/unit_tests_opt-fe_bernstein_test.obj: fe/fe_bernstein_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_bernstein_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_bernstein_test.Tpo -c -o fe/unit_tests_opt-fe_bernstein_test.obj `if test -f 'fe/fe_bernstein_test.C'; then $(CYGPATH_W) 'fe/fe_bernstein_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_bernstein_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_bernstein_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_bernstein_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_bernstein_test.C' object='fe/unit_tests_opt-fe_bernstein_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_bernstein_test.obj `if test -f 'fe/fe_bernstein_test.C'; then $(CYGPATH_W) 'fe/fe_bernstein_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_bernstein_test.C'; fi`
+
+fe/unit_tests_opt-fe_clough_test.o: fe/fe_clough_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_clough_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_clough_test.Tpo -c -o fe/unit_tests_opt-fe_clough_test.o `test -f 'fe/fe_clough_test.C' || echo '$(srcdir)/'`fe/fe_clough_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_clough_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_clough_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_clough_test.C' object='fe/unit_tests_opt-fe_clough_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_clough_test.o `test -f 'fe/fe_clough_test.C' || echo '$(srcdir)/'`fe/fe_clough_test.C
+
+fe/unit_tests_opt-fe_clough_test.obj: fe/fe_clough_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_clough_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_clough_test.Tpo -c -o fe/unit_tests_opt-fe_clough_test.obj `if test -f 'fe/fe_clough_test.C'; then $(CYGPATH_W) 'fe/fe_clough_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_clough_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_clough_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_clough_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_clough_test.C' object='fe/unit_tests_opt-fe_clough_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_clough_test.obj `if test -f 'fe/fe_clough_test.C'; then $(CYGPATH_W) 'fe/fe_clough_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_clough_test.C'; fi`
+
+fe/unit_tests_opt-fe_hermite_test.o: fe/fe_hermite_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_hermite_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_hermite_test.Tpo -c -o fe/unit_tests_opt-fe_hermite_test.o `test -f 'fe/fe_hermite_test.C' || echo '$(srcdir)/'`fe/fe_hermite_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_hermite_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_hermite_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hermite_test.C' object='fe/unit_tests_opt-fe_hermite_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_hermite_test.o `test -f 'fe/fe_hermite_test.C' || echo '$(srcdir)/'`fe/fe_hermite_test.C
+
+fe/unit_tests_opt-fe_hermite_test.obj: fe/fe_hermite_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_hermite_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_hermite_test.Tpo -c -o fe/unit_tests_opt-fe_hermite_test.obj `if test -f 'fe/fe_hermite_test.C'; then $(CYGPATH_W) 'fe/fe_hermite_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hermite_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_hermite_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_hermite_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hermite_test.C' object='fe/unit_tests_opt-fe_hermite_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_hermite_test.obj `if test -f 'fe/fe_hermite_test.C'; then $(CYGPATH_W) 'fe/fe_hermite_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hermite_test.C'; fi`
+
+fe/unit_tests_opt-fe_hierarchic_test.o: fe/fe_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_hierarchic_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_hierarchic_test.Tpo -c -o fe/unit_tests_opt-fe_hierarchic_test.o `test -f 'fe/fe_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hierarchic_test.C' object='fe/unit_tests_opt-fe_hierarchic_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_hierarchic_test.o `test -f 'fe/fe_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_hierarchic_test.C
+
+fe/unit_tests_opt-fe_hierarchic_test.obj: fe/fe_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_hierarchic_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_hierarchic_test.Tpo -c -o fe/unit_tests_opt-fe_hierarchic_test.obj `if test -f 'fe/fe_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hierarchic_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hierarchic_test.C' object='fe/unit_tests_opt-fe_hierarchic_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_hierarchic_test.obj `if test -f 'fe/fe_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hierarchic_test.C'; fi`
+
+fe/unit_tests_opt-fe_l2_hierarchic_test.o: fe/fe_l2_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_l2_hierarchic_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_l2_hierarchic_test.Tpo -c -o fe/unit_tests_opt-fe_l2_hierarchic_test.o `test -f 'fe/fe_l2_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_l2_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_l2_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_l2_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_hierarchic_test.C' object='fe/unit_tests_opt-fe_l2_hierarchic_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_l2_hierarchic_test.o `test -f 'fe/fe_l2_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_l2_hierarchic_test.C
+
+fe/unit_tests_opt-fe_l2_hierarchic_test.obj: fe/fe_l2_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_l2_hierarchic_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_l2_hierarchic_test.Tpo -c -o fe/unit_tests_opt-fe_l2_hierarchic_test.obj `if test -f 'fe/fe_l2_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_l2_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_hierarchic_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_l2_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_l2_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_hierarchic_test.C' object='fe/unit_tests_opt-fe_l2_hierarchic_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_l2_hierarchic_test.obj `if test -f 'fe/fe_l2_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_l2_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_hierarchic_test.C'; fi`
+
+fe/unit_tests_opt-fe_l2_lagrange_test.o: fe/fe_l2_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_l2_lagrange_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_l2_lagrange_test.Tpo -c -o fe/unit_tests_opt-fe_l2_lagrange_test.o `test -f 'fe/fe_l2_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_l2_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_l2_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_l2_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_lagrange_test.C' object='fe/unit_tests_opt-fe_l2_lagrange_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_l2_lagrange_test.o `test -f 'fe/fe_l2_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_l2_lagrange_test.C
+
+fe/unit_tests_opt-fe_l2_lagrange_test.obj: fe/fe_l2_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_l2_lagrange_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_l2_lagrange_test.Tpo -c -o fe/unit_tests_opt-fe_l2_lagrange_test.obj `if test -f 'fe/fe_l2_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_l2_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_lagrange_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_l2_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_l2_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_lagrange_test.C' object='fe/unit_tests_opt-fe_l2_lagrange_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_l2_lagrange_test.obj `if test -f 'fe/fe_l2_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_l2_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_lagrange_test.C'; fi`
+
+fe/unit_tests_opt-fe_lagrange_test.o: fe/fe_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_lagrange_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_lagrange_test.Tpo -c -o fe/unit_tests_opt-fe_lagrange_test.o `test -f 'fe/fe_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_lagrange_test.C' object='fe/unit_tests_opt-fe_lagrange_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_lagrange_test.o `test -f 'fe/fe_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_lagrange_test.C
+
+fe/unit_tests_opt-fe_lagrange_test.obj: fe/fe_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_lagrange_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_lagrange_test.Tpo -c -o fe/unit_tests_opt-fe_lagrange_test.obj `if test -f 'fe/fe_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_lagrange_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_lagrange_test.C' object='fe/unit_tests_opt-fe_lagrange_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_lagrange_test.obj `if test -f 'fe/fe_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_lagrange_test.C'; fi`
+
+fe/unit_tests_opt-fe_monomial_test.o: fe/fe_monomial_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_monomial_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_monomial_test.Tpo -c -o fe/unit_tests_opt-fe_monomial_test.o `test -f 'fe/fe_monomial_test.C' || echo '$(srcdir)/'`fe/fe_monomial_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_monomial_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_monomial_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_monomial_test.C' object='fe/unit_tests_opt-fe_monomial_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_monomial_test.o `test -f 'fe/fe_monomial_test.C' || echo '$(srcdir)/'`fe/fe_monomial_test.C
+
+fe/unit_tests_opt-fe_monomial_test.obj: fe/fe_monomial_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_monomial_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_monomial_test.Tpo -c -o fe/unit_tests_opt-fe_monomial_test.obj `if test -f 'fe/fe_monomial_test.C'; then $(CYGPATH_W) 'fe/fe_monomial_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_monomial_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_monomial_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_monomial_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_monomial_test.C' object='fe/unit_tests_opt-fe_monomial_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_monomial_test.obj `if test -f 'fe/fe_monomial_test.C'; then $(CYGPATH_W) 'fe/fe_monomial_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_monomial_test.C'; fi`
+
+fe/unit_tests_opt-fe_szabab_test.o: fe/fe_szabab_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_szabab_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_szabab_test.Tpo -c -o fe/unit_tests_opt-fe_szabab_test.o `test -f 'fe/fe_szabab_test.C' || echo '$(srcdir)/'`fe/fe_szabab_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_szabab_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_szabab_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_szabab_test.C' object='fe/unit_tests_opt-fe_szabab_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_szabab_test.o `test -f 'fe/fe_szabab_test.C' || echo '$(srcdir)/'`fe/fe_szabab_test.C
+
+fe/unit_tests_opt-fe_szabab_test.obj: fe/fe_szabab_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_szabab_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_szabab_test.Tpo -c -o fe/unit_tests_opt-fe_szabab_test.obj `if test -f 'fe/fe_szabab_test.C'; then $(CYGPATH_W) 'fe/fe_szabab_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_szabab_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_szabab_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_szabab_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_szabab_test.C' object='fe/unit_tests_opt-fe_szabab_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_szabab_test.obj `if test -f 'fe/fe_szabab_test.C'; then $(CYGPATH_W) 'fe/fe_szabab_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_szabab_test.C'; fi`
+
+fe/unit_tests_opt-fe_xyz_test.o: fe/fe_xyz_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_xyz_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_xyz_test.Tpo -c -o fe/unit_tests_opt-fe_xyz_test.o `test -f 'fe/fe_xyz_test.C' || echo '$(srcdir)/'`fe/fe_xyz_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_xyz_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_xyz_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_xyz_test.C' object='fe/unit_tests_opt-fe_xyz_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_xyz_test.o `test -f 'fe/fe_xyz_test.C' || echo '$(srcdir)/'`fe/fe_xyz_test.C
+
+fe/unit_tests_opt-fe_xyz_test.obj: fe/fe_xyz_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_opt-fe_xyz_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_opt-fe_xyz_test.Tpo -c -o fe/unit_tests_opt-fe_xyz_test.obj `if test -f 'fe/fe_xyz_test.C'; then $(CYGPATH_W) 'fe/fe_xyz_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_xyz_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_opt-fe_xyz_test.Tpo fe/$(DEPDIR)/unit_tests_opt-fe_xyz_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_xyz_test.C' object='fe/unit_tests_opt-fe_xyz_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_opt-fe_xyz_test.obj `if test -f 'fe/fe_xyz_test.C'; then $(CYGPATH_W) 'fe/fe_xyz_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_xyz_test.C'; fi`
+
 geom/unit_tests_opt-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-node_test.Tpo -c -o geom/unit_tests_opt-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-node_test.Tpo geom/$(DEPDIR)/unit_tests_opt-node_test.Po
@@ -3926,6 +4717,146 @@ base/unit_tests_prof-auto_ptr_test.obj: base/auto_ptr_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/auto_ptr_test.C' object='base/unit_tests_prof-auto_ptr_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_prof-auto_ptr_test.obj `if test -f 'base/auto_ptr_test.C'; then $(CYGPATH_W) 'base/auto_ptr_test.C'; else $(CYGPATH_W) '$(srcdir)/base/auto_ptr_test.C'; fi`
+
+fe/unit_tests_prof-fe_bernstein_test.o: fe/fe_bernstein_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_bernstein_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_bernstein_test.Tpo -c -o fe/unit_tests_prof-fe_bernstein_test.o `test -f 'fe/fe_bernstein_test.C' || echo '$(srcdir)/'`fe/fe_bernstein_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_bernstein_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_bernstein_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_bernstein_test.C' object='fe/unit_tests_prof-fe_bernstein_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_bernstein_test.o `test -f 'fe/fe_bernstein_test.C' || echo '$(srcdir)/'`fe/fe_bernstein_test.C
+
+fe/unit_tests_prof-fe_bernstein_test.obj: fe/fe_bernstein_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_bernstein_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_bernstein_test.Tpo -c -o fe/unit_tests_prof-fe_bernstein_test.obj `if test -f 'fe/fe_bernstein_test.C'; then $(CYGPATH_W) 'fe/fe_bernstein_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_bernstein_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_bernstein_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_bernstein_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_bernstein_test.C' object='fe/unit_tests_prof-fe_bernstein_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_bernstein_test.obj `if test -f 'fe/fe_bernstein_test.C'; then $(CYGPATH_W) 'fe/fe_bernstein_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_bernstein_test.C'; fi`
+
+fe/unit_tests_prof-fe_clough_test.o: fe/fe_clough_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_clough_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_clough_test.Tpo -c -o fe/unit_tests_prof-fe_clough_test.o `test -f 'fe/fe_clough_test.C' || echo '$(srcdir)/'`fe/fe_clough_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_clough_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_clough_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_clough_test.C' object='fe/unit_tests_prof-fe_clough_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_clough_test.o `test -f 'fe/fe_clough_test.C' || echo '$(srcdir)/'`fe/fe_clough_test.C
+
+fe/unit_tests_prof-fe_clough_test.obj: fe/fe_clough_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_clough_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_clough_test.Tpo -c -o fe/unit_tests_prof-fe_clough_test.obj `if test -f 'fe/fe_clough_test.C'; then $(CYGPATH_W) 'fe/fe_clough_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_clough_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_clough_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_clough_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_clough_test.C' object='fe/unit_tests_prof-fe_clough_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_clough_test.obj `if test -f 'fe/fe_clough_test.C'; then $(CYGPATH_W) 'fe/fe_clough_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_clough_test.C'; fi`
+
+fe/unit_tests_prof-fe_hermite_test.o: fe/fe_hermite_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_hermite_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_hermite_test.Tpo -c -o fe/unit_tests_prof-fe_hermite_test.o `test -f 'fe/fe_hermite_test.C' || echo '$(srcdir)/'`fe/fe_hermite_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_hermite_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_hermite_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hermite_test.C' object='fe/unit_tests_prof-fe_hermite_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_hermite_test.o `test -f 'fe/fe_hermite_test.C' || echo '$(srcdir)/'`fe/fe_hermite_test.C
+
+fe/unit_tests_prof-fe_hermite_test.obj: fe/fe_hermite_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_hermite_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_hermite_test.Tpo -c -o fe/unit_tests_prof-fe_hermite_test.obj `if test -f 'fe/fe_hermite_test.C'; then $(CYGPATH_W) 'fe/fe_hermite_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hermite_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_hermite_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_hermite_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hermite_test.C' object='fe/unit_tests_prof-fe_hermite_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_hermite_test.obj `if test -f 'fe/fe_hermite_test.C'; then $(CYGPATH_W) 'fe/fe_hermite_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hermite_test.C'; fi`
+
+fe/unit_tests_prof-fe_hierarchic_test.o: fe/fe_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_hierarchic_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_hierarchic_test.Tpo -c -o fe/unit_tests_prof-fe_hierarchic_test.o `test -f 'fe/fe_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hierarchic_test.C' object='fe/unit_tests_prof-fe_hierarchic_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_hierarchic_test.o `test -f 'fe/fe_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_hierarchic_test.C
+
+fe/unit_tests_prof-fe_hierarchic_test.obj: fe/fe_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_hierarchic_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_hierarchic_test.Tpo -c -o fe/unit_tests_prof-fe_hierarchic_test.obj `if test -f 'fe/fe_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hierarchic_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_hierarchic_test.C' object='fe/unit_tests_prof-fe_hierarchic_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_hierarchic_test.obj `if test -f 'fe/fe_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_hierarchic_test.C'; fi`
+
+fe/unit_tests_prof-fe_l2_hierarchic_test.o: fe/fe_l2_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_l2_hierarchic_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_l2_hierarchic_test.Tpo -c -o fe/unit_tests_prof-fe_l2_hierarchic_test.o `test -f 'fe/fe_l2_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_l2_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_l2_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_l2_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_hierarchic_test.C' object='fe/unit_tests_prof-fe_l2_hierarchic_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_l2_hierarchic_test.o `test -f 'fe/fe_l2_hierarchic_test.C' || echo '$(srcdir)/'`fe/fe_l2_hierarchic_test.C
+
+fe/unit_tests_prof-fe_l2_hierarchic_test.obj: fe/fe_l2_hierarchic_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_l2_hierarchic_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_l2_hierarchic_test.Tpo -c -o fe/unit_tests_prof-fe_l2_hierarchic_test.obj `if test -f 'fe/fe_l2_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_l2_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_hierarchic_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_l2_hierarchic_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_l2_hierarchic_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_hierarchic_test.C' object='fe/unit_tests_prof-fe_l2_hierarchic_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_l2_hierarchic_test.obj `if test -f 'fe/fe_l2_hierarchic_test.C'; then $(CYGPATH_W) 'fe/fe_l2_hierarchic_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_hierarchic_test.C'; fi`
+
+fe/unit_tests_prof-fe_l2_lagrange_test.o: fe/fe_l2_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_l2_lagrange_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_l2_lagrange_test.Tpo -c -o fe/unit_tests_prof-fe_l2_lagrange_test.o `test -f 'fe/fe_l2_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_l2_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_l2_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_l2_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_lagrange_test.C' object='fe/unit_tests_prof-fe_l2_lagrange_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_l2_lagrange_test.o `test -f 'fe/fe_l2_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_l2_lagrange_test.C
+
+fe/unit_tests_prof-fe_l2_lagrange_test.obj: fe/fe_l2_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_l2_lagrange_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_l2_lagrange_test.Tpo -c -o fe/unit_tests_prof-fe_l2_lagrange_test.obj `if test -f 'fe/fe_l2_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_l2_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_lagrange_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_l2_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_l2_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_l2_lagrange_test.C' object='fe/unit_tests_prof-fe_l2_lagrange_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_l2_lagrange_test.obj `if test -f 'fe/fe_l2_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_l2_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_l2_lagrange_test.C'; fi`
+
+fe/unit_tests_prof-fe_lagrange_test.o: fe/fe_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_lagrange_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_lagrange_test.Tpo -c -o fe/unit_tests_prof-fe_lagrange_test.o `test -f 'fe/fe_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_lagrange_test.C' object='fe/unit_tests_prof-fe_lagrange_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_lagrange_test.o `test -f 'fe/fe_lagrange_test.C' || echo '$(srcdir)/'`fe/fe_lagrange_test.C
+
+fe/unit_tests_prof-fe_lagrange_test.obj: fe/fe_lagrange_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_lagrange_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_lagrange_test.Tpo -c -o fe/unit_tests_prof-fe_lagrange_test.obj `if test -f 'fe/fe_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_lagrange_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_lagrange_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_lagrange_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_lagrange_test.C' object='fe/unit_tests_prof-fe_lagrange_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_lagrange_test.obj `if test -f 'fe/fe_lagrange_test.C'; then $(CYGPATH_W) 'fe/fe_lagrange_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_lagrange_test.C'; fi`
+
+fe/unit_tests_prof-fe_monomial_test.o: fe/fe_monomial_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_monomial_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_monomial_test.Tpo -c -o fe/unit_tests_prof-fe_monomial_test.o `test -f 'fe/fe_monomial_test.C' || echo '$(srcdir)/'`fe/fe_monomial_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_monomial_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_monomial_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_monomial_test.C' object='fe/unit_tests_prof-fe_monomial_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_monomial_test.o `test -f 'fe/fe_monomial_test.C' || echo '$(srcdir)/'`fe/fe_monomial_test.C
+
+fe/unit_tests_prof-fe_monomial_test.obj: fe/fe_monomial_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_monomial_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_monomial_test.Tpo -c -o fe/unit_tests_prof-fe_monomial_test.obj `if test -f 'fe/fe_monomial_test.C'; then $(CYGPATH_W) 'fe/fe_monomial_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_monomial_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_monomial_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_monomial_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_monomial_test.C' object='fe/unit_tests_prof-fe_monomial_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_monomial_test.obj `if test -f 'fe/fe_monomial_test.C'; then $(CYGPATH_W) 'fe/fe_monomial_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_monomial_test.C'; fi`
+
+fe/unit_tests_prof-fe_szabab_test.o: fe/fe_szabab_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_szabab_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_szabab_test.Tpo -c -o fe/unit_tests_prof-fe_szabab_test.o `test -f 'fe/fe_szabab_test.C' || echo '$(srcdir)/'`fe/fe_szabab_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_szabab_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_szabab_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_szabab_test.C' object='fe/unit_tests_prof-fe_szabab_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_szabab_test.o `test -f 'fe/fe_szabab_test.C' || echo '$(srcdir)/'`fe/fe_szabab_test.C
+
+fe/unit_tests_prof-fe_szabab_test.obj: fe/fe_szabab_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_szabab_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_szabab_test.Tpo -c -o fe/unit_tests_prof-fe_szabab_test.obj `if test -f 'fe/fe_szabab_test.C'; then $(CYGPATH_W) 'fe/fe_szabab_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_szabab_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_szabab_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_szabab_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_szabab_test.C' object='fe/unit_tests_prof-fe_szabab_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_szabab_test.obj `if test -f 'fe/fe_szabab_test.C'; then $(CYGPATH_W) 'fe/fe_szabab_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_szabab_test.C'; fi`
+
+fe/unit_tests_prof-fe_xyz_test.o: fe/fe_xyz_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_xyz_test.o -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_xyz_test.Tpo -c -o fe/unit_tests_prof-fe_xyz_test.o `test -f 'fe/fe_xyz_test.C' || echo '$(srcdir)/'`fe/fe_xyz_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_xyz_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_xyz_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_xyz_test.C' object='fe/unit_tests_prof-fe_xyz_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_xyz_test.o `test -f 'fe/fe_xyz_test.C' || echo '$(srcdir)/'`fe/fe_xyz_test.C
+
+fe/unit_tests_prof-fe_xyz_test.obj: fe/fe_xyz_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT fe/unit_tests_prof-fe_xyz_test.obj -MD -MP -MF fe/$(DEPDIR)/unit_tests_prof-fe_xyz_test.Tpo -c -o fe/unit_tests_prof-fe_xyz_test.obj `if test -f 'fe/fe_xyz_test.C'; then $(CYGPATH_W) 'fe/fe_xyz_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_xyz_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) fe/$(DEPDIR)/unit_tests_prof-fe_xyz_test.Tpo fe/$(DEPDIR)/unit_tests_prof-fe_xyz_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fe/fe_xyz_test.C' object='fe/unit_tests_prof-fe_xyz_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o fe/unit_tests_prof-fe_xyz_test.obj `if test -f 'fe/fe_xyz_test.C'; then $(CYGPATH_W) 'fe/fe_xyz_test.C'; else $(CYGPATH_W) '$(srcdir)/fe/fe_xyz_test.C'; fi`
 
 geom/unit_tests_prof-node_test.o: geom/node_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-node_test.Tpo -c -o geom/unit_tests_prof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
@@ -4619,6 +5550,8 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f base/$(DEPDIR)/$(am__dirstamp)
 	-rm -f base/$(am__dirstamp)
+	-rm -f fe/$(DEPDIR)/$(am__dirstamp)
+	-rm -f fe/$(am__dirstamp)
 	-rm -f fparser/$(DEPDIR)/$(am__dirstamp)
 	-rm -f fparser/$(am__dirstamp)
 	-rm -f geom/$(DEPDIR)/$(am__dirstamp)
@@ -4647,7 +5580,7 @@ clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
 	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR) base/$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) mesh/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) solvers/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) base/$(DEPDIR) fe/$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) mesh/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) solvers/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -4693,7 +5626,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR) base/$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) mesh/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) solvers/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) base/$(DEPDIR) fe/$(DEPDIR) fparser/$(DEPDIR) geom/$(DEPDIR) mesh/$(DEPDIR) numerics/$(DEPDIR) parallel/$(DEPDIR) quadrature/$(DEPDIR) solvers/$(DEPDIR) systems/$(DEPDIR) utils/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
