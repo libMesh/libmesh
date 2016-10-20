@@ -184,13 +184,13 @@ public:
                         (*_sys->current_local_solution)(_dof_indices[d]);
 
             CPPUNIT_ASSERT_DOUBLES_EQUAL
-              (grad_u(0), 1, TOLERANCE*TOLERANCE);
+              (grad_u(0), 1, TOLERANCE*sqrt(TOLERANCE));
             if (_dim > 1)
               CPPUNIT_ASSERT_DOUBLES_EQUAL
-                (grad_u(1), 0.25, TOLERANCE*TOLERANCE);
+                (grad_u(1), 0.25, TOLERANCE*sqrt(TOLERANCE));
             if (_dim > 2)
               CPPUNIT_ASSERT_DOUBLES_EQUAL
-                (grad_u(2), 0.0625, TOLERANCE*TOLERANCE);
+                (grad_u(2), 0.0625, TOLERANCE*sqrt(TOLERANCE));
           }
   }
 
@@ -233,13 +233,13 @@ public:
               }
 
             CPPUNIT_ASSERT_DOUBLES_EQUAL
-              (grad_u_x, 1, TOLERANCE*TOLERANCE);
+              (grad_u_x, 1, TOLERANCE*sqrt(TOLERANCE));
             if (_dim > 1)
               CPPUNIT_ASSERT_DOUBLES_EQUAL
-                (grad_u_y, 0.25, TOLERANCE*TOLERANCE);
+                (grad_u_y, 0.25, TOLERANCE*sqrt(TOLERANCE));
             if (_dim > 2)
               CPPUNIT_ASSERT_DOUBLES_EQUAL
-                (grad_u_z, 0.0625, TOLERANCE*TOLERANCE);
+                (grad_u_z, 0.0625, TOLERANCE*sqrt(TOLERANCE));
           }
   }
 
