@@ -486,6 +486,24 @@ solution_components_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 solution_components_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
 solution_components_dbg_LDADD      = libmesh_dbg.la
 
+# splitter
+opt_programs           += splitter-opt
+splitter_opt_SOURCES    = src/apps/splitter.C
+splitter_opt_CPPFLAGS   = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+splitter_opt_CXXFLAGS   = $(CXXFLAGS_OPT)
+splitter_opt_LDADD      = libmesh_opt.la
+
+devel_programs         += splitter-devel
+splitter_devel_SOURCES  = src/apps/splitter.C
+splitter_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+splitter_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
+splitter_devel_LDADD    = libmesh_devel.la
+
+dbg_programs           += splitter-dbg
+splitter_dbg_SOURCES    = src/apps/splitter.C
+splitter_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+splitter_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
+splitter_dbg_LDADD      = libmesh_dbg.la
 
 if LIBMESH_OPT_MODE
   bin_PROGRAMS += $(opt_programs)
