@@ -128,9 +128,11 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
           case EDGE3:
             return 2;
 
+          case TRI3:
           case TRI6:
             return 3;
 
+          case QUAD4:
           case QUAD8:
           case QUAD9:
             return 4;
@@ -358,6 +360,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
 
 
             // The 2D Szabo-Babuska defined on a 6-noded triangle
+          case TRI3:
           case TRI6:
             {
               switch (n)
@@ -373,13 +376,14 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 0;
 
                 default:
-                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI3/6!");
                 }
             }
 
 
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
+          case QUAD4:
           case QUAD8:
           case QUAD9:
             {
@@ -401,7 +405,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
                   return 0;
 
                 default:
-                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD8/9!");
+                  libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD4/8/9!");
                 }
             }
 
@@ -945,26 +949,20 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
           case NODEELEM:
             return 0;
 
-            // The 1D Szabo-Babuska defined on a two-noded edge
+            // The 1D Szabo-Babuska defined on an edge
           case EDGE2:
-            return 0;
-
-            // The 1D Szabo-Babuska defined on a three-noded edge
           case EDGE3:
             return 0;
 
-            // The 2D Szabo-Babuska defined on a 6-noded triangle
+            // The 2D Szabo-Babuska defined on a triangle
+          case TRI3:
           case TRI6:
             return 0;
 
             // The 2D tensor-product Szabo-Babuska defined on a
-            // nine-noded quadrilateral.
+            // quadrilateral.
+          case QUAD4:
           case QUAD8:
-            return 0;
-
-            // The 2D tensor-product Szabo-Babuska defined on a
-            // nine-noded quadrilateral.
-
           case QUAD9:
             return 0;
 
