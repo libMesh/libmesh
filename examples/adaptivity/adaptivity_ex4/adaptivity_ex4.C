@@ -153,6 +153,9 @@ int main(int argc, char ** argv)
   // Parse the input file
   GetPot input_file("adaptivity_ex4.in");
 
+  // But allow the command line to override it.
+  input_file.parse_command_line(argc, argv);
+
   // Read in parameters from the input file
   const unsigned int max_r_level = input_file("max_r_level", 10);
   const unsigned int max_r_steps = input_file("max_r_steps", 4);
