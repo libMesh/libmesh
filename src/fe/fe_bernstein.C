@@ -193,6 +193,9 @@ unsigned int bernstein_n_dofs_at_node(const ElemType t,
         default:
           libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE2/3!");
         }
+    case TRI3:
+      libmesh_assert_less (n, 3);
+      libmesh_assert_less (o, 2);
     case TRI6:
       switch (n)
         {
@@ -209,6 +212,9 @@ unsigned int bernstein_n_dofs_at_node(const ElemType t,
         default:
           libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for TRI6!");
         }
+    case QUAD4:
+      libmesh_assert_less (n, 4);
+      libmesh_assert_less (o, 2);
     case QUAD8:
       libmesh_assert_less (n, 8);
       libmesh_assert_less (o, 3);

@@ -119,6 +119,8 @@ unsigned int l2_hierarchic_n_dofs(const ElemType t, const Order o)
     case HEX20:
     case HEX27:
       return ((o+1)*(o+1)*(o+1));
+    case TRI3:
+      libmesh_assert_less (o, 2);
     case TRI6:
       return ((o+1)*(o+2)/2);
     case INVALID_ELEM:

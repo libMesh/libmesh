@@ -122,6 +122,8 @@ unsigned int hierarchic_n_dofs(const ElemType t, const Order o)
       libmesh_assert_less (o, 2);
     case HEX27:
       return ((o+1)*(o+1)*(o+1));
+    case TRI3:
+      libmesh_assert_less (o, 2);
     case TRI6:
       return ((o+1)*(o+2)/2);
     case INVALID_ELEM:
@@ -159,6 +161,9 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
         default:
           libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE2/3!");
         }
+    case TRI3:
+      libmesh_assert_less (n, 3);
+      libmesh_assert_less (o, 2);
     case TRI6:
       switch (n)
         {

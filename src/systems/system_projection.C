@@ -1672,11 +1672,12 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 side_fe->get_phi();
               const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
               if (cont == C_ONE)
+                dphi =
 #ifdef LIBMESH_ENABLE_AMR
-                dphi = (elem->refinement_flag() != Elem::JUST_COARSENED) ?
-                  &(fe->get_dphi()) :
+                  (elem->refinement_flag() == Elem::JUST_COARSENED) ?
+                    &(fe->get_dphi()) :
 #endif // LIBMESH_ENABLE_AMR
-                  &(side_fe->get_dphi());
+                    &(side_fe->get_dphi());
 
               for (unsigned char s=0; s != elem->n_sides(); ++s)
                 {

@@ -87,6 +87,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
           {
 
             // Szabo-Babuska shape functions on the triangle.
+          case TRI3:
           case TRI6:
             {
               const Real l1 = 1-p(0)-p(1);
@@ -112,6 +113,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
 
 
             // Szabo-Babuska shape functions on the quadrilateral.
+          case QUAD4:
           case QUAD8:
           case QUAD9:
             {
@@ -221,7 +223,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
@@ -322,7 +325,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
@@ -436,7 +440,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
@@ -560,7 +565,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
@@ -700,7 +706,8 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
               return f*(FE<1,SZABAB>::shape(EDGE3, totalorder, i0[i], xi)*
@@ -916,7 +923,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
 
@@ -1022,7 +1030,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
 
@@ -1131,7 +1140,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
 
@@ -1238,7 +1248,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
 
@@ -1349,7 +1360,8 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
                   break;
 
                 default:
-                  libmesh_error_msg("Invalid shape function index i = " << i);
+                  // Everything else keeps f=1
+                  break;
                 }
 
 
