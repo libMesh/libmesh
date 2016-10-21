@@ -67,7 +67,7 @@ Real FE<3,XYZ>::shape(const Elem * elem,
   // has changed from the last one we computed.
   // This avoids repeated centroid calculations
   // when called in succession with the same element.
-  if (elem->id() != old_elem_id)
+//  if (elem->id() != old_elem_id)
     {
       centroid = elem->centroid();
       old_elem_id = elem->id();
@@ -82,7 +82,7 @@ Real FE<3,XYZ>::shape(const Elem * elem,
 
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
-  libmesh_assert_equal_to (libMesh::n_threads(), 1);
+//  libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
   const Real x  = point_in(0);
   const Real y  = point_in(1);
@@ -274,7 +274,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem * elem,
   // has changed from the last one we computed.
   // This avoids repeated centroid calculations
   // when called in succession with the same element.
-  if (elem->id() != old_elem_id)
+//  if (elem->id() != old_elem_id)
     {
       centroid = elem->centroid();
       old_elem_id = elem->id();
@@ -289,7 +289,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem * elem,
 
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
-  libmesh_assert_equal_to (libMesh::n_threads(), 1);
+//  libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
   const Real x  = point_in(0);
   const Real y  = point_in(1);
@@ -761,7 +761,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem * elem,
   // has changed from the last one we computed.
   // This avoids repeated centroid calculations
   // when called in succession with the same element.
-  if (elem->id() != old_elem_id)
+//  if (elem->id() != old_elem_id)
     {
       centroid = elem->centroid();
       old_elem_id = elem->id();
@@ -776,7 +776,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem * elem,
 
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
-  libmesh_assert_equal_to (libMesh::n_threads(), 1);
+//  libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
   const Real x  = point_in(0);
   const Real y  = point_in(1);
