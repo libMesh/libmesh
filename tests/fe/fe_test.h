@@ -62,9 +62,9 @@ private:
   Elem *_elem;
   std::vector<dof_id_type> _dof_indices;
   FEBase * _fe;
-  Mesh* _mesh;
-  System* _sys;
-  EquationSystems* _es;
+  Mesh * _mesh;
+  System * _sys;
+  EquationSystems * _es;
 
 public:
   void setUp()
