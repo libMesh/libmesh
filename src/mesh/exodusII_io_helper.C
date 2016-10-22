@@ -1450,11 +1450,11 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
                   // numbering assumption here, so writing
                   // "discontinuous" Exodus files won't work with node
                   // numberings that have "holes".
-                  connect[connect_index] = node_counter*num_nodes_per_elem+elem_node_index+1;
+                  connect[connect_index] = node_counter + elem_node_index + 1;
                 }
             }
 
-          node_counter++;
+          node_counter += num_nodes_per_elem;
         }
 
       ex_err = exII::ex_put_elem_conn(ex_id, (*it).first, &connect[0]);
