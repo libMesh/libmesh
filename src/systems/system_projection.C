@@ -153,6 +153,7 @@ public:
 
   Output eval_at_node (const FEMContext & c,
                        unsigned int i,
+                       unsigned int /*elem_dim*/,
                        const Node & n,
                        const Real time)
   { return _f->component(c, i, n, time); }
@@ -234,6 +235,7 @@ public:
 
   Output eval_at_node (const FEMContext & c,
                        unsigned int i,
+                       unsigned int elem_dim,
                        const Node & n,
                        Real /* time */ =0.);
 
@@ -400,10 +402,12 @@ OldSolutionValue<Gradient, &FEMContext::point_gradient>::get_shape_outputs(FEBas
 template<>
 inline
 Number
-OldSolutionValue<Number, &FEMContext::point_value>::eval_at_node (const FEMContext & c,
-                                                                  unsigned int i,
-                                                                  const Node & n,
-                                                                  Real)
+OldSolutionValue<Number, &FEMContext::point_value>::eval_at_node
+  (const FEMContext & c,
+   unsigned int i,
+   unsigned int /* elem_dim */,
+   const Node & n,
+   Real /* time */)
 {
   LOG_SCOPE ("Number eval_at_node()", "OldSolutionValue");
 
@@ -431,10 +435,12 @@ OldSolutionValue<Number, &FEMContext::point_value>::eval_at_node (const FEMConte
 template<>
 inline
 Gradient
-OldSolutionValue<Gradient, &FEMContext::point_gradient>::eval_at_node (const FEMContext & c,
-                                                                       unsigned int i,
-                                                                       const Node & n,
-                                                                       Real)
+OldSolutionValue<Gradient, &FEMContext::point_gradient>::eval_at_node
+  (const FEMContext & c,
+   unsigned int i,
+   unsigned int elem_dim,
+   const Node & n,
+   Real /* time */)
 {
   LOG_SCOPE ("Gradient eval_at_node()", "OldSolutionValue");
 
@@ -450,7 +456,7 @@ OldSolutionValue<Gradient, &FEMContext::point_gradient>::eval_at_node (const FEM
       n.old_dof_object->n_comp(sys.number(), i))
     {
       Gradient g;
-      for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
+      for (unsigned int d = 0; d != elem_dim; ++d)
         {
           const dof_id_type old_id =
             n.old_dof_object->dof_number(sys.number(), i, d+1);
@@ -1312,6 +1318,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 {
                   Ue(current_dof) = f.eval_at_node(context,
                                                    var_component,
+                                                   dim,
                                                    elem->node_ref(n),
                                                    system.time);
                   dof_is_fixed[current_dof] = true;
@@ -1323,6 +1330,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   Ue(current_dof) =
                     f.eval_at_node(context,
                                    var_component,
+                                   dim,
                                    elem->node_ref(n),
                                    system.time);
                   dof_is_fixed[current_dof] = true;
@@ -1330,6 +1338,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   VectorValue<FValue> grad =
                     g->eval_at_node(context,
                                     var_component,
+                                    dim,
                                     elem->node_ref(n),
                                     system.time);
                   // x derivative
@@ -1449,6 +1458,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   libmesh_assert_equal_to (nc, 1 + dim);
                   Ue(current_dof) = f.eval_at_node(context,
                                                    var_component,
+                                                   dim,
                                                    elem->node_ref(n),
                                                    system.time);
                   dof_is_fixed[current_dof] = true;
@@ -1456,6 +1466,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   VectorValue<FValue> grad =
                     g->eval_at_node(context,
                                     var_component,
+                                    dim,
                                     elem->node_ref(n),
                                     system.time);
                   for (unsigned int i=0; i!= dim; ++i)
