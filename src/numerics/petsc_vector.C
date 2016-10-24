@@ -609,8 +609,10 @@ PetscVector<T>::operator = (const std::vector<T> & v)
    */
   if (this->size() == v.size())
     {
-      for (numeric_index_type i=0; i<_local_size; i++)
-        _values[i] =  static_cast<PetscScalar>(v[_first + i]);
+      numeric_index_type first = first_local_index();
+      numeric_index_type last = last_local_index();
+      for (numeric_index_type i=0; i<last-first; i++)
+        _values[i] =  static_cast<PetscScalar>(v[first + i]);
     }
 
   /**
