@@ -3677,9 +3677,9 @@ void DofMap::scatter_constraints(MeshBase & mesh)
 }
 
 
-void DofMap::gather_constraints (MeshBase & mesh,
+void DofMap::gather_constraints (MeshBase & /*mesh*/,
                                  std::set<dof_id_type> & unexpanded_dofs,
-                                 bool look_for_constrainees)
+                                 bool /*look_for_constrainees*/)
 {
   typedef std::set<dof_id_type> DoF_RCSet;
 
