@@ -64,10 +64,13 @@ enum EigenProblemType {NHEP=0,
  */
 enum PositionOfSpectrum {LARGEST_MAGNITUDE=0,
                          SMALLEST_MAGNITUDE,
+                         TARGET_MAGNITUDE,
                          LARGEST_REAL,
                          SMALLEST_REAL,
+                         TARGET_REAL,
                          LARGEST_IMAGINARY,
                          SMALLEST_IMAGINARY,
+                         TARGET_IMAGINARY,
 
                          INVALID_Postion_of_Spectrum};
 }
