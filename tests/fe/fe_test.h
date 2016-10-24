@@ -13,8 +13,11 @@
 #include <libmesh/numeric_vector.h>
 #include <libmesh/system.h>
 
+// Ignore unused parameter warnings coming from cppunit headers
+#include <libmesh/ignore_warnings.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
+#include <libmesh/restore_warnings.h>
 
 #include <vector>
 
