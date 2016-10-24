@@ -160,16 +160,15 @@ protected:
   std::vector<unsigned> _sequential_to_libmesh_node_map;
 
   /**
-   * Parameter controling the behaviour of tetgen.
-   * By default quiet.
-   */
-  std::string _switches;
-
-  /**
    * Tetgen only operates on serial meshes.
    */
   MeshSerializer _serializer;
 
+  /**
+   * Parameter controling the behaviour of tetgen.
+   * By default quiet.
+   */
+  std::string _switches;
 };
 
 } // namespace libMesh
