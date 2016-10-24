@@ -209,6 +209,16 @@ void tetrahedralize_domain(const Parallel::Communicator & comm)
 
   // Construct the Delaunay tetrahedralization
   TetGenMeshInterface t(mesh);
+
+  // in debug mode, set the tetgen switches 
+  // -V (verbose) and 
+  // -CC (check consistency and constrained Delaunay)
+  // by default: switch Q (quiet) set.
+  // For more options: see tetgen website:
+  // (http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual005.html#cmd-m)
+  #ifdef DEBUG
+  t.set_switches("VCC");
+  #endif
   t.triangulate_conformingDelaunayMesh_carvehole(hole,
                                                  quality_constraint,
                                                  volume_constraint);
