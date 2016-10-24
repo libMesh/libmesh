@@ -1274,6 +1274,13 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
           START_LOG ("project_nodes","GenericProjector");
 
+          // When interpolating C1 elements we need to know which
+          // vertices were also parent vertices; we'll cache an
+          // intermediate fact outside the nodes loop.
+          int i_am_child = -1;
+          if (elem->parent())
+            i_am_child = elem->parent()->which_child_am_i(elem);
+
           // In general, we need a series of
           // projections to ensure a unique and continuous
           // solution.  We start by interpolating nodes, then
@@ -1324,156 +1331,173 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
                 }
-              // The hermite element vertex shape functions are weird
-              else if (fe_type.family == HERMITE)
+              else if (cont == C_ONE)
                 {
-                  Ue(current_dof) =
-                    f.eval_at_node(context,
-                                   var_component,
-                                   dim,
-                                   elem->node_ref(n),
-                                   system.time);
-                  dof_is_fixed[current_dof] = true;
-                  current_dof++;
-                  VectorValue<FValue> grad =
-                    g->eval_at_node(context,
-                                    var_component,
-                                    dim,
-                                    elem->node_ref(n),
-                                    system.time);
-                  // x derivative
-                  Ue(current_dof) = grad(0);
-                  dof_is_fixed[current_dof] = true;
-                  current_dof++;
-                  if (dim > 1)
+                  const bool is_parent_vertex = (i_am_child == -1) ||
+                    elem->parent()->is_vertex_on_parent
+                      (i_am_child, n);
+
+                  // The hermite element vertex shape functions are weird
+                  if (fe_type.family == HERMITE)
                     {
-                      // We'll finite difference mixed derivatives
-                      Real delta_x = TOLERANCE * elem->hmin();
-
-                      Point nxminus = elem->point(n),
-                        nxplus = elem->point(n);
-                      nxminus(0) -= delta_x;
-                      nxplus(0) += delta_x;
-                      VectorValue<FValue> gxminus =
-                        g->eval_at_point(context,
-                                         var_component,
-                                         nxminus,
-                                         system.time);
-                      VectorValue<FValue> gxplus =
-                        g->eval_at_point(context,
-                                         var_component,
-                                         nxplus,
-                                         system.time);
-                      // y derivative
-                      Ue(current_dof) = grad(1);
+                      Ue(current_dof) =
+                        f.eval_at_node(context,
+                                       var_component,
+                                       dim,
+                                       elem->node_ref(n),
+                                       system.time);
                       dof_is_fixed[current_dof] = true;
                       current_dof++;
-                      // xy derivative
-                      Ue(current_dof) = (gxplus(1) - gxminus(1))
-                        / 2. / delta_x;
+                      VectorValue<FValue> grad =
+                        is_parent_vertex ?
+                        g->eval_at_node(context,
+                                        var_component,
+                                        dim,
+                                        elem->node_ref(n),
+                                        system.time) :
+                        g->eval_at_point(context,
+                                         var_component,
+                                         elem->node_ref(n),
+                                         system.time);
+                      // x derivative
+                      Ue(current_dof) = grad(0);
                       dof_is_fixed[current_dof] = true;
                       current_dof++;
-
-                      if (dim > 2)
+                      if (dim > 1)
                         {
-                          // z derivative
-                          Ue(current_dof) = grad(2);
-                          dof_is_fixed[current_dof] = true;
-                          current_dof++;
-                          // xz derivative
-                          Ue(current_dof) = (gxplus(2) - gxminus(2))
-                            / 2. / delta_x;
-                          dof_is_fixed[current_dof] = true;
-                          current_dof++;
-                          // We need new points for yz
-                          Point nyminus = elem->point(n),
-                            nyplus = elem->point(n);
-                          nyminus(1) -= delta_x;
-                          nyplus(1) += delta_x;
-                          VectorValue<FValue> gyminus =
+                          // We'll finite difference mixed derivatives
+                          Real delta_x = TOLERANCE * elem->hmin();
+
+                          Point nxminus = elem->point(n),
+                            nxplus = elem->point(n);
+                          nxminus(0) -= delta_x;
+                          nxplus(0) += delta_x;
+                          VectorValue<FValue> gxminus =
                             g->eval_at_point(context,
                                              var_component,
-                                             nyminus,
+                                             nxminus,
                                              system.time);
-                          VectorValue<FValue> gyplus =
+                          VectorValue<FValue> gxplus =
                             g->eval_at_point(context,
                                              var_component,
-                                             nyplus,
+                                             nxplus,
                                              system.time);
-                          // xz derivative
-                          Ue(current_dof) = (gyplus(2) - gyminus(2))
+                          // y derivative
+                          Ue(current_dof) = grad(1);
+                          dof_is_fixed[current_dof] = true;
+                          current_dof++;
+                          // xy derivative
+                          Ue(current_dof) = (gxplus(1) - gxminus(1))
                             / 2. / delta_x;
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
-                          // Getting a 2nd order xyz is more tedious
-                          Point nxmym = elem->point(n),
-                            nxmyp = elem->point(n),
-                            nxpym = elem->point(n),
-                            nxpyp = elem->point(n);
-                          nxmym(0) -= delta_x;
-                          nxmym(1) -= delta_x;
-                          nxmyp(0) -= delta_x;
-                          nxmyp(1) += delta_x;
-                          nxpym(0) += delta_x;
-                          nxpym(1) -= delta_x;
-                          nxpyp(0) += delta_x;
-                          nxpyp(1) += delta_x;
-                          VectorValue<FValue> gxmym =
-                            g->eval_at_point(context,
-                                             var_component,
-                                             nxmym,
-                                             system.time);
-                          VectorValue<FValue> gxmyp =
-                            g->eval_at_point(context,
-                                             var_component,
-                                             nxmyp,
-                                             system.time);
-                          VectorValue<FValue> gxpym =
-                            g->eval_at_point(context,
-                                             var_component,
-                                             nxpym,
-                                             system.time);
-                          VectorValue<FValue> gxpyp =
-                            g->eval_at_point(context,
-                                             var_component,
-                                             nxpyp,
-                                             system.time);
-                          FValue gxzplus = (gxpyp(2) - gxmyp(2))
-                            / 2. / delta_x;
-                          FValue gxzminus = (gxpym(2) - gxmym(2))
-                            / 2. / delta_x;
-                          // xyz derivative
-                          Ue(current_dof) = (gxzplus - gxzminus)
-                            / 2. / delta_x;
+
+                          if (dim > 2)
+                            {
+                              // z derivative
+                              Ue(current_dof) = grad(2);
+                              dof_is_fixed[current_dof] = true;
+                              current_dof++;
+                              // xz derivative
+                              Ue(current_dof) = (gxplus(2) - gxminus(2))
+                                / 2. / delta_x;
+                              dof_is_fixed[current_dof] = true;
+                              current_dof++;
+                              // We need new points for yz
+                              Point nyminus = elem->point(n),
+                                nyplus = elem->point(n);
+                              nyminus(1) -= delta_x;
+                              nyplus(1) += delta_x;
+                              VectorValue<FValue> gyminus =
+                                g->eval_at_point(context,
+                                                 var_component,
+                                                 nyminus,
+                                                 system.time);
+                              VectorValue<FValue> gyplus =
+                                g->eval_at_point(context,
+                                                 var_component,
+                                                 nyplus,
+                                                 system.time);
+                              // xz derivative
+                              Ue(current_dof) = (gyplus(2) - gyminus(2))
+                                / 2. / delta_x;
+                              dof_is_fixed[current_dof] = true;
+                              current_dof++;
+                              // Getting a 2nd order xyz is more tedious
+                              Point nxmym = elem->point(n),
+                                nxmyp = elem->point(n),
+                                nxpym = elem->point(n),
+                                nxpyp = elem->point(n);
+                              nxmym(0) -= delta_x;
+                              nxmym(1) -= delta_x;
+                              nxmyp(0) -= delta_x;
+                              nxmyp(1) += delta_x;
+                              nxpym(0) += delta_x;
+                              nxpym(1) -= delta_x;
+                              nxpyp(0) += delta_x;
+                              nxpyp(1) += delta_x;
+                              VectorValue<FValue> gxmym =
+                                g->eval_at_point(context,
+                                                 var_component,
+                                                 nxmym,
+                                                 system.time);
+                              VectorValue<FValue> gxmyp =
+                                g->eval_at_point(context,
+                                                 var_component,
+                                                 nxmyp,
+                                                 system.time);
+                              VectorValue<FValue> gxpym =
+                                g->eval_at_point(context,
+                                                 var_component,
+                                                 nxpym,
+                                                 system.time);
+                              VectorValue<FValue> gxpyp =
+                                g->eval_at_point(context,
+                                                 var_component,
+                                                 nxpyp,
+                                                 system.time);
+                              FValue gxzplus = (gxpyp(2) - gxmyp(2))
+                                / 2. / delta_x;
+                              FValue gxzminus = (gxpym(2) - gxmym(2))
+                                / 2. / delta_x;
+                              // xyz derivative
+                              Ue(current_dof) = (gxzplus - gxzminus)
+                                / 2. / delta_x;
+                              dof_is_fixed[current_dof] = true;
+                              current_dof++;
+                            }
+                        }
+                    }
+                  else
+                    {
+                      // Assume that other C_ONE elements have a single nodal
+                      // value shape function and nodal gradient component
+                      // shape functions
+                      libmesh_assert_equal_to (nc, 1 + dim);
+                      Ue(current_dof) = f.eval_at_node(context,
+                                                       var_component,
+                                                       dim,
+                                                       elem->node_ref(n),
+                                                       system.time);
+                      dof_is_fixed[current_dof] = true;
+                      current_dof++;
+                      VectorValue<FValue> grad =
+                        is_parent_vertex ?
+                        g->eval_at_node(context,
+                                        var_component,
+                                        dim,
+                                        elem->node_ref(n),
+                                        system.time) :
+                        g->eval_at_point(context,
+                                         var_component,
+                                         elem->node_ref(n),
+                                         system.time);
+                      for (unsigned int i=0; i!= dim; ++i)
+                        {
+                          Ue(current_dof) = grad(i);
                           dof_is_fixed[current_dof] = true;
                           current_dof++;
                         }
-                    }
-                }
-              // Assume that other C_ONE elements have a single nodal
-              // value shape function and nodal gradient component
-              // shape functions
-              else if (cont == C_ONE)
-                {
-                  libmesh_assert_equal_to (nc, 1 + dim);
-                  Ue(current_dof) = f.eval_at_node(context,
-                                                   var_component,
-                                                   dim,
-                                                   elem->node_ref(n),
-                                                   system.time);
-                  dof_is_fixed[current_dof] = true;
-                  current_dof++;
-                  VectorValue<FValue> grad =
-                    g->eval_at_node(context,
-                                    var_component,
-                                    dim,
-                                    elem->node_ref(n),
-                                    system.time);
-                  for (unsigned int i=0; i!= dim; ++i)
-                    {
-                      Ue(current_dof) = grad(i);
-                      dof_is_fixed[current_dof] = true;
-                      current_dof++;
                     }
                 }
               else
