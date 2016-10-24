@@ -103,7 +103,6 @@ void ExodusII_IO::write_discontinuous_exodusII(const std::string & name,
 ExodusII_IO::~ExodusII_IO ()
 {
   exio_helper->close();
-  delete exio_helper;
 }
 
 

@@ -94,20 +94,19 @@ Nemesis_IO::Nemesis_IO (MeshBase & mesh,
   ParallelObject (mesh),
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   nemhelper(new Nemesis_IO_Helper(*this, false, single_precision)),
-  _timestep(1),
 #endif
+  _timestep(1),
   _verbose (false),
   _append(false)
 {
 }
 
 
+
+// Destructor.  Defined in the C file so we can be sure to get away
+// with a forward declaration of Nemesis_IO_Helper in the header file.
 Nemesis_IO::~Nemesis_IO ()
 {
-#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-
-  delete nemhelper;
-#endif
 }
 
 
