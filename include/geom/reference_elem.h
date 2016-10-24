@@ -45,7 +45,7 @@ namespace ReferenceElem
  * @returns a constant reference to the reference element of
  * the user-requested type.
  */
-const Elem & get (const ElemType Type);
+const Elem & get (const ElemType type_in);
 
 } // namespace ReferenceElem
 
