@@ -52,8 +52,7 @@ void TetGenMeshInterface::set_switches(const std::string & switches)
   // V = verbose output
   // for full list of options and their meaning: see the tetgen manual
   // (http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual005.html)
-  _switches=switches;
-
+  _switches = switches;
 }
 
 
@@ -262,13 +261,13 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
     }
 
 
-  // Run TetGen triangulation method:
-  // p = tetrahedralizes a piecewise linear complex (see definition in user manual)
+  // Run TetGen triangulation method
 
-  // assemble switches:
-  std::ostringstream oss; // string holding switches
-  // I assume 'p' needed to run as expected.
-  oss << "p" ;
+  // Assemble switches: we append the user's switches (if any) to 'p',
+  // which tetrahedralizes a piecewise linear complex (see definition
+  // in user manual)
+  std::ostringstream oss;
+  oss << "p";
   oss << _switches;
 
   if (quality_constraint != 0)
