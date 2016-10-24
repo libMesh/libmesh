@@ -53,11 +53,12 @@ void clough_compute_coefs(const Elem * elem)
   // horribly with more than one thread.
   libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
-  // Coefficients are cached from old elements
+  // Coefficients are cached from old elements; we rely on that cache
+  // except in dbg mode
+#ifndef DEBUG
   if (elem->id() == old_elem_id)
     return;
-
-  old_elem_id = elem->id();
+#endif
 
   const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
@@ -85,6 +86,17 @@ void clough_compute_coefs(const Elem * elem)
     }
 
   // Calculate derivative scaling factors
+
+#ifdef DEBUG
+  // The cached factors should equal our calculations
+  if (elem->id() == old_elem_id)
+    {
+      libmesh_assert_equal_to(d1xd1x, dxdxi[0]);
+      libmesh_assert_equal_to(d2xd2x, dxdxi[1]);
+    }
+#endif
+
+  old_elem_id = elem->id();
 
   d1xd1x = dxdxi[0];
   d2xd2x = dxdxi[1];

@@ -2820,6 +2820,19 @@ Real Elem::volume () const
 
 
 
+bool Elem::is_vertex_on_parent(unsigned int c,
+                               unsigned int n) const
+{
+  unsigned int my_n_vertices = this->n_vertices();
+  for (unsigned int n_parent = 0; n_parent != my_n_vertices;
+       ++n_parent)
+    if (this->node_ptr(n_parent) == this->child_ptr(c)->node_ptr(n))
+      return true;
+  return false;
+}
+
+
+
 unsigned int Elem::opposite_side(const unsigned int /*s*/) const
 {
   // If the subclass didn't rederive this, using it is an error
