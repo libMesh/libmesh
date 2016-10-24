@@ -775,7 +775,8 @@ public:
    */
   virtual void read  (const std::string & name,
                       MeshData * mesh_data=libmesh_nullptr,
-                      bool skip_renumber_nodes_and_elements=false) = 0;
+                      bool skip_renumber_nodes_and_elements=false,
+                      bool skip_find_neighbors=false) = 0;
   virtual void write (const std::string & name, MeshData * mesh_data=libmesh_nullptr) = 0;
 
   /**
