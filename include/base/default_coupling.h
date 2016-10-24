@@ -55,8 +55,7 @@ public:
  {}
 
   // Change coupling matrix after construction
-  void set_dof_coupling(const CouplingMatrix * dof_coupling)
-  { _dof_coupling = dof_coupling; }
+  void set_dof_coupling(const CouplingMatrix * dof_coupling);
 
   // Return number of levels of neighbors we will couple.
   unsigned int n_levels()
