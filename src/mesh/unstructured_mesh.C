@@ -577,7 +577,8 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
 void UnstructuredMesh::read (const std::string & name,
                              MeshData * mesh_data,
-                             bool skip_renumber_nodes_and_elements)
+                             bool skip_renumber_nodes_and_elements,
+                             bool skip_find_neighbors)
 {
   // Set the skip_renumber_nodes_and_elements flag on all processors
   // if necessary.
@@ -610,7 +611,8 @@ void UnstructuredMesh::read (const std::string & name,
     }
 
   // Done reading the mesh.  Now prepare it for use.
-  this->prepare_for_use();
+  this->prepare_for_use(/*skip_renumber (deprecated)*/ false,
+                        skip_find_neighbors);
 }
 
 
