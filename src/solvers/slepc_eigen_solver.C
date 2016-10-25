@@ -745,6 +745,9 @@ void SlepcEigenSolver<T>::attach_deflation_space(NumericVector<T> & deflation_ve
 template <typename T>
 void SlepcEigenSolver<T>::set_initial_space(NumericVector<T> & initial_space_in)
 {
+#if SLEPC_VERSION_LESS_THAN(3,1,0)
+  libmesh_error_msg("SLEPc 3.1 is required to call EigenSolver::set_initial_space()");
+#else
   this->init();
   
   PetscErrorCode ierr = 0;
@@ -752,6 +755,7 @@ void SlepcEigenSolver<T>::set_initial_space(NumericVector<T> & initial_space_in)
   Vec * initial_space = &initial_vector;
   ierr = EPSSetInitialSpace(_eps, 1, initial_space);
   LIBMESH_CHKERR(ierr);
+#endif
 }
 
 template <typename T>
