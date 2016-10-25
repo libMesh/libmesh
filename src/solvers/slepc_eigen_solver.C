@@ -743,6 +743,18 @@ void SlepcEigenSolver<T>::attach_deflation_space(NumericVector<T> & deflation_ve
 }
 
 template <typename T>
+void SlepcEigenSolver<T>::set_initial_space(NumericVector<T> & initial_space_in)
+{
+  this->init();
+  
+  PetscErrorCode ierr = 0;
+  Vec initial_vector = (cast_ptr<PetscVector<T> *>(&initial_space_in))->vec();
+  Vec * initial_space = &initial_vector;
+  ierr = EPSSetInitialSpace(_eps, 1, initial_space);
+  LIBMESH_CHKERR(ierr);
+}
+
+template <typename T>
 PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, Vec dest)
 {
   /* Get the matrix context.  */

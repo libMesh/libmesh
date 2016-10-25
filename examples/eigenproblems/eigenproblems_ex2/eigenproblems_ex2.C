@@ -165,6 +165,13 @@ int main (int argc, char ** argv)
   // Prints information about the system to the screen.
   equation_systems.print_info();
 
+  // Get the SLEPc solver object and set initial guess for one basis vector
+  // this has to be done _after_ the EquationSystems object is initialized
+  UniquePtr<EigenSolver<Number> > & slepc_eps = eigen_system.eigen_solver;
+  NumericVector<Number> & initial_space = eigen_system.add_vector("initial_space");
+  initial_space.add(1.0);
+  slepc_eps->set_initial_space(initial_space);
+
   // Solve the system "Eigensystem".
   eigen_system.solve();
 
