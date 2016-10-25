@@ -245,7 +245,7 @@ private:
    * functionality when LIBMESH_HAVE_EXODUS_API is not defined.
    */
 #ifdef LIBMESH_HAVE_EXODUS_API
-  ExodusII_IO_Helper * exio_helper;
+  UniquePtr<ExodusII_IO_Helper> exio_helper;
 #endif
 
   /**
