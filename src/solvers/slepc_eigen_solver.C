@@ -752,8 +752,7 @@ void SlepcEigenSolver<T>::set_initial_space(NumericVector<T> & initial_space_in)
   
   PetscErrorCode ierr = 0;
   Vec initial_vector = (cast_ptr<PetscVector<T> *>(&initial_space_in))->vec();
-  Vec * initial_space = &initial_vector;
-  ierr = EPSSetInitialSpace(_eps, 1, initial_space);
+  ierr = EPSSetInitialSpace(_eps, 1, &initial_vector);
   LIBMESH_CHKERR(ierr);
 #endif
 }

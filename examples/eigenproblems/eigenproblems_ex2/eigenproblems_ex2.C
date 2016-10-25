@@ -41,6 +41,7 @@
 #include "libmesh/exodusII_io.h"
 #include "libmesh/eigen_system.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/slepc_eigen_solver.h"
 #include "libmesh/fe.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/dense_matrix.h"
