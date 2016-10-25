@@ -214,6 +214,11 @@ public:
   virtual void attach_deflation_space(NumericVector<T> & deflation_vector) = 0;
 
   /**
+   * Provide one basis vector for the initial guess
+   */
+  virtual void set_initial_space(NumericVector<T> & initial_space_in) = 0;
+
+  /**
    * Set the solver configuration object.
    */
   void set_solver_configuration(SolverConfiguration & solver_configuration);
