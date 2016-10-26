@@ -66,11 +66,12 @@ void clough_compute_coefs(const Elem * elem)
   // horribly with more than one thread.
   libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
-  // Coefficients are cached from old elements
+  // Coefficients are cached from old elements; we rely on that cache
+  // except in dbg mode
+#ifndef DEBUG
   if (elem->id() == old_elem_id)
     return;
-
-  old_elem_id = elem->id();
+#endif
 
   const Order mapping_order        (elem->default_order());
   const ElemType mapping_elem_type (elem->type());
@@ -412,6 +413,43 @@ void clough_compute_coefs(const Elem * elem)
   // Calculate midpoint derivative adjustments to nodal value
   // interpolant functions
 
+#ifdef DEBUG
+  // The cached factors should equal our calculations
+  if (elem->id() == old_elem_id)
+    {
+      libmesh_assert_equal_to(d1d2n, -(d1d2ndx * N2x + d1d2ndy * N2y) / d2nd2ndn);
+      libmesh_assert_equal_to(d1d3n, -(d1d3ndx * N3x + d1d3ndy * N3y) / d3nd3ndn);
+      libmesh_assert_equal_to(d2d3n, -(d2d3ndx * N3x + d2d3ndy * N3y) / d3nd3ndn);
+      libmesh_assert_equal_to(d2d1n, -(d2d1ndx * N1x + d2d1ndy * N1y) / d1nd1ndn);
+      libmesh_assert_equal_to(d3d1n, -(d3d1ndx * N1x + d3d1ndy * N1y) / d1nd1ndn);
+      libmesh_assert_equal_to(d3d2n, -(d3d2ndx * N2x + d3d2ndy * N2y) / d2nd2ndn);
+      libmesh_assert_equal_to(d1xd1x, 1. / (d1xd1dx - d1xd1dy * d1yd1dx / d1yd1dy));
+      libmesh_assert_equal_to(d1xd1y, 1. / (d1yd1dx - d1xd1dx * d1yd1dy / d1xd1dy));
+      libmesh_assert_equal_to(d1yd1y, 1. / (d1yd1dy - d1yd1dx * d1xd1dy / d1xd1dx));
+      libmesh_assert_equal_to(d1yd1x, 1. / (d1xd1dy - d1yd1dy * d1xd1dx / d1yd1dx));
+      libmesh_assert_equal_to(d2xd2x, 1. / (d2xd2dx - d2xd2dy * d2yd2dx / d2yd2dy));
+      libmesh_assert_equal_to(d2xd2y, 1. / (d2yd2dx - d2xd2dx * d2yd2dy / d2xd2dy));
+      libmesh_assert_equal_to(d2yd2y, 1. / (d2yd2dy - d2yd2dx * d2xd2dy / d2xd2dx));
+      libmesh_assert_equal_to(d2yd2x, 1. / (d2xd2dy - d2yd2dy * d2xd2dx / d2yd2dx));
+      libmesh_assert_equal_to(d3xd3x, 1. / (d3xd3dx - d3xd3dy * d3yd3dx / d3yd3dy));
+      libmesh_assert_equal_to(d3xd3y, 1. / (d3yd3dx - d3xd3dx * d3yd3dy / d3xd3dy));
+      libmesh_assert_equal_to(d3yd3y, 1. / (d3yd3dy - d3yd3dx * d3xd3dy / d3xd3dx));
+      libmesh_assert_equal_to(d3yd3x, 1. / (d3xd3dy - d3yd3dy * d3xd3dx / d3yd3dx));
+      libmesh_assert_equal_to(d1xd2n, -(d1xd1x * d1xd2ndn + d1xd1y * d1yd2ndn) / d2nd2ndn);
+      libmesh_assert_equal_to(d1yd2n, -(d1yd1y * d1yd2ndn + d1yd1x * d1xd2ndn) / d2nd2ndn);
+      libmesh_assert_equal_to(d1xd3n, -(d1xd1x * d1xd3ndn + d1xd1y * d1yd3ndn) / d3nd3ndn);
+      libmesh_assert_equal_to(d1yd3n, -(d1yd1y * d1yd3ndn + d1yd1x * d1xd3ndn) / d3nd3ndn);
+      libmesh_assert_equal_to(d2xd3n, -(d2xd2x * d2xd3ndn + d2xd2y * d2yd3ndn) / d3nd3ndn);
+      libmesh_assert_equal_to(d2yd3n, -(d2yd2y * d2yd3ndn + d2yd2x * d2xd3ndn) / d3nd3ndn);
+      libmesh_assert_equal_to(d2xd1n, -(d2xd2x * d2xd1ndn + d2xd2y * d2yd1ndn) / d1nd1ndn);
+      libmesh_assert_equal_to(d2yd1n, -(d2yd2y * d2yd1ndn + d2yd2x * d2xd1ndn) / d1nd1ndn);
+      libmesh_assert_equal_to(d3xd1n, -(d3xd3x * d3xd1ndn + d3xd3y * d3yd1ndn) / d1nd1ndn);
+      libmesh_assert_equal_to(d3yd1n, -(d3yd3y * d3yd1ndn + d3yd3x * d3xd1ndn) / d1nd1ndn);
+      libmesh_assert_equal_to(d3xd2n, -(d3xd3x * d3xd2ndn + d3xd3y * d3yd2ndn) / d2nd2ndn);
+      libmesh_assert_equal_to(d3yd2n, -(d3yd3y * d3yd2ndn + d3yd3x * d3xd2ndn) / d2nd2ndn);
+    }
+#endif
+
   d1d2n = -(d1d2ndx * N2x + d1d2ndy * N2y) / d2nd2ndn;
   d1d3n = -(d1d3ndx * N3x + d1d3ndy * N3y) / d3nd3ndn;
   d2d3n = -(d2d3ndx * N3x + d2d3ndy * N3y) / d3nd3ndn;
@@ -468,6 +506,8 @@ void clough_compute_coefs(const Elem * elem)
   d3yd1n = -(d3yd3y * d3yd1ndn + d3yd3x * d3xd1ndn) / d1nd1ndn;
   d3xd2n = -(d3xd3x * d3xd2ndn + d3xd3y * d3yd2ndn) / d2nd2ndn;
   d3yd2n = -(d3yd3y * d3yd2ndn + d3yd3x * d3xd2ndn) / d2nd2ndn;
+
+  old_elem_id = elem->id();
 
   // Cross your fingers
   //  libMesh::err << d1nd1ndn << ' ';

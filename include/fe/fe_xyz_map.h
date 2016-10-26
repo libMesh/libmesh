@@ -34,7 +34,11 @@ class FEXYZMap : public FEMap
 public:
 
   FEXYZMap()
-    : FEMap(){}
+    : FEMap()
+  {
+    // All FEXYZ objects are going to be querying xyz coordinates
+    calculate_xyz = true;
+  }
 
   virtual ~FEXYZMap(){}
 

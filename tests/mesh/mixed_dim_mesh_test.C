@@ -731,6 +731,7 @@ public:
 
   void testMesh()
   {
+#ifdef LIBMESH_ENABLE_AMR
     // We should have 15 total and 12 active elements.
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)15, _mesh->n_elem() );
     CPPUNIT_ASSERT_EQUAL( (dof_id_type)12, _mesh->n_active_elem() );
@@ -790,10 +791,12 @@ public:
     CPPUNIT_ASSERT_EQUAL( _mesh->elem_ref(14).interior_parent(),
                           _mesh->elem_ptr(6) );
 
+#endif // LIBMESH_ENABLE_AMR
   }
 
   void testDofOrdering()
   {
+#ifdef LIBMESH_ENABLE_AMR
     EquationSystems es(*_mesh);
     es.add_system<LinearImplicitSystem>("TestDofSystem");
     es.get_system("TestDofSystem").add_variable("u",FIRST);
@@ -850,6 +853,7 @@ public:
     CPPUNIT_ASSERT_EQUAL( elem6_dof_indices[0], elem9_dof_indices[1] );
     CPPUNIT_ASSERT_EQUAL( elem6_dof_indices[1], elem9_dof_indices[0] );
     CPPUNIT_ASSERT_EQUAL( elem8_dof_indices[0], elem12_dof_indices[0] );
+#endif // LIBMESH_ENABLE_AMR
   }
 
 };

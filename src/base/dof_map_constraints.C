@@ -2926,21 +2926,23 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
       unexpanded_dofs.insert(i->first);
     }
 
+  // Gather all the dof constraints we need
+  this->gather_constraints(mesh, unexpanded_dofs, false);
+
+  // Gather all the node constraints we need
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   typedef std::set<const Node *> Node_RCSet;
   Node_RCSet unexpanded_nodes;
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   for (NodeConstraints::iterator i = _node_constraints.begin();
        i != _node_constraints.end(); ++i)
     {
       unexpanded_nodes.insert(i->first);
     }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   // We have to keep recursing while the unexpanded set is
   // nonempty on *any* processor
-  bool unexpanded_set_nonempty = !unexpanded_dofs.empty() ||
-    !unexpanded_nodes.empty();
+  bool unexpanded_set_nonempty = !unexpanded_nodes.empty();
   this->comm().max(unexpanded_set_nonempty);
 
   while (unexpanded_set_nonempty)
@@ -2949,39 +2951,17 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
       parallel_object_only();
 
       // Request sets
-      DoF_RCSet   dof_request_set;
       Node_RCSet node_request_set;
 
       // Request sets to send to each processor
       std::vector<std::vector<dof_id_type> >
-        requested_dof_ids(this->n_processors()),
         requested_node_ids(this->n_processors());
 
       // And the sizes of each
       std::vector<dof_id_type>
-        dof_ids_on_proc(this->n_processors(), 0),
         node_ids_on_proc(this->n_processors(), 0);
 
       // Fill (and thereby sort and uniq!) the main request sets
-      for (DoF_RCSet::iterator i = unexpanded_dofs.begin();
-           i != unexpanded_dofs.end(); ++i)
-        {
-          DofConstraintRow & row = _dof_constraints[*i];
-          for (DofConstraintRow::iterator j = row.begin();
-               j != row.end(); ++j)
-            {
-              const dof_id_type constraining_dof = j->first;
-
-              // If it's non-local and we haven't already got a
-              // constraint for it, we might need to ask for one
-              if (((constraining_dof < this->first_dof()) ||
-                   (constraining_dof >= this->end_dof())) &&
-                  !_dof_constraints.count(constraining_dof))
-                dof_request_set.insert(constraining_dof);
-            }
-        }
-
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       for (Node_RCSet::iterator i = unexpanded_nodes.begin();
            i != unexpanded_nodes.end(); ++i)
         {
@@ -2999,23 +2979,12 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
                 node_request_set.insert(node);
             }
         }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
       // Clear the unexpanded constraint sets; we're about to expand
       // them
-      unexpanded_dofs.clear();
       unexpanded_nodes.clear();
 
       // Count requests by processor
-      processor_id_type proc_id = 0;
-      for (DoF_RCSet::iterator i = dof_request_set.begin();
-           i != dof_request_set.end(); ++i)
-        {
-          while (*i >= _end_df[proc_id])
-            proc_id++;
-          dof_ids_on_proc[proc_id]++;
-        }
-
       for (Node_RCSet::iterator i = node_request_set.begin();
            i != node_request_set.end(); ++i)
         {
@@ -3026,20 +2995,10 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
 
       for (processor_id_type p = 0; p != this->n_processors(); ++p)
         {
-          requested_dof_ids[p].reserve(dof_ids_on_proc[p]);
           requested_node_ids[p].reserve(node_ids_on_proc[p]);
         }
 
       // Prepare each processor's request set
-      proc_id = 0;
-      for (DoF_RCSet::iterator i = dof_request_set.begin();
-           i != dof_request_set.end(); ++i)
-        {
-          while (*i >= _end_df[proc_id])
-            proc_id++;
-          requested_dof_ids[proc_id].push_back(*i);
-        }
-
       for (Node_RCSet::iterator i = node_request_set.begin();
            i != node_request_set.end(); ++i)
         {
@@ -3057,84 +3016,19 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
             cast_int<processor_id_type>((this->n_processors() +
                                          this->processor_id() - p) %
                                         this->n_processors());
-          std::vector<dof_id_type> dof_request_to_fill,
-            node_request_to_fill;
+          std::vector<dof_id_type> node_request_to_fill;
 
-          this->comm().send_receive(procup, requested_dof_ids[procup],
-                                    procdown, dof_request_to_fill);
           this->comm().send_receive(procup, requested_node_ids[procup],
                                     procdown, node_request_to_fill);
 
           // Fill those requests
-          std::vector<std::vector<dof_id_type> > dof_row_keys(dof_request_to_fill.size()),
+          std::vector<std::vector<dof_id_type> >
             node_row_keys(node_request_to_fill.size());
-
-          std::vector<std::vector<Real> > dof_row_vals(dof_request_to_fill.size()),
+          std::vector<std::vector<Real> >
             node_row_vals(node_request_to_fill.size());
-          std::vector<Number> dof_row_rhss(dof_request_to_fill.size());
-          std::vector<std::vector<Number> >
-            dof_adj_rhss(max_qoi_num,
-                         std::vector<Number>(dof_request_to_fill.size()));
-          std::vector<Point>  node_row_rhss(node_request_to_fill.size());
-          for (std::size_t i=0; i != dof_request_to_fill.size(); ++i)
-            {
-              dof_id_type constrained = dof_request_to_fill[i];
-              if (_dof_constraints.count(constrained))
-                {
-                  DofConstraintRow & row = _dof_constraints[constrained];
-                  std::size_t row_size = row.size();
-                  dof_row_keys[i].reserve(row_size);
-                  dof_row_vals[i].reserve(row_size);
-                  for (DofConstraintRow::iterator j = row.begin();
-                       j != row.end(); ++j)
-                    {
-                      dof_row_keys[i].push_back(j->first);
-                      dof_row_vals[i].push_back(j->second);
+          std::vector<Point>
+            node_row_rhss(node_request_to_fill.size());
 
-                      // We should never have a 0 constraint
-                      // coefficient; that's implicit via sparse
-                      // constraint storage
-                      libmesh_assert(j->second);
-                    }
-                  DofConstraintValueMap::const_iterator rhsit =
-                    _primal_constraint_values.find(constrained);
-                  dof_row_rhss[i] = (rhsit == _primal_constraint_values.end()) ?
-                    0 : rhsit->second;
-
-                  for (unsigned int q = 0; q != max_qoi_num; ++q)
-                    {
-                      AdjointDofConstraintValues::const_iterator adjoint_map_it =
-                        _adjoint_constraint_values.find(q);
-
-                      if (adjoint_map_it == _adjoint_constraint_values.end())
-                        continue;
-
-                      const DofConstraintValueMap & constraint_map =
-                        adjoint_map_it->second;
-
-                      DofConstraintValueMap::const_iterator rhsit =
-                        constraint_map.find(constrained);
-                      dof_adj_rhss[q][i] = (rhsit == constraint_map.end()) ?
-                        0 : rhsit->second;
-                    }
-                }
-              else
-                {
-                  // Get NaN from Real, where it should exist, not
-                  // from Number, which may be std::complex, in which
-                  // case quiet_NaN() silently returns zero, rather
-                  // than sanely returning NaN or throwing an
-                  // exception or sending Stroustrop hate mail.
-                  dof_row_rhss[i] =
-                    std::numeric_limits<Real>::quiet_NaN();
-
-                  // Make sure we don't get caught by "!isnan(NaN)"
-                  // bugs again.
-                  libmesh_assert(libmesh_isnan(dof_row_rhss[i]));
-                }
-            }
-
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
           // FIXME - this could be an unordered set, given a
           // hash<pointers> specialization
           std::set<const Node *> nodes_requested;
@@ -3171,25 +3065,12 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
                   node_row_rhss[i] = _node_constraints[constrained_node].second;
                 }
             }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
           // Trade back the results
-          std::vector<std::vector<dof_id_type> > dof_filled_keys,
-            node_filled_keys;
-          std::vector<std::vector<Real> > dof_filled_vals,
-            node_filled_vals;
-          std::vector<Number> dof_filled_rhss;
-          std::vector<std::vector<Number> > adj_filled_rhss;
+          std::vector<std::vector<dof_id_type> > node_filled_keys;
+          std::vector<std::vector<Real> > node_filled_vals;
           std::vector<Point> node_filled_rhss;
-          this->comm().send_receive(procdown, dof_row_keys,
-                                    procup, dof_filled_keys);
-          this->comm().send_receive(procdown, dof_row_vals,
-                                    procup, dof_filled_vals);
-          this->comm().send_receive(procdown, dof_row_rhss,
-                                    procup, dof_filled_rhss);
-          this->comm().send_receive(procdown, dof_adj_rhss,
-                                    procup, adj_filled_rhss);
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+
           this->comm().send_receive(procdown, node_row_keys,
                                     procup, node_filled_keys);
           this->comm().send_receive(procdown, node_row_vals,
@@ -3205,63 +3086,10 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
                procup,   &mesh, mesh_inserter_iterator<Node>(mesh),
                (Node**)libmesh_nullptr);
 
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
-          libmesh_assert_equal_to (dof_filled_keys.size(), requested_dof_ids[procup].size());
-          libmesh_assert_equal_to (dof_filled_vals.size(), requested_dof_ids[procup].size());
-          libmesh_assert_equal_to (dof_filled_rhss.size(), requested_dof_ids[procup].size());
-#ifndef NDEBUG
-          for (unsigned int q=0; q != adj_filled_rhss.size(); ++q)
-            libmesh_assert_equal_to (adj_filled_rhss[q].size(), requested_dof_ids[procup].size());
-#endif
           libmesh_assert_equal_to (node_filled_keys.size(), requested_node_ids[procup].size());
           libmesh_assert_equal_to (node_filled_vals.size(), requested_node_ids[procup].size());
           libmesh_assert_equal_to (node_filled_rhss.size(), requested_node_ids[procup].size());
 
-          // Add any new constraint rows we've found
-          for (std::size_t i=0; i != requested_dof_ids[procup].size(); ++i)
-            {
-              libmesh_assert_equal_to (dof_filled_keys[i].size(), dof_filled_vals[i].size());
-              if (!libmesh_isnan(dof_filled_rhss[i]))
-                {
-                  dof_id_type constrained = requested_dof_ids[procup][i];
-                  DofConstraintRow & row = _dof_constraints[constrained];
-                  for (std::size_t j = 0; j != dof_filled_keys[i].size(); ++j)
-                    row[dof_filled_keys[i][j]] = dof_filled_vals[i][j];
-                  if (dof_filled_rhss[i] != Number(0))
-                    _primal_constraint_values[constrained] = dof_filled_rhss[i];
-                  else
-                    _primal_constraint_values.erase(constrained);
-
-                  for (unsigned int q = 0; q != max_qoi_num; ++q)
-                    {
-                      AdjointDofConstraintValues::iterator adjoint_map_it =
-                        _adjoint_constraint_values.find(q);
-
-                      if ((adjoint_map_it == _adjoint_constraint_values.end()) &&
-                          adj_filled_rhss[q][constrained] == Number(0))
-                        continue;
-
-                      if (adjoint_map_it == _adjoint_constraint_values.end())
-                        adjoint_map_it = _adjoint_constraint_values.insert
-                          (std::make_pair(q,DofConstraintValueMap())).first;
-
-                      DofConstraintValueMap & constraint_map =
-                        adjoint_map_it->second;
-
-                      if (adj_filled_rhss[q][i] != Number(0))
-                        constraint_map[constrained] =
-                          adj_filled_rhss[q][i];
-                      else
-                        constraint_map.erase(constrained);
-                    }
-
-                  // And prepare to check for more recursive constraints
-                  if (!dof_filled_keys[i].empty())
-                    unexpanded_dofs.insert(constrained);
-                }
-            }
-
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
           for (std::size_t i=0; i != requested_node_ids[procup].size(); ++i)
             {
               libmesh_assert_equal_to (node_filled_keys[i].size(), node_filled_vals[i].size());
@@ -3283,15 +3111,14 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
                   unexpanded_nodes.insert(constrained_node);
                 }
             }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
         }
 
       // We have to keep recursing while the unexpanded set is
       // nonempty on *any* processor
-      unexpanded_set_nonempty = !unexpanded_dofs.empty() ||
-        !unexpanded_nodes.empty();
+      unexpanded_set_nonempty = !unexpanded_nodes.empty();
       this->comm().max(unexpanded_set_nonempty);
     }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 }
 
 
@@ -3808,8 +3635,302 @@ void DofMap::scatter_constraints(MeshBase & mesh)
             }
         }
     }
+
+  // Finally, we need to handle the case of remote dof coupling.  If a
+  // processor's element is coupled to a ghost element, then the
+  // processor needs to know about all constraints which affect the
+  // dofs on that ghost element, so we'll have to query the ghost
+  // element's owner.
+
+  GhostingFunctor::map_type elements_to_couple;
+
+  // Man, I wish we had guaranteed unique_ptr availability...
+  std::set<CouplingMatrix*> temporary_coupling_matrices;
+
+  this->merge_ghost_functor_outputs
+    (elements_to_couple,
+     temporary_coupling_matrices,
+     this->coupling_functors_begin(),
+     this->coupling_functors_end(),
+     mesh.active_local_elements_begin(),
+     mesh.active_local_elements_end(),
+     this->processor_id());
+
+  // Each ghost-coupled element's owner should get a request for its dofs
+  std::set<dof_id_type> requested_dofs;
+
+  GhostingFunctor::map_type::iterator        etg_it = elements_to_couple.begin();
+  const GhostingFunctor::map_type::iterator etg_end = elements_to_couple.end();
+  for (; etg_it != etg_end; ++etg_it)
+    {
+      const Elem *elem = etg_it->first;
+
+      // FIXME - optimize for the non-fully-coupled case?
+      std::vector<dof_id_type> element_dofs;
+      this->dof_indices(elem, element_dofs);
+
+      for (unsigned int i=0; i != element_dofs.size(); ++i)
+        requested_dofs.insert(element_dofs[i]);
+    }
+
+  this->gather_constraints(mesh, requested_dofs, false);
 }
 
+
+void DofMap::gather_constraints (MeshBase & /*mesh*/,
+                                 std::set<dof_id_type> & unexpanded_dofs,
+                                 bool /*look_for_constrainees*/)
+{
+  typedef std::set<dof_id_type> DoF_RCSet;
+
+  // If we have heterogenous adjoint constraints we need to
+  // communicate those too.
+  const unsigned int max_qoi_num =
+    _adjoint_constraint_values.empty() ?
+    0 : _adjoint_constraint_values.rbegin()->first;
+
+  // We have to keep recursing while the unexpanded set is
+  // nonempty on *any* processor
+  bool unexpanded_set_nonempty = !unexpanded_dofs.empty();
+  this->comm().max(unexpanded_set_nonempty);
+
+  while (unexpanded_set_nonempty)
+    {
+      // Let's make sure we don't lose sync in this loop.
+      parallel_object_only();
+
+      // Request sets
+      DoF_RCSet   dof_request_set;
+
+      // Request sets to send to each processor
+      std::vector<std::vector<dof_id_type> >
+        requested_dof_ids(this->n_processors());
+
+      // And the sizes of each
+      std::vector<dof_id_type>
+        dof_ids_on_proc(this->n_processors(), 0);
+
+      // Fill (and thereby sort and uniq!) the main request sets
+      for (DoF_RCSet::iterator i = unexpanded_dofs.begin();
+           i != unexpanded_dofs.end(); ++i)
+        {
+          const dof_id_type unexpanded_dof = *i;
+          DofConstraints::const_iterator
+            pos = _dof_constraints.find(unexpanded_dof);
+
+          // If we were asked for a DoF and we don't already have a
+          // constraint for it, then we need to check for one.
+          if (pos == _dof_constraints.end())
+            {
+              if (((unexpanded_dof < this->first_dof()) ||
+                   (unexpanded_dof >= this->end_dof())) &&
+                  !_dof_constraints.count(unexpanded_dof))
+                dof_request_set.insert(unexpanded_dof);
+            }
+          // If we were asked for a DoF and we already have a
+          // constraint for it, then we need to check if the
+          // constraint is recursive.
+          else
+            {
+              const DofConstraintRow & row = pos->second;
+              for (DofConstraintRow::const_iterator j = row.begin();
+                   j != row.end(); ++j)
+                {
+                  const dof_id_type constraining_dof = j->first;
+
+                  // If it's non-local and we haven't already got a
+                  // constraint for it, we might need to ask for one
+                  if (((constraining_dof < this->first_dof()) ||
+                       (constraining_dof >= this->end_dof())) &&
+                      !_dof_constraints.count(constraining_dof))
+                    dof_request_set.insert(constraining_dof);
+                }
+            }
+        }
+
+      // Clear the unexpanded constraint set; we're about to expand it
+      unexpanded_dofs.clear();
+
+      // Count requests by processor
+      processor_id_type proc_id = 0;
+      for (DoF_RCSet::iterator i = dof_request_set.begin();
+           i != dof_request_set.end(); ++i)
+        {
+          while (*i >= _end_df[proc_id])
+            proc_id++;
+          dof_ids_on_proc[proc_id]++;
+        }
+
+      for (processor_id_type p = 0; p != this->n_processors(); ++p)
+        {
+          requested_dof_ids[p].reserve(dof_ids_on_proc[p]);
+        }
+
+      // Prepare each processor's request set
+      proc_id = 0;
+      for (DoF_RCSet::iterator i = dof_request_set.begin();
+           i != dof_request_set.end(); ++i)
+        {
+          while (*i >= _end_df[proc_id])
+            proc_id++;
+          requested_dof_ids[proc_id].push_back(*i);
+        }
+
+      // Now request constraint rows from other processors
+      for (processor_id_type p=1; p != this->n_processors(); ++p)
+        {
+          // Trade my requests with processor procup and procdown
+          processor_id_type procup =
+            cast_int<processor_id_type>((this->processor_id() + p) %
+                                        this->n_processors());
+          processor_id_type procdown =
+            cast_int<processor_id_type>((this->n_processors() +
+                                         this->processor_id() - p) %
+                                        this->n_processors());
+          std::vector<dof_id_type> dof_request_to_fill;
+
+          this->comm().send_receive(procup, requested_dof_ids[procup],
+                                    procdown, dof_request_to_fill);
+
+          // Fill those requests
+          std::vector<std::vector<dof_id_type> > dof_row_keys(dof_request_to_fill.size());
+
+          std::vector<std::vector<Real> > dof_row_vals(dof_request_to_fill.size());
+          std::vector<Number> dof_row_rhss(dof_request_to_fill.size());
+          std::vector<std::vector<Number> >
+            dof_adj_rhss(max_qoi_num,
+                         std::vector<Number>(dof_request_to_fill.size()));
+          for (std::size_t i=0; i != dof_request_to_fill.size(); ++i)
+            {
+              dof_id_type constrained = dof_request_to_fill[i];
+              if (_dof_constraints.count(constrained))
+                {
+                  DofConstraintRow & row = _dof_constraints[constrained];
+                  std::size_t row_size = row.size();
+                  dof_row_keys[i].reserve(row_size);
+                  dof_row_vals[i].reserve(row_size);
+                  for (DofConstraintRow::iterator j = row.begin();
+                       j != row.end(); ++j)
+                    {
+                      dof_row_keys[i].push_back(j->first);
+                      dof_row_vals[i].push_back(j->second);
+
+                      // We should never have a 0 constraint
+                      // coefficient; that's implicit via sparse
+                      // constraint storage
+                      libmesh_assert(j->second);
+                    }
+                  DofConstraintValueMap::const_iterator rhsit =
+                    _primal_constraint_values.find(constrained);
+                  dof_row_rhss[i] = (rhsit == _primal_constraint_values.end()) ?
+                    0 : rhsit->second;
+
+                  for (unsigned int q = 0; q != max_qoi_num; ++q)
+                    {
+                      AdjointDofConstraintValues::const_iterator adjoint_map_it =
+                        _adjoint_constraint_values.find(q);
+
+                      if (adjoint_map_it == _adjoint_constraint_values.end())
+                        continue;
+
+                      const DofConstraintValueMap & constraint_map =
+                        adjoint_map_it->second;
+
+                      DofConstraintValueMap::const_iterator rhsit =
+                        constraint_map.find(constrained);
+                      dof_adj_rhss[q][i] = (rhsit == constraint_map.end()) ?
+                        0 : rhsit->second;
+                    }
+                }
+              else
+                {
+                  // Get NaN from Real, where it should exist, not
+                  // from Number, which may be std::complex, in which
+                  // case quiet_NaN() silently returns zero, rather
+                  // than sanely returning NaN or throwing an
+                  // exception or sending Stroustrop hate mail.
+                  dof_row_rhss[i] =
+                    std::numeric_limits<Real>::quiet_NaN();
+
+                  // Make sure we don't get caught by "!isnan(NaN)"
+                  // bugs again.
+                  libmesh_assert(libmesh_isnan(dof_row_rhss[i]));
+                }
+            }
+
+          // Trade back the results
+          std::vector<std::vector<dof_id_type> > dof_filled_keys;
+          std::vector<std::vector<Real> > dof_filled_vals;
+          std::vector<Number> dof_filled_rhss;
+          std::vector<std::vector<Number> > adj_filled_rhss;
+          this->comm().send_receive(procdown, dof_row_keys,
+                                    procup, dof_filled_keys);
+          this->comm().send_receive(procdown, dof_row_vals,
+                                    procup, dof_filled_vals);
+          this->comm().send_receive(procdown, dof_row_rhss,
+                                    procup, dof_filled_rhss);
+          this->comm().send_receive(procdown, dof_adj_rhss,
+                                    procup, adj_filled_rhss);
+
+          libmesh_assert_equal_to (dof_filled_keys.size(), requested_dof_ids[procup].size());
+          libmesh_assert_equal_to (dof_filled_vals.size(), requested_dof_ids[procup].size());
+          libmesh_assert_equal_to (dof_filled_rhss.size(), requested_dof_ids[procup].size());
+#ifndef NDEBUG
+          for (unsigned int q=0; q != adj_filled_rhss.size(); ++q)
+            libmesh_assert_equal_to (adj_filled_rhss[q].size(), requested_dof_ids[procup].size());
+#endif
+
+          // Add any new constraint rows we've found
+          for (std::size_t i=0; i != requested_dof_ids[procup].size(); ++i)
+            {
+              libmesh_assert_equal_to (dof_filled_keys[i].size(), dof_filled_vals[i].size());
+              if (!libmesh_isnan(dof_filled_rhss[i]))
+                {
+                  dof_id_type constrained = requested_dof_ids[procup][i];
+                  DofConstraintRow & row = _dof_constraints[constrained];
+                  for (std::size_t j = 0; j != dof_filled_keys[i].size(); ++j)
+                    row[dof_filled_keys[i][j]] = dof_filled_vals[i][j];
+                  if (dof_filled_rhss[i] != Number(0))
+                    _primal_constraint_values[constrained] = dof_filled_rhss[i];
+                  else
+                    _primal_constraint_values.erase(constrained);
+
+                  for (unsigned int q = 0; q != max_qoi_num; ++q)
+                    {
+                      AdjointDofConstraintValues::iterator adjoint_map_it =
+                        _adjoint_constraint_values.find(q);
+
+                      if ((adjoint_map_it == _adjoint_constraint_values.end()) &&
+                          adj_filled_rhss[q][constrained] == Number(0))
+                        continue;
+
+                      if (adjoint_map_it == _adjoint_constraint_values.end())
+                        adjoint_map_it = _adjoint_constraint_values.insert
+                          (std::make_pair(q,DofConstraintValueMap())).first;
+
+                      DofConstraintValueMap & constraint_map =
+                        adjoint_map_it->second;
+
+                      if (adj_filled_rhss[q][i] != Number(0))
+                        constraint_map[constrained] =
+                          adj_filled_rhss[q][i];
+                      else
+                        constraint_map.erase(constrained);
+                    }
+
+                  // And prepare to check for more recursive constraints
+                  if (!dof_filled_keys[i].empty())
+                    unexpanded_dofs.insert(constrained);
+                }
+            }
+        }
+
+      // We have to keep recursing while the unexpanded set is
+      // nonempty on *any* processor
+      unexpanded_set_nonempty = !unexpanded_dofs.empty();
+      this->comm().max(unexpanded_set_nonempty);
+    }
+}
 
 void DofMap::add_constraints_to_send_list()
 {

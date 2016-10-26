@@ -60,59 +60,59 @@
 
     template<typename T>
     void send (const unsigned int dest_processor_id,
-               std::basic_string<T> &buf,
+               const std::basic_string<T> & buf,
                const MessageTag &tag=no_tag) const;
  
     template<typename T>
     void send (const unsigned int dest_processor_id,
-               std::basic_string<T> &buf,
+               const std::basic_string<T> & buf,
                Request &req,
                const MessageTag &tag=no_tag) const;
  
     template<typename T>
     void send (const unsigned int dest_processor_id,
-               std::set<T> &buf,
+               const std::set<T> & buf,
                const MessageTag &tag=no_tag) const;
 
     template<typename T>
     void send (const unsigned int dest_processor_id,
-               std::set<T> &buf,
+               const std::set<T> & buf,
                Request &req,
                const MessageTag &tag=no_tag) const;
 
     template<typename T>
     void send (const unsigned int dest_processor_id,
-               std::set<T> &buf,
+               const std::set<T> & buf,
                const DataType &type,
                const MessageTag &tag=no_tag) const;
 
     template<typename T>
     void send (const unsigned int dest_processor_id,
-               std::set<T> &buf,
+               const std::set<T> & buf,
                const DataType &type,
                Request &req,
                const MessageTag &tag=no_tag) const;
 
     template<typename T>
     void send (const unsigned int dest_processor_id,
-               std::vector<T> &buf,
+               const std::vector<T> & buf,
                const MessageTag &tag=no_tag) const;
 
     template<typename T>
     void send (const unsigned int dest_processor_id,
-               std::vector<T> &buf,
+               const std::vector<T> & buf,
                Request &req,
                const MessageTag &tag=no_tag) const;
 
     template <typename T>
     void send (const unsigned int dest_processor_id,
-               std::vector<T> &buf,
+               const std::vector<T> & buf,
                const DataType &type,
                const MessageTag &tag=no_tag) const;
 
     template <typename T>
     void send (const unsigned int dest_processor_id,
-               std::vector<T> &buf,
+               const std::vector<T> & buf,
                const DataType &type,
                Request &req,
                const MessageTag &tag=no_tag) const;
@@ -200,7 +200,7 @@
     // re-specify the default arguments
     template <typename T1, typename T2>
     void send_receive(const unsigned int dest_processor_id,
-                      std::vector<T1> &send,
+                      const std::vector<T1> & send,
                       const DataType &type1,
                       const unsigned int source_processor_id,
                       std::vector<T2> &recv,
@@ -210,7 +210,7 @@
 
     template <typename T1, typename T2>
     void send_receive(const unsigned int dest_processor_id,
-                      std::vector<T1> &send,
+                      const std::vector<T1> & send,
                       const unsigned int source_processor_id,
                       std::vector<T2> &recv,
                       const MessageTag &send_tag = no_tag,
@@ -221,7 +221,7 @@
     // MPI.
     template <typename T>
     void send_receive(const unsigned int dest_processor_id,
-                      std::vector<T> &send,
+                      const std::vector<T> & send,
                       const unsigned int source_processor_id,
                       std::vector<T> &recv,
                       const MessageTag &send_tag = no_tag,
@@ -229,7 +229,7 @@
 
     template <typename T1, typename T2>
     void send_receive(const unsigned int dest_processor_id,
-                      std::vector<std::vector<T1> > &send,
+                      const std::vector<std::vector<T1> > & send,
                       const unsigned int source_processor_id,
                       std::vector<std::vector<T2> > &recv,
                       const MessageTag &send_tag = no_tag,
@@ -237,7 +237,7 @@
 
     template <typename T>
     void send_receive(const unsigned int dest_processor_id,
-                      std::vector<std::vector<T> > &send,
+                      const std::vector<std::vector<T> > & send,
                       const unsigned int source_processor_id,
                       std::vector<std::vector<T> > &recv,
                       const MessageTag &send_tag = no_tag,

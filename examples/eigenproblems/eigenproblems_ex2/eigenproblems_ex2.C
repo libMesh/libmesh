@@ -41,6 +41,7 @@
 #include "libmesh/exodusII_io.h"
 #include "libmesh/eigen_system.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/slepc_eigen_solver.h"
 #include "libmesh/fe.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/dense_matrix.h"
@@ -166,6 +167,17 @@ int main (int argc, char ** argv)
 
   // Prints information about the system to the screen.
   equation_systems.print_info();
+
+#if SLEPC_VERSION_LESS_THAN(3,1,0)
+  libmesh_error_msg("SLEPc 3.1 is required to call EigenSolver::set_initial_space()");
+#else
+  // Get the SLEPc solver object and set initial guess for one basis vector
+  // this has to be done _after_ the EquationSystems object is initialized
+  UniquePtr<EigenSolver<Number> > & slepc_eps = eigen_system.eigen_solver;
+  NumericVector<Number> & initial_space = eigen_system.add_vector("initial_space");
+  initial_space.add(1.0);
+  slepc_eps->set_initial_space(initial_space);
+#endif
 
   // Solve the system "Eigensystem".
   eigen_system.solve();

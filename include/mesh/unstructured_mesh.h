@@ -83,11 +83,17 @@ public:
    * use with this mesh, since these read methods expect it.
    *
    * The skip_renumber_nodes_and_elements argument is now deprecated -
-   * to disallow renumbering, set \p MeshBase::allow_renumbering(false)
+   * to disallow renumbering, set \p MeshBase::allow_renumbering(false).
+   *
+   * Set skip_find_neighbors=true to skip the find-neighbors operation
+   * during prepare_for_use. This operation isn't always necessary
+   * and it can be time-consuming, which is why we provide an option to
+   * skip it.
    */
   virtual void read (const std::string & name,
                      MeshData * mesh_data=libmesh_nullptr,
-                     bool skip_renumber_nodes_and_elements=false) libmesh_override;
+                     bool skip_renumber_nodes_and_elements=false,
+                     bool skip_find_neighbors=false) libmesh_override;
   /**
    * Write the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.

@@ -15,6 +15,16 @@ unit_tests_sources = \
   base/default_coupling_test.C \
   base/getpot_test.C \
   base/auto_ptr_test.C \
+  fe/fe_bernstein_test.C \
+  fe/fe_clough_test.C \
+  fe/fe_hermite_test.C \
+  fe/fe_hierarchic_test.C \
+  fe/fe_l2_hierarchic_test.C \
+  fe/fe_l2_lagrange_test.C \
+  fe/fe_lagrange_test.C \
+  fe/fe_monomial_test.C \
+  fe/fe_szabab_test.C \
+  fe/fe_xyz_test.C \
   geom/node_test.C \
   geom/point_test.C \
   geom/point_test.h \

@@ -103,7 +103,6 @@ void ExodusII_IO::write_discontinuous_exodusII(const std::string & name,
 ExodusII_IO::~ExodusII_IO ()
 {
   exio_helper->close();
-  delete exio_helper;
 }
 
 
@@ -963,7 +962,6 @@ const std::vector<std::string> & ExodusII_IO::get_elem_var_names()
 
 ExodusII_IO::~ExodusII_IO ()
 {
-  libmesh_error_msg("ERROR, ExodusII API is not defined.");
 }
 
 
