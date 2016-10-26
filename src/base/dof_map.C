@@ -1546,9 +1546,29 @@ void DofMap::merge_ghost_functor_outputs
                         }
                       const_cast<CouplingMatrix&>(*existing_it->second) &= *metg_it->second;
                     }
+                  else
+                    {
+                      // Any existing_it matrix merged with a full
+                      // matrix (symbolized as nullptr) gives another
+                      // full matrix (symbolizable as nullptr).
+
+                      // So if existing_it->second is a temporary then
+                      // we don't need it anymore; we might as well
+                      // remove it to keep the set of temporaries
+                      // small.
+                      std::set<CouplingMatrix*>::iterator temp_it =
+                        temporary_coupling_matrices.find
+                          (const_cast<CouplingMatrix*>(existing_it->second));
+                      if (temp_it !=
+                          temporary_coupling_matrices.end())
+                        temporary_coupling_matrices.erase(temp_it);
+
+                      existing_it->second = libmesh_nullptr;
+                    }
                 }
-              else
-                existing_it->second = metg_it->second;
+              // else we have a nullptr already, then we have a full
+              // coupling matrix, already, and merging with anything
+              // else won't change that, so we're done.
             }
         }
     }
