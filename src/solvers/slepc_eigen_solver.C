@@ -90,7 +90,10 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> & matrix_A_in,
   this->init ();
 
   // Make sure the SparseMatrix passed in is really a PetscMatrix
-  PetscMatrix<T> * matrix_A   = cast_ptr<PetscMatrix<T> *>(&matrix_A_in);
+  PetscMatrix<T> * matrix_A = dynamic_cast<PetscMatrix<T> *>(&matrix_A_in);
+
+  if (!matrix_A)
+    libmesh_error_msg("Error: input matrix to solve_standard() must be a PetscMatrix.");
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix_A->close ();
@@ -111,7 +114,10 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> & shell_matrix,
 
   PetscErrorCode ierr=0;
 
-  // Prepare the matrix.
+  // Prepare the matrix.  Note that the const_cast is only necessary
+  // because PETSc does not accept a const void *.  Inside the member
+  // function _petsc_shell_matrix() below, the pointer is casted back
+  // to a const ShellMatrix<T> *.
   Mat mat;
   ierr = MatCreateShell(this->comm().get(),
                         shell_matrix.m(), // Specify the number of local rows
@@ -122,16 +128,10 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> & shell_matrix,
                         &mat);
   LIBMESH_CHKERR(ierr);
 
-  /* Note that the const_cast above is only necessary because PETSc
-     does not accept a const void *.  Inside the member function
-     _petsc_shell_matrix() below, the pointer is casted back to a
-     const ShellMatrix<T> *.  */
-
   ierr = MatShellSetOperation(mat,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
   LIBMESH_CHKERR(ierr);
   ierr = MatShellSetOperation(mat,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
   LIBMESH_CHKERR(ierr);
-
 
   return _solve_standard_helper(mat, nev, ncv, tol, m_its);
 }
@@ -275,13 +275,15 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
   this->init ();
 
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T> * matrix_A   = cast_ptr<PetscMatrix<T> *>(&matrix_A_in);
-  PetscMatrix<T> * matrix_B   = cast_ptr<PetscMatrix<T> *>(&matrix_B_in);
+  PetscMatrix<T> * matrix_A = dynamic_cast<PetscMatrix<T> *>(&matrix_A_in);
+  PetscMatrix<T> * matrix_B = dynamic_cast<PetscMatrix<T> *>(&matrix_B_in);
+
+  if (!matrix_A || !matrix_B)
+    libmesh_error_msg("Error: inputs to solve_generalized() must be of type PetscMatrix.");
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix_A->close ();
   matrix_B->close ();
-
 
   return _solve_generalized_helper (matrix_A->mat(), matrix_B->mat(), nev, ncv, tol, m_its);
 }
@@ -299,7 +301,10 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
 
   PetscErrorCode ierr=0;
 
-  // Prepare the matrix.
+  // Prepare the matrix. Note that the const_cast is only necessary
+  // because PETSc does not accept a const void *.  Inside the member
+  // function _petsc_shell_matrix() below, the pointer is casted back
+  // to a const ShellMatrix<T> *.
   Mat mat_A;
   ierr = MatCreateShell(this->comm().get(),
                         shell_matrix_A.m(), // Specify the number of local rows
@@ -310,15 +315,13 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
                         &mat_A);
   LIBMESH_CHKERR(ierr);
 
-  PetscMatrix<T> * matrix_B   = cast_ptr<PetscMatrix<T> *>(&matrix_B_in);
+  PetscMatrix<T> * matrix_B = dynamic_cast<PetscMatrix<T> *>(&matrix_B_in);
+
+  if (!matrix_B)
+    libmesh_error_msg("Error: inputs to solve_generalized() must be of type PetscMatrix.");
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix_B->close ();
-
-  /* Note that the const_cast above is only necessary because PETSc
-     does not accept a const void *.  Inside the member function
-     _petsc_shell_matrix() below, the pointer is casted back to a
-     const ShellMatrix<T> *.  */
 
   ierr = MatShellSetOperation(mat_A,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
   LIBMESH_CHKERR(ierr);
@@ -341,12 +344,18 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
 
   PetscErrorCode ierr=0;
 
-  PetscMatrix<T> * matrix_A = cast_ptr<PetscMatrix<T> *>(&matrix_A_in);
+  PetscMatrix<T> * matrix_A = dynamic_cast<PetscMatrix<T> *>(&matrix_A_in);
+
+  if (!matrix_A)
+    libmesh_error_msg("Error: inputs to solve_generalized() must be of type PetscMatrix.");
 
   // Close the matrix and vectors in case this wasn't already done.
   matrix_A->close ();
 
-  // Prepare the matrix.
+  // Prepare the matrix.  Note that the const_cast is only necessary
+  // because PETSc does not accept a const void *.  Inside the member
+  // function _petsc_shell_matrix() below, the pointer is casted back
+  // to a const ShellMatrix<T> *.
   Mat mat_B;
   ierr = MatCreateShell(this->comm().get(),
                         shell_matrix_B.m(), // Specify the number of local rows
@@ -357,10 +366,6 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
                         &mat_B);
   LIBMESH_CHKERR(ierr);
 
-  /* Note that the const_cast above is only necessary because PETSc
-     does not accept a const void *.  Inside the member function
-     _petsc_shell_matrix() below, the pointer is casted back to a
-     const ShellMatrix<T> *.  */
 
   ierr = MatShellSetOperation(mat_B,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
   LIBMESH_CHKERR(ierr);
@@ -383,7 +388,10 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
 
   PetscErrorCode ierr=0;
 
-  // Prepare the matrix.
+  // Prepare the matrices.  Note that the const_casts are only
+  // necessary because PETSc does not accept a const void *.  Inside
+  // the member function _petsc_shell_matrix() below, the pointer is
+  // casted back to a const ShellMatrix<T> *.
   Mat mat_A;
   ierr = MatCreateShell(this->comm().get(),
                         shell_matrix_A.m(), // Specify the number of local rows
@@ -403,11 +411,6 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
                         const_cast<void *>(static_cast<const void *>(&shell_matrix_B)),
                         &mat_B);
   LIBMESH_CHKERR(ierr);
-
-  /* Note that the const_cast above is only necessary because PETSc
-     does not accept a const void *.  Inside the member function
-     _petsc_shell_matrix() below, the pointer is casted back to a
-     const ShellMatrix<T> *.  */
 
   ierr = MatShellSetOperation(mat_A,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
   LIBMESH_CHKERR(ierr);
@@ -713,7 +716,10 @@ std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(dof_id_type i,
   PetscReal re, im;
 
   // Make sure the NumericVector passed in is really a PetscVector
-  PetscVector<T> * solution = cast_ptr<PetscVector<T> *>(&solution_in);
+  PetscVector<T> * solution = dynamic_cast<PetscVector<T> *>(&solution_in);
+
+  if (!solution)
+    libmesh_error_msg("Error getting eigenvector: input vector must be a PetscVector.");
 
   // real and imaginary part of the ith eigenvalue.
   PetscScalar kr, ki;
@@ -783,12 +789,21 @@ void SlepcEigenSolver<T>::attach_deflation_space(NumericVector<T> & deflation_ve
   this->init();
 
   PetscErrorCode ierr = 0;
-  Vec deflation_vector = (cast_ptr<PetscVector<T> *>(&deflation_vector_in))->vec();
-  Vec * deflation_space = &deflation_vector;
+
+  // Make sure the input vector is actually a PetscVector
+  PetscVector<T> * deflation_vector_petsc_vec =
+    dynamic_cast<PetscVector<T> *>(&deflation_vector_in);
+
+  if (!deflation_vector_petsc_vec)
+    libmesh_error_msg("Error attaching deflation space: input vector must be a PetscVector.");
+
+  // Get a handle for the underlying Vec.
+  Vec deflation_vector = deflation_vector_petsc_vec->vec();
+
 #if SLEPC_VERSION_LESS_THAN(3,1,0)
-  ierr = EPSAttachDeflationSpace(_eps, 1, deflation_space, PETSC_FALSE);
+  ierr = EPSAttachDeflationSpace(_eps, 1, &deflation_vector, PETSC_FALSE);
 #else
-  ierr = EPSSetDeflationSpace(_eps, 1, deflation_space);
+  ierr = EPSSetDeflationSpace(_eps, 1, &deflation_vector);
 #endif
   LIBMESH_CHKERR(ierr);
 }
@@ -802,7 +817,17 @@ void SlepcEigenSolver<T>::set_initial_space(NumericVector<T> & initial_space_in)
   this->init();
 
   PetscErrorCode ierr = 0;
-  Vec initial_vector = (cast_ptr<PetscVector<T> *>(&initial_space_in))->vec();
+
+  // Make sure the input vector is actually a PetscVector
+  PetscVector<T> * initial_space_petsc_vec =
+    dynamic_cast<PetscVector<T> *>(&initial_space_in);
+
+  if (!initial_space_petsc_vec)
+    libmesh_error_msg("Error attaching initial space: input vector must be a PetscVector.");
+
+  // Get a handle for the underlying Vec.
+  Vec initial_vector = initial_space_petsc_vec->vec();
+
   ierr = EPSSetInitialSpace(_eps, 1, &initial_vector);
   LIBMESH_CHKERR(ierr);
 #endif
