@@ -1206,8 +1206,11 @@ void MeshCommunication::make_node_ids_parallel_consistent (MeshBase & mesh)
 
 
 
-void MeshCommunication::make_node_unique_ids_parallel_consistent (MeshBase &mesh)
+void MeshCommunication::make_node_unique_ids_parallel_consistent (MeshBase & mesh)
 {
+  // Avoid unused variable warnings if unique ids aren't enabled.
+  libmesh_ignore(mesh);
+
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
