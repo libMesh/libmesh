@@ -641,14 +641,6 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
         LIBMESH_CHKERR(ierr);
         return;
       }
-    case TARGET_MAGNITUDE:
-      {
-        ierr = EPSSetTarget(_eps, this->_target_val);
-        LIBMESH_CHKERR(ierr);
-        ierr = EPSSetWhichEigenpairs (_eps, EPS_TARGET_MAGNITUDE);
-        LIBMESH_CHKERR(ierr);
-        return;
-      }
     case LARGEST_REAL:
       {
         ierr = EPSSetWhichEigenpairs (_eps, EPS_LARGEST_REAL);
@@ -658,14 +650,6 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
     case SMALLEST_REAL:
       {
         ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_REAL);
-        LIBMESH_CHKERR(ierr);
-        return;
-      }
-    case TARGET_REAL:
-      {
-        ierr = EPSSetTarget(_eps, this->_target_val);
-        LIBMESH_CHKERR(ierr);
-        ierr = EPSSetWhichEigenpairs (_eps, EPS_TARGET_REAL);
         LIBMESH_CHKERR(ierr);
         return;
       }
@@ -681,6 +665,25 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
         LIBMESH_CHKERR(ierr);
         return;
       }
+
+      // The EPS_TARGET_XXX enums were added in SLEPc 3.1
+#if !SLEPC_VERSION_LESS_THAN(3,1,0)
+    case TARGET_MAGNITUDE:
+      {
+        ierr = EPSSetTarget(_eps, this->_target_val);
+        LIBMESH_CHKERR(ierr);
+        ierr = EPSSetWhichEigenpairs (_eps, EPS_TARGET_MAGNITUDE);
+        LIBMESH_CHKERR(ierr);
+        return;
+      }
+    case TARGET_REAL:
+      {
+        ierr = EPSSetTarget(_eps, this->_target_val);
+        LIBMESH_CHKERR(ierr);
+        ierr = EPSSetWhichEigenpairs (_eps, EPS_TARGET_REAL);
+        LIBMESH_CHKERR(ierr);
+        return;
+      }
     case TARGET_IMAGINARY:
       {
         ierr = EPSSetTarget(_eps, this->_target_val);
@@ -689,6 +692,7 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
         LIBMESH_CHKERR(ierr);
         return;
       }
+#endif
 
     default:
       libmesh_error_msg("ERROR:  Unsupported SLEPc position of spectrum: " << this->_position_of_spectrum);
