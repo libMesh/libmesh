@@ -60,6 +60,25 @@ void EigenSolver<T>::set_solver_configuration(SolverConfiguration & solver_confi
   _solver_configuration = &solver_configuration;
 }
 
+template <typename T>
+void EigenSolver<T>::set_position_of_spectrum (Real pos)
+{
+  if (pos >= 0)
+    _position_of_spectrum = TARGET_MAGNITUDE;
+  else
+    _position_of_spectrum = TARGET_REAL;
+
+  _target_val = pos;
+}
+
+template <typename T>
+void EigenSolver<T>::set_position_of_spectrum (Real pos, PositionOfSpectrum target)
+{
+  _position_of_spectrum = target;
+  _target_val = pos;
+}
+
+
 
 //------------------------------------------------------------------
 // Explicit instantiations

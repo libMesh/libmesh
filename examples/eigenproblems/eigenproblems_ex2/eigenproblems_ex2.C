@@ -158,7 +158,9 @@ int main (int argc, char ** argv)
 
   // Set the eigenvalues to be computed. Note that not
   // all solvers support this.
-  // eigen_system.eigen_solver->set_position_of_spectrum(SMALLEST_MAGNITUDE);
+#ifdef LIBMESH_HAVE_SLEPC
+  eigen_system.eigen_solver->set_position_of_spectrum(2.3);
+#endif
 
   // Initialize the data structures for the equation system.
   equation_systems.init();

@@ -125,6 +125,9 @@ public:
   void set_position_of_spectrum (PositionOfSpectrum pos)
   {_position_of_spectrum= pos;}
 
+  void set_position_of_spectrum (Real pos);
+  void set_position_of_spectrum (Real pos, PositionOfSpectrum target);
+
   /**
    * Solves the standard eigen problem when matrix_A is a
    * \p SparseMatrix, and returns the number of converged
@@ -251,6 +254,7 @@ protected:
    */
   SolverConfiguration * _solver_configuration;
 
+  Real _target_val;
 };
 
 

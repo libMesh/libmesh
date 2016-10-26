@@ -630,18 +630,65 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
   switch (this->_position_of_spectrum)
     {
     case LARGEST_MAGNITUDE:
-      ierr = EPSSetWhichEigenpairs (_eps, EPS_LARGEST_MAGNITUDE);  LIBMESH_CHKERR(ierr); return;
+      {
+        ierr = EPSSetWhichEigenpairs (_eps, EPS_LARGEST_MAGNITUDE);
+        LIBMESH_CHKERR(ierr);
+        return;
+      }
     case SMALLEST_MAGNITUDE:
-      ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_MAGNITUDE); LIBMESH_CHKERR(ierr); return;
+      {
+        ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_MAGNITUDE);
+        LIBMESH_CHKERR(ierr);
+        return;
+      }
+    case TARGET_MAGNITUDE:
+      {
+        ierr = EPSSetTarget(_eps, this->_target_val);
+        LIBMESH_CHKERR(ierr);
+        ierr = EPSSetWhichEigenpairs (_eps, EPS_TARGET_MAGNITUDE);
+        LIBMESH_CHKERR(ierr);
+        return;
+      }
     case LARGEST_REAL:
-      ierr = EPSSetWhichEigenpairs (_eps, EPS_LARGEST_REAL);       LIBMESH_CHKERR(ierr); return;
+      {
+        ierr = EPSSetWhichEigenpairs (_eps, EPS_LARGEST_REAL);
+        LIBMESH_CHKERR(ierr);
+        return;
+      }
     case SMALLEST_REAL:
-      ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_REAL);      LIBMESH_CHKERR(ierr); return;
+      {
+        ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_REAL);
+        LIBMESH_CHKERR(ierr);
+        return;
+      }
+    case TARGET_REAL:
+      {
+        ierr = EPSSetTarget(_eps, this->_target_val);
+        LIBMESH_CHKERR(ierr);
+        ierr = EPSSetWhichEigenpairs (_eps, EPS_TARGET_REAL);
+        LIBMESH_CHKERR(ierr);
+        return;
+      }
     case LARGEST_IMAGINARY:
-      ierr = EPSSetWhichEigenpairs (_eps, EPS_LARGEST_IMAGINARY);  LIBMESH_CHKERR(ierr); return;
+      {
+        ierr = EPSSetWhichEigenpairs (_eps, EPS_LARGEST_IMAGINARY);
+        LIBMESH_CHKERR(ierr);
+        return;
+      }
     case SMALLEST_IMAGINARY:
-      ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_IMAGINARY); LIBMESH_CHKERR(ierr); return;
-
+      {
+        ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_IMAGINARY);
+        LIBMESH_CHKERR(ierr);
+        return;
+      }
+    case TARGET_IMAGINARY:
+      {
+        ierr = EPSSetTarget(_eps, this->_target_val);
+        LIBMESH_CHKERR(ierr);
+        ierr = EPSSetWhichEigenpairs (_eps, EPS_TARGET_IMAGINARY);
+        LIBMESH_CHKERR(ierr);
+        return;
+      }
 
     default:
       libmesh_error_msg("ERROR:  Unsupported SLEPc position of spectrum: " << this->_position_of_spectrum);
