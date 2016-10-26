@@ -27,14 +27,10 @@
 
 namespace libMesh
 {
-//
-// TetGenWrapper member functions
-//
 
-TetGenWrapper::TetGenWrapper()
+TetGenWrapper::TetGenWrapper() :
+  tetgen_output(new tetgenio)
 {
-  tetgen_output = new tetgenio;
-
   this->tetgen_data.mesh_dim                = 3;
   this->tetgen_data.numberofpointattributes = 0;
   this->tetgen_data.firstnumber             = 0;
@@ -44,7 +40,6 @@ TetGenWrapper::TetGenWrapper()
 
 TetGenWrapper::~TetGenWrapper()
 {
-  delete tetgen_output;
 }
 
 
@@ -180,7 +175,7 @@ void TetGenWrapper::set_switches(const std::string & s)
 void TetGenWrapper::run_tetgen()
 {
   // Call tetrahedralize from the TetGen library.
-  tetrahedralize(&tetgen_be, &tetgen_data, tetgen_output);
+  tetrahedralize(&tetgen_be, &tetgen_data, tetgen_output.get());
 }
 
 
