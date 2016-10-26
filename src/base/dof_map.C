@@ -476,7 +476,10 @@ void DofMap::reinit(MeshBase & mesh)
   _default_coupling->set_n_levels
     (std::max(_default_coupling->n_levels(), standard_n_levels));
 
-  _default_evaluating->set_dof_coupling(this->_dof_coupling);
+  // But we *don't* want to restrict to a CouplingMatrix unless the
+  // user does so manually; the original libMesh behavior was to put
+  // ghost indices on the send_list regardless of variable.
+  //_default_evaluating->set_dof_coupling(this->_dof_coupling);
 
   const unsigned int
     sys_num      = this->sys_number(),
@@ -888,7 +891,7 @@ void DofMap::clear()
 
   // Go back to default send_list generation
 
-  _default_evaluating->set_dof_coupling(this->_dof_coupling);
+  // _default_evaluating->set_dof_coupling(this->_dof_coupling);
   _default_evaluating->set_n_levels(1);
   this->add_algebraic_ghosting_functor(*_default_evaluating);
   }
