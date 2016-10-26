@@ -24,6 +24,7 @@ unit_tests_sources = \
   fe/fe_lagrange_test.C \
   fe/fe_monomial_test.C \
   fe/fe_szabab_test.C \
+  fe/fe_test.h \
   fe/fe_xyz_test.C \
   geom/node_test.C \
   geom/point_test.C \

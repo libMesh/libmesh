@@ -180,13 +180,14 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
 	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
-	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_xyz_test.C \
-	geom/node_test.C geom/point_test.C geom/point_test.h \
-	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
-	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
-	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
-	mesh/mesh_function_dfem.C numerics/composite_function_test.C \
+	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_test.h \
+	fe/fe_xyz_test.C geom/node_test.C geom/point_test.C \
+	geom/point_test.h mesh/all_tri.C mesh/boundary_mesh.C \
+	mesh/boundary_info.C mesh/contains_point.C \
+	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
+	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C mesh/mesh_function_dfem.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -270,13 +271,14 @@ am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
 	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
-	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_xyz_test.C \
-	geom/node_test.C geom/point_test.C geom/point_test.h \
-	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
-	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
-	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
-	mesh/mesh_function_dfem.C numerics/composite_function_test.C \
+	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_test.h \
+	fe/fe_xyz_test.C geom/node_test.C geom/point_test.C \
+	geom/point_test.h mesh/all_tri.C mesh/boundary_mesh.C \
+	mesh/boundary_info.C mesh/contains_point.C \
+	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
+	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C mesh/mesh_function_dfem.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -357,13 +359,14 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
 	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
-	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_xyz_test.C \
-	geom/node_test.C geom/point_test.C geom/point_test.h \
-	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
-	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
-	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
-	mesh/mesh_function_dfem.C numerics/composite_function_test.C \
+	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_test.h \
+	fe/fe_xyz_test.C geom/node_test.C geom/point_test.C \
+	geom/point_test.h mesh/all_tri.C mesh/boundary_mesh.C \
+	mesh/boundary_info.C mesh/contains_point.C \
+	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
+	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C mesh/mesh_function_dfem.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -444,13 +447,14 @@ am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
 	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
-	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_xyz_test.C \
-	geom/node_test.C geom/point_test.C geom/point_test.h \
-	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
-	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
-	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
-	mesh/mesh_function_dfem.C numerics/composite_function_test.C \
+	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_test.h \
+	fe/fe_xyz_test.C geom/node_test.C geom/point_test.C \
+	geom/point_test.h mesh/all_tri.C mesh/boundary_mesh.C \
+	mesh/boundary_info.C mesh/contains_point.C \
+	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
+	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C mesh/mesh_function_dfem.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -529,13 +533,14 @@ am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
 	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
-	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_xyz_test.C \
-	geom/node_test.C geom/point_test.C geom/point_test.h \
-	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
-	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
-	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
-	mesh/mesh_function_dfem.C numerics/composite_function_test.C \
+	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_test.h \
+	fe/fe_xyz_test.C geom/node_test.C geom/point_test.C \
+	geom/point_test.h mesh/all_tri.C mesh/boundary_mesh.C \
+	mesh/boundary_info.C mesh/contains_point.C \
+	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
+	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C mesh/mesh_function_dfem.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -1032,13 +1037,14 @@ unit_tests_sources = driver.C test_comm.h base/dof_object_test.h \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
 	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
-	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_xyz_test.C \
-	geom/node_test.C geom/point_test.C geom/point_test.h \
-	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
-	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
-	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
-	mesh/mesh_function_dfem.C numerics/composite_function_test.C \
+	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_test.h \
+	fe/fe_xyz_test.C geom/node_test.C geom/point_test.C \
+	geom/point_test.h mesh/all_tri.C mesh/boundary_mesh.C \
+	mesh/boundary_info.C mesh/contains_point.C \
+	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
+	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C mesh/mesh_function_dfem.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
