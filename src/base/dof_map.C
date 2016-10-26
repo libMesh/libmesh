@@ -205,7 +205,6 @@ DofMap::~DofMap()
   _mesh.remove_ghosting_functor(*_default_evaluating);
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
-  delete _dirichlet_boundaries;
   for (unsigned int q = 0; q != _adjoint_dirichlet_boundaries.size(); ++q)
     delete _adjoint_dirichlet_boundaries[q];
 #endif

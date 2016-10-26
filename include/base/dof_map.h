@@ -1096,12 +1096,12 @@ public:
 
   const DirichletBoundaries * get_dirichlet_boundaries() const
   {
-    return _dirichlet_boundaries;
+    return _dirichlet_boundaries.get();
   }
 
   DirichletBoundaries * get_dirichlet_boundaries()
   {
-    return _dirichlet_boundaries;
+    return _dirichlet_boundaries.get();
   }
 
   bool has_adjoint_dirichlet_boundaries(unsigned int q) const;
@@ -1577,7 +1577,7 @@ private:
    * Data structure containing Dirichlet functions.  The ith
    * entry is the constraint matrix row for boundaryid i.
    */
-  DirichletBoundaries * _dirichlet_boundaries;
+  UniquePtr<DirichletBoundaries> _dirichlet_boundaries;
 
   /**
    * Data structure containing Dirichlet functions.  The ith
