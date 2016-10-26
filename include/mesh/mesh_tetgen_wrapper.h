@@ -22,6 +22,7 @@
 #ifdef LIBMESH_HAVE_TETGEN
 
 // Local includes
+#include "auto_ptr.h"
 
 // TetGen include file
 #include "tetgen.h"  // Defines REAL and other Tetgen types
@@ -223,7 +224,7 @@ public:
   /**
    * TetGen output structure.
    */
-  tetgenio *  tetgen_output;
+  UniquePtr<tetgenio> tetgen_output;
 
   /**
    * TetGen mesh structure (from the TetGen library).
