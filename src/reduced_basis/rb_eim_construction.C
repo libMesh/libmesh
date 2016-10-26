@@ -53,7 +53,6 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
   : Parent(es, name_in, number_in),
     best_fit_type_flag(PROJECTION_BEST_FIT),
     _parametrized_functions_in_training_set_initialized(false),
-    _mesh_function(libmesh_nullptr),
     _point_locator_tol(TOLERANCE)
 {
   _explicit_system_name = name_in + "_explicit_sys";
@@ -95,8 +94,7 @@ void RBEIMConstruction::clear()
   Parent::clear();
 
   // clear the mesh function
-  delete _mesh_function;
-  _mesh_function = libmesh_nullptr;
+  _mesh_function.reset();
 
   // clear the eim assembly vector
   for(unsigned int i=0; i<_rb_eim_assembly_objects.size(); i++)
@@ -197,10 +195,10 @@ void RBEIMConstruction::initialize_rb_construction(bool skip_matrix_assembly,
   // solution vector at quadrature points
   std::vector<unsigned int> vars;
   get_explicit_system().get_all_variable_numbers(vars);
-  _mesh_function = new MeshFunction(get_equation_systems(),
-                                    *_ghosted_meshfunction_vector,
-                                    get_explicit_system().get_dof_map(),
-                                    vars);
+  _mesh_function.reset(new MeshFunction(get_equation_systems(),
+                                        *_ghosted_meshfunction_vector,
+                                        get_explicit_system().get_dof_map(),
+                                        vars));
   _mesh_function->init();
 
   // inner_product_solver performs solves with the same matrix every time
