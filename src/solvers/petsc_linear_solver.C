@@ -422,7 +422,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
   Vec subrhs = libmesh_nullptr;
   Vec subsolution = libmesh_nullptr;
   VecScatter scatter = libmesh_nullptr;
-  PetscMatrix<Number> * subprecond_matrix = libmesh_nullptr;
+  UniquePtr<PetscMatrix<Number> > subprecond_matrix;
 
   // Set operators.  Also restrict rhs and solution vector to
   // subdomain if neccessary.
@@ -542,10 +542,9 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
 #endif
       LIBMESH_CHKERR(ierr);
 
-      if(this->_preconditioner)
+      if (this->_preconditioner)
         {
-          subprecond_matrix = new PetscMatrix<Number>(subprecond,
-                                                      this->comm());
+          subprecond_matrix.reset(new PetscMatrix<Number>(subprecond, this->comm()));
           this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
         }
@@ -636,14 +635,12 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
       ierr = LibMeshVecScatterDestroy(&scatter);
       LIBMESH_CHKERR(ierr);
 
-      if(this->_preconditioner)
+      if (this->_preconditioner)
         {
-          /* Before we delete subprecond_matrix, we should give the
-             _preconditioner a different matrix.  */
+          // Before subprecond_matrix gets cleaned up, we should give
+          // the _preconditioner a different matrix.
           this->_preconditioner->set_matrix(matrix_in);
           this->_preconditioner->init();
-          delete subprecond_matrix;
-          subprecond_matrix = libmesh_nullptr;
         }
 
       ierr = LibMeshVecDestroy(&subsolution);
@@ -694,7 +691,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
   Vec subrhs = libmesh_nullptr;
   Vec subsolution = libmesh_nullptr;
   VecScatter scatter = libmesh_nullptr;
-  PetscMatrix<Number> * subprecond_matrix = libmesh_nullptr;
+  UniquePtr<PetscMatrix<Number> > subprecond_matrix;
 
   // Set operators.  Also restrict rhs and solution vector to
   // subdomain if neccessary.
@@ -814,10 +811,9 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
 #endif
       LIBMESH_CHKERR(ierr);
 
-      if(this->_preconditioner)
+      if (this->_preconditioner)
         {
-          subprecond_matrix = new PetscMatrix<Number>(subprecond,
-                                                      this->comm());
+          subprecond_matrix.reset(new PetscMatrix<Number>(subprecond, this->comm()));
           this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
         }
@@ -901,14 +897,12 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
       ierr = LibMeshVecScatterDestroy(&scatter);
       LIBMESH_CHKERR(ierr);
 
-      if(this->_preconditioner)
+      if (this->_preconditioner)
         {
-          /* Before we delete subprecond_matrix, we should give the
-             _preconditioner a different matrix.  */
+          // Before subprecond_matrix gets cleaned up, we should give
+          // the _preconditioner a different matrix.
           this->_preconditioner->set_matrix(matrix_in);
           this->_preconditioner->init();
-          delete subprecond_matrix;
-          subprecond_matrix = libmesh_nullptr;
         }
 
       ierr = LibMeshVecDestroy(&subsolution);
@@ -1231,7 +1225,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
   Vec subrhs = libmesh_nullptr;
   Vec subsolution = libmesh_nullptr;
   VecScatter scatter = libmesh_nullptr;
-  PetscMatrix<Number> * subprecond_matrix = libmesh_nullptr;
+  UniquePtr<PetscMatrix<Number> > subprecond_matrix;
 
   // Close the matrices and vectors in case this wasn't already done.
   solution->close ();
@@ -1385,10 +1379,9 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
 #endif
       LIBMESH_CHKERR(ierr);
 
-      if(this->_preconditioner)
+      if (this->_preconditioner)
         {
-          subprecond_matrix = new PetscMatrix<Number>(subprecond,
-                                                      this->comm());
+          subprecond_matrix.reset(new PetscMatrix<Number>(subprecond, this->comm()));
           this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
         }
@@ -1469,14 +1462,12 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
       ierr = LibMeshVecScatterDestroy(&scatter);
       LIBMESH_CHKERR(ierr);
 
-      if(this->_preconditioner)
+      if (this->_preconditioner)
         {
-          /* Before we delete subprecond_matrix, we should give the
-             _preconditioner a different matrix.  */
+          // Before subprecond_matrix gets cleaned up, we should give
+          // the _preconditioner a different matrix.
           this->_preconditioner->set_matrix(const_cast<SparseMatrix<Number> &>(precond_matrix));
           this->_preconditioner->init();
-          delete subprecond_matrix;
-          subprecond_matrix = libmesh_nullptr;
         }
 
       ierr = LibMeshVecDestroy(&subsolution);
