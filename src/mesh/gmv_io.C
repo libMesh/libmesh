@@ -24,8 +24,6 @@
 // C++ includes
 #include <iomanip>
 #include <fstream>
-#include <cstring> // for std::strcpy, std::memcpy
-#include <cstdio>  // for std::sprintf
 #include <vector>
 
 // Local includes
@@ -1184,69 +1182,65 @@ void GMVIO::write_binary (const std::string & fname,
 
   unsigned int mesh_max_p_level = 0;
 
-  char buf[80];
+  std::string buffer;
 
   // Begin interfacing with the GMV data file
   {
     // write the nodes
-    std::strcpy(buf, "gmvinput");
-    out_stream.write(buf, std::strlen(buf));
+    buffer = "gmvinput";
+    out_stream.write(buffer.c_str(), buffer.size());
 
-    std::strcpy(buf, "ieeei4r4");
-    out_stream.write(buf, std::strlen(buf));
+    buffer = "ieeei4r4";
+    out_stream.write(buffer.c_str(), buffer.size());
   }
 
 
 
   // write the nodes
   {
-    std::strcpy(buf, "nodes   ");
-    out_stream.write(buf, std::strlen(buf));
+    buffer = "nodes   ";
+    out_stream.write(buffer.c_str(), buffer.size());
 
     unsigned int tempint = mesh.n_nodes();
-
-    std::memcpy(buf, &tempint, sizeof(unsigned int));
-
-    out_stream.write(buf, sizeof(unsigned int));
+    out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
     // write the x coordinate
-    float * temp = new float[mesh.n_nodes()];
+    std::vector<float> temp(mesh.n_nodes());
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
       temp[v] = static_cast<float>(mesh.point(v)(0));
-    out_stream.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
+    out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());
 
     // write the y coordinate
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
+      {
 #if LIBMESH_DIM > 1
       temp[v] = static_cast<float>(mesh.point(v)(1));
 #else
-    temp[v] = 0.;
+      temp[v] = 0.;
 #endif
-    out_stream.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
+      }
+    out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());
 
     // write the z coordinate
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
+      {
 #if LIBMESH_DIM > 2
       temp[v] = static_cast<float>(mesh.point(v)(2));
 #else
-    temp[v] = 0.;
+      temp[v] = 0.;
 #endif
-    out_stream.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
-
-    delete [] temp;
+      }
+    out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());
   }
 
 
   // write the connectivity
   {
-    std::strcpy(buf, "cells   ");
-    out_stream.write(buf, std::strlen(buf));
+    buffer = "cells   ";
+    out_stream.write(buffer.c_str(), buffer.size());
 
     unsigned int tempint = n_active_elem;
-
-    std::memcpy(buf, &tempint, sizeof(unsigned int));
-
-    out_stream.write(buf, sizeof(unsigned int));
+    out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
     const MeshBase::const_element_iterator end = mesh.active_elements_end();
@@ -1265,13 +1259,10 @@ void GMVIO::write_binary (const std::string & fname,
             {
               for (unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
                 {
-                  std::strcpy(buf, "line    ");
-                  out_stream.write(buf, std::strlen(buf));
-
+                  buffer = "line    ";
+                  out_stream.write(buffer.c_str(), buffer.size());
                   tempint = 2;
-                  std::memcpy(buf, &tempint, sizeof(unsigned int));
-                  out_stream.write(buf, sizeof(unsigned int));
-
+                  out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
                   std::vector<dof_id_type> conn;
                   (*it)->connectivity(se,TECPLOT,conn);
                   out_stream.write(reinterpret_cast<char *>(&conn[0]), sizeof(unsigned int)*tempint);
@@ -1284,11 +1275,10 @@ void GMVIO::write_binary (const std::string & fname,
             {
               for (unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
                 {
-                  std::strcpy(buf, "quad    ");
-                  out_stream.write(buf, std::strlen(buf));
+                  buffer = "quad    ";
+                  out_stream.write(buffer.c_str(), buffer.size());
                   tempint = 4;
-                  std::memcpy(buf, &tempint, sizeof(unsigned int));
-                  out_stream.write(buf, sizeof(unsigned int));
+                  out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
                   std::vector<dof_id_type> conn;
                   (*it)->connectivity(se,TECPLOT,conn);
                   out_stream.write(reinterpret_cast<char *>(&conn[0]), sizeof(unsigned int)*tempint);
@@ -1300,11 +1290,10 @@ void GMVIO::write_binary (const std::string & fname,
             {
               for (unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
                 {
-                  std::strcpy(buf, "phex8   ");
-                  out_stream.write(buf, std::strlen(buf));
+                  buffer = "phex8   ";
+                  out_stream.write(buffer.c_str(), buffer.size());
                   tempint = 8;
-                  std::memcpy(buf, &tempint, sizeof(unsigned int));
-                  out_stream.write(buf, sizeof(unsigned int));
+                  out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
                   std::vector<dof_id_type> conn;
                   (*it)->connectivity(se,TECPLOT,conn);
                   out_stream.write(reinterpret_cast<char *>(&conn[0]), sizeof(unsigned int)*tempint);
@@ -1329,22 +1318,23 @@ void GMVIO::write_binary (const std::string & fname,
 
       else
         {
-          std::strcpy(buf, "material");
-          out_stream.write(buf, std::strlen(buf));
+          buffer = "material";
+          out_stream.write(buffer.c_str(), buffer.size());
 
           unsigned int tmpint = mesh.n_processors();
-          std::memcpy(buf, &tmpint, sizeof(unsigned int));
-          out_stream.write(buf, sizeof(unsigned int));
+          out_stream.write(reinterpret_cast<char *>(&tmpint), sizeof(unsigned int));
 
           tmpint = 0; // IDs are cell based
-          std::memcpy(buf, &tmpint, sizeof(unsigned int));
-          out_stream.write(buf, sizeof(unsigned int));
-
+          out_stream.write(reinterpret_cast<char *>(&tmpint), sizeof(unsigned int));
 
           for (unsigned int proc=0; proc<mesh.n_processors(); proc++)
             {
-              std::sprintf(buf, "proc_%u", proc);
-              out_stream.write(buf, 8);
+              // We have to write exactly 8 bytes.  This means that
+              // the processor id can be up to 3 characters long, and
+              // we pad it with blank characters on the end.
+              std::ostringstream oss;
+              oss << "proc_" << std::setw(3) << std::left << proc;
+              out_stream.write(oss.str().c_str(), oss.str().size());
             }
 
           std::vector<unsigned int> proc_id (n_active_elem);
@@ -1384,8 +1374,8 @@ void GMVIO::write_binary (const std::string & fname,
 
   if (write_variable)
     {
-      std::strcpy(buf, "variable");
-      out_stream.write(buf, std::strlen(buf));
+      buffer = "variable";
+      out_stream.write(buffer.c_str(), buffer.size());
     }
 
   // optionally write the partition information
@@ -1395,15 +1385,13 @@ void GMVIO::write_binary (const std::string & fname,
       for (unsigned int i=0; i != mesh.mesh_dimension(); ++i)
         n_floats *= 2;
 
-      float * temp = new float[n_floats];
+      std::vector<float> temp(n_floats);
 
-      std::strcpy(buf, "p_level");
-      out_stream.write(buf, std::strlen(buf));
+      buffer = "p_level";
+      out_stream.write(buffer.c_str(), buffer.size());
 
       unsigned int tempint = 0; // p levels are cell data
-
-      std::memcpy(buf, &tempint, sizeof(unsigned int));
-      out_stream.write(buf, sizeof(unsigned int));
+      out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
       MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
       const MeshBase::const_element_iterator end = mesh.active_elements_end();
@@ -1413,10 +1401,8 @@ void GMVIO::write_binary (const std::string & fname,
         for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
           temp[n++] = static_cast<float>( (*it)->p_level() );
 
-      out_stream.write(reinterpret_cast<char *>(temp),
+      out_stream.write(reinterpret_cast<char *>(&temp[0]),
                        sizeof(float)*n_floats);
-
-      delete [] temp;
     }
 
 
@@ -1431,13 +1417,11 @@ void GMVIO::write_binary (const std::string & fname,
       //        for (; it != end; ++it)
       //  {
       //    // Write out the variable name ...
-      //    std::strcpy(buf, (*it).first.c_str());
-      //    out_stream.write(buf, std::strlen(buf));
+      //    out_stream.write(it->first.c_str(), it->first.size());
 
       //    // ... followed by a zero.
       //    unsigned int tempint = 0; // 0 signifies cell data
-      //    std::memcpy(buf, &tempint, sizeof(unsigned int));
-      //    out_stream.write(buf, sizeof(unsigned int));
+      //    out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
       //    // Get a pointer to the array of cell-centered data values
       //    const std::vector<Real> * the_array = (*it).second;
@@ -1445,7 +1429,7 @@ void GMVIO::write_binary (const std::string & fname,
       //   // Since the_array might contain zeros (for inactive elements) we need to
       //   // make a copy of it containing just values for active elements.
       //   const unsigned int n_floats = n_active_elem * (1<<mesh.mesh_dimension());
-      //   float * temp = new float[n_floats];
+      //   std::vector<float> temp(n_floats);
 
       //   MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
       //   const MeshBase::const_element_iterator elem_end = mesh.active_elements_end();
@@ -1462,10 +1446,8 @@ void GMVIO::write_binary (const std::string & fname,
 
 
       //    // Write "the_array" directly to the file
-      //    out_stream.write(reinterpret_cast<char *>(temp),
+      //    out_stream.write(reinterpret_cast<char *>(&temp[0]),
       //      sizeof(float)*n_floats);
-
-      //   delete [] temp;
       //  }
     }
 
@@ -1476,7 +1458,7 @@ void GMVIO::write_binary (const std::string & fname,
   if ((solution_names != libmesh_nullptr) &&
       (vec != libmesh_nullptr))
     {
-      float * temp = new float[mesh.n_nodes()];
+      std::vector<float> temp(mesh.n_nodes());
 
       const unsigned int n_vars =
         cast_int<unsigned int>(solution_names->size());
@@ -1489,84 +1471,75 @@ void GMVIO::write_binary (const std::string & fname,
 
 
           // Real part
-          std::strcpy(buf, "r_");
-          out_stream.write(buf, 2);
-          std::strcpy(buf, (*solution_names)[c].c_str());
-          out_stream.write(buf, 6);
+          buffer = "r_";
+          out_stream.write(buffer.c_str(), buffer.size());
+
+          buffer = (*solution_names)[c];
+          out_stream.write(buffer.c_str(), buffer.size());
 
           unsigned int tempint = 1; // always do nodal data
-          std::memcpy(buf, &tempint, sizeof(unsigned int));
-          out_stream.write(buf, sizeof(unsigned int));
+          out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
             temp[n] = static_cast<float>( (*vec)[n*n_vars + c].real() );
 
-          out_stream.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
+          out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());
 
 
           // imaginary part
-          std::strcpy(buf, "i_");
-          out_stream.write(buf, 2);
-          std::strcpy(buf, (*solution_names)[c].c_str());
-          out_stream.write(buf, 6);
+          buffer = "i_";
+          out_stream.write(buffer.c_str(), buffer.size());
 
-          std::memcpy(buf, &tempint, sizeof(unsigned int));
-          out_stream.write(buf, sizeof(unsigned int));
+          buffer = (*solution_names)[c];
+          out_stream.write(buffer.c_str(), buffer.size());
+
+          out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
             temp[n] = static_cast<float>( (*vec)[n*n_vars + c].imag() );
 
-          out_stream.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
+          out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());
 
           // magnitude
-          std::strcpy(buf, "a_");
-          out_stream.write(buf, 2);
-          std::strcpy(buf, (*solution_names)[c].c_str());
-          out_stream.write(buf, 6);
+          buffer = "a_";
+          out_stream.write(buffer.c_str(), buffer.size());
+          buffer = (*solution_names)[c];
+          out_stream.write(buffer.c_str(), buffer.size());
 
-          std::memcpy(buf, &tempint, sizeof(unsigned int));
-          out_stream.write(buf, sizeof(unsigned int));
+          out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
             temp[n] = static_cast<float>(std::abs((*vec)[n*n_vars + c]));
 
-          out_stream.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
+          out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());
 
 #else
 
-
-          std::strcpy(buf, (*solution_names)[c].c_str());
-          out_stream.write(buf, 8);
+          buffer = (*solution_names)[c];
+          out_stream.write(buffer.c_str(), buffer.size());
 
           unsigned int tempint = 1; // always do nodal data
-          std::memcpy(buf, &tempint, sizeof(unsigned int));
-          out_stream.write(buf, sizeof(unsigned int));
+          out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
           for (unsigned int n=0; n<mesh.n_nodes(); n++)
             temp[n] = static_cast<float>((*vec)[n*n_vars + c]);
 
-          out_stream.write(reinterpret_cast<char *>(temp), sizeof(float)*mesh.n_nodes());
-
+          out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());
 
 #endif
-
-
         }
-
-      delete [] temp;
-
     }
 
   // If we wrote any variables, we have to close the variable section now
   if (write_variable)
     {
-      std::strcpy(buf, "endvars ");
-      out_stream.write(buf, std::strlen(buf));
+      buffer = "endvars ";
+      out_stream.write(buffer.c_str(), buffer.size());
     }
 
   // end the file
-  std::strcpy(buf, "endgmv  ");
-  out_stream.write(buf, std::strlen(buf));
+  buffer = "endgmv  ";
+  out_stream.write(buffer.c_str(), buffer.size());
 }
 
 
@@ -2087,8 +2060,13 @@ void GMVIO::read (const std::string & name)
   // Done reading in the mesh, now call find_neighbors, etc.
   // mesh.find_neighbors();
 
-  // Pass true flag to skip renumbering nodes and elements
-  mesh.prepare_for_use(true);
+  // Don't allow renumbering of nodes and elements when calling
+  // prepare_for_use().  It is usually confusing for users when the
+  // Mesh gets renumbered automatically, since sometimes there are
+  // other parts of the simulation which rely on the original
+  // ordering.
+  mesh.allow_renumbering(false);
+  mesh.prepare_for_use();
 #endif
 }
 

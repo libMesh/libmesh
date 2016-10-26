@@ -40,8 +40,7 @@ class MeshBase;
 /**
  * This class implements writing meshes in the GMV format.
  * For a full description of the GMV format and to obtain the
- * GMV software see
- * <a href="http://laws.lanl.gov/XCM/gmv/GMVHome.html">the GMV home page</a>
+ * GMV software see http://www.generalmeshviewer.com
  *
  * \author Benjamin S. Kirk
  * \date 2004
@@ -105,14 +104,10 @@ public:
                                  const std::vector<std::string> &) libmesh_override;
 
   /**
-   * Flag indicating whether or not to write a binary file.  While binary
-   * files may end up being smaller than equivalent ASCII files, they will
-   * almost certainly take longer to write.  The reason for this is that
-   * the ostream::write() function which is used to write "binary" data to
-   * streams, only takes a pointer to char as its first argument.  This means
-   * if you want to write anything other than a buffer of chars, you first
-   * have to use a strange memcpy hack to get the data into the desired format.
-   * See the templated to_binary_stream() function below.
+   * Flag indicating whether or not to write a binary file.  While
+   * binary files may end up being smaller than equivalent ASCII
+   * files, they are harder to debug if anything goes wrong, since
+   * they are not human-readable.
    */
   bool & binary ();
 
@@ -206,14 +201,6 @@ private:
   void write_binary (const std::string &,
                      const std::vector<Number> * = libmesh_nullptr,
                      const std::vector<std::string> * = libmesh_nullptr);
-
-  /**
-   * Helper function for writing unsigned ints to an ostream in binary format.
-   * Implemented via memcpy as suggested in the standard.
-   */
-  template <typename T>
-  void to_binary_stream(std::ostream & out,
-                        const T i);
 
   /**
    * Flag to write binary data.
@@ -342,17 +329,6 @@ inline
 bool & GMVIO::p_levels()
 {
   return _p_levels;
-}
-
-
-
-template <typename T>
-void GMVIO::to_binary_stream(std::ostream & out_str,
-                             const T i)
-{
-  static char buf[sizeof(T)];
-  memcpy(buf, &i, sizeof(T));
-  out_str.write(buf, sizeof(T));
 }
 
 } // namespace libMesh
