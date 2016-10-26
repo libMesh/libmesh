@@ -15,12 +15,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// Changes:
-// o no more subelements, all elements are written down to GMV directly
-// o Some nodes have to be left out, eg node 8 in QUAD9
-// o
-
-
 // C++ includes
 #include <iomanip>
 #include <fstream>
@@ -202,7 +196,36 @@ namespace libMesh
 {
 
 // ------------------------------------------------------------
-// GMVIO  members
+// GMVIO members
+GMVIO::GMVIO (const MeshBase & mesh) :
+  MeshOutput<MeshBase>    (mesh),
+  _binary                 (false),
+  _discontinuous          (false),
+  _partitioning           (true),
+  _write_subdomain_id_as_material (false),
+  _subdivide_second_order (true),
+  _p_levels               (true),
+  _next_elem_id           (0)
+{
+}
+
+
+
+GMVIO::GMVIO (MeshBase & mesh) :
+  MeshInput<MeshBase> (mesh),
+  MeshOutput<MeshBase>(mesh),
+  _binary (false),
+  _discontinuous          (false),
+  _partitioning           (true),
+  _write_subdomain_id_as_material (false),
+  _subdivide_second_order (true),
+  _p_levels               (true),
+  _next_elem_id           (0)
+{
+}
+
+
+
 void GMVIO::write (const std::string & fname)
 {
   if (this->binary())
@@ -791,11 +814,9 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                                    << (*it)->node_id(15)+1 << " ";
                       }
 #else
-                    /*
-                     * In case of infinite elements, HEX20
-                     * should be handled just like the
-                     * INFHEX16, since these connect to each other
-                     */
+                    // In case of infinite elements, HEX20
+                    // should be handled just like the
+                    // INFHEX16, since these connect to each other
                     if (((*it)->type() == HEX8)     ||
                         ((*it)->type() == HEX27)    ||
                         ((*it)->type() == INFHEX8)  ||
@@ -838,10 +859,8 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                              ((*it)->type() == INFPRISM12))
 #endif
                       {
-                        /**
-                         * Note that the prisms are treated as
-                         * degenerated phex8's.
-                         */
+                        // Note that the prisms are treated as
+                        // degenerated phex8's.
                         out_stream << "phex8 8\n";
                         (*it)->connectivity(se, TECPLOT, conn);
                         for (unsigned int i=0; i<conn.size(); i++)
@@ -888,10 +907,8 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
 #endif
                            )
                     {
-                      /**
-                       * Note that the prisms are treated as
-                       * degenerated phex8's.
-                       */
+                      // Note that the prisms are treated as
+                      // degenerated phex8's.
                       out_stream << "phex8 8\n";
                       lo_elem->connectivity(0, TECPLOT, conn);
                       for (unsigned int i=0; i<conn.size(); i++)
@@ -1167,6 +1184,10 @@ void GMVIO::write_binary (const std::string & fname,
                           const std::vector<Number> * vec,
                           const std::vector<std::string> * solution_names)
 {
+  // We use the file-scope global variable eletypes for mapping nodes
+  // from GMV to libmesh indices, so initialize that data now.
+  init_eletypes();
+
   // Get a reference to the mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
@@ -1250,61 +1271,46 @@ void GMVIO::write_binary (const std::string & fname,
         const Elem * elem = *it;
 
         mesh_max_p_level = std::max(mesh_max_p_level,
-                                    (*it)->p_level());
+                                    elem->p_level());
 
-        switch (elem->dim())
+        // The ElementDefinition label contains the GMV name
+        // and the number of nodes for the respective
+        // element.
+        const ElementDefinition & ed = eletypes[elem->type()];
+
+        // The ElementDefinition labels all have a name followed by a
+        // whitespace and then the number of nodes.  To write the
+        // string in binary, we want to drop everything after that
+        // space, and then pad the string out to 8 characters.
+        buffer = ed.label;
+
+        // Erase everything from the first whitespace character to the end of the string.
+        buffer.erase(buffer.find_first_of(' '), std::string::npos);
+
+        // Append whitespaces until the string is exactly 8 characters long.
+        while (buffer.size() < 8)
+          buffer.insert(buffer.end(), ' ');
+
+        // Debugging:
+        // libMesh::out << "Writing element with name = '" << buffer << "'" << std::endl;
+
+        // Finally, write the 8 character stream to file.
+        out_stream.write(buffer.c_str(), buffer.size());
+
+        // Write the number of nodes that this type of element has.
+        // Note: don't want to use the number of nodes of the element,
+        // because certain elements, like QUAD9 and HEX27 only support
+        // being written out as lower-order elements (QUAD8 and HEX20,
+        // respectively).
+        tempint = ed.node_map.size();
+        out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
+
+        // Write the element connectivity
+        for (unsigned int i=0; i<ed.node_map.size(); i++)
           {
-
-          case 1:
-            {
-              for (unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
-                {
-                  buffer = "line    ";
-                  out_stream.write(buffer.c_str(), buffer.size());
-                  tempint = 2;
-                  out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
-                  std::vector<dof_id_type> conn;
-                  (*it)->connectivity(se,TECPLOT,conn);
-                  out_stream.write(reinterpret_cast<char *>(&conn[0]), sizeof(unsigned int)*tempint);
-                }
-
-              break;
-            }
-
-          case 2:
-            {
-              for (unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
-                {
-                  buffer = "quad    ";
-                  out_stream.write(buffer.c_str(), buffer.size());
-                  tempint = 4;
-                  out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
-                  std::vector<dof_id_type> conn;
-                  (*it)->connectivity(se,TECPLOT,conn);
-                  out_stream.write(reinterpret_cast<char *>(&conn[0]), sizeof(unsigned int)*tempint);
-                }
-
-              break;
-            }
-          case 3:
-            {
-              for (unsigned se = 0; se < (*it)->n_sub_elem(); ++se)
-                {
-                  buffer = "phex8   ";
-                  out_stream.write(buffer.c_str(), buffer.size());
-                  tempint = 8;
-                  out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
-                  std::vector<dof_id_type> conn;
-                  (*it)->connectivity(se,TECPLOT,conn);
-                  out_stream.write(reinterpret_cast<char *>(&conn[0]), sizeof(unsigned int)*tempint);
-                }
-
-              break;
-            }
-          default:
-            libmesh_error_msg("Unsupported mesh dimension: " << mesh.mesh_dimension());
+            dof_id_type id = elem->node_id(ed.node_map[i]) + 1;
+            out_stream.write(reinterpret_cast<char *>(&id), sizeof(dof_id_type));
           }
-
       }
   }
 
@@ -1345,8 +1351,13 @@ void GMVIO::write_binary (const std::string & fname,
           const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
           for ( ; it != end; ++it)
-            for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-              proc_id[n++] = (*it)->processor_id()+1;
+            {
+              const Elem * elem = *it;
+
+              // We no longer write sub-elems in GMV, so just assign a
+              // processor id value to each element.
+              proc_id[n++] = elem->processor_id() + 1;
+            }
 
 
           out_stream.write(reinterpret_cast<char *>(&proc_id[0]),
@@ -1959,7 +1970,7 @@ void GMVIO::read (const std::string & name)
     {
       GMVLib::gmvread_data();
 
-      /*  Check for GMVEND.  */
+      // Check for GMVEND.
       if (GMVLib::gmv_data.keyword == GMVEND)
         {
           iend = 1;
@@ -1967,11 +1978,11 @@ void GMVIO::read (const std::string & name)
           break;
         }
 
-      /*  Check for GMVERROR.  */
+      // Check for GMVERROR.
       if (GMVLib::gmv_data.keyword == GMVERROR)
         libmesh_error_msg("Encountered GMVERROR while reading!");
 
-      /*  Process the data.  */
+      // Process the data.
       switch (GMVLib::gmv_data.keyword)
         {
         case NODES:
@@ -2131,10 +2142,8 @@ void GMVIO::_read_materials()
 void GMVIO::_read_nodes()
 {
 #ifdef LIBMESH_HAVE_GMV
-  //   // Debug Info
-  //   libMesh::out << "gmv_data.datatype="
-  //     <<  GMVLib::gmv_data.datatype
-  //     << std::endl;
+  // Debugging
+  // libMesh::out << "gmv_data.datatype = " << GMVLib::gmv_data.datatype << std::endl;
 
   // LibMesh writes UNSTRUCT=100 node data
   libmesh_assert_equal_to (GMVLib::gmv_data.datatype, UNSTRUCT);
@@ -2143,21 +2152,19 @@ void GMVIO::_read_nodes()
   // and is nnodes long
   for (int i = 0; i < GMVLib::gmv_data.num; i++)
     {
-      //       libMesh::out << "(x,y,z)="
-      // << "("
-      // << GMVLib::gmv_data.doubledata1[i]
-      // << ","
-      // << GMVLib::gmv_data.doubledata2[i]
-      // << ","
-      // << GMVLib::gmv_data.doubledata3[i]
-      // << ")"
-      // << std::endl;
+      // Debugging
+      // libMesh::out << "(x,y,z)="
+      //              << "("
+      //              << GMVLib::gmv_data.doubledata1[i] << ","
+      //              << GMVLib::gmv_data.doubledata2[i] << ","
+      //              << GMVLib::gmv_data.doubledata3[i]
+      //              << ")"
+      //              << std::endl;
 
       // Add the point to the Mesh
-      MeshInput<MeshBase>::mesh().add_point
-        ( Point(GMVLib::gmv_data.doubledata1[i],
-                GMVLib::gmv_data.doubledata2[i],
-                GMVLib::gmv_data.doubledata3[i]), i);
+      MeshInput<MeshBase>::mesh().add_point(Point(GMVLib::gmv_data.doubledata1[i],
+                                                  GMVLib::gmv_data.doubledata2[i],
+                                                  GMVLib::gmv_data.doubledata3[i]), i);
     }
 #endif
 }
@@ -2166,10 +2173,8 @@ void GMVIO::_read_nodes()
 void GMVIO::_read_one_cell()
 {
 #ifdef LIBMESH_HAVE_GMV
-  //   // Debug Info
-  //   libMesh::out << "gmv_data.datatype="
-  //     <<  GMVLib::gmv_data.datatype
-  //     << std::endl;
+  // Debugging
+  // libMesh::out << "gmv_data.datatype=" << GMVLib::gmv_data.datatype << std::endl;
 
   // This is either a REGULAR=111 cell or
   // the ENDKEYWORD=207 of the cells
@@ -2184,14 +2189,9 @@ void GMVIO::_read_one_cell()
 
   if (GMVLib::gmv_data.datatype == REGULAR)
     {
-      //       libMesh::out << "Name of the cell is: "
-      // << GMVLib::gmv_data.name1
-      // << std::endl;
-
-      //       libMesh::out << "Cell has "
-      // << GMVLib::gmv_data.num2
-      // << " vertices."
-      // << std::endl;
+      // Debugging
+      // libMesh::out << "Name of the cell is: " << GMVLib::gmv_data.name1 << std::endl;
+      // libMesh::out << "Cell has " << GMVLib::gmv_data.num2 << " vertices." << std::endl;
 
       // We need a mapping from GMV element types to LibMesh
       // ElemTypes.  Basically the reverse of the eletypes
@@ -2212,10 +2212,8 @@ void GMVIO::_read_one_cell()
       // this cell.
       for (int i=0; i<GMVLib::gmv_data.num2; i++)
         {
-          //   // Debugging info
-          //   libMesh::out << "Vertex " << i << " is node "
-          //     << GMVLib::gmv_data.longdata1[i]
-          //     << std::endl;
+          // Debugging
+          // libMesh::out << "Vertex " << i << " is node " << GMVLib::gmv_data.longdata1[i] << std::endl;
 
           // Map index i to GMV's numbering scheme
           unsigned mapped_i = eledef.node_map[i];
@@ -2381,9 +2379,9 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
                   // Since this var came from a GMV file, the index i corresponds to
                   // the (single) DOF value of the current variable for node i.
                   const unsigned int dof_index =
-                    MeshInput<MeshBase>::mesh().node_ptr(i)->dof_number(sys,      /*system #*/
-                                                                        var_num,  /*var # */
-                                                                        0);       /*component #, always zero for LAGRANGE */
+                    MeshInput<MeshBase>::mesh().node_ptr(i)->dof_number(sys,      // system #
+                                                                        var_num,  // var #
+                                                                        0);       // component #, always zero for LAGRANGE
 
                   // libMesh::out << "Value " << i << ": "
                   //     << (*it).second [i]

@@ -27,8 +27,6 @@
 #include "libmesh/enum_elem_type.h"
 
 // C++ includes
-#include <cstddef>
-#include <cstring>  // for memcpy
 #include <map>
 
 namespace libMesh
@@ -74,21 +72,6 @@ public:
    */
   virtual void read (const std::string & mesh_file) libmesh_override;
 
-  //   /**
-  //    * This method implements reading a mesh from a specified file.
-  //    */
-  //   virtual void read (const std::string & mesh_file)
-  //   { this->read_mesh_and_nodal_data(mesh_file, libmesh_nullptr); }
-
-  //   /**
-  //    * Extension of the MeshInput::read() routine which
-  //    * also takes an optional EquationSystems pointer and
-  //    * tries to read field variables from the GMV file
-  //    * into the EquationSystems object.
-  //    */
-  //   virtual void read_mesh_and_nodal_data (const std::string & ,
-  //  EquationSystems * es=libmesh_nullptr);
-
   /**
    * Bring in base class functionality for name resolution and to
    * avoid warnings about hidden overloaded virtual functions.
@@ -109,38 +92,38 @@ public:
    * files, they are harder to debug if anything goes wrong, since
    * they are not human-readable.
    */
-  bool & binary ();
+  bool & binary () { return _binary; }
 
   /**
    * Flag indicating whether or not to write the mesh
    * as discontinuous cell patches
    */
-  bool & discontinuous();
+  bool & discontinuous() { return _discontinuous; }
 
   /**
    * Flag indicating whether or not to write the partitioning
    * information for the mesh.
    */
-  bool & partitioning();
+  bool & partitioning() { return _partitioning; }
 
   /**
    * Flag to write element subdomain_id's as GMV "materials" instead
    * of element processor_id's.  Allows you to generate exploded views
    * on user-defined subdomains, potentially creating a pretty picture.
    */
-  bool & write_subdomain_id_as_material();
+  bool & write_subdomain_id_as_material() { return _write_subdomain_id_as_material; }
 
   /**
    * Flag indicating whether or not to subdivide second order
    * elements
    */
-  bool & subdivide_second_order();
+  bool & subdivide_second_order() { return _subdivide_second_order; }
 
   /**
    * Flag indicating whether or not to write p level
    * information for p refined meshes
    */
-  bool & p_levels();
+  bool & p_levels() { return _p_levels; }
 
   /**
    * Writes a GMV file with discontinuous data
@@ -252,84 +235,6 @@ private:
   void _read_var();
   std::map<std::string, std::vector<Number> > _nodal_data;
 };
-
-
-
-// ------------------------------------------------------------
-// GMVIO inline members
-inline
-GMVIO::GMVIO (const MeshBase & mesh) :
-  MeshOutput<MeshBase>    (mesh),
-  _binary                 (false),
-  _discontinuous          (false),
-  _partitioning           (true),
-  _write_subdomain_id_as_material (false),
-  _subdivide_second_order (true),
-  _p_levels               (true),
-  _next_elem_id           (0)
-{
-}
-
-inline
-GMVIO::GMVIO (MeshBase & mesh) :
-  MeshInput<MeshBase> (mesh),
-  MeshOutput<MeshBase>(mesh),
-  _binary (false),
-  _discontinuous          (false),
-  _partitioning           (true),
-  _write_subdomain_id_as_material (false),
-  _subdivide_second_order (true),
-  _p_levels               (true),
-  _next_elem_id           (0)
-{
-}
-
-
-
-inline
-bool & GMVIO::binary ()
-{
-  return _binary;
-}
-
-
-
-inline
-bool & GMVIO::discontinuous ()
-{
-  return _discontinuous;
-}
-
-
-
-inline
-bool & GMVIO::partitioning ()
-{
-  return _partitioning;
-}
-
-
-inline
-bool & GMVIO::write_subdomain_id_as_material ()
-{
-  return _write_subdomain_id_as_material;
-}
-
-
-
-inline
-bool & GMVIO::subdivide_second_order ()
-{
-  return _subdivide_second_order;
-}
-
-
-
-inline
-bool & GMVIO::p_levels()
-{
-  return _p_levels;
-}
 
 } // namespace libMesh
 
