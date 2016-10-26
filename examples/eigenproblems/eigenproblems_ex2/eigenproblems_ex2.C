@@ -157,10 +157,8 @@ int main (int argc, char ** argv)
   eigen_system.set_eigenproblem_type(GHEP);
 
   // Set the eigenvalues to be computed. Note that not
-  // all solvers support this.
-#ifdef LIBMESH_HAVE_SLEPC
+  // all solvers in SLEPc support this capability.
   eigen_system.eigen_solver->set_position_of_spectrum(2.3);
-#endif
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
