@@ -1058,7 +1058,7 @@ public:
 
   PeriodicBoundaries * get_periodic_boundaries()
   {
-    return _periodic_boundaries;
+    return _periodic_boundaries.get();
   }
 
 #endif // LIBMESH_ENABLE_PERIODIC
@@ -1563,7 +1563,7 @@ private:
    * Data structure containing periodic boundaries.  The ith
    * entry is the constraint matrix row for boundaryid i.
    */
-  PeriodicBoundaries * _periodic_boundaries;
+  UniquePtr<PeriodicBoundaries> _periodic_boundaries;
 #endif
 
 #ifdef LIBMESH_ENABLE_DIRICHLET

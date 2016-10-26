@@ -184,8 +184,8 @@ DofMap::DofMap(const unsigned int number,
   _default_evaluating->set_n_levels(1);
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  _default_coupling->set_periodic_boundaries(_periodic_boundaries);
-  _default_evaluating->set_periodic_boundaries(_periodic_boundaries);
+  _default_coupling->set_periodic_boundaries(_periodic_boundaries.get());
+  _default_evaluating->set_periodic_boundaries(_periodic_boundaries.get());
 #endif
 
   this->add_coupling_functor(*_default_coupling);
@@ -204,9 +204,6 @@ DofMap::~DofMap()
   _mesh.remove_ghosting_functor(*_default_coupling);
   _mesh.remove_ghosting_functor(*_default_evaluating);
 
-#ifdef LIBMESH_ENABLE_PERIODIC
-  delete _periodic_boundaries;
-#endif
 #ifdef LIBMESH_ENABLE_DIRICHLET
   delete _dirichlet_boundaries;
   for (unsigned int q = 0; q != _adjoint_dirichlet_boundaries.size(); ++q)
