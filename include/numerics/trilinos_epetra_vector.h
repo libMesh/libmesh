@@ -475,7 +475,7 @@ private:
   /**
    * Holds the distributed Map
    */
-  Epetra_Map * _map;
+  UniquePtr<Epetra_Map> _map;
 
   /**
    * This boolean value should only be set to false
@@ -699,10 +699,10 @@ EpetraVector<T>::EpetraVector(Epetra_Vector & v,
   myFirstID_ = _vec->Map().MinMyGID();
   myNumIDs_ = _vec->Map().NumMyElements();
 
-  _map = new Epetra_Map(_vec->GlobalLength(),
-                        _vec->MyLength(),
-                        0, // IndexBase = 0 for C/C++, 1 for Fortran.
-                        Epetra_MpiComm (this->comm().get()));
+  _map.reset(new Epetra_Map(_vec->GlobalLength(),
+                            _vec->MyLength(),
+                            0, // IndexBase = 0 for C/C++, 1 for Fortran.
+                            Epetra_MpiComm (this->comm().get())));
 
   //Currently we impose the restriction that NumVectors==1, so we won't
   //need the LDA argument when calling ExtractView. Hence the "dummy" arg.
@@ -791,10 +791,10 @@ void EpetraVector<T>::init (const numeric_index_type n,
   libmesh_assert ((this->_type==SERIAL && n==my_n_local) ||
                   this->_type==PARALLEL);
 
-  _map = new Epetra_Map(static_cast<int>(n),
-                        my_n_local,
-                        0,
-                        Epetra_MpiComm (this->comm().get()));
+  _map.reset(new Epetra_Map(static_cast<int>(n),
+                            my_n_local,
+                            0,
+                            Epetra_MpiComm (this->comm().get())));
 
   _vec = new Epetra_Vector(*_map);
 
@@ -878,8 +878,7 @@ void EpetraVector<T>::clear ()
         }
 
       // But we currently always own our own _map
-      delete _map;
-      _map = libmesh_nullptr;
+      _map.reset();
     }
 
   this->_is_closed = this->_is_initialized = false;
@@ -1015,7 +1014,7 @@ void EpetraVector<T>::swap (NumericVector<T> & other)
   EpetraVector<T> & v = cast_ref<EpetraVector<T> &>(other);
 
   std::swap(_vec, v._vec);
-  std::swap(_map, v._map);
+  _map.swap(v._map);
   std::swap(_destroy_vec_on_exit, v._destroy_vec_on_exit);
   std::swap(myFirstID_, v.myFirstID_);
   std::swap(myNumIDs_, v.myNumIDs_);
