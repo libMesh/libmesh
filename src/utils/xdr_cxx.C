@@ -483,18 +483,21 @@ template <>
 bool xdr_translate(XDR * x,
                    std::string & s)
 {
-  char * sptr = new char[xdr_MAX_STRING_LENGTH+1];
+  char sptr[xdr_MAX_STRING_LENGTH+1];
   std::copy(s.begin(), s.end(), sptr);
   sptr[s.size()] = 0;
   unsigned int length = xdr_MAX_STRING_LENGTH;
-  bool b = xdr_string(x, &sptr, length);
+
+  // Get a pointer to the beginning of the buffer.  We need to pass
+  // its address to the xdr API.
+  char * begin = sptr;
+  bool b = xdr_string(x, &begin, length);
 
   // This is necessary when reading, but inefficient when writing...
   length = cast_int<unsigned int>(std::strlen(sptr));
   s.resize(length);
   std::copy(sptr, sptr+length, s.begin());
 
-  delete [] sptr;
   return b;
 }
 
