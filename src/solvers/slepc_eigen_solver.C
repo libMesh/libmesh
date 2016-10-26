@@ -836,7 +836,7 @@ void SlepcEigenSolver<T>::set_initial_space(NumericVector<T> & initial_space_in)
 template <typename T>
 PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, Vec dest)
 {
-  /* Get the matrix context.  */
+  // Get the matrix context.
   PetscErrorCode ierr=0;
   void * ctx;
   ierr = MatShellGetContext(mat,&ctx);
@@ -845,14 +845,14 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, V
   PetscObjectGetComm((PetscObject)mat,&comm);
   CHKERRABORT(comm,ierr);
 
-  /* Get user shell matrix object.  */
+  // Get user shell matrix object.
   const ShellMatrix<T> & shell_matrix = *static_cast<const ShellMatrix<T> *>(ctx);
 
-  /* Make \p NumericVector instances around the vectors.  */
+  // Make \p NumericVector instances around the vectors.
   PetscVector<T> arg_global(arg,   shell_matrix.comm());
   PetscVector<T> dest_global(dest, shell_matrix.comm());
 
-  /* Call the user function.  */
+  // Call the user function.
   shell_matrix.vector_mult(dest_global,arg_global);
 
   return ierr;
@@ -861,7 +861,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, V
 template <typename T>
 PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Vec dest)
 {
-  /* Get the matrix context.  */
+  // Get the matrix context.
   PetscErrorCode ierr=0;
   void * ctx;
   ierr = MatShellGetContext(mat,&ctx);
@@ -870,13 +870,13 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
   PetscObjectGetComm((PetscObject)mat,&comm);
   CHKERRABORT(comm,ierr);
 
-  /* Get user shell matrix object.  */
+  // Get user shell matrix object.
   const ShellMatrix<T> & shell_matrix = *static_cast<const ShellMatrix<T> *>(ctx);
 
-  /* Make \p NumericVector instances around the vector.  */
+  // Make \p NumericVector instances around the vector.
   PetscVector<T> dest_global(dest, shell_matrix.comm());
 
-  /* Call the user function.  */
+  // Call the user function.
   shell_matrix.get_diagonal(dest_global);
 
   return ierr;
