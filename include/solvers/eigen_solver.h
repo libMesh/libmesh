@@ -250,7 +250,6 @@ protected:
   SolverConfiguration * _solver_configuration;
 
   Real _target_val;
-
 };
 
 

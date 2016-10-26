@@ -63,18 +63,19 @@ void EigenSolver<T>::set_solver_configuration(SolverConfiguration & solver_confi
 template <typename T>
 void EigenSolver<T>::set_position_of_spectrum (Real pos)
 {
-   if (pos>=0)
-     _position_of_spectrum=TARGET_MAGNITUDE;
+  if (pos >= 0)
+    _position_of_spectrum = TARGET_MAGNITUDE;
   else
-     _position_of_spectrum= TARGET_REAL;
-  _target_val=pos;
+    _position_of_spectrum = TARGET_REAL;
+
+  _target_val = pos;
 }
 
 template <typename T>
 void EigenSolver<T>::set_position_of_spectrum (Real pos, PositionOfSpectrum target)
 {
-    _position_of_spectrum=target;
-    _target_val=pos;
+  _position_of_spectrum = target;
+  _target_val = pos;
 }
 
 
@@ -84,5 +85,6 @@ void EigenSolver<T>::set_position_of_spectrum (Real pos, PositionOfSpectrum targ
 template class EigenSolver<Number>;
 
 } // namespace libMesh
+
 
 #endif // LIBMESH_HAVE_SLEPC
