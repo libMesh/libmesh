@@ -1278,9 +1278,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // vertices were also parent vertices; we'll cache an
           // intermediate fact outside the nodes loop.
           int i_am_child = -1;
+#ifdef LIBMESH_ENABLE_AMR
           if (elem->parent())
             i_am_child = elem->parent()->which_child_am_i(elem);
-
+#endif
           // In general, we need a series of
           // projections to ensure a unique and continuous
           // solution.  We start by interpolating nodes, then
