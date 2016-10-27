@@ -109,9 +109,15 @@ public:
    * Returns a pointer to a linear solver appropriate for use in
    * adjoint and/or sensitivity solves
    *
-   * In \p ImplicitSystem this just gives us a default LinearSolver;
-   * but it may be overridden in derived systems, e.g. to set solver
-   * parameters
+   * This function must be overridden in derived classes, since this
+   * base class does not have a valid LinearSolver to hand back a
+   * pointer to.  Its current behavior, i.e. allocating a LinearSolver
+   * and handing it back to the user, makes it very easy to leak
+   * memory, and probably won't have the intended effect, i.e. of
+   * setting some parameters on a LinearSolver that the System would
+   * later use internally.  This function is currently
+   * libmesh_deprecated() but will eventually become a libmesh_error()
+   * to call.
    */
   virtual LinearSolver<Number> * get_linear_solver() const;
 
@@ -126,6 +132,10 @@ public:
   /**
    * Releases a pointer to a linear solver acquired by
    * \p this->get_linear_solver()
+   *
+   * This function is designed to work with the now deprecated
+   * get_linear_solver() function, so its use is now deprecated as
+   * well.
    */
   virtual void release_linear_solver(LinearSolver<Number> *) const;
 
