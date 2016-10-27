@@ -176,7 +176,8 @@ CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
 am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/default_coupling_test.C \
-	base/getpot_test.C base/auto_ptr_test.C fe/fe_bernstein_test.C \
+	base/getpot_test.C base/point_neighbor_coupling_test.C \
+	base/auto_ptr_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
 	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
@@ -209,6 +210,7 @@ am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	base/unit_tests_dbg-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_dbg-getpot_test.$(OBJEXT) \
+	base/unit_tests_dbg-point_neighbor_coupling_test.$(OBJEXT) \
 	base/unit_tests_dbg-auto_ptr_test.$(OBJEXT) \
 	fe/unit_tests_dbg-fe_bernstein_test.$(OBJEXT) \
 	fe/unit_tests_dbg-fe_clough_test.$(OBJEXT) \
@@ -267,7 +269,8 @@ unit_tests_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(LDFLAGS) -o $@
 am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/default_coupling_test.C \
-	base/getpot_test.C base/auto_ptr_test.C fe/fe_bernstein_test.C \
+	base/getpot_test.C base/point_neighbor_coupling_test.C \
+	base/auto_ptr_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
 	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
@@ -299,6 +302,7 @@ am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	base/unit_tests_devel-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_devel-getpot_test.$(OBJEXT) \
+	base/unit_tests_devel-point_neighbor_coupling_test.$(OBJEXT) \
 	base/unit_tests_devel-auto_ptr_test.$(OBJEXT) \
 	fe/unit_tests_devel-fe_bernstein_test.$(OBJEXT) \
 	fe/unit_tests_devel-fe_clough_test.$(OBJEXT) \
@@ -355,7 +359,8 @@ unit_tests_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(LDFLAGS) -o $@
 am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/default_coupling_test.C \
-	base/getpot_test.C base/auto_ptr_test.C fe/fe_bernstein_test.C \
+	base/getpot_test.C base/point_neighbor_coupling_test.C \
+	base/auto_ptr_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
 	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
@@ -387,6 +392,7 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	base/unit_tests_oprof-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_oprof-getpot_test.$(OBJEXT) \
+	base/unit_tests_oprof-point_neighbor_coupling_test.$(OBJEXT) \
 	base/unit_tests_oprof-auto_ptr_test.$(OBJEXT) \
 	fe/unit_tests_oprof-fe_bernstein_test.$(OBJEXT) \
 	fe/unit_tests_oprof-fe_clough_test.$(OBJEXT) \
@@ -443,7 +449,8 @@ unit_tests_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(LDFLAGS) -o $@
 am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/default_coupling_test.C \
-	base/getpot_test.C base/auto_ptr_test.C fe/fe_bernstein_test.C \
+	base/getpot_test.C base/point_neighbor_coupling_test.C \
+	base/auto_ptr_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
 	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
@@ -475,6 +482,7 @@ am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	base/unit_tests_opt-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_opt-getpot_test.$(OBJEXT) \
+	base/unit_tests_opt-point_neighbor_coupling_test.$(OBJEXT) \
 	base/unit_tests_opt-auto_ptr_test.$(OBJEXT) \
 	fe/unit_tests_opt-fe_bernstein_test.$(OBJEXT) \
 	fe/unit_tests_opt-fe_clough_test.$(OBJEXT) \
@@ -529,7 +537,8 @@ unit_tests_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(LDFLAGS) -o $@
 am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 	base/dof_object_test.h base/default_coupling_test.C \
-	base/getpot_test.C base/auto_ptr_test.C fe/fe_bernstein_test.C \
+	base/getpot_test.C base/point_neighbor_coupling_test.C \
+	base/auto_ptr_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
 	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
@@ -561,6 +570,7 @@ am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	base/unit_tests_prof-default_coupling_test.$(OBJEXT) \
 	base/unit_tests_prof-getpot_test.$(OBJEXT) \
+	base/unit_tests_prof-point_neighbor_coupling_test.$(OBJEXT) \
 	base/unit_tests_prof-auto_ptr_test.$(OBJEXT) \
 	fe/unit_tests_prof-fe_bernstein_test.$(OBJEXT) \
 	fe/unit_tests_prof-fe_clough_test.$(OBJEXT) \
@@ -1033,18 +1043,18 @@ AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
 AM_LDFLAGS = $(libmesh_LDFLAGS)
 unit_tests_sources = driver.C test_comm.h base/dof_object_test.h \
 	base/default_coupling_test.C base/getpot_test.C \
-	base/auto_ptr_test.C fe/fe_bernstein_test.C \
-	fe/fe_clough_test.C fe/fe_hermite_test.C \
-	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
-	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
-	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_test.h \
-	fe/fe_xyz_test.C geom/node_test.C geom/point_test.C \
-	geom/point_test.h mesh/all_tri.C mesh/boundary_mesh.C \
-	mesh/boundary_info.C mesh/contains_point.C \
-	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
-	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
-	mesh/spatial_dimension_test.C mesh/mesh_function_dfem.C \
-	numerics/composite_function_test.C \
+	base/point_neighbor_coupling_test.C base/auto_ptr_test.C \
+	fe/fe_bernstein_test.C fe/fe_clough_test.C \
+	fe/fe_hermite_test.C fe/fe_hierarchic_test.C \
+	fe/fe_l2_hierarchic_test.C fe/fe_l2_lagrange_test.C \
+	fe/fe_lagrange_test.C fe/fe_monomial_test.C \
+	fe/fe_szabab_test.C fe/fe_test.h fe/fe_xyz_test.C \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	mesh/all_tri.C mesh/boundary_mesh.C mesh/boundary_info.C \
+	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
+	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
+	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
+	mesh/mesh_function_dfem.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -1146,6 +1156,8 @@ base/unit_tests_dbg-default_coupling_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_dbg-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_dbg-point_neighbor_coupling_test.$(OBJEXT):  \
+	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_dbg-auto_ptr_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
 fe/$(am__dirstamp):
@@ -1305,6 +1317,8 @@ base/unit_tests_devel-default_coupling_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_devel-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_devel-point_neighbor_coupling_test.$(OBJEXT):  \
+	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_devel-auto_ptr_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
 fe/unit_tests_devel-fe_bernstein_test.$(OBJEXT): fe/$(am__dirstamp) \
@@ -1404,6 +1418,8 @@ base/unit_tests_oprof-default_coupling_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_oprof-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_oprof-point_neighbor_coupling_test.$(OBJEXT):  \
+	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_oprof-auto_ptr_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
 fe/unit_tests_oprof-fe_bernstein_test.$(OBJEXT): fe/$(am__dirstamp) \
@@ -1503,6 +1519,8 @@ base/unit_tests_opt-default_coupling_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_opt-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_opt-point_neighbor_coupling_test.$(OBJEXT):  \
+	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_opt-auto_ptr_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
 fe/unit_tests_opt-fe_bernstein_test.$(OBJEXT): fe/$(am__dirstamp) \
@@ -1602,6 +1620,8 @@ base/unit_tests_prof-default_coupling_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_prof-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_prof-point_neighbor_coupling_test.$(OBJEXT):  \
+	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_prof-auto_ptr_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
 fe/unit_tests_prof-fe_bernstein_test.$(OBJEXT): fe/$(am__dirstamp) \
@@ -1723,18 +1743,23 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-auto_ptr_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-default_coupling_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-getpot_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-point_neighbor_coupling_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_devel-auto_ptr_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_devel-default_coupling_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_devel-getpot_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_devel-point_neighbor_coupling_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_oprof-auto_ptr_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_oprof-default_coupling_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_oprof-getpot_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_oprof-point_neighbor_coupling_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_opt-auto_ptr_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_opt-default_coupling_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_opt-getpot_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_opt-point_neighbor_coupling_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-auto_ptr_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-default_coupling_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-getpot_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-point_neighbor_coupling_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_bernstein_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_clough_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-fe_hermite_test.Po@am__quote@
@@ -2021,6 +2046,20 @@ base/unit_tests_dbg-getpot_test.obj: base/getpot_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_dbg-getpot_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_dbg-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
+
+base/unit_tests_dbg-point_neighbor_coupling_test.o: base/point_neighbor_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_dbg-point_neighbor_coupling_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_dbg-point_neighbor_coupling_test.Tpo -c -o base/unit_tests_dbg-point_neighbor_coupling_test.o `test -f 'base/point_neighbor_coupling_test.C' || echo '$(srcdir)/'`base/point_neighbor_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_dbg-point_neighbor_coupling_test.Tpo base/$(DEPDIR)/unit_tests_dbg-point_neighbor_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/point_neighbor_coupling_test.C' object='base/unit_tests_dbg-point_neighbor_coupling_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_dbg-point_neighbor_coupling_test.o `test -f 'base/point_neighbor_coupling_test.C' || echo '$(srcdir)/'`base/point_neighbor_coupling_test.C
+
+base/unit_tests_dbg-point_neighbor_coupling_test.obj: base/point_neighbor_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_dbg-point_neighbor_coupling_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_dbg-point_neighbor_coupling_test.Tpo -c -o base/unit_tests_dbg-point_neighbor_coupling_test.obj `if test -f 'base/point_neighbor_coupling_test.C'; then $(CYGPATH_W) 'base/point_neighbor_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/point_neighbor_coupling_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_dbg-point_neighbor_coupling_test.Tpo base/$(DEPDIR)/unit_tests_dbg-point_neighbor_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/point_neighbor_coupling_test.C' object='base/unit_tests_dbg-point_neighbor_coupling_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_dbg-point_neighbor_coupling_test.obj `if test -f 'base/point_neighbor_coupling_test.C'; then $(CYGPATH_W) 'base/point_neighbor_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/point_neighbor_coupling_test.C'; fi`
 
 base/unit_tests_dbg-auto_ptr_test.o: base/auto_ptr_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_dbg-auto_ptr_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_dbg-auto_ptr_test.Tpo -c -o base/unit_tests_dbg-auto_ptr_test.o `test -f 'base/auto_ptr_test.C' || echo '$(srcdir)/'`base/auto_ptr_test.C
@@ -2694,6 +2733,20 @@ base/unit_tests_devel-getpot_test.obj: base/getpot_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_devel-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
 
+base/unit_tests_devel-point_neighbor_coupling_test.o: base/point_neighbor_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_devel-point_neighbor_coupling_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_devel-point_neighbor_coupling_test.Tpo -c -o base/unit_tests_devel-point_neighbor_coupling_test.o `test -f 'base/point_neighbor_coupling_test.C' || echo '$(srcdir)/'`base/point_neighbor_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_devel-point_neighbor_coupling_test.Tpo base/$(DEPDIR)/unit_tests_devel-point_neighbor_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/point_neighbor_coupling_test.C' object='base/unit_tests_devel-point_neighbor_coupling_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_devel-point_neighbor_coupling_test.o `test -f 'base/point_neighbor_coupling_test.C' || echo '$(srcdir)/'`base/point_neighbor_coupling_test.C
+
+base/unit_tests_devel-point_neighbor_coupling_test.obj: base/point_neighbor_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_devel-point_neighbor_coupling_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_devel-point_neighbor_coupling_test.Tpo -c -o base/unit_tests_devel-point_neighbor_coupling_test.obj `if test -f 'base/point_neighbor_coupling_test.C'; then $(CYGPATH_W) 'base/point_neighbor_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/point_neighbor_coupling_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_devel-point_neighbor_coupling_test.Tpo base/$(DEPDIR)/unit_tests_devel-point_neighbor_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/point_neighbor_coupling_test.C' object='base/unit_tests_devel-point_neighbor_coupling_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_devel-point_neighbor_coupling_test.obj `if test -f 'base/point_neighbor_coupling_test.C'; then $(CYGPATH_W) 'base/point_neighbor_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/point_neighbor_coupling_test.C'; fi`
+
 base/unit_tests_devel-auto_ptr_test.o: base/auto_ptr_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_devel-auto_ptr_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_devel-auto_ptr_test.Tpo -c -o base/unit_tests_devel-auto_ptr_test.o `test -f 'base/auto_ptr_test.C' || echo '$(srcdir)/'`base/auto_ptr_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_devel-auto_ptr_test.Tpo base/$(DEPDIR)/unit_tests_devel-auto_ptr_test.Po
@@ -3365,6 +3418,20 @@ base/unit_tests_oprof-getpot_test.obj: base/getpot_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_oprof-getpot_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_oprof-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
+
+base/unit_tests_oprof-point_neighbor_coupling_test.o: base/point_neighbor_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_oprof-point_neighbor_coupling_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_oprof-point_neighbor_coupling_test.Tpo -c -o base/unit_tests_oprof-point_neighbor_coupling_test.o `test -f 'base/point_neighbor_coupling_test.C' || echo '$(srcdir)/'`base/point_neighbor_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_oprof-point_neighbor_coupling_test.Tpo base/$(DEPDIR)/unit_tests_oprof-point_neighbor_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/point_neighbor_coupling_test.C' object='base/unit_tests_oprof-point_neighbor_coupling_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_oprof-point_neighbor_coupling_test.o `test -f 'base/point_neighbor_coupling_test.C' || echo '$(srcdir)/'`base/point_neighbor_coupling_test.C
+
+base/unit_tests_oprof-point_neighbor_coupling_test.obj: base/point_neighbor_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_oprof-point_neighbor_coupling_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_oprof-point_neighbor_coupling_test.Tpo -c -o base/unit_tests_oprof-point_neighbor_coupling_test.obj `if test -f 'base/point_neighbor_coupling_test.C'; then $(CYGPATH_W) 'base/point_neighbor_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/point_neighbor_coupling_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_oprof-point_neighbor_coupling_test.Tpo base/$(DEPDIR)/unit_tests_oprof-point_neighbor_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/point_neighbor_coupling_test.C' object='base/unit_tests_oprof-point_neighbor_coupling_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_oprof-point_neighbor_coupling_test.obj `if test -f 'base/point_neighbor_coupling_test.C'; then $(CYGPATH_W) 'base/point_neighbor_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/point_neighbor_coupling_test.C'; fi`
 
 base/unit_tests_oprof-auto_ptr_test.o: base/auto_ptr_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_oprof-auto_ptr_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_oprof-auto_ptr_test.Tpo -c -o base/unit_tests_oprof-auto_ptr_test.o `test -f 'base/auto_ptr_test.C' || echo '$(srcdir)/'`base/auto_ptr_test.C
@@ -4038,6 +4105,20 @@ base/unit_tests_opt-getpot_test.obj: base/getpot_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_opt-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
 
+base/unit_tests_opt-point_neighbor_coupling_test.o: base/point_neighbor_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_opt-point_neighbor_coupling_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_opt-point_neighbor_coupling_test.Tpo -c -o base/unit_tests_opt-point_neighbor_coupling_test.o `test -f 'base/point_neighbor_coupling_test.C' || echo '$(srcdir)/'`base/point_neighbor_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_opt-point_neighbor_coupling_test.Tpo base/$(DEPDIR)/unit_tests_opt-point_neighbor_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/point_neighbor_coupling_test.C' object='base/unit_tests_opt-point_neighbor_coupling_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_opt-point_neighbor_coupling_test.o `test -f 'base/point_neighbor_coupling_test.C' || echo '$(srcdir)/'`base/point_neighbor_coupling_test.C
+
+base/unit_tests_opt-point_neighbor_coupling_test.obj: base/point_neighbor_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_opt-point_neighbor_coupling_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_opt-point_neighbor_coupling_test.Tpo -c -o base/unit_tests_opt-point_neighbor_coupling_test.obj `if test -f 'base/point_neighbor_coupling_test.C'; then $(CYGPATH_W) 'base/point_neighbor_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/point_neighbor_coupling_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_opt-point_neighbor_coupling_test.Tpo base/$(DEPDIR)/unit_tests_opt-point_neighbor_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/point_neighbor_coupling_test.C' object='base/unit_tests_opt-point_neighbor_coupling_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_opt-point_neighbor_coupling_test.obj `if test -f 'base/point_neighbor_coupling_test.C'; then $(CYGPATH_W) 'base/point_neighbor_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/point_neighbor_coupling_test.C'; fi`
+
 base/unit_tests_opt-auto_ptr_test.o: base/auto_ptr_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_opt-auto_ptr_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_opt-auto_ptr_test.Tpo -c -o base/unit_tests_opt-auto_ptr_test.o `test -f 'base/auto_ptr_test.C' || echo '$(srcdir)/'`base/auto_ptr_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_opt-auto_ptr_test.Tpo base/$(DEPDIR)/unit_tests_opt-auto_ptr_test.Po
@@ -4709,6 +4790,20 @@ base/unit_tests_prof-getpot_test.obj: base/getpot_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/getpot_test.C' object='base/unit_tests_prof-getpot_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_prof-getpot_test.obj `if test -f 'base/getpot_test.C'; then $(CYGPATH_W) 'base/getpot_test.C'; else $(CYGPATH_W) '$(srcdir)/base/getpot_test.C'; fi`
+
+base/unit_tests_prof-point_neighbor_coupling_test.o: base/point_neighbor_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_prof-point_neighbor_coupling_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_prof-point_neighbor_coupling_test.Tpo -c -o base/unit_tests_prof-point_neighbor_coupling_test.o `test -f 'base/point_neighbor_coupling_test.C' || echo '$(srcdir)/'`base/point_neighbor_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_prof-point_neighbor_coupling_test.Tpo base/$(DEPDIR)/unit_tests_prof-point_neighbor_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/point_neighbor_coupling_test.C' object='base/unit_tests_prof-point_neighbor_coupling_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_prof-point_neighbor_coupling_test.o `test -f 'base/point_neighbor_coupling_test.C' || echo '$(srcdir)/'`base/point_neighbor_coupling_test.C
+
+base/unit_tests_prof-point_neighbor_coupling_test.obj: base/point_neighbor_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_prof-point_neighbor_coupling_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_prof-point_neighbor_coupling_test.Tpo -c -o base/unit_tests_prof-point_neighbor_coupling_test.obj `if test -f 'base/point_neighbor_coupling_test.C'; then $(CYGPATH_W) 'base/point_neighbor_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/point_neighbor_coupling_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_prof-point_neighbor_coupling_test.Tpo base/$(DEPDIR)/unit_tests_prof-point_neighbor_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/point_neighbor_coupling_test.C' object='base/unit_tests_prof-point_neighbor_coupling_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_prof-point_neighbor_coupling_test.obj `if test -f 'base/point_neighbor_coupling_test.C'; then $(CYGPATH_W) 'base/point_neighbor_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/point_neighbor_coupling_test.C'; fi`
 
 base/unit_tests_prof-auto_ptr_test.o: base/auto_ptr_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_prof-auto_ptr_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_prof-auto_ptr_test.Tpo -c -o base/unit_tests_prof-auto_ptr_test.o `test -f 'base/auto_ptr_test.C' || echo '$(srcdir)/'`base/auto_ptr_test.C

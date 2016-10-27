@@ -14,6 +14,7 @@ libmesh_SOURCES =  \
         src/base/periodic_boundaries.C \
         src/base/periodic_boundary.C \
         src/base/periodic_boundary_base.C \
+        src/base/point_neighbor_coupling.C \
         src/base/print_trace.C \
         src/base/reference_counted_object.C \
         src/base/reference_counter.C \
