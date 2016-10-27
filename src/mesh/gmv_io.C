@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <fstream>
 #include <vector>
+#include <cstring> // std::strncmp
 
 // Local includes
 #include "libmesh/libmesh_config.h"
