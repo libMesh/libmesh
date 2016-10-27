@@ -1532,7 +1532,12 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
       // boundary QUAD into two boundary TRIs.  Therefore, we won't be
       // too picky about the actual number of BCs, and just assert that
       // there are some, somewhere.
-      libmesh_assert(new_bndry_elements.size()>0 || mesh.get_boundary_info().n_boundary_conds()>0);
+#ifndef NDEBUG
+      bool nbe_nonempty = new_bndry_elements.size();
+      mesh.comm().max(nbe_nonempty);
+      libmesh_assert(nbe_nonempty ||
+                     mesh.get_boundary_info().n_boundary_conds()>0);
+#endif
 
       // We should also be sure that the lengths of the new boundary data vectors
       // are all the same.
