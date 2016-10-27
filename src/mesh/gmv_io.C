@@ -27,6 +27,7 @@
 #include <cstring> // for std::strcpy, std::memcpy
 #include <cstdio>  // for std::sprintf
 #include <vector>
+#include <cstring> // std::strncmp
 
 // Local includes
 #include "libmesh/libmesh_config.h"
