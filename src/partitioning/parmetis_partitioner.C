@@ -73,9 +73,6 @@ ParmetisPartitioner::ParmetisPartitioner()
 
 ParmetisPartitioner::~ParmetisPartitioner()
 {
-#ifdef LIBMESH_HAVE_PARMETIS
-  delete _pmetis;
-#endif
 }
 
 

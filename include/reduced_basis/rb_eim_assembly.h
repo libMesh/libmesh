@@ -110,9 +110,8 @@ private:
   /**
    * We store an FE object and an associated quadrature rule.
    */
-  FEBase * _fe;
-  QBase * _qrule;
-
+  UniquePtr<FEBase> _fe;
+  UniquePtr<QBase> _qrule;
 };
 
 }

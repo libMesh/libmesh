@@ -49,8 +49,7 @@ FEMContext::FEMContext (const System & sys)
     _elem_dim(0), /* This will be reset in set_elem(). */
     _elem_dims(sys.get_mesh().elem_dimensions()),
     _element_qrule(4,libmesh_nullptr),
-    _side_qrule(4,libmesh_nullptr),
-    _edge_qrule(libmesh_nullptr)
+    _side_qrule(4,libmesh_nullptr)
 {
   // Reserve space for the FEAbstract and QBase objects for each
   // element dimension possiblity (0,1,2,3)
@@ -109,8 +108,8 @@ FEMContext::FEMContext (const System & sys)
       _side_qrule[dim] = hardest_fe_type.default_quadrature_rule
         (dim-1, sys.extra_quadrature_order).release();
       if (dim == 3)
-        _edge_qrule = hardest_fe_type.default_quadrature_rule
-          (1, sys.extra_quadrature_order).release();
+        _edge_qrule.reset(hardest_fe_type.default_quadrature_rule
+                          (1, sys.extra_quadrature_order).release());
 
       // Next, create finite element objects
       _element_fe_var[dim].resize(nv);
@@ -133,7 +132,7 @@ FEMContext::FEMContext (const System & sys)
               if (dim == 3)
                 {
                   _edge_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
-                  _edge_fe[fe_type]->attach_quadrature_rule(_edge_qrule);
+                  _edge_fe[fe_type]->attach_quadrature_rule(_edge_qrule.get());
                 }
             }
 
@@ -176,9 +175,6 @@ FEMContext::~FEMContext()
        i != _side_qrule.end(); ++i)
     delete *i;
   _side_qrule.clear();
-
-  delete _edge_qrule;
-  _edge_qrule = libmesh_nullptr;
 }
 
 

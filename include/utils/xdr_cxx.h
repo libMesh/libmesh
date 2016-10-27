@@ -213,7 +213,7 @@ private:
    * header file rpc/rpc.h
    * for more information.
    */
-  XDR * xdrs;
+  UniquePtr<XDR> xdrs;
 
   /**
    * File pointer.

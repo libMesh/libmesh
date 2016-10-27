@@ -305,7 +305,7 @@ private:
   /**
    * A mesh function to interpolate on the mesh.
    */
-  MeshFunction * _mesh_function;
+  UniquePtr<MeshFunction> _mesh_function;
 
   /**
    * We also need an extra vector in which we can store a ghosted
@@ -349,7 +349,6 @@ private:
    * The point locator tolerance.
    */
   Real _point_locator_tol;
-
 };
 
 } // namespace libMesh
