@@ -184,8 +184,8 @@ DofMap::DofMap(const unsigned int number,
   _default_evaluating->set_n_levels(1);
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  _default_coupling->set_periodic_boundaries(_periodic_boundaries);
-  _default_evaluating->set_periodic_boundaries(_periodic_boundaries);
+  _default_coupling->set_periodic_boundaries(_periodic_boundaries.get());
+  _default_evaluating->set_periodic_boundaries(_periodic_boundaries.get());
 #endif
 
   this->add_coupling_functor(*_default_coupling);
@@ -204,11 +204,7 @@ DofMap::~DofMap()
   _mesh.remove_ghosting_functor(*_default_coupling);
   _mesh.remove_ghosting_functor(*_default_evaluating);
 
-#ifdef LIBMESH_ENABLE_PERIODIC
-  delete _periodic_boundaries;
-#endif
 #ifdef LIBMESH_ENABLE_DIRICHLET
-  delete _dirichlet_boundaries;
   for (unsigned int q = 0; q != _adjoint_dirichlet_boundaries.size(); ++q)
     delete _adjoint_dirichlet_boundaries[q];
 #endif
@@ -476,7 +472,10 @@ void DofMap::reinit(MeshBase & mesh)
   _default_coupling->set_n_levels
     (std::max(_default_coupling->n_levels(), standard_n_levels));
 
-  _default_evaluating->set_dof_coupling(this->_dof_coupling);
+  // But we *don't* want to restrict to a CouplingMatrix unless the
+  // user does so manually; the original libMesh behavior was to put
+  // ghost indices on the send_list regardless of variable.
+  //_default_evaluating->set_dof_coupling(this->_dof_coupling);
 
   const unsigned int
     sys_num      = this->sys_number(),
@@ -888,7 +887,7 @@ void DofMap::clear()
 
   // Go back to default send_list generation
 
-  _default_evaluating->set_dof_coupling(this->_dof_coupling);
+  // _default_evaluating->set_dof_coupling(this->_dof_coupling);
   _default_evaluating->set_n_levels(1);
   this->add_algebraic_ghosting_functor(*_default_evaluating);
   }
@@ -1543,9 +1542,29 @@ void DofMap::merge_ghost_functor_outputs
                         }
                       const_cast<CouplingMatrix&>(*existing_it->second) &= *metg_it->second;
                     }
+                  else
+                    {
+                      // Any existing_it matrix merged with a full
+                      // matrix (symbolized as nullptr) gives another
+                      // full matrix (symbolizable as nullptr).
+
+                      // So if existing_it->second is a temporary then
+                      // we don't need it anymore; we might as well
+                      // remove it to keep the set of temporaries
+                      // small.
+                      std::set<CouplingMatrix*>::iterator temp_it =
+                        temporary_coupling_matrices.find
+                          (const_cast<CouplingMatrix*>(existing_it->second));
+                      if (temp_it !=
+                          temporary_coupling_matrices.end())
+                        temporary_coupling_matrices.erase(temp_it);
+
+                      existing_it->second = libmesh_nullptr;
+                    }
                 }
-              else
-                existing_it->second = metg_it->second;
+              // else we have a nullptr already, then we have a full
+              // coupling matrix, already, and merging with anything
+              // else won't change that, so we're done.
             }
         }
     }

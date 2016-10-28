@@ -783,6 +783,10 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
   // FIXME: This algorithm does not work on refined grids!
   {
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+    unique_id_type max_unique_id = mesh.parallel_max_unique_id();
+#endif
+
     MeshBase::element_iterator       el  = mesh.elements_begin();
     const MeshBase::element_iterator end = mesh.elements_end();
 
@@ -1480,10 +1484,6 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
           } // end if (mesh_has_boundary_data)
 
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-        unique_id_type max_unique_id = mesh.parallel_max_unique_id();
-#endif
-
         // Determine new IDs for the split elements which will be
         // the same on all processors, therefore keeping the Mesh
         // in sync.  Note: we offset the new IDs by max_orig_id to
@@ -1532,7 +1532,12 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
       // boundary QUAD into two boundary TRIs.  Therefore, we won't be
       // too picky about the actual number of BCs, and just assert that
       // there are some, somewhere.
-      libmesh_assert(new_bndry_elements.size()>0 || mesh.get_boundary_info().n_boundary_conds()>0);
+#ifndef NDEBUG
+      bool nbe_nonempty = new_bndry_elements.size();
+      mesh.comm().max(nbe_nonempty);
+      libmesh_assert(nbe_nonempty ||
+                     mesh.get_boundary_info().n_boundary_conds()>0);
+#endif
 
       // We should also be sure that the lengths of the new boundary data vectors
       // are all the same.

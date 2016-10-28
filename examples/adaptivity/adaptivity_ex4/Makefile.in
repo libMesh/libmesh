@@ -645,7 +645,8 @@ sources = $(data) run.sh
 # how to make documentation
 #
 CLEANFILES = 2D_hermite_adaptive.m 2D_hermite_adaptive.e \
-	$(am__append_1) $(example_name).html stdout.log
+	2D_clough_adaptive.m 2D_clough_adaptive.e $(am__append_1) \
+	$(example_name).html stdout.log
 
 # need to link files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp

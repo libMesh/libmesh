@@ -586,10 +586,8 @@ void UnstructuredMesh::read (const std::string & name,
   // during prepare_for_use() for certain types of mesh files.
   // This is required in cases where there is an associated solution
   // file which expects a certain ordering of the nodes.
-  if(name.rfind(".gmv")+4==name.size())
-    {
-      skip_renumber_nodes_and_elements =  true;
-    }
+  if (name.rfind(".gmv") + 4 == name.size())
+    this->allow_renumbering(false);
 
   if (mesh_data)
     {

@@ -136,7 +136,6 @@ Xdr::Xdr (const std::string & name,
   mode(m),
   file_name(name),
 #ifdef LIBMESH_HAVE_XDR
-  xdrs(libmesh_nullptr),
   fp(libmesh_nullptr),
 #endif
   in(),
@@ -175,8 +174,8 @@ void Xdr::open (const std::string & name)
         fp = fopen(name.c_str(), (mode == ENCODE) ? "w" : "r");
         if (!fp)
           libmesh_file_error(name.c_str());
-        xdrs = new XDR;
-        xdrstdio_create (xdrs, fp, (mode == ENCODE) ? XDR_ENCODE : XDR_DECODE);
+        xdrs.reset(new XDR);
+        xdrstdio_create (xdrs.get(), fp, (mode == ENCODE) ? XDR_ENCODE : XDR_DECODE);
 #else
 
         libmesh_error_msg("ERROR: Functionality is not available.\n" \
@@ -280,9 +279,8 @@ void Xdr::close ()
 
         if (xdrs)
           {
-            xdr_destroy (xdrs);
-            delete xdrs;
-            xdrs = libmesh_nullptr;
+            xdr_destroy (xdrs.get());
+            xdrs.reset();
           }
 
         if (fp)
@@ -485,18 +483,21 @@ template <>
 bool xdr_translate(XDR * x,
                    std::string & s)
 {
-  char * sptr = new char[xdr_MAX_STRING_LENGTH+1];
+  char sptr[xdr_MAX_STRING_LENGTH+1];
   std::copy(s.begin(), s.end(), sptr);
   sptr[s.size()] = 0;
   unsigned int length = xdr_MAX_STRING_LENGTH;
-  bool b = xdr_string(x, &sptr, length);
+
+  // Get a pointer to the beginning of the buffer.  We need to pass
+  // its address to the xdr API.
+  char * begin = sptr;
+  bool b = xdr_string(x, &begin, length);
 
   // This is necessary when reading, but inefficient when writing...
   length = cast_int<unsigned int>(std::strlen(sptr));
   s.resize(length);
   std::copy(sptr, sptr+length, s.begin());
 
-  delete [] sptr;
   return b;
 }
 
@@ -713,7 +714,7 @@ void Xdr::data (T & a, const char * comment_in)
 
         libmesh_assert (is_open());
 
-        xdr_translate(xdrs, a);
+        xdr_translate(xdrs.get(), a);
 
 #else
 
@@ -780,7 +781,7 @@ void Xdr::data_stream (T * val, const unsigned int len, const unsigned int line_
 
         if (size_of_type <= 4) // 32-bit types
           {
-            xdr_vector(xdrs,
+            xdr_vector(xdrs.get(),
                        (char *) val,
                        len,
                        size_of_type,
@@ -788,7 +789,7 @@ void Xdr::data_stream (T * val, const unsigned int len, const unsigned int line_
           }
         else // 64-bit types
           {
-            xdr_vector(xdrs,
+            xdr_vector(xdrs.get(),
                        (char *) val,
                        len,
                        size_of_type,
@@ -816,7 +817,7 @@ void Xdr::data_stream (T * val, const unsigned int len, const unsigned int line_
         if (size_of_type <= 4) // 32-bit types
           {
             if (len > 0)
-              xdr_vector(xdrs,
+              xdr_vector(xdrs.get(),
                          (char *) val,
                          len,
                          size_of_type,
@@ -825,7 +826,7 @@ void Xdr::data_stream (T * val, const unsigned int len, const unsigned int line_
         else // 64-bit types
           {
             if (len > 0)
-              xdr_vector(xdrs,
+              xdr_vector(xdrs.get(),
                          (char *) val,
                          len,
                          size_of_type,
@@ -921,7 +922,7 @@ void Xdr::data_stream (double * val, const unsigned int len, const unsigned int 
         libmesh_assert (this->is_open());
 
         if (len > 0)
-          xdr_vector(xdrs,
+          xdr_vector(xdrs.get(),
                      (char *) val,
                      len,
                      sizeof(double),
@@ -1020,7 +1021,7 @@ void Xdr::data_stream (float * val, const unsigned int len, const unsigned int l
         libmesh_assert (this->is_open());
 
         if (len > 0)
-          xdr_vector(xdrs,
+          xdr_vector(xdrs.get(),
                      (char *) val,
                      len,
                      sizeof(float),
@@ -1122,7 +1123,7 @@ void Xdr::data_stream (long double * val, const unsigned int len, const unsigned
         // doubles drops back to double precision, but you can still
         // write long double ASCII files of course.
         // if (len > 0)
-        //   xdr_vector(xdrs,
+        //   xdr_vector(xdrs.get(),
         //      (char *) val,
         //      len,
         //      sizeof(double),
@@ -1137,7 +1138,7 @@ void Xdr::data_stream (long double * val, const unsigned int len, const unsigned
               for (unsigned int i=0, cnt=0; i<len; i++)
                 io_buffer[cnt++] = val[i];
 
-            xdr_vector(xdrs,
+            xdr_vector(xdrs.get(),
                        (char *) &io_buffer[0],
                        len,
                        sizeof(double),
@@ -1257,7 +1258,7 @@ void Xdr::data_stream (std::complex<double> * val, const unsigned int len, const
                   io_buffer[cnt++] = val[i].imag();
                 }
 
-            xdr_vector(xdrs,
+            xdr_vector(xdrs.get(),
                        (char *) &io_buffer[0],
                        2*len,
                        sizeof(double),
@@ -1386,7 +1387,7 @@ void Xdr::data_stream (std::complex<long double> * val, const unsigned int len, 
                   io_buffer[cnt++] = val[i].imag();
                 }
 
-            xdr_vector(xdrs,
+            xdr_vector(xdrs.get(),
                        (char *) &io_buffer[0],
                        2*len,
                        sizeof(double),

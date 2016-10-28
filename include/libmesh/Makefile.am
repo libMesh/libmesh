@@ -30,6 +30,7 @@ BUILT_SOURCES = \
         periodic_boundaries.h \
         periodic_boundary.h \
         periodic_boundary_base.h \
+        point_neighbor_coupling.h \
         print_trace.h \
         reference_counted_object.h \
         reference_counter.h \
@@ -593,6 +594,9 @@ periodic_boundary.h: $(top_srcdir)/include/base/periodic_boundary.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 periodic_boundary_base.h: $(top_srcdir)/include/base/periodic_boundary_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+point_neighbor_coupling.h: $(top_srcdir)/include/base/point_neighbor_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 print_trace.h: $(top_srcdir)/include/base/print_trace.h

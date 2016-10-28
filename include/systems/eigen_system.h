@@ -145,12 +145,12 @@ public:
   /**
    * The system matrix for standard eigenvalue problems.
    */
-  SparseMatrix<Number> * matrix_A;
+  UniquePtr<SparseMatrix<Number> > matrix_A;
 
   /**
    * A second system matrix for generalized eigenvalue problems.
    */
-  SparseMatrix<Number> * matrix_B;
+  UniquePtr<SparseMatrix<Number> > matrix_B;
 
   /**
    * The EigenSolver, definig which interface, i.e solver

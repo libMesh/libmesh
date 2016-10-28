@@ -117,7 +117,7 @@ private:
    * Pointer to the Parmetis-specific data structures.  Lets us avoid
    * including parmetis.h here.
    */
-  ParmetisHelper * _pmetis;
+  UniquePtr<ParmetisHelper> _pmetis;
 
 #endif
 };

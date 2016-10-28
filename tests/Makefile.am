@@ -14,6 +14,7 @@ unit_tests_sources = \
   base/dof_object_test.h \
   base/default_coupling_test.C \
   base/getpot_test.C \
+  base/point_neighbor_coupling_test.C \
   base/auto_ptr_test.C \
   fe/fe_bernstein_test.C \
   fe/fe_clough_test.C \
@@ -24,6 +25,7 @@ unit_tests_sources = \
   fe/fe_lagrange_test.C \
   fe/fe_monomial_test.C \
   fe/fe_szabab_test.C \
+  fe/fe_test.h \
   fe/fe_xyz_test.C \
   geom/node_test.C \
   geom/point_test.C \

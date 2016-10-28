@@ -17,8 +17,8 @@
 
 
 
-#ifndef LIBMESH_DEFAULT_COUPLING_H
-#define LIBMESH_DEFAULT_COUPLING_H
+#ifndef LIBMESH_POINT_NEIGHBOR_COUPLING_H
+#define LIBMESH_POINT_NEIGHBOR_COUPLING_H
 
 // Local Includes -----------------------------------
 #include "libmesh/ghosting_functor.h"
@@ -38,14 +38,14 @@ class PeriodicBoundaries;
  * \author Roy H. Stogner
  * \date 2016
  */
-class DefaultCoupling : public GhostingFunctor
+class PointNeighborCoupling : public GhostingFunctor
 {
 public:
 
   /**
    * Constructor.
    */
-  DefaultCoupling() :
+  PointNeighborCoupling() :
     _dof_coupling(libmesh_nullptr),
 #ifdef LIBMESH_ENABLE_PERIODIC
     _periodic_bcs(libmesh_nullptr),
@@ -55,18 +55,21 @@ public:
  {}
 
   // Change coupling matrix after construction
-  void set_dof_coupling(const CouplingMatrix * dof_coupling);
+  void set_dof_coupling(const CouplingMatrix * dof_coupling)
+  { _dof_coupling = dof_coupling; }
 
-  // Return number of levels of neighbors we will couple.
+  // Return number of levels of point neighbors we will couple.
   unsigned int n_levels()
   { return _n_levels; }
 
-  // Change number of levels of neighbors to couple.
+  // Change number of levels of point neighbors to couple.
   void set_n_levels(unsigned int n_levels)
   { _n_levels = n_levels; }
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  // Set PeriodicBoundaries to couple
+  // Set PeriodicBoundaries to couple.
+  //
+  // FIXME: This capability is not currently implemented.
   void set_periodic_boundaries(const PeriodicBoundaries * periodic_bcs)
   { _periodic_bcs = periodic_bcs; }
 #endif
@@ -91,11 +94,8 @@ public:
    * For the specified range of active elements, find the elements
    * which will be coupled to them in the sparsity pattern.
    *
-   * This will be only the elements themselves by default, but will
-   * include side neighbors if an all-discontinuous-variable system is
-   * detected and/or if the user specified --implicit_neighbor_dofs on
-   * the command line or used set_implicit_neighbor_dofs() in their
-   * code.
+   * This will include the point neighbors, point neighbors of point
+   * neighbors, etc, to n_levels depth.
    */
   virtual void operator() (const MeshBase::const_element_iterator & range_begin,
                            const MeshBase::const_element_iterator & range_end,
@@ -114,4 +114,4 @@ private:
 
 } // namespace libMesh
 
-#endif // LIBMESH_DEFAULT_COUPLING_H
+#endif // LIBMESH_POINT_NEIGHBOR_COUPLING_H

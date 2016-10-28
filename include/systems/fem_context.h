@@ -1076,7 +1076,7 @@ protected:
    * Because edge rules only apply to 3D elements, we don't need to
    * worry about multiple dimensions
    */
-  QBase * _edge_qrule;
+  UniquePtr<QBase> _edge_qrule;
 
 private:
   /**
