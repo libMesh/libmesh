@@ -664,7 +664,9 @@ template <typename Output=Number>
 class ParsedFunction : public FunctionBase<Output>
 {
 public:
-  ParsedFunction (std::string /* expression */) : _dummy(0)
+  ParsedFunction (const std::string & /* expression */,
+                  const std::vector<std::string> * = libmesh_nullptr,
+                  const std::vector<Output> * = libmesh_nullptr) : _dummy(0)
   {
     libmesh_not_implemented();
   }
