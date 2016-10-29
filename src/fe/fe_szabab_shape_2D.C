@@ -773,6 +773,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
           {
 
             // Szabo-Babuska shape functions on the triangle.
+          case TRI3:
           case TRI6:
             {
               // Here we use finite differences to compute the derivatives!
@@ -811,6 +812,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
 
 
             // Szabo-Babuska shape functions on the quadrilateral.
+          case QUAD4:
           case QUAD8:
           case QUAD9:
             {
