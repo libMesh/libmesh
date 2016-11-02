@@ -762,8 +762,12 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem * inf_elem)
         const std::vector<std::vector<Real> > & Ss_map = (base_fe->get_fe_map()).get_dphidxi_map();
         const std::vector<std::vector<Real> > & St_map = (base_fe->get_fe_map()).get_dphideta_map();
 
-        const unsigned int n_radial_qp = radial_qrule->n_points();
-        const unsigned int n_base_qp = base_qrule->n_points();
+        const unsigned int n_radial_qp = som.size();
+        if (radial_qrule)
+          libmesh_assert_equal_to(n_radial_qp, radial_qrule->n_points());
+        const unsigned int n_base_qp = S_map[0].size();
+        if (base_qrule)
+          libmesh_assert_equal_to(n_base_qp, base_qrule->n_points());
 
         const unsigned int n_total_mapping_sf =
           cast_int<unsigned int>(radial_map.size()) * n_base_mapping_sf;
