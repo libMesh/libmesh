@@ -571,6 +571,15 @@ public:
   virtual bool is_vertex(const unsigned int i) const = 0;
 
   /**
+   * @returns true iff the specified (local) node number is a
+   * "mid-edge" node on an infinite element edge.  This is false for
+   * all nodes on non-infinite elements, so we won't make it pure
+   * virtual, to simplify their code.
+   */
+  virtual bool is_mid_infinite_edge_node(const unsigned int /* n */) const
+  { libmesh_assert (!this->infinite()); return false; }
+
+  /**
    * @returns true iff the specified child has a vertex at the
    * specified (child-local) node number.
    * Except in odd cases like pyramid refinement the child will have
