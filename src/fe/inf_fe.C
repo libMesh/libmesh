@@ -793,8 +793,6 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem *,
                                                         const std::vector<Point> &)
 {
-  libmesh_assert(radial_qrule.get());
-
   // Start logging the overall computation of shape functions
   LOG_SCOPE("compute_shape_functions()", "InfFE");
 
