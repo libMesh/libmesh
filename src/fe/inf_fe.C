@@ -109,9 +109,6 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
                                        const std::vector<Real> * const weights)
 {
   libmesh_assert(base_fe.get());
-  libmesh_assert(base_fe->qrule);
-  libmesh_assert_equal_to (base_fe->qrule, base_qrule.get());
-  libmesh_assert(radial_qrule.get());
   libmesh_assert(inf_elem);
 
   // I don't understand infinite elements well enough to risk
@@ -125,6 +122,10 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
 
   if (pts == libmesh_nullptr)
     {
+      libmesh_assert(base_fe->qrule);
+      libmesh_assert_equal_to (base_fe->qrule, base_qrule.get());
+      libmesh_assert(radial_qrule.get());
+
       bool init_shape_functions_required = false;
 
       // init the radial data fields only when the radial order changes
@@ -181,7 +182,9 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       // when either the radial or base part change,
       // we have to init the whole fields
       if (init_shape_functions_required)
-        this->init_shape_functions (inf_elem);
+        this->init_shape_functions (radial_qrule->get_points(),
+                                    base_fe->qrule->get_points(),
+                                    inf_elem);
 
       // computing the distance only works when we have the current
       // base_elem stored.  This happens when fe_type is const,
@@ -206,8 +209,35 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       // update the elem_type
       elem_type = inf_elem->type();
 
+      // We'll assume that pts is a tensor product mesh of points.
+      // That will handle the pts.size()==1 case that we care about
+      // right now, and it will generalize a bit, and it won't break
+      // the assumptions elsewhere in InfFE.
+      std::vector<Point> radial_pts;
+      for (unsigned int p=0; p != pts->size(); ++p)
+        {
+          Real radius = (*pts)[p](Dim-1);
+          if (radial_pts.size() && radial_pts[0](0) == radius)
+            break;
+          radial_pts.push_back(Point(radius));
+        }
+      const unsigned int radial_pts_size = radial_pts.size();
+      const unsigned int base_pts_size = pts->size() / radial_pts_size;
+      // If we're a tensor product we should have no remainder
+      libmesh_assert_equal_to
+        (base_pts_size * radial_pts_size, pts->size());
+
+      std::vector<Point> base_pts;
+      base_pts.reserve(base_pts_size);
+      for (unsigned int p=0; p != pts->size(); p += radial_pts_size)
+        {
+          Point pt = (*pts)[p];
+          pt(Dim-1) = 0;
+          base_pts.push_back(pt);
+        }
+
       // init radial shapes
-      this->init_radial_shape_functions(inf_elem);
+      this->init_radial_shape_functions(inf_elem, &radial_pts);
 
       // update the base
       this->update_base_elem(inf_elem);
@@ -215,17 +245,32 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       // the finite element on the ifem base
       base_fe.reset(FEBase::build(Dim-1, this->fe_type).release());
 
+      base_fe->calculate_phi = base_fe->calculate_dphi = base_fe->calculate_dphiref = true;
+      base_fe->get_xyz();
+      base_fe->determine_calculations();
+
       // init base shapes
-      base_fe->init_base_shape_functions(*pts,
+      base_fe->init_base_shape_functions(base_pts,
                                          base_elem.get());
 
       // compute the shape functions and map functions of base_fe
       // before using them later in combine_base_radial.
-      base_fe->_fe_map->compute_map (base_fe->dim, base_fe->qrule->get_weights(),
-                                     base_elem.get(), base_fe->calculate_d2phi);
-      base_fe->compute_shape_functions(base_elem.get(), base_fe->qrule->get_points());
 
-      this->init_shape_functions (inf_elem);
+      if (weights)
+        {
+          base_fe->_fe_map->compute_map (base_fe->dim, *weights,
+                                         base_elem.get(), base_fe->calculate_d2phi);
+        }
+      else
+        {
+          std::vector<Real> dummy_weights (pts->size(), 1.);
+          base_fe->_fe_map->compute_map (base_fe->dim, dummy_weights,
+                                         base_elem.get(), base_fe->calculate_d2phi);
+        }
+
+      base_fe->compute_shape_functions(base_elem.get(), *pts);
+
+      this->init_shape_functions (radial_pts, base_pts, inf_elem);
 
       // combine the base and radial shapes
       this->combine_base_radial (inf_elem);
@@ -337,7 +382,9 @@ void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem * inf_elem)
+void InfFE<Dim,T_radial,T_map>::init_shape_functions(const std::vector<Point> & radial_qp,
+                                                     const std::vector<Point> & base_qp,
+                                                     const Elem * inf_elem)
 {
   libmesh_assert(inf_elem);
 
@@ -380,7 +427,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem * inf_elem)
 
 
   // The number of the base quadrature points.
-  const unsigned int n_base_qp = base_qrule->n_points();
+  const unsigned int n_base_qp = base_qp.size();
 
   // The total number of quadrature points.
   const unsigned int n_total_qp = n_radial_qp * n_base_qp;
@@ -630,21 +677,32 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem * inf_elem)
     //     access from the outside to these fields
     // (b) form a std::vector<Real> which contains the appropriate weights
     //     of the combined quadrature rule!
-    const std::vector<Point> & radial_qp = radial_qrule->get_points();
     libmesh_assert_equal_to (radial_qp.size(), n_radial_qp);
 
-    const std::vector<Real> & radial_qw = radial_qrule->get_weights();
-    const std::vector<Real> & base_qw = base_qrule->get_weights();
-    libmesh_assert_equal_to (radial_qw.size(), n_radial_qp);
-    libmesh_assert_equal_to (base_qw.size(), n_base_qp);
+    if (radial_qrule && base_qrule)
+      {
+        const std::vector<Real> & radial_qw = radial_qrule->get_weights();
+        const std::vector<Real> & base_qw = base_qrule->get_weights();
+        libmesh_assert_equal_to (radial_qw.size(), n_radial_qp);
+        libmesh_assert_equal_to (base_qw.size(), n_base_qp);
 
-    for (unsigned int rp=0; rp<n_radial_qp; rp++)
-      for (unsigned int bp=0; bp<n_base_qp; bp++)
-        {
-          weight[bp + rp*n_base_qp] = Radial::D(radial_qp[rp](0));
-          dweightdv[bp + rp*n_base_qp] = Radial::D_deriv(radial_qp[rp](0));
-          _total_qrule_weights[bp + rp*n_base_qp] = radial_qw[rp] * base_qw[bp];
-        }
+        for (unsigned int rp=0; rp<n_radial_qp; rp++)
+          for (unsigned int bp=0; bp<n_base_qp; bp++)
+            {
+              weight[bp + rp*n_base_qp] = Radial::D(radial_qp[rp](0));
+              dweightdv[bp + rp*n_base_qp] = Radial::D_deriv(radial_qp[rp](0));
+              _total_qrule_weights[bp + rp*n_base_qp] = radial_qw[rp] * base_qw[bp];
+            }
+      }
+    else
+      {
+        for (unsigned int rp=0; rp<n_radial_qp; rp++)
+          for (unsigned int bp=0; bp<n_base_qp; bp++)
+            {
+              weight[bp + rp*n_base_qp] = Radial::D(radial_qp[rp](0));
+              dweightdv[bp + rp*n_base_qp] = Radial::D_deriv(radial_qp[rp](0));
+            }
+      }
   }
 }
 
