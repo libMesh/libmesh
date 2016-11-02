@@ -2073,9 +2073,11 @@ Elem::parent_bracketing_nodes(unsigned int child,
           // We have to examine each node in that child
           for (unsigned int n = 0; n != ncn; ++n)
             {
-              // If this child node isn't a vertex, we need to
-              // find bracketing nodes on the child.
-              if (!this->is_vertex_on_child(c, n))
+              // If this child node isn't a vertex or an infinite
+              // child element's mid-infinite-edge node, then we need
+              // to find bracketing nodes on the child.
+              if (!this->is_vertex_on_child(c, n) &&
+                  !this->is_mid_infinite_edge_node(n))
                 {
                   // Use the embedding matrix to find the child node
                   // location in parent master element space
