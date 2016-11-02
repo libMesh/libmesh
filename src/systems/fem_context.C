@@ -1800,10 +1800,14 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
     }
 #endif // LIBMESH_ENABLE_AMR
 
-  unsigned int elem_dim = this->has_elem() ? this->get_elem().dim() : 0;
+  const unsigned int elem_dim = this->has_elem() ? this->get_elem().dim() : 0;
 
   FEGenericBase<OutputShape>* fe_new =
-    FEGenericBase<OutputShape>::build(elem_dim, fe_type).release();
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+    (this->has_elem() && this->get_elem().infinite()) ?
+     FEGenericBase<OutputShape>::build_InfFE(elem_dim, fe_type).release() :
+#endif
+     FEGenericBase<OutputShape>::build(elem_dim, fe_type).release();
 
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit
