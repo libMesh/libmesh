@@ -516,7 +516,8 @@ protected:
    * infinite element.  The parts that only change when the radial
    * order changes, are initialized here.
    */
-  void init_radial_shape_functions(const Elem * inf_elem);
+  void init_radial_shape_functions(const Elem * inf_elem,
+                                   const std::vector<Point> * radial_pts = libmesh_nullptr);
 
   /**
    * Initialize all the data fields like \p weight, \p mode,

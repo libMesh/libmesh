@@ -252,9 +252,11 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem * libmesh_dbg_var(inf_elem))
+void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions
+  (const Elem * libmesh_dbg_var(inf_elem),
+   const std::vector<Point> * radial_pts)
 {
-  libmesh_assert(radial_qrule.get());
+  libmesh_assert(radial_qrule.get() || radial_pts);
   libmesh_assert(inf_elem);
 
   // Start logging the radial shape function initialization
@@ -270,8 +272,10 @@ void InfFE<Dim,T_radial,T_map>::init_radial_shape_functions(const Elem * libmesh
   const Order radial_approx_order = fe_type.radial_order;
   const unsigned int n_radial_approx_shape_functions = Radial::n_dofs(radial_approx_order);
 
-  const unsigned int n_radial_qp = radial_qrule->n_points();
-  const std::vector<Point> & radial_qp = radial_qrule->get_points();
+  const unsigned int n_radial_qp =
+    radial_pts ? radial_pts->size() : radial_qrule->n_points();
+  const std::vector<Point> & radial_qp =
+    radial_pts ? *radial_pts : radial_qrule->get_points();
 
   // resize the radial data fields
 
