@@ -69,7 +69,7 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
   LOG_SCOPE("evaluate_basis_function", "RBEIMAssembly");
 
   bool repeated_qrule = false;
-  if (_qrule != libmesh_nullptr)
+  if (_qrule.get() != libmesh_nullptr)
     {
       repeated_qrule =
         ( (element_qrule.type()      == _qrule->type()) &&
