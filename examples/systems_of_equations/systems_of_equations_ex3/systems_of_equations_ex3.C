@@ -159,7 +159,7 @@ int main (int argc, char ** argv)
   // The number of steps and the stopping criterion are also required
   // for the nonlinear iterations.
   const unsigned int n_nonlinear_steps = 15;
-  const Real nonlinear_tolerance = 1.e-5;
+  const Real nonlinear_tolerance = TOLERANCE*10;
 
   // We also set a standard linear solver flag in the EquationSystems object
   // which controls the maxiumum number of linear solver iterations allowed.
