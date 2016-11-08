@@ -37,7 +37,11 @@
 #include <vector>
 
 #ifdef __APPLE__
-#include <libkern/OSAtomic.h>
+#  ifdef __MAC_10_12
+#    include <os/lock.h>
+#else
+#    include <libkern/OSAtomic.h>
+#  endif
 #endif
 
 // Thread-Local-Storage macros
@@ -77,6 +81,35 @@ typedef NonConcurrentThread Thread;
  * space for the lock to be acquired.
  */
 #ifdef __APPLE__
+#ifdef __MAC_10_12
+class spin_mutex
+{
+public:
+  spin_mutex() { ulock = OS_UNFAIR_LOCK_INIT; }
+  ~spin_mutex() {}
+
+  void lock () { os_unfair_lock_lock(&ulock); }
+  void unlock () { os_unfair_lock_unlock(&ulock); }
+
+  class scoped_lock
+  {
+  public:
+    scoped_lock () : smutex(libmesh_nullptr) {}
+    explicit scoped_lock ( spin_mutex & in_smutex ) : smutex(&in_smutex) { smutex->lock(); }
+
+    ~scoped_lock () { release(); }
+
+    void acquire ( spin_mutex & in_smutex ) { smutex = &in_smutex; smutex->lock(); }
+    void release () { if (smutex) smutex->unlock(); smutex = libmesh_nullptr; }
+
+  private:
+    spin_mutex * smutex;
+  };
+
+private:
+  os_unfair_lock ulock;
+};
+#else
 class spin_mutex
 {
 public:
@@ -104,6 +137,7 @@ public:
 private:
   OSSpinLock slock;
 };
+#endif
 #else
 class spin_mutex
 {
