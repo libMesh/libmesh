@@ -34,16 +34,18 @@ void PointNeighborCoupling::mesh_reinit()
 {
   // Unless we have periodic boundary conditions, we don't need
   // anything precomputed.
-  if (!_periodic_bcs || _periodic_bcs->empty())
-    return;
+#ifdef LIBMESH_ENABLE_PERIODIC
+  if (_periodic_bcs && !_periodic_bcs->empty())
+#endif
+    {
+      // If we do have periodic boundary conditions, we'll need a master
+      // point locator, so we'd better have a mesh to build it on.
+      libmesh_assert(_mesh);
 
-  // If we do have periodic boundary conditions, we'll need a master
-  // point locator, so we'd better have a mesh to build it on.
-  libmesh_assert(_mesh);
-
-  // Make sure an up-to-date master point locator has been
-  // constructed; we'll need to grab sub-locators soon.
-  _mesh->sub_point_locator();
+      // Make sure an up-to-date master point locator has been
+      // constructed; we'll need to grab sub-locators soon.
+      _mesh->sub_point_locator();
+    }
 }
 
 
@@ -56,6 +58,7 @@ void PointNeighborCoupling::operator()
 {
   LOG_SCOPE("operator()", "PointNeighborCoupling");
 
+#ifdef LIBMESH_ENABLE_PERIODIC
   bool check_periodic_bcs =
     (_periodic_bcs && !_periodic_bcs->empty());
   UniquePtr<PointLocatorBase> point_locator;
@@ -64,6 +67,7 @@ void PointNeighborCoupling::operator()
       libmesh_assert(_mesh);
       point_locator = _mesh->sub_point_locator();
     }
+#endif
 
   if (!this->_n_levels)
     {
