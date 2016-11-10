@@ -679,7 +679,7 @@ public:
   /**
    * Reinitializes interior FE objects on the current geometric element
    */
-  void elem_fe_reinit(const std::vector<Point> * const pts = libmesh_nullptr);
+  virtual void elem_fe_reinit(const std::vector<Point> * const pts = libmesh_nullptr);
 
   /**
    * Reinitializes side FE objects on the current geometric element
@@ -689,7 +689,7 @@ public:
   /**
    * Reinitializes edge FE objects on the current geometric element
    */
-  void edge_fe_reinit();
+  virtual void edge_fe_reinit();
 
   /**
    * Accessor for element interior quadrature rule for the dimension of the
