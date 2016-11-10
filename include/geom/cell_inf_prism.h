@@ -95,6 +95,13 @@ public:
    */
   virtual unsigned int n_children() const libmesh_override { return 4; }
 
+  /**
+   * @returns true iff the specified (local) node number is a
+   * "mid-edge" node on an infinite element edge.
+   */
+  virtual bool is_mid_infinite_edge_node(const unsigned int i) const
+    libmesh_override { return (i > 2 && i < 6); }
+
   /*
    * @returns true iff the specified child is on the
    * specified side

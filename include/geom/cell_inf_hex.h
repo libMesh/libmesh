@@ -81,6 +81,13 @@ public:
   virtual unsigned int n_vertices() const libmesh_override { return 8; }
 
   /**
+   * @returns true iff the specified (local) node number is a
+   * "mid-edge" node on an infinite element edge.
+   */
+  virtual bool is_mid_infinite_edge_node(const unsigned int i) const
+    libmesh_override { return (i > 3 && i < 8); }
+
+  /**
    * @returns 8.  All infinite hexahedrals have 8 edges,
    * 4 lying in the base, and 4 perpendicular to the base.
    */

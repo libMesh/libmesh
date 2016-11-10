@@ -516,7 +516,8 @@ protected:
    * infinite element.  The parts that only change when the radial
    * order changes, are initialized here.
    */
-  void init_radial_shape_functions(const Elem * inf_elem);
+  void init_radial_shape_functions(const Elem * inf_elem,
+                                   const std::vector<Point> * radial_pts = libmesh_nullptr);
 
   /**
    * Initialize all the data fields like \p weight, \p mode,
@@ -524,7 +525,9 @@ protected:
    * for the current element.  This method prepares the data
    * related to the base part, and some of the combined fields.
    */
-  void init_shape_functions(const Elem * inf_elem);
+  void init_shape_functions(const std::vector<Point> & radial_qp,
+                            const std::vector<Point> & base_qp,
+                            const Elem * inf_elem);
 
   /**
    * Not implemented yet.  Initialize all the data fields like \p weight,

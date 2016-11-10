@@ -131,6 +131,13 @@ public:
    */
   virtual Point origin () const libmesh_override;
 
+  /**
+   * @returns true iff the specified (local) node number is a
+   * "mid-edge" node on an infinite element edge.
+   */
+  virtual bool is_mid_infinite_edge_node(const unsigned int i) const
+    libmesh_override { return (i > 0); }
+
 #endif
 
 

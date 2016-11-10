@@ -1512,7 +1512,11 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // In 3D with non-LAGRANGE, project any edge values next
           if (dim > 2 &&
               cont != DISCONTINUOUS &&
-              fe_type.family != LAGRANGE)
+              (fe_type.family != LAGRANGE
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+               || elem->infinite()
+#endif
+              ))
             {
               // If we're JUST_COARSENED we'll need a custom
               // evaluation, not just the standard edge FE
@@ -1684,7 +1688,11 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           // faces in 3D) next.
           if (dim > 1 &&
               cont != DISCONTINUOUS &&
-              fe_type.family != LAGRANGE)
+              (fe_type.family != LAGRANGE
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+               || elem->infinite()
+#endif
+              ))
             {
               // If we're JUST_COARSENED we'll need a custom
               // evaluation, not just the standard side FE
@@ -1862,7 +1870,12 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
           // Project any remaining (interior) dofs in the non-LAGRANGE
           // case.
-          if (free_dofs && fe_type.family != LAGRANGE)
+          if (free_dofs &&
+              (fe_type.family != LAGRANGE
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+               || elem->infinite()
+#endif
+              ))
             {
               const std::vector<Point> & xyz_values = fe->get_xyz();
               const std::vector<Real> & JxW = fe->get_JxW();
