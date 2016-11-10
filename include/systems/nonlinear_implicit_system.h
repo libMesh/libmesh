@@ -145,7 +145,7 @@ public:
      * It must be implemented by the user in a derived class.
      */
     virtual void operator()(std::vector<NumericVector<Number> *> & sp,
-                            sys_type & s);
+                            sys_type & s) = 0;
   };
 
   /**
