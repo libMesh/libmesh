@@ -31,7 +31,10 @@
 #include <cstdlib>
 #include <iostream>
 
+// Eigen uses deprecated std::binder1st/2nd classes, which GCC warns about.
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #include <Eigen/Dense>
+#pragma GCC diagnostic warning "-Wdeprecated-declarations"
 
 using namespace Eigen;
 using namespace std;
