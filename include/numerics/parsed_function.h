@@ -319,7 +319,7 @@ ParsedFunction<Output,OutputGradient>::get_inline_value (const std::string & inl
 #ifndef NDEBUG
   bool found_var_name = false;
 #endif
-  Output old_var_value;
+  Output old_var_value(0.);
 
   for (unsigned int s=0; s != _subexpressions.size(); ++s)
     {
