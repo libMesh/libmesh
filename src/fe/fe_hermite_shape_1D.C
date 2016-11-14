@@ -194,7 +194,7 @@ Real FE<1,HERMITE>::shape(const ElemType,
 
 template <>
 Real FE<1,HERMITE>::shape(const Elem * elem,
-                          const Order order,
+                          const Order libmesh_dbg_var(order),
                           const unsigned int i,
                           const Point & p)
 {
@@ -260,7 +260,7 @@ Real FE<1,HERMITE>::shape_deriv(const ElemType,
 
 template <>
 Real FE<1,HERMITE>::shape_deriv(const Elem * elem,
-                                const Order order,
+                                const Order libmesh_dbg_var(order),
                                 const unsigned int i,
                                 const unsigned int,
                                 const Point & p)
@@ -314,7 +314,7 @@ Real FE<1,HERMITE>::shape_deriv(const Elem * elem,
 
 template <>
 Real FE<1,HERMITE>::shape_second_deriv(const Elem * elem,
-                                       const Order order,
+                                       const Order libmesh_dbg_var(order),
                                        const unsigned int i,
                                        const unsigned int,
                                        const Point & p)
