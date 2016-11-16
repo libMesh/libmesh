@@ -20,20 +20,8 @@
 // for reading into a DistributedMesh
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
-#include "libmesh/node.h"
-#include "libmesh/mesh_refinement.h"
-#include "libmesh/mesh.h"
-#include "libmesh/mesh_tools.h"
-#include "libmesh/equation_systems.h"
-#include "libmesh/explicit_system.h"
-#include "libmesh/elem.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/exodusII_io.h"
-#include "libmesh/nemesis_io.h"
 #include "libmesh/checkpoint_io.h"
-#include "libmesh/mesh_generation.h"
 #include "libmesh/metis_partitioner.h"
-#include "libmesh/elem.h"
 #include "libmesh/getpot.h"
 
 using namespace libMesh;
