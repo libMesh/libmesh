@@ -33,6 +33,7 @@ unit_tests_sources = \
   mesh/all_tri.C \
   mesh/boundary_mesh.C \
   mesh/boundary_info.C \
+  mesh/checkpoint.C \
   mesh/contains_point.C \
   mesh/mixed_dim_mesh_test.C \
   mesh/nodal_neighbors.C \
@@ -163,7 +164,7 @@ $(top_builddir)/libmesh_oprof.la: FORCE
 
 TESTS = run_unit_tests.sh
 
-CLEANFILES = cube_mesh.xdr
+CLEANFILES = cube_mesh.xdr checkpoint_splitter.cpr-2-0 checkpoint_splitter.cpr-2-1 slit_mesh.xda slit_solution.xda
 
 ######################################################################
 #
