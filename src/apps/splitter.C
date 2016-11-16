@@ -32,9 +32,10 @@ int main (int argc, char ** argv)
 
   if (libMesh::on_command_line("--help"))
     {
-      libMesh::out << "Example: ./splitter-opt --mesh=filename.e --n-procs='4 8 16' \n\n"
+      libMesh::out << "Example: ./splitter-opt --mesh=filename.e --n-procs='4 8 16' --dry-run\n\n"
                    << "--mesh             Full name of the mesh file to read in. \n"
                    << "--n-procs          Vector of number of processors.\n"
+                   << "--dry-run          Only test the partitioning, don't write any files.\n"
                    << std::endl;
 
       return 0;
@@ -126,14 +127,14 @@ int main (int argc, char ** argv)
             }
         }
 
-      libMesh::out << "Writing " << my_num_chunks << " Files" << std::endl;
-
-      for (unsigned int i = my_first_chunk; i < my_first_chunk + my_num_chunks; i++)
+      if (!libMesh::on_command_line("--dry-run"))
         {
-          libMesh::err << comm.rank() << ": " << i << std::endl;
+          libMesh::out << "Writing " << my_num_chunks << " Files" << std::endl;
 
-          if (libMesh::on_command_line("--checkpoint"))
+          for (unsigned int i = my_first_chunk; i < my_first_chunk + my_num_chunks; i++)
             {
+              libMesh::err << comm.rank() << ": " << i << std::endl;
+
               CheckpointIO cpr(mesh);
               cpr.current_processor_id() = i;
               cpr.current_n_processors() = n_procs;
