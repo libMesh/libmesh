@@ -2453,6 +2453,14 @@ std::string Elem::get_info () const
   else
     oss << "invalid";
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  oss << ", unique_id()=";
+  if (this->valid_unique_id())
+    oss << this->unique_id();
+  else
+    oss << "invalid";
+#endif
+
   oss << ", processor_id()=" << this->processor_id()               << '\n';
 
   oss << "   type()="    << Utility::enum_to_string(this->type())  << '\n'
