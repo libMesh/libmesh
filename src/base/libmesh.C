@@ -549,7 +549,12 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   // initialization above may have removed command line arguments
   // that are not relevant to this application in the above calls.
   // We don't want a false-positive by detecting those arguments.
-  command_line->parse_command_line (argc, argv);
+  //
+  // Note: this seems overly paranoid/like it should be unnecessary,
+  // plus we were doing it wrong for many years and not clearing the
+  // existing GetPot object before re-parsing the command line, so all
+  // the command line arguments appeared twice in the GetPot object...
+  command_line.reset (new GetPot (argc, argv));
 
   // The following line is an optimization when simultaneous
   // C and C++ style access to output streams is not required.
@@ -574,15 +579,46 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       libMesh::err = *newerr;
     }
 
-  // Honor the --redirect-stdout command-line option.
-  // When this is specified each processor sends
-  // libMesh::out/libMesh::err messages to
-  // stdout.processor.####
-  if (libMesh::on_command_line ("--redirect-stdout"))
+  // Process command line arguments for redirecting stdout/stderr.
+  bool
+    cmdline_has_redirect_stdout = libMesh::on_command_line ("--redirect-stdout"),
+    cmdline_has_redirect_output = libMesh::on_command_line ("--redirect-output");
+
+  // The --redirect-stdout command-line option has been deprecated in
+  // favor of "--redirect-output basename".
+  if (cmdline_has_redirect_stdout)
+    libmesh_warning("The --redirect-stdout command line option has been deprecated. "
+                    "Use '--redirect-output basename' instead.");
+
+  // Honor the "--redirect-stdout" and "--redirect-output basename"
+  // command-line options.  When one of these is specified, each
+  // processor sends libMesh::out/libMesh::err messages to
+  // stdout.processor.#### (default) or basename.processor.####.
+  if (cmdline_has_redirect_stdout || cmdline_has_redirect_output)
     {
+      std::string basename = "stdout";
+
+      // Look for following argument if using new API
+      if (cmdline_has_redirect_output)
+        {
+          // Set the cursor to the correct location in the list of command line arguments.
+          command_line->search(1, "--redirect-output");
+
+          // Get the next option on the command line as a string.
+          std::string next_string = "";
+          next_string = command_line->next(next_string);
+
+          // If the next string starts with a dash, we assume it's
+          // another flag and not a file basename requested by the
+          // user.
+          if (next_string.size() > 0 && next_string.find_first_of("-") != 0)
+            basename = next_string;
+        }
+
       std::ostringstream filename;
-      filename << "stdout.processor." << libMesh::global_processor_id();
+      filename << basename << ".processor." << libMesh::global_processor_id();
       _ofstream.reset (new std::ofstream (filename.str().c_str()));
+
       // Redirect, saving the original streambufs!
       out_buf = libMesh::out.rdbuf (_ofstream->rdbuf());
       err_buf = libMesh::err.rdbuf (_ofstream->rdbuf());
@@ -687,7 +723,8 @@ LibMeshInit::~LibMeshInit()
   // Set the initialized() flag to false
   libMeshPrivateData::_is_initialized = false;
 
-  if (libMesh::on_command_line ("--redirect-stdout"))
+  if (libMesh::on_command_line ("--redirect-stdout") ||
+      libMesh::on_command_line ("--redirect-output"))
     {
       // If stdout/stderr were redirected to files, reset them now.
       libMesh::out.rdbuf (out_buf);
