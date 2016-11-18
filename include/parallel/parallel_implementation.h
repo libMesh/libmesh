@@ -34,7 +34,7 @@ namespace Parallel {
 
 #ifdef LIBMESH_HAVE_MPI
 
-#define STANDARD_TYPE(cxxtype,mpitype)                                  \
+#define LIBMESH_STANDARD_TYPE(cxxtype,mpitype)                                  \
   template<>                                                            \
   class StandardType<cxxtype> : public DataType                         \
   {                                                                     \
@@ -45,7 +45,7 @@ namespace Parallel {
 
 #else
 
-#define STANDARD_TYPE(cxxtype,mpitype)                                  \
+#define LIBMESH_STANDARD_TYPE(cxxtype,mpitype)                                  \
   template<>                                                            \
   class StandardType<cxxtype> : public DataType                         \
   {                                                                     \
@@ -56,8 +56,8 @@ namespace Parallel {
 
 #endif
 
-#define INT_TYPE(cxxtype,mpitype)                                       \
-  STANDARD_TYPE(cxxtype,mpitype);                                       \
+#define LIBMESH_INT_TYPE(cxxtype,mpitype)                                       \
+  LIBMESH_STANDARD_TYPE(cxxtype,mpitype);                                       \
                                                                         \
   template<>                                                            \
   struct Attributes<cxxtype>                                            \
@@ -67,8 +67,8 @@ namespace Parallel {
     static void set_highest(cxxtype & x) { x = std::numeric_limits<cxxtype>::max(); } \
   }
 
-#define FLOAT_TYPE(cxxtype,mpitype)                                     \
-  STANDARD_TYPE(cxxtype,mpitype);                                       \
+#define LIBMESH_FLOAT_TYPE(cxxtype,mpitype)                                     \
+  LIBMESH_STANDARD_TYPE(cxxtype,mpitype);                                       \
                                                                         \
   template<>                                                            \
   struct Attributes<cxxtype>                                            \
@@ -78,7 +78,7 @@ namespace Parallel {
     static void set_highest(cxxtype & x) { x = std::numeric_limits<cxxtype>::infinity(); } \
   }
 
-#define CONTAINER_TYPE(cxxtype)                                         \
+#define LIBMESH_CONTAINER_TYPE(cxxtype)                                         \
   template<typename T>                                                  \
   struct Attributes<cxxtype<T> >                                        \
   {                                                                     \
@@ -92,20 +92,20 @@ namespace Parallel {
   }
 
 
-INT_TYPE(char,MPI_CHAR);
+LIBMESH_INT_TYPE(char,MPI_CHAR);
 #if MPI_VERSION > 1
-INT_TYPE(signed char,MPI_SIGNED_CHAR);
+LIBMESH_INT_TYPE(signed char,MPI_SIGNED_CHAR);
 #endif
-INT_TYPE(unsigned char,MPI_UNSIGNED_CHAR);
-INT_TYPE(short int,MPI_SHORT);
-INT_TYPE(unsigned short int,MPI_UNSIGNED_SHORT);
-INT_TYPE(int,MPI_INT);
-INT_TYPE(unsigned int,MPI_UNSIGNED);
-INT_TYPE(long,MPI_LONG);
-INT_TYPE(long long,MPI_LONG_LONG_INT);
-INT_TYPE(unsigned long,MPI_UNSIGNED_LONG);
+LIBMESH_INT_TYPE(unsigned char,MPI_UNSIGNED_CHAR);
+LIBMESH_INT_TYPE(short int,MPI_SHORT);
+LIBMESH_INT_TYPE(unsigned short int,MPI_UNSIGNED_SHORT);
+LIBMESH_INT_TYPE(int,MPI_INT);
+LIBMESH_INT_TYPE(unsigned int,MPI_UNSIGNED);
+LIBMESH_INT_TYPE(long,MPI_LONG);
+LIBMESH_INT_TYPE(long long,MPI_LONG_LONG_INT);
+LIBMESH_INT_TYPE(unsigned long,MPI_UNSIGNED_LONG);
 #if MPI_VERSION > 1 || !defined(LIBMESH_HAVE_MPI)
-INT_TYPE(unsigned long long,MPI_UNSIGNED_LONG_LONG);
+LIBMESH_INT_TYPE(unsigned long long,MPI_UNSIGNED_LONG_LONG);
 #else
 // MPI 1.0 did not have an unsigned long long type, so we have to use
 // MPI_UNSIGNED_LONG in this case.  If "unsigned long" and "unsigned
@@ -132,11 +132,11 @@ struct Attributes<unsigned long long>
   static void set_highest(unsigned long long & x) { x = std::numeric_limits<unsigned long long>::max(); }
 }
 #endif
-FLOAT_TYPE(float,MPI_FLOAT);
-FLOAT_TYPE(double,MPI_DOUBLE);
-FLOAT_TYPE(long double,MPI_LONG_DOUBLE);
-CONTAINER_TYPE(std::set);
-CONTAINER_TYPE(std::vector);
+LIBMESH_FLOAT_TYPE(float,MPI_FLOAT);
+LIBMESH_FLOAT_TYPE(double,MPI_DOUBLE);
+LIBMESH_FLOAT_TYPE(long double,MPI_LONG_DOUBLE);
+LIBMESH_CONTAINER_TYPE(std::set);
+LIBMESH_CONTAINER_TYPE(std::vector);
 
 template<typename T1, typename T2>
 class StandardType<std::pair<T1, T2> > : public DataType
