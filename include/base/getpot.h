@@ -1765,7 +1765,7 @@ GetPot::search(const char* Option)
     return false;
 
   // (*) second loop from 0 to old cursor position
-  for (unsigned c = 1; c < OldCursor; c++)
+  for (unsigned c = 1; c <= OldCursor; c++)
     {
       if (argv[c] == SearchTerm)
         {
