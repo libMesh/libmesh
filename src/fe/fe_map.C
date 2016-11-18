@@ -1873,9 +1873,10 @@ Point FE<Dim,T>::inverse_map (const Elem * elem,
                 {
                   libMesh::err << "ERROR: Newton scheme FAILED to converge in "
                                << cnt
-                               << " iterations!"
-                               << " in element "
+                               << " iterations in element "
                                << elem->id()
+                               << " for physical point = "
+                               << physical_point
                                << std::endl;
 
                   elem->print_info(libMesh::err);
