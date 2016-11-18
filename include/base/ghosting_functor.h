@@ -54,8 +54,8 @@ class Elem;
  * which owns K1 might need to examine the solution dof values on K2.
  * An element K1 has a geometric dependency on K2 if a processor which
  * owns K1 might need to examine the geometry of K2. For any element
- * K, we could call the set of algebraic-ghosted("coupled") elements
- * C(K), call the set of solution-ghosted ("evaluable") elements E(K),
+ * K, we could call the set of coupling-ghosted ("coupled") elements
+ * C(K), call the set of algebraic-ghosted ("evaluable") elements E(K),
  * and call the set of geometry-ghosted ("ghosted") elements G(K).
  *
  * It should be safe to assume that, for any element K, C(K) implies
