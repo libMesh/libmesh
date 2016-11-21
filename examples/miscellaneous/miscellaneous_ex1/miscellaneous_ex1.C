@@ -47,6 +47,7 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/enum_xdr_mode.h"
 #include "libmesh/getpot.h"
+#include "libmesh/mesh_refinement.h"
 
 // Define the Finite and Infinite Element object.
 #include "libmesh/fe.h"
@@ -198,10 +199,13 @@ int main (int argc, char ** argv)
   // Initialize the data structures for the equation system.
   equation_systems.init();
 
-  // Prints information about the system to the screen.
-  equation_systems.print_info();
+  // Do a uniform refinement
+  MeshRefinement mesh_refinement(mesh);
+  mesh_refinement.uniformly_refine(1);
+  equation_systems.reinit();
 
-  // Solve the system "Wave".
+  // Print and solve the refined sysem
+  equation_systems.print_info();
   equation_systems.get_system("Wave").solve();
 
   libMesh::out << "Wave system solved" << std::endl;
