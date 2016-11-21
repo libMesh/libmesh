@@ -56,6 +56,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/tensor_value.h"
 #include "libmesh/perf_log.h"
+#include "libmesh/string_to_enum.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -160,6 +161,7 @@ int main(int argc, char ** argv)
   const unsigned int max_r_level = input_file("max_r_level", 10);
   const unsigned int max_r_steps = input_file("max_r_steps", 4);
   const std::string approx_type  = input_file("approx_type", "HERMITE");
+  const std::string approx_order_string = input_file("approx_order", "THIRD");
   const unsigned int uniform_refine = input_file("uniform_refine", 0);
   const Real refine_percentage = input_file("refine_percentage", 0.5);
   const Real coarsen_percentage = input_file("coarsen_percentage", 0.5);
@@ -254,15 +256,18 @@ int main(int argc, char ** argv)
   LinearImplicitSystem & system =
     equation_systems.add_system<LinearImplicitSystem> ("Biharmonic");
 
-  // Adds the variable "u" to "Biharmonic".  "u"
-  // will be approximated using Hermite tensor product squares
-  // or (possibly reduced) cubic Clough-Tocher triangles
+  Order approx_order = approx_type == "SECOND" ? SECOND :
+    Utility::string_to_enum<Order>(approx_order_string);
+
+  // Adds the variable "u" to "Biharmonic".  "u" will be approximated
+  // using Hermite tensor product squares or Clough-Tocher triangles
+
   if (approx_type == "HERMITE")
-    system.add_variable("u", THIRD, HERMITE);
+    system.add_variable("u", approx_order, HERMITE);
   else if (approx_type == "SECOND")
     system.add_variable("u", SECOND, CLOUGH);
   else if (approx_type == "CLOUGH")
-    system.add_variable("u", THIRD, CLOUGH);
+    system.add_variable("u", approx_order, CLOUGH);
   else
     libmesh_error_msg("Invalid approx_type = " << approx_type);
 
