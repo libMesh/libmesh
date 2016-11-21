@@ -646,6 +646,10 @@ public:
    *
    * The argument to skip renumbering is now deprecated - to prevent a
    * mesh from being renumbered, set allow_renumbering(false).
+   *
+   * If this is a distributed mesh, local copies of remote elements
+   * will be deleted here - to keep those elements replicated during
+   * preparation, set allow_remote_element_removal(false).
    */
   void prepare_for_use (const bool skip_renumber_nodes_and_elements=false, const bool skip_find_neighbors=false);
 
@@ -678,6 +682,15 @@ public:
    */
   void allow_renumbering(bool allow) { _skip_renumber_nodes_and_elements = !allow; }
   bool allow_renumbering() const { return !_skip_renumber_nodes_and_elements; }
+
+  /**
+   * If false is passed in then this mesh will no longer have remote
+   * elements deleted when being prepared for use; i.e. even a
+   * DistributedMesh will remain (if it is already) serialized.
+   * This may adversely affect performance and memory use.
+   */
+  void allow_remote_element_removal(bool allow) { _allow_remote_element_removal = allow; }
+  bool allow_remote_element_removal() const { return _allow_remote_element_removal; }
 
   /**
    * If true is passed in then this mesh will no longer be (re)partitioned.
@@ -1243,6 +1256,14 @@ protected:
    * This is set when prepare_for_use() is called.
    */
   bool _skip_renumber_nodes_and_elements;
+
+  /**
+   * If this is false then even on DistributedMesh remote elements
+   * will not be deleted during mesh preparation.
+   *
+   * This is true by default.
+   */
+  bool _allow_remote_element_removal;
 
   /**
    * This structure maintains the mapping of named blocks

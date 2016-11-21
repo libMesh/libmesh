@@ -60,6 +60,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
 #endif
   _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
+  _allow_remote_element_removal(true),
   _spatial_dimension(d),
   _default_ghosting(new GhostPointNeighbors(*this))
 {
@@ -84,6 +85,7 @@ MeshBase::MeshBase (unsigned char d) :
 #endif
   _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
+  _allow_remote_element_removal(true),
   _spatial_dimension(d),
   _default_ghosting(new GhostPointNeighbors(*this))
 {
@@ -109,6 +111,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 #endif
   _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
+  _allow_remote_element_removal(true),
   _elem_dims(other_mesh._elem_dims),
   _spatial_dimension(other_mesh._spatial_dimension),
   _default_ghosting(new GhostPointNeighbors(*this)),
@@ -256,8 +259,10 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   // Partition the mesh.
   this->partition();
 
-  // If we're using DistributedMesh, we'll want it parallelized.
-  this->delete_remote_elements();
+  // If we're using DistributedMesh, we'll probably want it
+  // parallelized.
+  if (this->_allow_remote_element_removal)
+    this->delete_remote_elements();
 
   if(!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
