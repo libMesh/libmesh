@@ -95,7 +95,7 @@ public:
 
   void testPostInitAddElem()
   {
-    SerialMesh mesh(*TestCommWorld);
+    ReplicatedMesh mesh(*TestCommWorld);
 
     EquationSystems es(mesh);
     System &sys = es.add_system<System> ("SimpleSystem");

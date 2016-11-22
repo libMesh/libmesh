@@ -46,11 +46,11 @@ public:
 
 protected:
 
-  SerialMesh* _mesh;
+  ReplicatedMesh* _mesh;
 
   void build_mesh()
   {
-    _mesh = new SerialMesh(*TestCommWorld);
+    _mesh = new ReplicatedMesh(*TestCommWorld);
 
     /*
       (0,1)           (1,1)
@@ -367,11 +367,11 @@ public:
   // Yes, this is necessary. Somewhere in those macros is a protected/private
 protected:
 
-  SerialMesh* _mesh;
+  ReplicatedMesh* _mesh;
 
   void build_mesh()
   {
-    _mesh = new SerialMesh(*TestCommWorld);
+    _mesh = new ReplicatedMesh(*TestCommWorld);
     /*
         We start with this
 
@@ -621,11 +621,11 @@ public:
 
 protected:
 
-  SerialMesh* _mesh;
+  ReplicatedMesh* _mesh;
 
   void build_mesh()
   {
-    _mesh = new SerialMesh(*TestCommWorld);
+    _mesh = new ReplicatedMesh(*TestCommWorld);
 
     /**
      * We start with this
@@ -877,11 +877,11 @@ public:
   // Yes, this is necessary. Somewhere in those macros is a protected/private
 protected:
 
-  SerialMesh* _mesh;
+  ReplicatedMesh* _mesh;
 
   void build_mesh()
   {
-    _mesh = new SerialMesh(*TestCommWorld);
+    _mesh = new ReplicatedMesh(*TestCommWorld);
 
     _mesh->set_mesh_dimension(3);
 

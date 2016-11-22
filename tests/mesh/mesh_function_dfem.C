@@ -71,12 +71,12 @@ public:
   CPPUNIT_TEST_SUITE_END();
 
 protected:
-  SerialMesh * _mesh;
+  ReplicatedMesh * _mesh;
   UniquePtr<PointLocatorBase> _point_locator;
 
   void build_mesh()
   {
-    _mesh = new SerialMesh(*TestCommWorld);
+    _mesh = new ReplicatedMesh(*TestCommWorld);
 
     /*
       (0,1)           (1,1)

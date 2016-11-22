@@ -49,7 +49,7 @@ public:
   void test1D()
   {
     // 1.) Test that build_line() produces a Mesh with spatial_dimension==1
-    SerialMesh mesh(*TestCommWorld);
+    ReplicatedMesh mesh(*TestCommWorld);
     MeshTools::Generation::build_line (mesh, /*n_elem=*/2, /*xmin=*/0., /*xmax=*/1., EDGE2);
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), mesh.mesh_dimension());
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), mesh.spatial_dimension());
@@ -112,7 +112,7 @@ public:
   void test2D()
   {
     // 1.) Test that build_cube() produces a Mesh with spatial_dimension==2
-    SerialMesh mesh(*TestCommWorld);
+    ReplicatedMesh mesh(*TestCommWorld);
     MeshTools::Generation::build_square (mesh,
                                          /*nx=*/2, /*ny=*/2,
                                          /*xmin=*/0., /*xmax=*/1.,

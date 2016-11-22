@@ -51,7 +51,7 @@ protected:
     MeshTools::Generation::build_square(*_mesh, 3, 5,
                                         0.1, 0.9, 0.1, 0.9, QUAD9);
 
-    // We'll need to skip repartitioning with ParallelMesh for now;
+    // We'll need to skip repartitioning with DistributedMesh for now;
     // otherwise the boundary meshes' interior parents might get
     // shuffled off to different processors.
     if (!_mesh->is_serial())
@@ -127,7 +127,7 @@ public:
 
         const Elem *pip = elem->interior_parent();
 
-        // On a ParallelMesh we might not be able to see the
+        // On a DistributedMesh we might not be able to see the
         // interior_parent of a non-local element
         if (pip == remote_elem)
           {
@@ -165,7 +165,7 @@ public:
 
         const Elem *pip = elem->interior_parent();
 
-        // On a ParallelMesh we might not be able to see the
+        // On a DistributedMesh we might not be able to see the
         // interior_parent of a non-local element
         if (pip == remote_elem)
           {
@@ -196,7 +196,7 @@ public:
 
         const Elem *pip = elem->interior_parent();
 
-        // On a ParallelMesh we might not be able to see the
+        // On a DistributedMesh we might not be able to see the
         // interior_parent of a non-local element
         if (pip == remote_elem)
           {

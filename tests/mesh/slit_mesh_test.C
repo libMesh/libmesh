@@ -273,8 +273,8 @@ public:
   {
     this->build_mesh();
 
-    // libMesh *should* renumber now, or a ParallelMesh might not have
-    // contiguous ids, which is a requirement to write xda files.
+    // libMesh *should* renumber now, or a DistributedMesh might not
+    // have contiguous ids, which is a requirement to write xda files.
     _mesh->allow_renumbering(true);
 
     _es = new EquationSystems(*_mesh);

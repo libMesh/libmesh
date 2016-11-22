@@ -57,7 +57,7 @@ public:
 
   void testExtruder()
   {
-    SerialMesh src_mesh(*TestCommWorld, /*dim=*/2);
+    ReplicatedMesh src_mesh(*TestCommWorld, /*dim=*/2);
 
     const unsigned int n_elems_per_side = 4;
     const unsigned int num_layers = 4;
@@ -72,7 +72,7 @@ public:
       elem.subdomain_id() = i;
     }
 
-    SerialMesh dest_mesh(*TestCommWorld, /*dim=*/3);
+    ReplicatedMesh dest_mesh(*TestCommWorld, /*dim=*/3);
 
     RealVectorValue extrusion_vector(0, 0, 1);
 

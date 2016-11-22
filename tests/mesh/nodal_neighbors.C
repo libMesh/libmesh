@@ -31,8 +31,8 @@ class NodalNeighborsTest : public CppUnit::TestCase
    * works in 1D.  If the numbering of MeshGeneration::build_line()
    * ever changes, this test will break, as it compares hand-checked
    * hard-coded "validation" data with the results of
-   * MeshTools::find_nodal_neighbors().  We also use a SerialMesh here
-   * to match the hard-coded numbering.
+   * MeshTools::find_nodal_neighbors().  We also use a ReplicatedMesh
+   * here to match the hard-coded numbering.
    */
 public:
   CPPUNIT_TEST_SUITE( NodalNeighborsTest );
@@ -50,7 +50,7 @@ protected:
                ElemType elem_type,
                dof_id_type * validation_data)
   {
-    SerialMesh mesh(*TestCommWorld, /*dim=*/1);
+    ReplicatedMesh mesh(*TestCommWorld, /*dim=*/1);
 
     MeshTools::Generation::build_line(mesh,
                                       n_elem,

@@ -53,7 +53,7 @@ protected:
                       dof_id_type n_elem_expected,
                       std::size_t n_boundary_conds_expected)
   {
-    SerialMesh mesh(*TestCommWorld, /*dim=*/2);
+    ReplicatedMesh mesh(*TestCommWorld, /*dim=*/2);
 
     // Build a 2x1 TRI3 mesh and ask to split it into triangles.
     // Should be a no-op
@@ -77,7 +77,7 @@ protected:
                       dof_id_type n_elem_expected,
                       std::size_t n_boundary_conds_expected)
   {
-    SerialMesh mesh(*TestCommWorld, /*dim=*/3);
+    ReplicatedMesh mesh(*TestCommWorld, /*dim=*/3);
 
     // Build a 2x1 TRI3 mesh and ask to split it into triangles.
     // Should be a no-op
