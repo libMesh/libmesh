@@ -5,6 +5,7 @@
 #include <libmesh/restore_warnings.h>
 
 #include "libmesh/mesh.h"
+#include "libmesh/serial_mesh.h"
 #include "libmesh/checkpoint_io.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/metis_partitioner.h"
@@ -57,7 +58,7 @@ public:
 
     {
       MetisPartitioner partitioner;
-      Mesh mesh(*TestCommWorld);
+      ReplicatedMesh mesh(*TestCommWorld);
 
       MeshTools::Generation::build_square(mesh,
                                           4,  4,
