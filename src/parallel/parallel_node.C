@@ -21,10 +21,10 @@
 
 // Local includes
 #include "libmesh/boundary_info.h"
+#include "libmesh/distributed_mesh.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/node.h"
 #include "libmesh/parallel.h"
-#include "libmesh/parallel_mesh.h"
 
 // Helper functions in anonymous namespace
 

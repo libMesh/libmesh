@@ -26,8 +26,6 @@
 #include "libmesh/node_range.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_ghost_sync.h"
-#include "libmesh/parallel_mesh.h"
-#include "libmesh/serial_mesh.h"
 #include "libmesh/sphere.h"
 #include "libmesh/threads.h"
 #include "libmesh/string_to_enum.h"
