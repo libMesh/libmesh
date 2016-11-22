@@ -136,11 +136,11 @@ int main (int argc, char** argv)
 
   // Create a mesh.
   // This example directly references all mesh nodes and is
-  // incompatible with ParallelMesh use.
+  // incompatible with DistributedMesh use.
   //
-  // Create a SerialMesh object, with dimension to be overridden
+  // Create a ReplicatedMesh object, with dimension to be overridden
   // later, distributed across the default MPI communicator.
-  SerialMesh mesh(init.comm());
+  ReplicatedMesh mesh(init.comm());
   MeshData mesh_data(mesh);
 
   // Read the meshfile specified in the command line or

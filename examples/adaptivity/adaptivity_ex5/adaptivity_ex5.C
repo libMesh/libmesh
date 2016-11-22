@@ -220,9 +220,9 @@ int main (int argc, char ** argv)
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
   // Create a new mesh on the default MPI communicator.
-  // ParallelMesh currently has a bug which is triggered by this
+  // DistributedMesh currently has a bug which is triggered by this
   // example.
-  SerialMesh mesh(init.comm());
+  ReplicatedMesh mesh(init.comm());
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);

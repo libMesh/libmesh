@@ -96,7 +96,7 @@ int main (int argc, char ** argv)
   const Real gap_function_tol = infile("gap_function_tol", 1.e-8);
 
   // This example code has not been written to cope with a distributed mesh
-  SerialMesh mesh(init.comm());
+  ReplicatedMesh mesh(init.comm());
   mesh.read("systems_of_equations_ex8.exo");
 
   mesh.print_info();

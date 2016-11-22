@@ -61,8 +61,8 @@
 
 using namespace libMesh;
 
-bool compare_elements(const SerialMesh & mesh1,
-                      const SerialMesh & mesh2);
+bool compare_elements(const ReplicatedMesh & mesh1,
+                      const ReplicatedMesh & mesh2);
 void assemble_poisson(EquationSystems & es,
                       const std::string & system_name);
 void assemble_and_solve(MeshBase &,
@@ -104,14 +104,14 @@ int main (int argc, char ** argv)
     ps = command_line.next(ps);
 
   // Generate eight meshes that will be stitched
-  SerialMesh mesh (init.comm());
-  SerialMesh mesh1(init.comm());
-  SerialMesh mesh2(init.comm());
-  SerialMesh mesh3(init.comm());
-  SerialMesh mesh4(init.comm());
-  SerialMesh mesh5(init.comm());
-  SerialMesh mesh6(init.comm());
-  SerialMesh mesh7(init.comm());
+  ReplicatedMesh mesh (init.comm());
+  ReplicatedMesh mesh1(init.comm());
+  ReplicatedMesh mesh2(init.comm());
+  ReplicatedMesh mesh3(init.comm());
+  ReplicatedMesh mesh4(init.comm());
+  ReplicatedMesh mesh5(init.comm());
+  ReplicatedMesh mesh6(init.comm());
+  ReplicatedMesh mesh7(init.comm());
   MeshTools::Generation::build_cube (mesh, ps, ps, ps, -1,    0,    0,  1,  0, 1, HEX8);
   MeshTools::Generation::build_cube (mesh1, ps, ps, ps,    0,  1,    0,  1,  0, 1, HEX8);
   MeshTools::Generation::build_cube (mesh2, ps, ps, ps, -1,    0, -1,    0,  0, 1, HEX8);
@@ -122,7 +122,7 @@ int main (int argc, char ** argv)
   MeshTools::Generation::build_cube (mesh7, ps, ps, ps,    0,  1, -1,    0, -1, 0, HEX8);
 
   // Generate a single unstitched reference mesh
-  SerialMesh nostitch_mesh(init.comm());
+  ReplicatedMesh nostitch_mesh(init.comm());
   MeshTools::Generation::build_cube (nostitch_mesh, ps*2, ps*2, ps*2, -1, 1, -1, 1, -1, 1, HEX8);
   STOP_LOG("Initialize and create cubes", "main");
 

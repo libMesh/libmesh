@@ -98,10 +98,10 @@ int main (int argc, char ** argv)
 
   // Create a serialized mesh, distributed across the default MPI
   // communicator.
-  // InfElemBuilder still requires some updates to be ParallelMesh
+  // InfElemBuilder still requires some updates to be DistributedMesh
   // compatible
 
-  SerialMesh mesh(init.comm());
+  ReplicatedMesh mesh(init.comm());
 
   // Use the internal mesh generator to create elements
   // on the square [-1,1]^3, of type Hex8.

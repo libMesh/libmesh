@@ -98,8 +98,8 @@ int main (int argc, char ** argv)
 #else
 
   // Create a 2D mesh distributed across the default MPI communicator.
-  // Subdivision surfaces do not appear to work with ParallelMesh yet.
-  SerialMesh mesh (init.comm(), 2);
+  // Subdivision surfaces do not appear to work with DistributedMesh yet.
+  ReplicatedMesh mesh (init.comm(), 2);
 
   // Read the coarse square mesh.
   mesh.read ("square_mesh.off");

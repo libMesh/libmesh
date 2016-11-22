@@ -244,8 +244,9 @@ int main (int argc, char ** argv)
       {
         Real nearest_dist_sq = std::numeric_limits<Real>::max();
 
-        // Find the closest local node.  On a ParallelMesh we may not even
-        // know about the existence of closer non-local nodes.
+        // Find the closest local node.  On a DistributedMesh we may
+        // not even know about the existence of closer non-local
+        // nodes.
         libMesh::MeshBase::const_node_iterator it = mesh.local_nodes_begin();
         const libMesh::MeshBase::const_node_iterator end = mesh.local_nodes_end();
         for (; it != end; ++it)
