@@ -25,6 +25,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_mesh.h"
 #include "libmesh/remote_elem.h"
 
 // Helper functions in anonymous namespace

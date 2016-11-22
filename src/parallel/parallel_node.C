@@ -25,6 +25,7 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/node.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_mesh.h"
 
 // Helper functions in anonymous namespace
 
