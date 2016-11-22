@@ -459,35 +459,6 @@ private:
   typedef std::vector<Node *>::const_iterator const_node_iterator_imp;
 };
 
-
-
-// For backwards compatibility with our original name, users can still
-// refer to a ReplicatedMesh as a SerialMesh.
-//
-// This has to be a shim class rather than a typedef so that forward
-// declarations still work.
-class SerialMesh : public ReplicatedMesh
-{
-public:
-  explicit
-  SerialMesh (const Parallel::Communicator & comm_in,
-              unsigned char dim=1)
-    : ReplicatedMesh(comm_in,dim) {}
-
-#ifndef LIBMESH_DISABLE_COMMWORLD
-  explicit
-  SerialMesh (unsigned char dim=1)
-    : ReplicatedMesh(dim) {}
-#endif
-
-  SerialMesh (const UnstructuredMesh & other_mesh) : ReplicatedMesh(other_mesh) {}
-
-  virtual UniquePtr<MeshBase> clone () const libmesh_override
-  { return UniquePtr<MeshBase>(new SerialMesh(*this)); }
-
-  ~SerialMesh() {}
-};
-
 } // namespace libMesh
 
 

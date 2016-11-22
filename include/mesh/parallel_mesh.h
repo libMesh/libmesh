@@ -20,7 +20,40 @@
 #ifndef LIBMESH_PARALLEL_MESH_H
 #define LIBMESH_PARALLEL_MESH_H
 
-// This file is a shim for backwards compatibility.
 #include "libmesh/distributed_mesh.h"
+
+
+namespace libMesh
+{
+
+// For backwards compatibility with our original name, users can still
+// refer to a DistributedMesh as a ParallelMesh.
+//
+// This has to be a shim class rather than a typedef so that forward
+// declarations still work.
+class ParallelMesh : public DistributedMesh
+{
+public:
+  explicit
+  ParallelMesh (const Parallel::Communicator & comm_in,
+                unsigned char dim=1)
+    : DistributedMesh(comm_in,dim) {}
+
+#ifndef LIBMESH_DISABLE_COMMWORLD
+  explicit
+  ParallelMesh (unsigned char dim=1)
+    : DistributedMesh(dim) {}
+#endif
+
+  ParallelMesh (const UnstructuredMesh & other_mesh) : DistributedMesh(other_mesh) {}
+
+  virtual UniquePtr<MeshBase> clone () const libmesh_override
+  { return UniquePtr<MeshBase>(new ParallelMesh(*this)); }
+
+  ~ParallelMesh() {}
+};
+
+} // namespace libMesh
+
 
 #endif // LIBMESH_PARALLEL_MESH_H
