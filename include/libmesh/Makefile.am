@@ -152,6 +152,7 @@ BUILT_SOURCES = \
         boundary_info.h \
         boundary_mesh.h \
         checkpoint_io.h \
+        distributed_mesh.h \
         ensight_io.h \
         exodusII_io.h \
         exodusII_io_helper.h \
@@ -191,6 +192,7 @@ BUILT_SOURCES = \
         parallel_mesh.h \
         patch.h \
         postscript_io.h \
+        replicated_mesh.h \
         serial_mesh.h \
         tecplot_io.h \
         tetgen_io.h \
@@ -962,6 +964,9 @@ boundary_mesh.h: $(top_srcdir)/include/mesh/boundary_mesh.h
 checkpoint_io.h: $(top_srcdir)/include/mesh/checkpoint_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+distributed_mesh.h: $(top_srcdir)/include/mesh/distributed_mesh.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 ensight_io.h: $(top_srcdir)/include/mesh/ensight_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1077,6 +1082,9 @@ patch.h: $(top_srcdir)/include/mesh/patch.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 postscript_io.h: $(top_srcdir)/include/mesh/postscript_io.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+replicated_mesh.h: $(top_srcdir)/include/mesh/replicated_mesh.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 serial_mesh.h: $(top_srcdir)/include/mesh/serial_mesh.h
