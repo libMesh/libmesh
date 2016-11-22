@@ -36,7 +36,7 @@
 
 // LibMesh includes
 #include "libmesh/libmesh.h"
-#include "libmesh/serial_mesh.h"
+#include "libmesh/replicated_mesh.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/mesh_modification.h"
 #include "libmesh/mesh_tools.h"

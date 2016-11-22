@@ -43,7 +43,7 @@
 
 // libMesh includes
 #include "libmesh/libmesh.h"
-#include "libmesh/serial_mesh.h"
+#include "libmesh/replicated_mesh.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/dof_map.h"

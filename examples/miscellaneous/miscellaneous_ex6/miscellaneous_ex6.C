@@ -34,7 +34,7 @@
 #include "libmesh/mesh_triangle_holes.h"
 #include "libmesh/mesh_triangle_interface.h"
 #include "libmesh/node.h"
-#include "libmesh/serial_mesh.h"
+#include "libmesh/replicated_mesh.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

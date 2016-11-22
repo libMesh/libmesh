@@ -1,9 +1,5 @@
 
-#include "libmesh/mesh.h"
-#include "libmesh/serial_mesh.h"
-#include "libmesh/mesh_generation.h"
-#include "libmesh/mesh_modification.h"
-#include "libmesh/mesh_refinement.h"
+#include "libmesh/mesh_base.h"
 
 #include "domain.h"
 

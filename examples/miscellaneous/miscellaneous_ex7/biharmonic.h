@@ -2,7 +2,7 @@
 #define BIHARMONIC_H
 
 #include "libmesh/equation_systems.h"
-#include "libmesh/serial_mesh.h"
+#include "libmesh/replicated_mesh.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/mesh_refinement.h"
 
