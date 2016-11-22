@@ -56,6 +56,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/tensor_value.h"
 #include "libmesh/perf_log.h"
+#include "libmesh/string_to_enum.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -72,6 +73,11 @@ void assemble_biharmonic(EquationSystems & es,
 
 // Prototypes for calculation of the exact solution.  Necessary
 // for setting boundary conditions.
+Number exact_1D_solution(const Point & p,
+                         const Parameters &,
+                         const std::string &,
+                         const std::string &);
+
 Number exact_2D_solution(const Point & p,
                          const Parameters &,   // parameters, not needed
                          const std::string &,  // sys_name, not needed
@@ -85,6 +91,11 @@ Number exact_3D_solution(const Point & p,
 // Prototypes for calculation of the gradient of the exact solution.
 // Necessary for setting boundary conditions in H^2_0 and testing
 // H^1 convergence of the solution
+Gradient exact_1D_derivative(const Point & p,
+                             const Parameters &,
+                             const std::string &,
+                             const std::string &);
+
 Gradient exact_2D_derivative(const Point & p,
                              const Parameters &,
                              const std::string &,
@@ -95,6 +106,11 @@ Gradient exact_3D_derivative(const Point & p,
                              const std::string &,
                              const std::string &);
 
+Tensor exact_1D_hessian(const Point & p,
+                        const Parameters &,
+                        const std::string &,
+                        const std::string &);
+
 Tensor exact_2D_hessian(const Point & p,
                         const Parameters &,
                         const std::string &,
@@ -104,6 +120,8 @@ Tensor exact_3D_hessian(const Point & p,
                         const Parameters &,
                         const std::string &,
                         const std::string &);
+
+Number forcing_function_1D(const Point & p);
 
 Number forcing_function_2D(const Point & p);
 
@@ -160,6 +178,7 @@ int main(int argc, char ** argv)
   const unsigned int max_r_level = input_file("max_r_level", 10);
   const unsigned int max_r_steps = input_file("max_r_steps", 4);
   const std::string approx_type  = input_file("approx_type", "HERMITE");
+  const std::string approx_order_string = input_file("approx_order", "THIRD");
   const unsigned int uniform_refine = input_file("uniform_refine", 0);
   const Real refine_percentage = input_file("refine_percentage", 0.5);
   const Real coarsen_percentage = input_file("coarsen_percentage", 0.5);
@@ -169,10 +188,7 @@ int main(int argc, char ** argv)
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_requires(dim <= LIBMESH_DIM, "2D/3D support");
 
-  // We have only defined 2 and 3 dimensional problems
-  libmesh_assert (dim == 2 || dim == 3);
-
-  // Currently only the Hermite cubics give a 3D C^1 basis
+  // Currently only the Hermite cubics give a 1D or 3D C^1 basis
   libmesh_assert (dim == 2 || approx_type == "HERMITE");
 
   // Create a mesh, with dimension to be overridden later, on the
@@ -182,7 +198,9 @@ int main(int argc, char ** argv)
   // Output file for plotting the error
   std::string output_file = "";
 
-  if (dim == 2)
+  if (dim == 1)
+    output_file += "1D_";
+  else if (dim == 2)
     output_file += "2D_";
   else if (dim == 3)
     output_file += "3D_";
@@ -212,8 +230,15 @@ int main(int argc, char ** argv)
       << "e = [\n";
 
   // Set up the dimension-dependent coarse mesh and solution
-  // We build more than one cell so as to avoid bugs on fewer than
-  // 4 processors in 2D or 8 in 3D.
+  if (dim == 1)
+    {
+      MeshTools::Generation::build_line(mesh, 2);
+      exact_solution = &exact_1D_solution;
+      exact_derivative = &exact_1D_derivative;
+      exact_hessian = &exact_1D_hessian;
+      forcing_function = &forcing_function_1D;
+    }
+
   if (dim == 2)
     {
       MeshTools::Generation::build_square(mesh, 2, 2);
@@ -254,15 +279,18 @@ int main(int argc, char ** argv)
   LinearImplicitSystem & system =
     equation_systems.add_system<LinearImplicitSystem> ("Biharmonic");
 
-  // Adds the variable "u" to "Biharmonic".  "u"
-  // will be approximated using Hermite tensor product squares
-  // or (possibly reduced) cubic Clough-Tocher triangles
+  Order approx_order = approx_type == "SECOND" ? SECOND :
+    Utility::string_to_enum<Order>(approx_order_string);
+
+  // Adds the variable "u" to "Biharmonic".  "u" will be approximated
+  // using Hermite tensor product squares or Clough-Tocher triangles
+
   if (approx_type == "HERMITE")
-    system.add_variable("u", THIRD, HERMITE);
+    system.add_variable("u", approx_order, HERMITE);
   else if (approx_type == "SECOND")
     system.add_variable("u", SECOND, CLOUGH);
   else if (approx_type == "CLOUGH")
-    system.add_variable("u", THIRD, CLOUGH);
+    system.add_variable("u", approx_order, CLOUGH);
   else
     libmesh_error_msg("Invalid approx_type = " << approx_type);
 
@@ -400,6 +428,63 @@ int main(int argc, char ** argv)
 #endif // #ifndef LIBMESH_ENABLE_AMR
 }
 
+
+
+Number exact_1D_solution(const Point & p,
+                         const Parameters &,  // parameters, not needed
+                         const std::string &, // sys_name, not needed
+                         const std::string &) // unk_name, not needed
+{
+  // x coordinate in space
+  const Real x = p(0);
+
+  // analytic solution value
+  return 256.*(x-x*x)*(x-x*x);
+}
+
+
+// We now define the gradient of the exact solution
+Gradient exact_1D_derivative(const Point & p,
+                             const Parameters &,  // parameters, not needed
+                             const std::string &, // sys_name, not needed
+                             const std::string &) // unk_name, not needed
+{
+  // x coordinate in space
+  const Real x = p(0);
+
+  // First derivatives to be returned.
+  Gradient gradu;
+
+  gradu(0) = 256.*2.*(x-x*x)*(1-2*x);
+
+  return gradu;
+}
+
+
+// We now define the hessian of the exact solution
+Tensor exact_1D_hessian(const Point & p,
+                        const Parameters &,  // parameters, not needed
+                        const std::string &, // sys_name, not needed
+                        const std::string &) // unk_name, not needed
+{
+  // Second derivatives to be returned.
+  Tensor hessu;
+
+  // x coordinate in space
+  const Real x = p(0);
+
+  hessu(0,0) = 256.*2.*(1-6.*x+6.*x*x);
+
+  return hessu;
+}
+
+
+
+Number forcing_function_1D(const Point &)
+{
+  // Equals laplacian(laplacian(u)), u'''' in 1D
+  return 256. * 2. * 12.;
+}
 
 
 Number exact_2D_solution(const Point & p,
@@ -721,7 +806,9 @@ void assemble_biharmonic(EquationSystems & es,
         {
           for (unsigned int i=0; i<phi.size(); i++)
             {
-              shape_laplacian[i] = d2phi[i][qp](0,0)+d2phi[i][qp](1,1);
+              shape_laplacian[i] = d2phi[i][qp](0,0);
+              if (dim > 1)
+                shape_laplacian[i] += d2phi[i][qp](1,1);
               if (dim == 3)
                 shape_laplacian[i] += d2phi[i][qp](2,2);
             }
