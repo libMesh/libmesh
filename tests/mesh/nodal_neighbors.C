@@ -5,10 +5,10 @@
 #include <libmesh/restore_warnings.h>
 
 #include <libmesh/libmesh.h>
-#include <libmesh/serial_mesh.h>
 #include <libmesh/node.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_tools.h>
+#include <libmesh/replicated_mesh.h>
 
 #include "test_comm.h"
 

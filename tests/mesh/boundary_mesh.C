@@ -4,11 +4,11 @@
 #include <cppunit/TestCase.h>
 #include <libmesh/restore_warnings.h>
 
-#include <libmesh/serial_mesh.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/remote_elem.h>
+#include <libmesh/replicated_mesh.h>
 
 #include "test_comm.h"
 
