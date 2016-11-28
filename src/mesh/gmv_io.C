@@ -19,7 +19,7 @@
 #include <iomanip>
 #include <fstream>
 #include <vector>
-#include <cstring> // std::strncmp
+#include <ctype.h> // isspace
 
 // Local includes
 #include "libmesh/libmesh_config.h"
@@ -196,8 +196,45 @@ void init_eletypes ()
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// GMVIO members
+// Initialize the static data members by calling the static build functions.
+std::map<std::string, ElemType> GMVIO::_reading_element_map = GMVIO::build_reading_element_map();
+
+
+
+// Static function used to build the _reading_element_map.
+std::map<std::string, ElemType> GMVIO::build_reading_element_map()
+{
+  std::map<std::string, ElemType> ret;
+
+  ret["line"]     = EDGE2;
+  ret["tri"]      = TRI3;
+  ret["tri3"]     = TRI3;
+  ret["quad"]     = QUAD4;
+  ret["tet"]      = TET4;
+  ret["ptet4"]    = TET4;
+  ret["hex"]      = HEX8;
+  ret["phex8"]    = HEX8;
+  ret["prism"]    = PRISM6;
+  ret["pprism6"]  = PRISM6;
+  ret["phex20"]   = HEX20;
+  ret["phex27"]   = HEX27;
+  ret["pprism15"] = PRISM15;
+  ret["ptet10"]   = TET10;
+  ret["6tri"]     = TRI6;
+  ret["8quad"]    = QUAD8;
+  ret["3line"]    = EDGE3;
+
+  // Unsupported/Unused types
+  // ret["vface2d"]
+  // ret["vface3d"]
+  // ret["pyramid"]
+  // ret["ppyrmd5"]
+  // ret["ppyrmd13"]
+
+  return ret;
+}
+
+
 GMVIO::GMVIO (const MeshBase & mesh) :
   MeshOutput<MeshBase>    (mesh),
   _binary                 (false),
@@ -814,7 +851,61 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                                    << (*it)->node_id(14)+1 << " "
                                    << (*it)->node_id(15)+1 << " ";
                       }
-#else
+
+                    // According to our copy of gmvread.c, this is the
+                    // mapping for the Hex27 element.  Unfortunately,
+                    // I tried it and Paraview does not seem to be
+                    // able to read Hex27 elements.  Since this is
+                    // unlikely to change any time soon, we'll
+                    // continue to write out Hex27 elements as 8 Hex8
+                    // sub-elements.
+                    //
+                    // TODO:
+                    // 1.) If we really wanted to use this code for
+                    // something, we'd want to avoid repeating the
+                    // hard-coded node ordering from the HEX20 case.
+                    // These should both be able to use
+                    // ElementDefinitions.
+                    // 2.) You would also need to change
+                    // Hex27::n_sub_elem() to return 1, not sure how
+                    // much other code that would affect...
+
+                    // else if ((*it)->type() == HEX27)
+                    //   {
+                    //     out_stream << "phex27 27\n";
+                    //     out_stream << (*it)->node_id(0)+1  << " "
+                    //                << (*it)->node_id(1)+1  << " "
+                    //                << (*it)->node_id(2)+1  << " "
+                    //                << (*it)->node_id(3)+1  << " "
+                    //                << (*it)->node_id(4)+1  << " "
+                    //                << (*it)->node_id(5)+1  << " "
+                    //                << (*it)->node_id(6)+1  << " "
+                    //                << (*it)->node_id(7)+1  << " "
+                    //                << (*it)->node_id(8)+1  << " "
+                    //                << (*it)->node_id(9)+1  << " "
+                    //                << (*it)->node_id(10)+1 << " "
+                    //                << (*it)->node_id(11)+1 << " "
+                    //                << (*it)->node_id(16)+1 << " "
+                    //                << (*it)->node_id(17)+1 << " "
+                    //                << (*it)->node_id(18)+1 << " "
+                    //                << (*it)->node_id(19)+1 << " "
+                    //                << (*it)->node_id(12)+1 << " "
+                    //                << (*it)->node_id(13)+1 << " "
+                    //                << (*it)->node_id(14)+1 << " "
+                    //                << (*it)->node_id(15)+1 << " "
+                    //       // mid-face nodes
+                    //                << (*it)->node_id(21)+1 << " " // GMV front
+                    //                << (*it)->node_id(22)+1 << " " // GMV right
+                    //                << (*it)->node_id(23)+1 << " " // GMV back
+                    //                << (*it)->node_id(24)+1 << " " // GMV left
+                    //                << (*it)->node_id(20)+1 << " " // GMV bottom
+                    //                << (*it)->node_id(25)+1 << " " // GMV top
+                    //       // center node
+                    //                << (*it)->node_id(26)+1 << " ";
+                    //   }
+
+#else // LIBMESH_ENABLE_INFINITE_ELEMENTS
+
                     // In case of infinite elements, HEX20
                     // should be handled just like the
                     // INFHEX16, since these connect to each other
@@ -2201,7 +2292,11 @@ void GMVIO::_read_one_cell()
       // FIXME: Since Quad9's apparently don't exist for GMV, and since
       // In general we write linear sub-elements to GMV files, we need
       // to be careful to read back in exactly what we wrote out...
-      ElemType type = this->_gmv_elem_to_libmesh_elem(GMVLib::gmv_data.name1);
+      //
+      // The gmv_data.name1 field is padded with blank characters when
+      // it is read in by GMV, so the function that converts it to the
+      // libmesh element type needs to take that into account.
+      ElemType type = this->gmv_elem_to_libmesh_elem(GMVLib::gmv_data.name1);
 
       Elem * elem = Elem::build(type).release();
       elem->set_id(_next_elem_id++);
@@ -2241,68 +2336,18 @@ void GMVIO::_read_one_cell()
 }
 
 
-ElemType GMVIO::_gmv_elem_to_libmesh_elem(const char * elemname)
+ElemType GMVIO::gmv_elem_to_libmesh_elem(std::string elemname)
 {
-  //
-  // Linear Elements
-  //
-  if (!std::strncmp(elemname,"line",4))
-    return EDGE2;
+  // Erase any whitespace padding in name coming from gmv before performing comparison.
+  elemname.erase(std::remove_if(elemname.begin(), elemname.end(), isspace), elemname.end());
 
-  if (!std::strncmp(elemname,"tri",3))
-    return TRI3;
+  // Look up the string in our string->ElemType name.
+  std::map<std::string, ElemType>::iterator it = _reading_element_map.find(elemname);
 
-  if (!std::strncmp(elemname,"quad",4))
-    return QUAD4;
+  if (it == _reading_element_map.end())
+    libmesh_error_msg("Uknown/unsupported element: " << elemname << " was read.");
 
-  // FIXME: tet or ptet4?
-  if ((!std::strncmp(elemname,"tet",3)) ||
-      (!std::strncmp(elemname,"ptet4",5)))
-    return TET4;
-
-  // FIXME: hex or phex8?
-  if ((!std::strncmp(elemname,"hex",3)) ||
-      (!std::strncmp(elemname,"phex8",5)))
-    return HEX8;
-
-  // FIXME: prism or pprism6?
-  if ((!std::strncmp(elemname,"prism",5)) ||
-      (!std::strncmp(elemname,"pprism6",7)))
-    return PRISM6;
-
-  //
-  // Quadratic Elements
-  //
-  if (!std::strncmp(elemname,"phex20",6))
-    return HEX20;
-
-  if (!std::strncmp(elemname,"phex27",6))
-    return HEX27;
-
-  if (!std::strncmp(elemname,"pprism15",8))
-    return PRISM15;
-
-  if (!std::strncmp(elemname,"ptet10",6))
-    return TET10;
-
-  if (!std::strncmp(elemname,"6tri",4))
-    return TRI6;
-
-  if (!std::strncmp(elemname,"8quad",5))
-    return QUAD8;
-
-  if (!std::strncmp(elemname,"3line",5))
-    return EDGE3;
-
-  // Unsupported/Unused types
-  // if (!std::strncmp(elemname,"vface2d",7))
-  // if (!std::strncmp(elemname,"vface3d",7))
-  // if (!std::strncmp(elemname,"pyramid",7))
-  // if (!std::strncmp(elemname,"ppyrmd5",7))
-  // if (!std::strncmp(elemname,"ppyrmd13",8))
-
-  // If we didn't return yet, then we didn't find the right cell!
-  libmesh_error_msg("Uknown/unsupported element: " << elemname << " was read.");
+  return it->second;
 }
 
 
