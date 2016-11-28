@@ -851,7 +851,61 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                                    << (*it)->node_id(14)+1 << " "
                                    << (*it)->node_id(15)+1 << " ";
                       }
-#else
+
+                    // According to our copy of gmvread.c, this is the
+                    // mapping for the Hex27 element.  Unfortunately,
+                    // I tried it and Paraview does not seem to be
+                    // able to read Hex27 elements.  Since this is
+                    // unlikely to change any time soon, we'll
+                    // continue to write out Hex27 elements as 8 Hex8
+                    // sub-elements.
+                    //
+                    // TODO:
+                    // 1.) If we really wanted to use this code for
+                    // something, we'd want to avoid repeating the
+                    // hard-coded node ordering from the HEX20 case.
+                    // These should both be able to use
+                    // ElementDefinitions.
+                    // 2.) You would also need to change
+                    // Hex27::n_sub_elem() to return 1, not sure how
+                    // much other code that would affect...
+
+                    // else if ((*it)->type() == HEX27)
+                    //   {
+                    //     out_stream << "phex27 27\n";
+                    //     out_stream << (*it)->node_id(0)+1  << " "
+                    //                << (*it)->node_id(1)+1  << " "
+                    //                << (*it)->node_id(2)+1  << " "
+                    //                << (*it)->node_id(3)+1  << " "
+                    //                << (*it)->node_id(4)+1  << " "
+                    //                << (*it)->node_id(5)+1  << " "
+                    //                << (*it)->node_id(6)+1  << " "
+                    //                << (*it)->node_id(7)+1  << " "
+                    //                << (*it)->node_id(8)+1  << " "
+                    //                << (*it)->node_id(9)+1  << " "
+                    //                << (*it)->node_id(10)+1 << " "
+                    //                << (*it)->node_id(11)+1 << " "
+                    //                << (*it)->node_id(16)+1 << " "
+                    //                << (*it)->node_id(17)+1 << " "
+                    //                << (*it)->node_id(18)+1 << " "
+                    //                << (*it)->node_id(19)+1 << " "
+                    //                << (*it)->node_id(12)+1 << " "
+                    //                << (*it)->node_id(13)+1 << " "
+                    //                << (*it)->node_id(14)+1 << " "
+                    //                << (*it)->node_id(15)+1 << " "
+                    //       // mid-face nodes
+                    //                << (*it)->node_id(21)+1 << " " // GMV front
+                    //                << (*it)->node_id(22)+1 << " " // GMV right
+                    //                << (*it)->node_id(23)+1 << " " // GMV back
+                    //                << (*it)->node_id(24)+1 << " " // GMV left
+                    //                << (*it)->node_id(20)+1 << " " // GMV bottom
+                    //                << (*it)->node_id(25)+1 << " " // GMV top
+                    //       // center node
+                    //                << (*it)->node_id(26)+1 << " ";
+                    //   }
+
+#else // LIBMESH_ENABLE_INFINITE_ELEMENTS
+
                     // In case of infinite elements, HEX20
                     // should be handled just like the
                     // INFHEX16, since these connect to each other
