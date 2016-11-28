@@ -323,8 +323,29 @@ public:
 
   inline unsigned vector_variable_size(const char* VarName) const;
   inline unsigned vector_variable_size(const std::string& VarName) const;
+
+  /*
+   * Return a list of all variables set by the current input
+   */
   inline STRING_VECTOR get_variable_names() const;
+
+  /*
+   * Return a list of all sections present in the current input
+   */
   inline STRING_VECTOR get_section_names() const;
+
+  /*
+   * Return a list of all subsections of the given section name in the
+   * current input.
+   *
+   * Subsections will be returned in the order they appear in the
+   * input.
+   *
+   * Subsections which exist multiple times in the input file will
+   * only be returned once, in the position of their first appearance.
+   */
+  inline STRING_VECTOR get_subsection_names(const std::string & section_name) const;
+
   inline std::set<std::string> get_overridden_variables() const;
 
   /**
@@ -2568,6 +2589,56 @@ inline STRING_VECTOR
 GetPot::get_section_names() const
 {
   return section_list;
+}
+
+
+
+inline STRING_VECTOR
+GetPot::get_subsection_names(const std::string & prefix) const
+{
+  // GetPot functions should understand user-provided section names
+  // either with or without a trailing slash.
+  const std::string full_prefix =
+    *prefix.rbegin() == '/' ? prefix : prefix + '/';
+
+  const std::size_t full_prefix_len = full_prefix.size();
+
+  // Subsections-of-subsections are in the section_list, so we'll be
+  // adding subsections multiple times.  Using std::set as an
+  // intermediate data structure helps us check for duplicates with
+  // O(N log N) rather than O(N^2) cost.
+  std::set<std::string> subsections;
+
+  STRING_VECTOR returnval;
+
+  for (STRING_VECTOR::const_iterator it = section_list.begin();
+       it != section_list.end(); ++it)
+    {
+      const std::string & section_name = *it;
+
+      // If this section name begins with the prefix
+      if (section_name.compare(0, full_prefix_len, full_prefix) == 0)
+        {
+          const std::size_t next_slash_len =
+            section_name.find('/', full_prefix_len);
+
+          const std::string subsection_name =
+            section_name.substr(full_prefix_len,
+                                next_slash_len - full_prefix_len);
+
+          // If there is a subsection, and if this is the first time
+          // we've seen it, add the prefix-less, postfix-less
+          // subsection name.
+          if (!subsection_name.empty() &&
+              !subsections.count(subsection_name))
+            {
+              returnval.push_back(subsection_name);
+              subsections.insert(subsection_name);
+            }
+        }
+    }
+
+  return returnval;
 }
 
 
