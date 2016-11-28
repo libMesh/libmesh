@@ -77,6 +77,7 @@
   * Add DofMap::gather_constraints() helper function, use in allgather_constraints().
   * Fix for writing NodeElems in ExodusII_IO_Helper::write_elements().
   * Add ability to set user-defined flags when calling TetgenMeshInterface functions.
+  * Move ReplicatedMesh->replicated_mesh.h, DistributedMesh->distributed_mesh.h
 
 0.9.5 -> 1.0.0
   * Add parallel I/O for Nemesis format, solution vector is no longer broadcast.
