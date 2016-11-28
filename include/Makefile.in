@@ -730,6 +730,7 @@ include_HEADERS = \
         mesh/boundary_info.h \
         mesh/boundary_mesh.h \
         mesh/checkpoint_io.h \
+        mesh/distributed_mesh.h \
         mesh/ensight_io.h \
         mesh/exodusII_io.h \
         mesh/fro_io.h \
@@ -767,6 +768,7 @@ include_HEADERS = \
         mesh/parallel_mesh.h \
         mesh/patch.h \
         mesh/postscript_io.h \
+        mesh/replicated_mesh.h \
         mesh/serial_mesh.h \
         mesh/tecplot_io.h \
         mesh/tetgen_io.h \
