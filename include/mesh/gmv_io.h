@@ -230,10 +230,21 @@ private:
   void _read_nodes();
   unsigned int _next_elem_id;
   void _read_one_cell();
-  ElemType _gmv_elem_to_libmesh_elem(const char * elemname);
+  ElemType gmv_elem_to_libmesh_elem(std::string elemname);
   void _read_materials();
   void _read_var();
   std::map<std::string, std::vector<Number> > _nodal_data;
+
+  /**
+   * Static map from string -> ElementType for
+   * use during reading.
+   */
+  static std::map<std::string, ElemType> _reading_element_map;
+
+  /**
+   * Static function used to build the _reading_element_map.
+   */
+  static std::map<std::string, ElemType> build_reading_element_map();
 };
 
 } // namespace libMesh
