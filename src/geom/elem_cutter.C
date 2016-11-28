@@ -22,7 +22,7 @@
 // Local includes
 #include "libmesh/elem_cutter.h"
 #include "libmesh/elem.h"
-#include "libmesh/serial_mesh.h"
+#include "libmesh/replicated_mesh.h"
 #include "libmesh/mesh_triangle_interface.h"
 #include "libmesh/mesh_tetgen_interface.h"
 

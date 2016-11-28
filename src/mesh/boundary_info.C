@@ -22,17 +22,17 @@
 
 // Local includes
 #include "libmesh/libmesh_config.h"
+
 #include "libmesh/boundary_info.h"
+#include "libmesh/distributed_mesh.h"
 #include "libmesh/elem.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_data.h"
 #include "libmesh/mesh_serializer.h"
 #include "libmesh/parallel.h"
-#include "libmesh/parallel_mesh.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/unstructured_mesh.h"
-#include "libmesh/elem.h"
 
 namespace libMesh
 {

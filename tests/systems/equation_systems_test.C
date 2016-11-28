@@ -7,7 +7,7 @@
 #include <libmesh/equation_systems.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
-#include <libmesh/serial_mesh.h>
+#include <libmesh/replicated_mesh.h>
 #include <libmesh/elem.h>
 
 #include "test_comm.h"
@@ -95,7 +95,7 @@ public:
 
   void testPostInitAddElem()
   {
-    SerialMesh mesh(*TestCommWorld);
+    ReplicatedMesh mesh(*TestCommWorld);
 
     EquationSystems es(mesh);
     System &sys = es.add_system<System> ("SimpleSystem");

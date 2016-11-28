@@ -39,7 +39,7 @@
 #include "libmesh/partitioner.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_communication.h"
-#include "libmesh/parallel_mesh.h"
+#include "libmesh/distributed_mesh.h"
 
 namespace libMesh
 {

@@ -32,7 +32,7 @@
 #include "libmesh/mesh_function.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/point.h"
-#include "libmesh/serial_mesh.h"
+#include "libmesh/replicated_mesh.h"
 
 
 using namespace libMesh;

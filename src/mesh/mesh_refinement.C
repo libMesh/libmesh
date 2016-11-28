@@ -40,14 +40,11 @@
 #ifdef DEBUG
 // Some extra validation for DistributedMesh
 #include "libmesh/mesh_tools.h"
-#include "libmesh/parallel_mesh.h"
 #endif // DEBUG
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 #include "libmesh/periodic_boundaries.h"
 #endif
-
-#include "libmesh/parallel_mesh.h"
 
 namespace libMesh
 {

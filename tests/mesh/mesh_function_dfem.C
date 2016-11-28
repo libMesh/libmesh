@@ -5,7 +5,7 @@
 #include <libmesh/restore_warnings.h>
 
 #include <libmesh/equation_systems.h>
-#include <libmesh/serial_mesh.h>
+#include <libmesh/replicated_mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/edge_edge2.h>
 #include <libmesh/face_quad4.h>
@@ -71,12 +71,12 @@ public:
   CPPUNIT_TEST_SUITE_END();
 
 protected:
-  SerialMesh * _mesh;
+  ReplicatedMesh * _mesh;
   UniquePtr<PointLocatorBase> _point_locator;
 
   void build_mesh()
   {
-    _mesh = new SerialMesh(*TestCommWorld);
+    _mesh = new ReplicatedMesh(*TestCommWorld);
 
     /*
       (0,1)           (1,1)

@@ -4,11 +4,11 @@
 #include <cppunit/TestCase.h>
 #include <libmesh/restore_warnings.h>
 
-#include <libmesh/serial_mesh.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/remote_elem.h>
+#include <libmesh/replicated_mesh.h>
 
 #include "test_comm.h"
 
@@ -51,7 +51,7 @@ protected:
     MeshTools::Generation::build_square(*_mesh, 3, 5,
                                         0.1, 0.9, 0.1, 0.9, QUAD9);
 
-    // We'll need to skip repartitioning with ParallelMesh for now;
+    // We'll need to skip repartitioning with DistributedMesh for now;
     // otherwise the boundary meshes' interior parents might get
     // shuffled off to different processors.
     if (!_mesh->is_serial())
@@ -127,7 +127,7 @@ public:
 
         const Elem *pip = elem->interior_parent();
 
-        // On a ParallelMesh we might not be able to see the
+        // On a DistributedMesh we might not be able to see the
         // interior_parent of a non-local element
         if (pip == remote_elem)
           {
@@ -165,7 +165,7 @@ public:
 
         const Elem *pip = elem->interior_parent();
 
-        // On a ParallelMesh we might not be able to see the
+        // On a DistributedMesh we might not be able to see the
         // interior_parent of a non-local element
         if (pip == remote_elem)
           {
@@ -196,7 +196,7 @@ public:
 
         const Elem *pip = elem->interior_parent();
 
-        // On a ParallelMesh we might not be able to see the
+        // On a DistributedMesh we might not be able to see the
         // interior_parent of a non-local element
         if (pip == remote_elem)
           {

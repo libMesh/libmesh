@@ -23,6 +23,7 @@
 
 // Local Includes -----------------------------------
 #include "libmesh/boundary_info.h"
+#include "libmesh/distributed_mesh.h"
 #include "libmesh/elem.h"
 #include "libmesh/ghosting_functor.h"
 #include "libmesh/libmesh_config.h"
@@ -34,7 +35,6 @@
 #include "libmesh/mesh_tools.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_elem.h"
-#include "libmesh/parallel_mesh.h"
 #include "libmesh/parallel_node.h"
 #include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/utility.h"

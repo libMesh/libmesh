@@ -17,10 +17,10 @@
 
 
 // Local includes
+#include "libmesh/distributed_mesh.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/mesh_output.h"
 #include "libmesh/parallel.h"
-#include "libmesh/parallel_mesh.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/numeric_vector.h"
 

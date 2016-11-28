@@ -20,8 +20,7 @@
 
 #include "libmesh/boundary_info.h"
 #include "libmesh/dof_map.h"
-#include "libmesh/parallel_mesh.h"
-#include "libmesh/serial_mesh.h"
+#include "libmesh/mapvector.h"
 
 namespace libMesh
 {

@@ -34,10 +34,6 @@
 #include "libmesh/cell_inf_hex18.h"
 #include "libmesh/mesh_base.h"
 
-#ifdef DEBUG
-#include "libmesh/parallel_mesh.h"
-#endif
-
 namespace libMesh
 {
 

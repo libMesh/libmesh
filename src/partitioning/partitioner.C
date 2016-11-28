@@ -28,10 +28,6 @@
 #include "libmesh/mesh_communication.h"
 #include "libmesh/libmesh_logging.h"
 
-//FIXME
-#include "libmesh/parallel_mesh.h"
-#include "libmesh/mesh_tools.h"
-
 namespace libMesh
 {
 

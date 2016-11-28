@@ -22,7 +22,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/metis_partitioner.h"
-#include "libmesh/serial_mesh.h"
+#include "libmesh/replicated_mesh.h"
 #include "libmesh/utility.h"
 
 #include LIBMESH_INCLUDE_UNORDERED_MAP
