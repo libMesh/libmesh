@@ -25,6 +25,7 @@ public:
 
   CPPUNIT_TEST( testVariables );
   CPPUNIT_TEST( testSections );
+  CPPUNIT_TEST( testSubSections );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -131,6 +132,46 @@ public:
 
     // No such thing as this section
     CPPUNIT_ASSERT(!input.have_section("ImNotASection/"));
+  }
+
+  void testSubSections()
+  {
+    typedef std::vector<std::string>::size_type sz;
+    typedef std::string str;
+
+    const std::vector<std::string> subsections1 =
+      input.get_subsection_names("Section1");
+
+    CPPUNIT_ASSERT_EQUAL(subsections1.size(), sz(1));
+    CPPUNIT_ASSERT_EQUAL(subsections1[0], str("SubSection1"));
+
+    const std::vector<std::string> subsections1_1 =
+      input.get_subsection_names("Section1/Subsection1");
+
+    CPPUNIT_ASSERT(subsections1_1.empty());
+
+    const std::vector<std::string> subsections2 =
+      input.get_subsection_names("Section2");
+
+    CPPUNIT_ASSERT_EQUAL(subsections2.size(), sz(2));
+    CPPUNIT_ASSERT_EQUAL(subsections2[0], str("Subsection2"));
+    CPPUNIT_ASSERT_EQUAL(subsections2[1], str("Subsection4"));
+
+    const std::vector<std::string> subsections2_2 =
+      input.get_subsection_names("Section2/Subsection2");
+
+    CPPUNIT_ASSERT_EQUAL(subsections2_2.size(), sz(1));
+    CPPUNIT_ASSERT_EQUAL(subsections2_2[0], str("Subsection3"));
+
+    const std::vector<std::string> subsections2_4 =
+      input.get_subsection_names("Section2/Subsection4");
+
+    CPPUNIT_ASSERT(subsections2_4.empty());
+
+    const std::vector<std::string> subsections3 =
+      input.get_subsection_names("Section3");
+
+    CPPUNIT_ASSERT(subsections3.empty());
   }
 
 };
