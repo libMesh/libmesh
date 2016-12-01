@@ -22,7 +22,7 @@
 
 #include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_TRILINOS
+#ifdef LIBMESH_TRILINOS_HAVE_EPETRA
 
 // Local includes
 #include "libmesh/preconditioner.h"
@@ -163,5 +163,5 @@ TrilinosPreconditioner<T>::~TrilinosPreconditioner ()
 
 } // namespace libMesh
 
-#endif // #ifdef LIBMESH_HAVE_TRILINOS
+#endif // LIBMESH_TRILINOS_HAVE_EPETRA
 #endif // LIBMESH_TRILINOS_PRECONDITIONER_H

@@ -20,7 +20,10 @@
 #ifndef LIBMESH_TRILINOS_NOX_NONLINEAR_SOLVER_H
 #define LIBMESH_TRILINOS_NOX_NONLINEAR_SOLVER_H
 
-#ifdef LIBMESH_TRILINOS_HAVE_NOX
+// It is possible to build Trilinos with NOX, but without Epetra.  The
+// way that libmesh uses NOX requires Epetra, however, so we have to
+// check for both.
+#if defined(LIBMESH_TRILINOS_HAVE_NOX) && defined(LIBMESH_TRILINOS_HAVE_EPETRA)
 
 // Local includes
 #include "libmesh/nonlinear_solver.h"
@@ -150,5 +153,5 @@ NoxNonlinearSolver<T>::~NoxNonlinearSolver ()
 } // namespace libMesh
 
 
-#endif // #ifdef LIBMESH_TRILINOS_HAVE_NOX
+#endif // LIBMESH_TRILINOS_HAVE_NOX && LIBMESH_TRILINOS_HAVE_EPETRA
 #endif // LIBMESH_TRILINOS_NOX_NONLINEAR_SOLVER_H

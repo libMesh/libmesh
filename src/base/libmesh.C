@@ -246,7 +246,7 @@ bool          libMesh::libMeshPrivateData::_is_initialized = false;
 SolverPackage libMesh::libMeshPrivateData::_solver_package =
 #if   defined(LIBMESH_HAVE_PETSC)    // PETSc is the default
   PETSC_SOLVERS;
-#elif defined(LIBMESH_HAVE_TRILINOS) // Use Trilinos if PETSc isn't there
+#elif defined(LIBMESH_TRILINOS_HAVE_AZTECOO) // Use Trilinos if PETSc isn't there
 TRILINOS_SOLVERS;
 #elif defined(LIBMESH_HAVE_EIGEN)    // Use Eigen if neither are there
 EIGEN_SOLVERS;
@@ -952,7 +952,7 @@ SolverPackage default_solver_package ()
         libMeshPrivateData::_solver_package = PETSC_SOLVERS;
 #endif
 
-#ifdef LIBMESH_HAVE_TRILINOS
+#ifdef LIBMESH_TRILINOS_HAVE_AZTECOO
       if (libMesh::on_command_line ("--use-trilinos") ||
           libMesh::on_command_line ("--disable-petsc"))
         libMeshPrivateData::_solver_package = TRILINOS_SOLVERS;

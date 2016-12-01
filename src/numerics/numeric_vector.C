@@ -59,7 +59,7 @@ NumericVector<T>::build(const Parallel::Communicator & comm, const SolverPackage
       return UniquePtr<NumericVector<T> >(new PetscVector<T>(comm, AUTOMATIC));
 #endif
 
-#ifdef LIBMESH_HAVE_TRILINOS
+#ifdef LIBMESH_TRILINOS_HAVE_EPETRA
     case TRILINOS_SOLVERS:
       return UniquePtr<NumericVector<T> >(new EpetraVector<T>(comm, AUTOMATIC));
 #endif

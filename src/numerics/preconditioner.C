@@ -49,7 +49,7 @@ Preconditioner<T>::build(const libMesh::Parallel::Communicator & comm,
       }
 #endif
 
-#ifdef LIBMESH_HAVE_TRILINOS
+#ifdef LIBMESH_TRILINOS_HAVE_EPETRA
     case TRILINOS_SOLVERS:
       return new TrilinosPreconditioner<T>(comm);
 #endif

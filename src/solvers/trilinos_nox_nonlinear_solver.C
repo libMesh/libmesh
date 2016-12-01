@@ -19,10 +19,7 @@
 
 #include "libmesh/libmesh_common.h"
 
-#ifdef LIBMESH_TRILINOS_HAVE_NOX
-
-
-// C++ includes
+#if defined(LIBMESH_TRILINOS_HAVE_NOX) && defined(LIBMESH_TRILINOS_HAVE_EPETRA)
 
 // Local Includes
 #include "libmesh/libmesh_logging.h"
@@ -38,7 +35,7 @@
 #include "libmesh/ignore_warnings.h"
 #include "NOX_Epetra_MatrixFree.H"
 #include "NOX_Epetra_LinearSystem_AztecOO.H"
-#include "NOX_Epetra_Group.H"// class definition
+#include "NOX_Epetra_Group.H"
 #include "NOX_Epetra_Vector.H"
 #include "libmesh/restore_warnings.h"
 
@@ -445,4 +442,4 @@ template class NoxNonlinearSolver<Number>;
 
 
 
-#endif // #ifdef LIBMESH_TRILINOS_HAVE_NOX
+#endif // LIBMESH_TRILINOS_HAVE_NOX && LIBMESH_TRILINOS_HAVE_EPETRA

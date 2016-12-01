@@ -151,7 +151,7 @@ SparseMatrix<T>::build(const Parallel::Communicator & comm,
 #endif
 
 
-#ifdef LIBMESH_HAVE_TRILINOS
+#ifdef LIBMESH_TRILINOS_HAVE_EPETRA
     case TRILINOS_SOLVERS:
       return UniquePtr<SparseMatrix<T> >(new EpetraMatrix<T>(comm));
 #endif

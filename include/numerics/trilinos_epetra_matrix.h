@@ -22,7 +22,7 @@
 
 #include "libmesh/libmesh_common.h"
 
-#ifdef LIBMESH_HAVE_TRILINOS
+#ifdef LIBMESH_TRILINOS_HAVE_EPETRA
 
 // Trilinos includes
 #include "libmesh/ignore_warnings.h"
@@ -337,5 +337,5 @@ private:
 
 } // namespace libMesh
 
-#endif // #ifdef LIBMESH_HAVE_TRILINOS
+#endif // LIBMESH_TRILINOS_HAVE_EPETRA
 #endif // LIBMESH_TRILINOS_EPETRA_MATRIX_H
