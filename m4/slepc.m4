@@ -143,6 +143,15 @@ AC_DEFUN([CONFIGURE_SLEPC],
             AC_DEFINE(HAVE_SLEPC, 1, [Flag indicating whether or not SLEPc is available])
             AC_SUBST(SLEPC_INCLUDE)
             AC_SUBST(SLEPC_LIBS)
+
+            AC_DEFINE_UNQUOTED(DETECTED_SLEPC_VERSION_MAJOR, [$slepcmajor],
+              [SLEPc's major version number, as detected by slepc.m4])
+
+            AC_DEFINE_UNQUOTED(DETECTED_SLEPC_VERSION_MINOR, [$slepcminor],
+              [SLEPc's minor version number, as detected by slepc.m4])
+
+            AC_DEFINE_UNQUOTED(DETECTED_SLEPC_VERSION_SUBMINOR, [$slepcsubminor],
+              [SLEPc's subminor version number, as detected by slepc.m4])
           ],[
             AC_MSG_RESULT(no)
             AC_MSG_RESULT(<<< Compiling trivial SLEPc program failed. SLEPc disabled. >>>)
