@@ -37345,6 +37345,24 @@ $as_echo "#define TRILINOS_HAVE_EPETRAEXT 1" >>confdefs.h
 $as_echo "<<< Configuring library with Trilinos EpetraExt support >>>" >&6; }
        fi
 
+                                                 as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/Epetra_CombineMode.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/Epetra_CombineMode.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enableepetra=yes
+else
+  enableepetra=no
+fi
+
+
+
+       if test "$enableepetra" != no ; then
+
+$as_echo "#define TRILINOS_HAVE_EPETRA 1" >>confdefs.h
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Trilinos Epetra support >>>" >&5
+$as_echo "<<< Configuring library with Trilinos Epetra support >>>" >&6; }
+       fi
+
     fi
   else
     enabletrilinos10=no
@@ -47005,6 +47023,7 @@ if (test "x$enableoptional" = "xyes"); then
   echo '     'Tpetra........................ : $enabletpetra
   echo '     'DTK........................... : $enabledtk
   echo '     'Ifpack........................ : $enableifpack
+  echo '     'Epetra........................ : $enableepetra
   echo '     'EpetraExt..................... : $enableepetraext
   fi
   echo '  'vtk.............................. : $enablevtk

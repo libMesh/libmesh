@@ -804,6 +804,10 @@
    DataTransferKit */
 #undef TRILINOS_HAVE_DTK
 
+/* Flag indicating whether the library shall be compiled to use Epetra
+   interface in Trilinos */
+#undef TRILINOS_HAVE_EPETRA
+
 /* Flag indicating whether the library shall be compiled to use the Trilinos
    EpetraExt interfaces */
 #undef TRILINOS_HAVE_EPETRAEXT
