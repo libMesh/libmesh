@@ -175,6 +175,7 @@ if (test "x$enableoptional" = "xyes"); then
   echo '     'Tpetra........................ : $enabletpetra
   echo '     'DTK........................... : $enabledtk
   echo '     'Ifpack........................ : $enableifpack
+  echo '     'Epetra........................ : $enableepetra
   echo '     'EpetraExt..................... : $enableepetraext
   fi
   echo '  'vtk.............................. : $enablevtk

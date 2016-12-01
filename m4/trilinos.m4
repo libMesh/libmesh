@@ -191,6 +191,22 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
           AC_MSG_RESULT([<<< Configuring library with Trilinos EpetraExt support >>>])
        fi
 
+       dnl ------------------------------------------------------
+       dnl Epetra - Trilinos can be built without Epetra, but
+       dnl libmesh can't do much with such a build.  There are several
+       dnl header files whose absence indicates Epetra is not available,
+       dnl we just choose one here that libmesh actually includes.
+       dnl ------------------------------------------------------
+       AC_CHECK_HEADER([$withtrilinosdir/include/Epetra_CombineMode.h],
+                       [enableepetra=yes],
+                       [enableepetra=no])
+
+       if test "$enableepetra" != no ; then
+          AC_DEFINE(TRILINOS_HAVE_EPETRA, 1,
+                    [Flag indicating whether the library shall be compiled to use Epetra interface in Trilinos])
+          AC_MSG_RESULT([<<< Configuring library with Trilinos Epetra support >>>])
+       fi
+
     fi
   else
     enabletrilinos10=no
