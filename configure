@@ -36925,6 +36925,24 @@ $as_echo "#define HAVE_SLEPC 1" >>confdefs.h
 
 
 
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_SLEPC_VERSION_MAJOR $slepcmajor
+_ACEOF
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_SLEPC_VERSION_MINOR $slepcminor
+_ACEOF
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_SLEPC_VERSION_SUBMINOR $slepcsubminor
+_ACEOF
+
+
 else
 
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5

@@ -20,26 +20,21 @@
 #ifndef LIBMESH_SLEPC_MACRO_H
 #define LIBMESH_SLEPC_MACRO_H
 
-// C++ includes
-
 // Local includes
+#include "libmesh/libmesh_config.h"
 
-/**
- * SLEPc include files. SLEPc can only be used
- * together with PETSc.
- */
+// SLEPc include files. SLEPc can only be used
+// together with PETSc.
 #ifdef LIBMESH_HAVE_SLEPC
-
-# include <slepcversion.h>
 
 // A convenient macro for comparing SLEPc versions.
 // Returns 1 if the current SLEPc version is < major.minor.subminor
 // and zero otherwise.
 #define SLEPC_VERSION_LESS_THAN(major,minor,subminor)                   \
-  ((SLEPC_VERSION_MAJOR < (major) ||                                    \
-    (SLEPC_VERSION_MAJOR == (major) && (SLEPC_VERSION_MINOR < (minor) || \
-                                        (SLEPC_VERSION_MINOR == (minor) && \
-                                         SLEPC_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
+  ((LIBMESH_DETECTED_SLEPC_VERSION_MAJOR < (major) ||                   \
+    (LIBMESH_DETECTED_SLEPC_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_SLEPC_VERSION_MINOR < (minor) || \
+                                                         (LIBMESH_DETECTED_SLEPC_VERSION_MINOR == (minor) && \
+                                                          LIBMESH_DETECTED_SLEPC_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
 
 // Make up for missing extern "C" in old SLEPc versions
 #if !defined(LIBMESH_USE_COMPLEX_NUMBERS) && SLEPC_VERSION_LESS_THAN(3,0,0)
