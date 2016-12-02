@@ -17,9 +17,7 @@
 
 #include "libmesh/libmesh_common.h"
 
-#ifdef LIBMESH_HAVE_TRILINOS
-
-// C++ includes
+#ifdef LIBMESH_TRILINOS_HAVE_EPETRA
 
 // Local Includes
 #include "libmesh/trilinos_preconditioner.h"
@@ -263,4 +261,4 @@ template class TrilinosPreconditioner<Number>;
 
 } // namespace libMesh
 
-#endif // #ifdef LIBMESH_HAVE_TRILINOS
+#endif // LIBMESH_TRILINOS_HAVE_EPETRA

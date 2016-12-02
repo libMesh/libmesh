@@ -136,7 +136,8 @@ int main (int argc, char ** argv)
   // Initialize libMesh and any dependent libaries, like in example 2.
   LibMeshInit init (argc, argv);
 
-#if !defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_HAVE_TRILINOS)
+  // This example requires a NonlinearSolver.
+#if !defined(LIBMESH_HAVE_PETSC) && (!defined(LIBMESH_TRILINOS_HAVE_NOX) || !defined(LIBMESH_TRILINOS_HAVE_EPETRA))
   libmesh_example_requires(false, "--enable-petsc or --enable-trilinos");
 #endif
 

@@ -26,10 +26,10 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/linear_solver.h"
 
-/**
- * Trilinos include files.
- */
 #ifdef LIBMESH_TRILINOS_HAVE_AZTECOO
+
+// Trilinos include files.  AztecOO requires Epetra, so there's no
+// need to check for both.
 #include <Epetra_LinearProblem.h>
 #include <AztecOO.h>
 

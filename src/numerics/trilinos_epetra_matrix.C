@@ -19,7 +19,7 @@
 // C++ includes
 #include "libmesh/libmesh_config.h"
 
-#ifdef LIBMESH_HAVE_TRILINOS
+#ifdef LIBMESH_TRILINOS_HAVE_EPETRA
 
 // Local includes
 #include "libmesh/trilinos_epetra_matrix.h"
@@ -514,4 +514,4 @@ template class EpetraMatrix<Number>;
 } // namespace libMesh
 
 
-#endif // #ifdef LIBMESH_HAVE_TRILINOS
+#endif // LIBMESH_TRILINOS_HAVE_EPETRA

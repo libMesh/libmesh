@@ -21,7 +21,7 @@
 // Local Includes
 #include "libmesh/trilinos_epetra_vector.h"
 
-#ifdef LIBMESH_HAVE_TRILINOS
+#ifdef LIBMESH_TRILINOS_HAVE_EPETRA
 
 #include "libmesh/dense_subvector.h"
 #include "libmesh/dense_vector.h"
@@ -926,4 +926,4 @@ template class EpetraVector<Number>;
 
 } // namespace libMesh
 
-#endif // #ifdef LIBMESH_HAVE_TRILINOS
+#endif // LIBMESH_TRILINOS_HAVE_EPETRA

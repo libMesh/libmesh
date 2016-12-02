@@ -21,8 +21,7 @@
 
 #include "libmesh/libmesh_common.h"
 
-
-#ifdef LIBMESH_HAVE_TRILINOS
+#ifdef LIBMESH_TRILINOS_HAVE_EPETRA
 
 // Local includes
 #include "libmesh/numeric_vector.h"
@@ -1031,5 +1030,5 @@ void EpetraVector<T>::swap (NumericVector<T> & other)
 } // namespace libMesh
 
 
-#endif // #ifdef LIBMESH_HAVE_TRILINOS
+#endif // #ifdef LIBMESH_TRILINOS_HAVE_EPETRA
 #endif // LIBMESH_TRILINOS_EPETRA_VECTOR_H
