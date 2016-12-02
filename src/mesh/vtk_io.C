@@ -32,9 +32,6 @@
 
 #ifdef LIBMESH_HAVE_VTK
 
-// Tell VTK not to use old header files
-#define VTK_LEGACY_REMOVE
-
 // I get a lot of "warning: extra ';' inside a class [-Wextra-semi]" from clang
 // on VTK header files.
 #include "libmesh/ignore_warnings.h"
