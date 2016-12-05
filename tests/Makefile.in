@@ -204,7 +204,8 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
-	utils/vectormap_test.C fparser/autodiff.C
+	utils/point_locator_test.C utils/vectormap_test.C \
+	fparser/autodiff.C
 am__dirstamp = $(am__leading_dot)dirstamp
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_1 = fparser/unit_tests_dbg-autodiff.$(OBJEXT)
 am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
@@ -255,6 +256,7 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	solvers/unit_tests_dbg-second_order_unsteady_solver_test.$(OBJEXT) \
 	systems/unit_tests_dbg-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_dbg-systems_test.$(OBJEXT) \
+	utils/unit_tests_dbg-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_dbg-vectormap_test.$(OBJEXT) $(am__objects_1)
 @LIBMESH_DBG_MODE_TRUE@am_unit_tests_dbg_OBJECTS = $(am__objects_2)
 unit_tests_dbg_OBJECTS = $(am_unit_tests_dbg_OBJECTS)
@@ -298,7 +300,8 @@ am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
-	utils/vectormap_test.C fparser/autodiff.C
+	utils/point_locator_test.C utils/vectormap_test.C \
+	fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_3 = fparser/unit_tests_devel-autodiff.$(OBJEXT)
 am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	base/unit_tests_devel-default_coupling_test.$(OBJEXT) \
@@ -348,6 +351,7 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	solvers/unit_tests_devel-second_order_unsteady_solver_test.$(OBJEXT) \
 	systems/unit_tests_devel-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_devel-systems_test.$(OBJEXT) \
+	utils/unit_tests_devel-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_devel-vectormap_test.$(OBJEXT) \
 	$(am__objects_3)
 @LIBMESH_DEVEL_MODE_TRUE@am_unit_tests_devel_OBJECTS =  \
@@ -389,7 +393,8 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
-	utils/vectormap_test.C fparser/autodiff.C
+	utils/point_locator_test.C utils/vectormap_test.C \
+	fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_5 = fparser/unit_tests_oprof-autodiff.$(OBJEXT)
 am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	base/unit_tests_oprof-default_coupling_test.$(OBJEXT) \
@@ -439,6 +444,7 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	solvers/unit_tests_oprof-second_order_unsteady_solver_test.$(OBJEXT) \
 	systems/unit_tests_oprof-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_oprof-systems_test.$(OBJEXT) \
+	utils/unit_tests_oprof-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_oprof-vectormap_test.$(OBJEXT) \
 	$(am__objects_5)
 @LIBMESH_OPROF_MODE_TRUE@am_unit_tests_oprof_OBJECTS =  \
@@ -480,7 +486,8 @@ am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
-	utils/vectormap_test.C fparser/autodiff.C
+	utils/point_locator_test.C utils/vectormap_test.C \
+	fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_7 = fparser/unit_tests_opt-autodiff.$(OBJEXT)
 am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	base/unit_tests_opt-default_coupling_test.$(OBJEXT) \
@@ -530,6 +537,7 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	solvers/unit_tests_opt-second_order_unsteady_solver_test.$(OBJEXT) \
 	systems/unit_tests_opt-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_opt-systems_test.$(OBJEXT) \
+	utils/unit_tests_opt-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_opt-vectormap_test.$(OBJEXT) $(am__objects_7)
 @LIBMESH_OPT_MODE_TRUE@am_unit_tests_opt_OBJECTS = $(am__objects_8)
 unit_tests_opt_OBJECTS = $(am_unit_tests_opt_OBJECTS)
@@ -569,7 +577,8 @@ am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
-	utils/vectormap_test.C fparser/autodiff.C
+	utils/point_locator_test.C utils/vectormap_test.C \
+	fparser/autodiff.C
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_9 = fparser/unit_tests_prof-autodiff.$(OBJEXT)
 am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	base/unit_tests_prof-default_coupling_test.$(OBJEXT) \
@@ -619,6 +628,7 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	solvers/unit_tests_prof-second_order_unsteady_solver_test.$(OBJEXT) \
 	systems/unit_tests_prof-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_prof-systems_test.$(OBJEXT) \
+	utils/unit_tests_prof-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_prof-vectormap_test.$(OBJEXT) \
 	$(am__objects_9)
 @LIBMESH_PROF_MODE_TRUE@am_unit_tests_prof_OBJECTS =  \
@@ -1076,7 +1086,8 @@ unit_tests_sources = driver.C test_comm.h base/dof_object_test.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/equation_systems_test.C systems/systems_test.C \
-	utils/vectormap_test.C $(am__append_1)
+	utils/point_locator_test.C utils/vectormap_test.C \
+	$(am__append_1)
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_SOURCES = $(unit_tests_sources)
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
@@ -1309,6 +1320,8 @@ utils/$(am__dirstamp):
 utils/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) utils/$(DEPDIR)
 	@: > utils/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_dbg-point_locator_test.$(OBJEXT):  \
+	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_dbg-vectormap_test.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
 fparser/$(am__dirstamp):
@@ -1418,6 +1431,8 @@ systems/unit_tests_devel-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_devel-systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_devel-point_locator_test.$(OBJEXT):  \
+	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_devel-vectormap_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 fparser/unit_tests_devel-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
@@ -1521,6 +1536,8 @@ systems/unit_tests_oprof-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_oprof-systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_oprof-point_locator_test.$(OBJEXT):  \
+	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_oprof-vectormap_test.$(OBJEXT):  \
 	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 fparser/unit_tests_oprof-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
@@ -1624,6 +1641,8 @@ systems/unit_tests_opt-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_opt-systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_opt-point_locator_test.$(OBJEXT):  \
+	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_opt-vectormap_test.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
 fparser/unit_tests_opt-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
@@ -1727,6 +1746,8 @@ systems/unit_tests_prof-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_prof-systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
+utils/unit_tests_prof-point_locator_test.$(OBJEXT):  \
+	utils/$(am__dirstamp) utils/$(DEPDIR)/$(am__dirstamp)
 utils/unit_tests_prof-vectormap_test.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
 fparser/unit_tests_prof-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
@@ -1998,10 +2019,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-systems_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-systems_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_dbg-point_locator_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_devel-point_locator_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_oprof-point_locator_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_opt-point_locator_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_prof-point_locator_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Po@am__quote@
 
 .C.o:
@@ -2699,6 +2725,20 @@ systems/unit_tests_dbg-systems_test.obj: systems/systems_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/systems_test.C' object='systems/unit_tests_dbg-systems_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_dbg-systems_test.obj `if test -f 'systems/systems_test.C'; then $(CYGPATH_W) 'systems/systems_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/systems_test.C'; fi`
+
+utils/unit_tests_dbg-point_locator_test.o: utils/point_locator_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_dbg-point_locator_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_dbg-point_locator_test.Tpo -c -o utils/unit_tests_dbg-point_locator_test.o `test -f 'utils/point_locator_test.C' || echo '$(srcdir)/'`utils/point_locator_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_dbg-point_locator_test.Tpo utils/$(DEPDIR)/unit_tests_dbg-point_locator_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/point_locator_test.C' object='utils/unit_tests_dbg-point_locator_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_dbg-point_locator_test.o `test -f 'utils/point_locator_test.C' || echo '$(srcdir)/'`utils/point_locator_test.C
+
+utils/unit_tests_dbg-point_locator_test.obj: utils/point_locator_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_dbg-point_locator_test.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_dbg-point_locator_test.Tpo -c -o utils/unit_tests_dbg-point_locator_test.obj `if test -f 'utils/point_locator_test.C'; then $(CYGPATH_W) 'utils/point_locator_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/point_locator_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_dbg-point_locator_test.Tpo utils/$(DEPDIR)/unit_tests_dbg-point_locator_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/point_locator_test.C' object='utils/unit_tests_dbg-point_locator_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_dbg-point_locator_test.obj `if test -f 'utils/point_locator_test.C'; then $(CYGPATH_W) 'utils/point_locator_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/point_locator_test.C'; fi`
 
 utils/unit_tests_dbg-vectormap_test.o: utils/vectormap_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_dbg-vectormap_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_dbg-vectormap_test.Tpo -c -o utils/unit_tests_dbg-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
@@ -3400,6 +3440,20 @@ systems/unit_tests_devel-systems_test.obj: systems/systems_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_devel-systems_test.obj `if test -f 'systems/systems_test.C'; then $(CYGPATH_W) 'systems/systems_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/systems_test.C'; fi`
 
+utils/unit_tests_devel-point_locator_test.o: utils/point_locator_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_devel-point_locator_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_devel-point_locator_test.Tpo -c -o utils/unit_tests_devel-point_locator_test.o `test -f 'utils/point_locator_test.C' || echo '$(srcdir)/'`utils/point_locator_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_devel-point_locator_test.Tpo utils/$(DEPDIR)/unit_tests_devel-point_locator_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/point_locator_test.C' object='utils/unit_tests_devel-point_locator_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_devel-point_locator_test.o `test -f 'utils/point_locator_test.C' || echo '$(srcdir)/'`utils/point_locator_test.C
+
+utils/unit_tests_devel-point_locator_test.obj: utils/point_locator_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_devel-point_locator_test.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_devel-point_locator_test.Tpo -c -o utils/unit_tests_devel-point_locator_test.obj `if test -f 'utils/point_locator_test.C'; then $(CYGPATH_W) 'utils/point_locator_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/point_locator_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_devel-point_locator_test.Tpo utils/$(DEPDIR)/unit_tests_devel-point_locator_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/point_locator_test.C' object='utils/unit_tests_devel-point_locator_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_devel-point_locator_test.obj `if test -f 'utils/point_locator_test.C'; then $(CYGPATH_W) 'utils/point_locator_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/point_locator_test.C'; fi`
+
 utils/unit_tests_devel-vectormap_test.o: utils/vectormap_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_devel-vectormap_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Tpo -c -o utils/unit_tests_devel-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Tpo utils/$(DEPDIR)/unit_tests_devel-vectormap_test.Po
@@ -4099,6 +4153,20 @@ systems/unit_tests_oprof-systems_test.obj: systems/systems_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/systems_test.C' object='systems/unit_tests_oprof-systems_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_oprof-systems_test.obj `if test -f 'systems/systems_test.C'; then $(CYGPATH_W) 'systems/systems_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/systems_test.C'; fi`
+
+utils/unit_tests_oprof-point_locator_test.o: utils/point_locator_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_oprof-point_locator_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_oprof-point_locator_test.Tpo -c -o utils/unit_tests_oprof-point_locator_test.o `test -f 'utils/point_locator_test.C' || echo '$(srcdir)/'`utils/point_locator_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_oprof-point_locator_test.Tpo utils/$(DEPDIR)/unit_tests_oprof-point_locator_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/point_locator_test.C' object='utils/unit_tests_oprof-point_locator_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_oprof-point_locator_test.o `test -f 'utils/point_locator_test.C' || echo '$(srcdir)/'`utils/point_locator_test.C
+
+utils/unit_tests_oprof-point_locator_test.obj: utils/point_locator_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_oprof-point_locator_test.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_oprof-point_locator_test.Tpo -c -o utils/unit_tests_oprof-point_locator_test.obj `if test -f 'utils/point_locator_test.C'; then $(CYGPATH_W) 'utils/point_locator_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/point_locator_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_oprof-point_locator_test.Tpo utils/$(DEPDIR)/unit_tests_oprof-point_locator_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/point_locator_test.C' object='utils/unit_tests_oprof-point_locator_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_oprof-point_locator_test.obj `if test -f 'utils/point_locator_test.C'; then $(CYGPATH_W) 'utils/point_locator_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/point_locator_test.C'; fi`
 
 utils/unit_tests_oprof-vectormap_test.o: utils/vectormap_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_oprof-vectormap_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_oprof-vectormap_test.Tpo -c -o utils/unit_tests_oprof-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
@@ -4800,6 +4868,20 @@ systems/unit_tests_opt-systems_test.obj: systems/systems_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_opt-systems_test.obj `if test -f 'systems/systems_test.C'; then $(CYGPATH_W) 'systems/systems_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/systems_test.C'; fi`
 
+utils/unit_tests_opt-point_locator_test.o: utils/point_locator_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_opt-point_locator_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_opt-point_locator_test.Tpo -c -o utils/unit_tests_opt-point_locator_test.o `test -f 'utils/point_locator_test.C' || echo '$(srcdir)/'`utils/point_locator_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_opt-point_locator_test.Tpo utils/$(DEPDIR)/unit_tests_opt-point_locator_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/point_locator_test.C' object='utils/unit_tests_opt-point_locator_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_opt-point_locator_test.o `test -f 'utils/point_locator_test.C' || echo '$(srcdir)/'`utils/point_locator_test.C
+
+utils/unit_tests_opt-point_locator_test.obj: utils/point_locator_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_opt-point_locator_test.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_opt-point_locator_test.Tpo -c -o utils/unit_tests_opt-point_locator_test.obj `if test -f 'utils/point_locator_test.C'; then $(CYGPATH_W) 'utils/point_locator_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/point_locator_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_opt-point_locator_test.Tpo utils/$(DEPDIR)/unit_tests_opt-point_locator_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/point_locator_test.C' object='utils/unit_tests_opt-point_locator_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_opt-point_locator_test.obj `if test -f 'utils/point_locator_test.C'; then $(CYGPATH_W) 'utils/point_locator_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/point_locator_test.C'; fi`
+
 utils/unit_tests_opt-vectormap_test.o: utils/vectormap_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_opt-vectormap_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Tpo -c -o utils/unit_tests_opt-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Tpo utils/$(DEPDIR)/unit_tests_opt-vectormap_test.Po
@@ -5499,6 +5581,20 @@ systems/unit_tests_prof-systems_test.obj: systems/systems_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/systems_test.C' object='systems/unit_tests_prof-systems_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_prof-systems_test.obj `if test -f 'systems/systems_test.C'; then $(CYGPATH_W) 'systems/systems_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/systems_test.C'; fi`
+
+utils/unit_tests_prof-point_locator_test.o: utils/point_locator_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_prof-point_locator_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_prof-point_locator_test.Tpo -c -o utils/unit_tests_prof-point_locator_test.o `test -f 'utils/point_locator_test.C' || echo '$(srcdir)/'`utils/point_locator_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_prof-point_locator_test.Tpo utils/$(DEPDIR)/unit_tests_prof-point_locator_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/point_locator_test.C' object='utils/unit_tests_prof-point_locator_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_prof-point_locator_test.o `test -f 'utils/point_locator_test.C' || echo '$(srcdir)/'`utils/point_locator_test.C
+
+utils/unit_tests_prof-point_locator_test.obj: utils/point_locator_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_prof-point_locator_test.obj -MD -MP -MF utils/$(DEPDIR)/unit_tests_prof-point_locator_test.Tpo -c -o utils/unit_tests_prof-point_locator_test.obj `if test -f 'utils/point_locator_test.C'; then $(CYGPATH_W) 'utils/point_locator_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/point_locator_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) utils/$(DEPDIR)/unit_tests_prof-point_locator_test.Tpo utils/$(DEPDIR)/unit_tests_prof-point_locator_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='utils/point_locator_test.C' object='utils/unit_tests_prof-point_locator_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o utils/unit_tests_prof-point_locator_test.obj `if test -f 'utils/point_locator_test.C'; then $(CYGPATH_W) 'utils/point_locator_test.C'; else $(CYGPATH_W) '$(srcdir)/utils/point_locator_test.C'; fi`
 
 utils/unit_tests_prof-vectormap_test.o: utils/vectormap_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT utils/unit_tests_prof-vectormap_test.o -MD -MP -MF utils/$(DEPDIR)/unit_tests_prof-vectormap_test.Tpo -c -o utils/unit_tests_prof-vectormap_test.o `test -f 'utils/vectormap_test.C' || echo '$(srcdir)/'`utils/vectormap_test.C
