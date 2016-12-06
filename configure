@@ -40051,28 +40051,6 @@ $as_echo "VTK header files not found!" >&6; }
 
          vtkversion=$vtkmajor.$vtkminor.$vtkbuild
          vtkmajorminor=$vtkmajor.$vtkminor
-
-
-
-
-
-
-cat >>confdefs.h <<_ACEOF
-#define DETECTED_VTK_VERSION_MAJOR $vtkmajor
-_ACEOF
-
-
-
-cat >>confdefs.h <<_ACEOF
-#define DETECTED_VTK_VERSION_MINOR $vtkminor
-_ACEOF
-
-
-
-cat >>confdefs.h <<_ACEOF
-#define DETECTED_VTK_VERSION_SUBMINOR $vtkbuild
-_ACEOF
-
        fi
 
        if (test x$enablevtk = xyes); then
@@ -40094,29 +40072,33 @@ _ACEOF
                   if (test $vtkmajor -eq 5); then
            VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
 
-                  elif (test $vtkmajor -eq 6 -a $vtkminor -le 1); then
+                           elif (test $vtkmajor -eq 6 -a $vtkminor -le 1); then
            VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
                                      -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
-                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor"
+                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor \
+                                     -lvtkParallelMPI-$vtkmajorminor -lvtkParallelCore-$vtkmajorminor"
 
            # Some Linux distributions (Arch) install VTK without the
            # "libfoo-6.x.so" naming scheme, so we try to handle that
            # situation as well.
            VTK_LIBRARY_NO_VERSION="-L$VTK_LIB -lvtkIOCore -lvtkCommonCore -lvtkCommonDataModel \
                                    -lvtkFiltersCore -lvtkIOXML -lvtkImagingCore \
-                                   -lvtkIOImage -lvtkImagingMath"
+                                   -lvtkIOImage -lvtkImagingMath \
+                                   -lvtkParallelMPI -lvtkParallelCore"
 
-                  else # elif (test $vtkmajor -eq 6 -a $vtkminor -eq 2); then
+                           else
            VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
                                      -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
-                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor"
+                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor \
+                                     -lvtkParallelMPI-$vtkmajorminor -lvtkParallelCore-$vtkmajorminor"
 
            # Some Linux distributions (Arch) install VTK without the
            # "libfoo-6.x.so" naming scheme, so we try to handle that
            # situation as well.
            VTK_LIBRARY_NO_VERSION="-L$VTK_LIB -lvtkIOCore -lvtkCommonCore -lvtkCommonDataModel \
                                    -lvtkFiltersCore -lvtkIOXML -lvtkImagingCore \
-                                   -lvtkIOImage -lvtkImagingMath -lvtkIOParallelXML"
+                                   -lvtkIOImage -lvtkImagingMath -lvtkIOParallelXML \
+                                   -lvtkParallelMPI -lvtkParallelCore"
          fi
 
                            if (test $vtkmajor -gt 5); then
@@ -40133,6 +40115,7 @@ _ACEOF
              #include "vtkDoubleArray.h"
              #include "vtkXMLPUnstructuredGridWriter.h"
              #include "vtkImageThreshold.h"
+             #include "vtkMPIController.h"
 
 int
 main ()
@@ -40144,6 +40127,7 @@ main ()
              vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
              vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
              vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
+             vtkSmartPointer<vtkMPIController> controller = vtkSmartPointer<vtkMPIController>::New();
 
   ;
   return 0;
@@ -40170,6 +40154,7 @@ rm -f core conftest.err conftest.$ac_objext \
              #include "vtkDoubleArray.h"
              #include "vtkXMLPUnstructuredGridWriter.h"
              #include "vtkImageThreshold.h"
+             #include "vtkMPIController.h"
 
 int
 main ()
@@ -40181,6 +40166,7 @@ main ()
              vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
              vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
              vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
+             vtkSmartPointer<vtkMPIController> controller = vtkSmartPointer<vtkMPIController>::New();
 
   ;
   return 0;
@@ -40334,6 +40320,28 @@ fi
          if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
            VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
          fi
+
+
+
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_VTK_VERSION_MAJOR $vtkmajor
+_ACEOF
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_VTK_VERSION_MINOR $vtkminor
+_ACEOF
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_VTK_VERSION_SUBMINOR $vtkbuild
+_ACEOF
+
 
 
 $as_echo "#define HAVE_VTK 1" >>confdefs.h
