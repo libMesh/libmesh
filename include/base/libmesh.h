@@ -31,6 +31,12 @@
 #include <string>
 #include <vector>
 
+// For dealing with MPI stuff in VTK.
+#if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
+# include "vtkSmartPointer.h"
+class vtkMPIController;
+#endif
+
 /**
  * The \p libMesh namespace provides an interface to certain functionality
  * in the library.  It provides a uniform \p init() method that
@@ -79,6 +85,11 @@ public:
 
 private:
   Parallel::Communicator _comm;
+
+#if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
+  // VTK object for dealing with MPI stuff in VTK.
+  vtkSmartPointer<vtkMPIController> _vtk_mpi_controller;
+#endif
 };
 
 /**
