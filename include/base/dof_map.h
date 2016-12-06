@@ -604,6 +604,21 @@ public:
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
+   * for the node.
+   */
+  void dof_indices (const Node * const node,
+                    std::vector<dof_id_type> & di) const;
+
+  /**
+   * Fills the vector \p di with the global degree of freedom indices
+   * for the node.   For one variable \p vn.
+   */
+  void dof_indices (const Node * const node,
+                    std::vector<dof_id_type> & di,
+                    const unsigned int vn) const;
+
+  /**
+   * Fills the vector \p di with the global degree of freedom indices
    * corresponding to the SCALAR variable vn. If old_dofs=true,
    * the old SCALAR dof indices are returned. Note that we do not
    * need to pass in an element since SCALARs are global variables.

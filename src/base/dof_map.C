@@ -2184,6 +2184,87 @@ void DofMap::dof_indices (const Elem * const elem,
 }
 
 
+void DofMap::dof_indices (const Node * const node,
+                          std::vector<dof_id_type> & di) const
+{
+  // We allow node==NULL to request just SCALAR dofs
+  // libmesh_assert(elem);
+
+  LOG_SCOPE("dof_indices(Node)", "DofMap");
+
+  // Clear the DOF indices vector
+  di.clear();
+
+  const unsigned int n_vars  = this->n_variables();
+  const unsigned int sys_num = this->sys_number();
+
+  // Get the dof numbers
+  for (unsigned int v=0; v<n_vars; v++)
+    {
+      const Variable & var = this->variable(v);
+      if (var.type().family == SCALAR)
+        {
+          std::vector<dof_id_type> di_new;
+          this->SCALAR_dof_indices(di_new,v);
+          di.insert( di.end(), di_new.begin(), di_new.end());
+        }
+      else
+        {
+          const int n_comp = node->n_comp(sys_num,v);
+          for (int i=0; i != n_comp; ++i)
+            {
+              libmesh_assert_not_equal_to
+                (node->dof_number(sys_num,v,i),
+                 DofObject::invalid_id);
+              di.push_back(node->dof_number(sys_num,v,i));
+            }
+        }
+    }
+}
+
+
+void DofMap::dof_indices (const Node * const node,
+                          std::vector<dof_id_type> & di,
+                          const unsigned int vn) const
+{
+  if (vn == libMesh::invalid_uint)
+    {
+      this->dof_indices(node, di);
+      return;
+    }
+
+  // We allow node==NULL to request just SCALAR dofs
+  // libmesh_assert(elem);
+
+  LOG_SCOPE("dof_indices(Node)", "DofMap");
+
+  // Clear the DOF indices vector
+  di.clear();
+
+  const unsigned int sys_num = this->sys_number();
+
+  // Get the dof numbers
+  const Variable & var = this->variable(vn);
+  if (var.type().family == SCALAR)
+    {
+      std::vector<dof_id_type> di_new;
+      this->SCALAR_dof_indices(di_new,vn);
+      di.insert( di.end(), di_new.begin(), di_new.end());
+    }
+  else
+    {
+      const int n_comp = node->n_comp(sys_num,vn);
+      for (int i=0; i != n_comp; ++i)
+        {
+          libmesh_assert_not_equal_to
+            (node->dof_number(sys_num,vn,i),
+             DofObject::invalid_id);
+          di.push_back(node->dof_number(sys_num,vn,i));
+        }
+    }
+}
+
+
 void DofMap::_dof_indices (const Elem * const elem,
                            int p_level,
                            std::vector<dof_id_type> & di,
