@@ -9,6 +9,7 @@ m4_define([_AX_CXX_COMPILE_VTK_preamble],
              @%:@include "vtkDoubleArray.h"
              @%:@include "vtkXMLPUnstructuredGridWriter.h"
              @%:@include "vtkImageThreshold.h"
+             @%:@include "vtkMPIController.h"
           ]])
 
 dnl Declare compilation test function body to
@@ -21,6 +22,7 @@ m4_define([_AX_CXX_COMPILE_VTK_body],
              vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
              vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
              vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
+             vtkSmartPointer<vtkMPIController> controller = vtkSmartPointer<vtkMPIController>::New();
           ]])
 
 dnl ----------------------------------------------------------------
@@ -164,30 +166,36 @@ AC_DEFUN([CONFIGURE_VTK],
            VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
 
          dnl VTK 6.1.x
+         dnl Not sure if -lvtkParallelMPI and -lvtkParallelCore existed in VTK-6.1.x
          elif (test $vtkmajor -eq 6 -a $vtkminor -le 1); then
            VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
                                      -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
-                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor"
+                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor \
+                                     -lvtkParallelMPI-$vtkmajorminor -lvtkParallelCore-$vtkmajorminor"
 
            # Some Linux distributions (Arch) install VTK without the
            # "libfoo-6.x.so" naming scheme, so we try to handle that
            # situation as well.
            VTK_LIBRARY_NO_VERSION="-L$VTK_LIB -lvtkIOCore -lvtkCommonCore -lvtkCommonDataModel \
                                    -lvtkFiltersCore -lvtkIOXML -lvtkImagingCore \
-                                   -lvtkIOImage -lvtkImagingMath"
+                                   -lvtkIOImage -lvtkImagingMath \
+                                   -lvtkParallelMPI -lvtkParallelCore"
 
          dnl VTK 6.2.x and above
-         else # elif (test $vtkmajor -eq 6 -a $vtkminor -eq 2); then
+         dnl Not sure if -lvtkParallelMPI and -lvtkParallelCore existed in VTK-6.2.x, but it does in VTK-7.x.
+         else
            VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
                                      -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
-                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor"
+                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor \
+                                     -lvtkParallelMPI-$vtkmajorminor -lvtkParallelCore-$vtkmajorminor"
 
            # Some Linux distributions (Arch) install VTK without the
            # "libfoo-6.x.so" naming scheme, so we try to handle that
            # situation as well.
            VTK_LIBRARY_NO_VERSION="-L$VTK_LIB -lvtkIOCore -lvtkCommonCore -lvtkCommonDataModel \
                                    -lvtkFiltersCore -lvtkIOXML -lvtkImagingCore \
-                                   -lvtkIOImage -lvtkImagingMath -lvtkIOParallelXML"
+                                   -lvtkIOImage -lvtkImagingMath -lvtkIOParallelXML \
+                                   -lvtkParallelMPI -lvtkParallelCore"
          fi
 
          dnl Try to compile test prog to check for existence of VTK libraries.
