@@ -416,6 +416,20 @@ public:
   virtual const_node_iterator bnd_nodes_begin () const libmesh_override;
   virtual const_node_iterator bnd_nodes_end () const libmesh_override;
 
+  virtual node_iterator evaluable_nodes_begin
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint);
+  virtual node_iterator evaluable_nodes_end
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint);
+  virtual const_node_iterator evaluable_nodes_begin
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) const;
+  virtual const_node_iterator evaluable_nodes_end
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) const;
+
+
 protected:
 
   /**

@@ -1164,6 +1164,24 @@ public:
   virtual const_node_iterator bnd_nodes_end () const = 0;
 
   /**
+   * Iterate over nodes in the Mesh where the solution (as
+   * distributed by the given DofMap) can be evaluated, for the given
+   * variable var_num, or for all variables by default.
+   */
+  virtual node_iterator evaluable_nodes_begin
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) = 0;
+  virtual node_iterator evaluable_nodes_end
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) = 0;
+  virtual const_node_iterator evaluable_nodes_begin
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) const = 0;
+  virtual const_node_iterator evaluable_nodes_end
+    (const DofMap & dof_map,
+     unsigned int var_num = libMesh::invalid_uint) const = 0;
+
+  /**
    * Return a writeable reference to the whole subdomain name map
    */
   std::map<subdomain_id_type, std::string> & set_subdomain_name_map ()
