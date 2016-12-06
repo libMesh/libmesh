@@ -41,6 +41,7 @@ class MeshBase;
 class Point;
 class TreeBase;
 class Elem;
+class Node;
 
 
 
@@ -105,6 +106,26 @@ public:
   virtual void operator() (const Point & p,
                            std::set<const Elem *> & candidate_elements,
                            const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const = 0;
+
+  /**
+   * Locates a Node with global coordinates \p p or returns NULL if no
+   * such Node can be found.
+   *
+   * Virtual so subclasses can override for efficiency, but has a
+   * default implementation that works based on element lookup.
+   *
+   * Optionally allows the user to restrict the subdomains searched;
+   * with such a restriction, only a Node belonging to an element on
+   * one or more of those subdomains will be returned.
+   *
+   * Will only return a Node whose distance from \p p is less than
+   * \p tol multiplied by the size of a semilocal element which
+   * contains \p p.
+   */
+  virtual const Node * locate_node
+    (const Point & p,
+     const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr,
+     Real tol = TOLERANCE) const;
 
   /**
    * @returns \p true when this object is properly initialized
