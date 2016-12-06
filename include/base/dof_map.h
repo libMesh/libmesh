@@ -636,11 +636,12 @@ public:
   bool all_semilocal_indices (const std::vector<dof_id_type> & dof_indices) const;
 
   /**
-   * @returns \p true iff our solutions can be locally evaluated on \p
-   * elem for variable number \p var_num (for all variables, if \p
-   * var_num is invalid_uint)
+   * @returns \p true iff our solutions can be locally evaluated on
+   * \p obj (which should be an Elem or a Node) for variable number \p
+   * var_num (for all variables, if \p var_num is invalid_uint)
    */
-  bool is_evaluable(const Elem & elem,
+  template <typename DofObjectSubclass>
+  bool is_evaluable(const DofObjectSubclass & obj,
                     unsigned int var_num = libMesh::invalid_uint) const;
 
   /**

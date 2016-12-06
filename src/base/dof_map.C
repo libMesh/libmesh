@@ -2441,19 +2441,20 @@ bool DofMap::all_semilocal_indices (const std::vector<dof_id_type> & dof_indices
 }
 
 
-bool DofMap::is_evaluable(const Elem & elem,
+template <typename DofObjectSubclass>
+bool DofMap::is_evaluable(const DofObjectSubclass & obj,
                           unsigned int var_num) const
 {
-  // Everything is evaluable on a local element
-  if (elem.processor_id() == this->processor_id())
+  // Everything is evaluable on a local object
+  if (obj.processor_id() == this->processor_id())
     return true;
 
   std::vector<dof_id_type> di;
 
   if (var_num == libMesh::invalid_uint)
-    this->dof_indices(&elem, di);
+    this->dof_indices(&obj, di);
   else
-    this->dof_indices(&elem, di, var_num);
+    this->dof_indices(&obj, di, var_num);
 
   // We're all semilocal unless we find a counterexample
   for (std::size_t i=0; i != di.size(); ++i)
@@ -2939,5 +2940,9 @@ std::string DofMap::get_info() const
 
   return os.str();
 }
+
+
+template bool DofMap::is_evaluable<Elem>(const Elem &, unsigned int) const;
+template bool DofMap::is_evaluable<Node>(const Node &, unsigned int) const;
 
 } // namespace libMesh
