@@ -129,19 +129,6 @@ AC_DEFUN([CONFIGURE_VTK],
 
          vtkversion=$vtkmajor.$vtkminor.$vtkbuild
          vtkmajorminor=$vtkmajor.$vtkminor
-
-         AC_SUBST(vtkversion)
-         AC_SUBST(vtkmajor)
-         AC_SUBST(vtkbuild)
-
-         AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_MAJOR, [$vtkmajor],
-           [VTK's major version number, as detected by vtk.m4])
-
-         AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_MINOR, [$vtkminor],
-           [VTK's minor version number, as detected by vtk.m4])
-
-         AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_SUBMINOR, [$vtkbuild],
-           [VTK's subminor version number, as detected by vtk.m4])
        fi
 
        if (test x$enablevtk = xyes); then
@@ -258,6 +245,19 @@ AC_DEFUN([CONFIGURE_VTK],
          if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
            VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
          fi
+
+         AC_SUBST(vtkversion)
+         AC_SUBST(vtkmajor)
+         AC_SUBST(vtkbuild)
+
+         AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_MAJOR, [$vtkmajor],
+           [VTK's major version number, as detected by vtk.m4])
+
+         AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_MINOR, [$vtkminor],
+           [VTK's minor version number, as detected by vtk.m4])
+
+         AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_SUBMINOR, [$vtkbuild],
+           [VTK's subminor version number, as detected by vtk.m4])
 
          AC_DEFINE(HAVE_VTK, 1, [Flag indicating whether the library will be compiled with VTK support])
          AC_MSG_RESULT(<<< Configuring library with VTK version $vtkversion support >>>)
