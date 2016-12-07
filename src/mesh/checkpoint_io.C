@@ -175,8 +175,10 @@ void CheckpointIO::build_elem_list()
 
     _local_elements.insert(elem->id());
 
-    // Also need to add in all the point neighbors of this element
-    elem->find_point_neighbors(neighbors);
+    // Also need to add in all the point neighbors of this element.
+    // Point neighbors can only be found for active elements...
+    if (elem->active())
+      elem->find_point_neighbors(neighbors);
 
     std::set<const Elem *>::iterator
       set_it = neighbors.begin(),
