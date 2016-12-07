@@ -40070,7 +40070,7 @@ $as_echo "VTK header files not found!" >&6; }
          fi
 
                   if (test $vtkmajor -eq 5); then
-           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging -lvtkParallel"
 
                            elif (test $vtkmajor -eq 6 -a $vtkminor -le 1); then
            VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
@@ -40185,6 +40185,8 @@ rm -f core conftest.err conftest.$ac_objext \
                       if (test x$enablevtk = xno); then
              { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Linking a test program against the VTK libraries failed >>>" >&5
 $as_echo "<<< Linking a test program against the VTK libraries failed >>>" >&6; }
+             { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< libMesh requires VTK to be configured with -DVTK_Group_MPI:BOOL=ON >>>" >&5
+$as_echo "<<< libMesh requires VTK to be configured with -DVTK_Group_MPI:BOOL=ON >>>" >&6; }
            fi
 
                       LIBS="$old_LIBS"
@@ -40194,119 +40196,47 @@ $as_echo "<<< Linking a test program against the VTK libraries failed >>>" >&6; 
            LIBS="$old_LIBS $VTK_RPATH_FLAGS $VTK_LIBRARY"
            CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
-                      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lvtkIO" >&5
-$as_echo_n "checking for main in -lvtkIO... " >&6; }
-if ${ac_cv_lib_vtkIO_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+                                 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
+             #include "vtkSmartPointer.h"
+             #include "vtkCellArray.h"
+             #include "vtkUnstructuredGrid.h"
+             #include "vtkPoints.h"
+             #include "vtkDoubleArray.h"
+             #include "vtkXMLPUnstructuredGridWriter.h"
+             #include "vtkImageThreshold.h"
+             #include "vtkMPIController.h"
 
 int
 main ()
 {
-return main ();
+
+             vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+             vtkSmartPointer<vtkUnstructuredGrid> grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+             vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+             vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
+             vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
+             vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
+             vtkSmartPointer<vtkMPIController> controller = vtkSmartPointer<vtkMPIController>::New();
+
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_vtkIO_main=yes
-else
-  ac_cv_lib_vtkIO_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_vtkIO_main" >&5
-$as_echo "$ac_cv_lib_vtkIO_main" >&6; }
-if test "x$ac_cv_lib_vtkIO_main" = xyes; then :
   enablevtk=yes
 else
   enablevtk=no
 fi
-
-
-           if (test $enablevtk = yes); then
-             { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lvtkCommon" >&5
-$as_echo_n "checking for main in -lvtkCommon... " >&6; }
-if ${ac_cv_lib_vtkCommon_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lvtkCommon  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_vtkCommon_main=yes
-else
-  ac_cv_lib_vtkCommon_main=no
-fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_vtkCommon_main" >&5
-$as_echo "$ac_cv_lib_vtkCommon_main" >&6; }
-if test "x$ac_cv_lib_vtkCommon_main" = xyes; then :
-  enablevtk=yes
-else
-  enablevtk=no
-fi
 
-           fi
-
-                      if (test $enablevtk = yes); then
-             { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lvtkFiltering" >&5
-$as_echo_n "checking for main in -lvtkFiltering... " >&6; }
-if ${ac_cv_lib_vtkFiltering_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lvtkFiltering  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_vtkFiltering_main=yes
-else
-  ac_cv_lib_vtkFiltering_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_vtkFiltering_main" >&5
-$as_echo "$ac_cv_lib_vtkFiltering_main" >&6; }
-if test "x$ac_cv_lib_vtkFiltering_main" = xyes; then :
-  enablevtk=yes
-else
-  enablevtk=no
-fi
-
+                      if (test x$enablevtk = xno); then
+             { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Linking a test program against the VTK libraries failed >>>" >&5
+$as_echo "<<< Linking a test program against the VTK libraries failed >>>" >&6; }
+             { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< libMesh requires VTK to be configured with -DVTK_USE_PARALLEL:BOOL=ON -DVTK_USE_MPI:BOOL=ON >>>" >&5
+$as_echo "<<< libMesh requires VTK to be configured with -DVTK_USE_PARALLEL:BOOL=ON -DVTK_USE_MPI:BOOL=ON >>>" >&6; }
            fi
 
                       LIBS="$old_LIBS"
