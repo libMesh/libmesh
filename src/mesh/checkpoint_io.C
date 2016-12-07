@@ -178,10 +178,12 @@ void CheckpointIO::build_elem_list()
     // Also need to add in all the point neighbors of this element
     elem->find_point_neighbors(neighbors);
 
-    for (std::set<const Elem *>::iterator it = neighbors.begin();
-         it != neighbors.end();
-         ++it)
-      _local_elements.insert((*it)->id());
+    std::set<const Elem *>::iterator
+      set_it = neighbors.begin(),
+      set_end = neighbors.end();
+
+    for (; set_it != set_end; ++set_it)
+      _local_elements.insert((*set_it)->id());
   }
 }
 
