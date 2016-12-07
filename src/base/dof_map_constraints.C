@@ -1352,8 +1352,16 @@ void DofMap::add_constraint_row (const dof_id_type dof_number,
     if (this->is_constrained_dof(dof_number))
       libmesh_error_msg("ERROR: DOF " << dof_number << " was already constrained!");
 
-  _dof_constraints.insert(std::make_pair(dof_number, constraint_row));
-  _primal_constraint_values.insert(std::make_pair(dof_number, constraint_rhs));
+  // We don't get insert_or_assign until C++17 so we make do.
+  std::pair<DofConstraints::iterator, bool> it =
+    _dof_constraints.insert(std::make_pair(dof_number, constraint_row));
+  if (!it.second)
+    it.first->second = constraint_row;
+
+  std::pair<DofConstraintValueMap::iterator, bool> rhs_it =
+    _primal_constraint_values.insert(std::make_pair(dof_number, constraint_rhs));
+  if (!rhs_it.second)
+    rhs_it.first->second = constraint_rhs;
 }
 
 
@@ -1395,7 +1403,13 @@ void DofMap::add_adjoint_constraint_row (const unsigned int qoi_index,
 
   // Creates the map of rhs values if it doesn't already exist; then
   // adds the current value to that map
-  _adjoint_constraint_values[qoi_index].insert(std::make_pair(dof_number, constraint_rhs));
+
+  // We don't get insert_or_assign until C++17 so we make do.
+  std::pair<DofConstraintValueMap::iterator, bool> rhs_it =
+    _adjoint_constraint_values[qoi_index].insert
+      (std::make_pair(dof_number, constraint_rhs));
+  if (!rhs_it.second)
+    rhs_it.first->second = constraint_rhs;
 }
 
 
