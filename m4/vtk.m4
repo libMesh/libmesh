@@ -150,7 +150,7 @@ AC_DEFUN([CONFIGURE_VTK],
 
          dnl VTK 5.x
          if (test $vtkmajor -eq 5); then
-           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging -lvtkParallel"
 
          dnl VTK 6.1.x
          dnl Not sure if -lvtkParallelMPI and -lvtkParallelCore existed in VTK-6.1.x
@@ -209,27 +209,28 @@ AC_DEFUN([CONFIGURE_VTK],
            dnl 3. If that also failed, print a message that we failed.
            if (test x$enablevtk = xno); then
              AC_MSG_RESULT(<<< Linking a test program against the VTK libraries failed >>>)
+             AC_MSG_RESULT([<<< libMesh requires VTK to be configured with -DVTK_Group_MPI:BOOL=ON >>>])
            fi
 
            dnl Reset $LIBS, $CPPFLAGS
            LIBS="$old_LIBS"
            CPPFLAGS="$old_CPPFLAGS"
 
-         dnl Check for VTK 5.x libraries
+         dnl Check for VTK 5.x headers and libraries
          else
            LIBS="$old_LIBS $VTK_RPATH_FLAGS $VTK_LIBRARY"
            CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
-           dnl AC_CHECK_LIB (library, function, [action-if-found], [action-if-not-found], [other-libraries])
-           AC_CHECK_LIB([vtkIO], main, [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering -lvtkImaging])
+           dnl test compiling and linking a test program.
+           dnl AC_LINK_IFELSE (input, [action-if-true], [action-if-false])
+           AC_LINK_IFELSE([AC_LANG_PROGRAM([_AX_CXX_COMPILE_VTK_preamble],[_AX_CXX_COMPILE_VTK_body])],
+                          [enablevtk=yes],
+                          [enablevtk=no])
 
-           if (test $enablevtk = yes); then
-             AC_CHECK_LIB([vtkCommon], main, [enablevtk=yes], [enablevtk=no])
-           fi
-
-           dnl As of VTK 5.4 it seems we also need vtkFiltering
-           if (test $enablevtk = yes); then
-             AC_CHECK_LIB([vtkFiltering], main, [enablevtk=yes], [enablevtk=no])
+           dnl If linking failed, print a status message
+           if (test x$enablevtk = xno); then
+             AC_MSG_RESULT(<<< Linking a test program against the VTK libraries failed >>>)
+             AC_MSG_RESULT([<<< libMesh requires VTK to be configured with -DVTK_USE_PARALLEL:BOOL=ON -DVTK_USE_MPI:BOOL=ON >>>])
            fi
 
            dnl Reset $LIBS, $CPPFLAGS
