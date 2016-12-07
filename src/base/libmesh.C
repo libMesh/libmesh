@@ -74,6 +74,14 @@
 # endif // #if defined(LIBMESH_HAVE_SLEPC)
 #endif // #if defined(LIBMESH_HAVE_PETSC)
 
+// If we're using MPI and VTK has been detected, we need to do some
+// MPI initialize/finalize stuff for VTK.
+#if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
+#include "libmesh/ignore_warnings.h"
+# include "vtkMPIController.h"
+#include "libmesh/restore_warnings.h"
+#endif
+
 // --------------------------------------------------------
 // Local anonymous namespace to hold miscelaneous bits
 namespace {
@@ -545,6 +553,13 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
     }
 #endif
 
+#if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
+  // Do MPI initializtion for VTK.
+  _vtk_mpi_controller = vtkSmartPointer<vtkMPIController>::New();
+  _vtk_mpi_controller->Initialize(&argc, const_cast<char ***>(&argv), /*initialized_externally=*/1);
+  _vtk_mpi_controller->SetGlobalController(_vtk_mpi_controller);
+#endif
+
   // Re-parse the command-line arguments.  Note that PETSc and MPI
   // initialization above may have removed command line arguments
   // that are not relevant to this application in the above calls.
@@ -769,6 +784,9 @@ LibMeshInit::~LibMeshInit()
     }
 #endif
 
+#if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
+  _vtk_mpi_controller->Finalize(/*finalized_externally=*/1);
+#endif
 
 #if defined(LIBMESH_HAVE_MPI)
   // Allow the user to bypass MPI finalization

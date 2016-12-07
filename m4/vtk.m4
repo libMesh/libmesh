@@ -9,6 +9,7 @@ m4_define([_AX_CXX_COMPILE_VTK_preamble],
              @%:@include "vtkDoubleArray.h"
              @%:@include "vtkXMLPUnstructuredGridWriter.h"
              @%:@include "vtkImageThreshold.h"
+             @%:@include "vtkMPIController.h"
           ]])
 
 dnl Declare compilation test function body to
@@ -21,6 +22,7 @@ m4_define([_AX_CXX_COMPILE_VTK_body],
              vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
              vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
              vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
+             vtkSmartPointer<vtkMPIController> controller = vtkSmartPointer<vtkMPIController>::New();
           ]])
 
 dnl ----------------------------------------------------------------
@@ -127,19 +129,6 @@ AC_DEFUN([CONFIGURE_VTK],
 
          vtkversion=$vtkmajor.$vtkminor.$vtkbuild
          vtkmajorminor=$vtkmajor.$vtkminor
-
-         AC_SUBST(vtkversion)
-         AC_SUBST(vtkmajor)
-         AC_SUBST(vtkbuild)
-
-         AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_MAJOR, [$vtkmajor],
-           [VTK's major version number, as detected by vtk.m4])
-
-         AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_MINOR, [$vtkminor],
-           [VTK's minor version number, as detected by vtk.m4])
-
-         AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_SUBMINOR, [$vtkbuild],
-           [VTK's subminor version number, as detected by vtk.m4])
        fi
 
        if (test x$enablevtk = xyes); then
@@ -161,33 +150,39 @@ AC_DEFUN([CONFIGURE_VTK],
 
          dnl VTK 5.x
          if (test $vtkmajor -eq 5); then
-           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging"
+           VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering -lvtkImaging -lvtkParallel"
 
          dnl VTK 6.1.x
+         dnl Not sure if -lvtkParallelMPI and -lvtkParallelCore existed in VTK-6.1.x
          elif (test $vtkmajor -eq 6 -a $vtkminor -le 1); then
            VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
                                      -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
-                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor"
+                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor \
+                                     -lvtkParallelMPI-$vtkmajorminor -lvtkParallelCore-$vtkmajorminor"
 
            # Some Linux distributions (Arch) install VTK without the
            # "libfoo-6.x.so" naming scheme, so we try to handle that
            # situation as well.
            VTK_LIBRARY_NO_VERSION="-L$VTK_LIB -lvtkIOCore -lvtkCommonCore -lvtkCommonDataModel \
                                    -lvtkFiltersCore -lvtkIOXML -lvtkImagingCore \
-                                   -lvtkIOImage -lvtkImagingMath"
+                                   -lvtkIOImage -lvtkImagingMath \
+                                   -lvtkParallelMPI -lvtkParallelCore"
 
          dnl VTK 6.2.x and above
-         else # elif (test $vtkmajor -eq 6 -a $vtkminor -eq 2); then
+         dnl Not sure if -lvtkParallelMPI and -lvtkParallelCore existed in VTK-6.2.x, but it does in VTK-7.x.
+         else
            VTK_LIBRARY_WITH_VERSION="-L$VTK_LIB -lvtkIOCore-$vtkmajorminor -lvtkCommonCore-$vtkmajorminor -lvtkCommonDataModel-$vtkmajorminor \
                                      -lvtkFiltersCore-$vtkmajorminor -lvtkIOXML-$vtkmajorminor -lvtkImagingCore-$vtkmajorminor \
-                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor"
+                                     -lvtkIOImage-$vtkmajorminor -lvtkImagingMath-$vtkmajorminor -lvtkIOParallelXML-$vtkmajorminor \
+                                     -lvtkParallelMPI-$vtkmajorminor -lvtkParallelCore-$vtkmajorminor"
 
            # Some Linux distributions (Arch) install VTK without the
            # "libfoo-6.x.so" naming scheme, so we try to handle that
            # situation as well.
            VTK_LIBRARY_NO_VERSION="-L$VTK_LIB -lvtkIOCore -lvtkCommonCore -lvtkCommonDataModel \
                                    -lvtkFiltersCore -lvtkIOXML -lvtkImagingCore \
-                                   -lvtkIOImage -lvtkImagingMath -lvtkIOParallelXML"
+                                   -lvtkIOImage -lvtkImagingMath -lvtkIOParallelXML \
+                                   -lvtkParallelMPI -lvtkParallelCore"
          fi
 
          dnl Try to compile test prog to check for existence of VTK libraries.
@@ -214,27 +209,28 @@ AC_DEFUN([CONFIGURE_VTK],
            dnl 3. If that also failed, print a message that we failed.
            if (test x$enablevtk = xno); then
              AC_MSG_RESULT(<<< Linking a test program against the VTK libraries failed >>>)
+             AC_MSG_RESULT([<<< libMesh requires VTK to be configured with -DVTK_Group_MPI:BOOL=ON >>>])
            fi
 
            dnl Reset $LIBS, $CPPFLAGS
            LIBS="$old_LIBS"
            CPPFLAGS="$old_CPPFLAGS"
 
-         dnl Check for VTK 5.x libraries
+         dnl Check for VTK 5.x headers and libraries
          else
            LIBS="$old_LIBS $VTK_RPATH_FLAGS $VTK_LIBRARY"
            CPPFLAGS="$CPPFLAGS -I$VTK_INC"
 
-           dnl AC_CHECK_LIB (library, function, [action-if-found], [action-if-not-found], [other-libraries])
-           AC_CHECK_LIB([vtkIO], main, [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering -lvtkImaging])
+           dnl test compiling and linking a test program.
+           dnl AC_LINK_IFELSE (input, [action-if-true], [action-if-false])
+           AC_LINK_IFELSE([AC_LANG_PROGRAM([_AX_CXX_COMPILE_VTK_preamble],[_AX_CXX_COMPILE_VTK_body])],
+                          [enablevtk=yes],
+                          [enablevtk=no])
 
-           if (test $enablevtk = yes); then
-             AC_CHECK_LIB([vtkCommon], main, [enablevtk=yes], [enablevtk=no])
-           fi
-
-           dnl As of VTK 5.4 it seems we also need vtkFiltering
-           if (test $enablevtk = yes); then
-             AC_CHECK_LIB([vtkFiltering], main, [enablevtk=yes], [enablevtk=no])
+           dnl If linking failed, print a status message
+           if (test x$enablevtk = xno); then
+             AC_MSG_RESULT(<<< Linking a test program against the VTK libraries failed >>>)
+             AC_MSG_RESULT([<<< libMesh requires VTK to be configured with -DVTK_USE_PARALLEL:BOOL=ON -DVTK_USE_MPI:BOOL=ON >>>])
            fi
 
            dnl Reset $LIBS, $CPPFLAGS
@@ -250,6 +246,19 @@ AC_DEFUN([CONFIGURE_VTK],
          if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
            VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
          fi
+
+         AC_SUBST(vtkversion)
+         AC_SUBST(vtkmajor)
+         AC_SUBST(vtkbuild)
+
+         AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_MAJOR, [$vtkmajor],
+           [VTK's major version number, as detected by vtk.m4])
+
+         AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_MINOR, [$vtkminor],
+           [VTK's minor version number, as detected by vtk.m4])
+
+         AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_SUBMINOR, [$vtkbuild],
+           [VTK's subminor version number, as detected by vtk.m4])
 
          AC_DEFINE(HAVE_VTK, 1, [Flag indicating whether the library will be compiled with VTK support])
          AC_MSG_RESULT(<<< Configuring library with VTK version $vtkversion support >>>)
