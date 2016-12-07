@@ -338,6 +338,10 @@ void CheckpointIO::write_connectivity (Xdr & io) const
         {
           const Elem & elem = mesh.elem_ref(*it);
 
+          // Only write elements of the current level.
+          if (elem.level() != level)
+            continue;
+
           unsigned int n_nodes = elem.n_nodes();
 
           elem_data[0] = elem.id();
