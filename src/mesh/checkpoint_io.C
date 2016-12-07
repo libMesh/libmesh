@@ -175,6 +175,10 @@ void CheckpointIO::build_elem_list()
 
     _local_elements.insert(elem->id());
 
+    // Make sure the neighbors vector is cleared out in case this Elem
+    // isn't active and we skip calling find_point_neighbors().
+    neighbors.clear();
+
     // Also need to add in all the point neighbors of this element.
     // Point neighbors can only be found for active elements...
     if (elem->active())
