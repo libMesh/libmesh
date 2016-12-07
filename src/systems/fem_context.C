@@ -1565,7 +1565,8 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
         sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices());
       else
         // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
-        sys.get_dof_map().dof_indices (libmesh_nullptr, this->get_dof_indices());
+        sys.get_dof_map().dof_indices
+          (static_cast<Elem*>(libmesh_nullptr), this->get_dof_indices());
     }
 #ifdef LIBMESH_ENABLE_AMR
   else if (algebraic_type() == OLD)
@@ -1575,7 +1576,8 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
         sys.get_dof_map().old_dof_indices (&(this->get_elem()), this->get_dof_indices());
       else
         // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
-        sys.get_dof_map().old_dof_indices (libmesh_nullptr, this->get_dof_indices());
+        sys.get_dof_map().old_dof_indices
+          (static_cast<Elem*>(libmesh_nullptr), this->get_dof_indices());
     }
 #endif // LIBMESH_ENABLE_AMR
 
@@ -1638,7 +1640,8 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
               sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
             else
               // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
-              sys.get_dof_map().dof_indices (libmesh_nullptr, this->get_dof_indices(i), i);
+              sys.get_dof_map().dof_indices
+                (static_cast<Elem*>(libmesh_nullptr), this->get_dof_indices());
           }
 #ifdef LIBMESH_ENABLE_AMR
         else if (algebraic_type() == OLD)
@@ -1647,7 +1650,8 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
               sys.get_dof_map().old_dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
             else
               // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
-              sys.get_dof_map().old_dof_indices (libmesh_nullptr, this->get_dof_indices(i), i);
+              sys.get_dof_map().old_dof_indices
+                (static_cast<Elem*>(libmesh_nullptr), this->get_dof_indices());
           }
 #endif // LIBMESH_ENABLE_AMR
 
