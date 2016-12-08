@@ -175,13 +175,21 @@ void CheckpointIO::build_elem_list()
 
     _local_elements.insert(elem->id());
 
-    // Also need to add in all the point neighbors of this element
-    elem->find_point_neighbors(neighbors);
+    // Make sure the neighbors vector is cleared out in case this Elem
+    // isn't active and we skip calling find_point_neighbors().
+    neighbors.clear();
 
-    for (std::set<const Elem *>::iterator it = neighbors.begin();
-         it != neighbors.end();
-         ++it)
-      _local_elements.insert((*it)->id());
+    // Also need to add in all the point neighbors of this element.
+    // Point neighbors can only be found for active elements...
+    if (elem->active())
+      elem->find_point_neighbors(neighbors);
+
+    std::set<const Elem *>::iterator
+      set_it = neighbors.begin(),
+      set_end = neighbors.end();
+
+    for (; set_it != set_end; ++set_it)
+      _local_elements.insert((*set_it)->id());
   }
 }
 
@@ -329,6 +337,10 @@ void CheckpointIO::write_connectivity (Xdr & io) const
       for (; it != end; ++it)
         {
           const Elem & elem = mesh.elem_ref(*it);
+
+          // Only write elements of the current level.
+          if (elem.level() != level)
+            continue;
 
           unsigned int n_nodes = elem.n_nodes();
 
