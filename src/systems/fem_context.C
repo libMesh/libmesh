@@ -1641,7 +1641,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
             else
               // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
               sys.get_dof_map().dof_indices
-                (static_cast<Elem*>(libmesh_nullptr), this->get_dof_indices());
+                (static_cast<Elem*>(libmesh_nullptr), this->get_dof_indices(i), i);
           }
 #ifdef LIBMESH_ENABLE_AMR
         else if (algebraic_type() == OLD)
@@ -1651,7 +1651,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
             else
               // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
               sys.get_dof_map().old_dof_indices
-                (static_cast<Elem*>(libmesh_nullptr), this->get_dof_indices());
+                (static_cast<Elem*>(libmesh_nullptr), this->get_dof_indices(i), i);
           }
 #endif // LIBMESH_ENABLE_AMR
 
