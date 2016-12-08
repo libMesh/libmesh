@@ -30,13 +30,6 @@
 namespace libMesh
 {
 
-
-// Forward declarations
-
-
-
-
-
 /**
  * The \p Tri is an element in 2D composed of 3 sides.
  * It looks like this:
@@ -51,6 +44,8 @@ namespace libMesh
  *     -----------
  *
  * \endverbatim
+ *
+ * \brief The base class for all triangular element types.
  */
 class Tri : public Face
 {

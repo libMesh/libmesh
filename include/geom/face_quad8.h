@@ -52,6 +52,8 @@ class Mesh;
  *        o-----o-----o
  *        0     4     1
  * \endverbatim
+ *
+ * \brief A 2D quadrilateral element with 8 nodes.
  */
 class Quad8 : public Quad
 {

@@ -47,6 +47,8 @@ namespace libMesh
  *              o-----------o   base side
  *              0           1
  * \endverbatim
+ *
+ * \brief A 2D infinite quadrilateral element with 4 nodes.
  */
 class InfQuad4 : public InfQuad
 {

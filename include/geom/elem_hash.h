@@ -28,14 +28,20 @@
 namespace libMesh
 {
 
-// The ElemHashUtils struct defines functions used for the "Hash" and
-// "Pred" template arguments of the various "unordered" containers,
-// e.g.
-// template <class Key,                         // unordered_multiset::key_type/value_type
-//           class Hash = hash<Key>,            // unordered_multiset::hasher
-//           class Pred = equal_to<Key>,        // unordered_multiset::key_equal
-//           class Alloc = allocator<Key>       // unordered_multiset::allocator_type
-//           > class unordered_multiset;
+/**
+ * The ElemHashUtils struct defines functions used for the "Hash" and
+ * "Pred" template arguments of the various "unordered" containers,
+ * e.g.
+ * template <class Key,                         // unordered_multiset::key_type/value_type
+ *           class Hash = hash<Key>,            // unordered_multiset::hasher
+ *           class Pred = equal_to<Key>,        // unordered_multiset::key_equal
+ *           class Alloc = allocator<Key>       // unordered_multiset::allocator_type
+ *           > class unordered_multiset;
+ *
+ * \author John W. Peterson
+ * \date 2015
+ * \brief A struct providing convenience functions for hashing elements.
+ */
 struct ElemHashUtils
 {
 public:

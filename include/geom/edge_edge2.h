@@ -39,6 +39,8 @@ namespace libMesh
  *  EDGE2: o--------o
  *         0        1
  * \endverbatim
+ *
+ * \brief A 1D geometric element with 2 nodes.
  */
 class Edge2 : public Edge
 {

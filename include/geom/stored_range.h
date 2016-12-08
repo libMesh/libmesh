@@ -46,6 +46,7 @@ namespace libMesh
  *
  * \author Benjamin S. Kirk
  * \date 2008
+ * \brief Utility class for defining generic ranges for threading.
  */
 template <typename iterator_type, typename object_type>
 class StoredRange

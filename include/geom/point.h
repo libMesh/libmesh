@@ -35,6 +35,7 @@ namespace libMesh
  *
  * \author Benjamin S. Kirk
  * \date 2003
+ * \brief A geometric point in (x,y,z) space.
  */
 class Point : public TypeVector<Real>
 {

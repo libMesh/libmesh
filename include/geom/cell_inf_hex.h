@@ -38,6 +38,8 @@ namespace libMesh
  * @e does exist in the mesh, since the outer nodes are located
  * at a specific distance from the mesh origin (and therefore
  * define a side).  Still, this face is not to be used!
+ *
+ * \brief The base class for all 3D infinite hexahedral element types.
  */
 class InfHex : public InfCell
 {

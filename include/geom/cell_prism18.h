@@ -70,6 +70,8 @@ namespace libMesh
  *   0         6         1
  *
  * \endverbatim
+ *
+ * \brief A 3D prismatic element with 18 nodes.
  */
 class Prism18 libmesh_final : public Prism
 {

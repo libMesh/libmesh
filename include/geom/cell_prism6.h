@@ -48,6 +48,8 @@ namespace libMesh
  *     o-------o
  *     0       1
  * \endverbatim
+ *
+ * \brief A 3D prismatic element with 6 nodes.
  */
 class Prism6 libmesh_final : public Prism
 {

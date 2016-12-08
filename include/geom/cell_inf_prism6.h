@@ -52,6 +52,8 @@ namespace libMesh
  *     o-------o     base face
  *     0       1
  * \endverbatim
+ *
+ * \brief A 3D infinite prismatic element with 6 nodes.
  */
 class InfPrism6 libmesh_final : public InfPrism
 {

@@ -31,6 +31,8 @@ namespace libMesh
 
 /**
  * The \p Prism is an element in 3D with 5 sides.
+ *
+ * \brief The base class for all prismatic element types.
  */
 class Prism : public Cell
 {

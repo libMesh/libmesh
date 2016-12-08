@@ -40,6 +40,7 @@ namespace libMesh
  *
  * \author Roy H. Stogner
  * \date 2007
+ * \brief Used by ParallelMesh to represent an Elem owned by another processor.
  */
 class RemoteElem : public Elem,
                    public Singleton

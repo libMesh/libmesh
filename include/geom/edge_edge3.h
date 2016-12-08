@@ -41,6 +41,8 @@ namespace libMesh
  *  EGDE3: o----o----o
  *         0    2    1
  * \endverbatim
+ *
+ * \brief A 1D geometric element with 3 nodes.
  */
 class Edge3 : public Edge
 {

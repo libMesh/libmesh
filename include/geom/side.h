@@ -44,7 +44,9 @@ class Node;
  * Similarly, you cannot access the neighbors of a side since it
  * does not store any.
  *
- * \author  Benjamin S. Kirk
+ * \author Benjamin S. Kirk
+ * \date 2004
+ * \brief Proxy class for efficiently representing an Elem's side.
  */
 template <class SideType, class ParentType>
 class Side : public SideType

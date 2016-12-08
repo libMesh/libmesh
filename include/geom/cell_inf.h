@@ -37,6 +37,8 @@ namespace libMesh
  * The \p InfCell is an abstract element type that lives in
  * three dimensions.  An infinite cell could be an infinite hexahedron,
  * or an infinite prism.
+ *
+ * \brief The base class for all 3D infinite geometric element types.
  */
 class InfCell : public Elem
 {
