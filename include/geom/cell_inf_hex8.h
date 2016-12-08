@@ -55,6 +55,8 @@ namespace libMesh
  *
  * \endverbatim
  *
+ * \author Daniel Dreyer
+ * \date 2002
  * \brief A 3D infinite hexahedral element with 8 nodes.
  */
 class InfHex8 libmesh_final : public InfHex

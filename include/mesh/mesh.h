@@ -42,6 +42,10 @@ namespace libMesh
 /**
  * The \p Mesh class is a thin wrapper, around the \p ReplicatedMesh
  * class by default.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2002
+ * \brief Manages a collection of Nodes and Elems.
  */
 class Mesh : public DefaultMesh
 {

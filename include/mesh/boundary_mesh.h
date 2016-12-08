@@ -33,6 +33,10 @@ namespace libMesh
  * contains a description of the boundary of some other mesh.
  * This is useful for writing the boundary of a domain for inspecting
  * boundary conditions and other things.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2002
+ * \brief Specialized mesh used for keeping track of boundary elements.
  */
 class BoundaryMesh : public Mesh
 {

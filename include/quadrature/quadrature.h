@@ -49,6 +49,7 @@ class Elem;
  *
  * \author Benjamin S. Kirk
  * \date 2002
+ * \brief Base class for all quadrature families and orders.
  */
 class QBase : public ReferenceCountedObject<QBase>
 {

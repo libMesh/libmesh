@@ -50,6 +50,10 @@ class MeshData;
  * element faces and nodes with ids useful for identifying the
  * type of boundary condtion.  It can also build a mesh that
  * just includes boundary elements/faces.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2002
+ * \brief Used by the Mesh to keep track of boundary nodes and elements.
  */
 class BoundaryInfo : public ParallelObject
 {

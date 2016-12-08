@@ -47,6 +47,7 @@ class System;
  * \author Benjamin Kirk
  * \author John Peterson
  * \date 2004
+ * \brief Handles reading and writing of Exodus binary files.
  */
 class ExodusII_IO : public MeshInput<MeshBase>,
                     public MeshOutput<MeshBase>,

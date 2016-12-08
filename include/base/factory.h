@@ -37,6 +37,10 @@ namespace libMesh
 
 /**
  * Factory class defintion.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2002
+ * \brief Handles name-based creation of objects.
  */
 template <class Base>
 class Factory

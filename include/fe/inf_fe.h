@@ -69,6 +69,7 @@ class FEComputeData;
  *
  * \author Daniel Dreyer
  * \date 2003
+ * \brief Base class for all the infinite geometric element types.
  */
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 class InfFE : public FEBase

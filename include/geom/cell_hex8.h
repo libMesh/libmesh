@@ -51,6 +51,8 @@ namespace libMesh
  *
  * \endverbatim
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief A 3D hexahedral element with 8 nodes.
  */
 class Hex8 libmesh_final : public Hex

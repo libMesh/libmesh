@@ -39,6 +39,7 @@ namespace libMesh
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
+ * \brief Common base for all objects whose creations/destructions are counted.
  */
 class ReferenceCounter
 {

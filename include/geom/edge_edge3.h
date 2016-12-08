@@ -42,6 +42,8 @@ namespace libMesh
  *         0    2    1
  * \endverbatim
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief A 1D geometric element with 3 nodes.
  */
 class Edge3 : public Edge

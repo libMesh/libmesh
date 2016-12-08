@@ -46,6 +46,8 @@ namespace libMesh
  *   0     3     1
  * \endverbatim
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief A 2D triangular element with 6 nodes.
  */
 class Tri6 : public Tri

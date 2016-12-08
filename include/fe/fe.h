@@ -83,6 +83,7 @@ struct FEOutputType<NEDELEC_ONE>
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
+ * \brief Template class which generates the different FE families and orders.
  */
 template <unsigned int Dim, FEFamily T>
 class FE : public FEGenericBase<typename FEOutputType<T>::type>

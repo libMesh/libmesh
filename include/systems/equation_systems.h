@@ -62,6 +62,7 @@ class MeshBase;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
+ * \brief Manages multiples systems of equations.
  */
 class EquationSystems : public ReferenceCountedObject<EquationSystems>,
                         public ParallelObject

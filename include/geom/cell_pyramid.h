@@ -32,6 +32,8 @@ namespace libMesh
 /**
  * The \p Pyramid is an element in 3D with 5 sides.
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief The base class for all pyramid element types.
  */
 class Pyramid : public Cell

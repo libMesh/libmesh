@@ -58,6 +58,7 @@ template <typename T> class SparseMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002
+ * \brief NumericVector interface to PETSc Vec.
  */
 template <typename T>
 class PetscVector libmesh_final : public NumericVector<T>

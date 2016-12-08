@@ -37,6 +37,8 @@ class Mesh;
  * two dimensions.  A face could be a triangle, a quadrilateral,
  * a pentagon, etc...
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief The base class for all 2D geometric element types.
  */
 class Face : public Elem

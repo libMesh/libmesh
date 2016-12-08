@@ -68,6 +68,7 @@ template <typename T> class DenseMatrix;
  *
  * \author Benjamin S. Kirk
  * \date 2002
+ * \brief SparseMatrix interface to PETSc Mat.
  */
 template <typename T>
 class PetscMatrix libmesh_final : public SparseMatrix<T>

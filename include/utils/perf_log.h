@@ -41,6 +41,7 @@ namespace libMesh
  *
  * \author Benjamin Kirk
  * \date 2003
+ * \brief Data object managed by PerfLog
  */
 class PerfData
 {
@@ -118,6 +119,7 @@ protected:
  *
  * \author Benjamin Kirk
  * \date 2003
+ * \brief Responsible for timing and summarizing events.
  */
 class PerfLog
 {

@@ -44,10 +44,11 @@ class MeshData;
  * \p UNV files.
  *
  * Author history
- * Original version: Tammo Kaschner, January 2003
- * Optimization: Daniel Dreyer, September 2003
- * Converted to MeshInput format: Benjamin Kirk, March 2004
- * Read in "groups" section, general refactoring: John Peterson, July 2014
+ * \author Tammo Kaschner
+ * \author Daniel Dreyer
+ * \author Benjamin S. Kirk
+ * \author John W. Peterson
+ * \date 2003, 2004, 2014
  */
 class UNVIO : public MeshInput<MeshBase>,
               public MeshOutput<MeshBase>

@@ -53,6 +53,8 @@ class Mesh;
  *        0     4     1
  * \endverbatim
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief A 2D quadrilateral element with 8 nodes.
  */
 class Quad8 : public Quad

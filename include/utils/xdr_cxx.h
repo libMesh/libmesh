@@ -63,6 +63,7 @@ namespace libMesh
  *
  * \author Benjamin Kirk
  * \date 2003
+ * \brief C++ interface for the XDR (eXternal Data Representation) format.
  */
 class Xdr
 {

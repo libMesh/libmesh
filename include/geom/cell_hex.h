@@ -26,12 +26,11 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * The \p Hex is an element in 3D with 6 sides.
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief The base class for all hexahedral element types.
  */
 class Hex : public Cell

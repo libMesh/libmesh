@@ -35,6 +35,8 @@ namespace libMesh
 /**
  * A namespace for quality utility functions.
  *
+ * \author John W. Peterson
+ * \date 2002
  * \brief Utilty functions for computing element quality indicators.
  */
 namespace Quality

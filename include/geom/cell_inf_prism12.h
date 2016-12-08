@@ -59,6 +59,10 @@ namespace libMesh
  *  o-------o-------o
  *  0       6       1
  * \endverbatim
+ *
+ * \author Daniel Dreyer
+ * \date 2002
+ * \brief A 3D infinite prismatic element with 12 nodes.
  */
 class InfPrism12 libmesh_final : public InfPrism
 {

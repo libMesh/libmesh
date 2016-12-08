@@ -50,6 +50,8 @@ namespace libMesh
  *
  * \endverbatim
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief A 3D pyramid element with 5 nodes.
  */
 class Pyramid5 libmesh_final : public Pyramid

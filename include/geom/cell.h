@@ -26,12 +26,13 @@
 namespace libMesh
 {
 
-
 /**
  * The \p Cell is an abstract element type that lives in
  * three dimensions.  A cell could be a tetrahedron, a hexahedron,
  * a pyramid, a prism, etc...
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief The base class for all 3D geometric element types.
  */
 class Cell : public Elem

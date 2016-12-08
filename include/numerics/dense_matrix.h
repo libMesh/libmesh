@@ -41,6 +41,7 @@ template <typename T> class DenseVector;
  *
  * \author Benjamin S. Kirk
  * \date 2002
+ * \brief A matrix object used for finite element assembly and numerics.
  */
 template<typename T>
 class DenseMatrix : public DenseMatrixBase<T>

@@ -170,6 +170,10 @@ inline std::ostream & operator << (std::ostream & os, const OrderWrapper& order)
 /**
  * class FEType hides (possibly multiple) FEFamily and approximation
  * orders, thereby enabling specialized finite element families.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2002
+ * \brief Manages the family, order, etc. parameters for a given FE.
  */
 class FEType
 {

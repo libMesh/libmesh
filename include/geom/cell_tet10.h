@@ -57,6 +57,8 @@ namespace libMesh
  *             1
  *  \endverbatim
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief A 3D tetrahedral element with 10 nodes.
  */
 class Tet10 libmesh_final : public Tet

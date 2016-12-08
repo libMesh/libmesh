@@ -40,6 +40,15 @@ namespace libMesh
 
 
 
+/**
+ * PAPI stands for Performance Application Programming Interface.
+ * This class was supposed to provide an interface to the hardware
+ * timers that PAPI exposes, but it never really got developed.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2002
+ * \brief A class for interfacing with hardware timers.
+ */
 class PerfMon
 {
 public:

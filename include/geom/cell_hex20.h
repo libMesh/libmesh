@@ -29,9 +29,6 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * The \p Hex20 is an element in 3D composed of 20 nodes.
  * It is numbered like this:
@@ -65,6 +62,8 @@ namespace libMesh
  *     0              8              1
  *   \endverbatim
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief A 3D hexahedral element with 20 nodes.
  */
 class Hex20 libmesh_final : public Hex

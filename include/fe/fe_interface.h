@@ -57,6 +57,7 @@ class PointLocatorBase;
  *
  * \author Daniel Dreyer
  * \date 2002-2007
+ * \brief Interface class which provides access to FE functions.
  */
 class FEInterface
 {

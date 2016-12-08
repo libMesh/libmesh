@@ -70,6 +70,7 @@ namespace libMesh
  *
  * \author John W. Peterson
  * \date 2002
+ * \brief A std::vector derived class for implementing simple statistical algorithms.
  */
 template <typename T>
 class StatisticsVector : public std::vector<T>

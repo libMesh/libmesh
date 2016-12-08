@@ -63,7 +63,9 @@ class MeshInput;
  * Furthermore, this class provides functions for reading and writing a
  * mesh to disk in various formats.
  *
- * \author  Benjamin S. Kirk
+ * \author Benjamin S. Kirk
+ * \date 2002
+ * \brief Base class for Mesh.
  */
 class MeshBase : public ParallelObject
 {

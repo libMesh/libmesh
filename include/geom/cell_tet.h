@@ -32,6 +32,8 @@ namespace libMesh
 /**
  * The \p Tet is an element in 3D composed of 4 sides.
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief The base class for all tetrahedral element types.
  */
 class Tet : public Cell

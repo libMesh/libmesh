@@ -39,6 +39,8 @@ class Mesh;
  * The \p Edge is an element in 1D. It can be thought of as a
  * line segment.
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief The base class for all 1D geometric element types.
  */
 class Edge : public Elem

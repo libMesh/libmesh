@@ -162,6 +162,7 @@ class NodeConstraints : public std::map<const Node *,
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
+ * \brief Manages the degrees of freedom (DOFs) in a simulation.
  */
 class DofMap : public ReferenceCountedObject<DofMap>,
                public ParallelObject

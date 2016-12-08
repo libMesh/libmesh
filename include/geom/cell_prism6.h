@@ -49,6 +49,8 @@ namespace libMesh
  *     0       1
  * \endverbatim
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief A 3D prismatic element with 6 nodes.
  */
 class Prism6 libmesh_final : public Prism

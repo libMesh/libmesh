@@ -49,6 +49,8 @@ namespace libMesh
  *
  * \endverbatim
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief The base class for all quadrilateral element types.
  */
 class Quad : public Face

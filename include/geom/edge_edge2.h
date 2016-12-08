@@ -40,6 +40,8 @@ namespace libMesh
  *         0        1
  * \endverbatim
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief A 1D geometric element with 2 nodes.
  */
 class Edge2 : public Edge

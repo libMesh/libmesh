@@ -53,6 +53,7 @@ class PointLocatorBase;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
+ * \brief Responsible for mesh refinement algorithms and data.
  */
 class MeshRefinement : public ParallelObject
 {

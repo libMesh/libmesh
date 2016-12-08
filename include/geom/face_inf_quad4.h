@@ -48,6 +48,8 @@ namespace libMesh
  *              0           1
  * \endverbatim
  *
+ * \author Daniel Dreyer
+ * \date 2002
  * \brief A 2D infinite quadrilateral element with 4 nodes.
  */
 class InfQuad4 : public InfQuad

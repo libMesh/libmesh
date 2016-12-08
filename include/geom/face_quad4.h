@@ -46,6 +46,8 @@ namespace libMesh
  *        0           1
  * \endverbatim
  *
+ * \author Benjamin S. Kirk
+ * \date 2002
  * \brief A 2D quadrilateral element with 4 nodes.
  */
 class Quad4 : public Quad

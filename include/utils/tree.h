@@ -38,6 +38,7 @@ class MeshBase;
  *
  * \author Benjamin S. Kirk
  * \date 2002
+ * \brief Tree class templated on the number of leaves on each node.
  */
 template <unsigned int N>
 class Tree : public TreeBase
