@@ -32,11 +32,6 @@
 namespace libMesh
 {
 
-
-// Forward declarations
-
-
-
 /**
  * The \p InfQuad is an abstract element type that lives in
  * two dimensions.  Here, an infinite face is @e always a quadrilateral,
@@ -56,6 +51,8 @@ namespace libMesh
  *           side 0
  *
  * \endverbatim
+ *
+ * \brief The base class for all 2D infinite quadrilateral element types.
  */
 class InfQuad : public Elem
 {

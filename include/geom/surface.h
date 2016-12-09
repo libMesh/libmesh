@@ -38,6 +38,7 @@ namespace libMesh
  *
  * \author Benjamin S. Kirk
  * \date 2002
+ * \brief Base class for Plane and Sphere classes.
  */
 class Surface
 {

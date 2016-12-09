@@ -49,6 +49,8 @@ namespace libMesh
  *     o         base node
  *       0
  * \endverbatim
+ *
+ * \brief A 1D infinite element with 2 nodes.
  */
 class InfEdge2 : public Edge
 {

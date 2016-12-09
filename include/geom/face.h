@@ -36,6 +36,8 @@ class Mesh;
  * The \p Face is an abstract element type that lives in
  * two dimensions.  A face could be a triangle, a quadrilateral,
  * a pentagon, etc...
+ *
+ * \brief The base class for all 2D geometric element types.
  */
 class Face : public Elem
 {

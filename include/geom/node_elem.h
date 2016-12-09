@@ -29,13 +29,13 @@
 namespace libMesh
 {
 
-
-// Forward declarations
-
-
 /**
  * The \p NodeElem is a point element, generally used as
  * a side of a 1D element.
+ *
+ * \author Roy H. Stogner
+ * \date 2006
+ * \brief A zero-dimensional geometric entity implementing the Elem interface.
  */
 class NodeElem : public Elem
 {

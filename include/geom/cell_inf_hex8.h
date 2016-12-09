@@ -54,6 +54,8 @@ namespace libMesh
  *      0        1
  *
  * \endverbatim
+ *
+ * \brief A 3D infinite hexahedral element with 8 nodes.
  */
 class InfHex8 libmesh_final : public InfHex
 {

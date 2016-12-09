@@ -56,6 +56,8 @@ namespace libMesh
  *             o
  *             1
  *  \endverbatim
+ *
+ * \brief A 3D tetrahedral element with 10 nodes.
  */
 class Tet10 libmesh_final : public Tet
 {

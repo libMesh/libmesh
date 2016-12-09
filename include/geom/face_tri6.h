@@ -31,13 +31,6 @@
 namespace libMesh
 {
 
-
-
-// Forward declarations
-
-
-
-
 /**
  * The \p Tri6 is an element in 2D composed of 6 nodes.
  * It is numbered like this:
@@ -52,6 +45,8 @@ namespace libMesh
  *   o-----o-----o
  *   0     3     1
  * \endverbatim
+ *
+ * \brief A 2D triangular element with 6 nodes.
  */
 class Tri6 : public Tri
 {

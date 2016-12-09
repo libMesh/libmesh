@@ -31,6 +31,7 @@ namespace libMesh
  *
  * \author David Knezevic
  * \date 2016
+ * \brief A 2D quadrilateral shell element with 4 nodes.
  */
 class QuadShell4 : public Quad4
 {

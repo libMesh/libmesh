@@ -33,6 +33,7 @@ namespace libMesh
  *
  * \author Benjamin S. Kirk
  * \date 2002
+ * \brief A geometric object representing a planar surface.
  */
 class Plane : public Surface
 {

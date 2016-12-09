@@ -33,15 +33,16 @@ namespace libMesh
 /**
  * The \p Edge4 is an element in 1D composed of 4 nodes.
  *
- * \author David Knezevic
- * \date 2005
- *
  * It is numbered like this:
  *
  * \verbatim
  *  EGDE4: o----o----o----o
  *         0    2    3    1
  * \endverbatim
+ *
+ * \author David Knezevic
+ * \date 2005
+ * \brief A 1D geometric element with 4 nodes.
  */
 class Edge4 libmesh_final : public Edge
 {

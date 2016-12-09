@@ -49,6 +49,8 @@ namespace libMesh
  *    o-----o
  *    0      1
  * \endverbatim
+ *
+ * \brief A 2D triangular element with 3 nodes.
  */
 class Tri3 : public Tri
 {

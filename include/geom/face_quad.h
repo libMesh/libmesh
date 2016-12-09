@@ -48,6 +48,8 @@ namespace libMesh
  *        o-----------o
  *
  * \endverbatim
+ *
+ * \brief The base class for all quadrilateral element types.
  */
 class Quad : public Face
 {

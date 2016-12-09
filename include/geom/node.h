@@ -49,6 +49,7 @@ class MeshRefinement;
  *
  * \author Benjamin S. Kirk
  * \date 2003
+ * \brief A geometric point in (x,y,z) space associated with a DOF.
  */
 class Node : public Point,
              public DofObject,

@@ -56,6 +56,7 @@ class SerialMesh;
  *
  * \author Benjamin S. Kirk
  * \date 2013
+ * \brief Subdivides a single element using a mesh generator.
  */
 class ElemCutter
 {

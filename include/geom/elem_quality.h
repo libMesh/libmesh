@@ -34,6 +34,8 @@ namespace libMesh
 
 /**
  * A namespace for quality utility functions.
+ *
+ * \brief Utilty functions for computing element quality indicators.
  */
 namespace Quality
 {

@@ -45,6 +45,8 @@ namespace libMesh
  *        o-----------o
  *        0           1
  * \endverbatim
+ *
+ * \brief A 2D quadrilateral element with 4 nodes.
  */
 class Quad4 : public Quad
 {

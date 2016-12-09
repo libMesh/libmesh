@@ -68,6 +68,7 @@ namespace libMesh
  *
  * \author Benjamin S. Kirk, Daniel Dreyer
  * \date 2002-2007
+ * \brief A geometric object representing a sphere.
  */
 class Sphere : public Surface
 {

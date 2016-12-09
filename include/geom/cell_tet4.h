@@ -49,6 +49,8 @@ namespace libMesh
  *       o
  *       1
  * \endverbatim
+ *
+ * \brief A 3D tetrahedral element with 4 nodes.
  */
 class Tet4 libmesh_final : public Tet
 {

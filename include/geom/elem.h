@@ -87,6 +87,7 @@ class PointLocatorBase;
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
+ * \brief The base class for all geometric element types.
  */
 class Elem : public ReferenceCountedObject<Elem>,
              public DofObject
