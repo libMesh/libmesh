@@ -20,7 +20,7 @@
 #ifndef LIBMESH_POINT_NEIGHBOR_COUPLING_H
 #define LIBMESH_POINT_NEIGHBOR_COUPLING_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/ghosting_functor.h"
 
 namespace libMesh

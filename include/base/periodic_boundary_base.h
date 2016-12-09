@@ -19,19 +19,20 @@
 #ifndef LIBMESH_PERIODIC_BOUNDARY_BASE_H
 #define LIBMESH_PERIODIC_BOUNDARY_BASE_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/point.h"
 #include "libmesh/auto_ptr.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <set>
 
-namespace libMesh {
+namespace libMesh
+{
 
 // Forward Declarations
 class Elem;
@@ -39,6 +40,10 @@ class MeshBase;
 
 /**
  * The base class for defining periodic boundaries.
+ *
+ * \author Roy Stogner
+ * \date 2010
+ * \brief Base class for all PeriodicBoundary implementations.
  */
 class PeriodicBoundaryBase
 {

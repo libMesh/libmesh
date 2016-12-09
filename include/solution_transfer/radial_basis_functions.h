@@ -66,6 +66,10 @@ namespace libMesh
 
 /**
  * Wendland's compactly supported Radial Basis Functions.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2013
+ * \brief Interface for evaluating Wendland's radial basis functions.
  */
 template <unsigned int SpaceDim, unsigned int Continuity>
 class WendlandRBF

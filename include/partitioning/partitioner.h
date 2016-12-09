@@ -20,12 +20,12 @@
 #ifndef LIBMESH_PARTITIONER_H
 #define LIBMESH_PARTITIONER_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh.h"
 #include "libmesh/auto_ptr.h"
 #include "libmesh/id_types.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <cstddef>
 
 namespace libMesh
@@ -41,6 +41,10 @@ class ErrorVector;
  * partitioning algorithms.  It takes a reference to a \p MeshBase
  * object as input, which it will partition into a number of
  * subdomains.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2003
+ * \brief Base class for all concrete Partitioner instantiations.
  */
 class Partitioner
 {

@@ -21,10 +21,16 @@
 // Local includes
 #include "libmesh/const_function.h"
 
-// C++ includes
+namespace libMesh
+{
 
-namespace libMesh {
-
+/**
+ * ConstFunction that simply returns 0.
+ *
+ * \author Roy Stogner
+ * \date 2012
+ * \brief ConstFunction that simply returns 0.
+ */
 template <typename Output=Number>
 class ZeroFunction : public ConstFunction<Output>
 {

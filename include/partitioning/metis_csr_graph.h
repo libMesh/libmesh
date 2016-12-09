@@ -20,22 +20,24 @@
 #ifndef LIBMESH_METIS_CSR_GRAPH_H
 #define LIBMESH_METIS_CSR_GRAPH_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <vector>
 #include <numeric>
-
-
 
 namespace libMesh
 {
 
 /**
  * This utility class provides a convenient implementation for
- * building the compressed-row-storage graph required for the METIS/ParMETIS
- * graph partitioning schemes.
+ * building the compressed-row-storage graph required for the
+ * METIS/ParMETIS graph partitioning schemes.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2013
+ * \brief Compressed graph data structure used by MetisPartitioner.
  */
 template <class IndexType>
 class METIS_CSR_Graph

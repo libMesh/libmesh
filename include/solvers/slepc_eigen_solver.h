@@ -28,25 +28,22 @@
 #include "libmesh/eigen_solver.h"
 #include "libmesh/slepc_macro.h"
 
-/**
- * SLEPc include files.
- */
+// SLEPc include files.
 EXTERN_C_FOR_SLEPC_BEGIN
 # include <slepceps.h>
 EXTERN_C_FOR_SLEPC_END
 
-// C++ includes
-
-
 namespace libMesh
 {
 
-
 /**
  * This class provides an interface to the SLEPc
- * eigenvalue solver library \p www.grycap.upv.es/slepc/.
+ * eigenvalue solver library from http://slepc.upv.es/.
+ *
+ * \author Steffen Peterson
+ * \date 2005
+ * \brief EigenSolver implementation based on SLEPc.
  */
-
 template <typename T>
 class SlepcEigenSolver : public EigenSolver<T>
 {

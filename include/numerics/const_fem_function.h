@@ -29,6 +29,13 @@ namespace libMesh
 // Forward declarations
 class Point;
 
+/**
+ * FEMFunction that returns a single.
+ *
+ * \author Roy Stogner
+ * \date 2012
+ * \brief FEMFunction that returns a single.
+ */
 template <typename Output=Number>
 class ConstFEMFunction : public FEMFunctionBase<Output>
 {

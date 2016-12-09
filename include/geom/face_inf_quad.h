@@ -52,6 +52,8 @@ namespace libMesh
  *
  * \endverbatim
  *
+ * \author Daniel Dreyer
+ * \date 2003
  * \brief The base class for all 2D infinite quadrilateral element types.
  */
 class InfQuad : public Elem

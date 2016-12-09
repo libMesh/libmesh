@@ -42,8 +42,16 @@
 #include <string>
 #include <vector>
 
-namespace libMesh {
+namespace libMesh
+{
 
+/**
+ * FEMFunction that returns a single.
+ *
+ * \author Roy Stogner
+ * \date 2012
+ * \brief A Function generated (via FParser) by parsing a mathematical expression.
+ */
 template <typename Output=Number, typename OutputGradient=Gradient>
 class ParsedFunction : public FunctionBase<Output>
 {

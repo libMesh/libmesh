@@ -20,7 +20,7 @@
 #ifndef LIBMESH_DOF_MAP_H
 #define LIBMESH_DOF_MAP_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/auto_ptr.h"
 #include "libmesh/enum_order.h"
@@ -35,7 +35,7 @@
 #include "libmesh/parallel_object.h"
 #include "libmesh/point.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <algorithm>
 #include <cstddef>
 #include <iterator>

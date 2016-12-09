@@ -21,7 +21,7 @@
 #define LIBMESH_PARSED_FUNCTION_PARAMETER_H
 
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parameter_accessor.h"
 #include "libmesh/parsed_function.h"
@@ -36,6 +36,10 @@ namespace libMesh
  * This ParameterAccessor subclass is specific to ParsedFunction
  * objects: it stores a pointer to the ParsedFunction and a string
  * describing the parameter (an inline variable) name to be accessed.
+ *
+ * \author Roy Stogner
+ * \date 2015
+ * \brief Stores a pointer to a parsed function and a string for the parameter.
  */
 template <typename T=Number>
 class ParsedFunctionParameter : public ParameterAccessor<T>

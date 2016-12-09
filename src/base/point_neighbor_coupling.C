@@ -17,14 +17,14 @@
 
 
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/point_neighbor_coupling.h"
 
 #include "libmesh/elem.h"
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/remote_elem.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include LIBMESH_INCLUDE_UNORDERED_SET
 
 namespace libMesh

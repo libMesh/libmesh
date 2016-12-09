@@ -23,11 +23,11 @@
 #include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_VSMOOTHER
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_smoother.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <cstddef>
 #include <vector>
 #include <map>

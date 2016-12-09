@@ -17,12 +17,7 @@
 
 
 
-// C++ Includes -------------------------------------
-#include <set>
-#include <algorithm> // for std::fill, std::equal_range, std::max, std::lower_bound, etc.
-#include <sstream>
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/coupling_matrix.h"
 #include "libmesh/default_coupling.h"
 #include "libmesh/dense_matrix.h"
@@ -46,7 +41,10 @@
 #include "libmesh/threads.h"
 #include "libmesh/mesh_subdivision_support.h"
 
-
+// C++ Includes
+#include <set>
+#include <algorithm> // for std::fill, std::equal_range, std::max, std::lower_bound, etc.
+#include <sstream>
 
 namespace libMesh
 {

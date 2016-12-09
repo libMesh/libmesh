@@ -20,19 +20,19 @@
 #ifndef LIBMESH_MORTON_SFC_PARTITIONER_H
 #define LIBMESH_MORTON_SFC_PARTITIONER_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/sfc_partitioner.h"
-
-// C++ Includes   -----------------------------------
 
 namespace libMesh
 {
 
-
-
 /**
  * The \p MortonSFCPartitioner uses a Morton space
  * filling curve to partition the elements.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2003
+ * \brief Partitioner based on Morton's space filling curve algorithm.
  */
 class MortonSFCPartitioner : public SFCPartitioner
 {

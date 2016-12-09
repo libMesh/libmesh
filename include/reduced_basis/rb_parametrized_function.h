@@ -34,6 +34,10 @@ class Elem;
 
 /**
  * A simple functor class that provides a RBParameter-dependent function.
+ *
+ * \author David Knezevic
+ * \date 2012
+ * \brief Provides a reduced basis parameterized function.
  */
 class RBParametrizedFunction
 {

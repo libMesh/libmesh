@@ -21,12 +21,12 @@
 #define LIBMESH_SENSITIVITY_DATA_H
 
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parameter_vector.h"
 #include "libmesh/system.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <vector>
 
 namespace libMesh
@@ -38,6 +38,10 @@ class QoISet;
 /**
  * Data structure for holding completed parameter sensitivity
  * calculations.
+ *
+ * \author Roy Stogner
+ * \date 2009
+ * \brief Holds completed parameter sensitivity calculations.
  */
 class SensitivityData
 {

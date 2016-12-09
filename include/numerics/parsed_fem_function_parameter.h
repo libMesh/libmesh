@@ -21,7 +21,7 @@
 #define LIBMESH_PARSED_FEM_FUNCTION_PARAMETER_H
 
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parameter_accessor.h"
 
@@ -38,6 +38,10 @@ template <typename T> class ParsedFEMFunction;
  * This ParameterAccessor subclass is specific to ParsedFEMFunction
  * objects: it stores a pointer to the ParsedFEMFunction and a string
  * describing the parameter (an inline variable) name to be accessed.
+ *
+ * \author Roy Stogner
+ * \date 2015
+ * \brief Stores a pointer to a ParsedFEMFunction and a string for the parameter.
  */
 template <typename T=Number>
 class ParsedFEMFunctionParameter : public ParameterAccessor<T>

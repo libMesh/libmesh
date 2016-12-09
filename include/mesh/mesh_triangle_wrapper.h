@@ -42,6 +42,10 @@ typedef Real REAL;
  * A special namespace for wrapping the standard Triangle API,
  * as well as some helper functions for initializing/destroying
  * the structs triangle uses to communicate.
+ *
+ * \author John W. Peterson
+ * \date 2011
+ * \brief Namespace that wraps the Triangle mesh generator's API.
  */
 namespace TriangleWrapper
 {

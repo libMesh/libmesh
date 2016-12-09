@@ -47,6 +47,10 @@ namespace RBDataDeserialization
 /**
  * This class de-serializes an RBEvaluation object
  * using the Cap'n Proto library.
+ *
+ * \author David Knezevic
+ * \date 2015
+ * \brief Deserializes RBEvaluation objects using Cap'n Proto.
  */
 class RBEvaluationDeserialization
 {

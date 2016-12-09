@@ -30,9 +30,6 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * The \p InfPrism is an element in 3D with 4 sides.
  * The \f$ 5^{th} \f$ side is theoretically located at infinity,
@@ -42,6 +39,8 @@ namespace libMesh
  * at a specific distance from the mesh origin (and therefore
  * define a side).  Still, this face is not to be used!
  *
+ * \author Daniel Dreyer
+ * \date 2003
  * \brief The base class for all 3D infinite prismatic element types.
  */
 class InfPrism : public InfCell

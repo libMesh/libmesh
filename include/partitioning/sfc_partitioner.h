@@ -20,10 +20,10 @@
 #ifndef LIBMESH_SFC_PARTITIONER_H
 #define LIBMESH_SFC_PARTITIONER_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/partitioner.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <string>
 
 namespace libMesh
@@ -32,6 +32,10 @@ namespace libMesh
 /**
  * The \p SFCPartitioner uses a Hilbert or Morton-ordered space
  * filling curve to partition the elements.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2003
+ * \brief Partitioner based on different types of space filling curves.
  */
 class SFCPartitioner : public Partitioner
 {

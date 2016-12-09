@@ -28,8 +28,14 @@
 namespace libMesh
 {
 
-// A do-nothing class for templated methods that expect output
-// iterator arguments.
+/**
+ * A do-nothing class for templated methods that expect output
+ * iterator arguments.
+ *
+ * \author Roy Stogner
+ * \date 2012
+ * \brief A do-nothing output iterator implementation.
+ */
 template <typename T>
 struct null_output_iterator
   : std::iterator<std::output_iterator_tag, T>

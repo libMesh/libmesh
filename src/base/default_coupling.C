@@ -17,7 +17,7 @@
 
 
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/default_coupling.h"
 
 #include "libmesh/coupling_matrix.h"
@@ -25,7 +25,7 @@
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/remote_elem.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include LIBMESH_INCLUDE_UNORDERED_SET
 
 namespace libMesh

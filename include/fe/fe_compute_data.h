@@ -42,14 +42,14 @@ class Point;
  * from \p FEInterface::shape() in a \p std::vector<Number>.
  * -- With enabled infinite elements, this class returns a vector of physically
  * correct shape functions, both for finite and infinite elements.
+ *
+ * \author Daniel Dreyer
+ * \date 2003
+ * \brief Helper class used with FEInterface::compute_data().
  */
 class FEComputeData
 {
 public:
-
-
-  //------------------------------------------------------
-  // Conventional FEComputeData
   /**
    * Constructor.  Takes the required input data and clears
    * the output data using \p clear().
@@ -62,23 +62,17 @@ public:
     this->clear();
   }
 
-
-  //----------------------------------------------------
-  // Input data
   /**
    * Const reference to the \p EquationSystems object
    * that contains simulation-specific data.
    */
   const EquationSystems & equation_systems;
+
   /**
    * Holds the point where the data are to be computed
    */
   const Point & p;
 
-
-
-  //----------------------------------------------------
-  // Output data
   /**
    * Storage for the computed shape function values.
    */
@@ -90,7 +84,6 @@ public:
    * Storage for the computed phase lag
    */
   Real phase;
-
 #endif
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -98,7 +91,6 @@ public:
    * The wave speed.
    */
   Real speed;
-
 #endif
 
 #if defined LIBMESH_ENABLE_INFINITE_ELEMENTS && defined(LIBMESH_USE_COMPLEX_NUMBERS)
@@ -107,20 +99,18 @@ public:
    * including the wave number depending terms
    */
   Real frequency;
-
 #endif
 
   /**
    * Clears the @e output data completely.
    */
-  void clear () ;
-
+  void clear ();
 
   /**
    * Inits the @e output data to default values, provided
    * the fields are correctly resized.
    */
-  void init () ;
+  void init ();
 };
 
 

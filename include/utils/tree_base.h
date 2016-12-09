@@ -47,6 +47,10 @@ namespace Trees
  * from the current processor.  This experimental capability may be
  * useful if you do not wish to include off-processor elements in the
  * search for a Point.
+ *
+ * \author Daniel Dreyer
+ * \date 2003
+ * \brief Base class for different Tree types.
  */
 enum BuildType {NODES=0,
                 ELEMENTS,

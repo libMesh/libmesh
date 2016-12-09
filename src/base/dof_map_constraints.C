@@ -15,14 +15,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// C++ Includes -------------------------------------
-#include <set>
-#include <algorithm> // for std::count, std::fill
-#include <sstream>
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath>
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/boundary_info.h" // needed for dirichlet constraints
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
@@ -54,6 +47,13 @@
 #include "libmesh/threads.h"
 #include "libmesh/tensor_tools.h"
 #include "libmesh/utility.h" // Utility::iota()
+
+// C++ Includes
+#include <set>
+#include <algorithm> // for std::count, std::fill
+#include <sstream>
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
+#include <cmath>
 
 
 // Anonymous namespace to hold helper classes

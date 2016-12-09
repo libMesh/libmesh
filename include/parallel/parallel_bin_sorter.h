@@ -34,12 +34,18 @@
 namespace libMesh
 {
 
-namespace Parallel {
+namespace Parallel
+{
 
-template <typename KeyType, typename IdxType=unsigned int>
 /**
  * Perform a parallel sort using a bin-sort method.
+ *
+ * \author Benjamin S. Kirk
+ * \author John W. Peterson
+ * \date 2007
+ * \brief Parallel bin sorting object.
  */
+template <typename KeyType, typename IdxType=unsigned int>
 class BinSorter : public ParallelObject
 {
   // the type of iterator we will be using is inferred from KeyType

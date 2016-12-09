@@ -21,12 +21,12 @@
 #define LIBMESH_PARAMETER_VECTOR_H
 
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parameter_accessor.h"
 #include "libmesh/auto_ptr.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <vector>
 
 namespace libMesh
@@ -36,6 +36,10 @@ namespace libMesh
 /**
  * Data structure for specifying which Parameters should be
  * independent variables in a parameter sensitivity calculation.
+ *
+ * \author Roy Stogner
+ * \date 2009
+ * \brief Specifies parameters for parameter sensitivity calculations.
  */
 class ParameterVector
 {

@@ -22,20 +22,19 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_input.h"
 
-// C++ headers
-
 namespace libMesh
 {
 
 // Forward declarations
 class MeshBase;
 
-
-
 /**
- * This class is repsonsible for reading an unstructured,
- * triangulated surface in the
- * standard OFF OOGL format.
+ * This class is repsonsible for reading an unstructured, triangulated
+ * surface in the standard OFF OOGL format.
+ *
+ * \author John W. Peterson
+ * \date 2004
+ * \brief Reads OOF OOGL triangulated surface files.
  */
 class OFFIO : public MeshInput<MeshBase>
 {

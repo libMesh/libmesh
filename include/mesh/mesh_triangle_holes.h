@@ -36,6 +36,10 @@ namespace libMesh
  * the connectivity of the hole is implicit in the numbering of the points,
  * i.e. node 0 is connected to node 1, node 1 is connected to node 2, etc,
  * and the last node "wraps around" to connect back to node 0.
+ *
+ * \author John W. Peterson
+ * \date 2011
+ * \brief Class for parameterizing 2D holes to be meshed with Triangle.
  */
 class TriangleInterface::Hole
 {

@@ -33,7 +33,6 @@
 namespace libMesh
 {
 
-
 /**
  * The \p InfEdge2 is an infinte element in 1D composed of 2 nodes.
  * It is numbered like this:
@@ -50,6 +49,8 @@ namespace libMesh
  *       0
  * \endverbatim
  *
+ * \author Daniel Dreyer
+ * \date 2003
  * \brief A 1D infinite element with 2 nodes.
  */
 class InfEdge2 : public Edge

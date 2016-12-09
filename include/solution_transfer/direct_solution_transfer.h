@@ -24,13 +24,20 @@
 
 #include <string>
 
-namespace libMesh {
+namespace libMesh
+{
 
 /**
- * Implementation of a SolutionTransfer object that only works for transferring the solution but only in the case of:
+ * Implementation of a SolutionTransfer object that only works for
+ * transferring the solution but only in the case of:
  *
- * 1.  The Systems must have EXACTLY the same mesh.
- * 2.  The two variables involved must have EXACTLY the same finite element family and order.
+ * 1. The Systems must have EXACTLY the same mesh.
+ * 2. The two variables involved must have EXACTLY the same finite
+ *    element family and order.
+ *
+ * \author Derek Gaston
+ * \date 2013
+ * \brief Implements solution transfers for matched variable/mesh case.
  */
 class DirectSolutionTransfer : public SolutionTransfer
 {

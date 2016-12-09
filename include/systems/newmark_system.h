@@ -43,6 +43,10 @@ namespace libMesh
  * Default values of the Newmark parameters \p alpha and \p delta
  * used for time integration are provided.
  * For details refer to the examples section.
+ *
+ * \author Steffen Petersen
+ * \date 2003
+ * \brief Implements the Newmark time integration scheme.
  */
 class NewmarkSystem : public LinearImplicitSystem
 {

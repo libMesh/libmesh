@@ -20,10 +20,10 @@
 #ifndef LIBMESH_UNSTRUCTURED_MESH_H
 #define LIBMESH_UNSTRUCTURED_MESH_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/mesh_base.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <cstddef>
 
 namespace libMesh
@@ -44,6 +44,10 @@ class MeshData;
  * refinement functions from that object.  To interact with the
  * boundary, instantiate a BoundaryMesh with a reference to
  * this class, and then use that object's functionality.
+ *
+ * \author Roy Stogner
+ * \date 2007
+ * \brief Base class for Replicated and Distributed meshes.
  */
 class UnstructuredMesh : public MeshBase
 {

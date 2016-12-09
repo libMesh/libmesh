@@ -17,9 +17,7 @@
 
 
 
-// C++ Includes   -----------------------------------
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_config.h"
 #include "libmesh/centroid_partitioner.h"
 #include "libmesh/metis_partitioner.h"

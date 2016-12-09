@@ -27,8 +27,16 @@
 // C++ includes
 #include <string>
 
-namespace libMesh {
+namespace libMesh
+{
 
+/**
+ * Function that returns a single value that never changes.
+ *
+ * \author Roy Stogner
+ * \date 2012
+ * \brief Function that returns a single value that never changes.
+ */
 template <typename Output=Number>
 class ConstFunction : public FunctionBase<Output>
 {

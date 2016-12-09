@@ -17,9 +17,7 @@
 
 
 
-// C++ Includes   -----------------------------------
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/mesh_base.h"
 #include "libmesh/linear_partitioner.h"
 #include "libmesh/libmesh_logging.h"

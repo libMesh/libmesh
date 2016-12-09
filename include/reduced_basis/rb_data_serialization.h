@@ -50,6 +50,10 @@ namespace RBDataSerialization
 /**
  * This class serializes an RBEvaluation object
  * using the Cap'n Proto library.
+ *
+ * \author David Knezevic
+ * \date 2015
+ * \brief Serializes RBEvaluation objects using Cap'n Proto.
  */
 class RBEvaluationSerialization
 {

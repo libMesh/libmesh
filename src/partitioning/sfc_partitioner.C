@@ -17,9 +17,7 @@
 
 
 
-// C++ Includes   -----------------------------------
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_config.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/sfc_partitioner.h"

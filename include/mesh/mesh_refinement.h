@@ -26,19 +26,19 @@
 
 #ifdef LIBMESH_ENABLE_AMR
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh.h" // libMesh::invalid_uint
 #include "libmesh/topology_map.h"
 #include "libmesh/parallel_object.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <vector>
 
 namespace libMesh
 {
 
-// Forward Declarations -----------------------------
+// Forward Declarations
 class MeshBase;
 class Point;
 class Node;

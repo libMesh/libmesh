@@ -29,6 +29,13 @@ namespace libMesh
 // Forward declarations
 class Elem;
 
+/**
+ * An implementation of FEMap for "XYZ" elements.
+ *
+ * \author Paul Bauman
+ * \date 2012
+ * \brief An implementation of FEMap for "XYZ" elements.
+ */
 class FEXYZMap : public FEMap
 {
 public:

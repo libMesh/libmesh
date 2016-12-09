@@ -17,9 +17,8 @@
 
 
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/sibling_coupling.h"
-
 #include "libmesh/elem.h"
 #include "libmesh/remote_elem.h"
 

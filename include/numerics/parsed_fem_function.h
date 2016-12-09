@@ -48,6 +48,7 @@ namespace libMesh
  *
  * \author Roy Stogner
  * \date 2014
+ * \brief Support for using parsed functions in FEMSystem.
  */
 template <typename Output=Number>
 class ParsedFEMFunction : public FEMFunctionBase<Output>

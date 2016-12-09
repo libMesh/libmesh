@@ -23,14 +23,8 @@
 // Local Includes
 #include "libmesh/system.h"
 
-// C++ includes
-
 namespace libMesh
 {
-
-
-// Forward Declarations
-
 
 /**
  * This class provides a specific system class.  It aims
@@ -38,6 +32,10 @@ namespace libMesh
  * the essentials needed to solve a system.  Note
  * that still additional vectors/matrices may be added,
  * as offered in the parent class \p System.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2004
+ * \brief Used for solving explicit systems of equations.
  */
 class ExplicitSystem : public System
 {

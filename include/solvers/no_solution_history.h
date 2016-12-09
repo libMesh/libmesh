@@ -25,7 +25,11 @@ namespace libMesh
 {
 
 /**
- * 'Save nothing' subclass of Solution History, this is the default
+ * 'Save nothing' subclass of Solution History, this is the default.
+ *
+ * \author Vikram Garg
+ * \date 2012
+ * \brief For storing and retrieiving timestep data.
  */
 class NoSolutionHistory : public SolutionHistory
 {

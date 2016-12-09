@@ -24,9 +24,6 @@
 #include "libmesh/system.h"
 #include "libmesh/libmesh_config.h"
 
-// C++ includes
-
-
 namespace libMesh
 {
 
@@ -44,6 +41,10 @@ class EigenSystem;
  * the essentials needed to solve a system.  Note
  * that still additional vectors/matrices may be added,
  * as offered in the parent classes.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2004
+ * \brief Used for solving transient systems of equations.
  */
 template <class Base>
 class TransientSystem : public Base

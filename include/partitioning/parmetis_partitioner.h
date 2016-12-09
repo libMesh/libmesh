@@ -20,12 +20,12 @@
 #ifndef LIBMESH_PARMETIS_PARTITIONER_H
 #define LIBMESH_PARMETIS_PARTITIONER_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/id_types.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/vectormap.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <cstddef>
 #include <vector>
 
@@ -38,6 +38,10 @@ class ParmetisHelper;
 /**
  * The \p ParmetisPartitioner uses the Parmetis graph partitioner
  * to partition the elements.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2003
+ * \brief Partitioner which provides an interface to ParMETIS.
  */
 class ParmetisPartitioner : public Partitioner
 {

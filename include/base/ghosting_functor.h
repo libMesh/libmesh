@@ -20,13 +20,13 @@
 #ifndef LIBMESH_GHOSTING_FUNCTOR_H
 #define LIBMESH_GHOSTING_FUNCTOR_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/id_types.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/reference_counted_object.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include LIBMESH_INCLUDE_UNORDERED_MAP
 
 namespace libMesh

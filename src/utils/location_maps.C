@@ -17,20 +17,17 @@
 
 
 
-// C++ Includes -----------------------------------
-#include <limits>
-#include <utility>
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/elem.h"
 #include "libmesh/location_maps.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/node.h"
 #include "libmesh/parallel.h"
 
+// C++ Includes
+#include <limits>
+#include <utility>
 
-
-//--------------------------------------------------------------------------
 namespace
 {
 using libMesh::Real;
@@ -45,7 +42,6 @@ const Real chunkfloat = 1024.0;
 namespace libMesh
 {
 
-//--------------------------------------------------------------------------
 template <typename T>
 void LocationMap<T>::init(MeshBase & mesh)
 {

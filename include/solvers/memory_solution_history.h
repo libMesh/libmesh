@@ -23,13 +23,20 @@
 // Local includes
 #include "libmesh/numeric_vector.h"
 #include "libmesh/solution_history.h"
+
+// C++ includes
 #include <list>
 
 namespace libMesh
 {
+
 /**
  * Subclass of Solution History that stores the solutions
  * and other important vectors in memory.
+ *
+ * \author Vikram Garg
+ * \date 2012
+ * \brief Stores past solutions in memory.
  */
 class MemorySolutionHistory : public SolutionHistory
 {

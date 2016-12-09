@@ -20,7 +20,7 @@
 #ifndef LIBMESH_MESH_GENERATION_H
 #define LIBMESH_MESH_GENERATION_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/vector_value.h"
@@ -28,7 +28,7 @@
 #include "libmesh/mesh_triangle_interface.h"
 #endif
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <cstddef>
 #include <vector>
 

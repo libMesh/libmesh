@@ -29,8 +29,6 @@
 #include "libmesh/eigen_system.h"
 #include "libmesh/sparse_matrix.h"
 
-// C++ includes
-
 namespace libMesh
 {
 
@@ -40,6 +38,10 @@ namespace libMesh
  * we want to remove certain degrees of freedom from the system.
  * This is useful, for example, in the case that one wants to solve
  * eigenvalue problems with Dirichlet boundary conditions.
+ *
+ * \author David Knezevic
+ * \date 2011
+ * \brief Extends EigenSystem to allow certain DOFs to be condensed out.
  */
 class CondensedEigenSystem : public EigenSystem
 {

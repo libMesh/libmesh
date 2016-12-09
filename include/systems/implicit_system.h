@@ -33,14 +33,16 @@ namespace libMesh
 template <typename T> class LinearSolver;
 template <typename T> class SparseMatrix;
 
-
-
 /**
  * This class provides a specific system class.  It aims
  * at implicit systems, offering nothing more than just
  * the essentials needed to solve a system.  Note
  * that still additional vectors/matrices may be added,
  * as offered in the parent class \p ExplicitSystem.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2004
+ * \brief Used for solving implicit systems of equations.
  */
 class ImplicitSystem : public ExplicitSystem
 {

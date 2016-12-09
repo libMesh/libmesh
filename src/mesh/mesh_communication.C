@@ -17,11 +17,7 @@
 
 
 
-// C++ Includes   -----------------------------------
-#include <numeric>
-#include <set>
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/boundary_info.h"
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/elem.h"
@@ -39,6 +35,11 @@
 #include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/utility.h"
 #include "libmesh/remote_elem.h"
+
+// C++ Includes
+#include <numeric>
+#include <set>
+
 
 
 

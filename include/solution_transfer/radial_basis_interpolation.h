@@ -31,8 +31,13 @@
 
 namespace libMesh
 {
+
 /**
  * Radial Basis Function interplation.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2013
+ * \brief Does radial basis function interpolation using Nanoflann.
  */
 template <unsigned int KDDim, class RBF = WendlandRBF<KDDim, 2> >
 class RadialBasisInterpolation : public InverseDistanceInterpolation<KDDim>

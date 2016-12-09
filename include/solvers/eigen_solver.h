@@ -33,8 +33,6 @@
 #include "libmesh/parallel_object.h"
 #include "libmesh/auto_ptr.h"
 
-// C++ includes
-
 namespace libMesh
 {
 
@@ -47,8 +45,11 @@ class SolverConfiguration;
 /**
  * This class provides an interface to solvers for eigenvalue
  * problems.
+ *
+ * \author Steffen Peterson
+ * \date 2005
+ * \brief Base class which defines the interface for solving eigenproblems.
  */
-
 template <typename T>
 class EigenSolver : public ReferenceCountedObject<EigenSolver<T> >,
                     public ParallelObject

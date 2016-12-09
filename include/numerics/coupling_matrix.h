@@ -46,6 +46,10 @@ class ConstCouplingRowConstIterator;
  * how different components in a system couple with each
  * other.  A coupling matrix is necessarily square but not
  * necessarily symmetric.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2002
+ * \brief Defines the coupling between variables of a System.
  */
 class CouplingMatrix
 {

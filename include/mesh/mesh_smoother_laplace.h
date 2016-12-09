@@ -20,19 +20,15 @@
 #ifndef LIBMESH_MESH_SMOOTHER_LAPLACE_H
 #define LIBMESH_MESH_SMOOTHER_LAPLACE_H
 
-
-// forward declarations
-
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <vector>
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh.h" // libMesh::out/err
 #include "libmesh/mesh_smoother.h"
 
 namespace libMesh
 {
-
 
 /**
  * This class defines the data structures necessary

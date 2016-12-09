@@ -31,6 +31,10 @@ namespace libMesh
  *
  * Note: A serialization of the "from" solution vector will be
  * performed!  This can be slow in parallel and take a lot of memory!
+ *
+ * \author Derek Gaston
+ * \date 2013
+ * \brief SolutionTransfer object which uses a MeshFunction.
  */
 class MeshFunctionSolutionTransfer : public SolutionTransfer
 {

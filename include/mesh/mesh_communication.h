@@ -20,13 +20,9 @@
 #ifndef LIBMESH_MESH_COMMUNICATION_H
 #define LIBMESH_MESH_COMMUNICATION_H
 
-
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_tools.h"
-
-// C++ Includes   -----------------------------------
 
 namespace libMesh
 {

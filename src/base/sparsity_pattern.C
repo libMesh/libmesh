@@ -17,7 +17,7 @@
 
 
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/coupling_matrix.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"

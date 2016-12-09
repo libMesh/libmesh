@@ -22,10 +22,15 @@
 
 #include "libmesh/libmesh_common.h"
 
-namespace libMesh {
+namespace libMesh
+{
 
 /**
  * Base class for all library singleton objects.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2013
+ * \brief Base class for all library singleton objects.
  */
 class Singleton
 {

@@ -20,11 +20,11 @@
 #ifndef LIBMESH_REPLICATED_MESH_H
 #define LIBMESH_REPLICATED_MESH_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/boundary_info.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <cstddef>
 
 namespace libMesh
@@ -37,6 +37,10 @@ namespace libMesh
  *
  * Most methods for this class are found in MeshBase, and most
  * implementation details are found in UnstructuredMesh.
+ *
+ * \author Roy Stogner
+ * \date 2007
+ * \brief Mesh data structure replicated on all processors.
  */
 class ReplicatedMesh : public UnstructuredMesh
 {

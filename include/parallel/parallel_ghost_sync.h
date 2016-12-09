@@ -20,14 +20,14 @@
 #ifndef LIBMESH_PARALLEL_GHOST_SYNC_H
 #define LIBMESH_PARALLEL_GHOST_SYNC_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/auto_ptr.h"
 #include "libmesh/elem.h"
 #include "libmesh/location_maps.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/parallel.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include LIBMESH_INCLUDE_UNORDERED_SET
 
 

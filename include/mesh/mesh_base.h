@@ -20,9 +20,7 @@
 #ifndef LIBMESH_MESH_BASE_H
 #define LIBMESH_MESH_BASE_H
 
-
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/auto_ptr.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/dof_object.h" // for invalid_processor_id
@@ -34,7 +32,7 @@
 #include "libmesh/variant_filter_iterator.h"
 #include "libmesh/parallel_object.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <cstddef>
 #include <string>
 

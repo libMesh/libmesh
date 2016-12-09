@@ -21,22 +21,26 @@
 #define LIBMESH_QOI_SET_H
 
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <vector>
 
 namespace libMesh
 {
 
-// Forward Declarations -----------------------------
+// Forward Declarations
 class System;
 
 /**
  * Data structure for specifying which Quantities of Interest
  * should be calculated in an adjoint or a parameter sensitivity
  * calculation.
+ *
+ * \author Roy Stogner
+ * \date 2009
+ * \brief Used to specify quantities of interest in a simulation.
  */
 class QoISet
 {

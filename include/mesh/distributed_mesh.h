@@ -20,11 +20,11 @@
 #ifndef LIBMESH_DISTRIBUTED_MESH_H
 #define LIBMESH_DISTRIBUTED_MESH_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/mapvector.h"
 #include "libmesh/unstructured_mesh.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <cstddef>
 #include <set>
 
@@ -41,6 +41,10 @@ class Node;
  * and is intended to provide identical functionality to the user
  * but be distributed rather than replicated across distributed-memory
  * systems.
+ *
+ * \author Roy Stogner
+ * \date 2007
+ * \brief Mesh data structure which is distributed across all processors.
  */
 class DistributedMesh : public UnstructuredMesh
 {

@@ -47,6 +47,10 @@ namespace libMesh
  * This is the case for conjugate heat transfer applications where
  * the common interface has overlapping but distinct boundary
  * discretizations.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2012
+ * \brief Base class which defines the mesh-free interpolation interface.
  */
 class MeshfreeInterpolation : public ParallelObject
 {

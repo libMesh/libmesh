@@ -20,12 +20,11 @@
 #ifndef LIBMESH_TOPOLOGY_MAP_H
 #define LIBMESH_TOPOLOGY_MAP_H
 
+// Local Includes
 #include "libmesh/libmesh_config.h"
-
-// Local Includes -----------------------------------
 #include "libmesh/libmesh_common.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include LIBMESH_INCLUDE_UNORDERED_MAP
 #include LIBMESH_INCLUDE_HASH
 #include <vector>
@@ -33,7 +32,7 @@
 namespace libMesh
 {
 
-// Forward Declarations -----------------------------
+// Forward Declarations
 class Elem;
 class MeshBase;
 class Node;
@@ -62,6 +61,10 @@ public:
  *
  * For efficiency we will use a hashed map if it is available,
  * otherwise a regular map.
+ *
+ * \author Roy Stogner
+ * \date 2015
+ * \brief Enables topology-based lookups of nodes.
  */
 class TopologyMap
 {

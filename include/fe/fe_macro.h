@@ -22,12 +22,9 @@
 
 
 
-/**
- * These macros help in instantiating specific versions
- * of the \p FE class.  Simply include this file, and
- * instantiate at the end for the desired dimension(s).
- */
-
+// These macros help in instantiating specific versions
+// of the \p FE class.  Simply include this file, and
+// instantiate at the end for the desired dimension(s).
 #define INSTANTIATE_MAPS(_dim,_type)                                    \
   template Point FE<_dim, _type>::map(const Elem *, const Point &);     \
   template Point FE<_dim, _type>::map_xi(const Elem *, const Point &);  \

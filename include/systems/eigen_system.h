@@ -29,8 +29,6 @@
 #include "libmesh/system.h"
 #include "libmesh/eigen_solver.h"
 
-// C++ includes
-
 namespace libMesh
 {
 
@@ -44,6 +42,10 @@ template <typename T> class SparseMatrix;
  * is able  to handle standard eigenvalue problems
  * \p A*x=lambda*x  and generalited eigenvalue problems
  * \p A*x=lambda*B*x.
+ *
+ * \author Steffen Peterson
+ * \date 2005
+ * \brief Base class for defining systems of equations for eigenproblems.
  */
 class EigenSystem : public System
 {

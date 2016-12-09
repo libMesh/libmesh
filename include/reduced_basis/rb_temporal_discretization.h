@@ -32,6 +32,10 @@ namespace libMesh
  * Define a class that encapsulates the details of a
  * "generalized Euler" temporal discretization to be
  * used in the rbOOmit framework.
+ *
+ * \author David Knezevic
+ * \date 2012
+ * \brief Encapsulates the details of the generalized Euler discretization.
  */
 class RBTemporalDiscretization
 {

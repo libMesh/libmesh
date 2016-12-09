@@ -31,6 +31,10 @@ namespace libMesh
  * This class extends FEMContext in order to provide extra data
  * required to perform local element residual and Jacobian assembly
  * in the case of a discontinuous Galerkin (DG) discretization.
+ *
+ * \author David Knezevic
+ * \date 2015
+ * \brief Extends FEMContext to work for DG problems.
  */
 class DGFEMContext : public FEMContext
 {

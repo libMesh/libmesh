@@ -22,18 +22,18 @@
 
 #include "libmesh/libmesh_config.h"
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/point.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include LIBMESH_INCLUDE_UNORDERED_MULTIMAP
 #include <vector>
 
 namespace libMesh
 {
 
-// Forward Declarations -----------------------------
+// Forward Declarations
 class Elem;
 class MeshBase;
 class Node;
@@ -44,6 +44,10 @@ class Node;
  * The key is a hash of the Point location.
  * For efficiency we will use a hashed multimap if it is
  * available, otherwise a regular multimap.
+ *
+ * \author Roy Stogner
+ * \date 2008
+ * \brief std::map-like data structure using hashed Points for keys.
  */
 template <typename T>
 class LocationMap

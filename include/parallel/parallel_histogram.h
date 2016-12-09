@@ -35,11 +35,17 @@
 namespace libMesh
 {
 
-namespace Parallel {
+namespace Parallel
+{
 
 /**
  * Defines a histogram to be used in parallel in conjuction with
  * a \p BinSorter.
+ *
+ * \author Benjamin S. Kirk
+ * \author John W. Peterson
+ * \date 2007
+ * \brief Used in conjunction with a BinSorter for parallel sorting.
  */
 template <typename KeyType, typename IdxType=unsigned int>
 class Histogram : public ParallelObject

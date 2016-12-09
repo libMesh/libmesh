@@ -17,19 +17,12 @@
 
 
 
-// C++ Includes   -----------------------------------
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/parameter_pointer.h"
 #include "libmesh/parameter_vector.h"
 
 namespace libMesh
 {
-
-// ------------------------------------------------------------
-// ParameterVector implementation
-
-
 
 ParameterVector::ParameterVector(const std::vector<Number *> &params)
   : _is_shallow_copy(false)

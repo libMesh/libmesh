@@ -21,11 +21,11 @@
 #define LIBMESH_PARAMETER_MULTIPOINTER_H
 
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parameter_accessor.h"
 
-// C++ ----------------------------------------------
+// C++ Includes
 #include <vector>
 
 namespace libMesh
@@ -38,6 +38,10 @@ namespace libMesh
  * This is a slightly flexible ParameterAccessor subclass: it stores
  * all user-provided pointers to copies of the parameter, and modifies
  * the value at each location in memory.
+ *
+ * \author Roy Stogner
+ * \date 2015
+ * \brief Stores multiple user-provided pointers.
  */
 template <typename T=Number>
 class ParameterMultiPointer : public ParameterAccessor<T>

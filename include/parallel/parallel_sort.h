@@ -43,6 +43,11 @@ namespace Parallel
  * ensuring that the data is properly sorted between
  * all the processors.  We assume that a Sort
  * is instantiated on all processors.
+ *
+ * \author Benjamin S. Kirk
+ * \author John W. Peterson
+ * \date 2007
+ * \brief Object for performing parallel sorts using MPI.
  */
 template <typename KeyType, typename IdxType=unsigned int>
 class Sort : public ParallelObject

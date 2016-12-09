@@ -21,11 +21,11 @@
 #define LIBMESH_PARAMETER_MULTIACCESSOR_H
 
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parameter_accessor.h"
 
-// C++ ----------------------------------------------
+// C++ Includes
 #include <vector>
 
 namespace libMesh
@@ -38,6 +38,10 @@ namespace libMesh
  * This is the "default" ParameterAccessor subclass: it simply stores
  * a user-provided pointer to the parameter, and modifies the value at
  * that location in memory.
+ *
+ * \author Roy Stogner
+ * \date 2015
+ * \brief Stores a user-provided pointer to a parameter.
  */
 template <typename T=Number>
 class ParameterMultiAccessor : public ParameterAccessor<T>

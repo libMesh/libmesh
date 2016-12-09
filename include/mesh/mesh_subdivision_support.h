@@ -20,14 +20,10 @@
 #ifndef LIBMESH_MESH_SUBDIVISION_SUPPORT_H
 #define LIBMESH_MESH_SUBDIVISION_SUPPORT_H
 
-
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh.h"
 #include "libmesh/face_tri3_subdivision.h"
 #include "libmesh/elem.h"
-
-// C++ Includes   -----------------------------------
 
 namespace libMesh
 {
@@ -35,12 +31,16 @@ namespace libMesh
 // Forward declarations
 class MeshBase;
 
-// ------------------------------------------------------------
 // MeshTools::Subdivision namespace
 namespace MeshTools
 {
 /**
  * Utility functions for subdivision surface operations on a \p Mesh.
+ *
+ * \author Roman Vetter
+ * \author Norbert Stoop
+ * \date 2014
+ * \brief Support functions for subdivision surface elements.
  */
 namespace Subdivision
 {

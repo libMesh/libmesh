@@ -35,14 +35,15 @@ class MeshBase;
 class DofMap;
 class CouplingMatrix;
 
-// ------------------------------------------------------------
-// Sparsity Pattern
-
 /**
  * This defines the sparsity pattern, or graph, of a sparse matrix.
  * The format is quite simple -- the global indices of the nonzero entries
  * in each row are packed into a vector.  The global indices (i,j) of the
  * nth nonzero entry of row i are given by j = sparsity_pattern[i][n];
+ *
+ * \author Roy Stogner
+ * \date 2010
+ * \brief Defines the sparsity pattern of a sparse matrix.
  */
 namespace SparsityPattern // use a namespace so member classes can be forward-declared.
 {

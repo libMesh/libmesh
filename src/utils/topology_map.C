@@ -17,23 +17,20 @@
 
 
 
-// C++ Includes -----------------------------------
-#include <limits>
-#include <utility>
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/elem.h"
 #include "libmesh/topology_map.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/node.h"
 #include "libmesh/parallel.h"
 
-
+// C++ Includes
+#include <limits>
+#include <utility>
 
 namespace libMesh
 {
 
-//--------------------------------------------------------------------------
 void TopologyMap::init(MeshBase & mesh)
 {
   // This function must be run on all processors at once

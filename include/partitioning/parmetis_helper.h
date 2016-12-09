@@ -18,10 +18,10 @@
 #ifndef LIBMESH_PARMETIS_HELPER_H
 #define LIBMESH_PARMETIS_HELPER_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_config.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <vector>
 
 // Include the ParMETIS header files.  We need this so we can use
@@ -46,6 +46,10 @@ namespace libMesh
  * file, apps do not include parmetis.h, and consequently we don't
  * have to install it, either.  This class is empty when Parmetis
  * is not available, when it is it is simply a data container.
+ *
+ * \author John W. Peterson
+ * \date 2015
+ * \brief Pointer-to-implementation class used by ParmetisPartitioner.
  */
 class ParmetisHelper
 {

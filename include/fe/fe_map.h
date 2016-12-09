@@ -34,6 +34,14 @@ namespace libMesh
 class Elem;
 class Node;
 
+/**
+ * Class contained in FE that encapsulates mapping (i.e. from physical
+ * space to reference space and vice-versa) quantities and operations.
+ *
+ * \author Paul Bauman
+ * \date 2012
+ * \brief Computes finite element mapping function values, gradients, etc.
+ */
 class FEMap
 {
 public:

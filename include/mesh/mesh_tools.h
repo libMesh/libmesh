@@ -20,9 +20,7 @@
 #ifndef LIBMESH_MESH_TOOLS_H
 #define LIBMESH_MESH_TOOLS_H
 
-
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/id_types.h"
@@ -30,7 +28,7 @@
 #include "libmesh/point.h" // some compilers want the full definition - I think so they can do
 // return-value-optimization for BoundingBox'es - BSK
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <vector>
 #include <set>
 #include <limits>

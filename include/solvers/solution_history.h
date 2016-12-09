@@ -25,8 +25,12 @@ namespace libMesh
 {
 
 /**
- * A SolutionHistory class that enables the storage and retrieval of timesteps
- * and (in the future) adaptive steps
+ * A SolutionHistory class that enables the storage and retrieval of
+ * timesteps and (in the future) adaptive steps.
+ *
+ * \author Vikram Garg
+ * \date 2012
+ * \brief For storing and retrieiving timestep data.
  */
 class SolutionHistory
 {

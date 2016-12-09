@@ -19,16 +19,17 @@
 #ifndef LIBMESH_PERIODIC_BOUNDARY_H
 #define LIBMESH_PERIODIC_BOUNDARY_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/periodic_boundary_base.h"
 #include "libmesh/vector_value.h" // RealVectorValue
 
-namespace libMesh {
+namespace libMesh
+{
 
 // Forward Declarations
 class Elem;
@@ -36,6 +37,10 @@ class MeshBase;
 
 /**
  * The definition of a periodic boundary.
+ *
+ * \author Roy Stogner
+ * \date 2010
+ * \brief Used for implementing periodic BCs via constraints.
  */
 class PeriodicBoundary : public PeriodicBoundaryBase
 {

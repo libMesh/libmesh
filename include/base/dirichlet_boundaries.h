@@ -24,12 +24,12 @@
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/auto_ptr.h"
 #include "libmesh/id_types.h"
 #include "libmesh/vector_value.h"
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <cstddef>
 #include <set>
 #include <vector>
@@ -80,6 +80,10 @@ enum VariableIndexing { SYSTEM_VARIABLE_ORDER = 0,
  * a NaN on a boundary edge in 3D would leave that edge and the two
  * adjoining face interiors unconstrained, but would still permit the
  * other edge and node DoFs around those faces to be constrained.
+ *
+ * \author Roy Stogner
+ * \date 2012
+ * \brief Class for specifying Dirichlet boundary conditions as constraints.
  */
 class DirichletBoundary
 {

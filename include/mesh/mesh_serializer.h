@@ -34,6 +34,10 @@ class MeshBase;
  * mesh is allgathered by the MeshSerializer constructor if
  * need_serial is true, then remote elements are deleted again by the
  * destructor.
+ *
+ * \author Roy Stogner
+ * \date 2011
+ * \brief Temporarily serializes a DistributedMesh for output.
  */
 class MeshSerializer
 {

@@ -42,6 +42,10 @@ class Elem;
  * contains a pointer to its parent (NULL if the node is
  * the root) and pointers to its children (NULL if the
  * node is active.
+ *
+ * \author Daniel Dreyer
+ * \date 2003
+ * \brief Base class for different Tree types.
  */
 template <unsigned int N>
 class TreeNode

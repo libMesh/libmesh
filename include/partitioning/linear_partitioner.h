@@ -20,21 +20,21 @@
 #ifndef LIBMESH_LINEAR_PARTITIONER_H
 #define LIBMESH_LINEAR_PARTITIONER_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/partitioner.h"
-
-// C++ Includes   -----------------------------------
 
 namespace libMesh
 {
-
-
 
 /**
  * The \p LinearPartitioner is the simplest of all possible partitioners.
  * It takes the element list and splits it into equal-sized chunks assigned
  * to each processor.  Health Warning: THIS PARTITIONER COULD BE ARBITRARILY
  * BAD!!
+ *
+ * \author Benjamin S. Kirk
+ * \date 2003
+ * \brief Partitions the elements based solely on their ids.
  */
 class LinearPartitioner : public Partitioner
 {

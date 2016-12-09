@@ -19,21 +19,19 @@
 #ifndef LIBMESH_PERIODIC_BOUNDARIES_H
 #define LIBMESH_PERIODIC_BOUNDARIES_H
 
-// ------------------------------------------------------------
-// Periodic boundary conditions information
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/vector_value.h" // RealVectorValue
 
-// C++ Includes   -----------------------------------
+// C++ Includes
 #include <map>
 
-namespace libMesh {
+namespace libMesh
+{
 
 // Forward Declarations
 class Elem;
@@ -44,6 +42,10 @@ class PointLocatorBase;
  * We're using a class instead of a typedef to allow forward
  * declarations and future flexibility.  Note that std::map has no
  * virtual destructor, so downcasting here would be dangerous.
+ *
+ * \author Roy Stogner
+ * \date 2010
+ * \brief Maps between boundary ids and PeriodicBoundaryBase objects.
  */
 class PeriodicBoundaries : public std::map<boundary_id_type, PeriodicBoundaryBase *>
 {

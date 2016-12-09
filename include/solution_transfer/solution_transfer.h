@@ -30,7 +30,12 @@
 namespace libMesh {
 
 /**
- * Base class for objects that allow transfering variable values between different systems with different meshes.
+ * Base class for objects that allow transfering variable values
+ * between different systems with different meshes.
+ *
+ * \author Derek Gaston
+ * \date 2013
+ * \brief Base class for all SolutionTransfer implementations.
  */
 class SolutionTransfer : public ParallelObject
 {

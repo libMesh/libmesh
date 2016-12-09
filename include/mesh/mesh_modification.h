@@ -20,13 +20,9 @@
 #ifndef LIBMESH_MESH_MODIFICATION_H
 #define LIBMESH_MESH_MODIFICATION_H
 
-
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/id_types.h" // for boundary_id_type, subdomain_id_type
-
-// C++ Includes   -----------------------------------
 
 namespace libMesh
 {

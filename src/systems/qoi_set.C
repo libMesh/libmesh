@@ -17,19 +17,16 @@
 
 
 
-// C++ Includes -------------------------------------
-#include <vector>
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/qoi_set.h"
 #include "libmesh/system.h"
 
+// C++ Includes
+#include <vector>
+
+
 namespace libMesh
 {
-
-// ------------------------------------------------------------
-// QoISet implementation
-
 
 QoISet::QoISet(const System & sys) : _indices(sys.qoi.size(), true) {}
 

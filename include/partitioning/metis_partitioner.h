@@ -20,10 +20,8 @@
 #ifndef LIBMESH_METIS_PARTITIONER_H
 #define LIBMESH_METIS_PARTITIONER_H
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/partitioner.h"
-
-// C++ Includes   -----------------------------------
 
 namespace libMesh
 {
@@ -31,6 +29,10 @@ namespace libMesh
 /**
  * The \p MetisPartitioner uses the Metis graph partitioner
  * to partition the elements.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2003
+ * \brief Partitioner which interfaces with the METIS library.
  */
 class MetisPartitioner : public Partitioner
 {

@@ -17,9 +17,7 @@
 
 
 
-// C++ Includes   -----------------------------------
-
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/elem.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/parallel.h"

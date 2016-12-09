@@ -42,6 +42,10 @@ namespace libMesh
  * objects.  Note that object destruction returns memory to the pool
  * rather than deallocate it.  It must be explicitly deallocated
  * prior to program termination.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2011
+ * \brief Boost-derived allocator that can be used with std::containers.
  */
 template <typename T>
 class PoolAllocator : public boost::pool_allocator<T>
@@ -92,6 +96,10 @@ public:
  * objects.  Note that object destruction returns memory to the pool
  * rather than deallocate it.  It must be explicitly deallocated
  * prior to program termination.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2011
+ * \brief Boost-derived allocator that can be used with std::containers.
  */
 template <typename T>
 class FastPoolAllocator : public boost::fast_pool_allocator<T>
@@ -141,6 +149,10 @@ public:
 /**
  * An allocator which can be used in standard containers.
  * A wrapper for \p std::allocator<> when Boost is not available.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2011
+ * \brief PoolAllocator is std::allocator when Boost is not available.
  */
 template <typename T>
 class PoolAllocator : public std::allocator<T>
@@ -181,6 +193,10 @@ public:
 /**
  * An allocator which can be used in standard containers.
  * A wrapper for \p std::allocator<> when Boost is not available.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2011
+ * \brief FastPoolAllocator is std::allocator when Boost is not available.
  */
 template <typename T>
 class FastPoolAllocator : public std::allocator<T>

@@ -28,7 +28,8 @@
 #include <string>
 #include <vector>
 
-namespace libMesh {
+namespace libMesh
+{
 
 // Forward Declaration
 class System;
@@ -40,6 +41,10 @@ class System;
  * name, a finite element approximation family, and
  * (optionally) a list of subdomains to which the
  * variable is restricted.
+ *
+ * \author Roy Stogner
+ * \date 2010
+ * \brief A variable which is solved for in a System of equations.
  */
 class Variable
 {

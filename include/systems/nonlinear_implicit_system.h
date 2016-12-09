@@ -40,6 +40,10 @@ template<typename T> class NonlinearSolver;
  * the essentials needed to solve a system.  Note
  * that still additional vectors/matrices may be added,
  * as offered in the parent class \p ExplicitSystem.
+ *
+ * \author Benjamin S. Kirk
+ * \date 2005
+ * \brief Used for solving nonlinear implicit systems of equations.
  */
 class NonlinearImplicitSystem : public ImplicitSystem
 {

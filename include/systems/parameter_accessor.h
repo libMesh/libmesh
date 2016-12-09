@@ -21,7 +21,7 @@
 #define LIBMESH_PARAMETER_ACCESSOR_H
 
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/compare_types.h" // remove_const
 #include "libmesh/auto_ptr.h"
@@ -44,6 +44,10 @@ class ConstParameterProxy;
  * This is an abstract base class.  Derived objects may simply modify
  * the parameter value at some address in memory, or may call
  * arbitrary setter/getter functions.
+ *
+ * \author Roy Stogner
+ * \date 2015
+ * \brief Base class for reading/writing sensitivty parameters.
  */
 template <typename T=Number>
 class ParameterAccessor

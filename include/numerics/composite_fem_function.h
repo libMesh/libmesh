@@ -32,6 +32,13 @@
 namespace libMesh
 {
 
+/**
+ * FEMFunction which is a function of another function.
+ *
+ * \author Roy Stogner
+ * \date 2012
+ * \brief FEMFunction which is a function of another function.
+ */
 template <typename Output=Number>
 class CompositeFEMFunction : public FEMFunctionBase<Output>
 {

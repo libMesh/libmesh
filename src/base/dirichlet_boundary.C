@@ -21,7 +21,7 @@
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
-// Local Includes -----------------------------------
+// Local Includes
 #include "libmesh/composite_fem_function.h"
 #include "libmesh/composite_function.h"
 #include "libmesh/vector_value.h"

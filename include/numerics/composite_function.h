@@ -32,6 +32,13 @@
 namespace libMesh
 {
 
+/**
+ * Function which is a function of another function.
+ *
+ * \author Roy Stogner
+ * \date 2012
+ * \brief Function which is a function of another function.
+ */
 template <typename Output=Number>
 class CompositeFunction : public FunctionBase<Output>
 {
