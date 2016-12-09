@@ -37,7 +37,7 @@ namespace libMesh
  *
  * \author John W. Peterson
  * \date 2002
- * \brief Utilty functions for computing element quality indicators.
+ * \brief Utility functions for computing element quality indicators.
  */
 namespace Quality
 {
