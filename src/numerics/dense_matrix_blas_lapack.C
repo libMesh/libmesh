@@ -207,39 +207,39 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
   // The calling sequence for dgetrf is:
   // dgetrf(M, N, A, lda, ipiv, info)
 
-  //    M       (input) int *
-  //            The number of rows of the matrix A.  M >= 0.
+  // M (input)
+  //   The number of rows of the matrix A.  M >= 0.
   // In C/C++, pass the number of *cols* of A
   PetscBLASInt M = this->n();
 
-  //    N       (input) int *
-  //            The number of columns of the matrix A.  N >= 0.
+  // N (input)
+  //   The number of columns of the matrix A.  N >= 0.
   // In C/C++, pass the number of *rows* of A
   PetscBLASInt N = this->m();
 
-  //    A (input/output) double precision array, dimension (LDA,N)
-  //      On entry, the M-by-N matrix to be factored.
-  //      On exit, the factors L and U from the factorization
-  //      A = P*L*U; the unit diagonal elements of L are not stored.
+  // A (input/output) double precision array, dimension (LDA,N)
+  //   On entry, the M-by-N matrix to be factored.
+  //   On exit, the factors L and U from the factorization
+  //   A = P*L*U; the unit diagonal elements of L are not stored.
   // Here, we pass &(_val[0]).
 
-  //    LDA     (input) int *
-  //            The leading dimension of the array A.  LDA >= max(1,M).
+  // LDA (input)
+  //     The leading dimension of the array A.  LDA >= max(1,M).
   PetscBLASInt LDA = M;
 
-  //    ipiv    (output) integer array, dimension (min(m,n))
-  //            The pivot indices; for 1 <= i <= min(m,n), row i of the
-  //            matrix was interchanged with row IPIV(i).
+  // ipiv (output) integer array, dimension (min(m,n))
+  //      The pivot indices; for 1 <= i <= min(m,n), row i of the
+  //      matrix was interchanged with row IPIV(i).
   // Here, we pass &(_pivots[0]), a private class member used to store pivots
   this->_pivots.resize( std::min(M,N) );
 
-  //    info    (output) int *
-  //            = 0:  successful exit
-  //            < 0:  if INFO = -i, the i-th argument had an illegal value
-  //            > 0:  if INFO = i, U(i,i) is exactly zero. The factorization
-  //                  has been completed, but the factor U is exactly
-  //                  singular, and division by zero will occur if it is used
-  //                  to solve a system of equations.
+  // info (output)
+  //      = 0:  successful exit
+  //      < 0:  if INFO = -i, the i-th argument had an illegal value
+  //      > 0:  if INFO = i, U(i,i) is exactly zero. The factorization
+  //            has been completed, but the factor U is exactly
+  //            singular, and division by zero will occur if it is used
+  //            to solve a system of equations.
   PetscBLASInt INFO = 0;
 
   // Ready to call the actual factorization routine through PETSc's interface
@@ -271,28 +271,27 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<Real> & sigma)
   // The calling sequence for dgetrf is:
   // DGESVD( JOBU, JOBVT, M, N, A, LDA, S, U, LDU, VT, LDVT, WORK, LWORK, INFO )
 
-
-  //  JOBU    (input) CHARACTER*1
-  //          Specifies options for computing all or part of the matrix U:
-  //          = 'A':  all M columns of U are returned in array U:
-  //          = 'S':  the first min(m,n) columns of U (the left singular
-  //                  vectors) are returned in the array U;
-  //          = 'O':  the first min(m,n) columns of U (the left singular
-  //                  vectors) are overwritten on the array A;
-  //          = 'N':  no columns of U (no left singular vectors) are
-  //                  computed.
+  // JOBU (input)
+  //      Specifies options for computing all or part of the matrix U:
+  //      = 'A':  all M columns of U are returned in array U:
+  //      = 'S':  the first min(m,n) columns of U (the left singular
+  //              vectors) are returned in the array U;
+  //      = 'O':  the first min(m,n) columns of U (the left singular
+  //              vectors) are overwritten on the array A;
+  //      = 'N':  no columns of U (no left singular vectors) are
+  //              computed.
   char JOBU = 'N';
 
-  //  JOBVT   (input) CHARACTER*1
-  //          Specifies options for computing all or part of the matrix
-  //          V**T:
-  //          = 'A':  all N rows of V**T are returned in the array VT;
-  //          = 'S':  the first min(m,n) rows of V**T (the right singular
-  //                  vectors) are returned in the array VT;
-  //          = 'O':  the first min(m,n) rows of V**T (the right singular
-  //                  vectors) are overwritten on the array A;
-  //          = 'N':  no rows of V**T (no right singular vectors) are
-  //                  computed.
+  // JOBVT (input)
+  //       Specifies options for computing all or part of the matrix
+  //       V**T:
+  //       = 'A':  all N rows of V**T are returned in the array VT;
+  //       = 'S':  the first min(m,n) rows of V**T (the right singular
+  //               vectors) are returned in the array VT;
+  //       = 'O':  the first min(m,n) rows of V**T (the right singular
+  //               vectors) are overwritten on the array A;
+  //       = 'N':  no rows of V**T (no right singular vectors) are
+  //               computed.
   char JOBVT = 'N';
 
   std::vector<Real> sigma_val;
@@ -316,28 +315,27 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<Real> & sigma,
   // The calling sequence for dgetrf is:
   // DGESVD( JOBU, JOBVT, M, N, A, LDA, S, U, LDU, VT, LDVT, WORK, LWORK, INFO )
 
-
-  //  JOBU    (input) CHARACTER*1
-  //          Specifies options for computing all or part of the matrix U:
-  //          = 'A':  all M columns of U are returned in array U:
-  //          = 'S':  the first min(m,n) columns of U (the left singular
-  //                  vectors) are returned in the array U;
-  //          = 'O':  the first min(m,n) columns of U (the left singular
-  //                  vectors) are overwritten on the array A;
-  //          = 'N':  no columns of U (no left singular vectors) are
-  //                  computed.
+  // JOBU (input)
+  //      Specifies options for computing all or part of the matrix U:
+  //      = 'A':  all M columns of U are returned in array U:
+  //      = 'S':  the first min(m,n) columns of U (the left singular
+  //              vectors) are returned in the array U;
+  //      = 'O':  the first min(m,n) columns of U (the left singular
+  //              vectors) are overwritten on the array A;
+  //      = 'N':  no columns of U (no left singular vectors) are
+  //              computed.
   char JOBU = 'S';
 
-  //  JOBVT   (input) CHARACTER*1
-  //          Specifies options for computing all or part of the matrix
-  //          V**T:
-  //          = 'A':  all N rows of V**T are returned in the array VT;
-  //          = 'S':  the first min(m,n) rows of V**T (the right singular
-  //                  vectors) are returned in the array VT;
-  //          = 'O':  the first min(m,n) rows of V**T (the right singular
-  //                  vectors) are overwritten on the array A;
-  //          = 'N':  no rows of V**T (no right singular vectors) are
-  //                  computed.
+  // JOBVT (input)
+  //       Specifies options for computing all or part of the matrix
+  //       V**T:
+  //       = 'A':  all N rows of V**T are returned in the array VT;
+  //       = 'S':  the first min(m,n) rows of V**T (the right singular
+  //               vectors) are returned in the array VT;
+  //       = 'O':  the first min(m,n) rows of V**T (the right singular
+  //               vectors) are overwritten on the array A;
+  //       = 'N':  no rows of V**T (no right singular vectors) are
+  //               computed.
   char JOBVT = 'S';
 
   // Note: Lapack is going to compute the singular values of A^T.  If
@@ -383,100 +381,99 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
                                   std::vector<Number> & VT_val)
 {
 
-  //    M       (input) PetscBLASInt *
-  //            The number of rows of the matrix A.  M >= 0.
+  // M (input)
+  //   The number of rows of the matrix A.  M >= 0.
   // In C/C++, pass the number of *cols* of A
   PetscBLASInt M = this->n();
 
-  //    N       (input) PetscBLASInt *
-  //            The number of columns of the matrix A.  N >= 0.
+  // N (input)
+  //   The number of columns of the matrix A.  N >= 0.
   // In C/C++, pass the number of *rows* of A
   PetscBLASInt N = this->m();
 
   PetscBLASInt min_MN = (M < N) ? M : N;
   PetscBLASInt max_MN = (M > N) ? M : N;
 
-  //  A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)
-  //          On entry, the M-by-N matrix A.
-  //          On exit,
-  //          if JOBU = 'O',  A is overwritten with the first min(m,n)
-  //                          columns of U (the left singular vectors,
-  //                          stored columnwise);
-  //          if JOBVT = 'O', A is overwritten with the first min(m,n)
-  //                          rows of V**T (the right singular vectors,
-  //                          stored rowwise);
-  //          if JOBU .ne. 'O' and JOBVT .ne. 'O', the contents of A
-  //                          are destroyed.
+  // A (input/output) DOUBLE PRECISION array, dimension (LDA,N)
+  //   On entry, the M-by-N matrix A.
+  //   On exit,
+  //   if JOBU  = 'O', A is overwritten with the first min(m,n)
+  //                   columns of U (the left singular vectors,
+  //                   stored columnwise);
+  //   if JOBVT = 'O', A is overwritten with the first min(m,n)
+  //                   rows of V**T (the right singular vectors,
+  //                   stored rowwise);
+  //   if JOBU != 'O' and JOBVT != 'O', the contents of A are destroyed.
   // Here, we pass &(_val[0]).
 
-  //    LDA     (input) PetscBLASInt *
-  //            The leading dimension of the array A.  LDA >= max(1,M).
+  // LDA (input)
+  //     The leading dimension of the array A.  LDA >= max(1,M).
   PetscBLASInt LDA = M;
 
-  //  S       (output) DOUBLE PRECISION array, dimension (min(M,N))
-  //          The singular values of A, sorted so that S(i) >= S(i+1).
+  // S (output) DOUBLE PRECISION array, dimension (min(M,N))
+  //   The singular values of A, sorted so that S(i) >= S(i+1).
   sigma_val.resize( min_MN );
 
-  //  LDU     (input) PetscBLASInt
-  //          The leading dimension of the array U.  LDU >= 1; if
-  //          JOBU = 'S' or 'A', LDU >= M.
+  // LDU (input)
+  //     The leading dimension of the array U.  LDU >= 1; if
+  //     JOBU = 'S' or 'A', LDU >= M.
   PetscBLASInt LDU = M;
 
-  //  U       (output) DOUBLE PRECISION array, dimension (LDU,UCOL)
-  //          (LDU,M) if JOBU = 'A' or (LDU,min(M,N)) if JOBU = 'S'.
-  //          If JOBU = 'A', U contains the M-by-M orthogonal matrix U;
-  //          if JOBU = 'S', U contains the first min(m,n) columns of U
-  //          (the left singular vectors, stored columnwise);
-  //          if JOBU = 'N' or 'O', U is not referenced.
+  // U (output) DOUBLE PRECISION array, dimension (LDU,UCOL)
+  //   (LDU,M) if JOBU = 'A' or (LDU,min(M,N)) if JOBU = 'S'.
+  //   If JOBU = 'A', U contains the M-by-M orthogonal matrix U;
+  //   if JOBU = 'S', U contains the first min(m,n) columns of U
+  //   (the left singular vectors, stored columnwise);
+  //   if JOBU = 'N' or 'O', U is not referenced.
   if (JOBU == 'S')
     U_val.resize( LDU*min_MN );
   else
     U_val.resize( LDU*M );
 
-  //  LDVT    (input) PetscBLASInt
-  //          The leading dimension of the array VT.  LDVT >= 1; if
-  //          JOBVT = 'A', LDVT >= N; if JOBVT = 'S', LDVT >= min(M,N).
+  // LDVT (input)
+  //      The leading dimension of the array VT.  LDVT >= 1; if
+  //      JOBVT = 'A', LDVT >= N; if JOBVT = 'S', LDVT >= min(M,N).
   PetscBLASInt LDVT = N;
   if (JOBVT == 'S')
     LDVT = min_MN;
 
-  //  VT      (output) DOUBLE PRECISION array, dimension (LDVT,N)
-  //          If JOBVT = 'A', VT contains the N-by-N orthogonal matrix
-  //          V**T;
-  //          if JOBVT = 'S', VT contains the first min(m,n) rows of
-  //          V**T (the right singular vectors, stored rowwise);
-  //          if JOBVT = 'N' or 'O', VT is not referenced.
+  // VT (output) DOUBLE PRECISION array, dimension (LDVT,N)
+  //    If JOBVT = 'A', VT contains the N-by-N orthogonal matrix
+  //    V**T;
+  //    if JOBVT = 'S', VT contains the first min(m,n) rows of
+  //    V**T (the right singular vectors, stored rowwise);
+  //    if JOBVT = 'N' or 'O', VT is not referenced.
   VT_val.resize( LDVT*N );
 
-  //  LWORK   (input) PetscBLASInt
-  //          The dimension of the array WORK.
-  //          LWORK >= MAX(1,3*MIN(M,N)+MAX(M,N),5*MIN(M,N)).
-  //          For good performance, LWORK should generally be larger.
+  // LWORK (input)
+  //       The dimension of the array WORK.
+  //       LWORK >= MAX(1,3*MIN(M,N)+MAX(M,N),5*MIN(M,N)).
+  //       For good performance, LWORK should generally be larger.
   //
-  //          If LWORK = -1, then a workspace query is assumed; the routine
-  //          only calculates the optimal size of the WORK array, returns
-  //          this value as the first entry of the WORK array, and no error
-  //          message related to LWORK is issued by XERBLA.
+  //       If LWORK = -1, then a workspace query is assumed; the routine
+  //       only calculates the optimal size of the WORK array, returns
+  //       this value as the first entry of the WORK array, and no error
+  //       message related to LWORK is issued by XERBLA.
   PetscBLASInt larger = (3*min_MN+max_MN > 5*min_MN) ? 3*min_MN+max_MN : 5*min_MN;
   PetscBLASInt LWORK  = (larger > 1) ? larger : 1;
 
 
-  //  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK))
-  //          On exit, if INFO = 0, WORK(1) returns the optimal LWORK;
-  //          if INFO > 0, WORK(2:MIN(M,N)) contains the unconverged
-  //          superdiagonal elements of an upper bidiagonal matrix B
-  //          whose diagonal is in S (not necessarily sorted). B
-  //          satisfies A = U * B * VT, so it has the same singular values
-  //          as A, and singular vectors related by U and VT.
+  // WORK (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK))
+  //      On exit, if INFO = 0, WORK(1) returns the optimal LWORK;
+  //      if INFO > 0, WORK(2:MIN(M,N)) contains the unconverged
+  //      superdiagonal elements of an upper bidiagonal matrix B
+  //      whose diagonal is in S (not necessarily sorted). B
+  //      satisfies A = U * B * VT, so it has the same singular values
+  //      as A, and singular vectors related by U and VT.
   std::vector<Number> WORK( LWORK );
 
-  //  INFO    (output) PetscBLASInt
-  //          = 0:  successful exit.
-  //          < 0:  if INFO = -i, the i-th argument had an illegal value.
-  //          > 0:  if DBDSQR did not converge, INFO specifies how many
-  //                superdiagonals of an intermediate bidiagonal form B
-  //                did not converge to zero. See the description of WORK
-  //                above for details.
+  // INFO (output)
+  //      = 0:  successful exit.
+  //      < 0:  if INFO = -i, the i-th argument had an illegal value.
+  //      > 0:  if DBDSQR did not converge, INFO specifies how many
+  //            superdiagonals of an intermediate bidiagonal form B
+  //            did not converge to zero. See the description of WORK
+  //            above for details.
   PetscBLASInt INFO = 0;
 
   // Ready to call the actual factorization routine through PETSc's interface.
@@ -489,10 +486,8 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
   // numbers to LAPACKgesvd_, but _val may contain Reals so we copy to Number below to
   // handle both the real-valued and complex-valued cases.
   std::vector<Number> val_copy(_val.size());
-  for(unsigned int i=0; i<_val.size(); i++)
-    {
+  for (unsigned int i=0; i<_val.size(); i++)
       val_copy[i] = _val[i];
-    }
 
   std::vector<Real> RWORK(5 * min_MN);
   LAPACKgesvd_(&JOBU, &JOBVT, &M, &N, &(val_copy[0]), &LDA, &(sigma_val[0]), &(U_val[0]),
@@ -540,12 +535,12 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
   DenseMatrix<T> A_trans;
   this->get_transpose(A_trans);
 
-  // M is PetscBLASInt
+  // M
   // The number of rows of the input matrix. M >= 0.
   // This is actually the number of *columns* of A_trans.
   PetscBLASInt M = A_trans.n();
 
-  // N is PetscBLASInt
+  // N
   // The number of columns of the matrix A. N >= 0.
   // This is actually the number of *rows* of A_trans.
   PetscBLASInt N = A_trans.m();
@@ -554,14 +549,14 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
   PetscBLASInt max_MN = std::max(M,N);
   PetscBLASInt min_MN = std::min(M,N);
 
-  // NRHS is PetscBLASInt
+  // NRHS
   // The number of right hand sides, i.e., the number of columns
   // of the matrices B and X. NRHS >= 0.
   // This could later be generalized to solve for multiple right-hand
   // sides...
   PetscBLASInt NRHS = 1;
 
-  // A is DOUBLE PRECISION array, dimension (LDA,N)
+  // A is double precision array, dimension (LDA,N)
   // On entry, the M-by-N matrix A.
   // On exit, the first min(m,n) rows of A are overwritten with
   // its right singular vectors, stored rowwise.
@@ -569,11 +564,11 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
   // The data vector that will be passed to Lapack.
   std::vector<T> & A_trans_vals = A_trans.get_values();
 
-  // LDA is PetscBLASInt
+  // LDA
   // The leading dimension of the array A.  LDA >= max(1,M).
   PetscBLASInt LDA = M;
 
-  // B is DOUBLE PRECISION array, dimension (LDB,NRHS)
+  // B is double precision array, dimension (LDB,NRHS)
   // On entry, the M-by-NRHS right hand side matrix B.
   // On exit, B is overwritten by the N-by-NRHS solution
   // matrix X.  If m >= n and RANK = n, the residual
@@ -591,27 +586,27 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
   // Make the syntax below simpler by grabbing a reference to this array.
   std::vector<T> & B = x.get_values();
 
-  // LDB is PetscBLASInt
+  // LDB
   // The leading dimension of the array B. LDB >= max(1,max(M,N)).
   PetscBLASInt LDB = x.size();
 
-  // S is DOUBLE PRECISION array, dimension (min(M,N))
+  // S is double precision array, dimension (min(M,N))
   // The singular values of A in decreasing order.
   // The condition number of A in the 2-norm = S(1)/S(min(m,n)).
   std::vector<T> S(min_MN);
 
-  // RCOND is DOUBLE PRECISION
-  // RCOND is used to determine the effective rank of A.
-  // Singular values S(i) <= RCOND*S(1) are treated as zero.
-  // If RCOND < 0, machine precision is used instead.
+  // RCOND
+  // Used to determine the effective rank of A.  Singular values
+  // S(i) <= RCOND*S(1) are treated as zero.  If RCOND < 0, machine
+  // precision is used instead.
   Real RCOND = rcond;
 
-  // RANK is PetscBLASInt
+  // RANK
   // The effective rank of A, i.e., the number of singular values
   // which are greater than RCOND*S(1).
   PetscBLASInt RANK = 0;
 
-  // LWORK is PetscBLASInt
+  // LWORK
   // The dimension of the array WORK. LWORK >= 1, and also:
   // LWORK >= 3*min(M,N) + max( 2*min(M,N), max(M,N), NRHS )
   // For good performance, LWORK should generally be larger.
@@ -625,11 +620,11 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
   // generally be larger" clause.
   PetscBLASInt LWORK = 1.5 * (3*min_MN + std::max(2*min_MN, std::max(max_MN, NRHS)));
 
-  // WORK is DOUBLE PRECISION array, dimension (MAX(1,LWORK))
+  // WORK is double precision array, dimension (MAX(1,LWORK))
   // On exit, if INFO = 0, WORK(1) returns the optimal LWORK.
   std::vector<T> WORK(LWORK);
 
-  // INFO is PetscBLASInt
+  // INFO
   // = 0:  successful exit
   // < 0:  if INFO = -i, the i-th argument had an illegal value.
   // > 0:  the algorithm for computing the SVD failed to converge;
@@ -741,95 +736,95 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   //        integer  LWORK,
   //        integer  INFO)
 
-  //  JOBVL   (input) CHARACTER*1
-  //          = 'N': left eigenvectors of A are not computed;
-  //          = 'V': left eigenvectors of A are computed.
+  // JOBVL (input)
+  //       = 'N': left eigenvectors of A are not computed;
+  //       = 'V': left eigenvectors of A are computed.
   char JOBVL = VL ? 'V' : 'N';
 
-  //  JOBVR   (input) CHARACTER*1
-  //          = 'N': right eigenvectors of A are not computed;
-  //          = 'V': right eigenvectors of A are computed.
+  // JOBVR (input)
+  //       = 'N': right eigenvectors of A are not computed;
+  //       = 'V': right eigenvectors of A are computed.
   char JOBVR = VR ? 'V' : 'N';
 
-  //    N       (input) PetscBLASInt *
-  //            The number of rows/cols of the matrix A.  N >= 0.
+  // N (input)
+  //   The number of rows/cols of the matrix A.  N >= 0.
   PetscBLASInt N = this->m();
 
-  //  A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)
-  //          On entry, the N-by-N matrix A.
-  //          On exit, A has been overwritten.
+  // A (input/output) DOUBLE PRECISION array, dimension (LDA,N)
+  //   On entry, the N-by-N matrix A.
+  //   On exit, A has been overwritten.
   // Here, we pass &(_val[0]).
 
-  //    LDA     (input) PetscBLASInt *
-  //            The leading dimension of the array A.  LDA >= max(1,N).
+  // LDA (input)
+  //     The leading dimension of the array A.  LDA >= max(1,N).
   PetscBLASInt LDA = N;
 
-  //  WR      (output) DOUBLE PRECISION array, dimension (N)
-  //  WI      (output) DOUBLE PRECISION array, dimension (N)
-  //          WR and WI contain the real and imaginary parts,
-  //          respectively, of the computed eigenvalues.  Complex
-  //          conjugate pairs of eigenvalues appear consecutively
-  //          with the eigenvalue having the positive imaginary part
-  //          first.
+  // WR (output) double precision array, dimension (N)
+  // WI (output) double precision array, dimension (N)
+  //    WR and WI contain the real and imaginary parts,
+  //    respectively, of the computed eigenvalues.  Complex
+  //    conjugate pairs of eigenvalues appear consecutively
+  //    with the eigenvalue having the positive imaginary part
+  //    first.
   lambda_real.resize(N);
   lambda_imag.resize(N);
 
-  //  VL      (output) DOUBLE PRECISION array, dimension (LDVL,N)
-  //          If JOBVL = 'V', the left eigenvectors u(j) are stored one
-  //          after another in the columns of VL, in the same order
-  //          as their eigenvalues.
-  //          If JOBVL = 'N', VL is not referenced.
-  //          If the j-th eigenvalue is real, then u(j) = VL(:,j),
-  //          the j-th column of VL.
-  //          If the j-th and (j+1)-st eigenvalues form a complex
-  //          conjugate pair, then u(j) = VL(:,j) + i*VL(:,j+1) and
-  //          u(j+1) = VL(:,j) - i*VL(:,j+1).
+  // VL (output) double precision array, dimension (LDVL,N)
+  //    If JOBVL = 'V', the left eigenvectors u(j) are stored one
+  //    after another in the columns of VL, in the same order
+  //    as their eigenvalues.
+  //    If JOBVL = 'N', VL is not referenced.
+  //    If the j-th eigenvalue is real, then u(j) = VL(:,j),
+  //    the j-th column of VL.
+  //    If the j-th and (j+1)-st eigenvalues form a complex
+  //    conjugate pair, then u(j) = VL(:,j) + i*VL(:,j+1) and
+  //    u(j+1) = VL(:,j) - i*VL(:,j+1).
   // Will be set below if needed.
 
-  //  LDVL    (input) PetscBLASInt
-  //          The leading dimension of the array VL.  LDVL >= 1; if
-  //          JOBVL = 'V', LDVL >= N.
+  // LDVL (input)
+  //      The leading dimension of the array VL.  LDVL >= 1; if
+  //      JOBVL = 'V', LDVL >= N.
   PetscBLASInt LDVL = VL ? N : 1;
 
-  //  VR      (output) DOUBLE PRECISION array, dimension (LDVR,N)
-  //          If JOBVR = 'V', the right eigenvectors v(j) are stored one
-  //          after another in the columns of VR, in the same order
-  //          as their eigenvalues.
-  //          If JOBVR = 'N', VR is not referenced.
-  //          If the j-th eigenvalue is real, then v(j) = VR(:,j),
-  //          the j-th column of VR.
-  //          If the j-th and (j+1)-st eigenvalues form a complex
-  //          conjugate pair, then v(j) = VR(:,j) + i*VR(:,j+1) and
-  //          v(j+1) = VR(:,j) - i*VR(:,j+1).
+  // VR (output) DOUBLE PRECISION array, dimension (LDVR,N)
+  //    If JOBVR = 'V', the right eigenvectors v(j) are stored one
+  //    after another in the columns of VR, in the same order
+  //    as their eigenvalues.
+  //    If JOBVR = 'N', VR is not referenced.
+  //    If the j-th eigenvalue is real, then v(j) = VR(:,j),
+  //    the j-th column of VR.
+  //    If the j-th and (j+1)-st eigenvalues form a complex
+  //    conjugate pair, then v(j) = VR(:,j) + i*VR(:,j+1) and
+  //    v(j+1) = VR(:,j) - i*VR(:,j+1).
   // Will be set below if needed.
 
-  //  LDVR    (input) PetscBLASInt
-  //          The leading dimension of the array VR.  LDVR >= 1; if
-  //          JOBVR = 'V', LDVR >= N.
+  // LDVR (input)
+  //      The leading dimension of the array VR.  LDVR >= 1; if
+  //      JOBVR = 'V', LDVR >= N.
   PetscBLASInt LDVR = VR ? N : 1;
 
-  //  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK))
-  //          On exit, if INFO = 0, WORK(1) returns the optimal LWORK.
+  // WORK (workspace/output) double precision array, dimension (MAX(1,LWORK))
+  //      On exit, if INFO = 0, WORK(1) returns the optimal LWORK.
   //
-  //  LWORK   (input) PetscBLASInt
-  //          The dimension of the array WORK.  LWORK >= max(1,3*N), and
-  //          if JOBVL = 'V' or JOBVR = 'V', LWORK >= 4*N.  For good
-  //          performance, LWORK must generally be larger.
+  // LWORK (input)
+  //       The dimension of the array WORK.  LWORK >= max(1,3*N), and
+  //       if JOBVL = 'V' or JOBVR = 'V', LWORK >= 4*N.  For good
+  //       performance, LWORK must generally be larger.
   //
-  //          If LWORK = -1, then a workspace query is assumed; the routine
-  //          only calculates the optimal size of the WORK array, returns
-  //          this value as the first entry of the WORK array, and no error
-  //          message related to LWORK is issued by XERBLA.
+  //       If LWORK = -1, then a workspace query is assumed; the routine
+  //       only calculates the optimal size of the WORK array, returns
+  //       this value as the first entry of the WORK array, and no error
+  //       message related to LWORK is issued by XERBLA.
   PetscBLASInt LWORK = (VR || VL) ? 4*N : 3*N;
   std::vector<T> WORK(LWORK);
 
-  //  INFO    (output) PetscBLASInt
-  //          = 0:  successful exit
-  //          < 0:  if INFO = -i, the i-th argument had an illegal value.
-  //          > 0:  if INFO = i, the QR algorithm failed to compute all the
-  //                eigenvalues, and no eigenvectors or condition numbers
-  //                have been computed; elements 1:ILO-1 and i+1:N of WR
-  //                and WI contain eigenvalues which have converged.
+  // INFO (output)
+  //      = 0:  successful exit
+  //      < 0:  if INFO = -i, the i-th argument had an illegal value.
+  //      > 0:  if INFO = i, the QR algorithm failed to compute all the
+  //            eigenvalues, and no eigenvectors or condition numbers
+  //            have been computed; elements 1:ILO-1 and i+1:N of WR
+  //            and WI contain eigenvalues which have converged.
   PetscBLASInt INFO = 0;
 
   // Get references to raw data
@@ -917,37 +912,37 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T> & b,
   // The calling sequence for getrs is:
   // dgetrs(TRANS, N, NRHS, A, LDA, IPIV, B, LDB, INFO)
 
-  //    trans   (input) char *
-  //            'n' for no tranpose, 't' for transpose
+  // trans (input)
+  //       'n' for no tranpose, 't' for transpose
   char TRANS[] = "t";
 
-  //    N       (input) PetscBLASInt *
-  //            The order of the matrix A.  N >= 0.
+  // N (input)
+  //   The order of the matrix A.  N >= 0.
   PetscBLASInt N = this->m();
 
 
-  //    NRHS    (input) PetscBLASInt *
-  //            The number of right hand sides, i.e., the number of columns
-  //            of the matrix B.  NRHS >= 0.
+  // NRHS (input)
+  //      The number of right hand sides, i.e., the number of columns
+  //      of the matrix B.  NRHS >= 0.
   PetscBLASInt NRHS = 1;
 
-  //    A       (input) DOUBLE PRECISION array, dimension (LDA,N)
-  //            The factors L and U from the factorization A = P*L*U
-  //            as computed by dgetrf.
+  // A (input) double precision array, dimension (LDA,N)
+  //   The factors L and U from the factorization A = P*L*U
+  //   as computed by dgetrf.
   // Here, we pass &(_val[0])
 
-  //    LDA     (input) PetscBLASInt *
-  //            The leading dimension of the array A.  LDA >= max(1,N).
+  // LDA (input)
+  //     The leading dimension of the array A.  LDA >= max(1,N).
   PetscBLASInt LDA = N;
 
-  //    ipiv    (input) int array, dimension (N)
-  //            The pivot indices from DGETRF; for 1<=i<=N, row i of the
-  //            matrix was interchanged with row IPIV(i).
+  // ipiv (input) int array, dimension (N)
+  //      The pivot indices from DGETRF; for 1<=i<=N, row i of the
+  //      matrix was interchanged with row IPIV(i).
   // Here, we pass &(_pivots[0]) which was computed in _lu_decompose_lapack
 
-  //    B       (input/output) DOUBLE PRECISION array, dimension (LDB,NRHS)
-  //            On entry, the right hand side matrix B.
-  //            On exit, the solution matrix X.
+  // B (input/output) double precision array, dimension (LDB,NRHS)
+  //   On entry, the right hand side matrix B.
+  //   On exit, the solution matrix X.
   // Here, we pass a copy of the rhs vector's data array in x, so that the
   // passed right-hand side b is unmodified.  I don't see a way around this
   // copy if we want to maintain an unmodified rhs in LibMesh.
@@ -958,13 +953,13 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T> & b,
   // pass b to the Lapack routine and then swap with x before exiting
   // std::vector<T> & x_vec = b.get_values();
 
-  //    LDB     (input) PetscBLASInt *
-  //            The leading dimension of the array B.  LDB >= max(1,N).
+  // LDB (input)
+  //     The leading dimension of the array B.  LDB >= max(1,N).
   PetscBLASInt LDB = N;
 
-  //    INFO    (output) PetscBLASInt *
-  //            = 0:  successful exit
-  //            < 0:  if INFO = -i, the i-th argument had an illegal value
+  // INFO (output)
+  //      = 0:  successful exit
+  //      < 0:  if INFO = -i, the i-th argument had an illegal value
   PetscBLASInt INFO = 0;
 
   // Finally, ready to call the Lapack getrs function
@@ -1029,29 +1024,30 @@ void DenseMatrix<T>::_matvec_blas(T alpha,
   //
   // dgemv(TRANS,M,N,ALPHA,A,LDA,X,INCX,BETA,Y,INCY)
 
-  //   TRANS  - CHARACTER*1, 't' for transpose, 'n' for non-transpose multiply
+  // TRANS (input)
+  //       't' for transpose, 'n' for non-transpose multiply
   // We store everything in row-major order, so pass the transpose flag for
   // non-transposed matvecs and the 'n' flag for transposed matvecs
   char TRANS[] = "t";
   if (trans)
     TRANS[0] = 'n';
 
-  //   M      - PetscBLASInt.
-  //            On entry, M specifies the number of rows of the matrix A.
+  // M (input)
+  //   On entry, M specifies the number of rows of the matrix A.
   // In C/C++, pass the number of *cols* of A
   PetscBLASInt M = this->n();
 
-  //   N      - PetscBLASInt.
-  //            On entry, N specifies the number of columns of the matrix A.
+  // N (input)
+  //   On entry, N specifies the number of columns of the matrix A.
   // In C/C++, pass the number of *rows* of A
   PetscBLASInt N = this->m();
 
-  //   ALPHA  - DOUBLE PRECISION.
+  // ALPHA (input)
   // The scalar constant passed to this function
 
-  //   A      - DOUBLE PRECISION array of DIMENSION ( LDA, n ).
-  //            Before entry, the leading m by n part of the array A must
-  //            contain the matrix of coefficients.
+  // A (input) double precision array of DIMENSION ( LDA, n ).
+  //   Before entry, the leading m by n part of the array A must
+  //   contain the matrix of coefficients.
   // The matrix, *this.  Note that _matvec_blas is called from
   // a const function, vector_mult(), and so we have made this function const
   // as well.  Since BLAS knows nothing about const, we have to cast it away
@@ -1059,46 +1055,46 @@ void DenseMatrix<T>::_matvec_blas(T alpha,
   DenseMatrix<T> & a_ref = const_cast< DenseMatrix<T> &> ( *this );
   std::vector<T> & a = a_ref.get_values();
 
-  //   LDA    - PetscBLASInt.
-  //            On entry, LDA specifies the first dimension of A as declared
-  //            in the calling (sub) program. LDA must be at least
-  //            max( 1, m ).
+  // LDA (input)
+  //     On entry, LDA specifies the first dimension of A as declared
+  //     in the calling (sub) program. LDA must be at least
+  //     max( 1, m ).
   PetscBLASInt LDA = M;
 
-  //   X      - DOUBLE PRECISION array of DIMENSION at least
-  //            ( 1 + ( n - 1 )*abs( INCX ) ) when TRANS = 'N' or 'n'
-  //            and at least
-  //            ( 1 + ( m - 1 )*abs( INCX ) ) otherwise.
-  //            Before entry, the incremented array X must contain the
-  //            vector x.
+  // X (input) double precision array of DIMENSION at least
+  //   ( 1 + ( n - 1 )*abs( INCX ) ) when TRANS = 'N' or 'n'
+  //   and at least
+  //   ( 1 + ( m - 1 )*abs( INCX ) ) otherwise.
+  //   Before entry, the incremented array X must contain the
+  //   vector x.
   // Here, we must cast away the const-ness of "arg" since BLAS knows
   // nothing about const
   DenseVector<T> & x_ref = const_cast< DenseVector<T> &> ( arg );
   std::vector<T> & x = x_ref.get_values();
 
-  //   INCX   - PetscBLASInt.
-  //            On entry, INCX specifies the increment for the elements of
-  //            X. INCX must not be zero.
+  // INCX (input)
+  //      On entry, INCX specifies the increment for the elements of
+  //      X. INCX must not be zero.
   PetscBLASInt INCX = 1;
 
-  //   BETA   - DOUBLE PRECISION.
-  //            On entry, BETA specifies the scalar beta. When BETA is
-  //            supplied as zero then Y need not be set on input.
+  // BETA (input)
+  //      On entry, BETA specifies the scalar beta. When BETA is
+  //      supplied as zero then Y need not be set on input.
   // The second scalar constant passed to this function
 
-  //   Y      - DOUBLE PRECISION array of DIMENSION at least
-  //            ( 1 + ( m - 1 )*abs( INCY ) ) when TRANS = 'N' or 'n'
-  //            and at least
-  //            ( 1 + ( n - 1 )*abs( INCY ) ) otherwise.
-  //            Before entry with BETA non-zero, the incremented array Y
-  //            must contain the vector y. On exit, Y is overwritten by the
-  //            updated vector y.
+  // Y (input) double precision array of DIMENSION at least
+  //   ( 1 + ( m - 1 )*abs( INCY ) ) when TRANS = 'N' or 'n'
+  //   and at least
+  //   ( 1 + ( n - 1 )*abs( INCY ) ) otherwise.
+  //   Before entry with BETA non-zero, the incremented array Y
+  //   must contain the vector y. On exit, Y is overwritten by the
+  //   updated vector y.
   // The input vector "dest"
   std::vector<T> & y = dest.get_values();
 
-  //   INCY   - PetscBLASInt.
-  //            On entry, INCY specifies the increment for the elements of
-  //            Y. INCY must not be zero.
+  // INCY (input)
+  //      On entry, INCY specifies the increment for the elements of
+  //      Y. INCY must not be zero.
   PetscBLASInt INCY = 1;
 
   // Finally, ready to call the BLAS function
