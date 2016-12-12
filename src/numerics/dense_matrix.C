@@ -665,7 +665,7 @@ void DenseMatrix<T>::_lu_back_substitute (const DenseVector<T> & b,
   for (unsigned int i=0; i<n_cols; ++i)
     {
       // Swap
-      if (_pivots[i] != static_cast<int>(i))
+      if (_pivots[i] != static_cast<pivot_index_t>(i))
         std::swap( z(i), z(_pivots[i]) );
 
       x(i) = z(i);
@@ -731,7 +731,7 @@ void DenseMatrix<T>::_lu_decompose ()
       // If the max was found in a different row, interchange rows.
       // Here we interchange the *entire* row, in Gaussian elimination
       // you would only interchange the subrows A(i,j) and A(p(i),j), for j>i
-      if (_pivots[i] != static_cast<int>(i))
+      if (_pivots[i] != static_cast<pivot_index_t>(i))
         {
           for (unsigned int j=0; j<n_rows; ++j)
             std::swap( A(i,j), A(_pivots[i], j) );
@@ -881,12 +881,12 @@ T DenseMatrix<T>::det ()
   for (unsigned int i=0; i<this->m(); i++)
     {
       if (this->_decomposition_type==LU)
-        if (_pivots[i] != static_cast<int>(i))
+        if (_pivots[i] != static_cast<pivot_index_t>(i))
           n_interchanges++;
 
       // Lapack pivots are 1-based!
       if (this->_decomposition_type==LU_BLAS_LAPACK)
-        if (_pivots[i] != static_cast<int>(i+1))
+        if (_pivots[i] != static_cast<pivot_index_t>(i+1))
           n_interchanges++;
 
       determinant *= (*this)(i,i);

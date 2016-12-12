@@ -24,6 +24,12 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/dense_matrix_base.h"
 
+// For the definition of PetscBLASInt.
+#if (LIBMESH_HAVE_PETSC)
+# include "libmesh/petsc_macro.h"
+# include <petscblaslapack.h>
+#endif
+
 // C++ includes
 #include <vector>
 #include <algorithm>
@@ -646,11 +652,16 @@ private:
                    DenseMatrix<T> * VR = libmesh_nullptr);
 
   /**
-   * This array is used to store pivot indices.  May be used
-   * by whatever factorization is currently active, clients of
-   * the class should not rely on it for any reason.
+   * Array used to store pivot indices.  May be used by whatever
+   * factorization is currently active, clients of the class should
+   * not rely on it for any reason.
    */
-  std::vector<int> _pivots;
+#if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
+  typedef PetscBLASInt pivot_index_t;
+#else
+  typedef int pivot_index_t;
+#endif
+  std::vector<pivot_index_t> _pivots;
 
   /**
    * Companion function to _lu_decompose_lapack().  Do not use
@@ -733,8 +744,7 @@ DenseMatrix<T>::DenseMatrix(const unsigned int new_m,
   use_blas_lapack(false),
 #endif
   _val(),
-  _decomposition_type(NONE),
-  _pivots()
+  _decomposition_type(NONE)
 {
   this->resize(new_m,new_n);
 }

@@ -784,8 +784,8 @@ void TransientRBConstruction::enrich_RB_space()
   // With the "method of snapshots", the size of
   // the eigenproblem is determined by the number
   // of time-steps (rather than the number of spatial dofs).
-  int eigen_size = temporal_data.size();
-  int LDA = eigen_size; // The leading order of correlation_matrix
+  PetscBLASInt eigen_size = temporal_data.size();
+  PetscBLASInt LDA = eigen_size; // The leading order of correlation_matrix
   std::vector<Number> correlation_matrix(LDA*eigen_size);
 
   for(int i=0; i<eigen_size; i++)
@@ -812,29 +812,29 @@ void TransientRBConstruction::enrich_RB_space()
   Real VL = 0.; // Not used when RANGE = A
   Real VU = 0.; // Not used when RANGE = A
 
-  int IL = 0; // Not used when RANGE = A
-  int IU = 0; // Not used when RANGE = A
+  PetscBLASInt IL = 0; // Not used when RANGE = A
+  PetscBLASInt IU = 0; // Not used when RANGE = A
 
   Real ABSTOL = 1.e-14; // Absolute tolerance for eigensolver
 
-  int M = 0; // (output) The total number of evals found
+  PetscBLASInt M = 0; // (output) The total number of evals found
 
   std::vector<Real> W(eigen_size); // (output) the eigenvalues
 
-  int LDZ = eigen_size; // The leading order of Z
+  PetscBLASInt LDZ = eigen_size; // The leading order of Z
   std::vector<Number> Z(LDZ*eigen_size); // (output) the eigenvectors
 
-  std::vector<int> ISUPPZ(2*eigen_size); // Indicates which evecs in Z are nonzero
+  std::vector<PetscBLASInt> ISUPPZ(2*eigen_size); // Indicates which evecs in Z are nonzero
 
   // Work array, sized according to lapack documentation
-  int LWORK = 26*eigen_size;
+  PetscBLASInt LWORK = 26*eigen_size;
   std::vector<Number> WORK(LWORK);
 
   // Work array, sized according to lapack documentation
-  int LIWORK = 10*eigen_size;
-  std::vector<int> IWORK(LIWORK);
+  PetscBLASInt LIWORK = 10*eigen_size;
+  std::vector<PetscBLASInt> IWORK(LIWORK);
 
-  int INFO = 0;
+  PetscBLASInt INFO = 0;
 
 #ifdef LIBMESH_USE_REAL_NUMBERS // Use real numbers
   // Call the eigensolver for symmetric eigenvalue problems.
@@ -846,7 +846,7 @@ void TransientRBConstruction::enrich_RB_space()
   // Need some extra data in the complex case
 
   // Work array, sized according to lapack documentation
-  int LRWORK = 24*eigen_size;
+  PetscBLASInt LRWORK = 24*eigen_size;
   std::vector<Real> RWORK(LRWORK);
 
   // Call the eigensolver for symmetric eigenvalue problems.
