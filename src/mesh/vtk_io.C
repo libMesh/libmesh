@@ -40,7 +40,7 @@
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLPUnstructuredGridWriter.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkGenericGeometryFilter.h"
+#include "vtkIntArray.h"
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
 #include "vtkConfigure.h"
