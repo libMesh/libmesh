@@ -1948,10 +1948,10 @@ private:
 
   /**
    * This flag is used only when *reading* in a system from file.
-   * Based on the system header, it keeps track of whether or not
+   * Based on the system header, it keeps track of how many
    * additional vectors were actually written for this file.
    */
-  bool _additional_data_written;
+  unsigned int _additional_data_written;
 
   /**
    * This vector is used only when *reading* in a system from file.
