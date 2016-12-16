@@ -1707,6 +1707,9 @@ private:
    * the values to a set of \p DofObjects.  This method uses
    * blocked input and is safe to call on a distributed memory-mesh.
    * Unless otherwise specified, all variables are read.
+   *
+   * If an entry in \p vecs is a null pointer, the corresponding data
+   * is read (incrementing the file read location) but discarded.
    */
   template <typename iterator_type, typename InValType>
   std::size_t read_serialized_blocked_dof_objects (const dof_id_type n_objects,

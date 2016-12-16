@@ -1066,7 +1066,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
               // unpack & set the values
               for (vec_iterator_type vec_it=vecs.begin(); vec_it!=vecs.end(); ++vec_it)
                 {
-                  NumericVector<Number> & vec(**vec_it);
+                  NumericVector<Number> * vec(*vec_it);
 
                   for (std::vector<unsigned int>::const_iterator var_it=vars_to_read.begin();
                        var_it!=vars_to_read.end(); ++var_it)
@@ -1077,10 +1077,13 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
                         {
                           const dof_id_type dof_index = (*it)->dof_number (sys_num, *var_it, comp);
                           libmesh_assert (val_it != vals.end());
-                          libmesh_assert_greater_equal (dof_index, vec.first_local_index());
-                          libmesh_assert_less (dof_index, vec.last_local_index());
-                          //libMesh::out << "dof_index, *val_it = \t" << dof_index << ", " << *val_it << '\n';
-                          vec.set (dof_index, *val_it);
+                          if (vec)
+                            {
+                              libmesh_assert_greater_equal (dof_index, vec->first_local_index());
+                              libmesh_assert_less (dof_index, vec->last_local_index());
+                              //libMesh::out << "dof_index, *val_it = \t" << dof_index << ", " << *val_it << '\n';
+                              vec->set (dof_index, *val_it);
+                            }
                         }
                     }
                 }
