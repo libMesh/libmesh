@@ -735,7 +735,7 @@ void System::read_serialized_data (Xdr & io,
   // Read the global solution vector
   {
     // total_read_size +=
-    this->read_serialized_vector<InValType>(io, *this->solution);
+    this->read_serialized_vector<InValType>(io, this->solution.get());
 
     // get the comment
     if (this->processor_id() == 0)
@@ -758,7 +758,7 @@ void System::read_serialized_data (Xdr & io,
       for(; pos != this->_vectors.end(); ++pos)
         {
           // total_read_size +=
-          this->read_serialized_vector<InValType>(io, *pos->second);
+          this->read_serialized_vector<InValType>(io, pos->second);
 
           // get the comment
           if (this->processor_id() == 0)
@@ -1149,17 +1149,17 @@ unsigned int System::read_SCALAR_dofs (const unsigned int var,
 
 template <typename InValType>
 numeric_index_type System::read_serialized_vector (Xdr & io,
-                                                   NumericVector<Number> & vec)
+                                                   NumericVector<Number> * vec)
 {
   parallel_object_only();
 
 #ifndef NDEBUG
   // In parallel we better be reading a parallel vector -- if not
   // we will not set all of its components below!!
-  if (this->n_processors() > 1)
+  if (this->n_processors() > 1 && vec)
     {
-      libmesh_assert (vec.type() == PARALLEL ||
-                      vec.type() == GHOSTED);
+      libmesh_assert (vec->type() == PARALLEL ||
+                      vec->type() == GHOSTED);
     }
 #endif
 
@@ -1197,7 +1197,7 @@ numeric_index_type System::read_serialized_vector (Xdr & io,
                                                    this->get_mesh().local_nodes_end(),
                                                    InValType(),
                                                    io,
-                                                   std::vector<NumericVector<Number> *> (1,&vec));
+                                                   std::vector<NumericVector<Number> *> (1,vec));
 
 
       //------------------------------------
@@ -1210,7 +1210,7 @@ numeric_index_type System::read_serialized_vector (Xdr & io,
                                                    this->get_mesh().local_elements_end(),
                                                    InValType(),
                                                    io,
-                                                   std::vector<NumericVector<Number> *> (1,&vec));
+                                                   std::vector<NumericVector<Number> *> (1,vec));
     }
 
   // for older versions, read variables var-major
@@ -1232,7 +1232,7 @@ numeric_index_type System::read_serialized_vector (Xdr & io,
                                                            this->get_mesh().local_nodes_end(),
                                                            InValType(),
                                                            io,
-                                                           std::vector<NumericVector<Number> *> (1,&vec),
+                                                           std::vector<NumericVector<Number> *> (1,vec),
                                                            var);
 
 
@@ -1246,7 +1246,7 @@ numeric_index_type System::read_serialized_vector (Xdr & io,
                                                            this->get_mesh().local_elements_end(),
                                                            InValType(),
                                                            io,
-                                                           std::vector<NumericVector<Number> *> (1,&vec),
+                                                           std::vector<NumericVector<Number> *> (1,vec),
                                                            var);
             } // end variable loop
         }
@@ -1262,11 +1262,12 @@ numeric_index_type System::read_serialized_vector (Xdr & io,
 #ifndef NDEBUG
           n_assigned_vals +=
 #endif
-            this->read_SCALAR_dofs (var, io, &vec);
+            this->read_SCALAR_dofs (var, io, vec);
         }
     }
 
-  vec.close();
+  if (vec)
+    vec->close();
 
 #ifndef NDEBUG
   this->comm().sum (n_assigned_vals);
@@ -2363,12 +2364,12 @@ std::size_t System::write_serialized_vectors (Xdr & io,
 
 template void System::read_parallel_data<Number> (Xdr & io, const bool read_additional_data);
 template void System::read_serialized_data<Number> (Xdr & io, const bool read_additional_data);
-template numeric_index_type System::read_serialized_vector<Number> (Xdr & io, NumericVector<Number> & vec);
+template numeric_index_type System::read_serialized_vector<Number> (Xdr & io, NumericVector<Number> * vec);
 template std::size_t System::read_serialized_vectors<Number> (Xdr & io, const std::vector<NumericVector<Number> *> & vectors) const;
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template void System::read_parallel_data<Real> (Xdr & io, const bool read_additional_data);
 template void System::read_serialized_data<Real> (Xdr & io, const bool read_additional_data);
-template numeric_index_type System::read_serialized_vector<Real> (Xdr & io, NumericVector<Number> & vec);
+template numeric_index_type System::read_serialized_vector<Real> (Xdr & io, NumericVector<Number> * vec);
 template std::size_t System::read_serialized_vectors<Real> (Xdr & io, const std::vector<NumericVector<Number> *> & vectors) const;
 #endif
 

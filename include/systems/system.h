@@ -1737,10 +1737,12 @@ private:
    * This method may safely be called on a distributed-memory mesh.
    *
    * Returns the length of the vector read.
+   *
+   * Reads data and discards it if \p vec is a null pointer.
    */
   template <typename InValType>
   numeric_index_type read_serialized_vector (Xdr & io,
-                                             NumericVector<Number> & vec);
+                                             NumericVector<Number> * vec);
 
   /**
    * Non-templated version for backward compatibility.
@@ -1752,7 +1754,7 @@ private:
    */
   numeric_index_type read_serialized_vector (Xdr & io,
                                              NumericVector<Number> & vec)
-  { return read_serialized_vector<Number>(io, vec); }
+  { return read_serialized_vector<Number>(io, &vec); }
 
   /**
    * Writes an output vector to the stream \p io for a set of \p DofObjects.
