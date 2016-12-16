@@ -1722,10 +1722,12 @@ private:
    * to the appropriate entries of \p vec.
    *
    * Returns the number of dofs read.
+   *
+   * Reads data and discards it if \p vec is a null pointer.
    */
   unsigned int read_SCALAR_dofs (const unsigned int var,
                                  Xdr & io,
-                                 NumericVector<Number> & vec) const;
+                                 NumericVector<Number> * vec) const;
 
   /**
    * Reads a vector for this System.

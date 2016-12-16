@@ -1098,7 +1098,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 
 unsigned int System::read_SCALAR_dofs (const unsigned int var,
                                        Xdr & io,
-                                       NumericVector<Number> & vec) const
+                                       NumericVector<Number> * vec) const
 {
   unsigned int n_assigned_vals = 0; // the number of values assigned, this will be returned.
 
@@ -1134,7 +1134,8 @@ unsigned int System::read_SCALAR_dofs (const unsigned int var,
 
       for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
         {
-          vec.set (SCALAR_dofs[i], input_buffer[i]);
+          if (vec)
+            vec->set (SCALAR_dofs[i], input_buffer[i]);
           ++n_assigned_vals;
         }
     }
@@ -1258,7 +1259,7 @@ numeric_index_type System::read_serialized_vector (Xdr & io,
 #ifndef NDEBUG
           n_assigned_vals +=
 #endif
-            this->read_SCALAR_dofs (var, io, vec);
+            this->read_SCALAR_dofs (var, io, &vec);
         }
     }
 
@@ -2279,7 +2280,7 @@ std::size_t System::read_serialized_vectors (Xdr & io,
           libmesh_assert_not_equal_to (vectors[vec], 0);
 
           read_length +=
-            this->read_SCALAR_dofs (var, io, *vectors[vec]);
+            this->read_SCALAR_dofs (var, io, vectors[vec]);
         }
 
   //---------------------------------------
