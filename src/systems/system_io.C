@@ -281,8 +281,7 @@ void System::read_header (Xdr & io,
   // If nvecs > 0, this means that write_additional_data
   // was true when this file was written.  We will need to
   // make use of this fact later.
-  if (nvecs > 0)
-    this->_additional_data_written = true;
+  this->_additional_data_written = nvecs;
 
   for (unsigned int vec=0; vec<nvecs; vec++)
     {
@@ -405,10 +404,21 @@ void System::read_legacy_data (Xdr & io,
   // _additional_data_written flag).
   if (this->_additional_data_written)
     {
+      const std::size_t nvecs = this->_vectors.size();
+
+      // If the number of additional vectors written is non-zero, and
+      // the number of additional vectors we have is non-zero, and
+      // they don't match, then something is wrong and we can't be
+      // sure we're reading data into the correct places.
+      if (read_additional_data && nvecs &&
+          nvecs != this->_additional_data_written)
+        libmesh_error_msg
+          ("Additional vectors in file do not match system");
+
       std::map<std::string, NumericVector<Number> * >::iterator
         pos = this->_vectors.begin();
 
-      for (; pos != this->_vectors.end(); ++pos)
+      for (std::size_t i = 0; i != this->_additional_data_written; ++i)
         {
           // 11.)
           // Read the values of the vec-th additional vector.
@@ -419,12 +429,14 @@ void System::read_legacy_data (Xdr & io,
 
           if (this->processor_id() == 0)
             io.data (global_vector);
-          this->comm().broadcast(global_vector);
 
-          // If read_additional_data==true, then we will keep this vector, otherwise
-          // we are going to throw it away.
-          if (read_additional_data)
+          // If read_additional_data==true and we have additional vectors,
+          // then we will keep this vector data; otherwise we are going to
+          // throw it away.
+          if (read_additional_data && nvecs)
             {
+              this->comm().broadcast(global_vector);
+
               // Remember that the stored vector is node-major.
               // We need to put it into whatever application-specific
               // ordering we may have using the dof_map.
@@ -488,6 +500,11 @@ void System::read_legacy_data (Xdr & io,
               // use the overloaded operator=(std::vector) to assign the values
               *(pos->second) = reordered_vector;
             }
+
+          // If we've got vectors then we need to be iterating through
+          // those too
+          if (pos != this->_vectors.end())
+            ++pos;
         }
     } // end if (_additional_data_written)
 }
@@ -623,13 +640,27 @@ void System::read_parallel_data (Xdr & io,
   // And we're done setting solution entries
   this->solution->close();
 
-  // Only read additional vectors if wanted
-  if (read_additional_data)
+  // For each additional vector, simply go through the list.
+  // ONLY attempt to do this IF additional data was actually
+  // written to the file for this system (controlled by the
+  // _additional_data_written flag).
+  if (this->_additional_data_written)
     {
+      const std::size_t nvecs = this->_vectors.size();
+
+      // If the number of additional vectors written is non-zero, and
+      // the number of additional vectors we have is non-zero, and
+      // they don't match, then something is wrong and we can't be
+      // sure we're reading data into the correct places.
+      if (read_additional_data && nvecs &&
+          nvecs != this->_additional_data_written)
+        libmesh_error_msg
+          ("Additional vectors in file do not match system");
+
       std::map<std::string, NumericVector<Number> * >::const_iterator
         pos = _vectors.begin();
 
-      for(; pos != this->_vectors.end(); ++pos)
+      for (std::size_t i = 0; i != this->_additional_data_written; ++i)
         {
           cnt=0;
           io_buffer.clear();
@@ -637,63 +668,74 @@ void System::read_parallel_data (Xdr & io,
           // 10.)
           //
           // Actually read the additional vector components
-          // for the ith system to disk
+          // for the ith system from disk
           io.data(io_buffer);
 
           total_read_size += cast_int<dof_id_type>(io_buffer.size());
 
-          // Loop over each non-SCALAR variable and each node, and read out the value.
-          for (unsigned int data_var=0; data_var<nv; data_var++)
+          // If read_additional_data==true and we have additional vectors,
+          // then we will keep this vector data; otherwise we are going to
+          // throw it away.
+          if (read_additional_data && nvecs)
             {
-              const unsigned int var = _written_var_indices[data_var];
-              if(this->variable(var).type().family != SCALAR)
+              // Loop over each non-SCALAR variable and each node, and read out the value.
+              for (unsigned int data_var=0; data_var<nv; data_var++)
                 {
-                  // First read the node DOF values
-                  for (std::vector<const DofObject *>::const_iterator
-                         it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
-                    for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-                      {
-                        libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
-                                                     DofObject::invalid_id);
-                        libmesh_assert_less (cnt, io_buffer.size());
-                        pos->second->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
-                      }
-
-                  // Then read the element DOF values
-                  for (std::vector<const DofObject *>::const_iterator
-                         it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
-                    for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-                      {
-                        libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
-                                                     DofObject::invalid_id);
-                        libmesh_assert_less (cnt, io_buffer.size());
-                        pos->second->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
-                      }
-                }
-            }
-
-          // Finally, read the SCALAR variables on the last processor
-          for (unsigned int data_var=0; data_var<nv; data_var++)
-            {
-              const unsigned int var = _written_var_indices[data_var];
-              if(this->variable(var).type().family == SCALAR)
-                {
-                  if (this->processor_id() == (this->n_processors()-1))
+                  const unsigned int var = _written_var_indices[data_var];
+                  if(this->variable(var).type().family != SCALAR)
                     {
-                      const DofMap & dof_map = this->get_dof_map();
-                      std::vector<dof_id_type> SCALAR_dofs;
-                      dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
+                      // First read the node DOF values
+                      for (std::vector<const DofObject *>::const_iterator
+                             it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
+                        for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+                          {
+                            libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
+                                                         DofObject::invalid_id);
+                            libmesh_assert_less (cnt, io_buffer.size());
+                            pos->second->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+                          }
 
-                      for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
+                      // Then read the element DOF values
+                      for (std::vector<const DofObject *>::const_iterator
+                             it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
+                        for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+                          {
+                            libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
+                                                         DofObject::invalid_id);
+                            libmesh_assert_less (cnt, io_buffer.size());
+                            pos->second->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+                          }
+                    }
+                }
+
+              // Finally, read the SCALAR variables on the last processor
+              for (unsigned int data_var=0; data_var<nv; data_var++)
+                {
+                  const unsigned int var = _written_var_indices[data_var];
+                  if(this->variable(var).type().family == SCALAR)
+                    {
+                      if (this->processor_id() == (this->n_processors()-1))
                         {
-                          pos->second->set( SCALAR_dofs[i], io_buffer[cnt++] );
+                          const DofMap & dof_map = this->get_dof_map();
+                          std::vector<dof_id_type> SCALAR_dofs;
+                          dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
+
+                          for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
+                            {
+                              pos->second->set( SCALAR_dofs[i], io_buffer[cnt++] );
+                            }
                         }
                     }
                 }
+
+              // And we're done setting entries for this variable
+              pos->second->close();
             }
 
-          // And we're done setting entries for this variable
-          pos->second->close();
+          // If we've got vectors then we need to be iterating through
+          // those too
+          if (pos != this->_vectors.end())
+            ++pos;
         }
     }
 
@@ -735,7 +777,7 @@ void System::read_serialized_data (Xdr & io,
   // Read the global solution vector
   {
     // total_read_size +=
-    this->read_serialized_vector<InValType>(io, *this->solution);
+    this->read_serialized_vector<InValType>(io, this->solution.get());
 
     // get the comment
     if (this->processor_id() == 0)
@@ -743,27 +785,42 @@ void System::read_serialized_data (Xdr & io,
   }
 
   // 11.)
-  // Only read additional vectors if the user requested them and
-  // data is available
-  bool is_eof = false;
-  if (this->processor_id() == 0)
-    is_eof = io.is_eof();
-  this->comm().broadcast(is_eof);
-
-  if (read_additional_data && !is_eof)
+  // Only read additional vectors if data is available, and only use
+  // that data to fill our vectors if the user requested it.
+  if (this->_additional_data_written)
     {
+      const std::size_t nvecs = this->_vectors.size();
+
+      // If the number of additional vectors written is non-zero, and
+      // the number of additional vectors we have is non-zero, and
+      // they don't match, then we can't read additional vectors
+      // and be sure we're reading data into the correct places.
+      if (read_additional_data && nvecs &&
+          nvecs != this->_additional_data_written)
+        libmesh_error_msg
+          ("Additional vectors in file do not match system");
+
       std::map<std::string, NumericVector<Number> * >::const_iterator
         pos = _vectors.begin();
 
-      for(; pos != this->_vectors.end(); ++pos)
+      for (std::size_t i = 0; i != this->_additional_data_written; ++i)
         {
+          // Read data, but only put it into a vector if we've been
+          // asked to and if we have a corresponding vector to read.
+
           // total_read_size +=
-          this->read_serialized_vector<InValType>(io, *pos->second);
+          this->read_serialized_vector<InValType>(io,
+            (read_additional_data && nvecs) ? pos->second : libmesh_nullptr);
 
           // get the comment
           if (this->processor_id() == 0)
             io.comment (comment);
 
+
+          // If we've got vectors then we need to be iterating through
+          // those too
+          if (pos != this->_vectors.end())
+            ++pos;
         }
     }
 
@@ -1066,7 +1123,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
               // unpack & set the values
               for (vec_iterator_type vec_it=vecs.begin(); vec_it!=vecs.end(); ++vec_it)
                 {
-                  NumericVector<Number> & vec(**vec_it);
+                  NumericVector<Number> * vec(*vec_it);
 
                   for (std::vector<unsigned int>::const_iterator var_it=vars_to_read.begin();
                        var_it!=vars_to_read.end(); ++var_it)
@@ -1077,10 +1134,13 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
                         {
                           const dof_id_type dof_index = (*it)->dof_number (sys_num, *var_it, comp);
                           libmesh_assert (val_it != vals.end());
-                          libmesh_assert_greater_equal (dof_index, vec.first_local_index());
-                          libmesh_assert_less (dof_index, vec.last_local_index());
-                          //libMesh::out << "dof_index, *val_it = \t" << dof_index << ", " << *val_it << '\n';
-                          vec.set (dof_index, *val_it);
+                          if (vec)
+                            {
+                              libmesh_assert_greater_equal (dof_index, vec->first_local_index());
+                              libmesh_assert_less (dof_index, vec->last_local_index());
+                              //libMesh::out << "dof_index, *val_it = \t" << dof_index << ", " << *val_it << '\n';
+                              vec->set (dof_index, *val_it);
+                            }
                         }
                     }
                 }
@@ -1098,7 +1158,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 
 unsigned int System::read_SCALAR_dofs (const unsigned int var,
                                        Xdr & io,
-                                       NumericVector<Number> & vec) const
+                                       NumericVector<Number> * vec) const
 {
   unsigned int n_assigned_vals = 0; // the number of values assigned, this will be returned.
 
@@ -1134,7 +1194,8 @@ unsigned int System::read_SCALAR_dofs (const unsigned int var,
 
       for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
         {
-          vec.set (SCALAR_dofs[i], input_buffer[i]);
+          if (vec)
+            vec->set (SCALAR_dofs[i], input_buffer[i]);
           ++n_assigned_vals;
         }
     }
@@ -1145,17 +1206,17 @@ unsigned int System::read_SCALAR_dofs (const unsigned int var,
 
 template <typename InValType>
 numeric_index_type System::read_serialized_vector (Xdr & io,
-                                                   NumericVector<Number> & vec)
+                                                   NumericVector<Number> * vec)
 {
   parallel_object_only();
 
 #ifndef NDEBUG
   // In parallel we better be reading a parallel vector -- if not
   // we will not set all of its components below!!
-  if (this->n_processors() > 1)
+  if (this->n_processors() > 1 && vec)
     {
-      libmesh_assert (vec.type() == PARALLEL ||
-                      vec.type() == GHOSTED);
+      libmesh_assert (vec->type() == PARALLEL ||
+                      vec->type() == GHOSTED);
     }
 #endif
 
@@ -1193,7 +1254,7 @@ numeric_index_type System::read_serialized_vector (Xdr & io,
                                                    this->get_mesh().local_nodes_end(),
                                                    InValType(),
                                                    io,
-                                                   std::vector<NumericVector<Number> *> (1,&vec));
+                                                   std::vector<NumericVector<Number> *> (1,vec));
 
 
       //------------------------------------
@@ -1206,7 +1267,7 @@ numeric_index_type System::read_serialized_vector (Xdr & io,
                                                    this->get_mesh().local_elements_end(),
                                                    InValType(),
                                                    io,
-                                                   std::vector<NumericVector<Number> *> (1,&vec));
+                                                   std::vector<NumericVector<Number> *> (1,vec));
     }
 
   // for older versions, read variables var-major
@@ -1228,7 +1289,7 @@ numeric_index_type System::read_serialized_vector (Xdr & io,
                                                            this->get_mesh().local_nodes_end(),
                                                            InValType(),
                                                            io,
-                                                           std::vector<NumericVector<Number> *> (1,&vec),
+                                                           std::vector<NumericVector<Number> *> (1,vec),
                                                            var);
 
 
@@ -1242,7 +1303,7 @@ numeric_index_type System::read_serialized_vector (Xdr & io,
                                                            this->get_mesh().local_elements_end(),
                                                            InValType(),
                                                            io,
-                                                           std::vector<NumericVector<Number> *> (1,&vec),
+                                                           std::vector<NumericVector<Number> *> (1,vec),
                                                            var);
             } // end variable loop
         }
@@ -1262,7 +1323,8 @@ numeric_index_type System::read_serialized_vector (Xdr & io,
         }
     }
 
-  vec.close();
+  if (vec)
+    vec->close();
 
 #ifndef NDEBUG
   this->comm().sum (n_assigned_vals);
@@ -2279,7 +2341,7 @@ std::size_t System::read_serialized_vectors (Xdr & io,
           libmesh_assert_not_equal_to (vectors[vec], 0);
 
           read_length +=
-            this->read_SCALAR_dofs (var, io, *vectors[vec]);
+            this->read_SCALAR_dofs (var, io, vectors[vec]);
         }
 
   //---------------------------------------
@@ -2359,12 +2421,12 @@ std::size_t System::write_serialized_vectors (Xdr & io,
 
 template void System::read_parallel_data<Number> (Xdr & io, const bool read_additional_data);
 template void System::read_serialized_data<Number> (Xdr & io, const bool read_additional_data);
-template numeric_index_type System::read_serialized_vector<Number> (Xdr & io, NumericVector<Number> & vec);
+template numeric_index_type System::read_serialized_vector<Number> (Xdr & io, NumericVector<Number> * vec);
 template std::size_t System::read_serialized_vectors<Number> (Xdr & io, const std::vector<NumericVector<Number> *> & vectors) const;
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template void System::read_parallel_data<Real> (Xdr & io, const bool read_additional_data);
 template void System::read_serialized_data<Real> (Xdr & io, const bool read_additional_data);
-template numeric_index_type System::read_serialized_vector<Real> (Xdr & io, NumericVector<Number> & vec);
+template numeric_index_type System::read_serialized_vector<Real> (Xdr & io, NumericVector<Number> * vec);
 template std::size_t System::read_serialized_vectors<Real> (Xdr & io, const std::vector<NumericVector<Number> *> & vectors) const;
 #endif
 

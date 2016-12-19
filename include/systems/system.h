@@ -1707,6 +1707,9 @@ private:
    * the values to a set of \p DofObjects.  This method uses
    * blocked input and is safe to call on a distributed memory-mesh.
    * Unless otherwise specified, all variables are read.
+   *
+   * If an entry in \p vecs is a null pointer, the corresponding data
+   * is read (incrementing the file read location) but discarded.
    */
   template <typename iterator_type, typename InValType>
   std::size_t read_serialized_blocked_dof_objects (const dof_id_type n_objects,
@@ -1722,20 +1725,24 @@ private:
    * to the appropriate entries of \p vec.
    *
    * Returns the number of dofs read.
+   *
+   * Reads data and discards it if \p vec is a null pointer.
    */
   unsigned int read_SCALAR_dofs (const unsigned int var,
                                  Xdr & io,
-                                 NumericVector<Number> & vec) const;
+                                 NumericVector<Number> * vec) const;
 
   /**
    * Reads a vector for this System.
    * This method may safely be called on a distributed-memory mesh.
    *
    * Returns the length of the vector read.
+   *
+   * Reads data and discards it if \p vec is a null pointer.
    */
   template <typename InValType>
   numeric_index_type read_serialized_vector (Xdr & io,
-                                             NumericVector<Number> & vec);
+                                             NumericVector<Number> * vec);
 
   /**
    * Non-templated version for backward compatibility.
@@ -1747,7 +1754,7 @@ private:
    */
   numeric_index_type read_serialized_vector (Xdr & io,
                                              NumericVector<Number> & vec)
-  { return read_serialized_vector<Number>(io, vec); }
+  { return read_serialized_vector<Number>(io, &vec); }
 
   /**
    * Writes an output vector to the stream \p io for a set of \p DofObjects.
@@ -1941,10 +1948,10 @@ private:
 
   /**
    * This flag is used only when *reading* in a system from file.
-   * Based on the system header, it keeps track of whether or not
+   * Based on the system header, it keeps track of how many
    * additional vectors were actually written for this file.
    */
-  bool _additional_data_written;
+  unsigned int _additional_data_written;
 
   /**
    * This vector is used only when *reading* in a system from file.
