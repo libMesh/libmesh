@@ -148,10 +148,18 @@ void TreeNode<N>::refine ()
   // A TreeNode<N> has by definition N children
   children.resize(N);
 
+  // Scale up the target bin size in child TreeNodes if we have reached
+  // the maximum number of refinement levels.
+  unsigned int new_target_bin_size = tgt_bin_size;
+  if(level() >= target_bin_size_increase_level)
+    {
+      new_target_bin_size *= 2;
+    }
+
   for (unsigned int c=0; c<N; c++)
     {
       // Create the child and set its bounding box.
-      children[c] = new TreeNode<N> (mesh, tgt_bin_size, this);
+      children[c] = new TreeNode<N> (mesh, new_target_bin_size, this);
       children[c]->set_bounding_box(this->create_bounding_box(c));
 
       // Pass off our nodes to our children

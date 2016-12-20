@@ -209,6 +209,15 @@ private:
   const unsigned int tgt_bin_size;
 
   /**
+   * This specifies the refinement level beyond which we will
+   * scale up the target bin size in child TreeNodes. We set
+   * the default to be 10, which should be large enough such
+   * that in most cases the target bin size does not need to
+   * be increased.
+   */
+  unsigned int target_bin_size_increase_level;
+
+  /**
    * Does this node contain any infinite elements.
    */
   bool contains_ifems;
@@ -228,6 +237,7 @@ TreeNode<N>::TreeNode (const MeshBase & m,
   mesh           (m),
   parent         (p),
   tgt_bin_size   (tbs),
+  target_bin_size_increase_level(10),
   contains_ifems (false)
 {
   // libmesh_assert our children are empty, thus we are active.
