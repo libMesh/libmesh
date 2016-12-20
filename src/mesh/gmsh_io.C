@@ -58,7 +58,6 @@ GmshIO::ElementMaps GmshIO::build_element_maps()
   em.add_def(ElementDefinition(HEX8, 5, 3, 8));
   em.add_def(ElementDefinition(TET4, 4, 3, 4));
   em.add_def(ElementDefinition(PRISM6, 6, 3, 6));
-  em.add_def(ElementDefinition(PRISM15, 13, 3, 15)); // TODO: what should be done with this on writing?
   em.add_def(ElementDefinition(PYRAMID5, 7, 3, 5));
 
   // Add elements with non-trivial node mappings
@@ -84,6 +83,14 @@ GmshIO::ElementMaps GmshIO::build_element_maps()
   {
     ElementDefinition eledef(TET10, 11, 3, 10);
     const unsigned int nodes[] = {0,1,2,3,4,5,6,7,9,8};
+    std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes); // swap trick
+    em.add_def(eledef);
+  }
+
+  // PRISM15
+  {
+    ElementDefinition eledef(PRISM15, 18, 3, 15);
+    const unsigned int nodes[] = {0,1,2,3,4,5,6,8,9,7,10,11,12,14,13};
     std::vector<unsigned int>(nodes, nodes+eledef.nnodes).swap(eledef.nodes); // swap trick
     em.add_def(eledef);
   }
