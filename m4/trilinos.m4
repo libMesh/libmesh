@@ -168,7 +168,9 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
        dnl ------------------------------------------------------
        AC_CHECK_HEADER([$withtrilinosdir/include/Ifpack_config.h],
                        [enableifpack=yes],
-                       [enableifpack=no])
+                       [AC_CHECK_HEADER([$withtrilinosdir/packages/ifpack/src/Ifpack_config.h],
+                                        [enableifpack=yes],
+                                        [enableifpack=no])])
 
        if test "$enableifpack" != no ; then
           AC_DEFINE(TRILINOS_HAVE_IFPACK, 1,
@@ -183,7 +185,9 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
        dnl ------------------------------------------------------
        AC_CHECK_HEADER([$withtrilinosdir/include/EpetraExt_config.h],
                        [enableepetraext=yes],
-                       [enableepetraext=no])
+                       [AC_CHECK_HEADER([$withtrilinosdir/packages/epetraext/src/EpetraExt_config.h],
+                                        [enableepetraext=yes],
+                                        [enableepetraext=no])])
 
        if test "$enableepetraext" != no ; then
           AC_DEFINE(TRILINOS_HAVE_EPETRAEXT, 1,
@@ -197,9 +201,11 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
        dnl header files whose absence indicates Epetra is not available,
        dnl we just choose one here that libmesh actually includes.
        dnl ------------------------------------------------------
-       AC_CHECK_HEADER([$withtrilinosdir/include/Epetra_CombineMode.h],
+       AC_CHECK_HEADER([$withtrilinosdir/include/Epetra_config.h],
                        [enableepetra=yes],
-                       [enableepetra=no])
+                       [AC_CHECK_HEADER([$withtrilinosdir/packages/epetra/src/Epetra_config.h],
+                                        [enableepetra=yes],
+                                        [enableepetra=no])])
 
        if test "$enableepetra" != no ; then
           AC_DEFINE(TRILINOS_HAVE_EPETRA, 1,

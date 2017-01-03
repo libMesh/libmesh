@@ -37314,7 +37314,15 @@ ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/Ifpack_config
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enableifpack=yes
 else
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/packages/ifpack/src/Ifpack_config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/packages/ifpack/src/Ifpack_config.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enableifpack=yes
+else
   enableifpack=no
+fi
+
+
 fi
 
 
@@ -37332,7 +37340,15 @@ ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/EpetraExt_con
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enableepetraext=yes
 else
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/packages/epetraext/src/EpetraExt_config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/packages/epetraext/src/EpetraExt_config.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enableepetraext=yes
+else
   enableepetraext=no
+fi
+
+
 fi
 
 
@@ -37345,12 +37361,20 @@ $as_echo "#define TRILINOS_HAVE_EPETRAEXT 1" >>confdefs.h
 $as_echo "<<< Configuring library with Trilinos EpetraExt support >>>" >&6; }
        fi
 
-                                                 as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/Epetra_CombineMode.h" | $as_tr_sh`
-ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/Epetra_CombineMode.h" "$as_ac_Header" "$ac_includes_default"
+                                                 as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/Epetra_config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/Epetra_config.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enableepetra=yes
+else
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/packages/epetra/src/Epetra_config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/packages/epetra/src/Epetra_config.h" "$as_ac_Header" "$ac_includes_default"
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enableepetra=yes
 else
   enableepetra=no
+fi
+
+
 fi
 
 
