@@ -29,18 +29,6 @@
 namespace libMesh
 {
 
-bool libmesh_isfinite(Real value)
-{
-  // check if \p value is infinite
-  if( value > std::numeric_limits<Real>::max()
-         || value <  std::numeric_limits<Real>::min() )
-     return false;
-  // check if \p value is nan
-  if( value != value)
-     return false;
-  // \p value is finite
-  return true;
-}
 
 
 // ------------------------------------------------------------
@@ -199,13 +187,13 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
            +o(2)*p1(0)*p0(1)+o(0)*p0(2)*p1(1));
 
 
-        if( !libmesh_isfinite(c_factor)){
-           // The above system is badly posed.
-           // It should only happen when \p physical_point is not
-           // in \p inf_elem. In this case, any point that is not in the
-           // element is a valid answer.
-           return o;
-        }
+        // Check whether the above system is ill-posed.  It should
+        // only happen when \p physical_point is not in \p
+        // inf_elem. In this case, any point that is not in the
+        // element is a valid answer.
+        if (libmesh_isinf(c_factor))
+          return o;
+
         // Compute the intersection with
         // {intersection} = {fp} + c*({fp}-{o}).
         intersection.add_scaled(fp,1.+c_factor);
