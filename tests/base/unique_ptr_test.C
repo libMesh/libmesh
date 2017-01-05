@@ -19,12 +19,12 @@
 
 using namespace libMesh;
 
-class AutoPtrTest : public CppUnit::TestCase
+class UniquePtrTest : public CppUnit::TestCase
 {
 public:
-  CPPUNIT_TEST_SUITE( AutoPtrTest );
+  CPPUNIT_TEST_SUITE( UniquePtrTest );
 
-  // Test that we can call if (!foo) for AutoPtr
+  // Test that we can call if (!foo) for UniquePtr
   CPPUNIT_TEST( testComparison );
 
   // Test that the libmesh_make_unique macro works.
@@ -45,10 +45,11 @@ public:
   void testComparison ()
   {
     // Test that if(foo) and if (!foo) compile and do the right thing
-    // for AutoPtr.  This tests that the safe_bool thing that AutoPtr
-    // uses is actually working.
+    // for UniquePtr.  This tests that the safe_bool thing that our
+    // internal AutoPtr uses is actually working, in cases where users
+    // are configured to use that.
     {
-      AutoPtr<int> foo(new int(42));
+      UniquePtr<int> foo(new int(42));
 
       bool test1_passed = false;
       if (foo)
@@ -63,7 +64,7 @@ public:
 
     // Test the converse for when foo holds a NULL pointer.
     {
-      AutoPtr<int> foo(NULL);
+      UniquePtr<int> foo;
 
       bool test3_passed = true;
       if (foo)
@@ -81,7 +82,7 @@ public:
     // so it's commented out for now, but if you uncomment this test,
     // you should get a compiler error.  This is probably a candidate
     // for a configure-time test instead.
-    // AutoPtr<int> bar(new int(21));
+    // UniquePtr<int> bar(new int(21));
     // if (foo == bar)
     //   std::cerr << "This should not compile." << std::endl;
   }
@@ -96,4 +97,4 @@ public:
   }
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION( AutoPtrTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( UniquePtrTest );
