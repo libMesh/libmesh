@@ -179,7 +179,7 @@ Real Edge3::volume () const
   const Real c = B.norm_sq();
 
   // Degenerate straight line case
-  if (a < TOLERANCE*TOLERANCE*TOLERANCE)
+  if (a < TOLERANCE*TOLERANCE)
     return (this->point(1) - this->point(0)).norm();
 
   const Real ba=b/a;
@@ -190,9 +190,12 @@ Real Edge3::volume () const
   const Real s1 = std::sqrt(1. - ba + ca);
   const Real s2 = std::sqrt(1. + ba + ca);
 
+  Real log_term = (1. - 0.5*ba + s1) / (-1. - 0.5*ba + s2);
+  libmesh_assert(!libmesh_isnan(log_term) && log_term > 0.);
+
   return 0.5*std::sqrt(a)*((1.-0.5*ba)*s1 +
                            (1.+0.5*ba)*s2 +
-                           (ca - 0.25*ba*ba)*std::log( (1.-0.5*ba+s1)/(-1.-0.5*ba+s2) )
+                           (ca - 0.25*ba*ba)*std::log(log_term)
                            );
 }
 
