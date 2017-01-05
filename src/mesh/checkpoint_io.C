@@ -562,6 +562,7 @@ void CheckpointIO::read (const std::string & name)
         if (_parallel != parallel)
           libmesh_error_msg("Attempted to read a " <<
                             (parallel ? "parallel" : "non-parallel")
+                            << " (" << parallel << ')'
                             << " checkpoint file with a " <<
                             (_parallel ? "parallel" : "non-parallel")
                             << " checkpoint object!");
