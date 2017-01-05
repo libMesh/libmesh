@@ -176,6 +176,13 @@ inline bool libmesh_isnan(long double a) { return libmesh_C_isnan_longdouble(a);
 template <typename T>
 inline bool libmesh_isnan(std::complex<T> a) { return (libmesh_isnan(std::real(a)) || libmesh_isnan(std::imag(a))); }
 
+// Same goes for isinf, which can be implemented in terms of isnan.
+// http://stackoverflow.com/a/2249173/659433
+template <typename T>
+inline bool libmesh_isinf(T x) { return !libmesh_isnan(x) && libmesh_isnan(x - x); }
+
+template <typename T>
+inline bool libmesh_isinf(std::complex<T> a) { return (libmesh_isinf(std::real(a)) || libmesh_isinf(std::imag(a))); }
 
 // Define the value type for unknowns in simulations.
 // This is either Real or Complex, depending on how

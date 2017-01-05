@@ -187,6 +187,13 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
            +o(2)*p1(0)*p0(1)+o(0)*p0(2)*p1(1));
 
 
+        // Check whether the above system is ill-posed.  It should
+        // only happen when \p physical_point is not in \p
+        // inf_elem. In this case, any point that is not in the
+        // element is a valid answer.
+        if (libmesh_isinf(c_factor))
+          return o;
+
         // Compute the intersection with
         // {intersection} = {fp} + c*({fp}-{o}).
         intersection.add_scaled(fp,1.+c_factor);
