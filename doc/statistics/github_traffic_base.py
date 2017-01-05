@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import csv
 
 # Import stuff for working with dates
 from datetime import datetime
@@ -13,8 +14,6 @@ import calendar
 # numbers of unique visitors and views for the last two weeks only...
 # So as long as I check back at least once every two weeks I can keep
 # a record of it?  Great...
-# Update Oct. 12, 2015: GitHub now only provides the most recent one
-# week of data.
 
 # https://github.com/libMesh/libmesh/graphs/traffic
 
@@ -52,26 +51,27 @@ class PlotData(object):
     Part of title string describing the average
     """
 
-    self.data_array = []
+    self.data_file = ''
     """
-    The 3-column array of data to be plotted
+    Name of a CSV file with date, total, unique data.
     """
 
   # Function which plots the two datasets on a single plot with two y axes.
   def plot_data(self):
-    # Extract the dates from the data array
-    date_strings = self.data_array[0::3]
+    # Read the data from the CSV file.
+    date_strings = []
+    data_column2 = []
+    data_column3 = []
+    with open(self.data_file, 'r') as f:
+      for row in csv.reader(f):
+        date_strings.append(row[0])
+        data_column2.append(int(row[1]))
+        data_column3.append(int(row[2]))
 
-    # Convert date strings into numbers
+    # Convert date strings into numbers.
     date_nums = []
     for d in date_strings:
       date_nums.append(date2num(datetime.strptime(d, '%Y-%b-%d')))
-
-    # Extract second column of data (n. views or n. clones).
-    data_column2 = self.data_array[1::3]
-
-    # Extract third column of data (unique visitors or unique cloners).
-    data_column3 = self.data_array[2::3]
 
     # Initialize an array with 1, 7, 14, ...
     N = len(date_strings)
@@ -128,7 +128,7 @@ class PlotData(object):
     # Make monthly plot
     fig.clf()
 
-    # Generate date numbers at montly intervals starting from '2014-Feb-17'
+    # Generate date numbers at monthly intervals starting from '2014-Feb-17'
     now = datetime.now()
     month_intervals = [735281] # date2num for '2014-Feb-17'
     for yr in xrange(2014, now.year+1):
@@ -186,4 +186,3 @@ class PlotData(object):
 # Local Variables:
 # python-indent: 2
 # End:
-
