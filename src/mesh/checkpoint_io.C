@@ -560,7 +560,11 @@ void CheckpointIO::read (const std::string & name)
         io.data(parallel, "# parallel");
 
         if (_parallel != parallel)
-          libmesh_error_msg("Attempted to utilize a checkpoint file with an incompatible mesh distribution!");
+          libmesh_error_msg("Attempted to read a " <<
+                            (parallel ? "parallel" : "non-parallel")
+                            << " checkpoint file with a " <<
+                            (_parallel ? "parallel" : "non-parallel")
+                            << " checkpoint object!");
       }
 
       // If this is a parallel mesh then we need to check to ensure we're reading this on the same number of procs
