@@ -175,13 +175,13 @@ Real Edge3::volume () const
   Point B = (this->point(1) - this->point(0))/2;
 
   const Real a = A.norm_sq();
-  const Real b = 2.*(A*B);
   const Real c = B.norm_sq();
 
   // Degenerate straight line case
   if (a < TOLERANCE*TOLERANCE)
-    return (this->point(1) - this->point(0)).norm();
+    return 2. * std::sqrt(c);
 
+  const Real b = 2.*(A*B);
   const Real ba=b/a;
   const Real ca=c/a;
 
