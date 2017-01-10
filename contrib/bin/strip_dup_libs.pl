@@ -73,6 +73,18 @@ foreach( @cleaned_up_libs_third ) {
     {
         push @system_lib_paths, $_;
     }
+    # Discard library paths starting with /lib. This directory is not
+    # even present on OSX and it is typically fairly empty on Linux,
+    # but it may be present on other UNIX systems.
+    elsif( ($_=~/-L\/lib/) )
+    {
+        push @system_lib_paths, $_;
+    }
+    # Discard -Wl,* flags starting with /lib
+    elsif( ($_=~/-Wl,.*\/lib/) )
+    {
+        push @system_lib_paths, $_;
+    }
     # Otherwise, keep the path.
     else
     {
