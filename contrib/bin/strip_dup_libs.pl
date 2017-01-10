@@ -69,7 +69,7 @@ foreach( @cleaned_up_libs_third ) {
         push @system_lib_paths, $_;
     }
     # Discard -Wl,* flags starting with /usr
-    elsif( ($_=~/-Wl,.*\/usr/) )
+    elsif( ($_=~/-Wl,[^\/]*\/usr/) )
     {
         push @system_lib_paths, $_;
     }
@@ -81,7 +81,7 @@ foreach( @cleaned_up_libs_third ) {
         push @system_lib_paths, $_;
     }
     # Discard -Wl,* flags starting with /lib
-    elsif( ($_=~/-Wl,.*\/lib/) )
+    elsif( ($_=~/-Wl,[^\/]*\/lib/) )
     {
         push @system_lib_paths, $_;
     }
