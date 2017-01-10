@@ -39,7 +39,7 @@
 /* SVN revision */
 #undef BUILD_VERSION
 
-/* define if the compiler has a broken errno_t */
+/* define if errno.h cannot be included in a namespace */
 #undef COMPILER_HAS_BROKEN_ERRNO_T
 
 /* Configuration information. */

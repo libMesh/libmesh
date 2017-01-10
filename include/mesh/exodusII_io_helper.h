@@ -49,24 +49,22 @@
 
 
 
+// Through several subsequent levels of includes, the exodusII.h
+// header includes <errno.h>.  On very specific system/compiler combinations
+// (currently GCC 5.2.0+ OSX Yosemite, El Capitan, possibly others) errno.h
+// cannot be included while wrapped in a namespace (as we do with the exII
+// namespace below).  A workaround for this is to simply include errno.h
+// not in any namespace prior to including exodusII.h.
+#ifdef LIBMESH_COMPILER_HAS_BROKEN_ERRNO_T
+#include <errno.h>
+#endif
+
+
 namespace exII {
 extern "C" {
 #include "exodusII.h" // defines MAX_LINE_LENGTH, MAX_STR_LENGTH used later
 }
 }
-
-// Through several subsequent levels of includes, the exodusII.h
-// header includes <errno.h>.  If <cstring> is subsequently included
-// in the same translation unit, there is an issue with GCC 5.2.0+ on
-// OSX which somehow causes errno_t to then be undefined.  This
-// typedef, which is controlled by an autoconf test, seems to fix the
-// issue and should be safe, since errno_t should have the same type as
-// errno, which according to the C99 standard is a "macro that expands
-// to a modifiable lvalue that has type int".
-#ifdef LIBMESH_COMPILER_HAS_BROKEN_ERRNO_T
-typedef int errno_t;
-#endif
-
 
 namespace libMesh
 {
