@@ -31842,8 +31842,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if compiler has working errno_t declaration" >&5
-$as_echo_n "checking if compiler has working errno_t declaration... " >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if errno.h can be wrapped in namespace" >&5
+$as_echo_n "checking if errno.h can be wrapped in namespace... " >&6; }
 
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -31876,18 +31876,18 @@ $as_echo "no" >&6; }
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-  # If errno_t does not work, verify that "typedef int errno_t;" fixes it.
+  # If that test failed, verify that including the header outside of any namespace fixes the issue.
   if (test x$errno_t_works = xno); then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking if errno_t typedef fixes the issue" >&5
-$as_echo_n "checking if errno_t typedef fixes the issue... " >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking if workaround fixes the issue" >&5
+$as_echo_n "checking if workaround fixes the issue... " >&6; }
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
+    #include <errno.h> // the fix
     namespace Foo {
     #include <errno.h>
     }
-    typedef int errno_t; // the fix
     #include <cstring>
 
 int
@@ -31921,16 +31921,16 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-  # If the compiler has the errno_t issue and the typedef fixes it, set the #define
+  # If the compiler has the issue and the workaround fixes it, set the #define
   if (test "x$errno_t_works" = "xno" -a "x$typedef_errno_t_fixes_issue" = "xyes"); then
 
 $as_echo "#define COMPILER_HAS_BROKEN_ERRNO_T 1" >>confdefs.h
 
   fi
 
-  # On the other hand, if the compiler has the errno_t issue and the typedef *doesn't* fix it, error out.
+  # On the other hand, if the compiler has the issue and the workaround *doesn't* fix it, error out.
   if (test "x$errno_t_works" = "xno" -a "x$typedef_errno_t_fixes_issue" = "x"); then
-    as_fn_error $? "Compiler has the errno_t issue, but typedef does not fix it.  This
+    as_fn_error $? "Cannot work around errno.h inclusion issue.  This
                   compiler will most likely not be able to build libmesh correctly." "$LINENO" 5
   fi
 
