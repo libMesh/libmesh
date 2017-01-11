@@ -84,6 +84,8 @@ public:
         }
     }
 
+    TestCommWorld->barrier();
+
     // Test that we can read in the files we wrote and sum up to the
     // same total number of elements.
     {
