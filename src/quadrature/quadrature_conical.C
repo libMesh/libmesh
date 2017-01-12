@@ -46,6 +46,18 @@ QConical::~QConical()
 
 
 
+void QConical::init_1D(const ElemType /*type_in*/,
+                       unsigned int p)
+{
+  QGauss gauss1D(1, static_cast<Order>(_order+2*p));
+
+  // Swap points and weights with the about-to-be destroyed rule.
+  _points.swap(gauss1D.get_points());
+  _weights.swap(gauss1D.get_weights());
+}
+
+
+
 // Builds and scales a Gauss rule and a Jacobi rule.
 // Then combines them to compute points and weights
 // of a 2D conical product rule.

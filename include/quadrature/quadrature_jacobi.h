@@ -23,8 +23,6 @@
 // Local includes
 #include "libmesh/quadrature.h"
 
-// C++ includes
-
 namespace libMesh
 {
 
@@ -46,6 +44,7 @@ namespace libMesh
  *
  * \author John W. Peterson
  * \date 2003
+ * \brief Implements 1D Gauss-Jacobi quadrature rules of various orders.
  */
 class QJacobi libmesh_final : public QBase
 {
@@ -72,8 +71,8 @@ public:
   ~QJacobi() {}
 
   /**
-   * @returns the \p QuadratureType, either
-   * \p QJACOBI_1_0 or \p QJACOBI_2_0.
+   * @returns the \p QuadratureType, either \p QJACOBI_1_0 or \p
+   * QJACOBI_2_0.
    */
   virtual QuadratureType type() const libmesh_override;
 

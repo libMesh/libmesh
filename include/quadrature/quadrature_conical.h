@@ -22,26 +22,23 @@
 // Local includes
 #include "libmesh/quadrature.h"
 
-// C++ includes
-
 namespace libMesh
 {
 
 /**
  * This class implements the so-called conical product quadrature
  * rules for Tri and Tet elements. These rules are generally
- * non-optimal in the number of evaluation points, but have the nice
- * property of having all positive weights and being well-defined to
- * any order for which their underlying 1D Gauss and Jacobi quadrature
- * rules are available.
- *
+ * non-optimal in the number of evaluation points, but have the following nice
+ * properties:
+ * .) All positive weights.
+ * .) Easily constructed for any order given the underlying 1D Gauss
+ *    and Jacobi quadrature rules.
  * The construction of these rules is given by e.g.
- *
- * Stroud, A.H. "Approximate Calculation of
- * Multiple Integrals.", 1972
+ * A. H. Stroud, "Approximate Calculation of Multiple Integrals.", 1972.
  *
  * \author John W. Peterson
  * \date 2008
+ * \brief Conical product quadrature rules for Tri and Tet elements.
  */
 class QConical libmesh_final : public QBase
 {
@@ -59,18 +56,17 @@ public:
   ~QConical();
 
   /**
-   * @returns the QuadratureType for this class
+   * @returns the QuadratureType for this class.
    */
   virtual QuadratureType type() const libmesh_override { return QCONICAL; }
 
 private:
 
+  /**
+   * The optimal "conical product" rule in 1D is simply Gauss.
+   */
   virtual void init_1D (const ElemType,
-                        unsigned int =0) libmesh_override
-  {
-    // See about making this non-pure virtual in the base class
-    libmesh_not_implemented();
-  }
+                        unsigned int = 0) libmesh_override;
 
   /**
    * The conical product rules are defined in 2D only for Tris.
@@ -101,7 +97,6 @@ private:
    */
   void conical_product_pyramid(unsigned int p);
 };
-
 
 } // namespace libMesh
 

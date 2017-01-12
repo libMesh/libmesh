@@ -23,17 +23,16 @@
 // Local includes
 #include "libmesh/quadrature.h"
 
-// C++ includes
-
 namespace libMesh
 {
 
 /**
- * This class creates a gaussian quadrature rule duplicated for each
+ * This class creates a Gaussian quadrature rule duplicated for each
  * subelement of a Clough-Tocher divided macroelement.
  *
  * \author Roy Stogner
  * \date 2005
+ * \brief Implements quadrature rules for Clough-Tocher macroelements.
  */
 class QClough libmesh_final : public QBase
 {
@@ -53,7 +52,7 @@ public:
   ~QClough() {}
 
   /**
-   * @returns \p QCLOUGH
+   * @returns \p QCLOUGH.
    */
   virtual QuadratureType type() const libmesh_override { return QCLOUGH; }
 
@@ -69,7 +68,5 @@ private:
 };
 
 } // namespace libMesh
-
-
 
 #endif // LIBMESH_QUADRATURE_CLOUGH_H

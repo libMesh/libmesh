@@ -27,8 +27,8 @@ namespace libMesh
 {
 
 /**
- * The \p MortonSFCPartitioner uses a Morton space
- * filling curve to partition the elements.
+ * The \p MortonSFCPartitioner uses a Morton space filling curve to
+ * partition the elements.
  *
  * \author Benjamin S. Kirk
  * \date 2003
@@ -39,7 +39,7 @@ class MortonSFCPartitioner : public SFCPartitioner
 public:
 
   /**
-   * Constructor.
+   * Constructor. Sets the underlying space filling curve type.
    */
   MortonSFCPartitioner ()
   {
@@ -48,7 +48,7 @@ public:
 
   /**
    * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
+   * a \p UniquePtr.
    */
   virtual UniquePtr<Partitioner> clone () const libmesh_override
   {
@@ -56,6 +56,7 @@ public:
   }
 
 protected:
+
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
@@ -67,6 +68,5 @@ protected:
 };
 
 } // namespace libMesh
-
 
 #endif // LIBMESH_MORTON_SFC_PARTITIONER_H

@@ -45,6 +45,10 @@ class METIS_CSR_Graph
 public:
   std::vector<IndexType> offsets, vals;
 
+  /**
+   * Sets the number of non-zero values in the given row.  The
+   * internal indexing is 1-based.
+   */
   void prep_n_nonzeros(const libMesh::dof_id_type row,
                        const libMesh::dof_id_type n_nonzeros_in)
   {
@@ -52,15 +56,20 @@ public:
     offsets[row+1] = n_nonzeros_in;
   }
 
-
-
+  /**
+   * @returns the number of nonzeros in the requested row by
+   * subtracting the offsets vector entries.
+   */
   libMesh::dof_id_type n_nonzeros (const libMesh::dof_id_type row) const
   {
     libmesh_assert_less (row+1, offsets.size());
     return (offsets[row+1] - offsets[row]);
   }
 
-
+  /**
+   * Replaces the entries in the offsets vector with their partial
+   * sums and resizes the val vector accordingly.
+   */
   void prepare_for_use()
   {
     std::partial_sum (offsets.begin(), offsets.end(), offsets.begin());
@@ -71,27 +80,29 @@ public:
       vals.push_back(0);
   }
 
-
-
-  IndexType & operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero)
+  /**
+   * @returns a writable reference to the nonzero'th entry of row.
+   */
+  IndexType & operator()(const libMesh::dof_id_type row,
+                         const libMesh::dof_id_type nonzero)
   {
     libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
 
     return vals[offsets[row]+nonzero];
   }
 
-
-
-  const IndexType & operator()(const libMesh::dof_id_type row, const libMesh::dof_id_type nonzero) const
+  /**
+   * @returns a const reference to the nonzero'th entry of row.
+   */
+  const IndexType & operator()(const libMesh::dof_id_type row,
+                               const libMesh::dof_id_type nonzero) const
   {
     libmesh_assert_greater (vals.size(), offsets[row]+nonzero);
 
     return vals[offsets[row]+nonzero];
   }
-
 };
 
 } // namespace libMesh
-
 
 #endif // LIBMESH_METIS_CSR_GRAPH_H

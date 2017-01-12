@@ -37,15 +37,14 @@
 namespace libMesh
 {
 
-
 // forward declarations
 class Elem;
 
 /**
- * This is the \p QBase class.  It provides the basic functionality
- * from which various quadrature rules can be derived.  The class contains
- * \p dim dimensional points describing the quadrature locations
- * (referenced to a master object) and associated weights.
+ * The \p QBase class provides the basic functionality from which
+ * various quadrature rules can be derived.  It computes and stores
+ * the quadrature points (in reference element space) and associated
+ * weights.
  *
  * \author Benjamin S. Kirk
  * \date 2002
@@ -56,8 +55,8 @@ class QBase : public ReferenceCountedObject<QBase>
 protected:
 
   /**
-   * Constructor. Protected to prevent instantiation
-   * of this base class.
+   * Constructor. Protected to prevent instantiation of this base
+   * class.  Use the build() method instead.
    */
   QBase (const unsigned int _dim,
          const Order _order=INVALID_ORDER);
@@ -75,101 +74,110 @@ public:
   virtual QuadratureType type() const = 0;
 
   /**
-   * Builds a specific quadrature rule, identified through the
-   * \p name string.  An \p UniquePtr<QBase> is returned
-   * to prevent a memory leak. This way the user need not
-   * remember to delete the object.  Enables run-time decision of
-   * the quadrature rule.  The input parameter \p name
-   * must be mappable through the \p Utility::string_to_enum<>()
-   * function.
+   * Builds a specific quadrature rule based on the \p name
+   * string. This enables selection of the quadrature rule at
+   * run-time.  The input parameter \p name must be mappable through
+   * the \p Utility::string_to_enum<>() function.
+   *
+   * This function allocates memory, therefore a \p UniquePtr<QBase>
+   * is returned so that the user does not accidentally leak it.
    */
   static UniquePtr<QBase> build (const std::string & name,
-                                 const unsigned int _dim,
-                                 const Order _order=INVALID_ORDER);
+                                 const unsigned int dim,
+                                 const Order order=INVALID_ORDER);
 
   /**
-   * Builds a specific quadrature rule, identified through the
-   * \p QuadratureType.  An \p UniquePtr<QBase> is returned
-   * to prevent a memory leak. This way the user need not
-   * remember to delete the object.  Enables run-time decision of
-   * the quadrature rule.
+   * Builds a specific quadrature rule based on the QuadratureType.
+   * This enables selection of the quadrature rule at run-time.
+   *
+   * This function allocates memory, therefore a \p UniquePtr<QBase>
+   * is returned so that the user does not accidentally leak it.
    */
-  static UniquePtr<QBase> build (const QuadratureType _qt,
-                                 const unsigned int _dim,
-                                 const Order _order=INVALID_ORDER);
+  static UniquePtr<QBase> build (const QuadratureType qt,
+                                 const unsigned int dim,
+                                 const Order order=INVALID_ORDER);
 
   /**
-   * @returns the current element type we're set up for
+   * @returns the element type we're currently using.
    */
-  ElemType get_elem_type() const
-  { return _type; }
+  ElemType get_elem_type() const { return _type; }
 
   /**
-   * @returns the current p refinement level we're initialized with
+   * @returns the p-refinement level we're currently using.
    */
-  unsigned int get_p_level() const
-  { return _p_level; }
+  unsigned int get_p_level() const { return _p_level; }
 
   /**
    * @returns the number of points associated with the quadrature rule.
    */
   unsigned int n_points() const
-  { libmesh_assert (!_points.empty());
-    return cast_int<unsigned int>(_points.size()); }
+  {
+    libmesh_assert (!_points.empty());
+    return cast_int<unsigned int>(_points.size());
+  }
 
   /**
-   * @returns the dimension of the quadrature rule.
+   * @returns the spatial dimension of the quadrature rule.
    */
-  unsigned int get_dim() const { return _dim;  }
+  unsigned int get_dim() const { return _dim; }
 
   /**
    * @returns a \p std::vector containing the quadrature point locations
-   * on a reference object.
+   * in reference element space.
    */
-  const std::vector<Point> & get_points() const { return _points;  }
+  const std::vector<Point> & get_points() const { return _points; }
 
   /**
    * @returns a \p std::vector containing the quadrature point locations
-   * on a reference object as a writeable reference.
+   * in reference element space as a writeable reference.
    */
-  std::vector<Point> & get_points() { return _points;  }
+  std::vector<Point> & get_points() { return _points; }
 
   /**
-   * @returns a \p std::vector containing the quadrature weights.
+   * @returns a constant reference to a \p std::vector containing the
+   * quadrature weights.
    */
   const std::vector<Real> & get_weights() const { return _weights; }
 
   /**
-   * @returns a \p std::vector containing the quadrature weights.
+   * @returns a writable references to a \p std::vector containing the
+   * quadrature weights.
    */
   std::vector<Real> & get_weights() { return _weights; }
 
   /**
-   * @returns the \f$ i^{th} \f$ quadrature point on the reference object.
+   * @returns the \f$ i^{th} \f$ quadrature point in reference element space.
    */
   Point qp(const unsigned int i) const
-  { libmesh_assert_less (i, _points.size()); return _points[i]; }
+  {
+    libmesh_assert_less (i, _points.size());
+    return _points[i];
+  }
 
   /**
    * @returns the \f$ i^{th} \f$ quadrature weight.
    */
   Real w(const unsigned int i) const
-  { libmesh_assert_less (i, _weights.size()); return _weights[i]; }
+  {
+    libmesh_assert_less (i, _weights.size());
+    return _weights[i];
+  }
 
   /**
-   * Initializes the data structures to contain a quadrature rule
-   * for an object of type \p type.
+   * Initializes the data structures for a quadrature rule for an
+   * element of type \p type.
    */
   virtual void init (const ElemType type=INVALID_ELEM,
                      unsigned int p_level=0);
 
   /**
-   * Initializes the data structures for a specific, potentially cut
-   * element.  The array \p vertex_distance_func contains vertex
-   * values of a signed distance function that cuts the element.  This
-   * interface is indended to be extended by derived classes that can
-   * cut the element into subelements, for example, and constuct a
-   * composite quadrature rule for the cut element.
+   * Initializes the data structures for an element potentially "cut"
+   * by a signed distance function.  The array \p vertex_distance_func
+   * contains vertex values of the signed distance function.  If the
+   * signed distance function changes sign on the vertices, then the
+   * element is considered to be cut.) This interface can be extended
+   * by derived classes in order to subdivide the element and construct
+   * a composite quadrature rule.
    */
   virtual void init (const Elem & elem,
                      const std::vector<Real> & vertex_distance_func,
@@ -187,10 +195,9 @@ public:
   void print_info(std::ostream & os=libMesh::out) const;
 
   /**
-   * Maps the points of a 1D interval quadrature rule (typically [-1,1])
-   * to any other 1D interval (typically [0,1]) and scales the weights
-   * accordingly.  The quadrature rule will be mapped from the
-   * entries of old_range to the entries of new_range.
+   * Maps the points of a 1D quadrature rule defined by "old_range" to
+   * another 1D interval defined by "new_range" and scales the weights
+   * accordingly.
    */
   void scale(std::pair<Real, Real> old_range,
              std::pair<Real, Real> new_range);
@@ -202,23 +209,19 @@ public:
 
   /**
    * Returns true if the shape functions need to be recalculated.
-   *
-   * This can happen if the number of points or their positions change.
-   *
-   * By default this will return false.
+   * This may be required if the number of quadrature points or their
+   * position changes. Returns false by default.
    */
   virtual bool shapes_need_reinit() { return false; }
 
   /**
-   * Flag (default true) controlling the use of quadrature rules with negative
-   * weights.  Set this to false to ONLY use (potentially) safer but more expensive
-   * rules with all positive weights.
+   * Flag (default true) controlling the use of quadrature rules with
+   * negative weights.  Set this to false to require rules with all
+   * positive weights.
    *
-   * Negative weights typically appear in Gaussian quadrature rules
-   * over three-dimensional elements.  Rules with negative weights can
-   * be unsuitable for some problems.  For example, it is possible for
-   * a rule with negative weights to obtain a negative result when
-   * integrating a positive function.
+   * Rules with negative weights can be unsuitable for some problems.
+   * For example, it is possible for a rule with negative weights to
+   * obtain a negative result when integrating a positive function.
    *
    * A particular example: if rules with negative weights are not allowed,
    * a request for TET,THIRD (5 points) will return the TET,FIFTH (14 points)
@@ -253,17 +256,15 @@ protected:
    * the rule will be defined by the implementing class.
    * Should not be pure virtual since a derived quadrature rule
    * may only be defined in 1D.  If not redefined, gives an
-   * error (when \p DEBUG defined) when called.
+   * error (when \p DEBUG is defined) when called.
    */
   virtual void init_2D (const ElemType,
-                        unsigned int =0)
-#ifndef DEBUG
-  {}
-#else
+                        unsigned int = 0)
   {
+#ifdef DEBUG
     libmesh_error_msg("ERROR: Seems as if this quadrature rule \nis not implemented for 2D.");
-  }
 #endif
+  }
 
   /**
    * Initializes the 3D quadrature rule by filling the points and
@@ -271,81 +272,72 @@ protected:
    * the rule will be defined by the implementing class.
    * Should not be pure virtual since a derived quadrature rule
    * may only be defined in 1D.  If not redefined, gives an
-   * error (when \p DEBUG defined) when called.
+   * error (when \p DEBUG is defined) when called.
    */
   virtual void init_3D (const ElemType,
-                        unsigned int =0)
-#ifndef DEBUG
-  {}
-#else
+                        unsigned int = 0)
   {
+#ifdef DEBUG
     libmesh_error_msg("ERROR: Seems as if this quadrature rule \nis not implemented for 3D.");
-  }
 #endif
-
+  }
 
   /**
-   * Computes the tensor product of
-   * two 1D rules and returns a 2D rule.
-   * Used in the init_2D routines for
-   * quadrilateral element types.
+   * Computes the tensor product of two 1D rules and returns a 2D
+   * rule.  Used in the init_2D routines for quadrilateral element
+   * types.
    */
   void tensor_product_quad (const QBase & q1D);
 
   /**
-   * Computes the tensor product quadrature rule
-   * [q1D x q1D x q1D] from the 1D rule q1D.
-   * Used in the init_3D routines for
+   * Computes the tensor product quadrature rule [q1D x q1D x q1D]
+   * from the 1D rule q1D.  Used in the init_3D routines for
    * hexahedral element types.
    */
   void tensor_product_hex (const QBase & q1D);
 
   /**
-   * Computes the tensor product of
-   * a 1D quadrature rule and a 2D
-   * quadrature rule.
-   * Used in the init_3D routines for
-   * prismatic element types.
+   * Computes the tensor product of a 1D quadrature rule and a 2D
+   * quadrature rule.  Used in the init_3D routines for prismatic
+   * element types.
    */
   void tensor_product_prism (const QBase & q1D, const QBase & q2D);
 
-
-
   /**
-   * The dimension
+   * The spatial dimension of the quadrature rule.
    */
   const unsigned int _dim;
 
   /**
-   * The order of the quadrature rule.
+   * The polynomial order which the quadrature rule is capable of
+   * integrating exactly.
    */
   const Order _order;
 
   /**
-   * The type of element for which the current values have
-   * been computed.
+   * The type of element for which the current values have been
+   * computed.
    */
   ElemType _type;
 
   /**
-   * The p level of element for which the current values have
+   * The p-level of the element for which the current values have
    * been computed.
    */
   unsigned int _p_level;
 
   /**
-   * The reference element locations of the
-   * quadrature points.
+   * The locations of the quadrature points in reference element
+   * space.
    */
   std::vector<Point> _points;
 
   /**
-   * The value of the quadrature weights.
+   * The quadrature weights.  The order of the weights matches the
+   * ordering of the _points vector.
    */
   std::vector<Real> _weights;
 };
-
-
 
 
 

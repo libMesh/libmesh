@@ -27,10 +27,10 @@ namespace libMesh
 {
 
 /**
- * The \p LinearPartitioner is the simplest of all possible partitioners.
- * It takes the element list and splits it into equal-sized chunks assigned
- * to each processor.  Health Warning: THIS PARTITIONER COULD BE ARBITRARILY
- * BAD!!
+ * The \p LinearPartitioner simply takes the element list and splits
+ * it into equal-sized chunks assigned to each processor.  Warning:
+ * the resulting domain decomposition can be arbitrarily bad in terms
+ * of edge-cut and other communication-based metrics!
  *
  * \author Benjamin S. Kirk
  * \date 2003
@@ -47,7 +47,7 @@ public:
 
   /**
    * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
+   * a \p UniquePtr.
    */
   virtual UniquePtr<Partitioner> clone () const libmesh_override
   {
@@ -55,6 +55,7 @@ public:
   }
 
 protected:
+
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
@@ -62,9 +63,6 @@ protected:
                               const unsigned int n) libmesh_override;
 };
 
-
 } // namespace libMesh
-
-
 
 #endif  // LIBMESH_LINEAR_PARTITIONER_H

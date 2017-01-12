@@ -27,14 +27,16 @@ namespace libMesh
 {
 
 /**
- * This class implemenets Gauss-Lobatto quadrature for 1D elements and 2D/3D
+ * This class implements Gauss-Lobatto quadrature for 1D elements and 2D/3D
  * tensor product elements.  Properties of Gauss-Lobatto quadrature rules:
  * .) Include the "end-points" of the domain (have points on edges/faces in 2D/3D).
  * .) Rules with n points can exactly integrate polynomials of degree 2n-3.
+ *
  * http://en.wikipedia.org/wiki/Gaussian_quadrature#Gauss.E2.80.93Lobatto_rules
  *
  * \author John W. Peterson
  * \date 2014
+ * \brief Implements 1D and 2/3D tensor product Gauss-Lobatto quadrature rules.
  */
 class QGaussLobatto libmesh_final : public QBase
 {
@@ -52,7 +54,7 @@ public:
   ~QGaussLobatto();
 
   /**
-   * @returns \p QGAUSS
+   * @returns \p QGAUSS_LOBATTO.
    */
   virtual QuadratureType type() const libmesh_override { return QGAUSS_LOBATTO; }
 

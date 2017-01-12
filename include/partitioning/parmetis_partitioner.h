@@ -59,7 +59,7 @@ public:
 
   /**
    * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
+   * a \p UniquePtr.
    */
   virtual UniquePtr<Partitioner> clone () const libmesh_override
   {
@@ -72,7 +72,7 @@ protected:
   /**
    * Parmetis can handle dynamically repartitioning a mesh such
    * that the redistribution costs are minimized.  This method
-   * takes a previously partitioned domain (which may have
+   * takes a previously partitioned mesh (which may have
    * then been adaptively refined) and repartitions it.
    */
   virtual void _do_repartition (MeshBase & mesh,
@@ -86,7 +86,7 @@ protected:
 
 private:
 
-  // These methods & data only need to be available if the
+  // These methods and data only need to be available if the
   // ParMETIS library is available.
 #ifdef LIBMESH_HAVE_PARMETIS
 
@@ -107,7 +107,7 @@ private:
 
   /**
    * The number of active elements on each processor.  Note that
-   * ParMETIS requires that each processor have some active elements,
+   * ParMETIS requires that each processor have some active elements;
    * it will abort if any processor passes a NULL _part array.
    */
   std::vector<dof_id_type> _n_active_elem_on_proc;
@@ -126,9 +126,6 @@ private:
 #endif
 };
 
-
 } // namespace libMesh
-
-
 
 #endif // LIBMESH_PARMETIS_PARTITIONER_H

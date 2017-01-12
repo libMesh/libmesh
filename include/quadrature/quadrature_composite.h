@@ -30,10 +30,9 @@
 #include "libmesh/fe_base.h"
 #include "libmesh/auto_ptr.h"
 
-// C++ includes
-
 namespace libMesh
 {
+
 /**
  * This class implements generic composite quadrature rules.
  * Composite quadrature rules are constructed from any of the
@@ -44,6 +43,7 @@ namespace libMesh
  *
  * \author Benjamin Kirk
  * \date 2013
+ * \brief A quadrature rule for subdivided elements.
  */
 template <class QSubCell>
 class QComposite libmesh_final : public QSubCell
@@ -70,17 +70,13 @@ public:
   ~QComposite();
 
   /**
-   * @returns \p QCOMPOSITE
+   * @returns \p QCOMPOSITE.
    */
   virtual QuadratureType type() const libmesh_override { return QCOMPOSITE; }
 
   /**
-   * Initializes the data structures for a specific, potentially cut
-   * element.  The array \p vertex_distance_func contains vertex
-   * values of a signed distance function that cuts the element.  This
-   * interface is indended to be extended by derived classes that can
-   * cut the element into subelements, for example, and constuct a
-   * composite quadrature rule for the cut element.
+   * Overrides the base class init() function, and uses the ElemCutter to
+   * subdivide the element into "inside" and "outside" subelements.
    */
   virtual void init (const Elem & elem,
                      const std::vector<Real> & vertex_distance_func,
@@ -89,7 +85,8 @@ public:
 private:
 
   /**
-   *
+   * Helper function called from init() to collect all the points and
+   * weights of the subelement quadrature rules.
    */
   void add_subelem_values (const std::vector<Elem const *> & subelem);
 
@@ -109,10 +106,7 @@ private:
   UniquePtr<FEBase> _lagrange_fe;
 };
 
-
 } // namespace libMesh
-
-
 
 #endif // LIBMESH_HAVE_TRIANGLE && LIBMESH_HAVE_TETGEN
 #endif // LIBMESH_QUADRATURE_COMPOSITE_H

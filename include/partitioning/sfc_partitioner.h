@@ -51,7 +51,7 @@ public:
 
   /**
    * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
+   * a \p UniquePtr.
    */
   virtual UniquePtr<Partitioner> clone () const libmesh_override
   {
@@ -60,9 +60,15 @@ public:
 
   /**
    * Sets the type of space-filling curve to use.  Valid types are
-   * "Hilbert" (the default) and "Morton"
+   * "Hilbert" (the default) and "Morton".
    */
-  void set_sfc_type (const std::string & sfc_type);
+  void set_sfc_type (const std::string & sfc_type)
+  {
+    libmesh_assert ((sfc_type == "Hilbert") ||
+                    (sfc_type == "Morton"));
+
+    _sfc_type = sfc_type;
+  }
 
 
 protected:
@@ -82,22 +88,6 @@ private:
   std::string _sfc_type;
 };
 
-
-
-// ------------------------------------------------------------
-// LinearPartitioner inline members
-inline
-void SFCPartitioner::set_sfc_type (const std::string & sfc_type)
-{
-  libmesh_assert ((sfc_type == "Hilbert") ||
-                  (sfc_type == "Morton"));
-
-  _sfc_type = sfc_type;
-}
-
-
 } // namespace libMesh
-
-
 
 #endif // LIBMESH_SFC_PARTITIONER_H
