@@ -62,12 +62,11 @@ public:
 
 private:
 
+  /**
+   * The optimal "conical product" rule in 1D is simply Gauss.
+   */
   virtual void init_1D (const ElemType,
-                        unsigned int =0) libmesh_override
-  {
-    // See about making this non-pure virtual in the base class
-    libmesh_not_implemented();
-  }
+                        unsigned int = 0) libmesh_override;
 
   /**
    * The conical product rules are defined in 2D only for Tris.
