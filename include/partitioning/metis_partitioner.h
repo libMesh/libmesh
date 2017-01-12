@@ -45,7 +45,7 @@ public:
 
   /**
    * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
+   * a \p UniquePtr.
    */
   virtual UniquePtr<Partitioner> clone () const libmesh_override
   {
@@ -55,6 +55,7 @@ public:
   virtual void attach_weights(ErrorVector * weights) libmesh_override { _weights = weights; }
 
 protected:
+
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
@@ -62,9 +63,6 @@ protected:
                               const unsigned int n) libmesh_override;
 };
 
-
-
 } // namespace libMesh
-
 
 #endif // LIBMESH_METIS_PARTITIONER_H

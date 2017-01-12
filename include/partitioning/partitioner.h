@@ -35,7 +35,6 @@ namespace libMesh
 class MeshBase;
 class ErrorVector;
 
-
 /**
  * The \p Partitioner class provides a uniform interface for
  * partitioning algorithms.  It takes a reference to a \p MeshBase
@@ -61,13 +60,11 @@ public:
   virtual ~Partitioner() {}
 
   /**
-   * Creates a new partitioner of this type and returns it in
-   * an \p UniquePtr.
-   * This is used when copying meshes, and must be overloaded in the
-   * derived classes.
+   * Creates a new partitioner of this type and returns it in a \p
+   * UniquePtr.  This is used when copying meshes, and must be
+   * overloaded in the derived classes.
    */
   virtual UniquePtr<Partitioner> clone () const = 0;
-
 
   /**
    * Partition the \p MeshBase into \p n parts.
@@ -83,7 +80,7 @@ public:
    * after the _do_partition() function is called.  The only
    * responsibility of the _do_partition() function, on the other
    * hand, is to set the processor IDs of the elements according to a
-   * specific partitioning algorithm.  See, e.g.  MetisPartitioner for
+   * specific partitioning algorithm.  See, e.g. MetisPartitioner for
    * an example.
    */
   virtual void partition (MeshBase & mesh,
@@ -103,16 +100,16 @@ public:
    * after the _do_partition() function is called.  The only
    * responsibility of the _do_partition() function, on the other
    * hand, is to set the processor IDs of the elements according to a
-   * specific partitioning algorithm.  See, e.g.  MetisPartitioner for
+   * specific partitioning algorithm.  See, e.g. MetisPartitioner for
    * an example.
    */
   virtual void partition (MeshBase & mesh);
 
   /**
-   * Repartitions the \p MeshBase into \p n parts.  This
-   * is required since some partitoning algorithms can repartition
-   * more efficiently than computing a new partitioning from scratch.
-   * The default behavior is to simply call this->partition(mesh,n)
+   * Repartitions the \p MeshBase into \p n parts. (Some partitoning
+   * algorithms can repartition more efficiently than computing a new
+   * partitioning from scratch.)  The default behavior is to simply
+   * call this->partition(mesh,n).
    */
   void repartition (MeshBase & mesh,
                     const unsigned int n);
@@ -125,7 +122,8 @@ public:
   void repartition (MeshBase & mesh);
 
   /**
-   * This function
+   * These functions assign processor IDs to newly-created elements
+   * (in parallel) which are currently assigned to processor 0.
    */
   static void partition_unpartitioned_elements (MeshBase & mesh);
 
@@ -134,7 +132,7 @@ public:
 
   /**
    * This function is called after partitioning to set the processor IDs
-   * for the inactive parent elements.  A Parent's processor ID is the same
+   * for the inactive parent elements.  A parent's processor ID is the same
    * as its first child.
    */
   static void set_parent_processor_ids(MeshBase & mesh);
@@ -191,9 +189,6 @@ protected:
   ErrorVector * _weights;
 };
 
-
 } // namespace libMesh
-
-
 
 #endif // LIBMESH_PARTITIONER_H
