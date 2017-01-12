@@ -131,7 +131,7 @@ void QGrundmann_Moller::gm_rule(unsigned int s, unsigned int dim)
 
 
 // This routine for computing compositions and their permutations is
-// originall due to:
+// originally due to:
 //
 // Albert Nijenhuis, Herbert Wilf,
 // Combinatorial Algorithms for Computers and Calculators,
@@ -169,9 +169,6 @@ void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositione
   // At the end, all the entries will be in the final slot of workspace
   while (workspace.back() != s)
     {
-      // Uncomment for debugging
-      //libMesh::out << "previous head_value=" << head_value << " -> ";
-
       // If the previous head value is still larger than 1, reset the index
       // to "off the front" of the array
       if (head_value > 1)
@@ -183,11 +180,6 @@ void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositione
 
       // Get current value of the head entry
       head_value = workspace[head_index];
-
-      // Uncomment for debugging
-      //std::copy(workspace.begin(), workspace.end(), std::ostream_iterator<int>(libMesh::out, " "));
-      //libMesh::out << ", head_index=" << head_index;
-      //libMesh::out << ", head_value=" << head_value << " -> ";
 
       // Put a zero into the head_index of the array.  If head_index==0,
       // this will be overwritten in the next line with head_value-1.
@@ -204,10 +196,6 @@ void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositione
 
       // Save this composition in the results
       result.push_back(workspace);
-
-      // Uncomment for debugging
-      //std::copy(workspace.begin(), workspace.end(), std::ostream_iterator<int>(libMesh::out, " "));
-      //libMesh::out<<"\n";
     }
 }
 

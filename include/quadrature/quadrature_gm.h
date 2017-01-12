@@ -23,8 +23,6 @@
 // Local includes
 #include "libmesh/quadrature.h"
 
-// C++ includes
-
 namespace libMesh
 {
 
@@ -83,17 +81,17 @@ namespace libMesh
  * \endverbatim
  *
  * Reference:
- *    Axel Grundmann and Michael M\"{o}ller,
- *    "Invariant Integration Formulas for the N-Simplex
- *    by Combinatorial Methods,"
- *    SIAM Journal on Numerical Analysis,
- *    Volume 15, Number 2, April 1978, pages 282-290.
+ *    Axel Grundmann and Michael M\"{o}ller, "Invariant Integration
+ *    Formulas for the N-Simplex by Combinatorial Methods," SIAM
+ *    Journal on Numerical Analysis, Volume 15, Number 2, April 1978,
+ *    pages 282-290.
  *
  * Reference LGPL Fortran90 code by John Burkardt can be found here:
  * http://people.scs.fsu.edu/~burkardt/f_src/gm_rules/gm_rules.html
  *
  * \author John W. Peterson
  * \date 2008
+ * \brief Implements the quadrature rules of Grundmann and Moller in 2D and 3D.
  */
 class QGrundmann_Moller libmesh_final : public QBase
 {
@@ -111,7 +109,7 @@ public:
   ~QGrundmann_Moller();
 
   /**
-   * @returns \p QGRUNDMANN_MOLLER
+   * @returns \p QGRUNDMANN_MOLLER.
    */
   virtual QuadratureType type() const libmesh_override { return QGRUNDMANN_MOLLER; }
 
@@ -154,12 +152,6 @@ private:
                    std::vector<std::vector<unsigned int> > & result);
 };
 
-
-
 } // namespace libMesh
-
-
-
-
 
 #endif // LIBMESH_QUADRATURE_GM_H

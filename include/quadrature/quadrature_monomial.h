@@ -23,40 +23,37 @@
 // Local includes
 #include "libmesh/quadrature.h"
 
-// C++ includes
-
 namespace libMesh
 {
 
 /**
- * This class defines alternate quadrature rules on
- * "tensor-product" elements (QUADs and HEXes) which can be
- * useful when integrating monomial finite element bases.
+ * This class defines alternate quadrature rules on "tensor-product"
+ * elements (quadrilaterals and hexahedra) which can be useful when
+ * integrating monomial finite element bases.
  *
- * While tensor product rules are ideal for integrating
- * bi/tri-linear, bi/tri-quadratic, etc. (i.e. tensor product)
- * bases (which consist of incomplete polynomials up to degree=
- * dim*p) they are not optimal for the MONOMIAL or FEXYZ bases,
- * which consist of complete polynomials of degree=p.
+ * While tensor product rules are optimal for integrating bi/tri-linear,
+ * bi/tri-quadratic, etc. (i.e. tensor product) bases (which consist
+ * of incomplete polynomials up to degree=dim*p) they are not optimal
+ * for the MONOMIAL or FEXYZ bases, which consist of complete
+ * polynomials of degree=p.
  *
- * This class is implemented to provide quadrature rules which are
- * more efficient than tensor product rules when they are available,
- * and fall back on Gaussian quadrature rules when necessary.
+ * This class provides quadrature rules which are more efficient than
+ * tensor product rules when they are available, and falls back on
+ * Gaussian quadrature rules otherwise.
  *
  * A number of these rules have been helpfully collected in electronic form by:
- *
  * Prof. Ronald Cools
  * Katholieke Universiteit Leuven,
  * Dept. Computerwetenschappen
  * http://www.cs.kuleuven.ac.be/~nines/research/ecf/ecf.html
+ * A username and password to access the tables is available by request.
  *
- * (A username and password to access the tables is available by request.)
- *
- * We also provide the original reference for each rule, as available,
- * in the source code file.
+ * We also provide the original reference for each rule when it is
+ * available.
  *
  * \author John W. Peterson
  * \date 2008
+ * \brief Implements quadrature rules for non-tensor polynomials.
  */
 class QMonomial libmesh_final : public QBase
 {
@@ -74,7 +71,7 @@ public:
   ~QMonomial();
 
   /**
-   * @returns \p QMONOMIAL
+   * @returns \p QMONOMIAL.
    */
   virtual QuadratureType type() const libmesh_override { return QMONOMIAL; }
 
@@ -88,13 +85,13 @@ private:
                         unsigned int =0) libmesh_override;
 
   /**
-   * More efficient rules for QUADs
+   * More efficient rules for quadrilaterals.
    */
   virtual void init_2D (const ElemType _type=INVALID_ELEM,
                         unsigned int p_level=0) libmesh_override;
 
   /**
-   * More efficient rules for HEXes
+   * More efficient rules for hexahedra.
    */
   virtual void init_3D (const ElemType _type=INVALID_ELEM,
                         unsigned int p_level=0) libmesh_override;
@@ -110,23 +107,23 @@ private:
    * for monomial bases.
    *
    * J. W. Wissman and T. Becker, Partially symmetric cubature
-   * formulas for even degrees of exactness, SIAM J. Numer. Anal.  23
+   * formulas for even degrees of exactness, SIAM J. Numer. Anal. 23
    * (1986), 676--685.
    */
   void wissmann_rule(const Real rule_data[][3],
                      const unsigned int n_pts);
 
   /**
-   * Stroud's rules for QUADs and HEXes can have one of several
+   * Stroud's rules for quads and hexes can have one of several
    * different types of symmetry.  The rule_symmetry array describes
    * how the different lines of the rule_data array are to be
    * applied.  The different rule_symmetry possibilities are:
-   * 0)  Origin or single-point: (x,y)
+   * 0) Origin or single-point: (x,y)
    * Fully-symmetric, 3 cases:
-   *   1) (x,y) -> (x,y), (-x,y), (x,-y), (-x,-y)
-   *               (y,x), (-y,x), (y,-x), (-y,-x)
-   *   2) (x,x) -> (x,x), (-x,x), (x,-x), (-x,-x)
-   *   3) (x,0) -> (x,0), (-x,0), (0, x), ( 0,-x)
+   * 1) (x,y) -> (x,y), (-x,y), (x,-y), (-x,-y)
+   *             (y,x), (-y,x), (y,-x), (-y,-x)
+   * 2) (x,x) -> (x,x), (-x,x), (x,-x), (-x,-x)
+   * 3) (x,0) -> (x,0), (-x,0), (0, x), ( 0,-x)
    * 4) Rotational Invariant, (x,y) -> (x,y), (-x,-y), (-y, x), (y,-x)
    * 5) Partial Symmetry,     (x,y) -> (x,y), (-x, y) [x!=0]
    * 6) Rectangular Symmetry, (x,y) -> (x,y), (-x, y), (-x,-y), (x,-y)
@@ -171,11 +168,14 @@ private:
    *                           [y, z, x], [z, -y, x], [-y, -z, x], [-x, z, y], [z, -x, -y],
    *                           [-z, -x, y], [-x, -z, -y], [z, x, y], [-z, x, -y]
    *
-   * Only two of Kim and Song's rules are particularly useful for FEM calculations: the degree 7,
-   * 38-point rule and their degree 8, 47-point rule.  The others either contain negative weights or points
-   * outside the reference interval.  The points and weights, to 32 digits, were obtained from:
-   * Ronald Cools' website (http://www.cs.kuleuven.ac.be/~nines/research/ecf/ecf.html) and
-   * the unique permutations of G^{rot} were computed by me [JWP] using Maple.
+   * Only two of Kim and Song's rules are particularly useful for FEM
+   * calculations: the degree 7, 38-point rule and their degree 8,
+   * 47-point rule.  The others either contain negative weights or
+   * points outside the reference interval.  The points and weights,
+   * to 32 digits, were obtained from: Ronald Cools' website
+   * (http://www.cs.kuleuven.ac.be/~nines/research/ecf/ecf.html) and
+   * the unique permutations of G^{rot} were computed by me [JWP]
+   * using Maple.
    */
   void kim_rule(const Real rule_data[][4],
                 const unsigned int * rule_id,

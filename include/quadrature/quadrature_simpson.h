@@ -23,8 +23,6 @@
 // Local includes
 #include "libmesh/quadrature.h"
 
-// C++ includes
-
 namespace libMesh
 {
 
@@ -35,6 +33,7 @@ namespace libMesh
  *
  * \author John W. Peterson
  * \date 2003
+ * \brief Implements Simpson's rule, i.e. nodal quadrature for quadratic elements.
  */
 class QSimpson : public QBase
 {
@@ -63,7 +62,7 @@ public:
   ~QSimpson() {}
 
   /**
-   * @returns \p QSIMPSON
+   * @returns \p QSIMPSON.
    */
   virtual QuadratureType type() const libmesh_override { return QSIMPSON; }
 
@@ -78,9 +77,6 @@ private:
                         unsigned int p_level=0) libmesh_override;
 };
 
-
 } // namespace libMesh
-
-
 
 #endif // LIBMESH_QUADRATURE_SIMPSON_H

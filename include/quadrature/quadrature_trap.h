@@ -23,8 +23,6 @@
 // Local includes
 #include "libmesh/quadrature.h"
 
-// C++ includes
-
 namespace libMesh
 {
 
@@ -35,6 +33,7 @@ namespace libMesh
  *
  * \author Benjamin Kirk
  * \date 2003
+ * \brief Implements trapezoidal rule, i.e. nodal quadrature for linear elements.
  */
 class QTrap : public QBase
 {
@@ -63,7 +62,7 @@ public:
   ~QTrap() {}
 
   /**
-   * @returns \p QTRAP
+   * @returns \p QTRAP.
    */
   virtual QuadratureType type() const libmesh_override { return QTRAP; }
 
