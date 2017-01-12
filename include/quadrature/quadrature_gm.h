@@ -116,12 +116,11 @@ public:
 
 private:
 
+  /**
+   * In 1D, simply use a Gauss rule.
+   */
   virtual void init_1D (const ElemType,
-                        unsigned int =0) libmesh_override
-  {
-    // See about making this non-pure virtual in the base class
-    libmesh_not_implemented();
-  }
+                        unsigned int = 0) libmesh_override;
 
   /**
    * Initialize a 3D GM rule.  Only makes sense for Tets.

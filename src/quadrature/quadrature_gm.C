@@ -17,6 +17,7 @@
 
 
 #include "libmesh/quadrature_gm.h"
+#include "libmesh/quadrature_gauss.h"
 
 namespace libMesh
 {
@@ -38,6 +39,18 @@ QGrundmann_Moller::QGrundmann_Moller(const unsigned int d,
 // Destructor
 QGrundmann_Moller::~QGrundmann_Moller()
 {
+}
+
+
+
+void QGrundmann_Moller::init_1D(const ElemType /*type_in*/,
+                                unsigned int p)
+{
+  QGauss gauss1D(1, static_cast<Order>(_order+2*p));
+
+  // Swap points and weights with the about-to-be destroyed rule.
+  _points.swap(gauss1D.get_points());
+  _weights.swap(gauss1D.get_weights());
 }
 
 
