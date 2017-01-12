@@ -92,26 +92,25 @@ public:
   virtual unsigned int n_faces() const libmesh_override { return 4; }
 
   /**
-   * @returns 4
+   * @returns 4.
    */
   virtual unsigned int n_children() const libmesh_override { return 4; }
 
   /**
-   * @returns true iff the specified (local) node number is a
+   * @returns true if the specified (local) node number is a
    * "mid-edge" node on an infinite element edge.
    */
   virtual bool is_mid_infinite_edge_node(const unsigned int i) const
     libmesh_override { return (i > 2 && i < 6); }
 
-  /*
-   * @returns true iff the specified child is on the
-   * specified side
+  /**
+   * @returns true if the specified child is on the specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
                                 const unsigned int s) const libmesh_override;
 
-  /*
-   * @returns true iff the specified edge is on the specified side
+  /**
+   * @returns true if the specified edge is on the specified side.
    */
   virtual bool is_edge_on_side(const unsigned int e,
                                const unsigned int s) const libmesh_override;

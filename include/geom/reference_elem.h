@@ -24,8 +24,6 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/enum_elem_type.h"
 
-// C++ includes
-
 namespace libMesh
 {
 

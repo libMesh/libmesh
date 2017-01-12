@@ -33,8 +33,6 @@
 // C++ includes
 #include <vector>
 
-
-
 namespace libMesh
 {
 

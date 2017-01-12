@@ -26,9 +26,6 @@
 namespace libMesh
 {
 
-
-
-
 /**
  * The \p Tet is an element in 3D composed of 4 sides.
  *
@@ -66,7 +63,7 @@ public:
   }
 
   /**
-   * @returns 4
+   * @returns 4.
    */
   virtual unsigned int n_sides() const libmesh_override { return 4; }
 
@@ -86,12 +83,12 @@ public:
   virtual unsigned int n_faces() const libmesh_override { return 4; }
 
   /**
-   * @returns 8
+   * @returns 8.
    */
   virtual unsigned int n_children() const libmesh_override { return 8; }
 
-  /*
-   * @returns true iff the specified edge is on the specified side
+  /**
+   * @returns true if the specified edge is on the specified side.
    */
   virtual bool is_edge_on_side(const unsigned int e,
                                const unsigned int s) const libmesh_override;
@@ -109,8 +106,7 @@ public:
   virtual dof_id_type key (const unsigned int s) const libmesh_override;
 
   /**
-   * @returns a primitive (3-noded) triangle for
-   * face i.
+   * @returns a primitive (3-noded) triangle for face i.
    */
   virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;
 
@@ -121,9 +117,9 @@ public:
   virtual Real quality (const ElemQuality q) const libmesh_override;
 
   /**
-   * Returns the suggested quality bounds for
-   * the hex based on quality measure q.  These are
-   * the values suggested by the CUBIT User's Manual.
+   * Returns the suggested quality bounds for the hex based on quality
+   * measure q.  These are the values suggested by the CUBIT User's
+   * Manual.
    */
   virtual std::pair<Real, Real> qual_bounds (const ElemQuality q) const libmesh_override;
 

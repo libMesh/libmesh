@@ -24,9 +24,6 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/edge.h"
 
-// C++ includes
-#include <cstddef>
-
 namespace libMesh
 {
 
@@ -36,8 +33,8 @@ namespace libMesh
  * It is numbered like this:
  *
  * \verbatim
- *  EGDE4: o----o----o----o
- *         0    2    3    1
+ *   EGDE4: o----o----o----o
+ *          0    2    3    1
  * \endverbatim
  *
  * \author David Knezevic
@@ -68,57 +65,57 @@ public:
   }
 
   /**
-   * @returns 4
+   * @returns 4.
    */
   virtual unsigned int n_nodes() const libmesh_override { return 4; }
 
   /**
-   * @returns 2
+   * @returns 2.
    */
   virtual unsigned int n_sub_elem() const libmesh_override { return 2; }
 
   /**
-   * @returns true iff the specified (local) node number is a vertex.
+   * @returns true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true iff the specified (local) node number is an edge.
+   * @returns true if the specified (local) node number is an edge.
    */
   virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true iff the specified (local) node number is a face.
+   * @returns true if the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const libmesh_override;
 
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified side
+  /**
+   * @returns true if the specified (local) node number is on the
+   * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
                                const unsigned int s) const libmesh_override;
 
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified edge (i.e. "returns true" in 1D)
+  /**
+   * @returns true if the specified (local) node number is on the
+   * specified edge (i.e. "returns true" in 1D).
    */
   virtual bool is_node_on_edge(const unsigned int n,
                                const unsigned int e) const libmesh_override;
 
-  /*
-   * @returns true iff the element map is definitely affine within
-   * numerical tolerances
+  /**
+   * @returns true if the element map is definitely affine within
+   * numerical tolerances.
    */
   virtual bool has_affine_map () const libmesh_override;
 
   /**
-   * @returns \p EDGE4
+   * @returns \p EDGE4.
    */
   virtual ElemType type() const libmesh_override { return EDGE4; }
 
   /**
-   * @returns THIRD
+   * @returns THIRD.
    */
   virtual Order default_order() const libmesh_override { return THIRD; }
 
@@ -170,7 +167,7 @@ public:
 protected:
 
   /**
-   * Data for links to nodes
+   * Data for links to nodes.
    */
   Node * _nodelinks_data[4];
 

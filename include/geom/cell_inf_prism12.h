@@ -27,37 +27,31 @@
 // Local includes
 #include "libmesh/cell_inf_prism.h"
 
-// C++ includes
-#include <cstddef>
-
 namespace libMesh
 {
-
-
-
 
 /**
  * The \p InfPrism12 is an infinite element in 3D composed of 12 nodes.
  * It is numbered like this:
  * \verbatim
- * INFPRISM12:
- *          5
- *          o
- *          :
- *          :
- *          :
- *   11 o   :   o 10
- *      :  2:   :
- *      :   o   :        closer to infinity
- *      :  . .  :
- * 3o   : . o9. :   o4
- *  |   :.  |  .:   |
- *  |   o   |   o   |
- *  |  . 8  |  7 .  |
- *  | .     |     . |
- *  |.      |      .|     base face
- *  o-------o-------o
- *  0       6       1
+ *   INFPRISM12:
+ *            5
+ *            o
+ *            :
+ *            :
+ *            :
+ *     11 o   :   o 10
+ *        :  2:   :
+ *        :   o   :        closer to infinity
+ *        :  . .  :
+ *   3o   : . o9. :   o4
+ *    |   :.  |  .:   |
+ *    |   o   |   o   |
+ *    |  . 8  |  7 .  |
+ *    | .     |     . |
+ *    |.      |      .|     base face
+ *    o-------o-------o
+ *    0       6       1
  * \endverbatim
  *
  * \author Daniel Dreyer
@@ -82,46 +76,46 @@ public:
   virtual unsigned int n_nodes() const libmesh_override { return 12; }
 
   /**
-   * @returns \p INFPRISM12
+   * @returns \p INFPRISM12.
    */
   virtual ElemType type () const libmesh_override { return INFPRISM12; }
 
   /**
-   * @returns 4
+   * @returns 4.
    */
   virtual unsigned int n_sub_elem() const libmesh_override { return 4; }
 
   /**
-   * @returns true iff the specified (local) node number is a vertex.
+   * @returns true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true iff the specified (local) node number is an edge.
+   * @returns true if the specified (local) node number is an edge.
    */
   virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true iff the specified (local) node number is a face.
+   * @returns true if the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const libmesh_override;
 
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified side
+  /**
+   * @returns true if the specified (local) node number is on the
+   * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
                                const unsigned int s) const libmesh_override;
 
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified edge
+  /**
+   * @returns true if the specified (local) node number is on the
+   * specified edge.
    */
   virtual bool is_node_on_edge(const unsigned int n,
                                const unsigned int e) const libmesh_override;
 
   /**
-   * @returns SECOND
+   * @returns SECOND.
    */
   virtual Order default_order() const libmesh_override { return SECOND; }
 
@@ -145,7 +139,7 @@ public:
                             std::vector<dof_id_type> & conn) const libmesh_override;
 
   /**
-   * @returns 2 for all \p n
+   * @returns 2 for all \p n.
    */
   virtual unsigned int n_second_order_adjacent_vertices (const unsigned int) const libmesh_override
   { return 2; }
@@ -183,7 +177,7 @@ public:
 protected:
 
   /**
-   * Data for links to nodes
+   * Data for links to nodes.
    */
   Node * _nodelinks_data[12];
 

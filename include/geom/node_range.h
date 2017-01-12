@@ -24,8 +24,6 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/stored_range.h"
 
-// C++ includes
-
 namespace libMesh
 {
 

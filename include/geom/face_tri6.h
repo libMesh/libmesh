@@ -20,13 +20,9 @@
 #ifndef LIBMESH_FACE_TRI6_H
 #define LIBMESH_FACE_TRI6_H
 
-
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/face_tri.h"
-
-// C++ includes
-#include <cstddef>
 
 namespace libMesh
 {
@@ -35,15 +31,15 @@ namespace libMesh
  * The \p Tri6 is an element in 2D composed of 6 nodes.
  * It is numbered like this:
  * \verbatim
- *  TRI6:  2
- *         o
- *        / \
- *       /   \
- *    5 o     o 4
- *     /       \
- *    /         \
- *   o-----o-----o
- *   0     3     1
+ *   TRI6:  2
+ *          o
+ *         / \
+ *        /   \
+ *     5 o     o 4
+ *      /       \
+ *     /         \
+ *    o-----o-----o
+ *    0     3     1
  * \endverbatim
  *
  * \author Benjamin S. Kirk
@@ -62,58 +58,58 @@ public:
     Tri(Tri6::n_nodes(), p, _nodelinks_data) {}
 
   /**
-   * @returns \p TRI6
+   * @returns \p TRI6.
    */
   virtual ElemType type () const libmesh_override { return TRI6; }
 
   /**
-   * @returns 6
+   * @returns 6.
    */
   virtual unsigned int n_nodes() const libmesh_override { return 6; }
 
   /**
-   * @returns 4
+   * @returns 4.
    */
   virtual unsigned int n_sub_elem() const libmesh_override { return 4; }
 
   /**
-   * @returns true iff the specified (local) node number is a vertex.
+   * @returns true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true iff the specified (local) node number is an edge.
+   * @returns true if the specified (local) node number is an edge.
    */
   virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true iff the specified (local) node number is a face.
+   * @returns true if the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const libmesh_override;
 
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified side
+  /**
+   * @returns true if the specified (local) node number is on the
+   * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
                                const unsigned int s) const libmesh_override;
 
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified edge (== is_node_on_side in 2D)
+  /**
+   * @returns true if the specified (local) node number is on the
+   * specified edge (== is_node_on_side in 2D).
    */
   virtual bool is_node_on_edge(const unsigned int n,
                                const unsigned int e) const libmesh_override
   { return this->is_node_on_side(n,e); }
 
-  /*
-   * @returns true iff the element map is definitely affine within
-   * numerical tolerances
+  /**
+   * @returns true if the element map is definitely affine within
+   * numerical tolerances.
    */
   virtual bool has_affine_map () const libmesh_override;
 
   /**
-   * @returns SECOND
+   * @returns SECOND.
    */
   virtual Order default_order() const libmesh_override { return SECOND; }
 
@@ -141,7 +137,7 @@ public:
                             std::vector<dof_id_type> & conn) const libmesh_override;
 
   /**
-   * @returns 2 for all \p n
+   * @returns 2 for all \p n.
    */
   virtual unsigned int n_second_order_adjacent_vertices (const unsigned int) const libmesh_override
   { return 2; }
@@ -177,7 +173,7 @@ public:
 protected:
 
   /**
-   * Data for links to nodes
+   * Data for links to nodes.
    */
   Node * _nodelinks_data[6];
 

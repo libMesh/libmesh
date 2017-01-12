@@ -27,29 +27,26 @@
 // Local includes
 #include "libmesh/elem.h"
 
-// C++ includes
-
 namespace libMesh
 {
 
 /**
- * The \p InfQuad is an abstract element type that lives in
- * two dimensions.  Here, an infinite face is @e always a quadrilateral,
- * so this class is directly derived from \p Elem, without an intermediate
- * \p InfFace class or so.
+ * The \p InfQuad is an abstract element type that lives in two
+ * dimensions.  Here, an infinite face is \e always a quadrilateral,
+ * so this class is directly derived from \p Elem, without an
+ * intermediate \p InfFace class.
+ *
  * It looks like this:
  * \verbatim
+ *                                   closer to infinity
+ *          |           |
+ *          |           |
+ *   side 2 |           | side 1
+ *          |           |
+ *          |           |
+ *           -----------             base side
  *
- *                                 closer to infinity
- *        |           |
- *        |           |
- * side 2 |           | side 1
- *        |           |
- *        |           |
- *         -----------             base side
- *
- *           side 0
- *
+ *             side 0
  * \endverbatim
  *
  * \author Daniel Dreyer
@@ -110,26 +107,24 @@ public:
   virtual unsigned int n_edges() const libmesh_override { return 3; }
 
   /**
-   * @returns 0.  All 2D elements have no faces, just
-   * edges.
+   * @returns 0.  All 2D elements have no faces, just edges.
    */
   virtual unsigned int n_faces() const libmesh_override { return 0; }
 
   /**
-   * @returns 2
+   * @returns 2.
    */
   virtual unsigned int n_children() const libmesh_override { return 2; }
 
   /**
-   * @returns true iff the specified (local) node number is a
+   * @returns true if the specified (local) node number is a
    * "mid-edge" node on an infinite element edge.
    */
   virtual bool is_mid_infinite_edge_node(const unsigned int i) const
     libmesh_override { return (i > 2 && i < 4); }
 
-  /*
-   * @returns true iff the specified child is on the
-   * specified side
+  /**
+   * @returns true if the specified child is on the specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
                                 const unsigned int s) const libmesh_override;
@@ -147,19 +142,18 @@ public:
   virtual dof_id_type key (const unsigned int s) const libmesh_override;
 
   /**
-   * @returns a primitive (2-noded) edge or infedge for
-   * edge \p i.
+   * @returns a primitive (2-noded) edge or infedge for edge \p i.
    */
   virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;
 
   /**
-   * build_edge_ptr() and build_side_ptr() are identical in 2D
+   * build_edge_ptr() and build_side_ptr() are identical in 2D.
    */
   virtual UniquePtr<Elem> build_edge_ptr (const unsigned int i) libmesh_override
   { return build_side_ptr(i); }
 
-  /*
-   * is_edge_on_side is trivial in 2D
+  /**
+   * is_edge_on_side is trivial in 2D.
    */
   virtual bool is_edge_on_side(const unsigned int e,
                                const unsigned int s) const libmesh_override

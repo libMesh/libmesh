@@ -25,20 +25,13 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/face.h"
 
-// C++ includes
-
 namespace libMesh
 {
-
-
-// Forward declarations
-
 
 /**
  * The \p QUAD is an element in 2D composed of 4 sides.
  * It looks like this:
  * \verbatim
- *
  *        o-----------o
  *        |           |
  *        |           |
@@ -46,7 +39,6 @@ namespace libMesh
  *        |           |
  *        |           |
  *        o-----------o
- *
  * \endverbatim
  *
  * \author Benjamin S. Kirk
@@ -88,7 +80,7 @@ public:
   virtual unsigned int n_nodes() const libmesh_override { return 4; }
 
   /**
-   * @returns 4
+   * @returns 4.
    */
   virtual unsigned int n_sides() const libmesh_override { return 4; }
 
@@ -103,13 +95,13 @@ public:
   virtual unsigned int n_edges() const libmesh_override { return 4; }
 
   /**
-   * @returns 4
+   * @returns 4.
    */
   virtual unsigned int n_children() const libmesh_override { return 4; }
 
-  /*
-   * @returns true iff the specified child is on the
-   * specified side
+  /**
+   * @returns true if the specified child is on the
+   * specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
                                 const unsigned int s) const libmesh_override;
@@ -148,8 +140,7 @@ public:
   virtual dof_id_type key () const libmesh_override;
 
   /**
-   * @returns a primitive (2-noded) edge for
-   * edge i.
+   * @returns a primitive (2-noded) edge for edge i.
    */
   virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;
 

@@ -23,14 +23,8 @@
 // Local includes
 #include "libmesh/cell_pyramid.h"
 
-// C++ includes
-#include <cstddef>
-
 namespace libMesh
 {
-
-
-
 
 /**
  * The \p Pyramid13 is an element in 3D composed of 13 nodes, designed
@@ -39,36 +33,34 @@ namespace libMesh
  * with linear pyramids, but as of version 14 will not export
  * quadratic pyramids.  Paraview should support 13-node pyramids...
  *
- * \author John W. Peterson
- * \date 2014
- *
  * The node numbering for the pyramid13 is given below:
  * \verbatim
- * PYRAMID13:
- *                     o 4
- *                   //|\
- *                  // | \
- *                 //  |  \
- *                //   |   \
- *            12 o/    |    o 11
- *              //     |     \
- *             /o 9    o 10   \
- *            //       |       \
- *           //        |        \
- *        3 o/.......o.|........o 2
- *         ./       7  |       /
- *        ./           |      /
- *       ./            |     /
- *      ./             |    /
- *   8 o/              |   o 6
- *    ./               |  /
- *   ./                | /
- *  ./                 |/
- *  o--------o---------o
- *  0        5         1
- *
+ *   PYRAMID13:
+ *                       o 4
+ *                     //|\
+ *                    // | \
+ *                   //  |  \
+ *                  //   |   \
+ *              12 o/    |    o 11
+ *                //     |     \
+ *               /o 9    o 10   \
+ *              //       |       \
+ *             //        |        \
+ *          3 o/.......o.|........o 2
+ *           ./       7  |       /
+ *          ./           |      /
+ *         ./            |     /
+ *        ./             |    /
+ *     8 o/              |   o 6
+ *      ./               |  /
+ *     ./                | /
+ *    ./                 |/
+ *    o--------o---------o
+ *    0        5         1
  * \endverbatim
  *
+ * \author John W. Peterson
+ * \date 2014
  * \brief A 3D pyramid element with 13 nodes.
  */
 class Pyramid13 libmesh_final : public Pyramid
@@ -89,53 +81,53 @@ public:
   virtual unsigned int n_nodes() const libmesh_override { return 13; }
 
   /**
-   * @returns \p PRYAMID13
+   * @returns \p PRYAMID13.
    */
   virtual ElemType type () const libmesh_override { return PYRAMID13; }
 
   /**
    * FIXME: we don't yet have a refinement pattern for pyramids...
-   * @returns 1
+   * @returns 1.
    */
   virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
 
   /**
-   * @returns true iff the specified (local) node number is a vertex.
+   * @returns true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true iff the specified (local) node number is an edge.
+   * @returns true if the specified (local) node number is an edge.
    */
   virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true iff the specified (local) node number is a face.
+   * @returns true if the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const libmesh_override;
 
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified side
+  /**
+   * @returns true if the specified (local) node number is on the
+   * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
                                const unsigned int s) const libmesh_override;
 
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified edge
+  /**
+   * @returns true if the specified (local) node number is on the
+   * specified edge.
    */
   virtual bool is_node_on_edge(const unsigned int n,
                                const unsigned int e) const libmesh_override;
 
-  /*
-   * @returns true iff the element map is definitely affine within
-   * numerical tolerances
+  /**
+   * @returns true if the element map is definitely affine within
+   * numerical tolerances.
    */
   virtual bool has_affine_map () const libmesh_override;
 
   /**
-   * @returns SECOND
+   * @returns SECOND.
    */
   virtual Order default_order() const libmesh_override { return SECOND; }
 
@@ -157,7 +149,7 @@ public:
                             std::vector<dof_id_type> & conn) const libmesh_override;
 
   /**
-   * @returns 2 for all edge nodes
+   * @returns 2 for all edge nodes.
    */
   virtual unsigned int n_second_order_adjacent_vertices (const unsigned int n) const libmesh_override;
 
@@ -188,7 +180,7 @@ public:
 protected:
 
   /**
-   * Data for links to nodes
+   * Data for links to nodes.
    */
   Node * _nodelinks_data[13];
 

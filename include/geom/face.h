@@ -23,19 +23,12 @@
 // Local includes
 #include "libmesh/elem.h"
 
-
 namespace libMesh
 {
 
-// Forward declarations
-class Mesh;
-
-
-
 /**
- * The \p Face is an abstract element type that lives in
- * two dimensions.  A face could be a triangle, a quadrilateral,
- * a pentagon, etc...
+ * The \p Face is an abstract element type that lives in two
+ * dimensions.  A face can be a triangle or quadrilateral in general.
  *
  * \author Benjamin S. Kirk
  * \date 2002
@@ -68,13 +61,13 @@ public:
   virtual unsigned int n_faces() const libmesh_override { return 0; }
 
   /**
-   * build_side and build_edge are identical for faces
+   * build_side and build_edge are identical for faces.
    */
   virtual UniquePtr<Elem> build_edge_ptr (const unsigned int i) libmesh_override
   { return build_side_ptr(i); }
 
-  /*
-   * is_edge_on_side is trivial in 2D
+  /**
+   * is_edge_on_side is trivial in 2D.
    */
   virtual bool is_edge_on_side(const unsigned int e,
                                const unsigned int s) const libmesh_override

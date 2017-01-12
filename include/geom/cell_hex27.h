@@ -23,17 +23,14 @@
 // Local includes
 #include "libmesh/cell_hex.h"
 
-// C++ includes
-#include <cstddef>
-
 namespace libMesh
 {
 
 /**
  * The \p Hex27 is an element in 3D composed of 27 nodes.
  * It is numbered like this:
- *  \verbatim
- *  HEX27:      7              18             6
+ * \verbatim
+ *   HEX27:     7              18             6
  *              o--------------o--------------o
  *             /:             /              /|
  *            / :            /              / |
@@ -60,7 +57,7 @@ namespace libMesh
  *    |.             |              |/
  *    o--------------o--------------o
  *    0              8              1
- *  \endverbatim
+ * \endverbatim
  *
  * \author Benjamin S. Kirk
  * \date 2002
@@ -79,57 +76,57 @@ public:
   {}
 
   /**
-   * @returns \p HEX27
+   * @returns \p HEX27.
    */
   virtual ElemType type () const libmesh_override { return HEX27; }
 
   /**
-   * @returns 27
+   * @returns 27.
    */
   virtual unsigned int n_nodes() const libmesh_override { return 27; }
 
   /**
-   * @returns 8
+   * @returns 8.
    */
   virtual unsigned int n_sub_elem() const libmesh_override { return 8; }
 
   /**
-   * @returns true iff the specified (local) node number is a vertex.
+   * @returns true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true iff the specified (local) node number is an edge.
+   * @returns true if the specified (local) node number is an edge.
    */
   virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true iff the specified (local) node number is a face.
+   * @returns true if the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const libmesh_override;
 
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified side
+  /**
+   * @returns true if the specified (local) node number is on the
+   * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
                                const unsigned int s) const libmesh_override;
 
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified edge
+  /**
+   * @returns true if the specified (local) node number is on the
+   * specified edge.
    */
   virtual bool is_node_on_edge(const unsigned int n,
                                const unsigned int e) const libmesh_override;
 
-  /*
-   * @returns true iff the element map is definitely affine within
-   * numerical tolerances
+  /**
+   * @returns true if the element map is definitely affine within
+   * numerical tolerances.
    */
   virtual bool has_affine_map () const libmesh_override;
 
   /**
-   * @returns SECOND
+   * @returns SECOND.
    */
   virtual Order default_order() const libmesh_override { return SECOND; }
 
@@ -168,7 +165,7 @@ public:
 
   /**
    * @returns 2 for all edge nodes, 4 for all face nodes, and
-   * 8 for the bubble node
+   * 8 for the bubble node.
    */
   virtual unsigned int n_second_order_adjacent_vertices (const unsigned int) const libmesh_override;
 
@@ -209,7 +206,7 @@ protected:
 
 
   /**
-   * Data for links to nodes
+   * Data for links to nodes.
    */
   Node * _nodelinks_data[27];
 

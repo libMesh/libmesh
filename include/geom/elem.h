@@ -56,34 +56,27 @@ class PointLocatorBase;
 #endif
 
 /**
- * This is the base class from which all geometric entities
- * (elements) are derived.  The \p Elem class contains information
- * that every entity might need, such as its number of nodes and
- * pointers to the nodes to which it is connected.  This class
- * also provides virtual functions that will be overloaded by
- * derived classes.  These functions provide information such as
- * the number of sides the element has, who its neighbors are,
- * how many children it might have, and who they are.
+ * This is the base class from which all geometric element types are
+ * derived.  The \p Elem class provides standard information such as
+ * the number of nodes, edges, faces, vertices, children, and
+ * neighbors it has, as well as access to (or the ability to
+ * construct) these entities.
  *
- * In an \p Elem becomes an \p Edge in 1D, a \p Face in 2D, and a \p
- * Cell in 3D.  An \p Elem is composed of a number of sides, which you
- * may access as \p Elem types in dimension \p D-1.  For example, a
- * concrete element type in 3D is a \p Hex8, which is a hexahedral. A
- * \p Hex8 has 6 sides, which are \p Faces.  You may access these
- * sides.
+ * An \p Elem has pointers to its \p Node objects.  Some of these
+ * nodes live at the vertices of the element, while others may live on
+ * edges (and faces in 3D), or interior to the element.  The number of
+ * nodes in a given element, \p n_nodes(), is encoded into the name of
+ * the class.  For example, a \p Tri3 has three nodes which correspond
+ * to the vertices, while a \p Tri6 has six nodes, three of which are
+ * located at vertices, and three which are located at the midpoint of
+ * each edge.  Nodes on edges, faces, and element interiors are called
+ * \e second-order nodes.
  *
- * An \p Elem is composed of a number of \p Node objects.  Some of
- * these nodes live at the vertices of the element, and others may
- * live on edges (and faces in 3D) or interior to the element.  The
- * number of vertices an element contains \p n_vertices() is
- * determined strictly by the type of geometric object it corresponds
- * to.  For example, a \p Tri is a type of \p Face that always
- * contains 3 vertices.  A \p Tri3 is a specific triangular element
- * type with three 3 nodes, all located at the vertices.  A \p Tri6 is
- * another triangular element with 6 nodes, 3 of which are located at
- * vertices and another 3 that live on the edges.
- * In all that follows, nodes that live either on edges, faces or the
- * interior are named @e second-order nodes.
+ * A 1D Elem is an \p Edge, a 2D Elem is a \p Face, and a 3D Elem is a
+ * \p Cell.  An \p Elem is composed of a number of sides, which can
+ * be accessed as dim-1 dimensional \p Elem types.  For example, a \p
+ * Hex8 is a 3D hexahedral element. A \p Hex8 has 6 sides, which are
+ * \p Faces of type Quad4.
  *
  * \author Benjamin S. Kirk
  * \date 2002-2007
@@ -346,9 +339,9 @@ public:
   bool is_semilocal (const processor_id_type my_pid) const;
 
   /**
-   * This function tells you which neighbor you \p (e) are.
+   * This function tells you which neighbor \p e is.
    * I.e. if s = a->which_neighbor_am_i(e); then
-   * a->neighbor(s) will be an ancestor of e;
+   * a->neighbor(s) will be an ancestor of e.
    */
   unsigned int which_neighbor_am_i(const Elem * e) const;
 
@@ -357,18 +350,18 @@ public:
    * I.e. if e = a->build_side_ptr(s) or e = a->side_ptr(s); then
    * a->which_side_am_i(e) will be s.
    *
-   * Returns \p invalid_uint if \p e is not a side of \p this
+   * Returns \p invalid_uint if \p e is not a side of \p this.
    */
   unsigned int which_side_am_i(const Elem * e) const;
 
   /**
-   * This function returns true iff a vertex of e is contained
-   * in this element
+   * This function returns true if a vertex of \p e is contained
+   * in this element.
    */
   bool contains_vertex_of(const Elem * e) const;
 
   /**
-   * This function returns true iff an edge of \p e is contained in
+   * This function returns true if an edge of \p e is contained in
    * this element.  (Internally, this is done by checking whether at
    * least two vertices of \p e are contained in this element).
    */
@@ -396,14 +389,14 @@ public:
   /**
    * This function finds all active elements (including this one) in
    * the same manifold as this element which touch this active element
-   * at any point
+   * at any point.
    */
   void find_point_neighbors(std::set<const Elem *> & neighbor_set) const;
 
   /**
    * This function finds all active elements (including this one) in
    * the same manifold as start_elem (which must be active and must
-   * touch this element) which touch this element at any point
+   * touch this element) which touch this element at any point.
    */
   void find_point_neighbors(std::set<const Elem *> & neighbor_set,
                             const Elem * start_elem) const;
@@ -411,7 +404,7 @@ public:
   /**
    * This function finds all active elements in the same manifold as
    * this element which touch the current active element along the
-   * whole edge defined by the two points \p p1 and \p p2
+   * whole edge defined by the two points \p p1 and \p p2.
    */
   void find_edge_neighbors(const Point & p1,
                            const Point & p2,
@@ -452,14 +445,14 @@ public:
   void make_links_to_me_local (unsigned int n);
 
   /**
-   * Returns true if this element is remote, false otherwise.
-   * A remote element (see \p RemoteElem) is a syntactic convenience --
+   * Returns true if this element is remote, false otherwise.  A
+   * remote element (see \p RemoteElem) is a syntactic convenience --
    * it is a placeholder for an element which exists on some other
    * processor.  Local elements are required to have valid neighbors,
    * and these ghost elements may have remote neighbors for data
-   * structure consistency.  The use of remote elements helps assure
-   * that any element we may access has a NULL neighbor if and only if
-   * it lies on the physical boundary of the domain.
+   * structure consistency.  The use of remote elements helps ensure
+   * that any element we may access has a NULL neighbor only if it
+   * lies on the physical boundary of the domain.
    */
   virtual bool is_remote () const
   { return false; }
@@ -531,7 +524,7 @@ public:
    * @returns the number of neighbors the element that has been derived
    * from this class has.  By default only face (or edge in 2D)
    * neighbors are stored, so this method returns n_sides(),
-   * however it may be overloaded in a derived class
+   * however it may be overloaded in a derived class.
    */
   virtual unsigned int n_neighbors () const
   { return this->n_sides(); }
@@ -567,12 +560,12 @@ public:
   virtual unsigned int n_children () const = 0;
 
   /**
-   * @returns true iff the specified (local) node number is a vertex.
+   * @returns true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int i) const = 0;
 
   /**
-   * @returns true iff the specified child has a vertex at the
+   * @returns true if the specified child has a vertex at the
    * specified (child-local) node number.
    * Except in odd cases like pyramid refinement the child will have
    * the same local structure as the parent element.
@@ -582,49 +575,49 @@ public:
   { return this->is_vertex(n); }
 
   /**
-   * @returns true iff this element has a vertex at the specified
+   * @returns true if this element has a vertex at the specified
    * (child-local) node number \p n of the specified child \p c.
    */
   virtual bool is_vertex_on_parent(unsigned int c,
                                    unsigned int n) const;
 
   /**
-   * @returns true iff the specified (local) node number is an edge.
+   * @returns true if the specified (local) node number is an edge.
    */
   virtual bool is_edge(const unsigned int i) const = 0;
 
   /**
-   * @returns true iff the specified (local) node number is a face.
+   * @returns true if the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const = 0;
 
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified side
+  /**
+   * @returns true if the specified (local) node number is on the
+   * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
                                const unsigned int s) const = 0;
 
-  /*
-   * @returns true iff the specified (local) node number is on the
-   * specified edge
+  /**
+   * @returns true if the specified (local) node number is on the
+   * specified edge.
    */
   virtual bool is_node_on_edge(const unsigned int n,
                                const unsigned int e) const = 0;
 
-  /*
-   * @returns true iff the specified edge is on the specified side
+  /**
+   * @returns true if the specified edge is on the specified side.
    */
   virtual bool is_edge_on_side(const unsigned int e,
                                const unsigned int s) const = 0;
 
-  /*
+  /**
    * @returns the side number opposite to \p s (for a tensor product
    * element), or throws an error otherwise.
    */
   virtual unsigned int opposite_side(const unsigned int s) const;
 
-  /*
+  /**
    * @returns the local node number for the node opposite to node n
    * on side \p opposite_side(s) (for a tensor product element), or
    * throws an error otherwise.
@@ -642,10 +635,10 @@ public:
   /**
    * @returns a proxy element coincident with side \p i.  This method returns
    * the _minimum_ element necessary to uniquely identify the side.  So,
-   * for example, the side of a hexahedral is always returned as a 4-noded
+   * for example, the side of a hexahedron is always returned as a 4-noded
    * quadrilateral, regardless of what type of hex you are dealing with.  If
    * you want the full-ordered face (i.e. a 9-noded quad face for a 27-noded
-   * hexahedral) use the build_side method.
+   * hexahedron) use the build_side method.
    */
   virtual UniquePtr<Elem> side_ptr (unsigned int i) = 0;
   UniquePtr<const Elem> side_ptr (unsigned int i) const;
@@ -747,11 +740,10 @@ public:
   virtual Real quality (const ElemQuality q) const;
 
   /**
-   * Returns the suggested quality bounds for
-   * the hex based on quality measure q.  These are
-   * the values suggested by the CUBIT User's Manual.
-   * Since this function can have no possible meaning
-   * for an abstract Elem, it is an error.
+   * Returns the suggested quality bounds for the Elem based on
+   * quality measure q.  These are the values suggested by the CUBIT
+   * User's Manual.  Since this function can have no possible meaning
+   * for an abstract Elem, it is an error in the base class.
    */
   virtual std::pair<Real,Real> qual_bounds (const ElemQuality) const
   { libmesh_not_implemented(); return std::make_pair(0.,0.); }
@@ -790,14 +782,14 @@ private:
 
 public:
   /**
-   * @returns true iff the element map is definitely affine (i.e. the same at
-   * every quadrature point) within numerical tolerances
+   * @returns true if the element map is definitely affine (i.e. the same at
+   * every quadrature point) within numerical tolerances.
    */
   virtual bool has_affine_map () const { return false; }
 
   /**
-   * @returns true iff the Lagrange shape functions on this element
-   * are linear
+   * @returns true if the Lagrange shape functions on this element
+   * are linear.
    */
   virtual bool is_linear () const { return false; }
 
@@ -813,7 +805,7 @@ public:
 
   /**
    * @returns \p true if the element is active (i.e. has no active
-   * descendants), \p false  otherwise. Note that it suffices to check the
+   * descendants), \p false otherwise. Note that it suffices to check the
    * first child only. Always returns \p true if AMR is disabled.
    */
   bool active () const;
@@ -834,7 +826,7 @@ public:
 
   /**
    * @returns \p true if the element has any children (active or not),
-   * \p false  otherwise. Always returns \p false if AMR is disabled.
+   * \p false otherwise. Always returns \p false if AMR is disabled.
    */
   bool has_children () const;
 
@@ -847,26 +839,26 @@ public:
 
   /**
    * @returns \p true if \p descendant is a child of \p this, or a
-   * child of a child of \p this, etc.
-   * Always returns \p false if AMR is disabled.
+   * child of a child of \p this, etc. Always returns \p false if AMR
+   * is disabled.
    */
   bool is_ancestor_of(const Elem * descendant) const;
 
   /**
    * @returns a const pointer to the element's parent.  Returns \p NULL if
-   * the element was not created via refinement, i.e. was read from file.
+   * the element was not created via refinement.
    */
   const Elem * parent () const;
 
   /**
    * @returns a pointer to the element's parent.  Returns \p NULL if
-   * the element was not created via refinement, i.e. was read from file.
+   * the element was not created via refinement.
    */
   Elem * parent ();
 
   /**
    * Sets the pointer to the element's parent.
-   * Dangerous to use in high-level code.
+   * Dangerous! Only use this if you know what you are doing!
    */
   void set_parent (Elem * p);
 
@@ -896,54 +888,59 @@ public:
 
   /**
    * Sets the pointer to the element's interior_parent.
-   * Dangerous to use in high-level code.
+   * Dangerous! Only use this if you know what you are doing!
    */
   void set_interior_parent (Elem * p);
 
   /**
-   * @returns the magnitude of the distance between nodes n1 and n2.
+   * @returns the distance between nodes n1 and n2.
    * Useful for computing the lengths of the sides of elements.
    */
   Real length (const unsigned int n1,
                const unsigned int n2) const;
 
   /**
-   * @returns the number of adjacent vertices, that uniquely define
+   * @returns the number of adjacent vertices that uniquely define
    * the location of the \f$ n^{th} \f$ @e second-order node.  For linear
-   * elements ( \p default_order()==FIRST ), this returns 0.
+   * elements (\p default_order()==FIRST), this returns 0.
    * This method is useful when converting linear elements to quadratic
-   * elements.  Note that \p n has to be greater or equal
+   * elements.  Note that \p n has to be greater than or equal to
    * \p this->n_vertices().
    */
   virtual unsigned int n_second_order_adjacent_vertices (const unsigned int n) const;
 
   /**
-   * @returns the element-local number of the  \f$ v^{th} \f$ vertex
-   * that defines the \f$ n^{th} \f$ second-order node.  Note that
-   * the return value is always less \p this->n_vertices(), while
-   * \p n has to be greater or equal \p this->n_vertices().  For
-   * linear elements this returns 0.
+   * @returns the element-local number of the \f$ v^{th} \f$ vertex
+   * that defines the \f$ n^{th} \f$ second-order node.  Note that the
+   * return value is always less than \p this->n_vertices(), while \p
+   * n has to be greater than or equal to \p this->n_vertices().  For
+   * linear elements, this returns 0.
    */
   virtual unsigned short int second_order_adjacent_vertex (const unsigned int n,
                                                            const unsigned int v) const;
 
   /**
-   * @returns the child number \p c and element-local index \p v of the
-   * \f$ n^{th} \f$ second-order node on the parent element.  Note that
-   * the return values are always less \p this->n_children() and
-   * \p this->child_ptr(c)->n_vertices(), while \p n has to be greater or equal
-   * to \p * this->n_vertices().  For linear elements this returns 0,0.
-   * On refined second order elements, the return value will satisfy
-   * \p this->node_ptr(n)==this->child_ptr(c)->node_ptr(v)
+   * @returns a pair (c,v), where
+   * c == child index, and
+   * v == element-local index of the \p \f$ n^{th} \f$
+   *      second-order node on the parent element.
+   * For linear elements, this returns (0,0).
+   *
+   * Notes:
+   * .) The return values are always less than \p this->n_children()
+   *    and \p this->child_ptr(c)->n_vertices().
+   * .) \p n has to be greater than or equal to \p this->n_vertices().
+   * .) On refined second-order elements, the return value will
+   *    satisfy \p this->node_ptr(n) == this->child_ptr(c)->node_ptr(v).
    */
   virtual std::pair<unsigned short int, unsigned short int>
   second_order_child_vertex (const unsigned int n) const;
 
   /**
    * @returns the element type of the associated second-order element,
-   * e.g. when \p this is a \p TET4, then \p TET10 is returned.  Returns
-   * \p INVALID_ELEM for second order or other elements that should not
-   * or cannot be converted into higher order equivalents.
+   * e.g. when \p this is a \p TET4, then \p TET10 is returned.
+   * Returns \p INVALID_ELEM for second-order or other elements that
+   * cannot be converted into higher order equivalents.
    *
    * For some elements, there exist two second-order equivalents, e.g.
    * for \p Quad4 there is \p Quad8 and \p Quad9.  When the optional
@@ -956,8 +953,8 @@ public:
   /**
    * @returns the element type of the associated first-order element,
    * e.g. when \p this is a \p TET10, then \p TET4 is returned.  Returns
-   * \p INVALID_ELEM for first order or other elements that should not
-   * or cannot be converted into lower order equivalents.
+   * \p INVALID_ELEM for first-order or other elements that cannot be
+   * converted into lower order equivalents.
    */
   static ElemType first_order_equivalent_type (const ElemType et);
 
@@ -973,13 +970,12 @@ public:
   /**
    * Returns the value of the p refinement level of an active
    * element, or the minimum value of the p refinement levels
-   * of an ancestor element's descendants
+   * of an ancestor element's descendants.
    */
   unsigned int p_level () const;
 
   /**
-   * @returns true iff the specified child is on the
-   * specified side
+   * @returns true if the specified child is on the specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
                                 const unsigned int s) const = 0;
@@ -987,8 +983,7 @@ public:
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
-   * Useful ENUM describing the refinement state of
-   * an element.
+   * Enumeration of possible element refinement states.
    */
   enum RefinementState { COARSEN = 0,
                          DO_NOTHING,
@@ -1027,15 +1022,14 @@ private:
 
 public:
   /**
-   * This function tells you which child you \p (e) are.
+   * This function tells you which child \p e is.
    * I.e. if c = a->which_child_am_i(e); then
-   * a->child_ptr(c) will be e;
+   * a->child_ptr(c) will be e.
    */
   unsigned int which_child_am_i(const Elem * e) const;
 
   /**
-   * @returns true iff the specified child is on the
-   * specified edge
+   * @returns true if the specified child is on the specified edge.
    */
   virtual bool is_child_on_edge(const unsigned int c,
                                 const unsigned int e) const;
@@ -1057,21 +1051,20 @@ public:
   void add_child (Elem * elem, unsigned int c);
 
   /**
-   * Replaces the child pointer at the specified index in the array of
-   * children of this element.
+   * Replaces the child pointer at the specified index in the child array.
    */
   void replace_child (Elem * elem, unsigned int c);
 
   /**
    * Fills the vector \p family with the children of this element,
-   * recursively.  So, calling this method on a twice-refined element
+   * recursively.  Calling this method on a twice-refined element
    * will give you the element itself, its direct children, and their
    * children, etc...  When the optional parameter \p reset is
-   * true then the vector will be cleared before the element and its
+   * true, the vector will be cleared before the element and its
    * descendants are added.
    *
-   * The family tree only includes ancestor and active elements; for
-   * subactive elements as well, use total_family_tree.
+   * The family tree only includes ancestor and active elements. To
+   * include subactive elements as well, use total_family_tree().
    */
   void family_tree (std::vector<const Elem *> & family,
                     const bool reset=true) const;
@@ -1140,13 +1133,12 @@ public:
    * \p neighbor here may be a topological (e.g. periodic boundary
    * condition) neighbor, not just a local neighbor.
    */
-  void active_family_tree_by_topological_neighbor
-    (std::vector<const Elem *> & family,
-     const Elem * neighbor,
-     const MeshBase & mesh,
-     const PointLocatorBase & point_locator,
-     const PeriodicBoundaries * pb,
-     const bool reset=true) const;
+  void active_family_tree_by_topological_neighbor (std::vector<const Elem *> & family,
+                                                   const Elem * neighbor,
+                                                   const MeshBase & mesh,
+                                                   const PointLocatorBase & point_locator,
+                                                   const PeriodicBoundaries * pb,
+                                                   const bool reset=true) const;
 
   /**
    * Returns the value of the refinement flag for the element.
@@ -1159,47 +1151,46 @@ public:
   void set_refinement_flag (const RefinementState rflag);
 
   /**
-   * Returns the value of the p refinement flag for the element.
+   * Returns the value of the p-refinement flag for the element.
    */
   RefinementState p_refinement_flag () const;
 
   /**
-   * Sets the value of the p refinement flag for the element.
+   * Sets the value of the p-refinement flag for the element.
    */
   void set_p_refinement_flag (const RefinementState pflag);
 
   /**
-   * Returns the maximum value of the p refinement levels of
-   * an ancestor element's descendants
+   * Returns the maximum value of the p-refinement levels of
+   * an ancestor element's descendants.
    */
   unsigned int max_descendant_p_level () const;
 
   /**
-   * Returns the minimum p refinement level of elements which
-   * are descended from this and which share a side with the
-   * active \p neighbor
+   * Returns the minimum p-refinement level of elements which are
+   * descended from this element, and which share a side with the
+   * active \p neighbor.
    */
   unsigned int min_p_level_by_neighbor (const Elem * neighbor,
                                         unsigned int current_min) const;
 
   /**
-   * Returns the minimum new p refinement level (i.e. after
-   * refinement and coarsening is done) of elements which are
-   * descended from this and which share a side with the
-   * active \p neighbor
+   * Returns the minimum new p-refinement level (i.e. after refinement
+   * and coarsening is done) of elements which are descended from this
+   * element and which share a side with the active \p neighbor.
    */
   unsigned int min_new_p_level_by_neighbor (const Elem * neighbor,
                                             unsigned int current_min) const;
 
   /**
-   * Sets the value of the p refinement level for the element
-   * Note that the maximum p refinement level is currently 255
+   * Sets the value of the p-refinement level for the element.
+   * Note that the maximum p-refinement level is currently 255.
    */
   void set_p_level (const unsigned int p);
 
   /**
-   * Sets the value of the p refinement level for the element
-   * without altering the p level of its ancestors
+   * Sets the value of the p-refinement level for the element
+   * without altering the p-level of its ancestors
    */
   void hack_p_level (const unsigned int p);
 
@@ -1209,9 +1200,8 @@ public:
   virtual void refine (MeshRefinement & mesh_refinement);
 
   /**
-   * Coarsen the element.  This is not
-   * virtual since it is the same for all
-   * element types.
+   * Coarsen the element.  This function is non-virtual since it is the same
+   * for all element types.
    */
   void coarsen ();
 
@@ -1219,7 +1209,7 @@ public:
    * Contract an active element, i.e. remove pointers to any
    * subactive children.  This should only be called via
    * MeshRefinement::contract, which will also remove subactive
-   * children from the mesh
+   * children from the mesh.
    */
   void contract ();
 
@@ -1227,14 +1217,13 @@ public:
 
 #ifdef DEBUG
   /**
-   * This function checks for consistent neighbor links at this
-   * element.
+   * Checks for consistent neighbor links on this element.
    */
   void libmesh_assert_valid_neighbors() const;
 
   /**
-   * This function checks for a valid id and for pointers to nodes
-   * with valid ids at this element.
+   * Checks for a valid id and pointers to nodes with valid ids on
+   * this element.
    */
   void libmesh_assert_valid_node_pointers() const;
 #endif // DEBUG
@@ -1243,7 +1232,7 @@ protected:
 
   /**
    * The protected nested SideIter class is used to iterate over the
-   * sides of this Elem.  It is a specially designed class since
+   * sides of this Elem.  It is a specially-designed class since
    * no sides are actually stored by the element.  This iterator-like
    * class has to provide the following three operations
    * 1) operator*
@@ -1258,7 +1247,6 @@ public:
    * Useful iterator typedefs
    */
   typedef Predicates::multi_predicate Predicate;
-  //typedef variant_filter_iterator<Elem *, Predicate> side_iterator;
 
   /**
    * Data structure for iterating over sides.  Defined at the end of
@@ -1286,12 +1274,12 @@ public:
 
   /**
    * @returns \p true if the element is an infinite element,
-   * \p false  otherwise.
+   * \p false otherwise.
    */
   virtual bool infinite () const = 0;
 
   /**
-   * @returns true iff the specified (local) node number is a
+   * @returns true if the specified (local) node number is a
    * "mid-edge" node on an infinite element edge.  This is false for
    * all nodes on non-infinite elements, so we won't make it pure
    * virtual, to simplify their code.
@@ -1300,12 +1288,9 @@ public:
   { libmesh_assert (!this->infinite()); return false; }
 
   /**
-   * @returns the origin for an infinite element.  Currently,
-   * @e all infinite elements used in a mesh share the same
-   * origin.  Overload this in infinite element classes.
-   * By default, issues an error, because returning the
-   * all zero point would very likely lead to unexpected
-   * behavior.
+   * @returns the origin for an infinite element.  Currently, \e all
+   * infinite elements used in a mesh share the same origin.  Overload
+   * this in infinite element classes.
    */
   virtual Point origin () const { libmesh_not_implemented(); return Point(); }
 
@@ -1315,9 +1300,8 @@ public:
 
 
   /**
-   * Build an element of type \p type.  Since this method
-   * allocates memory the new \p Elem is returned in a
-   * \p UniquePtr<>
+   * Build an element of type \p type.  Since this method allocates
+   * memory, the new \p Elem is returned in a \p UniquePtr<>.
    */
   static UniquePtr<Elem> build (const ElemType type,
                                 Elem * p=libmesh_nullptr);
@@ -1325,16 +1309,16 @@ public:
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
-   * Returns the local node id on the parent which corresponds to
-   * node n of child c, or returns invalid_uint if no such parent node
-   * exists.
+   * Returns the local node id on the parent which corresponds to node
+   * \p n of child \p c, or returns invalid_uint if no such parent
+   * node exists.
    */
   virtual unsigned int as_parent_node (unsigned int c,
                                        unsigned int n) const;
 
   /**
    * Returns all the pairs of nodes (indexed by local node id) which
-   * should bracket node n of child c.
+   * should bracket node \p n of child \p c.
    */
   virtual
   const std::vector<std::pair<unsigned char, unsigned char> > &
@@ -1343,7 +1327,7 @@ public:
 
   /**
    * Returns all the pairs of nodes (indexed by global node id) which
-   * should bracket node n of child c.
+   * should bracket node \p n of child \p c.
    */
   virtual
   const std::vector<std::pair<dof_id_type, dof_id_type> >
@@ -1353,7 +1337,7 @@ public:
 
   /**
    * Matrix that transforms the parents nodes into the children's
-   * nodes
+   * nodes.
    */
   virtual float embedding_matrix (const unsigned int child_num,
                                   const unsigned int child_node_num,
@@ -1372,30 +1356,26 @@ public:
 
 protected:
 
-  //-------------------------------------------------------
-  // These methods compute has keys from the specified
-  // global node numbers
-  //
   /**
-   * Compute a key from the specified nodes.
+   * Compute a hash key from the specified nodes.
    */
   static dof_id_type compute_key (dof_id_type n0);
 
   /**
-   * Compute a key from the specified nodes.
+   * Compute a hash key from the specified nodes.
    */
   static dof_id_type compute_key (dof_id_type n0,
                                   dof_id_type n1);
 
   /**
-   * Compute a key from the specified nodes.
+   * Compute a hash key from the specified nodes.
    */
   static dof_id_type compute_key (dof_id_type n0,
                                   dof_id_type n1,
                                   dof_id_type n2);
 
   /**
-   * Compute a key from the specified nodes.
+   * Compute a hash key from the specified nodes.
    */
   static dof_id_type compute_key (dof_id_type n0,
                                   dof_id_type n1,
@@ -1438,9 +1418,8 @@ protected:
 public:
 
   /**
-   * Replaces this element with \p NULL for all of
-   * its neighbors.  This is useful when deleting an
-   * element.
+   * Replaces this element with \p NULL for all of its neighbors.
+   * This is useful when deleting an element.
    */
   void nullify_neighbors ();
 
@@ -1453,7 +1432,7 @@ protected:
 
   /**
    * Pointers to this element's parent and neighbors, and for
-   * lower-dimensional elements interior_parent.
+   * lower-dimensional elements' interior_parent.
    */
   Elem ** _elemlinks;
 
@@ -1475,14 +1454,12 @@ protected:
    * to save space.
    */
   unsigned char _rflag;
-  //RefinementState _rflag;
 
   /**
    * p refinement flag. This is stored as an unsigned char
    * to save space.
    */
   unsigned char _pflag;
-  //RefinementState _pflag;
 
   /**
    * p refinement level - the difference between the
@@ -2320,7 +2297,7 @@ void Elem::hack_p_level(unsigned int p)
 
 
 
-#endif /* ifdef LIBMESH_ENABLE_AMR */
+#endif // ifdef LIBMESH_ENABLE_AMR
 
 
 inline
@@ -2515,7 +2492,6 @@ private:
 
   // A counter variable which keeps track of the side number
   unsigned int _side_number;
-
 };
 
 

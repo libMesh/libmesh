@@ -23,17 +23,8 @@
 // Local includes
 #include "libmesh/elem.h"
 
-// C++ includes
-#include <cstddef>
-
 namespace libMesh
 {
-
-
-// Forward declarations
-class Mesh;
-
-
 
 /**
  * The \p Edge is an element in 1D. It can be thought of as a
@@ -72,7 +63,7 @@ public:
   virtual unsigned int n_nodes() const libmesh_override { return 2; }
 
   /**
-   * @returns 2
+   * @returns 2.
    */
   virtual unsigned int n_sides() const libmesh_override { return 2; }
 
@@ -92,31 +83,30 @@ public:
   virtual unsigned int n_faces() const libmesh_override { return 0; }
 
   /**
-   * @returns 2
+   * @returns 2.
    */
   virtual unsigned int n_children() const libmesh_override { return 2; }
 
-  /*
-   * @returns true iff the specified child is on the
-   * specified side
+  /**
+   * @returns true if the specified child is on the specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
                                 const unsigned int s) const libmesh_override;
 
-  /*
-   * @returns true iff the specified edge is on the specified side
+  /**
+   * @returns true if the specified edge is on the specified side.
    */
   virtual bool is_edge_on_side(const unsigned int,
                                const unsigned int) const libmesh_override
   { return false; }
 
-  /*
+  /**
    * @returns the side number opposite to \p s (for a tensor product
    * element), or throws an error otherwise.
    */
   virtual unsigned int opposite_side(const unsigned int s) const libmesh_override;
 
-  /*
+  /**
    * @returns the local node number for the node opposite to node n
    * on side \p opposite_side(s) (for a tensor product element), or
    * throws an error otherwise.
@@ -145,7 +135,7 @@ public:
 
   /**
    * The \p Elem::side() member returns
-   * an auto pointer to a NodeElem for the specified node.
+   * a UniquePtr to a NodeElem for the specified node.
    */
   virtual UniquePtr<Elem> build_side_ptr (const unsigned int i,
                                           bool proxy) libmesh_override;

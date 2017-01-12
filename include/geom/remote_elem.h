@@ -25,7 +25,6 @@
 #include "libmesh/libmesh_singleton.h"
 
 // C++ includes
-#include <cstddef>
 #include <limits>
 
 namespace libMesh
@@ -173,7 +172,7 @@ public:
 
   /**
    * Matrix that transforms the parents nodes into the children's
-   * nodes
+   * nodes.
    */
   virtual float embedding_matrix (const unsigned int,
                                   const unsigned int,
@@ -188,7 +187,7 @@ public:
 protected:
 
   /**
-   * Data for link to (NULL!) parent
+   * Data for link to (NULL!) parent.
    */
   Elem * _elemlinks_data[1];
 };

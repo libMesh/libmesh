@@ -31,7 +31,6 @@
 namespace libMesh
 {
 
-
 /**
  * A namespace for quality utility functions.
  *
@@ -52,21 +51,20 @@ const unsigned int num_quals = 16;
  * @returns a descriptive name for a \p ElemQuality
  * \p enum
  */
-std::string              name     (const ElemQuality q);
+std::string name (const ElemQuality q);
 
 /**
  * @returns a description for a \p ElemQuality
  * \p enum
  */
-std::string              describe (const ElemQuality q);
+std::string describe (const ElemQuality q);
 
 /**
  * @returns the valid \p ElemQuality metrics for a given
  * \p ElemType element type.
  */
-std::vector<ElemQuality> valid    (const ElemType    t);
+std::vector<ElemQuality> valid (const ElemType t);
 }
-
 
 } // namespace libMesh
 

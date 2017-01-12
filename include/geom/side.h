@@ -24,16 +24,12 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/elem.h"
 
-// C++ includes
-#include <cstddef>
-
 namespace libMesh
 {
 
 // Forward declarations
 class Point;
 class Node;
-
 
 /**
  * This defines the \p Side class.  A \p Side is basically a proxy
@@ -72,7 +68,7 @@ public:
   }
 
   /**
-   * Setting a side node changes the node on the parent
+   * Setting a side node changes the node on the parent.
    */
   virtual Node * & set_node (const unsigned int i) libmesh_override
   {
@@ -81,7 +77,7 @@ public:
   }
 
   /**
-   * Sides effectively do not have sides
+   * Sides do not have sides.
    */
   virtual unsigned int n_sides () const libmesh_override
   { return 0; }
@@ -94,7 +90,7 @@ public:
 private:
 
   /**
-   * The side on the parent element
+   * The side on the parent element.
    */
   const unsigned int _side_number;
 };
@@ -109,7 +105,7 @@ private:
  * parent element (the element for which the side is created).  Similarly, you
  * cannot access the neighbors of a side since it does not store any.
  *
- * \author  Roy H. Stogner
+ * \author Roy H. Stogner
  */
 template <class EdgeType, class ParentType>
 class SideEdge : public EdgeType
@@ -134,7 +130,7 @@ public:
   }
 
   /**
-   * Setting an edge node changes the node on the parent
+   * Setting an edge node changes the node on the parent.
    */
   virtual Node * & set_node (const unsigned int i) libmesh_override
   {
@@ -143,15 +139,14 @@ public:
   }
 
   /**
-   * @returns 0. Edges effectively do not have sides, so
-   * don't even ask!
+   * @returns 0. Edges do not have sides, so don't even ask!
    */
   virtual unsigned int n_sides () const libmesh_override { return 0; }
 
 private:
 
   /**
-   * The side on the parent element
+   * The side on the parent element.
    */
   const unsigned int _edge_number;
 };

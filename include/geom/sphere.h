@@ -31,7 +31,6 @@
 namespace libMesh
 {
 
-
 /**
  * This class defines a sphere.  It also computes coordinate
  * transformations between cartesian  \f$ (x, y, z) \f$
@@ -85,7 +84,7 @@ public:
   Sphere (const Point & c, const Real r);
 
   /**
-   * Constructs a sphere connecting four points
+   * Constructs a sphere connecting four points.
    */
   Sphere (const Point &, const Point &, const Point &, const Point &);
 

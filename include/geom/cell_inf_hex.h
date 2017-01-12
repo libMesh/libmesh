@@ -79,43 +79,43 @@ public:
   virtual unsigned int n_sides() const libmesh_override { return 5; }
 
   /**
-   * @returns 8.  All infinite hexahedrals (in our
+   * @returns 8.  All infinite hexahedra (in our
    * setting) have 8 vertices.
    */
   virtual unsigned int n_vertices() const libmesh_override { return 8; }
 
   /**
-   * @returns true iff the specified (local) node number is a
+   * @returns true if the specified (local) node number is a
    * "mid-edge" node on an infinite element edge.
    */
   virtual bool is_mid_infinite_edge_node(const unsigned int i) const
     libmesh_override { return (i > 3 && i < 8); }
 
   /**
-   * @returns 8.  All infinite hexahedrals have 8 edges,
+   * @returns 8.  All infinite hexahedra have 8 edges,
    * 4 lying in the base, and 4 perpendicular to the base.
    */
   virtual unsigned int n_edges() const libmesh_override { return 8; }
 
   /**
-   * @returns 5.  All hexahedrals have 5 faces.
+   * @returns 5.  All infinite hexahedra have 5 faces.
    */
   virtual unsigned int n_faces() const libmesh_override { return 5; }
 
   /**
-   * @returns 4
+   * @returns 4.
    */
   virtual unsigned int n_children() const libmesh_override { return 4; }
 
-  /*
-   * @returns true iff the specified child is on the
-   * specified side
+  /**
+   * @returns true if the specified child is on the
+   * specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
                                 const unsigned int s) const libmesh_override;
 
-  /*
-   * @returns true iff the specified edge is on the specified side
+  /**
+   * @returns true if the specified edge is on the specified side.
    */
   virtual bool is_edge_on_side(const unsigned int e,
                                const unsigned int s) const libmesh_override;

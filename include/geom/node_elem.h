@@ -23,9 +23,6 @@
 // Local includes
 #include "libmesh/elem.h"
 
-// C++ includes
-#include <cstddef>
-
 namespace libMesh
 {
 
@@ -75,7 +72,7 @@ public:
   virtual unsigned int n_nodes() const libmesh_override { return 1; }
 
   /**
-   * @returns 0
+   * @returns 0.
    */
   virtual unsigned int n_sides() const libmesh_override { return 0; }
 
@@ -95,7 +92,7 @@ public:
   virtual unsigned int n_faces() const libmesh_override { return 0; }
 
   /**
-   * @returns 1
+   * @returns 1.
    */
   virtual unsigned int n_children() const libmesh_override { return 1; }
 
@@ -106,7 +103,7 @@ public:
 
   /**
    * @returns an id associated with the \p s side of this element.
-   * This should never be important for NodeElems
+   * This should never be important for NodeElems.
    */
   virtual dof_id_type key (const unsigned int) const libmesh_override
   { return 0; }
@@ -130,17 +127,17 @@ public:
   { libmesh_not_implemented(); return UniquePtr<Elem>(); }
 
   /**
-   * @returns 1
+   * @returns 1.
    */
   virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
 
   /**
-   * @returns true iff the specified (local) node number is a vertex.
+   * @returns true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int) const libmesh_override { return true; }
 
   /**
-   * NodeElem objects don't have faces or sides
+   * NodeElem objects don't have faces or sides.
    */
   virtual bool is_edge(const unsigned int) const libmesh_override { return false; }
   virtual bool is_face(const unsigned int) const libmesh_override { return false; }
@@ -161,25 +158,25 @@ public:
                                const unsigned int) const libmesh_override
   { libmesh_not_implemented(); return false; }
 
-  /*
-   * @returns true iff the element map is definitely affine within
-   * numerical tolerances
+  /**
+   * @returns true if the element map is definitely affine within
+   * numerical tolerances.
    */
   virtual bool has_affine_map () const libmesh_override { return true; }
 
   /**
-   * @returns true iff the Lagrange shape functions on this element
-   * are linear
+   * @returns true if the Lagrange shape functions on this element
+   * are linear.
    */
   virtual bool is_linear () const libmesh_override { return true; }
 
   /**
-   * @returns \p NODEELEM
+   * @returns \p NODEELEM.
    */
   virtual ElemType type() const libmesh_override { return NODEELEM; }
 
   /**
-   * @returns FIRST
+   * @returns FIRST.
    */
   virtual Order default_order() const libmesh_override { return FIRST; }
 
@@ -206,7 +203,7 @@ protected:
   Elem * _elemlinks_data[1+(LIBMESH_DIM>0)];
 
   /**
-   * Data for links to nodes
+   * Data for links to nodes.
    */
   Node * _nodelinks_data[1];
 

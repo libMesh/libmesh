@@ -30,7 +30,7 @@ namespace libMesh
 {
 
 /**
- * The \p StoredRange class defined a contiguous, divisible set of objects
+ * The \p StoredRange class defines a contiguous, divisible set of objects.
  * This class is used primarily as the argument to function objects.  The
  * range can then be subdivided into a number of "tasks" which can be executed
  * in parallel.  This concept is central to the Threading Building Blocks
@@ -204,7 +204,7 @@ public:
   }
 
   /**
-   * Destructor.  Releases the object array if we created it
+   * Destructor.  Releases the object array if we created it.
    */
   ~StoredRange ()
   {

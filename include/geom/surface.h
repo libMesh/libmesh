@@ -23,18 +23,17 @@
 // Local includes
 #include "libmesh/point.h"
 
-// C++ includes
-
 namespace libMesh
 {
 
 /**
- * This class defines a surface.  A surface is a two-dimensional
- * object living in three-dimensional space.  Examples of surfaces
- * are planes, hollow spheres, hollow cylinders, etc...  This is
- * a generic base class that describes the useful functionality
- * a surface will provide.  Specific derived classes actually implement
- * the functionality, so this class has pure virtual members.
+ * The base class for all "surface" related geometric objects.  A
+ * Surface is a two-dimensional object living in three-dimensional
+ * space.  Examples of Surfaces are planes, hollow spheres, hollow
+ * cylinders, etc...  This is a generic base class that describes the
+ * useful functionality a surface will provide.  Specific derived
+ * classes actually implement the functionality, so this class has
+ * pure virtual members.
  *
  * \author Benjamin S. Kirk
  * \date 2002
@@ -95,10 +94,10 @@ public:
    * surface's coordinate system.  \p world_coords
    * is in the world coordinate system.  This method
    * is not purely virtual, because there may be surfaces
-   * that do not have an own coordinate system.  These
+   * that do not have their own coordinate system.  These
    * simply do not have to overload this method.
    */
-  virtual Point surface_coords (const Point & world_coords) const;
+  virtual Point surface_coords (const Point & world_coords) const { return world_coords; }
 
   /**
    * @returns the world (cartesian) coordinates for the
@@ -107,31 +106,9 @@ public:
    * that do not have an own coordinate system.  These
    * simply do not have to overload this method.
    */
-  virtual Point world_coords (const Point & surf_coords) const;
+  virtual Point world_coords (const Point & surf_coords) const { return surf_coords; }
 };
 
-// ------------------------------------------------------------
-// Surface class member functions
-inline
-Point Surface::surface_coords (const Point & from_world_coords) const
-{
-  Point p (from_world_coords);
-  return p;
-}
-
-
-
-inline
-Point Surface::world_coords (const Point & surf_coords) const
-{
-  Point p (surf_coords);
-  return p;
-}
-
-
-
-
 } // namespace libMesh
-
 
 #endif // LIBMESH_SURFACE_H

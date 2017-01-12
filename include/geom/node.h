@@ -33,12 +33,10 @@
 namespace libMesh
 {
 
-
 // forward declarations
 class Node;
 class MeshBase;
 class MeshRefinement;
-
 
 /**
  * A \p Node is like a \p Point, but with more information.  A \p Node
@@ -60,7 +58,7 @@ public:
 
   /**
    * Constructor.  By default sets all entries to 0.  Gives the point 0 in
-   * \p LIBMESH_DIM dimensions with an \p id of \p Node::invalid_id
+   * \p LIBMESH_DIM dimensions with an \p id of \p Node::invalid_id.
    */
   explicit
   Node  (const Real x=0,
@@ -85,13 +83,13 @@ public:
   ~Node ();
 
   /**
-   * Assign to a node from a point
+   * Assign to a node from a point.
    */
   Node & operator= (const Point & p);
 
   /**
    * Builds a \p Node and returns an \p UniquePtr<Node> to the
-   * newly-created object.  The \p id is copied from \p n.id()
+   * newly-created object.  The \p id is copied from \p n.id().
    */
   static UniquePtr<Node> build (const Node & n);
 
@@ -126,7 +124,7 @@ public:
   bool operator ==(const Node & rhs) const;
 
   /**
-   * Prints relevant information about the node
+   * Prints relevant information about the node.
    */
   void print_info (std::ostream & os=libMesh::out) const;
 
@@ -197,7 +195,7 @@ private:
 
 
 // ------------------------------------------------------------
-// global Node functions
+// Global Node functions
 
 inline
 std::ostream & operator << (std::ostream & os, const Node & n)

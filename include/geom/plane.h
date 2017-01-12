@@ -23,8 +23,6 @@
 // Local includes
 #include "libmesh/surface.h"
 
-// C++ includes
-
 namespace libMesh
 {
 
@@ -81,17 +79,17 @@ public:
                                  const Point & p2 );
 
   /**
-   * Creates an XY plane located at z=zpos,
+   * Creates an XY plane located at z=zpos.
    */
   void xy_plane (const Real zpos=0.);
 
   /**
-   * Creates an XZ plane located at y=ypos,
+   * Creates an XZ plane located at y=ypos.
    */
   void xz_plane (const Real ypos=0.);
 
   /**
-   * Creates an YZ plane located at x=xpos,
+   * Creates an YZ plane located at x=xpos.
    */
   void yz_plane (const Real xpos=0.);
 
@@ -128,35 +126,23 @@ public:
 
   /**
    * @returns a point on the plane useful
-   * for determining position
+   * for determining position.
    */
   const Point & get_planar_point() const;
 
 
 private:
-
-
   /**
    * Returns the normal for the plane.
    */
-  const Point & normal () const;
+  const Point & normal () const { return _normal; }
 
   /**
    *  The plane is defined by a point and a normal.
    */
   Point _point;
   Point _normal;
-
 };
-
-
-
-// ------------------------------------------------------------
-// Plane class inline members
-inline const Point & Plane::normal () const
-{
-  return _normal;
-}
 
 } // namespace libMesh
 

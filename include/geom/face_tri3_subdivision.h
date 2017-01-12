@@ -24,16 +24,18 @@
 // Local includes
 #include "libmesh/face_tri3.h"
 
-// C++ includes
-
 namespace libMesh
 {
 
 /**
- * The \p Tri3 is an element in 2D composed of 3 nodes.
+ * The \p Tri3Subdivision element is a three-noded subdivision surface
+ * shell element used in mechanics calculations.  See also,
+ * miscellaneous_ex11.
  *
- * \author Roman Vetter and Norbert Stoop
+ * \author Roman Vetter
+ * \author Norbert Stoop
  * \date 2014
+ * \brief A surface shell element used in mechanics calculations.
  */
 class Tri3Subdivision libmesh_final : public Tri3
 {
@@ -51,24 +53,24 @@ public:
   Tri3Subdivision(Elem * p);
 
   /**
-   * @returns \p TRI3SUBDIVISION
+   * @returns \p TRI3SUBDIVISION.
    */
   virtual ElemType type () const libmesh_override { return TRI3SUBDIVISION; }
 
   /**
-   * @returns true iff the element map is definitely affine within
-   * numerical tolerances
+   * @returns true if the element map is definitely affine within
+   * numerical tolerances.
    */
   virtual bool has_affine_map () const libmesh_override { return false; }
 
   /**
-   * @returns true iff the Lagrange shape functions on this element
-   * are linear
+   * @returns true if the Lagrange shape functions on this element
+   * are linear.
    */
   virtual bool is_linear () const libmesh_override { return false; }
 
   /**
-   * @returns FOURTH
+   * @returns FOURTH.
    */
   virtual Order default_order() const libmesh_override { return FOURTH; }
 
@@ -80,7 +82,7 @@ public:
   void prepare_subdivision_properties();
 
   /**
-   * @returns \p true iff the subdivision element is ready for use,
+   * @returns \p true if the subdivision element is ready for use,
    * i.e. the nodes have been reordered.
    */
   bool is_subdivision_updated() const { return _subdivision_updated; }
@@ -103,7 +105,7 @@ public:
   unsigned int local_node_number(unsigned int node_id) const;
 
   /**
-   * @returns \p true iff the element is a ghost element.
+   * @returns \p true if the element is a ghost element.
    */
   bool is_ghost() const { return _is_ghost; }
 
@@ -121,13 +123,13 @@ private:
   Node * _ordered_nodes[3];
 
   /**
-   * \p true iff the subdivision element is ready for use,
+   * \p true if the subdivision element is ready for use,
    * i.e. the nodes have been reordered.
    */
   bool _subdivision_updated;
 
   /**
-   * \p true iff the element is a ghost element
+   * \p true if the element is a ghost element
    * (e.g. for boundary conditions).
    */
   bool _is_ghost;
