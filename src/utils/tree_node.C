@@ -118,8 +118,26 @@ bool TreeNode<N>::insert (const Elem * elem)
 
 #endif
 
+      unsigned int element_count = elements.size();
+      if(!mesh.get_count_lower_dim_elems_in_point_locator())
+      {
+        const std::set<unsigned char> & elem_dimensions = mesh.elem_dimensions();
+        if(elem_dimensions.size() > 1)
+        {
+          element_count = 0;
+          unsigned char highest_dim_elem = *elem_dimensions.rbegin();
+          for(unsigned int i=0; i<elements.size(); i++)
+          {
+            if(elements[i]->dim() == highest_dim_elem)
+            {
+              element_count++;
+            }
+          }
+        }
+      }
+
       // Refine ourself if we reach the target bin size for a TreeNode.
-      if (elements.size() == tgt_bin_size)
+      if (element_count == tgt_bin_size)
         this->refine();
 
       return true;
