@@ -871,6 +871,18 @@ public:
   void clear_point_locator ();
 
   /**
+   * In the point locator, do we count lower dimensional elements
+   * when we refine point locator regions? This is relevant in
+   * tree-based point locators, for example.
+   */
+  void set_count_lower_dim_elems_in_point_locator(bool count_lower_dim_elems);
+
+  /**
+   * Get the current value of _count_lower_dim_elems_in_point_locator.
+   */
+  bool get_count_lower_dim_elems_in_point_locator() const;
+
+  /**
    * Verify id and processor_id consistency of our elements and
    * nodes containers.
    * Calls libmesh_assert() on each possible failure.
@@ -1247,6 +1259,12 @@ protected:
    * and it operates on a constant reference to the mesh, this is OK.
    */
   mutable UniquePtr<PointLocatorBase> _point_locator;
+
+  /**
+   * Do we count lower dimensional elements in point locator refinement?
+   * This is relevant in tree-based point locators, for example.
+   */
+  bool _count_lower_dim_elems_in_point_locator;
 
   /**
    * A partitioner to use at each prepare_for_use().

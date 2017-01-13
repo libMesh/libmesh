@@ -54,6 +54,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _n_parts       (1),
   _is_prepared   (false),
   _point_locator (),
+  _count_lower_dim_elems_in_point_locator(true),
   _partitioner   (),
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(DofObject::invalid_unique_id),
@@ -549,6 +550,20 @@ UniquePtr<PointLocatorBase> MeshBase::sub_point_locator () const
 void MeshBase::clear_point_locator ()
 {
   _point_locator.reset(libmesh_nullptr);
+}
+
+
+
+void MeshBase::set_count_lower_dim_elems_in_point_locator(bool count_lower_dim_elems)
+{
+  _count_lower_dim_elems_in_point_locator = count_lower_dim_elems;
+}
+
+
+
+bool MeshBase::get_count_lower_dim_elems_in_point_locator() const
+{
+  return _count_lower_dim_elems_in_point_locator;
 }
 
 
