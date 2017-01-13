@@ -9585,8 +9585,8 @@ main ()
 {
 
       std::regex integer_regex("(\\\\+|-)?[[:digit:]]+");
-      regex_match("abc", integer_regex);
-      regex_match("123", integer_regex);
+      std::regex_match("abc", integer_regex);
+      std::regex_match("123", integer_regex);
 
   ;
   return 0;

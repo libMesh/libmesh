@@ -592,8 +592,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_REGEX],
     @%:@include <regex>
     ]], [[
       std::regex integer_regex("(\\\\+|-)?[[:digit:]]+");
-      regex_match("abc", integer_regex);
-      regex_match("123", integer_regex);
+      std::regex_match("abc", integer_regex);
+      std::regex_match("123", integer_regex);
     ]])],[
       if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
