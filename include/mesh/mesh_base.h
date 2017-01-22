@@ -142,6 +142,12 @@ public:
   virtual void allgather () {}
 
   /**
+   * Gathers all elements and nodes of the mesh onto
+   * processor zero
+   */
+  virtual void gather_to_zero() {}
+
+  /**
    * When supported, deletes all nonlocal elements of the mesh
    * except for "ghosts" which touch a local element, and deletes
    * all nodes which are not part of a local or ghost element

@@ -1001,9 +1001,6 @@ void MeshCommunication::gather (const processor_id_type, DistributedMesh &) cons
 // ------------------------------------------------------------
 void MeshCommunication::gather (const processor_id_type root_id, DistributedMesh & mesh) const
 {
-  // The mesh should know it's about to be serialized
-  libmesh_assert (mesh.is_serial());
-
   // Check for quick return
   if (mesh.n_processors() == 1)
     return;
@@ -1061,9 +1058,7 @@ void MeshCommunication::gather (const processor_id_type root_id, DistributedMesh
   // Inform new elements of their neighbors,
   // while resetting all remote_elem links on
   // the appropriate ranks.
-  if ((root_id == DofObject::invalid_processor_id) ||
-      (mesh.comm().rank() == root_id))
-    mesh.find_neighbors(true);
+  mesh.find_neighbors(true);
 
   // All done!
 }

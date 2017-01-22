@@ -42,7 +42,7 @@ class MeshBase;
 class MeshSerializer
 {
 public:
-  MeshSerializer(MeshBase & mesh, bool need_serial = true);
+  MeshSerializer(MeshBase & mesh, bool need_serial = true, bool serial_only_needed_on_proc_0 = false);
 
   ~MeshSerializer();
 

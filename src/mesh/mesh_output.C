@@ -64,7 +64,7 @@ void MeshOutput<MT>::write_equation_systems (const std::string & fname,
       my_mesh.allow_renumbering(false);
     }
 
-  MeshSerializer serialize(const_cast<MT &>(*_obj), !_is_parallel_format);
+  MeshSerializer serialize(const_cast<MT &>(*_obj), !_is_parallel_format, _serial_only_needed_on_proc_0);
 
   // Build the list of variable names that will be written.
   std::vector<std::string> names;
@@ -72,9 +72,6 @@ void MeshOutput<MT>::write_equation_systems (const std::string & fname,
 
   if (!_is_parallel_format)
     {
-      // We need a serial mesh for MeshOutput for now
-      const_cast<EquationSystems &>(es).allgather();
-
       // Build the nodal solution values & get the variable
       // names from the EquationSystems object
       std::vector<Number> soln;

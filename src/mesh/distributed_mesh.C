@@ -1367,6 +1367,8 @@ void DistributedMesh::delete_remote_elements()
 #endif
 
   _is_serial = false;
+  _is_serial_on_proc_0 = false;
+
   MeshCommunication().delete_remote_elements(*this, _extra_ghost_elems);
 
   libmesh_assert_equal_to (this->max_elem_id(), this->parallel_max_elem_id());
@@ -1451,6 +1453,15 @@ void DistributedMesh::allgather()
   this->libmesh_assert_valid_parallel_ids();
   this->libmesh_assert_valid_parallel_flags();
 #endif
+}
+
+void DistributedMesh::gather_to_zero()
+{
+  if (_is_serial_on_proc_0)
+    return;
+
+  _is_serial_on_proc_0 = true;
+  MeshCommunication().gather(0, *this);
 }
 
 

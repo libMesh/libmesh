@@ -166,6 +166,12 @@ public:
   virtual void allgather() libmesh_override;
 
   /**
+   * Gathers all elements and nodes of the mesh onto
+   * processor zero
+   */
+  virtual void gather_to_zero() libmesh_override;
+
+  /**
    * Deletes all nonlocal elements of the mesh
    * except for "ghosts" which touch a local element, and deletes
    * all nodes which are not part of a local or ghost element
@@ -479,6 +485,11 @@ protected:
    * A boolean remembering whether we're serialized or not
    */
   bool _is_serial;
+
+  /**
+   * A boolean remembering whether we're serialized to proc 0 or not
+   */
+  bool _is_serial_on_proc_0;
 
   /**
    * Cached data from the last renumber_nodes_and_elements call
