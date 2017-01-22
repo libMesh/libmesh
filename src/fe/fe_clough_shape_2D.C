@@ -30,7 +30,11 @@ namespace
 {
 using namespace libMesh;
 
+// Keep track of which element was most recently used to generate
+// cached data
 static dof_id_type old_elem_id = DofObject::invalid_id;
+static const Elem * old_elem_ptr = libmesh_nullptr;
+
 // Coefficient naming: d(1)d(2n) is the coefficient of the
 // global shape function corresponding to value 1 in terms of the
 // local shape function corresponding to normal derivative 2
@@ -69,7 +73,8 @@ void clough_compute_coefs(const Elem * elem)
   // Coefficients are cached from old elements; we rely on that cache
   // except in dbg mode
 #ifndef DEBUG
-  if (elem->id() == old_elem_id)
+  if (elem->id() == old_elem_id &&
+      elem == old_elem_ptr)
     return;
 #endif
 
@@ -414,8 +419,10 @@ void clough_compute_coefs(const Elem * elem)
   // interpolant functions
 
 #ifdef DEBUG
-  // The cached factors should equal our calculations
-  if (elem->id() == old_elem_id)
+  // The cached factors should equal our calculations if we're still
+  // operating on the cached element
+  if (elem->id() == old_elem_id &&
+      elem == old_elem_ptr)
     {
       libmesh_assert_equal_to(d1d2n, -(d1d2ndx * N2x + d1d2ndy * N2y) / d2nd2ndn);
       libmesh_assert_equal_to(d1d3n, -(d1d3ndx * N3x + d1d3ndy * N3y) / d3nd3ndn);
@@ -508,6 +515,7 @@ void clough_compute_coefs(const Elem * elem)
   d3yd2n = -(d3yd3y * d3yd2ndn + d3yd3x * d3xd2ndn) / d2nd2ndn;
 
   old_elem_id = elem->id();
+  old_elem_ptr = elem;
 
   // Cross your fingers
   //  libMesh::err << d1nd1ndn << ' ';
