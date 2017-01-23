@@ -541,6 +541,22 @@ void print_helper(std::ostream & os, const P * param)
   os << *param;
 }
 
+template<>
+inline
+void print_helper(std::ostream & os, const char * param)
+{
+  // Specialization so that we don't print out unprintable characters
+  os << (int)(*param);
+}
+
+template<>
+inline
+void print_helper(std::ostream & os, const unsigned char * param)
+{
+  // Specialization so that we don't print out unprintable characters
+  os << (int)(*param);
+}
+
 //non-member vector print function
 template<typename P>
 void print_helper(std::ostream & os, const std::vector<P> * param)
