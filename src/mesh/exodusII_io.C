@@ -814,9 +814,6 @@ void ExodusII_IO::write (const std::string & fname)
   exio_helper->write_sidesets(mesh);
   exio_helper->write_nodesets(mesh);
 
-  if(MeshOutput<MeshBase>::mesh().processor_id())
-    return;
-
   if( (mesh.get_boundary_info().n_edge_conds() > 0) &&
       _verbose )
     {
