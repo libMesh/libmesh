@@ -10,7 +10,7 @@ message_running() {
 
     echo "***************************************************************"
     echo "* Running Example $example_name:" 
-    echo "*  $LIBMESH_RUN $executable $options $LIBMESH_OPTIONS"
+    echo "*  $LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS"
     echo "***************************************************************"
     echo " "
 }
@@ -27,7 +27,7 @@ message_done_running() {
     echo " "
     echo "***************************************************************"
     echo "* Done Running Example $example_name:" 
-    echo "*  $LIBMESH_RUN $executable $options $LIBMESH_OPTIONS"
+    echo "*  $LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS"
     echo "***************************************************************"
 }
 
