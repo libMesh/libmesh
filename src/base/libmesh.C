@@ -687,6 +687,16 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 
 LibMeshInit::~LibMeshInit()
 {
+  // Every processor had better be ready to exit at the same time.
+  // This would be a libmesh_parallel_only() function, except that
+  // libmesh_parallel_only() uses libmesh_assert() which throws an
+  // exception() which causes compilers to scream about exceptions
+  // inside destructors.
+
+  // Even if we're not doing parallel_only debugging, we don't want
+  // one processor to try to exit until all others are done working.
+  this->comm().barrier();
+
   // We can't delete, finalize, etc. more than once without
   // reinitializing in between
   libmesh_exceptionless_assert(!libMesh::closed());
