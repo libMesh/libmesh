@@ -403,7 +403,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       // Check whether the calling program has already initialized
       // MPI, and avoid duplicate Init/Finalize
       int flag;
-      MPI_Initialized (&flag);
+      libmesh_call_mpi(MPI_Initialized (&flag));
 
       if (!flag)
         {
@@ -413,8 +413,9 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
             MPI_THREAD_FUNNELED :
             MPI_THREAD_SINGLE;
 
-          MPI_Init_thread (&argc, const_cast<char ***>(&argv),
-                           mpi_thread_requested, &mpi_thread_provided);
+          libmesh_call_mpi
+            (MPI_Init_thread (&argc, const_cast<char ***>(&argv),
+                              mpi_thread_requested, &mpi_thread_provided));
 
           if ((libMesh::n_threads() > 1) &&
               (mpi_thread_provided < MPI_THREAD_FUNNELED))
@@ -445,7 +446,8 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
                               std::endl);
             }
 
-          MPI_Init (&argc, const_cast<char ***>(&argv));
+          libmesh_call_mpi
+            (MPI_Init (&argc, const_cast<char ***>(&argv)));
 #endif
           libmesh_initialized_mpi = true;
         }
@@ -475,13 +477,19 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       if (libMesh::on_command_line ("--handle-mpi-errors"))
         {
 #if MPI_VERSION > 1
-          MPI_Comm_create_errhandler(libMesh_MPI_Handler, &libmesh_errhandler);
-          MPI_Comm_set_errhandler(libMesh::GLOBAL_COMM_WORLD, libmesh_errhandler);
-          MPI_Comm_set_errhandler(MPI_COMM_WORLD, libmesh_errhandler);
+          libmesh_call_mpi
+            (MPI_Comm_create_errhandler(libMesh_MPI_Handler, &libmesh_errhandler));
+          libmesh_call_mpi
+            (MPI_Comm_set_errhandler(libMesh::GLOBAL_COMM_WORLD, libmesh_errhandler));
+          libmesh_call_mpi
+            (MPI_Comm_set_errhandler(MPI_COMM_WORLD, libmesh_errhandler));
 #else
-          MPI_Errhandler_create(libMesh_MPI_Handler, &libmesh_errhandler);
-          MPI_Errhandler_set(libMesh::GLOBAL_COMM_WORLD, libmesh_errhandler);
-          MPI_Errhandler_set(MPI_COMM_WORLD, libmesh_errhandler);
+          libmesh_call_mpi
+            (MPI_Errhandler_create(libMesh_MPI_Handler, &libmesh_errhandler));
+          libmesh_call_mpi
+            (MPI_Errhandler_set(libMesh::GLOBAL_COMM_WORLD, libmesh_errhandler));
+          libmesh_call_mpi
+            (MPI_Errhandler_set(MPI_COMM_WORLD, libmesh_errhandler));
 #endif // #if MPI_VERSION > 1
         }
     }
@@ -808,7 +816,20 @@ LibMeshInit::~LibMeshInit()
 #endif
 
       if (libmesh_initialized_mpi)
-        MPI_Finalize();
+        {
+          // We can't just libmesh_assert here because destructor,
+          // but we ought to report any errors
+          unsigned int error_code = MPI_Finalize();
+          if (error_code != MPI_SUCCESS)
+            {
+              char error_string[MPI_MAX_ERROR_STRING+1];
+              int error_string_len;
+              MPI_Error_string(error_code, error_string,
+                               &error_string_len);
+              std::cerr << "Failure from MPI_Finalize():\n"
+                        << error_string << std::endl;
+            }
+        }
     }
 #endif
 }
