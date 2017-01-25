@@ -631,11 +631,76 @@ unique_id_type ReplicatedMesh::parallel_max_unique_id() const
 
 void ReplicatedMesh::renumber_nodes_and_elements ()
 {
-  // If we're not renumbering, we're not renumbering.
-  if (_skip_renumber_nodes_and_elements)
-    return;
-
   LOG_SCOPE("renumber_nodes_and_elem()", "Mesh");
+
+  // Even if we're not allowed to renumber, we can still delete nodes
+  // which have been "orphaned" due to coarsening, and remove NULL
+  // entries off the end of the _elements and _nodes vectors, since
+  // that does not require renumbering.
+  if (_skip_renumber_nodes_and_elements)
+    {
+      // Build set of nodes that are currently connected to elements.
+      LIBMESH_BEST_UNORDERED_SET<Node *> connected_nodes;
+
+      std::vector<Elem *>::iterator elem_it = _elements.begin();
+      const std::vector<Elem *>::iterator elem_end = _elements.end();
+      for (; elem_it != elem_end; ++elem_it)
+        {
+          Elem * elem = *elem_it;
+
+          if (elem)
+            {
+              // Add this element's nodes to the connected list.
+              for (unsigned int n=0; n<elem->n_nodes(); n++)
+                connected_nodes.insert(elem->node_ptr(n));
+            }
+        }
+
+      // Delete (and leave NULL entries for) the unconnected nodes.
+      std::vector<Node *>::iterator node_it = _nodes.begin();
+      const std::vector<Node *>::iterator node_end = _nodes.end();
+      for (; node_it != node_end; ++node_it)
+        {
+          // Get a reference to the pointer in the actual vector, so
+          // we can potentially delete it and reassign its value to
+          // NULL, rather than setting a _copy_ of the pointer's value
+          // to NULL.
+          Node *& node = *node_it;
+
+          if (node)
+            {
+              // If this node is not connected, delete it.  Note that
+              // it is *not* being erased from the _nodes vector.
+              if (connected_nodes.find(node) == connected_nodes.end())
+                {
+                  this->get_boundary_info().remove (node);
+                  delete node;
+                  node = libmesh_nullptr;
+                }
+            }
+        }
+
+      // Now, actually erase any NULL entries at the end of the
+      // _elements and _nodes vectors.
+
+      // Find the first non-NULL Elem, starting from the end.
+      std::vector<Elem *>::reverse_iterator last_elem = _elements.rbegin();
+      while (last_elem != _elements.rend() && *last_elem == libmesh_nullptr)
+        ++last_elem;
+
+      // Remove trailing NULL entries off the end of the _elements vector.
+      _elements.erase(last_elem.base(), _elements.end());
+
+      // Find the first non-NULL Node, starting from the end.
+      std::vector<Node *>::reverse_iterator last_node = _nodes.rbegin();
+      while (last_node != _nodes.rend() && *last_node == libmesh_nullptr)
+        ++last_node;
+
+      // Remove trailing NULL entries off the end of the _nodes vector.
+      _nodes.erase(last_node.base(), _nodes.end());
+
+      return;
+    }
 
   // node and element id counters
   dof_id_type next_free_elem = 0;
