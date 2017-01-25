@@ -878,9 +878,11 @@ void DistributedMesh::libmesh_assert_valid_parallel_object_ids(const mapvector<T
       libmesh_assert(!obj || obj->id() == i);
 
       // All processors with an object should agree on id
+#ifdef DEBUG
       const dof_id_type dofid = obj && obj->valid_id() ?
         obj->id() : DofObject::invalid_id;
       libmesh_assert(this->comm().semiverify(obj ? &dofid : libmesh_nullptr));
+#endif
 
       // All processors with an object should agree on processor id
       const dof_id_type procid = obj && obj->valid_processor_id() ?
@@ -905,7 +907,7 @@ void DistributedMesh::libmesh_assert_valid_parallel_object_ids(const mapvector<T
                       (min_procid != this->processor_id())
                       );
 
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
+#if defined(LIBMESH_ENABLE_UNIQUE_ID) && defined(DEBUG)
       // All processors with an object should agree on unique id
       const unique_id_type uniqueid = obj ? obj->unique_id() : 0;
       libmesh_assert(this->comm().semiverify(obj ? &uniqueid : libmesh_nullptr));
@@ -925,6 +927,7 @@ void DistributedMesh::libmesh_assert_valid_parallel_ids () const
 
 void DistributedMesh::libmesh_assert_valid_parallel_p_levels () const
 {
+#ifdef DEBUG
   // This function must be run on all processors at once
   parallel_object_only();
 
@@ -939,6 +942,7 @@ void DistributedMesh::libmesh_assert_valid_parallel_p_levels () const
       // All processors with an active element should agree on p level
       libmesh_assert(this->comm().semiverify((el && el->active()) ? &p_level : libmesh_nullptr));
     }
+#endif
 }
 
 
@@ -946,7 +950,7 @@ void DistributedMesh::libmesh_assert_valid_parallel_p_levels () const
 
 void DistributedMesh::libmesh_assert_valid_parallel_flags () const
 {
-#ifdef LIBMESH_ENABLE_AMR
+#if defined(LIBMESH_ENABLE_AMR) && defined(DEBUG)
   // This function must be run on all processors at once
   parallel_object_only();
 

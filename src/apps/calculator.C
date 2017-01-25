@@ -128,12 +128,11 @@ int main(int argc, char ** argv)
 
   old_es.print_info();
 
-  const unsigned int n_systems = old_es.n_systems();
 
   const unsigned int sysnum =
     cl.follow(0, "--insys");
 
-  libmesh_assert_less(sysnum, n_systems);
+  libmesh_assert_less(sysnum, old_es.n_systems());
 
   System & old_sys = old_es.get_system(sysnum);
   std::string current_sys_name = old_sys.name();

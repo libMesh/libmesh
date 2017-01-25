@@ -59,10 +59,9 @@ CouplingMatrix & CouplingMatrix::operator&= (const CouplingMatrix & other)
 
       // We did find a range which might contain the start of the new
       // range.
-      const std::size_t firstloc = lb->first;
       const std::size_t lastloc  = lb->second;
-      libmesh_assert_less_equal(firstloc, lastloc);
-      libmesh_assert_less_equal(firstloc, other_range_start);
+      libmesh_assert_less_equal(lb->first, lastloc);
+      libmesh_assert_less_equal(lb->first, other_range_start);
 
 #ifdef DEBUG
       {

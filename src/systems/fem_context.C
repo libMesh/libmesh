@@ -1432,6 +1432,7 @@ void FEMContext::elem_position_get()
   //    {
   unsigned int n_nodes = this->get_elem().n_nodes();
 
+#ifdef DEBUG
   const unsigned char dim = this->get_elem_dim();
 
   // For simplicity we demand that mesh coordinates be stored
@@ -1451,6 +1452,7 @@ void FEMContext::elem_position_get()
                   == LAGRANGE &&
                   this->get_element_fe(this->get_mesh_z_var(), dim)->get_fe_type().order.get_order()
                   == this->get_elem().default_order()));
+#endif
 
   // Get degree of freedom coefficients from point coordinates
   if (this->get_mesh_x_var() != libMesh::invalid_uint)
@@ -1489,13 +1491,15 @@ void FEMContext::_do_elem_position_set(Real)
   // operating on elements which share a node
   libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
-  const unsigned char dim = this->get_elem_dim();
-
   // If the coordinate data is in our own system, it's already
   // been set up for us, and we can ignore our input parameter theta
   //  if (_mesh_sys == this->number())
   //    {
   unsigned int n_nodes = this->get_elem().n_nodes();
+
+#ifdef DEBUG
+  const unsigned char dim = this->get_elem_dim();
+
   // For simplicity we demand that mesh coordinates be stored
   // in a format that allows a direct copy
   libmesh_assert(this->get_mesh_x_var() == libMesh::invalid_uint ||
@@ -1510,6 +1514,7 @@ void FEMContext::_do_elem_position_set(Real)
                  (this->get_element_fe(this->get_mesh_z_var(), dim)->get_fe_type().family
                   == LAGRANGE &&
                   this->get_elem_solution(this->get_mesh_z_var()).size() == n_nodes));
+#endif
 
   // Set the new point coordinates
   if (this->get_mesh_x_var() != libMesh::invalid_uint)
