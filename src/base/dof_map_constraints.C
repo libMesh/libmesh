@@ -2333,10 +2333,12 @@ DofMap::max_constraint_error (const System & system,
               global_dof >= vec.first_local_index() &&
               global_dof < vec.last_local_index())
             {
+#ifdef DEBUG
               DofConstraints::const_iterator
                 pos = _dof_constraints.find(global_dof);
 
               libmesh_assert (pos != _dof_constraints.end());
+#endif
 
               Number exact_value = 0;
               DofConstraintValueMap::const_iterator rhsit =

@@ -1037,8 +1037,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
 
   unsigned int n_files = multiple_vectors.size();
   unsigned int n_directories = multiple_directory_names.size();
-  unsigned int n_data_names = multiple_data_names.size();
-  libmesh_assert( (n_files == n_directories) && (n_files == n_data_names) );
+  libmesh_assert((n_files == n_directories) && (n_files == multiple_data_names.size()));
 
   if (n_files == 0)
     return;
