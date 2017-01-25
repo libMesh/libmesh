@@ -61,9 +61,10 @@
 #define IECXI8R4 7
 #define IECXI8R8 8
 
-static int charsize = CHARSIZE, shortsize = SHORTSIZE, intsize = INTSIZE, 
-           wordsize = WORDSIZE, floatsize = FLOATSIZE,
-           longsize = LONGSIZE, doublesize = DOUBLESIZE,
+static int charsize = CHARSIZE,
+           intsize = INTSIZE,
+           floatsize = FLOATSIZE,
+           doublesize = DOUBLESIZE,
            longlongsize = LONGLONGSIZE, charsize_in;
 
 static long numnodes, numcells, lncells, numcellsin, numfaces, lnfaces,
