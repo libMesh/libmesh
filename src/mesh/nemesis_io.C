@@ -68,7 +68,7 @@ inline unsigned int to_uint ( const T & t )
 
 // test equality for a.first -> a.second mapping.  since we can only map to one
 // value only test the first entry
-#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API) && defined(DEBUG)
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API) && !defined(NDEBUG)
 inline bool global_idx_mapping_equality (const std::pair<unsigned int, unsigned int> & a,
                                          const std::pair<unsigned int, unsigned int> & b)
 {

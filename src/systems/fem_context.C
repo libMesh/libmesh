@@ -1432,7 +1432,7 @@ void FEMContext::elem_position_get()
   //    {
   unsigned int n_nodes = this->get_elem().n_nodes();
 
-#ifdef DEBUG
+#ifndef NDEBUG
   const unsigned char dim = this->get_elem_dim();
 
   // For simplicity we demand that mesh coordinates be stored
@@ -1497,7 +1497,7 @@ void FEMContext::_do_elem_position_set(Real)
   //    {
   unsigned int n_nodes = this->get_elem().n_nodes();
 
-#ifdef DEBUG
+#ifndef NDEBUG
   const unsigned char dim = this->get_elem_dim();
 
   // For simplicity we demand that mesh coordinates be stored

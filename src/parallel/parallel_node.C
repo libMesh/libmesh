@@ -43,7 +43,7 @@ static const unsigned int header_size = 2;
 static const unsigned int idtypes_per_Real =
   (sizeof(Real) + sizeof(largest_id_type) - 1) / sizeof(largest_id_type);
 
-#ifdef DEBUG
+#ifndef NDEBUG
 // Currently this constant is only used for debugging.
 static const largest_id_type node_magic_header = 1234567890;
 #endif

@@ -2333,7 +2333,7 @@ DofMap::max_constraint_error (const System & system,
               global_dof >= vec.first_local_index() &&
               global_dof < vec.last_local_index())
             {
-#ifdef DEBUG
+#ifndef NDEBUG
               DofConstraints::const_iterator
                 pos = _dof_constraints.find(global_dof);
 

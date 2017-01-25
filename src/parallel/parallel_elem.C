@@ -40,7 +40,7 @@ static const unsigned int header_size = 12;
 static const unsigned int header_size = 11;
 #endif
 
-#ifdef DEBUG
+#ifndef NDEBUG
 // Currently this constant is only used for debugging.
 static const largest_id_type elem_magic_header = 987654321;
 #endif
