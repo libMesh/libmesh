@@ -631,14 +631,15 @@ unique_id_type ReplicatedMesh::parallel_max_unique_id() const
 
 void ReplicatedMesh::renumber_nodes_and_elements ()
 {
+  // If we're not renumbering, we're not renumbering.
+  if (_skip_renumber_nodes_and_elements)
+    return;
+
   LOG_SCOPE("renumber_nodes_and_elem()", "Mesh");
 
   // node and element id counters
   dof_id_type next_free_elem = 0;
   dof_id_type next_free_node = 0;
-
-  // Will hold the set of nodes that are currently connected to elements
-  LIBMESH_BEST_UNORDERED_SET<Node *> connected_nodes;
 
   // Loop over the elements.  Note that there may
   // be NULLs in the _elements vector from the coarsening
@@ -660,42 +661,33 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
           // Increment the element counter
           el->set_id (next_free_elem++);
 
-          if(_skip_renumber_nodes_and_elements)
-            {
-              // Add this elements nodes to the connected list
-              for (unsigned int n=0; n<el->n_nodes(); n++)
-                connected_nodes.insert(el->node_ptr(n));
-            }
-          else  // We DO want node renumbering
-            {
-              // Loop over this element's nodes.  Number them,
-              // if they have not been numbered already.  Also,
-              // position them in the _nodes vector so that they
-              // are packed contiguously from the beginning.
-              for (unsigned int n=0; n<el->n_nodes(); n++)
-                if (el->node_id(n) == next_free_node)    // don't need to process
-                  next_free_node++;                      // [(src == dst) below]
+          // Loop over this element's nodes.  Number them,
+          // if they have not been numbered already.  Also,
+          // position them in the _nodes vector so that they
+          // are packed contiguously from the beginning.
+          for (unsigned int n=0; n<el->n_nodes(); n++)
+            if (el->node_id(n) == next_free_node)    // don't need to process
+              next_free_node++;                      // [(src == dst) below]
 
-                else if (el->node_id(n) > next_free_node) // need to process
-                  {
-                    // The source and destination indices
-                    // for this node
-                    const dof_id_type src_idx = el->node_id(n);
-                    const dof_id_type dst_idx = next_free_node++;
+            else if (el->node_id(n) > next_free_node) // need to process
+              {
+                // The source and destination indices
+                // for this node
+                const dof_id_type src_idx = el->node_id(n);
+                const dof_id_type dst_idx = next_free_node++;
 
-                    // ensure we want to swap a valid nodes
-                    libmesh_assert(_nodes[src_idx]);
+                // ensure we want to swap a valid nodes
+                libmesh_assert(_nodes[src_idx]);
 
-                    // Swap the source and destination nodes
-                    std::swap(_nodes[src_idx],
-                              _nodes[dst_idx] );
+                // Swap the source and destination nodes
+                std::swap(_nodes[src_idx],
+                          _nodes[dst_idx] );
 
-                    // Set proper indices where that makes sense
-                    if (_nodes[src_idx] != libmesh_nullptr)
-                      _nodes[src_idx]->set_id (src_idx);
-                    _nodes[dst_idx]->set_id (dst_idx);
-                  }
-            }
+                // Set proper indices where that makes sense
+                if (_nodes[src_idx] != libmesh_nullptr)
+                  _nodes[src_idx]->set_id (src_idx);
+                _nodes[dst_idx]->set_id (dst_idx);
+              }
         }
 
     // Erase any additional storage. These elements have been
@@ -704,80 +696,33 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
     _elements.erase (out_iter, end);
   }
 
+  // Any nodes in the vector >= _nodes[next_free_node]
+  // are not connected to any elements will now be deleted.
+  {
+    std::vector<Node *>::iterator nd        = _nodes.begin();
+    const std::vector<Node *>::iterator end = _nodes.end();
 
-  if(_skip_renumber_nodes_and_elements)
-    {
-      // Loop over the nodes.  Note that there may
-      // be NULLs in the _nodes vector from the coarsening
-      // process.  Pack the nodes in to a contiguous array
-      // and then trim any excess.
+    std::advance (nd, next_free_node);
 
-      std::vector<Node *>::iterator in        = _nodes.begin();
-      std::vector<Node *>::iterator out_iter  = _nodes.begin();
-      const std::vector<Node *>::iterator end = _nodes.end();
-
-      for (; in != end; ++in)
-        if (*in != libmesh_nullptr)
-          {
-            // This is a reference so that if we change the pointer it will change in the vector
-            Node * & nd = *in;
-
-            // If this node is still connected to an elem, put it in the list
-            if(connected_nodes.find(nd) != connected_nodes.end())
-              {
-                *out_iter = nd;
-                ++out_iter;
-
-                // Increment the node counter
-                nd->set_id (next_free_node++);
-              }
-            else // This node is orphaned, delete it!
-              {
-                this->get_boundary_info().remove (nd);
-
-                // delete the node
-                delete nd;
-                nd = libmesh_nullptr;
-              }
-          }
-
-      // Erase any additional storage.  Whatever was
-      _nodes.erase (out_iter, end);
-    }
-  else // We really DO want node renumbering
-    {
-      // Any nodes in the vector >= _nodes[next_free_node]
-      // are not connected to any elements and may be deleted
-      // if desired.
-
-      // (This code block will erase the unused nodes)
-      // Now, delete the unused nodes
+    for (std::vector<Node *>::iterator it=nd;
+         it != end; ++it)
       {
-        std::vector<Node *>::iterator nd        = _nodes.begin();
-        const std::vector<Node *>::iterator end = _nodes.end();
+        // Mesh modification code might have already deleted some
+        // nodes
+        if (*it == libmesh_nullptr)
+          continue;
 
-        std::advance (nd, next_free_node);
+        // remove any boundary information associated with
+        // this node
+        this->get_boundary_info().remove (*it);
 
-        for (std::vector<Node *>::iterator it=nd;
-             it != end; ++it)
-          {
-            // Mesh modification code might have already deleted some
-            // nodes
-            if (*it == libmesh_nullptr)
-              continue;
-
-            // remove any boundary information associated with
-            // this node
-            this->get_boundary_info().remove (*it);
-
-            // delete the node
-            delete *it;
-            *it = libmesh_nullptr;
-          }
-
-        _nodes.erase (nd, end);
+        // delete the node
+        delete *it;
+        *it = libmesh_nullptr;
       }
-    }
+
+    _nodes.erase (nd, end);
+  }
 
   libmesh_assert_equal_to (next_free_elem, _elements.size());
   libmesh_assert_equal_to (next_free_node, _nodes.size());
