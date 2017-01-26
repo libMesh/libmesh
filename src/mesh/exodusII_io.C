@@ -671,27 +671,52 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
       unsigned int variable_name_position =
         cast_int<unsigned int>(pos - output_names.begin());
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-      std::vector<Real> real_parts(num_nodes);
-      std::vector<Real> imag_parts(num_nodes);
-      std::vector<Real> magnitudes(num_nodes);
+      // Set up temporary vectors to be passed to Exodus to write the
+      // nodal values for a single variable at a time.
+#ifdef LIBMESH_USE_REAL_NUMBERS
+      std::vector<Number> cur_soln;
 
-      for (unsigned int i=0; i<num_nodes; ++i)
-        {
-          real_parts[i] = soln[i*num_vars + c].real();
-          imag_parts[i] = soln[i*num_vars + c].imag();
-          magnitudes[i] = std::abs(soln[i*num_vars + c]);
-        }
-      exio_helper->write_nodal_values(3*variable_name_position+1,real_parts,_timestep);
-      exio_helper->write_nodal_values(3*variable_name_position+2,imag_parts,_timestep);
-      exio_helper->write_nodal_values(3*variable_name_position+3,magnitudes,_timestep);
+      // num_nodes is either exactly how much space we will need for
+      // each vector, or a safe upper bound for the amount of memory
+      // we will require when there are gaps in the numbering.
+      cur_soln.reserve(num_nodes);
 #else
-      std::vector<Number> cur_soln(num_nodes);
+      std::vector<Real> real_parts;
+      std::vector<Real> imag_parts;
+      std::vector<Real> magnitudes;
+      real_parts.reserve(num_nodes);
+      imag_parts.reserve(num_nodes);
+      magnitudes.reserve(num_nodes);
+#endif
 
-      // Copy out this variable's solution
-      for (dof_id_type i=0; i<num_nodes; i++)
-        cur_soln[i] = soln[i*num_vars + c];
-      exio_helper->write_nodal_values(variable_name_position+1,cur_soln,_timestep);
+      // There could be gaps in "soln", but it will always be in the
+      // order of [num_vars * node_id + var_id]. We now copy the
+      // proper solution values contiguously into "cur_soln",
+      // removing the gaps.
+      {
+        MeshBase::const_node_iterator it = mesh.nodes_begin();
+        const MeshBase::const_node_iterator end = mesh.nodes_end();
+        for (; it != end; ++it)
+          {
+            const Node * node = *it;
+            dof_id_type idx = node->id()*num_vars + c;
+#ifdef LIBMESH_USE_REAL_NUMBERS
+            cur_soln.push_back(soln[idx]);
+#else
+            real_parts.push_back(soln[idx].real());
+            imag_parts.push_back(soln[idx].imag());
+            magnitudes.push_back(std::abs(soln[idx]));
+#endif
+          }
+      }
+
+      // Finally, actually call the Exodus API to write to file.
+#ifdef LIBMESH_USE_REAL_NUMBERS
+      exio_helper->write_nodal_values(variable_name_position+1, cur_soln, _timestep);
+#else
+      exio_helper->write_nodal_values(3*variable_name_position+1, real_parts, _timestep);
+      exio_helper->write_nodal_values(3*variable_name_position+2, imag_parts, _timestep);
+      exio_helper->write_nodal_values(3*variable_name_position+3, magnitudes, _timestep);
 #endif
 
     }
