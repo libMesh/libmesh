@@ -59,14 +59,14 @@ protected:
    * rendering this object useless.
    */
   explicit
-  MeshOutput (const bool is_parallel_format = false);
+  MeshOutput (const bool is_parallel_format = false, const bool serial_only_needed_on_proc_0 = false);
 
   /**
    * Constructor.  Takes a reference to a constant object.
    * This constructor will only allow us to write the object.
    */
   explicit
-  MeshOutput (const MT &, const bool is_parallel_format = false);
+  MeshOutput (const MT &, const bool is_parallel_format = false, const bool serial_only_needed_on_proc_0 = false);
 
 
 public:
@@ -140,6 +140,14 @@ protected:
    */
   const bool _is_parallel_format;
 
+  /**
+   * Flag specifying whether this format can be written by only
+   * serializing the mesh to processor zero
+   *
+   * If this is false (default) the mesh will be serialized to
+   * all processors
+   */
+  const bool _serial_only_needed_on_proc_0;
 
 private:
 
@@ -165,8 +173,9 @@ private:
 // MeshOutput inline members
 template <class MT>
 inline
-MeshOutput<MT>::MeshOutput (const bool is_parallel_format) :
+MeshOutput<MT>::MeshOutput (const bool is_parallel_format, const bool serial_only_needed_on_proc_0) :
   _is_parallel_format(is_parallel_format),
+  _serial_only_needed_on_proc_0(serial_only_needed_on_proc_0),
   _obj(libmesh_nullptr),
   _ascii_precision (std::numeric_limits<Real>::digits10 + 2)
 {}
@@ -175,8 +184,9 @@ MeshOutput<MT>::MeshOutput (const bool is_parallel_format) :
 
 template <class MT>
 inline
-MeshOutput<MT>::MeshOutput (const MT & obj, const bool is_parallel_format) :
+MeshOutput<MT>::MeshOutput (const MT & obj, const bool is_parallel_format, const bool serial_only_needed_on_proc_0) :
   _is_parallel_format(is_parallel_format),
+  _serial_only_needed_on_proc_0(serial_only_needed_on_proc_0),
   _obj (&obj),
   _ascii_precision (std::numeric_limits<Real>::digits10 + 2)
 {

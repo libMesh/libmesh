@@ -34,6 +34,8 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/exodusII_io_helper.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/mesh_communication.h"
+#include "libmesh/parallel_mesh.h"
 
 namespace libMesh
 {
@@ -48,7 +50,9 @@ ExodusII_IO::ExodusII_IO (MeshBase & mesh,
 #endif
                           ) :
   MeshInput<MeshBase> (mesh),
-  MeshOutput<MeshBase> (mesh),
+  MeshOutput<MeshBase> (mesh,
+                        /* is_parallel_format = */ false,
+                        /* serial_only_needed_on_proc_0 = */ true),
   ParallelObject(mesh),
 #ifdef LIBMESH_HAVE_EXODUS_API
   exio_helper(new ExodusII_IO_Helper(*this, false, true, single_precision)),
@@ -543,7 +547,8 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   // ExodusII_IO::write_element_data() when the underlying Mesh is a
   // DistributedMesh will result in an unnecessary additional
   // serialization/re-parallelization step.
-  MeshSerializer serialize(MeshInput<MeshBase>::mesh(), !MeshOutput<MeshBase>::_is_parallel_format);
+  // The "true" specifies that we only need the mesh serialized to processor 0
+  MeshSerializer serialize(MeshInput<MeshBase>::mesh(), !MeshOutput<MeshBase>::_is_parallel_format, true);
 
   // To be (possibly) filled with a filtered list of variable names to output.
   std::vector<std::string> names;
@@ -788,7 +793,8 @@ void ExodusII_IO::write (const std::string & fname)
 
   // We may need to gather a DistributedMesh to output it, making that
   // const qualifier in our constructor a dirty lie
-  MeshSerializer serialize(const_cast<MeshBase &>(mesh), !MeshOutput<MeshBase>::_is_parallel_format);
+  // The "true" specifies that we only need the mesh serialized to processor 0
+  MeshSerializer serialize(MeshInput<MeshBase>::mesh(), !MeshOutput<MeshBase>::_is_parallel_format, true);
 
   libmesh_assert( !exio_helper->opened_for_writing );
 
@@ -807,9 +813,6 @@ void ExodusII_IO::write (const std::string & fname)
   exio_helper->write_elements(mesh);
   exio_helper->write_sidesets(mesh);
   exio_helper->write_nodesets(mesh);
-
-  if(MeshOutput<MeshBase>::mesh().processor_id())
-    return;
 
   if( (mesh.get_boundary_info().n_edge_conds() > 0) &&
       _verbose )
