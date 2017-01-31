@@ -1448,7 +1448,11 @@ bool MeshRefinement::_coarsen_elements ()
 
   // And we may need to update DistributedMesh values reflecting the changes
   if (mesh_changed)
-    _mesh.update_parallel_id_counts();
+    {
+      _mesh.update_parallel_id_counts();
+
+      MeshCommunication().send_coarse_ghosts(_mesh);
+    }
 
   // Node processor ids may need to change if an element of that id
   // was coarsened away
