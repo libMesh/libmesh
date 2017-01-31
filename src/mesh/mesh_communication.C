@@ -956,8 +956,12 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
 
   // Broadcast elements from coarsest to finest, so that child
   // elements will see their parents already in place.
-  unsigned int n_levels = MeshTools::n_levels(mesh);
-  mesh.comm().broadcast(n_levels);
+  //
+  // When restarting from a checkpoint, we may have elements which are
+  // assigned to a processor but which have not yet been sent to that
+  // processor, so we need to use a paranoid n_levels() count and not
+  // the usual fast algorithm.
+  const unsigned int n_levels = MeshTools::paranoid_n_levels(mesh);
 
   for (unsigned int l=0; l != n_levels; ++l)
     mesh.comm().broadcast_packed_range(&mesh,
@@ -1025,10 +1029,7 @@ void MeshCommunication::gather (const processor_id_type root_id, DistributedMesh
 
   // Gather elements from coarsest to finest, so that child
   // elements will see their parents already in place.
-  // rank 0 should know n_levels regardless, so this is
-  // safe independent of root_id
-  unsigned int n_levels = MeshTools::n_levels(mesh);
-  mesh.comm().broadcast(n_levels);
+  const unsigned int n_levels = MeshTools::n_levels(mesh);
 
   for (unsigned int l=0; l != n_levels; ++l)
     (root_id == DofObject::invalid_processor_id) ?
