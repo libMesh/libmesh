@@ -924,6 +924,191 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
 
 #ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
 // ------------------------------------------------------------
+void MeshCommunication::send_coarse_ghosts(MeshBase &) const
+{
+  // no MPI == one processor, no need for this method...
+  return;
+}
+#else
+void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
+{
+
+  // Don't need to do anything if all processors already ghost all non-local
+  // elements.
+  if (mesh.is_serial())
+    return;
+
+  // When we coarsen elements on a DistributedMesh, we make their
+  // parents active.  This may increase the ghosting requirements on
+  // the processor which owns the newly-activated parent element.  To
+  // ensure ghosting requirements are satisfied, processors which
+  // coarsen an element will send all the associated ghosted elements
+  // to all processors which own any of the coarsened-away-element's
+  // siblings.
+  typedef LIBMESH_BEST_UNORDERED_MAP
+    <processor_id_type, std::vector<Elem *> >
+    ghost_map;
+  ghost_map elements_to_ghost;
+
+  // Look for just-coarsened elements
+  MeshBase::element_iterator       it  = mesh.elements_begin();
+  const MeshBase::element_iterator end = mesh.elements_end();
+
+  for ( ; it != end; ++it)
+    {
+      Elem * elem = *it;
+
+      if (elem->refinement_flag() != Elem::COARSEN_INACTIVE)
+        continue;
+
+      // On a distributed mesh:
+      // If we don't own this element but we do own one of its
+      // children, then there is a chance that we are aware of
+      // ghost elements which the owner needs us to send them.
+      const processor_id_type their_proc_id = elem->processor_id();
+      if (their_proc_id != mesh.processor_id())
+        {
+          const unsigned int n_children = elem->n_children();
+          for (unsigned int c = 0; c != n_children; ++c)
+            {
+              const Elem * child = elem->child(c);
+              if (child->processor_id() == mesh.processor_id())
+                {
+                  elements_to_ghost[their_proc_id].push_back(elem);
+                  break;
+                }
+            }
+        }
+    }
+
+  const processor_id_type n_proc = mesh.n_processors();
+
+  // Get a few unique message tags to use in communications; we'll
+  // default to some numbers around pi*1000
+  Parallel::MessageTag
+    nodestag   = mesh.comm().get_unique_tag(3141),
+    elemstag   = mesh.comm().get_unique_tag(3142);
+
+  std::vector<Parallel::Request> send_requests;
+
+  // Using unsigned char instead of bool since it'll get converted for
+  // MPI use later anyway
+  std::vector<unsigned char> send_to_proc(n_proc, 0);
+
+  for (processor_id_type p=0; p != n_proc; ++p)
+    {
+      if (p == mesh.processor_id())
+        break;
+
+      // We'll send these asynchronously, but their data will be
+      // packed into Parallel:: buffers so it will be okay when the
+      // original containers are destructed before the sends complete.
+      std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
+      std::set<const Node *> nodes_to_send;
+
+      const ghost_map::const_iterator it =
+        elements_to_ghost.find(p);
+      if (it != elements_to_ghost.end())
+        {
+          const std::vector<Elem *> & elems = it->second;
+          libmesh_assert(elems.size());
+
+          // Make some fakey element iterators defining this vector of
+          // elements
+          Elem * const * elempp = const_cast<Elem * const *>(&elems[0]);
+          Elem * const * elemend = elempp+elems.size();
+          const MeshBase::const_element_iterator elem_it =
+            MeshBase::const_element_iterator(elempp, elemend, Predicates::NotNull<Elem * const *>());
+          const MeshBase::const_element_iterator elem_end =
+            MeshBase::const_element_iterator(elemend, elemend, Predicates::NotNull<Elem * const *>());
+
+          std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
+          const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
+          for (; gf_it != gf_end; ++gf_it)
+            {
+              GhostingFunctor::map_type elements_to_ghost;
+
+              GhostingFunctor *gf = *gf_it;
+              libmesh_assert(gf);
+              (*gf)(elem_it, elem_end, p, elements_to_ghost);
+
+              // We can ignore the CouplingMatrix in ->second, but we
+              // need to ghost all the elements in ->first.
+              GhostingFunctor::map_type::iterator        etg_it = elements_to_ghost.begin();
+              const GhostingFunctor::map_type::iterator etg_end = elements_to_ghost.end();
+              for (; etg_it != etg_end; ++etg_it)
+                {
+                  const Elem * elem = etg_it->first;
+                  libmesh_assert(elem);
+                  while (elem)
+                    {
+                      libmesh_assert(elem != remote_elem);
+                      elements_to_send.insert(elem);
+                      for (unsigned int n=0,
+                           n_nodes = elem->n_nodes(); n != n_nodes;
+                           ++n)
+                        nodes_to_send.insert(elem->node_ptr(n));
+                      elem = elem->parent();
+                    }
+                }
+            }
+
+          send_requests.push_back(Parallel::request());
+
+          mesh.comm().send_packed_range (p, &mesh,
+                                         nodes_to_send.begin(),
+                                         nodes_to_send.end(),
+                                         send_requests.back(),
+                                         nodestag);
+
+          send_requests.push_back(Parallel::request());
+
+          send_to_proc[p] = 1; // true
+
+          mesh.comm().send_packed_range (p, &mesh,
+                                         elements_to_send.begin(),
+                                         elements_to_send.end(),
+                                         send_requests.back(),
+                                         elemstag);
+        }
+    }
+
+  // Find out how many other processors are sending us elements+nodes.
+  std::vector<unsigned char> recv_from_proc(send_to_proc);
+  mesh.comm().alltoall(recv_from_proc);
+
+  const processor_id_type n_receives =
+    std::count(recv_from_proc.begin(), recv_from_proc.end(), 1);
+
+  // Receive nodes first since elements will need to attach to them
+  for (processor_id_type recv_i = 0; recv_i != n_receives; ++recv_i)
+    {
+      mesh.comm().receive_packed_range
+        (Parallel::any_source,
+         &mesh,
+         mesh_inserter_iterator<Node>(mesh),
+         (Elem**)libmesh_nullptr,
+         nodestag);
+    }
+
+  for (processor_id_type recv_i = 0; recv_i != n_receives; ++recv_i)
+    {
+      mesh.comm().receive_packed_range
+        (Parallel::any_source,
+         &mesh,
+         mesh_inserter_iterator<Elem>(mesh),
+         (Elem**)libmesh_nullptr,
+         elemstag);
+    }
+
+  // Wait for all sends to complete
+  Parallel::wait (send_requests);
+}
+
+#endif // LIBMESH_HAVE_MPI
+
+#ifndef LIBMESH_HAVE_MPI // avoid spurious gcc warnings
+// ------------------------------------------------------------
 void MeshCommunication::broadcast (MeshBase &) const
 {
   // no MPI == one processor, no need for this method...

@@ -103,6 +103,12 @@ public:
   void gather_neighboring_elements (DistributedMesh &) const;
 
   /**
+   * Examine a just-coarsened mesh, and for any newly-coarsened elements,
+   * send the associated ghosted elements to the processor which needs them.
+   */
+  void send_coarse_ghosts (MeshBase &) const;
+
+  /**
    * This method takes an input \p DistributedMesh which may be
    * distributed among all the processors.  Each processor then
    * sends its local nodes and elements to processor \p root_id.
