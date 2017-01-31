@@ -242,8 +242,9 @@ dof_id_type n_non_subactive_elem_of_type_at_level(const MeshBase & mesh,
 
 /**
  * Return the number of levels of refinement in the mesh.
- * Implemented by looping over all the local elements and finding the
- * maximum level, then summing in parallel.
+ * Implemented by looping over all the local elements and
+ * unpartitioned elements and finding the maximum level, then summing
+ * in parallel.
  */
 unsigned int n_levels(const MeshBase & mesh);
 
@@ -274,6 +275,17 @@ unsigned int n_active_local_levels(const MeshBase & mesh);
  * maximum p-level, then summing in parallel.
  */
 unsigned int n_p_levels (const MeshBase & mesh);
+
+/**
+ * Return the number of levels of refinement in the mesh, even if that
+ * mesh is not currently properly distributed or properly serialized.
+ *
+ * Implemented by looping over all elements and finding the maximum
+ * level, then summing in parallel.  This is much slower than
+ * n_levels() but will return correct values even when the mesh is in
+ * an inconsistent parallel state.
+ */
+unsigned int paranoid_n_levels(const MeshBase & mesh);
 
 /**
  * Builds a set of node IDs for nodes which belong to non-subactive
