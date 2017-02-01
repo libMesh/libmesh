@@ -121,9 +121,16 @@ Node * MeshRefinement::add_node(Elem & parent,
   const dof_id_type new_node_id =
     _new_nodes_map.find(bracketing_nodes);
 
-  // Return the node if it already exists
+  // Return the node if it already exists, but first update the
+  // processor_id if the node is now going to be attached to the
+  // element of a processor which may take ownership of it.
   if (new_node_id != DofObject::invalid_id)
-    return _mesh.node_ptr(new_node_id);
+    {
+      Node *node = _mesh.node_ptr(new_node_id);
+      if (proc_id < node->processor_id())
+        node->processor_id() = proc_id;
+      return node;
+    }
 
   // Otherwise we need to add a new node, with a default id and the
   // requested processor_id.  Figure out where to add the point:
