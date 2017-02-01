@@ -581,15 +581,15 @@ dof_id_type MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase & me
 
 unsigned int MeshTools::n_active_local_levels(const MeshBase & mesh)
 {
-  unsigned int max_level = 0;
+  unsigned int nl = 0;
 
   MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
   for( ; el != end_el; ++el)
-    max_level = std::max((*el)->level(), max_level);
+    nl = std::max((*el)->level() + 1, nl);
 
-  return max_level + 1;
+  return nl;
 }
 
 
@@ -617,15 +617,15 @@ unsigned int MeshTools::n_active_levels(const MeshBase & mesh)
 
 unsigned int MeshTools::n_local_levels(const MeshBase & mesh)
 {
-  unsigned int max_level = 0;
+  unsigned int nl = 0;
 
   MeshBase::const_element_iterator el = mesh.local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
 
   for( ; el != end_el; ++el)
-    max_level = std::max((*el)->level(), max_level);
+    nl = std::max((*el)->level() + 1, nl);
 
-  return max_level + 1;
+  return nl;
 }
 
 
