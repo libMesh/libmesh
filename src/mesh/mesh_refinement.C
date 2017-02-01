@@ -1519,19 +1519,65 @@ bool MeshRefinement::_refine_elements ()
   // levels on a distributed mesh.
   bool mesh_p_changed = false;
 
-  // Iterate over the elements, looking for elements
-  // flagged for refinement.
-  for (it = _mesh.elements_begin(); it != end; ++it)
+  // Iterate over the elements, looking for elements flagged for
+  // refinement.
+
+  // If we are in serial, then we just do the refinement in the same
+  // order on every processor and everything stays in sync.
+
+  // If we are distributed, that's impossible.  In that case, we need
+  // to make sure that if we end up as the owner of a new node, which
+  // might happen if that node is attached to one of our own elements,
+  // then we have given it a legitimate node id and our own processor
+  // id.  We generate legitimate node ids and use our own processor id
+  // when we are refining our own elements but not when we refine
+  // others' elements.  Therefore we want to refine our own elements
+  // *first*, thereby generating all nodes which might belong to us,
+  // and then refine others' elements *after*, thereby generating
+  // nodes with temporary ids which we know we will discard.
+  {
+    MeshBase::element_iterator
+      elem_it  = _mesh.active_local_elements_begin(),
+      elem_end = _mesh.active_local_elements_end();
+
+    if (_mesh.is_serial())
+      {
+        elem_it  = _mesh.active_elements_begin();
+        elem_end = _mesh.active_elements_end();
+      }
+
+    for (; elem_it != elem_end; ++elem_it)
+      {
+        Elem * elem = *elem_it;
+        if (elem->refinement_flag() == Elem::REFINE)
+          local_copy_of_elements.push_back(elem);
+        if (elem->p_refinement_flag() == Elem::REFINE &&
+            elem->active())
+          {
+            elem->set_p_level(elem->p_level()+1);
+            elem->set_p_refinement_flag(Elem::JUST_REFINED);
+            mesh_p_changed = true;
+          }
+      }
+  }
+
+  if (!_mesh.is_serial())
     {
-      Elem * elem = *it;
-      if (elem->refinement_flag() == Elem::REFINE)
-        local_copy_of_elements.push_back(elem);
-      if (elem->p_refinement_flag() == Elem::REFINE &&
-          elem->active())
+      for (MeshBase::element_iterator
+             elem_it = _mesh.active_not_local_elements_begin(),
+             elem_end = _mesh.active_not_local_elements_end();
+           elem_it != elem_end; ++elem_it)
         {
-          elem->set_p_level(elem->p_level()+1);
-          elem->set_p_refinement_flag(Elem::JUST_REFINED);
-          mesh_p_changed = true;
+          Elem * elem = *elem_it;
+          if (elem->refinement_flag() == Elem::REFINE)
+            local_copy_of_elements.push_back(elem);
+          if (elem->p_refinement_flag() == Elem::REFINE &&
+              elem->active())
+            {
+              elem->set_p_level(elem->p_level()+1);
+              elem->set_p_refinement_flag(Elem::JUST_REFINED);
+              mesh_p_changed = true;
+            }
         }
     }
 
