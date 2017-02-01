@@ -124,8 +124,9 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
  *                  std::vector<sync::datum> & data),
  * by resizing and setting the values of the data vector.
  * Respond to fulfillment with
- * sync.act_on_data(const std::vector<unsigned int> & ids,
- *                  std::vector<sync::datum> & data)
+ * bool sync.act_on_data(const std::vector<unsigned int> & ids,
+ *                       std::vector<sync::datum> & data)
+ * and return true iff the response changed any data.
  * The user must define Parallel::StandardType<sync::datum> if
  * sync::datum isn't a built-in type.
  */
@@ -135,8 +136,8 @@ template <typename ElemCheckFunctor,
 void sync_node_data_by_element_id(MeshBase & mesh,
                                   const MeshBase::const_element_iterator & range_begin,
                                   const MeshBase::const_element_iterator & range_end,
-                                  ElemCheckFunctor & elem_check,
-                                  NodeCheckFunctor & node_check,
+                                  const ElemCheckFunctor & elem_check,
+                                  const NodeCheckFunctor & node_check,
                                   SyncFunctor & sync);
 
 
@@ -493,160 +494,173 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
   libmesh_parallel_only(comm);
 
   // Keep track of which nodes we've asked about, so we only hit each
-  // once.
-  LIBMESH_BEST_UNORDERED_SET<dof_id_type> queried_nodes;
+  // once?
+  // LIBMESH_BEST_UNORDERED_SET<dof_id_type> queried_nodes;
 
-  // Count the objects to ask each processor about
-  std::vector<dof_id_type>
-    ghost_objects_from_proc(comm.size(), 0);
+  // No.  We need to ask every neighboring processor about every node,
+  // probably repeatedly.  Imagine a vertex surrounded by triangles,
+  // each on a different processor, with a ghosting policy that
+  // include only face neighbors and not point neighbors.  Then the
+  // only way for authoritative information to trickle out from that
+  // vertex is by being passed along, one neighbor at a time, to
+  // processors who mostly don't even see the node's true owner!
 
-  for (MeshBase::const_element_iterator it = range_begin;
-       it != range_end; ++it)
+  bool need_sync = false;
+
+  do
     {
-      const Elem * elem = *it;
-      libmesh_assert (elem);
+      // This is the last sync we need, unless we later discover
+      // otherwise
+      need_sync = false;
 
-      if (!elem_check(elem))
-        continue;
+      // Count the objects to ask each processor about
+      std::vector<dof_id_type>
+        ghost_objects_from_proc(comm.size(), 0);
 
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+      for (MeshBase::const_element_iterator it = range_begin;
+           it != range_end; ++it)
         {
-          if (!node_check(elem, n))
+          const Elem * elem = *it;
+          libmesh_assert (elem);
+
+          if (!elem_check(elem))
             continue;
 
-          const Node & node = elem->node_ref(n);
-
-          const processor_id_type proc_id = node.processor_id();
+          const processor_id_type proc_id = elem->processor_id();
           if (proc_id == comm.rank() ||
               proc_id == DofObject::invalid_processor_id)
             continue;
 
-          dof_id_type node_id = node.id();
-          if (!queried_nodes.count(node_id))
+          for (unsigned int n=0; n != elem->n_nodes(); ++n)
             {
+              if (!node_check(elem, n))
+                continue;
+
               ghost_objects_from_proc[proc_id]++;
-              queried_nodes.insert(node_id);
             }
         }
-    }
 
-  // Now repeat that iteration, filling request sets this time.
-  queried_nodes.clear();
+      // Now repeat that iteration, filling request sets this time.
 
-  // Request sets to send to each processor
-  std::vector<std::vector<dof_id_type> >
-    requested_objs_elem_id(comm.size());
-  std::vector<std::vector<unsigned char> >
-    requested_objs_node_num(comm.size());
+      // Request sets to send to each processor
+      std::vector<std::vector<dof_id_type> >
+        requested_objs_elem_id(comm.size());
+      std::vector<std::vector<unsigned char> >
+        requested_objs_node_num(comm.size());
 
-  // Keep track of current local ids for each too
-  std::vector<std::vector<dof_id_type> >
-    requested_objs_id(comm.size());
+      // Keep track of current local ids for each too
+      std::vector<std::vector<dof_id_type> >
+        requested_objs_id(comm.size());
 
-  // We know how many objects live on each processor, so reserve()
-  // space for each.
-  for (processor_id_type p=0; p != comm.size(); ++p)
-    if (p != comm.rank())
-      {
-        requested_objs_elem_id[p].reserve(ghost_objects_from_proc[p]);
-        requested_objs_node_num[p].reserve(ghost_objects_from_proc[p]);
-        requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
-      }
+      // We know how many objects live on each processor, so reserve()
+      // space for each.
+      for (processor_id_type p=0; p != comm.size(); ++p)
+        if (p != comm.rank())
+          {
+            requested_objs_elem_id[p].reserve(ghost_objects_from_proc[p]);
+            requested_objs_node_num[p].reserve(ghost_objects_from_proc[p]);
+            requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
+          }
 
-  for (MeshBase::const_element_iterator it = range_begin;
-       it != range_end; ++it)
-    {
-      const Elem * elem = *it;
-      libmesh_assert (elem);
-
-      if (!elem_check(elem))
-        continue;
-
-      const dof_id_type elem_id = elem->id();
-
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+      for (MeshBase::const_element_iterator it = range_begin;
+           it != range_end; ++it)
         {
-          if (!node_check(elem, n))
+          const Elem * elem = *it;
+          libmesh_assert (elem);
+
+          if (!elem_check(elem))
             continue;
 
-          const Node & node = elem->node_ref(n);
-          const dof_id_type node_id = node.id();
-
-          const processor_id_type proc_id = node.processor_id();
+          const processor_id_type proc_id = elem->processor_id();
           if (proc_id == comm.rank() ||
               proc_id == DofObject::invalid_processor_id)
             continue;
 
-          if (!queried_nodes.count(node_id))
+          const dof_id_type elem_id = elem->id();
+
+          for (unsigned int n=0; n != elem->n_nodes(); ++n)
             {
+              if (!node_check(elem, n))
+                continue;
+
+              const Node & node = elem->node_ref(n);
+              const dof_id_type node_id = node.id();
+
               requested_objs_elem_id[proc_id].push_back(elem_id);
               requested_objs_node_num[proc_id].push_back
                 (cast_int<unsigned char>(n));
               requested_objs_id[proc_id].push_back(node_id);
-              queried_nodes.insert(node_id);
             }
         }
-    }
 
-  // Trade requests with other processors
-  for (processor_id_type p=1; p != comm.size(); ++p)
-    {
-      // Trade my requests with processor procup and procdown
-      const processor_id_type procup =
-        cast_int<processor_id_type>
-        ((comm.rank() + p) % comm.size());
-      const processor_id_type procdown =
-        cast_int<processor_id_type>
-        ((comm.size() + comm.rank() - p) %
-         comm.size());
-
-      libmesh_assert_equal_to (requested_objs_id[procup].size(),
-                               ghost_objects_from_proc[procup]);
-      libmesh_assert_equal_to (requested_objs_elem_id[procup].size(),
-                               ghost_objects_from_proc[procup]);
-      libmesh_assert_equal_to (requested_objs_node_num[procup].size(),
-                               ghost_objects_from_proc[procup]);
-
-      std::vector<dof_id_type>   request_to_fill_elem_id;
-      std::vector<unsigned char> request_to_fill_node_num;
-      comm.send_receive(procup, requested_objs_elem_id[procup],
-                        procdown, request_to_fill_elem_id);
-      comm.send_receive(procup, requested_objs_node_num[procup],
-                        procdown, request_to_fill_node_num);
-
-      // Find the id of each requested element
-      std::size_t request_size = request_to_fill_elem_id.size();
-      std::vector<dof_id_type> request_to_fill_id(request_size);
-      for (std::size_t i=0; i != request_size; ++i)
+      // Trade requests with other processors
+      for (processor_id_type p=1; p != comm.size(); ++p)
         {
-          const Elem & elem = mesh.elem_ref(request_to_fill_elem_id[i]);
+          // Trade my requests with processor procup and procdown
+          const processor_id_type procup =
+            cast_int<processor_id_type>
+            ((comm.rank() + p) % comm.size());
+          const processor_id_type procdown =
+            cast_int<processor_id_type>
+            ((comm.size() + comm.rank() - p) %
+             comm.size());
 
-          const unsigned int n = request_to_fill_node_num[i];
-          libmesh_assert_less (n, elem.n_nodes());
+          libmesh_assert_equal_to (requested_objs_id[procup].size(),
+                                   ghost_objects_from_proc[procup]);
+          libmesh_assert_equal_to (requested_objs_elem_id[procup].size(),
+                                   ghost_objects_from_proc[procup]);
+          libmesh_assert_equal_to (requested_objs_node_num[procup].size(),
+                                   ghost_objects_from_proc[procup]);
 
-          const Node & node = elem.node_ref(n);
+          std::vector<dof_id_type>   request_to_fill_elem_id;
+          std::vector<unsigned char> request_to_fill_node_num;
+          comm.send_receive(procup, requested_objs_elem_id[procup],
+                            procdown, request_to_fill_elem_id);
+          comm.send_receive(procup, requested_objs_node_num[procup],
+                            procdown, request_to_fill_node_num);
 
-          // This isn't a safe assertion in the case where we're
-          // synching processor ids
-          // libmesh_assert_equal_to (node->processor_id(), comm.rank());
+          // Find the id of each requested element
+          std::size_t request_size = request_to_fill_elem_id.size();
+          std::vector<dof_id_type> request_to_fill_id(request_size);
+          for (std::size_t i=0; i != request_size; ++i)
+            {
+              const Elem & elem = mesh.elem_ref(request_to_fill_elem_id[i]);
 
-          request_to_fill_id[i] = node.id();
+              const unsigned int n = request_to_fill_node_num[i];
+              libmesh_assert_less (n, elem.n_nodes());
+
+              const Node & node = elem.node_ref(n);
+
+              // This isn't a safe assertion in the case where we're
+              // synching processor ids
+              // libmesh_assert_equal_to (node->processor_id(), comm.rank());
+
+              request_to_fill_id[i] = node.id();
+            }
+
+          // Gather whatever data the user wants
+          std::vector<typename SyncFunctor::datum> data;
+          sync.gather_data(request_to_fill_id, data);
+
+          // Trade back the results
+          std::vector<typename SyncFunctor::datum> received_data;
+          comm.send_receive(procdown, data,
+                            procup, received_data);
+          libmesh_assert_equal_to (requested_objs_elem_id[procup].size(),
+                                   received_data.size());
+
+          // Let the user process the results.  If any of the results
+          // were different than what the user expected, then we'll
+          // need to sync again just in case this processor has to
+          // pass on the changes to yet another processor.
+          bool data_changed =
+            sync.act_on_data(requested_objs_id[procup], received_data);
+
+          if (data_changed)
+            need_sync = true;
         }
-
-      // Gather whatever data the user wants
-      std::vector<typename SyncFunctor::datum> data;
-      sync.gather_data(request_to_fill_id, data);
-
-      // Trade back the results
-      std::vector<typename SyncFunctor::datum> received_data;
-      comm.send_receive(procdown, data,
-                        procup, received_data);
-      libmesh_assert_equal_to (requested_objs_elem_id[procup].size(),
-                               received_data.size());
-
-      // Let the user process the results
-      sync.act_on_data(requested_objs_id[procup], received_data);
-    }
+      comm.max(need_sync);
+    } while (need_sync);
 }
 
 

@@ -1288,6 +1288,97 @@ struct SyncIds
 };
 
 
+struct SyncNodeIds
+{
+  typedef dof_id_type datum;
+
+  SyncNodeIds(MeshBase & _mesh) :
+    mesh(_mesh) {}
+
+  MeshBase & mesh;
+
+  // We only know a Node id() is definitive if we own the Node or if
+  // we're told it's definitive.  We keep track of the latter cases by
+  // putting ghost node definitive ids into this set.
+  typedef LIBMESH_BEST_UNORDERED_SET<dof_id_type>
+    uset_type;
+  uset_type definitive_ids;
+
+  // We should never be told two different definitive ids for the same
+  // node, but let's check on that in debug mode.
+#ifdef DEBUG
+  typedef LIBMESH_BEST_UNORDERED_MAP<dof_id_type, dof_id_type>
+    umap_type;
+  umap_type definitive_renumbering;
+#endif
+
+  // Find the id of each requested DofObject -
+  // Parallel::sync_* already tried to do the work for us, but we can
+  // only say the result is definitive if we own the DofObject or if
+  // we were given the definitive result from another processor.
+  void gather_data (const std::vector<dof_id_type> & ids,
+                    std::vector<datum> & ids_out) const
+  {
+    ids_out.clear();
+    ids_out.resize(ids.size(), DofObject::invalid_id);
+
+    for (std::size_t i = 0; i != ids.size(); ++i)
+      {
+        const dof_id_type id = ids[i];
+        const Node * node = mesh.node_ptr(id);
+        if (node->processor_id() == mesh.processor_id() ||
+            definitive_ids.count(id))
+          ids_out[i] = id;
+      }
+  }
+
+  bool act_on_data (const std::vector<dof_id_type> & old_ids,
+                    std::vector<datum> & new_ids)
+  {
+    bool data_changed = false;
+    for (unsigned int i=0; i != old_ids.size(); ++i)
+      {
+        const dof_id_type new_id = new_ids[i];
+        if (new_id != DofObject::invalid_id)
+          {
+            const dof_id_type old_id = old_ids[i];
+
+            Node *node = mesh.query_node_ptr(old_id);
+
+            // If we can't find the node we were asking about, another
+            // processor must have already given us the definitive id
+            // for it
+            if (!node)
+              {
+                // But let's check anyway in debug mode
+#ifdef DEBUG
+                libmesh_assert
+                  (definitive_renumbering.count(old_id));
+                libmesh_assert_equal_to
+                  (new_id, definitive_renumbering[old_id]);
+#endif
+                continue;
+              }
+
+            if (node->processor_id() != mesh.processor_id())
+              definitive_ids.insert(new_id);
+            if (old_id != new_id)
+              {
+#ifdef DEBUG
+                libmesh_assert
+                  (!definitive_renumbering.count(old_id));
+                definitive_renumbering[old_id] = new_id;
+#endif
+                mesh.renumber_node(old_id, new_id);
+                data_changed = true;
+              }
+          }
+      }
+    return data_changed;
+  }
+};
+
+
 #ifdef LIBMESH_ENABLE_AMR
 struct SyncPLevels
 {
@@ -1381,7 +1472,7 @@ void MeshCommunication::make_node_ids_parallel_consistent (MeshBase & mesh)
 
   LOG_SCOPE ("make_node_ids_parallel_consistent()", "MeshCommunication");
 
-  SyncIds syncids(mesh, &MeshBase::renumber_node);
+  SyncNodeIds syncids(mesh);
   Parallel::sync_node_data_by_element_id
     (mesh, mesh.elements_begin(), mesh.elements_end(),
      Parallel::SyncEverything(), Parallel::SyncEverything(), syncids);
@@ -1483,15 +1574,27 @@ struct SyncProcIds
   }
 
   // ------------------------------------------------------------
-  void act_on_data (const std::vector<dof_id_type> & ids,
+  bool act_on_data (const std::vector<dof_id_type> & ids,
                     std::vector<datum> proc_ids)
   {
+    bool data_changed = false;
+
     // Set the ghost node processor ids we've now been informed of
     for (std::size_t i=0; i != ids.size(); ++i)
       {
         Node & node = mesh.node_ref(ids[i]);
-        node.processor_id() = proc_ids[i];
+
+        // If someone tells us our node processor id is too low, then
+        // they're wrong.  If they tell us our node processor id is
+        // too high, then we're wrong.
+        if (node.processor_id() > proc_ids[i])
+          {
+            data_changed = true;
+            node.processor_id() = proc_ids[i];
+          }
       }
+
+    return data_changed;
   }
 };
 
