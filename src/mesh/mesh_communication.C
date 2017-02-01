@@ -1599,17 +1599,27 @@ struct SyncProcIds
 };
 
 
-struct ElemJustRefined
+struct ElemNodesMaybeNew
 {
-  ElemJustRefined() {}
+  ElemNodesMaybeNew() {}
 
   bool operator() (const Elem * elem) const
   {
+    // If this element was just refined then it may have new nodes we
+    // need to work on
 #ifdef LIBMESH_ENABLE_AMR
-    return (elem->refinement_flag() == Elem::JUST_REFINED);
-#else
-    return false;
+    if (elem->refinement_flag() == Elem::JUST_REFINED)
+      return true;
 #endif
+
+    // If this element has remote_elem neighbors then there may have
+    // been refinement of those neighbors that affect its nodes'
+    // processor_id()
+    unsigned int n_neigh = elem->n_neighbors();
+    for (unsigned int s=0; s != n_neigh; ++s)
+      if (elem->neighbor(s) == remote_elem)
+        return true;
+    return false;
   }
 };
 
@@ -1621,17 +1631,28 @@ struct NodeMaybeNew
   bool operator() (const Elem * elem, unsigned int local_node_num) const
   {
 #ifdef LIBMESH_ENABLE_AMR
-    // This should only be called on just-refined elements
     const Elem * parent = elem->parent();
-    libmesh_assert(parent);
 
-    // If this node wasn't already a parent node then it might be a
-    // new node we need to work on.
-    const unsigned int c = parent->which_child_am_i(elem);
-    return (parent->as_parent_node(c, local_node_num) == libMesh::invalid_uint);
-#else
-    return false;
+    // If this is a child node which wasn't already a parent node then
+    // it might be a new node we need to work on.
+    if (parent)
+      {
+        const unsigned int c = parent->which_child_am_i(elem);
+        if (parent->as_parent_node(c, local_node_num) == libMesh::invalid_uint)
+          return true;
+      }
 #endif
+
+    // If this node is on a side with a remote element then there may
+    // have been refinement of that element which affects this node's
+    // processor_id()
+    unsigned int n_neigh = elem->n_neighbors();
+    for (unsigned int s=0; s != n_neigh; ++s)
+      if (elem->neighbor(s) == remote_elem)
+        if (elem->is_node_on_side(local_node_num, s))
+          return true;
+
+    return false;
   }
 };
 
@@ -1689,7 +1710,7 @@ void MeshCommunication::make_new_node_proc_ids_parallel_consistent(MeshBase & me
   SyncProcIds sync(mesh);
   Parallel::sync_node_data_by_element_id
     (mesh, mesh.elements_begin(), mesh.elements_end(),
-     ElemJustRefined(), NodeMaybeNew(), sync);
+     ElemNodesMaybeNew(), NodeMaybeNew(), sync);
 }
 
 
