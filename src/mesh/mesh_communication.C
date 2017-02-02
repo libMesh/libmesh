@@ -950,35 +950,27 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
     ghost_map;
   ghost_map elements_to_ghost;
 
+  const processor_id_type proc_id = mesh.processor_id();
   // Look for just-coarsened elements
-  MeshBase::element_iterator       it  = mesh.elements_begin();
-  const MeshBase::element_iterator end = mesh.elements_end();
+  MeshBase::element_iterator       it  =
+    mesh.flagged_pid_elements_begin(Elem::COARSEN, proc_id);
+  const MeshBase::element_iterator end =
+    mesh.flagged_pid_elements_end(Elem::COARSEN, proc_id);
 
   for ( ; it != end; ++it)
     {
       Elem * elem = *it;
 
-      if (elem->refinement_flag() != Elem::COARSEN_INACTIVE)
-        continue;
+      // If it's flagged for coarsening it had better have a parent
+      libmesh_assert(elem->parent());
 
       // On a distributed mesh:
-      // If we don't own this element but we do own one of its
-      // children, then there is a chance that we are aware of
-      // ghost elements which the owner needs us to send them.
-      const processor_id_type their_proc_id = elem->processor_id();
-      if (their_proc_id != mesh.processor_id())
-        {
-          const unsigned int n_children = elem->n_children();
-          for (unsigned int c = 0; c != n_children; ++c)
-            {
-              const Elem * child = elem->child(c);
-              if (child->processor_id() == mesh.processor_id())
-                {
-                  elements_to_ghost[their_proc_id].push_back(elem);
-                  break;
-                }
-            }
-        }
+      // If we don't own this element's parent but we do own it, then
+      // there is a chance that we are aware of ghost elements which
+      // the parent's owner needs us to send them.
+      const processor_id_type their_proc_id = elem->parent()->processor_id();
+      if (their_proc_id != proc_id)
+        elements_to_ghost[their_proc_id].push_back(elem);
     }
 
   const processor_id_type n_proc = mesh.n_processors();
@@ -997,7 +989,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
 
   for (processor_id_type p=0; p != n_proc; ++p)
     {
-      if (p == mesh.processor_id())
+      if (p == proc_id)
         break;
 
       // We'll send these asynchronously, but their data will be
@@ -1087,7 +1079,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
         (Parallel::any_source,
          &mesh,
          mesh_inserter_iterator<Node>(mesh),
-         (Elem**)libmesh_nullptr,
+         (Node**)libmesh_nullptr,
          nodestag);
     }
 
@@ -1288,6 +1280,97 @@ struct SyncIds
 };
 
 
+struct SyncNodeIds
+{
+  typedef dof_id_type datum;
+
+  SyncNodeIds(MeshBase & _mesh) :
+    mesh(_mesh) {}
+
+  MeshBase & mesh;
+
+  // We only know a Node id() is definitive if we own the Node or if
+  // we're told it's definitive.  We keep track of the latter cases by
+  // putting ghost node definitive ids into this set.
+  typedef LIBMESH_BEST_UNORDERED_SET<dof_id_type>
+    uset_type;
+  uset_type definitive_ids;
+
+  // We should never be told two different definitive ids for the same
+  // node, but let's check on that in debug mode.
+#ifdef DEBUG
+  typedef LIBMESH_BEST_UNORDERED_MAP<dof_id_type, dof_id_type>
+    umap_type;
+  umap_type definitive_renumbering;
+#endif
+
+  // Find the id of each requested DofObject -
+  // Parallel::sync_* already tried to do the work for us, but we can
+  // only say the result is definitive if we own the DofObject or if
+  // we were given the definitive result from another processor.
+  void gather_data (const std::vector<dof_id_type> & ids,
+                    std::vector<datum> & ids_out) const
+  {
+    ids_out.clear();
+    ids_out.resize(ids.size(), DofObject::invalid_id);
+
+    for (std::size_t i = 0; i != ids.size(); ++i)
+      {
+        const dof_id_type id = ids[i];
+        const Node * node = mesh.node_ptr(id);
+        if (node->processor_id() == mesh.processor_id() ||
+            definitive_ids.count(id))
+          ids_out[i] = id;
+      }
+  }
+
+  bool act_on_data (const std::vector<dof_id_type> & old_ids,
+                    std::vector<datum> & new_ids)
+  {
+    bool data_changed = false;
+    for (unsigned int i=0; i != old_ids.size(); ++i)
+      {
+        const dof_id_type new_id = new_ids[i];
+        if (new_id != DofObject::invalid_id)
+          {
+            const dof_id_type old_id = old_ids[i];
+
+            Node *node = mesh.query_node_ptr(old_id);
+
+            // If we can't find the node we were asking about, another
+            // processor must have already given us the definitive id
+            // for it
+            if (!node)
+              {
+                // But let's check anyway in debug mode
+#ifdef DEBUG
+                libmesh_assert
+                  (definitive_renumbering.count(old_id));
+                libmesh_assert_equal_to
+                  (new_id, definitive_renumbering[old_id]);
+#endif
+                continue;
+              }
+
+            if (node->processor_id() != mesh.processor_id())
+              definitive_ids.insert(new_id);
+            if (old_id != new_id)
+              {
+#ifdef DEBUG
+                libmesh_assert
+                  (!definitive_renumbering.count(old_id));
+                definitive_renumbering[old_id] = new_id;
+#endif
+                mesh.renumber_node(old_id, new_id);
+                data_changed = true;
+              }
+          }
+      }
+    return data_changed;
+  }
+};
+
+
 #ifdef LIBMESH_ENABLE_AMR
 struct SyncPLevels
 {
@@ -1381,7 +1464,7 @@ void MeshCommunication::make_node_ids_parallel_consistent (MeshBase & mesh)
 
   LOG_SCOPE ("make_node_ids_parallel_consistent()", "MeshCommunication");
 
-  SyncIds syncids(mesh, &MeshBase::renumber_node);
+  SyncNodeIds syncids(mesh);
   Parallel::sync_node_data_by_element_id
     (mesh, mesh.elements_begin(), mesh.elements_end(),
      Parallel::SyncEverything(), Parallel::SyncEverything(), syncids);
@@ -1483,30 +1566,52 @@ struct SyncProcIds
   }
 
   // ------------------------------------------------------------
-  void act_on_data (const std::vector<dof_id_type> & ids,
+  bool act_on_data (const std::vector<dof_id_type> & ids,
                     std::vector<datum> proc_ids)
   {
+    bool data_changed = false;
+
     // Set the ghost node processor ids we've now been informed of
     for (std::size_t i=0; i != ids.size(); ++i)
       {
         Node & node = mesh.node_ref(ids[i]);
-        node.processor_id() = proc_ids[i];
+
+        // If someone tells us our node processor id is too low, then
+        // they're wrong.  If they tell us our node processor id is
+        // too high, then we're wrong.
+        if (node.processor_id() > proc_ids[i])
+          {
+            data_changed = true;
+            node.processor_id() = proc_ids[i];
+          }
       }
+
+    return data_changed;
   }
 };
 
 
-struct ElemJustRefined
+struct ElemNodesMaybeNew
 {
-  ElemJustRefined() {}
+  ElemNodesMaybeNew() {}
 
   bool operator() (const Elem * elem) const
   {
+    // If this element was just refined then it may have new nodes we
+    // need to work on
 #ifdef LIBMESH_ENABLE_AMR
-    return (elem->refinement_flag() == Elem::JUST_REFINED);
-#else
-    return false;
+    if (elem->refinement_flag() == Elem::JUST_REFINED)
+      return true;
 #endif
+
+    // If this element has remote_elem neighbors then there may have
+    // been refinement of those neighbors that affect its nodes'
+    // processor_id()
+    unsigned int n_neigh = elem->n_neighbors();
+    for (unsigned int s=0; s != n_neigh; ++s)
+      if (elem->neighbor(s) == remote_elem)
+        return true;
+    return false;
   }
 };
 
@@ -1518,17 +1623,28 @@ struct NodeMaybeNew
   bool operator() (const Elem * elem, unsigned int local_node_num) const
   {
 #ifdef LIBMESH_ENABLE_AMR
-    // This should only be called on just-refined elements
     const Elem * parent = elem->parent();
-    libmesh_assert(parent);
 
-    // If this node wasn't already a parent node then it might be a
-    // new node we need to work on.
-    const unsigned int c = parent->which_child_am_i(elem);
-    return (parent->as_parent_node(c, local_node_num) == libMesh::invalid_uint);
-#else
-    return false;
+    // If this is a child node which wasn't already a parent node then
+    // it might be a new node we need to work on.
+    if (parent)
+      {
+        const unsigned int c = parent->which_child_am_i(elem);
+        if (parent->as_parent_node(c, local_node_num) == libMesh::invalid_uint)
+          return true;
+      }
 #endif
+
+    // If this node is on a side with a remote element then there may
+    // have been refinement of that element which affects this node's
+    // processor_id()
+    unsigned int n_neigh = elem->n_neighbors();
+    for (unsigned int s=0; s != n_neigh; ++s)
+      if (elem->neighbor(s) == remote_elem)
+        if (elem->is_node_on_side(local_node_num, s))
+          return true;
+
+    return false;
   }
 };
 
@@ -1586,7 +1702,7 @@ void MeshCommunication::make_new_node_proc_ids_parallel_consistent(MeshBase & me
   SyncProcIds sync(mesh);
   Parallel::sync_node_data_by_element_id
     (mesh, mesh.elements_begin(), mesh.elements_end(),
-     ElemJustRefined(), NodeMaybeNew(), sync);
+     ElemNodesMaybeNew(), NodeMaybeNew(), sync);
 }
 
 

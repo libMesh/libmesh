@@ -646,12 +646,20 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
               new_location /= static_cast<Real>(n_adjacent_vertices);
 
-              /* Add the new point to the mesh, giving it a globally
-               * well-defined processor id.
+              /* Add the new point to the mesh.
+               * If we are on a serialized mesh, then we're doing this
+               * all in sync, and the node processor_id will be
+               * consistent between processors.
+               * If we are on a distributed mesh, we can fix
+               * inconsistent processor ids later, but only if every
+               * processor gives new nodes a *locally* consistent
+               * processor id, so we'll give the new node the
+               * processor id of an adjacent element for now and then
+               * we'll update that later if appropriate.
                */
               Node * so_node = this->add_point
                 (new_location, DofObject::invalid_id,
-                 this->node_ref(adjacent_vertices_ids[0]).processor_id());
+                 lo_elem->processor_id());
 
               /*
                * insert the new node with its defining vertex
@@ -668,9 +676,15 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
           // yes, already added.
           else
             {
-              libmesh_assert(pos.first->second);
+              Node *so_node = pos.first->second;
+              libmesh_assert(so_node);
 
-              so_elem->set_node(son) = pos.first->second;
+              so_elem->set_node(son) = so_node;
+
+              // We need to ensure that the processor who should own a
+              // node *knows* they own the node.
+              if (so_node->processor_id() > lo_elem->processor_id())
+                so_node->processor_id() = lo_elem->processor_id();
             }
         }
 
@@ -721,9 +735,9 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
   // In a DistributedMesh our ghost node processor ids may be bad,
   // the ids of nodes touching remote elements may be inconsistent,
   // and unique_ids of newly added non-local nodes remain unset.
-  // make_new_nodes_parallel_consistent() will fix all this.
+  // make_nodes_parallel_consistent() will fix all this.
   if (!this->is_serial())
-    MeshCommunication().make_new_nodes_parallel_consistent (*this);
+    MeshCommunication().make_nodes_parallel_consistent (*this);
 
   // renumber nodes, elements etc
   this->prepare_for_use(/*skip_renumber =*/ false);
