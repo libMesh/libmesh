@@ -1079,7 +1079,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
         (Parallel::any_source,
          &mesh,
          mesh_inserter_iterator<Node>(mesh),
-         (Elem**)libmesh_nullptr,
+         (Node**)libmesh_nullptr,
          nodestag);
     }
 
