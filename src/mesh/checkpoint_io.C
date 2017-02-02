@@ -27,19 +27,20 @@
 #include <sstream> // for ostringstream
 
 // Local includes
+#include "libmesh/boundary_info.h"
+#include "libmesh/distributed_mesh.h"
+#include "libmesh/elem.h"
+#include "libmesh/enum_xdr_mode.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/mesh_communication.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/node.h"
+#include "libmesh/parallel.h"
+#include "libmesh/partitioner.h"
+#include "libmesh/remote_elem.h"
 #include "libmesh/xdr_io.h"
 #include "libmesh/xdr_cxx.h"
-#include "libmesh/enum_xdr_mode.h"
-#include "libmesh/mesh_base.h"
-#include "libmesh/node.h"
-#include "libmesh/elem.h"
-#include "libmesh/boundary_info.h"
-#include "libmesh/parallel.h"
-#include "libmesh/mesh_tools.h"
-#include "libmesh/partitioner.h"
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/mesh_communication.h"
-#include "libmesh/distributed_mesh.h"
 
 namespace libMesh
 {
@@ -304,9 +305,9 @@ void CheckpointIO::write_connectivity (Xdr & io) const
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   // We will only write active elements and their parents.
-  unsigned int n_active_levels = n_active_levels_on_processor(mesh);
+  unsigned int _n_active_levels = n_active_levels_on_processor(mesh);
 
-  std::vector<xdr_id_type> n_elem_at_level(n_active_levels, 0);
+  std::vector<xdr_id_type> n_elem_at_level(_n_active_levels, 0);
 
   // Find the number of elements at each level
   {
@@ -317,14 +318,14 @@ void CheckpointIO::write_connectivity (Xdr & io) const
       n_elem_at_level[mesh.elem_ptr(*it)->level()]++;
   }
 
-  io.data(n_active_levels, "# n_active_levels");
+  io.data(_n_active_levels, "# n_active_levels");
 
   // Put these out here to reduce memory churn
   // id type pid subdomain_id parent_id
   std::vector<largest_id_type> elem_data(5);
   std::vector<largest_id_type> conn_data;
 
-  for (unsigned int level=0; level < n_active_levels; level++)
+  for (unsigned int level=0; level < _n_active_levels; level++)
     {
       std::ostringstream comment;
       comment << "# n_elem at level ";
@@ -379,6 +380,45 @@ void CheckpointIO::write_connectivity (Xdr & io) const
                          cast_int<unsigned int>(conn_data.size()));
         }
     }
+}
+
+
+void CheckpointIO::write_remote_elem (Xdr & io) const
+{
+  libmesh_assert (io.writing());
+
+  // convenient reference to our mesh
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+
+  // Find the number of remote_elem links
+  dof_id_type n_remote_elem = 0;
+  std::vector<dof_id_type> elem_ids;
+  std::vector<unsigned char> elem_sides;
+
+  {
+    std::set<largest_id_type>::iterator it = _local_elements.begin();
+    const std::set<largest_id_type>::iterator end = _local_elements.end();
+
+    for (; it != end; ++it)
+      {
+        const Elem & elem = mesh.elem_ref(*it);
+
+        for (unsigned int n=0; n != elem.n_neighbors(); ++n)
+          {
+            if (elem.neighbor(n) == remote_elem)
+              {
+                elem_ids.push_back(elem.id());
+                elem_sides.push_back(n);
+                n_remote_elem++;
+              }
+          }
+      }
+  }
+
+  io.data(n_remote_elem, "# n_remote_elem");
+
+  io.data_stream(&elem_ids[0], n_remote_elem);
+  io.data_stream(&elem_sides[0], n_remote_elem);
 }
 
 
@@ -687,13 +727,12 @@ void CheckpointIO::read_connectivity (Xdr & io)
   // convenient reference to our mesh
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
-  unsigned int n_active_levels;
-  io.data(n_active_levels, "# n_active_levels");
+  io.data(_n_active_levels, "# n_active_levels");
 
   // Keep track of the highest dimensional element we've added to the mesh
   unsigned int highest_elem_dim = 1;
 
-  for (unsigned int level=0; level < n_active_levels; level++)
+  for (unsigned int level=0; level < _n_active_levels; level++)
     {
       xdr_id_type n_elem_at_level = 0;
       io.data (n_elem_at_level, "");
@@ -778,6 +817,34 @@ void CheckpointIO::read_connectivity (Xdr & io)
     }
 
   mesh.set_mesh_dimension(cast_int<unsigned char>(highest_elem_dim));
+}
+
+
+void CheckpointIO::read_remote_elem (Xdr & io)
+{
+  // convenient reference to our mesh
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
+
+  // Find the number of remote_elem links
+  dof_id_type n_remote_elem = 0;
+
+  io.data(n_remote_elem, "# n_remote_elem");
+
+  std::vector<dof_id_type> elem_ids;
+  std::vector<unsigned char> elem_sides;
+
+  if (n_remote_elem)
+    {
+      io.data_stream(&elem_ids[0], n_remote_elem);
+      io.data_stream(&elem_sides[0], n_remote_elem);
+
+      for (std::size_t i=0; i != n_remote_elem; ++i)
+        {
+          Elem & elem = mesh.elem_ref(elem_ids[i]);
+          elem.set_neighbor(elem_sides[i],
+                            const_cast<RemoteElem *>(remote_elem));
+        }
+    }
 }
 
 

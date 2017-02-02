@@ -156,6 +156,11 @@ private:
   void write_connectivity (Xdr & io) const;
 
   /**
+   * Write the remote_elem neighbor links for a parallel, distributed mesh
+   */
+  void write_remote_elem (Xdr & io) const;
+
+  /**
    * Write the nodal locations for a parallel, distributed mesh
    */
   void write_nodes (Xdr & io) const;
@@ -189,6 +194,11 @@ private:
   void read_connectivity (Xdr & io);
 
   /**
+   * Read the remote_elem neighbor links for a parallel, distributed mesh
+   */
+  void read_remote_elem (Xdr & io);
+
+  /**
    * Read the nodal locations for a parallel, distributed mesh
    */
   void read_nodes (Xdr & io);
@@ -220,6 +230,7 @@ private:
   bool _parallel;
   std::string _version;
   unsigned int _mesh_dimension;
+  unsigned int _n_active_levels;
 
   /// These are sets of IDs to make the lookup for boundary conditions simpler
   std::set<largest_id_type> _local_elements;
