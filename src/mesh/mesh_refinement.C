@@ -1384,16 +1384,38 @@ bool MeshRefinement::_coarsen_elements ()
   // any iterators currently in this data structure.
   // _unused_elements.clear();
 
-  MeshBase::element_iterator       it  = _mesh.elements_begin();
-  const MeshBase::element_iterator end = _mesh.elements_end();
-
-  // Loop over the elements.
-  for ( ; it != end; ++it)
+  // Loop over the elements first to determine if the mesh will
+  // undergo h-coarsening.  If it will, then we'll need to communicate
+  // more ghosted elements.  We need to communicate them *before* we
+  // do the coarsening; otherwise it is possible to coarsen away a
+  // one-element-thick layer partition and leave the partitions on
+  // either side unable to figure out how to talk to each other.
+  for (MeshBase::element_iterator
+         it  = _mesh.elements_begin(),
+         end = _mesh.elements_end();
+       it != end; ++it)
     {
       Elem * elem = *it;
+      if (elem->refinement_flag() == Elem::COARSEN)
+        {
+          mesh_changed = true;
+          break;
+        }
+    }
 
-      // Not necessary when using elem_iterator
-      // libmesh_assert(elem);
+  // If the mesh changed on any processor, it changed globally
+  this->comm().max(mesh_changed);
+
+  // And then we may need to widen the ghosting layers.
+  if (mesh_changed)
+    MeshCommunication().send_coarse_ghosts(_mesh);
+
+  for (MeshBase::element_iterator
+         it  = _mesh.elements_begin(),
+         end = _mesh.elements_end();
+       it != end; ++it)
+    {
+      Elem * elem = *it;
 
       // active elements flagged for coarsening will
       // no longer be deleted until MeshRefinement::contract()
@@ -1419,9 +1441,6 @@ bool MeshRefinement::_coarsen_elements ()
           // Don't delete the element until
           // MeshRefinement::contract()
           // _mesh.delete_elem(elem);
-
-          // the mesh has certainly changed
-          mesh_changed = true;
         }
 
       // inactive elements flagged for coarsening
@@ -1449,17 +1468,11 @@ bool MeshRefinement::_coarsen_elements ()
         }
     }
 
-  // If the mesh changed on any processor, it changed globally
-  this->comm().max(mesh_changed);
   this->comm().max(mesh_p_changed);
 
   // And we may need to update DistributedMesh values reflecting the changes
   if (mesh_changed)
-    {
-      _mesh.update_parallel_id_counts();
-
-      MeshCommunication().send_coarse_ghosts(_mesh);
-    }
+    _mesh.update_parallel_id_counts();
 
   // Node processor ids may need to change if an element of that id
   // was coarsened away

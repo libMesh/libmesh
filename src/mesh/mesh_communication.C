@@ -950,35 +950,27 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
     ghost_map;
   ghost_map elements_to_ghost;
 
+  const processor_id_type proc_id = mesh.processor_id();
   // Look for just-coarsened elements
-  MeshBase::element_iterator       it  = mesh.elements_begin();
-  const MeshBase::element_iterator end = mesh.elements_end();
+  MeshBase::element_iterator       it  =
+    mesh.flagged_pid_elements_begin(Elem::COARSEN, proc_id);
+  const MeshBase::element_iterator end =
+    mesh.flagged_pid_elements_end(Elem::COARSEN, proc_id);
 
   for ( ; it != end; ++it)
     {
       Elem * elem = *it;
 
-      if (elem->refinement_flag() != Elem::COARSEN_INACTIVE)
-        continue;
+      // If it's flagged for coarsening it had better have a parent
+      libmesh_assert(elem->parent());
 
       // On a distributed mesh:
-      // If we don't own this element but we do own one of its
-      // children, then there is a chance that we are aware of
-      // ghost elements which the owner needs us to send them.
-      const processor_id_type their_proc_id = elem->processor_id();
-      if (their_proc_id != mesh.processor_id())
-        {
-          const unsigned int n_children = elem->n_children();
-          for (unsigned int c = 0; c != n_children; ++c)
-            {
-              const Elem * child = elem->child(c);
-              if (child->processor_id() == mesh.processor_id())
-                {
-                  elements_to_ghost[their_proc_id].push_back(elem);
-                  break;
-                }
-            }
-        }
+      // If we don't own this element's parent but we do own it, then
+      // there is a chance that we are aware of ghost elements which
+      // the parent's owner needs us to send them.
+      const processor_id_type their_proc_id = elem->parent()->processor_id();
+      if (their_proc_id != proc_id)
+        elements_to_ghost[their_proc_id].push_back(elem);
     }
 
   const processor_id_type n_proc = mesh.n_processors();
@@ -997,7 +989,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
 
   for (processor_id_type p=0; p != n_proc; ++p)
     {
-      if (p == mesh.processor_id())
+      if (p == proc_id)
         break;
 
       // We'll send these asynchronously, but their data will be
