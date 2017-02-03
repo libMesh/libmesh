@@ -144,7 +144,7 @@ int main (int argc, char ** argv)
 
           for (unsigned int i = my_first_chunk; i < my_first_chunk + my_num_chunks; i++)
             {
-              libMesh::err << comm.rank() << ": " << i << std::endl;
+              libMesh::out << " " << 100 * (static_cast<double>(i) / static_cast<double>(my_num_chunks)) << "% Complete" << std::endl;
 
               CheckpointIO cpr(mesh);
               cpr.current_processor_id() = i;
@@ -153,6 +153,8 @@ int main (int argc, char ** argv)
               cpr.parallel() = true;
               cpr.write(remove_extension(filename) + ".cpr");
             }
+
+          libMesh::out << " 100% Complete" << std::endl;
         }
     }
 
