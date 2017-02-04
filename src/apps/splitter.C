@@ -26,11 +26,22 @@
 
 using namespace libMesh;
 
+// From: http://stackoverflow.com/a/6417908/2042320
+std::string remove_extension (const std::string & filename)
+{
+  size_t lastdot = filename.find_last_of(".");
+
+  if (lastdot == std::string::npos)
+    return filename;
+
+  return filename.substr(0, lastdot);
+}
+
 int main (int argc, char ** argv)
 {
   LibMeshInit init (argc, argv);
 
-  if (libMesh::on_command_line("--help"))
+  if (libMesh::on_command_line("--help") || argc < 3)
     {
       libMesh::out << "Example: ./splitter-opt --mesh=filename.e --n-procs='4 8 16' --dry-run\n\n"
                    << "--mesh             Full name of the mesh file to read in. \n"
@@ -133,15 +144,17 @@ int main (int argc, char ** argv)
 
           for (unsigned int i = my_first_chunk; i < my_first_chunk + my_num_chunks; i++)
             {
-              libMesh::err << comm.rank() << ": " << i << std::endl;
+              libMesh::out << " " << 100 * (static_cast<double>(i) / static_cast<double>(my_num_chunks)) << "% Complete" << std::endl;
 
               CheckpointIO cpr(mesh);
               cpr.current_processor_id() = i;
               cpr.current_n_processors() = n_procs;
               cpr.binary() = true;
               cpr.parallel() = true;
-              cpr.write(filename + ".cpr");
+              cpr.write(remove_extension(filename) + ".cpr");
             }
+
+          libMesh::out << " 100% Complete" << std::endl;
         }
     }
 
