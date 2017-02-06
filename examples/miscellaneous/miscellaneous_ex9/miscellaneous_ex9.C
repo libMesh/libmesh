@@ -280,7 +280,7 @@ void assemble_poisson(EquationSystems & es,
                   fe_elem_face->reinit(elem, side);
 
                   for (unsigned int qp=0; qp<qface.n_points(); qp++)
-                    for (unsigned int i=0; i<phi.size(); i++)
+                    for (std::size_t i=0; i<phi.size(); i++)
                       Fe(i) += JxW_face[qp] * phi_face[i][qp];
                 }
 

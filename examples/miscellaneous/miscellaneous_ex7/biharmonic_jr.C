@@ -310,7 +310,7 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
             M_prime_qp = 0.0,
             M_prime_old_qp = 0.0;
 
-          for (unsigned int i=0; i<phi.size(); i++)
+          for (std::size_t i=0; i<phi.size(); i++)
             {
               Laplacian_phi_qp[i] = d2phi[i][qp](0, 0);
               grad_u_qp(0) += u(dof_indices[i])*dphi[i][qp](0);
@@ -343,7 +343,7 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
             }
 
           // ELEMENT RESIDUAL AND JACOBIAN
-          for (unsigned int i=0; i<phi.size(); i++)
+          for (std::size_t i=0; i<phi.size(); i++)
             {
               // RESIDUAL
               if (R)
@@ -403,7 +403,7 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
                 {
                   Number M_prime_prime_qp = 0.0;
                   if (_biharmonic._degenerate) M_prime_prime_qp = -2.0;
-                  for (unsigned int j=0; j<phi.size(); j++)
+                  for (std::size_t j=0; j<phi.size(); j++)
                     {
                       Number ri_j = 0.0;
                       ri_j -= Laplacian_phi_qp[i]*M_qp*_biharmonic._kappa*Laplacian_phi_qp[j];
@@ -555,12 +555,12 @@ void Biharmonic::JR::bounds(NumericVector<Number> & XL,
       // Auxiliary variables will need to be introduced to reduce this to a "box" constraint.
       // Additional complications will arise since m might be singular (as is the case for Hermite,
       // which, however, is easily handled by inspection).
-      for (unsigned int i=0; i<phi.size(); ++i)
+      for (std::size_t i=0; i<phi.size(); ++i)
         {
           // FIXME: should be able to define INF and pass it to the solve
           Real infinity = 1.0e20;
           Real bound = infinity;
-          for (unsigned int j = 0; j < nodes.size(); ++j)
+          for (std::size_t j = 0; j < nodes.size(); ++j)
             {
               if (phi[i][j])
                 {

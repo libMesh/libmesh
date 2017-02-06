@@ -607,10 +607,10 @@ build_error_estimator_component_wise (FEMParameters & param,
   // Using the user filled error norm type vector, we pass the type of norm to be used for
   // the error in each variable, we can have different types of norms for the primal and
   // dual variables
-  unsigned int size = primal_error_norm_type.size();
+  std::size_t size = primal_error_norm_type.size();
 
   libmesh_assert_equal_to (size, dual_error_norm_type.size());
-  for (unsigned int i = 0; i != size; ++i)
+  for (std::size_t i = 0; i != size; ++i)
     {
       adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(i, primal_error_norm_type[i]);
       adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(i, dual_error_norm_type[i]);
@@ -619,11 +619,11 @@ build_error_estimator_component_wise (FEMParameters & param,
   // Now we set the right weights for each term in the error estimate, using the user provided
   // term_weights matrix
   libmesh_assert_equal_to (size, term_weights.size());
-  for (unsigned int i = 0; i != term_weights.size(); ++i)
+  for (std::size_t i = 0; i != term_weights.size(); ++i)
     {
       libmesh_assert_equal_to (size, term_weights[i].size());
       adjoint_residual_estimator->error_norm.set_weight(i, term_weights[i][i]);
-      for (unsigned int j = 0; j != size; ++j)
+      for (std::size_t j = 0; j != size; ++j)
         if (i != j)
           adjoint_residual_estimator->error_norm.set_off_diagonal_weight(i, j, term_weights[i][j]);
     }
@@ -660,7 +660,7 @@ build_weighted_error_estimator_component_wise (FEMParameters & param,
 
   // We pass the pointers to the user specified weight functions to the patch recovery
   // error estimator objects declared above
-  unsigned int size = primal_error_norm_type.size();
+  std::size_t size = primal_error_norm_type.size();
 
   libmesh_assert(coupled_system_weight_functions.size() == size);
   libmesh_assert(dual_error_norm_type.size() == size);
@@ -675,11 +675,11 @@ build_weighted_error_estimator_component_wise (FEMParameters & param,
   // Now we set the right weights for each term in the error estimate, using the user provided
   // term_weights matrix
   libmesh_assert_equal_to (size, term_weights.size());
-  for (unsigned int i = 0; i != term_weights.size(); ++i)
+  for (std::size_t i = 0; i != term_weights.size(); ++i)
     {
       libmesh_assert_equal_to (size, term_weights[i].size());
       adjoint_residual_estimator->error_norm.set_weight(i, term_weights[i][i]);
-      for (unsigned int j = 0; j != size; ++j)
+      for (std::size_t j = 0; j != size; ++j)
         if (i != j)
           adjoint_residual_estimator->error_norm.set_off_diagonal_weight(i, j, term_weights[i][j]);
     }
@@ -1060,10 +1060,8 @@ int main (int argc, char ** argv)
 
               // Now combine the contribs from the pressure and non
               // pressure terms to get the complete estimate
-              for (unsigned int i = 0; i < error.size(); i++)
-                {
-                  error[i] = error_non_pressure[i] + error_with_pressure[i] + error_convection_diffusion_x[i] + error_convection_diffusion_y[i];
-                }
+              for (std::size_t i = 0; i < error.size(); i++)
+                error[i] = error_non_pressure[i] + error_with_pressure[i] + error_convection_diffusion_x[i] + error_convection_diffusion_y[i];
             }
           else
             {

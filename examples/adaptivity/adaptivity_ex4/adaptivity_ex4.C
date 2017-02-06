@@ -804,7 +804,7 @@ void assemble_biharmonic(EquationSystems & es,
 
       for (unsigned int qp=0; qp<qrule->n_points(); qp++)
         {
-          for (unsigned int i=0; i<phi.size(); i++)
+          for (std::size_t i=0; i<phi.size(); i++)
             {
               shape_laplacian[i] = d2phi[i][qp](0,0);
               if (dim > 1)
@@ -812,8 +812,8 @@ void assemble_biharmonic(EquationSystems & es,
               if (dim == 3)
                 shape_laplacian[i] += d2phi[i][qp](2,2);
             }
-          for (unsigned int i=0; i<phi.size(); i++)
-            for (unsigned int j=0; j<phi.size(); j++)
+          for (std::size_t i=0; i<phi.size(); i++)
+            for (std::size_t j=0; j<phi.size(); j++)
               Ke(i,j) += JxW[qp]*
                 shape_laplacian[i]*shape_laplacian[j];
         }
@@ -883,8 +883,8 @@ void assemble_biharmonic(EquationSystems & es,
                   // integrated against test function values while
                   // basis fluxes are integrated against test function
                   // fluxes.
-                  for (unsigned int i=0; i<phi_face.size(); i++)
-                    for (unsigned int j=0; j<phi_face.size(); j++)
+                  for (std::size_t i=0; i<phi_face.size(); i++)
+                    for (std::size_t j=0; j<phi_face.size(); j++)
                       Ke(i,j) += JxW_face[qp] *
                         (penalty * phi_face[i][qp] *
                          phi_face[j][qp] + penalty2
@@ -895,7 +895,7 @@ void assemble_biharmonic(EquationSystems & es,
 
                   // Right-hand-side contribution of the L2
                   // projection.
-                  for (unsigned int i=0; i<phi_face.size(); i++)
+                  for (std::size_t i=0; i<phi_face.size(); i++)
                     Fe(i) += JxW_face[qp] *
                       (penalty * value * phi_face[i][qp]
                        + penalty2 *
@@ -911,7 +911,7 @@ void assemble_biharmonic(EquationSystems & es,
       }
 
       for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-        for (unsigned int i=0; i<phi.size(); i++)
+        for (std::size_t i=0; i<phi.size(); i++)
           Fe(i) += JxW[qp]*phi[i][qp]*forcing_function(q_point[qp]);
 
       // The element matrix and right-hand-side are now built

@@ -152,7 +152,7 @@ void FEMParameters::read(GetPot & input,
 {
   std::vector<std::string> variable_names;
   if (other_variable_names)
-    for (unsigned int i=0; i != other_variable_names->size(); ++i)
+    for (std::size_t i=0; i != other_variable_names->size(); ++i)
       {
         const std::string & name = (*other_variable_names)[i];
         const std::string stringval = input(name, std::string());
@@ -397,7 +397,7 @@ void FEMParameters::read(GetPot & input,
       const std::string variable_set =
         input("dirichlet_condition_variables", empty_string, i);
 
-      for (unsigned int i=0; i != variable_set.size(); ++i)
+      for (std::size_t i=0; i != variable_set.size(); ++i)
         {
           if (variable_set[i] == '1')
             dirichlet_condition_variables[func_boundary].push_back(i);
@@ -468,7 +468,7 @@ void FEMParameters::read(GetPot & input,
       const std::string variable_set =
         input("neumann_condition_variables", empty_string, i);
 
-      for (unsigned int i=0; i != variable_set.size(); ++i)
+      for (std::size_t i=0; i != variable_set.size(); ++i)
         {
           if (variable_set[i] == '1')
             neumann_condition_variables[func_boundary].push_back(i);
@@ -708,10 +708,10 @@ void FEMParameters::read(GetPot & input,
   if (this->comm().rank() == 0 && !bad_variables.empty())
     {
       libMesh::err << "ERROR: Unrecognized variables:" << std::endl;
-      for (unsigned int i = 0; i != bad_variables.size(); ++i)
+      for (std::size_t i = 0; i != bad_variables.size(); ++i)
         libMesh::err << bad_variables[i] << std::endl;
       libMesh::err << "Not found among recognized variables:" << std::endl;
-      for (unsigned int i = 0; i != variable_names.size(); ++i)
+      for (std::size_t i = 0; i != variable_names.size(); ++i)
         libMesh::err << variable_names[i] << std::endl;
       libmesh_error();
     }

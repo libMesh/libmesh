@@ -463,8 +463,8 @@ void assemble_poisson(EquationSystems & es,
       perf_log.push ("Ke");
 
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-        for (unsigned int i=0; i<phi.size(); i++)
-          for (unsigned int j=0; j<phi.size(); j++)
+        for (std::size_t i=0; i<phi.size(); i++)
+          for (std::size_t j=0; j<phi.size(); j++)
             Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
 
 
@@ -533,7 +533,7 @@ void assemble_poisson(EquationSystems & es,
             }
 
           // Add the RHS contribution
-          for (unsigned int i=0; i<phi.size(); i++)
+          for (std::size_t i=0; i<phi.size(); i++)
             Fe(i) += JxW[qp]*fxy*phi[i][qp];
         }
 

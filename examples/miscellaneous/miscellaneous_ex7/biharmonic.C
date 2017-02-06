@@ -119,7 +119,7 @@ Biharmonic::Biharmonic(ReplicatedMesh & mesh) :
 
   // Pad
   icenter.resize(3);
-  for (unsigned int i = icenter.size(); i < _dim; ++i)
+  for (std::size_t i = icenter.size(); i < _dim; ++i)
     icenter[i] = 0.5;
 
   for (unsigned int i = _dim; i < 3; ++i)

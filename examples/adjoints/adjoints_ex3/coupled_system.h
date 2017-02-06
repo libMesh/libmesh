@@ -53,7 +53,7 @@ public:
   ParameterVector & get_parameter_vector()
   {
     parameter_vector.resize(parameters.size());
-    for (unsigned int i = 0; i != parameters.size(); ++i)
+    for (std::size_t i = 0; i != parameters.size(); ++i)
       parameter_vector[i] = &parameters[i];
 
     return parameter_vector;

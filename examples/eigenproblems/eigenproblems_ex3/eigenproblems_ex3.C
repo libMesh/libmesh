@@ -395,8 +395,8 @@ void assemble_matrices(EquationSystems & es,
       // a double loop to integrate the test funcions (i) against
       // the trial functions (j).
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-        for (unsigned int i=0; i<phi.size(); i++)
-          for (unsigned int j=0; j<phi.size(); j++)
+        for (std::size_t i=0; i<phi.size(); i++)
+          for (std::size_t j=0; j<phi.size(); j++)
             {
               Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp];
               Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);

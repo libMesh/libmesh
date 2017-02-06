@@ -748,8 +748,8 @@ void assemble_laplace(EquationSystems & es,
       perf_log.push ("Ke");
 
       for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-        for (unsigned int i=0; i<dphi.size(); i++)
-          for (unsigned int j=0; j<dphi.size(); j++)
+        for (std::size_t i=0; i<dphi.size(); i++)
+          for (std::size_t j=0; j<dphi.size(); j++)
             Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
 
       // We need a forcing function to make the 1D case interesting
@@ -759,7 +759,7 @@ void assemble_laplace(EquationSystems & es,
             Real x = q_point[qp](0);
             Real f = singularity ? sqrt(3.)/9.*pow(-x, -4./3.) :
               cos(x);
-            for (unsigned int i=0; i<dphi.size(); ++i)
+            for (std::size_t i=0; i<dphi.size(); ++i)
               Fe(i) += JxW[qp]*phi[i][qp]*f;
           }
 
@@ -801,12 +801,12 @@ void assemble_laplace(EquationSystems & es,
                                                        "void");
 
                   // RHS contribution
-                  for (unsigned int i=0; i<psi.size(); i++)
+                  for (std::size_t i=0; i<psi.size(); i++)
                     Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
 
                   // Matrix contribution
-                  for (unsigned int i=0; i<psi.size(); i++)
-                    for (unsigned int j=0; j<psi.size(); j++)
+                  for (std::size_t i=0; i<psi.size(); i++)
+                    for (std::size_t j=0; j<psi.size(); j++)
                       Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
                 }
             }

@@ -315,8 +315,8 @@ void assemble_poisson(EquationSystems & es,
           // Now we will build the element matrix.  This involves
           // a double loop to integrate the test funcions (i) against
           // the trial functions (j).
-          for (unsigned int i=0; i<phi.size(); i++)
-            for (unsigned int j=0; j<phi.size(); j++)
+          for (std::size_t i=0; i<phi.size(); i++)
+            for (std::size_t j=0; j<phi.size(); j++)
               {
                 Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
               }
@@ -351,7 +351,7 @@ void assemble_poisson(EquationSystems & es,
                                exact_solution(x+eps, y) -
                                4.*exact_solution(x, y))/eps/eps;
 
-            for (unsigned int i=0; i<phi.size(); i++)
+            for (std::size_t i=0; i<phi.size(); i++)
               Fe(i) += JxW[qp]*fxy*phi[i][qp];
           }
         }
@@ -427,13 +427,13 @@ void assemble_poisson(EquationSystems & es,
                   const Real value = exact_solution(xf, yf);
 
                   // Matrix contribution of the L2 projection.
-                  for (unsigned int i=0; i<phi_face.size(); i++)
-                    for (unsigned int j=0; j<phi_face.size(); j++)
+                  for (std::size_t i=0; i<phi_face.size(); i++)
+                    for (std::size_t j=0; j<phi_face.size(); j++)
                       Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
 
                   // Right-hand-side contribution of the L2
                   // projection.
-                  for (unsigned int i=0; i<phi_face.size(); i++)
+                  for (std::size_t i=0; i<phi_face.size(); i++)
                     Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
                 }
             }
