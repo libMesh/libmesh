@@ -563,7 +563,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 
 #if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
   // Do MPI initializtion for VTK.
-  _vtk_mpi_controller = vtkSmartPointer<vtkMPIController>::New();
+  _vtk_mpi_controller = vtkMPIController::New();
   _vtk_mpi_controller->Initialize(&argc, const_cast<char ***>(&argv), /*initialized_externally=*/1);
   _vtk_mpi_controller->SetGlobalController(_vtk_mpi_controller);
 #endif
@@ -804,6 +804,7 @@ LibMeshInit::~LibMeshInit()
 
 #if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
   _vtk_mpi_controller->Finalize(/*finalized_externally=*/1);
+  _vtk_mpi_controller->Delete();
 #endif
 
 #if defined(LIBMESH_HAVE_MPI)
