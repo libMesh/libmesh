@@ -63,7 +63,7 @@ void ExactErrorEstimator::attach_exact_values (std::vector<FunctionBase<Number> 
 {
   // Clear out any previous _exact_values entries, then add a new
   // entry for each system.
-  for (unsigned int i=0; i != _exact_values.size(); ++i)
+  for (std::size_t i=0; i != _exact_values.size(); ++i)
     delete (_exact_values[i]);
 
   _exact_values.clear();
@@ -72,7 +72,7 @@ void ExactErrorEstimator::attach_exact_values (std::vector<FunctionBase<Number> 
   // We use clone() to get non-sliced copies of FunctionBase
   // subclasses, but we don't currently put the resulting UniquePtrs
   // into an STL container.
-  for (unsigned int i=0; i != f.size(); ++i)
+  for (std::size_t i=0; i != f.size(); ++i)
     if (f[i])
       _exact_values[i] = f[i]->clone().release();
 }
@@ -109,7 +109,7 @@ void ExactErrorEstimator::attach_exact_derivs (std::vector<FunctionBase<Gradient
 {
   // Clear out any previous _exact_derivs entries, then add a new
   // entry for each system.
-  for (unsigned int i=0; i != _exact_derivs.size(); ++i)
+  for (std::size_t i=0; i != _exact_derivs.size(); ++i)
     delete (_exact_derivs[i]);
 
   _exact_derivs.clear();
@@ -118,7 +118,7 @@ void ExactErrorEstimator::attach_exact_derivs (std::vector<FunctionBase<Gradient
   // We use clone() to get non-sliced copies of FunctionBase
   // subclasses, but we don't currently put the resulting UniquePtrs
   // into an STL container.
-  for (unsigned int i=0; i != g.size(); ++i)
+  for (std::size_t i=0; i != g.size(); ++i)
     if (g[i])
       _exact_derivs[i] = g[i]->clone().release();
 }
@@ -157,7 +157,7 @@ void ExactErrorEstimator::attach_exact_hessians (std::vector<FunctionBase<Tensor
 {
   // Clear out any previous _exact_hessians entries, then add a new
   // entry for each system.
-  for (unsigned int i=0; i != _exact_hessians.size(); ++i)
+  for (std::size_t i=0; i != _exact_hessians.size(); ++i)
     delete (_exact_hessians[i]);
 
   _exact_hessians.clear();
@@ -166,7 +166,7 @@ void ExactErrorEstimator::attach_exact_hessians (std::vector<FunctionBase<Tensor
   // We use clone() to get non-sliced copies of FunctionBase
   // subclasses, but we don't currently put the resulting UniquePtrs
   // into an STL container.
-  for (unsigned int i=0; i != h.size(); ++i)
+  for (std::size_t i=0; i != h.size(); ++i)
     if (h[i])
       _exact_hessians[i] = h[i]->clone().release();
 }
@@ -279,15 +279,15 @@ void ExactErrorEstimator::estimate_error (const System & system,
           fine_values->init();
         } else {
         // Initialize functors if we're using them
-        for (unsigned int i=0; i != _exact_values.size(); ++i)
+        for (std::size_t i=0; i != _exact_values.size(); ++i)
           if (_exact_values[i])
             _exact_values[i]->init();
 
-        for (unsigned int i=0; i != _exact_derivs.size(); ++i)
+        for (std::size_t i=0; i != _exact_derivs.size(); ++i)
           if (_exact_derivs[i])
             _exact_derivs[i]->init();
 
-        for (unsigned int i=0; i != _exact_hessians.size(); ++i)
+        for (std::size_t i=0; i != _exact_hessians.size(); ++i)
           if (_exact_hessians[i])
             _exact_hessians[i]->init();
       }
@@ -396,7 +396,7 @@ void ExactErrorEstimator::estimate_error (const System & system,
   // Compute the square-root of each component.
   {
     LOG_SCOPE("std::sqrt()", "ExactErrorEstimator");
-    for (dof_id_type i=0; i<error_per_cell.size(); i++)
+    for (std::size_t i=0; i<error_per_cell.size(); i++)
       if (error_per_cell[i] != 0.)
         {
           libmesh_assert_greater (error_per_cell[i], 0.);
@@ -556,13 +556,13 @@ void ExactErrorEstimator::clear_functors()
   // delete will clean up any cloned functors and no-op on any NULL
   // pointers
 
-  for (unsigned int i=0; i != _exact_values.size(); ++i)
+  for (std::size_t i=0; i != _exact_values.size(); ++i)
     delete (_exact_values[i]);
 
-  for (unsigned int i=0; i != _exact_derivs.size(); ++i)
+  for (std::size_t i=0; i != _exact_derivs.size(); ++i)
     delete (_exact_derivs[i]);
 
-  for (unsigned int i=0; i != _exact_hessians.size(); ++i)
+  for (std::size_t i=0; i != _exact_hessians.size(); ++i)
     delete (_exact_hessians[i]);
 }
 

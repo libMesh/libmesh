@@ -32,10 +32,8 @@ void DifferentiableQoI::thread_join( std::vector<Number> & qoi,
                                      const std::vector<Number> & other_qoi,
                                      const QoISet &)
 {
-  for (unsigned int i=0; i != qoi.size(); ++i)
+  for (std::size_t i=0; i != qoi.size(); ++i)
     qoi[i] += other_qoi[i];
-
-  return;
 }
 
 void DifferentiableQoI::parallel_op(const Parallel::Communicator & communicator,
@@ -48,8 +46,6 @@ void DifferentiableQoI::parallel_op(const Parallel::Communicator & communicator,
 
   // Now put into system qoi
   sys_qoi = local_qoi;
-
-  return;
 }
 
 } // namespace libMesh

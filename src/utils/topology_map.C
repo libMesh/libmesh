@@ -55,7 +55,7 @@ void TopologyMap::add_node(const Node & mid_node,
 
   libmesh_assert_not_equal_to(mid_node_id, DofObject::invalid_id);
 
-  for (unsigned int i=0; i != bracketing_nodes.size(); ++i)
+  for (std::size_t i=0; i != bracketing_nodes.size(); ++i)
     {
       const dof_id_type id1 = bracketing_nodes[i].first;
       const dof_id_type id2 = bracketing_nodes[i].second;
@@ -82,7 +82,7 @@ dof_id_type TopologyMap::find(const std::vector<std::pair<dof_id_type, dof_id_ty
 {
   dof_id_type new_node_id = DofObject::invalid_id;
 
-  for (unsigned int i = 0; i != bracketing_nodes.size(); ++i)
+  for (std::size_t i = 0; i != bracketing_nodes.size(); ++i)
     {
       const dof_id_type lower_id = std::min(bracketing_nodes[i].first,
                                             bracketing_nodes[i].second);

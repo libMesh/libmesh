@@ -75,7 +75,7 @@ void SparseMatrix<T>::add_block_matrix (const DenseMatrix<T> & dm,
   rows.reserve(blocksize*brows.size());
   cols.reserve(blocksize*bcols.size());
 
-  for (unsigned int ib=0; ib<brows.size(); ib++)
+  for (std::size_t ib=0; ib<brows.size(); ib++)
     {
       numeric_index_type i=brows[ib]*blocksize;
 
@@ -83,7 +83,7 @@ void SparseMatrix<T>::add_block_matrix (const DenseMatrix<T> & dm,
         rows.push_back(i++);
     }
 
-  for (unsigned int jb=0; jb<bcols.size(); jb++)
+  for (std::size_t jb=0; jb<bcols.size(); jb++)
     {
       numeric_index_type j=bcols[jb]*blocksize;
 

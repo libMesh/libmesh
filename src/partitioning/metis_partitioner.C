@@ -274,7 +274,7 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
                         // Get all the neighbor's children that
                         // live on that side and are thus connected
                         // to us
-                        for (unsigned int nc=0; nc<neighbors_offspring.size(); nc++)
+                        for (std::size_t nc=0; nc<neighbors_offspring.size(); nc++)
                           {
                             const Elem * child =
                               neighbors_offspring[nc];
@@ -365,7 +365,7 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
                         // Get all the neighbor's children that
                         // live on that side and are thus connected
                         // to us
-                        for (unsigned int nc=0; nc<neighbors_offspring.size(); nc++)
+                        for (std::size_t nc=0; nc<neighbors_offspring.size(); nc++)
                           {
                             const Elem * child =
                               neighbors_offspring[nc];

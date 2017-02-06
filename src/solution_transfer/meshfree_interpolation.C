@@ -83,7 +83,7 @@ void MeshfreeInterpolation::add_field_data (const std::vector<std::string> & fie
       if (_names.size() != field_names.size())
         libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
 
-      for (unsigned int v=0; v<_names.size(); v++)
+      for (std::size_t v=0; v<_names.size(); v++)
         if (_names[v] != field_names[v])
           libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
     }
@@ -208,7 +208,7 @@ void InverseDistanceInterpolation<KDDim>::interpolate_field_data (const std::vec
   if (_names.size() != field_names.size())
     libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
 
-  for (unsigned int v=0; v<_names.size(); v++)
+  for (std::size_t v=0; v<_names.size(); v++)
     if (_names[v] != field_names[v])
       libmesh_error_msg("ERROR:  when adding field data to an existing list the \nvariable list must be the same!");
 

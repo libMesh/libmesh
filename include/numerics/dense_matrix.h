@@ -873,7 +873,7 @@ template<typename T>
 inline
 void DenseMatrix<T>::scale (const T factor)
 {
-  for (unsigned int i=0; i<_val.size(); i++)
+  for (std::size_t i=0; i<_val.size(); i++)
     _val[i] *= factor;
 }
 
@@ -920,7 +920,7 @@ template<typename T>
 inline
 bool DenseMatrix<T>::operator == (const DenseMatrix<T> & mat) const
 {
-  for (unsigned int i=0; i<_val.size(); i++)
+  for (std::size_t i=0; i<_val.size(); i++)
     if (_val[i] != mat._val[i])
       return false;
 
@@ -933,7 +933,7 @@ template<typename T>
 inline
 bool DenseMatrix<T>::operator != (const DenseMatrix<T> & mat) const
 {
-  for (unsigned int i=0; i<_val.size(); i++)
+  for (std::size_t i=0; i<_val.size(); i++)
     if (_val[i] != mat._val[i])
       return true;
 
@@ -946,7 +946,7 @@ template<typename T>
 inline
 DenseMatrix<T> & DenseMatrix<T>::operator += (const DenseMatrix<T> & mat)
 {
-  for (unsigned int i=0; i<_val.size(); i++)
+  for (std::size_t i=0; i<_val.size(); i++)
     _val[i] += mat._val[i];
 
   return *this;
@@ -958,7 +958,7 @@ template<typename T>
 inline
 DenseMatrix<T> & DenseMatrix<T>::operator -= (const DenseMatrix<T> & mat)
 {
-  for (unsigned int i=0; i<_val.size(); i++)
+  for (std::size_t i=0; i<_val.size(); i++)
     _val[i] -= mat._val[i];
 
   return *this;

@@ -378,7 +378,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
         libmesh_assert_less_equal (ele.node_map.size(), elem->n_nodes());
 
         out_stream << ele.label << "\n";
-        for (unsigned int i=0; i < ele.node_map.size(); i++)
+        for (std::size_t i=0; i < ele.node_map.size(); i++)
           out_stream << elem->node_id(ele.node_map[i])+1 << " ";
         out_stream << "\n";
       }
@@ -463,7 +463,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
           // than are present in the current element!
           libmesh_assert_less_equal (ele.node_map.size(), elem->n_nodes());
 
-          for (unsigned int i=0; i < ele.node_map.size(); i++)
+          for (std::size_t i=0; i < ele.node_map.size(); i++)
             out_stream << elem->p_level() << " ";
         }
       out_stream << "\n\n";
@@ -697,7 +697,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                   {
                     out_stream << "line 2\n";
                     (*it)->connectivity(se, TECPLOT, conn);
-                    for (unsigned int i=0; i<conn.size(); i++)
+                    for (std::size_t i=0; i<conn.size(); i++)
                       out_stream << conn[i] << " ";
 
                     out_stream << '\n';
@@ -714,7 +714,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                         lo_elem->set_node(i) = (*it)->node_ptr(i);
                       lo_elem->connectivity(0, TECPLOT, conn);
                     }
-                  for (unsigned int i=0; i<conn.size(); i++)
+                  for (std::size_t i=0; i<conn.size(); i++)
                     out_stream << conn[i] << " ";
 
                   out_stream << '\n';
@@ -742,7 +742,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                       {
                         out_stream << "quad 4\n";
                         (*it)->connectivity(se, TECPLOT, conn);
-                        for (unsigned int i=0; i<conn.size(); i++)
+                        for (std::size_t i=0; i<conn.size(); i++)
                           out_stream << conn[i] << " ";
                       }
 
@@ -769,7 +769,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                     {
                       (*it)->connectivity(0, TECPLOT, conn);
                       out_stream << "quad 4\n";
-                      for (unsigned int i=0; i<conn.size(); i++)
+                      for (std::size_t i=0; i<conn.size(); i++)
                         out_stream << conn[i] << " ";
                     }
                   else if (((*it)->type() == QUAD8) ||
@@ -784,7 +784,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                         lo_elem->set_node(i) = (*it)->node_ptr(i);
                       lo_elem->connectivity(0, TECPLOT, conn);
                       out_stream << "quad 4\n";
-                      for (unsigned int i=0; i<conn.size(); i++)
+                      for (std::size_t i=0; i<conn.size(); i++)
                         out_stream << conn[i] << " ";
                     }
                   else if ((*it)->type() == TRI3)
@@ -823,7 +823,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                       {
                         out_stream << "phex8 8\n";
                         (*it)->connectivity(se, TECPLOT, conn);
-                        for (unsigned int i=0; i<conn.size(); i++)
+                        for (std::size_t i=0; i<conn.size(); i++)
                           out_stream << conn[i] << " ";
                       }
 
@@ -918,7 +918,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                       {
                         out_stream << "phex8 8\n";
                         (*it)->connectivity(se, TECPLOT, conn);
-                        for (unsigned int i=0; i<conn.size(); i++)
+                        for (std::size_t i=0; i<conn.size(); i++)
                           out_stream << conn[i] << " ";
                       }
 #endif
@@ -955,7 +955,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                         // degenerated phex8's.
                         out_stream << "phex8 8\n";
                         (*it)->connectivity(se, TECPLOT, conn);
-                        for (unsigned int i=0; i<conn.size(); i++)
+                        for (std::size_t i=0; i<conn.size(); i++)
                           out_stream << conn[i] << " ";
                       }
 
@@ -980,7 +980,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                     {
                       out_stream << "phex8 8\n";
                       lo_elem->connectivity(0, TECPLOT, conn);
-                      for (unsigned int i=0; i<conn.size(); i++)
+                      for (std::size_t i=0; i<conn.size(); i++)
                         out_stream << conn[i] << " ";
                     }
 
@@ -1003,7 +1003,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                       // degenerated phex8's.
                       out_stream << "phex8 8\n";
                       lo_elem->connectivity(0, TECPLOT, conn);
-                      for (unsigned int i=0; i<conn.size(); i++)
+                      for (std::size_t i=0; i<conn.size(); i++)
                         out_stream << conn[i] << " ";
                     }
 
@@ -1067,7 +1067,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                      << sbdid_map.size()
                      << " 0\n";
 
-          for (unsigned int sbdid=0; sbdid<sbdid_map.size(); sbdid++)
+          for (std::size_t sbdid=0; sbdid<sbdid_map.size(); sbdid++)
             out_stream << "proc_" << sbdid << "\n";
 
           MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
@@ -1398,7 +1398,7 @@ void GMVIO::write_binary (const std::string & fname,
         out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
         // Write the element connectivity
-        for (unsigned int i=0; i<ed.node_map.size(); i++)
+        for (std::size_t i=0; i<ed.node_map.size(); i++)
           {
             dof_id_type id = elem->node_id(ed.node_map[i]) + 1;
             out_stream.write(reinterpret_cast<char *>(&id), sizeof(dof_id_type));
@@ -2390,14 +2390,14 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
       const std::map<std::string, std::vector<Number> >::iterator end = _nodal_data.end();
       for (; it != end; ++it)
         {
-          std::string var_name = (*it).first;
+          std::string var_name = it->first;
           // libMesh::out << "Searching for var " << var_name << " in system " << sys << std::endl;
 
           if (system.has_variable(var_name))
             {
               // Check if there are as many nodes in the mesh as there are entries
               // in the stored nodal data vector
-              libmesh_assert_equal_to ( (*it).second.size(), MeshInput<MeshBase>::mesh().n_nodes() );
+              libmesh_assert_equal_to ( it->second.size(), MeshInput<MeshBase>::mesh().n_nodes() );
 
               const unsigned int var_num = system.variable_number(var_name);
 
@@ -2420,7 +2420,7 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
 
               // Loop over the stored vector's entries, inserting them into
               // the System's solution if appropriate.
-              for (unsigned int i=0; i<(*it).second.size(); ++i)
+              for (std::size_t i=0; i<it->second.size(); ++i)
                 {
                   // Since this var came from a GMV file, the index i corresponds to
                   // the (single) DOF value of the current variable for node i.
@@ -2430,14 +2430,14 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
                                                                         0);       // component #, always zero for LAGRANGE
 
                   // libMesh::out << "Value " << i << ": "
-                  //     << (*it).second [i]
+                  //     << it->second [i]
                   //     << ", dof index="
                   //     << dof_index << std::endl;
 
                   // If the dof_index is local to this processor, set the value
                   if ((dof_index >= system.solution->first_local_index()) &&
                       (dof_index <  system.solution->last_local_index()))
-                    system.solution->set (dof_index, (*it).second [i]);
+                    system.solution->set (dof_index, it->second [i]);
                 } // end loop over my GMVIO's copy of the solution
 
               // Add the most recently copied var to the set of copied vars
@@ -2460,10 +2460,10 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
 
     for (; it != end; ++it)
       {
-        if (vars_copied.find( (*it).first ) == vars_copied.end())
+        if (vars_copied.find( it->first ) == vars_copied.end())
           {
             libMesh::err << "Warning: Variable "
-                         << (*it).first
+                         << it->first
                          << " was not copied to the EquationSystems object."
                          << std::endl;
           }

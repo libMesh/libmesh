@@ -96,7 +96,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // Loop over all the adjoint problems and, if any have heterogenous
   // Dirichlet conditions, get the corresponding coarse lift
   // function(s)
-  for (unsigned int j=0; j != system.qoi.size(); j++)
+  for (std::size_t j=0; j != system.qoi.size(); j++)
     {
       // Skip this QoI if it is not in the QoI Set or if there are no
       // heterogeneous Dirichlet boundaries for it
@@ -186,7 +186,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // Copy the projected coarse grid solutions, which will be
   // overwritten by solve()
   std::vector<NumericVector<Number> *> coarse_adjoints;
-  for (unsigned int j=0; j != system.qoi.size(); j++)
+  for (std::size_t j=0; j != system.qoi.size(); j++)
     {
       if (_qoi_set.has_index(j))
         {
@@ -222,7 +222,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // Loop over all the adjoint solutions and get the QoI error
   // contributions from all of them.  While we're looping anyway we'll
   // pull off the coarse adjoints
-  for (unsigned int j=0; j != system.qoi.size(); j++)
+  for (std::size_t j=0; j != system.qoi.size(); j++)
     {
       // Skip this QoI if not in the QoI Set
       if (_qoi_set.has_index(j))
@@ -366,7 +366,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
   // We will loop over each adjoint solution, localize that adjoint
   // solution and then loop over local elements
-  for (unsigned int i=0; i != system.qoi.size(); i++)
+  for (std::size_t i=0; i != system.qoi.size(); i++)
     {
       // Skip this QoI if not in the QoI Set
       if (_qoi_set.has_index(i))
@@ -403,7 +403,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
               // We will have to manually do the dot products.
               Number local_contribution = 0.;
 
-              for (unsigned int j=0; j != dof_indices.size(); j++)
+              for (std::size_t j=0; j != dof_indices.size(); j++)
                 {
                   // The contribution to the error indicator for this element from the current QoI
                   local_contribution += (*localized_projected_residual)(dof_indices[j]) * (*localized_adjoint_solution)(dof_indices[j]);
@@ -423,7 +423,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
     } // End loop over QoIs
 
-  for (unsigned int j=0; j != system.qoi.size(); j++)
+  for (std::size_t j=0; j != system.qoi.size(); j++)
     {
       if (_qoi_set.has_index(j))
         {

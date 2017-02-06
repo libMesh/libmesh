@@ -111,7 +111,7 @@ void QBase::scale(std::pair<Real, Real> old_range,
   Real scfact = h_new/h_old;
 
   // We're mapping from old_range -> new_range
-  for (unsigned int i=0; i<_points.size(); i++)
+  for (std::size_t i=0; i<_points.size(); i++)
     {
       _points[i](0) = new_range.first +
         (_points[i](0) - old_range.first) * scfact;

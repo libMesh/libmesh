@@ -335,7 +335,7 @@ void FEMContext::interior_values (unsigned int var,
   const std::vector<std::vector<OutputShape> > & phi = fe->get_phi();
 
   // Loop over all the q_points on this element
-  for (unsigned int qp=0; qp != u_vals.size(); qp++)
+  for (std::size_t qp=0; qp != u_vals.size(); qp++)
     {
       OutputType & u = u_vals[qp];
 
@@ -399,7 +399,7 @@ void FEMContext::interior_gradients(unsigned int var,
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > & dphi = fe->get_dphi();
 
   // Loop over all the q_points in this finite element
-  for (unsigned int qp=0; qp != du_vals.size(); qp++)
+  for (std::size_t qp=0; qp != du_vals.size(); qp++)
     {
       OutputType & du = du_vals[qp];
 
@@ -463,7 +463,7 @@ void FEMContext::interior_hessians(unsigned int var,
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > & d2phi = fe->get_d2phi();
 
   // Loop over all the q_points in this finite element
-  for (unsigned int qp=0; qp != d2u_vals.size(); qp++)
+  for (std::size_t qp=0; qp != d2u_vals.size(); qp++)
     {
       OutputType & d2u = d2u_vals[qp];
 
@@ -589,7 +589,7 @@ void FEMContext::side_values(unsigned int var,
   const std::vector<std::vector<OutputShape> > & phi = the_side_fe->get_phi();
 
   // Loop over all the q_points on this element
-  for (unsigned int qp=0; qp != u_vals.size(); qp++)
+  for (std::size_t qp=0; qp != u_vals.size(); qp++)
     {
       OutputType & u = u_vals[qp];
 
@@ -671,7 +671,7 @@ void FEMContext::side_gradients(unsigned int var,
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > & dphi = the_side_fe->get_dphi();
 
   // Loop over all the q_points in this finite element
-  for (unsigned int qp=0; qp != du_vals.size(); qp++)
+  for (std::size_t qp=0; qp != du_vals.size(); qp++)
     {
       OutputType & du = du_vals[qp];
 
@@ -740,7 +740,7 @@ void FEMContext::side_hessians(unsigned int var,
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > & d2phi = the_side_fe->get_d2phi();
 
   // Loop over all the q_points in this finite element
-  for (unsigned int qp=0; qp != d2u_vals.size(); qp++)
+  for (std::size_t qp=0; qp != d2u_vals.size(); qp++)
     {
       OutputType & d2u = d2u_vals[qp];
 

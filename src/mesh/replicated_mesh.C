@@ -790,14 +790,14 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
 void ReplicatedMesh::fix_broken_node_and_element_numbering ()
 {
   // Nodes first
-  for (dof_id_type n=0; n<this->_nodes.size(); n++)
+  for (std::size_t n=0; n<this->_nodes.size(); n++)
     if (this->_nodes[n] != libmesh_nullptr)
-      this->_nodes[n]->set_id() = n;
+      this->_nodes[n]->set_id() = cast_int<dof_id_type>(n);
 
   // Elements next
-  for (dof_id_type e=0; e<this->_elements.size(); e++)
+  for (std::size_t e=0; e<this->_elements.size(); e++)
     if (this->_elements[e] != libmesh_nullptr)
-      this->_elements[e]->set_id() = e;
+      this->_elements[e]->set_id() = cast_int<dof_id_type>(e);
 }
 
 
@@ -897,7 +897,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                 // Get the list of nodes with associated boundary IDs
                 mesh_array[i]->get_boundary_info().build_node_list(node_id_list, bc_id_list);
 
-                for(unsigned int node_index=0; node_index<bc_id_list.size(); node_index++)
+                for (std::size_t node_index=0; node_index<bc_id_list.size(); node_index++)
                   {
                     boundary_id_type node_bc_id = bc_id_list[node_index];
                     if (node_bc_id == id_array[i])
@@ -1044,7 +1044,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
           }
 
           // Build up the node_to_node_map and node_to_elems_map using the sorted vectors of Points.
-          for (unsigned i=0; i<this_sorted_bndry_nodes.size(); ++i)
+          for (std::size_t i=0; i<this_sorted_bndry_nodes.size(); ++i)
             {
               // Current point we're working on
               Point this_point = this_sorted_bndry_nodes[i].first;

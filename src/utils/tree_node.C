@@ -126,7 +126,7 @@ bool TreeNode<N>::insert (const Elem * elem)
         {
           element_count = 0;
           unsigned char highest_dim_elem = *elem_dimensions.rbegin();
-          for(unsigned int i=0; i<elements.size(); i++)
+          for (std::size_t i=0; i<elements.size(); i++)
           {
             if(elements[i]->dim() == highest_dim_elem)
             {
@@ -181,11 +181,11 @@ void TreeNode<N>::refine ()
       children[c]->set_bounding_box(this->create_bounding_box(c));
 
       // Pass off our nodes to our children
-      for (unsigned int n=0; n<nodes.size(); n++)
+      for (std::size_t n=0; n<nodes.size(); n++)
         children[c]->insert(nodes[n]);
 
       // Pass off our elements to our children
-      for (unsigned int e=0; e<elements.size(); e++)
+      for (std::size_t e=0; e<elements.size(); e++)
         children[c]->insert(elements[e]);
     }
 
@@ -375,14 +375,14 @@ void TreeNode<N>::print_nodes(std::ostream & out_stream) const
     {
       out_stream << "TreeNode Level: " << this->level() << std::endl;
 
-      for (unsigned int n=0; n<nodes.size(); n++)
+      for (std::size_t n=0; n<nodes.size(); n++)
         out_stream << " " << nodes[n]->id();
 
       out_stream << std::endl << std::endl;
     }
   else
     {
-      for (unsigned int child=0; child<children.size(); child++)
+      for (std::size_t child=0; child<children.size(); child++)
         children[child]->print_nodes();
     }
 }
@@ -404,7 +404,7 @@ void TreeNode<N>::print_elements(std::ostream & out_stream) const
     }
   else
     {
-      for (unsigned int child=0; child<children.size(); child++)
+      for (std::size_t child=0; child<children.size(); child++)
         children[child]->print_elements();
     }
 }
@@ -423,7 +423,7 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
       // set to eliminate the duplication.
       std::set<const Elem *> elements_set;
 
-      for (unsigned int n=0; n<nodes.size(); n++)
+      for (std::size_t n=0; n<nodes.size(); n++)
         {
           // the actual global node number we are replacing
           // with the connected elements
@@ -432,7 +432,7 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
           libmesh_assert_less (node_number, mesh.n_nodes());
           libmesh_assert_less (node_number, nodes_to_elem.size());
 
-          for (unsigned int e=0; e<nodes_to_elem[node_number].size(); e++)
+          for (std::size_t e=0; e<nodes_to_elem[node_number].size(); e++)
             elements_set.insert(nodes_to_elem[node_number][e]);
         }
 
@@ -462,7 +462,7 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
     }
   else
     {
-      for (unsigned int child=0; child<children.size(); child++)
+      for (std::size_t child=0; child<children.size(); child++)
         children[child]->transform_nodes_to_elements (nodes_to_elem);
     }
 
@@ -480,7 +480,7 @@ unsigned int TreeNode<N>::n_active_bins() const
     {
       unsigned int sum=0;
 
-      for (unsigned int c=0; c<children.size(); c++)
+      for (std::size_t c=0; c<children.size(); c++)
         sum += children[c]->n_active_bins();
 
       return sum;
@@ -532,7 +532,7 @@ const Elem * TreeNode<N>::find_element_in_children (const Point & p,
 
   // First only look in the children whose bounding box
   // contain the point p.
-  for (unsigned int c=0; c<children.size(); c++)
+  for (std::size_t c=0; c<children.size(); c++)
     if (children[c]->bounds_point(p, relative_tol))
       {
         const Elem * e =
@@ -555,7 +555,7 @@ const Elem * TreeNode<N>::find_element_in_children (const Point & p,
   // was searched and did not find any elements containing
   // the point p.  So, let's look at the other children
   // but exclude the one we have already searched.
-  for (unsigned int c=0; c<children.size(); c++)
+  for (std::size_t c=0; c<children.size(); c++)
     if (!searched_child[c])
       {
         const Elem * e =

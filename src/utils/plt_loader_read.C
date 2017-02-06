@@ -857,7 +857,7 @@ void PltLoader::read_block_data (std::istream & in, const unsigned int zone)
 
             in.read ((char *) &data[0], LIBMESH_SIZEOF_FLOAT*data.size());
 
-            for (unsigned int i=0; i<data.size(); i++)
+            for (std::size_t i=0; i<data.size(); i++)
               rb(data[i]);
 
             break;
@@ -880,7 +880,7 @@ void PltLoader::read_block_data (std::istream & in, const unsigned int zone)
 
             in.read ((char *) &ddata[0], LIBMESH_SIZEOF_DOUBLE*ddata.size());
 
-            for (unsigned int i=0; i<data.size(); i++)
+            for (std::size_t i=0; i<data.size(); i++)
               data[i] = rb(ddata[i]);
 
             break;
@@ -970,7 +970,7 @@ void PltLoader::read_feblock_data (std::istream & in, const unsigned int zone)
 
             in.read ((char *) &data[0], LIBMESH_SIZEOF_FLOAT*data.size());
 
-            for (unsigned int i=0; i<data.size(); i++)
+            for (std::size_t i=0; i<data.size(); i++)
               rb(data[i]);
 
             break;
@@ -988,7 +988,7 @@ void PltLoader::read_feblock_data (std::istream & in, const unsigned int zone)
 
             in.read ((char *) &ddata[0], LIBMESH_SIZEOF_DOUBLE*ddata.size());
 
-            for (unsigned int i=0; i<data.size(); i++)
+            for (std::size_t i=0; i<data.size(); i++)
               data[i] = rb(ddata[i]);
 
             break;
@@ -1019,7 +1019,7 @@ void PltLoader::read_feblock_data (std::istream & in, const unsigned int zone)
 
         in.read ((char *) &_conn[zone][0], LIBMESH_SIZEOF_INT*_conn[zone].size());
 
-        for (unsigned int i=0; i<_conn[zone].size(); i++)
+        for (std::size_t i=0; i<_conn[zone].size(); i++)
           rb(_conn[zone][i]);
       }
   }
@@ -1094,7 +1094,7 @@ void PltLoader::read_fepoint_data (std::istream & in, const unsigned int zone)
 
         in.read ((char *) &_conn[zone][0], LIBMESH_SIZEOF_INT*_conn[zone].size());
 
-        for (unsigned int i=0; i<_conn[zone].size(); i++)
+        for (std::size_t i=0; i<_conn[zone].size(); i++)
           rb(_conn[zone][i]);
       }
   }

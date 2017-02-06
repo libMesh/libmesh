@@ -389,12 +389,12 @@ void JumpErrorEstimator::estimate_error (const System & system,
       // Sanity check: Make sure the number of flux faces is
       // always an integer value
 #ifdef DEBUG
-      for (unsigned int i=0; i<n_flux_faces.size(); ++i)
+      for (std::size_t i=0; i<n_flux_faces.size(); ++i)
         libmesh_assert_equal_to (n_flux_faces[i], static_cast<float>(static_cast<unsigned int>(n_flux_faces[i])) );
 #endif
 
       // Scale the error by the number of flux faces for each element
-      for (unsigned int i=0; i<n_flux_faces.size(); ++i)
+      for (std::size_t i=0; i<n_flux_faces.size(); ++i)
         {
           if (n_flux_faces[i] == 0.0) // inactive or non-local element
             continue;

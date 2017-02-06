@@ -296,7 +296,7 @@ void ExodusII_IO::read (const std::string & fname)
             = sideset_name;
       }
 
-    for (unsigned int e=0; e<exio_helper->elem_list.size(); e++)
+    for (std::size_t e=0; e<exio_helper->elem_list.size(); e++)
       {
         // The numbers in the Exodus file sidesets should be thought
         // of as (1-based) indices into the elem_num_map array.  So,
@@ -369,7 +369,7 @@ void ExodusII_IO::read (const std::string & fname)
 
         exio_helper->read_nodeset(nodeset);
 
-        for (unsigned int node=0; node<exio_helper->node_list.size(); node++)
+        for (std::size_t node=0; node<exio_helper->node_list.size(); node++)
           {
             // As before, the entries in 'node_list' are 1-based
             // indcies into the node_num_map array, so we have to map
@@ -466,7 +466,7 @@ void ExodusII_IO::copy_nodal_solution(System & system,
 
   const unsigned int var_num = system.variable_number(system_var_name);
 
-  for (unsigned int i=0; i<exio_helper->nodal_var_values.size(); ++i)
+  for (std::size_t i=0; i<exio_helper->nodal_var_values.size(); ++i)
     {
       const Node & node = MeshInput<MeshBase>::mesh().node_ref(i);
 

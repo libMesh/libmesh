@@ -170,7 +170,7 @@ void
 ParameterVector::clear()
 {
   if (!_is_shallow_copy)
-    for (unsigned int i=0; i != _params.size(); ++i)
+    for (std::size_t i=0; i != _params.size(); ++i)
       delete _params[i];
 
   _params.clear();

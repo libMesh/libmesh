@@ -213,7 +213,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
   // And it'll be best to avoid any repartitioning
   UniquePtr<Partitioner> old_partitioner(mesh.partitioner().release());
 
-  for (unsigned int i=0; i != system_list.size(); ++i)
+  for (std::size_t i=0; i != system_list.size(); ++i)
     {
       System & system = *system_list[i];
 
@@ -283,7 +283,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
       es.reinit();
     }
 
-  for (unsigned int i=0; i != system_list.size(); ++i)
+  for (std::size_t i=0; i != system_list.size(); ++i)
     {
       System & system = *system_list[i];
 
@@ -304,7 +304,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
       libmesh_assert (solution_vectors->find(sys) !=
                       solution_vectors->end());
       const NumericVector<Number> * vec = solution_vectors->find(sys)->second;
-      for (unsigned int j=0; j != sys->qoi.size(); ++j)
+      for (std::size_t j=0; j != sys->qoi.size(); ++j)
         {
           std::ostringstream adjoint_name;
           adjoint_name << "adjoint_solution" << j;
@@ -340,7 +340,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
                          !solution_vectors->find(system_list[0])->second);
 
 #ifdef DEBUG
-          for (unsigned int i=0; i != system_list.size(); ++i)
+          for (std::size_t i=0; i != system_list.size(); ++i)
             {
               System * sys = system_list[i];
               libmesh_assert (solution_vectors->find(sys) !=
@@ -349,7 +349,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
               if (solve_adjoint)
                 {
                   bool found_vec = false;
-                  for (unsigned int j=0; j != sys->qoi.size(); ++j)
+                  for (std::size_t j=0; j != sys->qoi.size(); ++j)
                     {
                       std::ostringstream adjoint_name;
                       adjoint_name << "adjoint_solution" << j;
@@ -372,13 +372,13 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
               std::vector<unsigned int> adjs(system_list.size(),
                                              libMesh::invalid_uint);
               // Set up proper initial guesses
-              for (unsigned int i=0; i != system_list.size(); ++i)
+              for (std::size_t i=0; i != system_list.size(); ++i)
                 {
                   System * sys = system_list[i];
                   libmesh_assert (solution_vectors->find(sys) !=
                                   solution_vectors->end());
                   const NumericVector<Number> * vec = solution_vectors->find(sys)->second;
-                  for (unsigned int j=0; j != sys->qoi.size(); ++j)
+                  for (std::size_t j=0; j != sys->qoi.size(); ++j)
                     {
                       std::ostringstream adjoint_name;
                       adjoint_name << "adjoint_solution" << j;
@@ -398,7 +398,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
 
               // Put the adjoint_solution into solution for
               // comparisons
-              for (unsigned int i=0; i != system_list.size(); ++i)
+              for (std::size_t i=0; i != system_list.size(); ++i)
                 {
                   system_list[i]->get_adjoint_solution(adjs[i]).swap(*system_list[i]->solution);
                   system_list[i]->update();
@@ -434,7 +434,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
           if (solve_adjoint)
             {
               unsigned int adj = libMesh::invalid_uint;
-              for (unsigned int j=0; j != sys->qoi.size(); ++j)
+              for (std::size_t j=0; j != sys->qoi.size(); ++j)
                 {
                   std::ostringstream adjoint_name;
                   adjoint_name << "adjoint_solution" << j;
@@ -462,7 +462,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
 
   // Get the error in the uniformly refined solution(s).
 
-  for (unsigned int sysnum=0; sysnum != system_list.size(); ++sysnum)
+  for (std::size_t sysnum=0; sysnum != system_list.size(); ++sysnum)
     {
       System & system = *system_list[sysnum];
 
@@ -681,7 +681,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
 
       // Compute the square-root of each component.
       LOG_SCOPE("std::sqrt()", "UniformRefinementEstimator");
-      for (unsigned int i=0; i<error_per_cell->size(); i++)
+      for (std::size_t i=0; i<error_per_cell->size(); i++)
         if ((*error_per_cell)[i] != 0.)
           (*error_per_cell)[i] = std::sqrt((*error_per_cell)[i]);
     }
@@ -696,14 +696,14 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
 
           // Compute the square-root of each component.
           LOG_SCOPE("std::sqrt()", "UniformRefinementEstimator");
-          for (unsigned int i=0; i<e->size(); i++)
+          for (std::size_t i=0; i<e->size(); i++)
             if ((*e)[i] != 0.)
               (*e)[i] = std::sqrt((*e)[i]);
         }
     }
 
   // Restore old solutions and clean up the heap
-  for (unsigned int i=0; i != system_list.size(); ++i)
+  for (std::size_t i=0; i != system_list.size(); ++i)
     {
       System & system = *system_list[i];
 

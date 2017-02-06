@@ -309,7 +309,7 @@ void DofObject::set_n_vars_per_group(const unsigned int s,
 #ifdef DEBUG
 
   // libMesh::out << " [ ";
-  // for (unsigned int i=0; i<_idx_buf.size(); i++)
+  // for (std::size_t i=0; i<_idx_buf.size(); i++)
   //   libMesh::out << _idx_buf[i] << " ";
   // libMesh::out << "]\n";
 
@@ -435,7 +435,7 @@ void DofObject::set_dof_number(const unsigned int s,
 
   // #ifdef DEBUG
   //   libMesh::out << " [ ";
-  //   for (unsigned int i=0; i<_idx_buf.size(); i++)
+  //   for (std::size_t i=0; i<_idx_buf.size(); i++)
   //     libMesh::out << _idx_buf[i] << " ";
   //   libMesh::out << "]\n";
   // #endif
@@ -542,7 +542,7 @@ DofObject::pack_indexing(std::back_insert_iterator<std::vector<largest_id_type> 
 void DofObject::debug_buffer () const
 {
   libMesh::out << " [ ";
-  for (unsigned int i=0; i<_idx_buf.size(); i++)
+  for (std::size_t i=0; i<_idx_buf.size(); i++)
     libMesh::out << _idx_buf[i] << " ";
   libMesh::out << "]\n";
 }

@@ -369,7 +369,7 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/B_min" << suffix;
       Xdr B_min_out(file_name.str(), mode);
 
-      for(unsigned int i=0; i<B_min.size(); i++)
+      for (std::size_t i=0; i<B_min.size(); i++)
         {
           Real B_min_i = get_B_min(i);
           B_min_out << B_min_i;
@@ -382,7 +382,7 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/B_max" << suffix;
       Xdr B_max_out(file_name.str(), mode);
 
-      for(unsigned int i=0; i<B_max.size(); i++)
+      for (std::size_t i=0; i<B_max.size(); i++)
         {
           Real B_max_i = get_B_max(i);
           B_max_out << B_max_i;
@@ -403,7 +403,7 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/C_J_stability_vector" << suffix;
       Xdr C_J_stability_vector_out(file_name.str(), mode);
 
-      for(unsigned int i=0; i<C_J_stability_vector.size(); i++)
+      for (std::size_t i=0; i<C_J_stability_vector.size(); i++)
         {
           Real C_J_stability_constraint_i = get_C_J_stability_constraint(i);
           C_J_stability_vector_out << C_J_stability_constraint_i;
@@ -415,7 +415,7 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/C_J" << suffix;
       Xdr C_J_out(file_name.str(), mode);
 
-      for(unsigned int i=0; i<C_J.size(); i++)
+      for (std::size_t i=0; i<C_J.size(); i++)
         {
           RBParameters::const_iterator it     = C_J[i].begin();
           RBParameters::const_iterator it_end = C_J[i].end();
@@ -434,14 +434,12 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/SCM_UB_vectors" << suffix;
       Xdr SCM_UB_vectors_out(file_name.str(), mode);
 
-      for(unsigned int i=0; i<SCM_UB_vectors.size(); i++)
-        {
-          for(unsigned int j=0; j<rb_theta_expansion->get_n_A_terms(); j++)
-            {
-              Real SCM_UB_vector_ij = get_SCM_UB_vector(i,j);
-              SCM_UB_vectors_out << SCM_UB_vector_ij;
-            }
-        }
+      for (std::size_t i=0; i<SCM_UB_vectors.size(); i++)
+        for (unsigned int j=0; j<rb_theta_expansion->get_n_A_terms(); j++)
+          {
+            Real SCM_UB_vector_ij = get_SCM_UB_vector(i,j);
+            SCM_UB_vectors_out << SCM_UB_vector_ij;
+          }
       SCM_UB_vectors_out.close();
     }
 }
@@ -534,7 +532,7 @@ void RBSCMEvaluation::legacy_read_offline_data_from_files(const std::string & di
 
   // Resize C_J based on C_J_stability_vector and Q_a
   C_J.resize( C_J_length );
-  for(unsigned int i=0; i<C_J.size(); i++)
+  for (std::size_t i=0; i<C_J.size(); i++)
     {
       RBParameters::const_iterator it     = get_parameters().begin();
       RBParameters::const_iterator it_end = get_parameters().end();
@@ -556,7 +554,7 @@ void RBSCMEvaluation::legacy_read_offline_data_from_files(const std::string & di
 
   // Resize SCM_UB_vectors based on C_J_stability_vector and Q_a
   SCM_UB_vectors.resize( C_J_stability_vector.size() );
-  for(unsigned int i=0; i<SCM_UB_vectors.size(); i++)
+  for (std::size_t i=0; i<SCM_UB_vectors.size(); i++)
     {
       SCM_UB_vectors[i].resize( rb_theta_expansion->get_n_A_terms() );
       for(unsigned int j=0; j<rb_theta_expansion->get_n_A_terms(); j++)

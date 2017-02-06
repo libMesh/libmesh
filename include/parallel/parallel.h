@@ -522,7 +522,7 @@ inline Status wait (Request & r) { return r.wait(); }
  * Wait for a non-blocking send or receive to finish
  */
 inline void wait (std::vector<Request> & r)
-{ for (unsigned int i=0; i<r.size(); i++) r[i].wait(); }
+{ for (std::size_t i=0; i<r.size(); i++) r[i].wait(); }
 
 
 /**

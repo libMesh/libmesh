@@ -56,8 +56,10 @@ public:
                            const Point &,
                            const Real,
                            DenseVector<Output> & output)
-  {for(unsigned int i = 0; i < output.size(); i++ )
-      output(i) = _c;}
+  {
+    for (std::size_t i = 0; i < output.size(); i++)
+      output(i) = _c;
+  }
 
 private:
   Output _c;

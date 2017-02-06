@@ -257,7 +257,7 @@ void PostscriptIO::plot_quadratic_elem(const Elem * elem)
       this->_compute_edge_bezier_coeffs(side.get());
 
       // Print curveto path to file
-      for (unsigned int i=0; i<_bezier_coeffs.size(); ++i)
+      for (std::size_t i=0; i<_bezier_coeffs.size(); ++i)
         _out << _bezier_coeffs[i](0) << " " << _bezier_coeffs[i](1) << " ";
       _out << " cs\n";
     }

@@ -368,7 +368,7 @@ void UCDIO::write_soln(std::ostream & out_stream,
 
   // First write out how many variables and how many components per variable
   out_stream << names.size();
-  for (unsigned int i = 0; i < names.size(); i++)
+  for (std::size_t i = 0; i < names.size(); i++)
     {
       libmesh_assert (out_stream.good());
       // Each named variable has only 1 component

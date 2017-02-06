@@ -174,13 +174,13 @@ std::string PerfLog::get_info_header() const
 
       // Find the longest string in all the streams
       unsigned int max_length = 0;
-      for (unsigned int i=0; i<v.size(); ++i)
+      for (std::size_t i=0; i<v.size(); ++i)
         if (v[i]->str().size() > max_length)
           max_length = cast_int<unsigned int>
             (v[i]->str().size());
 
       // Find the longest string in the parsed_libmesh_configure_info
-      for (unsigned i=0; i<parsed_libmesh_configure_info.size(); ++i)
+      for (std::size_t i=0; i<parsed_libmesh_configure_info.size(); ++i)
         if (parsed_libmesh_configure_info[i].size() > max_length)
           max_length = cast_int<unsigned int>
             (parsed_libmesh_configure_info[i].size());
@@ -191,7 +191,7 @@ std::string PerfLog::get_info_header() const
           << '\n';
 
       // Loop over all the strings and add end formatting
-      for (unsigned int i=0; i<v.size(); ++i)
+      for (std::size_t i=0; i<v.size(); ++i)
         {
           if (v[i]->str().size())
             oss << v[i]->str()
@@ -214,7 +214,7 @@ std::string PerfLog::get_info_header() const
 
       // Loop over the parsed_libmesh_configure_info and add end formatting.  The magic
       // number 3 below accounts for the leading 'pipe' character and indentation
-      for (unsigned i=1; i<parsed_libmesh_configure_info.size(); ++i)
+      for (std::size_t i=1; i<parsed_libmesh_configure_info.size(); ++i)
         {
           oss << "|  "
               << parsed_libmesh_configure_info[i]

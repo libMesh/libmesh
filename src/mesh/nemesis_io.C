@@ -326,7 +326,7 @@ void Nemesis_IO::read (const std::string & base_filename)
   // will be responsible for numbering.
   unsigned int num_nodes_i_must_number = 0;
 
-  for (unsigned int idx=0; idx<node_ownership.size(); idx++)
+  for (std::size_t idx=0; idx<node_ownership.size(); idx++)
     if (node_ownership[idx] == this->processor_id())
       num_nodes_i_must_number++;
 
@@ -571,7 +571,7 @@ void Nemesis_IO::read (const std::string & base_filename)
           this->comm().receive (requesting_pid_idx, xfer_buf, nodes_tag);
 
           // Fill the request
-          for (unsigned int i=0; i<xfer_buf.size(); i++)
+          for (std::size_t i=0; i<xfer_buf.size(); i++)
             {
               // the requested old global node index, *now 0-based*
               const unsigned int old_global_node_idx = xfer_buf[i];
@@ -623,7 +623,7 @@ void Nemesis_IO::read (const std::string & base_filename)
           libmesh_assert_less_equal (needed_node_idxs[cmap].size(),
                                      nemhelper->node_cmap_node_ids[cmap].size());
 
-          for (unsigned int i=0,j=0; i<nemhelper->node_cmap_node_ids[cmap].size(); i++)
+          for (std::size_t i=0, j=0; i<nemhelper->node_cmap_node_ids[cmap].size(); i++)
             {
               const unsigned int
                 local_node_idx  = nemhelper->node_cmap_node_ids[cmap][i]-1,
@@ -881,16 +881,16 @@ void Nemesis_IO::read (const std::string & base_filename)
   if (_verbose)
     {
       // Print local elems_of_dimension information
-      for (unsigned int i=1; i<elems_of_dimension.size(); ++i)
+      for (std::size_t i=1; i<elems_of_dimension.size(); ++i)
         libMesh::out << "[" << this->processor_id() << "] "
                      << "elems_of_dimension[" << i << "]=" << elems_of_dimension[i] << std::endl;
     }
 
   // Get the max dimension seen on the current processor
   unsigned char max_dim_seen = 0;
-  for (unsigned char i=1; i<elems_of_dimension.size(); ++i)
+  for (std::size_t i=1; i<elems_of_dimension.size(); ++i)
     if (elems_of_dimension[i])
-      max_dim_seen = i;
+      max_dim_seen = static_cast<unsigned char>(i);
 
   // Do a global max to determine the max dimension seen by all processors.
   // It should match -- I don't think we even support calculations on meshes
@@ -1001,7 +1001,7 @@ void Nemesis_IO::read (const std::string & base_filename)
   // Print entries of elem_list
   // libMesh::out << "[" << this->processor_id() << "] "
   //        << "elem_list = ";
-  // for (unsigned int e=0; e<nemhelper->elem_list.size(); e++)
+  // for (std::size_t e=0; e<nemhelper->elem_list.size(); e++)
   //   {
   //     libMesh::out << nemhelper->elem_list[e] << ", ";
   //   }
@@ -1010,7 +1010,7 @@ void Nemesis_IO::read (const std::string & base_filename)
   // Print entries of side_list
   // libMesh::out << "[" << this->processor_id() << "] "
   //        << "side_list = ";
-  // for (unsigned int e=0; e<nemhelper->side_list.size(); e++)
+  // for (std::size_t e=0; e<nemhelper->side_list.size(); e++)
   //   {
   //     libMesh::out << nemhelper->side_list[e] << ", ";
   //   }
@@ -1019,7 +1019,7 @@ void Nemesis_IO::read (const std::string & base_filename)
 
   // Loop over the entries of the elem_list, get their pointers from the
   // Mesh data structure, and assign the appropriate side to the BoundaryInfo object.
-  for (unsigned int e=0; e<nemhelper->elem_list.size(); e++)
+  for (std::size_t e=0; e<nemhelper->elem_list.size(); e++)
     {
       // Calling mesh.elem_ptr() is an error if no element with that
       // id exists on this processor...
@@ -1089,7 +1089,7 @@ void Nemesis_IO::read (const std::string & base_filename)
   //  libMesh::out << "[" << this->processor_id() << "] "
   //       << "nemhelper->node_num_map = ";
   //
-  //  for (unsigned int i=0; i<nemhelper->node_num_map.size(); ++i)
+  //  for (std::size_t i=0; i<nemhelper->node_num_map.size(); ++i)
   //    libMesh::out << nemhelper->node_num_map[i] << ", ";
   //  libMesh::out << std::endl;
 
@@ -1109,7 +1109,7 @@ void Nemesis_IO::read (const std::string & base_filename)
       nemhelper->read_nodeset(nodeset);
 
       // Add nodes from the node_list to the BoundaryInfo object
-      for (unsigned int node=0; node<nemhelper->node_list.size(); node++)
+      for (std::size_t node=0; node<nemhelper->node_list.size(); node++)
         {
           // Don't run past the end of our node map!
           if (to_uint(nemhelper->node_list[node]-1) >= nemhelper->node_num_map.size())

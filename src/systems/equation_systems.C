@@ -641,7 +641,7 @@ void EquationSystems::build_solution_vector (std::vector<Number> &,
 
   //       // Transfer the system solution to the element
   //       // solution by mapping it through the dof_indices vector.
-  //       for (unsigned int i=0; i<dof_indices.size(); i++)
+  //       for (std::size_t i=0; i<dof_indices.size(); i++)
   // elem_soln[i] = sys_soln[dof_indices[i]];
 
   //       // Using the FE interface, compute the nodal_soln
@@ -823,7 +823,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
 
                   elem_soln.resize(dof_indices.size());
 
-                  for (unsigned int i=0; i<dof_indices.size(); i++)
+                  for (std::size_t i=0; i<dof_indices.size(); i++)
                     elem_soln[i] = sys_soln(dof_indices[i]);
 
                   FEInterface::nodal_soln (dim,
@@ -1142,7 +1142,7 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number> &
 
                     elem_soln.resize(dof_indices.size());
 
-                    for (unsigned int i=0; i<dof_indices.size(); i++)
+                    for (std::size_t i=0; i<dof_indices.size(); i++)
                       elem_soln[i] = sys_soln[dof_indices[i]];
 
                     FEInterface::nodal_soln (dim,

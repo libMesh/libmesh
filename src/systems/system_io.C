@@ -629,10 +629,8 @@ void System::read_parallel_data (Xdr & io,
               std::vector<dof_id_type> SCALAR_dofs;
               dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
 
-              for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
-                {
-                  this->solution->set( SCALAR_dofs[i], io_buffer[cnt++] );
-                }
+              for (std::size_t i=0; i<SCALAR_dofs.size(); i++)
+                this->solution->set(SCALAR_dofs[i], io_buffer[cnt++]);
             }
         }
     }
@@ -720,10 +718,8 @@ void System::read_parallel_data (Xdr & io,
                           std::vector<dof_id_type> SCALAR_dofs;
                           dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
 
-                          for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
-                            {
-                              pos->second->set( SCALAR_dofs[i], io_buffer[cnt++] );
-                            }
+                          for (std::size_t i=0; i<SCALAR_dofs.size(); i++)
+                            pos->second->set(SCALAR_dofs[i], io_buffer[cnt++]);
                         }
                     }
                 }
@@ -1039,7 +1035,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 
               // note its possible we didn't receive values for objects in
               // this block if they have no components allocated.
-              for (dof_id_type idx=0; idx<ids.size(); idx+=2)
+              for (std::size_t idx=0; idx<ids.size(); idx+=2)
                 {
                   const dof_id_type
                     local_idx          = ids[idx+0]-first_object,
@@ -1068,7 +1064,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
           // Wait for read completion
           async_io.join();
           // now copy the values back to the main vector for transfer
-          for (unsigned int i_val=0; i_val<input_vals.size(); i_val++)
+          for (std::size_t i_val=0; i_val<input_vals.size(); i_val++)
             input_vals[i_val] = input_vals_tmp[i_val];
 
           n_read_values += input_vals.size();
@@ -1192,7 +1188,7 @@ unsigned int System::read_SCALAR_dofs (const unsigned int var,
       std::vector<dof_id_type> SCALAR_dofs;
       dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
 
-      for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
+      for (std::size_t i=0; i<SCALAR_dofs.size(); i++)
         {
           if (vec)
             vec->set (SCALAR_dofs[i], input_buffer[i]);
@@ -1645,10 +1641,8 @@ void System::write_parallel_data (Xdr & io,
             std::vector<dof_id_type> SCALAR_dofs;
             dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
 
-            for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
-              {
-                io_buffer.push_back( (*this->solution)(SCALAR_dofs[i]) );
-              }
+            for (std::size_t i=0; i<SCALAR_dofs.size(); i++)
+              io_buffer.push_back((*this->solution)(SCALAR_dofs[i]));
           }
       }
 
@@ -1715,10 +1709,8 @@ void System::write_parallel_data (Xdr & io,
                     std::vector<dof_id_type> SCALAR_dofs;
                     dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
 
-                    for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
-                      {
-                        io_buffer.push_back( (*pos->second)(SCALAR_dofs[i]) );
-                      }
+                    for (std::size_t i=0; i<SCALAR_dofs.size(); i++)
+                      io_buffer.push_back((*pos->second)(SCALAR_dofs[i]));
                   }
               }
 
@@ -2065,7 +2057,7 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
 
               // note its possible we didn't receive values for objects in
               // this block if they have no components allocated.
-              for (dof_id_type idx=0; idx<ids.size(); idx+=2)
+              for (std::size_t idx=0; idx<ids.size(); idx+=2)
                 {
                   const dof_id_type
                     local_idx          = ids[idx+0]-first_object,
@@ -2112,7 +2104,7 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
               const std::vector<Number>      & vals(recv_vals[proc]);
               std::vector<Number>::const_iterator proc_vals(vals.begin());
 
-              for (dof_id_type idx=0; idx<ids.size(); idx+=2)
+              for (std::size_t idx=0; idx<ids.size(); idx+=2)
                 {
                   const dof_id_type
                     local_idx          = ids[idx+0]-first_object,
@@ -2334,7 +2326,7 @@ std::size_t System::read_serialized_vectors (Xdr & io,
 
   //-------------------------------------------
   // Finally loop over all the SCALAR variables
-  for (unsigned int vec=0; vec<vectors.size(); vec++)
+  for (std::size_t vec=0; vec<vectors.size(); vec++)
     for (unsigned int var=0; var<this->n_vars(); var++)
       if(this->variable(var).type().family == SCALAR)
         {
@@ -2346,7 +2338,7 @@ std::size_t System::read_serialized_vectors (Xdr & io,
 
   //---------------------------------------
   // last step - must close all the vectors
-  for (unsigned int vec=0; vec<vectors.size(); vec++)
+  for (std::size_t vec=0; vec<vectors.size(); vec++)
     {
       libmesh_assert_not_equal_to (vectors[vec], 0);
       vectors[vec]->close();
@@ -2403,7 +2395,7 @@ std::size_t System::write_serialized_vectors (Xdr & io,
 
   //-------------------------------------------
   // Finally loop over all the SCALAR variables
-  for (unsigned int vec=0; vec<vectors.size(); vec++)
+  for (std::size_t vec=0; vec<vectors.size(); vec++)
     for (unsigned int var=0; var<this->n_vars(); var++)
       if(this->variable(var).type().family == SCALAR)
         {

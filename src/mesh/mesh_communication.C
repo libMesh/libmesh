@@ -262,8 +262,7 @@ void connect_families
         {
           std::vector<const Elem *> subactive_family;
           elem->total_family_tree(subactive_family);
-          for (unsigned int i=0; i != subactive_family.size();
-               ++i)
+          for (std::size_t i=0; i != subactive_family.size(); ++i)
             {
               libmesh_assert(subactive_family[i] != remote_elem);
               connected_elements.insert(subactive_family[i]);
@@ -797,7 +796,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
 
           std::vector<const Elem *> family_tree;
 
-          for (dof_id_type e=0, n_shared_nodes=0; e<my_interface_elements.size(); e++, n_shared_nodes=0)
+          for (std::size_t e=0, n_shared_nodes=0; e<my_interface_elements.size(); e++, n_shared_nodes=0)
             {
               const Elem * elem = my_interface_elements[e];
 
@@ -828,7 +827,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
                       family_tree.clear();
                       family_tree.push_back(elem);
 #endif
-                      for (unsigned int leaf=0; leaf<family_tree.size(); leaf++)
+                      for (std::size_t leaf=0; leaf<family_tree.size(); leaf++)
                         {
                           elem = family_tree[leaf];
                           elements_to_send.insert (elem);
@@ -1273,7 +1272,7 @@ struct SyncIds
   void act_on_data (const std::vector<dof_id_type> & old_ids,
                     std::vector<datum> & new_ids) const
   {
-    for (unsigned int i=0; i != old_ids.size(); ++i)
+    for (std::size_t i=0; i != old_ids.size(); ++i)
       if (old_ids[i] != new_ids[i])
         (mesh.*renumber)(old_ids[i], new_ids[i]);
   }
@@ -1387,7 +1386,7 @@ struct SyncPLevels
   {
     ids_out.reserve(ids.size());
 
-    for (unsigned int i=0; i != ids.size(); ++i)
+    for (std::size_t i=0; i != ids.size(); ++i)
       {
         Elem & elem = mesh.elem_ref(ids[i]);
 
@@ -1398,7 +1397,7 @@ struct SyncPLevels
   void act_on_data (const std::vector<dof_id_type> & old_ids,
                     std::vector<datum> & new_p_levels) const
   {
-    for (unsigned int i=0; i != old_ids.size(); ++i)
+    for (std::size_t i=0; i != old_ids.size(); ++i)
       {
         Elem & elem = mesh.elem_ref(old_ids[i]);
 
@@ -1430,7 +1429,7 @@ struct SyncUniqueIds
   {
     ids_out.reserve(ids.size());
 
-    for (unsigned int i=0; i != ids.size(); ++i)
+    for (std::size_t i=0; i != ids.size(); ++i)
       {
         DofObjSubclass *d = (mesh.*query)(ids[i]);
         libmesh_assert(d);
@@ -1442,7 +1441,7 @@ struct SyncUniqueIds
   void act_on_data (const std::vector<dof_id_type>& ids,
                     std::vector<datum>& unique_ids) const
   {
-    for (unsigned int i=0; i != ids.size(); ++i)
+    for (std::size_t i=0; i != ids.size(); ++i)
       {
         DofObjSubclass *d = (mesh.*query)(ids[i]);
         libmesh_assert(d);

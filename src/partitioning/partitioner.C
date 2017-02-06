@@ -281,7 +281,7 @@ void Partitioner::set_parent_processor_ids(MeshBase & mesh)
 
           std::vector<const Elem *> subactive_family;
           child->total_family_tree(subactive_family);
-          for (unsigned int i = 0; i != subactive_family.size(); ++i)
+          for (std::size_t i = 0; i != subactive_family.size(); ++i)
             const_cast<Elem *>(subactive_family[i])->processor_id() = child->processor_id();
 
           // Then set ancestors
@@ -326,7 +326,7 @@ void Partitioner::set_parent_processor_ids(MeshBase & mesh)
 
           std::vector<const Elem *> subactive_family;
           child->total_family_tree(subactive_family);
-          for (unsigned int i = 0; i != subactive_family.size(); ++i)
+          for (std::size_t i = 0; i != subactive_family.size(); ++i)
             const_cast<Elem *>(subactive_family[i])->processor_id() = child->processor_id();
         }
 
@@ -381,7 +381,7 @@ void Partitioner::set_parent_processor_ids(MeshBase & mesh)
 
                   std::vector<const Elem *> active_family;
                   parent->active_family_tree(active_family);
-                  for (unsigned int i = 0; i != active_family.size(); ++i)
+                  for (std::size_t i = 0; i != active_family.size(); ++i)
                     parent_pid = std::min (parent_pid, active_family[i]->processor_id());
 
                   const dof_id_type packed_idx = parent_idx - first_elem_id;

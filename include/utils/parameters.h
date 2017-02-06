@@ -561,7 +561,7 @@ void print_helper(std::ostream & os, const unsigned char * param)
 template<typename P>
 void print_helper(std::ostream & os, const std::vector<P> * param)
 {
-  for (unsigned int i=0; i<param->size(); ++i)
+  for (std::size_t i=0; i<param->size(); ++i)
     os << (*param)[i] << " ";
 }
 
@@ -569,8 +569,8 @@ void print_helper(std::ostream & os, const std::vector<P> * param)
 template<typename P>
 void print_helper(std::ostream & os, const std::vector<std::vector<P> > * param)
 {
-  for (unsigned int i=0; i<param->size(); ++i)
-    for (unsigned int j=0; j<(*param)[i].size(); ++j)
+  for (std::size_t i=0; i<param->size(); ++i)
+    for (std::size_t j=0; j<(*param)[i].size(); ++j)
       os << (*param)[i][j] << " ";
 }
 

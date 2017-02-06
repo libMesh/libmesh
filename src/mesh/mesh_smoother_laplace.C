@@ -82,7 +82,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
               {
                 Point avg_position(0.,0.,0.);
 
-                for (unsigned j=0; j<_graph[node->id()].size(); ++j)
+                for (std::size_t j=0; j<_graph[node->id()].size(); ++j)
                   {
                     // Will these nodal positions always be available
                     // or will they refer to remote nodes?  This will
@@ -266,7 +266,7 @@ void LaplaceMeshSmoother::init()
   // now have duplicate entries and we need to remove them so
   // they don't foul up the averaging algorithm employed by the
   // Laplace smoother.
-  for (unsigned i=0; i<_graph.size(); ++i)
+  for (std::size_t i=0; i<_graph.size(); ++i)
     {
       // The std::unique algorithm removes duplicate *consecutive* elements from a range,
       // so it only makes sense to call it on a sorted range...
@@ -281,7 +281,7 @@ void LaplaceMeshSmoother::init()
 
 void LaplaceMeshSmoother::print_graph(std::ostream & out_stream) const
 {
-  for (unsigned int i=0; i<_graph.size(); ++i)
+  for (std::size_t i=0; i<_graph.size(); ++i)
     {
       out_stream << i << ": ";
       std::copy(_graph[i].begin(),

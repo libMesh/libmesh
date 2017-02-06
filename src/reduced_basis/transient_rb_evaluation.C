@@ -62,18 +62,16 @@ void TransientRBEvaluation::clear_riesz_representors()
   Parent::clear_riesz_representors();
 
   // Delete the M_q representors
-  for(unsigned int q_m=0; q_m<M_q_representor.size(); q_m++)
-    {
-      for(unsigned int i=0; i<M_q_representor[q_m].size(); i++)
-        {
-          if(M_q_representor[q_m][i])
-            {
-              M_q_representor[q_m][i]->clear();
-              delete M_q_representor[q_m][i];
-              M_q_representor[q_m][i] = libmesh_nullptr;
-            }
-        }
-    }
+  for (std::size_t q_m=0; q_m<M_q_representor.size(); q_m++)
+    for (std::size_t i=0; i<M_q_representor[q_m].size(); i++)
+      {
+        if (M_q_representor[q_m][i])
+          {
+            M_q_representor[q_m][i]->clear();
+            delete M_q_representor[q_m][i];
+            M_q_representor[q_m][i] = libmesh_nullptr;
+          }
+      }
 }
 
 void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax,
@@ -104,7 +102,7 @@ void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax,
 
   // Initialize the initial condition storage
   RB_initial_condition_all_N.resize(Nmax);
-  for(unsigned int i=0; i<RB_initial_condition_all_N.size(); i++)
+  for (std::size_t i=0; i<RB_initial_condition_all_N.size(); i++)
     {
       // The i^th row holds a vector of lenght i+1
       RB_initial_condition_all_N[i].resize(i+1);

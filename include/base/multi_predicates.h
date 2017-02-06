@@ -58,7 +58,7 @@ struct abstract_multi_predicate : multi_predicate
   virtual ~abstract_multi_predicate()
   {
     // Clean-up vector
-    for (unsigned int i=0; i<_predicates.size(); ++i)
+    for (std::size_t i=0; i<_predicates.size(); ++i)
       delete _predicates[i];
   }
 
@@ -66,7 +66,7 @@ struct abstract_multi_predicate : multi_predicate
   abstract_multi_predicate & operator=(const abstract_multi_predicate & rhs)
   {
     // First clear out the predicates vector
-    for (unsigned int i=0; i<_predicates.size(); ++i)
+    for (std::size_t i=0; i<_predicates.size(); ++i)
       delete _predicates[i];
 
     // Now copy over the information from the rhs.
@@ -78,7 +78,7 @@ struct abstract_multi_predicate : multi_predicate
   // operator() checks all the predicates in the vector.
   virtual bool operator()(const T & it) const
   {
-    for (unsigned int i=0; i<_predicates.size(); ++i)
+    for (std::size_t i=0; i<_predicates.size(); ++i)
       {
         const predicate<T> * pred = _predicates[i];
 
@@ -106,7 +106,7 @@ protected:
   // copy constructor for the predicate class.
   void deep_copy(const abstract_multi_predicate & rhs)
   {
-    for (unsigned int i=0; i<rhs._predicates.size(); ++i)
+    for (std::size_t i=0; i<rhs._predicates.size(); ++i)
       _predicates.push_back(rhs._predicates[i]->clone());
   }
 

@@ -260,11 +260,11 @@ void EnsightIO::write_geometry_ascii()
         mesh_stream << std::setw(10) << elem_ref.size() << "\n";
 
         // Write element id
-        for (unsigned int i = 0; i < elem_ref.size(); i++)
+        for (std::size_t i = 0; i < elem_ref.size(); i++)
           mesh_stream << std::setw(10) << elem_ref[i]->id() << "\n";
 
         // Write connectivity
-        for (unsigned int i = 0; i < elem_ref.size(); i++)
+        for (std::size_t i = 0; i < elem_ref.size(); i++)
           {
             for (unsigned int j = 0; j < elem_ref[i]->n_nodes(); j++)
               {
@@ -312,7 +312,7 @@ void EnsightIO::write_case()
 
   for (; sys_it != sys_end; ++sys_it)
     {
-      for (unsigned int i=0; i < sys_it->second.EnsightScalars.size(); i++)
+      for (std::size_t i=0; i < sys_it->second.EnsightScalars.size(); i++)
         {
           Scalars scalar = sys_it->second.EnsightScalars[i];
           case_stream << "scalar per node:   1  "
@@ -320,7 +320,7 @@ void EnsightIO::write_case()
                       << _ensight_file_name << "_" << scalar.scalar_name << ".scl***\n";
         }
 
-      for (unsigned int i=0; i < sys_it->second.EnsightVectors.size(); i++)
+      for (std::size_t i=0; i < sys_it->second.EnsightVectors.size(); i++)
         {
           Vectors vec = sys_it->second.EnsightVectors[i];
           case_stream << "vector per node:      1    "
@@ -337,7 +337,7 @@ void EnsightIO::write_case()
           case_stream << "filename start number:   " << std::setw(10) << 0 << "\n";
           case_stream << "filename increment:  " << std::setw(10) << 1 << "\n";
           case_stream << "time values:\n";
-          for (unsigned int i = 0; i < _time_steps.size(); i++)
+          for (std::size_t i = 0; i < _time_steps.size(); i++)
             case_stream << std::setw(12) << std::setprecision(5) << std::scientific << _time_steps[i] << "\n";
         }
     }
@@ -352,11 +352,11 @@ void EnsightIO::write_solution_ascii()
 
   for (; sys_it != sys_end; ++sys_it)
     {
-      for (unsigned int i = 0; i < sys_it->second.EnsightScalars.size(); i++)
+      for (std::size_t i = 0; i < sys_it->second.EnsightScalars.size(); i++)
         this->write_scalar_ascii(sys_it->first,
                                  sys_it->second.EnsightScalars[i].scalar_name);
 
-      for (unsigned int i = 0; i < sys_it->second.EnsightVectors.size(); i++)
+      for (std::size_t i = 0; i < sys_it->second.EnsightVectors.size(); i++)
         this->write_vector_ascii(sys_it->first,
                                  sys_it->second.EnsightVectors[i].components,
                                  sys_it->second.EnsightVectors[i].description);
@@ -418,7 +418,7 @@ void EnsightIO::write_scalar_ascii(const std::string & sys,
 
       elem_soln.resize(dof_indices_scl.size());
 
-      for (unsigned int i = 0; i < dof_indices_scl.size(); i++)
+      for (std::size_t i = 0; i < dof_indices_scl.size(); i++)
         elem_soln[i] = system.current_solution(dof_indices_scl[i]);
 
       FEInterface::nodal_soln (dim, fe_type, elem, elem_soln, nodal_soln);
@@ -522,7 +522,7 @@ void EnsightIO::write_vector_ascii(const std::string & sys,
       if (dim == 3)
         elem_soln_w.resize(dof_indices_w.size());
 
-      for (unsigned int i = 0; i < dof_indices_u.size(); i++)
+      for (std::size_t i = 0; i < dof_indices_u.size(); i++)
         {
           elem_soln_u[i] = system.current_solution(dof_indices_u[i]);
           elem_soln_v[i] = system.current_solution(dof_indices_v[i]);

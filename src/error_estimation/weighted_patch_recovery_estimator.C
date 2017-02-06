@@ -364,7 +364,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                         u_h += (*phi)[i][qp]*system.current_solution (dof_indices[i]);
 
                       // Patch RHS contributions
-                      for (unsigned int i=0; i<psi.size(); i++)
+                      for (std::size_t i=0; i<psi.size(); i++)
                         F(i) = JxW[qp]*u_h*psi[i];
 
                     }
@@ -375,14 +375,14 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                       // at the quadrature point
                       Gradient grad_u_h;
 
-                      for (unsigned int i=0; i<n_dofs; i++)
+                      for (std::size_t i=0; i<n_dofs; i++)
                         grad_u_h.add_scaled ((*dphi)[i][qp],
                                              system.current_solution(dof_indices[i]));
 
 
 
                       // Patch RHS contributions
-                      for (unsigned int i=0; i<psi.size(); i++)
+                      for (std::size_t i=0; i<psi.size(); i++)
                         {
                           Fx(i) += JxW[qp]*grad_u_h(0)*psi[i];
 #if LIBMESH_DIM > 1
@@ -406,7 +406,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 
 
                       // Patch RHS contributions
-                      for (unsigned int i=0; i<psi.size(); i++)
+                      for (std::size_t i=0; i<psi.size(); i++)
                         {
                           Fx(i) += JxW[qp]*grad_u_h(0)*psi[i];
                         }
@@ -424,7 +424,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 
 
                       // Patch RHS contributions
-                      for (unsigned int i=0; i<psi.size(); i++)
+                      for (std::size_t i=0; i<psi.size(); i++)
                         {
                           Fy(i) += JxW[qp]*grad_u_h(1)*psi[i];
                         }
@@ -442,7 +442,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 
 
                       // Patch RHS contributions
-                      for (unsigned int i=0; i<psi.size(); i++)
+                      for (std::size_t i=0; i<psi.size(); i++)
                         {
                           Fz(i) += JxW[qp]*grad_u_h(2)*psi[i];
                         }
@@ -462,7 +462,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 
 
                       // Patch RHS contributions
-                      for (unsigned int i=0; i<psi.size(); i++)
+                      for (std::size_t i=0; i<psi.size(); i++)
                         {
                           Fx(i)  += JxW[qp]*hess_u_h(0,0)*psi[i];
 #if LIBMESH_DIM > 1

@@ -91,7 +91,7 @@ void TransientRBConstruction::clear()
   Parent::clear();
 
   // clear the mass matrices
-  for(unsigned int q=0; q<M_q_vector.size(); q++)
+  for (std::size_t q=0; q<M_q_vector.size(); q++)
     {
       delete M_q_vector[q];
       M_q_vector[q] = libmesh_nullptr;
@@ -99,7 +99,7 @@ void TransientRBConstruction::clear()
 
   if(store_non_dirichlet_operators)
     {
-      for(unsigned int q=0; q<non_dirichlet_M_q_vector.size(); q++)
+      for (std::size_t q=0; q<non_dirichlet_M_q_vector.size(); q++)
         {
           delete non_dirichlet_M_q_vector[q];
           non_dirichlet_M_q_vector[q] = libmesh_nullptr;
@@ -107,7 +107,7 @@ void TransientRBConstruction::clear()
     }
 
   // clear the temporal_data
-  for(unsigned int i=0; i<temporal_data.size(); i++)
+  for (std::size_t i=0; i<temporal_data.size(); i++)
     {
       if(temporal_data[i])
         {
@@ -976,10 +976,8 @@ void TransientRBConstruction::load_rb_solution()
                       << RB_solution_vector_k.size() \
                       << " entries. RB_solution in TransientRBConstruction::load_rb_solution is too long!");
 
-  for(unsigned int i=0; i<RB_solution_vector_k.size(); i++)
-    {
-      solution->add(RB_solution_vector_k(i), get_rb_evaluation().get_basis_function(i));
-    }
+  for (unsigned int i=0; i<RB_solution_vector_k.size(); i++)
+    solution->add(RB_solution_vector_k(i), get_rb_evaluation().get_basis_function(i));
 
   update();
 }
@@ -1338,7 +1336,7 @@ void TransientRBConstruction::write_riesz_representors_to_files(const std::strin
   const unsigned int istop  = trans_rb_eval.get_n_basis_functions();
   const unsigned int istart = istop-get_delta_N();
 
-  for (unsigned int q=0; q<trans_rb_eval.M_q_representor.size(); ++q)
+  for (std::size_t q=0; q<trans_rb_eval.M_q_representor.size(); ++q)
     for (unsigned int i=istart; i<istop; ++i)
       {
         libMesh::out << "Writing out M_q_representor[" << q << "][" << i << "]..." << std::endl;
@@ -1387,16 +1385,16 @@ void TransientRBConstruction::read_riesz_representors_from_files(const std::stri
   // Read in the Aq representors.  The class makes room for [Q_m][Nmax] of these.  We are going to
   // read in [Q_m][this->rb_eval->get_n_basis_functions()].  FIXME:
   // should we be worried about leaks in the locations where we're about to fill entries?
-  for (unsigned int i=0; i<trans_rb_eval.M_q_representor.size(); ++i)
-    for (unsigned int j=0; j<trans_rb_eval.M_q_representor[i].size(); ++j)
+  for (std::size_t i=0; i<trans_rb_eval.M_q_representor.size(); ++i)
+    for (std::size_t j=0; j<trans_rb_eval.M_q_representor[i].size(); ++j)
       {
         if (trans_rb_eval.M_q_representor[i][j] != libmesh_nullptr)
           libmesh_error_msg("Error, must delete existing M_q_representor before reading in from file.");
       }
 
   // Now ready to read them in from file!
-  for (unsigned int i=0; i<trans_rb_eval.M_q_representor.size(); ++i)
-    for (unsigned int j=0; j<trans_rb_eval.get_n_basis_functions(); ++j)
+  for (std::size_t i=0; i<trans_rb_eval.M_q_representor.size(); ++i)
+    for (std::size_t j=0; j<trans_rb_eval.get_n_basis_functions(); ++j)
       {
         file_name.str(""); // reset filename
         file_name << riesz_representors_dir

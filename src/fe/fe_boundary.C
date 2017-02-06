@@ -396,7 +396,7 @@ void FE<Dim,T>::side_map (const Elem * elem,
 
   const std::vector<std::vector<Real> > & psi_map = this->_fe_map->get_psi();
 
-  for (unsigned int i=0; i<psi_map.size(); i++) // sum over the nodes
+  for (std::size_t i=0; i<psi_map.size(); i++) // sum over the nodes
     {
       const Point & side_node = refspace_nodes[elem_nodes_map[i]];
       for (unsigned int p=0; p<n_points; p++)
@@ -982,7 +982,7 @@ void FEMap::compute_edge_map(int dim,
     }
 
   // compute x, dxdxi at the quadrature points
-  for (unsigned int i=0; i<this->psi_map.size(); i++) // sum over the nodes
+  for (std::size_t i=0; i<this->psi_map.size(); i++) // sum over the nodes
     {
       const Point & edge_point = edge->point(i);
 

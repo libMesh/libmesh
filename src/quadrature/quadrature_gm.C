@@ -93,7 +93,7 @@ void QGrundmann_Moller::gm_rule(unsigned int s, unsigned int dim)
       compose_all(s-i, dim+1, permutations);
       //libMesh::out << "n. permutations=" << permutations.size() << std::endl;
 
-      for (unsigned int p=0; p<permutations.size(); ++p)
+      for (std::size_t p=0; p<permutations.size(); ++p)
         {
           // We use the first dim entries of each permutation to
           // construct an integration point.
@@ -129,7 +129,7 @@ void QGrundmann_Moller::gm_rule(unsigned int s, unsigned int dim)
         }
 
       // This is the weight for each of the points computed previously
-      for (unsigned int j=0; j<permutations.size(); ++j)
+      for (std::size_t j=0; j<permutations.size(); ++j)
         _weights[offset+j] = weight;
 
       // Change sign for next iteration

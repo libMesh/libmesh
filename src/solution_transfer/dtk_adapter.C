@@ -116,7 +116,7 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
     {
     libMesh::err<<this->processor_id()<<" Vertices: ";
 
-    for(unsigned int i=0; i<vertices.size(); i++)
+    for (std::size_t i=0; i<vertices.size(); i++)
     libMesh::err<<vertices[i]<<" ";
 
     libMesh::err<<std::endl;
@@ -126,7 +126,7 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
     {
     libMesh::err<<this->processor_id()<<" Coordinates: ";
 
-    for(unsigned int i=0; i<coordinates.size(); i++)
+    for (std::size_t i=0; i<coordinates.size(); i++)
     libMesh::err<<coordinates[i]<<" ";
 
     libMesh::err<<std::endl;
@@ -136,7 +136,7 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
     {
     libMesh::err<<this->processor_id()<<" Connectivity: ";
 
-    for(unsigned int i=0; i<connectivity.size(); i++)
+    for (std::size_t i=0; i<connectivity.size(); i++)
     libMesh::err<<connectivity[i]<<" ";
 
     libMesh::err<<std::endl;
@@ -146,7 +146,7 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
     {
     libMesh::err<<this->processor_id()<<" Permutation_List: ";
 
-    for(unsigned int i=0; i<permutation_list.size(); i++)
+    for (std::size_t i=0; i<permutation_list.size(); i++)
     libMesh::err<<permutation_list[i]<<" ";
 
     libMesh::err<<std::endl;

@@ -90,7 +90,7 @@ void ExplicitSystem::assemble_qoi (const QoISet & qoi_indices)
 {
   // The user quantity of interest assembly gets to expect to
   // accumulate on initially zero values
-  for (unsigned int i=0; i != qoi.size(); ++i)
+  for (std::size_t i=0; i != qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       qoi[i] = 0;
 
@@ -105,7 +105,7 @@ void ExplicitSystem::assemble_qoi_derivative (const QoISet & qoi_indices,
 {
   // The user quantity of interest derivative assembly gets to expect
   // to accumulate on initially zero vectors
-  for (unsigned int i=0; i != qoi.size(); ++i)
+  for (std::size_t i=0; i != qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       this->add_adjoint_rhs(i).zero();
 

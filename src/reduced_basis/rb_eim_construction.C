@@ -97,14 +97,12 @@ void RBEIMConstruction::clear()
   _mesh_function.reset();
 
   // clear the eim assembly vector
-  for(unsigned int i=0; i<_rb_eim_assembly_objects.size(); i++)
-    {
-      delete _rb_eim_assembly_objects[i];
-    }
+  for (std::size_t i=0; i<_rb_eim_assembly_objects.size(); i++)
+    delete _rb_eim_assembly_objects[i];
   _rb_eim_assembly_objects.clear();
 
   // clear the parametrized functions from the training set
-  for(unsigned int i=0; i<_parametrized_functions_in_training_set.size(); i++)
+  for (std::size_t i=0; i<_parametrized_functions_in_training_set.size(); i++)
     {
       if (_parametrized_functions_in_training_set[i])
         {
@@ -115,7 +113,7 @@ void RBEIMConstruction::clear()
     }
   _parametrized_functions_in_training_set_initialized = false;
 
-  for(unsigned int i=0; i<_matrix_times_bfs.size(); i++)
+  for (std::size_t i=0; i<_matrix_times_bfs.size(); i++)
     {
       if(_matrix_times_bfs[i])
         {
@@ -498,7 +496,7 @@ void RBEIMConstruction::plot_parametrized_functions_in_training_set(const std::s
 {
   libmesh_assert(_parametrized_functions_in_training_set_initialized);
 
-  for(unsigned int i=0; i<_parametrized_functions_in_training_set.size(); i++)
+  for (std::size_t i=0; i<_parametrized_functions_in_training_set.size(); i++)
     {
 #ifdef LIBMESH_HAVE_EXODUS_API
       *get_explicit_system().solution = *_parametrized_functions_in_training_set[i];
@@ -682,7 +680,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 
               // Loop over qp before var because parametrized functions often use
               // some caching based on qp.
-              for (unsigned int qp=0; qp<JxW_values[elem_id].size(); qp++)
+              for (std::size_t qp=0; qp<JxW_values[elem_id].size(); qp++)
                 {
                   unsigned int n_var_dofs = phi_values[elem_id][qp].size();
 
@@ -854,7 +852,7 @@ void RBEIMConstruction::set_explicit_sys_subvector(NumericVector<Number> & dest,
   localized_source->init(this->n_dofs(), false, SERIAL);
   source.localize(*localized_source);
 
-  for(unsigned int i=0; i<_dof_map_between_systems[var].size(); i++)
+  for (std::size_t i=0; i<_dof_map_between_systems[var].size(); i++)
     {
       dof_id_type implicit_sys_dof_index = i;
       dof_id_type explicit_sys_dof_index = _dof_map_between_systems[var][i];
@@ -874,7 +872,7 @@ void RBEIMConstruction::get_explicit_sys_subvector(NumericVector<Number> & dest,
 {
   LOG_SCOPE("get_explicit_sys_subvector()", "RBEIMConstruction");
 
-  for(unsigned int i=0; i<_dof_map_between_systems[var].size(); i++)
+  for (std::size_t i=0; i<_dof_map_between_systems[var].size(); i++)
     {
       dof_id_type implicit_sys_dof_index = i;
       dof_id_type explicit_sys_dof_index = _dof_map_between_systems[var][i];
