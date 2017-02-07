@@ -61,7 +61,7 @@ void RBEvaluation::clear()
   LOG_SCOPE("clear()", "RBEvaluation");
 
   // Clear the basis functions
-  for(unsigned int i=0; i<basis_functions.size(); i++)
+  for (std::size_t i=0; i<basis_functions.size(); i++)
     {
       if (basis_functions[i])
         {
@@ -75,7 +75,7 @@ void RBEvaluation::clear()
   clear_riesz_representors();
 
   // Clear the Greedy param list
-  for(unsigned int i=0; i<greedy_param_list.size(); i++)
+  for (std::size_t i=0; i<greedy_param_list.size(); i++)
     greedy_param_list[i].clear();
   greedy_param_list.clear();
 }
@@ -412,15 +412,12 @@ void RBEvaluation::clear_riesz_representors()
 {
 
   // Clear the Aq_representors
-  for(unsigned int q_a=0; q_a<Aq_representor.size(); q_a++)
-    {
-      for(unsigned int i=0; i<Aq_representor[q_a].size(); i++)
-        {
-          delete Aq_representor[q_a][i];
-          Aq_representor[q_a][i] = libmesh_nullptr;
-        }
-    }
-
+  for (std::size_t q_a=0; q_a<Aq_representor.size(); q_a++)
+    for (std::size_t i=0; i<Aq_representor[q_a].size(); i++)
+      {
+        delete Aq_representor[q_a][i];
+        Aq_representor[q_a][i] = libmesh_nullptr;
+      }
 }
 
 void RBEvaluation::legacy_write_offline_data_to_files(const std::string & directory_name,
@@ -634,7 +631,7 @@ void RBEvaluation::legacy_write_offline_data_to_files(const std::string & direct
         file_name << directory_name << "/greedy_params" << suffix;
         Xdr greedy_params_out(file_name.str(), mode);
 
-        for(unsigned int i=0; i<greedy_param_list.size(); i++)
+        for (std::size_t i=0; i<greedy_param_list.size(); i++)
           {
             RBParameters::const_iterator it     = greedy_param_list[i].begin();
             RBParameters::const_iterator it_end = greedy_param_list[i].end();
@@ -882,7 +879,7 @@ void RBEvaluation::legacy_read_offline_data_from_files(const std::string & direc
   // get_n_bfs() returns the correct value. Initialize the pointers
   // to NULL
   set_n_basis_functions(n_bfs);
-  for(unsigned int i=0; i<basis_functions.size(); i++)
+  for (std::size_t i=0; i<basis_functions.size(); i++)
     {
       if(basis_functions[i])
         {
@@ -943,7 +940,7 @@ void RBEvaluation::write_out_vectors(System & sys,
 
   // // Use System::write_serialized_data to write out the basis functions
   // // by copying them into this->solution one at a time.
-  // for(unsigned int i=0; i<vectors.size(); i++)
+  // for (std::size_t i=0; i<vectors.size(); i++)
   // {
   //   // No need to copy, just swap
   //   // *solution = *vectors[i];
@@ -976,7 +973,7 @@ void RBEvaluation::write_out_vectors(System & sys,
     // Note the API wants pointers to constant vectors, hence this...
     std::vector<const NumericVector<Number> *> bf_out(vectors.begin(),
                                                       vectors.end());
-    // for(unsigned int i=0; i<vectors.size(); i++)
+    // for (std::size_t i=0; i<vectors.size(); i++)
     //   bf_out.push_back(vectors[i]);
     sys.write_serialized_vectors (bf_data, bf_out);
   }
@@ -1080,7 +1077,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
       std::vector<NumericVector<Number> *> & vectors = *multiple_vectors[data_index];
 
       // Allocate storage for each vector
-      for (unsigned int i=0; i<vectors.size(); i++)
+      for (std::size_t i=0; i<vectors.size(); i++)
         {
           // vectors should all be NULL, otherwise we get a memory leak when
           // we create the new vectors in RBEvaluation::read_in_vectors.

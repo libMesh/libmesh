@@ -410,7 +410,7 @@ void LaplaceYoung::residual (const NumericVector<Number> & soln,
           Number u = 0;
           Gradient grad_u;
 
-          for (unsigned int j=0; j<phi.size(); j++)
+          for (std::size_t j=0; j<phi.size(); j++)
             {
               u      += phi[j][qp]*soln(dof_indices[j]);
               grad_u += dphi[j][qp]*soln(dof_indices[j]);
@@ -418,7 +418,7 @@ void LaplaceYoung::residual (const NumericVector<Number> & soln,
 
           const Number K = 1./std::sqrt(1. + grad_u*grad_u);
 
-          for (unsigned int i=0; i<phi.size(); i++)
+          for (std::size_t i=0; i<phi.size(); i++)
             Re(i) += JxW[qp]*(
                               K*(dphi[i][qp]*grad_u) +
                               _kappa*phi[i][qp]*u
@@ -451,7 +451,7 @@ void LaplaceYoung::residual (const NumericVector<Number> & soln,
               {
                 // This is the right-hand-side contribution (f),
                 // which has to be subtracted from the current residual
-                for (unsigned int i=0; i<phi_face.size(); i++)
+                for (std::size_t i=0; i<phi_face.size(); i++)
                   Re(i) -= JxW_face[qp]*_sigma*phi_face[i][qp];
               }
           }
@@ -571,7 +571,7 @@ void LaplaceYoung::jacobian (const NumericVector<Number> & soln,
         {
           Gradient grad_u;
 
-          for (unsigned int i=0; i<phi.size(); i++)
+          for (std::size_t i=0; i<phi.size(); i++)
             grad_u += dphi[i][qp]*soln(dof_indices[i]);
 
           const Number
@@ -579,8 +579,8 @@ void LaplaceYoung::jacobian (const NumericVector<Number> & soln,
             K  = 1. / std::sqrt(sa),
             dK = -K / sa;
 
-          for (unsigned int i=0; i<phi.size(); i++)
-            for (unsigned int j=0; j<phi.size(); j++)
+          for (std::size_t i=0; i<phi.size(); i++)
+            for (std::size_t j=0; j<phi.size(); j++)
               Ke(i,j) += JxW[qp]*(
                                   K * (dphi[i][qp]*dphi[j][qp]) +
                                   dK * (grad_u*dphi[j][qp]) * (grad_u*dphi[i][qp]) +

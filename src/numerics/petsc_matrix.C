@@ -75,7 +75,7 @@ void transform_preallocation_arrays (const PetscInt blocksize,
   b_n_nz.clear(); /**/ b_n_nz.reserve(n_nz.size()/blocksize);
   b_n_oz.clear(); /**/ b_n_oz.reserve(n_oz.size()/blocksize);
 
-  for (unsigned int nn=0; nn<n_nz.size(); nn += blocksize)
+  for (std::size_t nn=0; nn<n_nz.size(); nn += blocksize)
     {
       b_n_nz.push_back (n_nz[nn]/blocksize);
       b_n_oz.push_back (n_oz[nn]/blocksize);

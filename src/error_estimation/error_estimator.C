@@ -74,7 +74,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems & equation_systems,
       if (s)
         {
           libmesh_assert_equal_to (error_per_cell.size(), system_error_per_cell.size());
-          for (unsigned int i=0; i != error_per_cell.size(); ++i)
+          for (std::size_t i=0; i != error_per_cell.size(); ++i)
             error_per_cell[i] += system_error_per_cell[i];
         }
       else

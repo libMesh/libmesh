@@ -203,7 +203,7 @@ DofMap::~DofMap()
   _mesh.remove_ghosting_functor(*_default_evaluating);
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
-  for (unsigned int q = 0; q != _adjoint_dirichlet_boundaries.size(); ++q)
+  for (std::size_t q = 0; q != _adjoint_dirichlet_boundaries.size(); ++q)
     delete _adjoint_dirichlet_boundaries[q];
 #endif
 }
@@ -1675,7 +1675,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
           const std::vector<unsigned int> & variable_list =
             column_variable_list->second;
 
-          for (unsigned int j=0; j != variable_list.size(); ++j)
+          for (std::size_t j=0; j != variable_list.size(); ++j)
             {
               const unsigned int vj=variable_list[j];
 
@@ -2555,7 +2555,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
                 FEInterface::extra_hanging_dofs(fe_type);
 
               // Get the node-based DOF numbers
-              for (unsigned int n=0; n<elem_nodes.size(); n++)
+              for (std::size_t n=0; n<elem_nodes.size(); n++)
                 {
                   const Node * node      = elem_nodes[n];
 
@@ -2717,7 +2717,7 @@ void DofMap::find_connected_dofs (std::vector<dof_id_type> & elem_dofs) const
   // in turn depend on others.  So, we need to repeat this process
   // in that case until the system depends only on unconstrained
   // degrees of freedom.
-  for (unsigned int i=0; i<elem_dofs.size(); i++)
+  for (std::size_t i=0; i<elem_dofs.size(); i++)
     if (this->is_constrained_dof(elem_dofs[i]))
       {
         // If the DOF is constrained

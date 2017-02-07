@@ -198,7 +198,7 @@ ParsedFunction<Output,OutputGradient>::reparse (const std::string & expression)
   // If additional vars were passed, append them to the string
   // that we send to the function parser. Also add them to the
   // end of our spacetime vector
-  for (unsigned int i=0; i < _additional_vars.size(); ++i)
+  for (std::size_t i=0; i < _additional_vars.size(); ++i)
     {
       variables += "," + _additional_vars[i];
       // Initialize extra variables to the vector passed in or zero
@@ -329,7 +329,7 @@ ParsedFunction<Output,OutputGradient>::get_inline_value (const std::string & inl
 #endif
   Output old_var_value(0.);
 
-  for (unsigned int s=0; s != _subexpressions.size(); ++s)
+  for (std::size_t s=0; s != _subexpressions.size(); ++s)
     {
       const std::string & subexpression = _subexpressions[s];
       const std::size_t varname_i =
@@ -403,7 +403,7 @@ ParsedFunction<Output,OutputGradient>::set_inline_value (const std::string & inl
 #ifndef NDEBUG
   bool found_var_name = false;
 #endif
-  for (unsigned int s=0; s != _subexpressions.size(); ++s)
+  for (std::size_t s=0; s != _subexpressions.size(); ++s)
     {
       const std::string & subexpression = _subexpressions[s];
       const std::size_t varname_i =
@@ -446,7 +446,7 @@ ParsedFunction<Output,OutputGradient>::set_inline_value (const std::string & inl
 
   std::string new_expression;
 
-  for (unsigned int s=0; s != _subexpressions.size(); ++s)
+  for (std::size_t s=0; s != _subexpressions.size(); ++s)
     {
       new_expression += '{';
       new_expression += _subexpressions[s];
@@ -622,7 +622,7 @@ ParsedFunction<Output,OutputGradient>::eval (FunctionParserADBase<Output> & pars
                    << " of expression '"
                    << function_name
                    << "' with arguments:\n";
-      for (unsigned int j=0; j<_spacetime.size(); ++j)
+      for (std::size_t j=0; j<_spacetime.size(); ++j)
         libMesh::err << '\t' << _spacetime[j] << '\n';
       libMesh::err << '\n';
 

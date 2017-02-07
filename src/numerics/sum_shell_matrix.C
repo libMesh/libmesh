@@ -28,14 +28,12 @@ template <typename T>
 numeric_index_type SumShellMatrix<T>::m () const
 {
   libmesh_assert(!matrices.empty());
-  const numeric_index_type result = matrices[0]->m();
+  const numeric_index_type n_rows = matrices[0]->m();
 #ifndef NDEBUG
-  for(std::size_t i=matrices.size(); i-->1; )
-    {
-      libmesh_assert_equal_to (matrices[i]->m(), result);
-    }
+  for (std::size_t i=1; i<matrices.size(); ++i)
+    libmesh_assert_equal_to (matrices[i]->m(), n_rows);
 #endif
-  return result;
+  return n_rows;
 }
 
 
@@ -44,14 +42,12 @@ template <typename T>
 numeric_index_type SumShellMatrix<T>::n () const
 {
   libmesh_assert(!matrices.empty());
-  const numeric_index_type result = matrices[0]->n();
+  const numeric_index_type n_cols = matrices[0]->n();
 #ifndef NDEBUG
-  for(std::size_t i=matrices.size(); i-->1; )
-    {
-      libmesh_assert_equal_to (matrices[i]->n(), result);
-    }
+  for (std::size_t i=1; i<matrices.size(); ++i)
+    libmesh_assert_equal_to (matrices[i]->n(), n_cols);
 #endif
-  return result;
+  return n_cols;
 }
 
 
@@ -70,10 +66,8 @@ template <typename T>
 void SumShellMatrix<T>::vector_mult_add (NumericVector<T> & dest,
                                          const NumericVector<T> & arg) const
 {
-  for(std::size_t i=matrices.size(); i-->0; )
-    {
-      matrices[i]->vector_mult_add(dest,arg);
-    }
+  for (std::size_t i=0; i<matrices.size(); ++i)
+    matrices[i]->vector_mult_add(dest, arg);
 }
 
 
@@ -81,9 +75,8 @@ void SumShellMatrix<T>::vector_mult_add (NumericVector<T> & dest,
 template <typename T>
 void SumShellMatrix<T>::get_diagonal (NumericVector<T> & dest) const
 {
-  UniquePtr<NumericVector<T> > a = dest.clone();
-  dest.zero();
-  for(std::size_t i=matrices.size(); i-->0; )
+  UniquePtr<NumericVector<T> > a = dest.zero_clone();
+  for (std::size_t i=0; i<matrices.size(); ++i)
     {
       matrices[i]->get_diagonal(*a);
       dest += *a;

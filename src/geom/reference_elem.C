@@ -63,7 +63,7 @@ class SingletonCache : public libMesh::Singleton
 public:
   ~SingletonCache()
   {
-    for (unsigned int e=0; e<elem_list.size(); e++)
+    for (std::size_t e=0; e<elem_list.size(); e++)
       {
         delete elem_list[e];
         elem_list[e] = libmesh_nullptr;
@@ -71,7 +71,7 @@ public:
 
     elem_list.clear();
 
-    for (unsigned int n=0; n<node_list.size(); n++)
+    for (std::size_t n=0; n<node_list.size(); n++)
       {
         delete node_list[n];
         node_list[n] = libmesh_nullptr;

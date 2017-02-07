@@ -177,7 +177,7 @@ public:
       if (_nelem[dir] != 0)
         {
           _cosines[dir].resize(_nelem[dir]+1);
-          for (unsigned i=0; i<_cosines[dir].size(); ++i)
+          for (std::size_t i=0; i<_cosines[dir].size(); ++i)
             _cosines[dir][i] = std::cos(libMesh::pi * i / _nelem[dir]);
         }
   }
@@ -1380,7 +1380,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             }
 
             // Add the new elements
-            for (unsigned int i=0; i<new_elements.size(); ++i)
+            for (std::size_t i=0; i<new_elements.size(); ++i)
               mesh.add_elem(new_elements[i]);
 
           } // end if (type == TET4,TET10,PYRAMID5,PYRAMID13,PYRAMID14

@@ -348,10 +348,8 @@ public:
 
         stress_dof_map.dof_indices (elem, vonmises_dof_indices_var, vonMises_var);
         std::vector< DenseMatrix<Number> > elem_sigma_vec(vonmises_dof_indices_var.size());
-        for(unsigned int index=0; index<elem_sigma_vec.size(); index++)
-        {
+        for (std::size_t index=0; index<elem_sigma_vec.size(); index++)
           elem_sigma_vec[index].resize(3,3);
-        }
 
         // Below we project each component of the stress tensor onto a L2_LAGRANGE discretization.
         // Note that this gives a discontinuous stress plot on element boundaries, which is
@@ -397,7 +395,7 @@ public:
             stress_var_index++;
           }
 
-        for(unsigned int index=0; index<elem_sigma_vec.size(); index++)
+        for (std::size_t index=0; index<elem_sigma_vec.size(); index++)
         {
           elem_sigma_vec[index](1,0) = elem_sigma_vec[index](0,1);
           elem_sigma_vec[index](2,0) = elem_sigma_vec[index](0,2);

@@ -258,7 +258,7 @@ void TecplotIO::write_ascii (const std::string & fname,
     out_stream << "Variables=x,y,z";
 
     if (solution_names != libmesh_nullptr)
-      for (unsigned int n=0; n<solution_names->size(); n++)
+      for (std::size_t n=0; n<solution_names->size(); n++)
         {
 #ifdef LIBMESH_USE_REAL_NUMBERS
 
@@ -419,7 +419,7 @@ void TecplotIO::write_binary (const std::string & fname,
 
     if (solution_names != libmesh_nullptr)
       {
-        for (unsigned int name=0; name<solution_names->size(); name++)
+        for (std::size_t name=0; name<solution_names->size(); name++)
           {
 #ifdef LIBMESH_USE_REAL_NUMBERS
 
@@ -529,7 +529,7 @@ void TecplotIO::write_binary (const std::string & fname,
               {
                 (*it)->connectivity(se, TECPLOT, conn);
 
-                for (unsigned int node=0; node<conn.size(); node++)
+                for (std::size_t node=0; node<conn.size(); node++)
                   tm.cd(node,te) = conn[node];
 
                 te++;
@@ -672,7 +672,7 @@ void TecplotIO::write_binary (const std::string & fname,
 
     if (solution_names != libmesh_nullptr)
       {
-        for (unsigned int name=0; name<solution_names->size(); name++)
+        for (std::size_t name=0; name<solution_names->size(); name++)
           {
 #ifdef LIBMESH_USE_REAL_NUMBERS
 
@@ -725,9 +725,9 @@ void TecplotIO::write_binary (const std::string & fname,
       if ((vec != libmesh_nullptr) &&
           (solution_names != libmesh_nullptr))
         {
-          const unsigned int n_vars = solution_names->size();
+          const std::size_t n_vars = solution_names->size();
 
-          for (unsigned int c=0; c<n_vars; c++)
+          for (std::size_t c=0; c<n_vars; c++)
             {
 #ifdef LIBMESH_USE_REAL_NUMBERS
 
@@ -756,7 +756,7 @@ void TecplotIO::write_binary (const std::string & fname,
           {
             (*it)->connectivity(se, TECPLOT, conn);
 
-            for (unsigned int node=0; node<conn.size(); node++)
+            for (std::size_t node=0; node<conn.size(); node++)
               tm.cd(node,te) = conn[node];
 
             te++;

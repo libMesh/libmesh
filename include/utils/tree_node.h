@@ -258,7 +258,7 @@ TreeNode<N>::~TreeNode ()
   // When we are destructed we must delete all of our
   // children.  They will this delete their children,
   // All the way down the line...
-  for (unsigned int c=0; c<children.size(); c++)
+  for (std::size_t c=0; c<children.size(); c++)
     delete children[c];
 }
 

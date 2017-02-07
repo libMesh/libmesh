@@ -80,8 +80,8 @@ void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
 
            or in indicial notation:  phi_j = xi_{i,j}*\hat{phi}_i */
 
-        for (unsigned int i=0; i<phi.size(); i++)
-          for (unsigned int p=0; p<phi[i].size(); p++)
+        for (std::size_t i=0; i<phi.size(); i++)
+          for (std::size_t p=0; p<phi[i].size(); p++)
             {
               // Need to temporarily cache reference shape functions
               // TODO: PB: Might be worth trying to build phi_ref separately to see
@@ -123,8 +123,8 @@ void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
 
            or in indicial notation:  phi_j = xi_{i,j}*\hat{phi}_i */
 
-        for (unsigned int i=0; i<phi.size(); i++)
-          for (unsigned int p=0; p<phi[i].size(); p++)
+        for (std::size_t i=0; i<phi.size(); i++)
+          for (std::size_t p=0; p<phi[i].size(); p++)
             {
               // Need to temporarily cache reference shape functions
               // TODO: PB: Might be worth trying to build phi_ref separately to see
@@ -171,8 +171,8 @@ void HCurlFETransformation<OutputShape>::map_curl(const unsigned int dim,
 
         // FIXME: I don't think this is valid for 2D elements in 3D space
         /* In 2D: curl(phi) = J^{-1} * curl(\hat{phi}) */
-        for (unsigned int i=0; i<curl_phi.size(); i++)
-          for (unsigned int p=0; p<curl_phi[i].size(); p++)
+        for (std::size_t i=0; i<curl_phi.size(); i++)
+          for (std::size_t p=0; p<curl_phi[i].size(); p++)
             {
               curl_phi[i][p].slice(0) = curl_phi[i][p].slice(1) = 0.0;
 
@@ -194,8 +194,8 @@ void HCurlFETransformation<OutputShape>::map_curl(const unsigned int dim,
 
         const std::vector<Real> & J = fe.get_fe_map().get_jacobian();
 
-        for (unsigned int i=0; i<curl_phi.size(); i++)
-          for (unsigned int p=0; p<curl_phi[i].size(); p++)
+        for (std::size_t i=0; i<curl_phi.size(); i++)
+          for (std::size_t p=0; p<curl_phi[i].size(); p++)
             {
               Real dx_dxi   = dxyz_dxi[p](0);
               Real dx_deta  = dxyz_deta[p](0);

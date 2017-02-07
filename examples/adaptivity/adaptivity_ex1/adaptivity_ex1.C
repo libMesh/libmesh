@@ -274,11 +274,11 @@ void assemble_1D(EquationSystems & es,
         {
           // Now build the element matrix and right-hand-side using loops to
           // integrate the test functions (i) against the trial functions (j).
-          for (unsigned int i=0; i<phi.size(); i++)
+          for (std::size_t i=0; i<phi.size(); i++)
             {
               Fe(i) += JxW[qp]*phi[i][qp];
 
-              for (unsigned int j=0; j<phi.size(); j++)
+              for (std::size_t j=0; j<phi.size(); j++)
                 {
                   Ke(i,j) += JxW[qp]*(1.e-3*dphi[i][qp]*dphi[j][qp] +
                                       phi[i][qp]*phi[j][qp]);

@@ -293,7 +293,7 @@ void AssembleOptimization::equality_constraints (const NumericVector<Number> & X
   constraint_values[1] = (*X_localized)(23);
   constraint_values[2] = (*X_localized)(98) + (*X_localized)(185);
 
-  for (unsigned int i=0; i<constraint_values.size(); i++)
+  for (std::size_t i=0; i<constraint_values.size(); i++)
     if ((C_eq.first_local_index() <= i) &&
         (i < C_eq.last_local_index()))
       C_eq.set(i, constraint_values[i]);
@@ -325,20 +325,15 @@ void AssembleOptimization::equality_constraints_jacobian (const NumericVector<Nu
   constraint_jac_indices[2][0] = 98;
   constraint_jac_indices[2][1] = 185;
 
-  for (unsigned int i=0; i<constraint_jac_values.size(); i++)
-    {
-      for (unsigned int j=0; j<constraint_jac_values[i].size(); j++)
+  for (std::size_t i=0; i<constraint_jac_values.size(); i++)
+    for (std::size_t j=0; j<constraint_jac_values[i].size(); j++)
+      if ((sys.C_eq->first_local_index() <= i) &&
+          (i < sys.C_eq->last_local_index()))
         {
-
-          if ((sys.C_eq->first_local_index() <= i) &&
-              (i < sys.C_eq->last_local_index()))
-            {
-              dof_id_type col_index = constraint_jac_indices[i][j];
-              Number value = constraint_jac_values[i][j];
-              C_eq_jac.set(i, col_index, value);
-            }
+          dof_id_type col_index = constraint_jac_indices[i][j];
+          Number value = constraint_jac_values[i][j];
+          C_eq_jac.set(i, col_index, value);
         }
-    }
 }
 
 void AssembleOptimization::inequality_constraints (const NumericVector<Number> & X,
@@ -355,11 +350,9 @@ void AssembleOptimization::inequality_constraints (const NumericVector<Number> &
   std::vector<Number> constraint_values(1);
   constraint_values[0] = (*X_localized)(200)*(*X_localized)(200) + (*X_localized)(201) - 5.;
 
-  for (unsigned int i=0; i<constraint_values.size(); i++)
-    {
-      if ((C_ineq.first_local_index() <= i) && (i < C_ineq.last_local_index()))
-        C_ineq.set(i, constraint_values[i]);
-    }
+  for (std::size_t i=0; i<constraint_values.size(); i++)
+    if ((C_ineq.first_local_index() <= i) && (i < C_ineq.last_local_index()))
+      C_ineq.set(i, constraint_values[i]);
 }
 
 void AssembleOptimization::inequality_constraints_jacobian (const NumericVector<Number> & X,
@@ -383,20 +376,16 @@ void AssembleOptimization::inequality_constraints_jacobian (const NumericVector<
   constraint_jac_indices[0][0] = 200;
   constraint_jac_indices[0][1] = 201;
 
-  for (unsigned int i=0; i<constraint_jac_values.size(); i++)
-    {
-      for (unsigned int j=0; j<constraint_jac_values[i].size(); j++)
+  for (std::size_t i=0; i<constraint_jac_values.size(); i++)
+    for (std::size_t j=0; j<constraint_jac_values[i].size(); j++)
+      if ((sys.C_ineq->first_local_index() <= i) &&
+          (i < sys.C_ineq->last_local_index()))
         {
-          if ((sys.C_ineq->first_local_index() <= i) &&
-              (i < sys.C_ineq->last_local_index()))
-            {
-              dof_id_type col_index = constraint_jac_indices[i][j];
-              Number value = constraint_jac_values[i][j];
-              C_ineq_jac.set(i, col_index, value);
-            }
-
+          dof_id_type col_index = constraint_jac_indices[i][j];
+          Number value = constraint_jac_values[i][j];
+          C_ineq_jac.set(i, col_index, value);
         }
-    }
+
 }
 
 void AssembleOptimization::lower_and_upper_bounds (OptimizationSystem & sys)

@@ -220,7 +220,7 @@ namespace libMesh
 //   if (zn == 0)
 //     libMesh::out << "  Writing ";
 
-//   for (unsigned int i=0; i<write_vars.size(); i++)
+//   for (std::size_t i=0; i<write_vars.size(); i++)
 //     {
 //       // Number of the variable to write
 //       const unsigned int v = write_vars[i];

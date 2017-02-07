@@ -281,10 +281,10 @@ void assemble_poisson(EquationSystems & es,
 
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
-          for (unsigned int i=0; i<phi.size(); i++)
+          for (std::size_t i=0; i<phi.size(); i++)
             {
               Fe(i) += JxW[qp]*phi[i][qp];
-              for (unsigned int j=0; j<phi.size(); j++)
+              for (std::size_t j=0; j<phi.size(); j++)
                 Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
             }
         }

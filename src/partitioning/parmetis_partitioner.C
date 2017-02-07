@@ -131,7 +131,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
   // per partition.
   {
     bool all_have_enough_elements = true;
-    for (processor_id_type pid=0; pid<_n_active_elem_on_proc.size(); pid++)
+    for (std::size_t pid=0; pid<_n_active_elem_on_proc.size(); pid++)
       if (_n_active_elem_on_proc[pid] < MIN_ELEM_PER_PROC)
         all_have_enough_elements = false;
 
@@ -537,7 +537,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
                   // Get all the neighbor's children that
                   // live on that side and are thus connected
                   // to us
-                  for (unsigned int nc=0; nc<neighbors_offspring.size(); nc++)
+                  for (std::size_t nc=0; nc<neighbors_offspring.size(); nc++)
                     {
                       const Elem * child =
                         neighbors_offspring[nc];

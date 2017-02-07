@@ -422,8 +422,8 @@ void assemble_helmholtz(EquationSystems & es,
           // the trial functions (j).  Note the braces on the rhs
           // of Ke(i,j): these are quite necessary to finally compute
           // Real*(Point*Point) = Real, and not something else...
-          for (unsigned int i=0; i<phi.size(); i++)
-            for (unsigned int j=0; j<phi.size(); j++)
+          for (std::size_t i=0; i<phi.size(); i++)
+            for (std::size_t j=0; j<phi.size(); j++)
               {
                 Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
                 Me(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp]);
@@ -481,8 +481,8 @@ void assemble_helmholtz(EquationSystems & es,
 
                 // Element matrix contributrion due to precribed
                 // admittance boundary conditions.
-                for (unsigned int i=0; i<phi_face.size(); i++)
-                  for (unsigned int j=0; j<phi_face.size(); j++)
+                for (std::size_t i=0; i<phi_face.size(); i++)
+                  for (std::size_t j=0; j<phi_face.size(); j++)
                     Ce(i,j) += rho*an_value*JxW_face[qp]*phi_face[i][qp]*phi_face[j][qp];
               }
           }

@@ -214,7 +214,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       // right now, and it will generalize a bit, and it won't break
       // the assumptions elsewhere in InfFE.
       std::vector<Point> radial_pts;
-      for (unsigned int p=0; p != pts->size(); ++p)
+      for (std::size_t p=0; p != pts->size(); ++p)
         {
           Real radius = (*pts)[p](Dim-1);
           if (radial_pts.size() && radial_pts[0](0) == radius)
@@ -229,7 +229,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
 
       std::vector<Point> base_pts;
       base_pts.reserve(base_pts_size);
-      for (unsigned int p=0; p != pts->size(); p += radial_pts_size)
+      for (std::size_t p=0; p != pts->size(); p += radial_pts_size)
         {
           Point pt = (*pts)[p];
           pt(Dim-1) = 0;
@@ -899,7 +899,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem *,
         const std::vector<Real> & dzetadz_map = this->_fe_map->get_dzetadz();
 
         // These are _all_ shape functions of this infinite element
-        for (unsigned int i=0; i<phi.size(); i++)
+        for (std::size_t i=0; i<phi.size(); i++)
           for (unsigned int p=0; p<n_total_qp; p++)
             {
               // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx) + (dphi/dzeta)*(dzeta/dx);

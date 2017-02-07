@@ -312,7 +312,7 @@ void Build::operator()(const ConstElemRange & range)
       // Get the row of the sparsity pattern
       SparsityPattern::Row & row = sparsity_pattern[i];
 
-      for (dof_id_type j=0; j<row.size(); j++)
+      for (std::size_t j=0; j<row.size(); j++)
         if ((row[j] < first_dof_on_proc) || (row[j] >= end_dof_on_proc))
           n_oz[i]++;
         else

@@ -108,7 +108,7 @@ void LinearElasticityWithContact::move_mesh (MeshBase & input_mesh,
             const Point master_point = elem->master_point(node_id);
 
             Point uvw;
-            for (unsigned int index=0; index<uvw_names.size(); index++)
+            for (std::size_t index=0; index<uvw_names.size(); index++)
               {
                 const unsigned int var = _sys.variable_number(uvw_names[index]);
                 const FEType & fe_type = _sys.get_dof_map().variable_type(var);
@@ -123,7 +123,7 @@ void LinearElasticityWithContact::move_mesh (MeshBase & input_mesh,
                 std::vector<dof_id_type> dof_indices_var;
                 _sys.get_dof_map().dof_indices (orig_elem, dof_indices_var, var);
 
-                for (unsigned int i=0; i<dof_indices_var.size(); i++)
+                for (std::size_t i=0; i<dof_indices_var.size(); i++)
                   {
                     Number value = (*localized_input_solution)(dof_indices_var[i]) * data.shape[i];
 
@@ -195,14 +195,14 @@ void LinearElasticityWithContact::initialize_contact_load_paths()
 
   // Do an N^2 search to match the contact nodes
   _contact_node_map.clear();
-  for (unsigned int i=0; i<nodes_on_lower_surface.size(); i++)
+  for (std::size_t i=0; i<nodes_on_lower_surface.size(); i++)
     {
       dof_id_type lower_node_id = nodes_on_lower_surface[i];
       Point p_lower = mesh.point(lower_node_id);
 
       Real min_distance = std::numeric_limits<Real>::max();
 
-      for (unsigned int j=0; j<nodes_on_upper_surface.size(); j++)
+      for (std::size_t j=0; j<nodes_on_upper_surface.size(); j++)
         {
           dof_id_type upper_node_id = nodes_on_upper_surface[j];
           Point p_upper = mesh.point(upper_node_id);

@@ -198,7 +198,7 @@ void set_system_parameters(HeatSystem & system,
                                                                     f));
 
       libMesh::out << "Added Dirichlet boundary " << b << " for variables ";
-      for (unsigned int vi=0; vi != param.dirichlet_condition_variables[b].size(); ++vi)
+      for (std::size_t vi=0; vi != param.dirichlet_condition_variables[b].size(); ++vi)
         libMesh::out << param.dirichlet_condition_variables[b][vi];
       libMesh::out << std::endl;
     }

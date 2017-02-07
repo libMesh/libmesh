@@ -194,7 +194,7 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
   LOG_SCOPE ("histogram()", "StatisticsVector");
 
   std::vector<Real> bin_bounds(n_bins+1);
-  for (unsigned int i=0; i<bin_bounds.size(); i++)
+  for (std::size_t i=0; i<bin_bounds.size(); i++)
     bin_bounds[i] = min + i * bin_size;
 
   // Give the last bin boundary a little wiggle room: we don't want
@@ -206,7 +206,7 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
   bin_members.resize(n_bins);
 
   dof_id_type data_index = 0;
-  for (unsigned int j=0; j<bin_members.size(); j++) // bin vector indexing
+  for (std::size_t j=0; j<bin_members.size(); j++) // bin vector indexing
     {
       // libMesh::out << "(debug) Filling bin " << j << std::endl;
 
@@ -291,14 +291,14 @@ void StatisticsVector<T>::plot_histogram(const processor_id_type my_procid,
 
       // abscissa values are located at the center of each bin.
       out_stream << "x=[";
-      for (unsigned int i=0; i<bin_members.size(); ++i)
+      for (std::size_t i=0; i<bin_members.size(); ++i)
         {
           out_stream << min + (i+0.5)*bin_size << " ";
         }
       out_stream << "];\n";
 
       out_stream << "y=[";
-      for (unsigned int i=0; i<bin_members.size(); ++i)
+      for (std::size_t i=0; i<bin_members.size(); ++i)
         {
           out_stream << bin_members[i] << " ";
         }

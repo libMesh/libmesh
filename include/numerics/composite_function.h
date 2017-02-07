@@ -48,7 +48,7 @@ public:
 
   ~CompositeFunction ()
   {
-    for (unsigned int i=0; i != subfunctions.size(); ++i)
+    for (std::size_t i=0; i != subfunctions.size(); ++i)
       delete subfunctions[i];
   }
 
@@ -72,7 +72,7 @@ public:
         (max_index+1, std::make_pair(libMesh::invalid_uint,
                                      libMesh::invalid_uint));
 
-    for (unsigned int j=0; j != index_map.size(); ++j)
+    for (std::size_t j=0; j != index_map.size(); ++j)
       {
         libmesh_assert_less(index_map[j], reverse_index_map.size());
         libmesh_assert_equal_to(reverse_index_map[index_map[j]].first,
@@ -116,11 +116,11 @@ public:
     output.zero();
 
     DenseVector<Output> temp;
-    for (unsigned int i=0; i != subfunctions.size(); ++i)
+    for (std::size_t i=0; i != subfunctions.size(); ++i)
       {
         temp.resize(index_maps[i].size());
         (*subfunctions[i])(p, time, temp);
-        for (unsigned int j=0; j != temp.size(); ++j)
+        for (std::size_t j=0; j != temp.size(); ++j)
           output(index_maps[i][j]) = temp(j);
       }
   }

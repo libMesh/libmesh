@@ -342,10 +342,10 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
                 mask[i] = 1;
 
                 // Search through neighbor nodes looking for two that form a straight line with this node
-                for (unsigned int a=0; a<thetas.size()-1; a++)
+                for (std::size_t a=0; a<thetas.size()-1; a++)
                   {
                     // Only try each pairing once
-                    for (unsigned int b=a+1; b<thetas.size(); b++)
+                    for (std::size_t b=a+1; b<thetas.size(); b++)
                       {
                         // Find if the two neighbor nodes angles are 180 degrees (pi) off of eachother (withing a tolerance)
                         // In order to make this a true movable boundary node... the two that forma  straight line with
@@ -525,7 +525,7 @@ float VariationalMeshSmoother::adapt_minimum() const
 {
   float min = 1.e30;
 
-  for (unsigned int i=0; i<_adapt_data->size(); i++)
+  for (std::size_t i=0; i<_adapt_data->size(); i++)
     {
       // Only positive (or zero) values in the error vector
       libmesh_assert_greater_equal ((*_adapt_data)[i], 0.);

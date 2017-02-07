@@ -415,7 +415,7 @@ void assemble_cd (EquationSystems & es,
           Gradient grad_u_old;
 
           // Compute the old solution & its gradient.
-          for (unsigned int l=0; l<phi.size(); l++)
+          for (std::size_t l=0; l<phi.size(); l++)
             {
               u_old += phi[l][qp]*system.old_solution  (dof_indices[l]);
 
@@ -426,7 +426,7 @@ void assemble_cd (EquationSystems & es,
             }
 
           // Now compute the element matrix and RHS contributions.
-          for (unsigned int i=0; i<phi.size(); i++)
+          for (std::size_t i=0; i<phi.size(); i++)
             {
               // The RHS contribution
               Fe(i) += JxW[qp]*(
@@ -442,7 +442,7 @@ void assemble_cd (EquationSystems & es,
                                         0.01*(grad_u_old*dphi[i][qp]))
                                 );
 
-              for (unsigned int j=0; j<phi.size(); j++)
+              for (std::size_t j=0; j<phi.size(); j++)
                 {
                   // The matrix contribution
                   Ke(i,j) += JxW[qp]*(
@@ -488,12 +488,12 @@ void assemble_cd (EquationSystems & es,
                                                        system.time);
 
                   // RHS contribution
-                  for (unsigned int i=0; i<psi.size(); i++)
+                  for (std::size_t i=0; i<psi.size(); i++)
                     Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
 
                   // Matrix contribution
-                  for (unsigned int i=0; i<psi.size(); i++)
-                    for (unsigned int j=0; j<psi.size(); j++)
+                  for (std::size_t i=0; i<psi.size(); i++)
+                    for (std::size_t j=0; j<psi.size(); j++)
                       Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
                 }
             }

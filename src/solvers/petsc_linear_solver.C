@@ -368,10 +368,8 @@ PetscLinearSolver<T>::restrict_solve_to (const std::vector<unsigned int> * const
       ierr = PetscMalloc(dofs->size()*sizeof(PetscInt), &petsc_dofs);
       LIBMESH_CHKERR(ierr);
 
-      for(size_t i=0; i<dofs->size(); i++)
-        {
-          petsc_dofs[i] = (*dofs)[i];
-        }
+      for (std::size_t i=0; i<dofs->size(); i++)
+        petsc_dofs[i] = (*dofs)[i];
 
       ierr = ISCreateLibMesh(this->comm().get(),dofs->size(),petsc_dofs,PETSC_OWN_POINTER,&_restrict_solve_to_is);
       LIBMESH_CHKERR(ierr);

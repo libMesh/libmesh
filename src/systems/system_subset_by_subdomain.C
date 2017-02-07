@@ -134,7 +134,7 @@ init (const SubdomainSelection & subdomain_selection)
           for (; it!=itEnd; ++it)
             {
               dof_map.dof_indices (elem, dof_indices, *it);
-              for(size_t i=0; i<dof_indices.size(); i++)
+              for (std::size_t i=0; i<dof_indices.size(); i++)
                 {
                   const dof_id_type dof = dof_indices[i];
                   for(processor_id_type proc=0; proc<this->n_processors(); proc++)
@@ -169,10 +169,8 @@ init (const SubdomainSelection & subdomain_selection)
         {
           this->comm().receive(proc,received_dofs);
         }
-      for(unsigned int i=0; i<received_dofs.size(); i++)
-        {
-          _dof_ids.push_back(received_dofs[i]);
-        }
+      for (std::size_t i=0; i<received_dofs.size(); i++)
+        _dof_ids.push_back(received_dofs[i]);
     }
 
   /* Sort and unique the vector (using the same mechanism as in \p

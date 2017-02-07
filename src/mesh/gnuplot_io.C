@@ -212,10 +212,8 @@ void GnuPlotIO::write_solution(const std::string & fname,
 
           data << kvp.first << "\t";
 
-          for(unsigned int i=0; i<values.size(); i++)
-            {
-              data << values[i] << "\t";
-            }
+          for (std::size_t i=0; i<values.size(); i++)
+            data << values[i] << "\t";
 
           data << "\n";
         }

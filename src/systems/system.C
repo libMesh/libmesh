@@ -1190,7 +1190,7 @@ unsigned int System::add_variables (const std::vector<std::string> & vars,
 
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
-  for (unsigned int ov=0; ov<vars.size(); ov++)
+  for (std::size_t ov=0; ov<vars.size(); ov++)
     for (unsigned int v=0; v<this->n_vars(); v++)
       if (this->variable_name(v) == vars[ov])
         {
@@ -1215,7 +1215,7 @@ unsigned int System::add_variables (const std::vector<std::string> & vars,
   const VariableGroup & vg (_variable_groups.back());
 
   // Add each component of the group individually
-  for (unsigned short v=0; v<vars.size(); v++)
+  for (std::size_t v=0; v<vars.size(); v++)
     {
       _variables.push_back (vg(v));
       _variable_numbers[vars[v]] = cast_int<unsigned short>
@@ -1311,7 +1311,7 @@ void System::local_dof_indices(const unsigned int var,
       const Elem * elem = *el;
       this->get_dof_map().dof_indices (elem, dof_indices, var);
 
-      for(unsigned int i=0; i<dof_indices.size(); i++)
+      for (std::size_t i=0; i<dof_indices.size(); i++)
         {
           dof_id_type dof = dof_indices[i];
 
@@ -1655,20 +1655,13 @@ Real System::calculate_norm(const NumericVector<Number> & v,
         }
 
       // Need to delete the FE and quadrature objects to prevent a memory leak
-      for(unsigned int i=0; i<fe_ptrs.size(); i++)
-        {
-          if(fe_ptrs[i])
-            {
-              delete fe_ptrs[i];
-            }
-        }
-      for(unsigned int i=0; i<q_rules.size(); i++)
-        {
-          if(q_rules[i])
-            {
-              delete q_rules[i];
-            }
-        }
+      for (std::size_t i=0; i<fe_ptrs.size(); i++)
+        if (fe_ptrs[i])
+          delete fe_ptrs[i];
+
+      for (std::size_t i=0; i<q_rules.size(); i++)
+        if (q_rules[i])
+          delete q_rules[i];
     }
 
   if (using_hilbert_norm)

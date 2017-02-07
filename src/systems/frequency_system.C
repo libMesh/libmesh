@@ -270,7 +270,7 @@ void FrequencySystem::set_frequencies (const std::vector<Real> & frequencies,
   es.parameters.set<unsigned int>("n_frequencies") = frequencies.size();
 
   // set frequencies, build solution storage
-  for (unsigned int n=0; n<frequencies.size(); n++)
+  for (std::size_t n=0; n<frequencies.size(); n++)
     {
       // remember frequencies as parameters
       es.parameters.set<Real>(this->form_freq_param_name(n)) = frequencies[n];

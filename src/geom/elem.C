@@ -1252,7 +1252,7 @@ void Elem::make_links_to_me_local(unsigned int n)
     neigh_family.push_back(neigh);
 
   // And point them to elem
-  for (unsigned int i = 0; i != neigh_family.size(); ++i)
+  for (std::size_t i = 0; i != neigh_family.size(); ++i)
     {
       Elem * neigh_family_member = const_cast<Elem *>(neigh_family[i]);
 
@@ -1319,7 +1319,7 @@ void Elem::make_links_to_me_remote()
                   // FIXME - There's a lot of ugly const_casts here; we
                   // may want to make remote_elem non-const and create
                   // non-const versions of the family_tree methods
-                  for (unsigned int i=0; i != family.size(); ++i)
+                  for (std::size_t i=0; i != family.size(); ++i)
                     {
                       Elem * n = const_cast<Elem *>(family[i]);
                       libmesh_assert (n);
@@ -1365,7 +1365,7 @@ void Elem::make_links_to_me_remote()
                   // FIXME - There's a lot of ugly const_casts here; we
                   // may want to make remote_elem non-const and create
                   // non-const versions of the family_tree methods
-                  for (unsigned int i=0; i != family.size(); ++i)
+                  for (std::size_t i=0; i != family.size(); ++i)
                     {
                       Elem * n = const_cast<Elem *>(family[i]);
                       libmesh_assert (n);
@@ -2206,7 +2206,7 @@ Elem::bracketing_nodes(unsigned int child,
   const std::vector<std::pair<unsigned char, unsigned char> > & pbc =
     this->parent_bracketing_nodes(child,child_node);
 
-  for (unsigned int i = 0; i != pbc.size(); ++i)
+  for (std::size_t i = 0; i != pbc.size(); ++i)
     {
       if (pbc[i].first < this->n_nodes() &&
           pbc[i].second < this->n_nodes())

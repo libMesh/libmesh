@@ -364,12 +364,12 @@ void assemble (EquationSystems & es,
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
           // Now compute the element matrix and RHS contributions.
-          for (unsigned int i=0; i<phi.size(); i++)
+          for (std::size_t i=0; i<phi.size(); i++)
             {
               // The RHS contribution
               Fe(i) += JxW[qp]*phi[i][qp];
 
-              for (unsigned int j=0; j<phi.size(); j++)
+              for (std::size_t j=0; j<phi.size(); j++)
                 {
                   // The matrix contribution
                   Ke(i,j) += JxW[qp]*(
@@ -408,8 +408,8 @@ void assemble (EquationSystems & es,
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
                   // Matrix contribution
-                  for (unsigned int i=0; i<psi.size(); i++)
-                    for (unsigned int j=0; j<psi.size(); j++)
+                  for (std::size_t i=0; i<psi.size(); i++)
+                    for (std::size_t j=0; j<psi.size(); j++)
                       Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
                 }
             }

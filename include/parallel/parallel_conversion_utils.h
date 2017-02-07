@@ -52,7 +52,7 @@ bool is_sorted (const std::vector<KeyType> & v)
   if (v.empty())
     return true;
 
-  for (unsigned int i=1; i<v.size(); i++)
+  for (std::size_t i=1; i<v.size(); i++)
     if (v[i] < v[i-1])
       return false;
 

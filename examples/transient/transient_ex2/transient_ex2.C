@@ -457,8 +457,8 @@ void assemble_wave(EquationSystems & es,
           // Now we will build the element matrix.  This involves
           // a double loop to integrate the test funcions (i) against
           // the trial functions (j).
-          for (unsigned int i=0; i<phi.size(); i++)
-            for (unsigned int j=0; j<phi.size(); j++)
+          for (std::size_t i=0; i<phi.size(); i++)
+            for (std::size_t j=0; j<phi.size(); j++)
               {
                 Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
                 Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp]
@@ -513,7 +513,7 @@ void assemble_wave(EquationSystems & es,
                 {
                   // Right-hand-side contribution due to prescribed
                   // normal acceleration.
-                  for (unsigned int i=0; i<phi_face.size(); i++)
+                  for (std::size_t i=0; i<phi_face.size(); i++)
                     {
                       Fe(i) += acc_n_value*rho
                         *phi_face[i][qp]*JxW_face[qp];

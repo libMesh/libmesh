@@ -225,7 +225,7 @@ void VTKIO::read (const std::string & name)
 
       // then reshuffle the nodes according to the connectivity, this
       // two-time-assign would evade the definition of the vtk_mapping
-      for (unsigned int j=0; j<conn.size(); ++j)
+      for (std::size_t j=0; j<conn.size(); ++j)
         elem->set_node(j) = mesh.node_ptr(conn[j]);
 
       elem->set_id(i);
@@ -447,7 +447,7 @@ void VTKIO::cells_to_vtk()
       std::vector<dof_id_type> conn;
       elem->connectivity(0, VTK, conn);
 
-      for (unsigned int i=0; i<conn.size(); ++i)
+      for (std::size_t i=0; i<conn.size(); ++i)
         {
           // If the node ID is not found in the _local_node_map, we'll
           // add it to the _vtk_grid.  NOTE[JWP]: none of the examples
@@ -531,7 +531,7 @@ void VTKIO::cells_to_vtk()
 //           libmesh_assert_equal_to (it->second.size(), es.get_mesh().n_nodes());
 //           data->SetNumberOfValues(it->second.size());
 //
-//           for (unsigned int i=0; i<it->second.size(); ++i)
+//           for (std::size_t i=0; i<it->second.size(); ++i)
 //             {
 // #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 //               libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"

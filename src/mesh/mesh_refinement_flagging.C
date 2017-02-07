@@ -323,7 +323,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
 
   // create_parent_error_vector sets values for non-parents and
   // non-coarsenable parents to -1.  Get rid of them.
-  for (dof_id_type i=0; i != error_per_parent.size(); ++i)
+  for (std::size_t i=0; i != error_per_parent.size(); ++i)
     if (error_per_parent[i] != -1)
       sorted_parent_error.push_back(std::make_pair(error_per_parent[i], i));
 
@@ -374,7 +374,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
   {
     std::vector<bool> is_refinable(max_elem_id, false);
 
-    for (dof_id_type i=0; i != sorted_error.size(); ++i)
+    for (std::size_t i=0; i != sorted_error.size(); ++i)
       {
         dof_id_type eid = sorted_error[i].second;
         Elem * elem = _mesh.query_elem_ptr(eid);
@@ -385,7 +385,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
 
     if (refine_count > max_elem_refine)
       refine_count = max_elem_refine;
-    for (dof_id_type i=0; i != sorted_error.size(); ++i)
+    for (std::size_t i=0; i != sorted_error.size(); ++i)
       {
         if (successful_refine_count >= refine_count)
           break;
@@ -414,7 +414,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
   dof_id_type successful_coarsen_count = 0;
   if (coarsen_count)
     {
-      for (dof_id_type i=0; i != sorted_parent_error.size(); ++i)
+      for (std::size_t i=0; i != sorted_parent_error.size(); ++i)
         {
           if (successful_coarsen_count >= coarsen_count * twotodim)
             break;

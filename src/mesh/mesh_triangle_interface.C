@@ -90,7 +90,7 @@ void TriangleInterface::triangulate()
       // Insert a new point on each PSLG at some random location
       // np=index into new points vector
       // n =index into original points vector
-      for (unsigned int np=0, n=0; np<2*original_points.size(); ++np)
+      for (std::size_t np=0, n=0; np<2*original_points.size(); ++np)
         {
           // the even entries are the original points
           if (np%2==0)
@@ -111,7 +111,7 @@ void TriangleInterface::triangulate()
 
   if (have_holes)
     {
-      for (unsigned int i=0; i<_holes->size(); ++i)
+      for (std::size_t i=0; i<_holes->size(); ++i)
         n_hole_points += (*_holes)[i]->n_points();
     }
 
@@ -157,7 +157,7 @@ void TriangleInterface::triangulate()
   unsigned int hole_offset=0;
 
   if (have_holes)
-    for (unsigned int i=0; i<_holes->size(); ++i)
+    for (std::size_t i=0; i<_holes->size(); ++i)
       {
         for (unsigned int ctr=0, h=0; h<(*_holes)[i]->n_points(); ctr+=2, ++h)
           {
@@ -212,7 +212,7 @@ void TriangleInterface::triangulate()
 
 
   // If the user provided it, use his ordering to define the segments
-  for (unsigned int ctr=0, s=0; s<this->segments.size(); ctr+=2, ++s)
+  for (std::size_t ctr=0, s=0; s<this->segments.size(); ctr+=2, ++s)
     {
       const unsigned int index0 = 2*hole_offset+ctr;
       const unsigned int index1 = 2*hole_offset+ctr+1;
@@ -228,7 +228,7 @@ void TriangleInterface::triangulate()
     {
       initial.numberofholes = _holes->size();
       initial.holelist      = static_cast<REAL*>(std::malloc(initial.numberofholes * 2 * sizeof(REAL)));
-      for (unsigned int i=0, ctr=0; i<_holes->size(); ++i, ctr+=2)
+      for (std::size_t i=0, ctr=0; i<_holes->size(); ++i, ctr+=2)
         {
           Point inside_point = (*_holes)[i]->inside();
           initial.holelist[ctr]   = inside_point(0);

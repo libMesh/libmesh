@@ -68,10 +68,8 @@ void RBEIMEvaluation::clear()
   _interpolation_points_mesh.clear();
 
   // Delete any RBTheta objects that were created
-  for(unsigned int i=0; i<_rb_eim_theta_objects.size(); i++)
-    {
-      delete _rb_eim_theta_objects[i];
-    }
+  for (std::size_t i=0; i<_rb_eim_theta_objects.size(); i++)
+    delete _rb_eim_theta_objects[i];
   _rb_eim_theta_objects.clear();
 }
 
@@ -305,7 +303,7 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
   std::map<dof_id_type, dof_id_type> node_id_map;
 
   unsigned int new_node_id = 0;
-  for(unsigned int i=0; i<interpolation_points_elem.size(); i++)
+  for (std::size_t i=0; i<interpolation_points_elem.size(); i++)
     {
       Elem * old_elem = interpolation_points_elem[i];
 
@@ -333,7 +331,7 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
   std::map<dof_id_type,dof_id_type> elem_id_map;
   std::vector<dof_id_type> interpolation_elem_ids(interpolation_points_elem.size());
   dof_id_type new_elem_id = 0;
-  for(unsigned int i=0; i<interpolation_elem_ids.size(); i++)
+  for (std::size_t i=0; i<interpolation_elem_ids.size(); i++)
     {
       Elem * old_elem = interpolation_points_elem[i];
 
@@ -387,10 +385,9 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
       std::ofstream interpolation_elem_ids_out
         ((directory_name + "/interpolation_elem_ids.dat").c_str(), std::ofstream::out);
 
-      for(unsigned int i=0; i<interpolation_elem_ids.size(); i++)
-        {
-          interpolation_elem_ids_out << interpolation_elem_ids[i] << std::endl;
-        }
+      for (std::size_t i=0; i<interpolation_elem_ids.size(); i++)
+        interpolation_elem_ids_out << interpolation_elem_ids[i] << std::endl;
+
       interpolation_elem_ids_out.close();
     }
 }

@@ -455,7 +455,7 @@ void GmshIO::read_mesh(std::istream & in)
                 max_elem_dimension_seen=1,
                 min_elem_dimension_seen=3;
 
-              for (unsigned char i=0; i<elem_dimensions_seen.size(); ++i)
+              for (std::size_t i=0; i<elem_dimensions_seen.size(); ++i)
                 if (elem_dimensions_seen[i])
                   {
                     // Debugging
@@ -783,7 +783,7 @@ void GmshIO::write_mesh (std::ostream & out_stream)
         mesh.boundary_info->build_side_list(element_id_list, side_list, bc_id_list);
 
         // Loop over these lists, writing data to the file.
-        for (unsigned idx=0; idx<element_id_list.size(); ++idx)
+        for (std::size_t idx=0; idx<element_id_list.size(); ++idx)
           {
             const Elem & elem = mesh.elem_ref(element_id_list[idx]);
 

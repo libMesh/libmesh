@@ -194,7 +194,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number> * shell_matr
 
   // Solve the linear system.
   SparseMatrix<Number> * pc = this->request_matrix("Preconditioner");
-  for (unsigned int p=0; p != parameters.size(); ++p)
+  for (std::size_t p=0; p != parameters.size(); ++p)
   {
   rval = linear_solver->solve (*matrix, pc,
   this->get_sensitivity_solution(p),
@@ -205,7 +205,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number> * shell_matr
 
   // Our matrix is the *negative* of the Jacobian for b-A*u, so our
   // solutions are all inverted
-  for (unsigned int p=0; p != parameters.size(); ++p)
+  for (std::size_t p=0; p != parameters.size(); ++p)
   {
   this->get_sensitivity_solution(p) *= -1.0;
   }

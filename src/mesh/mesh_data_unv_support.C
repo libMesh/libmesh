@@ -558,7 +558,7 @@ void MeshData::write_unv_implementation (std::ostream & out_file)
       // const reference to the nodal values
       const std::vector<Number> & values = this->get_data(node);
 
-      for (unsigned int v_cnt=0; v_cnt<values.size(); v_cnt++)
+      for (std::size_t v_cnt=0; v_cnt<values.size(); v_cnt++)
         {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
           std::sprintf(buf, "%13.5E%13.5E", values[v_cnt].real(),

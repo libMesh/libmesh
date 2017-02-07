@@ -330,7 +330,7 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
 
   // Solve the linear system.
   SparseMatrix<Number> * pc = this->request_matrix("Preconditioner");
-  for (unsigned int p=0; p != parameters.size(); ++p)
+  for (std::size_t p=0; p != parameters.size(); ++p)
     {
       std::pair<unsigned int, Real> rval =
         linear_solver->solve (*matrix, pc,
@@ -345,7 +345,7 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  for (unsigned int p=0; p != parameters.size(); ++p)
+  for (std::size_t p=0; p != parameters.size(); ++p)
     this->get_dof_map().enforce_constraints_exactly
       (*this, &this->get_sensitivity_solution(p),
        /* homogeneous = */ true);
@@ -383,7 +383,7 @@ ImplicitSystem::adjoint_solve (const QoISet & qoi_indices)
     this->get_linear_solve_parameters();
   std::pair<unsigned int, Real> totalrval = std::make_pair(0,0.0);
 
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
+  for (std::size_t i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       {
         const std::pair<unsigned int, Real> rval =
@@ -400,7 +400,7 @@ ImplicitSystem::adjoint_solve (const QoISet & qoi_indices)
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
+  for (std::size_t i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       this->get_dof_map().enforce_adjoint_constraints_exactly
         (this->get_adjoint_solution(i), i);
@@ -433,7 +433,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
 
   // FIXME: The derivation here does not yet take adjoint boundary
   // conditions into account.
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
+  for (std::size_t i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       libmesh_assert(!this->get_dof_map().has_adjoint_dirichlet_boundaries(i));
 
@@ -444,7 +444,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
   // any good reasons why users might want to save these:
 
   std::vector<NumericVector<Number> *> temprhs(this->qoi.size());
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
+  for (std::size_t i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       temprhs[i] = this->rhs->zero_clone().release();
 
@@ -475,7 +475,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
   this->assemble_qoi_derivative(qoi_indices,
                                 /* include_liftfunc = */ false,
                                 /* apply_constraints = */ true);
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
+  for (std::size_t i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       {
         this->get_adjoint_rhs(i).close();
@@ -495,7 +495,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
   this->assemble_qoi_derivative(qoi_indices,
                                 /* include_liftfunc = */ false,
                                 /* apply_constraints = */ true);
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
+  for (std::size_t i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       {
         this->get_adjoint_rhs(i).close();
@@ -528,7 +528,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
     this->get_linear_solve_parameters();
   std::pair<unsigned int, Real> totalrval = std::make_pair(0,0.0);
 
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
+  for (std::size_t i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       {
         const std::pair<unsigned int, Real> rval =
@@ -543,13 +543,13 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
 
   this->release_linear_solver(linear_solver);
 
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
+  for (std::size_t i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       delete temprhs[i];
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
+  for (std::size_t i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       this->get_dof_map().enforce_constraints_exactly
         (*this, &this->get_weighted_sensitivity_adjoint_solution(i),
@@ -841,7 +841,7 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity (const QoISet & qoi_indic
   // We don't need these to be closed() in this function, but libMesh
   // standard practice is to have them closed() by the time the
   // function exits
-  for (unsigned int i=0; i != this->qoi.size(); ++i)
+  for (std::size_t i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       this->get_adjoint_rhs(i).close();
 

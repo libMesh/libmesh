@@ -719,8 +719,8 @@ void FEGenericBase<OutputType>::compute_shape_functions (const Elem * elem,
 template <typename OutputType>
 void FEGenericBase<OutputType>::print_phi(std::ostream & os) const
 {
-  for (unsigned int i=0; i<phi.size(); ++i)
-    for (unsigned int j=0; j<phi[i].size(); ++j)
+  for (std::size_t i=0; i<phi.size(); ++i)
+    for (std::size_t j=0; j<phi[i].size(); ++j)
       os << " phi[" << i << "][" << j << "]=" << phi[i][j] << std::endl;
 }
 
@@ -730,8 +730,8 @@ void FEGenericBase<OutputType>::print_phi(std::ostream & os) const
 template <typename OutputType>
 void FEGenericBase<OutputType>::print_dphi(std::ostream & os) const
 {
-  for (unsigned int i=0; i<dphi.size(); ++i)
-    for (unsigned int j=0; j<dphi[i].size(); ++j)
+  for (std::size_t i=0; i<dphi.size(); ++i)
+    for (std::size_t j=0; j<dphi[i].size(); ++j)
       os << " dphi[" << i << "][" << j << "]=" << dphi[i][j];
 }
 
@@ -788,8 +788,8 @@ void FEGenericBase<OutputType>::determine_calculations()
 template <typename OutputType>
 void FEGenericBase<OutputType>::print_d2phi(std::ostream & os) const
 {
-  for (unsigned int i=0; i<dphi.size(); ++i)
-    for (unsigned int j=0; j<dphi[i].size(); ++j)
+  for (std::size_t i=0; i<dphi.size(); ++i)
+    for (std::size_t j=0; j<dphi[i].size(); ++j)
       os << " d2phi[" << i << "][" << j << "]=" << d2phi[i][j];
 }
 
@@ -951,8 +951,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
         // Some edge dofs are on nodes and already
         // fixed, others are free to calculate
         unsigned int free_dofs = 0;
-        for (unsigned int i=0; i !=
-               new_side_dofs.size(); ++i)
+        for (std::size_t i=0; i != new_side_dofs.size(); ++i)
           if (!dof_is_fixed[new_side_dofs[i]])
             free_dof[free_dofs++] = i;
         Ke.resize (free_dofs, free_dofs); Ke.zero();
@@ -1022,17 +1021,13 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
                   }
 
                 // Form edge projection matrix
-                for (unsigned int sidei=0, freei=0;
-                     sidei != new_side_dofs.size();
-                     ++sidei)
+                for (std::size_t sidei=0, freei=0; sidei != new_side_dofs.size(); ++sidei)
                   {
                     unsigned int i = new_side_dofs[sidei];
                     // fixed DoFs aren't test functions
                     if (dof_is_fixed[i])
                       continue;
-                    for (unsigned int sidej=0, freej=0;
-                         sidej != new_side_dofs.size();
-                         ++sidej)
+                    for (std::size_t sidej=0, freej=0; sidej != new_side_dofs.size(); ++sidej)
                       {
                         unsigned int j =
                           new_side_dofs[sidej];
@@ -1094,8 +1089,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
         // Some side dofs are on nodes/edges and already
         // fixed, others are free to calculate
         unsigned int free_dofs = 0;
-        for (unsigned int i=0; i !=
-               new_side_dofs.size(); ++i)
+        for (std::size_t i=0; i != new_side_dofs.size(); ++i)
           if (!dof_is_fixed[new_side_dofs[i]])
             free_dof[free_dofs++] = i;
         Ke.resize (free_dofs, free_dofs); Ke.zero();
@@ -1165,17 +1159,13 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
                   }
 
                 // Form side projection matrix
-                for (unsigned int sidei=0, freei=0;
-                     sidei != new_side_dofs.size();
-                     ++sidei)
+                for (std::size_t sidei=0, freei=0; sidei != new_side_dofs.size(); ++sidei)
                   {
                     unsigned int i = new_side_dofs[sidei];
                     // fixed DoFs aren't test functions
                     if (dof_is_fixed[i])
                       continue;
-                    for (unsigned int sidej=0, freej=0;
-                         sidej != new_side_dofs.size();
-                         ++sidej)
+                    for (std::size_t sidej=0, freej=0; sidej != new_side_dofs.size(); ++sidej)
                       {
                         unsigned int j =
                           new_side_dofs[sidej];
@@ -1814,7 +1804,7 @@ compute_periodic_constraints (DofConstraints & constraints,
                   // Translate the quadrature points over to the
                   // neighbor's boundary
                   std::vector<Point> neigh_point(q_point.size());
-                  for (unsigned int i=0; i != neigh_point.size(); ++i)
+                  for (std::size_t i=0; i != neigh_point.size(); ++i)
                     neigh_point[i] = periodic->get_corresponding_pos(q_point[i]);
 
                   FEInterface::inverse_map (Dim, base_fe_type, neigh,

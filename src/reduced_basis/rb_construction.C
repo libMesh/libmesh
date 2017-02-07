@@ -98,20 +98,20 @@ void RBConstruction::clear()
 
   Parent::clear();
 
-  for(unsigned int q=0; q<Aq_vector.size(); q++)
+  for (std::size_t q=0; q<Aq_vector.size(); q++)
     {
       delete Aq_vector[q];
       Aq_vector[q] = libmesh_nullptr;
     }
 
-  for(unsigned int q=0; q<Fq_vector.size(); q++)
+  for (std::size_t q=0; q<Fq_vector.size(); q++)
     {
       delete Fq_vector[q];
       Fq_vector[q] = libmesh_nullptr;
     }
 
-  for(unsigned int i=0; i<outputs_vector.size(); i++)
-    for(unsigned int q_l=0; q_l<outputs_vector[i].size(); q_l++)
+  for (std::size_t i=0; i<outputs_vector.size(); i++)
+    for (std::size_t q_l=0; q_l<outputs_vector[i].size(); q_l++)
       {
         delete outputs_vector[i][q_l];
         outputs_vector[i][q_l] = libmesh_nullptr;
@@ -119,20 +119,20 @@ void RBConstruction::clear()
 
   if(store_non_dirichlet_operators)
     {
-      for(unsigned int q=0; q<non_dirichlet_Aq_vector.size(); q++)
+      for (std::size_t q=0; q<non_dirichlet_Aq_vector.size(); q++)
         {
           delete non_dirichlet_Aq_vector[q];
           non_dirichlet_Aq_vector[q] = libmesh_nullptr;
         }
 
-      for(unsigned int q=0; q<non_dirichlet_Fq_vector.size(); q++)
+      for (std::size_t q=0; q<non_dirichlet_Fq_vector.size(); q++)
         {
           delete non_dirichlet_Fq_vector[q];
           non_dirichlet_Fq_vector[q] = libmesh_nullptr;
         }
 
-      for(unsigned int i=0; i<non_dirichlet_outputs_vector.size(); i++)
-        for(unsigned int q_l=0; q_l<non_dirichlet_outputs_vector[i].size(); q_l++)
+      for (std::size_t i=0; i<non_dirichlet_outputs_vector.size(); i++)
+        for (std::size_t q_l=0; q_l<non_dirichlet_outputs_vector[i].size(); q_l++)
           {
             delete non_dirichlet_outputs_vector[i][q_l];
             non_dirichlet_outputs_vector[i][q_l] = libmesh_nullptr;
@@ -140,7 +140,7 @@ void RBConstruction::clear()
     }
 
   // Also delete the Fq representors
-  for(unsigned int q_f=0; q_f<Fq_representor.size(); q_f++)
+  for (std::size_t q_f=0; q_f<Fq_representor.size(); q_f++)
     {
       delete Fq_representor[q_f];
       Fq_representor[q_f] = libmesh_nullptr;
@@ -268,10 +268,8 @@ void RBConstruction::process_parameters_file (const std::string & parameters_fil
 
       unsigned int n_vals_for_param = infile.vector_variable_size(param_name);
       std::vector<Real> vals_for_param(n_vals_for_param);
-      for(unsigned int j=0; j<vals_for_param.size(); j++)
-        {
-          vals_for_param[j] = infile(param_name, 0., j);
-        }
+      for (std::size_t j=0; j<vals_for_param.size(); j++)
+        vals_for_param[j] = infile(param_name, 0., j);
 
       discrete_parameter_values_in[param_name] = vals_for_param;
     }
@@ -631,7 +629,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
       // Get the list of nodes with boundary IDs
       mesh.get_boundary_info().build_node_list(node_id_list, bc_id_list);
 
-      for (unsigned int i=0; i<node_id_list.size(); i++)
+      for (std::size_t i=0; i<node_id_list.size(); i++)
         {
           const Node & node = mesh.node_ref(node_id_list[i]);
 
@@ -1013,10 +1011,9 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
     }
 
   // Clear the Greedy param list
-  for(unsigned int i=0; i<get_rb_evaluation().greedy_param_list.size(); i++)
-    {
-      get_rb_evaluation().greedy_param_list[i].clear();
-    }
+  for (std::size_t i=0; i<get_rb_evaluation().greedy_param_list.size(); i++)
+    get_rb_evaluation().greedy_param_list[i].clear();
+
   get_rb_evaluation().greedy_param_list.clear();
 
   Real training_greedy_error;
@@ -1116,7 +1113,7 @@ bool RBConstruction::greedy_termination_test(Real abs_greedy_error,
 
   if(exit_on_repeated_greedy_parameters)
     {
-      for(unsigned int i=0; i<get_rb_evaluation().greedy_param_list.size(); i++)
+      for (std::size_t i=0; i<get_rb_evaluation().greedy_param_list.size(); i++)
         {
           RBParameters & previous_parameters = get_rb_evaluation().greedy_param_list[i];
           if(previous_parameters == get_parameters())
@@ -1724,10 +1721,8 @@ void RBConstruction::load_rb_solution()
                       << " RB_solution vector constains " << get_rb_evaluation().RB_solution.size() << " entries." \
                       << " RB_solution in RBConstruction::load_rb_solution is too long!");
 
-  for(unsigned int i=0; i<get_rb_evaluation().RB_solution.size(); i++)
-    {
-      solution->add(get_rb_evaluation().RB_solution(i), get_rb_evaluation().get_basis_function(i));
-    }
+  for (std::size_t i=0; i<get_rb_evaluation().RB_solution.size(); i++)
+    solution->add(get_rb_evaluation().RB_solution(i), get_rb_evaluation().get_basis_function(i));
 
   update();
 }
@@ -1934,7 +1929,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string & riesz
     if ( mkdir(riesz_representors_dir.c_str(), 0755) != 0)
       libMesh::out << "Skipping creating residual_representors directory: " << strerror(errno) << std::endl;
 
-  for (unsigned int i=0; i<Fq_representor.size(); ++i)
+  for (std::size_t i=0; i<Fq_representor.size(); ++i)
     {
       if (Fq_representor[i] != libmesh_nullptr)
         {
@@ -1987,7 +1982,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string & riesz
 
   const unsigned int jstop  = get_rb_evaluation().get_n_basis_functions();
   const unsigned int jstart = jstop-get_delta_N();
-  for (unsigned int i=0; i<get_rb_evaluation().Aq_representor.size(); ++i)
+  for (std::size_t i=0; i<get_rb_evaluation().Aq_representor.size(); ++i)
     for (unsigned int j=jstart; j<jstop; ++j)
       {
         libMesh::out << "Writing out Aq_representor[" << i << "][" << j << "]..." << std::endl;
@@ -2034,13 +2029,13 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
 
   // Read in the Fq_representors.  There should be Q_f of these.  FIXME:
   // should we be worried about leaks here?
-  for (unsigned int i=0; i<Fq_representor.size(); ++i)
+  for (std::size_t i=0; i<Fq_representor.size(); ++i)
     {
       if (Fq_representor[i] != libmesh_nullptr)
         libmesh_error_msg("Error, must delete existing Fq_representor before reading in from file.");
     }
 
-  for (unsigned int i=0; i<Fq_representor.size(); i++)
+  for (std::size_t i=0; i<Fq_representor.size(); i++)
     {
       file_name.str(""); // reset filename
       file_name << riesz_representors_dir
@@ -2078,15 +2073,15 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
   // Read in the Aq representors.  The class makes room for [Q_a][Nmax] of these.  We are going to
   // read in [Q_a][get_rb_evaluation().get_n_basis_functions()].  FIXME:
   // should we be worried about leaks in the locations where we're about to fill entries?
-  for (unsigned int i=0; i<get_rb_evaluation().Aq_representor.size(); ++i)
-    for (unsigned int j=0; j<get_rb_evaluation().Aq_representor[i].size(); ++j)
+  for (std::size_t i=0; i<get_rb_evaluation().Aq_representor.size(); ++i)
+    for (std::size_t j=0; j<get_rb_evaluation().Aq_representor[i].size(); ++j)
       {
         if (get_rb_evaluation().Aq_representor[i][j] != libmesh_nullptr)
           libmesh_error_msg("Error, must delete existing Aq_representor before reading in from file.");
       }
 
   // Now ready to read them in from file!
-  for (unsigned int i=0; i<get_rb_evaluation().Aq_representor.size(); ++i)
+  for (std::size_t i=0; i<get_rb_evaluation().Aq_representor.size(); ++i)
     for (unsigned int j=0; j<get_rb_evaluation().get_n_basis_functions(); ++j)
       {
         file_name.str(""); // reset filename

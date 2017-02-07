@@ -138,10 +138,8 @@ void RBSCMConstruction::process_parameters_file(const std::string & parameters_f
 
       unsigned int n_vals_for_param = infile.vector_variable_size(param_name);
       std::vector<Real> vals_for_param(n_vals_for_param);
-      for(unsigned int j=0; j<vals_for_param.size(); j++)
-        {
-          vals_for_param[j] = infile(param_name, 0., j);
-        }
+      for (std::size_t j=0; j<vals_for_param.size(); j++)
+        vals_for_param[j] = infile(param_name, 0., j);
 
       discrete_parameter_values_in[param_name] = vals_for_param;
     }
@@ -203,7 +201,7 @@ void RBSCMConstruction::resize_SCM_vectors()
   rb_scm_eval->B_max.clear();
   rb_scm_eval->C_J.clear();
   rb_scm_eval->C_J_stability_vector.clear();
-  for(unsigned int i=0; i<rb_scm_eval->SCM_UB_vectors.size(); i++)
+  for (std::size_t i=0; i<rb_scm_eval->SCM_UB_vectors.size(); i++)
     rb_scm_eval->SCM_UB_vectors[i].clear();
   rb_scm_eval->SCM_UB_vectors.clear();
 

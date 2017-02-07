@@ -341,7 +341,7 @@ ParsedFEMFunction<Output>::reparse (const std::string & expression)
   unsigned int offset = LIBMESH_DIM + 1 + _n_requested_vars +
     _n_requested_grad_components + _n_requested_hess_components;
 
-  for (unsigned int i=0; i < _additional_vars.size(); ++i)
+  for (std::size_t i=0; i < _additional_vars.size(); ++i)
     {
       variables += "," + _additional_vars[i];
       // Initialize extra variables to the vector passed in or zero
@@ -453,7 +453,7 @@ ParsedFEMFunction<Output>::get_inline_value(const std::string & inline_var_name)
 #endif
   Output old_var_value(0.);
 
-  for (unsigned int s=0; s != _subexpressions.size(); ++s)
+  for (std::size_t s=0; s != _subexpressions.size(); ++s)
     {
       const std::string & subexpression = _subexpressions[s];
       const std::size_t varname_i =
@@ -526,7 +526,7 @@ ParsedFEMFunction<Output>::set_inline_value (const std::string & inline_var_name
 #ifndef NDEBUG
   bool found_var_name = false;
 #endif
-  for (unsigned int s=0; s != _subexpressions.size(); ++s)
+  for (std::size_t s=0; s != _subexpressions.size(); ++s)
     {
       const std::string & subexpression = _subexpressions[s];
       const std::size_t varname_i =
@@ -570,7 +570,7 @@ ParsedFEMFunction<Output>::set_inline_value (const std::string & inline_var_name
 
   std::string new_expression;
 
-  for (unsigned int s=0; s != _subexpressions.size(); ++s)
+  for (std::size_t s=0; s != _subexpressions.size(); ++s)
     {
       new_expression += '{';
       new_expression += _subexpressions[s];
@@ -773,7 +773,7 @@ ParsedFEMFunction<Output>::eval_args (const FEMContext & c,
 #ifndef NDEBUG
       bool at_quadrature_point = false;
 #endif
-      for (unsigned int qp = 0; qp != normals.size(); ++qp)
+      for (std::size_t qp = 0; qp != normals.size(); ++qp)
         {
           if (p == xyz[qp])
             {
@@ -817,7 +817,7 @@ ParsedFEMFunction<Output>::eval (FunctionParserBase<Output> & parser,
                    << " of expression '"
                    << function_name
                    << "' with arguments:\n";
-      for (unsigned int j=0; j<_spacetime.size(); ++j)
+      for (std::size_t j=0; j<_spacetime.size(); ++j)
         libMesh::err << '\t' << _spacetime[j] << '\n';
       libMesh::err << '\n';
 

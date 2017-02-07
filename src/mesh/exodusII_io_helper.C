@@ -840,7 +840,7 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
   this->read_var_names(NODAL);
 
   // See if we can find the variable we are looking for
-  unsigned int var_index = 0;
+  std::size_t var_index = 0;
   bool found = false;
 
   // Do a linear search for nodal_var_name in nodal_var_names
@@ -854,7 +854,7 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
   if (!found)
     {
       libMesh::err << "Available variables: " << std::endl;
-      for (unsigned int i=0; i<nodal_var_names.size(); ++i)
+      for (std::size_t i=0; i<nodal_var_names.size(); ++i)
         libMesh::err << nodal_var_names[i] << std::endl;
 
       libmesh_error_msg("Unable to locate variable named: " << nodal_var_name);
@@ -968,13 +968,13 @@ void ExodusII_IO_Helper::write_var_names_impl(const char * var_type, int & count
       NamesData names_table(names.size(), MAX_STR_LENGTH);
 
       // Store the input names in the format required by Exodus.
-      for (unsigned i=0; i<names.size(); ++i)
+      for (std::size_t i=0; i<names.size(); ++i)
         names_table.push_back_entry(names[i]);
 
       if (verbose)
         {
           libMesh::out << "Writing variable name(s) to file: " << std::endl;
-          for (unsigned i=0; i<names.size(); ++i)
+          for (std::size_t i=0; i<names.size(); ++i)
             libMesh::out << names_table.get_char_star(i) << std::endl;
         }
 
@@ -997,7 +997,7 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
   this->read_var_names(ELEMENTAL);
 
   // See if we can find the variable we are looking for
-  unsigned var_index = 0;
+  std::size_t var_index = 0;
   bool found = false;
 
   // Do a linear search for nodal_var_name in nodal_var_names
@@ -1011,7 +1011,7 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
   if (!found)
     {
       libMesh::err << "Available variables: " << std::endl;
-      for (unsigned i=0; i<elem_var_names.size(); ++i)
+      for (std::size_t i=0; i<elem_var_names.size(); ++i)
         libMesh::err << elem_var_names[i] << std::endl;
 
       libmesh_error_msg("Unable to locate variable named: " << elemental_var_name);
@@ -1139,10 +1139,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
     // treats these the same way.
     std::vector<boundary_id_type> shellface_boundaries;
     mesh.get_boundary_info().build_shellface_boundary_ids(shellface_boundaries);
-    for(unsigned int i=0; i<shellface_boundaries.size(); i++)
-      {
-        unique_side_boundaries.push_back(shellface_boundaries[i]);
-      }
+    for (std::size_t i=0; i<shellface_boundaries.size(); i++)
+      unique_side_boundaries.push_back(shellface_boundaries[i]);
   }
   mesh.get_boundary_info().build_node_boundary_ids(unique_node_boundaries);
 
@@ -1388,7 +1386,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
       connect.resize(tmp_vec.size()*num_nodes_per_elem);
 
-      for (unsigned int i=0; i<tmp_vec.size(); i++)
+      for (std::size_t i=0; i<tmp_vec.size(); i++)
         {
           unsigned int elem_id = tmp_vec[i];
           libmesh_elem_num_to_exodus[elem_id] = ++libmesh_elem_num_to_exodus_counter; // 1-based indexing for Exodus
@@ -1510,7 +1508,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
     mesh.get_boundary_info().build_side_list(el, sl, il);
 
     // Accumulate the vectors to pass into ex_put_side_set
-    for (unsigned int i=0; i<el.size(); i++)
+    for (std::size_t i=0; i<el.size(); i++)
       {
         std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
@@ -1523,7 +1521,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
         family.push_back(mesh.elem_ptr(el[i]));
 #endif
 
-        for (unsigned int j=0; j<family.size(); ++j)
+        for (std::size_t j=0; j<family.size(); ++j)
           {
             const ExodusII_IO_Helper::Conversion conv =
               em.assign_conversion(mesh.elem_ptr(family[j]->id())->type());
@@ -1548,7 +1546,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
     mesh.get_boundary_info().build_shellface_list(el, sl, il);
 
     // Accumulate the vectors to pass into ex_put_side_set
-    for (unsigned int i=0; i<el.size(); i++)
+    for (std::size_t i=0; i<el.size(); i++)
       {
         std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
@@ -1561,7 +1559,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
         family.push_back(mesh.elem_ptr(el[i]));
 #endif
 
-        for (unsigned int j=0; j<family.size(); ++j)
+        for (std::size_t j=0; j<family.size(); ++j)
           {
             const ExodusII_IO_Helper::Conversion conv =
               em.assign_conversion(mesh.elem_ptr(family[j]->id())->type());
@@ -1575,10 +1573,8 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
     std::vector<boundary_id_type> shellface_boundary_ids;
     mesh.get_boundary_info().build_shellface_boundary_ids(shellface_boundary_ids);
-    for(unsigned int i=0; i<shellface_boundary_ids.size(); i++)
-      {
-        side_boundary_ids.push_back(shellface_boundary_ids[i]);
-      }
+    for (std::size_t i=0; i<shellface_boundary_ids.size(); i++)
+      side_boundary_ids.push_back(shellface_boundary_ids[i]);
   }
 
   // Write out the sideset names, but only if there is something to write
@@ -1586,7 +1582,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
     {
       NamesData names_table(side_boundary_ids.size(), MAX_STR_LENGTH);
 
-      for (unsigned int i=0; i<side_boundary_ids.size(); i++)
+      for (std::size_t i=0; i<side_boundary_ids.size(); i++)
         {
           boundary_id_type ss_id = side_boundary_ids[i];
           int actual_id = ss_id;
@@ -1621,7 +1617,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
   std::map<boundary_id_type, std::vector<int> > node;
 
   // Accumulate the vectors to pass into ex_put_node_set
-  for (unsigned int i=0; i<nl.size(); i++)
+  for (std::size_t i=0; i<nl.size(); i++)
     node[il[i]].push_back(nl[i]+1);
 
   std::vector<boundary_id_type> node_boundary_ids;
@@ -1632,7 +1628,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
     {
       NamesData names_table(node_boundary_ids.size(), MAX_STR_LENGTH);
 
-      for (unsigned int i=0; i<node_boundary_ids.size(); i++)
+      for (std::size_t i=0; i<node_boundary_ids.size(); i++)
         {
           boundary_id_type nodeset_id = node_boundary_ids[i];
 
@@ -1772,11 +1768,11 @@ void ExodusII_IO_Helper::check_existing_vars(ExodusVarType type,
   if (names_from_file != names)
     {
       libMesh::err << "Error! The Exodus file already contains the variables:" << std::endl;
-      for (unsigned i=0; i<names_from_file.size(); ++i)
+      for (std::size_t i=0; i<names_from_file.size(); ++i)
         libMesh::out << names_from_file[i] << std::endl;
 
       libMesh::err << "And you asked to write:" << std::endl;
-      for (unsigned i=0; i<names.size(); ++i)
+      for (std::size_t i=0; i<names.size(); ++i)
         libMesh::out << names[i] << std::endl;
 
       libmesh_error_msg("Cannot overwrite existing variables in Exodus II file.");
@@ -1922,7 +1918,7 @@ void ExodusII_IO_Helper::write_information_records(const std::vector<std::string
 
       // If an entry is longer than MAX_LINE_LENGTH characters it's not an error, we just
       // write the first MAX_LINE_LENGTH characters to the file.
-      for (unsigned i=0; i<records.size(); ++i)
+      for (std::size_t i=0; i<records.size(); ++i)
         info.push_back_entry(records[i]);
 
       ex_err = exII::ex_put_info(ex_id, num_records, info.get_char_star_star());

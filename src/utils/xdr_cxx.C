@@ -634,7 +634,7 @@ void Xdr::do_read(std::vector<T> & a)
   data(length, "# vector length");
   a.resize(length);
 
-  for (unsigned int i=0; i<a.size(); i++)
+  for (std::size_t i=0; i<a.size(); i++)
     {
       libmesh_assert(in.get());
       libmesh_assert (in->good());
@@ -650,7 +650,7 @@ void Xdr::do_read(std::vector<std::complex<T> > & a)
   data(length, "# vector length x 2 (complex)");
   a.resize(length);
 
-  for (unsigned int i=0; i<a.size(); i++)
+  for (std::size_t i=0; i<a.size(); i++)
     {
       T r, im;
       libmesh_assert(in.get());

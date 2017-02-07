@@ -807,7 +807,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
 
         // Fill the requests
         global_ids.clear(); /**/ global_ids.reserve(request_to_fill.size());
-        for (unsigned int idx=0; idx<request_to_fill.size(); idx++)
+        for (std::size_t idx=0; idx<request_to_fill.size(); idx++)
           {
             const Parallel::DofObjectKey & hilbert_indices = request_to_fill[idx];
             libmesh_assert_less_equal (hilbert_indices, upper_bounds[communicator.rank()]);

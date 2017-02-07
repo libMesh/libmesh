@@ -677,10 +677,8 @@ void add_rb_scm_evaluation_data_to_builder(RBSCMEvaluation & rb_scm_eval,
     if (rb_scm_eval.B_min.size() != rb_scm_eval.get_rb_theta_expansion().get_n_A_terms())
       libmesh_error_msg("Size error while writing B_min");
     auto b_min_list = rb_scm_eval_builder.initBMin( rb_scm_eval.B_min.size() );
-    for(unsigned int i=0; i<rb_scm_eval.B_min.size(); i++)
-      {
-        b_min_list.set(i, rb_scm_eval.get_B_min(i));
-      }
+    for (std::size_t i=0; i<rb_scm_eval.B_min.size(); i++)
+      b_min_list.set(i, rb_scm_eval.get_B_min(i));
   }
 
   {
@@ -688,26 +686,22 @@ void add_rb_scm_evaluation_data_to_builder(RBSCMEvaluation & rb_scm_eval,
       libmesh_error_msg("Size error while writing B_max");
 
     auto b_max_list = rb_scm_eval_builder.initBMax( rb_scm_eval.B_max.size() );
-    for(unsigned int i=0; i<rb_scm_eval.B_max.size(); i++)
-      {
-        b_max_list.set(i, rb_scm_eval.get_B_max(i));
-      }
+    for (std::size_t i=0; i<rb_scm_eval.B_max.size(); i++)
+      b_max_list.set(i, rb_scm_eval.get_B_max(i));
   }
 
   {
     auto cj_stability_vector =
       rb_scm_eval_builder.initCJStabilityVector( rb_scm_eval.C_J_stability_vector.size() );
-    for(unsigned int i=0; i<rb_scm_eval.C_J_stability_vector.size(); i++)
-      {
-        cj_stability_vector.set(i, rb_scm_eval.get_C_J_stability_constraint(i));
-      }
+    for (std::size_t i=0; i<rb_scm_eval.C_J_stability_vector.size(); i++)
+      cj_stability_vector.set(i, rb_scm_eval.get_C_J_stability_constraint(i));
   }
 
   {
     auto cj_parameters_outer =
       rb_scm_eval_builder.initCJ( rb_scm_eval.C_J.size() );
 
-    for(unsigned int i=0; i<rb_scm_eval.C_J.size(); i++)
+    for (std::size_t i=0; i<rb_scm_eval.C_J.size(); i++)
       {
         auto cj_parameters_inner =
           cj_parameters_outer.init(i, rb_scm_eval.C_J[i].n_parameters());

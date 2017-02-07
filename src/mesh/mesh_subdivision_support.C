@@ -121,7 +121,7 @@ void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
             {
               mesh.get_boundary_info().boundary_ids(elem, side, ids);
 
-              for (unsigned id=0; id<ids.size(); ++id)
+              for (std::size_t id=0; id<ids.size(); ++id)
                 {
                   // add the boundary id to the list of new boundary ids
                   new_boundary_ids.push_back(ids[id]);
@@ -150,7 +150,7 @@ void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
       libmesh_assert_equal_to(new_boundary_sides.size(), new_boundary_ids.size());
 
       // Add the new boundary info to the mesh.
-      for (unsigned int s = 0; s < new_boundary_elements.size(); ++s)
+      for (std::size_t s = 0; s < new_boundary_elements.size(); ++s)
         mesh.get_boundary_info().add_side(new_boundary_elements[s],
                                           new_boundary_sides[s],
                                           new_boundary_ids[s]);
@@ -281,7 +281,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                   // which would then lead to a zero size ghost
                   // element below.
                   Node * node = libmesh_nullptr;
-                  for (unsigned int j = 0; j < ghost_nodes.size(); ++j)
+                  for (std::size_t j = 0; j < ghost_nodes.size(); ++j)
                     {
                       if ((*ghost_nodes[j] - point).norm() < tol * (elem->point(k) - point).norm())
                         {
@@ -353,7 +353,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
               // two mirrored ghost vertices coincide, which would
               // then lead to a zero size ghost element below.
               Node * node = libmesh_nullptr;
-              for (unsigned int j = 0; j < ghost_nodes.size(); ++j)
+              for (std::size_t j = 0; j < ghost_nodes.size(); ++j)
                 {
                   if ((*ghost_nodes[j] - point).norm() < tol * (elem->point(i) - point).norm())
                     {
@@ -437,7 +437,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                   // This is necessary because for some triangulations, it can happen that two mirrored
                   // ghost vertices coincide, which would then lead to a zero size ghost element below.
                   Node * node = libmesh_nullptr;
-                  for (unsigned int k = 0; k < ghost_nodes.size(); ++k)
+                  for (std::size_t k = 0; k < ghost_nodes.size(); ++k)
                     {
                       if ((*ghost_nodes[k] - point).norm() < tol * (nb2->point(j) - point).norm())
                         {
