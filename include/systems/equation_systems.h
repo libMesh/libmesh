@@ -454,6 +454,24 @@ public:
    **/
   void allgather ();
 
+  /**
+   * Calls to reinit() will also do two-step coarsen-then-refine
+   **/
+  void enable_refine_in_reinit()
+    { this->_refine_in_reinit = true; }
+
+  /**
+   * Calls to reinit() will not try to coarsen or refine the mesh
+   **/
+  void disable_refine_in_reinit()
+    { this->_refine_in_reinit = false; }
+
+  /**
+   * @returns whether or not calls to reinit() will try to coarsen/refine the mesh
+   **/
+  bool refine_in_reinit_flag()
+    { return this->_refine_in_reinit; }
+
 
   /**
    * Data structure holding arbitrary parameters.
@@ -489,6 +507,12 @@ protected:
    * Typedef for constatnt system iterators
    */
   typedef std::map<std::string, System *>::const_iterator const_system_iterator;
+
+  /**
+   * Flag for whether to call coarsen/refine in reinit().
+   * Default value: true
+   */
+  bool _refine_in_reinit;
 
 private:
 
