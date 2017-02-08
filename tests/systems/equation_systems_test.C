@@ -9,6 +9,7 @@
 #include <libmesh/mesh_generation.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/elem.h>
+#include <libmesh/mesh_refinement.h>
 
 #include "test_comm.h"
 
@@ -33,6 +34,7 @@ public:
   CPPUNIT_TEST( testInit );
   CPPUNIT_TEST( testPostInitAddSystem );
   CPPUNIT_TEST( testPostInitAddElem );
+  CPPUNIT_TEST( testRefineThenReinitPreserveFlags );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -113,6 +115,27 @@ public:
     mesh.prepare_for_use();
 
     es.reinit();
+  }
+
+  void testRefineThenReinitPreserveFlags()
+  {
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+    System & sys = es.add_system<System> ("SimpleSystem");
+    sys.add_variable("u", FIRST);
+    MeshTools::Generation::build_square(mesh,2,1);
+    es.init();
+    mesh.elem(0)->set_refinement_flag(Elem::RefinementState::REFINE);
+    MeshRefinement mr(mesh);
+    mr.refine_elements();
+    es.disable_refine_in_reinit();
+    es.reinit();
+
+    CPPUNIT_ASSERT_EQUAL( Elem::RefinementState::INACTIVE,mesh.elem(0)->refinement_flag() );
+    CPPUNIT_ASSERT( mesh.elem(1)->active() );
+
+    for (unsigned int c=0; c<mesh.elem(0)->n_children(); c++)
+      CPPUNIT_ASSERT_EQUAL( Elem::RefinementState::JUST_REFINED, mesh.elem(0)->child(c)->refinement_flag() );
   }
 
 
