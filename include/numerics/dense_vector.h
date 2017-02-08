@@ -26,6 +26,10 @@
 #include "libmesh/dense_vector_base.h"
 #include "libmesh/tensor_tools.h"
 
+#ifdef LIBMESH_HAVE_EIGEN
+#include <Eigen/Dense>
+#endif
+
 // C++ includes
 #include <vector>
 
@@ -253,6 +257,23 @@ private:
    */
   std::vector<T> _val;
 
+  /**
+   * The original inline l1_norm implementation, we fall back on this
+   * when Eigen is not available.
+   */
+  Real l1_norm_fallback () const;
+
+  /**
+   * The original inline l2_norm implementation, we fall back on this
+   * when Eigen is not available.
+   */
+  Real l2_norm_fallback () const;
+
+  /**
+   * The original inline linfty_norm implementation, we fall back on this
+   * when Eigen is not available.
+   */
+  Real linfty_norm_fallback () const;
 };
 
 
@@ -545,7 +566,7 @@ Real DenseVector<T>::max () const
 
 template<typename T>
 inline
-Real DenseVector<T>::l1_norm () const
+Real DenseVector<T>::l1_norm_fallback () const
 {
   Real my_norm = 0.;
   for (unsigned int i=0; i!=this->size(); i++)
@@ -557,9 +578,35 @@ Real DenseVector<T>::l1_norm () const
 
 
 
+template<>
+inline
+Real DenseVector<Real>::l1_norm () const
+{
+#if defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_DEFAULT_DOUBLE_PRECISION)
+  return Eigen::Map<const Eigen::VectorXd>(&_val[0], _val.size()).lpNorm<1>();
+#else
+  return this->l1_norm_fallback<Real>();
+#endif
+}
+
+
+
+template<>
+inline
+Real DenseVector<Complex>::l1_norm () const
+{
+#if defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_DEFAULT_DOUBLE_PRECISION)
+  return Eigen::Map<const Eigen::VectorXcd>(&_val[0], _val.size()).lpNorm<1>();
+#else
+  return this->l1_norm_fallback<Complex>();
+#endif
+}
+
+
+
 template<typename T>
 inline
-Real DenseVector<T>::l2_norm () const
+Real DenseVector<T>::l2_norm_fallback () const
 {
   Real my_norm = 0.;
   for (unsigned int i=0; i!=this->size(); i++)
@@ -571,9 +618,35 @@ Real DenseVector<T>::l2_norm () const
 
 
 
+template<>
+inline
+Real DenseVector<Real>::l2_norm () const
+{
+#if defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_DEFAULT_DOUBLE_PRECISION)
+  return Eigen::Map<const Eigen::VectorXd>(&_val[0], _val.size()).norm();
+#else
+  return this->l2_norm_fallback<Real>();
+#endif
+}
+
+
+
+template<>
+inline
+Real DenseVector<Complex>::l2_norm () const
+{
+#if defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_DEFAULT_DOUBLE_PRECISION)
+  return Eigen::Map<const Eigen::VectorXcd>(&_val[0], _val.size()).norm();
+#else
+  return this->l2_norm_fallback<Complex>();
+#endif
+}
+
+
+
 template<typename T>
 inline
-Real DenseVector<T>::linfty_norm () const
+Real DenseVector<T>::linfty_norm_fallback () const
 {
   if (!this->size())
     return 0.;
@@ -586,6 +659,34 @@ Real DenseVector<T>::linfty_norm () const
     }
   return sqrt(my_norm);
 }
+
+
+
+template<>
+inline
+Real DenseVector<Real>::linfty_norm () const
+{
+#if defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_DEFAULT_DOUBLE_PRECISION)
+  return Eigen::Map<const Eigen::VectorXd>(&_val[0], _val.size()).lpNorm<Eigen::Infinity>();
+#else
+  return this->linfty_norm_fallback<Real>();
+#endif
+}
+
+
+
+template<>
+inline
+Real DenseVector<Complex>::linfty_norm () const
+{
+#if defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_DEFAULT_DOUBLE_PRECISION)
+  return Eigen::Map<const Eigen::VectorXcd>(&_val[0], _val.size()).lpNorm<Eigen::Infinity>();
+#else
+  return this->linfty_norm_fallback<Complex>();
+#endif
+}
+
+
 
 template<typename T>
 inline
