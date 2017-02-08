@@ -1238,7 +1238,11 @@ void MeshCommunication::gather (const processor_id_type root_id, DistributedMesh
   mesh.find_neighbors(root_id == DofObject::invalid_processor_id ||
                       root_id == mesh.processor_id());
 
-  // All done!
+  // All done, but let's make sure it's done correctly
+
+#ifdef DEBUG
+  MeshTools::libmesh_assert_valid_boundary_ids(mesh);
+#endif
 }
 #endif // LIBMESH_HAVE_MPI
 
