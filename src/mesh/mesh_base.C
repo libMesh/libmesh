@@ -272,6 +272,7 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   _is_prepared = true;
 
 #if defined(DEBUG) && defined(LIBMESH_ENABLE_UNIQUE_ID)
+  MeshTools::libmesh_assert_valid_boundary_ids(*this);
   MeshTools::libmesh_assert_valid_unique_ids(*this);
 #endif
 }

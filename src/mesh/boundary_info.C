@@ -55,10 +55,17 @@ BoundaryInfo::BoundaryInfo(MeshBase & m) :
 
 BoundaryInfo & BoundaryInfo::operator=(const BoundaryInfo & other_boundary_info)
 {
+  // Overwrite any preexisting boundary info
+  this->clear();
+
   /**
-   * A quick note: We're going to attempt to pull _new_ pointers out of the mesh assigned to this boundary info.
-   * This will only work if the mesh assigned to this BoundaryInfo is the same mesh object as other_boundary_info
-   * _or_ was constructed in exactly the same way (or constructed as a copy).
+   * We're going to attempt to pull _new_ pointers out of the mesh
+   * assigned to this boundary info.
+   *
+   * This will only work if the mesh assigned to this BoundaryInfo is
+   * the same mesh object as other_boundary_info _or_ was constructed
+   * in exactly the same way (or constructed as a copy, or a refined
+   * copy without renumbering, etc.).
    */
 
   // Copy node boundary info
