@@ -59,6 +59,7 @@ EquationSystems::EquationSystems (MeshBase & m, MeshData * mesh_data) :
   // Set default parameters
   this->parameters.set<Real>        ("linear solver tolerance") = TOLERANCE * TOLERANCE;
   this->parameters.set<unsigned int>("linear solver maximum iterations") = 5000;
+  this->_refine_in_reinit = true; // default value
 }
 
 
@@ -230,52 +231,54 @@ void EquationSystems::reinit ()
     dof_constraints_created = true;
   }
 
-  // Don't override any user refinement settings
-  MeshRefinement mesh_refine(_mesh);
-  mesh_refine.face_level_mismatch_limit() = 0; // unlimited
-  mesh_refine.overrefined_boundary_limit() = -1; // unlimited
-  mesh_refine.underrefined_boundary_limit() = -1; // unlimited
-
-  // Try to coarsen the mesh, then restrict each system's vectors
-  // if necessary
-  if (mesh_refine.coarsen_elements())
+  if (this->_refine_in_reinit)
     {
-      for (unsigned int i=0; i != this->n_systems(); ++i)
+      // Don't override any user refinement settings
+      MeshRefinement mesh_refine(_mesh);
+      mesh_refine.face_level_mismatch_limit() = 0; // unlimited
+      mesh_refine.overrefined_boundary_limit() = -1; // unlimited
+      mesh_refine.underrefined_boundary_limit() = -1; // unlimited
+
+      // Try to coarsen the mesh, then restrict each system's vectors
+      // if necessary
+      if (mesh_refine.coarsen_elements())
         {
-          System & sys = this->get_system(i);
-          if (!dof_constraints_created)
+          for (unsigned int i=0; i != this->n_systems(); ++i)
             {
-              sys.get_dof_map().distribute_dofs(_mesh);
-              sys.reinit_constraints();
-
+              System & sys = this->get_system(i);
+              if (!dof_constraints_created)
+                {
+                  sys.get_dof_map().distribute_dofs(_mesh);
+                  sys.reinit_constraints();
+                }
+              sys.restrict_vectors();
             }
-          sys.restrict_vectors();
+          mesh_changed = true;
+          dof_constraints_created = true;
         }
-      mesh_changed = true;
-      dof_constraints_created = true;
-    }
 
-  // Once vectors are all restricted, we can delete
-  // children of coarsened elements
-  if (mesh_changed)
-    this->get_mesh().contract();
+      // Once vectors are all restricted, we can delete
+      // children of coarsened elements
+      if (mesh_changed)
+        this->get_mesh().contract();
 
-  // Try to refine the mesh, then prolong each system's vectors
-  // if necessary
-  if (mesh_refine.refine_elements())
-    {
-      for (unsigned int i=0; i != this->n_systems(); ++i)
+      // Try to refine the mesh, then prolong each system's vectors
+      // if necessary
+      if (mesh_refine.refine_elements())
         {
-          System & sys = this->get_system(i);
-          if (!dof_constraints_created)
+          for (unsigned int i=0; i != this->n_systems(); ++i)
             {
-              sys.get_dof_map().distribute_dofs(_mesh);
-              sys.reinit_constraints();
+              System & sys = this->get_system(i);
+              if (!dof_constraints_created)
+                {
+                  sys.get_dof_map().distribute_dofs(_mesh);
+                  sys.reinit_constraints();
+                }
+              sys.prolong_vectors();
             }
-          sys.prolong_vectors();
+          mesh_changed = true;
+          // dof_constraints_created = true;
         }
-      mesh_changed = true;
-      // dof_constraints_created = true;
     }
 
   // If the mesh has changed, systems will need to create new dof
