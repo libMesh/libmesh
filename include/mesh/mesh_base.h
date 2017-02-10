@@ -136,6 +136,13 @@ public:
   { return true; }
 
   /**
+   * @returns \p true if new elements and nodes can and should be
+   * created in synchronization on all processors, \p false otherwise
+   */
+  virtual bool is_replicated () const
+  { return true; }
+
+  /**
    * Gathers all elements and nodes of the mesh onto
    * every processor
    */

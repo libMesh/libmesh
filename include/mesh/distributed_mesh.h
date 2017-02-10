@@ -119,6 +119,13 @@ public:
   { return _is_serial; }
 
   /**
+   * @returns \p true if new elements and nodes can and should be
+   * created in synchronization on all processors, \p false otherwise
+   */
+  virtual bool is_replicated () const libmesh_override
+  { return false; }
+
+  /**
    * Verify id, processor_id, and if applicable unique_id consistency
    * of a parallel objects container.
    * Calls libmesh_assert() on each possible failure in that container.
