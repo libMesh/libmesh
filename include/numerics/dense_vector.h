@@ -27,7 +27,9 @@
 #include "libmesh/tensor_tools.h"
 
 #ifdef LIBMESH_HAVE_EIGEN
+#include "libmesh/ignore_warnings.h"
 #include <Eigen/Dense>
+#include "libmesh/restore_warnings.h"
 #endif
 
 // C++ includes

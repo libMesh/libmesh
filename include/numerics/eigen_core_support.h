@@ -40,13 +40,15 @@
 // #endif
 
 // Eigen uses deprecated std::binder1st/2nd classes, which GCC warns about.
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+// GCC 6.1 also warns about misleading indentation from if blocks in
+// Eigen.
+#include "libmesh/ignore_warnings.h"
 
 // Eigen includes
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
-#pragma GCC diagnostic warning "-Wdeprecated-declarations"
+#include "libmesh/restore_warnings.h"
 
 // #ifdef libMeshSaveMatType
 // #  define libMeshSaveMatType MatType
