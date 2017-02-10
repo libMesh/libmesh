@@ -1542,25 +1542,34 @@ bool MeshRefinement::_refine_elements ()
   // Iterate over the elements, looking for elements flagged for
   // refinement.
 
-  // If we are in serial, then we just do the refinement in the same
-  // order on every processor and everything stays in sync.
+  // If we are on a ReplicatedMesh, then we just do the refinement in
+  // the same order on every processor and everything stays in sync.
 
-  // If we are distributed, that's impossible.  In that case, we need
-  // to make sure that if we end up as the owner of a new node, which
-  // might happen if that node is attached to one of our own elements,
-  // then we have given it a legitimate node id and our own processor
-  // id.  We generate legitimate node ids and use our own processor id
-  // when we are refining our own elements but not when we refine
-  // others' elements.  Therefore we want to refine our own elements
-  // *first*, thereby generating all nodes which might belong to us,
-  // and then refine others' elements *after*, thereby generating
-  // nodes with temporary ids which we know we will discard.
+  // If we are on a DistributedMesh, that's impossible.
+  //
+  // If the mesh is distributed, we need to make sure that if we end
+  // up as the owner of a new node, which might happen if that node is
+  // attached to one of our own elements, then we have given it a
+  // legitimate node id and our own processor id.  We generate
+  // legitimate node ids and use our own processor id when we are
+  // refining our own elements but not when we refine others'
+  // elements.  Therefore we want to refine our own elements *first*,
+  // thereby generating all nodes which might belong to us, and then
+  // refine others' elements *after*, thereby generating nodes with
+  // temporary ids which we know we will discard.
+  //
+  // Even if the DistributedMesh is serialized, we can't just treat it
+  // like a ReplicatedMesh, because DistributedMesh doesn't *trust*
+  // users to refine partitioned elements in a serialized way, so it
+  // assigns temporary ids, so we need to synchronize ids afterward to
+  // be safe anyway, so we might as well use the distributed mesh code
+  // path.
   {
     MeshBase::element_iterator
       elem_it  = _mesh.active_local_elements_begin(),
       elem_end = _mesh.active_local_elements_end();
 
-    if (_mesh.is_serial())
+    if (_mesh.is_replicated())
       {
         elem_it  = _mesh.active_elements_begin();
         elem_end = _mesh.active_elements_end();
@@ -1581,7 +1590,7 @@ bool MeshRefinement::_refine_elements ()
       }
   }
 
-  if (!_mesh.is_serial())
+  if (!_mesh.is_replicated())
     {
       for (MeshBase::element_iterator
              elem_it = _mesh.active_not_local_elements_begin(),
@@ -1619,7 +1628,7 @@ bool MeshRefinement::_refine_elements ()
   if (mesh_changed)
     _mesh.update_parallel_id_counts();
 
-  if (mesh_changed && !_mesh.is_serial())
+  if (mesh_changed && !_mesh.is_replicated())
     {
       MeshCommunication().make_elems_parallel_consistent (_mesh);
       MeshCommunication().make_new_nodes_parallel_consistent (_mesh);
@@ -1628,7 +1637,7 @@ bool MeshRefinement::_refine_elements ()
 #endif
     }
 
-  if (mesh_p_changed && !_mesh.is_serial())
+  if (mesh_p_changed && !_mesh.is_replicated())
     {
       MeshCommunication().make_p_levels_parallel_consistent (_mesh);
     }
