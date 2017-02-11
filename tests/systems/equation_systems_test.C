@@ -4,12 +4,13 @@
 #include <cppunit/TestCase.h>
 #include <libmesh/restore_warnings.h>
 
+#include <libmesh/elem.h>
 #include <libmesh/equation_systems.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
-#include <libmesh/replicated_mesh.h>
-#include <libmesh/elem.h>
 #include <libmesh/mesh_refinement.h>
+#include <libmesh/remote_elem.h>
+#include <libmesh/replicated_mesh.h>
 
 #include "test_comm.h"
 
@@ -125,17 +126,29 @@ public:
     sys.add_variable("u", FIRST);
     MeshTools::Generation::build_square(mesh,2,1);
     es.init();
-    mesh.elem(0)->set_refinement_flag(Elem::RefinementState::REFINE);
+
+    Elem * to_refine = mesh.query_elem_ptr(0);
+    if (to_refine)
+      to_refine->set_refinement_flag(Elem::RefinementState::REFINE);
+
     MeshRefinement mr(mesh);
     mr.refine_elements();
     es.disable_refine_in_reinit();
     es.reinit();
 
-    CPPUNIT_ASSERT_EQUAL( Elem::RefinementState::INACTIVE,mesh.elem(0)->refinement_flag() );
+    if (mesh.query_elem_ptr(1))
     CPPUNIT_ASSERT( mesh.elem(1)->active() );
 
-    for (unsigned int c=0; c<mesh.elem(0)->n_children(); c++)
-      CPPUNIT_ASSERT_EQUAL( Elem::RefinementState::JUST_REFINED, mesh.elem(0)->child(c)->refinement_flag() );
+    const Elem * elem = mesh.query_elem_ptr(0);
+    if (elem)
+      {
+        CPPUNIT_ASSERT_EQUAL( Elem::RefinementState::INACTIVE,elem->refinement_flag() );
+
+        for (unsigned int c=0; c<elem->n_children(); c++)
+          if (elem->child(c) != remote_elem)
+            CPPUNIT_ASSERT_EQUAL(Elem::RefinementState::JUST_REFINED,
+                                 elem->child(c)->refinement_flag());
+      }
   }
 
 
