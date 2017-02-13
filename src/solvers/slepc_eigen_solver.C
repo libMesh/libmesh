@@ -834,6 +834,47 @@ void SlepcEigenSolver<T>::set_initial_space(NumericVector<T> & initial_space_in)
 }
 
 template <typename T>
+void SlepcEigenSolver<T>::set_spectral_transform(SpectralTransform spect_transform)
+{
+  // if not yet initialised, do it now:
+  this->init();
+
+  PetscErrorCode ierr = 0;
+
+  // setup a \p ST object
+  ST st;
+  STCreate(this->comm().get(), &st);
+
+  // Set it to the desired type of spectral transformation.
+  // The value of the respective shift is chosen to be the target
+  // specified via \p set_position_of_spectrum().
+  switch (spect_transform)
+    {
+    case SHIFT:
+      ierr = STSetType(st, STSHIFT);
+      break;
+    case INVERT:
+      ierr = STSetType(st, STSINVERT);
+      break;
+    case CAYLEY:
+#if SLEPC_VERSION_LESS_THAN(2,2,1)
+      libmesh_error_msg("SLEPc 2.2.1 is required to call CAYLEY transform.");
+      break;
+#else
+      ierr = STSetType(st, STCAYLEY);
+      break;
+#endif
+    default:
+      // print a warning but do nothing more.
+      break;
+    }
+
+  //tell the \p EPS object which \p ST to use
+  ierr = EPSSetST(_eps, st);
+  LIBMESH_CHKERR(ierr);
+}
+
+template <typename T>
 PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, Vec dest)
 {
   // Get the matrix context.

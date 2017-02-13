@@ -73,6 +73,17 @@ enum PositionOfSpectrum {LARGEST_MAGNITUDE=0,
                          TARGET_IMAGINARY,
 
                          INVALID_Postion_of_Spectrum};
+
+
+/**
+ * Defines an \p enum for spectral tronsformations
+ * applied before solving the (generalised) eigenproblem
+ */
+enum SpectralTransform {SHIFT=0,
+                        INVERT,
+                        CAYLEY,
+
+                        INVALID_ST};
 }
 
 #endif // LIBMESH_ENUM_EIGENSOLVER_TYPE_H

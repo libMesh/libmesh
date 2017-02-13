@@ -208,6 +208,12 @@ public:
   set_initial_space(NumericVector<T> & initial_space_in) libmesh_override;
 
   /**
+   * Set the spectral transformation to be used
+   */
+  virtual void 
+  set_spectral_transform(SpectralTransform st) libmesh_override;
+
+  /**
    * Returns the raw SLEPc eps context pointer.
    */
   EPS eps() { this->init(); return _eps; }
