@@ -221,6 +221,11 @@ private:
    * Does this node contain any infinite elements.
    */
   bool contains_ifems;
+
+  /**
+   * Used in find_element_in_children
+   */
+  mutable std::vector<bool> searched_child;
 };
 
 
