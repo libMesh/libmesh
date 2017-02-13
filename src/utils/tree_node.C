@@ -528,10 +528,7 @@ const Elem * TreeNode<N>::find_element_in_children (const Point & p,
 {
   libmesh_assert (!this->active());
 
-  if (searched_child.size() != children.size())
-    searched_child.resize(children.size(), false);
-
-  std::fill(searched_child.begin(), searched_child.end(), false);
+  searched_child.assign(children.size(), false);
 
   // First only look in the children whose bounding box
   // contain the point p.
