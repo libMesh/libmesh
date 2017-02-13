@@ -45,7 +45,9 @@
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 // Ignore warnings from code that uses deprecated members of std, like std::auto_ptr.
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#if (__GNUC__ > 5)
 // Ignore warnings from code that does "if (foo) bar();"
 #pragma GCC diagnostic ignored "-Wmisleading-indentation"
+#endif // GCC > 5
 #endif // GCC > 4.1
 #endif // __GNUC__ && !__INTEL_COMPILER
