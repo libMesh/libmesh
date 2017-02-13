@@ -108,9 +108,11 @@ protected:
   virtual bool _general_residual (bool request_jacobian,
                                   DiffContext &,
                                   ResFuncType mass,
+                                  ResFuncType damping,
                                   ResFuncType time_deriv,
                                   ResFuncType constraint,
-                                  ReinitFuncType reinit);
+                                  ReinitFuncType reinit,
+                                  bool compute_second_order_eqns);
 };
 
 
