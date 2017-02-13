@@ -29,7 +29,9 @@
 // GCC > 4.1 supports diagnostic pragmas
 #if (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ > 1)
 // TODO: use the gcc 4.6 push/pop when available
+#if (__GNUC__ > 5)
 #pragma GCC diagnostic warning "-Wmisleading-indentation"
+#endif // GCC > 5
 #pragma GCC diagnostic warning "-Wdeprecated-declarations"
 #pragma GCC diagnostic warning "-Wunused-parameter"
 #pragma GCC diagnostic warning "-Wdeprecated"
