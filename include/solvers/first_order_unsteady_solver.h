@@ -84,6 +84,13 @@ protected:
    */
   std::map<unsigned int,unsigned int> _second_order_dot_vars;
 
+  /**
+   * If there are second order variables in the system,
+   * then we also prepare the accel for those variables
+   * so the user can treat them as such.
+   */
+  void prepare_accel(DiffContext & context);
+
 };
 
 } // end namespace libMesh

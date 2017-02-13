@@ -58,4 +58,11 @@ unsigned int FirstOrderUnsteadySolver::get_second_order_dot_var(unsigned int var
   return _second_order_dot_vars.find(var)->second;
 }
 
+void FirstOrderUnsteadySolver::prepare_accel(DiffContext & context)
+{
+  context.get_elem_solution_accel() = context.get_elem_solution_rate();
+
+  context.elem_solution_accel_derivative = context.get_elem_solution_rate_derivative();
+}
+
 } // namespace libMesh
