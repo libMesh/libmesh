@@ -91,6 +91,15 @@ protected:
    */
   void prepare_accel(DiffContext & context);
 
+  /**
+   * If there are second order variables, then we need to compute their residual equations
+   * and corresponding Jacobian. The residual equation will simply be
+   * \f$ \dot{u} - v = 0 \f$, where \f$ u \f$ is the second order variable add
+   * by the user and \f$ v \f$ is the variable added by the time-solver as the
+   * "velocity" variable.
+   */
+  bool compute_second_order_eqns(bool compute_jacobian, DiffContext & c);
+
 };
 
 } // end namespace libMesh
