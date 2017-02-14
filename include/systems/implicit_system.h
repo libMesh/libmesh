@@ -338,6 +338,12 @@ public:
    */
   SparseMatrix<Number> * matrix;
 
+  /**
+   * By default, the system will zero out the matrix and the right hand side.
+   * If this flag is false, it is the responsibility of the client code
+   * to take care of setting these to zero before assembly begins
+   */
+  bool zero_out_matrix_and_rhs;
 
 
 protected:
