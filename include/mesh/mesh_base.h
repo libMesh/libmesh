@@ -685,6 +685,17 @@ public:
    * when being prepared for use.  This may slightly adversely affect
    * performance during subsequent element access, particulary when
    * using a distributed mesh.
+   *
+   * Important! When allow_renumbering(false) is set,
+   * ReplicatedMesh::n_elem() and ReplicatedMesh::n_nodes() will
+   * return *wrong* values whenever adaptive refinement is followed by
+   * adaptive coarsening. (Uniform refinement followed by uniform
+   * coarsening is OK.) This is due to the fact that n_elem() and
+   * n_nodes() are currently O(1) functions that just return the size
+   * of the respective underlying vectors, and this size is wrong when
+   * the numbering includes "gaps" from nodes and elements that have
+   * been deleted. We plan to implement a caching mechanism in the
+   * near future that will fix this incorrect behavior.
    */
   void allow_renumbering(bool allow) { _skip_renumber_nodes_and_elements = !allow; }
   bool allow_renumbering() const { return !_skip_renumber_nodes_and_elements; }

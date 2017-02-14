@@ -722,27 +722,30 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
     nv = n_scalar_vars + dim*n_vector_vars;
   }
 
-  // Get the number of elements that share each node.  We will
-  // compute the average value at each node.  This is particularly
-  // useful for plotting discontinuous data.
-  MeshBase::element_iterator       e_it  = _mesh.active_local_elements_begin();
-  const MeshBase::element_iterator e_end = _mesh.active_local_elements_end();
+  // We handle NULL entries in the Mesh's _nodes vector by just
+  // carrying around extra zeroes in the solution vector.
+  numeric_index_type parallel_soln_global_size = nn*nv;
 
-  // Get the number of local nodes
-  dof_id_type n_local_nodes = cast_int<dof_id_type>
-    (std::distance(_mesh.local_nodes_begin(),
-                   _mesh.local_nodes_end()));
+  numeric_index_type div = parallel_soln_global_size / this->n_processors();
+  numeric_index_type mod = parallel_soln_global_size % this->n_processors();
+
+  // Initialize all processors to the average size.
+  numeric_index_type parallel_soln_local_size = div;
+
+  // The first "mod" processors get an extra entry.
+  if (this->processor_id() < mod)
+    parallel_soln_local_size = div+1;
 
   // Create a NumericVector to hold the parallel solution
   UniquePtr<NumericVector<Number> > parallel_soln_ptr = NumericVector<Number>::build(_communicator);
   NumericVector<Number> & parallel_soln = *parallel_soln_ptr;
-  parallel_soln.init(nn*nv, n_local_nodes*nv, false, PARALLEL);
+  parallel_soln.init(parallel_soln_global_size, parallel_soln_local_size, /*fast=*/false, PARALLEL);
 
   // Create a NumericVector to hold the "repeat_count" for each node - this is essentially
   // the number of elements contributing to that node's value
   UniquePtr<NumericVector<Number> > repeat_count_ptr = NumericVector<Number>::build(_communicator);
   NumericVector<Number> & repeat_count = *repeat_count_ptr;
-  repeat_count.init(nn*nv, n_local_nodes*nv, false, PARALLEL);
+  repeat_count.init(parallel_soln_global_size, parallel_soln_local_size, /*fast=*/false, PARALLEL);
 
   repeat_count.close();
 
@@ -869,7 +872,24 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
       var_num += nv_sys_split;
     } // end loop over systems
 
+  // Communicate the nodal solution values and repeat counts.
   parallel_soln.close();
+  repeat_count.close();
+
+  // If there were gaps in the node numbering, there will be
+  // corresponding zeros in the parallel_soln and repeat_count
+  // vectors.  We need to set those repeat_count entries to 1
+  // in order to avoid dividing by zero.
+  for (numeric_index_type i=repeat_count.first_local_index(); i<repeat_count.last_local_index(); ++i)
+    {
+      // repeat_count entries are integral values but let's avoid a
+      // direct floating point comparison with 0 just in case some
+      // roundoff noise crept in during vector assembly?
+      if (std::abs(repeat_count(i)) < TOLERANCE)
+        repeat_count.set(i, 1.);
+    }
+
+  // Make sure the repeat_count vector is up-to-date on all processors.
   repeat_count.close();
 
   // Divide to get the average value at the nodes
