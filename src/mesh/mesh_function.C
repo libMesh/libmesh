@@ -257,6 +257,9 @@ void MeshFunction::operator() (const Point & p,
 
   if (!element)
     {
+      // We'd better be in out_of_mesh_mode if we couldn't find an
+      // element in the mesh
+      libmesh_assert (_out_of_mesh_mode);
       output = _out_of_mesh_value;
     }
   else
