@@ -36,10 +36,14 @@ void FirstOrderUnsteadySolver::init()
           const Variable & var = _system.variable(*var_it);
           std::string new_var_name = std::string("dot_")+var.name();
 
+          unsigned int v_var_idx;
+
           if( var.active_subdomains().empty() )
-            _system.add_variable( new_var_name, var.type() );
+            v_var_idx = _system.add_variable( new_var_name, var.type() );
           else
-            _system.add_variable( new_var_name, var.type(), &var.active_subdomains() );
+            v_var_idx = _system.add_variable( new_var_name, var.type(), &var.active_subdomains() );
+
+          _second_order_dot_vars.insert( std::pair<unsigned int,unsigned int>(*var_it,v_var_idx) );
         }
     }
 }
