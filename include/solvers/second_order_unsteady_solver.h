@@ -99,6 +99,15 @@ public:
    */
   Number old_solution_accel (const dof_id_type global_dof_number) const;
 
+  /**
+   * For a given second order (in time) variable var, this just returns var. This is
+   * provided to allow compatiblity for treating second order systems using
+   * FirstOrderUnsteadySolver time stepping.
+   *
+   * This method should not be called with first order variables.
+   */
+  virtual unsigned int get_second_order_dot_var( unsigned int var ) const libmesh_override libmesh_final;
+
 protected:
 
   /**

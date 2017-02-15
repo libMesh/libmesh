@@ -51,4 +51,11 @@ void FirstOrderUnsteadySolver::init()
     }
 }
 
+unsigned int FirstOrderUnsteadySolver::get_second_order_dot_var(unsigned int var) const
+{
+  libmesh_assert(this->is_second_order_var(var));
+  libmesh_assert(_second_order_dot_vars.find(var) != _second_order_dot_vars.end());
+  return _second_order_dot_vars.find(var)->second;
+}
+
 } // namespace libMesh

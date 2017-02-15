@@ -65,6 +65,16 @@ public:
    */
   virtual void init () libmesh_override;
 
+  /**
+   * If var is a second order variable, then this methond will return
+   * the index to the corresponding "dot" variable added by this
+   * TimeSolver. That is, if var corresponds to "u", this method
+   * will return the variable index corresponding to "dot_u".
+   *
+   * This method should not be called with first order variables.
+   */
+  virtual unsigned int get_second_order_dot_var( unsigned int var ) const libmesh_override libmesh_final;
+
 protected:
 
   /**

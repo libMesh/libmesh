@@ -189,6 +189,20 @@ public:
   bool is_second_order_var( unsigned int var ) const
   { return _second_order_vars.find(var) != _second_order_vars.end(); }
 
+
+  /**
+   * For a given second order (in time) variable var, this method will return
+   * the index to the corresponding "dot" variable. For FirstOrderUnsteadySolver
+   * classes, the "dot" variable would automatically be added and the returned
+   * index will correspond to that variable. For SecondOrderUnsteadySolver classes,
+   * this method will return var as there this is no "dot" variable per se, but
+   * having this function allows one to use the interface to treat both
+   * FirstOrderUnsteadySolver and SecondOrderUnsteadySolver simultaneously.
+   *
+   * This method should not be called with first order variables.
+   */
+  virtual unsigned int get_second_order_dot_var( unsigned int var ) const =0;
+
 protected:
 
   /**
