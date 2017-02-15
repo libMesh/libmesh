@@ -122,4 +122,10 @@ Number SecondOrderUnsteadySolver::old_solution_accel(const dof_id_type global_do
   return (*_old_local_solution_accel)(global_dof_number);
 }
 
+unsigned int SecondOrderUnsteadySolver::get_second_order_dot_var(unsigned int var) const
+{
+  libmesh_assert(this->is_second_order_var(var));
+  return var;
+}
+
 } // end namespace libMesh
