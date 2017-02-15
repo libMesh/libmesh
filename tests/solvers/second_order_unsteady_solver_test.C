@@ -11,6 +11,8 @@
 #include <libmesh/quadrature.h>
 #include <libmesh/diff_solver.h>
 #include <libmesh/newmark_solver.h>
+#include <libmesh/euler_solver.h>
+#include <libmesh/euler2_solver.h>
 
 #include "test_comm.h"
 
@@ -139,4 +141,64 @@ public:
 
 };
 
+template<typename TimeSolverType>
+class ThetaSolverTestBase : public TimeSolverTestImplementation<TimeSolverType>
+{
+public:
+  ThetaSolverTestBase()
+    : TimeSolverTestImplementation<TimeSolverType>(),
+      _theta(1.0)
+  {}
+
+protected:
+
+  virtual void aux_time_solver_init( TimeSolverType & time_solver )
+  { time_solver.theta = _theta; }
+
+  void set_theta( Real theta )
+  { _theta = theta; }
+
+  Real _theta;
+};
+
+class EulerSolverSecondOrderTest : public CppUnit::TestCase,
+                                   public ThetaSolverTestBase<EulerSolver>
+{
+public:
+  CPPUNIT_TEST_SUITE( EulerSolverSecondOrderTest );
+
+  CPPUNIT_TEST( testEulerSolverConstantSecondOrderODE );
+
+  CPPUNIT_TEST_SUITE_END();
+
+public:
+
+  void testEulerSolverConstantSecondOrderODE()
+  {
+    this->set_theta(0.5);
+    this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase> >(0.5,10);
+  }
+
+};
+
+class Euler2SolverSecondOrderTest : public CppUnit::TestCase,
+                                    public ThetaSolverTestBase<Euler2Solver>
+{
+public:
+  CPPUNIT_TEST_SUITE( Euler2SolverSecondOrderTest );
+
+  CPPUNIT_TEST( testEuler2SolverConstantSecondOrderODE );
+
+  CPPUNIT_TEST_SUITE_END();
+
+public:
+  void testEuler2SolverConstantSecondOrderODE()
+  {
+    this->set_theta(0.5);
+    this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase> >(0.5,10);
+  }
+};
+
 CPPUNIT_TEST_SUITE_REGISTRATION( NewmarkSolverTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( EulerSolverSecondOrderTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( Euler2SolverSecondOrderTest );
