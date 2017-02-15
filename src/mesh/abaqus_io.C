@@ -309,11 +309,18 @@ void AbaqusIO::read (const std::string & fname)
               if (nset_name == "")
                 libmesh_error_msg("Unnamed nset encountered!");
 
+              // Is this a "generated" nset, i.e. one which has three
+              // entries corresponding to (first, last, stride)?
+              bool is_generated = this->detect_generated_set(upper);
+
               // Process any lines of comments that may be present
               this->process_and_discard_comments();
 
               // Read the IDs, storing them in _nodeset_ids
-              this->read_ids(nset_name, _nodeset_ids);
+              if (is_generated)
+                this->generate_ids(nset_name, _nodeset_ids);
+              else
+                this->read_ids(nset_name, _nodeset_ids);
             } // *Nodeset
 
 
@@ -328,11 +335,18 @@ void AbaqusIO::read (const std::string & fname)
               if (elset_name == "")
                 libmesh_error_msg("Unnamed elset encountered!");
 
+              // Is this a "generated" elset, i.e. one which has three
+              // entries corresponding to (first, last, stride)?
+              bool is_generated = this->detect_generated_set(upper);
+
               // Process any lines of comments that may be present
               this->process_and_discard_comments();
 
               // Read the IDs, storing them in _elemset_ids
-              this->read_ids(elset_name, _elemset_ids);
+              if (is_generated)
+                this->generate_ids(elset_name, _elemset_ids);
+              else
+                this->read_ids(elset_name, _elemset_ids);
             } // *Elset
 
 
@@ -658,7 +672,7 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
 
 
 
-std::string AbaqusIO::parse_label(std::string line, std::string label_name)
+std::string AbaqusIO::parse_label(std::string line, std::string label_name) const
 {
   // Handle files which have weird line endings from e.g. windows.
   // You can check what kind of line endings you have with 'cat -vet'.
@@ -703,6 +717,23 @@ std::string AbaqusIO::parse_label(std::string line, std::string label_name)
 
 
 
+bool AbaqusIO::detect_generated_set(std::string upper) const
+{
+  // Avoid issues with weird line endings, spaces before commas, etc.
+  upper.erase(std::remove_if(upper.begin(), upper.end(), isspace), upper.end());
+
+  // Check each comma-separated value in "upper" to see if it is the generate flag.
+  std::string cell;
+  std::stringstream line_stream(upper);
+  while (std::getline(line_stream, cell, ','))
+    if (cell == "GENERATE")
+      return true;
+
+  return false;
+}
+
+
+
 void AbaqusIO::read_ids(std::string set_name, container_t & container)
 {
   // Grab a reference to a vector that will hold all the IDs
@@ -742,6 +773,43 @@ void AbaqusIO::read_ids(std::string set_name, container_t & container)
               id_storage.push_back( id );
             }
         }
+    }
+}
+
+
+
+
+void AbaqusIO::generate_ids(std::string set_name, container_t & container)
+{
+  // Grab a reference to a vector that will hold all the IDs
+  std::vector<dof_id_type> & id_storage = container[set_name];
+
+  // Read until the start of another section is detected, or EOF is
+  // encountered.  "generate" sections seem to only have one line,
+  // although I suppose it's possible they could have more.
+  while (_in.peek() != '*' && _in.peek() != EOF)
+    {
+      // Read entire comma-separated line into a string
+      std::string csv_line;
+      std::getline(_in, csv_line);
+
+      // Remove all whitespaces from csv_line.
+      csv_line.erase(std::remove_if(csv_line.begin(), csv_line.end(), isspace), csv_line.end());
+
+      // Create a new stringstream object from the string, and stream
+      // in the comma-separated values.
+      char c;
+      dof_id_type start, end, stride;
+      std::stringstream line_stream(csv_line);
+      line_stream >> start >> c >> end >> c >> stride;
+
+      // Generate entries in the id_storage.  Note: each element can
+      // only belong to a single Elset (since this corresponds to the
+      // subdomain_id) so if an element appears in multiple Elsets,
+      // the "last" one (alphabetically, based on set name) in the
+      // _elemset_ids map will "win".
+      for (dof_id_type current = start; current <= end; current += stride)
+        id_storage.push_back(current);
     }
 }
 
