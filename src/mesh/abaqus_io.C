@@ -513,7 +513,7 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
       elems_of_dimension[2] = true;
     }
   else if (upper.find("CPS3") != std::string::npos ||
-           upper.find("S3R") != std::string::npos)
+           upper.find("S3") != std::string::npos)
     {
       elem_type = TRI3;
       n_nodes_per_elem = 3;
