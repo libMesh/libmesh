@@ -166,6 +166,10 @@ public:
   const std::set<unsigned int> & get_first_order_vars() const
   { return _first_order_vars; }
 
+  bool is_first_order_var( unsigned int var ) const
+  { return _first_order_vars.find(var) != _first_order_vars.end(); }
+
+
   /**
    * Indicate to the UnsteadySolver which variables are second order in time.
    * Subclasses may use this information in different ways.
@@ -181,6 +185,9 @@ public:
    */
   const std::set<unsigned int> & get_second_order_vars() const
   { return _second_order_vars; }
+
+  bool is_second_order_var( unsigned int var ) const
+  { return _second_order_vars.find(var) != _second_order_vars.end(); }
 
 protected:
 
