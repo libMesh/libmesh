@@ -65,6 +65,15 @@ public:
    */
   virtual void init () libmesh_override;
 
+protected:
+
+  /**
+   * If the user adds any second order variables, then we need to also
+   * cache the map to their corresponding dot variable that will
+   * be added by this TimeSolver class.
+   */
+  std::map<unsigned int,unsigned int> _second_order_dot_vars;
+
 };
 
 } // end namespace libMesh
