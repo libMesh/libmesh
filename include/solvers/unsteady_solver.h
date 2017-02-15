@@ -171,6 +171,11 @@ public:
 
 
   /**
+   * Check for any first order vars that are also belong to FEFamily::SCALAR
+   */
+  bool have_first_order_scalar_vars() const;
+
+  /**
    * Indicate to the UnsteadySolver which variables are second order in time.
    * Subclasses may use this information in different ways.
    */
@@ -202,6 +207,11 @@ public:
    * This method should not be called with first order variables.
    */
   virtual unsigned int get_second_order_dot_var( unsigned int var ) const =0;
+
+  /**
+   * Check for any second order vars that are also belong to FEFamily::SCALAR
+   */
+  bool have_second_order_scalar_vars() const;
 
 protected:
 
