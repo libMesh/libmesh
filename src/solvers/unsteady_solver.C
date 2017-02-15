@@ -238,5 +238,40 @@ Real UnsteadySolver::du(const SystemNorm & norm) const
 }
 
 
+bool UnsteadySolver::have_first_order_scalar_vars() const
+{
+  bool have_first_order_scalar_vars = false;
+
+  if(this->have_first_order_vars())
+    {
+      for( std::set<unsigned int>::const_iterator var_it = this->get_first_order_vars().begin();
+           var_it != this->get_first_order_vars().end();
+           ++var_it )
+        {
+          if( this->system().variable(*var_it).type().family == FEFamily::SCALAR )
+            have_first_order_scalar_vars = true;
+        }
+    }
+
+  return have_first_order_scalar_vars;
+}
+
+bool UnsteadySolver::have_second_order_scalar_vars() const
+{
+  bool have_second_order_scalar_vars = false;
+
+  if(this->have_second_order_vars())
+    {
+      for( std::set<unsigned int>::const_iterator var_it = this->get_second_order_vars().begin();
+           var_it != this->get_second_order_vars().end();
+           ++var_it )
+        {
+          if( this->system().variable(*var_it).type().family == FEFamily::SCALAR )
+            have_second_order_scalar_vars = true;
+        }
+    }
+
+  return have_second_order_scalar_vars;
+}
 
 } // namespace libMesh
