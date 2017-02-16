@@ -99,7 +99,16 @@ private:
    * The input to the function in this case would be foo, the
    * output would be bar
    */
-  std::string parse_label(std::string line, std::string label_name);
+  std::string parse_label(std::string line, std::string label_name) const;
+
+  /**
+   * Returns true if the input string is a generated elset or nset,
+   * false otherwise. The input string is assumed to already be in all
+   * upper case. Generated nsets are assumed to have the following
+   * format:
+   * *Nset, nset=Set-1, generate
+   */
+  bool detect_generated_set(std::string upper) const;
 
   /**
    * This function reads all the IDs for the current node or element
@@ -107,6 +116,14 @@ private:
    * name as key.
    */
   void read_ids(std::string set_name, container_t & container);
+
+  /**
+   * This function handles "generated" nset and elset sections.  These
+   * are denoted by having the comma-separated "GENERATE" keyword in
+   * their definition, e.g.
+   * *Nset, nset=Set-1, generate
+   */
+  void generate_ids(std::string set_name, container_t & container);
 
   /**
    * This function is called after all the elements have been
