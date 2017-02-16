@@ -1,4 +1,4 @@
-CLEANFILES   = # start empty, append beloe
+CLEANFILES   = # start empty, append below
 
 example_name = miscellaneous_ex2
 install_dir  = $(examples_install_path)/miscellaneous/ex2
