@@ -249,10 +249,16 @@ int main (int argc, char ** argv)
       // After solving the system, write the solution
       // to an ExodusII-formatted plot file, for every frequency.
 #ifdef LIBMESH_HAVE_EXODUS_API
-      char buf[14];
-      sprintf (buf, "out%04u.exd", n);
+      std::ostringstream file_name;
 
-      ExodusII_IO(mesh).write_equation_systems (buf,
+      file_name << "out_"
+                << std::setw(4)
+                << std::setfill('0')
+                << std::right
+                << n
+                << ".e";
+
+      ExodusII_IO(mesh).write_equation_systems (file_name.str(),
                                                 equation_systems);
 #endif
     }
