@@ -27,13 +27,14 @@
 #include <libmesh/ignore_warnings.h>
 
 //! Implements ODE: 3.14\ddot{u} = 2.71, u(0) = 0, \dot{u}(0) = 0
-class ConstantSecondOrderODE : public SecondOrderScalarSystemBase
+template<typename SystemBase>
+class ConstantSecondOrderODE : public SystemBase
 {
 public:
   ConstantSecondOrderODE(EquationSystems & es,
                          const std::string & name_in,
                          const unsigned int number_in)
-    : SecondOrderScalarSystemBase(es, name_in, number_in)
+    : SystemBase(es, name_in, number_in)
   {}
 
   virtual Number F( FEMContext & /*context*/, unsigned int /*qp*/ ) libmesh_override
@@ -50,13 +51,14 @@ public:
 };
 
 //! Implements ODE: 1.0\ddot{u} = 6.0*t+2.0, u(0) = 0, \dot{u}(0) = 0
-class LinearTimeSecondOrderODE : public SecondOrderScalarSystemBase
+template<typename SystemBase>
+class LinearTimeSecondOrderODE : public SystemBase
 {
 public:
   LinearTimeSecondOrderODE(EquationSystems & es,
                            const std::string & name_in,
                            const unsigned int number_in)
-    : SecondOrderScalarSystemBase(es, name_in, number_in)
+    : SystemBase(es, name_in, number_in)
   {}
 
   virtual Number F( FEMContext & context, unsigned int /*qp*/ ) libmesh_override
@@ -98,25 +100,25 @@ class NewmarkSolverTest : public CppUnit::TestCase,
 public:
   CPPUNIT_TEST_SUITE( NewmarkSolverTest );
 
-  CPPUNIT_TEST( testNewmarkSolverConstantSecondOrderODE );
-  CPPUNIT_TEST( testNewmarkSolverLinearTimeSecondOrderODE );
+  CPPUNIT_TEST( testNewmarkSolverConstantSecondOrderODESecondOrderStyle );
+  CPPUNIT_TEST( testNewmarkSolverLinearTimeSecondOrderODESecondOrderStyle );
 
   CPPUNIT_TEST_SUITE_END();
 
 public:
 
-  void testNewmarkSolverConstantSecondOrderODE()
+  void testNewmarkSolverConstantSecondOrderODESecondOrderStyle()
   {
-    this->run_test_with_exact_soln<ConstantSecondOrderODE>(0.5,10);
+    this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemSecondOrderTimeSolverBase> >(0.5,10);
   }
 
-  void testNewmarkSolverLinearTimeSecondOrderODE()
+  void testNewmarkSolverLinearTimeSecondOrderODESecondOrderStyle()
   {
     // For \beta = 1/6, we have the "linear acceleration method" for which
     // we should be able to exactly integrate linear (in time) acceleration
     // functions.
     this->set_beta(1.0/6.0);
-    this->run_test_with_exact_soln<LinearTimeSecondOrderODE>(0.5,10);
+    this->run_test_with_exact_soln<LinearTimeSecondOrderODE<SecondOrderScalarSystemSecondOrderTimeSolverBase> >(0.5,10);
   }
 
 };

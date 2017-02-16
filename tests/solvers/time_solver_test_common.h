@@ -153,15 +153,16 @@ protected:
 
 //! FEMSystem-based class for testing of TimeSolvers using second order SCALARs
 /**
+ *  This is for solving second order systems using second order time solvers.
  *  We're assuming the ODEs are only dependent on time, so no Jacobian
  *  functions are needed, just F, C, and M.
  */
-class SecondOrderScalarSystemBase : public FirstOrderScalarSystemBase
+class SecondOrderScalarSystemSecondOrderTimeSolverBase : public FirstOrderScalarSystemBase
 {
 public:
-  SecondOrderScalarSystemBase(EquationSystems & es,
-                              const std::string & name_in,
-                              const unsigned int number_in)
+  SecondOrderScalarSystemSecondOrderTimeSolverBase(EquationSystems & es,
+                                                   const std::string & name_in,
+                                                   const unsigned int number_in)
     : FirstOrderScalarSystemBase(es, name_in, number_in)
   {}
 
