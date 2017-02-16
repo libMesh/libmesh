@@ -102,6 +102,8 @@ public:
 
   CPPUNIT_TEST( testNewmarkSolverConstantSecondOrderODESecondOrderStyle );
   CPPUNIT_TEST( testNewmarkSolverLinearTimeSecondOrderODESecondOrderStyle );
+  CPPUNIT_TEST( testNewmarkSolverConstantSecondOrderODEFirstOrderStyle );
+  CPPUNIT_TEST( testNewmarkSolverLinearTimeSecondOrderODEFirstOrderStyle );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -119,6 +121,20 @@ public:
     // functions.
     this->set_beta(1.0/6.0);
     this->run_test_with_exact_soln<LinearTimeSecondOrderODE<SecondOrderScalarSystemSecondOrderTimeSolverBase> >(0.5,10);
+  }
+
+  void testNewmarkSolverConstantSecondOrderODEFirstOrderStyle()
+  {
+    this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase> >(0.5,10);
+  }
+
+  void testNewmarkSolverLinearTimeSecondOrderODEFirstOrderStyle()
+  {
+    // For \beta = 1/6, we have the "linear acceleration method" for which
+    // we should be able to exactly integrate linear (in time) acceleration
+    // functions.
+    this->set_beta(1.0/6.0);
+    this->run_test_with_exact_soln<LinearTimeSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase> >(0.5,10);
   }
 
 };
