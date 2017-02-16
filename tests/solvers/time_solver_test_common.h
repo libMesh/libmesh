@@ -91,7 +91,7 @@ public:
   virtual void init_data ()
   {
     _u_var = this->add_variable ("u", FIRST, LAGRANGE);
-    this->time_evolving(_u_var);
+    this->time_evolving(_u_var,1);
     FEMSystem::init_data();
   }
 
@@ -165,6 +165,13 @@ public:
                                                    const unsigned int number_in)
     : FirstOrderScalarSystemBase(es, name_in, number_in)
   {}
+
+  virtual void init_data ()
+  {
+    _u_var = this->add_variable ("u", FIRST, LAGRANGE);
+    this->time_evolving(_u_var,2);
+    FEMSystem::init_data();
+  }
 
   //! Value of C(u).
   virtual Number C( FEMContext & context, unsigned int qp ) =0;
