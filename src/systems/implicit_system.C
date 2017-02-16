@@ -44,6 +44,7 @@ ImplicitSystem::ImplicitSystem (EquationSystems & es,
 
   Parent            (es, name_in, number_in),
   matrix            (libmesh_nullptr),
+  zero_out_matrix_and_rhs(true),
   _can_add_matrices (true)
 {
 }
@@ -193,10 +194,11 @@ void ImplicitSystem::assemble ()
   libmesh_assert(rhs);
   libmesh_assert (rhs->initialized());
 
-  // The user assembly gets to expect to accumulate on an initially
-  // empty system
-  matrix->zero ();
-  rhs->zero ();
+  if (zero_out_matrix_and_rhs)
+  {
+    matrix->zero ();
+    rhs->zero ();
+  }
 
   // Call the base class assemble function
   Parent::assemble ();
