@@ -90,6 +90,7 @@ MeshBase::MeshBase (unsigned char d) :
   _spatial_dimension(d),
   _default_ghosting(new GhostPointNeighbors(*this))
 {
+  libmesh_deprecated();
   _elem_dims.insert(d);
   _ghosting_functors.insert(_default_ghosting.get());
   libmesh_assert_less_equal (LIBMESH_DIM, 3);

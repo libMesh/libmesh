@@ -37,6 +37,7 @@ BoundaryMesh::BoundaryMesh(const Parallel::Communicator & comm_in,
 BoundaryMesh::BoundaryMesh(unsigned char d) :
   Mesh(d)
 {
+  libmesh_deprecated();
 }
 #endif
 
