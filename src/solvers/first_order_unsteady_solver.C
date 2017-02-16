@@ -44,6 +44,9 @@ void FirstOrderUnsteadySolver::init()
             v_var_idx = _system.add_variable( new_var_name, var.type(), &var.active_subdomains() );
 
           _second_order_dot_vars.insert( std::pair<unsigned int,unsigned int>(*var_it,v_var_idx) );
+
+          // The new velocities are time evolving variables of first order
+          this->system().time_evolving( v_var_idx, 1 );
         }
     }
 }
