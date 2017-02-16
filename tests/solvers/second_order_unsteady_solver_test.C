@@ -36,16 +36,16 @@ public:
     : SecondOrderScalarSystemBase(es, name_in, number_in)
   {}
 
-  virtual Number F( FEMContext & /*context*/, unsigned int /*qp*/ )
+  virtual Number F( FEMContext & /*context*/, unsigned int /*qp*/ ) libmesh_override
   { return -2.71; }
 
-  virtual Number C( FEMContext & /*context*/, unsigned int /*qp*/ )
+  virtual Number C( FEMContext & /*context*/, unsigned int /*qp*/ ) libmesh_override
   { return 0.0; }
 
-  virtual Number M( FEMContext & /*context*/, unsigned int /*qp*/ )
+  virtual Number M( FEMContext & /*context*/, unsigned int /*qp*/ ) libmesh_override
   { return 3.14; }
 
-  virtual Number u( Real t )
+  virtual Number u( Real t ) libmesh_override
   { return 2.71/3.14*0.5*t*t; }
 };
 
@@ -59,16 +59,16 @@ public:
     : SecondOrderScalarSystemBase(es, name_in, number_in)
   {}
 
-  virtual Number F( FEMContext & context, unsigned int /*qp*/ )
+  virtual Number F( FEMContext & context, unsigned int /*qp*/ ) libmesh_override
   { return -6.0*context.get_time()-2.0; }
 
-  virtual Number C( FEMContext & /*context*/, unsigned int /*qp*/ )
+  virtual Number C( FEMContext & /*context*/, unsigned int /*qp*/ ) libmesh_override
   { return 0.0; }
 
-  virtual Number M( FEMContext & /*context*/, unsigned int /*qp*/ )
+  virtual Number M( FEMContext & /*context*/, unsigned int /*qp*/ ) libmesh_override
   { return 1.0; }
 
-  virtual Number u( Real t )
+  virtual Number u( Real t ) libmesh_override
   { return t*t*t+t*t; }
 };
 
@@ -82,7 +82,7 @@ public:
 
 protected:
 
-  virtual void aux_time_solver_init( NewmarkSolver & time_solver )
+  virtual void aux_time_solver_init( NewmarkSolver & time_solver ) libmesh_override
   { time_solver.set_beta(_beta);
     time_solver.compute_initial_accel(); }
 
