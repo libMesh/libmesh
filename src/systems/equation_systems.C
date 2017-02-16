@@ -98,10 +98,6 @@ void EquationSystems::init ()
 
   libmesh_assert_not_equal_to (n_sys, 0);
 
-  // Distribute the mesh if possible
-  if (this->n_processors() > 1)
-    _mesh.delete_remote_elements();
-
   // Tell all the \p DofObject entities how many systems
   // there are.
   {
