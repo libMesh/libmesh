@@ -66,6 +66,8 @@ DistributedMesh::DistributedMesh (unsigned char d) :
   , _next_unpartitioned_unique_id(this->n_processors())
 #endif
 {
+  libmesh_deprecated();
+
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id = this->processor_id();
 #endif

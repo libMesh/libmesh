@@ -42,7 +42,10 @@ public:
 #ifndef LIBMESH_DISABLE_COMMWORLD
   explicit
   ParallelMesh (unsigned char dim=1)
-    : DistributedMesh(dim) {}
+    : DistributedMesh(dim)
+  {
+    libmesh_deprecated();
+  }
 #endif
 
   ParallelMesh (const UnstructuredMesh & other_mesh) : DistributedMesh(other_mesh) {}

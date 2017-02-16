@@ -65,6 +65,7 @@ UnstructuredMesh::UnstructuredMesh (const Parallel::Communicator & comm_in,
 UnstructuredMesh::UnstructuredMesh (unsigned char d) :
   MeshBase (d)
 {
+  libmesh_deprecated();
   libmesh_assert (libMesh::initialized());
 }
 #endif

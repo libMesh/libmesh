@@ -42,7 +42,10 @@ public:
 #ifndef LIBMESH_DISABLE_COMMWORLD
   explicit
   SerialMesh (unsigned char dim=1)
-    : ReplicatedMesh(dim) {}
+    : ReplicatedMesh(dim)
+  {
+    libmesh_deprecated();
+  }
 #endif
 
   SerialMesh (const UnstructuredMesh & other_mesh) : ReplicatedMesh(other_mesh) {}

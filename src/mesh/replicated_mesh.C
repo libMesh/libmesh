@@ -136,6 +136,7 @@ ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
 ReplicatedMesh::ReplicatedMesh (unsigned char d) :
   UnstructuredMesh (d)
 {
+  libmesh_deprecated();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   // In serial we just need to reset the next unique id to zero
   // here in the constructor.
