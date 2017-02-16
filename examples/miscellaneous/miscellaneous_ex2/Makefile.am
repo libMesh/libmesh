@@ -18,7 +18,7 @@ if LIBMESH_VPATH_BUILD
 	-rm -f lshape_data.unv && $(LN_S) -f $(srcdir)/lshape_data.unv .
 	$(AM_V_GEN)touch .linkstamp
 
-  CLEANFILES += lshape.unv lshape_data.unv .linkstamp
+  CLEANFILES += lshape.unv lshape_data.unv out_*.e eqn_sys.dat .linkstamp
 endif
 
 
