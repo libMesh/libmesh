@@ -646,7 +646,7 @@ public:
   /**
    * @returns a proxy element coincident with side \p i.
    *
-   * This method will eventually be deprecated/removed, since it
+   * This method is deprecated and will be removed, since it
    * returns a non-const pointer to a side that could be used to
    * indirectly modify this.  Please use the the const-correct
    * side_ptr() function instead.
@@ -675,7 +675,7 @@ public:
   /**
    * @returns a proxy element coincident with side \p i.
    *
-   * This method will eventually be deprecated/removed, since it
+   * This method is deprecated and will be removed, since it
    * returns a non-const pointer to a side that could be used to
    * indirectly modify this.  Please use the the const-correct
    * build_side_ptr() function instead.
@@ -696,7 +696,7 @@ public:
   /**
    * Creates an element coincident with edge \p i.
    *
-   * This method will eventually be deprecated/removed, since it
+   * This is deprecated and will be removed, since it
    * returns a non-const pointer to an edge that could be used to
    * indirectly modify this.  Please use the the const-correct
    * build_edge_ptr() function instead.
@@ -1603,6 +1603,7 @@ dof_id_type Elem::node_id (const unsigned int i) const
 inline
 dof_id_type Elem::node (const unsigned int i) const
 {
+  libmesh_deprecated();
   return this->node_id(i);
 }
 
@@ -1673,8 +1674,9 @@ Node * Elem::get_node (const unsigned int i) const
   // for years.  Now that it is reimplemented in terms of the new
   // interface which does return a const pointer, we need to use a
   // const_cast to mimic the old (incorrect) behavior.  This function
-  // will be officially deprecated (hopefully soon) and eventually
-  // removed entirely, obviating the need for this ugly cast.
+  // is now deprecated and eventually will be removed entirely,
+  // obviating the need for this ugly cast.
+  libmesh_deprecated();
   return const_cast<Node *>(this->node_ptr(i));
 }
 
@@ -1743,6 +1745,7 @@ Elem * Elem::neighbor (const unsigned int i) const
 {
   // Support the deprecated interface by calling the new,
   // const-correct interface and casting the result to an Elem *.
+  libmesh_deprecated();
   return const_cast<Elem *>(this->neighbor_ptr(i));
 }
 
@@ -1812,6 +1815,7 @@ inline
 UniquePtr<Elem> Elem::side (const unsigned int i) const
 {
   // Call the const version of side_ptr(), and const_cast the result.
+  libmesh_deprecated();
   Elem * s = const_cast<Elem *>(this->side_ptr(i).release());
   return UniquePtr<Elem>(s);
 }
@@ -1836,6 +1840,7 @@ UniquePtr<Elem>
 Elem::build_side (const unsigned int i, bool proxy) const
 {
   // Call the const version of build_side_ptr(), and const_cast the result.
+  libmesh_deprecated();
   Elem * s = const_cast<Elem *>(this->build_side_ptr(i, proxy).release());
   return UniquePtr<Elem>(s);
 }
@@ -1860,6 +1865,7 @@ UniquePtr<Elem>
 Elem::build_edge (const unsigned int i) const
 {
   // Call the const version of build_edge_ptr(), and const_cast the result.
+  libmesh_deprecated();
   Elem * e = const_cast<Elem *>(this->build_edge_ptr(i).release());
   return UniquePtr<Elem>(e);
 }
@@ -2152,6 +2158,7 @@ Elem * Elem::child (const unsigned int i) const
 {
   // Support the deprecated interface by calling the new,
   // const-correct interface and casting the result to an Elem *.
+  libmesh_deprecated();
   return const_cast<Elem *>(this->child_ptr(i));
 }
 
