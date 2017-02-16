@@ -57,15 +57,14 @@ int main (int argc, char ** argv)
   LibMeshInit init (argc, argv);
 
   // Parse the input file
-  GetPot infile("fem_system_ex3.in");
+  GetPot cl(argc,argv);
 
   // Read in parameters from the input file
-  const bool transient        = infile("transient", true);
-  const Real deltat           = infile("deltat", 0.25);
-  unsigned int n_timesteps    = infile("n_timesteps", 25);
+  const Real deltat           = cl("deltat", 0.25);
+  unsigned int n_timesteps    = cl("n_timesteps", 1);
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-  const unsigned int write_interval    = infile("write_interval", 1);
+  const unsigned int write_interval    = cl("write_interval", 1);
 #endif
 
   // Initialize the cantilever mesh
@@ -158,28 +157,36 @@ int main (int argc, char ** argv)
   ElasticitySystem & system =
     equation_systems.add_system<ElasticitySystem> ("Linear Elasticity");
 
-  // Create ExplicitSystem to help output velocity
-  ExplicitSystem & v_system =
-    equation_systems.add_system<ExplicitSystem> ("Velocity");
-  v_system.add_variable("u_vel", FIRST, LAGRANGE);
-  v_system.add_variable("v_vel", FIRST, LAGRANGE);
-  v_system.add_variable("w_vel", FIRST, LAGRANGE);
-
-  // Create ExplicitSystem to help output acceleration
-  ExplicitSystem & a_system =
-    equation_systems.add_system<ExplicitSystem> ("Acceleration");
-  a_system.add_variable("u_accel", FIRST, LAGRANGE);
-  a_system.add_variable("v_accel", FIRST, LAGRANGE);
-  a_system.add_variable("w_accel", FIRST, LAGRANGE);
-
   // Solve this as a time-dependent or steady system
-  if (transient)
+  std::string time_solver = cl("time_solver","DIE!");
+
+  ExplicitSystem * v_system;
+  ExplicitSystem * a_system;
+
+  if( time_solver == std::string("newmark") )
+    {
+      // Create ExplicitSystem to help output velocity
+      v_system = &equation_systems.add_system<ExplicitSystem> ("Velocity");
+      v_system->add_variable("u_vel", FIRST, LAGRANGE);
+      v_system->add_variable("v_vel", FIRST, LAGRANGE);
+      v_system->add_variable("w_vel", FIRST, LAGRANGE);
+
+      // Create ExplicitSystem to help output acceleration
+      a_system = &equation_systems.add_system<ExplicitSystem> ("Acceleration");
+      a_system->add_variable("u_accel", FIRST, LAGRANGE);
+      a_system->add_variable("v_accel", FIRST, LAGRANGE);
+      a_system->add_variable("w_accel", FIRST, LAGRANGE);
+    }
+
+  if( time_solver == std::string("newmark"))
     system.time_solver.reset(new NewmarkSolver(system));
-  else
+  else if( time_solver == std::string("steady"))
     {
       system.time_solver.reset(new SteadySolver(system));
       libmesh_assert_equal_to (n_timesteps, 1);
     }
+  else
+    libmesh_error_msg(std::string("ERROR: invalud time_solver ")+time_solver);
 
   // Initialize the system
   equation_systems.init ();
@@ -189,27 +196,30 @@ int main (int argc, char ** argv)
 
   // And the nonlinear solver options
   DiffSolver & solver = *(system.time_solver->diff_solver().get());
-  solver.quiet = infile("solver_quiet", true);
+  solver.quiet = cl("solver_quiet", true);
   solver.verbose = !solver.quiet;
-  solver.max_nonlinear_iterations = infile("max_nonlinear_iterations", 15);
-  solver.relative_step_tolerance = infile("relative_step_tolerance", 1.e-3);
-  solver.relative_residual_tolerance = infile("relative_residual_tolerance", 0.0);
-  solver.absolute_residual_tolerance = infile("absolute_residual_tolerance", 0.0);
+  solver.max_nonlinear_iterations = cl("max_nonlinear_iterations", 15);
+  solver.relative_step_tolerance = cl("relative_step_tolerance", 1.e-3);
+  solver.relative_residual_tolerance = cl("relative_residual_tolerance", 0.0);
+  solver.absolute_residual_tolerance = cl("absolute_residual_tolerance", 0.0);
 
   // And the linear solver options
-  solver.max_linear_iterations = infile("max_linear_iterations", 50000);
-  solver.initial_linear_tolerance = infile("initial_linear_tolerance", 1.e-3);
+  solver.max_linear_iterations = cl("max_linear_iterations", 50000);
+  solver.initial_linear_tolerance = cl("initial_linear_tolerance", 1.e-3);
 
   // Print information about the system to the screen.
   equation_systems.print_info();
 
-  NewmarkSolver * newmark = cast_ptr<NewmarkSolver*>(system.time_solver.get());
-  newmark->compute_initial_accel();
+  if( time_solver == std::string("newmark") )
+    {
+      NewmarkSolver * newmark = cast_ptr<NewmarkSolver*>(system.time_solver.get());
+      newmark->compute_initial_accel();
 
-  // Copy over initial velocity and acceleration for output.
-  // Note we can do this because of the matching variables/FE spaces
-  (*v_system.solution) = system.get_vector("_old_solution_rate");
-  (*a_system.solution) = system.get_vector("_old_solution_accel");
+      // Copy over initial velocity and acceleration for output.
+      // Note we can do this because of the matching variables/FE spaces
+      *(v_system->solution) = system.get_vector("_old_solution_rate");
+      *(a_system->solution) = system.get_vector("_old_solution_accel");
+    }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   // Output initial state
@@ -249,8 +259,11 @@ int main (int argc, char ** argv)
 
       // Copy over updated velocity and acceleration for output.
       // Note we can do this because of the matching variables/FE spaces
-      (*v_system.solution) = system.get_vector("_old_solution_rate");
-      (*a_system.solution) = system.get_vector("_old_solution_accel");
+      if( time_solver == std::string("newmark") )
+        {
+          *(v_system->solution) = system.get_vector("_old_solution_rate");
+          *(a_system->solution) = system.get_vector("_old_solution_accel");
+        }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
       // Write out this timestep if we're requested to
