@@ -30,16 +30,6 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/petsc_vector.h"
 
-#if !PETSC_RELEASE_LESS_THAN(3,6,0)
-# include "libmesh/ignore_warnings.h"
-# include "petsc/private/matimpl.h"
-# include "libmesh/restore_warnings.h"
-#elif !PETSC_VERSION_LESS_THAN(3,5,0)
-# include "libmesh/ignore_warnings.h"
-# include "petsc-private/matimpl.h"
-# include "libmesh/restore_warnings.h"
-#endif
-
 // For some reason, the blocked matrix API calls below seem to break with PETSC 3.2 & presumably earier.
 // For example:
 // [0]PETSC ERROR: --------------------- Error Message ------------------------------------
@@ -415,45 +405,7 @@ void PetscMatrix<T>::init ()
 template <typename T>
 void PetscMatrix<T>::update_preallocation_and_zero ()
 {
-  libmesh_assert(this->_dof_map);
-  libmesh_assert(this->initialized());
-
-  const std::vector<numeric_index_type> & n_nz = this->_dof_map->get_n_nz();
-  const std::vector<numeric_index_type> & n_oz = this->_dof_map->get_n_oz();
-
-  PetscErrorCode ierr = 0;
-
-  {
-#if !PETSC_VERSION_LESS_THAN(3,5,0)
-    ierr = (*_mat->ops->destroy)(_mat);
-    LIBMESH_CHKERR(ierr);
-    _mat->ops->destroy = libmesh_nullptr;
-    _mat->preallocated = PETSC_FALSE;
-    _mat->assembled    = PETSC_FALSE;
-    _mat->was_assembled = PETSC_FALSE;
-    ++_mat->nonzerostate;
-    ierr = PetscObjectStateIncrease((PetscObject)_mat);
-    LIBMESH_CHKERR(ierr);
-#else
-    libmesh_error_msg("PetscMatrix::update_preallocation_and_zero() requires PETSc 3.5.0 or greater to work correctly.");
-#endif
-
-    ierr = MatSetType(_mat,MATAIJ);
-    LIBMESH_CHKERR(ierr);
-
-    ierr = MatSeqAIJSetPreallocation (_mat,
-                                      0,
-                                      numeric_petsc_cast(n_nz.empty() ? libmesh_nullptr : &n_nz[0]));
-    LIBMESH_CHKERR(ierr);
-    ierr = MatMPIAIJSetPreallocation (_mat,
-                                      0,
-                                      numeric_petsc_cast(n_nz.empty() ? libmesh_nullptr : &n_nz[0]),
-                                      0,
-                                      numeric_petsc_cast(n_oz.empty() ? libmesh_nullptr : &n_oz[0]));
-    LIBMESH_CHKERR(ierr);
-  }
-
-  this->zero();
+  libmesh_not_implemented();
 }
 
 
