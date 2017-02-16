@@ -429,6 +429,9 @@ template<typename T2>
 inline
 typename CompareTypes<T, T2>::supertype DenseVector<T>::dot (const DenseVector<T2> & vec) const
 {
+  if (!_val.size())
+    return 0.;
+
   libmesh_assert_equal_to (this->size(), vec.size());
 
 #ifdef LIBMESH_HAVE_EIGEN
@@ -563,6 +566,9 @@ template<typename T>
 inline
 Real DenseVector<T>::l1_norm () const
 {
+  if (!_val.size())
+    return 0.;
+
 #ifdef LIBMESH_HAVE_EIGEN
   return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1> >(&_val[0], _val.size()).template lpNorm<1>();
 #else
@@ -581,6 +587,9 @@ template<typename T>
 inline
 Real DenseVector<T>::l2_norm () const
 {
+  if (!_val.size())
+    return 0.;
+
 #ifdef LIBMESH_HAVE_EIGEN
   return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1> >(&_val[0], _val.size()).norm();
 #else
@@ -599,11 +608,12 @@ template<typename T>
 inline
 Real DenseVector<T>::linfty_norm () const
 {
+  if (!_val.size())
+    return 0.;
+
 #ifdef LIBMESH_HAVE_EIGEN
   return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1> >(&_val[0], _val.size()).template lpNorm<Eigen::Infinity>();
 #else
-  if (!this->size())
-    return 0.;
   Real my_norm = TensorTools::norm_sq((*this)(0));
 
   for (unsigned int i=1; i!=this->size(); i++)
