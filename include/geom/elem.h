@@ -639,6 +639,10 @@ public:
    * quadrilateral, regardless of what type of hex you are dealing with.  If
    * you want the full-ordered face (i.e. a 9-noded quad face for a 27-noded
    * hexahedron) use the build_side method.
+   *
+   * The const version of this function is non-virtual; it simply
+   * calls the virtual non-const version and const_casts the return
+   * type.
    */
   virtual UniquePtr<Elem> side_ptr (unsigned int i) = 0;
   UniquePtr<const Elem> side_ptr (unsigned int i) const;
@@ -668,6 +672,10 @@ public:
    * memory, and is usually sufficient for FE calculation purposes.
    * If you really need a full-ordered, non-proxy side object, call
    * this function with proxy=false.
+   *
+   * The const version of this function is non-virtual; it simply
+   * calls the virtual non-const version and const_casts the return
+   * type.
    */
   virtual UniquePtr<Elem> build_side_ptr (const unsigned int i, bool proxy=true) = 0;
   UniquePtr<const Elem> build_side_ptr (const unsigned int i, bool proxy=true) const;
@@ -689,6 +697,10 @@ public:
    *
    * A \p UniquePtr<Elem> is returned to prevent a memory leak.
    * This way the user need not remember to delete the object.
+   *
+   * The const version of this function is non-virtual; it simply
+   * calls the virtual non-const version and const_casts the return
+   * type.
    */
   virtual UniquePtr<Elem> build_edge_ptr (const unsigned int i) = 0;
   UniquePtr<const Elem> build_edge_ptr (const unsigned int i) const;
