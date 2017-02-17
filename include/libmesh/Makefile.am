@@ -89,6 +89,7 @@ BUILT_SOURCES = \
         inf_fe_instantiate_2D.h \
         inf_fe_instantiate_3D.h \
         inf_fe_macro.h \
+        bounding_box.h \
         cell.h \
         cell_hex.h \
         cell_hex20.h \
@@ -773,6 +774,9 @@ inf_fe_instantiate_3D.h: $(top_srcdir)/include/fe/inf_fe_instantiate_3D.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 inf_fe_macro.h: $(top_srcdir)/include/fe/inf_fe_macro.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+bounding_box.h: $(top_srcdir)/include/geom/bounding_box.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell.h: $(top_srcdir)/include/geom/cell.h

@@ -305,12 +305,12 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/geom/reference_elem.data src/geom/remote_elem.C \
 	src/geom/sphere.C src/geom/surface.C src/mesh/abaqus_io.C \
 	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
-	src/mesh/checkpoint_io.C src/mesh/distributed_mesh.C \
-	src/mesh/ensight_io.C src/mesh/exodusII_io.C \
-	src/mesh/exodusII_io_helper.C src/mesh/fro_io.C \
-	src/mesh/gmsh_io.C src/mesh/gmv_io.C src/mesh/gnuplot_io.C \
-	src/mesh/inf_elem_builder.C src/mesh/matlab_io.C \
-	src/mesh/medit_io.C src/mesh/mesh_base.C \
+	src/mesh/bounding_box.C src/mesh/checkpoint_io.C \
+	src/mesh/distributed_mesh.C src/mesh/ensight_io.C \
+	src/mesh/exodusII_io.C src/mesh/exodusII_io_helper.C \
+	src/mesh/fro_io.C src/mesh/gmsh_io.C src/mesh/gmv_io.C \
+	src/mesh/gnuplot_io.C src/mesh/inf_elem_builder.C \
+	src/mesh/matlab_io.C src/mesh/medit_io.C src/mesh/mesh_base.C \
 	src/mesh/mesh_communication.C \
 	src/mesh/mesh_communication_global_indices.C \
 	src/mesh/mesh_data.C src/mesh/mesh_data_tetgen_support.C \
@@ -669,6 +669,7 @@ am__objects_1 = src/base/libmesh_dbg_la-default_coupling.lo \
 	src/mesh/libmesh_dbg_la-abaqus_io.lo \
 	src/mesh/libmesh_dbg_la-boundary_info.lo \
 	src/mesh/libmesh_dbg_la-boundary_mesh.lo \
+	src/mesh/libmesh_dbg_la-bounding_box.lo \
 	src/mesh/libmesh_dbg_la-checkpoint_io.lo \
 	src/mesh/libmesh_dbg_la-distributed_mesh.lo \
 	src/mesh/libmesh_dbg_la-ensight_io.lo \
@@ -1026,12 +1027,12 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/geom/reference_elem.data src/geom/remote_elem.C \
 	src/geom/sphere.C src/geom/surface.C src/mesh/abaqus_io.C \
 	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
-	src/mesh/checkpoint_io.C src/mesh/distributed_mesh.C \
-	src/mesh/ensight_io.C src/mesh/exodusII_io.C \
-	src/mesh/exodusII_io_helper.C src/mesh/fro_io.C \
-	src/mesh/gmsh_io.C src/mesh/gmv_io.C src/mesh/gnuplot_io.C \
-	src/mesh/inf_elem_builder.C src/mesh/matlab_io.C \
-	src/mesh/medit_io.C src/mesh/mesh_base.C \
+	src/mesh/bounding_box.C src/mesh/checkpoint_io.C \
+	src/mesh/distributed_mesh.C src/mesh/ensight_io.C \
+	src/mesh/exodusII_io.C src/mesh/exodusII_io_helper.C \
+	src/mesh/fro_io.C src/mesh/gmsh_io.C src/mesh/gmv_io.C \
+	src/mesh/gnuplot_io.C src/mesh/inf_elem_builder.C \
+	src/mesh/matlab_io.C src/mesh/medit_io.C src/mesh/mesh_base.C \
 	src/mesh/mesh_communication.C \
 	src/mesh/mesh_communication_global_indices.C \
 	src/mesh/mesh_data.C src/mesh/mesh_data_tetgen_support.C \
@@ -1389,6 +1390,7 @@ am__objects_2 = src/base/libmesh_devel_la-default_coupling.lo \
 	src/mesh/libmesh_devel_la-abaqus_io.lo \
 	src/mesh/libmesh_devel_la-boundary_info.lo \
 	src/mesh/libmesh_devel_la-boundary_mesh.lo \
+	src/mesh/libmesh_devel_la-bounding_box.lo \
 	src/mesh/libmesh_devel_la-checkpoint_io.lo \
 	src/mesh/libmesh_devel_la-distributed_mesh.lo \
 	src/mesh/libmesh_devel_la-ensight_io.lo \
@@ -1743,12 +1745,12 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/geom/reference_elem.data src/geom/remote_elem.C \
 	src/geom/sphere.C src/geom/surface.C src/mesh/abaqus_io.C \
 	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
-	src/mesh/checkpoint_io.C src/mesh/distributed_mesh.C \
-	src/mesh/ensight_io.C src/mesh/exodusII_io.C \
-	src/mesh/exodusII_io_helper.C src/mesh/fro_io.C \
-	src/mesh/gmsh_io.C src/mesh/gmv_io.C src/mesh/gnuplot_io.C \
-	src/mesh/inf_elem_builder.C src/mesh/matlab_io.C \
-	src/mesh/medit_io.C src/mesh/mesh_base.C \
+	src/mesh/bounding_box.C src/mesh/checkpoint_io.C \
+	src/mesh/distributed_mesh.C src/mesh/ensight_io.C \
+	src/mesh/exodusII_io.C src/mesh/exodusII_io_helper.C \
+	src/mesh/fro_io.C src/mesh/gmsh_io.C src/mesh/gmv_io.C \
+	src/mesh/gnuplot_io.C src/mesh/inf_elem_builder.C \
+	src/mesh/matlab_io.C src/mesh/medit_io.C src/mesh/mesh_base.C \
 	src/mesh/mesh_communication.C \
 	src/mesh/mesh_communication_global_indices.C \
 	src/mesh/mesh_data.C src/mesh/mesh_data_tetgen_support.C \
@@ -2106,6 +2108,7 @@ am__objects_3 = src/base/libmesh_oprof_la-default_coupling.lo \
 	src/mesh/libmesh_oprof_la-abaqus_io.lo \
 	src/mesh/libmesh_oprof_la-boundary_info.lo \
 	src/mesh/libmesh_oprof_la-boundary_mesh.lo \
+	src/mesh/libmesh_oprof_la-bounding_box.lo \
 	src/mesh/libmesh_oprof_la-checkpoint_io.lo \
 	src/mesh/libmesh_oprof_la-distributed_mesh.lo \
 	src/mesh/libmesh_oprof_la-ensight_io.lo \
@@ -2460,12 +2463,12 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/geom/reference_elem.data src/geom/remote_elem.C \
 	src/geom/sphere.C src/geom/surface.C src/mesh/abaqus_io.C \
 	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
-	src/mesh/checkpoint_io.C src/mesh/distributed_mesh.C \
-	src/mesh/ensight_io.C src/mesh/exodusII_io.C \
-	src/mesh/exodusII_io_helper.C src/mesh/fro_io.C \
-	src/mesh/gmsh_io.C src/mesh/gmv_io.C src/mesh/gnuplot_io.C \
-	src/mesh/inf_elem_builder.C src/mesh/matlab_io.C \
-	src/mesh/medit_io.C src/mesh/mesh_base.C \
+	src/mesh/bounding_box.C src/mesh/checkpoint_io.C \
+	src/mesh/distributed_mesh.C src/mesh/ensight_io.C \
+	src/mesh/exodusII_io.C src/mesh/exodusII_io_helper.C \
+	src/mesh/fro_io.C src/mesh/gmsh_io.C src/mesh/gmv_io.C \
+	src/mesh/gnuplot_io.C src/mesh/inf_elem_builder.C \
+	src/mesh/matlab_io.C src/mesh/medit_io.C src/mesh/mesh_base.C \
 	src/mesh/mesh_communication.C \
 	src/mesh/mesh_communication_global_indices.C \
 	src/mesh/mesh_data.C src/mesh/mesh_data_tetgen_support.C \
@@ -2823,6 +2826,7 @@ am__objects_4 = src/base/libmesh_opt_la-default_coupling.lo \
 	src/mesh/libmesh_opt_la-abaqus_io.lo \
 	src/mesh/libmesh_opt_la-boundary_info.lo \
 	src/mesh/libmesh_opt_la-boundary_mesh.lo \
+	src/mesh/libmesh_opt_la-bounding_box.lo \
 	src/mesh/libmesh_opt_la-checkpoint_io.lo \
 	src/mesh/libmesh_opt_la-distributed_mesh.lo \
 	src/mesh/libmesh_opt_la-ensight_io.lo \
@@ -3176,12 +3180,12 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/geom/reference_elem.data src/geom/remote_elem.C \
 	src/geom/sphere.C src/geom/surface.C src/mesh/abaqus_io.C \
 	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
-	src/mesh/checkpoint_io.C src/mesh/distributed_mesh.C \
-	src/mesh/ensight_io.C src/mesh/exodusII_io.C \
-	src/mesh/exodusII_io_helper.C src/mesh/fro_io.C \
-	src/mesh/gmsh_io.C src/mesh/gmv_io.C src/mesh/gnuplot_io.C \
-	src/mesh/inf_elem_builder.C src/mesh/matlab_io.C \
-	src/mesh/medit_io.C src/mesh/mesh_base.C \
+	src/mesh/bounding_box.C src/mesh/checkpoint_io.C \
+	src/mesh/distributed_mesh.C src/mesh/ensight_io.C \
+	src/mesh/exodusII_io.C src/mesh/exodusII_io_helper.C \
+	src/mesh/fro_io.C src/mesh/gmsh_io.C src/mesh/gmv_io.C \
+	src/mesh/gnuplot_io.C src/mesh/inf_elem_builder.C \
+	src/mesh/matlab_io.C src/mesh/medit_io.C src/mesh/mesh_base.C \
 	src/mesh/mesh_communication.C \
 	src/mesh/mesh_communication_global_indices.C \
 	src/mesh/mesh_data.C src/mesh/mesh_data_tetgen_support.C \
@@ -3539,6 +3543,7 @@ am__objects_5 = src/base/libmesh_prof_la-default_coupling.lo \
 	src/mesh/libmesh_prof_la-abaqus_io.lo \
 	src/mesh/libmesh_prof_la-boundary_info.lo \
 	src/mesh/libmesh_prof_la-boundary_mesh.lo \
+	src/mesh/libmesh_prof_la-bounding_box.lo \
 	src/mesh/libmesh_prof_la-checkpoint_io.lo \
 	src/mesh/libmesh_prof_la-distributed_mesh.lo \
 	src/mesh/libmesh_prof_la-ensight_io.lo \
@@ -4938,6 +4943,7 @@ libmesh_SOURCES = \
         src/mesh/abaqus_io.C \
         src/mesh/boundary_info.C \
         src/mesh/boundary_mesh.C \
+        src/mesh/bounding_box.C \
         src/mesh/checkpoint_io.C \
         src/mesh/distributed_mesh.C \
         src/mesh/ensight_io.C \
@@ -5950,6 +5956,8 @@ src/mesh/libmesh_dbg_la-abaqus_io.lo: src/mesh/$(am__dirstamp) \
 src/mesh/libmesh_dbg_la-boundary_info.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_dbg_la-boundary_mesh.lo: src/mesh/$(am__dirstamp) \
+	src/mesh/$(DEPDIR)/$(am__dirstamp)
+src/mesh/libmesh_dbg_la-bounding_box.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_dbg_la-checkpoint_io.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
@@ -7041,6 +7049,8 @@ src/mesh/libmesh_devel_la-boundary_info.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_devel_la-boundary_mesh.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
+src/mesh/libmesh_devel_la-bounding_box.lo: src/mesh/$(am__dirstamp) \
+	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_devel_la-checkpoint_io.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_devel_la-distributed_mesh.lo:  \
@@ -8073,6 +8083,8 @@ src/mesh/libmesh_oprof_la-abaqus_io.lo: src/mesh/$(am__dirstamp) \
 src/mesh/libmesh_oprof_la-boundary_info.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_oprof_la-boundary_mesh.lo: src/mesh/$(am__dirstamp) \
+	src/mesh/$(DEPDIR)/$(am__dirstamp)
+src/mesh/libmesh_oprof_la-bounding_box.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_oprof_la-checkpoint_io.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
@@ -9107,6 +9119,8 @@ src/mesh/libmesh_opt_la-boundary_info.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_opt_la-boundary_mesh.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
+src/mesh/libmesh_opt_la-bounding_box.lo: src/mesh/$(am__dirstamp) \
+	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_opt_la-checkpoint_io.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_opt_la-distributed_mesh.lo: src/mesh/$(am__dirstamp) \
@@ -10136,6 +10150,8 @@ src/mesh/libmesh_prof_la-abaqus_io.lo: src/mesh/$(am__dirstamp) \
 src/mesh/libmesh_prof_la-boundary_info.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_prof_la-boundary_mesh.lo: src/mesh/$(am__dirstamp) \
+	src/mesh/$(DEPDIR)/$(am__dirstamp)
+src/mesh/libmesh_prof_la-bounding_box.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
 src/mesh/libmesh_prof_la-checkpoint_io.lo: src/mesh/$(am__dirstamp) \
 	src/mesh/$(DEPDIR)/$(am__dirstamp)
@@ -12197,6 +12213,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_dbg_la-abaqus_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_dbg_la-boundary_info.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_dbg_la-boundary_mesh.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_dbg_la-bounding_box.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_dbg_la-checkpoint_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_dbg_la-distributed_mesh.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_dbg_la-ensight_io.Plo@am__quote@
@@ -12252,6 +12269,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_devel_la-abaqus_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_devel_la-boundary_info.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_devel_la-boundary_mesh.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_devel_la-bounding_box.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_devel_la-checkpoint_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_devel_la-distributed_mesh.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_devel_la-ensight_io.Plo@am__quote@
@@ -12307,6 +12325,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_oprof_la-abaqus_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_oprof_la-boundary_info.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_oprof_la-boundary_mesh.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_oprof_la-bounding_box.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_oprof_la-checkpoint_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_oprof_la-distributed_mesh.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_oprof_la-ensight_io.Plo@am__quote@
@@ -12362,6 +12381,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_opt_la-abaqus_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_opt_la-boundary_info.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_opt_la-boundary_mesh.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_opt_la-bounding_box.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_opt_la-checkpoint_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_opt_la-distributed_mesh.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_opt_la-ensight_io.Plo@am__quote@
@@ -12417,6 +12437,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_prof_la-abaqus_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_prof_la-boundary_info.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_prof_la-boundary_mesh.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_prof_la-bounding_box.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_prof_la-checkpoint_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_prof_la-distributed_mesh.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_prof_la-ensight_io.Plo@am__quote@
@@ -14692,6 +14713,13 @@ src/mesh/libmesh_dbg_la-boundary_mesh.lo: src/mesh/boundary_mesh.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/boundary_mesh.C' object='src/mesh/libmesh_dbg_la-boundary_mesh.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_dbg_la-boundary_mesh.lo `test -f 'src/mesh/boundary_mesh.C' || echo '$(srcdir)/'`src/mesh/boundary_mesh.C
+
+src/mesh/libmesh_dbg_la-bounding_box.lo: src/mesh/bounding_box.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_dbg_la-bounding_box.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_dbg_la-bounding_box.Tpo -c -o src/mesh/libmesh_dbg_la-bounding_box.lo `test -f 'src/mesh/bounding_box.C' || echo '$(srcdir)/'`src/mesh/bounding_box.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/mesh/$(DEPDIR)/libmesh_dbg_la-bounding_box.Tpo src/mesh/$(DEPDIR)/libmesh_dbg_la-bounding_box.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/bounding_box.C' object='src/mesh/libmesh_dbg_la-bounding_box.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_dbg_la-bounding_box.lo `test -f 'src/mesh/bounding_box.C' || echo '$(srcdir)/'`src/mesh/bounding_box.C
 
 src/mesh/libmesh_dbg_la-checkpoint_io.lo: src/mesh/checkpoint_io.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_dbg_la-checkpoint_io.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_dbg_la-checkpoint_io.Tpo -c -o src/mesh/libmesh_dbg_la-checkpoint_io.lo `test -f 'src/mesh/checkpoint_io.C' || echo '$(srcdir)/'`src/mesh/checkpoint_io.C
@@ -17640,6 +17668,13 @@ src/mesh/libmesh_devel_la-boundary_mesh.lo: src/mesh/boundary_mesh.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_devel_la-boundary_mesh.lo `test -f 'src/mesh/boundary_mesh.C' || echo '$(srcdir)/'`src/mesh/boundary_mesh.C
 
+src/mesh/libmesh_devel_la-bounding_box.lo: src/mesh/bounding_box.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_devel_la-bounding_box.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_devel_la-bounding_box.Tpo -c -o src/mesh/libmesh_devel_la-bounding_box.lo `test -f 'src/mesh/bounding_box.C' || echo '$(srcdir)/'`src/mesh/bounding_box.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/mesh/$(DEPDIR)/libmesh_devel_la-bounding_box.Tpo src/mesh/$(DEPDIR)/libmesh_devel_la-bounding_box.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/bounding_box.C' object='src/mesh/libmesh_devel_la-bounding_box.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_devel_la-bounding_box.lo `test -f 'src/mesh/bounding_box.C' || echo '$(srcdir)/'`src/mesh/bounding_box.C
+
 src/mesh/libmesh_devel_la-checkpoint_io.lo: src/mesh/checkpoint_io.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_devel_la-checkpoint_io.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_devel_la-checkpoint_io.Tpo -c -o src/mesh/libmesh_devel_la-checkpoint_io.lo `test -f 'src/mesh/checkpoint_io.C' || echo '$(srcdir)/'`src/mesh/checkpoint_io.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/mesh/$(DEPDIR)/libmesh_devel_la-checkpoint_io.Tpo src/mesh/$(DEPDIR)/libmesh_devel_la-checkpoint_io.Plo
@@ -20586,6 +20621,13 @@ src/mesh/libmesh_oprof_la-boundary_mesh.lo: src/mesh/boundary_mesh.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/boundary_mesh.C' object='src/mesh/libmesh_oprof_la-boundary_mesh.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_oprof_la-boundary_mesh.lo `test -f 'src/mesh/boundary_mesh.C' || echo '$(srcdir)/'`src/mesh/boundary_mesh.C
+
+src/mesh/libmesh_oprof_la-bounding_box.lo: src/mesh/bounding_box.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_oprof_la-bounding_box.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_oprof_la-bounding_box.Tpo -c -o src/mesh/libmesh_oprof_la-bounding_box.lo `test -f 'src/mesh/bounding_box.C' || echo '$(srcdir)/'`src/mesh/bounding_box.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/mesh/$(DEPDIR)/libmesh_oprof_la-bounding_box.Tpo src/mesh/$(DEPDIR)/libmesh_oprof_la-bounding_box.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/bounding_box.C' object='src/mesh/libmesh_oprof_la-bounding_box.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_oprof_la-bounding_box.lo `test -f 'src/mesh/bounding_box.C' || echo '$(srcdir)/'`src/mesh/bounding_box.C
 
 src/mesh/libmesh_oprof_la-checkpoint_io.lo: src/mesh/checkpoint_io.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_oprof_la-checkpoint_io.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_oprof_la-checkpoint_io.Tpo -c -o src/mesh/libmesh_oprof_la-checkpoint_io.lo `test -f 'src/mesh/checkpoint_io.C' || echo '$(srcdir)/'`src/mesh/checkpoint_io.C
@@ -23534,6 +23576,13 @@ src/mesh/libmesh_opt_la-boundary_mesh.lo: src/mesh/boundary_mesh.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_opt_la-boundary_mesh.lo `test -f 'src/mesh/boundary_mesh.C' || echo '$(srcdir)/'`src/mesh/boundary_mesh.C
 
+src/mesh/libmesh_opt_la-bounding_box.lo: src/mesh/bounding_box.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_opt_la-bounding_box.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_opt_la-bounding_box.Tpo -c -o src/mesh/libmesh_opt_la-bounding_box.lo `test -f 'src/mesh/bounding_box.C' || echo '$(srcdir)/'`src/mesh/bounding_box.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/mesh/$(DEPDIR)/libmesh_opt_la-bounding_box.Tpo src/mesh/$(DEPDIR)/libmesh_opt_la-bounding_box.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/bounding_box.C' object='src/mesh/libmesh_opt_la-bounding_box.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_opt_la-bounding_box.lo `test -f 'src/mesh/bounding_box.C' || echo '$(srcdir)/'`src/mesh/bounding_box.C
+
 src/mesh/libmesh_opt_la-checkpoint_io.lo: src/mesh/checkpoint_io.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_opt_la-checkpoint_io.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_opt_la-checkpoint_io.Tpo -c -o src/mesh/libmesh_opt_la-checkpoint_io.lo `test -f 'src/mesh/checkpoint_io.C' || echo '$(srcdir)/'`src/mesh/checkpoint_io.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/mesh/$(DEPDIR)/libmesh_opt_la-checkpoint_io.Tpo src/mesh/$(DEPDIR)/libmesh_opt_la-checkpoint_io.Plo
@@ -26480,6 +26529,13 @@ src/mesh/libmesh_prof_la-boundary_mesh.lo: src/mesh/boundary_mesh.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/boundary_mesh.C' object='src/mesh/libmesh_prof_la-boundary_mesh.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_prof_la-boundary_mesh.lo `test -f 'src/mesh/boundary_mesh.C' || echo '$(srcdir)/'`src/mesh/boundary_mesh.C
+
+src/mesh/libmesh_prof_la-bounding_box.lo: src/mesh/bounding_box.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_prof_la-bounding_box.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_prof_la-bounding_box.Tpo -c -o src/mesh/libmesh_prof_la-bounding_box.lo `test -f 'src/mesh/bounding_box.C' || echo '$(srcdir)/'`src/mesh/bounding_box.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/mesh/$(DEPDIR)/libmesh_prof_la-bounding_box.Tpo src/mesh/$(DEPDIR)/libmesh_prof_la-bounding_box.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/mesh/bounding_box.C' object='src/mesh/libmesh_prof_la-bounding_box.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/mesh/libmesh_prof_la-bounding_box.lo `test -f 'src/mesh/bounding_box.C' || echo '$(srcdir)/'`src/mesh/bounding_box.C
 
 src/mesh/libmesh_prof_la-checkpoint_io.lo: src/mesh/checkpoint_io.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/mesh/libmesh_prof_la-checkpoint_io.lo -MD -MP -MF src/mesh/$(DEPDIR)/libmesh_prof_la-checkpoint_io.Tpo -c -o src/mesh/libmesh_prof_la-checkpoint_io.lo `test -f 'src/mesh/checkpoint_io.C' || echo '$(srcdir)/'`src/mesh/checkpoint_io.C
