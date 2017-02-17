@@ -228,23 +228,18 @@ const Elem * PointLocatorTree::operator() (const Point & p,
               return this->_element;
             }
 
-          // No element seems to contain this point. Thus:
-          // 1.) If _out_of_mesh_mode == true, we can just return NULL
-          //     without searching further.
-          // 2.) If _out_of_mesh_mode == false, we perform a linear
-          //     search over all active (possibly local) elements.
-          //     The idea here is that, in the case of curved elements,
-          //     the bounding box computed in \p TreeNode::insert(const
-          //     Elem *) might be slightly inaccurate and therefore we may
-          //     have generated a false negative.
-          //
-          // Note that we skip the _use_close_to_point_tol case below, because
-          // we already did a linear search in that case above.
-          if (_out_of_mesh_mode == false && !_use_close_to_point_tol)
-            {
-              this->_element = this->perform_linear_search(p, allowed_subdomains, /*use_close_to_point*/ false);
-              return this->_element;
-            }
+          // No element seems to contain this point.  In theory, our
+          // tree now correctly handles curved elements.  In
+          // out-of-mesh mode this is sometimes expected, and we can
+          // just return NULL without searching further.  Out of
+          // out-of-mesh mode, something must have gone wrong.
+
+          // We'll avoid making this assertion just yet, though,
+          // because some users are leaving out_of_mesh_mode disabled
+          // as a workaround for old PointLocatorTree behavior.
+          // libmesh_assert_equal_to (_out_of_mesh_mode, true);
+
+          return this->_element;
         }
     }
 
