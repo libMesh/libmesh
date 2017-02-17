@@ -189,7 +189,7 @@ extern SolverPackage _solver_package;
 
 
 // ------------------------------------------------------------
-// libMeshdata initialization
+// libMesh data initialization
 #ifdef LIBMESH_HAVE_MPI
 #ifndef LIBMESH_DISABLE_COMMWORLD
 MPI_Comm           COMM_WORLD = MPI_COMM_NULL;
