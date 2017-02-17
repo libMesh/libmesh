@@ -36,7 +36,6 @@ namespace libMesh
 
 // Forward declarations
 class MeshBase;
-class MeshData;
 
 /**
  * The \p UNVIO class implements the Ideas \p UNV universal
@@ -60,13 +59,13 @@ public:
    * Constructor.  Takes a writeable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
-  UNVIO (MeshBase & mesh, MeshData * mesh_data = libmesh_nullptr);
+  UNVIO (MeshBase & mesh);
 
   /**
    * Constructor.  Takes a reference to a constant mesh object.
    * This constructor will only allow us to write the mesh.
    */
-  UNVIO (const MeshBase & mesh, MeshData * mesh_data = libmesh_nullptr);
+  UNVIO (const MeshBase & mesh);
 
   /**
    * Destructor.
@@ -131,8 +130,7 @@ private:
    * Method reads elements and stores them in
    * \p std::vector<Elem *> \p _elements in the same order as they
    * come in. Within \p UNVIO, element labels are
-   * ignored, but \p MeshData takes care of such things
-   * (if active).
+   * ignored.
    */
   void elements_in (std::istream & in_file);
 
@@ -146,18 +144,14 @@ private:
   // write support methods
 
   /**
-   * Outputs nodes to the file \p out_file.
-   * For this to work, the \p MeshData of the current
-   * \p MeshBase has to be active.  Do not use this directly,
+   * Outputs nodes to the file \p out_file.  Do not use this directly,
    * but through the proper write method.
    */
   void nodes_out (std::ostream & out_file);
 
   /**
-   * Outputs the element data to the file \p out_file.
-   * For this to work, the \p MeshData of the current
-   * \p Mesh has to be active. Do not use this directly,
-   * but through the proper write method.
+   * Outputs the element data to the file \p out_file. Do not use this
+   * directly, but through the proper write method.
    */
   void elements_out (std::ostream & out_file);
 
@@ -204,17 +198,6 @@ private:
    * label for the groups dataset
    */
   static const std::string _groups_dataset_label;
-
-  /**
-   * A pointer to the MeshData object you would like to use.
-   * with this UNVIO object.  Can be NULL.
-   */
-  MeshData * _mesh_data;
-
-  /**
-   * Map libmesh element IDs to UNV element IDs.
-   */
-  // std::vector<unsigned> _libmesh_elem_id_to_unv_elem_id;
 
   /**
    * Map UNV element IDs to libmesh element IDs.
