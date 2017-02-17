@@ -24,7 +24,6 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/cell_tet4.h"
 #include "libmesh/cell_tet10.h"
-#include "libmesh/mesh_data.h"
 
 namespace libMesh
 {
@@ -102,11 +101,6 @@ void TetGenIO::read_nodes_and_elem (std::istream & node_stream,
   this->node_in    (node_stream);
   this->element_in (ele_stream);
 
-  // Tell the MeshData object that we are finished
-  // reading data.
-  if (this->_mesh_data != libmesh_nullptr)
-    this->_mesh_data->close_foreign_id_maps ();
-
   // some more clean-up
   _assign_nodes.clear();
 }
@@ -164,13 +158,8 @@ void TetGenIO::node_in (std::istream & node_stream)
       //_assign_nodes.insert (std::make_pair(node_lab,i));
       _assign_nodes[node_lab] = i;
 
-      // do this irrespective whether MeshData exists
-      Node * newnode = mesh.add_point(xyz, i);
-
-      // Add node to the nodes vector &
-      // tell the MeshData object the foreign node id.
-      if (this->_mesh_data != libmesh_nullptr)
-        this->_mesh_data->add_foreign_node_id (newnode, node_lab);
+      // Add this point to the Mesh.
+      mesh.add_point(xyz, i);
     }
 }
 
@@ -229,11 +218,6 @@ void TetGenIO::element_in (std::istream & ele_stream)
 
       // Read the element label
       ele_stream >> element_lab;
-
-      // Add the element to the mesh &
-      // tell the MeshData object the foreign element id
-      if (this->_mesh_data != libmesh_nullptr)
-        this->_mesh_data->add_foreign_elem_id (elem, element_lab);
 
       // Read node labels
       for (dof_id_type j=0; j<n_nodes; j++)
