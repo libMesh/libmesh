@@ -47,6 +47,7 @@
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/exodusII_io.h"
+#include "libmesh/unv_io.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/elem.h"
 
@@ -70,10 +71,6 @@
 
 // Define the DofMap, which handles degree of freedom indexing.
 #include "libmesh/dof_map.h"
-
-// Define the MeshData class, which allows you to store
-// data about the mesh when reading in files, etc.
-#include "libmesh/mesh_data.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -124,8 +121,7 @@ int main (int argc, char ** argv)
     {
       if (init.comm().rank() == 0)
         {
-          libMesh::err << "ERROR: Skipping example 7.\n"
-                       << "MeshData objects currently only work in serial."
+          libMesh::err << "TODO: This example should be able to run in parallel."
                        << std::endl;
         }
       return 0;
@@ -151,28 +147,29 @@ int main (int argc, char ** argv)
   // across the default MPI communicator.
   Mesh mesh(init.comm());
 
-  // Create a corresponding MeshData and activate it.
-  MeshData mesh_data(mesh);
-  mesh_data.activate();
-
   // Read the mesh file. Here the file lshape.unv contains
   // an L-shaped domain in .unv format.
-  mesh.read("lshape.unv", &mesh_data);
+  UNVIO unvio(mesh);
+  unvio.read("lshape.unv");
+
+  // Manually prepare the mesh for use, this is not done automatically
+  // by the UNVIO reader, so we have to do it here. Note that calling
+  // this function renumbers the nodes and elements of the Mesh, but
+  // the original numbering is still stored in the UNVIO object for
+  // correctly mapping dataset values (see below) to the correct nodes.
+  mesh.prepare_for_use();
+
+  // Read the dataset accompanying this problem.  The load on the
+  // boundary of the domain is stored in the .unv data file
+  // lshape_data.unv.  The data are given as complex-valued normal
+  // velocities.
+  unvio.read_dataset("lshape_data.unv");
 
   // Print information about the mesh to the screen.
   mesh.print_info();
 
-  // The load on the boundary of the domain is stored in the .unv data
-  // file lshape_data.unv.  The data are given as complex-valued
-  // normal velocities.
-  mesh_data.read("lshape_data.unv");
-
-  // Print information about the mesh to the screen.
-  mesh_data.print_info();
-
-  // Create an EquationSystems object, and pass a MeshData pointer so
-  // the data can be accessed in the matrix and rhs assembly.
-  EquationSystems equation_systems (mesh, &mesh_data);
+  // Create an EquationSystems object.
+  EquationSystems equation_systems (mesh);
 
   // Create a FrequencySystem named "Helmholtz" and store a
   // reference to it.
@@ -217,6 +214,35 @@ int main (int argc, char ** argv)
 
   // Initialize the EquationSystems object.
   equation_systems.init ();
+
+  // Set values in the "rhs" vector based on the entries stored in the
+  // UNVIO object from the dataset we read in.  These values only need
+  // to be set once, as they are the same for every frequency. We can
+  // only do this once equation_systems.init() has been called...
+  {
+    NumericVector<Number> & freq_indep_rhs = f_system.get_vector("rhs");
+
+    MeshBase::const_node_iterator       node_it  = mesh.nodes_begin();
+    const MeshBase::const_node_iterator node_end = mesh.nodes_end();
+
+    for ( ; node_it != node_end; ++node_it)
+      {
+        // the current node pointer
+        Node * node = *node_it;
+
+        // Get the data read in from the dataset for the current Node, if any.
+        const std::vector<Number> * nodal_data = unvio.get_data(node);
+
+        // Set the rhs value based on values read in from the dataset.
+        if (nodal_data)
+          {
+            unsigned int dn = node->dof_number(/*system=*/0,
+                                               /*variable=*/0,
+                                               /*component=*/0);
+            freq_indep_rhs.set(dn, (*nodal_data)[0]);
+          }
+      }
+  }
 
   // Print information about the system to the screen.
   equation_systems.print_info ();
@@ -301,7 +327,6 @@ void assemble_helmholtz(EquationSystems & es,
   SparseMatrix<Number> & stiffness = f_system.get_matrix("stiffness");
   SparseMatrix<Number> & damping = f_system.get_matrix("damping");
   SparseMatrix<Number> & mass = f_system.get_matrix("mass");
-  NumericVector<Number> & freq_indep_rhs = f_system.get_vector("rhs");
 
   // Build a finite element object of the specified type.  Since the
   // FEBase::build() member dynamically creates memory we will
@@ -476,44 +501,6 @@ void assemble_helmholtz(EquationSystems & es,
       // identical sparsity footprints.
       f_system.matrix->add_matrix(zero_matrix, dof_indices);
     } // end loop over elements
-
-
-  // It now remains to compute the rhs. Here, we simply get the normal
-  // velocity values on the boundary from the mesh data.
-  {
-    LOG_SCOPE("rhs", "assemble_helmholtz");
-
-    // Get a reference to the mesh data.
-    const MeshData & mesh_data = es.get_mesh_data();
-
-    // We will now loop over all nodes. In case nodal data
-    // for a certain node is available in the MeshData, we simply
-    // adopt the corresponding value for the rhs vector.
-    // Note that normal data was given in the mesh data file,
-    // i.e. one value per node.
-    libmesh_assert_equal_to (mesh_data.n_val_per_node(), 1);
-
-    MeshBase::const_node_iterator       node_it  = mesh.nodes_begin();
-    const MeshBase::const_node_iterator node_end = mesh.nodes_end();
-
-    for ( ; node_it != node_end; ++node_it)
-      {
-        // the current node pointer
-        const Node * node = *node_it;
-
-        // Check if the MeshData object has data for the current node,
-        // and set the values for all the components.
-        if (mesh_data.has_data(node))
-          for (unsigned int comp=0; comp<node->n_comp(/*system=*/0, /*variable=*/0); comp++)
-            {
-              // the dof number
-              unsigned int dn = node->dof_number(0, 0, comp);
-
-              // set the nodal value
-              freq_indep_rhs.set(dn, mesh_data.get_data(node)[0]);
-            }
-      }
-  }
 }
 
 

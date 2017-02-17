@@ -88,6 +88,19 @@ public:
    */
   bool & verbose ();
 
+  /**
+   * Read a UNV data file containing a dataset of type "2414".
+   * For more info, see http://tinyurl.com/htcf6zm
+   */
+  void read_dataset(std::string file_name);
+
+  /**
+   * @returns a pointer the values associated with the node \p node,
+   * as read in by the read_dataset() method.  If no values exist for
+   * the node in question, a libmesh_nullptr is returned instead.  It
+   * is up to the user to check the return value before using it.
+   */
+  const std::vector<Number> * get_data (Node * node) const;
 
 private:
 
@@ -155,6 +168,14 @@ private:
    */
   unsigned char max_elem_dimension_seen ();
 
+  /**
+   * Replaces "1.1111D+00" with "1.1111e+00" if necessary.  Returns
+   * true if the replacement occurs, false otherwise.  This function
+   * only needs to be called once per stream, one can assume that if
+   * one number needs rewriting, they all do.
+   */
+  bool need_D_to_e (std::string & number);
+
   //-------------------------------------------------------------
   // local data
 
@@ -164,9 +185,10 @@ private:
   bool _verbose;
 
   /**
-   * maps node IDs from UNV to internal.  Used when reading.
+   * Maps UNV node IDs to libMesh Node*s. Used when reading. Even if the
+   * libMesh Mesh is renumbered, this map should continue to be valid.
    */
-  std::map<unsigned, unsigned> _unv_node_id_to_libmesh_node_id;
+  std::map<dof_id_type, Node *> _unv_node_id_to_libmesh_node_ptr;
 
   /**
    * label for the node dataset
@@ -198,6 +220,12 @@ private:
    * Map UNV element IDs to libmesh element IDs.
    */
   std::map<unsigned, unsigned> _unv_elem_id_to_libmesh_elem_id;
+
+  /**
+   * Map from libMesh Node* to data at that node, as read in by the
+   * read_dataset() function.
+   */
+  std::map<Node *, std::vector<Number> > _node_data;
 };
 
 

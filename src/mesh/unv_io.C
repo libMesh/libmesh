@@ -387,11 +387,12 @@ void UNVIO::nodes_in (std::istream & in_file)
       coords_stream.clear(); // clear iostate bits!  Important!
       coords_stream >> xyz(0) >> xyz(1) >> xyz(2);
 
-      // set up the id map
-      _unv_node_id_to_libmesh_node_id[node_label] = ctr;
-
-      // add node to the Mesh
+      // Add node to the Mesh, bump the counter.
       Node * added_node = mesh.add_point(xyz, ctr++);
+
+      // Maintain the mapping between UNV node ids and libmesh Node
+      // pointers.
+      _unv_node_id_to_libmesh_node_ptr[node_label] = added_node;
 
       // tell the MeshData object the foreign node id
       if (_mesh_data)
@@ -413,6 +414,23 @@ unsigned char UNVIO::max_elem_dimension_seen ()
       max_dim = i;
 
   return max_dim;
+}
+
+
+
+bool UNVIO::need_D_to_e (std::string & number)
+{
+  // find "D" in string, start looking at 6th element since dont expect a "D" earlier.
+  std::string::size_type position = number.find("D", 6);
+
+  if (position != std::string::npos)
+    {
+      // replace "D" in string
+      number.replace(position, 1, "e");
+      return true;
+    }
+  else
+    return false;
 }
 
 
@@ -862,11 +880,11 @@ void UNVIO::elements_in (std::istream & in_file)
       for (dof_id_type j=1; j<=n_nodes; j++)
         {
           // Map the UNV node ID to the libmesh node ID
-          std::map<unsigned, unsigned>::iterator it =
-            _unv_node_id_to_libmesh_node_id.find(node_labels[j]);
+          std::map<unsigned, Node *>::iterator it =
+            _unv_node_id_to_libmesh_node_ptr.find(node_labels[j]);
 
-          if (it != _unv_node_id_to_libmesh_node_id.end())
-            elem->set_node(assign_elem_nodes[j]) = mesh.node_ptr(it->second);
+          if (it != _unv_node_id_to_libmesh_node_ptr.end())
+            elem->set_node(assign_elem_nodes[j]) = it->second;
           else
             libmesh_error_msg("ERROR: UNV node " << node_labels[j] << " not found!");
         }
@@ -1220,5 +1238,181 @@ void UNVIO::elements_out(std::ostream & out_file)
   // Write end of dataset
   out_file << "    -1\n";
 }
+
+
+
+void UNVIO::read_dataset(std::string file_name)
+{
+  std::ifstream in_stream(file_name.c_str());
+
+  if (!in_stream.good())
+    libmesh_error_msg("Error opening UNV data file.");
+
+  std::string olds, news, dummy;
+
+  while (true)
+    {
+      in_stream >> olds >> news;
+
+      // A "-1" followed by a number means the beginning of a dataset.
+      while (((olds != "-1") || (news == "-1")) && !in_stream.eof())
+        {
+          olds = news;
+          in_stream >> news;
+        }
+
+      if (in_stream.eof())
+        break;
+
+      // We only support reading datasets in the "2414" format.
+      if (news == "2414")
+        {
+          // Ignore the rest of the current line and the next two
+          // lines that contain analysis dataset label and name.
+          for (unsigned int i=0; i<3; i++)
+            std::getline(in_stream, dummy);
+
+          // Read the dataset location, where
+          // 1: Data at nodes
+          // 2: Data on elements
+          // Currently only data on nodes is supported.
+          unsigned int dataset_location;
+          in_stream >> dataset_location;
+
+          // Currently only nodal datasets are supported.
+          if (dataset_location != 1)
+            libmesh_error_msg("ERROR: Currently only Data at nodes is supported.");
+
+          // Ignore the rest of this line and the next five records.
+          for (unsigned int i=0; i<6; i++)
+            std::getline(in_stream, dummy);
+
+          // These data are all of no interest to us...
+          unsigned int
+            model_type,
+            analysis_type,
+            data_characteristic,
+            result_type;
+
+          // The type of data (complex, real, float, double etc, see
+          // below).
+          unsigned int data_type;
+
+          // The number of floating-point values per entity.
+          unsigned int num_vals_per_node;
+
+          in_stream >> model_type           // not used here
+                    >> analysis_type        // not used here
+                    >> data_characteristic  // not used here
+                    >> result_type          // not used here
+                    >> data_type
+                    >> num_vals_per_node;
+
+          // Ignore the rest of record 9, and records 10-13.
+          for (unsigned int i=0; i<5; i++)
+            std::getline(in_stream, dummy);
+
+          // Now get the foreign (aka UNV node) node number and
+          // the respective nodal data.
+          int f_n_id;
+          std::vector<Number> values;
+
+          while (true)
+            {
+              in_stream >> f_n_id;
+
+              // If -1 then we have reached the end of the dataset.
+              if (f_n_id == -1)
+                break;
+
+              // Resize the values vector (usually data in three
+              // principle directions, i.e. num_vals_per_node = 3).
+              values.resize(num_vals_per_node);
+
+              // Read the meshdata for the respective node.
+              for (unsigned int data_cnt=0; data_cnt<num_vals_per_node; data_cnt++)
+                {
+                  // Check what data type we are reading.
+                  // 2,4: Real
+                  // 5,6: Complex
+                  // other data types are not supported yet.
+                  // As again, these floats may also be written
+                  // using a 'D' instead of an 'e'.
+                  if (data_type == 2 || data_type == 4)
+                    {
+                      std::string buf;
+                      in_stream >> buf;
+                      this->need_D_to_e(buf);
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+                      values[data_cnt] = Complex(std::atof(buf.c_str()), 0.);
+#else
+                      values[data_cnt] = std::atof(buf.c_str());
+#endif
+                    }
+
+                  else if (data_type == 5 || data_type == 6)
+                    {
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+                      Real re_val, im_val;
+
+                      std::string buf;
+                      in_stream >> buf;
+
+                      if (this->need_D_to_e(buf))
+                        {
+                          re_val = std::atof(buf.c_str());
+                          in_stream >> buf;
+                          this->need_D_to_e(buf);
+                          im_val = std::atof(buf.c_str());
+                        }
+                      else
+                        {
+                          re_val = std::atof(buf.c_str());
+                          in_stream >> im_val;
+                        }
+
+                      values[data_cnt] = Complex(re_val,im_val);
+#else
+
+                      libmesh_error_msg("ERROR: Complex data only supported when libMesh is configured with --enable-complex!");
+#endif
+                    }
+
+                  else
+                    libmesh_error_msg("ERROR: Data type not supported.");
+
+                } // end loop data_cnt
+
+              // Get a pointer to the Node associated with the UNV node id.
+              std::map<unsigned, Node *>::const_iterator it =
+                _unv_node_id_to_libmesh_node_ptr.find(f_n_id);
+
+              if (it == _unv_node_id_to_libmesh_node_ptr.end())
+                libmesh_error_msg("UNV node id " << f_n_id << " was not found.");
+
+              // Store the nodal values in our map which uses the
+              // libMesh Node* as the key.  We use operator[] here
+              // because we want to create an empty vector if the
+              // entry does not already exist.
+              _node_data[it->second] = values;
+            } // end while (true)
+        } // end if (news == "2414")
+    } // end while (true)
+}
+
+
+
+const std::vector<Number> *
+UNVIO::get_data (Node * node) const
+{
+  std::map<Node *, std::vector<Number> >::const_iterator
+    it = _node_data.find(node);
+
+  if (it == _node_data.end())
+    return libmesh_nullptr;
+  else
+    return &(it->second);
+}
+
 
 } // namespace libMesh
