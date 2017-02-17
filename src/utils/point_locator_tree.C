@@ -348,24 +348,9 @@ std::set<const Elem *> PointLocatorTree::perform_fuzzy_linear_search(const Point
 
 void PointLocatorTree::enable_out_of_mesh_mode ()
 {
-  // Out-of-mesh mode is currently only supported if all of the
-  // elements have affine mappings.  The reason is that for quadratic
-  // mappings, it is not easy to construct a reliable bounding box of
-  // the element, and thus, the fallback linear search in \p
-  // operator() is required.  Hence, out-of-mesh mode would be
-  // extremely slow.
-  if (_out_of_mesh_mode == false)
-    {
-#ifdef DEBUG
-      MeshBase::const_element_iterator       pos     = this->_mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end_pos = this->_mesh.active_elements_end();
-      for ( ; pos != end_pos; ++pos)
-        if (!(*pos)->has_affine_map())
-          libmesh_error_msg("ERROR: Out-of-mesh mode is currently only supported if all elements have affine mappings.");
-#endif
-
-      _out_of_mesh_mode = true;
-    }
+  // Out-of-mesh mode should now work properly even on meshes with
+  // non-affine elements.
+  _out_of_mesh_mode = true;
 }
 
 
