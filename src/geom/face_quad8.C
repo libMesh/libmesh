@@ -365,6 +365,36 @@ void Quad8::connectivity(const unsigned int sf,
 
 
 
+BoundingBox Quad8::loose_bounding_box () const
+{
+  // This might have curved edges, or might be a curved surface in
+  // 3-space, in which case the full bounding box can be larger than
+  // the bounding box of just the nodes.
+  //
+  //
+  // FIXME - I haven't yet proven the formula below to be correct for
+  // biquadratics - RHS
+  Point pmin, pmax;
+
+  for (unsigned d=0; d<LIBMESH_DIM; ++d)
+    {
+      Real center = this->point(0)(d);
+      for (unsigned int p=1; p != 8; ++p)
+        center += this->point(1)(d);
+      center /= 8;
+
+      Real hd = std::abs(center - this->point(0)(d));
+      for (unsigned int p=0; p != 8; ++p)
+        hd = std::max(hd, std::abs(center - this->point(p)(d)));
+
+      pmin(d) = center - hd;
+      pmax(d) = center + hd;
+    }
+
+  return BoundingBox(pmin, pmax);
+}
+
+
 Real Quad8::volume () const
 {
   // Make copies of our points.  It makes the subsequent calculations a bit

@@ -2833,6 +2833,28 @@ Real Elem::volume () const
 
 
 
+BoundingBox Elem::loose_bounding_box () const
+{
+  Point pmin = this->point(0);
+  Point pmax = pmin;
+
+  unsigned int n_points = this->n_nodes();
+  for (unsigned int p=0; p != n_points; ++p)
+    for (unsigned d=0; d<LIBMESH_DIM; ++d)
+      {
+        const Point &pt = this->point(p);
+        if (pmin(d) > pt(d))
+          pmin(d) = pt(d);
+
+        if (pmax(d) < pt(d))
+          pmax(d) = pt(d);
+      }
+
+  return BoundingBox(pmin, pmax);
+}
+
+
+
 bool Elem::is_vertex_on_parent(unsigned int c,
                                unsigned int n) const
 {

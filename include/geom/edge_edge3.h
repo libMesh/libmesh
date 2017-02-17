@@ -149,6 +149,12 @@ public:
    */
   virtual Real volume () const libmesh_override;
 
+  /**
+   * @return a bounding box (not necessarily the minimal bounding box)
+   * containing the edge.
+   */
+  virtual BoundingBox loose_bounding_box () const;
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
