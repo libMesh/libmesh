@@ -46,7 +46,6 @@ namespace libMesh
 {
 
 // Forward Declarations
-class MeshData;
 class Elem;
 class MeshBase;
 
@@ -91,7 +90,7 @@ public:
   /**
    * Constructor.
    */
-  EquationSystems (MeshBase & mesh, MeshData * mesh_data=libmesh_nullptr);
+  EquationSystems (MeshBase & mesh);
 
   /**
    * Destructor.  Should be virtual, since the user may want to derive
@@ -433,22 +432,6 @@ public:
   MeshBase & get_mesh();
 
   /**
-   * @returns true when the _mesh_data pointer is not NULL.
-   * This is needed because get_mesh_data will fail if it is NULL
-   */
-  bool has_mesh_data() const;
-
-  /**
-   * @returns a constant reference to the mesh_data
-   */
-  const MeshData & get_mesh_data() const;
-
-  /**
-   * @returns a reference to the mesh_data
-   */
-  MeshData & get_mesh_data();
-
-  /**
    * Serializes a distributed mesh and its associated
    * degree of freedom numbering for all systems
    **/
@@ -486,12 +469,6 @@ protected:
    * The mesh data structure
    */
   MeshBase & _mesh;
-
-  /**
-   * A pointer to the MeshData object you would like to use.
-   * Can be NULL.
-   */
-  MeshData * _mesh_data;
 
   /**
    * Data structure holding the systems.
@@ -559,28 +536,6 @@ inline
 MeshBase & EquationSystems::get_mesh ()
 {
   return _mesh;
-}
-
-
-inline
-const MeshData & EquationSystems::get_mesh_data () const
-{
-  libmesh_assert(_mesh_data);
-  return *_mesh_data;
-}
-
-
-inline
-MeshData & EquationSystems::get_mesh_data ()
-{
-  libmesh_assert(_mesh_data);
-  return *_mesh_data;
-}
-
-inline
-bool EquationSystems::has_mesh_data () const
-{
-  return (_mesh_data!=libmesh_nullptr);
 }
 
 

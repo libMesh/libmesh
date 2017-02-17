@@ -51,10 +51,9 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // EquationSystems class implementation
-EquationSystems::EquationSystems (MeshBase & m, MeshData * mesh_data) :
+EquationSystems::EquationSystems (MeshBase & m) :
   ParallelObject (m),
-  _mesh          (m),
-  _mesh_data     (mesh_data)
+  _mesh          (m)
 {
   // Set default parameters
   this->parameters.set<Real>        ("linear solver tolerance") = TOLERANCE * TOLERANCE;
