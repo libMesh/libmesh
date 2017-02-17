@@ -744,7 +744,6 @@ include_HEADERS = \
         mesh/mesh.h \
         mesh/mesh_base.h \
         mesh/mesh_communication.h \
-        mesh/mesh_data.h \
         mesh/mesh_function.h \
         mesh/mesh_generation.h \
         mesh/mesh_input.h \
