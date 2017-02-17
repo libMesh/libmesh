@@ -54,8 +54,7 @@
  *      packages.  Adding a new solver interface is as simple as deriving from these classes.
  *
  *  - Mesh IO & Format Translation Utilities
- *    - Ideas Universal (UNV) format (.unv) with support through \p MeshData for arbitrary
- *      float data, like boundary conditions, associated with mesh entities.
+ *    - Ideas Universal (UNV) format (.unv) with support for reading nodal data from 2414 datasets.
  *    - Sandia National Labs ExodusII format (.exd)
  *    - Amtec Engineering's Tecplot binary format (.plt)
  *    - Amtec Engineering's Tecplot ascii format (.dat)
