@@ -74,10 +74,6 @@
 // The definition of a geometric element
 #include "libmesh/elem.h"
 
-// Defines the MeshData class, which allows you to store
-// data about the mesh when reading in files, etc.
-#include "libmesh/mesh_data.h"
-
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
@@ -141,18 +137,9 @@ int main (int argc, char** argv)
   // Create a ReplicatedMesh object, with dimension to be overridden
   // later, distributed across the default MPI communicator.
   ReplicatedMesh mesh(init.comm());
-  MeshData mesh_data(mesh);
 
-  // Read the meshfile specified in the command line or
-  // use the internal mesh generator to create a uniform
-  // grid on an elongated cube.
-  mesh.read(mesh_file, &mesh_data);
-
-  // mesh.build_cube (10, 10, 40,
-  //                       -1., 1.,
-  //                       -1., 1.,
-  //                        0., 4.,
-  //                        HEX8);
+  // Read the meshfile specified on the command line.
+  mesh.read(mesh_file);
 
   // Print information about the mesh to the screen.
   mesh.print_info();

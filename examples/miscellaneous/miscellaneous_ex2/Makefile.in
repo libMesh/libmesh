@@ -89,7 +89,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = lshape.unv lshape_data.unv .linkstamp
+@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = lshape.unv lshape_data.unv out_*.e eqn_sys.dat .linkstamp
 check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5)
 @LIBMESH_DBG_MODE_TRUE@am__append_2 = example-dbg

@@ -1,4 +1,4 @@
-CLEANFILES   = # start empty, append beloe
+CLEANFILES   = # start empty, append below
 
 example_name = miscellaneous_ex2
 install_dir  = $(examples_install_path)/miscellaneous/ex2
@@ -18,7 +18,7 @@ if LIBMESH_VPATH_BUILD
 	-rm -f lshape_data.unv && $(LN_S) -f $(srcdir)/lshape_data.unv .
 	$(AM_V_GEN)touch .linkstamp
 
-  CLEANFILES += lshape.unv lshape_data.unv .linkstamp
+  CLEANFILES += lshape.unv lshape_data.unv out_*.e eqn_sys.dat .linkstamp
 endif
 
 
