@@ -283,10 +283,10 @@ DenseVector<T>::DenseVector (const DenseVector<T2> & other_vector) :
 
   _val.clear();
 
-  const std::size_t N = other_vals.size();
+  const int N = cast_int<int>(other_vals.size());
   _val.reserve(N);
 
-  for (std::size_t i=0; i<N; i++)
+  for (int i=0; i<N; i++)
     _val.push_back(other_vals[i]);
 }
 
@@ -313,10 +313,10 @@ DenseVector<T> & DenseVector<T>::operator = (const DenseVector<T2> & other_vecto
 
   _val.clear();
 
-  const std::size_t N = other_vals.size();
+  const int N = cast_int<int>(other_vals.size());
   _val.reserve(N);
 
-  for (std::size_t i=0; i<N; i++)
+  for (int i=0; i<N; i++)
     _val.push_back(other_vals[i]);
 
   return *this;
@@ -394,8 +394,8 @@ template<typename T>
 inline
 void DenseVector<T>::scale (const T factor)
 {
-  const std::size_t N = _val.size();
-  for (std::size_t i=0; i<N; i++)
+  const int N = cast_int<int>(_val.size());
+  for (int i=0; i<N; i++)
     _val[i] *= factor;
 }
 
@@ -421,8 +421,8 @@ DenseVector<T>::add (const T2 factor,
 {
   libmesh_assert_equal_to (this->size(), vec.size());
 
-  const std::size_t N = _val.size();
-  for (unsigned int i=0; i<N; i++)
+  const int N = cast_int<int>(_val.size());
+  for (int i=0; i<N; i++)
     (*this)(i) += static_cast<T>(factor)*vec(i);
 }
 
@@ -448,8 +448,8 @@ typename CompareTypes<T, T2>::supertype DenseVector<T>::dot (const DenseVector<T
 #else
   typename CompareTypes<T, T2>::supertype val = 0.;
 
-  const std::size_t N = _val.size();
-  for (unsigned int i=0; i<N; i++)
+  const int N = cast_int<int>(_val.size());
+  for (int i=0; i<N; i++)
     val += (*this)(i)*libmesh_conj(vec(i));
 
   return val;
@@ -465,8 +465,8 @@ typename CompareTypes<T, T2>::supertype DenseVector<T>::indefinite_dot (const De
 
   typename CompareTypes<T, T2>::supertype val = 0.;
 
-  const std::size_t N = _val.size();
-  for (std::size_t i=0; i<N; i++)
+  const int N = cast_int<int>(_val.size());
+  for (int i=0; i<N; i++)
     val += (*this)(i)*(vec(i));
 
   return val;
@@ -479,8 +479,8 @@ bool DenseVector<T>::operator== (const DenseVector<T2> & vec) const
 {
   libmesh_assert_equal_to (this->size(), vec.size());
 
-  const std::size_t N = _val.size();
-  for (std::size_t i=0; i<N; i++)
+  const int N = cast_int<int>(_val.size());
+  for (int i=0; i<N; i++)
     if ((*this)(i) != vec(i))
       return false;
 
@@ -496,8 +496,8 @@ bool DenseVector<T>::operator!= (const DenseVector<T2> & vec) const
 {
   libmesh_assert_equal_to (this->size(), vec.size());
 
-  const std::size_t N = _val.size();
-  for (std::size_t i=0; i<N; i++)
+  const int N = cast_int<int>(_val.size());
+  for (int i=0; i<N; i++)
     if ((*this)(i) != vec(i))
       return true;
 
@@ -513,8 +513,8 @@ DenseVector<T> & DenseVector<T>::operator+= (const DenseVector<T2> & vec)
 {
   libmesh_assert_equal_to (this->size(), vec.size());
 
-  const std::size_t N = _val.size();
-  for (std::size_t i=0; i<N; i++)
+  const int N = cast_int<int>(_val.size());
+  for (int i=0; i<N; i++)
     (*this)(i) += vec(i);
 
   return *this;
@@ -529,8 +529,8 @@ DenseVector<T> & DenseVector<T>::operator-= (const DenseVector<T2> & vec)
 {
   libmesh_assert_equal_to (this->size(), vec.size());
 
-  const std::size_t N = _val.size();
-  for (std::size_t i=0; i<N; i++)
+  const int N = cast_int<int>(_val.size());
+  for (int i=0; i<N; i++)
     (*this)(i) -= vec(i);
 
   return *this;
@@ -545,8 +545,8 @@ Real DenseVector<T>::min () const
   libmesh_assert (this->size());
   Real my_min = libmesh_real((*this)(0));
 
-  const std::size_t N = _val.size();
-  for (std::size_t i=1; i!=N; i++)
+  const int N = cast_int<int>(_val.size());
+  for (int i=1; i!=N; i++)
     {
       Real current = libmesh_real((*this)(i));
       my_min = (my_min < current? my_min : current);
@@ -563,8 +563,8 @@ Real DenseVector<T>::max () const
   libmesh_assert (this->size());
   Real my_max = libmesh_real((*this)(0));
 
-  const std::size_t N = _val.size();
-  for (std::size_t i=1; i!=N; i++)
+  const int N = cast_int<int>(_val.size());
+  for (int i=1; i!=N; i++)
     {
       Real current = libmesh_real((*this)(i));
       my_max = (my_max > current? my_max : current);
@@ -585,8 +585,8 @@ Real DenseVector<T>::l1_norm () const
   return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1> >(&_val[0], _val.size()).template lpNorm<1>();
 #else
   Real my_norm = 0.;
-  const std::size_t N = _val.size();
-  for (std::size_t i=0; i!=N; i++)
+  const int N = cast_int<int>(_val.size());
+  for (int i=0; i!=N; i++)
     my_norm += std::abs((*this)(i));
 
   return my_norm;
@@ -606,8 +606,8 @@ Real DenseVector<T>::l2_norm () const
   return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1> >(&_val[0], _val.size()).norm();
 #else
   Real my_norm = 0.;
-  const std::size_t N = _val.size();
-  for (std::size_t i=0; i!=N; i++)
+  const int N = cast_int<int>(_val.size());
+  for (int i=0; i!=N; i++)
     my_norm += TensorTools::norm_sq((*this)(i));
 
   return sqrt(my_norm);
@@ -628,8 +628,8 @@ Real DenseVector<T>::linfty_norm () const
 #else
   Real my_norm = TensorTools::norm_sq((*this)(0));
 
-  const std::size_t N = _val.size();
-  for (std::size_t i=1; i!=N; i++)
+  const int N = cast_int<int>(_val.size());
+  for (int i=1; i!=N; i++)
     {
       Real current = TensorTools::norm_sq((*this)(i));
       my_norm = (my_norm > current? my_norm : current);
@@ -648,8 +648,9 @@ void DenseVector<T>::get_principal_subvector (unsigned int sub_n,
   libmesh_assert_less_equal ( sub_n, this->size() );
 
   dest.resize(sub_n);
-  for(unsigned int i=0; i<sub_n; i++)
-    dest(i) = (*this)(i);
+  const int N = cast_int<int>(sub_n);
+  for (int i=0; i<N; i++)
+    dest(i) = _val[i];
 }
 
 } // namespace libMesh
