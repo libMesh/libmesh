@@ -67,7 +67,7 @@ int main (int argc, char ** argv)
 
   MetisPartitioner partitioner;
 
-  for (unsigned int i = 0; i < all_n_procs.size(); i++)
+  for (std::size_t i = 0; i < all_n_procs.size(); i++)
     {
       processor_id_type n_procs = all_n_procs[i];
 

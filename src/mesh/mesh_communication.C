@@ -1331,14 +1331,14 @@ struct SyncNodeIds
                     std::vector<datum> & new_ids)
   {
     bool data_changed = false;
-    for (unsigned int i=0; i != old_ids.size(); ++i)
+    for (std::size_t i=0; i != old_ids.size(); ++i)
       {
         const dof_id_type new_id = new_ids[i];
         if (new_id != DofObject::invalid_id)
           {
             const dof_id_type old_id = old_ids[i];
 
-            Node *node = mesh.query_node_ptr(old_id);
+            Node * node = mesh.query_node_ptr(old_id);
 
             // If we can't find the node we were asking about, another
             // processor must have already given us the definitive id

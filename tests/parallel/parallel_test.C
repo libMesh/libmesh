@@ -126,7 +126,7 @@ public:
 
     TestCommWorld->broadcast(dest);
 
-    for (unsigned int i=0; i<src.size(); i++)
+    for (std::size_t i=0; i<src.size(); i++)
       CPPUNIT_ASSERT_EQUAL( src[i] , dest[i] );
   }
 
@@ -142,7 +142,7 @@ public:
       if (TestCommWorld->rank() == 0)
       {
         src.resize(TestCommWorld->size());
-        for (unsigned int i=0; i<src.size(); i++)
+        for (std::size_t i=0; i<src.size(); i++)
           src[i] = i;
       }
 
@@ -160,7 +160,7 @@ public:
       if (TestCommWorld->rank() == 0)
       {
         src.resize(TestCommWorld->size() * CHUNK_SIZE);
-        for (unsigned int i=0; i<src.size(); i++)
+        for (std::size_t i=0; i<src.size(); i++)
           src[i] = i;
       }
 
@@ -182,7 +182,7 @@ public:
         src.resize((TestCommWorld->size() * (TestCommWorld->size() + 1)) / 2);
         counts.resize(TestCommWorld->size());
 
-        for (unsigned int i=0; i<src.size(); i++)
+        for (std::size_t i=0; i<src.size(); i++)
           src[i] = i;
         for (unsigned int i=0; i<TestCommWorld->size(); i++)
           counts[i] = static_cast<int>(i+1);
@@ -204,12 +204,12 @@ public:
       {
         // Give each processor "rank" number of items ( Sum i=1..n == (n * (n + 1))/2 )
         src.resize(TestCommWorld->size());
-        for (unsigned int i=0; i<src.size(); ++i)
+        for (std::size_t i=0; i<src.size(); ++i)
           src[i].resize(i+1);
 
         unsigned int global_counter = 0;
-        for (unsigned int i=0; i<src.size(); i++)
-          for (unsigned int j=0; j<src[i].size(); j++)
+        for (std::size_t i=0; i<src.size(); i++)
+          for (std::size_t j=0; j<src[i].size(); j++)
             src[i][j] = global_counter++;
       }
 
@@ -319,7 +319,7 @@ public:
 
         CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
 
-        for (unsigned int i=0; i<src_val.size(); i++)
+        for (std::size_t i=0; i<src_val.size(); i++)
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
 
 
@@ -338,7 +338,7 @@ public:
 
         CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
 
-        for (unsigned int i=0; i<src_val.size(); i++)
+        for (std::size_t i=0; i<src_val.size(); i++)
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
 
         // Restore default communication
@@ -380,7 +380,7 @@ public:
 
         CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
 
-        for (unsigned int i=0; i<src_val.size(); i++)
+        for (std::size_t i=0; i<src_val.size(); i++)
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
 
         // Synchronous communication
@@ -399,7 +399,7 @@ public:
 
         CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
 
-        for (unsigned int i=0; i<src_val.size(); i++)
+        for (std::size_t i=0; i<src_val.size(); i++)
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
 
         // Restore default communication

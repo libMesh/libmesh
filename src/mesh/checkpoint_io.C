@@ -624,7 +624,7 @@ void CheckpointIO::read_subdomain_names(Xdr & io)
       io.data(subdomain_ids);
       io.data(subdomain_names);
 
-      for (unsigned int i=0; i<subdomain_ids.size(); i++)
+      for (std::size_t i=0; i<subdomain_ids.size(); i++)
         subdomain_map[cast_int<subdomain_id_type>(subdomain_ids[i])] =
           subdomain_names[i];
     }
@@ -769,7 +769,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
           libmesh_assert(elem->n_nodes() == conn_data.size());
 
           // Connect all the nodes to this element
-          for (unsigned int n=0; n<conn_data.size(); n++)
+          for (std::size_t n=0; n<conn_data.size(); n++)
             elem->set_node(n) =
               mesh.node_ptr(cast_int<dof_id_type>(conn_data[n]));
 
@@ -802,7 +802,7 @@ void CheckpointIO::read_bcs (Xdr & io)
   io.data(side_list, "# sides of elements for bcs");
   io.data(bc_id_list, "# bc ids");
 
-  for (unsigned int i=0; i<element_id_list.size(); i++)
+  for (std::size_t i=0; i<element_id_list.size(); i++)
     boundary_info.add_side(element_id_list[i], side_list[i], bc_id_list[i]);
 }
 
@@ -822,7 +822,7 @@ void CheckpointIO::read_nodesets (Xdr & io)
   io.data(node_id_list, "# node id list");
   io.data(bc_id_list, "# nodeset bc id list");
 
-  for (unsigned int i=0; i<node_id_list.size(); i++)
+  for (std::size_t i=0; i<node_id_list.size(); i++)
     boundary_info.add_node(node_id_list[i], bc_id_list[i]);
 }
 
@@ -850,7 +850,7 @@ void CheckpointIO::read_bc_names(Xdr & io, BoundaryInfo & info, bool is_sideset)
     }
 
   // Add them back into the map
-  for (unsigned int i=0; i<boundary_ids.size(); i++)
+  for (std::size_t i=0; i<boundary_ids.size(); i++)
     boundary_map[boundary_ids[i]] = boundary_names[i];
 }
 

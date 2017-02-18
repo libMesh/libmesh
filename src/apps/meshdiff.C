@@ -73,7 +73,7 @@ int main(int argc, char ** argv)
     libMesh::out << "No systems found in fine or coarse solution!"
                  << std::endl;
 
-  for (unsigned int i = 0; i != sysnames.size(); ++i)
+  for (std::size_t i = 0; i != sysnames.size(); ++i)
     {
       const std::string sysname = sysnames[i];
       const System & sys1 = es1.get_system(sysname);

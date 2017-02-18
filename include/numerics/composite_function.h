@@ -148,7 +148,7 @@ public:
   virtual UniquePtr<FunctionBase<Output> > clone() const libmesh_override
   {
     CompositeFunction * returnval = new CompositeFunction();
-    for (unsigned int i=0; i != subfunctions.size(); ++i)
+    for (std::size_t i=0; i != subfunctions.size(); ++i)
       returnval->attach_subfunction(*subfunctions[i], index_maps[i]);
     return UniquePtr<FunctionBase<Output> > (returnval);
   }

@@ -81,7 +81,7 @@ int main(int argc, char ** argv)
                EquationSystems::READ_BASIC_ONLY);
       libMesh::out << "Loaded next solution " << argv[i] << std::endl;
 
-      for (unsigned int s = 0; s != sysnames.size(); ++s)
+      for (std::size_t s = 0; s != sysnames.size(); ++s)
         {
           if (!es2.has_system(sysnames[s]))
             libmesh_error_msg("EquationSystems object does not have " << sysnames[s]);
@@ -92,7 +92,7 @@ int main(int argc, char ** argv)
 
   int n_solutions = argc - 3;
 
-  for (unsigned int s = 0; s != sysnames.size(); ++s)
+  for (std::size_t s = 0; s != sysnames.size(); ++s)
     {
       (*summed_solutions[s]) /= n_solutions;
       es1.get_system(s).solution->swap(*summed_solutions[s]);

@@ -155,7 +155,7 @@ int main (int argc, char ** argv)
         // Loop over the fine element's Gauss Points
         perf_log.start_event("gp_loop");
 
-        for (unsigned int gp=0; gp<q_point.size(); gp++)
+        for (std::size_t gp=0; gp<q_point.size(); gp++)
           {
             Number fine_soln=0., coarse_soln=0.;
 

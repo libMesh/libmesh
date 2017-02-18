@@ -207,7 +207,7 @@ public:
 
         CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
 
-        for (unsigned int i=0; i<src_val.size(); i++)
+        for (std::size_t i=0; i<src_val.size(); i++)
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
 
 
@@ -226,7 +226,7 @@ public:
 
         CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
 
-        for (unsigned int i=0; i<src_val.size(); i++)
+        for (std::size_t i=0; i<src_val.size(); i++)
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
 
         // Restore default communication
@@ -268,7 +268,7 @@ public:
 
         CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
 
-        for (unsigned int i=0; i<src_val.size(); i++)
+        for (std::size_t i=0; i<src_val.size(); i++)
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
 
         // Synchronous communication
@@ -287,7 +287,7 @@ public:
 
         CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
 
-        for (unsigned int i=0; i<src_val.size(); i++)
+        for (std::size_t i=0; i<src_val.size(); i++)
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
 
         // Restore default communication

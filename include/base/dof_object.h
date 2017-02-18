@@ -924,7 +924,7 @@ dof_id_type DofObject::vg_dof_base(const unsigned int s,
 
   // #ifdef DEBUG
   //   std::cout << " [ ";
-  //   for (unsigned int i=0; i<_idx_buf.size(); i++)
+  //   for (std:size_t i=0; i<_idx_buf.size(); i++)
   //     std::cout << _idx_buf[i] << " ";
   //   std::cout << "]\n";
   // #endif

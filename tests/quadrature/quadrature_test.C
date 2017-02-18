@@ -236,7 +236,7 @@ public:
                     Utility::iota(denominator.begin(), denominator.end(), sorted_powers[2]+1);
 
                     // The denominator is guaranteed to have the most terms...
-                    for (unsigned i=0; i<denominator.size(); ++i)
+                    for (std::size_t i=0; i<denominator.size(); ++i)
                       {
                         if (i < numerator_1.size())
                           analytical *= numerator_1[i];
@@ -311,7 +311,7 @@ public:
                   Utility::iota(denominator.begin(), denominator.end(), larger_power+1);
 
                   // The denominator is guaranteed to have more terms...
-                  for (unsigned i=0; i<denominator.size(); ++i)
+                  for (std::size_t i=0; i<denominator.size(); ++i)
                     {
                       if (i < numerator.size())
                         analytical *= numerator[i];
@@ -351,13 +351,13 @@ public:
     // alpha=1 integral values
     // int((1-x)*x^p, x=0..1) = 1 / (p^2 + 3p + 2)
     true_integrals[0].resize(10);
-    for (unsigned p=0; p<true_integrals[0].size(); ++p)
+    for (std::size_t p=0; p<true_integrals[0].size(); ++p)
       true_integrals[0][p] = 1. / (p*p + 3.*p + 2.);
 
     // alpha=2 integral values
     // int((1-x)^2*x^p, x=0..1) = 2 / (p^3 + 6*p^2 + 11*p + 6)
     true_integrals[1].resize(10);
-    for (unsigned p=0; p<true_integrals[1].size(); ++p)
+    for (std::size_t p=0; p<true_integrals[1].size(); ++p)
       true_integrals[1][p] = 2. / (p*p*p + 6.*p*p + 11.*p + 6.);
 
     // Test both types of Jacobi quadrature rules

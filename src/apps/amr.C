@@ -201,7 +201,7 @@ void assemble(EquationSystems & es,
       // standard stuff...  like in code 1.
       for (unsigned int gp=0; gp<qrule.n_points(); gp++)
         {
-          for (unsigned int i=0; i<phi.size(); ++i)
+          for (std::size_t i=0; i<phi.size(); ++i)
             {
               // this is tricky.  ig is the _global_ dof index corresponding
               // to the _global_ vertex number elem->node_id(i).  Note that
@@ -219,7 +219,7 @@ void assemble(EquationSystems & es,
               Fu(i) += JxW[gp]*f*phi[i][gp];
               Fv(i) += JxW[gp]*f*phi[i][gp];
 
-              for (unsigned int j=0; j<phi.size(); ++j)
+              for (std::size_t j=0; j<phi.size(); ++j)
                 {
 
                   Kuu(i,j) += JxW[gp]*((phi[i][gp])*(phi[j][gp]));
@@ -242,7 +242,7 @@ void assemble(EquationSystems & es,
 
                 //fe_face->print_info();
 
-                for (unsigned int gp=0; gp<JxW_face.size(); gp++)
+                for (std::size_t gp=0; gp<JxW_face.size(); gp++)
                   area += JxW_face[gp];
               }
         }

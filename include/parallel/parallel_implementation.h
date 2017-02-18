@@ -3383,7 +3383,7 @@ void Communicator::scatter(const std::vector<std::vector<T> > & data,
       if (!identical_buffer_sizes)
         counts.resize(this->size());
 
-      for (unsigned int i=0; i < data.size(); ++i)
+      for (std::size_t i=0; i < data.size(); ++i)
         {
           if (!identical_buffer_sizes)
             counts[i] = data[i].size();
@@ -3505,7 +3505,7 @@ inline void Communicator::broadcast (std::basic_string<T> & data,
 #endif
 
   if (this->rank() == root_id)
-    for(std::size_t i=0; i<data.size(); i++)
+    for (std::size_t i=0; i<data.size(); i++)
       data_c[i] = data[i];
 
   this->broadcast (data_c, root_id);
@@ -3573,7 +3573,7 @@ inline void Communicator::broadcast (std::vector<std::basic_string<T> > & data,
   // Pack the strings
   if (root_id == this->rank())
     {
-      for (unsigned int i=0; i<data.size(); ++i)
+      for (std::size_t i=0; i<data.size(); ++i)
         {
           temp.push_back(cast_int<unsigned int>(data[i].size()));
           for (std::size_t j=0; j != data[i].size(); ++j)

@@ -267,7 +267,7 @@ private:
         const std::vector<Point> & xyz = s->get_side_fe(0)->get_xyz();
 
         // On side 3 of a hex the normal direction is +y
-        for (unsigned int qp=0; qp != xyz.size(); ++qp)
+        for (std::size_t qp=0; qp != xyz.size(); ++qp)
           {
             CPPUNIT_ASSERT_DOUBLES_EQUAL
               (libmesh_real(nx(*s,xyz[qp])), 0.0, TOLERANCE*TOLERANCE);

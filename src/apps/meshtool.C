@@ -666,12 +666,6 @@ int main (int argc, char ** argv)
                    << " of " << mesh.n_elem()
                    << " elements below the cutoff." << std::endl;
 
-      /*
-        for (unsigned int i=0; i<bad_elts.size(); i++)
-        libMesh::out << bad_elts[i] << " ";
-        libMesh::out << std::endl;
-      */
-
       // Compute the histogram for this distribution
       std::vector<dof_id_type> histogram;
       sv.histogram(histogram, n_bins);

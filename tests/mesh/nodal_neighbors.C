@@ -80,12 +80,12 @@ protected:
           // to memory address, which is somewhat arbitrary, so create
           // a vector sorted by IDs for test purposes.
           std::vector<dof_id_type> neighbor_node_ids(neighbor_nodes.size());
-          for (unsigned i=0; i<neighbor_nodes.size(); ++i)
+          for (std::size_t i=0; i<neighbor_nodes.size(); ++i)
             neighbor_node_ids[i] = neighbor_nodes[i]->id();
           std::sort(neighbor_node_ids.begin(), neighbor_node_ids.end());
 
           // Compare to validation_data
-          for (unsigned j=0; j<neighbor_node_ids.size(); ++j)
+          for (std::size_t j=0; j<neighbor_node_ids.size(); ++j)
             {
               CPPUNIT_ASSERT_EQUAL( validation_data[2*ctr + j], neighbor_node_ids[j] );
             }

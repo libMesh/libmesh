@@ -149,7 +149,7 @@ public:
             _fe->reinit(_elem, &master_points);
 
             Number u = 0;
-            for (unsigned int d = 0; d != _dof_indices.size(); ++d)
+            for (std::size_t d = 0; d != _dof_indices.size(); ++d)
               u += _fe->get_phi()[d][0] *
                    (*_sys->current_local_solution)(_dof_indices[d]);
 
@@ -184,7 +184,7 @@ public:
             _fe->reinit(_elem, &master_points);
 
             Gradient grad_u = 0;
-            for (unsigned int d = 0; d != _dof_indices.size(); ++d)
+            for (std::size_t d = 0; d != _dof_indices.size(); ++d)
               grad_u += _fe->get_dphi()[d][0] *
                         (*_sys->current_local_solution)(_dof_indices[d]);
 
@@ -226,7 +226,7 @@ public:
             _fe->reinit(_elem, &master_points);
 
             Number grad_u_x = 0, grad_u_y = 0, grad_u_z = 0;
-            for (unsigned int d = 0; d != _dof_indices.size(); ++d)
+            for (std::size_t d = 0; d != _dof_indices.size(); ++d)
               {
                 grad_u_x += _fe->get_dphidx()[d][0] *
                             (*_sys->current_local_solution)(_dof_indices[d]);
