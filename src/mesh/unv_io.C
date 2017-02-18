@@ -20,7 +20,6 @@
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/unv_io.h"
-#include "libmesh/mesh_data.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/face_quad4.h"
@@ -62,20 +61,18 @@ const std::string UNVIO::_groups_dataset_label   = "2467";
 // ------------------------------------------------------------
 // UNVIO class members
 
-UNVIO::UNVIO (MeshBase & mesh, MeshData * mesh_data) :
+UNVIO::UNVIO (MeshBase & mesh) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase>(mesh),
-  _verbose (false),
-  _mesh_data (mesh_data)
+  _verbose (false)
 {
 }
 
 
 
-UNVIO::UNVIO (const MeshBase & mesh, MeshData * mesh_data) :
+UNVIO::UNVIO (const MeshBase & mesh) :
   MeshOutput<MeshBase> (mesh),
-  _verbose (false),
-  _mesh_data (mesh_data)
+  _verbose (false)
 {
 }
 
@@ -236,11 +233,6 @@ void UNVIO::read_implementation (std::istream & in_stream)
                         << "D support." );
 #endif
 
-    // Possibly tell the MeshData object that we are finished
-    // reading data.
-    if (_mesh_data)
-      _mesh_data->close_foreign_id_maps ();
-
     // Delete any lower-dimensional elements that might have been
     // added to the mesh stricly for setting BCs.
     {
@@ -303,19 +295,6 @@ void UNVIO::write_implementation (std::ostream & out_file)
 {
   if ( !out_file.good() )
     libmesh_error_msg("ERROR: Output file not good.");
-
-  // If we have a MeshData object, possibly set it to use "compatibility" mode.
-  if (_mesh_data && !(_mesh_data->active()) && !(_mesh_data->compatibility_mode()))
-    {
-      libMesh::err << std::endl
-                   << "*************************************************************************" << std::endl
-                   << "* WARNING: MeshData neither active nor in compatibility mode.           *" << std::endl
-                   << "*          Enable compatibility mode for MeshData.  Use this Universal  *" << std::endl
-                   << "*          file with caution: libMesh node and element ids are used.    *" << std::endl
-                   << "*************************************************************************" << std::endl
-                   << std::endl;
-      _mesh_data->enable_compatibility_mode();
-    }
 
   // write the nodes, then the elements
   this->nodes_out    (out_file);
@@ -393,10 +372,6 @@ void UNVIO::nodes_in (std::istream & in_file)
       // Maintain the mapping between UNV node ids and libmesh Node
       // pointers.
       _unv_node_id_to_libmesh_node_ptr[node_label] = added_node;
-
-      // tell the MeshData object the foreign node id
-      if (_mesh_data)
-        _mesh_data->add_foreign_node_id (added_node, node_label);
     }
 }
 
@@ -895,18 +870,11 @@ void UNVIO::elements_in (std::istream & in_file)
       elem->set_id(ctr);
 
       // Maintain a map from the libmesh (0-based) numbering to the
-      // UNV numbering.  This probably duplicates what the MeshData
-      // object does, but hopefully the MeshData object will be going
-      // away at some point...
-      //_libmesh_elem_id_to_unv_elem_id[i] = element_label;
+      // UNV numbering.
       _unv_elem_id_to_libmesh_elem_id[element_label] = ctr;
 
       // Add the element to the Mesh
-      Elem * added_elem = mesh.add_elem(elem);
-
-      // Tell the MeshData object the foreign elem id
-      if (_mesh_data)
-        _mesh_data->add_foreign_elem_id (added_elem, element_label);
+      mesh.add_elem(elem);
 
       // Increment the counter for the next iteration
       ctr++;
@@ -920,10 +888,6 @@ void UNVIO::elements_in (std::istream & in_file)
 
 void UNVIO::nodes_out (std::ostream & out_file)
 {
-  if (_mesh_data)
-    libmesh_assert (_mesh_data->active() ||
-                    _mesh_data->compatibility_mode());
-
   if (this->verbose())
     libMesh::out << "  Writing " << MeshOutput<MeshBase>::mesh().n_nodes() << " nodes" << std::endl;
 
@@ -952,10 +916,6 @@ void UNVIO::nodes_out (std::ostream & out_file)
       const Node * current_node = *nd;
 
       dof_id_type node_id = current_node->id();
-
-      // If possible, use the MeshData object to get the right node ID.
-      if (_mesh_data)
-        node_id = _mesh_data->node_to_foreign_id(current_node);
 
       out_file << std::setw(10) << node_id
                << std::setw(10) << exp_coord_sys_dummy
@@ -995,10 +955,6 @@ void UNVIO::nodes_out (std::ostream & out_file)
 
 void UNVIO::elements_out(std::ostream & out_file)
 {
-  if (_mesh_data)
-    libmesh_assert (_mesh_data->active() ||
-                    _mesh_data->compatibility_mode());
-
   if (this->verbose())
     libMesh::out << "  Writing elements" << std::endl;
 
@@ -1194,10 +1150,6 @@ void UNVIO::elements_out(std::ostream & out_file)
 
       dof_id_type elem_id = elem->id();
 
-      // If possible, use the MeshData object to get the right node ID.
-      if (_mesh_data)
-        _mesh_data->elem_to_foreign_id(elem);
-
       out_file << std::setw(10) << elem_id             // element ID
                << std::setw(10) << fe_descriptor_id    // type of element
                << std::setw(10) << phys_prop_tab_dummy // not supported
@@ -1219,10 +1171,6 @@ void UNVIO::elements_out(std::ostream & out_file)
 
           // Write foreign label for this node
           dof_id_type node_id = node_in_unv_order->id();
-
-          // If possible, use the MeshData object to determine this
-          if (_mesh_data)
-            _mesh_data->node_to_foreign_id(node_in_unv_order);
 
           out_file << std::setw(10) << node_id;
         }
@@ -1329,7 +1277,7 @@ void UNVIO::read_dataset(std::string file_name)
               // principle directions, i.e. num_vals_per_node = 3).
               values.resize(num_vals_per_node);
 
-              // Read the meshdata for the respective node.
+              // Read the values for the respective node.
               for (unsigned int data_cnt=0; data_cnt<num_vals_per_node; data_cnt++)
                 {
                   // Check what data type we are reading.

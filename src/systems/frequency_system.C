@@ -135,11 +135,12 @@ void FrequencySystem::init_data ()
        */
       if (es.parameters.have_parameter<unsigned int> ("n_frequencies"))
         {
+#ifndef NDEBUG
           const unsigned int n_freq =
             es.parameters.get<unsigned int>("n_frequencies");
 
           libmesh_assert_greater (n_freq, 0);
-
+#endif
           _finished_set_frequencies = true;
 
           this->set_current_frequency(0);

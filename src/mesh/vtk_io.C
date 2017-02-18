@@ -26,7 +26,6 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/system.h"
-#include "libmesh/mesh_data.h"
 #include "libmesh/node.h"
 #include "libmesh/elem.h"
 
@@ -71,32 +70,26 @@ namespace libMesh
 {
 
 // Constructor for reading
-VTKIO::VTKIO (MeshBase & mesh, MeshData * mesh_data) :
+VTKIO::VTKIO (MeshBase & mesh) :
   MeshInput<MeshBase> (mesh, /*is_parallel_format=*/true),
   MeshOutput<MeshBase>(mesh, /*is_parallel_format=*/true)
 #ifdef LIBMESH_HAVE_VTK
   ,_vtk_grid(libmesh_nullptr)
-  ,_mesh_data(mesh_data)
   ,_compress(false)
 #endif
 {
-  // Ignore unused parameters when !LIBMESH_HAVE_VTK
-  libmesh_ignore(mesh_data);
 }
 
 
 
 // Constructor for writing
-VTKIO::VTKIO (const MeshBase & mesh, MeshData * mesh_data) :
+VTKIO::VTKIO (const MeshBase & mesh) :
   MeshOutput<MeshBase>(mesh, /*is_parallel_format=*/true)
 #ifdef LIBMESH_HAVE_VTK
   ,_vtk_grid(libmesh_nullptr)
-  ,_mesh_data(mesh_data)
   ,_compress(false)
 #endif
 {
-  // Ignore unused parameters when !LIBMESH_HAVE_VTK
-  libmesh_ignore(mesh_data);
 }
 
 
@@ -196,11 +189,6 @@ void VTKIO::read (const std::string & name)
       double * pnt = _vtk_grid->GetPoint(static_cast<vtkIdType>(i));
       Point xyz(pnt[0], pnt[1], pnt[2]);
       Node * newnode = mesh.add_point(xyz, i);
-
-      // Add node to the nodes vector &
-      // tell the MeshData object the foreign node id.
-      if (this->_mesh_data != libmesh_nullptr)
-        this->_mesh_data->add_foreign_node_id (newnode, i);
     }
 
   // Get the number of cells from the _vtk_grid object

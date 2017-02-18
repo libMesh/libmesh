@@ -30,7 +30,6 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
 #include "libmesh/equation_systems.h"
-#include "libmesh/mesh_data.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/mesh_modification.h"
 #include "libmesh/elem.h"

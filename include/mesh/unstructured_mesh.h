@@ -29,10 +29,6 @@
 namespace libMesh
 {
 
-// Forward Declarations
-class MeshData;
-
-
 /**
  * The \p UnstructuredMesh class is derived from the \p MeshBase class.  The
  * user will typically want to instantiate and use the
@@ -82,10 +78,6 @@ public:
    * way to read a mesh.  The \p UnstructuredMesh then initializes its data
    * structures and is ready for use.
    *
-   * In order to read the UNV and TetGen file types, you must
-   * also pass a separate pointer to the MeshData object you will
-   * use with this mesh, since these read methods expect it.
-   *
    * The skip_renumber_nodes_and_elements argument is now deprecated -
    * to disallow renumbering, set \p MeshBase::allow_renumbering(false).
    *
@@ -95,19 +87,14 @@ public:
    * skip it.
    */
   virtual void read (const std::string & name,
-                     MeshData * mesh_data=libmesh_nullptr,
+                     void * mesh_data=libmesh_nullptr,
                      bool skip_renumber_nodes_and_elements=false,
                      bool skip_find_neighbors=false) libmesh_override;
   /**
    * Write the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
-   *
-   * In order to write the UNV and TetGen file types, you must
-   * also pass a separate pointer to the MeshData object you have been
-   * using with this mesh, since these write methods expect it.
    */
-  virtual void write (const std::string & name,
-                      MeshData * mesh_data=libmesh_nullptr) libmesh_override;
+  virtual void write (const std::string & name) libmesh_override;
 
   /**
    * Write to the file specified by \p name.  Attempts to figure out the

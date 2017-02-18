@@ -194,10 +194,6 @@ libmesh_SOURCES =  \
         src/mesh/mesh_base.C \
         src/mesh/mesh_communication.C \
         src/mesh/mesh_communication_global_indices.C \
-        src/mesh/mesh_data.C \
-        src/mesh/mesh_data_tetgen_support.C \
-        src/mesh/mesh_data_unv_support.C \
-        src/mesh/mesh_data_xdr_support.C \
         src/mesh/mesh_function.C \
         src/mesh/mesh_generation.C \
         src/mesh/mesh_iterators.C \

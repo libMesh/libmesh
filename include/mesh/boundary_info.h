@@ -40,16 +40,14 @@ class Elem;
 class Node;
 class MeshBase;
 class UnstructuredMesh;
-class MeshData;
 
 
 /**
- * The \p BoundaryInfo class contains information relevant
- * to boundary conditions: it does not hold actual boundary
- * condition data (check \p MeshData for that), but can mark
- * element faces and nodes with ids useful for identifying the
- * type of boundary condtion.  It can also build a mesh that
- * just includes boundary elements/faces.
+ * The \p BoundaryInfo class contains information relevant to boundary
+ * conditions including storing faces, edges, and nodes on the
+ * boundary, along with ids that can be used to identify the type of
+ * boundary each entity is part of. It can also build a mesh that just
+ * includes boundary elements/faces.
  *
  * \author Benjamin S. Kirk
  * \date 2002
@@ -95,14 +93,8 @@ public:
    * like any other mesh, except with interior_parent() values defined
    * for algorithms which couple boundary and interior mesh
    * information.  Any pre-existing \p boundary_mesh data is cleared.
-   *
-   * If you are using a MeshData class with this Mesh, you can
-   * pass a pointer to both the boundary_mesh's MeshData object,
-   * and the MeshData object used for this mesh.
    */
-  void sync (UnstructuredMesh & boundary_mesh,
-             MeshData * boundary_mesh_data=libmesh_nullptr,
-             MeshData * this_mesh_data=libmesh_nullptr);
+  void sync (UnstructuredMesh & boundary_mesh);
 
   /**
    * Generates \p boundary_mesh data structures corresponding to the
@@ -114,15 +106,9 @@ public:
    * Boundary IDs for the nodes on \p requested_boundary_ids
    * will also be copied over to \p boundary_mesh. We do not
    * currently copy edge boundary IDs over to \p boundary_mesh.
-   *
-   * If you are using a MeshData class with this Mesh, you can
-   * pass a pointer to both the boundary_mesh's MeshData object,
-   * and the MeshData object used for this mesh.
    */
   void sync (const std::set<boundary_id_type> & requested_boundary_ids,
-             UnstructuredMesh & boundary_mesh,
-             MeshData * boundary_mesh_data=libmesh_nullptr,
-             MeshData * this_mesh_data=libmesh_nullptr);
+             UnstructuredMesh & boundary_mesh);
 
   /**
    * Suppose we have used sync to create \p boundary_mesh. Then each

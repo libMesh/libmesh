@@ -45,7 +45,6 @@
 #include "libmesh/inf_elem_builder.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
-#include "libmesh/mesh_data.h"
 #include "libmesh/mesh_modification.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/perfmon.h"
@@ -60,7 +59,7 @@ using namespace libMesh;
  * convenient enum for the mode in which the boundary mesh
  * should be written
  */
-enum BoundaryMeshWriteMode {BM_DISABLED=0, BM_MESH_ONLY, BM_WITH_MESHDATA};
+enum BoundaryMeshWriteMode {BM_DISABLED=0, BM_MESH_ONLY};
 
 
 void usage(const std::string & progName)
@@ -77,7 +76,6 @@ void usage(const std::string & progName)
            << "    -o <string>                   Output file name\n"
            << "    -s <string>                   Solution file name\n"
            << "\n    -b                            Write the boundary conditions\n"
-           << "    -B                            Like -b, but with activated MeshData\n"
            << "    -D <factor>                   Randomly move interior nodes by D*hmin\n"
            << "    -h                            Print help menu\n"
            << "    -p <count>                    Partition into <count> subdomains\n"
@@ -355,20 +353,6 @@ void process_cmd_line(int argc,
           }
 
           /**
-           * Try to write the boundary,
-           * but copy also the MeshData
-           */
-        case 'B':
-          {
-            if (b_mesh_b_given)
-              libmesh_error_msg("ERROR: Do not use -b and -B concurrently!");
-
-            b_mesh_B_given = true;
-            write_bndry = BM_WITH_MESHDATA;
-            break;
-          }
-
-          /**
            * Convert elements to first-order
            * counterparts
            */
@@ -550,27 +534,12 @@ int main (int argc, char ** argv)
     }
 
   Mesh & mesh = *mesh_ptr;
-  MeshData mesh_data(mesh);
 
   /**
    * Read the input mesh
    */
   if (!names.empty())
     {
-      /*
-       * activate the MeshData of the dim mesh,
-       * so that it can be copied to the boundary
-       */
-
-      if (write_bndry == BM_WITH_MESHDATA)
-        {
-          mesh_data.activate();
-
-          if (verbose)
-            mesh_data.print_info();
-        }
-
-
       mesh.read(names[0]);
 
       if (verbose)
@@ -948,16 +917,12 @@ int main (int argc, char ** argv)
           {
             BoundaryMesh boundary_mesh
               (mesh.comm(), cast_int<unsigned char>(mesh.mesh_dimension()-1));
-            MeshData boundary_mesh_data (boundary_mesh);
 
             std::string boundary_name = "bndry_";
             boundary_name += names[1];
 
             if (write_bndry == BM_MESH_ONLY)
               mesh.get_boundary_info().sync(boundary_mesh);
-
-            else if  (write_bndry == BM_WITH_MESHDATA)
-              mesh.get_boundary_info().sync(boundary_mesh, &boundary_mesh_data, &mesh_data);
 
             else
               libmesh_error_msg("Invalid value write_bndry = " << write_bndry);
@@ -969,12 +934,6 @@ int main (int argc, char ** argv)
           }
       }
   };
-
-  /*
-    libMesh::out << "Infinite loop, look at memory footprint" << std::endl;
-    for (;;)
-    ;
-  */
 
   return 0;
 }

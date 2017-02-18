@@ -39,7 +39,6 @@ namespace libMesh
 {
 
 class MeshBase;
-class MeshData;
 
 /**
  * This class implements reading and writing meshes in the VTK format.
@@ -62,14 +61,14 @@ public:
    * This is the constructor required to read a mesh.
    */
   explicit
-  VTKIO (MeshBase & mesh, MeshData * mesh_data=libmesh_nullptr);
+  VTKIO (MeshBase & mesh);
 
   /**
    * Constructor.  Takes a read-only reference to a mesh object.
    * This is the constructor required to write a mesh.
    */
   explicit
-  VTKIO (const MeshBase & mesh, MeshData * mesh_data=libmesh_nullptr);
+  VTKIO (const MeshBase & mesh);
 
   /**
    * Bring in base class functionality for name resolution and to
@@ -144,12 +143,6 @@ private:
    * pointer to the VTK grid
    */
   vtkUnstructuredGrid * _vtk_grid;
-
-  /**
-   * A pointer to the MeshData object you would like to use.
-   * with this VTKIO object.  Can be NULL.
-   */
-  MeshData * _mesh_data;
 
   /**
    * Flag to indicate whether the output should be compressed
