@@ -67,6 +67,9 @@ public:
 
     UniquePtr<PointLocatorBase> locator = mesh.sub_point_locator();
 
+    if (!mesh.is_serial())
+      locator->enable_out_of_mesh_mode();
+
     for (unsigned int i=0; i != n_elem_per_side+1; ++i)
       {
         for (unsigned int j=0; j != ny+1; ++j)
