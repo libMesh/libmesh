@@ -55,7 +55,26 @@ class Elem;
 namespace MeshTools
 {
 
-using libMesh::BoundingBox;  // Backwards compatibility
+// Backwards compatibility with forward declarations
+class BoundingBox : public libMesh::BoundingBox
+{
+public:
+  BoundingBox (const Point & new_min,
+               const Point & new_max) :
+    libMesh::BoundingBox(new_min, new_max) {
+    libmesh_deprecated(); // Switch to libMesh::BoundingBox
+  }
+
+  BoundingBox (const std::pair<Point, Point> & bbox) :
+    libMesh::BoundingBox(bbox) {
+    libmesh_deprecated(); // Switch to libMesh::BoundingBox
+  }
+
+  BoundingBox () {
+    libmesh_deprecated(); // Switch to libMesh::BoundingBox
+  }
+};
+
 
 /**
  * This function returns the sum over all the elemenents of the number
