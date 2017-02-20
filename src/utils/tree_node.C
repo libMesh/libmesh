@@ -72,36 +72,13 @@ bool TreeNode<N>::insert (const Elem * elem)
   libmesh_assert(elem);
 
   // We first want to find the corners of the cuboid surrounding the cell.
-  Point min_coord = elem->point(0);
-  Point max_coord = min_coord;
-  for (unsigned i=1; i<elem->n_nodes(); ++i)
-    {
-      Point p = elem->point(i);
-
-      // LIBMESH_DIM gives the number of non-zero components in a Point
-      for (unsigned d=0; d<LIBMESH_DIM; ++d)
-        {
-          if (min_coord(d) > p(d))
-            min_coord(d) = p(d);
-
-          if (max_coord(d) < p(d))
-            max_coord(d) = p(d);
-        }
-    }
+  const BoundingBox bbox = elem->loose_bounding_box();
 
   // Next, find out whether this cuboid has got non-empty intersection
   // with the bounding box of the current tree node.
-  bool intersects = true;
-
-  // LIBMESH_DIM gives the number of non-zero components in a Point
-  for (unsigned int d=0; d<LIBMESH_DIM; d++)
-    {
-      if (max_coord(d) < this->bounding_box.first(d) || min_coord(d) > this->bounding_box.second(d))
-        intersects = false;
-    }
-
+  //
   // If not, we should not care about this element.
-  if (!intersects)
+  if (!this->bounding_box.intersect(bbox))
     return false;
 
   // Only add the element if we are active
@@ -247,7 +224,7 @@ bool TreeNode<N>::bounds_point (const Point & p,
 
 
 template <unsigned int N>
-std::pair<Point, Point>
+BoundingBox
 TreeNode<N>::create_bounding_box (unsigned int c) const
 {
   switch (N)
@@ -270,29 +247,29 @@ TreeNode<N>::create_bounding_box (unsigned int c) const
         switch (c)
           {
           case 0:
-            return std::make_pair (Point(xmin, ymin, zmin),
-                                   Point(xc,   yc,   zc));
+            return BoundingBox (Point(xmin, ymin, zmin),
+                                Point(xc,   yc,   zc));
           case 1:
-            return std::make_pair (Point(xc,   ymin, zmin),
-                                   Point(xmax, yc,   zc));
+            return BoundingBox (Point(xc,   ymin, zmin),
+                                Point(xmax, yc,   zc));
           case 2:
-            return std::make_pair (Point(xmin, yc,   zmin),
-                                   Point(xc,   ymax, zc));
+            return BoundingBox (Point(xmin, yc,   zmin),
+                                Point(xc,   ymax, zc));
           case 3:
-            return std::make_pair (Point(xc,   yc,   zmin),
-                                   Point(xmax, ymax, zc));
+            return BoundingBox (Point(xc,   yc,   zmin),
+                                Point(xmax, ymax, zc));
           case 4:
-            return std::make_pair (Point(xmin, ymin, zc),
-                                   Point(xc,   yc,   zmax));
+            return BoundingBox (Point(xmin, ymin, zc),
+                                Point(xc,   yc,   zmax));
           case 5:
-            return std::make_pair (Point(xc,   ymin, zc),
-                                   Point(xmax, yc,   zmax));
+            return BoundingBox (Point(xc,   ymin, zc),
+                                Point(xmax, yc,   zmax));
           case 6:
-            return std::make_pair (Point(xmin, yc,   zc),
-                                   Point(xc,   ymax, zmax));
+            return BoundingBox (Point(xmin, yc,   zc),
+                                Point(xc,   ymax, zmax));
           case 7:
-            return std::make_pair (Point(xc,   yc,   zc),
-                                   Point(xmax, ymax, zmax));
+            return BoundingBox (Point(xc,   yc,   zc),
+                                Point(xmax, ymax, zmax));
           default:
             libmesh_error_msg("c >= N! : " << c);
           }
@@ -315,17 +292,17 @@ TreeNode<N>::create_bounding_box (unsigned int c) const
         switch (c)
           {
           case 0:
-            return std::make_pair (Point(xmin, ymin),
-                                   Point(xc,   yc));
+            return BoundingBox (Point(xmin, ymin),
+                                Point(xc,   yc));
           case 1:
-            return std::make_pair (Point(xc,   ymin),
-                                   Point(xmax, yc));
+            return BoundingBox (Point(xc,   ymin),
+                                Point(xmax, yc));
           case 2:
-            return std::make_pair (Point(xmin, yc),
-                                   Point(xc,   ymax));
+            return BoundingBox (Point(xmin, yc),
+                                Point(xc,   ymax));
           case 3:
-            return std::make_pair (Point(xc,   yc),
-                                   Point(xmax, ymax));
+            return BoundingBox (Point(xc,   yc),
+                                Point(xmax, ymax));
           default:
             libmesh_error_msg("c >= N!");
           }
@@ -345,11 +322,11 @@ TreeNode<N>::create_bounding_box (unsigned int c) const
         switch (c)
           {
           case 0:
-            return std::make_pair (Point(xmin),
-                                   Point(xc));
+            return BoundingBox (Point(xmin),
+                                Point(xc));
           case 1:
-            return std::make_pair (Point(xc),
-                                   Point(xmax));
+            return BoundingBox (Point(xc),
+                                Point(xmax));
           default:
             libmesh_error_msg("c >= N!");
           }
@@ -363,7 +340,7 @@ TreeNode<N>::create_bounding_box (unsigned int c) const
 
   libmesh_error_msg("We'll never get here!");
   Point min, max;
-  return std::make_pair (min, max);
+  return BoundingBox (min, max);
 }
 
 

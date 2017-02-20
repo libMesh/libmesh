@@ -228,23 +228,18 @@ const Elem * PointLocatorTree::operator() (const Point & p,
               return this->_element;
             }
 
-          // No element seems to contain this point. Thus:
-          // 1.) If _out_of_mesh_mode == true, we can just return NULL
-          //     without searching further.
-          // 2.) If _out_of_mesh_mode == false, we perform a linear
-          //     search over all active (possibly local) elements.
-          //     The idea here is that, in the case of curved elements,
-          //     the bounding box computed in \p TreeNode::insert(const
-          //     Elem *) might be slightly inaccurate and therefore we may
-          //     have generated a false negative.
-          //
-          // Note that we skip the _use_close_to_point_tol case below, because
-          // we already did a linear search in that case above.
-          if (_out_of_mesh_mode == false && !_use_close_to_point_tol)
-            {
-              this->_element = this->perform_linear_search(p, allowed_subdomains, /*use_close_to_point*/ false);
-              return this->_element;
-            }
+          // No element seems to contain this point.  In theory, our
+          // tree now correctly handles curved elements.  In
+          // out-of-mesh mode this is sometimes expected, and we can
+          // just return NULL without searching further.  Out of
+          // out-of-mesh mode, something must have gone wrong.
+
+          // We'll avoid making this assertion just yet, though,
+          // because some users are leaving out_of_mesh_mode disabled
+          // as a workaround for old PointLocatorTree behavior.
+          // libmesh_assert_equal_to (_out_of_mesh_mode, true);
+
+          return this->_element;
         }
     }
 
@@ -348,24 +343,9 @@ std::set<const Elem *> PointLocatorTree::perform_fuzzy_linear_search(const Point
 
 void PointLocatorTree::enable_out_of_mesh_mode ()
 {
-  // Out-of-mesh mode is currently only supported if all of the
-  // elements have affine mappings.  The reason is that for quadratic
-  // mappings, it is not easy to construct a reliable bounding box of
-  // the element, and thus, the fallback linear search in \p
-  // operator() is required.  Hence, out-of-mesh mode would be
-  // extremely slow.
-  if (_out_of_mesh_mode == false)
-    {
-#ifdef DEBUG
-      MeshBase::const_element_iterator       pos     = this->_mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end_pos = this->_mesh.active_elements_end();
-      for ( ; pos != end_pos; ++pos)
-        if (!(*pos)->has_affine_map())
-          libmesh_error_msg("ERROR: Out-of-mesh mode is currently only supported if all elements have affine mappings.");
-#endif
-
-      _out_of_mesh_mode = true;
-    }
+  // Out-of-mesh mode should now work properly even on meshes with
+  // non-affine elements.
+  _out_of_mesh_mode = true;
 }
 
 

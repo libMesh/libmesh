@@ -201,6 +201,28 @@ Real Edge3::volume () const
 
 
 
+BoundingBox Edge3::loose_bounding_box () const
+{
+  // This might be a curved line through 2-space or 3-space, in which
+  // case the full bounding box can be larger than the bounding box of
+  // just the nodes.
+  Point pmin, pmax;
+
+  for (unsigned d=0; d<LIBMESH_DIM; ++d)
+    {
+      Real center = this->point(2)(d);
+      Real hd = std::max(std::abs(center - this->point(0)(d)),
+                         std::abs(center - this->point(1)(d)));
+
+      pmin(d) = center - hd;
+      pmax(d) = center + hd;
+    }
+
+  return BoundingBox(pmin, pmax);
+}
+
+
+
 dof_id_type Edge3::key () const
 {
   return this->compute_key(this->node_id(2));

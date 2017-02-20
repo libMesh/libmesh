@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/bounding_box.h"
 #include "libmesh/point.h"
 
 // C++ includes
@@ -167,7 +168,7 @@ private:
   /**
    * Constructs the bounding box for child \p c.
    */
-  std::pair<Point, Point> create_bounding_box (unsigned int c) const;
+  BoundingBox create_bounding_box (unsigned int c) const;
 
   /**
    * Reference to the mesh.
@@ -187,10 +188,8 @@ private:
 
   /**
    * The Cartesian bounding box for the node.
-   * The minimum point is stored as bounding_box.first,
-   * the maximum point is stored as bounding_box.second.
    */
-  std::pair<Point, Point> bounding_box;
+  BoundingBox bounding_box;
 
   /**
    * Pointers to the elements in this tree node.

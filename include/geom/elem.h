@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/bounding_box.h"
 #include "libmesh/dof_object.h"
 #include "libmesh/id_types.h"
 #include "libmesh/reference_counted_object.h"
@@ -744,6 +745,18 @@ public:
    * @return the (length/area/volume) of the geometric element.
    */
   virtual Real volume () const;
+
+  /**
+   * @return a bounding box (not necessarily the minimal bounding box)
+   * containing the geometric element.
+   *
+   * The base class implementation determines a bounding box for the
+   * element *nodes*, which should be sufficient for first order
+   * finite elements.  Higher order geometric elements will need to
+   * override with an implementation which takes curved elements into
+   * account.
+   */
+  virtual BoundingBox loose_bounding_box () const;
 
   /**
    * Based on the quality metric q specified by the user,

@@ -136,6 +136,11 @@ public:
                                                            const unsigned int) const libmesh_override
   { libmesh_not_implemented(); return 0; }
 
+  /**
+   * @return a bounding box (not necessarily the minimal bounding box)
+   * containing the edge.
+   */
+  virtual BoundingBox loose_bounding_box () const;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

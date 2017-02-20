@@ -382,6 +382,9 @@ public:
     // make sure our unique ids were all read in correctly too.
     UniquePtr<PointLocatorBase> locator = _mesh->sub_point_locator();
 
+    if (!_mesh->is_serial())
+      locator->enable_out_of_mesh_mode();
+
     MeshBase::const_element_iterator       el     =
       mesh2.active_local_elements_begin();
     const MeshBase::const_element_iterator end_el =

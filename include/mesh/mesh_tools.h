@@ -22,11 +22,10 @@
 
 // Local Includes
 #include "libmesh/libmesh.h"
+#include "libmesh/bounding_box.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/id_types.h"
 #include "libmesh/mesh_base.h"
-#include "libmesh/point.h" // some compilers want the full definition - I think so they can do
-// return-value-optimization for BoundingBox'es - BSK
 
 // C++ Includes
 #include <vector>
@@ -55,61 +54,27 @@ class Elem;
 // MeshTools namespace
 namespace MeshTools
 {
-/**
- * Defines a Cartesian bounding box by the two
- * corner extremum.
- */
-class BoundingBox : public std::pair<Point, Point>
+
+// Backwards compatibility with forward declarations
+class BoundingBox : public libMesh::BoundingBox
 {
 public:
-
   BoundingBox (const Point & new_min,
                const Point & new_max) :
-    std::pair<Point, Point>(new_min, new_max)
-  {}
+    libMesh::BoundingBox(new_min, new_max) {
+    libmesh_deprecated(); // Switch to libMesh::BoundingBox
+  }
 
   BoundingBox (const std::pair<Point, Point> & bbox) :
-    std::pair<Point, Point> (bbox)
-  {}
-
-  /**
-   * Default constructor sets invalid bounds.
-   */
-  BoundingBox ()
-  {
-    this->invalidate();
+    libMesh::BoundingBox(bbox) {
+    libmesh_deprecated(); // Switch to libMesh::BoundingBox
   }
 
-  void invalidate ()
-  {
-    for (unsigned int i=0; i<LIBMESH_DIM; i++)
-      {
-        this->first(i)  =  std::numeric_limits<Real>::max();
-        this->second(i) = -std::numeric_limits<Real>::max();
-      }
+  BoundingBox () {
+    libmesh_deprecated(); // Switch to libMesh::BoundingBox
   }
-
-  const Point & min() const
-  { return this->first; }
-
-  Point & min()
-  { return this->first; }
-
-  const Point & max() const
-  { return this->second; }
-
-  Point & max()
-  { return this->second; }
-
-  BoundingBox & expand()
-  { return *this; }
-
-  bool intersect (const BoundingBox &) const;
-
-  bool contains_point (const Point &) const;
-
-private:
 };
+
 
 /**
  * This function returns the sum over all the elemenents of the number

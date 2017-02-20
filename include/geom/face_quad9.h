@@ -177,6 +177,12 @@ public:
    */
   virtual Real volume () const libmesh_override;
 
+  /**
+   * @return a bounding box (not necessarily the minimal bounding box)
+   * containing the geometric element.
+   */
+  virtual BoundingBox loose_bounding_box () const;
+
 protected:
 
   /**

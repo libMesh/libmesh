@@ -2039,7 +2039,7 @@ Number System::point_value(unsigned int var, const Point & p, const bool insist_
   UniquePtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase & locator = *locator_ptr;
 
-  if (!insist_on_success)
+  if (!insist_on_success || !mesh.is_serial())
     locator.enable_out_of_mesh_mode();
 
   // Get a pointer to the element that contains P
@@ -2151,7 +2151,7 @@ Gradient System::point_gradient(unsigned int var, const Point & p, const bool in
   UniquePtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase & locator = *locator_ptr;
 
-  if (!insist_on_success)
+  if (!insist_on_success || !mesh.is_serial())
     locator.enable_out_of_mesh_mode();
 
   // Get a pointer to the element that contains P
@@ -2266,7 +2266,7 @@ Tensor System::point_hessian(unsigned int var, const Point & p, const bool insis
   UniquePtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase & locator = *locator_ptr;
 
-  if (!insist_on_success)
+  if (!insist_on_success || !mesh.is_serial())
     locator.enable_out_of_mesh_mode();
 
   // Get a pointer to the element that contains P

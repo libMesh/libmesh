@@ -54,6 +54,12 @@ public:
    */
   virtual unsigned int dim () const libmesh_override { return 3; }
 
+  /**
+   * @return a bounding box (not necessarily the minimal bounding box)
+   * containing the geometric element.
+   */
+  virtual BoundingBox loose_bounding_box () const;
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
