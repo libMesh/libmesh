@@ -267,10 +267,10 @@ ax.bar(x, combined_devel_users_number, width, color='c', label='libmesh-users')
 ax.bar(x, devel_numbers, width, color='b', label='libmesh-devel')
 
 # Set the xticks and xticklabels
-xticks = [1, 25, 49, 73, 97, 121, 145]
+xticks = [1, 25, 49, 73, 97, 121, 145, 169]
 xticks = [x+width/2. for x in xticks]
 ax.set_xticks(xticks)
-ax.set_xticklabels(['2003', '2005', '2007', '2009', '2011', '2013', '2015'])
+ax.set_xticklabels(['2003', '2005', '2007', '2009', '2011', '2013', '2015', '2017'])
 
 # Add a legend to the plot.
 plt.legend(loc='upper left')
