@@ -223,12 +223,12 @@ ax1.plot(date_nums, n_files, 'bo-')
 ax1.set_ylabel('Files (blue circles)')
 
 # Set up x-tick locations
-ticks_names = ['2003-03-04', '2007-03-04', '2011-03-04', '2015-03-04']
+ticks_names = ['2003', '2005', '2007', '2009', '2011', '2013', '2015']
 
 # Get numerical values for the names
 tick_nums = []
 for x in ticks_names:
-  tick_nums.append(date2num(datetime.strptime(x, '%Y-%m-%d')))
+  tick_nums.append(date2num(datetime.strptime(x + '-03-04', '%Y-%m-%d')))
 
 # Set tick labels and positions
 ax1.set_xticks(tick_nums)
