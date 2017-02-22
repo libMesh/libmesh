@@ -517,9 +517,17 @@ void GmshIO::read_mesh(std::istream & in)
               if (n_dims_seen > 1)
                 {
                   // Store lower-dimensional elements in a map sorted
-                  // by Elem::key().  Bob Jenkins' hash functions are
-                  // very good, but it's not possible for them to be
-                  // perfect... so we use a multimap.
+                  // by Elem::key().  We use a multimap for two reasons:
+                  // 1.) The hash function is not guaranteed to be
+                  // unique, so different lower-dimensional elements
+                  // could theoretically hash to the same value,
+                  // although this is pretty unlikely.
+                  // 2.) The Gmsh file may contain multiple
+                  // lower-dimensional elements for a single side in
+                  // order to implement multiple boundary ids for a
+                  // single side.  These lower-dimensional elements
+                  // will all hash to the same value, and we need to
+                  // be able to store all of them.
                   typedef LIBMESH_BEST_UNORDERED_MULTIMAP<dof_id_type, Elem *> provide_container_t;
                   provide_container_t provide_bcs;
 
@@ -566,7 +574,7 @@ void GmshIO::read_mesh(std::istream & in)
                             // This is a max-dimension element that
                             // may require BCs.  For each of its
                             // sides, including internal sides, we'll
-                            // see if a lower-dimensional element
+                            // see if one more more lower-dimensional elements
                             // provides boundary information for it.
                             // Note that we have not yet called
                             // find_neighbors(), so we can't use
@@ -596,9 +604,6 @@ void GmshIO::read_mesh(std::istream & in)
                                         // higher-dimensional element.
                                         boundary_id_type bid = cast_int<boundary_id_type>(lower_dim_elem->subdomain_id());
                                         mesh.get_boundary_info().add_side(elem, sn, bid);
-
-                                        // We only allow one match, so break out of for loop.
-                                        break;
                                       }
                                   }
                               }

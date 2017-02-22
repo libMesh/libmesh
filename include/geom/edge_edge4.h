@@ -140,7 +140,7 @@ public:
    * @return a bounding box (not necessarily the minimal bounding box)
    * containing the edge.
    */
-  virtual BoundingBox loose_bounding_box () const;
+  virtual BoundingBox loose_bounding_box () const libmesh_override;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

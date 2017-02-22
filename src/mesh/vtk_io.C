@@ -188,7 +188,7 @@ void VTKIO::read (const std::string & name)
       // and add the actual point
       double * pnt = _vtk_grid->GetPoint(static_cast<vtkIdType>(i));
       Point xyz(pnt[0], pnt[1], pnt[2]);
-      Node * newnode = mesh.add_point(xyz, i);
+      mesh.add_point(xyz, i);
     }
 
   // Get the number of cells from the _vtk_grid object
