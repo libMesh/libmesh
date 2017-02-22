@@ -216,12 +216,12 @@ ax.bar(date_nums, n_hits_month, width=30, color='b')
 fig.suptitle('LibMesh Page Hits/Month (in Thousands)')
 
 # Set up x-tick locations -- August of each year
-ticks_names = ['Aug 2011', 'Aug 2012', 'Aug 2013', 'Aug 2014', 'Aug 2015']
+ticks_names = ['2012', '2013', '2014', '2015', '2016', '2017']
 
 # Get numerical values for the names
 tick_nums = []
 for x in ticks_names:
-  tick_nums.append(date2num(datetime.strptime(x, '%b %Y')))
+  tick_nums.append(date2num(datetime.strptime('Jan ' + x, '%b %Y')))
 
 # Set tick labels and positions
 ax.set_xticks(tick_nums)
