@@ -151,6 +151,55 @@ void BoundaryInfo::clear()
 
 
 
+void BoundaryInfo::regenerate_id_sets()
+{
+  // Clear the old caches
+  _boundary_ids.clear();
+  _side_boundary_ids.clear();
+  _node_boundary_ids.clear();
+  _edge_boundary_ids.clear();
+  _shellface_boundary_ids.clear();
+
+  // Loop over id maps to regenerate each set.
+  for (boundary_node_iter it = _boundary_node_id.begin(),
+         end = _boundary_node_id.end();
+       it != end; ++it)
+    {
+      const boundary_id_type id = it->second;
+      _boundary_ids.insert(id);
+      _node_boundary_ids.insert(id);
+    }
+
+  for (boundary_edge_iter it = _boundary_edge_id.begin(),
+         end = _boundary_edge_id.end();
+       it != end; ++it)
+    {
+      const boundary_id_type id = it->second.second;
+      _boundary_ids.insert(id);
+      _edge_boundary_ids.insert(id);
+    }
+
+  for (boundary_side_iter it = _boundary_side_id.begin(),
+         end = _boundary_side_id.end();
+       it != end; ++it)
+    {
+      const boundary_id_type id = it->second.second;
+      _boundary_ids.insert(id);
+      _side_boundary_ids.insert(id);
+    }
+
+  for (boundary_shellface_iter it = _boundary_shellface_id.begin(),
+         end = _boundary_shellface_id.end();
+       it != end; ++it)
+    {
+      const boundary_id_type id = it->second.second;
+      _boundary_ids.insert(id);
+      _shellface_boundary_ids.insert(id);
+    }
+}
+
+
+
 void BoundaryInfo::sync (UnstructuredMesh & boundary_mesh)
 {
   std::set<boundary_id_type> request_boundary_ids(_boundary_ids);
