@@ -139,6 +139,9 @@ void TetGenMeshInterface::pointset_convexhull ()
       this->_mesh.delete_elem (*it);
   }
 
+  // We just removed any boundary info associated with element faces
+  // or edges, so let's update the boundary id caches.
+  this->_mesh.get_boundary_info().regenerate_id_sets();
 
   // Add the 2D elements which comprise the convex hull back to the mesh.
   // Vector that temporarily holds the node labels defining element.
@@ -468,6 +471,10 @@ void TetGenMeshInterface::delete_2D_hull_elements()
       if (elem->type() == TRI3)
         _mesh.delete_elem(elem);
     }
+
+  // We just removed any boundary info associated with hull element
+  // edges, so let's update the boundary id caches.
+  this->_mesh.get_boundary_info().regenerate_id_sets();
 }
 
 

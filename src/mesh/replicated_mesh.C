@@ -1457,6 +1457,11 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                 }
             }
         }
+
+      // Removing stitched-away boundary ids might have removed an id
+      // *entirely*, so we need to recompute boundary id sets to check
+      // for that.
+      this->get_boundary_info().regenerate_id_sets();
     }
 }
 
