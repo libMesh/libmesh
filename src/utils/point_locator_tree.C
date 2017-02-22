@@ -233,11 +233,7 @@ const Elem * PointLocatorTree::operator() (const Point & p,
           // out-of-mesh mode this is sometimes expected, and we can
           // just return NULL without searching further.  Out of
           // out-of-mesh mode, something must have gone wrong.
-
-          // We'll avoid making this assertion just yet, though,
-          // because some users are leaving out_of_mesh_mode disabled
-          // as a workaround for old PointLocatorTree behavior.
-          // libmesh_assert_equal_to (_out_of_mesh_mode, true);
+          libmesh_assert_equal_to (_out_of_mesh_mode, true);
 
           return this->_element;
         }
