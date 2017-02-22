@@ -23,7 +23,7 @@ import numpy as np
 # being moved to their respective years after being published.
 
 data = [
-    '2004',  5,
+    '\'04',  5,
     '\'05',  2,
     '\'06', 13,
     '\'07',  8,
@@ -37,8 +37,7 @@ data = [
     '\'15', 79,
     '\'16', 81,
     '\'17', 19,
-    'P',     5, # Preprints
-    'T',    58  # Theses
+    'T',    58
     ]
 
 # Extract the x-axis labels from the data array
@@ -63,11 +62,11 @@ x = np.linspace(1, N, N)
 width = 0.8
 
 # Make the bar chart.  Plot years in blue, preprints and theses in green.
-ax.bar(x[0:N-2], n_papers[0:N-2], width, color='b')
-ax.bar(x[N-2:N], n_papers[N-2:N], width, color='g')
+ax.bar(x[0:N-1], n_papers[0:N-1], width, color='b')
+ax.bar(x[N-1:N], n_papers[N-1:N], width, color='g')
 
 # Label the x-axis
-plt.xlabel('P=Preprints, T=Theses')
+plt.xlabel('T=PhD, MS, and BS Theses')
 
 # Set up the xtick locations and labels.  Note that you have to offset
 # the position of the ticks by width/2, where width is the width of
