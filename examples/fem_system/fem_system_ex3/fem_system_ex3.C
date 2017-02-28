@@ -43,6 +43,8 @@
 #include "libmesh/diff_solver.h"
 #include "libmesh/newmark_solver.h"
 #include "libmesh/steady_solver.h"
+#include "libmesh/euler_solver.h"
+#include "libmesh/euler2_solver.h"
 #include "libmesh/elem.h"
 
 #define x_scaling 1.3
@@ -183,6 +185,21 @@ int main (int argc, char ** argv)
 
   if( time_solver == std::string("newmark"))
     system.time_solver.reset(new NewmarkSolver(system));
+
+  else if( time_solver == std::string("euler") )
+    {
+      system.time_solver.reset(new EulerSolver(system));
+      EulerSolver & euler_solver = libmesh_cast_ref<EulerSolver &>(*(system.time_solver.get()));
+      euler_solver.theta = infile("theta", 1.0);
+    }
+
+  else if( time_solver == std::string("euler2") )
+    {
+      system.time_solver.reset(new Euler2Solver(system));
+      Euler2Solver & euler_solver = libmesh_cast_ref<Euler2Solver &>(*(system.time_solver.get()));
+      euler_solver.theta = infile("theta", 1.0);
+    }
+
   else if( time_solver == std::string("steady"))
     {
       system.time_solver.reset(new SteadySolver(system));
@@ -230,7 +247,7 @@ int main (int argc, char ** argv)
     std::ostringstream file_name;
 
     // We write the file in the ExodusII format.
-    file_name << "out.e-s."
+    file_name << std::string("out.")+time_solver+std::string(".e-s.")
               << std::setw(3)
               << std::setfill('0')
               << std::right
@@ -275,7 +292,7 @@ int main (int argc, char ** argv)
           std::ostringstream file_name;
 
           // We write the file in the ExodusII format.
-          file_name << "out.e-s."
+          file_name << std::string("out.")+time_solver+std::string(".e-s.")
                     << std::setw(3)
                     << std::setfill('0')
                     << std::right
