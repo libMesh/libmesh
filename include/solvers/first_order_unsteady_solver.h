@@ -100,6 +100,16 @@ protected:
    */
   bool compute_second_order_eqns(bool compute_jacobian, DiffContext & c);
 
+  /**
+   * Helper function to and Dirichlet boundary conditions to "dot" variable
+   * cousins of second order variables in the system. The function takes the
+   * second order variable index, it's corresponding "dot" variable index and
+   * then searches for DirchletBoundary objects for var_idx and then adds a
+   * DirichletBoundary object for dot_var_idx using the same boundary ids and
+   * functors for the var_idx DirichletBoundary.
+   */
+  void add_dot_var_dirichlet_bcs( unsigned int var_idx, unsigned int dot_var_idx);
+
 };
 
 } // end namespace libMesh
