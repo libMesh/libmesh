@@ -20,3 +20,12 @@ run_example_no_extra_options "$example_name" "$options"
 
 options="time_solver=steady $common_options $petsc_options"
 run_example_no_extra_options "$example_name" "$options"
+
+# With first order solvers, the Jacobian is no longer symmetric
+petsc_options="-ksp_type gmres -pc_type bjacobi -sub_pc_type ilu"
+
+options="deltat=0.25 n_timesteps=5 time_solver=euler theta=0.5 $common_options $petsc_options"
+run_example_no_extra_options "$example_name" "$options"
+
+options="deltat=0.25 n_timesteps=5 time_solver=euler2 theta=0.5 $common_options $petsc_options"
+run_example_no_extra_options "$example_name" "$options"
