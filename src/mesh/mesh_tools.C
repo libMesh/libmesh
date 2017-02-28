@@ -1588,8 +1588,11 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase & mesh)
   if (mesh.n_processors() == 1)
     return;
 
-  std::vector<unsigned char> my_elem_h_state(mesh.max_elem_id(), 255);
-  std::vector<unsigned char> my_elem_p_state(mesh.max_elem_id(), 255);
+  dof_id_type pmax_elem_id = mesh.max_elem_id();
+  mesh.comm().max(pmax_elem_id);
+
+  std::vector<unsigned char> my_elem_h_state(pmax_elem_id, 255);
+  std::vector<unsigned char> my_elem_p_state(pmax_elem_id, 255);
 
   const MeshBase::const_element_iterator el_end =
     mesh.elements_end();
@@ -1612,7 +1615,7 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase & mesh)
   std::vector<unsigned char> min_elem_p_state(my_elem_p_state);
   mesh.comm().min(min_elem_p_state);
 
-  for (dof_id_type i=0; i!= mesh.max_elem_id(); ++i)
+  for (dof_id_type i=0; i!= pmax_elem_id; ++i)
     {
       libmesh_assert(my_elem_h_state[i] == 255 ||
                      my_elem_h_state[i] == min_elem_h_state[i]);
@@ -1686,7 +1689,10 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
 
   libmesh_parallel_only(mesh.comm());
 
-  for (dof_id_type i=0; i != mesh.max_elem_id(); ++i)
+  dof_id_type pmax_elem_id = mesh.max_elem_id();
+  mesh.comm().max(pmax_elem_id);
+
+  for (dof_id_type i=0; i != pmax_elem_id; ++i)
     {
       const Elem * elem = mesh.query_elem_ptr(i);
 
