@@ -88,6 +88,16 @@ public:
   void clear ();
 
   /**
+   * Clears and regenerates the cached sets of ids.
+   * This is necessary after use of remove_*() functions, which remove
+   * individual id associations (an O(1) process) without checking to
+   * see whether that is the last association with the id (an O(N)
+   * process.
+   */
+  void regenerate_id_sets ();
+
+
+  /**
    * Generates \p boundary_mesh data structures corresponding to the
    * \p mesh data structures.  Allows the \p boundary_mesh to be used
    * like any other mesh, except with interior_parent() values defined

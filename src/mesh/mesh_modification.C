@@ -427,6 +427,11 @@ void UnstructuredMesh::all_first_order ()
         this->delete_node(the_node);
     }
 
+  // If crazy people applied boundary info to non-vertices and then
+  // deleted those non-vertices, we should make sure their boundary id
+  // caches are correct.
+  this->get_boundary_info().regenerate_id_sets();
+
   STOP_LOG("all_first_order()", "Mesh");
 
   // On hanging nodes that used to also be second order nodes, we

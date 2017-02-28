@@ -1891,6 +1891,10 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   // elements it pointed to have been deleted.
   mesh.clear_point_locator();
 
+  // Much of our boundary info may have been for now-remote parts of
+  // the mesh, in which case we don't want to keep local copies.
+  mesh.get_boundary_info().regenerate_id_sets();
+
   // We now have all remote elements and nodes deleted; our ghosting
   // functors should be ready to delete any now-redundant cached data
   // they use too.

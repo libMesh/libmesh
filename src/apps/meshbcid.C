@@ -192,6 +192,11 @@ int main(int argc, char ** argv)
         }
     }
 
+  // We might have removed *every* instance of a given id, and if that
+  // happened then we should make sure that file formats which write
+  // out id sets do not write out the removed id.
+  mesh.get_boundary_info().regenerate_id_sets();
+
   std::string outputname;
   if(cl.search("--output"))
     {
