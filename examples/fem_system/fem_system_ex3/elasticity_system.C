@@ -89,6 +89,15 @@ bool ElasticitySystem::element_time_derivative(bool request_jacobian,
   unsigned int v_dot_var = _v_var;
   unsigned int w_dot_var = _w_var;
 
+  // If we have an unsteady solver, then we need to extract the corresponding
+  // velocity variable. This allows us to use either a FirstOrderUnsteadySolver
+  // or a SecondOrderUnsteadySolver. That is, we get back the velocity variable
+  // index for FirstOrderUnsteadySolvers or, if it's a SecondOrderUnsteadySolver,
+  // this is actually just giving us back the same variable index.
+
+  // If we only wanted to use a SecondOrderUnsteadySolver, then this
+  // step would be unnecessary and we would just
+  // populate the _u_var, etc. blocks of the residual and Jacobian.
   if( !(this->get_time_solver().is_steady()) )
     {
       u_dot_var =
@@ -208,6 +217,15 @@ bool ElasticitySystem::side_time_derivative (bool request_jacobian,
       unsigned int v_dot_var = _v_var;
       unsigned int w_dot_var = _w_var;
 
+      // If we have an unsteady solver, then we need to extract the corresponding
+      // velocity variable. This allows us to use either a FirstOrderUnsteadySolver
+      // or a SecondOrderUnsteadySolver. That is, we get back the velocity variable
+      // index for FirstOrderUnsteadySolvers or, if it's a SecondOrderUnsteadySolver,
+      // this is actually just giving us back the same variable index.
+
+      // If we only wanted to use a SecondOrderUnsteadySolver, then this
+      // step would be unnecessary and we would just
+      // populate the _u_var, etc. blocks of the residual and Jacobian.
       if( !(this->get_time_solver().is_steady()) )
         {
           u_dot_var =
@@ -260,6 +278,15 @@ bool ElasticitySystem::mass_residual(bool request_jacobian,
 {
   FEMContext & c = cast_ref<FEMContext &>(context);
 
+  // We need to extract the corresponding velocity variable.
+  // This allows us to use either a FirstOrderUnsteadySolver
+  // or a SecondOrderUnsteadySolver. That is, we get back the velocity variable
+  // index for FirstOrderUnsteadySolvers or, if it's a SecondOrderUnsteadySolver,
+  // this is actually just giving us back the same variable index.
+
+  // If we only wanted to use a SecondOrderUnsteadySolver, then this
+  // step would be unnecessary and we would just
+  // populate the _u_var, etc. blocks of the residual and Jacobian.
   unsigned int u_dot_var =
     (cast_ref<const UnsteadySolver &>(this->get_time_solver())).get_second_order_dot_var(_u_var);
 
@@ -293,6 +320,10 @@ bool ElasticitySystem::mass_residual(bool request_jacobian,
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
+      // If we only cared about using FirstOrderUnsteadySolvers for time-stepping,
+      // then we could actually just use interior rate, but using interior_accel
+      // allows this assembly to function for both FirstOrderUnsteadySolvers
+      // and SecondOrderUnsteadySolvers
       libMesh::Number u_ddot, v_ddot, w_ddot;
       c.interior_accel(u_dot_var, qp, u_ddot);
       c.interior_accel(v_dot_var, qp, v_ddot);
