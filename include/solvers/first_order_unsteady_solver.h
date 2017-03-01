@@ -88,35 +88,7 @@ public:
   virtual unsigned int time_order() const libmesh_override
   { return 1; }
 
-  /**
-   * The initialization function.  This method is used to
-   * initialize internal data structures before a simulation begins.
-   * We check for second order in time variables and then add them
-   * to the System as dot_<varname>. Then, during assembly, we'll
-   * populate the elem_accel vectors with the dot_<varname> values
-   * so the user's element assembly function can still treat the
-   * variable as a second order in time variable.
-   */
-  virtual void init () libmesh_override;
-
-  /**
-   * If var is a second order variable, then this methond will return
-   * the index to the corresponding "dot" variable added by this
-   * TimeSolver. That is, if var corresponds to "u", this method
-   * will return the variable index corresponding to "dot_u".
-   *
-   * This method should not be called with first order variables.
-   */
-  virtual unsigned int get_second_order_dot_var( unsigned int var ) const libmesh_override libmesh_final;
-
 protected:
-
-  /**
-   * If the user adds any second order variables, then we need to also
-   * cache the map to their corresponding dot variable that will
-   * be added by this TimeSolver class.
-   */
-  std::map<unsigned int,unsigned int> _second_order_dot_vars;
 
   /**
    * If there are second order variables in the system,
@@ -133,16 +105,6 @@ protected:
    * "velocity" variable.
    */
   bool compute_second_order_eqns(bool compute_jacobian, DiffContext & c);
-
-  /**
-   * Helper function to and Dirichlet boundary conditions to "dot" variable
-   * cousins of second order variables in the system. The function takes the
-   * second order variable index, it's corresponding "dot" variable index and
-   * then searches for DirchletBoundary objects for var_idx and then adds a
-   * DirichletBoundary object for dot_var_idx using the same boundary ids and
-   * functors for the var_idx DirichletBoundary.
-   */
-  void add_dot_var_dirichlet_bcs( unsigned int var_idx, unsigned int dot_var_idx);
 
 };
 
