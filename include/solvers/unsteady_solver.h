@@ -150,69 +150,6 @@ public:
    */
   virtual bool is_steady() const libmesh_override { return false; }
 
-  /**
-   * Indicate to the UnsteadySolver which variables are first order in time.
-   * Subclasses may use this information in different ways.
-   */
-  void add_first_order_var(unsigned int var)
-  { _first_order_vars.insert(var); }
-
-  bool have_first_order_vars() const
-  { return !_first_order_vars.empty(); }
-
-  /**
-   * Returns the set of first order in time variable indices. May be empty.
-   */
-  const std::set<unsigned int> & get_first_order_vars() const
-  { return _first_order_vars; }
-
-  bool is_first_order_var( unsigned int var ) const
-  { return _first_order_vars.find(var) != _first_order_vars.end(); }
-
-
-  /**
-   * Check for any first order vars that are also belong to FEFamily::SCALAR
-   */
-  bool have_first_order_scalar_vars() const;
-
-  /**
-   * Indicate to the UnsteadySolver which variables are second order in time.
-   * Subclasses may use this information in different ways.
-   */
-  void add_second_order_var(unsigned int var)
-  { _second_order_vars.insert(var); }
-
-  bool have_second_order_vars() const
-  { return !_second_order_vars.empty(); }
-
-  /**
-   * Returns the set of second order in time variable indices. May be empty.
-   */
-  const std::set<unsigned int> & get_second_order_vars() const
-  { return _second_order_vars; }
-
-  bool is_second_order_var( unsigned int var ) const
-  { return _second_order_vars.find(var) != _second_order_vars.end(); }
-
-
-  /**
-   * For a given second order (in time) variable var, this method will return
-   * the index to the corresponding "dot" variable. For FirstOrderUnsteadySolver
-   * classes, the "dot" variable would automatically be added and the returned
-   * index will correspond to that variable. For SecondOrderUnsteadySolver classes,
-   * this method will return var as there this is no "dot" variable per se, but
-   * having this function allows one to use the interface to treat both
-   * FirstOrderUnsteadySolver and SecondOrderUnsteadySolver simultaneously.
-   *
-   * This method should not be called with first order variables.
-   */
-  virtual unsigned int get_second_order_dot_var( unsigned int var ) const =0;
-
-  /**
-   * Check for any second order vars that are also belong to FEFamily::SCALAR
-   */
-  bool have_second_order_scalar_vars() const;
-
 protected:
 
   /**
@@ -226,16 +163,6 @@ protected:
    * (when the primal solution is to be used to set adjoint boundary conditions) and false thereafter
    */
   bool first_adjoint_step;
-
-  /**
-   * Variable indices for those variables that are first order in time.
-   */
-  std::set<unsigned int> _first_order_vars;
-
-  /**
-   * Variable indices for those variables that are second order in time.
-   */
-  std::set<unsigned int> _second_order_vars;
 };
 
 

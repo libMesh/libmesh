@@ -53,6 +53,11 @@ void DifferentiablePhysics::time_evolving (unsigned int var,
     _time_evolving.resize(var+1, 0);
 
   _time_evolving[var] = order;
+
+  if( order == 1 )
+    _first_order_vars.insert(var);
+  else
+    _second_order_vars.insert(var);
 }
 
 bool DifferentiablePhysics::nonlocal_mass_residual(bool request_jacobian,
@@ -105,7 +110,5 @@ bool DifferentiablePhysics::_eulerian_time_deriv (bool request_jacobian,
   return this->eulerian_residual(request_jacobian, context) &&
     request_jacobian;
 }
-
-
 
 } // namespace libMesh

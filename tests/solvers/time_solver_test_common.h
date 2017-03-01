@@ -260,7 +260,7 @@ public:
   {
     FEMContext & c = cast_ref<FEMContext &>(context);
 
-    unsigned int v_var = (cast_ref<const UnsteadySolver &>(this->get_time_solver())).get_second_order_dot_var(_u_var);
+    unsigned int v_var = this->get_second_order_dot_var(_u_var);
 
     DenseSubVector<Number> & Fv = c.get_elem_residual(v_var);
 
@@ -284,7 +284,7 @@ public:
   {
     FEMContext & c = cast_ref<FEMContext &>(context);
 
-    unsigned int v_var = (cast_ref<const UnsteadySolver &>(this->get_time_solver())).get_second_order_dot_var(_u_var);
+    unsigned int v_var = this->get_second_order_dot_var(_u_var);
 
     DenseSubVector<Number> & Fv = c.get_elem_residual(v_var);
 
@@ -318,7 +318,7 @@ public:
   {
     FEMContext & c = cast_ref<FEMContext &>(context);
 
-    unsigned int v_var = (cast_ref<const UnsteadySolver &>(this->get_time_solver())).get_second_order_dot_var(_u_var);
+    unsigned int v_var = this->get_second_order_dot_var(_u_var);
 
     DenseSubVector<Number> & Fv = c.get_elem_residual(v_var);
     DenseSubMatrix<Number> & Kvv = c.get_elem_jacobian(v_var, v_var);

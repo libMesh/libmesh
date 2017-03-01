@@ -20,6 +20,8 @@
 #include "libmesh/diff_system.h"
 #include "libmesh/time_solver.h"
 #include "libmesh/unsteady_solver.h"
+#include "libmesh/dirichlet_boundaries.h"
+#include "libmesh/dof_map.h"
 
 namespace libMesh
 {
@@ -110,42 +112,23 @@ void DifferentiableSystem::init_data ()
   // Do any initialization our solvers need
   libmesh_assert(time_solver.get());
   libmesh_assert_equal_to (&(time_solver->system()), this);
+
+  // Now check for second order variables and add their velocities to the System.
+  if( !time_solver->is_steady() )
+    {
+      const UnsteadySolver & unsteady_solver =
+        cast_ref<const UnsteadySolver &>(*(time_solver.get()));
+
+      if( unsteady_solver.time_order() == 1 )
+        this->add_second_order_dot_vars();
+    }
+
   time_solver->init();
 
   // Next initialize ImplicitSystem data
   Parent::init_data();
 
   time_solver->init_data();
-}
-
-void DifferentiableSystem::time_evolving (unsigned int var)
-{
-  libmesh_deprecated();
-  libmesh_assert(time_solver);
-
-  DifferentiablePhysics::time_evolving(var);
-
-  UnsteadySolver * unsteady_solver = dynamic_cast<UnsteadySolver *>(time_solver.get());
-  if (unsteady_solver)
-    unsteady_solver->add_first_order_var(var);
-}
-
-void DifferentiableSystem::time_evolving (unsigned int var, unsigned int order)
-{
-  libmesh_assert(time_solver);
-
-  DifferentiablePhysics::time_evolving(var,order);
-
-  UnsteadySolver * unsteady_solver = dynamic_cast<UnsteadySolver *>(time_solver.get());
-  if (unsteady_solver)
-    {
-      if (order==1)
-        unsteady_solver->add_first_order_var(var);
-      else if(order==2)
-        unsteady_solver->add_second_order_var(var);
-      else
-        libmesh_error_msg("Input order must be 1 or 2!");
-    }
 }
 
 UniquePtr<DiffContext> DifferentiableSystem::build_context ()
@@ -207,6 +190,176 @@ std::pair<unsigned int, Real> DifferentiableSystem::get_linear_solve_parameters(
 
 void DifferentiableSystem::release_linear_solver(LinearSolver<Number> *) const
 {
+}
+
+void DifferentiableSystem::add_second_order_dot_vars()
+{
+  const std::set<unsigned int> & second_order_vars = this->get_second_order_vars();
+  if( !second_order_vars.empty() )
+    {
+      for( std::set<unsigned int>::const_iterator var_it = second_order_vars.begin();
+           var_it != second_order_vars.end(); ++var_it )
+        {
+          const Variable & var = this->variable(*var_it);
+          std::string new_var_name = std::string("dot_")+var.name();
+
+          unsigned int v_var_idx;
+
+          if( var.active_subdomains().empty() )
+            v_var_idx = this->add_variable( new_var_name, var.type() );
+          else
+            v_var_idx = this->add_variable( new_var_name, var.type(), &var.active_subdomains() );
+
+          _second_order_dot_vars.insert( std::pair<unsigned int,unsigned int>(*var_it,v_var_idx) );
+
+          // The new velocities are time evolving variables of first order
+          this->time_evolving( v_var_idx, 1 );
+
+          // And if there are any boundary conditions set on the second order
+          // variable, we also need to set it on its velocity variable.
+          this->add_dot_var_dirichlet_bcs( *var_it, v_var_idx );
+        }
+    }
+}
+
+void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
+                                                      unsigned int dot_var_idx )
+{
+  // We're assuming that there could be a lot more variables than
+  // boundary conditions, so we search each of the boundary conditions
+  // for this variable rather than looping over boundary conditions
+  // in a separate loop and searching through all the variables.
+  const DirichletBoundaries * all_dbcs =
+    this->get_dof_map().get_dirichlet_boundaries();
+
+  if( all_dbcs )
+    {
+      // We need to cache the DBCs to be added so that we add them
+      // after looping over the existing DBCs. Otherwise, we're polluting
+      // the thing we're looping over.
+      std::vector<DirichletBoundary*> new_dbcs;
+
+      DirichletBoundaries::const_iterator dbc_it = all_dbcs->begin();
+      for( ; dbc_it != all_dbcs->end(); ++dbc_it )
+        {
+          libmesh_assert(*dbc_it);
+          DirichletBoundary & dbc = *(*dbc_it);
+
+          // Look for second order variable in the current
+          // DirichletBoundary object
+          std::vector<unsigned int>::const_iterator dbc_var_it =
+            std::find( dbc.variables.begin(), dbc.variables.end(), var_idx );
+
+          // If we found it, then we also need to add it's corresponding
+          // "dot" variable to a DirichletBoundary
+          std::vector<unsigned int> vars_to_add;
+          if( dbc_var_it != dbc.variables.end() )
+            vars_to_add.push_back(dot_var_idx);
+
+          if( !vars_to_add.empty() )
+            {
+              DirichletBoundary * new_dbc;
+
+              if( dbc.f )
+                {
+                  if( dbc.g )
+                    new_dbc = new DirichletBoundary(dbc.b,
+                                                    vars_to_add,
+                                                    dbc.f.get(),
+                                                    dbc.g.get());
+
+                  else
+                    new_dbc = new DirichletBoundary(dbc.b,
+                                                    vars_to_add,
+                                                    dbc.f.get());
+                }
+              else if( dbc.f_fem )
+                {
+                  if( dbc.g_fem )
+                    new_dbc = new DirichletBoundary(dbc.b,
+                                                    vars_to_add,
+                                                    *this,
+                                                    dbc.f_fem.get(),
+                                                    dbc.g_fem.get());
+
+                  else
+                    new_dbc = new DirichletBoundary(dbc.b,
+                                                    vars_to_add,
+                                                    *this,
+                                                    dbc.f_fem.get());
+                }
+              else
+                libmesh_error_msg("Could not find valid boundary function!");
+
+              new_dbcs.push_back(new_dbc);
+            }
+        }
+
+      // Now add the new DBCs for the "dot" vars to the DofMap
+      std::vector<DirichletBoundary*>::iterator new_dbc_it =
+        new_dbcs.begin();
+
+      for( ; new_dbc_it != new_dbcs.end(); ++new_dbc_it )
+        {
+          const DirichletBoundary & dbc = *(*new_dbc_it);
+          this->get_dof_map().add_dirichlet_boundary(dbc);
+          delete *new_dbc_it;
+        }
+
+    } // if(all_dbcs)
+}
+
+unsigned int DifferentiableSystem::get_second_order_dot_var( unsigned int var ) const
+{
+  // For SteadySolver or SecondOrderUnsteadySolvers, we just give back var
+  unsigned int dot_var = var;
+
+  if( !time_solver->is_steady() )
+    {
+      const UnsteadySolver & unsteady_solver =
+        cast_ref<const UnsteadySolver &>(*(time_solver.get()));
+
+      if( unsteady_solver.time_order() == 1 )
+        dot_var = this->_second_order_dot_vars.find(var)->second;
+    }
+
+  return dot_var;
+}
+
+bool DifferentiableSystem::have_first_order_scalar_vars() const
+{
+  bool have_first_order_scalar_vars = false;
+
+  if(this->have_first_order_vars())
+    {
+      for( std::set<unsigned int>::const_iterator var_it = this->get_first_order_vars().begin();
+           var_it != this->get_first_order_vars().end();
+           ++var_it )
+        {
+          if( this->variable(*var_it).type().family == FEFamily::SCALAR )
+            have_first_order_scalar_vars = true;
+        }
+    }
+
+  return have_first_order_scalar_vars;
+}
+
+bool DifferentiableSystem::have_second_order_scalar_vars() const
+{
+  bool have_second_order_scalar_vars = false;
+
+  if(this->have_second_order_vars())
+    {
+      for( std::set<unsigned int>::const_iterator var_it = this->get_second_order_vars().begin();
+           var_it != this->get_second_order_vars().end();
+           ++var_it )
+        {
+          if( this->variable(*var_it).type().family == FEFamily::SCALAR )
+            have_second_order_scalar_vars = true;
+        }
+    }
+
+  return have_second_order_scalar_vars;
 }
 
 } // namespace libMesh

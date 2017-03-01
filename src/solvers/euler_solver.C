@@ -50,7 +50,7 @@ Real EulerSolver::error_order() const
 bool EulerSolver::element_residual (bool request_jacobian,
                                     DiffContext & context)
 {
-  bool compute_second_order_eqns = this->have_second_order_vars();
+  bool compute_second_order_eqns = this->_system.have_second_order_vars();
 
   return this->_general_residual(request_jacobian,
                                  context,
@@ -82,7 +82,7 @@ bool EulerSolver::side_residual (bool request_jacobian,
 bool EulerSolver::nonlocal_residual (bool request_jacobian,
                                      DiffContext & context)
 {
-  bool compute_second_order_eqns = this->have_second_order_scalar_vars();
+  bool compute_second_order_eqns = this->_system.have_second_order_scalar_vars();
 
   return this->_general_residual(request_jacobian,
                                  context,

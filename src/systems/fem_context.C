@@ -1615,7 +1615,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
               // We only need accel space if the TimeSolver is second order
               const UnsteadySolver & time_solver = cast_ref<const UnsteadySolver &>(diff_system->get_time_solver());
 
-              if( time_solver.time_order() >= 2 || !time_solver.get_second_order_vars().empty() )
+              if( time_solver.time_order() >= 2 || !diff_system->get_second_order_vars().empty() )
                 this->get_elem_solution_accel().resize(n_dofs);
             }
         }
@@ -1683,7 +1683,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
                     // We only need accel space if the TimeSolver is second order
                     const UnsteadySolver & time_solver = cast_ref<const UnsteadySolver &>(diff_system->get_time_solver());
 
-                    if( time_solver.time_order() >= 2 || !time_solver.get_second_order_vars().empty() )
+                    if( time_solver.time_order() >= 2 || !diff_system->get_second_order_vars().empty() )
                       this->get_elem_solution_accel(i).reposition
                         (sub_dofs, n_dofs_var);
                   }

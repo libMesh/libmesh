@@ -85,11 +85,7 @@ bool ElasticitySystem::element_time_derivative(bool request_jacobian,
 {
   FEMContext & c = cast_ref<FEMContext &>(context);
 
-  unsigned int u_dot_var = _u_var;
-  unsigned int v_dot_var = _v_var;
-  unsigned int w_dot_var = _w_var;
-
-  // If we have an unsteady solver, then we need to extract the corresponding
+ // If we have an unsteady solver, then we need to extract the corresponding
   // velocity variable. This allows us to use either a FirstOrderUnsteadySolver
   // or a SecondOrderUnsteadySolver. That is, we get back the velocity variable
   // index for FirstOrderUnsteadySolvers or, if it's a SecondOrderUnsteadySolver,
@@ -98,17 +94,9 @@ bool ElasticitySystem::element_time_derivative(bool request_jacobian,
   // If we only wanted to use a SecondOrderUnsteadySolver, then this
   // step would be unnecessary and we would just
   // populate the _u_var, etc. blocks of the residual and Jacobian.
-  if( !(this->get_time_solver().is_steady()) )
-    {
-      u_dot_var =
-        (cast_ref<const UnsteadySolver &>(this->get_time_solver())).get_second_order_dot_var(_u_var);
-
-      v_dot_var =
-        (cast_ref<const UnsteadySolver &>(this->get_time_solver())).get_second_order_dot_var(_v_var);
-
-      w_dot_var =
-        (cast_ref<const UnsteadySolver &>(this->get_time_solver())).get_second_order_dot_var(_w_var);
-    }
+  unsigned int u_dot_var = this->get_second_order_dot_var(_u_var);
+  unsigned int v_dot_var = this->get_second_order_dot_var(_v_var);
+  unsigned int w_dot_var = this->get_second_order_dot_var(_w_var);
 
   FEBase * u_elem_fe;
   c.get_element_fe(_u_var, u_elem_fe);
@@ -213,10 +201,6 @@ bool ElasticitySystem::side_time_derivative (bool request_jacobian,
   // If we're on the correct side, apply the traction
   if (c.has_side_boundary_id(BOUNDARY_ID_MAX_X))
     {
-      unsigned int u_dot_var = _u_var;
-      unsigned int v_dot_var = _v_var;
-      unsigned int w_dot_var = _w_var;
-
       // If we have an unsteady solver, then we need to extract the corresponding
       // velocity variable. This allows us to use either a FirstOrderUnsteadySolver
       // or a SecondOrderUnsteadySolver. That is, we get back the velocity variable
@@ -226,17 +210,9 @@ bool ElasticitySystem::side_time_derivative (bool request_jacobian,
       // If we only wanted to use a SecondOrderUnsteadySolver, then this
       // step would be unnecessary and we would just
       // populate the _u_var, etc. blocks of the residual and Jacobian.
-      if( !(this->get_time_solver().is_steady()) )
-        {
-          u_dot_var =
-            (cast_ref<const UnsteadySolver &>(this->get_time_solver())).get_second_order_dot_var(_u_var);
-
-          v_dot_var =
-            (cast_ref<const UnsteadySolver &>(this->get_time_solver())).get_second_order_dot_var(_v_var);
-
-          w_dot_var =
-            (cast_ref<const UnsteadySolver &>(this->get_time_solver())).get_second_order_dot_var(_w_var);
-        }
+      unsigned int u_dot_var = this->get_second_order_dot_var(_u_var);
+      unsigned int v_dot_var = this->get_second_order_dot_var(_v_var);
+      unsigned int w_dot_var = this->get_second_order_dot_var(_w_var);
 
       FEBase * u_side_fe;
       c.get_side_fe(_u_var, u_side_fe);
@@ -287,14 +263,9 @@ bool ElasticitySystem::mass_residual(bool request_jacobian,
   // If we only wanted to use a SecondOrderUnsteadySolver, then this
   // step would be unnecessary and we would just
   // populate the _u_var, etc. blocks of the residual and Jacobian.
-  unsigned int u_dot_var =
-    (cast_ref<const UnsteadySolver &>(this->get_time_solver())).get_second_order_dot_var(_u_var);
-
-  unsigned int v_dot_var =
-    (cast_ref<const UnsteadySolver &>(this->get_time_solver())).get_second_order_dot_var(_v_var);
-
-  unsigned int w_dot_var =
-    (cast_ref<const UnsteadySolver &>(this->get_time_solver())).get_second_order_dot_var(_w_var);
+  unsigned int u_dot_var = this->get_second_order_dot_var(_u_var);
+  unsigned int v_dot_var = this->get_second_order_dot_var(_v_var);
+  unsigned int w_dot_var = this->get_second_order_dot_var(_w_var);
 
   FEBase * u_elem_fe;
   c.get_element_fe(u_dot_var, u_elem_fe);

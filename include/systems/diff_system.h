@@ -92,45 +92,6 @@ public:
   virtual void reinit () libmesh_override;
 
   /**
-   * Tells the DiffSystem that variable var is evolving with
-   * respect to time.  In general, the user's init() function
-   * should call time_evolving() for any variables which
-   * behave like du/dt = F(u), and should not call time_evolving()
-   * for any variables which behave like 0 = G(u).
-   *
-   * This will then notify the TimeSolver which variables are first order.
-   * Thus, the TimeSolver must have been added
-   * to the DiffSystem *before* this method is called.
-   *
-   * Most derived systems will not have to reimplment this function; however
-   * any system which reimplements mass_residual() may have to reimplement
-   * time_evolving() to prepare data structures.
-   *
-   * This method is deprecated. Instead, use the time_evolving override
-   * and specify the order-in-time of the variable, either 1 or 2. This method
-   * assumes the variable is first order for backward compatibility.
-   */
-  virtual void time_evolving (unsigned int var);
-
-  /**
-   * Tells the DiffSystem that variable var is evolving with
-   * respect to time.  In general, the user's init() function
-   * should call time_evolving() with order 1 for any variables which
-   * behave like du/dt = F(u), with order 2 for any variables that
-   * behave like d^2u/dt^2 = F(u), and should not call time_evolving()
-   * for any variables which behave like 0 = G(u).
-   *
-   * This will then notify the TimeSolver which variables are first order
-   * and which are second order. Thus, the TimeSolver must have been added
-   * to the DiffSystem *before* this method is called.
-   *
-   * Most derived systems will not have to reimplment this function; however
-   * any system which reimplements mass_residual() may have to reimplement
-   * time_evolving() to prepare data structures.
-   */
-  virtual void time_evolving (unsigned int var, unsigned int order);
-
-  /**
    * Prepares \p matrix and \p rhs for matrix assembly.
    * Users should not reimplement this
    */
@@ -303,6 +264,27 @@ public:
   virtual void side_postprocess (DiffContext &) {}
 
   /**
+   * For a given second order (in time) variable var, this method will return
+   * the index to the corresponding "dot" variable. For FirstOrderUnsteadySolver
+   * classes, the "dot" variable would automatically be added and the returned
+   * index will correspond to that variable. For SecondOrderUnsteadySolver classes,
+   * this method will return var as there this is no "dot" variable per se, but
+   * having this function allows one to use the interface to treat both
+   * FirstOrderUnsteadySolver and SecondOrderUnsteadySolver simultaneously.
+   */
+  unsigned int get_second_order_dot_var( unsigned int var ) const;
+
+  /**
+   * Check for any first order vars that are also belong to FEFamily::SCALAR
+   */
+  bool have_first_order_scalar_vars() const;
+
+  /**
+   * Check for any second order vars that are also belong to FEFamily::SCALAR
+   */
+  bool have_second_order_scalar_vars() const;
+
+  /**
    * If \p postprocess_sides is true (it is false by default), the
    * postprocessing loop will loop over all sides as well as all elements.
    */
@@ -374,8 +356,33 @@ protected:
   /**
    * Initializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
+   *
+   * If the TimeSolver is a FirstOrderUnsteadySolver,
+   * we check for second order in time variables and then add them
+   * to the System as dot_<varname>. Then, during assembly, the
+   * TimeSolver will populate the elem_accel vectors with the
+   * dot_<varname> values so the user's element assembly function
+   * can still treat the variable as a second order in time variable.
    */
   virtual void init_data () libmesh_override;
+
+  /**
+   * Helper function to add "velocity" variables that are cousins to
+   * second order-in-time variables in the DifferentiableSystem. This
+   * function is only called if the TimeSolver is a FirstOrderUnsteadySolver.
+   */
+  void add_second_order_dot_vars();
+
+  /**
+   * Helper function to and Dirichlet boundary conditions to "dot" variable
+   * cousins of second order variables in the system. The function takes the
+   * second order variable index, it's corresponding "dot" variable index and
+   * then searches for DirchletBoundary objects for var_idx and then adds a
+   * DirichletBoundary object for dot_var_idx using the same boundary ids and
+   * functors for the var_idx DirichletBoundary.
+   */
+  void add_dot_var_dirichlet_bcs( unsigned int var_idx, unsigned int dot_var_idx);
+
 };
 
 // --------------------------------------------------------------
