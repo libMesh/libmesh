@@ -22,6 +22,7 @@
 #include "libmesh/unsteady_solver.h"
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/zero_function.h"
 
 namespace libMesh
 {
@@ -258,38 +259,36 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
 
           if( !vars_to_add.empty() )
             {
+              // We need to check if the boundary condition is time-dependent.
+              // Currently, we cannot automatically differentiate w.r.t. time
+              // so if the user supplies a time-dependent Dirichlet BC, then
+              // we can't automatically support the Dirichlet BC for the
+              // "velocity" boundary condition, so we error. Otherwise,
+              // the "velocity boundary condition will just be zero.
+              bool is_time_evolving_bc = false;
+              if( dbc.f )
+                is_time_evolving_bc = dbc.f->is_time_dependent();
+              else if( dbc.f_fem )
+                // We it's a FEMFunctionBase object, it will be implictly
+                // time-dependent since it is assumed to depend on the solution.
+                is_time_evolving_bc = true;
+              else
+                libmesh_error_msg("Could not find valid boundary function!");
+
+              if( is_time_evolving_bc )
+                libmesh_error_msg("Cannot currently support time-dependent Dirichlet BC for dot variables!");
+
+
               DirichletBoundary * new_dbc;
 
               if( dbc.f )
                 {
-                  if( dbc.g )
-                    new_dbc = new DirichletBoundary(dbc.b,
-                                                    vars_to_add,
-                                                    dbc.f.get(),
-                                                    dbc.g.get());
+                  ZeroFunction<Number> zf;
 
-                  else
-                    new_dbc = new DirichletBoundary(dbc.b,
-                                                    vars_to_add,
-                                                    dbc.f.get());
-                }
-              else if( dbc.f_fem )
-                {
-                  if( dbc.g_fem )
-                    new_dbc = new DirichletBoundary(dbc.b,
-                                                    vars_to_add,
-                                                    *this,
-                                                    dbc.f_fem.get(),
-                                                    dbc.g_fem.get());
-
-                  else
-                    new_dbc = new DirichletBoundary(dbc.b,
-                                                    vars_to_add,
-                                                    *this,
-                                                    dbc.f_fem.get());
+                  new_dbc = new DirichletBoundary(dbc.b, vars_to_add, zf);
                 }
               else
-                libmesh_error_msg("Could not find valid boundary function!");
+                libmesh_error();
 
               new_dbcs.push_back(new_dbc);
             }
