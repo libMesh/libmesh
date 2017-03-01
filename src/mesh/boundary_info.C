@@ -1965,6 +1965,8 @@ BoundaryInfo::build_node_list_from_side_list()
     }
 
   // Process all incoming requests
+  std::vector<vec_type> responses(n_proc-1);
+
   for (processor_id_type p = 1; p != n_proc; ++p)
     {
       std::vector<dof_id_type> requested_nodes;
@@ -1980,8 +1982,6 @@ BoundaryInfo::build_node_list_from_side_list()
       Parallel::Request &request =
         node_response_requests[p-1];
 
-      vec_type response;
-
       std::vector<boundary_id_type> bcids;
 
       for (std::vector<dof_id_type>::const_iterator
@@ -1993,12 +1993,12 @@ BoundaryInfo::build_node_list_from_side_list()
           for (std::size_t i=0; i != bcids.size(); ++i)
             {
               const boundary_id_type b = bcids[i];
-              response.push_back(std::make_pair(*it, b));
+              responses[p-1].push_back(std::make_pair(*it, b));
             }
         }
 
       this->comm().send
-        (source_pid, response, request, node_responses_tag);
+        (source_pid, responses[p-1], request, node_responses_tag);
     }
 
   // Process all incoming responses
