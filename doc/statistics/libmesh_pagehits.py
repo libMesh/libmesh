@@ -15,6 +15,16 @@ from matplotlib.dates import date2num
 # .) Adjust date range to previous month
 # .) Record the number of "Pageviews" in the "Hits" column below
 
+# Note: This seems to have stopped working as of Feb/March 2017.  The
+# problem appears to be that GitHub inserts the analytics code
+# UA-3769691-2 onto the https://www.github.com/libMesh/libmesh page,
+# but the code that Google automatically assigns for me is
+# UA-24978333-{2,3,...} (where the last number may change depending on
+# how many times you tried to add/remove this property in the
+# Analytics Dashboard).  As far as I know, there is no way for us to
+# control what code gets inserted on these pages, although we can
+# control the codes over at the libmesh.github.io site.
+
 #                    Hits,  pages, GB served
 data = [
 #     'Jan 2003',    616,    616, 0
