@@ -25,7 +25,9 @@
 
 // Threading building blocks includes
 #ifdef LIBMESH_HAVE_TBB_API
+#  include "libmesh/ignore_warnings.h"
 #  include "tbb/scalable_allocator.h"
+#  include "libmesh/restore_warnings.h"
 #endif
 
 // C++ includes
