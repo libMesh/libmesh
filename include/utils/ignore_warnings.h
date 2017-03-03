@@ -48,6 +48,8 @@
 #if (__GNUC__ > 5)
 // Ignore warnings from code that does "if (foo) bar();"
 #pragma GCC diagnostic ignored "-Wmisleading-indentation"
+// Ignore warnings from bad placement new use
+#pragma GCC diagnostic ignored "-Wplacement-new"
 #endif // GCC > 5
 #endif // GCC > 4.1
 #endif // __GNUC__ && !__INTEL_COMPILER
