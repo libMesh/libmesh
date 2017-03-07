@@ -273,6 +273,7 @@ libmesh_SOURCES =  \
         src/partitioning/partitioner.C \
         src/partitioning/partitioner_factory.C \
         src/partitioning/sfc_partitioner.C \
+        src/partitioning/subdomain_partitioner.C \
         src/physics/diff_physics.C \
         src/physics/diff_qoi.C \
         src/physics/fem_physics.C \
