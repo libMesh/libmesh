@@ -44,6 +44,7 @@
 #include "vtkCellData.h"
 #include "vtkConfigure.h"
 #include "vtkDoubleArray.h"
+#include "vtkGenericCell.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkSmartPointer.h"
@@ -74,7 +75,6 @@ VTKIO::VTKIO (MeshBase & mesh) :
   MeshInput<MeshBase> (mesh, /*is_parallel_format=*/true),
   MeshOutput<MeshBase>(mesh, /*is_parallel_format=*/true)
 #ifdef LIBMESH_HAVE_VTK
-  ,_vtk_grid(libmesh_nullptr)
   ,_compress(false)
 #endif
 {
@@ -86,7 +86,6 @@ VTKIO::VTKIO (MeshBase & mesh) :
 VTKIO::VTKIO (const MeshBase & mesh) :
   MeshOutput<MeshBase>(mesh, /*is_parallel_format=*/true)
 #ifdef LIBMESH_HAVE_VTK
-  ,_vtk_grid(libmesh_nullptr)
   ,_compress(false)
 #endif
 {
@@ -169,7 +168,6 @@ void VTKIO::read (const std::string & name)
 
   // read in the grid
   _vtk_grid = reader->GetOutput();
-  // _vtk_grid->Update(); // FIXME: Necessary?
 
   // Get a reference to the mesh
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
@@ -180,13 +178,13 @@ void VTKIO::read (const std::string & name)
   // Get the number of points from the _vtk_grid object
   const unsigned int vtk_num_points = static_cast<unsigned int>(_vtk_grid->GetNumberOfPoints());
 
-  // always numbered nicely??, so we can loop like this
-  // I'm pretty sure it is numbered nicely
+  // always numbered nicely so we can loop like this
   for (unsigned int i=0; i<vtk_num_points; ++i)
     {
       // add to the id map
       // and add the actual point
-      double * pnt = _vtk_grid->GetPoint(static_cast<vtkIdType>(i));
+      double pnt[3];
+      _vtk_grid->GetPoint(static_cast<vtkIdType>(i), pnt);
       Point xyz(pnt[0], pnt[1], pnt[2]);
       mesh.add_point(xyz, i);
     }
@@ -194,9 +192,10 @@ void VTKIO::read (const std::string & name)
   // Get the number of cells from the _vtk_grid object
   const unsigned int vtk_num_cells = static_cast<unsigned int>(_vtk_grid->GetNumberOfCells());
 
+  vtkSmartPointer<vtkGenericCell> cell = vtkSmartPointer<vtkGenericCell>::New();
   for (unsigned int i=0; i<vtk_num_cells; ++i)
     {
-      vtkCell * cell = _vtk_grid->GetCell(i);
+      _vtk_grid->GetCell(i, cell);
 
       // Get the libMesh element type corresponding to this VTK element type.
       ElemType libmesh_elem_type = _element_maps.find(cell->GetCellType());
@@ -260,7 +259,7 @@ void VTKIO::write_nodal_data (const std::string & fname,
     libmesh_error_msg("Empty soln vector in VTKIO::write_nodal_data().");
 
   // we only use Unstructured grids
-  _vtk_grid = vtkUnstructuredGrid::New();
+  _vtk_grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
   vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
 
   // add nodes to the grid and update _local_node_map
@@ -317,8 +316,9 @@ void VTKIO::write_nodal_data (const std::string & fname,
   // the ghosts are cells rather than nodes.
   writer->SetGhostLevel(1);
 
-  // Not sure exactly when this changed, but SetInput() is not a
-  // method on vtkXMLPUnstructuredGridWriter as of VTK 6.1.0
+  // VTK 6 replaces SetInput() with SetInputData(). See
+  // http://www.vtk.org/Wiki/VTK/VTK_6_Migration/Replacement_of_SetInput
+  // for the full explanation.
 #if VTK_VERSION_LESS_THAN(6,0,0)
   writer->SetInput(_vtk_grid);
 #else
@@ -340,7 +340,6 @@ void VTKIO::write_nodal_data (const std::string & fname,
 
   writer->Write();
 
-  _vtk_grid->Delete();
 }
 
 
@@ -366,7 +365,9 @@ void VTKIO::nodes_to_vtk()
   // containers for points and coordinates of points
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
+  // if this grid is to be used in VTK then the dimesion of the points should be 3
   pcoords->SetNumberOfComponents(LIBMESH_DIM);
+  pcoords->Allocate(3*mesh.n_local_nodes());
   points->SetNumberOfPoints(mesh.n_local_nodes()); // it seems that it needs this to prevent a segfault
 
   unsigned int local_node_counter = 0;
@@ -377,7 +378,7 @@ void VTKIO::nodes_to_vtk()
     {
       Node & node = **nd;
 
-      double pnt[LIBMESH_DIM];
+      double pnt[3] = {0, 0, 0};
       for (unsigned int i=0; i<LIBMESH_DIM; ++i)
         pnt[i] = node(i);
 

@@ -26,6 +26,7 @@
 
 #ifdef LIBMESH_HAVE_VTK
 #include "vtkType.h"
+#include "vtkSmartPointer.h"
 #endif
 
 // C++ includes
@@ -140,9 +141,11 @@ private:
   //                            vtkUnstructuredGrid * & grid);
 
   /**
-   * pointer to the VTK grid
+   * pointer to the VTK grid. the vtkSmartPointer will automatically
+   * initialize the value to null and keep track of reference
+   * counting.
    */
-  vtkUnstructuredGrid * _vtk_grid;
+  vtkSmartPointer<vtkUnstructuredGrid> _vtk_grid;
 
   /**
    * Flag to indicate whether the output should be compressed
