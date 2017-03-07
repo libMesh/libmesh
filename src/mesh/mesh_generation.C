@@ -2051,8 +2051,14 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
 
   const std::set<boundary_id_type> & side_ids =
     cross_section_boundary_info.get_side_boundary_ids();
-  const boundary_id_type next_side_id = side_ids.empty() ?
+
+  boundary_id_type next_side_id = side_ids.empty() ?
     0 : cast_int<boundary_id_type>(*side_ids.rbegin() + 1);
+
+  // side_ids may not include ids from remote elements, in which case
+  // some processors may have underestimated the next_side_id; let's
+  // fix that.
+  cross_section.comm().max(next_side_id);
 
   MeshBase::const_element_iterator       el  = cross_section.elements_begin();
   const MeshBase::const_element_iterator end = cross_section.elements_end();
