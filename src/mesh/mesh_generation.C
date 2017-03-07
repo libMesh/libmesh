@@ -1992,6 +1992,10 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
   dof_id_type orig_elem = cross_section.n_elem();
   dof_id_type orig_nodes = cross_section.n_nodes();
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  unique_id_type orig_unique_ids = cross_section.parallel_max_unique_id();
+#endif
+
   unsigned int order = 1;
 
   BoundaryInfo & boundary_info = mesh.get_boundary_info();
@@ -2027,6 +2031,17 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                            (extrusion_vector * k / nz / order),
                            node->id() + (k * orig_nodes),
                            node->processor_id());
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+          // Let's give the base of the extruded mesh the same
+          // unique_ids as the source mesh, in case anyone finds that
+          // a useful map to preserve.
+          const unique_id_type uid = (k == 0) ?
+            node->unique_id() :
+            orig_unique_ids + (k-1)*(orig_nodes + orig_elem) + node->id();
+
+          new_node->set_unique_id() = uid;
+#endif
 
           cross_section_boundary_info.boundary_ids(node, ids_to_copy);
           boundary_info.add_node(new_node, ids_to_copy);
@@ -2164,6 +2179,17 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
 
           new_elem->set_id(elem->id() + (k * orig_elem));
           new_elem->processor_id() = elem->processor_id();
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+          // Let's give the base of the extruded mesh the same
+          // unique_ids as the source mesh, in case anyone finds that
+          // a useful map to preserve.
+          const unique_id_type uid = (k == 0) ?
+            elem->unique_id() :
+            orig_unique_ids + (k-1)*(orig_nodes + orig_elem) + orig_nodes + elem->id();
+
+          new_elem->set_unique_id() = uid;
+#endif
 
           if (!elem_subdomain)
             // maintain the subdomain_id
