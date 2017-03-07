@@ -367,9 +367,11 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/partitioning/parmetis_partitioner.C \
 	src/partitioning/partitioner.C \
 	src/partitioning/partitioner_factory.C \
-	src/partitioning/sfc_partitioner.C src/physics/diff_physics.C \
-	src/physics/diff_qoi.C src/physics/fem_physics.C \
-	src/quadrature/quadrature.C src/quadrature/quadrature_build.C \
+	src/partitioning/sfc_partitioner.C \
+	src/partitioning/subdomain_partitioner.C \
+	src/physics/diff_physics.C src/physics/diff_qoi.C \
+	src/physics/fem_physics.C src/quadrature/quadrature.C \
+	src/quadrature/quadrature_build.C \
 	src/quadrature/quadrature_clough.C \
 	src/quadrature/quadrature_clough_1D.C \
 	src/quadrature/quadrature_clough_2D.C \
@@ -761,6 +763,7 @@ am__objects_1 = src/base/libmesh_dbg_la-default_coupling.lo \
 	src/partitioning/libmesh_dbg_la-partitioner.lo \
 	src/partitioning/libmesh_dbg_la-partitioner_factory.lo \
 	src/partitioning/libmesh_dbg_la-sfc_partitioner.lo \
+	src/partitioning/libmesh_dbg_la-subdomain_partitioner.lo \
 	src/physics/libmesh_dbg_la-diff_physics.lo \
 	src/physics/libmesh_dbg_la-diff_qoi.lo \
 	src/physics/libmesh_dbg_la-fem_physics.lo \
@@ -1083,9 +1086,11 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/partitioning/parmetis_partitioner.C \
 	src/partitioning/partitioner.C \
 	src/partitioning/partitioner_factory.C \
-	src/partitioning/sfc_partitioner.C src/physics/diff_physics.C \
-	src/physics/diff_qoi.C src/physics/fem_physics.C \
-	src/quadrature/quadrature.C src/quadrature/quadrature_build.C \
+	src/partitioning/sfc_partitioner.C \
+	src/partitioning/subdomain_partitioner.C \
+	src/physics/diff_physics.C src/physics/diff_qoi.C \
+	src/physics/fem_physics.C src/quadrature/quadrature.C \
+	src/quadrature/quadrature_build.C \
 	src/quadrature/quadrature_clough.C \
 	src/quadrature/quadrature_clough_1D.C \
 	src/quadrature/quadrature_clough_2D.C \
@@ -1476,6 +1481,7 @@ am__objects_2 = src/base/libmesh_devel_la-default_coupling.lo \
 	src/partitioning/libmesh_devel_la-partitioner.lo \
 	src/partitioning/libmesh_devel_la-partitioner_factory.lo \
 	src/partitioning/libmesh_devel_la-sfc_partitioner.lo \
+	src/partitioning/libmesh_devel_la-subdomain_partitioner.lo \
 	src/physics/libmesh_devel_la-diff_physics.lo \
 	src/physics/libmesh_devel_la-diff_qoi.lo \
 	src/physics/libmesh_devel_la-fem_physics.lo \
@@ -1795,9 +1801,11 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/partitioning/parmetis_partitioner.C \
 	src/partitioning/partitioner.C \
 	src/partitioning/partitioner_factory.C \
-	src/partitioning/sfc_partitioner.C src/physics/diff_physics.C \
-	src/physics/diff_qoi.C src/physics/fem_physics.C \
-	src/quadrature/quadrature.C src/quadrature/quadrature_build.C \
+	src/partitioning/sfc_partitioner.C \
+	src/partitioning/subdomain_partitioner.C \
+	src/physics/diff_physics.C src/physics/diff_qoi.C \
+	src/physics/fem_physics.C src/quadrature/quadrature.C \
+	src/quadrature/quadrature_build.C \
 	src/quadrature/quadrature_clough.C \
 	src/quadrature/quadrature_clough_1D.C \
 	src/quadrature/quadrature_clough_2D.C \
@@ -2188,6 +2196,7 @@ am__objects_3 = src/base/libmesh_oprof_la-default_coupling.lo \
 	src/partitioning/libmesh_oprof_la-partitioner.lo \
 	src/partitioning/libmesh_oprof_la-partitioner_factory.lo \
 	src/partitioning/libmesh_oprof_la-sfc_partitioner.lo \
+	src/partitioning/libmesh_oprof_la-subdomain_partitioner.lo \
 	src/physics/libmesh_oprof_la-diff_physics.lo \
 	src/physics/libmesh_oprof_la-diff_qoi.lo \
 	src/physics/libmesh_oprof_la-fem_physics.lo \
@@ -2507,9 +2516,11 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/partitioning/parmetis_partitioner.C \
 	src/partitioning/partitioner.C \
 	src/partitioning/partitioner_factory.C \
-	src/partitioning/sfc_partitioner.C src/physics/diff_physics.C \
-	src/physics/diff_qoi.C src/physics/fem_physics.C \
-	src/quadrature/quadrature.C src/quadrature/quadrature_build.C \
+	src/partitioning/sfc_partitioner.C \
+	src/partitioning/subdomain_partitioner.C \
+	src/physics/diff_physics.C src/physics/diff_qoi.C \
+	src/physics/fem_physics.C src/quadrature/quadrature.C \
+	src/quadrature/quadrature_build.C \
 	src/quadrature/quadrature_clough.C \
 	src/quadrature/quadrature_clough_1D.C \
 	src/quadrature/quadrature_clough_2D.C \
@@ -2900,6 +2911,7 @@ am__objects_4 = src/base/libmesh_opt_la-default_coupling.lo \
 	src/partitioning/libmesh_opt_la-partitioner.lo \
 	src/partitioning/libmesh_opt_la-partitioner_factory.lo \
 	src/partitioning/libmesh_opt_la-sfc_partitioner.lo \
+	src/partitioning/libmesh_opt_la-subdomain_partitioner.lo \
 	src/physics/libmesh_opt_la-diff_physics.lo \
 	src/physics/libmesh_opt_la-diff_qoi.lo \
 	src/physics/libmesh_opt_la-fem_physics.lo \
@@ -3218,9 +3230,11 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/partitioning/parmetis_partitioner.C \
 	src/partitioning/partitioner.C \
 	src/partitioning/partitioner_factory.C \
-	src/partitioning/sfc_partitioner.C src/physics/diff_physics.C \
-	src/physics/diff_qoi.C src/physics/fem_physics.C \
-	src/quadrature/quadrature.C src/quadrature/quadrature_build.C \
+	src/partitioning/sfc_partitioner.C \
+	src/partitioning/subdomain_partitioner.C \
+	src/physics/diff_physics.C src/physics/diff_qoi.C \
+	src/physics/fem_physics.C src/quadrature/quadrature.C \
+	src/quadrature/quadrature_build.C \
 	src/quadrature/quadrature_clough.C \
 	src/quadrature/quadrature_clough_1D.C \
 	src/quadrature/quadrature_clough_2D.C \
@@ -3611,6 +3625,7 @@ am__objects_5 = src/base/libmesh_prof_la-default_coupling.lo \
 	src/partitioning/libmesh_prof_la-partitioner.lo \
 	src/partitioning/libmesh_prof_la-partitioner_factory.lo \
 	src/partitioning/libmesh_prof_la-sfc_partitioner.lo \
+	src/partitioning/libmesh_prof_la-subdomain_partitioner.lo \
 	src/physics/libmesh_prof_la-diff_physics.lo \
 	src/physics/libmesh_prof_la-diff_qoi.lo \
 	src/physics/libmesh_prof_la-fem_physics.lo \
@@ -5007,6 +5022,7 @@ libmesh_SOURCES = \
         src/partitioning/partitioner.C \
         src/partitioning/partitioner_factory.C \
         src/partitioning/sfc_partitioner.C \
+        src/partitioning/subdomain_partitioner.C \
         src/physics/diff_physics.C \
         src/physics/diff_qoi.C \
         src/physics/fem_physics.C \
@@ -6173,6 +6189,9 @@ src/partitioning/libmesh_dbg_la-partitioner_factory.lo:  \
 src/partitioning/libmesh_dbg_la-sfc_partitioner.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
+src/partitioning/libmesh_dbg_la-subdomain_partitioner.lo:  \
+	src/partitioning/$(am__dirstamp) \
+	src/partitioning/$(DEPDIR)/$(am__dirstamp)
 src/physics/$(am__dirstamp):
 	@$(MKDIR_P) src/physics
 	@: > src/physics/$(am__dirstamp)
@@ -7240,6 +7259,9 @@ src/partitioning/libmesh_devel_la-partitioner_factory.lo:  \
 src/partitioning/libmesh_devel_la-sfc_partitioner.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
+src/partitioning/libmesh_devel_la-subdomain_partitioner.lo:  \
+	src/partitioning/$(am__dirstamp) \
+	src/partitioning/$(DEPDIR)/$(am__dirstamp)
 src/physics/libmesh_devel_la-diff_physics.lo:  \
 	src/physics/$(am__dirstamp) \
 	src/physics/$(DEPDIR)/$(am__dirstamp)
@@ -8265,6 +8287,9 @@ src/partitioning/libmesh_oprof_la-partitioner_factory.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
 src/partitioning/libmesh_oprof_la-sfc_partitioner.lo:  \
+	src/partitioning/$(am__dirstamp) \
+	src/partitioning/$(DEPDIR)/$(am__dirstamp)
+src/partitioning/libmesh_oprof_la-subdomain_partitioner.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
 src/physics/libmesh_oprof_la-diff_physics.lo:  \
@@ -9293,6 +9318,9 @@ src/partitioning/libmesh_opt_la-partitioner_factory.lo:  \
 src/partitioning/libmesh_opt_la-sfc_partitioner.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
+src/partitioning/libmesh_opt_la-subdomain_partitioner.lo:  \
+	src/partitioning/$(am__dirstamp) \
+	src/partitioning/$(DEPDIR)/$(am__dirstamp)
 src/physics/libmesh_opt_la-diff_physics.lo:  \
 	src/physics/$(am__dirstamp) \
 	src/physics/$(DEPDIR)/$(am__dirstamp)
@@ -10315,6 +10343,9 @@ src/partitioning/libmesh_prof_la-partitioner_factory.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
 src/partitioning/libmesh_prof_la-sfc_partitioner.lo:  \
+	src/partitioning/$(am__dirstamp) \
+	src/partitioning/$(DEPDIR)/$(am__dirstamp)
+src/partitioning/libmesh_prof_la-subdomain_partitioner.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
 src/physics/libmesh_prof_la-diff_physics.lo:  \
@@ -12593,6 +12624,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_dbg_la-partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_dbg_la-partitioner_factory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_dbg_la-sfc_partitioner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_dbg_la-subdomain_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_devel_la-centroid_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_devel_la-linear_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_devel_la-metis_partitioner.Plo@am__quote@
@@ -12600,6 +12632,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_devel_la-partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_devel_la-partitioner_factory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_devel_la-sfc_partitioner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_devel_la-subdomain_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_oprof_la-centroid_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_oprof_la-linear_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_oprof_la-metis_partitioner.Plo@am__quote@
@@ -12607,6 +12640,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_oprof_la-partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_oprof_la-partitioner_factory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_oprof_la-sfc_partitioner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_oprof_la-subdomain_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_opt_la-centroid_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_opt_la-linear_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_opt_la-metis_partitioner.Plo@am__quote@
@@ -12614,6 +12648,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_opt_la-partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_opt_la-partitioner_factory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_opt_la-sfc_partitioner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_opt_la-subdomain_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_prof_la-centroid_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_prof_la-linear_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_prof_la-metis_partitioner.Plo@am__quote@
@@ -12621,6 +12656,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_prof_la-partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_prof_la-partitioner_factory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_prof_la-sfc_partitioner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_prof_la-subdomain_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/physics/$(DEPDIR)/libmesh_dbg_la-diff_physics.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/physics/$(DEPDIR)/libmesh_dbg_la-diff_qoi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/physics/$(DEPDIR)/libmesh_dbg_la-fem_physics.Plo@am__quote@
@@ -15277,6 +15313,13 @@ src/partitioning/libmesh_dbg_la-sfc_partitioner.lo: src/partitioning/sfc_partiti
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/sfc_partitioner.C' object='src/partitioning/libmesh_dbg_la-sfc_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_dbg_la-sfc_partitioner.lo `test -f 'src/partitioning/sfc_partitioner.C' || echo '$(srcdir)/'`src/partitioning/sfc_partitioner.C
+
+src/partitioning/libmesh_dbg_la-subdomain_partitioner.lo: src/partitioning/subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/partitioning/libmesh_dbg_la-subdomain_partitioner.lo -MD -MP -MF src/partitioning/$(DEPDIR)/libmesh_dbg_la-subdomain_partitioner.Tpo -c -o src/partitioning/libmesh_dbg_la-subdomain_partitioner.lo `test -f 'src/partitioning/subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/partitioning/$(DEPDIR)/libmesh_dbg_la-subdomain_partitioner.Tpo src/partitioning/$(DEPDIR)/libmesh_dbg_la-subdomain_partitioner.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/subdomain_partitioner.C' object='src/partitioning/libmesh_dbg_la-subdomain_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_dbg_la-subdomain_partitioner.lo `test -f 'src/partitioning/subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/subdomain_partitioner.C
 
 src/physics/libmesh_dbg_la-diff_physics.lo: src/physics/diff_physics.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/physics/libmesh_dbg_la-diff_physics.lo -MD -MP -MF src/physics/$(DEPDIR)/libmesh_dbg_la-diff_physics.Tpo -c -o src/physics/libmesh_dbg_la-diff_physics.lo `test -f 'src/physics/diff_physics.C' || echo '$(srcdir)/'`src/physics/diff_physics.C
@@ -18204,6 +18247,13 @@ src/partitioning/libmesh_devel_la-sfc_partitioner.lo: src/partitioning/sfc_parti
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_devel_la-sfc_partitioner.lo `test -f 'src/partitioning/sfc_partitioner.C' || echo '$(srcdir)/'`src/partitioning/sfc_partitioner.C
 
+src/partitioning/libmesh_devel_la-subdomain_partitioner.lo: src/partitioning/subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/partitioning/libmesh_devel_la-subdomain_partitioner.lo -MD -MP -MF src/partitioning/$(DEPDIR)/libmesh_devel_la-subdomain_partitioner.Tpo -c -o src/partitioning/libmesh_devel_la-subdomain_partitioner.lo `test -f 'src/partitioning/subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/partitioning/$(DEPDIR)/libmesh_devel_la-subdomain_partitioner.Tpo src/partitioning/$(DEPDIR)/libmesh_devel_la-subdomain_partitioner.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/subdomain_partitioner.C' object='src/partitioning/libmesh_devel_la-subdomain_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_devel_la-subdomain_partitioner.lo `test -f 'src/partitioning/subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/subdomain_partitioner.C
+
 src/physics/libmesh_devel_la-diff_physics.lo: src/physics/diff_physics.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/physics/libmesh_devel_la-diff_physics.lo -MD -MP -MF src/physics/$(DEPDIR)/libmesh_devel_la-diff_physics.Tpo -c -o src/physics/libmesh_devel_la-diff_physics.lo `test -f 'src/physics/diff_physics.C' || echo '$(srcdir)/'`src/physics/diff_physics.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/physics/$(DEPDIR)/libmesh_devel_la-diff_physics.Tpo src/physics/$(DEPDIR)/libmesh_devel_la-diff_physics.Plo
@@ -21129,6 +21179,13 @@ src/partitioning/libmesh_oprof_la-sfc_partitioner.lo: src/partitioning/sfc_parti
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/sfc_partitioner.C' object='src/partitioning/libmesh_oprof_la-sfc_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_oprof_la-sfc_partitioner.lo `test -f 'src/partitioning/sfc_partitioner.C' || echo '$(srcdir)/'`src/partitioning/sfc_partitioner.C
+
+src/partitioning/libmesh_oprof_la-subdomain_partitioner.lo: src/partitioning/subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/partitioning/libmesh_oprof_la-subdomain_partitioner.lo -MD -MP -MF src/partitioning/$(DEPDIR)/libmesh_oprof_la-subdomain_partitioner.Tpo -c -o src/partitioning/libmesh_oprof_la-subdomain_partitioner.lo `test -f 'src/partitioning/subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/partitioning/$(DEPDIR)/libmesh_oprof_la-subdomain_partitioner.Tpo src/partitioning/$(DEPDIR)/libmesh_oprof_la-subdomain_partitioner.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/subdomain_partitioner.C' object='src/partitioning/libmesh_oprof_la-subdomain_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_oprof_la-subdomain_partitioner.lo `test -f 'src/partitioning/subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/subdomain_partitioner.C
 
 src/physics/libmesh_oprof_la-diff_physics.lo: src/physics/diff_physics.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/physics/libmesh_oprof_la-diff_physics.lo -MD -MP -MF src/physics/$(DEPDIR)/libmesh_oprof_la-diff_physics.Tpo -c -o src/physics/libmesh_oprof_la-diff_physics.lo `test -f 'src/physics/diff_physics.C' || echo '$(srcdir)/'`src/physics/diff_physics.C
@@ -24056,6 +24113,13 @@ src/partitioning/libmesh_opt_la-sfc_partitioner.lo: src/partitioning/sfc_partiti
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_opt_la-sfc_partitioner.lo `test -f 'src/partitioning/sfc_partitioner.C' || echo '$(srcdir)/'`src/partitioning/sfc_partitioner.C
 
+src/partitioning/libmesh_opt_la-subdomain_partitioner.lo: src/partitioning/subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/partitioning/libmesh_opt_la-subdomain_partitioner.lo -MD -MP -MF src/partitioning/$(DEPDIR)/libmesh_opt_la-subdomain_partitioner.Tpo -c -o src/partitioning/libmesh_opt_la-subdomain_partitioner.lo `test -f 'src/partitioning/subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/partitioning/$(DEPDIR)/libmesh_opt_la-subdomain_partitioner.Tpo src/partitioning/$(DEPDIR)/libmesh_opt_la-subdomain_partitioner.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/subdomain_partitioner.C' object='src/partitioning/libmesh_opt_la-subdomain_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_opt_la-subdomain_partitioner.lo `test -f 'src/partitioning/subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/subdomain_partitioner.C
+
 src/physics/libmesh_opt_la-diff_physics.lo: src/physics/diff_physics.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/physics/libmesh_opt_la-diff_physics.lo -MD -MP -MF src/physics/$(DEPDIR)/libmesh_opt_la-diff_physics.Tpo -c -o src/physics/libmesh_opt_la-diff_physics.lo `test -f 'src/physics/diff_physics.C' || echo '$(srcdir)/'`src/physics/diff_physics.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/physics/$(DEPDIR)/libmesh_opt_la-diff_physics.Tpo src/physics/$(DEPDIR)/libmesh_opt_la-diff_physics.Plo
@@ -26981,6 +27045,13 @@ src/partitioning/libmesh_prof_la-sfc_partitioner.lo: src/partitioning/sfc_partit
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/sfc_partitioner.C' object='src/partitioning/libmesh_prof_la-sfc_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_prof_la-sfc_partitioner.lo `test -f 'src/partitioning/sfc_partitioner.C' || echo '$(srcdir)/'`src/partitioning/sfc_partitioner.C
+
+src/partitioning/libmesh_prof_la-subdomain_partitioner.lo: src/partitioning/subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/partitioning/libmesh_prof_la-subdomain_partitioner.lo -MD -MP -MF src/partitioning/$(DEPDIR)/libmesh_prof_la-subdomain_partitioner.Tpo -c -o src/partitioning/libmesh_prof_la-subdomain_partitioner.lo `test -f 'src/partitioning/subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/partitioning/$(DEPDIR)/libmesh_prof_la-subdomain_partitioner.Tpo src/partitioning/$(DEPDIR)/libmesh_prof_la-subdomain_partitioner.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/subdomain_partitioner.C' object='src/partitioning/libmesh_prof_la-subdomain_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_prof_la-subdomain_partitioner.lo `test -f 'src/partitioning/subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/subdomain_partitioner.C
 
 src/physics/libmesh_prof_la-diff_physics.lo: src/physics/diff_physics.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/physics/libmesh_prof_la-diff_physics.lo -MD -MP -MF src/physics/$(DEPDIR)/libmesh_prof_la-diff_physics.Tpo -c -o src/physics/libmesh_prof_la-diff_physics.lo `test -f 'src/physics/diff_physics.C' || echo '$(srcdir)/'`src/physics/diff_physics.C

@@ -573,9 +573,9 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	hilbert_sfc_partitioner.h linear_partitioner.h \
 	metis_csr_graph.h metis_partitioner.h morton_sfc_partitioner.h \
 	parmetis_helper.h parmetis_partitioner.h partitioner.h \
-	sfc_partitioner.h diff_physics.h diff_qoi.h fem_physics.h \
-	quadrature.h quadrature_clough.h quadrature_composite.h \
-	quadrature_conical.h quadrature_gauss.h \
+	sfc_partitioner.h subdomain_partitioner.h diff_physics.h \
+	diff_qoi.h fem_physics.h quadrature.h quadrature_clough.h \
+	quadrature_composite.h quadrature_conical.h quadrature_gauss.h \
 	quadrature_gauss_lobatto.h quadrature_gm.h quadrature_grid.h \
 	quadrature_jacobi.h quadrature_monomial.h quadrature_simpson.h \
 	quadrature_trap.h rb_assembly_expansion.h rb_construction.h \
@@ -1690,6 +1690,9 @@ partitioner.h: $(top_srcdir)/include/partitioning/partitioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sfc_partitioner.h: $(top_srcdir)/include/partitioning/sfc_partitioner.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+subdomain_partitioner.h: $(top_srcdir)/include/partitioning/subdomain_partitioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 diff_physics.h: $(top_srcdir)/include/physics/diff_physics.h
