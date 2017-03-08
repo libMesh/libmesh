@@ -44,6 +44,7 @@
 #include "libmesh/cell_pyramid5.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/boundary_info.h"
+#include "libmesh/remote_elem.h"
 #include "libmesh/sphere.h"
 #include "libmesh/mesh_modification.h"
 #include "libmesh/mesh_smoother_laplace.h"
@@ -1992,6 +1993,10 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
   dof_id_type orig_elem = cross_section.n_elem();
   dof_id_type orig_nodes = cross_section.n_nodes();
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  unique_id_type orig_unique_ids = cross_section.parallel_max_unique_id();
+#endif
+
   unsigned int order = 1;
 
   BoundaryInfo & boundary_info = mesh.get_boundary_info();
@@ -2006,8 +2011,10 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
 
   // For straightforward meshes we need one or two additional layers per
   // element.
-  if ((*cross_section.elements_begin())->default_order() == SECOND)
+  if (cross_section.elements_begin() != cross_section.elements_end() &&
+      (*cross_section.elements_begin())->default_order() == SECOND)
     order = 2;
+  mesh.comm().max(order);
 
   mesh.reserve_nodes((order*nz+1)*orig_nodes);
 
@@ -2028,6 +2035,17 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                            node->id() + (k * orig_nodes),
                            node->processor_id());
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+          // Let's give the base of the extruded mesh the same
+          // unique_ids as the source mesh, in case anyone finds that
+          // a useful map to preserve.
+          const unique_id_type uid = (k == 0) ?
+            node->unique_id() :
+            orig_unique_ids + (k-1)*(orig_nodes + orig_elem) + node->id();
+
+          new_node->set_unique_id() = uid;
+#endif
+
           cross_section_boundary_info.boundary_ids(node, ids_to_copy);
           boundary_info.add_node(new_node, ids_to_copy);
         }
@@ -2035,8 +2053,14 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
 
   const std::set<boundary_id_type> & side_ids =
     cross_section_boundary_info.get_side_boundary_ids();
-  const boundary_id_type next_side_id = side_ids.empty() ?
+
+  boundary_id_type next_side_id = side_ids.empty() ?
     0 : cast_int<boundary_id_type>(*side_ids.rbegin() + 1);
+
+  // side_ids may not include ids from remote elements, in which case
+  // some processors may have underestimated the next_side_id; let's
+  // fix that.
+  cross_section.comm().max(next_side_id);
 
   MeshBase::const_element_iterator       el  = cross_section.elements_begin();
   const MeshBase::const_element_iterator end = cross_section.elements_end();
@@ -2060,6 +2084,12 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                 new_elem->set_node(1) = mesh.node_ptr(elem->node_ptr(1)->id() + (k * orig_nodes));
                 new_elem->set_node(2) = mesh.node_ptr(elem->node_ptr(1)->id() + ((k+1) * orig_nodes));
                 new_elem->set_node(3) = mesh.node_ptr(elem->node_ptr(0)->id() + ((k+1) * orig_nodes));
+
+                if (elem->neighbor(0) == remote_elem)
+                  new_elem->set_neighbor(3, const_cast<RemoteElem *>(remote_elem));
+                if (elem->neighbor(1) == remote_elem)
+                  new_elem->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
+
                 break;
               }
             case EDGE3:
@@ -2074,6 +2104,12 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                 new_elem->set_node(6) = mesh.node_ptr(elem->node_ptr(2)->id() + ((2*k+2) * orig_nodes));
                 new_elem->set_node(7) = mesh.node_ptr(elem->node_ptr(0)->id() + ((2*k+1) * orig_nodes));
                 new_elem->set_node(8) = mesh.node_ptr(elem->node_ptr(2)->id() + ((2*k+1) * orig_nodes));
+
+                if (elem->neighbor(0) == remote_elem)
+                  new_elem->set_neighbor(3, const_cast<RemoteElem *>(remote_elem));
+                if (elem->neighbor(1) == remote_elem)
+                  new_elem->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
+
                 break;
               }
             case TRI3:
@@ -2085,6 +2121,14 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                 new_elem->set_node(3) = mesh.node_ptr(elem->node_ptr(0)->id() + ((k+1) * orig_nodes));
                 new_elem->set_node(4) = mesh.node_ptr(elem->node_ptr(1)->id() + ((k+1) * orig_nodes));
                 new_elem->set_node(5) = mesh.node_ptr(elem->node_ptr(2)->id() + ((k+1) * orig_nodes));
+
+                if (elem->neighbor(0) == remote_elem)
+                  new_elem->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
+                if (elem->neighbor(1) == remote_elem)
+                  new_elem->set_neighbor(2, const_cast<RemoteElem *>(remote_elem));
+                if (elem->neighbor(2) == remote_elem)
+                  new_elem->set_neighbor(3, const_cast<RemoteElem *>(remote_elem));
+
                 break;
               }
             case TRI6:
@@ -2108,6 +2152,14 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                 new_elem->set_node(15) = mesh.node_ptr(elem->node_ptr(3)->id() + ((2*k+1) * orig_nodes));
                 new_elem->set_node(16) = mesh.node_ptr(elem->node_ptr(4)->id() + ((2*k+1) * orig_nodes));
                 new_elem->set_node(17) = mesh.node_ptr(elem->node_ptr(5)->id() + ((2*k+1) * orig_nodes));
+
+                if (elem->neighbor(0) == remote_elem)
+                  new_elem->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
+                if (elem->neighbor(1) == remote_elem)
+                  new_elem->set_neighbor(2, const_cast<RemoteElem *>(remote_elem));
+                if (elem->neighbor(2) == remote_elem)
+                  new_elem->set_neighbor(3, const_cast<RemoteElem *>(remote_elem));
+
                 break;
               }
             case QUAD4:
@@ -2121,6 +2173,16 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                 new_elem->set_node(5) = mesh.node_ptr(elem->node_ptr(1)->id() + ((k+1) * orig_nodes));
                 new_elem->set_node(6) = mesh.node_ptr(elem->node_ptr(2)->id() + ((k+1) * orig_nodes));
                 new_elem->set_node(7) = mesh.node_ptr(elem->node_ptr(3)->id() + ((k+1) * orig_nodes));
+
+                if (elem->neighbor(0) == remote_elem)
+                  new_elem->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
+                if (elem->neighbor(1) == remote_elem)
+                  new_elem->set_neighbor(2, const_cast<RemoteElem *>(remote_elem));
+                if (elem->neighbor(2) == remote_elem)
+                  new_elem->set_neighbor(3, const_cast<RemoteElem *>(remote_elem));
+                if (elem->neighbor(3) == remote_elem)
+                  new_elem->set_neighbor(4, const_cast<RemoteElem *>(remote_elem));
+
                 break;
               }
             case QUAD9:
@@ -2153,6 +2215,16 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                 new_elem->set_node(24) = mesh.node_ptr(elem->node_ptr(7)->id() + ((2*k+1) * orig_nodes));
                 new_elem->set_node(25) = mesh.node_ptr(elem->node_ptr(8)->id() + ((2*k+2) * orig_nodes));
                 new_elem->set_node(26) = mesh.node_ptr(elem->node_ptr(8)->id() + ((2*k+1) * orig_nodes));
+
+                if (elem->neighbor(0) == remote_elem)
+                  new_elem->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
+                if (elem->neighbor(1) == remote_elem)
+                  new_elem->set_neighbor(2, const_cast<RemoteElem *>(remote_elem));
+                if (elem->neighbor(2) == remote_elem)
+                  new_elem->set_neighbor(3, const_cast<RemoteElem *>(remote_elem));
+                if (elem->neighbor(3) == remote_elem)
+                  new_elem->set_neighbor(4, const_cast<RemoteElem *>(remote_elem));
+
                 break;
               }
             default:
@@ -2164,6 +2236,17 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
 
           new_elem->set_id(elem->id() + (k * orig_elem));
           new_elem->processor_id() = elem->processor_id();
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+          // Let's give the base of the extruded mesh the same
+          // unique_ids as the source mesh, in case anyone finds that
+          // a useful map to preserve.
+          const unique_id_type uid = (k == 0) ?
+            elem->unique_id() :
+            orig_unique_ids + (k-1)*(orig_nodes + orig_elem) + orig_nodes + elem->id();
+
+          new_elem->set_unique_id() = uid;
+#endif
 
           if (!elem_subdomain)
             // maintain the subdomain_id
