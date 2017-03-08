@@ -46,6 +46,8 @@
 #include "libmesh/euler_solver.h"
 #include "libmesh/euler2_solver.h"
 #include "libmesh/elem.h"
+#include "libmesh/newton_solver.h"
+#include "libmesh/eigen_sparse_linear_solver.h"
 
 #define x_scaling 1.3
 
@@ -229,6 +231,21 @@ int main (int argc, char ** argv)
 
   // Print information about the system to the screen.
   equation_systems.print_info();
+
+  // If we're using EulerSolver or Euler2Solver, and we're using EigenSparseLinearSolver,
+  // then we need to reset the EigenSparseLinearSolver to use SPARSELU because BICGSTAB
+  // chokes on the Jacobian matrix we give it and Eigen's GMRES currently doesn't work.
+  NewtonSolver * newton_solver = dynamic_cast<NewtonSolver *>( &solver );
+  if( newton_solver &&
+      (time_solver == std::string("euler") || time_solver == std::string("euler2") ) )
+    {
+      LinearSolver<Number> & linear_solver = newton_solver->get_linear_solver();
+      EigenSparseLinearSolver<Number> * eigen_linear_solver =
+        dynamic_cast<EigenSparseLinearSolver<Number> *>(&linear_solver);
+
+      if( eigen_linear_solver )
+        eigen_linear_solver->set_solver_type(SPARSELU);
+    }
 
   if( time_solver == std::string("newmark") )
     {
