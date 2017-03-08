@@ -78,6 +78,16 @@ public:
    */
   virtual unsigned int solve () libmesh_override;
 
+  LinearSolver<Number> & get_linear_solver()
+  { libmesh_assert(_linear_solver);
+    return *_linear_solver;
+  }
+
+  const LinearSolver<Number> & get_linear_solver() const
+  { libmesh_assert(_linear_solver);
+    return *_linear_solver;
+  }
+
   /**
    * If this is set to true, the solver is forced to test the residual
    * after each Newton step, and to reduce the length of its steps
