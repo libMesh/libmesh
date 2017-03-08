@@ -30,6 +30,8 @@
 // libMesh includes
 #include "libmesh/libmesh_logging.h"
 
+#include "libmesh/ignore_warnings.h"
+
 // Threading building blocks includes
 #include "tbb/tbb_stddef.h"
 #include "tbb/blocked_range.h"
@@ -42,6 +44,8 @@
 #include "tbb/atomic.h"
 #include "tbb/tbb_thread.h"
 #include "tbb/enumerable_thread_specific.h"
+
+#include "libmesh/restore_warnings.h"
 
 #define TBB_VERSION_LESS_THAN(major,minor)                              \
   ((LIBMESH_DETECTED_TBB_VERSION_MAJOR < (major) ||                     \
