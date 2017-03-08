@@ -178,7 +178,7 @@ public:
 #endif
                );
 
-    const MeshTools::BoundingBox ret_val(pmin, pmax);
+    const BoundingBox ret_val(pmin, pmax);
 
     return ret_val;
   }

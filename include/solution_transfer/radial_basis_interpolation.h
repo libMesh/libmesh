@@ -25,7 +25,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/meshfree_interpolation.h"
 #include "libmesh/radial_basis_functions.h"
-#include "libmesh/mesh_tools.h"
+#include "libmesh/bounding_box.h"
 
 
 
@@ -54,7 +54,7 @@ protected:
   /**
    * Bounding box for our source points.
    */
-  MeshTools::BoundingBox _src_bbox;
+  BoundingBox _src_bbox;
 
   /**
    * basis coefficients.

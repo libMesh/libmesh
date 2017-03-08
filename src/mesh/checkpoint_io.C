@@ -205,7 +205,7 @@ void CheckpointIO::build_node_list()
     const Elem * elem = mesh.elem_ptr(*it);
 
     for (unsigned int n = 0; n < elem->n_nodes(); n++)
-      _nodes_connected_to_local_elements.insert(elem->node(n));
+      _nodes_connected_to_local_elements.insert(elem->node_id(n));
   }
 }
 

@@ -183,7 +183,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
   const Parallel::Communicator & communicator (mesh.comm());
 
   // Global bounding box
-  MeshTools::BoundingBox bbox =
+  BoundingBox bbox =
     MeshTools::bounding_box (mesh);
 
   //-------------------------------------------------------------
@@ -578,7 +578,7 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
   LOG_SCOPE ("check_for_duplicate_global_indices()", "MeshCommunication");
 
   // Global bounding box
-  MeshTools::BoundingBox bbox =
+  BoundingBox bbox =
     MeshTools::bounding_box (mesh);
 
   std::vector<Parallel::DofObjectKey>

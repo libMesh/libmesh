@@ -97,7 +97,7 @@ public:
         const Elem * elem = *elem_it;
         for (unsigned int s1=0; s1 != elem->n_neighbors(); ++s1)
           {
-            const Elem *n1 = elem->neighbor(s1);
+            const Elem * n1 = elem->neighbor_ptr(s1);
             if (!n1)
               continue;
 
@@ -108,14 +108,14 @@ public:
 
             for (unsigned int s2=0; s2 != elem->n_neighbors(); ++s2)
               {
-                const Elem *n2 = elem->neighbor(s2);
+                const Elem * n2 = elem->neighbor_ptr(s2);
                 if (!n2 ||
                     n2->processor_id() == mesh.processor_id())
                   continue;
 
                 for (unsigned int s3=0; s3 != elem->n_neighbors(); ++s3)
                   {
-                    const Elem *n3 = elem->neighbor(s3);
+                    const Elem * n3 = elem->neighbor_ptr(s3);
                     if (!n3 ||
                         n3->processor_id() == mesh.processor_id())
                       continue;
