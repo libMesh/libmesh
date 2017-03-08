@@ -2011,8 +2011,10 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
 
   // For straightforward meshes we need one or two additional layers per
   // element.
-  if ((*cross_section.elements_begin())->default_order() == SECOND)
+  if (cross_section.elements_begin() != cross_section.elements_end() &&
+      (*cross_section.elements_begin())->default_order() == SECOND)
     order = 2;
+  mesh.comm().max(order);
 
   mesh.reserve_nodes((order*nz+1)*orig_nodes);
 
