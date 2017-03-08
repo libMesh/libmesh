@@ -206,10 +206,10 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
                                                              // partition
 
   // Initialize data structures for ParMETIS
-  _pmetis->vtxdist.resize (mesh.n_processors()+1); std::fill (_pmetis->vtxdist.begin(), _pmetis->vtxdist.end(), 0);
-  _pmetis->tpwgts.resize  (_pmetis->nparts);       std::fill (_pmetis->tpwgts.begin(),  _pmetis->tpwgts.end(),  1./_pmetis->nparts);
-  _pmetis->ubvec.resize   (_pmetis->ncon);         std::fill (_pmetis->ubvec.begin(),   _pmetis->ubvec.end(),   1.05);
-  _pmetis->part.resize    (n_active_local_elem);   std::fill (_pmetis->part.begin(),    _pmetis->part.end(), 0);
+  _pmetis->vtxdist.assign (mesh.n_processors()+1, 0);
+  _pmetis->tpwgts.assign  (_pmetis->nparts, 1./_pmetis->nparts);
+  _pmetis->ubvec.assign   (_pmetis->ncon, 1.05);
+  _pmetis->part.assign    (n_active_local_elem, 0);
   _pmetis->options.resize (5);
   _pmetis->vwgt.resize    (n_active_local_elem);
 
