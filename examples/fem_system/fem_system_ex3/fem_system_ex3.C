@@ -59,10 +59,12 @@ int main (int argc, char ** argv)
   // Parse the input file
   GetPot infile("fem_system_ex3.in");
 
+  // Override input file arguments from the commannd line
+  infile.parse_command_line(argc, argv);
+
   // Read in parameters from the input file
-  const bool transient        = infile("transient", true);
   const Real deltat           = infile("deltat", 0.25);
-  unsigned int n_timesteps    = infile("n_timesteps", 25);
+  unsigned int n_timesteps    = infile("n_timesteps", 1);
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   const unsigned int write_interval    = infile("write_interval", 1);
@@ -158,28 +160,36 @@ int main (int argc, char ** argv)
   ElasticitySystem & system =
     equation_systems.add_system<ElasticitySystem> ("Linear Elasticity");
 
-  // Create ExplicitSystem to help output velocity
-  ExplicitSystem & v_system =
-    equation_systems.add_system<ExplicitSystem> ("Velocity");
-  v_system.add_variable("u_vel", FIRST, LAGRANGE);
-  v_system.add_variable("v_vel", FIRST, LAGRANGE);
-  v_system.add_variable("w_vel", FIRST, LAGRANGE);
-
-  // Create ExplicitSystem to help output acceleration
-  ExplicitSystem & a_system =
-    equation_systems.add_system<ExplicitSystem> ("Acceleration");
-  a_system.add_variable("u_accel", FIRST, LAGRANGE);
-  a_system.add_variable("v_accel", FIRST, LAGRANGE);
-  a_system.add_variable("w_accel", FIRST, LAGRANGE);
-
   // Solve this as a time-dependent or steady system
-  if (transient)
+  std::string time_solver = infile("time_solver","DIE!");
+
+  ExplicitSystem * v_system;
+  ExplicitSystem * a_system;
+
+  if( time_solver == std::string("newmark") )
+    {
+      // Create ExplicitSystem to help output velocity
+      v_system = &equation_systems.add_system<ExplicitSystem> ("Velocity");
+      v_system->add_variable("u_vel", FIRST, LAGRANGE);
+      v_system->add_variable("v_vel", FIRST, LAGRANGE);
+      v_system->add_variable("w_vel", FIRST, LAGRANGE);
+
+      // Create ExplicitSystem to help output acceleration
+      a_system = &equation_systems.add_system<ExplicitSystem> ("Acceleration");
+      a_system->add_variable("u_accel", FIRST, LAGRANGE);
+      a_system->add_variable("v_accel", FIRST, LAGRANGE);
+      a_system->add_variable("w_accel", FIRST, LAGRANGE);
+    }
+
+  if( time_solver == std::string("newmark"))
     system.time_solver.reset(new NewmarkSolver(system));
-  else
+  else if( time_solver == std::string("steady"))
     {
       system.time_solver.reset(new SteadySolver(system));
       libmesh_assert_equal_to (n_timesteps, 1);
     }
+  else
+    libmesh_error_msg(std::string("ERROR: invalud time_solver ")+time_solver);
 
   // Initialize the system
   equation_systems.init ();
@@ -203,13 +213,16 @@ int main (int argc, char ** argv)
   // Print information about the system to the screen.
   equation_systems.print_info();
 
-  NewmarkSolver * newmark = cast_ptr<NewmarkSolver*>(system.time_solver.get());
-  newmark->compute_initial_accel();
+  if( time_solver == std::string("newmark") )
+    {
+      NewmarkSolver * newmark = cast_ptr<NewmarkSolver*>(system.time_solver.get());
+      newmark->compute_initial_accel();
 
-  // Copy over initial velocity and acceleration for output.
-  // Note we can do this because of the matching variables/FE spaces
-  (*v_system.solution) = system.get_vector("_old_solution_rate");
-  (*a_system.solution) = system.get_vector("_old_solution_accel");
+      // Copy over initial velocity and acceleration for output.
+      // Note we can do this because of the matching variables/FE spaces
+      *(v_system->solution) = system.get_vector("_old_solution_rate");
+      *(a_system->solution) = system.get_vector("_old_solution_accel");
+    }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   // Output initial state
@@ -249,8 +262,11 @@ int main (int argc, char ** argv)
 
       // Copy over updated velocity and acceleration for output.
       // Note we can do this because of the matching variables/FE spaces
-      (*v_system.solution) = system.get_vector("_old_solution_rate");
-      (*a_system.solution) = system.get_vector("_old_solution_accel");
+      if( time_solver == std::string("newmark") )
+        {
+          *(v_system->solution) = system.get_vector("_old_solution_rate");
+          *(a_system->solution) = system.get_vector("_old_solution_accel");
+        }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
       // Write out this timestep if we're requested to
