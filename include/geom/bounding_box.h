@@ -58,6 +58,9 @@ public:
     this->invalidate();
   }
 
+  /*
+   * Sets the bounding box to encompass the universe.
+   */
   void invalidate ()
   {
     for (unsigned int i=0; i<LIBMESH_DIM; i++)
@@ -67,12 +70,18 @@ public:
       }
   }
 
+  /*
+   * Returns a point at the minimum x,y,z coordinates of the box.
+   */
   const Point & min() const
   { return this->first; }
 
   Point & min()
   { return this->first; }
 
+  /*
+   * Returns a point at the maximum x,y,z coordinates of the box.
+   */
   const Point & max() const
   { return this->second; }
 
@@ -84,6 +93,9 @@ public:
 
   bool intersect (const BoundingBox &) const;
 
+  /*
+   * Returns true iff the bounding box contains the given point.
+   */
   bool contains_point (const Point &) const;
 
 private:
