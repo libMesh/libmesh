@@ -88,12 +88,9 @@ public:
   Point & max()
   { return this->second; }
 
-  BoundingBox & expand()
-  { return *this; }
-
   /*
-   * Returns true iff the other bounding box intersects this bounding
-   * box.
+   * Returns true iff the other bounding box has a non-empty
+   * intersection with this bounding box.
    */
   bool intersects (const BoundingBox &) const;
 
