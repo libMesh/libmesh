@@ -92,7 +92,7 @@ void PostscriptIO::write (const std::string & fname)
 
       // The mesh bounding box gives us info about what the
       // Postscript bounding box should be.
-      MeshTools::BoundingBox bbox = MeshTools::bounding_box(the_mesh);
+      BoundingBox bbox = MeshTools::bounding_box(the_mesh);
 
       // Add a little extra padding to the "true" bounding box so
       // that we can still see the boundary

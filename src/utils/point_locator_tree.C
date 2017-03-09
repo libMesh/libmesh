@@ -138,7 +138,7 @@ void PointLocatorTree::init (Trees::BuildType build_type)
               // Build the bounding box for the mesh.  If the delta-z bound is
               // negligibly small then we can use a quadtree.
               {
-                MeshTools::BoundingBox bbox = MeshTools::bounding_box(this->_mesh);
+                BoundingBox bbox = MeshTools::bounding_box(this->_mesh);
 
                 const Real
                   Dx = bbox.second(0) - bbox.first(0),

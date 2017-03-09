@@ -137,7 +137,7 @@ public:
     es.reinit();
 
     if (mesh.query_elem_ptr(1))
-    CPPUNIT_ASSERT( mesh.elem(1)->active() );
+      CPPUNIT_ASSERT( mesh.elem_ptr(1)->active() );
 
     const Elem * elem = mesh.query_elem_ptr(0);
     if (elem)
@@ -145,9 +145,9 @@ public:
         CPPUNIT_ASSERT_EQUAL( Elem::RefinementState::INACTIVE,elem->refinement_flag() );
 
         for (unsigned int c=0; c<elem->n_children(); c++)
-          if (elem->child(c) != remote_elem)
+          if (elem->child_ptr(c) != remote_elem)
             CPPUNIT_ASSERT_EQUAL(Elem::RefinementState::JUST_REFINED,
-                                 elem->child(c)->refinement_flag());
+                                 elem->child_ptr(c)->refinement_flag());
       }
   }
 

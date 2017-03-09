@@ -699,7 +699,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        */
       for (unsigned short s=0; s<lo_elem->n_sides(); s++)
         {
-          if (lo_elem->neighbor(s) == remote_elem)
+          if (lo_elem->neighbor_ptr(s) == remote_elem)
             so_elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
         }
 

@@ -852,6 +852,7 @@ include_HEADERS = \
         partitioning/parmetis_partitioner.h \
         partitioning/partitioner.h \
         partitioning/sfc_partitioner.h \
+        partitioning/subdomain_partitioner.h \
         physics/diff_physics.h \
         physics/diff_qoi.h \
         physics/fem_physics.h \

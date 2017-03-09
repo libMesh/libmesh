@@ -279,6 +279,7 @@ BUILT_SOURCES = \
         parmetis_partitioner.h \
         partitioner.h \
         sfc_partitioner.h \
+        subdomain_partitioner.h \
         diff_physics.h \
         diff_qoi.h \
         fem_physics.h \
@@ -1343,6 +1344,9 @@ partitioner.h: $(top_srcdir)/include/partitioning/partitioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sfc_partitioner.h: $(top_srcdir)/include/partitioning/sfc_partitioner.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+subdomain_partitioner.h: $(top_srcdir)/include/partitioning/subdomain_partitioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 diff_physics.h: $(top_srcdir)/include/physics/diff_physics.h
