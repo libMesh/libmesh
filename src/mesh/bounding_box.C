@@ -24,13 +24,13 @@
 
 namespace libMesh
 {
-// Small helper function to make intersect more readable.
+// Small helper function to make intersects() more readable.
 bool is_between(Real min, Real check, Real max)
 {
   return min <= check && check <= max;
 }
 
-bool BoundingBox::intersect (const BoundingBox & other_box) const
+bool BoundingBox::intersects (const BoundingBox & other_box) const
 {
   // Make local variables first to make thiings more clear in a moment
   const Real & my_min_x = this->first(0);

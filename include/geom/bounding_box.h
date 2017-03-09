@@ -91,7 +91,11 @@ public:
   BoundingBox & expand()
   { return *this; }
 
-  bool intersect (const BoundingBox &) const;
+  /*
+   * Returns true iff the other bounding box intersects this bounding
+   * box.
+   */
+  bool intersects (const BoundingBox &) const;
 
   /*
    * Returns true iff the bounding box contains the given point.
