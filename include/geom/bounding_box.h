@@ -98,6 +98,18 @@ public:
    */
   bool contains_point (const Point &) const;
 
+  /*
+   * Sets this bounding box to be the intersection with the other
+   * bounding box.
+   */
+  void intersect_with (const BoundingBox &);
+
+  /*
+   * Sets this bounding box to be the union with the other
+   * bounding box.
+   */
+  void union_with (const BoundingBox &);
+
 private:
 };
 

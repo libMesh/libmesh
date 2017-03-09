@@ -100,5 +100,39 @@ bool BoundingBox::contains_point (const Point & p) const
 }
 
 
+void BoundingBox::intersect_with (const BoundingBox & other_box)
+{
+  this->first(0)  = std::max(this->first(0),  other_box.first(0));
+  this->second(0) = std::min(this->second(0), other_box.second(0));
+
+#if LIBMESH_DIM > 1
+  this->first(1)  = std::max(this->first(1),  other_box.first(1));
+  this->second(1) = std::min(this->second(1), other_box.second(1));
+#endif
+
+#if LIBMESH_DIM > 2
+  this->first(2)  = std::max(this->first(2),  other_box.first(2));
+  this->second(2) = std::min(this->second(2), other_box.second(2));
+#endif
+}
+
+
+void BoundingBox::union_with (const BoundingBox & other_box)
+{
+  this->first(0)  = std::min(this->first(0),  other_box.first(0));
+  this->second(0) = std::max(this->second(0), other_box.second(0));
+
+#if LIBMESH_DIM > 1
+  this->first(1)  = std::min(this->first(1),  other_box.first(1));
+  this->second(1) = std::max(this->second(1), other_box.second(1));
+#endif
+
+#if LIBMESH_DIM > 2
+  this->first(2)  = std::min(this->first(2),  other_box.first(2));
+  this->second(2) = std::max(this->second(2), other_box.second(2));
+#endif
+}
+
+
 
 } // namespace libMesh
