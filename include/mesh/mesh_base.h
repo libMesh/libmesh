@@ -27,7 +27,6 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/multi_predicates.h"
-#include "libmesh/partitioner.h" // UniquePtr needs a real declaration
 #include "libmesh/point_locator_base.h"
 #include "libmesh/variant_filter_iterator.h"
 #include "libmesh/parallel_object.h"
@@ -44,6 +43,7 @@ class Elem;
 class GhostingFunctor;
 class Node;
 class Point;
+class Partitioner;
 
 template <class MT>
 class MeshInput;

@@ -55,10 +55,10 @@ namespace libMesh
 {
 
 
-// ------------------------------------------------------------
-// MetisPartitioner implementation
-void MetisPartitioner::_do_partition (MeshBase & mesh,
-                                      const unsigned int n_pieces)
+void MetisPartitioner::partition_range(MeshBase & mesh,
+                                       MeshBase::element_iterator beg,
+                                       MeshBase::element_iterator end,
+                                       unsigned int n_pieces)
 {
   libmesh_assert_greater (n_pieces, 0);
   libmesh_assert (mesh.is_serial());
@@ -66,7 +66,7 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
   // Check for an easy return
   if (n_pieces == 1)
     {
-      this->single_partition (mesh);
+      this->single_partition_range (beg, end);
       return;
     }
 
@@ -79,83 +79,73 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
                << "partitioner instead!"                         << std::endl;
 
   SFCPartitioner sfcp;
-
-  sfcp.partition (mesh, n_pieces);
+  sfcp.partition_range (mesh, beg, end, n_pieces);
 
   // What to do if the Metis library IS present
 #else
 
-  LOG_SCOPE("partition()", "MetisPartitioner");
+  LOG_SCOPE("partition_range()", "MetisPartitioner");
 
-  const dof_id_type n_active_elem = mesh.n_active_elem();
+  const dof_id_type n_range_elem = std::distance(beg, end);
 
   // build the graph
   // std::vector<Metis::idx_t> options(5);
-  std::vector<Metis::idx_t> vwgt(n_active_elem);
-  std::vector<Metis::idx_t> part(n_active_elem);
+  std::vector<Metis::idx_t> vwgt(n_range_elem);
+  std::vector<Metis::idx_t> part(n_range_elem);
 
   Metis::idx_t
-    n = static_cast<Metis::idx_t>(n_active_elem),  // number of "nodes" (elements)
-                                                   //   in the graph
-    //    wgtflag = 2,                             // weights on vertices only,
-    //                                             //   none on edges
-    //    numflag = 0,                             // C-style 0-based numbering
+    n = static_cast<Metis::idx_t>(n_range_elem),   // number of "nodes" (elements) in the graph
+    // wgtflag = 2,                                // weights on vertices only, none on edges
+    // numflag = 0,                                // C-style 0-based numbering
     nparts  = static_cast<Metis::idx_t>(n_pieces), // number of subdomains to create
-    edgecut = 0;                                   // the numbers of edges cut by the
-                                                   //   resulting partition
+    edgecut = 0;                                   // the numbers of edges cut by the resulting partition
 
   // Set the options
   // options[0] = 0; // use default options
 
-  // Metis will only consider the active elements.
-  // We need to map the active element ids into a
+  // Metis will only consider the elements in the range.
+  // We need to map the range element ids into a
   // contiguous range.  Further, we want the unique range indexing to be
   // independent of the element ordering, otherwise a circular dependency
   // can result in which the partitioning depends on the ordering which
   // depends on the partitioning...
   vectormap<dof_id_type, dof_id_type> global_index_map;
-  global_index_map.reserve (n_active_elem);
+  global_index_map.reserve (n_range_elem);
 
   {
     std::vector<dof_id_type> global_index;
 
-    MeshBase::element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator end = mesh.active_elements_end();
-
     MeshCommunication().find_global_indices (mesh.comm(),
                                              MeshTools::bounding_box(mesh),
-                                             it, end, global_index);
+                                             beg, end, global_index);
 
-    libmesh_assert_equal_to (global_index.size(), n_active_elem);
+    libmesh_assert_equal_to (global_index.size(), n_range_elem);
 
+    MeshBase::element_iterator it = beg;
     for (std::size_t cnt=0; it != end; ++it)
       {
         const Elem * elem = *it;
 
         global_index_map.insert (std::make_pair(elem->id(), global_index[cnt++]));
       }
-    libmesh_assert_equal_to (global_index_map.size(), n_active_elem);
+    libmesh_assert_equal_to (global_index_map.size(), n_range_elem);
   }
 
   // If we have boundary elements in this mesh, we want to account for
   // the connectivity between them and interior elements.  We can find
   // interior elements from boundary elements, but we need to build up
   // a lookup map to do the reverse.
-
-  typedef LIBMESH_BEST_UNORDERED_MULTIMAP<const Elem *, const Elem *>
-    map_type;
+  typedef LIBMESH_BEST_UNORDERED_MULTIMAP<const Elem *, const Elem *> map_type;
   map_type interior_to_boundary_map;
 
   {
-    MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator elem_end = mesh.active_elements_end();
-
-    for (; elem_it != elem_end; ++elem_it)
+    MeshBase::element_iterator it = beg;
+    for (; it != end; ++it)
       {
-        const Elem * elem = *elem_it;
+        const Elem * elem = *it;
 
-        // If we don't have an interior_parent then there's nothing to look us
-        // up.
+        // If we don't have an interior_parent then there's nothing
+        // to look us up.
         if ((elem->dim() >= LIBMESH_DIM) ||
             !elem->interior_parent())
           continue;
@@ -167,20 +157,18 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
         std::set<const Elem *>::iterator n_it = neighbor_set.begin();
         for (; n_it != neighbor_set.end(); ++n_it)
           {
-            // FIXME - non-const versions of the Elem set methods
-            // would be nice
+            // FIXME - non-const versions of the std::set<const Elem
+            // *> returning methods would be nice
             Elem * neighbor = const_cast<Elem *>(*n_it);
 
-#if defined(LIBMESH_HAVE_UNORDERED_MULTIMAP) ||         \
-  defined(LIBMESH_HAVE_TR1_UNORDERED_MULTIMAP) ||       \
-  defined(LIBMESH_HAVE_HASH_MULTIMAP) ||                \
+#if defined(LIBMESH_HAVE_UNORDERED_MULTIMAP) ||   \
+  defined(LIBMESH_HAVE_TR1_UNORDERED_MULTIMAP) || \
+  defined(LIBMESH_HAVE_HASH_MULTIMAP) ||          \
   defined(LIBMESH_HAVE_EXT_HASH_MULTIMAP)
-            interior_to_boundary_map.insert
-              (std::make_pair(neighbor, elem));
+            interior_to_boundary_map.insert(std::make_pair(neighbor, elem));
 #else
-            interior_to_boundary_map.insert
-              (interior_to_boundary_map.begin(),
-               std::make_pair(neighbor, elem));
+            interior_to_boundary_map.insert(interior_to_boundary_map.begin(),
+                                            std::make_pair(neighbor, elem));
 #endif
           }
       }
@@ -193,7 +181,7 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
     {
       METIS_CSR_Graph<Metis::idx_t> csr_graph;
 
-      csr_graph.offsets.resize(n_active_elem+1, 0);
+      csr_graph.offsets.resize(n_range_elem + 1, 0);
 
       // Local scope for these
       {
@@ -205,18 +193,16 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
         std::vector<const Elem *> neighbors_offspring;
 #endif
 
-        MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-        const MeshBase::element_iterator elem_end = mesh.active_elements_end();
-
 #ifndef NDEBUG
         std::size_t graph_size=0;
 #endif
 
         // (1) first pass - get the row sizes for each element by counting the number
         // of face neighbors.  Also populate the vwght array if necessary
-        for (; elem_it != elem_end; ++elem_it)
+        MeshBase::element_iterator it = beg;
+        for (; it != end; ++it)
           {
-            const Elem * elem = *elem_it;
+            const Elem * elem = *it;
 
             const dof_id_type elem_global_index =
               global_index_map[elem->id()];
@@ -225,7 +211,7 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
 
             // maybe there is a better weight?
             // The weight is used to define what a balanced graph is
-            if(!_weights)
+            if (!_weights)
               vwgt[elem_global_index] = elem->n_nodes();
             else
               vwgt[elem_global_index] = static_cast<Metis::idx_t>((*_weights)[elem->id()]);
@@ -268,7 +254,6 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
                         // on partition interiors, which would reduce
                         // communication overhead for constraint
                         // equations, so we'll leave it.
-
                         neighbor->active_family_tree (neighbors_offspring);
 
                         // Get all the neighbor's children that
@@ -296,8 +281,7 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
               }
 
             // Check for any interior neighbors
-            if ((elem->dim() < LIBMESH_DIM) &&
-                elem->interior_parent())
+            if ((elem->dim() < LIBMESH_DIM) && elem->interior_parent())
               {
                 // get all relevant interior elements
                 std::set<const Elem *> neighbor_set;
@@ -321,11 +305,11 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
         csr_graph.prepare_for_use();
 
         // (2) second pass - fill the compressed adjacency array
-        elem_it  = mesh.active_elements_begin();
+        it = beg;
 
-        for (; elem_it != elem_end; ++elem_it)
+        for (; it != end; ++it)
           {
-            const Elem * elem = *elem_it;
+            const Elem * elem = *it;
 
             const dof_id_type elem_global_index =
               global_index_map[elem->id()];
@@ -441,7 +425,7 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
         // We create a non-empty vals for a disconnected graph, to
         // work around a segfault from METIS.
         libmesh_assert_equal_to (csr_graph.vals.size(),
-                                 std::max(graph_size,std::size_t(1)));
+                                 std::max(graph_size, std::size_t(1)));
       } // done building the graph
 
       Metis::idx_t ncon = 1;
@@ -450,15 +434,35 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
 
       // Use recursive if the number of partitions is less than or equal to 8
       if (n_pieces <= 8)
-        Metis::METIS_PartGraphRecursive(&n, &ncon, &csr_graph.offsets[0], &csr_graph.vals[0], &vwgt[0], libmesh_nullptr,
-                                        libmesh_nullptr, &nparts, libmesh_nullptr, libmesh_nullptr, libmesh_nullptr,
-                                        &edgecut, &part[0]);
+        Metis::METIS_PartGraphRecursive(&n,
+                                        &ncon,
+                                        &csr_graph.offsets[0],
+                                        &csr_graph.vals[0],
+                                        &vwgt[0],
+                                        libmesh_nullptr,
+                                        libmesh_nullptr,
+                                        &nparts,
+                                        libmesh_nullptr,
+                                        libmesh_nullptr,
+                                        libmesh_nullptr,
+                                        &edgecut,
+                                        &part[0]);
 
       // Otherwise  use kway
       else
-        Metis::METIS_PartGraphKway(&n, &ncon, &csr_graph.offsets[0], &csr_graph.vals[0], &vwgt[0], libmesh_nullptr,
-                                   libmesh_nullptr, &nparts, libmesh_nullptr, libmesh_nullptr, libmesh_nullptr,
-                                   &edgecut, &part[0]);
+        Metis::METIS_PartGraphKway(&n,
+                                   &ncon,
+                                   &csr_graph.offsets[0],
+                                   &csr_graph.vals[0],
+                                   &vwgt[0],
+                                   libmesh_nullptr,
+                                   libmesh_nullptr,
+                                   &nparts,
+                                   libmesh_nullptr,
+                                   libmesh_nullptr,
+                                   libmesh_nullptr,
+                                   &edgecut,
+                                   &part[0]);
 
     } // end processor 0 part
 
@@ -469,9 +473,7 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
   // the processor id for each active element, but in terms of
   // the contiguous indexing we defined above
   {
-    MeshBase::element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator end = mesh.active_elements_end();
-
+    MeshBase::element_iterator it = beg;
     for (; it!=end; ++it)
       {
         Elem * elem = *it;
@@ -489,6 +491,17 @@ void MetisPartitioner::_do_partition (MeshBase & mesh,
       }
   }
 #endif
+}
+
+
+
+void MetisPartitioner::_do_partition (MeshBase & mesh,
+                                      const unsigned int n_pieces)
+{
+  this->partition_range(mesh,
+                        mesh.active_elements_begin(),
+                        mesh.active_elements_end(),
+                        n_pieces);
 }
 
 } // namespace libMesh

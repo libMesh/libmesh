@@ -70,6 +70,13 @@ public:
     _sfc_type = sfc_type;
   }
 
+  /**
+   * Called by the SubdomainPartitioner to partition elements in the range (it, end).
+   */
+  virtual void partition_range(MeshBase & mesh,
+                               MeshBase::element_iterator it,
+                               MeshBase::element_iterator end,
+                               const unsigned int n) libmesh_override;
 
 protected:
 

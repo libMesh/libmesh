@@ -38,18 +38,17 @@ namespace libMesh
 {
 
 
-// ------------------------------------------------------------
-// SFCPartitioner implementation
-void SFCPartitioner::_do_partition (MeshBase & mesh,
-                                    const unsigned int n)
+void SFCPartitioner::partition_range(MeshBase & mesh,
+                                     MeshBase::element_iterator beg,
+                                     MeshBase::element_iterator end,
+                                     unsigned int n)
 {
-
   libmesh_assert_greater (n, 0);
 
   // Check for an easy return
   if (n == 1)
     {
-      this->single_partition (mesh);
+      this->single_partition_range (beg, end);
       return;
     }
 
@@ -62,65 +61,53 @@ void SFCPartitioner::_do_partition (MeshBase & mesh,
                << "partitioner instead!" << std::endl;
 
   LinearPartitioner lp;
-
-  lp.partition (mesh, n);
+  lp.partition_range (mesh, beg, end, n);
 
   // What to do if the sfcurves library IS present
 #else
 
-  LOG_SCOPE("sfc_partition()", "SFCPartitioner");
+  LOG_SCOPE("partition_range()", "SFCPartitioner");
 
-  const dof_id_type n_active_elem = mesh.n_active_elem();
-  const dof_id_type n_elem        = mesh.n_elem();
+  const dof_id_type n_range_elem = std::distance(beg, end);
+  const dof_id_type n_elem = mesh.n_elem();
 
-  // the forward_map maps the active element id
-  // into a contiguous block of indices
-  std::vector<dof_id_type>
-    forward_map (n_elem, DofObject::invalid_id);
+  // The forward_map maps the range's element ids into a contiguous
+  // block of indices.
+  std::vector<dof_id_type> forward_map (n_elem, DofObject::invalid_id);
 
   // the reverse_map maps the contiguous ids back
   // to active elements
-  std::vector<Elem *> reverse_map (n_active_elem, libmesh_nullptr);
+  std::vector<Elem *> reverse_map (n_range_elem, libmesh_nullptr);
 
-  int size = static_cast<int>(n_active_elem);
-  std::vector<double> x      (size);
-  std::vector<double> y      (size);
-  std::vector<double> z      (size);
-  std::vector<int>    table  (size);
+  std::vector<double> x      (n_range_elem);
+  std::vector<double> y      (n_range_elem);
+  std::vector<double> z      (n_range_elem);
+  std::vector<int>    table  (n_range_elem);
 
-
-  // We need to map the active element ids into a
-  // contiguous range.
+  // Map the range's element ids into a contiguous range.
   {
-    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.active_elements_end();
-
+    MeshBase::element_iterator it = beg;
     dof_id_type el_num = 0;
 
-    for (; elem_it != elem_end; ++elem_it)
+    for (; it != end; ++it)
       {
-        libmesh_assert_less ((*elem_it)->id(), forward_map.size());
+        libmesh_assert_less ((*it)->id(), forward_map.size());
         libmesh_assert_less (el_num, reverse_map.size());
 
-        forward_map[(*elem_it)->id()] = el_num;
-        reverse_map[el_num]           = *elem_it;
+        forward_map[(*it)->id()] = el_num;
+        reverse_map[el_num] = *it;
         el_num++;
       }
-    libmesh_assert_equal_to (el_num, n_active_elem);
+    libmesh_assert_equal_to (el_num, n_range_elem);
   }
 
-
-  // Get the centroid for each active element
+  // Get the centroid for each range element.
   {
-    //     const_active_elem_iterator       elem_it (mesh.const_elements_begin());
-    //     const const_active_elem_iterator elem_end(mesh.const_elements_end());
+    MeshBase::element_iterator it = beg;
 
-    MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.active_elements_end();
-
-    for (; elem_it != elem_end; ++elem_it)
+    for (; it != end; ++it)
       {
-        const Elem * elem = *elem_it;
+        const Elem * elem = *it;
 
         libmesh_assert_less (elem->id(), forward_map.size());
 
@@ -131,6 +118,9 @@ void SFCPartitioner::_do_partition (MeshBase & mesh,
         z[forward_map[elem->id()]] = p(2);
       }
   }
+
+  // We need an integer reference to pass to the Sfc interface.
+  int size = static_cast<int>(n_range_elem);
 
   // build the space-filling curve
   if (_sfc_type == "Hilbert")
@@ -153,34 +143,40 @@ void SFCPartitioner::_do_partition (MeshBase & mesh,
     }
 
 
-  // Assign the partitioning to the active elements
+  // Assign the partitioning to the range elements
   {
-    //      {
-    //        std::ofstream out ("sfc.dat");
-    //        out << "variables=x,y,z" << std::endl;
-    //        out << "zone f=point" << std::endl;
+    // {
+    //   std::ofstream out ("sfc.dat");
+    //   out << "variables=x,y,z" << std::endl;
+    //   out << "zone f=point" << std::endl;
+    //   for (unsigned int i=0; i<n_range_elem; i++)
+    //     out << x[i] << " " << y[i] << " " << z[i] << std::endl;
+    // }
 
-    //        for (unsigned int i=0; i<n_active_elem; i++)
-    //  out << x[i] << " "
-    //      << y[i] << " "
-    //      << z[i] << std::endl;
-    //      }
+    const dof_id_type blksize = (n_range_elem + n - 1) / n;
 
-    const dof_id_type blksize = (n_active_elem+n-1)/n;
-
-    for (dof_id_type i=0; i<n_active_elem; i++)
+    for (dof_id_type i=0; i<n_range_elem; i++)
       {
-        libmesh_assert_less (static_cast<unsigned int>(table[i]-1), reverse_map.size());
+        libmesh_assert_less (static_cast<unsigned int>(table[i] - 1), reverse_map.size());
 
-        Elem * elem = reverse_map[table[i]-1];
+        Elem * elem = reverse_map[table[i] - 1];
 
-        elem->processor_id() = cast_int<processor_id_type>
-          (i/blksize);
+        elem->processor_id() = cast_int<processor_id_type>(i/blksize);
       }
   }
 
 #endif
+}
 
+
+
+void SFCPartitioner::_do_partition (MeshBase & mesh,
+                                    const unsigned int n)
+{
+  this->partition_range(mesh,
+                        mesh.active_elements_begin(),
+                        mesh.active_elements_end(),
+                        n);
 }
 
 } // namespace libMesh
