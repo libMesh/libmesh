@@ -28,9 +28,9 @@ using namespace libMesh;
 
 void ElasticitySystem::init_data()
 {
-  u_var = this->add_variable ("u", FIRST, LAGRANGE);
-  v_var = this->add_variable ("v", FIRST, LAGRANGE);
-  w_var = this->add_variable ("w", FIRST, LAGRANGE);
+  u_var = this->add_variable ("Ux", FIRST, LAGRANGE);
+  v_var = this->add_variable ("Uy", FIRST, LAGRANGE);
+  w_var = this->add_variable ("Uz", FIRST, LAGRANGE);
 
   this->time_evolving(u_var);
   this->time_evolving(v_var);
