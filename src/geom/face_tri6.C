@@ -330,12 +330,12 @@ BoundingBox Tri6::loose_bounding_box () const
   for (unsigned d=0; d<LIBMESH_DIM; ++d)
     {
       Real center = this->point(0)(d);
-      for (unsigned int p=0; p != 6; ++p)
+      for (unsigned int p=1; p != 6; ++p)
         center += this->point(p)(d);
       center /= 6;
 
       Real hd = std::abs(center - this->point(0)(d));
-      for (unsigned int p=0; p != 6; ++p)
+      for (unsigned int p=1; p != 6; ++p)
         hd = std::max(hd, std::abs(center - this->point(p)(d)));
 
       pmin(d) = center - hd;
