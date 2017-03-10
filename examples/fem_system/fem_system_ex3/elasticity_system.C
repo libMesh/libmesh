@@ -23,18 +23,19 @@
 #include "libmesh/zero_function.h"
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/quadrature.h"
+#include "libmesh/unsteady_solver.h"
 
 using namespace libMesh;
 
 void ElasticitySystem::init_data()
 {
-  u_var = this->add_variable ("u", FIRST, LAGRANGE);
-  v_var = this->add_variable ("v", FIRST, LAGRANGE);
-  w_var = this->add_variable ("w", FIRST, LAGRANGE);
+  _u_var = this->add_variable ("Ux", FIRST, LAGRANGE);
+  _v_var = this->add_variable ("Uy", FIRST, LAGRANGE);
+  _w_var = this->add_variable ("Uz", FIRST, LAGRANGE);
 
-  this->time_evolving(u_var);
-  this->time_evolving(v_var);
-  this->time_evolving(w_var);
+  this->time_evolving(_u_var,2);
+  this->time_evolving(_v_var,2);
+  this->time_evolving(_w_var,2);
 
   std::set<boundary_id_type> boundary_ids;
   boundary_ids.insert(BOUNDARY_ID_MIN_X);
@@ -42,9 +43,9 @@ void ElasticitySystem::init_data()
   boundary_ids.insert(EDGE_BOUNDARY_ID);
 
   std::vector<unsigned int> variables;
-  variables.push_back(u_var);
-  variables.push_back(v_var);
-  variables.push_back(w_var);
+  variables.push_back(_u_var);
+  variables.push_back(_v_var);
+  variables.push_back(_w_var);
 
   ZeroFunction<> zf;
 
@@ -66,8 +67,8 @@ void ElasticitySystem::init_context(DiffContext & context)
   FEBase * u_elem_fe;
   FEBase * u_side_fe;
 
-  c.get_element_fe(u_var, u_elem_fe);
-  c.get_side_fe(u_var, u_side_fe);
+  c.get_element_fe(_u_var, u_elem_fe);
+  c.get_side_fe(_u_var, u_side_fe);
 
   // We should prerequest all the data
   // we will need to build the residuals.
@@ -84,11 +85,24 @@ bool ElasticitySystem::element_time_derivative(bool request_jacobian,
 {
   FEMContext & c = cast_ref<FEMContext &>(context);
 
+ // If we have an unsteady solver, then we need to extract the corresponding
+  // velocity variable. This allows us to use either a FirstOrderUnsteadySolver
+  // or a SecondOrderUnsteadySolver. That is, we get back the velocity variable
+  // index for FirstOrderUnsteadySolvers or, if it's a SecondOrderUnsteadySolver,
+  // this is actually just giving us back the same variable index.
+
+  // If we only wanted to use a SecondOrderUnsteadySolver, then this
+  // step would be unnecessary and we would just
+  // populate the _u_var, etc. blocks of the residual and Jacobian.
+  unsigned int u_dot_var = this->get_second_order_dot_var(_u_var);
+  unsigned int v_dot_var = this->get_second_order_dot_var(_v_var);
+  unsigned int w_dot_var = this->get_second_order_dot_var(_w_var);
+
   FEBase * u_elem_fe;
-  c.get_element_fe(u_var, u_elem_fe);
+  c.get_element_fe(_u_var, u_elem_fe);
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+  const unsigned int n_u_dofs = c.get_dof_indices(_u_var).size();
 
   // Element Jacobian * quadrature weights for interior integration
   const std::vector<Real> & JxW = u_elem_fe->get_JxW();
@@ -96,19 +110,19 @@ bool ElasticitySystem::element_time_derivative(bool request_jacobian,
   const std::vector<std::vector<Real> > & phi = u_elem_fe->get_phi();
   const std::vector<std::vector<RealGradient> > & grad_phi = u_elem_fe->get_dphi();
 
-  DenseSubVector<Number> & Fu = c.get_elem_residual(u_var);
-  DenseSubVector<Number> & Fv = c.get_elem_residual(v_var);
-  DenseSubVector<Number> & Fw = c.get_elem_residual(w_var);
+  DenseSubVector<Number> & Fu = c.get_elem_residual(u_dot_var);
+  DenseSubVector<Number> & Fv = c.get_elem_residual(v_dot_var);
+  DenseSubVector<Number> & Fw = c.get_elem_residual(w_dot_var);
 
-  DenseSubMatrix<Number> & Kuu = c.get_elem_jacobian(u_var, u_var);
-  DenseSubMatrix<Number> & Kvv = c.get_elem_jacobian(v_var, v_var);
-  DenseSubMatrix<Number> & Kww = c.get_elem_jacobian(w_var, w_var);
-  DenseSubMatrix<Number> & Kuv = c.get_elem_jacobian(u_var, v_var);
-  DenseSubMatrix<Number> & Kuw = c.get_elem_jacobian(u_var, w_var);
-  DenseSubMatrix<Number> & Kvu = c.get_elem_jacobian(v_var, u_var);
-  DenseSubMatrix<Number> & Kvw = c.get_elem_jacobian(v_var, w_var);
-  DenseSubMatrix<Number> & Kwu = c.get_elem_jacobian(w_var, u_var);
-  DenseSubMatrix<Number> & Kwv = c.get_elem_jacobian(w_var, v_var);
+  DenseSubMatrix<Number> & Kuu = c.get_elem_jacobian(u_dot_var, _u_var);
+  DenseSubMatrix<Number> & Kvv = c.get_elem_jacobian(v_dot_var, _v_var);
+  DenseSubMatrix<Number> & Kww = c.get_elem_jacobian(w_dot_var, _w_var);
+  DenseSubMatrix<Number> & Kuv = c.get_elem_jacobian(u_dot_var, _v_var);
+  DenseSubMatrix<Number> & Kuw = c.get_elem_jacobian(u_dot_var, _w_var);
+  DenseSubMatrix<Number> & Kvu = c.get_elem_jacobian(v_dot_var, _u_var);
+  DenseSubMatrix<Number> & Kvw = c.get_elem_jacobian(v_dot_var, _w_var);
+  DenseSubMatrix<Number> & Kwu = c.get_elem_jacobian(w_dot_var, _u_var);
+  DenseSubMatrix<Number> & Kwv = c.get_elem_jacobian(w_dot_var, _v_var);
 
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
@@ -117,9 +131,9 @@ bool ElasticitySystem::element_time_derivative(bool request_jacobian,
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       Gradient grad_u, grad_v, grad_w;
-      c.interior_gradient(u_var, qp, grad_u);
-      c.interior_gradient(v_var, qp, grad_v);
-      c.interior_gradient(w_var, qp, grad_w);
+      c.interior_gradient(_u_var, qp, grad_u);
+      c.interior_gradient(_v_var, qp, grad_v);
+      c.interior_gradient(_w_var, qp, grad_w);
 
       // Convenience
       Tensor grad_U (grad_u, grad_v, grad_w);
@@ -187,15 +201,28 @@ bool ElasticitySystem::side_time_derivative (bool request_jacobian,
   // If we're on the correct side, apply the traction
   if (c.has_side_boundary_id(BOUNDARY_ID_MAX_X))
     {
+      // If we have an unsteady solver, then we need to extract the corresponding
+      // velocity variable. This allows us to use either a FirstOrderUnsteadySolver
+      // or a SecondOrderUnsteadySolver. That is, we get back the velocity variable
+      // index for FirstOrderUnsteadySolvers or, if it's a SecondOrderUnsteadySolver,
+      // this is actually just giving us back the same variable index.
+
+      // If we only wanted to use a SecondOrderUnsteadySolver, then this
+      // step would be unnecessary and we would just
+      // populate the _u_var, etc. blocks of the residual and Jacobian.
+      unsigned int u_dot_var = this->get_second_order_dot_var(_u_var);
+      unsigned int v_dot_var = this->get_second_order_dot_var(_v_var);
+      unsigned int w_dot_var = this->get_second_order_dot_var(_w_var);
+
       FEBase * u_side_fe;
-      c.get_side_fe(u_var, u_side_fe);
+      c.get_side_fe(_u_var, u_side_fe);
 
       // The number of local degrees of freedom in each variable
-      const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+      const unsigned int n_u_dofs = c.get_dof_indices(_u_var).size();
 
-      DenseSubVector<Number> & Fu = c.get_elem_residual(u_var);
-      DenseSubVector<Number> & Fv = c.get_elem_residual(v_var);
-      DenseSubVector<Number> & Fw = c.get_elem_residual(w_var);
+      DenseSubVector<Number> & Fu = c.get_elem_residual(u_dot_var);
+      DenseSubVector<Number> & Fv = c.get_elem_residual(v_dot_var);
+      DenseSubVector<Number> & Fw = c.get_elem_residual(w_dot_var);
 
       // Element Jacobian * quadrature weights for interior integration
       const std::vector<Real> & JxW = u_side_fe->get_JxW();
@@ -227,11 +254,24 @@ bool ElasticitySystem::mass_residual(bool request_jacobian,
 {
   FEMContext & c = cast_ref<FEMContext &>(context);
 
+  // We need to extract the corresponding velocity variable.
+  // This allows us to use either a FirstOrderUnsteadySolver
+  // or a SecondOrderUnsteadySolver. That is, we get back the velocity variable
+  // index for FirstOrderUnsteadySolvers or, if it's a SecondOrderUnsteadySolver,
+  // this is actually just giving us back the same variable index.
+
+  // If we only wanted to use a SecondOrderUnsteadySolver, then this
+  // step would be unnecessary and we would just
+  // populate the _u_var, etc. blocks of the residual and Jacobian.
+  unsigned int u_dot_var = this->get_second_order_dot_var(_u_var);
+  unsigned int v_dot_var = this->get_second_order_dot_var(_v_var);
+  unsigned int w_dot_var = this->get_second_order_dot_var(_w_var);
+
   FEBase * u_elem_fe;
-  c.get_element_fe(u_var, u_elem_fe);
+  c.get_element_fe(u_dot_var, u_elem_fe);
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
+  const unsigned int n_u_dofs = c.get_dof_indices(u_dot_var).size();
 
   // Element Jacobian * quadrature weights for interior integration
   const std::vector<Real> & JxW = u_elem_fe->get_JxW();
@@ -239,22 +279,26 @@ bool ElasticitySystem::mass_residual(bool request_jacobian,
   const std::vector<std::vector<Real> > & phi = u_elem_fe->get_phi();
 
   // Residuals that we're populating
-  libMesh::DenseSubVector<libMesh::Number> & Fu = c.get_elem_residual(u_var);
-  libMesh::DenseSubVector<libMesh::Number> & Fv = c.get_elem_residual(v_var);
-  libMesh::DenseSubVector<libMesh::Number> & Fw = c.get_elem_residual(w_var);
+  libMesh::DenseSubVector<libMesh::Number> & Fu = c.get_elem_residual(u_dot_var);
+  libMesh::DenseSubVector<libMesh::Number> & Fv = c.get_elem_residual(v_dot_var);
+  libMesh::DenseSubVector<libMesh::Number> & Fw = c.get_elem_residual(w_dot_var);
 
-  libMesh::DenseSubMatrix<libMesh::Number> & Kuu = c.get_elem_jacobian(u_var, u_var);
-  libMesh::DenseSubMatrix<libMesh::Number> & Kvv = c.get_elem_jacobian(v_var, v_var);
-  libMesh::DenseSubMatrix<libMesh::Number> & Kww = c.get_elem_jacobian(w_var, w_var);
+  libMesh::DenseSubMatrix<libMesh::Number> & Kuu = c.get_elem_jacobian(u_dot_var, u_dot_var);
+  libMesh::DenseSubMatrix<libMesh::Number> & Kvv = c.get_elem_jacobian(v_dot_var, v_dot_var);
+  libMesh::DenseSubMatrix<libMesh::Number> & Kww = c.get_elem_jacobian(w_dot_var, w_dot_var);
 
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
+      // If we only cared about using FirstOrderUnsteadySolvers for time-stepping,
+      // then we could actually just use interior rate, but using interior_accel
+      // allows this assembly to function for both FirstOrderUnsteadySolvers
+      // and SecondOrderUnsteadySolvers
       libMesh::Number u_ddot, v_ddot, w_ddot;
-      c.interior_accel(u_var, qp, u_ddot);
-      c.interior_accel(v_var, qp, v_ddot);
-      c.interior_accel(w_var, qp, w_ddot);
+      c.interior_accel(u_dot_var, qp, u_ddot);
+      c.interior_accel(v_dot_var, qp, v_ddot);
+      c.interior_accel(w_dot_var, qp, w_ddot);
 
       for (unsigned int i=0; i != n_u_dofs; i++)
         {

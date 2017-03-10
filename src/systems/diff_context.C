@@ -79,7 +79,7 @@ DiffContext::DiffContext (const System & sys) :
               // We only need accel space if the TimeSolver is second order
               const UnsteadySolver & time_solver = cast_ref<const UnsteadySolver &>(diff_system->get_time_solver());
 
-              if( time_solver.time_order() >= 2 )
+              if( time_solver.time_order() >= 2 || !diff_system->get_second_order_vars().empty() )
                 _elem_subsolution_accels.push_back(new DenseSubVector<Number>(_elem_solution_accel));
             }
         }

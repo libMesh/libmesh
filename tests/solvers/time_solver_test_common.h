@@ -91,13 +91,13 @@ public:
   virtual void init_data ()
   {
     _u_var = this->add_variable ("u", FIRST, LAGRANGE);
-    this->time_evolving(_u_var);
+    this->time_evolving(_u_var,1);
     FEMSystem::init_data();
   }
 
   //! Note the nonlinear residual is F(u)-M(u)\dot{u}
   virtual bool element_time_derivative (bool request_jacobian,
-                                        DiffContext & context)
+                                        DiffContext & context) libmesh_override
   {
     FEMContext & c = cast_ref<FEMContext &>(context);
     DenseSubVector<Number> & Fu = c.get_elem_residual(_u_var);
@@ -118,7 +118,7 @@ public:
 
   //! Note the nonlinear residual is F(u)-M(u)\dot{u}
   virtual bool mass_residual (bool request_jacobian,
-                              DiffContext & context)
+                              DiffContext & context) libmesh_override
   {
     FEMContext & c = cast_ref<FEMContext &>(context);
     DenseSubVector<Number> & Fu = c.get_elem_residual(_u_var);
@@ -153,24 +153,32 @@ protected:
 
 //! FEMSystem-based class for testing of TimeSolvers using second order SCALARs
 /**
+ *  This is for solving second order systems using second order time solvers.
  *  We're assuming the ODEs are only dependent on time, so no Jacobian
  *  functions are needed, just F, C, and M.
  */
-class SecondOrderScalarSystemBase : public FirstOrderScalarSystemBase
+class SecondOrderScalarSystemSecondOrderTimeSolverBase : public FirstOrderScalarSystemBase
 {
 public:
-  SecondOrderScalarSystemBase(EquationSystems & es,
-                              const std::string & name_in,
-                              const unsigned int number_in)
+  SecondOrderScalarSystemSecondOrderTimeSolverBase(EquationSystems & es,
+                                                   const std::string & name_in,
+                                                   const unsigned int number_in)
     : FirstOrderScalarSystemBase(es, name_in, number_in)
   {}
+
+  virtual void init_data ()
+  {
+    _u_var = this->add_variable ("u", FIRST, LAGRANGE);
+    this->time_evolving(_u_var,2);
+    FEMSystem::init_data();
+  }
 
   //! Value of C(u).
   virtual Number C( FEMContext & context, unsigned int qp ) =0;
 
   //! Note the nonlinear residual is M(u)\ddot{u} + C(u)\dot{u} + F(u)
   virtual bool damping_residual (bool request_jacobian,
-                                 DiffContext & context)
+                                 DiffContext & context) libmesh_override
   {
     FEMContext & c = cast_ref<FEMContext &>(context);
     DenseSubVector<Number> & Fu = c.get_elem_residual(_u_var);
@@ -200,7 +208,7 @@ public:
   }
 
   virtual bool mass_residual (bool request_jacobian,
-                              DiffContext & context)
+                              DiffContext & context) libmesh_override
   {
     FEMContext & c = cast_ref<FEMContext &>(context);
     DenseSubVector<Number> & Fu = c.get_elem_residual(_u_var);
@@ -223,6 +231,115 @@ public:
             if (request_jacobian)
               for (unsigned int j=0; j != n_u_dofs; j++)
                 Kuu(i,j) += Mval*context.get_elem_solution_accel_derivative();
+          }
+      }
+
+    return request_jacobian;
+  }
+};
+
+
+//! FEMSystem-based class for testing of TimeSolvers using second order SCALARs
+/**
+ *  This is for solving second order systems using *first* order *or* second order
+ *  time solvers. We're assuming the ODEs are only dependent on time, so no Jacobian
+ *  functions are needed, just F, C, and M.
+ */
+class SecondOrderScalarSystemFirstOrderTimeSolverBase : public SecondOrderScalarSystemSecondOrderTimeSolverBase
+{
+public:
+  SecondOrderScalarSystemFirstOrderTimeSolverBase(EquationSystems & es,
+                              const std::string & name_in,
+                              const unsigned int number_in)
+    : SecondOrderScalarSystemSecondOrderTimeSolverBase(es, name_in, number_in)
+  {}
+
+  //! Note the nonlinear residual is M(u)\dot{v} + C(u)v + F(u)
+  virtual bool element_time_derivative (bool request_jacobian,
+                                        DiffContext & context) libmesh_override
+  {
+    FEMContext & c = cast_ref<FEMContext &>(context);
+
+    unsigned int v_var = this->get_second_order_dot_var(_u_var);
+
+    DenseSubVector<Number> & Fv = c.get_elem_residual(v_var);
+
+    const unsigned int n_u_dofs = c.get_dof_indices(_u_var).size();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
+
+    for (unsigned int qp=0; qp != n_qpoints; qp++)
+      {
+        Number Fval = this->F(c,qp);
+
+        for (unsigned int i=0; i != n_u_dofs; i++)
+          Fv(i) += Fval;
+      }
+
+    return request_jacobian;
+  }
+
+  //! Note the nonlinear residual is M(u)\dot{v} + C(u)v + F(u)
+  virtual bool damping_residual (bool request_jacobian,
+                                 DiffContext & context) libmesh_override
+  {
+    FEMContext & c = cast_ref<FEMContext &>(context);
+
+    unsigned int v_var = this->get_second_order_dot_var(_u_var);
+
+    DenseSubVector<Number> & Fv = c.get_elem_residual(v_var);
+
+    DenseSubMatrix<Number> & Kvv = c.get_elem_jacobian(v_var, v_var);
+
+    const unsigned int n_u_dofs = c.get_dof_indices(_u_var).size();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
+
+    for (unsigned int qp=0; qp != n_qpoints; qp++)
+      {
+        libMesh::Number udot;
+        c.interior_rate(v_var,qp,udot);
+
+        Number Cval = this->C(c,qp);
+
+        for (unsigned int i=0; i != n_u_dofs; i++)
+          {
+            Fv(i) += Cval*udot;
+
+            if (request_jacobian)
+              for (unsigned int j=0; j != n_u_dofs; j++)
+                Kvv(i,j) += Cval*context.get_elem_solution_rate_derivative();
+          }
+      }
+
+    return request_jacobian;
+  }
+
+  virtual bool mass_residual (bool request_jacobian,
+                              DiffContext & context) libmesh_override
+  {
+    FEMContext & c = cast_ref<FEMContext &>(context);
+
+    unsigned int v_var = this->get_second_order_dot_var(_u_var);
+
+    DenseSubVector<Number> & Fv = c.get_elem_residual(v_var);
+    DenseSubMatrix<Number> & Kvv = c.get_elem_jacobian(v_var, v_var);
+
+    const unsigned int n_u_dofs = c.get_dof_indices(_u_var).size();
+    unsigned int n_qpoints = c.get_element_qrule().n_points();
+
+    for (unsigned int qp=0; qp != n_qpoints; qp++)
+      {
+        libMesh::Number uddot;
+        c.interior_accel(v_var,qp,uddot);
+
+        Number Mval = this->M(c,qp);
+
+        for (unsigned int i=0; i != n_u_dofs; i++)
+          {
+            Fv(i) += Mval*uddot;
+
+            if (request_jacobian)
+              for (unsigned int j=0; j != n_u_dofs; j++)
+                Kvv(i,j) += Mval*context.get_elem_solution_accel_derivative();
           }
       }
 

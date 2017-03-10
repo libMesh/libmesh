@@ -237,7 +237,7 @@ NewtonSolver::NewtonSolver (sys_type & s)
     track_linear_convergence(false),
     minsteplength(1e-5),
     linear_tolerance_multiplier(1e-3),
-    linear_solver(LinearSolver<Number>::build(s.comm()))
+    _linear_solver(LinearSolver<Number>::build(s.comm()))
 {
 }
 
@@ -254,11 +254,11 @@ void NewtonSolver::init()
   Parent::init();
 
   if (libMesh::on_command_line("--solver_system_names"))
-    linear_solver->init((_system.name()+"_").c_str());
+    _linear_solver->init((_system.name()+"_").c_str());
   else
-    linear_solver->init();
+    _linear_solver->init();
 
-  linear_solver->init_names(_system);
+  _linear_solver->init_names(_system);
 }
 
 
@@ -267,9 +267,9 @@ void NewtonSolver::reinit()
 {
   Parent::reinit();
 
-  linear_solver->clear();
+  _linear_solver->clear();
 
-  linear_solver->init_names(_system);
+  _linear_solver->init_names(_system);
 }
 
 
@@ -392,13 +392,13 @@ unsigned int NewtonSolver::solve()
 
       // Solve the linear system.
       const std::pair<unsigned int, Real> rval =
-        linear_solver->solve (matrix, _system.request_matrix("Preconditioner"),
-                              linear_solution, rhs, current_linear_tolerance,
-                              max_linear_iterations);
+        _linear_solver->solve (matrix, _system.request_matrix("Preconditioner"),
+                               linear_solution, rhs, current_linear_tolerance,
+                               max_linear_iterations);
 
       if (track_linear_convergence)
         {
-          LinearConvergenceReason linear_c_reason = linear_solver->get_converged_reason();
+          LinearConvergenceReason linear_c_reason = _linear_solver->get_converged_reason();
 
           // Check if something went wrong during the linear solve
           if (linear_c_reason < 0)
