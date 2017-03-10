@@ -186,9 +186,11 @@ public:
   virtual void delete_remote_elements() libmesh_override;
 
   /**
-   * Inserts the element _and_ adds it to a list of elements not to
-   * get deleted by delete_remote_elements.  This is handy for inserting
-   * off-processor elements that you want to keep track of on this processor.
+   * Inserts the element _and_ adds it to a list of elements that
+   * should not get deleted or have their descendants deleted by
+   * delete_remote_elements.  This is handy for inserting otherwise
+   * off-processor elements that you want to keep track of on this
+   * processor.
    */
   virtual void add_extra_ghost_elem(Elem * e);
 

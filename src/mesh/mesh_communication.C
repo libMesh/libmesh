@@ -1822,7 +1822,16 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
       it != extra_ghost_elem_ids.end(); ++it)
     {
       const Elem * elem = *it;
-      elements_to_keep.insert(elem);
+
+      std::vector<const Elem *> active_family;
+#ifdef LIBMESH_ENABLE_AMR
+      elem->active_family_tree(active_family);
+#else
+      active_family.insert(elem);
+#endif
+
+      for (std::size_t i=0; i != active_family.size(); ++i)
+        elements_to_keep.insert(active_family[i]);
     }
 
   // See which elements we still need to keep ghosted, given that
