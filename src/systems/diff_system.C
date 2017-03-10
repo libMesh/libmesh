@@ -335,7 +335,7 @@ bool DifferentiableSystem::have_first_order_scalar_vars() const
            var_it != this->get_first_order_vars().end();
            ++var_it )
         {
-          if( this->variable(*var_it).type().family == FEFamily::SCALAR )
+          if( this->variable(*var_it).type().family == SCALAR )
             have_first_order_scalar_vars = true;
         }
     }
@@ -353,7 +353,7 @@ bool DifferentiableSystem::have_second_order_scalar_vars() const
            var_it != this->get_second_order_vars().end();
            ++var_it )
         {
-          if( this->variable(*var_it).type().family == FEFamily::SCALAR )
+          if( this->variable(*var_it).type().family == SCALAR )
             have_second_order_scalar_vars = true;
         }
     }
