@@ -321,7 +321,9 @@ public:
   void remove_id (boundary_id_type id);
 
   /**
-   * Returns the number of user-specified boundary ids.
+   * Returns the number of user-specified boundary ids on the
+   * semilocal part of the mesh.  DistributedMesh users may need to
+   * compare boundary_ids sets via inter-processor communication.
    */
   std::size_t n_boundary_ids () const { return _boundary_ids.size(); }
 
