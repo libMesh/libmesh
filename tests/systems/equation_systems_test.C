@@ -121,6 +121,7 @@ public:
   void testRefineThenReinitPreserveFlags()
   {
     Mesh mesh(*TestCommWorld);
+    mesh.allow_renumbering(false);
     EquationSystems es(mesh);
     System & sys = es.add_system<System> ("SimpleSystem");
     sys.add_variable("u", FIRST);

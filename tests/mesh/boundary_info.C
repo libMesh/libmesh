@@ -71,7 +71,21 @@ public:
 
     // build_square adds boundary_ids 0,1,2,3 for the bottom, right,
     // top, and left sides, respectively.
-    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(4), bi.n_boundary_ids());
+
+    // On a ReplicatedMesh, we should see all 4 ids on each processor
+    if (mesh.is_serial())
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(4), bi.n_boundary_ids());
+
+    // On any mesh, we should see each id on *some* processor
+    {
+      const std::set<boundary_id_type> & bc_ids = bi.get_boundary_ids();
+      for (unsigned int i = 0 ; i != 4; ++i)
+        {
+          bool has_bcid = bc_ids.count(i);
+          mesh.comm().max(has_bcid);
+          CPPUNIT_ASSERT(has_bcid);
+        }
+    }
 
     // Build the side list
     bi.build_side_list (element_id_list, side_list, bc_id_list);
@@ -85,7 +99,19 @@ public:
     bi.remove_id(0);
 
     // Check that there are now only 3 boundary ids total on the Mesh.
-    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(3), bi.n_boundary_ids());
+    if (mesh.is_serial())
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(3), bi.n_boundary_ids());
+
+    {
+      const std::set<boundary_id_type> & bc_ids = bi.get_boundary_ids();
+      CPPUNIT_ASSERT(!bc_ids.count(0));
+      for (unsigned int i = 1 ; i != 4; ++i)
+        {
+          bool has_bcid = bc_ids.count(i);
+          mesh.comm().max(has_bcid);
+          CPPUNIT_ASSERT(has_bcid);
+        }
+    }
 
     // Build the side list again
     bi.build_side_list (element_id_list, side_list, bc_id_list);
@@ -100,7 +126,8 @@ public:
 
     // Remove the same id again, make sure nothing changes.
     bi.remove_id(0);
-    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(3), bi.n_boundary_ids());
+    if (mesh.is_serial())
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(3), bi.n_boundary_ids());
 
     // Remove the remaining IDs, verify that we have no sides left and
     // that we can safely reuse the same vectors in the
