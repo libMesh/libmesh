@@ -27,6 +27,7 @@ unit_tests_sources = \
   fe/fe_szabab_test.C \
   fe/fe_test.h \
   fe/fe_xyz_test.C \
+  geom/elem_test.C \
   geom/node_test.C \
   geom/point_test.C \
   geom/point_test.h \
@@ -109,6 +110,7 @@ endif
 
 if LIBMESH_DEVEL_MODE
   check_PROGRAMS           += unit_tests-devel
+  noinst_PROGRAMS          += unit_tests-devel
   unit_tests_devel_SOURCES  = $(unit_tests_sources)
   unit_tests_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
   unit_tests_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
@@ -117,6 +119,7 @@ endif
 
 if LIBMESH_PROF_MODE
   check_PROGRAMS          += unit_tests-prof
+  noinst_PROGRAMS         += unit_tests-prof
   unit_tests_prof_SOURCES  = $(unit_tests_sources)
   unit_tests_prof_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
   unit_tests_prof_CXXFLAGS = $(CXXFLAGS_PROF)
@@ -125,6 +128,7 @@ endif
 
 if LIBMESH_OPROF_MODE
   check_PROGRAMS           += unit_tests-oprof
+  noinst_PROGRAMS          += unit_tests-oprof
   unit_tests_oprof_SOURCES  = $(unit_tests_sources)
   unit_tests_oprof_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
   unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)

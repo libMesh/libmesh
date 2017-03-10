@@ -78,7 +78,7 @@ bool TreeNode<N>::insert (const Elem * elem)
   // with the bounding box of the current tree node.
   //
   // If not, we should not care about this element.
-  if (!this->bounding_box.intersect(bbox))
+  if (!this->bounding_box.intersects(bbox))
     return false;
 
   // Only add the element if we are active

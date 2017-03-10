@@ -380,7 +380,7 @@ BoundingBox Quad8::loose_bounding_box () const
     {
       Real center = this->point(0)(d);
       for (unsigned int p=1; p != 8; ++p)
-        center += this->point(1)(d);
+        center += this->point(p)(d);
       center /= 8;
 
       Real hd = std::abs(center - this->point(0)(d));

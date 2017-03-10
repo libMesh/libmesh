@@ -32,7 +32,7 @@ BoundingBox Cell::loose_bounding_box () const
   BoundingBox bbox = this->build_side_ptr(0)->loose_bounding_box();
   unsigned int my_n_sides = this->n_sides();
   for (unsigned s=1; s < my_n_sides; ++s)
-    bbox.intersect(this->build_side_ptr(s)->loose_bounding_box());
+    bbox.union_with(this->build_side_ptr(s)->loose_bounding_box());
 
   return bbox;
 }
