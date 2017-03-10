@@ -154,6 +154,7 @@ INSTANTIATE_ELEM_ACCESSORS(type_elements,                   Type,               
 INSTANTIATE_ELEM_ACCESSORS(active_type_elements,            ActiveType,           ElemType type,                  type)
 INSTANTIATE_ELEM_ACCESSORS(active_pid_elements,             ActivePID,            processor_id_type proc_id,      proc_id)
 INSTANTIATE_ELEM_ACCESSORS(active_subdomain_elements,       ActiveSubdomain,      subdomain_id_type subdomain_id, subdomain_id)
+INSTANTIATE_ELEM_ACCESSORS(active_subdomain_set_elements,   ActiveSubdomainSet,   std::set<subdomain_id_type> ss, ss)
 INSTANTIATE_ELEM_ACCESSORS(ghost_elements,                  Ghost,                EMPTY,                          this->processor_id())
 INSTANTIATE_ELEM_ACCESSORS(evaluable_elements,              Evaluable,            const DofMap & dof_map LIBMESH_COMMA unsigned int var_num, this->processor_id(), dof_map, var_num)
 INSTANTIATE_ELEM_ACCESSORS(unpartitioned_elements,          PID,                  EMPTY,                          DofObject::invalid_processor_id)

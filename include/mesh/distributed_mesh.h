@@ -395,6 +395,11 @@ public:
   virtual const_element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) const libmesh_override;
   virtual const_element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id) const libmesh_override;
 
+  virtual element_iterator active_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) libmesh_override;
+  virtual element_iterator active_subdomain_set_elements_end (std::set<subdomain_id_type> ss) libmesh_override;
+  virtual const_element_iterator active_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) const libmesh_override;
+  virtual const_element_iterator active_subdomain_set_elements_end (std::set<subdomain_id_type> ss) const libmesh_override;
+
   virtual element_iterator ghost_elements_begin () libmesh_override;
   virtual element_iterator ghost_elements_end () libmesh_override;
   virtual const_element_iterator ghost_elements_begin () const libmesh_override;
