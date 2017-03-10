@@ -65,7 +65,7 @@ public:
 private:
 
   // Indices for each variable;
-  unsigned int u_var, v_var, w_var;
+  unsigned int _u_var, _v_var, _w_var;
 
   Real _rho;
 

@@ -43,7 +43,11 @@
 #include "libmesh/diff_solver.h"
 #include "libmesh/newmark_solver.h"
 #include "libmesh/steady_solver.h"
+#include "libmesh/euler_solver.h"
+#include "libmesh/euler2_solver.h"
 #include "libmesh/elem.h"
+#include "libmesh/newton_solver.h"
+#include "libmesh/eigen_sparse_linear_solver.h"
 
 #define x_scaling 1.3
 
@@ -59,10 +63,12 @@ int main (int argc, char ** argv)
   // Parse the input file
   GetPot infile("fem_system_ex3.in");
 
+  // Override input file arguments from the commannd line
+  infile.parse_command_line(argc, argv);
+
   // Read in parameters from the input file
-  const bool transient        = infile("transient", true);
   const Real deltat           = infile("deltat", 0.25);
-  unsigned int n_timesteps    = infile("n_timesteps", 25);
+  unsigned int n_timesteps    = infile("n_timesteps", 1);
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   const unsigned int write_interval    = infile("write_interval", 1);
@@ -158,28 +164,51 @@ int main (int argc, char ** argv)
   ElasticitySystem & system =
     equation_systems.add_system<ElasticitySystem> ("Linear Elasticity");
 
-  // Create ExplicitSystem to help output velocity
-  ExplicitSystem & v_system =
-    equation_systems.add_system<ExplicitSystem> ("Velocity");
-  v_system.add_variable("u_vel", FIRST, LAGRANGE);
-  v_system.add_variable("v_vel", FIRST, LAGRANGE);
-  v_system.add_variable("w_vel", FIRST, LAGRANGE);
-
-  // Create ExplicitSystem to help output acceleration
-  ExplicitSystem & a_system =
-    equation_systems.add_system<ExplicitSystem> ("Acceleration");
-  a_system.add_variable("u_accel", FIRST, LAGRANGE);
-  a_system.add_variable("v_accel", FIRST, LAGRANGE);
-  a_system.add_variable("w_accel", FIRST, LAGRANGE);
-
   // Solve this as a time-dependent or steady system
-  if (transient)
+  std::string time_solver = infile("time_solver","DIE!");
+
+  ExplicitSystem * v_system;
+  ExplicitSystem * a_system;
+
+  if( time_solver == std::string("newmark") )
+    {
+      // Create ExplicitSystem to help output velocity
+      v_system = &equation_systems.add_system<ExplicitSystem> ("Velocity");
+      v_system->add_variable("u_vel", FIRST, LAGRANGE);
+      v_system->add_variable("v_vel", FIRST, LAGRANGE);
+      v_system->add_variable("w_vel", FIRST, LAGRANGE);
+
+      // Create ExplicitSystem to help output acceleration
+      a_system = &equation_systems.add_system<ExplicitSystem> ("Acceleration");
+      a_system->add_variable("u_accel", FIRST, LAGRANGE);
+      a_system->add_variable("v_accel", FIRST, LAGRANGE);
+      a_system->add_variable("w_accel", FIRST, LAGRANGE);
+    }
+
+  if( time_solver == std::string("newmark"))
     system.time_solver.reset(new NewmarkSolver(system));
-  else
+
+  else if( time_solver == std::string("euler") )
+    {
+      system.time_solver.reset(new EulerSolver(system));
+      EulerSolver & euler_solver = libmesh_cast_ref<EulerSolver &>(*(system.time_solver.get()));
+      euler_solver.theta = infile("theta", 1.0);
+    }
+
+  else if( time_solver == std::string("euler2") )
+    {
+      system.time_solver.reset(new Euler2Solver(system));
+      Euler2Solver & euler_solver = libmesh_cast_ref<Euler2Solver &>(*(system.time_solver.get()));
+      euler_solver.theta = infile("theta", 1.0);
+    }
+
+  else if( time_solver == std::string("steady"))
     {
       system.time_solver.reset(new SteadySolver(system));
       libmesh_assert_equal_to (n_timesteps, 1);
     }
+  else
+    libmesh_error_msg(std::string("ERROR: invalud time_solver ")+time_solver);
 
   // Initialize the system
   equation_systems.init ();
@@ -203,13 +232,31 @@ int main (int argc, char ** argv)
   // Print information about the system to the screen.
   equation_systems.print_info();
 
-  NewmarkSolver * newmark = cast_ptr<NewmarkSolver*>(system.time_solver.get());
-  newmark->compute_initial_accel();
+  // If we're using EulerSolver or Euler2Solver, and we're using EigenSparseLinearSolver,
+  // then we need to reset the EigenSparseLinearSolver to use SPARSELU because BICGSTAB
+  // chokes on the Jacobian matrix we give it and Eigen's GMRES currently doesn't work.
+  NewtonSolver * newton_solver = dynamic_cast<NewtonSolver *>( &solver );
+  if( newton_solver &&
+      (time_solver == std::string("euler") || time_solver == std::string("euler2") ) )
+    {
+      LinearSolver<Number> & linear_solver = newton_solver->get_linear_solver();
+      EigenSparseLinearSolver<Number> * eigen_linear_solver =
+        dynamic_cast<EigenSparseLinearSolver<Number> *>(&linear_solver);
 
-  // Copy over initial velocity and acceleration for output.
-  // Note we can do this because of the matching variables/FE spaces
-  (*v_system.solution) = system.get_vector("_old_solution_rate");
-  (*a_system.solution) = system.get_vector("_old_solution_accel");
+      if( eigen_linear_solver )
+        eigen_linear_solver->set_solver_type(SPARSELU);
+    }
+
+  if( time_solver == std::string("newmark") )
+    {
+      NewmarkSolver * newmark = cast_ptr<NewmarkSolver*>(system.time_solver.get());
+      newmark->compute_initial_accel();
+
+      // Copy over initial velocity and acceleration for output.
+      // Note we can do this because of the matching variables/FE spaces
+      *(v_system->solution) = system.get_vector("_old_solution_rate");
+      *(a_system->solution) = system.get_vector("_old_solution_accel");
+    }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   // Output initial state
@@ -217,7 +264,7 @@ int main (int argc, char ** argv)
     std::ostringstream file_name;
 
     // We write the file in the ExodusII format.
-    file_name << "out.e-s."
+    file_name << std::string("out.")+time_solver+std::string(".e-s.")
               << std::setw(3)
               << std::setfill('0')
               << std::right
@@ -249,8 +296,11 @@ int main (int argc, char ** argv)
 
       // Copy over updated velocity and acceleration for output.
       // Note we can do this because of the matching variables/FE spaces
-      (*v_system.solution) = system.get_vector("_old_solution_rate");
-      (*a_system.solution) = system.get_vector("_old_solution_accel");
+      if( time_solver == std::string("newmark") )
+        {
+          *(v_system->solution) = system.get_vector("_old_solution_rate");
+          *(a_system->solution) = system.get_vector("_old_solution_accel");
+        }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
       // Write out this timestep if we're requested to
@@ -259,7 +309,7 @@ int main (int argc, char ** argv)
           std::ostringstream file_name;
 
           // We write the file in the ExodusII format.
-          file_name << "out.e-s."
+          file_name << std::string("out.")+time_solver+std::string(".e-s.")
                     << std::setw(3)
                     << std::setfill('0')
                     << std::right

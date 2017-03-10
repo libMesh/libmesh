@@ -240,12 +240,30 @@ public:
    * Most derived systems will not have to reimplment this function; however
    * any system which reimplements mass_residual() may have to reimplement
    * time_evolving() to prepare data structures.
+   *
+   * This method is deprecated. Instead, use the time_evolving override
+   * and specify the order-in-time of the variable, either 1 or 2. This method
+   * assumes the variable is first order for backward compatibility.
    */
-  virtual void time_evolving (unsigned int var) {
-    if (_time_evolving.size() <= var)
-      _time_evolving.resize(var+1, false);
-    _time_evolving[var] = true;
+  virtual void time_evolving (unsigned int var)
+  {
+    libmesh_deprecated();
+    this->time_evolving(var,1);
   }
+
+  /**
+   * Tells the DiffSystem that variable var is evolving with
+   * respect to time.  In general, the user's init() function
+   * should call time_evolving() with order 1 for any variables which
+   * behave like du/dt = F(u), with order 2 for any variables that
+   * behave like d^2u/dt^2 = F(u), and should not call time_evolving()
+   * for any variables which behave like 0 = G(u).
+   *
+   * Most derived systems will not have to reimplment this function; however
+   * any system which reimplements mass_residual() may have to reimplement
+   * time_evolving() to prepare data structures.
+   */
+  virtual void time_evolving (unsigned int var, unsigned int order);
 
   /**
    * Returns true iff variable \p var is evolving with
@@ -254,7 +272,12 @@ public:
    * behave like du/dt = F(u), and should not call time_evolving()
    * for any variables which behave like 0 = G(u).
    */
-  bool is_time_evolving (unsigned int var) const {
+  bool is_time_evolving (unsigned int var) const
+  {
+    libmesh_assert_less(var,_time_evolving.size());
+    libmesh_assert( _time_evolving[var] == 0 ||
+                    _time_evolving[var] == 1 ||
+                    _time_evolving[var] == 2 );
     return _time_evolving[var];
   }
 
@@ -483,6 +506,31 @@ public:
   bool _eulerian_time_deriv (bool request_jacobian,
                              DiffContext &);
 
+  bool have_first_order_vars() const
+  { return !_first_order_vars.empty(); }
+
+  /**
+   * Returns the set of first order in time variable indices. May be empty.
+   */
+  const std::set<unsigned int> & get_first_order_vars() const
+  { return _first_order_vars; }
+
+  bool is_first_order_var( unsigned int var ) const
+  { return _first_order_vars.find(var) != _first_order_vars.end(); }
+
+
+  bool have_second_order_vars() const
+  { return !_second_order_vars.empty(); }
+
+  /**
+   * Returns the set of second order in time variable indices. May be empty.
+   */
+  const std::set<unsigned int> & get_second_order_vars() const
+  { return _second_order_vars; }
+
+  bool is_second_order_var( unsigned int var ) const
+  { return _second_order_vars.find(var) != _second_order_vars.end(); }
+
 
 protected:
 
@@ -497,13 +545,30 @@ protected:
   unsigned int _mesh_x_var, _mesh_y_var, _mesh_z_var;
 
   /**
-   * Stores bools to tell us which variables are evolving
-   * in time and which are just constraints
+   * Stores unsigned int to tell us which variables are evolving
+   * as first order in time (1), second order in time (2), or are
+   * not time evolving (0).
    */
-  std::vector<bool> _time_evolving;
+  std::vector<unsigned int> _time_evolving;
+
+  /**
+   * Variable indices for those variables that are first order in time.
+   */
+  std::set<unsigned int> _first_order_vars;
+
+  /**
+   * Variable indices for those variables that are second order in time.
+   */
+  std::set<unsigned int> _second_order_vars;
+
+  /**
+   * If the user adds any second order variables, then we need to also
+   * cache the map to their corresponding dot variable that will
+   * be added by this TimeSolver class.
+   */
+  std::map<unsigned int,unsigned int> _second_order_dot_vars;
+
 };
-
-
 
 // ------------------------------------------------------------
 // DifferentiablePhysics inline methods

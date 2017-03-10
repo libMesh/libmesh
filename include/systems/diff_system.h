@@ -264,6 +264,27 @@ public:
   virtual void side_postprocess (DiffContext &) {}
 
   /**
+   * For a given second order (in time) variable var, this method will return
+   * the index to the corresponding "dot" variable. For FirstOrderUnsteadySolver
+   * classes, the "dot" variable would automatically be added and the returned
+   * index will correspond to that variable. For SecondOrderUnsteadySolver classes,
+   * this method will return var as there this is no "dot" variable per se, but
+   * having this function allows one to use the interface to treat both
+   * FirstOrderUnsteadySolver and SecondOrderUnsteadySolver simultaneously.
+   */
+  unsigned int get_second_order_dot_var( unsigned int var ) const;
+
+  /**
+   * Check for any first order vars that are also belong to FEFamily::SCALAR
+   */
+  bool have_first_order_scalar_vars() const;
+
+  /**
+   * Check for any second order vars that are also belong to FEFamily::SCALAR
+   */
+  bool have_second_order_scalar_vars() const;
+
+  /**
    * If \p postprocess_sides is true (it is false by default), the
    * postprocessing loop will loop over all sides as well as all elements.
    */
@@ -335,8 +356,33 @@ protected:
   /**
    * Initializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
+   *
+   * If the TimeSolver is a FirstOrderUnsteadySolver,
+   * we check for second order in time variables and then add them
+   * to the System as dot_<varname>. Then, during assembly, the
+   * TimeSolver will populate the elem_accel vectors with the
+   * dot_<varname> values so the user's element assembly function
+   * can still treat the variable as a second order in time variable.
    */
   virtual void init_data () libmesh_override;
+
+  /**
+   * Helper function to add "velocity" variables that are cousins to
+   * second order-in-time variables in the DifferentiableSystem. This
+   * function is only called if the TimeSolver is a FirstOrderUnsteadySolver.
+   */
+  void add_second_order_dot_vars();
+
+  /**
+   * Helper function to and Dirichlet boundary conditions to "dot" variable
+   * cousins of second order variables in the system. The function takes the
+   * second order variable index, it's corresponding "dot" variable index and
+   * then searches for DirchletBoundary objects for var_idx and then adds a
+   * DirichletBoundary object for dot_var_idx using the same boundary ids and
+   * functors for the var_idx DirichletBoundary.
+   */
+  void add_dot_var_dirichlet_bcs( unsigned int var_idx, unsigned int dot_var_idx);
+
 };
 
 // --------------------------------------------------------------
