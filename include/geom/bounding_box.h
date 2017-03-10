@@ -94,6 +94,9 @@ public:
    */
   bool intersects (const BoundingBox &) const;
 
+  bool intersect (const BoundingBox & b) const
+    { libmesh_deprecated(); return this->intersect(b); }
+
   /*
    * Returns true iff the bounding box contains the given point.
    */
