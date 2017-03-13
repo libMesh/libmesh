@@ -88,21 +88,6 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
 
   const dof_id_type n_range_elem = std::distance(beg, end);
 
-  // build the graph
-  // std::vector<Metis::idx_t> options(5);
-  std::vector<Metis::idx_t> vwgt(n_range_elem);
-  std::vector<Metis::idx_t> part(n_range_elem);
-
-  Metis::idx_t
-    n = static_cast<Metis::idx_t>(n_range_elem),   // number of "nodes" (elements) in the graph
-    // wgtflag = 2,                                // weights on vertices only, none on edges
-    // numflag = 0,                                // C-style 0-based numbering
-    nparts  = static_cast<Metis::idx_t>(n_pieces), // number of subdomains to create
-    edgecut = 0;                                   // the numbers of edges cut by the resulting partition
-
-  // Set the options
-  // options[0] = 0; // use default options
-
   // Metis will only consider the elements in the range.
   // We need to map the range element ids into a
   // contiguous range.  Further, we want the unique range indexing to be
@@ -174,11 +159,28 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
       }
   }
 
+  // Data structure that Metis will fill up on processor 0 and broadcast.
+  std::vector<Metis::idx_t> part(n_range_elem);
 
   // Invoke METIS, but only on processor 0.
   // Then broadcast the resulting decomposition
   if (mesh.processor_id() == 0)
     {
+      // Data structures and parameters needed only on processor 0 by Metis.
+      // std::vector<Metis::idx_t> options(5);
+      std::vector<Metis::idx_t> vwgt(n_range_elem);
+
+      Metis::idx_t
+        n = static_cast<Metis::idx_t>(n_range_elem),   // number of "nodes" (elements) in the graph
+        // wgtflag = 2,                                // weights on vertices only, none on edges
+        // numflag = 0,                                // C-style 0-based numbering
+        nparts  = static_cast<Metis::idx_t>(n_pieces), // number of subdomains to create
+        edgecut = 0;                                   // the numbers of edges cut by the resulting partition
+
+      // Set the options
+      // options[0] = 0; // use default options
+
+      // build the graph
       METIS_CSR_Graph<Metis::idx_t> csr_graph;
 
       csr_graph.offsets.resize(n_range_elem + 1, 0);
