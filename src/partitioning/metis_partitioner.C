@@ -226,6 +226,11 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
 
                 if (neighbor != libmesh_nullptr)
                   {
+                    // If the neighbor is not in the range of elements
+                    // being partitioned, treat it as a NULL neighbor.
+                    if (global_index_map.find(neighbor->id()) == global_index_map.end())
+                      continue;
+
                     // If the neighbor is active treat it
                     // as a connection
                     if (neighbor->active())
@@ -263,6 +268,10 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                           {
                             const Elem * child =
                               neighbors_offspring[nc];
+
+                            // Skip neighbor offspring which are not in the range of elements being partitioned.
+                            if (global_index_map.find(child->id()) == global_index_map.end())
+                              continue;
 
                             // This does not assume a level-1 mesh.
                             // Note that since children have sides numbered
@@ -324,6 +333,11 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
 
                 if (neighbor != libmesh_nullptr)
                   {
+                    // If the neighbor is not in the range of elements
+                    // being partitioned, treat it as a NULL neighbor.
+                    if (global_index_map.find(neighbor->id()) == global_index_map.end())
+                      continue;
+
                     // If the neighbor is active treat it
                     // as a connection
                     if (neighbor->active())
@@ -353,6 +367,10 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                           {
                             const Elem * child =
                               neighbors_offspring[nc];
+
+                            // Skip neighbor offspring which are not in the range of elements being partitioned.
+                            if (global_index_map.find(child->id()) == global_index_map.end())
+                              continue;
 
                             // This does not assume a level-1 mesh.
                             // Note that since children have sides numbered
