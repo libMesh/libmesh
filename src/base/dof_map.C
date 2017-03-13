@@ -1011,8 +1011,9 @@ void DofMap::distribute_dofs (MeshBase & mesh)
     const unsigned int
       sys_num = this->sys_number();
 
-    // Processors should all agree on DoF ids
-    MeshTools::libmesh_assert_valid_dof_ids(mesh);
+    // Processors should all agree on DoF ids for the newly numbered
+    // system.
+    MeshTools::libmesh_assert_valid_dof_ids(mesh, sys_num);
 
     // DoF processor ids should match DofObject processor ids
     MeshBase::const_node_iterator       node_it  = mesh.nodes_begin();
