@@ -230,7 +230,12 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                   {
                     // If the neighbor is not in the range of elements
                     // being partitioned, treat it as a NULL neighbor.
-                    if (global_index_map.find(neighbor->id()) == global_index_map.end())
+                    //
+                    // Note: vectormap::find() is a little weird, it
+                    // returns lower_bound, so checking its return
+                    // value against end() is not useful.  Therefore,
+                    // we vall vectormap::count() instead!
+                    if (!global_index_map.count(neighbor->id()))
                       continue;
 
                     // If the neighbor is active treat it
@@ -272,7 +277,7 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                               neighbors_offspring[nc];
 
                             // Skip neighbor offspring which are not in the range of elements being partitioned.
-                            if (global_index_map.find(child->id()) == global_index_map.end())
+                            if (!global_index_map.count(child->id()))
                               continue;
 
                             // This does not assume a level-1 mesh.
@@ -337,7 +342,12 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                   {
                     // If the neighbor is not in the range of elements
                     // being partitioned, treat it as a NULL neighbor.
-                    if (global_index_map.find(neighbor->id()) == global_index_map.end())
+                    //
+                    // Note: vectormap::find() is a little weird, it
+                    // returns lower_bound, so checking its return
+                    // value against end() is not useful.  Therefore,
+                    // we vall vectormap::count() instead!
+                    if (!global_index_map.count(neighbor->id()))
                       continue;
 
                     // If the neighbor is active treat it
@@ -371,7 +381,7 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                               neighbors_offspring[nc];
 
                             // Skip neighbor offspring which are not in the range of elements being partitioned.
-                            if (global_index_map.find(child->id()) == global_index_map.end())
+                            if (!global_index_map.count(child->id()))
                               continue;
 
                             // This does not assume a level-1 mesh.
