@@ -387,8 +387,12 @@ void libmesh_assert_valid_boundary_ids (const MeshBase & mesh);
 /**
  * A function for verifying that degree of freedom indexing matches
  * across processors.
+ *
+ * Verify a particular system by specifying that system's number, or
+ * verify all systems at once by leaving \p sysnum unspecified.
  */
-void libmesh_assert_valid_dof_ids (const MeshBase & mesh);
+void libmesh_assert_valid_dof_ids (const MeshBase & mesh,
+                                   unsigned int sysnum = libMesh::invalid_uint);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 /**

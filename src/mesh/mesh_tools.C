@@ -190,7 +190,8 @@ private:
 
 #ifdef DEBUG
 void assert_semiverify_dofobj(const Parallel::Communicator & communicator,
-                              const DofObject * d)
+                              const DofObject * d,
+                              unsigned int sysnum = libMesh::invalid_uint)
 {
   if (d)
     {
@@ -198,7 +199,9 @@ void assert_semiverify_dofobj(const Parallel::Communicator & communicator,
 
       std::vector<unsigned int> n_vars (n_sys, 0);
       for (unsigned int s = 0; s != n_sys; ++s)
-        n_vars[s] = d->n_vars(s);
+        if (sysnum == s ||
+            sysnum == libMesh::invalid_uint)
+          n_vars[s] = d->n_vars(s);
 
       const unsigned int tot_n_vars =
         std::accumulate(n_vars.begin(), n_vars.end(), 0);
@@ -207,11 +210,17 @@ void assert_semiverify_dofobj(const Parallel::Communicator & communicator,
       std::vector<dof_id_type> first_dof (tot_n_vars, 0);
 
       for (unsigned int s = 0, i=0; s != n_sys; ++s)
-        for (unsigned int v = 0; v != n_vars[s]; ++v, ++i)
-          {
-            n_comp[i] = d->n_comp(s,v);
-            first_dof[i] = n_comp[i] ? d->dof_number(s,v,0) : DofObject::invalid_id;
-          }
+        {
+          if (sysnum != s &&
+              sysnum != libMesh::invalid_uint)
+            continue;
+
+          for (unsigned int v = 0; v != n_vars[s]; ++v, ++i)
+            {
+              n_comp[i] = d->n_comp(s,v);
+              first_dof[i] = n_comp[i] ? d->dof_number(s,v,0) : DofObject::invalid_id;
+            }
+        }
 
       libmesh_assert(communicator.semiverify(&n_sys));
       libmesh_assert(communicator.semiverify(&n_vars));
@@ -1322,7 +1331,7 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
     }
 }
 
-void libmesh_assert_valid_dof_ids(const MeshBase & mesh)
+void libmesh_assert_valid_dof_ids(const MeshBase & mesh, unsigned int sysnum)
 {
   if (mesh.n_processors() == 1)
     return;
@@ -1334,14 +1343,16 @@ void libmesh_assert_valid_dof_ids(const MeshBase & mesh)
 
   for (dof_id_type i=0; i != pmax_elem_id; ++i)
     assert_semiverify_dofobj(mesh.comm(),
-                             mesh.query_elem_ptr(i));
+                             mesh.query_elem_ptr(i),
+                             sysnum);
 
   dof_id_type pmax_node_id = mesh.max_node_id();
   mesh.comm().max(pmax_node_id);
 
   for (dof_id_type i=0; i != pmax_node_id; ++i)
     assert_semiverify_dofobj(mesh.comm(),
-                             mesh.query_node_ptr(i));
+                             mesh.query_node_ptr(i),
+                             sysnum);
 }
 
 
