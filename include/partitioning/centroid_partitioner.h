@@ -85,6 +85,13 @@ public:
    */
   void set_sort_method (const CentroidSortMethod sm) { _sort_method = sm; }
 
+  /**
+   * Called by the SubdomainPartitioner to partition elements in the range (it, end).
+   */
+  virtual void partition_range(MeshBase & mesh,
+                               MeshBase::element_iterator it,
+                               MeshBase::element_iterator end,
+                               const unsigned int n) libmesh_override;
 
 protected:
 
@@ -97,10 +104,10 @@ protected:
 private:
 
   /**
-   * Computes a list of element centroids for the mesh.  This list
-   * will be kept around in case a repartition is desired.
+   * Computes a list of element centroids for the mesh.
    */
-  void compute_centroids (MeshBase & mesh);
+  void compute_centroids (MeshBase::element_iterator it,
+                          MeshBase::element_iterator end);
 
   /**
    * Helper function which sorts by the centroid's x-coordinate in the

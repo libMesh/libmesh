@@ -27,25 +27,40 @@ namespace libMesh
 {
 
 /**
- * The \p SubdomainPartitioner partitions the elements based on their
- * subdomain ids. The user must set up the values in the public
- * subdomain_to_proc map in order to specify which subdomains should
- * be partitioned onto which processors.  More than one subdomain can
- * be partitioned onto a given processor, but every subdomain must be
- * assigned to exactly 1 processor.
+ * The \p SubdomainPartitioner partitions the elements in "chunks" of
+ * user-specified subdomain ids.  Once all the chunks are partitioned,
+ * the overall mesh partitioning is simply the union of the chunk
+ * partitionings. For example, if the "chunks" vector is given by:
+ * chunks[0] = {1, 2, 4}
+ * chunks[1] = {3, 7, 8}
+ * chunks[2] = {5, 6}
+ * then we will call the internal Partitioner three times, once for
+ * subodmains 1, 2, and 4, once for subdomains 3, 7, and 8, and once
+ * for subdomains 5 and 6.
+ *
+ * Note: this Partitioner may produce highly non-optimal communication
+ * patterns and is likely to place geometrically disjoint sets of
+ * elements on the same processor. Its intended use is to help
+ * facilitate load balancing. That is, if the user knows that certain
+ * subdomains (or groups of subdomains) are more expensive to compute
+ * than others, he/she can ensure that they are partitioned more or
+ * less evenly among the available processors by specifying them
+ * together in a single entry of the "chunk" vector.
  *
  * \author John W. Peterson
  * \date 2017
- * \brief Partitions elements based on their subdomain ids.
+ * \brief Independently partitions chunks of subdomains and combines the results.
  */
 class SubdomainPartitioner : public Partitioner
 {
 public:
 
   /**
-   * Constructor.
+   * Constructor, default initializes the internal Partitioner object
+   * to a MetisPartitioner so the class is usable, although this type
+   * can be customized later.
    */
-  SubdomainPartitioner () {}
+  SubdomainPartitioner ();
 
   /**
    * Creates a new partitioner of this type and returns it in
@@ -57,22 +72,31 @@ public:
   }
 
   /**
-   * Before calling partition(), the user must assign all the Mesh
-   * subdomains to certain processors by adding them to this std::map.
-   * For example:
-   * subdomain_to_proc[1] = 0;
-   * subdomain_to_proc[2] = 0;
-   * subdomain_to_proc[3] = 0;
-   * subdomain_to_proc[4] = 1;
-   * subdomain_to_proc[5] = 1;
-   * subdomain_to_proc[6] = 2;
-   * Would partition the mesh onto three processors, with subdomains
-   * 1, 2, and 3 on processor 0, subdomains 4 and 5 on processor 1,
-   * and subdomain 6 on processor 2.
+   * Each entry of "chunks" represents a set of subdomains which are
+   * to be partitioned together.  The internal Partitioner will be
+   * called once for each entry of chunks, and the resulting
+   * partitioning will simply be the union of all these partitionings.
    */
-  std::map<subdomain_id_type, processor_id_type> subdomain_to_proc;
+  std::vector<std::set<subdomain_id_type> > chunks;
+
+  /**
+   * Get a reference to the Partitioner used internally by the
+   * SubdomainPartitioner.  Note: the internal Partitioner cannot also
+   * be a SubdomainPartitioner, otherwise an infinite loop will
+   * result.  To have this class use e.g. the space-filling curve
+   * Partitioner internally, one could do:
+   *
+   * SubdomainPartitioner sp;
+   * sp.internal_partitioner().reset(new SFCPartitioner);
+   */
+  UniquePtr<Partitioner> & internal_partitioner() { return _internal_partitioner; }
 
 protected:
+  /**
+   * The internal Partitioner we use. Public access via the
+   * internal_partitioner() member function.
+   */
+  UniquePtr<Partitioner> _internal_partitioner;
 
   /**
    * Partition the \p MeshBase into \p n subdomains.

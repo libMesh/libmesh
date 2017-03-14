@@ -17,8 +17,8 @@
 
 
 
-#ifndef LIBMESH_METIS_PARTITIONER_H
-#define LIBMESH_METIS_PARTITIONER_H
+#ifndef LIBMESH_MAPPED_SUBDOMAIN_PARTITIONER_H
+#define LIBMESH_MAPPED_SUBDOMAIN_PARTITIONER_H
 
 // Local Includes
 #include "libmesh/partitioner.h"
@@ -27,21 +27,25 @@ namespace libMesh
 {
 
 /**
- * The \p MetisPartitioner uses the Metis graph partitioner
- * to partition the elements.
+ * The \p MappedSubdomainPartitioner partitions the elements based on their
+ * subdomain ids. The user must set up the values in the public
+ * subdomain_to_proc map in order to specify which subdomains should
+ * be partitioned onto which processors.  More than one subdomain can
+ * be partitioned onto a given processor, but every subdomain must be
+ * assigned to exactly 1 processor.
  *
- * \author Benjamin S. Kirk
- * \date 2003
- * \brief Partitioner which interfaces with the METIS library.
+ * \author John W. Peterson
+ * \date 2017
+ * \brief Partitions elements based on user-defined mapping from subdomain ids -> processor ids.
  */
-class MetisPartitioner : public Partitioner
+class MappedSubdomainPartitioner : public Partitioner
 {
 public:
 
   /**
    * Constructor.
    */
-  MetisPartitioner () {}
+  MappedSubdomainPartitioner () {}
 
   /**
    * Creates a new partitioner of this type and returns it in
@@ -49,10 +53,24 @@ public:
    */
   virtual UniquePtr<Partitioner> clone () const libmesh_override
   {
-    return UniquePtr<Partitioner>(new MetisPartitioner());
+    return UniquePtr<Partitioner>(new MappedSubdomainPartitioner());
   }
 
-  virtual void attach_weights(ErrorVector * weights) libmesh_override { _weights = weights; }
+  /**
+   * Before calling partition() or partition_range(), the user must
+   * assign all the Mesh subdomains to certain processors by adding
+   * them to this std::map.  For example:
+   * subdomain_to_proc[1] = 0;
+   * subdomain_to_proc[2] = 0;
+   * subdomain_to_proc[3] = 0;
+   * subdomain_to_proc[4] = 1;
+   * subdomain_to_proc[5] = 1;
+   * subdomain_to_proc[6] = 2;
+   * Would partition the mesh onto three processors, with subdomains
+   * 1, 2, and 3 on processor 0, subdomains 4 and 5 on processor 1,
+   * and subdomain 6 on processor 2.
+   */
+  std::map<subdomain_id_type, processor_id_type> subdomain_to_proc;
 
   /**
    * Called by the SubdomainPartitioner to partition elements in the range (it, end).
@@ -73,4 +91,4 @@ protected:
 
 } // namespace libMesh
 
-#endif // LIBMESH_METIS_PARTITIONER_H
+#endif  // LIBMESH_MAPPED_SUBDOMAIN_PARTITIONER_H

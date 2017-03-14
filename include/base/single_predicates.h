@@ -26,6 +26,7 @@
 
 // C++ includes
 #include <vector>
+#include <set>
 
 namespace libMesh
 {
@@ -408,6 +409,24 @@ struct subdomain : predicate<T>
 protected:
   virtual predicate<T> * clone() const libmesh_override { return new subdomain<T>(*this); }
   const subdomain_id_type _subdomain;
+};
+
+
+// The subdomain_set predicate returns true if the pointer's
+// subdomain id is in the provided std::set<subdomain_id_type>.
+template <typename T>
+struct subdomain_set : predicate<T>
+{
+  // Constructor
+  subdomain_set(std::set<subdomain_id_type> sset) : _subdomain_set(sset) {}
+  virtual ~subdomain_set() {}
+
+  // op()
+  virtual bool operator()(const T & it) const libmesh_override { return _subdomain_set.count((*it)->subdomain_id()); }
+
+protected:
+  virtual predicate<T> * clone() const libmesh_override { return new subdomain_set<T>(*this); }
+  const std::set<subdomain_id_type> _subdomain_set;
 };
 
 

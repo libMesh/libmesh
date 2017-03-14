@@ -363,6 +363,7 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/parallel/parallel_sort.C src/parallel/threads.C \
 	src/partitioning/centroid_partitioner.C \
 	src/partitioning/linear_partitioner.C \
+	src/partitioning/mapped_subdomain_partitioner.C \
 	src/partitioning/metis_partitioner.C \
 	src/partitioning/parmetis_partitioner.C \
 	src/partitioning/partitioner.C \
@@ -760,6 +761,7 @@ am__objects_1 = src/base/libmesh_dbg_la-default_coupling.lo \
 	src/parallel/libmesh_dbg_la-threads.lo \
 	src/partitioning/libmesh_dbg_la-centroid_partitioner.lo \
 	src/partitioning/libmesh_dbg_la-linear_partitioner.lo \
+	src/partitioning/libmesh_dbg_la-mapped_subdomain_partitioner.lo \
 	src/partitioning/libmesh_dbg_la-metis_partitioner.lo \
 	src/partitioning/libmesh_dbg_la-parmetis_partitioner.lo \
 	src/partitioning/libmesh_dbg_la-partitioner.lo \
@@ -1085,6 +1087,7 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/parallel/parallel_sort.C src/parallel/threads.C \
 	src/partitioning/centroid_partitioner.C \
 	src/partitioning/linear_partitioner.C \
+	src/partitioning/mapped_subdomain_partitioner.C \
 	src/partitioning/metis_partitioner.C \
 	src/partitioning/parmetis_partitioner.C \
 	src/partitioning/partitioner.C \
@@ -1481,6 +1484,7 @@ am__objects_2 = src/base/libmesh_devel_la-default_coupling.lo \
 	src/parallel/libmesh_devel_la-threads.lo \
 	src/partitioning/libmesh_devel_la-centroid_partitioner.lo \
 	src/partitioning/libmesh_devel_la-linear_partitioner.lo \
+	src/partitioning/libmesh_devel_la-mapped_subdomain_partitioner.lo \
 	src/partitioning/libmesh_devel_la-metis_partitioner.lo \
 	src/partitioning/libmesh_devel_la-parmetis_partitioner.lo \
 	src/partitioning/libmesh_devel_la-partitioner.lo \
@@ -1803,6 +1807,7 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/parallel/parallel_sort.C src/parallel/threads.C \
 	src/partitioning/centroid_partitioner.C \
 	src/partitioning/linear_partitioner.C \
+	src/partitioning/mapped_subdomain_partitioner.C \
 	src/partitioning/metis_partitioner.C \
 	src/partitioning/parmetis_partitioner.C \
 	src/partitioning/partitioner.C \
@@ -2199,6 +2204,7 @@ am__objects_3 = src/base/libmesh_oprof_la-default_coupling.lo \
 	src/parallel/libmesh_oprof_la-threads.lo \
 	src/partitioning/libmesh_oprof_la-centroid_partitioner.lo \
 	src/partitioning/libmesh_oprof_la-linear_partitioner.lo \
+	src/partitioning/libmesh_oprof_la-mapped_subdomain_partitioner.lo \
 	src/partitioning/libmesh_oprof_la-metis_partitioner.lo \
 	src/partitioning/libmesh_oprof_la-parmetis_partitioner.lo \
 	src/partitioning/libmesh_oprof_la-partitioner.lo \
@@ -2521,6 +2527,7 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/parallel/parallel_sort.C src/parallel/threads.C \
 	src/partitioning/centroid_partitioner.C \
 	src/partitioning/linear_partitioner.C \
+	src/partitioning/mapped_subdomain_partitioner.C \
 	src/partitioning/metis_partitioner.C \
 	src/partitioning/parmetis_partitioner.C \
 	src/partitioning/partitioner.C \
@@ -2917,6 +2924,7 @@ am__objects_4 = src/base/libmesh_opt_la-default_coupling.lo \
 	src/parallel/libmesh_opt_la-threads.lo \
 	src/partitioning/libmesh_opt_la-centroid_partitioner.lo \
 	src/partitioning/libmesh_opt_la-linear_partitioner.lo \
+	src/partitioning/libmesh_opt_la-mapped_subdomain_partitioner.lo \
 	src/partitioning/libmesh_opt_la-metis_partitioner.lo \
 	src/partitioning/libmesh_opt_la-parmetis_partitioner.lo \
 	src/partitioning/libmesh_opt_la-partitioner.lo \
@@ -3238,6 +3246,7 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/parallel/parallel_sort.C src/parallel/threads.C \
 	src/partitioning/centroid_partitioner.C \
 	src/partitioning/linear_partitioner.C \
+	src/partitioning/mapped_subdomain_partitioner.C \
 	src/partitioning/metis_partitioner.C \
 	src/partitioning/parmetis_partitioner.C \
 	src/partitioning/partitioner.C \
@@ -3634,6 +3643,7 @@ am__objects_5 = src/base/libmesh_prof_la-default_coupling.lo \
 	src/parallel/libmesh_prof_la-threads.lo \
 	src/partitioning/libmesh_prof_la-centroid_partitioner.lo \
 	src/partitioning/libmesh_prof_la-linear_partitioner.lo \
+	src/partitioning/libmesh_prof_la-mapped_subdomain_partitioner.lo \
 	src/partitioning/libmesh_prof_la-metis_partitioner.lo \
 	src/partitioning/libmesh_prof_la-parmetis_partitioner.lo \
 	src/partitioning/libmesh_prof_la-partitioner.lo \
@@ -5032,6 +5042,7 @@ libmesh_SOURCES = \
         src/parallel/threads.C \
         src/partitioning/centroid_partitioner.C \
         src/partitioning/linear_partitioner.C \
+        src/partitioning/mapped_subdomain_partitioner.C \
         src/partitioning/metis_partitioner.C \
         src/partitioning/parmetis_partitioner.C \
         src/partitioning/partitioner.C \
@@ -6190,6 +6201,9 @@ src/partitioning/libmesh_dbg_la-centroid_partitioner.lo:  \
 src/partitioning/libmesh_dbg_la-linear_partitioner.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
+src/partitioning/libmesh_dbg_la-mapped_subdomain_partitioner.lo:  \
+	src/partitioning/$(am__dirstamp) \
+	src/partitioning/$(DEPDIR)/$(am__dirstamp)
 src/partitioning/libmesh_dbg_la-metis_partitioner.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
@@ -7263,6 +7277,9 @@ src/partitioning/libmesh_devel_la-centroid_partitioner.lo:  \
 src/partitioning/libmesh_devel_la-linear_partitioner.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
+src/partitioning/libmesh_devel_la-mapped_subdomain_partitioner.lo:  \
+	src/partitioning/$(am__dirstamp) \
+	src/partitioning/$(DEPDIR)/$(am__dirstamp)
 src/partitioning/libmesh_devel_la-metis_partitioner.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
@@ -8294,6 +8311,9 @@ src/partitioning/libmesh_oprof_la-centroid_partitioner.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
 src/partitioning/libmesh_oprof_la-linear_partitioner.lo:  \
+	src/partitioning/$(am__dirstamp) \
+	src/partitioning/$(DEPDIR)/$(am__dirstamp)
+src/partitioning/libmesh_oprof_la-mapped_subdomain_partitioner.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
 src/partitioning/libmesh_oprof_la-metis_partitioner.lo:  \
@@ -9328,6 +9348,9 @@ src/partitioning/libmesh_opt_la-centroid_partitioner.lo:  \
 src/partitioning/libmesh_opt_la-linear_partitioner.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
+src/partitioning/libmesh_opt_la-mapped_subdomain_partitioner.lo:  \
+	src/partitioning/$(am__dirstamp) \
+	src/partitioning/$(DEPDIR)/$(am__dirstamp)
 src/partitioning/libmesh_opt_la-metis_partitioner.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
@@ -10356,6 +10379,9 @@ src/partitioning/libmesh_prof_la-centroid_partitioner.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
 src/partitioning/libmesh_prof_la-linear_partitioner.lo:  \
+	src/partitioning/$(am__dirstamp) \
+	src/partitioning/$(DEPDIR)/$(am__dirstamp)
+src/partitioning/libmesh_prof_la-mapped_subdomain_partitioner.lo:  \
 	src/partitioning/$(am__dirstamp) \
 	src/partitioning/$(DEPDIR)/$(am__dirstamp)
 src/partitioning/libmesh_prof_la-metis_partitioner.lo:  \
@@ -12650,6 +12676,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/parallel/$(DEPDIR)/libmesh_prof_la-threads.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_dbg_la-centroid_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_dbg_la-linear_partitioner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_dbg_la-mapped_subdomain_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_dbg_la-metis_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_dbg_la-parmetis_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_dbg_la-partitioner.Plo@am__quote@
@@ -12658,6 +12685,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_dbg_la-subdomain_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_devel_la-centroid_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_devel_la-linear_partitioner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_devel_la-mapped_subdomain_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_devel_la-metis_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_devel_la-parmetis_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_devel_la-partitioner.Plo@am__quote@
@@ -12666,6 +12694,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_devel_la-subdomain_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_oprof_la-centroid_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_oprof_la-linear_partitioner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_oprof_la-mapped_subdomain_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_oprof_la-metis_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_oprof_la-parmetis_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_oprof_la-partitioner.Plo@am__quote@
@@ -12674,6 +12703,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_oprof_la-subdomain_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_opt_la-centroid_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_opt_la-linear_partitioner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_opt_la-mapped_subdomain_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_opt_la-metis_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_opt_la-parmetis_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_opt_la-partitioner.Plo@am__quote@
@@ -12682,6 +12712,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_opt_la-subdomain_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_prof_la-centroid_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_prof_la-linear_partitioner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_prof_la-mapped_subdomain_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_prof_la-metis_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_prof_la-parmetis_partitioner.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/partitioning/$(DEPDIR)/libmesh_prof_la-partitioner.Plo@am__quote@
@@ -15314,6 +15345,13 @@ src/partitioning/libmesh_dbg_la-linear_partitioner.lo: src/partitioning/linear_p
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/linear_partitioner.C' object='src/partitioning/libmesh_dbg_la-linear_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_dbg_la-linear_partitioner.lo `test -f 'src/partitioning/linear_partitioner.C' || echo '$(srcdir)/'`src/partitioning/linear_partitioner.C
+
+src/partitioning/libmesh_dbg_la-mapped_subdomain_partitioner.lo: src/partitioning/mapped_subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/partitioning/libmesh_dbg_la-mapped_subdomain_partitioner.lo -MD -MP -MF src/partitioning/$(DEPDIR)/libmesh_dbg_la-mapped_subdomain_partitioner.Tpo -c -o src/partitioning/libmesh_dbg_la-mapped_subdomain_partitioner.lo `test -f 'src/partitioning/mapped_subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/mapped_subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/partitioning/$(DEPDIR)/libmesh_dbg_la-mapped_subdomain_partitioner.Tpo src/partitioning/$(DEPDIR)/libmesh_dbg_la-mapped_subdomain_partitioner.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/mapped_subdomain_partitioner.C' object='src/partitioning/libmesh_dbg_la-mapped_subdomain_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_dbg_la-mapped_subdomain_partitioner.lo `test -f 'src/partitioning/mapped_subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/mapped_subdomain_partitioner.C
 
 src/partitioning/libmesh_dbg_la-metis_partitioner.lo: src/partitioning/metis_partitioner.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/partitioning/libmesh_dbg_la-metis_partitioner.lo -MD -MP -MF src/partitioning/$(DEPDIR)/libmesh_dbg_la-metis_partitioner.Tpo -c -o src/partitioning/libmesh_dbg_la-metis_partitioner.lo `test -f 'src/partitioning/metis_partitioner.C' || echo '$(srcdir)/'`src/partitioning/metis_partitioner.C
@@ -18255,6 +18293,13 @@ src/partitioning/libmesh_devel_la-linear_partitioner.lo: src/partitioning/linear
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_devel_la-linear_partitioner.lo `test -f 'src/partitioning/linear_partitioner.C' || echo '$(srcdir)/'`src/partitioning/linear_partitioner.C
 
+src/partitioning/libmesh_devel_la-mapped_subdomain_partitioner.lo: src/partitioning/mapped_subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/partitioning/libmesh_devel_la-mapped_subdomain_partitioner.lo -MD -MP -MF src/partitioning/$(DEPDIR)/libmesh_devel_la-mapped_subdomain_partitioner.Tpo -c -o src/partitioning/libmesh_devel_la-mapped_subdomain_partitioner.lo `test -f 'src/partitioning/mapped_subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/mapped_subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/partitioning/$(DEPDIR)/libmesh_devel_la-mapped_subdomain_partitioner.Tpo src/partitioning/$(DEPDIR)/libmesh_devel_la-mapped_subdomain_partitioner.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/mapped_subdomain_partitioner.C' object='src/partitioning/libmesh_devel_la-mapped_subdomain_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_devel_la-mapped_subdomain_partitioner.lo `test -f 'src/partitioning/mapped_subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/mapped_subdomain_partitioner.C
+
 src/partitioning/libmesh_devel_la-metis_partitioner.lo: src/partitioning/metis_partitioner.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/partitioning/libmesh_devel_la-metis_partitioner.lo -MD -MP -MF src/partitioning/$(DEPDIR)/libmesh_devel_la-metis_partitioner.Tpo -c -o src/partitioning/libmesh_devel_la-metis_partitioner.lo `test -f 'src/partitioning/metis_partitioner.C' || echo '$(srcdir)/'`src/partitioning/metis_partitioner.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/partitioning/$(DEPDIR)/libmesh_devel_la-metis_partitioner.Tpo src/partitioning/$(DEPDIR)/libmesh_devel_la-metis_partitioner.Plo
@@ -21194,6 +21239,13 @@ src/partitioning/libmesh_oprof_la-linear_partitioner.lo: src/partitioning/linear
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/linear_partitioner.C' object='src/partitioning/libmesh_oprof_la-linear_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_oprof_la-linear_partitioner.lo `test -f 'src/partitioning/linear_partitioner.C' || echo '$(srcdir)/'`src/partitioning/linear_partitioner.C
+
+src/partitioning/libmesh_oprof_la-mapped_subdomain_partitioner.lo: src/partitioning/mapped_subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/partitioning/libmesh_oprof_la-mapped_subdomain_partitioner.lo -MD -MP -MF src/partitioning/$(DEPDIR)/libmesh_oprof_la-mapped_subdomain_partitioner.Tpo -c -o src/partitioning/libmesh_oprof_la-mapped_subdomain_partitioner.lo `test -f 'src/partitioning/mapped_subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/mapped_subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/partitioning/$(DEPDIR)/libmesh_oprof_la-mapped_subdomain_partitioner.Tpo src/partitioning/$(DEPDIR)/libmesh_oprof_la-mapped_subdomain_partitioner.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/mapped_subdomain_partitioner.C' object='src/partitioning/libmesh_oprof_la-mapped_subdomain_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_oprof_la-mapped_subdomain_partitioner.lo `test -f 'src/partitioning/mapped_subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/mapped_subdomain_partitioner.C
 
 src/partitioning/libmesh_oprof_la-metis_partitioner.lo: src/partitioning/metis_partitioner.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/partitioning/libmesh_oprof_la-metis_partitioner.lo -MD -MP -MF src/partitioning/$(DEPDIR)/libmesh_oprof_la-metis_partitioner.Tpo -c -o src/partitioning/libmesh_oprof_la-metis_partitioner.lo `test -f 'src/partitioning/metis_partitioner.C' || echo '$(srcdir)/'`src/partitioning/metis_partitioner.C
@@ -24135,6 +24187,13 @@ src/partitioning/libmesh_opt_la-linear_partitioner.lo: src/partitioning/linear_p
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_opt_la-linear_partitioner.lo `test -f 'src/partitioning/linear_partitioner.C' || echo '$(srcdir)/'`src/partitioning/linear_partitioner.C
 
+src/partitioning/libmesh_opt_la-mapped_subdomain_partitioner.lo: src/partitioning/mapped_subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/partitioning/libmesh_opt_la-mapped_subdomain_partitioner.lo -MD -MP -MF src/partitioning/$(DEPDIR)/libmesh_opt_la-mapped_subdomain_partitioner.Tpo -c -o src/partitioning/libmesh_opt_la-mapped_subdomain_partitioner.lo `test -f 'src/partitioning/mapped_subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/mapped_subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/partitioning/$(DEPDIR)/libmesh_opt_la-mapped_subdomain_partitioner.Tpo src/partitioning/$(DEPDIR)/libmesh_opt_la-mapped_subdomain_partitioner.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/mapped_subdomain_partitioner.C' object='src/partitioning/libmesh_opt_la-mapped_subdomain_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_opt_la-mapped_subdomain_partitioner.lo `test -f 'src/partitioning/mapped_subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/mapped_subdomain_partitioner.C
+
 src/partitioning/libmesh_opt_la-metis_partitioner.lo: src/partitioning/metis_partitioner.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/partitioning/libmesh_opt_la-metis_partitioner.lo -MD -MP -MF src/partitioning/$(DEPDIR)/libmesh_opt_la-metis_partitioner.Tpo -c -o src/partitioning/libmesh_opt_la-metis_partitioner.lo `test -f 'src/partitioning/metis_partitioner.C' || echo '$(srcdir)/'`src/partitioning/metis_partitioner.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/partitioning/$(DEPDIR)/libmesh_opt_la-metis_partitioner.Tpo src/partitioning/$(DEPDIR)/libmesh_opt_la-metis_partitioner.Plo
@@ -27074,6 +27133,13 @@ src/partitioning/libmesh_prof_la-linear_partitioner.lo: src/partitioning/linear_
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/linear_partitioner.C' object='src/partitioning/libmesh_prof_la-linear_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_prof_la-linear_partitioner.lo `test -f 'src/partitioning/linear_partitioner.C' || echo '$(srcdir)/'`src/partitioning/linear_partitioner.C
+
+src/partitioning/libmesh_prof_la-mapped_subdomain_partitioner.lo: src/partitioning/mapped_subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/partitioning/libmesh_prof_la-mapped_subdomain_partitioner.lo -MD -MP -MF src/partitioning/$(DEPDIR)/libmesh_prof_la-mapped_subdomain_partitioner.Tpo -c -o src/partitioning/libmesh_prof_la-mapped_subdomain_partitioner.lo `test -f 'src/partitioning/mapped_subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/mapped_subdomain_partitioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/partitioning/$(DEPDIR)/libmesh_prof_la-mapped_subdomain_partitioner.Tpo src/partitioning/$(DEPDIR)/libmesh_prof_la-mapped_subdomain_partitioner.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/partitioning/mapped_subdomain_partitioner.C' object='src/partitioning/libmesh_prof_la-mapped_subdomain_partitioner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/partitioning/libmesh_prof_la-mapped_subdomain_partitioner.lo `test -f 'src/partitioning/mapped_subdomain_partitioner.C' || echo '$(srcdir)/'`src/partitioning/mapped_subdomain_partitioner.C
 
 src/partitioning/libmesh_prof_la-metis_partitioner.lo: src/partitioning/metis_partitioner.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/partitioning/libmesh_prof_la-metis_partitioner.lo -MD -MP -MF src/partitioning/$(DEPDIR)/libmesh_prof_la-metis_partitioner.Tpo -c -o src/partitioning/libmesh_prof_la-metis_partitioner.lo `test -f 'src/partitioning/metis_partitioner.C' || echo '$(srcdir)/'`src/partitioning/metis_partitioner.C

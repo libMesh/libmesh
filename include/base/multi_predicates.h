@@ -662,6 +662,23 @@ struct ActiveSubdomain : abstract_multi_predicate<T>
 
 
 /**
+ * Used to iterate over non-NULL, active elements whose
+ * subdomains are in a user-specified set.
+ */
+template <typename T>
+struct ActiveSubdomainSet : abstract_multi_predicate<T>
+{
+  ActiveSubdomainSet(std::set<subdomain_id_type> sset)
+  {
+    this->_predicates.push_back(new not_null<T>);
+    this->_predicates.push_back(new active<T>);
+    this->_predicates.push_back(new subdomain_set<T>(sset));
+  }
+};
+
+
+
+/**
  * Used to iterate over non-NULL elements not owned by a given
  * processor but semi-local to that processor, i.e. ghost elements.
  */

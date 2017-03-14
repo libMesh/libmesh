@@ -18,50 +18,56 @@
 
 
 // Local Includes
-#include "libmesh/linear_partitioner.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/mapped_subdomain_partitioner.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
 
 namespace libMesh
 {
 
-void LinearPartitioner::partition_range(MeshBase & /*mesh*/,
-                                        MeshBase::element_iterator it,
-                                        MeshBase::element_iterator end,
-                                        const unsigned int n)
+
+void MappedSubdomainPartitioner::partition_range(MeshBase & /*mesh*/,
+                                                 MeshBase::element_iterator it,
+                                                 MeshBase::element_iterator end,
+                                                 const unsigned int n)
 {
   libmesh_assert_greater (n, 0);
 
-  // Check for an easy return
-  if (n == 1)
+  // Check for an easy return.  If the user has not specified any
+  // entries in subdomain_to_proc, we just do a single partitioning.
+  if ((n == 1) || subdomain_to_proc.empty())
     {
       this->single_partition_range (it, end);
       return;
     }
 
-  // Create a simple linear partitioning
-  LOG_SCOPE ("partition_range()", "LinearPartitioner");
+  // Now actually do the partitioning.
+  LOG_SCOPE ("partition_range()", "MappedSubdomainPartitioner");
 
-  const dof_id_type blksize = std::distance(it, end) / n;
-
-  dof_id_type e = 0;
   for ( ; it != end; ++it)
     {
       Elem * elem = *it;
-      if ((e/blksize) < n)
-        elem->processor_id() = cast_int<processor_id_type>(e/blksize);
 
-      else
-        elem->processor_id() = 0;
+      subdomain_id_type sbd_id = elem->subdomain_id();
 
-      e++;
+      // Find which processor id corresponds to this element's subdomain id.
+      std::map<subdomain_id_type, processor_id_type>::iterator
+        it = subdomain_to_proc.find(sbd_id);
+
+      // If an element has a subdomain we don't know how to
+      // partition, throw an error.
+      if (it == subdomain_to_proc.end())
+        libmesh_error_msg("Could not find processor id corresponding to subdomain id " << sbd_id);
+
+      elem->processor_id() = it->second;
     }
 }
 
 
 
-void LinearPartitioner::_do_partition (MeshBase & mesh,
-                                       const unsigned int n)
+void MappedSubdomainPartitioner::_do_partition (MeshBase & mesh,
+                                                const unsigned int n)
 {
   this->partition_range(mesh,
                         mesh.active_elements_begin(),

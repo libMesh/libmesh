@@ -192,8 +192,8 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
-	mesh/subdomain_partitioner_test.C mesh/mesh_function_dfem.C \
-	numerics/composite_function_test.C \
+	mesh/mapped_subdomain_partitioner_test.C \
+	mesh/mesh_function_dfem.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -241,7 +241,7 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	mesh/unit_tests_dbg-mesh_extruder.$(OBJEXT) \
 	mesh/unit_tests_dbg-slit_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-spatial_dimension_test.$(OBJEXT) \
-	mesh/unit_tests_dbg-subdomain_partitioner_test.$(OBJEXT) \
+	mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-mesh_function_dfem.$(OBJEXT) \
 	numerics/unit_tests_dbg-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-coupling_matrix_test.$(OBJEXT) \
@@ -291,8 +291,8 @@ am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
-	mesh/subdomain_partitioner_test.C mesh/mesh_function_dfem.C \
-	numerics/composite_function_test.C \
+	mesh/mapped_subdomain_partitioner_test.C \
+	mesh/mesh_function_dfem.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -339,7 +339,7 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	mesh/unit_tests_devel-mesh_extruder.$(OBJEXT) \
 	mesh/unit_tests_devel-slit_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_devel-spatial_dimension_test.$(OBJEXT) \
-	mesh/unit_tests_devel-subdomain_partitioner_test.$(OBJEXT) \
+	mesh/unit_tests_devel-mapped_subdomain_partitioner_test.$(OBJEXT) \
 	mesh/unit_tests_devel-mesh_function_dfem.$(OBJEXT) \
 	numerics/unit_tests_devel-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_devel-coupling_matrix_test.$(OBJEXT) \
@@ -387,8 +387,8 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
-	mesh/subdomain_partitioner_test.C mesh/mesh_function_dfem.C \
-	numerics/composite_function_test.C \
+	mesh/mapped_subdomain_partitioner_test.C \
+	mesh/mesh_function_dfem.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -435,7 +435,7 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	mesh/unit_tests_oprof-mesh_extruder.$(OBJEXT) \
 	mesh/unit_tests_oprof-slit_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-spatial_dimension_test.$(OBJEXT) \
-	mesh/unit_tests_oprof-subdomain_partitioner_test.$(OBJEXT) \
+	mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-mesh_function_dfem.$(OBJEXT) \
 	numerics/unit_tests_oprof-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-coupling_matrix_test.$(OBJEXT) \
@@ -483,8 +483,8 @@ am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
-	mesh/subdomain_partitioner_test.C mesh/mesh_function_dfem.C \
-	numerics/composite_function_test.C \
+	mesh/mapped_subdomain_partitioner_test.C \
+	mesh/mesh_function_dfem.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -531,7 +531,7 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	mesh/unit_tests_opt-mesh_extruder.$(OBJEXT) \
 	mesh/unit_tests_opt-slit_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_opt-spatial_dimension_test.$(OBJEXT) \
-	mesh/unit_tests_opt-subdomain_partitioner_test.$(OBJEXT) \
+	mesh/unit_tests_opt-mapped_subdomain_partitioner_test.$(OBJEXT) \
 	mesh/unit_tests_opt-mesh_function_dfem.$(OBJEXT) \
 	numerics/unit_tests_opt-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_opt-coupling_matrix_test.$(OBJEXT) \
@@ -577,8 +577,8 @@ am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
-	mesh/subdomain_partitioner_test.C mesh/mesh_function_dfem.C \
-	numerics/composite_function_test.C \
+	mesh/mapped_subdomain_partitioner_test.C \
+	mesh/mesh_function_dfem.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -625,7 +625,7 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	mesh/unit_tests_prof-mesh_extruder.$(OBJEXT) \
 	mesh/unit_tests_prof-slit_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_prof-spatial_dimension_test.$(OBJEXT) \
-	mesh/unit_tests_prof-subdomain_partitioner_test.$(OBJEXT) \
+	mesh/unit_tests_prof-mapped_subdomain_partitioner_test.$(OBJEXT) \
 	mesh/unit_tests_prof-mesh_function_dfem.$(OBJEXT) \
 	numerics/unit_tests_prof-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_prof-coupling_matrix_test.$(OBJEXT) \
@@ -1089,8 +1089,8 @@ unit_tests_sources = driver.C test_comm.h base/dof_object_test.h \
 	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
 	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
 	mesh/spatial_dimension_test.C \
-	mesh/subdomain_partitioner_test.C mesh/mesh_function_dfem.C \
-	numerics/composite_function_test.C \
+	mesh/mapped_subdomain_partitioner_test.C \
+	mesh/mesh_function_dfem.C numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -1263,7 +1263,7 @@ mesh/unit_tests_dbg-slit_mesh_test.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-spatial_dimension_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
-mesh/unit_tests_dbg-subdomain_partitioner_test.$(OBJEXT):  \
+mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-mesh_function_dfem.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
@@ -1414,7 +1414,7 @@ mesh/unit_tests_devel-slit_mesh_test.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-spatial_dimension_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
-mesh/unit_tests_devel-subdomain_partitioner_test.$(OBJEXT):  \
+mesh/unit_tests_devel-mapped_subdomain_partitioner_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-mesh_function_dfem.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
@@ -1523,7 +1523,7 @@ mesh/unit_tests_oprof-slit_mesh_test.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-spatial_dimension_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
-mesh/unit_tests_oprof-subdomain_partitioner_test.$(OBJEXT):  \
+mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-mesh_function_dfem.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
@@ -1632,7 +1632,7 @@ mesh/unit_tests_opt-slit_mesh_test.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-spatial_dimension_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
-mesh/unit_tests_opt-subdomain_partitioner_test.$(OBJEXT):  \
+mesh/unit_tests_opt-mapped_subdomain_partitioner_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-mesh_function_dfem.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
@@ -1741,7 +1741,7 @@ mesh/unit_tests_prof-slit_mesh_test.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-spatial_dimension_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
-mesh/unit_tests_prof-subdomain_partitioner_test.$(OBJEXT):  \
+mesh/unit_tests_prof-mapped_subdomain_partitioner_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-mesh_function_dfem.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
@@ -1914,61 +1914,61 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-boundary_mesh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-checkpoint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-contains_point.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mapped_subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-nodal_neighbors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-slit_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-spatial_dimension_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-all_tri.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-boundary_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-boundary_mesh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-checkpoint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-contains_point.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mapped_subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-nodal_neighbors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-slit_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-spatial_dimension_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-all_tri.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-boundary_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-boundary_mesh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-checkpoint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-contains_point.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mapped_subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-nodal_neighbors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-slit_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-spatial_dimension_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-all_tri.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-boundary_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-boundary_mesh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-checkpoint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-contains_point.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mapped_subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-nodal_neighbors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-slit_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-spatial_dimension_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-all_tri.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-boundary_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-boundary_mesh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-checkpoint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-contains_point.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mapped_subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-nodal_neighbors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-slit_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-spatial_dimension_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-composite_function_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-coupling_matrix_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-dense_matrix_test.Po@am__quote@
@@ -2496,19 +2496,19 @@ mesh/unit_tests_dbg-spatial_dimension_test.obj: mesh/spatial_dimension_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-spatial_dimension_test.obj `if test -f 'mesh/spatial_dimension_test.C'; then $(CYGPATH_W) 'mesh/spatial_dimension_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/spatial_dimension_test.C'; fi`
 
-mesh/unit_tests_dbg-subdomain_partitioner_test.o: mesh/subdomain_partitioner_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-subdomain_partitioner_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_dbg-subdomain_partitioner_test.o `test -f 'mesh/subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/subdomain_partitioner_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_dbg-subdomain_partitioner_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/subdomain_partitioner_test.C' object='mesh/unit_tests_dbg-subdomain_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.o: mesh/mapped_subdomain_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mapped_subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.o `test -f 'mesh/mapped_subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/mapped_subdomain_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-mapped_subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_dbg-mapped_subdomain_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mapped_subdomain_partitioner_test.C' object='mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-subdomain_partitioner_test.o `test -f 'mesh/subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/subdomain_partitioner_test.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.o `test -f 'mesh/mapped_subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/mapped_subdomain_partitioner_test.C
 
-mesh/unit_tests_dbg-subdomain_partitioner_test.obj: mesh/subdomain_partitioner_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-subdomain_partitioner_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_dbg-subdomain_partitioner_test.obj `if test -f 'mesh/subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/subdomain_partitioner_test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_dbg-subdomain_partitioner_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/subdomain_partitioner_test.C' object='mesh/unit_tests_dbg-subdomain_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.obj: mesh/mapped_subdomain_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mapped_subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.obj `if test -f 'mesh/mapped_subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/mapped_subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mapped_subdomain_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-mapped_subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_dbg-mapped_subdomain_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mapped_subdomain_partitioner_test.C' object='mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-subdomain_partitioner_test.obj `if test -f 'mesh/subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/subdomain_partitioner_test.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.obj `if test -f 'mesh/mapped_subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/mapped_subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mapped_subdomain_partitioner_test.C'; fi`
 
 mesh/unit_tests_dbg-mesh_function_dfem.o: mesh/mesh_function_dfem.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mesh_function_dfem.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Tpo -c -o mesh/unit_tests_dbg-mesh_function_dfem.o `test -f 'mesh/mesh_function_dfem.C' || echo '$(srcdir)/'`mesh/mesh_function_dfem.C
@@ -3238,19 +3238,19 @@ mesh/unit_tests_devel-spatial_dimension_test.obj: mesh/spatial_dimension_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-spatial_dimension_test.obj `if test -f 'mesh/spatial_dimension_test.C'; then $(CYGPATH_W) 'mesh/spatial_dimension_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/spatial_dimension_test.C'; fi`
 
-mesh/unit_tests_devel-subdomain_partitioner_test.o: mesh/subdomain_partitioner_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-subdomain_partitioner_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_devel-subdomain_partitioner_test.o `test -f 'mesh/subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/subdomain_partitioner_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_devel-subdomain_partitioner_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/subdomain_partitioner_test.C' object='mesh/unit_tests_devel-subdomain_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+mesh/unit_tests_devel-mapped_subdomain_partitioner_test.o: mesh/mapped_subdomain_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mapped_subdomain_partitioner_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mapped_subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_devel-mapped_subdomain_partitioner_test.o `test -f 'mesh/mapped_subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/mapped_subdomain_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-mapped_subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_devel-mapped_subdomain_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mapped_subdomain_partitioner_test.C' object='mesh/unit_tests_devel-mapped_subdomain_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-subdomain_partitioner_test.o `test -f 'mesh/subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/subdomain_partitioner_test.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-mapped_subdomain_partitioner_test.o `test -f 'mesh/mapped_subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/mapped_subdomain_partitioner_test.C
 
-mesh/unit_tests_devel-subdomain_partitioner_test.obj: mesh/subdomain_partitioner_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-subdomain_partitioner_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_devel-subdomain_partitioner_test.obj `if test -f 'mesh/subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/subdomain_partitioner_test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_devel-subdomain_partitioner_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/subdomain_partitioner_test.C' object='mesh/unit_tests_devel-subdomain_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+mesh/unit_tests_devel-mapped_subdomain_partitioner_test.obj: mesh/mapped_subdomain_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mapped_subdomain_partitioner_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mapped_subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_devel-mapped_subdomain_partitioner_test.obj `if test -f 'mesh/mapped_subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/mapped_subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mapped_subdomain_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-mapped_subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_devel-mapped_subdomain_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mapped_subdomain_partitioner_test.C' object='mesh/unit_tests_devel-mapped_subdomain_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-subdomain_partitioner_test.obj `if test -f 'mesh/subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/subdomain_partitioner_test.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-mapped_subdomain_partitioner_test.obj `if test -f 'mesh/mapped_subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/mapped_subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mapped_subdomain_partitioner_test.C'; fi`
 
 mesh/unit_tests_devel-mesh_function_dfem.o: mesh/mesh_function_dfem.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mesh_function_dfem.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Tpo -c -o mesh/unit_tests_devel-mesh_function_dfem.o `test -f 'mesh/mesh_function_dfem.C' || echo '$(srcdir)/'`mesh/mesh_function_dfem.C
@@ -3980,19 +3980,19 @@ mesh/unit_tests_oprof-spatial_dimension_test.obj: mesh/spatial_dimension_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-spatial_dimension_test.obj `if test -f 'mesh/spatial_dimension_test.C'; then $(CYGPATH_W) 'mesh/spatial_dimension_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/spatial_dimension_test.C'; fi`
 
-mesh/unit_tests_oprof-subdomain_partitioner_test.o: mesh/subdomain_partitioner_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-subdomain_partitioner_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_oprof-subdomain_partitioner_test.o `test -f 'mesh/subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/subdomain_partitioner_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_oprof-subdomain_partitioner_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/subdomain_partitioner_test.C' object='mesh/unit_tests_oprof-subdomain_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.o: mesh/mapped_subdomain_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mapped_subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.o `test -f 'mesh/mapped_subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/mapped_subdomain_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-mapped_subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_oprof-mapped_subdomain_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mapped_subdomain_partitioner_test.C' object='mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-subdomain_partitioner_test.o `test -f 'mesh/subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/subdomain_partitioner_test.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.o `test -f 'mesh/mapped_subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/mapped_subdomain_partitioner_test.C
 
-mesh/unit_tests_oprof-subdomain_partitioner_test.obj: mesh/subdomain_partitioner_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-subdomain_partitioner_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_oprof-subdomain_partitioner_test.obj `if test -f 'mesh/subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/subdomain_partitioner_test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_oprof-subdomain_partitioner_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/subdomain_partitioner_test.C' object='mesh/unit_tests_oprof-subdomain_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.obj: mesh/mapped_subdomain_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mapped_subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.obj `if test -f 'mesh/mapped_subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/mapped_subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mapped_subdomain_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-mapped_subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_oprof-mapped_subdomain_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mapped_subdomain_partitioner_test.C' object='mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-subdomain_partitioner_test.obj `if test -f 'mesh/subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/subdomain_partitioner_test.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.obj `if test -f 'mesh/mapped_subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/mapped_subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mapped_subdomain_partitioner_test.C'; fi`
 
 mesh/unit_tests_oprof-mesh_function_dfem.o: mesh/mesh_function_dfem.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mesh_function_dfem.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Tpo -c -o mesh/unit_tests_oprof-mesh_function_dfem.o `test -f 'mesh/mesh_function_dfem.C' || echo '$(srcdir)/'`mesh/mesh_function_dfem.C
@@ -4722,19 +4722,19 @@ mesh/unit_tests_opt-spatial_dimension_test.obj: mesh/spatial_dimension_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-spatial_dimension_test.obj `if test -f 'mesh/spatial_dimension_test.C'; then $(CYGPATH_W) 'mesh/spatial_dimension_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/spatial_dimension_test.C'; fi`
 
-mesh/unit_tests_opt-subdomain_partitioner_test.o: mesh/subdomain_partitioner_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-subdomain_partitioner_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_opt-subdomain_partitioner_test.o `test -f 'mesh/subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/subdomain_partitioner_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_opt-subdomain_partitioner_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/subdomain_partitioner_test.C' object='mesh/unit_tests_opt-subdomain_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+mesh/unit_tests_opt-mapped_subdomain_partitioner_test.o: mesh/mapped_subdomain_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mapped_subdomain_partitioner_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mapped_subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_opt-mapped_subdomain_partitioner_test.o `test -f 'mesh/mapped_subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/mapped_subdomain_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-mapped_subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_opt-mapped_subdomain_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mapped_subdomain_partitioner_test.C' object='mesh/unit_tests_opt-mapped_subdomain_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-subdomain_partitioner_test.o `test -f 'mesh/subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/subdomain_partitioner_test.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-mapped_subdomain_partitioner_test.o `test -f 'mesh/mapped_subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/mapped_subdomain_partitioner_test.C
 
-mesh/unit_tests_opt-subdomain_partitioner_test.obj: mesh/subdomain_partitioner_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-subdomain_partitioner_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_opt-subdomain_partitioner_test.obj `if test -f 'mesh/subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/subdomain_partitioner_test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_opt-subdomain_partitioner_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/subdomain_partitioner_test.C' object='mesh/unit_tests_opt-subdomain_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+mesh/unit_tests_opt-mapped_subdomain_partitioner_test.obj: mesh/mapped_subdomain_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mapped_subdomain_partitioner_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mapped_subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_opt-mapped_subdomain_partitioner_test.obj `if test -f 'mesh/mapped_subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/mapped_subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mapped_subdomain_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-mapped_subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_opt-mapped_subdomain_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mapped_subdomain_partitioner_test.C' object='mesh/unit_tests_opt-mapped_subdomain_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-subdomain_partitioner_test.obj `if test -f 'mesh/subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/subdomain_partitioner_test.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-mapped_subdomain_partitioner_test.obj `if test -f 'mesh/mapped_subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/mapped_subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mapped_subdomain_partitioner_test.C'; fi`
 
 mesh/unit_tests_opt-mesh_function_dfem.o: mesh/mesh_function_dfem.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mesh_function_dfem.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Tpo -c -o mesh/unit_tests_opt-mesh_function_dfem.o `test -f 'mesh/mesh_function_dfem.C' || echo '$(srcdir)/'`mesh/mesh_function_dfem.C
@@ -5464,19 +5464,19 @@ mesh/unit_tests_prof-spatial_dimension_test.obj: mesh/spatial_dimension_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-spatial_dimension_test.obj `if test -f 'mesh/spatial_dimension_test.C'; then $(CYGPATH_W) 'mesh/spatial_dimension_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/spatial_dimension_test.C'; fi`
 
-mesh/unit_tests_prof-subdomain_partitioner_test.o: mesh/subdomain_partitioner_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-subdomain_partitioner_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_prof-subdomain_partitioner_test.o `test -f 'mesh/subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/subdomain_partitioner_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_prof-subdomain_partitioner_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/subdomain_partitioner_test.C' object='mesh/unit_tests_prof-subdomain_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
+mesh/unit_tests_prof-mapped_subdomain_partitioner_test.o: mesh/mapped_subdomain_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mapped_subdomain_partitioner_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mapped_subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_prof-mapped_subdomain_partitioner_test.o `test -f 'mesh/mapped_subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/mapped_subdomain_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-mapped_subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_prof-mapped_subdomain_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mapped_subdomain_partitioner_test.C' object='mesh/unit_tests_prof-mapped_subdomain_partitioner_test.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-subdomain_partitioner_test.o `test -f 'mesh/subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/subdomain_partitioner_test.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-mapped_subdomain_partitioner_test.o `test -f 'mesh/mapped_subdomain_partitioner_test.C' || echo '$(srcdir)/'`mesh/mapped_subdomain_partitioner_test.C
 
-mesh/unit_tests_prof-subdomain_partitioner_test.obj: mesh/subdomain_partitioner_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-subdomain_partitioner_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_prof-subdomain_partitioner_test.obj `if test -f 'mesh/subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/subdomain_partitioner_test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_prof-subdomain_partitioner_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/subdomain_partitioner_test.C' object='mesh/unit_tests_prof-subdomain_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
+mesh/unit_tests_prof-mapped_subdomain_partitioner_test.obj: mesh/mapped_subdomain_partitioner_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mapped_subdomain_partitioner_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mapped_subdomain_partitioner_test.Tpo -c -o mesh/unit_tests_prof-mapped_subdomain_partitioner_test.obj `if test -f 'mesh/mapped_subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/mapped_subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mapped_subdomain_partitioner_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-mapped_subdomain_partitioner_test.Tpo mesh/$(DEPDIR)/unit_tests_prof-mapped_subdomain_partitioner_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mapped_subdomain_partitioner_test.C' object='mesh/unit_tests_prof-mapped_subdomain_partitioner_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-subdomain_partitioner_test.obj `if test -f 'mesh/subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/subdomain_partitioner_test.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-mapped_subdomain_partitioner_test.obj `if test -f 'mesh/mapped_subdomain_partitioner_test.C'; then $(CYGPATH_W) 'mesh/mapped_subdomain_partitioner_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mapped_subdomain_partitioner_test.C'; fi`
 
 mesh/unit_tests_prof-mesh_function_dfem.o: mesh/mesh_function_dfem.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mesh_function_dfem.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Tpo -c -o mesh/unit_tests_prof-mesh_function_dfem.o `test -f 'mesh/mesh_function_dfem.C' || echo '$(srcdir)/'`mesh/mesh_function_dfem.C

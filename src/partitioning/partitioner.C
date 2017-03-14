@@ -150,24 +150,27 @@ void Partitioner::repartition (MeshBase & mesh,
 
 void Partitioner::single_partition (MeshBase & mesh)
 {
-  LOG_SCOPE("single_partition()","Partitioner");
-
-  // Loop over all the elements and assign them to processor 0.
-  MeshBase::element_iterator       elem_it  = mesh.elements_begin();
-  const MeshBase::element_iterator elem_end = mesh.elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
-    (*elem_it)->processor_id() = 0;
-
-  // For a single partition, all the nodes are on processor 0
-  MeshBase::node_iterator       node_it  = mesh.nodes_begin();
-  const MeshBase::node_iterator node_end = mesh.nodes_end();
-
-  for ( ; node_it != node_end; ++node_it)
-    (*node_it)->processor_id() = 0;
+  this->single_partition_range(mesh.elements_begin(),
+                               mesh.elements_end());
 }
 
 
+
+void Partitioner::single_partition_range (MeshBase::element_iterator it,
+                                          MeshBase::element_iterator end)
+{
+  LOG_SCOPE("single_partition_range()", "Partitioner");
+
+  for ( ; it != end; ++it)
+    {
+      Elem * elem = *it;
+      elem->processor_id() = 0;
+
+      // Assign all this element's nodes to processor 0 as well.
+      for (unsigned int n=0; n<elem->n_nodes(); ++n)
+        elem->node_ptr(n)->processor_id() = 0;
+    }
+}
 
 void Partitioner::partition_unpartitioned_elements (MeshBase & mesh)
 {

@@ -24,6 +24,7 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/auto_ptr.h"
 #include "libmesh/id_types.h"
+#include "libmesh/mesh_base.h" // for MeshBase::element_iterator
 
 // C++ Includes
 #include <cstddef>
@@ -32,7 +33,6 @@ namespace libMesh
 {
 
 // Forward Declarations
-class MeshBase;
 class ErrorVector;
 
 /**
@@ -67,10 +67,8 @@ public:
   virtual UniquePtr<Partitioner> clone () const = 0;
 
   /**
-   * Partition the \p MeshBase into \p n parts.
-   * The partitioner currently does not modify the subdomain_id
-   * of each element.  This number is reserved for things like
-   * material properties, etc.
+   * Partitions the \p MeshBase into \p n parts by setting
+   * processor_id() on Nodes and Elems.
    *
    * NOTE: If you are implementing a new type of Partitioner, you most
    * likely do *not* want to override the partition() function, see
@@ -87,10 +85,8 @@ public:
                           const unsigned int n);
 
   /**
-   * Partition the \p MeshBase into \p mesh.n_processors() parts.
-   * The partitioner currently does not modify the subdomain_id
-   * of each element.  This number is reserved for things like
-   * material properties, etc.
+   * Partitions the \p MeshBase into \p mesh.n_processors() by setting
+   * processor_id() on Nodes and Elems.
    *
    * NOTE: If you are implementing a new type of Partitioner, you most
    * likely do *not* want to override the partition() function, see
@@ -104,6 +100,27 @@ public:
    * an example.
    */
   virtual void partition (MeshBase & mesh);
+
+  /**
+   * Partitions elements in the range (it, end) into n parts.
+   * The mesh from which the iterators are created must also be passed
+   * in, since it is a parallel object and has other useful
+   * information in it.
+   *
+   * Although partition_range() is part of the public Partitioner
+   * interface, it should not generally be called by applications.
+   * Its main purpose is to support the SubdomainPartitioner, which
+   * uses it internally to individually partition ranges of elements
+   * before combining them into the final partitioning. Most of the
+   * time, the protected _do_partition() function is implemented in
+   * terms of partition_range() by passing a range which includes all
+   * the elements of the Mesh.
+   */
+  virtual void partition_range (MeshBase & /*mesh*/,
+                                MeshBase::element_iterator /*beg*/,
+                                MeshBase::element_iterator /*end*/,
+                                const unsigned int /*n_parts*/)
+  { libmesh_not_implemented(); }
 
   /**
    * Repartitions the \p MeshBase into \p n parts. (Some partitoning
@@ -160,6 +177,13 @@ protected:
    * so that derived classes may use it without reimplementing it.
    */
   void single_partition (MeshBase & mesh);
+
+  /**
+   * Slightly generalized version of single_partition which acts on a
+   * range of elements defined by the pair of iterators (it, end).
+   */
+  void single_partition_range(MeshBase::element_iterator it,
+                              MeshBase::element_iterator end);
 
   /**
    * This is the actual partitioning method which must be overloaded

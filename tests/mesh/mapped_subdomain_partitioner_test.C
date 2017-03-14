@@ -9,7 +9,7 @@
 #include <libmesh/elem.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_modification.h>
-#include "libmesh/subdomain_partitioner.h"
+#include "libmesh/mapped_subdomain_partitioner.h"
 
 #include "test_comm.h"
 
@@ -25,16 +25,16 @@
 
 using namespace libMesh;
 
-class SubdomainPartitionerTest : public CppUnit::TestCase
+class MappedSubdomainPartitionerTest : public CppUnit::TestCase
 {
   /**
    * The goal of this test is to verify proper operation of the
-   * SubdomainPartitioner on different numbers of processors.
+   * MappedSubdomainPartitioner on different numbers of processors.
    */
 public:
-  CPPUNIT_TEST_SUITE( SubdomainPartitionerTest );
+  CPPUNIT_TEST_SUITE( MappedSubdomainPartitionerTest );
 
-  CPPUNIT_TEST( testSubdomainPartitionerTest );
+  CPPUNIT_TEST( testMappedSubdomainPartitioner );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -47,7 +47,7 @@ public:
 
   void tearDown() {}
 
-  void testSubdomainPartitionerTest()
+  void testMappedSubdomainPartitioner()
   {
     ReplicatedMesh mesh(*TestCommWorld, /*dim=*/2);
 
@@ -62,14 +62,14 @@ public:
                                          ymin, ymax,
                                          QUAD4);
 
-    // The SubdomainPartitioner partitions based on user-defined
+    // The MappedSubdomainPartitioner partitions based on user-defined
     // assignment of subdomains to processors.
-    mesh.partitioner() = UniquePtr<Partitioner>(new SubdomainPartitioner);
+    mesh.partitioner() = UniquePtr<Partitioner>(new MappedSubdomainPartitioner);
 
-    // Get a pointer to the SubdomainPartitioner so we can call its
+    // Get a pointer to the MappedSubdomainPartitioner so we can call its
     // API specifically.
-    SubdomainPartitioner * subdomain_partitioner =
-      dynamic_cast<SubdomainPartitioner *>(mesh.partitioner().get());
+    MappedSubdomainPartitioner * subdomain_partitioner =
+      dynamic_cast<MappedSubdomainPartitioner *>(mesh.partitioner().get());
 
     // Create 2x as many subdomains as processors, then assign them in
     // the following way:
@@ -103,7 +103,7 @@ public:
         }
     }
 
-    // Partition again, now that we have set up the SubdomainPartitioner.
+    // Partition again, now that we have set up the MappedSubdomainPartitioner.
     mesh.partition();
 
     // Assert that the partitioning worked as expected.
@@ -125,4 +125,4 @@ public:
 };
 
 
-CPPUNIT_TEST_SUITE_REGISTRATION( SubdomainPartitionerTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( MappedSubdomainPartitionerTest );
