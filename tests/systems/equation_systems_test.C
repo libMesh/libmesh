@@ -130,7 +130,7 @@ public:
 
     Elem * to_refine = mesh.query_elem_ptr(0);
     if (to_refine)
-      to_refine->set_refinement_flag(Elem::RefinementState::REFINE);
+      to_refine->set_refinement_flag(Elem::REFINE);
 
     MeshRefinement mr(mesh);
     mr.refine_elements();
@@ -143,11 +143,11 @@ public:
     const Elem * elem = mesh.query_elem_ptr(0);
     if (elem)
       {
-        CPPUNIT_ASSERT_EQUAL( Elem::RefinementState::INACTIVE,elem->refinement_flag() );
+        CPPUNIT_ASSERT_EQUAL( Elem::INACTIVE,elem->refinement_flag() );
 
         for (unsigned int c=0; c<elem->n_children(); c++)
           if (elem->child_ptr(c) != remote_elem)
-            CPPUNIT_ASSERT_EQUAL(Elem::RefinementState::JUST_REFINED,
+            CPPUNIT_ASSERT_EQUAL(Elem::JUST_REFINED,
                                  elem->child_ptr(c)->refinement_flag());
       }
   }

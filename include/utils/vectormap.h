@@ -124,12 +124,9 @@ public:
    */
   void sort()
   {
-    FirstOrder   order;
-    FirstCompare comp;
+    std::sort (this->begin(), this->end(), FirstOrder());
 
-    std::sort (this->begin(), this->end(), order);
-
-    this->erase (std::unique (this->begin(), this->end(), comp), this->end());
+    this->erase (std::unique (this->begin(), this->end(), FirstCompare()), this->end());
 
     _sorted = true;
   }
@@ -147,12 +144,11 @@ public:
     value_type to_find;
     to_find.first = key;
 
-    FirstOrder order;
+    const_iterator lower_bound = std::lower_bound (this->begin(), this->end(), to_find, FirstOrder());
 
-    const_iterator lower_bound = std::lower_bound (this->begin(), this->end(), to_find, order);
-
-    libmesh_assert (lower_bound != this->end());
-    libmesh_assert_equal_to (lower_bound->first, key);
+    if (lower_bound == this->end() || lower_bound->first != key)
+      libmesh_error_msg("Error in vectormap::operator[], key not found. "
+                        "If you are searching for values you aren't sure exist, try vectormap::find() instead.");
 
     return lower_bound->second;
   }
@@ -171,9 +167,13 @@ public:
     value_type to_find;
     to_find.first = key;
 
-    FirstOrder order;
+    iterator lb = std::lower_bound (this->begin(), this->end(), to_find, FirstOrder());
 
-    return std::lower_bound (this->begin(), this->end(), to_find, order);
+    // If we didn't find the key, return end()
+    if (lb == this->end() || lb->first != key)
+      return this->end();
+
+    return lb;
   }
 
   /**
@@ -192,9 +192,13 @@ public:
     value_type to_find;
     to_find.first = key;
 
-    FirstOrder order;
+    const_iterator lb = std::lower_bound (this->begin(), this->end(), to_find, FirstOrder());
 
-    return std::lower_bound (this->begin(), this->end(), to_find, order);
+    // If we didn't find the key, return end()
+    if (lb == this->end() || lb->first != key)
+      return this->end();
+
+    return lb;
   }
 
   /**
@@ -212,12 +216,13 @@ public:
     value_type to_find;
     to_find.first = key;
 
-    FirstOrder order;
+    const_iterator lb = std::lower_bound (this->begin(), this->end(), to_find, FirstOrder());
 
-    std::pair<const_iterator, const_iterator>
-      bounds = std::equal_range (this->begin(), this->end(), to_find, order);
+    // If we didn't find the key, the count is 0.
+    if (lb == this->end() || lb->first != key)
+      return 0;
 
-    return std::distance (bounds.first, bounds.second);
+    return 1;
   }
 
 

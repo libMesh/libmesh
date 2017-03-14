@@ -29,6 +29,7 @@ public:
   CPPUNIT_TEST( testCreate );
   CPPUNIT_TEST( testInsert );
   CPPUNIT_TEST( testIterate );
+  CPPUNIT_TEST( testFind );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -108,6 +109,22 @@ public:
     iterate<char,int> ();
     iterate<long,int*>();
     iterate<int, std::string>("test_string");
+  }
+
+  void testFind()
+  {
+    vectormap<int, int> vm;
+    for (int i=16; i<32; ++i)
+      vm.insert(std::make_pair(i,i));
+
+    vectormap<int, int>::iterator
+      it1 = vm.find(24),
+      it2 = vm.find(4);
+
+    CPPUNIT_ASSERT(it1 != vm.end());
+    CPPUNIT_ASSERT(it2 == vm.end());
+    CPPUNIT_ASSERT(vm.count(24) == 1);
+    CPPUNIT_ASSERT(vm.count(4) == 0);
   }
 };
 
