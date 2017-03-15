@@ -123,7 +123,7 @@ public:
     libmesh_assert_equal_to(sizeof(unsigned long long),
                             sizeof(unsigned long));
   }
-}
+};
 
 template<>
 struct Attributes<unsigned long long>
@@ -131,8 +131,9 @@ struct Attributes<unsigned long long>
   static const bool has_min_max = true;
   static void set_lowest(unsigned long long & x) { x = std::numeric_limits<unsigned long long>::min(); }
   static void set_highest(unsigned long long & x) { x = std::numeric_limits<unsigned long long>::max(); }
-}
+};
 #endif
+
 LIBMESH_FLOAT_TYPE(float,MPI_FLOAT);
 LIBMESH_FLOAT_TYPE(double,MPI_DOUBLE);
 LIBMESH_FLOAT_TYPE(long double,MPI_LONG_DOUBLE);
