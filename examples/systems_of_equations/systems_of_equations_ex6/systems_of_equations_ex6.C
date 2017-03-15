@@ -329,22 +329,22 @@ public:
 
         std::vector< DenseMatrix<Number> > stress_tensor_qp(qrule.n_points());
         for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-        {
-          stress_tensor_qp[qp].resize(3,3);
+          {
+            stress_tensor_qp[qp].resize(3,3);
 
-          // Row is variable u1, u2, or u3, column is x, y, or z
-          DenseMatrix<Number> grad_u(3,3);
-          for (unsigned int var_i=0; var_i<3; var_i++)
-            for (unsigned int var_j=0; var_j<3; var_j++)
-              for (unsigned int j=0; j<n_var_dofs; j++)
-                grad_u(var_i,var_j) += dphi[j][qp](var_j) * system.current_solution(dof_indices_var[var_i][j]);
+            // Row is variable u1, u2, or u3, column is x, y, or z
+            DenseMatrix<Number> grad_u(3,3);
+            for (unsigned int var_i=0; var_i<3; var_i++)
+              for (unsigned int var_j=0; var_j<3; var_j++)
+                for (unsigned int j=0; j<n_var_dofs; j++)
+                  grad_u(var_i,var_j) += dphi[j][qp](var_j) * system.current_solution(dof_indices_var[var_i][j]);
 
-          for (unsigned int var_i=0; var_i<3; var_i++)
-            for (unsigned int var_j=0; var_j<3; var_j++)
-              for (unsigned int k=0; k<3; k++)
-                for (unsigned int l=0; l<3; l++)
-                  stress_tensor_qp[qp](var_i,var_j) += elasticity_tensor(var_i,var_j,k,l) * grad_u(k,l);
-        }
+            for (unsigned int var_i=0; var_i<3; var_i++)
+              for (unsigned int var_j=0; var_j<3; var_j++)
+                for (unsigned int k=0; k<3; k++)
+                  for (unsigned int l=0; l<3; l++)
+                    stress_tensor_qp[qp](var_i,var_j) += elasticity_tensor(var_i,var_j,k,l) * grad_u(k,l);
+          }
 
         stress_dof_map.dof_indices (elem, vonmises_dof_indices_var, vonMises_var);
         std::vector< DenseMatrix<Number> > elem_sigma_vec(vonmises_dof_indices_var.size());
@@ -357,64 +357,64 @@ public:
         unsigned int stress_var_index = 0;
         for (unsigned int var_i=0; var_i<3; var_i++)
           for (unsigned int var_j=var_i; var_j<3; var_j++)
-          {
-            stress_dof_map.dof_indices (elem, stress_dof_indices_var, sigma_vars[stress_var_index]);
-
-            const unsigned int n_proj_dofs = stress_dof_indices_var.size();
-
-            DenseMatrix<Real> Me(n_proj_dofs, n_proj_dofs);
-            for (unsigned int qp=0; qp<qrule.n_points(); qp++)
             {
-              for(unsigned int i=0; i<n_proj_dofs; i++)
-                for(unsigned int j=0; j<n_proj_dofs; j++)
+              stress_dof_map.dof_indices (elem, stress_dof_indices_var, sigma_vars[stress_var_index]);
+
+              const unsigned int n_proj_dofs = stress_dof_indices_var.size();
+
+              DenseMatrix<Real> Me(n_proj_dofs, n_proj_dofs);
+              for (unsigned int qp=0; qp<qrule.n_points(); qp++)
                 {
-                  Me(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp]);
+                  for(unsigned int i=0; i<n_proj_dofs; i++)
+                    for(unsigned int j=0; j<n_proj_dofs; j++)
+                      {
+                        Me(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp]);
+                      }
                 }
+
+              DenseVector<Number> Fe(n_proj_dofs);
+              for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+                for(unsigned int i=0; i<n_proj_dofs; i++)
+                  {
+                    Fe(i) += JxW[qp] * stress_tensor_qp[qp](var_i,var_j) * phi[i][qp];
+                  }
+
+              DenseVector<Number> projected_data;
+              Me.cholesky_solve(Fe, projected_data);
+
+              for(unsigned int index=0; index<n_proj_dofs; index++)
+                {
+                  dof_id_type dof_index = stress_dof_indices_var[index];
+                  if ((stress_system.solution->first_local_index() <= dof_index) &&
+                      (dof_index < stress_system.solution->last_local_index()))
+                    stress_system.solution->set(dof_index, projected_data(index));
+
+                  elem_sigma_vec[index](var_i,var_j) = projected_data(index);
+                }
+
+              stress_var_index++;
             }
-
-            DenseVector<Number> Fe(n_proj_dofs);
-            for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-              for(unsigned int i=0; i<n_proj_dofs; i++)
-              {
-                Fe(i) += JxW[qp] * stress_tensor_qp[qp](var_i,var_j) * phi[i][qp];
-              }
-
-            DenseVector<Number> projected_data;
-            Me.cholesky_solve(Fe, projected_data);
-
-            for(unsigned int index=0; index<n_proj_dofs; index++)
-            {
-              dof_id_type dof_index = stress_dof_indices_var[index];
-              if ((stress_system.solution->first_local_index() <= dof_index) &&
-                  (dof_index < stress_system.solution->last_local_index()))
-                stress_system.solution->set(dof_index, projected_data(index));
-
-              elem_sigma_vec[index](var_i,var_j) = projected_data(index);
-            }
-
-            stress_var_index++;
-          }
 
         for (std::size_t index=0; index<elem_sigma_vec.size(); index++)
-        {
-          elem_sigma_vec[index](1,0) = elem_sigma_vec[index](0,1);
-          elem_sigma_vec[index](2,0) = elem_sigma_vec[index](0,2);
-          elem_sigma_vec[index](2,1) = elem_sigma_vec[index](1,2);
+          {
+            elem_sigma_vec[index](1,0) = elem_sigma_vec[index](0,1);
+            elem_sigma_vec[index](2,0) = elem_sigma_vec[index](0,2);
+            elem_sigma_vec[index](2,1) = elem_sigma_vec[index](1,2);
 
-          // Get the von Mises stress from the projected stress tensor
-          Number vonMises_value = std::sqrt(0.5*(pow(elem_sigma_vec[index](0,0) - elem_sigma_vec[index](1,1), 2.) +
-                                                 pow(elem_sigma_vec[index](1,1) - elem_sigma_vec[index](2,2), 2.) +
-                                                 pow(elem_sigma_vec[index](2,2) - elem_sigma_vec[index](0,0), 2.) +
-                                                6.*(pow(elem_sigma_vec[index](0,1), 2.) +
-                                                    pow(elem_sigma_vec[index](1,2), 2.) +
-                                                    pow(elem_sigma_vec[index](2,0), 2.))));
+            // Get the von Mises stress from the projected stress tensor
+            Number vonMises_value = std::sqrt(0.5*(pow(elem_sigma_vec[index](0,0) - elem_sigma_vec[index](1,1), 2.) +
+                                                   pow(elem_sigma_vec[index](1,1) - elem_sigma_vec[index](2,2), 2.) +
+                                                   pow(elem_sigma_vec[index](2,2) - elem_sigma_vec[index](0,0), 2.) +
+                                                   6.*(pow(elem_sigma_vec[index](0,1), 2.) +
+                                                       pow(elem_sigma_vec[index](1,2), 2.) +
+                                                       pow(elem_sigma_vec[index](2,0), 2.))));
 
-          dof_id_type dof_index = vonmises_dof_indices_var[index];
+            dof_id_type dof_index = vonmises_dof_indices_var[index];
 
-          if ((stress_system.solution->first_local_index() <= dof_index) &&
-              (dof_index < stress_system.solution->last_local_index()))
-            stress_system.solution->set(dof_index, vonMises_value);
-        }
+            if ((stress_system.solution->first_local_index() <= dof_index) &&
+                (dof_index < stress_system.solution->last_local_index()))
+              stress_system.solution->set(dof_index, vonMises_value);
+          }
       }
 
     // Should call close and update when we set vector entries directly
