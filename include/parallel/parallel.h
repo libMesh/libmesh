@@ -1102,14 +1102,14 @@ public:
                      const T & send,
                      std::vector<T> & recv) const;
 
-   /**
-    * Gather overload for string types
-    */
-   template <typename T>
-   inline void gather(const unsigned int root_id,
-                      const std::basic_string<T> & send,
-                      std::vector<std::basic_string<T> > & recv,
-                      const bool identical_buffer_sizes=false) const;
+  /**
+   * Gather overload for string types
+   */
+  template <typename T>
+  inline void gather(const unsigned int root_id,
+                     const std::basic_string<T> & send,
+                     std::vector<std::basic_string<T> > & recv,
+                     const bool identical_buffer_sizes=false) const;
 
   /**
    * Take a vector of local variables and expand it on processor root_id
@@ -1146,7 +1146,7 @@ public:
                         std::vector<T> & recv) const;
 
   /**
-  * AllGather overload for string types
+   * AllGather overload for string types
    */
   template <typename T>
   inline void allgather(const std::basic_string<T> & send,

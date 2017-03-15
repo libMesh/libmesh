@@ -440,20 +440,17 @@ public:
   /**
    * Calls to reinit() will also do two-step coarsen-then-refine
    **/
-  void enable_refine_in_reinit()
-    { this->_refine_in_reinit = true; }
+  void enable_refine_in_reinit() { this->_refine_in_reinit = true; }
 
   /**
    * Calls to reinit() will not try to coarsen or refine the mesh
    **/
-  void disable_refine_in_reinit()
-    { this->_refine_in_reinit = false; }
+  void disable_refine_in_reinit() { this->_refine_in_reinit = false; }
 
   /**
    * @returns whether or not calls to reinit() will try to coarsen/refine the mesh
    **/
-  bool refine_in_reinit_flag()
-    { return this->_refine_in_reinit; }
+  bool refine_in_reinit_flag() { return this->_refine_in_reinit; }
 
 
   /**

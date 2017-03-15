@@ -439,7 +439,7 @@ struct evaluable : predicate<T>
   // Constructor
   evaluable(const DofMap & dof_map,
             unsigned int var_num) :
-            _dof_map(dof_map), _var_num(var_num) {}
+    _dof_map(dof_map), _var_num(var_num) {}
   virtual ~evaluable() {}
 
   // op()

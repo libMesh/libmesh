@@ -122,10 +122,10 @@ public:
    * \p tol multiplied by the size of a semilocal element which
    * contains \p p.
    */
-  virtual const Node * locate_node
-    (const Point & p,
-     const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr,
-     Real tol = TOLERANCE) const;
+  virtual const Node *
+  locate_node (const Point & p,
+               const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr,
+               Real tol = TOLERANCE) const;
 
   /**
    * @returns \p true when this object is properly initialized

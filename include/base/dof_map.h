@@ -1300,14 +1300,14 @@ private:
    * A utility method for obtaining a set of elements to ghost along
    * with merged coupling matrices.
    */
-  static void merge_ghost_functor_outputs
-    (GhostingFunctor::map_type & elements_to_ghost,
-     std::set<CouplingMatrix*> & temporary_coupling_matrices,
-     const std::set<GhostingFunctor *>::iterator & gf_begin,
-     const std::set<GhostingFunctor *>::iterator & gf_end,
-     const MeshBase::const_element_iterator & elems_begin,
-     const MeshBase::const_element_iterator & elems_end,
-     processor_id_type p);
+  static void
+  merge_ghost_functor_outputs (GhostingFunctor::map_type & elements_to_ghost,
+                               std::set<CouplingMatrix *> & temporary_coupling_matrices,
+                               const std::set<GhostingFunctor *>::iterator & gf_begin,
+                               const std::set<GhostingFunctor *>::iterator & gf_end,
+                               const MeshBase::const_element_iterator & elems_begin,
+                               const MeshBase::const_element_iterator & elems_end,
+                               processor_id_type p);
 
   /**
    * Adds entries to the \p _send_list vector corresponding to DoFs
