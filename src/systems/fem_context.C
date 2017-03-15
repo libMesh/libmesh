@@ -442,11 +442,9 @@ void FEMContext::interior_hessians(unsigned int var,
                                    const NumericVector<Number> & _system_vector,
                                    std::vector<OutputType> & d2u_vals) const
 {
-  typedef typename TensorTools::MakeReal<
-    typename TensorTools::DecrementRank<
-      typename TensorTools::DecrementRank<
-        OutputType>::type>::type>::type
-    OutputShape;
+  typedef typename TensorTools::DecrementRank<OutputType>::type Rank1Decrement;
+  typedef typename TensorTools::DecrementRank<Rank1Decrement>::type Rank2Decrement;
+  typedef typename TensorTools::MakeReal<Rank2Decrement>::type OutputShape;
 
   // Get local-to-global dof index lookup
   const unsigned int n_dofs = cast_int<unsigned int>
@@ -719,11 +717,9 @@ void FEMContext::side_hessians(unsigned int var,
                                const NumericVector<Number> & _system_vector,
                                std::vector<OutputType> & d2u_vals) const
 {
-  typedef typename TensorTools::MakeReal<
-    typename TensorTools::DecrementRank<
-      typename TensorTools::DecrementRank<
-        OutputType>::type>::type>::type
-    OutputShape;
+  typedef typename TensorTools::DecrementRank<OutputType>::type Rank1Decrement;
+  typedef typename TensorTools::DecrementRank<Rank1Decrement>::type Rank2Decrement;
+  typedef typename TensorTools::MakeReal<Rank2Decrement>::type OutputShape;
 
   // Get local-to-global dof index lookup
   const unsigned int n_dofs = cast_int<unsigned int>
@@ -874,11 +870,9 @@ void FEMContext::point_hessian(unsigned int var,
                                OutputType & hess_u,
                                const Real tolerance) const
 {
-  typedef typename TensorTools::MakeReal<
-    typename TensorTools::DecrementRank<
-      typename TensorTools::DecrementRank<
-        OutputType>::type>::type>::type
-    OutputShape;
+  typedef typename TensorTools::DecrementRank<OutputType>::type Rank1Decrement;
+  typedef typename TensorTools::DecrementRank<Rank1Decrement>::type Rank2Decrement;
+  typedef typename TensorTools::MakeReal<Rank2Decrement>::type OutputShape;
 
   // Get local-to-global dof index lookup
   const unsigned int n_dofs = cast_int<unsigned int>
@@ -1211,11 +1205,9 @@ void FEMContext::fixed_point_hessian(unsigned int var,
                                      OutputType & hess_u,
                                      const Real tolerance) const
 {
-  typedef typename TensorTools::MakeReal<
-    typename TensorTools::DecrementRank<
-      typename TensorTools::DecrementRank<
-        OutputType>::type>::type>::type
-    OutputShape;
+  typedef typename TensorTools::DecrementRank<OutputType>::type Rank1Decrement;
+  typedef typename TensorTools::DecrementRank<Rank1Decrement>::type Rank2Decrement;
+  typedef typename TensorTools::MakeReal<Rank2Decrement>::type OutputShape;
 
   // Get local-to-global dof index lookup
   const unsigned int n_dofs = cast_int<unsigned int>
@@ -1314,7 +1306,7 @@ void FEMContext::elem_reinit(Real theta)
           elem_position_set(theta);
         }
       elem_fe_reinit();
-   }
+    }
 }
 
 
@@ -1814,9 +1806,9 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
   FEGenericBase<OutputShape>* fe_new =
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
     (this->has_elem() && this->get_elem().infinite()) ?
-     FEGenericBase<OutputShape>::build_InfFE(elem_dim, fe_type).release() :
+    FEGenericBase<OutputShape>::build_InfFE(elem_dim, fe_type).release() :
 #endif
-     FEGenericBase<OutputShape>::build(elem_dim, fe_type).release();
+    FEGenericBase<OutputShape>::build(elem_dim, fe_type).release();
 
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit

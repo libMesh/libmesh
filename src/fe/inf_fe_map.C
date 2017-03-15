@@ -427,11 +427,11 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
   // the point \p p on the reference element actually does
   // map to the point \p physical_point within a tolerance.
 #ifdef DEBUG
-    const Point check = InfFE<Dim,T_radial,T_map>::map (inf_elem, p);
-    const Point diff  = physical_point - check;
+  const Point check = InfFE<Dim,T_radial,T_map>::map (inf_elem, p);
+  const Point diff  = physical_point - check;
 
-    if (diff.norm() > tolerance)
-      libmesh_warning("WARNING:  diff is " << diff.norm());
+  if (diff.norm() > tolerance)
+    libmesh_warning("WARNING:  diff is " << diff.norm());
 #endif
 
   return p;

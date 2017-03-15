@@ -402,12 +402,12 @@ OldSolutionValue<Gradient, &FEMContext::point_gradient>::get_shape_outputs(FEBas
 template<>
 inline
 Number
-OldSolutionValue<Number, &FEMContext::point_value>::eval_at_node
-  (const FEMContext & c,
-   unsigned int i,
-   unsigned int /* elem_dim */,
-   const Node & n,
-   Real /* time */)
+OldSolutionValue<Number, &FEMContext::point_value>::
+eval_at_node(const FEMContext & c,
+             unsigned int i,
+             unsigned int /* elem_dim */,
+             const Node & n,
+             Real /* time */)
 {
   LOG_SCOPE ("Number eval_at_node()", "OldSolutionValue");
 
@@ -435,12 +435,12 @@ OldSolutionValue<Number, &FEMContext::point_value>::eval_at_node
 template<>
 inline
 Gradient
-OldSolutionValue<Gradient, &FEMContext::point_gradient>::eval_at_node
-  (const FEMContext & c,
-   unsigned int i,
-   unsigned int elem_dim,
-   const Node & n,
-   Real /* time */)
+OldSolutionValue<Gradient, &FEMContext::point_gradient>::
+eval_at_node(const FEMContext & c,
+             unsigned int i,
+             unsigned int elem_dim,
+             const Node & n,
+             Real /* time */)
 {
   LOG_SCOPE ("Gradient eval_at_node()", "OldSolutionValue");
 
@@ -1335,8 +1335,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               else if (cont == C_ONE)
                 {
                   const bool is_parent_vertex = (i_am_child == -1) ||
-                    elem->parent()->is_vertex_on_parent
-                      (i_am_child, n);
+                    elem->parent()->is_vertex_on_parent(i_am_child, n);
 
                   // The hermite element vertex shape functions are weird
                   if (fe_type.family == HERMITE)
@@ -1516,7 +1515,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
                || elem->infinite()
 #endif
-              ))
+               ))
             {
               // If we're JUST_COARSENED we'll need a custom
               // evaluation, not just the standard edge FE
@@ -1692,7 +1691,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
                || elem->infinite()
 #endif
-              ))
+               ))
             {
               // If we're JUST_COARSENED we'll need a custom
               // evaluation, not just the standard side FE
@@ -1718,10 +1717,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               if (cont == C_ONE)
                 dphi =
 #ifdef LIBMESH_ENABLE_AMR
-                  (elem->refinement_flag() == Elem::JUST_COARSENED) ?
-                    &(fe->get_dphi()) :
+                  (elem->refinement_flag() == Elem::JUST_COARSENED) ? &(fe->get_dphi()) :
 #endif // LIBMESH_ENABLE_AMR
-                    &(side_fe->get_dphi());
+                  &(side_fe->get_dphi());
 
               for (unsigned char s=0; s != elem->n_sides(); ++s)
                 {
@@ -1875,7 +1873,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
                || elem->infinite()
 #endif
-              ))
+               ))
             {
               const std::vector<Point> & xyz_values = fe->get_xyz();
               const std::vector<Real> & JxW = fe->get_JxW();

@@ -487,7 +487,7 @@ void DenseMatrix<T>::_svd_helper (char JOBU,
   // handle both the real-valued and complex-valued cases.
   std::vector<Number> val_copy(_val.size());
   for (std::size_t i=0; i<_val.size(); i++)
-      val_copy[i] = _val[i];
+    val_copy[i] = _val[i];
 
   std::vector<Real> RWORK(5 * min_MN);
   LAPACKgesvd_(&JOBU, &JOBVT, &M, &N, &(val_copy[0]), &LDA, &(sigma_val[0]), &(U_val[0]),
@@ -878,12 +878,12 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
           std::swap((*VR)(i,j), (*VR)(j,i));
     }
 
- if (VL)
-   {
-     for (unsigned int i=0; i<static_cast<unsigned int>(N); ++i)
-       for (unsigned int j=0; j<i; ++j)
-         std::swap((*VL)(i,j), (*VL)(j,i));
-   }
+  if (VL)
+    {
+      for (unsigned int i=0; i<static_cast<unsigned int>(N); ++i)
+        for (unsigned int j=0; j<i; ++j)
+          std::swap((*VL)(i,j), (*VL)(j,i));
+    }
 }
 
 #else

@@ -162,35 +162,35 @@ void CheckpointIO::build_elem_list()
   MeshBase::const_element_iterator end = mesh.elements_end();
 
   if (_parallel)
-  {
-    it  = mesh.pid_elements_begin(_my_processor_id);
-    end = mesh.pid_elements_end(_my_processor_id);
-  }
+    {
+      it  = mesh.pid_elements_begin(_my_processor_id);
+      end = mesh.pid_elements_end(_my_processor_id);
+    }
 
   std::set<const Elem *> neighbors;
 
   for (; it != end; ++it)
-  {
-    Elem * elem = *it;
+    {
+      Elem * elem = *it;
 
-    _local_elements.insert(elem->id());
+      _local_elements.insert(elem->id());
 
-    // Make sure the neighbors vector is cleared out in case this Elem
-    // isn't active and we skip calling find_point_neighbors().
-    neighbors.clear();
+      // Make sure the neighbors vector is cleared out in case this Elem
+      // isn't active and we skip calling find_point_neighbors().
+      neighbors.clear();
 
-    // Also need to add in all the point neighbors of this element.
-    // Point neighbors can only be found for active elements...
-    if (elem->active())
-      elem->find_point_neighbors(neighbors);
+      // Also need to add in all the point neighbors of this element.
+      // Point neighbors can only be found for active elements...
+      if (elem->active())
+        elem->find_point_neighbors(neighbors);
 
-    std::set<const Elem *>::iterator
-      set_it = neighbors.begin(),
-      set_end = neighbors.end();
+      std::set<const Elem *>::iterator
+        set_it = neighbors.begin(),
+        set_end = neighbors.end();
 
-    for (; set_it != set_end; ++set_it)
-      _local_elements.insert((*set_it)->id());
-  }
+      for (; set_it != set_end; ++set_it)
+        _local_elements.insert((*set_it)->id());
+    }
 }
 
 void CheckpointIO::build_node_list()
@@ -201,12 +201,12 @@ void CheckpointIO::build_node_list()
   const std::set<largest_id_type>::iterator end  = _local_elements.end();
 
   for (; it != end; ++it)
-  {
-    const Elem * elem = mesh.elem_ptr(*it);
+    {
+      const Elem * elem = mesh.elem_ptr(*it);
 
-    for (unsigned int n = 0; n < elem->n_nodes(); n++)
-      _nodes_connected_to_local_elements.insert(elem->node_id(n));
-  }
+      for (unsigned int n = 0; n < elem->n_nodes(); n++)
+        _nodes_connected_to_local_elements.insert(elem->node_id(n));
+    }
 }
 
 void CheckpointIO::write_subdomain_names(Xdr & io) const
@@ -415,19 +415,19 @@ void CheckpointIO::write_bcs (Xdr & io) const
 
   // Filter these lists to only include local elements
   for (unsigned int i = 0; i < num_orig_elements; i++)
-  {
-    if (_local_elements.find(orig_element_id_list[i]) != _local_elements.end())
     {
-      // Only write out BCs for truly local elements
-      if (_parallel &&
-          mesh.elem_ptr(orig_element_id_list[i])->processor_id() != _my_processor_id)
-          continue;
+      if (_local_elements.find(orig_element_id_list[i]) != _local_elements.end())
+        {
+          // Only write out BCs for truly local elements
+          if (_parallel &&
+              mesh.elem_ptr(orig_element_id_list[i])->processor_id() != _my_processor_id)
+            continue;
 
-      element_id_list.push_back(orig_element_id_list[i]);
-      side_list.push_back(orig_side_list[i]);
-      bc_id_list.push_back(orig_bc_id_list[i]);
+          element_id_list.push_back(orig_element_id_list[i]);
+          side_list.push_back(orig_side_list[i]);
+          bc_id_list.push_back(orig_bc_id_list[i]);
+        }
     }
-  }
 
   io.data(element_id_list, "# element ids for bcs");
   io.data(side_list, "# sides of elements for bcs");
@@ -461,18 +461,18 @@ void CheckpointIO::write_nodesets (Xdr & io) const
 
   // Filter these lists to only include nodes connected to local elements
   for (unsigned int i = 0; i < num_orig_nodes; i++)
-  {
-    if (_nodes_connected_to_local_elements.find(orig_node_id_list[i]) != _nodes_connected_to_local_elements.end())
     {
-      // Only write out BCs for truly local nodes
-      if (_parallel &&
-          mesh.node_ptr(orig_node_id_list[i])->processor_id() != _my_processor_id)
-          continue;
+      if (_nodes_connected_to_local_elements.find(orig_node_id_list[i]) != _nodes_connected_to_local_elements.end())
+        {
+          // Only write out BCs for truly local nodes
+          if (_parallel &&
+              mesh.node_ptr(orig_node_id_list[i])->processor_id() != _my_processor_id)
+            continue;
 
-      node_id_list.push_back(orig_node_id_list[i]);
-      bc_id_list.push_back(orig_bc_id_list[i]);
+          node_id_list.push_back(orig_node_id_list[i]);
+          bc_id_list.push_back(orig_bc_id_list[i]);
+        }
     }
-  }
 
   io.data(node_id_list, "# node id list");
   io.data(bc_id_list, "# nodeset bc id list");

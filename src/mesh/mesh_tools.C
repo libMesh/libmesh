@@ -1850,8 +1850,10 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   std::vector<std::vector<std::pair<dof_id_type, processor_id_type> > >
     ids_to_push(mesh.n_processors());
 
-  for (MeshBase::const_node_iterator n_it = mesh.nodes_begin(),
-       n_end = mesh.nodes_end(); n_it != n_end; ++n_it)
+  for (MeshBase::const_node_iterator
+         n_it = mesh.nodes_begin(),
+         n_end = mesh.nodes_end();
+       n_it != n_end; ++n_it)
     {
       const Node *node = *n_it;
       const dof_id_type id = node->id();
@@ -1909,8 +1911,10 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   // first we'll need to keep track of which nodes we used to own,
   // lest we get them confused with nodes we newly own.
   LIBMESH_BEST_UNORDERED_SET<Node *> ex_local_nodes;
-  for (MeshBase::node_iterator n_it = mesh.local_nodes_begin(),
-       n_end = mesh.local_nodes_end(); n_it != n_end; ++n_it)
+  for (MeshBase::node_iterator
+         n_it = mesh.local_nodes_begin(),
+         n_end = mesh.local_nodes_end();
+       n_it != n_end; ++n_it)
     {
       Node *node = *n_it;
       const proc_id_map_type::iterator it = new_proc_ids.find(node->id());
@@ -1926,8 +1930,10 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
     (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync);
 
   // And finally let's update the nodes we used to own.
-  for (LIBMESH_BEST_UNORDERED_SET<Node *>::iterator n_it = ex_local_nodes.begin(),
-       n_end = ex_local_nodes.end(); n_it != n_end; ++n_it)
+  for (LIBMESH_BEST_UNORDERED_SET<Node *>::iterator
+         n_it = ex_local_nodes.begin(),
+         n_end = ex_local_nodes.end();
+       n_it != n_end; ++n_it)
     {
       Node *node = *n_it;
       const dof_id_type id = node->id();

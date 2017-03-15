@@ -1327,9 +1327,9 @@ void GMVIO::write_binary (const std::string & fname,
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
       {
 #if LIBMESH_DIM > 1
-      temp[v] = static_cast<float>(mesh.point(v)(1));
+        temp[v] = static_cast<float>(mesh.point(v)(1));
 #else
-      temp[v] = 0.;
+        temp[v] = 0.;
 #endif
       }
     out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());
@@ -1338,9 +1338,9 @@ void GMVIO::write_binary (const std::string & fname,
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
       {
 #if LIBMESH_DIM > 2
-      temp[v] = static_cast<float>(mesh.point(v)(2));
+        temp[v] = static_cast<float>(mesh.point(v)(2));
 #else
-      temp[v] = 0.;
+        temp[v] = 0.;
 #endif
       }
     out_stream.write(reinterpret_cast<char *>(&temp[0]), sizeof(float)*mesh.n_nodes());

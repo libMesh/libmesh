@@ -78,20 +78,20 @@ void _dummy_function(void) {}
 
 
 
-void Build::handle_vi_vj
-  (const Elem * partner,
-   const std::vector<dof_id_type> & element_dofs_i,
-   unsigned int vj)
+void Build::handle_vi_vj(const Elem * partner,
+                         const std::vector<dof_id_type> & element_dofs_i,
+                         unsigned int vj)
 {
   const unsigned int n_dofs_on_element_i =
     cast_int<unsigned int>(element_dofs_i.size());
 
-  const processor_id_type proc_id           = mesh.processor_id();
+  const processor_id_type proc_id     = mesh.processor_id();
   const dof_id_type first_dof_on_proc = dof_map.first_dof(proc_id);
   const dof_id_type end_dof_on_proc   = dof_map.end_dof(proc_id);
 
-  std::vector<dof_id_type> element_dofs_j,
-                           dofs_to_add;
+  std::vector<dof_id_type>
+    element_dofs_j,
+    dofs_to_add;
 
   // Find element dofs for variable vj
   dof_map.dof_indices (partner, element_dofs_j, vj);
@@ -213,84 +213,91 @@ void Build::operator()(const ConstElemRange & range)
   sparsity_pattern.resize(n_dofs_on_proc);
 
   // Handle dof coupling specified by library and user coupling functors
-    {
-      const unsigned int n_var = dof_map.n_variables();
+  {
+    const unsigned int n_var = dof_map.n_variables();
 
-      std::vector<dof_id_type> element_dofs_i;
+    std::vector<dof_id_type> element_dofs_i;
 
-      std::vector<const Elem *> coupled_neighbors;
-      for (ConstElemRange::const_iterator elem_it = range.begin() ; elem_it != range.end(); ++elem_it)
-        {
-          const Elem * const elem = *elem_it;
+    std::vector<const Elem *> coupled_neighbors;
+    for (ConstElemRange::const_iterator elem_it = range.begin() ; elem_it != range.end(); ++elem_it)
+      {
+        const Elem * const elem = *elem_it;
 
-          // Make some fakey element iterators defining a range
-          // pointing to only this element.
-          Elem * const * elempp = const_cast<Elem * const *>(&elem);
-          Elem * const * elemend = elempp+1;
-          const MeshBase::const_element_iterator fake_elem_it =
-            MeshBase::const_element_iterator(elempp, elemend, Predicates::NotNull<Elem * const *>());
-          const MeshBase::const_element_iterator fake_elem_end =
-            MeshBase::const_element_iterator(elemend, elemend, Predicates::NotNull<Elem * const *>());
+        // Make some fakey element iterators defining a range
+        // pointing to only this element.
+        Elem * const * elempp = const_cast<Elem * const *>(&elem);
+        Elem * const * elemend = elempp+1;
 
-          GhostingFunctor::map_type elements_to_couple;
+        const MeshBase::const_element_iterator fake_elem_it =
+          MeshBase::const_element_iterator(elempp,
+                                           elemend,
+                                           Predicates::NotNull<Elem * const *>());
 
-          // Man, I wish we had guaranteed unique_ptr availability...
-          std::set<CouplingMatrix*> temporary_coupling_matrices;
+        const MeshBase::const_element_iterator fake_elem_end =
+          MeshBase::const_element_iterator(elemend,
+                                           elemend,
+                                           Predicates::NotNull<Elem * const *>());
 
-          dof_map.merge_ghost_functor_outputs
-            (elements_to_couple,
-             temporary_coupling_matrices,
-             dof_map.coupling_functors_begin(),
-             dof_map.coupling_functors_end(),
-             fake_elem_it, fake_elem_end, DofObject::invalid_processor_id);
+        GhostingFunctor::map_type elements_to_couple;
 
-          for (unsigned int vi=0; vi<n_var; vi++)
-            {
-              // Find element dofs for variable vi
-              dof_map.dof_indices (elem, element_dofs_i, vi);
+        // Man, I wish we had guaranteed unique_ptr availability...
+        std::set<CouplingMatrix *> temporary_coupling_matrices;
+
+        dof_map.merge_ghost_functor_outputs(elements_to_couple,
+                                            temporary_coupling_matrices,
+                                            dof_map.coupling_functors_begin(),
+                                            dof_map.coupling_functors_end(),
+                                            fake_elem_it,
+                                            fake_elem_end,
+                                            DofObject::invalid_processor_id);
+
+        for (unsigned int vi=0; vi<n_var; vi++)
+          {
+            // Find element dofs for variable vi
+            dof_map.dof_indices (elem, element_dofs_i, vi);
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-              dof_map.find_connected_dofs (element_dofs_i);
+            dof_map.find_connected_dofs (element_dofs_i);
 #endif
 
-              // We can be more efficient if we sort the element DOFs
-              // into increasing order
-              std::sort(element_dofs_i.begin(), element_dofs_i.end());
+            // We can be more efficient if we sort the element DOFs
+            // into increasing order
+            std::sort(element_dofs_i.begin(), element_dofs_i.end());
 
-              GhostingFunctor::map_type::iterator        etg_it = elements_to_couple.begin();
-              const GhostingFunctor::map_type::iterator etg_end = elements_to_couple.end();
-              for (; etg_it != etg_end; ++etg_it)
-                {
-                  const Elem * const partner = etg_it->first;
-                  const CouplingMatrix *ghost_coupling = etg_it->second;
+            GhostingFunctor::map_type::iterator        etg_it = elements_to_couple.begin();
+            const GhostingFunctor::map_type::iterator etg_end = elements_to_couple.end();
+            for (; etg_it != etg_end; ++etg_it)
+              {
+                const Elem * const partner = etg_it->first;
+                const CouplingMatrix *ghost_coupling = etg_it->second;
 
-                  // Loop over coupling matrix row variables if we have a
-                  // coupling matrix, or all variables if not.
-                  if (ghost_coupling)
-                    {
-                      libmesh_assert_equal_to (ghost_coupling->size(), n_var);
-                      ConstCouplingRow ccr(vi, *ghost_coupling);
+                // Loop over coupling matrix row variables if we have a
+                // coupling matrix, or all variables if not.
+                if (ghost_coupling)
+                  {
+                    libmesh_assert_equal_to (ghost_coupling->size(), n_var);
+                    ConstCouplingRow ccr(vi, *ghost_coupling);
 
-                      for (ConstCouplingRow::const_iterator  it = ccr.begin(),
-                                                            end = ccr.end();
-                           it != end; ++it)
-                        this->handle_vi_vj(partner, element_dofs_i, *it);
-                    }
-                  else
-                    {
-                      for (unsigned int vj = 0; vj != n_var; ++vj)
-                        this->handle_vi_vj(partner, element_dofs_i, vj);
-                    }
-                } // End ghosted element loop
-            } // End vi loop
+                    for (ConstCouplingRow::const_iterator  it = ccr.begin(),
+                           end = ccr.end();
+                         it != end; ++it)
+                      this->handle_vi_vj(partner, element_dofs_i, *it);
+                  }
+                else
+                  {
+                    for (unsigned int vj = 0; vj != n_var; ++vj)
+                      this->handle_vi_vj(partner, element_dofs_i, vj);
+                  }
+              } // End ghosted element loop
+          } // End vi loop
 
-          for (std::set<CouplingMatrix*>::iterator
-                 it  = temporary_coupling_matrices.begin(),
-                 end = temporary_coupling_matrices.begin();
-               it != end; ++it)
-            delete *it;
+        for (std::set<CouplingMatrix *>::iterator
+               it  = temporary_coupling_matrices.begin(),
+               end = temporary_coupling_matrices.begin();
+             it != end; ++it)
+          delete *it;
 
-        } // End range element loop
-    } // End ghosting functor section
+      } // End range element loop
+  } // End ghosting functor section
 
   // Now a new chunk of sparsity structure is built for all of the
   // DOFs connected to our rows of the matrix.

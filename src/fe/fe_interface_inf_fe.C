@@ -430,28 +430,28 @@ Point FEInterface::ifem_map (const unsigned int dim,
                              const Elem * elem,
                              const Point & p)
 {
-   switch (fe_t.inf_map)
-   {
-      case CARTESIAN:
+  switch (fe_t.inf_map)
+    {
+    case CARTESIAN:
       {
-         switch (dim)
-         {
-         case 1:
+        switch (dim)
+          {
+          case 1:
             return InfFE<1,JACOBI_20_00,CARTESIAN>::map(elem, p);
-         case 2:
+          case 2:
             return InfFE<2,JACOBI_20_00,CARTESIAN>::map(elem, p);
-         case 3:
+          case 3:
             return InfFE<3,JACOBI_20_00,CARTESIAN>::map(elem, p);
-         default:
+          default:
             libmesh_error_msg("Invalid dim = " << dim);
-         }
+          }
       }
-      case SPHERICAL:
-      case ELLIPSOIDAL:
-         libmesh_not_implemented_msg("ERROR: Spherical and Ellipsoidal IFEMs not (yet) implemented.");
-      default:
-         libmesh_error_msg("Invalid map = " << fe_t.inf_map);
-   }
+    case SPHERICAL:
+    case ELLIPSOIDAL:
+      libmesh_not_implemented_msg("ERROR: Spherical and Ellipsoidal IFEMs not (yet) implemented.");
+    default:
+      libmesh_error_msg("Invalid map = " << fe_t.inf_map);
+    }
 }
 
 

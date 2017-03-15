@@ -146,9 +146,9 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
             // *> returning methods would be nice
             Elem * neighbor = const_cast<Elem *>(*n_it);
 
-#if defined(LIBMESH_HAVE_UNORDERED_MULTIMAP) ||   \
-  defined(LIBMESH_HAVE_TR1_UNORDERED_MULTIMAP) || \
-  defined(LIBMESH_HAVE_HASH_MULTIMAP) ||          \
+#if defined(LIBMESH_HAVE_UNORDERED_MULTIMAP) ||         \
+  defined(LIBMESH_HAVE_TR1_UNORDERED_MULTIMAP) ||       \
+  defined(LIBMESH_HAVE_HASH_MULTIMAP) ||                \
   defined(LIBMESH_HAVE_EXT_HASH_MULTIMAP)
             interior_to_boundary_map.insert(std::make_pair(neighbor, elem));
 #else

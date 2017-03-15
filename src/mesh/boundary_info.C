@@ -1948,8 +1948,9 @@ BoundaryInfo::build_node_list_from_side_list()
 
   typedef std::vector<std::pair<dof_id_type, boundary_id_type> > vec_type;
 
-  std::vector<Parallel::Request> node_pull_requests(n_proc-1),
-                                 node_response_requests(n_proc-1);
+  std::vector<Parallel::Request>
+    node_pull_requests(n_proc-1),
+    node_response_requests(n_proc-1);
 
   // Make all requests
   for (processor_id_type p = 0; p != n_proc; ++p)
