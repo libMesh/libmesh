@@ -855,7 +855,7 @@ void UNVIO::elements_in (std::istream & in_file)
       for (dof_id_type j=1; j<=n_nodes; j++)
         {
           // Map the UNV node ID to the libmesh node ID
-          std::map<unsigned, Node *>::iterator it =
+          std::map<dof_id_type, Node *>::iterator it =
             _unv_node_id_to_libmesh_node_ptr.find(node_labels[j]);
 
           if (it != _unv_node_id_to_libmesh_node_ptr.end())
@@ -1332,7 +1332,7 @@ void UNVIO::read_dataset(std::string file_name)
                 } // end loop data_cnt
 
               // Get a pointer to the Node associated with the UNV node id.
-              std::map<unsigned, Node *>::const_iterator it =
+              std::map<dof_id_type, Node *>::const_iterator it =
                 _unv_node_id_to_libmesh_node_ptr.find(f_n_id);
 
               if (it == _unv_node_id_to_libmesh_node_ptr.end())
