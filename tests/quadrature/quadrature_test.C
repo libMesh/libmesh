@@ -24,8 +24,8 @@ using namespace libMesh;
 
 #define MACROCOMMA ,
 
-#define TEST_ONE_ORDER(qtype, order, maxorder) \
-  CPPUNIT_TEST( testBuild<qtype MACROCOMMA order> ); \
+#define TEST_ONE_ORDER(qtype, order, maxorder)                          \
+  CPPUNIT_TEST( testBuild<qtype MACROCOMMA order> );                    \
   CPPUNIT_TEST( test1DWeights<qtype MACROCOMMA order MACROCOMMA maxorder> ); \
   CPPUNIT_TEST( test2DWeights<qtype MACROCOMMA order MACROCOMMA maxorder> ); \
   CPPUNIT_TEST( test3DWeights<qtype MACROCOMMA order MACROCOMMA maxorder> );
@@ -33,25 +33,25 @@ using namespace libMesh;
 // std::min isn't constexpr, and C++03 lacks constexpr anyway
 #define mymin(a, b) (a < b ? a : b)
 
-#define TEST_ALL_ORDERS(qtype, maxorder) \
-  TEST_ONE_ORDER(qtype, FIRST, mymin(1,maxorder)); \
-  TEST_ONE_ORDER(qtype, SECOND, mymin(2,maxorder)); \
-  TEST_ONE_ORDER(qtype, THIRD, mymin(3,maxorder)); \
-  TEST_ONE_ORDER(qtype, FOURTH, mymin(4,maxorder)); \
-  TEST_ONE_ORDER(qtype, FIFTH, mymin(5,maxorder)); \
-  TEST_ONE_ORDER(qtype, SIXTH, mymin(6,maxorder)); \
-  TEST_ONE_ORDER(qtype, SEVENTH, mymin(7,maxorder)); \
-  TEST_ONE_ORDER(qtype, EIGHTH, mymin(8,maxorder)); \
+#define TEST_ALL_ORDERS(qtype, maxorder)                \
+  TEST_ONE_ORDER(qtype, FIRST, mymin(1,maxorder));      \
+  TEST_ONE_ORDER(qtype, SECOND, mymin(2,maxorder));     \
+  TEST_ONE_ORDER(qtype, THIRD, mymin(3,maxorder));      \
+  TEST_ONE_ORDER(qtype, FOURTH, mymin(4,maxorder));     \
+  TEST_ONE_ORDER(qtype, FIFTH, mymin(5,maxorder));      \
+  TEST_ONE_ORDER(qtype, SIXTH, mymin(6,maxorder));      \
+  TEST_ONE_ORDER(qtype, SEVENTH, mymin(7,maxorder));    \
+  TEST_ONE_ORDER(qtype, EIGHTH, mymin(8,maxorder));     \
   TEST_ONE_ORDER(qtype, NINTH, mymin(9,maxorder));
 
-#define LIBMESH_ASSERT_REALS_EQUAL(first, second, tolerance) \
-  if (std::abs(first-second) >= tolerance) \
-    { \
-      std::cerr << "first = " << first << std::endl; \
-      std::cerr << "second = " << second << std::endl; \
-      std::cerr << "error = " << std::abs(first-second) << std::endl; \
-      std::cerr << "tolerance = " << tolerance << std::endl; \
-    } \
+#define LIBMESH_ASSERT_REALS_EQUAL(first, second, tolerance)            \
+  if (std::abs(first-second) >= tolerance)                              \
+    {                                                                   \
+      std::cerr << "first = " << first << std::endl;                    \
+      std::cerr << "second = " << second << std::endl;                  \
+      std::cerr << "error = " << std::abs(first-second) << std::endl;   \
+      std::cerr << "tolerance = " << tolerance << std::endl;            \
+    }                                                                   \
   CPPUNIT_ASSERT (std::abs(first-second) < tolerance)
 
 class QuadratureTest : public CppUnit::TestCase {
@@ -289,7 +289,9 @@ public:
                 // Compute the integral via quadrature
                 Real sumq = 0.;
                 for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-                  sumq += qrule->w(qp) * std::pow(qrule->qp(qp)(0), x_power) * std::pow(qrule->qp(qp)(1), y_power);
+                  sumq += qrule->w(qp)
+                    * std::pow(qrule->qp(qp)(0), x_power)
+                    * std::pow(qrule->qp(qp)(1), y_power);
 
                 // std::cout << "sumq = " << sumq << std::endl;
 
@@ -366,8 +368,8 @@ public:
         for (int order=0; order<10; ++order)
           {
             UniquePtr<QBase> qrule = QBase::build(qtype[qt],
-                                                /*dim=*/1,
-                                                static_cast<Order>(order));
+                                                  /*dim=*/1,
+                                                  static_cast<Order>(order));
 
             // Initialize on a 1D element, EDGE2/3/4 should not matter...
             qrule->init (EDGE2);
@@ -466,8 +468,9 @@ public:
           Real sum = 0;
 
           for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-            sum += qrule->w(qp) * std::pow(qrule->qp(qp)(0), static_cast<Real>(modex))
-                                * std::pow(qrule->qp(qp)(1), static_cast<Real>(modey));
+            sum += qrule->w(qp)
+              * std::pow(qrule->qp(qp)(0), static_cast<Real>(modex))
+              * std::pow(qrule->qp(qp)(1), static_cast<Real>(modey));
 
           const Real exactx = (modex % 2) ?
             0 : (Real(2.0) / (modex+1));
@@ -511,9 +514,10 @@ public:
             Real sum = 0;
 
             for (unsigned int qp=0; qp<qrule->n_points(); qp++)
-              sum += qrule->w(qp) * std::pow(qrule->qp(qp)(0), static_cast<Real>(modex))
-                                  * std::pow(qrule->qp(qp)(1), static_cast<Real>(modey))
-                                  * std::pow(qrule->qp(qp)(2), static_cast<Real>(modez));
+              sum += qrule->w(qp)
+                * std::pow(qrule->qp(qp)(0), static_cast<Real>(modex))
+                * std::pow(qrule->qp(qp)(1), static_cast<Real>(modey))
+                * std::pow(qrule->qp(qp)(2), static_cast<Real>(modez));
 
             const Real exactx = (modex % 2) ?
               0 : (Real(2.0) / (modex+1));

@@ -153,9 +153,9 @@ public:
     sys.add_variable("u", THIRD, HIERARCHIC);
 
     MeshTools::Generation::build_cube (mesh,
-                                      3, 3, 3,
-                                      0., 1., 0., 1., 0., 1.,
-                                      elem_type);
+                                       3, 3, 3,
+                                       0., 1., 0., 1., 0., 1.,
+                                       elem_type);
 
     es.init();
     sys.project_solution(cubic_test, NULL, es.parameters);
@@ -169,11 +169,10 @@ public:
     mesh_function_vector->init(sys.n_dofs(), false, SERIAL);
     sys.solution->localize( *mesh_function_vector );
 
-    MeshFunction mesh_function(
-      es,
-      *mesh_function_vector,
-      sys.get_dof_map(),
-      variables);
+    MeshFunction mesh_function(es,
+                               *mesh_function_vector,
+                               sys.get_dof_map(),
+                               variables);
     mesh_function.init();
 
     // Make a second system and project onto it using a MeshFunction
@@ -184,9 +183,9 @@ public:
     proj_sys.add_variable("u", SECOND, LAGRANGE);
 
     MeshTools::Generation::build_cube (proj_mesh,
-                                      5, 5, 5,
-                                      0., 1., 0., 1., 0., 1.,
-                                      elem_type);
+                                       5, 5, 5,
+                                       0., 1., 0., 1., 0., 1.,
+                                       elem_type);
 
     proj_es.init();
     proj_sys.project_solution(&mesh_function);

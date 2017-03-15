@@ -39,11 +39,11 @@ public:
     const unsigned int use_z = dim > 2;
 
     MeshTools::Generation::build_cube (*_mesh,
-                                      N, N*use_y, N*use_z,
-                                      minpos, maxpos,
-                                      minpos, use_y*maxpos,
-                                      minpos, use_z*maxpos,
-                                      elem_type);
+                                       N, N*use_y, N*use_z,
+                                       minpos, maxpos,
+                                       minpos, use_y*maxpos,
+                                       minpos, use_z*maxpos,
+                                       elem_type);
   }
 
   void tearDown()
@@ -90,22 +90,22 @@ public:
 
         CPPUNIT_ASSERT(!bbox.contains_point(wide_bbox.min()));
         CPPUNIT_ASSERT(!bbox.contains_point(wide_bbox.max()));
-    }
+      }
   }
 };
 
-#define ELEMTEST                     \
+#define ELEMTEST                                \
   CPPUNIT_TEST( test_bounding_box )
 
-#define INSTANTIATE_ELEMTEST(elemtype) \
-class ElemTest_##elemtype : public ElemTest<elemtype> { \
-public: \
-  CPPUNIT_TEST_SUITE( ElemTest_##elemtype ); \
-  ELEMTEST; \
-  CPPUNIT_TEST_SUITE_END(); \
-}; \
- \
-CPPUNIT_TEST_SUITE_REGISTRATION( ElemTest_##elemtype )
+#define INSTANTIATE_ELEMTEST(elemtype)                          \
+  class ElemTest_##elemtype : public ElemTest<elemtype> {       \
+  public:                                                       \
+  CPPUNIT_TEST_SUITE( ElemTest_##elemtype );                    \
+  ELEMTEST;                                                     \
+  CPPUNIT_TEST_SUITE_END();                                     \
+  };                                                            \
+                                                                \
+  CPPUNIT_TEST_SUITE_REGISTRATION( ElemTest_##elemtype )
 
 INSTANTIATE_ELEMTEST(EDGE2);
 INSTANTIATE_ELEMTEST(EDGE3);

@@ -73,7 +73,7 @@ class ThetaSolverTestBase : public TimeSolverTestImplementation<TimeSolverType>
 public:
   ThetaSolverTestBase()
     : TimeSolverTestImplementation<TimeSolverType>(),
-      _theta(1.0)
+    _theta(1.0)
   {}
 
 protected:

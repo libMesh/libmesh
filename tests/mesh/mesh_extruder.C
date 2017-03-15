@@ -44,10 +44,10 @@ protected:
   {
     /// The override from the base class for obtaining a new id based on the old (original) element and the specified layer
     virtual subdomain_id_type get_subdomain_for_layer(const Elem * old_elem, unsigned int layer)
-      {
-        // This method will assign an new id based on the old element and the layer
-        return old_elem->subdomain_id() + layer;
-      }
+    {
+      // This method will assign an new id based on the old element and the layer
+      return old_elem->subdomain_id() + layer;
+    }
   };
 
 public:
@@ -66,11 +66,11 @@ public:
 
     MeshTools::Generation::build_square(src_mesh, n_elems_per_side, n_elems_per_side);
     for (unsigned int i=0; i<n_elems_per_layer; ++i)
-    {
-      // Retrieve the element from the mesh by ID to guarantee proper ordering instead of with iterators
-      Elem & elem = src_mesh.elem_ref(i);
-      elem.subdomain_id() = i;
-    }
+      {
+        // Retrieve the element from the mesh by ID to guarantee proper ordering instead of with iterators
+        Elem & elem = src_mesh.elem_ref(i);
+        elem.subdomain_id() = i;
+      }
 
     ReplicatedMesh dest_mesh(*TestCommWorld, /*dim=*/3);
 
@@ -85,12 +85,12 @@ public:
     MeshTools::Generation::build_extrusion(dest_mesh, src_mesh, num_layers, extrusion_vector, &new_elem_subdomain_id);
 
     for (unsigned int i=0; i<n_elems_per_layer * num_layers; ++i)
-    {
-      // Retrieve the element from the mesh by ID to guarantee proper ordering instead of with iterators
-      Elem & elem = dest_mesh.elem_ref(i);
+      {
+        // Retrieve the element from the mesh by ID to guarantee proper ordering instead of with iterators
+        Elem & elem = dest_mesh.elem_ref(i);
 
-      CPPUNIT_ASSERT_EQUAL((unsigned int)elem.subdomain_id(), i%n_elems_per_layer + i/n_elems_per_layer /* integer division */);
-    }
+        CPPUNIT_ASSERT_EQUAL((unsigned int)elem.subdomain_id(), i%n_elems_per_layer + i/n_elems_per_layer /* integer division */);
+      }
   }
 };
 

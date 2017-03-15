@@ -8,12 +8,12 @@ class TimeSolverTestImplementation
 {
 protected:
 
-  //! Any specialized initialization that's needed for the test
+  // Any specialized initialization that's needed for the test
   virtual void aux_time_solver_init( TimeSolverType & /*time_solver*/ ){}
 
-  //! Implementation for solving ODE of SystemType
-  /*! Note this test assumes that the time integrator gets the *exact* solution
-      to within floating point tolerance. */
+  // Implementation for solving ODE of SystemType
+  // Note this test assumes that the time integrator gets the *exact* solution
+  // to within floating point tolerance.
   template<typename SystemType>
   void run_test_with_exact_soln(Real deltat, unsigned int n_timesteps)
   {
@@ -249,8 +249,8 @@ class SecondOrderScalarSystemFirstOrderTimeSolverBase : public SecondOrderScalar
 {
 public:
   SecondOrderScalarSystemFirstOrderTimeSolverBase(EquationSystems & es,
-                              const std::string & name_in,
-                              const unsigned int number_in)
+                                                  const std::string & name_in,
+                                                  const unsigned int number_in)
     : SecondOrderScalarSystemSecondOrderTimeSolverBase(es, name_in, number_in)
   {}
 

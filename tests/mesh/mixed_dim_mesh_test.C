@@ -52,23 +52,21 @@ protected:
   {
     _mesh = new ReplicatedMesh(*TestCommWorld);
 
-    /*
-      (0,1)           (1,1)
-        x---------------x
-        |               |
-        |               |
-        |               |
-        |               |
-        |               |
-        x---------------x
-       (0,0)           (1,0)
-        |               |
-        |               |
-        |               |
-        |               |
-        x---------------x
-       (0,-1)          (1,-1)
-     */
+    // (0,1)           (1,1)
+    // x---------------x
+    // |               |
+    // |               |
+    // |               |
+    // |               |
+    // |               |
+    // x---------------x
+    // (0,0)           (1,0)
+    // |               |
+    // |               |
+    // |               |
+    // |               |
+    // x---------------x
+    // (0,-1)          (1,-1)
 
     _mesh->set_mesh_dimension(2);
 
@@ -115,7 +113,7 @@ public:
   void tearDown()
   {
     delete _mesh;
-   }
+  }
 
   void testMesh()
   {
@@ -228,23 +226,19 @@ public:
 
   void setUp()
   {
-    /*
-
-        3-------10------2
-        |       |       |
-        |   5   |   6   |
-        8-------7-------9
-        |       |       |
-        |   3   |   4   |
-        0-------6-------1
-        |       |       |
-        |   9   |  10   |
-       13------12-------14
-        |       |       |
-        |   7   |   8   |
-        4-------11------5
-
-     */
+    // 3-------10------2
+    // |       |       |
+    // |   5   |   6   |
+    // 8-------7-------9
+    // |       |       |
+    // |   3   |   4   |
+    // 0-------6-------1
+    // |       |       |
+    // |   9   |  10   |
+    // 13------12-------14
+    // |       |       |
+    // |   7   |   8   |
+    // 4-------11------5
     this->build_mesh();
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -372,69 +366,66 @@ protected:
   void build_mesh()
   {
     _mesh = new ReplicatedMesh(*TestCommWorld);
-    /*
-        We start with this
-
-
-      (0,2)           (1,2)
-        4---------------5
-        |               |
-        |               |
-        |       1       |
-        |               |
-        |               |
-      (0,1)           (1,1)
-        3---------------2
-        |               |
-        |               |
-        |       0       |
-        |               |
-        |               |
-        0---------------1
-      (0,0)           (1,0)
-        |               |
-        |       2       |
-        |               |
-        |               |
-        6---------------7
-      (0,-1)          (1,-1)
-        |               |
-        |       3       |
-        |               |
-        |               |
-        9---------------8
-      (0,-2)          (1,-2)
-
-       But the single element refinement should result
-       with this for the default max_mismatch = 0 case
-
-        4---------------5
-        |               |
-        |               |
-        |       1       |
-        |               |
-        |               |
-        3------14-------2
-        |       |       |
-        |   7   |   8   |
-       12------11-------13
-        |       |       |
-        |   5   |   6   |
-        0------10-------1
-        |       |       |
-        |   11  |   12  |
-       17------16-------18
-        |       |       |
-        |   9   |   10  |
-        6------15-------7
-        |               |
-        |               |
-        |       3       |
-        |               |
-        |               |
-        9---------------8
-
-     */
+    // We start with this
+    //
+    //
+    // (0,2)           (1,2)
+    // 4---------------5
+    // |               |
+    // |               |
+    // |       1       |
+    // |               |
+    // |               |
+    // (0,1)           (1,1)
+    // 3---------------2
+    // |               |
+    // |               |
+    // |       0       |
+    // |               |
+    // |               |
+    // 0---------------1
+    // (0,0)           (1,0)
+    // |               |
+    // |       2       |
+    // |               |
+    // |               |
+    // 6---------------7
+    // (0,-1)          (1,-1)
+    // |               |
+    // |       3       |
+    // |               |
+    // |               |
+    // 9---------------8
+    // (0,-2)          (1,-2)
+    //
+    // But the single element refinement should result
+    // with this for the default max_mismatch = 0 case
+    //
+    // 4---------------5
+    // |               |
+    // |               |
+    // |       1       |
+    // |               |
+    // |               |
+    // 3------14-------2
+    // |       |       |
+    // |   7   |   8   |
+    // 12------11-------13
+    // |       |       |
+    // |   5   |   6   |
+    // 0------10-------1
+    // |       |       |
+    // |   11  |   12  |
+    // 17------16-------18
+    // |       |       |
+    // |   9   |   10  |
+    // 6------15-------7
+    // |               |
+    // |               |
+    // |       3       |
+    // |               |
+    // |               |
+    // 9---------------8
 
     _mesh->set_mesh_dimension(2);
 
@@ -727,7 +718,7 @@ public:
   void tearDown()
   {
     delete _mesh;
-   }
+  }
 
   void testMesh()
   {
@@ -886,25 +877,25 @@ protected:
     _mesh->set_mesh_dimension(3);
 
     //Add the nodes
-    for(unsigned int z = 0; z < 5; z++)
-    {
-        for(unsigned int y = 0; y < 4; y++)
-        {
-             for(unsigned int x = 0; x < 4; x++)
-             {
-                 _mesh->add_point( Point(Real(x),Real(y),Real(z)), 16*z+4*y+x);
-             }
-        }
-    }
+    for (unsigned int z = 0; z < 5; z++)
+      {
+        for (unsigned int y = 0; y < 4; y++)
+          {
+            for (unsigned int x = 0; x < 4; x++)
+              {
+                _mesh->add_point( Point(Real(x),Real(y),Real(z)), 16*z+4*y+x);
+              }
+          }
+      }
 
     {
       //Add the HEX8 elements
-      for(unsigned int z = 0; z < 4; z++)
-      {
-          for(unsigned int y = 0; y < 3; y++)
-          {
-              for(unsigned int x = 0; x < 3; x++)
-              {
+      for (unsigned int z = 0; z < 4; z++)
+        {
+          for (unsigned int y = 0; y < 3; y++)
+            {
+              for (unsigned int x = 0; x < 3; x++)
+                {
                   Elem* hex = _mesh->add_elem( new Hex8 );
                   hex->set_node(0) = _mesh->node_ptr(x+4*y    +16*z        );
                   hex->set_node(1) = _mesh->node_ptr(x+4*y    +16*z     + 1);
@@ -914,9 +905,9 @@ protected:
                   hex->set_node(5) = _mesh->node_ptr(x+4*y    +16*(z+1) + 1);
                   hex->set_node(6) = _mesh->node_ptr(x+4*(y+1)+16*(z+1) + 1);
                   hex->set_node(7) = _mesh->node_ptr(x+4*(y+1)+16*(z+1)    );
-              }
-          }
-      }
+                }
+            }
+        }
       Elem* quad = _mesh->add_elem( new Quad4 );
       unsigned int x=1,y=1,z=2;
       quad->set_node(0) = _mesh->node_ptr(x+4*y    +16*z    );

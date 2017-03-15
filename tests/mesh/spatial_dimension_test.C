@@ -120,17 +120,17 @@ public:
                                          QUAD4);
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), mesh.spatial_dimension());
 
-   // 2.) Move the nodes in the z-direction, test that spatial_dimension==3
-   // The spatial dimension is updated during prepare_for_use().
+    // 2.) Move the nodes in the z-direction, test that spatial_dimension==3
+    // The spatial dimension is updated during prepare_for_use().
     {
-     MeshBase::node_iterator node_it  = mesh.nodes_begin();
-     MeshBase::node_iterator node_end = mesh.nodes_end();
+      MeshBase::node_iterator node_it  = mesh.nodes_begin();
+      MeshBase::node_iterator node_end = mesh.nodes_end();
 
-     for (; node_it != node_end; ++node_it)
-       {
-         Node & node = **node_it;
-         node(2) = node(0)*node(0) + node(1)*node(1);
-       }
+      for (; node_it != node_end; ++node_it)
+        {
+          Node & node = **node_it;
+          node(2) = node(0)*node(0) + node(1)*node(1);
+        }
     }
 
     mesh.prepare_for_use();
