@@ -4,7 +4,7 @@ install_dir   = $(examples_install_path)/fem_system/ex3
 data          = fem_system_ex3.C fem_system_ex3.in elasticity_system.C elasticity_system.h run.sh
 sources       = $(data) run.sh
 
-CLEANFILES = out.e*
+CLEANFILES = out.e* out.newmark.* out.steady.*
 
 # also need to link files for VPATH builds
 if LIBMESH_VPATH_BUILD
