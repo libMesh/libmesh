@@ -805,8 +805,8 @@ void System::read_serialized_data (Xdr & io,
           // asked to and if we have a corresponding vector to read.
 
           // total_read_size +=
-          this->read_serialized_vector<InValType>(io,
-            (read_additional_data && nvecs) ? pos->second : libmesh_nullptr);
+          this->read_serialized_vector<InValType>
+            (io, (read_additional_data && nvecs) ? pos->second : libmesh_nullptr);
 
           // get the comment
           if (this->processor_id() == 0)

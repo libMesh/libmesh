@@ -21,9 +21,9 @@
 
 #include <vector>
 
-#define FETEST                   \
-  CPPUNIT_TEST( testU );         \
-  CPPUNIT_TEST( testGradU );     \
+#define FETEST                                  \
+  CPPUNIT_TEST( testU );                        \
+  CPPUNIT_TEST( testGradU );                    \
   CPPUNIT_TEST( testGradUComp );
 
 using namespace libMesh;
@@ -79,9 +79,9 @@ public:
     const unsigned int nz = _dim > 2;
 
     MeshTools::Generation::build_cube (*_mesh,
-                                      1, ny, nz,
-                                      0., 1., 0., ny, 0., nz,
-                                      elem_type);
+                                       1, ny, nz,
+                                       0., 1., 0., ny, 0., nz,
+                                       elem_type);
 
     _es = new EquationSystems(*_mesh);
     _sys = &(_es->add_system<System> ("SimpleSystem"));
@@ -150,8 +150,7 @@ public:
 
             Number u = 0;
             for (std::size_t d = 0; d != _dof_indices.size(); ++d)
-              u += _fe->get_phi()[d][0] *
-                   (*_sys->current_local_solution)(_dof_indices[d]);
+              u += _fe->get_phi()[d][0] * (*_sys->current_local_solution)(_dof_indices[d]);
 
             CPPUNIT_ASSERT_DOUBLES_EQUAL
               (libmesh_real(u),
@@ -185,20 +184,16 @@ public:
 
             Gradient grad_u = 0;
             for (std::size_t d = 0; d != _dof_indices.size(); ++d)
-              grad_u += _fe->get_dphi()[d][0] *
-                        (*_sys->current_local_solution)(_dof_indices[d]);
+              grad_u += _fe->get_dphi()[d][0] * (*_sys->current_local_solution)(_dof_indices[d]);
 
-            CPPUNIT_ASSERT_DOUBLES_EQUAL
-              (libmesh_real(grad_u(0)), 1.0,
-               TOLERANCE*sqrt(TOLERANCE));
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(grad_u(0)), 1.0,
+                                         TOLERANCE*sqrt(TOLERANCE));
             if (_dim > 1)
-              CPPUNIT_ASSERT_DOUBLES_EQUAL
-                (libmesh_real(grad_u(1)), 0.25,
-                 TOLERANCE*sqrt(TOLERANCE));
+              CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(grad_u(1)), 0.25,
+                                           TOLERANCE*sqrt(TOLERANCE));
             if (_dim > 2)
-              CPPUNIT_ASSERT_DOUBLES_EQUAL
-                (libmesh_real(grad_u(2)), 0.0625,
-                 TOLERANCE*sqrt(TOLERANCE));
+              CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(grad_u(2)), 0.0625,
+                                           TOLERANCE*sqrt(TOLERANCE));
           }
   }
 
@@ -228,29 +223,23 @@ public:
             Number grad_u_x = 0, grad_u_y = 0, grad_u_z = 0;
             for (std::size_t d = 0; d != _dof_indices.size(); ++d)
               {
-                grad_u_x += _fe->get_dphidx()[d][0] *
-                            (*_sys->current_local_solution)(_dof_indices[d]);
+                grad_u_x += _fe->get_dphidx()[d][0] * (*_sys->current_local_solution)(_dof_indices[d]);
 #if LIBMESH_DIM > 1
-                grad_u_y += _fe->get_dphidy()[d][0] *
-                            (*_sys->current_local_solution)(_dof_indices[d]);
+                grad_u_y += _fe->get_dphidy()[d][0] * (*_sys->current_local_solution)(_dof_indices[d]);
 #endif
 #if LIBMESH_DIM > 2
-                grad_u_z += _fe->get_dphidz()[d][0] *
-                            (*_sys->current_local_solution)(_dof_indices[d]);
+                grad_u_z += _fe->get_dphidz()[d][0] * (*_sys->current_local_solution)(_dof_indices[d]);
 #endif
               }
 
-            CPPUNIT_ASSERT_DOUBLES_EQUAL
-              (libmesh_real(grad_u_x), 1.0,
-               TOLERANCE*sqrt(TOLERANCE));
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(grad_u_x), 1.0,
+                                         TOLERANCE*sqrt(TOLERANCE));
             if (_dim > 1)
-              CPPUNIT_ASSERT_DOUBLES_EQUAL
-                (libmesh_real(grad_u_y), 0.25,
-                 TOLERANCE*sqrt(TOLERANCE));
+              CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(grad_u_y), 0.25,
+                                           TOLERANCE*sqrt(TOLERANCE));
             if (_dim > 2)
-              CPPUNIT_ASSERT_DOUBLES_EQUAL
-                (libmesh_real(grad_u_z), 0.0625,
-                 TOLERANCE*sqrt(TOLERANCE));
+              CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(grad_u_z), 0.0625,
+                                           TOLERANCE*sqrt(TOLERANCE));
           }
   }
 
@@ -264,14 +253,14 @@ public:
 // related header that our including code sees.
 #include <libmesh/ignore_warnings.h>
 
-#define INSTANTIATE_FETEST(order, family, elemtype) \
-class FETest_##order##_##family##_##elemtype : public FETest<order, family, elemtype> { \
-public: \
-  CPPUNIT_TEST_SUITE( FETest_##order##_##family##_##elemtype ); \
-  FETEST \
-  CPPUNIT_TEST_SUITE_END(); \
-}; \
- \
-CPPUNIT_TEST_SUITE_REGISTRATION( FETest_##order##_##family##_##elemtype );
+#define INSTANTIATE_FETEST(order, family, elemtype)                     \
+  class FETest_##order##_##family##_##elemtype : public FETest<order, family, elemtype> { \
+  public:                                                               \
+  CPPUNIT_TEST_SUITE( FETest_##order##_##family##_##elemtype );         \
+  FETEST                                                                \
+  CPPUNIT_TEST_SUITE_END();                                             \
+  };                                                                    \
+                                                                        \
+  CPPUNIT_TEST_SUITE_REGISTRATION( FETest_##order##_##family##_##elemtype );
 
 #endif // #ifdef __fe_test_h__

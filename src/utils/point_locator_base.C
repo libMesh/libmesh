@@ -100,17 +100,17 @@ void PointLocatorBase::unset_close_to_point_tol ()
 
 
 const Node *
-PointLocatorBase::locate_node
-  (const Point & p,
-   const std::set<subdomain_id_type> * allowed_subdomains,
-   Real tol) const
+PointLocatorBase::
+locate_node(const Point & p,
+            const std::set<subdomain_id_type> * allowed_subdomains,
+            Real tol) const
 {
   std::set<const Elem *> candidate_elements;
   this->operator()(p, candidate_elements, allowed_subdomains);
 
   for (std::set<const Elem *>::const_iterator
          it = candidate_elements.begin();
-         it != candidate_elements.end(); ++it)
+       it != candidate_elements.end(); ++it)
     {
       const Elem * elem = *it;
       const int elem_n_nodes = elem->n_nodes();

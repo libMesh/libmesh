@@ -78,23 +78,21 @@ protected:
   {
     _mesh = new ReplicatedMesh(*TestCommWorld);
 
-    /*
-      (0,1)           (1,1)
-        x---------------x
-        |               |
-        |               |
-        |               |
-        |               |
-        |               |
-        x---------------x
-       (0,0)           (1,0)
-        |               |
-        |               |
-        |               |
-        |               |
-        x---------------x
-       (0,-1)          (1,-1)
-     */
+    // (0,1)           (1,1)
+    // x---------------x
+    // |               |
+    // |               |
+    // |               |
+    // |               |
+    // |               |
+    // x---------------x
+    // (0,0)           (1,0)
+    // |               |
+    // |               |
+    // |               |
+    // |               |
+    // x---------------x
+    // (0,-1)          (1,-1)
 
     _mesh->set_mesh_dimension(2);
 
@@ -161,11 +159,11 @@ public:
     CPPUNIT_ASSERT (face_cand.size() == 2);
     int array[2] = {0, 0};
     for (std::set<const Elem *>::iterator it = face_cand.begin(); it != face_cand.end(); ++it)
-    {
-      // first test that array entry hasn't been set before
-      CPPUNIT_ASSERT (array[(*it)->id()] == 0);
-      array[(*it)->id()] = 1;
-    }
+      {
+        // first test that array entry hasn't been set before
+        CPPUNIT_ASSERT (array[(*it)->id()] == 0);
+        array[(*it)->id()] = 1;
+      }
     CPPUNIT_ASSERT (array[0] == 1);
     CPPUNIT_ASSERT (array[1] == 1);
   }

@@ -33,13 +33,13 @@ private:
     ADTest(const std::string & _func,
            double _min, double _max, double _dx = 1e-6,
            double _reltol = 1e-5, int _steps = 20, double _abstol = 1e-10) :
-        func(_func),
-        min(_min),
-        max(_max),
-        dx(_dx),
-        reltol(_reltol),
-        abstol(_abstol),
-        steps(_steps)
+      func(_func),
+      min(_min),
+      max(_max),
+      dx(_dx),
+      reltol(_reltol),
+      abstol(_abstol),
+      steps(_steps)
     {
       CPPUNIT_ASSERT_MESSAGE ("Failed to parse test function", F.Parse(func, "x") == -1);
       dF.Parse(func, "x");
@@ -59,37 +59,37 @@ private:
     {
       double x1, x2, vdF, vF1, vF2, fd;
       for (double x = min; x <= max; x += (max-min) / double(steps))
-      {
-        x1 = x - dx/2.0;
-        x2 = x + dx/2.0;
-
-        vF1 = F.Eval(&x1);
-        vF2 = F.Eval(&x2);
-        fd = (vF2-vF1) / dx;
-
-        // CPPUNIT_ASSERT(std::abs(fd - vdF) > tol)
-        // CPPUNIT_ASSERT(std::abs(fd - vdFopt) > tol)
-        vdF = dF.Eval(&x);
-        if (std::abs(vdF) > abstol && std::abs((fd - vdF)/vdF) > reltol && std::abs(fd - vdF)> abstol)
         {
-          std::cout << "Error in " << func << ": " << fd << "!=" << vdF << " at x=" << x << '\n';
-          return false;
-        }
+          x1 = x - dx/2.0;
+          x2 = x + dx/2.0;
 
-        vdF = dFopt.Eval(&x);
-        if (std::abs(vdF) > abstol && std::abs((fd - vdF)/vdF) > reltol && std::abs(fd - vdF)> abstol)
-        {
-          std::cout << "Error in opt " << func << ": " << fd << "!=" << vdF << " at x=" << x << '\n';
-          return false;
-        }
+          vF1 = F.Eval(&x1);
+          vF2 = F.Eval(&x2);
+          fd = (vF2-vF1) / dx;
 
-        vdF = dFaopt.Eval(&x);
-        if (std::abs(vdF) > abstol && std::abs((fd - vdF)/vdF) > reltol && std::abs(fd - vdF)> abstol)
-        {
-          std::cout << "Error in auto opt " << func << ": " << fd << "!=" << vdF << " at x=" << x << '\n';
-          return false;
+          // CPPUNIT_ASSERT(std::abs(fd - vdF) > tol)
+          // CPPUNIT_ASSERT(std::abs(fd - vdFopt) > tol)
+          vdF = dF.Eval(&x);
+          if (std::abs(vdF) > abstol && std::abs((fd - vdF)/vdF) > reltol && std::abs(fd - vdF)> abstol)
+            {
+              std::cout << "Error in " << func << ": " << fd << "!=" << vdF << " at x=" << x << '\n';
+              return false;
+            }
+
+          vdF = dFopt.Eval(&x);
+          if (std::abs(vdF) > abstol && std::abs((fd - vdF)/vdF) > reltol && std::abs(fd - vdF)> abstol)
+            {
+              std::cout << "Error in opt " << func << ": " << fd << "!=" << vdF << " at x=" << x << '\n';
+              return false;
+            }
+
+          vdF = dFaopt.Eval(&x);
+          if (std::abs(vdF) > abstol && std::abs((fd - vdF)/vdF) > reltol && std::abs(fd - vdF)> abstol)
+            {
+              std::cout << "Error in auto opt " << func << ": " << fd << "!=" << vdF << " at x=" << x << '\n';
+              return false;
+            }
         }
-      }
 
       return true;
     }
@@ -173,11 +173,11 @@ public:
     for (x = -1.0; x < 1.0; x+=0.3726)
       for (a = -1.0; a < 1.0; a+=0.2642)
         for (y = -1.0; y < 1.0; y+=0.3156)
-        {
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(R.Eval(p), x*a, 1.e-12);
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(dR.Eval(p), a+x*y, 1.e-12);
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(d2R.Eval(p), 2*y, 1.e-12);
-        }
+          {
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(R.Eval(p), x*a, 1.e-12);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(dR.Eval(p), a+x*y, 1.e-12);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(d2R.Eval(p), 2*y, 1.e-12);
+          }
   }
 };
 

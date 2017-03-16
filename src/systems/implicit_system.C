@@ -195,10 +195,10 @@ void ImplicitSystem::assemble ()
   libmesh_assert (rhs->initialized());
 
   if (zero_out_matrix_and_rhs)
-  {
-    matrix->zero ();
-    rhs->zero ();
-  }
+    {
+      matrix->zero ();
+      rhs->zero ();
+    }
 
   // Call the base class assemble function
   Parent::assemble ();

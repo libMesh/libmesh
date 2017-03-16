@@ -216,9 +216,9 @@ void tetrahedralize_domain(const Parallel::Communicator & comm)
   // In optimized mode, only switch Q (quiet) is set.
   // For more options, see tetgen website:
   // (http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual005.html#cmd-m)
-  #ifdef DEBUG
+#ifdef DEBUG
   t.set_switches("VCC");
-  #endif
+#endif
   t.triangulate_conformingDelaunayMesh_carvehole(hole,
                                                  quality_constraint,
                                                  volume_constraint);

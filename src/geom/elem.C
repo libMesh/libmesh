@@ -1774,13 +1774,14 @@ void Elem::family_tree_by_subneighbor (std::vector<const Elem *> & family,
 
 
 
-void Elem::active_family_tree_by_topological_neighbor
-  (std::vector<const Elem *> & family,
-   const Elem * neighbor_in,
-   const MeshBase & mesh,
-   const PointLocatorBase & point_locator,
-   const PeriodicBoundaries * pb,
-   const bool reset) const
+void
+Elem::
+active_family_tree_by_topological_neighbor(std::vector<const Elem *> & family,
+                                           const Elem * neighbor_in,
+                                           const MeshBase & mesh,
+                                           const PointLocatorBase & point_locator,
+                                           const PeriodicBoundaries * pb,
+                                           const bool reset) const
 {
   // The "family tree" doesn't include subactive elements or
   // remote_elements
@@ -1794,8 +1795,10 @@ void Elem::active_family_tree_by_topological_neighbor
   // This only makes sense if we're already a topological neighbor
 #ifndef NDEBUG
   if (this->level() >= neighbor_in->level())
-    libmesh_assert (this->has_topological_neighbor
-                      (neighbor_in, mesh, point_locator, pb));
+    libmesh_assert (this->has_topological_neighbor(neighbor_in,
+                                                   mesh,
+                                                   point_locator,
+                                                   pb));
 #endif
 
   // Add an active element to the family tree.
@@ -1809,8 +1812,10 @@ void Elem::active_family_tree_by_topological_neighbor
       {
         const Elem * current_child = this->child_ptr(c);
         if (current_child != remote_elem &&
-            current_child->has_topological_neighbor
-              (neighbor_in, mesh, point_locator, pb))
+            current_child->has_topological_neighbor(neighbor_in,
+                                                    mesh,
+                                                    point_locator,
+                                                    pb))
           current_child->active_family_tree_by_topological_neighbor
             (family, neighbor_in, mesh, point_locator, pb, false);
       }

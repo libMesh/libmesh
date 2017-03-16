@@ -46,8 +46,7 @@ public:
 
   virtual Number operator() (const FEMContext & c,
                              const Point & p,
-                             const Real /*time*/ = 0.)
-  libmesh_override
+                             const Real /*time*/ = 0.) libmesh_override
   {
     const Real & x = p(0);
     const Real & y = p(1);
@@ -60,8 +59,7 @@ public:
   virtual void operator() (const FEMContext & c,
                            const Point & p,
                            const Real time,
-                           DenseVector<Number> & output)
-  libmesh_override
+                           DenseVector<Number> & output) libmesh_override
   {
     for (unsigned int i=0; i != output.size(); ++i)
       output(i) = (*this)(c, p, time);
@@ -94,23 +92,21 @@ protected:
   {
     _mesh = new Mesh(*TestCommWorld);
 
-    /*
-      (0,1)           (1,1)           (2,1)
-        x---------------x---------------x
-        |               |               |
-        |               |               |
-        |               |               |
-        |               |               |
-        |               |               |
-        x---------------x---------------x
-       (0,0)           (1,0)          (2,0)
-        |               |               |
-        |               |               |
-        |               |               |
-        |               |               |
-        x---------------x---------------x
-       (0,-1)          (1,-1)         (2,-1)
-     */
+    // (0,1)           (1,1)           (2,1)
+    // x---------------x---------------x
+    // |               |               |
+    // |               |               |
+    // |               |               |
+    // |               |               |
+    // |               |               |
+    // x---------------x---------------x
+    // (0,0)           (1,0)          (2,0)
+    // |               |               |
+    // |               |               |
+    // |               |               |
+    // |               |               |
+    // x---------------x---------------x
+    // (0,-1)          (1,-1)         (2,-1)
 
     _mesh->set_mesh_dimension(2);
 

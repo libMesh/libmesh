@@ -617,28 +617,25 @@ void DofMap::reinit(MeshBase & mesh)
           if (elem->p_level() + base_fe_type.order >
               FEInterface::max_order(base_fe_type, type))
             {
-              libmesh_assert_less_msg
-                (static_cast<unsigned int>
-                   (base_fe_type.order.get_order()),
-                 FEInterface::max_order(base_fe_type,type),
-                 "ERROR: Finite element "
-                  << Utility::enum_to_string(base_fe_type.family)
-                  << " on geometric element "
-                  << Utility::enum_to_string(type)
-                  << "\nonly supports FEInterface::max_order = "
-                  << FEInterface::max_order(base_fe_type,type)
-                  << ", not fe_type.order = "
-                  << base_fe_type.order);
+              libmesh_assert_less_msg(static_cast<unsigned int>(base_fe_type.order.get_order()),
+                                      FEInterface::max_order(base_fe_type,type),
+                                      "ERROR: Finite element "
+                                      << Utility::enum_to_string(base_fe_type.family)
+                                      << " on geometric element "
+                                      << Utility::enum_to_string(type)
+                                      << "\nonly supports FEInterface::max_order = "
+                                      << FEInterface::max_order(base_fe_type,type)
+                                      << ", not fe_type.order = "
+                                      << base_fe_type.order);
 
 #  ifdef DEBUG
-              libMesh::err
-                << "WARNING: Finite element "
-                << Utility::enum_to_string(base_fe_type.family)
-                << " on geometric element "
-                << Utility::enum_to_string(type) << std::endl
-                << "could not be p refined past FEInterface::max_order = "
-                << FEInterface::max_order(base_fe_type,type)
-                << std::endl;
+              libMesh::err << "WARNING: Finite element "
+                           << Utility::enum_to_string(base_fe_type.family)
+                           << " on geometric element "
+                           << Utility::enum_to_string(type) << std::endl
+                           << "could not be p refined past FEInterface::max_order = "
+                           << FEInterface::max_order(base_fe_type,type)
+                           << std::endl;
 #  endif
               elem->set_p_level(FEInterface::max_order(base_fe_type,type)
                                 - base_fe_type.order);
@@ -852,42 +849,41 @@ void DofMap::clear()
 
   // Reset ghosting functor statuses
   {
-  std::set<GhostingFunctor *>::iterator        gf_it = this->coupling_functors_begin();
-  const std::set<GhostingFunctor *>::iterator gf_end = this->coupling_functors_end();
-  for (; gf_it != gf_end; ++gf_it)
-    {
-      GhostingFunctor *gf = *gf_it;
-      libmesh_assert(gf);
-      _mesh.remove_ghosting_functor(*gf);
-    }
-  this->_coupling_functors.clear();
+    std::set<GhostingFunctor *>::iterator        gf_it = this->coupling_functors_begin();
+    const std::set<GhostingFunctor *>::iterator gf_end = this->coupling_functors_end();
+    for (; gf_it != gf_end; ++gf_it)
+      {
+        GhostingFunctor * gf = *gf_it;
+        libmesh_assert(gf);
+        _mesh.remove_ghosting_functor(*gf);
+      }
+    this->_coupling_functors.clear();
 
-  // Go back to default coupling
+    // Go back to default coupling
 
-  _default_coupling->set_dof_coupling(this->_dof_coupling);
-  _default_coupling->set_n_levels
-    (this->use_coupled_neighbor_dofs(this->_mesh));
+    _default_coupling->set_dof_coupling(this->_dof_coupling);
+    _default_coupling->set_n_levels(this->use_coupled_neighbor_dofs(this->_mesh));
 
-  this->add_coupling_functor(*_default_coupling);
+    this->add_coupling_functor(*_default_coupling);
   }
 
 
   {
-  std::set<GhostingFunctor *>::iterator        gf_it = this->algebraic_ghosting_functors_begin();
-  const std::set<GhostingFunctor *>::iterator gf_end = this->algebraic_ghosting_functors_end();
-  for (; gf_it != gf_end; ++gf_it)
-    {
-      GhostingFunctor *gf = *gf_it;
-      libmesh_assert(gf);
-      _mesh.remove_ghosting_functor(*gf);
-    }
-  this->_algebraic_ghosting_functors.clear();
+    std::set<GhostingFunctor *>::iterator        gf_it = this->algebraic_ghosting_functors_begin();
+    const std::set<GhostingFunctor *>::iterator gf_end = this->algebraic_ghosting_functors_end();
+    for (; gf_it != gf_end; ++gf_it)
+      {
+        GhostingFunctor * gf = *gf_it;
+        libmesh_assert(gf);
+        _mesh.remove_ghosting_functor(*gf);
+      }
+    this->_algebraic_ghosting_functors.clear();
 
-  // Go back to default send_list generation
+    // Go back to default send_list generation
 
-  // _default_evaluating->set_dof_coupling(this->_dof_coupling);
-  _default_evaluating->set_n_levels(1);
-  this->add_algebraic_ghosting_functor(*_default_evaluating);
+    // _default_evaluating->set_dof_coupling(this->_dof_coupling);
+    _default_evaluating->set_n_levels(1);
+    this->add_algebraic_ghosting_functor(*_default_evaluating);
   }
 
   _variables.clear();
@@ -1078,7 +1074,7 @@ void DofMap::distribute_dofs (MeshBase & mesh)
     const std::set<GhostingFunctor *>::iterator gf_end = this->algebraic_ghosting_functors_end();
     for (; gf_it != gf_end; ++gf_it)
       {
-        GhostingFunctor *gf = *gf_it;
+        GhostingFunctor * gf = *gf_it;
         libmesh_assert(gf);
         gf->dofmap_reinit();
       }
@@ -1089,7 +1085,7 @@ void DofMap::distribute_dofs (MeshBase & mesh)
     const std::set<GhostingFunctor *>::iterator gf_end = this->coupling_functors_end();
     for (; gf_it != gf_end; ++gf_it)
       {
-        GhostingFunctor *gf = *gf_it;
+        GhostingFunctor * gf = *gf_it;
         libmesh_assert(gf);
         gf->dofmap_reinit();
       }
@@ -1495,21 +1491,22 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
 
 
 
-void DofMap::merge_ghost_functor_outputs
-  (GhostingFunctor::map_type & elements_to_ghost,
-   std::set<CouplingMatrix*> & temporary_coupling_matrices,
-   const std::set<GhostingFunctor *>::iterator & gf_begin,
-   const std::set<GhostingFunctor *>::iterator & gf_end,
-   const MeshBase::const_element_iterator & elems_begin,
-   const MeshBase::const_element_iterator & elems_end,
-   processor_id_type p)
+void
+DofMap::
+merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
+                            std::set<CouplingMatrix *> & temporary_coupling_matrices,
+                            const std::set<GhostingFunctor *>::iterator & gf_begin,
+                            const std::set<GhostingFunctor *>::iterator & gf_end,
+                            const MeshBase::const_element_iterator & elems_begin,
+                            const MeshBase::const_element_iterator & elems_end,
+                            processor_id_type p)
 {
   std::set<GhostingFunctor *>::iterator gf_it = gf_begin;
   for (; gf_it != gf_end; ++gf_it)
     {
       GhostingFunctor::map_type more_elements_to_ghost;
 
-      GhostingFunctor *gf = *gf_it;
+      GhostingFunctor * gf = *gf_it;
       libmesh_assert(gf);
       (*gf)(elems_begin, elems_end, p, more_elements_to_ghost);
 
@@ -1531,15 +1528,13 @@ void DofMap::merge_ghost_functor_outputs
                       // then we need to make one so we'll
                       // have a non-const matrix to merge
                       if (temporary_coupling_matrices.empty() ||
-                          temporary_coupling_matrices.find
-                            (const_cast<CouplingMatrix*>(existing_it->second)) ==
-                          temporary_coupling_matrices.end())
+                          temporary_coupling_matrices.find(const_cast<CouplingMatrix *>(existing_it->second)) == temporary_coupling_matrices.end())
                         {
-                          CouplingMatrix *cm = new CouplingMatrix(*existing_it->second);
+                          CouplingMatrix * cm = new CouplingMatrix(*existing_it->second);
                           temporary_coupling_matrices.insert(cm);
                           existing_it->second = cm;
                         }
-                      const_cast<CouplingMatrix&>(*existing_it->second) &= *metg_it->second;
+                      const_cast<CouplingMatrix &>(*existing_it->second) &= *metg_it->second;
                     }
                   else
                     {
@@ -1551,11 +1546,9 @@ void DofMap::merge_ghost_functor_outputs
                       // we don't need it anymore; we might as well
                       // remove it to keep the set of temporaries
                       // small.
-                      std::set<CouplingMatrix*>::iterator temp_it =
-                        temporary_coupling_matrices.find
-                          (const_cast<CouplingMatrix*>(existing_it->second));
-                      if (temp_it !=
-                          temporary_coupling_matrices.end())
+                      std::set<CouplingMatrix *>::iterator temp_it =
+                        temporary_coupling_matrices.find(const_cast<CouplingMatrix *>(existing_it->second));
+                      if (temp_it != temporary_coupling_matrices.end())
                         temporary_coupling_matrices.erase(temp_it);
 
                       existing_it->second = libmesh_nullptr;
@@ -1585,29 +1578,27 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
   GhostingFunctor::map_type elements_to_send;
 
   // Man, I wish we had guaranteed unique_ptr availability...
-  std::set<CouplingMatrix*> temporary_coupling_matrices;
+  std::set<CouplingMatrix *> temporary_coupling_matrices;
 
   // We need to add dofs to the send list if they've been directly
   // requested by an algebraic ghosting functor or they've been
   // indirectly requested by a coupling functor.
-  this->merge_ghost_functor_outputs
-    (elements_to_send,
-     temporary_coupling_matrices,
-     this->algebraic_ghosting_functors_begin(),
-     this->algebraic_ghosting_functors_end(),
-     local_elem_it, local_elem_end, mesh.processor_id());
+  this->merge_ghost_functor_outputs(elements_to_send,
+                                    temporary_coupling_matrices,
+                                    this->algebraic_ghosting_functors_begin(),
+                                    this->algebraic_ghosting_functors_end(),
+                                    local_elem_it, local_elem_end, mesh.processor_id());
 
-  this->merge_ghost_functor_outputs
-    (elements_to_send,
-     temporary_coupling_matrices,
-     this->coupling_functors_begin(),
-     this->coupling_functors_end(),
-     local_elem_it, local_elem_end, mesh.processor_id());
+  this->merge_ghost_functor_outputs(elements_to_send,
+                                    temporary_coupling_matrices,
+                                    this->coupling_functors_begin(),
+                                    this->coupling_functors_end(),
+                                    local_elem_it, local_elem_end, mesh.processor_id());
 
   // Making a list of non-zero coupling matrix columns is an
   // O(N_var^2) operation.  We cache it so we only have to do it once
   // per CouplingMatrix and not once per element.
-  std::map<const CouplingMatrix*, std::vector<unsigned int> >
+  std::map<const CouplingMatrix *, std::vector<unsigned int> >
     column_variable_lists;
 
   GhostingFunctor::map_type::iterator        etg_it = elements_to_send.begin();
@@ -1620,7 +1611,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
       libmesh_assert_not_equal_to
         (partner->processor_id(), this->processor_id());
 
-      const CouplingMatrix *ghost_coupling = etg_it->second;
+      const CouplingMatrix * ghost_coupling = etg_it->second;
 
       // Loop over any present coupling matrix column variables if we
       // have a coupling matrix, or just add all variables to
@@ -1630,23 +1621,15 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
           libmesh_assert_equal_to (ghost_coupling->size(), n_var);
 
           // Try to find a cached list of column variables.
-          std::map<const CouplingMatrix*,
-                   std::vector<unsigned int> >::const_iterator
-            column_variable_list =
-              column_variable_lists.find(ghost_coupling);
+          std::map<const CouplingMatrix *, std::vector<unsigned int> >::const_iterator
+            column_variable_list = column_variable_lists.find(ghost_coupling);
 
           // If we didn't find it, then we need to create it.
           if (column_variable_list == column_variable_lists.end())
             {
-              std::pair<
-                std::map<const CouplingMatrix*,
-                         std::vector<unsigned int> >::iterator,
-                bool>
-                inserted_variable_list_pair =
-                column_variable_lists.insert
-                  (std::pair<const CouplingMatrix*,
-                             std::vector<unsigned int> >
-                    (ghost_coupling, std::vector<unsigned int>()));
+              std::pair<std::map<const CouplingMatrix *, std::vector<unsigned int> >::iterator, bool>
+                inserted_variable_list_pair = column_variable_lists.insert(std::make_pair(ghost_coupling,
+                                                                                          std::vector<unsigned int>()));
               column_variable_list = inserted_variable_list_pair.first;
 
               std::vector<unsigned int> & new_variable_list =
@@ -1658,8 +1641,9 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
                 {
                   ConstCouplingRow ccr(vi, *ghost_coupling);
 
-                  for (ConstCouplingRow::const_iterator  it = ccr.begin(),
-                                                        end = ccr.end();
+                  for (ConstCouplingRow::const_iterator
+                         it = ccr.begin(),
+                         end = ccr.end();
                        it != end; ++it)
                     {
                       const unsigned int vj = *it;
@@ -1705,7 +1689,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
     }
 
   // We're now done with any merged coupling matrices we had to create.
-  for (std::set<CouplingMatrix*>::iterator
+  for (std::set<CouplingMatrix *>::iterator
          it  = temporary_coupling_matrices.begin(),
          end = temporary_coupling_matrices.begin();
        it != end; ++it)
@@ -1894,8 +1878,8 @@ void DofMap::clear_sparsity()
 
 
 
-void DofMap::add_coupling_functor
-  (GhostingFunctor & coupling_functor)
+void
+DofMap::add_coupling_functor(GhostingFunctor & coupling_functor)
 {
   _coupling_functors.insert(&coupling_functor);
   _mesh.add_ghosting_functor(coupling_functor);
@@ -1903,8 +1887,8 @@ void DofMap::add_coupling_functor
 
 
 
-void DofMap::remove_coupling_functor
-  (GhostingFunctor & coupling_functor)
+void
+DofMap::remove_coupling_functor(GhostingFunctor & coupling_functor)
 {
   libmesh_assert(_coupling_functors.count(&coupling_functor));
   _coupling_functors.erase(&coupling_functor);
@@ -1913,8 +1897,8 @@ void DofMap::remove_coupling_functor
 
 
 
-void DofMap::add_algebraic_ghosting_functor
-  (GhostingFunctor & algebraic_ghosting_functor)
+void
+DofMap::add_algebraic_ghosting_functor(GhostingFunctor & algebraic_ghosting_functor)
 {
   _algebraic_ghosting_functors.insert(&algebraic_ghosting_functor);
   _mesh.add_ghosting_functor(algebraic_ghosting_functor);
@@ -1922,11 +1906,10 @@ void DofMap::add_algebraic_ghosting_functor
 
 
 
-void DofMap::remove_algebraic_ghosting_functor
-  (GhostingFunctor & algebraic_ghosting_functor)
+void
+DofMap::remove_algebraic_ghosting_functor(GhostingFunctor & algebraic_ghosting_functor)
 {
-  libmesh_assert(_algebraic_ghosting_functors.count
-                   (&algebraic_ghosting_functor));
+  libmesh_assert(_algebraic_ghosting_functors.count(&algebraic_ghosting_functor));
   _algebraic_ghosting_functors.erase(&algebraic_ghosting_functor);
   _mesh.remove_ghosting_functor(algebraic_ghosting_functor);
 }

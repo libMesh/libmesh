@@ -87,10 +87,9 @@ private:
   const bool implicit_neighbor_dofs;
   const bool need_full_sparsity_pattern;
 
-  void handle_vi_vj
-    (const Elem * partner,
-     const std::vector<dof_id_type> & element_dofs_i,
-     unsigned int vj);
+  void handle_vi_vj(const Elem * partner,
+                    const std::vector<dof_id_type> & element_dofs_i,
+                    unsigned int vj);
 
 public:
 

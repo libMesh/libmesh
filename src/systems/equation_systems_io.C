@@ -470,7 +470,7 @@ void EquationSystems::write(const std::string & name,
     // // write in serial and we're on a distributed mesh
     // (!(write_flags & EquationSystems::WRITE_SERIAL_FILES) &&
     // !this->get_mesh().is_serial())
-  ;
+    ;
 
   // New scope so that io will close before we try to zip the file
   {

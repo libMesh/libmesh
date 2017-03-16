@@ -30,11 +30,11 @@
 namespace libMesh
 {
 
-DirichletBoundary::DirichletBoundary
-  (const std::set<boundary_id_type> & b_in,
-   const std::vector<unsigned int> & variables_in,
-   const FunctionBase<Number> * f_in,
-   const FunctionBase<Gradient> * g_in) :
+DirichletBoundary::
+DirichletBoundary(const std::set<boundary_id_type> & b_in,
+                  const std::vector<unsigned int> & variables_in,
+                  const FunctionBase<Number> * f_in,
+                  const FunctionBase<Gradient> * g_in) :
   b(b_in),
   variables(variables_in),
   f(f_in ? f_in->clone() : UniquePtr<FunctionBase<Number> >()),
@@ -50,11 +50,11 @@ DirichletBoundary::DirichletBoundary
 }
 
 
-DirichletBoundary::DirichletBoundary
-  (const std::set<boundary_id_type> & b_in,
-   const std::vector<unsigned int> & variables_in,
-   const FunctionBase<Number> & f_in,
-   VariableIndexing type) :
+DirichletBoundary::
+DirichletBoundary(const std::set<boundary_id_type> & b_in,
+                  const std::vector<unsigned int> & variables_in,
+                  const FunctionBase<Number> & f_in,
+                  VariableIndexing type) :
   b(b_in),
   variables(variables_in),
   f(UniquePtr<FunctionBase<Number> >()),
@@ -78,12 +78,12 @@ DirichletBoundary::DirichletBoundary
 }
 
 
-DirichletBoundary::DirichletBoundary
-  (const std::set<boundary_id_type> & b_in,
-   const std::vector<unsigned int> & variables_in,
-   const FunctionBase<Number> & f_in,
-   const FunctionBase<Gradient> & g_in,
-   VariableIndexing type) :
+DirichletBoundary::
+DirichletBoundary(const std::set<boundary_id_type> & b_in,
+                  const std::vector<unsigned int> & variables_in,
+                  const FunctionBase<Number> & f_in,
+                  const FunctionBase<Gradient> & g_in,
+                  VariableIndexing type) :
   b(b_in),
   variables(variables_in),
   f(UniquePtr<FunctionBase<Number> >()),
@@ -114,12 +114,12 @@ DirichletBoundary::DirichletBoundary
 }
 
 
-DirichletBoundary::DirichletBoundary
-  (const std::set<boundary_id_type> & b_in,
-   const std::vector<unsigned int> & variables_in,
-   const System & f_sys_in,
-   const FEMFunctionBase<Number> * f_in,
-   const FEMFunctionBase<Gradient> * g_in) :
+DirichletBoundary::
+DirichletBoundary(const std::set<boundary_id_type> & b_in,
+                  const std::vector<unsigned int> & variables_in,
+                  const System & f_sys_in,
+                  const FEMFunctionBase<Number> * f_in,
+                  const FEMFunctionBase<Gradient> * g_in) :
   b(b_in),
   variables(variables_in),
   f(UniquePtr<FunctionBase<Number> >()),
@@ -132,12 +132,12 @@ DirichletBoundary::DirichletBoundary
 }
 
 
-DirichletBoundary::DirichletBoundary
-  (const std::set<boundary_id_type> & b_in,
-   const std::vector<unsigned int> & variables_in,
-   const System & f_sys_in,
-   const FEMFunctionBase<Number> & f_in,
-   VariableIndexing type) :
+DirichletBoundary::
+DirichletBoundary(const std::set<boundary_id_type> & b_in,
+                  const std::vector<unsigned int> & variables_in,
+                  const System & f_sys_in,
+                  const FEMFunctionBase<Number> & f_in,
+                  VariableIndexing type) :
   b(b_in),
   variables(variables_in),
   f(UniquePtr<FunctionBase<Number> >()),
@@ -159,13 +159,13 @@ DirichletBoundary::DirichletBoundary
 }
 
 
-DirichletBoundary::DirichletBoundary
-  (const std::set<boundary_id_type> & b_in,
-   const std::vector<unsigned int> & variables_in,
-   const System & f_sys_in,
-   const FEMFunctionBase<Number> & f_in,
-   const FEMFunctionBase<Gradient> & g_in,
-   VariableIndexing type) :
+DirichletBoundary::
+DirichletBoundary(const std::set<boundary_id_type> & b_in,
+                  const std::vector<unsigned int> & variables_in,
+                  const System & f_sys_in,
+                  const FEMFunctionBase<Number> & f_in,
+                  const FEMFunctionBase<Gradient> & g_in,
+                  VariableIndexing type) :
   b(b_in),
   variables(variables_in),
   f(UniquePtr<FunctionBase<Number> >()),
@@ -193,8 +193,8 @@ DirichletBoundary::DirichletBoundary
 }
 
 
-DirichletBoundary::DirichletBoundary
-  (const DirichletBoundary & dirichlet_in) :
+DirichletBoundary::
+DirichletBoundary(const DirichletBoundary & dirichlet_in) :
   b(dirichlet_in.b),
   variables(dirichlet_in.variables),
   f(dirichlet_in.f.get() ?

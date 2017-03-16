@@ -52,7 +52,7 @@ public:
 #endif
     _mesh(libmesh_nullptr),
     _n_levels(0)
- {}
+  {}
 
   // Change coupling matrix after construction
   void set_dof_coupling(const CouplingMatrix * dof_coupling);

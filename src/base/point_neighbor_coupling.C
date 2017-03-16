@@ -93,8 +93,9 @@ void PointNeighborCoupling::operator()
       next_elements_to_check.clear();
       elements_checked.insert(elements_to_check.begin(), elements_to_check.end());
 
-      for (set_type::const_iterator elem_it  = elements_to_check.begin(),
-                                    elem_end = elements_to_check.end();
+      for (set_type::const_iterator
+             elem_it  = elements_to_check.begin(),
+             elem_end = elements_to_check.end();
            elem_it != elem_end; ++elem_it)
         {
           std::set<const Elem *> point_neighbors;

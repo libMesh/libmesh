@@ -90,8 +90,9 @@ public:
     es.init();
     sys.project_solution(cubic_default_coupling_test, NULL, es.parameters);
 
-    for (MeshBase::const_element_iterator elem_it  = mesh.active_local_elements_begin(),
-                                          elem_end = mesh.active_local_elements_end();
+    for (MeshBase::const_element_iterator
+           elem_it  = mesh.active_local_elements_begin(),
+           elem_end = mesh.active_local_elements_end();
          elem_it != elem_end; ++elem_it)
       {
         const Elem * elem = *elem_it;

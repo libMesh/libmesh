@@ -140,11 +140,11 @@ public:
       unsigned int dest;
 
       if (TestCommWorld->rank() == 0)
-      {
-        src.resize(TestCommWorld->size());
-        for (std::size_t i=0; i<src.size(); i++)
-          src[i] = i;
-      }
+        {
+          src.resize(TestCommWorld->size());
+          for (std::size_t i=0; i<src.size(); i++)
+            src[i] = i;
+        }
 
       TestCommWorld->scatter(src, dest);
 
@@ -158,11 +158,11 @@ public:
       static const unsigned int CHUNK_SIZE = 3;
 
       if (TestCommWorld->rank() == 0)
-      {
-        src.resize(TestCommWorld->size() * CHUNK_SIZE);
-        for (std::size_t i=0; i<src.size(); i++)
-          src[i] = i;
-      }
+        {
+          src.resize(TestCommWorld->size() * CHUNK_SIZE);
+          for (std::size_t i=0; i<src.size(); i++)
+            src[i] = i;
+        }
 
       TestCommWorld->scatter(src, dest);
 
@@ -177,16 +177,16 @@ public:
       std::vector<int> counts;
 
       if (TestCommWorld->rank() == 0)
-      {
-        // Give each processor "rank" number of items ( Sum i=1..n == (n * (n + 1))/2 )
-        src.resize((TestCommWorld->size() * (TestCommWorld->size() + 1)) / 2);
-        counts.resize(TestCommWorld->size());
+        {
+          // Give each processor "rank" number of items ( Sum i=1..n == (n * (n + 1))/2 )
+          src.resize((TestCommWorld->size() * (TestCommWorld->size() + 1)) / 2);
+          counts.resize(TestCommWorld->size());
 
-        for (std::size_t i=0; i<src.size(); i++)
-          src[i] = i;
-        for (unsigned int i=0; i<TestCommWorld->size(); i++)
-          counts[i] = static_cast<int>(i+1);
-      }
+          for (std::size_t i=0; i<src.size(); i++)
+            src[i] = i;
+          for (unsigned int i=0; i<TestCommWorld->size(); i++)
+            counts[i] = static_cast<int>(i+1);
+        }
 
       TestCommWorld->scatter(src, counts, dest);
 
@@ -201,17 +201,17 @@ public:
       std::vector<unsigned int> dest;
 
       if (TestCommWorld->rank() == 0)
-      {
-        // Give each processor "rank" number of items ( Sum i=1..n == (n * (n + 1))/2 )
-        src.resize(TestCommWorld->size());
-        for (std::size_t i=0; i<src.size(); ++i)
-          src[i].resize(i+1);
+        {
+          // Give each processor "rank" number of items ( Sum i=1..n == (n * (n + 1))/2 )
+          src.resize(TestCommWorld->size());
+          for (std::size_t i=0; i<src.size(); ++i)
+            src[i].resize(i+1);
 
-        unsigned int global_counter = 0;
-        for (std::size_t i=0; i<src.size(); i++)
-          for (std::size_t j=0; j<src[i].size(); j++)
-            src[i][j] = global_counter++;
-      }
+          unsigned int global_counter = 0;
+          for (std::size_t i=0; i<src.size(); i++)
+            for (std::size_t j=0; j<src[i].size(); j++)
+              src[i][j] = global_counter++;
+        }
 
       TestCommWorld->scatter(src, dest);
 

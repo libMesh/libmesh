@@ -1364,15 +1364,15 @@ void PetscVector<T>::_get_array(bool read_only) const
               _values_read_only = false;
 #else
               if (read_only)
-              {
-                ierr = VecGetArrayRead(_vec, &_read_only_values);
-                _values_read_only = true;
-              }
+                {
+                  ierr = VecGetArrayRead(_vec, &_read_only_values);
+                  _values_read_only = true;
+                }
               else
-              {
-                ierr = VecGetArray(_vec, &_values);
-                _values_read_only = false;
-              }
+                {
+                  ierr = VecGetArray(_vec, &_values);
+                  _values_read_only = false;
+                }
 #endif
               LIBMESH_CHKERR(ierr);
               _local_size = this->local_size();
@@ -1390,15 +1390,15 @@ void PetscVector<T>::_get_array(bool read_only) const
               _values_read_only = false;
 #else
               if (read_only)
-              {
-                ierr = VecGetArrayRead(_local_form, &_read_only_values);
-                _values_read_only = true;
-              }
+                {
+                  ierr = VecGetArrayRead(_local_form, &_read_only_values);
+                  _values_read_only = true;
+                }
               else
-              {
-                ierr = VecGetArray(_local_form, &_values);
-                _values_read_only = false;
-              }
+                {
+                  ierr = VecGetArray(_local_form, &_values);
+                  _values_read_only = false;
+                }
 #endif
               LIBMESH_CHKERR(ierr);
 

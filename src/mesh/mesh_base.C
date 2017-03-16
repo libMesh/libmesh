@@ -121,8 +121,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 {
   // Make sure we don't accidentally delete the other mesh's default
   // ghosting functor; we'll use our own if that's needed.
-  if (other_mesh._ghosting_functors.count
-        (other_mesh._default_ghosting.get()))
+  if (other_mesh._ghosting_functors.count(other_mesh._default_ghosting.get()))
     {
       _ghosting_functors.erase(other_mesh._default_ghosting.get());
       _ghosting_functors.insert(_default_ghosting.get());

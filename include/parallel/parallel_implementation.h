@@ -34,7 +34,7 @@ namespace Parallel {
 
 #ifdef LIBMESH_HAVE_MPI
 
-#define LIBMESH_STANDARD_TYPE(cxxtype,mpitype)                                  \
+#define LIBMESH_STANDARD_TYPE(cxxtype,mpitype)                          \
   template<>                                                            \
   class StandardType<cxxtype> : public DataType                         \
   {                                                                     \
@@ -45,7 +45,7 @@ namespace Parallel {
 
 #else
 
-#define LIBMESH_STANDARD_TYPE(cxxtype,mpitype)                                  \
+#define LIBMESH_STANDARD_TYPE(cxxtype,mpitype)                          \
   template<>                                                            \
   class StandardType<cxxtype> : public DataType                         \
   {                                                                     \
@@ -56,8 +56,8 @@ namespace Parallel {
 
 #endif
 
-#define LIBMESH_INT_TYPE(cxxtype,mpitype)                                       \
-  LIBMESH_STANDARD_TYPE(cxxtype,mpitype);                                       \
+#define LIBMESH_INT_TYPE(cxxtype,mpitype)                               \
+  LIBMESH_STANDARD_TYPE(cxxtype,mpitype);                               \
                                                                         \
   template<>                                                            \
   struct Attributes<cxxtype>                                            \
@@ -67,8 +67,8 @@ namespace Parallel {
     static void set_highest(cxxtype & x) { x = std::numeric_limits<cxxtype>::max(); } \
   }
 
-#define LIBMESH_FLOAT_TYPE(cxxtype,mpitype)                                     \
-  LIBMESH_STANDARD_TYPE(cxxtype,mpitype);                                       \
+#define LIBMESH_FLOAT_TYPE(cxxtype,mpitype)                             \
+  LIBMESH_STANDARD_TYPE(cxxtype,mpitype);                               \
                                                                         \
   template<>                                                            \
   struct Attributes<cxxtype>                                            \
@@ -78,7 +78,7 @@ namespace Parallel {
     static void set_highest(cxxtype & x) { x = std::numeric_limits<cxxtype>::infinity(); } \
   }
 
-#define LIBMESH_CONTAINER_TYPE(cxxtype)                                         \
+#define LIBMESH_CONTAINER_TYPE(cxxtype)                                 \
   template<typename T>                                                  \
   struct Attributes<cxxtype<T> >                                        \
   {                                                                     \
@@ -118,11 +118,12 @@ class StandardType<unsigned long long> : public DataType
 public:
   explicit
   StandardType(const cxxtype * = libmesh_nullptr) :
-    DataType(MPI_UNSIGNED_LONG) {
-  libmesh_assert_equal_to
-    (sizeof(unsigned long long), sizeof(unsigned long));
+    DataType(MPI_UNSIGNED_LONG)
+  {
+    libmesh_assert_equal_to(sizeof(unsigned long long),
+                            sizeof(unsigned long));
   }
-}
+};
 
 template<>
 struct Attributes<unsigned long long>
@@ -130,8 +131,9 @@ struct Attributes<unsigned long long>
   static const bool has_min_max = true;
   static void set_lowest(unsigned long long & x) { x = std::numeric_limits<unsigned long long>::min(); }
   static void set_highest(unsigned long long & x) { x = std::numeric_limits<unsigned long long>::max(); }
-}
+};
 #endif
+
 LIBMESH_FLOAT_TYPE(float,MPI_FLOAT);
 LIBMESH_FLOAT_TYPE(double,MPI_DOUBLE);
 LIBMESH_FLOAT_TYPE(long double,MPI_LONG_DOUBLE);
@@ -3286,10 +3288,10 @@ void Communicator::scatter(const std::vector<T> & data,
 
   int recv_buffer_size;
   if (this->rank() == root_id)
-  {
-    libmesh_assert(data.size() % this->size() == 0);
-    recv_buffer_size = data.size() / this->size();
-  }
+    {
+      libmesh_assert(data.size() % this->size() == 0);
+      recv_buffer_size = data.size() / this->size();
+    }
 
   this->broadcast(recv_buffer_size);
   recv.resize(recv_buffer_size);
@@ -4001,9 +4003,9 @@ inline void Communicator::scatter(const std::vector<T> & data,
 
 template <typename T>
 inline void Communicator::scatter(const std::vector<T> & data,
-                      const std::vector<int> counts,
-                      std::vector<T> & recv,
-                      const unsigned int root_id) const
+                                  const std::vector<int> counts,
+                                  std::vector<T> & recv,
+                                  const unsigned int root_id) const
 {
   libmesh_assert_equal_to (root_id, 0);
   libmesh_assert_equal_to (counts.size(), 1);

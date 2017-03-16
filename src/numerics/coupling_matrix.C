@@ -97,7 +97,7 @@ CouplingMatrix & CouplingMatrix::operator&= (const CouplingMatrix & other)
       // which will be redundant later
       for (const std::size_t nextloc =
              (next == this->_ranges.end()) ?
-               std::numeric_limits<std::size_t>::max() : next->first;
+             std::numeric_limits<std::size_t>::max() : next->first;
            nextloc <= lb->second; ++next)
         {
           // Ranges should be sorted and should not have been touching

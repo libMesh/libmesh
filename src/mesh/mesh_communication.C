@@ -147,26 +147,26 @@ struct SyncNeighbors
 };
 
 
-void query_ghosting_functors
-  (MeshBase & mesh,
-   processor_id_type pid,
-   bool newly_coarsened_only,
-   std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+void query_ghosting_functors(MeshBase & mesh,
+                             processor_id_type pid,
+                             bool newly_coarsened_only,
+                             std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_assert(!newly_coarsened_only);
 #endif
 
-  MeshBase::const_element_iterator       elem_it  =
+  MeshBase::const_element_iterator elem_it =
 #ifdef LIBMESH_ENABLE_AMR
     newly_coarsened_only ? mesh.flagged_pid_elements_begin(Elem::JUST_COARSENED, pid) :
 #endif
-                           mesh.active_pid_elements_begin(pid);
+    mesh.active_pid_elements_begin(pid);
+
   const MeshBase::const_element_iterator elem_end =
 #ifdef LIBMESH_ENABLE_AMR
     newly_coarsened_only ? mesh.flagged_pid_elements_end(Elem::JUST_COARSENED, pid) :
 #endif
-                           mesh.active_pid_elements_end(pid);
+    mesh.active_pid_elements_end(pid);
 
   std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
   const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
@@ -197,10 +197,9 @@ void query_ghosting_functors
 }
 
 
-void connect_children
-  (MeshBase & mesh,
-   processor_id_type pid,
-   std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+void connect_children(MeshBase & mesh,
+                      processor_id_type pid,
+                      std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
 #ifdef LIBMESH_ENABLE_AMR
   // Our XdrIO output needs inactive local elements to not have any
@@ -223,8 +222,7 @@ void connect_children
 }
 
 
-void connect_families
-  (std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -1035,9 +1033,8 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
                     {
                       libmesh_assert(elem != remote_elem);
                       elements_to_send.insert(elem);
-                      for (unsigned int n=0,
-                           n_nodes = elem->n_nodes(); n != n_nodes;
-                           ++n)
+                      for (unsigned int n=0, n_nodes = elem->n_nodes();
+                           n != n_nodes; ++n)
                         nodes_to_send.insert(elem->node_ptr(n));
                       elem = elem->parent();
                     }
@@ -1295,15 +1292,13 @@ struct SyncNodeIds
   // We only know a Node id() is definitive if we own the Node or if
   // we're told it's definitive.  We keep track of the latter cases by
   // putting ghost node definitive ids into this set.
-  typedef LIBMESH_BEST_UNORDERED_SET<dof_id_type>
-    uset_type;
+  typedef LIBMESH_BEST_UNORDERED_SET<dof_id_type> uset_type;
   uset_type definitive_ids;
 
   // We should never be told two different definitive ids for the same
   // node, but let's check on that in debug mode.
 #ifdef DEBUG
-  typedef LIBMESH_BEST_UNORDERED_MAP<dof_id_type, dof_id_type>
-    umap_type;
+  typedef LIBMESH_BEST_UNORDERED_MAP<dof_id_type, dof_id_type> umap_type;
   umap_type definitive_renumbering;
 #endif
 

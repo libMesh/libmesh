@@ -1402,8 +1402,8 @@ void DofMap::add_adjoint_constraint_row (const unsigned int qoi_index,
 
   // We don't get insert_or_assign until C++17 so we make do.
   std::pair<DofConstraintValueMap::iterator, bool> rhs_it =
-    _adjoint_constraint_values[qoi_index].insert
-      (std::make_pair(dof_number, constraint_rhs));
+    _adjoint_constraint_values[qoi_index].insert(std::make_pair(dof_number,
+                                                                constraint_rhs));
   if (!rhs_it.second)
     rhs_it.first->second = constraint_rhs;
 }
