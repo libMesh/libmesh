@@ -203,7 +203,7 @@ void print_trace(std::ostream & out_stream)
       int size = backtrace(addresses, 40);
       strings = backtrace_symbols(addresses, size);
       out_stream << "Stack frames: " << size << std::endl;
-      for(int i = 0; i < size; i++)
+      for (int i = 0; i < size; i++)
         out_stream << i << ": " << process_trace(strings[i]) << std::endl;
       std::free(strings);
     }

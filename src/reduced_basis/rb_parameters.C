@@ -48,7 +48,7 @@ Real RBParameters::get_value(const std::string & param_name) const
   const_iterator it = _parameters.find(param_name);
 
   // throw and error if the parameter doesn't exist
-  if( it == _parameters.end() )
+  if (it == _parameters.end())
     libmesh_error_msg("Error: parameter " << param_name << " does not exist in RBParameters object.");
 
   return it->second;
@@ -71,7 +71,7 @@ void RBParameters::get_parameter_names(std::set<std::string> & param_names) cons
 
   const_iterator it     = _parameters.begin();
   const_iterator it_end = _parameters.end();
-  for( ; it != it_end; ++it)
+  for ( ; it != it_end; ++it)
     {
       param_names.insert( it->first );
     }
@@ -104,7 +104,7 @@ std::string RBParameters::get_string(unsigned int precision) const
 
   const_iterator it     = _parameters.begin();
   const_iterator it_end = _parameters.end();
-  for( ; it != it_end; ++it)
+  for ( ; it != it_end; ++it)
     {
       param_stringstream << it->first << ": " << std::scientific <<  it->second << std::endl;
     }

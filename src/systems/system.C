@@ -243,7 +243,7 @@ void System::init ()
 
   // If no variables have been added to this system
   // don't do anything
-  if(!this->n_vars())
+  if (!this->n_vars())
     return;
 
   // Then call the user-provided intialization function
@@ -330,7 +330,7 @@ void System::restrict_vectors ()
         {
           ParallelType type = _vector_types[pos->first];
 
-          if(type == GHOSTED)
+          if (type == GHOSTED)
             {
 #ifdef LIBMESH_ENABLE_GHOSTED
               pos->second->init (this->n_dofs(), this->n_local_dofs(),
@@ -381,7 +381,7 @@ void System::reinit ()
 {
   //If no variables have been added to this system
   //don't do anything
-  if(!this->n_vars())
+  if (!this->n_vars())
     return;
 
   // Constraints get handled in EquationSystems::reinit now
@@ -443,7 +443,7 @@ void System::re_update ()
   parallel_object_only();
 
   // If this system is empty... don't do anything!
-  if(!this->n_vars())
+  if (!this->n_vars())
     return;
 
   const std::vector<dof_id_type> & send_list = this->get_dof_map().get_send_list ();
@@ -694,7 +694,7 @@ NumericVector<Number> & System::add_vector (const std::string & vec_name,
   // Initialize it if necessary
   if (_is_initialized)
     {
-      if(type == GHOSTED)
+      if (type == GHOSTED)
         {
 #ifdef LIBMESH_ENABLE_GHOSTED
           buf->init (this->n_dofs(), this->n_local_dofs(),
@@ -714,7 +714,7 @@ NumericVector<Number> & System::add_vector (const std::string & vec_name,
 void System::remove_vector (const std::string & vec_name)
 {
   //Return if the vector does not exist
-  if ( !(this->have_vector(vec_name)) )
+  if (!(this->have_vector(vec_name)))
     return;
 
   _vectors[vec_name]->clear();
@@ -756,7 +756,7 @@ const NumericVector<Number> * System::request_vector (const unsigned int vec_num
   const_vectors_iterator v = vectors_begin();
   const_vectors_iterator v_end = vectors_end();
   unsigned int num = 0;
-  while((num<vec_num) && (v!=v_end))
+  while ((num<vec_num) && (v!=v_end))
     {
       num++;
       ++v;
@@ -773,7 +773,7 @@ NumericVector<Number> * System::request_vector (const unsigned int vec_num)
   vectors_iterator v = vectors_begin();
   vectors_iterator v_end = vectors_end();
   unsigned int num = 0;
-  while((num<vec_num) && (v!=v_end))
+  while ((num<vec_num) && (v!=v_end))
     {
       num++;
       ++v;
@@ -816,7 +816,7 @@ const NumericVector<Number> & System::get_vector (const unsigned int vec_num) co
   const_vectors_iterator v = vectors_begin();
   const_vectors_iterator v_end = vectors_end();
   unsigned int num = 0;
-  while((num<vec_num) && (v!=v_end))
+  while ((num<vec_num) && (v!=v_end))
     {
       num++;
       ++v;
@@ -832,7 +832,7 @@ NumericVector<Number> & System::get_vector (const unsigned int vec_num)
   vectors_iterator v = vectors_begin();
   vectors_iterator v_end = vectors_end();
   unsigned int num = 0;
-  while((num<vec_num) && (v!=v_end))
+  while ((num<vec_num) && (v!=v_end))
     {
       num++;
       ++v;
@@ -848,7 +848,7 @@ const std::string & System::vector_name (const unsigned int vec_num) const
   const_vectors_iterator v = vectors_begin();
   const_vectors_iterator v_end = vectors_end();
   unsigned int num = 0;
-  while((num<vec_num) && (v!=v_end))
+  while ((num<vec_num) && (v!=v_end))
     {
       num++;
       ++v;
@@ -862,10 +862,10 @@ const std::string & System::vector_name (const NumericVector<Number> & vec_refer
   const_vectors_iterator v = vectors_begin();
   const_vectors_iterator v_end = vectors_end();
 
-  for(; v != v_end; ++v)
+  for (; v != v_end; ++v)
     {
       // Check if the current vector is the one whose name we want
-      if(&vec_reference == v->second)
+      if (&vec_reference == v->second)
         break; // exit loop if it is
     }
 
@@ -1280,7 +1280,7 @@ void System::get_all_variable_numbers(std::vector<unsigned int> & all_variable_n
     it_end = _variable_numbers.end();
 
   unsigned int count = 0;
-  for( ; it != it_end; ++it)
+  for ( ; it != it_end; ++it)
     {
       all_variable_numbers[count] = it->second;
       count++;
@@ -1316,7 +1316,7 @@ void System::local_dof_indices(const unsigned int var,
           dof_id_type dof = dof_indices[i];
 
           //If the dof is owned by the local processor
-          if(first_local <= dof && dof < end_local)
+          if (first_local <= dof && dof < end_local)
             var_indices.insert(dof_indices[i]);
         }
     }
@@ -1344,7 +1344,7 @@ void System::zero_variable (NumericVector<Number> & v,
       {
         const Node * node = *it;
         unsigned int n_comp = node->n_comp(sys_num,var_num);
-        for(unsigned int i=0; i<n_comp; i++)
+        for (unsigned int i=0; i<n_comp; i++)
           {
             const dof_id_type index = node->dof_number(sys_num,var_num,i);
             v.set(index,0.0);
@@ -1360,7 +1360,7 @@ void System::zero_variable (NumericVector<Number> & v,
       {
         const Elem * elem = *it;
         unsigned int n_comp = elem->n_comp(sys_num,var_num);
-        for(unsigned int i=0; i<n_comp; i++)
+        for (unsigned int i=0; i<n_comp; i++)
           {
             const dof_id_type index = elem->dof_number(sys_num,var_num,i);
             v.set(index,0.0);
@@ -1378,11 +1378,11 @@ Real System::discrete_var_norm(const NumericVector<Number> & v,
   std::set<dof_id_type> var_indices;
   local_dof_indices(var, var_indices);
 
-  if(norm_type == DISCRETE_L1)
+  if (norm_type == DISCRETE_L1)
     return v.subset_l1_norm(var_indices);
-  if(norm_type == DISCRETE_L2)
+  if (norm_type == DISCRETE_L2)
     return v.subset_l2_norm(var_indices);
-  if(norm_type == DISCRETE_L_INF)
+  if (norm_type == DISCRETE_L_INF)
     return v.subset_linfty_norm(var_indices);
   else
     libmesh_error_msg("Invalid norm_type = " << norm_type);
@@ -1396,9 +1396,9 @@ Real System::calculate_norm(const NumericVector<Number> & v,
                             std::set<unsigned int> * skip_dimensions) const
 {
   //short circuit to save time
-  if(norm_type == DISCRETE_L1 ||
-     norm_type == DISCRETE_L2 ||
-     norm_type == DISCRETE_L_INF)
+  if (norm_type == DISCRETE_L1 ||
+      norm_type == DISCRETE_L2 ||
+      norm_type == DISCRETE_L_INF)
     return discrete_var_norm(v,var,norm_type);
 
   // Not a discrete norm
@@ -1430,17 +1430,17 @@ Real System::calculate_norm(const NumericVector<Number> & v,
       FEMNormType norm_type0 = norm.type(0);
       unsigned int check_var = 0;
       for (; check_var != this->n_vars(); ++check_var)
-        if((norm.weight(check_var) != 1.0) || (norm.type(check_var) != norm_type0))
+        if ((norm.weight(check_var) != 1.0) || (norm.type(check_var) != norm_type0))
           break;
 
       //All weights were 1.0 so just do the full vector discrete norm
-      if(check_var == this->n_vars())
+      if (check_var == this->n_vars())
         {
-          if(norm_type0 == DISCRETE_L1)
+          if (norm_type0 == DISCRETE_L1)
             return v.l1_norm();
-          if(norm_type0 == DISCRETE_L2)
+          if (norm_type0 == DISCRETE_L2)
             return v.l2_norm();
-          if(norm_type0 == DISCRETE_L_INF)
+          if (norm_type0 == DISCRETE_L_INF)
             return v.linfty_norm();
           else
             libmesh_error_msg("Invalid norm_type0 = " << norm_type0);
@@ -1481,11 +1481,11 @@ Real System::calculate_norm(const NumericVector<Number> & v,
 
       // Check for unimplemented norms (rather than just returning 0).
       FEMNormType norm_type = norm.type(var);
-      if((norm_type==H1) ||
-         (norm_type==H2) ||
-         (norm_type==L2) ||
-         (norm_type==H1_SEMINORM) ||
-         (norm_type==H2_SEMINORM))
+      if ((norm_type==H1) ||
+          (norm_type==H2) ||
+          (norm_type==L2) ||
+          (norm_type==H1_SEMINORM) ||
+          (norm_type==H2_SEMINORM))
         {
           if (!using_hilbert_norm)
             libmesh_not_implemented();

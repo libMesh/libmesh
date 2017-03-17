@@ -117,9 +117,9 @@ DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
   this->get_boundary_info() = other_mesh.get_boundary_info();
 
   // Need to copy extra_ghost_elems
-  for(std::set<Elem *>::iterator it = other_mesh._extra_ghost_elems.begin();
-      it != other_mesh._extra_ghost_elems.end();
-      ++it)
+  for (std::set<Elem *>::iterator it = other_mesh._extra_ghost_elems.begin();
+       it != other_mesh._extra_ghost_elems.end();
+       ++it)
     _extra_ghost_elems.insert(this->elem_ptr((*it)->id()));
 }
 

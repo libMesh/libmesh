@@ -265,13 +265,13 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
     const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
     // Start loop over elems
-    for(; elem_it != elem_end; ++elem_it)
+    for (; elem_it != elem_end; ++elem_it)
       {
         // Pointer to this element
         const Elem * elem = *elem_it;
 
         // Loop over the nodes in the element
-        for(unsigned int n=0; n != elem->n_nodes(); ++n)
+        for (unsigned int n=0; n != elem->n_nodes(); ++n)
           {
             // Get a reference to the current node
             const Node & node = elem->node_ref(n);
@@ -280,7 +280,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
             dof_id_type node_id = node.id();
 
             // If we havent already processed this node, do so now
-            if(processed_node_ids.find(node_id) == processed_node_ids.end())
+            if (processed_node_ids.find(node_id) == processed_node_ids.end())
               {
                 // Declare a neighbor_set to be filled by the find_point_neighbors
                 std::set<const Elem *> fine_grid_neighbor_set;
@@ -296,7 +296,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
                 const std::set<const Elem *>::iterator fine_neighbor_end = fine_grid_neighbor_set.end();
 
                 // Loop over all the fine neighbors of this node
-                for(; fine_neighbor_it != fine_neighbor_end ; ++fine_neighbor_it)
+                for (; fine_neighbor_it != fine_neighbor_end ; ++fine_neighbor_it)
                   {
                     // Pointer to the current fine neighbor element
                     const Elem * fine_elem = *fine_neighbor_it;
@@ -317,7 +317,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
                     for (; j != coarse_grid_neighbors.size(); j++)
                       {
                         // If the set already contains this element break out of the loop
-                        if(coarse_grid_neighbors[j] == coarse_id)
+                        if (coarse_grid_neighbors[j] == coarse_id)
                           {
                             break;
                           }
@@ -325,7 +325,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
                     // If we didn't leave the loop even at the last element,
                     // this is a new neighbour, put in the coarse_grid_neighbor_set
-                    if(j == coarse_grid_neighbors.size())
+                    if (j == coarse_grid_neighbors.size())
                       {
                         coarse_grid_neighbors.push_back(coarse_id);
                       }
@@ -380,7 +380,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
           MeshBase::const_element_iterator elem_it = mesh.active_local_elements_begin();
           const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
-          for(; elem_it != elem_end; ++elem_it)
+          for (; elem_it != elem_end; ++elem_it)
             {
               // Pointer to the element
               const Elem * elem = *elem_it;

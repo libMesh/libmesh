@@ -143,7 +143,7 @@ FEInterface::FEInterface()
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << fe_t.family);      \
       }                                                                 \
-  } while(0)
+  } while (0)
 
 
 #define fe_vector_scalar_error_switch(dim, func_and_args, prefix, suffix) \
@@ -169,7 +169,7 @@ FEInterface::FEInterface()
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << fe_t.family);      \
       }                                                                 \
-  } while(0)
+  } while (0)
 
 #else
 #define fe_family_switch(dim, func_and_args, prefix, suffix)            \
@@ -267,7 +267,7 @@ FEInterface::FEInterface()
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << fe_t.family);      \
       }                                                                 \
-  } while(0)
+  } while (0)
 
 
 #define fe_vector_scalar_error_switch(dim, func_and_args, prefix, suffix) \
@@ -291,7 +291,7 @@ FEInterface::FEInterface()
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << fe_t.family);      \
       }                                                                 \
-  } while(0)
+  } while (0)
 #endif
 
 
@@ -394,7 +394,7 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
    * to infinite elements through the element type.
    */
 
-  if ( is_InfFE_elem(t) )
+  if (is_InfFE_elem(t))
     return ifem_n_shape_functions(dim, fe_t, t);
 
 #endif
@@ -417,7 +417,7 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  if ( is_InfFE_elem(t) )
+  if (is_InfFE_elem(t))
     return ifem_n_dofs(dim, fe_t, t);
 
 #endif
@@ -440,7 +440,7 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  if ( is_InfFE_elem(t) )
+  if (is_InfFE_elem(t))
     return ifem_n_dofs_at_node(dim, fe_t, t, n);
 
 #endif
@@ -463,7 +463,7 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  if ( is_InfFE_elem(t) )
+  if (is_InfFE_elem(t))
     return ifem_n_dofs_per_elem(dim, fe_t, t);
 
 #endif
@@ -518,7 +518,7 @@ void FEInterface::nodal_soln(const unsigned int dim,
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  if ( is_InfFE_elem(elem->type()) )
+  if (is_InfFE_elem(elem->type()))
     {
       ifem_nodal_soln(dim, fe_t, elem, elem_soln, nodal_soln);
       return;
@@ -562,7 +562,7 @@ Point FEInterface::inverse_map (const unsigned int dim,
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  if ( is_InfFE_elem(elem->type()) )
+  if (is_InfFE_elem(elem->type()))
     return ifem_inverse_map(dim, fe_t, elem, p,tolerance, secure);
 
 #endif
@@ -599,7 +599,7 @@ void FEInterface::inverse_map (const unsigned int dim,
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  if ( is_InfFE_elem(elem->type()) )
+  if (is_InfFE_elem(elem->type()))
     {
       ifem_inverse_map(dim, fe_t, elem, physical_points, reference_points, tolerance, secure);
       return;
@@ -633,7 +633,7 @@ Real FEInterface::shape(const unsigned int dim,
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  if ( is_InfFE_elem(t) )
+  if (is_InfFE_elem(t))
     return ifem_shape(dim, fe_t, t, i, p);
 
 #endif
@@ -654,7 +654,7 @@ Real FEInterface::shape(const unsigned int dim,
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  if ( elem && is_InfFE_elem(elem->type()) )
+  if (elem && is_InfFE_elem(elem->type()))
     return ifem_shape(dim, fe_t, elem, i, p);
 
 #endif
@@ -677,7 +677,7 @@ void FEInterface::shape<Real>(const unsigned int dim,
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  if ( is_InfFE_elem(t) )
+  if (is_InfFE_elem(t))
     phi = ifem_shape(dim, fe_t, t, i, p);
 
 #endif
@@ -715,7 +715,7 @@ void FEInterface::shape<Real>(const unsigned int dim,
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  if ( elem && is_InfFE_elem(elem->type()) )
+  if (elem && is_InfFE_elem(elem->type()))
     phi = ifem_shape(dim, fe_t, elem, i, p);
 
 #endif
@@ -812,7 +812,7 @@ void FEInterface::compute_data(const unsigned int dim,
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  if ( elem && is_InfFE_elem(elem->type()) )
+  if (elem && is_InfFE_elem(elem->type()))
     {
       data.init();
       ifem_compute_data(dim, fe_t, elem, data);

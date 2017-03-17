@@ -400,8 +400,8 @@ void DenseMatrix<T>::vector_mult (DenseVector<T> & dest,
       const unsigned int n_rows = this->m();
       const unsigned int n_cols = this->n();
 
-      for(unsigned int i=0; i<n_rows; i++)
-        for(unsigned int j=0; j<n_cols; j++)
+      for (unsigned int i=0; i<n_rows; i++)
+        for (unsigned int j=0; j<n_cols; j++)
           dest(i) += (*this)(i,j)*arg(j);
     }
 }
@@ -421,14 +421,14 @@ void DenseMatrix<T>::vector_mult (DenseVector<typename CompareTypes<T,T2>::super
   dest.resize(this->m());
 
   // Short-circuit if the matrix is empty
-  if(this->m() == 0 || this->n() == 0)
+  if (this->m() == 0 || this->n() == 0)
     return;
 
   const unsigned int n_rows = this->m();
   const unsigned int n_cols = this->n();
 
-  for(unsigned int i=0; i<n_rows; i++)
-    for(unsigned int j=0; j<n_cols; j++)
+  for (unsigned int i=0; i<n_rows; i++)
+    for (unsigned int j=0; j<n_cols; j++)
       dest(i) += (*this)(i,j)*arg(j);
 }
 
@@ -446,7 +446,7 @@ void DenseMatrix<T>::vector_mult_transpose (DenseVector<T> & dest,
   dest.resize(this->n());
 
   // Short-circuit if the matrix is empty
-  if(this->m() == 0)
+  if (this->m() == 0)
     return;
 
   if (this->use_blas_lapack)
@@ -459,13 +459,13 @@ void DenseMatrix<T>::vector_mult_transpose (DenseVector<T> & dest,
       const unsigned int n_cols = this->n();
 
       // WORKS
-      // for(unsigned int j=0; j<n_cols; j++)
-      //   for(unsigned int i=0; i<n_rows; i++)
+      // for (unsigned int j=0; j<n_cols; j++)
+      //   for (unsigned int i=0; i<n_rows; i++)
       //     dest(j) += (*this)(i,j)*arg(i);
 
       // ALSO WORKS, (i,j) just swapped
-      for(unsigned int i=0; i<n_cols; i++)
-        for(unsigned int j=0; j<n_rows; j++)
+      for (unsigned int i=0; i<n_cols; i++)
+        for (unsigned int j=0; j<n_rows; j++)
           dest(i) += (*this)(j,i)*arg(j);
     }
 }
@@ -485,20 +485,20 @@ void DenseMatrix<T>::vector_mult_transpose (DenseVector<typename CompareTypes<T,
   dest.resize(this->n());
 
   // Short-circuit if the matrix is empty
-  if(this->m() == 0)
+  if (this->m() == 0)
     return;
 
   const unsigned int n_rows = this->m();
   const unsigned int n_cols = this->n();
 
   // WORKS
-  // for(unsigned int j=0; j<n_cols; j++)
-  //   for(unsigned int i=0; i<n_rows; i++)
+  // for (unsigned int j=0; j<n_cols; j++)
+  //   for (unsigned int i=0; i<n_rows; i++)
   //     dest(j) += (*this)(i,j)*arg(i);
 
   // ALSO WORKS, (i,j) just swapped
-  for(unsigned int i=0; i<n_cols; i++)
-    for(unsigned int j=0; j<n_rows; j++)
+  for (unsigned int i=0; i<n_cols; i++)
+    for (unsigned int j=0; j<n_rows; j++)
       dest(i) += (*this)(j,i)*arg(j);
 }
 
@@ -510,7 +510,7 @@ void DenseMatrix<T>::vector_mult_add (DenseVector<T> & dest,
                                       const DenseVector<T> & arg) const
 {
   // Short-circuit if the matrix is empty
-  if(this->m() == 0)
+  if (this->m() == 0)
     {
       dest.resize(0);
       return;
@@ -557,8 +557,8 @@ void DenseMatrix<T>::get_principal_submatrix (unsigned int sub_m,
   libmesh_assert( (sub_m <= this->m()) && (sub_n <= this->n()) );
 
   dest.resize(sub_m, sub_n);
-  for(unsigned int i=0; i<sub_m; i++)
-    for(unsigned int j=0; j<sub_n; j++)
+  for (unsigned int i=0; i<sub_m; i++)
+    for (unsigned int j=0; j<sub_n; j++)
       dest(i,j) = (*this)(i,j);
 }
 
@@ -623,7 +623,7 @@ void DenseMatrix<T>::lu_solve (const DenseVector<T> & b,
     case LU:
       {
         // Already factored, just need to call back_substitute.
-        if ( !(this->use_blas_lapack) )
+        if (!(this->use_blas_lapack))
           break;
       }
 

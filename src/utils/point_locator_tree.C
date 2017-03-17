@@ -210,9 +210,9 @@ const Elem * PointLocatorTree::operator() (const Point & p,
         {
           // If we haven't found the element, we may want to do a linear
           // search using a tolerance.
-          if( _use_close_to_point_tol )
+          if (_use_close_to_point_tol)
             {
-              if(_verbose)
+              if (_verbose)
                 {
                   libMesh::out << "Performing linear search using close-to-point tolerance "
                                << _close_to_point_tol
@@ -292,7 +292,7 @@ const Elem * PointLocatorTree::perform_linear_search(const Point & p,
       if (!allowed_subdomains ||
           allowed_subdomains->count((*pos)->subdomain_id()))
         {
-          if(!use_close_to_point)
+          if (!use_close_to_point)
             {
               if ((*pos)->contains_point(p))
                 return (*pos);

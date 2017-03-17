@@ -591,7 +591,7 @@ void System::read_parallel_data (Xdr & io,
   for (unsigned int data_var=0; data_var<nv; data_var++)
     {
       const unsigned int var = _written_var_indices[data_var];
-      if(this->variable(var).type().family != SCALAR)
+      if (this->variable(var).type().family != SCALAR)
         {
           // First read the node DOF values
           for (std::vector<const DofObject *>::const_iterator
@@ -621,7 +621,7 @@ void System::read_parallel_data (Xdr & io,
   for (unsigned int data_var=0; data_var<nv; data_var++)
     {
       const unsigned int var = _written_var_indices[data_var];
-      if(this->variable(var).type().family == SCALAR)
+      if (this->variable(var).type().family == SCALAR)
         {
           if (this->processor_id() == (this->n_processors()-1))
             {
@@ -680,7 +680,7 @@ void System::read_parallel_data (Xdr & io,
               for (unsigned int data_var=0; data_var<nv; data_var++)
                 {
                   const unsigned int var = _written_var_indices[data_var];
-                  if(this->variable(var).type().family != SCALAR)
+                  if (this->variable(var).type().family != SCALAR)
                     {
                       // First read the node DOF values
                       for (std::vector<const DofObject *>::const_iterator
@@ -710,7 +710,7 @@ void System::read_parallel_data (Xdr & io,
               for (unsigned int data_var=0; data_var<nv; data_var++)
                 {
                   const unsigned int var = _written_var_indices[data_var];
-                  if(this->variable(var).type().family == SCALAR)
+                  if (this->variable(var).type().family == SCALAR)
                     {
                       if (this->processor_id() == (this->n_processors()-1))
                         {
@@ -1167,7 +1167,7 @@ unsigned int System::read_SCALAR_dofs (const unsigned int var,
     }
 
 #ifdef LIBMESH_HAVE_MPI
-  if ( this->n_processors() > 1 )
+  if (this->n_processors() > 1)
     {
       const Parallel::MessageTag val_tag = this->comm().get_unique_tag(321);
 
@@ -1273,7 +1273,7 @@ numeric_index_type System::read_serialized_vector (Xdr & io,
       for (unsigned int data_var=0; data_var<nv; data_var++)
         {
           const unsigned int var = _written_var_indices[data_var];
-          if(this->variable(var).type().family != SCALAR)
+          if (this->variable(var).type().family != SCALAR)
             {
               //---------------------------------
               // Collect the values for all nodes
@@ -1310,7 +1310,7 @@ numeric_index_type System::read_serialized_vector (Xdr & io,
   for (unsigned int data_var=0; data_var<nv; data_var++)
     {
       const unsigned int var = _written_var_indices[data_var];
-      if(this->variable(var).type().family == SCALAR)
+      if (this->variable(var).type().family == SCALAR)
         {
 #ifndef NDEBUG
           n_assigned_vals +=
@@ -1633,7 +1633,7 @@ void System::write_parallel_data (Xdr & io,
 
   // Finally, write the SCALAR data on the last processor
   for (unsigned int var=0; var<this->n_vars(); var++)
-    if(this->variable(var).type().family == SCALAR)
+    if (this->variable(var).type().family == SCALAR)
       {
         if (this->processor_id() == (this->n_processors()-1))
           {
@@ -1668,13 +1668,13 @@ void System::write_parallel_data (Xdr & io,
       std::map<std::string, NumericVector<Number> *>::const_iterator
         pos = _vectors.begin();
 
-      for(; pos != this->_vectors.end(); ++pos)
+      for (; pos != this->_vectors.end(); ++pos)
         {
           io_buffer.clear(); io_buffer.reserve( pos->second->local_size());
 
           // Loop over each non-SCALAR variable and each node, and write out the value.
           for (unsigned int var=0; var<nv; var++)
-            if(this->variable(var).type().family != SCALAR)
+            if (this->variable(var).type().family != SCALAR)
               {
                 // First write the node DOF values
                 for (std::vector<const DofObject *>::const_iterator
@@ -1701,7 +1701,7 @@ void System::write_parallel_data (Xdr & io,
 
           // Finally, write the SCALAR data on the last processor
           for (unsigned int var=0; var<this->n_vars(); var++)
-            if(this->variable(var).type().family == SCALAR)
+            if (this->variable(var).type().family == SCALAR)
               {
                 if (this->processor_id() == (this->n_processors()-1))
                   {
@@ -1789,7 +1789,7 @@ void System::write_serialized_data (Xdr & io,
       std::map<std::string, NumericVector<Number> *>::const_iterator
         pos = _vectors.begin();
 
-      for(; pos != this->_vectors.end(); ++pos)
+      for (; pos != this->_vectors.end(); ++pos)
         {
           // total_written_size +=
           this->write_serialized_vector(io, *pos->second);
@@ -1834,7 +1834,7 @@ void System::write_serialized_data (Xdr & io,
   // std::map<std::string, NumericVector<Number> * >::const_iterator
   //   pos = _vectors.begin();
 
-  // for(; pos != this->_vectors.end(); ++pos)
+  // for (; pos != this->_vectors.end(); ++pos)
   //   {
   //     names.push_back("Additional Vector " + pos->first);
   //     vectors_to_write.push_back(pos->second);
@@ -2168,19 +2168,19 @@ unsigned int System::write_SCALAR_dofs (const NumericVector<Number> & vec,
       const unsigned int n_scalar_dofs = cast_int<unsigned int>
         (SCALAR_dofs.size());
 
-      for(unsigned int i=0; i<n_scalar_dofs; i++)
+      for (unsigned int i=0; i<n_scalar_dofs; i++)
         {
           vals.push_back( vec(SCALAR_dofs[i]) );
         }
     }
 
 #ifdef LIBMESH_HAVE_MPI
-  if ( this->n_processors() > 1 )
+  if (this->n_processors() > 1)
     {
       const Parallel::MessageTag val_tag(1);
 
       // Post the receive on processor 0
-      if ( this->processor_id() == 0 )
+      if (this->processor_id() == 0)
         {
           this->comm().receive(this->n_processors()-1, vals, val_tag);
         }
@@ -2241,7 +2241,7 @@ dof_id_type System::write_serialized_vector (Xdr & io,
   //-------------------------------------------
   // Finally loop over all the SCALAR variables
   for (unsigned int var=0; var<this->n_vars(); var++)
-    if(this->variable(var).type().family == SCALAR)
+    if (this->variable(var).type().family == SCALAR)
       {
         written_length +=
           this->write_SCALAR_dofs (vec, var, io);
@@ -2328,7 +2328,7 @@ std::size_t System::read_serialized_vectors (Xdr & io,
   // Finally loop over all the SCALAR variables
   for (std::size_t vec=0; vec<vectors.size(); vec++)
     for (unsigned int var=0; var<this->n_vars(); var++)
-      if(this->variable(var).type().family == SCALAR)
+      if (this->variable(var).type().family == SCALAR)
         {
           libmesh_assert_not_equal_to (vectors[vec], 0);
 
@@ -2397,7 +2397,7 @@ std::size_t System::write_serialized_vectors (Xdr & io,
   // Finally loop over all the SCALAR variables
   for (std::size_t vec=0; vec<vectors.size(); vec++)
     for (unsigned int var=0; var<this->n_vars(); var++)
-      if(this->variable(var).type().family == SCALAR)
+      if (this->variable(var).type().family == SCALAR)
         {
           libmesh_assert_not_equal_to (vectors[vec], 0);
 

@@ -44,7 +44,7 @@
 //   index[1]=0;
 //   index[2]=0;
 
-//   for(i=sizeof(unsigned int)*8-1;i>=0;i--)
+//   for (i=sizeof(unsigned int)*8-1;i>=0;i--)
 //     {
 //       index[j] += (tempx >> i) & 01;
 //       index[j]  = index[j] << 01;

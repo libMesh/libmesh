@@ -115,7 +115,7 @@ void GnuPlotIO::write_solution(const std::string & fname,
 
       unsigned int count = 0;
 
-      for( ; it != end_it; ++it)
+      for ( ; it != end_it; ++it)
         {
           const Elem * el = *it;
 
@@ -131,7 +131,7 @@ void GnuPlotIO::write_solution(const std::string & fname,
             }
           xtics_stream << "\"\" " << (el->point(1))(0);
 
-          if(count+1 != n_active_elem)
+          if (count+1 != n_active_elem)
             {
               xtics_stream << ", \\\n";
             }
@@ -140,10 +140,10 @@ void GnuPlotIO::write_solution(const std::string & fname,
 
       out_stream << "set xrange [" << x_min << ":" << x_max << "]\n";
 
-      if(_grid)
+      if (_grid)
         out_stream << "set x2tics (" << xtics_stream.str() << ")\nset grid noxtics noytics x2tics\n";
 
-      if(_png_output)
+      if (_png_output)
         {
           out_stream << "set terminal png\n";
           out_stream << "set output \"" << fname << ".png\"\n";
@@ -153,9 +153,9 @@ void GnuPlotIO::write_solution(const std::string & fname,
                  << axes_limits
                  << " \"" << data_file_name << "\" using 1:2 title \"" << (*names)[0]
                  << "\" with lines";
-      if(n_vars > 1)
+      if (n_vars > 1)
         {
-          for(unsigned int i=1; i<n_vars; i++)
+          for (unsigned int i=1; i<n_vars; i++)
             {
               out_stream << ", \\\n\"" << data_file_name << "\" using 1:" << i+2
                          << " title \"" << (*names)[i] << "\" with lines";
@@ -185,14 +185,14 @@ void GnuPlotIO::write_solution(const std::string & fname,
         {
           const Elem * elem = *it;
 
-          for(unsigned int i=0; i<elem->n_nodes(); i++)
+          for (unsigned int i=0; i<elem->n_nodes(); i++)
             {
               std::vector<Number> values;
 
               // Get the global id of the node
               dof_id_type global_id = elem->node_id(i);
 
-              for(unsigned int c=0; c<n_vars; c++)
+              for (unsigned int c=0; c<n_vars; c++)
                 {
                   values.push_back( (*soln)[global_id*n_vars + c] );
                 }
@@ -205,7 +205,7 @@ void GnuPlotIO::write_solution(const std::string & fname,
       map_iterator map_it = node_map.begin();
       const map_iterator end_map_it = node_map.end();
 
-      for( ; map_it != end_map_it; ++map_it)
+      for ( ; map_it != end_map_it; ++map_it)
         {
           key_value_pair kvp = *map_it;
           std::vector<Number> values = kvp.second;

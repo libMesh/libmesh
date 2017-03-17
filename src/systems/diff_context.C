@@ -69,17 +69,17 @@ DiffContext::DiffContext (const System & sys) :
       // Only make space for these if we're using DiffSystem
       // This is assuming *only* DiffSystem is using elem_solution_rate/accel
       const DifferentiableSystem * diff_system = dynamic_cast<const DifferentiableSystem *>(&sys);
-      if(diff_system)
+      if (diff_system)
         {
           // Now, we only need these if the solver is unsteady
-          if( !diff_system->get_time_solver().is_steady() )
+          if (!diff_system->get_time_solver().is_steady())
             {
               _elem_subsolution_rates.push_back(new DenseSubVector<Number>(_elem_solution_rate));
 
               // We only need accel space if the TimeSolver is second order
               const UnsteadySolver & time_solver = cast_ref<const UnsteadySolver &>(diff_system->get_time_solver());
 
-              if( time_solver.time_order() >= 2 || !diff_system->get_second_order_vars().empty() )
+              if (time_solver.time_order() >= 2 || !diff_system->get_second_order_vars().empty())
                 _elem_subsolution_accels.push_back(new DenseSubVector<Number>(_elem_solution_accel));
             }
         }
@@ -106,9 +106,9 @@ DiffContext::~DiffContext ()
       delete _elem_subresiduals[i];
       for (std::size_t q=0; q != _elem_qoi_subderivatives.size(); ++q)
         delete _elem_qoi_subderivatives[q][i];
-      if( !_elem_subsolution_rates.empty() )
+      if (!_elem_subsolution_rates.empty())
         delete _elem_subsolution_rates[i];
-      if( !_elem_subsolution_accels.empty() )
+      if (!_elem_subsolution_accels.empty())
         delete _elem_subsolution_accels[i];
       if (!_elem_fixed_subsolutions.empty())
         delete _elem_fixed_subsolutions[i];
@@ -123,13 +123,13 @@ DiffContext::~DiffContext ()
   std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *> > >::iterator localized_vectors_end = _localized_vectors.end();
 
   // Loop over every localized_vector
-  for(; localized_vectors_it != localized_vectors_end; ++localized_vectors_it)
+  for (; localized_vectors_it != localized_vectors_end; ++localized_vectors_it)
     {
       // Grab the DenseSubVector to be deleted
       std::vector<DenseSubVector<Number> * > &  localized_vector_dsv = localized_vectors_it->second.second;
 
       // Loop over that vector and delete each entry
-      for(std::size_t i=0; i != localized_vector_dsv.size(); ++i)
+      for (std::size_t i=0; i != localized_vector_dsv.size(); ++i)
         delete localized_vector_dsv[i];
     }
 }
@@ -161,7 +161,7 @@ void DiffContext::add_localized_vector (NumericVector<Number> & localized_vector
   _localized_vectors[&localized_vector].second.reserve(nv);
 
   // Fill the DenseSubVector with nv copies of DenseVector
-  for(unsigned int i=0; i != nv; ++i)
+  for (unsigned int i=0; i != nv; ++i)
     _localized_vectors[&localized_vector].second.push_back(new DenseSubVector<Number>(_localized_vectors[&localized_vector].first));
 }
 

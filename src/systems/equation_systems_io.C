@@ -446,7 +446,7 @@ void EquationSystems::write(const std::string & name,
   // the EquationSystems::write() method should look constant,
   // but we need to assign a temporary numbering to the nodes
   // and elements in the mesh, which requires that we abuse const_cast
-  if(partition_agnostic)
+  if (partition_agnostic)
     {
       MeshBase & mesh = const_cast<MeshBase &>(this->get_mesh());
       MeshTools::Private::globally_renumber_nodes_and_elements(mesh);
@@ -577,7 +577,7 @@ void EquationSystems::write(const std::string & name,
   // the EquationSystems::write() method should look constant,
   // but we need to undo the temporary numbering of the nodes
   // and elements in the mesh, which requires that we abuse const_cast
-  if(partition_agnostic)
+  if (partition_agnostic)
     const_cast<MeshBase &>(_mesh).fix_broken_node_and_element_numbering();
 }
 

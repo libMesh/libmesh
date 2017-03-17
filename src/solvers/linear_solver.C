@@ -81,7 +81,7 @@ template <typename T>
 PreconditionerType
 LinearSolver<T>::preconditioner_type () const
 {
-  if(_preconditioner)
+  if (_preconditioner)
     return _preconditioner->type();
 
   return _preconditioner_type;
@@ -91,7 +91,7 @@ template <typename T>
 void
 LinearSolver<T>::set_preconditioner_type (const PreconditionerType pct)
 {
-  if(_preconditioner)
+  if (_preconditioner)
     _preconditioner->set_type(pct);
   else
     _preconditioner_type = pct;

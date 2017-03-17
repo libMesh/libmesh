@@ -317,7 +317,7 @@ void ExodusII_IO::read (const std::string & fname)
         unsigned int raw_side_index = exio_helper->side_list[e]-1;
         unsigned int side_index_offset = conv.get_shellface_index_offset();
 
-        if(raw_side_index < side_index_offset)
+        if (raw_side_index < side_index_offset)
           {
             // We assume this is a "shell face"
             int mapped_shellface = raw_side_index;
@@ -575,12 +575,12 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   std::vector<Number> soln;
   es.get_solution(soln, names);
 
-  if(soln.empty()) // If there is nothing to write just return
+  if (soln.empty()) // If there is nothing to write just return
     return;
 
   // The data must ultimately be written block by block.  This means that this data
   // must be sorted appropriately.
-  if(MeshOutput<MeshBase>::mesh().processor_id())
+  if (MeshOutput<MeshBase>::mesh().processor_id())
     return;
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
@@ -643,7 +643,7 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
   // The names of the variables to be output
   std::vector<std::string> output_names;
 
-  if(_allow_empty_variables || !_output_variables.empty())
+  if (_allow_empty_variables || !_output_variables.empty())
     output_names = _output_variables;
   else
     output_names = names;
@@ -707,7 +707,7 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
 
 void ExodusII_IO::write_information_records (const std::vector<std::string> & records)
 {
-  if(MeshOutput<MeshBase>::mesh().processor_id())
+  if (MeshOutput<MeshBase>::mesh().processor_id())
     return;
 
   if (!exio_helper->opened_for_writing)
@@ -721,7 +721,7 @@ void ExodusII_IO::write_information_records (const std::vector<std::string> & re
 void ExodusII_IO::write_global_data (const std::vector<Number> & soln,
                                      const std::vector<std::string> & names)
 {
-  if(MeshOutput<MeshBase>::mesh().processor_id())
+  if (MeshOutput<MeshBase>::mesh().processor_id())
     return;
 
   if (!exio_helper->opened_for_writing)
@@ -779,7 +779,7 @@ void ExodusII_IO::write_timestep (const std::string & fname,
   _timestep = timestep;
   write_equation_systems(fname,es);
 
-  if(MeshOutput<MeshBase>::mesh().processor_id())
+  if (MeshOutput<MeshBase>::mesh().processor_id())
     return;
 
   exio_helper->write_timestep(timestep, time);
@@ -814,8 +814,7 @@ void ExodusII_IO::write (const std::string & fname)
   exio_helper->write_sidesets(mesh);
   exio_helper->write_nodesets(mesh);
 
-  if( (mesh.get_boundary_info().n_edge_conds() > 0) &&
-      _verbose )
+  if ((mesh.get_boundary_info().n_edge_conds() > 0) && _verbose)
     {
       libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
                    << "are not supported by the ExodusII format."
@@ -921,8 +920,7 @@ void ExodusII_IO::write_nodal_data_common(std::string fname,
           exio_helper->write_sidesets(mesh);
           exio_helper->write_nodesets(mesh);
 
-          if( (mesh.get_boundary_info().n_edge_conds() > 0) &&
-              _verbose )
+          if ((mesh.get_boundary_info().n_edge_conds() > 0) && _verbose)
             {
               libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
                            << "are not supported by the ExodusII format."

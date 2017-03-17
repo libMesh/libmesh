@@ -91,7 +91,7 @@ void NameBasedIO::read (const std::string & name)
       if (!in.good())
         libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << full_name.str());
     }
-  else if(name.rfind(".cp")) {} // Do error checking in the reader
+  else if (name.rfind(".cp")) {} // Do error checking in the reader
   else
     {
       std::ifstream in (name.c_str());
@@ -152,7 +152,7 @@ void NameBasedIO::read (const std::string & name)
         Nemesis_IO(mymesh).read (name);
       else if (name.rfind(".cp") < name.size())
         {
-          if(name.rfind(".cpa") < name.size())
+          if (name.rfind(".cpa") < name.size())
             CheckpointIO(mymesh, false).read(name);
           else
             CheckpointIO(mymesh, true).read(name);

@@ -435,7 +435,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
     write_variable = true;
 
   // 3.) cell-centered data
-  if ( !(this->_cell_centered_data.empty()) )
+  if (!(this->_cell_centered_data.empty()))
     write_variable = true;
 
   if (write_variable)
@@ -471,7 +471,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
 
 
   // optionally write cell-centered data
-  if ( !(this->_cell_centered_data.empty()) )
+  if (!(this->_cell_centered_data.empty()))
     {
       std::map<std::string, const std::vector<Real> *>::iterator       it  = this->_cell_centered_data.begin();
       const std::map<std::string, const std::vector<Real> *>::iterator end = this->_cell_centered_data.end();
@@ -1127,7 +1127,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
     write_variable = true;
 
   // 3.) cell-centered data
-  if ( !(this->_cell_centered_data.empty()) )
+  if (!(this->_cell_centered_data.empty()))
     write_variable = true;
 
   if (write_variable)
@@ -1155,7 +1155,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
 
 
   // optionally write cell-centered data
-  if ( !(this->_cell_centered_data.empty()) )
+  if (!(this->_cell_centered_data.empty()))
     {
       std::map<std::string, const std::vector<Real> *>::iterator       it  = this->_cell_centered_data.begin();
       const std::map<std::string, const std::vector<Real> *>::iterator end = this->_cell_centered_data.end();
@@ -1472,7 +1472,7 @@ void GMVIO::write_binary (const std::string & fname,
     write_variable = true;
 
   //   // 3.) cell-centered data - unsupported
-  //   if ( !(this->_cell_centered_data.empty()) )
+  //   if (!(this->_cell_centered_data.empty()))
   //     write_variable = true;
 
   if (write_variable)
@@ -1510,7 +1510,7 @@ void GMVIO::write_binary (const std::string & fname,
 
 
   // optionally write cell-centered data
-  if ( !(this->_cell_centered_data.empty()) )
+  if (!(this->_cell_centered_data.empty()))
     {
       libMesh::err << "Cell-centered data not (yet) supported in binary I/O mode!" << std::endl;
 
@@ -1909,7 +1909,7 @@ void GMVIO::write_discontinuous_gmv (const std::string & name,
 
 
   // Writing cell-centered data is not yet supported in discontinuous GMV files.
-  if ( !(this->_cell_centered_data.empty()) )
+  if (!(this->_cell_centered_data.empty()))
     {
       libMesh::err << "Cell-centered data not (yet) supported for discontinuous GMV files!" << std::endl;
     }

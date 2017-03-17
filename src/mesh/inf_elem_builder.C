@@ -198,7 +198,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
       // duplicate) global node numbers.
       std::set< std::pair<dof_id_type,unsigned int> >::iterator face_it = inner_faces.begin();
       const std::set< std::pair<dof_id_type,unsigned int> >::iterator face_end = inner_faces.end();
-      for(; face_it!=face_end; ++face_it)
+      for (; face_it!=face_end; ++face_it)
         {
           std::pair<dof_id_type,unsigned int> p = *face_it;
 
@@ -330,7 +330,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
     MeshBase::element_iterator       it  = this->_mesh.active_elements_begin();
     const MeshBase::element_iterator end = this->_mesh.active_elements_end();
 
-    for(; it != end; ++it)
+    for (; it != end; ++it)
       {
         Elem * elem = *it;
 
@@ -352,33 +352,33 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
                 // Loop over the nodes to check whether they are on the symmetry planes,
                 // and therefore sufficient to use a non-full-ordered side element
-                for(unsigned int n=0; n<side->n_nodes(); n++)
+                for (unsigned int n=0; n<side->n_nodes(); n++)
                   {
                     const Point dist_from_origin =
                       this->_mesh.point(side->node_id(n)) - origin;
 
-                    if(x_sym)
-                      if( std::abs(dist_from_origin(0)) > 1.e-3 )
+                    if (x_sym)
+                      if (std::abs(dist_from_origin(0)) > 1.e-3)
                         on_x_sym=false;
 
-                    if(y_sym)
-                      if( std::abs(dist_from_origin(1)) > 1.e-3 )
+                    if (y_sym)
+                      if (std::abs(dist_from_origin(1)) > 1.e-3)
                         on_y_sym=false;
 
-                    if(z_sym)
-                      if( std::abs(dist_from_origin(2)) > 1.e-3 )
+                    if (z_sym)
+                      if (std::abs(dist_from_origin(2)) > 1.e-3)
                         on_z_sym=false;
 
-                    //       if(x_sym)
-                    // if( std::abs(dist_from_origin(0)) > 1.e-6 )
+                    //       if (x_sym)
+                    // if (std::abs(dist_from_origin(0)) > 1.e-6)
                     //   on_x_sym=false;
 
-                    //       if(y_sym)
-                    // if( std::abs(dist_from_origin(1)) > 1.e-6 )
+                    //       if (y_sym)
+                    // if (std::abs(dist_from_origin(1)) > 1.e-6)
                     //   on_y_sym=false;
 
-                    //       if(z_sym)
-                    // if( std::abs(dist_from_origin(2)) > 1.e-6 )
+                    //       if (z_sym)
+                    // if (std::abs(dist_from_origin(2)) > 1.e-6)
                     //   on_z_sym=false;
 
                     //find the node most distant from origin
@@ -434,8 +434,8 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
       UniquePtr<Elem> side(this->_mesh.elem_ref(p.first).build_side_ptr(p.second));
 
       bool found=false;
-      for(unsigned int sn=0; sn<side->n_nodes(); sn++)
-        if(onodes.count(side->node_id(sn)))
+      for (unsigned int sn=0; sn<side->n_nodes(); sn++)
+        if (onodes.count(side->node_id(sn)))
           {
             found=true;
             break;
@@ -443,9 +443,9 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
 
       // If a new oface is found, include its nodes in onodes
-      if(found)
+      if (found)
         {
-          for(unsigned int sn=0; sn<side->n_nodes(); sn++)
+          for (unsigned int sn=0; sn<side->n_nodes(); sn++)
             onodes.insert(side->node_id(sn));
 
           ofaces.insert(p);
@@ -460,7 +460,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
       // If at least one new oface was found in this cycle,
       // do another search cycle.
-      if(facesfound>0 && face_it == faces.end())
+      if (facesfound>0 && face_it == faces.end())
         {
           facesfound = 0;
           face_it    = faces.begin();
@@ -501,7 +501,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
   // for each boundary node, add an outer_node with
   // double distance from origin.
   std::set<dof_id_type>::iterator on_it = onodes.begin();
-  for( ; on_it != onodes.end(); ++on_it)
+  for ( ; on_it != onodes.end(); ++on_it)
     {
       Point p = (Point(this->_mesh.point(*on_it)) * 2) - origin;
       if (_mesh.is_serial())
@@ -529,7 +529,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
   // build Elems based on boundary side type
   std::set< std::pair<dof_id_type,unsigned int> >::iterator face_it = ofaces.begin();
-  for( ; face_it != ofaces.end(); ++face_it)
+  for ( ; face_it != ofaces.end(); ++face_it)
     {
       // Shortcut to the pair being iterated over
       std::pair<dof_id_type,unsigned int> p = *face_it;
@@ -605,7 +605,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
       // assign vertices to the new infinite element
       const unsigned int n_base_vertices = side->n_vertices();
-      for(unsigned int i=0; i<n_base_vertices; i++)
+      for (unsigned int i=0; i<n_base_vertices; i++)
         {
           el->set_node(i                ) = side->node_ptr(i);
           el->set_node(i+n_base_vertices) = outer_nodes[side->node_id(i)];
@@ -622,7 +622,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
           // since for QUAD9, the 9th node was already assigned above
           const unsigned int n_safe_base_nodes   = el->n_vertices();
 
-          for(unsigned int i=n_base_vertices; i<n_safe_base_nodes; i++)
+          for (unsigned int i=n_base_vertices; i<n_safe_base_nodes; i++)
             {
               el->set_node(i+n_base_vertices)   = side->node_ptr(i);
               el->set_node(i+n_safe_base_nodes) =

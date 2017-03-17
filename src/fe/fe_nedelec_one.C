@@ -118,12 +118,12 @@ void nedelec_one_nodal_soln(const Elem * elem,
 
         vis_fe->reinit(elem,&refspace_nodes);
 
-        for( unsigned int n = 0; n < n_nodes; n++ )
+        for (unsigned int n = 0; n < n_nodes; n++)
           {
             libmesh_assert_equal_to (elem_soln.size(), n_sf);
 
             // Zero before summation
-            for( int d = 0; d < dim; d++ )
+            for (int d = 0; d < dim; d++)
               {
                 nodal_soln[dim*n+d] = 0;
               }
@@ -131,7 +131,7 @@ void nedelec_one_nodal_soln(const Elem * elem,
             // u = Sum (u_i phi_i)
             for (unsigned int i=0; i<n_sf; i++)
               {
-                for( int d = 0; d < dim; d++ )
+                for (int d = 0; d < dim; d++)
                   {
                     nodal_soln[dim*n+d]   += elem_soln[i]*(vis_phi[i][n](d));
                   }

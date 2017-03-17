@@ -199,7 +199,7 @@ void PetscVector<T>::add_vector (const T * v,
                                  const std::vector<numeric_index_type> & dof_indices)
 {
   // If we aren't adding anything just return
-  if(dof_indices.empty())
+  if (dof_indices.empty())
     return;
 
   this->_restore_array();
@@ -329,7 +329,7 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T> & v_in)
 
   libmesh_assert_equal_to (this->size(), v->size());
 
-  if(this->type() != GHOSTED)
+  if (this->type() != GHOSTED)
     {
       ierr = VecAXPY(_vec, a, v->_vec);
       LIBMESH_CHKERR(ierr);
@@ -382,7 +382,7 @@ void PetscVector<T>::scale (const T factor_in)
   PetscErrorCode ierr = 0;
   PetscScalar factor = static_cast<PetscScalar>(factor_in);
 
-  if(this->type() != GHOSTED)
+  if (this->type() != GHOSTED)
     {
       ierr = VecScale(_vec, factor);
       LIBMESH_CHKERR(ierr);
@@ -421,7 +421,7 @@ void PetscVector<T>::abs()
 
   PetscErrorCode ierr = 0;
 
-  if(this->type() != GHOSTED)
+  if (this->type() != GHOSTED)
     {
       ierr = VecAbs(_vec);
       LIBMESH_CHKERR(ierr);
@@ -495,7 +495,7 @@ PetscVector<T>::operator = (const T s_in)
 
   if (this->size() != 0)
     {
-      if(this->type() != GHOSTED)
+      if (this->type() != GHOSTED)
         {
           ierr = VecSet(_vec, s);
           LIBMESH_CHKERR(ierr);
@@ -565,7 +565,7 @@ PetscVector<T>::operator = (const PetscVector<T> & v)
 
       if (v.size() != 0)
         {
-          if(this->type() != GHOSTED)
+          if (this->type() != GHOSTED)
             {
               ierr = VecCopy (v._vec, this->_vec);
               LIBMESH_CHKERR(ierr);
@@ -968,7 +968,7 @@ void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
   // otherwise multiple processors
   else
     {
-      if(pid == 0) // optimized version for localizing to 0
+      if (pid == 0) // optimized version for localizing to 0
         {
           Vec vout;
           VecScatter ctx;
@@ -981,7 +981,7 @@ void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
           ierr = VecScatterEnd(ctx, _vec, vout, INSERT_VALUES, SCATTER_FORWARD);
           LIBMESH_CHKERR(ierr);
 
-          if(processor_id() == 0)
+          if (processor_id() == 0)
             {
               v_local.resize(n);
 
@@ -1130,7 +1130,7 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T> & vec1,
 
   // Call PETSc function.
 
-  if(this->type() != GHOSTED)
+  if (this->type() != GHOSTED)
     {
       ierr = VecPointwiseMult(this->vec(),
                               const_cast<PetscVector<T> *>(vec1_petsc)->vec(),
@@ -1354,7 +1354,7 @@ void PetscVector<T>::_get_array(bool read_only) const
       if (!_array_is_present)
         {
           PetscErrorCode ierr=0;
-          if(this->type() != GHOSTED)
+          if (this->type() != GHOSTED)
             {
 #if PETSC_VERSION_LESS_THAN(3,2,0)
               // Vec{Get,Restore}ArrayRead were introduced in PETSc 3.2.0.  If you
@@ -1449,7 +1449,7 @@ void PetscVector<T>::_restore_array() const
       if (_array_is_present)
         {
           PetscErrorCode ierr=0;
-          if(this->type() != GHOSTED)
+          if (this->type() != GHOSTED)
             {
 #if PETSC_VERSION_LESS_THAN(3,2,0)
               // Vec{Get,Restore}ArrayRead were introduced in PETSc 3.2.0.  If you

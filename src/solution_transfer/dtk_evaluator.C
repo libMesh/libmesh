@@ -52,13 +52,13 @@ DTKEvaluator::evaluate(const Teuchos::ArrayRCP<int> & elements,
   Teuchos::ArrayRCP<Number> values(num_values);
   DataTransferKit::FieldContainer<Number> evaluations(values, 1);
 
-  for(unsigned int i=0; i<num_values; i++)
+  for (unsigned int i=0; i<num_values; i++)
     {
       Elem * elem = mesh.elem_ptr(elements[i]);
 
       Point p;
 
-      for(unsigned int j=0; j<dim; j++)
+      for (unsigned int j=0; j<dim; j++)
         p(j) = coords[(j*num_values)+i];
 
       const Point mapped_point(FEInterface::inverse_map(dim, dof_map.variable_type(0), elem, p));

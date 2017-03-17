@@ -2103,7 +2103,7 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
       // to a local element.  Otherwise, another processor will be responsible for writing it in its nodeset.
       std::map<int, int>::iterator it = this->libmesh_node_num_to_exodus.find( boundary_node_list[i] );
 
-      if ( it != this->libmesh_node_num_to_exodus.end() )
+      if (it != this->libmesh_node_num_to_exodus.end())
         {
           // Get reference to the vector where this node ID will be inserted.  If it
           // doesn't yet exist, this will create it.

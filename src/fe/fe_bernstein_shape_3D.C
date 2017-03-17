@@ -351,7 +351,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               // handle the edge orientation
               {
                 // Edge 0
-                if ( (i0[i] >= 2) && (i1[i] == 0) && (i2[i] == 0))
+                if ((i0[i] >= 2) && (i1[i] == 0) && (i2[i] == 0))
                   {
                     if (elem->point(0) != std::min(elem->point(0), elem->point(1)))
                       xi_mapped = -xi;
@@ -428,7 +428,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               // handle the face orientation
               {
                 // Face 0
-                if (     (i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
+                if ((i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
                   {
                     const Point min_point = std::min(elem->point(1),
                                                      std::min(elem->point(2),
@@ -875,7 +875,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               // handle the edge orientation
               {
                 // Edge 0
-                if ( (i0[i] >= 2) && (i1[i] == 0) && (i2[i] == 0))
+                if ((i0[i] >= 2) && (i1[i] == 0) && (i2[i] == 0))
                   {
                     if (elem->point(0) != std::min(elem->point(0), elem->point(1)))
                       xi_mapped = -xi;
@@ -952,7 +952,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               // handle the face orientation
               {
                 // Face 0
-                if (     (i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
+                if ((i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
                   {
                     const Point min_point = std::min(elem->point(1),
                                                      std::min(elem->point(2),
@@ -1954,7 +1954,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
             //       // handle the face orientation
             //       {
             // // Face 0
-            // if (     (i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
+            // if ((i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
             //   {
             //     const unsigned int min_node = std::min(elem->node_id(1),
             //    std::min(elem->node_id(2),
@@ -2528,7 +2528,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
             //       // handle the face orientation
             //       {
             // // Face 0
-            // if (     (i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
+            // if ((i2[i] == 0) && (i0[i] >= 2) && (i1[i] >= 2))
             //   {
             //     const unsigned int min_node = std::min(elem->node_id(1),
             //    std::min(elem->node_id(2),

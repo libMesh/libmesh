@@ -560,7 +560,7 @@ int main (int argc, char ** argv)
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  if(addinfelems)
+  if (addinfelems)
     {
       if (names.size() == 3)
         libmesh_error_msg("ERROR: Invalid combination: Building infinite elements\n"

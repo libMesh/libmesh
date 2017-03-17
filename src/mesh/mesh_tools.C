@@ -506,8 +506,8 @@ dof_id_type MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase & me
   MeshBase::const_element_iterator el = mesh.type_elements_begin(type);
   const MeshBase::const_element_iterator end = mesh.type_elements_end(type);
 
-  for(; el!=end; ++el)
-    if( ((*el)->level() == level) && !(*el)->subactive())
+  for (; el!=end; ++el)
+    if (((*el)->level() == level) && !(*el)->subactive())
       cnt++;
 
   return cnt;
@@ -521,7 +521,7 @@ unsigned int MeshTools::n_active_local_levels(const MeshBase & mesh)
   MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     nl = std::max((*el)->level() + 1, nl);
 
   return nl;
@@ -540,7 +540,7 @@ unsigned int MeshTools::n_active_levels(const MeshBase & mesh)
   const MeshBase::const_element_iterator end_el =
     mesh.unpartitioned_elements_end();
 
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     if ((*el)->active())
       nl = std::max((*el)->level() + 1, nl);
 
@@ -557,7 +557,7 @@ unsigned int MeshTools::n_local_levels(const MeshBase & mesh)
   MeshBase::const_element_iterator el = mesh.local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
 
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     nl = std::max((*el)->level() + 1, nl);
 
   return nl;
@@ -576,7 +576,7 @@ unsigned int MeshTools::n_levels(const MeshBase & mesh)
   const MeshBase::const_element_iterator end_el =
     mesh.unpartitioned_elements_end();
 
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     nl = std::max((*el)->level() + 1, nl);
 
   mesh.comm().max(nl);
@@ -603,7 +603,7 @@ unsigned int MeshTools::paranoid_n_levels(const MeshBase & mesh)
     mesh.elements_end();
 
   unsigned int nl = 0;
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     nl = std::max((*el)->level() + 1, nl);
 
   mesh.comm().max(nl);
@@ -617,10 +617,10 @@ void MeshTools::get_not_subactive_node_ids(const MeshBase & mesh,
 {
   MeshBase::const_element_iterator el           = mesh.elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.elements_end();
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     {
       const Elem * elem = (*el);
-      if(!elem->subactive())
+      if (!elem->subactive())
         for (unsigned int n=0; n<elem->n_nodes(); ++n)
           not_subactive_node_ids.insert(elem->node_id(n));
     }
@@ -655,14 +655,14 @@ unsigned int MeshTools::n_p_levels (const MeshBase & mesh)
     el     = mesh.local_elements_begin(),
     end_el = mesh.local_elements_end();
 
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     max_p_level = std::max((*el)->p_level(), max_p_level);
 
   // then any unpartitioned objects
   el     = mesh.unpartitioned_elements_begin();
   end_el = mesh.unpartitioned_elements_end();
 
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     max_p_level = std::max((*el)->p_level(), max_p_level);
 
   mesh.comm().max(max_p_level);
@@ -800,7 +800,7 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
               // Find the edge the node is on
               bool found_edge = false;
               for (; current_edge<elem->n_edges(); ++current_edge)
-                if ( elem->is_node_on_edge(local_node_number, current_edge) )
+                if (elem->is_node_on_edge(local_node_number, current_edge))
                   {
                     found_edge = true;
                     break;
@@ -855,7 +855,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
 
       //Right now this only works for quad4's
       //libmesh_assert_equal_to (elem->type(), QUAD4);
-      if(elem->type() == QUAD4)
+      if (elem->type() == QUAD4)
         {
           //Loop over the sides looking for sides that have hanging nodes
           //This code is inspired by compute_proj_constraints()
@@ -882,15 +882,15 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
 
                       bool found_in_neighbor = false;
 
-                      //Find the two vertices that make up this side
-                      while(!elem->is_node_on_side(local_node1++,s)) { }
+                      // Find the two vertices that make up this side
+                      while (!elem->is_node_on_side(local_node1++,s)) { }
                       local_node1--;
 
-                      //Start looking for the second one with the next node
+                      // Start looking for the second one with the next node
                       local_node2=local_node1+1;
 
-                      //Find the other one
-                      while(!elem->is_node_on_side(local_node2++,s)) { }
+                      // Find the other one
+                      while (!elem->is_node_on_side(local_node2++,s)) { }
                       local_node2--;
 
                       //Pull out their global ids:
@@ -903,35 +903,35 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
 
                       //First look for the first one
                       //FIXME could be streamlined a bit
-                      for(unsigned int n=0;n<neigh->n_sides();n++)
+                      for (unsigned int n=0;n<neigh->n_sides();n++)
                         {
-                          if(neigh->node_id(n) == node1)
+                          if (neigh->node_id(n) == node1)
                             found_in_neighbor=true;
                         }
 
                       dof_id_type hanging_node=0;
 
-                      if(!found_in_neighbor)
+                      if (!found_in_neighbor)
                         hanging_node=node1;
-                      else //If it wasn't node1 then it must be node2!
+                      else // If it wasn't node1 then it must be node2!
                         hanging_node=node2;
 
-                      //Reset these for reuse
+                      // Reset these for reuse
                       local_node1=0;
                       local_node2=0;
 
-                      //Find the first node that makes up the side in the neighbor (these should be the parent nodes)
-                      while(!neigh->is_node_on_side(local_node1++,s_neigh)) { }
+                      // Find the first node that makes up the side in the neighbor (these should be the parent nodes)
+                      while (!neigh->is_node_on_side(local_node1++,s_neigh)) { }
                       local_node1--;
 
                       local_node2=local_node1+1;
 
                       //Find the second node...
-                      while(!neigh->is_node_on_side(local_node2++,s_neigh)) { }
+                      while (!neigh->is_node_on_side(local_node2++,s_neigh)) { }
                       local_node2--;
 
                       //Save them if we haven't already found the parents for this one
-                      if(hanging_nodes[hanging_node].size()<2)
+                      if (hanging_nodes[hanging_node].size()<2)
                         {
                           hanging_nodes[hanging_node].push_back(neigh->node_id(local_node1));
                           hanging_nodes[hanging_node].push_back(neigh->node_id(local_node2));

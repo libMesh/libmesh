@@ -115,12 +115,12 @@ void DifferentiableSystem::init_data ()
   libmesh_assert_equal_to (&(time_solver->system()), this);
 
   // Now check for second order variables and add their velocities to the System.
-  if( !time_solver->is_steady() )
+  if (!time_solver->is_steady())
     {
       const UnsteadySolver & unsteady_solver =
         cast_ref<const UnsteadySolver &>(*(time_solver.get()));
 
-      if( unsteady_solver.time_order() == 1 )
+      if (unsteady_solver.time_order() == 1)
         this->add_second_order_dot_vars();
     }
 
@@ -196,17 +196,17 @@ void DifferentiableSystem::release_linear_solver(LinearSolver<Number> *) const
 void DifferentiableSystem::add_second_order_dot_vars()
 {
   const std::set<unsigned int> & second_order_vars = this->get_second_order_vars();
-  if( !second_order_vars.empty() )
+  if (!second_order_vars.empty())
     {
-      for( std::set<unsigned int>::const_iterator var_it = second_order_vars.begin();
-           var_it != second_order_vars.end(); ++var_it )
+      for (std::set<unsigned int>::const_iterator var_it = second_order_vars.begin();
+           var_it != second_order_vars.end(); ++var_it)
         {
           const Variable & var = this->variable(*var_it);
           std::string new_var_name = std::string("dot_")+var.name();
 
           unsigned int v_var_idx;
 
-          if( var.active_subdomains().empty() )
+          if (var.active_subdomains().empty())
             v_var_idx = this->add_variable( new_var_name, var.type() );
           else
             v_var_idx = this->add_variable( new_var_name, var.type(), &var.active_subdomains() );
@@ -233,7 +233,7 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
   const DirichletBoundaries * all_dbcs =
     this->get_dof_map().get_dirichlet_boundaries();
 
-  if( all_dbcs )
+  if (all_dbcs)
     {
       // We need to cache the DBCs to be added so that we add them
       // after looping over the existing DBCs. Otherwise, we're polluting
@@ -241,7 +241,7 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
       std::vector<DirichletBoundary*> new_dbcs;
 
       DirichletBoundaries::const_iterator dbc_it = all_dbcs->begin();
-      for( ; dbc_it != all_dbcs->end(); ++dbc_it )
+      for ( ; dbc_it != all_dbcs->end(); ++dbc_it )
         {
           libmesh_assert(*dbc_it);
           DirichletBoundary & dbc = *(*dbc_it);
@@ -254,10 +254,10 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
           // If we found it, then we also need to add it's corresponding
           // "dot" variable to a DirichletBoundary
           std::vector<unsigned int> vars_to_add;
-          if( dbc_var_it != dbc.variables.end() )
+          if (dbc_var_it != dbc.variables.end())
             vars_to_add.push_back(dot_var_idx);
 
-          if( !vars_to_add.empty() )
+          if (!vars_to_add.empty())
             {
               // We need to check if the boundary condition is time-dependent.
               // Currently, we cannot automatically differentiate w.r.t. time
@@ -266,22 +266,22 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
               // "velocity" boundary condition, so we error. Otherwise,
               // the "velocity boundary condition will just be zero.
               bool is_time_evolving_bc = false;
-              if( dbc.f )
+              if (dbc.f)
                 is_time_evolving_bc = dbc.f->is_time_dependent();
-              else if( dbc.f_fem )
+              else if (dbc.f_fem)
                 // We it's a FEMFunctionBase object, it will be implictly
                 // time-dependent since it is assumed to depend on the solution.
                 is_time_evolving_bc = true;
               else
                 libmesh_error_msg("Could not find valid boundary function!");
 
-              if( is_time_evolving_bc )
+              if (is_time_evolving_bc)
                 libmesh_error_msg("Cannot currently support time-dependent Dirichlet BC for dot variables!");
 
 
               DirichletBoundary * new_dbc;
 
-              if( dbc.f )
+              if (dbc.f)
                 {
                   ZeroFunction<Number> zf;
 
@@ -298,14 +298,14 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
       std::vector<DirichletBoundary*>::iterator new_dbc_it =
         new_dbcs.begin();
 
-      for( ; new_dbc_it != new_dbcs.end(); ++new_dbc_it )
+      for ( ; new_dbc_it != new_dbcs.end(); ++new_dbc_it )
         {
           const DirichletBoundary & dbc = *(*new_dbc_it);
           this->get_dof_map().add_dirichlet_boundary(dbc);
           delete *new_dbc_it;
         }
 
-    } // if(all_dbcs)
+    } // if (all_dbcs)
 }
 
 unsigned int DifferentiableSystem::get_second_order_dot_var( unsigned int var ) const
@@ -313,12 +313,12 @@ unsigned int DifferentiableSystem::get_second_order_dot_var( unsigned int var ) 
   // For SteadySolver or SecondOrderUnsteadySolvers, we just give back var
   unsigned int dot_var = var;
 
-  if( !time_solver->is_steady() )
+  if (!time_solver->is_steady())
     {
       const UnsteadySolver & unsteady_solver =
         cast_ref<const UnsteadySolver &>(*(time_solver.get()));
 
-      if( unsteady_solver.time_order() == 1 )
+      if (unsteady_solver.time_order() == 1)
         dot_var = this->_second_order_dot_vars.find(var)->second;
     }
 
@@ -329,13 +329,13 @@ bool DifferentiableSystem::have_first_order_scalar_vars() const
 {
   bool have_first_order_scalar_vars = false;
 
-  if(this->have_first_order_vars())
+  if (this->have_first_order_vars())
     {
-      for( std::set<unsigned int>::const_iterator var_it = this->get_first_order_vars().begin();
+      for (std::set<unsigned int>::const_iterator var_it = this->get_first_order_vars().begin();
            var_it != this->get_first_order_vars().end();
-           ++var_it )
+           ++var_it)
         {
-          if( this->variable(*var_it).type().family == SCALAR )
+          if (this->variable(*var_it).type().family == SCALAR)
             have_first_order_scalar_vars = true;
         }
     }
@@ -347,13 +347,13 @@ bool DifferentiableSystem::have_second_order_scalar_vars() const
 {
   bool have_second_order_scalar_vars = false;
 
-  if(this->have_second_order_vars())
+  if (this->have_second_order_vars())
     {
-      for( std::set<unsigned int>::const_iterator var_it = this->get_second_order_vars().begin();
+      for (std::set<unsigned int>::const_iterator var_it = this->get_second_order_vars().begin();
            var_it != this->get_second_order_vars().end();
-           ++var_it )
+           ++var_it)
         {
-          if( this->variable(*var_it).type().family == SCALAR )
+          if (this->variable(*var_it).type().family == SCALAR)
             have_second_order_scalar_vars = true;
         }
     }

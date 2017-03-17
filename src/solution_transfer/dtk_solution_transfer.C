@@ -56,14 +56,14 @@ DTKSolutionTransfer::DTKSolutionTransfer(const libMesh::Parallel::Communicator &
 
 DTKSolutionTransfer::~DTKSolutionTransfer()
 {
-  for(std::map<EquationSystems *, DTKAdapter *>::iterator it = adapters.begin();
-      it != adapters.end();
-      ++it)
+  for (std::map<EquationSystems *, DTKAdapter *>::iterator it = adapters.begin();
+       it != adapters.end();
+       ++it)
     delete it->second;
 
-  for(std::map<std::pair<EquationSystems *, EquationSystems *>, shared_domain_map_type *>::iterator it = dtk_maps.begin();
-      it != dtk_maps.end();
-      ++it)
+  for (std::map<std::pair<EquationSystems *, EquationSystems *>, shared_domain_map_type *>::iterator it = dtk_maps.begin();
+       it != dtk_maps.end();
+       ++it)
     delete it->second;
 }
 
@@ -77,11 +77,11 @@ DTKSolutionTransfer::transfer(const Variable & from_var,
   EquationSystems * to_es = &to_var.system()->get_equation_systems();
 
   // Possibly make an Adapter for from_es
-  if(adapters.find(from_es) == adapters.end())
+  if (adapters.find(from_es) == adapters.end())
     adapters[from_es] = new DTKAdapter(comm_default, *from_es);
 
   // Possibly make an Adapter for to_es
-  if(adapters.find(to_es) == adapters.end())
+  if (adapters.find(to_es) == adapters.end())
     adapters[to_es] = new DTKAdapter(comm_default, *to_es);
 
   DTKAdapter * from_adapter = adapters[from_es];
@@ -90,7 +90,7 @@ DTKSolutionTransfer::transfer(const Variable & from_var,
   std::pair<EquationSystems *, EquationSystems *> from_to(from_es, to_es);
 
   // If we haven't created a map for this pair of EquationSystems yet, do it now
-  if(dtk_maps.find(from_to) == dtk_maps.end())
+  if (dtk_maps.find(from_to) == dtk_maps.end())
     {
       libmesh_assert(from_es->get_mesh().mesh_dimension() == to_es->get_mesh().mesh_dimension());
 
@@ -106,7 +106,7 @@ DTKSolutionTransfer::transfer(const Variable & from_var,
 
   dtk_maps[from_to]->apply(from_evaluator, to_values);
 
-  if(dtk_maps[from_to]->getMissedTargetPoints().size())
+  if (dtk_maps[from_to]->getMissedTargetPoints().size())
     libMesh::out<<"Warning: Some points were missed in the transfer of "<<from_var.name()<<" to "<<to_var.name()<<"!"<<std::endl;
 
   to_adapter->update_variable_values(to_var.name());

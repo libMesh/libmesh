@@ -221,7 +221,7 @@ private:
 inline
 unsigned int EigenSystem::n_matrices () const
 {
-  if(_is_generalized_eigenproblem)
+  if (_is_generalized_eigenproblem)
     return 2;
 
   return 1;

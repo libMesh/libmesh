@@ -1813,7 +1813,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
         Elem * copy = Elem::build(elem->type()).release();
 
         // Set node pointers (they still point to nodes in the original mesh)
-        for(unsigned int n=0; n<elem->n_nodes(); n++)
+        for (unsigned int n=0; n<elem->n_nodes(); n++)
           copy->set_node(n) = elem->node_ptr(n);
 
         // Copy over ids
@@ -1916,7 +1916,7 @@ void MeshTools::Modification::change_boundary_id (MeshBase & mesh,
                                                   const boundary_id_type old_id,
                                                   const boundary_id_type new_id)
 {
-  if(old_id == new_id)
+  if (old_id == new_id)
     {
       // If the IDs are the same, this is a no-op.
       return;
@@ -2068,7 +2068,7 @@ void MeshTools::Modification::change_subdomain_id (MeshBase & mesh,
                                                    const subdomain_id_type old_id,
                                                    const subdomain_id_type new_id)
 {
-  if(old_id == new_id)
+  if (old_id == new_id)
     {
       // If the IDs are the same, this is a no-op.
       return;

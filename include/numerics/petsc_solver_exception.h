@@ -55,7 +55,7 @@ public:
   do {                                          \
     if (ierr != 0) {                            \
       throw PetscSolverException(ierr);         \
-    } } while(0)
+    } } while (0)
 
 #else
 

@@ -13,7 +13,7 @@ MemorySolutionHistory::~MemorySolutionHistory ()
   stored_solutions_iterator stored_sols_it = stored_solutions.begin();
   const stored_solutions_iterator stored_sols_end = stored_solutions.end();
 
-  for(; stored_sols_it != stored_sols_end; ++stored_sols_it)
+  for (; stored_sols_it != stored_sols_end; ++stored_sols_it)
     {
       // The saved vectors at this timestep
       std::map<std::string, NumericVector<Number> *> saved_vectors = stored_sols_it->second;
@@ -150,8 +150,8 @@ void MemorySolutionHistory::retrieve()
 
   // Do we not have a solution for this time?  Then
   // there's nothing to do.
-  if(stored_sols == stored_solutions.end() ||
-     std::abs(recovery_time - _system.time) > TOLERANCE)
+  if (stored_sols == stored_solutions.end() ||
+      std::abs(recovery_time - _system.time) > TOLERANCE)
     {
       //libMesh::out << "No more solutions to recover ! We are at time t = " <<
       //                     _system.time << std::endl;

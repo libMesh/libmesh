@@ -345,7 +345,7 @@ double PerfData::stop_or_pause(const bool do_stop)
 
   this->tot_time += elapsed_time;
 
-  if(do_stop)
+  if (do_stop)
     {
       const double elapsed_time_incl_sub = (static_cast<double>(this->tstart.tv_sec  - this->tstart_incl_sub.tv_sec) +
                                             static_cast<double>(this->tstart.tv_usec - this->tstart_incl_sub.tv_usec)*1.e-6);

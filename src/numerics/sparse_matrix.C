@@ -102,7 +102,7 @@ void SparseMatrix<Complex>::print(std::ostream & os, const bool sparse) const
 {
   // std::complex<>::operator<<() is defined, but use this form
 
-  if(sparse)
+  if (sparse)
     {
       libmesh_not_implemented();
     }
@@ -208,7 +208,7 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
 
   libmesh_assert (this->initialized());
 
-  if(!this->_dof_map)
+  if (!this->_dof_map)
     libmesh_error_msg("Error!  Trying to print a matrix with no dof_map set!");
 
   // We'll print the matrix from processor 0 to make sure
@@ -219,7 +219,7 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
       for (numeric_index_type i=this->_dof_map->first_dof();
            i!=this->_dof_map->end_dof(); ++i)
         {
-          if(sparse)
+          if (sparse)
             {
               for (numeric_index_type j=0; j<this->n(); j++)
                 {
@@ -257,7 +257,7 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
           std::size_t currentb = 0;
           for (;currenti <= ibuf.back(); ++currenti)
             {
-              if(sparse)
+              if (sparse)
                 {
                   for (numeric_index_type j=0; j<this->n(); j++)
                     {
@@ -288,7 +288,7 @@ void SparseMatrix<T>::print(std::ostream & os, const bool sparse) const
                 }
             }
         }
-      if(!sparse)
+      if (!sparse)
         {
           for (; currenti != this->m(); ++currenti)
             {

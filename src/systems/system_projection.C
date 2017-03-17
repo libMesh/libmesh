@@ -712,11 +712,11 @@ void System::project_vector (const NumericVector<Number> & old_v,
       // Copy the SCALAR dofs from old_vector to new_vector
       // Note: We assume that all SCALAR dofs are on the
       // processor with highest ID
-      if(this->processor_id() == (this->n_processors()-1))
+      if (this->processor_id() == (this->n_processors()-1))
         {
           const DofMap & dof_map = this->get_dof_map();
           for (unsigned int var=0; var<this->n_vars(); var++)
-            if(this->variable(var).type().family == SCALAR)
+            if (this->variable(var).type().family == SCALAR)
               {
                 // We can just map SCALAR dofs directly across
                 std::vector<dof_id_type> new_SCALAR_indices, old_SCALAR_indices;
@@ -925,14 +925,14 @@ void System::project_vector (NumericVector<Number> & new_vector,
   // Also, load values into the SCALAR dofs
   // Note: We assume that all SCALAR dofs are on the
   // processor with highest ID
-  if(this->processor_id() == (this->n_processors()-1))
+  if (this->processor_id() == (this->n_processors()-1))
     {
       // FIXME: Do we want to first check for SCALAR vars before building this? [PB]
       FEMContext context( *this );
 
       const DofMap & dof_map = this->get_dof_map();
       for (unsigned int var=0; var<this->n_vars(); var++)
-        if(this->variable(var).type().family == SCALAR)
+        if (this->variable(var).type().family == SCALAR)
           {
             // FIXME: We reinit with an arbitrary element in case the user
             //        doesn't override FEMFunctionBase::component. Is there
@@ -1121,29 +1121,29 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           context.get_element_fe( var, fe, dim );
           if (fe->get_fe_type().family == SCALAR)
             continue;
-          if( dim > 1 )
+          if (dim > 1)
             context.get_side_fe( var, side_fe, dim );
-          if( dim > 2 )
+          if (dim > 2)
             context.get_edge_fe( var, edge_fe );
 
           fe->get_xyz();
 
           fe->get_phi();
-          if( dim > 1 )
+          if (dim > 1)
             side_fe->get_phi();
-          if( dim > 2 )
+          if (dim > 2)
             edge_fe->get_phi();
 
           const FEContinuity cont = fe->get_continuity();
-          if(cont == C_ONE)
+          if (cont == C_ONE)
             {
               // Our C1 elements need gradient information
               libmesh_assert(g);
 
               fe->get_dphi();
-              if( dim > 1 )
+              if (dim > 1)
                 side_fe->get_dphi();
-              if( dim > 2 )
+              if (dim > 2)
                 edge_fe->get_dphi();
             }
         }
@@ -1151,7 +1151,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
   // Now initialize any user requested shape functions, xyz vals, etc
   f.init_context(context);
-  if(g.get())
+  if (g.get())
     g->init_context(context);
 
   // this->init_context(context);
@@ -1253,9 +1253,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
           context.get_element_fe( var, fe, dim );
           if (fe->get_fe_type().family == SCALAR)
             continue;
-          if( dim > 1 )
+          if (dim > 1)
             context.get_side_fe( var, side_fe, dim );
-          if( dim > 2 )
+          if (dim > 2)
             context.get_edge_fe( var, edge_fe );
 
           const FEContinuity cont = fe->get_continuity();

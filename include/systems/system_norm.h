@@ -216,7 +216,7 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> & norms,
   _weights_sq(weights.size()),
   _off_diagonal_weights(weights)
 {
-  if(_norms.empty())
+  if (_norms.empty())
     _norms.push_back(DISCRETE_L2);
 
   if (_weights.empty())
@@ -228,9 +228,9 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> & norms,
     {
       // Loop over the entries of the user provided matrix and store its entries in
       // the _off_diagonal_weights or _diagonal_weights
-      for(std::size_t i=0; i!=_off_diagonal_weights.size(); ++i)
+      for (std::size_t i=0; i!=_off_diagonal_weights.size(); ++i)
         {
-          if(_off_diagonal_weights[i].size() > i)
+          if (_off_diagonal_weights[i].size() > i)
             {
               _weights[i] = _off_diagonal_weights[i][i];
               _off_diagonal_weights[i][i] = 0;
@@ -362,13 +362,13 @@ Real SystemNorm::calculate_norm(const std::vector<Real> & v1,
 
   // Loop over all the components of the system with explicit
   // weights
-  for(std::size_t i = 0; i != diagsize; i++)
+  for (std::size_t i = 0; i != diagsize; i++)
     {
       val += this->_weights[i] * v1[i] * v2[i];
     }
   // Loop over all the components of the system with implicit
   // weights
-  for(std::size_t i = diagsize; i < vsize; i++)
+  for (std::size_t i = diagsize; i < vsize; i++)
     {
       val += v1[i] * v2[i];
     }
@@ -377,10 +377,10 @@ Real SystemNorm::calculate_norm(const std::vector<Real> & v1,
   std::size_t nrows = this->_off_diagonal_weights.size();
   libmesh_assert_less_equal (vsize, nrows);
 
-  for(std::size_t i = 0; i != nrows; i++)
+  for (std::size_t i = 0; i != nrows; i++)
     {
       std::size_t ncols = this->_off_diagonal_weights[i].size();
-      for(std::size_t j=0; j != ncols; j++)
+      for (std::size_t j=0; j != ncols; j++)
         {
           // Note that the diagonal weights here were set to zero
           // in the constructor
@@ -403,12 +403,12 @@ bool SystemNorm::is_identity()
   std::size_t nrows = this->_off_diagonal_weights.size();
 
   // If any of the off-diagonal elements is not 0, then we are in the non-identity case
-  for(std::size_t i = 0; i != nrows; i++)
+  for (std::size_t i = 0; i != nrows; i++)
     {
       std::size_t ncols = this->_off_diagonal_weights[i].size();
-      for(std::size_t j = 0; j != ncols; j++)
+      for (std::size_t j = 0; j != ncols; j++)
         {
-          if(_off_diagonal_weights[i][j] != 0)
+          if (_off_diagonal_weights[i][j] != 0)
             {
               return(false);
             }
@@ -417,8 +417,8 @@ bool SystemNorm::is_identity()
 
   // If any of the diagonal elements is not 1, then we are in the non-identity case
   nrows = this->_weights.size();
-  for(std::size_t i = 0; i != nrows; i++)
-    if(_weights[i] != 1)
+  for (std::size_t i = 0; i != nrows; i++)
+    if (_weights[i] != 1)
       return(false);
 
   // If all the off-diagonals elements are 0, and diagonal elements 1, then we are in an identity case

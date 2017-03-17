@@ -52,7 +52,7 @@ void NewmarkSolver::advance_timestep ()
   NumericVector<Number> & old_solution_accel =
     _system.get_vector("_old_solution_accel");
 
-  if( !first_solve )
+  if (!first_solve)
     {
       NumericVector<Number> & old_nonlinear_soln =
         _system.get_vector("_old_nonlinear_solution");
@@ -148,7 +148,7 @@ void NewmarkSolver::set_initial_accel_avail( bool initial_accel_set )
 void NewmarkSolver::solve ()
 {
   // First, check that the initial accel was set one way or another
-  if( !_initial_accel_set )
+  if (!_initial_accel_set)
     {
       std::string error = "ERROR: Must first set initial acceleration using one of:\n";
       error += "NewmarkSolver::compute_initial_accel()\n";
@@ -226,7 +226,7 @@ bool NewmarkSolver::_general_residual (bool request_jacobian,
   // So upstream we've swapped _system.solution and _old_local_solution_accel
   // So we need to give the context the correct entries since we're solving for
   // acceleration here.
-  if( _is_accel_solve )
+  if (_is_accel_solve)
     {
       // System._solution is actually the acceleration right now so we need
       // to reset the elem_solution to the right thing, which in this case

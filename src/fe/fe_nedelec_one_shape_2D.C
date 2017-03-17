@@ -73,14 +73,14 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
                 {
                 case 0:
                   {
-                    if( elem->point(0) > elem->point(1) )
+                    if (elem->point(0) > elem->point(1))
                       return RealGradient( -0.25*(1.0-eta), 0.0 );
                     else
                       return RealGradient( 0.25*(1.0-eta), 0.0 );
                   }
                 case 1:
                   {
-                    if( elem->point(1) > elem->point(2) )
+                    if (elem->point(1) > elem->point(2))
                       return RealGradient( 0.0, -0.25*(1.0+xi) );
                     else
                       return RealGradient( 0.0, 0.25*(1.0+xi) );
@@ -88,14 +88,14 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
 
                 case 2:
                   {
-                    if( elem->point(2) > elem->point(3) )
+                    if (elem->point(2) > elem->point(3))
                       return RealGradient( 0.25*(1.0+eta), 0.0 );
                     else
                       return RealGradient( -0.25*(1.0+eta), 0.0 );
                   }
                 case 3:
                   {
-                    if( elem->point(3) > elem->point(0) )
+                    if (elem->point(3) > elem->point(0))
                       return RealGradient( 0.0, -0.25*(xi-1.0) );
                     else
                       return RealGradient( 0.0, 0.25*(xi-1.0) );
@@ -119,14 +119,14 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
                 {
                 case 0:
                   {
-                    if( elem->point(0) > elem->point(1) )
+                    if (elem->point(0) > elem->point(1))
                       return RealGradient( -1.0+eta, -xi );
                     else
                       return RealGradient( 1.0-eta, xi );
                   }
                 case 1:
                   {
-                    if( elem->point(1) > elem->point(2) )
+                    if (elem->point(1) > elem->point(2))
                       return RealGradient( eta, -xi );
                     else
                       return RealGradient( -eta, xi );
@@ -134,7 +134,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
 
                 case 2:
                   {
-                    if( elem->point(2) > elem->point(0) )
+                    if (elem->point(2) > elem->point(0))
                       return RealGradient( eta, -xi+1.0 );
                     else
                       return RealGradient( -eta, xi-1.0 );
@@ -212,14 +212,14 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                         return RealGradient();
                       case 1:
                         {
-                          if( elem->point(1) > elem->point(2) )
+                          if (elem->point(1) > elem->point(2))
                             return RealGradient( 0.0, -0.25 );
                           else
                             return RealGradient( 0.0, 0.25 );
                         }
                       case 3:
                         {
-                          if( elem->point(3) > elem->point(0) )
+                          if (elem->point(3) > elem->point(0))
                             return RealGradient( 0.0, -0.25 );
                           else
                             return RealGradient( 0.0, 0.25 );
@@ -239,14 +239,14 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                         return RealGradient();
                       case 0:
                         {
-                          if( elem->point(0) > elem->point(1) )
+                          if (elem->point(0) > elem->point(1))
                             return RealGradient( 0.25 );
                           else
                             return RealGradient( -0.25 );
                         }
                       case 2:
                         {
-                          if( elem->point(2) > elem->point(3) )
+                          if (elem->point(2) > elem->point(3))
                             return RealGradient( 0.25 );
                           else
                             return RealGradient( -0.25 );
@@ -274,19 +274,19 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                 {
                 case 0:
                   {
-                    if( elem->point(0) > elem->point(1) )
+                    if (elem->point(0) > elem->point(1))
                       f = -1.0;
                     break;
                   }
                 case 1:
                   {
-                    if( elem->point(1) > elem->point(2) )
+                    if (elem->point(1) > elem->point(2))
                       f = -1.0;
                     break;
                   }
                 case 2:
                   {
-                    if( elem->point(2) > elem->point(0) )
+                    if (elem->point(2) > elem->point(0))
                       f = -1.0;
                     break;
                   }

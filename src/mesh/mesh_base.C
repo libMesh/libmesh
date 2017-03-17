@@ -127,7 +127,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
       _ghosting_functors.insert(_default_ghosting.get());
     }
 
-  if(other_mesh._partitioner.get())
+  if (other_mesh._partitioner.get())
     {
       _partitioner = other_mesh._partitioner->clone();
     }
@@ -205,13 +205,13 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
 
   // Mesh modification operations might not leave us with consistent
   // id counts, but our partitioner might need that consistency.
-  if(!_skip_renumber_nodes_and_elements)
+  if (!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
   else
     this->update_parallel_id_counts();
 
   // Let all the elements find their neighbors
-  if(!skip_find_neighbors)
+  if (!skip_find_neighbors)
     this->find_neighbors();
 
   // The user may have set boundary conditions.  We require that the
@@ -265,7 +265,7 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   if (this->_allow_remote_element_removal)
     this->delete_remote_elements();
 
-  if(!_skip_renumber_nodes_and_elements)
+  if (!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
 
   // The mesh is now prepared for use.
@@ -468,8 +468,7 @@ void MeshBase::partition (const unsigned int n_parts)
     }
   // NULL partitioner means don't repartition
   // Non-serial meshes may not be ready for repartitioning here.
-  else if(!skip_partitioning() &&
-          partitioner().get())
+  else if (!skip_partitioning() && partitioner().get())
     {
       partitioner()->partition (*this, n_parts);
     }

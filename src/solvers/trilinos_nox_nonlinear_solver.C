@@ -342,7 +342,7 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T> &  /* jac_in */,  // System Jacobi
 
   if (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object)
     {
-      if(this->_preconditioner)
+      if (this->_preconditioner)
         {
           // PJNFK
           lsParams.set("Preconditioner", "User Defined");

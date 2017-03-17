@@ -511,12 +511,12 @@ Real ExactErrorEstimator::find_squared_element_error(const System & system,
           error_norm.type(var) == H2)
         {
           Gradient grad_error = grad_u_h;
-          if(_exact_deriv)
+          if (_exact_deriv)
             grad_error -= _exact_deriv(q_point[qp],parameters,sys_name,var_name);
           else if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
             grad_error -= _exact_derivs[sys_num]->
               component(var_component, q_point[qp], system.time);
-          else if(_equation_systems_fine)
+          else if (_equation_systems_fine)
             grad_error -= fine_values->gradient(q_point[qp]);
 
           error_val += JxW[qp]*grad_error.norm_sq();
@@ -530,7 +530,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System & system,
            error_norm.type(var) == H2))
         {
           Tensor grad2_error = grad2_u_h;
-          if(_exact_hessian)
+          if (_exact_hessian)
             grad2_error -= _exact_hessian(q_point[qp],parameters,sys_name,var_name);
           else if (_exact_hessians.size() > sys_num && _exact_hessians[sys_num])
             grad2_error -= _exact_hessians[sys_num]->

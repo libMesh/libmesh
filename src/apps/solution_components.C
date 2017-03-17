@@ -130,7 +130,7 @@ int main(int argc, char ** argv)
           libmesh_assert_equal_to(n_comp,
                                   new_node->n_comp(new_sys_num[pairnum],new_var_num[pairnum]));
 
-          for(unsigned int i=0; i<n_comp; i++)
+          for (unsigned int i=0; i<n_comp; i++)
             {
               const dof_id_type
                 old_index = old_node->dof_number
@@ -169,7 +169,7 @@ int main(int argc, char ** argv)
           libmesh_assert_equal_to(n_comp,
                                   new_elem->n_comp(new_sys_num[pairnum],new_var_num[pairnum]));
 
-          for(unsigned int i=0; i<n_comp; i++)
+          for (unsigned int i=0; i<n_comp; i++)
             {
               const dof_id_type
                 old_index = old_elem->dof_number

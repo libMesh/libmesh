@@ -54,7 +54,7 @@ void DifferentiablePhysics::time_evolving (unsigned int var,
 
   _time_evolving[var] = order;
 
-  if( order == 1 )
+  if (order == 1)
     _first_order_vars.insert(var);
   else
     _second_order_vars.insert(var);

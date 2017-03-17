@@ -812,7 +812,7 @@ void NumericVector<T>::get(const std::vector<numeric_index_type> & index,
                            T * values) const
 {
   const std::size_t num = index.size();
-  for(std::size_t i=0; i<num; i++)
+  for (std::size_t i=0; i<num; i++)
     {
       values[i] = (*this)(index[i]);
     }

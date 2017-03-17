@@ -277,7 +277,7 @@ void EpetraMatrix<T>::get_transpose (SparseMatrix<T> & dest) const
   // Make sure the SparseMatrix passed in is really a EpetraMatrix
   EpetraMatrix<T> & epetra_dest = cast_ref<EpetraMatrix<T> &>(dest);
 
-  if(&epetra_dest != this)
+  if (&epetra_dest != this)
     epetra_dest = *this;
 
   epetra_dest._use_transpose = !epetra_dest._use_transpose;

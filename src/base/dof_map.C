@@ -581,7 +581,7 @@ void DofMap::reinit(MeshBase & mesh)
 
       // Don't need to loop over elements for a SCALAR variable
       // Just increment _n_SCALAR_dofs
-      if(base_fe_type.family == SCALAR)
+      if (base_fe_type.family == SCALAR)
         {
           this->_n_SCALAR_dofs += base_fe_type.order.get_order()*n_var_in_group;
           continue;
@@ -1062,7 +1062,7 @@ void DofMap::distribute_dofs (MeshBase & mesh)
   // renumbering rather than once per SCALAR_dof_indices() call
 
   for (unsigned int v=0; v<this->n_variables(); v++)
-    if(this->variable(v).type().family == SCALAR)
+    if (this->variable(v).type().family == SCALAR)
       {
         _first_scalar_df[v] = current_SCALAR_dof_index;
         current_SCALAR_dof_index += this->variable(v).type().order.get_order();
@@ -1145,7 +1145,7 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
 
           // Next get any new element DOFS
           const unsigned int n_comp = elem->n_comp(sys_num, var_num);
-          for(unsigned int i=0; i<n_comp; i++)
+          for (unsigned int i=0; i<n_comp; i++)
             {
               const dof_id_type index = elem->dof_number(sys_num,var_num,i);
               if (idx.empty() || index > idx.back())
@@ -1172,7 +1172,7 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
             libmesh_assert(node);
 
             const unsigned int n_comp = node->n_comp(sys_num, var_num);
-            for(unsigned int i=0; i<n_comp; i++)
+            for (unsigned int i=0; i<n_comp; i++)
               {
                 const dof_id_type index = node->dof_number(sys_num,var_num,i);
                 if (idx.empty() || index > idx.back())
@@ -1183,7 +1183,7 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
     }
   // Otherwise, count up the SCALAR dofs, if we're on the processor
   // that holds this SCALAR variable
-  else if ( this->processor_id() == (this->n_processors()-1) )
+  else if (this->processor_id() == (this->n_processors()-1))
     {
       std::vector<dof_id_type> di_scalar;
       this->SCALAR_dof_indices(di_scalar,var_num);
@@ -1219,8 +1219,8 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
             {
               const VariableGroup & vg_description(this->variable_group(vg));
 
-              if( (vg_description.type().family != SCALAR) &&
-                  (vg_description.active_on_subdomain(elem->subdomain_id())) )
+              if ((vg_description.type().family != SCALAR) &&
+                  (vg_description.active_on_subdomain(elem->subdomain_id())))
                 {
                   // assign dof numbers (all at once) if this is
                   // our node and if they aren't already there
@@ -1244,8 +1244,8 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
         {
           const VariableGroup & vg_description(this->variable_group(vg));
 
-          if ( (vg_description.type().family != SCALAR) &&
-               (vg_description.active_on_subdomain(elem->subdomain_id())) )
+          if ((vg_description.type().family != SCALAR) &&
+              (vg_description.active_on_subdomain(elem->subdomain_id())))
             if (elem->n_comp_group(sys_num,vg) > 0)
               {
                 libmesh_assert_equal_to (elem->vg_dof_base(sys_num,vg),
@@ -1303,7 +1303,7 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
     {
       const VariableGroup & vg_description(this->variable_group(vg));
 
-      if( vg_description.type().family == SCALAR )
+      if (vg_description.type().family == SCALAR)
         {
           this->_n_SCALAR_dofs += (vg_description.n_variables()*
                                    vg_description.type().order.get_order());
@@ -1313,7 +1313,7 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
 
   // Only increment next_free_dof if we're on the processor
   // that holds this SCALAR variable
-  if ( this->processor_id() == (this->n_processors()-1) )
+  if (this->processor_id() == (this->n_processors()-1))
     next_free_dof += _n_SCALAR_dofs;
 
 #ifdef DEBUG
@@ -1451,7 +1451,7 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
     {
       const VariableGroup & vg_description(this->variable_group(vg));
 
-      if( vg_description.type().family == SCALAR )
+      if (vg_description.type().family == SCALAR)
         {
           this->_n_SCALAR_dofs += (vg_description.n_variables()*
                                    vg_description.type().order.get_order());
@@ -1461,7 +1461,7 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
 
   // Only increment next_free_dof if we're on the processor
   // that holds this SCALAR variable
-  if ( this->processor_id() == (this->n_processors()-1) )
+  if (this->processor_id() == (this->n_processors()-1))
     next_free_dof += _n_SCALAR_dofs;
 
 #ifdef DEBUG
@@ -1790,7 +1790,7 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase & mesh) const
 
   // Possibly override the commandline option, if set_implicit_neighbor_dofs
   // has been called.
-  if(_implicit_neighbor_dofs_initialized)
+  if (_implicit_neighbor_dofs_initialized)
     {
       implicit_neighbor_dofs = _implicit_neighbor_dofs;
 
@@ -2040,8 +2040,8 @@ void DofMap::dof_indices (const Elem * const elem,
           // Get the dof numbers
           for (unsigned int v=0; v<n_vars; v++)
             {
-              if(this->variable(v).type().family == SCALAR &&
-                 this->variable(v).active_on_subdomain(elem->subdomain_id()))
+              if (this->variable(v).type().family == SCALAR &&
+                  this->variable(v).active_on_subdomain(elem->subdomain_id()))
                 {
 #ifdef DEBUG
                   tot_size += this->variable(v).type().order;
@@ -2067,9 +2067,9 @@ void DofMap::dof_indices (const Elem * const elem,
   for (unsigned int v=0; v<n_vars; v++)
     {
       const Variable & var = this->variable(v);
-      if(var.type().family == SCALAR &&
-         (!elem ||
-          var.active_on_subdomain(elem->subdomain_id())))
+      if (var.type().family == SCALAR &&
+          (!elem ||
+           var.active_on_subdomain(elem->subdomain_id())))
         {
 #ifdef DEBUG
           tot_size += var.type().order;
@@ -2141,9 +2141,9 @@ void DofMap::dof_indices (const Elem * const elem,
   const Variable & var = this->variable(vn);
 
   // Get the dof numbers
-  if(var.type().family == SCALAR &&
-     (!elem ||
-      var.active_on_subdomain(elem->subdomain_id())))
+  if (var.type().family == SCALAR &&
+      (!elem ||
+       var.active_on_subdomain(elem->subdomain_id())))
     {
 #ifdef DEBUG
       tot_size += var.type().order;
@@ -2396,7 +2396,7 @@ void DofMap::SCALAR_dof_indices (std::vector<dof_id_type> & di,
   const int n_dofs_vn = this->variable(vn).type().order.get_order();
 
   di.resize(n_dofs_vn);
-  for(int i = 0; i != n_dofs_vn; ++i)
+  for (int i = 0; i != n_dofs_vn; ++i)
     di[i] = my_idx++;
 }
 
@@ -2503,9 +2503,9 @@ void DofMap::old_dof_indices (const Elem * const elem,
   for (unsigned int v=0; v<n_vars; v++)
     if ((v == vn) || (vn == libMesh::invalid_uint))
       {
-        if(this->variable(v).type().family == SCALAR &&
-           (!elem ||
-            this->variable(v).active_on_subdomain(elem->subdomain_id())))
+        if (this->variable(v).type().family == SCALAR &&
+            (!elem ||
+             this->variable(v).active_on_subdomain(elem->subdomain_id())))
           {
             // We asked for this variable, so add it to the vector.
             std::vector<dof_id_type> di_new;

@@ -123,7 +123,7 @@ class Status;
                                       libmesh_mpi_error_string);        \
         }                                                               \
     }                                                                   \
-  while(0)
+  while (0)
 
 #else
 
@@ -141,7 +141,7 @@ class Status;
       unsigned int libmesh_mpi_error_code = mpi_call;           \
       libmesh_assert_mpi_success (libmesh_mpi_error_code);      \
     }                                                           \
-  while(0)
+  while (0)
 
 #else
 
@@ -150,7 +150,7 @@ class Status;
     {                                           \
       mpi_call;                                 \
     }                                           \
-  while(0)
+  while (0)
 #endif
 
 

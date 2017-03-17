@@ -344,14 +344,14 @@ Real ExactSolution::error_norm(const std::string & sys_name,
       return std::sqrt(error_vals[0] + error_vals[1] + error_vals[2]);
     case HCURL:
       {
-        if(FEInterface::field_type(fe_type) == TYPE_SCALAR)
+        if (FEInterface::field_type(fe_type) == TYPE_SCALAR)
           libmesh_error_msg("Cannot compute HCurl error norm of scalar-valued variables!");
         else
           return std::sqrt(error_vals[0] + error_vals[5]);
       }
     case HDIV:
       {
-        if(FEInterface::field_type(fe_type) == TYPE_SCALAR)
+        if (FEInterface::field_type(fe_type) == TYPE_SCALAR)
           libmesh_error_msg("Cannot compute HDiv error norm of scalar-valued variables!");
         else
           return std::sqrt(error_vals[0] + error_vals[6]);
@@ -362,14 +362,14 @@ Real ExactSolution::error_norm(const std::string & sys_name,
       return std::sqrt(error_vals[2]);
     case HCURL_SEMINORM:
       {
-        if(FEInterface::field_type(fe_type) == TYPE_SCALAR)
+        if (FEInterface::field_type(fe_type) == TYPE_SCALAR)
           libmesh_error_msg("Cannot compute HCurl error seminorm of scalar-valued variables!");
         else
           return std::sqrt(error_vals[5]);
       }
     case HDIV_SEMINORM:
       {
-        if(FEInterface::field_type(fe_type) == TYPE_SCALAR)
+        if (FEInterface::field_type(fe_type) == TYPE_SCALAR)
           libmesh_error_msg("Cannot compute HDiv error seminorm of scalar-valued variables!");
         else
           return std::sqrt(error_vals[6]);
@@ -591,7 +591,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
 
   // FIXME: MeshFunction needs to be updated to support vector-valued
   //        elements before we can use a reference solution.
-  if( (n_vec_dim > 1) && _equation_systems_fine )
+  if ((n_vec_dim > 1) && _equation_systems_fine)
     {
       libMesh::err << "Error calculation using reference solution not yet\n"
                    << "supported for vector-valued elements."
@@ -605,8 +605,8 @@ void ExactSolution::_compute_error(const std::string & sys_name,
   std::vector<QBase *> q_rules(4, libmesh_nullptr);
 
   // Prepare finite elements for each dimension present in the mesh
-  for( std::set<unsigned char>::const_iterator d_it = elem_dims.begin();
-       d_it != elem_dims.end(); ++d_it )
+  for (std::set<unsigned char>::const_iterator d_it = elem_dims.begin();
+       d_it != elem_dims.end(); ++d_it)
     {
       q_rules[*d_it] =
         fe_type.default_quadrature_rule (*d_it, _extra_order).release();
@@ -643,7 +643,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
       const subdomain_id_type elem_subid = elem->subdomain_id();
 
       // If the variable is not active on this subdomain, don't bother
-      if(!computed_system.variable(var).active_on_subdomain(elem_subid))
+      if (!computed_system.variable(var).active_on_subdomain(elem_subid))
         continue;
 
       /* If the variable is active, then we're going to restrict the
@@ -677,7 +677,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
       // Only computed for vector-valued elements
       const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> > * div_values = libmesh_nullptr;
 
-      if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
+      if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
         {
           curl_values = &fe->get_curl_phi();
           div_values = &fe->get_div_phi();
@@ -735,7 +735,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
               grad2_u_h += d2phi_values[i][qp]*computed_system.current_solution (dof_indices[i]);
 #endif
-              if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
+              if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
                 {
                   curl_u_h += (*curl_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
                   div_u_h += (*div_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
@@ -747,7 +747,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
           RawAccessor<typename FEGenericBase<OutputShape>::OutputNumber> exact_val_accessor( exact_val, dim );
           if (_exact_values.size() > sys_num && _exact_values[sys_num])
             {
-              for( unsigned int c = 0; c < n_vec_dim; c++)
+              for (unsigned int c = 0; c < n_vec_dim; c++)
                 exact_val_accessor(c) =
                   _exact_values[sys_num]->
                   component(var_component+c, q_point[qp], time);
@@ -768,7 +768,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
           Real norm = sqrt(error_sq);
           error_vals[3] += JxW[qp]*norm;
 
-          if(error_vals[4]<norm) { error_vals[4] = norm; }
+          if (error_vals[4]<norm) { error_vals[4] = norm; }
 
           // Compute the value of the error in the gradient at this
           // quadrature point
@@ -795,7 +795,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
           error_vals[1] += JxW[qp]*grad_error.norm_sq();
 
 
-          if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
+          if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
             {
               // Compute the value of the error in the curl at this
               // quadrature point
@@ -842,12 +842,12 @@ void ExactSolution::_compute_error(const std::string & sys_name,
               //FIXME: This needs to be implemented to support rank 3 tensors
               //       which can't happen until type_n_tensor is fully implemented
               //       and a RawAccessor<TypeNTensor> is fully implemented
-              if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
+              if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
                 libmesh_not_implemented();
 
-              for( unsigned int c = 0; c < n_vec_dim; c++)
-                for( unsigned int d = 0; d < dim; d++ )
-                  for( unsigned int e =0; e < dim; e++ )
+              for (unsigned int c = 0; c < n_vec_dim; c++)
+                for (unsigned int d = 0; d < dim; d++)
+                  for (unsigned int e =0; e < dim; e++)
                     exact_hess_accessor(d + e*dim + c*dim*dim) =
                       _exact_hessians[sys_num]->
                       component(var_component+c, q_point[qp], time)(d,e);
@@ -870,8 +870,8 @@ void ExactSolution::_compute_error(const std::string & sys_name,
     } // end element loop
 
   // Clean up the FE and QBase pointers we created
-  for( std::set<unsigned char>::const_iterator d_it = elem_dims.begin();
-       d_it != elem_dims.end(); ++d_it )
+  for (std::set<unsigned char>::const_iterator d_it = elem_dims.begin();
+       d_it != elem_dims.end(); ++d_it)
     {
       delete fe_ptrs[*d_it];
       delete q_rules[*d_it];

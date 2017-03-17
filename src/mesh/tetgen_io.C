@@ -72,7 +72,7 @@ void TetGenIO::read (const std::string & name)
   std::ifstream node_stream (name_node.c_str());
   std::ifstream ele_stream  (name_ele.c_str());
 
-  if ( !node_stream.good() || !ele_stream.good() )
+  if (!node_stream.good() || !ele_stream.good())
     libmesh_error_msg("Error while opening either "     \
                       << name_node                      \
                       << " or "                         \

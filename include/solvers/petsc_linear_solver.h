@@ -359,7 +359,7 @@ PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &
   // No ISComplement in PETSc 2.3.3
   libmesh_not_implemented();
 #else
-  if(_restrict_solve_to_is_complement==libmesh_nullptr)
+  if (_restrict_solve_to_is_complement==libmesh_nullptr)
     {
       int ierr = ISComplement(_restrict_solve_to_is,
                               vec_in.first_local_index(),

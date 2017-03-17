@@ -146,7 +146,7 @@ void TreeNode<N>::refine ()
   // Scale up the target bin size in child TreeNodes if we have reached
   // the maximum number of refinement levels.
   unsigned int new_target_bin_size = tgt_bin_size;
-  if(level() >= target_bin_size_increase_level)
+  if (level() >= target_bin_size_increase_level)
     {
       new_target_bin_size *= 2;
     }

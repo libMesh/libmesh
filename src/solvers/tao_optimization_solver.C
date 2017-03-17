@@ -518,19 +518,19 @@ void TaoOptimizationSolver<T>::solve ()
   ierr = TaoSetObjectiveRoutine(_tao, __libmesh_tao_objective, this);
   LIBMESH_CHKERR(ierr);
 
-  if ( this->gradient_object )
+  if (this->gradient_object)
     {
       ierr = TaoSetGradientRoutine(_tao, __libmesh_tao_gradient, this);
       LIBMESH_CHKERR(ierr);
     }
 
-  if ( this->hessian_object )
+  if (this->hessian_object)
     {
       ierr = TaoSetHessianRoutine(_tao, hessian->mat(), hessian->mat(), __libmesh_tao_hessian, this);
       LIBMESH_CHKERR(ierr);
     }
 
-  if ( this->lower_and_upper_bounds_object )
+  if (this->lower_and_upper_bounds_object)
     {
       // Need to actually compute the bounds vectors first
       this->lower_and_upper_bounds_object->lower_and_upper_bounds(this->system());
@@ -541,13 +541,13 @@ void TaoOptimizationSolver<T>::solve ()
       LIBMESH_CHKERR(ierr);
     }
 
-  if ( this->equality_constraints_object )
+  if (this->equality_constraints_object)
     {
       ierr = TaoSetEqualityConstraintsRoutine(_tao, ceq->vec(), __libmesh_tao_equality_constraints, this);
       LIBMESH_CHKERR(ierr);
     }
 
-  if ( this->equality_constraints_jacobian_object )
+  if (this->equality_constraints_jacobian_object)
     {
       ierr = TaoSetJacobianEqualityRoutine(_tao,
                                            ceq_jac->mat(),
@@ -558,14 +558,14 @@ void TaoOptimizationSolver<T>::solve ()
     }
 
   // Optionally set inequality constraints
-  if ( this->inequality_constraints_object )
+  if (this->inequality_constraints_object)
     {
       ierr = TaoSetInequalityConstraintsRoutine(_tao, cineq->vec(), __libmesh_tao_inequality_constraints, this);
       LIBMESH_CHKERR(ierr);
     }
 
   // Optionally set inequality constraints Jacobian
-  if ( this->inequality_constraints_jacobian_object )
+  if (this->inequality_constraints_jacobian_object)
     {
       ierr = TaoSetJacobianInequalityRoutine(_tao,
                                              cineq_jac->mat(),

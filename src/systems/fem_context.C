@@ -87,18 +87,18 @@ FEMContext::FEMContext (const System & sys)
       // We need to detect SCALAR's so we can prepare FE objects for
       // them, and so we don't mistake high order scalars as a reason
       // to crank up the quadrature order on other types.
-      if( fe_type.family == SCALAR )
+      if (fe_type.family == SCALAR)
         have_scalar = true;
       else if (fe_type.order > hardest_fe_type.order)
         hardest_fe_type = fe_type;
     }
 
-  if(have_scalar)
+  if (have_scalar)
     // SCALAR FEs have dimension 0 by assumption
     _elem_dims.insert(0);
 
-  for( std::set<unsigned char>::const_iterator dim_it = _elem_dims.begin();
-       dim_it != _elem_dims.end(); ++dim_it )
+  for (std::set<unsigned char>::const_iterator dim_it = _elem_dims.begin();
+       dim_it != _elem_dims.end(); ++dim_it)
     {
       const unsigned char dim = *dim_it;
 
@@ -122,7 +122,7 @@ FEMContext::FEMContext (const System & sys)
         {
           FEType fe_type = sys.variable_type(i);
 
-          if ( _element_fe[dim][fe_type] == libmesh_nullptr )
+          if (_element_fe[dim][fe_type] == libmesh_nullptr)
             {
               _element_fe[dim][fe_type] = FEAbstract::build(dim, fe_type).release();
               _element_fe[dim][fe_type]->attach_quadrature_rule(_element_qrule[dim]);
@@ -1364,7 +1364,7 @@ void FEMContext::elem_fe_reinit(const std::vector<Point> * const pts)
   for (std::map<FEType, FEAbstract *>::iterator i = _element_fe[dim].begin();
        i != local_fe_end; ++i)
     {
-      if(this->has_elem())
+      if (this->has_elem())
         i->second->reinit(&(this->get_elem()), pts);
       else
         // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
@@ -1558,7 +1558,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
       algebraic_type() == DOFS_ONLY)
     {
       // Initialize the per-element data for elem.
-      if(this->has_elem())
+      if (this->has_elem())
         sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices());
       else
         // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
@@ -1569,7 +1569,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
   else if (algebraic_type() == OLD)
     {
       // Initialize the per-element data for elem.
-      if(this->has_elem())
+      if (this->has_elem())
         sys.get_dof_map().old_dof_indices (&(this->get_elem()), this->get_dof_indices());
       else
         // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
@@ -1597,17 +1597,17 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
       // Only make space for these if we're using DiffSystem
       // This is assuming *only* DiffSystem is using elem_solution_rate/accel
       const DifferentiableSystem * diff_system = dynamic_cast<const DifferentiableSystem *>(&sys);
-      if(diff_system)
+      if (diff_system)
         {
           // Now, we only need these if the solver is unsteady
-          if( !diff_system->get_time_solver().is_steady() )
+          if (!diff_system->get_time_solver().is_steady())
             {
               this->get_elem_solution_rate().resize(n_dofs);
 
               // We only need accel space if the TimeSolver is second order
               const UnsteadySolver & time_solver = cast_ref<const UnsteadySolver &>(diff_system->get_time_solver());
 
-              if( time_solver.time_order() >= 2 || !diff_system->get_second_order_vars().empty() )
+              if (time_solver.time_order() >= 2 || !diff_system->get_second_order_vars().empty())
                 this->get_elem_solution_accel().resize(n_dofs);
             }
         }
@@ -1633,7 +1633,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
         if (algebraic_type() == CURRENT ||
             algebraic_type() == DOFS_ONLY)
           {
-            if(this->has_elem())
+            if (this->has_elem())
               sys.get_dof_map().dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
             else
               // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
@@ -1643,7 +1643,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
 #ifdef LIBMESH_ENABLE_AMR
         else if (algebraic_type() == OLD)
           {
-            if(this->has_elem())
+            if (this->has_elem())
               sys.get_dof_map().old_dof_indices (&(this->get_elem()), this->get_dof_indices(i), i);
             else
               // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
@@ -1664,10 +1664,10 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
             // Only make space for these if we're using DiffSystem
             // This is assuming *only* DiffSystem is using elem_solution_rate/accel
             const DifferentiableSystem * diff_system = dynamic_cast<const DifferentiableSystem *>(&sys);
-            if(diff_system)
+            if (diff_system)
               {
                 // Now, we only need these if the solver is unsteady
-                if( !diff_system->get_time_solver().is_steady() )
+                if (!diff_system->get_time_solver().is_steady())
                   {
                     this->get_elem_solution_rate(i).reposition
                       (sub_dofs, n_dofs_var);
@@ -1675,7 +1675,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
                     // We only need accel space if the TimeSolver is second order
                     const UnsteadySolver & time_solver = cast_ref<const UnsteadySolver &>(diff_system->get_time_solver());
 
-                    if( time_solver.time_order() >= 2 || !diff_system->get_second_order_vars().empty() )
+                    if (time_solver.time_order() >= 2 || !diff_system->get_second_order_vars().empty())
                       this->get_elem_solution_accel(i).reposition
                         (sub_dofs, n_dofs_var);
                   }
@@ -1729,7 +1729,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
       DiffContext::localized_vectors_iterator localized_vec_it = this->_localized_vectors.begin();
       const DiffContext::localized_vectors_iterator localized_vec_end = this->_localized_vectors.end();
 
-      for(; localized_vec_it != localized_vec_end; ++localized_vec_it)
+      for (; localized_vec_it != localized_vec_end; ++localized_vec_it)
         {
           const NumericVector<Number> & current_localized_vector = *localized_vec_it->first;
           DenseVector<Number> & target_vector = localized_vec_it->second.first;
@@ -1822,7 +1822,7 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
   std::vector<Point> coor(1, master_point);
 
   // Reinitialize the element and compute the shape function values at coor
-  if(this->has_elem())
+  if (this->has_elem())
     fe_new->reinit (&this->get_elem(), &coor);
   else
     // If !this->has_elem(), then we assume we are dealing with a SCALAR variable

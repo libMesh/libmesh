@@ -157,7 +157,7 @@ Real Quad::quality (const ElemQuality q) const
         const Real d13 = this->length(1,3);
 
         // Find the biggest and smallest diagonals
-        if ( (d02 > 0.) && (d13 >0.) )
+        if ((d02 > 0.) && (d13 >0.))
           if (d02 < d13) return d02 / d13;
           else return d13 / d02;
         else
