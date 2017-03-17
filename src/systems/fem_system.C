@@ -918,7 +918,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
 
   // Check and see if we have SCALAR variables
   bool have_scalar = false;
-  for(unsigned int i=0; i != this->n_variable_groups(); ++i)
+  for (unsigned int i=0; i != this->n_variable_groups(); ++i)
     {
       if (this->variable_group(i).type().family == SCALAR)
         {
@@ -1109,9 +1109,9 @@ void FEMSystem::postprocess ()
   this->get_time_solver().set_is_adjoint(false);
 
   // Loop over every active mesh element on this processor
-  Threads::parallel_for(elem_range.reset(mesh.active_local_elements_begin(),
-                                         mesh.active_local_elements_end()),
-                        PostprocessContributions(*this));
+  Threads::parallel_for (elem_range.reset(mesh.active_local_elements_begin(),
+                                          mesh.active_local_elements_end()),
+                         PostprocessContributions(*this));
 }
 
 
@@ -1163,12 +1163,12 @@ void FEMSystem::assemble_qoi_derivative (const QoISet & qoi_indices,
       this->add_adjoint_rhs(i).zero();
 
   // Loop over every active mesh element on this processor
-  Threads::parallel_for(elem_range.reset(mesh.active_local_elements_begin(),
-                                         mesh.active_local_elements_end()),
-                        QoIDerivativeContributions(*this, qoi_indices,
-                                                   *(this->diff_qoi),
-                                                   include_liftfunc,
-                                                   apply_constraints));
+  Threads::parallel_for (elem_range.reset(mesh.active_local_elements_begin(),
+                                          mesh.active_local_elements_end()),
+                         QoIDerivativeContributions(*this, qoi_indices,
+                                                    *(this->diff_qoi),
+                                                    include_liftfunc,
+                                                    apply_constraints));
 }
 
 

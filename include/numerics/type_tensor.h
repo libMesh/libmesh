@@ -674,7 +674,7 @@ TypeTensor<T>::row(const unsigned int r) const
 {
   TypeVector<T> return_vector;
 
-  for(unsigned int j=0; j<LIBMESH_DIM; j++)
+  for (unsigned int j=0; j<LIBMESH_DIM; j++)
     return_vector._coords[j] = _coords[r*LIBMESH_DIM + j];
 
   return return_vector;

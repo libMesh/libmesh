@@ -97,8 +97,8 @@ FEMContext::FEMContext (const System & sys)
     // SCALAR FEs have dimension 0 by assumption
     _elem_dims.insert(0);
 
-  for( std::set<unsigned char>::const_iterator dim_it = _elem_dims.begin();
-       dim_it != _elem_dims.end(); ++dim_it )
+  for (std::set<unsigned char>::const_iterator dim_it = _elem_dims.begin();
+       dim_it != _elem_dims.end(); ++dim_it)
     {
       const unsigned char dim = *dim_it;
 
@@ -1729,7 +1729,7 @@ void FEMContext::pre_fe_reinit(const System & sys, const Elem * e)
       DiffContext::localized_vectors_iterator localized_vec_it = this->_localized_vectors.begin();
       const DiffContext::localized_vectors_iterator localized_vec_end = this->_localized_vectors.end();
 
-      for(; localized_vec_it != localized_vec_end; ++localized_vec_it)
+      for (; localized_vec_it != localized_vec_end; ++localized_vec_it)
         {
           const NumericVector<Number> & current_localized_vector = *localized_vec_it->first;
           DenseVector<Number> & target_vector = localized_vec_it->second.first;

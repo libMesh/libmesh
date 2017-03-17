@@ -251,8 +251,8 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
 
   MeshBase::const_node_iterator n_end  = _mesh.nodes_end();
 
-  for(MeshBase::const_node_iterator n_it = _mesh.nodes_begin();
-      n_it != n_end; ++n_it)
+  for (MeshBase::const_node_iterator n_it = _mesh.nodes_begin();
+       n_it != n_end; ++n_it)
     {
       const Node * node = *n_it;
       dof_id_type node_id = node->id();
@@ -342,7 +342,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
       // Use centroid comparison as a way to check.
       unsigned char interior_parent_side_index = 0;
       bool found_matching_sides = false;
-      for(unsigned char side=0; side<interior_parent->n_sides(); side++)
+      for (unsigned char side=0; side<interior_parent->n_sides(); side++)
         {
           UniquePtr<const Elem> interior_parent_side = interior_parent->build_side_ptr(side);
           Real centroid_distance = (boundary_elem->centroid() - interior_parent_side->centroid()).norm();
@@ -363,7 +363,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
       side_id_map[boundary_elem->id()] = interior_parent_side_index;
 
       UniquePtr<const Elem> interior_parent_side = interior_parent->build_side_ptr(interior_parent_side_index);
-      for(unsigned char local_node_index=0; local_node_index<boundary_elem->n_nodes(); local_node_index++)
+      for (unsigned char local_node_index=0; local_node_index<boundary_elem->n_nodes(); local_node_index++)
         {
           dof_id_type boundary_node_id = boundary_elem->node_id(local_node_index);
           dof_id_type interior_node_id = interior_parent_side->node_id(local_node_index);

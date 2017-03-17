@@ -137,7 +137,7 @@ init (const SubdomainSelection & subdomain_selection)
               for (std::size_t i=0; i<dof_indices.size(); i++)
                 {
                   const dof_id_type dof = dof_indices[i];
-                  for(processor_id_type proc=0; proc<this->n_processors(); proc++)
+                  for (processor_id_type proc=0; proc<this->n_processors(); proc++)
                     {
                       if ((dof>=dof_map.first_dof(proc)) && (dof<dof_map.end_dof(proc)))
                         {
@@ -151,14 +151,14 @@ init (const SubdomainSelection & subdomain_selection)
 
   /* Distribute information among processors.  */
   std::vector<Parallel::Request> request_per_processor(this->n_processors());
-  for(unsigned int proc=0; proc<this->n_processors(); proc++)
+  for (unsigned int proc=0; proc<this->n_processors(); proc++)
     {
       if (proc!=this->processor_id())
         {
           this->comm().send(proc,dof_ids_per_processor[proc],request_per_processor[proc]);
         }
     }
-  for(unsigned int proc=0; proc<this->n_processors(); proc++)
+  for (unsigned int proc=0; proc<this->n_processors(); proc++)
     {
       std::vector<dof_id_type> received_dofs;
       if (proc==this->processor_id())
@@ -180,7 +180,7 @@ init (const SubdomainSelection & subdomain_selection)
   std::vector<unsigned int> (_dof_ids.begin(), new_end).swap (_dof_ids);
 
   /* Wait for sends to be complete.  */
-  for(unsigned int proc=0; proc<this->n_processors(); proc++)
+  for (unsigned int proc=0; proc<this->n_processors(); proc++)
     {
       if (proc!=this->processor_id())
         {

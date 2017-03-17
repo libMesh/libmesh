@@ -90,7 +90,7 @@ bool is_sorted(InputIterator first, InputIterator last)
   //             ^    ^
   //           prev first
   InputIterator prev( first );
-  for ( ++first; first != last; ++prev, ++first )
+  for (++first; first != last; ++prev, ++first)
     if (*first < *prev)    // Note: this is the same as *prev > *first,
       return false;        // but we only require op< to be defined.
 

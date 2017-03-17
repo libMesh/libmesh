@@ -48,7 +48,7 @@ CondensedEigenSystem::initialize_condensed_dofs(const std::set<dof_id_type> & gl
 
   // First, put all unconstrained local dofs into non_dirichlet_dofs_set
   std::set<dof_id_type> local_non_condensed_dofs_set;
-  for(dof_id_type i=this->get_dof_map().first_dof(); i<this->get_dof_map().end_dof(); i++)
+  for (dof_id_type i=this->get_dof_map().first_dof(); i<this->get_dof_map().end_dof(); i++)
     if (!dof_map.is_constrained_dof(i))
       local_non_condensed_dofs_set.insert(i);
 

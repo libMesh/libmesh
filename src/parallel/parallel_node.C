@@ -300,7 +300,7 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
   const largest_id_type num_bcs = *in++;
   // libmesh_assert_greater_equal (num_bcs, 0);
 
-  for(largest_id_type bc_it=0; bc_it < num_bcs; bc_it++)
+  for (largest_id_type bc_it=0; bc_it < num_bcs; bc_it++)
     mesh->get_boundary_info().add_node
       (node, cast_int<boundary_id_type>(*in++));
 

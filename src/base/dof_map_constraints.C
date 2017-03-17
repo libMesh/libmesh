@@ -568,7 +568,7 @@ private:
             else if ((cont == C_ZERO) || (fe_type.family == SUBDIVISION))
               {
                 libmesh_assert_equal_to (nc, n_vec_dim);
-                for( unsigned int c = 0; c < n_vec_dim; c++ )
+                for (unsigned int c = 0; c < n_vec_dim; c++)
                   {
                     Ue(current_dof+c) =
                       f_component(f, f_fem, context.get(), var_component+c,
@@ -742,7 +742,7 @@ private:
                   OutputNumber fineval(0);
                   libMesh::RawAccessor<OutputNumber> f_accessor( fineval, dim );
 
-                  for( unsigned int c = 0; c < n_vec_dim; c++)
+                  for (unsigned int c = 0; c < n_vec_dim; c++)
                     f_accessor(c) =
                       f_component(f, f_fem, context.get(), var_component+c,
                                   xyz_values[qp], time);
@@ -769,8 +769,8 @@ private:
                     }
 
                   if (cont == C_ONE)
-                    for( unsigned int c = 0; c < n_vec_dim; c++)
-                      for( unsigned int d = 0; d < g_rank; d++ )
+                    for (unsigned int c = 0; c < n_vec_dim; c++)
+                      for (unsigned int d = 0; d < g_rank; d++)
                         g_accessor(c + d*dim ) =
                           g_component(g, g_fem, context.get(), var_component,
                                       xyz_values[qp], time)(c);
@@ -862,7 +862,7 @@ private:
                   OutputNumber fineval(0);
                   libMesh::RawAccessor<OutputNumber> f_accessor( fineval, dim );
 
-                  for( unsigned int c = 0; c < n_vec_dim; c++)
+                  for (unsigned int c = 0; c < n_vec_dim; c++)
                     f_accessor(c) =
                       f_component(f, f_fem, context.get(), var_component+c,
                                   xyz_values[qp], time);
@@ -889,8 +889,8 @@ private:
                     }
 
                   if (cont == C_ONE)
-                    for( unsigned int c = 0; c < n_vec_dim; c++)
-                      for( unsigned int d = 0; d < g_rank; d++ )
+                    for (unsigned int c = 0; c < n_vec_dim; c++)
+                      for (unsigned int d = 0; d < g_rank; d++)
                         g_accessor(c + d*dim ) =
                           g_component(g, g_fem, context.get(), var_component,
                                       xyz_values[qp], time)(c);
@@ -983,7 +983,7 @@ private:
                   OutputNumber fineval(0);
                   libMesh::RawAccessor<OutputNumber> f_accessor( fineval, dim );
 
-                  for( unsigned int c = 0; c < n_vec_dim; c++)
+                  for (unsigned int c = 0; c < n_vec_dim; c++)
                     f_accessor(c) =
                       f_component(f, f_fem, context.get(), var_component+c,
                                   xyz_values[qp], time);
@@ -1010,8 +1010,8 @@ private:
                     }
 
                   if (cont == C_ONE)
-                    for( unsigned int c = 0; c < n_vec_dim; c++)
-                      for( unsigned int d = 0; d < g_rank; d++ )
+                    for (unsigned int c = 0; c < n_vec_dim; c++)
+                      for (unsigned int d = 0; d < g_rank; d++)
                         g_accessor(c + d*dim ) =
                           g_component(g, g_fem, context.get(), var_component,
                                       xyz_values[qp], time)(c);

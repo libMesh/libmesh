@@ -137,7 +137,7 @@ initialize_inequality_constraints_storage(const std::vector<std::set<numeric_ind
 
   // Get the maximum number of non-zeros per row
   unsigned int max_nnz = 0;
-  for(unsigned int i=0; i<n_ineq_constraints; i++)
+  for (unsigned int i=0; i<n_ineq_constraints; i++)
     {
       unsigned int nnz = constraint_jac_sparsity[i].size();
       if (nnz > max_nnz)

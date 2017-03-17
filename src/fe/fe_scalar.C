@@ -41,7 +41,7 @@ void scalar_nodal_soln(const Elem * elem,
 
   // If the SCALAR order is CONSTANT, just set the nodal values
   // to zero, otherwise, set to the value of the first SCALAR dof
-  for(unsigned int i=0; i<n_nodes; i++)
+  for (unsigned int i=0; i<n_nodes; i++)
     nodal_soln[i] = (order == CONSTANT) ? 0. : elem_soln[0];
 } // scalar_nodal_soln()
 

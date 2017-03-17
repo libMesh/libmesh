@@ -198,8 +198,8 @@ void DifferentiableSystem::add_second_order_dot_vars()
   const std::set<unsigned int> & second_order_vars = this->get_second_order_vars();
   if (!second_order_vars.empty())
     {
-      for( std::set<unsigned int>::const_iterator var_it = second_order_vars.begin();
-           var_it != second_order_vars.end(); ++var_it )
+      for (std::set<unsigned int>::const_iterator var_it = second_order_vars.begin();
+           var_it != second_order_vars.end(); ++var_it)
         {
           const Variable & var = this->variable(*var_it);
           std::string new_var_name = std::string("dot_")+var.name();
@@ -241,7 +241,7 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
       std::vector<DirichletBoundary*> new_dbcs;
 
       DirichletBoundaries::const_iterator dbc_it = all_dbcs->begin();
-      for( ; dbc_it != all_dbcs->end(); ++dbc_it )
+      for ( ; dbc_it != all_dbcs->end(); ++dbc_it )
         {
           libmesh_assert(*dbc_it);
           DirichletBoundary & dbc = *(*dbc_it);
@@ -298,7 +298,7 @@ void DifferentiableSystem::add_dot_var_dirichlet_bcs( unsigned int var_idx,
       std::vector<DirichletBoundary*>::iterator new_dbc_it =
         new_dbcs.begin();
 
-      for( ; new_dbc_it != new_dbcs.end(); ++new_dbc_it )
+      for ( ; new_dbc_it != new_dbcs.end(); ++new_dbc_it )
         {
           const DirichletBoundary & dbc = *(*new_dbc_it);
           this->get_dof_map().add_dirichlet_boundary(dbc);
@@ -331,9 +331,9 @@ bool DifferentiableSystem::have_first_order_scalar_vars() const
 
   if (this->have_first_order_vars())
     {
-      for( std::set<unsigned int>::const_iterator var_it = this->get_first_order_vars().begin();
+      for (std::set<unsigned int>::const_iterator var_it = this->get_first_order_vars().begin();
            var_it != this->get_first_order_vars().end();
-           ++var_it )
+           ++var_it)
         {
           if (this->variable(*var_it).type().family == SCALAR)
             have_first_order_scalar_vars = true;
@@ -349,9 +349,9 @@ bool DifferentiableSystem::have_second_order_scalar_vars() const
 
   if (this->have_second_order_vars())
     {
-      for( std::set<unsigned int>::const_iterator var_it = this->get_second_order_vars().begin();
+      for (std::set<unsigned int>::const_iterator var_it = this->get_second_order_vars().begin();
            var_it != this->get_second_order_vars().end();
-           ++var_it )
+           ++var_it)
         {
           if (this->variable(*var_it).type().family == SCALAR)
             have_second_order_scalar_vars = true;

@@ -1668,7 +1668,7 @@ void System::write_parallel_data (Xdr & io,
       std::map<std::string, NumericVector<Number> *>::const_iterator
         pos = _vectors.begin();
 
-      for(; pos != this->_vectors.end(); ++pos)
+      for (; pos != this->_vectors.end(); ++pos)
         {
           io_buffer.clear(); io_buffer.reserve( pos->second->local_size());
 
@@ -1789,7 +1789,7 @@ void System::write_serialized_data (Xdr & io,
       std::map<std::string, NumericVector<Number> *>::const_iterator
         pos = _vectors.begin();
 
-      for(; pos != this->_vectors.end(); ++pos)
+      for (; pos != this->_vectors.end(); ++pos)
         {
           // total_written_size +=
           this->write_serialized_vector(io, *pos->second);
@@ -1834,7 +1834,7 @@ void System::write_serialized_data (Xdr & io,
   // std::map<std::string, NumericVector<Number> * >::const_iterator
   //   pos = _vectors.begin();
 
-  // for(; pos != this->_vectors.end(); ++pos)
+  // for (; pos != this->_vectors.end(); ++pos)
   //   {
   //     names.push_back("Additional Vector " + pos->first);
   //     vectors_to_write.push_back(pos->second);
@@ -2168,7 +2168,7 @@ unsigned int System::write_SCALAR_dofs (const NumericVector<Number> & vec,
       const unsigned int n_scalar_dofs = cast_int<unsigned int>
         (SCALAR_dofs.size());
 
-      for(unsigned int i=0; i<n_scalar_dofs; i++)
+      for (unsigned int i=0; i<n_scalar_dofs; i++)
         {
           vals.push_back( vec(SCALAR_dofs[i]) );
         }

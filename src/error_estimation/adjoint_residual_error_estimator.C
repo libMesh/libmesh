@@ -88,7 +88,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
   ErrorMap total_dual_errors_per_cell;
   // Allocate ErrorVectors to this map if we're going to use it
   if (!error_norm_is_identity)
-    for(unsigned int v = 0; v < n_vars; v++)
+    for (unsigned int v = 0; v < n_vars; v++)
       {
         primal_errors_per_cell[std::make_pair(&_system, v)] = new ErrorVector;
         dual_errors_per_cell[std::make_pair(&_system, v)] = new ErrorVector;
@@ -154,7 +154,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
           if (!error_norm_is_identity)
             {
               // Loop over variables
-              for(unsigned int v = 0; v < n_vars; v++)
+              for (unsigned int v = 0; v < n_vars; v++)
                 {
                   libmesh_assert(!total_dual_errors_per_cell[std::make_pair(&_system, v)]->size() ||
                                  total_dual_errors_per_cell[std::make_pair(&_system, v)]->size() == error_size) ;
@@ -174,7 +174,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
               if (!error_norm_is_identity) // If we have
                 {
                   // Loop over variables
-                  for(unsigned int v = 0; v < n_vars; v++)
+                  for (unsigned int v = 0; v < n_vars; v++)
                     {
                       // Now fill in total_dual_error ErrorMap with the weight
                       (*total_dual_errors_per_cell[std::make_pair(&_system, v)])[e] +=
@@ -198,7 +198,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
       if (!error_norm_is_identity) // If we have
         {
           // Loop over variables
-          for(unsigned int v = 0; v < n_vars; v++)
+          for (unsigned int v = 0; v < n_vars; v++)
             {
               std::ostringstream primal_out;
               std::ostringstream dual_out;
@@ -250,7 +250,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
           std::vector<Real> cell_primal_error;
           std::vector<Real> cell_dual_error;
 
-          for(unsigned int v = 0; v < n_vars; v++)
+          for (unsigned int v = 0; v < n_vars; v++)
             {
               cell_primal_error.push_back((*primal_errors_per_cell[std::make_pair(&_system, v)])[i]);
               cell_dual_error.push_back((*total_dual_errors_per_cell[std::make_pair(&_system, v)])[i]);
@@ -268,7 +268,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System & _system,
 
   // Deallocate the ErrorMap contents if we allocated them earlier
   if (!error_norm_is_identity)
-    for(unsigned int v = 0; v < n_vars; v++)
+    for (unsigned int v = 0; v < n_vars; v++)
       {
         delete primal_errors_per_cell[std::make_pair(&_system, v)];
         delete dual_errors_per_cell[std::make_pair(&_system, v)];

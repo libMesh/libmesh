@@ -329,7 +329,7 @@ Real NumericVector<T>::subset_l1_norm (const std::set<numeric_index_type> & indi
 
   Real norm = 0;
 
-  for(; it!=it_end; ++it)
+  for (; it!=it_end; ++it)
     norm += std::abs(v(*it));
 
   this->comm().sum(norm);
@@ -347,7 +347,7 @@ Real NumericVector<T>::subset_l2_norm (const std::set<numeric_index_type> & indi
 
   Real norm = 0;
 
-  for(; it!=it_end; ++it)
+  for (; it!=it_end; ++it)
     norm += TensorTools::norm_sq(v(*it));
 
   this->comm().sum(norm);
@@ -365,7 +365,7 @@ Real NumericVector<T>::subset_linfty_norm (const std::set<numeric_index_type> & 
 
   Real norm = 0;
 
-  for(; it!=it_end; ++it)
+  for (; it!=it_end; ++it)
     {
       Real value = std::abs(v(*it));
       if (value > norm)

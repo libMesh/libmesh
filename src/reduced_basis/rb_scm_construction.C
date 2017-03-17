@@ -113,7 +113,7 @@ void RBSCMConstruction::process_parameters_file(const std::string & parameters_f
   unsigned int n_continuous_parameters = infile.vector_variable_size("parameter_names");
   RBParameters mu_min_in;
   RBParameters mu_max_in;
-  for(unsigned int i=0; i<n_continuous_parameters; i++)
+  for (unsigned int i=0; i<n_continuous_parameters; i++)
     {
       // Read in the parameter names
       std::string param_name = infile("parameter_names", "NONE", i);
@@ -132,7 +132,7 @@ void RBSCMConstruction::process_parameters_file(const std::string & parameters_f
   std::map< std::string, std::vector<Real> > discrete_parameter_values_in;
 
   unsigned int n_discrete_parameters = infile.vector_variable_size("discrete_parameter_names");
-  for(unsigned int i=0; i<n_discrete_parameters; i++)
+  for (unsigned int i=0; i<n_discrete_parameters; i++)
     {
       std::string param_name = infile("discrete_parameter_names", "NONE", i);
 
@@ -151,7 +151,7 @@ void RBSCMConstruction::process_parameters_file(const std::string & parameters_f
   RBParameters::const_iterator it     = mu.begin();
   RBParameters::const_iterator it_end = mu.end();
   unsigned int i=0;
-  for( ; it != it_end; ++it)
+  for ( ; it != it_end; ++it)
     {
       std::string param_name = it->first;
       log_scaling[param_name] = static_cast<bool>(infile("log_scaling", 0, i));
@@ -182,7 +182,7 @@ void RBSCMConstruction::print_info()
   libMesh::out << "Number of parameters: " << get_n_params() << std::endl;
   RBParameters::const_iterator it     = get_parameters().begin();
   RBParameters::const_iterator it_end = get_parameters().end();
-  for( ; it != it_end; ++it)
+  for ( ; it != it_end; ++it)
     {
       std::string param_name = it->first;
       libMesh::out <<   "Parameter " << param_name
@@ -242,7 +242,7 @@ void RBSCMConstruction::perform_SCM_greedy()
   EquationSystems & es = this->get_equation_systems();
   RBConstruction & rb_system = es.get_system<RBConstruction>(RB_system_name);
 
-  for(dof_id_type i=0; i<rb_system.n_dofs(); i++)
+  for (dof_id_type i=0; i<rb_system.n_dofs(); i++)
     {
       if (rb_system.get_dof_map().is_constrained_dof(i))
         {
@@ -299,7 +299,7 @@ void RBSCMConstruction::compute_SCM_bounding_box()
   rb_scm_eval->B_min.resize(get_rb_theta_expansion().get_n_A_terms());
   rb_scm_eval->B_max.resize(get_rb_theta_expansion().get_n_A_terms());
 
-  for(unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
+  for (unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
     {
       matrix_A->zero();
       add_scaled_symm_Aq(q, 1.);
@@ -363,7 +363,7 @@ void RBSCMConstruction::evaluate_stability_constant()
 
   // Set matrix A corresponding to mu_star
   matrix_A->zero();
-  for(unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
+  for (unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
     {
       add_scaled_symm_Aq(q, get_rb_theta_expansion().eval_A_theta(q,get_parameters()));
     }
@@ -390,7 +390,7 @@ void RBSCMConstruction::evaluate_stability_constant()
       // We use this later to compute the SCM upper bounds.
       Real norm_B2 = libmesh_real( B_inner_product(*solution, *solution) );
 
-      for(unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
+      for (unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
         {
           Real norm_Aq2 = libmesh_real( Aq_inner_product(q, *solution, *solution) );
 
@@ -432,7 +432,7 @@ std::pair<unsigned int,Real> RBSCMConstruction::compute_SCM_bounds_on_training_s
   Real max_SCM_error = 0.;
 
   numeric_index_type first_index = get_first_local_training_index();
-  for(unsigned int i=0; i<get_local_n_training_samples(); i++)
+  for (unsigned int i=0; i<get_local_n_training_samples(); i++)
     {
       set_params_from_training_set(first_index+i);
       rb_scm_eval->set_parameters( get_parameters() );
@@ -467,7 +467,7 @@ void RBSCMConstruction::enrich_C_J(unsigned int new_C_J_index)
 
   RBParameters::const_iterator it     = get_parameters().begin();
   RBParameters::const_iterator it_end = get_parameters().end();
-  for( ; it != it_end; ++it)
+  for ( ; it != it_end; ++it)
     {
       if (it != get_parameters().begin())
         libMesh::out << ",";

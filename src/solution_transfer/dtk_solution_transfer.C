@@ -56,14 +56,14 @@ DTKSolutionTransfer::DTKSolutionTransfer(const libMesh::Parallel::Communicator &
 
 DTKSolutionTransfer::~DTKSolutionTransfer()
 {
-  for(std::map<EquationSystems *, DTKAdapter *>::iterator it = adapters.begin();
-      it != adapters.end();
-      ++it)
+  for (std::map<EquationSystems *, DTKAdapter *>::iterator it = adapters.begin();
+       it != adapters.end();
+       ++it)
     delete it->second;
 
-  for(std::map<std::pair<EquationSystems *, EquationSystems *>, shared_domain_map_type *>::iterator it = dtk_maps.begin();
-      it != dtk_maps.end();
-      ++it)
+  for (std::map<std::pair<EquationSystems *, EquationSystems *>, shared_domain_map_type *>::iterator it = dtk_maps.begin();
+       it != dtk_maps.end();
+       ++it)
     delete it->second;
 }
 

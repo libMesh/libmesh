@@ -218,7 +218,7 @@ SlepcEigenSolver<T>::_solve_standard_helper(Mat mat,
                      "   ----------------- -----------------\n" );
   LIBMESH_CHKERR(ierr);
 
-  for(PetscInt i=0; i<nconv; i++ )
+  for (PetscInt i=0; i<nconv; i++ )
     {
       ierr = EPSGetEigenpair(_eps, i, &kr, &ki, PETSC_NULL, PETSC_NULL);
       LIBMESH_CHKERR(ierr);
@@ -512,7 +512,7 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
                      "   ----------------- -----------------\n" );
   LIBMESH_CHKERR(ierr);
 
-  for(PetscInt i=0; i<nconv; i++ )
+  for (PetscInt i=0; i<nconv; i++ )
     {
       ierr = EPSGetEigenpair(_eps, i, &kr, &ki, PETSC_NULL, PETSC_NULL);
       LIBMESH_CHKERR(ierr);

@@ -103,7 +103,7 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
   unsigned int n_qpoints = _qrule->n_points();
   values.resize(n_qpoints);
 
-  for(unsigned int qp=0; qp<n_qpoints; qp++)
+  for (unsigned int qp=0; qp<n_qpoints; qp++)
     {
       values[qp] = 0.;
       for (std::size_t i=0; i<dof_indices_var.size(); i++)

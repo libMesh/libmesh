@@ -506,7 +506,7 @@ dof_id_type MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase & me
   MeshBase::const_element_iterator el = mesh.type_elements_begin(type);
   const MeshBase::const_element_iterator end = mesh.type_elements_end(type);
 
-  for(; el!=end; ++el)
+  for (; el!=end; ++el)
     if (((*el)->level() == level) && !(*el)->subactive())
       cnt++;
 
@@ -521,7 +521,7 @@ unsigned int MeshTools::n_active_local_levels(const MeshBase & mesh)
   MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     nl = std::max((*el)->level() + 1, nl);
 
   return nl;
@@ -540,7 +540,7 @@ unsigned int MeshTools::n_active_levels(const MeshBase & mesh)
   const MeshBase::const_element_iterator end_el =
     mesh.unpartitioned_elements_end();
 
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     if ((*el)->active())
       nl = std::max((*el)->level() + 1, nl);
 
@@ -557,7 +557,7 @@ unsigned int MeshTools::n_local_levels(const MeshBase & mesh)
   MeshBase::const_element_iterator el = mesh.local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
 
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     nl = std::max((*el)->level() + 1, nl);
 
   return nl;
@@ -576,7 +576,7 @@ unsigned int MeshTools::n_levels(const MeshBase & mesh)
   const MeshBase::const_element_iterator end_el =
     mesh.unpartitioned_elements_end();
 
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     nl = std::max((*el)->level() + 1, nl);
 
   mesh.comm().max(nl);
@@ -603,7 +603,7 @@ unsigned int MeshTools::paranoid_n_levels(const MeshBase & mesh)
     mesh.elements_end();
 
   unsigned int nl = 0;
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     nl = std::max((*el)->level() + 1, nl);
 
   mesh.comm().max(nl);
@@ -617,7 +617,7 @@ void MeshTools::get_not_subactive_node_ids(const MeshBase & mesh,
 {
   MeshBase::const_element_iterator el           = mesh.elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.elements_end();
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     {
       const Elem * elem = (*el);
       if (!elem->subactive())
@@ -655,14 +655,14 @@ unsigned int MeshTools::n_p_levels (const MeshBase & mesh)
     el     = mesh.local_elements_begin(),
     end_el = mesh.local_elements_end();
 
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     max_p_level = std::max((*el)->p_level(), max_p_level);
 
   // then any unpartitioned objects
   el     = mesh.unpartitioned_elements_begin();
   end_el = mesh.unpartitioned_elements_end();
 
-  for( ; el != end_el; ++el)
+  for ( ; el != end_el; ++el)
     max_p_level = std::max((*el)->p_level(), max_p_level);
 
   mesh.comm().max(max_p_level);
@@ -903,7 +903,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
 
                       //First look for the first one
                       //FIXME could be streamlined a bit
-                      for(unsigned int n=0;n<neigh->n_sides();n++)
+                      for (unsigned int n=0;n<neigh->n_sides();n++)
                         {
                           if (neigh->node_id(n) == node1)
                             found_in_neighbor=true;

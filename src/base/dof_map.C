@@ -1145,7 +1145,7 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
 
           // Next get any new element DOFS
           const unsigned int n_comp = elem->n_comp(sys_num, var_num);
-          for(unsigned int i=0; i<n_comp; i++)
+          for (unsigned int i=0; i<n_comp; i++)
             {
               const dof_id_type index = elem->dof_number(sys_num,var_num,i);
               if (idx.empty() || index > idx.back())
@@ -1172,7 +1172,7 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
             libmesh_assert(node);
 
             const unsigned int n_comp = node->n_comp(sys_num, var_num);
-            for(unsigned int i=0; i<n_comp; i++)
+            for (unsigned int i=0; i<n_comp; i++)
               {
                 const dof_id_type index = node->dof_number(sys_num,var_num,i);
                 if (idx.empty() || index > idx.back())
@@ -2396,7 +2396,7 @@ void DofMap::SCALAR_dof_indices (std::vector<dof_id_type> & di,
   const int n_dofs_vn = this->variable(vn).type().order.get_order();
 
   di.resize(n_dofs_vn);
-  for(int i = 0; i != n_dofs_vn; ++i)
+  for (int i = 0; i != n_dofs_vn; ++i)
     di[i] = my_idx++;
 }
 

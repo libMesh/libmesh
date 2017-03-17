@@ -1813,7 +1813,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
         Elem * copy = Elem::build(elem->type()).release();
 
         // Set node pointers (they still point to nodes in the original mesh)
-        for(unsigned int n=0; n<elem->n_nodes(); n++)
+        for (unsigned int n=0; n<elem->n_nodes(); n++)
           copy->set_node(n) = elem->node_ptr(n);
 
         // Copy over ids

@@ -605,8 +605,8 @@ void ExactSolution::_compute_error(const std::string & sys_name,
   std::vector<QBase *> q_rules(4, libmesh_nullptr);
 
   // Prepare finite elements for each dimension present in the mesh
-  for( std::set<unsigned char>::const_iterator d_it = elem_dims.begin();
-       d_it != elem_dims.end(); ++d_it )
+  for (std::set<unsigned char>::const_iterator d_it = elem_dims.begin();
+       d_it != elem_dims.end(); ++d_it)
     {
       q_rules[*d_it] =
         fe_type.default_quadrature_rule (*d_it, _extra_order).release();
@@ -747,7 +747,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
           RawAccessor<typename FEGenericBase<OutputShape>::OutputNumber> exact_val_accessor( exact_val, dim );
           if (_exact_values.size() > sys_num && _exact_values[sys_num])
             {
-              for( unsigned int c = 0; c < n_vec_dim; c++)
+              for (unsigned int c = 0; c < n_vec_dim; c++)
                 exact_val_accessor(c) =
                   _exact_values[sys_num]->
                   component(var_component+c, q_point[qp], time);
@@ -845,9 +845,9 @@ void ExactSolution::_compute_error(const std::string & sys_name,
               if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
                 libmesh_not_implemented();
 
-              for( unsigned int c = 0; c < n_vec_dim; c++)
-                for( unsigned int d = 0; d < dim; d++ )
-                  for( unsigned int e =0; e < dim; e++ )
+              for (unsigned int c = 0; c < n_vec_dim; c++)
+                for (unsigned int d = 0; d < dim; d++)
+                  for (unsigned int e =0; e < dim; e++)
                     exact_hess_accessor(d + e*dim + c*dim*dim) =
                       _exact_hessians[sys_num]->
                       component(var_component+c, q_point[qp], time)(d,e);
@@ -870,8 +870,8 @@ void ExactSolution::_compute_error(const std::string & sys_name,
     } // end element loop
 
   // Clean up the FE and QBase pointers we created
-  for( std::set<unsigned char>::const_iterator d_it = elem_dims.begin();
-       d_it != elem_dims.end(); ++d_it )
+  for (std::set<unsigned char>::const_iterator d_it = elem_dims.begin();
+       d_it != elem_dims.end(); ++d_it)
     {
       delete fe_ptrs[*d_it];
       delete q_rules[*d_it];

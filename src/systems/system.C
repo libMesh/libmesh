@@ -862,7 +862,7 @@ const std::string & System::vector_name (const NumericVector<Number> & vec_refer
   const_vectors_iterator v = vectors_begin();
   const_vectors_iterator v_end = vectors_end();
 
-  for(; v != v_end; ++v)
+  for (; v != v_end; ++v)
     {
       // Check if the current vector is the one whose name we want
       if (&vec_reference == v->second)
@@ -1280,7 +1280,7 @@ void System::get_all_variable_numbers(std::vector<unsigned int> & all_variable_n
     it_end = _variable_numbers.end();
 
   unsigned int count = 0;
-  for( ; it != it_end; ++it)
+  for ( ; it != it_end; ++it)
     {
       all_variable_numbers[count] = it->second;
       count++;
@@ -1344,7 +1344,7 @@ void System::zero_variable (NumericVector<Number> & v,
       {
         const Node * node = *it;
         unsigned int n_comp = node->n_comp(sys_num,var_num);
-        for(unsigned int i=0; i<n_comp; i++)
+        for (unsigned int i=0; i<n_comp; i++)
           {
             const dof_id_type index = node->dof_number(sys_num,var_num,i);
             v.set(index,0.0);
@@ -1360,7 +1360,7 @@ void System::zero_variable (NumericVector<Number> & v,
       {
         const Elem * elem = *it;
         unsigned int n_comp = elem->n_comp(sys_num,var_num);
-        for(unsigned int i=0; i<n_comp; i++)
+        for (unsigned int i=0; i<n_comp; i++)
           {
             const dof_id_type index = elem->dof_number(sys_num,var_num,i);
             v.set(index,0.0);

@@ -72,7 +72,7 @@ void RBParametrized::initialize_parameters(const RBParameters & mu_min_in,
       {
         RBParameters::const_iterator it     = mu_min_in.begin();
         RBParameters::const_iterator it_end = mu_min_in.end();
-        for( ; it != it_end; ++it)
+        for ( ; it != it_end; ++it)
           {
             std::string param_name = it->first;
             if (mu_min_in.get_value(param_name) > mu_max_in.get_value(param_name))
@@ -90,7 +90,7 @@ void RBParametrized::initialize_parameters(const RBParameters & mu_min_in,
       discrete_parameter_values.begin();
     const std::map< std::string, std::vector<Real> >::const_iterator it_end =
       discrete_parameter_values.end();
-    for( ; it != it_end; ++it)
+    for ( ; it != it_end; ++it)
       {
         if (it->second.empty())
           libmesh_error_msg("Error: List of discrete parameters for " << it->first << " is empty.");
@@ -242,7 +242,7 @@ void RBParametrized::write_parameter_ranges_to_file(const std::string & file_nam
   RBParameters::const_iterator it_end;
   it = get_parameters_min().begin();
   it_end = get_parameters_min().end();
-  for( ; it != it_end; ++it)
+  for ( ; it != it_end; ++it)
     {
       std::string param_name = it->first;
       if (!is_discrete_parameter(param_name))
@@ -253,7 +253,7 @@ void RBParametrized::write_parameter_ranges_to_file(const std::string & file_nam
     }
   it     = get_parameters_max().begin();
   it_end = get_parameters_max().end();
-  for( ; it != it_end; ++it)
+  for ( ; it != it_end; ++it)
     {
       std::string param_name = it->first;
       if (!is_discrete_parameter(param_name))
@@ -282,14 +282,14 @@ void RBParametrized::write_discrete_parameter_values_to_file(const std::string &
         get_discrete_parameter_values().begin();
       const std::map< std::string, std::vector<Real> >::const_iterator discrete_it_end =
         get_discrete_parameter_values().end();
-      for( ; discrete_it != discrete_it_end; ++discrete_it)
+      for ( ; discrete_it != discrete_it_end; ++discrete_it)
         {
           std::string param_name = discrete_it->first;
           unsigned int n_discrete_values = cast_int<unsigned int>
             (discrete_it->second.size());
           discrete_parameters_out << param_name << n_discrete_values;
 
-          for(unsigned int i=0; i<n_discrete_values; i++)
+          for (unsigned int i=0; i<n_discrete_values; i++)
             {
               Real discrete_value = discrete_it->second[i];
               discrete_parameters_out << discrete_value;
@@ -330,7 +330,7 @@ void RBParametrized::read_parameter_ranges_from_file(const std::string & file_na
   unsigned int n_continuous_params;
   parameter_ranges_in >> n_continuous_params;
 
-  for(unsigned int i=0; i<n_continuous_params; i++)
+  for (unsigned int i=0; i<n_continuous_params; i++)
     {
       std::string param_name;
       Real param_value;
@@ -340,7 +340,7 @@ void RBParametrized::read_parameter_ranges_from_file(const std::string & file_na
 
       param_min.set_value(param_name, param_value);
     }
-  for(unsigned int i=0; i<n_continuous_params; i++)
+  for (unsigned int i=0; i<n_continuous_params; i++)
     {
       std::string param_name;
       Real param_value;
@@ -370,7 +370,7 @@ void RBParametrized::read_discrete_parameter_values_from_file(const std::string 
       unsigned int n_discrete_params;
       discrete_parameter_values_in >> n_discrete_params;
 
-      for(unsigned int i=0; i<n_discrete_params; i++)
+      for (unsigned int i=0; i<n_discrete_params; i++)
         {
           std::string param_name;
           discrete_parameter_values_in >> param_name;
@@ -415,7 +415,7 @@ void RBParametrized::print_discrete_parameter_values() const
   const std::map< std::string, std::vector<Real> >::const_iterator it_end =
     get_discrete_parameter_values().end();
 
-  for( ; it != it_end; ++it)
+  for ( ; it != it_end; ++it)
     {
       libMesh::out << "Discrete parameter " << it->first << ", values: ";
 
@@ -436,7 +436,7 @@ bool RBParametrized::valid_params(const RBParameters & params)
       bool valid = true;
       RBParameters::const_iterator it     = params.begin();
       RBParameters::const_iterator it_end = params.end();
-      for( ; it != it_end; ++it)
+      for ( ; it != it_end; ++it)
         {
           std::string param_name = it->first;
           valid = valid && ( (get_parameter_min(param_name) <= params.get_value(param_name)) &&
@@ -471,7 +471,7 @@ Real RBParametrized::get_closest_value(Real value, const std::vector<Real> & lis
 
   Real min_distance = std::numeric_limits<Real>::max();
   Real closest_val = 0.;
-  for( ; it != it_end; ++it)
+  for ( ; it != it_end; ++it)
     {
       Real distance = std::abs(value - *it);
       if (distance < min_distance)

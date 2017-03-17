@@ -57,15 +57,15 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
   {
     unsigned int i = 0;
 
-    for(std::set<unsigned int>::iterator it = semi_local_nodes.begin();
-        it != semi_local_nodes.end();
-        ++it)
+    for (std::set<unsigned int>::iterator it = semi_local_nodes.begin();
+         it != semi_local_nodes.end();
+         ++it)
       {
         const Node & node = mesh.node_ref(*it);
 
         vertices[i] = node.id();
 
-        for(unsigned int j=0; j<dim; j++)
+        for (unsigned int j=0; j<dim; j++)
           coordinates[(j*num_local_nodes) + i] = node(j);
 
         i++;
@@ -86,14 +86,14 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
     unsigned int i = 0;
 
     MeshBase::const_element_iterator end = mesh.local_elements_end();
-    for(MeshBase::const_element_iterator it = mesh.local_elements_begin();
-        it != end;
-        ++it)
+    for (MeshBase::const_element_iterator it = mesh.local_elements_begin();
+         it != end;
+         ++it)
       {
         const Elem & elem = *(*it);
         elements[i] = elem.id();
 
-        for(unsigned int j=0; j<n_nodes_per_elem; j++)
+        for (unsigned int j=0; j<n_nodes_per_elem; j++)
           connectivity[(j*n_local_elem)+i] = elem.node_id(j);
 
         i++;
@@ -211,7 +211,7 @@ DTKAdapter::update_variable_values(std::string var_name)
 
   unsigned int i=0;
   // Loop over the values (one for each node) and assign the value of this variable at each node
-  for(FieldContainerType::iterator it=values->begin(); it != values->end(); ++it)
+  for (FieldContainerType::iterator it=values->begin(); it != values->end(); ++it)
     {
       unsigned int node_num = vertices[i];
       const Node & node = mesh.node_ref(node_num);
@@ -241,7 +241,7 @@ DTKAdapter::find_sys(std::string var_name)
   System * sys = libmesh_nullptr;
 
   // Find the system this variable is from
-  for(unsigned int i=0; i<es.n_systems(); i++)
+  for (unsigned int i=0; i<es.n_systems(); i++)
     {
       if (es.get_system(i).has_variable(var_name))
         {
@@ -280,13 +280,13 @@ void
 DTKAdapter::get_semi_local_nodes(std::set<unsigned int> & semi_local_nodes)
 {
   MeshBase::const_element_iterator end = mesh.local_elements_end();
-  for(MeshBase::const_element_iterator it = mesh.local_elements_begin();
-      it != end;
-      ++it)
+  for (MeshBase::const_element_iterator it = mesh.local_elements_begin();
+       it != end;
+       ++it)
     {
       const Elem & elem = *(*it);
 
-      for(unsigned int j=0; j<elem.n_nodes(); j++)
+      for (unsigned int j=0; j<elem.n_nodes(); j++)
         semi_local_nodes.insert(elem.node_id(j));
     }
 }

@@ -128,7 +128,7 @@ void __libmesh_nlopt_equality_constraints(unsigned m,
   if (sys.solution->size() != n)
     libmesh_error_msg("Error: Input vector x has different length than sys.solution!");
 
-  for(unsigned int i=sys.solution->first_local_index(); i<sys.solution->last_local_index(); i++)
+  for (unsigned int i=sys.solution->first_local_index(); i<sys.solution->last_local_index(); i++)
     sys.solution->set(i, x[i]);
   sys.solution->close();
 
@@ -172,11 +172,11 @@ void __libmesh_nlopt_equality_constraints(unsigned m,
               sys.C_eq_jac->close();
 
               // copy the Jacobian data to the gradient array
-              for(numeric_index_type i=0; i<m; i++)
+              for (numeric_index_type i=0; i<m; i++)
                 {
                   std::set<numeric_index_type>::iterator it = sys.eq_constraint_jac_sparsity[i].begin();
                   std::set<numeric_index_type>::iterator it_end = sys.eq_constraint_jac_sparsity[i].end();
-                  for( ; it != it_end; ++it)
+                  for ( ; it != it_end; ++it)
                     {
                       numeric_index_type dof_index = *it;
                       gradient[n*i+dof_index] = (*sys.C_eq_jac)(i,dof_index);
@@ -215,7 +215,7 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
   if (sys.solution->size() != n)
     libmesh_error_msg("Error: Input vector x has different length than sys.solution!");
 
-  for(unsigned int i=sys.solution->first_local_index(); i<sys.solution->last_local_index(); i++)
+  for (unsigned int i=sys.solution->first_local_index(); i<sys.solution->last_local_index(); i++)
     sys.solution->set(i, x[i]);
   sys.solution->close();
 
@@ -259,11 +259,11 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
               sys.C_ineq_jac->close();
 
               // copy the Jacobian data to the gradient array
-              for(numeric_index_type i=0; i<m; i++)
+              for (numeric_index_type i=0; i<m; i++)
                 {
                   std::set<numeric_index_type>::iterator it = sys.ineq_constraint_jac_sparsity[i].begin();
                   std::set<numeric_index_type>::iterator it_end = sys.ineq_constraint_jac_sparsity[i].end();
-                  for( ; it != it_end; ++it)
+                  for ( ; it != it_end; ++it)
                     {
                       numeric_index_type dof_index = *it;
                       gradient[n*i+dof_index] = (*sys.C_ineq_jac)(i,dof_index);
@@ -377,7 +377,7 @@ void NloptOptimizationSolver<T>::solve ()
 
       std::vector<Real> nlopt_lb(nlopt_size);
       std::vector<Real> nlopt_ub(nlopt_size);
-      for(unsigned int i=0; i<nlopt_size; i++)
+      for (unsigned int i=0; i<nlopt_size; i++)
         {
           nlopt_lb[i] = this->system().get_vector("lower_bounds")(i);
           nlopt_ub[i] = this->system().get_vector("upper_bounds")(i);

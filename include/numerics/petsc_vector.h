@@ -803,7 +803,7 @@ PetscVector<T>::PetscVector (Vec v,
           ierr = ISLocalToGlobalMappingGetIndices(mapping,&indices);
           LIBMESH_CHKERR(ierr);
 #endif
-          for(numeric_index_type i=ghost_begin; i<ghost_end; i++)
+          for (numeric_index_type i=ghost_begin; i<ghost_end; i++)
             _global_to_local_map[indices[i]] = i-my_local_size;
           this->_type = GHOSTED;
 #if !PETSC_RELEASE_LESS_THAN(3,1,1)
@@ -950,7 +950,7 @@ void PetscVector<T>::init (const numeric_index_type n,
   this->_type = GHOSTED;
 
   /* Make the global-to-local ghost cell map.  */
-  for(numeric_index_type i=0; i<ghost.size(); i++)
+  for (numeric_index_type i=0; i<ghost.size(); i++)
     {
       _global_to_local_map[ghost[i]] = i;
     }
@@ -1298,7 +1298,7 @@ void PetscVector<T>::get(const std::vector<numeric_index_type> & index,
 
   const std::size_t num = index.size();
 
-  for(std::size_t i=0; i<num; i++)
+  for (std::size_t i=0; i<num; i++)
     {
       const numeric_index_type local_index = this->map_global_to_local_index(index[i]);
 #ifndef NDEBUG

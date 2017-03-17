@@ -134,7 +134,7 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
   // Get the rhs by sampling parametrized_function
   // at the first N interpolation_points
   DenseVector<Number> EIM_rhs(N);
-  for(unsigned int i=0; i<N; i++)
+  for (unsigned int i=0; i<N; i++)
     {
       EIM_rhs(i) = evaluate_parametrized_function(interpolation_points_var[i],
                                                   interpolation_points[i],
@@ -161,7 +161,7 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
 
       // Next, evaluate the EIM approximation at x_{N+1}
       Number EIM_approx_at_next_x = 0.;
-      for(unsigned int j=0; j<N; j++)
+      for (unsigned int j=0; j<N; j++)
         {
           EIM_approx_at_next_x += RB_solution(j) * interpolation_matrix(N,j);
         }
@@ -209,7 +209,7 @@ void RBEIMEvaluation::initialize_eim_theta_objects()
 {
   // Initialize the rb_theta objects that access the solution from this rb_eim_evaluation
   _rb_eim_theta_objects.clear();
-  for(unsigned int i=0; i<get_n_basis_functions(); i++)
+  for (unsigned int i=0; i<get_n_basis_functions(); i++)
     {
       _rb_eim_theta_objects.push_back( build_eim_theta(i).release() );
     }
@@ -250,9 +250,9 @@ void RBEIMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/interpolation_matrix" << suffix;
       Xdr interpolation_matrix_out(file_name.str(), mode);
 
-      for(unsigned int i=0; i<n_bfs; i++)
+      for (unsigned int i=0; i<n_bfs; i++)
         {
-          for(unsigned int j=0; j<=i; j++)
+          for (unsigned int j=0; j<=i; j++)
             {
               interpolation_matrix_out << interpolation_matrix(i,j);
             }
@@ -263,7 +263,7 @@ void RBEIMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/interpolation_points" << suffix;
       Xdr interpolation_points_out(file_name.str(), mode);
 
-      for(unsigned int i=0; i<n_bfs; i++)
+      for (unsigned int i=0; i<n_bfs; i++)
         {
           interpolation_points_out << interpolation_points[i](0);
 
@@ -280,7 +280,7 @@ void RBEIMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/interpolation_points_var" << suffix;
       Xdr interpolation_points_var_out(file_name.str(), mode);
 
-      for(unsigned int i=0; i<n_bfs; i++)
+      for (unsigned int i=0; i<n_bfs; i++)
         {
           interpolation_points_var_out << interpolation_points_var[i];
         }
@@ -306,7 +306,7 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
     {
       Elem * old_elem = interpolation_points_elem[i];
 
-      for(unsigned int n=0; n<old_elem->n_nodes(); n++)
+      for (unsigned int n=0; n<old_elem->n_nodes(); n++)
         {
           Node & node_ref = old_elem->node_ref(n);
           dof_id_type old_node_id = node_ref.id();
@@ -344,7 +344,7 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
           new_elem->subdomain_id() = old_elem->subdomain_id();
 
           // Assign all the nodes
-          for(unsigned int n=0; n<new_elem->n_nodes(); n++)
+          for (unsigned int n=0; n<new_elem->n_nodes(); n++)
             {
               dof_id_type old_node_id = old_elem->node_id(n);
               new_elem->set_node(n) =
@@ -419,9 +419,9 @@ void RBEIMEvaluation::legacy_read_offline_data_from_files(const std::string & di
 
   Xdr interpolation_matrix_in(file_name.str(), mode);
 
-  for(unsigned int i=0; i<n_bfs; i++)
+  for (unsigned int i=0; i<n_bfs; i++)
     {
-      for(unsigned int j=0; j<=i; j++)
+      for (unsigned int j=0; j<=i; j++)
         {
           Number value;
           interpolation_matrix_in >> value;
@@ -437,7 +437,7 @@ void RBEIMEvaluation::legacy_read_offline_data_from_files(const std::string & di
 
   Xdr interpolation_points_in(file_name.str(), mode);
 
-  for(unsigned int i=0; i<n_bfs; i++)
+  for (unsigned int i=0; i<n_bfs; i++)
     {
       Real x_val, y_val, z_val = 0.;
       interpolation_points_in >> x_val;
@@ -460,7 +460,7 @@ void RBEIMEvaluation::legacy_read_offline_data_from_files(const std::string & di
 
   Xdr interpolation_points_var_in(file_name.str(), mode);
 
-  for(unsigned int i=0; i<n_bfs; i++)
+  for (unsigned int i=0; i<n_bfs; i++)
     {
       unsigned int var;
       interpolation_points_var_in >> var;
@@ -488,7 +488,7 @@ void RBEIMEvaluation::legacy_read_in_interpolation_points_elem(const std::string
     if (!interpolation_elem_ids_in)
       libmesh_error_msg("RB data missing: " + directory_name + "/interpolation_elem_ids.dat");
 
-    for(unsigned int i=0; i<n_bfs; i++)
+    for (unsigned int i=0; i<n_bfs; i++)
       {
         dof_id_type elem_id;
         interpolation_elem_ids_in >> elem_id;
@@ -498,7 +498,7 @@ void RBEIMEvaluation::legacy_read_in_interpolation_points_elem(const std::string
   }
 
   interpolation_points_elem.resize(n_bfs);
-  for(unsigned int i=0; i<n_bfs; i++)
+  for (unsigned int i=0; i<n_bfs; i++)
     {
       interpolation_points_elem[i] =
         _interpolation_points_mesh.elem_ptr(interpolation_elem_ids[i]);

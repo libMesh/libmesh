@@ -1090,7 +1090,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
           std::set<dof_id_type>::iterator set_it     = this_boundary_node_ids.begin();
           std::set<dof_id_type>::iterator set_it_end = this_boundary_node_ids.end();
-          for( ; set_it != set_it_end; ++set_it)
+          for ( ; set_it != set_it_end; ++set_it)
             {
               dof_id_type this_node_id = *set_it;
               Node & this_node = this->node_ref(this_node_id);
@@ -1099,7 +1099,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
               std::set<dof_id_type>::iterator other_set_it     = other_boundary_node_ids.begin();
               std::set<dof_id_type>::iterator other_set_it_end = other_boundary_node_ids.end();
-              for( ; other_set_it != other_set_it_end; ++other_set_it)
+              for ( ; other_set_it != other_set_it_end; ++other_set_it)
                 {
                   dof_id_type other_node_id = *other_set_it;
                   Node & other_node = other_mesh->node_ref(other_node_id);
@@ -1205,16 +1205,16 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
       // Also, increment the node_to_node_map and node_to_elems_map
       std::map<dof_id_type, dof_id_type>::iterator node_map_it     = node_to_node_map.begin();
       std::map<dof_id_type, dof_id_type>::iterator node_map_it_end = node_to_node_map.end();
-      for( ; node_map_it != node_map_it_end; ++node_map_it)
+      for ( ; node_map_it != node_map_it_end; ++node_map_it)
         {
           node_map_it->second += node_delta;
         }
       std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it     = node_to_elems_map.begin();
       std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it_end = node_to_elems_map.end();
-      for( ; elem_map_it != elem_map_it_end; ++elem_map_it)
+      for ( ; elem_map_it != elem_map_it_end; ++elem_map_it)
         {
           std::size_t n_elems = elem_map_it->second.size();
-          for(std::size_t i=0; i<n_elems; i++)
+          for (std::size_t i=0; i<n_elems; i++)
             {
               (elem_map_it->second)[i] += elem_delta;
             }
@@ -1295,14 +1295,14 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
   std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it     = node_to_elems_map.begin();
   std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it_end = node_to_elems_map.end();
-  for( ; elem_map_it != elem_map_it_end; ++elem_map_it)
+  for ( ; elem_map_it != elem_map_it_end; ++elem_map_it)
     {
       dof_id_type target_node_id = elem_map_it->first;
       dof_id_type other_node_id = node_to_node_map[target_node_id];
       Node & target_node = this->node_ref(target_node_id);
 
       std::size_t n_elems = elem_map_it->second.size();
-      for(std::size_t i=0; i<n_elems; i++)
+      for (std::size_t i=0; i<n_elems; i++)
         {
           dof_id_type elem_id = elem_map_it->second[i];
           Elem * el = this->elem_ptr(elem_id);
@@ -1320,7 +1320,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
   std::map<dof_id_type, dof_id_type>::iterator node_map_it     = node_to_node_map.begin();
   std::map<dof_id_type, dof_id_type>::iterator node_map_it_end = node_to_node_map.end();
-  for( ; node_map_it != node_map_it_end; ++node_map_it)
+  for ( ; node_map_it != node_map_it_end; ++node_map_it)
     {
       // In the case that this==other_mesh, the two nodes might be the same (e.g. if
       // we're stitching a "sliver"), hence we need to skip node deletion in that case.
@@ -1343,17 +1343,17 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
       elem_map_it     = node_to_elems_map.begin();
       elem_map_it_end = node_to_elems_map.end();
       std::set<dof_id_type> fixed_elems;
-      for( ; elem_map_it != elem_map_it_end; ++elem_map_it)
+      for ( ; elem_map_it != elem_map_it_end; ++elem_map_it)
         {
           std::size_t n_elems = elem_map_it->second.size();
-          for(std::size_t i=0; i<n_elems; i++)
+          for (std::size_t i=0; i<n_elems; i++)
             {
               dof_id_type elem_id = elem_map_it->second[i];
               if (fixed_elems.find(elem_id) == fixed_elems.end())
                 {
                   Elem * el = this->elem_ptr(elem_id);
                   fixed_elems.insert(elem_id);
-                  for(unsigned int s = 0; s < el->n_neighbors(); ++s)
+                  for (unsigned int s = 0; s < el->n_neighbors(); ++s)
                     {
                       if (el->neighbor_ptr(s) == libmesh_nullptr)
                         {

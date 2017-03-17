@@ -265,13 +265,13 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
     const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
     // Start loop over elems
-    for(; elem_it != elem_end; ++elem_it)
+    for (; elem_it != elem_end; ++elem_it)
       {
         // Pointer to this element
         const Elem * elem = *elem_it;
 
         // Loop over the nodes in the element
-        for(unsigned int n=0; n != elem->n_nodes(); ++n)
+        for (unsigned int n=0; n != elem->n_nodes(); ++n)
           {
             // Get a reference to the current node
             const Node & node = elem->node_ref(n);
@@ -296,7 +296,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
                 const std::set<const Elem *>::iterator fine_neighbor_end = fine_grid_neighbor_set.end();
 
                 // Loop over all the fine neighbors of this node
-                for(; fine_neighbor_it != fine_neighbor_end ; ++fine_neighbor_it)
+                for (; fine_neighbor_it != fine_neighbor_end ; ++fine_neighbor_it)
                   {
                     // Pointer to the current fine neighbor element
                     const Elem * fine_elem = *fine_neighbor_it;
@@ -380,7 +380,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
           MeshBase::const_element_iterator elem_it = mesh.active_local_elements_begin();
           const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
-          for(; elem_it != elem_end; ++elem_it)
+          for (; elem_it != elem_end; ++elem_it)
             {
               // Pointer to the element
               const Elem * elem = *elem_it;

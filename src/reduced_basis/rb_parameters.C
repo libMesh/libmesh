@@ -71,7 +71,7 @@ void RBParameters::get_parameter_names(std::set<std::string> & param_names) cons
 
   const_iterator it     = _parameters.begin();
   const_iterator it_end = _parameters.end();
-  for( ; it != it_end; ++it)
+  for ( ; it != it_end; ++it)
     {
       param_names.insert( it->first );
     }
@@ -104,7 +104,7 @@ std::string RBParameters::get_string(unsigned int precision) const
 
   const_iterator it     = _parameters.begin();
   const_iterator it_end = _parameters.end();
-  for( ; it != it_end; ++it)
+  for ( ; it != it_end; ++it)
     {
       param_stringstream << it->first << ": " << std::scientific <<  it->second << std::endl;
     }

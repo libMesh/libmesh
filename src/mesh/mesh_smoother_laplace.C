@@ -92,7 +92,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
                     const Point & connected_node = _mesh.point(_graph[node->id()][j]);
 
                     avg_position.add( connected_node );
-                  } // end for(j)
+                  } // end for (j)
 
                 // Compute the average, store in the new_positions vector
                 new_positions[node->id()] = avg_position / static_cast<Real>(_graph[node->id()].size());

@@ -384,7 +384,7 @@ EpetraVector<T>::operator = (const std::vector<T> & v)
       const unsigned int nl=this->local_size();
       const unsigned int fli=this->first_local_index();
 
-      for(unsigned int i=0;i<nl;i++)
+      for (unsigned int i=0;i<nl;i++)
         values[i]=v[fli+i];
     }
 
@@ -398,7 +398,7 @@ EpetraVector<T>::operator = (const std::vector<T> & v)
 
       const unsigned int nl=this->local_size();
 
-      for(unsigned int i=0;i<nl;i++)
+      for (unsigned int i=0;i<nl;i++)
         values[i]=v[i];
     }
 
@@ -663,7 +663,7 @@ int EpetraVector<T>::inputValues(int numIDs,
   //Important note!! This method assumes that there is only 1 point
   //associated with each element.
 
-  for(int i=0; i<numIDs; ++i) {
+  for (int i=0; i<numIDs; ++i) {
     if (_vec->Map().MyGID(GIDs[i])) {
       if (accumulate) {
         _vec->SumIntoGlobalValue(GIDs[i], 0, 0, values[i]);
@@ -699,16 +699,16 @@ int EpetraVector<T>::inputValues(int numIDs,
   }
 
   int offset=0;
-  for(int i=0; i<numIDs; ++i) {
+  for (int i=0; i<numIDs; ++i) {
     int numValues = numValuesPerID[i];
     if (_vec->Map().MyGID(GIDs[i])) {
       if (accumulate) {
-        for(int j=0; j<numValues; ++j) {
+        for (int j=0; j<numValues; ++j) {
           _vec->SumIntoGlobalValue(GIDs[i], j, 0, values[offset+j]);
         }
       }
       else {
-        for(int j=0; j<numValues; ++j) {
+        for (int j=0; j<numValues; ++j) {
           _vec->ReplaceGlobalValue(GIDs[i], j, 0, values[offset+j]);
         }
       }
@@ -792,12 +792,12 @@ int EpetraVector<T>::inputNonlocalValues(int GID,
     }
 
     if (accumulate) {
-      for(int j=0; j<numValues; ++j) {
+      for (int j=0; j<numValues; ++j) {
         nonlocalCoefs_[offset][j] += values[j];
       }
     }
     else {
-      for(int j=0; j<numValues; ++j) {
+      for (int j=0; j<numValues; ++j) {
         nonlocalCoefs_[offset][j] = values[j];
       }
     }
@@ -817,7 +817,7 @@ int EpetraVector<T>::inputNonlocalValues(int GID,
     EPETRA_CHK_ERR( Epetra_Util_insert(numValues, insertPoint, nonlocalElementSize_,
                                        tmp1, tmp3) );
     double * newvalues = new double[numValues];
-    for(int j=0; j<numValues; ++j) {
+    for (int j=0; j<numValues; ++j) {
       newvalues[j] = values[j];
     }
     EPETRA_CHK_ERR( Epetra_Util_insert(newvalues, insertPoint, nonlocalCoefs_,
@@ -855,8 +855,8 @@ int EpetraVector<T>::GlobalAssemble(Epetra_CombineMode mode)
   Epetra_MultiVector nonlocalVector(sourceMap, 1);
 
   int i,j;
-  for(i=0; i<numNonlocalIDs_; ++i) {
-    for(j=0; j<nonlocalElementSize_[i]; ++j) {
+  for (i=0; i<numNonlocalIDs_; ++i) {
+    for (j=0; j<nonlocalElementSize_[i]; ++j) {
       nonlocalVector.ReplaceGlobalValue(nonlocalIDs_[i], j, 0,
                                         nonlocalCoefs_[i][j]);
     }
@@ -886,12 +886,12 @@ void EpetraVector<T>::FEoperatorequals(const EpetraVector & source)
     nonlocalIDs_ = new int[allocatedNonlocalLength_];
     nonlocalElementSize_ = new int[allocatedNonlocalLength_];
     nonlocalCoefs_ = new double *[allocatedNonlocalLength_];
-    for(int i=0; i<numNonlocalIDs_; ++i) {
+    for (int i=0; i<numNonlocalIDs_; ++i) {
       int elemSize = source.nonlocalElementSize_[i];
       nonlocalCoefs_[i] = new double[elemSize];
       nonlocalIDs_[i] = source.nonlocalIDs_[i];
       nonlocalElementSize_[i] = elemSize;
-      for(int j=0; j<elemSize; ++j) {
+      for (int j=0; j<elemSize; ++j) {
         nonlocalCoefs_[i][j] = source.nonlocalCoefs_[i][j];
       }
     }
@@ -908,7 +908,7 @@ void EpetraVector<T>::destroyNonlocalData()
     delete [] nonlocalElementSize_;
     nonlocalIDs_ = libmesh_nullptr;
     nonlocalElementSize_ = libmesh_nullptr;
-    for(int i=0; i<numNonlocalIDs_; ++i) {
+    for (int i=0; i<numNonlocalIDs_; ++i) {
       delete [] nonlocalCoefs_[i];
     }
     delete [] nonlocalCoefs_;

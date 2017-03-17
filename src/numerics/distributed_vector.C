@@ -169,7 +169,7 @@ NumericVector<T> & DistributedVector<T>::operator /= (NumericVector<T> & v)
 
   std::size_t val_size = _values.size();
 
-  for(std::size_t i=0; i<val_size; i++)
+  for (std::size_t i=0; i<val_size; i++)
     _values[i] = _values[i] / v_vec._values[i];
 
   return *this;

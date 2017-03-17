@@ -123,13 +123,13 @@ DiffContext::~DiffContext ()
   std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *> > >::iterator localized_vectors_end = _localized_vectors.end();
 
   // Loop over every localized_vector
-  for(; localized_vectors_it != localized_vectors_end; ++localized_vectors_it)
+  for (; localized_vectors_it != localized_vectors_end; ++localized_vectors_it)
     {
       // Grab the DenseSubVector to be deleted
       std::vector<DenseSubVector<Number> * > &  localized_vector_dsv = localized_vectors_it->second.second;
 
       // Loop over that vector and delete each entry
-      for(std::size_t i=0; i != localized_vector_dsv.size(); ++i)
+      for (std::size_t i=0; i != localized_vector_dsv.size(); ++i)
         delete localized_vector_dsv[i];
     }
 }
@@ -161,7 +161,7 @@ void DiffContext::add_localized_vector (NumericVector<Number> & localized_vector
   _localized_vectors[&localized_vector].second.reserve(nv);
 
   // Fill the DenseSubVector with nv copies of DenseVector
-  for(unsigned int i=0; i != nv; ++i)
+  for (unsigned int i=0; i != nv; ++i)
     _localized_vectors[&localized_vector].second.push_back(new DenseSubVector<Number>(_localized_vectors[&localized_vector].first));
 }
 

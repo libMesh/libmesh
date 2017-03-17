@@ -1813,8 +1813,8 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   std::set<const Elem *, CompareElemIdsByLevel> elements_to_keep;
 
   // Don't delete elements that we were explicitly told not to
-  for(std::set<Elem *>::iterator it = extra_ghost_elem_ids.begin();
-      it != extra_ghost_elem_ids.end(); ++it)
+  for (std::set<Elem *>::iterator it = extra_ghost_elem_ids.begin();
+       it != extra_ghost_elem_ids.end(); ++it)
     {
       const Elem * elem = *it;
 

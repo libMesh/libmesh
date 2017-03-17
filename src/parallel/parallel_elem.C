@@ -769,7 +769,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           const boundary_id_type num_bcs =
             cast_int<boundary_id_type>(*in++);
 
-          for(boundary_id_type bc_it=0; bc_it < num_bcs; bc_it++)
+          for (boundary_id_type bc_it=0; bc_it < num_bcs; bc_it++)
             mesh->get_boundary_info().add_side
               (elem, s, cast_int<boundary_id_type>(*in++));
         }
@@ -779,7 +779,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           const boundary_id_type num_bcs =
             cast_int<boundary_id_type>(*in++);
 
-          for(boundary_id_type bc_it=0; bc_it < num_bcs; bc_it++)
+          for (boundary_id_type bc_it=0; bc_it < num_bcs; bc_it++)
             mesh->get_boundary_info().add_edge
               (elem, e, cast_int<boundary_id_type>(*in++));
         }
@@ -789,7 +789,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           const boundary_id_type num_bcs =
             cast_int<boundary_id_type>(*in++);
 
-          for(boundary_id_type bc_it=0; bc_it < num_bcs; bc_it++)
+          for (boundary_id_type bc_it=0; bc_it < num_bcs; bc_it++)
             mesh->get_boundary_info().add_shellface
               (elem, sf, cast_int<boundary_id_type>(*in++));
         }

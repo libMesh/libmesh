@@ -68,7 +68,7 @@ MeshFunctionSolutionTransfer::transfer(const Variable & from_var,
   MeshBase::const_node_iterator nd_end = to_sys->get_mesh().local_nodes_end();
 
   // Now loop over the nodes of the 'To' mesh setting values for each variable.
-  for(;nd != nd_end; ++nd)
+  for (;nd != nd_end; ++nd)
     // 0 is for the value component
     to_sys->solution->set((*nd)->dof_number(to_sys_num, to_var_num, 0), from_func(**nd));
 

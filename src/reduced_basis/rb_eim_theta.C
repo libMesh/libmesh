@@ -41,7 +41,7 @@ Number RBEIMTheta::evaluate(const RBParameters & mu)
       RBParameters mu_eim;
       RBParameters::const_iterator it     = rb_eim_eval.get_parameters().begin();
       RBParameters::const_iterator it_end = rb_eim_eval.get_parameters().end();
-      for( ; it != it_end; ++it)
+      for ( ; it != it_end; ++it)
         {
           std::string param_name = it->first;
           mu_eim.set_value(param_name, mu.get_value(param_name));

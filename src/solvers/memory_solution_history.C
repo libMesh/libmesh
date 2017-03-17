@@ -13,7 +13,7 @@ MemorySolutionHistory::~MemorySolutionHistory ()
   stored_solutions_iterator stored_sols_it = stored_solutions.begin();
   const stored_solutions_iterator stored_sols_end = stored_solutions.end();
 
-  for(; stored_sols_it != stored_sols_end; ++stored_sols_it)
+  for (; stored_sols_it != stored_sols_end; ++stored_sols_it)
     {
       // The saved vectors at this timestep
       std::map<std::string, NumericVector<Number> *> saved_vectors = stored_sols_it->second;

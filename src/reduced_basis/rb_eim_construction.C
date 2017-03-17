@@ -268,7 +268,7 @@ Real RBEIMConstruction::get_point_locator_tol() const
 void RBEIMConstruction::initialize_eim_assembly_objects()
 {
   _rb_eim_assembly_objects.clear();
-  for(unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
+  for (unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
     {
       _rb_eim_assembly_objects.push_back( build_eim_assembly(i).release() );
     }
@@ -333,7 +333,7 @@ void RBEIMConstruction::enrich_RB_space()
       // at the interpolation points
       unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
       DenseVector<Number> EIM_rhs(RB_size);
-      for(unsigned int i=0; i<RB_size; i++)
+      for (unsigned int i=0; i<RB_size; i++)
         {
           EIM_rhs(i) = evaluate_mesh_function( eim_eval.interpolation_points_var[i],
                                                eim_eval.interpolation_points[i] );
@@ -344,7 +344,7 @@ void RBEIMConstruction::enrich_RB_space()
 
       // Load the "EIM residual" into solution by subtracting
       // the EIM approximation
-      for(unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
+      for (unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
         {
           get_explicit_system().solution->add(-eim_eval.RB_solution(i), get_rb_evaluation().get_basis_function(i));
         }
@@ -379,11 +379,11 @@ void RBEIMConstruction::enrich_RB_space()
       explicit_context.pre_fe_reinit(get_explicit_system(), *el);
       explicit_context.elem_fe_reinit();
 
-      for(unsigned int var=0; var<get_explicit_system().n_vars(); var++)
+      for (unsigned int var=0; var<get_explicit_system().n_vars(); var++)
         {
           unsigned int n_qpoints = explicit_context.get_element_qrule().n_points();
 
-          for(unsigned int qp=0; qp<n_qpoints; qp++)
+          for (unsigned int qp=0; qp<n_qpoints; qp++)
             {
               Number value = explicit_context.interior_value(var, qp);
               Real abs_value = std::abs(value);
@@ -477,7 +477,7 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
   get_rb_evaluation().initialize_parameters(*this);
 
   _parametrized_functions_in_training_set.resize( get_n_training_samples() );
-  for(unsigned int i=0; i<get_n_training_samples(); i++)
+  for (unsigned int i=0; i<get_n_training_samples(); i++)
     {
       set_params_from_training_set(i);
       truth_solve(-1);
@@ -533,7 +533,7 @@ Real RBEIMConstruction::compute_best_fit_error()
         // We have pre-stored inner_product_matrix * basis_function[i] for each i
         // so we can just evaluate the dot product here.
         DenseVector<Number> best_fit_rhs(RB_size);
-        for(unsigned int i=0; i<RB_size; i++)
+        for (unsigned int i=0; i<RB_size; i++)
           {
             best_fit_rhs(i) = get_explicit_system().solution->dot(*_matrix_times_bfs[i]);
           }
@@ -581,7 +581,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
       // Check if parameters are in the training set. If so, we can just load the
       // solution from _parametrized_functions_in_training_set
 
-      for(unsigned int i=0; i<get_n_training_samples(); i++)
+      for (unsigned int i=0; i<get_n_training_samples(); i++)
         {
           if (get_parameters() == get_params_from_training_set(i))
             {
@@ -727,7 +727,7 @@ void RBEIMConstruction::init_context_with_sys(FEMContext & c, System & sys)
 {
   // default implementation of init_context
   // for compute_best_fit
-  for(unsigned int var=0; var<sys.n_vars(); var++)
+  for (unsigned int var=0; var<sys.n_vars(); var++)
     {
       FEBase * elem_fe = libmesh_nullptr;
       c.get_element_fe( var, elem_fe );
@@ -751,9 +751,9 @@ void RBEIMConstruction::update_RB_system_matrices()
     UniquePtr< NumericVector<Number> > temp1 = this->solution->zero_clone();
     UniquePtr< NumericVector<Number> > temp2 = this->solution->zero_clone();
 
-    for(unsigned int i=(RB_size-1); i<RB_size; i++)
+    for (unsigned int i=(RB_size-1); i<RB_size; i++)
       {
-        for(unsigned int j=0; j<RB_size; j++)
+        for (unsigned int j=0; j<RB_size; j++)
           {
             // We must localize get_rb_evaluation().get_basis_function(j) before calling
             // get_explicit_sys_subvector
@@ -763,7 +763,7 @@ void RBEIMConstruction::update_RB_system_matrices()
             get_rb_evaluation().get_basis_function(j).localize(*localized_basis_function);
 
             // Compute reduced inner_product_matrix via a series of matvecs
-            for(unsigned int var=0; var<get_explicit_system().n_vars(); var++)
+            for (unsigned int var=0; var<get_explicit_system().n_vars(); var++)
               {
                 get_explicit_sys_subvector(*temp1, var, *localized_basis_function);
                 inner_product_matrix->vector_mult(*temp2, *temp1);
@@ -787,7 +787,7 @@ void RBEIMConstruction::update_RB_system_matrices()
   RBEIMEvaluation & eim_eval = cast_ref<RBEIMEvaluation &>(get_rb_evaluation());
 
   // update the EIM interpolation matrix
-  for(unsigned int j=0; j<RB_size; j++)
+  for (unsigned int j=0; j<RB_size; j++)
     {
       // Sample the basis functions at the
       // new interpolation point
@@ -894,7 +894,7 @@ void RBEIMConstruction::init_dof_map_between_systems()
   unsigned int n_sys_dofs = this->n_dofs();
 
   _dof_map_between_systems.resize(n_vars);
-  for(unsigned int var=0; var<n_vars; var++)
+  for (unsigned int var=0; var<n_vars; var++)
     {
       _dof_map_between_systems[var].resize(n_sys_dofs);
     }
@@ -913,13 +913,13 @@ void RBEIMConstruction::init_dof_map_between_systems()
 
       const unsigned int n_dofs = implicit_sys_dof_indices.size();
 
-      for(unsigned int var=0; var<n_vars; var++)
+      for (unsigned int var=0; var<n_vars; var++)
         {
           get_explicit_system().get_dof_map().dof_indices (elem, explicit_sys_dof_indices, var);
 
           libmesh_assert(explicit_sys_dof_indices.size() == n_dofs);
 
-          for(unsigned int i=0; i<n_dofs; i++)
+          for (unsigned int i=0; i<n_dofs; i++)
             {
               dof_id_type implicit_sys_dof_index = implicit_sys_dof_indices[i];
               dof_id_type explicit_sys_dof_index = explicit_sys_dof_indices[i];

@@ -158,7 +158,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
         //Assign all the nodes
-        for(unsigned int i=0;i<el->n_nodes();i++)
+        for (unsigned int i=0;i<el->n_nodes();i++)
           el->set_node(i) = this->node_ptr(old->node_id(i));
 
         // And start it off in the same subdomain
