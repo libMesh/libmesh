@@ -882,15 +882,15 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
 
                       bool found_in_neighbor = false;
 
-                      //Find the two vertices that make up this side
-                      while(!elem->is_node_on_side(local_node1++,s)) { }
+                      // Find the two vertices that make up this side
+                      while (!elem->is_node_on_side(local_node1++,s)) { }
                       local_node1--;
 
-                      //Start looking for the second one with the next node
+                      // Start looking for the second one with the next node
                       local_node2=local_node1+1;
 
-                      //Find the other one
-                      while(!elem->is_node_on_side(local_node2++,s)) { }
+                      // Find the other one
+                      while (!elem->is_node_on_side(local_node2++,s)) { }
                       local_node2--;
 
                       //Pull out their global ids:
@@ -913,21 +913,21 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
 
                       if (!found_in_neighbor)
                         hanging_node=node1;
-                      else //If it wasn't node1 then it must be node2!
+                      else // If it wasn't node1 then it must be node2!
                         hanging_node=node2;
 
-                      //Reset these for reuse
+                      // Reset these for reuse
                       local_node1=0;
                       local_node2=0;
 
-                      //Find the first node that makes up the side in the neighbor (these should be the parent nodes)
-                      while(!neigh->is_node_on_side(local_node1++,s_neigh)) { }
+                      // Find the first node that makes up the side in the neighbor (these should be the parent nodes)
+                      while (!neigh->is_node_on_side(local_node1++,s_neigh)) { }
                       local_node1--;
 
                       local_node2=local_node1+1;
 
                       //Find the second node...
-                      while(!neigh->is_node_on_side(local_node2++,s_neigh)) { }
+                      while (!neigh->is_node_on_side(local_node2++,s_neigh)) { }
                       local_node2--;
 
                       //Save them if we haven't already found the parents for this one

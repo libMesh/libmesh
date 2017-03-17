@@ -769,15 +769,16 @@ void Elem::find_edge_neighbors(const Point & p1,
   std::set<const Elem *>::iterator        it = neighbor_set.begin();
   const std::set<const Elem *>::iterator end = neighbor_set.end();
 
-  while(it != end) {
-    std::set<const Elem *>::iterator current = it++;
+  while (it != end)
+    {
+      std::set<const Elem *>::iterator current = it++;
 
-    const Elem * elem = *current;
-    // This won't invalidate iterator it, because it is already
-    // pointing to the next element
-    if (!elem->contains_point(p2))
-      neighbor_set.erase(current);
-  }
+      const Elem * elem = *current;
+      // This won't invalidate iterator it, because it is already
+      // pointing to the next element
+      if (!elem->contains_point(p2))
+        neighbor_set.erase(current);
+    }
 }
 
 
@@ -901,7 +902,7 @@ void Elem::find_interior_neighbors(std::set<const Elem *> & neighbor_set) const
   std::set<const Elem *>::iterator        it = neighbor_set.begin();
   const std::set<const Elem *>::iterator end = neighbor_set.end();
 
-  while(it != end)
+  while (it != end)
     {
       std::set<const Elem *>::iterator current = it++;
       const Elem * elem = *current;

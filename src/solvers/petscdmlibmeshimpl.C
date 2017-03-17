@@ -620,12 +620,12 @@ static PetscErrorCode  DMlibMeshParseDecompositionDescriptor_Private(DM dm, cons
     *dtype=DMLIBMESH_DOMAIN_DECOMPOSITION;
   }
   ierr = PetscStrlen(s0,&count);       CHKERRQ(ierr);
-  while(count < len0) {
+  while (count < len0) {
     struct token * st;
     struct token * br;
     ++ss; ++count;
     s=ss;
-    while(*ss && *ss != ',' && *ss != ';') {
+    while (*ss && *ss != ',' && *ss != ';') {
       ++ss; ++count;
     }
     st = PETSC_NULL; br = PETSC_NULL;
@@ -675,7 +675,7 @@ static PetscErrorCode  DMlibMeshParseDecompositionDescriptor_Private(DM dm, cons
   /* The result of parsing is in the linked list ll. */
   /* Count up the strings and the breaks. */
   tok = llfirst;
-  while(tok) {
+  while (tok) {
     if (tok->s)
       ++stcount;
     else
@@ -688,7 +688,7 @@ static PetscErrorCode  DMlibMeshParseDecompositionDescriptor_Private(DM dm, cons
   ierr = PetscMalloc(*dcount*sizeof(char **),   dlists); CHKERRQ(ierr);
   for (d = 0; d < *dcount; ++d) (*dsizes)[d] = 0;
   tok = llfirst; d = 0;
-  while(tok) {
+  while (tok) {
     if (tok->s)
       ++(*dsizes)[d];
     else
@@ -700,7 +700,7 @@ static PetscErrorCode  DMlibMeshParseDecompositionDescriptor_Private(DM dm, cons
   }
   /* Now copy strings and destroy tokens. */
   tok = llfirst; d = 0; i = 0;
-  while(tok) {
+  while (tok) {
     if (tok->s) {
       ierr = PetscStrallocpy(tok->s, (*dlists)[d]+i); CHKERRQ(ierr);
       ++i;

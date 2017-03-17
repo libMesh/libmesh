@@ -1039,7 +1039,7 @@ Real RBConstruction::train_reduced_basis(const bool resize_rb_eval_data)
   libMesh::out << std::endl << "---- Performing Greedy basis enrichment ----" << std::endl;
   Real initial_greedy_error = 0.;
   bool initial_greedy_error_initialized = false;
-  while(true)
+  while (true)
     {
       libMesh::out << std::endl << "---- Basis dimension: "
                    << get_rb_evaluation().get_n_basis_functions() << " ----" << std::endl;

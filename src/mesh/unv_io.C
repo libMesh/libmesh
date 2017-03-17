@@ -878,7 +878,7 @@ void UNVIO::elements_in (std::istream & in_file)
 
       // Increment the counter for the next iteration
       ctr++;
-    } // end while(true)
+    } // end while (true)
 }
 
 

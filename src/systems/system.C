@@ -756,7 +756,7 @@ const NumericVector<Number> * System::request_vector (const unsigned int vec_num
   const_vectors_iterator v = vectors_begin();
   const_vectors_iterator v_end = vectors_end();
   unsigned int num = 0;
-  while((num<vec_num) && (v!=v_end))
+  while ((num<vec_num) && (v!=v_end))
     {
       num++;
       ++v;
@@ -773,7 +773,7 @@ NumericVector<Number> * System::request_vector (const unsigned int vec_num)
   vectors_iterator v = vectors_begin();
   vectors_iterator v_end = vectors_end();
   unsigned int num = 0;
-  while((num<vec_num) && (v!=v_end))
+  while ((num<vec_num) && (v!=v_end))
     {
       num++;
       ++v;
@@ -816,7 +816,7 @@ const NumericVector<Number> & System::get_vector (const unsigned int vec_num) co
   const_vectors_iterator v = vectors_begin();
   const_vectors_iterator v_end = vectors_end();
   unsigned int num = 0;
-  while((num<vec_num) && (v!=v_end))
+  while ((num<vec_num) && (v!=v_end))
     {
       num++;
       ++v;
@@ -832,7 +832,7 @@ NumericVector<Number> & System::get_vector (const unsigned int vec_num)
   vectors_iterator v = vectors_begin();
   vectors_iterator v_end = vectors_end();
   unsigned int num = 0;
-  while((num<vec_num) && (v!=v_end))
+  while ((num<vec_num) && (v!=v_end))
     {
       num++;
       ++v;
@@ -848,7 +848,7 @@ const std::string & System::vector_name (const unsigned int vec_num) const
   const_vectors_iterator v = vectors_begin();
   const_vectors_iterator v_end = vectors_end();
   unsigned int num = 0;
-  while((num<vec_num) && (v!=v_end))
+  while ((num<vec_num) && (v!=v_end))
     {
       num++;
       ++v;

@@ -264,7 +264,7 @@ void RBSCMConstruction::perform_SCM_greedy()
   enrich_C_J(0);
 
   unsigned int SCM_iter=0;
-  while(true)
+  while (true)
     {
       // matrix_A is reinitialized for the current parameters
       // on each call to evaluate_stability_constant

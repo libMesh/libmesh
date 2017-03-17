@@ -143,7 +143,7 @@ FEInterface::FEInterface()
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << fe_t.family);      \
       }                                                                 \
-  } while(0)
+  } while (0)
 
 
 #define fe_vector_scalar_error_switch(dim, func_and_args, prefix, suffix) \
@@ -169,7 +169,7 @@ FEInterface::FEInterface()
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << fe_t.family);      \
       }                                                                 \
-  } while(0)
+  } while (0)
 
 #else
 #define fe_family_switch(dim, func_and_args, prefix, suffix)            \
@@ -267,7 +267,7 @@ FEInterface::FEInterface()
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << fe_t.family);      \
       }                                                                 \
-  } while(0)
+  } while (0)
 
 
 #define fe_vector_scalar_error_switch(dim, func_and_args, prefix, suffix) \
@@ -291,7 +291,7 @@ FEInterface::FEInterface()
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << fe_t.family);      \
       }                                                                 \
-  } while(0)
+  } while (0)
 #endif
 
 
