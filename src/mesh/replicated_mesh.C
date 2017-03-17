@@ -661,7 +661,7 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
           // Increment the element counter
           el->set_id (next_free_elem++);
 
-          if(_skip_renumber_nodes_and_elements)
+          if (_skip_renumber_nodes_and_elements)
             {
               // Add this elements nodes to the connected list
               for (unsigned int n=0; n<el->n_nodes(); n++)
@@ -706,7 +706,7 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
   }
 
 
-  if(_skip_renumber_nodes_and_elements)
+  if (_skip_renumber_nodes_and_elements)
     {
       // Loop over the nodes.  Note that there may
       // be NULLs in the _nodes vector from the coarsening
@@ -724,7 +724,7 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
             Node * & nd = *in;
 
             // If this node is still connected to an elem, put it in the list
-            if(connected_nodes.find(nd) != connected_nodes.end())
+            if (connected_nodes.find(nd) != connected_nodes.end())
               {
                 *out_iter = nd;
                 ++out_iter;
@@ -863,13 +863,13 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
   map_type side_to_elem_map;
 
   // If there is only one mesh (i.e. other_mesh==NULL), then loop over this mesh twice
-  if(!other_mesh)
+  if (!other_mesh)
     {
       other_mesh = this;
     }
 
-  if( (this_mesh_boundary_id  != BoundaryInfo::invalid_id) &&
-      (other_mesh_boundary_id != BoundaryInfo::invalid_id) )
+  if ((this_mesh_boundary_id  != BoundaryInfo::invalid_id) &&
+      (other_mesh_boundary_id != BoundaryInfo::invalid_id))
     {
       // While finding nodes on the boundary, also find the minimum edge length
       // of all faces on both boundaries.  This will later be used in relative
@@ -890,7 +890,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
             // First we deal with node boundary IDs.
             // We only enter this loop if we have at least one
             // nodeset.
-            if(mesh_array[i]->get_boundary_info().n_nodeset_conds() > 0)
+            if (mesh_array[i]->get_boundary_info().n_nodeset_conds() > 0)
               {
                 std::vector<numeric_index_type> node_id_list;
                 std::vector<boundary_id_type> bc_id_list;
@@ -943,7 +943,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                           h_min_updated = true;
 
                           // This side is on the boundary, add its information to side_to_elem
-                          if(skip_find_neighbors && (i==0))
+                          if (skip_find_neighbors && (i==0))
                             {
                               key_type key = el->key(side_id);
                               val_type val;
@@ -967,7 +967,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                       // neighbor info on edges.
                       for (unsigned short edge_id=0; edge_id<el->n_edges(); ++edge_id)
                         {
-                          if(el->is_edge_on_side(edge_id, side_id))
+                          if (el->is_edge_on_side(edge_id, side_id))
                             {
                               // Get *all* boundary IDs on this edge, not just the first one!
                               mesh_array[i]->get_boundary_info().edge_boundary_ids (el, edge_id, bc_ids);
@@ -996,7 +996,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                        << "Other mesh has " << other_boundary_node_ids.size()
                        << " nodes on boundary " << other_mesh_boundary_id << ".\n";
 
-          if(h_min_updated)
+          if (h_min_updated)
             {
               libMesh::out << "Minimum edge length on both surfaces is " << h_min << ".\n";
             }
@@ -1007,7 +1007,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
         }
 
 
-      if(use_binary_search)
+      if (use_binary_search)
         {
           // Store points from both stitched faces in sorted vectors for faster
           // searching later.
@@ -1106,10 +1106,10 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
                   Real node_distance = (this_node - other_node).norm();
 
-                  if(node_distance < tol*h_min)
+                  if (node_distance < tol*h_min)
                     {
                       // Make sure we didn't already find a matching node!
-                      if(found_matching_nodes)
+                      if (found_matching_nodes)
                         libmesh_error_msg("Error: Found multiple matching nodes in stitch_meshes");
 
                       node_to_node_map[this_node_id] = other_node_id;
@@ -1149,7 +1149,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
           }
       }
 
-      if(verbose)
+      if (verbose)
         {
           libMesh::out << "In ReplicatedMesh::stitch_meshes:\n"
                        << "Found " << node_to_node_map.size()
@@ -1157,19 +1157,18 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                        << std::endl;
         }
 
-      if(enforce_all_nodes_match_on_boundaries)
+      if (enforce_all_nodes_match_on_boundaries)
         {
           std::size_t n_matching_nodes = node_to_node_map.size();
           std::size_t this_mesh_n_nodes = this_boundary_node_ids.size();
           std::size_t other_mesh_n_nodes = other_boundary_node_ids.size();
-          if( (n_matching_nodes != this_mesh_n_nodes) ||
-              (n_matching_nodes != other_mesh_n_nodes) )
+          if ((n_matching_nodes != this_mesh_n_nodes) || (n_matching_nodes != other_mesh_n_nodes))
             libmesh_error_msg("Error: We expected the number of nodes to match.");
         }
     }
   else
     {
-      if(verbose)
+      if (verbose)
         {
           libMesh::out << "Skip node merging in ReplicatedMesh::stitch_meshes:" << std::endl;
         }
@@ -1182,7 +1181,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
   // If other_mesh!=NULL, then we have to do a bunch of work
   // in order to copy it to this mesh
-  if(this!=other_mesh)
+  if (this!=other_mesh)
     {
       // need to increment node and element IDs of other_mesh before copying to this mesh
       MeshBase::node_iterator node_it  = other_mesh->nodes_begin();
@@ -1282,7 +1281,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
             }
         }
 
-    } // end if(other_mesh)
+    } // end if (other_mesh)
 
   // Finally, we need to "merge" the overlapping nodes
   // We do this by iterating over node_to_elems_map and updating
@@ -1339,7 +1338,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
   //   1. Loop over all copied elements adjacent to the boundary using node_to_elems_map (trying to avoid duplicates)
   //   2. Look at all their sides with a NULL neighbor and update them using side_to_elem_map if necessary
   //   3. Update the corresponding side in side_to_elem_map as well
-  if(skip_find_neighbors)
+  if (skip_find_neighbors)
     {
       elem_map_it     = node_to_elems_map.begin();
       elem_map_it_end = node_to_elems_map.end();
@@ -1350,7 +1349,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
           for(std::size_t i=0; i<n_elems; i++)
             {
               dof_id_type elem_id = elem_map_it->second[i];
-              if(fixed_elems.find(elem_id) == fixed_elems.end())
+              if (fixed_elems.find(elem_id) == fixed_elems.end())
                 {
                   Elem * el = this->elem_ptr(elem_id);
                   fixed_elems.insert(elem_id);
@@ -1363,7 +1362,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                           std::pair<key_val_it_type, key_val_it_type>
                             bounds = side_to_elem_map.equal_range(key);
 
-                          if(bounds.first != bounds.second)
+                          if (bounds.first != bounds.second)
                             {
                               // Get the side for this element
                               const UniquePtr<Elem> my_side(el->side_ptr(s));
@@ -1388,9 +1387,9 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                                   // ns != ms, and we also check level() to
                                   // avoid setting our neighbor pointer to
                                   // any of our neighbor's descendants
-                                  if( (*my_side == *their_side) &&
+                                  if ((*my_side == *their_side) &&
                                       (el->level() == neighbor->level()) &&
-                                      ((el->dim() != 1) || (ns != s)) )
+                                      ((el->dim() != 1) || (ns != s)))
                                     {
                                       // So share a side.  Is this a mixed pair
                                       // of subactive and active/ancestor
@@ -1432,7 +1431,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
   // After the stitching, we may want to clear boundary IDs from element
   // faces that are now internal to the mesh
-  if(clear_stitched_boundary_ids)
+  if (clear_stitched_boundary_ids)
     {
       // Container to catch boundary IDs passed back from BoundaryInfo.
       std::vector<boundary_id_type> bc_ids;

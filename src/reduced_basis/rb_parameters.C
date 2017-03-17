@@ -48,7 +48,7 @@ Real RBParameters::get_value(const std::string & param_name) const
   const_iterator it = _parameters.find(param_name);
 
   // throw and error if the parameter doesn't exist
-  if( it == _parameters.end() )
+  if (it == _parameters.end())
     libmesh_error_msg("Error: parameter " << param_name << " does not exist in RBParameters object.");
 
   return it->second;

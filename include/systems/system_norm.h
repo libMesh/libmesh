@@ -216,7 +216,7 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> & norms,
   _weights_sq(weights.size()),
   _off_diagonal_weights(weights)
 {
-  if(_norms.empty())
+  if (_norms.empty())
     _norms.push_back(DISCRETE_L2);
 
   if (_weights.empty())
@@ -230,7 +230,7 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> & norms,
       // the _off_diagonal_weights or _diagonal_weights
       for(std::size_t i=0; i!=_off_diagonal_weights.size(); ++i)
         {
-          if(_off_diagonal_weights[i].size() > i)
+          if (_off_diagonal_weights[i].size() > i)
             {
               _weights[i] = _off_diagonal_weights[i][i];
               _off_diagonal_weights[i][i] = 0;
@@ -408,7 +408,7 @@ bool SystemNorm::is_identity()
       std::size_t ncols = this->_off_diagonal_weights[i].size();
       for(std::size_t j = 0; j != ncols; j++)
         {
-          if(_off_diagonal_weights[i][j] != 0)
+          if (_off_diagonal_weights[i][j] != 0)
             {
               return(false);
             }
@@ -418,7 +418,7 @@ bool SystemNorm::is_identity()
   // If any of the diagonal elements is not 1, then we are in the non-identity case
   nrows = this->_weights.size();
   for(std::size_t i = 0; i != nrows; i++)
-    if(_weights[i] != 1)
+    if (_weights[i] != 1)
       return(false);
 
   // If all the off-diagonals elements are 0, and diagonal elements 1, then we are in an identity case

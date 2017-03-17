@@ -362,7 +362,7 @@ private:
 
     const FEContinuity cont = fe->get_continuity();
 
-    if ( (cont == C_ONE) && (fe_type.family != SUBDIVISION) )
+    if ((cont == C_ONE) && (fe_type.family != SUBDIVISION))
       {
         // We'll need gradient data for a C1 projection
         libmesh_assert(g || g_fem);
@@ -553,8 +553,8 @@ private:
             const unsigned int nc =
               FEInterface::n_dofs_at_node (dim, fe_type, elem_type,
                                            n);
-            if ( (!elem->is_vertex(n) || !is_boundary_node[n]) &&
-                 !is_boundary_nodeset[n] )
+            if ((!elem->is_vertex(n) || !is_boundary_node[n]) &&
+                !is_boundary_nodeset[n])
               {
                 current_dof += nc;
                 continue;
@@ -565,7 +565,7 @@ private:
               }
             // Assume that C_ZERO elements have a single nodal
             // value shape function
-            else if ( (cont == C_ZERO) || (fe_type.family == SUBDIVISION) )
+            else if ((cont == C_ZERO) || (fe_type.family == SUBDIVISION))
               {
                 libmesh_assert_equal_to (nc, n_vec_dim);
                 for( unsigned int c = 0; c < n_vec_dim; c++ )
@@ -1942,7 +1942,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number> & matrix,
           {
             for (unsigned int j=0; j<matrix.n(); j++)
               {
-                if(row_dofs[i] != col_dofs[j])
+                if (row_dofs[i] != col_dofs[j])
                   matrix(i,j) = 0.;
                 else // If the DOF is constrained
                   matrix(i,j) = 1.;
@@ -4198,7 +4198,7 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase & periodic_bounda
   // See if we already have a periodic boundary associated myboundary...
   PeriodicBoundaryBase * existing_boundary = _periodic_boundaries->boundary(periodic_boundary.myboundary);
 
-  if ( existing_boundary == libmesh_nullptr )
+  if (existing_boundary == libmesh_nullptr)
     {
       // ...if not, clone the input (and its inverse) and add them to the PeriodicBoundaries object
       PeriodicBoundaryBase * boundary = periodic_boundary.clone().release();

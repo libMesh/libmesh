@@ -115,7 +115,7 @@ void RBEIMConstruction::clear()
 
   for (std::size_t i=0; i<_matrix_times_bfs.size(); i++)
     {
-      if(_matrix_times_bfs[i])
+      if (_matrix_times_bfs[i])
         {
           _matrix_times_bfs[i]->clear();
           delete _matrix_times_bfs[i];
@@ -136,12 +136,12 @@ void RBEIMConstruction::process_parameters_file (const std::string & parameters_
 
 void RBEIMConstruction::set_best_fit_type_flag (const std::string & best_fit_type_string)
 {
-  if(best_fit_type_string == "projection")
+  if (best_fit_type_string == "projection")
     {
       best_fit_type_flag = PROJECTION_BEST_FIT;
     }
   else
-    if(best_fit_type_string == "eim")
+    if (best_fit_type_string == "eim")
       {
         best_fit_type_flag = EIM_BEST_FIT;
       }
@@ -155,12 +155,12 @@ void RBEIMConstruction::print_info()
 
   // Print out setup info
   libMesh::out << std::endl << "RBEIMConstruction parameters:" << std::endl;
-  if(best_fit_type_flag == PROJECTION_BEST_FIT)
+  if (best_fit_type_flag == PROJECTION_BEST_FIT)
     {
       libMesh::out << "best fit type: projection" << std::endl;
     }
   else
-    if(best_fit_type_flag == EIM_BEST_FIT)
+    if (best_fit_type_flag == EIM_BEST_FIT)
       {
         libMesh::out << "best fit type: eim" << std::endl;
       }
@@ -230,7 +230,7 @@ Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
   Number value = 0;
   unsigned int root_id=0;
   unsigned int check_for_valid_value = 0;
-  if(values.size() != 0)
+  if (values.size() != 0)
     {
       root_id = this->processor_id();
       value = values(var_number);
@@ -240,7 +240,7 @@ Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
   // If this sum is zero, then we didn't enter the if block above on any processor. In that
   // case we should throw an error.
   this->comm().sum(check_for_valid_value);
-  if(check_for_valid_value == 0)
+  if (check_for_valid_value == 0)
     {
       libmesh_error_msg("MeshFunction evaluation failed on all processors");
     }
@@ -296,7 +296,7 @@ void RBEIMConstruction::load_rb_solution()
 
   solution->zero();
 
-  if(get_rb_evaluation().RB_solution.size() > get_rb_evaluation().get_n_basis_functions())
+  if (get_rb_evaluation().RB_solution.size() > get_rb_evaluation().get_n_basis_functions())
     libmesh_error_msg("ERROR: System contains " << get_rb_evaluation().get_n_basis_functions() << " basis functions." \
                       << " RB_solution vector constains " << get_rb_evaluation().RB_solution.size() << " entries." \
                       << " RB_solution in RBConstruction::load_rb_solution is too long!");
@@ -326,7 +326,7 @@ void RBEIMConstruction::enrich_RB_space()
 
   // If we have at least one basis function we need to use
   // rb_solve to find the EIM interpolation error, otherwise just use solution as is
-  if(get_rb_evaluation().get_n_basis_functions() > 0)
+  if (get_rb_evaluation().get_n_basis_functions() > 0)
     {
       // get the right-hand side vector for the EIM approximation
       // by sampling the parametrized function (stored in solution)
@@ -388,7 +388,7 @@ void RBEIMConstruction::enrich_RB_space()
               Number value = explicit_context.interior_value(var, qp);
               Real abs_value = std::abs(value);
 
-              if( abs_value > largest_abs_value )
+              if (abs_value > largest_abs_value)
                 {
                   optimal_value = value;
                   largest_abs_value = abs_value;
@@ -433,7 +433,7 @@ void RBEIMConstruction::enrich_RB_space()
   *new_bf = *get_explicit_system().solution;
   get_rb_evaluation().basis_functions.push_back( new_bf );
 
-  if(best_fit_type_flag == PROJECTION_BEST_FIT)
+  if (best_fit_type_flag == PROJECTION_BEST_FIT)
     {
       // In order to speed up dot products, we store the product
       // of the basis function and the inner product matrix
@@ -468,7 +468,7 @@ void RBEIMConstruction::enrich_RB_space()
 
 void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
 {
-  if(!serial_training_set)
+  if (!serial_training_set)
     libmesh_error_msg("Error: We must have serial_training_set==true in " \
                       << "RBEIMConstruction::initialize_parametrized_functions_in_training_set");
 
@@ -576,14 +576,14 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
   LOG_SCOPE("truth_solve()", "RBEIMConstruction");
 
   int training_parameters_found_index = -1;
-  if( _parametrized_functions_in_training_set_initialized )
+  if (_parametrized_functions_in_training_set_initialized)
     {
       // Check if parameters are in the training set. If so, we can just load the
       // solution from _parametrized_functions_in_training_set
 
       for(unsigned int i=0; i<get_n_training_samples(); i++)
         {
-          if(get_parameters() == get_params_from_training_set(i))
+          if (get_parameters() == get_params_from_training_set(i))
             {
               training_parameters_found_index = i;
               break;
@@ -592,7 +592,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
     }
 
   // If the parameters are in the training set, just copy the solution vector
-  if(training_parameters_found_index >= 0)
+  if (training_parameters_found_index >= 0)
     {
       *get_explicit_system().solution =
         *_parametrized_functions_in_training_set[training_parameters_found_index];
@@ -601,7 +601,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
   // Otherwise, we have to compute the projection
   else
     {
-      if(this->n_vars() != 1)
+      if (this->n_vars() != 1)
         {
           libmesh_error_msg("The system that we use to perform EIM L2 solves should have one variable");
         }
@@ -712,7 +712,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
       get_explicit_system().update();
     }
 
-  if(plot_solution > 0)
+  if (plot_solution > 0)
     {
 #ifdef LIBMESH_HAVE_EXODUS_API
       ExodusII_IO(get_mesh()).write_equation_systems ("truth.exo",
@@ -772,7 +772,7 @@ void RBEIMConstruction::update_RB_system_matrices()
 
             Number value = explicit_sys_temp->dot( get_rb_evaluation().get_basis_function(i) );
             get_rb_evaluation().RB_inner_product_matrix(i,j) = value;
-            if(i!=j)
+            if (i!=j)
               {
                 // The inner product matrix is assumed
                 // to be hermitian
@@ -816,20 +816,20 @@ bool RBEIMConstruction::greedy_termination_test(Real abs_greedy_error,
                                                 Real initial_error,
                                                 int)
 {
-  if(abs_greedy_error < get_abs_training_tolerance())
+  if (abs_greedy_error < get_abs_training_tolerance())
     {
       libMesh::out << "Absolute error tolerance reached." << std::endl;
       return true;
     }
 
   Real rel_greedy_error = abs_greedy_error/initial_error;
-  if(rel_greedy_error < get_rel_training_tolerance())
+  if (rel_greedy_error < get_rel_training_tolerance())
     {
       libMesh::out << "Relative error tolerance reached." << std::endl;
       return true;
     }
 
-  if(get_rb_evaluation().get_n_basis_functions() >= this->get_Nmax())
+  if (get_rb_evaluation().get_n_basis_functions() >= this->get_Nmax())
     {
       libMesh::out << "Maximum number of basis functions reached: Nmax = "
                    << get_Nmax() << "." << std::endl;

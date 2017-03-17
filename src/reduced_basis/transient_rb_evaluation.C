@@ -111,7 +111,7 @@ void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax,
   initial_L2_error_all_N.resize(Nmax, 0.);
 
 
-  if(resize_error_bound_data)
+  if (resize_error_bound_data)
     {
       // Initialize vectors for the norms of the representors
       Fq_Mq_representor_innerprods.resize(Q_f);
@@ -164,7 +164,7 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
 {
   LOG_SCOPE("rb_solve()", "TransientRBEvaluation");
 
-  if(N > get_n_basis_functions())
+  if (N > get_n_basis_functions())
     libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
 
   const RBParameters & mu = get_parameters();
@@ -234,7 +234,7 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
   RB_solution.resize(N);
 
   // Load the initial condition into RB_solution
-  if(N > 0)
+  if (N > 0)
     {
       RB_solution = RB_initial_condition_all_N[N-1];
     }
@@ -272,9 +272,9 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
   // Initialize error bounds, if necessary
   Real error_bound_sum = 0.;
   Real alpha_LB = 0.;
-  if(evaluate_RB_error_bound)
+  if (evaluate_RB_error_bound)
     {
-      if(N > 0)
+      if (N > 0)
         {
           error_bound_sum += pow( initial_L2_error_all_N[N-1], 2.);
         }
@@ -313,7 +313,7 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
       // Add forcing terms
       RB_rhs.add(get_control(time_level), RB_RHS_save);
 
-      if(N > 0)
+      if (N > 0)
         {
           RB_LHS_matrix.lu_solve(RB_rhs, RB_solution);
         }
@@ -335,7 +335,7 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
         }
 
       // Calculate RB error bounds
-      if(evaluate_RB_error_bound)
+      if (evaluate_RB_error_bound)
         {
           // Evaluate the dual norm of the residual for RB_solution_vector
           // Real epsilon_N = uncached_compute_residual_dual_norm(N);
@@ -357,7 +357,7 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
 
   _rb_solve_data_cached = true ;
 
-  if(evaluate_RB_error_bound) // Calculate the error bounds
+  if (evaluate_RB_error_bound) // Calculate the error bounds
     {
       return error_bound_all_k[n_time_steps];
     }
@@ -381,7 +381,7 @@ Real TransientRBEvaluation::rb_solve_again()
   RB_solution.resize(N);
 
   // Load the initial condition into RB_solution
-  if(N > 0)
+  if (N > 0)
     RB_solution = RB_initial_condition_all_N[N-1];
 
   // Resize/clear the old solution vector
@@ -582,7 +582,7 @@ Real TransientRBEvaluation::compute_residual_dual_norm(const unsigned int N)
       }
 
 
-  if(libmesh_real(residual_norm_sq) < 0)
+  if (libmesh_real(residual_norm_sq) < 0)
     {
       libMesh::out << "Warning: Square of residual norm is negative "
                    << "in TransientRBEvaluation::compute_residual_dual_norm()" << std::endl;
@@ -730,7 +730,7 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
         }
     }
 
-  if(libmesh_real(residual_norm_sq) < 0)
+  if (libmesh_real(residual_norm_sq) < 0)
     {
       libMesh::out << "Warning: Square of residual norm is negative "
                    << "in TransientRBEvaluation::compute_residual_dual_norm()" << std::endl;
@@ -768,7 +768,7 @@ void TransientRBEvaluation::legacy_write_offline_data_to_files(const std::string
   // The suffix to use for all the files that are written out
   const std::string suffix = write_binary_data ? ".xdr" : ".dat";
 
-  if(this->processor_id() == 0)
+  if (this->processor_id() == 0)
     {
       std::ostringstream file_name;
 
@@ -1012,7 +1012,7 @@ void TransientRBEvaluation::legacy_read_offline_data_from_files(const std::strin
   initial_L2_error_in.close();
 
 
-  if(read_error_bound_data)
+  if (read_error_bound_data)
     {
       // Next read in the Fq_Mq representor norm data
       file_name.str("");

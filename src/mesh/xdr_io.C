@@ -1072,7 +1072,7 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const header_id_type n_bcs, c
     {
       const Elem * elem = *it;
 
-      if(bc_type == "side")
+      if (bc_type == "side")
         {
           for (unsigned short s=0; s<elem->n_sides(); s++)
             {
@@ -1089,7 +1089,7 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const header_id_type n_bcs, c
                 }
             }
         }
-      else if(bc_type == "edge")
+      else if (bc_type == "edge")
         {
           for (unsigned short e=0; e<elem->n_edges(); e++)
             {
@@ -1106,7 +1106,7 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const header_id_type n_bcs, c
                 }
             }
         }
-      else if(bc_type == "shellface")
+      else if (bc_type == "shellface")
         {
           for (unsigned short sf=0; sf<2; sf++)
             {
@@ -1908,17 +1908,17 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
             {
               libmesh_assert_equal_to (pos.first->dof_id, (*it)->id());
 
-              if(bc_type == "side")
+              if (bc_type == "side")
                 {
                   libmesh_assert_less (pos.first->side, (*it)->n_sides());
                   boundary_info.add_side (*it, pos.first->side, pos.first->bc_id);
                 }
-              else if(bc_type == "edge")
+              else if (bc_type == "edge")
                 {
                   libmesh_assert_less (pos.first->side, (*it)->n_edges());
                   boundary_info.add_edge (*it, pos.first->side, pos.first->bc_id);
                 }
-              else if(bc_type == "shellface")
+              else if (bc_type == "shellface")
                 {
                   // Shell face IDs can only be 0 or 1.
                   libmesh_assert_less(pos.first->side, 2);

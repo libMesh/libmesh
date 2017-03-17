@@ -212,7 +212,7 @@ void EquationSystems::reinit ()
         //
         // Who's been adding zero-var systems anyway, outside of my
         // unit tests? - RHS
-        // if(!sys.n_vars())
+        // if (!sys.n_vars())
         // continue;
 
         sys.get_dof_map().distribute_dofs(_mesh);
@@ -502,8 +502,7 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
 
         for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
           {
-            if( FEInterface::field_type(pos->second->variable_type(vn)) ==
-                TYPE_VECTOR )
+            if (FEInterface::field_type(pos->second->variable_type(vn)) == TYPE_VECTOR)
               n_vector_vars++;
             else
               n_scalar_vars++;
@@ -546,7 +545,7 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
           // Filter on the type if requested
           if (type == libmesh_nullptr || (type && *type == fe_type))
             {
-              if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
+              if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
                 {
                   switch(n_vec_dim)
                     {
@@ -705,8 +704,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
 
         for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
           {
-            if( FEInterface::field_type(pos->second->variable_type(vn)) ==
-                TYPE_VECTOR )
+            if (FEInterface::field_type(pos->second->variable_type(vn)) == TYPE_VECTOR)
               n_vector_vars++;
             else
               n_scalar_vars++;
@@ -769,8 +767,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
       unsigned int n_vector_vars = 0;
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
         {
-          if( FEInterface::field_type(pos->second->variable_type(vn)) ==
-              TYPE_VECTOR )
+          if (FEInterface::field_type(pos->second->variable_type(vn)) == TYPE_VECTOR)
             n_vector_vars++;
           else
             n_scalar_vars++;
@@ -854,7 +851,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
               else // If this variable doesn't exist on this subdomain we have to still increment repeat_count so that we won't divide by 0 later:
                 for (unsigned int n=0; n<elem->n_nodes(); n++)
                   // Only do this if this variable has NO DoFs at this node... it might have some from an ajoining element...
-                  if(!elem->node_ptr(n)->n_dofs(sys_num, var))
+                  if (!elem->node_ptr(n)->n_dofs(sys_num, var))
                     for( unsigned int d=0; d < n_vec_dim; d++ )
                       repeat_count.add(nv*(elem->node_id(n)) + (var+d + var_num), 1);
 

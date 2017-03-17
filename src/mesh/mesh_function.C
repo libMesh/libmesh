@@ -169,7 +169,7 @@ UniquePtr<FunctionBase<Number> > MeshFunction::clone () const
   FunctionBase<Number> * mf_clone =
     new MeshFunction(_eqn_systems, _vector, _dof_map, _system_vars, this);
 
-  if(this->initialized())
+  if (this->initialized())
     mf_clone->init();
 
   return UniquePtr< FunctionBase<Number> >(mf_clone);
@@ -637,7 +637,7 @@ const Elem * MeshFunction::find_element(const Point & p,
     {
       const MeshFunction * master =
         cast_ptr<const MeshFunction *>(this->_master);
-      if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
+      if (_out_of_mesh_mode!=master->_out_of_mesh_mode)
         libmesh_error_msg("ERROR: If you use out-of-mesh-mode in connection with master mesh " \
                           << "functions, you must enable out-of-mesh mode for both the master and the slave mesh function.");
     }
@@ -686,7 +686,7 @@ std::set<const Elem *> MeshFunction::find_elements(const Point & p,
     {
       const MeshFunction * master =
         cast_ptr<const MeshFunction *>(this->_master);
-      if(_out_of_mesh_mode!=master->_out_of_mesh_mode)
+      if (_out_of_mesh_mode!=master->_out_of_mesh_mode)
         libmesh_error_msg("ERROR: If you use out-of-mesh-mode in connection with master mesh " \
                           << "functions, you must enable out-of-mesh mode for both the master and the slave mesh function.");
     }

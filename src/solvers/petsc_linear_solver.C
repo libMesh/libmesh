@@ -112,7 +112,7 @@ void PetscLinearSolver<T>::clear ()
           _restrict_solve_to_is = libmesh_nullptr;
         }
 
-      if(_restrict_solve_to_is_complement != libmesh_nullptr)
+      if (_restrict_solve_to_is_complement != libmesh_nullptr)
         {
           PetscErrorCode ierr = LibMeshISDestroy(&_restrict_solve_to_is_complement);
           LIBMESH_CHKERR(ierr);
@@ -129,7 +129,7 @@ void PetscLinearSolver<T>::clear ()
       // Mimic PETSc default solver and preconditioner
       this->_solver_type           = GMRES;
 
-      if(!this->_preconditioner)
+      if (!this->_preconditioner)
         {
           if (this->n_processors() == 1)
             this->_preconditioner_type = ILU_PRECOND;
@@ -170,7 +170,7 @@ void PetscLinearSolver<T>::init (const char * name)
 
       // If the SolverConfiguration object is provided, use it to set
       // options during solver initialization.
-      if(this->_solver_configuration)
+      if (this->_solver_configuration)
         {
           this->_solver_configuration->set_options_during_init();
         }
@@ -223,7 +223,7 @@ void PetscLinearSolver<T>::init (const char * name)
       PetscPreconditioner<T>::set_petsc_preconditioner_type(this->_preconditioner_type,_pc);
 
       //If there is a preconditioner object we need to set the internal setup and apply routines
-      if(this->_preconditioner)
+      if (this->_preconditioner)
         {
           this->_preconditioner->init();
           PCShellSetContext(_pc,(void *)this->_preconditioner);
@@ -275,7 +275,7 @@ void PetscLinearSolver<T>::init (PetscMatrix<T> * matrix,
 
       // If the SolverConfiguration object is provided, use it to set
       // options during solver initialization.
-      if(this->_solver_configuration)
+      if (this->_solver_configuration)
         {
           this->_solver_configuration->set_options_during_init();
         }
@@ -325,7 +325,7 @@ void PetscLinearSolver<T>::init (PetscMatrix<T> * matrix,
       LIBMESH_CHKERR(ierr);
 
       PetscPreconditioner<T>::set_petsc_preconditioner_type(this->_preconditioner_type,_pc);
-      if(this->_preconditioner)
+      if (this->_preconditioner)
         {
           this->_preconditioner->set_matrix(*matrix);
           this->_preconditioner->init();
@@ -479,7 +479,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
          system, we will now change the right hand side to compensate
          for this.  Note that this is not necessary if \p SUBSET_ZERO
          has been selected.  */
-      if(_subset_solve_mode!=SUBSET_ZERO)
+      if (_subset_solve_mode!=SUBSET_ZERO)
         {
           _create_complement_is(rhs_in);
           PetscInt is_complement_local_size =
@@ -560,7 +560,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
 #endif
       LIBMESH_CHKERR(ierr);
 
-      if(this->_preconditioner)
+      if (this->_preconditioner)
         {
           this->_preconditioner->set_matrix(matrix_in);
           this->_preconditioner->init();
@@ -579,7 +579,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
 
   // If the SolverConfiguration object is provided, use it to override
   // solver options.
-  if(this->_solver_configuration)
+  if (this->_solver_configuration)
     {
       this->_solver_configuration->configure_solver();
     }
@@ -748,7 +748,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
          system, we will now change the right hand side to compensate
          for this.  Note that this is not necessary if \p SUBSET_ZERO
          has been selected.  */
-      if(_subset_solve_mode!=SUBSET_ZERO)
+      if (_subset_solve_mode!=SUBSET_ZERO)
         {
           _create_complement_is(rhs_in);
           PetscInt is_complement_local_size =
@@ -829,7 +829,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
 #endif
       LIBMESH_CHKERR(ierr);
 
-      if(this->_preconditioner)
+      if (this->_preconditioner)
         {
           this->_preconditioner->set_matrix(matrix_in);
           this->_preconditioner->init();
@@ -1025,7 +1025,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
          system, we will now change the right hand side to compensate
          for this.  Note that this is not necessary if \p SUBSET_ZERO
          has been selected.  */
-      if(_subset_solve_mode!=SUBSET_ZERO)
+      if (_subset_solve_mode!=SUBSET_ZERO)
         {
           _create_complement_is(rhs_in);
           PetscInt is_complement_local_size =
@@ -1302,7 +1302,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
          system, we will now change the right hand side to compensate
          for this.  Note that this is not necessary if \p SUBSET_ZERO
          has been selected.  */
-      if(_subset_solve_mode!=SUBSET_ZERO)
+      if (_subset_solve_mode!=SUBSET_ZERO)
         {
           _create_complement_is(rhs_in);
           PetscInt is_complement_local_size = rhs_in.local_size()-is_local_size;
@@ -1394,7 +1394,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
 #endif
       LIBMESH_CHKERR(ierr);
 
-      if(this->_preconditioner)
+      if (this->_preconditioner)
         {
           this->_preconditioner->set_matrix(const_cast<SparseMatrix<Number> &>(precond_matrix));
           this->_preconditioner->init();
@@ -1719,7 +1719,7 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult_add(Mat mat, Vec a
   PetscVector<T> dest_global(dest, shell_matrix.comm());
   PetscVector<T> add_global(add, shell_matrix.comm());
 
-  if(add!=arg)
+  if (add!=arg)
     {
       arg_global = add_global;
     }

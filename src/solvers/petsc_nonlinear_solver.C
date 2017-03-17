@@ -442,7 +442,7 @@ void PetscNonlinearSolver<T>::init (const char * name)
 
       // If the SolverConfiguration object is provided, use it to set
       // options during solver initialization.
-      if(this->_solver_configuration)
+      if (this->_solver_configuration)
         {
           this->_solver_configuration->set_options_during_init();
         }
@@ -454,7 +454,7 @@ void PetscNonlinearSolver<T>::init (const char * name)
       LIBMESH_CHKERR(ierr);
 #endif
 
-      if(this->_preconditioner)
+      if (this->_preconditioner)
         {
           KSP ksp;
           ierr = SNESGetKSP (_snes, &ksp);
@@ -650,13 +650,14 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
       MatNullSpace msp = PETSC_NULL;
       this->build_mat_null_space(this->nearnullspace_object, this->nearnullspace, &msp);
 
-      if(msp) {
-        ierr = MatSetNearNullSpace(jac->mat(), msp);
-        LIBMESH_CHKERR(ierr);
+      if (msp)
+        {
+          ierr = MatSetNearNullSpace(jac->mat(), msp);
+          LIBMESH_CHKERR(ierr);
 
-        ierr = MatNullSpaceDestroy(&msp);
-        LIBMESH_CHKERR(ierr);
-      }
+          ierr = MatNullSpaceDestroy(&msp);
+          LIBMESH_CHKERR(ierr);
+        }
     }
 #endif
   // Have the Krylov subspace method use our good initial guess rather than 0
@@ -685,7 +686,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
     this->user_presolve(this->system());
 
   //Set the preconditioning matrix
-  if(this->_preconditioner)
+  if (this->_preconditioner)
     {
       this->_preconditioner->set_matrix(jac_in);
       this->_preconditioner->init();
@@ -693,7 +694,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
 
   // If the SolverConfiguration object is provided, use it to override
   // solver options.
-  if(this->_solver_configuration)
+  if (this->_solver_configuration)
     {
       this->_solver_configuration->configure_solver();
     }

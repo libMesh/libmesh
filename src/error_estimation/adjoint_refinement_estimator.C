@@ -280,7 +280,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
             dof_id_type node_id = node.id();
 
             // If we havent already processed this node, do so now
-            if(processed_node_ids.find(node_id) == processed_node_ids.end())
+            if (processed_node_ids.find(node_id) == processed_node_ids.end())
               {
                 // Declare a neighbor_set to be filled by the find_point_neighbors
                 std::set<const Elem *> fine_grid_neighbor_set;
@@ -317,7 +317,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
                     for (; j != coarse_grid_neighbors.size(); j++)
                       {
                         // If the set already contains this element break out of the loop
-                        if(coarse_grid_neighbors[j] == coarse_id)
+                        if (coarse_grid_neighbors[j] == coarse_id)
                           {
                             break;
                           }
@@ -325,7 +325,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
                     // If we didn't leave the loop even at the last element,
                     // this is a new neighbour, put in the coarse_grid_neighbor_set
-                    if(j == coarse_grid_neighbors.size())
+                    if (j == coarse_grid_neighbors.size())
                       {
                         coarse_grid_neighbors.push_back(coarse_id);
                       }

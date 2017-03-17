@@ -148,7 +148,7 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
 
   // If we are asked to compute residuals for second order variables,
   // we also populate the acceleration part so the user can use that.
-  if(compute_second_order_eqns)
+  if (compute_second_order_eqns)
     this->prepare_accel(context);
 
   // Move the mesh into place first if necessary, set t = t_{n+1}
@@ -167,7 +167,7 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
 
   // If we have second-order variables, we need to get damping terms
   // and the velocity equations
-  if(compute_second_order_eqns)
+  if (compute_second_order_eqns)
     {
       jacobian_computed = (_system.*damping)(jacobian_computed, context) &&
         jacobian_computed;
@@ -218,7 +218,7 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
 
   // If we have second-order variables, we need to get damping terms
   // and the velocity equations
-  if(compute_second_order_eqns)
+  if (compute_second_order_eqns)
     {
       jacobian_computed = (_system.*damping)(jacobian_computed, context) &&
         jacobian_computed;

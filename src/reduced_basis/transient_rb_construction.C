@@ -97,7 +97,7 @@ void TransientRBConstruction::clear()
       M_q_vector[q] = libmesh_nullptr;
     }
 
-  if(store_non_dirichlet_operators)
+  if (store_non_dirichlet_operators)
     {
       for (std::size_t q=0; q<non_dirichlet_M_q_vector.size(); q++)
         {
@@ -109,7 +109,7 @@ void TransientRBConstruction::clear()
   // clear the temporal_data
   for (std::size_t i=0; i<temporal_data.size(); i++)
     {
-      if(temporal_data[i])
+      if (temporal_data[i])
         {
           temporal_data[i]->clear();
           delete temporal_data[i];
@@ -169,7 +169,7 @@ void TransientRBConstruction::print_info()
 
   libMesh::out << std::endl << "TransientRBConstruction parameters:" << std::endl;
 
-  if( is_rb_eval_initialized() )
+  if (is_rb_eval_initialized())
     {
       // Print out info that describes the current setup
       TransientRBThetaExpansion & trans_theta_expansion =
@@ -183,12 +183,12 @@ void TransientRBConstruction::print_info()
   libMesh::out << "Number of time-steps: " << get_n_time_steps() << std::endl;
   libMesh::out << "dt: " << get_delta_t() << std::endl;
   libMesh::out << "euler_theta (time discretization parameter): " << get_euler_theta() << std::endl;
-  if(get_POD_tol() > 0.)
+  if (get_POD_tol() > 0.)
     libMesh::out << "POD_tol: " << get_POD_tol() << std::endl;
-  if(max_truth_solves > 0)
+  if (max_truth_solves > 0)
     libMesh::out << "Maximum number of truth solves: " << max_truth_solves << std::endl;
   libMesh::out << "delta_N (number of basis functions to add each POD-Greedy step): " << get_delta_N() << std::endl;
-  if(nonzero_initialization)
+  if (nonzero_initialization)
     {
       libMesh::out << "Reading initial condition from " << init_filename << std::endl;
     }
@@ -235,7 +235,7 @@ void TransientRBConstruction::allocate_data_structures()
       }
 
     // We also need to initialize a second set of non-Dirichlet operators
-    if(store_non_dirichlet_operators)
+    if (store_non_dirichlet_operators)
       {
         dof_map.attach_matrix(*non_dirichlet_L2_matrix);
         non_dirichlet_L2_matrix->init();
@@ -283,7 +283,7 @@ void TransientRBConstruction::assemble_affine_expansion(bool skip_matrix_assembl
   // of the initial condition into the RB space
   // so that we can continue to enrich a given RB
   // space.
-  if(get_rb_evaluation().get_n_basis_functions() > 0)
+  if (get_rb_evaluation().get_n_basis_functions() > 0)
     {
       // Load the initial condition into the solution vector
       initialize_truth();
@@ -315,7 +315,7 @@ SparseMatrix<Number> * TransientRBConstruction::get_M_q(unsigned int q)
   TransientRBThetaExpansion & trans_theta_expansion =
     cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
 
-  if(q >= trans_theta_expansion.get_n_M_terms())
+  if (q >= trans_theta_expansion.get_n_M_terms())
     libmesh_error_msg("Error: We must have q < Q_m in get_M_q.");
 
   return M_q_vector[q];
@@ -323,13 +323,13 @@ SparseMatrix<Number> * TransientRBConstruction::get_M_q(unsigned int q)
 
 SparseMatrix<Number> * TransientRBConstruction::get_non_dirichlet_M_q(unsigned int q)
 {
-  if(!store_non_dirichlet_operators)
+  if (!store_non_dirichlet_operators)
     libmesh_error_msg("Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_M_q.");
 
   TransientRBThetaExpansion & trans_theta_expansion =
     cast_ref<TransientRBThetaExpansion &>(get_rb_theta_expansion());
 
-  if(q >= trans_theta_expansion.get_n_M_terms())
+  if (q >= trans_theta_expansion.get_n_M_terms())
     libmesh_error_msg("Error: We must have q < Q_m in get_M_q.");
 
   return non_dirichlet_M_q_vector[q];
@@ -477,7 +477,7 @@ void TransientRBConstruction::set_L2_assembly(ElemAssembly & L2_assembly_in)
 
 ElemAssembly & TransientRBConstruction::get_L2_assembly()
 {
-  if(!L2_assembly)
+  if (!L2_assembly)
     libmesh_error_msg("Error: L2_assembly hasn't been initialized yet");
 
   return *L2_assembly;
@@ -491,7 +491,7 @@ void TransientRBConstruction::assemble_Mq_matrix(unsigned int q, SparseMatrix<Nu
   TransientRBAssemblyExpansion & trans_assembly_expansion =
     cast_ref<TransientRBAssemblyExpansion &>(get_rb_assembly_expansion());
 
-  if(q >= trans_theta_expansion.get_n_M_terms())
+  if (q >= trans_theta_expansion.get_n_M_terms())
     libmesh_error_msg("Error: We must have q < Q_m in assemble_Mq_matrix.");
 
   input_matrix->zero();
@@ -513,7 +513,7 @@ void TransientRBConstruction::assemble_all_affine_operators()
   for(unsigned int q=0; q<trans_theta_expansion.get_n_M_terms(); q++)
     assemble_Mq_matrix(q, get_M_q(q));
 
-  if(store_non_dirichlet_operators)
+  if (store_non_dirichlet_operators)
     {
       for(unsigned int q=0; q<trans_theta_expansion.get_n_M_terms(); q++)
         assemble_Mq_matrix(q, get_non_dirichlet_M_q(q), false);
@@ -525,7 +525,7 @@ void TransientRBConstruction::assemble_misc_matrices()
   libMesh::out << "Assembling L2 matrix" << std::endl;
   assemble_L2_matrix(L2_matrix.get());
 
-  if(store_non_dirichlet_operators)
+  if (store_non_dirichlet_operators)
     {
       libMesh::out << "Assembling non-Dirichlet L2 matrix" << std::endl;
       assemble_L2_matrix(non_dirichlet_L2_matrix.get(), /* apply_dirichlet_bc = */ false);
@@ -561,7 +561,7 @@ Real TransientRBConstruction::truth_solve(int write_interval)
     }
 
   // Load initial projection error into temporal_data dense matrix
-  if(compute_truth_projection_error)
+  if (compute_truth_projection_error)
     set_error_temporal_data();
 
   for(unsigned int time_level=1; time_level<=n_time_steps; time_level++)
@@ -597,10 +597,10 @@ Real TransientRBConstruction::truth_solve(int write_interval)
         }
 
       // load projection error into column _k of temporal_data matrix
-      if(compute_truth_projection_error)
+      if (compute_truth_projection_error)
         set_error_temporal_data();
 
-      if ( (write_interval > 0) && (time_level%write_interval == 0) )
+      if ((write_interval > 0) && (time_level%write_interval == 0))
         {
           libMesh::out << std::endl << "Truth solve, plotting time step " << time_level << std::endl;
 
@@ -637,7 +637,7 @@ TransientRBConstruction::greedy_termination_test(Real abs_greedy_error,
                                                  Real initial_greedy_error,
                                                  int count)
 {
-  if ( (get_max_truth_solves()>0) && (count >= get_max_truth_solves()) )
+  if ((get_max_truth_solves()>0) && (count >= get_max_truth_solves()))
     {
       libMesh::out << "Maximum number of truth solves reached: max = "
                    << count << std::endl;
@@ -656,7 +656,7 @@ Number TransientRBConstruction::set_error_temporal_data()
 
   const unsigned int time_step = get_time_step();
 
-  if(get_rb_evaluation().get_n_basis_functions() == 0)
+  if (get_rb_evaluation().get_n_basis_functions() == 0)
     {
       // If the basis is empty, then the error is the solution itself
       temporal_data[time_step]->zero();
@@ -914,7 +914,7 @@ void TransientRBConstruction::enrich_RB_space()
           update_system();
           Real error_bound = get_rb_evaluation().rb_solve(get_rb_evaluation().get_n_basis_functions());
 
-          if ( (error_bound <= POD_tol) || (get_rb_evaluation().get_n_basis_functions()==get_Nmax()) )
+          if ((error_bound <= POD_tol) || (get_rb_evaluation().get_n_basis_functions()==get_Nmax()))
             {
               set_delta_N(0);
               break;
@@ -944,7 +944,7 @@ void TransientRBConstruction::enrich_RB_space()
 void TransientRBConstruction::update_system()
 {
   // If delta_N is set to zero, there is nothing to update
-  if(get_delta_N() == 0)
+  if (get_delta_N() == 0)
     return;
 
   Parent::update_system();
@@ -969,7 +969,7 @@ void TransientRBConstruction::load_rb_solution()
   TransientRBEvaluation & trans_rb_eval = cast_ref<TransientRBEvaluation &>(get_rb_evaluation());
   DenseVector<Number> RB_solution_vector_k = trans_rb_eval.RB_temporal_solution_data[time_step];
 
-  if(RB_solution_vector_k.size() > get_rb_evaluation().get_n_basis_functions())
+  if (RB_solution_vector_k.size() > get_rb_evaluation().get_n_basis_functions())
     libmesh_error_msg("ERROR: rb_eval object contains " \
                       << get_rb_evaluation().get_n_basis_functions() \
                       << " basis functions. RB_solution vector constains " \
@@ -1009,7 +1009,7 @@ void TransientRBConstruction::update_RB_system_matrices()
 
           Number value = get_rb_evaluation().get_basis_function(i).dot(*temp);
           trans_rb_eval.RB_L2_matrix(i,j) = value;
-          if(i!=j)
+          if (i!=j)
             {
               // The L2 matrix is assumed
               // to be symmetric
@@ -1025,7 +1025,7 @@ void TransientRBConstruction::update_RB_system_matrices()
               value = (get_rb_evaluation().get_basis_function(i)).dot(*temp);
               trans_rb_eval.RB_M_q_vector[q_m](i,j) = value;
 
-              if(i!=j)
+              if (i!=j)
                 {
                   // Each mass matrix term is assumed
                   // to be symmetric
@@ -1062,7 +1062,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
       for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
         {
           // Initialize the vectors when we need them
-          if(!trans_rb_eval.M_q_representor[q_m][i])
+          if (!trans_rb_eval.M_q_representor[q_m][i])
             {
               trans_rb_eval.M_q_representor[q_m][i] = (NumericVector<Number>::build(this->comm()).release());
               trans_rb_eval.M_q_representor[q_m][i]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
@@ -1130,7 +1130,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
                       trans_rb_eval.Mq_Mq_representor_innerprods[q][i][j] =
                         trans_rb_eval.M_q_representor[q_m1][i]->dot(*inner_product_storage_vector);
 
-                      if(i != j)
+                      if (i != j)
                         {
                           inner_product_matrix->vector_mult(*inner_product_storage_vector,
                                                             *trans_rb_eval.M_q_representor[q_m2][i]);
@@ -1159,7 +1159,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
                       trans_rb_eval.Aq_Mq_representor_innerprods[q_a][q_m][i][j] =
                         trans_rb_eval.Aq_representor[q_a][i]->dot(*inner_product_storage_vector);
 
-                      if(i != j)
+                      if (i != j)
                         {
                           inner_product_matrix->vector_mult(*inner_product_storage_vector,
                                                             *trans_rb_eval.M_q_representor[q_m][i]);
@@ -1293,7 +1293,7 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
 //   matrix->zero();
 //   {
 //     matrix->add(1., *inner_product_matrix);
-//     if(constrained_problem)
+//     if (constrained_problem)
 //       matrix->add(1., *constraint_matrix);
 //   }
 //
@@ -1301,10 +1301,10 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
 //   solution->zero();
 //   solve();
 //   // Make sure we didn't max out the number of iterations
-//   if( (this->n_linear_iterations() >=
+//   if ((this->n_linear_iterations() >=
 //        this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
 //       (this->final_linear_residual() >
-//        this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
+//        this->get_equation_systems().parameters.get<Real>("linear solver tolerance")))
 //   {
 //     libmesh_error_msg("Warning: Linear solver may not have converged! Final linear residual = "
 //                  << this->final_linear_residual() << ", number of iterations = "

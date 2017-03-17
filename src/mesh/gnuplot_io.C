@@ -131,7 +131,7 @@ void GnuPlotIO::write_solution(const std::string & fname,
             }
           xtics_stream << "\"\" " << (el->point(1))(0);
 
-          if(count+1 != n_active_elem)
+          if (count+1 != n_active_elem)
             {
               xtics_stream << ", \\\n";
             }
@@ -140,10 +140,10 @@ void GnuPlotIO::write_solution(const std::string & fname,
 
       out_stream << "set xrange [" << x_min << ":" << x_max << "]\n";
 
-      if(_grid)
+      if (_grid)
         out_stream << "set x2tics (" << xtics_stream.str() << ")\nset grid noxtics noytics x2tics\n";
 
-      if(_png_output)
+      if (_png_output)
         {
           out_stream << "set terminal png\n";
           out_stream << "set output \"" << fname << ".png\"\n";
@@ -153,7 +153,7 @@ void GnuPlotIO::write_solution(const std::string & fname,
                  << axes_limits
                  << " \"" << data_file_name << "\" using 1:2 title \"" << (*names)[0]
                  << "\" with lines";
-      if(n_vars > 1)
+      if (n_vars > 1)
         {
           for(unsigned int i=1; i<n_vars; i++)
             {

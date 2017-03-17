@@ -150,8 +150,8 @@ void MemorySolutionHistory::retrieve()
 
   // Do we not have a solution for this time?  Then
   // there's nothing to do.
-  if(stored_sols == stored_solutions.end() ||
-     std::abs(recovery_time - _system.time) > TOLERANCE)
+  if (stored_sols == stored_solutions.end() ||
+      std::abs(recovery_time - _system.time) > TOLERANCE)
     {
       //libMesh::out << "No more solutions to recover ! We are at time t = " <<
       //                     _system.time << std::endl;

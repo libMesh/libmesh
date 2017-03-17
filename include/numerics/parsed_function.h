@@ -578,7 +578,7 @@ ParsedFunction<Output,OutputGradient>::expression_is_time_dependent( const std::
 
   // By definition, time is "t" for FunctionBase-based objects, so we just need to
   // see if this expression has the variable "t" in it.
-  if( this->find_name( std::string("t"), expression ) != std::string::npos )
+  if (this->find_name(std::string("t"), expression) != std::string::npos)
     is_time_dependent = true;
 
   return is_time_dependent;

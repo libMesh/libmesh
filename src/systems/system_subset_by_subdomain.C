@@ -127,7 +127,7 @@ init (const SubdomainSelection & subdomain_selection)
   for ( ; el != end_el; ++el)
     {
       const Elem * elem = *el;
-      if(subdomain_selection(elem->subdomain_id()))
+      if (subdomain_selection(elem->subdomain_id()))
         {
           std::set<unsigned int>::const_iterator it = _var_nums.begin();
           const std::set<unsigned int>::const_iterator itEnd = _var_nums.end();
@@ -139,7 +139,7 @@ init (const SubdomainSelection & subdomain_selection)
                   const dof_id_type dof = dof_indices[i];
                   for(processor_id_type proc=0; proc<this->n_processors(); proc++)
                     {
-                      if((dof>=dof_map.first_dof(proc)) && (dof<dof_map.end_dof(proc)))
+                      if ((dof>=dof_map.first_dof(proc)) && (dof<dof_map.end_dof(proc)))
                         {
                           dof_ids_per_processor[proc].push_back(dof);
                         }
@@ -153,7 +153,7 @@ init (const SubdomainSelection & subdomain_selection)
   std::vector<Parallel::Request> request_per_processor(this->n_processors());
   for(unsigned int proc=0; proc<this->n_processors(); proc++)
     {
-      if(proc!=this->processor_id())
+      if (proc!=this->processor_id())
         {
           this->comm().send(proc,dof_ids_per_processor[proc],request_per_processor[proc]);
         }
@@ -161,7 +161,7 @@ init (const SubdomainSelection & subdomain_selection)
   for(unsigned int proc=0; proc<this->n_processors(); proc++)
     {
       std::vector<dof_id_type> received_dofs;
-      if(proc==this->processor_id())
+      if (proc==this->processor_id())
         {
           received_dofs = dof_ids_per_processor[proc];
         }
@@ -182,7 +182,7 @@ init (const SubdomainSelection & subdomain_selection)
   /* Wait for sends to be complete.  */
   for(unsigned int proc=0; proc<this->n_processors(); proc++)
     {
-      if(proc!=this->processor_id())
+      if (proc!=this->processor_id())
         {
           request_per_processor[proc].wait();
         }

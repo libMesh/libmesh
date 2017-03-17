@@ -577,7 +577,7 @@ bool Elem::contains_edge_of(const Elem * e) const
       if (this->contains_point(e->point(n)))
         {
           num_contained_edges++;
-          if(num_contained_edges>=2)
+          if (num_contained_edges>=2)
             {
               return true;
             }
@@ -1507,7 +1507,7 @@ bool Elem::ancestor() const
 
 void Elem::add_child (Elem * elem)
 {
-  if(_children == libmesh_nullptr)
+  if (_children == libmesh_nullptr)
     {
       _children = new Elem *[this->n_children()];
 
@@ -1517,7 +1517,7 @@ void Elem::add_child (Elem * elem)
 
   for (unsigned int c=0; c<this->n_children(); c++)
     {
-      if(this->_children[c] == libmesh_nullptr || this->_children[c] == remote_elem)
+      if (this->_children[c] == libmesh_nullptr || this->_children[c] == remote_elem)
         {
           libmesh_assert_equal_to (this, elem->parent());
           this->set_child(c, elem);
@@ -1532,7 +1532,7 @@ void Elem::add_child (Elem * elem)
 
 void Elem::add_child (Elem * elem, unsigned int c)
 {
-  if(!this->has_children())
+  if (!this->has_children())
     {
       _children = new Elem *[this->n_children()];
 
@@ -2305,7 +2305,7 @@ bool Elem::contains_point (const Point & p, Real tol) const
   // Elem::close_to_point()), but print a warning so that the
   // user can eventually switch his code over to calling close_to_point()
   // instead, which is intended to be used for this purpose.
-  if ( tol > TOLERANCE )
+  if (tol > TOLERANCE)
     {
       libmesh_do_once(libMesh::err
                       << "WARNING: Resizing bounding box to match user-specified tolerance!\n"

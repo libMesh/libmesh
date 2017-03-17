@@ -195,7 +195,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
       // initialize quadrature rule
       this->qrule->init(side->type(), side_p_level);
 
-      if(this->qrule->shapes_need_reinit())
+      if (this->qrule->shapes_need_reinit())
         this->shapes_on_quadrature = false;
 
       // FIXME - could this break if the same FE object was used
@@ -307,7 +307,7 @@ void FE<Dim,T>::edge_reinit(const Elem * elem,
       // initialize quadrature rule
       this->qrule->init(edge->type(), elem->p_level());
 
-      if(this->qrule->shapes_need_reinit())
+      if (this->qrule->shapes_need_reinit())
         this->shapes_on_quadrature = false;
 
       // We might not need to reinitialize the shape functions

@@ -126,7 +126,7 @@ int NumericVector<T>::compare (const NumericVector<T> & other_vector,
 
   do
     {
-      if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
+      if (std::abs((*this)(i) - other_vector(i)) > threshold)
         first_different_i = i;
       else
         i++;
@@ -158,8 +158,8 @@ int NumericVector<T>::local_relative_compare (const NumericVector<T> & other_vec
 
   do
     {
-      if ( std::abs( (*this)(i) - other_vector(i) ) > threshold *
-           std::max(std::abs((*this)(i)), std::abs(other_vector(i))))
+      if (std::abs((*this)(i) - other_vector(i)) > threshold *
+          std::max(std::abs((*this)(i)), std::abs(other_vector(i))))
         first_different_i = i;
       else
         i++;
@@ -195,7 +195,7 @@ int NumericVector<T>::global_relative_compare (const NumericVector<T> & other_ve
 
   do
     {
-      if ( std::abs( (*this)(i) - other_vector(i) ) > abs_threshold )
+      if (std::abs((*this)(i) - other_vector(i) ) > abs_threshold)
         first_different_i = i;
       else
         i++;
@@ -229,7 +229,7 @@ numeric_index_type i = first_local_index();
 
 do
 {
-if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
+if (std::abs((*this)(i) - other_vector(i) ) > threshold)
 rvalue = i;
 else
 i++;
@@ -254,7 +254,7 @@ numeric_index_type i = first_local_index();
 
 do
 {
-if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
+if (std::abs((*this)(i) - other_vector(i) ) > threshold)
 rvalue = i;
 else
 i++;
@@ -280,7 +280,7 @@ numeric_index_type i = first_local_index();
 
 do
 {
-if ( std::abs( (*this)(i) - other_vector(i) ) > threshold )
+if (std::abs((*this)(i) - other_vector(i) ) > threshold)
 rvalue = i;
 else
 i++;
@@ -307,7 +307,7 @@ numeric_index_type i = first_local_index();
 
 do
 {
-if (( std::abs( (*this)(i).real() - other_vector(i).real() ) > threshold ) || ( std::abs( (*this)(i).imag() - other_vector(i).imag() ) > threshold ))
+if ((std::abs((*this)(i).real() - other_vector(i).real()) > threshold) || (std::abs((*this)(i).imag() - other_vector(i).imag()) > threshold))
 rvalue = i;
 else
 i++;
@@ -368,7 +368,7 @@ Real NumericVector<T>::subset_linfty_norm (const std::set<numeric_index_type> & 
   for(; it!=it_end; ++it)
     {
       Real value = std::abs(v(*it));
-      if(value > norm)
+      if (value > norm)
         norm = value;
     }
 

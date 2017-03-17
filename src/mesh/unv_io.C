@@ -124,7 +124,7 @@ void UNVIO::read_implementation (std::istream & in_stream)
   elems_of_dimension.resize(4, false);
 
   {
-    if ( !in_stream.good() )
+    if (!in_stream.good())
       libmesh_error_msg("ERROR: Input file not good.");
 
     // Flags to be set when certain sections are encountered
@@ -293,7 +293,7 @@ void UNVIO::write (const std::string & file_name)
 
 void UNVIO::write_implementation (std::ostream & out_file)
 {
-  if ( !out_file.good() )
+  if (!out_file.good())
     libmesh_error_msg("ERROR: Output file not good.");
 
   // write the nodes, then the elements

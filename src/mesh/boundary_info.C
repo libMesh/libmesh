@@ -347,7 +347,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
           UniquePtr<const Elem> interior_parent_side = interior_parent->build_side_ptr(side);
           Real centroid_distance = (boundary_elem->centroid() - interior_parent_side->centroid()).norm();
 
-          if( centroid_distance < (tolerance * boundary_elem->hmin()) )
+          if (centroid_distance < (tolerance * boundary_elem->hmin()))
             {
               interior_parent_side_index = side;
               found_matching_sides = true;
@@ -355,7 +355,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
             }
         }
 
-      if(!found_matching_sides)
+      if (!found_matching_sides)
         {
           libmesh_error_msg("No matching side found within the specified tolerance");
         }

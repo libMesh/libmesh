@@ -692,27 +692,27 @@ void FEGenericBase<OutputType>::compute_shape_functions (const Elem * elem,
 
   this->determine_calculations();
 
-  if( calculate_phi )
-    this->_fe_trans->map_phi( this->dim, elem, qp, (*this), this->phi );
+  if (calculate_phi)
+    this->_fe_trans->map_phi(this->dim, elem, qp, (*this), this->phi);
 
-  if( calculate_dphi )
-    this->_fe_trans->map_dphi( this->dim, elem, qp, (*this), this->dphi,
-                               this->dphidx, this->dphidy, this->dphidz );
+  if (calculate_dphi)
+    this->_fe_trans->map_dphi(this->dim, elem, qp, (*this), this->dphi,
+                              this->dphidx, this->dphidy, this->dphidz);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if( calculate_d2phi )
-    this->_fe_trans->map_d2phi( this->dim, qp, (*this), this->d2phi,
-                                this->d2phidx2, this->d2phidxdy, this->d2phidxdz,
-                                this->d2phidy2, this->d2phidydz, this->d2phidz2 );
+  if (calculate_d2phi)
+    this->_fe_trans->map_d2phi(this->dim, qp, (*this), this->d2phi,
+                               this->d2phidx2, this->d2phidxdy, this->d2phidxdz,
+                               this->d2phidy2, this->d2phidydz, this->d2phidz2);
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   // Only compute curl for vector-valued elements
-  if( calculate_curl_phi && TypesEqual<OutputType,RealGradient>::value )
-    this->_fe_trans->map_curl( this->dim, elem, qp, (*this), this->curl_phi );
+  if (calculate_curl_phi && TypesEqual<OutputType,RealGradient>::value)
+    this->_fe_trans->map_curl(this->dim, elem, qp, (*this), this->curl_phi);
 
   // Only compute div for vector-valued elements
-  if( calculate_div_phi && TypesEqual<OutputType,RealGradient>::value )
-    this->_fe_trans->map_div( this->dim, elem, qp, (*this), this->div_phi );
+  if (calculate_div_phi && TypesEqual<OutputType,RealGradient>::value)
+    this->_fe_trans->map_div(this->dim, elem, qp, (*this), this->div_phi);
 }
 
 
@@ -749,7 +749,7 @@ void FEGenericBase<OutputType>::determine_calculations()
       && !this->calculate_curl_phi && !this->calculate_div_phi)
     {
       this->calculate_phi = this->calculate_dphi = this->calculate_d2phi = this->calculate_dphiref = true;
-      if( FEInterface::field_type(fe_type.family) == TYPE_VECTOR )
+      if (FEInterface::field_type(fe_type.family) == TYPE_VECTOR)
         {
           this->calculate_curl_phi = true;
           this->calculate_div_phi  = true;
@@ -759,7 +759,7 @@ void FEGenericBase<OutputType>::determine_calculations()
   if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_curl_phi && !this->calculate_div_phi)
     {
       this->calculate_phi = this->calculate_dphi = this->calculate_dphiref = true;
-      if( FEInterface::field_type(fe_type.family) == TYPE_VECTOR )
+      if (FEInterface::field_type(fe_type.family) == TYPE_VECTOR)
         {
           this->calculate_curl_phi = true;
           this->calculate_div_phi  = true;
@@ -768,14 +768,14 @@ void FEGenericBase<OutputType>::determine_calculations()
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   // Request whichever terms are necessary from the FEMap
-  if( this->calculate_phi )
+  if (this->calculate_phi)
     this->_fe_trans->init_map_phi(*this);
 
-  if( this->calculate_dphiref )
+  if (this->calculate_dphiref)
     this->_fe_trans->init_map_dphi(*this);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if( this->calculate_d2phi )
+  if (this->calculate_d2phi)
     this->_fe_trans->init_map_d2phi(*this);
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 }

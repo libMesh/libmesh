@@ -189,7 +189,7 @@ SlepcEigenSolver<T>::_solve_standard_helper(Mat mat,
 
   // If the SolverConfiguration object is provided, use it to override
   // solver options.
-  if(this->_solver_configuration)
+  if (this->_solver_configuration)
     {
       this->_solver_configuration->configure_solver();
     }
@@ -483,7 +483,7 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 
   // If the SolverConfiguration object is provided, use it to override
   // solver options.
-  if(this->_solver_configuration)
+  if (this->_solver_configuration)
     {
       this->_solver_configuration->configure_solver();
     }

@@ -134,7 +134,7 @@ void LinearImplicitSystem::solve ()
 
   // Solve the linear system.  Several cases:
   std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
-  if(_shell_matrix)
+  if (_shell_matrix)
     // 1.) Shell matrix with or without user-supplied preconditioner.
     rval = linear_solver->solve(*_shell_matrix, this->request_matrix("Preconditioner"), *solution, *rhs, tol, maxits);
   else
@@ -220,7 +220,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number> * shell_matr
   // We currently don't support adjoint solves of shell matrices
   // FIXME - we should let shell matrices support
   // vector_transpose_mult so that we can use them here.
-  if(_shell_matrix!=libmesh_nullptr)
+  if (_shell_matrix!=libmesh_nullptr)
   libmesh_not_implemented();
 
   if (this->assemble_before_solve)
@@ -233,7 +233,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number> * shell_matr
 
   // Including of any separate preconditioner
   SparseMatrix<Number> * pc = this->request_matrix("Preconditioner");
-  if(pc)
+  if (pc)
   pc->get_transpose(*pc);
 
   // But now replace the right hand sides with the quantity of

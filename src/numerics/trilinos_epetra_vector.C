@@ -379,7 +379,7 @@ EpetraVector<T>::operator = (const std::vector<T> & v)
    * Case 1:  The vector is the same size of
    * The global vector.  Only add the local components.
    */
-  if(this->size() == v.size())
+  if (this->size() == v.size())
     {
       const unsigned int nl=this->local_size();
       const unsigned int fli=this->first_local_index();

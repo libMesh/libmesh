@@ -920,7 +920,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
   bool have_scalar = false;
   for(unsigned int i=0; i != this->n_variable_groups(); ++i)
     {
-      if( this->variable_group(i).type().family == SCALAR )
+      if (this->variable_group(i).type().family == SCALAR)
         {
           have_scalar = true;
           break;
@@ -929,7 +929,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
 
   // SCALAR dofs are stored on the last processor, so we'll evaluate
   // their equation terms there and only if we have a SCALAR variable
-  if ( this->processor_id() == (this->n_processors()-1) && have_scalar )
+  if (this->processor_id() == (this->n_processors()-1) && have_scalar)
     {
       UniquePtr<DiffContext> con = this->build_context();
       FEMContext & _femcontext = cast_ref<FEMContext &>(*con);

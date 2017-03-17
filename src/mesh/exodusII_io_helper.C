@@ -1074,7 +1074,7 @@ void ExodusII_IO_Helper::create(std::string filename)
         comp_ws = 0,
         io_ws = 0;
 
-      if(_single_precision)
+      if (_single_precision)
         {
           comp_ws = cast_int<int>(sizeof(float));
           io_ws = cast_int<int>(sizeof(float));

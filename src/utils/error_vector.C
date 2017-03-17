@@ -101,7 +101,7 @@ Real ErrorVector::median()
   sv.reserve (n);
 
   for (dof_id_type i=0; i<n; i++)
-    if(this->is_active_elem(i))
+    if (this->is_active_elem(i))
       sv.push_back((*this)[i]);
 
   return sv.median();
@@ -288,8 +288,8 @@ void ErrorVector::plot_error(const std::string & filename,
         (filename, temp_es);
     }
 #ifdef LIBMESH_HAVE_EXODUS_API
-  else if( (filename.rfind(".exo") < filename.size()) ||
-           (filename.rfind(".e") < filename.size()) )
+  else if ((filename.rfind(".exo") < filename.size()) ||
+           (filename.rfind(".e") < filename.size()))
     {
       ExodusII_IO io(mesh);
       io.write(filename);

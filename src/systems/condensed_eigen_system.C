@@ -84,7 +84,7 @@ CondensedEigenSystem::initialize_condensed_dofs(const std::set<dof_id_type> & gl
 
 dof_id_type CondensedEigenSystem::n_global_non_condensed_dofs() const
 {
-  if(!condensed_dofs_initialized)
+  if (!condensed_dofs_initialized)
     {
       return this->n_dofs();
     }
@@ -104,7 +104,7 @@ void CondensedEigenSystem::solve()
 
   // If we haven't initialized any condensed dofs,
   // just use the default eigen_system
-  if(!condensed_dofs_initialized)
+  if (!condensed_dofs_initialized)
     {
       Parent::solve();
       return;
@@ -129,7 +129,7 @@ void CondensedEigenSystem::solve()
                              local_non_condensed_dofs_vector,
                              local_non_condensed_dofs_vector);
 
-  if(generalized())
+  if (generalized())
     {
       matrix_B->create_submatrix(*condensed_matrix_B,
                                  local_non_condensed_dofs_vector,
@@ -155,7 +155,7 @@ void CondensedEigenSystem::solve()
   std::pair<unsigned int, unsigned int> solve_data;
 
   // call the solver depending on the type of eigenproblem
-  if ( generalized() )
+  if (generalized())
     {
       //in case of a generalized eigenproblem
       solve_data = eigen_solver->solve_generalized

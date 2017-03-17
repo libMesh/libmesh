@@ -87,7 +87,8 @@ std::string ReferenceCounter::get_info ()
 
 void ReferenceCounter::print_info (std::ostream & out_stream)
 {
-  if( _enable_print_counter ) out_stream << ReferenceCounter::get_info();
+  if (_enable_print_counter)
+    out_stream << ReferenceCounter::get_info();
 }
 
 #else

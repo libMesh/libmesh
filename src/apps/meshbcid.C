@@ -60,7 +60,7 @@ int main(int argc, char ** argv)
 
   Mesh mesh(init.comm(), dim);
 
-  if(!cl.search("--input"))
+  if (!cl.search("--input"))
     {
       libMesh::err << "No --input argument found!" << std::endl;
       usage_error(argv[0]);
@@ -70,7 +70,7 @@ int main(int argc, char ** argv)
   mesh.read(meshname);
   libMesh::out << "Loaded mesh " << meshname << std::endl;
 
-  if(!cl.search("--newbcid"))
+  if (!cl.search("--newbcid"))
     {
       libMesh::err << "No --bcid argument found!" << std::endl;
       usage_error(argv[0]);
@@ -198,7 +198,7 @@ int main(int argc, char ** argv)
   mesh.get_boundary_info().regenerate_id_sets();
 
   std::string outputname;
-  if(cl.search("--output"))
+  if (cl.search("--output"))
     {
       outputname = cl.next("mesh.xda");
     }

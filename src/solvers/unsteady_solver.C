@@ -179,7 +179,7 @@ void UnsteadySolver::adjoint_advance_timestep ()
 {
   // On the first call of this function, we dont save the adjoint solution or
   // decrement the time, we just call the retrieve function below
-  if(!first_adjoint_step)
+  if (!first_adjoint_step)
     {
       // Call the store function to store the last adjoint before decrementing the time
       solution_history->store();

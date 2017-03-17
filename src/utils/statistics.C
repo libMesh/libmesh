@@ -218,7 +218,7 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
           // There may be entries in the vector smaller than the value
           // reported by this->minimum().  (e.g. inactive elements in an
           // ErrorVector.)  We just skip entries like that.
-          if ( current_val < min )
+          if (current_val < min)
             {
               //     libMesh::out << "(debug) Skipping entry v[" << i << "]="
               //       << (*this)[i]
@@ -227,7 +227,7 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type> & bin_members,
               continue;
             }
 
-          if ( current_val > bin_bounds[j+1] ) // if outside the current bin (bin[j] is bounded
+          if (current_val > bin_bounds[j+1]) // if outside the current bin (bin[j] is bounded
             // by bin_bounds[j] and bin_bounds[j+1])
             {
               // libMesh::out.precision(16);

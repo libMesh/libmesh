@@ -74,7 +74,7 @@ void iota (ForwardIter first, ForwardIter last, T value)
 template< class InputIterator >
 bool is_sorted(InputIterator first, InputIterator last)
 {
-  if ( first == last )
+  if (first == last)
     return true;
 
   // "prev" always points to the entry just to the left of "first"
@@ -91,7 +91,7 @@ bool is_sorted(InputIterator first, InputIterator last)
   //           prev first
   InputIterator prev( first );
   for ( ++first; first != last; ++prev, ++first )
-    if ( *first < *prev  )    // Note: this is the same as *prev > *first,
+    if (*first < *prev)    // Note: this is the same as *prev > *first,
       return false;        // but we only require op< to be defined.
 
   // If we haven't returned yet, it's sorted!

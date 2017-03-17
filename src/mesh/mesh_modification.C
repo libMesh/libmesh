@@ -1916,7 +1916,7 @@ void MeshTools::Modification::change_boundary_id (MeshBase & mesh,
                                                   const boundary_id_type old_id,
                                                   const boundary_id_type new_id)
 {
-  if(old_id == new_id)
+  if (old_id == new_id)
     {
       // If the IDs are the same, this is a no-op.
       return;
@@ -2068,7 +2068,7 @@ void MeshTools::Modification::change_subdomain_id (MeshBase & mesh,
                                                    const subdomain_id_type old_id,
                                                    const subdomain_id_type new_id)
 {
-  if(old_id == new_id)
+  if (old_id == new_id)
     {
       // If the IDs are the same, this is a no-op.
       return;

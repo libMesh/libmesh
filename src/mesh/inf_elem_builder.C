@@ -357,28 +357,28 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
                     const Point dist_from_origin =
                       this->_mesh.point(side->node_id(n)) - origin;
 
-                    if(x_sym)
-                      if( std::abs(dist_from_origin(0)) > 1.e-3 )
+                    if (x_sym)
+                      if (std::abs(dist_from_origin(0)) > 1.e-3)
                         on_x_sym=false;
 
-                    if(y_sym)
-                      if( std::abs(dist_from_origin(1)) > 1.e-3 )
+                    if (y_sym)
+                      if (std::abs(dist_from_origin(1)) > 1.e-3)
                         on_y_sym=false;
 
-                    if(z_sym)
-                      if( std::abs(dist_from_origin(2)) > 1.e-3 )
+                    if (z_sym)
+                      if (std::abs(dist_from_origin(2)) > 1.e-3)
                         on_z_sym=false;
 
-                    //       if(x_sym)
-                    // if( std::abs(dist_from_origin(0)) > 1.e-6 )
+                    //       if (x_sym)
+                    // if (std::abs(dist_from_origin(0)) > 1.e-6)
                     //   on_x_sym=false;
 
-                    //       if(y_sym)
-                    // if( std::abs(dist_from_origin(1)) > 1.e-6 )
+                    //       if (y_sym)
+                    // if (std::abs(dist_from_origin(1)) > 1.e-6)
                     //   on_y_sym=false;
 
-                    //       if(z_sym)
-                    // if( std::abs(dist_from_origin(2)) > 1.e-6 )
+                    //       if (z_sym)
+                    // if (std::abs(dist_from_origin(2)) > 1.e-6)
                     //   on_z_sym=false;
 
                     //find the node most distant from origin
@@ -435,7 +435,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
       bool found=false;
       for(unsigned int sn=0; sn<side->n_nodes(); sn++)
-        if(onodes.count(side->node_id(sn)))
+        if (onodes.count(side->node_id(sn)))
           {
             found=true;
             break;
@@ -443,7 +443,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
 
       // If a new oface is found, include its nodes in onodes
-      if(found)
+      if (found)
         {
           for(unsigned int sn=0; sn<side->n_nodes(); sn++)
             onodes.insert(side->node_id(sn));
@@ -460,7 +460,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
       // If at least one new oface was found in this cycle,
       // do another search cycle.
-      if(facesfound>0 && face_it == faces.end())
+      if (facesfound>0 && face_it == faces.end())
         {
           facesfound = 0;
           face_it    = faces.begin();

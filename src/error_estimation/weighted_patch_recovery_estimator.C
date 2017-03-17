@@ -129,7 +129,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
       // If we are reusing patches and the current element
       // already has an estimate associated with it, move on the
       // next element
-      if(this->error_estimator.patch_reuse && error_per_cell[e_id] != 0)
+      if (this->error_estimator.patch_reuse && error_per_cell[e_id] != 0)
         continue;
 
       // If we are not reusing patches or havent built one containing this element, we build one
@@ -143,7 +143,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
       // not reusing patches since we will only be computing error for
       // one cell
       std::vector<Real> new_error_per_cell(1, 0.);
-      if(this->error_estimator.patch_reuse)
+      if (this->error_estimator.patch_reuse)
         new_error_per_cell.resize(patch.size(), 0.);
 
       //------------------------------------------------------------
@@ -543,7 +543,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
           // Declare a new patch
           Patch patch_re(mesh.processor_id());
 
-          if(this->error_estimator.patch_reuse)
+          if (this->error_estimator.patch_reuse)
             {
               // Just get the iterators from the current patch
               patch_re_it  = patch.begin();
@@ -845,7 +845,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
       // Build a new patch if necessary
       Patch current_elem_patch(mesh.processor_id());
 
-      if(this->error_estimator.patch_reuse)
+      if (this->error_estimator.patch_reuse)
         {
           // Just get the iterators from the current patch
           patch_re_it  = patch.begin();

@@ -86,7 +86,7 @@ void RadialBasisInterpolation<KDDim,RBF>::prepare_for_use()
 
 
   // Construct the Radial Basis Function, giving it the size of the domain
-  if(_r_override < 0)
+  if (_r_override < 0)
     _r_bbox = (_src_bbox.max() - _src_bbox.min()).norm();
   else
     _r_bbox = _r_override;

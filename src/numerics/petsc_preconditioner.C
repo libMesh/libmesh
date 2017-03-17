@@ -55,7 +55,7 @@ void PetscPreconditioner<T>::apply(const NumericVector<T> & x, NumericVector<T> 
 template <typename T>
 void PetscPreconditioner<T>::init ()
 {
-  if(!this->_matrix)
+  if (!this->_matrix)
     libmesh_error_msg("ERROR: No matrix set for PetscPreconditioner, but init() called");
 
   // Clear the preconditioner in case it has been created in the past

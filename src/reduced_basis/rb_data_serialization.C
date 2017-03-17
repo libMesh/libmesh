@@ -82,7 +82,7 @@ void RBEvaluationSerialization::write_to_file(const std::string & path)
 {
   LOG_SCOPE("write_to_file()", "RBEvaluationSerialization");
 
-  if(_rb_eval.comm().rank() == 0)
+  if (_rb_eval.comm().rank() == 0)
     {
       capnp::MallocMessageBuilder message;
 
@@ -127,7 +127,7 @@ void TransientRBEvaluationSerialization::write_to_file(const std::string & path)
 {
   LOG_SCOPE("write_to_file()", "TransientRBEvaluationSerialization");
 
-  if(_trans_rb_eval.comm().rank() == 0)
+  if (_trans_rb_eval.comm().rank() == 0)
     {
       capnp::MallocMessageBuilder message;
 
@@ -178,7 +178,7 @@ void RBEIMEvaluationSerialization::write_to_file(const std::string & path)
 {
   LOG_SCOPE("write_to_file()", "RBEIMEvaluationSerialization");
 
-  if(_rb_eim_eval.comm().rank() == 0)
+  if (_rb_eim_eval.comm().rank() == 0)
     {
       capnp::MallocMessageBuilder message;
 
@@ -231,7 +231,7 @@ void RBSCMEvaluationSerialization::write_to_file(const std::string & path)
 {
   LOG_SCOPE("write_to_file()", "RBSCMEvaluationSerialization");
 
-  if(_rb_scm_eval.comm().rank() == 0)
+  if (_rb_scm_eval.comm().rank() == 0)
     {
       capnp::MallocMessageBuilder message;
 
@@ -277,7 +277,7 @@ void add_parameter_ranges_to_builder(const RBParametrized & rb_evaluation,
     unsigned int count = 0;
     for(const auto & parameter_name : parameter_names)
       {
-        if(!rb_evaluation.is_discrete_parameter(parameter_name))
+        if (!rb_evaluation.is_discrete_parameter(parameter_name))
           {
             names.set(count, parameter_name);
             mins.set(count, parameters_min.get_value(parameter_name));
@@ -444,7 +444,7 @@ void add_rb_evaluation_data_to_builder(RBEvaluation & rb_eval,
   }
 
   // Inner-product matrix
-  if(rb_eval.compute_RB_inner_product)
+  if (rb_eval.compute_RB_inner_product)
     {
       auto rb_inner_product_matrix_list =
         rb_evaluation_builder.initRbInnerProductMatrix(n_bfs*n_bfs);

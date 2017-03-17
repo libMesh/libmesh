@@ -105,7 +105,7 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
     permutation_list[i] = i;
 
   /*
-    if(this->processor_id() == 1)
+    if (this->processor_id() == 1)
     sleep(1);
 
     libMesh::out<<"n_nodes_per_elem: "<<n_nodes_per_elem<<std::endl;
@@ -177,7 +177,7 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
 DTKAdapter::RCP_Evaluator
 DTKAdapter::get_variable_evaluator(std::string var_name)
 {
-  if(evaluators.find(var_name) == evaluators.end()) // We haven't created an evaluator for the variable yet
+  if (evaluators.find(var_name) == evaluators.end()) // We haven't created an evaluator for the variable yet
     {
       System * sys = find_sys(var_name);
 
@@ -191,7 +191,7 @@ DTKAdapter::get_variable_evaluator(std::string var_name)
 Teuchos::RCP<DataTransferKit::FieldManager<DTKAdapter::FieldContainerType> >
 DTKAdapter::get_values_to_fill(std::string var_name)
 {
-  if(values_to_fill.find(var_name) == values_to_fill.end())
+  if (values_to_fill.find(var_name) == values_to_fill.end())
     {
       Teuchos::ArrayRCP<double> data_space(num_local_nodes);
       Teuchos::RCP<FieldContainerType> field_container = Teuchos::rcp(new FieldContainerType(data_space, 1));
@@ -216,7 +216,7 @@ DTKAdapter::update_variable_values(std::string var_name)
       unsigned int node_num = vertices[i];
       const Node & node = mesh.node_ref(node_num);
 
-      if(node.processor_id() == sys->processor_id())
+      if (node.processor_id() == sys->processor_id())
         {
           // The 0 is for the component... this only works for LAGRANGE!
           dof_id_type dof = node.dof_number(sys->number(), var_num, 0);
@@ -243,7 +243,7 @@ DTKAdapter::find_sys(std::string var_name)
   // Find the system this variable is from
   for(unsigned int i=0; i<es.n_systems(); i++)
     {
-      if(es.get_system(i).has_variable(var_name))
+      if (es.get_system(i).has_variable(var_name))
         {
           sys = &es.get_system(i);
           break;
@@ -260,17 +260,17 @@ DTKAdapter::get_element_topology(const Elem * elem)
 {
   ElemType type = elem->type();
 
-  if(type == EDGE2)
+  if (type == EDGE2)
     return DataTransferKit::DTK_LINE_SEGMENT;
-  else if(type == TRI3)
+  else if (type == TRI3)
     return DataTransferKit::DTK_TRIANGLE;
-  else if(type == QUAD4)
+  else if (type == QUAD4)
     return DataTransferKit::DTK_QUADRILATERAL;
-  else if(type == TET4)
+  else if (type == TET4)
     return DataTransferKit::DTK_TETRAHEDRON;
-  else if(type == HEX8)
+  else if (type == HEX8)
     return DataTransferKit::DTK_HEXAHEDRON;
-  else if(type == PYRAMID5)
+  else if (type == PYRAMID5)
     return DataTransferKit::DTK_PYRAMID;
 
   libmesh_error_msg("Element type not supported by DTK!");

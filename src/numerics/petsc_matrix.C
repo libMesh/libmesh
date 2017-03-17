@@ -440,7 +440,7 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
   PetscErrorCode ierr=0;
 
 #if PETSC_RELEASE_LESS_THAN(3,1,1)
-  if(!rows.empty())
+  if (!rows.empty())
     ierr = MatZeroRows(_mat, rows.size(),
                        numeric_petsc_cast(&rows[0]), diag_value);
   else
@@ -450,7 +450,7 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
   // optional arguments.  The optional arguments (x,b) can be used to specify the
   // solutions for the zeroed rows (x) and right hand side (b) to update.
   // Could be useful for setting boundary conditions...
-  if(!rows.empty())
+  if (!rows.empty())
     ierr = MatZeroRows(_mat, cast_int<PetscInt>(rows.size()),
                        numeric_petsc_cast(&rows[0]), diag_value,
                        PETSC_NULL, PETSC_NULL);
@@ -788,7 +788,7 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
 
   // If we're not reusing submatrix and submatrix is already initialized
   // then we need to clear it, otherwise we get a memory leak.
-  if( !reuse_submatrix && submatrix.initialized() )
+  if (!reuse_submatrix && submatrix.initialized())
     submatrix.clear();
 
   // Construct row and column index sets.
@@ -849,7 +849,7 @@ void PetscMatrix<T>::get_transpose (SparseMatrix<T> & dest) const
 
   // If we aren't reusing the matrix then need to clear dest,
   // otherwise we get a memory leak
-  if(&petsc_dest != this)
+  if (&petsc_dest != this)
     dest.clear();
 
   PetscErrorCode ierr;

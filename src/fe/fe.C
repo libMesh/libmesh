@@ -159,7 +159,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
           libmesh_assert(this->qrule);
           this->qrule->init(elem->type(), elem->p_level());
 
-          if(this->qrule->shapes_need_reinit())
+          if (this->qrule->shapes_need_reinit())
             this->shapes_on_quadrature = false;
 
           if (this->elem_type != elem->type() ||
@@ -306,7 +306,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
       this->dphidz.resize  (n_approx_shape_functions);
     }
 
-  if(this->calculate_dphiref)
+  if (this->calculate_dphiref)
     {
       if (Dim > 0)
         this->dphidxi.resize (n_approx_shape_functions);
@@ -318,10 +318,10 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
         this->dphidzeta.resize     (n_approx_shape_functions);
     }
 
-  if( this->calculate_curl_phi && (FEInterface::field_type(T) == TYPE_VECTOR) )
+  if (this->calculate_curl_phi && (FEInterface::field_type(T) == TYPE_VECTOR))
     this->curl_phi.resize(n_approx_shape_functions);
 
-  if( this->calculate_div_phi && (FEInterface::field_type(T) == TYPE_VECTOR) )
+  if (this->calculate_div_phi && (FEInterface::field_type(T) == TYPE_VECTOR))
     this->div_phi.resize(n_approx_shape_functions);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -364,7 +364,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
           this->dphidz[i].resize      (n_qp);
         }
 
-      if(this->calculate_dphiref)
+      if (this->calculate_dphiref)
         {
           if (Dim > 0)
             this->dphidxi[i].resize(n_qp);
@@ -376,10 +376,10 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
             this->dphidzeta[i].resize(n_qp);
         }
 
-      if(this->calculate_curl_phi && (FEInterface::field_type(T) == TYPE_VECTOR) )
+      if (this->calculate_curl_phi && (FEInterface::field_type(T) == TYPE_VECTOR))
         this->curl_phi[i].resize(n_qp);
 
-      if(this->calculate_div_phi && (FEInterface::field_type(T) == TYPE_VECTOR) )
+      if (this->calculate_div_phi && (FEInterface::field_type(T) == TYPE_VECTOR))
         this->div_phi[i].resize(n_qp);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES

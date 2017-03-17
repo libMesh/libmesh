@@ -108,7 +108,7 @@ numeric_index_type RBConstructionBase<Base>::get_n_training_samples() const
 {
   libmesh_assert(training_parameters_initialized);
 
-  if(training_parameters.empty())
+  if (training_parameters.empty())
     return 0;
 
   return training_parameters.begin()->second->size();
@@ -169,8 +169,8 @@ void RBConstructionBase<Base>::set_params_from_training_set_and_broadcast(unsign
   libmesh_assert(training_parameters_initialized);
 
   processor_id_type root_id = 0;
-  if( (this->get_first_local_training_index() <= index) &&
-      (index < this->get_last_local_training_index()) )
+  if ((this->get_first_local_training_index() <= index) &&
+      (index < this->get_last_local_training_index()))
     {
       // Set parameters on only one processor
       set_params_from_training_set(index);
@@ -210,7 +210,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
   }
   libMesh::out << std::endl;
 
-  if(deterministic)
+  if (deterministic)
     {
       generate_training_parameters_deterministic(this->comm(),
                                                  log_param_scale,
@@ -235,14 +235,14 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
 
   // For each parameter that only allows discrete values, we "snap" to the nearest
   // allowable discrete value
-  if(get_n_discrete_params() > 0)
+  if (get_n_discrete_params() > 0)
     {
       std::map< std::string, NumericVector<Number> * >::iterator it           = training_parameters.begin();
       std::map< std::string, NumericVector<Number> * >::const_iterator it_end = training_parameters.end();
       for( ; it != it_end; ++it)
         {
           std::string param_name = it->first;
-          if(is_discrete_parameter(param_name))
+          if (is_discrete_parameter(param_name))
             {
               std::vector<Real> discrete_values =
                 get_discrete_parameter_values().find(param_name)->second;
@@ -269,11 +269,11 @@ void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vec
 {
   // First, make sure that an initial training set has already been
   // generated
-  if(!training_parameters_initialized)
+  if (!training_parameters_initialized)
     libmesh_error_msg("Error: load_training_set cannot be used to initialize parameters");
 
   // Make sure that the training set has the correct number of parameters
-  if(new_training_set.size() != get_n_params())
+  if (new_training_set.size() != get_n_params())
     libmesh_error_msg("Error: Incorrect number of parameters in load_training_set.");
 
   // Clear the training set
@@ -347,7 +347,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
 
   if (training_parameters_random_seed < 0)
     {
-      if(!serial_training_set)
+      if (!serial_training_set)
         {
           // seed the random number generator with the system time
           // and the processor ID so that the seed is different
@@ -368,7 +368,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
     }
   else
     {
-      if(!serial_training_set)
+      if (!serial_training_set)
         {
           // seed the random number generator with the provided value
           // and the processor ID so that the seed is different
@@ -392,13 +392,13 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
         std::string param_name = it->first;
         training_parameters_in[param_name] = NumericVector<Number>::build(communicator).release();
 
-        if(!serial_training_set)
+        if (!serial_training_set)
           {
             // Calculate the number of training parameters local to this processor
             unsigned int n_local_training_samples;
             unsigned int quotient  = n_training_samples_in/communicator.size();
             unsigned int remainder = n_training_samples_in%communicator.size();
-            if(communicator.rank() < remainder)
+            if (communicator.rank() < remainder)
               n_local_training_samples = (quotient + 1);
             else
               n_local_training_samples = quotient;
@@ -429,7 +429,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
             Real random_number = ((double)std::rand())/RAND_MAX; // in range [0,1]
 
             // Generate log10 scaled training parameters
-            if(log_param_scale[param_name])
+            if (log_param_scale[param_name])
               {
                 Real log_min   = log10(min_parameters.get_value(param_name));
                 Real log_range = log10(max_parameters.get_value(param_name) / min_parameters.get_value(param_name));
@@ -462,7 +462,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
   if (num_params == 0)
     return;
 
-  if(num_params > 2)
+  if (num_params > 2)
     {
       libMesh::out << "ERROR: Deterministic training sample generation "
                    << " not implemented for more than two parameters." << std::endl;
@@ -491,13 +491,13 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
         std::string param_name = it->first;
         training_parameters_in[param_name] = NumericVector<Number>::build(communicator).release();
 
-        if(!serial_training_set)
+        if (!serial_training_set)
           {
             // Calculate the number of training parameters local to this processor
             unsigned int n_local_training_samples;
             unsigned int quotient  = n_training_samples_in/communicator.size();
             unsigned int remainder = n_training_samples_in%communicator.size();
-            if(communicator.rank() < remainder)
+            if (communicator.rank() < remainder)
               n_local_training_samples = (quotient + 1);
             else
               n_local_training_samples = quotient;
@@ -511,7 +511,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
       }
   }
 
-  if(num_params == 1)
+  if (num_params == 1)
     {
       NumericVector<Number> * training_vector = training_parameters_in.begin()->second;
       bool use_log_scaling = log_param_scale.begin()->second;
@@ -522,7 +522,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
       for(numeric_index_type i=0; i<training_vector->local_size(); i++)
         {
           numeric_index_type index = first_index+i;
-          if(use_log_scaling)
+          if (use_log_scaling)
             {
               Real epsilon = 1.e-6; // Prevent rounding errors triggering asserts
               Real log_min   = log10(min_param + epsilon);
@@ -530,7 +530,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
               Real step_size = log_range /
                 std::max((unsigned int)1,(n_training_samples_in-1));
 
-              if(index<(n_training_samples_in-1))
+              if (index<(n_training_samples_in-1))
                 {
                   training_vector->set(index, pow(10., log_min + index*step_size ));
                 }
@@ -553,11 +553,11 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
 
 
   // This is for two parameters
-  if(num_params == 2)
+  if (num_params == 2)
     {
       // First make sure n_training_samples_in is a square number
       unsigned int n_training_parameters_per_var = static_cast<unsigned int>( std::sqrt(static_cast<Real>(n_training_samples_in)) );
-      if( (n_training_parameters_per_var*n_training_parameters_per_var) != n_training_samples_in)
+      if ((n_training_parameters_per_var*n_training_parameters_per_var) != n_training_samples_in)
         libmesh_error_msg("Error: Number of training parameters = " \
                           << n_training_samples_in \
                           << ".\n" \
@@ -582,7 +582,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
           for(unsigned int j=0; j<n_training_parameters_per_var; j++)
             {
               // Generate log10 scaled training parameters
-              if(use_log_scaling)
+              if (use_log_scaling)
                 {
                   Real epsilon = 1.e-6; // Prevent rounding errors triggering asserts
                   Real log_min   = log10(min_param + epsilon);
@@ -590,7 +590,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
                   Real step_size = log_range /
                     std::max((unsigned int)1,(n_training_parameters_per_var-1));
 
-                  if(j<(n_training_parameters_per_var-1))
+                  if (j<(n_training_parameters_per_var-1))
                     {
                       training_parameters_matrix[i][j] = pow(10., log_min + j*step_size );
                     }
@@ -626,8 +626,8 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
             {
               unsigned int index = index1*n_training_parameters_per_var + index2;
 
-              if( (training_vector_0->first_local_index() <= index) &&
-                  (index < training_vector_0->last_local_index()) )
+              if ((training_vector_0->first_local_index() <= index) &&
+                  (index < training_vector_0->last_local_index()))
                 {
                   training_vector_0->set(index, training_parameters_matrix[0][index1]);
                   training_vector_1->set(index, training_parameters_matrix[1][index2]);

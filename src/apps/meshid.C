@@ -55,21 +55,21 @@ int main(int argc, char ** argv)
   GetPot cl(argc, argv);
 
   // Command line parsing
-  if(!cl.search("--input"))
+  if (!cl.search("--input"))
     {
       std::cerr << "No --input argument found!" << std::endl;
       usage_error(argv[0]);
     }
   const char * meshname = cl.next("");
 
-  if(!cl.search("--oldid"))
+  if (!cl.search("--oldid"))
     {
       std::cerr << "No --oldid argument found!" << std::endl;
       usage_error(argv[0]);
     }
   long oldid = cl.next(0);
 
-  if(!cl.search("--newid"))
+  if (!cl.search("--newid"))
     {
       std::cerr << "No --newid argument found!" << std::endl;
       usage_error(argv[0]);
@@ -143,7 +143,7 @@ int main(int argc, char ** argv)
       status = nc_inq_dimlen (nc_id, dim_id, &dim_len);
       if (status != NC_NOERR) handle_error(status, "Error while inquiring about a dimension's length.");
 
-      if ( (flags & mask) != EXODUS_DIM)
+      if ((flags & mask) != EXODUS_DIM)
         {
           // Now get the variable values themselves
           std::vector<long> var_vals(dim_len);

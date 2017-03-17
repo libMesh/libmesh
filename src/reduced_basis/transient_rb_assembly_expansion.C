@@ -34,7 +34,7 @@ TransientRBAssemblyExpansion::TransientRBAssemblyExpansion()
 void TransientRBAssemblyExpansion::perform_M_interior_assembly(unsigned int q,
                                                                FEMContext & context)
 {
-  if(q >= get_n_M_terms())
+  if (q >= get_n_M_terms())
     libmesh_error_msg("Error: We must have q < get_n_M_terms in perform_M_interior_assembly.");
 
   libmesh_assert(_M_assembly_vector[q]);
@@ -45,7 +45,7 @@ void TransientRBAssemblyExpansion::perform_M_interior_assembly(unsigned int q,
 void TransientRBAssemblyExpansion::perform_M_boundary_assembly(unsigned int q,
                                                                FEMContext & context)
 {
-  if(q >= get_n_M_terms())
+  if (q >= get_n_M_terms())
     libmesh_error_msg("Error: We must have q < get_n_M_terms in perform_M_boundary_assembly.");
 
   libmesh_assert(_M_assembly_vector[q]);
@@ -65,7 +65,7 @@ void TransientRBAssemblyExpansion::attach_M_assembly(ElemAssembly * M_q_assembly
 
 ElemAssembly & TransientRBAssemblyExpansion::get_M_assembly(unsigned int q)
 {
-  if(q >= get_n_M_terms())
+  if (q >= get_n_M_terms())
     libmesh_error_msg("Error: We must have q < get_n_M_terms in get_M_assembly.");
 
   return *_M_assembly_vector[q];

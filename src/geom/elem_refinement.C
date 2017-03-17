@@ -136,7 +136,7 @@ void Elem::coarsen()
                 }
             }
 
-          if(calculated_new_pos)
+          if (calculated_new_pos)
             {
               //Move the existing node back into it's original location
               for(unsigned int i=0; i<LIBMESH_DIM; i++)

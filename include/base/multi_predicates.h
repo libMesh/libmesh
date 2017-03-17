@@ -84,7 +84,7 @@ struct abstract_multi_predicate : multi_predicate
 
         libmesh_assert (pred);
 
-        if ( ! (*pred)(it) )
+        if (!(*pred)(it))
           return false;
       }
 

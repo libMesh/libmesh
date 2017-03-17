@@ -664,7 +664,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 
   // Check command line to override printing
   // of reference count information.
-  if(libMesh::on_command_line("--disable-refcount-printing") )
+  if (libMesh::on_command_line("--disable-refcount-printing"))
     ReferenceCounter::disable_print_counter_info();
 
 #ifdef LIBMESH_ENABLE_EXCEPTIONS

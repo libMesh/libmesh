@@ -79,7 +79,7 @@ void RBSCMConstruction::set_rb_scm_evaluation(RBSCMEvaluation & rb_scm_eval_in)
 
 RBSCMEvaluation & RBSCMConstruction::get_rb_scm_evaluation()
 {
-  if(!rb_scm_eval)
+  if (!rb_scm_eval)
     libmesh_error_msg("Error: RBSCMEvaluation object hasn't been initialized yet");
 
   return *rb_scm_eval;
@@ -171,7 +171,7 @@ void RBSCMConstruction::print_info()
   libMesh::out << std::endl << "RBSCMConstruction parameters:" << std::endl;
   libMesh::out << "system name: " << this->name() << std::endl;
   libMesh::out << "SCM Greedy tolerance: " << get_SCM_training_tolerance() << std::endl;
-  if(rb_scm_eval)
+  if (rb_scm_eval)
     {
       libMesh::out << "A_q operators attached: " << get_rb_theta_expansion().get_n_A_terms() << std::endl;
     }
@@ -244,7 +244,7 @@ void RBSCMConstruction::perform_SCM_greedy()
 
   for(dof_id_type i=0; i<rb_system.n_dofs(); i++)
     {
-      if( rb_system.get_dof_map().is_constrained_dof(i) )
+      if (rb_system.get_dof_map().is_constrained_dof(i))
         {
           constrained_dofs_set.insert(i);
         }
@@ -275,7 +275,7 @@ void RBSCMConstruction::perform_SCM_greedy()
       libMesh::out << "SCM iteration " << SCM_iter
                    << ", max_SCM_error = " << SCM_error_pair.second << std::endl;
 
-      if( SCM_error_pair.second < SCM_training_tolerance )
+      if (SCM_error_pair.second < SCM_training_tolerance)
         {
           libMesh::out << std::endl << "SCM tolerance of " << SCM_training_tolerance << " reached."
                        << std::endl << std::endl;
@@ -413,7 +413,7 @@ Number RBSCMConstruction::Aq_inner_product(unsigned int q,
                                            const NumericVector<Number> & v,
                                            const NumericVector<Number> & w)
 {
-  if(q >= get_rb_theta_expansion().get_n_A_terms())
+  if (q >= get_rb_theta_expansion().get_n_A_terms())
     libmesh_error_msg("Error: We must have q < Q_a in Aq_inner_product.");
 
   matrix_A->zero();
@@ -441,7 +441,7 @@ std::pair<unsigned int,Real> RBSCMConstruction::compute_SCM_bounds_on_training_s
 
       Real error_i = SCM_greedy_error_indicator(LB, UB);
 
-      if( error_i > max_SCM_error )
+      if (error_i > max_SCM_error)
         {
           max_SCM_error = error_i;
           new_C_J_index = i;
@@ -469,7 +469,8 @@ void RBSCMConstruction::enrich_C_J(unsigned int new_C_J_index)
   RBParameters::const_iterator it_end = get_parameters().end();
   for( ; it != it_end; ++it)
     {
-      if(it != get_parameters().begin()) libMesh::out << ",";
+      if (it != get_parameters().begin())
+        libMesh::out << ",";
       std::string param_name = it->first;
       RBParameters C_J_params = rb_scm_eval->C_J[rb_scm_eval->C_J.size()-1];
       libMesh::out << C_J_params.get_value(param_name);

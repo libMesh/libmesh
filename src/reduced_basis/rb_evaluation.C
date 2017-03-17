@@ -87,7 +87,7 @@ void RBEvaluation::set_rb_theta_expansion(RBThetaExpansion & rb_theta_expansion_
 
 RBThetaExpansion & RBEvaluation::get_rb_theta_expansion()
 {
-  if(!is_rb_theta_expansion_initialized())
+  if (!is_rb_theta_expansion_initialized())
     libmesh_error_msg("Error: rb_theta_expansion hasn't been initialized yet");
 
   return *rb_theta_expansion;
@@ -95,7 +95,7 @@ RBThetaExpansion & RBEvaluation::get_rb_theta_expansion()
 
 bool RBEvaluation::is_rb_theta_expansion_initialized() const
 {
-  if(rb_theta_expansion)
+  if (rb_theta_expansion)
     {
       return true;
     }
@@ -110,11 +110,11 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax,
 {
   LOG_SCOPE("resize_data_structures()", "RBEvaluation");
 
-  if(Nmax < this->get_n_basis_functions())
+  if (Nmax < this->get_n_basis_functions())
     libmesh_error_msg("Error: Cannot set Nmax to be less than the current number of basis functions.");
 
   // Resize/clear inner product matrix
-  if(compute_RB_inner_product)
+  if (compute_RB_inner_product)
     RB_inner_product_matrix.resize(Nmax,Nmax);
 
   // Allocate dense matrices for RB solves
@@ -150,7 +150,7 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax,
   RB_outputs.resize(rb_theta_expansion->get_n_outputs(), 0.);
 
 
-  if(resize_error_bound_data)
+  if (resize_error_bound_data)
     {
       // Initialize vectors for the norms of the Fq representors
       unsigned int Q_f_hat = rb_theta_expansion->get_n_F_terms()*(rb_theta_expansion->get_n_F_terms()+1)/2;
@@ -210,7 +210,7 @@ Real RBEvaluation::rb_solve(unsigned int N)
 {
   LOG_SCOPE("rb_solve()", "RBEvaluation");
 
-  if(N > get_n_basis_functions())
+  if (N > get_n_basis_functions())
     libmesh_error_msg("ERROR: N cannot be larger than the number of basis functions in rb_solve");
 
   const RBParameters & mu = get_parameters();
@@ -243,7 +243,7 @@ Real RBEvaluation::rb_solve(unsigned int N)
     }
 
   // Solve the linear system
-  if(N > 0)
+  if (N > 0)
     {
       RB_system_matrix.lu_solve(RB_rhs, RB_solution);
     }
@@ -260,7 +260,7 @@ Real RBEvaluation::rb_solve(unsigned int N)
         }
     }
 
-  if(evaluate_RB_error_bound) // Calculate the error bounds
+  if (evaluate_RB_error_bound) // Calculate the error bounds
     {
       // Evaluate the dual norm of the residual for RB_solution_vector
       Real epsilon_N = compute_residual_dual_norm(N);
@@ -360,7 +360,7 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
         }
     }
 
-  if(libmesh_real(residual_norm_sq) < 0.)
+  if (libmesh_real(residual_norm_sq) < 0.)
     {
       //    libMesh::out << "Warning: Square of residual norm is negative "
       //                 << "in RBSystem::compute_residual_dual_norm()" << std::endl;
@@ -434,12 +434,12 @@ void RBEvaluation::legacy_write_offline_data_to_files(const std::string & direct
   // The suffix to use for all the files that are written out
   const std::string suffix = write_binary_data ? ".xdr" : ".dat";
 
-  if(this->processor_id() == 0)
+  if (this->processor_id() == 0)
     {
 
       // Make a directory to store all the data files
       mkdir(directory_name.c_str(), 0777);
-      //    if( mkdir(directory_name.c_str(), 0777) == -1)
+      //    if (mkdir(directory_name.c_str(), 0777) == -1)
       //    {
       //      libMesh::out << "In RBEvaluation::write_offline_data_to_files, directory "
       //                   << directory_name << " already exists, overwriting contents." << std::endl;
@@ -531,7 +531,7 @@ void RBEvaluation::legacy_write_offline_data_to_files(const std::string & direct
             }
         }
 
-      if(compute_RB_inner_product)
+      if (compute_RB_inner_product)
         {
           // Next write out the inner product matrix
           file_name.str("");
@@ -722,7 +722,7 @@ void RBEvaluation::legacy_read_offline_data_from_files(const std::string & direc
         }
     }
 
-  if(compute_RB_inner_product)
+  if (compute_RB_inner_product)
     {
       // Next read in the inner product matrix
       file_name.str("");
@@ -795,7 +795,7 @@ void RBEvaluation::legacy_read_offline_data_from_files(const std::string & direc
     }
 
 
-  if(read_error_bound_data)
+  if (read_error_bound_data)
     {
       // Next read in Fq representor norm data
       file_name.str("");
@@ -881,7 +881,7 @@ void RBEvaluation::legacy_read_offline_data_from_files(const std::string & direc
   set_n_basis_functions(n_bfs);
   for (std::size_t i=0; i<basis_functions.size(); i++)
     {
-      if(basis_functions[i])
+      if (basis_functions[i])
         {
           basis_functions[i]->clear();
           delete basis_functions[i];
@@ -917,7 +917,7 @@ void RBEvaluation::write_out_vectors(System & sys,
 {
   LOG_SCOPE("write_out_vectors()", "RBEvaluation");
 
-  if(this->processor_id() == 0)
+  if (this->processor_id() == 0)
     {
       // Make a directory to store all the data files
       mkdir(directory_name.c_str(), 0777);

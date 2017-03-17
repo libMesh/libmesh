@@ -306,7 +306,7 @@ void load_rb_evaluation_data(RBEvaluation & rb_evaluation,
   unsigned int n_F_terms = rb_theta_expansion.get_n_F_terms();
   unsigned int n_A_terms = rb_theta_expansion.get_n_A_terms();
 
-  if(read_error_bound_data)
+  if (read_error_bound_data)
     {
 
       // Fq representor inner-product data
@@ -453,7 +453,7 @@ void load_rb_evaluation_data(RBEvaluation & rb_evaluation,
   }
 
   // Inner-product matrix
-  if(rb_evaluation.compute_RB_inner_product)
+  if (rb_evaluation.compute_RB_inner_product)
     {
       auto rb_inner_product_matrix_list =
         rb_evaluation_reader.getRbInnerProductMatrix();
@@ -564,7 +564,7 @@ void load_transient_rb_evaluation_data(TransientRBEvaluation & trans_rb_eval,
   }
 
 
-  if(read_error_bound_data)
+  if (read_error_bound_data)
     {
       // Fq_Mq data
       {

@@ -172,7 +172,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 #endif
 
         //Hold onto it
-        if(!skip_find_neighbors)
+        if (!skip_find_neighbors)
           {
             this->add_elem(el);
           }
@@ -183,12 +183,12 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
           }
 
         // Add the link between the original element and this copy to the map
-        if(skip_find_neighbors)
+        if (skip_find_neighbors)
           old_elems_to_new_elems[old] = el;
       }
 
     // Loop (again) over the elements to fill in the neighbors
-    if(skip_find_neighbors)
+    if (skip_find_neighbors)
       {
         it = other_mesh.elements_begin();
         for (; it != end; ++it)
@@ -317,9 +317,9 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                         // ns != ms, and we also check level() to
                         // avoid setting our neighbor pointer to
                         // any of our neighbor's descendants
-                        if( (*my_side == *their_side) &&
+                        if ((*my_side == *their_side) &&
                             (element->level() == neighbor->level()) &&
-                            ((element->dim() != 1) || (ns != ms)) )
+                            ((element->dim() != 1) || (ns != ms)))
                           {
                             // So share a side.  Is this a mixed pair
                             // of subactive and active/ancestor

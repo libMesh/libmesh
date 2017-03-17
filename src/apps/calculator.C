@@ -65,7 +65,7 @@ T assert_argument (GetPot & cl,
                    const char * progname,
                    const T & defaultarg)
 {
-  if(!cl.search(argname))
+  if (!cl.search(argname))
     {
       libMesh::err << ("No " + argname + " argument found!") << std::endl;
       usage_error(progname);

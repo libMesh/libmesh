@@ -33,7 +33,7 @@ RBEIMTheta::RBEIMTheta(RBEIMEvaluation & rb_eim_eval_in, unsigned int index_in)
 
 Number RBEIMTheta::evaluate(const RBParameters & mu)
 {
-  if(mu.n_parameters() > rb_eim_eval.get_n_params())
+  if (mu.n_parameters() > rb_eim_eval.get_n_params())
     {
       // In this case the parameters related to the EIM are a subset of
       // the parameters from the associated RB problem, hence we need to "pull out"

@@ -507,7 +507,7 @@ dof_id_type MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase & me
   const MeshBase::const_element_iterator end = mesh.type_elements_end(type);
 
   for(; el!=end; ++el)
-    if( ((*el)->level() == level) && !(*el)->subactive())
+    if (((*el)->level() == level) && !(*el)->subactive())
       cnt++;
 
   return cnt;
@@ -620,7 +620,7 @@ void MeshTools::get_not_subactive_node_ids(const MeshBase & mesh,
   for( ; el != end_el; ++el)
     {
       const Elem * elem = (*el);
-      if(!elem->subactive())
+      if (!elem->subactive())
         for (unsigned int n=0; n<elem->n_nodes(); ++n)
           not_subactive_node_ids.insert(elem->node_id(n));
     }
@@ -800,7 +800,7 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
               // Find the edge the node is on
               bool found_edge = false;
               for (; current_edge<elem->n_edges(); ++current_edge)
-                if ( elem->is_node_on_edge(local_node_number, current_edge) )
+                if (elem->is_node_on_edge(local_node_number, current_edge))
                   {
                     found_edge = true;
                     break;
@@ -855,7 +855,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
 
       //Right now this only works for quad4's
       //libmesh_assert_equal_to (elem->type(), QUAD4);
-      if(elem->type() == QUAD4)
+      if (elem->type() == QUAD4)
         {
           //Loop over the sides looking for sides that have hanging nodes
           //This code is inspired by compute_proj_constraints()
@@ -905,13 +905,13 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
                       //FIXME could be streamlined a bit
                       for(unsigned int n=0;n<neigh->n_sides();n++)
                         {
-                          if(neigh->node_id(n) == node1)
+                          if (neigh->node_id(n) == node1)
                             found_in_neighbor=true;
                         }
 
                       dof_id_type hanging_node=0;
 
-                      if(!found_in_neighbor)
+                      if (!found_in_neighbor)
                         hanging_node=node1;
                       else //If it wasn't node1 then it must be node2!
                         hanging_node=node2;
@@ -931,7 +931,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
                       local_node2--;
 
                       //Save them if we haven't already found the parents for this one
-                      if(hanging_nodes[hanging_node].size()<2)
+                      if (hanging_nodes[hanging_node].size()<2)
                         {
                           hanging_nodes[hanging_node].push_back(neigh->node_id(local_node1));
                           hanging_nodes[hanging_node].push_back(neigh->node_id(local_node2));
