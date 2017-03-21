@@ -226,8 +226,8 @@ am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/metaphysicl.pc.in \
 	$(top_srcdir)/doxygen/txt_common/about_vpath.page.in \
 	$(top_srcdir)/src/utilities/include/metaphysicl/metaphysicl_version.h.in \
 	AUTHORS COPYING build-aux/compile build-aux/config.guess \
-	build-aux/config.sub build-aux/install-sh build-aux/ltmain.sh \
-	build-aux/missing
+	build-aux/config.sub build-aux/depcomp build-aux/install-sh \
+	build-aux/ltmain.sh build-aux/missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -468,7 +468,6 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@

@@ -119,6 +119,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/laspack.m4 $(top_srcdir)/m4/libhilbert.m4 \
 	$(top_srcdir)/m4/libmesh_compiler_features.m4 \
 	$(top_srcdir)/m4/libmesh_core_features.m4 \
+	$(top_srcdir)/m4/libmesh_metaphysicl.m4 \
 	$(top_srcdir)/m4/libmesh_method.m4 \
 	$(top_srcdir)/m4/libmesh_optional_packages.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/locale.m4 \
@@ -658,6 +659,7 @@ LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
+METAPHYSICL_INCLUDE = @METAPHYSICL_INCLUDE@
 METHOD = @METHOD@
 METHODS = @METHODS@
 METIS_INCLUDE = @METIS_INCLUDE@

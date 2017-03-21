@@ -229,6 +229,11 @@ if LIBMESH_ENABLE_NANOFLANN
   # header-only library - no library dependencies
 endif
 
+if LIBMESH_ENABLE_METAPHYSICL
+  SUBDIRS += metaphysicl/0.2.0
+  # header-only library for the parts we use - no library dependencies
+endif
+
 
 
 ######################################################################

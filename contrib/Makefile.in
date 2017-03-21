@@ -220,11 +220,12 @@ target_triplet = @target@
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_122 = fparser/libprof.la
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_123 = fparser/liboprof.la
 @LIBMESH_ENABLE_NANOFLANN_TRUE@am__append_124 = nanoflann
-@LIBMESH_OPT_MODE_TRUE@am__append_125 = libcontrib_opt.la
-@LIBMESH_DBG_MODE_TRUE@am__append_126 = libcontrib_dbg.la
-@LIBMESH_DEVEL_MODE_TRUE@am__append_127 = libcontrib_devel.la
-@LIBMESH_PROF_MODE_TRUE@am__append_128 = libcontrib_prof.la
-@LIBMESH_OPROF_MODE_TRUE@am__append_129 = libcontrib_oprof.la
+@LIBMESH_ENABLE_METAPHYSICL_TRUE@am__append_125 = metaphysicl/0.2.0
+@LIBMESH_OPT_MODE_TRUE@am__append_126 = libcontrib_opt.la
+@LIBMESH_DBG_MODE_TRUE@am__append_127 = libcontrib_dbg.la
+@LIBMESH_DEVEL_MODE_TRUE@am__append_128 = libcontrib_devel.la
+@LIBMESH_PROF_MODE_TRUE@am__append_129 = libcontrib_prof.la
+@LIBMESH_OPROF_MODE_TRUE@am__append_130 = libcontrib_oprof.la
 subdir = contrib
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -250,6 +251,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/laspack.m4 $(top_srcdir)/m4/libhilbert.m4 \
 	$(top_srcdir)/m4/libmesh_compiler_features.m4 \
 	$(top_srcdir)/m4/libmesh_core_features.m4 \
+	$(top_srcdir)/m4/libmesh_metaphysicl.m4 \
 	$(top_srcdir)/m4/libmesh_method.m4 \
 	$(top_srcdir)/m4/libmesh_optional_packages.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/locale.m4 \
@@ -420,7 +422,8 @@ DIST_SUBDIRS = capnproto unique_ptr boost/include eigen/eigen gmv \
 	gzstream netcdf/v3 netcdf/v4 exodusii/v5.09 \
 	exodusii/v5.22/exodus nemesis/v3.09 nemesis/v5.22/nemesis \
 	tecplot/tecio tecplot/binary triangle tetgen qhull/qhull \
-	libHilbert laspack metis parmetis sfcurves fparser nanoflann
+	libHilbert laspack metis parmetis sfcurves fparser nanoflann \
+	metaphysicl/0.2.0
 am__DIST_COMMON = $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp README
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -572,6 +575,7 @@ LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
+METAPHYSICL_INCLUDE = @METAPHYSICL_INCLUDE@
 METHOD = @METHOD@
 METHODS = @METHODS@
 METIS_INCLUDE = @METIS_INCLUDE@
@@ -760,7 +764,8 @@ SUBDIRS = $(am__append_1) $(am__append_7) $(am__append_8) \
 	$(am__append_58) $(am__append_64) $(am__append_70) \
 	$(am__append_76) $(am__append_82) $(am__append_88) \
 	$(am__append_94) $(am__append_100) $(am__append_106) \
-	$(am__append_112) $(am__append_118) $(am__append_124)
+	$(am__append_112) $(am__append_118) $(am__append_124) \
+	$(am__append_125)
 opt_libs = $(am__append_2) $(am__append_11) $(am__append_17) \
 	$(am__append_23) $(am__append_29) $(am__append_35) \
 	$(am__append_41) $(am__append_47) $(am__append_53) \
@@ -805,8 +810,8 @@ AM_LDFLAGS = $(libmesh_LDFLAGS)
 #
 # Building the flavors
 #
-noinst_LTLIBRARIES = $(am__append_125) $(am__append_126) \
-	$(am__append_127) $(am__append_128) $(am__append_129)
+noinst_LTLIBRARIES = $(am__append_126) $(am__append_127) \
+	$(am__append_128) $(am__append_129) $(am__append_130)
 @LIBMESH_OPT_MODE_TRUE@libcontrib_opt_la_SOURCES = cppsource.C
 @LIBMESH_OPT_MODE_TRUE@libcontrib_opt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@libcontrib_opt_la_CXXFLAGS = $(CXXFLAGS_OPT)
@@ -1252,6 +1257,7 @@ uninstall-am:
 @LIBMESH_ENABLE_FPARSER_TRUE@  # ATM always compile fparser with optimized flags,
 @LIBMESH_ENABLE_FPARSER_TRUE@  # and reuse in all methods
 @LIBMESH_ENABLE_NANOFLANN_TRUE@  # header-only library - no library dependencies
+@LIBMESH_ENABLE_METAPHYSICL_TRUE@  # header-only library for the parts we use - no library dependencies
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
