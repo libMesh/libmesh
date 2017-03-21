@@ -212,6 +212,7 @@ BUILT_SOURCES = \
         coupling_matrix.h \
         dense_matrix.h \
         dense_matrix_base.h \
+        dense_matrix_impl.h \
         dense_submatrix.h \
         dense_subvector.h \
         dense_vector.h \
@@ -1150,6 +1151,9 @@ dense_matrix.h: $(top_srcdir)/include/numerics/dense_matrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dense_matrix_base.h: $(top_srcdir)/include/numerics/dense_matrix_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+dense_matrix_impl.h: $(top_srcdir)/include/numerics/dense_matrix_impl.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dense_submatrix.h: $(top_srcdir)/include/numerics/dense_submatrix.h
