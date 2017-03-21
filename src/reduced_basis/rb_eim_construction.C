@@ -217,6 +217,12 @@ Real RBEIMConstruction::train_reduced_basis(const bool resize_rb_eval_data)
 Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
                                                  Point p)
 {
+  // Set default values to be an empty vector so that we can use it
+  // below
+  // to check if this processor returned valid data.
+  DenseVector<Number> default_values;
+  _mesh_function->enable_out_of_mesh_mode(default_values);
+
   _mesh_function->set_point_locator_tolerance( get_point_locator_tol() );
 
   DenseVector<Number> values;
