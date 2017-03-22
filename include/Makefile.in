@@ -954,6 +954,7 @@ include_HEADERS = \
         systems/fem_context.h \
         systems/fem_system.h \
         systems/frequency_system.h \
+        systems/generic_projector.h \
         systems/implicit_system.h \
         systems/linear_implicit_system.h \
         systems/newmark_system.h \
