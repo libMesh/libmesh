@@ -379,6 +379,7 @@ BUILT_SOURCES = \
         fem_context.h \
         fem_system.h \
         frequency_system.h \
+        generic_projector.h \
         implicit_system.h \
         linear_implicit_system.h \
         newmark_system.h \
@@ -1652,6 +1653,9 @@ fem_system.h: $(top_srcdir)/include/systems/fem_system.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 frequency_system.h: $(top_srcdir)/include/systems/frequency_system.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+generic_projector.h: $(top_srcdir)/include/systems/generic_projector.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 implicit_system.h: $(top_srcdir)/include/systems/implicit_system.h
