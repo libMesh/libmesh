@@ -183,7 +183,7 @@ public:
   { libmesh_error(); }
 
 private:
-  UniquePtr<FEMFunctionBase<Output> > _f;
+  UniquePtr<FEMFunctionBase<Output>> _f;
 };
 
 
@@ -225,7 +225,7 @@ public:
     old_context.set_custom_solution(&old_solution);
   }
 
-  static void get_shape_outputs(FEBase& fe);
+  static void get_shape_outputs(FEBase & fe);
 
   // Integrating on new mesh elements, we won't yet have an up to date
   // current_local_solution.
@@ -346,10 +346,10 @@ protected:
             // that boundary.
             const Real master_tol = out_of_elem_tol / elem.hmax() * 2;
 
-            for (unsigned int c=0; c != elem.n_children(); ++c)
-              if (elem.child_ptr(c)->close_to_point(p, master_tol))
+            for (auto & child : elem.child_ref_range())
+              if (child.close_to_point(p, master_tol))
                 {
-                  old_context.pre_fe_reinit(sys, elem.child_ptr(c));
+                  old_context.pre_fe_reinit(sys, &child);
                   break;
                 }
 
@@ -377,10 +377,10 @@ protected:
             libmesh_assert_equal_to
               (elem.refinement_flag(), Elem::JUST_COARSENED);
 
-            for (unsigned int c=0; c != elem.n_children(); ++c)
-              if (elem.child_ptr(c)->close_to_point(p, master_tol))
+            for (auto & child : elem.child_ref_range())
+              if (child.close_to_point(p, master_tol))
                 {
-                  old_context.pre_fe_reinit(sys, elem.child_ptr(c));
+                  old_context.pre_fe_reinit(sys, &child);
                   break;
                 }
 
@@ -404,7 +404,7 @@ private:
 
 template<>
 inline void
-OldSolutionValue<Number, &FEMContext::point_value>::get_shape_outputs(FEBase& fe)
+OldSolutionValue<Number, &FEMContext::point_value>::get_shape_outputs(FEBase & fe)
 {
   fe.get_phi();
 }
@@ -412,7 +412,7 @@ OldSolutionValue<Number, &FEMContext::point_value>::get_shape_outputs(FEBase& fe
 
 template<>
 inline void
-OldSolutionValue<Gradient, &FEMContext::point_gradient>::get_shape_outputs(FEBase& fe)
+OldSolutionValue<Gradient, &FEMContext::point_gradient>::get_shape_outputs(FEBase & fe)
 {
   fe.get_dphi();
 }

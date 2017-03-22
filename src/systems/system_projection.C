@@ -24,16 +24,15 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
-#include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
-#include "libmesh/equation_systems.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/generic_projector.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/quadrature_gauss.h"
+#include "libmesh/quadrature.h"
 #include "libmesh/system.h"
 #include "libmesh/threads.h"
 #include "libmesh/wrapped_function.h"
@@ -45,439 +44,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // Helper class definitions
 
-/**
- * This class implements the loops to other projection operations.
- * This may be executed in parallel on multiple threads.
- */
-template <typename FFunctor, typename GFunctor,
-          typename FValue, typename ProjectionAction>
-class GenericProjector
-{
-private:
-  const System & system;
-
-  // For TBB compatibility and thread safety we'll copy these in
-  // operator()
-  const FFunctor & master_f;
-  const GFunctor * master_g;  // Needed for C1 type elements only
-  bool g_was_copied;
-  const ProjectionAction & master_action;
-  const std::vector<unsigned int> & variables;
-
-public:
-  GenericProjector (const System & system_in,
-                    const FFunctor & f_in,
-                    const GFunctor * g_in,
-                    const ProjectionAction & act_in,
-                    const std::vector<unsigned int> & variables_in) :
-    system(system_in),
-    master_f(f_in),
-    master_g(g_in),
-    g_was_copied(false),
-    master_action(act_in),
-    variables(variables_in)
-  {}
-
-  GenericProjector (const GenericProjector & in) :
-    system(in.system),
-    master_f(in.master_f),
-    master_g(in.master_g ? new GFunctor(*in.master_g) : libmesh_nullptr),
-    g_was_copied(in.master_g),
-    master_action(in.master_action),
-    variables(in.variables)
-  {}
-
-  ~GenericProjector()
-  {
-    if (g_was_copied)
-      delete master_g;
-  }
-
-  void operator() (const ConstElemRange & range) const;
-};
-
-
-/**
- * This action class can be used with a GenericProjector to set
- * projection values (which must be of type Val) as coefficients of
- * the given NumericVector.
- */
-
-template <typename Val>
-class VectorSetAction
-{
-private:
-  NumericVector<Val> & target_vector;
-
-public:
-  VectorSetAction(NumericVector<Val> & target_vec) :
-    target_vector(target_vec) {}
-
-  void insert(const FEMContext & c,
-              unsigned int var_num,
-              const DenseVector<Val> & Ue)
-  {
-    const numeric_index_type
-      first = target_vector.first_local_index(),
-      last  = target_vector.last_local_index();
-
-    const std::vector<dof_id_type> & dof_indices =
-      c.get_dof_indices(var_num);
-
-    unsigned int size = Ue.size();
-
-    libmesh_assert_equal_to(size, dof_indices.size());
-
-    // Lock the new vector since it is shared among threads.
-    {
-      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-
-      for (unsigned int i = 0; i != size; ++i)
-        if ((dof_indices[i] >= first) && (dof_indices[i] <  last))
-          target_vector.set(dof_indices[i], Ue(i));
-    }
-  }
-};
-
-
-template <typename Output>
-class FEMFunctionWrapper
-{
-public:
-  FEMFunctionWrapper(const FEMFunctionBase<Output> & f) : _f(f.clone()) {}
-
-  FEMFunctionWrapper(const FEMFunctionWrapper<Output> & fw) :
-    _f(fw._f->clone()) {}
-
-  void init_context (FEMContext & c) { _f->init_context(c); }
-
-  Output eval_at_node (const FEMContext & c,
-                       unsigned int i,
-                       unsigned int /*elem_dim*/,
-                       const Node & n,
-                       const Real time)
-  { return _f->component(c, i, n, time); }
-
-  Output eval_at_point (const FEMContext & c,
-                        unsigned int i,
-                        const Point & n,
-                        const Real time)
-  { return _f->component(c, i, n, time); }
-
-  bool is_grid_projection() { return false; }
-
-  void eval_old_dofs (const FEMContext & /* c */,
-                      unsigned int /* var_component */,
-                      std::vector<Output> /* values */)
-  { libmesh_error(); }
-
-private:
-  UniquePtr<FEMFunctionBase<Output>> _f;
-};
-
-
 #ifdef LIBMESH_ENABLE_AMR
-template <typename Output,
-          void (FEMContext::*point_output) (unsigned int,
-                                            const Point &,
-                                            Output &,
-                                            const Real) const>
-class OldSolutionValue
-{
-public:
-  OldSolutionValue(const libMesh::System & sys_in,
-                   const NumericVector<Number> & old_sol) :
-    last_elem(libmesh_nullptr),
-    sys(sys_in),
-    old_context(sys_in),
-    old_solution(old_sol)
-  {
-    old_context.set_algebraic_type(FEMContext::OLD);
-    old_context.set_custom_solution(&old_solution);
-  }
-
-  OldSolutionValue(const OldSolutionValue & in) :
-    last_elem(libmesh_nullptr),
-    sys(in.sys),
-    old_context(sys),
-    old_solution(in.old_solution)
-  {
-    old_context.set_algebraic_type(FEMContext::OLD);
-    old_context.set_custom_solution(&old_solution);
-  }
-
-  static void get_shape_outputs(FEBase & fe);
-
-  // Integrating on new mesh elements, we won't yet have an up to date
-  // current_local_solution.
-  void init_context (FEMContext & c)
-  {
-    c.set_algebraic_type(FEMContext::DOFS_ONLY);
-
-    // Loop over variables, to prerequest
-    for (unsigned int var=0; var!=sys.n_vars(); ++var)
-      {
-        FEBase * fe = libmesh_nullptr;
-        const std::set<unsigned char> & elem_dims =
-          old_context.elem_dimensions();
-
-        for (std::set<unsigned char>::const_iterator dim_it =
-               elem_dims.begin(); dim_it != elem_dims.end(); ++dim_it)
-          {
-            const unsigned char dim = *dim_it;
-            old_context.get_element_fe( var, fe, dim );
-            get_shape_outputs(*fe);
-          }
-      }
-  }
-
-
-
-  Output eval_at_node (const FEMContext & c,
-                       unsigned int i,
-                       unsigned int elem_dim,
-                       const Node & n,
-                       Real /* time */ =0.);
-
-  Output eval_at_point(const FEMContext & c,
-                       unsigned int i,
-                       const Point & p,
-                       Real /* time */ =0.)
-  {
-    LOG_SCOPE ("eval_at_point()", "OldSolutionValue");
-
-    if (!this->check_old_context(c, p))
-      return 0;
-
-    Output n;
-    (old_context.*point_output)(i, p, n, out_of_elem_tol);
-    return n;
-  }
-
-  bool is_grid_projection() { return true; }
-
-  void eval_old_dofs (const FEMContext & c,
-                      unsigned int var,
-                      std::vector<Output> & values)
-  {
-    LOG_SCOPE ("eval_old_dofs()", "OldSolutionValue");
-
-    this->check_old_context(c);
-
-    const std::vector<dof_id_type> & old_dof_indices =
-      old_context.get_dof_indices(var);
-
-    libmesh_assert_equal_to (old_dof_indices.size(), values.size());
-
-    old_solution.get(old_dof_indices, values);
-  }
-
-protected:
-  void check_old_context (const FEMContext & c)
-  {
-    LOG_SCOPE ("check_old_context(c)", "OldSolutionValue");
-    const Elem & elem = c.get_elem();
-    if (last_elem != &elem)
-      {
-        if (elem.refinement_flag() == Elem::JUST_REFINED)
-          {
-            old_context.pre_fe_reinit(sys, elem.parent());
-          }
-        else if (elem.refinement_flag() == Elem::JUST_COARSENED)
-          {
-            libmesh_error();
-          }
-        else
-          {
-            if (!elem.old_dof_object)
-              {
-                libmesh_error();
-              }
-
-            old_context.pre_fe_reinit(sys, &elem);
-          }
-
-        last_elem = &elem;
-      }
-    else
-      {
-        libmesh_assert(old_context.has_elem());
-      }
-  }
-
-
-  bool check_old_context (const FEMContext & c, const Point & p)
-  {
-    LOG_SCOPE ("check_old_context(c,p)", "OldSolutionValue");
-    const Elem & elem = c.get_elem();
-    if (last_elem != &elem)
-      {
-        if (elem.refinement_flag() == Elem::JUST_REFINED)
-          {
-            old_context.pre_fe_reinit(sys, elem.parent());
-          }
-        else if (elem.refinement_flag() == Elem::JUST_COARSENED)
-          {
-            // Find the child with this point.  Use out_of_elem_tol
-            // (in physical space, which may correspond to a large
-            // tolerance in master space!) to allow for out-of-element
-            // finite differencing of mixed gradient terms.  Pray we
-            // have no quadrature locations which are within 1e-5 of
-            // the element subdivision boundary but are not exactly on
-            // that boundary.
-            const Real master_tol = out_of_elem_tol / elem.hmax() * 2;
-
-            for (auto & child : elem.child_ref_range())
-              if (child.close_to_point(p, master_tol))
-                {
-                  old_context.pre_fe_reinit(sys, &child);
-                  break;
-                }
-
-            libmesh_assert
-              (old_context.get_elem().close_to_point(p, master_tol));
-          }
-        else
-          {
-            if (!elem.old_dof_object)
-              return false;
-
-            old_context.pre_fe_reinit(sys, &elem);
-          }
-
-        last_elem = &elem;
-      }
-    else
-      {
-        libmesh_assert(old_context.has_elem());
-
-        const Real master_tol = out_of_elem_tol / elem.hmax() * 2;
-
-        if (!old_context.get_elem().close_to_point(p, master_tol))
-          {
-            libmesh_assert_equal_to
-              (elem.refinement_flag(), Elem::JUST_COARSENED);
-
-            for (auto & child : elem.child_ref_range())
-              if (child.close_to_point(p, master_tol))
-                {
-                  old_context.pre_fe_reinit(sys, &child);
-                  break;
-                }
-
-            libmesh_assert
-              (old_context.get_elem().close_to_point(p, master_tol));
-          }
-      }
-
-    return true;
-  }
-
-private:
-  const Elem * last_elem;
-  const System & sys;
-  FEMContext old_context;
-  const NumericVector<Number> & old_solution;
-
-  static const Real out_of_elem_tol;
-};
-
-
-template<>
-inline void
-OldSolutionValue<Number, &FEMContext::point_value>::get_shape_outputs(FEBase & fe)
-{
-  fe.get_phi();
-}
-
-
-template<>
-inline void
-OldSolutionValue<Gradient, &FEMContext::point_gradient>::get_shape_outputs(FEBase & fe)
-{
-  fe.get_dphi();
-}
-
-
-template<>
-inline
-Number
-OldSolutionValue<Number, &FEMContext::point_value>::
-eval_at_node(const FEMContext & c,
-             unsigned int i,
-             unsigned int /* elem_dim */,
-             const Node & n,
-             Real /* time */)
-{
-  LOG_SCOPE ("Number eval_at_node()", "OldSolutionValue");
-
-  // Optimize for the common case, where this node was part of the
-  // old solution.
-  //
-  // Be sure to handle cases where the variable wasn't defined on
-  // this node (due to changing subdomain support) or where the
-  // variable has no components on this node (due to Elem order
-  // exceeding FE order)
-  if (n.old_dof_object &&
-      n.old_dof_object->n_vars(sys.number()) &&
-      n.old_dof_object->n_comp(sys.number(), i))
-    {
-      const dof_id_type old_id =
-        n.old_dof_object->dof_number(sys.number(), i, 0);
-      return old_solution(old_id);
-    }
-
-  return this->eval_at_point(c, i, n, 0);
-}
-
-
-
-template<>
-inline
-Gradient
-OldSolutionValue<Gradient, &FEMContext::point_gradient>::
-eval_at_node(const FEMContext & c,
-             unsigned int i,
-             unsigned int elem_dim,
-             const Node & n,
-             Real /* time */)
-{
-  LOG_SCOPE ("Gradient eval_at_node()", "OldSolutionValue");
-
-  // Optimize for the common case, where this node was part of the
-  // old solution.
-  //
-  // Be sure to handle cases where the variable wasn't defined on
-  // this node (due to changing subdomain support) or where the
-  // variable has no components on this node (due to Elem order
-  // exceeding FE order)
-  if (n.old_dof_object &&
-      n.old_dof_object->n_vars(sys.number()) &&
-      n.old_dof_object->n_comp(sys.number(), i))
-    {
-      Gradient g;
-      for (unsigned int d = 0; d != elem_dim; ++d)
-        {
-          const dof_id_type old_id =
-            n.old_dof_object->dof_number(sys.number(), i, d+1);
-          g(d) = old_solution(old_id);
-        }
-      return g;
-    }
-
-  return this->eval_at_point(c, i, n, 0);
-}
-
-
-
-
-
-template <>
-const Real OldSolutionValue<Number, &FEMContext::point_value>::out_of_elem_tol = 10*TOLERANCE;
-
-template <>
-const Real OldSolutionValue <Gradient, &FEMContext::point_gradient>::out_of_elem_tol = 10*TOLERANCE;
-
 
 /**
  * This class builds the send_list of old dof indices
@@ -488,6 +55,7 @@ const Real OldSolutionValue <Gradient, &FEMContext::point_gradient>::out_of_elem
  * The \p unique() method can be used to sort and
  * create a unique list.
  */
+
 class BuildProjectionList
 {
 private:
@@ -1071,6 +639,7 @@ void System::boundary_project_vector (const std::set<boundary_id_type> & b,
 
 
 
+<<<<<<< HEAD
 template <typename FFunctor, typename GFunctor,
           typename FValue, typename ProjectionAction>
 void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
@@ -2000,6 +1569,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
 
 
+=======
+>>>>>>> Use generic_projector.h in system_projection.C
 #ifdef LIBMESH_ENABLE_AMR
 void BuildProjectionList::unique()
 {
