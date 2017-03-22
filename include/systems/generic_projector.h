@@ -188,8 +188,10 @@ private:
 
 
 /**
- * The OldSolutionValue input functor class can be used to read 
- * GenericProjector to read values from an FEMFunction.
+ * The OldSolutionBase input functor abstract base class is the root
+ * of the OldSolutionValue and OldSolutionCoefs classes which allow a
+ * GenericProjector to read old solution values or solution
+ * interpolation coefficients for a just-refined-and-coarsened mesh.
  *
  * \author Roy H. Stogner
  * \date 2016
@@ -201,28 +203,21 @@ template <typename Output,
                                             const Point &,
                                             Output &,
                                             const Real) const>
-class OldSolutionValue
+class OldSolutionBase
 {
 public:
-  OldSolutionValue(const libMesh::System & sys_in,
-                   const NumericVector<Number> & old_sol) :
+  OldSolutionBase(const libMesh::System & sys_in) :
     last_elem(libmesh_nullptr),
     sys(sys_in),
-    old_context(sys_in),
-    old_solution(old_sol)
+    old_context(sys_in)
   {
-    old_context.set_algebraic_type(FEMContext::OLD);
-    old_context.set_custom_solution(&old_solution);
   }
 
-  OldSolutionValue(const OldSolutionValue & in) :
+  OldSolutionBase(const OldSolutionBase & in) :
     last_elem(libmesh_nullptr),
     sys(in.sys),
-    old_context(sys),
-    old_solution(in.old_solution)
+    old_context(sys)
   {
-    old_context.set_algebraic_type(FEMContext::OLD);
-    old_context.set_custom_solution(&old_solution);
   }
 
   static void get_shape_outputs(FEBase & fe);
@@ -250,51 +245,12 @@ public:
       }
   }
 
-
-
-  Output eval_at_node (const FEMContext & c,
-                       unsigned int i,
-                       unsigned int elem_dim,
-                       const Node & n,
-                       Real /* time */ =0.);
-
-  Output eval_at_point(const FEMContext & c,
-                       unsigned int i,
-                       const Point & p,
-                       Real /* time */ =0.)
-  {
-    LOG_SCOPE ("eval_at_point()", "OldSolutionValue");
-
-    if (!this->check_old_context(c, p))
-      return 0;
-
-    Output n;
-    (old_context.*point_output)(i, p, n, out_of_elem_tol);
-    return n;
-  }
-
   bool is_grid_projection() { return true; }
-
-  void eval_old_dofs (const FEMContext & c,
-                      unsigned int var,
-                      std::vector<Output> & values)
-  {
-    LOG_SCOPE ("eval_old_dofs()", "OldSolutionValue");
-
-    this->check_old_context(c);
-
-    const std::vector<dof_id_type> & old_dof_indices =
-      old_context.get_dof_indices(var);
-
-    libmesh_assert_equal_to (old_dof_indices.size(), values.size());
-
-    old_solution.get(old_dof_indices, values);
-  }
 
 protected:
   void check_old_context (const FEMContext & c)
   {
-    LOG_SCOPE ("check_old_context(c)", "OldSolutionValue");
+    LOG_SCOPE ("check_old_context(c)", "OldSolutionBase");
     const Elem & elem = c.get_elem();
     if (last_elem != &elem)
       {
@@ -327,7 +283,7 @@ protected:
 
   bool check_old_context (const FEMContext & c, const Point & p)
   {
-    LOG_SCOPE ("check_old_context(c,p)", "OldSolutionValue");
+    LOG_SCOPE ("check_old_context(c,p)", "OldSolutionBase");
     const Elem & elem = c.get_elem();
     if (last_elem != &elem)
       {
@@ -392,19 +348,94 @@ protected:
     return true;
   }
 
-private:
+protected:
   const Elem * last_elem;
   const System & sys;
   FEMContext old_context;
-  const NumericVector<Number> & old_solution;
 
   static const Real out_of_elem_tol;
 };
 
 
+/**
+ * The OldSolutionValue input functor class can be used with
+ * GenericProjector to read values from a solution on a
+ * just-refined-and-coarsened mesh.
+ *
+ * \author Roy H. Stogner
+ * \date 2016
+ */
+template <typename Output,
+          void (FEMContext::*point_output) (unsigned int,
+                                            const Point &,
+                                            Output &,
+                                            const Real) const>
+class OldSolutionValue : public OldSolutionBase<Output, point_output>
+{
+public:
+  OldSolutionValue(const libMesh::System & sys_in,
+                   const NumericVector<Number> & old_sol) :
+    OldSolutionBase<Output, point_output>(sys_in),
+    old_solution(old_sol)
+  {
+    this->old_context.set_algebraic_type(FEMContext::OLD);
+    this->old_context.set_custom_solution(&old_solution);
+  }
+
+  OldSolutionValue(const OldSolutionValue & in) :
+    OldSolutionBase<Output, point_output>(in.sys),
+    old_solution(in.old_solution)
+  {
+    this->old_context.set_algebraic_type(FEMContext::OLD);
+    this->old_context.set_custom_solution(&old_solution);
+  }
+
+
+  Output eval_at_node (const FEMContext & c,
+                       unsigned int i,
+                       unsigned int elem_dim,
+                       const Node & n,
+                       Real /* time */ =0.);
+
+  Output eval_at_point(const FEMContext & c,
+                       unsigned int i,
+                       const Point & p,
+                       Real /* time */ =0.)
+  {
+    LOG_SCOPE ("eval_at_point()", "OldSolutionValue");
+
+    if (!this->check_old_context(c, p))
+      return 0;
+
+    Output n;
+    (this->old_context.*point_output)(i, p, n, this->out_of_elem_tol);
+    return n;
+  }
+
+  void eval_old_dofs (const FEMContext & c,
+                      unsigned int var,
+                      std::vector<Output> & values)
+  {
+    LOG_SCOPE ("eval_old_dofs()", "OldSolutionValue");
+
+    this->check_old_context(c);
+
+    const std::vector<dof_id_type> & old_dof_indices =
+      this->old_context.get_dof_indices(var);
+
+    libmesh_assert_equal_to (old_dof_indices.size(), values.size());
+
+    old_solution.get(old_dof_indices, values);
+  }
+
+private:
+  const NumericVector<Number> & old_solution;
+};
+
+
 template<>
 inline void
-OldSolutionValue<Number, &FEMContext::point_value>::get_shape_outputs(FEBase & fe)
+OldSolutionBase<Number, &FEMContext::point_value>::get_shape_outputs(FEBase & fe)
 {
   fe.get_phi();
 }
@@ -412,7 +443,7 @@ OldSolutionValue<Number, &FEMContext::point_value>::get_shape_outputs(FEBase & f
 
 template<>
 inline void
-OldSolutionValue<Gradient, &FEMContext::point_gradient>::get_shape_outputs(FEBase & fe)
+OldSolutionBase<Gradient, &FEMContext::point_gradient>::get_shape_outputs(FEBase & fe)
 {
   fe.get_dphi();
 }
@@ -492,10 +523,10 @@ eval_at_node(const FEMContext & c,
 
 
 template <>
-const Real OldSolutionValue<Number, &FEMContext::point_value>::out_of_elem_tol = 10*TOLERANCE;
+const Real OldSolutionBase <Number, &FEMContext::point_value>::out_of_elem_tol = 10*TOLERANCE;
 
 template <>
-const Real OldSolutionValue <Gradient, &FEMContext::point_gradient>::out_of_elem_tol = 10*TOLERANCE;
+const Real OldSolutionBase <Gradient, &FEMContext::point_gradient>::out_of_elem_tol = 10*TOLERANCE;
 
 #endif // LIBMESH_ENABLE_AMR
 
@@ -965,13 +996,13 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 #endif
                 edge_fe->get_JxW();
 
-              const std::vector<std::vector<Real> > & phi =
+              const std::vector<std::vector<Real>> & phi =
 #ifdef LIBMESH_ENABLE_AMR
                 (elem->refinement_flag() == Elem::JUST_COARSENED) ?
                 fe->get_phi() :
 #endif
                 edge_fe->get_phi();
-              const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
+              const std::vector<std::vector<RealGradient>> * dphi = libmesh_nullptr;
               if (cont == C_ONE)
                 dphi =
 #ifdef LIBMESH_ENABLE_AMR
@@ -980,7 +1011,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 #endif
                   &(edge_fe->get_dphi());
 
-              for (unsigned char e=0; e != elem->n_edges(); ++e)
+              for (auto e : elem->edge_index_range())
                 {
                   context.edge = e;
 
@@ -999,8 +1030,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                       const std::vector<Point> & child_xyz =
                         fine_fe->get_xyz();
 
-                      for (unsigned int c = 0;
-                           c != elem->n_children(); ++c)
+                      for (unsigned int c = 0, nc = elem->n_children();
+                           c != nc; ++c)
                         {
                           if (!elem->is_child_on_edge(c, e))
                             continue;
@@ -1140,13 +1171,13 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 fe->get_JxW() :
 #endif // LIBMESH_ENABLE_AMR
                 side_fe->get_JxW();
-              const std::vector<std::vector<Real> > & phi =
+              const std::vector<std::vector<Real>> & phi =
 #ifdef LIBMESH_ENABLE_AMR
                 (elem->refinement_flag() == Elem::JUST_COARSENED) ?
                 fe->get_phi() :
 #endif // LIBMESH_ENABLE_AMR
                 side_fe->get_phi();
-              const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
+              const std::vector<std::vector<RealGradient>> * dphi = libmesh_nullptr;
               if (cont == C_ONE)
                 dphi =
 #ifdef LIBMESH_ENABLE_AMR
@@ -1154,7 +1185,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 #endif // LIBMESH_ENABLE_AMR
                   &(side_fe->get_dphi());
 
-              for (unsigned char s=0; s != elem->n_sides(); ++s)
+              for (auto s : elem->side_index_range())
                 {
                   FEInterface::dofs_on_side(elem, dim, base_fe_type,
                                             s, side_dofs);
@@ -1192,8 +1223,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                       const std::vector<Point> & child_xyz =
                         fine_fe->get_xyz();
 
-                      for (unsigned int c = 0;
-                           c != elem->n_children(); ++c)
+                      for (unsigned int c = 0, nc = elem->n_children();
+                           c != nc; ++c)
                         {
                           if (!elem->is_child_on_side(c, s))
                             continue;
@@ -1311,8 +1342,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               const std::vector<Point> & xyz_values = fe->get_xyz();
               const std::vector<Real> & JxW = fe->get_JxW();
 
-              const std::vector<std::vector<Real> > & phi = fe->get_phi();
-              const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
+              const std::vector<std::vector<Real>> & phi = fe->get_phi();
+              const std::vector<std::vector<RealGradient>> * dphi = libmesh_nullptr;
               if (cont == C_ONE)
                 dphi = &(fe->get_dphi());
 
@@ -1331,10 +1362,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   const std::vector<Point> & child_xyz =
                     fine_fe->get_xyz();
 
-                  for (unsigned int c = 0;
-                       c != elem->n_children(); ++c)
+                  for (auto & child : elem->child_ref_range())
                     {
-                      fine_fe->reinit(elem->child_ptr(c));
+                      fine_fe->reinit(&child);
                       fine_points.insert(fine_points.end(),
                                          child_xyz.begin(),
                                          child_xyz.end());
