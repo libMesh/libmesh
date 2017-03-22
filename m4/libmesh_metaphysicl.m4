@@ -11,15 +11,16 @@ AC_DEFUN([CONFIGURE_METAPHYSICL],
                   no)  enablemetaphysicl=no ;;
                   *)  AC_MSG_ERROR(bad value ${enableval} for --enable-metaphysicl) ;;
                 esac],
-                [enablemetaphysicl=$enableoptional])
+                [enablemetaphysicl=$enablenested])
 
   # The MetaPhysicL API is distributed with libmesh, so we don't have
   # to guess where it might be installed.  This needs to be replaced
   # someday with an option to include an external version instead.
   if (test $enablemetaphysicl = yes); then
-     METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/include"
+     METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/0.2.0/include"
      AC_DEFINE(HAVE_METAPHYSICL, 1, [Flag indicating whether the library will be compiled with MetaPhysicL support])
      AC_MSG_RESULT(<<< Configuring library with MetaPhysicL support >>>)
+     AC_CONFIG_SUBDIRS([contrib/metaphysicl/0.2.0])
   else
      METAPHYSICL_INCLUDE=""
      enablemetaphysicl=no
