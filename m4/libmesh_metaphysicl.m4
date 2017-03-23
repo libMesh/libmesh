@@ -17,7 +17,7 @@ AC_DEFUN([CONFIGURE_METAPHYSICL],
   # to guess where it might be installed.  This needs to be replaced
   # someday with an option to include an external version instead.
   if (test $enablemetaphysicl = yes); then
-     METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/0.2.0/include"
+     METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/0.2.0/src/numerics/include -I\$(top_srcdir)/contrib/metaphysicl/0.2.0/src/core/include -I\$(top_srcdir)/contrib/metaphysicl/0.2.0/src/utilities/include"
      AC_DEFINE(HAVE_METAPHYSICL, 1, [Flag indicating whether the library will be compiled with MetaPhysicL support])
      AC_MSG_RESULT(<<< Configuring library with MetaPhysicL support >>>)
      AC_CONFIG_SUBDIRS([contrib/metaphysicl/0.2.0])
