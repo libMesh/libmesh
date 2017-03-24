@@ -1135,8 +1135,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   for (unsigned int i=0; i != free_dofs; ++i)
                     {
                       FValue & ui = Ue(side_dofs[free_dof[i]]);
-                      libmesh_assert(std::abs(ui) < TOLERANCE ||
-                                     std::abs(ui - Uedge(i)) < TOLERANCE);
+                      libmesh_assert(bool(std::abs(ui) < TOLERANCE) ||
+                                     bool(std::abs(ui - Uedge(i)) < TOLERANCE));
                       ui = Uedge(i);
                       dof_is_fixed[side_dofs[free_dof[i]]] = true;
                     }
@@ -1309,8 +1309,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   for (unsigned int i=0; i != free_dofs; ++i)
                     {
                       FValue & ui = Ue(side_dofs[free_dof[i]]);
-                      libmesh_assert(std::abs(ui) < TOLERANCE ||
-                                     std::abs(ui - Uside(i)) < TOLERANCE);
+                      libmesh_assert(bool(std::abs(ui) < TOLERANCE) ||
+                                     bool(std::abs(ui - Uside(i)) < TOLERANCE));
                       ui = Uside(i);
                       dof_is_fixed[side_dofs[free_dof[i]]] = true;
                     }
@@ -1443,8 +1443,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               for (unsigned int i=0; i != free_dofs; ++i)
                 {
                   FValue & ui = Ue(free_dof[i]);
-                  libmesh_assert(std::abs(ui) < TOLERANCE ||
-                                 std::abs(ui - Uint(i)) < TOLERANCE);
+                  libmesh_assert(bool(std::abs(ui) < TOLERANCE) ||
+                                 bool(std::abs(ui - Uint(i)) < TOLERANCE));
                   ui = Uint(i);
                   dof_is_fixed[free_dof[i]] = true;
                 }
