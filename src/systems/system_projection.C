@@ -21,6 +21,40 @@
 #include <vector>
 
 // Local includes
+#include "libmesh/libmesh_config.h"
+
+#ifdef LIBMESH_HAVE_METAPHYSICL
+// Template specialization declarations in here need to *precede* code
+// using them.
+#include "metaphysicl/dynamicsparsenumberarray_decl.h"
+#include "libmesh/compare_types.h"
+
+using MetaPhysicL::DynamicSparseNumberArray;
+
+namespace libMesh
+{
+// From the perspective of libMesh gradient vectors, a DSNA is a
+// scalar component
+template <typename T, typename I>
+struct ScalarTraits<MetaPhysicL::DynamicSparseNumberArray<T,I> >
+{
+  static const bool value = true;
+};
+
+// And although MetaPhysicL knows how to combine DSNA with something
+// else, we need to teach libMesh too.
+template <typename T, typename I, typename T2>
+struct CompareTypes<MetaPhysicL::DynamicSparseNumberArray<T,I>, T2>
+{
+  typedef typename
+    MetaPhysicL::DynamicSparseNumberArray
+      <typename CompareTypes<T,T2>::supertype,I> supertype;
+};
+}
+
+
+#endif
+
 #include "libmesh/boundary_info.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
@@ -33,10 +67,32 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/quadrature.h"
+#include "libmesh/sparse_matrix.h"
 #include "libmesh/system.h"
 #include "libmesh/threads.h"
 #include "libmesh/wrapped_function.h"
 #include "libmesh/wrapped_functor.h"
+
+
+
+#ifdef LIBMESH_HAVE_METAPHYSICL
+// Include MetaPhysicL definitions finally
+#include "metaphysicl/dynamicsparsenumberarray.h"
+
+// And make sure we instantiate the methods we'll need to use on them.
+#include "libmesh/dense_matrix_impl.h"
+
+namespace libMesh {
+typedef DynamicSparseNumberArray<Number, dof_id_type> DSNAN;
+
+template void DenseMatrix<Real>::cholesky_solve
+  (const DenseVector<DSNAN> &, DenseVector<DSNAN> &);
+template void DenseMatrix<Real>::_cholesky_back_substitute
+  (const DenseVector<DSNAN> &, DenseVector<DSNAN> &) const;
+}
+#endif
+
+
 
 namespace libMesh
 {
@@ -349,6 +405,224 @@ void System::project_vector (const NumericVector<Number> & old_v,
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 }
+
+
+#ifdef LIBMESH_ENABLE_AMR
+#ifdef LIBMESH_HAVE_METAPHYSICL
+
+template <typename Output>
+class DSNAOutput
+{
+public:
+  typedef DynamicSparseNumberArray<Output, dof_id_type> type;
+};
+
+template <typename InnerOutput>
+class DSNAOutput<VectorValue<InnerOutput> >
+{
+public:
+  typedef VectorValue<DynamicSparseNumberArray<InnerOutput, dof_id_type> > type;
+};
+
+/**
+ * The OldSolutionCoefs input functor class can be used with
+ * GenericProjector to read solution transfer coefficients on a
+ * just-refined-and-coarsened mesh.
+ *
+ * \author Roy H. Stogner
+ * \date 2017
+ */
+
+template <typename Output,
+          void (FEMContext::*point_output) (unsigned int,
+                                            const Point &,
+                                            Output &,
+                                            const Real) const>
+class OldSolutionCoefs : public OldSolutionBase<Output, point_output>
+{
+public:
+  typedef typename DSNAOutput<Output>::type DSNA;
+
+  OldSolutionCoefs(const libMesh::System & sys_in) :
+    OldSolutionBase<Output, point_output>(sys_in)
+  {
+    this->old_context.set_algebraic_type(FEMContext::DOFS_ONLY);
+  }
+
+  OldSolutionCoefs(const OldSolutionCoefs & in) :
+    OldSolutionBase<Output, point_output>(in.sys)
+  {
+    this->old_context.set_algebraic_type(FEMContext::DOFS_ONLY);
+  }
+
+  DSNA eval_at_node (const FEMContext & c,
+                     unsigned int i,
+                     unsigned int elem_dim,
+                     const Node & n,
+                     Real /* time */ =0.)
+  {
+    libmesh_not_implemented();
+    return DSNA();
+  }
+
+  DSNA eval_at_point(const FEMContext & c,
+                     unsigned int i,
+                     const Point & p,
+                     Real /* time */ =0.)
+  {
+    libmesh_not_implemented();
+    return DSNA();
+  }
+
+  void eval_old_dofs (const FEMContext & c,
+                      unsigned int var,
+                      std::vector<DSNA> & values)
+  {
+    LOG_SCOPE ("eval_old_dofs()", "OldSolutionValue");
+
+    this->check_old_context(c);
+
+    const std::vector<dof_id_type> & old_dof_indices =
+      this->old_context.get_dof_indices(var);
+
+    std::size_t size = values.size();
+    libmesh_assert_equal_to (old_dof_indices.size(), size);
+
+    for (unsigned int i=0; i != size; ++i)
+      {
+        values[i].resize(1);
+        values[i].raw_at(0) = 1;
+        values[i].raw_index(0) = old_dof_indices[i];
+      }
+  }
+};
+
+
+
+/**
+ * The MatrixFillAction output functor class can be used with
+ * GenericProjector to write solution transfer coefficients into a
+ * sparse matrix.
+ *
+ * \author Roy H. Stogner
+ * \date 2017
+ */
+template <typename Val>
+class MatrixFillAction
+{
+private:
+  SparseMatrix<Val> & target_matrix;
+
+public:
+  MatrixFillAction(SparseMatrix<Val> & target_mat) :
+    target_matrix(target_mat) {}
+
+  void insert(const FEMContext & c,
+              unsigned int var_num,
+              const DenseVector<DynamicSparseNumberArray<Val, dof_id_type> > & Ue)
+  {
+    const numeric_index_type
+      begin_dof = target_matrix.row_start(),
+      end_dof = target_matrix.row_stop();
+
+    const std::vector<dof_id_type> & dof_indices =
+      c.get_dof_indices(var_num);
+
+    unsigned int size = Ue.size();
+
+    libmesh_assert_equal_to(size, dof_indices.size());
+
+    // Lock the target matrix since it is shared among threads.
+    {
+      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+      for (unsigned int i = 0; i != size; ++i)
+        {
+          const dof_id_type dof_i = dof_indices[i];
+          if ((dof_i >= begin_dof) && (dof_i < end_dof))
+            {
+              const DynamicSparseNumberArray<Val,dof_id_type> & dnsa = Ue(i);
+              const std::size_t size = dnsa.size();
+              for (unsigned int j = 0; j != size; ++j)
+                {
+                  const dof_id_type dof_j = dnsa.raw_index(j);
+                  const Val dof_val = dnsa.raw_at(j);
+                  target_matrix.set(dof_i, dof_j, dof_val);
+                }
+            }
+        }
+    }
+  }
+};
+
+
+
+/**
+ * This method creates a projection matrix which corresponds to the
+ * operation of project_vector between old and new solution spaces.
+ */
+void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
+{
+  LOG_SCOPE ("projection_matrix()", "System");
+
+  const unsigned int n_variables = this->n_vars();
+
+  if (n_variables)
+    {
+      ConstElemRange active_local_elem_range
+        (this->get_mesh().active_local_elements_begin(),
+         this->get_mesh().active_local_elements_end());
+
+      std::vector<unsigned int> vars(n_variables);
+      for (unsigned int i=0; i != n_variables; ++i)
+        vars[i] = i;
+
+      // Use a typedef to make the calling sequence for parallel_for() a bit more readable
+      typedef OldSolutionCoefs<Number,   &FEMContext::point_value>
+              OldSolutionValueCoefs;
+      typedef OldSolutionCoefs<Gradient, &FEMContext::point_gradient>
+              OldSolutionGradientCoefs;
+
+      typedef
+        GenericProjector<OldSolutionValueCoefs,
+                         OldSolutionGradientCoefs,
+                         DynamicSparseNumberArray<Real,dof_id_type>,
+                         MatrixFillAction<Real> > ProjMatFiller;
+
+      OldSolutionValueCoefs    f(*this);
+      OldSolutionGradientCoefs g(*this);
+      MatrixFillAction<Real> setter(proj_mat);
+
+      Threads::parallel_for (active_local_elem_range,
+                             ProjMatFiller(*this, f, &g, setter, vars));
+
+      // Set the SCALAR dof transfer entries too.
+      // Note: We assume that all SCALAR dofs are on the
+      // processor with highest ID
+      if (this->processor_id() == (this->n_processors()-1))
+        {
+          const DofMap & dof_map = this->get_dof_map();
+          for (unsigned int var=0; var<this->n_vars(); var++)
+            if (this->variable(var).type().family == SCALAR)
+              {
+                // We can just map SCALAR dofs directly across
+                std::vector<dof_id_type> new_SCALAR_indices, old_SCALAR_indices;
+                dof_map.SCALAR_dof_indices (new_SCALAR_indices, var, false);
+                dof_map.SCALAR_dof_indices (old_SCALAR_indices, var, true);
+                const unsigned int new_n_dofs =
+                  cast_int<unsigned int>(new_SCALAR_indices.size());
+
+                for (unsigned int i=0; i<new_n_dofs; i++)
+                  {
+                    proj_mat.set( new_SCALAR_indices[i],
+                                  old_SCALAR_indices[i], 1);
+                  }
+              }
+        }
+    }
+}
+#endif // LIBMESH_HAVE_METAPHYSICL
+#endif // LIBMESH_ENABLE_AMR
 
 
 
