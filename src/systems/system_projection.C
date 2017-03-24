@@ -459,20 +459,12 @@ public:
                      unsigned int i,
                      unsigned int elem_dim,
                      const Node & n,
-                     Real /* time */ =0.)
-  {
-    libmesh_not_implemented();
-    return DSNA();
-  }
+                     Real /* time */ = 0.);
 
   DSNA eval_at_point(const FEMContext & c,
                      unsigned int i,
                      const Point & p,
-                     Real /* time */ =0.)
-  {
-    libmesh_not_implemented();
-    return DSNA();
-  }
+                     Real /* time */ = 0.);
 
   void eval_old_dofs (const FEMContext & c,
                       unsigned int var,
@@ -496,6 +488,177 @@ public:
       }
   }
 };
+
+
+
+template<>
+inline
+DynamicSparseNumberArray<Number, dof_id_type>
+OldSolutionCoefs<Number, &FEMContext::point_value>::
+eval_at_point(const FEMContext & c,
+              unsigned int i,
+              const Point & p,
+              Real /* time */)
+{
+  LOG_SCOPE ("eval_at_point()", "OldSolutionCoefs");
+
+  if (!this->check_old_context(c, p))
+    return 0;
+
+  // Get finite element object
+  FEGenericBase<Number> * fe = libmesh_nullptr;
+  this->old_context.get_element_fe<Number>
+    (i, fe, this->old_context.get_elem_dim());
+
+  // Build a FE for calculating phi(p)
+  FEGenericBase<Number> * fe_new =
+    this->old_context.build_new_fe(fe, p);
+
+  // Get the values and global indices of the shape functions
+  const std::vector<std::vector<Real> > & phi = fe_new->get_phi();
+  const std::vector<dof_id_type> & dof_indices =
+    this->old_context.get_dof_indices(i);
+
+  const std::size_t n_dofs = phi.size();
+  libmesh_assert_equal_to(n_dofs, dof_indices.size());
+
+  DynamicSparseNumberArray<Number, dof_id_type> returnval;
+  returnval.resize(n_dofs);
+
+  for (std::size_t i = 0; i != n_dofs; ++i)
+    {
+      returnval.raw_at(i) = phi[i][0];
+      returnval.raw_index(i) = dof_indices[i];
+    }
+
+  return returnval;
+}
+
+
+
+template<>
+inline
+VectorValue<DynamicSparseNumberArray<Number, dof_id_type> >
+OldSolutionCoefs<Gradient, &FEMContext::point_gradient>::
+eval_at_point(const FEMContext & c,
+              unsigned int i,
+              const Point & p,
+              Real /* time */)
+{
+  LOG_SCOPE ("eval_at_point()", "OldSolutionCoefs");
+
+  if (!this->check_old_context(c, p))
+    return 0;
+
+  // Get finite element object
+  FEGenericBase<Number> * fe = libmesh_nullptr;
+  this->old_context.get_element_fe<Number>
+    (i, fe, this->old_context.get_elem_dim());
+
+  // Build a FE for calculating phi(p)
+  FEGenericBase<Number> * fe_new =
+    this->old_context.build_new_fe(fe, p);
+
+  // Get the values and global indices of the shape functions
+  const std::vector<std::vector<RealGradient> > & dphi = fe_new->get_dphi();
+  const std::vector<dof_id_type> & dof_indices =
+    this->old_context.get_dof_indices(i);
+
+  const std::size_t n_dofs = dphi.size();
+  libmesh_assert_equal_to(n_dofs, dof_indices.size());
+
+  VectorValue<DynamicSparseNumberArray<Number, dof_id_type> > returnval;
+
+  for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
+    returnval(d).resize(n_dofs);
+
+  for (std::size_t i = 0; i != n_dofs; ++i)
+    {
+      for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
+        {
+          returnval(d).raw_at(i) = dphi[i][0](d);
+          returnval(d).raw_index(i) = dof_indices[i];
+        }
+    }
+
+  return returnval;
+}
+
+
+template<>
+inline
+DynamicSparseNumberArray<Number, dof_id_type>
+OldSolutionCoefs<Number, &FEMContext::point_value>::
+eval_at_node(const FEMContext & c,
+             unsigned int i,
+             unsigned int /* elem_dim */,
+             const Node & n,
+             Real /* time */)
+{
+  LOG_SCOPE ("Number eval_at_node()", "OldSolutionCoefs");
+
+  // Optimize for the common case, where this node was part of the
+  // old solution.
+  //
+  // Be sure to handle cases where the variable wasn't defined on
+  // this node (due to changing subdomain support) or where the
+  // variable has no components on this node (due to Elem order
+  // exceeding FE order)
+  if (n.old_dof_object &&
+      n.old_dof_object->n_vars(sys.number()) &&
+      n.old_dof_object->n_comp(sys.number(), i))
+    {
+      DynamicSparseNumberArray<Number, dof_id_type> returnval;
+      const dof_id_type old_id =
+        n.old_dof_object->dof_number(sys.number(), i, 0);
+      returnval.resize(1);
+      returnval.raw_at(0) = 1;
+      returnval.raw_index(0) = old_id;
+      return returnval;
+    }
+
+  return this->eval_at_point(c, i, n, 0);
+}
+
+
+
+template<>
+inline
+VectorValue<DynamicSparseNumberArray<Number, dof_id_type> >
+OldSolutionCoefs<Gradient, &FEMContext::point_gradient>::
+eval_at_node(const FEMContext & c,
+             unsigned int i,
+             unsigned int elem_dim,
+             const Node & n,
+             Real /* time */)
+{
+  LOG_SCOPE ("Gradient eval_at_node()", "OldSolutionCoefs");
+
+  // Optimize for the common case, where this node was part of the
+  // old solution.
+  //
+  // Be sure to handle cases where the variable wasn't defined on
+  // this node (due to changing subdomain support) or where the
+  // variable has no components on this node (due to Elem order
+  // exceeding FE order)
+  if (n.old_dof_object &&
+      n.old_dof_object->n_vars(sys.number()) &&
+      n.old_dof_object->n_comp(sys.number(), i))
+    {
+      VectorValue<DynamicSparseNumberArray<Number, dof_id_type> > g;
+      for (unsigned int d = 0; d != elem_dim; ++d)
+        {
+          const dof_id_type old_id =
+            n.old_dof_object->dof_number(sys.number(), i, d+1);
+          g(d).resize(1);
+          g(d).raw_at(0) = 1;
+          g(d).raw_index(0) = old_id;
+        }
+      return g;
+    }
+
+  return this->eval_at_point(c, i, n, 0);
+}
 
 
 
