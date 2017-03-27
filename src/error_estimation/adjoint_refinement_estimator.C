@@ -205,6 +205,11 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
         coarse_adjoints.push_back(static_cast<NumericVector<Number> *>(libmesh_nullptr));
     }
 
+  // Next, we are going to build up the residual for evaluating the error estimate
+  // // If the residual ptr is null, set it to be the physics held by the system
+
+  // // Else if residual ptr is not null (i.e. user has set physics which they want to use for residual evaluation)
+
   // Rebuild the rhs with the projected primal solution
   (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
   NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
