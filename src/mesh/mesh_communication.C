@@ -1868,11 +1868,6 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
           if (!keep_me)
             elem->make_links_to_me_remote();
 
-          // Subactive neighbor pointers aren't preservable here
-          if (elem->subactive())
-            for (unsigned int s=0; s != elem->n_sides(); ++s)
-              elem->set_neighbor(s, libmesh_nullptr);
-
           // delete_elem doesn't currently invalidate element
           // iterators... that had better not change
           if (!keep_me)
