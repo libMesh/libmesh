@@ -1727,6 +1727,33 @@ void Elem::family_tree_by_neighbor (std::vector<const Elem *> & family,
 
 
 
+void Elem::total_family_tree_by_neighbor (std::vector<const Elem *> & family,
+                                          const Elem * neighbor_in,
+                                          const bool reset) const
+{
+  // Clear the vector if the flag reset tells us to.
+  if (reset)
+    family.clear();
+
+  // This only makes sense if we're already a neighbor
+  libmesh_assert (this->has_neighbor(neighbor_in));
+
+  // Add this element to the family tree.
+  family.push_back(this);
+
+  // Recurse into the elements children, if it has any.
+  // Do not clear the vector any more.
+  if (this->has_children())
+    for (unsigned int c=0; c<this->n_children(); c++)
+      {
+        const Elem * current_child = this->child_ptr(c);
+        if (current_child != remote_elem && current_child->has_neighbor(neighbor_in))
+          current_child->total_family_tree_by_neighbor (family, neighbor_in, false);
+      }
+}
+
+
+
 void Elem::family_tree_by_subneighbor (std::vector<const Elem *> & family,
                                        const Elem * neighbor_in,
                                        const Elem * subneighbor,
@@ -1769,6 +1796,51 @@ void Elem::family_tree_by_subneighbor (std::vector<const Elem *> & family,
                     child_neigh->is_ancestor_of(subneighbor))))
                 current_child->family_tree_by_subneighbor (family, child_neigh,
                                                            subneighbor, false);
+            }
+      }
+}
+
+
+
+void Elem::total_family_tree_by_subneighbor (std::vector<const Elem *> & family,
+                                             const Elem * neighbor_in,
+                                             const Elem * subneighbor,
+                                             const bool reset) const
+{
+  // Clear the vector if the flag reset tells us to.
+  if (reset)
+    family.clear();
+
+  // To simplifly this function we need an existing neighbor
+  libmesh_assert (neighbor_in);
+  libmesh_assert_not_equal_to (neighbor_in, remote_elem);
+  libmesh_assert (this->has_neighbor(neighbor_in));
+
+  // This only makes sense if subneighbor descends from neighbor
+  libmesh_assert (subneighbor);
+  libmesh_assert_not_equal_to (subneighbor, remote_elem);
+  libmesh_assert (neighbor_in->is_ancestor_of(subneighbor));
+
+  // Add this element to the family tree if applicable.
+  if (neighbor_in == subneighbor)
+    family.push_back(this);
+
+  // Recurse into the elements children, if it has any.
+  // Do not clear the vector any more.
+  if (this->has_children())
+    for (unsigned int c=0; c != this->n_children(); ++c)
+      {
+        const Elem * current_child = this->child_ptr(c);
+        if (current_child != remote_elem)
+          for (unsigned int s=0; s != current_child->n_sides(); ++s)
+            {
+              const Elem * child_neigh = current_child->neighbor_ptr(s);
+              if (child_neigh &&
+                  (child_neigh == neighbor_in ||
+                   (child_neigh->parent() == neighbor_in &&
+                    child_neigh->is_ancestor_of(subneighbor))))
+                current_child->total_family_tree_by_subneighbor
+                  (family, child_neigh, subneighbor, false);
             }
       }
 }

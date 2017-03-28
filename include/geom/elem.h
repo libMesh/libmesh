@@ -1135,6 +1135,14 @@ public:
                                 const bool reset=true) const;
 
   /**
+   * Same as the \p family_tree_by_neighbor() member, but also adds
+   * any subactive descendants.
+   */
+  void total_family_tree_by_neighbor (std::vector<const Elem *> & family,
+                                      const Elem * neighbor,
+                                      const bool reset=true) const;
+
+  /**
    * Same as the \p family_tree() member, but only adds elements
    * which are next to \p subneighbor.  Only applicable when
    * \p this->has_neighbor(neighbor) and
@@ -1144,6 +1152,15 @@ public:
                                    const Elem * neighbor,
                                    const Elem * subneighbor,
                                    const bool reset=true) const;
+
+  /**
+   * Same as the \p family_tree_by_subneighbor() member, but also adds
+   * any subactive descendants.
+   */
+  void total_family_tree_by_subneighbor (std::vector<const Elem *> & family,
+                                         const Elem * neighbor,
+                                         const Elem * subneighbor,
+                                         const bool reset=true) const;
 
   /**
    * Same as the \p active_family_tree() member, but only adds elements
