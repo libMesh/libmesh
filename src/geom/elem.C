@@ -1395,6 +1395,106 @@ void Elem::make_links_to_me_remote()
 }
 
 
+void Elem::remove_links_to_me()
+{
+  libmesh_assert_not_equal_to (this, remote_elem);
+
+  // We need to have handled any children first
+#ifdef LIBMESH_ENABLE_AMR
+  libmesh_assert (!this->has_children());
+#endif
+
+  // Nullify any neighbor links
+  for (unsigned int s = 0; s != this->n_sides(); ++s)
+    {
+      Elem * neigh = this->neighbor_ptr(s);
+      if (neigh && neigh != remote_elem)
+        {
+          // My neighbor should never be more refined than me; my real
+          // neighbor would have been its parent in that case.
+          libmesh_assert_greater_equal (this->level(), neigh->level());
+
+          if (this->level() == neigh->level() &&
+              neigh->has_neighbor(this))
+            {
+#ifdef LIBMESH_ENABLE_AMR
+              // My neighbor may have descendants which also consider me a
+              // neighbor
+              std::vector<const Elem *> family;
+              neigh->total_family_tree_by_neighbor (family, this);
+
+              // FIXME - There's a lot of ugly const_casts here; we
+              // may want to make remote_elem non-const and create
+              // non-const versions of the family_tree methods
+              for (std::size_t i=0; i != family.size(); ++i)
+                {
+                  Elem * n = const_cast<Elem *>(family[i]);
+                  libmesh_assert (n);
+                  if (n == remote_elem)
+                    continue;
+                  unsigned int my_s = n->which_neighbor_am_i(this);
+                  libmesh_assert_less (my_s, n->n_neighbors());
+                  libmesh_assert_equal_to (n->neighbor_ptr(my_s), this);
+                  n->set_neighbor(my_s, libmesh_nullptr);
+                }
+#else
+              unsigned int my_s = neigh->which_neighbor_am_i(this);
+              libmesh_assert_less (my_s, neigh->n_neighbors());
+              libmesh_assert_equal_to (neigh->neighbor(my_s), this);
+              neigh->set_neighbor(my_s, libmesh_nullptr);
+#endif
+            }
+#ifdef LIBMESH_ENABLE_AMR
+          // Even if my neighbor doesn't link back to me, it might
+          // have subactive descendants which do
+          else if (neigh->has_children())
+            {
+              // If my neighbor at the same level doesn't have me as a
+              // neighbor, I must be subactive
+              libmesh_assert(this->level() > neigh->level() ||
+                             this->subactive());
+
+              // My neighbor must have some ancestor of mine as a
+              // neighbor
+              Elem * my_ancestor = this->parent();
+              libmesh_assert(my_ancestor);
+              while (!neigh->has_neighbor(my_ancestor))
+                {
+                  my_ancestor = my_ancestor->parent();
+                  libmesh_assert(my_ancestor);
+                }
+
+              // My neighbor may have descendants which consider me a
+              // neighbor
+              std::vector<const Elem *> family;
+              neigh->total_family_tree_by_subneighbor (family, my_ancestor, this);
+
+              // FIXME - There's a lot of ugly const_casts here; we
+              // may want to make remote_elem non-const and create
+              // non-const versions of the family_tree methods
+              for (std::size_t i=0; i != family.size(); ++i)
+                {
+                  Elem * n = const_cast<Elem *>(family[i]);
+                  libmesh_assert (n);
+                  if (n == remote_elem)
+                    continue;
+                  unsigned int my_s = n->which_neighbor_am_i(this);
+                  libmesh_assert_less (my_s, n->n_neighbors());
+                  libmesh_assert_equal_to (n->neighbor_ptr(my_s), this);
+                  n->set_neighbor(my_s, libmesh_nullptr);
+                }
+            }
+#endif
+        }
+    }
+
+#ifdef LIBMESH_ENABLE_AMR
+  // We can't currently delete a child with a parent!
+  libmesh_assert (!this->parent());
+#endif
+}
+
+
 
 void Elem::write_connectivity (std::ostream & out_stream,
                                const IOPackage iop) const
