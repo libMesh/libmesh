@@ -830,8 +830,8 @@ void CheckpointIO::read_remote_elem (Xdr & io)
 
   io.data(n_remote_elem, "# n_remote_elem");
 
-  std::vector<dof_id_type> elem_ids;
-  std::vector<unsigned char> elem_sides;
+  std::vector<dof_id_type> elem_ids(n_remote_elem);
+  std::vector<unsigned char> elem_sides(n_remote_elem);
 
   if (n_remote_elem)
     {
