@@ -36,6 +36,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/system.h"
+#include "libmesh/fem_system.h"
 #include "libmesh/implicit_system.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/adjoint_refinement_estimator.h"
@@ -189,26 +190,30 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   for (std::size_t j=0; j != system.qoi.size(); j++)
     {
       if (_qoi_set.has_index(j))
-        {
-          NumericVector<Number> * coarse_adjoint =
-            NumericVector<Number>::build(mesh.comm()).release();
+      {
+	NumericVector<Number> * coarse_adjoint =
+	  NumericVector<Number>::build(mesh.comm()).release();
 
-          // Can do "fast" init since we're overwriting this in a sec
-          coarse_adjoint->init(system.get_adjoint_solution(j),
-                               /* fast = */ true);
+	// Can do "fast" init since we're overwriting this in a sec
+	coarse_adjoint->init(system.get_adjoint_solution(j),
+			     /* fast = */ true);
 
-          *coarse_adjoint = system.get_adjoint_solution(j);
+	*coarse_adjoint = system.get_adjoint_solution(j);
 
-          coarse_adjoints.push_back(coarse_adjoint);
-        }
+	coarse_adjoints.push_back(coarse_adjoint);
+      }
       else
         coarse_adjoints.push_back(static_cast<NumericVector<Number> *>(libmesh_nullptr));
     }
 
   // Next, we are going to build up the residual for evaluating the error estimate
-  // // If the residual ptr is null, set it to be the physics held by the system
 
-  // // Else if residual ptr is not null (i.e. user has set physics which they want to use for residual evaluation)
+  // If the residual ptr is null, set it to be the physics held by the system
+  if (!_residual_evaluation_physics)
+  {
+    _residual_evaluation_physics = dynamic_cast<FEMPhysics *>((dynamic_cast<FEMSystem &>(system)).get_physics());
+  }
+  // Else if residual ptr is not null (i.e. user has set physics which they want to use for residual evaluation)
 
   // Rebuild the rhs with the projected primal solution
   (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
