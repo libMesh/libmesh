@@ -424,10 +424,12 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                   Elem * neigh = parent->neighbor_ptr(s);
 
                   // If neigh was refined and had non-subactive children
-                  // made remote earlier, then a non-subactive elem should
+                  // made remote earlier, then our current elem should
                   // actually have one of those remote children as a
                   // neighbor
-                  if (neigh && (neigh->ancestor()) && (!current_elem->subactive()))
+                  if (neigh &&
+                      (neigh->ancestor() ||
+                       (current_elem->subactive() && neigh->has_children())))
                     {
 #ifdef DEBUG
                       // Let's make sure that "had children made remote"
@@ -450,8 +452,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                       neigh = const_cast<RemoteElem *>(remote_elem);
                     }
 
-                  if (!current_elem->subactive())
-                    current_elem->set_neighbor(s, neigh);
+                  current_elem->set_neighbor(s, neigh);
 #ifdef DEBUG
                   if (neigh != libmesh_nullptr && neigh != remote_elem)
                     // We ignore subactive elements here because
