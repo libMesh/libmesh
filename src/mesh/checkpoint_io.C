@@ -148,6 +148,9 @@ void CheckpointIO::write (const std::string & name)
       // write the nodeset information
       this->write_nodesets (io);
 
+      // write remote_elem connectivity
+      this->write_remote_elem (io);
+
       // close it up
       io.close();
     }
@@ -632,6 +635,9 @@ void CheckpointIO::read (const std::string & name)
 
       // read the nodesets
       this->read_nodesets (io);
+
+      // read remote_elem connectivity
+      this->read_remote_elem (io);
 
       io.close();
     }
