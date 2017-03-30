@@ -135,6 +135,14 @@ public:
   { return true; }
 
   /**
+   * Asserts that not all elements and nodes of the mesh necessarily
+   * exist on the current processor.  Only valid to call on classes
+   * which can be created in a distributed form.
+   */
+  virtual void set_distributed ()
+  { libmesh_error(); }
+
+  /**
    * @returns \p true if new elements and nodes can and should be
    * created in synchronization on all processors, \p false otherwise
    */

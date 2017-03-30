@@ -119,6 +119,13 @@ public:
   { return _is_serial; }
 
   /**
+   * Asserts that not all elements and nodes of the mesh necessarily
+   * exist on the current processor.
+   */
+  virtual void set_distributed ()
+  { _is_serial = false; }
+
+  /**
    * @returns \p true if new elements and nodes can and should be
    * created in synchronization on all processors, \p false otherwise
    */
