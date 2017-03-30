@@ -463,86 +463,93 @@ void CheckpointIO::read (const std::string & name)
 
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
-  // Try to dynamic cast the mesh to see if it's a DistributedMesh object
-  // Note: Just using is_serial() is not good enough because the Mesh won't
-  // have been prepared yet when is when that flag gets set to false... sigh.
-  _parallel = _parallel || !mesh.is_replicated();
-
-  // If this is a serial mesh then we're going to only read it on processor 0 and broadcast it
+  // If this is a serial read then we're going to only read the mesh
+  // on processor 0, then broadcast it
   if (_parallel || _my_processor_id == 0)
     {
-      std::ostringstream file_name_stream;
+      // If we're trying to read a parallel checkpoint file on a
+      // replicated mesh, we need to read every file on every
+      // processor.
+      const processor_id_type begin_proc_id =
+        (mesh.is_replicated() && _parallel) ? 0 : _my_processor_id;
+      const processor_id_type end_proc_id =
+        (mesh.is_replicated() && _parallel) ? _my_n_processors : (_my_processor_id+1);
 
-      file_name_stream << name;
-
-      if (_parallel)
-        file_name_stream << "-" << _my_n_processors << "-" << _my_processor_id;
-
-      {
-        std::ifstream in (file_name_stream.str().c_str());
-
-        if (!in.good())
-          libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << file_name_stream.str());
-      }
-
-      Xdr io (file_name_stream.str(), this->binary() ? DECODE : READ);
-
-      // read the version
-      io.data (_version);
-
-      // read the dimension
-      io.data (_mesh_dimension);
-      mesh.set_mesh_dimension(_mesh_dimension);
-
-      // Check if the mesh we're reading is the same as the one that was written
-      {
-        unsigned int parallel;
-        io.data(parallel, "# parallel");
-
-        if (_parallel != parallel)
-          libmesh_error_msg("Attempted to read a " <<
-                            (parallel ? "parallel" : "non-parallel")
-                            << " (" << parallel << ')'
-                            << " checkpoint file with a " <<
-                            (_parallel ? "parallel" : "non-parallel")
-                            << " checkpoint object!");
-      }
-
-      // If this is a parallel mesh then we need to check to ensure we're reading this on the same number of procs
-      if (_parallel)
+      for (processor_id_type proc_id = begin_proc_id; proc_id != end_proc_id; ++proc_id)
         {
-          largest_id_type n_procs;
-          io.data(n_procs, "# n_procs");
+          std::ostringstream file_name_stream;
 
-          if (n_procs != _my_n_processors)
-            libmesh_error_msg("Attempted to utilize a checkpoint file on " << _my_n_processors << " processors but it was written using " << n_procs << "!!");
+          file_name_stream << name;
+
+          if (_parallel)
+            file_name_stream << "-" << _my_n_processors << "-" << proc_id;
+
+          {
+            std::ifstream in (file_name_stream.str().c_str());
+
+            if (!in.good())
+              libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << file_name_stream.str());
+          }
+
+          Xdr io (file_name_stream.str(), this->binary() ? DECODE : READ);
+
+          // read the version
+          io.data (_version);
+
+          // read the dimension
+          io.data (_mesh_dimension);
+          mesh.set_mesh_dimension(_mesh_dimension);
+
+          // Check if the mesh we're reading is the same as the one that was written
+          {
+            unsigned int parallel;
+            io.data(parallel, "# parallel");
+
+            if (_parallel != parallel)
+              libmesh_error_msg("Attempted to read a " <<
+                                (parallel ? "parallel" : "non-parallel")
+                                << " (" << parallel << ')'
+                                << " checkpoint file with a " <<
+                                (_parallel ? "parallel" : "non-parallel")
+                                << " checkpoint object!");
+          }
+
+          // If this is a parallel mesh then we need to check to ensure we're reading this on the same number of procs
+          if (_parallel)
+            {
+              largest_id_type n_procs;
+              io.data(n_procs, "# n_procs");
+
+              if (n_procs != _my_n_processors)
+                libmesh_error_msg("Attempted to utilize a checkpoint file on " << _my_n_processors << " processors but it was written using " << n_procs << "!!");
+            }
+
+          // read subdomain names
+          this->read_subdomain_names(io);
+
+          // read the nodal locations
+          this->read_nodes (io);
+
+          // read connectivity
+          this->read_connectivity (io);
+
+          // read the boundary conditions
+          this->read_bcs (io);
+
+          // read the nodesets
+          this->read_nodesets (io);
+
+          // read remote_elem connectivity
+          this->read_remote_elem (io);
+
+          io.close();
         }
-
-      // read subdomain names
-      this->read_subdomain_names(io);
-
-      // read the nodal locations
-      this->read_nodes (io);
-
-      // read connectivity
-      this->read_connectivity (io);
-
-      // read the boundary conditions
-      this->read_bcs (io);
-
-      // read the nodesets
-      this->read_nodesets (io);
-
-      // read remote_elem connectivity
-      this->read_remote_elem (io);
-
-      io.close();
     }
 
-  // If the mesh is serial then we only read it on processor 0 so we need to broadcast it
-  if (!_parallel)
+  // If the mesh was only read on processor 0 then we need to broadcast it
+  if (!_parallel || mesh.is_replicated())
     MeshCommunication().broadcast(mesh);
-  // If the mesh isn't serial then we need to make sure it knows that
+  // If the mesh is distributed then we need to make sure it knows that
   else
     mesh.set_distributed();
 }
