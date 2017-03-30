@@ -470,11 +470,11 @@ void CheckpointIO::read (const std::string & name)
 
   // If this is a serial read then we're going to only read the mesh
   // on processor 0, then broadcast it
-  if (_parallel || _my_processor_id == 0)
+  if ((_parallel && !mesh.is_replicated()) || _my_processor_id == 0)
     {
       // If we're trying to read a parallel checkpoint file on a
-      // replicated mesh, we need to read every file on every
-      // processor.
+      // replicated mesh, we'll read every file on processor 0 so we
+      // can broadcast it later.
       const processor_id_type begin_proc_id =
         (mesh.is_replicated() && _parallel) ? 0 : _my_processor_id;
       const processor_id_type end_proc_id =
@@ -552,7 +552,7 @@ void CheckpointIO::read (const std::string & name)
     }
 
   // If the mesh was only read on processor 0 then we need to broadcast it
-  if (!_parallel || mesh.is_replicated())
+  if (mesh.is_replicated())
     MeshCommunication().broadcast(mesh);
   // If the mesh is distributed then we need to make sure it knows that
   else
