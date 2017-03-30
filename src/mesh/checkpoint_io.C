@@ -463,6 +463,11 @@ void CheckpointIO::read (const std::string & name)
 
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
+  // Try to dynamic cast the mesh to see if it's a DistributedMesh object
+  // Note: Just using is_serial() is not good enough because the Mesh won't
+  // have been prepared yet when is when that flag gets set to false... sigh.
+  _parallel = _parallel || !mesh.is_replicated();
+
   // If this is a serial read then we're going to only read the mesh
   // on processor 0, then broadcast it
   if (_parallel || _my_processor_id == 0)
