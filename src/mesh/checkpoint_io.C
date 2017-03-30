@@ -127,12 +127,6 @@ void CheckpointIO::write (const std::string & name)
           io.data(n_procs, "# n_procs");
         }
 
-      // Build the list of local elements
-      this->build_elem_list();
-
-      // Build the list of nodes connected to local elements
-      this->build_node_list();
-
       // write subdomain names
       this->write_subdomain_names(io);
 
@@ -156,61 +150,6 @@ void CheckpointIO::write (const std::string & name)
     }
 
   // this->comm().barrier();
-}
-
-void CheckpointIO::build_elem_list()
-{
-  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-
-  MeshBase::const_element_iterator it = mesh.elements_begin();
-  MeshBase::const_element_iterator end = mesh.elements_end();
-
-  if (_parallel)
-    {
-      it  = mesh.pid_elements_begin(_my_processor_id);
-      end = mesh.pid_elements_end(_my_processor_id);
-    }
-
-  std::set<const Elem *> neighbors;
-
-  for (; it != end; ++it)
-    {
-      Elem * elem = *it;
-
-      _local_elements.insert(elem->id());
-
-      // Make sure the neighbors vector is cleared out in case this Elem
-      // isn't active and we skip calling find_point_neighbors().
-      neighbors.clear();
-
-      // Also need to add in all the point neighbors of this element.
-      // Point neighbors can only be found for active elements...
-      if (elem->active())
-        elem->find_point_neighbors(neighbors);
-
-      std::set<const Elem *>::iterator
-        set_it = neighbors.begin(),
-        set_end = neighbors.end();
-
-      for (; set_it != set_end; ++set_it)
-        _local_elements.insert((*set_it)->id());
-    }
-}
-
-void CheckpointIO::build_node_list()
-{
-  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-
-  std::set<largest_id_type>::iterator it  = _local_elements.begin();
-  const std::set<largest_id_type>::iterator end  = _local_elements.end();
-
-  for (; it != end; ++it)
-    {
-      const Elem * elem = mesh.elem_ptr(*it);
-
-      for (unsigned int n = 0; n < elem->n_nodes(); n++)
-        _nodes_connected_to_local_elements.insert(elem->node_id(n));
-    }
 }
 
 void CheckpointIO::write_subdomain_names(Xdr & io) const
@@ -255,7 +194,8 @@ void CheckpointIO::write_nodes (Xdr & io) const
   // convenient reference to our mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  unsigned int n_nodes_here = _nodes_connected_to_local_elements.size();
+  unsigned int n_nodes_here =
+    std::distance(mesh.nodes_begin(), mesh.nodes_end());
 
   io.data(n_nodes_here, "# n_nodes on proc");
 
@@ -265,13 +205,13 @@ void CheckpointIO::write_nodes (Xdr & io) const
   // For the coordinates
   std::vector<Real> coords(LIBMESH_DIM);
 
-  std::set<largest_id_type>::iterator
-    it  = _nodes_connected_to_local_elements.begin(),
-    end = _nodes_connected_to_local_elements.end();
+  MeshBase::const_node_iterator
+    it  = mesh.nodes_begin(),
+    end = mesh.nodes_end();
 
   for (; it != end; ++it)
     {
-      const Node & node = mesh.node_ref(*it);
+      const Node & node = **it;
 
       id_pid[0] = node.id();
       id_pid[1] = node.processor_id();
@@ -314,11 +254,12 @@ void CheckpointIO::write_connectivity (Xdr & io) const
 
   // Find the number of elements at each level
   {
-    std::set<largest_id_type>::iterator it = _local_elements.begin();
-    const std::set<largest_id_type>::iterator end = _local_elements.end();
+    MeshBase::const_element_iterator
+      it  = mesh.elements_begin(),
+      end = mesh.elements_end();
 
     for (; it != end; ++it)
-      n_elem_at_level[mesh.elem_ptr(*it)->level()]++;
+      n_elem_at_level[(*it)->level()]++;
   }
 
   io.data(_n_active_levels, "# n_active_levels");
@@ -335,12 +276,13 @@ void CheckpointIO::write_connectivity (Xdr & io) const
       comment << level ;
       io.data (n_elem_at_level[level], comment.str().c_str());
 
-      std::set<largest_id_type>::iterator it = _local_elements.begin();
-      const std::set<largest_id_type>::iterator end = _local_elements.end();
+      MeshBase::const_element_iterator
+        it  = mesh.elements_begin(),
+        end = mesh.elements_end();
 
       for (; it != end; ++it)
         {
-          const Elem & elem = mesh.elem_ref(*it);
+          const Elem & elem = **it;
 
           // Only write elements of the current level.
           if (elem.level() != level)
@@ -396,15 +338,16 @@ void CheckpointIO::write_remote_elem (Xdr & io) const
   // Find the number of remote_elem links
   dof_id_type n_remote_elem = 0;
   std::vector<dof_id_type> elem_ids;
-  std::vector<unsigned char> elem_sides;
+  std::vector<unsigned short int> elem_sides;
 
   {
-    std::set<largest_id_type>::iterator it = _local_elements.begin();
-    const std::set<largest_id_type>::iterator end = _local_elements.end();
+    MeshBase::const_element_iterator
+      it  = mesh.elements_begin(),
+      end = mesh.elements_end();
 
     for (; it != end; ++it)
       {
-        const Elem & elem = mesh.elem_ref(*it);
+        const Elem & elem = **it;
 
         for (unsigned int n=0; n != elem.n_neighbors(); ++n)
           {
@@ -420,8 +363,11 @@ void CheckpointIO::write_remote_elem (Xdr & io) const
 
   io.data(n_remote_elem, "# n_remote_elem");
 
-  io.data_stream(&elem_ids[0], n_remote_elem);
-  io.data_stream(&elem_sides[0], n_remote_elem);
+  if (n_remote_elem)
+    {
+      io.data_stream(&elem_ids[0], n_remote_elem);
+      io.data_stream(&elem_sides[0], n_remote_elem);
+    }
 }
 
 
@@ -440,37 +386,11 @@ void CheckpointIO::write_bcs (Xdr & io) const
   write_bc_names(io, boundary_info, true);  // sideset names
   write_bc_names(io, boundary_info, false); // nodeset names
 
-  std::vector<dof_id_type> orig_element_id_list;
-  std::vector<unsigned short int> orig_side_list;
-  std::vector<boundary_id_type> orig_bc_id_list;
-
-  boundary_info.build_side_list(orig_element_id_list, orig_side_list, orig_bc_id_list);
-
-  size_t num_orig_elements = orig_element_id_list.size();
-
   std::vector<dof_id_type> element_id_list;
   std::vector<unsigned short int> side_list;
   std::vector<boundary_id_type> bc_id_list;
 
-  element_id_list.reserve(num_orig_elements);
-  side_list.reserve(num_orig_elements);
-  bc_id_list.reserve(num_orig_elements);
-
-  // Filter these lists to only include local elements
-  for (unsigned int i = 0; i < num_orig_elements; i++)
-    {
-      if (_local_elements.find(orig_element_id_list[i]) != _local_elements.end())
-        {
-          // Only write out BCs for truly local elements
-          if (_parallel &&
-              mesh.elem_ptr(orig_element_id_list[i])->processor_id() != _my_processor_id)
-            continue;
-
-          element_id_list.push_back(orig_element_id_list[i]);
-          side_list.push_back(orig_side_list[i]);
-          bc_id_list.push_back(orig_bc_id_list[i]);
-        }
-    }
+  boundary_info.build_side_list(element_id_list, side_list, bc_id_list);
 
   io.data(element_id_list, "# element ids for bcs");
   io.data(side_list, "# sides of elements for bcs");
@@ -489,33 +409,10 @@ void CheckpointIO::write_nodesets (Xdr & io) const
   // and our boundary info object
   const BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
-  std::vector<dof_id_type> orig_node_id_list;
-  std::vector<boundary_id_type> orig_bc_id_list;
-
-  boundary_info.build_node_list(orig_node_id_list, orig_bc_id_list);
-
-  size_t num_orig_nodes = orig_node_id_list.size();
-
   std::vector<dof_id_type> node_id_list;
   std::vector<boundary_id_type> bc_id_list;
 
-  node_id_list.reserve(num_orig_nodes);
-  bc_id_list.reserve(num_orig_nodes);
-
-  // Filter these lists to only include nodes connected to local elements
-  for (unsigned int i = 0; i < num_orig_nodes; i++)
-    {
-      if (_nodes_connected_to_local_elements.find(orig_node_id_list[i]) != _nodes_connected_to_local_elements.end())
-        {
-          // Only write out BCs for truly local nodes
-          if (_parallel &&
-              mesh.node_ptr(orig_node_id_list[i])->processor_id() != _my_processor_id)
-            continue;
-
-          node_id_list.push_back(orig_node_id_list[i]);
-          bc_id_list.push_back(orig_bc_id_list[i]);
-        }
-    }
+  boundary_info.build_node_list(node_id_list, bc_id_list);
 
   io.data(node_id_list, "# node id list");
   io.data(bc_id_list, "# nodeset bc id list");
@@ -645,6 +542,9 @@ void CheckpointIO::read (const std::string & name)
   // If the mesh is serial then we only read it on processor 0 so we need to broadcast it
   if (!_parallel)
     MeshCommunication().broadcast(mesh);
+  // If the mesh isn't serial then we need to make sure it knows that
+  else
+    mesh.set_distributed();
 }
 
 
@@ -837,7 +737,7 @@ void CheckpointIO::read_remote_elem (Xdr & io)
   io.data(n_remote_elem, "# n_remote_elem");
 
   std::vector<dof_id_type> elem_ids(n_remote_elem);
-  std::vector<unsigned char> elem_sides(n_remote_elem);
+  std::vector<unsigned short int> elem_sides(n_remote_elem);
 
   if (n_remote_elem)
     {
@@ -932,11 +832,12 @@ unsigned int CheckpointIO::n_active_levels_on_processor(const MeshBase & mesh) c
 {
   unsigned int max_level = 0;
 
-  std::set<largest_id_type>::iterator it = _local_elements.begin();
-  const std::set<largest_id_type>::iterator end = _local_elements.end();
+  MeshBase::const_element_iterator
+    it  = mesh.elements_begin(),
+    end = mesh.elements_end();
 
   for (; it != end; ++it)
-    max_level = std::max(mesh.elem_ptr((*it))->level(), max_level);
+    max_level = std::max((*it)->level(), max_level);
 
   return max_level + 1;
 }

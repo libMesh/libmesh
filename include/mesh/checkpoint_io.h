@@ -136,16 +136,6 @@ private:
   // Write Implementation
 
   /**
-   * Build up the elem list
-   */
-  void build_elem_list();
-
-  /**
-   * Build up the node list
-   */
-  void build_node_list();
-
-  /**
    * Write subdomain name information - NEW in 0.9.2 format
    */
   void write_subdomain_names(Xdr & io) const;
@@ -231,10 +221,6 @@ private:
   std::string _version;
   unsigned int _mesh_dimension;
   unsigned int _n_active_levels;
-
-  /// These are sets of IDs to make the lookup for boundary conditions simpler
-  std::set<largest_id_type> _local_elements;
-  std::set<largest_id_type> _nodes_connected_to_local_elements;
 
   /// The processor_id to use
   processor_id_type _my_processor_id;
