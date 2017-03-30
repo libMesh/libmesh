@@ -782,25 +782,12 @@ void Xdr::data_stream (T * val, const unsigned int len, const unsigned int line_
 
         unsigned int size_of_type = cast_int<unsigned int>(sizeof(T));
 
-        if (size_of_type <= 4) // 32-bit types
-          {
-            xdr_vector(xdrs.get(),
-                       (char *) val,
-                       len,
-                       size_of_type,
-                       (xdrproc_t) xdr_u_int);
-          }
-        else // 64-bit types
-          {
-            xdr_vector(xdrs.get(),
-                       (char *) val,
-                       len,
-                       size_of_type,
-                       (xdrproc_t) xdr_u_hyper);
-          }
-
+        xdr_vector(xdrs.get(),
+                   (char *) val,
+                   len,
+                   size_of_type,
+                   xdr_translator<T>());
 #else
-
         libmesh_error_msg("ERROR: Functionality is not available.\n"    \
                           << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
                           << "The XDR interface is not available in this installation");
@@ -817,28 +804,13 @@ void Xdr::data_stream (T * val, const unsigned int len, const unsigned int line_
 
         unsigned int size_of_type = cast_int<unsigned int>(sizeof(T));
 
-        if (size_of_type <= 4) // 32-bit types
-          {
-            if (len > 0)
-              xdr_vector(xdrs.get(),
-                         (char *) val,
-                         len,
-                         size_of_type,
-                         (xdrproc_t) xdr_u_int);
-          }
-        else // 64-bit types
-          {
-            if (len > 0)
-              xdr_vector(xdrs.get(),
-                         (char *) val,
-                         len,
-                         size_of_type,
-                         (xdrproc_t) xdr_u_hyper);
-
-          }
-
+        if (len > 0)
+          xdr_vector(xdrs.get(),
+                     (char *) val,
+                     len,
+                     size_of_type,
+                     xdr_translator<T>());
 #else
-
         libmesh_error_msg("ERROR: Functionality is not available.\n"    \
                           << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
                           << "The XDR interface is not available in this installation");
