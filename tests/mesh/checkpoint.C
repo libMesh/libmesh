@@ -31,7 +31,8 @@ class CheckpointIOTest : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( CheckpointIOTest );
 
-  CPPUNIT_TEST( testSplitter );
+  CPPUNIT_TEST( testAsciiSplitter );
+  CPPUNIT_TEST( testBinarySplitter );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -47,7 +48,7 @@ public:
   }
 
   // Test that we can write multiple checkpoint files from a single processor.
-  void testSplitter()
+  void testSplitter(bool binary)
   {
     // In this test, we partition the mesh into n_procs parts.
     const unsigned int n_procs = 2;
@@ -55,6 +56,9 @@ public:
     // The number of elements in the original mesh.  For verification
     // later.
     dof_id_type original_n_elem = 0;
+
+    const std::string filename =
+      std::string("checkpoint_splitter.cp") + (binary ? "r" : "a");
 
     {
       MetisPartitioner partitioner;
@@ -78,9 +82,9 @@ public:
           CheckpointIO cpr(mesh);
           cpr.current_processor_id() = i;
           cpr.current_n_processors() = n_procs;
-          cpr.binary() = true;
+          cpr.binary() = binary;
           cpr.parallel() = true;
-          cpr.write("checkpoint_splitter.cpr");
+          cpr.write(filename);
         }
     }
 
@@ -97,9 +101,9 @@ public:
           CheckpointIO cpr(mesh);
           cpr.current_processor_id() = i;
           cpr.current_n_processors() = n_procs;
-          cpr.binary() = true;
+          cpr.binary() = binary;
           cpr.parallel() = true;
-          cpr.read("checkpoint_splitter.cpr");
+          cpr.read(filename);
           read_in_elements += std::distance(mesh.pid_elements_begin(i),
                                             mesh.pid_elements_end(i));
         }
@@ -107,6 +111,16 @@ public:
       // Verify that we read in exactly as many elements on each proc as we started with.
       CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(read_in_elements), original_n_elem);
     }
+  }
+
+  void testAsciiSplitter()
+  {
+    testSplitter(false);
+  }
+
+  void testBinarySplitter()
+  {
+    testSplitter(true);
   }
 
 };
