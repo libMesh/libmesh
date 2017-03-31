@@ -626,15 +626,34 @@ void CheckpointIO::read_nodes (Xdr & io)
       p(2) = coords[2];
 #endif
 
+      const dof_id_type id = cast_int<dof_id_type>(id_pid[0]);
+      const processor_id_type pid = cast_int<processor_id_type>(id_pid[1]);
+
+      // If we already have this node (e.g. from another file, when
+      // reading multiple distributed CheckpointIO files into a
+      // ReplicatedMesh) then we don't want to add it again (because
+      // ReplicatedMesh can't handle that) but we do want to assert
+      // consistency between what we're reading and what we have.
+      const Node * old_node = mesh.query_node_ptr(id);
+
+      if (old_node)
+        {
+          libmesh_assert_equal_to(pid, old_node->processor_id());
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      Node * node =
+          libmesh_assert_equal_to(unique_id, old_node->unique_id());
 #endif
-        mesh.add_point(p, cast_int<dof_id_type>(id_pid[0]),
-                       cast_int<processor_id_type>(id_pid[1]));
+        }
+      else
+        {
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+          Node * node =
+#endif
+            mesh.add_point(p, id, pid);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      node->set_unique_id() = unique_id;
+          node->set_unique_id() = unique_id;
 #endif
+        }
     }
 }
 
@@ -697,40 +716,68 @@ void CheckpointIO::read_connectivity (Xdr & io)
             (parent_id == DofObject::invalid_processor_id) ?
             libmesh_nullptr : mesh.elem_ptr(parent_id);
 
-          // Create the element
-          Elem * elem = Elem::build(elem_type, parent).release();
+          Elem * old_elem = mesh.query_elem_ptr(id);
+
+          // If we already have this element (e.g. from another file,
+          // when reading multiple distributed CheckpointIO files into
+          // a ReplicatedMesh) then we don't want to add it again
+          // (because ReplicatedMesh can't handle that) but we do want
+          // to assert consistency between what we're reading and what
+          // we have.
+          if (old_elem)
+            {
+              libmesh_assert_equal_to(elem_type, old_elem->type());
+              libmesh_assert_equal_to(proc_id, old_elem->processor_id());
+              libmesh_assert_equal_to(subdomain_id, old_elem->subdomain_id());
+              if (parent)
+                libmesh_assert_equal_to(parent, old_elem->parent());
+              else
+                libmesh_assert(!old_elem->parent());
+
+              libmesh_assert_equal_to(old_elem->n_nodes(), conn_data.size());
+
+              for (std::size_t n=0; n != conn_data.size(); ++n)
+                libmesh_assert_equal_to
+                  (old_elem->node_id(n),
+                   cast_int<dof_id_type>(conn_data[n]));
+            }
+          else
+            {
+              // Create the element
+              Elem * elem = Elem::build(elem_type, parent).release();
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          elem->set_unique_id() = unique_id;
+              elem->set_unique_id() = unique_id;
 #endif
 
-          if (elem->dim() > highest_elem_dim)
-            highest_elem_dim = elem->dim();
+              if (elem->dim() > highest_elem_dim)
+                highest_elem_dim = elem->dim();
 
-          elem->set_id()       = id;
-          elem->processor_id() = proc_id;
-          elem->subdomain_id() = subdomain_id;
+              elem->set_id()       = id;
+              elem->processor_id() = proc_id;
+              elem->subdomain_id() = subdomain_id;
 
 #ifdef LIBMESH_ENABLE_AMR
-          elem->hack_p_level(p_level);
+              elem->hack_p_level(p_level);
 
-          // Set parent connections
-          if (parent)
-            {
-              parent->add_child(elem);
-              parent->set_refinement_flag (Elem::INACTIVE);
-              elem->set_refinement_flag   (Elem::JUST_REFINED);
-            }
+              // Set parent connections
+              if (parent)
+                {
+                  parent->add_child(elem);
+                  parent->set_refinement_flag (Elem::INACTIVE);
+                  elem->set_refinement_flag   (Elem::JUST_REFINED);
+                }
 #endif
 
-          libmesh_assert(elem->n_nodes() == conn_data.size());
+              libmesh_assert(elem->n_nodes() == conn_data.size());
 
-          // Connect all the nodes to this element
-          for (std::size_t n=0; n<conn_data.size(); n++)
-            elem->set_node(n) =
-              mesh.node_ptr(cast_int<dof_id_type>(conn_data[n]));
+              // Connect all the nodes to this element
+              for (std::size_t n=0; n<conn_data.size(); n++)
+                elem->set_node(n) =
+                  mesh.node_ptr(cast_int<dof_id_type>(conn_data[n]));
 
-          mesh.add_elem(elem);
+              mesh.add_elem(elem);
+            }
         }
     }
 
