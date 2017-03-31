@@ -4,11 +4,11 @@
 #include <cppunit/TestCase.h>
 #include <libmesh/restore_warnings.h>
 
-#include "libmesh/mesh.h"
+#include "libmesh/distributed_mesh.h"
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/checkpoint_io.h"
 #include "libmesh/mesh_generation.h"
-#include "libmesh/metis_partitioner.h"
+#include "libmesh/partitioner.h"
 
 #include "test_comm.h"
 
@@ -31,8 +31,14 @@ class CheckpointIOTest : public CppUnit::TestCase {
 public:
   CPPUNIT_TEST_SUITE( CheckpointIOTest );
 
-  CPPUNIT_TEST( testAsciiSplitter );
-  CPPUNIT_TEST( testBinarySplitter );
+  CPPUNIT_TEST( testAsciiDistRepSplitter );
+  CPPUNIT_TEST( testBinaryDistRepSplitter );
+  CPPUNIT_TEST( testAsciiRepDistSplitter );
+  CPPUNIT_TEST( testBinaryRepDistSplitter );
+  CPPUNIT_TEST( testAsciiRepRepSplitter );
+  CPPUNIT_TEST( testBinaryRepRepSplitter );
+  CPPUNIT_TEST( testAsciiDistDistSplitter );
+  CPPUNIT_TEST( testBinaryDistDistSplitter );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -48,10 +54,14 @@ public:
   }
 
   // Test that we can write multiple checkpoint files from a single processor.
-  void testSplitter(bool binary)
+  template <typename MeshA, typename MeshB>
+  void testSplitter(bool binary, bool using_distmesh)
   {
-    // In this test, we partition the mesh into n_procs parts.
-    const unsigned int n_procs = 2;
+    // In this test, we partition the mesh into n_procs parts.  Don't
+    // try to partition a DistributedMesh into more parts than we have
+    // processors, though.
+    const unsigned int n_procs =
+      using_distmesh ? std::min((unsigned int)2, TestCommWorld->size()) : 2;
 
     // The number of elements in the original mesh.  For verification
     // later.
@@ -61,8 +71,7 @@ public:
       std::string("checkpoint_splitter.cp") + (binary ? "r" : "a");
 
     {
-      MetisPartitioner partitioner;
-      ReplicatedMesh mesh(*TestCommWorld);
+      MeshA mesh(*TestCommWorld);
 
       MeshTools::Generation::build_square(mesh,
                                           4,  4,
@@ -74,7 +83,7 @@ public:
       original_n_elem = mesh.n_elem();
 
       // Partition the mesh into n_procs pieces
-      partitioner.partition(mesh, n_procs);
+      mesh.partition(n_procs);
 
       // Write out checkpoint files for each processor.
       for (unsigned i=0; i<n_procs; ++i)
@@ -97,7 +106,7 @@ public:
 
       for (unsigned i=0; i<n_procs; ++i)
         {
-          Mesh mesh(*TestCommWorld);
+          MeshB mesh(*TestCommWorld);
           CheckpointIO cpr(mesh);
           cpr.current_processor_id() = i;
           cpr.current_n_processors() = n_procs;
@@ -113,14 +122,44 @@ public:
     }
   }
 
-  void testAsciiSplitter()
+  void testAsciiDistRepSplitter()
   {
-    testSplitter(false);
+    testSplitter<DistributedMesh, ReplicatedMesh>(false, true);
   }
 
-  void testBinarySplitter()
+  void testBinaryDistRepSplitter()
   {
-    testSplitter(true);
+    testSplitter<DistributedMesh, ReplicatedMesh>(true, true);
+  }
+
+  void testAsciiRepDistSplitter()
+  {
+    testSplitter<ReplicatedMesh, DistributedMesh>(false, true);
+  }
+
+  void testBinaryRepDistSplitter()
+  {
+    testSplitter<ReplicatedMesh, DistributedMesh>(true, true);
+  }
+
+  void testAsciiRepRepSplitter()
+  {
+    testSplitter<ReplicatedMesh, ReplicatedMesh>(false, false);
+  }
+
+  void testBinaryRepRepSplitter()
+  {
+    testSplitter<ReplicatedMesh, ReplicatedMesh>(true, false);
+  }
+
+  void testAsciiDistDistSplitter()
+  {
+    testSplitter<DistributedMesh, DistributedMesh>(false, true);
+  }
+
+  void testBinaryDistDistSplitter()
+  {
+    testSplitter<DistributedMesh, DistributedMesh>(true, true);
   }
 
 };
