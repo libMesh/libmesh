@@ -693,6 +693,7 @@ include_HEADERS = \
         geom/cell_tet.h \
         geom/cell_tet10.h \
         geom/cell_tet4.h \
+        geom/compare_elems_by_level.h \
         geom/edge.h \
         geom/edge_edge2.h \
         geom/edge_edge3.h \
