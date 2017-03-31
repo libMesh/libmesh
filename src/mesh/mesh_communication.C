@@ -19,6 +19,7 @@
 
 // Local Includes
 #include "libmesh/boundary_info.h"
+#include "libmesh/compare_elem_ids_by_level.h"
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/elem.h"
 #include "libmesh/ghosting_functor.h"
@@ -48,28 +49,6 @@
 namespace {
 
 using namespace libMesh;
-
-/**
- * Specific weak ordering for Elem *'s to be used in a set.
- * We use the id, but first sort by level.  This guarantees
- * when traversing the set from beginning to end the lower
- * level (parent) elements are encountered first.
- */
-struct CompareElemIdsByLevel
-{
-  bool operator()(const Elem * a,
-                  const Elem * b) const
-  {
-    libmesh_assert (a);
-    libmesh_assert (b);
-    const unsigned int
-      al = a->level(), bl = b->level();
-    const dof_id_type
-      aid = a->id(),   bid = b->id();
-
-    return (al == bl) ? aid < bid : al < bl;
-  }
-};
 
 struct SyncNeighbors
 {
