@@ -554,8 +554,9 @@ void CheckpointIO::read (const std::string & name)
   // If the mesh was only read on processor 0 then we need to broadcast it
   if (mesh.is_replicated())
     MeshCommunication().broadcast(mesh);
-  // If the mesh is distributed then we need to make sure it knows that
-  else
+  // If the mesh is really distributed then we need to make sure it
+  // knows that
+  else if (mesh.n_processors() > 1)
     mesh.set_distributed();
 }
 
