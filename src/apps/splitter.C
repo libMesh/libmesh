@@ -19,7 +19,7 @@
 // Read in a Mesh file and write out partitionings of it that are suitable
 // for reading into a DistributedMesh
 #include "libmesh/libmesh.h"
-#include "libmesh/mesh.h"
+#include "libmesh/replicated_mesh.h"
 #include "libmesh/checkpoint_io.h"
 #include "libmesh/metis_partitioner.h"
 #include "libmesh/getpot.h"
@@ -59,7 +59,7 @@ int main (int argc, char ** argv)
 
   Parallel::Communicator & comm = init.comm();
 
-  Mesh mesh(init.comm());
+  ReplicatedMesh mesh(init.comm());
 
   libMesh::out << "Reading " << filename << std::endl;
 
@@ -142,19 +142,14 @@ int main (int argc, char ** argv)
         {
           libMesh::out << "Writing " << my_num_chunks << " Files" << std::endl;
 
+          CheckpointIO cpr(mesh);
+          cpr.current_processor_ids().clear();
           for (unsigned int i = my_first_chunk; i < my_first_chunk + my_num_chunks; i++)
-            {
-              libMesh::out << " " << 100 * (static_cast<double>(i) / static_cast<double>(my_num_chunks)) << "% Complete" << std::endl;
-
-              CheckpointIO cpr(mesh);
-              cpr.current_processor_id() = i;
-              cpr.current_n_processors() = n_procs;
-              cpr.binary() = true;
-              cpr.parallel() = true;
-              cpr.write(remove_extension(filename) + ".cpr");
-            }
-
-          libMesh::out << " 100% Complete" << std::endl;
+            cpr.current_processor_ids().push_back(i);
+          cpr.current_n_processors() = n_procs;
+          cpr.binary() = true;
+          cpr.parallel() = true;
+          cpr.write(remove_extension(filename) + ".cpr");
         }
     }
 

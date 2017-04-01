@@ -85,16 +85,18 @@ public:
       // Partition the mesh into n_procs pieces
       mesh.partition(n_procs);
 
-      // Write out checkpoint files for each processor.
-      for (unsigned i=0; i<n_procs; ++i)
-        {
-          CheckpointIO cpr(mesh);
-          cpr.current_processor_id() = i;
-          cpr.current_n_processors() = n_procs;
-          cpr.binary() = binary;
-          cpr.parallel() = true;
-          cpr.write(filename);
-        }
+      // Write out checkpoint files for each piece.  Since on a
+      // ReplicatedMesh we might have more pieces than we do
+      // processors, some processors may have to write out more than
+      // one piece.
+      CheckpointIO cpr(mesh);
+      cpr.current_processor_ids().clear();
+      for (processor_id_type pid = mesh.processor_id(); pid < n_procs; pid += mesh.n_processors())
+        cpr.current_processor_ids().push_back(pid);
+      cpr.current_n_processors() = n_procs;
+      cpr.binary() = binary;
+      cpr.parallel() = true;
+      cpr.write(filename);
     }
 
     TestCommWorld->barrier();
@@ -102,22 +104,21 @@ public:
     // Test that we can read in the files we wrote and sum up to the
     // same total number of elements.
     {
-      unsigned int read_in_elements = 0;
+      MeshB mesh(*TestCommWorld);
+      CheckpointIO cpr(mesh);
+      cpr.binary() = binary;
+      cpr.read(filename);
 
-      for (unsigned i=0; i<n_procs; ++i)
+      std::size_t read_in_elements = 0;
+
+      for (unsigned pid=mesh.processor_id(); pid<n_procs; pid += mesh.n_processors())
         {
-          MeshB mesh(*TestCommWorld);
-          CheckpointIO cpr(mesh);
-          cpr.current_processor_id() = i;
-          cpr.current_n_processors() = n_procs;
-          cpr.binary() = binary;
-          cpr.parallel() = true;
-          cpr.read(filename);
-          read_in_elements += std::distance(mesh.pid_elements_begin(i),
-                                            mesh.pid_elements_end(i));
+          read_in_elements += std::distance(mesh.pid_elements_begin(pid),
+                                            mesh.pid_elements_end(pid));
         }
+      mesh.comm().sum(read_in_elements);
 
-      // Verify that we read in exactly as many elements on each proc as we started with.
+      // Verify that we read in exactly as many elements as we started with.
       CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(read_in_elements), original_n_elem);
     }
   }
