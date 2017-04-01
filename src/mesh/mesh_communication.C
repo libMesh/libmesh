@@ -19,7 +19,6 @@
 
 // Local Includes
 #include "libmesh/boundary_info.h"
-#include "libmesh/compare_elem_ids_by_level.h"
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/elem.h"
 #include "libmesh/ghosting_functor.h"
@@ -126,7 +125,15 @@ struct SyncNeighbors
 };
 
 
-void query_ghosting_functors(MeshBase & mesh,
+}
+
+
+
+namespace libMesh
+{
+
+
+void query_ghosting_functors(const MeshBase & mesh,
                              processor_id_type pid,
                              bool newly_coarsened_only,
                              std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
@@ -176,7 +183,7 @@ void query_ghosting_functors(MeshBase & mesh,
 }
 
 
-void connect_children(MeshBase & mesh,
+void connect_children(const MeshBase & mesh,
                       processor_id_type pid,
                       std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
@@ -290,11 +297,7 @@ void reconnect_nodes (const std::set<const Elem *, CompareElemIdsByLevel> & conn
     }
 }
 
-}
 
-
-namespace libMesh
-{
 
 
 // ------------------------------------------------------------

@@ -21,6 +21,7 @@
 #define LIBMESH_MESH_COMMUNICATION_H
 
 // Local Includes
+#include "libmesh/compare_elems_by_level.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_tools.h"
 
@@ -229,6 +230,31 @@ public:
    */
   void make_new_nodes_parallel_consistent (MeshBase &);
 };
+
+
+// Related utilities
+
+// Ask a mesh's ghosting functors to insert into a set all elements
+// that are either on or connected to processor id \p pid.  Ask only
+// for newly-coarsened elements if \p newly_coarsened_only is true.
+void query_ghosting_functors(const MeshBase & mesh,
+                             processor_id_type pid,
+                             bool newly_coarsened_only,
+                             std::set<const Elem *, CompareElemIdsByLevel> & connected_elements);
+
+// Take a set of elements and insert all elements' immediate
+// children as well.
+void connect_children(const MeshBase & mesh,
+                      processor_id_type pid,
+                      std::set<const Elem *, CompareElemIdsByLevel> & connected_elements);
+
+// Take a set of elements and insert all elements' ancestors and
+// subactive descendants as well.
+void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_elements);
+
+// Take a set of elements and create a set of connected nodes.
+void reconnect_nodes (const std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
+                      std::set<const Node *> & connected_nodes);
 
 
 
