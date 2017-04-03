@@ -390,11 +390,11 @@ void AbaqusIO::read (const std::string & fname)
   // Assign sideset values in the BoundaryInfo object
   this->assign_sideset_ids();
 
-  // Abaqus files only contain nodesets by default.  To be useful in
-  // applying most types of BCs in libmesh, we will definitely need
-  // sidesets.  So we can call the new BoundaryInfo function which
-  // generates sidesets from nodesets.
-  if (build_sidesets_from_nodesets)
+  // If the Abaqus file contains only nodesets, we can have libmesh
+  // generate sidesets from them. This BoundaryInfo function currently
+  // *overwrites* existing sidesets in surprising ways, so we don't
+  // call it if there are already sidesets present in the original file.
+  if (build_sidesets_from_nodesets && the_mesh.get_boundary_info().n_boundary_conds() == 0)
     the_mesh.get_boundary_info().build_side_list_from_node_list();
 
   // Delete lower-dimensional elements from the Mesh.  We assume these
