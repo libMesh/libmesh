@@ -513,14 +513,15 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
   unsigned n_nodes_per_elem = 0;
 
   // Within s, we should have "type=XXXX"
-  if (upper.find("T3D2") != std::string::npos)
+  if (upper.find("T3D2") != std::string::npos ||
+      upper.find("B31") != std::string::npos)
     {
       elem_type = EDGE2;
       n_nodes_per_elem = 2;
       elems_of_dimension[1] = true;
     }
   else if (upper.find("CPE4") != std::string::npos ||
-           upper.find("CPS4") != std::string::npos)
+           upper.find("S4") != std::string::npos)
     {
       elem_type = QUAD4;
       n_nodes_per_elem = 4;
