@@ -17,8 +17,8 @@
 
 
 
-#ifndef LIBMESH_COMPARE_ELEM_IDS_BY_LEVEL_H
-#define LIBMESH_COMPARE_ELEM_IDS_BY_LEVEL_H
+#ifndef LIBMESH_COMPARE_ELEMS_BY_LEVEL_H
+#define LIBMESH_COMPARE_ELEMS_BY_LEVEL_H
 
 
 // Local Includes
@@ -58,4 +58,4 @@ struct CompareElemIdsByLevel
 
 } // namespace libMesh
 
-#endif // LIBMESH_COMPARE_ELEM_IDS_BY_LEVEL_H
+#endif // LIBMESH_COMPARE_ELEMS_BY_LEVEL_H
