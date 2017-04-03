@@ -57,9 +57,11 @@ public:
   virtual void read (const std::string & name) libmesh_override;
 
   /**
-   * Default false.  Abaqus files have only nodesets in them by
-   * default.  Set this flag to true if you want libmesh to automatically
-   * generate sidesets from Abaqus' nodesets.
+   * Default false. Set this flag to true if you want libmesh to
+   * automatically generate sidesets from Abaqus' nodesets. If the
+   * Abaqus file already contains some sidesets, we ignore this flag
+   * and don't generate sidesets, because the algorithm to do so
+   * currently does not take into account existing sidesets.
    */
   bool build_sidesets_from_nodesets;
 
