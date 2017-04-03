@@ -518,7 +518,7 @@ void CheckpointIO::read (const std::string & name)
   if (this->processor_id() == 0)
     {
       {
-        std::ifstream in (name);
+        std::ifstream in (name.c_str());
 
         if (!in.good())
           libmesh_error_msg("ERROR: cannot locate header file:\n\t" << name);
