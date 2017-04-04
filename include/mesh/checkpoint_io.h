@@ -232,7 +232,6 @@ private:
   bool _parallel;
   std::string _version;
   unsigned int _mesh_dimension;
-  unsigned int _n_active_levels;
 
   // The processor ids to write
   std::vector<processor_id_type> _my_processor_ids;
