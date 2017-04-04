@@ -510,6 +510,8 @@ void CheckpointIO::read (const std::string & name)
 
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
+  libmesh_assert(!mesh.n_elem());
+
   // Will this be a parallel input file?  With how many processors?  Stay tuned!
   unsigned int input_parallel;
   processor_id_type input_n_procs;
