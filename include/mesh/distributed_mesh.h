@@ -122,7 +122,7 @@ public:
    * Asserts that not all elements and nodes of the mesh necessarily
    * exist on the current processor.
    */
-  virtual void set_distributed ()
+  virtual void set_distributed () libmesh_override
   { _is_serial = false; }
 
   /**
