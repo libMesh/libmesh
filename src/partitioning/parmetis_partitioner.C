@@ -116,6 +116,9 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
   // Revert to METIS on one processor.
   if (mesh.n_processors() == 1)
     {
+      // Make sure the mesh knows it's serial
+      mesh.allgather();
+
       MetisPartitioner mp;
       mp.partition (mesh, n_sbdmns);
       return;

@@ -783,7 +783,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
         // We used to simply call non_const_sys.solution->close()
         // here, but that is not allowed when the solution vector is
         // locked read-only, for example when printing the solution
-        // during during the middle of a solve...  So try to be a bit
+        // during the middle of a solve...  So try to be a bit
         // more careful about calling close() unnecessarily.
         libmesh_assert(this->comm().verify(non_const_sys.solution->closed()));
         if (!non_const_sys.solution->closed())

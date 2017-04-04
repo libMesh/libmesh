@@ -22,7 +22,7 @@
 
 
 // Local includes
-#include "libmesh/libmesh.h"
+#include "libmesh/compare_elems_by_level.h"
 #include "libmesh/mesh_input.h"
 #include "libmesh/mesh_output.h"
 #include "libmesh/parallel_object.h"
@@ -39,13 +39,13 @@ class Xdr;
 /**
  * The CheckpointIO class can be used to write simplified restart
  * files that can be used to restart simulations that have
- * crashed. Only N-to-N (procs) restart is supported with CheckpointIO
- * files.
+ * crashed.
  *
  * \author Benjamin Kirk
  * \author John Peterson
  * \author Derek Gaston
- * \date 2013
+ * \author Roy Stogner
+ * \date 2017
  */
 class CheckpointIO : public MeshInput<MeshBase>,
                      public MeshOutput<MeshBase>,
@@ -112,17 +112,23 @@ public:
   std::string &       version ()       { return _version; }
 
   /**
-   * Get/Set the processor_id to use
+   * Get/Set the processor id or processor ids to use.
+   *
+   * The default processor_id to use is the processor_id() of the
+   * mesh.
    *
    * This is used for m->n parallel checkpoint file writing:
-   * You can force CheckpointIO to view the world as if it is on a particular
-   * processor_id by setting it here
+   * You can force CheckpointIO to write out different partitions of a
+   * mesh by setting which partitions to write from each processor here.
    */
-  const processor_id_type & current_processor_id() const { return _my_processor_id; }
-  processor_id_type & current_processor_id() { return _my_processor_id; }
+  const std::vector<processor_id_type> & current_processor_ids() const { return _my_processor_ids; }
+  std::vector<processor_id_type> & current_processor_ids() { return _my_processor_ids; }
 
   /**
    * Get/Set the n_processors to use
+   *
+   * The default n_processors to use is the n_processors() of the
+   * mesh.
    *
    * This is used for m->n parallel checkpoint file writing:
    * You can force CheckpointIO to view the world as if it contains this number of
@@ -136,39 +142,39 @@ private:
   // Write Implementation
 
   /**
-   * Build up the elem list
-   */
-  void build_elem_list();
-
-  /**
-   * Build up the node list
-   */
-  void build_node_list();
-
-  /**
    * Write subdomain name information - NEW in 0.9.2 format
    */
   void write_subdomain_names(Xdr & io) const;
 
   /**
-   * Write the connectivity for a parallel, distributed mesh
+   * Write the connectivity for part of a mesh
    */
-  void write_connectivity (Xdr & io) const;
+  void write_connectivity (Xdr & io,
+                           const std::set<const Elem *, CompareElemIdsByLevel> & elements) const;
 
   /**
-   * Write the nodal locations for a parallel, distributed mesh
+   * Write the remote_elem neighbor links for part of a mesh
    */
-  void write_nodes (Xdr & io) const;
+  void write_remote_elem (Xdr & io,
+                          const std::set<const Elem *, CompareElemIdsByLevel> & elements) const;
 
   /**
-   * Write the boundary conditions for a parallel, distributed mesh
+   * Write the nodal locations for part of a mesh
    */
-  void write_bcs (Xdr & io) const;
+  void write_nodes (Xdr & io,
+                    const std::set<const Node *> & nodeset) const;
 
   /**
-   * Write the boundary conditions for a parallel, distributed mesh
+   * Write the side boundary conditions for part of a mesh
    */
-  void write_nodesets (Xdr & io) const;
+  void write_bcs (Xdr & io,
+                  const std::set<const Elem *, CompareElemIdsByLevel> & elements) const;
+
+  /**
+   * Write the nodal boundary conditions for part of a mesh
+   */
+  void write_nodesets (Xdr & io,
+                       const std::set<const Node *> & nodeset) const;
 
   /**
    * Write boundary names information (sideset and nodeset) - NEW in 0.9.2 format
@@ -187,6 +193,11 @@ private:
    * Read the connectivity for a parallel, distributed mesh
    */
   void read_connectivity (Xdr & io);
+
+  /**
+   * Read the remote_elem neighbor links for a parallel, distributed mesh
+   */
+  void read_remote_elem (Xdr & io);
 
   /**
    * Read the nodal locations for a parallel, distributed mesh
@@ -214,21 +225,19 @@ private:
    * Implemented by looping over all the active elements and finding
    * the maximum level.
    */
-  unsigned int n_active_levels_on_processor(const MeshBase & mesh) const;
+  unsigned int n_active_levels_in(MeshBase::const_element_iterator begin,
+                                  MeshBase::const_element_iterator end) const;
 
   bool _binary;
   bool _parallel;
   std::string _version;
   unsigned int _mesh_dimension;
+  unsigned int _n_active_levels;
 
-  /// These are sets of IDs to make the lookup for boundary conditions simpler
-  std::set<largest_id_type> _local_elements;
-  std::set<largest_id_type> _nodes_connected_to_local_elements;
+  // The processor ids to write
+  std::vector<processor_id_type> _my_processor_ids;
 
-  /// The processor_id to use
-  processor_id_type _my_processor_id;
-
-  /// The number of processors to use
+  // The largest processor id to write
   processor_id_type _my_n_processors;
 };
 

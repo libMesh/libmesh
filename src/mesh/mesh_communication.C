@@ -49,28 +49,6 @@ namespace {
 
 using namespace libMesh;
 
-/**
- * Specific weak ordering for Elem *'s to be used in a set.
- * We use the id, but first sort by level.  This guarantees
- * when traversing the set from beginning to end the lower
- * level (parent) elements are encountered first.
- */
-struct CompareElemIdsByLevel
-{
-  bool operator()(const Elem * a,
-                  const Elem * b) const
-  {
-    libmesh_assert (a);
-    libmesh_assert (b);
-    const unsigned int
-      al = a->level(), bl = b->level();
-    const dof_id_type
-      aid = a->id(),   bid = b->id();
-
-    return (al == bl) ? aid < bid : al < bl;
-  }
-};
-
 struct SyncNeighbors
 {
   typedef std::vector<dof_id_type> datum;
@@ -147,7 +125,15 @@ struct SyncNeighbors
 };
 
 
-void query_ghosting_functors(MeshBase & mesh,
+}
+
+
+
+namespace libMesh
+{
+
+
+void query_ghosting_functors(const MeshBase & mesh,
                              processor_id_type pid,
                              bool newly_coarsened_only,
                              std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
@@ -197,7 +183,7 @@ void query_ghosting_functors(MeshBase & mesh,
 }
 
 
-void connect_children(MeshBase & mesh,
+void connect_children(const MeshBase & mesh,
                       processor_id_type pid,
                       std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
@@ -311,11 +297,7 @@ void reconnect_nodes (const std::set<const Elem *, CompareElemIdsByLevel> & conn
     }
 }
 
-}
 
-
-namespace libMesh
-{
 
 
 // ------------------------------------------------------------

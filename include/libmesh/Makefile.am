@@ -114,6 +114,7 @@ BUILT_SOURCES = \
         cell_tet.h \
         cell_tet10.h \
         cell_tet4.h \
+        compare_elems_by_level.h \
         edge.h \
         edge_edge2.h \
         edge_edge3.h \
@@ -850,6 +851,9 @@ cell_tet10.h: $(top_srcdir)/include/geom/cell_tet10.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_tet4.h: $(top_srcdir)/include/geom/cell_tet4.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+compare_elems_by_level.h: $(top_srcdir)/include/geom/compare_elems_by_level.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 edge.h: $(top_srcdir)/include/geom/edge.h

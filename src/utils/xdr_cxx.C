@@ -565,6 +565,9 @@ template <>
 xdrproc_t xdr_translator<unsigned long int>() { return (xdrproc_t)(xdr_u_long); }
 
 template <>
+xdrproc_t xdr_translator<long long>() { return (xdrproc_t)(xdr_longlong_t); }
+
+template <>
 xdrproc_t xdr_translator<unsigned long long>() { return (xdrproc_t)(xdr_u_longlong_t); }
 
 template <>
@@ -779,25 +782,12 @@ void Xdr::data_stream (T * val, const unsigned int len, const unsigned int line_
 
         unsigned int size_of_type = cast_int<unsigned int>(sizeof(T));
 
-        if (size_of_type <= 4) // 32-bit types
-          {
-            xdr_vector(xdrs.get(),
-                       (char *) val,
-                       len,
-                       size_of_type,
-                       (xdrproc_t) xdr_u_int);
-          }
-        else // 64-bit types
-          {
-            xdr_vector(xdrs.get(),
-                       (char *) val,
-                       len,
-                       size_of_type,
-                       (xdrproc_t) xdr_u_hyper);
-          }
-
+        xdr_vector(xdrs.get(),
+                   (char *) val,
+                   len,
+                   size_of_type,
+                   xdr_translator<T>());
 #else
-
         libmesh_error_msg("ERROR: Functionality is not available.\n"    \
                           << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
                           << "The XDR interface is not available in this installation");
@@ -814,28 +804,13 @@ void Xdr::data_stream (T * val, const unsigned int len, const unsigned int line_
 
         unsigned int size_of_type = cast_int<unsigned int>(sizeof(T));
 
-        if (size_of_type <= 4) // 32-bit types
-          {
-            if (len > 0)
-              xdr_vector(xdrs.get(),
-                         (char *) val,
-                         len,
-                         size_of_type,
-                         (xdrproc_t) xdr_u_int);
-          }
-        else // 64-bit types
-          {
-            if (len > 0)
-              xdr_vector(xdrs.get(),
-                         (char *) val,
-                         len,
-                         size_of_type,
-                         (xdrproc_t) xdr_u_hyper);
-
-          }
-
+        if (len > 0)
+          xdr_vector(xdrs.get(),
+                     (char *) val,
+                     len,
+                     size_of_type,
+                     xdr_translator<T>());
 #else
-
         libmesh_error_msg("ERROR: Functionality is not available.\n"    \
                           << "Make sure LIBMESH_HAVE_XDR is defined at build time\n" \
                           << "The XDR interface is not available in this installation");
@@ -1532,6 +1507,7 @@ template void Xdr::data<short int>                        (short int &,         
 template void Xdr::data<unsigned long int>                (unsigned long int &,               const char *);
 template void Xdr::data<unsigned long long>               (unsigned long long &,              const char *);
 template void Xdr::data<long int>                         (long int &,                        const char *);
+template void Xdr::data<long long>                        (long long &,                       const char *);
 template void Xdr::data<char>                             (char &,                            const char *);
 template void Xdr::data<signed char>                      (signed char &,                     const char *);
 template void Xdr::data<unsigned char>                    (unsigned char &,                   const char *);
@@ -1547,6 +1523,7 @@ template void Xdr::data<std::vector<unsigned int> >       (std::vector<unsigned 
 template void Xdr::data<std::vector<short int> >          (std::vector<short int> &,          const char *);
 template void Xdr::data<std::vector<unsigned short int> > (std::vector<unsigned short int> &, const char *);
 template void Xdr::data<std::vector<long int> >           (std::vector<long int> &,           const char *);
+template void Xdr::data<std::vector<long long> >          (std::vector<long long> &,          const char *);
 template void Xdr::data<std::vector<unsigned long int> >  (std::vector<unsigned long int> &,  const char *);
 template void Xdr::data<std::vector<unsigned long long> > (std::vector<unsigned long long> &, const char *);
 template void Xdr::data<std::vector<char> >               (std::vector<char> &,               const char *);
@@ -1559,7 +1536,10 @@ template void Xdr::data<std::vector<std::complex<float> > >  (std::vector<std::c
 template void Xdr::data<std::vector<std::complex<double> > > (std::vector<std::complex<double> > &, const char *);
 template void Xdr::data<std::vector<std::complex<long double> > > (std::vector<std::complex<long double> > &, const char *);
 template void Xdr::data<std::vector<std::string> >        (std::vector<std::string> &,        const char *);
+template void Xdr::data_stream<unsigned char>      (unsigned char * val,      const unsigned int len, const unsigned int line_break);
+template void Xdr::data_stream<short int>          (short int * val,          const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<int>                (int * val,                const unsigned int len, const unsigned int line_break);
+template void Xdr::data_stream<long long>          (long long * val,          const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned short int> (unsigned short int * val, const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned int>       (unsigned int * val,       const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned long int>  (unsigned long int * val,  const unsigned int len, const unsigned int line_break);
