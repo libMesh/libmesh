@@ -431,8 +431,17 @@ public:
   /**
    * Resets this element's neighbors' appropriate neighbor pointers
    * and its parent's and children's appropriate pointers
+   * to point to null instead of to this.
+   *
+   * Used by the library before an element is deleted from a mesh.
+   */
+  void remove_links_to_me ();
+
+  /**
+   * Resets this element's neighbors' appropriate neighbor pointers
+   * and its parent's and children's appropriate pointers
    * to point to the global remote_elem instead of this.
-   * Used by the library before a remote element is deleted on the
+   * Used by the library before an element becomes remote on the
    * local processor.
    */
   void make_links_to_me_remote ();
