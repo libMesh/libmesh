@@ -332,20 +332,15 @@ void ExodusII_IO_Helper::open(const char * filename, bool read_only)
   // Version of Exodus you are using
   float ex_version = 0.;
 
-  int
-    comp_ws = 0;
+  int comp_ws = 0;
 
-  if(_single_precision)
-    {
-      comp_ws = cast_int<int>(sizeof(float));
-    }
+  if (_single_precision)
+    comp_ws = cast_int<int>(sizeof(float));
+
   // Fall back on double precision when necessary since ExodusII
   // doesn't seem to support long double
   else
-    {
-      comp_ws = cast_int<int>
-        (std::min(sizeof(Real), sizeof(double)));
-    }
+    comp_ws = cast_int<int>(std::min(sizeof(Real), sizeof(double)));
 
   // Word size in bytes of the floating point data as they are stored
   // in the ExodusII file.  "If this argument is 0, the word size of the
