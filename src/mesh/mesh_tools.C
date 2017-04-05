@@ -430,6 +430,10 @@ libMesh::BoundingBox
 MeshTools::create_processor_bounding_box (const MeshBase & mesh,
                                           const processor_id_type pid)
 {
+  // This can only be run in parallel, with consistent arguments.
+  libmesh_parallel_only(mesh.comm());
+  libmesh_assert(mesh.comm().verify(pid));
+
   libmesh_assert_less (pid, mesh.n_processors());
 
   FindBBox find_bbox;
@@ -476,6 +480,10 @@ libMesh::BoundingBox
 MeshTools::create_subdomain_bounding_box (const MeshBase & mesh,
                                           const subdomain_id_type sid)
 {
+  // This can only be run in parallel, with consistent arguments.
+  libmesh_parallel_only(mesh.comm());
+  libmesh_assert(mesh.comm().verify(sid));
+
   FindBBox find_bbox;
 
   Threads::parallel_reduce
