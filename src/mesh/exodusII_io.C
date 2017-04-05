@@ -468,11 +468,11 @@ void ExodusII_IO::copy_nodal_solution(System & system,
 
   for (std::size_t i=0; i<exio_helper->nodal_var_values.size(); ++i)
     {
-      const Node & node = MeshInput<MeshBase>::mesh().node_ref(i);
+      const Node * node = MeshInput<MeshBase>::mesh().query_node_ptr(i);
 
-      if (node.n_comp(system.number(), var_num) > 0)
+      if (node && node->n_comp(system.number(), var_num) > 0)
         {
-          dof_id_type dof_index = node.dof_number(system.number(), var_num, 0);
+          dof_id_type dof_index = node->dof_number(system.number(), var_num, 0);
 
           // If the dof_index is local to this processor, set the value
           if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
@@ -514,10 +514,7 @@ void ExodusII_IO::copy_elemental_solution(System & system,
     {
       const Elem * elem = MeshInput<MeshBase>::mesh().query_elem_ptr(it->first);
 
-      if (!elem)
-        libmesh_error_msg("Error! Mesh returned NULL pointer for elem " << it->first);
-
-      if (elem->n_comp(system.number(), var_num) > 0)
+      if (elem && elem->n_comp(system.number(), var_num) > 0)
         {
           dof_id_type dof_index = elem->dof_number(system.number(), var_num, 0);
 
