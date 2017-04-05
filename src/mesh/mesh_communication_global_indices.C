@@ -42,7 +42,7 @@ using namespace libMesh;
 // Utility function to map (x,y,z) in [bbox.min, bbox.max]^3 into
 // [0,max_inttype]^3 for computing Hilbert keys
 void get_hilbert_coords (const Point & p,
-                         const MeshTools::BoundingBox & bbox,
+                         const libMesh::BoundingBox & bbox,
                          CFixBitVec icoords[3])
 {
   static const Hilbert::inttype max_inttype = static_cast<Hilbert::inttype>(-1);
@@ -75,7 +75,7 @@ void get_hilbert_coords (const Point & p,
 
 Parallel::DofObjectKey
 get_hilbert_index (const Elem * e,
-                   const MeshTools::BoundingBox & bbox)
+                   const libMesh::BoundingBox & bbox)
 {
   static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
 
@@ -98,7 +98,7 @@ get_hilbert_index (const Elem * e,
 // Compute the hilbert index
 Parallel::DofObjectKey
 get_hilbert_index (const Node * n,
-                   const MeshTools::BoundingBox & bbox)
+                   const libMesh::BoundingBox & bbox)
 {
   static const unsigned int sizeof_inttype = sizeof(Hilbert::inttype);
 
@@ -120,7 +120,7 @@ get_hilbert_index (const Node * n,
 class ComputeHilbertKeys
 {
 public:
-  ComputeHilbertKeys (const MeshTools::BoundingBox & bbox,
+  ComputeHilbertKeys (const libMesh::BoundingBox & bbox,
                       std::vector<Parallel::DofObjectKey> & keys) :
     _bbox(bbox),
     _keys(keys)
@@ -153,7 +153,7 @@ public:
   }
 
 private:
-  const MeshTools::BoundingBox & _bbox;
+  const libMesh::BoundingBox & _bbox;
   std::vector<Parallel::DofObjectKey> & _keys;
 };
 }
@@ -184,7 +184,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
 
   // Global bounding box
   BoundingBox bbox =
-    MeshTools::bounding_box (mesh);
+    MeshTools::create_bounding_box (mesh);
 
   //-------------------------------------------------------------
   // (1) compute Hilbert keys
@@ -579,7 +579,7 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
 
   // Global bounding box
   BoundingBox bbox =
-    MeshTools::bounding_box (mesh);
+    MeshTools::create_bounding_box (mesh);
 
   std::vector<Parallel::DofObjectKey>
     node_keys, elem_keys;
@@ -668,7 +668,7 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase &) const
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 template <typename ForwardIterator>
 void MeshCommunication::find_global_indices (const Parallel::Communicator & communicator,
-                                             const MeshTools::BoundingBox & bbox,
+                                             const libMesh::BoundingBox & bbox,
                                              const ForwardIterator & begin,
                                              const ForwardIterator & end,
                                              std::vector<dof_id_type> & index_map) const
@@ -912,7 +912,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
 #else // LIBMESH_HAVE_LIBHILBERT, LIBMESH_HAVE_MPI
 template <typename ForwardIterator>
 void MeshCommunication::find_global_indices (const Parallel::Communicator &,
-                                             const MeshTools::BoundingBox &,
+                                             const libMesh::BoundingBox &,
                                              const ForwardIterator & begin,
                                              const ForwardIterator & end,
                                              std::vector<dof_id_type> & index_map) const
@@ -929,24 +929,24 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &,
 
 //------------------------------------------------------------------
 template void MeshCommunication::find_global_indices<MeshBase::const_node_iterator> (const Parallel::Communicator &,
-                                                                                     const MeshTools::BoundingBox &,
+                                                                                     const libMesh::BoundingBox &,
                                                                                      const MeshBase::const_node_iterator &,
                                                                                      const MeshBase::const_node_iterator &,
                                                                                      std::vector<dof_id_type> &) const;
 
 template void MeshCommunication::find_global_indices<MeshBase::const_element_iterator> (const Parallel::Communicator &,
-                                                                                        const MeshTools::BoundingBox &,
+                                                                                        const libMesh::BoundingBox &,
                                                                                         const MeshBase::const_element_iterator &,
                                                                                         const MeshBase::const_element_iterator &,
                                                                                         std::vector<dof_id_type> &) const;
 template void MeshCommunication::find_global_indices<MeshBase::node_iterator> (const Parallel::Communicator &,
-                                                                               const MeshTools::BoundingBox &,
+                                                                               const libMesh::BoundingBox &,
                                                                                const MeshBase::node_iterator &,
                                                                                const MeshBase::node_iterator &,
                                                                                std::vector<dof_id_type> &) const;
 
 template void MeshCommunication::find_global_indices<MeshBase::element_iterator> (const Parallel::Communicator &,
-                                                                                  const MeshTools::BoundingBox &,
+                                                                                  const libMesh::BoundingBox &,
                                                                                   const MeshBase::element_iterator &,
                                                                                   const MeshBase::element_iterator &,
                                                                                   std::vector<dof_id_type> &) const;

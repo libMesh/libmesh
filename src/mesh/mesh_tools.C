@@ -159,7 +159,10 @@ public:
   }
 #endif
 
-  MeshTools::BoundingBox bbox () const
+  /**
+   * FindBBox::bbox() now returns a non-deprecated libMesh::BoundingBox object.
+   */
+  libMesh::BoundingBox bbox () const
   {
     Point pmin(_vmin[0]
 #if LIBMESH_DIM > 1
@@ -178,9 +181,7 @@ public:
 #endif
                );
 
-    const BoundingBox ret_val(pmin, pmax);
-
-    return ret_val;
+    return libMesh::BoundingBox(pmin, pmax);
   }
 
 private:
@@ -357,6 +358,18 @@ void MeshTools::find_boundary_nodes (const MeshBase & mesh,
 MeshTools::BoundingBox
 MeshTools::bounding_box(const MeshBase & mesh)
 {
+  // This function is deprecated.  It simply calls
+  // create_bounding_box() and converts the result to a
+  // MeshTools::BoundingBox.
+  libmesh_deprecated();
+  return MeshTools::create_bounding_box(mesh);
+}
+
+
+
+libMesh::BoundingBox
+MeshTools::create_bounding_box (const MeshBase & mesh)
+{
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
@@ -383,7 +396,7 @@ MeshTools::bounding_box(const MeshBase & mesh)
 Sphere
 MeshTools::bounding_sphere(const MeshBase & mesh)
 {
-  BoundingBox bbox = bounding_box(mesh);
+  libMesh::BoundingBox bbox = MeshTools::create_bounding_box(mesh);
 
   const Real  diag = (bbox.second - bbox.first).norm();
   const Point cent = (bbox.second + bbox.first)/2;
@@ -396,6 +409,16 @@ MeshTools::bounding_sphere(const MeshBase & mesh)
 MeshTools::BoundingBox
 MeshTools::processor_bounding_box (const MeshBase & mesh,
                                    const processor_id_type pid)
+{
+  libmesh_deprecated();
+  return MeshTools::create_processor_bounding_box(mesh, pid);
+}
+
+
+
+libMesh::BoundingBox
+MeshTools::create_processor_bounding_box (const MeshBase & mesh,
+                                          const processor_id_type pid)
 {
   libmesh_assert_less (pid, mesh.n_processors());
 
@@ -418,7 +441,8 @@ Sphere
 MeshTools::processor_bounding_sphere (const MeshBase & mesh,
                                       const processor_id_type pid)
 {
-  BoundingBox bbox = processor_bounding_box(mesh,pid);
+  libMesh::BoundingBox bbox =
+    MeshTools::create_processor_bounding_box(mesh, pid);
 
   const Real  diag = (bbox.second - bbox.first).norm();
   const Point cent = (bbox.second + bbox.first)/2;
@@ -431,6 +455,16 @@ MeshTools::processor_bounding_sphere (const MeshBase & mesh,
 MeshTools::BoundingBox
 MeshTools::subdomain_bounding_box (const MeshBase & mesh,
                                    const subdomain_id_type sid)
+{
+  libmesh_deprecated();
+  return MeshTools::create_subdomain_bounding_box(mesh, sid);
+}
+
+
+
+libMesh::BoundingBox
+MeshTools::create_subdomain_bounding_box (const MeshBase & mesh,
+                                          const subdomain_id_type sid)
 {
   FindBBox find_bbox;
 
@@ -452,7 +486,8 @@ Sphere
 MeshTools::subdomain_bounding_sphere (const MeshBase & mesh,
                                       const subdomain_id_type sid)
 {
-  BoundingBox bbox = subdomain_bounding_box(mesh,sid);
+  libMesh::BoundingBox bbox =
+    MeshTools::create_subdomain_bounding_box(mesh, sid);
 
   const Real  diag = (bbox.second - bbox.first).norm();
   const Point cent = (bbox.second + bbox.first)/2;

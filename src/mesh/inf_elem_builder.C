@@ -41,7 +41,7 @@ const Point InfElemBuilder::build_inf_elem(bool be_verbose)
 {
   // determine origin automatically,
   // works only if the mesh has no symmetry planes.
-  const MeshTools::BoundingBox b_box = MeshTools::bounding_box(_mesh);
+  const BoundingBox b_box = MeshTools::create_bounding_box(_mesh);
   Point origin = (b_box.first + b_box.second) / 2;
 
   if (be_verbose && _mesh.processor_id() == 0)
@@ -101,7 +101,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
   if ( !origin_x.first || !origin_y.first || !origin_z.first)
     {
       // determine origin
-      const MeshTools::BoundingBox b_box = MeshTools::bounding_box(_mesh);
+      const BoundingBox b_box = MeshTools::create_bounding_box(_mesh);
       const Point auto_origin = (b_box.first+b_box.second)/2;
 
       // override default values, if necessary

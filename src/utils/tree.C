@@ -43,7 +43,7 @@ Tree<N>::Tree (const MeshBase & m,
 {
   // Set the root node bounding box equal to the bounding
   // box for the entire domain.
-  root.set_bounding_box (MeshTools::bounding_box(mesh));
+  root.set_bounding_box (MeshTools::create_bounding_box(mesh));
 
   if (build_type == Trees::NODES)
     {
