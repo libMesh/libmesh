@@ -111,6 +111,11 @@ public:
     return computed_global_QoI_errors[qoi_index];
   }
 
+  /**
+   * Swap pointer of current physics object with that of another called swap_physics
+   */
+  void swap (FEMPhysics* swap_physics_1, FEMPhysics* swap_physics_2);
+
   virtual ErrorEstimatorType type() const
   { return ADJOINT_REFINEMENT;}
 

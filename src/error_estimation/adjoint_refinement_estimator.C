@@ -63,6 +63,14 @@ namespace libMesh
 // By richer FE space, we mean a grid that has been refined once and a polynomial order
 // that has been increased once, i.e. one h and one p refinement
 
+
+void AdjointRefinementEstimator::swap (FEMPhysics* swap_physics_1, FEMPhysics* swap_physics_2)
+{
+  FEMPhysics* temp = swap_physics_1;
+  swap_physics_1 = swap_physics_2;
+  swap_physics_2 = temp;
+}
+
 // Both a global QoI error estimate and element wise error indicators are included
 // Note that the element wise error indicators slightly over estimate the error in
 // each element
@@ -206,19 +214,30 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
         coarse_adjoints.push_back(static_cast<NumericVector<Number> *>(libmesh_nullptr));
     }
 
-  // Next, we are going to build up the residual for evaluating the error estimate
+  // Hack
+  //_residual_evaluation_physics = dynamic_cast<FEMPhysics *>((dynamic_cast<FEMSystem &>(system)).get_physics());
 
-  // If the residual ptr is null, set it to be the physics held by the system
+  // Next, we are going to build up the residual for evaluating the error estimate
+  NumericVector<Number> * projected_residual = libmesh_nullptr;
+  // If the residual ptr is null, use whatever the default physics built by the user is to build the residual vector
   if (!_residual_evaluation_physics)
   {
-    _residual_evaluation_physics = dynamic_cast<FEMPhysics *>((dynamic_cast<FEMSystem &>(system)).get_physics());
+    // Rebuild the rhs with the projected primal solution
+    (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
+    NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
+    projected_residual.close();
   }
   // Else if residual ptr is not null (i.e. user has set physics which they want to use for residual evaluation)
-
-  // Rebuild the rhs with the projected primal solution
-  (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
-  NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
-  projected_residual.close();
+  {
+    // Swap the residual evaluation physics with the system physics
+    swap(dynamic_cast<FEMPhysics *>((dynamic_cast<FEMSystem &>(system)).get_physics()), _residual_evaluation_physics);
+    // Rebuild the rhs with the projected primal solution
+    (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
+    NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
+    projected_residual.close();
+    // Swap back
+    swap(dynamic_cast<FEMPhysics *>((dynamic_cast<FEMSystem &>(system)).get_physics()), _residual_evaluation_physics);
+  }
 
   // Solve the adjoint problem(s) on the refined FE space
   system.adjoint_solve(_qoi_set);
@@ -245,7 +264,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
           // use that for our lift function.
           system.get_adjoint_solution(j) -= *coarse_adjoints[j];
 
-          computed_global_QoI_errors[j] = projected_residual.dot(system.get_adjoint_solution(j));
+          computed_global_QoI_errors[j] = projected_residual->dot(system.get_adjoint_solution(j));
         }
     }
 
@@ -368,7 +387,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // an element it owns
   UniquePtr<NumericVector<Number> > localized_projected_residual = NumericVector<Number>::build(system.comm());
   localized_projected_residual->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_send_list(), false, GHOSTED);
-  projected_residual.localize(*localized_projected_residual, system.get_dof_map().get_send_list());
+  projected_residual->localize(*localized_projected_residual, system.get_dof_map().get_send_list());
 
   // Each adjoint solution will also require ghosting; for efficiency we'll reuse the same memory
   UniquePtr<NumericVector<Number> > localized_adjoint_solution = NumericVector<Number>::build(system.comm());
