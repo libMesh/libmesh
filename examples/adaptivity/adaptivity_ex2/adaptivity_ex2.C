@@ -133,9 +133,9 @@ int main (int argc, char ** argv)
   // Use commandline parameter to specify if we are to
   // read in an initial solution or generate it ourself
   libMesh::out << "Usage:\n"
-               <<"\t " << argv[0] << " -init_timestep 0\n"
+               <<"\t " << argv[0] << " -init_timestep 0 -n_timesteps 25 [-n_refinements 5]\n"
                << "OR\n"
-               <<"\t " << argv[0] << " -read_solution -init_timestep 26\n"
+               <<"\t " << argv[0] << " -read_solution -init_timestep 26 -n_timesteps 25\n"
                << std::endl;
 
   libMesh::out << "Running: " << argv[0];
