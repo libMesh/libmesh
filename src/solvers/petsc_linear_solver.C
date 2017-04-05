@@ -457,21 +457,31 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
 
 #if PETSC_VERSION_LESS_THAN(3,1,0)
       ierr = LibMeshCreateSubMatrix(matrix->mat(),
-                             _restrict_solve_to_is,_restrict_solve_to_is,
-                             PETSC_DECIDE,MAT_INITIAL_MATRIX,&submat);
+                                    _restrict_solve_to_is,
+                                    _restrict_solve_to_is,
+                                    PETSC_DECIDE,
+                                    MAT_INITIAL_MATRIX,
+                                    &submat);
       LIBMESH_CHKERR(ierr);
       ierr = LibMeshCreateSubMatrix(precond->mat(),
-                             _restrict_solve_to_is,_restrict_solve_to_is,
-                             PETSC_DECIDE,MAT_INITIAL_MATRIX,&subprecond);
+                                    _restrict_solve_to_is,
+                                    _restrict_solve_to_is,
+                                    PETSC_DECIDE,
+                                    MAT_INITIAL_MATRIX,
+                                    &subprecond);
       LIBMESH_CHKERR(ierr);
 #else
       ierr = LibMeshCreateSubMatrix(matrix->mat(),
-                             _restrict_solve_to_is,_restrict_solve_to_is,
-                             MAT_INITIAL_MATRIX,&submat);
+                                    _restrict_solve_to_is,
+                                    _restrict_solve_to_is,
+                                    MAT_INITIAL_MATRIX,
+                                    &submat);
       LIBMESH_CHKERR(ierr);
       ierr = LibMeshCreateSubMatrix(precond->mat(),
-                             _restrict_solve_to_is,_restrict_solve_to_is,
-                             MAT_INITIAL_MATRIX,&subprecond);
+                                    _restrict_solve_to_is,
+                                    _restrict_solve_to_is,
+                                    MAT_INITIAL_MATRIX,
+                                    &subprecond);
       LIBMESH_CHKERR(ierr);
 #endif
 
@@ -509,13 +519,18 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
 
 #if PETSC_VERSION_LESS_THAN(3,1,0)
           ierr = LibMeshCreateSubMatrix(matrix->mat(),
-                                 _restrict_solve_to_is,_restrict_solve_to_is_complement,
-                                 PETSC_DECIDE,MAT_INITIAL_MATRIX,&submat1);
+                                        _restrict_solve_to_is,
+                                        _restrict_solve_to_is_complement,
+                                        PETSC_DECIDE,
+                                        MAT_INITIAL_MATRIX,
+                                        &submat1);
           LIBMESH_CHKERR(ierr);
 #else
           ierr = LibMeshCreateSubMatrix(matrix->mat(),
-                                 _restrict_solve_to_is,_restrict_solve_to_is_complement,
-                                 MAT_INITIAL_MATRIX,&submat1);
+                                        _restrict_solve_to_is,
+                                        _restrict_solve_to_is_complement,
+                                        MAT_INITIAL_MATRIX,
+                                        &submat1);
           LIBMESH_CHKERR(ierr);
 #endif
 
@@ -726,21 +741,31 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
 
 #if PETSC_VERSION_LESS_THAN(3,1,0)
       ierr = LibMeshCreateSubMatrix(matrix->mat(),
-                             _restrict_solve_to_is,_restrict_solve_to_is,
-                             PETSC_DECIDE,MAT_INITIAL_MATRIX,&submat);
+                                    _restrict_solve_to_is,
+                                    _restrict_solve_to_is,
+                                    PETSC_DECIDE,
+                                    MAT_INITIAL_MATRIX,
+                                    &submat);
       LIBMESH_CHKERR(ierr);
       ierr = LibMeshCreateSubMatrix(precond->mat(),
-                             _restrict_solve_to_is,_restrict_solve_to_is,
-                             PETSC_DECIDE,MAT_INITIAL_MATRIX,&subprecond);
+                                    _restrict_solve_to_is,
+                                    _restrict_solve_to_is,
+                                    PETSC_DECIDE,
+                                    MAT_INITIAL_MATRIX,
+                                    &subprecond);
       LIBMESH_CHKERR(ierr);
 #else
       ierr = LibMeshCreateSubMatrix(matrix->mat(),
-                             _restrict_solve_to_is,_restrict_solve_to_is,
-                             MAT_INITIAL_MATRIX,&submat);
+                                    _restrict_solve_to_is,
+                                    _restrict_solve_to_is,
+                                    MAT_INITIAL_MATRIX,
+                                    &submat);
       LIBMESH_CHKERR(ierr);
       ierr = LibMeshCreateSubMatrix(precond->mat(),
-                             _restrict_solve_to_is,_restrict_solve_to_is,
-                             MAT_INITIAL_MATRIX,&subprecond);
+                                    _restrict_solve_to_is,
+                                    _restrict_solve_to_is,
+                                    MAT_INITIAL_MATRIX,
+                                    &subprecond);
       LIBMESH_CHKERR(ierr);
 #endif
 
@@ -778,13 +803,18 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
 
 #if PETSC_VERSION_LESS_THAN(3,1,0)
           ierr = LibMeshCreateSubMatrix(matrix->mat(),
-                                 _restrict_solve_to_is,_restrict_solve_to_is_complement,
-                                 PETSC_DECIDE,MAT_INITIAL_MATRIX,&submat1);
+                                        _restrict_solve_to_is,
+                                        _restrict_solve_to_is_complement,
+                                        PETSC_DECIDE,
+                                        MAT_INITIAL_MATRIX,
+                                        &submat1);
           LIBMESH_CHKERR(ierr);
 #else
           ierr = LibMeshCreateSubMatrix(matrix->mat(),
-                                 _restrict_solve_to_is,_restrict_solve_to_is_complement,
-                                 MAT_INITIAL_MATRIX,&submat1);
+                                        _restrict_solve_to_is,
+                                        _restrict_solve_to_is_complement,
+                                        MAT_INITIAL_MATRIX,
+                                        &submat1);
           LIBMESH_CHKERR(ierr);
 #endif
 
@@ -1016,8 +1046,10 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
       libmesh_assert(false);
 #else
       ierr = LibMeshCreateSubMatrix(mat,
-                             _restrict_solve_to_is,_restrict_solve_to_is,
-                             MAT_INITIAL_MATRIX,&submat);
+                                    _restrict_solve_to_is,
+                                    _restrict_solve_to_is,
+                                    MAT_INITIAL_MATRIX,
+                                    &submat);
       LIBMESH_CHKERR(ierr);
 #endif
 
@@ -1058,8 +1090,10 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
           libmesh_assert(false);
 #else
           ierr = LibMeshCreateSubMatrix(mat,
-                                 _restrict_solve_to_is,_restrict_solve_to_is_complement,
-                                 MAT_INITIAL_MATRIX,&submat1);
+                                        _restrict_solve_to_is,
+                                        _restrict_solve_to_is_complement,
+                                        MAT_INITIAL_MATRIX,
+                                        &submat1);
           LIBMESH_CHKERR(ierr);
 #endif
 
@@ -1289,12 +1323,16 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
       libmesh_assert(false);
 #else
       ierr = LibMeshCreateSubMatrix(mat,
-                             _restrict_solve_to_is,_restrict_solve_to_is,
-                             MAT_INITIAL_MATRIX,&submat);
+                                    _restrict_solve_to_is,
+                                    _restrict_solve_to_is,
+                                    MAT_INITIAL_MATRIX,
+                                    &submat);
       LIBMESH_CHKERR(ierr);
       ierr = LibMeshCreateSubMatrix(const_cast<PetscMatrix<T> *>(precond)->mat(),
-                             _restrict_solve_to_is,_restrict_solve_to_is,
-                             MAT_INITIAL_MATRIX,&subprecond);
+                                    _restrict_solve_to_is,
+                                    _restrict_solve_to_is,
+                                    MAT_INITIAL_MATRIX,
+                                    &subprecond);
       LIBMESH_CHKERR(ierr);
 #endif
 
@@ -1334,8 +1372,10 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
           libmesh_assert(false);
 #else
           ierr = LibMeshCreateSubMatrix(mat,
-                                 _restrict_solve_to_is,_restrict_solve_to_is_complement,
-                                 MAT_INITIAL_MATRIX,&submat1);
+                                        _restrict_solve_to_is,
+                                        _restrict_solve_to_is_complement,
+                                        MAT_INITIAL_MATRIX,
+                                        &submat1);
           LIBMESH_CHKERR(ierr);
 #endif
 
