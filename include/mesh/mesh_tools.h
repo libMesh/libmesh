@@ -131,9 +131,18 @@ void find_boundary_nodes (const MeshBase & mesh,
  * @returns two points defining a cartesian box that bounds the
  * mesh.  The first entry in the pair is the mininum, the second
  * is the maximim.
+ *
+ * This function is now deprecated, use create_bounding_box() instead.
  */
 BoundingBox
 bounding_box (const MeshBase & mesh);
+
+/**
+ * The same functionality as the deprecated MeshTools::bounding_box()
+ * function, but returns the non-deprecated libMesh::BoundingBox type.
+ */
+libMesh::BoundingBox
+create_bounding_box (const MeshBase & mesh);
 
 /**
  * Same, but returns a sphere instead of a box.
@@ -144,10 +153,20 @@ bounding_sphere (const MeshBase & mesh);
 /**
  * @returns two points defining a cartesian box that bounds the
  * elements belonging to processor pid.
+ *
+ * This function is now deprecated, use create_processor_bounding_box() instead.
  */
 BoundingBox
 processor_bounding_box (const MeshBase & mesh,
                         const processor_id_type pid);
+
+/**
+ * The same functionality as the deprecated MeshTools::processor_bounding_box()
+ * function, but returns the non-deprecated libMesh::BoundingBox type.
+ */
+libMesh::BoundingBox
+create_processor_bounding_box (const MeshBase & mesh,
+                               const processor_id_type pid);
 
 /**
  * Same, but returns a sphere instead of a box.
@@ -159,10 +178,21 @@ processor_bounding_sphere (const MeshBase & mesh,
 /**
  * @returns two points defining a Cartesian box that bounds the
  * elements belonging to subdomain sid.
+ *
+ * This function is now deprecated, use create_subdomain_bounding_box() instead.
  */
 BoundingBox
 subdomain_bounding_box (const MeshBase & mesh,
                         const subdomain_id_type sid);
+
+
+/**
+ * The same functionality as the deprecated MeshTools::subdomain_bounding_box()
+ * function, but returns the non-deprecated libMesh::BoundingBox type.
+ */
+libMesh::BoundingBox
+create_subdomain_bounding_box (const MeshBase & mesh,
+                               const subdomain_id_type sid);
 
 /**
  * Same, but returns a sphere instead of a box.

@@ -172,7 +172,7 @@ public:
    */
   template <typename ForwardIterator>
   void find_global_indices (const Parallel::Communicator & communicator,
-                            const MeshTools::BoundingBox &,
+                            const libMesh::BoundingBox &,
                             const ForwardIterator &,
                             const ForwardIterator &,
                             std::vector<dof_id_type> &) const;

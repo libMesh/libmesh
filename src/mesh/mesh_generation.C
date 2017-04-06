@@ -2085,9 +2085,9 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                 new_elem->set_node(2) = mesh.node_ptr(elem->node_ptr(1)->id() + ((k+1) * orig_nodes));
                 new_elem->set_node(3) = mesh.node_ptr(elem->node_ptr(0)->id() + ((k+1) * orig_nodes));
 
-                if (elem->neighbor(0) == remote_elem)
+                if (elem->neighbor_ptr(0) == remote_elem)
                   new_elem->set_neighbor(3, const_cast<RemoteElem *>(remote_elem));
-                if (elem->neighbor(1) == remote_elem)
+                if (elem->neighbor_ptr(1) == remote_elem)
                   new_elem->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
 
                 break;
@@ -2105,9 +2105,9 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                 new_elem->set_node(7) = mesh.node_ptr(elem->node_ptr(0)->id() + ((2*k+1) * orig_nodes));
                 new_elem->set_node(8) = mesh.node_ptr(elem->node_ptr(2)->id() + ((2*k+1) * orig_nodes));
 
-                if (elem->neighbor(0) == remote_elem)
+                if (elem->neighbor_ptr(0) == remote_elem)
                   new_elem->set_neighbor(3, const_cast<RemoteElem *>(remote_elem));
-                if (elem->neighbor(1) == remote_elem)
+                if (elem->neighbor_ptr(1) == remote_elem)
                   new_elem->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
 
                 break;
@@ -2122,11 +2122,11 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                 new_elem->set_node(4) = mesh.node_ptr(elem->node_ptr(1)->id() + ((k+1) * orig_nodes));
                 new_elem->set_node(5) = mesh.node_ptr(elem->node_ptr(2)->id() + ((k+1) * orig_nodes));
 
-                if (elem->neighbor(0) == remote_elem)
+                if (elem->neighbor_ptr(0) == remote_elem)
                   new_elem->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
-                if (elem->neighbor(1) == remote_elem)
+                if (elem->neighbor_ptr(1) == remote_elem)
                   new_elem->set_neighbor(2, const_cast<RemoteElem *>(remote_elem));
-                if (elem->neighbor(2) == remote_elem)
+                if (elem->neighbor_ptr(2) == remote_elem)
                   new_elem->set_neighbor(3, const_cast<RemoteElem *>(remote_elem));
 
                 break;
@@ -2153,11 +2153,11 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                 new_elem->set_node(16) = mesh.node_ptr(elem->node_ptr(4)->id() + ((2*k+1) * orig_nodes));
                 new_elem->set_node(17) = mesh.node_ptr(elem->node_ptr(5)->id() + ((2*k+1) * orig_nodes));
 
-                if (elem->neighbor(0) == remote_elem)
+                if (elem->neighbor_ptr(0) == remote_elem)
                   new_elem->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
-                if (elem->neighbor(1) == remote_elem)
+                if (elem->neighbor_ptr(1) == remote_elem)
                   new_elem->set_neighbor(2, const_cast<RemoteElem *>(remote_elem));
-                if (elem->neighbor(2) == remote_elem)
+                if (elem->neighbor_ptr(2) == remote_elem)
                   new_elem->set_neighbor(3, const_cast<RemoteElem *>(remote_elem));
 
                 break;
@@ -2174,13 +2174,13 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                 new_elem->set_node(6) = mesh.node_ptr(elem->node_ptr(2)->id() + ((k+1) * orig_nodes));
                 new_elem->set_node(7) = mesh.node_ptr(elem->node_ptr(3)->id() + ((k+1) * orig_nodes));
 
-                if (elem->neighbor(0) == remote_elem)
+                if (elem->neighbor_ptr(0) == remote_elem)
                   new_elem->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
-                if (elem->neighbor(1) == remote_elem)
+                if (elem->neighbor_ptr(1) == remote_elem)
                   new_elem->set_neighbor(2, const_cast<RemoteElem *>(remote_elem));
-                if (elem->neighbor(2) == remote_elem)
+                if (elem->neighbor_ptr(2) == remote_elem)
                   new_elem->set_neighbor(3, const_cast<RemoteElem *>(remote_elem));
-                if (elem->neighbor(3) == remote_elem)
+                if (elem->neighbor_ptr(3) == remote_elem)
                   new_elem->set_neighbor(4, const_cast<RemoteElem *>(remote_elem));
 
                 break;
@@ -2216,13 +2216,13 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
                 new_elem->set_node(25) = mesh.node_ptr(elem->node_ptr(8)->id() + ((2*k+2) * orig_nodes));
                 new_elem->set_node(26) = mesh.node_ptr(elem->node_ptr(8)->id() + ((2*k+1) * orig_nodes));
 
-                if (elem->neighbor(0) == remote_elem)
+                if (elem->neighbor_ptr(0) == remote_elem)
                   new_elem->set_neighbor(1, const_cast<RemoteElem *>(remote_elem));
-                if (elem->neighbor(1) == remote_elem)
+                if (elem->neighbor_ptr(1) == remote_elem)
                   new_elem->set_neighbor(2, const_cast<RemoteElem *>(remote_elem));
-                if (elem->neighbor(2) == remote_elem)
+                if (elem->neighbor_ptr(2) == remote_elem)
                   new_elem->set_neighbor(3, const_cast<RemoteElem *>(remote_elem));
-                if (elem->neighbor(3) == remote_elem)
+                if (elem->neighbor_ptr(3) == remote_elem)
                   new_elem->set_neighbor(4, const_cast<RemoteElem *>(remote_elem));
 
                 break;

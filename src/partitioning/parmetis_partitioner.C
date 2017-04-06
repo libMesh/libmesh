@@ -259,8 +259,8 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
   // This can be fed to ParMetis as the initial partitioning of the subdomains (decoupled
   // from the partitioning of the objects themselves).  This allows us to get the same
   // resultant partitioning independed of the input partitioning.
-  BoundingBox bbox =
-    MeshTools::bounding_box(mesh);
+  libMesh::BoundingBox bbox =
+    MeshTools::create_bounding_box(mesh);
 
   _global_index_by_pid_map.clear();
 

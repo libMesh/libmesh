@@ -101,7 +101,7 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
     std::vector<dof_id_type> global_index;
 
     MeshCommunication().find_global_indices (mesh.comm(),
-                                             MeshTools::bounding_box(mesh),
+                                             MeshTools::create_bounding_box(mesh),
                                              beg, end, global_index);
 
     libmesh_assert_equal_to (global_index.size(), n_range_elem);

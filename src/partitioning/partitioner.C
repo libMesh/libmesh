@@ -224,7 +224,7 @@ void Partitioner::partition_unpartitioned_elements (MeshBase & mesh,
   // Calling this on all processors a unique range in [0,n_unpartitioned_elements) is constructed.
   // Only the indices for the elements we pass in are returned in the array.
   MeshCommunication().find_global_indices (mesh.comm(),
-                                           MeshTools::bounding_box(mesh), it, end,
+                                           MeshTools::create_bounding_box(mesh), it, end,
                                            global_indices);
 
   for (dof_id_type cnt=0; it != end; ++it)
