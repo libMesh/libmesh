@@ -152,6 +152,17 @@ bounding_sphere (const MeshBase & mesh);
 
 /**
  * @returns two points defining a cartesian box that bounds the
+ * elements belonging to the local processor.
+ *
+ * Unlike the other bounding box creation functions, this does *not*
+ * need to be run in parallel, because this is the only function we
+ * can guarantee can be resolved with only local information.
+ */
+libMesh::BoundingBox
+create_local_bounding_box (const MeshBase & mesh);
+
+/**
+ * @returns two points defining a cartesian box that bounds the
  * elements belonging to processor pid.
  *
  * This function is now deprecated, use create_processor_bounding_box() instead.

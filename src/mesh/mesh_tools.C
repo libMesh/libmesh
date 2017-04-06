@@ -379,6 +379,20 @@ MeshTools::bounding_sphere(const MeshBase & mesh)
 
 
 
+libMesh::BoundingBox
+MeshTools::create_local_bounding_box (const MeshBase & mesh)
+{
+  FindBBox find_bbox;
+
+  Threads::parallel_reduce (ConstElemRange (mesh.local_elements_begin(),
+                                            mesh.local_elements_end()),
+                            find_bbox);
+
+  return find_bbox.bbox();
+}
+
+
+
 MeshTools::BoundingBox
 MeshTools::processor_bounding_box (const MeshBase & mesh,
                                    const processor_id_type pid)
