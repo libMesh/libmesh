@@ -150,10 +150,12 @@ public:
   }
 #endif
 
-  /**
-   * FindBBox::bbox() now returns a non-deprecated libMesh::BoundingBox object.
-   */
-  libMesh::BoundingBox bbox () const
+  const libMesh::BoundingBox & bbox () const
+  {
+    return _bbox;
+  }
+
+  libMesh::BoundingBox & bbox ()
   {
     return _bbox;
   }
