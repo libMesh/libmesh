@@ -1632,7 +1632,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
     {
       NamesData names_table(side_boundary_ids.size(), MAX_STR_LENGTH);
 
-      exII::ex_set sets[side_boundary_ids.size()];
+      std::vector<exII::ex_set> sets(side_boundary_ids.size());
 
       for (std::size_t i=0; i<side_boundary_ids.size(); i++)
         {
@@ -1649,7 +1649,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
           sets[i].distribution_factor_list = NULL;
         }
 
-      ex_err = exII::ex_put_sets(ex_id, side_boundary_ids.size(), sets);
+      ex_err = exII::ex_put_sets(ex_id, side_boundary_ids.size(), &sets[0]);
       EX_CHECK_ERR(ex_err, "Error writing sidesets");
 
       ex_err = exII::ex_put_names(ex_id, exII::EX_SIDE_SET, names_table.get_char_star_star());
