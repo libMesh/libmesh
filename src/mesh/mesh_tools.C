@@ -25,6 +25,7 @@
 #include "libmesh/mesh_tools.h"
 #include "libmesh/node_range.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_algebra.h"
 #include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/sphere.h"
 #include "libmesh/threads.h"
@@ -98,18 +99,12 @@ private:
 class FindBBox
 {
 public:
-  FindBBox () :
-    _vmin(LIBMESH_DIM,  std::numeric_limits<Real>::max()),
-    _vmax(LIBMESH_DIM, -std::numeric_limits<Real>::max())
+  FindBBox () : _bbox()
   {}
 
   FindBBox (FindBBox & other, Threads::split) :
-    _vmin(other._vmin),
-    _vmax(other._vmax)
+    _bbox(other._bbox)
   {}
-
-  std::vector<Real> & min() { return _vmin; }
-  std::vector<Real> & max() { return _vmax; }
 
   void operator()(const ConstNodeRange & range)
   {
@@ -118,11 +113,7 @@ public:
         const Node * node = *it;
         libmesh_assert(node);
 
-        for (unsigned int i=0; i<LIBMESH_DIM; i++)
-          {
-            _vmin[i] = std::min(_vmin[i], (*node)(i));
-            _vmax[i] = std::max(_vmax[i], (*node)(i));
-          }
+        _bbox.union_with(*node);
       }
   }
 
@@ -137,25 +128,25 @@ public:
           {
             const Point & point = elem->point(n);
 
-            for (unsigned int i=0; i<LIBMESH_DIM; i++)
-              {
-                _vmin[i] = std::min(_vmin[i], point(i));
-                _vmax[i] = std::max(_vmax[i], point(i));
-              }
+            _bbox.union_with(point);
           }
       }
   }
+
+  const Point & min() const { return _bbox.min(); }
+
+  Point & min() { return _bbox.min(); }
+
+  const Point & max() const { return _bbox.max(); }
+
+  Point & max() { return _bbox.max(); }
 
   // If we don't have threads we never need a join, and icpc yells a
   // warning if it sees an anonymous function that's never used
 #if LIBMESH_USING_THREADS
   void join (const FindBBox & other)
   {
-    for (unsigned int i=0; i<LIBMESH_DIM; i++)
-      {
-        _vmin[i] = std::min(_vmin[i], other._vmin[i]);
-        _vmax[i] = std::max(_vmax[i], other._vmax[i]);
-      }
+    _bbox.union_with(other._bbox);
   }
 #endif
 
@@ -164,29 +155,11 @@ public:
    */
   libMesh::BoundingBox bbox () const
   {
-    Point pmin(_vmin[0]
-#if LIBMESH_DIM > 1
-               , _vmin[1]
-#endif
-#if LIBMESH_DIM > 2
-               , _vmin[2]
-#endif
-               );
-    Point pmax(_vmax[0]
-#if LIBMESH_DIM > 1
-               , _vmax[1]
-#endif
-#if LIBMESH_DIM > 2
-               , _vmax[2]
-#endif
-               );
-
-    return libMesh::BoundingBox(pmin, pmax);
+    return _bbox;
   }
 
 private:
-  std::vector<Real> _vmin;
-  std::vector<Real> _vmax;
+  BoundingBox _bbox;
 };
 
 #ifdef DEBUG
