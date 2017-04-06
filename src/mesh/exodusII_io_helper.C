@@ -1348,26 +1348,84 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   elem_num_map.resize(n_active_elem);
   std::vector<int>::iterator curr_elem_map_end = elem_num_map.begin();
 
+  std::vector<int> blkid;
+  std::vector<int> nelems;
+  std::vector<int> nnodes;
+  std::vector<int> nedges;
+  std::vector<int> nfaces;
+  std::vector<int> nattr;
+  NamesData types_table(num_elem_blk, MAX_STR_LENGTH);
+
   // Note: It appears that there is a bug in exodusII::ex_put_name where
   // the index returned from the ex_id_lkup is erronously used.  For now
   // the work around is to use the alternative function ex_put_names, but
   // this function requires a char ** datastructure.
   NamesData names_table(num_elem_blk, MAX_STR_LENGTH);
 
-  // This counter is used to fill up the libmesh_elem_num_to_exodus map in the loop below.
-  unsigned libmesh_elem_num_to_exodus_counter = 0;
-
   // counter indexes into the block_ids vector
   unsigned int counter = 0;
-
-  // node counter for discontinuous plotting
-  unsigned int node_counter = 0;
-
   for (subdomain_map_type::iterator it=subdomain_map.begin(); it!=subdomain_map.end(); ++it)
     {
       block_ids[counter] = (*it).first;
       names_table.push_back_entry(mesh.subdomain_name((*it).first));
 
+      // Get a reference to a vector of element IDs for this subdomain.
+      subdomain_map_type::mapped_type & tmp_vec = (*it).second;
+
+      ExodusII_IO_Helper::ElementMaps em;
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      // Skip infinite element-blocks; they can not be viewed in most visualization software
+      // as paraview.
+      if (mesh.elem_ref(tmp_vec[0]).infinite())
+        continue;
+#endif
+      // Use the first element in this block to get representative information.
+      // Note that Exodus assumes all elements in a block are of the same type!
+      // We are using that same assumption here!
+      const ExodusII_IO_Helper::Conversion conv =
+        em.assign_conversion(mesh.elem_ref(tmp_vec[0]).type());
+      num_nodes_per_elem = mesh.elem_ref(tmp_vec[0]).n_nodes();
+
+      blkid.push_back((*it).first);
+      types_table.push_back_entry(conv.exodus_elem_type().c_str());
+      nelems.push_back(tmp_vec.size());
+      nnodes.push_back(num_nodes_per_elem);
+      nedges.push_back(0);
+      nfaces.push_back(0);
+      nattr.push_back(0);
+
+      counter++;
+    }
+
+  exII::ex_block_params blocks;
+  blocks.edge_blk_id = libmesh_nullptr;
+  blocks.edge_type = libmesh_nullptr;
+  blocks.num_edge_this_blk = libmesh_nullptr;
+  blocks.num_nodes_per_edge = libmesh_nullptr;
+  blocks.num_attr_edge = libmesh_nullptr;
+  blocks.face_blk_id = libmesh_nullptr;
+  blocks.face_type = libmesh_nullptr;
+  blocks.num_face_this_blk = libmesh_nullptr;
+  blocks.num_nodes_per_face = libmesh_nullptr;
+  blocks.num_attr_face = libmesh_nullptr;
+  blocks.elem_blk_id = &blkid[0];
+  blocks.elem_type = types_table.get_char_star_star();
+  blocks.num_elem_this_blk = &nelems[0];
+  blocks.num_nodes_per_elem = &nnodes[0];
+  blocks.num_edges_per_elem = &nedges[0];
+  blocks.num_faces_per_elem = &nfaces[0];
+  blocks.num_attr_elem = &nattr[0];
+  blocks.define_maps = 0;
+  ex_err = exII::ex_put_concat_all_blocks(ex_id, &blocks);
+  EX_CHECK_ERR(ex_err, "Error writing element blocks.");
+
+  // This counter is used to fill up the libmesh_elem_num_to_exodus map in the loop below.
+  unsigned libmesh_elem_num_to_exodus_counter = 0;
+
+  // node counter for discontinuous plotting
+  unsigned int node_counter = 0;
+  for (subdomain_map_type::iterator it=subdomain_map.begin(); it!=subdomain_map.end(); ++it)
+    {
       // Get a reference to a vector of element IDs for this subdomain.
       subdomain_map_type::mapped_type & tmp_vec = (*it).second;
 
@@ -1385,15 +1443,6 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       const ExodusII_IO_Helper::Conversion conv =
         em.assign_conversion(mesh.elem_ref(tmp_vec[0]).type());
       num_nodes_per_elem = mesh.elem_ref(tmp_vec[0]).n_nodes();
-
-      ex_err = exII::ex_put_elem_block(ex_id,
-                                       (*it).first,
-                                       conv.exodus_elem_type().c_str(),
-                                       tmp_vec.size(),
-                                       num_nodes_per_elem,
-                                       /*num_attr=*/0);
-
-      EX_CHECK_ERR(ex_err, "Error writing element block.");
 
       connect.resize(tmp_vec.size()*num_nodes_per_elem);
 
@@ -1494,6 +1543,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       ex_err = exII::ex_put_names(ex_id, exII::EX_ELEM_BLOCK, names_table.get_char_star_star());
       EX_CHECK_ERR(ex_err, "Error writing element names");
     }
+
 }
 
 
@@ -1593,19 +1643,24 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
     {
       NamesData names_table(side_boundary_ids.size(), MAX_STR_LENGTH);
 
+      std::vector<exII::ex_set> sets(side_boundary_ids.size());
+
       for (std::size_t i=0; i<side_boundary_ids.size(); i++)
         {
           boundary_id_type ss_id = side_boundary_ids[i];
-          int actual_id = ss_id;
-
           names_table.push_back_entry(mesh.get_boundary_info().get_sideset_name(ss_id));
 
-          ex_err = exII::ex_put_side_set_param(ex_id, actual_id, elem[ss_id].size(), 0);
-          EX_CHECK_ERR(ex_err, "Error writing sideset parameters");
-
-          ex_err = exII::ex_put_side_set(ex_id, actual_id, &elem[ss_id][0], &side[ss_id][0]);
-          EX_CHECK_ERR(ex_err, "Error writing sidesets");
+          sets[i].id = ss_id;
+          sets[i].type = exII::EX_SIDE_SET;
+          sets[i].num_entry = elem[ss_id].size();
+          sets[i].num_distribution_factor = 0;
+          sets[i].entry_list = &elem[ss_id][0];
+          sets[i].extra_list = &side[ss_id][0];
+          sets[i].distribution_factor_list = libmesh_nullptr;
         }
+
+      ex_err = exII::ex_put_sets(ex_id, side_boundary_ids.size(), &sets[0]);
+      EX_CHECK_ERR(ex_err, "Error writing sidesets");
 
       ex_err = exII::ex_put_names(ex_id, exII::EX_SIDE_SET, names_table.get_char_star_star());
       EX_CHECK_ERR(ex_err, "Error writing sideset names");
