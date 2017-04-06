@@ -109,6 +109,11 @@ public:
   void intersect_with (const BoundingBox &);
 
   /*
+   * Enlarges this bounding box to include the given point
+   */
+  void union_with (const Point & p);
+
+  /*
    * Sets this bounding box to be the union with the other
    * bounding box.
    */
@@ -116,6 +121,22 @@ public:
 
 private:
 };
+
+
+
+// ------------------------------------------------------------
+// BoundingBox class member functions
+
+inline
+void
+BoundingBox::union_with(const Point & p)
+{
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    {
+      min()(i) = std::min(min()(i), p(i));
+      max()(i) = std::max(max()(i), p(i));
+    }
+}
 
 } // namespace libMesh
 
