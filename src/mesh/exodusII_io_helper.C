@@ -1379,9 +1379,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       if (mesh.elem_ref(tmp_vec[0]).infinite())
         continue;
 #endif
-      //Use the first element in this block to get representative information.
-      //Note that Exodus assumes all elements in a block are of the same type!
-      //We are using that same assumption here!
+      // Use the first element in this block to get representative information.
+      // Note that Exodus assumes all elements in a block are of the same type!
+      // We are using that same assumption here!
       const ExodusII_IO_Helper::Conversion conv =
         em.assign_conversion(mesh.elem_ref(tmp_vec[0]).type());
       num_nodes_per_elem = mesh.elem_ref(tmp_vec[0]).n_nodes();
@@ -1636,7 +1636,6 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
       for (std::size_t i=0; i<side_boundary_ids.size(); i++)
         {
-          //boundary_id_type ss_id = side_boundary_ids[side_boundary_ids.size()-1-i];
           boundary_id_type ss_id = side_boundary_ids[i];
           names_table.push_back_entry(mesh.get_boundary_info().get_sideset_name(ss_id));
 
