@@ -43,6 +43,38 @@ namespace Parallel {
       StandardType(const cxxtype * = libmesh_nullptr) : DataType(mpitype) {} \
   }
 
+#define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)                           \
+  template<>                                                            \
+  class OpFunction<cxxtype>                                             \
+  {                                                                     \
+  public:                                                               \
+    static MPI_Op max()          { return MPI_MAX; }                    \
+    static MPI_Op min()          { return MPI_MIN; }                    \
+    static MPI_Op sum()          { return MPI_SUM; }                    \
+    static MPI_Op product()      { return MPI_PROD; }                   \
+    static MPI_Op logical_and()  { return MPI_LAND; }                   \
+    static MPI_Op bitwise_and()  { return MPI_BAND; }                   \
+    static MPI_Op logical_or()   { return MPI_LOR; }                    \
+    static MPI_Op bitwise_or()   { return MPI_BOR; }                    \
+    static MPI_Op logical_xor()  { return MPI_LXOR; }                   \
+    static MPI_Op bitwise_xor()  { return MPI_BXOR; }                   \
+    static MPI_Op max_location() { return MPI_MAXLOC; }                 \
+    static MPI_Op min_location() { return MPI_MINLOC; }                 \
+  }
+
+#define LIBMESH_PARALLEL_FLOAT_OPS(cxxtype)                             \
+  template<>                                                            \
+  class OpFunction<cxxtype>                                             \
+  {                                                                     \
+  public:                                                               \
+    static MPI_Op max()          { return MPI_MAX; }                    \
+    static MPI_Op min()          { return MPI_MIN; }                    \
+    static MPI_Op sum()          { return MPI_SUM; }                    \
+    static MPI_Op product()      { return MPI_PROD; }                   \
+    static MPI_Op max_location() { return MPI_MAXLOC; }                 \
+    static MPI_Op min_location() { return MPI_MINLOC; }                 \
+  }
+
 #else
 
 #define LIBMESH_STANDARD_TYPE(cxxtype,mpitype)                          \
@@ -54,10 +86,17 @@ namespace Parallel {
       StandardType(const cxxtype * = libmesh_nullptr) : DataType() {}   \
   }
 
+#define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)                           \
+  template<>                                                            \
+  class OpFunction<cxxtype>                                             \
+  {                                                                     \
+  }
+
 #endif
 
 #define LIBMESH_INT_TYPE(cxxtype,mpitype)                               \
   LIBMESH_STANDARD_TYPE(cxxtype,mpitype);                               \
+  LIBMESH_PARALLEL_INTEGER_OPS(cxxtype);                                \
                                                                         \
   template<>                                                            \
   struct Attributes<cxxtype>                                            \
@@ -69,6 +108,7 @@ namespace Parallel {
 
 #define LIBMESH_FLOAT_TYPE(cxxtype,mpitype)                             \
   LIBMESH_STANDARD_TYPE(cxxtype,mpitype);                               \
+  LIBMESH_PARALLEL_FLOAT_OPS(cxxtype);                                  \
                                                                         \
   template<>                                                            \
   struct Attributes<cxxtype>                                            \
@@ -124,6 +164,8 @@ public:
                             sizeof(unsigned long));
   }
 };
+
+LIBMESH_PARALLEL_INTEGER_OPS(unsigned long long);                                \
 
 template<>
 struct Attributes<unsigned long long>
