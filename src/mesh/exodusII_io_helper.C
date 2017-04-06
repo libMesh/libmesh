@@ -1397,7 +1397,17 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       counter++;
     }
 
-  exII::ex_block_params blocks = {0};
+  exII::ex_block_params blocks;
+  blocks.edge_blk_id = libmesh_nullptr;
+  blocks.edge_type = libmesh_nullptr;
+  blocks.num_edge_this_blk = libmesh_nullptr;
+  blocks.num_nodes_per_edge = libmesh_nullptr;
+  blocks.num_attr_edge = libmesh_nullptr;
+  blocks.face_blk_id = libmesh_nullptr;
+  blocks.face_type = libmesh_nullptr;
+  blocks.num_face_this_blk = libmesh_nullptr;
+  blocks.num_nodes_per_face = libmesh_nullptr;
+  blocks.num_attr_face = libmesh_nullptr;
   blocks.elem_blk_id = &blkid[0];
   blocks.elem_type = types_table.get_char_star_star();
   blocks.num_elem_this_blk = &nelems[0];
@@ -1405,6 +1415,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   blocks.num_edges_per_elem = &nedges[0];
   blocks.num_faces_per_elem = &nfaces[0];
   blocks.num_attr_elem = &nattr[0];
+  blocks.define_maps = 0;
   ex_err = exII::ex_put_concat_all_blocks(ex_id, &blocks);
   EX_CHECK_ERR(ex_err, "Error writing element blocks.");
 
@@ -1639,14 +1650,13 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
           boundary_id_type ss_id = side_boundary_ids[i];
           names_table.push_back_entry(mesh.get_boundary_info().get_sideset_name(ss_id));
 
-          sets[i] = {0};
-          sets[i].type = exII::EX_SIDE_SET;
           sets[i].id = ss_id;
+          sets[i].type = exII::EX_SIDE_SET;
           sets[i].num_entry = elem[ss_id].size();
           sets[i].num_distribution_factor = 0;
           sets[i].entry_list = &elem[ss_id][0];
           sets[i].extra_list = &side[ss_id][0];
-          sets[i].distribution_factor_list = NULL;
+          sets[i].distribution_factor_list = libmesh_nullptr;
         }
 
       ex_err = exII::ex_put_sets(ex_id, side_boundary_ids.size(), &sets[0]);
