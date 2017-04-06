@@ -808,14 +808,14 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
                          &iscol); LIBMESH_CHKERR(ierr);
 
   // Extract submatrix
-  ierr = MatGetSubMatrix(_mat,
-                         isrow,
-                         iscol,
+  ierr = LibMeshCreateSubMatrix(_mat,
+                                isrow,
+                                iscol,
 #if PETSC_RELEASE_LESS_THAN(3,0,1)
-                         PETSC_DECIDE,
+                                PETSC_DECIDE,
 #endif
-                         (reuse_submatrix ? MAT_REUSE_MATRIX : MAT_INITIAL_MATRIX),
-                         &(petsc_submatrix->_mat));  LIBMESH_CHKERR(ierr);
+                                (reuse_submatrix ? MAT_REUSE_MATRIX : MAT_INITIAL_MATRIX),
+                                &(petsc_submatrix->_mat));  LIBMESH_CHKERR(ierr);
 
   // Specify that the new submatrix is initialized and close it.
   petsc_submatrix->_is_initialized = true;
