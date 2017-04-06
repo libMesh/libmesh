@@ -350,14 +350,13 @@ MeshTools::create_bounding_box (const MeshBase & mesh)
 
   FindBBox find_bbox;
 
-  Threads::parallel_reduce (ConstNodeRange (mesh.local_nodes_begin(),
-                                            mesh.local_nodes_end()),
+  // Start with any unpartitioned elements we know about locally
+  Threads::parallel_reduce (ConstElemRange (mesh.pid_elements_begin(DofObject::invalid_processor_id),
+                                            mesh.pid_elements_end(DofObject::invalid_processor_id)),
                             find_bbox);
 
-  // and the unpartitioned nodes
-  Threads::parallel_reduce (ConstNodeRange (mesh.pid_nodes_begin(DofObject::invalid_processor_id),
-                                            mesh.pid_nodes_end(DofObject::invalid_processor_id)),
-                            find_bbox);
+  // And combine with our local elements
+  find_bbox.bbox().union_with(MeshTools::create_local_bounding_box(mesh));
 
   // Compare the bounding boxes across processors
   mesh.comm().min(find_bbox.min());
