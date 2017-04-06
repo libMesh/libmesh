@@ -124,12 +124,7 @@ public:
         const Elem * elem = *it;
         libmesh_assert(elem);
 
-        for (unsigned int n=0; n<elem->n_nodes(); n++)
-          {
-            const Point & point = elem->point(n);
-
-            _bbox.union_with(point);
-          }
+        _bbox.union_with(elem->loose_bounding_box());
       }
   }
 
