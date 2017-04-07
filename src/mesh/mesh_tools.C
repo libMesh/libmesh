@@ -124,12 +124,7 @@ public:
         const Elem * elem = *it;
         libmesh_assert(elem);
 
-        for (unsigned int n=0; n<elem->n_nodes(); n++)
-          {
-            const Point & point = elem->point(n);
-
-            _bbox.union_with(point);
-          }
+        _bbox.union_with(elem->loose_bounding_box());
       }
   }
 
@@ -150,10 +145,12 @@ public:
   }
 #endif
 
-  /**
-   * FindBBox::bbox() now returns a non-deprecated libMesh::BoundingBox object.
-   */
-  libMesh::BoundingBox bbox () const
+  const libMesh::BoundingBox & bbox () const
+  {
+    return _bbox;
+  }
+
+  libMesh::BoundingBox & bbox ()
   {
     return _bbox;
   }
@@ -348,13 +345,39 @@ MeshTools::create_bounding_box (const MeshBase & mesh)
 
   FindBBox find_bbox;
 
-  Threads::parallel_reduce (ConstNodeRange (mesh.local_nodes_begin(),
-                                            mesh.local_nodes_end()),
+  // Start with any unpartitioned elements we know about locally
+  Threads::parallel_reduce (ConstElemRange (mesh.pid_elements_begin(DofObject::invalid_processor_id),
+                                            mesh.pid_elements_end(DofObject::invalid_processor_id)),
                             find_bbox);
 
-  // and the unpartitioned nodes
+  // And combine with our local elements
+  find_bbox.bbox().union_with(MeshTools::create_local_bounding_box(mesh));
+
+  // Compare the bounding boxes across processors
+  mesh.comm().min(find_bbox.min());
+  mesh.comm().max(find_bbox.max());
+
+  return find_bbox.bbox();
+}
+
+
+
+libMesh::BoundingBox
+MeshTools::create_nodal_bounding_box (const MeshBase & mesh)
+{
+  // This function must be run on all processors at once
+  libmesh_parallel_only(mesh.comm());
+
+  FindBBox find_bbox;
+
+  // Start with any unpartitioned nodes we know about locally
   Threads::parallel_reduce (ConstNodeRange (mesh.pid_nodes_begin(DofObject::invalid_processor_id),
                                             mesh.pid_nodes_end(DofObject::invalid_processor_id)),
+                            find_bbox);
+
+  // Add our local nodes
+  Threads::parallel_reduce (ConstNodeRange (mesh.local_nodes_begin(),
+                                            mesh.local_nodes_end()),
                             find_bbox);
 
   // Compare the bounding boxes across processors
@@ -375,6 +398,20 @@ MeshTools::bounding_sphere(const MeshBase & mesh)
   const Point cent = (bbox.second + bbox.first)/2;
 
   return Sphere (cent, .5*diag);
+}
+
+
+
+libMesh::BoundingBox
+MeshTools::create_local_bounding_box (const MeshBase & mesh)
+{
+  FindBBox find_bbox;
+
+  Threads::parallel_reduce (ConstElemRange (mesh.local_elements_begin(),
+                                            mesh.local_elements_end()),
+                            find_bbox);
+
+  return find_bbox.bbox();
 }
 
 

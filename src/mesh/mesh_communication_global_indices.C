@@ -182,9 +182,11 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
 
   const Parallel::Communicator & communicator (mesh.comm());
 
-  // Global bounding box
+  // Global bounding box.  We choose the nodal bounding box for
+  // backwards compatibility; the element bounding box may be looser
+  // on curved elements.
   BoundingBox bbox =
-    MeshTools::create_bounding_box (mesh);
+    MeshTools::create_nodal_bounding_box (mesh);
 
   //-------------------------------------------------------------
   // (1) compute Hilbert keys
@@ -577,9 +579,12 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
 {
   LOG_SCOPE ("check_for_duplicate_global_indices()", "MeshCommunication");
 
-  // Global bounding box
+  // Global bounding box.  We choose the nodal bounding box for
+  // backwards compatibility; the element bounding box may be looser
+  // on curved elements.
   BoundingBox bbox =
-    MeshTools::create_bounding_box (mesh);
+    MeshTools::create_nodal_bounding_box (mesh);
+
 
   std::vector<Parallel::DofObjectKey>
     node_keys, elem_keys;
