@@ -160,7 +160,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 #ifndef NDEBUG
   // n_coarse_elem is only used in an assertion later so
   // avoid declaring it unless asserts are active.
-  const dof_id_type n_coarse_elem = mesh.n_elem();
+  const dof_id_type n_coarse_elem = mesh.n_active_elem();
 #endif
 
   // Uniformly refine the mesh
@@ -451,8 +451,10 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
       es.reinit();
     }
 
-  // We should be back where we started
-  libmesh_assert_equal_to (n_coarse_elem, mesh.n_elem());
+  // We should have the same number of active elements as when we started,
+  // but not necessarily the same number of elements since reinit() doesn't
+  // always call contract()
+  libmesh_assert_equal_to (n_coarse_elem, mesh.n_active_elem());
 
   // Restore old solutions and clean up the heap
   system.project_solution_on_reinit() = old_projection_setting;
