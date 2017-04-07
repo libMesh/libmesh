@@ -710,7 +710,8 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = *.gmv.* $(am__append_2) $(example_name).html stdout.log
+CLEANFILES = *.gmv.* primal.e* dual.e* $(am__append_2) \
+	$(example_name).html stdout.log
 
 ######################################################################
 #

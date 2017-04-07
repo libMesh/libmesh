@@ -97,6 +97,7 @@
 #include "libmesh/getpot.h"
 #include "libmesh/tecplot_io.h"
 #include "libmesh/gmv_io.h"
+#include "libmesh/exodusII_io.h"
 
 // SolutionHistory Includes
 #include "libmesh/solution_history.h"
@@ -108,22 +109,56 @@
 #include <iomanip>
 
 void write_output(EquationSystems & es,
-                  unsigned int a_step,       // The adaptive step count
-                  std::string solution_type) // primal or adjoint solve
+                  unsigned int t_step,       // The current time step count
+                  std::string solution_type, // primal or adjoint solve
+                  FEMParameters & param)
 {
 #ifdef LIBMESH_HAVE_GMV
-  MeshBase & mesh = es.get_mesh();
+  if (param.output_gmv)
+    {
+      MeshBase & mesh = es.get_mesh();
 
-  std::ostringstream file_name_gmv;
-  file_name_gmv << solution_type
-                << ".out.gmv."
-                << std::setw(2)
-                << std::setfill('0')
-                << std::right
-                << a_step;
+      std::ostringstream file_name_gmv;
+      file_name_gmv << solution_type
+                    << ".out.gmv."
+                    << std::setw(2)
+                    << std::setfill('0')
+                    << std::right
+                    << t_step;
 
-  GMVIO(mesh).write_equation_systems
-    (file_name_gmv.str(), es);
+      GMVIO(mesh).write_equation_systems(file_name_gmv.str(), es);
+    }
+#endif
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+  if (param.output_exodus)
+    {
+      MeshBase & mesh = es.get_mesh();
+
+      // We write out one file per timestep. The files are named in
+      // the following way:
+      // foo.e
+      // foo.e-s002
+      // foo.e-s003
+      // ...
+      // so that, if you open the first one with Paraview, it actually
+      // opens the entire sequence of adapted files.
+      std::ostringstream file_name_exodus;
+
+      file_name_exodus << solution_type << ".e";
+      if (t_step > 0)
+        file_name_exodus << "-s"
+                         << std::setw(3)
+                         << std::setfill('0')
+                         << std::right
+                         << t_step + 1;
+
+      // TODO: Get the current time from the System...
+      ExodusII_IO(mesh).write_timestep(file_name_exodus.str(),
+                                       es,
+                                       1,
+                                       /*time=*/t_step + 1);
+    }
 #endif
 }
 
@@ -352,7 +387,7 @@ int main (int argc, char** argv)
   finish_initialization();
 
   // Plot the initial conditions
-  write_output(equation_systems, 0, "primal");
+  write_output(equation_systems, 0, "primal", param);
 
   // Print information about the mesh and system to the screen.
   mesh.print_info();
@@ -392,7 +427,7 @@ int main (int argc, char** argv)
           system.time_solver->advance_timestep();
 
           // Write out this timestep
-          write_output(equation_systems, t_step+1, "primal");
+          write_output(equation_systems, t_step+1, "primal", param);
         }
       // End timestep loop
 
@@ -450,7 +485,7 @@ int main (int argc, char** argv)
                    << std::endl
                    << std::endl;
 
-      write_output(equation_systems, param.n_timesteps, "dual");
+      write_output(equation_systems, param.n_timesteps, "dual", param);
 
       // Now that the adjoint initial condition is set, we will start the
       // backwards in time adjoint integration
@@ -512,7 +547,7 @@ int main (int argc, char** argv)
           // Swap the primal and dual solutions so we can write out the adjoint solution
           primal_solution.swap(dual_solution_0);
 
-          write_output(equation_systems, param.n_timesteps - (t_step + 1), "dual");
+          write_output(equation_systems, param.n_timesteps - (t_step + 1), "dual", param);
 
           // Swap back
           primal_solution.swap(dual_solution_0);
