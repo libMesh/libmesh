@@ -124,6 +124,7 @@ output_xda = false
 output_xdr = false
 output_gmv = true
 output_tecplot = false
+output_exodus = false
 
 # Do the simulation or just postprocess ?
 run_simulation = true
