@@ -368,6 +368,33 @@ MeshTools::create_bounding_box (const MeshBase & mesh)
 
 
 
+libMesh::BoundingBox
+MeshTools::create_nodal_bounding_box (const MeshBase & mesh)
+{
+  // This function must be run on all processors at once
+  libmesh_parallel_only(mesh.comm());
+
+  FindBBox find_bbox;
+
+  // Start with any unpartitioned nodes we know about locally
+  Threads::parallel_reduce (ConstNodeRange (mesh.pid_nodes_begin(DofObject::invalid_processor_id),
+                                            mesh.pid_nodes_end(DofObject::invalid_processor_id)),
+                            find_bbox);
+
+  // Add our local nodes
+  Threads::parallel_reduce (ConstNodeRange (mesh.local_nodes_begin(),
+                                            mesh.local_nodes_end()),
+                            find_bbox);
+
+  // Compare the bounding boxes across processors
+  mesh.comm().min(find_bbox.min());
+  mesh.comm().max(find_bbox.max());
+
+  return find_bbox.bbox();
+}
+
+
+
 Sphere
 MeshTools::bounding_sphere(const MeshBase & mesh)
 {

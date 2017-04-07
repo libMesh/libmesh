@@ -152,6 +152,16 @@ bounding_sphere (const MeshBase & mesh);
 
 /**
  * @returns two points defining a cartesian box that bounds the
+ * nodes of the mesh.
+ *
+ * In the case of curved elements, this box might *not* bound the
+ * elements of the mesh.
+ */
+libMesh::BoundingBox
+create_nodal_bounding_box (const MeshBase & mesh);
+
+/**
+ * @returns two points defining a cartesian box that bounds the
  * elements belonging to the local processor.
  *
  * Unlike the other bounding box creation functions, this does *not*
