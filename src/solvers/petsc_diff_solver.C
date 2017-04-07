@@ -110,7 +110,7 @@ extern "C"
     R_input.swap(R_system);
 
     // We may need to correct a non-conforming solution
-    sys.get_dof_map().enforce_constraints_exactly(sys);
+    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
     // We may need to localize a parallel solution
     sys.update();
@@ -177,7 +177,7 @@ extern "C"
     J_input.swap(J_system);
 
     // We may need to correct a non-conforming solution
-    sys.get_dof_map().enforce_constraints_exactly(sys);
+    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
     // We may need to localize a parallel solution
     sys.update();
