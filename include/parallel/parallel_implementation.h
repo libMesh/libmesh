@@ -43,6 +43,38 @@ namespace Parallel {
       StandardType(const cxxtype * = libmesh_nullptr) : DataType(mpitype) {} \
   }
 
+#define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)                           \
+  template<>                                                            \
+  class OpFunction<cxxtype>                                             \
+  {                                                                     \
+  public:                                                               \
+    static MPI_Op max()          { return MPI_MAX; }                    \
+    static MPI_Op min()          { return MPI_MIN; }                    \
+    static MPI_Op sum()          { return MPI_SUM; }                    \
+    static MPI_Op product()      { return MPI_PROD; }                   \
+    static MPI_Op logical_and()  { return MPI_LAND; }                   \
+    static MPI_Op bitwise_and()  { return MPI_BAND; }                   \
+    static MPI_Op logical_or()   { return MPI_LOR; }                    \
+    static MPI_Op bitwise_or()   { return MPI_BOR; }                    \
+    static MPI_Op logical_xor()  { return MPI_LXOR; }                   \
+    static MPI_Op bitwise_xor()  { return MPI_BXOR; }                   \
+    static MPI_Op max_location() { return MPI_MAXLOC; }                 \
+    static MPI_Op min_location() { return MPI_MINLOC; }                 \
+  }
+
+#define LIBMESH_PARALLEL_FLOAT_OPS(cxxtype)                             \
+  template<>                                                            \
+  class OpFunction<cxxtype>                                             \
+  {                                                                     \
+  public:                                                               \
+    static MPI_Op max()          { return MPI_MAX; }                    \
+    static MPI_Op min()          { return MPI_MIN; }                    \
+    static MPI_Op sum()          { return MPI_SUM; }                    \
+    static MPI_Op product()      { return MPI_PROD; }                   \
+    static MPI_Op max_location() { return MPI_MAXLOC; }                 \
+    static MPI_Op min_location() { return MPI_MINLOC; }                 \
+  }
+
 #else
 
 #define LIBMESH_STANDARD_TYPE(cxxtype,mpitype)                          \
@@ -54,10 +86,17 @@ namespace Parallel {
       StandardType(const cxxtype * = libmesh_nullptr) : DataType() {}   \
   }
 
+#define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)                           \
+  template<>                                                            \
+  class OpFunction<cxxtype>                                             \
+  {                                                                     \
+  }
+
 #endif
 
 #define LIBMESH_INT_TYPE(cxxtype,mpitype)                               \
   LIBMESH_STANDARD_TYPE(cxxtype,mpitype);                               \
+  LIBMESH_PARALLEL_INTEGER_OPS(cxxtype);                                \
                                                                         \
   template<>                                                            \
   struct Attributes<cxxtype>                                            \
@@ -69,6 +108,7 @@ namespace Parallel {
 
 #define LIBMESH_FLOAT_TYPE(cxxtype,mpitype)                             \
   LIBMESH_STANDARD_TYPE(cxxtype,mpitype);                               \
+  LIBMESH_PARALLEL_FLOAT_OPS(cxxtype);                                  \
                                                                         \
   template<>                                                            \
   struct Attributes<cxxtype>                                            \
@@ -124,6 +164,8 @@ public:
                             sizeof(unsigned long));
   }
 };
+
+LIBMESH_PARALLEL_INTEGER_OPS(unsigned long long);                                \
 
 template<>
 struct Attributes<unsigned long long>
@@ -1541,7 +1583,8 @@ inline void Communicator::min(T & r) const
 
       T temp = r;
       libmesh_call_mpi
-        (MPI_Allreduce (&temp, &r, 1, StandardType<T>(&temp), MPI_MIN,
+        (MPI_Allreduce (&temp, &r, 1, StandardType<T>(&temp),
+                        OpFunction<T>::min(),
                         this->get()));
     }
 }
@@ -1558,7 +1601,8 @@ inline void Communicator::min(bool & r) const
 
       libmesh_call_mpi
         (MPI_Allreduce (&tempsend, &temp, 1,
-                        StandardType<unsigned int>(), MPI_MIN,
+                        StandardType<unsigned int>(),
+                        OpFunction<unsigned int>::min(),
                         this->get()));
       r = temp;
     }
@@ -1577,7 +1621,8 @@ inline void Communicator::min(std::vector<T> & r) const
       std::vector<T> temp(r);
       libmesh_call_mpi
         (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size()),
-                        StandardType<T>(&temp[0]), MPI_MIN,
+                        StandardType<T>(&temp[0]),
+                        OpFunction<T>::min(),
                         this->get()));
     }
 }
@@ -1618,7 +1663,7 @@ inline void Communicator::minloc(T & r,
       DataPlusInt<T> data_out;
       libmesh_call_mpi
         (MPI_Allreduce (&data_in, &data_out, 1, dataplusint_type<T>(),
-                        MPI_MINLOC, this->get()));
+                        OpFunction<T>::max_location(), this->get()));
       r = data_out.val;
       min_id = data_out.rank;
     }
@@ -1641,7 +1686,7 @@ inline void Communicator::minloc(bool & r,
       libmesh_call_mpi
         (MPI_Allreduce (&data_in, &data_out, 1,
                         dataplusint_type<int>(),
-                        MPI_MINLOC, this->get()));
+                        OpFunction<int>::min_location(), this->get()));
       r = data_out.val;
       min_id = data_out.rank;
     }
@@ -1670,8 +1715,8 @@ inline void Communicator::minloc(std::vector<T> & r,
       libmesh_call_mpi
         (MPI_Allreduce (&data_in[0], &data_out[0],
                         cast_int<int>(r.size()),
-                        dataplusint_type<T>(), MPI_MINLOC,
-                        this->get()));
+                        dataplusint_type<T>(),
+                        OpFunction<T>::min_location(), this->get()));
       for (std::size_t i=0; i != r.size(); ++i)
         {
           r[i]      = data_out[i].val;
@@ -1705,8 +1750,8 @@ inline void Communicator::minloc(std::vector<bool> & r,
       libmesh_call_mpi
         (MPI_Allreduce (&data_in[0], &data_out[0],
                         cast_int<int>(r.size()),
-                        StandardType<int>(), MPI_MINLOC,
-                        this->get()));
+                        StandardType<int>(),
+                        OpFunction<int>::min_location(), this->get()));
       for (std::size_t i=0; i != r.size(); ++i)
         {
           r[i]      = data_out[i].val;
@@ -1730,7 +1775,8 @@ inline void Communicator::max(T & r) const
 
       T temp;
       libmesh_call_mpi
-        (MPI_Allreduce (&r, &temp, 1, StandardType<T>(&r), MPI_MAX,
+        (MPI_Allreduce (&r, &temp, 1, StandardType<T>(&r),
+                        OpFunction<T>::max(),
                         this->get()));
       r = temp;
     }
@@ -1747,7 +1793,8 @@ inline void Communicator::max(bool & r) const
       unsigned int temp;
       libmesh_call_mpi
         (MPI_Allreduce (&tempsend, &temp, 1,
-                        StandardType<unsigned int>(), MPI_MAX,
+                        StandardType<unsigned int>(),
+                        OpFunction<unsigned int>::max(),
                         this->get()));
       r = temp;
     }
@@ -1766,7 +1813,8 @@ inline void Communicator::max(std::vector<T> & r) const
       std::vector<T> temp(r);
       libmesh_call_mpi
         (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size()),
-                        StandardType<T>(&temp[0]), MPI_MAX,
+                        StandardType<T>(&temp[0]),
+                        OpFunction<T>::max(),
                         this->get()));
     }
 }
@@ -1808,7 +1856,8 @@ inline void Communicator::maxloc(T & r,
       libmesh_call_mpi
         (MPI_Allreduce (&data_in, &data_out, 1,
                         dataplusint_type<T>(),
-                        MPI_MAXLOC, this->get()));
+                        OpFunction<T>::max_location(),
+                        this->get()));
       r = data_out.val;
       max_id = data_out.rank;
     }
@@ -1831,7 +1880,8 @@ inline void Communicator::maxloc(bool & r,
       libmesh_call_mpi
         (MPI_Allreduce (&data_in, &data_out, 1,
                         dataplusint_type<int>(),
-                        MPI_MAXLOC, this->get()));
+                        OpFunction<int>::max_location(),
+                        this->get()));
       r = data_out.val;
       max_id = data_out.rank;
     }
@@ -1860,7 +1910,8 @@ inline void Communicator::maxloc(std::vector<T> & r,
       libmesh_call_mpi
         (MPI_Allreduce (&data_in[0], &data_out[0],
                         cast_int<int>(r.size()),
-                        dataplusint_type<T>(), MPI_MAXLOC,
+                        dataplusint_type<T>(),
+                        OpFunction<T>::max_location(),
                         this->get()));
       for (std::size_t i=0; i != r.size(); ++i)
         {
@@ -1895,7 +1946,8 @@ inline void Communicator::maxloc(std::vector<bool> & r,
       libmesh_call_mpi
         (MPI_Allreduce (&data_in[0], &data_out[0],
                         cast_int<int>(r.size()),
-                        StandardType<int>(), MPI_MAXLOC,
+                        StandardType<int>(),
+                        OpFunction<int>::max_location(),
                         this->get()));
       for (std::size_t i=0; i != r.size(); ++i)
         {
@@ -1920,7 +1972,8 @@ inline void Communicator::sum(T & r) const
 
       T temp = r;
       libmesh_call_mpi
-        (MPI_Allreduce (&temp, &r, 1, StandardType<T>(&temp), MPI_SUM,
+        (MPI_Allreduce (&temp, &r, 1, StandardType<T>(&temp),
+                        OpFunction<T>::sum(),
                         this->get()));
     }
 }
@@ -1938,7 +1991,8 @@ inline void Communicator::sum(std::vector<T> & r) const
       std::vector<T> temp(r);
       libmesh_call_mpi
         (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size()),
-                        StandardType<T>(&temp[0]), MPI_SUM,
+                        StandardType<T>(&temp[0]),
+                        OpFunction<T>::sum(),
                         this->get()));
     }
 }
@@ -1955,7 +2009,8 @@ inline void Communicator::sum(std::complex<T> & r) const
 
       std::complex<T> temp(r);
       libmesh_call_mpi
-        (MPI_Allreduce (&temp, &r, 2, StandardType<T>(), MPI_SUM,
+        (MPI_Allreduce (&temp, &r, 2, StandardType<T>(),
+                        OpFunction<T>::sum(),
                         this->get()));
     }
 }
@@ -1973,7 +2028,8 @@ inline void Communicator::sum(std::vector<std::complex<T> > & r) const
       std::vector<std::complex<T> > temp(r);
       libmesh_call_mpi
         (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size() * 2),
-                        StandardType<T>(libmesh_nullptr), MPI_SUM, this->get()));
+                        StandardType<T>(libmesh_nullptr),
+                        OpFunction<T>::sum(), this->get()));
     }
 }
 

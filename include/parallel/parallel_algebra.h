@@ -309,6 +309,113 @@ public:
   }
 };
 
+// OpFunction<> specializations to return an MPI_Op version of the
+// reduction operations on LIBMESH_DIM-vectors.
+//
+// We use static variables to minimize the number of MPI datatype
+// construction calls executed over the course of the program.
+//
+// We use a singleton pattern because a global variable would
+// have tried to call MPI functions before MPI got initialized.
+//
+// min() and max() are applied component-wise; this makes them useful
+// for bounding box reduction operations.
+template <typename V>
+class TypeVectorOpFunction
+{
+public:
+#ifdef LIBMESH_HAVE_MPI
+  static void vector_max (void *invec, void *inoutvec, int *len, MPI_Datatype *)
+  {
+    V *in = static_cast<V *>(invec);
+    V *inout = static_cast<V *>(inoutvec);
+    for (int i=0; i != *len; ++i)
+      for (int d=0; d != LIBMESH_DIM; ++d)
+        inout[i](d) = std::max(in[i](d), inout[i](d));
+  }
+
+  static void vector_min (void *invec, void *inoutvec, int *len, MPI_Datatype *)
+  {
+    V *in = static_cast<V *>(invec);
+    V *inout = static_cast<V *>(inoutvec);
+    for (int i=0; i != *len; ++i)
+      for (int d=0; d != LIBMESH_DIM; ++d)
+        inout[i](d) = std::min(in[i](d), inout[i](d));
+  }
+
+  static void vector_sum (void *invec, void *inoutvec, int *len, MPI_Datatype *)
+  {
+    V *in = static_cast<V *>(invec);
+    V *inout = static_cast<V *>(inoutvec);
+    for (int i=0; i != *len; ++i)
+      for (int d=0; d != LIBMESH_DIM; ++d)
+        inout[i](d) += in[i](d);
+  }
+
+  static MPI_Op max()
+  {
+    // _static_op never gets freed, but it only gets committed once
+    // per T, so it's not a *huge* memory leak...
+    static MPI_Op _static_op;
+    static bool _is_initialized = false;
+    if (!_is_initialized)
+      {
+        libmesh_call_mpi
+          (MPI_Op_create (vector_max, /*commute=*/ true,
+                          &_static_op));
+
+        _is_initialized = true;
+      }
+
+    return _static_op;
+  }
+  static MPI_Op min()
+  {
+    // _static_op never gets freed, but it only gets committed once
+    // per T, so it's not a *huge* memory leak...
+    static MPI_Op _static_op;
+    static bool _is_initialized = false;
+    if (!_is_initialized)
+      {
+        libmesh_call_mpi
+          (MPI_Op_create (vector_min, /*commute=*/ true,
+                          &_static_op));
+
+        _is_initialized = true;
+      }
+
+    return _static_op;
+  }
+  static MPI_Op sum()
+  {
+    // _static_op never gets freed, but it only gets committed once
+    // per T, so it's not a *huge* memory leak...
+    static MPI_Op _static_op;
+    static bool _is_initialized = false;
+    if (!_is_initialized)
+      {
+        libmesh_call_mpi
+          (MPI_Op_create (vector_sum, /*commute=*/ true,
+                          &_static_op));
+
+        _is_initialized = true;
+      }
+
+    return _static_op;
+  }
+
+#endif // LIBMESH_HAVE_MPI
+};
+
+template <typename T>
+class OpFunction<TypeVector<T> > : public TypeVectorOpFunction<TypeVector<T> > {};
+
+template <typename T>
+class OpFunction<VectorValue<T> > : public TypeVectorOpFunction<VectorValue<T> > {};
+
+template <>
+class OpFunction<Point> : public TypeVectorOpFunction<Point> {};
+
 // StandardType<> specializations to return a derived MPI datatype
 // to handle communication of LIBMESH_DIM*LIBMESH_DIM-tensors.
 //
