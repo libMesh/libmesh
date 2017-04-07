@@ -59,6 +59,13 @@ coarsen_threshold = 0
 # The maximum number of adaptive steps per timestep
 max_adaptivesteps = 2
 
+# Output format(s)
+output_xda = false
+output_xdr = false
+output_gmv = true
+output_tecplot = false
+output_exodus = false
+
 # Use what finite element space?
 fe_family = LAGRANGE
 fe_order = 2
