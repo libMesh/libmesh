@@ -86,6 +86,7 @@
 // libMesh I/O includes
 #include "libmesh/getpot.h"
 #include "libmesh/gmv_io.h"
+#include "libmesh/exodusII_io.h"
 
 // Local includes
 #include "femparameters.h"
@@ -103,21 +104,56 @@ using namespace libMesh;
 // Write gmv output
 void write_output(EquationSystems & es,
                   unsigned int a_step, // The adaptive step count
-                  std::string solution_type) // primal or adjoint solve
+                  std::string solution_type, // primal or adjoint solve
+                  FEMParameters & param)
 {
 #ifdef LIBMESH_HAVE_GMV
-  MeshBase & mesh = es.get_mesh();
+  if (param.output_gmv)
+    {
+      MeshBase & mesh = es.get_mesh();
 
-  std::ostringstream file_name_gmv;
-  file_name_gmv << solution_type
-                << ".out.gmv."
-                << std::setw(2)
-                << std::setfill('0')
-                << std::right
-                << a_step;
+      std::ostringstream file_name_gmv;
+      file_name_gmv << solution_type
+                    << ".out.gmv."
+                    << std::setw(2)
+                    << std::setfill('0')
+                    << std::right
+                    << a_step;
 
-  GMVIO(mesh).write_equation_systems(file_name_gmv.str(), es);
+      GMVIO(mesh).write_equation_systems(file_name_gmv.str(), es);
+    }
+#endif
 
+#ifdef LIBMESH_HAVE_EXODUS_API
+  if (param.output_exodus)
+    {
+      MeshBase & mesh = es.get_mesh();
+
+      // We write out one file per adaptive step. The files are named in
+      // the following way:
+      // foo.e
+      // foo.e-s002
+      // foo.e-s003
+      // ...
+      // so that, if you open the first one with Paraview, it actually
+      // opens the entire sequence of adapted files.
+      std::ostringstream file_name_exodus;
+
+      file_name_exodus << solution_type << ".e";
+      if (a_step > 0)
+        file_name_exodus << "-s"
+                         << std::setw(3)
+                         << std::setfill('0')
+                         << std::right
+                         << a_step + 1;
+
+      // We write each adaptive step as a pseudo "time" step, where the
+      // time simply matches the (1-based) adaptive step we are on.
+      ExodusII_IO(mesh).write_timestep(file_name_exodus.str(),
+                                       es,
+                                       1,
+                                       /*time=*/a_step + 1);
+    }
 #endif
 }
 
@@ -330,7 +366,7 @@ int main (int argc, char ** argv)
         system.solve();
 
         // Write out the computed primal solution
-        write_output(equation_systems, a_step, "primal");
+        write_output(equation_systems, a_step, "primal", param);
 
         // Get a pointer to the primal solution vector
         NumericVector<Number> & primal_solution = *system.solution;
@@ -390,7 +426,7 @@ int main (int argc, char ** argv)
 
         // Swap the primal and dual solutions so we can write out the adjoint solution
         primal_solution.swap(dual_solution_0);
-        write_output(equation_systems, a_step, "adjoint_0");
+        write_output(equation_systems, a_step, "adjoint_0", param);
 
         // Swap back
         primal_solution.swap(dual_solution_0);
@@ -463,7 +499,7 @@ int main (int argc, char ** argv)
       {
         system.solve();
 
-        write_output(equation_systems, a_step, "primal");
+        write_output(equation_systems, a_step, "primal", param);
 
         NumericVector<Number> & primal_solution = *system.solution;
 
@@ -522,7 +558,7 @@ int main (int argc, char ** argv)
         NumericVector<Number> & dual_solution_0 = system.get_adjoint_solution(0);
 
         primal_solution.swap(dual_solution_0);
-        write_output(equation_systems, a_step, "adjoint_0");
+        write_output(equation_systems, a_step, "adjoint_0", param);
 
         primal_solution.swap(dual_solution_0);
       }

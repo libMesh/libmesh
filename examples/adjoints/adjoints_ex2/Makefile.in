@@ -687,8 +687,8 @@ DISTCLEANFILES = $(BUILT_SOURCES)
 #
 # how to make documentation
 #
-CLEANFILES = lshaped.xda primal.out.* adjoint_0.out.* $(am__append_2) \
-	$(example_name).html stdout.log
+CLEANFILES = lshaped.xda primal.out.* adjoint_0.out.* primal.e* \
+	adjoint_0.e* $(am__append_2) $(example_name).html stdout.log
 example_name = adjoints_ex2
 check_SCRIPTS = run.sh
 install_dir = $(examples_install_path)/adjoints/ex2

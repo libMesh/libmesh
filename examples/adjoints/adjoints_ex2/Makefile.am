@@ -19,7 +19,7 @@ install_dir   = $(examples_install_path)/adjoints/ex2
 data          = adjoints_ex2.C ../adjoints_ex1/lshaped.xda L-shaped.C L-shaped.h general.in l-shaped.in L-qoi.C L-qoi.h run.sh femparameters.C femparameters.h
 sources       = $(data) run.sh
 
-CLEANFILES += primal.out.* adjoint_0.out.*
+CLEANFILES += primal.out.* adjoint_0.out.* primal.e* adjoint_0.e*
 
 # also need to link input for VPATH builds
 if LIBMESH_VPATH_BUILD
