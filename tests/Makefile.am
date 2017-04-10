@@ -170,7 +170,9 @@ $(top_builddir)/libmesh_oprof.la: FORCE
 
 TESTS = run_unit_tests.sh
 
-CLEANFILES = cube_mesh.xdr checkpoint_splitter.cpr-2-0 checkpoint_splitter.cpr-2-1 slit_mesh.xda slit_solution.xda
+CLEANFILES = cube_mesh.xdr \
+             checkpoint_splitter.cpr* checkpoint_splitter.cpa* \
+             slit_mesh.xda slit_solution.xda
 
 ######################################################################
 #
