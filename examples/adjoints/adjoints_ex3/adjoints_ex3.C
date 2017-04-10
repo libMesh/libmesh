@@ -90,6 +90,7 @@
 #include "libmesh/fem_function_base.h"
 #include "libmesh/getpot.h"
 #include "libmesh/gmv_io.h"
+#include "libmesh/exodusII_io.h"
 #include "libmesh/kelly_error_estimator.h"
 #include "libmesh/parameter_vector.h"
 #include "libmesh/patch_recovery_error_estimator.h"
@@ -146,8 +147,7 @@ std::string numbered_filename(unsigned int t_step, // The timestep count
   return file_name.str();
 }
 
-// Write tecplot, gmv and xda/xdr output
-
+// Possibly write tecplot, gmv, xda/xdr, and exodus output files.
 void write_output(EquationSystems & es,
                   unsigned int t_step, // The timestep count
                   unsigned int a_step, // The adaptive step count
@@ -215,6 +215,36 @@ void write_output(EquationSystems & es,
                WRITE, EquationSystems::WRITE_DATA |
                EquationSystems::WRITE_ADDITIONAL_DATA);
     }
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+  if (param.output_exodus)
+    {
+      // We write out one file per adaptive step. The files are named in
+      // the following way:
+      // foo.e
+      // foo.e-s002
+      // foo.e-s003
+      // ...
+      // so that, if you open the first one with Paraview, it actually
+      // opens the entire sequence of adapted files.
+      std::ostringstream file_name_exodus;
+
+      file_name_exodus << solution_type << ".e";
+      if (a_step > 0)
+        file_name_exodus << "-s"
+                         << std::setw(3)
+                         << std::setfill('0')
+                         << std::right
+                         << a_step + 1;
+
+      // We write each adaptive step as a pseudo "time" step, where the
+      // time simply matches the (1-based) adaptive step we are on.
+      ExodusII_IO(mesh).write_timestep(file_name_exodus.str(),
+                                       es,
+                                       1,
+                                       /*time=*/a_step + 1);
+    }
+#endif
 }
 
 void write_output_headers(FEMParameters & param)

@@ -736,8 +736,8 @@ CLEANFILES = primal.out.gmv.000.05 primal.out.gmv.000.04 \
 	error.gmv.000.00_convection_diffusion_x complete \
 	adjoint.out.gmv.000.04 adjoint.out.gmv.000.03 \
 	adjoint.out.gmv.000.02 adjoint.out.gmv.000.01 \
-	adjoint.out.gmv.000.00 $(am__append_2) $(example_name).html \
-	stdout.log
+	adjoint.out.gmv.000.00 primal.e* adjoint.e* $(am__append_2) \
+	$(example_name).html stdout.log
 
 ######################################################################
 #

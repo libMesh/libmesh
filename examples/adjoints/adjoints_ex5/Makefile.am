@@ -13,7 +13,7 @@ install_dir   = $(examples_install_path)/adjoints/ex5
 data          = heatsystem.C element_qoi_derivative.C factoryfunction.C general.in initial.C heatsystem.h adjoints_ex5.C femparameters.C heat.in femparameters.h adjoint_initial.C adjoint_initial.h initial.h run.sh
 sources       = $(data) run.sh
 
-CLEANFILES = *.gmv.*
+CLEANFILES = *.gmv.* primal.e* dual.e*
 
 # also need links for VPATH builds
 if LIBMESH_VPATH_BUILD
