@@ -1139,9 +1139,9 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
           NODEPRECATEDFLAG="-Wno-deprecated"
 
-          CFLAGS_OPT="-O2 -Qunused-arguments -Wunused-parameter -Wunused"
-          CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -fno-limit-debug-info -Wunused-parameter -Wunused"
-          CFLAGS_DBG="-g -Wimplicit -Qunused-arguments -fno-limit-debug-info -Wunused-parameter -Wunused"
+          CFLAGS_OPT="-O2 -Qunused-arguments -Wunused"
+          CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -fno-limit-debug-info -Wunused"
+          CFLAGS_DBG="-g -Wimplicit -Qunused-arguments -fno-limit-debug-info -Wunused"
           ;;
 
       *)
