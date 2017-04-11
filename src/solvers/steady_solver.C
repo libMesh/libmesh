@@ -78,13 +78,13 @@ bool SteadySolver::_general_residual(bool request_jacobian,
     }
 
   bool jacobian_computed =
-    (_system.*time_deriv)(request_jacobian, context);
+    (_system.get_physics()->*time_deriv)(request_jacobian, context);
 
   // The user shouldn't compute a jacobian unless requested
   libmesh_assert (request_jacobian || !jacobian_computed);
 
   bool jacobian_computed2 =
-    (_system.*constraint)(jacobian_computed, context);
+    (_system.get_physics()->*constraint)(jacobian_computed, context);
 
   // The user shouldn't compute a jacobian unless requested
   libmesh_assert (jacobian_computed || !jacobian_computed2);
