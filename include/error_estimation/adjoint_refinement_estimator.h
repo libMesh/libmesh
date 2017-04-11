@@ -111,11 +111,6 @@ public:
     return computed_global_QoI_errors[qoi_index];
   }
 
-  /**
-   * Swap pointer of current physics object with that of another called swap_physics
-   */
-  void swap (FEMPhysics* swap_physics_1, FEMPhysics* swap_physics_2);
-
   virtual ErrorEstimatorType type() const
   { return ADJOINT_REFINEMENT;}
 
@@ -135,6 +130,12 @@ public:
    */
   FEMPhysics * get_residual_evaluation_physics()
   { return this->_residual_evaluation_physics; }
+
+  /**
+   * Set the _residual_evaluation_physics member to argument
+   */
+  void set_residual_evaluation_physics(FEMPhysics* set_physics)
+  { this->_residual_evaluation_physics = set_physics; }
 
 protected:
 

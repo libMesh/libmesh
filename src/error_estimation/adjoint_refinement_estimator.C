@@ -63,14 +63,6 @@ namespace libMesh
 // By richer FE space, we mean a grid that has been refined once and a polynomial order
 // that has been increased once, i.e. one h and one p refinement
 
-
-void AdjointRefinementEstimator::swap (FEMPhysics* swap_physics_1, FEMPhysics* swap_physics_2)
-{
-  FEMPhysics* temp = swap_physics_1;
-  swap_physics_1 = swap_physics_2;
-  swap_physics_2 = temp;
-}
-
 // Both a global QoI error estimate and element wise error indicators are included
 // Note that the element wise error indicators slightly over estimate the error in
 // each element
@@ -224,19 +216,19 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   {
     // Rebuild the rhs with the projected primal solution
     (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
-    NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
-    projected_residual.close();
+    projected_residual = &(dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
+    projected_residual->close();
   }
-  // Else if residual ptr is not null (i.e. user has set physics which they want to use for residual evaluation)
+  else // Else if residual ptr is not null (i.e. user has set physics which they want to use for residual evaluation)
   {
     // Swap the residual evaluation physics with the system physics
-    swap(dynamic_cast<FEMPhysics *>((dynamic_cast<FEMSystem &>(system)).get_physics()), _residual_evaluation_physics);
+    dynamic_cast<FEMSystem &>(system).swap(_residual_evaluation_physics);
     // Rebuild the rhs with the projected primal solution
     (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
-    NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
-    projected_residual.close();
+    projected_residual = &(dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
+    projected_residual->close();
     // Swap back
-    swap(dynamic_cast<FEMPhysics *>((dynamic_cast<FEMSystem &>(system)).get_physics()), _residual_evaluation_physics);
+    dynamic_cast<FEMSystem &>(system).swap(_residual_evaluation_physics);
   }
 
   // Solve the adjoint problem(s) on the refined FE space
