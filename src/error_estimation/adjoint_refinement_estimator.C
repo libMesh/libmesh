@@ -206,9 +206,6 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
         coarse_adjoints.push_back(static_cast<NumericVector<Number> *>(libmesh_nullptr));
     }
 
-  // Hack
-  //_residual_evaluation_physics = dynamic_cast<FEMPhysics *>((dynamic_cast<FEMSystem &>(system)).get_physics());
-
   // Next, we are going to build up the residual for evaluating the error estimate
   NumericVector<Number> * projected_residual = libmesh_nullptr;
   // If the residual ptr is null, use whatever the default physics built by the user is to build the residual vector
@@ -222,13 +219,21 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   else // Else if residual ptr is not null (i.e. user has set physics which they want to use for residual evaluation)
   {
     // Swap the residual evaluation physics with the system physics
-    dynamic_cast<FEMSystem &>(system).swap(_residual_evaluation_physics);
+    _residual_evaluation_physics = dynamic_cast<FEMSystem &>(system).swap_with_system_physics(&*_residual_evaluation_physics);
     // Rebuild the rhs with the projected primal solution
     (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
     projected_residual = &(dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
     projected_residual->close();
+
+    // Begin Hack
+    // for( int i = 0; i < projected_residual->size(); i++)
+    // {
+    //   std::cout<<"projected_residual["<<i<<"]: "<<projected_residual[i]<<std::endl;
+    // }
+    // End Hack
+
     // Swap back
-    dynamic_cast<FEMSystem &>(system).swap(_residual_evaluation_physics);
+    _residual_evaluation_physics = dynamic_cast<FEMSystem &>(system).swap_with_system_physics(&*_residual_evaluation_physics);
   }
 
   // Solve the adjoint problem(s) on the refined FE space

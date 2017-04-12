@@ -1434,11 +1434,12 @@ void FEMSystem::mesh_position_get()
   this->System::update();
 }
 
-void FEMSystem::swap (FEMPhysics* swap_physics)
+FEMPhysics* FEMSystem::swap_with_system_physics (FEMPhysics* swap_physics)
 {
   FEMPhysics* temp = dynamic_cast<FEMPhysics *>(this->get_physics());
   this->_diff_physics = dynamic_cast<DifferentiablePhysics *>(swap_physics);
   swap_physics = temp;
+  return swap_physics;
 }
 
 
