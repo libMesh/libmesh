@@ -1434,10 +1434,13 @@ void FEMSystem::mesh_position_get()
   this->System::update();
 }
 
-FEMPhysics* FEMSystem::swap_with_system_physics (FEMPhysics* swap_physics)
+FEMPhysics* FEMSystem::swap_with_diff_physics (FEMPhysics* swap_physics)
 {
   FEMPhysics* temp = dynamic_cast<FEMPhysics *>(this->get_physics());
+  std::cout<<"Swap Physics: "<<swap_physics<<std::endl;
+  std::cout<<"Diff Physics: "<<this->_diff_physics<<std::endl;
   this->_diff_physics = dynamic_cast<DifferentiablePhysics *>(swap_physics);
+  std::cout<<"Diff Physics: "<<this->_diff_physics<<std::endl;
   swap_physics = temp;
   return swap_physics;
 }

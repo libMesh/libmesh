@@ -237,7 +237,7 @@ public:
   /**
    * Swap pointer of physics object belonging to current FEMSystem object with another FEMPhysics called swap_physics
    */
-  FEMPhysics* swap_with_system_physics (FEMPhysics* swap_physics);
+  FEMPhysics* swap_with_diff_physics (FEMPhysics* swap_physics);
 
 protected:
   /**
