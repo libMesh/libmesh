@@ -1068,7 +1068,11 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                     Point other_point = other_iter->first;
 
                     if (!this_point.absolute_fuzzy_equals(other_point, tol*h_min))
-                      libmesh_error_msg("Error: mismatched points: " << this_point << " and " << other_point);
+                      {
+                        std::stringstream msg;
+                        msg << "Error: mismatched points: " << this_point << " and " << other_point;
+                        LIBMESH_THROW(std::runtime_error(msg.str()));
+                      }
                   }
 
 
@@ -1110,7 +1114,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                     {
                       // Make sure we didn't already find a matching node!
                       if (found_matching_nodes)
-                        libmesh_error_msg("Error: Found multiple matching nodes in stitch_meshes");
+                        LIBMESH_THROW(std::runtime_error(("Error: Found multiple matching nodes in stitch_meshes")));
 
                       node_to_node_map[this_node_id] = other_node_id;
                       other_to_this_node_map[other_node_id] = this_node_id;
@@ -1163,7 +1167,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
           std::size_t this_mesh_n_nodes = this_boundary_node_ids.size();
           std::size_t other_mesh_n_nodes = other_boundary_node_ids.size();
           if ((n_matching_nodes != this_mesh_n_nodes) || (n_matching_nodes != other_mesh_n_nodes))
-            libmesh_error_msg("Error: We expected the number of nodes to match.");
+            LIBMESH_THROW(std::runtime_error(("Error: The nodes do not match in mesh stitching.")));
         }
     }
   else
