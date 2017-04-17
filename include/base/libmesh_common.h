@@ -369,8 +369,10 @@ extern bool warned_about_auto_ptr;
 #define libmesh_error_msg(msg)                                          \
   do {                                                                  \
     libMesh::err << msg << std::endl;                                   \
+    std::stringstream msg_stream;                                       \
+    msg_stream << msg;                                                  \
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME); \
-    LIBMESH_THROW(libMesh::LogicError());                               \
+    LIBMESH_THROW(libMesh::LogicError(msg_stream.str()));               \
   } while (0)
 
 #define libmesh_error() libmesh_error_msg("")
