@@ -220,11 +220,11 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   else // Else if residual ptr is not null (i.e. user has set physics which they want to use for residual evaluation)
   {
     // Swap the residual evaluation physics with the system physics
-    std::cout<<"Diff Physics: "<<dynamic_cast<FEMSystem &>(system).get_physics()<<std::endl;
-    std::cout<<"Residual Physics: "<<_residual_evaluation_physics<<std::endl;
+    std::cout<<"Diff Physics before swapping: "<<dynamic_cast<FEMSystem &>(system).get_physics()<<std::endl;
+    std::cout<<"Residual Physics before swapping: "<<_residual_evaluation_physics<<std::endl;
     _residual_evaluation_physics = dynamic_cast<FEMSystem &>(system).swap_with_diff_physics(_residual_evaluation_physics);
-    std::cout<<"Diff Physics: "<<dynamic_cast<FEMSystem &>(system).get_physics()<<std::endl;
-    std::cout<<"Residual Physics: "<<_residual_evaluation_physics<<std::endl;
+    std::cout<<"Diff Physics after swapping: "<<dynamic_cast<FEMSystem &>(system).get_physics()<<std::endl;
+    std::cout<<"Residual Physics after swapping: "<<_residual_evaluation_physics<<std::endl;
     // Rebuild the rhs with the projected primal solution
     (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
     projected_residual = &(dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
@@ -239,8 +239,8 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
     // Swap back
     _residual_evaluation_physics = dynamic_cast<FEMSystem &>(system).swap_with_diff_physics(_residual_evaluation_physics);
-    std::cout<<"Diff Physics: "<<dynamic_cast<FEMSystem &>(system).get_physics()<<std::endl;
-    std::cout<<"Residual Physics: "<<_residual_evaluation_physics<<std::endl;
+    std::cout<<"Diff Physics after swapping back: "<<dynamic_cast<FEMSystem &>(system).get_physics()<<std::endl;
+    std::cout<<"Residual Physics after swapping back: "<<_residual_evaluation_physics<<std::endl;
   }
 
   // Solve the adjoint problem(s) on the refined FE space
