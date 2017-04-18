@@ -265,8 +265,8 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
           this->boundary_ids(node, node_boundary_ids);
           for (std::size_t index=0; index<node_boundary_ids.size(); index++)
             {
-              boundary_mesh.boundary_info->add_node(node_id_map[node_id],
-                                                    node_boundary_ids[index]);
+              boundary_mesh.get_boundary_info().add_node(node_id_map[node_id],
+                                                         node_boundary_ids[index]);
             }
         }
     }
