@@ -88,7 +88,7 @@ public:
   //! Exact solution as a function of time t.
   virtual Number u( Real t ) =0;
 
-  virtual void init_data ()
+  virtual void init_data () libmesh_override
   {
     _u_var = this->add_variable ("u", FIRST, LAGRANGE);
     this->time_evolving(_u_var,1);
@@ -166,7 +166,7 @@ public:
     : FirstOrderScalarSystemBase(es, name_in, number_in)
   {}
 
-  virtual void init_data ()
+  virtual void init_data () libmesh_override
   {
     _u_var = this->add_variable ("u", FIRST, LAGRANGE);
     this->time_evolving(_u_var,2);
