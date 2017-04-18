@@ -432,14 +432,16 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
                 }
             }
 
-          // if side s wasn't found or doesn't have a boundary
-          // condition we may still want to add it
-          if (range.first == range.second)
-            {
-              this_bcid = invalid_id;
-              if (requested_boundary_ids.count(this_bcid))
-                add_this_side = true;
-            }
+          // We may still want to add this side if the user called
+          // sync() with no requested_boundary_ids. This corresponds
+          // to the "old" style of calling sync() in which the entire
+          // boundary was copied to the BoundaryMesh, and handles the
+          // case where elements on the geometric boundary are not in
+          // any sidesets.
+          if (range.first == range.second              &&
+              requested_boundary_ids.count(invalid_id) &&
+              elem->neighbor_ptr(s) == libmesh_nullptr)
+            add_this_side = true;
 
           if (add_this_side)
             sides_to_add.push_back(std::make_pair(elem->id(), s));
@@ -2515,14 +2517,16 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
                 }
             }
 
-          // Even if nothing was found in the _boundary_side_id
-          // container, we may still want to add it.
-          if (range.first == range.second)
-            {
-              this_bcid = invalid_id;
-              if (requested_boundary_ids.count(this_bcid))
-                add_this_side = true;
-            }
+          // We may still want to add this side if the user called
+          // sync() with no requested_boundary_ids. This corresponds
+          // to the "old" style of calling sync() in which the entire
+          // boundary was copied to the BoundaryMesh, and handles the
+          // case where elements on the geometric boundary are not in
+          // any sidesets.
+          if (range.first == range.second              &&
+              requested_boundary_ids.count(invalid_id) &&
+              elem->neighbor_ptr(s) == libmesh_nullptr)
+            add_this_side = true;
 
           if (add_this_side)
             {
