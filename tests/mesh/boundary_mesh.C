@@ -62,7 +62,7 @@ protected:
       }
 
     // Get the border of the square
-    _mesh->boundary_info->sync(*_all_boundary_mesh);
+    _mesh->get_boundary_info().sync(*_all_boundary_mesh);
 
     std::set<boundary_id_type> left_id, right_id;
     left_id.insert(3);
@@ -70,11 +70,11 @@ protected:
 
     // Add the right side of the square to the square; this should
     // make it a mixed dimension mesh
-    _mesh->boundary_info->add_elements(right_id, *_mesh);
+    _mesh->get_boundary_info().add_elements(right_id, *_mesh);
     _mesh->prepare_for_use();
 
     // Add the left side of the square to its own boundary mesh.
-    _mesh->boundary_info->sync(left_id, *_left_boundary_mesh);
+    _mesh->get_boundary_info().sync(left_id, *_left_boundary_mesh);
   }
 
 public:

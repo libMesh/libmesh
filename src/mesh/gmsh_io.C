@@ -510,7 +510,7 @@ void GmshIO::read_mesh(std::istream & in)
                     // block, it's a sideset name.
                     else if (phys_dim < max_elem_dimension_seen &&
                              !lower_dimensional_blocks.count(cast_int<boundary_id_type>(phys_id)))
-                      mesh.boundary_info->sideset_name(cast_int<boundary_id_type>(phys_id)) = phys_name;
+                      mesh.get_boundary_info().sideset_name(cast_int<boundary_id_type>(phys_id)) = phys_name;
                   }
               }
 
@@ -685,7 +685,7 @@ void GmshIO::write_mesh (std::ostream & out_stream)
   // element-side-based boundary conditions.
   unsigned int n_boundary_faces = 0;
   if (this->write_lower_dimensional_elements())
-    n_boundary_faces = mesh.boundary_info->n_boundary_conds();
+    n_boundary_faces = mesh.get_boundary_info().n_boundary_conds();
 
   // Note: we are using version 2.0 of the gmsh output format.
 
@@ -785,7 +785,7 @@ void GmshIO::write_mesh (std::ostream & out_stream)
         std::vector<unsigned short int> side_list;
         std::vector<boundary_id_type> bc_id_list;
 
-        mesh.boundary_info->build_side_list(element_id_list, side_list, bc_id_list);
+        mesh.get_boundary_info().build_side_list(element_id_list, side_list, bc_id_list);
 
         // Loop over these lists, writing data to the file.
         for (std::size_t idx=0; idx<element_id_list.size(); ++idx)
