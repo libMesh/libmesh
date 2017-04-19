@@ -212,8 +212,24 @@ void BoundaryInfo::sync (UnstructuredMesh & boundary_mesh)
 }
 
 
+
 void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_ids,
                          UnstructuredMesh & boundary_mesh)
+{
+  // Call the 3 argument version of this function with a dummy value for the third set.
+  std::set<subdomain_id_type> subdomains_relative_to;
+  subdomains_relative_to.insert(Elem::invalid_subdomain_id);
+
+  this->sync(requested_boundary_ids,
+             boundary_mesh,
+             subdomains_relative_to);
+}
+
+
+
+void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_ids,
+                         UnstructuredMesh & boundary_mesh,
+                         const std::set<subdomain_id_type> & subdomains_relative_to)
 {
   LOG_SCOPE("sync()", "BoundaryInfo");
 
@@ -245,7 +261,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
   std::map<dof_id_type, dof_id_type> node_id_map;
   std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> side_id_map;
 
-  this->_find_id_maps(requested_boundary_ids, 0, &node_id_map, 0, &side_id_map);
+  this->_find_id_maps(requested_boundary_ids, 0, &node_id_map, 0, &side_id_map, subdomains_relative_to);
 
   // Let's add all the boundary nodes we found to the boundary mesh
 
@@ -272,7 +288,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
     }
 
   // Let's add the elements
-  this->add_elements (requested_boundary_ids, boundary_mesh);
+  this->add_elements (requested_boundary_ids, boundary_mesh, subdomains_relative_to);
 
   // The new elements are currently using the interior mesh's nodes;
   // we want them to use the boundary mesh's nodes instead.
@@ -375,8 +391,24 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
 }
 
 
+
 void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_boundary_ids,
                                 UnstructuredMesh & boundary_mesh)
+{
+  // Call the 3 argument version of this function with a dummy value for the third arg.
+  std::set<subdomain_id_type> subdomains_relative_to;
+  subdomains_relative_to.insert(Elem::invalid_subdomain_id);
+
+  this->add_elements(requested_boundary_ids,
+                     boundary_mesh,
+                     subdomains_relative_to);
+}
+
+
+
+void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_boundary_ids,
+                                UnstructuredMesh & boundary_mesh,
+                                const std::set<subdomain_id_type> & subdomains_relative_to)
 {
   LOG_SCOPE("add_elements()", "BoundaryInfo");
 
@@ -390,7 +422,8 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
                       0,
                       libmesh_nullptr,
                       boundary_mesh.max_elem_id(),
-                      &side_id_map);
+                      &side_id_map,
+                      subdomains_relative_to);
 
   // We have to add sides *outside* any element loop, because if
   // boundary_mesh and _mesh are the same then those additions can
@@ -2440,7 +2473,8 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
                                  dof_id_type first_free_node_id,
                                  std::map<dof_id_type, dof_id_type> * node_id_map,
                                  dof_id_type first_free_elem_id,
-                                 std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map)
+                                 std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map,
+                                 const std::set<subdomain_id_type> & /*subdomains_relative_to*/)
 {
   // We'll do the same modulus trick that DistributedMesh uses to avoid
   // id conflicts between different processors

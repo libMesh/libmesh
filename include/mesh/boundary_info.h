@@ -121,6 +121,20 @@ public:
              UnstructuredMesh & boundary_mesh);
 
   /**
+   * Like the other sync() implementations, but specifically intended
+   * for building "boundary" meshes from internal sidesets. In the
+   * case of an internal sideset, each side may belong to 2
+   * higher-dimensional parent elements, and typically we do not want
+   * to add the same side to the boundary mesh twice. The
+   * std::set<subdomain_id_type> passed into this function specifies
+   * which subdomain the sides in question should relative to, so that
+   * they are only added once.
+   */
+  void sync (const std::set<boundary_id_type> & requested_boundary_ids,
+             UnstructuredMesh & boundary_mesh,
+             const std::set<subdomain_id_type> & subdomains_relative_to);
+
+  /**
    * Suppose we have used sync to create \p boundary_mesh. Then each
    * element in \p boundary_mesh will have interior_parent defined.
    * This method gets extra data for us:
@@ -148,6 +162,16 @@ public:
    */
   void add_elements (const std::set<boundary_id_type> & requested_boundary_ids,
                      UnstructuredMesh & boundary_mesh);
+
+  /**
+   * Same as the add_elements() function above, but takes a set of
+   * subdomains for which the sides must be relative to. This is
+   * necessary to avoid double-adding sides of internal sidesets to
+   * the BoundaryMesh.
+   */
+  void add_elements(const std::set<boundary_id_type> & requested_boundary_ids,
+                    UnstructuredMesh & boundary_mesh,
+                    const std::set<subdomain_id_type> & subdomains_relative_to);
 
   /**
    * Add \p Node \p node with boundary id \p id to the boundary
@@ -757,7 +781,8 @@ private:
                       dof_id_type first_free_node_id,
                       std::map<dof_id_type, dof_id_type> * node_id_map,
                       dof_id_type first_free_elem_id,
-                      std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map);
+                      std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map,
+                      const std::set<subdomain_id_type> & subdomains_relative_to);
 
   /**
    * The Mesh this boundary info pertains to.
