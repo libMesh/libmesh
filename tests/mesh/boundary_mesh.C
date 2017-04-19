@@ -38,17 +38,17 @@ public:
 
 protected:
 
-  Mesh * _mesh;
-  Mesh * _all_boundary_mesh;
-  Mesh * _left_boundary_mesh;
-  Mesh * _internal_boundary_mesh;
+  UniquePtr<Mesh> _mesh;
+  UniquePtr<Mesh> _all_boundary_mesh;
+  UniquePtr<Mesh> _left_boundary_mesh;
+  UniquePtr<Mesh> _internal_boundary_mesh;
 
   void build_mesh()
   {
-    _mesh = new Mesh(*TestCommWorld);
-    _all_boundary_mesh = new Mesh(*TestCommWorld);
-    _left_boundary_mesh = new Mesh(*TestCommWorld);
-    _internal_boundary_mesh = new Mesh(*TestCommWorld);
+    _mesh.reset(new Mesh(*TestCommWorld));
+    _all_boundary_mesh.reset(new Mesh(*TestCommWorld));
+    _left_boundary_mesh.reset(new Mesh(*TestCommWorld));
+    _internal_boundary_mesh.reset(new Mesh(*TestCommWorld));
 
     MeshTools::Generation::build_square(*_mesh, 3, 5,
                                         0.1, 0.9, 0.1, 0.9, QUAD9);
@@ -152,14 +152,6 @@ public:
   void setUp()
   {
     this->build_mesh();
-  }
-
-  void tearDown()
-  {
-    delete _internal_boundary_mesh;
-    delete _all_boundary_mesh;
-    delete _left_boundary_mesh;
-    delete _mesh;
   }
 
   void testMesh()
