@@ -439,6 +439,16 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
     {
       const Elem * elem = *el;
 
+      // If the subdomains_relative_to container has the
+      // invalid_subdomain_id, we fall back on the "old" behavior of
+      // adding sides regardless of this Elem's subdomain. Otherwise,
+      // if the subdomains_relative_to container doesn't contain the
+      // current Elem's subdomain_id(), we won't add any sides from
+      // it.
+      if (!subdomains_relative_to.count(Elem::invalid_subdomain_id) &&
+          !subdomains_relative_to.count(elem->subdomain_id()))
+        continue;
+
       // Get the top-level parent for this element
       const Elem * top_parent = elem->top_parent();
 
@@ -2474,7 +2484,7 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
                                  std::map<dof_id_type, dof_id_type> * node_id_map,
                                  dof_id_type first_free_elem_id,
                                  std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map,
-                                 const std::set<subdomain_id_type> & /*subdomains_relative_to*/)
+                                 const std::set<subdomain_id_type> & subdomains_relative_to)
 {
   // We'll do the same modulus trick that DistributedMesh uses to avoid
   // id conflicts between different processors
@@ -2523,6 +2533,16 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
         }
 
       const Elem * elem = *el;
+
+      // If the subdomains_relative_to container has the
+      // invalid_subdomain_id, we fall back on the "old" behavior of
+      // adding sides regardless of this Elem's subdomain. Otherwise,
+      // if the subdomains_relative_to container doesn't contain the
+      // current Elem's subdomain_id(), we won't add any sides from
+      // it.
+      if (!subdomains_relative_to.count(Elem::invalid_subdomain_id) &&
+          !subdomains_relative_to.count(elem->subdomain_id()))
+        continue;
 
       // Get the top-level parent for this element. This is used for
       // searching for boundary sides on this element.
