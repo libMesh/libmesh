@@ -38,9 +38,9 @@ public:
 
 protected:
 
-  Mesh* _mesh;
-  Mesh* _all_boundary_mesh;
-  Mesh* _left_boundary_mesh;
+  Mesh * _mesh;
+  Mesh * _all_boundary_mesh;
+  Mesh * _left_boundary_mesh;
 
   void build_mesh()
   {
@@ -123,9 +123,9 @@ public:
       _mesh->active_elements_end();
     for (; elem_it != elem_end; ++elem_it)
       {
-        const Elem *elem = *elem_it;
+        const Elem * elem = *elem_it;
 
-        const Elem *pip = elem->interior_parent();
+        const Elem * pip = elem->interior_parent();
 
         // On a DistributedMesh we might not be able to see the
         // interior_parent of a non-local element
@@ -159,11 +159,11 @@ public:
       _left_boundary_mesh->active_elements_end();
     for (; left_bdy_elem_it != left_bdy_elem_end; ++left_bdy_elem_it)
       {
-        const Elem *elem = *left_bdy_elem_it;
+        const Elem * elem = *left_bdy_elem_it;
 
         CPPUNIT_ASSERT_EQUAL(elem->type(), EDGE3);
 
-        const Elem *pip = elem->interior_parent();
+        const Elem * pip = elem->interior_parent();
 
         // On a DistributedMesh we might not be able to see the
         // interior_parent of a non-local element
@@ -190,11 +190,11 @@ public:
       _left_boundary_mesh->active_elements_end();
     for (; all_bdy_elem_it != all_bdy_elem_end; ++all_bdy_elem_it)
       {
-        const Elem *elem = *all_bdy_elem_it;
+        const Elem * elem = *all_bdy_elem_it;
 
         CPPUNIT_ASSERT_EQUAL(elem->type(), EDGE3);
 
-        const Elem *pip = elem->interior_parent();
+        const Elem * pip = elem->interior_parent();
 
         // On a DistributedMesh we might not be able to see the
         // interior_parent of a non-local element
