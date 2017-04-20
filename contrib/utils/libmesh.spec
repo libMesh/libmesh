@@ -730,7 +730,6 @@ fi
 %{prefix}/%{name}-%{version}/contrib/bin/make_dependencies.pl
 %{prefix}/%{name}-%{version}/contrib/bin/stripcomments.pl
 %{prefix}/%{name}-%{version}/contrib/bin/ex2html.sh
-%{prefix}/%{name}-%{version}/contrib/bin/cvs2html
 %{prefix}/%{name}-%{version}/contrib/bin/test_headers.sh
 %{prefix}/%{name}-%{version}/contrib/bin/libmesh-config.in
 %{prefix}/%{name}-%{version}/contrib/bin/program2html.pl
