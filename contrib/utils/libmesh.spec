@@ -727,8 +727,6 @@ fi
 %{prefix}/%{name}-%{version}/contrib/bin/upload_documentation
 %{prefix}/%{name}-%{version}/contrib/bin/create_example_docs.sh
 %{prefix}/%{name}-%{version}/contrib/bin/create_libmesh_release.in
-%{prefix}/%{name}-%{version}/contrib/bin/make_dependencies.pl
-%{prefix}/%{name}-%{version}/contrib/bin/stripcomments.pl
 %{prefix}/%{name}-%{version}/contrib/bin/ex2html.sh
 %{prefix}/%{name}-%{version}/contrib/bin/test_headers.sh
 %{prefix}/%{name}-%{version}/contrib/bin/libmesh-config.in

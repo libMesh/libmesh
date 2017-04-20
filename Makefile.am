@@ -71,10 +71,9 @@ config_DATA      = contrib/utils/Make.common \
                    contrib/utils/libmesh-prof.pc \
                    contrib/utils/libmesh-oprof.pc
 
-# install the old make_dependencies.pl script for backwards compatibility
+# install the libtool script so that dependent apps can also use it
 contribbindir      = $(prefix)/contrib/bin
-contribbin_SCRIPTS = contrib/bin/make_dependencies.pl libtool
-EXTRA_DIST        += contrib/bin/make_dependencies.pl
+contribbin_SCRIPTS = libtool
 
 # Support for libmesh-config in $(exec_prefix)/bin
 libmesh_configdir      = $(exec_prefix)/bin
