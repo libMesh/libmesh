@@ -730,9 +730,6 @@ fi
 %{prefix}/%{name}-%{version}/contrib/bin/ex2html.sh
 %{prefix}/%{name}-%{version}/contrib/bin/test_headers.sh
 %{prefix}/%{name}-%{version}/contrib/bin/libmesh-config.in
-%{prefix}/%{name}-%{version}/contrib/bin/program2html.pl
-%{prefix}/%{name}-%{version}/contrib/bin/keywords
-%{prefix}/%{name}-%{version}/contrib/bin/stripenscript.pl
 %{prefix}/%{name}-%{version}/examples/
 %{prefix}/%{name}-%{version}/examples/ex4/
 %{prefix}/%{name}-%{version}/examples/ex4/Makefile
