@@ -27,7 +27,8 @@ EXTRA_DIST = reference_elements \
              src/rebuild_libmesh_SOURCES.sh \
              contrib/tecplot/README \
              contrib/bin/strip_dup_incl_paths.pl \
-             contrib/bin/strip_dup_libs.pl
+             contrib/bin/strip_dup_libs.pl \
+             CITATION
 
 nobase_data_DATA = \
         reference_elements/2D/one_quad.xda \
