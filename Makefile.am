@@ -274,7 +274,7 @@ meshtool_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 meshtool_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
 meshtool_dbg_LDADD      = libmesh_dbg.la
 
-# compare
+# calculator
 opt_programs          += calculator-opt
 calculator_opt_SOURCES    = src/apps/calculator.C
 calculator_opt_SOURCES   += src/apps/L2system.C src/apps/L2system.h
