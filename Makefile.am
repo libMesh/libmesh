@@ -27,7 +27,8 @@ EXTRA_DIST = reference_elements \
              src/rebuild_libmesh_SOURCES.sh \
              contrib/tecplot/README \
              contrib/bin/strip_dup_incl_paths.pl \
-             contrib/bin/strip_dup_libs.pl
+             contrib/bin/strip_dup_libs.pl \
+             CITATION
 
 nobase_data_DATA = \
         reference_elements/2D/one_quad.xda \
@@ -70,10 +71,9 @@ config_DATA      = contrib/utils/Make.common \
                    contrib/utils/libmesh-prof.pc \
                    contrib/utils/libmesh-oprof.pc
 
-# install the old make_dependencies.pl script for backwards compatibility
+# install the libtool script so that dependent apps can also use it
 contribbindir      = $(prefix)/contrib/bin
-contribbin_SCRIPTS = contrib/bin/make_dependencies.pl libtool
-EXTRA_DIST        += contrib/bin/make_dependencies.pl
+contribbin_SCRIPTS = libtool
 
 # Support for libmesh-config in $(exec_prefix)/bin
 libmesh_configdir      = $(exec_prefix)/bin
@@ -255,6 +255,25 @@ getpot_parse_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 getpot_parse_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
 getpot_parse_dbg_LDADD      = libmesh_dbg.la
 
+# amr
+opt_programs    += amr-opt
+amr_opt_SOURCES  = src/apps/amr.C
+amr_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+amr_opt_CXXFLAGS = $(CXXFLAGS_OPT)
+amr_opt_LDADD    = libmesh_opt.la
+
+devel_programs    += amr-devel
+amr_devel_SOURCES  = src/apps/amr.C
+amr_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+amr_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
+amr_devel_LDADD    = libmesh_devel.la
+
+dbg_programs    += amr-dbg
+amr_dbg_SOURCES  = src/apps/amr.C
+amr_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+amr_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
+amr_dbg_LDADD    = libmesh_dbg.la
+
 # meshtool
 opt_programs           += meshtool-opt
 meshtool_opt_SOURCES    = src/apps/meshtool.C
@@ -274,7 +293,7 @@ meshtool_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 meshtool_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
 meshtool_dbg_LDADD      = libmesh_dbg.la
 
-# compare
+# calculator
 opt_programs          += calculator-opt
 calculator_opt_SOURCES    = src/apps/calculator.C
 calculator_opt_SOURCES   += src/apps/L2system.C src/apps/L2system.h
