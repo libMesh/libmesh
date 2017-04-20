@@ -3807,8 +3807,6 @@ ac_config_files="$ac_config_files contrib/bin/libmesh-config"
 
 #AC_CONFIG_FILES(contrib/bin/strip_dup_libs.pl,       [chmod +x contrib/bin/strip_dup_libs.pl])
 #AC_CONFIG_FILES(contrib/bin/strip_dup_incl_paths.pl, [chmod +x contrib/bin/strip_dup_incl_paths.pl])
-ac_config_files="$ac_config_files contrib/bin/xda2mgf"
-
 ac_config_files="$ac_config_files contrib/bin/create_libmesh_release"
 
 ac_config_files="$ac_config_files doc/dot"
@@ -44746,7 +44744,6 @@ do
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "doc/html/Makefile") CONFIG_FILES="$CONFIG_FILES doc/html/Makefile" ;;
     "contrib/bin/libmesh-config") CONFIG_FILES="$CONFIG_FILES contrib/bin/libmesh-config" ;;
-    "contrib/bin/xda2mgf") CONFIG_FILES="$CONFIG_FILES contrib/bin/xda2mgf" ;;
     "contrib/bin/create_libmesh_release") CONFIG_FILES="$CONFIG_FILES contrib/bin/create_libmesh_release" ;;
     "doc/dot") CONFIG_FILES="$CONFIG_FILES doc/dot" ;;
     "tests/run_unit_tests.sh") CONFIG_FILES="$CONFIG_FILES tests/run_unit_tests.sh" ;;
@@ -45436,7 +45433,6 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
 
   case $ac_file$ac_mode in
     "contrib/bin/libmesh-config":F) chmod +x contrib/bin/libmesh-config ;;
-    "contrib/bin/xda2mgf":F) chmod +x contrib/bin/xda2mgf ;;
     "contrib/bin/create_libmesh_release":F) chmod +x contrib/bin/create_libmesh_release ;;
     "doc/dot":F) chmod +x doc/dot ;;
     "tests/run_unit_tests.sh":F) chmod +x tests/run_unit_tests.sh ;;
