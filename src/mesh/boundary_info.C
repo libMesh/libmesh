@@ -212,8 +212,24 @@ void BoundaryInfo::sync (UnstructuredMesh & boundary_mesh)
 }
 
 
+
 void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_ids,
                          UnstructuredMesh & boundary_mesh)
+{
+  // Call the 3 argument version of this function with a dummy value for the third set.
+  std::set<subdomain_id_type> subdomains_relative_to;
+  subdomains_relative_to.insert(Elem::invalid_subdomain_id);
+
+  this->sync(requested_boundary_ids,
+             boundary_mesh,
+             subdomains_relative_to);
+}
+
+
+
+void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_ids,
+                         UnstructuredMesh & boundary_mesh,
+                         const std::set<subdomain_id_type> & subdomains_relative_to)
 {
   LOG_SCOPE("sync()", "BoundaryInfo");
 
@@ -245,7 +261,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
   std::map<dof_id_type, dof_id_type> node_id_map;
   std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> side_id_map;
 
-  this->_find_id_maps(requested_boundary_ids, 0, &node_id_map, 0, &side_id_map);
+  this->_find_id_maps(requested_boundary_ids, 0, &node_id_map, 0, &side_id_map, subdomains_relative_to);
 
   // Let's add all the boundary nodes we found to the boundary mesh
 
@@ -272,7 +288,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
     }
 
   // Let's add the elements
-  this->add_elements (requested_boundary_ids, boundary_mesh);
+  this->add_elements (requested_boundary_ids, boundary_mesh, subdomains_relative_to);
 
   // The new elements are currently using the interior mesh's nodes;
   // we want them to use the boundary mesh's nodes instead.
@@ -375,8 +391,24 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
 }
 
 
+
 void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_boundary_ids,
                                 UnstructuredMesh & boundary_mesh)
+{
+  // Call the 3 argument version of this function with a dummy value for the third arg.
+  std::set<subdomain_id_type> subdomains_relative_to;
+  subdomains_relative_to.insert(Elem::invalid_subdomain_id);
+
+  this->add_elements(requested_boundary_ids,
+                     boundary_mesh,
+                     subdomains_relative_to);
+}
+
+
+
+void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_boundary_ids,
+                                UnstructuredMesh & boundary_mesh,
+                                const std::set<subdomain_id_type> & subdomains_relative_to)
 {
   LOG_SCOPE("add_elements()", "BoundaryInfo");
 
@@ -390,7 +422,8 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
                       0,
                       libmesh_nullptr,
                       boundary_mesh.max_elem_id(),
-                      &side_id_map);
+                      &side_id_map,
+                      subdomains_relative_to);
 
   // We have to add sides *outside* any element loop, because if
   // boundary_mesh and _mesh are the same then those additions can
@@ -406,45 +439,56 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
     {
       const Elem * elem = *el;
 
+      // If the subdomains_relative_to container has the
+      // invalid_subdomain_id, we fall back on the "old" behavior of
+      // adding sides regardless of this Elem's subdomain. Otherwise,
+      // if the subdomains_relative_to container doesn't contain the
+      // current Elem's subdomain_id(), we won't add any sides from
+      // it.
+      if (!subdomains_relative_to.count(Elem::invalid_subdomain_id) &&
+          !subdomains_relative_to.count(elem->subdomain_id()))
+        continue;
+
+      // Get the top-level parent for this element
+      const Elem * top_parent = elem->top_parent();
+
+      // Find all the boundary side ids for this Elem.
+      const std::pair<boundary_side_iter, boundary_side_iter>
+        range = _boundary_side_id.equal_range(top_parent);
+
       for (unsigned int s=0; s<elem->n_sides(); s++)
-        if (elem->neighbor_ptr(s) == libmesh_nullptr) // on the boundary
-          {
-            // Get the top-level parent for this element
-            const Elem * top_parent = elem->top_parent();
+        {
+          bool add_this_side = false;
+          boundary_id_type this_bcid = invalid_id;
 
-            // Find the right id number for that side
-            std::pair<boundary_side_iter, boundary_side_iter> pos = _boundary_side_id.equal_range(top_parent);
+          for (boundary_side_iter bsi = range.first; bsi != range.second; ++bsi)
+            {
+              this_bcid = bsi->second.second;
 
-            bool add_this_side = false;
-            boundary_id_type this_bcid = invalid_id;
-
-            for (; pos.first != pos.second; ++pos.first)
-              {
-                this_bcid = pos.first->second.second;
-
-                // if this side is flagged with a boundary condition
-                // and the user wants this id
-                if ((pos.first->second.first == s) &&
-                    (requested_boundary_ids.count(this_bcid)))
-                  {
-                    add_this_side = true;
-                    break;
-                  }
-              }
-
-            // if side s wasn't found or doesn't have a boundary
-            // condition we may still want to add it
-            if (pos.first == pos.second)
-              {
-                this_bcid = invalid_id;
-                if (requested_boundary_ids.count(this_bcid))
+              // if this side is flagged with a boundary condition
+              // and the user wants this id
+              if ((bsi->second.first == s) &&
+                  (requested_boundary_ids.count(this_bcid)))
+                {
                   add_this_side = true;
-              }
+                  break;
+                }
+            }
 
-            if (add_this_side)
-              sides_to_add.push_back
-                (std::make_pair(elem->id(), s));
-          }
+          // We may still want to add this side if the user called
+          // sync() with no requested_boundary_ids. This corresponds
+          // to the "old" style of calling sync() in which the entire
+          // boundary was copied to the BoundaryMesh, and handles the
+          // case where elements on the geometric boundary are not in
+          // any sidesets.
+          if (range.first == range.second              &&
+              requested_boundary_ids.count(invalid_id) &&
+              elem->neighbor_ptr(s) == libmesh_nullptr)
+            add_this_side = true;
+
+          if (add_this_side)
+            sides_to_add.push_back(std::make_pair(elem->id(), s));
+        }
     }
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -2439,7 +2483,8 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
                                  dof_id_type first_free_node_id,
                                  std::map<dof_id_type, dof_id_type> * node_id_map,
                                  dof_id_type first_free_elem_id,
-                                 std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map)
+                                 std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map,
+                                 const std::set<subdomain_id_type> & subdomains_relative_to)
 {
   // We'll do the same modulus trick that DistributedMesh uses to avoid
   // id conflicts between different processors
@@ -2489,77 +2534,90 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
 
       const Elem * elem = *el;
 
+      // If the subdomains_relative_to container has the
+      // invalid_subdomain_id, we fall back on the "old" behavior of
+      // adding sides regardless of this Elem's subdomain. Otherwise,
+      // if the subdomains_relative_to container doesn't contain the
+      // current Elem's subdomain_id(), we won't add any sides from
+      // it.
+      if (!subdomains_relative_to.count(Elem::invalid_subdomain_id) &&
+          !subdomains_relative_to.count(elem->subdomain_id()))
+        continue;
+
+      // Get the top-level parent for this element. This is used for
+      // searching for boundary sides on this element.
+      const Elem * top_parent = elem->top_parent();
+
+      // Find all the boundary side ids for this Elem.
+      const std::pair<boundary_side_iter, boundary_side_iter>
+        range = _boundary_side_id.equal_range(top_parent);
+
       for (unsigned char s=0; s<elem->n_sides(); s++)
-        if (elem->neighbor_ptr(s) == libmesh_nullptr) // on the boundary
-          {
-            // Get the top-level parent for this element
-            const Elem * top_parent = elem->top_parent();
+        {
+          bool add_this_side = false;
+          boundary_id_type this_bcid = invalid_id;
 
-            // Find the right id number for that side
-            std::pair<boundary_side_iter, boundary_side_iter> pos = _boundary_side_id.equal_range(top_parent);
+          for (boundary_side_iter bsi = range.first; bsi != range.second; ++bsi)
+            {
+              this_bcid = bsi->second.second;
 
-            bool add_this_side = false;
-            boundary_id_type this_bcid = invalid_id;
-
-            for (; pos.first != pos.second; ++pos.first)
-              {
-                this_bcid = pos.first->second.second;
-
-                // if this side is flagged with a boundary condition
-                // and the user wants this id
-                if ((pos.first->second.first == s) &&
-                    (requested_boundary_ids.count(this_bcid)))
-                  {
-                    add_this_side = true;
-                    break;
-                  }
-              }
-
-            // if side s wasn't found or doesn't have a boundary
-            // condition we may still want to add it
-            if (pos.first == pos.second)
-              {
-                this_bcid = invalid_id;
-                if (requested_boundary_ids.count(this_bcid))
+              // if this side is flagged with a boundary condition
+              // and the user wants this id
+              if ((bsi->second.first == s) &&
+                  (requested_boundary_ids.count(this_bcid)))
+                {
                   add_this_side = true;
-              }
+                  break;
+                }
+            }
 
-            if (add_this_side)
-              {
-                // We only assign ids for our own and for
-                // unpartitioned elements
-                if (side_id_map &&
-                    ((elem->processor_id() == this->processor_id()) ||
-                     (elem->processor_id() ==
-                      DofObject::invalid_processor_id)))
-                  {
-                    std::pair<dof_id_type, unsigned char> side_pair(elem->id(), s);
-                    libmesh_assert (!side_id_map->count(side_pair));
-                    (*side_id_map)[side_pair] = next_elem_id;
-                    next_elem_id += this->n_processors() + 1;
-                  }
+          // We may still want to add this side if the user called
+          // sync() with no requested_boundary_ids. This corresponds
+          // to the "old" style of calling sync() in which the entire
+          // boundary was copied to the BoundaryMesh, and handles the
+          // case where elements on the geometric boundary are not in
+          // any sidesets.
+          if (range.first == range.second              &&
+              requested_boundary_ids.count(invalid_id) &&
+              elem->neighbor_ptr(s) == libmesh_nullptr)
+            add_this_side = true;
 
-                // Use a proxy element for the side to query nodes
-                UniquePtr<const Elem> side (elem->build_side_ptr(s));
-                for (unsigned int n = 0; n != side->n_nodes(); ++n)
-                  {
-                    const Node & node = side->node_ref(n);
+          if (add_this_side)
+            {
+              // We only assign ids for our own and for
+              // unpartitioned elements
+              if (side_id_map &&
+                  ((elem->processor_id() == this->processor_id()) ||
+                   (elem->processor_id() ==
+                    DofObject::invalid_processor_id)))
+                {
+                  std::pair<dof_id_type, unsigned char> side_pair(elem->id(), s);
+                  libmesh_assert (!side_id_map->count(side_pair));
+                  (*side_id_map)[side_pair] = next_elem_id;
+                  next_elem_id += this->n_processors() + 1;
+                }
 
-                    // In parallel we don't know enough to number
-                    // others' nodes ourselves.
-                    if (!hit_end_el &&
-                        (node.processor_id() != this->processor_id()))
-                      continue;
+              // Use a proxy element for the side to query nodes
+              UniquePtr<const Elem> side (elem->build_side_ptr(s));
+              for (unsigned int n = 0; n != side->n_nodes(); ++n)
+                {
+                  const Node & node = side->node_ref(n);
 
-                    dof_id_type node_id = node.id();
-                    if (node_id_map && !node_id_map->count(node_id))
-                      {
-                        (*node_id_map)[node_id] = next_node_id;
-                        next_node_id += this->n_processors() + 1;
-                      }
-                  }
-              }
-          }
+                  // In parallel we don't know enough to number
+                  // others' nodes ourselves.
+                  if (!hit_end_el &&
+                      (node.processor_id() != this->processor_id()))
+                    continue;
+
+                  dof_id_type node_id = node.id();
+                  if (node_id_map && !node_id_map->count(node_id))
+                    {
+                      (*node_id_map)[node_id] = next_node_id;
+                      next_node_id += this->n_processors() + 1;
+                    }
+                }
+            }
+        }
     }
 
   // FIXME: ought to renumber side/node_id_map image to be contiguous
