@@ -324,6 +324,12 @@
 /* Compiler supports std::move, but it is disabled in libmesh */
 #undef HAVE_CXX11_MOVE_BUT_DISABLED
 
+/* Flag indicating whether compiler supports move construction */
+#undef HAVE_CXX11_MOVE_CONSTRUCTORS
+
+/* Compiler supports move construction, but it is disabled in libmesh */
+#undef HAVE_CXX11_MOVE_CONSTRUCTORS_BUT_DISABLED
+
 /* Flag indicating whether compiler supports noexcept */
 #undef HAVE_CXX11_NOEXCEPT
 
