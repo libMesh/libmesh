@@ -260,19 +260,52 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
       // Skip this QoI if not in the QoI Set
       if (_qoi_set.has_index(j))
         {
-          // If the adjoint solution has heterogeneous dirichlet
-          // values, then to get a proper error estimate here we need
-          // to subtract off a coarse grid lift function.  In any case
-          // we can get a better error estimate by separating off a
-          // coarse representation of the adjoint solution, so we'll
-          // use that for our lift function.
-          system.get_adjoint_solution(j) -= *coarse_adjoints[j];
+
+	  // // If the adjoint solution has heterogeneous dirichlet
+	  // // values, then to get a proper error estimate here we need
+	  // // to subtract off a coarse grid lift function. For convenience, we simply
+	  // // subtract off the coarse grid adjoint, which has the necessary lift properties.
+	  // if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
+	  // {
+	  //   system.get_adjoint_solution(j) -= *coarse_adjoints[j];
+	  // }
 
           computed_global_QoI_errors[j] = projected_residual->dot(system.get_adjoint_solution(j));
+
+	  // // Add the lift back to get the original adjoint solution
+	  // if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
+	  // {
+	  //   system.get_adjoint_solution(j) += *coarse_adjoints[j];
+	  // }
+
         }
     }
 
+
   // Done with the global error estimates, now construct the element wise error indicators
+
+  // To get a better element wise breakdown of the error estimate,
+  // we subtract off a coarse representation of the adjoint solution.
+  // This remains valid for all combinations of heterogenous adjoint bcs and
+  // stabilized/non-stabilized formulations, except for the case where we not using a
+  // heterogenous adjoint bc and have a stabilized formulation.
+  // Then, R(u^h_s, z^h_s)  != 0 (no Galerkin orthogonality w.r.t the non-stabilized residual)
+  for (std::size_t j=0; j != system.qoi.size(); j++)
+    {
+      // Skip this QoI if not in the QoI Set
+      if (_qoi_set.has_index(j))
+        {
+
+	  // Here we assume that a non-NULL residual evaluation physics implies a stabilized formulation
+	  // Definitely not the best thing to do when the residual evaluation physics is not related
+	  // to stabilized/non-stabilized, but we will have to live with suboptimal elementwise breakdown
+	  // in that case for now
+	  if(!system.get_dof_map().has_adjoint_dirichlet_boundaries(j) && _residual_evaluation_physics)
+	  {
+	    system.get_adjoint_solution(j) -= *coarse_adjoints[j];
+	  }
+	}
+    }
 
   // We ought to account for 'spill-over' effects while computing the
   // element error indicators This happens because the same dof is
