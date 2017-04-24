@@ -49,6 +49,59 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MOVE],
   ])
 
 
+dnl Properly implemented move constructors require rvalue references,
+dnl std::move, and noexcept, so this tests for all of those features.
+AC_DEFUN([LIBMESH_TEST_CXX11_MOVE_CONSTRUCTORS],
+  [
+    have_cxx11_move_constructors=no
+
+    AC_MSG_CHECKING(for C++11 move constructor support)
+    AC_LANG_PUSH([C++])
+
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <utility>
+    class move_constructable_base
+    {
+    public:
+      move_constructable_base() {}
+      move_constructable_base(move_constructable_base && other) {}
+    };
+    class move_constructable : public move_constructable_base
+    {
+    public:
+      move_constructable() {}
+      move_constructable(move_constructable && other) : move_constructable_base(std::move(other)) {}
+    };
+    ]], [[
+        move_constructable m1;
+        move_constructable m2(std::move(m1));
+    ]])],[
+        if (test "x$enablecxx11" = "xyes"); then
+          AC_MSG_RESULT(yes)
+          AC_DEFINE(HAVE_CXX11_MOVE_CONSTRUCTORS, 1, [Flag indicating whether compiler supports move construction])
+          have_cxx11_move_constructors=yes
+        else
+          AC_MSG_RESULT([yes, but disabled.])
+          AC_DEFINE(HAVE_CXX11_MOVE_CONSTRUCTORS_BUT_DISABLED, 1, [Compiler supports move construction, but it is disabled in libmesh])
+        fi
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+
+    AM_CONDITIONAL(HAVE_CXX11_MOVE_CONSTRUCTORS, test x$have_cxx11_move_constructors == xyes)
+  ])
+
+
 AC_DEFUN([LIBMESH_TEST_CXX11_RANGEFOR],
   [
     have_cxx11_rangefor=no

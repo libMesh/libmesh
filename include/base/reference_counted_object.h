@@ -93,6 +93,21 @@ protected:
 #endif
   }
 
+#ifdef LIBMESH_HAVE_CXX11_MOVE_CONSTRUCTORS
+  /**
+   * Move constructor, must be declared noexcept.
+   */
+  ReferenceCountedObject(ReferenceCountedObject && other) noexcept
+    : ReferenceCounter(std::move(other))
+  {
+#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
+
+    increment_constructor_count(typeid(T).name());
+
+#endif
+  }
+#endif
+
 public:
 
   /**
@@ -106,9 +121,6 @@ public:
 
 #endif
   }
-
-private:
-
 };
 
 

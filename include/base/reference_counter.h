@@ -53,6 +53,14 @@ protected:
   ReferenceCounter ();
   ReferenceCounter (const ReferenceCounter &);
 
+
+#ifdef LIBMESH_HAVE_CXX11_MOVE_CONSTRUCTORS
+  /**
+   * Move constructor, must be declared noexcept.
+   */
+  ReferenceCounter(ReferenceCounter && other) noexcept;
+#endif
+
 public:
 
   /**
@@ -150,6 +158,15 @@ inline ReferenceCounter::ReferenceCounter(const ReferenceCounter & /*other*/)
 {
   ++_n_objects;
 }
+
+
+
+#ifdef LIBMESH_HAVE_CXX11_MOVE_CONSTRUCTORS
+inline ReferenceCounter::ReferenceCounter(ReferenceCounter && /*other*/) noexcept
+{
+  ++_n_objects;
+}
+#endif
 
 
 

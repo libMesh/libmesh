@@ -53,6 +53,15 @@ public:
    */
   RBTheta () {}
 
+#ifdef LIBMESH_HAVE_CXX11_MOVE_CONSTRUCTORS
+  /**
+   * Move constructor, must be declared noexcept.
+   */
+  RBTheta (RBTheta && other) noexcept
+    : ReferenceCountedObject<RBTheta>(std::move(other))
+  {}
+#endif
+
   /**
    * Destructor.
    */
