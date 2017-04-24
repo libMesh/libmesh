@@ -4712,7 +4712,8 @@ EXTRA_DIST = reference_elements include/include_HEADERS \
 	include/rebuild_include_HEADERS.sh src/libmesh_SOURCES \
 	src/rebuild_libmesh_SOURCES.sh contrib/tecplot/README \
 	contrib/bin/strip_dup_incl_paths.pl \
-	contrib/bin/strip_dup_libs.pl contrib/bin/make_dependencies.pl
+	contrib/bin/strip_dup_libs.pl CITATION \
+	contrib/bin/make_dependencies.pl
 nobase_data_DATA = \
         reference_elements/2D/one_quad.xda \
         reference_elements/2D/one_quad8.xda \
