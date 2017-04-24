@@ -351,6 +351,14 @@ public:
    * I.e. if e = a->build_side_ptr(s) or e = a->side_ptr(s); then
    * a->which_side_am_i(e) will be s.
    *
+   * Note that an _exact_ floating point comparison of the nodal
+   * positions of 'e' is made with the nodal positions of *this in
+   * order to perform this test. The idea is that the test will return
+   * a valid side id if 'e' either directly shares Node pointers with
+   * *this, or was created by exactly copying some of the nodes of
+   * *this (e.g. through BoundaryMesh::sync()). In these
+   * circumstances, non-fuzzy floating point equality is expected.
+   *
    * Returns \p invalid_uint if \p e is not a side of \p this.
    */
   unsigned int which_side_am_i(const Elem * e) const;
@@ -1973,7 +1981,10 @@ unsigned int Elem::which_side_am_i (const Elem * e) const
       Point side_point = e->point(i);
       unsigned int local_node_id = libMesh::invalid_uint;
 
-      // Look for a node of this that's contiguous with node i of e
+      // Look for a node of this that's contiguous with node i of
+      // e. Note that the exact floating point comparison of Point
+      // positions is intentional, see the class documentation for
+      // this function.
       for (unsigned int j=0; j != nn; ++j)
         if (this->point(j) == side_point)
           local_node_id = j;
