@@ -205,48 +205,32 @@ std::pair<Real, Real> Tri3::min_and_max_angle() const
 
 bool Tri3::contains_point (const Point & p, Real tol) const
 {
-  // move test point relative to node 0
-  const Point p0 ( p - this->point(0) );
+  // See "Barycentric Technique" section at
+  // http://www.blackpawn.com/texts/pointinpoly for details.
 
-  // define two in plane vectors
-  Point v1 ( this->point(1) - this->point(0) );
-  Point v2 ( this->point(2) - this->point(0) );
+  // Compute vectors
+  Point v0 = this->point(1) - this->point(0);
+  Point v1 = this->point(2) - this->point(0);
+  Point v2 = p - this->point(0);
 
-#if LIBMESH_DIM == 3
-  // define out of plane vector
-  Point oop ( v1.cross(v2) );
+  // Compute dot products
+  Real dot00 = v0 * v0;
+  Real dot01 = v0 * v1;
+  Real dot02 = v0 * v2;
+  Real dot11 = v1 * v1;
+  Real dot12 = v1 * v2;
 
-  // project moved test point onto out of plane component and bail
-  // if it is farther out of plane than tol.
-  if ( std::abs(p0 * oop) > tol || oop.norm_sq() < tol * tol)
-    return false;
-#endif
-
-  const Real d01 = p0 * v1;
-  const Real d02 = p0 * v2;
-  const Real d11 = v1.norm_sq();
-  const Real d12 = v1 * v2;
-  const Real d22 = v2.norm_sq();
-
-#if LIBMESH_DIM == 3
-  // the denominator can only be 0 if v1 = v2, but then the cross product would be 0
-  // and we'd have bailed out already
-  const Real d = 1.0 / (d11 * d22 - d12 * d12);
-#else
-  Real d = d11 * d22 - d12 * d12;
-  if (d < tol)
-    return false;
-  d = 1.0 / d;
-#endif
-
-  // the in plane check implements the barycentric technique from
-  // http://www.blackpawn.com/texts/pointinpoly/
-  const Real s1 = (d02 * d11 - d01 * d12) * d;
-  if (s1 <= -tol)
+  // Out of plane check
+  if (std::abs(triple_product(v2, v0, v1)) / std::max(dot00, dot11) > tol)
     return false;
 
-  const Real s2 = (d01 * d22 - d02 * d12) * d;
-  return s2 > -tol && s1 + s2 < 1.0 + tol;
+  // Compute barycentric coordinates
+  Real invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+  Real u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+  Real v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+  // Check if point is in triangle
+  return (u > -tol) && (v > -tol) && (u + v < 1 + tol);
 }
 
 } // namespace libMesh
