@@ -397,6 +397,7 @@ extern bool warned_about_auto_ptr;
 
 #define libmesh_file_error_msg(filename, msg)                           \
   do {                                                                  \
+    libMesh::err << "Error with file `" << filename << "'" << std::endl;\
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME); \
     libMesh::err << msg << std::endl;                                   \
     LIBMESH_THROW(libMesh::FileError(filename));                        \
