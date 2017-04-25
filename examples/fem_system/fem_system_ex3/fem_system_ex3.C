@@ -240,11 +240,13 @@ int main (int argc, char ** argv)
       (time_solver == std::string("euler") || time_solver == std::string("euler2") ) )
     {
       LinearSolver<Number> & linear_solver = newton_solver->get_linear_solver();
+#ifdef LIBMESH_HAVE_EIGEN_SPARSE
       EigenSparseLinearSolver<Number> * eigen_linear_solver =
         dynamic_cast<EigenSparseLinearSolver<Number> *>(&linear_solver);
 
       if( eigen_linear_solver )
         eigen_linear_solver->set_solver_type(SPARSELU);
+#endif
     }
 
   if( time_solver == std::string("newmark") )
