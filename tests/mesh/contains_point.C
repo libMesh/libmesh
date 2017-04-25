@@ -45,37 +45,17 @@ public:
   // TRI3 test
   void testContainsPointTri3()
   {
-    // tri corner nodes
-    Node a(3,1,2, 0);
-    Node b(1,2,3, 1);
-    Node c(2,3,1, 2);
+    Point a(3,1,2), b(1,2,3), c(2,3,1);
+    containsPointTri3Helper(a, b, c, a);
 
-    // helper vectors to span the tri and point out of plane
-    Point va(a-c);
-    Point vb(b-c);
-    Point oop(va.cross(vb));
+    // Ben's 1st "small triangle" test case.
+    containsPointTri3Helper(a/5000., b/5000., c/5000., c/5000.);
 
-    UniquePtr<Elem> elem = Elem::build(TRI3);
-
-    elem->set_node(0) = &a;
-    elem->set_node(1) = &b;
-    elem->set_node(2) = &c;
-
-    // centroid
-    CPPUNIT_ASSERT (elem->contains_point(elem->centroid()));
-
-    // out of plane from the centroid
-    CPPUNIT_ASSERT (!elem->contains_point(elem->centroid() + oop/10));
-
-    // check all corners
-    CPPUNIT_ASSERT (elem->contains_point(a));
-    CPPUNIT_ASSERT (elem->contains_point(b));
-    CPPUNIT_ASSERT (elem->contains_point(c));
-
-    // check outside
-    CPPUNIT_ASSERT (!elem->contains_point(a + va * TOLERANCE * 10));
-    CPPUNIT_ASSERT (!elem->contains_point(b + vb * TOLERANCE * 10));
-    CPPUNIT_ASSERT (!elem->contains_point(c - (va + vb) * TOLERANCE * 10));
+    // Ben's 2nd "small triangle" test case.
+    containsPointTri3Helper(Point(0.000808805, 0.0047284,  0.),
+                            Point(0.0011453,   0.00472831, 0.),
+                            Point(0.000982249, 0.00508037, 0.),
+                            Point(0.001,       0.005,      0.));
   }
 
 
@@ -146,6 +126,49 @@ public:
       CPPUNIT_ASSERT (!elem->contains_point(Point(epsilon/10, epsilon/10, 1.0)));
       CPPUNIT_ASSERT (!elem->contains_point(Point(epsilon/2, -epsilon/10, 0.5)));
     }
+  }
+
+protected:
+  // The first 3 arguments are the points of the triangle, the last argument is a
+  // custom point that should be inside the Tri.
+  void containsPointTri3Helper(Point a_in, Point b_in, Point c_in, Point p)
+  {
+    // vertices
+    Node a(a_in, 0);
+    Node b(b_in, 1);
+    Node c(c_in, 2);
+
+    // Build the test Elem
+    UniquePtr<Elem> elem = Elem::build(TRI3);
+
+    elem->set_node(0) = &a;
+    elem->set_node(1) = &b;
+    elem->set_node(2) = &c;
+
+    // helper vectors to span the tri and point out of plane
+    Point va(a-c);
+    Point vb(b-c);
+    Point oop(va.cross(vb));
+    Point oop_unit = oop.unit();
+
+    // The triangle must contain its own centroid
+    CPPUNIT_ASSERT (elem->contains_point(elem->centroid()));
+
+    // triangle should contain all its vertices
+    CPPUNIT_ASSERT (elem->contains_point(a));
+    CPPUNIT_ASSERT (elem->contains_point(b));
+    CPPUNIT_ASSERT (elem->contains_point(c));
+
+    // out of plane from the centroid, should *not* be in the element
+    CPPUNIT_ASSERT (!elem->contains_point(elem->centroid() + std::sqrt(TOLERANCE) * oop_unit));
+
+    // These points should be outside the triangle
+    CPPUNIT_ASSERT (!elem->contains_point(a + va * TOLERANCE * 10));
+    CPPUNIT_ASSERT (!elem->contains_point(b + vb * TOLERANCE * 10));
+    CPPUNIT_ASSERT (!elem->contains_point(c - (va + vb) * TOLERANCE * 10));
+
+    // Test the custom point
+    CPPUNIT_ASSERT (elem->contains_point(p));
   }
 };
 
