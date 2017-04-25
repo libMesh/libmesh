@@ -230,7 +230,7 @@ bool Tri3::contains_point (const Point & p, Real tol) const
   Real v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 
   // Check if point is in triangle
-  return (u >= 0) && (v >= 0) && (u + v <= 1);
+  return (u > -tol) && (v > -tol) && (u + v < 1 + tol);
 }
 
 } // namespace libMesh
