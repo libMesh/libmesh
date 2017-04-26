@@ -51,7 +51,7 @@ protected:
     _internal_boundary_mesh.reset(new Mesh(*TestCommWorld));
 
     MeshTools::Generation::build_square(*_mesh, 3, 5,
-                                        0.1, 0.9, 0.1, 0.9, QUAD9);
+                                        0.2, 0.8, 0.2, 0.7, QUAD9);
 
     // We'll need to skip repartitioning with DistributedMesh for now;
     // otherwise the boundary meshes' interior parents might get
@@ -81,25 +81,24 @@ protected:
     //
     // and we will create an internal sideset along the border between
     // subdomains 1 and 2.
-    std::vector<subdomain_id_type> sbd_id_list(15);
-    sbd_id_list[0] = 1;
-    sbd_id_list[1] = 1;
-    sbd_id_list[2] = 2;
-    sbd_id_list[3] = 1;
-    sbd_id_list[4] = 1;
-    sbd_id_list[5] = 2;
-    sbd_id_list[6] = 2;
-    sbd_id_list[7] = 2;
-    sbd_id_list[8] = 2;
-    sbd_id_list[9] = 2;
-    sbd_id_list[10] = 2;
-    sbd_id_list[11] = 2;
-    sbd_id_list[12] = 2;
-    sbd_id_list[13] = 2;
-    sbd_id_list[14] = 2;
 
-    for (unsigned int e=0; e<sbd_id_list.size(); ++e)
-      _mesh->elem_ptr(e)->subdomain_id() = sbd_id_list[e];
+    for (MeshBase::element_iterator elem_it =
+           _mesh->active_elements_begin(),
+         elem_end =
+           _mesh->active_elements_end();
+         elem_it != elem_end; ++elem_it)
+      {
+        Elem * elem = *elem_it;
+        if (elem)
+          {
+            const Point c = elem->centroid();
+            if (c(0) < 0.6 &&
+                c(1) < 0.4)
+              elem->subdomain_id() = 1;
+            else
+              elem->subdomain_id() = 2;
+          }
+      }
 
     // Get the border of the square
     _mesh->get_boundary_info().sync(*_all_boundary_mesh);
@@ -116,25 +115,46 @@ protected:
     // Add the left side of the square to its own boundary mesh.
     _mesh->get_boundary_info().sync(left_id, *_left_boundary_mesh);
 
-    // Add an internal sideset to the _mesh.  We pick an ID that does
-    // not conflict with sidesets 0-3 that get created by
-    // build_square().
-    BoundaryInfo & bi = _mesh->get_boundary_info();
+    // We create an internal sideset ID that does not conflict with
+    // sidesets 0-3 that get created by build_square().
     boundary_id_type bid = 5;
 
-    bi.add_side(_mesh->elem_ptr(1), /*side=*/1, bid);
-    bi.add_side(_mesh->elem_ptr(4), /*side=*/1, bid);
-    bi.add_side(_mesh->elem_ptr(4), /*side=*/2, bid);
-    bi.add_side(_mesh->elem_ptr(3), /*side=*/2, bid);
+    // To test the "relative to" feature, we add the same sides to the
+    // same sideset twice, from elements in subdomain 2 the second
+    // time.  These should not show up in the BoundaryMesh, i.e. there
+    // should not be overlapped elems in the BoundaryMesh.
+    BoundaryInfo & bi = _mesh->get_boundary_info();
 
-    // To test the "relative to" feature, add the same sides to the
-    // same sideset, but from elements in subdomain 2 instead. These
-    // should not show up in the BoundaryMesh, i.e. there should not
-    // be overlapped elems in the BoundaryMesh.
-    bi.add_side(_mesh->elem_ptr(2), /*side=*/3, bid);
-    bi.add_side(_mesh->elem_ptr(5), /*side=*/3, bid);
-    bi.add_side(_mesh->elem_ptr(7), /*side=*/0, bid);
-    bi.add_side(_mesh->elem_ptr(6), /*side=*/0, bid);
+    for (MeshBase::element_iterator elem_it =
+           _mesh->active_elements_begin(),
+         elem_end =
+           _mesh->active_elements_end();
+         elem_it != elem_end; ++elem_it)
+      {
+        Elem * elem = *elem_it;
+        if (elem)
+          {
+            const Point c = elem->centroid();
+            if (c(0) < 0.6 &&
+                c(1) < 0.4)
+              {
+                if (c(0) > 0.4)
+                  bi.add_side(elem, 1, bid);
+                if (c(1) > 0.3)
+                  bi.add_side(elem, 2, bid);
+              }
+            else
+              {
+                if (c(0) < 0.75 &&
+                    c(1) < 0.4)
+                  bi.add_side(elem, 3, bid);
+                if (c(0) < 0.6 &&
+                    c(1) < 0.5)
+                  bi.add_side(elem, 0, bid);
+              }
+          }
+      }
+
 
     // Create a BoundaryMesh from the internal sideset relative to subdomain 1.
     {
@@ -222,7 +242,7 @@ public:
             CPPUNIT_ASSERT_EQUAL(pip->level(), elem->level());
 
             // We only added right edges
-            CPPUNIT_ASSERT_DOUBLES_EQUAL(elem->centroid()(0), 0.9,
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(elem->centroid()(0), 0.8,
                                          TOLERANCE*TOLERANCE);
           }
         else
@@ -257,7 +277,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(pip->level(), elem->level());
 
         // We only added left edges
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(elem->centroid()(0), 0.1,
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(elem->centroid()(0), 0.2,
                                      TOLERANCE*TOLERANCE);
       }
 
