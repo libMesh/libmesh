@@ -1,0 +1,16 @@
+netcdf ref_tst_nul3 {
+dimensions:
+	n = 8 ;
+variables:
+	char cdata(n) ;
+	char cdata2(n) ;
+
+// global attributes:
+		:global = "x\000y" ;
+		:byte_att = 0b, 1b, 2b, 127b, -128b, -127b, -2b, -1b ;
+data:
+
+ cdata = "abc\000def" ;
+
+ cdata2 = "\000\001\002\177\200\201\376\377" ;
+}

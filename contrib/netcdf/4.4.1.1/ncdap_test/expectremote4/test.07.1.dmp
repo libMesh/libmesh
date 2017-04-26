@@ -1,0 +1,19 @@
+netcdf test {
+types:
+  int(*) person_t ;
+variables:
+	person_t person ;
+
+// global attributes:
+		:Facility.PrincipleInvestigator = "Mark Abbott\n",
+			"Ph.D" ;
+		:Facility.DataCenter = "COAS Environmental Computer Facility" ;
+		:Facility.DrifterType = "MetOcean WOCE/OCM" ;
+		:b.Description = "A test byte" ;
+		:b.units = "unknown" ;
+		:i32.Description = "A 32 bit test server int" ;
+		:i32.units = "unknown" ;
+data:
+
+ person = {1, 2, 3, 5, 8} ;
+}

@@ -1,0 +1,5 @@
+Dataset {
+      Structure {
+        Int32   bad/name[3];
+      } S1[2];
+    } TEST1;
