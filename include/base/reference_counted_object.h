@@ -108,6 +108,15 @@ protected:
   }
 #endif
 
+  /**
+   * Copy assignment operator does nothing - we're copying an
+   * already-allocated object over an already-allocated object, so the
+   * counts for this class shouldn't change.
+   */
+  ReferenceCountedObject & operator= (const ReferenceCountedObject & other)
+  {}
+
+
 public:
 
   /**
