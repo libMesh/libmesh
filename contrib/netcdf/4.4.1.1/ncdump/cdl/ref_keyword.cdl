@@ -1,0 +1,9 @@
+netcdf file {
+variables:
+int data;
+data : _FillValue = 0;
+
+data:
+
+data = 177;
+}
