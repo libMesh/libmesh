@@ -72,7 +72,10 @@ AC_CONFIG_LINKS([nc_test4/ref_hdf5_compat2.nc:nc_test4/ref_hdf5_compat2.nc])
 AC_CONFIG_LINKS([nc_test4/ref_hdf5_compat3.nc:nc_test4/ref_hdf5_compat3.nc])
 
 # This call is required by automake.
-AM_INIT_AUTOMAKE([foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11])
+AM_INIT_AUTOMAKE(m4_esyscmd([case `automake --version | head -n 1` in
+                             *1.11*) echo foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11;;
+                             *)      echo foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11 serial-tests;;
+                             esac]))
 
 # use silent rules - automake 1.11
 AM_SILENT_RULES(yes)
