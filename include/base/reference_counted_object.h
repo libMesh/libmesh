@@ -113,7 +113,7 @@ protected:
    * already-allocated object over an already-allocated object, so the
    * counts for this class shouldn't change.
    */
-  ReferenceCountedObject & operator= (const ReferenceCountedObject & other)
+  ReferenceCountedObject & operator= (const ReferenceCountedObject & /*other*/)
   {}
 
 
