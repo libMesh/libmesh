@@ -402,17 +402,16 @@ void assemble_matrices(EquationSystems & es,
               Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
             }
 
-      // On an unrefined mesh, constrain_element_matrix does
-      // nothing.  If this assembly function is ever repurposed to
-      // run on a refined mesh, getting the hanging node constraints
-      // right will be important.  Note that, even with
-      // asymmetric_constraint_rows = false, the constrained dof
-      // diagonals still exist in the matrix, with diagonal entries
-      // that are there to ensure non-singular matrices for linear
-      // solves but which would generate positive non-physical
-      // eigenvalues for eigensolves.
-      // dof_map.constrain_element_matrix(Ke, dof_indices, false);
-      // dof_map.constrain_element_matrix(Me, dof_indices, false);
+      // The calls to constrain_element_matrix below have no effect in
+      // the current example. However, if users modify this example to
+      // include hanging nodes due to mesh refinement, for example,
+      // then it is essential to call constrain_element_matrix.
+      // As a result we include constrain_element_matrix here to
+      // ensure this example is ready to be used with hanging nodes.
+      // (Note that constrained rows/cols will be eliminated from
+      // the eigenproblem by the CondensedEigenSystem.)
+      dof_map.constrain_element_matrix(Ke, dof_indices, false);
+      dof_map.constrain_element_matrix(Me, dof_indices, false);
 
       // Finally, simply add the element contribution to the
       // overall matrices A and B.
