@@ -1,0 +1,35 @@
+# NetCDF C Configuration Summary
+==============================
+
+# General
+-------
+NetCDF Version:		@PACKAGE_VERSION@
+Configured On:		@CONFIG_DATE@
+Host System:		@host_cpu@-@host_vendor@-@host_os@
+Build Directory: 	@abs_top_builddir@
+Install Prefix:         @prefix@
+
+# Compiling Options
+-----------------
+C Compiler:		@CC_VERSION@
+CFLAGS:			@CFLAGS@
+CPPFLAGS:		@CPPFLAGS@
+LDFLAGS:		@LDFLAGS@
+AM_CFLAGS:		@AM_CFLAGS@
+AM_CPPFLAGS:		@AM_CPPFLAGS@
+AM_LDFLAGS:		@AM_LDFLAGS@
+Shared Library:		@enable_shared@
+Static Library:		@enable_static@
+Extra libraries:	@LIBS@
+
+# Features
+--------
+NetCDF-2 API:		@HAS_NC2@
+HDF4 Support:		@HAS_HDF4@
+NetCDF-4 API:		@HAS_NC4@
+NC-4 Parallel Support:	@HAS_PARALLEL4@
+PNetCDF Support:	@HAS_PNETCDF@
+DAP Support:		@HAS_DAP@
+Diskless Support:	@HAS_DISKLESS@
+MMap Support:		@HAS_MMAP@
+JNA Support:		@HAS_JNA@
