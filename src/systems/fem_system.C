@@ -49,6 +49,7 @@ femsystem_mutex assembly_mutex;
 void assemble_unconstrained_element_system(const FEMSystem & _sys,
                                            const bool _get_jacobian,
                                            const bool _constrain_heterogeneously,
+					   const bool _no_constraints,
                                            FEMContext & _femcontext)
 {
   if (_sys.print_element_solutions)
@@ -276,6 +277,10 @@ void add_element_system(const FEMSystem & _sys,
           (_femcontext.get_elem_jacobian(),
            _femcontext.get_elem_residual(),
            _femcontext.get_dof_indices(), false);
+      else if (_no_constraints)
+	{
+	  // Do noting
+	}
       else
         _sys.get_dof_map().constrain_element_matrix_and_vector
           (_femcontext.get_elem_jacobian(),
@@ -290,6 +295,10 @@ void add_element_system(const FEMSystem & _sys,
           (_femcontext.get_elem_jacobian(),
            _femcontext.get_elem_residual(),
            _femcontext.get_dof_indices(), false);
+      else if (_no_constraints)
+	{
+	  // Do noting
+	}      
       else
         _sys.get_dof_map().constrain_element_vector
           (_femcontext.get_elem_residual(), _femcontext.get_dof_indices(), false);
@@ -380,7 +389,7 @@ public:
         _femcontext.elem_fe_reinit();
 
         assemble_unconstrained_element_system
-          (_sys, _get_jacobian, _constrain_heterogeneously,
+          (_sys, _get_jacobian, _constrain_heterogeneously, _no_constraints,
            _femcontext);
 
         add_element_system
