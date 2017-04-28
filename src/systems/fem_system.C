@@ -74,7 +74,7 @@ void assemble_unconstrained_element_system(const FEMSystem & _sys,
 
   // We need jacobians to do heterogeneous residual constraints
   const bool need_jacobian =
-    _get_jacobian || _constrain_heterogeneously;
+    (_get_jacobian || _constrain_heterogeneously) ;
 
   bool jacobian_computed =
     _sys.time_solver->element_residual(need_jacobian, _femcontext);
@@ -251,6 +251,7 @@ void add_element_system(const FEMSystem & _sys,
                         const bool _get_residual,
                         const bool _get_jacobian,
                         const bool _constrain_heterogeneously,
+                        const bool _no_constraints,
                         FEMContext & _femcontext)
 {
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
@@ -280,6 +281,7 @@ void add_element_system(const FEMSystem & _sys,
           (_femcontext.get_elem_jacobian(),
            _femcontext.get_elem_residual(),
            _femcontext.get_dof_indices(), false);
+      // Do nothing if(_no_constraints)
     }
   else if (_get_residual)
     {
@@ -291,13 +293,16 @@ void add_element_system(const FEMSystem & _sys,
       else
         _sys.get_dof_map().constrain_element_vector
           (_femcontext.get_elem_residual(), _femcontext.get_dof_indices(), false);
+      // Do nothing if(_no_constraints)
     }
   else if (_get_jacobian)
     {
       // Heterogeneous and homogeneous constraints are the same on the
       // matrix
-      _sys.get_dof_map().constrain_element_matrix
-        (_femcontext.get_elem_jacobian(), _femcontext.get_dof_indices(), false);
+      // Only get these contribs if we are applying some constraints
+      if(!_no_constraints)
+        _sys.get_dof_map().constrain_element_matrix
+          (_femcontext.get_elem_jacobian(), _femcontext.get_dof_indices(), false);
     }
 #endif // #ifdef LIBMESH_ENABLE_CONSTRAINTS
 
@@ -348,11 +353,13 @@ public:
   AssemblyContributions(FEMSystem & sys,
                         bool get_residual,
                         bool get_jacobian,
-                        bool constrain_heterogeneously) :
+                        bool constrain_heterogeneously,
+bool no_constraints) :
     _sys(sys),
     _get_residual(get_residual),
     _get_jacobian(get_jacobian),
-    _constrain_heterogeneously(constrain_heterogeneously) {}
+    _constrain_heterogeneously(constrain_heterogeneously),
+    _no_constraints(no_constraints){}
 
   /**
    * operator() for use with Threads::parallel_for().
@@ -377,7 +384,7 @@ public:
 
         add_element_system
           (_sys, _get_residual, _get_jacobian,
-           _constrain_heterogeneously, _femcontext);
+           _constrain_heterogeneously, _no_constraints, _femcontext);
       }
   }
 
@@ -385,7 +392,7 @@ private:
 
   FEMSystem & _sys;
 
-  const bool _get_residual, _get_jacobian, _constrain_heterogeneously;
+  const bool _get_residual, _get_jacobian, _constrain_heterogeneously, _no_constraints;
 };
 
 class PostprocessContributions
@@ -843,7 +850,8 @@ void FEMSystem::init_data ()
 
 
 void FEMSystem::assembly (bool get_residual, bool get_jacobian,
-                          bool apply_heterogeneous_constraints)
+                          bool apply_heterogeneous_constraints,
+                          bool apply_no_constraints)
 {
   libmesh_assert(get_residual || get_jacobian);
   std::string log_name;
@@ -914,7 +922,8 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
     (elem_range.reset(mesh.active_local_elements_begin(),
                       mesh.active_local_elements_end()),
      AssemblyContributions(*this, get_residual, get_jacobian,
-                           apply_heterogeneous_constraints));
+                           apply_heterogeneous_constraints,
+                           apply_no_constraints));
 
   // Check and see if we have SCALAR variables
   bool have_scalar = false;
@@ -999,7 +1008,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
 
           add_element_system
             (*this, get_residual, get_jacobian,
-             apply_heterogeneous_constraints, _femcontext);
+             apply_heterogeneous_constraints, apply_no_constraints, _femcontext);
         }
     }
 

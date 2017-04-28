@@ -237,7 +237,8 @@ public:
    */
   virtual void assembly(bool get_residual,
                         bool get_jacobian,
-                        bool apply_heterogeneous_constraints = false) libmesh_override;
+                        bool apply_heterogeneous_constraints = false,
+                        bool apply_no_constraints = false) libmesh_override;
 
   /**
    * @returns \p "NonlinearImplicit".  Helps in identifying
