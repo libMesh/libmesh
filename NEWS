@@ -83,6 +83,14 @@
   * Add MeshCommunication::send_coarse_ghosts().
   * Fixes for MeshTools::n*levels on empty meshes.
   * Ignore TBB placement-new warnings in GCC6.
+  * Fix bug in Tri3::contains_point() implementation affecting small triangles.
+  * Fix issue with missing incrementing copy constructor to ReferenceCounter class.
+  * Add compiler.m4 support for Intel 2017 compilers.
+  * Fix for ExodusII_IO::write_timestep() in single precision case.
+  * Fix issue with accessing read-only solution vector in PetscDiffSolver.
+  * Include CITATION file with distributed tarballs.
+  * Disallow remote element removal during Mesh copy.
+  * Fix ExodusII_IO::copy_* on distributed meshes.
 
 1.0.0 -> 1.1.0
   * Add interface for passing the transpose nullspace to PETSc.
