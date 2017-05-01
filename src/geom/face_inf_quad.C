@@ -62,6 +62,17 @@ dof_id_type InfQuad::key (const unsigned int s) const
 
 
 
+unsigned int InfQuad::which_node_am_i(unsigned int side,
+                                      unsigned int side_node) const
+{
+  libmesh_assert_less (side, this->n_sides());
+  libmesh_assert_less (side_node, 2);
+
+  return InfQuad4::side_nodes_map[side][side_node];
+}
+
+
+
 UniquePtr<Elem> InfQuad::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());

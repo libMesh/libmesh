@@ -129,6 +129,12 @@ public:
   virtual Order default_order() const libmesh_override { return SECOND; }
 
   /**
+   * Does some range checking and then returns InfHex16::side_nodes_map[side][side_node].
+   */
+  virtual unsigned int which_node_am_i(unsigned int side,
+                                       unsigned int side_node) const libmesh_override;
+
+  /**
    * Returns a \p QUAD8 built coincident with face 0, an \p INFQUAD6
    * built coincident with faces 1 to 4. Note that the \p UniquePtr<Elem>
    * takes care of freeing memory.

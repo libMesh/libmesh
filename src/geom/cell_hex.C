@@ -83,6 +83,17 @@ dof_id_type Hex::key (const unsigned int s) const
 
 
 
+unsigned int Hex::which_node_am_i(unsigned int side,
+                                  unsigned int side_node) const
+{
+  libmesh_assert_less (side, this->n_sides());
+  libmesh_assert_less (side_node, 4);
+
+  return Hex8::side_nodes_map[side][side_node];
+}
+
+
+
 UniquePtr<Elem> Hex::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());

@@ -364,6 +364,19 @@ public:
   unsigned int which_side_am_i(const Elem * e) const;
 
   /**
+   * Returns the local node id for node "side_node" on side "side" of
+   * this Elem. Simply relies on the side_nodes_map for each of the
+   * derived types. For example,
+   * Tri3::which_node_am_i(0, 0) -> 0
+   * Tri3::which_node_am_i(0, 1) -> 1
+   * Tri3::which_node_am_i(1, 0) -> 1
+   * Tri3::which_node_am_i(1, 1) -> 2
+   * etc...
+   */
+  virtual unsigned int which_node_am_i(unsigned int side,
+                                       unsigned int side_node) const = 0;
+
+  /**
    * This function returns true if a vertex of \p e is contained
    * in this element.
    */

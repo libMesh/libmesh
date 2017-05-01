@@ -167,6 +167,17 @@ UniquePtr<Elem> Hex20::build_side_ptr (const unsigned int i,
 
 
 
+unsigned int Hex20::which_node_am_i(unsigned int side,
+                                    unsigned int side_node) const
+{
+  libmesh_assert_less (side, this->n_sides());
+  libmesh_assert_less (side_node, 8);
+
+  return Hex20::side_nodes_map[side][side_node];
+}
+
+
+
 UniquePtr<Elem> Hex20::build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());

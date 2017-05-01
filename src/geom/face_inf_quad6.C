@@ -133,6 +133,17 @@ dof_id_type InfQuad6::key (const unsigned int s) const
 
 
 
+unsigned int InfQuad6::which_node_am_i(unsigned int side,
+                                       unsigned int side_node) const
+{
+  libmesh_assert_less (side, this->n_sides());
+  libmesh_assert ((side == 0 && side_node < 3) || (side_node < 2));
+
+  return InfQuad6::side_nodes_map[side][side_node];
+}
+
+
+
 UniquePtr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
                                           bool proxy)
 {

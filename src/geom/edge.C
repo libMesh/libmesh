@@ -24,6 +24,14 @@
 namespace libMesh
 {
 
+unsigned int Edge::which_node_am_i(unsigned int side,
+                                   unsigned int /*side_node*/) const
+{
+  libmesh_assert_less (side, this->n_sides());
+  return side;
+}
+
+
 
 UniquePtr<Elem> Edge::side_ptr (const unsigned int i)
 {

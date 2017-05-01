@@ -127,6 +127,12 @@ public:
   virtual dof_id_type key (const unsigned int s) const libmesh_override;
 
   /**
+   * Does some range checking and then returns InfQuad6::side_nodes_map[side][side_node].
+   */
+  virtual unsigned int which_node_am_i(unsigned int side,
+                                       unsigned int side_node) const libmesh_override;
+
+  /**
    * Creates and returns an \p Edge3 for the base (0) side, and an \p InfEdge2 for
    * the sides 1, 2.
    */

@@ -128,6 +128,12 @@ public:
   { return this->compute_key(this->node_id(s)); }
 
   /**
+   * Does some range checking and then returns side. side_node is ignored.
+   */
+  virtual unsigned int which_node_am_i(unsigned int side,
+                                       unsigned int /*side_node*/) const libmesh_override;
+
+  /**
    * The \p Elem::side() member returns
    * an auto pointer to a NodeElem for the specified node.
    */
