@@ -445,7 +445,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             {
               for (unsigned int i=0; i<nx; i++)
                 {
-                  Elem * elem = mesh.add_elem (new Edge2);
+                  Elem * elem = new Edge2;
+                  elem->set_id(i);
+                  elem = mesh.add_elem (elem);
                   elem->set_node(0) = mesh.node_ptr(i);
                   elem->set_node(1) = mesh.node_ptr(i+1);
 
@@ -462,7 +464,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             {
               for (unsigned int i=0; i<nx; i++)
                 {
-                  Elem * elem = mesh.add_elem (new Edge3);
+                  Elem * elem = new Edge3;
+                  elem->set_id(i);
+                  elem = mesh.add_elem (elem);
                   elem->set_node(0) = mesh.node_ptr(2*i);
                   elem->set_node(2) = mesh.node_ptr(2*i+1);
                   elem->set_node(1) = mesh.node_ptr(2*i+2);
@@ -480,7 +484,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             {
               for (unsigned int i=0; i<nx; i++)
                 {
-                  Elem * elem = mesh.add_elem (new Edge4);
+                  Elem * elem = new Edge4;
+                  elem->set_id(i);
+                  elem = mesh.add_elem (elem);
                   elem->set_node(0) = mesh.node_ptr(3*i);
                   elem->set_node(2) = mesh.node_ptr(3*i+1);
                   elem->set_node(3) = mesh.node_ptr(3*i+2);
@@ -637,6 +643,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
         // Build the elements.  Each one is a bit different.
+        unsigned int elem_id = 0;
         switch (type)
           {
 
@@ -646,7 +653,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               for (unsigned int j=0; j<ny; j++)
                 for (unsigned int i=0; i<nx; i++)
                   {
-                    Elem * elem = mesh.add_elem(new Quad4);
+                    Elem * elem = new Quad4;
+                    elem->set_id(elem_id++);
+                    elem = mesh.add_elem (elem);
 
                     elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
                     elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+1,j)  );
@@ -674,10 +683,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               for (unsigned int j=0; j<ny; j++)
                 for (unsigned int i=0; i<nx; i++)
                   {
-                    Elem * elem = libmesh_nullptr;
-
                     // Add first Tri3
-                    elem = mesh.add_elem(new Tri3);
+                    Elem * elem = new Tri3;
+                    elem->set_id(elem_id++);
+                    elem = mesh.add_elem (elem);
 
                     elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
                     elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+1,j)  );
@@ -690,7 +699,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                       boundary_info.add_side(elem, 1, 1);
 
                     // Add second Tri3
-                    elem = mesh.add_elem(new Tri3);
+                    elem = new Tri3;
+                    elem->set_id(elem_id++);
+                    elem = mesh.add_elem (elem);
 
                     elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
                     elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+1,j+1));
@@ -714,9 +725,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                 for (unsigned int i=0; i<(2*nx); i += 2)
                   {
                     Elem * elem = (type == QUAD8) ?
-                      mesh.add_elem(new Quad8) :
-                      mesh.add_elem(new Quad9);
-
+                      static_cast<Elem *>(new Quad8) :
+                      static_cast<Elem *>(new Quad9);
+                    elem->set_id(elem_id++);
+                    elem = mesh.add_elem (elem);
 
                     elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
                     elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+2,j)  );
@@ -751,10 +763,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               for (unsigned int j=0; j<(2*ny); j += 2)
                 for (unsigned int i=0; i<(2*nx); i += 2)
                   {
-                    Elem * elem = libmesh_nullptr;
-
                     // Add first Tri6
-                    elem = mesh.add_elem(new Tri6);
+                    Elem * elem = new Tri6;
+                    elem->set_id(elem_id++);
+                    elem = mesh.add_elem (elem);
 
                     elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
                     elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+2,j)  );
@@ -770,7 +782,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                       boundary_info.add_side(elem, 1, 1);
 
                     // Add second Tri6
-                    elem = mesh.add_elem(new Tri6);
+                    elem = new Tri6;
+                    elem->set_id(elem_id++);
+                    elem = mesh.add_elem (elem);
 
                     elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
                     elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+2,j+2));
@@ -967,6 +981,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
         // Build the elements.
+        unsigned int elem_id = 0;
         switch (type)
           {
           case INVALID_ELEM:
@@ -976,7 +991,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                 for (unsigned int j=0; j<ny; j++)
                   for (unsigned int i=0; i<nx; i++)
                     {
-                      Elem * elem = mesh.add_elem(new Hex8);
+                      Elem * elem = new Hex8;
+                      elem->set_id(elem_id++);
+                      elem = mesh.add_elem (elem);
 
                       elem->set_node(0) = mesh.node_ptr(idx(type,nx,ny,i,j,k)      );
                       elem->set_node(1) = mesh.node_ptr(idx(type,nx,ny,i+1,j,k)    );
@@ -1018,8 +1035,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                   for (unsigned int i=0; i<nx; i++)
                     {
                       // First Prism
-                      Elem * elem = libmesh_nullptr;
-                      elem = mesh.add_elem(new Prism6);
+                      Elem * elem = new Prism6;
+                      elem->set_id(elem_id++);
+                      elem = mesh.add_elem (elem);
 
                       elem->set_node(0) = mesh.node_ptr(idx(type,nx,ny,i,j,k)      );
                       elem->set_node(1) = mesh.node_ptr(idx(type,nx,ny,i+1,j,k)    );
@@ -1042,7 +1060,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                         boundary_info.add_side(elem, 4, 5);
 
                       // Second Prism
-                      elem = mesh.add_elem(new Prism6);
+                      elem = new Prism6;
+                      elem->set_id(elem_id++);
+                      elem = mesh.add_elem (elem);
 
                       elem->set_node(0) = mesh.node_ptr(idx(type,nx,ny,i+1,j,k)    );
                       elem->set_node(1) = mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k)  );
@@ -1085,8 +1105,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                   for (unsigned int i=0; i<(2*nx); i += 2)
                     {
                       Elem * elem = (type == HEX20) ?
-                        mesh.add_elem(new Hex20) :
-                        mesh.add_elem(new Hex27);
+                        static_cast<Elem *>(new Hex20) :
+                        static_cast<Elem *>(new Hex27);
+                      elem->set_id(elem_id++);
+                      elem = mesh.add_elem (elem);
 
                       elem->set_node(0)  = mesh.node_ptr(idx(type,nx,ny,i,  j,  k)  );
                       elem->set_node(1)  = mesh.node_ptr(idx(type,nx,ny,i+2,j,  k)  );
@@ -1153,10 +1175,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                   for (unsigned int i=0; i<(2*nx); i += 2)
                     {
                       // First Prism
-                      Elem * elem = libmesh_nullptr;
-                      elem = ((type == PRISM15) ?
-                              mesh.add_elem(new Prism15) :
-                              mesh.add_elem(new Prism18));
+                      Elem * elem = (type == PRISM15) ?
+                        static_cast<Elem *>(new Prism15) :
+                        static_cast<Elem *>(new Prism18);
+                      elem->set_id(elem_id++);
+                      elem = mesh.add_elem (elem);
 
                       elem->set_node(0)  = mesh.node_ptr(idx(type,nx,ny,i,  j,  k)  );
                       elem->set_node(1)  = mesh.node_ptr(idx(type,nx,ny,i+2,j,  k)  );
@@ -1195,9 +1218,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
                       // Second Prism
-                      elem = ((type == PRISM15) ?
-                              mesh.add_elem(new Prism15) :
-                              mesh.add_elem(new Prism18));
+                      elem = (type == PRISM15) ?
+                        static_cast<Elem *>(new Prism15) :
+                        static_cast<Elem *>(new Prism18);
+                      elem->set_id(elem_id++);
+                      elem = mesh.add_elem (elem);
 
                       elem->set_node(0)  = mesh.node_ptr(idx(type,nx,ny,i+2,j,k)     );
                       elem->set_node(1)  = mesh.node_ptr(idx(type,nx,ny,i+2,j+2,k)   );
@@ -1382,7 +1407,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
             // Add the new elements
             for (std::size_t i=0; i<new_elements.size(); ++i)
-              mesh.add_elem(new_elements[i]);
+              {
+                new_elements[i]->set_id(i);
+                mesh.add_elem(new_elements[i]);
+              }
 
           } // end if (type == TET4,TET10,PYRAMID5,PYRAMID13,PYRAMID14
 
