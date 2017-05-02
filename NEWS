@@ -1,3 +1,97 @@
+1.1.0 -> 1.2.0
+  * 1.2.0 is the last release that does not require a C++11 compiler.
+  * Add Eigen optimizations for DenseVector::l2_norm(), l1_norm(), linfty_norm(), dot().
+  * Add clang-specific vectorization pragmas in DenseVector.
+  * Fix BoundaryInfo::operator=
+  * Add EquationSystems flag to skip internal refine/coarsen calls.
+  * Add MeshBase::is_replicated() function.
+  * AbaqusIO: Support reading elements of type 'S3'.
+  * AbaqusIO: Support generated elsets and nsets.
+  * ImplicitSystem: Allow users to control if the matrix and RHS should be zeroed out.
+  * Fix issue where delete_remote_elements() was called inappropriately.
+  * Remove PetscMatrix::update_preallocation_and_zero().
+  * Deprecate old Elem and Mesh interfaces and constructors.
+  * Officially remove long-deprecated MeshData class.
+  * Fix unsigned int/size_t mismatch in for loops.
+  * Move BoundingBox to its own header, deprecate old usage.
+  * Add Elem::loose_bounding_box() implementations.
+  * GmshIO: Allow multiple lower-dimensional elements for BCs.
+  * Add BoundaryInfo::regenerate_id_sets().
+  * Use *parallel* max_elem_id in assert code.
+  * Fix DistributedMesh build_node_list_from_side_list().
+  * Support for VTK-7.1.
+  * Misc. VTK improvements from @acbauer (avoid memory leaks, etc.).
+  * Fix issues with mesh extrusion when using DistributedMesh.
+  * Add MappedSubdomainPartitioner, maps subdomains to processor ids.
+  * Add Distributed-compatible BoundaryInfo unit tests.
+  * FEMSystem: Add solvers for second-order in time problems.
+  * Add missing Pyramid sidesets in ExodusII_IO.
+  * Add SubdomainPartitioner, partitions "chunks" of subdomains.
+  * Fix issues with vectormap::find().
+  * Add evaluable_nodes iterators.
+  * CheckPointIO format can now be used to pre-split meshes.
+  * Fix several issues in CheckPointIO.
+  * Misc. Doxygen updates, fix issue with missing libmesh_final classes.
+  * int -> PetscBLASInt in BLAS/LAPACK routines.
+  * AdjointRefinement ghosted adjoint compatibility.
+  * Fixes for multisystem XDA reads.
+  * Fix gmsh numbering and node ordering for PRISM15.
+  * PointLocator fixes and updates for "truss-like" meshes.
+  * Add extra package search paths in trilinos.m4.
+  * inverse_map() fixes for infinite elements.
+  * Update AutoPtr unit test to test UniquePtr.
+  * Adjust tolerance in Edge3::volume().
+  * Update fix for errno.h inclusion in a namespace.
+  * Reorder paths starting with /lib to the end of the linking list.
+  * Fix misc. documentation typos and wording in geom, quadrature, partitioning.
+  * Use the -fno-limit-debug-info flag in dbg/devel mode for clang.
+  * Use the '-Wunused -Wunused-parameter' flags for clang in all modes.
+  * Avoid printing unprintable [unsigned] char Parameters.
+  * Only serialize the Mesh to processor 0 for Exodus.
+  * Add a barrier() to ~LibMeshInit to avoid missing potential error messages.
+  * Misc. DistributedMesh fixes.
+  * Fixes for MeshTools::n*levels().
+  * Various source code formatting improvements.
+  * Optionally skip find_neighbors in MeshBase::read().
+  * SLEPc: Add option to set initial guess.
+  * SLEPc: Add 'target' spectrum positions.
+  * SLEPc: detect major, minor, subminor version numbers during configure.
+  * Add SLEPC_VERSION_LESS_THAN macro.
+  * Fix binary writing of GMV files.
+  * Fix bug when merging NULL+non-null CouplingMatrix.
+  * Mange the lifetimes of various protected members with UniquePtrs.
+  * Add PointNeighborCoupling class and unit test.
+  * Fix bugs in MeshTools::all_tri().
+  * Deprecate ImplicitSystem::get_linear_solver().
+  * Use os_unfair_lock() for Mac OS X Sierra compatibility.
+  * Allow virtual methods for edge_fe_reinit() and elem_fe_reinit().
+  * Enable 1D Hermite elements of arbitrary p.
+  * Prefix libMesh Parallel:: macros with LIBMESH_.
+  * Fix GetPot off-by-1 bug.
+  * Add support for --redirect-output command line option.
+  * Move serial->replicated_mesh.h, parallel->distributed_mesh.h headers.
+  * Add GetPot::get_subsection_names() and unit tests.
+  * Various Trilinos ifdef fixes.
+  * Add PointLocatorBase::locate_node() and unit tests.
+  * Various Doxygen fixes, update docs at libmesh.github.io.
+  * Bugfix for FEMContext::pre_fe_reinit SCALAR case
+  * Add historic authorship information for various classes.
+  * Add libmesh_isinf() helper function.
+  * Optionally skip lower dimensional element counting in TreeNode.
+  * More robust caching with Clough-Tocher elements.
+  * Add MeshTools::paranoid_n_levels().
+  * Add MeshCommunication::send_coarse_ghosts().
+  * Fixes for MeshTools::n*levels on empty meshes.
+  * Ignore TBB placement-new warnings in GCC6.
+  * Fix bug in Tri3::contains_point() implementation affecting small triangles.
+  * Fix issue with missing incrementing copy constructor to ReferenceCounter class.
+  * Add compiler.m4 support for Intel 2017 compilers.
+  * Fix for ExodusII_IO::write_timestep() in single precision case.
+  * Fix issue with accessing read-only solution vector in PetscDiffSolver.
+  * Include CITATION file with distributed tarballs.
+  * Disallow remote element removal during Mesh copy.
+  * Fix ExodusII_IO::copy_* on distributed meshes.
+
 1.0.0 -> 1.1.0
   * Add interface for passing the transpose nullspace to PETSc.
   * Fixes for MPI implementations not quite compatible with MPI-2.
