@@ -106,7 +106,7 @@ public:
    * This should never be important for NodeElems.
    */
   virtual dof_id_type key (const unsigned int) const libmesh_override
-  { return 0; }
+  { libmesh_error_msg("Calling NodeElem::key(side) does not make sense."); return 0; }
 
   /**
    * NodeElems don't have sides, so they can't have nodes on sides.
