@@ -298,7 +298,7 @@ void add_element_system(const FEMSystem & _sys,
       else if (_no_constraints)
 	{
 	  // Do noting
-	}      
+	}
       else
         _sys.get_dof_map().constrain_element_vector
           (_femcontext.get_elem_residual(), _femcontext.get_dof_indices(), false);
