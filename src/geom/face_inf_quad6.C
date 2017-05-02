@@ -38,9 +38,9 @@ namespace libMesh
 // InfQuad6 class static member initializations
 const unsigned int InfQuad6::side_nodes_map[3][3] =
   {
-    {0, 1, 4}, // Side 0
-    {1, 3},    // Side 1
-    {0, 2}     // Side 2
+    {0, 1, 4},  // Side 0
+    {1, 3, 99}, // Side 1
+    {0, 2, 99}  // Side 2
   };
 
 
