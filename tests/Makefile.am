@@ -31,6 +31,7 @@ unit_tests_sources = \
   geom/node_test.C \
   geom/point_test.C \
   geom/point_test.h \
+  geom/which_node_am_i_test.C \
   mesh/all_tri.C \
   mesh/boundary_mesh.C \
   mesh/boundary_info.C \
