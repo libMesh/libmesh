@@ -24,12 +24,13 @@ libMesh supports the notion of multiple methods - that is, compilation
 settings used to build the library.  The major methods supported by
 the library are:
 
-* opt: Fully Optimized mode, with little to no error checking. No debugging
-  symbols are included in the resulting library.  Agressive optimization
+* opt: Fully optimized mode, with little to no error checking. No debugging
+  symbols are included in the resulting library.  Aggressive optimization
   flags are used.
 
 * dbg: Full debugging mode - all useful compiler warnings are enabled,
-  as well as robust internal state checking.
+  as well as robust internal state checking. The asymptotic complexity
+  of some algorithms is allowed to be worse than the design spec states.
 
 * devel: Use high levels of compiler optimization, but also enable internal
   state checking.  Debugging symbols are included, but the resulting
@@ -57,15 +58,15 @@ Multiple Builds with Different Compilers
 
 libMesh fully supports out-of-tree builds, and users are encouraged to use this
 feature when needed to support multiple compilers. For example, on a system
-where multiple compilers are availble and accessible via modules, you can share
+where multiple compilers are available and accessible via modules, you can share
 the same source tree by creating a subdirectory for each compiler build:
 
     $ export LIBMESH_SRC=/local/libmesh
     $ cd $LIBMESH_SRC
-    $ module load gcc/4.8
-    $ cd $LIBMESH_SRC && mkdir gcc-4.8 && cd gcc-4.8 && ../configure && make && make install
-    $ module swap gcc intel/16.0
-    $ cd $LIBMESH_SRC && mkdir intel-16.0 && cd intel-16.0 && ../configure && make && make install
+    $ module load gcc/6.3
+    $ cd $LIBMESH_SRC && mkdir gcc-6.3 && cd gcc-6.3 && ../configure && make && make install
+    $ module swap gcc/6.3 intel/17.0
+    $ cd $LIBMESH_SRC && mkdir intel-17.0 && cd intel-17.0 && ../configure && make && make install
 
 
 Dependencies
@@ -79,8 +80,8 @@ Optional Packages
 -----------------
 
 We support a large number of optional packages, some of which are
-distributed inside the ./contrib directory and are compiler directly
-with libMesh, others can be used from third-party installation.  For a
+distributed inside the ./contrib directory and are compiled directly
+with libMesh, others can be used from third-party installations.  For a
 list of supported packages and optional dependencies see
 [here](http://libmesh.github.io/externalsoftware.html)
 
