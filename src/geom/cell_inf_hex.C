@@ -83,6 +83,17 @@ dof_id_type InfHex::key (const unsigned int s) const
 
 
 
+unsigned int InfHex::which_node_am_i(unsigned int side,
+                                     unsigned int side_node) const
+{
+  libmesh_assert_less (side, this->n_sides());
+  libmesh_assert_less (side_node, 4);
+
+  return InfHex8::side_nodes_map[side][side_node];
+}
+
+
+
 UniquePtr<Elem> InfHex::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());

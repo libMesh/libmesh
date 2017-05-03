@@ -104,6 +104,24 @@ bool InfHex16::is_node_on_edge(const unsigned int n,
   return false;
 }
 
+
+
+unsigned int InfHex16::which_node_am_i(unsigned int side,
+                                       unsigned int side_node) const
+{
+  libmesh_assert_less (side, this->n_sides());
+
+  // Never more than 8 nodes per side.
+  libmesh_assert_less (side_node, 8);
+
+  // Some sides have 6 nodes.
+  libmesh_assert(side == 0 || side_node < 6);
+
+  return InfHex16::side_nodes_map[side][side_node];
+}
+
+
+
 UniquePtr<Elem> InfHex16::build_side_ptr (const unsigned int i,
                                           bool proxy)
 {

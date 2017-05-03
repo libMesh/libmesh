@@ -101,6 +101,21 @@ bool InfPrism12::is_node_on_edge(const unsigned int n,
   return false;
 }
 
+
+
+unsigned int InfPrism12::which_node_am_i(unsigned int side,
+                                         unsigned int side_node) const
+{
+  libmesh_assert_less (side, this->n_sides());
+
+  // Never more than 6 nodes per side.
+  libmesh_assert_less(side_node, 6);
+
+  return InfPrism12::side_nodes_map[side][side_node];
+}
+
+
+
 UniquePtr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
                                             bool proxy)
 {

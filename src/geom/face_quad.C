@@ -60,6 +60,17 @@ dof_id_type Quad::key (const unsigned int s) const
 
 
 
+unsigned int Quad::which_node_am_i(unsigned int side,
+                                   unsigned int side_node) const
+{
+  libmesh_assert_less (side, this->n_sides());
+  libmesh_assert_less (side_node, 2);
+
+  return Quad4::side_nodes_map[side][side_node];
+}
+
+
+
 dof_id_type Quad::key () const
 {
   return this->compute_key(this->node_id(0),

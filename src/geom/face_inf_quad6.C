@@ -38,9 +38,9 @@ namespace libMesh
 // InfQuad6 class static member initializations
 const unsigned int InfQuad6::side_nodes_map[3][3] =
   {
-    {0, 1, 4}, // Side 0
-    {1, 3},    // Side 1
-    {0, 2}     // Side 2
+    {0, 1, 4},  // Side 0
+    {1, 3, 99}, // Side 1
+    {0, 2, 99}  // Side 2
   };
 
 
@@ -129,6 +129,17 @@ dof_id_type InfQuad6::key (const unsigned int s) const
 
   libmesh_error_msg("We'll never get here!");
   return 0;
+}
+
+
+
+unsigned int InfQuad6::which_node_am_i(unsigned int side,
+                                       unsigned int side_node) const
+{
+  libmesh_assert_less (side, this->n_sides());
+  libmesh_assert ((side == 0 && side_node < 3) || (side_node < 2));
+
+  return InfQuad6::side_nodes_map[side][side_node];
 }
 
 

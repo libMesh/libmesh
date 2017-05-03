@@ -172,6 +172,20 @@ dof_id_type Prism18::key (const unsigned int s) const
 
 
 
+unsigned int Prism18::which_node_am_i(unsigned int side,
+                                      unsigned int side_node) const
+{
+  libmesh_assert_less (side, this->n_sides());
+
+  // Never more than 9 nodes per side.
+  libmesh_assert_less(side_node, 9);
+
+  // Some sides have 6 nodes.
+  libmesh_assert(!(side==0 || side==4) || side_node < 6);
+
+  return Prism18::side_nodes_map[side][side_node];
+}
+
 
 
 UniquePtr<Elem> Prism18::build_side_ptr (const unsigned int i,

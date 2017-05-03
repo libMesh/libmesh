@@ -153,6 +153,17 @@ bool Tet10::has_affine_map() const
 
 
 
+unsigned int Tet10::which_node_am_i(unsigned int side,
+                                    unsigned int side_node) const
+{
+  libmesh_assert_less (side, this->n_sides());
+  libmesh_assert_less (side_node, 6);
+
+  return Tet10::side_nodes_map[side][side_node];
+}
+
+
+
 UniquePtr<Elem> Tet10::build_side_ptr (const unsigned int i,
                                        bool proxy)
 {

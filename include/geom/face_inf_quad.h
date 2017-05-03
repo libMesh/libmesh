@@ -142,6 +142,12 @@ public:
   virtual dof_id_type key (const unsigned int s) const libmesh_override;
 
   /**
+   * Does some range checking and then returns InfQuad4::side_nodes_map[side][side_node].
+   */
+  virtual unsigned int which_node_am_i(unsigned int side,
+                                       unsigned int side_node) const libmesh_override;
+
+  /**
    * @returns a primitive (2-noded) edge or infedge for edge \p i.
    */
   virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;

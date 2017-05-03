@@ -88,6 +88,10 @@ public:
   virtual dof_id_type key (const unsigned int) const libmesh_override
   { libmesh_not_implemented(); return 0; }
 
+  virtual unsigned int which_node_am_i(unsigned int /*side*/,
+                                       unsigned int /*side_node*/) const libmesh_override
+  { libmesh_not_implemented(); return 0; }
+
   virtual bool is_remote () const libmesh_override
   { return true; }
 
