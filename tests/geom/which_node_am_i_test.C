@@ -32,37 +32,34 @@ public:
 
 public:
 
-  /**
-   * Note: the sections below marked
-   *
-   * #if !defined(NDEBUG) && defined(LIBMESH_ENABLE_EXCEPTIONS)
-   *
-   * are currently commented out because (even though they work) they
-   * print a bunch of stuff to the screen (error message, stack trace,
-   * etc.) that makes it look like they failed. If we could silently
-   * avoid seeing all that in the output stream, it might be worth
-   * including this test. The Google Test suite may provide a better
-   * mechanism for doing this.
-   */
-
   void testPyramids()
   {
     // The last node on the right side (1) should be node 4 (apex node).
     const Elem & pyr5 = ReferenceElem::get(PYRAMID5);
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4), pyr5.which_node_am_i(/*side=*/1, /*node=*/2));
 
-// #if !defined(NDEBUG) && defined(LIBMESH_ENABLE_EXCEPTIONS)
-//     try
-//       {
-//         // Asking for the 4th node on a triangular face should throw.
-//         unsigned int n = pyr5.which_node_am_i(1, 3);
-//
-//         // We shouldn't get here if the line above throws. If we do
-//         // get here, there's no way this assert will pass.
-//         CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(-1), n);
-//       }
-//     catch (...) {}
-// #endif
+    // Test the libmesh_asserts when they are enabled and exceptions
+    // are available. If exceptions aren't available, libmesh_assert
+    // simply aborts, so we can't unit test in that case.
+#if !defined(NDEBUG) && defined(LIBMESH_ENABLE_EXCEPTIONS)
+    // Save the original streambuf and redirect to NULL
+    std::streambuf * errbuf = libMesh::err.rdbuf();
+    libMesh::err.rdbuf(libmesh_nullptr);
+
+    try
+      {
+        // Asking for the 4th node on a triangular face should throw.
+        unsigned int n = pyr5.which_node_am_i(1, 3);
+
+        // We shouldn't get here if the line above throws. If we do
+        // get here, there's no way this assert will pass.
+        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(-1), n);
+      }
+    catch (...) {}
+
+    // Restore original stream
+    libMesh::err.rdbuf(errbuf);
+#endif
 
 #ifdef NDEBUG
     // In optimized mode, we expect to get the "dummy" value 99.
@@ -87,21 +84,31 @@ public:
     const Elem & prism6 = ReferenceElem::get(PRISM6);
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4), prism6.which_node_am_i(/*side=*/4, /*node=*/1));
 
-// #if !defined(NDEBUG) && defined(LIBMESH_ENABLE_EXCEPTIONS)
-//     try
-//       {
-//         // Asks for the 3rd node on a Tri face which only has
-//         // indices 0, 1, and 2. Should throw an exception
-//         // (libmesh_assert throws an exception) when NDEBUG is not
-//         // defined.
-//         unsigned int n = prism6.which_node_am_i(0, 3);
-//
-//         // We shouldn't get here if the line above throws. If we do
-//         // get here, there's no way this assert will pass.
-//         CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(-1), n);
-//       }
-//     catch (...) {}
-// #endif
+    // Test the libmesh_asserts when they are enabled and exceptions
+    // are available. If exceptions aren't available, libmesh_assert
+    // simply aborts, so we can't unit test in that case.
+#if !defined(NDEBUG) && defined(LIBMESH_ENABLE_EXCEPTIONS)
+    // Save the original streambuf and redirect to NULL
+    std::streambuf * errbuf = libMesh::err.rdbuf();
+    libMesh::err.rdbuf(libmesh_nullptr);
+
+    try
+      {
+        // Asks for the 3rd node on a Tri face which only has
+        // indices 0, 1, and 2. Should throw an exception
+        // (libmesh_assert throws an exception) when NDEBUG is not
+        // defined.
+        unsigned int n = prism6.which_node_am_i(0, 3);
+
+        // We shouldn't get here if the line above throws. If we do
+        // get here, there's no way this assert will pass.
+        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(-1), n);
+      }
+    catch (...) {}
+
+    // Restore original stream
+    libMesh::err.rdbuf(errbuf);
+#endif
 
 #ifdef NDEBUG
     // In optimized mode, we expect to get the "dummy" value 99.
