@@ -7,6 +7,9 @@
 #include <libmesh/elem.h>
 #include <libmesh/reference_elem.h>
 
+// Unit test headers
+#include "stream_redirector.h"
+
 // THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
 // std::auto_ptr, which in turn produces -Wdeprecated-declarations
 // warnings.  These can be ignored in GCC as long as we wrap the
@@ -42,12 +45,11 @@ public:
     // are available. If exceptions aren't available, libmesh_assert
     // simply aborts, so we can't unit test in that case.
 #if !defined(NDEBUG) && defined(LIBMESH_ENABLE_EXCEPTIONS)
-    // Save the original streambuf and redirect to NULL
-    std::streambuf * errbuf = libMesh::err.rdbuf();
-    libMesh::err.rdbuf(libmesh_nullptr);
-
     try
       {
+        // Avoid sending confusing error messages to the console.
+        StreamRedirector stream_redirector;
+
         // Asking for the 4th node on a triangular face should throw.
         unsigned int n = pyr5.which_node_am_i(1, 3);
 
@@ -56,9 +58,6 @@ public:
         CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(-1), n);
       }
     catch (...) {}
-
-    // Restore original stream
-    libMesh::err.rdbuf(errbuf);
 #endif
 
 #ifdef NDEBUG
@@ -88,12 +87,11 @@ public:
     // are available. If exceptions aren't available, libmesh_assert
     // simply aborts, so we can't unit test in that case.
 #if !defined(NDEBUG) && defined(LIBMESH_ENABLE_EXCEPTIONS)
-    // Save the original streambuf and redirect to NULL
-    std::streambuf * errbuf = libMesh::err.rdbuf();
-    libMesh::err.rdbuf(libmesh_nullptr);
-
     try
       {
+        // Avoid sending confusing error messages to the console.
+        StreamRedirector stream_redirector;
+
         // Asks for the 3rd node on a Tri face which only has
         // indices 0, 1, and 2. Should throw an exception
         // (libmesh_assert throws an exception) when NDEBUG is not
@@ -105,9 +103,6 @@ public:
         CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(-1), n);
       }
     catch (...) {}
-
-    // Restore original stream
-    libMesh::err.rdbuf(errbuf);
 #endif
 
 #ifdef NDEBUG
