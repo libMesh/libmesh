@@ -11,6 +11,7 @@ LIBS         = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS)
 unit_tests_sources = \
   driver.C \
   test_comm.h \
+  stream_redirector.h \
   base/dof_object_test.h \
   base/default_coupling_test.C \
   base/getpot_test.C \
