@@ -92,6 +92,12 @@ namespace Parallel {
   {                                                                     \
   }
 
+#define LIBMESH_PARALLEL_FLOAT_OPS(cxxtype)                             \
+  template<>                                                            \
+  class OpFunction<cxxtype>                                             \
+  {                                                                     \
+  }
+
 #endif
 
 #define LIBMESH_INT_TYPE(cxxtype,mpitype)                               \
