@@ -94,8 +94,8 @@ Nemesis_IO::Nemesis_IO (MeshBase & mesh,
   ParallelObject (mesh),
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   nemhelper(new Nemesis_IO_Helper(*this, false, single_precision)),
-#endif
   _timestep(1),
+#endif
   _verbose (false),
   _append(false)
 {
