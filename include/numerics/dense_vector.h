@@ -451,7 +451,9 @@ typename CompareTypes<T, T2>::supertype DenseVector<T>::dot (const DenseVector<T
   const int N = cast_int<int>(_val.size());
   // The following pragma tells clang's vectorizer that it is safe to
   // reorder floating point operations for this loop.
+#ifdef __clang__
 #pragma clang loop vectorize(enable)
+#endif
   for (int i=0; i<N; i++)
     val += (*this)(i)*libmesh_conj(vec(i));
 
@@ -612,7 +614,9 @@ Real DenseVector<T>::l2_norm () const
   const int N = cast_int<int>(_val.size());
   // The following pragma tells clang's vectorizer that it is safe to
   // reorder floating point operations for this loop.
+#ifdef __clang__
 #pragma clang loop vectorize(enable)
+#endif
   for (int i=0; i!=N; i++)
     my_norm += TensorTools::norm_sq((*this)(i));
 
