@@ -1078,7 +1078,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TYPE_TRAITS],
   ])
 
 
-AC_DEFUN([LIBMESH_TEST_CXX11_INVERSE_HYPERBOLIC_FUNCS],
+AC_DEFUN([LIBMESH_TEST_CXX11_MATH_FUNCS],
   [
     have_cxx11_inverse_hyperbolic_sine=no
     have_cxx11_inverse_hyperbolic_cosine=no
@@ -1214,6 +1214,25 @@ AC_DEFUN([LIBMESH_TEST_CXX11_INVERSE_HYPERBOLIC_FUNCS],
       AC_MSG_RESULT(no)
     ])
 
+    # Test for erf
+    AC_MSG_CHECKING(for C++11 std::erf support in <cmath>)
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+      @%:@include <cmath>
+    ]], [[
+      double val = std::erf(1.);
+    ]])],[
+      if (test "x$enablecxx11" = "xyes"); then
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_ERF, 1, [Flag indicating whether compiler supports std::erf])
+        have_cxx11_erf=yes
+      else
+        AC_MSG_RESULT([yes, but disabled.])
+        AC_DEFINE(HAVE_CXX11_ERF_BUT_DISABLED, 1, [Compiler supports std::erf, but it is disabled in libmesh])
+      fi
+    ],[
+      AC_MSG_RESULT(no)
+    ])
+
 
     # Reset the flags
     CXXFLAGS="$old_CXXFLAGS"
@@ -1226,6 +1245,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_INVERSE_HYPERBOLIC_FUNCS],
     AM_CONDITIONAL(HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX, test x$have_cxx11_inverse_hyperbolic_sine_complex == xyes)
     AM_CONDITIONAL(HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX, test x$have_cxx11_inverse_hyperbolic_cosine_complex == xyes)
     AM_CONDITIONAL(HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX, test x$have_cxx11_inverse_hyperbolic_tangent_complex == xyes)
+
+    AM_CONDITIONAL(HAVE_CXX11_ERF, test x$have_cxx11_erf == xyes)
   ])
 
 
