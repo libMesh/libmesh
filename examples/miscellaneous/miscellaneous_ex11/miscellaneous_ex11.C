@@ -79,6 +79,10 @@ int main (int argc, char ** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+  // This example requires a linear solver package.
+  libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
+                           "--enable-petsc, --enable-trilinos, or --enable-eigen");
+
   // Skip this 3D example if libMesh was compiled as 1D/2D-only.
   libmesh_example_requires (3 == LIBMESH_DIM, "3D support");
 
