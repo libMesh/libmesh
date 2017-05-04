@@ -93,6 +93,9 @@ void JumpErrorEstimator::estimate_error (const System & system,
    *  ----------------------
    */
 
+  // This parameter is not used when !LIBMESH_ENABLE_AMR.
+  libmesh_ignore(estimate_parent_error);
+
   // The current mesh
   const MeshBase & mesh = system.get_mesh();
 
@@ -100,7 +103,9 @@ void JumpErrorEstimator::estimate_error (const System & system,
   const unsigned int n_vars = system.n_vars();
 
   // The DofMap for this system
+#ifdef LIBMESH_ENABLE_AMR
   const DofMap & dof_map = system.get_dof_map();
+#endif
 
   // Resize the error_per_cell vector to be
   // the number of elements, initialize it to 0.
