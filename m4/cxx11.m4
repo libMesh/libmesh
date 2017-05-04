@@ -1078,7 +1078,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TYPE_TRAITS],
   ])
 
 
-AC_DEFUN([LIBMESH_TEST_CXX11_INVERSE_HYPERBOLIC_FUNCS],
+AC_DEFUN([LIBMESH_TEST_CXX11_MATH_FUNCS],
   [
     have_cxx11_inverse_hyperbolic_sine=no
     have_cxx11_inverse_hyperbolic_cosine=no
