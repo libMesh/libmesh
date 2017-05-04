@@ -183,11 +183,13 @@ int main (int argc, char ** argv)
   UniquePtr<NumericVector<Number> >
     last_nonlinear_soln (navier_stokes_system.solution->clone());
 
+#ifdef LIBMESH_HAVE_EXODUS_API
   // Since we are not doing adaptivity, write all solutions to a single Exodus file.
   ExodusII_IO exo_io(mesh);
 
   // Write out the initial condition
   exo_io.write_equation_systems ("out.e", equation_systems);
+#endif
 
   for (unsigned int t_step=1; t_step<=n_timesteps; ++t_step)
     {
