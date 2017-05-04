@@ -615,7 +615,7 @@ AC_ARG_ENABLE(cppunit,
                 no)  enablecppunit=no ;;
                 *)  AC_MSG_ERROR(bad value ${enableval} for --enable-cppunit) ;;
               esac],
-              [enablecppunit=$enableoptional])
+              [enablecppunit=yes])
 if (test "$enablecppunit" = yes) ; then
   AM_PATH_CPPUNIT([1.10.0],[enablecppunit=yes],[enablecppunit=no])
 fi
