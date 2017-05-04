@@ -857,9 +857,9 @@ ParsedFEMFunction<Output>::eval (FunctionParserBase<Output> & parser,
 template <typename Output>
 inline
 Output
-ParsedFEMFunction<Output>::eval (char & libmesh_dbg_var(parser),
-                                 const std::string & libmesh_dbg_var(function_name),
-                                 unsigned int libmesh_dbg_var(component_idx)) const
+ParsedFEMFunction<Output>::eval (char & /*parser*/,
+                                 const std::string & /*function_name*/,
+                                 unsigned int /*component_idx*/) const
 {
   libmesh_error_msg("ERROR: This functionality requires fparser!");
   return Output(0);
