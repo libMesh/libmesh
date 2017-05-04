@@ -498,8 +498,11 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
   libMesh::out << "Parametrized functions in training set initialized" << std::endl << std::endl;
 }
 
-void RBEIMConstruction::plot_parametrized_functions_in_training_set(const std::string& pathname)
+void RBEIMConstruction::plot_parametrized_functions_in_training_set(const std::string & pathname)
 {
+  // Ignore unused parameter warnings when Exodus is not available.
+  libmesh_ignore(pathname);
+
   libmesh_assert(_parametrized_functions_in_training_set_initialized);
 
   for (std::size_t i=0; i<_parametrized_functions_in_training_set.size(); i++)
