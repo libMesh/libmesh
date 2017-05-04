@@ -120,6 +120,8 @@ public:
 
   void testRefineThenReinitPreserveFlags()
   {
+    // This test requires AMR support since it sets refinement flags.
+#ifdef LIBMESH_ENABLE_AMR
     Mesh mesh(*TestCommWorld);
     mesh.allow_renumbering(false);
     EquationSystems es(mesh);
@@ -150,6 +152,7 @@ public:
             CPPUNIT_ASSERT_EQUAL(Elem::JUST_REFINED,
                                  elem->child_ptr(c)->refinement_flag());
       }
+#endif
   }
 
 
