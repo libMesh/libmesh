@@ -81,6 +81,10 @@ int main (int argc, char ** argv)
   // Initialize libMesh and any dependent libaries
   LibMeshInit init (argc, argv);
 
+  // This example requires a linear solver package.
+  libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
+                           "--enable-petsc, --enable-trilinos, or --enable-eigen");
+
   // This example NaNs with the Eigen sparse linear solvers
   libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc or --enable-laspack");
 

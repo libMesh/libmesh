@@ -113,6 +113,12 @@ void write_output(EquationSystems & es,
                   std::string solution_type, // primal or adjoint solve
                   FEMParameters & param)
 {
+  // Ignore parameters when there are no output formats available.
+  libmesh_ignore(es);
+  libmesh_ignore(t_step);
+  libmesh_ignore(solution_type);
+  libmesh_ignore(param);
+
 #ifdef LIBMESH_HAVE_GMV
   if (param.output_gmv)
     {

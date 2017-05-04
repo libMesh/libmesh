@@ -94,6 +94,12 @@ void write_output(EquationSystems & es,
                   std::string solution_type, // primal or adjoint solve
                   FEMParameters & param)
 {
+  // Ignore parameters when there are no output formats available.
+  libmesh_ignore(es);
+  libmesh_ignore(a_step);
+  libmesh_ignore(solution_type);
+  libmesh_ignore(param);
+
 #ifdef LIBMESH_HAVE_GMV
   if (param.output_gmv)
     {
@@ -240,6 +246,10 @@ int main (int argc, char** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
+
+  // This example requires a linear solver package.
+  libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
+                           "--enable-petsc, --enable-trilinos, or --enable-eigen");
 
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR

@@ -500,6 +500,10 @@ int main (int argc, char** argv)
 {
   LibMeshInit init(argc, argv);
 
+  // This example requires a linear solver package.
+  libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
+                           "--enable-petsc, --enable-trilinos, or --enable-eigen");
+
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_example_requires(false, "--enable-amr");

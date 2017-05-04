@@ -60,6 +60,10 @@ int main (int argc, char ** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+  // This example requires a linear solver package.
+  libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
+                           "--enable-petsc, --enable-trilinos, or --enable-eigen");
+
   // Parse the input file
   GetPot infile("fem_system_ex3.in");
 
