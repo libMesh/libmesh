@@ -231,8 +231,6 @@ int main (int argc, char ** argv)
                    << std::endl;
 
       current_max_gap_function = std::max(std::abs(least_gap_fn), std::abs(max_gap_fn));
-
-      outer_iteration++;
     }
 
   libMesh::out << "Computing stresses..." << std::endl;
