@@ -130,6 +130,12 @@ public:
     if (!_elem)
       return;
 
+    // These tests require exceptions to be enabled because a
+    // TypeTensor::solve() call down in Elem::contains_point()
+    // actually throws a non-fatal exception for a certain Point which
+    // is not in the Elem. When exceptions are not enabled, this test
+    // simply aborts.
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
     for (unsigned int i=0; i != _nx; ++i)
       for (unsigned int j=0; j != _ny; ++j)
         for (unsigned int k=0; k != _nz; ++k)
@@ -157,6 +163,7 @@ public:
                libmesh_real(x + 0.25*y + 0.0625*z),
                TOLERANCE*TOLERANCE);
           }
+#endif
   }
 
   void testGradU()
@@ -165,6 +172,12 @@ public:
     if (!_elem)
       return;
 
+    // These tests require exceptions to be enabled because a
+    // TypeTensor::solve() call down in Elem::contains_point()
+    // actually throws a non-fatal exception for a certain Point which
+    // is not in the Elem. When exceptions are not enabled, this test
+    // simply aborts.
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
     for (unsigned int i=0; i != _nx; ++i)
       for (unsigned int j=0; j != _ny; ++j)
         for (unsigned int k=0; k != _nz; ++k)
@@ -195,6 +208,7 @@ public:
               CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(grad_u(2)), 0.0625,
                                            TOLERANCE*sqrt(TOLERANCE));
           }
+#endif
   }
 
   void testGradUComp()
@@ -203,6 +217,12 @@ public:
     if (!_elem)
       return;
 
+    // These tests require exceptions to be enabled because a
+    // TypeTensor::solve() call down in Elem::contains_point()
+    // actually throws a non-fatal exception for a certain Point which
+    // is not in the Elem. When exceptions are not enabled, this test
+    // simply aborts.
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
     for (unsigned int i=0; i != _nx; ++i)
       for (unsigned int j=0; j != _ny; ++j)
         for (unsigned int k=0; k != _nz; ++k)
@@ -241,6 +261,7 @@ public:
               CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(grad_u_z), 0.0625,
                                            TOLERANCE*sqrt(TOLERANCE));
           }
+#endif
   }
 
 };
