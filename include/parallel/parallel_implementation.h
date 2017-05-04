@@ -54,6 +54,18 @@ namespace Parallel {
       StandardType(const cxxtype * = libmesh_nullptr) : DataType() {}   \
   }
 
+#define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)                           \
+  template<>                                                            \
+  class OpFunction<cxxtype>                                             \
+  {                                                                     \
+  }
+
+#define LIBMESH_PARALLEL_FLOAT_OPS(cxxtype)                             \
+  template<>                                                            \
+  class OpFunction<cxxtype>                                             \
+  {                                                                     \
+  }
+
 #endif
 
 #define LIBMESH_INT_TYPE(cxxtype,mpitype)                               \
