@@ -1822,7 +1822,7 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
 #ifdef LIBMESH_ENABLE_AMR
       elem->active_family_tree(active_family);
 #else
-      active_family.insert(elem);
+      active_family.push_back(elem);
 #endif
 
       for (std::size_t i=0; i != active_family.size(); ++i)
