@@ -256,6 +256,12 @@
 /* Compiler supports deleted functions, but they are disabled in libmesh */
 #undef HAVE_CXX11_DELETED_FUNCTIONS_BUT_DISABLED
 
+/* Flag indicating whether compiler supports std::erf */
+#undef HAVE_CXX11_ERF
+
+/* Compiler supports std::erf, but it is disabled in libmesh */
+#undef HAVE_CXX11_ERF_BUT_DISABLED
+
 /* Flag indicating whether compiler supports f() final; */
 #undef HAVE_CXX11_FINAL
 

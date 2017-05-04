@@ -907,6 +907,8 @@ HAVE_CXX11_FINAL_FALSE
 HAVE_CXX11_FINAL_TRUE
 HAVE_CXX11_DELETED_FUNCTIONS_FALSE
 HAVE_CXX11_DELETED_FUNCTIONS_TRUE
+HAVE_CXX11_ERF_FALSE
+HAVE_CXX11_ERF_TRUE
 HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_FALSE
 HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_TRUE
 HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX_FALSE
@@ -10648,6 +10650,49 @@ $as_echo "no" >&6; }
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
+    # Test for erf
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::erf support in <cmath>" >&5
+$as_echo_n "checking for C++11 std::erf support in <cmath>... " >&6; }
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+      #include <cmath>
+
+int
+main ()
+{
+
+      double val = std::erf(1.);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+      if (test "x$enablecxx11" = "xyes"); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_ERF 1" >>confdefs.h
+
+        have_cxx11_erf=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_ERF_BUT_DISABLED 1" >>confdefs.h
+
+      fi
+
+else
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
 
     # Reset the flags
     CXXFLAGS="$old_CXXFLAGS"
@@ -10705,6 +10750,15 @@ fi
 else
   HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_TRUE='#'
   HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_FALSE=
+fi
+
+
+     if test x$have_cxx11_erf == xyes; then
+  HAVE_CXX11_ERF_TRUE=
+  HAVE_CXX11_ERF_FALSE='#'
+else
+  HAVE_CXX11_ERF_TRUE='#'
+  HAVE_CXX11_ERF_FALSE=
 fi
 
 
@@ -43465,6 +43519,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_TRUE}" && test -z "${HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_ERF_TRUE}" && test -z "${HAVE_CXX11_ERF_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_ERF\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_DELETED_FUNCTIONS_TRUE}" && test -z "${HAVE_CXX11_DELETED_FUNCTIONS_FALSE}"; then
