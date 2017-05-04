@@ -179,7 +179,9 @@ $(top_builddir)/libmesh_oprof.la: FORCE
 
 
 
+if LIBMESH_ENABLE_CPPUNIT
 TESTS = run_unit_tests.sh
+endif
 
 CLEANFILES = cube_mesh.xdr \
              checkpoint_splitter.cpr* checkpoint_splitter.cpa* \
