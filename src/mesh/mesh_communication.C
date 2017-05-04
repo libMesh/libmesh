@@ -138,6 +138,9 @@ void query_ghosting_functors(const MeshBase & mesh,
                              bool newly_coarsened_only,
                              std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
+  // This parameter is not used when !LIBMESH_ENABLE_AMR.
+  libmesh_ignore(newly_coarsened_only);
+
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_assert(!newly_coarsened_only);
 #endif
@@ -187,6 +190,11 @@ void connect_children(const MeshBase & mesh,
                       processor_id_type pid,
                       std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
+  // None of these parameters are used when !LIBMESH_ENABLE_AMR.
+  libmesh_ignore(mesh);
+  libmesh_ignore(pid);
+  libmesh_ignore(connected_elements);
+
 #ifdef LIBMESH_ENABLE_AMR
   // Our XdrIO output needs inactive local elements to not have any
   // remote_elem children.  Let's make sure that doesn't happen.
@@ -210,6 +218,9 @@ void connect_children(const MeshBase & mesh,
 
 void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
+  // This parameter is not used when !LIBMESH_ENABLE_AMR.
+  libmesh_ignore(connected_elements);
+
 #ifdef LIBMESH_ENABLE_AMR
 
   // Because our set is sorted by ascending level, we can traverse it
