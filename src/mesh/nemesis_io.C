@@ -1320,8 +1320,8 @@ void Nemesis_IO::prepare_to_write_nodal_data (const std::string & fname,
 
 #else
 
-void Nemesis_IO::prepare_to_write_nodal_data (const std::string & fname,
-                                              const std::vector<std::string> & names)
+void Nemesis_IO::prepare_to_write_nodal_data (const std::string &,
+                                              const std::vector<std::string> &)
 {
   libmesh_error_msg("ERROR, Nemesis API is not defined.");
 }
