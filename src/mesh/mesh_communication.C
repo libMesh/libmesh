@@ -928,6 +928,12 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
   if (mesh.is_serial())
     return;
 
+  // This algorithm uses the MeshBase::flagged_pid_elements_begin/end iterators
+  // which are only available when AMR is enabled.
+#ifndef LIBMESH_ENABLE_AMR
+  libmesh_error_msg("Calling MeshCommunication::send_coarse_ghosts() requires AMR to be enabled. "
+                    "Please configure libmesh with --enable-amr.");
+#else
   // When we coarsen elements on a DistributedMesh, we make their
   // parents active.  This may increase the ghosting requirements on
   // the processor which owns the newly-activated parent element.  To
@@ -1084,6 +1090,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
 
   // Wait for all sends to complete
   Parallel::wait (send_requests);
+#endif // LIBMESH_ENABLE_AMR
 }
 
 #endif // LIBMESH_HAVE_MPI
