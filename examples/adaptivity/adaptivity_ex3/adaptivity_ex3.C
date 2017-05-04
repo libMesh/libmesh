@@ -605,8 +605,12 @@ Gradient exact_derivative(const Point & p,
 // account the boundary conditions, which will be handled
 // via a penalty method.
 void assemble_laplace(EquationSystems & es,
-                      const std::string & libmesh_dbg_var(system_name))
+                      const std::string & system_name)
 {
+  // Ignore unused parameter warnings when !LIBMESH_ENABLE_AMR.
+  libmesh_ignore(es);
+  libmesh_ignore(system_name);
+
 #ifdef LIBMESH_ENABLE_AMR
   // It is a good idea to make sure we are assembling
   // the proper system.

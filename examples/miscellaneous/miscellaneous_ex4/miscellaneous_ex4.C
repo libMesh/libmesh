@@ -239,8 +239,12 @@ int main (int argc, char ** argv)
 // computing the proper matrix entries for the element stiffness
 // matrices and right-hand sides.
 void assemble (EquationSystems & es,
-               const std::string & libmesh_dbg_var(system_name))
+               const std::string & system_name)
 {
+  // Ignore unused parameter warnings when !LIBMESH_ENABLE_AMR.
+  libmesh_ignore(es);
+  libmesh_ignore(system_name);
+
 #ifdef LIBMESH_ENABLE_AMR
   // It is a good idea to make sure we are assembling
   // the proper system.
