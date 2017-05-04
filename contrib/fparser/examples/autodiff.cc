@@ -28,7 +28,8 @@ int main()
   std::string function;
   FunctionParserAD fparser;
 
-  std::string func = "2 + 4*x + 8*x^2 + 16*x^3 + 32*x^4";
+  // std::string func = "2 + 4*x + 8*x^2 + 16*x^3 + 32*x^4";
+  std::string func = "erf(x)";
 
   // Parse the input expression into bytecode
   fparser.Parse(func, "x,a");
