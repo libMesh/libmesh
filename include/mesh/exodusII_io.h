@@ -247,7 +247,6 @@ private:
    */
 #ifdef LIBMESH_HAVE_EXODUS_API
   UniquePtr<ExodusII_IO_Helper> exio_helper;
-#endif
 
   /**
    * Stores the current value of the timestep when calling
@@ -261,16 +260,17 @@ private:
   bool _verbose;
 
   /**
-   * The names of the variables to be output.
-   * If this is empty then all variables are output.
-   */
-  std::vector<std::string> _output_variables;
-
-  /**
    * Default false.  If true, files will be opened with EX_WRITE
    * rather than created from scratch when writing.
    */
   bool _append;
+#endif
+
+  /**
+   * The names of the variables to be output.
+   * If this is empty then all variables are output.
+   */
+  std::vector<std::string> _output_variables;
 
   /**
    * This function factors out a bunch of code which is common to the
