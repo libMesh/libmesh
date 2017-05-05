@@ -81,6 +81,7 @@ endif
 check_PROGRAMS = # empty, append below
 noinst_PROGRAMS = # empty, append below
 
+if LIBMESH_ENABLE_CPPUNIT
 if LIBMESH_OPT_MODE
   check_PROGRAMS         += unit_tests-opt
   unit_tests_opt_SOURCES  = $(unit_tests_sources)
@@ -88,12 +89,14 @@ if LIBMESH_OPT_MODE
   unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
   unit_tests_opt_LDADD    = $(top_builddir)/libmesh_opt.la
 endif
+endif
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
 # others segfault and/or hang.  By default we will not run
 # GLIBCXX-debugging builds with cppunit unless specificallly
 # configured to.
+if LIBMESH_ENABLE_CPPUNIT
 if LIBMESH_DBG_MODE
 if LIBMESH_ENABLE_GLIBCXX_DEBUGGING
 if LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT
@@ -109,7 +112,9 @@ endif
   unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
   unit_tests_dbg_LDADD    = $(top_builddir)/libmesh_dbg.la
 endif
+endif
 
+if LIBMESH_ENABLE_CPPUNIT
 if LIBMESH_DEVEL_MODE
   check_PROGRAMS           += unit_tests-devel
   noinst_PROGRAMS          += unit_tests-devel
@@ -118,7 +123,9 @@ if LIBMESH_DEVEL_MODE
   unit_tests_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
   unit_tests_devel_LDADD    = $(top_builddir)/libmesh_devel.la
 endif
+endif
 
+if LIBMESH_ENABLE_CPPUNIT
 if LIBMESH_PROF_MODE
   check_PROGRAMS          += unit_tests-prof
   noinst_PROGRAMS         += unit_tests-prof
@@ -127,7 +134,9 @@ if LIBMESH_PROF_MODE
   unit_tests_prof_CXXFLAGS = $(CXXFLAGS_PROF)
   unit_tests_prof_LDADD    = $(top_builddir)/libmesh_prof.la
 endif
+endif
 
+if LIBMESH_ENABLE_CPPUNIT
 if LIBMESH_OPROF_MODE
   check_PROGRAMS           += unit_tests-oprof
   noinst_PROGRAMS          += unit_tests-oprof
@@ -136,7 +145,7 @@ if LIBMESH_OPROF_MODE
   unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
   unit_tests_oprof_LDADD    = $(top_builddir)/libmesh_oprof.la
 endif
-
+endif
 
 # Recursive automake builds subdirectories before parent directories.
 # But here we need the subdirectory to be able to link to
@@ -170,7 +179,9 @@ $(top_builddir)/libmesh_oprof.la: FORCE
 
 
 
+if LIBMESH_ENABLE_CPPUNIT
 TESTS = run_unit_tests.sh
+endif
 
 CLEANFILES = cube_mesh.xdr \
              checkpoint_splitter.cpr* checkpoint_splitter.cpa* \

@@ -126,13 +126,13 @@ public:
 private:
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   UniquePtr<Nemesis_IO_Helper> nemhelper;
-#endif
 
   /**
    * Keeps track of the current timestep index being written. Used
    * when calling write_nodal_data() and other functions.
    */
   int _timestep;
+#endif
 
   /**
    * Controls whether extra debugging information is printed to the screen or not.

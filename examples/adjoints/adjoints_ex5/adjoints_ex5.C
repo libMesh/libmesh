@@ -113,6 +113,12 @@ void write_output(EquationSystems & es,
                   std::string solution_type, // primal or adjoint solve
                   FEMParameters & param)
 {
+  // Ignore parameters when there are no output formats available.
+  libmesh_ignore(es);
+  libmesh_ignore(t_step);
+  libmesh_ignore(solution_type);
+  libmesh_ignore(param);
+
 #ifdef LIBMESH_HAVE_GMV
   if (param.output_gmv)
     {
@@ -281,10 +287,12 @@ void set_system_parameters(HeatSystem & system,
 }
 
 // The main program.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
+  libmesh_ignore(argc);
+  libmesh_ignore(argv);
   libmesh_example_requires(false, "--enable-amr");
 #else
   // Skip this 2D example if libMesh was compiled as 1D-only.

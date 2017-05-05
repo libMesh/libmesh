@@ -98,22 +98,22 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5) $(am__EXEEXT_6)
 noinst_PROGRAMS = $(am__EXEEXT_7) $(am__EXEEXT_4) $(am__EXEEXT_5) \
 	$(am__EXEEXT_6)
-@LIBMESH_OPT_MODE_TRUE@am__append_2 = unit_tests-opt
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_2 = unit_tests-opt
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
 # others segfault and/or hang.  By default we will not run
 # GLIBCXX-debugging builds with cppunit unless specificallly
 # configured to.
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__append_3 = unit_tests-dbg
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__append_4 = unit_tests-dbg
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__append_5 = unit_tests-dbg
-@LIBMESH_DEVEL_MODE_TRUE@am__append_6 = unit_tests-devel
-@LIBMESH_DEVEL_MODE_TRUE@am__append_7 = unit_tests-devel
-@LIBMESH_PROF_MODE_TRUE@am__append_8 = unit_tests-prof
-@LIBMESH_PROF_MODE_TRUE@am__append_9 = unit_tests-prof
-@LIBMESH_OPROF_MODE_TRUE@am__append_10 = unit_tests-oprof
-@LIBMESH_OPROF_MODE_TRUE@am__append_11 = unit_tests-oprof
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__append_3 = unit_tests-dbg
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__append_4 = unit_tests-dbg
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__append_5 = unit_tests-dbg
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_6 = unit_tests-devel
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_7 = unit_tests-devel
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__append_8 = unit_tests-prof
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__append_9 = unit_tests-prof
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_10 = unit_tests-oprof
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_11 = unit_tests-oprof
 
 ######################################################################
 #
@@ -170,13 +170,13 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES = run_unit_tests.sh
 CONFIG_CLEAN_VPATH_FILES =
-@LIBMESH_OPT_MODE_TRUE@am__EXEEXT_1 = unit_tests-opt$(EXEEXT)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__EXEEXT_3 = unit_tests-dbg$(EXEEXT)
-@LIBMESH_DEVEL_MODE_TRUE@am__EXEEXT_4 = unit_tests-devel$(EXEEXT)
-@LIBMESH_PROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-prof$(EXEEXT)
-@LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_6 = unit_tests-oprof$(EXEEXT)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_7 = unit_tests-dbg$(EXEEXT)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__EXEEXT_1 = unit_tests-opt$(EXEEXT)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__EXEEXT_3 = unit_tests-dbg$(EXEEXT)
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_4 = unit_tests-devel$(EXEEXT)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-prof$(EXEEXT)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_6 = unit_tests-oprof$(EXEEXT)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_7 = unit_tests-dbg$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	stream_redirector.h base/dof_object_test.h \
@@ -267,10 +267,9 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	systems/unit_tests_dbg-systems_test.$(OBJEXT) \
 	utils/unit_tests_dbg-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_dbg-vectormap_test.$(OBJEXT) $(am__objects_1)
-@LIBMESH_DBG_MODE_TRUE@am_unit_tests_dbg_OBJECTS = $(am__objects_2)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am_unit_tests_dbg_OBJECTS = $(am__objects_2)
 unit_tests_dbg_OBJECTS = $(am_unit_tests_dbg_OBJECTS)
-@LIBMESH_DBG_MODE_TRUE@unit_tests_dbg_DEPENDENCIES =  \
-@LIBMESH_DBG_MODE_TRUE@	$(top_builddir)/libmesh_dbg.la
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_DEPENDENCIES = $(top_builddir)/libmesh_dbg.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -368,11 +367,9 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	utils/unit_tests_devel-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_devel-vectormap_test.$(OBJEXT) \
 	$(am__objects_3)
-@LIBMESH_DEVEL_MODE_TRUE@am_unit_tests_devel_OBJECTS =  \
-@LIBMESH_DEVEL_MODE_TRUE@	$(am__objects_4)
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am_unit_tests_devel_OBJECTS = $(am__objects_4)
 unit_tests_devel_OBJECTS = $(am_unit_tests_devel_OBJECTS)
-@LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_DEPENDENCIES =  \
-@LIBMESH_DEVEL_MODE_TRUE@	$(top_builddir)/libmesh_devel.la
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_DEPENDENCIES = $(top_builddir)/libmesh_devel.la
 unit_tests_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
@@ -466,11 +463,9 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	utils/unit_tests_oprof-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_oprof-vectormap_test.$(OBJEXT) \
 	$(am__objects_5)
-@LIBMESH_OPROF_MODE_TRUE@am_unit_tests_oprof_OBJECTS =  \
-@LIBMESH_OPROF_MODE_TRUE@	$(am__objects_6)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am_unit_tests_oprof_OBJECTS = $(am__objects_6)
 unit_tests_oprof_OBJECTS = $(am_unit_tests_oprof_OBJECTS)
-@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_DEPENDENCIES =  \
-@LIBMESH_OPROF_MODE_TRUE@	$(top_builddir)/libmesh_oprof.la
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_DEPENDENCIES = $(top_builddir)/libmesh_oprof.la
 unit_tests_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
@@ -563,10 +558,9 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	systems/unit_tests_opt-systems_test.$(OBJEXT) \
 	utils/unit_tests_opt-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_opt-vectormap_test.$(OBJEXT) $(am__objects_7)
-@LIBMESH_OPT_MODE_TRUE@am_unit_tests_opt_OBJECTS = $(am__objects_8)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am_unit_tests_opt_OBJECTS = $(am__objects_8)
 unit_tests_opt_OBJECTS = $(am_unit_tests_opt_OBJECTS)
-@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_DEPENDENCIES =  \
-@LIBMESH_OPT_MODE_TRUE@	$(top_builddir)/libmesh_opt.la
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_DEPENDENCIES = $(top_builddir)/libmesh_opt.la
 unit_tests_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
@@ -660,11 +654,9 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	utils/unit_tests_prof-point_locator_test.$(OBJEXT) \
 	utils/unit_tests_prof-vectormap_test.$(OBJEXT) \
 	$(am__objects_9)
-@LIBMESH_PROF_MODE_TRUE@am_unit_tests_prof_OBJECTS =  \
-@LIBMESH_PROF_MODE_TRUE@	$(am__objects_10)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am_unit_tests_prof_OBJECTS = $(am__objects_10)
 unit_tests_prof_OBJECTS = $(am_unit_tests_prof_OBJECTS)
-@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_DEPENDENCIES =  \
-@LIBMESH_PROF_MODE_TRUE@	$(top_builddir)/libmesh_prof.la
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_DEPENDENCIES = $(top_builddir)/libmesh_prof.la
 unit_tests_prof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
@@ -1119,27 +1111,27 @@ unit_tests_sources = driver.C test_comm.h stream_redirector.h \
 	systems/equation_systems_test.C systems/systems_test.C \
 	utils/point_locator_test.C utils/vectormap_test.C \
 	$(am__append_1)
-@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_SOURCES = $(unit_tests_sources)
-@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
-@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
-@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_LDADD = $(top_builddir)/libmesh_opt.la
-@LIBMESH_DBG_MODE_TRUE@unit_tests_dbg_SOURCES = $(unit_tests_sources)
-@LIBMESH_DBG_MODE_TRUE@unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
-@LIBMESH_DBG_MODE_TRUE@unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
-@LIBMESH_DBG_MODE_TRUE@unit_tests_dbg_LDADD = $(top_builddir)/libmesh_dbg.la
-@LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_SOURCES = $(unit_tests_sources)
-@LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
-@LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
-@LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_LDADD = $(top_builddir)/libmesh_devel.la
-@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_SOURCES = $(unit_tests_sources)
-@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
-@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_CXXFLAGS = $(CXXFLAGS_PROF)
-@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_LDADD = $(top_builddir)/libmesh_prof.la
-@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_SOURCES = $(unit_tests_sources)
-@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
-@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
-@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_LDADD = $(top_builddir)/libmesh_oprof.la
-TESTS = run_unit_tests.sh
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_SOURCES = $(unit_tests_sources)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_LDADD = $(top_builddir)/libmesh_opt.la
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_SOURCES = $(unit_tests_sources)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_LDADD = $(top_builddir)/libmesh_dbg.la
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_SOURCES = $(unit_tests_sources)
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_devel_LDADD = $(top_builddir)/libmesh_devel.la
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_SOURCES = $(unit_tests_sources)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_CXXFLAGS = $(CXXFLAGS_PROF)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_LDADD = $(top_builddir)/libmesh_prof.la
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_SOURCES = $(unit_tests_sources)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_LDADD = $(top_builddir)/libmesh_oprof.la
+@LIBMESH_ENABLE_CPPUNIT_TRUE@TESTS = run_unit_tests.sh
 CLEANFILES = cube_mesh.xdr checkpoint_splitter.cpr* \
 	checkpoint_splitter.cpa* slit_mesh.xda slit_solution.xda \
 	$(am__append_12)

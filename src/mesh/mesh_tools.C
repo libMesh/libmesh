@@ -1433,6 +1433,9 @@ void libmesh_assert_valid_unique_ids(const MeshBase &mesh)
 template <>
 void libmesh_assert_topology_consistent_procids<Elem>(const MeshBase & mesh)
 {
+  // This parameter is not used when !LIBMESH_ENABLE_AMR
+  libmesh_ignore(mesh);
+
   // If we're adaptively refining, check processor ids for consistency
   // between parents and children.
 #ifdef LIBMESH_ENABLE_AMR

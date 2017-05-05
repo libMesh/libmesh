@@ -105,6 +105,10 @@ int main (int argc, char ** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+  // This example requires a linear solver package.
+  libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
+                           "--enable-petsc, --enable-trilinos, or --enable-eigen");
+
   // This example requires Adaptive Mesh Refinement support - although
   // it only refines uniformly, the refinement code used is the same
   // underneath
@@ -286,8 +290,12 @@ void init_cd (EquationSystems & es,
 // by the EquationSystems object at each timestep to assemble
 // the linear system for solution.
 void assemble_cd (EquationSystems & es,
-                  const std::string & libmesh_dbg_var(system_name))
+                  const std::string & system_name)
 {
+  // Ignore unused parameter warnings when !LIBMESH_ENABLE_AMR.
+  libmesh_ignore(es);
+  libmesh_ignore(system_name);
+
 #ifdef LIBMESH_ENABLE_AMR
   // It is a good idea to make sure we are assembling
   // the proper system.

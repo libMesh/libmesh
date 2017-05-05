@@ -94,8 +94,8 @@ Nemesis_IO::Nemesis_IO (MeshBase & mesh,
   ParallelObject (mesh),
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
   nemhelper(new Nemesis_IO_Helper(*this, false, single_precision)),
-#endif
   _timestep(1),
+#endif
   _verbose (false),
   _append(false)
 {
@@ -1320,8 +1320,8 @@ void Nemesis_IO::prepare_to_write_nodal_data (const std::string & fname,
 
 #else
 
-void Nemesis_IO::prepare_to_write_nodal_data (const std::string & fname,
-                                              const std::vector<std::string> & names)
+void Nemesis_IO::prepare_to_write_nodal_data (const std::string &,
+                                              const std::vector<std::string> &)
 {
   libmesh_error_msg("ERROR, Nemesis API is not defined.");
 }

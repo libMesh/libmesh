@@ -56,10 +56,10 @@ ExodusII_IO::ExodusII_IO (MeshBase & mesh,
   ParallelObject(mesh),
 #ifdef LIBMESH_HAVE_EXODUS_API
   exio_helper(new ExodusII_IO_Helper(*this, false, true, single_precision)),
-#endif
   _timestep(1),
   _verbose(false),
   _append(false),
+#endif
   _allow_empty_variables(false)
 {
 }

@@ -1,15 +1,14 @@
 Please use the following reference to cite libMesh:
 
 @Article{libMeshPaper,
-   author = {B.~S.~Kirk and J.~W.~Peterson and R.~H.~Stogner and G.~F.~Carey},
-    title = {{\texttt{libMesh}: A C++ Library for Parallel Adaptive Mesh
-              Refinement/Coarsening Simulations}},
+  author  = {B.~S.~Kirk and J.~W.~Peterson and R.~H.~Stogner and G.~F.~Carey},
+  title   = {{\texttt{libMesh}: A C++ library for parallel adaptive mesh refinement/coarsening simulations}},
   journal = {Engineering with Computers},
-   volume = {22},
-   number = {3--4},
-    pages = {237--254},
-     year = {2006},
-     note = {\url{http://dx.doi.org/10.1007/s00366-006-0049-3}}
+  volume  = 22,
+  number  = {3--4},
+  pages   = {237--254},
+  year    = 2006,
+  note    = {\url{http://dx.doi.org/10.1007/s00366-006-0049-3}}
 }
 
 B. S. Kirk, J. W. Peterson, R. H. Stogner, and G. F. Carey, "libMesh:

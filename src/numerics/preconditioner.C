@@ -38,6 +38,9 @@ Preconditioner<T> *
 Preconditioner<T>::build(const libMesh::Parallel::Communicator & comm,
                          const SolverPackage solver_package)
 {
+  // Avoid unused parameter warnings when no solver packages are enabled.
+  libmesh_ignore(comm);
+
   // Build the appropriate solver
   switch (solver_package)
     {

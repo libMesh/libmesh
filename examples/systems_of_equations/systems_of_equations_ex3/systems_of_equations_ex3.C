@@ -81,6 +81,10 @@ int main (int argc, char ** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+  // This example requires a linear solver package.
+  libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
+                           "--enable-petsc, --enable-trilinos, or --enable-eigen");
+
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
@@ -179,11 +183,13 @@ int main (int argc, char ** argv)
   UniquePtr<NumericVector<Number> >
     last_nonlinear_soln (navier_stokes_system.solution->clone());
 
+#ifdef LIBMESH_HAVE_EXODUS_API
   // Since we are not doing adaptivity, write all solutions to a single Exodus file.
   ExodusII_IO exo_io(mesh);
 
   // Write out the initial condition
   exo_io.write_equation_systems ("out.e", equation_systems);
+#endif
 
   for (unsigned int t_step=1; t_step<=n_timesteps; ++t_step)
     {

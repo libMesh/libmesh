@@ -42587,7 +42587,7 @@ if test "${enable_cppunit+set}" = set; then :
                 *)  as_fn_error $? "bad value ${enableval} for --enable-cppunit" "$LINENO" 5 ;;
               esac
 else
-  enablecppunit=$enableoptional
+  enablecppunit=yes
 fi
 
 if (test "$enablecppunit" = yes) ; then

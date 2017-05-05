@@ -101,6 +101,10 @@ int main (int argc, char** argv)
   // Initialize libraries, like in example 2.
   LibMeshInit init (argc, argv);
 
+  // This example requires a linear solver package.
+  libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
+                           "--enable-petsc, --enable-trilinos, or --enable-eigen");
+
   // Check for proper usage.
   if (argc < 2)
     libmesh_error_msg("Usage: " << argv[0] << " [meshfile]");

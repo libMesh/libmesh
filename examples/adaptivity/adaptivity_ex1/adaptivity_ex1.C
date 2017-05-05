@@ -65,6 +65,10 @@ int main(int argc, char ** argv)
   // finalized.
   LibMeshInit init (argc, argv);
 
+  // This example requires a linear solver package.
+  libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
+                           "--enable-petsc, --enable-trilinos, or --enable-eigen");
+
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_example_requires(false, "--enable-amr");
@@ -177,8 +181,11 @@ int main(int argc, char ** argv)
 
 // Define the matrix assembly function for the 1D PDE we are solving
 void assemble_1D(EquationSystems & es,
-                 const std::string & libmesh_dbg_var(system_name))
+                 const std::string & system_name)
 {
+  // Ignore unused parameter warnings when !LIBMESH_ENABLE_AMR.
+  libmesh_ignore(es);
+  libmesh_ignore(system_name);
 
 #ifdef LIBMESH_ENABLE_AMR
 

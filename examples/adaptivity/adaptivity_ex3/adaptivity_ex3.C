@@ -118,6 +118,10 @@ int main(int argc, char ** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+  // This example requires a linear solver package.
+  libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
+                           "--enable-petsc, --enable-trilinos, or --enable-eigen");
+
   // Single precision is inadequate for p refinement
   libmesh_example_requires(sizeof(Real) > 4, "--disable-singleprecision");
 
@@ -605,8 +609,12 @@ Gradient exact_derivative(const Point & p,
 // account the boundary conditions, which will be handled
 // via a penalty method.
 void assemble_laplace(EquationSystems & es,
-                      const std::string & libmesh_dbg_var(system_name))
+                      const std::string & system_name)
 {
+  // Ignore unused parameter warnings when !LIBMESH_ENABLE_AMR.
+  libmesh_ignore(es);
+  libmesh_ignore(system_name);
+
 #ifdef LIBMESH_ENABLE_AMR
   // It is a good idea to make sure we are assembling
   // the proper system.

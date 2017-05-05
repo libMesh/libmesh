@@ -138,6 +138,9 @@ void query_ghosting_functors(const MeshBase & mesh,
                              bool newly_coarsened_only,
                              std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
+  // This parameter is not used when !LIBMESH_ENABLE_AMR.
+  libmesh_ignore(newly_coarsened_only);
+
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_assert(!newly_coarsened_only);
 #endif
@@ -187,6 +190,11 @@ void connect_children(const MeshBase & mesh,
                       processor_id_type pid,
                       std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
+  // None of these parameters are used when !LIBMESH_ENABLE_AMR.
+  libmesh_ignore(mesh);
+  libmesh_ignore(pid);
+  libmesh_ignore(connected_elements);
+
 #ifdef LIBMESH_ENABLE_AMR
   // Our XdrIO output needs inactive local elements to not have any
   // remote_elem children.  Let's make sure that doesn't happen.
@@ -210,6 +218,9 @@ void connect_children(const MeshBase & mesh,
 
 void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
 {
+  // This parameter is not used when !LIBMESH_ENABLE_AMR.
+  libmesh_ignore(connected_elements);
+
 #ifdef LIBMESH_ENABLE_AMR
 
   // Because our set is sorted by ascending level, we can traverse it
@@ -917,6 +928,12 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
   if (mesh.is_serial())
     return;
 
+  // This algorithm uses the MeshBase::flagged_pid_elements_begin/end iterators
+  // which are only available when AMR is enabled.
+#ifndef LIBMESH_ENABLE_AMR
+  libmesh_error_msg("Calling MeshCommunication::send_coarse_ghosts() requires AMR to be enabled. "
+                    "Please configure libmesh with --enable-amr.");
+#else
   // When we coarsen elements on a DistributedMesh, we make their
   // parents active.  This may increase the ghosting requirements on
   // the processor which owns the newly-activated parent element.  To
@@ -1073,6 +1090,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
 
   // Wait for all sends to complete
   Parallel::wait (send_requests);
+#endif // LIBMESH_ENABLE_AMR
 }
 
 #endif // LIBMESH_HAVE_MPI
@@ -1804,7 +1822,7 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
 #ifdef LIBMESH_ENABLE_AMR
       elem->active_family_tree(active_family);
 #else
-      active_family.insert(elem);
+      active_family.push_back(elem);
 #endif
 
       for (std::size_t i=0; i != active_family.size(); ++i)
