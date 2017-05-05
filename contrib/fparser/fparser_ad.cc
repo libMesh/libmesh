@@ -941,7 +941,14 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
         }
         else if (function == mFErf)
         {
+#if LIBMESH_HAVE_CXX11_ERF
           ccfile << "s[" << sp << "] = std::erf(s[" << sp << "]);\n";
+#else
+          std::cerr << "Libmesh is not compiled with c++11 so std::erf is not supported by JIT.\n";
+          ccfile.close();
+          std::remove(ccname);
+          return false;
+#endif
         }
         else
         {
