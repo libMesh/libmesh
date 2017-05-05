@@ -98,6 +98,7 @@ FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& 
     FunctionParserBase<Value_t>(cpy),
     compiledFunction(cpy.compiledFunction),
     mFPlog(cpy.mFPlog),
+    mFErf(cpy.mFErf),
     mADFlags(cpy.mADFlags),
     mRegisteredDerivatives(cpy.mRegisteredDerivatives),
     ad(new ADImplementation<Value_t>(this))
@@ -468,7 +469,7 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::D(cons
       }
       else if (func.GetFuncNo() == this->parser->mFErf)
       {
-        return D(a) * CodeTreeAD(Value_t(2) / Value_t(M_PI)) * MakeTree(cExp, -(a*a));
+        return D(a) * CodeTreeAD(Value_t(2) / fp_sqrt<Value_t>(M_PI)) * MakeTree(cExp, -(a*a));
       }
       // fall through to undefined
 
