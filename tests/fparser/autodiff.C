@@ -128,6 +128,7 @@ public:
     tests.push_back(ADTest("0.767^sin(x)", -1.5, 1.5));
     tests.push_back(ADTest("A := sin(x) + tanh(x); A + sqrt(A) - x", -1.5, 1.5));
     tests.push_back(ADTest("3*sin(2*x)*sin(2*x)", -5.0, 5.0, 1e-7, 1e-5, 100));
+    tests.push_back(ADTest("erf(0.5*x)", -2., 2., 1e-6, 1e-5, 100));
   }
 
   void runTests()
