@@ -111,10 +111,14 @@ protected:
   /**
    * Copy assignment operator does nothing - we're copying an
    * already-allocated object over an already-allocated object, so the
-   * counts for this class shouldn't change.
+   * counts for this class shouldn't change. There are also no non-static
+   * members in this or the base class to copy, so there is nothing
+   * for us to actually do.
    */
   ReferenceCountedObject & operator= (const ReferenceCountedObject & /*other*/)
-  {}
+  {
+    return *this;
+  }
 
 
 public:
