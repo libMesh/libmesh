@@ -45,18 +45,6 @@ extern double erfcx(double x); // special case for real x
 extern std::complex<double> erf(std::complex<double> z, double relerr=0);
 extern double erf(double x); // special case for real x
 
-// compute erfi(z) = -i erf(iz), the imaginary error function
-extern std::complex<double> erfi(std::complex<double> z, double relerr=0);
-extern double erfi(double x); // special case for real x
-
-// compute erfc(z) = 1 - erf(z), the complementary error function
-extern std::complex<double> erfc(std::complex<double> z, double relerr=0);
-extern double erfc(double x); // special case for real x
-
-// compute Dawson(z) = sqrt(pi)/2  *  exp(-z^2) * erfi(z)
-extern std::complex<double> Dawson(std::complex<double> z, double relerr=0);
-extern double Dawson(double x); // special case for real x
-
 } // namespace Faddeeva
 
 #endif // FADDEEVA_HH
