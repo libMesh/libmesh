@@ -3,6 +3,7 @@
 #include "extrasrc/fptypes.hh"
 #include "extrasrc/fpaux.hh"
 #include <stdlib.h>
+#include "Faddeeva.hh"
 
 using namespace FUNCTIONPARSERTYPES;
 
@@ -117,90 +118,30 @@ Value_t FunctionParserADBase<Value_t>::fp_plog(const Value_t * params)
 template <typename Value_t>
 Value_t FunctionParserADBase<Value_t>::fp_erf(const Value_t * params)
 {
-  const Value_t x = params[0];
-  return std::erf(x);
-}
-
-// Derivation of these complex method can be found here: https://math.stackexchange.com/a/712568/408963
-
-template<>
-std::complex<double>
-FunctionParserADBase<std::complex<double>>::fp_erf(const std::complex<double> * params)
-{
-  const std::complex<double> z = params[0];
-  double x = z.real(), y = z.imag();
-  double fx = std::erf(x) + std::exp(-(x*x)) / (2. * M_PI) * (1. - std::cos(2. * x * y));
-  double fy = std::exp(-(x*x)) / (2. * M_PI) * std::sin(2. * x * y);
-
-  // Set this to as high as you want for greater accuracy
-  unsigned n = 3;
-  for (unsigned k = 1; k <= n; k++)
-  {
-    double fxk = 2. * x * (1. - std::cos(2. * x * y) * std::cosh(k * y))
-      + k * std::sin(2. * x * y) * std::sinh(k * y);
-    double fyk = 2. * x * std::sin(2. * x * y) * std::cosh(k * y)
-      + k * std::cos(2. * x * y) * std::sinh(k * y);
-    double mult = 2. / M_PI * std::exp(-(x*x)) * std::exp(-k*k / 4.) / (k*k + 4. * x*x);
-    fx += mult * fxk;
-    fy += mult * fyk;
-  }
-
-  std::complex<double> f (fx, fy);
-  return f;
+  const Value_t z = params[0];
+  return Faddeeva::erf(z);
 }
 
 template<>
-std::complex<float>
-FunctionParserADBase<std::complex<float>>::fp_erf(const std::complex<float> * params)
+std::complex<float> FunctionParserADBase<std::complex<float>>::fp_erf(const std::complex<float> * params)
 {
-  const std::complex<float> z = params[0];
-  float x = z.real(), y = z.imag();
-  double fx = std::erf(x) + std::exp(-(x*x)) / (2. * M_PI) * (1. - std::cos(2. * x * y));
-  double fy = std::exp(-(x*x)) / (2. * M_PI) * std::sin(2. * x * y);
-
-  // Set this to as high as you want for greater accuracy
-  unsigned n = 3;
-  for (unsigned k = 1; k <= n; k++)
-  {
-    double fxk = 2. * x * (1. - std::cos(2. * x * y) * std::cosh(k * y))
-      + k * std::sin(2. * x * y) * std::sinh(k * y);
-    double fyk = 2. * x * std::sin(2. * x * y) * std::cosh(k * y)
-      + k * std::cos(2. * x * y) * std::sinh(k * y);
-    double mult = 2. / M_PI * std::exp(-(x*x)) * std::exp(-k*k / 4.) / (k*k + 4. * x*x);
-    fx += mult * fxk;
-    fy += mult * fyk;
-  }
-
-  std::complex<float> f (fx, fy);
-  return f;
+  const std::complex<float> zf = params[0];
+  std::complex<double> erfd = Faddeeva::erf(zf);
+  float erffx = erfd.real(), erffy = erfd.imag();
+  std::complex<float> erff (erffx, erffy);
+  return erff;
 }
 
 template<>
-std::complex<long double>
-FunctionParserADBase<std::complex<long double>>::fp_erf(const std::complex<long double> * params)
+std::complex<long double> FunctionParserADBase<std::complex<long double>>::fp_erf(const std::complex<long double> * params)
 {
-  const std::complex<long double> z = params[0];
-  long double x = z.real(), y = z.imag();
-  long double fx = std::erf(x) + std::exp(-(x*x)) / ((long double) 2 * M_PI)
-    * ((long double) 1 - std::cos((long double) 2 * x * y));
-  long double fy = std::exp(-(x*x)) / ((long double) 2 * M_PI) * std::sin((long double) 2 * x * y);
-
-  // Set this to as high as you want for greater accuracy
-  unsigned n = 3;
-  for (unsigned k = 1; k <= n; k++)
-  {
-    long double fxk = (long double) 2 * x * ((long double) 1 - std::cos((long double) 2 * x * y) * std::cosh(k * y))
-      + k * std::sin((long double) 2 * x * y) * std::sinh(k * y);
-    long double fyk = (long double) 2 * x * std::sin((long double) 2 * x * y) * std::cosh(k * y)
-      + k * std::cos((long double) 2 * x * y) * std::sinh(k * y);
-    long double mult = (long double) 2 / M_PI * std::exp(-(x*x))
-      * std::exp(-k*k / (long double) 4) / (k*k + (long double) 4 * x*x);
-    fx += mult * fxk;
-    fy += mult * fyk;
-  }
-
-  std::complex<long double> f (fx, fy);
-  return f;
+  const std::complex<long double> zld = params[0];
+  double zdx = (double) zld.real(), zdy = (double) zld.imag();
+  std::complex<double> zd (zdx, zdy);
+  std::complex<double> erfd = Faddeeva::erf(zd);
+  long double erfldx = erfd.real(), erfldy = erfd.imag();
+  std::complex<long double> erfld (erfldx, erfldy);
+  return erfld;
 }
 
 template<typename Value_t>
