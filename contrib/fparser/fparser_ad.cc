@@ -118,30 +118,27 @@ Value_t FunctionParserADBase<Value_t>::fp_plog(const Value_t * params)
 template <typename Value_t>
 Value_t FunctionParserADBase<Value_t>::fp_erf(const Value_t * params)
 {
-  const Value_t z = params[0];
-  return Faddeeva::erf(z);
+  return Faddeeva::erf(params[0]);
 }
 
 template<>
-std::complex<float> FunctionParserADBase<std::complex<float>>::fp_erf(const std::complex<float> * params)
+std::complex<float>
+FunctionParserADBase<std::complex<float> >::fp_erf(const std::complex<float> * params)
 {
-  const std::complex<float> zf = params[0];
-  std::complex<double> erfd = Faddeeva::erf(zf);
-  float erffx = erfd.real(), erffy = erfd.imag();
-  std::complex<float> erff (erffx, erffy);
-  return erff;
+  std::complex<double> result =
+    Faddeeva::erf(std::complex<double>(params[0].real(),
+                                       params[0].imag()));
+  return std::complex<float>(result.real(), result.imag());
 }
 
 template<>
-std::complex<long double> FunctionParserADBase<std::complex<long double>>::fp_erf(const std::complex<long double> * params)
+std::complex<long double>
+FunctionParserADBase<std::complex<long double> >::fp_erf(const std::complex<long double> * params)
 {
-  const std::complex<long double> zld = params[0];
-  double zdx = (double) zld.real(), zdy = (double) zld.imag();
-  std::complex<double> zd (zdx, zdy);
-  std::complex<double> erfd = Faddeeva::erf(zd);
-  long double erfldx = erfd.real(), erfldy = erfd.imag();
-  std::complex<long double> erfld (erfldx, erfldy);
-  return erfld;
+  std::complex<double> result =
+    Faddeeva::erf(std::complex<double>(params[0].real(),
+                                       params[0].imag()));
+  return std::complex<long double>(result.real(), result.imag());
 }
 
 template<typename Value_t>
