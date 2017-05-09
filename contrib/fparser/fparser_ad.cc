@@ -3,6 +3,7 @@
 #include "extrasrc/fptypes.hh"
 #include "extrasrc/fpaux.hh"
 #include <stdlib.h>
+#include "Faddeeva.hh"
 
 using namespace FUNCTIONPARSERTYPES;
 
@@ -89,6 +90,8 @@ FunctionParserADBase<Value_t>::FunctionParserADBase() :
     ad(new ADImplementation<Value_t>(this))
 {
   this->AddFunction("plog", fp_plog, 2);
+  mFErf = this->mData->mFuncPtrs.size();
+  this->AddFunction("erf", fp_erf, 1);
 }
 
 template<typename Value_t>
@@ -96,6 +99,7 @@ FunctionParserADBase<Value_t>::FunctionParserADBase(const FunctionParserADBase& 
     FunctionParserBase<Value_t>(cpy),
     compiledFunction(cpy.compiledFunction),
     mFPlog(cpy.mFPlog),
+    mFErf(cpy.mFErf),
     mADFlags(cpy.mADFlags),
     mRegisteredDerivatives(cpy.mRegisteredDerivatives),
     ad(new ADImplementation<Value_t>(this))
@@ -109,6 +113,32 @@ Value_t FunctionParserADBase<Value_t>::fp_plog(const Value_t * params)
   const Value_t x = params[0];
   const Value_t a = params[1];
   return x < a ? fp_log(a) + (x-a)/a - (x-a)*(x-a)/(Value_t(2)*a*a) + (x-a)*(x-a)*(x-a)/(Value_t(3)*a*a*a) : fp_log(x);
+}
+
+template <typename Value_t>
+Value_t FunctionParserADBase<Value_t>::fp_erf(const Value_t * params)
+{
+  return Faddeeva::erf(params[0]);
+}
+
+template<>
+std::complex<float>
+FunctionParserADBase<std::complex<float> >::fp_erf(const std::complex<float> * params)
+{
+  std::complex<double> result =
+    Faddeeva::erf(std::complex<double>(params[0].real(),
+                                       params[0].imag()));
+  return std::complex<float>(result.real(), result.imag());
+}
+
+template<>
+std::complex<long double>
+FunctionParserADBase<std::complex<long double> >::fp_erf(const std::complex<long double> * params)
+{
+  std::complex<double> result =
+    Faddeeva::erf(std::complex<double>(params[0].real(),
+                                       params[0].imag()));
+  return std::complex<long double>(result.real(), result.imag());
 }
 
 template<typename Value_t>
@@ -374,6 +404,10 @@ typename ADImplementation<Value_t>::CodeTreeAD ADImplementation<Value_t>::D(cons
             + MakeTree(cPow, b, CodeTreeAD(-3)) * MakeTree(cSqr, a-b),
             MakeTree(cInv, a)
         );
+      }
+      else if (func.GetFuncNo() == this->parser->mFErf)
+      {
+        return D(a) * CodeTreeAD(Value_t(2) / fp_sqrt<Value_t>(M_PI)) * MakeTree(cExp, -(a*a));
       }
       // fall through to undefined
 
@@ -842,6 +876,17 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
           // --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "]) + (s[" << sp << "] - s[" << (sp+1) << "]) / s[" << (sp+1) << "] : std::log(s[" << sp << "]);\n";
           // --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "]) - 1.5 + 2.0/s[" << (sp+1) << "] * s[" << sp << "] - 0.5/(s[" << (sp+1) << "]*s[" << (sp+1) << "]) * s[" << sp << "]*s[" << sp << "] : std::log(s[" << sp << "]);\n";
           --sp; ccfile << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "])  +  (s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "]  -  std::pow((s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "],2.0)/2.0  +  std::pow((s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "],3.0)/3.0 : std::log(s[" << sp << "]);\n";
+        }
+        else if (function == mFErf)
+        {
+#if LIBMESH_HAVE_CXX11_ERF
+          ccfile << "s[" << sp << "] = std::erf(s[" << sp << "]);\n";
+#else
+          std::cerr << "Libmesh is not compiled with c++11 so std::erf is not supported by JIT.\n";
+          ccfile.close();
+          std::remove(ccname);
+          return false;
+#endif
         }
         else
         {

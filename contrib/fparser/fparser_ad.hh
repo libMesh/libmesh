@@ -130,8 +130,14 @@ private:
   // user function plog
   static Value_t fp_plog(const Value_t * params);
 
+  // user function erf
+  static Value_t fp_erf(const Value_t * params);
+
   // function ID for the plog function
   unsigned int mFPlog;
+
+  // function ID for the erf function
+  unsigned int mFErf;
 
   // flags that control cache bahavior, optimization, and error reporting
   int mADFlags;

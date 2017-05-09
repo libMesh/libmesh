@@ -98,10 +98,10 @@ FPOPTIMIZER_CC_FILES=\
 EXTRA_DIST += $(FPOPTIMIZER_CC_FILES) fpoptimizer/fpoptimizer_header.txt fpoptimizer/fpoptimizer_footer.txt
 
 
-pkg_sources = fparser.cc fparser_ad.cc
+pkg_sources = fparser.cc fparser_ad.cc Faddeeva.cc
 if FPARSER_SUPPORT_JIT
   pkg_sources += lib/sha1.cpp
-  pkg_cppflags += -DFPARSER_JIT_COMPILER="\"$(CXX)\""
+  pkg_cppflags += -DFPARSER_JIT_COMPILER="\"$(CXX) $(CXXFLAGS)\""
 endif
 
 pkg_cppflags += $(FEATURE_FLAGS)

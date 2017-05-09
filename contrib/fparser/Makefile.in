@@ -98,7 +98,7 @@ target_triplet = @target@
 @HAVE_CXX11_MOVE_TRUE@am__append_2 = -DFP_SUPPORT_CXX11_MOVE
 noinst_PROGRAMS = $(am__EXEEXT_1)
 @FPARSER_SUPPORT_JIT_TRUE@am__append_3 = lib/sha1.cpp
-@FPARSER_SUPPORT_JIT_TRUE@am__append_4 = -DFPARSER_JIT_COMPILER="\"$(CXX)\""
+@FPARSER_SUPPORT_JIT_TRUE@am__append_4 = -DFPARSER_JIT_COMPILER="\"$(CXX) $(CXXFLAGS)\""
 @FPARSER_DEVEL_TRUE@am__append_5 = fpoptimizer/grammar_data.cc
 @FPARSER_DEVEL_TRUE@am__append_6 = util/tree_grammar_parser \
 @FPARSER_DEVEL_TRUE@	util/bytecoderules_parser
@@ -164,8 +164,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libdbg_la_DEPENDENCIES =
-am__libdbg_la_SOURCES_DIST = fparser.cc fparser_ad.cc lib/sha1.cpp \
-	lib/crc32.hh lib/autoptr.hh lib/functional.hh \
+am__libdbg_la_SOURCES_DIST = fparser.cc fparser_ad.cc Faddeeva.cc \
+	lib/sha1.cpp lib/crc32.hh lib/autoptr.hh lib/functional.hh \
 	fpoptimizer/hash.hh fpoptimizer/codetree.hh \
 	fpoptimizer/grammar.hh fpoptimizer/consts.hh \
 	fpoptimizer/optimize.hh fpoptimizer/opcodename.hh \
@@ -209,7 +209,8 @@ am__objects_2 = fpoptimizer/libdbg_la-opcodename.lo \
 @FPARSER_DEVEL_TRUE@am__objects_3 = $(am__objects_2)
 @FPARSER_DEVEL_FALSE@am__objects_4 = libdbg_la-fpoptimizer.lo
 am__objects_5 = libdbg_la-fparser.lo libdbg_la-fparser_ad.lo \
-	$(am__objects_1) $(am__objects_3) $(am__objects_4)
+	libdbg_la-Faddeeva.lo $(am__objects_1) $(am__objects_3) \
+	$(am__objects_4)
 @LIBMESH_DBG_MODE_TRUE@am_libdbg_la_OBJECTS = $(am__objects_5)
 libdbg_la_OBJECTS = $(am_libdbg_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -221,8 +222,8 @@ libdbg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_DBG_MODE_TRUE@am_libdbg_la_rpath =
 libdevel_la_DEPENDENCIES =
-am__libdevel_la_SOURCES_DIST = fparser.cc fparser_ad.cc lib/sha1.cpp \
-	lib/crc32.hh lib/autoptr.hh lib/functional.hh \
+am__libdevel_la_SOURCES_DIST = fparser.cc fparser_ad.cc Faddeeva.cc \
+	lib/sha1.cpp lib/crc32.hh lib/autoptr.hh lib/functional.hh \
 	fpoptimizer/hash.hh fpoptimizer/codetree.hh \
 	fpoptimizer/grammar.hh fpoptimizer/consts.hh \
 	fpoptimizer/optimize.hh fpoptimizer/opcodename.hh \
@@ -265,7 +266,8 @@ am__objects_7 = fpoptimizer/libdevel_la-opcodename.lo \
 @FPARSER_DEVEL_TRUE@am__objects_8 = $(am__objects_7)
 @FPARSER_DEVEL_FALSE@am__objects_9 = libdevel_la-fpoptimizer.lo
 am__objects_10 = libdevel_la-fparser.lo libdevel_la-fparser_ad.lo \
-	$(am__objects_6) $(am__objects_8) $(am__objects_9)
+	libdevel_la-Faddeeva.lo $(am__objects_6) $(am__objects_8) \
+	$(am__objects_9)
 @LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_OBJECTS = $(am__objects_10)
 libdevel_la_OBJECTS = $(am_libdevel_la_OBJECTS)
 libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -273,8 +275,8 @@ libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_rpath =
 liboprof_la_DEPENDENCIES =
-am__liboprof_la_SOURCES_DIST = fparser.cc fparser_ad.cc lib/sha1.cpp \
-	lib/crc32.hh lib/autoptr.hh lib/functional.hh \
+am__liboprof_la_SOURCES_DIST = fparser.cc fparser_ad.cc Faddeeva.cc \
+	lib/sha1.cpp lib/crc32.hh lib/autoptr.hh lib/functional.hh \
 	fpoptimizer/hash.hh fpoptimizer/codetree.hh \
 	fpoptimizer/grammar.hh fpoptimizer/consts.hh \
 	fpoptimizer/optimize.hh fpoptimizer/opcodename.hh \
@@ -317,7 +319,8 @@ am__objects_12 = fpoptimizer/liboprof_la-opcodename.lo \
 @FPARSER_DEVEL_TRUE@am__objects_13 = $(am__objects_12)
 @FPARSER_DEVEL_FALSE@am__objects_14 = liboprof_la-fpoptimizer.lo
 am__objects_15 = liboprof_la-fparser.lo liboprof_la-fparser_ad.lo \
-	$(am__objects_11) $(am__objects_13) $(am__objects_14)
+	liboprof_la-Faddeeva.lo $(am__objects_11) $(am__objects_13) \
+	$(am__objects_14)
 @LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_OBJECTS = $(am__objects_15)
 liboprof_la_OBJECTS = $(am_liboprof_la_OBJECTS)
 liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -325,8 +328,8 @@ liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_rpath =
 libopt_la_DEPENDENCIES =
-am__libopt_la_SOURCES_DIST = fparser.cc fparser_ad.cc lib/sha1.cpp \
-	lib/crc32.hh lib/autoptr.hh lib/functional.hh \
+am__libopt_la_SOURCES_DIST = fparser.cc fparser_ad.cc Faddeeva.cc \
+	lib/sha1.cpp lib/crc32.hh lib/autoptr.hh lib/functional.hh \
 	fpoptimizer/hash.hh fpoptimizer/codetree.hh \
 	fpoptimizer/grammar.hh fpoptimizer/consts.hh \
 	fpoptimizer/optimize.hh fpoptimizer/opcodename.hh \
@@ -369,7 +372,8 @@ am__objects_17 = fpoptimizer/libopt_la-opcodename.lo \
 @FPARSER_DEVEL_TRUE@am__objects_18 = $(am__objects_17)
 @FPARSER_DEVEL_FALSE@am__objects_19 = libopt_la-fpoptimizer.lo
 am__objects_20 = libopt_la-fparser.lo libopt_la-fparser_ad.lo \
-	$(am__objects_16) $(am__objects_18) $(am__objects_19)
+	libopt_la-Faddeeva.lo $(am__objects_16) $(am__objects_18) \
+	$(am__objects_19)
 @LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_20)
 libopt_la_OBJECTS = $(am_libopt_la_OBJECTS)
 libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -377,8 +381,8 @@ libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_OPT_MODE_TRUE@am_libopt_la_rpath =
 libprof_la_DEPENDENCIES =
-am__libprof_la_SOURCES_DIST = fparser.cc fparser_ad.cc lib/sha1.cpp \
-	lib/crc32.hh lib/autoptr.hh lib/functional.hh \
+am__libprof_la_SOURCES_DIST = fparser.cc fparser_ad.cc Faddeeva.cc \
+	lib/sha1.cpp lib/crc32.hh lib/autoptr.hh lib/functional.hh \
 	fpoptimizer/hash.hh fpoptimizer/codetree.hh \
 	fpoptimizer/grammar.hh fpoptimizer/consts.hh \
 	fpoptimizer/optimize.hh fpoptimizer/opcodename.hh \
@@ -421,7 +425,8 @@ am__objects_22 = fpoptimizer/libprof_la-opcodename.lo \
 @FPARSER_DEVEL_TRUE@am__objects_23 = $(am__objects_22)
 @FPARSER_DEVEL_FALSE@am__objects_24 = libprof_la-fpoptimizer.lo
 am__objects_25 = libprof_la-fparser.lo libprof_la-fparser_ad.lo \
-	$(am__objects_21) $(am__objects_23) $(am__objects_24)
+	libprof_la-Faddeeva.lo $(am__objects_21) $(am__objects_23) \
+	$(am__objects_24)
 @LIBMESH_PROF_MODE_TRUE@am_libprof_la_OBJECTS = $(am__objects_25)
 libprof_la_OBJECTS = $(am_libprof_la_OBJECTS)
 libprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -998,8 +1003,8 @@ FPOPTIMIZER_CC_FILES = \
 	    fpoptimizer/cse.cc \
 	    fpoptimizer/optimize_main.cc
 
-pkg_sources = fparser.cc fparser_ad.cc $(am__append_3) $(am__append_7) \
-	$(am__append_9)
+pkg_sources = fparser.cc fparser_ad.cc Faddeeva.cc $(am__append_3) \
+	$(am__append_7) $(am__append_9)
 
 # util/tree_grammar_parser is a utility which is required to build
 # fpoptimizer/grammar_data.cc.  But this file itself is only needed
@@ -1422,18 +1427,23 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdbg_la-Faddeeva.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdbg_la-fparser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdbg_la-fparser_ad.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdbg_la-fpoptimizer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdevel_la-Faddeeva.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdevel_la-fparser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdevel_la-fparser_ad.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdevel_la-fpoptimizer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboprof_la-Faddeeva.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboprof_la-fparser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboprof_la-fparser_ad.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboprof_la-fpoptimizer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libopt_la-Faddeeva.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libopt_la-fparser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libopt_la-fparser_ad.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libopt_la-fpoptimizer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libprof_la-Faddeeva.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libprof_la-fparser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libprof_la-fparser_ad.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libprof_la-fpoptimizer.Plo@am__quote@
@@ -1580,6 +1590,13 @@ libdbg_la-fparser_ad.lo: fparser_ad.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fparser_ad.cc' object='libdbg_la-fparser_ad.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libdbg_la-fparser_ad.lo `test -f 'fparser_ad.cc' || echo '$(srcdir)/'`fparser_ad.cc
+
+libdbg_la-Faddeeva.lo: Faddeeva.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -MT libdbg_la-Faddeeva.lo -MD -MP -MF $(DEPDIR)/libdbg_la-Faddeeva.Tpo -c -o libdbg_la-Faddeeva.lo `test -f 'Faddeeva.cc' || echo '$(srcdir)/'`Faddeeva.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdbg_la-Faddeeva.Tpo $(DEPDIR)/libdbg_la-Faddeeva.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Faddeeva.cc' object='libdbg_la-Faddeeva.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libdbg_la-Faddeeva.lo `test -f 'Faddeeva.cc' || echo '$(srcdir)/'`Faddeeva.cc
 
 lib/libdbg_la-sha1.lo: lib/sha1.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -MT lib/libdbg_la-sha1.lo -MD -MP -MF lib/$(DEPDIR)/libdbg_la-sha1.Tpo -c -o lib/libdbg_la-sha1.lo `test -f 'lib/sha1.cpp' || echo '$(srcdir)/'`lib/sha1.cpp
@@ -1742,6 +1759,13 @@ libdevel_la-fparser_ad.lo: fparser_ad.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o libdevel_la-fparser_ad.lo `test -f 'fparser_ad.cc' || echo '$(srcdir)/'`fparser_ad.cc
 
+libdevel_la-Faddeeva.lo: Faddeeva.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -MT libdevel_la-Faddeeva.lo -MD -MP -MF $(DEPDIR)/libdevel_la-Faddeeva.Tpo -c -o libdevel_la-Faddeeva.lo `test -f 'Faddeeva.cc' || echo '$(srcdir)/'`Faddeeva.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdevel_la-Faddeeva.Tpo $(DEPDIR)/libdevel_la-Faddeeva.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Faddeeva.cc' object='libdevel_la-Faddeeva.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o libdevel_la-Faddeeva.lo `test -f 'Faddeeva.cc' || echo '$(srcdir)/'`Faddeeva.cc
+
 lib/libdevel_la-sha1.lo: lib/sha1.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -MT lib/libdevel_la-sha1.lo -MD -MP -MF lib/$(DEPDIR)/libdevel_la-sha1.Tpo -c -o lib/libdevel_la-sha1.lo `test -f 'lib/sha1.cpp' || echo '$(srcdir)/'`lib/sha1.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) lib/$(DEPDIR)/libdevel_la-sha1.Tpo lib/$(DEPDIR)/libdevel_la-sha1.Plo
@@ -1902,6 +1926,13 @@ liboprof_la-fparser_ad.lo: fparser_ad.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fparser_ad.cc' object='liboprof_la-fparser_ad.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o liboprof_la-fparser_ad.lo `test -f 'fparser_ad.cc' || echo '$(srcdir)/'`fparser_ad.cc
+
+liboprof_la-Faddeeva.lo: Faddeeva.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT liboprof_la-Faddeeva.lo -MD -MP -MF $(DEPDIR)/liboprof_la-Faddeeva.Tpo -c -o liboprof_la-Faddeeva.lo `test -f 'Faddeeva.cc' || echo '$(srcdir)/'`Faddeeva.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboprof_la-Faddeeva.Tpo $(DEPDIR)/liboprof_la-Faddeeva.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Faddeeva.cc' object='liboprof_la-Faddeeva.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o liboprof_la-Faddeeva.lo `test -f 'Faddeeva.cc' || echo '$(srcdir)/'`Faddeeva.cc
 
 lib/liboprof_la-sha1.lo: lib/sha1.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT lib/liboprof_la-sha1.lo -MD -MP -MF lib/$(DEPDIR)/liboprof_la-sha1.Tpo -c -o lib/liboprof_la-sha1.lo `test -f 'lib/sha1.cpp' || echo '$(srcdir)/'`lib/sha1.cpp
@@ -2064,6 +2095,13 @@ libopt_la-fparser_ad.lo: fparser_ad.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o libopt_la-fparser_ad.lo `test -f 'fparser_ad.cc' || echo '$(srcdir)/'`fparser_ad.cc
 
+libopt_la-Faddeeva.lo: Faddeeva.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT libopt_la-Faddeeva.lo -MD -MP -MF $(DEPDIR)/libopt_la-Faddeeva.Tpo -c -o libopt_la-Faddeeva.lo `test -f 'Faddeeva.cc' || echo '$(srcdir)/'`Faddeeva.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libopt_la-Faddeeva.Tpo $(DEPDIR)/libopt_la-Faddeeva.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Faddeeva.cc' object='libopt_la-Faddeeva.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o libopt_la-Faddeeva.lo `test -f 'Faddeeva.cc' || echo '$(srcdir)/'`Faddeeva.cc
+
 lib/libopt_la-sha1.lo: lib/sha1.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT lib/libopt_la-sha1.lo -MD -MP -MF lib/$(DEPDIR)/libopt_la-sha1.Tpo -c -o lib/libopt_la-sha1.lo `test -f 'lib/sha1.cpp' || echo '$(srcdir)/'`lib/sha1.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) lib/$(DEPDIR)/libopt_la-sha1.Tpo lib/$(DEPDIR)/libopt_la-sha1.Plo
@@ -2224,6 +2262,13 @@ libprof_la-fparser_ad.lo: fparser_ad.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='fparser_ad.cc' object='libprof_la-fparser_ad.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o libprof_la-fparser_ad.lo `test -f 'fparser_ad.cc' || echo '$(srcdir)/'`fparser_ad.cc
+
+libprof_la-Faddeeva.lo: Faddeeva.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT libprof_la-Faddeeva.lo -MD -MP -MF $(DEPDIR)/libprof_la-Faddeeva.Tpo -c -o libprof_la-Faddeeva.lo `test -f 'Faddeeva.cc' || echo '$(srcdir)/'`Faddeeva.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libprof_la-Faddeeva.Tpo $(DEPDIR)/libprof_la-Faddeeva.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Faddeeva.cc' object='libprof_la-Faddeeva.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o libprof_la-Faddeeva.lo `test -f 'Faddeeva.cc' || echo '$(srcdir)/'`Faddeeva.cc
 
 lib/libprof_la-sha1.lo: lib/sha1.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT lib/libprof_la-sha1.lo -MD -MP -MF lib/$(DEPDIR)/libprof_la-sha1.Tpo -c -o lib/libprof_la-sha1.lo `test -f 'lib/sha1.cpp' || echo '$(srcdir)/'`lib/sha1.cpp
