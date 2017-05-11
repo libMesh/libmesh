@@ -43,7 +43,7 @@ class LogicError : public std::logic_error
 {
 public:
   LogicError() : std::logic_error( "Error in libMesh internal logic" ) {}
-  LogicError(const std::string& msg) : std::logic_error( msg ) {}
+  LogicError(const std::string & msg) : std::logic_error( msg ) {}
 };
 
 

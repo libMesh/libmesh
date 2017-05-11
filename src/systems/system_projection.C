@@ -206,7 +206,7 @@ public:
     old_context.set_custom_solution(&old_solution);
   }
 
-  static void get_shape_outputs(FEBase& fe);
+  static void get_shape_outputs(FEBase & fe);
 
   // Integrating on new mesh elements, we won't yet have an up to date
   // current_local_solution.
@@ -385,7 +385,7 @@ private:
 
 template<>
 inline void
-OldSolutionValue<Number, &FEMContext::point_value>::get_shape_outputs(FEBase& fe)
+OldSolutionValue<Number, &FEMContext::point_value>::get_shape_outputs(FEBase & fe)
 {
   fe.get_phi();
 }
@@ -393,7 +393,7 @@ OldSolutionValue<Number, &FEMContext::point_value>::get_shape_outputs(FEBase& fe
 
 template<>
 inline void
-OldSolutionValue<Gradient, &FEMContext::point_gradient>::get_shape_outputs(FEBase& fe)
+OldSolutionValue<Gradient, &FEMContext::point_gradient>::get_shape_outputs(FEBase & fe)
 {
   fe.get_dphi();
 }

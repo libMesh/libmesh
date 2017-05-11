@@ -91,12 +91,12 @@ private:
 /**
  * Overload comparison operators for OrderWrapper.
  */
-inline bool operator==(const OrderWrapper& lhs, const OrderWrapper& rhs){ return lhs.get_order() == rhs.get_order(); }
-inline bool operator!=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return !(lhs == rhs); }
-inline bool operator< (const OrderWrapper& lhs, const OrderWrapper& rhs){ return lhs.get_order() < rhs.get_order(); }
-inline bool operator> (const OrderWrapper& lhs, const OrderWrapper& rhs){ return rhs < lhs; }
-inline bool operator<=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return !(lhs > rhs); }
-inline bool operator>=(const OrderWrapper& lhs, const OrderWrapper& rhs){ return !(lhs < rhs); }
+inline bool operator==(const OrderWrapper & lhs, const OrderWrapper & rhs){ return lhs.get_order() == rhs.get_order(); }
+inline bool operator!=(const OrderWrapper & lhs, const OrderWrapper & rhs){ return !(lhs == rhs); }
+inline bool operator< (const OrderWrapper & lhs, const OrderWrapper & rhs){ return lhs.get_order() < rhs.get_order(); }
+inline bool operator> (const OrderWrapper & lhs, const OrderWrapper & rhs){ return rhs < lhs; }
+inline bool operator<=(const OrderWrapper & lhs, const OrderWrapper & rhs){ return !(lhs > rhs); }
+inline bool operator>=(const OrderWrapper & lhs, const OrderWrapper & rhs){ return !(lhs < rhs); }
 
 // First disambiguate everything that would be ambiguated by the
 // subsequent disambiguations
@@ -133,35 +133,35 @@ OrderWrapperOperators(std::size_t)
 #endif
 
 // Now disambiguate all the things
-inline bool operator==(int lhs, const OrderWrapper& rhs){ return lhs == rhs.get_order(); }
-inline bool operator==(const OrderWrapper& lhs, int rhs){ return lhs.get_order() == rhs; }
-inline bool operator==(Order lhs, const OrderWrapper& rhs){ return lhs == rhs.get_order(); }
-inline bool operator==(const OrderWrapper& lhs, Order rhs){ return lhs.get_order() == rhs; }
-inline bool operator!=(int lhs, const OrderWrapper& rhs){ return !(lhs == rhs); }
-inline bool operator!=(const OrderWrapper& lhs, int rhs){ return !(lhs == rhs); }
-inline bool operator!=(Order lhs, const OrderWrapper& rhs){ return !(lhs == rhs); }
-inline bool operator!=(const OrderWrapper& lhs, Order rhs){ return !(lhs == rhs); }
-inline bool operator< (int lhs, const OrderWrapper& rhs){ return lhs < rhs.get_order(); }
-inline bool operator< (const OrderWrapper& lhs, int rhs){ return lhs.get_order() < rhs; }
-inline bool operator< (Order lhs, const OrderWrapper& rhs){ return lhs < rhs.get_order(); }
-inline bool operator< (const OrderWrapper& lhs, Order rhs){ return lhs.get_order() < rhs; }
-inline bool operator> (int lhs, const OrderWrapper& rhs){ return rhs < lhs; }
-inline bool operator> (const OrderWrapper& lhs, int rhs){ return rhs < lhs; }
-inline bool operator> (Order lhs, const OrderWrapper& rhs){ return rhs < lhs; }
-inline bool operator> (const OrderWrapper& lhs, Order rhs){ return rhs < lhs; }
-inline bool operator<=(int lhs, const OrderWrapper& rhs){ return !(lhs > rhs); }
-inline bool operator<=(const OrderWrapper& lhs, int rhs){ return !(lhs > rhs); }
-inline bool operator<=(Order lhs, const OrderWrapper& rhs){ return !(lhs > rhs); }
-inline bool operator<=(const OrderWrapper& lhs, Order rhs){ return !(lhs > rhs); }
-inline bool operator>=(int lhs, const OrderWrapper& rhs){ return !(lhs < rhs); }
-inline bool operator>=(const OrderWrapper& lhs, int rhs){ return !(lhs < rhs); }
-inline bool operator>=(Order lhs, const OrderWrapper& rhs){ return !(lhs < rhs); }
-inline bool operator>=(const OrderWrapper& lhs, Order rhs){ return !(lhs < rhs); }
+inline bool operator==(int lhs, const OrderWrapper & rhs){ return lhs == rhs.get_order(); }
+inline bool operator==(const OrderWrapper & lhs, int rhs){ return lhs.get_order() == rhs; }
+inline bool operator==(Order lhs, const OrderWrapper & rhs){ return lhs == rhs.get_order(); }
+inline bool operator==(const OrderWrapper & lhs, Order rhs){ return lhs.get_order() == rhs; }
+inline bool operator!=(int lhs, const OrderWrapper & rhs){ return !(lhs == rhs); }
+inline bool operator!=(const OrderWrapper & lhs, int rhs){ return !(lhs == rhs); }
+inline bool operator!=(Order lhs, const OrderWrapper & rhs){ return !(lhs == rhs); }
+inline bool operator!=(const OrderWrapper & lhs, Order rhs){ return !(lhs == rhs); }
+inline bool operator< (int lhs, const OrderWrapper & rhs){ return lhs < rhs.get_order(); }
+inline bool operator< (const OrderWrapper & lhs, int rhs){ return lhs.get_order() < rhs; }
+inline bool operator< (Order lhs, const OrderWrapper & rhs){ return lhs < rhs.get_order(); }
+inline bool operator< (const OrderWrapper & lhs, Order rhs){ return lhs.get_order() < rhs; }
+inline bool operator> (int lhs, const OrderWrapper & rhs){ return rhs < lhs; }
+inline bool operator> (const OrderWrapper & lhs, int rhs){ return rhs < lhs; }
+inline bool operator> (Order lhs, const OrderWrapper & rhs){ return rhs < lhs; }
+inline bool operator> (const OrderWrapper & lhs, Order rhs){ return rhs < lhs; }
+inline bool operator<=(int lhs, const OrderWrapper & rhs){ return !(lhs > rhs); }
+inline bool operator<=(const OrderWrapper & lhs, int rhs){ return !(lhs > rhs); }
+inline bool operator<=(Order lhs, const OrderWrapper & rhs){ return !(lhs > rhs); }
+inline bool operator<=(const OrderWrapper & lhs, Order rhs){ return !(lhs > rhs); }
+inline bool operator>=(int lhs, const OrderWrapper & rhs){ return !(lhs < rhs); }
+inline bool operator>=(const OrderWrapper & lhs, int rhs){ return !(lhs < rhs); }
+inline bool operator>=(Order lhs, const OrderWrapper & rhs){ return !(lhs < rhs); }
+inline bool operator>=(const OrderWrapper & lhs, Order rhs){ return !(lhs < rhs); }
 
 /**
  * Overload stream operators.
  */
-inline std::ostream & operator << (std::ostream & os, const OrderWrapper& order)
+inline std::ostream & operator << (std::ostream & os, const OrderWrapper & order)
 {
   os << order.get_order();
   return os;

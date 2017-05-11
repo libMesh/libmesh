@@ -83,7 +83,7 @@ namespace Hilbert {
 // XCode didn't find it in the libMesh namespace.
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 inline
-std::ostream & operator << (std::ostream& os,
+std::ostream & operator << (std::ostream & os,
                             const libMesh::Parallel::DofObjectKey & hilbert_pair)
 {
   os << '(' << hilbert_pair.first << ',' << hilbert_pair.second << ')' << std::endl;

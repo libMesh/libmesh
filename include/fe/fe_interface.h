@@ -396,7 +396,7 @@ private:
                               std::vector<Number> & nodal_soln);
 
   static Point ifem_map (const unsigned int dim,
-                         const FEType& fe_t,
+                         const FEType & fe_t,
                          const Elem * elem,
                          const Point & p);
 

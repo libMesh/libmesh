@@ -280,7 +280,7 @@ void RBEIMConstruction::initialize_eim_assembly_objects()
     }
 }
 
-ExplicitSystem& RBEIMConstruction::get_explicit_system()
+ExplicitSystem & RBEIMConstruction::get_explicit_system()
 {
   return get_equation_systems().get_system<ExplicitSystem>(_explicit_system_name);
 }

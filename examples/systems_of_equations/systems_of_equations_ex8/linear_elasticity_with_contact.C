@@ -229,8 +229,8 @@ void LinearElasticityWithContact::add_contact_edge_elements()
       dof_id_type master_node_id = it->first;
       dof_id_type slave_node_id = it->second;
 
-      Node& master_node = mesh.node(master_node_id);
-      Node& slave_node = mesh.node(slave_node_id);
+      Node & master_node = mesh.node(master_node_id);
+      Node & slave_node = mesh.node(slave_node_id);
 
       Elem* connector_elem = mesh.add_elem (new Edge2);
       connector_elem->set_node(0) = &master_node;

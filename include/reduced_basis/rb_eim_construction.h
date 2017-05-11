@@ -185,7 +185,7 @@ public:
   /**
    * Get the ExplicitSystem associated with this system.
    */
-  ExplicitSystem& get_explicit_system();
+  ExplicitSystem & get_explicit_system();
 
   /**
    * Load the i^th RB function into the RBConstruction
@@ -227,7 +227,7 @@ public:
    * in _parametrized_functions_in_training_set. \p pathname
    * provides the path to where the plot data will be saved.
    */
-  void plot_parametrized_functions_in_training_set(const std::string& pathname);
+  void plot_parametrized_functions_in_training_set(const std::string & pathname);
 
   //----------- PUBLIC DATA MEMBERS -----------//
 
