@@ -187,7 +187,7 @@ Packing<const Node *>::pack (const Node * const & node,
 template <>
 template <>
 void
-Packing<const Node *>::pack (const Node* const & node,
+Packing<const Node *>::pack (const Node * const & node,
                              std::back_insert_iterator<std::vector<largest_id_type> > data_out,
                              const DistributedMesh * mesh)
 {
@@ -199,7 +199,7 @@ Packing<const Node *>::pack (const Node* const & node,
 template <>
 template <>
 void
-Packing<const Node *>::pack (const Node* const & node,
+Packing<const Node *>::pack (const Node * const & node,
                              std::back_insert_iterator<std::vector<largest_id_type> > data_out,
                              const ParallelMesh * mesh)
 {

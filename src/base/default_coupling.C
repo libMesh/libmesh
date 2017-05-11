@@ -127,7 +127,7 @@ void DefaultCoupling::operator()
 
           for (unsigned int s=0; s<elem->n_sides(); s++)
             {
-              const Elem *neigh = elem->neighbor_ptr(s);
+              const Elem * neigh = elem->neighbor_ptr(s);
 
               // If we have a neighbor here
               if (neigh)

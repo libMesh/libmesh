@@ -1266,7 +1266,7 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
 
   for (dof_id_type i=0; i != pmax_elem_id; ++i)
     {
-      const Elem *elem = mesh.query_elem_ptr(i);
+      const Elem * elem = mesh.query_elem_ptr(i);
       unsigned int n_nodes = elem ? elem->n_nodes() : 0;
       unsigned int n_edges = elem ? elem->n_edges() : 0;
       unsigned int n_sides = elem ? elem->n_sides() : 0;
@@ -1402,7 +1402,7 @@ void libmesh_assert_valid_dof_ids(const MeshBase & mesh, unsigned int sysnum)
 
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-void libmesh_assert_valid_unique_ids(const MeshBase &mesh)
+void libmesh_assert_valid_unique_ids(const MeshBase & mesh)
 {
   libmesh_parallel_only(mesh.comm());
 
@@ -1411,7 +1411,7 @@ void libmesh_assert_valid_unique_ids(const MeshBase &mesh)
 
   for (dof_id_type i=0; i != pmax_elem_id; ++i)
     {
-      const Elem *elem = mesh.query_elem_ptr(i);
+      const Elem * elem = mesh.query_elem_ptr(i);
       const unique_id_type unique_id = elem ? elem->unique_id() : 0;
       const unique_id_type * uid_ptr = elem ? &unique_id : libmesh_nullptr;
       libmesh_assert(mesh.comm().semiverify(uid_ptr));
@@ -1422,7 +1422,7 @@ void libmesh_assert_valid_unique_ids(const MeshBase &mesh)
 
   for (dof_id_type i=0; i != pmax_node_id; ++i)
     {
-      const Node *node = mesh.query_node_ptr(i);
+      const Node * node = mesh.query_node_ptr(i);
       const unique_id_type unique_id = node ? node->unique_id() : 0;
       const unique_id_type * uid_ptr = node ? &unique_id : libmesh_nullptr;
       libmesh_assert(mesh.comm().semiverify(uid_ptr));
@@ -1903,7 +1903,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
          n_end = mesh.nodes_end();
        n_it != n_end; ++n_it)
     {
-      const Node *node = *n_it;
+      const Node * node = *n_it;
       const dof_id_type id = node->id();
       const proc_id_map_type::iterator it = new_proc_ids.find(id);
       if (it == new_proc_ids.end())
@@ -1964,7 +1964,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
          n_end = mesh.local_nodes_end();
        n_it != n_end; ++n_it)
     {
-      Node *node = *n_it;
+      Node * node = *n_it;
       const proc_id_map_type::iterator it = new_proc_ids.find(node->id());
       if (it != new_proc_ids.end() && it->second != mesh.processor_id())
         ex_local_nodes.insert(node);
@@ -1983,7 +1983,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
          n_end = ex_local_nodes.end();
        n_it != n_end; ++n_it)
     {
-      Node *node = *n_it;
+      Node * node = *n_it;
       const dof_id_type id = node->id();
       const proc_id_map_type::iterator it = new_proc_ids.find(id);
       libmesh_assert(it != new_proc_ids.end());

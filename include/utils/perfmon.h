@@ -93,7 +93,7 @@ PerfMon::reset ()
 
 inline
 double
-PerfMon::print (std::string msg, std::ostream &my_out)
+PerfMon::print (std::string msg, std::ostream & my_out)
 {
   gettimeofday (&the_time_stop, libmesh_nullptr);
 

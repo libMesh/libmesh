@@ -268,7 +268,7 @@ void Build::operator()(const ConstElemRange & range)
             for (; etg_it != etg_end; ++etg_it)
               {
                 const Elem * const partner = etg_it->first;
-                const CouplingMatrix *ghost_coupling = etg_it->second;
+                const CouplingMatrix * ghost_coupling = etg_it->second;
 
                 // Loop over coupling matrix row variables if we have a
                 // coupling matrix, or all variables if not.

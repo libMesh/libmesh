@@ -682,7 +682,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
           // yes, already added.
           else
             {
-              Node *so_node = pos.first->second;
+              Node * so_node = pos.first->second;
               libmesh_assert(so_node);
 
               so_elem->set_node(son) = so_node;

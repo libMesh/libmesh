@@ -251,7 +251,7 @@ int main (int argc, char ** argv)
         const libMesh::MeshBase::const_node_iterator end = mesh.local_nodes_end();
         for (; it != end; ++it)
           {
-            Node *n = *it;
+            Node * n = *it;
             const Real dist_sq = (*n-point_C).norm_sq();
             if (dist_sq < nearest_dist_sq)
               {
