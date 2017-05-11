@@ -265,18 +265,18 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 	  // // values, then to get a proper error estimate here we need
 	  // // to subtract off a coarse grid lift function. For convenience, we simply
 	  // // subtract off the coarse grid adjoint, which has the necessary lift properties.
-	  if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
-	  {
-	    system.get_adjoint_solution(j) -= *coarse_adjoints[j];
-	  }
+	  // if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
+	  // {
+	  //   system.get_adjoint_solution(j) -= *coarse_adjoints[j];
+	  // }
 
           computed_global_QoI_errors[j] = projected_residual->dot(system.get_adjoint_solution(j));
 
 	  // // Add the lift back to get the original adjoint solution
-	  if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
-	  {
-	    system.get_adjoint_solution(j) += *coarse_adjoints[j];
-	  }
+	  // if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
+	  // {
+	  //   system.get_adjoint_solution(j) += *coarse_adjoints[j];
+	  // }
 
         }
     }
