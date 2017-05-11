@@ -95,7 +95,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 
         // Add new nodes in old node Point locations
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-        Node *newn =
+        Node * newn =
 #endif
           this->add_point(*oldn, oldn->id(), oldn->processor_id());
 

@@ -144,7 +144,7 @@ int main (int argc, char ** argv)
   const MeshBase::element_iterator elem_end = mesh.elements_end();
   for (; elem_it != elem_end; ++elem_it)
     {
-      Elem* elem = *elem_it;
+      Elem * elem = *elem_it;
       if(elem->infinite())
         {
           elem->subdomain_id() = 1;

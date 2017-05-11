@@ -325,7 +325,7 @@ class TypeVectorOpFunction
 {
 public:
 #ifdef LIBMESH_HAVE_MPI
-  static void vector_max (void *invec, void *inoutvec, int *len, MPI_Datatype *)
+  static void vector_max (void * invec, void * inoutvec, int * len, MPI_Datatype *)
   {
     V *in = static_cast<V *>(invec);
     V *inout = static_cast<V *>(inoutvec);
@@ -334,7 +334,7 @@ public:
         inout[i](d) = std::max(in[i](d), inout[i](d));
   }
 
-  static void vector_min (void *invec, void *inoutvec, int *len, MPI_Datatype *)
+  static void vector_min (void * invec, void * inoutvec, int * len, MPI_Datatype *)
   {
     V *in = static_cast<V *>(invec);
     V *inout = static_cast<V *>(inoutvec);
@@ -343,7 +343,7 @@ public:
         inout[i](d) = std::min(in[i](d), inout[i](d));
   }
 
-  static void vector_sum (void *invec, void *inoutvec, int *len, MPI_Datatype *)
+  static void vector_sum (void * invec, void * inoutvec, int * len, MPI_Datatype *)
   {
     V *in = static_cast<V *>(invec);
     V *inout = static_cast<V *>(inoutvec);

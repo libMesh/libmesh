@@ -98,9 +98,9 @@ std::ostream & operator << (std::ostream & os,
 // both DofObjectKey types
 
 inline
-void dofobjectkey_max_op (libMesh::Parallel::DofObjectKey *in,
-                          libMesh::Parallel::DofObjectKey *inout,
-                          int *len, void *)
+void dofobjectkey_max_op (libMesh::Parallel::DofObjectKey * in,
+                          libMesh::Parallel::DofObjectKey * inout,
+                          int * len, void *)
 {
   // When (*in <= *inout), then inout already contains max(*in,*inout)
   // Otherwise we need to copy from in.
@@ -110,9 +110,9 @@ void dofobjectkey_max_op (libMesh::Parallel::DofObjectKey *in,
 }
 
 inline
-void dofobjectkey_min_op (libMesh::Parallel::DofObjectKey *in,
-                          libMesh::Parallel::DofObjectKey *inout,
-                          int *len, void *)
+void dofobjectkey_min_op (libMesh::Parallel::DofObjectKey * in,
+                          libMesh::Parallel::DofObjectKey * inout,
+                          int * len, void *)
 {
   // When (*in >= *inout), then inout already contains min(*in,*inout)
   // Otherwise we need to copy from in.

@@ -451,7 +451,7 @@ void libmesh_assert_valid_dof_ids (const MeshBase & mesh,
  *
  * FIXME: we ought to check for uniqueness too.
  */
-void libmesh_assert_valid_unique_ids (const MeshBase &mesh);
+void libmesh_assert_valid_unique_ids (const MeshBase & mesh);
 #endif
 
 /**

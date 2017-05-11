@@ -57,7 +57,7 @@ void GhostPointNeighbors::operator()
   // This code is just for geometric coupling, so we use a null
   // CouplingMatrix pointer.  We'll declare that here so as to avoid
   // confusing the insert() calls later.
-  CouplingMatrix *nullcm = libmesh_nullptr;
+  CouplingMatrix * nullcm = libmesh_nullptr;
 
   for (MeshBase::const_element_iterator elem_it = range_begin;
        elem_it!=range_end; ++elem_it)

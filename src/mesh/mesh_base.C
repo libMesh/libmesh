@@ -252,7 +252,7 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
   const std::set<GhostingFunctor *>::iterator gf_end = this->ghosting_functors_end();
   for (; gf_it != gf_end; ++gf_it)
     {
-      GhostingFunctor *gf = *gf_it;
+      GhostingFunctor * gf = *gf_it;
       libmesh_assert(gf);
       gf->mesh_reinit();
     }

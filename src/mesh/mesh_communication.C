@@ -163,7 +163,7 @@ void query_ghosting_functors(const MeshBase & mesh,
     {
       GhostingFunctor::map_type elements_to_ghost;
 
-      GhostingFunctor *gf = *gf_it;
+      GhostingFunctor * gf = *gf_it;
       libmesh_assert(gf);
       (*gf)(elem_it, elem_end, pid, elements_to_ghost);
 
@@ -203,11 +203,11 @@ void connect_children(const MeshBase & mesh,
   const MeshBase::const_element_iterator elem_end = mesh.pid_elements_end(pid);
   for (; elem_it != elem_end; ++elem_it)
     {
-      const Elem *elem = *elem_it;
+      const Elem * elem = *elem_it;
       if (elem->has_children())
         for (unsigned int c=0; c != elem->n_children(); ++c)
           {
-            const Elem *child = elem->child_ptr(c);
+            const Elem * child = elem->child_ptr(c);
             if (child != remote_elem)
               connected_elements.insert(child);
           }
@@ -243,9 +243,9 @@ void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_
 
   for (; elem_rit != connected_elements.rend(); ++elem_rit)
     {
-      const Elem *elem = *elem_rit;
+      const Elem * elem = *elem_rit;
       libmesh_assert(elem);
-      const Elem *parent = elem->parent();
+      const Elem * parent = elem->parent();
 
       // We let ghosting functors worry about only active elements,
       // but the remote processor needs all its semilocal elements'
@@ -276,9 +276,9 @@ void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_
 
   for (; elem_it != elem_end; ++elem_it)
     {
-      const Elem *elem = *elem_it;
+      const Elem * elem = *elem_it;
       libmesh_assert(elem);
-      const Elem *parent = elem->parent();
+      const Elem * parent = elem->parent();
       if (parent)
         libmesh_assert(connected_elements.count(parent));
     }
@@ -527,7 +527,7 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
   const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
   for (; gf_it != gf_end; ++gf_it)
     {
-      GhostingFunctor *gf = *gf_it;
+      GhostingFunctor * gf = *gf_it;
       gf->redistribute();
     }
 

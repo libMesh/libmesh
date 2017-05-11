@@ -126,7 +126,7 @@ Node * MeshRefinement::add_node(Elem & parent,
   // element of a processor which may take ownership of it.
   if (new_node_id != DofObject::invalid_id)
     {
-      Node *node = _mesh.node_ptr(new_node_id);
+      Node * node = _mesh.node_ptr(new_node_id);
       if (proc_id < node->processor_id())
         node->processor_id() = proc_id;
       return node;

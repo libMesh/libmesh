@@ -3015,7 +3015,7 @@ BoundingBox Elem::loose_bounding_box () const
   for (unsigned int p=0; p != n_points; ++p)
     for (unsigned d=0; d<LIBMESH_DIM; ++d)
       {
-        const Point &pt = this->point(p);
+        const Point & pt = this->point(p);
         if (pmin(d) > pt(d))
           pmin(d) = pt(d);
 
