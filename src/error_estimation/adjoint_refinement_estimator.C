@@ -226,7 +226,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
     std::cout<<"Diff Physics after swapping: "<<dynamic_cast<FEMSystem &>(system).get_physics()<<std::endl;
     std::cout<<"Residual Physics after swapping: "<<_residual_evaluation_physics<<std::endl;
     // Rebuild the rhs with the projected primal solution
-    (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
+    (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false, true, false);
     projected_residual = &(dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
     projected_residual->close();
 
@@ -265,18 +265,18 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 	  // // values, then to get a proper error estimate here we need
 	  // // to subtract off a coarse grid lift function. For convenience, we simply
 	  // // subtract off the coarse grid adjoint, which has the necessary lift properties.
-	  // if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
-	  // {
-	  //   system.get_adjoint_solution(j) -= *coarse_adjoints[j];
-	  // }
+	  if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
+	  {
+	    system.get_adjoint_solution(j) -= *coarse_adjoints[j];
+	  }
 
           computed_global_QoI_errors[j] = projected_residual->dot(system.get_adjoint_solution(j));
 
 	  // // Add the lift back to get the original adjoint solution
-	  // if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
-	  // {
-	  //   system.get_adjoint_solution(j) += *coarse_adjoints[j];
-	  // }
+	  if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
+	  {
+	    system.get_adjoint_solution(j) += *coarse_adjoints[j];
+	  }
 
         }
     }
