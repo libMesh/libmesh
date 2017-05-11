@@ -247,8 +247,7 @@ void InverseDistanceInterpolation<KDDim>::interpolate_field_data (const std::vec
   }
 #else
 
-  libmesh_error_msg("ERROR:  This functionality requires the library to be configured\n" \
-                    << "with nanoflann KD-Tree approximate nearest neighbor support!");
+  libmesh_error_msg("ERROR: This functionality requires the library to be configured with nanoflann support!");
 
 #endif
 }
