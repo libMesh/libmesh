@@ -265,18 +265,31 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 	  // // values, then to get a proper error estimate here we need
 	  // // to subtract off a coarse grid lift function. For convenience, we simply
 	  // // subtract off the coarse grid adjoint, which has the necessary lift properties.
-	  // if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
-	  // {
-	  //   system.get_adjoint_solution(j) -= *coarse_adjoints[j];
-	  // }
+	  if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
+	    {
+	      // Create a new vector to hold z^h+ - lift
+	      NumericVector<Number> * adjointminuslift = system.get_adjoint_solution(j).clone().release();
 
-          computed_global_QoI_errors[j] = projected_residual->dot(system.get_adjoint_solution(j));
+	      //adjointminuslift->init(system.get_adjoint_solution(j));
 
-	  // // Add the lift back to get the original adjoint solution
-	  // if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
-	  // {
-	  //   system.get_adjoint_solution(j) += *coarse_adjoints[j];
-	  // }
+	      //adjointminuslift = &system.get_adjoint_solution(j);
+
+	      // Now call the enforce constraints exactly function, with boolean set to be true
+	      // this will change adjointminuslift to z^h+ - lift from z^h+
+	      system.get_dof_map().enforce_constraints_exactly
+		(system, adjointminuslift, true);
+
+	      // Now evaluate R(u^h, z^h+ - lift)
+	      computed_global_QoI_errors[j] = projected_residual->dot(*adjointminuslift);
+
+	      // Clear the adjointminuslift
+	      adjointminuslift->clear();
+
+	    }
+	  else
+	    {
+	      computed_global_QoI_errors[j] = projected_residual->dot(system.get_adjoint_solution(j));
+	    }
 
         }
     }
