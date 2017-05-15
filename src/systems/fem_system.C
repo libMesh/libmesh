@@ -49,7 +49,6 @@ femsystem_mutex assembly_mutex;
 void assemble_unconstrained_element_system(const FEMSystem & _sys,
                                            const bool _get_jacobian,
                                            const bool _constrain_heterogeneously,
-					   const bool _no_constraints,
                                            FEMContext & _femcontext)
 {
   if (_sys.print_element_solutions)
@@ -389,8 +388,7 @@ public:
         _femcontext.elem_fe_reinit();
 
         assemble_unconstrained_element_system
-          (_sys, _get_jacobian, _constrain_heterogeneously, _no_constraints,
-           _femcontext);
+          (_sys, _get_jacobian, _constrain_heterogeneously, _femcontext);
 
         add_element_system
           (_sys, _get_residual, _get_jacobian,

@@ -226,7 +226,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
     std::cout<<"Diff Physics after swapping: "<<dynamic_cast<FEMSystem &>(system).get_physics()<<std::endl;
     std::cout<<"Residual Physics after swapping: "<<_residual_evaluation_physics<<std::endl;
     // Rebuild the rhs with the projected primal solution
-    (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false, true, false);
+    (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false, false, true);
     projected_residual = &(dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
     projected_residual->close();
 
