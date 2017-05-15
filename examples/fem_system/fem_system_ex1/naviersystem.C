@@ -111,10 +111,10 @@ void NavierSystem::init_data ()
 
   // Tell the system to march velocity forward in time, but
   // leave p as a constraint only
-  this->time_evolving(u_var);
-  this->time_evolving(v_var);
+  this->time_evolving(u_var, 1);
+  this->time_evolving(v_var, 1);
   if (dim == 3)
-    this->time_evolving(w_var);
+    this->time_evolving(w_var, 1);
 
   // Useful debugging options
   // Set verify_analytic_jacobians to 1e-6 to use
@@ -264,16 +264,20 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
   // weight functions.
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
+  // Variables to store solutions & its gradient at old Newton iterate
+  Number p, u, v, w;
+  Gradient grad_u, grad_v, grad_w;
+
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       // Compute the solution & its gradient at the old Newton iterate
-      Number p = c.interior_value(p_var, qp),
-        u = c.interior_value(u_var, qp),
-        v = c.interior_value(v_var, qp),
-        w = c.interior_value(w_var, qp);
-      Gradient grad_u = c.interior_gradient(u_var, qp),
-        grad_v = c.interior_gradient(v_var, qp),
-        grad_w = c.interior_gradient(w_var, qp);
+      c.interior_value(p_var, qp, p),
+      c.interior_value(u_var, qp, u),
+      c.interior_value(v_var, qp, v),
+      c.interior_value(w_var, qp, w);
+      c.interior_gradient(u_var, qp, grad_u),
+      c.interior_gradient(v_var, qp, grad_v),
+      c.interior_gradient(w_var, qp, grad_w);
 
       // Definitions for convenience.  It is sometimes simpler to do a
       // dot product if you have the full vector at your disposal.
@@ -421,12 +425,15 @@ bool NavierSystem::element_constraint (bool request_jacobian,
   // Add the constraint given by the continuity equation
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
+  // Variables to store solutions & its gradient at old Newton iterate
+  Gradient grad_u, grad_v, grad_w;
+
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       // Compute the velocity gradient at the old Newton iterate
-      Gradient grad_u = c.interior_gradient(u_var, qp),
-        grad_v = c.interior_gradient(v_var, qp),
-        grad_w = c.interior_gradient(w_var, qp);
+      c.interior_gradient(u_var, qp, grad_u),
+      c.interior_gradient(v_var, qp, grad_v),
+      c.interior_gradient(w_var, qp, grad_w);
 
       // Now a loop over the pressure degrees of freedom.  This
       // computes the contributions of the continuity equation.
@@ -479,7 +486,9 @@ bool NavierSystem::side_constraint (bool request_jacobian,
       DenseSubVector<Number> & Fp = c.get_elem_residual(p_var);
       const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
 
-      Number p = c.point_value(p_var, zero);
+      Number p;
+      c.point_value(p_var, zero, p);
+
       Number p_value = 0.;
 
       unsigned int dim = get_mesh().mesh_dimension();
@@ -547,31 +556,35 @@ bool NavierSystem::mass_residual (bool request_jacobian,
 
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
+  // Variables to store time derivatives at old Newton iterate
+  Number u_dot, v_dot, w_dot;
+
   for (unsigned int qp = 0; qp != n_qpoints; ++qp)
     {
-      Number u = c.interior_value(u_var, qp),
-        v = c.interior_value(v_var, qp),
-        w = c.interior_value(w_var, qp);
+      // Compute time derivatives
+      c.interior_rate(u_var, qp, u_dot),
+      c.interior_rate(v_var, qp, v_dot),
+      c.interior_rate(w_var, qp, w_dot);
 
       // We pull as many calculations as possible outside of loops
       Number JxWxRe   = JxW[qp] * Reynolds;
-      Number JxWxRexU = JxWxRe * u;
-      Number JxWxRexV = JxWxRe * v;
-      Number JxWxRexW = JxWxRe * w;
+      Number JxWxRexU = JxWxRe * u_dot;
+      Number JxWxRexV = JxWxRe * v_dot;
+      Number JxWxRexW = JxWxRe * w_dot;
 
       for (unsigned int i = 0; i != n_u_dofs; ++i)
         {
-          Fu(i) += JxWxRexU * phi[i][qp];
-          Fv(i) += JxWxRexV * phi[i][qp];
+          Fu(i) -= JxWxRexU * phi[i][qp];
+          Fv(i) -= JxWxRexV * phi[i][qp];
           if (dim == 3)
-            Fw(i) += JxWxRexW * phi[i][qp];
+            Fw(i) -= JxWxRexW * phi[i][qp];
 
           if (request_jacobian && c.get_elem_solution_derivative())
             {
               libmesh_assert_equal_to (c.get_elem_solution_derivative(), 1.0);
 
               Number JxWxRexPhiI = JxWxRe * phi[i][qp];
-              Number JxWxRexPhiII = JxWxRexPhiI * phi[i][qp];
+              Number JxWxRexPhiII = -JxWxRexPhiI * phi[i][qp];
               Kuu(i,i) += JxWxRexPhiII;
               Kvv(i,i) += JxWxRexPhiII;
               if (dim == 3)
@@ -582,7 +595,7 @@ bool NavierSystem::mass_residual (bool request_jacobian,
               // triangles
               for (unsigned int j = i+1; j != n_u_dofs; ++j)
                 {
-                  Number Kij = JxWxRexPhiI * phi[j][qp];
+                  Number Kij = -JxWxRexPhiI * phi[j][qp];
                   Kuu(i,j) += Kij;
                   Kuu(j,i) += Kij;
                   Kvv(i,j) += Kij;
