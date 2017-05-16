@@ -264,16 +264,17 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
   // weight functions.
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
+  // Variables to store solutions & its gradient at old Newton iterate
+  Number p, u, v, w;
+  Gradient grad_u, grad_v, grad_w;
+
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       // Compute the solution & its gradient at the old Newton iterate
-      Number p, u, v, w;
       c.interior_value(p_var, qp, p),
       c.interior_value(u_var, qp, u),
       c.interior_value(v_var, qp, v),
       c.interior_value(w_var, qp, w);
-
-      Gradient grad_u, grad_v, grad_w;
       c.interior_gradient(u_var, qp, grad_u),
       c.interior_gradient(v_var, qp, grad_v),
       c.interior_gradient(w_var, qp, grad_w);
@@ -424,10 +425,12 @@ bool NavierSystem::element_constraint (bool request_jacobian,
   // Add the constraint given by the continuity equation
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
+  // Variables to store solutions & its gradient at old Newton iterate
+  Gradient grad_u, grad_v, grad_w;
+
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       // Compute the velocity gradient at the old Newton iterate
-      Gradient grad_u, grad_v, grad_w;
       c.interior_gradient(u_var, qp, grad_u),
       c.interior_gradient(v_var, qp, grad_v),
       c.interior_gradient(w_var, qp, grad_w);
@@ -553,9 +556,12 @@ bool NavierSystem::mass_residual (bool request_jacobian,
 
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
+  // Variables to store time derivatives at old Newton iterate
+  Number u_dot, v_dot, w_dot;
+
   for (unsigned int qp = 0; qp != n_qpoints; ++qp)
     {
-      Number u_dot, v_dot, w_dot;
+      // Compute time derivatives
       c.interior_rate(u_var, qp, u_dot),
       c.interior_rate(v_var, qp, v_dot),
       c.interior_rate(w_var, qp, w_dot);
