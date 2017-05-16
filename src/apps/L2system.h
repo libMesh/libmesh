@@ -10,8 +10,8 @@ class L2System : public libMesh::FEMSystem
 {
 public:
   // Constructor
-  L2System(libMesh::EquationSystems& es,
-           const std::string& name,
+  L2System(libMesh::EquationSystems & es,
+           const std::string & name,
            const unsigned int number)
   : libMesh::FEMSystem(es, name, number),
     input_system(NULL),
@@ -31,7 +31,7 @@ public:
   // case) for that system.
   libMesh::AutoPtr<libMesh::FEMFunctionBase<libMesh::Number> > goal_func;
 
-  libMesh::System *input_system;
+  libMesh::System * input_system;
 
   std::map<libMesh::FEMContext *, libMesh::FEMContext *>
     input_contexts;
@@ -41,12 +41,12 @@ protected:
   virtual void init_data ();
 
   // Context initialization
-  virtual void init_context (libMesh::DiffContext &context);
+  virtual void init_context (libMesh::DiffContext & context);
 
   // Element residual and jacobian calculations
   // Time dependent parts
   virtual bool element_time_derivative (bool request_jacobian,
-                                        libMesh::DiffContext &context);
+                                        libMesh::DiffContext & context);
 
   // The FE type to use
   std::string _fe_family;
