@@ -494,7 +494,14 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
           {
             Serialize(ostr);
             ostr.close();
-            std::rename(cache_file_tmp, cache_file.c_str());
+
+            /**
+             * MPI runs on asynchronous networked filesystems require a two-step
+             * renaming. The link call will not do anything if the cache_file
+             * has already been created by a different rank.
+             */
+            link(cache_file_tmp, cache_file.c_str());
+            std::remove(cache_file_tmp);
           }
         }
       }
@@ -1031,13 +1038,13 @@ bool FunctionParserADBase<Value_t>::JITCompileHelper(const std::string & Value_t
   // clear evalerror (this will not get set again by the JIT code)
   this->mData->mEvalErrorType = 0;
 
-  // rename successfully compiled obj to cache file
+  // hard link successfully compiled obj to final cache file
   if (cacheFunction && (mkdir(jitdir.c_str(), 0700) == 0 || errno == EEXIST)) {
-    // the directory was either successfuly created, or it already exists
-    status = std::rename(object_so.c_str(), libname.c_str());
-    if (status == 0) return true;
+    // the directory was either successfully created, or it already exists
+    link(object_so.c_str(), libname.c_str());
   }
 
+  // remove temporary object
   std::remove(object_so.c_str());
   return true;
 }
