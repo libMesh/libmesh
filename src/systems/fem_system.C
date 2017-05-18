@@ -74,7 +74,7 @@ void assemble_unconstrained_element_system(const FEMSystem & _sys,
 
   // We need jacobians to do heterogeneous residual constraints
   const bool need_jacobian =
-    (_get_jacobian || _constrain_heterogeneously) ;
+    (_get_jacobian || _constrain_heterogeneously);
 
   bool jacobian_computed =
     _sys.time_solver->element_residual(need_jacobian, _femcontext);
@@ -281,7 +281,7 @@ void add_element_system(const FEMSystem & _sys,
           (_femcontext.get_elem_jacobian(),
            _femcontext.get_elem_residual(),
            _femcontext.get_dof_indices(), false);
-      // Do nothing if(_no_constraints)
+      // Do nothing if (_no_constraints)
     }
   else if (_get_residual)
     {
@@ -293,16 +293,17 @@ void add_element_system(const FEMSystem & _sys,
       else
         _sys.get_dof_map().constrain_element_vector
           (_femcontext.get_elem_residual(), _femcontext.get_dof_indices(), false);
-      // Do nothing if(_no_constraints)
+      // Do nothing if (_no_constraints)
     }
   else if (_get_jacobian)
     {
       // Heterogeneous and homogeneous constraints are the same on the
       // matrix
       // Only get these contribs if we are applying some constraints
-      if(!_no_constraints)
-        _sys.get_dof_map().constrain_element_matrix
-          (_femcontext.get_elem_jacobian(), _femcontext.get_dof_indices(), false);
+      if (!_no_constraints)
+        _sys.get_dof_map().constrain_element_matrix (_femcontext.get_elem_jacobian(),
+                                                     _femcontext.get_dof_indices(),
+                                                     false);
     }
 #endif // #ifdef LIBMESH_ENABLE_CONSTRAINTS
 
@@ -354,12 +355,12 @@ public:
                         bool get_residual,
                         bool get_jacobian,
                         bool constrain_heterogeneously,
-bool no_constraints) :
+                        bool no_constraints) :
     _sys(sys),
     _get_residual(get_residual),
     _get_jacobian(get_jacobian),
     _constrain_heterogeneously(constrain_heterogeneously),
-    _no_constraints(no_constraints){}
+    _no_constraints(no_constraints) {}
 
   /**
    * operator() for use with Threads::parallel_for().
