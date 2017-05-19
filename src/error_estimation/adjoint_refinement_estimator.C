@@ -107,11 +107,23 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
         {
           std::ostringstream liftfunc_name;
           liftfunc_name << "adjoint_lift_function" << j;
-          NumericVector<Number> & liftvec =
-            system.add_vector(liftfunc_name.str());
 
-          system.get_dof_map().enforce_constraints_exactly
-            (system, &liftvec, true);
+	  system.add_vector(liftfunc_name.str());
+
+	  system.get_vector(liftfunc_name.str()).init(system.get_adjoint_solution(j), false);
+
+          system.get_dof_map().enforce_adjoint_constraints_exactly
+            (system.get_vector(liftfunc_name.str()), static_cast<unsigned int>(j));
+
+	  // Next, we are going to build up the residual for evaluating the flux QoI
+	  NumericVector<Number> * coarse_residual = libmesh_nullptr;
+	  (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
+	  coarse_residual = &(dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
+	  coarse_residual->close();
+
+	  // Compute the flux R(u^h, L)
+	  std::cout<<"The flux QoI "<<static_cast<unsigned int>(j)<<" is: "<<coarse_residual->dot(system.get_vector(liftfunc_name.str()))<<std::endl;
+
         }
     }
 
@@ -164,6 +176,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // avoid declaring it unless asserts are active.
   const dof_id_type n_coarse_elem = mesh.n_active_elem();
 #endif
+
 
   // Uniformly refine the mesh
   MeshRefinement mesh_refinement(mesh);
@@ -243,6 +256,8 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
     std::cout<<"Residual Physics after swapping back: "<<_residual_evaluation_physics<<std::endl;
   }
 
+  std::cout<<"The projected residual norm is: "<<projected_residual->dot(*projected_residual)<<std::endl;
+
   // Solve the adjoint problem(s) on the refined FE space
   system.adjoint_solve(_qoi_set);
 
@@ -267,23 +282,19 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 	  // // subtract off the coarse grid adjoint, which has the necessary lift properties.
 	  if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
 	    {
-	      // Create a new vector to hold z^h+ - lift
-	      NumericVector<Number> * adjointminuslift = system.get_adjoint_solution(j).clone().release();
+	      // Need to create a string with current loop index to retrieve
+	      // the correct vector from the liftvectors map
+	       std::ostringstream liftfunc_name;
+	       liftfunc_name << "adjoint_lift_function" << j;
 
-	      //adjointminuslift->init(system.get_adjoint_solution(j));
-
-	      //adjointminuslift = &system.get_adjoint_solution(j);
-
-	      // Now call the enforce constraints exactly function, with boolean set to be true
-	      // this will change adjointminuslift to z^h+ - lift from z^h+
-	      system.get_dof_map().enforce_constraints_exactly
-		(system, adjointminuslift, true);
+	       // Subtract off the corresponding lift vector from the adjoint solution
+	       system.get_adjoint_solution(j) -= system.get_vector(liftfunc_name.str());
 
 	      // Now evaluate R(u^h, z^h+ - lift)
-	      computed_global_QoI_errors[j] = projected_residual->dot(*adjointminuslift);
+	      computed_global_QoI_errors[j] = projected_residual->dot(system.get_adjoint_solution(j));
 
-	      // Clear the adjointminuslift
-	      adjointminuslift->clear();
+	      // Add the lift back to get back the adjoint
+	      system.get_adjoint_solution(j) += system.get_vector(liftfunc_name.str());
 
 	    }
 	  else
