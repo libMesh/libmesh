@@ -32,7 +32,8 @@
 #ifdef LIBMESH_HAVE_VTK
 
 // I get a lot of "warning: extra ';' inside a class [-Wextra-semi]" from clang
-// on VTK header files.
+// on VTK header files. This is because VTK macros have ';' at the end of them
+// but some developers add in an extra ';' at the end of the macro use.
 #include "libmesh/ignore_warnings.h"
 
 #include "vtkXMLUnstructuredGridReader.h"
@@ -48,6 +49,9 @@
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkSmartPointer.h"
+#ifdef LIBMESH_HAVE_MPI
+#include "vtkMPIController.h"
+#endif
 
 #include "libmesh/restore_warnings.h"
 
@@ -76,6 +80,9 @@ VTKIO::VTKIO (MeshBase & mesh) :
   MeshOutput<MeshBase>(mesh, /*is_parallel_format=*/true)
 #ifdef LIBMESH_HAVE_VTK
   ,_compress(false)
+#ifdef LIBMESH_HAVE_MPI
+  ,_vtk_mpicontroller(libmesh_nullptr)
+#endif
 #endif
 {
 }
@@ -89,6 +96,26 @@ VTKIO::VTKIO (const MeshBase & mesh) :
   ,_compress(false)
 #endif
 {
+#ifdef LIBMESH_HAVE_MPI
+  _vtk_mpicontroller = vtkMPIController::New();
+  // assume that MPI is already initialized
+  _vtk_mpicontroller->Initialize();
+  _vtk_mpicontroller->SetGlobalController(_vtk_mpicontroller);
+#endif
+}
+
+
+
+// Destructor
+VTKIO::~VTKIO ()
+{
+#if defined(LIBMESH_HAVE_VTK) && defined(LIBMESH_HAVE_MPI)
+  if (_vtk_mpicontroller)
+    {
+      _vtk_mpicontroller->Finalize(1);
+      _vtk_mpicontroller = libmesh_nullptr;
+    }
+#endif
 }
 
 

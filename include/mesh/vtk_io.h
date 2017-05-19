@@ -38,6 +38,9 @@
 
 // Forward declarations
 class vtkUnstructuredGrid;
+#ifdef LIBMESH_HAVE_MPI
+class vtkMPIController;
+#endif
 
 namespace libMesh
 {
@@ -73,6 +76,11 @@ public:
    */
   explicit
   VTKIO (const MeshBase & mesh);
+
+  /**
+   * Destructor.
+   */
+  ~VTKIO ();
 
   /**
    * Bring in base class functionality for name resolution and to
@@ -151,6 +159,14 @@ private:
   vtkSmartPointer<vtkUnstructuredGrid> _vtk_grid;
 
   /**
+   * If libMesh is using MPI we need to use VTK's MPI controller
+   * when writing out data in the PXML format.
+   */
+#ifdef LIBMESH_HAVE_MPI
+  vtkMPIController* _vtk_mpicontroller;
+#endif
+
+  /**
    * Flag to indicate whether the output should be compressed
    */
   bool _compress;
@@ -159,7 +175,6 @@ private:
    * maps global node id to node id of partition
    */
   std::map<dof_id_type, dof_id_type> _local_node_map;
-
 
   /**
    * Helper object that holds a map from VTK to libMesh element types
