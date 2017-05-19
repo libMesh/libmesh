@@ -29,24 +29,24 @@ class BdyFunction : public FunctionBase<Number>
 public:
   BdyFunction (unsigned int T_var)
     : _T_var(T_var)
-    { this->_initialized = true; }
+  { this->_initialized = true; }
 
   virtual Number operator() (const Point&, const Real = 0)
-    { libmesh_not_implemented(); }
+  { libmesh_not_implemented(); }
 
   virtual void operator() (const Point& p,
                            const Real,
                            DenseVector<Number>& output)
-    {
-      output.resize(2);
-      output.zero();
-      const Real x=p(0);
-      // Set the parabolic weighting
-      output(_T_var) = -x * (1 - x);
-    }
+  {
+    output.resize(2);
+    output.zero();
+    const Real x=p(0);
+    // Set the parabolic weighting
+    output(_T_var) = -x * (1 - x);
+  }
 
   virtual UniquePtr<FunctionBase<Number> > clone() const
-    { return UniquePtr<FunctionBase<Number> > (new BdyFunction(_T_var)); }
+  { return UniquePtr<FunctionBase<Number> > (new BdyFunction(_T_var)); }
 
 private:
   const unsigned int _T_var;

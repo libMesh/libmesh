@@ -11,7 +11,6 @@ using namespace libMesh;
 class PoissonSystem : public FEMSystem
 {
 public:
-  // Constructor
   PoissonSystem(EquationSystems& es,
                 const std::string& name_in,
                 const unsigned int number_in)

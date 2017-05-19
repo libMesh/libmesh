@@ -12,13 +12,9 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-// Last modified: Feb 13, 2009
-
-// Define the postprocess function to compute QoI 0, the integral of the the solution
-// over a subdomain
+// Define the postprocess function to compute QoI 0, the weighted flux
 
 void PoissonSystem::element_postprocess (DiffContext &context)
-
 {
   FEMContext &c = cast_ref<FEMContext&>(context);
 

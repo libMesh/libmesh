@@ -15,19 +15,27 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// <h1>Adjoints Example 4 - Poisson Equation in square domain with AdjointRefinementErrorEstimator</h1>
+// <h1>Adjoints Example 6 - Poisson Equation in square domain with AdjointRefinementErrorEstimator</h1>
 // \author Vikram Garg
-// \date 2012
+// \date 2017
 //
 // This example solves the Poisson equation, whose solution displays a sharp layer,
 // with QoI based adjoint error estimation and adaptive mesh refinement. The exact
 // solution is . This example also illustrates the use of the adjoint Dirichlet boundary
 // condition capability, necesary for handling flux QoIs. Since we use the adjoint capabilities
-// of libMesh in this example, we use the DiffSystem framework. This file (adjoints_ex4.C)
+// of libMesh in this example, we use the DiffSystem framework. This file (adjoints_ex6.C)
 // contains the declaration of mesh and equation system objects, poissonsystem.C
 // contains the assembly of the system. Postprocessing to compute the QoI is done in element_postprocess.C.
 // There is no need for element and side qoi derivative functions, since the adjoint RHS is supplied
 // by the adjoint dirichlet boundary condition.
+
+// WARNING: To maintain consistency, the flux must be computed internally in the library as R^h(u^h, L^h)
+// where R^h is the residual vector, u^h is the solution, and L^h the lift function at the current mesh.
+// It is w.r.t to this QoI evaluation that the adjoint error estimate R^h+([u^h]+, z^h+ - [L^h]+) is a
+// valid estimate. Automatic flux QoI evaluation via Adjoint Dirichlet boundary conditions is forthcoming
+// in libMesh, after which flux QoIs will be computed internally and there will be no need for
+// element_postprocess.C
+
 
 // An input file named "general.in"
 // is provided which allows the user to set several parameters for
@@ -157,7 +165,7 @@ void set_system_parameters(PoissonSystem &system, FEMParameters &param)
 #ifdef LIBMESH_ENABLE_AMR
 
 UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
-                                              FEMParameters &param)
+                                                FEMParameters &param)
 {
   MeshRefinement* mesh_refinement = new MeshRefinement(mesh);
   mesh_refinement->coarsen_by_parents() = true;
@@ -236,10 +244,10 @@ int main (int argc, char** argv)
 
   // Read in the mesh
   MeshTools::Generation::build_square
-		(mesh, 2, 2,
-		 0.0, 1.0,
-		 0.0, 1.0,
-		 QUAD4);
+    (mesh, 2, 2,
+     0.0, 1.0,
+     0.0, 1.0,
+     QUAD4);
 
   // Make all the elements of the mesh second order so we can compute
   // with a higher order basis
@@ -286,7 +294,7 @@ int main (int argc, char** argv)
         else
           libmesh_assert_greater (param.nelem_target, 0);
 
-	// Dont reuse preconditioners before the primal solve
+        // Dont reuse preconditioners before the primal solve
         linear_solver->reuse_preconditioner(false);
 
         // Solve the forward problem
@@ -321,7 +329,7 @@ int main (int argc, char** argv)
         //Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
         system.set_adjoint_already_solved(true);
 
-	// Get a pointer to the primal solution vector
+        // Get a pointer to the primal solution vector
         NumericVector<Number> &primal_solution = *system.solution;
 
         //Get a pointer to the solution vector of the adjoint problem for QoI 0
@@ -439,9 +447,9 @@ int main (int argc, char** argv)
 
         system.assemble_qoi_sides = true;
 
-	linear_solver->reuse_preconditioner(param.reuse_preconditioner);
+        linear_solver->reuse_preconditioner(param.reuse_preconditioner);
         system.adjoint_solve();
-	system.set_adjoint_already_solved(true);
+        system.set_adjoint_already_solved(true);
 
         NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
 
@@ -462,7 +470,7 @@ int main (int argc, char** argv)
         Number QoI_0_computed = system.get_QoI_value("computed", 0);
         Number QoI_0_exact = system.get_QoI_value("exact", 0);
 
-	std::cout<< "The computed QoI 0 is " << std::setprecision(17)
+        std::cout<< "The computed QoI 0 is " << std::setprecision(17)
                  << QoI_0_computed << std::endl;
         std::cout<< "The relative error in QoI 0 is " << std::setprecision(17)
                  << std::abs(QoI_0_computed - QoI_0_exact) << std::endl; // / std::abs(QoI_0_exact)
@@ -492,7 +500,7 @@ int main (int argc, char** argv)
 
         // Hard coded assert to ensure that the actual numbers we are getting are what they should be
 
-	// The effectivity index isn't exactly reproduceable at single precision
+        // The effectivity index isn't exactly reproduceable at single precision
         // libmesh_assert_less(std::abs(std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) / std::abs(QoI_0_computed - QoI_0_exact) - 0.84010976704434637), 1.e-5);
         // libmesh_assert_less(std::abs(std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(1)) / std::abs(QoI_1_computed - QoI_1_exact) - 0.48294428289950514), 1.e-5);
 
