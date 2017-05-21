@@ -105,24 +105,64 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
       if (_qoi_set.has_index(j) &&
           system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
         {
-          std::ostringstream liftfunc_name;
-          liftfunc_name << "adjoint_lift_function" << j;
-
-	  system.add_vector(liftfunc_name.str());
-
-	  system.get_vector(liftfunc_name.str()).init(system.get_adjoint_solution(j), false);
-
-          system.get_dof_map().enforce_adjoint_constraints_exactly
-            (system.get_vector(liftfunc_name.str()), static_cast<unsigned int>(j));
-
 	  // Next, we are going to build up the residual for evaluating the flux QoI
 	  NumericVector<Number> * coarse_residual = libmesh_nullptr;
-	  (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
-	  coarse_residual = &(dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
-	  coarse_residual->close();
+	  // If the residual ptr is null, use whatever the default physics built by the user is to build the residual vector
+	  if (!_residual_evaluation_physics)
+	    {
+	      (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false, false, true);
+	      coarse_residual = &(dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
+	      coarse_residual->close();
 
-	  // Compute the flux R(u^h, L)
-	  std::cout<<"The flux QoI "<<static_cast<unsigned int>(j)<<" is: "<<coarse_residual->dot(system.get_vector(liftfunc_name.str()))<<std::endl;
+	      std::ostringstream liftfunc_name;
+	      liftfunc_name << "adjoint_lift_function" << j;
+
+	      system.add_vector(liftfunc_name.str());
+
+	      system.get_vector(liftfunc_name.str()).init(system.get_adjoint_solution(j), false);
+
+	      system.get_dof_map().enforce_adjoint_constraints_exactly
+		(system.get_vector(liftfunc_name.str()), static_cast<unsigned int>(j));
+
+	      // Compute the flux R(u^h, L)
+	  std::cout<<"The flux QoI "<<static_cast<unsigned int>(j)<<" is: "<<coarse_residual->dot(system.get_vector(liftfunc_name.str()))<<std::endl<<std::endl;
+
+	    }
+	  else // Else if residual ptr is not null (i.e. user has set physics which they want to use for residual evaluation)
+	    {
+	      // Swap the residual evaluation physics with the system physics
+	      std::cout<<"Diff Physics before swapping: "<<dynamic_cast<FEMSystem &>(system).get_physics()<<std::endl;
+	      std::cout<<"Residual Physics before swapping: "<<_residual_evaluation_physics<<std::endl;
+	      _residual_evaluation_physics = dynamic_cast<FEMSystem &>(system).swap_with_diff_physics(_residual_evaluation_physics);
+	      std::cout<<"Diff Physics after swapping: "<<dynamic_cast<FEMSystem &>(system).get_physics()<<std::endl;
+	      std::cout<<"Residual Physics after swapping: "<<_residual_evaluation_physics<<std::endl;
+
+	      // Rebuild the rhs with the projected primal solution
+	      //(dynamic_cast<ImplicitSystem &>(system)).assembly(true, false, false, true);
+	      (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false, false, true);
+	      coarse_residual = &(dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
+	      coarse_residual->close();
+
+	      std::ostringstream liftfunc_name;
+	      liftfunc_name << "adjoint_lift_function" << j;
+
+	      system.add_vector(liftfunc_name.str());
+
+	      system.get_vector(liftfunc_name.str()).init(system.get_adjoint_solution(j), false);
+
+	      system.get_dof_map().enforce_adjoint_constraints_exactly
+		(system.get_vector(liftfunc_name.str()), static_cast<unsigned int>(j));
+
+
+	      // Swap back
+	      _residual_evaluation_physics = dynamic_cast<FEMSystem &>(system).swap_with_diff_physics(_residual_evaluation_physics);
+	      std::cout<<"Diff Physics after swapping back: "<<dynamic_cast<FEMSystem &>(system).get_physics()<<std::endl;
+	      std::cout<<"Residual Physics after swapping back: "<<_residual_evaluation_physics<<std::endl;
+
+	      // Compute the flux R(u^h, L)
+	  std::cout<<"The flux QoI "<<static_cast<unsigned int>(j)<<" is: "<<coarse_residual->dot(system.get_vector(liftfunc_name.str()))<<std::endl<<std::endl;
+
+	    }
 
         }
     }
@@ -239,7 +279,8 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
     std::cout<<"Diff Physics after swapping: "<<dynamic_cast<FEMSystem &>(system).get_physics()<<std::endl;
     std::cout<<"Residual Physics after swapping: "<<_residual_evaluation_physics<<std::endl;
     // Rebuild the rhs with the projected primal solution
-    (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false, false, true);
+    //(dynamic_cast<ImplicitSystem &>(system)).assembly(true, false, false, true);
+    (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
     projected_residual = &(dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
     projected_residual->close();
 
