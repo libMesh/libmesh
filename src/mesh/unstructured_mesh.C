@@ -434,7 +434,12 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                   // neighbor
                   if (neigh &&
                       (neigh->ancestor() ||
-                       (current_elem->subactive() && neigh->has_children())))
+                  // If neigh has subactive children which should have
+                  // matched as neighbors of the current element but
+                  // did not, then those likewise must be remote
+                  // children.
+                       (current_elem->subactive() && neigh->has_children() &&
+                        (neigh->level()+1) == current_elem->level())))
                     {
 #ifdef DEBUG
                       // Let's make sure that "had children made remote"
