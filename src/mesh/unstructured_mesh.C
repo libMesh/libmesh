@@ -434,7 +434,12 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                   // neighbor
                   if (neigh &&
                       (neigh->ancestor() ||
-                       (current_elem->subactive() && neigh->has_children())))
+                  // If neigh has subactive children which should have
+                  // matched as neighbors of the current element but
+                  // did not, then those likewise must be remote
+                  // children.
+                       (current_elem->subactive() && neigh->has_children() &&
+                        (neigh->level()+1) == current_elem->level())))
                     {
 #ifdef DEBUG
                       // Let's make sure that "had children made remote"
@@ -456,7 +461,47 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 #endif // DEBUG
                       neigh = const_cast<RemoteElem *>(remote_elem);
                     }
-
+                  // If neigh and current_elem are more than one level
+                  // apart, figuring out whether we have a remote
+                  // neighbor here becomes much harder.
+                  else if (neigh && (current_elem->subactive() &&
+                                     neigh->has_children()))
+                    {
+                      // Find the deepest descendant of neigh which
+                      // we could consider for a neighbor.  If we run
+                      // out of neigh children, then that's our
+                      // neighbor.  If we find a potential neighbor
+                      // with remote_children and we don't find any
+                      // potential neighbors among its non-remote
+                      // children, then our neighbor must be remote.
+                      while (neigh != remote_elem &&
+                             neigh->has_children())
+                        {
+                          bool found_neigh = false;
+                          for (unsigned int c = 0;
+                               !found_neigh &&
+                               c != neigh->n_children(); ++c)
+                            {
+                              Elem * child = neigh->child_ptr(c);
+                              if (child == remote_elem)
+                                continue;
+                              unsigned int n_neigh = child->n_neighbors();
+                              for (unsigned int n=0; n != n_neigh; ++n)
+                                {
+                                  Elem * ncn = child->neighbor(n);
+                                  if (ncn != remote_elem &&
+                                      ncn->is_ancestor_of(current_elem))
+                                    {
+                                      neigh = ncn;
+                                      found_neigh = true;
+                                      break;
+                                    }
+                                }
+                            }
+                          if (!found_neigh)
+                          neigh = const_cast<RemoteElem *>(remote_elem);
+                        }
+                    }
                   current_elem->set_neighbor(s, neigh);
 #ifdef DEBUG
                   if (neigh != libmesh_nullptr && neigh != remote_elem)
