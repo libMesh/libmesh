@@ -43,7 +43,7 @@ void PoissonSystem::element_postprocess (DiffContext &context)
       Real f = -alpha * ( ( (- 4 * alpha * alpha) * exp(-alpha*x) * y * (1 - y) ) + ( -8 + ( 8 * exp(-alpha*x) ) + ( 8 * ( 1 - exp(-alpha) )* x) ) );
 
       Real s = x * (1 - x) * (1 - y);
-      NumberVectorValue U ((1-y)*(1-(2*x)),-x*(1-x));
+      RealVectorValue U ((1-y)*(1-(2*x)),-x*(1-x));
 
       Gradient grad_u = c.interior_gradient(0, qp);
 
