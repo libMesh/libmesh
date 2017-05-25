@@ -56,8 +56,8 @@ public:
     ErrorEstimator(),
     number_h_refinements(1),
     number_p_refinements(0),
-      _qoi_set(QoISet()),
-      _residual_evaluation_physics(libmesh_nullptr)
+    _qoi_set(QoISet()),
+    _residual_evaluation_physics(libmesh_nullptr)
   {
     // We're not actually going to use error_norm; our norms are
     // absolute values of QoI error.
@@ -125,8 +125,8 @@ public:
   unsigned char number_p_refinements;
 
   /**
-   * Returns reference to DifferentiablePhysics object. Note that if
-   * no external Physics object is attached, the default is this.
+   * Returns reference to DifferentiablePhysics object. Will return NULL if
+   * no external Physics object is attached.
    */
   FEMPhysics * get_residual_evaluation_physics()
   { return this->_residual_evaluation_physics; }
@@ -141,8 +141,7 @@ protected:
 
   /**
    * Pointer to object to use for physics assembly evaluations.
-   * Defaults to \p this for backwards compatibility; in the future
-   * users should create separate physics objects.
+   * Defaults to libmesh_nullptr for backwards compatibility.
    */
   FEMPhysics * _residual_evaluation_physics;
 

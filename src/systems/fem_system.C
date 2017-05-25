@@ -277,9 +277,9 @@ void add_element_system(const FEMSystem & _sys,
            _femcontext.get_elem_residual(),
            _femcontext.get_dof_indices(), false);
       else if (_no_constraints)
-	{
-	  // Do noting
-	}
+        {
+          // Do noting
+        }
       else
         _sys.get_dof_map().constrain_element_matrix_and_vector
           (_femcontext.get_elem_jacobian(),
@@ -295,9 +295,9 @@ void add_element_system(const FEMSystem & _sys,
            _femcontext.get_elem_residual(),
            _femcontext.get_dof_indices(), false);
       else if (_no_constraints)
-	{
-	  // Do noting
-	}
+        {
+          // Do noting
+        }
       else
         _sys.get_dof_map().constrain_element_vector
           (_femcontext.get_elem_residual(), _femcontext.get_dof_indices(), false);
@@ -1444,11 +1444,11 @@ void FEMSystem::mesh_position_get()
 FEMPhysics* FEMSystem::swap_with_diff_physics (FEMPhysics* swap_physics)
 {
   FEMPhysics* temp = dynamic_cast<FEMPhysics *>(this->get_physics());
-  std::cout<<"Swap Physics: "<<swap_physics<<std::endl;
-  std::cout<<"Diff Physics: "<<this->_diff_physics<<std::endl;
+
   this->_diff_physics = dynamic_cast<DifferentiablePhysics *>(swap_physics);
-  std::cout<<"Diff Physics: "<<this->_diff_physics<<std::endl;
+
   swap_physics = temp;
+
   return swap_physics;
 }
 
