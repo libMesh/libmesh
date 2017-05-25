@@ -29,7 +29,7 @@
 // There is no need for element and side qoi derivative functions, since the adjoint RHS is supplied
 // by the adjoint dirichlet boundary condition.
 
-// WARNING: To maintain consistency, the flux must be computed internally in the library as R^h(u^h, L^h)
+// WARNING: Ideally, the flux must be computed internally in the library as R^h(u^h, L^h)
 // where R^h is the residual vector, u^h is the solution, and L^h the lift function at the current mesh.
 // It is w.r.t to this QoI evaluation that the adjoint error estimate R^h+([u^h]+, z^h+ - [L^h]+) is a
 // valid estimate. Automatic flux QoI evaluation via Adjoint Dirichlet boundary conditions is forthcoming
