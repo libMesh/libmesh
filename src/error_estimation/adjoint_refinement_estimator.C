@@ -242,8 +242,8 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
         coarse_adjoints.push_back(static_cast<NumericVector<Number> *>(libmesh_nullptr));
     }
 
-  // Next, we are going to build up the residual for evaluating the error estimate
-  NumericVector<Number> * projected_residual = libmesh_nullptr;
+  // Next, we are going to build up the residual for evaluating the
+  // error estimate.
 
   // If the residual physics pointer is not null, use it when
   // evaluating here.
@@ -256,13 +256,14 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
       // have to be applied to get the correct error estimate since error
       // on the Dirichlet boundary is zero
       (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
-      projected_residual = &(dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
-      projected_residual->close();
 
       // Swap back if needed
       if (swapping_physics)
         dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
     }
+
+  NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
+  projected_residual.close();
 
   // Solve the adjoint problem(s) on the refined FE space
   system.adjoint_solve(_qoi_set);
@@ -297,7 +298,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
               system.get_adjoint_solution(j) -= system.get_vector(liftfunc_name.str());
 
               // Now evaluate R(u^h, z^h+ - lift)
-              computed_global_QoI_errors[j] = projected_residual->dot(system.get_adjoint_solution(j));
+              computed_global_QoI_errors[j] = projected_residual.dot(system.get_adjoint_solution(j));
 
               // Add the lift back to get back the adjoint
               system.get_adjoint_solution(j) += system.get_vector(liftfunc_name.str());
@@ -307,7 +308,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
             {
               // Usual dual weighted residual error estimate
               // |Q(u) - Q(u^h)| = |R([u^h]+, z^h+)| + HOT
-              computed_global_QoI_errors[j] = projected_residual->dot(system.get_adjoint_solution(j));
+              computed_global_QoI_errors[j] = projected_residual.dot(system.get_adjoint_solution(j));
             }
 
         }
@@ -457,7 +458,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // an element it owns
   UniquePtr<NumericVector<Number> > localized_projected_residual = NumericVector<Number>::build(system.comm());
   localized_projected_residual->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_send_list(), false, GHOSTED);
-  projected_residual->localize(*localized_projected_residual, system.get_dof_map().get_send_list());
+  projected_residual.localize(*localized_projected_residual, system.get_dof_map().get_send_list());
 
   // Each adjoint solution will also require ghosting; for efficiency we'll reuse the same memory
   UniquePtr<NumericVector<Number> > localized_adjoint_solution = NumericVector<Number>::build(system.comm());
