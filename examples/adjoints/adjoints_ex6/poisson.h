@@ -11,8 +11,8 @@ using namespace libMesh;
 class PoissonSystem : public FEMSystem
 {
 public:
-  PoissonSystem(EquationSystems& es,
-                const std::string& name_in,
+  PoissonSystem(EquationSystems & es,
+                const std::string & name_in,
                 const unsigned int number_in)
     : FEMSystem(es, name_in, number_in),
       _fe_family("LAGRANGE"), _fe_order(2),
@@ -26,9 +26,9 @@ public:
 
   virtual void postprocess(void);
 
-  Number &get_QoI_value(std::string type, unsigned int QoI_index)
+  Number & get_QoI_value(std::string type, unsigned int QoI_index)
   {
-    if(type == "exact")
+    if (type == "exact")
       {
         return exact_QoI[QoI_index];
       }
@@ -43,16 +43,16 @@ protected:
   virtual void init_data ();
 
   // Context initialization
-  virtual void init_context (DiffContext &context);
+  virtual void init_context (DiffContext & context);
 
   // Element residual and jacobian calculations
   // Time dependent parts
   virtual bool element_time_derivative (bool request_jacobian,
-                                        DiffContext &context);
+                                        DiffContext & context);
 
   // Overloading the postprocess function
 
-  virtual void element_postprocess(DiffContext &context);
+  virtual void element_postprocess(DiffContext & context);
 
   // Forcing function coefficient
   Real alpha;

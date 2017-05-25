@@ -14,17 +14,17 @@ using namespace libMesh;
 
 // Define the postprocess function to compute QoI 0, the weighted flux
 
-void PoissonSystem::element_postprocess (DiffContext &context)
+void PoissonSystem::element_postprocess (DiffContext & context)
 {
-  FEMContext &c = cast_ref<FEMContext&>(context);
+  FEMContext & c = cast_ref<FEMContext &>(context);
 
-  FEBase* elem_fe = NULL;
+  FEBase * elem_fe = NULL;
   c.get_element_fe( 0, elem_fe );
 
   // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = elem_fe->get_JxW();
+  const std::vector<Real> & JxW = elem_fe->get_JxW();
 
-  const std::vector<Point> &xyz = elem_fe->get_xyz();
+  const std::vector<Point> & xyz = elem_fe->get_xyz();
 
   // The number of local degrees of freedom in each variable
 

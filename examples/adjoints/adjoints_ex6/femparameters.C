@@ -21,7 +21,7 @@ using namespace libMesh;
     std::string stringval = input(#A, std::string());                   \
     variable_names.push_back(std::string(#A "=") + stringval); }
 
-FEMParameters::FEMParameters(const Parallel::Communicator &comm_in) :
+FEMParameters::FEMParameters(const Parallel::Communicator & comm_in) :
   ParallelObject(comm_in),
   initial_timestep(0), n_timesteps(100),
   transient(true),
@@ -147,8 +147,8 @@ AutoPtr<FunctionBase<Number> > new_function_base(const std::string& func_type,
 }
 
 
-void FEMParameters::read(GetPot &input,
-                         const std::vector<std::string>* other_variable_names)
+void FEMParameters::read(GetPot & input,
+                         const std::vector<std::string> * other_variable_names)
 {
   std::vector<std::string> variable_names;
   if (other_variable_names)

@@ -89,12 +89,12 @@ using namespace libMesh;
 
 // Write gmv output
 
-void write_output(EquationSystems &es,
+void write_output(EquationSystems & es,
                   unsigned int a_step,       // The adaptive step count
                   std::string solution_type) // primal or adjoint solve
 {
 #ifdef LIBMESH_HAVE_GMV
-  MeshBase &mesh = es.get_mesh();
+  MeshBase & mesh = es.get_mesh();
 
   std::ostringstream file_name_gmv;
   file_name_gmv << solution_type
@@ -111,7 +111,7 @@ void write_output(EquationSystems &es,
 
 // Set the parameters for the nonlinear and linear solvers to be used during the simulation
 
-void set_system_parameters(PoissonSystem &system, FEMParameters &param)
+void set_system_parameters(PoissonSystem & system, FEMParameters & param)
 {
   // Use analytical jacobians?
   system.analytic_jacobians() = param.analytic_jacobians;
@@ -137,7 +137,7 @@ void set_system_parameters(PoissonSystem &system, FEMParameters &param)
 
   // Nonlinear solver options
   {
-    NewtonSolver *solver = new NewtonSolver(system);
+    NewtonSolver * solver = new NewtonSolver(system);
     system.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver);
 
     solver->quiet                       = param.solver_quiet;
@@ -164,10 +164,10 @@ void set_system_parameters(PoissonSystem &system, FEMParameters &param)
 
 #ifdef LIBMESH_ENABLE_AMR
 
-UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
-                                                FEMParameters &param)
+UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
+                                                FEMParameters & param)
 {
-  MeshRefinement* mesh_refinement = new MeshRefinement(mesh);
+  MeshRefinement * mesh_refinement = new MeshRefinement(mesh);
   mesh_refinement->coarsen_by_parents() = true;
   mesh_refinement->absolute_global_tolerance() = param.global_tolerance;
   mesh_refinement->nelem_target()      = param.nelem_target;
@@ -181,11 +181,11 @@ UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
 // This is where declare the adjoint refined error estimator. This estimator builds an error bound
 // for Q(u) - Q(u_h), by solving the adjoint problem on a finer Finite Element space. For more details
 // see the description of the Adjoint Refinement Error Estimator in adjoint_refinement_error_estimator.C
-UniquePtr<AdjointRefinementEstimator> build_adjoint_refinement_error_estimator(QoISet &qois)
+UniquePtr<AdjointRefinementEstimator> build_adjoint_refinement_error_estimator(QoISet & qois)
 {
   std::cout<<"Computing the error estimate using the Adjoint Refinement Error Estimator"<<std::endl<<std::endl;
 
-  AdjointRefinementEstimator *adjoint_refinement_estimator = new AdjointRefinementEstimator;
+  AdjointRefinementEstimator * adjoint_refinement_estimator = new AdjointRefinementEstimator;
 
   adjoint_refinement_estimator->qoi_set() = qois;
 
@@ -199,7 +199,7 @@ UniquePtr<AdjointRefinementEstimator> build_adjoint_refinement_error_estimator(Q
 
 
 // The main program.
-int main (int argc, char** argv)
+int main (int argc, char ** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
@@ -261,7 +261,7 @@ int main (int argc, char** argv)
   std::cout << "Building system" << std::endl;
 
   // Build the FEMSystem
-  PoissonSystem &system = equation_systems.add_system<PoissonSystem> ("PoissonSystem");
+  PoissonSystem & system = equation_systems.add_system<PoissonSystem> ("PoissonSystem");
 
   // Set its parameters
   set_system_parameters(system, param);
@@ -278,7 +278,7 @@ int main (int argc, char** argv)
   equation_systems.print_info();
 
   // Get a pointer to the linear solver object to be able to reuse preconditioner
-  LinearSolver<Number> *linear_solver = system.get_linear_solver();
+  LinearSolver<Number> * linear_solver = system.get_linear_solver();
 
   {
     // Adaptively solve the timestep
@@ -330,10 +330,10 @@ int main (int argc, char** argv)
         system.set_adjoint_already_solved(true);
 
         // Get a pointer to the primal solution vector
-        NumericVector<Number> &primal_solution = *system.solution;
+        NumericVector<Number> & primal_solution = *system.solution;
 
         //Get a pointer to the solution vector of the adjoint problem for QoI 0
-        NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
+        NumericVector<Number> & dual_solution_0 = system.get_adjoint_solution(0);
 
         //Swap the primal and dual solutions so we can write out the adjoint solution
         primal_solution.swap(dual_solution_0);
@@ -392,12 +392,12 @@ int main (int argc, char** argv)
         // Otherwise we flag elements by error tolerance or nelem target
 
         // Uniform refinement
-        if(param.refine_uniformly)
+        if (param.refine_uniformly)
           {
             mesh_refinement->uniformly_refine(1);
           }
         // Adaptively refine based on reaching an error tolerance
-        else if(param.global_tolerance >= 0. && param.nelem_target == 0.)
+        else if (param.global_tolerance >= 0. && param.nelem_target == 0.)
           {
             mesh_refinement->flag_elements_by_error_tolerance (QoI_elementwise_error);
 
@@ -435,7 +435,7 @@ int main (int argc, char** argv)
 
         write_output(equation_systems, a_step, "primal");
 
-        NumericVector<Number> &primal_solution = *system.solution;
+        NumericVector<Number> & primal_solution = *system.solution;
 
         QoISet qois;
         std::vector<unsigned int> qoi_indices;
@@ -451,7 +451,7 @@ int main (int argc, char** argv)
         system.adjoint_solve();
         system.set_adjoint_already_solved(true);
 
-        NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
+        NumericVector<Number> & dual_solution_0 = system.get_adjoint_solution(0);
 
         primal_solution.swap(dual_solution_0);
         write_output(equation_systems, a_step, "adjoint_0");
