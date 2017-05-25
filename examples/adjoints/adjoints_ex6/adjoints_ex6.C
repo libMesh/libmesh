@@ -29,12 +29,12 @@
 // There is no need for element and side qoi derivative functions, since the adjoint RHS is supplied
 // by the adjoint dirichlet boundary condition.
 
-// WARNING: Ideally, the flux must be computed internally in the library as R^h(u^h, L^h)
-// where R^h is the residual vector, u^h is the solution, and L^h the lift function at the current mesh.
-// It is w.r.t to this QoI evaluation that the adjoint error estimate R^h+([u^h]+, z^h+ - [L^h]+) is a
-// valid estimate. Automatic flux QoI evaluation via Adjoint Dirichlet boundary conditions is forthcoming
-// in libMesh, after which flux QoIs will be computed internally and there will be no need for
-// element_postprocess.C
+// WARNING: Adjoint-dirichlet based weighted flux quantities of
+// interest are computed internally by FEMSystem as R^h(u^h, L^h)
+// where R^h is the physics residual, u^h is the solution, and L^h the
+// lift function at the current mesh.  This is appropriate for
+// unstabilized weak residuals.  Non-FEMSystem users and stabilized
+// method users will need to override the default flux QoI behavior.
 
 
 // An input file named "general.in"
