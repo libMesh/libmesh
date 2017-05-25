@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2015 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2017 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -11,6 +11,8 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
 
+
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -19,15 +21,18 @@
 // \author Vikram Garg
 // \date 2017
 //
-// This example solves the Poisson equation, whose solution displays a sharp layer,
-// with QoI based adjoint error estimation and adaptive mesh refinement. The exact
-// QoI value is in poisson.in. This example also illustrates the use of the adjoint Dirichlet boundary
-// condition capability, necesary for handling flux QoIs. We access the adjoint capabilities
-// of libMesh via the DiffSystem framework. This file (adjoints_ex6.C)
-// contains the declaration of mesh and equation system objects, poissonsystem.C
-// contains the assembly of the system. Postprocessing to compute the QoI is done in element_postprocess.C.
-// There is no need for element and side qoi derivative functions, since the adjoint RHS is supplied
-// by the adjoint dirichlet boundary condition.
+// This example solves the Poisson equation, whose solution displays a
+// sharp layer, with QoI based adjoint error estimation and adaptive
+// mesh refinement. The exact QoI value is in poisson.in. This example
+// also illustrates the use of the adjoint Dirichlet boundary
+// condition capability, necesary for handling flux QoIs. We access
+// the adjoint capabilities of libMesh via the DiffSystem
+// framework. This file (adjoints_ex6.C) contains the declaration of
+// mesh and equation system objects, poissonsystem.C contains the
+// assembly of the system. Postprocessing to compute the QoI is done
+// in element_postprocess.C.  There is no need for element and side
+// qoi derivative functions, since the adjoint RHS is supplied by the
+// adjoint dirichlet boundary condition.
 
 // WARNING: Adjoint-dirichlet based weighted flux quantities of
 // interest are computed internally by FEMSystem as R^h(u^h, L^h)
@@ -36,18 +41,17 @@
 // unstabilized weak residuals.  Non-FEMSystem users and stabilized
 // method users will need to override the default flux QoI behavior.
 
-
-// An input file named "general.in"
-// is provided which allows the user to set several parameters for
-// the solution so that the problem can be re-run without a
-// re-compile.  The solution technique employed is to have a
-// refinement loop with a linear (forward and adjoint) solve inside followed by a
-// refinement of the grid and projection of the solution to the new grid
-// In the final loop iteration, there is no additional
-// refinement after the solve.  In the input file "general.in", the variable
-// "max_adaptivesteps" controls the number of refinement steps, and
-// "refine_fraction" / "coarsen_fraction" determine the number of
-// elements which will be refined / coarsened at each step.
+// An input file named "general.in" is provided which allows the user
+// to set several parameters for the solution so that the problem can
+// be re-run without a re-compile.  The solution technique employed is
+// to have a refinement loop with a linear (forward and adjoint) solve
+// inside followed by a refinement of the grid and projection of the
+// solution to the new grid In the final loop iteration, there is no
+// additional refinement after the solve.  In the input file
+// "general.in", the variable "max_adaptivesteps" controls the number
+// of refinement steps, and "refine_fraction" / "coarsen_fraction"
+// determine the number of elements which will be refined / coarsened
+// at each step.
 
 // C++ includes
 #include <iostream>
@@ -88,7 +92,6 @@ using namespace libMesh;
 // whether the output is the primal solution or the dual solution for the ith QoI
 
 // Write gmv output
-
 void write_output(EquationSystems & es,
                   unsigned int a_step,       // The adaptive step count
                   std::string solution_type) // primal or adjoint solve
@@ -110,7 +113,6 @@ void write_output(EquationSystems & es,
 }
 
 // Set the parameters for the nonlinear and linear solvers to be used during the simulation
-
 void set_system_parameters(PoissonSystem & system, FEMParameters & param)
 {
   // Use analytical jacobians?
@@ -160,10 +162,10 @@ void set_system_parameters(PoissonSystem & system, FEMParameters & param)
   }
 }
 
-// Build the mesh refinement object and set parameters for refining/coarsening etc
 
 #ifdef LIBMESH_ENABLE_AMR
 
+// Build the mesh refinement object and set parameters for refining/coarsening etc
 UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
                                                 FEMParameters & param)
 {
@@ -178,9 +180,12 @@ UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
   return UniquePtr<MeshRefinement>(mesh_refinement);
 }
 
-// This is where declare the adjoint refined error estimator. This estimator builds an error bound
-// for Q(u) - Q(u_h), by solving the adjoint problem on a finer Finite Element space. For more details
-// see the description of the Adjoint Refinement Error Estimator in adjoint_refinement_error_estimator.C
+
+// This is where declare the adjoint refined error estimator. This
+// estimator builds an error bound for Q(u) - Q(u_h), by solving the
+// adjoint problem on a finer Finite Element space. For more details
+// see the description of the Adjoint Refinement Error Estimator in
+// adjoint_refinement_error_estimator.C
 UniquePtr<AdjointRefinementEstimator> build_adjoint_refinement_error_estimator(QoISet & qois)
 {
   libMesh::out << "Computing the error estimate using the Adjoint Refinement Error Estimator\n" << std::endl;
@@ -417,7 +422,7 @@ int main (int argc, char ** argv)
             mesh_refinement->refine_and_coarsen_elements();
           }
 
-        // Dont forget to reinit the system after each adaptive refinement !
+        // Dont forget to reinit the system after each adaptive refinement!
         equation_systems.reinit();
 
         libMesh::out << "Refined mesh to "
@@ -476,9 +481,12 @@ int main (int argc, char ** argv)
                      << std::abs(QoI_0_computed - QoI_0_exact) << std::endl; // / std::abs(QoI_0_exact)
 
 
-        // We will declare an error vector for passing to the adjoint refinement error estimator
-        // Right now, only the first entry of this vector will be filled (with the global QoI error estimate)
-        // Later, each entry of the vector will contain elementwise error that the user can sum to get the total error
+        // We will declare an error vector for passing to the adjoint
+        // refinement error estimator Right now, only the first entry
+        // of this vector will be filled (with the global QoI error
+        // estimate) Later, each entry of the vector will contain
+        // elementwise error that the user can sum to get the total
+        // error
         ErrorVector QoI_elementwise_error;
 
         // Build an adjoint refinement error estimator object
@@ -488,8 +496,9 @@ int main (int argc, char ** argv)
         // Estimate the error in each element using the Adjoint Refinement estimator
         adjoint_refinement_error_estimator->estimate_error(system, QoI_elementwise_error);
 
-        // Print out the computed error estimate, note that we access the global error estimates
-        // using an accessor function, right now sum(QoI_elementwise_error) != global_QoI_error_estimate
+        // Print out the computed error estimate, note that we access
+        // the global error estimates using an accessor function,
+        // right now sum(QoI_elementwise_error) != global_QoI_error_estimate
         libMesh::out << "The computed relative error in QoI 0 is " << std::setprecision(17)
                      << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) << std::endl; // / std::abs(QoI_0_exact)
 
