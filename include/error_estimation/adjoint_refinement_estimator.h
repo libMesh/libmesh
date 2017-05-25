@@ -24,7 +24,7 @@
 #include "libmesh/error_estimator.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/qoi_set.h"
-#include "libmesh/fem_physics.h"
+#include "libmesh/diff_physics.h"
 
 // C++ includes
 #include <cstddef>
@@ -128,13 +128,13 @@ public:
    * Returns reference to DifferentiablePhysics object. Will return NULL if
    * no external Physics object is attached.
    */
-  FEMPhysics * get_residual_evaluation_physics()
+  DifferentiablePhysics * get_residual_evaluation_physics()
   { return this->_residual_evaluation_physics; }
 
   /**
    * Set the _residual_evaluation_physics member to argument
    */
-  void set_residual_evaluation_physics(FEMPhysics* set_physics)
+  void set_residual_evaluation_physics(DifferentiablePhysics* set_physics)
   { this->_residual_evaluation_physics = set_physics; }
 
 protected:
@@ -143,7 +143,7 @@ protected:
    * Pointer to object to use for physics assembly evaluations.
    * Defaults to libmesh_nullptr for backwards compatibility.
    */
-  FEMPhysics * _residual_evaluation_physics;
+  DifferentiablePhysics * _residual_evaluation_physics;
 
   /* A vector to hold the computed global QoI error estimate */
   std::vector<Number> computed_global_QoI_errors;

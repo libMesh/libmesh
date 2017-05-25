@@ -183,6 +183,11 @@ public:
     this->_diff_physics->init_physics(*this);}
 
   /**
+   * Swap current physics object with external object
+   */
+  void swap_physics ( DifferentiablePhysics * & swap_physics );
+
+  /**
    * Returns const reference to DifferentiableQoI object. Note that if no external
    * QoI object is attached, the default is this.
    */

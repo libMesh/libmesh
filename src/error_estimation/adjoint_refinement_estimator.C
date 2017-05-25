@@ -142,7 +142,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
           else // Else residual ptr is not null (i.e. user has set physics which they want to use for the QoI evaluation)
             {
               // Swap the system and residual evaluation physics with each other
-              _residual_evaluation_physics = dynamic_cast<FEMSystem &>(system).swap_with_diff_physics(_residual_evaluation_physics);
+              dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
 
               // Assemble without applying constraints, to capture the solution values on the boundary
               // The fact that we are assembling with the user specified residual physics impacts the
@@ -167,7 +167,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
                 (system.get_vector(liftfunc_name.str()), static_cast<unsigned int>(j));
 
               // Swap back the residual evaluation and system physics
-              _residual_evaluation_physics = dynamic_cast<FEMSystem &>(system).swap_with_diff_physics(_residual_evaluation_physics);
+              dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
 
               // Compute the flux R(u^h, L)
               std::cout<<"The flux QoI "<<static_cast<unsigned int>(j)<<" is: "<<coarse_residual->dot(system.get_vector(liftfunc_name.str()))<<std::endl<<std::endl;
@@ -283,7 +283,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   else // Else residual ptr is not null (i.e. user has set physics which they want to use for residual evaluation)
     {
       // Swap the residual evaluation physics with the system physics
-      _residual_evaluation_physics = dynamic_cast<FEMSystem &>(system).swap_with_diff_physics(_residual_evaluation_physics);
+      dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
 
       // Rebuild the rhs with the projected primal solution (and user specified physics), constraints have to be applied to get the correct error estimate since error on the Dirichlet boundary is zero
       (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
@@ -291,7 +291,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
       projected_residual->close();
 
       // Swap back system and residual evaluation physics
-      _residual_evaluation_physics = dynamic_cast<FEMSystem &>(system).swap_with_diff_physics(_residual_evaluation_physics);
+      dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
     }
 
   // Solve the adjoint problem(s) on the refined FE space

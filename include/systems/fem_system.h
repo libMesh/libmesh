@@ -234,11 +234,6 @@ public:
    */
   void numerical_nonlocal_jacobian (FEMContext & context) const;
 
-  /**
-   * Swap pointer of physics object belonging to current FEMSystem object with another FEMPhysics called swap_physics
-   */
-  FEMPhysics* swap_with_diff_physics (FEMPhysics* swap_physics);
-
 protected:
   /**
    * Initializes the member data fields associated with
