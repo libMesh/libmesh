@@ -21,9 +21,9 @@
 //
 // This example solves the Poisson equation, whose solution displays a sharp layer,
 // with QoI based adjoint error estimation and adaptive mesh refinement. The exact
-// solution is . This example also illustrates the use of the adjoint Dirichlet boundary
-// condition capability, necesary for handling flux QoIs. Since we use the adjoint capabilities
-// of libMesh in this example, we use the DiffSystem framework. This file (adjoints_ex6.C)
+// QoI value is in poisson.in. This example also illustrates the use of the adjoint Dirichlet boundary
+// condition capability, necesary for handling flux QoIs. We access the adjoint capabilities
+// of libMesh via the DiffSystem framework. This file (adjoints_ex6.C)
 // contains the declaration of mesh and equation system objects, poissonsystem.C
 // contains the assembly of the system. Postprocessing to compute the QoI is done in element_postprocess.C.
 // There is no need for element and side qoi derivative functions, since the adjoint RHS is supplied
