@@ -24,11 +24,13 @@
 #include "libmesh/error_estimator.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/qoi_set.h"
-#include "libmesh/diff_physics.h"
 
 // C++ includes
 #include <cstddef>
 #include <vector>
+
+// Forward declarations
+class DifferentiablePhysics;
 
 #ifdef LIBMESH_ENABLE_AMR
 
