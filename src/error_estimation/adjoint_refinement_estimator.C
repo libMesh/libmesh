@@ -328,12 +328,23 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
       // Skip this QoI if not in the QoI Set
       if (_qoi_set.has_index(j))
         {
+          // If we have a NULL residual evaluation physics pointer, we
+          // assume the user's formulation is consistent from mesh to
+          // mesh, so we have Galerkin orthogonality and we can get
+          // better indicator results by subtracting a coarse adjoint.
 
-          // Here we assume that a non-NULL residual evaluation physics implies a stabilized formulation
-          // Definitely not the best thing to do when the residual evaluation physics is not related
-          // to stabilized/non-stabilized, but we will have to live with suboptimal elementwise breakdown
-          // in that case for now
-          if(!system.get_dof_map().has_adjoint_dirichlet_boundaries(j) && _residual_evaluation_physics)
+          // If we have a residual evaluation physics pointer, but we
+          // also have heterogeneous adjoint dirichlet boundaries,
+          // then we have to subtract off *some* lift function for
+          // consistency, and we choose the coarse adjoint in lieu of
+          // having any better ideas.
+
+          // If we have a residual evaluation physics pointer and we
+          // have homogeneous adjoint dirichlet boundaries, then we
+          // don't have to subtract off anything, and with stabilized
+          // formulations we get the best results if we don't.
+          if(system.get_dof_map().has_adjoint_dirichlet_boundaries(j)
+             || !_residual_evaluation_physics)
             {
               // z^h+ -> z^h+ - [z^h]+
               system.get_adjoint_solution(j) -= *coarse_adjoints[j];
