@@ -24,6 +24,8 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/zero_function.h"
 
+#include <utility> // std::swap
+
 namespace libMesh
 {
 
@@ -360,5 +362,13 @@ bool DifferentiableSystem::have_second_order_scalar_vars() const
 
   return have_second_order_scalar_vars;
 }
+
+
+
+void DifferentiableSystem::swap_physics ( DifferentiablePhysics * & swap_physics )
+{
+  std::swap(this->_diff_physics, swap_physics);
+}
+
 
 } // namespace libMesh

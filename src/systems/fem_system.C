@@ -276,7 +276,7 @@ void add_element_system(const FEMSystem & _sys,
           (_femcontext.get_elem_jacobian(),
            _femcontext.get_elem_residual(),
            _femcontext.get_dof_indices(), false);
-      else
+      else if (!_no_constraints)
         _sys.get_dof_map().constrain_element_matrix_and_vector
           (_femcontext.get_elem_jacobian(),
            _femcontext.get_elem_residual(),
@@ -290,7 +290,7 @@ void add_element_system(const FEMSystem & _sys,
           (_femcontext.get_elem_jacobian(),
            _femcontext.get_elem_residual(),
            _femcontext.get_dof_indices(), false);
-      else
+      else if (!_no_constraints)
         _sys.get_dof_map().constrain_element_vector
           (_femcontext.get_elem_residual(), _femcontext.get_dof_indices(), false);
       // Do nothing if (_no_constraints)
@@ -380,8 +380,7 @@ public:
         _femcontext.elem_fe_reinit();
 
         assemble_unconstrained_element_system
-          (_sys, _get_jacobian, _constrain_heterogeneously,
-           _femcontext);
+          (_sys, _get_jacobian, _constrain_heterogeneously, _femcontext);
 
         add_element_system
           (_sys, _get_residual, _get_jacobian,

@@ -50,7 +50,7 @@ Real Euler2Solver::error_order() const
 bool Euler2Solver::element_residual (bool request_jacobian,
                                      DiffContext & context)
 {
-  bool compute_second_order_eqns = !this->_system.get_second_order_vars().empty();
+  bool compute_second_order_eqns = !this->_system.get_physics()->get_second_order_vars().empty();
 
   return this->_general_residual(request_jacobian,
                                  context,
@@ -158,18 +158,18 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
   // The element should already be in the proper place
   // even for a moving mesh problem.
   bool jacobian_computed =
-    (_system.*time_deriv)(request_jacobian, context);
+    (_system.get_physics()->*time_deriv)(request_jacobian, context);
 
   // Next, evaluate the mass residual at the new timestep
 
-  jacobian_computed = (_system.*mass)(jacobian_computed, context) &&
+  jacobian_computed = (_system.get_physics()->*mass)(jacobian_computed, context) &&
     jacobian_computed;
 
   // If we have second-order variables, we need to get damping terms
   // and the velocity equations
   if (compute_second_order_eqns)
     {
-      jacobian_computed = (_system.*damping)(jacobian_computed, context) &&
+      jacobian_computed = (_system.get_physics()->*damping)(jacobian_computed, context) &&
         jacobian_computed;
 
       jacobian_computed = this->compute_second_order_eqns(jacobian_computed, context) &&
@@ -177,7 +177,7 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
     }
 
   // Add the constraint term
-  jacobian_computed = (_system.*constraint)(jacobian_computed, context) &&
+  jacobian_computed = (_system.get_physics()->*constraint)(jacobian_computed, context) &&
     jacobian_computed;
 
   // The new solution's contribution is scaled by theta
@@ -202,7 +202,7 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
   (context.*reinit_func)(0.);
 
   jacobian_computed =
-    (_system.*time_deriv)(jacobian_computed, context) &&
+    (_system.get_physics()->*time_deriv)(jacobian_computed, context) &&
     jacobian_computed;
 
   // Add the mass residual term for the old solution
@@ -213,14 +213,14 @@ bool Euler2Solver::_general_residual (bool request_jacobian,
   // mass_residual functions
 
   jacobian_computed =
-    (_system.*mass)(jacobian_computed, context) &&
+    (_system.get_physics()->*mass)(jacobian_computed, context) &&
     jacobian_computed;
 
   // If we have second-order variables, we need to get damping terms
   // and the velocity equations
   if (compute_second_order_eqns)
     {
-      jacobian_computed = (_system.*damping)(jacobian_computed, context) &&
+      jacobian_computed = (_system.get_physics()->*damping)(jacobian_computed, context) &&
         jacobian_computed;
 
       jacobian_computed = this->compute_second_order_eqns(jacobian_computed, context) &&

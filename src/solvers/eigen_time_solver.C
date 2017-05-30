@@ -137,13 +137,13 @@ bool EigenTimeSolver::element_residual(bool request_jacobian,
   if (now_assembling == Matrix_A)
     {
       bool jacobian_computed =
-        _system.element_time_derivative(request_jacobian, context);
+        _system.get_physics()->element_time_derivative(request_jacobian, context);
 
       // The user shouldn't compute a jacobian unless requested
       libmesh_assert(request_jacobian || !jacobian_computed);
 
       bool jacobian_computed2 =
-        _system.element_constraint(jacobian_computed, context);
+        _system.get_physics()->element_constraint(jacobian_computed, context);
 
       // The user shouldn't compute a jacobian unless requested
       libmesh_assert (jacobian_computed || !jacobian_computed2);
@@ -156,7 +156,7 @@ bool EigenTimeSolver::element_residual(bool request_jacobian,
   else if (now_assembling == Matrix_B)
     {
       bool mass_jacobian_computed =
-        _system.mass_residual(request_jacobian, context);
+        _system.get_physics()->mass_residual(request_jacobian, context);
 
       // Scale Jacobian by -1 to get positive matrix from new negative
       // mass_residual convention
@@ -184,13 +184,13 @@ bool EigenTimeSolver::side_residual(bool request_jacobian,
   if (now_assembling == Matrix_A)
     {
       bool jacobian_computed =
-        _system.side_time_derivative(request_jacobian, context);
+        _system.get_physics()->side_time_derivative(request_jacobian, context);
 
       // The user shouldn't compute a jacobian unless requested
       libmesh_assert (request_jacobian || !jacobian_computed);
 
       bool jacobian_computed2 =
-        _system.side_constraint(jacobian_computed, context);
+        _system.get_physics()->side_constraint(jacobian_computed, context);
 
       // The user shouldn't compute a jacobian unless requested
       libmesh_assert (jacobian_computed || !jacobian_computed2);
@@ -203,7 +203,7 @@ bool EigenTimeSolver::side_residual(bool request_jacobian,
   else if (now_assembling == Matrix_B)
     {
       bool mass_jacobian_computed =
-        _system.side_mass_residual(request_jacobian, context);
+        _system.get_physics()->side_mass_residual(request_jacobian, context);
 
       // Scale Jacobian by -1 to get positive matrix from new negative
       // mass_residual convention
@@ -228,13 +228,13 @@ bool EigenTimeSolver::nonlocal_residual(bool request_jacobian,
   if (now_assembling == Matrix_A)
     {
       bool jacobian_computed =
-        _system.nonlocal_time_derivative(request_jacobian, context);
+        _system.get_physics()->nonlocal_time_derivative(request_jacobian, context);
 
       // The user shouldn't compute a jacobian unless requested
       libmesh_assert (request_jacobian || !jacobian_computed);
 
       bool jacobian_computed2 =
-        _system.nonlocal_constraint(jacobian_computed, context);
+        _system.get_physics()->nonlocal_constraint(jacobian_computed, context);
 
       // The user shouldn't compute a jacobian unless requested
       libmesh_assert (jacobian_computed || !jacobian_computed2);
@@ -247,7 +247,7 @@ bool EigenTimeSolver::nonlocal_residual(bool request_jacobian,
   else if (now_assembling == Matrix_B)
     {
       bool mass_jacobian_computed =
-        _system.nonlocal_mass_residual(request_jacobian, context);
+        _system.get_physics()->nonlocal_mass_residual(request_jacobian, context);
 
       // Scale Jacobian by -1 to get positive matrix from new negative
       // mass_residual convention

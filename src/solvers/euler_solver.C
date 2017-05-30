@@ -50,7 +50,7 @@ Real EulerSolver::error_order() const
 bool EulerSolver::element_residual (bool request_jacobian,
                                     DiffContext & context)
 {
-  bool compute_second_order_eqns = this->_system.have_second_order_vars();
+  bool compute_second_order_eqns = this->_system.get_physics()->have_second_order_vars();
 
   return this->_general_residual(request_jacobian,
                                  context,
@@ -151,16 +151,16 @@ bool EulerSolver::_general_residual (bool request_jacobian,
 
   // Get the time derivative at t_theta
   bool jacobian_computed =
-    (_system.*time_deriv)(request_jacobian, context);
+    (_system.get_physics()->*time_deriv)(request_jacobian, context);
 
-  jacobian_computed = (_system.*mass)(jacobian_computed, context) &&
+  jacobian_computed = (_system.get_physics()->*mass)(jacobian_computed, context) &&
     jacobian_computed;
 
   // If we have second-order variables, we need to get damping terms
   // and the velocity equations
   if (compute_second_order_eqns)
     {
-      jacobian_computed = (_system.*damping)(jacobian_computed, context) &&
+      jacobian_computed = (_system.get_physics()->*damping)(jacobian_computed, context) &&
         jacobian_computed;
 
       jacobian_computed = this->compute_second_order_eqns(jacobian_computed, context) &&
@@ -175,7 +175,7 @@ bool EulerSolver::_general_residual (bool request_jacobian,
   context.elem_solution_derivative = 1;
 
   // Add the constraint term
-  jacobian_computed = (_system.*constraint)(jacobian_computed, context) &&
+  jacobian_computed = (_system.get_physics()->*constraint)(jacobian_computed, context) &&
     jacobian_computed;
 
   // Add back (or restore) the old jacobian

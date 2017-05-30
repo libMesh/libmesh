@@ -317,18 +317,18 @@ bool NewmarkSolver::_general_residual (bool request_jacobian,
     context.get_elem_fixed_solution() = context.get_elem_solution();
 
   // Get the time derivative at t_{n+1}, F(u_{n+1})
-  bool jacobian_computed = (_system.*time_deriv)(request_jacobian, context);
+  bool jacobian_computed = (_system.get_physics()->*time_deriv)(request_jacobian, context);
 
   // Damping at t_{n+1}, C(u_{n+1})
-  jacobian_computed = (_system.*damping)(jacobian_computed, context) &&
+  jacobian_computed = (_system.get_physics()->*damping)(jacobian_computed, context) &&
     jacobian_computed;
 
   // Mass at t_{n+1}, M(u_{n+1})
-  jacobian_computed = (_system.*mass)(jacobian_computed, context) &&
+  jacobian_computed = (_system.get_physics()->*mass)(jacobian_computed, context) &&
     jacobian_computed;
 
   // Add the constraint term
-  jacobian_computed = (_system.*constraint)(jacobian_computed, context) &&
+  jacobian_computed = (_system.get_physics()->*constraint)(jacobian_computed, context) &&
     jacobian_computed;
 
   // Add back (or restore) the old jacobian

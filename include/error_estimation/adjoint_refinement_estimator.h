@@ -29,6 +29,9 @@
 #include <cstddef>
 #include <vector>
 
+// Forward declarations
+class DifferentiablePhysics;
+
 #ifdef LIBMESH_ENABLE_AMR
 
 namespace libMesh
@@ -55,6 +58,7 @@ public:
     ErrorEstimator(),
     number_h_refinements(1),
     number_p_refinements(0),
+    _residual_evaluation_physics(libmesh_nullptr),
     _qoi_set(QoISet())
   {
     // We're not actually going to use error_norm; our norms are
@@ -122,7 +126,26 @@ public:
    */
   unsigned char number_p_refinements;
 
+  /**
+   * Returns reference to DifferentiablePhysics object. Will return NULL if
+   * no external Physics object is attached.
+   */
+  DifferentiablePhysics * get_residual_evaluation_physics()
+  { return this->_residual_evaluation_physics; }
+
+  /**
+   * Set the _residual_evaluation_physics member to argument
+   */
+  void set_residual_evaluation_physics(DifferentiablePhysics* set_physics)
+  { this->_residual_evaluation_physics = set_physics; }
+
 protected:
+
+  /**
+   * Pointer to object to use for physics assembly evaluations.
+   * Defaults to libmesh_nullptr for backwards compatibility.
+   */
+  DifferentiablePhysics * _residual_evaluation_physics;
 
   /* A vector to hold the computed global QoI error estimate */
   std::vector<Number> computed_global_QoI_errors;
