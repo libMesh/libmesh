@@ -439,8 +439,8 @@ void UnstructuredMesh::all_first_order ()
   // might now have an invalid nodal processor_id()
   Partitioner::set_node_processor_ids(*this);
 
-  // delete or renumber nodes, etc
-  this->prepare_for_use(/*skip_renumber =*/ false);
+  // delete or renumber nodes if desired
+  this->prepare_for_use();
 }
 
 
