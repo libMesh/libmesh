@@ -196,8 +196,9 @@ public:
   { return _elem_dims; }
 
   /**
-   * Returns the "spatial dimension" of the mesh.  The spatial
-   * dimension is defined as:
+   * \returns The "spatial dimension" of the mesh.
+   *
+   * The spatial dimension is defined as:
    *
    *   1 - for an exactly x-aligned mesh of 1D elements
    *   2 - for an exactly x-y planar mesh of 2D elements
@@ -228,49 +229,53 @@ public:
   void set_spatial_dimension(unsigned char d);
 
   /**
-   * Returns the number of nodes in the mesh. This function and others must
-   * be defined in derived classes since the MeshBase class has no specific
-   * storage for nodes or elements.  The standard n_nodes() function
-   * may return a cached value on distributed meshes, and so can be
-   * called by any processor at any time.
+   * \returns The number of nodes in the mesh.
+   *
+   * This function and others must be defined in derived classes since
+   * the MeshBase class has no specific storage for nodes or elements.
+   * The standard \p n_nodes() function may return a cached value on
+   * distributed meshes, and so can be called by any processor at any
+   * time.
    */
   virtual dof_id_type n_nodes () const = 0;
 
   /**
-   * Returns the number of nodes in the mesh. This function and others must
-   * be defined in derived classes since the MeshBase class has no specific
-   * storage for nodes or elements.  The parallel_n_nodes() function
-   * returns a newly calculated parallel-synchronized value on
-   * distributed meshes, and so must be called in parallel only.
+   * \returns The number of nodes in the mesh.
+   *
+   * This function and others must be defined in derived classes since
+   * the MeshBase class has no specific storage for nodes or elements.
+   * The \p parallel_n_nodes() function returns a newly calculated
+   * parallel-synchronized value on distributed meshes, and so must be
+   * called in parallel only.
    */
   virtual dof_id_type parallel_n_nodes () const = 0;
 
   /**
-   * Returns the number of nodes on processor \p proc.
+   * \returns The number of nodes on processor \p proc.
    */
   dof_id_type n_nodes_on_proc (const processor_id_type proc) const;
 
   /**
-   * Returns the number of nodes on the local processor.
+   * \returns The number of nodes on the local processor.
    */
   dof_id_type n_local_nodes () const
   { return this->n_nodes_on_proc (this->processor_id()); }
 
   /**
-   * Returns the number of nodes owned by no processor.
+   * \returns The number of nodes owned by no processor.
    */
   dof_id_type n_unpartitioned_nodes () const
   { return this->n_nodes_on_proc (DofObject::invalid_processor_id); }
 
   /**
-   * Returns a number greater than or equal to the maximum node id in the
+   * \returns A number greater than or equal to the maximum node id in the
    * mesh.
    */
   virtual dof_id_type max_node_id () const = 0;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   /**
-   * Returns the next unique id to be used.
+   * \returns The next unique id to be used.
    */
   unique_id_type next_unique_id() { return _next_unique_id; }
 
@@ -290,28 +295,31 @@ public:
   virtual void reserve_nodes (const dof_id_type nn) = 0;
 
   /**
-   * Returns the number of elements in the mesh.  The standard
-   * n_elem() function may return a cached value on distributed
-   * meshes, and so can be called by any processor at any time.
+   * \returns the number of elements in the mesh.
+   *
+   * The standard n_elem() function may return a cached value on
+   * distributed meshes, and so can be called by any processor at any
+   * time.
    */
   virtual dof_id_type n_elem () const = 0;
 
   /**
-   * Returns the number of elements in the mesh.  The
-   * parallel_n_elem() function returns a newly calculated
+   * \returns The number of elements in the mesh.
+   *
+   * The parallel_n_elem() function returns a newly calculated
    * parallel-synchronized value on distributed meshes, and so must be
    * called in parallel only.
    */
   virtual dof_id_type parallel_n_elem () const = 0;
 
   /**
-   * Returns a number greater than or equal to the maximum element id in the
+   * \returns A number greater than or equal to the maximum element id in the
    * mesh.
    */
   virtual dof_id_type max_elem_id () const = 0;
 
   /**
-   * Returns a number greater than or equal to the maximum unique_id in the
+   * \returns A number greater than or equal to the maximum unique_id in the
    * mesh.
    */
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -334,62 +342,65 @@ public:
   virtual void update_parallel_id_counts () = 0;
 
   /**
-   * Returns the number of active elements in the mesh.  Implemented
-   * in terms of active_element_iterators.
+   * \returns The number of active elements in the mesh.
+   *
+   * Implemented in terms of active_element_iterators.
    */
   virtual dof_id_type n_active_elem () const = 0;
 
   /**
-   * Returns the number of elements on processor \p proc.
+   * \returns The number of elements on processor \p proc.
    */
   dof_id_type n_elem_on_proc (const processor_id_type proc) const;
 
   /**
-   * Returns the number of elements on the local processor.
+   * \returns The number of elements on the local processor.
    */
   dof_id_type n_local_elem () const
   { return this->n_elem_on_proc (this->processor_id()); }
 
   /**
-   * Returns the number of elements owned by no processor.
+   * \returns The number of elements owned by no processor.
    */
   dof_id_type n_unpartitioned_elem () const
   { return this->n_elem_on_proc (DofObject::invalid_processor_id); }
 
   /**
-   * Returns the number of active elements on processor \p proc.
+   * \returns The number of active elements on processor \p proc.
    */
   dof_id_type n_active_elem_on_proc (const processor_id_type proc) const;
 
   /**
-   * Returns the number of active elements on the local processor.
+   * \returns The number of active elements on the local processor.
    */
   dof_id_type n_active_local_elem () const
   { return this->n_active_elem_on_proc (this->processor_id()); }
 
   /**
-   * This function returns the number of elements that will be written
-   * out in the Tecplot format.  For example, a 9-noded quadrilateral will
-   * be broken into 4 linear sub-elements for plotting purposes.  Thus, for
-   * a mesh of 2 \p QUAD9 elements  \p n_tecplot_elem() will return 8.
-   * Implemented in terms of element_iterators.
+   * \returns The number of elements that will be written
+   * out in certain I/O formats.
+   *
+   * For example, a 9-noded quadrilateral will be broken into 4 linear
+   * sub-elements for plotting purposes.  Thus, for a mesh of 2 \p
+   * QUAD9 elements \p n_tecplot_elem() will return 8.  Implemented in
+   * terms of element_iterators.
    */
   dof_id_type n_sub_elem () const;
 
   /**
-   * Same, but only counts active elements.
+   * Same as \p n_sub_elem(), but only counts active elements.
    */
   dof_id_type n_active_sub_elem () const;
 
   /**
-   * Return a constant reference (for reading only) to the
+   * \returns A constant reference (for reading only) to the
    * \f$ i^{th} \f$ point, which should be present in this processor's
    * subset of the mesh data structure.
    */
   virtual const Point & point (const dof_id_type i) const = 0;
 
   /**
-   * Return a constant reference (for reading only) to the
+   * \returns A constant reference (for reading only) to the
    * \f$ i^{th} \f$ node, which should be present in this processor's
    * subset of the mesh data structure.
    */
@@ -398,7 +409,7 @@ public:
   }
 
   /**
-   * Return a reference to the \f$ i^{th} \f$ node, which should be
+   * \returns A reference to the \f$ i^{th} \f$ node, which should be
    * present in this processor's subset of the mesh data structure.
    */
   virtual Node & node_ref (const dof_id_type i) {
@@ -406,7 +417,7 @@ public:
   }
 
   /**
-   * Return a constant reference (for reading only) to the
+   * \returns A constant reference (for reading only) to the
    * \f$ i^{th} \f$ node, which should be present in this processor's
    * subset of the mesh data structure.
    *
@@ -419,7 +430,7 @@ public:
   }
 
   /**
-   * Return a reference to the \f$ i^{th} \f$ node, which should be
+   * \returns A reference to the \f$ i^{th} \f$ node, which should be
    * present in this processor's subset of the mesh data structure.
    *
    * \deprecated Use the less confusingly-named node_ref() instead.
@@ -431,32 +442,32 @@ public:
   }
 
   /**
-   * Return a pointer to the \f$ i^{th} \f$ node, which should be
+   * \returns A pointer to the \f$ i^{th} \f$ node, which should be
    * present in this processor's subset of the mesh data structure.
    */
   virtual const Node * node_ptr (const dof_id_type i) const = 0;
 
   /**
-   * Return a writeable pointer to the \f$ i^{th} \f$ node, which
+   * \returns A writeable pointer to the \f$ i^{th} \f$ node, which
    * should be present in this processor's subset of the mesh data
    * structure.
    */
   virtual Node * node_ptr (const dof_id_type i) = 0;
 
   /**
-   * Return a pointer to the \f$ i^{th} \f$ node, or NULL if no such
+   * \returns A pointer to the \f$ i^{th} \f$ node, or \p NULL if no such
    * node exists in this processor's mesh data structure.
    */
   virtual const Node * query_node_ptr (const dof_id_type i) const = 0;
 
   /**
-   * Return a writeable pointer to the \f$ i^{th} \f$ node, or NULL if
+   * \returns A writeable pointer to the \f$ i^{th} \f$ node, or \p NULL if
    * no such node exists in this processor's mesh data structure.
    */
   virtual Node * query_node_ptr (const dof_id_type i) = 0;
 
   /**
-   * Return a reference to the \f$ i^{th} \f$ element, which should be
+   * \returns A reference to the \f$ i^{th} \f$ element, which should be
    * present in this processor's subset of the mesh data structure.
    */
   virtual const Elem & elem_ref (const dof_id_type i) const {
@@ -464,7 +475,7 @@ public:
   }
 
   /**
-   * Return a writeable reference to the \f$ i^{th} \f$ element, which
+   * \returns A writeable reference to the \f$ i^{th} \f$ element, which
    * should be present in this processor's subset of the mesh data
    * structure.
    */
@@ -473,20 +484,20 @@ public:
   }
 
   /**
-   * Return a pointer to the \f$ i^{th} \f$ element, which should be
+   * \returns A pointer to the \f$ i^{th} \f$ element, which should be
    * present in this processor's subset of the mesh data structure.
    */
   virtual const Elem * elem_ptr (const dof_id_type i) const = 0;
 
   /**
-   * Return a writeable pointer to the \f$ i^{th} \f$ element, which
+   * \returns A writeable pointer to the \f$ i^{th} \f$ element, which
    * should be present in this processor's subset of the mesh data
    * structure.
    */
   virtual Elem * elem_ptr (const dof_id_type i) = 0;
 
   /**
-   * Return a pointer to the \f$ i^{th} \f$ element, which should be
+   * \returns A pointer to the \f$ i^{th} \f$ element, which should be
    * present in this processor's subset of the mesh data structure.
    *
    * \deprecated Use the less confusingly-named elem_ptr() instead.
@@ -498,7 +509,7 @@ public:
   }
 
   /**
-   * Return a writeable pointer to the \f$ i^{th} \f$ element, which
+   * \returns A writeable pointer to the \f$ i^{th} \f$ element, which
    * should be present in this processor's subset of the mesh data
    * structure.
    *
@@ -511,19 +522,19 @@ public:
   }
 
   /**
-   * Return a pointer to the \f$ i^{th} \f$ element, or NULL if no
+   * \returns A pointer to the \f$ i^{th} \f$ element, or NULL if no
    * such element exists in this processor's mesh data structure.
    */
   virtual const Elem * query_elem_ptr (const dof_id_type i) const = 0;
 
   /**
-   * Return a writeable pointer to the \f$ i^{th} \f$ element, or NULL
+   * \returns A writeable pointer to the \f$ i^{th} \f$ element, or NULL
    * if no such element exists in this processor's mesh data structure.
    */
   virtual Elem * query_elem_ptr (const dof_id_type i) = 0;
 
   /**
-   * Return a pointer to the \f$ i^{th} \f$ element, or NULL if no
+   * \returns A pointer to the \f$ i^{th} \f$ element, or NULL if no
    * such element exists in this processor's mesh data structure.
    *
    * \deprecated Use the less confusingly-named query_elem_ptr() instead.
@@ -535,7 +546,7 @@ public:
   }
 
   /**
-   * Return a writeable pointer to the \f$ i^{th} \f$ element, or NULL
+   * \returns A writeable pointer to the \f$ i^{th} \f$ element, or NULL
    * if no such element exists in this processor's mesh data structure.
    *
    * \deprecated Use the less confusingly-named query_elem_ptr() instead.
@@ -776,7 +787,7 @@ public:
   void subdomain_ids (std::set<subdomain_id_type> & ids) const;
 
   /**
-   * Returns the number of subdomains in the global mesh. Subdomains correspond
+   * \returns The number of subdomains in the global mesh. Subdomains correspond
    * to separate subsets of the mesh which could correspond e.g. to different
    * materials in a solid mechanics application, or regions where different
    * physical processes are important.  The subdomain mapping is independent
@@ -785,7 +796,7 @@ public:
   subdomain_id_type n_subdomains () const;
 
   /**
-   * Returns the number of partitions which have been defined via
+   * \returns The number of partitions which have been defined via
    * a call to either mesh.partition() or by building a Partitioner
    * object and calling partition.  Note that the partitioner objects
    * are responsible for setting this value.
@@ -878,7 +889,7 @@ public:
   unsigned int recalculate_n_partitions();
 
   /**
-   * \p returns a pointer to a \p PointLocatorBase object for this
+   * \returns A pointer to a \p PointLocatorBase object for this
    * mesh, constructing a master PointLocator first if necessary.
    *
    * \deprecated This should never be used in threaded or non-parallel_only code.
@@ -886,7 +897,7 @@ public:
   const PointLocatorBase & point_locator () const;
 
   /**
-   * \p returns a pointer to a subordinate \p PointLocatorBase object
+   * \returns A pointer to a subordinate \p PointLocatorBase object
    * for this mesh, constructing a master PointLocator first if
    * necessary.  This should not be used in threaded or
    * non-parallel_only code unless the master has already been
@@ -921,15 +932,15 @@ public:
   virtual void libmesh_assert_valid_parallel_ids() const {}
 
   /**
-   * Returns a writable reference for getting/setting an optional
+   * \returns A writable reference for getting/setting an optional
    * name for a subdomain.
    */
   std::string & subdomain_name(subdomain_id_type id);
   const std::string & subdomain_name(subdomain_id_type id) const;
 
   /**
-   * Returns the id of the named subdomain if it exists,
-   * Elem::invalid_subdomain_id otherwise.
+   * \returns The id of the named subdomain if it exists,
+   * \p Elem::invalid_subdomain_id otherwise.
    */
   subdomain_id_type get_id_by_name(const std::string & name) const;
 
@@ -1234,7 +1245,7 @@ public:
                        unsigned int var_num = libMesh::invalid_uint) const = 0;
 
   /**
-   * Return a writeable reference to the whole subdomain name map
+   * \returns A writeable reference to the whole subdomain name map
    */
   std::map<subdomain_id_type, std::string> & set_subdomain_name_map ()
   { return _block_id_to_name; }
@@ -1270,7 +1281,7 @@ public:
 protected:
 
   /**
-   * Returns a writeable reference to the number of partitions.
+   * \returns A writeable reference to the number of partitions.
    */
   unsigned int & set_n_partitions ()
   { return _n_parts; }

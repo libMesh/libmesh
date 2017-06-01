@@ -475,12 +475,12 @@ protected:
    * of dimension and base_family.  It is templated, though,
    * w.r.t. to radial \p FEFamily.
    *
-   * Specialized for \p T_radial=INFINITE_MAP, this function returns
-   * the value of the \f$ i^{th} \f$ mapping shape function
-   * in radial direction evaluated at \p v.  Currently, only one specific
-   * mapping shape is used.  Namely the one by Marques JMMC, Owen DRJ:
-   * Infinite elements in quasi-static materially nonlinear problems,
-   * Computers and Structures, 1984.
+   * \returns The value of the \f$ i^{th} \f$ mapping shape function
+   * in radial direction evaluated at \p v when T_radial ==
+   * INFINITE_MAP.  Currently, only one specific mapping shape is
+   * used.  Namely the one by Marques JMMC, Owen DRJ: Infinite
+   * elements in quasi-static materially nonlinear problems, Computers
+   * and Structures, 1984.
    */
   static Real eval(Real v,
                    Order o_radial,

@@ -133,7 +133,7 @@ public:
 
 private:
   /**
-   * Returns the normal for the plane.
+   * \returns The normal for the plane.
    */
   const Point & normal () const { return _normal; }
 

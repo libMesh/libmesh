@@ -139,7 +139,7 @@ public:
   virtual Real volume () const libmesh_override;
 
   /**
-   * Returns the minimum and maximum angles for the triangle
+   * \returns The minimum and maximum angles for the triangle
    * (in radians) in a std::pair.  The first entry in the pair
    * is the minimum angle, the second entry is the max angle.
    */

@@ -128,7 +128,7 @@ protected:
 
 
   /**
-   * Returns the object as a read-only reference.
+   * \returns The object as a read-only reference.
    */
   const MT & mesh() const;
 

@@ -164,8 +164,8 @@ public:
                          std::vector<Number> & nodal_soln);
 
   /**
-   * Returns the point in physical space of the reference point
-   * refpoint which is passed in.
+   * \returns The point in physical space corresponding to the
+   * reference point \p p which is passed in.
    */
   static Point map(unsigned int dim,
                    const FEType & fe_t,
@@ -208,12 +208,12 @@ public:
                             const bool secure = true);
 
   /**
-   * \returns true if the point p is located on the reference element
-   * for element type t, false otherwise.
+   * \returns \p true if the point \p p is located on the reference element
+   * for element type t, \p false otherwise.
    *
-   * Since we are doing floating point comparisons here the parameter
+   * Since we are doing floating point comparisons, the parameter
    * \p eps can be specified to indicate a tolerance.  For example,
-   * \f$ \xi \le 1 \f$  becomes \f$ \xi \le 1 + \epsilon \f$.
+   * \f$ \xi \le 1 \f$ becomes \f$ \xi \le 1 + \epsilon \f$.
    */
   static bool on_reference_element(const Point & p,
                                    const ElemType t,
@@ -224,7 +224,8 @@ public:
    * element type, and order directly. Automatically passes the
    * request to the appropriate finite element class member.
    *
-   * On a p-refined element, \p fe_t.order should be the total order of the element.
+   * \note On a p-refined element, \p fe_t.order should be the total
+   * order of the element.
    */
   static Real shape(const unsigned int dim,
                     const FEType & fe_t,
@@ -238,7 +239,8 @@ public:
    * element type, and order directly. Automatically passes the
    * request to the appropriate finite element class member.
    *
-   * On a p-refined element, \p fe_t.order should be the base order of the element.
+   * \note On a p-refined element, \p fe_t.order should be the base
+   * order of the element.
    */
   static Real shape(const unsigned int dim,
                     const FEType & fe_t,
@@ -252,7 +254,8 @@ public:
    * element type, and order directly. Automatically passes the
    * request to the appropriate *scalar* finite element class member.
    *
-   * On a p-refined element, \p fe_t.order should be the total order of the element.
+   * \note On a p-refined element, \p fe_t.order should be the total
+   * order of the element.
    */
   template< typename OutputType>
   static void shape(const unsigned int dim,
@@ -268,7 +271,8 @@ public:
    * element type, and order directly. Automatically passes the
    * request to the appropriate *scalar* finite element class member.
    *
-   * On a p-refined element, \p fe_t.order should be the total order of the element.
+   * \note On a p-refined element, \p fe_t.order should be the total
+   * order of the element.
    */
   template< typename OutputType>
   static void shape(const unsigned int dim,
@@ -280,12 +284,13 @@ public:
 
   /**
    * Lets the appropriate child of \p FEBase compute the requested
-   * data for the input specified in \p data, and returns the values
-   * also through \p data.  See this as a generalization of \p shape().
-   * Currently, with disabled infinite elements, returns a vector of
-   * all shape functions of \p elem evaluated ap \p p.
+   * data for the input specified in \p data, and sets the values in
+   * \p data.  See this as a generalization of \p shape().  With
+   * infinite elements disabled, computes values for all shape
+   * functions of \p elem evaluated at \p p.
    *
-   * On a p-refined element, \p fe_t.order should be the base order of the element.
+   * \note On a p-refined element, \p fe_t.order should be the base
+   * order of the element.
    */
   static void compute_data(const unsigned int dim,
                            const FEType & fe_t,
@@ -320,32 +325,32 @@ public:
 #endif // #ifdef LIBMESH_ENABLE_PERIODIC
 
   /**
-   * Returns the maximum polynomial degree that the given finite
+   * \returns The maximum polynomial degree that the given finite
    * element family can support on the given geometric element.
    */
   static unsigned int max_order (const FEType & fe_t,
                                  const ElemType & el_t);
 
   /**
-   * Returns true if separate degrees of freedom must be allocated for
+   * \returns \p true if separate degrees of freedom must be allocated for
    * vertex DoFs and edge/face DoFs at a hanging node.
    */
   static bool extra_hanging_dofs (const FEType & fe_t);
 
   /**
-   * Returns the number of components of a vector-valued element.
+   * \returns The number of components of a vector-valued element.
    * Scalar-valued elements return 1.
    */
   static FEFieldType field_type (const FEType & fe_type);
 
   /**
-   * Returns the number of components of a vector-valued element.
+   * \returns The number of components of a vector-valued element.
    * Scalar-valued elements return 1.
    */
   static FEFieldType field_type (const FEFamily & fe_family);
 
   /**
-   * Returns the number of components of a vector-valued element.
+   * \returns The number of components of a vector-valued element.
    * Scalar-valued elements return 1.
    */
   static unsigned int n_vec_dim (const MeshBase & mesh,
@@ -355,20 +360,17 @@ private:
 
 
   /**
-   * \returns true if \p et is an element to be processed by
-   * class \p InfFE.  Otherwise, it returns false.
-   * For compatibility with disabled infinite elements
-   * it always returns false.
+   * \returns \p true if \p et is an element to be processed by class
+   * \p InfFE, false otherwise or when !LIBMESH_ENABLE_INFINITE_ELEMENTS.
    */
   static bool is_InfFE_elem(const ElemType et);
 
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-  // ------------------------------------------------------------
   /*
    * All these private members do the same as their public
-   * counterparts, but for infinite elements. This dis-entangles
+   * counterparts, except for infinite elements. This disentangles
    * the calls to \p FE and \p InfFE.
    */
 

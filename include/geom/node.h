@@ -88,21 +88,19 @@ public:
   Node & operator= (const Point & p);
 
   /**
-   * Builds a \p Node and returns an \p UniquePtr<Node> to the
-   * newly-created object.  The \p id is copied from \p n.id().
+   * \returns A \p Node copied from \p n and wrapped in a smart pointer.
    */
   static UniquePtr<Node> build (const Node & n);
 
   /**
-   * Builds a \p Node from \p Point p and returns an \p UniquePtr<Node>
-   * to the newly-created object.  Optionally assignes the \p id.
+   * \returns A \p Node copied from \p p with id == \id and wrapped in a smart pointer.
    */
   static UniquePtr<Node> build (const Point & p,
                                 const dof_id_type id);
 
   /**
-   * Builds a \p Node from specified points and returns an \p UniquePtr<Node>
-   * to the newly-created object.  Optionally assigned the \p id.
+   * \returns A \p Node created from the specified (x,y,z) positions
+   * with id == \id and wrapped in a smart pointer.
    */
   static UniquePtr<Node> build (const Real x,
                                 const Real y,

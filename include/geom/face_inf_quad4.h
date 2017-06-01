@@ -111,7 +111,7 @@ public:
   virtual Order default_order() const libmesh_override { return FIRST; }
 
   /**
-   * Creates and returns an \p Edge2 for the base side, and an \p InfEdge2 for
+   * \returns An \p Edge2 for the base side, or an \p InfEdge2 for
    * the sides 1, 2.
    */
   virtual UniquePtr<Elem> build_side_ptr (const unsigned int i,

@@ -113,9 +113,11 @@ protected:
   virtual void internal_side_integration() = 0;
 
   /**
-   * The function, to be implemented by derived classes, which calculates an error
-   * term on a boundary side
-   * Returns true if the flux bc function is in fact defined on the current side
+   * The function, to be implemented by derived classes, which
+   * calculates an error term on a boundary side.
+   *
+   * \returns \p true if the flux bc function is in fact defined on
+   * the current side.
    */
   virtual bool boundary_side_integration() { return false; }
 

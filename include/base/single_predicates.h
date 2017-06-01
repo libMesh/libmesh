@@ -68,7 +68,9 @@ protected:
 };
 
 
-// The is_null predicate returns true if the underlying pointer is NULL.
+/**
+ * \returns \p true if the underlying pointer is NULL.
+ */
 template <typename T>
 struct is_null : predicate<T>
 {
@@ -79,7 +81,9 @@ protected:
   virtual predicate<T> * clone() const libmesh_override { return new is_null<T>(*this); }
 };
 
-// The not_null predicate simply returns true if the pointer is not NULL.
+/**
+ * \returns \p true if the pointer is not NULL.
+ */
 template <typename T>
 struct not_null : is_null<T>
 {
@@ -90,7 +94,9 @@ protected:
 };
 
 
-// The active predicate returns true if the pointer is active.
+/**
+ * \returns \p true if the pointer is active.
+ */
 template <typename T>
 struct active : predicate<T>
 {
@@ -101,7 +107,9 @@ protected:
   virtual predicate<T> * clone() const libmesh_override { return new active<T>(*this); }
 };
 
-// The not active predicate returns true when the pointer is inactive
+/**
+ * \returns \p true when the pointer is inactive.
+ */
 template <typename T>
 struct not_active : active<T>
 {
@@ -112,7 +120,9 @@ protected:
 };
 
 
-// The ancestor predicate returns true if the pointer is ancestor.
+/**
+ * \returns \p true if the pointer is an ancestor.
+ */
 template <typename T>
 struct ancestor : predicate<T>
 {
@@ -123,7 +133,9 @@ protected:
   virtual predicate<T> * clone() const libmesh_override { return new ancestor<T>(*this); }
 };
 
-// The not_ancestor predicate returns true when the pointer is not ancestor
+/**
+ * \returns \p true when the pointer is not an ancestor.
+ */
 template <typename T>
 struct not_ancestor : ancestor<T>
 {
@@ -134,7 +146,9 @@ protected:
 };
 
 
-// The subactive predicate returns true if the pointer is subactive.
+/**
+ * \returns \p true if the pointer is subactive.
+ */
 template <typename T>
 struct subactive : predicate<T>
 {
@@ -145,7 +159,9 @@ protected:
   virtual predicate<T> * clone() const libmesh_override { return new subactive<T>(*this); }
 };
 
-// The not_subactive predicate returns true when the pointer is not subactive
+/**
+ * \returns true when the pointer is not subactive.
+ */
 template <typename T>
 struct not_subactive : subactive<T>
 {
@@ -157,12 +173,12 @@ protected:
 
 
 
-// The pid predicate returns true if the pointers
-// processor id matches a given processor id.
+/**
+ * \returns \p true if the pointer's processor id matches a given processor id.
+ */
 template <typename T>
 struct pid : predicate<T>
 {
-  // Constructor
   pid(processor_id_type p) : _pid(p) {}
   virtual ~pid() {}
 
@@ -176,11 +192,12 @@ protected:
 
 
 
-// The bid predicate returns true if has_boundary_id(node, id) returns true.
+/**
+ * \returns \p has_boundary_id(node, id).
+ */
 template <typename T>
 struct bid : predicate<T>
 {
-  // Constructor
   bid(boundary_id_type bid,
       const BoundaryInfo & bndry_info) :
     _bid(bid),
@@ -199,11 +216,12 @@ protected:
 
 
 
-// The bnd predicate returns true if n_boundary_ids(node) > 0.
+/**
+ * \returns \p true if n_boundary_ids(node) > 0.
+ */
 template <typename T>
 struct bnd : predicate<T>
 {
-  // Constructor
   bnd(const BoundaryInfo & bndry_info) :
     _bndry_info(bndry_info)
   {}
@@ -219,13 +237,13 @@ protected:
 
 
 
-// The semilocal_pid predicate returns true if the element
-// pointed to is semilocal to (has nodes shared with an element of) a
-// given processor id.
+/**
+ * \returns \p true if the element pointed to is semilocal to (has nodes
+ * shared with an element of) a given processor id.
+ */
 template <typename T>
 struct semilocal_pid : predicate<T>
 {
-  // Constructor
   semilocal_pid(processor_id_type p) : _pid(p) {}
   virtual ~semilocal_pid() {}
 
@@ -239,13 +257,13 @@ protected:
 
 
 
-// The facelocal_pid predicate returns true if the element
-// pointed to is face-local to (is on or has a neighbor on the
-// partition of) a given processor id.
+/**
+ * \returns \p true if the element pointed to is face-local to (is on
+ * or has a neighbor on the partition of) a given processor id.
+ */
 template <typename T>
 struct facelocal_pid : predicate<T>
 {
-  // Constructor
   facelocal_pid(processor_id_type p) : _pid(p) {}
   virtual ~facelocal_pid() {}
 
@@ -268,8 +286,9 @@ protected:
 
 
 
-// The not_pid predicate returns ture if the pointers
-// processor id does _not_ match p.
+/**
+ * \returns \p true if the pointer's processor id does \e not match p.
+ */
 template <typename T>
 struct not_pid : pid<T>
 {
@@ -282,13 +301,14 @@ protected:
 };
 
 
-// The elem_type predicate returns true if the pointers type matches
-// the given type.  Of course, this one can only be instantiated for
-// objects which return Elem pointers when dereferenced.
+/**
+ * \returns \p true if the pointer's type matches the given type.  Of
+ * course, this one can only be instantiated for objects which return
+ * Elem pointers when dereferenced.
+ */
 template <typename T>
 struct elem_type : predicate<T>
 {
-  // Constructor
   elem_type (ElemType t) : _elem_type(t) {}
   virtual ~elem_type() {}
 
@@ -302,14 +322,14 @@ protected:
 
 
 #ifdef LIBMESH_ENABLE_AMR
-// The flagged predicate returns true if the pointers refinement flag
-// matches the given rflag.  Of course, this one can only be
-// instantiated for objects which return Elem pointers when
-// dereferenced.
+/**
+ * \returns \p true if the pointer's refinement flag matches the given
+ * rflag.  Of course, this one can only be instantiated for objects
+ * which return Elem pointers when dereferenced.
+ */
 template <typename T>
 struct flagged : predicate<T>
 {
-  // Constructor
   flagged (unsigned char rflag) : _rflag(rflag) {}
   virtual ~flagged() {}
 
@@ -326,12 +346,12 @@ protected:
 
 
 
-// The level predicate returns true if the pointers level
-// matches the given level.
+/**
+ * \returns \p true if the pointer's level matches the given level.
+ */
 template <typename T>
 struct level : predicate<T>
 {
-  // Constructor
   level (unsigned int l) : _level(l) {}
   virtual ~level() {}
 
@@ -344,12 +364,13 @@ protected:
 
 
 
-// The not_level predicate returns true if the pointers level
-// _does not_ match the given level.
+/**
+ * \returns \p true if the pointers level _does not_ match the given
+ * level.
+ */
 template <typename T>
 struct not_level : level<T>
 {
-  // Constructor
   not_level(unsigned int l) : level<T>(l) {}
 
   virtual bool operator()(const T & it) const libmesh_override { return !level<T>::operator()(it); }
@@ -361,8 +382,9 @@ protected:
 
 
 
-// The null_neighbor predicate returns true if the pointer has any
-// NULL neigbors.
+/**
+ * \returns \p true if the pointer has any \p NULL neighbors.
+ */
 template <typename T>
 struct null_neighbor : predicate<T>
 {
@@ -378,9 +400,13 @@ protected:
 
 
 
-// This predicate simply forwards the work of determining whether
-// a particular side is on the boundary to the iterator itself, which
-// has more information.
+/**
+ * \returns \p side_on_boundary().
+ *
+ * This predicate simply forwards the work of determining whether a
+ * particular side is on the boundary to the iterator itself, which
+ * has more information.
+ */
 template <typename T>
 struct boundary_side : predicate<T>
 {
@@ -394,12 +420,13 @@ protected:
   virtual predicate<T> * clone() const libmesh_override { return new boundary_side<T>(*this); }
 };
 
-// The subdomain predicate returns true if the pointers
-// subdimain id matches a given subdomain id.
+/**
+ * \returns \p true if the pointer's \p subdomain_id() matches a given
+ * id.
+ */
 template <typename T>
 struct subdomain : predicate<T>
 {
-  // Constructor
   subdomain(subdomain_id_type sid) : _subdomain(sid) {}
   virtual ~subdomain() {}
 
@@ -412,12 +439,13 @@ protected:
 };
 
 
-// The subdomain_set predicate returns true if the pointer's
-// subdomain id is in the provided std::set<subdomain_id_type>.
+/**
+ * \returns \p true if the pointer's \p subdomain_id() is in the
+ * provided \p std::set<subdomain_id_type>.
+ */
 template <typename T>
 struct subdomain_set : predicate<T>
 {
-  // Constructor
   subdomain_set(std::set<subdomain_id_type> sset) : _subdomain_set(sset) {}
   virtual ~subdomain_set() {}
 
@@ -430,13 +458,14 @@ protected:
 };
 
 
-// The evaluable predicate returns true if the pointer (which must be
-// a local element) has degrees of freedom which can be evaluated for
-// the specified DofMap and variable.
+/**
+ * \returns \p true if the pointer (which must be a local element) has
+ * degrees of freedom which can be evaluated for the specified DofMap
+ * and variable.
+ */
 template <typename T>
 struct evaluable : predicate<T>
 {
-  // Constructor
   evaluable(const DofMap & dof_map,
             unsigned int var_num) :
     _dof_map(dof_map), _var_num(var_num) {}

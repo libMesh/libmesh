@@ -75,20 +75,25 @@ public:
     virtual  IterBase * clone() const = 0;
 
     /**
-     * Custom interface method.
+     * Dereferences the iterator.
      */
     virtual ReferenceType operator*() const = 0;
 
     /**
-     * Custom interface method.
+     * Pre-increments the iterator.
      */
     virtual IterBase & operator++() = 0;
 
     virtual bool equal(const IterBase * other) const = 0;
 
-    // Similar to clone function above, but returns a pointer to a copy of a different type.
     // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::IterBase const_IterBase;
     typedef typename variant_filter_iterator<Predicate, Type const, Type const & , Type const *>::IterBase const_IterBase;
+
+    /**
+     * Similar to the \p clone() function.
+     *
+     * \returns A pointer to a copy of a different type.
+     */
     virtual const_IterBase * const_clone() const = 0;
   };
 
@@ -107,9 +112,14 @@ public:
     virtual PredBase * clone() const = 0;
     virtual bool operator()(const IterBase * in) const = 0;
 
-    // Similar to clone function above, but returns a pointer to a copy of a different type.
     // typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::PredBase const_PredBase;
     typedef typename variant_filter_iterator<Predicate, Type const, Type const &, Type const *>::PredBase const_PredBase;
+
+    /**
+     * Similar to the \p clone() function.
+     *
+     * \returns A pointer to a copy of a different type.
+     */
     virtual const_PredBase * const_clone() const = 0;
   };
 
@@ -167,7 +177,7 @@ public:
     }
 
     /**
-     * Returns a copy of this object as a pointer to a
+     * \returns a copy of this object as a pointer to a
      * different type of object.
      */
     virtual typename IterBase::const_IterBase * const_clone() const libmesh_override
@@ -185,7 +195,7 @@ public:
     }
 
     /**
-     * Custom interface method.
+     * Dereferences the iterator.
      */
     virtual ReferenceType operator*() const libmesh_override
     {
@@ -193,7 +203,7 @@ public:
     }
 
     /**
-     * Custom interface method.
+     * Pre-increments the iterator.
      */
     virtual Iter & operator++() libmesh_override
     {
@@ -249,7 +259,7 @@ public:
     virtual ~Pred () {}
 
     /**
-     * Returns a copy of this object as a pointer to the base class.
+     * \returns A copy of this object as a pointer to the base class.
      */
     virtual PredBase * clone() const libmesh_override
     {
@@ -267,12 +277,11 @@ public:
 
     /**
      * The redefinition of the const_clone function for the Pred class.
-     * Notice the strange typename syntax required.  Will it compile everywhere?
      */
     virtual typename PredBase::const_PredBase * const_clone() const libmesh_override
     {
       /**
-       * Important typedef for const_iterators.  Notice the weird syntax!  Does it compile everywhere?
+       * Important typedef for const_iterators.
        */
       //      typedef typename variant_filter_iterator<Predicate, Type, const Type &, const Type *>::template Pred<IterType, PredType> const_Pred;
       typedef typename variant_filter_iterator<Predicate, Type const, Type const &,  Type const *>::template Pred<IterType, PredType> const_Pred;
@@ -452,10 +461,8 @@ public:
   }
 
   /**
-   * forwards on the the equal function defined for the
-   * IterBase pointer.  Possibly also compare the end pointers,
-   * but this is usually not important and would require an
-   * additional dynamic cast.
+   * Forwards to the \p equal() function defined for the
+   * IterBase pointer.
    */
   bool equal(const variant_filter_iterator & other) const
   {
@@ -507,7 +514,6 @@ private:
 
 
 
-//---------------------------------------------------------------------------
 // op==
 template<class Predicate, class Type, class ReferenceType, class PointerType>
 inline

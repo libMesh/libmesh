@@ -79,7 +79,7 @@ public:
 protected:
 
   /**
-   * Returns the object as a writeable reference.
+   * \returns The object as a writeable reference.
    */
   MT & mesh ();
 

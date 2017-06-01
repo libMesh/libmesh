@@ -169,75 +169,95 @@ public:
                      const std::string & unknown_name);
 
   /**
-   * This function returns the integrated L2 error for the system
-   * sys_name for the unknown unknown_name.  Note that no error computations
-   * are actually performed, you must call compute_error() for that.
+   * \returns The integrated L2 error for the system \p sys_name for the
+   * unknown \p unknown_name.
+   *
+   * \note No error computations are actually performed, you must call
+   * \p compute_error() for that.
    */
   Real l2_error(const std::string & sys_name,
                 const std::string & unknown_name);
 
   /**
-   * This function returns the integrated L1 error for the system
-   * sys_name for the unknown unknown_name.  Note that no error computations
-   * are actually performed, you must call compute_error() for that.
+   * \returns The integrated L1 error for the system \p sys_name for
+   * the unknown \p unknown_name.
+   *
+   * \note No error computations are actually performed, you must call
+   * \p compute_error() for that.
    */
   Real l1_error(const std::string & sys_name,
                 const std::string & unknown_name);
 
   /**
-   * This function returns the L_INF error for the system sys_name for
-   * the unknown unknown_name.  Note that no error computations are
-   * actually performed, you must call compute_error() for that.  Note
-   * also that the result (as for the other norms as well) is not
-   * exact, but an approximation based on the chosen quadrature rule:
-   * to compute it, we take the max of the absolute value of the error
+   * \returns The L_INF error for the system \p sys_name for
+   * the unknown \p unknown_name.
+   *
+   * \note No error computations are actually performed, you must call
+   * compute_error() for that.
+   *
+   * \note The result (as for the other norms as well) is not exact,
+   * but an approximation based on the chosen quadrature rule: to
+   * compute it, we take the max of the absolute value of the error
    * over all the quadrature points.
    */
   Real l_inf_error(const std::string & sys_name,
                    const std::string & unknown_name);
 
   /**
-   * This function computes and returns the H1 error for the system
-   * sys_name for the unknown unknown_name.  Note that no error computations
-   * are actually performed, you must call compute_error() for that.
+   * \returns The H1 error for the system \p sys_name for the unknown
+   * \p unknown_name.
+   *
+   * \note No error computations are actually performed, you must call
+   * \p compute_error() for that.
    */
   Real h1_error(const std::string & sys_name,
                 const std::string & unknown_name);
 
   /**
-   * This function computes and returns the HCurl error for the system
-   * sys_name for the unknown unknown_name.  Note that no error computations
-   * are actually performed, you must call compute_error() for that. This
-   * is only valid for vector-valued element. An error is thrown if requested
-   * for scalar-valued elements.
+   * \returns The H(curl) error for the system \p sys_name for the
+   * unknown \p unknown_name.
+   *
+   * \note No error computations are actually performed, you must call
+   * \p compute_error() for that.
+   *
+   * \note This is only valid for vector-valued elements. An error is
+   * thrown if requested for scalar-valued elements.
    */
   Real hcurl_error(const std::string & sys_name,
                    const std::string & unknown_name);
 
   /**
-   * This function computes and returns the HDiv error for the system
-   * sys_name for the unknown unknown_name.  Note that no error computations
-   * are actually performed, you must call compute_error() for that. This
-   * is only valid for vector-valued element. An error is thrown if requested
-   * for scalar-valued elements.
+   * \returns The H(div) error for the system \p sys_name for the
+   * unknown \p unknown_name.
+   *
+   * \note No error computations are actually performed, you must call
+   * \p compute_error() for that.
+   *
+   * \note This is only valid for vector-valued elements. An error is
+   * thrown if requested for scalar-valued elements.
    */
   Real hdiv_error(const std::string & sys_name,
                   const std::string & unknown_name);
 
   /**
-   * This function computes and returns the H2 error for the system
-   * sys_name for the unknown unknown_name.  Note that no error computations
-   * are actually performed, you must call compute_error() for that.
+   * \returns The H2 error for the system \p sys_name for the unknown
+   * \p unknown_name.
+   *
+   * \note No error computations are actually performed, you must call
+   * \p compute_error() for that.
    */
   Real h2_error(const std::string & sys_name,
                 const std::string & unknown_name);
 
   /**
-   * This function returns the error in the requested norm for the system
-   * sys_name for the unknown unknown_name.  Note that no error computations
-   * are actually performed, you must call compute_error() for that.
-   * Note also that the result is not exact, but an approximation
-   * based on the chosen quadrature rule.
+   * \returns The error in the requested norm for the system \p
+   * sys_name for the unknown \p unknown_name.
+   *
+   * \note No error computations are actually performed, you must call
+   * \p compute_error() for that.
+   *
+   * \note The result is not exact, but an approximation based on the
+   * chosen quadrature rule.
    */
   Real error_norm(const std::string & sys_name,
                   const std::string & unknown_name,
@@ -256,9 +276,10 @@ private:
                       std::vector<Real> & error_vals);
 
   /**
-   * This function is responsible for checking the validity of
-   * the sys_name and unknown_name inputs, and returning a
-   * reference to the proper vector for storing the values.
+   * This function is responsible for checking the validity of the \p
+   * sys_name and \p unknown_name inputs.
+   *
+   * \returns a reference to the proper vector for storing the values.
    */
   std::vector<Real> & _check_inputs(const std::string & sys_name,
                                     const std::string & unknown_name);

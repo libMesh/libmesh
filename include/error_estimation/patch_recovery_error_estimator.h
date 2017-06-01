@@ -100,9 +100,8 @@ public:
 protected:
 
   /**
-   * Returns the spectral polynomial basis function values at a point x,y,z
+   * \returns the spectral polynomial basis function values at a point (x,y,z).
    */
-
   static std::vector<Real> specpoly(const unsigned int dim,
                                     const Order order,
                                     const Point p,
@@ -129,13 +128,7 @@ private:
 
     void operator()(const ConstElemRange & range) const;
 
-    /**
-     * Function to set the boolean patch_reuse in case the user
-     * wants to change the default behaviour of patch_recovery_error_estimator
-     */
-
   private:
-
     const System & system;
     const PatchRecoveryErrorEstimator & error_estimator;
     ErrorVector & error_per_cell;

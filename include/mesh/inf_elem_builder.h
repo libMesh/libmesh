@@ -65,13 +65,16 @@ public:
   typedef std::pair<bool, double> InfElemOriginValue;
 
   /**
-   * Build infinite elements atop a volume-based mesh,
-   * determine origin automatically.  Also returns the
-   * origin as a \p const \p Point to make it more obvious that
-   * the origin should not change after the infinite elements
-   * have been built.  When symmetry planes are present, use
-   * the version with optional symmetry switches.
-   * The flag \p be_verbose enables some diagnostic output.
+   * Build infinite elements atop a volume-based mesh, determine
+   * origin automatically.
+   *
+   * \returns The origin as a \p const \p Point to make it more
+   * obvious that the origin should not change after the infinite
+   * elements have been built.
+   *
+   * When symmetry planes are present, use the version with optional
+   * symmetry switches.  The flag \p be_verbose enables some
+   * diagnostic output.
    */
   const Point build_inf_elem (const bool be_verbose = false);
 

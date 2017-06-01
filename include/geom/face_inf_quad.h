@@ -142,7 +142,7 @@ public:
   virtual dof_id_type key (const unsigned int s) const libmesh_override;
 
   /**
-   * Does some range checking and then returns InfQuad4::side_nodes_map[side][side_node].
+   * \returns \p InfQuad4::side_nodes_map[side][side_node] after doing some range checking.
    */
   virtual unsigned int which_node_am_i(unsigned int side,
                                        unsigned int side_node) const libmesh_override;
@@ -166,13 +166,13 @@ public:
   { return (e == s); }
 
   /**
-   * Based on the quality metric \p q specified by the user,
-   * returns a quantitative assessment of element quality.
+   * \returns a quantitative assessment of element quality based on
+   * the quality metric \p q specified by the user.
    */
   virtual Real quality (const ElemQuality q) const libmesh_override;
 
   /**
-   * Returns the suggested quality bounds for
+   * \returns The suggested quality bounds for
    * the hex based on quality measure q.  These are
    * the values suggested by the CUBIT User's Manual.
    */

@@ -132,7 +132,7 @@ public:
   virtual Order default_order() const libmesh_override { return SECOND; }
 
   /**
-   * Does some range checking and then returns Prism15::side_nodes_map[side][side_node].
+   * \returns \p Prism15::side_nodes_map[side][side_node] after doing some range checking.
    */
   virtual unsigned int which_node_am_i(unsigned int side,
                                        unsigned int side_node) const libmesh_override;

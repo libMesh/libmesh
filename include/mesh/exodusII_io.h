@@ -88,16 +88,18 @@ public:
   void verbose (bool set_verbosity);
 
   /**
-   * Returns an array containing the timesteps in the file
+   * \returns An array containing the timesteps in the file.
    */
   const std::vector<Real> & get_time_steps();
 
   /**
-   * Returns the number of timesteps currently stored in the Exodus
-   * file.  Knowing the number of time steps currently stored in the
-   * file is sometimes necessary when appending, so we can know where
-   * to start writing new data.  Throws an error if the file is not
-   * currently open for reading or writing.
+   * \returns The number of timesteps currently stored in the Exodus
+   * file.
+   *
+   * Knowing the number of time steps currently stored in the file is
+   * sometimes necessary when appending, so we can know where to start
+   * writing new data.  Throws an error if the file is not currently
+   * open for reading or writing.
    */
   int get_num_time_steps();
 

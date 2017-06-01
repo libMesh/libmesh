@@ -213,9 +213,10 @@ public:
   }
 
   /**
-   * Resets the \p StoredRange to contain [first,last).  Returns
-   * a reference to itself for convenience, so functions
-   * expecting a StoredRange<> can be passed e.g. foo.reset(begin,end).
+   * Resets the \p StoredRange to contain [first,last).
+   *
+   * \returns A reference to itself for convenience, so functions
+   * expecting a \p StoredRange<> can be passed e.g. foo.reset(begin,end).
    */
   StoredRange<iterator_type, object_type> &
   reset (const iterator_type & first,
@@ -238,8 +239,9 @@ public:
   /**
    * Resets the range to the last specified range.  This method only exists
    * for efficiency -- it is more efficient to set the range to its previous
-   * value without rebuilding the underlying vector.  Returns
-   * a reference to itself for convenience, so functions
+   * value without rebuilding the underlying vector.
+   *
+   * \returns A reference to itself for convenience, so functions
    * expecting a StoredRange<> can be passed e.g. foo.reset().
    */
   StoredRange<iterator_type, object_type> & reset ()
@@ -294,12 +296,12 @@ public:
   //------------------------------------------------------------------------
 
   /**
-   * Returns true if the range is empty.
+   * \returns \p true if the range is empty.
    */
   bool empty() const { return (_begin == _end); }
 
   /**
-   * Returns true if the range can be subdivided.
+   * \returns \p true if the range can be subdivided.
    */
   bool is_divisible() const { return this->grainsize() < static_cast<unsigned int>(std::distance(_begin, _end)); }
 

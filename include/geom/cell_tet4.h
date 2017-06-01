@@ -164,11 +164,12 @@ public:
   virtual Real volume () const libmesh_override;
 
   /**
-   * Returns the min and max *dihedral* angles for the tetrahedron.
-   * Note there are 6 dihedral angles (angles between the planar
+   * \returns The min and max *dihedral* angles for the tetrahedron.
+   *
+   * \note There are 6 dihedral angles (angles between the planar
    * faces) for the Tet4.  Dihedral angles near 180 deg. are generally
-   * bad for interplation.  Small dihedral angles are not necessarily
-   * bad for interplation, but they can effect the stiffness matrix
+   * bad for interpolation.  Small dihedral angles are not necessarily
+   * bad for interpolation, but they can affect the stiffness matrix
    * condition number.
    */
   std::pair<Real, Real> min_and_max_angle() const;
