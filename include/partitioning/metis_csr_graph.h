@@ -57,7 +57,7 @@ public:
   }
 
   /**
-   * @returns the number of nonzeros in the requested row by
+   * \returns the number of nonzeros in the requested row by
    * subtracting the offsets vector entries.
    */
   libMesh::dof_id_type n_nonzeros (const libMesh::dof_id_type row) const
@@ -81,7 +81,7 @@ public:
   }
 
   /**
-   * @returns a writable reference to the nonzero'th entry of row.
+   * \returns a writable reference to the nonzero'th entry of row.
    */
   IndexType & operator()(const libMesh::dof_id_type row,
                          const libMesh::dof_id_type nonzero)
@@ -92,7 +92,7 @@ public:
   }
 
   /**
-   * @returns a const reference to the nonzero'th entry of row.
+   * \returns a const reference to the nonzero'th entry of row.
    */
   const IndexType & operator()(const libMesh::dof_id_type row,
                                const libMesh::dof_id_type nonzero) const

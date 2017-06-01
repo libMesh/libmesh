@@ -101,8 +101,8 @@ public:
   OutputShape;
 
   /**
-   * @returns the value of the \f$ i^{th} \f$ shape function at
-   * point \p p.  This method allows you to specify the imension,
+   * \returns the value of the \f$ i^{th} \f$ shape function at
+   * point \p p.  This method allows you to specify the dimension,
    * element type, and order directly.  This allows the method to
    * be static.
    *
@@ -114,8 +114,8 @@ public:
                            const Point & p);
 
   /**
-   * @returns the value of the \f$ i^{th} \f$ shape function at
-   * point \p p.  This method allows you to specify the imension,
+   * \returns the value of the \f$ i^{th} \f$ shape function at
+   * point \p p.  This method allows you to specify the dimension,
    * element type, and order directly.  This allows the method to
    * be static.
    *
@@ -127,7 +127,7 @@ public:
                            const Point & p);
 
   /**
-   * @returns the \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
+   * \returns the \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function at point \p p.  This method allows you to
    * specify the dimension, element type, and order directly.
    *
@@ -140,7 +140,7 @@ public:
                                  const Point & p);
 
   /**
-   * @returns the \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
+   * \returns the \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function.  You must specify element type, and order directly.
    *
    * On a p-refined element, \p o should be the base order of the element.
@@ -152,7 +152,7 @@ public:
                                  const Point & p);
 
   /**
-   * @returns the second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
+   * \returns the second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function at the point \p p.  Note that cross-derivatives are
    * also possible, i.e.
    * j = 0 ==> d^2 phi / dxi^2
@@ -176,7 +176,7 @@ public:
                                         const Point & p);
 
   /**
-   * @returns the second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
+   * \returns the second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function at the point \p p.  Note that cross-derivatives are
    * also possible, i.e.
    * j = 0 ==> d^2 phi / dxi^2
@@ -210,13 +210,13 @@ public:
                          std::vector<Number> & nodal_soln);
 
   /**
-   * @returns the number of shape functions associated with
+   * \returns the number of shape functions associated with
    * this finite element.
    */
   virtual unsigned int n_shape_functions () const libmesh_override;
 
   /**
-   * @returns the number of shape functions associated with
+   * \returns the number of shape functions associated with
    * a finite element of type \p t and approximation order \p o.
    *
    * On a p-refined element, \p o should be the total order of the element.
@@ -226,7 +226,7 @@ public:
   { return FE<Dim,T>::n_dofs (t,o); }
 
   /**
-   * @returns the number of shape functions associated with this
+   * \returns the number of shape functions associated with this
    * finite element.
    *
    * On a p-refined element, \p o should be the total order of the element.
@@ -235,7 +235,7 @@ public:
                              const Order o);
 
   /**
-   * @returns the number of dofs at node \p n for a finite element
+   * \returns the number of dofs at node \p n for a finite element
    * of type \p t and order \p o.
    *
    * On a p-refined element, \p o should be the total order of the element.
@@ -245,7 +245,7 @@ public:
                                      const unsigned int n);
 
   /**
-   * @returns the number of dofs interior to the element,
+   * \returns the number of dofs interior to the element,
    * not associated with any interior nodes.
    *
    * On a p-refined element, \p o should be the total order of the element.
@@ -254,12 +254,12 @@ public:
                                       const Order o);
 
   /**
-   * @returns the continuity level of the finite element.
+   * \returns the continuity level of the finite element.
    */
   virtual FEContinuity get_continuity() const libmesh_override;
 
   /**
-   * @returns true if the finite element's higher order shape functions are
+   * \returns true if the finite element's higher order shape functions are
    * hierarchic
    */
   virtual bool is_hierarchic() const libmesh_override;
@@ -286,7 +286,7 @@ public:
                            std::vector<unsigned int> & di);
 
   /**
-   * @returns the location (on the reference element) of the
+   * \returns the location (on the reference element) of the
    * point \p p located in physical space.  This function requires
    * inverting the (possibly nonlinear) transformation map, so
    * it is not trivial. The optional parameter \p tolerance defines
@@ -377,7 +377,7 @@ public:
   virtual void attach_quadrature_rule (QBase * q) libmesh_override;
 
   /**
-   * @returns the total number of quadrature points.  Call this
+   * \returns the total number of quadrature points.  Call this
    * to get an upper bound for the \p for loop in your simulation
    * for matrix assembly of the current element.
    */
@@ -397,7 +397,7 @@ public:
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
   /**
-   * @returns \p true when the shape functions (for
+   * \returns \p true when the shape functions (for
    * this \p FEFamily) depend on the particular
    * element, and therefore needs to be re-initialized
    * for each new element.  \p false otherwise.
@@ -405,28 +405,28 @@ public:
   virtual bool shapes_need_reinit() const libmesh_override;
 
   /**
-   * @returns the location (in physical space) of the point
+   * \returns the location (in physical space) of the point
    * \p p located on the reference element.
    */
   static Point map (const Elem * elem,
                     const Point & reference_point);
 
   /**
-   * @returns d(xyz)/dxi (in physical space) of the point
+   * \returns d(xyz)/dxi (in physical space) of the point
    * \p p located on the reference element.
    */
   static Point map_xi (const Elem * elem,
                        const Point & reference_point);
 
   /**
-   * @returns d(xyz)/deta (in physical space) of the point
+   * \returns d(xyz)/deta (in physical space) of the point
    * \p p located on the reference element.
    */
   static Point map_eta (const Elem * elem,
                         const Point & reference_point);
 
   /**
-   * @returns d(xyz)/dzeta (in physical space) of the point
+   * \returns d(xyz)/dzeta (in physical space) of the point
    * \p p located on the reference element.
    */
   static Point map_zeta (const Elem * elem,
@@ -619,7 +619,7 @@ public:
                                     const Elem * elem) libmesh_override;
 
   /**
-   * @returns the value of the \f$ i^{th} \f$ of the 12 quartic
+   * \returns the value of the \f$ i^{th} \f$ of the 12 quartic
    * box splines interpolating a regular Loop subdivision
    * element, evaluated at the barycentric coordinates \p v,
    * \p w.
@@ -629,7 +629,7 @@ public:
                             const Real w);
 
   /**
-   * @returns the \f$ j^{th} \f$ derivative of the \f$ i^{th}
+   * \returns the \f$ j^{th} \f$ derivative of the \f$ i^{th}
    * \f$ of the 12 quartic box splines interpolating a regular
    * Loop subdivision element, evaluated at the barycentric
    * coordinates \p v, \p w.
@@ -640,7 +640,7 @@ public:
                                   const Real w);
 
   /**
-   * @returns the second \f$ j^{th} \f$ derivative of the
+   * \returns the second \f$ j^{th} \f$ derivative of the
    * \f$ i^{th} \f$ of the 12 quartic box splines interpolating
    * a regular Loop subdivision element, evaluated at the
    * barycentric coordinates \p v, \p w.

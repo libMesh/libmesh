@@ -26,29 +26,29 @@ namespace libMesh {
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
 /**
- * @returns the number of processors used in the current simulation.
+ * \returns the number of processors used in the current simulation.
  */
 processor_id_type n_processors();
 
 /**
- * @returns the index of the local processor.
+ * \returns the index of the local processor.
  */
 processor_id_type processor_id();
 #endif
 
 /**
- * @returns the number of processors libMesh was initialized with.
+ * \returns the number of processors libMesh was initialized with.
  */
 processor_id_type global_n_processors();
 
 /**
- * @returns the index of the local processor with respect to the
+ * \returns the index of the local processor with respect to the
  * original MPI pool libMesh was initialized with.
  */
 processor_id_type global_processor_id();
 
 /**
- * @returns the maximum number of threads used in the simulation.
+ * \returns the maximum number of threads used in the simulation.
  */
 unsigned int n_threads();
 

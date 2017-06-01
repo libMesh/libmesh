@@ -59,22 +59,22 @@ public:
   virtual void zero() = 0;
 
   /**
-   * @returns the \p (i) element of the vector.
+   * \returns the \p (i) element of the vector.
    */
   virtual T el(const unsigned int i) const = 0;
 
   /**
-   * @returns the \p (i) element of the vector as a writeable reference.
+   * \returns the \p (i) element of the vector as a writeable reference.
    */
   virtual T & el(const unsigned int i) = 0;
 
   /**
-   * @returns the size of the vector.
+   * \returns the size of the vector.
    */
   virtual unsigned int size() const = 0;
 
   /**
-   * @returns true iff size() is 0.
+   * \returns true iff size() is 0.
    */
   virtual bool empty() const { return (this->size() == 0); }
 

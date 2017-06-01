@@ -580,14 +580,14 @@ public:
   void build_shellface_boundary_ids(std::vector<boundary_id_type> & b_ids) const;
 
   /**
-   * @returns the number of element-side-based boundary conditions.
+   * \returns the number of element-side-based boundary conditions.
    *
    * This will be the correct global count even on a distributed mesh.
    */
   std::size_t n_boundary_conds () const;
 
   /**
-   * @returns the number of edge-based boundary conditions.
+   * \returns the number of edge-based boundary conditions.
    * Edge-based boundary IDs should only be used in 3D.
    *
    * This will be the correct global count even on a distributed mesh.
@@ -595,7 +595,7 @@ public:
   std::size_t n_edge_conds () const;
 
   /**
-   * @returns the number of shellface-based boundary conditions.
+   * \returns the number of shellface-based boundary conditions.
    * This is only relevant on shell elements.
    *
    * This will be the correct global count even on a distributed mesh.
@@ -603,7 +603,7 @@ public:
   std::size_t n_shellface_conds () const;
 
   /**
-   * @returns the number of node-based boundary conditions.
+   * \returns the number of node-based boundary conditions.
    *
    * This will be the correct global count even on a distributed mesh.
    */
@@ -674,7 +674,7 @@ public:
                              std::vector<boundary_id_type> &   bc_id_list) const;
 
   /**
-   * @returns a set of the boundary ids which exist on semilocal parts
+   * \returns a set of the boundary ids which exist on semilocal parts
    * of the mesh.
    *
    * DistributedMesh-compatible code may need a set_union or other

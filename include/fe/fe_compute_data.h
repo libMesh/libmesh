@@ -37,8 +37,8 @@ class Point;
  * children of \p FEBase through the \p FEInterface::compute_data()
  * method.  This enables the efficient computation of data on
  * the finite element level, while maintaining library integrity.
- * -- With special finite elements @e disabled (like infinite elements),
- * this class wraps the return values of @e all shape functions
+ * -- With special finite elements disabled (like infinite elements),
+ * this class wraps the return values of all shape functions
  * from \p FEInterface::shape() in a \p std::vector<Number>.
  * -- With enabled infinite elements, this class returns a vector of physically
  * correct shape functions, both for finite and infinite elements.
@@ -102,12 +102,12 @@ public:
 #endif
 
   /**
-   * Clears the @e output data completely.
+   * Clears the output data completely.
    */
   void clear ();
 
   /**
-   * Inits the @e output data to default values, provided
+   * Inits the output data to default values, provided
    * the fields are correctly resized.
    */
   void init ();

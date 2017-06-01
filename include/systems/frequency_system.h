@@ -40,7 +40,7 @@ namespace libMesh
  * for frequency-dependent (linear) systems.
  * Generally two solution flavors are possible:
  *
- * - @e fast solution of moderately-sized systems:
+ * - Fast solution of moderately-sized systems:
  *   For moderate numbers of dof, it is possible to keep
  *   frequency-independent matrices in memory.  For this,
  *   simply provide multiple frequencies prior to \p ini().
@@ -49,13 +49,13 @@ namespace libMesh
  *   these contributions to give the frequency-dependent overall
  *   matrix, respectively. For details see the examples section.
  *
- * - solution of @e large systems:
+ * - Solution of large systems:
  *   When there is not enough space to keep the frequency-independent
  *   contributions in memory, the user need only provide a function
  *   \p _solve_fptr which assembles the overall, frequency-dependent
  *   matrix for the current frequency given in the parameter section
- *   of \p EquationSystems<FrequencySystem> named \p current \p frequency.
- *   For this to work, only provide @e one frequency.
+ *   of \p EquationSystems<FrequencySystem> named "current frequency".
+ *   For this to work, only provide one frequency.
  *
  * \author Daniel Dreyer
  * \date 2003
@@ -114,7 +114,7 @@ public:
               const unsigned int n_stop);
 
   /**
-   * @returns \p "Frequency".  Helps in identifying
+   * \returns \p "Frequency".  Helps in identifying
    * the system type in an equation system file.
    */
   virtual std::string system_type () const libmesh_override { return "Frequency"; }
@@ -166,14 +166,14 @@ public:
                         const bool allocate_solution_duplicates=true);
 
   /**
-   * @returns the number of frequencies to solve
+   * \returns the number of frequencies to solve
    */
   unsigned int n_frequencies () const;
 
   /**
    * Register a required user function to use in assembling/solving the system.
-   * It is intended to compute @e frequency-dependent data.  For proper
-   * work of \p FrequencySystem, at least @e this function has to be provided
+   * It is intended to compute frequency-dependent data.  For proper
+   * work of \p FrequencySystem, at least this function has to be provided
    * by the user.
    */
   void attach_solve_function(void fptr(EquationSystems & es,
@@ -186,19 +186,19 @@ public:
                          const std::string & name);
 
   /**
-   * @returns the number of iterations and the final residual.
+   * \returns the number of iterations and the final residual.
    */
   std::pair<unsigned int, Real> get_rval (unsigned int n) const;
 
   /**
-   * @returns a string of the form \p "frequency_x", where \p x is
+   * \returns a string of the form \p "frequency_x", where \p x is
    * the integer \p n.  Useful for identifying frequencies and
    * solution vectors in the parameters set of \p _equation_systems.
    */
   std::string form_freq_param_name(const unsigned int n) const;
 
   /**
-   * @returns a string of the form \p "solution_x", where \p x is
+   * \returns a string of the form \p "solution_x", where \p x is
    * the integer \p n.  Useful for identifying frequencies and
    * solution vectors in the vectors map of \p System.
    */
@@ -211,7 +211,7 @@ protected:
   /**
    * Initializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
-   * The frequenices have to be set @e prior to calling
+   * The frequenices have to be set prior to calling
    * \p init().
    */
   virtual void init_data () libmesh_override;

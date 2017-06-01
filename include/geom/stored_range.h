@@ -285,7 +285,7 @@ public:
   void grainsize (const unsigned int & gs) {_grainsize = gs;}
 
   /**
-   * \return the size of the range.
+   * \returns the size of the range.
    */
   std::size_t size () const { return std::distance(_begin, _end); }
 

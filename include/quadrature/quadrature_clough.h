@@ -52,7 +52,7 @@ public:
   ~QClough() {}
 
   /**
-   * @returns \p QCLOUGH.
+   * \returns \p QCLOUGH.
    */
   virtual QuadratureType type() const libmesh_override { return QCLOUGH; }
 

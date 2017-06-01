@@ -69,13 +69,13 @@ public:
   ~TreeNode ();
 
   /**
-   * @returns true if this node is the root node, false
+   * \returns true if this node is the root node, false
    * otherwise.
    */
   bool is_root() const { return (parent == libmesh_nullptr); }
 
   /**
-   * @returns true if this node is active (i.e. has no
+   * \returns true if this node is active (i.e. has no
    * children), false otherwise.
    */
   bool active() const { return children.empty(); }
@@ -106,21 +106,21 @@ public:
   void set_bounding_box (const std::pair<Point, Point> & bbox);
 
   /**
-   * @returns true if this TreeNode (or its children) contain node n
+   * \returns true if this TreeNode (or its children) contain node n
    * (within relative tolerance), false otherwise.
    */
   bool bounds_node (const Node * nd,
                     Real relative_tol = 0) const;
 
   /**
-   * @returns true if this TreeNode (or its children) contain point p
+   * \returns true if this TreeNode (or its children) contain point p
    * (within relative tolerance), false otherwise.
    */
   bool bounds_point (const Point & p,
                      Real relative_tol = 0) const;
 
   /**
-   * @returns the level of the node.
+   * \returns the level of the node.
    */
   unsigned int level () const;
 
@@ -142,13 +142,13 @@ public:
   void transform_nodes_to_elements (std::vector<std::vector<const Elem *> > & nodes_to_elem);
 
   /**
-   * @returns the number of active bins below
+   * \returns the number of active bins below
    * (including) this element.
    */
   unsigned int n_active_bins() const;
 
   /**
-   * @returns an element containing point p,
+   * \returns an element containing point p,
    * optionally restricted to a set of allowed subdomains.
    */
   const Elem * find_element (const Point & p,

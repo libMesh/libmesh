@@ -341,18 +341,18 @@ public:
   void zero();
 
   /**
-   * @returns \p true if two tensors are equal valued.
+   * \returns \p true if two tensors are equal valued.
    */
   bool operator == (const TypeTensor<T> & rhs) const;
 
   /**
-   * @returns \p true if this tensor is "less"
+   * \returns \p true if this tensor is "less"
    * than another.  Useful for sorting.
    */
   bool operator < (const TypeTensor<T> & rhs) const;
 
   /**
-   * @returns \p true if this tensor is "greater"
+   * \returns \p true if this tensor is "greater"
    * than another.
    */
   bool operator > (const TypeTensor<T> & rhs) const;

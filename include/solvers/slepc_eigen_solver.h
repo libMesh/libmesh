@@ -191,7 +191,7 @@ public:
   get_eigenvalue (dof_id_type i) libmesh_override;
 
   /**
-   * @returns the relative error ||A*x-lambda*x||/|lambda*x|
+   * \returns the relative error \f$ ||A x - \lambda x|| / |\lambda x| \f$
    * of the ith eigenpair. (or the equivalent for a general eigenvalue problem)
    */
   Real get_relative_error (unsigned int i);

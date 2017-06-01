@@ -63,39 +63,39 @@ public:
     Tri(Tri3::n_nodes(), p, _nodelinks_data) {}
 
   /**
-   * @returns \p TRI3.
+   * \returns \p TRI3.
    */
   virtual ElemType type () const libmesh_override { return TRI3; }
 
   /**
-   * @returns 1.
+   * \returns 1.
    */
   virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
 
   /**
-   * @returns true if the specified (local) node number is a vertex.
+   * \returns true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is an edge.
+   * \returns true if the specified (local) node number is an edge.
    */
   virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is a face.
+   * \returns true if the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is on the
+   * \returns true if the specified (local) node number is on the
    * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
                                const unsigned int s) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is on the
+   * \returns true if the specified (local) node number is on the
    * specified edge (== is_node_on_side in 2D).
    */
   virtual bool is_node_on_edge(const unsigned int n,
@@ -103,19 +103,19 @@ public:
   { return this->is_node_on_side(n,e); }
 
   /**
-   * @returns true if the element map is definitely affine within
+   * \returns true if the element map is definitely affine within
    * numerical tolerances.
    */
   virtual bool has_affine_map () const libmesh_override { return true; }
 
   /**
-   * @returns true if the Lagrange shape functions on this element
+   * \returns true if the Lagrange shape functions on this element
    * are linear.
    */
   virtual bool is_linear () const libmesh_override { return true; }
 
   /**
-   * @returns FIRST.
+   * \returns FIRST.
    */
   virtual Order default_order() const libmesh_override { return FIRST; }
 

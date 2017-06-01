@@ -101,7 +101,7 @@ public:
         const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
-   * @returns true if the matrix has been initialized,
+   * \returns true if the matrix has been initialized,
    * false otherwise.
    */
   virtual bool initialized() const { return _is_initialized; }
@@ -178,13 +178,13 @@ public:
   virtual void close () const = 0;
 
   /**
-   * @returns \p m, the row-dimension of
+   * \returns \p m, the row-dimension of
    * the matrix where the marix is \f$ M \times N \f$.
    */
   virtual numeric_index_type m () const = 0;
 
   /**
-   * @returns \p n, the column-dimension of
+   * \returns \p n, the column-dimension of
    * the matrix where the marix is \f$ M \times N \f$.
    */
   virtual numeric_index_type n () const = 0;

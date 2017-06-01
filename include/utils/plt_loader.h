@@ -155,91 +155,91 @@ public:
 
 
   /**
-   * @returns the Tecplot version number string.  This identifies the
+   * \returns the Tecplot version number string.  This identifies the
    * version of Tecplot (or preplot) that wrote the binary file.  Currently,
    * PltLoader understands versions "#!TDV7X " and "#!TDV1XX"
    */
   const std::string & version () const { return _version; }
 
   /**
-   * @returns \p true if the binary type of the file is different than the
+   * \returns \p true if the binary type of the file is different than the
    * machine that is reading it.  If this is the case we must perform an
    * endian-swap on all input data.
    */
   bool is_foreign () const { return _is_foreign; }
 
   /**
-   * @returns the data set title
+   * \returns the data set title
    */
   const std::string & title () const { return _title; }
 
   /**
-   * @returns the number of variables in the data set.
+   * \returns the number of variables in the data set.
    */
   unsigned int n_vars () const { return _n_vars; }
 
   /**
-   * @returns the name of variable \p v.
+   * \returns the name of variable \p v.
    */
   const std::string & var_name (const unsigned int v) const;
 
   /**
-   * @returns the type of variable \p v
+   * \returns the type of variable \p v
    */
   unsigned int var_type (const unsigned int v) const;
 
   /**
-   * @returns the number of zones.
+   * \returns the number of zones.
    */
   unsigned int n_zones () const { return _n_zones; }
 
   /**
-   * @returns the type of zone \p z
+   * \returns the type of zone \p z
    */
   unsigned int zone_type (const unsigned int z) const;
 
   /**
-   * @returns the name of zone \p z.
+   * \returns the name of zone \p z.
    */
   const std::string & zone_name (const unsigned int z) const;
 
   /**
-   * @returns the data packing flag for zone \p z.
+   * \returns the data packing flag for zone \p z.
    */
   unsigned int zone_pack (const unsigned int z) const;
 
   /**
-   * @returns \p imax for zone \p z.
+   * \returns \p imax for zone \p z.
    */
   unsigned int imax (const unsigned int z) const;
 
   /**
-   * @returns \p jmax for zone \p z.
+   * \returns \p jmax for zone \p z.
    */
   unsigned int jmax (const unsigned int z) const;
 
   /**
-   * @returns \p kmax for zone \p z.
+   * \returns \p kmax for zone \p z.
    */
   unsigned int kmax (const unsigned int z) const;
 
   /**
-   * @returns the number of nodes in the mesh (for unstructured meshes).
+   * \returns the number of nodes in the mesh (for unstructured meshes).
    */
   unsigned int n_nodes (const unsigned int z) const;
 
   /**
-   * @returns the number of elements in the mesh (for unstructured meshes).
+   * \returns the number of elements in the mesh (for unstructured meshes).
    */
   unsigned int n_elem (const unsigned int z) const;
 
   /**
-   * @returns the element type for the \p zth zone (for unstructured meshes).
+   * \returns the element type for the \p zth zone (for unstructured meshes).
    */
   FEType elem_type (const unsigned int z) const;
 
   /**
-   * @returns a reference to the data read from the file
+   * \returns a reference to the data read from the file
    */
   const std::vector<std::vector<std::vector<float> > > & get_data () const;
 
@@ -289,69 +289,69 @@ private:
 
 
   /**
-   * @returns the Tecplot version number string.
+   * \returns the Tecplot version number string.
    */
   std::string & version () { return _version; }
 
   /**
-   * @returns \p true if the binary type of the file is different than the
+   * \returns \p true if the binary type of the file is different than the
    * machine that is reading it.  If this is the case we must perform an
    * endian-swap on all input data.
    */
   bool & is_foreign () { return _is_foreign; }
 
   /**
-   * @returns the data set title
+   * \returns the data set title
    */
   std::string & title () { return _title; }
 
   /**
-   * @returns the number of variables in the data set.
+   * \returns the number of variables in the data set.
    */
   void set_n_vars (const unsigned int nv);
 
   /**
-   * @returns the name of variable \p v.
+   * \returns the name of variable \p v.
    */
   std::string & var_name (const unsigned int v);
 
   /**
-   * @returns the type of variable \p v
+   * \returns the type of variable \p v
    */
   unsigned int & var_type (const unsigned int v);
 
   /**
-   * @returns the number of zones.
+   * \returns the number of zones.
    */
   void set_n_zones (const unsigned int nz);
 
   /**
-   * @returns the type of zone \p z
+   * \returns the type of zone \p z
    */
   unsigned int & zone_type (const unsigned int z);
 
   /**
-   * @returns the name of zone \p z.
+   * \returns the name of zone \p z.
    */
   std::string & zone_name (const unsigned int z);
 
   /**
-   * @returns the data pack flag for zone \p z.
+   * \returns the data pack flag for zone \p z.
    */
   unsigned int & zone_pack (const unsigned int z);
 
   /**
-   * @returns \p imax for zone \p z.
+   * \returns \p imax for zone \p z.
    */
   unsigned int & imax (const unsigned int z);
 
   /**
-   * @returns \p jmax for zone \p z.
+   * \returns \p jmax for zone \p z.
    */
   unsigned int & jmax (const unsigned int z);
 
   /**
-   * @returns \p kmax for zone \p z.
+   * \returns \p kmax for zone \p z.
    */
   unsigned int & kmax (const unsigned int z);
 

@@ -50,7 +50,7 @@ class PointLocatorBase;
 #endif
 
 /**
- * This class provides an encapsulated access to all @e static
+ * This class provides an encapsulated access to all static
  * public member functions of finite element classes.
  * Using this class, one need not worry about the correct
  * finite element class.
@@ -76,7 +76,7 @@ public:
   virtual ~FEInterface() {}
 
   /**
-   * @returns the number of shape functions associated with this
+   * \returns the number of shape functions associated with this
    * finite element of type \p fe_t.
    * Automatically decides which finite element class to use.
    *
@@ -87,7 +87,7 @@ public:
                                         const ElemType t);
 
   /**
-   * @returns the number of shape functions associated with this
+   * \returns the number of shape functions associated with this
    * finite element.
    * Automatically decides which finite element class to use.
    *
@@ -98,7 +98,7 @@ public:
                              const ElemType t);
 
   /**
-   * @returns the number of dofs at node n for a finite element
+   * \returns the number of dofs at node n for a finite element
    * of type \p fe_t.
    * Automatically decides which finite element class to use.
    *
@@ -110,7 +110,7 @@ public:
                                      const unsigned int n);
 
   /**
-   * @returns the number of dofs interior to the element,
+   * \returns the number of dofs interior to the element,
    * not associated with any interior nodes.
    * Automatically decides which finite element class to use.
    *
@@ -173,7 +173,7 @@ public:
                    const Point & p);
 
   /**
-   * @returns the location (on the reference element) of the
+   * \returns the location (on the reference element) of the
    * point \p p located in physical space.  This function requires
    * inverting the (probably nonlinear) transformation map, so
    * it is not trivial. The optional parameter \p tolerance defines
@@ -189,7 +189,7 @@ public:
                             const bool secure = true);
 
   /**
-   * @returns the location (on the reference element) of the points \p
+   * \returns the location (on the reference element) of the points \p
    * physical_points located in physical space.  This function
    * requires inverting the (probably nonlinear) transformation map,
    * so it is not trivial. The location of each point on the reference
@@ -208,7 +208,7 @@ public:
                             const bool secure = true);
 
   /**
-   * @returns true if the point p is located on the reference element
+   * \returns true if the point p is located on the reference element
    * for element type t, false otherwise.
    *
    * Since we are doing floating point comparisons here the parameter
@@ -219,7 +219,7 @@ public:
                                    const ElemType t,
                                    const Real eps=TOLERANCE);
   /**
-   * @returns the value of the \f$ i^{th} \f$ shape function at
+   * \returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p. This method allows you to specify the dimension,
    * element type, and order directly. Automatically passes the
    * request to the appropriate finite element class member.
@@ -233,7 +233,7 @@ public:
                     const Point & p);
 
   /**
-   * @returns the value of the \f$ i^{th} \f$ shape function at
+   * \returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p. This method allows you to specify the dimension,
    * element type, and order directly. Automatically passes the
    * request to the appropriate finite element class member.
@@ -247,7 +247,7 @@ public:
                     const Point & p);
 
   /**
-   * @returns the value of the \f$ i^{th} \f$ shape function at
+   * \returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p. This method allows you to specify the dimension,
    * element type, and order directly. Automatically passes the
    * request to the appropriate *scalar* finite element class member.
@@ -263,7 +263,7 @@ public:
                     OutputType & phi);
 
   /**
-   * @returns the value of the \f$ i^{th} \f$ shape function at
+   * \returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p. This method allows you to specify the dimension,
    * element type, and order directly. Automatically passes the
    * request to the appropriate *scalar* finite element class member.
@@ -355,7 +355,7 @@ private:
 
 
   /**
-   * @returns true if \p et is an element to be processed by
+   * \returns true if \p et is an element to be processed by
    * class \p InfFE.  Otherwise, it returns false.
    * For compatibility with disabled infinite elements
    * it always returns false.

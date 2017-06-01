@@ -840,7 +840,7 @@ public:
   { return _elem_dim; }
 
   /**
-   * @returns set of dimensions of elements present in the mesh at
+   * \returns set of dimensions of elements present in the mesh at
    * context initialization.
    */
   const std::set<unsigned char> & elem_dimensions() const

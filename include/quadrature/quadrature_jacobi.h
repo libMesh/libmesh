@@ -71,7 +71,7 @@ public:
   ~QJacobi() {}
 
   /**
-   * @returns the \p QuadratureType, either \p QJACOBI_1_0 or \p
+   * \returns the \p QuadratureType, either \p QJACOBI_1_0 or \p
    * QJACOBI_2_0.
    */
   virtual QuadratureType type() const libmesh_override;

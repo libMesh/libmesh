@@ -87,7 +87,7 @@ public:
   // ------------------------------------------------------
   // misc
   /**
-   * @returns the scalar value at coordinate
+   * \returns the scalar value at coordinate
    * \p p and time \p time, which defaults to zero.
    * Purely virtual, so you have to overload it.
    * Note that this cannot be a const method, check \p MeshFunction.
@@ -107,7 +107,7 @@ public:
                    DenseVector<Output> & output) libmesh_override;
 
   /**
-   * @returns the vector component \p i at coordinate
+   * \returns the vector component \p i at coordinate
    * \p p and time \p time.
    */
   virtual Output component(const FEMContext & c,
@@ -118,7 +118,7 @@ public:
   const std::string & expression() { return _expression; }
 
   /**
-   * @returns the value of an inline variable.  Will *only* be correct
+   * \returns the value of an inline variable.  Will *only* be correct
    * if the inline variable value is independent of input variables,
    * if the inline variable is not redefined within any subexpression,
    * and if the inline variable takes the same value within any

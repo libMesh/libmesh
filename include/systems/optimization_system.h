@@ -79,7 +79,7 @@ public:
     /**
      * This function will be called to compute the objective function
      * to be minimized, and must be implemented by the user in a
-     * derived class. @return the value of the objective function at
+     * derived class. \returns the value of the objective function at
      * the iterate \p X.
      */
     virtual Number objective (const NumericVector<Number> & X,
@@ -214,7 +214,7 @@ public:
   };
 
   /**
-   * @returns a clever pointer to the system.
+   * \returns a clever pointer to the system.
    */
   sys_type & system () { return *this; }
 
@@ -256,7 +256,7 @@ public:
   void initialize_inequality_constraints_storage(const std::vector< std::set<numeric_index_type> > & constraint_jac_sparsity);
 
   /**
-   * @returns \p "Optimization".  Helps in identifying
+   * \returns \p "Optimization".  Helps in identifying
    * the system type in an equation system file.
    */
   virtual std::string system_type () const libmesh_override { return "Optimization"; }

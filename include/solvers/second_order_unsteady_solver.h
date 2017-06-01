@@ -88,13 +88,13 @@ public:
                             FunctionBase<Gradient> * g = libmesh_nullptr);
 
   /**
-   * @returns the solution rate at the previous time step, \f$\dot{u}_n\f$,
+   * \returns the solution rate at the previous time step, \f$\dot{u}_n\f$,
    * for the specified global DOF.
    */
   Number old_solution_rate (const dof_id_type global_dof_number) const;
 
   /**
-   * @returns the solution acceleration at the previous time step, \f$\ddot{u}_n\f$,
+   * \returns the solution acceleration at the previous time step, \f$\ddot{u}_n\f$,
    * for the specified global DOF.
    */
   Number old_solution_accel (const dof_id_type global_dof_number) const;

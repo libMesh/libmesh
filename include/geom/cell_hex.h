@@ -51,7 +51,7 @@ public:
 
 
   /**
-   * @returns the \p Point associated with local \p Node \p i,
+   * \returns the \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
   virtual Point master_point (const unsigned int i) const libmesh_override
@@ -63,50 +63,50 @@ public:
   }
 
   /**
-   * @returns 6.
+   * \returns 6.
    */
   virtual unsigned int n_sides() const libmesh_override { return 6; }
 
   /**
-   * @returns 8.  All hexahedra have 8 vertices.
+   * \returns 8.  All hexahedra have 8 vertices.
    */
   virtual unsigned int n_vertices() const libmesh_override { return 8; }
 
   /**
-   * @returns 12.  All hexahedra have 12 edges.
+   * \returns 12.  All hexahedra have 12 edges.
    */
   virtual unsigned int n_edges() const libmesh_override { return 12; }
 
   /**
-   * @returns 6.  All hexahedra have 6 faces.
+   * \returns 6.  All hexahedra have 6 faces.
    */
   virtual unsigned int n_faces() const libmesh_override { return 6; }
 
   /**
-   * @returns 8.
+   * \returns 8.
    */
   virtual unsigned int n_children() const libmesh_override { return 8; }
 
   /**
-   * @returns true if the specified child is on the specified side.
+   * \returns true if the specified child is on the specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
                                 const unsigned int s) const libmesh_override;
 
   /**
-   * @returns true if the specified edge is on the specified side.
+   * \returns true if the specified edge is on the specified side.
    */
   virtual bool is_edge_on_side(const unsigned int e,
                                const unsigned int s) const libmesh_override;
 
   /**
-   * @returns the side number opposite to \p s (for a tensor product
+   * \returns the side number opposite to \p s (for a tensor product
    * element), or throws an error otherwise.
    */
   virtual unsigned int opposite_side(const unsigned int s) const libmesh_override;
 
   /**
-   * @returns the local node number for the node opposite to node n
+   * \returns the local node number for the node opposite to node n
    * on side \p opposite_side(s) (for a tensor product element), or
    * throws an error otherwise.
    */
@@ -119,7 +119,7 @@ public:
   using Elem::key;
 
   /**
-   * @returns an id associated with the \p s side of this element.
+   * \returns an id associated with the \p s side of this element.
    * The id is not necessarily unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
@@ -132,7 +132,7 @@ public:
                                        unsigned int side_node) const libmesh_override;
 
   /**
-   * @returns a primitive (4-noded) quad for face i.
+   * \returns a primitive (4-noded) quad for face i.
    */
   virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;
 

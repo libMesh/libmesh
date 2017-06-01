@@ -76,7 +76,7 @@ public:
   const Point build_inf_elem (const bool be_verbose = false);
 
   /**
-   * @returns the origin of the infinite elements.
+   * \returns the origin of the infinite elements.
    * Builds infinite elements atop a volume-based mesh.
    * Finds all faces on the outer boundary and build infinite elements
    * on them.  Using the \p InfElemOriginValue the user can
@@ -85,7 +85,7 @@ public:
    * of the mesh.
    *
    * During the search for faces on which infinite elements are built,
-   * @e interior faces that are not on symmetry planes are found, too.
+   * interior faces that are not on symmetry planes are found, too.
    * When an (optional) pointer to \p inner_boundary_nodes is provided,
    * then this vector will be filled with the nodes that lie on the
    * inner boundary.

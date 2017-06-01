@@ -43,7 +43,7 @@ public:
     Tri3(p) {}
 
   /**
-   * @returns \p TRISHELL3.
+   * \returns \p TRISHELL3.
    */
   virtual ElemType type () const libmesh_override { return TRISHELL3; }
 };

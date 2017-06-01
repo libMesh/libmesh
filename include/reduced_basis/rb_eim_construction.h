@@ -123,7 +123,7 @@ public:
    * into the EIM space and then evaluate the error
    * in the norm defined by inner_product_matrix.
    *
-   * @return the error in the best fit
+   * \returns the error in the best fit
    */
   virtual Real compute_best_fit_error();
 
@@ -157,7 +157,7 @@ public:
   void set_point_locator_tol(Real point_locator_tol);
 
   /**
-   * @return the point locator tolerance.
+   * \returns the point locator tolerance.
    */
   Real get_point_locator_tol() const;
 
@@ -170,7 +170,7 @@ public:
   virtual void initialize_eim_assembly_objects();
 
   /**
-   * @return the vector of assembly objects that point to this RBEIMConstruction.
+   * \returns the vector of assembly objects that point to this RBEIMConstruction.
    */
   std::vector<ElemAssembly *> get_eim_assembly_objects();
 
@@ -237,7 +237,7 @@ public:
    * a) projection: Find the best fit in the inner product
    * b) eim: Use empirical interpolation to find a "best fit"
    *
-   * @return the error associated with the "best fit" in the
+   * \returns the error associated with the "best fit" in the
    * norm induced by inner_product_matrix.
    */
   BEST_FIT_TYPE best_fit_type_flag;

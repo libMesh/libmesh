@@ -80,7 +80,7 @@ public:
   RBThetaExpansion & get_rb_theta_expansion();
 
   /**
-   * @return true if the theta expansion has been initialized.
+   * \returns true if the theta expansion has been initialized.
    */
   bool is_rb_theta_expansion_initialized() const;
 
@@ -102,7 +102,7 @@ public:
   /**
    * Perform online solve with the N RB basis functions, for the
    * set of parameters in current_params, where 0 <= N <= RB_size.
-   * @return the (absolute) error bound associated with
+   * \returns the (absolute) error bound associated with
    * the RB approximation.
    * With an empty RB space (N=0), our RB solution is zero, but we
    * still obtain a meaningful error bound associated with the
@@ -111,7 +111,7 @@ public:
   virtual Real rb_solve(unsigned int N);
 
   /**
-   * @return a scaling factor that we can use to provide a consistent
+   * \returns a scaling factor that we can use to provide a consistent
    * scaling of the RB error bound across different parameter values.
    */
   virtual Real get_error_bound_normalization();

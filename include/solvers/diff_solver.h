@@ -113,29 +113,29 @@ public:
   virtual unsigned int solve () = 0;
 
   /**
-   * @returns the number of "outer" (e.g. quasi-Newton) iterations
+   * \returns the number of "outer" (e.g. quasi-Newton) iterations
    * required by the last solve.
    */
   unsigned int total_outer_iterations() { return _outer_iterations; }
 
   /**
-   * @returns the number of "inner" (e.g. Krylov) iterations
+   * \returns the number of "inner" (e.g. Krylov) iterations
    * required by the last solve.
    */
   unsigned int total_inner_iterations() { return _inner_iterations; }
 
   /**
-   * @returns the value of the SolveResult from the last solve.
+   * \returns the value of the SolveResult from the last solve.
    */
   unsigned int solve_result() { return _solve_result; }
 
   /**
-   * @returns a constant reference to the system we are solving.
+   * \returns a constant reference to the system we are solving.
    */
   const sys_type & system () const { return _system; }
 
   /**
-   * @returns a writeable reference to the system we are solving.
+   * \returns a writeable reference to the system we are solving.
    */
   sys_type & system () { return _system; }
 

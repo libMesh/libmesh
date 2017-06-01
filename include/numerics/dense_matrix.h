@@ -77,26 +77,26 @@ public:
   virtual void zero() libmesh_override;
 
   /**
-   * @returns the \p (i,j) element of the matrix.
+   * \returns the \p (i,j) element of the matrix.
    */
   T operator() (const unsigned int i,
                 const unsigned int j) const;
 
   /**
-   * @returns the \p (i,j) element of the matrix as a writeable reference.
+   * \returns the \p (i,j) element of the matrix as a writeable reference.
    */
   T & operator() (const unsigned int i,
                   const unsigned int j);
 
   /**
-   * @returns the \p (i,j) element of the matrix as a writeable reference.
+   * \returns the \p (i,j) element of the matrix as a writeable reference.
    */
   virtual T el(const unsigned int i,
                const unsigned int j) const libmesh_override
   { return (*this)(i,j); }
 
   /**
-   * @returns the \p (i,j) element of the matrix as a writeable reference.
+   * \returns the \p (i,j) element of the matrix as a writeable reference.
    */
   virtual T & el(const unsigned int i,
                  const unsigned int j) libmesh_override
@@ -256,14 +256,14 @@ public:
   DenseMatrix<T> & operator-= (const DenseMatrix<T> & mat);
 
   /**
-   * @returns the minimum element in the matrix.
+   * \returns the minimum element in the matrix.
    * In case of complex numbers, this returns the minimum
    * Real part.
    */
   Real min () const;
 
   /**
-   * @returns the maximum element in the matrix.
+   * \returns the maximum element in the matrix.
    * In case of complex numbers, this returns the maximum
    * Real part.
    */
@@ -320,7 +320,7 @@ public:
   void right_multiply_transpose (const DenseMatrix<T2> & A);
 
   /**
-   * @returns the \p (i,j) element of the transposed matrix.
+   * \returns the \p (i,j) element of the transposed matrix.
    */
   T transpose (const unsigned int i,
                const unsigned int j) const;
@@ -495,7 +495,7 @@ public:
                           DenseMatrix<T> & VR);
 
   /**
-   * @returns the determinant of the matrix.  Note that this means
+   * \returns the determinant of the matrix.  Note that this means
    * doing an LU decomposition and then computing the product of the
    * diagonal terms.  Therefore this is a non-const method.
    */

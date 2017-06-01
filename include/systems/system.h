@@ -220,7 +220,7 @@ public:
   typedef System sys_type;
 
   /**
-   * @returns a clever pointer to the system.
+   * \returns a clever pointer to the system.
    */
   sys_type & system () { return *this; }
 
@@ -240,7 +240,7 @@ public:
    * Reinitializes degrees of freedom and other
    * required data on the current mesh.  Note that the matrix
    * is not initialized at this time since it may not be required
-   * for all applications. @e Should be overloaded in derived classes.
+   * for all applications. Should be overloaded in derived classes.
    */
   virtual void reinit ();
 
@@ -264,19 +264,19 @@ public:
    * Prepares \p matrix and \p _dof_map for matrix assembly.
    * Does not actually assemble anything.  For matrix assembly,
    * use the \p assemble() in derived classes.
-   * @e Should be overloaded in derived classes.
+   * Should be overloaded in derived classes.
    */
   virtual void assemble ();
 
   /**
    * Calls user qoi function.
-   * @e Can be overloaded in derived classes.
+   * Can be overloaded in derived classes.
    */
   virtual void assemble_qoi (const QoISet & qoi_indices = QoISet());
 
   /**
    * Calls user qoi derivative function.
-   * @e Can be overloaded in derived classes.
+   * Can be overloaded in derived classes.
    */
   virtual void assemble_qoi_derivative (const QoISet & qoi_indices = QoISet(),
                                         bool include_liftfunc = true,
@@ -449,7 +449,7 @@ public:
                                                     SensitivityData & product);
 
   /**
-   * @returns \p true when the other system contains
+   * \returns \p true when the other system contains
    * identical data, up to the given threshold.  Outputs
    * some diagnostic info when \p verbose is set.
    */
@@ -458,12 +458,12 @@ public:
                         const bool verbose) const;
 
   /**
-   * @returns the system name.
+   * \returns the system name.
    */
   const std::string & name () const;
 
   /**
-   * @returns the type of system, helpful in identifying
+   * \returns the type of system, helpful in identifying
    * which system type to use when reading equation system
    * data from file.  Should be overloaded in derived classes.
    */
@@ -666,7 +666,7 @@ public:
                                 int is_adjoint = -1) const;
 
   /**
-   * @returns the system number.
+   * \returns the system number.
    */
   unsigned int number () const;
 
@@ -686,37 +686,37 @@ public:
                                const processor_id_type dest_proc) const;
 
   /**
-   * @returns a constant reference to this systems's \p _mesh.
+   * \returns a constant reference to this systems's \p _mesh.
    */
   const MeshBase & get_mesh() const;
 
   /**
-   * @returns a reference to this systems's \p _mesh.
+   * \returns a reference to this systems's \p _mesh.
    */
   MeshBase & get_mesh();
 
   /**
-   * @returns a constant reference to this system's \p _dof_map.
+   * \returns a constant reference to this system's \p _dof_map.
    */
   const DofMap & get_dof_map() const;
 
   /**
-   * @returns a writeable reference to this system's \p _dof_map.
+   * \returns a writeable reference to this system's \p _dof_map.
    */
   DofMap & get_dof_map();
 
   /**
-   * @returns a constant reference to this system's parent EquationSystems object.
+   * \returns a constant reference to this system's parent EquationSystems object.
    */
   const EquationSystems & get_equation_systems() const { return _equation_systems; }
 
   /**
-   * @returns a reference to this system's parent EquationSystems object.
+   * \returns a reference to this system's parent EquationSystems object.
    */
   EquationSystems & get_equation_systems() { return _equation_systems; }
 
   /**
-   * @returns \p true if the system is active, \p false otherwise.
+   * \returns \p true if the system is active, \p false otherwise.
    * An active system will be solved.
    */
   bool active () const;
@@ -794,73 +794,73 @@ public:
   { return _solution_projection; }
 
   /**
-   * @returns \p true if this \p System has a vector associated with the
+   * \returns \p true if this \p System has a vector associated with the
    * given name, \p false otherwise.
    */
   bool have_vector (const std::string & vec_name) const;
 
   /**
-   * @returns a const pointer to the vector if this \p System has a
+   * \returns a const pointer to the vector if this \p System has a
    * vector associated with the given name, \p NULL otherwise.
    */
   const NumericVector<Number> * request_vector (const std::string & vec_name) const;
 
   /**
-   * @returns a pointer to the vector if this \p System has a
+   * \returns a pointer to the vector if this \p System has a
    * vector associated with the given name, \p NULL otherwise.
    */
   NumericVector<Number> * request_vector (const std::string & vec_name);
 
   /**
-   * @returns a const pointer to this system's @e additional vector
+   * \returns a const pointer to this system's additional vector
    * number \p vec_num (where the vectors are counted starting with
    * 0), or returns \p NULL if the system has no such vector.
    */
   const NumericVector<Number> * request_vector (const unsigned int vec_num) const;
 
   /**
-   * @returns a writeable pointer to this system's @e additional
+   * \returns a writeable pointer to this system's additional
    * vector number \p vec_num (where the vectors are counted starting
    * with 0), or returns \p NULL if the system has no such vector.
    */
   NumericVector<Number> * request_vector (const unsigned int vec_num);
 
   /**
-   * @returns a const reference to this system's @e additional vector
+   * \returns a const reference to this system's additional vector
    * named \p vec_name.  Access is only granted when the vector is already
    * properly initialized.
    */
   const NumericVector<Number> & get_vector (const std::string & vec_name) const;
 
   /**
-   * @returns a writeable reference to this system's @e additional vector
+   * \returns a writeable reference to this system's additional vector
    * named \p vec_name.  Access is only granted when the vector is already
    * properly initialized.
    */
   NumericVector<Number> & get_vector (const std::string & vec_name);
 
   /**
-   * @returns a const reference to this system's @e additional vector
+   * \returns a const reference to this system's additional vector
    * number \p vec_num (where the vectors are counted starting with
    * 0).
    */
   const NumericVector<Number> & get_vector (const unsigned int vec_num) const;
 
   /**
-   * @returns a writeable reference to this system's @e additional
+   * \returns a writeable reference to this system's additional
    * vector number \p vec_num (where the vectors are counted starting
    * with 0).
    */
   NumericVector<Number> & get_vector (const unsigned int vec_num);
 
   /**
-   * @returns the name of this system's @e additional vector number \p
+   * \returns the name of this system's additional vector number \p
    * vec_num (where the vectors are counted starting with 0).
    */
   const std::string & vector_name (const unsigned int vec_num) const;
 
   /**
-   * @returns the name of a system vector, given a reference to that vector
+   * \returns the name of a system vector, given a reference to that vector
    */
   const std::string & vector_name (const NumericVector<Number> & vec_reference) const;
 
@@ -877,7 +877,7 @@ public:
   void set_vector_as_adjoint (const std::string & vec_name, int qoi_num);
 
   /**
-   * @returns the int describing whether the vector identified by
+   * \returns the int describing whether the vector identified by
    * vec_name represents a solution from an adjoint (non-negative) or
    * the primal (-1) space.
    */
@@ -891,52 +891,52 @@ public:
   void set_vector_preservation (const std::string & vec_name, bool preserve);
 
   /**
-   * @returns the boolean describing whether the vector identified by
+   * \returns the boolean describing whether the vector identified by
    * vec_name should be "preserved": projected to new meshes, saved,
    * etc.
    */
   bool vector_preservation (const std::string & vec_name) const;
 
   /**
-   * @returns a reference to one of the system's adjoint solution
+   * \returns a reference to one of the system's adjoint solution
    * vectors, by default the one corresponding to the first qoi.
    * Creates the vector if it doesn't already exist.
    */
   NumericVector<Number> & add_adjoint_solution(unsigned int i=0);
 
   /**
-   * @returns a reference to one of the system's adjoint solution
+   * \returns a reference to one of the system's adjoint solution
    * vectors, by default the one corresponding to the first qoi.
    */
   NumericVector<Number> & get_adjoint_solution(unsigned int i=0);
 
   /**
-   * @returns a reference to one of the system's adjoint solution
+   * \returns a reference to one of the system's adjoint solution
    * vectors, by default the one corresponding to the first qoi.
    */
   const NumericVector<Number> & get_adjoint_solution(unsigned int i=0) const;
 
   /**
-   * @returns a reference to one of the system's solution sensitivity
+   * \returns a reference to one of the system's solution sensitivity
    * vectors, by default the one corresponding to the first parameter.
    * Creates the vector if it doesn't already exist.
    */
   NumericVector<Number> & add_sensitivity_solution(unsigned int i=0);
 
   /**
-   * @returns a reference to one of the system's solution sensitivity
+   * \returns a reference to one of the system's solution sensitivity
    * vectors, by default the one corresponding to the first parameter.
    */
   NumericVector<Number> & get_sensitivity_solution(unsigned int i=0);
 
   /**
-   * @returns a reference to one of the system's solution sensitivity
+   * \returns a reference to one of the system's solution sensitivity
    * vectors, by default the one corresponding to the first parameter.
    */
   const NumericVector<Number> & get_sensitivity_solution(unsigned int i=0) const;
 
   /**
-   * @returns a reference to one of the system's weighted sensitivity
+   * \returns a reference to one of the system's weighted sensitivity
    * adjoint solution vectors, by default the one corresponding to the
    * first qoi.
    * Creates the vector if it doesn't already exist.
@@ -944,47 +944,47 @@ public:
   NumericVector<Number> & add_weighted_sensitivity_adjoint_solution(unsigned int i=0);
 
   /**
-   * @returns a reference to one of the system's weighted sensitivity
+   * \returns a reference to one of the system's weighted sensitivity
    * adjoint solution vectors, by default the one corresponding to the
    * first qoi.
    */
   NumericVector<Number> & get_weighted_sensitivity_adjoint_solution(unsigned int i=0);
 
   /**
-   * @returns a reference to one of the system's weighted sensitivity
+   * \returns a reference to one of the system's weighted sensitivity
    * adjoint solution vectors, by default the one corresponding to the
    * first qoi.
    */
   const NumericVector<Number> & get_weighted_sensitivity_adjoint_solution(unsigned int i=0) const;
 
   /**
-   * @returns a reference to the solution of the last weighted
+   * \returns a reference to the solution of the last weighted
    * sensitivity solve
    * Creates the vector if it doesn't already exist.
    */
   NumericVector<Number> & add_weighted_sensitivity_solution();
 
   /**
-   * @returns a reference to the solution of the last weighted
+   * \returns a reference to the solution of the last weighted
    * sensitivity solve
    */
   NumericVector<Number> & get_weighted_sensitivity_solution();
 
   /**
-   * @returns a reference to the solution of the last weighted
+   * \returns a reference to the solution of the last weighted
    * sensitivity solve
    */
   const NumericVector<Number> & get_weighted_sensitivity_solution() const;
 
   /**
-   * @returns a reference to one of the system's adjoint rhs
+   * \returns a reference to one of the system's adjoint rhs
    * vectors, by default the one corresponding to the first qoi.
    * Creates the vector if it doesn't already exist.
    */
   NumericVector<Number> & add_adjoint_rhs(unsigned int i=0);
 
   /**
-   * @returns a reference to one of the system's adjoint rhs
+   * \returns a reference to one of the system's adjoint rhs
    * vectors, by default the one corresponding to the first qoi.
    * This what the user's QoI derivative code should assemble
    * when setting up an adjoint problem
@@ -992,20 +992,20 @@ public:
   NumericVector<Number> & get_adjoint_rhs(unsigned int i=0);
 
   /**
-   * @returns a reference to one of the system's adjoint rhs
+   * \returns a reference to one of the system's adjoint rhs
    * vectors, by default the one corresponding to the first qoi.
    */
   const NumericVector<Number> & get_adjoint_rhs(unsigned int i=0) const;
 
   /**
-   * @returns a reference to one of the system's sensitivity rhs
+   * \returns a reference to one of the system's sensitivity rhs
    * vectors, by default the one corresponding to the first parameter.
    * Creates the vector if it doesn't already exist.
    */
   NumericVector<Number> & add_sensitivity_rhs(unsigned int i=0);
 
   /**
-   * @returns a reference to one of the system's sensitivity rhs
+   * \returns a reference to one of the system's sensitivity rhs
    * vectors, by default the one corresponding to the first parameter.
    * By default these vectors are built by the library, using finite
    * differences, when \p assemble_residual_derivatives() is called.
@@ -1016,20 +1016,20 @@ public:
   NumericVector<Number> & get_sensitivity_rhs(unsigned int i=0);
 
   /**
-   * @returns a reference to one of the system's sensitivity rhs
+   * \returns a reference to one of the system's sensitivity rhs
    * vectors, by default the one corresponding to the first parameter.
    */
   const NumericVector<Number> & get_sensitivity_rhs(unsigned int i=0) const;
 
   /**
-   * @returns the number of vectors (in addition to the solution)
+   * \returns the number of vectors (in addition to the solution)
    * handled by this system
    * This is the size of the \p _vectors map
    */
   unsigned int n_vectors () const;
 
   /**
-   * @returns the number of matrices
+   * \returns the number of matrices
    * handled by this system.
    *
    * This will return 0 by default but can be overriden.
@@ -1037,24 +1037,24 @@ public:
   virtual unsigned int n_matrices () const;
 
   /**
-   * @returns the number of variables in the system
+   * \returns the number of variables in the system
    */
   unsigned int n_vars() const;
 
   /**
-   * @returns the number of \p VariableGroup variable groups in the system
+   * \returns the number of \p VariableGroup variable groups in the system
    */
   unsigned int n_variable_groups() const;
 
   /**
-   * @returns the total number of scalar components in the system's
+   * \returns the total number of scalar components in the system's
    * variables.  This will equal \p n_vars() in the case of all
    * scalar-valued variables.
    */
   unsigned int n_components() const;
 
   /**
-   * @returns the number of degrees of freedom in the system
+   * \returns the number of degrees of freedom in the system
    */
   dof_id_type n_dofs() const;
 
@@ -1065,19 +1065,19 @@ public:
   dof_id_type n_active_dofs() const;
 
   /**
-   * @returns the total number of constrained degrees of freedom
+   * \returns the total number of constrained degrees of freedom
    * in the system.
    */
   dof_id_type n_constrained_dofs() const;
 
   /**
-   * @returns the number of constrained degrees of freedom
+   * \returns the number of constrained degrees of freedom
    * on this processor.
    */
   dof_id_type n_local_constrained_dofs() const;
 
   /**
-   * @returns the number of degrees of freedom local
+   * \returns the number of degrees of freedom local
    * to this processor
    */
   dof_id_type n_local_dofs() const;
@@ -1129,17 +1129,17 @@ public:
   const VariableGroup & variable_group (unsigned int vg) const;
 
   /**
-   * @returns true if a variable named \p var exists in this System
+   * \returns true if a variable named \p var exists in this System
    */
   bool has_variable(const std::string & var) const;
 
   /**
-   * @returns the name of variable \p i.
+   * \returns the name of variable \p i.
    */
   const std::string & variable_name(const unsigned int i) const;
 
   /**
-   * @returns the variable number assoicated with
+   * \returns the variable number assoicated with
    * the user-specified variable named \p var.
    */
   unsigned short int variable_number (const std::string & var) const;
@@ -1151,7 +1151,7 @@ public:
   void get_all_variable_numbers(std::vector<unsigned int> & all_variable_numbers) const;
 
   /**
-   * @returns an index, starting from 0 for the first component of the
+   * \returns an index, starting from 0 for the first component of the
    * first variable, and incrementing for each component of each
    * (potentially vector-valued) variable in the system in order.
    * For systems with only scalar-valued variables, this will be the
@@ -1164,7 +1164,7 @@ public:
                                        unsigned int component) const;
 
   /**
-   * @returns an index, starting from 0 for the first component of the
+   * \returns an index, starting from 0 for the first component of the
    * first variable, and incrementing for each component of each
    * (potentially vector-valued) variable in the system in order.
    * For systems with only scalar-valued variables, this will be the
@@ -1178,17 +1178,17 @@ public:
 
 
   /**
-   * @returns the finite element type variable number \p i.
+   * \returns the finite element type variable number \p i.
    */
   const FEType & variable_type (const unsigned int i) const;
 
   /**
-   * @returns the finite element type for variable \p var.
+   * \returns the finite element type for variable \p var.
    */
   const FEType & variable_type (const std::string & var) const;
 
   /**
-   * @returns \p true when \p VariableGroup structures should be
+   * \returns \p true when \p VariableGroup structures should be
    * automatically identified, \p false otherwise.
    */
   bool identify_variable_groups () const;
@@ -1199,7 +1199,7 @@ public:
   void identify_variable_groups (const bool);
 
   /**
-   * @returns a norm of variable \p var in the vector \p v, in the specified
+   * \returns a norm of variable \p var in the vector \p v, in the specified
    * norm (e.g. L2, L_INF, H1)
    */
   Real calculate_norm(const NumericVector<Number> & v,
@@ -1208,7 +1208,7 @@ public:
                       std::set<unsigned int> * skip_dimensions=libmesh_nullptr) const;
 
   /**
-   * @returns a norm of the vector \p v, using \p component_norm and \p
+   * \returns a norm of the vector \p v, using \p component_norm and \p
    * component_scale to choose and weight the norms of each variable.
    */
   Real calculate_norm(const NumericVector<Number> & v,
@@ -1325,7 +1325,7 @@ public:
                             const bool write_additional_data) const;
 
   /**
-   * @returns a string containing information about the
+   * \returns a string containing information about the
    * system.
    */
   std::string get_info () const;
@@ -1505,7 +1505,7 @@ public:
   // The solution and solution access members
 
   /**
-   * @returns the current solution for the specified global
+   * \returns the current solution for the specified global
    * DOF.
    */
   Number current_solution (const dof_id_type global_dof_number) const;

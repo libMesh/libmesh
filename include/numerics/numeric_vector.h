@@ -129,23 +129,23 @@ public:
 #endif
 
   /**
-   * @returns true if the vector has been initialized,
+   * \returns true if the vector has been initialized,
    * false otherwise.
    */
   virtual bool initialized() const { return _is_initialized; }
 
   /**
-   * @returns the type (SERIAL, PARALLEL, GHOSTED) of the vector.
+   * \returns the type (SERIAL, PARALLEL, GHOSTED) of the vector.
    */
   ParallelType type() const { return _type; }
 
   /**
-   * @returns the type (SERIAL, PARALLEL, GHOSTED) of the vector.
+   * \returns the type (SERIAL, PARALLEL, GHOSTED) of the vector.
    */
   ParallelType & type() { return _type; }
 
   /**
-   * @returns true if the vector is closed and ready for
+   * \returns true if the vector is closed and ready for
    * computation, false otherwise.
    */
   virtual bool closed() const { return _is_closed; }
@@ -156,7 +156,7 @@ public:
   virtual void close () = 0;
 
   /**
-   * @returns the \p NumericVector<T> to a pristine state.
+   * \returns the \p NumericVector<T> to a pristine state.
    */
   virtual void clear ();
 
@@ -238,14 +238,14 @@ public:
   virtual NumericVector<T> & operator= (const std::vector<T> & v) = 0;
 
   /**
-   * @returns the minimum element in the vector.
+   * \returns the minimum element in the vector.
    * In case of complex numbers, this returns the minimum
    * Real part.
    */
   virtual Real min () const = 0;
 
   /**
-   * @returns the maximum element in the vector.
+   * \returns the maximum element in the vector.
    * In case of complex numbers, this returns the maximum
    * Real part.
    */
@@ -257,27 +257,27 @@ public:
   virtual T sum() const = 0;
 
   /**
-   * @returns the \f$l_1\f$-norm of the vector, i.e.
+   * \returns the \f$l_1\f$-norm of the vector, i.e.
    * the sum of the absolute values.
    */
   virtual Real l1_norm () const = 0;
 
   /**
-   * @returns the \f$l_2\f$-norm of the vector, i.e.
+   * \returns the \f$l_2\f$-norm of the vector, i.e.
    * the square root of the sum of the
    * squares of the elements.
    */
   virtual Real l2_norm () const = 0;
 
   /**
-   * @returns the maximum absolute value of the
+   * \returns the maximum absolute value of the
    * elements of this vector, which is the
    * \f$l_\infty\f$-norm of a vector.
    */
   virtual Real linfty_norm () const = 0;
 
   /**
-   * @returns the \f$l_1\f$-norm of the vector, i.e.
+   * \returns the \f$l_1\f$-norm of the vector, i.e.
    * the sum of the absolute values for the specified
    * entries in the vector.
    *
@@ -287,7 +287,7 @@ public:
   virtual Real subset_l1_norm (const std::set<numeric_index_type> & indices) const;
 
   /**
-   * @returns the \f$l_2\f$-norm of the vector, i.e.
+   * \returns the \f$l_2\f$-norm of the vector, i.e.
    * the square root of the sum of the
    * squares of the elements for the specified entries
    * in the vector.
@@ -298,7 +298,7 @@ public:
   virtual Real subset_l2_norm (const std::set<numeric_index_type> & indices) const;
 
   /**
-   * @returns the maximum absolute value of the
+   * \returns the maximum absolute value of the
    * specified entries of this vector, which is the
    * \f$l_\infty\f$-norm of a vector.
    *
@@ -308,7 +308,7 @@ public:
   virtual Real subset_linfty_norm (const std::set<numeric_index_type> & indices) const;
 
   /**
-   * @returns dimension of the vector. This
+   * \returns dimension of the vector. This
    * function was formerly called \p n(), but
    * was renamed to get the \p NumericVector<T> class
    * closer to the C++ standard library's
@@ -317,21 +317,21 @@ public:
   virtual numeric_index_type size () const = 0;
 
   /**
-   * @returns the local size of the vector
+   * \returns the local size of the vector
    * (index_stop-index_start).
    * In ghost cell mode, this does *not* include the ghost cells.
    */
   virtual numeric_index_type local_size() const = 0;
 
   /**
-   * @returns the index of the first vector element
+   * \returns the index of the first vector element
    * actually stored on this processor.  Hint: the
    * minimum for this index is \p 0.
    */
   virtual numeric_index_type first_local_index() const = 0;
 
   /**
-   * @returns the index+1 of the last vector element
+   * \returns the index+1 of the last vector element
    * actually stored on this processor.  Hint: the
    * maximum for this index is \p size().
    */
@@ -343,7 +343,7 @@ public:
   virtual T operator() (const numeric_index_type i) const = 0;
 
   /**
-   * @returns the element \p U(i)
+   * \returns the element \p U(i)
    */
   virtual T el(const numeric_index_type i) const { return (*this)(i); }
 
@@ -611,7 +611,7 @@ public:
                                 const processor_id_type proc_id=0) const = 0;
 
   /**
-   * @returns \p -1 when \p this is equivalent to \p other_vector,
+   * \returns \p -1 when \p this is equivalent to \p other_vector,
    * up to the given \p threshold.  When differences occur,
    * the return value contains the first index \p i where
    * the difference \p (a[i]-b[i]) exceeded the threshold.  When
@@ -622,7 +622,7 @@ public:
                        const Real threshold = TOLERANCE) const;
 
   /**
-   * @returns \p -1 when \p this is equivalent to \p other_vector,
+   * \returns \p -1 when \p this is equivalent to \p other_vector,
    * up to the given local relative \p threshold.  When differences
    * occur, the return value contains the first index where
    * the difference \p (a[i]-b[i])/max(a[i],b[i]) exceeded the
@@ -633,7 +633,7 @@ public:
                                       const Real threshold = TOLERANCE) const;
 
   /**
-   * @returns \p -1 when \p this is equivalent to \p other_vector,
+   * \returns \p -1 when \p this is equivalent to \p other_vector,
    * up to the given local relative \p threshold.  When differences
    * occur, the return value contains the first index where
    * the difference \p (a[i]-b[i])/max_j(a[j],b[j]) exceeded the

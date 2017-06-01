@@ -218,7 +218,7 @@ public:
   void grainsize (const unsigned int & gs) {_grainsize = gs;}
 
   /**
-   * \return the size of the range.
+   * \returns the size of the range.
    */
   int size () const { return (_end -_begin); }
 

@@ -52,7 +52,7 @@ public:
   }
 
   /**
-   * @returns the \p Point associated with local \p Node \p i,
+   * \returns the \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
   virtual Point master_point (const unsigned int libmesh_dbg_var(i)) const libmesh_override
@@ -62,37 +62,37 @@ public:
   }
 
   /**
-   * @returns 0, the dimensionality of the object.
+   * \returns 0, the dimensionality of the object.
    */
   virtual unsigned int dim () const libmesh_override { return 0; }
 
   /**
-   * @returns 1.
+   * \returns 1.
    */
   virtual unsigned int n_nodes() const libmesh_override { return 1; }
 
   /**
-   * @returns 0.
+   * \returns 0.
    */
   virtual unsigned int n_sides() const libmesh_override { return 0; }
 
   /**
-   * @returns 1.  Every NodeElem is a vertex
+   * \returns 1.  Every NodeElem is a vertex
    */
   virtual unsigned int n_vertices() const libmesh_override { return 1; }
 
   /**
-   * @returns 0.
+   * \returns 0.
    */
   virtual unsigned int n_edges() const libmesh_override { return 0; }
 
   /**
-   * @returns 0.
+   * \returns 0.
    */
   virtual unsigned int n_faces() const libmesh_override { return 0; }
 
   /**
-   * @returns 1.
+   * \returns 1.
    */
   virtual unsigned int n_children() const libmesh_override { return 1; }
 
@@ -102,7 +102,7 @@ public:
   using Elem::key;
 
   /**
-   * @returns an id associated with the \p s side of this element.
+   * \returns an id associated with the \p s side of this element.
    * This should never be important for NodeElems.
    */
   virtual dof_id_type key (const unsigned int) const libmesh_override
@@ -134,12 +134,12 @@ public:
   { libmesh_not_implemented(); return UniquePtr<Elem>(); }
 
   /**
-   * @returns 1.
+   * \returns 1.
    */
   virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
 
   /**
-   * @returns true if the specified (local) node number is a vertex.
+   * \returns true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int) const libmesh_override { return true; }
 
@@ -166,24 +166,24 @@ public:
   { libmesh_not_implemented(); return false; }
 
   /**
-   * @returns true if the element map is definitely affine within
+   * \returns true if the element map is definitely affine within
    * numerical tolerances.
    */
   virtual bool has_affine_map () const libmesh_override { return true; }
 
   /**
-   * @returns true if the Lagrange shape functions on this element
+   * \returns true if the Lagrange shape functions on this element
    * are linear.
    */
   virtual bool is_linear () const libmesh_override { return true; }
 
   /**
-   * @returns \p NODEELEM.
+   * \returns \p NODEELEM.
    */
   virtual ElemType type() const libmesh_override { return NODEELEM; }
 
   /**
-   * @returns FIRST.
+   * \returns FIRST.
    */
   virtual Order default_order() const libmesh_override { return FIRST; }
 
@@ -195,7 +195,7 @@ public:
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
-   * @returns \p false.
+   * \returns \p false.
    */
   virtual bool infinite () const libmesh_override { return false; }
 

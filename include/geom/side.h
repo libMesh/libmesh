@@ -139,7 +139,7 @@ public:
   }
 
   /**
-   * @returns 0. Edges do not have sides, so don't even ask!
+   * \returns 0. Edges do not have sides, so don't even ask!
    */
   virtual unsigned int n_sides () const libmesh_override { return 0; }
 

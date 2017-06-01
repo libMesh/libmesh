@@ -120,7 +120,7 @@ public:
   virtual void close () libmesh_override;
 
   /**
-   * @returns the \p EpetraVector<T> to a pristine state.
+   * \returns the \p EpetraVector<T> to a pristine state.
    */
   virtual void clear () libmesh_override;
 
@@ -204,46 +204,46 @@ public:
   virtual NumericVector<T> & operator= (const std::vector<T> & v) libmesh_override;
 
   /**
-   * @returns the minimum element in the vector.
+   * \returns the minimum element in the vector.
    * In case of complex numbers, this returns the minimum
    * Real part.
    */
   virtual Real min () const libmesh_override;
 
   /**
-   * @returns the maximum element in the vector.
+   * \returns the maximum element in the vector.
    * In case of complex numbers, this returns the maximum
    * Real part.
    */
   virtual Real max () const libmesh_override;
 
   /**
-   * @returns the sum of values in a vector
+   * \returns the sum of values in a vector
    */
   virtual T sum () const libmesh_override;
 
   /**
-   * @returns the \f$l_1\f$-norm of the vector, i.e.
+   * \returns the \f$l_1\f$-norm of the vector, i.e.
    * the sum of the absolute values.
    */
   virtual Real l1_norm () const libmesh_override;
 
   /**
-   * @returns the \f$l_2\f$-norm of the vector, i.e.
+   * \returns the \f$l_2\f$-norm of the vector, i.e.
    * the square root of the sum of the
    * squares of the elements.
    */
   virtual Real l2_norm () const libmesh_override;
 
   /**
-   * @returns the maximum absolute value of the
+   * \returns the maximum absolute value of the
    * elements of this vector, which is the
    * \f$l_\infty\f$-norm of a vector.
    */
   virtual Real linfty_norm () const libmesh_override;
 
   /**
-   * @returns dimension of the vector. This
+   * \returns dimension of the vector. This
    * function was formerly called \p n(), but
    * was renamed to get the \p EpetraVector<T> class
    * closer to the C++ standard library's
@@ -252,19 +252,19 @@ public:
   virtual numeric_index_type size () const libmesh_override;
 
   /**
-   * @returns the local size of the vector
+   * \returns the local size of the vector
    * (index_stop-index_start)
    */
   virtual numeric_index_type local_size() const libmesh_override;
 
   /**
-   * @returns the index of the first vector element
+   * \returns the index of the first vector element
    * actually stored on this processor
    */
   virtual numeric_index_type first_local_index() const libmesh_override;
 
   /**
-   * @returns the index of the last vector element
+   * \returns the index of the last vector element
    * actually stored on this processor
    */
   virtual numeric_index_type last_local_index() const libmesh_override;
@@ -484,48 +484,50 @@ private:
 
 
 
-  /*********************************************************************
-   * The following were copied (and slightly modified) from
-   * Epetra_FEVector.h in order to allow us to use a standard
-   * Epetra_Vector... which is more compatible with other Trilinos
-   * packages such as NOX.  All of this code is originally under LGPL
-   *********************************************************************/
+  // The following were copied (and slightly modified) from
+  // Epetra_FEVector.h in order to allow us to use a standard
+  // Epetra_Vector... which is more compatible with other Trilinos
+  // packages such as NOX.  All of this code is originally under LGPL
 
-  /** Accumulate values into the vector, adding them to any values that
-      already exist for the specified indices.
-  */
+  /**
+   * Accumulate values into the vector, adding them to any values that
+   * already exist for the specified indices.
+   */
   int SumIntoGlobalValues(int numIDs,
                           const int * GIDs,
                           const double * values);
 
-  /** Accumulate values into the vector, adding them to any values that
-      already exist for the specified GIDs.
-
-      @param GIDs List of global ids. Must be the same length as the
-      accompanying list of values.
-
-      @param values List of coefficient values. Must be the same length as
-      the accompanying list of GIDs.
-  */
+  /**
+   * Accumulate values into the vector, adding them to any values that
+   * already exist for the specified GIDs.
+   *
+   * \param GIDs List of global ids. Must be the same length as the
+   * accompanying list of values.
+   *
+   * \param values List of coefficient values. Must be the same length as
+   * the accompanying list of GIDs.
+   */
   int SumIntoGlobalValues(const Epetra_IntSerialDenseVector & GIDs,
                           const Epetra_SerialDenseVector & values);
 
-  /** Copy values into the vector overwriting any values that already exist
-      for the specified indices.
-  */
+  /**
+   * Copy values into the vector overwriting any values that already
+   * exist for the specified indices.
+   */
   int ReplaceGlobalValues(int numIDs,
                           const int * GIDs,
                           const double * values);
 
-  /** Copy values into the vector, replacing any values that
-      already exist for the specified GIDs.
-
-      @param GIDs List of global ids. Must be the same length as the
-      accompanying list of values.
-
-      @param values List of coefficient values. Must be the same length as
-      the accompanying list of GIDs.
-  */
+  /**
+   * Copy values into the vector, replacing any values that
+   * already exist for the specified GIDs.
+   *
+   * \param GIDs List of global ids. Must be the same length as the
+   * accompanying list of values.
+   *
+   * \param values List of coefficient values. Must be the same length as
+   * the accompanying list of GIDs.
+   */
   int ReplaceGlobalValues(const Epetra_IntSerialDenseVector & GIDs,
                           const Epetra_SerialDenseVector & values);
 
@@ -539,16 +541,18 @@ private:
                           const int * numValuesPerID,
                           const double * values);
 
-  /** Gather any overlapping/shared data into the non-overlapping partitioning
-      defined by the Map that was passed to this vector at construction time.
-      Data imported from other processors is stored on the owning processor
-      with a "sumInto" or accumulate operation.
-      This is a collective method -- every processor must enter it before any
-      will complete it.
-  */
+  /**
+   * Gather any overlapping/shared data into the non-overlapping
+   * partitioning defined by the Map that was passed to this vector at
+   * construction time.  Data imported from other processors is stored
+   * on the owning processor with a "sumInto" or accumulate operation.
+   * This is a collective method -- every processor must enter it
+   * before any will complete it.
+   */
   int GlobalAssemble(Epetra_CombineMode mode = Add);
 
-  /** Set whether or not non-local data values should be ignored.
+  /**
+   * Set whether or not non-local data values should be ignored.
    */
   void setIgnoreNonLocalEntries(bool flag) {
     ignoreNonLocalEntries_ = flag;
@@ -739,8 +743,8 @@ EpetraVector<T>::EpetraVector (const Parallel::Communicator & comm,
 
 
 
-/* Default implementation for solver packages for which ghosted
-   vectors are not yet implemented.  */
+// Default implementation for solver packages for which ghosted
+// vectors are not yet implemented.
 template <class T>
 void EpetraVector<T>::init (const NumericVector<T> & other,
                             const bool fast)
@@ -800,8 +804,8 @@ void EpetraVector<T>::init (const numeric_index_type n,
   myFirstID_ = _vec->Map().MinMyGID();
   myNumIDs_ = _vec->Map().NumMyElements();
 
-  //Currently we impose the restriction that NumVectors==1, so we won't
-  //need the LDA argument when calling ExtractView. Hence the "dummy" arg.
+  // Currently we impose the restriction that NumVectors==1, so we won't
+  // need the LDA argument when calling ExtractView. Hence the "dummy" arg.
   int dummy;
   _vec->ExtractView(&myCoefs_, &dummy);
 

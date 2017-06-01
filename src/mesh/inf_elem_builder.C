@@ -214,7 +214,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
       // inner_boundary_node_numbers now still holds multiple entries of
       // node numbers.  So first sort, then unique the vector.
       // Note that \p std::unique only puts the new ones in
-      // front, while to leftovers are @e not deleted.  Instead,
+      // front, while to leftovers are not deleted.  Instead,
       // it returns a pointer to the end of the unique range.
       //TODO:[BSK] int_ibn_size_before is not the same type as unique_size!
 #ifndef NDEBUG

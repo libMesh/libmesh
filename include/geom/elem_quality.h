@@ -48,19 +48,19 @@ namespace Quality
 const unsigned int num_quals = 16;
 
 /**
- * @returns a descriptive name for a \p ElemQuality
+ * \returns a descriptive name for a \p ElemQuality
  * \p enum
  */
 std::string name (const ElemQuality q);
 
 /**
- * @returns a description for a \p ElemQuality
+ * \returns a description for a \p ElemQuality
  * \p enum
  */
 std::string describe (const ElemQuality q);
 
 /**
- * @returns the valid \p ElemQuality metrics for a given
+ * \returns the valid \p ElemQuality metrics for a given
  * \p ElemType element type.
  */
 std::vector<ElemQuality> valid (const ElemType t);

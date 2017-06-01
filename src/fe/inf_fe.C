@@ -40,7 +40,7 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType & fet) :
 
   // initialize the current_fe_type to all the same
   // values as \p fet (since the FE families and coordinate
-  // map type should @e not change), but use an invalid order
+  // map type should not change), but use an invalid order
   // for the radial part (since this is the only order
   // that may change!).
   // the data structures like \p phi etc are not initialized

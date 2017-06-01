@@ -98,7 +98,7 @@ public:
   bool operator== (const RBParameters & rhs) const;
 
   /**
-   * @return !(*this == rhs).
+   * \returns !(*this == rhs).
    */
   bool operator!= (const RBParameters & node) const;
 

@@ -174,7 +174,7 @@ public:
                          std::vector<Point> &       reference_points) = 0;
 
   /**
-   * @returns true if the point p is located on the reference element
+   * \returns true if the point p is located on the reference element
    * for element type t, false otherwise.  Since we are doing floating
    * point comparisons here the parameter \p eps can be specified to
    * indicate a tolerance.  For example, \f$ x \le 1 \f$  becomes
@@ -217,48 +217,48 @@ public:
 #endif // LIBMESH_ENABLE_PERIODIC
 
   /**
-   * @returns the \p xyz spatial locations of the quadrature
+   * \returns the \p xyz spatial locations of the quadrature
    * points on the element.
    */
   const std::vector<Point> & get_xyz() const
   { return this->_fe_map->get_xyz(); }
 
   /**
-   * @returns the element Jacobian times the quadrature weight for
+   * \returns the element Jacobian times the quadrature weight for
    * each quadrature point.
    */
   const std::vector<Real> & get_JxW() const
   { return this->_fe_map->get_JxW(); }
 
   /**
-   * @returns the element tangents in xi-direction at the quadrature
+   * \returns the element tangents in xi-direction at the quadrature
    * points.
    */
   const std::vector<RealGradient> & get_dxyzdxi() const
   { return this->_fe_map->get_dxyzdxi(); }
 
   /**
-   * @returns the element tangents in eta-direction at the quadrature
+   * \returns the element tangents in eta-direction at the quadrature
    * points.
    */
   const std::vector<RealGradient> & get_dxyzdeta() const
   { return this->_fe_map->get_dxyzdeta(); }
 
   /**
-   * @returns the element tangents in zeta-direction at the quadrature
+   * \returns the element tangents in zeta-direction at the quadrature
    * points.
    */
   const std::vector<RealGradient> & get_dxyzdzeta() const
   { return _fe_map->get_dxyzdzeta(); }
 
   /**
-   * @returns the second partial derivatives in xi.
+   * \returns the second partial derivatives in xi.
    */
   const std::vector<RealGradient> & get_d2xyzdxi2() const
   { return this->_fe_map->get_d2xyzdxi2(); }
 
   /**
-   * @returns the second partial derivatives in eta.
+   * \returns the second partial derivatives in eta.
    */
   const std::vector<RealGradient> & get_d2xyzdeta2() const
   { return this->_fe_map->get_d2xyzdeta2(); }
@@ -266,7 +266,7 @@ public:
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
-   * @returns the second partial derivatives in zeta.
+   * \returns the second partial derivatives in zeta.
    */
   const std::vector<RealGradient> & get_d2xyzdzeta2() const
   { return this->_fe_map->get_d2xyzdzeta2(); }
@@ -274,7 +274,7 @@ public:
 #endif
 
   /**
-   * @returns the second partial derivatives in xi-eta.
+   * \returns the second partial derivatives in xi-eta.
    */
   const std::vector<RealGradient> & get_d2xyzdxideta() const
   { return this->_fe_map->get_d2xyzdxideta(); }
@@ -282,13 +282,13 @@ public:
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
-   * @returns the second partial derivatives in xi-zeta.
+   * \returns the second partial derivatives in xi-zeta.
    */
   const std::vector<RealGradient> & get_d2xyzdxidzeta() const
   { return this->_fe_map->get_d2xyzdxidzeta(); }
 
   /**
-   * @returns the second partial derivatives in eta-zeta.
+   * \returns the second partial derivatives in eta-zeta.
    */
   const std::vector<RealGradient> & get_d2xyzdetadzeta() const
   { return this->_fe_map->get_d2xyzdetadzeta(); }
@@ -296,82 +296,82 @@ public:
 #endif
 
   /**
-   * @returns the dxi/dx entry in the transformation
+   * \returns the dxi/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_dxidx() const
   { return this->_fe_map->get_dxidx(); }
 
   /**
-   * @returns the dxi/dy entry in the transformation
+   * \returns the dxi/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_dxidy() const
   { return this->_fe_map->get_dxidy(); }
 
   /**
-   * @returns the dxi/dz entry in the transformation
+   * \returns the dxi/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_dxidz() const
   { return this->_fe_map->get_dxidz(); }
 
   /**
-   * @returns the deta/dx entry in the transformation
+   * \returns the deta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_detadx() const
   { return this->_fe_map->get_detadx(); }
 
   /**
-   * @returns the deta/dy entry in the transformation
+   * \returns the deta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_detady() const
   { return this->_fe_map->get_detady(); }
 
   /**
-   * @returns the deta/dz entry in the transformation
+   * \returns the deta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_detadz() const
   { return this->_fe_map->get_detadz(); }
 
   /**
-   * @returns the dzeta/dx entry in the transformation
+   * \returns the dzeta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_dzetadx() const
   { return this->_fe_map->get_dzetadx(); }
 
   /**
-   * @returns the dzeta/dy entry in the transformation
+   * \returns the dzeta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_dzetady() const
   { return this->_fe_map->get_dzetady(); }
 
   /**
-   * @returns the dzeta/dz entry in the transformation
+   * \returns the dzeta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real> & get_dzetadz() const
   { return this->_fe_map->get_dzetadz(); }
 
   /**
-   * @returns the tangent vectors for face integration.
+   * \returns the tangent vectors for face integration.
    */
   const std::vector<std::vector<Point> > & get_tangents() const
   { return this->_fe_map->get_tangents(); }
 
   /**
-   * @returns the outward pointing normal vectors for face integration.
+   * \returns the outward pointing normal vectors for face integration.
    */
   const std::vector<Point> & get_normals() const
   { return this->_fe_map->get_normals(); }
 
   /**
-   * @returns the curvatures for use in face integration.
+   * \returns the curvatures for use in face integration.
    */
   const std::vector<Real> & get_curvatures() const
   { return this->_fe_map->get_curvatures();}
@@ -383,38 +383,38 @@ public:
   virtual void attach_quadrature_rule (QBase * q) = 0;
 
   /**
-   * @returns the total number of approximation shape functions
+   * \returns the total number of approximation shape functions
    * for the current element.  Useful during matrix assembly.
    * Implement this in derived classes.
    */
   virtual unsigned int n_shape_functions () const = 0;
 
   /**
-   * @returns the total number of quadrature points.  Useful
+   * \returns the total number of quadrature points.  Useful
    * during matrix assembly.  Implement this in derived classes.
    */
   virtual unsigned int n_quadrature_points () const = 0;
 
   /**
-   * @returns the element type that the current shape functions
+   * \returns the element type that the current shape functions
    * have been calculated for.  Useful in determining when shape
    * functions must be recomputed.
    */
   ElemType get_type()  const { return elem_type; }
 
   /**
-   * @returns the p refinement level that the current shape
+   * \returns the p refinement level that the current shape
    * functions have been calculated for.
    */
   unsigned int get_p_level() const { return _p_level; }
 
   /**
-   * @returns the FE Type (approximation order and family) of the finite element.
+   * \returns the FE Type (approximation order and family) of the finite element.
    */
   FEType get_fe_type()  const { return fe_type; }
 
   /**
-   * @returns the approximation order of the finite element.
+   * \returns the approximation order of the finite element.
    */
   Order get_order()  const { return static_cast<Order>(fe_type.order + _p_level); }
 
@@ -424,23 +424,23 @@ public:
   void set_fe_order(int new_order) { fe_type.order = new_order; }
 
   /**
-   * @returns the continuity level of the finite element.
+   * \returns the continuity level of the finite element.
    */
   virtual FEContinuity get_continuity() const = 0;
 
   /**
-   * @returns true if the finite element's higher order shape functions are
+   * \returns true if the finite element's higher order shape functions are
    * hierarchic
    */
   virtual bool is_hierarchic() const = 0;
 
   /**
-   * @returns the finite element family of this element.
+   * \returns the finite element family of this element.
    */
   FEFamily get_family()  const { return fe_type.family; }
 
   /**
-   * @returns the mapping object
+   * \returns the mapping object
    */
   const FEMap & get_fe_map() const { return *_fe_map.get(); }
 
@@ -582,7 +582,7 @@ protected:
   bool shapes_on_quadrature;
 
   /**
-   * @returns \p true when the shape functions (for
+   * \returns \p true when the shape functions (for
    * this \p FEFamily) depend on the particular
    * element, and therefore needs to be re-initialized
    * for each new element.  \p false otherwise.

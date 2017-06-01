@@ -311,13 +311,13 @@ public:
   Elem * add_elem (Elem * elem);
 
   /**
-   * @returns a constant reference to the \p MeshBase object associated
+   * \returns a constant reference to the \p MeshBase object associated
    * with this object.
    */
   const MeshBase & get_mesh () const { return _mesh; }
 
   /**
-   * @returns a writeable reference to the \p MeshBase object associated
+   * \returns a writeable reference to the \p MeshBase object associated
    * with this object.
    */
   MeshBase & get_mesh () { return _mesh; }

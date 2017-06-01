@@ -62,7 +62,7 @@ public:
   ~QTrap() {}
 
   /**
-   * @returns \p QTRAP.
+   * \returns \p QTRAP.
    */
   virtual QuadratureType type() const libmesh_override { return QTRAP; }
 

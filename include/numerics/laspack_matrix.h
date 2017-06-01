@@ -138,13 +138,13 @@ public:
   virtual void close () const libmesh_override { const_cast<LaspackMatrix<T> *>(this)->_closed = true; }
 
   /**
-   * @returns \p m, the row-dimension of
+   * \returns \p m, the row-dimension of
    * the matrix where the marix is \f$ M \times N \f$.
    */
   virtual numeric_index_type m () const libmesh_override;
 
   /**
-   * @returns \p n, the column-dimension of
+   * \returns \p n, the column-dimension of
    * the matrix where the marix is \f$ M \times N \f$.
    */
   virtual numeric_index_type n () const libmesh_override;
@@ -270,7 +270,7 @@ public:
 private:
 
   /**
-   * @returns the position in the compressed row
+   * \returns the position in the compressed row
    * storage scheme of the \f$ (i,j) \f$ element.
    */
   numeric_index_type pos (const numeric_index_type i,

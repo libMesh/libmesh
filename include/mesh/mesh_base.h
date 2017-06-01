@@ -124,14 +124,14 @@ public:
   virtual void clear ();
 
   /**
-   * @returns \p true if the mesh has been prepared via a call
+   * \returns \p true if the mesh has been prepared via a call
    * to \p prepare_for_use, \p false otherwise.
    */
   bool is_prepared () const
   { return _is_prepared; }
 
   /**
-   * @returns \p true if all elements and nodes of the mesh
+   * \returns \p true if all elements and nodes of the mesh
    * exist on the current processor, \p false otherwise
    */
   virtual bool is_serial () const
@@ -146,7 +146,7 @@ public:
   { libmesh_error(); }
 
   /**
-   * @returns \p true if new elements and nodes can and should be
+   * \returns \p true if new elements and nodes can and should be
    * created in synchronization on all processors, \p false otherwise
    */
   virtual bool is_replicated () const
@@ -172,7 +172,7 @@ public:
   virtual void delete_remote_elements () {}
 
   /**
-   * @returns the logical dimension of the mesh; i.e. the manifold
+   * \returns the logical dimension of the mesh; i.e. the manifold
    * dimension of the elements in the mesh.  If we ever support
    * multi-dimensional meshes (e.g. hexes and quads in the same mesh)
    * then this will return the largest such dimension.
@@ -190,7 +190,7 @@ public:
   { _elem_dims.clear(); _elem_dims.insert(d); }
 
   /**
-   * @returns set of dimensions of elements present in the mesh.
+   * \returns set of dimensions of elements present in the mesh.
    */
   const std::set<unsigned char> & elem_dimensions() const
   { return _elem_dims; }
@@ -794,7 +794,7 @@ public:
   { return _n_parts; }
 
   /**
-   * @returns a string containing relevant information
+   * \returns a string containing relevant information
    * about the mesh.
    */
   std::string get_info () const;
@@ -834,7 +834,7 @@ public:
    * elements into a mesh with second-order elements.  For
    * example, a mesh consisting of \p Tet4 will be converted
    * to a mesh with \p Tet10 etc.  Note that for some elements
-   * like \p Hex8 there exist @e two higher order equivalents,
+   * like \p Hex8 there exist two higher order equivalents,
    * \p Hex20 and \p Hex27.  When \p full_ordered is \p true
    * (default), then \p Hex27 is built.  Otherwise, \p Hex20
    * is built.  The same holds obviously for \p Quad4, \p Prism6

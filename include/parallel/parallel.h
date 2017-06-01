@@ -867,9 +867,9 @@ public:
    * Template type must match the object type that will be in
    * the packed range
    *
-   * @param src_processor_id The processor the mssage is expected from or Parallel::any_source
-   * @param tag The message tag or Parallel::any_tag
-   * @param flag Output.  True if a message exists.  False otherwise.
+   * \param src_processor_id The processor the mssage is expected from or Parallel::any_source
+   * \param tag The message tag or Parallel::any_tag
+   * \param flag Output.  True if a message exists.  False otherwise.
    */
   template <typename T>
   Status packed_range_probe (const unsigned int src_processor_id,

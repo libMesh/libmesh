@@ -67,7 +67,7 @@ public:
   typedef ImplicitSystem sys_type;
 
   /**
-   * @returns a clever pointer to the system.
+   * \returns a clever pointer to the system.
    */
   sys_type & system () { return *this; }
 
@@ -91,7 +91,7 @@ public:
   /**
    * Prepares \p matrix and \p rhs for system assembly, then calls
    * user assembly function.
-   * @e Can be overloaded in derived classes.
+   * Can be overloaded in derived classes.
    */
   virtual void assemble () libmesh_override;
 
@@ -102,7 +102,7 @@ public:
   virtual void disable_cache () libmesh_override;
 
   /**
-   * @returns \p "Implicit".  Helps in identifying
+   * \returns \p "Implicit".  Helps in identifying
    * the system type in an equation system file.
    */
   virtual std::string system_type () const libmesh_override { return "Implicit"; }
@@ -163,7 +163,7 @@ public:
    * -(partial R / partial p_i), making them ready to solve
    * the forward sensitivity equation.
    *
-   * @e Can be overloaded in derived classes.
+   * Can be overloaded in derived classes.
    */
   virtual void assemble_residual_derivatives (const ParameterVector & parameters) libmesh_override;
 
@@ -283,52 +283,52 @@ public:
 
   /**
    * Adds the additional matrix \p mat_name to this system.  Only
-   * allowed @e prior to \p assemble().  All additional matrices
+   * allowed prior to \p assemble().  All additional matrices
    * have the same sparsity pattern as the matrix used during
-   * solution.  When not \p System but the @e user wants to
+   * solution.  When not \p System but the user wants to
    * initialize the mayor matrix, then all the additional matrices,
    * if existent, have to be initialized by the user, too.
    */
   SparseMatrix<Number> & add_matrix (const std::string & mat_name);
 
   /**
-   * @returns \p true if this \p System has a matrix associated with the
+   * \returns \p true if this \p System has a matrix associated with the
    * given name, \p false otherwise.
    */
   bool have_matrix (const std::string & mat_name) const;
 
   /**
-   * @returns a const pointer to this system's @e additional matrix
+   * \returns a const pointer to this system's additional matrix
    * named \p mat_name, or returns \p NULL if no matrix by that name
    * exists.
    */
   const SparseMatrix<Number> * request_matrix (const std::string & mat_name) const;
 
   /**
-   * @returns a writable pointer to this system's @e additional matrix
+   * \returns a writable pointer to this system's additional matrix
    * named \p mat_name, or returns \p NULL if no matrix by that name
    * exists.
    */
   SparseMatrix<Number> * request_matrix (const std::string & mat_name);
 
   /**
-   * @returns a const reference to this system's @e additional matrix
-   * named \p mat_name.  @e None of these matrices is involved in the
+   * \returns a const reference to this system's additional matrix
+   * named \p mat_name.  None of these matrices is involved in the
    * solution process.  Access is only granted when the matrix is already
    * properly initialized.
    */
   const SparseMatrix<Number> & get_matrix (const std::string & mat_name) const;
 
   /**
-   * @returns a writeable reference to this system's @e additional matrix
-   * named \p mat_name.  @e None of these matrices is involved in the
+   * \returns a writeable reference to this system's additional matrix
+   * named \p mat_name.  None of these matrices is involved in the
    * solution process.  Access is only granted when the matrix is already
    * properly initialized.
    */
   SparseMatrix<Number> & get_matrix (const std::string & mat_name);
 
   /**
-   * @returns the number of matrices handled by this system
+   * \returns the number of matrices handled by this system
    */
   virtual unsigned int n_matrices () const libmesh_override;
 

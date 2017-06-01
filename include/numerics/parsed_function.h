@@ -81,7 +81,7 @@ public:
                            DenseVector<Output> & output);
 
   /**
-   * @returns the vector component \p i at coordinate
+   * \returns the vector component \p i at coordinate
    * \p p and time \p time.
    */
   virtual Output component (unsigned int i,
@@ -91,14 +91,14 @@ public:
   const std::string & expression() { return _expression; }
 
   /**
-   * @returns the address of a parsed variable so you can supply a parameterized value
+   * \returns the address of a parsed variable so you can supply a parameterized value
    */
   virtual Output & getVarAddress(const std::string & variable_name);
 
   virtual UniquePtr<FunctionBase<Output> > clone() const;
 
   /**
-   * @returns the value of an inline variable.  Will *only* be correct
+   * \returns the value of an inline variable.  Will *only* be correct
    * if the inline variable value is independent of input variables,
    * if the inline variable is not redefined within any subexpression,
    * and if the inline variable takes the same value within any
@@ -270,7 +270,7 @@ ParsedFunction<Output,OutputGradient>::operator()
 }
 
 /**
- * @returns the vector component \p i at coordinate
+ * \returns the vector component \p i at coordinate
  * \p p and time \p time.
  */
 template <typename Output, typename OutputGradient>
@@ -290,7 +290,7 @@ ParsedFunction<Output,OutputGradient>::component (unsigned int i,
 }
 
 /**
- * @returns the address of a parsed variable so you can supply a parameterized value
+ * \returns the address of a parsed variable so you can supply a parameterized value
  */
 template <typename Output, typename OutputGradient>
 inline

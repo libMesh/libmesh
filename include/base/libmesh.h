@@ -120,7 +120,7 @@ void enableFPE(bool on);
 void enableSEGV(bool on);
 
 /**
- * @returns true if the argument \p arg was specified on the command line,
+ * \returns true if the argument \p arg was specified on the command line,
  * \p false otherwise.
  */
 bool on_command_line (const std::string & arg);
@@ -157,7 +157,7 @@ extern const Number imaginary;
 #endif
 
 /**
- * @returns the default solver interface to use.  The value depends on
+ * \returns the default solver interface to use.  The value depends on
  * which solver packages  were available when the library was configured.
  * The command-line is also checked, allowing the user to override the
  * compiled default.  For example, \p --use-petsc will force the use of

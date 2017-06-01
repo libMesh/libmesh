@@ -115,7 +115,7 @@ public:
   virtual void update_post_partitioning () libmesh_override;
 
   /**
-   * @returns \p true if all elements and nodes of the mesh
+   * \returns \p true if all elements and nodes of the mesh
    * exist on the current processor, \p false otherwise
    */
   virtual bool is_serial () const libmesh_override
@@ -129,7 +129,7 @@ public:
   { _is_serial = false; }
 
   /**
-   * @returns \p true if new elements and nodes can and should be
+   * \returns \p true if new elements and nodes can and should be
    * created in synchronization on all processors, \p false otherwise
    */
   virtual bool is_replicated () const libmesh_override
