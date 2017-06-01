@@ -150,7 +150,7 @@ public:
     virtual ~Iter () {}
 
     /**
-     * @returns a copy of this object as a pointer to
+     * \returns a copy of this object as a pointer to
      * the base (non-templated) class.
      */
     virtual IterBase * clone() const libmesh_override

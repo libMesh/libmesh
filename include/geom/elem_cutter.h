@@ -72,7 +72,7 @@ public:
   ~ElemCutter();
 
   /**
-   * @returns \p true if the element is completely inside the
+   * \returns \p true if the element is completely inside the
    * interface defined implicitly by the vertex values of the signed
    * \p vertex_distance_func.
    */
@@ -80,7 +80,7 @@ public:
                   const std::vector<Real> & vertex_distance_func) const;
 
   /**
-   * @returns \p true if the element is completely outside the
+   * \returns \p true if the element is completely outside the
    * interface defined implicitly by the vertex values of the signed
    * \p vertex_distance_func.
    */
@@ -88,7 +88,7 @@ public:
                    const std::vector<Real> & vertex_distance_func) const;
 
   /**
-   * @returns \p true if the element is cut by the interface defined
+   * \returns \p true if the element is cut by the interface defined
    * implicitly by the vertex values of the signed
    * \p vertex_distance_func.
    */

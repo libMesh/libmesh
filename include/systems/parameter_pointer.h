@@ -62,7 +62,9 @@ public:
 
   /**
    * Reseater: change the location of the parameter we access.
-   * This is included for backward compatibility, but is deprecated.
+   *
+   * \deprecated This is included for backward compatibility, but
+   * should no longer be used.
    */
   virtual ParameterAccessor<T> &
   operator= (T * new_ptr) libmesh_override

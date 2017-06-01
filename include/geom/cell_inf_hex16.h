@@ -80,51 +80,51 @@ public:
   {}
 
   /**
-   * @returns 16.  The \p InfHex16 has 16 nodes.
+   * \returns 16.  The \p InfHex16 has 16 nodes.
    */
   virtual unsigned int n_nodes() const libmesh_override { return 16; }
 
   /**
-   * @returns \p INFHEX16.
+   * \returns \p INFHEX16.
    */
   virtual ElemType type () const libmesh_override { return INFHEX16; }
 
   /**
-   * @returns the number of sub elements for this element type.
+   * \returns the number of sub elements for this element type.
    */
   virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
 
   /**
-   * @returns true if the specified (local) node number is a vertex.
+   * \returns true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is an edge.
+   * \returns true if the specified (local) node number is an edge.
    */
   virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is a face.
+   * \returns true if the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is on the
+   * \returns true if the specified (local) node number is on the
    * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
                                const unsigned int s) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is on the
+   * \returns true if the specified (local) node number is on the
    * specified edge.
    */
   virtual bool is_node_on_edge(const unsigned int n,
                                const unsigned int e) const libmesh_override;
 
   /**
-   * @returns SECOND.
+   * \returns SECOND.
    */
   virtual Order default_order() const libmesh_override { return SECOND; }
 
@@ -157,13 +157,13 @@ public:
   { return 12; }
 
   /**
-   * @returns 2 for all \p n.
+   * \returns 2 for all \p n.
    */
   virtual unsigned int n_second_order_adjacent_vertices (const unsigned int) const libmesh_override
   { return 2; }
 
   /**
-   * @returns the element-local number of the  \f$ v^{th} \f$ vertex
+   * \returns the element-local number of the  \f$ v^{th} \f$ vertex
    * that defines the \f$ n^{th} \f$ second-order node.
    * Note that \p n is counted as depicted above, \f$ 8 \le n < 16 \f$.
    */
@@ -171,7 +171,7 @@ public:
                                                            const unsigned int v) const libmesh_override;
 
   /**
-   * @returns the child number \p c and element-local index \p v of the
+   * \returns the child number \p c and element-local index \p v of the
    * \f$ n^{th} \f$ second-order node on the parent element.  See
    * elem.h for further details.
    */

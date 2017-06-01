@@ -254,7 +254,7 @@ void deallocate (std::vector<T> & vec)
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
 /**
- * @returns for \p r_o_c = 0 the filename for output of the real part
+ * \returns for \p r_o_c = 0 the filename for output of the real part
  * of complex data, and for  \p r_o_c = 1 the filename for the imaginary
  * part.
  */

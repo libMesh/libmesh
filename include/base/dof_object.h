@@ -127,7 +127,7 @@ public:
   void invalidate ();
 
   /**
-   * @returns the number of degrees of freedom associated with
+   * \returns the number of degrees of freedom associated with
    * system \p s for this object. Optionally only counts degrees
    * of freedom for variable number \p var
    */
@@ -162,19 +162,19 @@ public:
   { this->set_id() = dofid; }
 
   /**
-   * @returns \p true if this \p DofObject has a valid \p id set,
+   * \returns \p true if this \p DofObject has a valid \p id set,
    * \p false otherwise.
    */
   bool valid_id () const;
 
   /**
-   * @returns \p true if this \p DofObject has a valid \p unique_id set,
+   * \returns \p true if this \p DofObject has a valid \p unique_id set,
    * \p false otherwise.
    */
   bool valid_unique_id () const;
 
   /**
-   * @returns the processor that this DofObject belongs to.
+   * \returns the processor that this DofObject belongs to.
    *
    * When partitioning and DoF numbering have been performed by
    * libMesh, every current DoF on this DofObject will belong to its
@@ -183,7 +183,7 @@ public:
   processor_id_type processor_id () const;
 
   /**
-   * @returns the processor that this DofObject belongs to as a
+   * \returns the processor that this DofObject belongs to as a
    * writeable reference.
    */
   processor_id_type & processor_id ();
@@ -194,13 +194,13 @@ public:
   void processor_id (const processor_id_type pid);
 
   /**
-   * @returns \p true if this \p DofObject has a valid \p id set,
+   * \returns \p true if this \p DofObject has a valid \p id set,
    * \p false otherwise.
    */
   bool valid_processor_id () const;
 
   /**
-   * @returns the number of systems associated with this
+   * \returns the number of systems associated with this
    * \p DofObject
    */
   unsigned int n_systems() const;
@@ -216,20 +216,20 @@ public:
   void add_system ();
 
   /**
-   * @returns the number of \p VariableGroup variable groups
+   * \returns the number of \p VariableGroup variable groups
    * associated with system \p s for this \p DofObject
    */
   unsigned int n_var_groups(const unsigned int s) const;
 
   /**
-   * @returns the number of \p Variable variables associated
+   * \returns the number of \p Variable variables associated
    * with \p VariableGroup \p vg in system \p s for this \p DofObject
    */
   unsigned int n_vars(const unsigned int s,
                       const unsigned int vg) const;
 
   /**
-   * @returns the number of \p Variable variables associated
+   * \returns the number of \p Variable variables associated
    * with system \p s for this \p DofObject
    */
   unsigned int n_vars(const unsigned int s) const;
@@ -245,10 +245,10 @@ public:
                             const std::vector<unsigned int> & nvpg);
 
   /**
-   * @returns the number of components for variable \p var
+   * \returns the number of components for variable \p var
    * of system \p s associated with this \p DofObject.
    * For example, the \p HIERARCHIC shape functions may
-   * have @e multiple DoFs associated with @e one node.  Another
+   * have multiple DoFs associated with one node.  Another
    * example is the \p MONOMIALs, where only the elements
    * hold the DoFs.  For the different spatial directions,
    * and orders, see \p FE.
@@ -257,10 +257,10 @@ public:
                       const unsigned int var) const;
 
   /**
-   * @returns the number of components for \p VariableGroup \p vg
+   * \returns the number of components for \p VariableGroup \p vg
    * of system \p s associated with this \p DofObject.
    * For example, the \p HIERARCHIC shape functions may
-   * have @e multiple DoFs associated with @e one node.  Another
+   * have multiple DoFs associated with one node.  Another
    * example is the \p MONOMIALs, where only the elements
    * hold the DoFs.  For the different spatial directions,
    * and orders, see \p FE.
@@ -285,9 +285,8 @@ public:
                         const unsigned int ncomp);
 
   /**
-   * @returns the global degree of freedom number for variable \p var,
+   * \returns the global degree of freedom number for variable \p var,
    * component \p comp for system \p s associated with this \p DofObject
-   *
    *
    * When partitioning and DoF numbering have been performed by
    * libMesh, every current DoF on this DofObject will belong to its
@@ -307,7 +306,7 @@ public:
                       const dof_id_type dn);
 
   /**
-   * @returns true if any system has variables which have been assigned,
+   * \returns true if any system has variables which have been assigned,
    * false otherwise
    */
   bool has_dofs(const unsigned int s=libMesh::invalid_uint) const;

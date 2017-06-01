@@ -73,7 +73,7 @@ public:
   typedef ImplicitSystem Parent;
 
   /**
-   * @returns a clever pointer to the system.
+   * \returns a clever pointer to the system.
    */
   sys_type & system () { return *this; }
 
@@ -98,7 +98,7 @@ public:
    * Prepares \p matrix and \p _dof_map for matrix assembly.
    * Does not actually assemble anything.  For matrix assembly,
    * use the \p assemble() in derived classes.
-   * @e Should be overloaded in derived classes.
+   * Should be overloaded in derived classes.
    */
   virtual void assemble () libmesh_override { ImplicitSystem::assemble(); }
 
@@ -137,7 +137,7 @@ public:
                         bool apply_no_constraints = false) libmesh_override;
 
   /**
-   * @returns \p "LinearImplicit".  Helps in identifying
+   * \returns \p "LinearImplicit".  Helps in identifying
    * the system type in an equation system file.
    */
   virtual std::string system_type () const libmesh_override { return "LinearImplicit"; }

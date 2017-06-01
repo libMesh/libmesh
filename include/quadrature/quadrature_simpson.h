@@ -62,7 +62,7 @@ public:
   ~QSimpson() {}
 
   /**
-   * @returns \p QSIMPSON.
+   * \returns \p QSIMPSON.
    */
   virtual QuadratureType type() const libmesh_override { return QSIMPSON; }
 

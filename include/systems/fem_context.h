@@ -81,8 +81,8 @@ public:
   /**
    * Lists the boundary ids found on the current side
    *
-   * This function is now deprecated. Instead, use the version that
-   * takes a reference to a std::set.
+   * \deprecated Instead, use the version that takes a reference to a
+   * std::set.
    */
   std::vector<boundary_id_type> side_boundary_ids() const;
 
@@ -840,7 +840,7 @@ public:
   { return _elem_dim; }
 
   /**
-   * @returns set of dimensions of elements present in the mesh at
+   * \returns set of dimensions of elements present in the mesh at
    * context initialization.
    */
   const std::set<unsigned char> & elem_dimensions() const

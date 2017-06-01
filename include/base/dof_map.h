@@ -428,37 +428,37 @@ public:
   void add_variable_group (const VariableGroup & var_group);
 
   /**
-   * @returns the \p VariableGroup description object for group \p g.
+   * \returns the \p VariableGroup description object for group \p g.
    */
   const VariableGroup & variable_group (const unsigned int c) const;
 
   /**
-   * @returns the variable description object for variable \p c.
+   * \returns the variable description object for variable \p c.
    */
   const Variable & variable (const unsigned int c) const;
 
   /**
-   * @returns the approximation order for variable \p c.
+   * \returns the approximation order for variable \p c.
    */
   Order variable_order (const unsigned int c) const;
 
   /**
-   * @returns the approximation order for \p VariableGroup \p vg.
+   * \returns the approximation order for \p VariableGroup \p vg.
    */
   Order variable_group_order (const unsigned int vg) const;
 
   /**
-   * @returns the finite element type for variable \p c.
+   * \returns the finite element type for variable \p c.
    */
   const FEType & variable_type (const unsigned int c) const;
 
   /**
-   * @returns the finite element type for \p VariableGroup \p vg.
+   * \returns the finite element type for \p VariableGroup \p vg.
    */
   const FEType & variable_group_type (const unsigned int vg) const;
 
   /**
-   * @returns the number of variables in the global solution vector. Defaults
+   * \returns the number of variables in the global solution vector. Defaults
    * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
    * Stokes (u,v,p), etc...
    */
@@ -466,7 +466,7 @@ public:
   { return cast_int<unsigned int>(_variable_groups.size()); }
 
   /**
-   * @returns the number of variables in the global solution vector. Defaults
+   * \returns the number of variables in the global solution vector. Defaults
    * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
    * Stokes (u,v,p), etc...
    */
@@ -474,7 +474,7 @@ public:
   { return cast_int<unsigned int>(_variables.size()); }
 
   /**
-   * @returns true if the variables are capable of being stored in a blocked
+   * \returns true if the variables are capable of being stored in a blocked
    * form.  Presently, this means that there can only be one variable group,
    * and that the group has more than one variable.
    */
@@ -488,7 +488,7 @@ public:
   }
 
   /**
-   * @returns the block size, if the variables are amenable to block storage.
+   * \returns the block size, if the variables are amenable to block storage.
    * Otherwise 1.
    */
   unsigned int block_size() const
@@ -501,17 +501,17 @@ public:
   }
 
   /**
-   * @returns the total number of degrees of freedom in the problem.
+   * \returns the total number of degrees of freedom in the problem.
    */
   dof_id_type n_dofs() const { return _n_dfs; }
 
   /**
-   * @returns the number of SCALAR dofs.
+   * \returns the number of SCALAR dofs.
    */
   dof_id_type n_SCALAR_dofs() const { return _n_SCALAR_dofs; }
 
   /**
-   * @returns the number of degrees of freedom on this processor.
+   * \returns the number of degrees of freedom on this processor.
    */
   dof_id_type n_local_dofs () const
   { return this->n_dofs_on_processor (this->processor_id()); }
@@ -548,8 +548,9 @@ public:
 
   /**
    * Returns the last dof index that is local to processor \p proc.
-   * This function is now deprecated, because it returns nonsense in the rare
-   * case where \p proc has no local dof indices.  Use end_dof() instead.
+   *
+   * \deprecated This function returns nonsense in the rare case where
+   * \p proc has no local dof indices.  Use end_dof() instead.
    */
   dof_id_type last_dof(const processor_id_type proc) const
   {
@@ -637,7 +638,7 @@ public:
   bool all_semilocal_indices (const std::vector<dof_id_type> & dof_indices) const;
 
   /**
-   * @returns \p true iff our solutions can be locally evaluated on
+   * \returns \p true iff our solutions can be locally evaluated on
    * \p obj (which should be an Elem or a Node) for variable number \p
    * var_num (for all variables, if \p var_num is invalid_uint)
    */
@@ -689,20 +690,20 @@ public:
   //--------------------------------------------------------------------
   // Constraint-specific methods
   /**
-   * @returns the total number of constrained degrees of freedom
+   * \returns the total number of constrained degrees of freedom
    * in the problem.
    */
   dof_id_type n_constrained_dofs() const;
 
   /**
-   * @returns the number of constrained degrees of freedom
+   * \returns the number of constrained degrees of freedom
    * on this processor.
    */
   dof_id_type n_local_constrained_dofs() const;
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   /**
-   * @returns the total number of constrained Nodes
+   * \returns the total number of constrained Nodes
    * in the mesh.
    */
   dof_id_type n_constrained_nodes() const
@@ -826,19 +827,19 @@ public:
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   /**
-   * @returns true if the degree of freedom dof is constrained,
+   * \returns true if the degree of freedom dof is constrained,
    * false otherwise.
    */
   bool is_constrained_dof (const dof_id_type dof) const;
 
   /**
-   * @returns true if the system has any heterogenous constraints for
+   * \returns true if the system has any heterogenous constraints for
    * adjoint solution \p qoi_num, false otherwise.
    */
   bool has_heterogenous_adjoint_constraints (const unsigned int qoi_num) const;
 
   /**
-   * @returns the heterogeneous constraint value if the degree of
+   * \returns the heterogeneous constraint value if the degree of
    * freedom \p dof has a heterogenous constraint for adjoint solution
    * \p qoi_num, zero otherwise.
    */
@@ -846,13 +847,13 @@ public:
                                               const dof_id_type dof) const;
 
   /**
-   * @returns a reference to the set of right-hand-side values in
+   * \returns a reference to the set of right-hand-side values in
    * primal constraint equations
    */
   DofConstraintValueMap & get_primal_constraint_values();
 
   /**
-   * @returns true if the Node is constrained,
+   * \returns true if the Node is constrained,
    * false otherwise.
    */
   bool is_constrained_node (const Node * node) const;
@@ -1062,13 +1063,13 @@ public:
   /**
    * Add a periodic boundary pair
    *
-   * @param boundary - primary boundary
-   * @param inverse_boundary - inverse boundary
+   * \param boundary - primary boundary
+   * \param inverse_boundary - inverse boundary
    */
   void add_periodic_boundary (const PeriodicBoundaryBase & boundary, const PeriodicBoundaryBase & inverse_boundary);
 
   /**
-   * @returns true if the boundary given by \p boundaryid is periodic,
+   * \returns true if the boundary given by \p boundaryid is periodic,
    * false otherwise
    */
   bool is_periodic_boundary (const boundary_id_type boundaryid) const;
@@ -1157,8 +1158,7 @@ public:
                         std::vector<dof_id_type> & di,
                         const unsigned int vn = libMesh::invalid_uint) const;
   /**
-   * @returns the total number of degrees of freedom on old_dof_objects
-   *
+   * \returns the total number of degrees of freedom on old_dof_objects
    */
   dof_id_type n_old_dofs() const { return _n_old_dfs; }
 
@@ -1210,7 +1210,7 @@ public:
   CouplingMatrix * _dof_coupling;
 
   /**
-   * @returns the number of the system we are responsible for.
+   * \returns the number of the system we are responsible for.
    */
   unsigned int sys_number() const;
 
@@ -1394,7 +1394,7 @@ private:
   MeshBase & _mesh;
 
   /**
-   * Additional matrices handled by this object.  These pointers do @e
+   * Additional matrices handled by this object.  These pointers do \e
    * not handle the memory, instead, \p System, who
    * told \p DofMap about them, owns them.
    */

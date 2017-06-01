@@ -58,7 +58,7 @@ public:
 
 
   /**
-   * @returns a reference to the parent vector.
+   * \returns a reference to the parent vector.
    */
   DenseVector<T> & parent () { return _parent_vector; }
 
@@ -68,42 +68,42 @@ public:
   virtual void zero() libmesh_override;
 
   /**
-   * @returns the \p (i,j) element of the subvector as a const
+   * \returns the \p (i,j) element of the subvector as a const
    * reference.
    */
   const T & operator() (const unsigned int i) const;
 
   /**
-   * @returns the \p (i,j) element of the subvector as a writeable reference.
+   * \returns the \p (i,j) element of the subvector as a writeable reference.
    */
   T & operator() (const unsigned int i);
 
   /**
-   * @returns the \p (i) element of the vector.
+   * \returns the \p (i) element of the vector.
    */
   virtual T el(const unsigned int i) const libmesh_override
   { return (*this)(i); }
 
   /**
-   * @returns the \p (i) element of the vector as a writeable reference.
+   * \returns the \p (i) element of the vector as a writeable reference.
    */
   virtual T & el(const unsigned int i) libmesh_override
   { return (*this)(i); }
 
   /**
-   * @returns the size of the subvector.
+   * \returns the size of the subvector.
    */
   virtual unsigned int size() const libmesh_override
   { return _n; }
 
   /**
-   * @returns true iff size() is 0.
+   * \returns true iff size() is 0.
    */
   virtual bool empty() const libmesh_override
   { return (_n == 0); }
 
   /**
-   * @returns the row offset into the parent vector.
+   * \returns the row offset into the parent vector.
    */
   unsigned int i_off() const { return _i_off; }
 
@@ -114,34 +114,34 @@ public:
                   const unsigned int n);
 
   /**
-   * @returns the minimum element in the vector.
+   * \returns the minimum element in the vector.
    * In case of complex numbers, this returns the minimum
    * Real part.
    */
   Real min () const;
 
   /**
-   * @returns the maximum element in the vector.
+   * \returns the maximum element in the vector.
    * In case of complex numbers, this returns the maximum
    * Real part.
    */
   Real max () const;
 
   /**
-   * @returns the \f$l_1\f$-norm of the vector, i.e.
+   * \returns the \f$l_1\f$-norm of the vector, i.e.
    * the sum of the absolute values.
    */
   Real l1_norm () const;
 
   /**
-   * @returns the \f$l_2\f$-norm of the vector, i.e.
+   * \returns the \f$l_2\f$-norm of the vector, i.e.
    * the square root of the sum of the
    * squares of the elements.
    */
   Real l2_norm () const;
 
   /**
-   * @returns the maximum absolute value of the
+   * \returns the maximum absolute value of the
    * elements of this vector, which is the
    * \f$l_\infty\f$-norm of a vector.
    */

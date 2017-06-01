@@ -70,7 +70,7 @@ public:
   ~QComposite();
 
   /**
-   * @returns \p QCOMPOSITE.
+   * \returns \p QCOMPOSITE.
    */
   virtual QuadratureType type() const libmesh_override { return QCOMPOSITE; }
 

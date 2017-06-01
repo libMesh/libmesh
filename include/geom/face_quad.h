@@ -62,7 +62,7 @@ public:
   }
 
   /**
-   * @returns the \p Point associated with local \p Node \p i,
+   * \returns the \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
   virtual Point master_point (const unsigned int i) const libmesh_override
@@ -74,46 +74,46 @@ public:
   }
 
   /**
-   * @returns 4.  All quad-derivatives are guaranteed to have at
+   * \returns 4.  All quad-derivatives are guaranteed to have at
    * least 4 nodes.
    */
   virtual unsigned int n_nodes() const libmesh_override { return 4; }
 
   /**
-   * @returns 4.
+   * \returns 4.
    */
   virtual unsigned int n_sides() const libmesh_override { return 4; }
 
   /**
-   * @returns 4.  All quadrilaterals have 4 vertices.
+   * \returns 4.  All quadrilaterals have 4 vertices.
    */
   virtual unsigned int n_vertices() const libmesh_override { return 4; }
 
   /**
-   * @returns 4.  All quadrilaterals have 4 edges.
+   * \returns 4.  All quadrilaterals have 4 edges.
    */
   virtual unsigned int n_edges() const libmesh_override { return 4; }
 
   /**
-   * @returns 4.
+   * \returns 4.
    */
   virtual unsigned int n_children() const libmesh_override { return 4; }
 
   /**
-   * @returns true if the specified child is on the
+   * \returns true if the specified child is on the
    * specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
                                 const unsigned int s) const libmesh_override;
 
   /**
-   * @returns the side number opposite to \p s (for a tensor product
+   * \returns the side number opposite to \p s (for a tensor product
    * element), or throws an error otherwise.
    */
   virtual unsigned int opposite_side(const unsigned int s) const libmesh_override;
 
   /**
-   * @returns the local node number for the node opposite to node n
+   * \returns the local node number for the node opposite to node n
    * on side \p opposite_side(s) (for a tensor product element), or
    * throws an error otherwise.
    */
@@ -126,14 +126,14 @@ public:
   using Elem::key;
 
   /**
-   * @returns an id associated with the \p s side of this element.
+   * \returns an id associated with the \p s side of this element.
    * The id is not necessarily unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
   virtual dof_id_type key (const unsigned int s) const libmesh_override;
 
   /**
-   * @returns an id associated with the global node ids of this
+   * \returns an id associated with the global node ids of this
    * element.  The id is not necessarily unique, but should be
    * close.
    */
@@ -146,7 +146,7 @@ public:
                                        unsigned int side_node) const libmesh_override;
 
   /**
-   * @returns a primitive (2-noded) edge for edge i.
+   * \returns a primitive (2-noded) edge for edge i.
    */
   virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;
 

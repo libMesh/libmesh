@@ -166,7 +166,7 @@ public:
   void set_L2_assembly(ElemAssembly & L2_assembly_in);
 
   /**
-   * @return a reference to the L2 assembly object
+   * \returns a reference to the L2 assembly object
    */
   ElemAssembly & get_L2_assembly();
 

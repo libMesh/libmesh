@@ -71,7 +71,7 @@ public:
   ~QMonomial();
 
   /**
-   * @returns \p QMONOMIAL.
+   * \returns \p QMONOMIAL.
    */
   virtual QuadratureType type() const libmesh_override { return QMONOMIAL; }
 

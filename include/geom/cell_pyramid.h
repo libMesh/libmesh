@@ -54,7 +54,7 @@ public:
   }
 
   /**
-   * @returns the \p Point associated with local \p Node \p i,
+   * \returns the \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
   virtual Point master_point (const unsigned int i) const libmesh_override
@@ -66,45 +66,45 @@ public:
   }
 
   /**
-   * @returns 5.  All pyramid-derivatives are guaranteed to have at
+   * \returns 5.  All pyramid-derivatives are guaranteed to have at
    * least 5 nodes.
    */
   virtual unsigned int n_nodes() const libmesh_override { return 5; }
 
   /**
-   * @returns 5
+   * \returns 5
    */
   virtual unsigned int n_sides() const libmesh_override { return 5; }
 
   /**
-   * @returns 5.  All pyramids have 5 vertices.
+   * \returns 5.  All pyramids have 5 vertices.
    */
   virtual unsigned int n_vertices() const libmesh_override { return 5; }
 
   /**
-   * @returns 8.  All pyramids have 8 edges.
+   * \returns 8.  All pyramids have 8 edges.
    */
   virtual unsigned int n_edges() const libmesh_override { return 8; }
 
   /**
-   * @returns 5.  All pyramids have 5 faces.
+   * \returns 5.  All pyramids have 5 faces.
    */
   virtual unsigned int n_faces() const libmesh_override { return 5; }
 
   /**
-   * @returns 10.
+   * \returns 10.
    */
   virtual unsigned int n_children() const libmesh_override { return 10; }
 
   /**
-   * @returns true if the specified child is on the
+   * \returns true if the specified child is on the
    * specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
                                 const unsigned int s) const libmesh_override;
 
   /**
-   * @returns true if the specified edge is on the specified side.
+   * \returns true if the specified edge is on the specified side.
    */
   virtual bool is_edge_on_side(const unsigned int e,
                                const unsigned int s) const libmesh_override;
@@ -115,7 +115,7 @@ public:
   using Elem::key;
 
   /**
-   * @returns an id associated with the \p s side of this element.
+   * \returns an id associated with the \p s side of this element.
    * The id is not necessarily unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
@@ -128,7 +128,7 @@ public:
                                        unsigned int side_node) const libmesh_override;
 
   /**
-   * @returns a primitive triangle or quad for
+   * \returns a primitive triangle or quad for
    * face i.
    */
   virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;

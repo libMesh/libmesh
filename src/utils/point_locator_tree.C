@@ -165,7 +165,7 @@ void PointLocatorTree::init (Trees::BuildType build_type)
           // We are _not_ the master.  Let our Tree point to
           // the master's tree.  But for this we first transform
           // the master in a state for which we are friends.
-          // And make sure the master @e has a tree!
+          // And make sure the master has a tree!
           const PointLocatorTree * my_master =
             cast_ptr<const PointLocatorTree *>(this->_master);
 

@@ -102,7 +102,9 @@ public:
   int get_num_time_steps();
 
   /**
-   * Backward compatibility version of function that takes a single variable name
+   * Backward compatibility version of function that takes a single variable name.
+   *
+   * \deprecated Use the version of copy_nodal_solution() that takes two names.
    */
   void copy_nodal_solution(System & system,
                            std::string var_name,
@@ -171,10 +173,10 @@ public:
 
   /**
    * Writes out the solution at a specific timestep.
-   * @param fname Name of the file to write to
-   * @param es EquationSystems object which contains the solution vector.
-   * @param timestep The timestep to write out, should be _1_ indexed.
-   * @param time The current simulation time.
+   * \param fname Name of the file to write to
+   * \param es EquationSystems object which contains the solution vector.
+   * \param timestep The timestep to write out, should be _1_ indexed.
+   * \param time The current simulation time.
    */
   void write_timestep (const std::string & fname,
                        const EquationSystems & es,
@@ -217,8 +219,18 @@ public:
   void write_as_dimension(unsigned dim);
 
   /**
-   * Allows you to set a vector that is added to the coordinates of all
-   * of the nodes.  Effectively, this "moves" the mesh to a particular position
+   * Allows you to set a vector that is added to the coordinates of
+   * all of the nodes. Effectively, this "moves" the mesh to a
+   * particular position.
+   *
+   * \deprecated As requested by Roy in libmesh PR #90, this function
+   * was "deprecated on arrival". There is not really a suitable
+   * replacement for it in the works, however. The same effect *could*
+   * be achieved by calling MeshTools::Modification::translate()
+   * twice, but that approach seems inefficient in the case of very
+   * large problems with millions of nodes. That said, this should
+   * probably become a base class API so that it works for all the
+   * different IO subclasses.
    */
   void set_coordinate_offset(Point p);
 

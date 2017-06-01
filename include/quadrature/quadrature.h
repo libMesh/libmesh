@@ -69,7 +69,7 @@ public:
   virtual ~QBase() {}
 
   /**
-   * @returns the quadrature type in derived classes.
+   * \returns the quadrature type in derived classes.
    */
   virtual QuadratureType type() const = 0;
 
@@ -98,17 +98,17 @@ public:
                                  const Order order=INVALID_ORDER);
 
   /**
-   * @returns the element type we're currently using.
+   * \returns the element type we're currently using.
    */
   ElemType get_elem_type() const { return _type; }
 
   /**
-   * @returns the p-refinement level we're currently using.
+   * \returns the p-refinement level we're currently using.
    */
   unsigned int get_p_level() const { return _p_level; }
 
   /**
-   * @returns the number of points associated with the quadrature rule.
+   * \returns the number of points associated with the quadrature rule.
    */
   unsigned int n_points() const
   {
@@ -117,36 +117,36 @@ public:
   }
 
   /**
-   * @returns the spatial dimension of the quadrature rule.
+   * \returns the spatial dimension of the quadrature rule.
    */
   unsigned int get_dim() const { return _dim; }
 
   /**
-   * @returns a \p std::vector containing the quadrature point locations
+   * \returns a \p std::vector containing the quadrature point locations
    * in reference element space.
    */
   const std::vector<Point> & get_points() const { return _points; }
 
   /**
-   * @returns a \p std::vector containing the quadrature point locations
+   * \returns a \p std::vector containing the quadrature point locations
    * in reference element space as a writeable reference.
    */
   std::vector<Point> & get_points() { return _points; }
 
   /**
-   * @returns a constant reference to a \p std::vector containing the
+   * \returns a constant reference to a \p std::vector containing the
    * quadrature weights.
    */
   const std::vector<Real> & get_weights() const { return _weights; }
 
   /**
-   * @returns a writable references to a \p std::vector containing the
+   * \returns a writable references to a \p std::vector containing the
    * quadrature weights.
    */
   std::vector<Real> & get_weights() { return _weights; }
 
   /**
-   * @returns the \f$ i^{th} \f$ quadrature point in reference element space.
+   * \returns the \f$ i^{th} \f$ quadrature point in reference element space.
    */
   Point qp(const unsigned int i) const
   {
@@ -155,7 +155,7 @@ public:
   }
 
   /**
-   * @returns the \f$ i^{th} \f$ quadrature weight.
+   * \returns the \f$ i^{th} \f$ quadrature weight.
    */
   Real w(const unsigned int i) const
   {
@@ -184,7 +184,7 @@ public:
                      unsigned int p_level=0);
 
   /**
-   * @returns the order of the quadrature rule.
+   * \returns the order of the quadrature rule.
    */
   Order get_order() const { return static_cast<Order>(_order + _p_level); }
 

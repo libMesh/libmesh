@@ -56,7 +56,7 @@ public:
   ~QConical();
 
   /**
-   * @returns the QuadratureType for this class.
+   * \returns the QuadratureType for this class.
    */
   virtual QuadratureType type() const libmesh_override { return QCONICAL; }
 

@@ -55,18 +55,18 @@ public:
   {}
 
   /**
-   * @returns 3, the dimensionality of the object.
+   * \returns 3, the dimensionality of the object.
    */
   virtual unsigned int dim () const libmesh_override { return 3; }
 
   /**
-   * @returns \p true.  All classes derived from \p InfCell
+   * \returns \p true.  All classes derived from \p InfCell
    * are infinite elements.
    */
   virtual bool infinite () const libmesh_override { return true; }
 
   /**
-   * @returns the origin of this infinite element.
+   * \returns the origin of this infinite element.
    */
   virtual Point origin () const libmesh_override
   {

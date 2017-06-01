@@ -66,7 +66,7 @@ public:
   typedef EigenSystem Parent;
 
   /**
-   * @returns a clever pointer to the system.
+   * \returns a clever pointer to the system.
    */
   sys_type & system () { return *this; }
 
@@ -87,7 +87,7 @@ public:
                                  std::set<dof_id_type>());
 
   /**
-   * @return the global number of non-condensed dofs in the system.
+   * \returns the global number of non-condensed dofs in the system.
    */
   dof_id_type n_global_non_condensed_dofs() const;
 

@@ -202,7 +202,7 @@ public:
   };
 
   /**
-   * @returns a clever pointer to the system.
+   * \returns a clever pointer to the system.
    */
   sys_type & system () { return *this; }
 
@@ -241,7 +241,7 @@ public:
                         bool apply_no_constraints = false) libmesh_override;
 
   /**
-   * @returns \p "NonlinearImplicit".  Helps in identifying
+   * \returns \p "NonlinearImplicit".  Helps in identifying
    * the system type in an equation system file.
    */
   virtual std::string system_type () const libmesh_override { return "NonlinearImplicit"; }

@@ -213,19 +213,19 @@ public:
                      const std::string & header="");
 
   /**
-   * @returns a string containing:
+   * \returns a string containing:
    * (1) Basic machine information (if first call)
    * (2) The performance log
    */
   std::string get_log() const;
 
   /**
-   * @returns a string containing ONLY the information header.
+   * \returns a string containing ONLY the information header.
    */
   std::string get_info_header() const;
 
   /**
-   * @returns a string containing ONLY the log information
+   * \returns a string containing ONLY the log information
    */
   std::string get_perf_info() const;
 
@@ -235,12 +235,12 @@ public:
   void print_log() const;
 
   /**
-   * @returns the total time spent on this event.
+   * \returns the total time spent on this event.
    */
   double get_elapsed_time() const;
 
   /**
-   * @returns the active time
+   * \returns the active time
    */
   double get_active_time() const;
 

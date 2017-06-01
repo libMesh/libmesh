@@ -267,8 +267,9 @@ public:
 
   /**
    * Returns the magnitude of the vector, i.e. the square-root of the
-   * sum of the elements squared.  This function is deprecated, instead
-   * call norm().
+   * sum of the elements squared.
+   *
+   * \deprecated Use the norm() function instead.
    */
   Real size() const;
 
@@ -280,8 +281,9 @@ public:
 
   /**
    * Returns the magnitude of the vector squared, i.e. the sum of the
-   * element magnitudes squared.  This function is deprecated, instead
-   * call norm_sq().
+   * element magnitudes squared.
+   *
+   * \deprecated Use the norm_sq() function instead.
    */
   Real size_sq() const;
 
@@ -297,34 +299,34 @@ public:
   void zero();
 
   /**
-   * @returns \p true iff two vectors occupy approximately the same
+   * \returns \p true iff two vectors occupy approximately the same
    * physical location in space, to within a relative tolerance of \p tol.
    */
   bool relative_fuzzy_equals(const TypeVector<T> & rhs,
                              Real tol = TOLERANCE) const;
 
   /**
-   * @returns \p true iff two vectors occupy approximately the same
+   * \returns \p true iff two vectors occupy approximately the same
    * physical location in space, to within an absolute tolerance of \p tol.
    */
   bool absolute_fuzzy_equals(const TypeVector<T> & rhs,
                              Real tol = TOLERANCE) const;
 
   /**
-   * @returns \p true iff this(i)==rhs(i) for each component of the
+   * \returns \p true iff this(i)==rhs(i) for each component of the
    * vector. For floating point types T, the function
    * absolute_fuzzy_equals may be a more appropriate choice.
    */
   bool operator == (const TypeVector<T> & rhs) const;
 
   /**
-   * @returns \p true iff two vectors do not occupy approximately the same
+   * \returns \p true iff two vectors do not occupy approximately the same
    * physical location in space.
    */
   bool operator != (const TypeVector<T> & rhs) const;
 
   /**
-   * @returns \p true if this vector is "less"
+   * \returns \p true if this vector is "less"
    * than another.  Useful for sorting.
    * Also used for choosing some arbitrary basis function
    * orientations
@@ -332,7 +334,7 @@ public:
   bool operator < (const TypeVector<T> & rhs) const;
 
   /**
-   * @returns \p true if this vector is "less"
+   * \returns \p true if this vector is "less"
    * than or equal to another.  Useful for sorting.
    * Also used for choosing some arbitrary constraint
    * equation directions
@@ -340,7 +342,7 @@ public:
   bool operator <= (const TypeVector<T> & rhs) const;
 
   /**
-   * @returns \p true if this vector is "greater"
+   * \returns \p true if this vector is "greater"
    * than another.  Useful for sorting.
    * Also used for choosing some arbitrary basis function
    * orientations
@@ -348,7 +350,7 @@ public:
   bool operator > (const TypeVector<T> & rhs) const;
 
   /**
-   * @returns \p true if this vector is "greater"
+   * \returns \p true if this vector is "greater"
    * than or equal to another.  Useful for sorting.
    * Also used for choosing some arbitrary constraint
    * equation directions

@@ -154,6 +154,8 @@ public:
   /**
    * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
    * element magnitudes squared.
+   *
+   * \deprecated Use the norm_sq() function instead.
    */
   Real size_sq() const { libmesh_deprecated(); return 0.;}
 
@@ -164,20 +166,20 @@ public:
   Real norm_sq() const { return 0.;}
 
   /**
-   * @returns \p true if two tensors are equal valued.
+   * \returns \p true if two tensors are equal valued.
    */
   bool operator == (const TypeNTensor<N,T> & /*rhs*/) const
   { return true; }
 
   /**
-   * @returns \p true if this tensor is "less"
+   * \returns \p true if this tensor is "less"
    * than another.  Useful for sorting.
    */
   bool operator < (const TypeNTensor<N,T> & /*rhs*/) const
   { return false; }
 
   /**
-   * @returns \p true if this tensor is "greater"
+   * \returns \p true if this tensor is "greater"
    * than another.
    */
   bool operator > (const TypeNTensor<N,T> & /*rhs*/) const

@@ -111,19 +111,19 @@ public:
   { _names = names; }
 
   /**
-   *@returns the field variables as a read-only reference.
+   *\returns the field variables as a read-only reference.
    */
   const std::vector<std::string> & field_variables() const
   { return _names; }
 
   /**
-   * @returns a writeable reference to the point list.
+   * \returns a writeable reference to the point list.
    */
   std::vector<Point> & get_source_points ()
   { return _src_pts; }
 
   /**
-   * @returns a writeable reference to the point list.
+   * \returns a writeable reference to the point list.
    */
   std::vector<Number> & get_source_vals ()
   { return _src_vals; }

@@ -124,7 +124,7 @@ public:
   virtual unsigned int time_order () const = 0;
 
   /**
-   * @returns the old nonlinear solution for the specified global
+   * \returns the old nonlinear solution for the specified global
    * DOF.
    */
   Number old_nonlinear_solution (const dof_id_type global_dof_number) const;

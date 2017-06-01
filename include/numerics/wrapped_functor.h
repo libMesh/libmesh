@@ -59,7 +59,7 @@ public:
   }
 
   /**
-   * @returns the scalar value of variable varnum at coordinate \p p
+   * \returns the scalar value of variable varnum at coordinate \p p
    * and time \p time.
    */
   virtual Output operator() (const FEMContext &,
@@ -79,7 +79,7 @@ public:
   { _func->operator() (p, time, output); }
 
   /**
-   * @returns the vector component \p i at coordinate
+   * \returns the vector component \p i at coordinate
    * \p p and time \p time.
    */
   virtual Output component (const FEMContext &,

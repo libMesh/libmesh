@@ -109,7 +109,7 @@ public:
   ~QGrundmann_Moller();
 
   /**
-   * @returns \p QGRUNDMANN_MOLLER.
+   * \returns \p QGRUNDMANN_MOLLER.
    */
   virtual QuadratureType type() const libmesh_override { return QGRUNDMANN_MOLLER; }
 

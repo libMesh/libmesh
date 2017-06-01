@@ -78,9 +78,12 @@ public:
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**
-   * Deprecated constructor.  Takes \p dim, the dimension of the mesh.
-   * The mesh dimension can be changed (and may automatically be
-   * changed by mesh generation/loading) later.
+   * Constructor which takes \p dim, the dimension of the mesh.  The
+   * mesh dimension can be changed (and may automatically be changed
+   * by mesh generation/loading) later.
+   *
+   * \deprecated LIBMESH_DISABLE_COMMWORLD is now the default, use the
+   * constructor that takes a Parallel::Communicator instead.
    */
   MeshBase (unsigned char dim=1);
 #endif
@@ -121,14 +124,14 @@ public:
   virtual void clear ();
 
   /**
-   * @returns \p true if the mesh has been prepared via a call
+   * \returns \p true if the mesh has been prepared via a call
    * to \p prepare_for_use, \p false otherwise.
    */
   bool is_prepared () const
   { return _is_prepared; }
 
   /**
-   * @returns \p true if all elements and nodes of the mesh
+   * \returns \p true if all elements and nodes of the mesh
    * exist on the current processor, \p false otherwise
    */
   virtual bool is_serial () const
@@ -143,7 +146,7 @@ public:
   { libmesh_error(); }
 
   /**
-   * @returns \p true if new elements and nodes can and should be
+   * \returns \p true if new elements and nodes can and should be
    * created in synchronization on all processors, \p false otherwise
    */
   virtual bool is_replicated () const
@@ -169,7 +172,7 @@ public:
   virtual void delete_remote_elements () {}
 
   /**
-   * @returns the logical dimension of the mesh; i.e. the manifold
+   * \returns the logical dimension of the mesh; i.e. the manifold
    * dimension of the elements in the mesh.  If we ever support
    * multi-dimensional meshes (e.g. hexes and quads in the same mesh)
    * then this will return the largest such dimension.
@@ -187,7 +190,7 @@ public:
   { _elem_dims.clear(); _elem_dims.insert(d); }
 
   /**
-   * @returns set of dimensions of elements present in the mesh.
+   * \returns set of dimensions of elements present in the mesh.
    */
   const std::set<unsigned char> & elem_dimensions() const
   { return _elem_dims; }
@@ -407,8 +410,7 @@ public:
    * \f$ i^{th} \f$ node, which should be present in this processor's
    * subset of the mesh data structure.
    *
-   * This method is deprecated; use the less confusingly-named
-   * node_ref() instead.
+   * \deprecated Use the less confusingly-named node_ref() instead.
    */
   virtual const Node & node (const dof_id_type i) const
   {
@@ -420,8 +422,7 @@ public:
    * Return a reference to the \f$ i^{th} \f$ node, which should be
    * present in this processor's subset of the mesh data structure.
    *
-   * This method is deprecated; use the less confusingly-named
-   * node_ref() instead.
+   * \deprecated Use the less confusingly-named node_ref() instead.
    */
   virtual Node & node (const dof_id_type i)
   {
@@ -488,8 +489,7 @@ public:
    * Return a pointer to the \f$ i^{th} \f$ element, which should be
    * present in this processor's subset of the mesh data structure.
    *
-   * This method is deprecated; use the less confusingly-named
-   * elem_ptr() instead.
+   * \deprecated Use the less confusingly-named elem_ptr() instead.
    */
   virtual const Elem * elem (const dof_id_type i) const
   {
@@ -502,8 +502,7 @@ public:
    * should be present in this processor's subset of the mesh data
    * structure.
    *
-   * This method is deprecated; use the less confusingly-named
-   * elem_ptr() instead.
+   * \deprecated Use the less confusingly-named elem_ptr() instead.
    */
   virtual Elem * elem (const dof_id_type i)
   {
@@ -527,8 +526,7 @@ public:
    * Return a pointer to the \f$ i^{th} \f$ element, or NULL if no
    * such element exists in this processor's mesh data structure.
    *
-   * This method is deprecated; use the less confusingly-named
-   * query_elem_ptr() instead.
+   * \deprecated Use the less confusingly-named query_elem_ptr() instead.
    */
   virtual const Elem * query_elem (const dof_id_type i) const
   {
@@ -540,8 +538,7 @@ public:
    * Return a writeable pointer to the \f$ i^{th} \f$ element, or NULL
    * if no such element exists in this processor's mesh data structure.
    *
-   * This method is deprecated; use the less confusingly-named
-   * query_elem_ptr() instead.
+   * \deprecated Use the less confusingly-named query_elem_ptr() instead.
    */
   virtual Elem * query_elem (const dof_id_type i)
   {
@@ -797,7 +794,7 @@ public:
   { return _n_parts; }
 
   /**
-   * @returns a string containing relevant information
+   * \returns a string containing relevant information
    * about the mesh.
    */
   std::string get_info () const;
@@ -837,7 +834,7 @@ public:
    * elements into a mesh with second-order elements.  For
    * example, a mesh consisting of \p Tet4 will be converted
    * to a mesh with \p Tet10 etc.  Note that for some elements
-   * like \p Hex8 there exist @e two higher order equivalents,
+   * like \p Hex8 there exist two higher order equivalents,
    * \p Hex20 and \p Hex27.  When \p full_ordered is \p true
    * (default), then \p Hex27 is built.  Otherwise, \p Hex20
    * is built.  The same holds obviously for \p Quad4, \p Prism6
@@ -883,8 +880,8 @@ public:
   /**
    * \p returns a pointer to a \p PointLocatorBase object for this
    * mesh, constructing a master PointLocator first if necessary.
-   * This should never be used in threaded or non-parallel_only code,
-   * and so is deprecated.
+   *
+   * \deprecated This should never be used in threaded or non-parallel_only code.
    */
   const PointLocatorBase & point_locator () const;
 

@@ -48,14 +48,14 @@ class Elem;
  * \author Benjamin S. Kirk
  * \date 2004
  */
-
-
-// ------------------------------------------------------------
-// MeshTools namespace
 namespace MeshTools
 {
 
-// Backwards compatibility with forward declarations
+/**
+ * Backwards compatibility with forward declarations.
+ *
+ * \deprecated Use libMesh::BoundingBox instead.
+ */
 class BoundingBox : public libMesh::BoundingBox
 {
 public:
@@ -128,11 +128,11 @@ void find_boundary_nodes (const MeshBase & mesh,
                           std::vector<bool> & on_boundary);
 
 /**
- * @returns two points defining a cartesian box that bounds the
+ * \returns two points defining a cartesian box that bounds the
  * mesh.  The first entry in the pair is the mininum, the second
  * is the maximim.
  *
- * This function is now deprecated, use create_bounding_box() instead.
+ * \deprecated Use create_bounding_box() instead.
  */
 BoundingBox
 bounding_box (const MeshBase & mesh);
@@ -151,7 +151,7 @@ Sphere
 bounding_sphere (const MeshBase & mesh);
 
 /**
- * @returns two points defining a cartesian box that bounds the
+ * \returns two points defining a cartesian box that bounds the
  * nodes of the mesh.
  *
  * In the case of curved elements, this box might *not* bound the
@@ -161,7 +161,7 @@ libMesh::BoundingBox
 create_nodal_bounding_box (const MeshBase & mesh);
 
 /**
- * @returns two points defining a cartesian box that bounds the
+ * \returns two points defining a cartesian box that bounds the
  * elements belonging to the local processor.
  *
  * Unlike the other bounding box creation functions, this does *not*
@@ -172,10 +172,10 @@ libMesh::BoundingBox
 create_local_bounding_box (const MeshBase & mesh);
 
 /**
- * @returns two points defining a cartesian box that bounds the
+ * \returns two points defining a cartesian box that bounds the
  * elements belonging to processor pid.
  *
- * This function is now deprecated, use create_processor_bounding_box() instead.
+ * \deprecated Use create_processor_bounding_box() instead.
  */
 BoundingBox
 processor_bounding_box (const MeshBase & mesh,
@@ -197,10 +197,10 @@ processor_bounding_sphere (const MeshBase & mesh,
                            const processor_id_type pid);
 
 /**
- * @returns two points defining a Cartesian box that bounds the
+ * \returns two points defining a Cartesian box that bounds the
  * elements belonging to subdomain sid.
  *
- * This function is now deprecated, use create_subdomain_bounding_box() instead.
+ * \deprecated Use create_subdomain_bounding_box() instead.
  */
 BoundingBox
 subdomain_bounding_box (const MeshBase & mesh,

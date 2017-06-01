@@ -132,7 +132,7 @@ public:
   double smooth(unsigned int n_iterations);
 
   /**
-   * @return max distance a node moved during the last smooth.
+   * \returns max distance a node moved during the last smooth.
    */
   double distance_moved() const { return _distance; }
 

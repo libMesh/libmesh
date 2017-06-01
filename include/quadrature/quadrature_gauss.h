@@ -62,7 +62,7 @@ public:
   ~QGauss() {}
 
   /**
-   * @returns \p QGAUSS.
+   * \returns \p QGAUSS.
    */
   virtual QuadratureType type() const libmesh_override { return QGAUSS; }
 

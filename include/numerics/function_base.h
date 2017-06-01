@@ -95,7 +95,7 @@ public:
   // ------------------------------------------------------
   // misc
   /**
-   * @returns the scalar value at coordinate
+   * \returns the scalar value at coordinate
    * \p p and time \p time, which defaults to zero.
    * Purely virtual, so you have to overload it.
    * Note that this cannot be a const method, check \p MeshFunction.
@@ -127,7 +127,7 @@ public:
                            DenseVector<Output> & output) = 0;
 
   /**
-   * @returns the vector component \p i at coordinate
+   * \returns the vector component \p i at coordinate
    * \p p and time \p time.
    * Subclasses aren't required to overload this, since the default
    * implementation is based on the full vector evaluation, which is
@@ -142,7 +142,7 @@ public:
 
 
   /**
-   * @returns \p true when this object is properly initialized
+   * \returns \p true when this object is properly initialized
    * and ready for use, \p false otherwise.
    */
   bool initialized () const;
@@ -156,7 +156,7 @@ public:
   void set_is_time_dependent( bool is_time_dependent);
 
   /**
-   * @returns \p true when the function this object represents
+   * \returns \p true when the function this object represents
    * is actually time-dependent, \p false otherwise.
    */
   bool is_time_dependent() const;

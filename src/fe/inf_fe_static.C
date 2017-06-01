@@ -346,7 +346,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType & fet,
 
   /*
    * This is quite weird: the phase is actually
-   * a measure how @e advanced the pressure is that
+   * a measure how advanced the pressure is that
    * we compute.  In other words: the further away
    * the node \p data.p is, the further we look into
    * the future...

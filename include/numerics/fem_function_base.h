@@ -72,7 +72,7 @@ public:
 
   /**
    * Returns a new copy of the function.  The new copy should be as
-   * ``deep'' as necessary to allow independent destruction and
+   * "deep" as necessary to allow independent destruction and
    * simultaneous evaluations of the copies in different threads.
    */
   virtual UniquePtr<FEMFunctionBase<Output> > clone () const = 0;
@@ -80,7 +80,7 @@ public:
   // ------------------------------------------------------
   // misc
   /**
-   * @returns the scalar value at coordinate
+   * \returns the scalar value at coordinate
    * \p p and time \p time, which defaults to zero.
    * Purely virtual, so you have to overload it.
    * Note that this cannot be a const method, check \p MeshFunction.
@@ -112,7 +112,7 @@ public:
                            DenseVector<Output> & output) = 0;
 
   /**
-   * @returns the vector component \p i at coordinate
+   * \returns the vector component \p i at coordinate
    * \p p and time \p time.
    * Subclasses aren't required to overload this, since the default
    * implementation is based on the full vector evaluation, which is

@@ -209,10 +209,8 @@ private:
 #ifdef LIBMESH_HAVE_XDR
 
   /**
-   * Pointer to the standard @p xdr
-   * struct.  See the standard
-   * header file rpc/rpc.h
-   * for more information.
+   * Pointer to the standard XDR struct.  See the standard header file
+   * rpc/rpc.h for more information.
    */
   UniquePtr<XDR> xdrs;
 

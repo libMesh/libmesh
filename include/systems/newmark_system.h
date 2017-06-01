@@ -89,7 +89,7 @@ public:
   virtual void assemble () libmesh_override;
 
   /**
-   * @returns \p "Newmark".  Helps in identifying
+   * \returns \p "Newmark".  Helps in identifying
    * the system type in an equation system file.
    */
   virtual std::string system_type () const libmesh_override { return "Newmark"; }

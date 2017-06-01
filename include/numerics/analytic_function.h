@@ -97,7 +97,7 @@ public:
   virtual UniquePtr<FunctionBase<Output> > clone () const libmesh_override;
 
   /**
-   * @returns the value at point \p p and time
+   * \returns the value at point \p p and time
    * \p time, which defaults to zero.
    */
   virtual Output operator() (const Point & p,

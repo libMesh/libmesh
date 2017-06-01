@@ -70,7 +70,7 @@ public:
   virtual UniquePtr<FunctionBase<Output> > clone () const libmesh_override;
 
   /**
-   * @returns the scalar value of variable varnum at coordinate \p p
+   * \returns the scalar value of variable varnum at coordinate \p p
    * and time \p time.
    */
   virtual Output operator() (const Point & p,
@@ -86,7 +86,7 @@ public:
                            DenseVector<Output> & output) libmesh_override;
 
   /**
-   * @returns the vector component \p i at coordinate
+   * \returns the vector component \p i at coordinate
    * \p p and time \p time.
    */
   virtual Output component (unsigned int i,
@@ -184,7 +184,7 @@ void WrappedFunction<Output>::operator() (const Point & p,
 
 
 /**
- * @returns the vector component \p i at coordinate
+ * \returns the vector component \p i at coordinate
  * \p p and time \p time.
  */
 template <typename Output>

@@ -53,24 +53,24 @@ public:
   Tri3Subdivision(Elem * p);
 
   /**
-   * @returns \p TRI3SUBDIVISION.
+   * \returns \p TRI3SUBDIVISION.
    */
   virtual ElemType type () const libmesh_override { return TRI3SUBDIVISION; }
 
   /**
-   * @returns true if the element map is definitely affine within
+   * \returns true if the element map is definitely affine within
    * numerical tolerances.
    */
   virtual bool has_affine_map () const libmesh_override { return false; }
 
   /**
-   * @returns true if the Lagrange shape functions on this element
+   * \returns true if the Lagrange shape functions on this element
    * are linear.
    */
   virtual bool is_linear () const libmesh_override { return false; }
 
   /**
-   * @returns FOURTH.
+   * \returns FOURTH.
    */
   virtual Order default_order() const libmesh_override { return FOURTH; }
 
@@ -82,30 +82,30 @@ public:
   void prepare_subdivision_properties();
 
   /**
-   * @returns \p true if the subdivision element is ready for use,
+   * \returns \p true if the subdivision element is ready for use,
    * i.e. the nodes have been reordered.
    */
   bool is_subdivision_updated() const { return _subdivision_updated; }
 
   /**
-   * @returns a pointer to the node whose ordered id is \p node_id.
+   * \returns a pointer to the node whose ordered id is \p node_id.
    */
   Node * get_ordered_node(unsigned int node_id) const;
 
   /**
-   * @returns the number of nodes connected to the ordered node
+   * \returns the number of nodes connected to the ordered node
    * whose id is \p node_id.
    */
   unsigned int get_ordered_valence(unsigned int node_id) const;
 
   /**
-   * @returns the order number of the node whose unordered id is
+   * \returns the order number of the node whose unordered id is
    * \p node_id. This is the inverse of an \p _ordered_nodes lookup.
    */
   unsigned int local_node_number(unsigned int node_id) const;
 
   /**
-   * @returns \p true if the element is a ghost element.
+   * \returns \p true if the element is a ghost element.
    */
   bool is_ghost() const { return _is_ghost; }
 

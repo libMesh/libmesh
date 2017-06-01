@@ -76,7 +76,7 @@ public:
                                                  const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
-   * @returns true if the data structures are
+   * \returns true if the data structures are
    * initialized, false otherwise.
    */
   bool initialized () const { return _is_initialized; }
@@ -165,13 +165,13 @@ public:
   OptimizationSystem::ComputeLowerAndUpperBounds * lower_and_upper_bounds_object;
 
   /**
-   * @returns a constant reference to the system we are using to
+   * \returns a constant reference to the system we are using to
    * define the optimization problem.
    */
   const sys_type & system () const { return _system; }
 
   /**
-   * @returns a writeable reference to the system we are using to
+   * \returns a writeable reference to the system we are using to
    * define the optimization problem.
    */
   sys_type & system () { return _system; }

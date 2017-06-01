@@ -132,7 +132,7 @@ public:
   }
 
   /**
-   * @returns the value corresponding to \p key
+   * \returns the value corresponding to \p key
    */
   const Tp & operator[](const key_type & key) const
   {

@@ -50,12 +50,12 @@ public:
     Elem (nn, ns, p, elemlinkdata, nodelinkdata) {}
 
   /**
-   * @returns 3, the dimensionality of the object.
+   * \returns 3, the dimensionality of the object.
    */
   virtual unsigned int dim () const libmesh_override { return 3; }
 
   /**
-   * @return a bounding box (not necessarily the minimal bounding box)
+   * \returns a bounding box (not necessarily the minimal bounding box)
    * containing the geometric element.
    */
   virtual BoundingBox loose_bounding_box () const libmesh_override;
@@ -63,7 +63,7 @@ public:
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
-   * @returns \p false.  All classes derived from \p Cell
+   * \returns \p false.  All classes derived from \p Cell
    * are finite elements.
    */
   virtual bool infinite () const libmesh_override { return false; }

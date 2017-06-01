@@ -128,7 +128,7 @@ public:
                Real tol = TOLERANCE) const;
 
   /**
-   * @returns \p true when this object is properly initialized
+   * \returns \p true when this object is properly initialized
    * and ready for use, \p false otherwise.
    */
   bool initialized () const;

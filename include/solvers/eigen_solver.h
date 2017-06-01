@@ -76,7 +76,7 @@ public:
                                           const SolverPackage solver_package = SLEPC_SOLVERS);
 
   /**
-   * @returns true if the data structures are
+   * \returns true if the data structures are
    * initialized, false otherwise.
    */
   bool initialized () const { return _is_initialized; }

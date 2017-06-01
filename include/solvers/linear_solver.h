@@ -80,7 +80,7 @@ public:
                                            const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
-   * @returns true if the data structures are
+   * \returns true if the data structures are
    * initialized, false otherwise.
    */
   bool initialized () const { return _is_initialized; }
@@ -139,7 +139,7 @@ public:
   virtual void reuse_preconditioner(bool );
 
   /**
-   * @return same_preconditioner, which indicates if we reuse the
+   * \returns same_preconditioner, which indicates if we reuse the
    * same preconditioner for subsequent solves.
    */
   bool get_same_preconditioner();

@@ -311,13 +311,13 @@ public:
   Elem * add_elem (Elem * elem);
 
   /**
-   * @returns a constant reference to the \p MeshBase object associated
+   * \returns a constant reference to the \p MeshBase object associated
    * with this object.
    */
   const MeshBase & get_mesh () const { return _mesh; }
 
   /**
-   * @returns a writeable reference to the \p MeshBase object associated
+   * \returns a writeable reference to the \p MeshBase object associated
    * with this object.
    */
   MeshBase & get_mesh () { return _mesh; }
@@ -467,14 +467,16 @@ public:
   /**
    * Returns the state of the _enforce_mismatch_limit_prior_to_refinement flag.
    * Defaults to false.
-   * Deprecated - use enforce_mismatch_limit_prior_to_refinement() instead.
+   *
+   * \deprecated Use enforce_mismatch_limit_prior_to_refinement() instead.
    */
   bool get_enforce_mismatch_limit_prior_to_refinement();
 
   /**
    * Set _enforce_mismatch_limit_prior_to_refinement option.
    * Defaults to false.
-   * Deprecated - use enforce_mismatch_limit_prior_to_refinement() instead.
+   *
+   * \deprecated Use enforce_mismatch_limit_prior_to_refinement() instead.
    */
   void set_enforce_mismatch_limit_prior_to_refinement(bool enforce);
 

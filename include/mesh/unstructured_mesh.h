@@ -60,9 +60,12 @@ public:
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
   /**
-   * Deprecated constructor.  Takes \p dim, the dimension of the mesh.
-   * The mesh dimension can be changed (and may automatically be
-   * changed by mesh generation/loading) later.
+   * Constructor which takes \p dim, the dimension of the mesh.  The
+   * mesh dimension can be changed (and may automatically be changed
+   * by mesh generation/loading) later.
+   *
+   * \deprecated LIBMESH_DISABLE_COMMWORLD is now the default, use the
+   * constructor that takes a Parallel::Communicator instead.
    */
   UnstructuredMesh (unsigned char dim=1);
 #endif
@@ -117,7 +120,7 @@ public:
    * elements into a mesh with second-order elements.  For
    * example, a mesh consisting of \p Tet4 will be converted
    * to a mesh with \p Tet10 etc.  Note that for some elements
-   * like \p Hex8 there exist @e two higher order equivalents,
+   * like \p Hex8 there exist two higher order equivalents,
    * \p Hex20 and \p Hex27.  When \p full_ordered is \p true
    * (default), then \p Hex27 is built.  Otherwise, \p Hex20
    * is built.  The same holds obviously for \p Quad4, \p Prism6

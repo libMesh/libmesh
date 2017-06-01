@@ -98,7 +98,7 @@ public:
   virtual void close () libmesh_override;
 
   /**
-   * @returns the \p DistributedVector to a pristine state.
+   * \returns the \p DistributedVector to a pristine state.
    */
   virtual void clear () libmesh_override;
 
@@ -182,46 +182,46 @@ public:
   virtual NumericVector<T> & operator= (const std::vector<T> & v) libmesh_override;
 
   /**
-   * @returns the minimum element in the vector.
+   * \returns the minimum element in the vector.
    * In case of complex numbers, this returns the minimum
    * Real part.
    */
   virtual Real min () const libmesh_override;
 
   /**
-   * @returns the maximum element in the vector.
+   * \returns the maximum element in the vector.
    * In case of complex numbers, this returns the maximum
    * Real part.
    */
   virtual Real max () const libmesh_override;
 
   /**
-   * @returns the sum of all values in the vector
+   * \returns the sum of all values in the vector
    */
   virtual T sum() const libmesh_override;
 
   /**
-   * @returns the \f$l_1\f$-norm of the vector, i.e.
+   * \returns the \f$ l_1 \f$-norm of the vector, i.e.
    * the sum of the absolute values.
    */
   virtual Real l1_norm () const libmesh_override;
 
   /**
-   * @returns the \f$l_2\f$-norm of the vector, i.e.
+   * \returns the \f$l_2\f$-norm of the vector, i.e.
    * the square root of the sum of the
    * squares of the elements.
    */
   virtual Real l2_norm () const libmesh_override;
 
   /**
-   * @returns the maximum absolute value of the
+   * \returns the maximum absolute value of the
    * elements of this vector, which is the
    * \f$l_\infty\f$-norm of a vector.
    */
   virtual Real linfty_norm () const libmesh_override;
 
   /**
-   * @returns dimension of the vector. This
+   * \returns dimension of the vector. This
    * function was formerly called \p n(), but
    * was renamed to get the \p DistributedVector class
    * closer to the C++ standard library's
@@ -230,19 +230,19 @@ public:
   virtual numeric_index_type size () const libmesh_override;
 
   /**
-   * @returns the local size of the vector
+   * \returns the local size of the vector
    * (index_stop-index_start)
    */
   virtual numeric_index_type local_size() const libmesh_override;
 
   /**
-   * @returns the index of the first vector element
+   * \returns the index of the first vector element
    * actually stored on this processor
    */
   virtual numeric_index_type first_local_index() const libmesh_override;
 
   /**
-   * @returns the index of the last vector element
+   * \returns the index of the last vector element
    * actually stored on this processor
    */
   virtual numeric_index_type last_local_index() const libmesh_override;
@@ -321,7 +321,7 @@ public:
    * \f$U+=A*V\f$.
    * Add the product of a Sparse matrix \p A
    * and a Numeric vector \p V to this Numeric vector.
-   * @e Not @e implemented.
+   * Not implemented.
    */
   virtual void add_vector (const NumericVector<T> &,
                            const SparseMatrix<T> &) libmesh_override
@@ -331,7 +331,7 @@ public:
    * \f$U+=A^T*V\f$.
    * Add the product of the transpose of a Sparse matrix \p A_trans
    * and a Numeric vector \p V to this Numeric vector.
-   * @e Not @e implemented.
+   * Not implemented.
    */
   virtual void add_vector_transpose (const NumericVector<T> &,
                                      const SparseMatrix<T> &) libmesh_override

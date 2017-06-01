@@ -50,12 +50,12 @@ public:
     Elem(nn, ns, p, elemlinkdata, nodelinkdata) {}
 
   /**
-   * @returns 2, the dimensionality of the object.
+   * \returns 2, the dimensionality of the object.
    */
   virtual unsigned int dim () const libmesh_override { return 2; }
 
   /**
-   * @returns 0.  All 2D elements have no faces, just
+   * \returns 0.  All 2D elements have no faces, just
    * edges.
    */
   virtual unsigned int n_faces() const libmesh_override { return 0; }
@@ -76,7 +76,7 @@ public:
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
-   * @returns \p false.  All classes derived from \p Face
+   * \returns \p false.  All classes derived from \p Face
    * are finite elements.
    */
   virtual bool infinite () const libmesh_override { return false; }

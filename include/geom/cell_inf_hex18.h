@@ -80,49 +80,49 @@ public:
   {}
 
   /**
-   * @returns 18.  The \p InfHex18 has 18 nodes.
+   * \returns 18.  The \p InfHex18 has 18 nodes.
    */
   virtual unsigned int n_nodes() const libmesh_override { return 18; }
 
   /**
-   * @returns \p INFHEX18.
+   * \returns \p INFHEX18.
    */
   virtual ElemType type () const libmesh_override { return INFHEX18; }
 
   /**
-   * @returns 4.
+   * \returns 4.
    */
   virtual unsigned int n_sub_elem() const libmesh_override { return 4; }
 
   /**
-   * @returns SECOND.
+   * \returns SECOND.
    */
   virtual Order default_order() const libmesh_override { return SECOND; }
 
   /**
-   * @returns true if the specified (local) node number is a vertex.
+   * \returns true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is an edge.
+   * \returns true if the specified (local) node number is an edge.
    */
   virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is a face.
+   * \returns true if the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is on the
+   * \returns true if the specified (local) node number is on the
    * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
                                const unsigned int s) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is on the
+   * \returns true if the specified (local) node number is on the
    * specified edge.
    */
   virtual bool is_node_on_edge(const unsigned int n,
@@ -149,7 +149,7 @@ public:
   using Elem::key;
 
   /**
-   * @returns an id associated with the \p s side of this element.
+   * \returns an id associated with the \p s side of this element.
    * The id is not necessarily unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    *
@@ -173,12 +173,12 @@ public:
   { return 12; }
 
   /**
-   * @returns 2 for all edge nodes, 4 for face nodes.
+   * \returns 2 for all edge nodes, 4 for face nodes.
    */
   virtual unsigned int n_second_order_adjacent_vertices (const unsigned int) const libmesh_override;
 
   /**
-   * @returns the element-local number of the  \f$ v^{th} \f$ vertex
+   * \returns the element-local number of the  \f$ v^{th} \f$ vertex
    * that defines the \f$ n^{th} \f$ second-order node.
    * Note that \p n is counted as depicted above, \f$ 8 \le n < 18 \f$.
    */
@@ -186,7 +186,7 @@ public:
                                                            const unsigned int v) const libmesh_override;
 
   /**
-   * @returns the child number \p c and element-local index \p v of the
+   * \returns the child number \p c and element-local index \p v of the
    * \f$ n^{th} \f$ second-order node on the parent element.  See
    * elem.h for further details.
    */

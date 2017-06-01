@@ -54,7 +54,7 @@ public:
   ~QGaussLobatto();
 
   /**
-   * @returns \p QGAUSS_LOBATTO.
+   * \returns \p QGAUSS_LOBATTO.
    */
   virtual QuadratureType type() const libmesh_override { return QGAUSS_LOBATTO; }
 

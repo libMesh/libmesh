@@ -305,7 +305,7 @@ public:
   }
 
   /**
-   * @returns the default quadrature order for this \p FEType.  The
+   * \returns the default quadrature order for this \p FEType.  The
    * default quadrature order is calculated assuming a polynomial of
    * degree \p order and is based on integrating the mass matrix for
    * such an element exactly.
@@ -313,7 +313,7 @@ public:
   Order default_quadrature_order () const;
 
   /**
-   * @returns a quadrature rule of appropriate type and order for this \p
+   * \returns a quadrature rule of appropriate type and order for this \p
    * FEType.  The default quadrature rule is based on integrating the mass
    * matrix for such an element exactly.  Higher or lower degree rules can
    * be chosen by changing the extraorder parameter.

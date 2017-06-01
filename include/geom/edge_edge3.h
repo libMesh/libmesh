@@ -52,7 +52,7 @@ public:
     Edge(Edge3::n_nodes(), p, _nodelinks_data) {}
 
   /**
-   * @returns the \p Point associated with local \p Node \p i,
+   * \returns the \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
   virtual Point master_point (const unsigned int i) const libmesh_override
@@ -64,57 +64,57 @@ public:
   }
 
   /**
-   * @returns 3.
+   * \returns 3.
    */
   virtual unsigned int n_nodes() const libmesh_override { return 3; }
 
   /**
-   * @returns 2.
+   * \returns 2.
    */
   virtual unsigned int n_sub_elem() const libmesh_override { return 2; }
 
   /**
-   * @returns true if the specified (local) node number is a vertex.
+   * \returns true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is an edge.
+   * \returns true if the specified (local) node number is an edge.
    */
   virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is a face.
+   * \returns true if the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is on the
+   * \returns true if the specified (local) node number is on the
    * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
                                const unsigned int s) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is on the
+   * \returns true if the specified (local) node number is on the
    * specified edge (i.e. "returns true" in 1D).
    */
   virtual bool is_node_on_edge(const unsigned int n,
                                const unsigned int e) const libmesh_override;
 
   /**
-   * @returns true if the element map is definitely affine within
+   * \returns true if the element map is definitely affine within
    * numerical tolerances.
    */
   virtual bool has_affine_map () const libmesh_override;
 
   /**
-   * @returns \p EDGE3.
+   * \returns \p EDGE3.
    */
   virtual ElemType type() const libmesh_override { return EDGE3; }
 
   /**
-   * @returns SECOND.
+   * \returns SECOND.
    */
   virtual Order default_order() const libmesh_override { return SECOND; }
 
@@ -123,13 +123,13 @@ public:
                             std::vector<dof_id_type> & conn) const libmesh_override;
 
   /**
-   * @returns 2 for all \p n.
+   * \returns 2 for all \p n.
    */
   virtual unsigned int n_second_order_adjacent_vertices (const unsigned int) const libmesh_override
   { return 2; }
 
   /**
-   * @returns the element-local number of the  \f$ v^{th} \f$ vertex
+   * \returns the element-local number of the  \f$ v^{th} \f$ vertex
    * that defines the \f$ n^{th} \f$ second-order node.
    */
   virtual unsigned short int second_order_adjacent_vertex (const unsigned int,
@@ -137,7 +137,7 @@ public:
   { return static_cast<unsigned short int>(v); }
 
   /**
-   * @returns the child number \p c and element-local index \p v of the
+   * \returns the child number \p c and element-local index \p v of the
    * \f$ n^{th} \f$ second-order node on the parent element.  See
    * elem.h for further details.
    */
@@ -150,7 +150,7 @@ public:
   virtual Real volume () const libmesh_override;
 
   /**
-   * @return a bounding box (not necessarily the minimal bounding box)
+   * \returns a bounding box (not necessarily the minimal bounding box)
    * containing the edge.
    */
   virtual BoundingBox loose_bounding_box () const libmesh_override;
@@ -158,7 +158,7 @@ public:
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
-   * @returns \p false.  This is a finite element.
+   * \returns \p false.  This is a finite element.
    */
   virtual bool infinite () const libmesh_override { return false; }
 

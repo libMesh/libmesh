@@ -60,13 +60,13 @@ public:
   virtual ~ShellMatrix ();
 
   /**
-   * @returns \p m, the row-dimension of the matrix where the marix is
+   * \returns \p m, the row-dimension of the matrix where the marix is
    * \f$ M \times N \f$.
    */
   virtual numeric_index_type m () const = 0;
 
   /**
-   * @returns \p n, the column-dimension of the matrix where the marix
+   * \returns \p n, the column-dimension of the matrix where the marix
    * is \f$ M \times N \f$.
    */
   virtual numeric_index_type n () const = 0;

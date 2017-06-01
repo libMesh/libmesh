@@ -116,11 +116,11 @@ namespace libMesh
 {
 
 /**
- *  A wrapper class to provide AutoPtr with reference semantics.  For
- *  example, an AutoPtr can be assigned (or constructed from) the result of
- *  a function which returns an AutoPtr by value.
+ * A wrapper class to provide AutoPtr with reference semantics.  For
+ * example, an AutoPtr can be assigned (or constructed from) the result of
+ * a function which returns an AutoPtr by value.
  *
- *  All the AutoPtrRef stuff should happen behind the scenes.
+ * All the AutoPtrRef stuff should happen behind the scenes.
  */
 template<typename Tp1>
 struct AutoPtrRef
@@ -140,24 +140,24 @@ struct AutoPtrRef
 
 
 /**
- *  @brief  A simple smart pointer providing strict ownership semantics.
+ * \brief  A simple smart pointer providing strict ownership semantics.
  *
- *  The Standard says:
- *  <pre>
- *  An @c AutoPtr owns the object it holds a pointer to.  Copying an
- *  @c AutoPtr copies the pointer and transfers ownership to the destination.
- *  If more than one @c AutoPtr owns the same object at the same time the
- *  behavior of the program is undefined.
+ * The Standard says:
+ * <pre>
+ * An AutoPtr owns the object it holds a pointer to.  Copying an
+ * AutoPtr copies the pointer and transfers ownership to the destination.
+ * If more than one AutoPtr owns the same object at the same time the
+ * behavior of the program is undefined.
  *
- *  The uses of @c AutoPtr include providing temporary exception-safety for
- *  dynamically allocated memory, passing ownership of dynamically allocated
- *  memory to a function, and returning dynamically allocated memory from a
- *  function.  @c AutoPtr does not meet the CopyConstructible and Assignable
- *  requirements for Standard Library <a href="tables.html#65">container</a>
- *  elements and thus instantiating a Standard Library container with an
- *  @c AutoPtr results in undefined behavior.
- *  </pre>
- *  Quoted from [20.4.5]/3.
+ * The uses of AutoPtr include providing temporary exception-safety for
+ * dynamically allocated memory, passing ownership of dynamically allocated
+ * memory to a function, and returning dynamically allocated memory from a
+ * function.  AutoPtr does not meet the CopyConstructible and Assignable
+ * requirements for Standard Library <a href="tables.html#65">container</a>
+ * elements and thus instantiating a Standard Library container with an
+ * AutoPtr results in undefined behavior.
+ * </pre>
+ * Quoted from [20.4.5]/3.
  *
  * This class is adopted from the GCC 3.2.1 source tree and should
  * function as a replacement for \p std::auto_ptr<>.  Unfortunately
@@ -223,10 +223,10 @@ public:
   typedef Tp element_type;
 
   /**
-   *  @brief  An %AutoPtr is usually constructed from a raw pointer.
-   *  @param  p  A pointer (defaults to NULL).
+   * \brief  An AutoPtr is usually constructed from a raw pointer.
+   * \param  p  A pointer (defaults to NULL).
    *
-   *  This object now @e owns the object pointed to by @a p.
+   * This object now owns the object pointed to by \p p.
    */
   explicit
   AutoPtr(element_type * p = 0)
@@ -238,11 +238,11 @@ public:
   }
 
   /**
-   *  @brief  An %AutoPtr can be constructed from another %AutoPtr.
-   *  @param  a  Another %AutoPtr of the same type.
+   * \brief  An AutoPtr can be constructed from another AutoPtr.
+   * \param  a  Another AutoPtr of the same type.
    *
-   *  This object now @e owns the object previously owned by @a a, which has
-   *  given up ownsership.
+   * This object now owns the object previously owned by \p a, which has
+   * given up ownsership.
    */
   AutoPtr(AutoPtr & a)
     : _ptr(a.release())
@@ -250,13 +250,13 @@ public:
   }
 
   /**
-   *  @brief  An %AutoPtr can be constructed from another %AutoPtr.
-   *  @param  a  Another %AutoPtr of a different but related type.
+   * \brief  An AutoPtr can be constructed from another AutoPtr.
+   * \param  a  Another AutoPtr of a different but related type.
    *
-   *  A pointer-to-Tp1 must be convertible to a pointer-to-Tp/element_type.
+   * A pointer-to-Tp1 must be convertible to a pointer-to-Tp/element_type.
    *
-   *  This object now @e owns the object previously owned by @a a, which has
-   *  given up ownsership.
+   * This object now owns the object previously owned by \p a, which has
+   * given up ownsership.
    */
   template<typename Tp1>
   AutoPtr(AutoPtr<Tp1> & a)
@@ -265,12 +265,12 @@ public:
   }
 
   /**
-   *  @brief  %AutoPtr assignment operator.
-   *  @param  a  Another %AutoPtr of the same type.
+   * \brief  AutoPtr assignment operator.
+   * \param  a  Another AutoPtr of the same type.
    *
-   *  This object now @e owns the object previously owned by @a a, which has
-   *  given up ownsership.  The object that this one @e used to own and
-   *  track has been deleted.
+   * This object now owns the object previously owned by \p a, which has
+   * given up ownsership.  The object that this one used to own and
+   * track has been deleted.
    */
   AutoPtr &
   operator=(AutoPtr & a)
@@ -280,14 +280,14 @@ public:
   }
 
   /**
-   *  @brief  %AutoPtr assignment operator.
-   *  @param  a  Another %AutoPtr of a different but related type.
+   * \brief  AutoPtr assignment operator.
+   * \param  a  Another AutoPtr of a different but related type.
    *
-   *  A pointer-to-Tp1 must be convertible to a pointer-to-Tp/element_type.
+   * A pointer-to-Tp1 must be convertible to a pointer-to-Tp/element_type.
    *
-   *  This object now @e owns the object previously owned by @a a, which has
-   *  given up ownsership.  The object that this one @e used to own and
-   *  track has been deleted.
+   * This object now owns the object previously owned by \p a, which has
+   * given up ownsership.  The object that this one used to own and
+   * track has been deleted.
    */
   template <typename Tp1>
   AutoPtr &
@@ -298,16 +298,14 @@ public:
   }
 
   /**
-   *  When the %AutoPtr goes out of scope, the object it owns is deleted.
-   *  If it no longer owns anything (i.e., @c get() is @c NULL), then this
-   *  has no effect.
+   * When the AutoPtr goes out of scope, the object it owns is deleted.
+   * If it no longer owns anything (i.e., \p get() is \p NULL), then this
+   * has no effect.
    *
-   *  @if maint
-   *  The C++ standard says there is supposed to be an empty throw
-   *  specification here, but omitting it is standard conforming.  Its
-   *  presence can be detected only if _Tp::~_Tp() throws, but this is
-   *  prohibited.  [17.4.3.6]/2
-   *  @endif maint
+   * The C++ standard says there is supposed to be an empty throw
+   * specification here, but omitting it is standard conforming.  Its
+   * presence can be detected only if _Tp::~_Tp() throws, but this is
+   * prohibited.  [17.4.3.6]/2
    */
   ~AutoPtr()
   {
@@ -320,48 +318,48 @@ public:
   }
 
   /**
-   *  @brief  Smart pointer dereferencing.
+   * \brief  Smart pointer dereferencing.
    *
-   *  If this %AutoPtr no longer owns anything, then this operation will
-   *  crash.  (For a smart pointer, "no longer owns anything" is the same as
-   *  being a null pointer, and you know what happens when you dereference
-   *  one of those...)
+   * If this AutoPtr no longer owns anything, then this operation will
+   * crash.  (For a smart pointer, "no longer owns anything" is the same as
+   * being a null pointer, and you know what happens when you dereference
+   * one of those...)
    */
   element_type &
   operator*() const  { return *_ptr; }
 
   /**
-   *  @brief  Smart pointer dereferencing.
+   * \brief  Smart pointer dereferencing.
    *
-   *  This returns the pointer itself, which the language then will
-   *  automatically cause to be dereferenced.
+   * This returns the pointer itself, which the language then will
+   * automatically cause to be dereferenced.
    */
   element_type *
   operator->() const  { return _ptr; }
 
   /**
-   *  @brief  Bypassing the smart pointer.
-   *  @return  The raw pointer being managed.
+   * \brief  Bypassing the smart pointer.
+   * \returns  The raw pointer being managed.
    *
-   *  You can get a copy of the pointer that this object owns, for
-   *  situations such as passing to a function which only accepts a raw
-   *  pointer.
+   * You can get a copy of the pointer that this object owns, for
+   * situations such as passing to a function which only accepts a raw
+   * pointer.
    *
-   *  @note  This %AutoPtr still owns the memory.
+   * \note  This AutoPtr still owns the memory.
    */
   element_type *
   get() const  { return _ptr; }
 
   /**
-   *  @brief  Bypassing the smart pointer.
-   *  @return  The raw pointer being managed.
+   * \brief  Bypassing the smart pointer.
+   * \returns  The raw pointer being managed.
    *
-   *  You can get a copy of the pointer that this object owns, for
-   *  situations such as passing to a function which only accepts a raw
-   *  pointer.
+   * You can get a copy of the pointer that this object owns, for
+   * situations such as passing to a function which only accepts a raw
+   * pointer.
    *
-   *  @note  This %AutoPtr no longer owns the memory.  When this object
-   *  goes out of scope, nothing will happen.
+   * \note  This AutoPtr no longer owns the memory.  When this object
+   * goes out of scope, nothing will happen.
    */
   element_type *
   release()
@@ -372,11 +370,11 @@ public:
   }
 
   /**
-   *  @brief  Forcibly deletes the managed object.
-   *  @param  p  A pointer (defaults to NULL).
+   * \brief  Forcibly deletes the managed object.
+   * \param  p  A pointer (defaults to NULL).
    *
-   *  This object now @e owns the object pointed to by @a p.  The previous
-   *  object has been deleted.
+   * This object now owns the object pointed to by \p p.  The previous
+   * object has been deleted.
    */
   void
   reset(element_type * p = 0)
@@ -388,25 +386,26 @@ public:
       }
   }
 
-  /** @{
-   *  @brief  Automatic conversions
+  /**
+   * \brief  Automatic conversions
    *
-   *  These operations convert an %AutoPtr into and from an AutoPtrRef
-   *  automatically as needed.  This allows constructs such as
-   *  @code
-   *    AutoPtr<Derived>  func_returning_AutoPtr(.....);
-   *    ...
-   *    AutoPtr<Base> ptr = func_returning_AutoPtr(.....);
-   *  @endcode
+   * These operations convert an AutoPtr into and from an AutoPtrRef
+   * automatically as needed.  This allows constructs such as
+   * \code
+   *   AutoPtr<Derived>  func_returning_AutoPtr(.....);
+   *   ...
+   *   AutoPtr<Base> ptr = func_returning_AutoPtr(.....);
+   * \endcode
    */
   AutoPtr(AutoPtrRef<element_type> ref)
     : _ptr(ref._ptr) {}
 
   /**
    * op= for AutoPtr.  Allows you to write:
-   * @code
+   *
+   * \code
    * AutoPtr<Base> ptr = func_returning_AutoPtr(.....);
-   * @endcode
+   * \endcode
    */
   AutoPtr &
   operator=(AutoPtrRef<element_type> ref)
@@ -422,7 +421,13 @@ public:
   /**
    * A "safe" replacement for operator bool () that behaves more like
    * an explicit conversion operator even in C++98. This allows code
-   * like if (!foo) to work with AutoPtr.
+   * like:
+   *
+   * \code
+   * if(!foo)
+   * \endcode
+   *
+   * to work with AutoPtr.
    */
   bool boolean_test() const
   {

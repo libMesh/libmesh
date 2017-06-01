@@ -166,12 +166,12 @@ public:
   virtual void before_timestep () {}
 
   /**
-   * @returns a constant reference to the system we are solving.
+   * \returns a constant reference to the system we are solving.
    */
   const sys_type & system () const { return _system; }
 
   /**
-   * @returns a writeable reference to the system we are solving.
+   * \returns a writeable reference to the system we are solving.
    */
   sys_type & system () { return _system; }
 

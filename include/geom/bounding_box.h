@@ -94,6 +94,12 @@ public:
    */
   bool intersects (const BoundingBox &) const;
 
+  /**
+   * Returns true iff the other bounding box has a non-empty
+   * intersection with this bounding box.
+   *
+   * \deprecated Use the BoundingBox::intersects() function instead.
+   */
   bool intersect (const BoundingBox & b) const
   { libmesh_deprecated(); return this->intersects(b); }
 

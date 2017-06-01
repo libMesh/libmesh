@@ -53,7 +53,7 @@ public:
     Edge(Edge4::n_nodes(), p, _nodelinks_data) {}
 
   /**
-   * @returns the \p Point associated with local \p Node \p i,
+   * \returns the \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
   virtual Point master_point (const unsigned int i) const libmesh_override
@@ -65,57 +65,57 @@ public:
   }
 
   /**
-   * @returns 4.
+   * \returns 4.
    */
   virtual unsigned int n_nodes() const libmesh_override { return 4; }
 
   /**
-   * @returns 2.
+   * \returns 2.
    */
   virtual unsigned int n_sub_elem() const libmesh_override { return 2; }
 
   /**
-   * @returns true if the specified (local) node number is a vertex.
+   * \returns true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is an edge.
+   * \returns true if the specified (local) node number is an edge.
    */
   virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is a face.
+   * \returns true if the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is on the
+   * \returns true if the specified (local) node number is on the
    * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
                                const unsigned int s) const libmesh_override;
 
   /**
-   * @returns true if the specified (local) node number is on the
+   * \returns true if the specified (local) node number is on the
    * specified edge (i.e. "returns true" in 1D).
    */
   virtual bool is_node_on_edge(const unsigned int n,
                                const unsigned int e) const libmesh_override;
 
   /**
-   * @returns true if the element map is definitely affine within
+   * \returns true if the element map is definitely affine within
    * numerical tolerances.
    */
   virtual bool has_affine_map () const libmesh_override;
 
   /**
-   * @returns \p EDGE4.
+   * \returns \p EDGE4.
    */
   virtual ElemType type() const libmesh_override { return EDGE4; }
 
   /**
-   * @returns THIRD.
+   * \returns THIRD.
    */
   virtual Order default_order() const libmesh_override { return THIRD; }
 
@@ -137,7 +137,7 @@ public:
   { libmesh_not_implemented(); return 0; }
 
   /**
-   * @return a bounding box (not necessarily the minimal bounding box)
+   * \returns a bounding box (not necessarily the minimal bounding box)
    * containing the edge.
    */
   virtual BoundingBox loose_bounding_box () const libmesh_override;
@@ -145,7 +145,7 @@ public:
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
-   * @returns \p false.  This is a finite element.
+   * \returns \p false.  This is a finite element.
    */
   virtual bool infinite () const libmesh_override { return false; }
 
@@ -157,7 +157,7 @@ public:
   using Edge::key;
 
   /**
-   * @returns an id associated with the global node ids of this
+   * \returns an id associated with the global node ids of this
    * element.  The id is not necessarily unique, but should be
    * close.
    */
