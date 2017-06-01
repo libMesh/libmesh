@@ -1226,6 +1226,10 @@ public:
 
   /**
    * Reads additional data, namely vectors, for this System.
+   *
+   * \deprecated The ability to read XDR data files in the old (aka
+   * "legacy") XDR format has been deprecated for many years, this
+   * capability may soon disappear altogether.
    */
   void read_legacy_data (Xdr & io,
                          const bool read_additional_data=true);

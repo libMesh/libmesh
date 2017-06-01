@@ -132,8 +132,7 @@ public:
   /**
    * @returns the global id number of local \p Node \p i.
    *
-   * This method is deprecated; use the less ambiguously named
-   * node_id() instead.
+   * \deprecated Use the less ambiguously named node_id() instead.
    */
   dof_id_type node (const unsigned int i) const;
 
@@ -177,8 +176,7 @@ public:
   /**
    * @returns the pointer to local \p Node \p i.
    *
-   * This method is deprecated.  Use the more consistently and less
-   * confusingly named node_ptr() instead.
+   * \deprecated Use the less ambiguously named node_ptr() instead.
    */
   Node * get_node (const unsigned int i) const;
 
@@ -262,8 +260,7 @@ public:
   Elem * neighbor_ptr (unsigned int i);
 
   /**
-   * This function is deprecated.  Use the more specifically named and
-   * const-correct neighbor_ptr() functions instead.
+   * \deprecated Use the const-correct neighbor_ptr() function instead.
    */
   Elem * neighbor (const unsigned int i) const;
 
@@ -681,7 +678,7 @@ public:
   /**
    * @returns a proxy element coincident with side \p i.
    *
-   * This method is deprecated and will be removed, since it
+   * \deprecated This method will eventually be removed since it
    * returns a non-const pointer to a side that could be used to
    * indirectly modify this.  Please use the the const-correct
    * side_ptr() function instead.
@@ -714,7 +711,7 @@ public:
   /**
    * @returns a proxy element coincident with side \p i.
    *
-   * This method is deprecated and will be removed, since it
+   * \deprecated This method will eventually be removed since it
    * returns a non-const pointer to a side that could be used to
    * indirectly modify this.  Please use the the const-correct
    * build_side_ptr() function instead.
@@ -739,9 +736,9 @@ public:
   /**
    * Creates an element coincident with edge \p i.
    *
-   * This is deprecated and will be removed, since it
+   * \deprecated This method will eventually be removed since it
    * returns a non-const pointer to an edge that could be used to
-   * indirectly modify this.  Please use the the const-correct
+   * indirectly modify this Elem.  Please use the the const-correct
    * build_edge_ptr() function instead.
    */
   UniquePtr<Elem> build_edge (const unsigned int i) const;
@@ -1062,8 +1059,10 @@ public:
   Elem * child_ptr (unsigned int i);
 
   /**
-   * This function is now deprecated, use the more accurately-named and
-   * const correct child_ptr() function instead.
+   * @returns a non-constant pointer to the \f$ i^{th} \f$ child for this element.
+   *
+   * \deprecated Use the more accurately-named and const correct
+   * child_ptr() function instead.
    */
   Elem * child (const unsigned int i) const;
 

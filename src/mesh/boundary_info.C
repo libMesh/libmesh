@@ -1256,10 +1256,6 @@ void BoundaryInfo::raw_shellface_boundary_ids (const Elem * const elem,
 boundary_id_type BoundaryInfo::boundary_id(const Elem * const elem,
                                            const unsigned short int side) const
 {
-  // Asking for just one boundary id means your code isn't safe to use
-  // on meshes with overlapping boundary ids.  Try using
-  // BoundaryInfo::boundary_ids or BoundaryInfo::has_boundary_id
-  // instead.
   libmesh_deprecated();
 
   std::vector<boundary_id_type> ids;

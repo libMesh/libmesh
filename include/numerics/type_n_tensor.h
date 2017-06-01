@@ -154,6 +154,8 @@ public:
   /**
    * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
    * element magnitudes squared.
+   *
+   * \deprecated Use the norm_sq() function instead.
    */
   Real size_sq() const { libmesh_deprecated(); return 0.;}
 

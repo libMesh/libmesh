@@ -119,7 +119,10 @@ public:
   /**
    * Builds a \p NumericVector on the processors in communicator
    * CommWorld using the linear solver package specified by \p
-   * solver_package.  Deprecated.
+   * solver_package.
+   *
+   * \deprecated LIBMESH_DISABLE_COMMWORLD is now the default, use the
+   * build() method that takes a Parallel::Communicator instead.
    */
   static UniquePtr<NumericVector<T> >
   build(const SolverPackage solver_package = libMesh::default_solver_package());

@@ -467,14 +467,16 @@ public:
   /**
    * Returns the state of the _enforce_mismatch_limit_prior_to_refinement flag.
    * Defaults to false.
-   * Deprecated - use enforce_mismatch_limit_prior_to_refinement() instead.
+   *
+   * \deprecated Use enforce_mismatch_limit_prior_to_refinement() instead.
    */
   bool get_enforce_mismatch_limit_prior_to_refinement();
 
   /**
    * Set _enforce_mismatch_limit_prior_to_refinement option.
    * Defaults to false.
-   * Deprecated - use enforce_mismatch_limit_prior_to_refinement() instead.
+   *
+   * \deprecated Use enforce_mismatch_limit_prior_to_refinement() instead.
    */
   void set_enforce_mismatch_limit_prior_to_refinement(bool enforce);
 

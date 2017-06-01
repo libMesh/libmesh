@@ -241,8 +241,8 @@ public:
    * any system which reimplements mass_residual() may have to reimplement
    * time_evolving() to prepare data structures.
    *
-   * This method is deprecated. Instead, use the time_evolving override
-   * and specify the order-in-time of the variable, either 1 or 2. This method
+   * \deprecated Instead, use the time_evolving override and specify
+   * the order-in-time of the variable, either 1 or 2. This method
    * assumes the variable is first order for backward compatibility.
    */
   virtual void time_evolving (unsigned int var)

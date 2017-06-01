@@ -200,8 +200,11 @@ public:
 
   /**
    * Remove the system named \p name from the systems array.
-   * This function is now deprecated - write the
-   * libmesh-devel mailing list if you need it reimplemented.
+   *
+   * \deprecated This function may not work as intended and has not
+   * been actively tested over the years. If you need the ability to
+   * delete a System from an EquationSystems object, it could probably
+   * be added.
    */
   void delete_system (const std::string & name);
 

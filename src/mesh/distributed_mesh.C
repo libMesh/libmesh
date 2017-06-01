@@ -53,8 +53,6 @@ DistributedMesh::DistributedMesh (const Parallel::Communicator & comm_in,
 
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
-// ------------------------------------------------------------
-// DistributedMesh class member functions
 DistributedMesh::DistributedMesh (unsigned char d) :
   UnstructuredMesh (d), _is_serial(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),

@@ -267,8 +267,9 @@ public:
 
   /**
    * Returns the magnitude of the vector, i.e. the square-root of the
-   * sum of the elements squared.  This function is deprecated, instead
-   * call norm().
+   * sum of the elements squared.
+   *
+   * \deprecated Use the norm() function instead.
    */
   Real size() const;
 
@@ -280,8 +281,9 @@ public:
 
   /**
    * Returns the magnitude of the vector squared, i.e. the sum of the
-   * element magnitudes squared.  This function is deprecated, instead
-   * call norm_sq().
+   * element magnitudes squared.
+   *
+   * \deprecated Use the norm_sq() function instead.
    */
   Real size_sq() const;
 

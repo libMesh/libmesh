@@ -360,8 +360,8 @@ public:
   /**
    * Returns the boundary ids associated with \p Node \p node.
    *
-   * This function has been deprecated.  Instead, use the version of
-   * this function that fills a std::vector.
+   * \deprecated Instead, use the version of this function that fills
+   * a std::vector.
    */
   std::vector<boundary_id_type> boundary_ids (const Node * node) const;
 
@@ -392,8 +392,8 @@ public:
    * element \p elem.
    * Edge-based boundary IDs should only be used in 3D.
    *
-   * This function has been deprecated.  Instead, use the version of
-   * this function that fills a std::vector.
+   * \deprecated Instead, use the version of this function that fills
+   * a std::vector.
    */
   std::vector<boundary_id_type> edge_boundary_ids (const Elem * const elem,
                                                    const unsigned short int edge) const;
@@ -416,8 +416,8 @@ public:
    * its ancestors' boundary id.
    * Edge-based boundary IDs should only be used in 3D.
    *
-   * This function has been deprecated.  Instead, use the version of
-   * this function that fills a std::vector.
+   * \deprecated Instead, use the version of this function that fills
+   * a std::vector.
    */
   std::vector<boundary_id_type> raw_edge_boundary_ids (const Elem * const elem,
                                                        const unsigned short int edge) const;
@@ -475,6 +475,11 @@ public:
    * however multiple sides per element are allowed.  Returns \p invalid_id
    * if the \p side does not have an associated boundary id, hence
    * \p invalid_id can be used as the default boundary id.
+   *
+   * \deprecated Asking for just one boundary id means your code isn't
+   * safe to use on meshes with overlapping boundary ids.  Try using
+   * BoundaryInfo::boundary_ids() or BoundaryInfo::has_boundary_id()
+   * instead.
    */
   boundary_id_type boundary_id (const Elem * const elem,
                                 const unsigned short int side) const;
@@ -490,8 +495,8 @@ public:
    * Returns the list of boundary ids associated with the \p side side of
    * element \p elem.
    *
-   * This function has been deprecated.  Instead, use the version of
-   * this function that fills a std::vector.
+   * \deprecated Instead, use the version of this function that fills
+   * a std::vector.
    */
   std::vector<boundary_id_type> boundary_ids (const Elem * const elem,
                                               const unsigned short int side) const;
@@ -512,8 +517,8 @@ public:
    * exclude ids which are implicit, such as a child's inheritance of
    * its ancestors' boundary id.
    *
-   * This function has been deprecated.  Instead, use the version of
-   * this function that fills a std::vector.
+   * \deprecated Instead, use the version of this function that fills
+   * a std::vector.
    */
   std::vector<boundary_id_type> raw_boundary_ids (const Elem * const elem,
                                                   const unsigned short int side) const;

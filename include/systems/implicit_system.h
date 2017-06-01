@@ -113,13 +113,13 @@ public:
    *
    * This function must be overridden in derived classes, since this
    * base class does not have a valid LinearSolver to hand back a
-   * pointer to.  Its current behavior, i.e. allocating a LinearSolver
-   * and handing it back to the user, makes it very easy to leak
-   * memory, and probably won't have the intended effect, i.e. of
-   * setting some parameters on a LinearSolver that the System would
-   * later use internally.  This function is currently
-   * libmesh_deprecated() but will eventually become a libmesh_error()
-   * to call.
+   * pointer to.
+   *
+   * \deprecated This function's current behavior, i.e. allocating a
+   * LinearSolver and handing it back to the user, makes it very easy
+   * to leak memory, and probably won't have the intended effect,
+   * i.e. of setting some parameters on a LinearSolver that the System
+   * would later use internally.
    */
   virtual LinearSolver<Number> * get_linear_solver() const;
 
@@ -135,7 +135,7 @@ public:
    * Releases a pointer to a linear solver acquired by
    * \p this->get_linear_solver()
    *
-   * This function is designed to work with the now deprecated
+   * \deprecated This function is designed to work with the deprecated
    * get_linear_solver() function, so its use is now deprecated as
    * well.
    */

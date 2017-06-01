@@ -548,8 +548,9 @@ public:
 
   /**
    * Returns the last dof index that is local to processor \p proc.
-   * This function is now deprecated, because it returns nonsense in the rare
-   * case where \p proc has no local dof indices.  Use end_dof() instead.
+   *
+   * \deprecated This function returns nonsense in the rare case where
+   * \p proc has no local dof indices.  Use end_dof() instead.
    */
   dof_id_type last_dof(const processor_id_type proc) const
   {
