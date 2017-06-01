@@ -210,8 +210,9 @@ void ErrorVector::plot_error(const std::string & filename,
   UniquePtr<MeshBase> meshptr = oldmesh.clone();
   MeshBase & mesh = *meshptr;
 
-  // The all_first_order routine requires that renumbering be allowed
-  mesh.allow_renumbering(true);
+  // The all_first_order routine will prepare_for_use(), which would
+  // break our ordering if elements get changed.
+  mesh.allow_renumbering(false);
   mesh.all_first_order();
 
 #ifdef LIBMESH_ENABLE_AMR
