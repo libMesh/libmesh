@@ -110,9 +110,10 @@ public:
   virtual ~FEAbstract();
 
   /**
-   * Builds a specific finite element type.  A \p
-   * UniquePtr<FEAbstract> is returned to prevent a memory leak. This
-   * way the user need not remember to delete the object.
+   * Builds a specific finite element type.
+   *
+   * \returns A UniquePtr<FEAbstract> to the FE object to prevent
+   * memory leaks.
    */
   static UniquePtr<FEAbstract> build (const unsigned int dim,
                                       const FEType & type);
@@ -184,8 +185,8 @@ public:
                                    const ElemType t,
                                    const Real eps = TOLERANCE);
   /**
-   * returns the reference space nodes coordinates
-   * given the element type
+   * \returns The reference space coordinates of \p nodes based on the
+   * element type.
    */
   static void get_refspace_nodes(const ElemType t,
                                  std::vector<Point> & nodes);

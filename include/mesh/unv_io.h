@@ -156,17 +156,18 @@ private:
   void elements_out (std::ostream & out_file);
 
   /**
-   * Returns the maximum geometric element dimension encountered while
+   * \returns The maximum geometric element dimension encountered while
    * reading the Mesh.  Only valid after the elements have been read
    * in and the elems_of_dimension array has been populated.
    */
   unsigned char max_elem_dimension_seen ();
 
   /**
-   * Replaces "1.1111D+00" with "1.1111e+00" if necessary.  Returns
-   * true if the replacement occurs, false otherwise.  This function
-   * only needs to be called once per stream, one can assume that if
-   * one number needs rewriting, they all do.
+   * Replaces "1.1111D+00" with "1.1111e+00" if necessary. This
+   * function only needs to be called once per stream, one can assume
+   * that if one number needs rewriting, they all do.
+   *
+   * \returns \p true if the replacement occurs, false otherwise.
    */
   bool need_D_to_e (std::string & number);
 

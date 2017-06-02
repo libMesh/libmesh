@@ -71,7 +71,7 @@ public:
   }
 
   /*
-   * Returns a point at the minimum x,y,z coordinates of the box.
+   * \returns A point at the minimum x,y,z coordinates of the box.
    */
   const Point & min() const
   { return this->first; }
@@ -80,7 +80,7 @@ public:
   { return this->first; }
 
   /*
-   * Returns a point at the maximum x,y,z coordinates of the box.
+   * \returns A point at the maximum x,y,z coordinates of the box.
    */
   const Point & max() const
   { return this->second; }
@@ -89,13 +89,13 @@ public:
   { return this->second; }
 
   /*
-   * Returns true iff the other bounding box has a non-empty
+   * \returns \p true if the other bounding box has a non-empty
    * intersection with this bounding box.
    */
   bool intersects (const BoundingBox &) const;
 
   /**
-   * Returns true iff the other bounding box has a non-empty
+   * \returns \p true if the other bounding box has a non-empty
    * intersection with this bounding box.
    *
    * \deprecated Use the BoundingBox::intersects() function instead.
@@ -104,7 +104,7 @@ public:
   { libmesh_deprecated(); return this->intersects(b); }
 
   /*
-   * Returns true iff the bounding box contains the given point.
+   * \returns \p true if the bounding box contains the given point.
    */
   bool contains_point (const Point &) const;
 

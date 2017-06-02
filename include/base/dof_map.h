@@ -383,16 +383,19 @@ public:
   void prepare_send_list ();
 
   /**
-   * Returns a constant reference to the \p _send_list for this processor.  The
-   * \p _send_list contains the global indices of all the variables in the
-   * global solution vector that influence the current processor.  This
-   * information can be used for gathers at each solution step to retrieve
-   * solution values needed for computation.
+   * \returns A constant reference to the \p _send_list for this processor.
+   *
+   * The \p _send_list contains the global indices of all the
+   * variables in the global solution vector that influence the
+   * current processor.  This information can be used for gathers at
+   * each solution step to retrieve solution values needed for
+   * computation.
    */
   const std::vector<dof_id_type> & get_send_list() const { return _send_list; }
 
   /**
-   * Returns a constant reference to the \p _n_nz list for this processor.
+   * \returns A constant reference to the \p _n_nz list for this processor.
+   *
    * The vector contains the bandwidth of the on-processor coupling for each
    * row of the global matrix that the current processor owns.  This
    * information can be used to preallocate space for a parallel sparse matrix.
@@ -404,7 +407,8 @@ public:
   }
 
   /**
-   * Returns a constant reference to the \p _n_oz list for this processor.
+   * \returns A constant reference to the \p _n_oz list for this processor.
+   *
    * The vector contains the bandwidth of the off-processor coupling for each
    * row of the global matrix that the current processor owns.  This
    * information can be used to preallocate space for a parallel sparse matrix.
@@ -517,7 +521,7 @@ public:
   { return this->n_dofs_on_processor (this->processor_id()); }
 
   /**
-   * Returns the number of degrees of freedom on partition \p proc.
+   * \returns The number of degrees of freedom on partition \p proc.
    */
   dof_id_type n_dofs_on_processor(const processor_id_type proc) const
   {
@@ -526,7 +530,7 @@ public:
   }
 
   /**
-   * Returns the first dof index that is local to partition \p proc.
+   * \returns The first dof index that is local to partition \p proc.
    */
   dof_id_type first_dof(const processor_id_type proc) const
   { libmesh_assert_less (proc, _first_df.size()); return _first_df[proc]; }
@@ -536,7 +540,7 @@ public:
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
-   * Returns the first old dof index that is local to partition \p proc.
+   * \returns The first old dof index that is local to partition \p proc.
    */
   dof_id_type first_old_dof(const processor_id_type proc) const
   { libmesh_assert_less (proc, _first_old_df.size()); return _first_old_df[proc]; }
@@ -547,7 +551,7 @@ public:
 #endif //LIBMESH_ENABLE_AMR
 
   /**
-   * Returns the last dof index that is local to processor \p proc.
+   * \returns The last dof index that is local to processor \p proc.
    *
    * \deprecated This function returns nonsense in the rare case where
    * \p proc has no local dof indices.  Use end_dof() instead.
@@ -563,8 +567,9 @@ public:
   { return this->last_dof(this->processor_id()); }
 
   /**
-   * Returns the first dof index that is after all indices local to
+   * \returns The first dof index that is after all indices local to
    * processor \p proc.
+   *
    * Analogous to the end() member function of STL containers.
    */
   dof_id_type end_dof(const processor_id_type proc) const
@@ -575,8 +580,9 @@ public:
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
-   * Returns the first old dof index that is after all indices local
+   * \returns The first old dof index that is after all indices local
    * to processor \p proc.
+   *
    * Analogous to the end() member function of STL containers.
    */
   dof_id_type end_old_dof(const processor_id_type proc) const
@@ -630,9 +636,10 @@ public:
                            const bool old_dofs=false) const;
 
   /**
-   * Returns \p true iff all degree of freedom indices in
-   * \p dof_indices are either local indices or in the \p send_list.
-   * Note that this is an O(logN) operation, not O(1); we don't cache
+   * \returns \p true if all degree of freedom indices in \p
+   * dof_indices are either local indices or in the \p send_list.
+   *
+   * \note This is an O(logN) operation, not O(1); we don't cache
    * enough information for O(1) right now.
    */
   bool all_semilocal_indices (const std::vector<dof_id_type> & dof_indices) const;
@@ -789,13 +796,13 @@ public:
   { add_constraint_row(dof_number, constraint_row, 0., forbid_constraint_overwrite); }
 
   /**
-   * Returns an iterator pointing to the first DoF constraint row
+   * \returns An iterator pointing to the first DoF constraint row.
    */
   DofConstraints::const_iterator constraint_rows_begin() const
   { return _dof_constraints.begin(); }
 
   /**
-   * Returns an iterator pointing just past the last DoF constraint row
+   * \returns An iterator pointing just past the last DoF constraint row.
    */
   DofConstraints::const_iterator constraint_rows_end() const
   { return _dof_constraints.end(); }
@@ -814,27 +821,27 @@ public:
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   /**
-   * Returns an iterator pointing to the first Node constraint row
+   * \returns An iterator pointing to the first Node constraint row.
    */
   NodeConstraints::const_iterator node_constraint_rows_begin() const
   { return _node_constraints.begin(); }
 
   /**
-   * Returns an iterator pointing just past the last Node constraint row
+   * \returns An iterator pointing just past the last Node constraint row.
    */
   NodeConstraints::const_iterator node_constraint_rows_end() const
   { return _node_constraints.end(); }
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   /**
-   * \returns true if the degree of freedom dof is constrained,
-   * false otherwise.
+   * \returns \p true if the degree of freedom dof is constrained,
+   * \p false otherwise.
    */
   bool is_constrained_dof (const dof_id_type dof) const;
 
   /**
-   * \returns true if the system has any heterogenous constraints for
-   * adjoint solution \p qoi_num, false otherwise.
+   * \returns \p true if the system has any heterogenous constraints for
+   * adjoint solution \p qoi_num, \p false otherwise.
    */
   bool has_heterogenous_adjoint_constraints (const unsigned int qoi_num) const;
 
@@ -1246,17 +1253,17 @@ private:
   void invalidate_dofs(MeshBase & mesh) const;
 
   /**
-   * An adapter function that returns Node pointers by index
+   * \returns The Node pointer with index \p i from the \p mesh.
    */
   DofObject * node_ptr(MeshBase & mesh, dof_id_type i) const;
 
   /**
-   * An adapter function that returns Elem pointers by index
+   * \returns The Elem pointer with index \p i from the \p mesh.
    */
   DofObject * elem_ptr(MeshBase & mesh, dof_id_type i) const;
 
   /**
-   * A member function type like node_ptr or elem_ptr
+   * A member function type like \p node_ptr() or \p elem_ptr().
    */
   typedef DofObject * (DofMap::*dofobject_accessor)
     (MeshBase & mesh, dof_id_type i) const;

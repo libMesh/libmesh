@@ -67,7 +67,6 @@ public:
 
   /**
    * Register a user function to use in computing the essential BCs.
-   * The return value is std::pair<bool, Real>
    */
   void attach_essential_bc_function (std::pair<bool,Real> fptr(const System & system,
                                                                const Point & p,
@@ -93,12 +92,13 @@ protected:
   /**
    * The function which calculates a normal derivative jump based error
    * term on a boundary side.
-   * Returns true if the flux bc function is in fact defined on the current side.
+   *
+   * \returns \p true if the flux bc function is in fact defined on the current side.
    */
   virtual bool boundary_side_integration() libmesh_override;
 
   /**
-   * Pointer to function that returns BC information.
+   * Pointer to function that provides BC information.
    */
   std::pair<bool,Real> (* _bc_function) (const System & system,
                                          const Point & p,

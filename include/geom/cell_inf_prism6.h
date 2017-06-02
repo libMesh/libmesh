@@ -116,17 +116,19 @@ public:
   virtual Order default_order() const libmesh_override { return FIRST; }
 
   /**
-   * Returns a \p TRI3 built coincident with face 0, an \p INFQUAD4
-   * built coincident with faces 1 to 3.  Note that the \p UniquePtr<Elem>
-   * takes care of freeing memory.
+   * \returns A \p TRI3 built coincident with face 0, or an \p INFQUAD4
+   * built coincident with faces 1 to 3.
+   *
+   * \note The \p UniquePtr<Elem> takes care of freeing memory.
    */
   virtual UniquePtr<Elem> build_side_ptr (const unsigned int i,
                                           bool proxy) libmesh_override;
 
   /**
-   * Returns a \p EDGE2 built coincident with edges 0 to 2, an \p INFEDGE2
-   * built coincident with edges 3 to 5.  Note that the \p UniquePtr<Elem>
-   * takes care of freeing memory.
+   * \returns An \p EDGE2 built coincident with edges 0 to 2, an \p INFEDGE2
+   * built coincident with edges 3 to 5.
+   *
+   * \note that the \p UniquePtr<Elem> takes care of freeing memory.
    */
   virtual UniquePtr<Elem> build_edge_ptr (const unsigned int i) libmesh_override;
 

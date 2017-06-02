@@ -540,63 +540,72 @@ protected:
   /**
    * Used in \p FEMap::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
-   * Returns the x value of the pth entry of the dxzydxi_map.
+   *
+   * \returns The x value of the pth entry of the dxzydxi_map.
    */
   Real dxdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](0); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
-   * Returns the y value of the pth entry of the dxzydxi_map.
+   *
+   * \returns The y value of the pth entry of the dxzydxi_map.
    */
   Real dydxi_map(const unsigned int p) const   { return dxyzdxi_map[p](1); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
-   * Returns the z value of the pth entry of the dxzydxi_map.
+   *
+   * \returns The z value of the pth entry of the dxzydxi_map.
    */
   Real dzdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](2); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
-   * Returns the x value of the pth entry of the dxzydeta_map.
+   *
+   * \returns The x value of the pth entry of the dxzydeta_map.
    */
   Real dxdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](0); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
-   * Returns the y value of the pth entry of the dxzydeta_map.
+   *
+   * \returns The y value of the pth entry of the dxzydeta_map.
    */
   Real dydeta_map(const unsigned int p) const  { return dxyzdeta_map[p](1); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
-   * Returns the z value of the pth entry of the dxzydeta_map.
+   *
+   * \returns The z value of the pth entry of the dxzydeta_map.
    */
   Real dzdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](2); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
-   * Returns the x value of the pth entry of the dxzydzeta_map.
+   *
+   * \returns The x value of the pth entry of the dxzydzeta_map.
    */
   Real dxdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](0); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
-   * Returns the y value of the pth entry of the dxzydzeta_map.
+   *
+   * \returns The y value of the pth entry of the dxzydzeta_map.
    */
   Real dydzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](1); }
 
   /**
    * Used in \p FEMap::compute_map(), which should be
    * be usable in derived classes, and therefore protected.
-   * Returns the z value of the pth entry of the dxzydzeta_map.
+   *
+   * \returns The z value of the pth entry of the dxzydzeta_map.
    */
   Real dzdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](2); }
 

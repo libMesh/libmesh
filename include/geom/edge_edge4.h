@@ -97,8 +97,8 @@ public:
                                const unsigned int s) const libmesh_override;
 
   /**
-   * \returns true if the specified (local) node number is on the
-   * specified edge (i.e. "returns true" in 1D).
+   * \returns \p true if the specified (local) node number is on the
+   * specified edge (always true in 1D).
    */
   virtual bool is_node_on_edge(const unsigned int n,
                                const unsigned int e) const libmesh_override;

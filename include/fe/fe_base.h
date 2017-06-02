@@ -404,13 +404,13 @@ public:
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
-   * \returns the global first derivative of the phase term
+   * \returns The global first derivative of the phase term
    * which is used in infinite elements, evaluated at the
    * quadrature points.
    *
    * In case of the general finite element class \p FE this
    * field is initialized to all zero, so that the variational
-   * formulation for an infinite element returns correct element
+   * formulation for an infinite element produces correct element
    * matrices for a mesh using both finite and infinite elements.
    */
   const std::vector<OutputGradient> & get_dphase() const
@@ -418,7 +418,7 @@ public:
 
 
   /**
-   * \returns the multiplicative weight at each quadrature point.
+   * \returns The multiplicative weight at each quadrature point.
    * This weight is used for certain infinite element weak
    * formulations, so that weighted Sobolev spaces are
    * used for the trial function space.  This renders the
@@ -426,14 +426,14 @@ public:
    *
    * In case of the general finite element class \p FE this
    * field is initialized to all ones, so that the variational
-   * formulation for an infinite element returns correct element
+   * formulation for an infinite element produces correct element
    * matrices for a mesh using both finite and infinite elements.
    */
   const std::vector<Real> & get_Sobolev_weight() const
   { return weight; }
 
   /**
-   * \returns the first global derivative of the multiplicative
+   * \returns The first global derivative of the multiplicative
    * weight at each quadrature point. See \p get_Sobolev_weight()
    * for details.  In case of \p FE initialized to all zero.
    */

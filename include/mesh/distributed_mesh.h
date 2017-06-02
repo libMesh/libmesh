@@ -164,9 +164,9 @@ public:
   void libmesh_assert_valid_parallel_flags() const;
 
   /**
-   * Renumber a parallel objects container
-   * Returns the smallest globally unused id for that
-   * container.
+   * Renumber a parallel objects container.
+   *
+   * \returns the smallest globally unused id for that container.
    */
   template <typename T>
   dof_id_type renumber_dof_objects (mapvector<T *,dof_id_type> &);

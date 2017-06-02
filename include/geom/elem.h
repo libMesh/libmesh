@@ -246,11 +246,13 @@ public:
   bool operator == (const Elem & rhs) const;
 
   /**
-   * \returns a const pointer to the \f$ i^{th} \f$ neighbor of this element.
-   * If \p MeshBase::find_neighbors() has not been called this
-   * simply returns \p NULL.  If \p MeshBase::find_neighbors()
-   * has been called and this returns \p NULL then the side is on
-   * a boundary of the domain.
+   * \returns A const pointer to the \f$ i^{th} \f$ neighbor of this
+   * element, or \p NULL if \p MeshBase::find_neighbors() has not been
+   * called.
+   *
+   * \note If \p MeshBase::find_neighbors() has been called and this
+   * function still returns \p NULL, then the side is on a boundary of
+   * the domain.
    */
   const Elem * neighbor_ptr (unsigned int i) const;
 
@@ -310,16 +312,14 @@ public:
   bool has_neighbor (const Elem * elem) const;
 
   /**
-   * If the element \p elem in question is a neighbor
-   * of a child of this element, this returns a pointer
-   * to that child.  Otherwise it returns NULL.
+   * \returns If \p elem is a neighbor of a child of this element, a
+   * pointer to that child, otherwise \p NULL.
    */
   Elem * child_neighbor (Elem * elem);
 
   /**
-   * If the element \p elem in question is a neighbor
-   * of a child of this element, this returns a pointer
-   * to that child.  Otherwise it returns NULL.
+   * \returns If \p elem is a neighbor of a child of this element, a
+   * pointer to that child, otherwise \p NULL.
    */
   const Elem * child_neighbor (const Elem * elem) const;
 
@@ -348,21 +348,22 @@ public:
    * I.e. if e = a->build_side_ptr(s) or e = a->side_ptr(s); then
    * a->which_side_am_i(e) will be s.
    *
-   * Note that an _exact_ floating point comparison of the nodal
-   * positions of 'e' is made with the nodal positions of *this in
+   * \note An \e exact floating point comparison of the nodal
+   * positions of \p e is made with the nodal positions of \p this in
    * order to perform this test. The idea is that the test will return
-   * a valid side id if 'e' either directly shares Node pointers with
-   * *this, or was created by exactly copying some of the nodes of
-   * *this (e.g. through BoundaryMesh::sync()). In these
+   * a valid side id if \p e either directly shares Node pointers with
+   * \p this, or was created by exactly copying some of the nodes of
+   * \p this (e.g. through BoundaryMesh::sync()). In these
    * circumstances, non-fuzzy floating point equality is expected.
    *
-   * Returns \p invalid_uint if \p e is not a side of \p this.
+   * \returns The side of \p this the element which \p e is, otherwise
+   * \p invalid_uint.
    */
   unsigned int which_side_am_i(const Elem * e) const;
 
   /**
-   * Returns the local node id for node "side_node" on side "side" of
-   * this Elem. Simply relies on the side_nodes_map for each of the
+   * \returns the local node id for node \p side_node on side \p side of
+   * this Elem. Simply relies on the \p side_nodes_map for each of the
    * derived types. For example,
    * Tri3::which_node_am_i(0, 0) -> 0
    * Tri3::which_node_am_i(0, 1) -> 1
@@ -374,13 +375,13 @@ public:
                                        unsigned int side_node) const = 0;
 
   /**
-   * This function returns true if a vertex of \p e is contained
+   * \returns \p true if a vertex of \p e is contained
    * in this element.
    */
   bool contains_vertex_of(const Elem * e) const;
 
   /**
-   * This function returns true if an edge of \p e is contained in
+   * \returns \p true if an edge of \p e is contained in
    * this element.  (Internally, this is done by checking whether at
    * least two vertices of \p e are contained in this element).
    */
@@ -473,23 +474,22 @@ public:
   void make_links_to_me_local (unsigned int n);
 
   /**
-   * Returns true if this element is remote, false otherwise.  A
-   * remote element (see \p RemoteElem) is a syntactic convenience --
+   * \returns \p true if this element is remote, false otherwise.
+   *
+   * A remote element (see \p RemoteElem) is a syntactic convenience --
    * it is a placeholder for an element which exists on some other
    * processor.  Local elements are required to have valid neighbors,
    * and these ghost elements may have remote neighbors for data
    * structure consistency.  The use of remote elements helps ensure
-   * that any element we may access has a NULL neighbor only if it
+   * that any element we may access has a \p NULL neighbor only if it
    * lies on the physical boundary of the domain.
    */
   virtual bool is_remote () const
   { return false; }
 
   /**
-   * Returns the connectivity for this element in a specific
-   * format, which is specified by the IOPackage tag.  This
-   * method supercedes the tecplot_connectivity(...) and vtk_connectivity(...)
-   * routines.
+   * \returns The connectivity for this element in a specific
+   * format, which is specified by the IOPackage tag.
    */
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
@@ -498,9 +498,7 @@ public:
   /**
    * Writes the element connectivity for various IO packages
    * to the passed ostream "out".  Not virtual, since it is
-   * implemented in the base class.  This function supercedes the
-   * write_tecplot_connectivity(...) and write_ucd_connectivity(...)
-   * routines.
+   * implemented in the base class.
    */
   void write_connectivity (std::ostream & out,
                            const IOPackage iop) const;
@@ -655,8 +653,8 @@ public:
 
   /**
    * \returns the number of sub-elements this element may be broken
-   * down into for visualization purposes.  For example, this returns
-   * 1 for a linear triangle, 4 for a quadratic (6-noded) triangle, etc...
+   * down into for visualization purposes.  For example, 1 for a
+   * linear triangle, 4 for a quadratic (6-noded) triangle, etc...
    */
   virtual unsigned int n_sub_elem () const = 0;
 
@@ -786,16 +784,18 @@ public:
   virtual BoundingBox loose_bounding_box () const;
 
   /**
-   * Based on the quality metric q specified by the user,
-   * returns a quantitative assessment of element quality.
+   * \returns A quantitative assessment of element quality based on
+   * the quality metric \p q specified by the user.
    */
   virtual Real quality (const ElemQuality q) const;
 
   /**
-   * Returns the suggested quality bounds for the Elem based on
-   * quality measure q.  These are the values suggested by the CUBIT
-   * User's Manual.  Since this function can have no possible meaning
-   * for an abstract Elem, it is an error in the base class.
+   * \returns The suggested quality bounds for the Elem based on
+   * quality measure \p q.
+   *
+   * These are the values suggested by the CUBIT User's Manual.  Since
+   * this function can have no possible meaning for an abstract Elem,
+   * it is an error in the base class.
    */
   virtual std::pair<Real,Real> qual_bounds (const ElemQuality) const
   { libmesh_not_implemented(); return std::make_pair(0.,0.); }
@@ -1020,14 +1020,14 @@ public:
   unsigned int level () const;
 
   /**
-   * Returns the value of the p refinement level of an active
+   * \returns The value of the p refinement level of an active
    * element, or the minimum value of the p refinement levels
    * of an ancestor element's descendants.
    */
   unsigned int p_level () const;
 
   /**
-   * \returns true if the specified child is on the specified side.
+   * \returns \p true if the specified child is on the specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
                                 const unsigned int s) const = 0;
@@ -1212,7 +1212,7 @@ public:
                                                    const bool reset=true) const;
 
   /**
-   * Returns the value of the refinement flag for the element.
+   * \returns The value of the refinement flag for the element.
    */
   RefinementState refinement_flag () const;
 
@@ -1222,7 +1222,7 @@ public:
   void set_refinement_flag (const RefinementState rflag);
 
   /**
-   * Returns the value of the p-refinement flag for the element.
+   * \returns The value of the p-refinement flag for the element.
    */
   RefinementState p_refinement_flag () const;
 
@@ -1232,13 +1232,13 @@ public:
   void set_p_refinement_flag (const RefinementState pflag);
 
   /**
-   * Returns the maximum value of the p-refinement levels of
+   * \returns The maximum value of the p-refinement levels of
    * an ancestor element's descendants.
    */
   unsigned int max_descendant_p_level () const;
 
   /**
-   * Returns the minimum p-refinement level of elements which are
+   * \returns The minimum p-refinement level of elements which are
    * descended from this element, and which share a side with the
    * active \p neighbor.
    */
@@ -1246,7 +1246,7 @@ public:
                                         unsigned int current_min) const;
 
   /**
-   * Returns the minimum new p-refinement level (i.e. after refinement
+   * \returns The minimum new p-refinement level (i.e. after refinement
    * and coarsening is done) of elements which are descended from this
    * element and which share a side with the active \p neighbor.
    */
@@ -1380,15 +1380,15 @@ public:
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
-   * Returns the local node id on the parent which corresponds to node
-   * \p n of child \p c, or returns invalid_uint if no such parent
+   * \returns The local node id on the parent which corresponds to node
+   * \p n of child \p c, or \p invalid_uint if no such parent
    * node exists.
    */
   virtual unsigned int as_parent_node (unsigned int c,
                                        unsigned int n) const;
 
   /**
-   * Returns all the pairs of nodes (indexed by local node id) which
+   * \returns All the pairs of nodes (indexed by local node id) which
    * should bracket node \p n of child \p c.
    */
   virtual
@@ -1397,7 +1397,7 @@ public:
                           unsigned int n) const;
 
   /**
-   * Returns all the pairs of nodes (indexed by global node id) which
+   * \returns All the pairs of nodes (indexed by global node id) which
    * should bracket node \p n of child \p c.
    */
   virtual

@@ -129,17 +129,19 @@ public:
                                const unsigned int e) const libmesh_override;
 
   /**
-   * Returns a \p QUAD9 built coincident with face 0, an \p INFQUAD6
-   * built coincident with faces 1 to 4. Note that the \p UniquePtr<Elem>
-   * takes care of freeing memory.
+   * \returns a \p QUAD9 built coincident with face 0, or an \p INFQUAD6
+   * built coincident with faces 1 to 4.
+   *
+   * \note The \p UniquePtr<Elem> takes care of freeing memory.
    */
   virtual UniquePtr<Elem> build_side_ptr (const unsigned int i,
                                           bool proxy) libmesh_override;
 
   /**
-   * Returns a \p EDGE3 built coincident with edges 0-3, an \p INFEDGE2
-   * built coincident with edges 4 to 11. Note that the \p UniquePtr<Elem>
-   * takes care of freeing memory.
+   * \returns An \p EDGE3 built coincident with edges 0-3, or an \p INFEDGE2
+   * built coincident with edges 4 to 11.
+   *
+   * \note that the \p UniquePtr<Elem> takes care of freeing memory.
    */
   virtual UniquePtr<Elem> build_edge_ptr (const unsigned int i) libmesh_override;
 
@@ -160,7 +162,7 @@ public:
   virtual dof_id_type key (const unsigned int s) const libmesh_override;
 
   /**
-   * Does some range checking and then returns InfHex18::side_nodes_map[side][side_node].
+   * \returns \p InfHex18::side_nodes_map[side][side_node] after doing some range checking.
    */
   virtual unsigned int which_node_am_i(unsigned int side,
                                        unsigned int side_node) const libmesh_override;
@@ -180,7 +182,8 @@ public:
   /**
    * \returns the element-local number of the  \f$ v^{th} \f$ vertex
    * that defines the \f$ n^{th} \f$ second-order node.
-   * Note that \p n is counted as depicted above, \f$ 8 \le n < 18 \f$.
+   *
+   * \note \p n is counted as depicted above, \f$ 8 \le n < 18 \f$.
    */
   virtual unsigned short int second_order_adjacent_vertex (const unsigned int n,
                                                            const unsigned int v) const libmesh_override;

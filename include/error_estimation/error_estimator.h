@@ -129,7 +129,7 @@ public:
                                 bool estimate_parent_error = false);
 
   /**
-   * Returns the type for the ErrorEstimator subclass.
+   * \returns The type for the ErrorEstimator subclass.
    */
   virtual ErrorEstimatorType type() const = 0;
 

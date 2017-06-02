@@ -45,19 +45,26 @@ namespace libMesh
 struct ElemHashUtils
 {
 public:
-  // The "Hash" template argument.  A custom hash functor that can be
-  // used with the "unordered" container types.  Simply returns
-  // elem->key() as the hash.
+  /**
+   * The "Hash" template argument.  A custom hash functor that can be
+   * used with the "unordered" container types.
+   *
+   * \returns elem->key() as the hash.
+   */
   inline
   std::size_t operator()(const Elem * elem) const
   {
     return cast_int<std::size_t>(elem->key());
   }
 
-  // The "Pred" template argument.  A binary predicate that takes two
-  // arguments of the same type as the elements and returns a bool.
-  // We need to specify this in order to use the unordered_multiset,
-  // otherwise it just uses std::equal_to to compare two pointers...
+  /**
+   * Satisfies the requirements of the "Pred" template parameter of
+   * the standard hash containers.  We need to specify this in order
+   * to use the unordered_multiset, otherwise it just uses
+   * std::equal_to to compare two pointers...
+   *
+   * \returns \p true if the two Elem keys are equal, \p false otherwise.
+   */
   inline
   bool operator()(const Elem * lhs, const Elem * rhs) const
   {

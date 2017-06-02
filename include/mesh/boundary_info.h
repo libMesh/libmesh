@@ -81,9 +81,8 @@ public:
   ~BoundaryInfo ();
 
   /**
-   * Clears the underlying data structures.
-   * Returns the object to a pristine state
-   * with no data stored.
+   * Clears the underlying data structures and restores the object to
+   * a pristine state with no data stored.
    */
   void clear ();
 
@@ -345,20 +344,22 @@ public:
   void remove_id (boundary_id_type id);
 
   /**
-   * Returns the number of user-specified boundary ids on the
-   * semilocal part of the mesh.  DistributedMesh users may need to
-   * compare boundary_ids sets via inter-processor communication.
+   * \returns The number of user-specified boundary ids on the
+   * semilocal part of the mesh.
+   *
+   * \note DistributedMesh users may need to compare boundary_ids sets
+   * via inter-processor communication.
    */
   std::size_t n_boundary_ids () const { return _boundary_ids.size(); }
 
   /**
-   * Returns true iff the given node is associated with the given id.
+   * \returns \p true if \p node is associated with boundary \p id.
    */
   bool has_boundary_id (const Node * const node,
                         const boundary_id_type id) const;
 
   /**
-   * Returns the boundary ids associated with \p Node \p node.
+   * \returns The boundary ids associated with \p Node \p node.
    *
    * \deprecated Instead, use the version of this function that fills
    * a std::vector.
@@ -375,22 +376,24 @@ public:
                      std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
-   * Returns the number of boundary ids associated with \p Node \p node.
+   * \returns The number of boundary ids associated with \p Node \p node.
    */
   unsigned int n_boundary_ids (const Node * node) const;
 
   /**
-   * Returns the number of boundary ids associated with the \p edge
+   * \returns The number of boundary ids associated with the \p edge
    * edge of element \p elem.
-   * Edge-based boundary IDs should only be used in 3D.
+   *
+   * \note Edge-based boundary IDs should only be used in 3D.
    */
   unsigned int n_edge_boundary_ids (const Elem * const elem,
                                     const unsigned short int edge) const;
 
   /**
-   * Returns the list of boundary ids associated with the \p edge edge of
+   * \returns The list of boundary ids associated with the \p edge edge of
    * element \p elem.
-   * Edge-based boundary IDs should only be used in 3D.
+   *
+   * \note Edge-based boundary IDs should only be used in 3D.
    *
    * \deprecated Instead, use the version of this function that fills
    * a std::vector.
@@ -399,9 +402,10 @@ public:
                                                    const unsigned short int edge) const;
 
   /**
-   * Returns the list of boundary ids associated with the \p edge edge of
+   * \returns The list of boundary ids associated with the \p edge edge of
    * element \p elem.
-   * Edge-based boundary IDs should only be used in 3D.
+   *
+   * \note Edge-based boundary IDs should only be used in 3D.
    *
    * This is the non-deprecated version of the function.
    */
@@ -410,11 +414,13 @@ public:
                           std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
-   * Returns the list of raw boundary ids associated with the \p edge
-   * edge of element \p elem.  These ids are "raw" because they
-   * exclude ids which are implicit, such as a child's inheritance of
-   * its ancestors' boundary id.
-   * Edge-based boundary IDs should only be used in 3D.
+   * \returns The list of raw boundary ids associated with the \p edge
+   * edge of element \p elem.
+   *
+   * These ids are "raw" because they exclude ids which are implicit,
+   * such as a child's inheritance of its ancestors' boundary id.
+   *
+   * \note Edge-based boundary IDs should only be used in 3D.
    *
    * \deprecated Instead, use the version of this function that fills
    * a std::vector.
@@ -423,11 +429,13 @@ public:
                                                        const unsigned short int edge) const;
 
   /**
-   * Returns the list of raw boundary ids associated with the \p edge
-   * edge of element \p elem.  These ids are "raw" because they
-   * exclude ids which are implicit, such as a child's inheritance of
-   * its ancestors' boundary id.
-   * Edge-based boundary IDs should only be used in 3D.
+   * \returns The list of raw boundary ids associated with the \p edge
+   * edge of element \p elem.
+   *
+   * These ids are "raw" because they exclude ids which are implicit,
+   * such as a child's inheritance of its ancestors' boundary id.
+   *
+   * \note Edge-based boundary IDs should only be used in 3D.
    *
    * This is the non-deprecated version of the function.
    */
@@ -436,45 +444,52 @@ public:
                               std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
-   * Returns the number of boundary ids associated with the specified shell face
-   * of element \p elem. This is only relevant for shell elements.
+   * \returns The number of boundary ids associated with the specified
+   * shell face of element \p elem.
+   *
+   * \note This is only relevant for shell elements.
    */
   unsigned int n_shellface_boundary_ids (const Elem * const elem,
                                          const unsigned short int shellface) const;
 
   /**
-   * Returns the list of boundary ids associated with the specified shell face
-   * of element \p elem. This is only relevant for shell elements.
+   * \returns the list of boundary ids associated with the specified shell face
+   * of element \p elem.
+   *
+   * \note This is only relevant for shell elements.
    */
   void shellface_boundary_ids (const Elem * const elem,
                                const unsigned short int shellface,
                                std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
-   * Returns the list of raw boundary ids associated with the specified shell face
-   * of element \p elem.  These ids are "raw" because they
-   * exclude ids which are implicit, such as a child's inheritance of
-   * its ancestors' boundary id.
-   * This is only relevant for shell elements.
+   * \returns The list of raw boundary ids associated with the
+   * specified shell face of element \p elem.
+   *
+   * These ids are "raw" because they exclude ids which are implicit,
+   * such as a child's inheritance of its ancestors' boundary id.
+   *
+   * \note This is only relevant for shell elements.
    */
   void raw_shellface_boundary_ids (const Elem * const elem,
                                    const unsigned short int shellface,
                                    std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
-   * Returns true iff the given side of the given element is
-   * associated with the given id.
+   * \returns \p true if side \p side of Elem \p elem is associated
+   * with \p id.
    */
   bool has_boundary_id (const Elem * const elem,
                         const unsigned short int side,
                         const boundary_id_type id) const;
 
   /**
-   * Returns the boundary id associated with the \p side side of
-   * element \p elem.  Note that only one id per side is allowed,
-   * however multiple sides per element are allowed.  Returns \p invalid_id
-   * if the \p side does not have an associated boundary id, hence
-   * \p invalid_id can be used as the default boundary id.
+   * \returns The boundary id associated with the \p side side of
+   * element \p elem, or \p invalid_id if the \p side does not have an
+   * associated boundary id.
+   *
+   * \note Only one id per side is allowed, however multiple sides per
+   * element are allowed.
    *
    * \deprecated Asking for just one boundary id means your code isn't
    * safe to use on meshes with overlapping boundary ids.  Try using
@@ -485,14 +500,14 @@ public:
                                 const unsigned short int side) const;
 
   /**
-   * Returns the number of boundary ids associated with the \p side
+   * \returns The number of boundary ids associated with the \p side
    * side of element \p elem.
    */
   unsigned int n_boundary_ids (const Elem * const elem,
                                const unsigned short int side) const;
 
   /**
-   * Returns the list of boundary ids associated with the \p side side of
+   * \returns The list of boundary ids associated with the \p side side of
    * element \p elem.
    *
    * \deprecated Instead, use the version of this function that fills
@@ -502,7 +517,7 @@ public:
                                               const unsigned short int side) const;
 
   /**
-   * Returns the list of boundary ids associated with the \p side side of
+   * \returns The list of boundary ids associated with the \p side side of
    * element \p elem.
    *
    * This is the non-deprecated version of the function.
@@ -512,10 +527,11 @@ public:
                      std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
-   * Returns the list of raw boundary ids associated with the \p side
-   * side of element \p elem.  These ids are "raw" because they
-   * exclude ids which are implicit, such as a child's inheritance of
-   * its ancestors' boundary id.
+   * \returns the list of raw boundary ids associated with the \p side
+   * side of element \p elem.
+   *
+   * These ids are "raw" because they exclude ids which are implicit,
+   * such as a child's inheritance of its ancestors' boundary id.
    *
    * \deprecated Instead, use the version of this function that fills
    * a std::vector.
@@ -524,10 +540,11 @@ public:
                                                   const unsigned short int side) const;
 
   /**
-   * Returns the list of raw boundary ids associated with the \p side
-   * side of element \p elem.  These ids are "raw" because they
-   * exclude ids which are implicit, such as a child's inheritance of
-   * its ancestors' boundary id.
+   * \returns The list of raw boundary ids associated with the \p side
+   * side of element \p elem.
+   *
+   * These ids are "raw" because they exclude ids which are implicit,
+   * such as a child's inheritance of its ancestors' boundary id.
    *
    * This is the non-deprecated version of the function.
    */
@@ -545,12 +562,11 @@ public:
                           const Elem * const new_elem);
 
   /**
-   * Returns a side of element \p elem whose associated boundary id is
-   * \p boundary_id if such a side exists.
-   * If multiple sides of \p elem have the same id, only the lowest numbered
-   * such side is returned.
+   * \returns A side of element \p elem whose associated boundary id is
+   * \p boundary_id if such a side exists, and \p invalid_uint otherwise.
    *
-   * Returns \p invalid_uint if no side has the requested boundary id.
+   * \note If multiple sides of \p elem have the same id, only the lowest numbered
+   * such side is returned.
    */
   unsigned int side_with_boundary_id(const Elem * const elem,
                                      const boundary_id_type boundary_id) const;
@@ -685,29 +701,32 @@ public:
   { return _boundary_ids; }
 
   /**
-   * Returns a reference to the set of the boundary IDs specified on
+   * \returns A reference to the set of the boundary IDs specified on
    * sides of semilocal mesh elements.
    */
   const std::set<boundary_id_type> & get_side_boundary_ids () const
   { return _side_boundary_ids; }
 
   /**
-   * Returns a reference to the set of all boundary IDs specified on
+   * \returns A reference to the set of all boundary IDs specified on
    * edges of semilocal mesh elements.
-   * Edge-based boundary IDs should only be used in 3D.
+   *
+   * \note Edge-based boundary IDs should only be used in 3D.
    */
   const std::set<boundary_id_type> & get_edge_boundary_ids () const
   { return _edge_boundary_ids; }
 
   /**
-   * Returns a reference to the set of all boundary IDs
-   * specified on shell faces. This is only relevant on shell elements.
+   * \returns A reference to the set of all boundary IDs specified on
+   * shell faces.
+   *
+   * \note This is only relevant on shell elements.
    */
   const std::set<boundary_id_type> & get_shellface_boundary_ids () const
   { return _shellface_boundary_ids; }
 
   /**
-   * Returns a reference to the set of all boundary IDs specified on
+   * \returns A reference to the set of all boundary IDs specified on
    * semilocal mesh nodes.
    */
   const std::set<boundary_id_type> & get_node_boundary_ids () const
@@ -715,45 +734,45 @@ public:
 
 
   /**
-   * Print the boundary information data structure.
+   * Prints the boundary information data structure.
    */
   void print_info (std::ostream & out=libMesh::out) const;
 
   /**
-   * Print a summary of the boundary information.
+   * Prints a summary of the boundary information.
    */
   void print_summary (std::ostream & out=libMesh::out) const;
 
   /**
-   * Returns a reference for getting an optional name for a sideset.
+   * \returns A reference for getting an optional name for a sideset.
    */
   const std::string & get_sideset_name(boundary_id_type id) const;
 
   /**
-   * Returns a writable reference for setting an optional
+   * \returns A writable reference for setting an optional
    * name for a sideset.
    */
   std::string & sideset_name(boundary_id_type id);
 
   /**
-   * Returns a reference for getting an optional name for a nodeset.
+   * \returns A reference for getting an optional name for a nodeset.
    */
   const std::string & get_nodeset_name(boundary_id_type id) const;
 
   /**
-   * Returns a writable reference for setting an optional
+   * \returns A writable reference for setting an optional
    * name for a nodeset.
    */
   std::string & nodeset_name(boundary_id_type id);
 
   /**
-   * Returns the id of the named boundary if it exists, invalid_id
+   * \returns The id of the named boundary if it exists, \p invalid_id
    * otherwise.
    */
   boundary_id_type get_id_by_name(const std::string & name) const;
 
   /**
-   * Return a writeable reference to the whole sideset name map
+   * \returns A writeable reference to the sideset name map.
    */
   std::map<boundary_id_type, std::string> & set_sideset_name_map ()
   { return _ss_id_to_name; }
@@ -761,7 +780,7 @@ public:
   { return _ss_id_to_name; }
 
   /**
-   * Return a writeable reference to the whole nodeset name map
+   * \returns A writeable reference to the nodeset name map.
    */
   std::map<boundary_id_type, std::string> & set_nodeset_name_map ()
   { return _ns_id_to_name; }

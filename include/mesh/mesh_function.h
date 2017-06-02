@@ -107,17 +107,19 @@ public:
   virtual void clear () libmesh_override;
 
   /**
-   * Returns a new copy of the function.  The new copy uses the
-   * original as a master function to enable simultaneous evaluations
-   * of the copies in different threads.
-   * Note that this implies the copy should not be used after the
+   * \returns A new copy of the function.
+   *
+   * The new copy uses the original as a master function to enable
+   * simultaneous evaluations of the copies in different threads.
+   *
+   * \note This implies the copy should not be used after the
    * original is destroyed.
    */
   virtual UniquePtr<FunctionBase<Number> > clone () const libmesh_override;
 
   /**
-   * \returns the value of variable 0 at point
-   * \p p and for \p time, which defaults to zero.
+   * \returns the value of variable 0 at point \p p and for \p time,
+   * which defaults to zero.
    */
   Number operator() (const Point & p,
                      const Real time=0.) libmesh_override;
@@ -125,8 +127,10 @@ public:
   /**
    * \returns a map of values of variable 0 at point
    * \p p and for \p time.
-   * map is from element to Number and accounts for double defined
-   * values on faces if discontinuous variables are used
+   *
+   * The std::map is from element to Number and accounts for
+   * doubly-defined values on faces if discontinuous variables are
+   * used.
    */
   std::map<const Elem *, Number> discontinuous_value (const Point & p,
                                                       const Real time=0.);
@@ -237,9 +241,10 @@ public:
                 const std::set<subdomain_id_type> * subdomain_ids = libmesh_nullptr);
 
   /**
-   * Returns the current \p PointLocator object, for you might want to
-   * use it elsewhere.  The \p MeshFunction object must be initialized
-   * before.
+   * \returns The current \p PointLocator object, for use elsewhere.
+   *
+   * \note The \p MeshFunction object must be initialized before this
+   * is called.
    */
   const PointLocatorBase & get_point_locator (void) const;
 
@@ -294,8 +299,10 @@ protected:
                             const std::set<subdomain_id_type> * subdomain_ids = libmesh_nullptr) const;
 
   /**
-   * Similar to find_element but returns all elements that are close to a point
-   * to cover cases where p is on the boundary
+   * \returns All elements that are close to a point \p p.
+   *
+   * This is similar to \p find_element() but covers cases where \p p
+   * is on the boundary.
    */
   std::set<const Elem *> find_elements(const Point & p,
                                        const std::set<subdomain_id_type> * subdomain_ids = libmesh_nullptr) const;

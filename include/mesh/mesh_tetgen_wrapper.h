@@ -90,126 +90,126 @@ public:
   void set_switches(const std::string & s);
 
   /**
-   * Method starts triangulization.
+   * Starts the triangulation.
    */
   void run_tetgen();
 
   /**
-   * Method returns number of tetrahedra in TetGen output.
+   * \returns Number of tetrahedra in the TetGen output.
    */
   int  get_numberoftetrahedra();
 
   /**
-   * Method returns number of triangle surface elts. in TetGen output.
+   * \returns Number of triangle surface elements in the TetGen output.
    */
   int  get_numberoftrifaces();
 
   /**
-   * Method sets number of nodes in TetGen input.
+   * Sets the number of nodes in the TetGen input.
    */
   void set_numberofpoints(int i);
 
   /**
-   * Method returns number of nodes in TetGen output.
+   * \returns Number of nodes in the TetGen output.
    */
   int get_numberofpoints();
 
   /**
-   * Method sets number of facets in TetGen input.
+   * Sets the number of facets in the TetGen input.
    */
   void set_numberoffacets(int i);
 
   /**
-   * Method sets number of holes in TetGen input.
+   * Sets the number of holes in the TetGen input.
    */
   void set_numberofholes(int i);
 
   /**
-   * Method sets number of regions in TetGen input.
+   * Sets the number of regions in the TetGen input.
    */
   void set_numberofregions(int i);
 
   /**
-   * Method allocates memory, sets number of nodes in TetGen input.
+   * Allocates memory, sets number of nodes in the TetGen input.
    */
   void allocate_pointlist(int numofpoints);
 
   /**
-   * Method allocates memory, sets number of facets, holes in TetGen input.
+   * Allocates memory, sets number of facets, holes in the TetGen input.
    */
   void allocate_facetlist(int numoffacets, int numofholes);
 
   /**
-   * Method allocates memory, sets number of regions in TetGen input.
+   * Allocates memory, sets number of regions in the TetGen input.
    */
   void allocate_regionlist(int numofregions);
 
   /**
-   * Method sets coordinates of point i in TetGen input.
+   * Sets coordinates of point i in the TetGen input.
    */
   void set_node(unsigned i, REAL x, REAL y, REAL z);
 
   /**
-   * Method returns coordinates of point i in TetGen output.
+   * \returns The coordinates of point i in the TetGen output.
    */
   void get_output_node(unsigned i, REAL & x, REAL & y, REAL & z);
 
   /**
-   * Method returns index of jth node from element i in TetGen output.
+   * \returns The index of jth node from element i in the TetGen output.
    */
   int  get_element_node(unsigned i, unsigned j);
 
   /**
-   * Method returns index of jth node from surface triangle i in TetGen output.
+   * \returns The index of the jth node from surface triangle i in the TetGen output.
    */
   int  get_triface_node(unsigned i, unsigned j);
 
   /**
-   * Method returns attribute of element i in TetGen output.
+   * \returns The attribute of element i in the TetGen output.
    */
   REAL get_element_attribute(unsigned i);
 
   /**
-   * Method sets coordinates of hole i in TetGen input.
+   * Sets coordinates of hole i in the TetGen input.
    */
   void set_hole(unsigned i, REAL x, REAL y, REAL z);
 
   /**
-   * Method sets number of polygons for facet i in TetGen input.
+   * Sets the number of polygons for facet i in the TetGen input.
    */
   void set_facet_numberofpolygons(unsigned i, int num);
 
   /**
-   * Method sets number of holes for facet i in TetGen input.
+   * Sets the number of holes for facet i in the TetGen input.
    */
   void set_facet_numberofholes(unsigned i, int num);
 
   /**
-   * Method allocates memory, sets number of polygons for facet i
-   * in TetGen input.
+   * Allocates memory, sets number of polygons for facet i
+   * in the TetGen input.
    */
   void allocate_facet_polygonlist(unsigned i, int numofpolygons);
 
   /**
-   * Method sets number of vertices for polygon j, facet i in TetGen input.
+   * Sets the number of vertices for polygon j, facet i in the TetGen input.
    */
   void set_polygon_numberofvertices(unsigned i, unsigned j, int num);
 
   /**
-   * Method allocates memory, sets number of vertices for polygon j,
-   * facet i in TetGen input.
+   * Allocates memory, sets number of vertices for polygon j,
+   * facet i in the TetGen input.
    */
   void allocate_polygon_vertexlist(unsigned i, unsigned j, int numofvertices);
 
   /**
-   * Method sets index of ith facet, jth polygon, kth vertex in
-   * TetGen input.
+   * Sets index of ith facet, jth polygon, kth vertex in
+   * the TetGen input.
    */
   void set_vertex(unsigned i, unsigned j, unsigned k, int nodeindex);
 
   /**
-   * Method sets coordinates, attribute and volume constraint for
-   * region i in TetGen input.  Note that coordinates and attributes
+   * Sets coordinates, attribute, and volume constraint for
+   * region i in the TetGen input.  Note that coordinates and attributes
    * will only be considered if the corresponding switches are
    * enabled.  See TetGen documentation for more details.
    */

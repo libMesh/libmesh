@@ -229,7 +229,7 @@ public:
   void close();
 
   /**
-   * Generic inquiry, returns the value
+   * \returns The value obtained from a generic exII::ex_inquire() call.
    */
   int inquire(int req_info, std::string error_msg="");
 
@@ -360,7 +360,7 @@ public:
   void set_coordinate_offset(Point p);
 
   /**
-   * Returns a vector with three copies of each element in the provided name vector,
+   * \returns A vector with three copies of each element in the provided name vector,
    * starting with r_, i_ and a_ respectively.
    */
   std::vector<std::string> get_complex_names(const std::vector<std::string> & names) const;
@@ -707,9 +707,10 @@ public:
   {}
 
   /**
-   * Returns the ith component of the node map for this
-   * element.  The node map maps the exodusII node numbering
-   * format to this library's format.
+   * \returns The ith component of the node map for this element.
+   *
+   * The node map maps the exodusII node numbering format to this
+   * library's format.
    */
   int get_node_map(int i) const
   {
@@ -718,10 +719,14 @@ public:
   }
 
   /**
-   * Returns the ith component of the inverse node map for this
-   * element.  The inverse node map maps the libmesh node numbering
-   * to Exodus' node numbering.  Note that all elements except Hex27
-   * currently have the same node numbering as libmesh elements.
+   * \returns The ith component of the inverse node map for this
+   * element.
+   *
+   * The inverse node map maps the libmesh node numbering to Exodus'
+   * node numbering.
+   *
+   * \note All elements except Hex27 currently have the same node
+   * numbering as libmesh elements.
    */
   int get_inverse_node_map(int i) const
   {
@@ -730,16 +735,18 @@ public:
   }
 
   /**
-   * Returns the ith component of the side map for this
-   * element.  The side map maps the exodusII side numbering
-   * format to this library's format.
+   * \returns The ith component of the side map for this element.
+   *
+   * The side map maps the exodusII side numbering format to this
+   * library's format.
    */
   int get_side_map(int i) const;
 
   /**
-   * Returns the ith component of the side map for this
-   * element.  The side map maps the libMesh side numbering
-   * format to this exodus's format.
+   * \returns The ith component of the side map for this element.
+   *
+   * The side map maps the libMesh side numbering format to this
+   * exodus's format.
    */
   int get_inverse_side_map(int i) const
   {
@@ -748,8 +755,7 @@ public:
   }
 
   /**
-   * Returns the ith component of the shellface map for this
-   * element.
+   * \returns The ith component of the shellface map for this element.
    */
   int get_inverse_shellface_map(int i) const
   {
@@ -758,19 +764,20 @@ public:
   }
 
   /**
-   * Returns the canonical element type for this
-   * element.  The canonical element type is the standard
-   * element type understood by this library.
+   * \returns The canonical element type for this element.
+   *
+   * The canonical element type is the standard element type
+   * understood by this library.
    */
   ElemType get_canonical_type()    const { return canonical_type; }
 
   /**
-   * Returns the string corresponding to the Exodus type for this element
+   * \returns The string corresponding to the Exodus type for this element.
    */
   std::string exodus_elem_type() const { return exodus_type; }
 
   /**
-   * Returns the shellface index offset.
+   * \returns The shellface index offset.
    */
   int get_shellface_index_offset() const { return shellface_index_offset; }
 

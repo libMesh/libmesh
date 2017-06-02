@@ -59,7 +59,7 @@ public:
   ~MeshCommunication () {}
 
   /**
-   * Clears all data structures and returns to a pristine state.
+   * Clears all data structures and resets to a pristine state.
    */
   void clear ();
 

@@ -147,12 +147,12 @@ public:
   virtual Point unit_normal (const Point & p) const libmesh_override;
 
   /**
-   * Returns the radius of the sphere.
+   * \returns The radius of the sphere.
    */
   Real radius() const { return _rad; }
 
   /**
-   * Returns the radius of the sphere as a writeable reference.
+   * \returns The radius of the sphere as a writeable reference.
    */
   Real & radius() { return _rad; }
 

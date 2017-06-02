@@ -77,18 +77,22 @@ public:
 
 
 /**
- * This function returns the sum over all the elemenents of the number
- * of nodes per element.  This can be useful for partitioning hybrid meshes.
- * A feasible load balancing scheme is to keep the weight per processor as
- * uniform as possible.
+ * \returns the sum over all the elemenents of the number
+ * of nodes per element.
+ *
+ * This can be useful for partitioning hybrid meshes.  A feasible load
+ * balancing scheme is to keep the weight per processor as uniform as
+ * possible.
  */
 dof_id_type total_weight (const MeshBase & mesh);
 
 /**
- * This function returns the sum over all the elemenents on processor \p pid
- * of nodes per element.  This can be useful for partitioning hybrid meshes.
- * A feasible load balancing scheme is to keep the weight per processor as
- * uniform as possible.
+ * \returns the sum over all the elemenents on processor \p pid
+ * of nodes per element.
+ *
+ * This can be useful for partitioning hybrid meshes.  A feasible load
+ * balancing scheme is to keep the weight per processor as uniform as
+ * possible.
  */
 dof_id_type weight (const MeshBase & mesh,
                     const processor_id_type pid);
@@ -138,20 +142,21 @@ BoundingBox
 bounding_box (const MeshBase & mesh);
 
 /**
- * The same functionality as the deprecated MeshTools::bounding_box()
- * function, but returns the non-deprecated libMesh::BoundingBox type.
+ * The same functionality as the deprecated MeshTools::bounding_box().
+ *
+ * \returns The non-deprecated libMesh::BoundingBox type.
  */
 libMesh::BoundingBox
 create_bounding_box (const MeshBase & mesh);
 
 /**
- * Same, but returns a sphere instead of a box.
+ * \returns A bounding sphere for \p mesh instead of a bounding box.
  */
 Sphere
 bounding_sphere (const MeshBase & mesh);
 
 /**
- * \returns two points defining a cartesian box that bounds the
+ * \returns Two points defining a cartesian box that bounds the
  * nodes of the mesh.
  *
  * In the case of curved elements, this box might *not* bound the
@@ -182,15 +187,16 @@ processor_bounding_box (const MeshBase & mesh,
                         const processor_id_type pid);
 
 /**
- * The same functionality as the deprecated MeshTools::processor_bounding_box()
- * function, but returns the non-deprecated libMesh::BoundingBox type.
+ * The same functionality as the deprecated MeshTools::processor_bounding_box().
+ *
+ * \returns The non-deprecated libMesh::BoundingBox type.
  */
 libMesh::BoundingBox
 create_processor_bounding_box (const MeshBase & mesh,
                                const processor_id_type pid);
 
 /**
- * Same, but returns a sphere instead of a box.
+ * \returns A processor bounding sphere instead of a processor bounding box.
  */
 Sphere
 processor_bounding_sphere (const MeshBase & mesh,
@@ -208,15 +214,16 @@ subdomain_bounding_box (const MeshBase & mesh,
 
 
 /**
- * The same functionality as the deprecated MeshTools::subdomain_bounding_box()
- * function, but returns the non-deprecated libMesh::BoundingBox type.
+ * The same functionality as the deprecated MeshTools::subdomain_bounding_box().
+ *
+ * \returns The non-deprecated libMesh::BoundingBox type.
  */
 libMesh::BoundingBox
 create_subdomain_bounding_box (const MeshBase & mesh,
                                const subdomain_id_type sid);
 
 /**
- * Same, but returns a sphere instead of a box.
+ * \returns a subdomain bounding sphere instead of a subdomain bounding box.
  */
 Sphere
 subdomain_bounding_sphere (const MeshBase & mesh,
@@ -248,7 +255,7 @@ dof_id_type n_active_elem_of_type (const MeshBase & mesh,
  * Return the number of elements of type \p type at the specified
  * refinement level.
  *
- * TODO: Replace all of the n_xxx_elem() functions like this with
+ * \todo Replace all of the n_xxx_elem() functions like this with
  * a single function which takes a range of iterators and returns the
  * std::distance between them.
  */
