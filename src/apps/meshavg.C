@@ -21,18 +21,10 @@
 
 #include "libmesh/libmesh.h"
 
-#include "libmesh/mesh.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/mesh.h"
+#include "libmesh/namebased_io.h"
 #include "libmesh/numeric_vector.h"
-
-#include "libmesh/exodusII_io.h"
-#include "libmesh/gmsh_io.h"
-#include "libmesh/gmv_io.h"
-#include "libmesh/gnuplot_io.h"
-#include "libmesh/medit_io.h"
-#include "libmesh/nemesis_io.h"
-#include "libmesh/tecplot_io.h"
-#include "libmesh/vtk_io.h"
 
 using namespace libMesh;
 
@@ -101,30 +93,7 @@ int main(int argc, char ** argv)
       delete summed_solutions[s];
     }
 
-  std::string outputname(argv[1]);
-
-  if (outputname.find(".xda") != std::string::npos ||
-      outputname.find(".xdr") != std::string::npos)
-    es1.write(outputname.c_str(),
-              EquationSystems::WRITE_DATA |
-              EquationSystems::WRITE_ADDITIONAL_DATA);
-  else if (outputname.find(".gnuplot") != std::string::npos)
-    GnuPlotIO(mesh1).write_equation_systems (outputname, es1);
-  else if (outputname.find(".gmv") != std::string::npos)
-    GMVIO(mesh1).write_equation_systems (outputname, es1);
-  else if (outputname.find(".mesh") != std::string::npos)
-    MEDITIO(mesh1).write_equation_systems (outputname, es1);
-  else if (outputname.find(".msh") != std::string::npos)
-    GmshIO(mesh1).write_equation_systems (outputname, es1);
-  else if (outputname.find(".plt") != std::string::npos)
-    TecplotIO(mesh1).write_equation_systems (outputname, es1);
-  else if (outputname.find(".vtu") != std::string::npos)
-    VTKIO(mesh1).write_equation_systems (outputname, es1);
-  else if (outputname.find(".e") != std::string::npos)
-    ExodusII_IO(mesh1).write_equation_systems (outputname, es1);
-  else if (outputname.find(".n") != std::string::npos)
-    Nemesis_IO(mesh1).write_equation_systems (outputname, es1);
-  libMesh::out << "Wrote solution " << outputname << std::endl;
+  NameBasedIO(mesh1).write_equation_systems (argv[1], es1);
 
   return 0;
 }
