@@ -59,6 +59,14 @@ public:
   DenseVector(const unsigned int n=0);
 
   /**
+   * Constructor.  Creates a dense vector of dimension \p n where all
+   * entries have value \p val.
+   */
+  explicit
+  DenseVector(const unsigned int n,
+              const T & val);
+
+  /**
    * Copy-constructor.
    */
   template <typename T2>
@@ -268,6 +276,15 @@ template<typename T>
 inline
 DenseVector<T>::DenseVector(const unsigned int n) :
   _val (n, T(0.))
+{
+}
+
+
+template<typename T>
+inline
+DenseVector<T>::DenseVector(const unsigned int n,
+                            const T & val) :
+  _val (n, val)
 {
 }
 
