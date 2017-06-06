@@ -25,6 +25,9 @@
 #include "libmesh/mesh.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/exact_solution.h"
+#include "libmesh/mesh_function.h"
+#include "libmesh/namebased_io.h"
+#include "libmesh/numeric_vector.h"
 
 using namespace libMesh;
 
@@ -38,7 +41,7 @@ int main(int argc, char ** argv)
   EquationSystems coarse_es(coarse_mesh), fine_es(fine_mesh);
 
   libMesh::out << "Usage: " << argv[0]
-               << " coarsemesh coarsesolution finemesh finesolution" << std::endl;
+               << " coarsemesh coarsesolution finemesh finesolution [outputdiff]" << std::endl;
 
   if (argc < 5)
     libmesh_error();
@@ -125,6 +128,44 @@ int main(int argc, char ** argv)
       if (!coarse_sys.n_vars() && !fine_sys.n_vars())
         libMesh::out << "No variables found in fine or coarse solution system "
                      << sysname << '!' << std::endl;
+    }
+
+  if (argc > 5)
+    {
+      libMesh::out << "Writing diff solution " << argv[5] << std::endl;
+
+      for (std::size_t i = 0; i != sysnames.size(); ++i)
+        {
+          const std::string sysname = sysnames[i];
+          const System & coarse_sys = coarse_es.get_system(sysname);
+          const System & fine_sys = fine_es.get_system(sysname);
+
+          UniquePtr<NumericVector<Number> > fine_solution = fine_sys.solution->clone();
+          fine_sys.solution->zero();
+
+          std::vector<unsigned int>
+            var_remapping(fine_sys.n_vars(), libMesh::invalid_uint);
+
+          for (unsigned int j = 0; j != fine_sys.n_vars(); ++j)
+            {
+              const std::string varname = fine_sys.variable_name(j);
+
+              if (coarse_sys.has_variable(varname))
+                var_remapping[j] = coarse_sys.variable_number(varname);
+            }
+
+          MeshFunction coarse_solution
+            (coarse_es, *coarse_sys.solution,
+             coarse_sys.get_dof_map(), var_remapping);
+          coarse_solution.init();
+          const DenseVector<Number> oom_value(fine_sys.n_vars(), 0);
+          coarse_solution.enable_out_of_mesh_mode(oom_value);
+
+          fine_sys.project_solution(&coarse_solution);
+          *fine_sys.solution -= *fine_solution;
+        }
+
+      NameBasedIO(fine_mesh).write_equation_systems (argv[5], fine_es);
     }
 
   return 0;
