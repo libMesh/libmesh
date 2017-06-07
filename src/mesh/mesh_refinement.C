@@ -880,8 +880,11 @@ bool MeshRefinement::make_coarsening_compatible()
       }
   }
 
-  // if there are no refined elements on this processor then
-  // there is no work for us to do
+  // Even if there are no refined elements on this processor then
+  // there may still be work for us to do on e.g. ancestor elements.
+  // At the very least we need to be in the loop if a distributed mesh
+  // needs to synchronize data.
+#if 0
   if (max_level == 0 && max_p_level == 0)
     {
       // But we still have to check with other processors
@@ -889,8 +892,7 @@ bool MeshRefinement::make_coarsening_compatible()
 
       return compatible_with_refinement;
     }
-
-
+#endif
 
   // Loop over all the active elements.  If an element is marked
   // for coarsening we better check its neighbors.  If ANY of these neighbors
