@@ -36,6 +36,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/remote_elem.h"
+#include "libmesh/sync_refinement_flags.h"
 
 #ifdef DEBUG
 // Some extra validation for DistributedMesh
@@ -749,77 +750,6 @@ bool MeshRefinement::refine_elements ()
     _mesh.prepare_for_use (/*skip_renumber =*/false);
 
   return mesh_changed;
-}
-
-
-// Functor for make_flags_parallel_consistent
-namespace {
-
-struct SyncRefinementFlags
-{
-  typedef unsigned char datum;
-  typedef Elem::RefinementState (Elem::*get_a_flag)() const;
-  typedef void (Elem::*set_a_flag)(const Elem::RefinementState);
-
-  SyncRefinementFlags(MeshBase & _mesh,
-                      get_a_flag _getter,
-                      set_a_flag _setter) :
-    mesh(_mesh), parallel_consistent(true),
-    get_flag(_getter), set_flag(_setter) {}
-
-  MeshBase & mesh;
-  bool parallel_consistent;
-  get_a_flag get_flag;
-  set_a_flag set_flag;
-  // References to pointers to member functions segfault?
-  // get_a_flag & get_flag;
-  // set_a_flag & set_flag;
-
-  // Find the refinement flag on each requested element
-  void gather_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> & flags) const
-  {
-    flags.resize(ids.size());
-
-    for (std::size_t i=0; i != ids.size(); ++i)
-      {
-        // Look for this element in the mesh
-        // We'd better find every element we're asked for
-        Elem & elem = mesh.elem_ref(ids[i]);
-
-        // Return the element's refinement flag
-        flags[i] = (elem.*get_flag)();
-      }
-  }
-
-  void act_on_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> & flags)
-  {
-    for (std::size_t i=0; i != ids.size(); ++i)
-      {
-        Elem & elem = mesh.elem_ref(ids[i]);
-
-        datum old_flag = (elem.*get_flag)();
-        datum & new_flag = flags[i];
-
-        if (old_flag != new_flag)
-          {
-            // It's possible for foreign flags to be (temporarily) more
-            // conservative than our own, such as when a refinement in
-            // one of the foreign processor's elements is mandated by a
-            // refinement in one of our neighboring elements it can see
-            // which was mandated by a refinement in one of our
-            // neighboring elements it can't see
-            // libmesh_assert (!(new_flag != Elem::REFINE &&
-            //                   old_flag == Elem::REFINE));
-            //
-            (elem.*set_flag)
-              (static_cast<Elem::RefinementState>(new_flag));
-            parallel_consistent = false;
-          }
-      }
-  }
-};
 }
 
 
