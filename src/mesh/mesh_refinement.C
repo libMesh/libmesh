@@ -57,15 +57,18 @@ using namespace libMesh;
 struct SyncCoarsenInactive
 {
   bool operator() (const Elem * elem) const {
-    // If we're not an ancestor marked INACTIVE, there's no chance we
-    // need to be changed to COARSEN_INACTIVE
-    if (elem->refinement_flag() != Elem::INACTIVE ||
-        !elem->ancestor())
+    // If we're not an ancestor, there's no chance our coarsening
+    // settings need to be changed.
+    if (!elem->ancestor())
       return false;
 
-    // If we don't have any remote children, or if we know we have a
-    // child that isn't being coarsened, there's nothing we need to
-    // communicate.
+    // If we don't have any remote children, we already know enough to
+    // determine the correct refinement flag ourselves.
+    //
+    // If we know we have a child that isn't being coarsened, that
+    // also forces a specific flag.
+    //
+    // Either way there's nothing we need to communicate.
     bool found_remote_child = false;
     for (unsigned int c=0; c<elem->n_children(); c++)
       {
