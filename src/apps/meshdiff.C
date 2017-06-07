@@ -25,6 +25,9 @@
 #include "libmesh/mesh.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/exact_solution.h"
+#include "libmesh/mesh_function.h"
+#include "libmesh/namebased_io.h"
+#include "libmesh/numeric_vector.h"
 
 using namespace libMesh;
 
@@ -34,83 +37,86 @@ int main(int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
 
-  Mesh mesh1(init.comm(), dim), mesh2(init.comm(), dim);
-  EquationSystems es1(mesh1), es2(mesh2);
+  Mesh coarse_mesh(init.comm(), dim), fine_mesh(init.comm(), dim);
+  EquationSystems coarse_es(coarse_mesh), fine_es(fine_mesh);
 
   libMesh::out << "Usage: " << argv[0]
-               << " coarsemesh coarsesolution finemesh finesolution" << std::endl;
+               << " coarsemesh coarsesolution finemesh finesolution [outputdiff]" << std::endl;
 
-  mesh1.read(argv[1]);
+  if (argc < 5)
+    libmesh_error();
+
+  coarse_mesh.read(argv[1]);
   libMesh::out << "Loaded coarse mesh " << argv[1] << std::endl;
-  es1.read(argv[2]);
+  coarse_es.read(argv[2]);
   libMesh::out << "Loaded coarse solution " << argv[2] << std::endl;
-  mesh2.read(argv[3]);
+  fine_mesh.read(argv[3]);
   libMesh::out << "Loaded fine mesh " << argv[3] << std::endl;
-  es2.read(argv[4]);
+  fine_es.read(argv[4]);
   libMesh::out << "Loaded fine solution " << argv[4] << std::endl;
 
-  ExactSolution exact_sol(es1);
-  exact_sol.attach_reference_solution(&es2);
+  ExactSolution exact_sol(coarse_es);
+  exact_sol.attach_reference_solution(&fine_es);
 
   std::vector<std::string> sysnames;
-  sysnames.reserve(es1.n_systems());
+  sysnames.reserve(coarse_es.n_systems());
 
-  for (unsigned int i = 0; i != es1.n_systems(); ++i)
-    if (es2.has_system(es1.get_system(i).name()))
-      sysnames.push_back(es1.get_system(i).name());
+  for (unsigned int i = 0; i != coarse_es.n_systems(); ++i)
+    if (fine_es.has_system(coarse_es.get_system(i).name()))
+      sysnames.push_back(coarse_es.get_system(i).name());
     else
       libMesh::out << "Coarse solution system "
-                   << es1.get_system(i).name()
+                   << coarse_es.get_system(i).name()
                    << " not found in fine solution!" << std::endl;
 
-  for (unsigned int i = 0; i != es2.n_systems(); ++i)
-    if (!es1.has_system(es2.get_system(i).name()))
+  for (unsigned int i = 0; i != fine_es.n_systems(); ++i)
+    if (!coarse_es.has_system(fine_es.get_system(i).name()))
       libMesh::out << "Fine solution system "
-                   << es2.get_system(i).name()
+                   << fine_es.get_system(i).name()
                    << " not found in coarse solution!" << std::endl;
 
-  if (!es1.n_systems() && !es2.n_systems())
+  if (!coarse_es.n_systems() && !fine_es.n_systems())
     libMesh::out << "No systems found in fine or coarse solution!"
                  << std::endl;
 
   for (std::size_t i = 0; i != sysnames.size(); ++i)
     {
       const std::string sysname = sysnames[i];
-      const System & sys1 = es1.get_system(sysname);
-      const System & sys2 = es2.get_system(sysname);
+      const System & coarse_sys = coarse_es.get_system(sysname);
+      const System & fine_sys = fine_es.get_system(sysname);
 
-      for (unsigned int j = 0; j != sys1.n_vars(); ++j)
+      for (unsigned int j = 0; j != coarse_sys.n_vars(); ++j)
         {
-          const std::string varname = sys1.variable_name(j);
+          const std::string varname = coarse_sys.variable_name(j);
 
-          if (!sys2.has_variable(varname))
+          if (!fine_sys.has_variable(varname))
             {
               libMesh::out << "Fine solution system " << sysname
                            << " variable " << varname
                            << " not found in coarse solution!" << std::endl;
               continue;
             }
-          const unsigned int j2 = sys2.variable_number(varname);
+          const unsigned int j2 = fine_sys.variable_number(varname);
 
           exact_sol.compute_error(sysname, varname);
 
           libMesh::out << "Errors in system " << sysname << ", variable " << varname << ":" << std::endl;
           libMesh::out << "L2 error: " << exact_sol.l2_error(sysname, varname)
-                       << ", fine norm: " << sys1.calculate_norm(*sys1.solution, j, L2)
-                       << ", coarse norm: " << sys2.calculate_norm(*sys2.solution, j2, L2) << std::endl;
+                       << ", fine norm: " << coarse_sys.calculate_norm(*coarse_sys.solution, j, L2)
+                       << ", coarse norm: " << fine_sys.calculate_norm(*fine_sys.solution, j2, L2) << std::endl;
           libMesh::out << "H1 error: " << exact_sol.h1_error(sysname, varname)
-                       << ", fine norm: " << sys1.calculate_norm(*sys1.solution, j, H1)
-                       << ", coarse norm: " << sys2.calculate_norm(*sys2.solution, j2, H1) << std::endl;
+                       << ", fine norm: " << coarse_sys.calculate_norm(*coarse_sys.solution, j, H1)
+                       << ", coarse norm: " << fine_sys.calculate_norm(*fine_sys.solution, j2, H1) << std::endl;
           libMesh::out << "H2 error: " << exact_sol.h2_error(sysname, varname)
-                       << ", fine norm: " << sys1.calculate_norm(*sys1.solution, j, H2)
-                       << ", coarse norm: " << sys2.calculate_norm(*sys2.solution, j2, H2) << std::endl;
+                       << ", fine norm: " << coarse_sys.calculate_norm(*coarse_sys.solution, j, H2)
+                       << ", coarse norm: " << fine_sys.calculate_norm(*fine_sys.solution, j2, H2) << std::endl;
         }
 
-      for (unsigned int j = 0; j != sys2.n_vars(); ++j)
+      for (unsigned int j = 0; j != fine_sys.n_vars(); ++j)
         {
-          const std::string varname = sys2.variable_name(j);
+          const std::string varname = fine_sys.variable_name(j);
 
-          if (!sys1.has_variable(varname))
+          if (!coarse_sys.has_variable(varname))
             {
               libMesh::out << "Coarse solution system " << sysname
                            << " variable " << varname
@@ -119,9 +125,47 @@ int main(int argc, char ** argv)
             }
         }
 
-      if (!sys1.n_vars() && !sys2.n_vars())
+      if (!coarse_sys.n_vars() && !fine_sys.n_vars())
         libMesh::out << "No variables found in fine or coarse solution system "
                      << sysname << '!' << std::endl;
+    }
+
+  if (argc > 5)
+    {
+      libMesh::out << "Writing diff solution " << argv[5] << std::endl;
+
+      for (std::size_t i = 0; i != sysnames.size(); ++i)
+        {
+          const std::string sysname = sysnames[i];
+          const System & coarse_sys = coarse_es.get_system(sysname);
+          const System & fine_sys = fine_es.get_system(sysname);
+
+          UniquePtr<NumericVector<Number> > fine_solution = fine_sys.solution->clone();
+          fine_sys.solution->zero();
+
+          std::vector<unsigned int>
+            var_remapping(fine_sys.n_vars(), libMesh::invalid_uint);
+
+          for (unsigned int j = 0; j != fine_sys.n_vars(); ++j)
+            {
+              const std::string varname = fine_sys.variable_name(j);
+
+              if (coarse_sys.has_variable(varname))
+                var_remapping[j] = coarse_sys.variable_number(varname);
+            }
+
+          MeshFunction coarse_solution
+            (coarse_es, *coarse_sys.solution,
+             coarse_sys.get_dof_map(), var_remapping);
+          coarse_solution.init();
+          const DenseVector<Number> oom_value(fine_sys.n_vars(), 0);
+          coarse_solution.enable_out_of_mesh_mode(oom_value);
+
+          fine_sys.project_solution(&coarse_solution);
+          *fine_sys.solution -= *fine_solution;
+        }
+
+      NameBasedIO(fine_mesh).write_equation_systems (argv[5], fine_es);
     }
 
   return 0;

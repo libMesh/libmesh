@@ -292,6 +292,15 @@ void MeshFunction::operator() (const Point & p,
              * the data for this variable
              */
             const unsigned int var = _system_vars[index];
+
+            if (var == libMesh::invalid_uint)
+              {
+                libmesh_assert (_out_of_mesh_mode &&
+                                index < _out_of_mesh_value.size());
+                output(index) = _out_of_mesh_value(index);
+                continue;
+              }
+
             const FEType & fe_type = this->_dof_map.variable_type(var);
 
             /**
@@ -377,6 +386,15 @@ void MeshFunction::discontinuous_value (const Point & p,
            * the data for this variable
            */
           const unsigned int var = _system_vars[index];
+
+          if (var == libMesh::invalid_uint)
+            {
+              libmesh_assert (_out_of_mesh_mode &&
+                              index < _out_of_mesh_value.size());
+              temp_output(index) = _out_of_mesh_value(index);
+              continue;
+            }
+
           const FEType & fe_type = this->_dof_map.variable_type(var);
 
           /**
@@ -457,6 +475,15 @@ void MeshFunction::gradient (const Point & p,
              * the data for this variable
              */
             const unsigned int var = _system_vars[index];
+
+            if (var == libMesh::invalid_uint)
+              {
+                libmesh_assert (_out_of_mesh_mode &&
+                                index < _out_of_mesh_value.size());
+                output[index] = Gradient(_out_of_mesh_value(index));
+                continue;
+              }
+
             const FEType & fe_type = this->_dof_map.variable_type(var);
 
             UniquePtr<FEBase> point_fe (FEBase::build(dim, fe_type));
@@ -532,6 +559,15 @@ void MeshFunction::discontinuous_gradient (const Point & p,
            * the data for this variable
            */
           const unsigned int var = _system_vars[index];
+
+          if (var == libMesh::invalid_uint)
+            {
+              libmesh_assert (_out_of_mesh_mode &&
+                              index < _out_of_mesh_value.size());
+              temp_output[index] = Gradient(_out_of_mesh_value(index));
+              continue;
+            }
+
           const FEType & fe_type = this->_dof_map.variable_type(var);
 
           UniquePtr<FEBase> point_fe (FEBase::build(dim, fe_type));
@@ -603,6 +639,14 @@ void MeshFunction::hessian (const Point & p,
              * the data for this variable
              */
             const unsigned int var = _system_vars[index];
+
+            if (var == libMesh::invalid_uint)
+              {
+                libmesh_assert (_out_of_mesh_mode &&
+                                index < _out_of_mesh_value.size());
+                output[index] = Tensor(_out_of_mesh_value(index));
+                continue;
+              }
             const FEType & fe_type = this->_dof_map.variable_type(var);
 
             UniquePtr<FEBase> point_fe (FEBase::build(dim, fe_type));

@@ -32,6 +32,7 @@
 #include "libmesh/gmv_io.h"
 #include "libmesh/tecplot_io.h"
 #include "libmesh/exodusII_io.h"
+#include "libmesh/xdr_io.h"
 
 namespace libMesh
 {
@@ -297,11 +298,25 @@ void ErrorVector::plot_error(const std::string & filename,
       io.write_element_data(temp_es);
     }
 #endif
+  else if (filename.rfind(".xda") < filename.size())
+    {
+      XdrIO(mesh).write("mesh-"+filename);
+      temp_es.write("soln-"+filename,WRITE,
+                    EquationSystems::WRITE_DATA |
+                    EquationSystems::WRITE_ADDITIONAL_DATA);
+    }
+  else if (filename.rfind(".xdr") < filename.size())
+    {
+      XdrIO(mesh,true).write("mesh-"+filename);
+      temp_es.write("soln-"+filename,ENCODE,
+                    EquationSystems::WRITE_DATA |
+                    EquationSystems::WRITE_ADDITIONAL_DATA);
+    }
   else
     {
       libmesh_here();
       libMesh::err << "Warning: ErrorVector::plot_error currently only"
-                   << " supports .gmv and .plt and .exo/.e (if enabled) output;" << std::endl;
+                   << " supports .gmv, .plt, .xdr/.xda, and .exo/.e (if enabled) output;" << std::endl;
       libMesh::err << "Could not recognize filename: " << filename
                    << std::endl;
     }
