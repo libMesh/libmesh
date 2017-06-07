@@ -1736,14 +1736,8 @@ void MeshRefinement::_smooth_flags(bool refining, bool coarsening)
           satisfied = (coarsening_satisfied &&
                        refinement_satisfied &&
                        smoothing_satisfied);
-#ifdef DEBUG
-          bool max_satisfied = satisfied,
-            min_satisfied = satisfied;
-          this->comm().max(max_satisfied);
-          this->comm().min(min_satisfied);
-          libmesh_assert_equal_to (satisfied, max_satisfied);
-          libmesh_assert_equal_to (satisfied, min_satisfied);
-#endif
+
+          libmesh_assert(this->comm().verify(satisfied));
         }
       while (!satisfied);
     }
