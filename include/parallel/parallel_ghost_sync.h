@@ -85,6 +85,22 @@ void sync_dofobject_data_by_id(const Communicator & comm,
                                const Iterator &     range_end,
                                SyncFunctor &        sync);
 
+/**
+ * Request data about a range of ghost dofobjects uniquely
+ * identified by their id.
+ *
+ * Elements within the range can be excluded from the request by
+ * returning false from dofobj_check(dof_object)
+ */
+template <typename Iterator,
+          typename DofObjectCheckFunctor,
+          typename SyncFunctor>
+void sync_dofobject_data_by_id(const Communicator & comm,
+                               const Iterator & range_begin,
+                               const Iterator & range_end,
+                               const DofObjectCheckFunctor & dofobj_check,
+                               SyncFunctor &    sync);
+
 //------------------------------------------------------------------------
 /**
  * Request data about a range of ghost elements uniquely
@@ -143,6 +159,20 @@ void sync_node_data_by_element_id(MeshBase & mesh,
 
 //------------------------------------------------------------------------
 // Parallel members
+
+
+// "Check" Functor to perform sync operations with no exclusions
+struct SyncEverything
+{
+  SyncEverything() {}
+
+  bool operator() (const DofObject *) const { return true; }
+
+  bool operator() (const Elem *, unsigned int) const
+  { return true; }
+};
+
+
 
 template <typename Iterator,
           typename DofObjType,
@@ -275,6 +305,18 @@ void sync_dofobject_data_by_id(const Communicator & comm,
                                const Iterator & range_end,
                                SyncFunctor &    sync)
 {
+  sync_dofobject_data_by_id(comm, range_begin, range_end, SyncEverything(), sync);
+}
+
+template <typename Iterator,
+          typename DofObjectCheckFunctor,
+          typename SyncFunctor>
+void sync_dofobject_data_by_id(const Communicator & comm,
+                               const Iterator & range_begin,
+                               const Iterator & range_end,
+                               const DofObjectCheckFunctor & dofobj_check,
+                               SyncFunctor &    sync)
+{
   // This function must be run on all processors at once
   libmesh_parallel_only(comm);
 
@@ -284,8 +326,14 @@ void sync_dofobject_data_by_id(const Communicator & comm,
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
-      DofObject * obj = *it;
+       DofObject * obj = *it;
       libmesh_assert (obj);
+
+      // We may want to pass Elem* or Node* to the check function, not
+      // just DofObject*
+      if (!dofobj_check(*it))
+        continue;
+
       processor_id_type obj_procid = obj->processor_id();
       if (obj_procid != DofObject::invalid_processor_id)
         ghost_objects_from_proc[obj_procid]++;
@@ -305,6 +353,10 @@ void sync_dofobject_data_by_id(const Communicator & comm,
   for (Iterator it = range_begin; it != range_end; ++it)
     {
       DofObject * obj = *it;
+
+      if (!dofobj_check(*it))
+        continue;
+
       processor_id_type obj_procid = obj->processor_id();
       if (obj_procid == comm.rank() ||
           obj_procid == DofObject::invalid_processor_id)
@@ -464,17 +516,6 @@ void sync_element_data_by_parent_id(MeshBase &,
 {
 }
 #endif // LIBMESH_ENABLE_AMR
-
-
-struct SyncEverything
-{
-  SyncEverything() {}
-
-  bool operator() (const Elem *) const { return true; }
-
-  bool operator() (const Elem *, unsigned int) const
-  { return true; }
-};
 
 
 
