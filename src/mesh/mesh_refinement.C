@@ -1170,7 +1170,7 @@ bool MeshRefinement::make_coarsening_compatible()
 
       Parallel::MessageTag
         uncoarsenable_tag = this->comm().get_unique_tag(2718);
-      std::vector<Parallel::Request> uncoarsenable_push_requests(n_proc);
+      std::vector<Parallel::Request> uncoarsenable_push_requests(n_proc-1);
 
       for (processor_id_type p = 0; p != n_proc; ++p)
         {
@@ -1201,6 +1201,8 @@ bool MeshRefinement::make_coarsening_compatible()
               elem.set_refinement_flag(Elem::INACTIVE);
             }
         }
+
+      Parallel::wait(uncoarsenable_push_requests);
 
       SyncRefinementFlags hsync(_mesh, &Elem::refinement_flag,
                                 &Elem::set_refinement_flag);
