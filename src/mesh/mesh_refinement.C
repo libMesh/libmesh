@@ -1165,6 +1165,9 @@ bool MeshRefinement::make_coarsening_compatible()
   // INACTIVE vs. COARSEN_INACTIVE flags.
   if (distributed_mesh)
     {
+      // We'd better still be in sync here
+      parallel_object_only();
+
       Parallel::MessageTag
         uncoarsenable_tag = this->comm().get_unique_tag(2718);
       std::vector<Parallel::Request> uncoarsenable_push_requests(n_proc);
