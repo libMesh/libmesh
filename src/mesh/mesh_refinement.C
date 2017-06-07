@@ -47,6 +47,41 @@
 #include "libmesh/periodic_boundaries.h"
 #endif
 
+
+
+// Anonymous namespace for helper functions
+namespace {
+
+using namespace libMesh;
+
+struct SyncCoarsenInactive
+{
+  bool operator() (const Elem * elem) const {
+    // If we're not an ancestor marked INACTIVE, there's no chance we
+    // need to be changed to COARSEN_INACTIVE
+    if (elem->refinement_flag() != Elem::INACTIVE ||
+        !elem->ancestor())
+      return false;
+
+    // If we don't have any remote children, or if we know we have a
+    // child that isn't being coarsened, there's nothing we need to
+    // communicate.
+    bool found_remote_child = false;
+    for (unsigned int c=0; c<elem->n_children(); c++)
+      {
+        const Elem * child = elem->child_ptr(c);
+        if (child->refinement_flag() != Elem::COARSEN)
+          return false;
+        if (child == remote_elem)
+          found_remote_child = true;
+      }
+    return found_remote_child;
+  }
+};
+}
+
+
+
 namespace libMesh
 {
 
@@ -1070,35 +1105,101 @@ bool MeshRefinement::make_coarsening_compatible()
 
 
   // If all the children of a parent are set to be coarsened
-  // then flag the parent so that they can kill their kids...
-  MeshBase::element_iterator       all_el     = _mesh.elements_begin();
-  const MeshBase::element_iterator all_el_end = _mesh.elements_end();
-  for (; all_el != all_el_end; ++all_el)
+  // then flag the parent so that they can kill their kids.
+
+  // On a distributed mesh, we won't always be able to determine this
+  // on ghost elements without talking to neighboring processors.
+  // We'll first communicate *to* parents' owners when we determine
+  // they cannot be coarsened, then we'll sync the final refinement
+  // flag *from* the parents.
+
+  // uncoarsenable_parents[p] live on processor id p
+  const processor_id_type n_proc     = _mesh.n_processors();
+  const processor_id_type my_proc_id = _mesh.processor_id();
+  const bool distributed_mesh = !_mesh.is_replicated();
+
+  std::vector<std::vector<dof_id_type> >
+    uncoarsenable_parents(n_proc);
+
+  MeshBase::element_iterator       ancestor_el =
+    _mesh.ancestor_elements_begin();
+  const MeshBase::element_iterator ancestor_el_end =
+    _mesh.ancestor_elements_end();
+  for (; ancestor_el != ancestor_el_end; ++ancestor_el)
     {
-      Elem * elem = *all_el;
-      if (elem->ancestor())
+      Elem * elem = *ancestor_el;
+
+      // Presume all the children are flagged for coarsening and
+      // then look for a contradiction
+      bool all_children_flagged_for_coarsening = true;
+
+      for (unsigned int c=0; c<elem->n_children(); c++)
         {
-
-          // Presume all the children are local and flagged for
-          // coarsening and then look for a contradiction
-          bool all_children_flagged_for_coarsening = true;
-          bool found_remote_child = false;
-
-          for (unsigned int c=0; c<elem->n_children(); c++)
+          Elem * child = elem->child_ptr(c);
+          if (child != remote_elem &&
+              child->refinement_flag() != Elem::COARSEN)
             {
-              Elem * child = elem->child_ptr(c);
-              if (child == remote_elem)
-                found_remote_child = true;
-              else if (child->refinement_flag() != Elem::COARSEN)
-                all_children_flagged_for_coarsening = false;
+              all_children_flagged_for_coarsening = false;
+              if (!distributed_mesh)
+                break;
+              if (child->processor_id() != elem->processor_id())
+                {
+                  uncoarsenable_parents[elem->processor_id()].push_back(elem->id());
+                  break;
+                }
             }
-
-          if (!found_remote_child &&
-              all_children_flagged_for_coarsening)
-            elem->set_refinement_flag(Elem::COARSEN_INACTIVE);
-          else if (!found_remote_child)
-            elem->set_refinement_flag(Elem::INACTIVE);
         }
+
+      if (all_children_flagged_for_coarsening)
+        elem->set_refinement_flag(Elem::COARSEN_INACTIVE);
+      else
+        elem->set_refinement_flag(Elem::INACTIVE);
+    }
+
+  // If we have a distributed mesh, we might need to sync up
+  // INACTIVE vs. COARSEN_INACTIVE flags.
+  if (distributed_mesh)
+    {
+      Parallel::MessageTag
+        uncoarsenable_tag = this->comm().get_unique_tag(2718);
+      std::vector<Parallel::Request> uncoarsenable_push_requests(n_proc);
+
+      for (processor_id_type p = 0; p != n_proc; ++p)
+        {
+          if (p == my_proc_id)
+            continue;
+
+          Parallel::Request &request =
+            uncoarsenable_push_requests[p - (p > my_proc_id)];
+
+          _mesh.comm().send
+            (p, uncoarsenable_parents[p], request, uncoarsenable_tag);
+        }
+
+      for (processor_id_type p = 1; p != n_proc; ++p)
+        {
+          std::vector<dof_id_type> my_uncoarsenable_parents;
+          _mesh.comm().receive
+            (Parallel::any_source, my_uncoarsenable_parents,
+             uncoarsenable_tag);
+
+          for (std::vector<dof_id_type>::const_iterator
+               it = my_uncoarsenable_parents.begin(),
+               end = my_uncoarsenable_parents.end(); it != end; ++it)
+            {
+              Elem & elem = _mesh.elem_ref(*it);
+              libmesh_assert(elem.refinement_flag() == Elem::INACTIVE ||
+                             elem.refinement_flag() == Elem::COARSEN_INACTIVE);
+              elem.set_refinement_flag(Elem::INACTIVE);
+            }
+        }
+
+      SyncRefinementFlags hsync(_mesh, &Elem::refinement_flag,
+                                &Elem::set_refinement_flag);
+      sync_dofobject_data_by_id
+        (this->comm(), _mesh.not_local_elements_begin(),
+         _mesh.not_local_elements_end(), SyncCoarsenInactive(),
+         hsync);
     }
 
   // If one processor finds an incompatibility, we're globally
