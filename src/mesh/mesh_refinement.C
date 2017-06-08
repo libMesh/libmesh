@@ -1854,7 +1854,8 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
           for ( ; elem_it != elem_end; ++elem_it)
             {
               const Elem & elem = **elem_it;
-              if (elem.refinement_flag() == Elem::COARSEN_INACTIVE)
+              if (elem.processor_id() != my_proc_id &&
+                  elem.refinement_flag() == Elem::COARSEN_INACTIVE)
                 parents_to_coarsen[elem.processor_id()].push_back(elem.id());
             }
 
