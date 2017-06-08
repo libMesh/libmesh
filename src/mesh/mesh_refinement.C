@@ -1208,7 +1208,9 @@ bool MeshRefinement::make_coarsening_compatible()
                                 &Elem::set_refinement_flag);
       sync_dofobject_data_by_id
         (this->comm(), _mesh.not_local_elements_begin(),
-         _mesh.not_local_elements_end(), SyncCoarsenInactive(),
+         _mesh.not_local_elements_end(),
+         // We'd like a smaller sync, but this leads to bugs?
+         // SyncCoarsenInactive(),
          hsync);
     }
 
