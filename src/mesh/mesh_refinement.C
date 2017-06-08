@@ -36,6 +36,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/remote_elem.h"
+#include "libmesh/sync_refinement_flags.h"
 
 #ifdef DEBUG
 // Some extra validation for DistributedMesh
@@ -45,6 +46,44 @@
 #ifdef LIBMESH_ENABLE_PERIODIC
 #include "libmesh/periodic_boundaries.h"
 #endif
+
+
+
+// Anonymous namespace for helper functions
+namespace {
+
+using namespace libMesh;
+
+struct SyncCoarsenInactive
+{
+  bool operator() (const Elem * elem) const {
+    // If we're not an ancestor, there's no chance our coarsening
+    // settings need to be changed.
+    if (!elem->ancestor())
+      return false;
+
+    // If we don't have any remote children, we already know enough to
+    // determine the correct refinement flag ourselves.
+    //
+    // If we know we have a child that isn't being coarsened, that
+    // also forces a specific flag.
+    //
+    // Either way there's nothing we need to communicate.
+    bool found_remote_child = false;
+    for (unsigned int c=0; c<elem->n_children(); c++)
+      {
+        const Elem * child = elem->child_ptr(c);
+        if (child->refinement_flag() != Elem::COARSEN)
+          return false;
+        if (child == remote_elem)
+          found_remote_child = true;
+      }
+    return found_remote_child;
+  }
+};
+}
+
+
 
 namespace libMesh
 {
@@ -752,77 +791,6 @@ bool MeshRefinement::refine_elements ()
 }
 
 
-// Functor for make_flags_parallel_consistent
-namespace {
-
-struct SyncRefinementFlags
-{
-  typedef unsigned char datum;
-  typedef Elem::RefinementState (Elem::*get_a_flag)() const;
-  typedef void (Elem::*set_a_flag)(const Elem::RefinementState);
-
-  SyncRefinementFlags(MeshBase & _mesh,
-                      get_a_flag _getter,
-                      set_a_flag _setter) :
-    mesh(_mesh), parallel_consistent(true),
-    get_flag(_getter), set_flag(_setter) {}
-
-  MeshBase & mesh;
-  bool parallel_consistent;
-  get_a_flag get_flag;
-  set_a_flag set_flag;
-  // References to pointers to member functions segfault?
-  // get_a_flag & get_flag;
-  // set_a_flag & set_flag;
-
-  // Find the refinement flag on each requested element
-  void gather_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> & flags) const
-  {
-    flags.resize(ids.size());
-
-    for (std::size_t i=0; i != ids.size(); ++i)
-      {
-        // Look for this element in the mesh
-        // We'd better find every element we're asked for
-        Elem & elem = mesh.elem_ref(ids[i]);
-
-        // Return the element's refinement flag
-        flags[i] = (elem.*get_flag)();
-      }
-  }
-
-  void act_on_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> & flags)
-  {
-    for (std::size_t i=0; i != ids.size(); ++i)
-      {
-        Elem & elem = mesh.elem_ref(ids[i]);
-
-        datum old_flag = (elem.*get_flag)();
-        datum & new_flag = flags[i];
-
-        if (old_flag != new_flag)
-          {
-            // It's possible for foreign flags to be (temporarily) more
-            // conservative than our own, such as when a refinement in
-            // one of the foreign processor's elements is mandated by a
-            // refinement in one of our neighboring elements it can see
-            // which was mandated by a refinement in one of our
-            // neighboring elements it can't see
-            // libmesh_assert (!(new_flag != Elem::REFINE &&
-            //                   old_flag == Elem::REFINE));
-            //
-            (elem.*set_flag)
-              (static_cast<Elem::RefinementState>(new_flag));
-            parallel_consistent = false;
-          }
-      }
-  }
-};
-}
-
-
 
 bool MeshRefinement::make_flags_parallel_consistent()
 {
@@ -912,8 +880,11 @@ bool MeshRefinement::make_coarsening_compatible()
       }
   }
 
-  // if there are no refined elements on this processor then
-  // there is no work for us to do
+  // Even if there are no refined elements on this processor then
+  // there may still be work for us to do on e.g. ancestor elements.
+  // At the very least we need to be in the loop if a distributed mesh
+  // needs to synchronize data.
+#if 0
   if (max_level == 0 && max_p_level == 0)
     {
       // But we still have to check with other processors
@@ -921,8 +892,7 @@ bool MeshRefinement::make_coarsening_compatible()
 
       return compatible_with_refinement;
     }
-
-
+#endif
 
   // Loop over all the active elements.  If an element is marked
   // for coarsening we better check its neighbors.  If ANY of these neighbors
@@ -1140,35 +1110,108 @@ bool MeshRefinement::make_coarsening_compatible()
 
 
   // If all the children of a parent are set to be coarsened
-  // then flag the parent so that they can kill their kids...
-  MeshBase::element_iterator       all_el     = _mesh.elements_begin();
-  const MeshBase::element_iterator all_el_end = _mesh.elements_end();
-  for (; all_el != all_el_end; ++all_el)
+  // then flag the parent so that they can kill their kids.
+
+  // On a distributed mesh, we won't always be able to determine this
+  // on ghost elements without talking to neighboring processors.
+  // We'll first communicate *to* parents' owners when we determine
+  // they cannot be coarsened, then we'll sync the final refinement
+  // flag *from* the parents.
+
+  // uncoarsenable_parents[p] live on processor id p
+  const processor_id_type n_proc     = _mesh.n_processors();
+  const processor_id_type my_proc_id = _mesh.processor_id();
+  const bool distributed_mesh = !_mesh.is_replicated();
+
+  std::vector<std::vector<dof_id_type> >
+    uncoarsenable_parents(n_proc);
+
+  MeshBase::element_iterator       ancestor_el =
+    _mesh.ancestor_elements_begin();
+  const MeshBase::element_iterator ancestor_el_end =
+    _mesh.ancestor_elements_end();
+  for (; ancestor_el != ancestor_el_end; ++ancestor_el)
     {
-      Elem * elem = *all_el;
-      if (elem->ancestor())
+      Elem * elem = *ancestor_el;
+
+      // Presume all the children are flagged for coarsening and
+      // then look for a contradiction
+      bool all_children_flagged_for_coarsening = true;
+
+      for (unsigned int c=0; c<elem->n_children(); c++)
         {
-
-          // Presume all the children are local and flagged for
-          // coarsening and then look for a contradiction
-          bool all_children_flagged_for_coarsening = true;
-          bool found_remote_child = false;
-
-          for (unsigned int c=0; c<elem->n_children(); c++)
+          Elem * child = elem->child_ptr(c);
+          if (child != remote_elem &&
+              child->refinement_flag() != Elem::COARSEN)
             {
-              Elem * child = elem->child_ptr(c);
-              if (child == remote_elem)
-                found_remote_child = true;
-              else if (child->refinement_flag() != Elem::COARSEN)
-                all_children_flagged_for_coarsening = false;
+              all_children_flagged_for_coarsening = false;
+              if (!distributed_mesh)
+                break;
+              if (child->processor_id() != elem->processor_id())
+                {
+                  uncoarsenable_parents[elem->processor_id()].push_back(elem->id());
+                  break;
+                }
             }
-
-          if (!found_remote_child &&
-              all_children_flagged_for_coarsening)
-            elem->set_refinement_flag(Elem::COARSEN_INACTIVE);
-          else if (!found_remote_child)
-            elem->set_refinement_flag(Elem::INACTIVE);
         }
+
+      if (all_children_flagged_for_coarsening)
+        elem->set_refinement_flag(Elem::COARSEN_INACTIVE);
+      else
+        elem->set_refinement_flag(Elem::INACTIVE);
+    }
+
+  // If we have a distributed mesh, we might need to sync up
+  // INACTIVE vs. COARSEN_INACTIVE flags.
+  if (distributed_mesh)
+    {
+      // We'd better still be in sync here
+      parallel_object_only();
+
+      Parallel::MessageTag
+        uncoarsenable_tag = this->comm().get_unique_tag(2718);
+      std::vector<Parallel::Request> uncoarsenable_push_requests(n_proc-1);
+
+      for (processor_id_type p = 0; p != n_proc; ++p)
+        {
+          if (p == my_proc_id)
+            continue;
+
+          Parallel::Request &request =
+            uncoarsenable_push_requests[p - (p > my_proc_id)];
+
+          _mesh.comm().send
+            (p, uncoarsenable_parents[p], request, uncoarsenable_tag);
+        }
+
+      for (processor_id_type p = 1; p != n_proc; ++p)
+        {
+          std::vector<dof_id_type> my_uncoarsenable_parents;
+          _mesh.comm().receive
+            (Parallel::any_source, my_uncoarsenable_parents,
+             uncoarsenable_tag);
+
+          for (std::vector<dof_id_type>::const_iterator
+               it = my_uncoarsenable_parents.begin(),
+               end = my_uncoarsenable_parents.end(); it != end; ++it)
+            {
+              Elem & elem = _mesh.elem_ref(*it);
+              libmesh_assert(elem.refinement_flag() == Elem::INACTIVE ||
+                             elem.refinement_flag() == Elem::COARSEN_INACTIVE);
+              elem.set_refinement_flag(Elem::INACTIVE);
+            }
+        }
+
+      Parallel::wait(uncoarsenable_push_requests);
+
+      SyncRefinementFlags hsync(_mesh, &Elem::refinement_flag,
+                                &Elem::set_refinement_flag);
+      sync_dofobject_data_by_id
+        (this->comm(), _mesh.not_local_elements_begin(),
+         _mesh.not_local_elements_end(),
+         // We'd like a smaller sync, but this leads to bugs?
+         // SyncCoarsenInactive(),
+         hsync);
     }
 
   // If one processor finds an incompatibility, we're globally
@@ -1695,14 +1738,8 @@ void MeshRefinement::_smooth_flags(bool refining, bool coarsening)
           satisfied = (coarsening_satisfied &&
                        refinement_satisfied &&
                        smoothing_satisfied);
-#ifdef DEBUG
-          bool max_satisfied = satisfied,
-            min_satisfied = satisfied;
-          this->comm().max(max_satisfied);
-          this->comm().min(min_satisfied);
-          libmesh_assert_equal_to (satisfied, max_satisfied);
-          libmesh_assert_equal_to (satisfied, min_satisfied);
-#endif
+
+          libmesh_assert(this->comm().verify(satisfied));
         }
       while (!satisfied);
     }

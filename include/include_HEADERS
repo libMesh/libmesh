@@ -204,6 +204,7 @@ include_HEADERS =  \
         mesh/postscript_io.h \
         mesh/replicated_mesh.h \
         mesh/serial_mesh.h \
+        mesh/sync_refinement_flags.h \
         mesh/tecplot_io.h \
         mesh/tetgen_io.h \
         mesh/ucd_io.h \

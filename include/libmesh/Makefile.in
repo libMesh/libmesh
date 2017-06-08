@@ -544,9 +544,10 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	mesh_triangle_holes.h mesh_triangle_interface.h \
 	mesh_triangle_wrapper.h namebased_io.h nemesis_io.h \
 	nemesis_io_helper.h off_io.h parallel_mesh.h patch.h \
-	postscript_io.h replicated_mesh.h serial_mesh.h tecplot_io.h \
-	tetgen_io.h ucd_io.h unstructured_mesh.h unv_io.h vtk_io.h \
-	xdr_io.h analytic_function.h composite_fem_function.h \
+	postscript_io.h replicated_mesh.h serial_mesh.h \
+	sync_refinement_flags.h tecplot_io.h tetgen_io.h ucd_io.h \
+	unstructured_mesh.h unv_io.h vtk_io.h xdr_io.h \
+	analytic_function.h composite_fem_function.h \
 	composite_function.h const_fem_function.h const_function.h \
 	coupling_matrix.h dense_matrix.h dense_matrix_base.h \
 	dense_submatrix.h dense_subvector.h dense_vector.h \
@@ -1439,6 +1440,9 @@ replicated_mesh.h: $(top_srcdir)/include/mesh/replicated_mesh.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 serial_mesh.h: $(top_srcdir)/include/mesh/serial_mesh.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+sync_refinement_flags.h: $(top_srcdir)/include/mesh/sync_refinement_flags.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 tecplot_io.h: $(top_srcdir)/include/mesh/tecplot_io.h
