@@ -126,7 +126,8 @@ public:
    * exist on the current processor.
    */
   virtual void set_distributed () libmesh_override
-  { _is_serial = false; }
+  { _is_serial = false;
+    _is_serial_on_proc_0 = false; }
 
   /**
    * \returns \p true if new elements and nodes can and should be

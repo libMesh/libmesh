@@ -34,6 +34,7 @@ namespace libMesh
 DistributedMesh::DistributedMesh (const Parallel::Communicator & comm_in,
                                   unsigned char d) :
   UnstructuredMesh (comm_in,d), _is_serial(true),
+  _is_serial_on_proc_0(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
   _next_free_local_elem_id(this->processor_id()),
@@ -54,7 +55,7 @@ DistributedMesh::DistributedMesh (const Parallel::Communicator & comm_in,
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
 DistributedMesh::DistributedMesh (unsigned char d) :
-  UnstructuredMesh (d), _is_serial(true),
+  UnstructuredMesh (d), _is_serial(true), _is_serial_on_proc_0(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
   _next_free_local_elem_id(this->processor_id()),
@@ -87,6 +88,7 @@ DistributedMesh::~DistributedMesh ()
 // constructor instead.
 DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
   UnstructuredMesh (other_mesh), _is_serial(other_mesh._is_serial),
+  _is_serial_on_proc_0(other_mesh._is_serial_on_proc_0),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
   _next_free_local_elem_id(this->processor_id()),
@@ -125,6 +127,7 @@ DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
 
 DistributedMesh::DistributedMesh (const UnstructuredMesh & other_mesh) :
   UnstructuredMesh (other_mesh), _is_serial(other_mesh.is_serial()),
+  _is_serial_on_proc_0(other_mesh.is_serial()),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(this->processor_id()),
   _next_free_local_elem_id(this->processor_id()),
@@ -804,6 +807,7 @@ void DistributedMesh::clear ()
 
   // We're no longer distributed if we were before
   _is_serial = true;
+  _is_serial_on_proc_0 = true;
 
   // Correct our caches
   _n_nodes = 0;
@@ -1431,8 +1435,9 @@ void DistributedMesh::allgather()
 {
   if (_is_serial)
     return;
-  _is_serial = true;
   MeshCommunication().allgather(*this);
+  _is_serial = true;
+  _is_serial_on_proc_0 = true;
 
   // Make sure our caches are up to date and our
   // DofObjects are well packed
