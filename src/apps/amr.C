@@ -161,8 +161,8 @@ void assemble(EquationSystems & es,
   const std::vector<std::vector<Real> > & phi          = fe->get_phi();
   const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
-  std::vector<unsigned int> dof_indices_U;
-  std::vector<unsigned int> dof_indices_V;
+  std::vector<dof_id_type> dof_indices_U;
+  std::vector<dof_id_type> dof_indices_V;
   const DofMap & dof_map = system.get_dof_map();
 
   DenseMatrix<Number> Kuu;
