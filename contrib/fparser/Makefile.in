@@ -165,8 +165,8 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libdbg_la_DEPENDENCIES =
 am__libdbg_la_SOURCES_DIST = fparser.cc fparser_ad.cc Faddeeva.cc \
-	lib/sha1.cpp lib/crc32.hh lib/autoptr.hh lib/functional.hh \
-	fpoptimizer/hash.hh fpoptimizer/codetree.hh \
+	Faddeeva.hh lib/sha1.cpp lib/crc32.hh lib/autoptr.hh \
+	lib/functional.hh fpoptimizer/hash.hh fpoptimizer/codetree.hh \
 	fpoptimizer/grammar.hh fpoptimizer/consts.hh \
 	fpoptimizer/optimize.hh fpoptimizer/opcodename.hh \
 	fpoptimizer/opcodename.cc fpoptimizer/bytecodesynth.hh \
@@ -223,8 +223,8 @@ libdbg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 @LIBMESH_DBG_MODE_TRUE@am_libdbg_la_rpath =
 libdevel_la_DEPENDENCIES =
 am__libdevel_la_SOURCES_DIST = fparser.cc fparser_ad.cc Faddeeva.cc \
-	lib/sha1.cpp lib/crc32.hh lib/autoptr.hh lib/functional.hh \
-	fpoptimizer/hash.hh fpoptimizer/codetree.hh \
+	Faddeeva.hh lib/sha1.cpp lib/crc32.hh lib/autoptr.hh \
+	lib/functional.hh fpoptimizer/hash.hh fpoptimizer/codetree.hh \
 	fpoptimizer/grammar.hh fpoptimizer/consts.hh \
 	fpoptimizer/optimize.hh fpoptimizer/opcodename.hh \
 	fpoptimizer/opcodename.cc fpoptimizer/bytecodesynth.hh \
@@ -276,8 +276,8 @@ libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 @LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_rpath =
 liboprof_la_DEPENDENCIES =
 am__liboprof_la_SOURCES_DIST = fparser.cc fparser_ad.cc Faddeeva.cc \
-	lib/sha1.cpp lib/crc32.hh lib/autoptr.hh lib/functional.hh \
-	fpoptimizer/hash.hh fpoptimizer/codetree.hh \
+	Faddeeva.hh lib/sha1.cpp lib/crc32.hh lib/autoptr.hh \
+	lib/functional.hh fpoptimizer/hash.hh fpoptimizer/codetree.hh \
 	fpoptimizer/grammar.hh fpoptimizer/consts.hh \
 	fpoptimizer/optimize.hh fpoptimizer/opcodename.hh \
 	fpoptimizer/opcodename.cc fpoptimizer/bytecodesynth.hh \
@@ -329,8 +329,8 @@ liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 @LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_rpath =
 libopt_la_DEPENDENCIES =
 am__libopt_la_SOURCES_DIST = fparser.cc fparser_ad.cc Faddeeva.cc \
-	lib/sha1.cpp lib/crc32.hh lib/autoptr.hh lib/functional.hh \
-	fpoptimizer/hash.hh fpoptimizer/codetree.hh \
+	Faddeeva.hh lib/sha1.cpp lib/crc32.hh lib/autoptr.hh \
+	lib/functional.hh fpoptimizer/hash.hh fpoptimizer/codetree.hh \
 	fpoptimizer/grammar.hh fpoptimizer/consts.hh \
 	fpoptimizer/optimize.hh fpoptimizer/opcodename.hh \
 	fpoptimizer/opcodename.cc fpoptimizer/bytecodesynth.hh \
@@ -382,8 +382,8 @@ libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 @LIBMESH_OPT_MODE_TRUE@am_libopt_la_rpath =
 libprof_la_DEPENDENCIES =
 am__libprof_la_SOURCES_DIST = fparser.cc fparser_ad.cc Faddeeva.cc \
-	lib/sha1.cpp lib/crc32.hh lib/autoptr.hh lib/functional.hh \
-	fpoptimizer/hash.hh fpoptimizer/codetree.hh \
+	Faddeeva.hh lib/sha1.cpp lib/crc32.hh lib/autoptr.hh \
+	lib/functional.hh fpoptimizer/hash.hh fpoptimizer/codetree.hh \
 	fpoptimizer/grammar.hh fpoptimizer/consts.hh \
 	fpoptimizer/optimize.hh fpoptimizer/opcodename.hh \
 	fpoptimizer/opcodename.cc fpoptimizer/bytecodesynth.hh \
@@ -1003,8 +1003,8 @@ FPOPTIMIZER_CC_FILES = \
 	    fpoptimizer/cse.cc \
 	    fpoptimizer/optimize_main.cc
 
-pkg_sources = fparser.cc fparser_ad.cc Faddeeva.cc $(am__append_3) \
-	$(am__append_7) $(am__append_9)
+pkg_sources = fparser.cc fparser_ad.cc Faddeeva.cc Faddeeva.hh \
+	$(am__append_3) $(am__append_7) $(am__append_9)
 
 # util/tree_grammar_parser is a utility which is required to build
 # fpoptimizer/grammar_data.cc.  But this file itself is only needed
