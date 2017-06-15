@@ -75,30 +75,25 @@ class PetscMatrix libmesh_final : public SparseMatrix<T>
 {
 public:
   /**
-   * Constructor; initializes the matrix to
-   * be empty, without any structure, i.e.
-   * the matrix is not usable at all. This
-   * constructor is therefore only useful
-   * for matrices which are members of a
-   * class. All other matrices should be
-   * created at a point in the data flow
-   * where all necessary information is
+   * Constructor; initializes the matrix to be empty, without any
+   * structure, i.e.  the matrix is not usable at all. This
+   * constructor is therefore only useful for matrices which are
+   * members of a class. All other matrices should be created at a
+   * point in the data flow where all necessary information is
    * available.
    *
-   * You have to initialize
-   * the matrix before usage with
-   * \p init(...).
+   * You have to initialize the matrix before usage with \p init(...).
    */
   explicit
   PetscMatrix (const Parallel::Communicator & comm_in
                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
-   * Constructor.  Creates a PetscMatrix assuming you already
-   * have a valid Mat object.  In this case, m is NOT destroyed
-   * by the PetscMatrix destructor when this object goes out of scope.
-   * This allows ownership of m to remain with the original creator,
-   * and to simply provide additional functionality with the PetscMatrix.
+   * Constructor.  Creates a PetscMatrix assuming you already have a
+   * valid Mat object.  In this case, m is NOT destroyed by the
+   * PetscMatrix destructor when this object goes out of scope.  This
+   * allows ownership of m to remain with the original creator, and to
+   * simply provide additional functionality with the PetscMatrix.
    */
   explicit
   PetscMatrix (Mat m,
@@ -106,20 +101,21 @@ public:
                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
-   * Destructor. Free all memory, but do not
-   * release the memory of the sparsity
-   * structure.
+   * Destructor. Free all memory, but do not release the memory of the
+   * sparsity structure.
    */
   ~PetscMatrix ();
 
   /**
-   * Initialize a Petsc matrix that is of global
-   * dimension \f$ m \times  n \f$ with local dimensions
-   * \f$ m_l \times n_l \f$.  \p nnz is the number of on-processor
-   * nonzeros per row (defaults to 30).
-   * \p noz is the number of on-processor
-   * nonzeros per row (defaults to 30).
-   * Optionally supports a block size, which indicates dense coupled blocks
+   * Initialize a PetscMatrix with the specified sizes.
+   *
+   * \param m The global number of rows.
+   * \param n The global number of columns.
+   * \param m_l The local number of rows.
+   * \param n_l The local number of columns.
+   * \param nnz The number of on-diagonal nonzeros per row (defaults to 30).
+   * \param noz The number of off-diagonal nonzeros per row (defaults to 10).
+   * \param blocksize Optional value indicating dense coupled blocks
    * for systems with multiple variables all of the same type.
    */
   virtual void init (const numeric_index_type m,
@@ -131,13 +127,14 @@ public:
                      const numeric_index_type blocksize=1) libmesh_override;
 
   /**
-   * Initialize a Petsc matrix that is of global
-   * dimension \f$ m \times  n \f$ with local dimensions
-   * \f$ m_l \times n_l \f$.  \p nnz is the number of on-processor
-   * nonzeros per row.
-   * \p noz is the number of off-processor
-   * nonzeros per row.
-   * Optionally supports a block size, which indicates dense coupled blocks
+   * Initialize a Petsc matrix that is of global dimension \f$ m
+   * \times n \f$ with local dimensions \f$ m_l \times n_l \f$.
+   *
+   * \param n_nz array containing the number of nonzeros in each row
+   * of the DIAGONAL portion of the local submatrix.
+   * \param n_oz array containing the number of nonzeros in each row
+   * of the OFF-DIAGONAL portion of the local submatrix.
+   * \param blocksize Optional value indicating dense coupled blocks
    * for systems with multiple variables all of the same type.
    */
   void init (const numeric_index_type m,
@@ -161,100 +158,86 @@ public:
   void update_preallocation_and_zero();
 
   /**
-   * Release all memory and return
-   * to a state just like after
-   * having called the default
-   * constructor.
+   * Release all memory, and go back to the default-constructed state.
    */
   virtual void clear () libmesh_override;
 
   /**
-   * Set all entries to 0. This method retains
-   * sparsity structure.
+   * Set all entries to 0. This method retains sparsity structure.
    */
   virtual void zero () libmesh_override;
 
   /**
-   * Set all row entries to 0 then puts diag_value in the diagonal entry
+   * Set all row entries to 0 then puts \p diag_value on the diagonal.
    */
   virtual void zero_rows (std::vector<numeric_index_type> & rows, T diag_value = 0.0) libmesh_override;
 
   /**
-   * Call the Petsc assemble routines.
-   * sends necessary messages to other
-   * processors
+   * Call the Petsc assemble routines. Sends/receives required values from
+   * other processors.
    */
   virtual void close () const libmesh_override;
 
   /**
-   * \returns \p m, the row-dimension of
-   * the matrix where the marix is \f$ M \times N \f$.
+   * \returns The row-dimension of the matrix.
    */
   virtual numeric_index_type m () const libmesh_override;
 
   /**
-   * \returns \p n, the column-dimension of
-   * the matrix where the marix is \f$ M \times N \f$.
+   * \returns The column-dimension of the matrix.
    */
   virtual numeric_index_type n () const libmesh_override;
 
   /**
-   * return row_start, the index of the first
-   * matrix row stored on this processor
+   * \returns The index of the first matrix row stored on this
+   * processor.
    */
   virtual numeric_index_type row_start () const libmesh_override;
 
   /**
-   * return row_stop, the index of the last
-   * matrix row (+1) stored on this processor
+   * \returns The index of the last matrix row (+1) stored on this
+   * processor.
    */
   virtual numeric_index_type row_stop () const libmesh_override;
 
   /**
-   * Set the element \p (i,j) to \p value.
-   * Throws an error if the entry does
-   * not exist. Still, it is allowed to store
-   * zero values in non-existent fields.
+   * Set the element \p (i,j) to \p value.  Throws an error if the
+   * entry does not exist. Zero values can be "stored" in non-existent
+   * fields.
    */
   virtual void set (const numeric_index_type i,
                     const numeric_index_type j,
                     const T value) libmesh_override;
 
   /**
-   * Add \p value to the element
-   * \p (i,j).  Throws an error if
-   * the entry does not
-   * exist. Still, it is allowed to
-   * store zero values in
-   * non-existent fields.
+   * Add \p value to the element \p (i,j).  Throws an error if the
+   * entry does not exist. Zero values can be "added" to non-existent
+   * entries.
    */
   virtual void add (const numeric_index_type i,
                     const numeric_index_type j,
                     const T value) libmesh_override;
 
   /**
-   * Add the full matrix to the
-   * Petsc matrix.  This is useful
-   * for adding an element matrix
-   * at assembly time
+   * Add the DenseMatrix to the Petsc matrix.  This is useful for
+   * adding an element matrix at assembly time.
    */
   virtual void add_matrix (const DenseMatrix<T> & dm,
                            const std::vector<numeric_index_type> & rows,
                            const std::vector<numeric_index_type> & cols) libmesh_override;
 
   /**
-   * Same as \p add_matrix, but assumes the row and column maps are the same.
-   * Thus the matrix \p dm must be square.
+   * Same, but assumes the row and column maps are the same.  Thus the
+   * matrix \p dm must be square.
    */
   virtual void add_matrix (const DenseMatrix<T> & dm,
                            const std::vector<numeric_index_type> & dof_indices) libmesh_override;
 
   /**
-   * Add the full matrix \p dm to the
-   * Sparse matrix.  This is useful
-   * for adding an element matrix
-   * at assembly time.  The matrix is assumed blocked, and \p brow, \p bcol
-   * correspond to the *block* row, columm indices.
+   * Add the full matrix \p dm to the Sparse matrix.  This is useful
+   * for adding an element matrix at assembly time.  The matrix is
+   * assumed blocked, and \p brow, \p bcol correspond to the *block*
+   * row, columm indices.
    */
   virtual void add_block_matrix (const DenseMatrix<T> & dm,
                                  const std::vector<numeric_index_type> & brows,
@@ -269,75 +252,67 @@ public:
   { this->add_block_matrix (dm, dof_indices, dof_indices); }
 
   /**
-   * Add a Sparse matrix \p X, scaled with \p a, to \p this,
-   * stores the result in \p this:
-   * \f$\texttt{this} = a*X + \texttt{this} \f$.
-   * Use this with caution, the sparse matrices need to have the
-   * same nonzero pattern, otherwise \p PETSc will crash!
-   * It is advisable to not only allocate appropriate memory with
-   * \p init() , but also explicitly zero the terms of \p this
-   * whenever you add a non-zero value to \p X.  Note: \p X will
-   * be closed, if not already done, before performing any work.
+   * Compute A += a*X for scalar \p a, matrix \p X.
+   *
+   * \note The matrices A and X need to have the same nonzero pattern,
+   * otherwise \p PETSc will crash!
+   *
+   * \note It is advisable to not only allocate appropriate memory
+   * with \p init(), but also explicitly zero the terms of \p this
+   * whenever you add a non-zero value to \p X.
+   *
+   * \note \p X will be closed, if not already done, before performing
+   * any work.
    */
   virtual void add (const T a, SparseMatrix<T> & X) libmesh_override;
 
   /**
-   * Return the value of the entry
-   * \p (i,j).  This may be an
-   * expensive operation, and you
-   * should always be careful where
-   * you call this function.
+   * \returns A copy of matrix entry \p (i,j).
+   *
+   * \note This may be an expensive operation, and you should always
+   * be careful where you call this function.
    */
   virtual T operator () (const numeric_index_type i,
                          const numeric_index_type j) const libmesh_override;
 
   /**
-   * Return the l1-norm of the matrix, that is
-   * \f$|M|_1=max_{all columns j}\sum_{all
-   * rows i} |M_ij|\f$,
-   * (max. sum of columns).
-   * This is the
-   * natural matrix norm that is compatible
-   * to the l1-norm for vectors, i.e.
-   * \f$|Mv|_1\leq |M|_1 |v|_1\f$.
+   * \returns The l1-norm of the matrix, that is the max column sum:
+   * \f$ |M|_1 = \max_{all columns j} \sum_{all rows i} |M_ij|\f$
+   *
+   * This is the natural matrix norm that is compatible with the
+   * l1-norm for vectors, i.e. \f$ |Mv|_1 \leq |M|_1 |v|_1 \f$.
    * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
    */
   virtual Real l1_norm () const libmesh_override;
 
   /**
-   * Return the linfty-norm of the
-   * matrix, that is
-   * \f$|M|_infty=max_{all rows i}\sum_{all
-   * columns j} |M_ij|\f$,
-   * (max. sum of rows).
-   * This is the
-   * natural matrix norm that is compatible
-   * to the linfty-norm of vectors, i.e.
-   * \f$|Mv|_infty \leq |M|_infty |v|_infty\f$.
+   * Return the linfty-norm of the matrix, that is the max row sum:
+   *
+   * \f$ |M|_infty = \max_{all rows i} \sum_{all columns j} |M_ij| \f$
+   *
+   * This is the natural matrix norm that is compatible to the
+   * linfty-norm of vectors, i.e. \f$ |Mv|_infty \leq |M|_infty |v|_infty \f$.
    * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
    */
   virtual Real linfty_norm () const libmesh_override;
 
   /**
-   * see if Petsc matrix has been closed
-   * and fully assembled yet
+   * \returns \p true If the matrix's assembly routines have been called.
    */
   virtual bool closed() const libmesh_override;
 
   /**
-   * Print the contents of the matrix to the screen
-   * with the PETSc viewer.  This function only allows
-   * printing to standard out, this is because we have
-   * limited ourselves to one PETSc implementation for
-   * writing.
+   * Print the contents of the matrix to the screen with the PETSc
+   * viewer. This function only allows printing to standard out, this
+   * is because we have limited ourselves to one PETSc implementation
+   * for writing.
    */
   virtual void print_personal(std::ostream & os=libMesh::out) const libmesh_override;
 
   /**
-   * Print the contents of the matrix in Matlab's
-   * sparse matrix format. Optionally prints the
-   * matrix to the file named \p name.  If \p name
-   * is not specified it is dumped to the screen.
+   * Print the contents of the matrix in Matlab's sparse matrix
+   * format. Optionally prints the matrix to the file named \p name.
+   * If \p name is not specified it is dumped to the screen.
    */
   virtual void print_matlab(const std::string & name = "") const libmesh_override;
 
@@ -353,27 +328,31 @@ public:
   virtual void get_transpose (SparseMatrix<T> & dest) const libmesh_override;
 
   /**
-   * Swaps the raw PETSc matrix context pointers.
+   * Swaps the internal data pointers, no actual values are swapped.
    */
   void swap (PetscMatrix<T> &);
 
   /**
-   * Returns the raw PETSc matrix context pointer.  Note this is generally
-   * not required in user-level code. Just don't do anything crazy like
-   * calling LibMeshMatDestroy()!
+   * \returns The raw PETSc matrix pointer.
+   *
+   * \note This is generally not required in user-level code.
+   *
+   * \note Don't do anything crazy like calling LibMeshMatDestroy() on
+   * it, or very bad things will likely happen!
    */
   Mat mat () { libmesh_assert (_mat); return _mat; }
 
 protected:
 
   /**
-   * This function either creates or re-initializes
-   * a matrix called "submatrix" which is defined
-   * by the row and column indices given in the "rows" and "cols" entries.
+   * This function either creates or re-initializes a matrix called \p
+   * submatrix which is defined by the indices given in the \p rows
+   * and \p cols vectors.
+   *
    * This function is implemented in terms of the MatGetSubMatrix()
-   * routine of PETSc.  The boolean reuse_submatrix parameter determines
-   * whether or not PETSc will treat "submatrix" as one which has already
-   * been used (had memory allocated) or as a new matrix.
+   * routine of PETSc.  The \p reuse_submatrix parameter determines
+   * whether or not PETSc will treat \p submatrix as one which has
+   * already been used (had memory allocated) or as a new matrix.
    */
   virtual void _get_submatrix(SparseMatrix<T> & submatrix,
                               const std::vector<numeric_index_type> & rows,
@@ -383,13 +362,13 @@ protected:
 private:
 
   /**
-   * Petsc matrix datatype to store values
+   * Petsc matrix datatype to store values.
    */
   Mat _mat;
 
   /**
-   * This boolean value should only be set to false
-   * for the constructor which takes a PETSc Mat object.
+   * This boolean value should only be set to \p false for the
+   * constructor which takes a PETSc Mat object.
    */
   bool _destroy_mat_on_exit;
 };

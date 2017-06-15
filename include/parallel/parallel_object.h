@@ -81,20 +81,20 @@ public:
   virtual ~ParallelObject () {}
 
   /**
-   * \returns a reference to the \p Parallel::Communicator object
+   * \returns A reference to the \p Parallel::Communicator object
    * used by this mesh.
    */
   const Parallel::Communicator & comm () const
   { return _communicator; }
 
   /**
-   * \returns the number of processors in the group.
+   * \returns The number of processors in the group.
    */
   processor_id_type n_processors () const
   { return cast_int<processor_id_type>(_communicator.size()); }
 
   /**
-   * \returns the rank of this processor in the group.
+   * \returns The rank of this processor in the group.
    */
   processor_id_type processor_id () const
   { return cast_int<processor_id_type>(_communicator.rank()); }

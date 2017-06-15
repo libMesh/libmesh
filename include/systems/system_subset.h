@@ -55,14 +55,15 @@ public:
   virtual ~SystemSubset ();
 
   /**
-   * Method that returns the actual set of dofs that the subset
-   * consists of.  The result must contain local dofs on each
-   * processor only and must not contain duplictates.
+   * \returns The actual set of dofs that the subset consists of.
+   *
+   * The result must contain local dofs on each processor only and
+   * must not contain duplictates.
    */
   virtual const std::vector<unsigned int> & dof_ids () const = 0;
 
   /**
-   * Returns the \p System to which we belong.
+   * \returns The \p System to which we belong.
    */
   const System & get_system () const;
 

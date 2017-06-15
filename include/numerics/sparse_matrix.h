@@ -51,12 +51,10 @@ std::ostream & operator << (std::ostream & os, const SparseMatrix<T> & m);
 
 
 /**
- * Generic sparse matrix. This class contains
- * pure virtual members that must be overloaded
- * in derived classes.  Using a common base class
- * allows for uniform access to sparse matrices
- * from various different solver packages in
- * different formats.
+ * Generic sparse matrix. This class contains pure virtual members
+ * that must be overridden in derived classes.  Using a common base
+ * class allows for uniform access to sparse matrices from various
+ * different solver packages in different formats.
  *
  * \author Benjamin S. Kirk
  * \date 2003
@@ -67,18 +65,14 @@ class SparseMatrix : public ReferenceCountedObject<SparseMatrix<T> >,
 {
 public:
   /**
-   * Constructor; initializes the matrix to
-   * be empty, without any structure, i.e.
-   * the matrix is not usable at all. This
-   * constructor is therefore only useful
-   * for matrices which are members of a
-   * class. All other matrices should be
-   * created at a point in the data flow
-   * where all necessary information is
+   * Constructor; initializes the matrix to be empty, without any
+   * structure, i.e.  the matrix is not usable at all. This
+   * constructor is therefore only useful for matrices which are
+   * members of a class. All other matrices should be created at a
+   * point in the data flow where all necessary information is
    * available.
    *
-   * You have to initialize
-   * the matrix before usage with
+   * You have to initialize the matrix before usage with
    * \p init(...).
    */
   explicit
@@ -86,9 +80,8 @@ public:
                 LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
-   * Destructor. Free all memory, but do not
-   * release the memory of the sparsity
-   * structure.
+   * Destructor. Free all memory, but do not release the memory of the
+   * sparsity structure.
    */
   virtual ~SparseMatrix ();
 
@@ -101,8 +94,8 @@ public:
         const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
-   * \returns true if the matrix has been initialized,
-   * false otherwise.
+   * \returns \p true if the matrix has been initialized,
+   * \p false otherwise.
    */
   virtual bool initialized() const { return _is_initialized; }
 
@@ -113,30 +106,34 @@ public:
   { _dof_map = &dof_map; }
 
   /**
-   * \p returns true if this sparse matrix format needs to be fed the
-   * graph of the sparse matrix.  This is true in the case of the \p LaspackMatrix,
-   * but not for the \p PetscMatrix.  In the case where the full graph is not
-   * required we can efficiently approximate it to provide a good estimate of the
-   * required size of the sparse matrix.
+   * \returns \p true if this sparse matrix format needs to be fed the
+   * graph of the sparse matrix.
+   *
+   * This is true for \p LaspackMatrix, but not \p PetscMatrix.  In
+   * the case where the full graph is not required, we can efficiently
+   * approximate it to provide a good estimate of the required size of
+   * the sparse matrix.
    */
   virtual bool need_full_sparsity_pattern() const
   { return false; }
 
   /**
    * Updates the matrix sparsity pattern. When your \p SparseMatrix<T>
-   * implementation does not need this data simply do
-   * not overload this method.
+   * implementation does not need this data, simply do not override
+   * this method.
    */
   virtual void update_sparsity_pattern (const SparsityPattern::Graph &) {}
 
   /**
-   * Initialize a Sparse matrix that is of global
-   * dimension \f$ m \times  n \f$ with local dimensions
-   * \f$ m_l \times n_l \f$.  \p nnz is the number of on-processor
-   * nonzeros per row (defaults to 30).
-   * \p noz is the number of on-processor
-   * nonzeros per row (defaults to 10).
-   * Optionally supports a block size, which indicates dense coupled blocks
+   * Initialize SparseMatrix with the specified sizes.
+   *
+   * \param m The global number of rows.
+   * \param n The global number of columns.
+   * \param m_l The local number of rows.
+   * \param n_l The local number of columns.
+   * \param nnz The number of on-diagonal nonzeros per row (defaults to 30).
+   * \param noz The number of off-diagonal nonzeros per row (defaults to 10).
+   * \param blocksize Optional value indicating dense coupled blocks
    * for systems with multiple variables all of the same type.
    */
   virtual void init (const numeric_index_type m,
@@ -148,15 +145,12 @@ public:
                      const numeric_index_type blocksize=1) = 0;
 
   /**
-   * Initialize using sparsity structure computed by \p dof_map.
+   * Initialize this matrix using the sparsity structure computed by \p dof_map.
    */
   virtual void init () = 0;
 
   /**
-   * Release all memory and return
-   * to a state just like after
-   * having called the default
-   * constructor.
+   * Restores the \p SparseMatrix<T> to a pristine state.
    */
   virtual void clear () = 0;
 
@@ -166,68 +160,59 @@ public:
   virtual void zero () = 0;
 
   /**
-   * Set all row entries to 0 then puts diag_value in the diagonal entry
+   * Sets all row entries to 0 then puts diag_value in the diagonal entry.
    */
   virtual void zero_rows (std::vector<numeric_index_type> & rows, T diag_value = 0.0);
 
   /**
-   * Call the Sparse assemble routines.
-   * sends necessary messages to other
-   * processors
+   * Calls the SparseMatrix's internal assembly routines, ensuring
+   * that the values are consistent across processors.
    */
   virtual void close () const = 0;
 
   /**
-   * \returns \p m, the row-dimension of
-   * the matrix where the marix is \f$ M \times N \f$.
+   * \returns The row-dimension of the matrix.
    */
   virtual numeric_index_type m () const = 0;
 
   /**
-   * \returns \p n, the column-dimension of
-   * the matrix where the marix is \f$ M \times N \f$.
+   * \returns The column-dimension of the matrix.
    */
   virtual numeric_index_type n () const = 0;
 
   /**
-   * return row_start, the index of the first
-   * matrix row stored on this processor
+   * \returns The index of the first matrix row stored on this
+   * processor.
    */
   virtual numeric_index_type row_start () const = 0;
 
   /**
-   * return row_stop, the index of the last
-   * matrix row (+1) stored on this processor
+   * \returns The index of the last matrix row (+1) stored on this
+   * processor.
    */
   virtual numeric_index_type row_stop () const = 0;
 
   /**
-   * Set the element \p (i,j) to \p value.
-   * Throws an error if the entry does
-   * not exist. Still, it is allowed to store
-   * zero values in non-existent fields.
+   * Set the element \p (i,j) to \p value.  Throws an error if the
+   * entry does not exist. Zero values can be "stored" in non-existent
+   * fields.
    */
   virtual void set (const numeric_index_type i,
                     const numeric_index_type j,
                     const T value) = 0;
 
   /**
-   * Add \p value to the element
-   * \p (i,j).  Throws an error if
-   * the entry does not
-   * exist. Still, it is allowed to
-   * store zero values in
-   * non-existent fields.
+   * Add \p value to the element \p (i,j).  Throws an error if the
+   * entry does not exist. Zero values can be "added" to non-existent
+   * entries.
    */
   virtual void add (const numeric_index_type i,
                     const numeric_index_type j,
                     const T value) = 0;
 
   /**
-   * Add the full matrix \p dm to the
-   * Sparse matrix.  This is useful
-   * for adding an element matrix
-   * at assembly time
+   * Add the full matrix \p dm to the SparseMatrix.  This is useful
+   * for adding an element matrix at assembly time.
    */
   virtual void add_matrix (const DenseMatrix<T> & dm,
                            const std::vector<numeric_index_type> & rows,
@@ -241,82 +226,72 @@ public:
                            const std::vector<numeric_index_type> & dof_indices) = 0;
 
   /**
-   * Add the full matrix \p dm to the
-   * Sparse matrix.  This is useful
-   * for adding an element matrix
-   * at assembly time.  The matrix is assumed blocked, and \p brow, \p bcol
-   * correspond to the *block* row, columm indices.
+   * Add the full matrix \p dm to the SparseMatrix.  This is useful
+   * for adding an element matrix at assembly time.  The matrix is
+   * assumed blocked, and \p brow, \p bcol correspond to the *block*
+   * row and column indices.
    */
   virtual void add_block_matrix (const DenseMatrix<T> & dm,
                                  const std::vector<numeric_index_type> & brows,
                                  const std::vector<numeric_index_type> & bcols);
 
   /**
-   * Same as \p add_block_matrix , but assumes the row and column maps are the same.
-   * Thus the matrix \p dm must be square.
+   * Same as \p add_block_matrix(), but assumes the row and column
+   * maps are the same.  Thus the matrix \p dm must be square.
    */
   virtual void add_block_matrix (const DenseMatrix<T> & dm,
                                  const std::vector<numeric_index_type> & dof_indices)
   { this->add_block_matrix (dm, dof_indices, dof_indices); }
 
   /**
-   * Add a Sparse matrix \p _X, scaled with \p _a, to \p this,
-   * stores the result in \p this:
-   * \f$\texttt{this} = \_a*\_X + \texttt{this} \f$.
+   * Compute A += a*X for scalar \p a, matrix \p X.
    */
-  virtual void add (const T, SparseMatrix<T> &) = 0;
+  virtual void add (const T a, SparseMatrix<T> & X) = 0;
 
   /**
-   * Return the value of the entry
-   * \p (i,j).  This may be an
-   * expensive operation, and you
-   * should always be careful where
-   * you call this function.
+   * \returns A copy of matrix entry \p (i,j).
+   *
+   * \note This may be an expensive operation, and you should always
+   * be careful where you call this function.
    */
   virtual T operator () (const numeric_index_type i,
                          const numeric_index_type j) const = 0;
 
   /**
-   * Return the l1-norm of the matrix, that is
-   * \f$|M|_1=max_{all columns j}\sum_{all
-   * rows i} |M_ij|\f$,
-   * (max. sum of columns).
-   * This is the
-   * natural matrix norm that is compatible
-   * to the l1-norm for vectors, i.e.
-   * \f$|Mv|_1\leq |M|_1 |v|_1\f$.
+   * \returns The l1-norm of the matrix, that is the max column sum:
+   * \f$ |M|_1 = \max_{all columns j} \sum_{all rows i} |M_ij|\f$
+   *
+   * This is the natural matrix norm that is compatible with the
+   * l1-norm for vectors, i.e. \f$ |Mv|_1 \leq |M|_1 |v|_1 \f$.
+   * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
    */
   virtual Real l1_norm () const = 0;
 
   /**
-   * Return the linfty-norm of the
-   * matrix, that is
-   * \f$|M|_\infty=max_{all rows i}\sum_{all
-   * columns j} |M_ij|\f$,
-   * (max. sum of rows).
-   * This is the
-   * natural matrix norm that is compatible
-   * to the linfty-norm of vectors, i.e.
-   * \f$|Mv|_\infty \leq |M|_\infty |v|_\infty\f$.
+   * Return the linfty-norm of the matrix, that is the max row sum:
+   *
+   * \f$ |M|_infty = \max_{all rows i} \sum_{all columns j} |M_ij| \f$
+   *
+   * This is the natural matrix norm that is compatible to the
+   * linfty-norm of vectors, i.e. \f$ |Mv|_infty \leq |M|_infty |v|_infty \f$.
+   * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
    */
   virtual Real linfty_norm () const = 0;
 
   /**
-   * see if Sparse matrix has been closed
-   * and fully assembled yet
+   * \returns \p true if the matrix has been assembled.
    */
   virtual bool closed() const = 0;
 
   /**
-   * Print the contents of the matrix to the screen
-   * in a uniform style, regardless of matrix/solver
-   * package being used.
+   * Print the contents of the matrix to the screen in a uniform
+   * style, regardless of matrix/solver package being used.
    */
   void print(std::ostream & os=libMesh::out, const bool sparse=false) const;
 
   /**
-   * Same as the print method above, but allows you
-   * to print to a stream in the standard syntax.
+   * Same as the print method above, but allows you to print to a
+   * stream in the standard syntax.
    *
    * \code
    * template <typename U>
@@ -344,16 +319,15 @@ public:
   friend std::ostream & operator << <>(std::ostream & os, const SparseMatrix<T> & m);
 
   /**
-   * Print the contents of the matrix to the screen
-   * in a package-personalized style, if available.
+   * Print the contents of the matrix to the screen in a
+   * package-personalized style, if available.
    */
   virtual void print_personal(std::ostream & os=libMesh::out) const = 0;
 
   /**
-   * Print the contents of the matrix in Matlab's
-   * sparse matrix format. Optionally prints the
-   * matrix to the file named \p name.  If \p name
-   * is not specified it is dumped to the screen.
+   * Print the contents of the matrix in Matlab's sparse matrix
+   * format. Optionally prints the matrix to the file named \p name.
+   * If \p name is not specified it is dumped to the screen.
    */
   virtual void print_matlab(const std::string & /*name*/ = "") const
   {
@@ -392,14 +366,15 @@ public:
   }
 
   /**
-   * Multiplies the matrix with \p arg and stores the result in \p
-   * dest.
+   * Multiplies the matrix by the NumericVector \p arg and stores the
+   * result in NumericVector \p dest.
    */
   void vector_mult (NumericVector<T> & dest,
                     const NumericVector<T> & arg) const;
 
   /**
-   * Multiplies the matrix with \p arg and adds the result to \p dest.
+   * Multiplies the matrix by the NumericVector \p arg and adds the
+   * result to the NumericVector \p dest.
    */
   void vector_mult_add (NumericVector<T> & dest,
                         const NumericVector<T> & arg) const;
@@ -422,10 +397,10 @@ protected:
    * routines.  Note that this function must be redefined in derived classes
    * for it to work properly!
    */
-  virtual void _get_submatrix(SparseMatrix<T> & ,
-                              const std::vector<numeric_index_type> & ,
-                              const std::vector<numeric_index_type> & ,
-                              const bool) const
+  virtual void _get_submatrix(SparseMatrix<T> & /*submatrix*/,
+                              const std::vector<numeric_index_type> & /*rows*/,
+                              const std::vector<numeric_index_type> & /*cols*/,
+                              const bool /*reuse_submatrix*/) const
   {
     libmesh_not_implemented();
   }
@@ -436,8 +411,7 @@ protected:
   DofMap const * _dof_map;
 
   /**
-   * Flag indicating whether or not the matrix
-   * has been initialized.
+   * Flag indicating whether or not the matrix has been initialized.
    */
   bool _is_initialized;
 };

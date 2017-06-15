@@ -103,7 +103,7 @@ public:
   bool have_parameter (const std::string &) const;
 
   /**
-   * \returns a constant reference to the specified parameter
+   * \returns A constant reference to the specified parameter
    * value.  Requires, of course, that the parameter exists.
    */
   template <typename T>
@@ -118,7 +118,7 @@ public:
   void insert (const std::string &);
 
   /**
-   * \returns a writeable reference to the specified parameter.
+   * \returns A writable reference to the specified parameter.
    * This method will create the parameter if it does not exist,
    * so it can be used to define parameters which will later be
    * accessed with the \p get() member.
@@ -138,13 +138,13 @@ public:
   void remove (const std::string &);
 
   /**
-   * \returns the total number of parameters.
+   * \returns The total number of parameters.
    */
   std::size_t n_parameters () const { return _values.size(); }
 
 #ifdef LIBMESH_HAVE_RTTI
   /**
-   * \returns the number of parameters of the requested type.
+   * \returns The number of parameters of the requested type.
    */
   template <typename T>
   unsigned int n_parameters () const;
@@ -207,12 +207,12 @@ public:
   public:
 
     /**
-     * \returns a read-only reference to the parameter value.
+     * \returns A read-only reference to the parameter value.
      */
     const T & get () const { return _value; }
 
     /**
-     * \returns a writeable reference to the parameter value.
+     * \returns A writable reference to the parameter value.
      */
     T & set () { return _value; }
 

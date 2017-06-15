@@ -69,27 +69,27 @@ public:
   ~TreeNode ();
 
   /**
-   * \returns true if this node is the root node, false
+   * \returns \p true if this node is the root node, false
    * otherwise.
    */
   bool is_root() const { return (parent == libmesh_nullptr); }
 
   /**
-   * \returns true if this node is active (i.e. has no
+   * \returns \p true if this node is active (i.e. has no
    * children), false otherwise.
    */
   bool active() const { return children.empty(); }
 
   /**
    * Tries to insert \p Node \p nd into the TreeNode.
-   * Returns \p true iff \p nd is inserted into the TreeNode or one of
+   * \returns \p true iff \p nd is inserted into the TreeNode or one of
    * its children.
    */
   bool insert (const Node * nd);
 
   /**
    * Inserts \p Elem \p el into the TreeNode.
-   * Returns \p true iff \p el is inserted into the TreeNode or one of
+   * \returns \p true iff \p el is inserted into the TreeNode or one of
    * its children.
    */
   bool insert (const Elem * nd);
@@ -106,21 +106,21 @@ public:
   void set_bounding_box (const std::pair<Point, Point> & bbox);
 
   /**
-   * \returns true if this TreeNode (or its children) contain node n
+   * \returns \p true if this TreeNode (or its children) contain node n
    * (within relative tolerance), false otherwise.
    */
   bool bounds_node (const Node * nd,
                     Real relative_tol = 0) const;
 
   /**
-   * \returns true if this TreeNode (or its children) contain point p
+   * \returns \p true if this TreeNode (or its children) contain point p
    * (within relative tolerance), false otherwise.
    */
   bool bounds_point (const Point & p,
                      Real relative_tol = 0) const;
 
   /**
-   * \returns the level of the node.
+   * \returns The level of the node.
    */
   unsigned int level () const;
 
@@ -142,13 +142,13 @@ public:
   void transform_nodes_to_elements (std::vector<std::vector<const Elem *> > & nodes_to_elem);
 
   /**
-   * \returns the number of active bins below
+   * \returns The number of active bins below
    * (including) this element.
    */
   unsigned int n_active_bins() const;
 
   /**
-   * \returns an element containing point p,
+   * \returns An element containing point p,
    * optionally restricted to a set of allowed subdomains.
    */
   const Elem * find_element (const Point & p,

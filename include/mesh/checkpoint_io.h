@@ -59,7 +59,7 @@ public:
   typedef uint32_t header_id_type;
 
   /**
-   * Constructor.  Takes a writeable reference to a mesh object.
+   * Constructor.  Takes a writable reference to a mesh object.
    * This is the constructor required to read a mesh.
    * The optional parameter \p binary can be used to switch
    * between ASCII (\p false, the default) or binary (\p true)

@@ -91,7 +91,7 @@ public:
   RBEvaluation & get_rb_evaluation();
 
   /**
-   * \returns true if rb_eval is initialized. False, otherwise.
+   * \returns \p true if rb_eval is initialized. False, otherwise.
    */
   bool is_rb_eval_initialized() const;
 
@@ -107,12 +107,12 @@ public:
   void set_rb_assembly_expansion(RBAssemblyExpansion & rb_assembly_expansion_in);
 
   /**
-   * \returns a reference to the rb_assembly_expansion object
+   * \returns A reference to the rb_assembly_expansion object
    */
   RBAssemblyExpansion & get_rb_assembly_expansion();
 
   /**
-   * \returns a clever pointer to the system.
+   * \returns A reference to *this.
    */
   sys_type & system () { return *this; }
 
@@ -128,7 +128,7 @@ public:
   virtual void clear () libmesh_override;
 
   /**
-   * \returns a string indicating the type of the system.
+   * \returns A string indicating the type of the system.
    */
   virtual std::string system_type () const libmesh_override;
 
@@ -154,7 +154,7 @@ public:
    * set it to false if, for example, we are continuing from a previous
    * training run and don't want to clobber the existing rb_eval data.
    *
-   * \returns the final maximum a posteriori error bound on the training set.
+   * \returns The final maximum a posteriori error bound on the training set.
    */
   virtual Real train_reduced_basis(const bool resize_rb_eval_data=true);
 
@@ -398,7 +398,7 @@ public:
   void set_inner_product_assembly(ElemAssembly & inner_product_assembly_in);
 
   /**
-   * \returns a reference to the inner product assembly object
+   * \returns A reference to the inner product assembly object
    */
   ElemAssembly & get_inner_product_assembly();
 
@@ -554,7 +554,7 @@ protected:
 
   /**
    * Function that indicates when to terminate the Greedy
-   * basis training. Overload in subclasses to specialize.
+   * basis training. Override in subclasses to specialize.
    */
   virtual bool greedy_termination_test(Real abs_greedy_error,
                                        Real initial_greedy_error,
@@ -643,8 +643,9 @@ protected:
   virtual void update_system();
 
   /**
-   * This function returns the RB error bound for the current parameters and
-   * is used in the Greedy algorithm to select the next parameter.
+   * \returns The RB error bound for the current parameters.
+   *
+   * Used in the Greedy algorithm to select the next parameter.
    */
   virtual Real get_RB_error_bound();
 

@@ -114,7 +114,7 @@ public:
   }
 
   /**
-   * \returns the vector component \p i at coordinate
+   * \returns The vector component \p i at coordinate
    * \p p and time \p time.
    */
   virtual Output component (const FEMContext & c,

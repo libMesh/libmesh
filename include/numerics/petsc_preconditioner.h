@@ -46,7 +46,7 @@ template <typename T> class ShellMatrix;
 
 /**
  * This class provides an interface to the suite of preconditioners available
- * from Petsc.
+ * from PETSc.
  *
  * \author Derek Gaston
  * \date 2009
@@ -68,8 +68,9 @@ public:
   virtual ~PetscPreconditioner ();
 
   /**
-   * Computes the preconditioned vector "y" based on input "x".
-   * Usually by solving Py=x to get the action of P^-1 x.
+   * Computes the preconditioned vector \p y based on input vector \p
+   * x. This is usually done by solving \f$ Py=x \f$ to get the
+   * action of \f$ P^-1 x \f$.
    */
   virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) libmesh_override;
 
@@ -84,13 +85,13 @@ public:
   virtual void init () libmesh_override;
 
   /**
-   * Returns the actual Petsc PC struct.  Useful for more advanced
-   * purposes
+   * \returns The PETSc PC object.  Can be useful for implementing
+   * more advanced algorithms.
    */
   PC pc() { return _pc; }
 
   /**
-   * Tells PETSC to use the user-specified preconditioner
+   * Tells PETSc to use the user-specified preconditioner.
    */
   static void set_petsc_preconditioner_type (const PreconditionerType & preconditioner_type, PC & pc);
 
@@ -102,8 +103,7 @@ protected:
   PC _pc;
 
   /**
-   * Petsc Matrix that's been pulled out of the _matrix object.
-   * This happens during init...
+   * PETSc Mat pulled out of the _matrix object during init().
    */
   Mat _mat;
 

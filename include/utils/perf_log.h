@@ -141,7 +141,7 @@ public:
   ~PerfLog();
 
   /**
-   * Clears all the internal data and returns the
+   * Clears all the internal data and restores the
    * data structures to a pristine state.  This function
    * checks to see if it is currently monitoring any
    * events, and if so errors.  Be sure you are not
@@ -160,7 +160,7 @@ public:
   void enable_logging() { log_events = true; }
 
   /**
-   * Returns true iff performance logging is enabled
+   * \returns \p true iff performance logging is enabled
    */
   bool logging_enabled() const { return log_events; }
 
@@ -213,19 +213,19 @@ public:
                      const std::string & header="");
 
   /**
-   * \returns a string containing:
+   * \returns A string containing:
    * (1) Basic machine information (if first call)
    * (2) The performance log
    */
   std::string get_log() const;
 
   /**
-   * \returns a string containing ONLY the information header.
+   * \returns A string containing ONLY the information header.
    */
   std::string get_info_header() const;
 
   /**
-   * \returns a string containing ONLY the log information
+   * \returns A string containing ONLY the log information
    */
   std::string get_perf_info() const;
 
@@ -235,12 +235,12 @@ public:
   void print_log() const;
 
   /**
-   * \returns the total time spent on this event.
+   * \returns The total time spent on this event.
    */
   double get_elapsed_time() const;
 
   /**
-   * \returns the active time
+   * \returns The active time
    */
   double get_active_time() const;
 

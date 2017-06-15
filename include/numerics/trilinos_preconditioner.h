@@ -96,11 +96,14 @@ public:
   void set_params(Teuchos::ParameterList & list);
 
   /**
-   * Returns the actual Trilinos preconditioner object.
+   * \returns The actual Trilinos preconditioner object.
    */
   Epetra_FECrsMatrix * mat() { return _mat; }
 
   /**
+   * Sets the Trilinos preconditioner to use based on the libMesh PreconditionerType.
+   *
+   * \note Not all libMesh PreconditionerTypes are supported.
    */
   void set_preconditioner_type (const PreconditionerType & preconditioner_type);
 
@@ -112,7 +115,7 @@ public:
 protected:
 
   /**
-   * Trilinos preconditioner
+   * Trilinos preconditioner.
    */
   Epetra_Operator * _prec;
 
@@ -122,7 +125,7 @@ protected:
   Epetra_FECrsMatrix * _mat;
 
   /**
-   * Parameter list to be used for building the preconditioner
+   * Parameter list to be used for building the preconditioner.
    */
   Teuchos::ParameterList _param_list;
 

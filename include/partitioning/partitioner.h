@@ -60,9 +60,10 @@ public:
   virtual ~Partitioner() {}
 
   /**
-   * Creates a new partitioner of this type and returns it in a \p
-   * UniquePtr.  This is used when copying meshes, and must be
-   * overloaded in the derived classes.
+   * \returns A copy of this partitioner wrapped in a smart pointer.
+   *
+   * This is used when copying meshes, and must be overridden in the
+   * derived classes.
    */
   virtual UniquePtr<Partitioner> clone () const = 0;
 
@@ -186,7 +187,7 @@ protected:
                               MeshBase::element_iterator end);
 
   /**
-   * This is the actual partitioning method which must be overloaded
+   * This is the actual partitioning method which must be overridden
    * in derived classes.  It is called via the public partition()
    * method above by the user.
    */
@@ -194,7 +195,7 @@ protected:
                              const unsigned int n) = 0;
 
   /**
-   * This is the actual re-partitioning method which can be overloaded
+   * This is the actual re-partitioning method which can be overridden
    * in derived classes.  Note that the default behavior is to simply
    * call the partition function.
    */

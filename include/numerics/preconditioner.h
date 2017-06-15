@@ -43,8 +43,8 @@ template <typename T> class ShellMatrix;
 
 /**
  * This class provides a uniform interface for preconditioners.  This base
- * class is overloaded to provide linear solvers from different packages
- * like PETSC or Trilinos.
+ * class can be inherited from to wrap preconditioners from different packages
+ * like PETSc or Trilinos.
  *
  * In the below comments P is the matrix to be preconditioned with Apply()
  * performing the equivalent of the matrix vector product P^-1 x.  This
@@ -60,7 +60,7 @@ class Preconditioner : public ReferenceCountedObject<Preconditioner<T> >,
 public:
 
   /**
-   *  Constructor. Initializes Preconditioner data structures
+   * Constructor. Initializes Preconditioner data structures.
    */
   Preconditioner (const libMesh::Parallel::Communicator & comm);
 
@@ -78,14 +78,15 @@ public:
                                    const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
-   * \returns true if the data structures are
-   * initialized, false otherwise.
+   * \returns \p true if the data structures are initialized, \p false
+   * otherwise.
    */
   bool initialized () const { return _is_initialized; }
 
   /**
-   * Computes the preconditioned vector "y" based on input "x".
-   * Usually by solving Py=x to get the action of P^-1 x.
+   * Computes the preconditioned vector \p y based on input vector \p
+   * x. This is usually done by solving \f$ Py=x \f$ to get the
+   * action of \f$ P^-1 x \f$.
    */
   virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) = 0;
 
@@ -97,27 +98,26 @@ public:
   /**
    * Initialize data structures if not done so already.
    *
-   * This MUST be called before the preconditioning object is used.
+   * \note This MUST be called before the preconditioning object is used.
    */
   virtual void init () {}
 
   /**
    * This is called every time the "operator might have changed".
    *
-   * This is essentially where you need to fill in your preconditioning matrix.
+   * This is where you need to fill in your preconditioning matrix.
    */
   virtual void setup () {}
 
   /**
-   * Sets the matrix P to be preconditioned.
+   * Sets the matrix to be preconditioned.
    */
   void set_matrix(SparseMatrix<Number> & mat);
 
   /**
-   * Returns the type of preconditioner to use.
+   * \returns The type of preconditioner to use.
    */
-  PreconditionerType type () const
-  { return _preconditioner_type; }
+  PreconditionerType type () const { return _preconditioner_type; }
 
   /**
    * Sets the type of preconditioner to use.

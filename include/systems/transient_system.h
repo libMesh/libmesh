@@ -70,7 +70,7 @@ public:
   typedef TransientSystem<Base> sys_type;
 
   /**
-   * \returns a clever pointer to the system.
+   * \returns A reference to *this.
    */
   sys_type & system () { return *this; }
 
@@ -98,13 +98,13 @@ public:
   // access to the solution data fields
 
   /**
-   * \returns the old solution (at the previous timestep)
+   * \returns The old solution (at the previous timestep)
    * for the specified global DOF.
    */
   Number old_solution (const dof_id_type global_dof_number) const;
 
   /**
-   * \returns the older solution (two timesteps ago)
+   * \returns The older solution (two timesteps ago)
    * for the specified global DOF.
    */
   Number older_solution (const dof_id_type global_dof_number) const;

@@ -117,14 +117,16 @@ public:
   virtual Real error_order () const = 0;
 
   /**
-   * Returns the maximum order of time derivatives for which the
-   * UnsteadySolver subclass is capable of handling. E.g. EulerSolver
-   * will have time_order = 1 and NewmarkSolver will have time_order = 2
+   * \returns The maximum order of time derivatives for which the
+   * UnsteadySolver subclass is capable of handling.
+   *
+   * For example, EulerSolver will have \p time_order() = 1 and
+   * NewmarkSolver will have \p time_order() = 2.
    */
   virtual unsigned int time_order () const = 0;
 
   /**
-   * \returns the old nonlinear solution for the specified global
+   * \returns The old nonlinear solution for the specified global
    * DOF.
    */
   Number old_nonlinear_solution (const dof_id_type global_dof_number) const;

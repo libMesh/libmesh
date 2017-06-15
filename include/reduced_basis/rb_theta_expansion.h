@@ -56,7 +56,7 @@ public:
   virtual ~RBThetaExpansion() {}
 
   /**
-   * Evaluate theta_q_a at the current parameter. Overload
+   * Evaluate theta_q_a at the current parameter. Override
    * if the theta functions need to be treated differently
    * in subclasses.
    */

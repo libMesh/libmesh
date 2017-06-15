@@ -34,6 +34,7 @@ namespace libMesh
 /**
  * This class will eventually define a rank-N tensor in \p LIBMESH_DIM
  * dimensional space of type T.
+ *
  * Right now it defines a shim to allow for rank-independent code to
  * compile (but not give correct results) in the case of vector-valued
  * elements and second derivatives.
@@ -65,13 +66,13 @@ public:
   ~TypeNTensor() {}
 
   /**
-   * Return a proxy for the \f$ i^{th} \f$ slice of the tensor.
+   * \returns A proxy for the \f$ i^{th} \f$ slice of the tensor.
    */
   const TypeNTensor<N-1,T> slice (const unsigned int /*i*/) const
   { return TypeNTensor<N-1,T>(); }
 
   /**
-   * Return a writeable proxy for the \f$ i^{th} \f$ slice of the tensor.
+   * \returns A writable proxy for the \f$ i^{th} \f$ slice of the tensor.
    */
   TypeNTensor<N-1,T> slice (const unsigned int /*i*/)
   { return TypeNTensor<N-1,T>(); }
@@ -107,13 +108,13 @@ public:
   { return *this; }
 
   /**
-   * Return the opposite of a tensor
+   * \returns The negative of a tensor.
    */
   TypeNTensor<N,T> operator - () const
   { return *this; }
 
   /**
-   * Multiply a tensor by a number, i.e. scale.
+   * Multiply every entry of a tensor by a number.
    */
   template <typename Scalar>
   typename boostcopy::enable_if_c<
@@ -123,13 +124,13 @@ public:
   { return TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>(); }
 
   /**
-   * Multiply this tensor by a number, i.e. scale.
+   * Multiply every entry of this tensor by a number.
    */
   template <typename Scalar>
   const TypeNTensor<N,T> & operator *= (const Scalar) { return *this; }
 
   /**
-   * Divide a tensor by a number, i.e. scale.
+   * Divide every entry of a tensor by a number.
    */
   template <typename Scalar>
   typename boostcopy::enable_if_c<
@@ -138,13 +139,12 @@ public:
   operator / (const Scalar) const { return *this; }
 
   /**
-   * Divide this tensor by a number, i.e. scale.
+   * Divide every entry of this tensor by a number.
    */
   const TypeNTensor<N,T> & operator /= (const T) { return *this; }
 
   /**
-   * Multiply 2 tensors together, i.e. dyadic product
-   * sum_ij Aij*Bij.
+   * Multiply 2 tensors together, i.e. dyadic product sum_ij Aij*Bij.
    * The tensors may be of different types.
    */
   template <typename T2>
@@ -152,47 +152,50 @@ public:
   contract (const TypeNTensor<N,T2> &) const { return 0; }
 
   /**
-   * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
-   * element magnitudes squared.
+   * \returns The Frobenius norm of the tensor squared, i.e. the sum of the
+   * entry magnitudes squared.
    *
    * \deprecated Use the norm_sq() function instead.
    */
   Real size_sq() const { libmesh_deprecated(); return 0.;}
 
   /**
-   * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
-   * element magnitudes squared.
+   * \returns The Frobenius norm of the tensor squared, i.e. the sum of the
+   * entry magnitudes squared.
    */
   Real norm_sq() const { return 0.;}
 
   /**
-   * \returns \p true if two tensors are equal valued.
+   * \returns \p true if two tensors are equal, \p false otherwise.
    */
   bool operator == (const TypeNTensor<N,T> & /*rhs*/) const
   { return true; }
 
   /**
-   * \returns \p true if this tensor is "less"
-   * than another.  Useful for sorting.
+   * \returns \p true if this tensor is "less" than another.
+   *
+   * Useful for sorting.
    */
   bool operator < (const TypeNTensor<N,T> & /*rhs*/) const
   { return false; }
 
   /**
-   * \returns \p true if this tensor is "greater"
-   * than another.
+   * \returns \p true if this tensor is "greater" than another.
    */
   bool operator > (const TypeNTensor<N,T> & /*rhs*/) const
   { return false; }
 
   /**
-   * Formatted print, by default to \p libMesh::out.
+   * Do a formatted print of this tensor to a stream which defaults to
+   * \p libMesh::out.
    */
   void print(std::ostream & /*os = libMesh::out*/) const {}
 
   /**
-   * Formatted print as above but allows you to do
+   * Does a formatted print (as above) but supports the syntax:
+   * \code
    * std::cout << t << std::endl;
+   * \endcode
    */
   friend std::ostream & operator << (std::ostream & os,
                                      const TypeNTensor<N,T> & t)

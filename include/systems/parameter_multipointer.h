@@ -103,7 +103,7 @@ public:
   }
 
   /**
-   * Returns a new copy of the accessor.
+   * \returns A new copy of the accessor.
    */
   virtual UniquePtr<ParameterAccessor<T> > clone() const libmesh_override
   {
@@ -116,7 +116,7 @@ public:
   void push_back (T * new_ptr) { _ptrs.push_back(new_ptr); }
 
   /**
-   * Returns the number of data associated with this parameter.
+   * \returns The number of data associated with this parameter.
    * Useful for testing if the multipointer is empty/invalid.
    */
   std::size_t size() const { return _ptrs.size(); }

@@ -56,7 +56,7 @@ public:
   GMVIO (const MeshBase &);
 
   /**
-   * Constructor.  Takes a writeable reference to a mesh object.
+   * Constructor.  Takes a writable reference to a mesh object.
    * This constructor is required to let us read in a mesh.
    */
   explicit

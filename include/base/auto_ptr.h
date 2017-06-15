@@ -331,7 +331,7 @@ public:
   /**
    * \brief  Smart pointer dereferencing.
    *
-   * This returns the pointer itself, which the language then will
+   * \returns The pointer itself, which the language then will
    * automatically cause to be dereferenced.
    */
   element_type *

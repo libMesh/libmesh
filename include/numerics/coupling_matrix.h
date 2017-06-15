@@ -62,20 +62,20 @@ public:
   CouplingMatrix (const unsigned int n=0);
 
   /**
-   * \returns the (i,j) entry of the matrix.
+   * \returns The (i,j) entry of the matrix.
    */
   bool operator() (const unsigned int i,
                    const unsigned int j) const;
 
   /**
-   * \returns the (i,j) entry of the matrix as
+   * \returns The (i,j) entry of the matrix as
    * a smart-reference.
    */
   CouplingAccessor operator() (const unsigned int i,
                                const unsigned int j);
 
   /**
-   * \returns the size of the matrix, i.e. N for an
+   * \returns The size of the matrix, i.e. N for an
    * NxN matrix.
    */
   unsigned int size() const;
@@ -92,7 +92,7 @@ public:
   void clear();
 
   /**
-   * \returns true if the matrix is empty.
+   * \returns \p true if the matrix is empty.
    */
   bool empty() const;
 

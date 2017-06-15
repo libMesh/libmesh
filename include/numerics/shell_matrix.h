@@ -38,7 +38,7 @@ template <typename T> class NumericVector;
 /**
  * Generic shell matrix, i.e. a matrix that does not define anything
  * but its action on a vector.  This class contains pure virtual
- * members that must be overloaded in derived classes.
+ * members that must be overridden in derived classes.
  *
  * \author Tim Kroeger
  * \date 2008

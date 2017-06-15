@@ -99,7 +99,7 @@ public:
   RBThetaExpansion & get_rb_theta_expansion();
 
   /**
-   * Clear and resize the SCM data vectors. Overload
+   * Clear and resize the SCM data vectors. Override
    * in subclass as necessary.
    */
   virtual void resize_SCM_vectors ();
@@ -118,7 +118,7 @@ public:
   /**
    * This function is called before truth eigensolves in
    * compute_SCM_bounding_box and evaluate_stability_constant.
-   * Overload it to set specific properties to optimize
+   * Override it to set specific properties to optimize
    * eigensolver performance. The argument refers to
    * the operator index in compute_SCM_bounding_box;
    * a negative value of the argument indicates we are
@@ -150,7 +150,7 @@ public:
    * be useful in solving constrained eigenvalue problems.
    *
    * This function is called at the start of perform_SCM_greedy and by
-   * default is does nothing. Overload in subclass to attach a specific
+   * default is does nothing. Override in subclass to attach a specific
    * vector.
    */
   virtual void attach_deflation_space() {}
@@ -213,7 +213,7 @@ protected:
   /**
    * Helper function which provides an error
    * indicator to be used in the SCM greedy.
-   * Overload in subclasses to specialize behavior.
+   * Override in subclasses to specialize behavior.
    */
   virtual Real SCM_greedy_error_indicator(Real LB, Real UB) { return fabs(UB-LB)/fabs(UB); }
 

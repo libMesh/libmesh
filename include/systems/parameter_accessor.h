@@ -88,7 +88,7 @@ public:
   ConstParameterProxy<T> operator* () const { return ConstParameterProxy<T>(*this); }
 
   /**
-   * Returns a new copy of the accessor.  The new copy should probably
+   * \returns A new copy of the accessor.  The new copy should probably
    * be as shallow as possible, but should still access the same
    * parameter.
    */

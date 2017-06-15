@@ -46,7 +46,7 @@ namespace libMesh
 {
 
 /**
- * FEMFunction that returns a single.
+ * FEMFunction that returns a scalar value.
  *
  * \author Roy Stogner
  * \date 2012
@@ -61,13 +61,17 @@ public:
                   const std::vector<std::string> * additional_vars=libmesh_nullptr,
                   const std::vector<Output> * initial_vals=libmesh_nullptr);
 
-  // Re-parse with new expression
+  /**
+   * Re-parse with new expression.
+   */
   void reparse (const std::string & expression);
 
   virtual Output operator() (const Point & p,
                              const Real time = 0);
 
-  // Query if the automatic derivative generation was successful
+  /**
+   * Query if the automatic derivative generation was successful.
+   */
   virtual bool has_derivatives() { return _valid_derivatives; }
 
   virtual Output dot(const Point & p,
@@ -81,8 +85,8 @@ public:
                            DenseVector<Output> & output);
 
   /**
-   * \returns the vector component \p i at coordinate
-   * \p p and time \p time.
+   * \returns The vector component \p i at coordinate \p p and time \p
+   * time.
    */
   virtual Output component (unsigned int i,
                             const Point & p,
@@ -91,48 +95,62 @@ public:
   const std::string & expression() { return _expression; }
 
   /**
-   * \returns the address of a parsed variable so you can supply a parameterized value
+   * \returns The address of a parsed variable so you can supply a parameterized value.
    */
   virtual Output & getVarAddress(const std::string & variable_name);
 
   virtual UniquePtr<FunctionBase<Output> > clone() const;
 
   /**
-   * \returns the value of an inline variable.  Will *only* be correct
-   * if the inline variable value is independent of input variables,
-   * if the inline variable is not redefined within any subexpression,
-   * and if the inline variable takes the same value within any
-   * subexpressions where it appears.
+   * \returns The value of an inline variable.
+   *
+   * \note Will *only* be correct if the inline variable value is
+   * independent of input variables, if the inline variable is not
+   * redefined within any subexpression, and if the inline variable
+   * takes the same value within any subexpressions where it appears.
    */
   Output get_inline_value(const std::string & inline_var_name) const;
 
   /**
-   * Changes the value of an inline variable.  Forever after the
-   * variable value will take the given constant, independent of input
-   * variables, in every subexpression where it is already defined.
-   * Currently only works if the inline variable is not redefined
-   * within any one subexpression.
+   * Changes the value of an inline variable.
+   *
+   * \note Forever after, the variable value will take the given
+   * constant, independent of input variables, in every subexpression
+   * where it is already defined.
+   *
+   * \note Currently only works if the inline variable is not
+   * redefined within any one subexpression.
    */
   void set_inline_value(const std::string & inline_var_name,
                         Output newval);
 
 protected:
-  // Re-parse with minor changes to expression
+  /**
+   * Re-parse with minor changes to expression.
+   */
   void partial_reparse (const std::string & expression);
 
-  // Helper function for parsing out variable names
+  /**
+   * Helper function for parsing out variable names.
+   */
   std::size_t find_name (const std::string & varname,
                          const std::string & expr) const;
 
-  // Helper function for determining time-dependence of expression
+  /**
+   * \returns \p true if the expression is time-dependent, false otherwise.
+   */
   bool expression_is_time_dependent( const std::string & expression ) const;
 
 private:
-  // Set the _spacetime argument vector
+  /**
+   * Set the _spacetime argument vector.
+   */
   void set_spacetime(const Point & p,
                      const Real time = 0);
 
-  // Evaluate the ith FunctionParser and check the result
+  /**
+   * Evaluate the ith FunctionParser and check the result.
+   */
   inline Output eval(FunctionParserADBase<Output> & parser,
                      const std::string & libmesh_dbg_var(function_name),
                      unsigned int libmesh_dbg_var(component_idx)) const;
@@ -270,7 +288,7 @@ ParsedFunction<Output,OutputGradient>::operator()
 }
 
 /**
- * \returns the vector component \p i at coordinate
+ * \returns The vector component \p i at coordinate
  * \p p and time \p time.
  */
 template <typename Output, typename OutputGradient>
@@ -290,7 +308,7 @@ ParsedFunction<Output,OutputGradient>::component (unsigned int i,
 }
 
 /**
- * \returns the address of a parsed variable so you can supply a parameterized value
+ * \returns The address of a parsed variable so you can supply a parameterized value
  */
 template <typename Output, typename OutputGradient>
 inline

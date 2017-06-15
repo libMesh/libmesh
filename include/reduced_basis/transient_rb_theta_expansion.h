@@ -53,7 +53,7 @@ public:
   typedef RBThetaExpansion Parent;
 
   /**
-   * Evaluate theta at the current parameter. Overload
+   * Evaluate theta at the current parameter. Override
    * if the theta functions need to be treated differently
    * in subclasses.
    */

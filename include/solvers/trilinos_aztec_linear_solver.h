@@ -130,10 +130,11 @@ public:
   void get_residual_history(std::vector<double> & hist);
 
   /**
-   * Returns just the initial residual for the solve just
-   * completed with this interface.  Use this method instead
-   * of the one above if you just want the starting residual
-   * and not the entire history.
+   * \returns The initial residual for the solve just completed with
+   * this interface.
+   *
+   * Use this method instead of the one above if you just want the
+   * starting residual and not the entire history.
    */
   Real get_initial_residual();
 
@@ -144,7 +145,7 @@ public:
   virtual void print_converged_reason() const libmesh_override;
 
   /**
-   * Returns the solver's convergence flag
+   * \returns The solver's convergence flag
    */
   virtual LinearConvergenceReason get_converged_reason() const libmesh_override;
 

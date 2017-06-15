@@ -134,7 +134,7 @@ public:
   virtual void print_converged_reason() const libmesh_override;
 
   /**
-   * Returns the solver's convergence flag
+   * \returns The solver's convergence flag.
    */
   virtual LinearConvergenceReason get_converged_reason() const libmesh_override;
 

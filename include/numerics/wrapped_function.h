@@ -70,24 +70,23 @@ public:
   virtual UniquePtr<FunctionBase<Output> > clone () const libmesh_override;
 
   /**
-   * \returns the scalar value of variable varnum at coordinate \p p
-   * and time \p time.
+   * \returns The scalar function value at coordinate \p p and time \p
+   * time, which defaults to zero.
    */
   virtual Output operator() (const Point & p,
                              const Real time = 0.) libmesh_override;
 
   /**
-   * Return function for vectors.
-   * Returns in \p output the values of all system variables at the
-   * coordinate \p p and for time \p time.
+   * Evaluation function for time-dependent vector-valued functions.
+   * Sets output values in the passed-in \p output DenseVector.
    */
   virtual void operator() (const Point & p,
                            const Real time,
                            DenseVector<Output> & output) libmesh_override;
 
   /**
-   * \returns the vector component \p i at coordinate
-   * \p p and time \p time.
+   * \returns The vector component \p i at coordinate \p p and time \p
+   * time.
    */
   virtual Output component (unsigned int i,
                             const Point & p,
@@ -137,11 +136,6 @@ WrappedFunction<Output>::clone () const
 }
 
 
-/**
- * Return function for vectors.
- * Returns in \p output the values of all system variables at the
- * coordinate \p p and for time \p time.
- */
 template <typename Output>
 inline
 void WrappedFunction<Output>::operator() (const Point & p,
@@ -183,10 +177,6 @@ void WrappedFunction<Output>::operator() (const Point & p,
 }
 
 
-/**
- * \returns the vector component \p i at coordinate
- * \p p and time \p time.
- */
 template <typename Output>
 inline
 Output WrappedFunction<Output>::component (unsigned int i,

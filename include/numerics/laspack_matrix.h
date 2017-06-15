@@ -270,7 +270,7 @@ public:
 private:
 
   /**
-   * \returns the position in the compressed row
+   * \returns The position in the compressed row
    * storage scheme of the \f$ (i,j) \f$ element.
    */
   numeric_index_type pos (const numeric_index_type i,

@@ -98,7 +98,7 @@ public:
   virtual Real rb_solve_again();
 
   /**
-   * \returns a scaling factor that we can use to provide a consistent
+   * \returns A scaling factor that we can use to provide a consistent
    * scaling of the RB error bound across different parameter values.
    */
   virtual Real get_error_bound_normalization() libmesh_override;

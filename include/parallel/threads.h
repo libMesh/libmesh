@@ -218,7 +218,7 @@ public:
   void grainsize (const unsigned int & gs) {_grainsize = gs;}
 
   /**
-   * \returns the size of the range.
+   * \returns The size of the range.
    */
   int size () const { return (_end -_begin); }
 
@@ -227,12 +227,12 @@ public:
   //------------------------------------------------------------------------
 
   /**
-   * Returns true if the range is empty.
+   * \returns \p true if the range is empty.
    */
   bool empty() const { return (_begin == _end); }
 
   /**
-   * Returns true if the range can be subdivided.
+   * \returns \p true if the range can be subdivided.
    */
   bool is_divisible() const { return ((_begin + this->grainsize()) < _end); }
 

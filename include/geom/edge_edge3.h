@@ -52,7 +52,7 @@ public:
     Edge(Edge3::n_nodes(), p, _nodelinks_data) {}
 
   /**
-   * \returns the \p Point associated with local \p Node \p i,
+   * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
   virtual Point master_point (const unsigned int i) const libmesh_override
@@ -74,22 +74,22 @@ public:
   virtual unsigned int n_sub_elem() const libmesh_override { return 2; }
 
   /**
-   * \returns true if the specified (local) node number is a vertex.
+   * \returns \p true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
-   * \returns true if the specified (local) node number is an edge.
+   * \returns \p true if the specified (local) node number is an edge.
    */
   virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
-   * \returns true if the specified (local) node number is a face.
+   * \returns \p true if the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const libmesh_override;
 
   /**
-   * \returns true if the specified (local) node number is on the
+   * \returns \p true if the specified (local) node number is on the
    * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
@@ -103,7 +103,7 @@ public:
                                const unsigned int e) const libmesh_override;
 
   /**
-   * \returns true if the element map is definitely affine within
+   * \returns \p true if the element map is definitely affine within
    * numerical tolerances.
    */
   virtual bool has_affine_map () const libmesh_override;
@@ -129,7 +129,7 @@ public:
   { return 2; }
 
   /**
-   * \returns the element-local number of the  \f$ v^{th} \f$ vertex
+   * \returns The element-local number of the \f$ v^{th} \f$ vertex
    * that defines the \f$ n^{th} \f$ second-order node.
    */
   virtual unsigned short int second_order_adjacent_vertex (const unsigned int,
@@ -137,7 +137,7 @@ public:
   { return static_cast<unsigned short int>(v); }
 
   /**
-   * \returns the child number \p c and element-local index \p v of the
+   * \returns The child number \p c and element-local index \p v of the
    * \f$ n^{th} \f$ second-order node on the parent element.  See
    * elem.h for further details.
    */
@@ -150,7 +150,7 @@ public:
   virtual Real volume () const libmesh_override;
 
   /**
-   * \returns a bounding box (not necessarily the minimal bounding box)
+   * \returns A bounding box (not necessarily the minimal bounding box)
    * containing the edge.
    */
   virtual BoundingBox loose_bounding_box () const libmesh_override;

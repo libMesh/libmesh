@@ -92,13 +92,13 @@ public:
   void close();
 
   /**
-   * Returns true if the Xdr file is open, false
+   * \returns \p true if the Xdr file is open, false
    * if it is closed.
    */
   bool is_open() const;
 
   /**
-   * Returns true if the Xdr file being read is at End-Of-File.
+   * \returns \p true if the Xdr file being read is at End-Of-File.
    * Note that this is *not* a const method - the only portable way to
    * test for an impending EOF is to peek at the next byte of the file
    * first, which may set the eof flag on the istream.
@@ -106,19 +106,19 @@ public:
   bool is_eof();
 
   /**
-   * Returns true if the file is opened in a reading
+   * \returns \p true if the file is opened in a reading
    * state, false otherwise.
    */
   bool reading() const { return ((mode == DECODE) || (mode == READ)); }
 
   /**
-   * Returns true if the file is opened in a writing
+   * \returns \p true if the file is opened in a writing
    * state, false otherwise.
    */
   bool writing() const { return ((mode == ENCODE) || (mode == WRITE)); }
 
   /**
-   * Returns the mode used to access the file.  Valid modes
+   * \returns The mode used to access the file.  Valid modes
    * are ENCODE, DECODE, READ, or WRITE.
    */
   XdrMODE access_mode () const { return mode; }

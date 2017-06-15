@@ -189,7 +189,7 @@ public:
   /**
    * If verify_analytic_jacobian is equal to zero (as it is by
    * default), no numeric jacobians will be calculated unless
-   * an overloaded element_time_derivative(), element_constraint(),
+   * an overridden element_time_derivative(), element_constraint(),
    * side_time_derivative(), or side_constraint() function cannot
    * provide an analytic jacobian upon request.
    *

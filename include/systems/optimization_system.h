@@ -79,8 +79,9 @@ public:
     /**
      * This function will be called to compute the objective function
      * to be minimized, and must be implemented by the user in a
-     * derived class. \returns the value of the objective function at
-     * the iterate \p X.
+     * derived class.
+     *
+     * \returns The value of the objective function at iterate \p X.
      */
     virtual Number objective (const NumericVector<Number> & X,
                               sys_type & S) = 0;
@@ -214,7 +215,7 @@ public:
   };
 
   /**
-   * \returns a clever pointer to the system.
+   * \returns A reference to *this.
    */
   sys_type & system () { return *this; }
 

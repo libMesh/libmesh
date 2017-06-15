@@ -40,10 +40,11 @@ namespace Parallel {
 namespace Utils {
 
 /**
- * Utility function that returns true if the vector v
- * is sorted, false otherwise.  O(N), the length of the
- * vector.  This is implemented solely because the std::is_sorted
- * appears to be an STL extension.
+ * \returns \p true if the vector \p v is sorted, \p false otherwise.
+ *
+ * Requires O(N) comparisons, where N is the length of the vector.
+ * This was implemented because std::is_sorted() was an STL extension
+ * at the time.
  */
 template <typename KeyType>
 inline

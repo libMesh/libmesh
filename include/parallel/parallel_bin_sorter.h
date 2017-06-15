@@ -58,14 +58,18 @@ public:
   BinSorter (const Parallel::Communicator & comm,
              const std::vector<KeyType> & d);
 
-  // The actual function which sorts the data into
-  // nbins.  Currently based on the global min and
-  // max which you must provide e.g. by using MPI.
+  /**
+   * The actual function which sorts the data into
+   * nbins.  Currently based on the global min and
+   * max which you must provide e.g. by using MPI.
+   */
   void binsort (const IdxType nbins,
                 KeyType max,
                 KeyType min);
 
-  // Returns the size of bin b as an unsigned int.
+  /**
+   * \returns The size of bin b as an unsigned int.
+   */
   IdxType sizeof_bin (const IdxType bin) const;
 
 

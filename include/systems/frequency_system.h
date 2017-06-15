@@ -166,7 +166,7 @@ public:
                         const bool allocate_solution_duplicates=true);
 
   /**
-   * \returns the number of frequencies to solve
+   * \returns The number of frequencies to solve
    */
   unsigned int n_frequencies () const;
 
@@ -186,19 +186,19 @@ public:
                          const std::string & name);
 
   /**
-   * \returns the number of iterations and the final residual.
+   * \returns The number of iterations and the final residual.
    */
   std::pair<unsigned int, Real> get_rval (unsigned int n) const;
 
   /**
-   * \returns a string of the form \p "frequency_x", where \p x is
+   * \returns A string of the form \p "frequency_x", where \p x is
    * the integer \p n.  Useful for identifying frequencies and
    * solution vectors in the parameters set of \p _equation_systems.
    */
   std::string form_freq_param_name(const unsigned int n) const;
 
   /**
-   * \returns a string of the form \p "solution_x", where \p x is
+   * \returns A string of the form \p "solution_x", where \p x is
    * the integer \p n.  Useful for identifying frequencies and
    * solution vectors in the vectors map of \p System.
    */

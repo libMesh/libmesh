@@ -202,7 +202,7 @@ public:
   };
 
   /**
-   * \returns a clever pointer to the system.
+   * \returns A reference to *this.
    */
   sys_type & system () { return *this; }
 
@@ -224,7 +224,7 @@ public:
   virtual void solve () libmesh_override;
 
   /**
-   * Returns an integer corresponding to the upper iteration count
+   * \returns An integer corresponding to the upper iteration count
    * limit and a Real corresponding to the convergence tolerance to
    * be used in linear adjoint and/or sensitivity solves
    */
@@ -261,13 +261,13 @@ public:
   UniquePtr<DiffSolver> diff_solver;
 
   /**
-   * Returns  the number of iterations
+   * \returns The number of iterations
    * taken for the most recent nonlinear solve.
    */
   unsigned int n_nonlinear_iterations() const { return _n_nonlinear_iterations; }
 
   /**
-   * Returns the final residual for the nonlinear system solve.
+   * \returns The final residual for the nonlinear system solve.
    */
   Real final_nonlinear_residual() const { return _final_nonlinear_residual; }
 

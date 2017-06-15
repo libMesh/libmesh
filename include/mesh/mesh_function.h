@@ -118,14 +118,14 @@ public:
   virtual UniquePtr<FunctionBase<Number> > clone () const libmesh_override;
 
   /**
-   * \returns the value of variable 0 at point \p p and for \p time,
+   * \returns The value of variable 0 at point \p p and for \p time,
    * which defaults to zero.
    */
   Number operator() (const Point & p,
                      const Real time=0.) libmesh_override;
 
   /**
-   * \returns a map of values of variable 0 at point
+   * \returns A map of values of variable 0 at point
    * \p p and for \p time.
    *
    * The std::map is from element to Number and accounts for
@@ -136,14 +136,14 @@ public:
                                                       const Real time=0.);
 
   /**
-   * \returns the first derivatives of variable 0 at point
+   * \returns The first derivatives of variable 0 at point
    * \p p and for \p time, which defaults to zero.
    */
   Gradient gradient (const Point & p,
                      const Real time=0.);
 
   /**
-   * \returns a map of first derivatives (gradients) of variable 0 at point
+   * \returns A map of first derivatives (gradients) of variable 0 at point
    * \p p and for \p time.
    * map is from element to Gradient and accounts for double defined
    * values on faces if the gradient is discontinuous
@@ -153,7 +153,7 @@ public:
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
-   * \returns the second derivatives of variable 0 at point
+   * \returns The second derivatives of variable 0 at point
    * \p p and for \p time, which defaults to zero.
    */
   Tensor hessian (const Point & p,

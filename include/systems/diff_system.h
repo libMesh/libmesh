@@ -98,13 +98,13 @@ public:
   virtual void assemble () libmesh_override;
 
   /**
-   * Returns a pointer to a linear solver appropriate for use in
+   * \returns A pointer to a linear solver appropriate for use in
    * adjoint and/or sensitivity solves
    */
   virtual LinearSolver<Number> * get_linear_solver() const libmesh_override;
 
   /**
-   * Returns an integer corresponding to the upper iteration count
+   * \returns An integer corresponding to the upper iteration count
    * limit and a Real corresponding to the convergence tolerance to
    * be used in linear adjoint and/or sensitivity solves
    */
@@ -161,16 +161,19 @@ public:
   }
 
   /**
-   * Returns const reference to DifferentiablePhysics object. Note
-   * that if no external Physics object is attached, the default is
-   * this.
+   * \returns A const reference to a DifferentiablePhysics object.
+   *
+   * \note If no external Physics object is attached, the default is
+   * \p this.
    */
   const DifferentiablePhysics * get_physics() const
   { return this->_diff_physics; }
 
   /**
-   * Returns reference to DifferentiablePhysics object. Note that if
-   * no external Physics object is attached, the default is this.
+   * \returns A reference to a DifferentiablePhysics object.
+   *
+   * \note If no external Physics object is attached, the default is
+   * \p this.
    */
   DifferentiablePhysics * get_physics()
   { return this->_diff_physics; }
@@ -188,15 +191,17 @@ public:
   void swap_physics ( DifferentiablePhysics * & swap_physics );
 
   /**
-   * Returns const reference to DifferentiableQoI object. Note that if no external
-   * QoI object is attached, the default is this.
+   * \returns A const reference to a DifferentiableQoI object.
+   *
+   * \note If no external QoI object is attached, the default is \p this.
    */
   const DifferentiableQoI * get_qoi() const
   { return this->diff_qoi; }
 
   /**
-   * Returns reference to DifferentiableQoI object. Note that if no external
-   * QoI object is attached, the default is this.
+   * \returns A reference to a DifferentiableQoI object.
+   *
+   * \note If no external QoI object is attached, the default is this.
    */
   DifferentiableQoI * get_qoi()
   { return this->diff_qoi; }
@@ -227,7 +232,7 @@ public:
   }
 
   /**
-   * Returns a pointer to the time solver attached to the calling system
+   * \returns A pointer to the time solver attached to the calling system
    */
   TimeSolver & get_time_solver();
 

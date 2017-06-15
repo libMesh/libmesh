@@ -41,7 +41,7 @@ class AbaqusIO : public MeshInput<MeshBase>
 {
 public:
   /**
-   * Constructor.  Takes a writeable reference to a mesh object.
+   * Constructor.  Takes a writable reference to a mesh object.
    */
   explicit
   AbaqusIO (MeshBase & mesh);

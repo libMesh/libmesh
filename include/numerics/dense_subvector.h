@@ -30,9 +30,9 @@ namespace libMesh
 {
 
 /**
- * Defines a dense subvector for use in Finite Element-type computations.
- * Useful for storing element load vectors  before summation
- * into a global vector, particularly when you have systems of equations.
+ * Defines a dense subvector for use in finite element computations.
+ * Useful for storing element load vectors before summation into a
+ * global vector, particularly when you have systems of equations.
  *
  * \author Benjamin S. Kirk
  * \date 2003
@@ -56,9 +56,8 @@ public:
    */
   virtual ~DenseSubVector() {}
 
-
   /**
-   * \returns a reference to the parent vector.
+   * \returns A reference to the parent vector.
    */
   DenseVector<T> & parent () { return _parent_vector; }
 
@@ -68,42 +67,42 @@ public:
   virtual void zero() libmesh_override;
 
   /**
-   * \returns the \p (i,j) element of the subvector as a const
+   * \returns The \p (i,j) element of the subvector as a const
    * reference.
    */
   const T & operator() (const unsigned int i) const;
 
   /**
-   * \returns the \p (i,j) element of the subvector as a writeable reference.
+   * \returns The \p (i,j) element of the subvector as a writable reference.
    */
   T & operator() (const unsigned int i);
 
   /**
-   * \returns the \p (i) element of the vector.
+   * \returns The \p (i) element of the vector.
    */
   virtual T el(const unsigned int i) const libmesh_override
   { return (*this)(i); }
 
   /**
-   * \returns the \p (i) element of the vector as a writeable reference.
+   * \returns The \p (i) element of the vector as a writable reference.
    */
   virtual T & el(const unsigned int i) libmesh_override
   { return (*this)(i); }
 
   /**
-   * \returns the size of the subvector.
+   * \returns The size of the subvector.
    */
   virtual unsigned int size() const libmesh_override
   { return _n; }
 
   /**
-   * \returns true iff size() is 0.
+   * \returns \p true if size() is 0.
    */
   virtual bool empty() const libmesh_override
   { return (_n == 0); }
 
   /**
-   * \returns the row offset into the parent vector.
+   * \returns The row offset into the parent vector.
    */
   unsigned int i_off() const { return _i_off; }
 
@@ -114,36 +113,32 @@ public:
                   const unsigned int n);
 
   /**
-   * \returns the minimum element in the vector.
-   * In case of complex numbers, this returns the minimum
-   * Real part.
+   * \returns The minimum element in the vector, or the minimum real
+   * part in the case of complex numbers.
    */
   Real min () const;
 
   /**
-   * \returns the maximum element in the vector.
-   * In case of complex numbers, this returns the maximum
-   * Real part.
+   * \returns The maximum element in the vector, or the maximum real
+   * part in the case of complex numbers.
    */
   Real max () const;
 
   /**
-   * \returns the \f$l_1\f$-norm of the vector, i.e.
-   * the sum of the absolute values.
+   * \returns The \f$l_1\f$-norm of the vector, i.e. the sum of the
+   * absolute values of the entries.
    */
   Real l1_norm () const;
 
   /**
-   * \returns the \f$l_2\f$-norm of the vector, i.e.
-   * the square root of the sum of the
-   * squares of the elements.
+   * \returns The \f$l_2\f$-norm of the vector, i.e. the square root
+   * of the sum of the squares of the entries.
    */
   Real l2_norm () const;
 
   /**
-   * \returns the maximum absolute value of the
-   * elements of this vector, which is the
-   * \f$l_\infty\f$-norm of a vector.
+   * \returns The \f$l_\infty\f$-norm of the vector, i.e. the maximum
+   * absolute value of the entries.
    */
   Real linfty_norm () const;
 

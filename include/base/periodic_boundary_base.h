@@ -73,7 +73,7 @@ public:
   virtual ~PeriodicBoundaryBase() {}
 
   /**
-   * This function should be overloaded by derived classes to
+   * This function should be overridden by derived classes to
    * define how one finds corresponding nodes on the periodic
    * boundary pair.
    */

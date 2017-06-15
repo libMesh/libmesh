@@ -103,14 +103,14 @@ public:
                              const ParameterVector & parameter_vector);
 
   /**
-   * Returns the parameter sensitivity derivative for the specified
+   * \returns The parameter sensitivity derivative for the specified
    * quantity of interest for the specified parameter
    */
   const Number & derivative (unsigned int qoi_index,
                              unsigned int parameter_index) const;
 
   /**
-   * Returns the parameter sensitivity derivative for the specified
+   * \returns The parameter sensitivity derivative for the specified
    * quantity of interest for the specified pair of parameters
    */
   const Number & second_derivative (unsigned int qoi_index,

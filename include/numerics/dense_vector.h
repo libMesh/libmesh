@@ -84,7 +84,7 @@ public:
   ~DenseVector() {}
 
   /**
-   * \returns the size of the vector.
+   * \returns The size of the vector.
    */
   virtual unsigned int size() const libmesh_override
   {
@@ -92,7 +92,7 @@ public:
   }
 
   /**
-   * \returns true iff size() is 0
+   * \returns \p true if size() is 0.
    */
   virtual bool empty() const libmesh_override
   { return _val.empty(); }
@@ -103,29 +103,31 @@ public:
   virtual void zero() libmesh_override;
 
   /**
-   * \returns the \p (i) element of the vector as a const reference.
+   * \returns Entry \p i of the vector as a const reference.
    */
   const T & operator() (const unsigned int i) const;
 
   /**
-   * \returns the \p (i,j) element of the vector as a writeable reference.
+   * \returns Entry \p i of the vector as a writable reference.
    */
   T & operator() (const unsigned int i);
 
   /**
-   * \returns the \p (i) element of the vector.
+   * \returns A const reference to entry \p i of the vector via virtual function call.
    */
   virtual T el(const unsigned int i) const libmesh_override
   { return (*this)(i); }
 
   /**
-   * \returns the \p (i) element of the vector as a writeable reference.
+   * \returns A writable reference to entry \p i of the vector via virtual function call.
    */
   virtual T & el(const unsigned int i) libmesh_override
   { return (*this)(i); }
 
   /**
    * Assignment operator.
+   *
+   * \returns A reference to *this.
    */
   template <typename T2>
   DenseVector<T> & operator = (const DenseVector<T2> & other_vector);
@@ -154,6 +156,8 @@ public:
 
   /**
    * Multiplies every element in the vector by \p factor.
+   *
+   * \returns A reference to *this.
    */
   DenseVector<T> & operator*= (const T factor);
 
@@ -161,6 +165,8 @@ public:
    * Adds \p factor times \p vec to this vector.
    * This should only work if T += T2 * T3 is valid C++ and
    * if T2 is scalar.  Return type is void
+   *
+   * \returns A reference to *this.
    */
   template <typename T2, typename T3>
   typename boostcopy::enable_if_c<
@@ -169,94 +175,97 @@ public:
        const DenseVector<T3> & vec);
 
   /**
-   * Evaluate dot product with \p vec. In the complex-valued case, use the
-   * complex conjugate of vec.
+   * \returns The dot product of *this with \p vec.
+   *
+   * In the complex-valued case, uses the complex conjugate of \p vec.
    */
   template <typename T2>
   typename CompareTypes<T, T2>::supertype dot (const DenseVector<T2> & vec) const;
 
   /**
-   * Evaluate dot product with \p vec. In the complex-valued case, do not
-   * use the complex conjugate of vec.
+   * \returns The dot product of *this with \p vec.
+   *
+   * In the complex-valued case, does not use the complex conjugate of
+   * \p vec.
    */
   template <typename T2>
   typename CompareTypes<T, T2>::supertype indefinite_dot (const DenseVector<T2> & vec) const;
 
   /**
-   * Tests if \p vec is exactly equal to this vector.
+   * \returns \p true if \p vec is exactly equal to this vector, false otherwise.
    */
   template <typename T2>
   bool operator== (const DenseVector<T2> & vec) const;
 
   /**
-   * Tests if \p vec is not exactly equal to this vector.
+   * \returns \p true if \p vec is not exactly equal to this vector, false otherwise.
    */
   template <typename T2>
   bool operator!= (const DenseVector<T2> & vec) const;
 
   /**
    * Adds \p vec to this vector.
+   *
+   * \returns A reference to *this.
    */
   template <typename T2>
   DenseVector<T> & operator+= (const DenseVector<T2> & vec);
 
   /**
    * Subtracts \p vec from this vector.
+   *
+   * \returns A reference to *this.
    */
   template <typename T2>
   DenseVector<T> & operator-= (const DenseVector<T2> & vec);
 
   /**
-   * \returns the minimum element in the vector.
-   * In case of complex numbers, this returns the minimum
-   * Real part.
+   * \returns The minimum entry of the vector, or the minimum real
+   * part in the case of complex numbers.
    */
   Real min () const;
 
   /**
-   * \returns the maximum element in the vector.
-   * In case of complex numbers, this returns the maximum
-   * Real part.
+   * \returns The maximum entry of the vector, or the maximum real
+   * part in the case of complex numbers.
    */
   Real max () const;
 
   /**
-   * \returns the \f$l_1\f$-norm of the vector, i.e.
-   * the sum of the absolute values.
+   * \returns The \f$l_1\f$-norm of the vector, i.e. the sum of the
+   * absolute values of the entries.
    */
   Real l1_norm () const;
 
   /**
-   * \returns the \f$l_2\f$-norm of the vector, i.e.
-   * the square root of the sum of the
-   * squares of the elements.
+   * \returns The \f$l_2\f$-norm of the vector, i.e. the square root
+   * of the sum of the squares of the entries.
    */
   Real l2_norm () const;
 
   /**
-   * \returns the maximum absolute value of the
-   * elements of this vector, which is the
-   * \f$l_\infty\f$-norm of a vector.
+   * \returns The \f$l_\infty\f$-norm of the vector, i.e. the maximum
+   * absolute value of the entries.
    */
   Real linfty_norm () const;
 
   /**
-   * Puts the principal subvector of size \p sub_n
-   * (i.e. first sub_n entries) into \p dest.
+   * Puts the principal subvector of size \p sub_n (i.e. first sub_n
+   * entries) into \p dest.
    */
   void get_principal_subvector (unsigned int sub_n, DenseVector<T> & dest) const;
 
   /**
-   * Access to the values array. This should be used with
-   * caution but can  be used to speed up code compilation
-   * significantly.
+   * \returns A reference to the underlying data storage vector.
+   *
+   * This should be used with caution (i.e. one should not change the
+   * size of the vector, etc.) but is useful for interoperating with
+   * low level BLAS routines which expect a simple array.
    */
   std::vector<T> & get_values() { return _val; }
 
   /**
-   * Access to the values array. This should be used with
-   * caution but can  be used to speed up code compilation
-   * significantly.
+   * \returns A constant reference to the underlying data storage vector.
    */
   const std::vector<T> & get_values() const { return _val; }
 

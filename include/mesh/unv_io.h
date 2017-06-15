@@ -56,7 +56,7 @@ class UNVIO : public MeshInput<MeshBase>,
 public:
 
   /**
-   * Constructor.  Takes a writeable reference to a mesh object.
+   * Constructor.  Takes a writable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
   UNVIO (MeshBase & mesh);
@@ -94,10 +94,12 @@ public:
   void read_dataset(std::string file_name);
 
   /**
-   * \returns a pointer the values associated with the node \p node,
-   * as read in by the read_dataset() method.  If no values exist for
-   * the node in question, a libmesh_nullptr is returned instead.  It
-   * is up to the user to check the return value before using it.
+   * \returns A pointer the values associated with the node \p node,
+   * as read in by the read_dataset() method.
+   *
+   * If no values exist for the node in question, a libmesh_nullptr is
+   * returned instead.  It is up to the user to check the return value
+   * before using it.
    */
   const std::vector<Number> * get_data (Node * node) const;
 

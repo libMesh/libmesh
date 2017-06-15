@@ -123,7 +123,7 @@ public:
    * into the EIM space and then evaluate the error
    * in the norm defined by inner_product_matrix.
    *
-   * \returns the error in the best fit
+   * \returns The error in the best fit
    */
   virtual Real compute_best_fit_error();
 
@@ -157,7 +157,7 @@ public:
   void set_point_locator_tol(Real point_locator_tol);
 
   /**
-   * \returns the point locator tolerance.
+   * \returns The point locator tolerance.
    */
   Real get_point_locator_tol() const;
 
@@ -170,7 +170,7 @@ public:
   virtual void initialize_eim_assembly_objects();
 
   /**
-   * \returns the vector of assembly objects that point to this RBEIMConstruction.
+   * \returns The vector of assembly objects that point to this RBEIMConstruction.
    */
   std::vector<ElemAssembly *> get_eim_assembly_objects();
 
@@ -237,7 +237,7 @@ public:
    * a) projection: Find the best fit in the inner product
    * b) eim: Use empirical interpolation to find a "best fit"
    *
-   * \returns the error associated with the "best fit" in the
+   * \returns The error associated with the "best fit" in the
    * norm induced by inner_product_matrix.
    */
   BEST_FIT_TYPE best_fit_type_flag;
@@ -250,7 +250,7 @@ protected:
   virtual void init_data() libmesh_override;
 
   /**
-   * Add a new basis function to the RB space. Overload
+   * Add a new basis function to the RB space. Override
    * to enrich with the EIM basis functions.
    */
   virtual void enrich_RB_space() libmesh_override;
@@ -263,20 +263,20 @@ protected:
 
   /**
    * Compute the reduced basis matrices for the current basis.
-   * Overload to update the inner product matrix that
+   * Override to update the inner product matrix that
    * is used to compute the best fit to parametrized_function.
    */
   virtual void update_RB_system_matrices() libmesh_override;
 
   /**
-   * Overload to return the best fit error. This function is used in
+   * Override to return the best fit error. This function is used in
    * the Greedy algorithm to select the next parameter.
    */
   virtual Real get_RB_error_bound() libmesh_override;
 
   /**
    * Function that indicates when to terminate the Greedy
-   * basis training. Overload in subclasses to specialize.
+   * basis training. Override in subclasses to specialize.
    */
   virtual bool greedy_termination_test(Real abs_greedy_error,
                                        Real initial_greedy_error,

@@ -46,7 +46,7 @@ public:
 
   /**
    * Constructor to wrap FunctionBase functors in a FEMFunctionBase
-   * compatible shim
+   * compatible shim.
    */
   WrappedFunctor (const FunctionBase<Output> & func)
     : _func(func.clone())
@@ -59,8 +59,8 @@ public:
   }
 
   /**
-   * \returns the scalar value of variable varnum at coordinate \p p
-   * and time \p time.
+   * \returns The scalar function value at coordinate \p p and time \p
+   * time, which defaults to zero.
    */
   virtual Output operator() (const FEMContext &,
                              const Point & p,
@@ -68,9 +68,8 @@ public:
   { return _func->operator()(p, time); }
 
   /**
-   * Return function for vectors.
-   * Returns in \p output the values of all system variables at the
-   * coordinate \p p and for time \p time.
+   * Evaluation function for time-dependent vector-valued functions.
+   * Sets output values in the passed-in \p output DenseVector.
    */
   virtual void operator() (const FEMContext &,
                            const Point & p,
@@ -79,8 +78,8 @@ public:
   { _func->operator() (p, time, output); }
 
   /**
-   * \returns the vector component \p i at coordinate
-   * \p p and time \p time.
+   * \returns The vector component \p i at coordinate \p p and time \p
+   * time.
    */
   virtual Output component (const FEMContext &,
                             unsigned int i,

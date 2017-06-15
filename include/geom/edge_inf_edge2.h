@@ -61,7 +61,7 @@ public:
     Edge(InfEdge2::n_nodes(), p, _nodelinks_data) {}
 
   /**
-   * \returns the \p Point associated with local \p Node \p i,
+   * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
   virtual Point master_point (const unsigned int i) const libmesh_override
@@ -76,22 +76,22 @@ public:
   virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
 
   /**
-   * \returns true if the specified (local) node number is a vertex.
+   * \returns \p true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int i) const libmesh_override;
 
   /**
-   * \returns true if the specified (local) node number is an edge.
+   * \returns \p true if the specified (local) node number is an edge.
    */
   virtual bool is_edge(const unsigned int i) const libmesh_override;
 
   /**
-   * \returns true if the specified (local) node number is a face.
+   * \returns \p true if the specified (local) node number is a face.
    */
   virtual bool is_face(const unsigned int i) const libmesh_override;
 
   /**
-   * \returns true if the specified (local) node number is on the
+   * \returns \p true if the specified (local) node number is on the
    * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
@@ -126,12 +126,12 @@ public:
   virtual bool infinite () const libmesh_override { return true; }
 
   /**
-   * \returns the origin of this infinite element.
+   * \returns The origin of this infinite element.
    */
   virtual Point origin () const libmesh_override;
 
   /**
-   * \returns true if the specified (local) node number is a
+   * \returns \p true if the specified (local) node number is a
    * "mid-edge" node on an infinite element edge.
    */
   virtual bool is_mid_infinite_edge_node(const unsigned int i) const

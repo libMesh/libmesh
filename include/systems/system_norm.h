@@ -95,29 +95,29 @@ public:
   SystemNorm(const SystemNorm & s);
 
   /**
-   * Returns true if this is purely a discrete norm
+   * \returns \p true if this is purely a discrete norm
    */
   bool is_discrete() const;
 
   /**
-   * Returns the weighted norm v^T*W*v where W represents our
+   * \returns The weighted norm v^T*W*v where W represents our
    * weights matrix or weights vector times identity matrix.
    */
   Real calculate_norm(const std::vector<Real> & v);
 
   /**
-   * Returns the weighted inner product v1^T*W*v2 where R is our weights
+   * \returns The weighted inner product v1^T*W*v2 where R is our weights
    */
   Real calculate_norm(const std::vector<Real> & v1,
                       const std::vector<Real> & v2);
 
   /**
-   * Returns true if no weight matrix W is specified or an identiy matrix is specified, otherwise returns false
+   * \returns \p true if no weight matrix W is specified or an identiy matrix is specified, otherwise returns false
    */
   bool is_identity();
 
   /**
-   * Returns the type of the norm in variable \p var
+   * \returns The type of the norm in variable \p var
    */
   FEMNormType type(unsigned int var) const;
 
@@ -127,7 +127,7 @@ public:
   void set_type(unsigned int var, const FEMNormType & t);
 
   /**
-   * Returns the weight corresponding to the norm in variable \p var
+   * \returns The weight corresponding to the norm in variable \p var
    */
   Real weight(unsigned int var) const;
 
@@ -142,7 +142,7 @@ public:
   void set_off_diagonal_weight(unsigned int i, unsigned int j, Real w);
 
   /**
-   * Returns the squared weight corresponding to the norm in variable
+   * \returns The squared weight corresponding to the norm in variable
    * \p var.  We cache that at construction time to save a few flops.
    */
   Real weight_sq(unsigned int var) const;

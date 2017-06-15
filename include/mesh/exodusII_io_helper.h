@@ -100,7 +100,7 @@ public:
   virtual ~ExodusII_IO_Helper();
 
   /**
-   * \returns the current element type.  Note: the default behavior is
+   * \returns The current element type.  Note: the default behavior is
    * for this value to be in all capital letters, e.g. \p HEX27.
    */
   const char * get_elem_type() const;
@@ -1169,12 +1169,12 @@ public:
   static const int pyramid_inverse_face_map[5];
 
   /**
-   * \returns a conversion object given an element type name.
+   * \returns A conversion object given an element type name.
    */
   ExodusII_IO_Helper::Conversion assign_conversion(std::string type_str);
 
   /**
-   * \returns a conversion object given an element type.
+   * \returns A conversion object given an element type.
    */
   ExodusII_IO_Helper::Conversion assign_conversion(const ElemType type);
 };

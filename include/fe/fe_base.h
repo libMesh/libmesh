@@ -214,7 +214,7 @@ public:
 #endif // LIBMESH_ENABLE_PERIODIC
 
   /**
-   * \returns the shape function values at the quadrature points
+   * \returns The shape function values at the quadrature points
    * on the element.
    */
   const std::vector<std::vector<OutputShape> > & get_phi() const
@@ -222,7 +222,7 @@ public:
     calculate_phi = true; return phi; }
 
   /**
-   * \returns the shape function derivatives at the quadrature
+   * \returns The shape function derivatives at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputGradient> > & get_dphi() const
@@ -230,7 +230,7 @@ public:
     calculate_dphi = calculate_dphiref = true; return dphi; }
 
   /**
-   * \returns the curl of the shape function at the quadrature
+   * \returns The curl of the shape function at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputShape> > & get_curl_phi() const
@@ -238,7 +238,7 @@ public:
     calculate_curl_phi = calculate_dphiref = true; return curl_phi; }
 
   /**
-   * \returns the divergence of the shape function at the quadrature
+   * \returns The divergence of the shape function at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputDivergence> > & get_div_phi() const
@@ -246,7 +246,7 @@ public:
     calculate_div_phi = calculate_dphiref = true; return div_phi; }
 
   /**
-   * \returns the shape function x-derivative at the quadrature
+   * \returns The shape function x-derivative at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputShape> > & get_dphidx() const
@@ -254,7 +254,7 @@ public:
     calculate_dphi = calculate_dphiref = true; return dphidx; }
 
   /**
-   * \returns the shape function y-derivative at the quadrature
+   * \returns The shape function y-derivative at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputShape> > & get_dphidy() const
@@ -262,7 +262,7 @@ public:
     calculate_dphi = calculate_dphiref = true; return dphidy; }
 
   /**
-   * \returns the shape function z-derivative at the quadrature
+   * \returns The shape function z-derivative at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputShape> > & get_dphidz() const
@@ -270,7 +270,7 @@ public:
     calculate_dphi = calculate_dphiref = true; return dphidz; }
 
   /**
-   * \returns the shape function xi-derivative at the quadrature
+   * \returns The shape function xi-derivative at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputShape> > & get_dphidxi() const
@@ -278,7 +278,7 @@ public:
     calculate_dphiref = true; return dphidxi; }
 
   /**
-   * \returns the shape function eta-derivative at the quadrature
+   * \returns The shape function eta-derivative at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputShape> > & get_dphideta() const
@@ -286,7 +286,7 @@ public:
     calculate_dphiref = true; return dphideta; }
 
   /**
-   * \returns the shape function zeta-derivative at the quadrature
+   * \returns The shape function zeta-derivative at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputShape> > & get_dphidzeta() const
@@ -296,7 +296,7 @@ public:
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
-   * \returns the shape function second derivatives at the quadrature
+   * \returns The shape function second derivatives at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputTensor> > & get_d2phi() const
@@ -304,7 +304,7 @@ public:
     calculate_d2phi = calculate_dphiref = true; return d2phi; }
 
   /**
-   * \returns the shape function second derivatives at the quadrature
+   * \returns The shape function second derivatives at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputShape> > & get_d2phidx2() const
@@ -312,7 +312,7 @@ public:
     calculate_d2phi = calculate_dphiref = true; return d2phidx2; }
 
   /**
-   * \returns the shape function second derivatives at the quadrature
+   * \returns The shape function second derivatives at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputShape> > & get_d2phidxdy() const
@@ -320,7 +320,7 @@ public:
     calculate_d2phi = calculate_dphiref = true; return d2phidxdy; }
 
   /**
-   * \returns the shape function second derivatives at the quadrature
+   * \returns The shape function second derivatives at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputShape> > & get_d2phidxdz() const
@@ -328,7 +328,7 @@ public:
     calculate_d2phi = calculate_dphiref = true; return d2phidxdz; }
 
   /**
-   * \returns the shape function second derivatives at the quadrature
+   * \returns The shape function second derivatives at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputShape> > & get_d2phidy2() const
@@ -336,7 +336,7 @@ public:
     calculate_d2phi =  calculate_dphiref = true; return d2phidy2; }
 
   /**
-   * \returns the shape function second derivatives at the quadrature
+   * \returns The shape function second derivatives at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputShape> > & get_d2phidydz() const
@@ -344,7 +344,7 @@ public:
     calculate_d2phi = calculate_dphiref = true; return d2phidydz; }
 
   /**
-   * \returns the shape function second derivatives at the quadrature
+   * \returns The shape function second derivatives at the quadrature
    * points.
    */
   const std::vector<std::vector<OutputShape> > & get_d2phidz2() const
@@ -352,7 +352,7 @@ public:
     calculate_d2phi = calculate_dphiref = true; return d2phidz2; }
 
   /**
-   * \returns the shape function second derivatives at the quadrature
+   * \returns The shape function second derivatives at the quadrature
    * points, in reference coordinates
    */
   const std::vector<std::vector<OutputShape> > & get_d2phidxi2() const
@@ -360,7 +360,7 @@ public:
     calculate_d2phi = calculate_dphiref = true; return d2phidxi2; }
 
   /**
-   * \returns the shape function second derivatives at the quadrature
+   * \returns The shape function second derivatives at the quadrature
    * points, in reference coordinates
    */
   const std::vector<std::vector<OutputShape> > & get_d2phidxideta() const
@@ -368,7 +368,7 @@ public:
     calculate_d2phi = calculate_dphiref = true; return d2phidxideta; }
 
   /**
-   * \returns the shape function second derivatives at the quadrature
+   * \returns The shape function second derivatives at the quadrature
    * points, in reference coordinates
    */
   const std::vector<std::vector<OutputShape> > & get_d2phidxidzeta() const
@@ -376,7 +376,7 @@ public:
     calculate_d2phi = calculate_dphiref = true; return d2phidxidzeta; }
 
   /**
-   * \returns the shape function second derivatives at the quadrature
+   * \returns The shape function second derivatives at the quadrature
    * points, in reference coordinates
    */
   const std::vector<std::vector<OutputShape> > & get_d2phideta2() const
@@ -384,7 +384,7 @@ public:
     calculate_d2phi = calculate_dphiref = true; return d2phideta2; }
 
   /**
-   * \returns the shape function second derivatives at the quadrature
+   * \returns The shape function second derivatives at the quadrature
    * points, in reference coordinates
    */
   const std::vector<std::vector<OutputShape> > & get_d2phidetadzeta() const
@@ -392,7 +392,7 @@ public:
     calculate_d2phi = calculate_dphiref = true; return d2phidetadzeta; }
 
   /**
-   * \returns the shape function second derivatives at the quadrature
+   * \returns The shape function second derivatives at the quadrature
    * points, in reference coordinates
    */
   const std::vector<std::vector<OutputShape> > & get_d2phidzeta2() const

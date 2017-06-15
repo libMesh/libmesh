@@ -95,7 +95,7 @@ public:
   virtual void init (const char * name = libmesh_nullptr) libmesh_override;
 
   /**
-   * Returns the raw PETSc snes context pointer.
+   * \returns The raw PETSc snes context pointer.
    */
   SNES snes() { this->init(); return _snes; }
 
@@ -117,8 +117,10 @@ public:
   virtual void print_converged_reason() libmesh_override;
 
   /**
-   * Returns the currently-available (or most recently obtained, if the SNES object has
-   * been destroyed) convergence reason.  Refer to PETSc docs for the meaning of different
+   * \returns The currently-available (or most recently obtained, if
+   * the SNES object has been destroyed) convergence reason.
+   *
+   * Refer to PETSc docs for the meaning of different
    * SNESConvergedReasons.
    */
   SNESConvergedReason get_converged_reason();
@@ -129,9 +131,9 @@ public:
   virtual int get_total_linear_iterations() libmesh_override;
 
   /**
-   * If called *during* the solve(), for example by the user-specified
-   * residual or Jacobian function, returns the current nonlinear iteration
-   * number.
+   * \returns The current nonlinear iteration number if called
+   * *during* the solve(), for example by the user-specified residual
+   * or Jacobian function.
    */
   virtual unsigned get_current_nonlinear_iteration_number() const libmesh_override
   { return _current_nonlinear_iteration_number; }

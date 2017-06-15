@@ -74,7 +74,7 @@ public:
   typedef RBConstructionBase<Base> sys_type;
 
   /**
-   * \returns a clever pointer to the system.
+   * \returns A reference to *this.
    */
   sys_type & system () { return *this; }
 

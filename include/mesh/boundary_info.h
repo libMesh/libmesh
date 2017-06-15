@@ -453,7 +453,7 @@ public:
                                          const unsigned short int shellface) const;
 
   /**
-   * \returns the list of boundary ids associated with the specified shell face
+   * \returns The list of boundary ids associated with the specified shell face
    * of element \p elem.
    *
    * \note This is only relevant for shell elements.
@@ -527,7 +527,7 @@ public:
                      std::vector<boundary_id_type> & vec_to_fill) const;
 
   /**
-   * \returns the list of raw boundary ids associated with the \p side
+   * \returns The list of raw boundary ids associated with the \p side
    * side of element \p elem.
    *
    * These ids are "raw" because they exclude ids which are implicit,
@@ -596,14 +596,14 @@ public:
   void build_shellface_boundary_ids(std::vector<boundary_id_type> & b_ids) const;
 
   /**
-   * \returns the number of element-side-based boundary conditions.
+   * \returns The number of element-side-based boundary conditions.
    *
    * This will be the correct global count even on a distributed mesh.
    */
   std::size_t n_boundary_conds () const;
 
   /**
-   * \returns the number of edge-based boundary conditions.
+   * \returns The number of edge-based boundary conditions.
    * Edge-based boundary IDs should only be used in 3D.
    *
    * This will be the correct global count even on a distributed mesh.
@@ -611,7 +611,7 @@ public:
   std::size_t n_edge_conds () const;
 
   /**
-   * \returns the number of shellface-based boundary conditions.
+   * \returns The number of shellface-based boundary conditions.
    * This is only relevant on shell elements.
    *
    * This will be the correct global count even on a distributed mesh.
@@ -619,7 +619,7 @@ public:
   std::size_t n_shellface_conds () const;
 
   /**
-   * \returns the number of node-based boundary conditions.
+   * \returns The number of node-based boundary conditions.
    *
    * This will be the correct global count even on a distributed mesh.
    */
@@ -690,7 +690,7 @@ public:
                              std::vector<boundary_id_type> &   bc_id_list) const;
 
   /**
-   * \returns a set of the boundary ids which exist on semilocal parts
+   * \returns A set of the boundary ids which exist on semilocal parts
    * of the mesh.
    *
    * DistributedMesh-compatible code may need a set_union or other
@@ -772,7 +772,7 @@ public:
   boundary_id_type get_id_by_name(const std::string & name) const;
 
   /**
-   * \returns A writeable reference to the sideset name map.
+   * \returns A writable reference to the sideset name map.
    */
   std::map<boundary_id_type, std::string> & set_sideset_name_map ()
   { return _ss_id_to_name; }
@@ -780,7 +780,7 @@ public:
   { return _ss_id_to_name; }
 
   /**
-   * \returns A writeable reference to the nodeset name map.
+   * \returns A writable reference to the nodeset name map.
    */
   std::map<boundary_id_type, std::string> & set_nodeset_name_map ()
   { return _ns_id_to_name; }

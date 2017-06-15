@@ -204,16 +204,19 @@ public:
          const unsigned int m_its) libmesh_override;
 
   /**
-   * Returns the raw PETSc preconditioner context pointer.  This allows
-   * you to specify the PCShellSetApply() and PCShellSetSetUp() functions
-   * if you desire.  Just don't do anything crazy like calling PCDestroy()!
+   * \returns The raw PETSc preconditioner context pointer.
+   *
+   * This allows you to specify the PCShellSetApply() and
+   * PCShellSetSetUp() functions if you desire.  Just don't do
+   * anything crazy like calling libMeshPCDestroy() on the pointer!
    */
   PC pc() { this->init(); return _pc; }
 
   /**
-   * Returns the raw PETSc ksp context pointer.  This is useful if
-   * you are for example setting a custom convergence test with
-   * KSPSetConvergenceTest().
+   * \returns The raw PETSc ksp context pointer.
+   *
+   * This is useful if you are for example setting a custom
+   * convergence test with KSPSetConvergenceTest().
    */
   KSP ksp() { this->init(); return _ksp; }
 
@@ -224,15 +227,16 @@ public:
   void get_residual_history(std::vector<double> & hist);
 
   /**
-   * Returns just the initial residual for the solve just
-   * completed with this interface.  Use this method instead
-   * of the one above if you just want the starting residual
-   * and not the entire history.
+   * \returns Just the initial residual for the solve just
+   * completed with this interface.
+   *
+   * Use this method instead of the one above if you just want the
+   * starting residual and not the entire history.
    */
   Real get_initial_residual();
 
   /**
-   * Returns the solver's convergence flag
+   * \returns The solver's convergence flag
    */
   virtual LinearConvergenceReason get_converged_reason() const libmesh_override;
 
@@ -283,8 +287,7 @@ private:
   IS _restrict_solve_to_is_complement;
 
   /**
-   * Internal method that returns the local size of \p
-   * _restrict_solve_to_is.
+   * \returns The local size of \p _restrict_solve_to_is.
    */
   PetscInt _restrict_solve_to_is_local_size() const;
 

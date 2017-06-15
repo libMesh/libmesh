@@ -153,10 +153,11 @@ protected:
   UniquePtr<LinearSolver<Number> > _linear_solver;
 
   /**
-   * This does a line search in the direction opposite linear_solution
-   * to try and minimize the residual of newton_iterate.
-   * newton_iterate is moved to the end of the quasiNewton step, and
-   * the return value is the substep size.
+   * This does a line search in the direction opposite \p linear_solution
+   * to try and minimize the residual of \p newton_iterate.
+   * \p newton_iterate is moved to the end of the quasiNewton step.
+   *
+   * \returns The substep size.
    */
   Real line_search(Real tol,
                    Real last_residual,
@@ -174,7 +175,7 @@ protected:
                          bool linear_solve_finished);
 
   /**
-   * This returns true if a convergence criterion has been passed
+   * \returns \p true if a convergence criterion has been passed
    * by the given residual and step size; false otherwise.
    */
   bool test_convergence(Real current_residual,

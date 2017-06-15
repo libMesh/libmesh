@@ -85,7 +85,7 @@ public:
   void clear();
 
   /**
-   * Returns the number of parameters to be used
+   * \returns The number of parameters to be used
    */
   std::size_t size() const { return _params.size(); }
 
@@ -112,12 +112,12 @@ public:
   void deep_resize(unsigned int s);
 
   /**
-   * Returns a smart-pointer to a parameter value
+   * \returns A smart-pointer to a parameter value
    */
   const ParameterAccessor<Number> & operator[](unsigned int i) const;
 
   /**
-   * Returns a reference to a smart-pointer to a parameter value,
+   * \returns A reference to a smart-pointer to a parameter value,
    * suitable for repointing it to a different address.
    * This method is deprecated and may not work with more
    * sophisticated ParameterAccessor subclasses.

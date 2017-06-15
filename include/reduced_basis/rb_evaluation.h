@@ -80,16 +80,15 @@ public:
   RBThetaExpansion & get_rb_theta_expansion();
 
   /**
-   * \returns true if the theta expansion has been initialized.
+   * \returns \p true if the theta expansion has been initialized.
    */
   bool is_rb_theta_expansion_initialized() const;
 
   /**
-   * Resize and clear the data vectors corresponding to the
-   * value of \p Nmax. Optionally resize the data structures
-   * required for the error bound.
-   * Overload to also clear and resize any extra
-   * data in subclasses.
+   * Resize and clear the data vectors corresponding to the value of
+   * \p Nmax. Optionally resize the data structures required for the
+   * error bound.  Override to also clear and resize any extra data in
+   * subclasses.
    */
   virtual void resize_data_structures(const unsigned int Nmax,
                                       bool resize_error_bound_data=true);
@@ -102,7 +101,7 @@ public:
   /**
    * Perform online solve with the N RB basis functions, for the
    * set of parameters in current_params, where 0 <= N <= RB_size.
-   * \returns the (absolute) error bound associated with
+   * \returns The (absolute) error bound associated with
    * the RB approximation.
    * With an empty RB space (N=0), our RB solution is zero, but we
    * still obtain a meaningful error bound associated with the
@@ -111,7 +110,7 @@ public:
   virtual Real rb_solve(unsigned int N);
 
   /**
-   * \returns a scaling factor that we can use to provide a consistent
+   * \returns A scaling factor that we can use to provide a consistent
    * scaling of the RB error bound across different parameter values.
    */
   virtual Real get_error_bound_normalization();
@@ -124,7 +123,7 @@ public:
 
   /**
    * Specifies the residual scaling on the denominator to
-   * be used in the a posteriori error bound. Overload
+   * be used in the a posteriori error bound. Override
    * in subclass in order to obtain the desired error bound.
    */
   virtual Real residual_scaling_denom(Real alpha_LB);

@@ -66,7 +66,7 @@ public:
   virtual bool infinite () const libmesh_override { return true; }
 
   /**
-   * \returns the origin of this infinite element.
+   * \returns The origin of this infinite element.
    */
   virtual Point origin () const libmesh_override
   {

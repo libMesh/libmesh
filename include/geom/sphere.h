@@ -104,31 +104,31 @@ public:
   void create_from_center_radius (const Point & c, const Real r);
 
   /**
-   * \returns true if other_sphere intersects this sphere,
+   * \returns \p true if other_sphere intersects this sphere,
    * false otherwise.
    */
   bool intersects (const Sphere & other_sphere) const;
 
   /**
-   * \returns the distance between the surface of this sphere and
+   * \returns The distance between the surface of this sphere and
    * another sphere.
    */
   Real distance (const Sphere & other_sphere) const;
 
   /**
-   * \returns true if the point p is above the surface,
+   * \returns \p true if the point p is above the surface,
    * false otherwise.
    */
   virtual bool above_surface (const Point & p) const libmesh_override;
 
   /**
-   * \returns true if the point p is below the surface,
+   * \returns \p true if the point p is below the surface,
    * false otherwise.
    */
   virtual bool below_surface (const Point & p) const libmesh_override;
 
   /**
-   * \returns true if the point p is on the surface,
+   * \returns \p true if the point p is on the surface,
    * false otherwise.  Note that the definition of on
    * the surface really means "very close" to account
    * for roundoff error.
@@ -136,12 +136,12 @@ public:
   virtual bool on_surface (const Point & p) const libmesh_override;
 
   /**
-   * \returns the closest point on the surface to point p.
+   * \returns The closest point on the surface to point p.
    */
   virtual Point closest_point (const Point & p) const libmesh_override;
 
   /**
-   * \returns a unit vector normal to the surface at
+   * \returns A unit vector normal to the surface at
    * point p.
    */
   virtual Point unit_normal (const Point & p) const libmesh_override;
@@ -152,28 +152,28 @@ public:
   Real radius() const { return _rad; }
 
   /**
-   * \returns The radius of the sphere as a writeable reference.
+   * \returns The radius of the sphere as a writable reference.
    */
   Real & radius() { return _rad; }
 
   /**
-   * \returns the center of the sphere.
+   * \returns The center of the sphere.
    */
   const Point & center() const { return _cent; }
 
   /**
-   * \returns the center of the sphere.
+   * \returns The center of the sphere.
    */
   Point & center() { return _cent; }
 
   /**
-   * \returns the spherical coordinates for the
+   * \returns The spherical coordinates for the
    * cartesian coordinates \p cart.
    */
   virtual Point surface_coords (const Point & cart) const libmesh_override;
 
   /**
-   * \returns the cartesian coordinates for the
+   * \returns The cartesian coordinates for the
    * spherical coordinates \p sph.
    */
   virtual Point world_coords (const Point & sph) const libmesh_override;

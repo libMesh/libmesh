@@ -49,7 +49,7 @@ public:
    * The "Hash" template argument.  A custom hash functor that can be
    * used with the "unordered" container types.
    *
-   * \returns elem->key() as the hash.
+   * \returns A hash for the element computed by calling elem->key().
    */
   inline
   std::size_t operator()(const Elem * elem) const
