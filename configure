@@ -33591,7 +33591,7 @@ $as_echo "$as_me: Your boost libraries seems to old (version $_version)." >&6;}
 
 
 
-$as_echo "#define HAVE_BOOST /**/" >>confdefs.h
+$as_echo "#define HAVE_BOOST 1" >>confdefs.h
 
         # execute ACTION-IF-FOUND (if present):
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Using external boost installation >>>" >&5
@@ -33872,7 +33872,7 @@ $as_echo "$as_me: Your boost libraries seems to old (version $_version)." >&6;}
 
 
 
-$as_echo "#define HAVE_BOOST /**/" >>confdefs.h
+$as_echo "#define HAVE_BOOST 1" >>confdefs.h
 
         # execute ACTION-IF-FOUND (if present):
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Using libmesh-provided boost in ./contrib >>>" >&5
