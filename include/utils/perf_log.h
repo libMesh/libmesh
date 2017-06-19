@@ -249,6 +249,11 @@ public:
    */
   PerfData get_perf_data(const std::string & label, const std::string & header="");
 
+  /**
+   * \returns the raw underlying data structure for the entire performance log.
+   */
+  const std::map < std::pair<std::string, std::string>, PerfData > & get_log_raw() const { return log; }
+
 private:
 
 
