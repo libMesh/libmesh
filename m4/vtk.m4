@@ -43,6 +43,21 @@ AC_DEFUN([CONFIGURE_VTK],
                 esac],
                 [enablevtk=$enableoptional])
 
+  dnl Setting --enable-vtk-required causes an error to be emitted during
+  dnl configure if VTK is not successfully detected. This is useful for app
+  dnl codes which require VTK (like MOOSE-based apps), since it prevents
+  dnl situations where libmesh is accidentally built without VTK support
+  dnl (which may take a very long time), and then the app fails to compile,
+  dnl requiring you to redo everything.
+  AC_ARG_ENABLE(vtk-required,
+                AC_HELP_STRING([--enable-vtk-required],
+                               [Error if VTK is not detected by configure]),
+                               [case "${enableval}" in
+                     yes) vtkrequired=yes ;;
+                     no)  vtkrequired=no ;;
+                     *)   AC_MSG_ERROR(bad value ${enableval} for --enable-vtk-required) ;;
+                     esac],
+                     [vtkrequired=no])
 
   if (test $enablevtk = yes); then
 
@@ -272,4 +287,14 @@ AC_DEFUN([CONFIGURE_VTK],
   dnl Substitute the substitution variables
   AC_SUBST(VTK_INCLUDE)
   AC_SUBST(VTK_LIBRARY)
+
+  dnl If VTK is not enabled, but it *was* required, error out now
+  dnl instead of compiling libmesh in an invalid configuration.
+  if (test $enablevtk = no -a $vtkrequired = yes) ; then
+    dnl We return error code 4 here, since 0 means success and 1 is
+    dnl indistinguishable from other errors.  Ideally, all of the
+    dnl AC_MSG_ERROR calls in our m4 files would return a different
+    dnl error code, but currently this is not enforced.
+    AC_MSG_ERROR([*** VTK was not found, but --enable-vtk-required was specified.], 4)
+  fi
 ])
