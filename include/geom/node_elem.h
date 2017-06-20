@@ -52,7 +52,7 @@ public:
   }
 
   /**
-   * \returns the \p Point associated with local \p Node \p i,
+   * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
   virtual Point master_point (const unsigned int libmesh_dbg_var(i)) const libmesh_override
@@ -102,7 +102,7 @@ public:
   using Elem::key;
 
   /**
-   * \returns an id associated with the \p s side of this element.
+   * \returns An id associated with the \p s side of this element.
    * This should never be important for NodeElems.
    */
   virtual dof_id_type key (const unsigned int) const libmesh_override
@@ -139,7 +139,7 @@ public:
   virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
 
   /**
-   * \returns true if the specified (local) node number is a vertex.
+   * \returns \p true if the specified (local) node number is a vertex.
    */
   virtual bool is_vertex(const unsigned int) const libmesh_override { return true; }
 
@@ -166,13 +166,13 @@ public:
   { libmesh_not_implemented(); return false; }
 
   /**
-   * \returns true if the element map is definitely affine within
+   * \returns \p true if the element map is definitely affine within
    * numerical tolerances.
    */
   virtual bool has_affine_map () const libmesh_override { return true; }
 
   /**
-   * \returns true if the Lagrange shape functions on this element
+   * \returns \p true if the Lagrange shape functions on this element
    * are linear.
    */
   virtual bool is_linear () const libmesh_override { return true; }

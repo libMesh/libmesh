@@ -111,19 +111,19 @@ public:
   { _names = names; }
 
   /**
-   *\returns the field variables as a read-only reference.
+   *\returns The field variables as a read-only reference.
    */
   const std::vector<std::string> & field_variables() const
   { return _names; }
 
   /**
-   * \returns a writeable reference to the point list.
+   * \returns A writable reference to the point list.
    */
   std::vector<Point> & get_source_points ()
   { return _src_pts; }
 
   /**
-   * \returns a writeable reference to the point list.
+   * \returns A writable reference to the point list.
    */
   std::vector<Number> & get_source_vals ()
   { return _src_vals; }
@@ -208,7 +208,7 @@ protected:
     inline size_t kdtree_get_point_count() const { return _pts.size(); }
 
     /**
-     * Returns the distance between the vector "p1[0:size-1]"
+     * \returns The distance between the vector "p1[0:size-1]"
      * and the data point with index "idx_p2" stored in the class
      */
     inline coord_t kdtree_distance(const coord_t * p1, const size_t idx_p2, size_t size) const
@@ -252,7 +252,7 @@ protected:
     }
 
     /**
-     * Returns the dim'th component of the idx'th point in the class:
+     * \returns The dim'th component of the idx'th point in the class:
      * Since this is inlined and the "dim" argument is typically an immediate value, the
      *  "if's" are actually solved at compile time.
      */
@@ -270,9 +270,13 @@ protected:
     }
 
     /**
-     * Optional bounding-box computation: return false to default to a standard bbox computation loop.
-     * Return true if the BBOX was already computed by the class and returned in "bb" so it can be
-     * avoided to redo it again. Look at bb.size() to find out the expected dimensionality
+     * Optional bounding-box computation.
+     *
+     * \returns \p true if the BBOX was already computed by the class
+     * and returned in \p bb so we can avoid redoing it, or \p false
+     * to default to a standard bbox computation loop.
+     *
+     * Look at bb.size() to find out the expected dimensionality
      * (e.g. 2 or 3 for point clouds)
      */
     template <class BBOX>

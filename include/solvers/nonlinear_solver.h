@@ -42,9 +42,8 @@ template <typename T> class Preconditioner;
 class SolverConfiguration;
 
 /**
- * This class provides a uniform interface for nonlinear solvers.  This base
- * class is overloaded to provide nonlinear solvers from different packages
- * like PETSC.
+ * This base class can be inherited from to provide interfaces to
+ * nonlinear solvers from different packages like PETSc and Trilinos.
  *
  * \author Benjamin Kirk
  * \date 2005
@@ -78,7 +77,7 @@ public:
                                               const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
-   * \returns true if the data structures are
+   * \returns \p true if the data structures are
    * initialized, false otherwise.
    */
   bool initialized () const { return _is_initialized; }
@@ -115,9 +114,11 @@ public:
   virtual int get_total_linear_iterations() = 0;
 
   /**
-   * If called *during* the solve(), for example by the user-specified
-   * residual or Jacobian function, returns the current nonlinear iteration
-   * number.  Must be redefined in derived classes.
+   * \returns The current nonlinear iteration number if called
+   * *during* the solve(), for example by the user-specified residual
+   * or Jacobian function.
+   *
+   * Must be overridden in derived classes.
    */
   virtual unsigned get_current_nonlinear_iteration_number() const = 0;
 
@@ -250,12 +251,12 @@ public:
   NonlinearImplicitSystem::ComputePostCheck * postcheck_object;
 
   /**
-   * \returns a constant reference to the system we are solving.
+   * \returns A constant reference to the system we are solving.
    */
   const sys_type & system () const { return _system; }
 
   /**
-   * \returns a writeable reference to the system we are solving.
+   * \returns A writable reference to the system we are solving.
    */
   sys_type & system () { return _system; }
 

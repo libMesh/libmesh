@@ -99,7 +99,7 @@ public:
   ReplicatedMesh & get_interpolation_points_mesh();
 
   /**
-   * \returns the value of the parametrized function that is being
+   * \returns The value of the parametrized function that is being
    * approximated at the point \p p.
    * \p var_index specifies the
    * variable (i.e. the parametrized function index) to be evaluated.
@@ -113,7 +113,7 @@ public:
    * Calculate the EIM approximation to parametrized_function
    * using the first \p N EIM basis functions. Store the
    * solution coefficients in the member RB_solution.
-   * \returns the EIM a posteriori error bound.
+   * \returns The EIM a posteriori error bound.
    */
   virtual Real rb_solve(unsigned int N) libmesh_override;
 
@@ -125,7 +125,7 @@ public:
   void rb_solve(DenseVector<Number> & EIM_rhs);
 
   /**
-   * \returns a scaling factor that we can use to provide a consistent
+   * \returns A scaling factor that we can use to provide a consistent
    * scaling of the RB error bound across different parameter values.
    */
   virtual Real get_error_bound_normalization() libmesh_override;
@@ -138,7 +138,7 @@ public:
   void initialize_eim_theta_objects();
 
   /**
-   * \returns the vector of theta objects that point to this RBEIMEvaluation.
+   * \returns The vector of theta objects that point to this RBEIMEvaluation.
    */
   std::vector<RBTheta *> get_eim_theta_objects();
 

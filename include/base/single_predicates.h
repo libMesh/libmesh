@@ -160,7 +160,7 @@ protected:
 };
 
 /**
- * \returns true when the pointer is not subactive.
+ * \returns \p true when the pointer is not subactive.
  */
 template <typename T>
 struct not_subactive : subactive<T>

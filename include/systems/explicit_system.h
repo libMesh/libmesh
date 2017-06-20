@@ -65,7 +65,7 @@ public:
   typedef System Parent;
 
   /**
-   * \returns a clever pointer to the system.
+   * \returns A reference to *this.
    */
   sys_type & system () { return *this; }
 
@@ -84,14 +84,14 @@ public:
   /**
    * Prepares \p qoi for quantity of interest assembly, then calls
    * user qoi function.
-   * Can be overloaded in derived classes.
+   * Can be overridden in derived classes.
    */
   virtual void assemble_qoi (const QoISet & qoi_indices = QoISet()) libmesh_override;
 
   /**
    * Prepares \p adjoint_rhs for quantity of interest derivative assembly,
    * then calls user qoi derivative function.
-   * Can be overloaded in derived classes.
+   * Can be overridden in derived classes.
    */
   virtual void assemble_qoi_derivative (const QoISet & qoi_indices = QoISet(),
                                         bool include_liftfunc = true,

@@ -95,7 +95,7 @@ public:
   virtual Real truth_solve(int write_interval) libmesh_override;
 
   /**
-   * Train the reduced basis. Overloaded so that we can set the
+   * Train the reduced basis. Overridden so that we can set the
    * flag compute_truth_projection_error to true so that the calls
    * to truth_solve during the basis construction will compute the
    * projection error. Other calls to truth_solve generally do not
@@ -124,7 +124,7 @@ public:
 
   /**
    * Assemble and store all the affine operators.
-   * Overload to assemble the mass matrix operators.
+   * Override to assemble the mass matrix operators.
    */
   virtual void assemble_all_affine_operators() libmesh_override;
 
@@ -166,7 +166,7 @@ public:
   void set_L2_assembly(ElemAssembly & L2_assembly_in);
 
   /**
-   * \returns a reference to the L2 assembly object
+   * \returns A reference to the L2 assembly object
    */
   ElemAssembly & get_L2_assembly();
 

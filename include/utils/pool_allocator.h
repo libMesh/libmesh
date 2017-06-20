@@ -71,7 +71,7 @@ public:
 
   /**
    * Frees every memory block that doesn't have any allocated chunks.
-   * Returns true if at least one memory block was freed.
+   * \returns \p true if at least one memory block was freed.
    */
   static bool release_memory ()
   {
@@ -80,7 +80,9 @@ public:
 
   /**
    * Frees every memory block. This function invalidates any pointers previously returned
-   * by allocation functions. Returns true if at least one memory block was freed.
+   * by allocation functions.
+   *
+   * \returns \p true if at least one memory block was freed.
    */
   static bool purge_memory ()
   {
@@ -126,7 +128,7 @@ public:
 
   /**
    * Frees every memory block that doesn't have any allocated chunks.
-   * Returns true if at least one memory block was freed.
+   * \returns \p true if at least one memory block was freed.
    */
   static bool release_memory ()
   {
@@ -135,7 +137,9 @@ public:
 
   /**
    * Frees every memory block. This function invalidates any pointers previously returned
-   * by allocation functions. Returns true if at least one memory block was freed.
+   * by allocation functions.
+   *
+   * \returns \p true if at least one memory block was freed.
    */
   static bool purge_memory ()
   {
@@ -177,13 +181,15 @@ public:
 
   /**
    * Frees every memory block that doesn't have any allocated chunks.
-   * Returns true if at least one memory block was freed.
+   * \returns \p true if at least one memory block was freed.
    */
   static bool release_memory () { /* no-op for std::allocator<> - already freed. */ return false; }
 
   /**
    * Frees every memory block. This function invalidates any pointers previously returned
-   * by allocation functions. Returns true if at least one memory block was freed.
+   * by allocation functions.
+   *
+   * \returns \p true if at least one memory block was freed.
    */
   static bool purge_memory ()   { /* no-op for std::allocator<> - already freed. */ return false; }
 };
@@ -221,13 +227,15 @@ public:
 
   /**
    * Frees every memory block that doesn't have any allocated chunks.
-   * Returns true if at least one memory block was freed.
+   * \returns \p true if at least one memory block was freed.
    */
   static bool release_memory () { /* no-op for std::allocator<> - already freed. */ return false; }
 
   /**
    * Frees every memory block. This function invalidates any pointers previously returned
-   * by allocation functions. Returns true if at least one memory block was freed.
+   * by allocation functions.
+   *
+   * \returns \p true if at least one memory block was freed.
    */
   static bool purge_memory ()   { /* no-op for std::allocator<> - already freed. */ return false; }
 };

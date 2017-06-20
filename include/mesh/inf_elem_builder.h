@@ -79,7 +79,7 @@ public:
   const Point build_inf_elem (const bool be_verbose = false);
 
   /**
-   * \returns the origin of the infinite elements.
+   * \returns The origin of the infinite elements.
    * Builds infinite elements atop a volume-based mesh.
    * Finds all faces on the outer boundary and build infinite elements
    * on them.  Using the \p InfElemOriginValue the user can

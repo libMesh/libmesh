@@ -51,7 +51,7 @@ public:
   }
 
   /**
-   * \returns the \p Point associated with local \p Node \p i,
+   * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
   virtual Point master_point (const unsigned int i) const libmesh_override
@@ -88,7 +88,7 @@ public:
   virtual unsigned int n_children() const libmesh_override { return 8; }
 
   /**
-   * \returns true if the specified edge is on the specified side.
+   * \returns \p true if the specified edge is on the specified side.
    */
   virtual bool is_edge_on_side(const unsigned int e,
                                const unsigned int s) const libmesh_override;
@@ -99,7 +99,7 @@ public:
   using Elem::key;
 
   /**
-   * \returns an id associated with the \p s side of this element.
+   * \returns An id associated with the \p s side of this element.
    * The id is not necessarily unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
@@ -112,7 +112,7 @@ public:
                                        unsigned int side_node) const libmesh_override;
 
   /**
-   * \returns a primitive (3-noded) triangle for face i.
+   * \returns A primitive (3-noded) triangle for face i.
    */
   virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;
 

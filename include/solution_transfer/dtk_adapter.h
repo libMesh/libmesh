@@ -81,7 +81,7 @@ protected:
   System * find_sys(std::string var_name);
 
   /**
-   * Helper that returns the DTK ElementTopology for a given Elem
+   * \returns The DTK ElementTopology for a given Elem.
    */
   DataTransferKit::DTK_ElementTopology get_element_topology(const Elem * elem);
 

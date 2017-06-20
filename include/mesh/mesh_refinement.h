@@ -303,8 +303,7 @@ public:
    * parent Elem parent.  The processor_id is assigned to all newly
    * created nodes.
    *
-   * \returns a pointer to a suitable existing node, or creates a new
-   * node and returns a pointer to it.
+   * \returns A pointer to a suitable existing or newly-created node.
    */
   Node * add_node (Elem & parent,
                    unsigned int child,
@@ -317,13 +316,13 @@ public:
   Elem * add_elem (Elem * elem);
 
   /**
-   * \returns a constant reference to the \p MeshBase object associated
+   * \returns A constant reference to the \p MeshBase object associated
    * with this object.
    */
   const MeshBase & get_mesh () const { return _mesh; }
 
   /**
-   * \returns a writeable reference to the \p MeshBase object associated
+   * \returns A writable reference to the \p MeshBase object associated
    * with this object.
    */
   MeshBase & get_mesh () { return _mesh; }

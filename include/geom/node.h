@@ -147,7 +147,7 @@ public:
 #endif // #ifdef LIBMESH_HAVE_MPI
 
   /**
-   * \returns the number of nodes connected with this node.
+   * \returns The number of nodes connected with this node.
    * Currently, this value is invalid (zero) except for
    * subdivision meshes.
    */

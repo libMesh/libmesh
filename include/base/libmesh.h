@@ -120,13 +120,13 @@ void enableFPE(bool on);
 void enableSEGV(bool on);
 
 /**
- * \returns true if the argument \p arg was specified on the command line,
+ * \returns \p true if the argument \p arg was specified on the command line,
  * \p false otherwise.
  */
 bool on_command_line (const std::string & arg);
 
 /**
- * \returns the value associated with name on the command line if it is specified,
+ * \returns The value associated with name on the command line if it is specified,
  * otherwise return the default, provided value.  A second template function is provided
  * to support recognizing multiple variations of a given option
  */
@@ -143,7 +143,7 @@ template <typename T>
 T command_line_next (const std::string &, T);
 
 /**
- * \returns the array of values associated with name on the command line if it is specified,
+ * \returns The array of values associated with name on the command line if it is specified,
  * otherwise return the default, provided array.
  */
 template <typename T>
@@ -157,7 +157,7 @@ extern const Number imaginary;
 #endif
 
 /**
- * \returns the default solver interface to use.  The value depends on
+ * \returns The default solver interface to use.  The value depends on
  * which solver packages  were available when the library was configured.
  * The command-line is also checked, allowing the user to override the
  * compiled default.  For example, \p --use-petsc will force the use of

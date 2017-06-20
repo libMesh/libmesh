@@ -59,19 +59,19 @@ public:
   virtual ~Surface () {}
 
   /**
-   * \returns true if the point p is above the surface,
+   * \returns \p true if the point p is above the surface,
    * false otherwise.
    */
   virtual bool above_surface (const Point & p) const = 0;
 
   /**
-   * \returns true if the point p is below the surface,
+   * \returns \p true if the point p is below the surface,
    * false otherwise.
    */
   virtual bool below_surface (const Point & p) const = 0;
 
   /**
-   * \returns true if the point p is on the surface,
+   * \returns \p true if the point p is on the surface,
    * false otherwise.  Note that the definition of on
    * the surface really means "very close" to account
    * for roundoff error.
@@ -79,32 +79,32 @@ public:
   virtual bool on_surface (const Point & p) const = 0;
 
   /**
-   * \returns the closest point on the surface to point p.
+   * \returns The closest point on the surface to point p.
    */
   virtual Point closest_point (const Point & p) const = 0;
 
   /**
-   * \returns a unit vector normal to the surface at
+   * \returns A unit vector normal to the surface at
    * point p.
    */
   virtual Point unit_normal (const Point & p) const = 0;
 
   /**
-   * \returns the \p Point \p world_coords in the
+   * \returns The \p Point \p world_coords in the
    * surface's coordinate system.  \p world_coords
    * is in the world coordinate system.  This method
    * is not purely virtual, because there may be surfaces
    * that do not have their own coordinate system.  These
-   * simply do not have to overload this method.
+   * simply do not have to override this method.
    */
   virtual Point surface_coords (const Point & world_coords) const { return world_coords; }
 
   /**
-   * \returns the world (cartesian) coordinates for the
+   * \returns The world (cartesian) coordinates for the
    * surface coordinates \p surf_coords.  This method
    * is not purely virtual, because there may be surfaces
    * that do not have an own coordinate system.  These
-   * simply do not have to overload this method.
+   * simply do not have to override this method.
    */
   virtual Point world_coords (const Point & surf_coords) const { return surf_coords; }
 };

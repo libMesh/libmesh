@@ -66,7 +66,7 @@ public:
   virtual void zero() = 0;
 
   /**
-   * \returns the \p (i,j) element of the matrix.
+   * \returns The \p (i,j) element of the matrix.
    * Since internal data representations may differ, you
    * must redefine this function.
    */
@@ -74,7 +74,7 @@ public:
                const unsigned int j) const = 0;
 
   /**
-   * \returns the \p (i,j) element of the matrix as a writeable reference.
+   * \returns The \p (i,j) element of the matrix as a writable reference.
    * Since internal data representations may differ, you
    * must redefine this function.
    */
@@ -92,12 +92,12 @@ public:
   virtual void right_multiply (const DenseMatrixBase<T> & M3) = 0;
 
   /**
-   * \returns the row-dimension of the matrix.
+   * \returns The row-dimension of the matrix.
    */
   unsigned int m() const { return _m; }
 
   /**
-   * \returns the column-dimension of the matrix.
+   * \returns The column-dimension of the matrix.
    */
   unsigned int n() const { return _n; }
 

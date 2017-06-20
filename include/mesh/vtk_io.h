@@ -61,7 +61,7 @@ class VTKIO : public MeshInput<MeshBase>,
 {
 public:
   /**
-   * Constructor.  Takes a writeable reference to a mesh object.
+   * Constructor.  Takes a writable reference to a mesh object.
    * This is the constructor required to read a mesh.
    */
   explicit

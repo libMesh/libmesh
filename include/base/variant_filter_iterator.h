@@ -160,7 +160,7 @@ public:
     virtual ~Iter () {}
 
     /**
-     * \returns a copy of this object as a pointer to
+     * \returns A copy of this object as a pointer to
      * the base (non-templated) class.
      */
     virtual IterBase * clone() const libmesh_override
@@ -177,7 +177,7 @@ public:
     }
 
     /**
-     * \returns a copy of this object as a pointer to a
+     * \returns A copy of this object as a pointer to a
      * different type of object.
      */
     virtual typename IterBase::const_IterBase * const_clone() const libmesh_override

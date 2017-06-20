@@ -112,7 +112,7 @@ public:
   }
 
   /**
-   * Returns a new copy of the accessor.
+   * \returns A new copy of the accessor.
    */
   virtual UniquePtr<ParameterAccessor<T> > clone() const libmesh_override
   {
@@ -129,7 +129,7 @@ public:
   }
 
   /**
-   * Returns the number of sub-accessors associated with this
+   * \returns The number of sub-accessors associated with this
    * parameter.  Useful for testing if the multi-accessor is
    * empty/invalid.
    */

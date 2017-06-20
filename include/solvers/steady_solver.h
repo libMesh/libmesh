@@ -100,9 +100,9 @@ public:
                                   DiffContext &) libmesh_override;
 
   /**
-   * Nominally computes the size of the difference between
-   * successive solution iterates ||u^{n+1} - u^{n}|| in some norm,
-   * but for this class just returns 0.
+   * \returns 0, but derived classes should override this function to
+   * compute the size of the difference between successive solution
+   * iterates ||u^{n+1} - u^{n}|| in some norm.
    */
   virtual Real du(const SystemNorm &) const libmesh_override { return 0; }
 

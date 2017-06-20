@@ -167,7 +167,7 @@ public:
   /**
    * Renumber a parallel objects container.
    *
-   * \returns the smallest globally unused id for that container.
+   * \returns The smallest globally unused id for that container.
    */
   template <typename T>
   dof_id_type renumber_dof_objects (mapvector<T *,dof_id_type> &);

@@ -44,8 +44,7 @@ public:
   MetisPartitioner () {}
 
   /**
-   * Creates a new partitioner of this type and returns it in
-   * a \p UniquePtr.
+   * \returns A copy of this partitioner wrapped in a smart pointer.
    */
   virtual UniquePtr<Partitioner> clone () const libmesh_override
   {

@@ -75,7 +75,7 @@ public:
   typedef System Parent;
 
   /**
-   * \returns a clever pointer to the system.
+   * \returns A reference to *this.
    */
   sys_type & system () { return *this; }
 
@@ -102,7 +102,7 @@ public:
   virtual void assemble () libmesh_override;
 
   /**
-   * Returns real and imaginary part of the ith eigenvalue and copies
+   * \returns Real and imaginary part of the ith eigenvalue and copies
    * the respective eigen vector to the solution vector.
    */
   virtual std::pair<Real, Real> get_eigenpair (dof_id_type i);
@@ -114,17 +114,17 @@ public:
   virtual std::string system_type () const libmesh_override { return "Eigen"; }
 
   /**
-   * \returns the number of matrices handled by this system
+   * \returns The number of matrices handled by this system
    */
   virtual unsigned int n_matrices () const libmesh_override;
 
   /**
-   * \returns the number of converged eigenpairs.
+   * \returns The number of converged eigenpairs.
    */
   unsigned int get_n_converged () const {return _n_converged_eigenpairs;}
 
   /**
-   * \returns the number of eigen solver iterations.
+   * \returns The number of eigen solver iterations.
    */
   unsigned int get_n_iterations () const {return _n_iterations;}
 
@@ -134,12 +134,12 @@ public:
   void set_eigenproblem_type (EigenProblemType ept);
 
   /**
-   * \returns the eigen problem type.
+   * \returns The eigen problem type.
    */
   EigenProblemType get_eigenproblem_type () const {return _eigen_problem_type;}
 
   /**
-   * \returns true if the underlying problem is generalized
+   * \returns \p true if the underlying problem is generalized
    * , false otherwise.
    */
   bool generalized () const { return _is_generalized_eigenproblem; }

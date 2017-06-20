@@ -88,12 +88,12 @@ public:
   virtual void print_elements(std::ostream & out=libMesh::out) const = 0;
 
   /**
-   * \returns the number of active bins.
+   * \returns The number of active bins.
    */
   virtual unsigned int n_active_bins() const = 0;
 
   /**
-   * \returns a pointer to the element containing point p,
+   * \returns A pointer to the element containing point p,
    * optionally restricted to a set of allowed subdomains,
    * optionally using a non-zero relative tolerance for searches.
    */

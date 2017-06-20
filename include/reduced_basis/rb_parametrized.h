@@ -160,8 +160,7 @@ public:
   void print_discrete_parameter_values() const;
 
   /**
-   * Helper function that returns the closest entry to \p value from
-   * \p list_of_values.
+   * \returns The closest entry to \p value from \p list_of_values.
    */
   static Real get_closest_value(Real value, const std::vector<Real> & list_of_values);
 

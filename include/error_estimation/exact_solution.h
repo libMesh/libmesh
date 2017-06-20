@@ -279,7 +279,7 @@ private:
    * This function is responsible for checking the validity of the \p
    * sys_name and \p unknown_name inputs.
    *
-   * \returns a reference to the proper vector for storing the values.
+   * \returns A reference to the proper vector for storing the values.
    */
   std::vector<Real> & _check_inputs(const std::string & sys_name,
                                     const std::string & unknown_name);

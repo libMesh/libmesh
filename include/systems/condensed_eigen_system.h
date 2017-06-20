@@ -66,7 +66,7 @@ public:
   typedef EigenSystem Parent;
 
   /**
-   * \returns a clever pointer to the system.
+   * \returns A reference to *this.
    */
   sys_type & system () { return *this; }
 
@@ -87,7 +87,7 @@ public:
                                  std::set<dof_id_type>());
 
   /**
-   * \returns the global number of non-condensed dofs in the system.
+   * \returns The global number of non-condensed dofs in the system.
    */
   dof_id_type n_global_non_condensed_dofs() const;
 
@@ -99,7 +99,7 @@ public:
   virtual void solve() libmesh_override;
 
   /**
-   * Overload get_eigenpair to retrieve the eigenpair for
+   * Override \p get_eigenpair() to retrieve the eigenpair for
    * the condensed eigensolve. We only set the non-condensed
    * entries of the solution vector (the condensed
    * entries are set to zero by default).

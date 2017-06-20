@@ -108,11 +108,12 @@ public:
                            const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const = 0;
 
   /**
-   * Locates a Node with global coordinates \p p or returns NULL if no
-   * such Node can be found.
+   * \returns A pointer to a Node with global coordinates \p p or \p
+   * NULL if no such Node can be found.
    *
-   * Virtual so subclasses can override for efficiency, but has a
-   * default implementation that works based on element lookup.
+   * Virtual subclasses can override for efficiency, but the base
+   * class has a default implementation that works based on element
+   * lookup.
    *
    * Optionally allows the user to restrict the subdomains searched;
    * with such a restriction, only a Node belonging to an element on

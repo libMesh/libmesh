@@ -76,23 +76,22 @@ public:
     StatisticsVector<ErrorVectorReal> (i,val) {}
 
   /**
-   * Returns the minimum nonzero value in the data set.
+   * \returns The minimum nonzero value in the data set.
    */
   virtual ErrorVectorReal minimum() const libmesh_override;
 
   /**
-   * Returns the mean value of the data set. Ignores
+   * \returns The mean value of the data set. Ignores
    * zero values.
    */
   virtual Real mean() const libmesh_override;
 
   /**
-   * Returns the median (e.g. the middle)
-   * value of the data set, ignoring inactive elements.
-   * This function modifies the
-   * original data by sorting, so it
-   * can't be called on const objects.
-   * Source: GNU Scientific Library
+   * \returns The median (e.g. the middle) value of the data set,
+   * ignoring inactive elements.
+   *
+   * This function modifies the original data by sorting, so it can't
+   * be called on const objects.  Source: GNU Scientific Library
    */
   virtual Real median() libmesh_override;
 
@@ -104,40 +103,36 @@ public:
   virtual Real median() const libmesh_override;
 
   /**
-   * Computes the variance of the data set
-   * ignoring inactive elements.
-   * Uses a recurrence relation to prevent
-   * data overflow for large sums.
-   * Note: The variance is equal to the
-   * standard deviation squared.  The variance
-   * is normalized by N in this case.
-   * Source: GNU Scientific Library
+   * \returns The variance of the data set ignoring inactive elements.
+   *
+   * Uses a recurrence relation to prevent data overflow for large
+   * sums.  Note: The variance is equal to the standard deviation
+   * squared.  The variance is normalized by N in this case.  Source:
+   * GNU Scientific Library
    */
   virtual Real variance() const libmesh_override
   { return this->variance(this->mean()); }
 
   /**
-   * Computes the variance of the data set
-   * ignoring inactive elements.
-   * where the \p mean is provided. This is useful
-   * for efficiency when you have already calculated
-   * the mean. Uses a recurrence relation to prevent
-   * data overflow for large sums.
-   * Note: The variance is equal to the
-   * standard deviation squared.
-   * Source: GNU Scientific Library
+   * \returns The variance of the data set ignoring inactive elements
+   * and given the \p mean.
+   *
+   * This is useful for efficiency when you have already calculated
+   * the mean. Uses a recurrence relation to prevent data overflow for
+   * large sums.  Note: The variance is equal to the standard
+   * deviation squared.  Source: GNU Scientific Library
    */
   virtual Real variance(const Real mean) const libmesh_override;
 
   /**
-   * Returns a vector of dof_id_types which correspond
+   * \returns A vector of dof_id_types which correspond
    * to the indices of every member of the data set
    * below the cutoff value cut ignoring inactive elements.
    */
   virtual std::vector<dof_id_type> cut_below(Real cut) const libmesh_override;
 
   /**
-   * Returns a vector of dof_id_types which correspond
+   * \returns A vector of dof_id_types which correspond
    * to the indices of every member of the data set
    * above the cutoff value cut ignoring inactive elements.
    */

@@ -92,20 +92,19 @@ public:
   virtual void clear () libmesh_override;
 
   /**
-   * Returns a new deep copy of the function.
+   * \returns A new deep copy of the function.
    */
   virtual UniquePtr<FunctionBase<Output> > clone () const libmesh_override;
 
   /**
-   * \returns the value at point \p p and time
+   * \returns The value at point \p p and time
    * \p time, which defaults to zero.
    */
   virtual Output operator() (const Point & p,
                              const Real time=0.) libmesh_override;
 
   /**
-   * Like before, but returns the values in a
-   * writable reference.
+   * Like before, but sets output values in the passed-in \p output DenseVector.
    */
   virtual void operator() (const Point & p,
                            const Real time,

@@ -98,7 +98,7 @@ public:
   virtual void init () libmesh_override;
 
   /**
-   * Returns the raw NLopt object.
+   * \returns The raw NLopt object.
    */
   nlopt_opt get_nlopt_object() { this->init(); return _opt; }
 
@@ -114,14 +114,14 @@ public:
   virtual void print_converged_reason() libmesh_override;
 
   /**
-   * Returns the currently-available (or most recently obtained, if the NLopt object has
+   * \returns The currently-available (or most recently obtained, if the NLopt object has
    * been destroyed) convergence reason.  Refer to NLopt docs for the meaning of different
    * the value.
    */
   virtual int get_converged_reason() libmesh_override;
 
   /**
-   * Returns a writeable reference to the current iteration count
+   * \returns A writable reference to the current iteration count
    * which can be incremented in the objective function.
    */
   unsigned & get_iteration_count() { return _iteration_count; }

@@ -30,11 +30,12 @@ namespace libMesh
 class Point;
 
 /**
- * FEMFunction that returns a single.
+ * FEMFunction that returns a single value, regardless of the time and
+ * location inputs.
  *
  * \author Roy Stogner
  * \date 2012
- * \brief FEMFunction that returns a single.
+ * \brief FEMFunction that returns a single value.
  */
 template <typename Output=Number>
 class ConstFEMFunction : public FEMFunctionBase<Output>

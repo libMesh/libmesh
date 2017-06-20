@@ -175,10 +175,10 @@ public:
 
 
   /**
-   * This function returns the real and imaginary part of the
-   * ith eigenvalue and copies the respective eigenvector to the
-   * solution vector. Note that also in case of purely real matrix
-   * entries the eigenpair may be complex values.
+   * \returns The real and imaginary part of the ith eigenvalue and
+   * copies the respective eigenvector to the solution vector.
+   *
+   * \note The eigenpair may be complex even for real-valued matrices.
    */
   virtual std::pair<Real, Real>
   get_eigenpair (dof_id_type i,
@@ -191,8 +191,8 @@ public:
   get_eigenvalue (dof_id_type i) libmesh_override;
 
   /**
-   * \returns the relative error \f$ ||A x - \lambda x|| / |\lambda x| \f$
-   * of the ith eigenpair. (or the equivalent for a general eigenvalue problem)
+   * \returns The relative error \f$ ||A x - \lambda x|| / |\lambda x| \f$
+   * of the ith eigenpair (or the equivalent for a general eigenvalue problem).
    */
   Real get_relative_error (unsigned int i);
 
@@ -202,13 +202,13 @@ public:
   virtual void attach_deflation_space(NumericVector<T> & deflation_vector) libmesh_override;
 
   /**
-   * Provide one basis vector for the initial guess
+   * Use \p initial_space_in as the initial guess.
    */
   virtual void
   set_initial_space(NumericVector<T> & initial_space_in) libmesh_override;
 
   /**
-   * Returns the raw SLEPc eps context pointer.
+   * \returns The raw SLEPc \p EPS pointer.
    */
   EPS eps() { this->init(); return _eps; }
 

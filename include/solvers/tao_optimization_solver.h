@@ -86,7 +86,7 @@ public:
   virtual void init () libmesh_override;
 
   /**
-   * Returns the raw PETSc Tao context pointer.
+   * \returns The raw PETSc Tao context pointer.
    */
   Tao tao() { this->init(); return _tao; }
 
@@ -109,9 +109,10 @@ public:
   virtual void print_converged_reason() libmesh_override;
 
   /**
-   * Returns the currently-available (or most recently obtained, if the Tao object has
-   * been destroyed) convergence reason.  Refer to Tao docs for the meaning of different
-   * TaoConvergedReason.
+   * \returns The currently-available (or most recently obtained, if
+   * the Tao object has been destroyed) convergence reason.
+   *
+   * Refer to Tao docs for the meaning of different TaoConvergedReason.
    */
   virtual int get_converged_reason() libmesh_override;
 

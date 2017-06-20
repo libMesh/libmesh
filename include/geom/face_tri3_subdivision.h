@@ -58,13 +58,13 @@ public:
   virtual ElemType type () const libmesh_override { return TRI3SUBDIVISION; }
 
   /**
-   * \returns true if the element map is definitely affine within
+   * \returns \p true if the element map is definitely affine within
    * numerical tolerances.
    */
   virtual bool has_affine_map () const libmesh_override { return false; }
 
   /**
-   * \returns true if the Lagrange shape functions on this element
+   * \returns \p true if the Lagrange shape functions on this element
    * are linear.
    */
   virtual bool is_linear () const libmesh_override { return false; }
@@ -88,18 +88,18 @@ public:
   bool is_subdivision_updated() const { return _subdivision_updated; }
 
   /**
-   * \returns a pointer to the node whose ordered id is \p node_id.
+   * \returns A pointer to the node whose ordered id is \p node_id.
    */
   Node * get_ordered_node(unsigned int node_id) const;
 
   /**
-   * \returns the number of nodes connected to the ordered node
+   * \returns The number of nodes connected to the ordered node
    * whose id is \p node_id.
    */
   unsigned int get_ordered_valence(unsigned int node_id) const;
 
   /**
-   * \returns the order number of the node whose unordered id is
+   * \returns The order number of the node whose unordered id is
    * \p node_id. This is the inverse of an \p _ordered_nodes lookup.
    */
   unsigned int local_node_number(unsigned int node_id) const;

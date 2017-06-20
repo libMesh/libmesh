@@ -60,7 +60,7 @@ public:
   typedef uint32_t header_id_type;
 
   /**
-   * Constructor.  Takes a writeable reference to a mesh object.
+   * Constructor.  Takes a writable reference to a mesh object.
    * This is the constructor required to read a mesh.
    * The optional parameter \p binary can be used to switch
    * between ASCII (\p false, the default) or binary (\p true)
@@ -162,19 +162,19 @@ public:
   std::string &       polynomial_level_file_name()       { return _p_level_file; }
 
   /**
-   * \returns true if the current file has an XDR/XDA version that
+   * \returns \p true if the current file has an XDR/XDA version that
    * matches or exceeds 0.9.2.
    */
   bool version_at_least_0_9_2() const;
 
   /**
-   * \returns true if the current file has an XDR/XDA version that
+   * \returns \p true if the current file has an XDR/XDA version that
    * matches or exceeds 0.9.6.
    */
   bool version_at_least_0_9_6() const;
 
   /**
-   * \returns true if the current file has an XDR/XDA version that
+   * \returns \p true if the current file has an XDR/XDA version that
    * matches or exceeds 1.1.0.
    */
   bool version_at_least_1_1_0() const;
@@ -260,7 +260,7 @@ private:
 
   /**
    * Read the side boundary conditions for a parallel, distributed mesh
-   * \returns the number of bcs read
+   * \returns The number of bcs read
    */
   template <typename T>
   void read_serialized_side_bcs (Xdr & io, T);
@@ -268,7 +268,7 @@ private:
   /**
    * Read the edge boundary conditions for a parallel, distributed mesh.
    * NEW in 1.1.0 format.
-   * \returns the number of bcs read
+   * \returns The number of bcs read
    */
   template <typename T>
   void read_serialized_edge_bcs (Xdr & io, T);
@@ -276,14 +276,14 @@ private:
   /**
    * Read the "shell face" boundary conditions for a parallel, distributed mesh.
    * NEW in 1.1.0 format.
-   * \returns the number of bcs read
+   * \returns The number of bcs read
    */
   template <typename T>
   void read_serialized_shellface_bcs (Xdr & io, T);
 
   /**
    * Read the nodeset conditions for a parallel, distributed mesh
-   * \returns the number of nodesets read
+   * \returns The number of nodesets read
    */
   template <typename T>
   void read_serialized_nodesets (Xdr & io, T);

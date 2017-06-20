@@ -78,28 +78,25 @@ public:
   virtual void init_context (const FEMContext & c) libmesh_override;
 
   /**
-   * Returns a new copy of the function.  The new copy should be as
-   * ``deep'' as necessary to allow independent destruction and
-   * simultaneous evaluations of the copies in different threads.
+   * \returns A new copy of the function.
+   *
+   * The new copy should be as "deep" as necessary to allow
+   * independent destruction and simultaneous evaluations of the
+   * copies in different threads.
    */
   virtual UniquePtr<FEMFunctionBase<Output> > clone () const libmesh_override;
 
-  // ------------------------------------------------------
-  // misc
   /**
-   * \returns the scalar value at coordinate
-   * \p p and time \p time, which defaults to zero.
-   * Purely virtual, so you have to overload it.
-   * Note that this cannot be a const method, check \p MeshFunction.
+   * \returns The scalar function value at coordinate \p p and time \p
+   * time, which defaults to zero.
    */
   virtual Output operator() (const FEMContext & c,
                              const Point & p,
                              const Real time = 0.) libmesh_override;
 
   /**
-   * Return function for vectors.
-   * Returns in \p output the values of the data at the
-   * coordinate \p p and for time \p time.
+   * Evaluation function for time-dependent vector-valued functions.
+   * Sets output values in the passed-in \p output DenseVector.
    */
   void operator() (const FEMContext & c,
                    const Point & p,
@@ -107,8 +104,8 @@ public:
                    DenseVector<Output> & output) libmesh_override;
 
   /**
-   * \returns the vector component \p i at coordinate
-   * \p p and time \p time.
+   * \returns The vector component \p i at coordinate \p p and time \p
+   * time.
    */
   virtual Output component(const FEMContext & c,
                            unsigned int i,
@@ -118,19 +115,23 @@ public:
   const std::string & expression() { return _expression; }
 
   /**
-   * \returns the value of an inline variable.  Will *only* be correct
-   * if the inline variable value is independent of input variables,
-   * if the inline variable is not redefined within any subexpression,
-   * and if the inline variable takes the same value within any
-   * subexpressions where it appears.
+   * \returns The value of an inline variable.
+   *
+   * \note Will *only* be correct if the inline variable value is
+   * independent of input variables, if the inline variable is not
+   * redefined within any subexpression, and if the inline variable
+   * takes the same value within any subexpressions where it appears.
    */
   Output get_inline_value(const std::string & inline_var_name) const;
 
   /**
-   * Changes the value of an inline variable.  Forever after the
-   * variable value will take the given constant, independent of input
-   * variables, in every subexpression where it is already defined.
-   * Currently only works if the inline variable is not redefined
+   * Changes the value of an inline variable.
+   *
+   * \note Forever after, the variable value will take the given
+   * constant, independent of input variables, in every subexpression
+   * where it is already defined.
+   *
+   * \note Currently only works if the inline variable is not redefined
    * within any one subexpression.
    */
   void set_inline_value(const std::string & inline_var_name,

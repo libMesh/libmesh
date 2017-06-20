@@ -67,7 +67,7 @@ public:
 
 
   /**
-   * \returns a reference to the parent matrix.
+   * \returns A reference to the parent matrix.
    */
   DenseMatrix<T> & parent () { return _parent_matrix; }
 
@@ -77,26 +77,26 @@ public:
   virtual void zero() libmesh_override;
 
   /**
-   * \returns the \p (i,j) element of the submatrix.
+   * \returns The \p (i,j) element of the submatrix.
    */
   T operator() (const unsigned int i,
                 const unsigned int j) const;
 
   /**
-   * \returns the \p (i,j) element of the submatrix as a writeable reference.
+   * \returns The \p (i,j) element of the submatrix as a writable reference.
    */
   T & operator() (const unsigned int i,
                   const unsigned int j);
 
   /**
-   * \returns the \p (i,j) element of the matrix as a writeable reference.
+   * \returns The \p (i,j) element of the matrix as a writable reference.
    */
   virtual T el(const unsigned int i,
                const unsigned int j) const libmesh_override
   { return (*this)(i,j); }
 
   /**
-   * \returns the \p (i,j) element of the matrix as a writeable reference.
+   * \returns The \p (i,j) element of the matrix as a writable reference.
    */
   virtual T & el(const unsigned int i,
                  const unsigned int j) libmesh_override
@@ -121,12 +121,12 @@ public:
                   const unsigned int new_n);
 
   /**
-   * \returns the row offset into the parent matrix.
+   * \returns The row offset into the parent matrix.
    */
   unsigned int i_off() const { return _i_off; }
 
   /**
-   * \returns the column offset into the parent matrix.
+   * \returns The column offset into the parent matrix.
    */
   unsigned int j_off() const { return _j_off; }
 

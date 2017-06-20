@@ -37,10 +37,10 @@ template <typename T> class ConstTypeTensorColumn;
 template <unsigned int N, typename T> class TypeNTensor;
 
 /**
- * This class defines a tensor in \p LIBMESH_DIM dimensional space of type T.
- * T may either be Real or Complex.  The default constructor for
- * this class is protected, suggesting that you should not instantiate
- * one of these directly.
+ * This class defines a tensor in \p LIBMESH_DIM dimensional space of
+ * type T.  T may either be Real or Complex.  The default constructor
+ * for this class is protected, suggesting that you should not
+ * instantiate one of these directly.
  *
  * \author Roy Stogner
  * \date 2004
@@ -54,7 +54,7 @@ class TypeTensor
 protected:
 
   /**
-   * Empty constructor.  Gives the tensor 0 in \p LIBMESH_DIM
+   * Empty constructor. Gives the tensor 0 in \p LIBMESH_DIM
    * dimensions.
    */
   TypeTensor  ();
@@ -112,7 +112,7 @@ protected:
 public:
 
   /**
-   * Helper typedef for C++98 generic programming
+   * Helper typedef for C++98 generic programming.
    */
   typedef T value_type;
 
@@ -128,13 +128,15 @@ public:
   ~TypeTensor();
 
   /**
-   * Assign to a tensor without creating a temporary.
+   * Assign to this tensor without creating a temporary.
    */
   template<typename T2>
   void assign (const TypeTensor<T2> &);
 
   /**
    * Assignment-from-scalar operator.  Used only to zero out vectors.
+   *
+   * \returns A reference to *this.
    */
   template <typename Scalar>
   typename boostcopy::enable_if_c<
@@ -144,33 +146,34 @@ public:
   { libmesh_assert_equal_to (p, Scalar(0)); this->zero(); return *this; }
 
   /**
-   * Return the \f$ i,j^{th} \f$ element of the tensor.
+   * \returns A const reference to the (i,j) entry of the tensor.
    */
   const T & operator () (const unsigned int i, const unsigned int j) const;
 
   /**
-   * Return a writeable reference to the \f$ i,j^{th} \f$ element of the
-   * tensor.
+   * \returns A writable reference to the (i,j) entry of the tensor.
    */
   T & operator () (const unsigned int i, const unsigned int j);
 
   /**
-   * Return a proxy for the \f$ i^{th} \f$ column of the tensor.
+   * \returns A proxy for the \f$ i^{th} \f$ column of the tensor.
    */
   ConstTypeTensorColumn<T> slice (const unsigned int i) const;
 
   /**
-   * Return a writeable proxy for the \f$ i^{th} \f$ column of the tensor.
+   * \returns A writable proxy for the \f$ i^{th} \f$ column of the tensor.
    */
   TypeTensorColumn<T> slice (const unsigned int i);
 
   /**
-   * Return one row of the tensor as a TypeVector.
+   * \returns A copy of one row of the tensor as a TypeVector.
    */
   TypeVector<T> row(const unsigned int r) const;
 
   /**
-   * Add two tensors.
+   * Add another tensor to this tensor.
+   *
+   * \returns A copy of the result, this tensor is unchanged.
    */
   template<typename T2>
   TypeTensor<typename CompareTypes<T, T2>::supertype>
@@ -178,6 +181,8 @@ public:
 
   /**
    * Add to this tensor.
+   *
+   * \returns A reference to *this.
    */
   template<typename T2>
   const TypeTensor<T> & operator += (const TypeTensor<T2> &);
@@ -189,14 +194,15 @@ public:
   void add (const TypeTensor<T2> &);
 
   /**
-   * Add a scaled tensor to this tensor without
-   * creating a temporary.
+   * Add a scaled tensor to this tensor without creating a temporary.
    */
   template <typename T2>
   void add_scaled (const TypeTensor<T2> &, const T);
 
   /**
-   * Subtract two tensors.
+   * Subtract a tensor from this tensor.
+   *
+   * \returns A copy of the result, this tensor is unchanged.
    */
   template<typename T2>
   TypeTensor<typename CompareTypes<T, T2>::supertype>
@@ -204,6 +210,8 @@ public:
 
   /**
    * Subtract from this tensor.
+   *
+   * \returns A reference to *this.
    */
   template<typename T2>
   const TypeTensor<T> & operator -= (const TypeTensor<T2> &);
@@ -215,19 +223,21 @@ public:
   void subtract (const TypeTensor<T2> &);
 
   /**
-   * Subtract a scaled value from this tensor without
-   * creating a temporary.
+   * Subtract a scaled value from this tensor without creating a
+   * temporary.
    */
   template <typename T2>
   void subtract_scaled (const TypeTensor<T2> &, const T);
 
   /**
-   * Return the opposite of a tensor
+   * \returns The negative of this tensor in a separate copy.
    */
   TypeTensor<T> operator - () const;
 
   /**
-   * Multiply a tensor by a number, i.e. scale.
+   * Multiply this tensor by a scalar value.
+   *
+   * \returns A copy of the result, this tensor is unchanged.
    */
   template <typename Scalar>
   typename boostcopy::enable_if_c<
@@ -236,13 +246,17 @@ public:
   operator * (const Scalar) const;
 
   /**
-   * Multiply this tensor by a number, i.e. scale.
+   * Multiply this tensor by a scalar value in place.
+   *
+   * \returns A reference to *this.
    */
   template <typename Scalar>
   const TypeTensor<T> & operator *= (const Scalar);
 
   /**
-   * Divide a tensor by a number, i.e. scale.
+   * Divide each entry of this tensor by a scalar value.
+   *
+   * \returns A copy of the result, this tensor is unchanged.
    */
   template <typename Scalar>
   typename boostcopy::enable_if_c<
@@ -251,52 +265,62 @@ public:
   operator / (const Scalar) const;
 
   /**
-   * Divide this tensor by a number, i.e. scale.
+   * Divide each entry of this tensor by a scalar value.
+   *
+   * \returns A reference to *this.
    */
   const TypeTensor<T> & operator /= (const T);
 
   /**
-   * Multiply 2 tensors together, i.e. matrix product.
-   * The tensors may be of different types.
+   * Multiply 2 tensors together, i.e. matrix-matrix product.
+   * The tensors may contain different numeric types.
+   *
+   * \returns A copy of the result, this tensor is unchanged.
    */
   template <typename T2>
   TypeTensor<T> operator * (const TypeTensor<T2> &) const;
 
   /**
-   * Multiply 2 tensors together, i.e. dyadic product
-   * sum_ij Aij*Bij.
-   * The tensors may be of different types.
+   * Multiply 2 tensors together, i.e. dyadic product,
+   * \f$ \sum_{ij} A_{ij} B_{ij} \f$
+   * The tensors may contain different numeric types.
+   *
+   * \returns A copy of the result, this tensor is unchanged.
    */
   template <typename T2>
   typename CompareTypes<T,T2>::supertype
   contract (const TypeTensor<T2> &) const;
 
   /**
-   * Multiply a tensor and vector together, i.e. matrix-vector product.
-   * The tensor and vector may be of different types.
+   * Multiply this tensor by a vector, i.e. matrix-vector product.
+   * The tensor and vector may contain different numeric types.
+   *
+   * \returns A copy of the result vector, this tensor is unchanged.
    */
   template <typename T2>
   TypeVector<typename CompareTypes<T,T2>::supertype>
   operator * (const TypeVector<T2> &) const;
 
   /**
-   * The transpose (with complex numbers not conjugated) of the tensor.
+   * \returns The transpose of this tensor (with complex numbers not conjugated).
    */
   TypeTensor<T> transpose() const;
 
   /**
-   * Returns the inverse of the tensor.
+   * \returns The inverse of this tensor as an independent object.
    */
   TypeTensor<T> inverse() const;
 
   /**
    * Solve the 2x2 or 3x3 system of equations A*x = b for x
    * by directly inverting A and multiplying it by b.
+   *
+   * \returns The solution in the \p x vector.
    */
   void solve(const TypeVector<T> & b, TypeVector<T> & x) const;
 
   /**
-   * Returns the Frobenius norm of the tensor, i.e. the square-root of
+   * \returns The Frobenius norm of the tensor, i.e. the square-root of
    * the sum of the elements squared.
    *
    * \deprecated Use the norm() function instead.
@@ -304,13 +328,13 @@ public:
   Real size() const;
 
   /**
-   * Returns the Frobenius norm of the tensor, i.e. the square-root of
+   * \returns The Frobenius norm of the tensor, i.e. the square-root of
    * the sum of the elements squared.
    */
   Real norm() const;
 
   /**
-   * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
+   * \returns The Frobenius norm of the tensor squared, i.e. sum of the
    * element magnitudes squared.
    *
    * \deprecated Use the norm_sq() function instead.
@@ -318,53 +342,56 @@ public:
   Real size_sq() const;
 
   /**
-   * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
+   * \returns The Frobenius norm of the tensor squared, i.e. sum of the
    * element magnitudes squared.
    */
   Real norm_sq() const;
 
   /**
-   * Returns the determinant of the tensor.  Because these are 3x3
-   * tensors at most, we don't do an LU decomposition like DenseMatrix
-   * does.
+   * \returns The determinant of the tensor.
+   *
+   * Because these are 3x3 tensors at most, we don't do an LU
+   * decomposition like DenseMatrix does.
    */
   T det() const;
 
   /**
-   * Returns the trace of the tensor.
+   * \returns The trace of the tensor.
    */
   T tr() const;
 
   /**
-   * Zero the tensor in any dimension.
+   * Set all entries of the tensor to 0.
    */
   void zero();
 
   /**
-   * \returns \p true if two tensors are equal valued.
+   * \returns \p true if two tensors are equal, \p false otherwise.
    */
   bool operator == (const TypeTensor<T> & rhs) const;
 
   /**
-   * \returns \p true if this tensor is "less"
-   * than another.  Useful for sorting.
+   * \returns \p true if this tensor is "less" than another.  Useful
+   * for sorting.
    */
   bool operator < (const TypeTensor<T> & rhs) const;
 
   /**
-   * \returns \p true if this tensor is "greater"
-   * than another.
+   * \returns \p true if this tensor is "greater" than another.
    */
   bool operator > (const TypeTensor<T> & rhs) const;
 
   /**
-   * Formatted print, by default to \p libMesh::out.
+   * Formatted print to a stream which defaults to \p libMesh::out.
    */
   void print(std::ostream & os = libMesh::out) const;
 
   /**
-   * Formatted print as above but allows you to do
+   * Formatted print as above but supports the syntax:
+   *
+   * \code
    * std::cout << t << std::endl;
+   * \endcode
    */
   friend std::ostream & operator << (std::ostream & os, const TypeTensor<T> & t)
   {
@@ -378,7 +405,7 @@ public:
    */
   void write_unformatted (std::ostream & out, const bool newline = true) const;
 
-  // protected:
+protected:
 
   /**
    * The coordinates of the \p TypeTensor
@@ -397,7 +424,7 @@ public:
     _tensor(&tensor), _j(j) {}
 
   /**
-   * Return a writeable reference to the \f$ i,this \f$ element of the
+   * \returns A writable reference to the \f$ i,this \f$ element of the
    * tensor.
    */
   T & operator () (const unsigned int i)

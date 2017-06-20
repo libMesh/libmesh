@@ -103,9 +103,11 @@ public:
   virtual int get_total_linear_iterations() libmesh_override;
 
   /**
-   * If called *during* the solve(), for example by the user-specified
-   * residual or Jacobian function, returns the current nonlinear iteration
-   * number.  Not currently implemented.
+   * \returns The current nonlinear iteration number if called
+   * *during* the solve(), for example by the user-specified residual
+   * or Jacobian function.
+   *
+   * \note Not currently implemented for the NoxNonlinearSolver.
    */
   virtual unsigned get_current_nonlinear_iteration_number() const libmesh_override
   { libmesh_not_implemented(); return 0; }

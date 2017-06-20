@@ -67,7 +67,7 @@ public:
   typedef ImplicitSystem sys_type;
 
   /**
-   * \returns a clever pointer to the system.
+   * \returns A reference to *this.
    */
   sys_type & system () { return *this; }
 
@@ -91,13 +91,13 @@ public:
   /**
    * Prepares \p matrix and \p rhs for system assembly, then calls
    * user assembly function.
-   * Can be overloaded in derived classes.
+   * Can be overridden in derived classes.
    */
   virtual void assemble () libmesh_override;
 
   /**
    * Avoids use of any cached data that might affect any solve result.  Should
-   * be overloaded in derived systems.
+   * be overridden in derived systems.
    */
   virtual void disable_cache () libmesh_override;
 
@@ -108,7 +108,7 @@ public:
   virtual std::string system_type () const libmesh_override { return "Implicit"; }
 
   /**
-   * Returns a pointer to a linear solver appropriate for use in
+   * \returns A pointer to a linear solver appropriate for use in
    * adjoint and/or sensitivity solves
    *
    * This function must be overridden in derived classes, since this
@@ -124,7 +124,7 @@ public:
   virtual LinearSolver<Number> * get_linear_solver() const;
 
   /**
-   * Returns an integer corresponding to the upper iteration count
+   * \returns An integer corresponding to the upper iteration count
    * limit and a Real corresponding to the convergence tolerance to
    * be used in linear adjoint and/or sensitivity solves
    */
@@ -163,7 +163,7 @@ public:
    * -(partial R / partial p_i), making them ready to solve
    * the forward sensitivity equation.
    *
-   * Can be overloaded in derived classes.
+   * Can be overridden in derived classes.
    */
   virtual void assemble_residual_derivatives (const ParameterVector & parameters) libmesh_override;
 
@@ -171,7 +171,7 @@ public:
    * Assembles & solves the linear system(s) (dR/du)*u_p = -dR/dp, for
    * those parameters contained within \p parameters.
    *
-   * Returns a pair with the total number of linear iterations
+   * \returns A pair with the total number of linear iterations
    * performed and the (sum of the) final residual norms
    */
   virtual std::pair<unsigned int, Real>
@@ -182,7 +182,7 @@ public:
    * those parameters p contained within \p parameters weighted by the
    * values w_p found within \p weights.
    *
-   * Returns a pair with the total number of linear iterations
+   * \returns A pair with the total number of linear iterations
    * performed and the (sum of the) final residual norms
    */
   virtual std::pair<unsigned int, Real>
@@ -195,7 +195,7 @@ public:
    *
    * Leave \p qoi_indices empty to solve all adjoint problems.
    *
-   * Returns a pair with the total number of linear iterations
+   * \returns A pair with the total number of linear iterations
    * performed and the (sum of the) final residual norms
    */
   virtual std::pair<unsigned int, Real>
@@ -210,7 +210,7 @@ public:
    * Assumes that adjoint_solve has already calculated z for each qoi
    * in \p qoi_indices.
    *
-   * Returns a pair with the total number of linear iterations
+   * \returns A pair with the total number of linear iterations
    * performed and the (sum of the) final residual norms
    */
   virtual std::pair<unsigned int, Real>
@@ -298,37 +298,41 @@ public:
   bool have_matrix (const std::string & mat_name) const;
 
   /**
-   * \returns a const pointer to this system's additional matrix
-   * named \p mat_name, or returns \p NULL if no matrix by that name
+   * \returns A const pointer to this system's additional matrix
+   * named \p mat_name, or \p NULL if no matrix by that name
    * exists.
    */
   const SparseMatrix<Number> * request_matrix (const std::string & mat_name) const;
 
   /**
-   * \returns a writable pointer to this system's additional matrix
-   * named \p mat_name, or returns \p NULL if no matrix by that name
+   * \returns A writable pointer to this system's additional matrix
+   * named \p mat_name, or \p NULL if no matrix by that name
    * exists.
    */
   SparseMatrix<Number> * request_matrix (const std::string & mat_name);
 
   /**
-   * \returns a const reference to this system's additional matrix
-   * named \p mat_name.  None of these matrices is involved in the
-   * solution process.  Access is only granted when the matrix is already
-   * properly initialized.
+   * \returns A const reference to this system's additional matrix
+   * named \p mat_name.
+   *
+   * None of these matrices is involved in the solution process.
+   * Access is only granted when the matrix is already properly
+   * initialized.
    */
   const SparseMatrix<Number> & get_matrix (const std::string & mat_name) const;
 
   /**
-   * \returns a writeable reference to this system's additional matrix
-   * named \p mat_name.  None of these matrices is involved in the
-   * solution process.  Access is only granted when the matrix is already
-   * properly initialized.
+   * \returns A writable reference to this system's additional matrix
+   * named \p mat_name.
+   *
+   * None of these matrices is involved in the solution process.
+   * Access is only granted when the matrix is already properly
+   * initialized.
    */
   SparseMatrix<Number> & get_matrix (const std::string & mat_name);
 
   /**
-   * \returns the number of matrices handled by this system
+   * \returns The number of matrices handled by this system
    */
   virtual unsigned int n_matrices () const libmesh_override;
 

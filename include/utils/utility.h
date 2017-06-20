@@ -37,16 +37,15 @@ namespace libMesh
 
 namespace Utility
 {
-//-------------------------------------------------------------------
+
 /**
- * The \p system_info function returns information about the system
- * you are running on.
+ * \returns A string containing information about the system you are
+ * running on.
  */
 std::string system_info();
 
 
 
-//-------------------------------------------------------------------
 /**
  * \p Utility::iota is a duplication of the SGI STL extension
  * \p std::iota.  It simply assigns sequentially increasing values
@@ -121,10 +120,13 @@ bool is_sorted(InputIterator first, InputIterator last)
 
 
 /**
- * The STL provides binary_search() which returns true/false depending
- * on whether the searched-for value is found.  Utility::binary_find() uses a
- * binary search on a sorted range to return an iterator to the searched-for
- * element, or "last" if the element is not found.
+ * The STL provides \p std::binary_search() which returns \p true or
+ * \p false depending on whether the searched-for value is found.  In
+ * contrast, Utility::binary_find() uses a std::lower_bound() based
+ * search on a sorted range to find the required value.
+ *
+ * \returns An iterator to the searched-for element, or "last" if the
+ * element is not found.
  */
 template<class ForwardIterator, class T>
 ForwardIterator binary_find(ForwardIterator first, ForwardIterator last, const T & value)
@@ -144,7 +146,6 @@ ForwardIterator binary_find(ForwardIterator first, ForwardIterator last, const T
 }
 
 
-//-------------------------------------------------------------------
 /**
  * An efficient template instantiation for raising
  * to an arbitrary integer power.
@@ -196,7 +197,6 @@ T pow(const T & x)
   return do_pow<N,T>::apply(x);
 }
 
-//-------------------------------------------------------------------
 /**
  * A simple implementation of the factorial.
  */
@@ -237,7 +237,6 @@ T binomial(T n, T k)
 }
 
 
-//-------------------------------------------------------------------
 /**
  * A convenient method to truly empty a vector using the "swap trick"
  */
@@ -248,13 +247,12 @@ void deallocate (std::vector<T> & vec)
 }
 
 
-//-------------------------------------------------------------------
 // Utility functions useful when dealing with complex numbers.
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
 /**
- * \returns for \p r_o_c = 0 the filename for output of the real part
+ * \returns For \p r_o_c = 0 the filename for output of the real part
  * of complex data, and for  \p r_o_c = 1 the filename for the imaginary
  * part.
  */
@@ -272,7 +270,6 @@ void prepare_complex_data (const std::vector<Complex> & source,
 
 
 
-//-------------------------------------------------------------------
 /**
  * This Functor simply takes an object and reverses its byte
  * representation.  This is useful for changing endian-ness
@@ -302,7 +299,7 @@ public:
 private:
 
   /**
-   * Returns the value of the reverse flag.
+   * \returns The value of the reverse flag.
    */
   bool reverse () const { return _do_reverse; }
 
@@ -314,7 +311,6 @@ private:
 
 
 
-//---------------------------------------------------------
 // ReverseBytes inline members
 inline
 ReverseBytes::ReverseBytes (const bool rb) :

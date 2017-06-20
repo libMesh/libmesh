@@ -100,7 +100,7 @@ public:
 protected:
 
   /**
-   * \returns the spectral polynomial basis function values at a point (x,y,z).
+   * \returns The spectral polynomial basis function values at a point (x,y,z).
    */
   static std::vector<Real> specpoly(const unsigned int dim,
                                     const Order order,

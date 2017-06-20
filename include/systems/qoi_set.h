@@ -124,7 +124,7 @@ public:
   void clear() { _indices.clear(); _weights.clear(); }
 
   /**
-   * Returns the number of QoIs that would be computed for the
+   * \returns The number of QoIs that would be computed for the
    * System \p sys
    */
   unsigned int size(const System & sys) const;

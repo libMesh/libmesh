@@ -114,7 +114,7 @@ public:
   const BoundaryInfo & get_boundary_info() const { return *boundary_info; }
 
   /**
-   * Writeable information about boundary ids on the mesh
+   * Writable information about boundary ids on the mesh
    */
   BoundaryInfo & get_boundary_info() { return *boundary_info; }
 
@@ -172,7 +172,7 @@ public:
   virtual void delete_remote_elements () {}
 
   /**
-   * \returns the logical dimension of the mesh; i.e. the manifold
+   * \returns The logical dimension of the mesh; i.e. the manifold
    * dimension of the elements in the mesh.  If we ever support
    * multi-dimensional meshes (e.g. hexes and quads in the same mesh)
    * then this will return the largest such dimension.
@@ -190,7 +190,8 @@ public:
   { _elem_dims.clear(); _elem_dims.insert(d); }
 
   /**
-   * \returns set of dimensions of elements present in the mesh.
+   * \returns A const reference to a std::set of element dimensions
+   * present in the mesh.
    */
   const std::set<unsigned char> & elem_dimensions() const
   { return _elem_dims; }
@@ -242,11 +243,11 @@ public:
   /**
    * \returns The number of nodes in the mesh.
    *
-   * This function and others must be defined in derived classes since
+   * This function and others must be overridden in derived classes since
    * the MeshBase class has no specific storage for nodes or elements.
-   * The \p parallel_n_nodes() function returns a newly calculated
-   * parallel-synchronized value on distributed meshes, and so must be
-   * called in parallel only.
+   * The \p parallel_n_nodes() function computes a parallel-synchronized
+   * value on distributed meshes, and so must be called in parallel
+   * only.
    */
   virtual dof_id_type parallel_n_nodes () const = 0;
 
@@ -295,7 +296,7 @@ public:
   virtual void reserve_nodes (const dof_id_type nn) = 0;
 
   /**
-   * \returns the number of elements in the mesh.
+   * \returns The number of elements in the mesh.
    *
    * The standard n_elem() function may return a cached value on
    * distributed meshes, and so can be called by any processor at any
@@ -306,9 +307,9 @@ public:
   /**
    * \returns The number of elements in the mesh.
    *
-   * The parallel_n_elem() function returns a newly calculated
-   * parallel-synchronized value on distributed meshes, and so must be
-   * called in parallel only.
+   * The parallel_n_elem() function computes a parallel-synchronized
+   * value on distributed meshes, and so must be called in parallel
+   * only.
    */
   virtual dof_id_type parallel_n_elem () const = 0;
 
@@ -328,6 +329,7 @@ public:
 
   /**
    * Reserves space for a known number of elements.
+   *
    * Note that this method may or may not do anything, depending
    * on the actual \p Mesh implementation.  If you know the number
    * of elements you will add and call this method before repeatedly
@@ -448,7 +450,7 @@ public:
   virtual const Node * node_ptr (const dof_id_type i) const = 0;
 
   /**
-   * \returns A writeable pointer to the \f$ i^{th} \f$ node, which
+   * \returns A writable pointer to the \f$ i^{th} \f$ node, which
    * should be present in this processor's subset of the mesh data
    * structure.
    */
@@ -461,7 +463,7 @@ public:
   virtual const Node * query_node_ptr (const dof_id_type i) const = 0;
 
   /**
-   * \returns A writeable pointer to the \f$ i^{th} \f$ node, or \p NULL if
+   * \returns A writable pointer to the \f$ i^{th} \f$ node, or \p NULL if
    * no such node exists in this processor's mesh data structure.
    */
   virtual Node * query_node_ptr (const dof_id_type i) = 0;
@@ -475,7 +477,7 @@ public:
   }
 
   /**
-   * \returns A writeable reference to the \f$ i^{th} \f$ element, which
+   * \returns A writable reference to the \f$ i^{th} \f$ element, which
    * should be present in this processor's subset of the mesh data
    * structure.
    */
@@ -490,7 +492,7 @@ public:
   virtual const Elem * elem_ptr (const dof_id_type i) const = 0;
 
   /**
-   * \returns A writeable pointer to the \f$ i^{th} \f$ element, which
+   * \returns A writable pointer to the \f$ i^{th} \f$ element, which
    * should be present in this processor's subset of the mesh data
    * structure.
    */
@@ -509,7 +511,7 @@ public:
   }
 
   /**
-   * \returns A writeable pointer to the \f$ i^{th} \f$ element, which
+   * \returns A writable pointer to the \f$ i^{th} \f$ element, which
    * should be present in this processor's subset of the mesh data
    * structure.
    *
@@ -528,7 +530,7 @@ public:
   virtual const Elem * query_elem_ptr (const dof_id_type i) const = 0;
 
   /**
-   * \returns A writeable pointer to the \f$ i^{th} \f$ element, or NULL
+   * \returns A writable pointer to the \f$ i^{th} \f$ element, or NULL
    * if no such element exists in this processor's mesh data structure.
    */
   virtual Elem * query_elem_ptr (const dof_id_type i) = 0;
@@ -546,7 +548,7 @@ public:
   }
 
   /**
-   * \returns A writeable pointer to the \f$ i^{th} \f$ element, or NULL
+   * \returns A writable pointer to the \f$ i^{th} \f$ element, or NULL
    * if no such element exists in this processor's mesh data structure.
    *
    * \deprecated Use the less confusingly-named query_elem_ptr() instead.
@@ -805,7 +807,7 @@ public:
   { return _n_parts; }
 
   /**
-   * \returns a string containing relevant information
+   * \returns A string containing relevant information
    * about the mesh.
    */
   std::string get_info () const;
@@ -957,7 +959,7 @@ public:
   virtual const_element_iterator elements_end () const = 0;
 
   /**
-   * Iterate over elements for which elem->ancestor() returns true.
+   * Iterate over elements for which elem->ancestor() is true.
    */
   virtual element_iterator ancestor_elements_begin () = 0;
   virtual element_iterator ancestor_elements_end () = 0;
@@ -965,7 +967,7 @@ public:
   virtual const_element_iterator ancestor_elements_end () const = 0;
 
   /**
-   * Iterate over elements for which elem->subactive() returns true.
+   * Iterate over elements for which elem->subactive() is true.
    */
   virtual element_iterator subactive_elements_begin () = 0;
   virtual element_iterator subactive_elements_end () = 0;
@@ -973,7 +975,7 @@ public:
   virtual const_element_iterator subactive_elements_end () const = 0;
 
   /**
-   * Iterate over elements for which elem->is_semilocal() returns true for the current processor.
+   * Iterate over elements for which elem->is_semilocal() is true for the current processor.
    */
   virtual element_iterator semilocal_elements_begin () = 0;
   virtual element_iterator semilocal_elements_end () = 0;
@@ -1208,7 +1210,7 @@ public:
   virtual const_node_iterator pid_nodes_end (processor_id_type proc_id) const = 0;
 
   /**
-   * Iterate over nodes for which BoundaryInfo::has_boundary_id(node, bndry_id) returns true.
+   * Iterate over nodes for which BoundaryInfo::has_boundary_id(node, bndry_id) is true.
    */
   virtual node_iterator bid_nodes_begin (boundary_id_type bndry_id) = 0;
   virtual node_iterator bid_nodes_end (boundary_id_type bndry_id) = 0;
@@ -1245,7 +1247,7 @@ public:
                        unsigned int var_num = libMesh::invalid_uint) const = 0;
 
   /**
-   * \returns A writeable reference to the whole subdomain name map
+   * \returns A writable reference to the whole subdomain name map
    */
   std::map<subdomain_id_type, std::string> & set_subdomain_name_map ()
   { return _block_id_to_name; }
@@ -1281,7 +1283,7 @@ public:
 protected:
 
   /**
-   * \returns A writeable reference to the number of partitions.
+   * \returns A writable reference to the number of partitions.
    */
   unsigned int & set_n_partitions ()
   { return _n_parts; }

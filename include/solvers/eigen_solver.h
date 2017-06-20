@@ -76,7 +76,7 @@ public:
                                           const SolverPackage solver_package = SLEPC_SOLVERS);
 
   /**
-   * \returns true if the data structures are
+   * \returns \p true if the data structures are
    * initialized, false otherwise.
    */
   bool initialized () const { return _is_initialized; }
@@ -93,17 +93,17 @@ public:
   virtual void init () = 0;
 
   /**
-   * Returns the type of eigensolver to use.
+   * \returns The type of eigensolver to use.
    */
   EigenSolverType eigen_solver_type () const { return _eigen_solver_type; }
 
   /**
-   * Returns the type of the eigen problem.
+   * \returns The type of the eigen problem.
    */
   EigenProblemType eigen_problem_type () const { return _eigen_problem_type;}
 
   /**
-   * Returns the position of the spectrum to compute.
+   * \returns The position of the spectrum to compute.
    */
   PositionOfSpectrum position_of_spectrum () const
   { return _position_of_spectrum;}
@@ -130,9 +130,10 @@ public:
   void set_position_of_spectrum (Real pos, PositionOfSpectrum target);
 
   /**
-   * Solves the standard eigen problem when matrix_A is a
-   * \p SparseMatrix, and returns the number of converged
-   * eigenpairs and the number of iterations.
+   * Solves the standard eigenproblem involving the SparseMatrix \p matrix_A.
+   *
+   * \returns The number of converged eigenpairs and the number of
+   * iterations.
    */
   virtual std::pair<unsigned int, unsigned int> solve_standard (SparseMatrix<T> & matrix_A,
                                                                 int nev,
@@ -141,9 +142,10 @@ public:
                                                                 const unsigned int m_its) = 0;
 
   /**
-   * Solves the standard eigen problem when matrix_A is a
-   * \p ShellMatrix, and returns the number of converged
-   * eigenpairs and the number of iterations.
+   * Solves the standard eigenproblem involving the ShellMatrix \p matrix_A.
+   *
+   * \returns The number of converged eigenpairs and the number of
+   * iterations.
    */
   virtual std::pair<unsigned int, unsigned int> solve_standard (ShellMatrix<T> & matrix_A,
                                                                 int nev,
@@ -153,10 +155,11 @@ public:
 
 
   /**
-   * Solves the generalized eigen problem when both matrix_A
-   * and matrix_B are of type \p SparseMatrix and returns the
-   * number of converged eigenpairs and the number
-   * of iterations.
+   * Solves the generalized eigenproblem involving SparseMatrices \p matrix_A
+   * and \p matrix_B.
+   *
+   * \returns The number of converged eigenpairs and the number of
+   * iterations.
    */
   virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> & matrix_A,
                                                                    SparseMatrix<T> & matrix_B,
@@ -166,8 +169,11 @@ public:
                                                                    const unsigned int m_its) = 0;
 
   /**
-   * Solves the generalized eigen problem when matrix_A is
-   * a ShellMatrix and matrix_B is a SparseMatrix.
+   * Solves the generalized eigenproblem with ShellMatrix \p matrix_A
+   * and SparseMatrix \p matrix_B.
+   *
+   * \returns The number of converged eigenpairs and the number of
+   * iterations.
    */
   virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> & matrix_A,
                                                                    SparseMatrix<T> & matrix_B,
@@ -177,8 +183,11 @@ public:
                                                                    const unsigned int m_its) = 0;
 
   /**
-   * Solves the generalized eigen problem when matrix_A is
-   * a SparseMatrix and matrix_B is a ShellMatrix.
+   * Solves the generalized eigenproblem with SparseMatrix \p matrix_A
+   * and ShellMatrix \p matrix_B.
+   *
+   * \returns The number of converged eigenpairs and the number of
+   * iterations.
    */
   virtual std::pair<unsigned int, unsigned int> solve_generalized (SparseMatrix<T> & matrix_A,
                                                                    ShellMatrix<T> & matrix_B,
@@ -188,8 +197,11 @@ public:
                                                                    const unsigned int m_its) = 0;
 
   /**
-   * Solves the generalized eigen problem when both matrix_A
-   * and matrix_B are of type ShellMatrix.
+   * Solves the generalized eigenproblem involving ShellMatrices \p
+   * matrix_A and \p matrix_B.
+   *
+   * \returns The number of converged eigenpairs and the number of
+   * iterations.
    */
   virtual std::pair<unsigned int, unsigned int> solve_generalized (ShellMatrix<T> & matrix_A,
                                                                    ShellMatrix<T> & matrix_B,
@@ -200,15 +212,16 @@ public:
 
 
   /**
-   * Returns the \p ith eigenvalue (real and imaginary part),
-   * and copies the \ ith eigen vector to the solution vector.
+   * \returns The \p ith eigenvalue (real and imaginary part),
+   * and copies the \p ith eigenvector into the \p solution vector.
    */
   virtual std::pair<Real, Real> get_eigenpair (dof_id_type i,
                                                NumericVector<T> & solution) = 0;
 
   /**
-   * Returns the \p ith eigenvalue (real and imaginary part).
-   * Same as above function, except it does copy the eigenvector.
+   * \returns The \p ith eigenvalue (real and imaginary part).
+   *
+   * Same as above function, except it does not copy the eigenvector.
    */
   virtual std::pair<Real, Real> get_eigenvalue (dof_id_type i) = 0;
 

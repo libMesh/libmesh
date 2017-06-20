@@ -102,36 +102,36 @@ protected:
   public:
 
     /**
-     * \returns the decay in the radial direction of
+     * \returns The decay in the radial direction of
      * the \p Dim dimensional infinite element.
      */
     static Real decay (const Real v);
 
     /**
-     * \returns the first (local) derivative of the
+     * \returns The first (local) derivative of the
      * decay in radial direction of the infinite element.
      */
     static Real decay_deriv (const Real) { return -.5; }
 
     /**
-     * \returns the radial weight D, used as an additional weight
+     * \returns The radial weight D, used as an additional weight
      * for the test function, evaluated at local radial coordinate \p v.
      */
     static Real D (const Real v) { return (1.-v)*(1.-v)/4.; }
 
     /**
-     * \returns the first (local) radial derivative of the radial weight D.
+     * \returns The first (local) radial derivative of the radial weight D.
      */
     static Real D_deriv (const Real v) { return (v-1.)/2.; }
 
     /**
-     * \returns the Order of the mapping functions
+     * \returns The Order of the mapping functions
      * in the radial direction. Currently, this is always \p FIRST.
      */
     static Order mapping_order() { return FIRST; }
 
     /**
-     * \returns the number of shape functions in radial direction
+     * \returns The number of shape functions in radial direction
      * associated with this infinite element.
      * Either way, if the modes are stored as nodal dofs (\p n_dofs_at_node)
      * or as element dofs (\p n_dofs_per_elem), in each case we have the
@@ -146,7 +146,7 @@ protected:
     { return static_cast<unsigned int>(o_radial)+1; }
 
     /**
-     * \returns the number of dofs in radial direction on "onion slice"
+     * \returns The number of dofs in radial direction on "onion slice"
      * \p n (either 0 or 1) for an infinite element of type \p inf_elem_type and
      * radial order \p o_radial.
      *
@@ -158,7 +158,7 @@ protected:
                                         const unsigned int n_onion);
 
     /**
-     * \returns the number of modes in radial direction interior to the element,
+     * \returns The number of modes in radial direction interior to the element,
      * not associated with any interior nodes.
      * Note that these modes are a discontinuous approximation, therefore
      * we have no special formulation for coupling in the base, like in the
@@ -198,14 +198,14 @@ protected:
     static Elem * build_elem (const Elem * inf_elem);
 
     /**
-     * \returns the base element associated to
+     * \returns The base element associated to
      * \p type.  This is, for example, \p TRI3 for
      * \p INFPRISM6.
      */
     static ElemType get_elem_type (const ElemType type);
 
     /**
-     * \returns the number of shape functions used in the
+     * \returns The number of shape functions used in the
      * mapping in the base element of type \p base_elem_type
      * mapped with order \p base_mapping_order
      */
@@ -244,7 +244,7 @@ public:
   // The static public members for access from FEInterface etc
 
   /**
-   * \returns the value of the \f$ i^{th} \f$ shape function at
+   * \returns The value of the \f$ i^{th} \f$ shape function at
    * point \p p.  This method lets you specify the relevant
    * data directly, and is therefore allowed to be static.
    * Note that this class member is by far not as efficient as
@@ -260,7 +260,7 @@ public:
                     const Point & p);
 
   /**
-   * \returns the value of the \f$ i^{th} \f$ shape function at
+   * \returns The value of the \f$ i^{th} \f$ shape function at
    * point \p p.  This method lets you specify the relevant
    * data directly, and is therefore allowed to be static.
    * Note that this class member is not as efficient as its
@@ -289,7 +289,7 @@ public:
                            FEComputeData & data);
 
   /**
-   * \returns the number of shape functions associated with
+   * \returns The number of shape functions associated with
    * a finite element of type \p t and approximation order \p o.
    */
   static unsigned int n_shape_functions (const FEType & fet,
@@ -297,7 +297,7 @@ public:
   { return n_dofs(fet, t); }
 
   /**
-   * \returns the number of shape functions associated with this
+   * \returns The number of shape functions associated with this
    * infinite element.  Currently, we have \p o_radial+1 modes in
    * radial direction, and \code FE<Dim-1,T>::n_dofs(...) \endcode
    * in the base.
@@ -306,7 +306,7 @@ public:
                              const ElemType inf_elem_type);
 
   /**
-   * \returns the number of dofs at infinite element node \p n
+   * \returns The number of dofs at infinite element node \p n
    * (not dof!) for an element of type \p t and order \p o.
    */
   static unsigned int n_dofs_at_node(const FEType & fet,
@@ -314,20 +314,20 @@ public:
                                      const unsigned int n);
 
   /**
-   * \returns the number of dofs interior to the element,
+   * \returns The number of dofs interior to the element,
    * not associated with any interior nodes.
    */
   static unsigned int n_dofs_per_elem(const FEType & fet,
                                       const ElemType inf_elem_type);
 
   /**
-   * \returns the continuity of the element.
+   * \returns The continuity of the element.
    */
   virtual FEContinuity get_continuity() const libmesh_override
   { return C_ZERO; }  // FIXME - is this true??
 
   /**
-   * \returns true if the element's higher order shape functions are
+   * \returns \p true if the element's higher order shape functions are
    * hierarchic
    */
   virtual bool is_hierarchic() const libmesh_override
@@ -346,14 +346,14 @@ public:
                          std::vector<Number> & nodal_soln);
 
   /**
-   * \returns the location (in physical space) of the point
+   * \returns The location (in physical space) of the point
    * \p p located on the reference element.
    */
   static Point map (const Elem * inf_elem,
                     const Point & reference_point);
 
   /**
-   * \returns the location (on the reference element) of the
+   * \returns The location (on the reference element) of the
    * point \p p located in physical space.  First, the location
    * in the base face is computed. This requires inverting the
    * (possibly nonlinear) transformation map in the base, so it is
@@ -447,14 +447,14 @@ public:
   virtual void attach_quadrature_rule (QBase * q) libmesh_override;
 
   /**
-   * \returns the number of shape functions associated with
+   * \returns The number of shape functions associated with
    * this infinite element.
    */
   virtual unsigned int n_shape_functions () const libmesh_override
   { return _n_total_approx_sf; }
 
   /**
-   * \returns the total number of quadrature points.  Call this
+   * \returns The total number of quadrature points.  Call this
    * to get an upper bound for the \p for loop in your simulation
    * for matrix assembly of the current element.
    */
@@ -467,7 +467,7 @@ protected:
   // static members used by the workhorses
 
   /**
-   * \returns the value of the \f$ i^{th} \f$ polynomial evaluated
+   * \returns The value of the \f$ i^{th} \f$ polynomial evaluated
    * at \p v.  This method provides the approximation
    * in radial direction for the overall shape functions,
    * which is defined in \p InfFE::shape().
@@ -487,7 +487,7 @@ protected:
                    unsigned int i);
 
   /**
-   * \returns the value of the first derivative of the
+   * \returns The value of the first derivative of the
    * \f$ i^{th} \f$ polynomial at coordinate \p v.
    * See \p eval for details.
    */
@@ -556,7 +556,6 @@ protected:
    * should barely be re-defined in derived classes, but
    * still should be usable for children. Therefore, keep
    * it protected.
-   * Overloaded method from the \p FEBase version.
    */
   virtual void compute_shape_functions(const Elem *, const std::vector<Point> &) libmesh_override;
 

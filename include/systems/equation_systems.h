@@ -99,7 +99,7 @@ public:
   virtual ~EquationSystems ();
 
   /**
-   * Returns tha data structure to a pristine state.
+   * Restores the data structure to a pristine state.
    */
   virtual void clear ();
 
@@ -119,18 +119,18 @@ public:
   void update ();
 
   /**
-   * \returns the number of equation systems.
+   * \returns The number of equation systems.
    */
   unsigned int n_systems() const;
 
   /**
-   * \returns true if the system named \p name exists within
+   * \returns \p true if the system named \p name exists within
    * this EquationSystems object.
    */
   bool has_system (const std::string & name) const;
 
   /**
-   * \returns a constant reference to the system named \p name.
+   * \returns A constant reference to the system named \p name.
    * The template argument defines the return type.  For example,
    * const SteadySystem & sys = eq.get_system<SteadySystem> ("sys");
    * is an example of how the method might be used
@@ -139,7 +139,7 @@ public:
   const T_sys & get_system (const std::string & name) const;
 
   /**
-   * \returns a writeable referene to the system named \p name.
+   * \returns A writable referene to the system named \p name.
    * The template argument defines the return type.  For example,
    * const SteadySystem & sys = eq.get_system<SteadySystem> ("sys");
    * is an example of how the method might be used
@@ -148,7 +148,7 @@ public:
   T_sys & get_system (const std::string & name);
 
   /**
-   * \returns a constant reference to system number \p num.
+   * \returns A constant reference to system number \p num.
    * The template argument defines the return type.  For example,
    * const SteadySystem & sys = eq.get_system<SteadySystem> (0);
    * is an example of how the method might be used
@@ -157,7 +157,7 @@ public:
   const T_sys & get_system (const unsigned int num) const;
 
   /**
-   * \returns a writeable referene to the system number \p num.
+   * \returns A writable referene to the system number \p num.
    * The template argument defines the return type.  For example,
    * const SteadySystem & sys = eq.get_system<SteadySystem> (0);
    * is an example of how the method might be used
@@ -166,22 +166,22 @@ public:
   T_sys & get_system (const unsigned int num);
 
   /**
-   * \returns a constant reference to the system named \p name.
+   * \returns A constant reference to the system named \p name.
    */
   const System & get_system (const std::string & name) const;
 
   /**
-   * \returns a writeable referene to the system named \p name.
+   * \returns A writable referene to the system named \p name.
    */
   System & get_system (const std::string & name);
 
   /**
-   * \returns a constant reference to system number \p num.
+   * \returns A constant reference to system number \p num.
    */
   const System & get_system (const unsigned int num) const;
 
   /**
-   * \returns a writeable referene to the system number \p num.
+   * \returns A writable referene to the system number \p num.
    */
   System & get_system (const unsigned int num);
 
@@ -209,19 +209,19 @@ public:
   void delete_system (const std::string & name);
 
   /**
-   * \returns the total number of variables in all
+   * \returns The total number of variables in all
    * systems.
    */
   unsigned int n_vars () const;
 
   /**
-   * \returns the total number of degrees of freedom
+   * \returns The total number of degrees of freedom
    * in all systems.
    */
   std::size_t n_dofs () const;
 
   /**
-   * Returns the number of active degrees of freedom
+   * \returns The number of active degrees of freedom
    * for the EquationSystems object.
    */
   std::size_t n_active_dofs() const;
@@ -289,10 +289,11 @@ public:
 
   /**
    * A version of build_solution_vector which is appropriate for
-   * "parallel" output formats like Nemesis.  Returns a UniquePtr to a
-   * node-major NumericVector of total length n_nodes*n_vars that
-   * various I/O classes can then use to get the local values they
-   * need to write on each processor.
+   * "parallel" output formats like Nemesis.
+   *
+   * \returns A UniquePtr to a node-major NumericVector of total
+   * length n_nodes*n_vars that various I/O classes can then use to
+   * get the local values they need to write on each processor.
    */
   UniquePtr<NumericVector<Number> >
   build_parallel_solution_vector(const std::set<std::string> * system_names=libmesh_nullptr) const;
@@ -407,7 +408,7 @@ public:
                         const bool verbose) const;
 
   /**
-   * \returns a string containing information about the
+   * \returns A string containing information about the
    * systems, flags, and parameters.
    */
   virtual std::string get_info() const;
@@ -425,12 +426,12 @@ public:
                                      const EquationSystems & es);
 
   /**
-   * \returns a constant reference to the mesh
+   * \returns A constant reference to the mesh
    */
   const MeshBase & get_mesh() const;
 
   /**
-   * \returns a reference to the mesh
+   * \returns A reference to the mesh
    */
   MeshBase & get_mesh();
 
@@ -451,7 +452,7 @@ public:
   void disable_refine_in_reinit() { this->_refine_in_reinit = false; }
 
   /**
-   * \returns whether or not calls to reinit() will try to coarsen/refine the mesh
+   * \returns Whether or not calls to reinit() will try to coarsen/refine the mesh
    **/
   bool refine_in_reinit_flag() { return this->_refine_in_reinit; }
 

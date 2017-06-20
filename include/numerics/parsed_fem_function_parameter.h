@@ -54,7 +54,7 @@ public:
    * The restrictions of get_inline_value() and set_inline_value()
    * in ParsedFEMFunction apply to this interface as well.
    *
-   * Note that *only* the function referred to here is changed by
+   * \note Only the function referred to here is changed by
    * set() - any clones of the function which precede the set()
    * remain at their previous values.
    */
@@ -63,7 +63,7 @@ public:
     _func(func_ref), _name(param_name) {}
 
   /**
-   * A simple reseater won't work with a parsed function
+   * A simple reseater won't work with a parsed function.
    */
   virtual ParameterAccessor<T> &
   operator= (T * /* new_ptr */) { libmesh_error(); return *this; }
@@ -76,7 +76,7 @@ public:
   }
 
   /**
-   * Getter: get the value of the parameter we access.
+   * \returns A constant reference to the value of the parameter we access.
    */
   virtual const T & get () const {
     _current_val = _func.get_inline_value(_name);
@@ -84,7 +84,7 @@ public:
   }
 
   /**
-   * Returns a new copy of the accessor.
+   * \returns A new copy of the accessor.
    */
   virtual UniquePtr<ParameterAccessor<T> > clone() const {
     return UniquePtr<ParameterAccessor<T> >

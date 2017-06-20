@@ -35,11 +35,14 @@
 // Anonymous namespace for utility functions used locally
 namespace
 {
-// Rotate x by k bits
-// \author Bob Jenkins
-// \date May 2006
-// \copyright Public Domain
-// http://burtleburtle.net/bob/hash/index.html
+/**
+ * Rotate x by k bits.
+ *
+ * \author Bob Jenkins
+ * \date May 2006
+ * \copyright Public Domain
+ * http://burtleburtle.net/bob/hash/index.html
+ */
 inline
 uint32_t rot(uint32_t x, uint32_t k)
 {
@@ -48,11 +51,14 @@ uint32_t rot(uint32_t x, uint32_t k)
 
 
 
-// mix 3 32-bit values reversibly
-// \author Bob Jenkins
-// \date May 2006
-// \copyright Public Domain
-// http://burtleburtle.net/bob/hash/index.html
+/**
+ * Mix 3 32-bit values reversibly.
+ *
+ * \author Bob Jenkins
+ * \date May 2006
+ * \copyright Public Domain
+ * http://burtleburtle.net/bob/hash/index.html
+ */
 inline
 void mix(uint32_t & a, uint32_t & b, uint32_t & c)
 {
@@ -65,11 +71,14 @@ void mix(uint32_t & a, uint32_t & b, uint32_t & c)
 }
 
 
-// 'final' mixing of 3 32-bit numbers, result is stored in c.
-// \author Bob Jenkins
-// \date May 2006
-// \copyright Public Domain
-// http://burtleburtle.net/bob/hash/index.html
+/**
+ * Perform a "final" mixing of 3 32-bit numbers, result is stored in c.
+ *
+ * \author Bob Jenkins
+ * \date May 2006
+ * \copyright Public Domain
+ * http://burtleburtle.net/bob/hash/index.html
+ */
 inline
 void final(uint32_t & a, uint32_t & b, uint32_t & c)
 {
@@ -83,20 +92,20 @@ void final(uint32_t & a, uint32_t & b, uint32_t & c)
 }
 
 
-// fnv_64_buf - perform a 64 bit Fowler/Noll/Vo hash on a buffer.
-// http://www.isthe.com/chongo/tech/comp/fnv/index.html
-// Code is in the public domain.
-//
-// Authors:
-// Phong Vo (http://www.research.att.com/info/kpv/)
-// Glenn Fowler (http://www.research.att.com/~gsf/)
-// Landon Curt Noll (http://www.isthe.com/chongo/)
-//
-// input:
-// buf - start of buffer to hash
-// len - length of buffer in octets
-//
-// returns: 64 bit hash as a static hash type
+/**
+ * fnv_64_buf - perform a 64 bit Fowler/Noll/Vo hash on a buffer.
+ * http://www.isthe.com/chongo/tech/comp/fnv/index.html
+ *
+ * \author Phong Vo (http://www.research.att.com/info/kpv/)
+ * \author Glenn Fowler (http://www.research.att.com/~gsf/)
+ * \author Landon Curt Noll (http://www.isthe.com/chongo/)
+ * \date 1991, 2012
+ * \copyright Public Domain
+ *
+ * \param buf start of buffer to hash
+ * \param len length of buffer in octets
+ * \returns 64 bit hash as a static hash type
+ */
 uint64_t fnv_64_buf(const void * buf, size_t len)
 {
   // Initializing hval with this value corresponds to the FNV-1 hash algorithm.
@@ -131,12 +140,15 @@ namespace libMesh
 {
 namespace Utility
 {
-// The hashword function takes an array of uint32_t's of length 'length'
-// and computes a single key from it.
-// \author Bob Jenkins
-// \date May 2006
-// \copyright Public Domain
-// http://burtleburtle.net/bob/hash/index.html
+/**
+ * The hashword function takes an array of uint32_t's of length 'length'
+ * and computes a single key from it.
+ *
+ * \author Bob Jenkins
+ * \date May 2006
+ * \copyright Public Domain
+ * http://burtleburtle.net/bob/hash/index.html
+ */
 inline
 uint32_t hashword(const uint32_t * k, size_t length, uint32_t initval=0)
 {
@@ -173,18 +185,24 @@ uint32_t hashword(const uint32_t * k, size_t length, uint32_t initval=0)
 
 
 
-// Calls function above with slightly more convenient std::vector interface.
+/**
+ * Calls function above with slightly more convenient std::vector interface.
+ */
 inline
 uint32_t hashword(const std::vector<uint32_t> & keys, uint32_t initval=0)
 {
   return hashword(&keys[0], keys.size(), initval);
 }
 
-// This is a hard-coded version of hashword for hashing exactly 2 numbers
-// \author Bob Jenkins
-// \date May 2006
-// \copyright Public Domain
-// http://burtleburtle.net/bob/hash/index.html
+
+/**
+ * This is a hard-coded version of hashword for hashing exactly 2 numbers.
+ *
+ * \author Bob Jenkins
+ * \date May 2006
+ * \copyright Public Domain
+ * http://burtleburtle.net/bob/hash/index.html
+ */
 inline
 uint32_t hashword2(const uint32_t & first, const uint32_t & second, uint32_t initval=0)
 {
@@ -200,7 +218,9 @@ uint32_t hashword2(const uint32_t & first, const uint32_t & second, uint32_t ini
   return c;
 }
 
-// Call the 64-bit FNV hash function.
+/**
+ * Call the 64-bit FNV hash function.
+ */
 inline
 uint64_t hashword2(const uint64_t first, const uint64_t second)
 {
@@ -219,7 +239,9 @@ uint16_t hashword2(const uint16_t first, const uint16_t second)
   return static_cast<uint16_t>(first%65449 + (second<<5)%65449);
 }
 
-// Call the 64-bit FNV hash function.
+/**
+ * Call the 64-bit FNV hash function.
+ */
 inline
 uint64_t hashword(const uint64_t * k, size_t length)
 {
@@ -228,17 +250,21 @@ uint64_t hashword(const uint64_t * k, size_t length)
 
 
 
-// Calls function above with slightly more convenient std::vector interface.
+/**
+ * Calls function above with slightly more convenient std::vector interface.
+ */
 inline
 uint64_t hashword(const std::vector<uint64_t> & keys)
 {
   return hashword(&keys[0], keys.size());
 }
 
-// In a personal communication from Bob Jenkins, he recommended using
-// "Probably final() from lookup3.c... You could hash up to 6 16-bit
-// integers that way.  The output is c, or the top or bottom 16 bits
-// of c if you only need 16 bit hash values." [JWP]
+/**
+ * In a personal communication from Bob Jenkins, he recommended using
+ * "Probably final() from lookup3.c... You could hash up to 6 16-bit
+ * integers that way.  The output is c, or the top or bottom 16 bits
+ * of c if you only need 16 bit hash values." [JWP]
+ */
 inline
 uint16_t hashword(const uint16_t * k, size_t length)
 {
@@ -275,7 +301,9 @@ uint16_t hashword(const uint16_t * k, size_t length)
 }
 
 
-// Calls function above with slightly more convenient std::vector interface.
+/**
+ * Calls function above with slightly more convenient std::vector interface.
+ */
 inline
 uint16_t hashword(const std::vector<uint16_t> & keys)
 {

@@ -77,38 +77,38 @@ public:
   virtual void zero() libmesh_override;
 
   /**
-   * \returns the \p (i,j) element of the matrix.
+   * \returns The \p (i,j) element of the matrix.
    */
   T operator() (const unsigned int i,
                 const unsigned int j) const;
 
   /**
-   * \returns the \p (i,j) element of the matrix as a writeable reference.
+   * \returns The \p (i,j) element of the matrix as a writable reference.
    */
   T & operator() (const unsigned int i,
                   const unsigned int j);
 
   /**
-   * \returns the \p (i,j) element of the matrix as a writeable reference.
+   * \returns The \p (i,j) element of the matrix as a writable reference.
    */
   virtual T el(const unsigned int i,
                const unsigned int j) const libmesh_override
   { return (*this)(i,j); }
 
   /**
-   * \returns the \p (i,j) element of the matrix as a writeable reference.
+   * \returns The \p (i,j) element of the matrix as a writable reference.
    */
   virtual T & el(const unsigned int i,
                  const unsigned int j) libmesh_override
   { return (*this)(i,j); }
 
   /**
-   * Left multipliess by the matrix \p M2.
+   * Left multiplies by the matrix \p M2.
    */
   virtual void left_multiply (const DenseMatrixBase<T> & M2) libmesh_override;
 
   /**
-   * Left multipliess by the matrix \p M2 of different type
+   * Left multiplies by the matrix \p M2 of different type
    */
   template <typename T2>
   void left_multiply (const DenseMatrixBase<T2> & M2);
@@ -186,15 +186,19 @@ public:
 
   /**
    * Assignment operator.
+   *
+   * \returns A reference to *this.
    */
   DenseMatrix<T> & operator = (const DenseMatrix<T> & other_matrix);
 
   /**
-   * Assignment-from-other-matrix-type operator
+   * Assignment-from-other-matrix-type operator.
    *
    * Copies the dense matrix of type T2 into the present matrix.  This
    * is useful for copying real matrices into complex ones for further
-   * operations
+   * operations.
+   *
+   * \returns A reference to *this.
    */
   template <typename T2>
   DenseMatrix<T> & operator = (const DenseMatrix<T2> & other_matrix);
@@ -216,7 +220,6 @@ public:
    */
   void scale (const T factor);
 
-
   /**
    * Multiplies every element in the column \p col matrix by \p factor.
    */
@@ -224,11 +227,15 @@ public:
 
   /**
    * Multiplies every element in the matrix by \p factor.
+   *
+   * \returns A reference to *this.
    */
   DenseMatrix<T> & operator *= (const T factor);
 
   /**
    * Adds \p factor times \p mat to this matrix.
+   *
+   * \returns A reference to *this.
    */
   template<typename T2, typename T3>
   typename boostcopy::enable_if_c<
@@ -236,61 +243,58 @@ public:
                                                const DenseMatrix<T3> & mat);
 
   /**
-   * Tests if \p mat is exactly equal to this matrix.
+   * \returns \p true if \p mat is exactly equal to this matrix, \p false otherwise.
    */
   bool operator== (const DenseMatrix<T> & mat) const;
 
   /**
-   * Tests if \p mat is not exactly equal to this matrix.
+   * \returns \p true if \p mat is not exactly equal to this matrix, false otherwise.
    */
   bool operator!= (const DenseMatrix<T> & mat) const;
 
   /**
    * Adds \p mat to this matrix.
+   *
+   * \returns A reference to *this.
    */
   DenseMatrix<T> & operator+= (const DenseMatrix<T> & mat);
 
   /**
    * Subtracts \p mat from this matrix.
+   *
+   * \returns A reference to *this.
    */
   DenseMatrix<T> & operator-= (const DenseMatrix<T> & mat);
 
   /**
-   * \returns the minimum element in the matrix.
-   * In case of complex numbers, this returns the minimum
-   * Real part.
+   * \returns The minimum entry in the matrix, or the minimum real
+   * part in the case of complex numbers.
    */
   Real min () const;
 
   /**
-   * \returns the maximum element in the matrix.
-   * In case of complex numbers, this returns the maximum
-   * Real part.
+   * \returns The maximum entry in the matrix, or the maximum real
+   * part in the case of complex numbers.
    */
   Real max () const;
 
   /**
-   * Return the l1-norm of the matrix, that is
-   * \f$|M|_1=max_{all columns j}\sum_{all
-   * rows i} |M_ij|\f$,
-   * (max. sum of columns).
-   * This is the
-   * natural matrix norm that is compatible
-   * to the l1-norm for vectors, i.e.
-   * \f$|Mv|_1\leq |M|_1 |v|_1\f$.
+   * \returns The l1-norm of the matrix, that is, the max column sum:
+   *
+   * \f$ |M|_1 = max_{all columns j} \sum_{all rows i} |M_ij| \f$,
+   *
+   * This is the natural matrix norm that is compatible to the l1-norm
+   * for vectors, i.e. \f$ |Mv|_1 \leq |M|_1 |v|_1 \f$.
    */
   Real l1_norm () const;
 
   /**
-   * Return the linfty-norm of the
-   * matrix, that is
-   * \f$|M|_\infty=max_{all rows i}\sum_{all
-   * columns j} |M_ij|\f$,
-   * (max. sum of rows).
-   * This is the
-   * natural matrix norm that is compatible
-   * to the linfty-norm of vectors, i.e.
-   * \f$|Mv|_\infty \leq |M|_\infty |v|_\infty\f$.
+   * \returns The linfty-norm of the matrix, that is, the max row sum:
+   *
+   * \f$ |M|_\infty = max_{all rows i} \sum_{all columns j} |M_ij| \f$,
+   *
+   * This is the natural matrix norm that is compatible to the
+   * linfty-norm of vectors, i.e. \f$ |Mv|_\infty \leq |M|_\infty |v|_\infty \f$.
    */
   Real linfty_norm () const;
 
@@ -300,8 +304,8 @@ public:
   void left_multiply_transpose (const DenseMatrix<T> & A);
 
   /**
-   * Left multiplies by the transpose of the matrix \p A of different
-   * type
+   * Left multiplies by the transpose of the matrix \p A which
+   * contains a different numerical type.
    */
   template <typename T2>
   void left_multiply_transpose (const DenseMatrix<T2> & A);
@@ -313,14 +317,14 @@ public:
   void right_multiply_transpose (const DenseMatrix<T> & A);
 
   /**
-   * Right multiplies by the transpose of the matrix \p A of different
-   * type.
+   * Right multiplies by the transpose of the matrix \p A which
+   * contains a different numerical type.
    */
   template <typename T2>
   void right_multiply_transpose (const DenseMatrix<T2> & A);
 
   /**
-   * \returns the \p (i,j) element of the transposed matrix.
+   * \returns The \p (i,j) element of the transposed matrix.
    */
   T transpose (const unsigned int i,
                const unsigned int j) const;
@@ -331,14 +335,16 @@ public:
   void get_transpose(DenseMatrix<T> & dest) const;
 
   /**
-   * Access to the values array.  This should be used with
-   * caution but can  be used to speed up code compilation
-   * significantly.
+   * \returns A reference to the underlying data storage vector.
+   *
+   * This should be used with caution (i.e. one should not change the
+   * size of the vector, etc.) but is useful for interoperating with
+   * low level BLAS routines which expect a simple array.
    */
   std::vector<T> & get_values() { return _val; }
 
   /**
-   * Return a constant reference to the matrix values.
+   * \returns A constant reference to the underlying data storage vector.
    */
   const std::vector<T> & get_values() const { return _val; }
 
@@ -362,14 +368,12 @@ public:
   void lu_solve (const DenseVector<T> & b,
                  DenseVector<T> & x);
 
-
-
   /**
    * For symmetric positive definite (SPD) matrices. A Cholesky factorization
    * of A such that A = L L^T is about twice as fast as a standard LU
    * factorization.  Therefore you can use this method if you know a-priori
    * that the matrix is SPD.  If the matrix is not SPD, an error is generated.
-   * One nice property of cholesky decompositions is that they do not require
+   * One nice property of Cholesky decompositions is that they do not require
    * pivoting for stability. Note that this method may also be used when
    * A is real-valued and x and b are complex-valued.
    */
@@ -377,27 +381,25 @@ public:
   void cholesky_solve(const DenseVector<T2> & b,
                       DenseVector<T2> & x);
 
-
   /**
-   * Compute the Singular Value Decomposition of the matrix.
+   * Compute the singular value decomposition of the matrix.
    * On exit, sigma holds all of the singular values (in
    * descending order).
    *
-   * The implementation uses PETSc's interface to blas/lapack.
+   * The implementation uses PETSc's interface to BLAS/LAPACK.
    * If this is not available, this function throws an error.
    */
   void svd(DenseVector<Real> & sigma);
 
-
   /**
-   * Compute the "reduced" Singular Value Decomposition of the matrix.
+   * Compute the "reduced" singular value decomposition of the matrix.
    * On exit, sigma holds all of the singular values (in
    * descending order), U holds the left singular vectors,
    * and VT holds the transpose of the right singular vectors.
    * In the reduced SVD, U has min(m,n) columns and VT has
    * min(m,n) rows. (In the "full" SVD, U and VT would be square.)
    *
-   * The implementation uses PETSc's interface to blas/lapack.
+   * The implementation uses PETSc's interface to BLAS/LAPACK.
    * If this is not available, this function throws an error.
    */
   void svd(DenseVector<Real> & sigma,
@@ -405,8 +407,8 @@ public:
            DenseMatrix<Number> & VT);
 
   /**
-   * Solve the system of equations A*x = rhs for x in the
-   * least-squares sense. $A$ may be non-square and/or rank-deficient.
+   * Solve the system of equations \f$ A x = rhs \f$ for \f$ x \f$ in the
+   * least-squares sense. \f$ A \f$ may be non-square and/or rank-deficient.
    * You can control which singular values are treated as zero by
    * changing the "rcond" parameter.  Singular values S(i) for which
    * S(i) <= rcond*S(1) are treated as zero for purposes of the solve.
@@ -428,22 +430,22 @@ public:
   /**
    * Compute the eigenvalues (both real and imaginary parts) of a general matrix.
    *
-   * Warning: the contents of A are overwritten by this function!
+   * Warning: the contents of \p *this are overwritten by this function!
    *
-   * The implementation requires the LAPACKgeev_ which is wrapped by PETSc.
+   * The implementation requires the LAPACKgeev_ function which is wrapped by PETSc.
    */
   void evd(DenseVector<T> & lambda_real,
            DenseVector<T> & lambda_imag);
 
   /**
    * Compute the eigenvalues (both real and imaginary parts) and left
-   * eigenvectors of a general matrix.
+   * eigenvectors of a general matrix, \f$ A \f$.
    *
-   * Warning: the contents of A are overwritten by this function!
+   * Warning: the contents of \p *this are overwritten by this function!
    *
-   * The left eigenvector u_j of A satisfies:
-   * u_j**H * A = lambda_j * u_j**H
-   * where u_j**H denotes the conjugate-transpose of u_j.
+   * The left eigenvector \f$ u_j \f$ of \f$ A \f$ satisfies:
+   * \f$ u_j^H A = lambda_j u_j^H \f$
+   * where \f$ u_j^H \f$ denotes the conjugate-transpose of \f$ u_j \f$.
    *
    * If the j-th and (j+1)-st eigenvalues form a complex conjugate
    * pair, then the j-th and (j+1)-st columns of VL "share" their
@@ -451,7 +453,7 @@ public:
    * u_j     = VL(:,j) + i*VL(:,j+1) and
    * u_{j+1} = VL(:,j) - i*VL(:,j+1).
    *
-   * The implementation requires the LAPACKgeev_ which is wrapped by PETSc.
+   * The implementation requires the LAPACKgeev_ routine which is provided by PETSc.
    */
   void evd_left(DenseVector<T> & lambda_real,
                 DenseVector<T> & lambda_imag,
@@ -459,13 +461,13 @@ public:
 
   /**
    * Compute the eigenvalues (both real and imaginary parts) and right
-   * eigenvectors of a general matrix.
+   * eigenvectors of a general matrix, \f$ A \f$.
    *
-   * Warning: the contents of A are overwritten by this function!
+   * Warning: the contents of \p *this are overwritten by this function!
    *
-   * The right eigenvector v_j of A satisfies:
-   * A * v_j = lambda_j * v_j
-   * where lambda_j is its corresponding eigenvalue.
+   * The right eigenvector \f$ v_j \f$ of \f$ A \f$ satisfies:
+   * \f$ A v_j = lambda_j v_j \f$
+   * where \f$ lambda_j \f$ is its corresponding eigenvalue.
    *
    * Note: If the j-th and (j+1)-st eigenvalues form a complex
    * conjugate pair, then the j-th and (j+1)-st columns of VR "share"
@@ -473,7 +475,7 @@ public:
    * v_j     = VR(:,j) + i*VR(:,j+1) and
    * v_{j+1} = VR(:,j) - i*VR(:,j+1).
    *
-   * The implementation requires the LAPACKgeev_ which is wrapped by PETSc.
+   * The implementation requires the LAPACKgeev_ routine which is provided by PETSc.
    */
   void evd_right(DenseVector<T> & lambda_real,
                  DenseVector<T> & lambda_imag,
@@ -483,11 +485,11 @@ public:
    * Compute the eigenvalues (both real and imaginary parts) as well as the left
    * and right eigenvectors of a general matrix.
    *
-   * Warning: the contents of A are overwritten by this function!
+   * Warning: the contents of \p *this are overwritten by this function!
    *
-   * See the documentation of the evd_left() and evd_right() functions
-   * for more information.  The implementation requires the
-   * LAPACKgeev_ which is wrapped by PETSc.
+   * See the documentation of the \p evd_left() and \p evd_right()
+   * functions for more information.  The implementation requires the
+   * LAPACKgeev_ routine which is provided by PETSc.
    */
   void evd_left_and_right(DenseVector<T> & lambda_real,
                           DenseVector<T> & lambda_imag,
@@ -495,9 +497,11 @@ public:
                           DenseMatrix<T> & VR);
 
   /**
-   * \returns the determinant of the matrix.  Note that this means
-   * doing an LU decomposition and then computing the product of the
-   * diagonal terms.  Therefore this is a non-const method.
+   * \returns The determinant of the matrix.
+   *
+   * Note that this means doing an LU decomposition and then computing
+   * the product of the diagonal terms.  Therefore this is a non-const
+   * method.
    */
   T det();
 
@@ -505,14 +509,17 @@ public:
    * Computes the inverse of the dense matrix (assuming it is invertible)
    * by first computing the LU decomposition and then performing multiple
    * back substitution steps.  Follows the algorithm from Numerical Recipes
-   * in C available on the web.  This is not the most memory efficient routine since
-   * the inverse is not computed "in place" but is instead placed into a the
-   * matrix inv passed in by the user.
+   * in C that is available on the web.
+   *
+   * This routine is commented out since it is not really a memory- or
+   * computationally- efficient implementation.  Also, you typically
+   * don't need the actual inverse for anything, and can use something
+   * like lu_solve() instead.
    */
   // void inverse();
 
   /**
-   * Run-time selectable option to turn on/off blas support.
+   * Run-time selectable option to turn on/off BLAS support.
    * This was primarily used for testing purposes, and could be
    * removed...
    */

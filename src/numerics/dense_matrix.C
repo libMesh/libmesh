@@ -1031,9 +1031,6 @@ void DenseMatrix<T>::_cholesky_back_substitute (const DenseVector<T2> & b,
 
 
 
-// This routine is commented out since it is not really a memory
-// efficient implementation.  Also, you don't *need* the inverse
-// for anything, instead just use lu_solve to solve Ax=b.
 // template<typename T>
 // void DenseMatrix<T>::inverse ()
 // {

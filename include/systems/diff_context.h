@@ -510,7 +510,7 @@ public:
   void set_deltat_pointer(Real * dt);
 
   /**
-   * Returns the value currently pointed to by this class's _deltat
+   * \returns The value currently pointed to by this class's \p _deltat
    * member
    */
   Real get_deltat_value();

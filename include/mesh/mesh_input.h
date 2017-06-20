@@ -57,7 +57,7 @@ protected:
   MeshInput (bool is_parallel_format = false);
 
   /**
-   * Constructor.  Takes a writeable reference to an object.
+   * Constructor.  Takes a writable reference to an object.
    * This is the constructor required to read an object.
    */
   explicit
@@ -79,7 +79,7 @@ public:
 protected:
 
   /**
-   * \returns The object as a writeable reference.
+   * \returns The object as a writable reference.
    */
   MT & mesh ();
 

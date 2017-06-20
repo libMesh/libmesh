@@ -41,8 +41,9 @@ template <typename T> class NumericVector;
 template <typename T> class Preconditioner;
 
 /**
- * This class provides a uniform interface for optimization solvers.  This base
- * class is overloaded to provide optimization solvers from different packages.
+ * This base class can be inherited from to provide interfaces to
+ * optimziation solvers from different packages like PETSc/TAO and
+ * nlopt.
  *
  * \author David Knezevic
  * \date 2015
@@ -76,7 +77,7 @@ public:
                                                  const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
-   * \returns true if the data structures are
+   * \returns \p true if the data structures are
    * initialized, false otherwise.
    */
   bool initialized () const { return _is_initialized; }
@@ -111,11 +112,13 @@ public:
   virtual void print_converged_reason() { libmesh_not_implemented(); }
 
   /**
-   * Most optimization solver packages return an integral status
+   * \returns 0, but derived classes should override this to return an
+   * appropriate integer convergence status value.
+   *
+   * Most optimization solver packages return an integer status
    * result of some kind.  This interface assumes they can be coerced
    * into an "int" type, which is usually safe since they are based on
-   * enumerations.  Simply returns 0 if not implemented in derived
-   * classes.
+   * enumerations.
    */
   virtual int get_converged_reason() { return 0; }
 
@@ -165,13 +168,13 @@ public:
   OptimizationSystem::ComputeLowerAndUpperBounds * lower_and_upper_bounds_object;
 
   /**
-   * \returns a constant reference to the system we are using to
+   * \returns A constant reference to the system we are using to
    * define the optimization problem.
    */
   const sys_type & system () const { return _system; }
 
   /**
-   * \returns a writeable reference to the system we are using to
+   * \returns A writable reference to the system we are using to
    * define the optimization problem.
    */
   sys_type & system () { return _system; }

@@ -72,13 +72,13 @@ public:
   virtual void print_elements(std::ostream & my_out=libMesh::out) const libmesh_override;
 
   /**
-   * \returns the number of active bins.
+   * \returns The number of active bins.
    */
   virtual unsigned int n_active_bins() const libmesh_override
   { return root.n_active_bins(); }
 
   /**
-   * \returns a pointer to the element containing point p,
+   * \returns A pointer to the element containing point p,
    * optionally restricted to a set of allowed subdomains,
    * optionally using a non-zero relative tolerance for searches.
    */
@@ -87,7 +87,7 @@ public:
                                     Real relative_tol = TOLERANCE) const libmesh_override;
 
   /**
-   * \returns a pointer to the element containing point p,
+   * \returns A pointer to the element containing point p,
    * optionally restricted to a set of allowed subdomains,
    * optionally using a non-zero relative tolerance for searches.
    */
