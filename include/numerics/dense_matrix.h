@@ -42,8 +42,9 @@ template <typename T> class DenseVector;
 
 /**
  * Defines a dense matrix for use in Finite Element-type computations.
- * Useful for storing element stiffness matrices before summation
- * into a global matrix.
+ * Useful for storing element stiffness matrices before summation into
+ * a global matrix.  All overridden virtual functions are documented
+ * in dense_matrix_base.h.
  *
  * \author Benjamin S. Kirk
  * \date 2002
@@ -61,19 +62,11 @@ public:
               const unsigned int new_n=0);
 
   /**
-   * Copy-constructor.
-   */
-  //DenseMatrix (const DenseMatrix<T> & other_matrix);
-
-  /**
    * Destructor.  Empty.
    */
   virtual ~DenseMatrix() {}
 
 
-  /**
-   * Set every element in the matrix to 0.
-   */
   virtual void zero() libmesh_override;
 
   /**
@@ -88,23 +81,14 @@ public:
   T & operator() (const unsigned int i,
                   const unsigned int j);
 
-  /**
-   * \returns The \p (i,j) element of the matrix as a writable reference.
-   */
   virtual T el(const unsigned int i,
                const unsigned int j) const libmesh_override
   { return (*this)(i,j); }
 
-  /**
-   * \returns The \p (i,j) element of the matrix as a writable reference.
-   */
   virtual T & el(const unsigned int i,
                  const unsigned int j) libmesh_override
   { return (*this)(i,j); }
 
-  /**
-   * Left multiplies by the matrix \p M2.
-   */
   virtual void left_multiply (const DenseMatrixBase<T> & M2) libmesh_override;
 
   /**
@@ -113,9 +97,6 @@ public:
   template <typename T2>
   void left_multiply (const DenseMatrixBase<T2> & M2);
 
-  /**
-   * Right multiplies by the matrix \p M2.
-   */
   virtual void right_multiply (const DenseMatrixBase<T> & M2) libmesh_override;
 
   /**
@@ -755,19 +736,6 @@ DenseMatrix<T>::DenseMatrix(const unsigned int new_m,
 {
   this->resize(new_m,new_n);
 }
-
-
-
-// FIXME[JWP]: This copy ctor has not been maintained along with
-// the rest of the class...
-// Can we just use the compiler-generated copy ctor here?
-// template<typename T>
-// inline
-// DenseMatrix<T>::DenseMatrix (const DenseMatrix<T> & other_matrix)
-//   : DenseMatrixBase<T>(other_matrix._m, other_matrix._n)
-// {
-//   _val = other_matrix._val;
-// }
 
 
 

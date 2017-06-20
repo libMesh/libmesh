@@ -33,6 +33,7 @@ namespace libMesh
  * Defines a dense subvector for use in finite element computations.
  * Useful for storing element load vectors before summation into a
  * global vector, particularly when you have systems of equations.
+ * All overridden virtual functions are documented in dense_vector_base.h.
  *
  * \author Benjamin S. Kirk
  * \date 2003
@@ -61,9 +62,6 @@ public:
    */
   DenseVector<T> & parent () { return _parent_vector; }
 
-  /**
-   * Set every element in the subvector to 0.
-   */
   virtual void zero() libmesh_override;
 
   /**
@@ -77,27 +75,15 @@ public:
    */
   T & operator() (const unsigned int i);
 
-  /**
-   * \returns The \p (i) element of the vector.
-   */
   virtual T el(const unsigned int i) const libmesh_override
   { return (*this)(i); }
 
-  /**
-   * \returns The \p (i) element of the vector as a writable reference.
-   */
   virtual T & el(const unsigned int i) libmesh_override
   { return (*this)(i); }
 
-  /**
-   * \returns The size of the subvector.
-   */
   virtual unsigned int size() const libmesh_override
   { return _n; }
 
-  /**
-   * \returns \p true if size() is 0.
-   */
   virtual bool empty() const libmesh_override
   { return (_n == 0); }
 

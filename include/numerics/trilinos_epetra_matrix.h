@@ -53,7 +53,8 @@ template <typename T> class DenseMatrix;
 
 /**
  * This class provides a nice interface to the Epetra data structures
- * for parallel, sparse matrices.
+ * for parallel, sparse matrices. All overridden virtual functions are
+ * documented in sparse_matrix.h.
  *
  * \author Benjamin S. Kirk
  * \date 2008
@@ -106,18 +107,6 @@ public:
    */
   virtual void update_sparsity_pattern (const SparsityPattern::Graph &) libmesh_override;
 
-  /**
-   * Initialize an EpetraMatrix with the specified sizes.
-   *
-   * \param m The global number of rows.
-   * \param n The global number of columns.
-   * \param m_l The local number of rows.
-   * \param n_l The local number of columns.
-   * \param nnz The number of on-diagonal nonzeros per row (defaults to 30).
-   * \param noz The number of off-diagonal nonzeros per row (defaults to 10).
-   * \param blocksize Optional value indicating dense coupled blocks
-   * for systems with multiple variables all of the same type.
-   */
   virtual void init (const numeric_index_type m,
                      const numeric_index_type n,
                      const numeric_index_type m_l,
@@ -126,79 +115,34 @@ public:
                      const numeric_index_type noz=10,
                      const numeric_index_type blocksize=1) libmesh_override;
 
-  /**
-   * Initialize using sparsity structure computed by \p dof_map.
-   */
   virtual void init () libmesh_override;
 
-  /**
-   * Release all memory, and go back to the default-constructed state.
-   */
   virtual void clear () libmesh_override;
 
-  /**
-   * Set all entries to 0. This method retains sparsity structure.
-   */
   virtual void zero () libmesh_override;
 
-  /**
-   * Call the matrix's internal assembly routines. Sends/receives
-   * required values from other processors.
-   */
   virtual void close () const libmesh_override;
 
-  /**
-   * \returns The row-dimension of the matrix.
-   */
   virtual numeric_index_type m () const libmesh_override;
 
-  /**
-   * \returns The column-dimension of the matrix.
-   */
   virtual numeric_index_type n () const libmesh_override;
 
-  /**
-   * \returns The index of the first matrix row stored on this
-   * processor.
-   */
   virtual numeric_index_type row_start () const libmesh_override;
 
-  /**
-   * \returns The index of the last matrix row (+1) stored on this
-   * processor.
-   */
   virtual numeric_index_type row_stop () const libmesh_override;
 
-  /**
-   * Set the element \p (i,j) to \p value.  Throws an error if the
-   * entry does not exist. Zero values can be "stored" in non-existent
-   * fields.
-   */
   virtual void set (const numeric_index_type i,
                     const numeric_index_type j,
                     const T value) libmesh_override;
 
-  /**
-   * Add \p value to the element \p (i,j).  Throws an error if the
-   * entry does not exist. Zero values can be "added" to non-existent
-   * entries.
-   */
   virtual void add (const numeric_index_type i,
                     const numeric_index_type j,
                     const T value) libmesh_override;
 
-  /**
-   * Add the DenseMatrix to this SparseMatrix.  This is useful for
-   * adding an element matrix at assembly time.
-   */
   virtual void add_matrix (const DenseMatrix<T> & dm,
                            const std::vector<numeric_index_type> & rows,
                            const std::vector<numeric_index_type> & cols) libmesh_override;
 
-  /**
-   * Same, but assumes the row and column maps are the same.  Thus the
-   * matrix \p dm must be square.
-   */
   virtual void add_matrix (const DenseMatrix<T> & dm,
                            const std::vector<numeric_index_type> & dof_indices) libmesh_override;
 
@@ -214,55 +158,19 @@ public:
    */
   virtual void add (const T a, SparseMatrix<T> & X) libmesh_override;
 
-  /**
-   * \returns A copy of matrix entry \p (i,j).
-   *
-   * \note This may be an expensive operation, and you should always
-   * be careful where you call this function.
-   */
   virtual T operator () (const numeric_index_type i,
                          const numeric_index_type j) const libmesh_override;
 
-  /**
-   * \returns The l1-norm of the matrix, that is the max column sum:
-   * \f$ |M|_1 = \max_{all columns j} \sum_{all rows i} |M_ij|\f$
-   *
-   * This is the natural matrix norm that is compatible with the
-   * l1-norm for vectors, i.e. \f$ |Mv|_1 \leq |M|_1 |v|_1 \f$.
-   * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
-   */
   virtual Real l1_norm () const libmesh_override;
 
-  /**
-   * Return the linfty-norm of the matrix, that is the max row sum:
-   *
-   * \f$ |M|_infty = \max_{all rows i} \sum_{all columns j} |M_ij| \f$
-   *
-   * This is the natural matrix norm that is compatible to the
-   * linfty-norm of vectors, i.e. \f$ |Mv|_infty \leq |M|_infty |v|_infty \f$.
-   * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
-   */
   virtual Real linfty_norm () const libmesh_override;
 
-  /**
-   * \returns \p true If the matrix's assembly routines have been called.
-   */
   virtual bool closed() const libmesh_override;
 
-  /**
-   * Print the contents of the matrix, by default to libMesh::out.
-   */
   virtual void print_personal(std::ostream & os=libMesh::out) const libmesh_override;
 
-  /**
-   * Copies the diagonal part of the matrix into \p dest.
-   */
   virtual void get_diagonal (NumericVector<T> & dest) const libmesh_override;
 
-  /**
-   * Copies the transpose of the matrix into \p dest, which may be
-   * *this.
-   */
   virtual void get_transpose (SparseMatrix<T> & dest) const libmesh_override;
 
   /**

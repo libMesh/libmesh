@@ -25,13 +25,7 @@
 #ifdef LIBMESH_HAVE_EIGEN
 
 // Local includes
-#include "libmesh/eigen_core_support.h"
 #include "libmesh/preconditioner.h"
-#include "libmesh/libmesh_common.h"
-#include "libmesh/enum_solver_package.h"
-#include "libmesh/enum_preconditioner_type.h"
-#include "libmesh/reference_counted_object.h"
-#include "libmesh/libmesh.h"
 
 namespace libMesh
 {
@@ -42,8 +36,9 @@ template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
 
 /**
- * This class provides an interface to the suite of preconditioners available
- * from Eigen.
+ * This class provides an interface to the suite of preconditioners
+ * available from Eigen. All overridden virtual functions are
+ * documented in preconditioner.h.
  *
  * \author Benjamin Kirk
  * \date 2013
@@ -63,20 +58,10 @@ public:
    */
   virtual ~EigenPreconditioner ();
 
-  /**
-   * Computes the preconditioned vector "y" based on input "x".
-   * Usually by solving Py=x to get the action of P^-1 x.
-   */
   virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) libmesh_override;
 
-  /**
-   * Release all memory and clear data structures.
-   */
   virtual void clear () libmesh_override {}
 
-  /**
-   * Initialize data structures if not done so already.
-   */
   virtual void init () libmesh_override;
 };
 

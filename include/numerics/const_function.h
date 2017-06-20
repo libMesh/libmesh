@@ -31,7 +31,8 @@ namespace libMesh
 {
 
 /**
- * Function that returns a single value that never changes.
+ * Function that returns a single value that never changes. All
+ * overridden virtual functions are documented in function_base.h.
  *
  * \author Roy Stogner
  * \date 2012

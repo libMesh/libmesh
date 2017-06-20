@@ -53,8 +53,9 @@ template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
 
 /**
- * This class provides an interface to the suite of preconditioners available
- * from Trilinos.
+ * This class provides an interface to the suite of preconditioners
+ * available from Trilinos. All overridden virtual functions are
+ * documented in preconditioner.h.
  *
  * \author David Andrs
  * \date 2011
@@ -77,22 +78,15 @@ public:
    */
   virtual ~TrilinosPreconditioner ();
 
-  /**
-   * Computes the preconditioned vector "y" based on input "x".
-   * Usually by solving Py=x to get the action of P^-1 x.
-   */
   virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) libmesh_override;
 
-  /**
-   * Release all memory and clear data structures.
-   */
   virtual void clear () libmesh_override {}
 
-  /**
-   * Initialize data structures if not done so already.
-   */
   virtual void init () libmesh_override;
 
+  /**
+   * Stores a copy of the ParameterList \p list internally.
+   */
   void set_params(Teuchos::ParameterList & list);
 
   /**

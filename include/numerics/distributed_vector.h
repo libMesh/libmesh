@@ -37,11 +37,11 @@ namespace libMesh
 {
 
 /**
- * Distributed vector. Provides an interface for simple
- * parallel, distributed vectors. Offers some collective
- * communication capabilities.  Note that the class will
- * sill function without MPI, but only on one processor.
- * This lets us keep the parallel details behind the scenes.
+ * This class provides a simple parallel, distributed vector datatype
+ * which is specific to libmesh. Offers some collective communication
+ * capabilities.  Note that the class will sill function without MPI,
+ * but only on one processor. All overridden virtual functions are
+ * documented in numeric_vector.h.
  *
  * \author Benjamin S. Kirk
  * \date 2003
@@ -92,84 +92,36 @@ public:
    */
   ~DistributedVector ();
 
-  /**
-   * Call the assemble functions
-   */
   virtual void close () libmesh_override;
 
-  /**
-   * Restores the \p DistributedVector to a pristine state.
-   */
   virtual void clear () libmesh_override;
 
-  /**
-   * Set all entries to zero. Equivalent to \p v = 0, but more obvious and
-   * faster.
-   */
   virtual void zero () libmesh_override;
 
-  /**
-   * \returns A smart pointer to a copy of this vector with the same
-   * type, size, and partitioning, but with all zero entries.
-   */
   virtual UniquePtr<NumericVector<T> > zero_clone () const libmesh_override;
 
-  /**
-   * \returns A copy of this vector wrapped in a smart pointer.
-   */
   virtual UniquePtr<NumericVector<T> > clone () const libmesh_override;
 
-  /**
-   * Change the dimension of the vector to \p N. The reserved memory
-   * for this vector remains unchanged if possible.  If \p N==0, all
-   * memory is freed. Therefore, if you want to resize the vector and
-   * release the memory not needed, you have to first call \p init(0)
-   * and then \p init(N). This behaviour is analogous to that of the
-   * STL containers.
-   *
-   * On \p fast==false, the vector is filled by zeros.
-   */
   virtual void init (const numeric_index_type N,
                      const numeric_index_type n_local,
-                     const bool         fast=false,
+                     const bool fast=false,
                      const ParallelType ptype=AUTOMATIC) libmesh_override;
 
-  /**
-   * Call \p init() with n_local = N.
-   */
   virtual void init (const numeric_index_type N,
-                     const bool         fast=false,
+                     const bool fast=false,
                      const ParallelType ptype=AUTOMATIC) libmesh_override;
 
-  /**
-   * Create a vector that holds the local indices plus those specified
-   * in the \p ghost argument.
-   */
-  virtual void init (const numeric_index_type /*N*/,
-                     const numeric_index_type /*n_local*/,
-                     const std::vector<numeric_index_type> & /*ghost*/,
-                     const bool /*fast*/ = false,
+  virtual void init (const numeric_index_type N,
+                     const numeric_index_type n_local,
+                     const std::vector<numeric_index_type> & ghost,
+                     const bool fast = false,
                      const ParallelType = AUTOMATIC) libmesh_override;
 
-  /**
-   * Creates a vector that has the same dimension and storage type as
-   * \p other, including ghost dofs.
-   */
   virtual void init (const NumericVector<T> & other,
                      const bool fast = false) libmesh_override;
 
-  /**
-   * Sets all entries of the vector to the value \p s.
-   *
-   * \returns A reference to *this.
-   */
   virtual NumericVector<T> & operator= (const T s) libmesh_override;
 
-  /**
-   * Sets (*this)(i) = v(i) for each entry of the vector.
-   *
-   * \returns A reference to *this as the base type.
-   */
   virtual NumericVector<T> & operator= (const NumericVector<T> & v) libmesh_override;
 
   /**
@@ -179,133 +131,48 @@ public:
    */
   DistributedVector<T> & operator= (const DistributedVector<T> & v);
 
-  /**
-   * Sets (*this)(i) = v(i) for each entry of the vector.
-   *
-   * \returns A reference to *this as the base type.
-   */
   virtual NumericVector<T> & operator= (const std::vector<T> & v) libmesh_override;
 
-  /**
-   * \returns The minimum entry in the vector, or the minimum real
-   * part in the case of complex numbers.
-   */
   virtual Real min () const libmesh_override;
 
-  /**
-   * \returns The maximum entry in the vector, or the maximum real
-   * part in the case of complex numbers.
-   */
   virtual Real max () const libmesh_override;
 
-  /**
-   * \returns The sum of all values in the vector.
-   */
   virtual T sum() const libmesh_override;
 
-  /**
-   * \returns The \f$ l_1 \f$-norm of the vector, i.e. the sum of the
-   * absolute values of the entries.
-   */
   virtual Real l1_norm () const libmesh_override;
 
-  /**
-   * \returns The \f$l_2\f$-norm of the vector, i.e. the square root
-   * of the sum of the squares of the entries.
-   */
   virtual Real l2_norm () const libmesh_override;
 
-  /**
-   * \returns The \f$l_\infty\f$-norm of the vector, i.e. the maximum
-   * absolute value of the entries of the vector.
-   */
   virtual Real linfty_norm () const libmesh_override;
 
-  /**
-   * \returns The size of the vector.
-   */
   virtual numeric_index_type size () const libmesh_override;
 
-  /**
-   * \returns The local size of the vector, i.e. \p index_stop - \p index_start.
-   */
   virtual numeric_index_type local_size() const libmesh_override;
 
-  /**
-   * \returns The index of the first vector element actually stored on
-   * this processor.
-   */
   virtual numeric_index_type first_local_index() const libmesh_override;
 
-  /**
-   * \returns The index of the last vector element actually stored on
-   * this processor.
-   */
   virtual numeric_index_type last_local_index() const libmesh_override;
 
-  /**
-   * \returns A copy of the ith entry of the vector.
-   */
   virtual T operator() (const numeric_index_type i) const libmesh_override;
 
-  /**
-   * Add \p v to *this. Equivalent to \p U.add(1, V).
-   *
-   * \returns A reference to *this as the base type.
-   */
   virtual NumericVector<T> & operator += (const NumericVector<T> & v) libmesh_override;
 
-  /**
-   * Subtracts \p v from *this.
-   *
-   * \returns A reference to *this as the base type.
-   */
   virtual NumericVector<T> & operator -= (const NumericVector<T> & v) libmesh_override;
 
-  /**
-   * Pointwise division operator. Sets u(i) <- u(i)/v(i) for each
-   * entry in the vector.
-   *
-   * \returns A reference to *this as the base type.
-   */
   virtual NumericVector<T> & operator /= (NumericVector<T> & v) libmesh_override;
 
-  /**
-   * Sets u(i) <- 1/u(i) for each entry in the vector.
-   */
   virtual void reciprocal() libmesh_override;
 
-  /**
-   * Negates the imaginary component of each entry in the vector.
-   */
   virtual void conjugate() libmesh_override;
 
-  /**
-   * Sets v(i) = \p value.
-   */
   virtual void set (const numeric_index_type i, const T value) libmesh_override;
 
-  /**
-   * Adds \p value to each entry of the vector.
-   */
   virtual void add (const numeric_index_type i, const T value) libmesh_override;
 
-  /**
-   * Adds \p s to each entry of the vector.
-   */
   virtual void add (const T s) libmesh_override;
 
-  /**
-   * Vector addition. Sets u(i) <- u(i) + v(i) for each entry in the
-   * vector. Equivalent to calling \p operator+=().
-   */
   virtual void add (const NumericVector<T> & V) libmesh_override;
 
-  /**
-   * Vector addition with a scalar multiple. Sets u(i) <- u(i) + a *
-   * v(i) for each entry in the vector. Equivalent to calling \p
-   * operator+=().
-   */
   virtual void add (const T a, const NumericVector<T> & v) libmesh_override;
 
   /**
@@ -314,120 +181,66 @@ public:
    */
   using NumericVector<T>::add_vector;
 
-  /**
-   * Adds the product of a SparseMatrix \p A and a NumericVector \p
-   * v to this vector, i.e. \f$u += A v \f$.
-   *
-   * Not implemented.
-   */
   virtual void add_vector (const NumericVector<T> &,
                            const SparseMatrix<T> &) libmesh_override
   { libmesh_not_implemented(); }
 
-  /**
-   * Adds the product of a SparseMatrix \p A^T and a NumericVector \p
-   * v to this vector, i.e. \f$u += A^T v \f$.
-   *
-   * Not implemented.
-   */
   virtual void add_vector_transpose (const NumericVector<T> &,
                                      const SparseMatrix<T> &) libmesh_override
   { libmesh_not_implemented(); }
 
-  /**
-   * Scale each element of the vector by the given factor.
-   */
   virtual void scale (const T factor) libmesh_override;
 
-  /**
-   * Sets u(i) <- abs(u(i)) for each entry in the vector.
-   */
   virtual void abs() libmesh_override;
 
-  /**
-   * \returns The dot product of (*this) with the vector \p V.
-   */
   virtual T dot(const NumericVector<T> & V) const libmesh_override;
 
-  /**
-   * Creates a copy of the global vector in the local vector \p
-   * v_local.
-   */
   virtual void localize (std::vector<T> & v_local) const libmesh_override;
 
-  /**
-   * Same, but fills a \p NumericVector<T> instead of a \p
-   * std::vector.
-   */
   virtual void localize (NumericVector<T> & v_local) const libmesh_override;
 
-  /**
-   * Creates a local vector \p v_local containing only information
-   * relevant to this processor, as defined by the \p send_list.
-   */
   virtual void localize (NumericVector<T> & v_local,
                          const std::vector<numeric_index_type> & send_list) const libmesh_override;
 
-  /**
-   * Fill in the local std::vector "v_local" with the global indices
-   * given in "indices".  See numeric_vector.h for more details.
-   */
   virtual void localize (std::vector<T> & v_local,
                          const std::vector<numeric_index_type> & indices) const libmesh_override;
 
-  /**
-   * Updates a local vector with selected values from neighboring
-   * processors, as defined by \p send_list.
-   */
   virtual void localize (const numeric_index_type first_local_idx,
                          const numeric_index_type last_local_idx,
                          const std::vector<numeric_index_type> & send_list) libmesh_override;
 
-  /**
-   * Creates a local copy of the global vector in \p v_local only on
-   * processor \p proc_id. By default the data is sent to processor
-   * 0. This method is useful for outputting data from one processor.
-   */
   virtual void localize_to_one (std::vector<T> & v_local,
                                 const processor_id_type proc_id=0) const libmesh_override;
 
-  /**
-   * Computes the pointwise (i.e. component-wise) product of \p vec1
-   * and \p vec2 and stores the result in \p *this.
-   */
   virtual void pointwise_mult (const NumericVector<T> & vec1,
                                const NumericVector<T> & vec2) libmesh_override;
 
-  /**
-   * Swaps the vector data and metadata
-   */
   virtual void swap (NumericVector<T> & v) libmesh_override;
 
 private:
 
   /**
-   * Actual vector datatype
-   * to hold vector entries
+   * Actual vector datatype to hold vector entries.
    */
   std::vector<T> _values;
 
   /**
-   * The global vector size
+   * The global vector size.
    */
   numeric_index_type _global_size;
 
   /**
-   * The local vector size
+   * The local vector size.
    */
   numeric_index_type _local_size;
 
   /**
-   * The first component stored locally
+   * The first component stored locally.
    */
   numeric_index_type _first_local_index;
 
   /**
-   * The last component (+1) stored locally
+   * The last component (+1) stored locally.
    */
   numeric_index_type _last_local_index;
 };

@@ -45,8 +45,9 @@ template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
 
 /**
- * This class provides an interface to the suite of preconditioners available
- * from PETSc.
+ * This class provides an interface to the suite of preconditioners
+ * available from PETSc. All overridden virtual functions are
+ * documented in preconditioner.h.
  *
  * \author Derek Gaston
  * \date 2009
@@ -67,21 +68,10 @@ public:
    */
   virtual ~PetscPreconditioner ();
 
-  /**
-   * Computes the preconditioned vector \p y based on input vector \p
-   * x. This is usually done by solving \f$ Py=x \f$ to get the
-   * action of \f$ P^-1 x \f$.
-   */
   virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) libmesh_override;
 
-  /**
-   * Release all memory and clear data structures.
-   */
   virtual void clear () libmesh_override;
 
-  /**
-   * Initialize data structures if not done so already.
-   */
   virtual void init () libmesh_override;
 
   /**

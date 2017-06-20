@@ -34,9 +34,10 @@ template <typename T>
 class DenseVector;
 
 /**
- * This class provides function-like objects for which an
- * analytical expression can be provided.  The user may
- * either provide vector-return or number-return functions.
+ * This class provides function-like objects for which an analytical
+ * expression can be provided.  The user may either provide
+ * vector-return or number-return functions.  All overridden virtual
+ * functions are documented in function_base.h.
  *
  * \author Daniel Dreyer
  * \date 2003
@@ -81,31 +82,15 @@ public:
                          const Point & p,
                          const Real time);
 
-  /**
-   * The actual initialization process.
-   */
   virtual void init () libmesh_override;
 
-  /**
-   * Clears the function.
-   */
   virtual void clear () libmesh_override;
 
-  /**
-   * \returns A new deep copy of the function.
-   */
   virtual UniquePtr<FunctionBase<Output> > clone () const libmesh_override;
 
-  /**
-   * \returns The value at point \p p and time
-   * \p time, which defaults to zero.
-   */
   virtual Output operator() (const Point & p,
                              const Real time=0.) libmesh_override;
 
-  /**
-   * Like before, but sets output values in the passed-in \p output DenseVector.
-   */
   virtual void operator() (const Point & p,
                            const Real time,
                            DenseVector<Output> & output) libmesh_override;

@@ -1,4 +1,4 @@
-//-------------// The libMesh Finite Element Library.
+// The libMesh Finite Element Library.
 // Copyright (C) 2002-2017 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
@@ -33,7 +33,8 @@ namespace libMesh
 {
 
 /**
- * Function which is a function of another function.
+ * Function which is a function of another function.  All overridden
+ * virtual functions are documented in function_base.h.
  *
  * \author Roy Stogner
  * \date 2012
@@ -52,9 +53,11 @@ public:
       delete subfunctions[i];
   }
 
-  // Attach a new subfunction, along with a map from the indices of
-  // that subfunction to the indices of the global function.
-  // (*this)(index_map[i]) will return f(i).
+  /**
+   * Attach a new subfunction, along with a map from the indices of
+   * that subfunction to the indices of the global function.
+   * (*this)(index_map[i]) will return f(i).
+   */
   void attach_subfunction (const FunctionBase<Output> & f,
                            const std::vector<unsigned int> & index_map)
   {
@@ -125,10 +128,6 @@ public:
       }
   }
 
-  /**
-   * \returns The vector component \p i at coordinate
-   * \p p and time \p time.
-   */
   virtual Output component (unsigned int i,
                             const Point & p,
                             Real time) libmesh_override
