@@ -27,6 +27,16 @@ AC_DEFUN([CONFIGURE_BOOST],
                   [external_boost_found=no],
                   [])
 
+    # Set an extra define if an external boost installation (as opposed to
+    # libmesh's internal boost subset) was found. This will allow users to
+    # determine at compile time when they are safe to use boost features
+    # that are not available in the libmesh subset. Note: we currently don't
+    # distinguish which features are available in the external boost (we assume
+    # it is a full installation) but that could be added later.
+    if test "$external_boost_found" = "yes" ; then
+      AC_DEFINE(HAVE_EXTERNAL_BOOST, 1, [Flag indicating whether an external Boost was found])
+    fi
+
     # If that did not work, try using our builtin boost.
     if test "$external_boost_found" = "no" ; then
       AC_MSG_RESULT(<<< External boost installation *not* found... will try to configure for libmesh's internal boost >>>)
