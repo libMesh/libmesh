@@ -1221,6 +1221,7 @@ enable_triangle
 enable_qhull
 enable_gmv
 enable_vtk
+enable_vtk_required
 with_vtk_include
 with_vtk_lib
 enable_eigen
@@ -2012,6 +2013,7 @@ Optional Features:
   --enable-qhull          build with Qhull API support
   --disable-gmv           build without GMV file I/O support
   --disable-vtk           build without VTK file I/O support
+  --enable-vtk-required   Error if VTK is not detected by configure
   --disable-eigen         build without Eigen linear algebra support
   --disable-glpk          build without GLPK support
   --disable-nlopt         build without NLOPT support
@@ -40139,6 +40141,17 @@ else
 fi
 
 
+              # Check whether --enable-vtk-required was given.
+if test "${enable_vtk_required+set}" = set; then :
+  enableval=$enable_vtk_required; case "${enableval}" in
+                     yes) vtkrequired=yes ;;
+                     no)  vtkrequired=no ;;
+                     *)   as_fn_error $? "bad value ${enableval} for --enable-vtk-required" "$LINENO" 5 ;;
+                     esac
+else
+  vtkrequired=no
+fi
+
 
   if (test $enablevtk = yes); then
 
@@ -40472,6 +40485,10 @@ $as_echo "<<< Configuring library without VTK support >>>" >&6; }
 
 
 
+
+      if (test $enablevtk = no -a $vtkrequired = yes) ; then
+                    as_fn_error 4 "*** VTK was not found, but --enable-vtk-required was specified." "$LINENO" 5
+  fi
 
 if (test x$enablevtk = xyes); then
   libmesh_optional_INCLUDES="$VTK_INCLUDE $libmesh_optional_INCLUDES"
