@@ -224,16 +224,16 @@ void EpetraVector<T>::add_vector (const T * v,
 
 // TODO: fill this in after creating an EpetraMatrix
 template <typename T>
-void EpetraVector<T>::add_vector (const NumericVector<T> & V_in,
+void EpetraVector<T>::add_vector (const NumericVector<T> & v_in,
                                   const SparseMatrix<T> & A_in)
 {
-  const EpetraVector<T> * V = cast_ptr<const EpetraVector<T> *>(&V_in);
+  const EpetraVector<T> * v = cast_ptr<const EpetraVector<T> *>(&v_in);
   const EpetraMatrix<T> * A = cast_ptr<const EpetraMatrix<T> *>(&A_in);
 
   // FIXME - does Trilinos let us do this *without* memory allocation?
-  UniquePtr<NumericVector<T> > temp = V->zero_clone();
-  EpetraVector<T> * tempV = cast_ptr<EpetraVector<T> *>(temp.get());
-  A->mat()->Multiply(false, *V->_vec, *tempV->_vec);
+  UniquePtr<NumericVector<T> > temp = v->zero_clone();
+  EpetraVector<T> * temp_v = cast_ptr<EpetraVector<T> *>(temp.get());
+  A->mat()->Multiply(false, *v->_vec, *temp_v->_vec);
   *this += *temp;
 }
 
@@ -241,7 +241,7 @@ void EpetraVector<T>::add_vector (const NumericVector<T> & V_in,
 
 // TODO: fill this in after creating an EpetraMatrix
 template <typename T>
-void EpetraVector<T>::add_vector_transpose (const NumericVector<T> & /* V_in */,
+void EpetraVector<T>::add_vector_transpose (const NumericVector<T> & /* v_in */,
                                             const SparseMatrix<T> & /* A_in */)
 {
   libmesh_not_implemented();
@@ -309,13 +309,13 @@ void EpetraVector<T>::abs()
 
 
 template <typename T>
-T EpetraVector<T>::dot (const NumericVector<T> & V_in) const
+T EpetraVector<T>::dot (const NumericVector<T> & v_in) const
 {
-  const EpetraVector<T> * V = cast_ptr<const EpetraVector<T> *>(&V_in);
+  const EpetraVector<T> * v = cast_ptr<const EpetraVector<T> *>(&v_in);
 
   T result=0.0;
 
-  _vec->Dot(*V->_vec, &result);
+  _vec->Dot(*v->_vec, &result);
 
   return result;
 }
@@ -325,10 +325,10 @@ template <typename T>
 void EpetraVector<T>::pointwise_mult (const NumericVector<T> & vec1,
                                       const NumericVector<T> & vec2)
 {
-  const EpetraVector<T> * V1 = cast_ptr<const EpetraVector<T> *>(&vec1);
-  const EpetraVector<T> * V2 = cast_ptr<const EpetraVector<T> *>(&vec2);
+  const EpetraVector<T> * v1 = cast_ptr<const EpetraVector<T> *>(&vec1);
+  const EpetraVector<T> * v2 = cast_ptr<const EpetraVector<T> *>(&vec2);
 
-  _vec->Multiply(1.0, *V1->_vec, *V2->_vec, 0.0);
+  _vec->Multiply(1.0, *v1->_vec, *v2->_vec, 0.0);
 }
 
 

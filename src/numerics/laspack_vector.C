@@ -245,12 +245,12 @@ void LaspackVector<T>::abs()
 }
 
 template <typename T>
-T LaspackVector<T>::dot (const NumericVector<T> & V) const
+T LaspackVector<T>::dot (const NumericVector<T> & v_in) const
 {
   libmesh_assert (this->initialized());
 
   // Make sure the NumericVector passed in is really a LaspackVector
-  const LaspackVector<T> * v = cast_ptr<const LaspackVector<T> *>(&V);
+  const LaspackVector<T> * v = cast_ptr<const LaspackVector<T> *>(&v_in);
   libmesh_assert(v);
 
   return Mul_VV (const_cast<QVector*>(&(this->_vec)),

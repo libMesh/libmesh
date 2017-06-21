@@ -233,7 +233,7 @@ public:
    *
    * \returns A reference to *this as the base type.
    */
-  virtual NumericVector<T> & operator= (const NumericVector<T> & V) = 0;
+  virtual NumericVector<T> & operator= (const NumericVector<T> & v) = 0;
 
   /**
    * Sets (*this)(i) = v(i) for each entry of the vector.
@@ -260,25 +260,25 @@ public:
   virtual T sum() const = 0;
 
   /**
-   * \returns The \f$ l_1 \f$-norm of the vector, i.e. the sum of the
+   * \returns The \f$ \ell_1 \f$-norm of the vector, i.e. the sum of the
    * absolute values of the entries.
    */
   virtual Real l1_norm () const = 0;
 
   /**
-   * \returns The \f$l_2\f$-norm of the vector, i.e. the square root
+   * \returns The \f$ \ell_2 \f$-norm of the vector, i.e. the square root
    * of the sum of the squares of the entries.
    */
   virtual Real l2_norm () const = 0;
 
   /**
-   * \returns The \f$l_\infty\f$-norm of the vector, i.e. the maximum
+   * \returns The \f$ \ell_{\infty} \f$-norm of the vector, i.e. the maximum
    * absolute value of the entries of the vector.
    */
   virtual Real linfty_norm () const = 0;
 
   /**
-   * \returns The \f$l_1\f$-norm of the vector, i.e. the sum of the
+   * \returns The \f$ \ell_1 \f$-norm of the vector, i.e. the sum of the
    * absolute values for the specified entries in the vector.
    *
    * Note that the indices must necessarily live on this processor.
@@ -286,7 +286,7 @@ public:
   virtual Real subset_l1_norm (const std::set<numeric_index_type> & indices) const;
 
   /**
-   * \returns The \f$l_2\f$-norm of the vector, i.e. the square root
+   * \returns The \f$ \ell_2 \f$-norm of the vector, i.e. the square root
    * of the sum of the squares of the elements for the specified
    * entries in the vector.
    *
@@ -296,7 +296,7 @@ public:
 
   /**
    * \returns The maximum absolute value of the specified entries of
-   * this vector, which is the \f$l_\infty\f$-norm of a vector.
+   * this vector, which is the \f$ \ell_{\infty} \f$-norm of a vector.
    *
    * Note that the indices must necessarily live on this processor.
    */
@@ -357,43 +357,52 @@ public:
            std::vector<T> & values) const;
 
   /**
-   * Add \p V to *this. Equivalent to \p U.add(1, V).
+   * Adds \p v to *this,
+   * \f$ \vec{u} \leftarrow \vec{u} + \vec{v} \f$.
+   * Equivalent to \p u.add(1, v).
    *
    * \returns A reference to *this.
    */
-  virtual NumericVector<T> & operator += (const NumericVector<T> & V) = 0;
+  virtual NumericVector<T> & operator += (const NumericVector<T> & v) = 0;
 
   /**
-   * Subtracts \p V from *this. Equivalent to \p U.add(-1, V).
+   * Subtracts \p v from *this,
+   * \f$ \vec{u} \leftarrow \vec{u} - \vec{v} \f$.
+   * Equivalent to \p u.add(-1, v).
    *
    * \returns A reference to *this.
    */
-  virtual NumericVector<T> & operator -= (const NumericVector<T> & V) = 0;
+  virtual NumericVector<T> & operator -= (const NumericVector<T> & v) = 0;
 
   /**
-   * Multiplication operator. Equivalent to \p U.scale(a)
+   * Scales the vector by \p a,
+   * \f$ \vec{u} \leftarrow a\vec{u} \f$.
+   * Equivalent to \p u.scale(a)
    *
    * \returns A reference to *this.
    */
   NumericVector<T> & operator *= (const T a) { this->scale(a); return *this; }
 
   /**
-   * Division operator. Equivalent to \p U.scale(1./a)
+   * Scales the vector by \p 1/a,
+   * \f$ \vec{u} \leftarrow \frac{1}{a}\vec{u} \f$.
+   * Equivalent to \p u.scale(1./a)
    *
    * \returns A reference to *this.
    */
   NumericVector<T> & operator /= (const T a) { this->scale(1./a); return *this; }
 
   /**
-   * Pointwise division operator. Sets u(i) <- u(i)/v(i) for each
-   * entry in the vector.
+   * Computes the pointwise division of this vector's entries by another's,
+   * \f$ u_i \leftarrow \frac{u_i}{v_i} \, \forall i\f$
    *
    * \returns A reference to *this.
    */
   virtual NumericVector<T> & operator /= (NumericVector<T> & /*v*/) = 0;
 
   /**
-   * Sets u(i) <- 1/u(i) for each entry in the vector.
+   * Computes the pointwise reciprocal,
+   * \f$ u_i \leftarrow \frac{1}{u_i} \, \forall i\f$
    */
   virtual void reciprocal() = 0;
 
@@ -413,108 +422,110 @@ public:
   virtual void add (const numeric_index_type i, const T value) = 0;
 
   /**
-   * Adds \p s to each entry of the vector.
+   * Adds \p s to each entry of the vector,
+   * \f$ u_i \leftarrow u_i + s \f$
    */
   virtual void add (const T s) = 0;
 
   /**
-   * Vector addition. Sets u(i) <- u(i) + v(i) for each entry in the
-   * vector. Equivalent to calling \p operator+=().
+   * Adds \p v to \p this,
+   * \f$ \vec{u} \leftarrow \vec{u} + \vec{v} \f$.
+   * Equivalent to calling \p operator+=().
    */
-  virtual void add (const NumericVector<T> & V) = 0;
+  virtual void add (const NumericVector<T> & v) = 0;
 
   /**
-   * Vector addition with a scalar multiple. Sets u(i) <- u(i) + a *
-   * v(i) for each entry in the vector. Equivalent to calling \p
-   * operator+=().
+   * Vector addition with a scalar multiple,
+   * \f$ \vec{u} \leftarrow \vec{u} + a\vec{v} \f$.
+   * Equivalent to calling \p operator+=().
    */
   virtual void add (const T a, const NumericVector<T> & v) = 0;
 
   /**
-   * \f$ U+=v \f$ where v is a pointer and each \p dof_indices[i]
-   * specifies where to add value \p v[i]
-   *
-   * This should be overridden in subclasses for efficiency
+   * Computes \f$ \vec{u} \leftarrow \vec{u} + \vec{v} \f$,
+   * where \p v is a pointer and each \p dof_indices[i] specifies where
+   * to add value \p v[i].  This should be overridden in subclasses
+   * for efficiency.
    */
   virtual void add_vector (const T * v,
                            const std::vector<numeric_index_type> & dof_indices);
 
   /**
-   * \f$ U+=v \f$ where v is a std::vector and each \p dof_indices[i]
-   * specifies where to add value \p v[i]
+   * Computes \f$ \vec{u} \leftarrow \vec{u} + \vec{v} \f$,
+   * where \p v is a std::vector and each \p dof_indices[i] specifies
+   * where to add value \p v[i].
    */
   void add_vector (const std::vector<T> & v,
                    const std::vector<numeric_index_type> & dof_indices);
 
   /**
-   * \f$ U+=v \f$ where v is a NumericVector and each \p dof_indices[i]
-   * specifies where to add value \p v(i)
+   * Computes \f$ \vec{u} \leftarrow \vec{u} + \vec{v} \f$,
+   * where \p v is a NumericVector and each \p dof_indices[i]
+   * specifies where to add value \p v(i).
    */
-  virtual void add_vector (const NumericVector<T> & V,
+  virtual void add_vector (const NumericVector<T> & v,
                            const std::vector<numeric_index_type> & dof_indices);
 
   /**
-   * \f$ U+=v \f$ where v is a DenseVector and each \p dof_indices[i]
-   * specifies where to add value \p v(i).
+   * Computes \f$ \vec{u} \leftarrow \vec{u} + \vec{v} \f$,
+   * where \p v is a DenseVector and each \p dof_indices[i] specifies
+   * where to add value \p v(i).
    */
-  void add_vector (const DenseVector<T> & V,
+  void add_vector (const DenseVector<T> & v,
                    const std::vector<numeric_index_type> & dof_indices);
 
   /**
-   * \f$U+=A*V\f$, add the product of a \p SparseMatrix \p A and a \p
-   * NumericVector \p V to \p this, where \p this=U.
+   * Computes \f$ \vec{u} \leftarrow \vec{u} + A \vec{v} \f$,
+   * i.e. adds the product of a \p SparseMatrix \p A and a \p
+   * NumericVector \p v to \p this.
    */
   virtual void add_vector (const NumericVector<T> & v,
                            const SparseMatrix<T> & A) = 0;
 
   /**
-   * \f$U+=A*V\f$, add the product of a \p ShellMatrix \p A and a \p
-   * NumericVector \p V to \p this, where \p this=U.
+   * Computes \f$ \vec{u} \leftarrow \vec{u} + A \vec{v} \f$,
+   * i.e. adds the product of a \p ShellMatrix \p A and a \p
+   * NumericVector \p v to \p this.
    */
   void add_vector (const NumericVector<T> & v,
                    const ShellMatrix<T> & A);
 
   /**
-   * \f$U+=A^T*V\f$, add the product of the transpose of a \p
-   * SparseMatrix \p A and a \p NumericVector \p V to \p this,
-   * where \p this=U.
+   * Computes \f$ \vec{u} \leftarrow \vec{u} + A^T \vec{v} \f$,
+   * i.e. adds the product of the transpose of a \p SparseMatrix \p A
+   * and a \p NumericVector \p v to \p this.
    */
   virtual void add_vector_transpose (const NumericVector<T> & v,
                                      const SparseMatrix<T> & A) = 0;
 
   /**
-   * \f$ U=v \f$ where v is a \p T[] or T * and you want to specify
-   * WHERE to insert it.
+   * Inserts the entries of \p v in *this at the locations specified by \p v.
    */
   virtual void insert (const T * v,
                        const std::vector<numeric_index_type> & dof_indices);
 
   /**
-   * \f$ U=v \f$ where v is a \p std::vector<T> and you want to
-   * specify WHERE to insert it.
+   * Inserts the entries of \p v in *this at the locations specified by \p v.
    */
   void insert (const std::vector<T> & v,
                const std::vector<numeric_index_type> & dof_indices);
 
   /**
-   * \f$U=V\f$, where U and V are type NumericVector<T> and you want
-   * to specify WHERE to insert the NumericVector<T> V.
+   * Inserts the entries of \p v in *this at the locations specified by \p v.
    */
-  virtual void insert (const NumericVector<T> & V,
+  virtual void insert (const NumericVector<T> & v,
                        const std::vector<numeric_index_type> & dof_indices);
 
   /**
-   * \f$ U=V \f$ where U and V are type DenseVector<T> and you want to
-   * specify WHERE to insert the DenseVector<T> V.
+   * Inserts the entries of \p v in *this at the locations specified by \p v.
    */
-  void insert (const DenseVector<T> & V,
+  void insert (const DenseVector<T> & v,
                const std::vector<numeric_index_type> & dof_indices);
 
   /**
-   * \f$ U=V \f$ where V is a DenseSubVector<T> and you want to
-   * specify WHERE to insert it.
+   * Inserts the entries of \p v in *this at the locations specified by \p v.
    */
-  void insert (const DenseSubVector<T> & V,
+  void insert (const DenseSubVector<T> & v,
                const std::vector<numeric_index_type> & dof_indices);
 
   /**
@@ -523,16 +534,17 @@ public:
   virtual void scale (const T factor) = 0;
 
   /**
-   * Sets u(i) <- abs(u(i)) for each entry in the vector.
+   * Sets \f$ u_i \leftarrow |u_i| \f$ for each entry in the vector.
    */
   virtual void abs() = 0;
 
   /**
-   * \returns The dot product of (*this) with the vector \p V.
+   * \returns \f$ \vec{u} \cdot \vec{v} \f$, the dot product of
+   * (*this) with the vector \p v.
    *
-   * Uses the complex-conjugate of V in the complex-valued case.
+   * Uses the complex-conjugate of \p v in the complex-valued case.
    */
-  virtual T dot(const NumericVector<T> & V) const = 0;
+  virtual T dot(const NumericVector<T> & v) const = 0;
 
   /**
    * Creates a copy of the global vector in the local vector \p
@@ -623,8 +635,9 @@ public:
                                        const Real threshold = TOLERANCE) const;
 
   /**
-   * Computes the pointwise (i.e. component-wise) product of \p vec1
-   * and \p vec2 and stores the result in \p *this.
+   * Computes \f$ u_i \leftarrow u_i v_i \f$ (summation not implied)
+   * i.e. the pointwise (component-wise) product of \p vec1 and
+   * \p vec2, and stores the result in \p *this.
    */
   virtual void pointwise_mult (const NumericVector<T> & vec1,
                                const NumericVector<T> & vec2) = 0;

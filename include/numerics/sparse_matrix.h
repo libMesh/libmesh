@@ -160,7 +160,7 @@ public:
   virtual void zero () = 0;
 
   /**
-   * Sets all row entries to 0 then puts diag_value in the diagonal entry.
+   * Sets all row entries to 0 then puts \p diag_value in the diagonal entry.
    */
   virtual void zero_rows (std::vector<numeric_index_type> & rows, T diag_value = 0.0);
 
@@ -244,7 +244,7 @@ public:
   { this->add_block_matrix (dm, dof_indices, dof_indices); }
 
   /**
-   * Compute A += a*X for scalar \p a, matrix \p X.
+   * Compute \f$ A \leftarrow A + a*X \f$ for scalar \p a, matrix \p X.
    */
   virtual void add (const T a, SparseMatrix<T> & X) = 0;
 
@@ -258,22 +258,23 @@ public:
                          const numeric_index_type j) const = 0;
 
   /**
-   * \returns The l1-norm of the matrix, that is the max column sum:
-   * \f$ |M|_1 = \max_{all columns j} \sum_{all rows i} |M_ij|\f$
+   * \returns The \f$ \ell_1 \f$-norm of the matrix, that is the max column sum:
+   * \f$ |M|_1 = \max_{j} \sum_{i} |M_{ij}| \f$
    *
    * This is the natural matrix norm that is compatible with the
-   * l1-norm for vectors, i.e. \f$ |Mv|_1 \leq |M|_1 |v|_1 \f$.
+   * \f$ \ell_1 \f$-norm for vectors, i.e. \f$ |Mv|_1 \leq |M|_1 |v|_1 \f$.
    * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
    */
   virtual Real l1_norm () const = 0;
 
   /**
-   * Return the linfty-norm of the matrix, that is the max row sum:
+   * \returns The \f$ \ell_{\infty} \f$-norm of the matrix, that is the max row sum:
    *
-   * \f$ |M|_infty = \max_{all rows i} \sum_{all columns j} |M_ij| \f$
+   * \f$ |M|_{\infty} = \max_{i} \sum_{j} |M_{ij}| \f$
    *
    * This is the natural matrix norm that is compatible to the
-   * linfty-norm of vectors, i.e. \f$ |Mv|_infty \leq |M|_infty |v|_infty \f$.
+   * \f$ \ell_{\infty} \f$-norm of vectors, i.e.
+   * \f$ |Mv|_{\infty} \leq |M|_{\infty} |v|_{\infty} \f$.
    * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
    */
   virtual Real linfty_norm () const = 0;
