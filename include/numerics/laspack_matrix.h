@@ -103,7 +103,7 @@ public:
 
   virtual void zero () libmesh_override;
 
-  virtual void close () const libmesh_override { const_cast<LaspackMatrix<T> *>(this)->_closed = true; }
+  virtual void close () libmesh_override { this->_closed = true; }
 
   virtual numeric_index_type m () const libmesh_override;
 

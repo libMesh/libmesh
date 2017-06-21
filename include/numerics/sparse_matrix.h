@@ -168,7 +168,7 @@ public:
    * Calls the SparseMatrix's internal assembly routines, ensuring
    * that the values are consistent across processors.
    */
-  virtual void close () const = 0;
+  virtual void close () = 0;
 
   /**
    * \returns The row-dimension of the matrix.

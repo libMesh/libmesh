@@ -319,7 +319,7 @@ EpetraMatrix<T>::~EpetraMatrix()
 
 
 template <typename T>
-void EpetraMatrix<T>::close () const
+void EpetraMatrix<T>::close ()
 {
   libmesh_assert(_mat);
 

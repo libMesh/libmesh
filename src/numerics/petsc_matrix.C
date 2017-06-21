@@ -533,8 +533,13 @@ void PetscMatrix<T>::print_matlab (const std::string & name) const
 
   semiparallel_only();
 
-  // libmesh_assert (this->closed());
-  this->close();
+  if (!this->closed())
+    {
+      libmesh_deprecated();
+      libmesh_warning("The matrix must be assembled before calling PetscMatrix::print_matlab().\n"
+                      "Please update your code, as this warning will become an error in a future release.");
+      const_cast<PetscMatrix<T> *>(this)->close();
+    }
 
   PetscErrorCode ierr=0;
   PetscViewer petsc_viewer;
@@ -615,7 +620,13 @@ void PetscMatrix<T>::print_personal(std::ostream & os) const
   // #endif
 
   // Matrix must be in an assembled state to be printed
-  this->close();
+  if (!this->closed())
+    {
+      libmesh_deprecated();
+      libmesh_warning("The matrix must be assembled before calling PetscMatrix::print_personal().\n"
+                      "Please update your code, as this warning will become an error in a future release.");
+      const_cast<PetscMatrix<T> *>(this)->close();
+    }
 
   PetscErrorCode ierr=0;
 
@@ -780,8 +791,13 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
                                     const std::vector<numeric_index_type> & cols,
                                     const bool reuse_submatrix) const
 {
-  // Can only extract submatrices from closed matrices
-  this->close();
+  if (!this->closed())
+    {
+      libmesh_deprecated();
+      libmesh_warning("The matrix must be assembled before calling PetscMatrix::create_submatrix().\n"
+                      "Please update your code, as this warning will become an error in a future release.");
+      const_cast<PetscMatrix<T> *>(this)->close();
+    }
 
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscMatrix<T> * petsc_submatrix = cast_ptr<PetscMatrix<T> *>(&submatrix);
@@ -878,7 +894,7 @@ void PetscMatrix<T>::get_transpose (SparseMatrix<T> & dest) const
 
 
 template <typename T>
-void PetscMatrix<T>::close () const
+void PetscMatrix<T>::close ()
 {
   semiparallel_only();
 

@@ -148,7 +148,7 @@ public:
 
   virtual void zero_rows (std::vector<numeric_index_type> & rows, T diag_value = 0.0) libmesh_override;
 
-  virtual void close () const libmesh_override;
+  virtual void close () libmesh_override;
 
   virtual numeric_index_type m () const libmesh_override;
 
