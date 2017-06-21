@@ -31,9 +31,11 @@ namespace libMesh
 {
 
 /**
- * Defines a dense submatrix for use in Finite Element-type computations.
- * Useful for storing element stiffness matrices before summation
- * into a global matrix, particularly when you have systems of equations.
+ * Defines a dense submatrix for use in Finite Element-type
+ * computations.  Useful for storing element stiffness matrices before
+ * summation into a global matrix, particularly when you have systems
+ * of equations.  All overridden virtual functions are documented in
+ * dense_matrix_base.h.
  *
  * \author Benjamin S. Kirk
  * \date 2003
@@ -65,15 +67,11 @@ public:
    */
   virtual ~DenseSubMatrix() {}
 
-
   /**
    * \returns A reference to the parent matrix.
    */
   DenseMatrix<T> & parent () { return _parent_matrix; }
 
-  /**
-   * Set every element in the submatrix to 0.
-   */
   virtual void zero() libmesh_override;
 
   /**
@@ -88,28 +86,16 @@ public:
   T & operator() (const unsigned int i,
                   const unsigned int j);
 
-  /**
-   * \returns The \p (i,j) element of the matrix as a writable reference.
-   */
   virtual T el(const unsigned int i,
                const unsigned int j) const libmesh_override
   { return (*this)(i,j); }
 
-  /**
-   * \returns The \p (i,j) element of the matrix as a writable reference.
-   */
   virtual T & el(const unsigned int i,
                  const unsigned int j) libmesh_override
   { return (*this)(i,j); }
 
-  /**
-   * Performs the operation: (*this) <- M2 * (*this)
-   */
   virtual void left_multiply (const DenseMatrixBase<T> & M2) libmesh_override;
 
-  /**
-   * Performs the operation: (*this) <- (*this) * M3
-   */
   virtual void right_multiply (const DenseMatrixBase<T> & M3) libmesh_override;
 
   /**

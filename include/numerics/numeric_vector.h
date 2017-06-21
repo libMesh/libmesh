@@ -476,7 +476,7 @@ public:
 
   /**
    * \f$U+=A^T*V\f$, add the product of the transpose of a \p
-   * SparseMatrix \p A_trans and a \p NumericVector \p V to \p this,
+   * SparseMatrix \p A and a \p NumericVector \p V to \p this,
    * where \p this=U.
    */
   virtual void add_vector_transpose (const NumericVector<T> & v,
@@ -651,7 +651,7 @@ public:
   }
 
   /**
-   * Print the contents of the matrix in Matlab's sparse matrix
+   * Print the contents of the vector in Matlab's sparse matrix
    * format. Optionally prints the vector to the file named \p name.
    * If \p name is not specified it is dumped to the screen.
    */
@@ -661,8 +661,8 @@ public:
   }
 
   /**
-   * Creates the subvector "subvector" from the indices in the "rows"
-   * array.  Similar to the \p create_submatrix() routine for the
+   * Fills in \p subvector from this vector using the indices in \p
+   * rows.  Similar to the \p create_submatrix() routine for the
    * SparseMatrix class, it is currently only implemented for
    * PetscVectors.
    */
@@ -673,8 +673,8 @@ public:
   }
 
   /**
-   * Exchanges the values/sizes of two vectors.  There should be
-   * enough indirection in subclasses to make this an O(1) header-swap
+   * Swaps the contents of this with \p v.  There should be enough
+   * indirection in subclasses to make this an O(1) header-swap
    * operation.
    */
   virtual void swap (NumericVector<T> & v);

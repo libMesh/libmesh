@@ -46,11 +46,13 @@ namespace libMesh
 {
 
 /**
- * FEMFunction that returns a scalar value.
+ * A Function generated (via FParser) by parsing a mathematical
+ * expression. All overridden virtual functions are documented in
+ * function_base.h.
  *
  * \author Roy Stogner
  * \date 2012
- * \brief A Function generated (via FParser) by parsing a mathematical expression.
+ * \brief A Function defined by a std::string.
  */
 template <typename Output=Number, typename OutputGradient=Gradient>
 class ParsedFunction : public FunctionBase<Output>
@@ -67,7 +69,7 @@ public:
   void reparse (const std::string & expression);
 
   virtual Output operator() (const Point & p,
-                             const Real time = 0);
+                             const Real time = 0) libmesh_override;
 
   /**
    * Query if the automatic derivative generation was successful.
@@ -82,15 +84,11 @@ public:
 
   virtual void operator() (const Point & p,
                            const Real time,
-                           DenseVector<Output> & output);
+                           DenseVector<Output> & output) libmesh_override;
 
-  /**
-   * \returns The vector component \p i at coordinate \p p and time \p
-   * time.
-   */
   virtual Output component (unsigned int i,
                             const Point & p,
-                            Real time);
+                            Real time) libmesh_override;
 
   const std::string & expression() { return _expression; }
 
@@ -99,7 +97,7 @@ public:
    */
   virtual Output & getVarAddress(const std::string & variable_name);
 
-  virtual UniquePtr<FunctionBase<Output> > clone() const;
+  virtual UniquePtr<FunctionBase<Output> > clone() const libmesh_override;
 
   /**
    * \returns The value of an inline variable.

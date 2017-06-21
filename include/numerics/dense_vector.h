@@ -43,6 +43,7 @@ namespace libMesh
  * This class is to basically compliment the \p DenseMatix class.  It
  * has additional capabilities over the \p std::vector that make it
  * useful for finite elements, particulary for systems of equations.
+ * All overridden virtual functions are documented in dense_vector_base.h.
  *
  * \author Benjamin S. Kirk
  * \date 2003
@@ -83,23 +84,14 @@ public:
    */
   ~DenseVector() {}
 
-  /**
-   * \returns The size of the vector.
-   */
   virtual unsigned int size() const libmesh_override
   {
     return cast_int<unsigned int>(_val.size());
   }
 
-  /**
-   * \returns \p true if size() is 0.
-   */
   virtual bool empty() const libmesh_override
   { return _val.empty(); }
 
-  /**
-   * Set every element in the vector to 0.
-   */
   virtual void zero() libmesh_override;
 
   /**
@@ -112,15 +104,9 @@ public:
    */
   T & operator() (const unsigned int i);
 
-  /**
-   * \returns A const reference to entry \p i of the vector via virtual function call.
-   */
   virtual T el(const unsigned int i) const libmesh_override
   { return (*this)(i); }
 
-  /**
-   * \returns A writable reference to entry \p i of the vector via virtual function call.
-   */
   virtual T & el(const unsigned int i) libmesh_override
   { return (*this)(i); }
 

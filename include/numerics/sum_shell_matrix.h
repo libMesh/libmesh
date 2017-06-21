@@ -34,7 +34,8 @@ namespace libMesh
 
 /**
  * This class combines any number of shell matrices to a single shell
- * matrix, acting as the sum of the matrices.
+ * matrix by summing them together. All overridden virtual functions
+ * are documented in shell_matrix.h.
  *
  * \author Tim Kroeger
  * \date 2008
@@ -65,38 +66,20 @@ public:
    */
   virtual ~SumShellMatrix ();
 
-  /**
-   * \returns \p m, the row-dimension of the matrix where the marix is
-   * \f$ M \times N \f$.
-   */
   virtual numeric_index_type m () const libmesh_override;
 
-  /**
-   * \returns \p n, the column-dimension of the matrix where the marix
-   * is \f$ M \times N \f$.
-   */
   virtual numeric_index_type n () const libmesh_override;
 
-  /**
-   * Multiplies the matrix with \p arg and stores the result in \p
-   * dest.
-   */
   virtual void vector_mult (NumericVector<T> & dest,
                             const NumericVector<T> & arg) const libmesh_override;
 
-  /**
-   * Multiplies the matrix with \p arg and adds the result to \p dest.
-   */
   virtual void vector_mult_add (NumericVector<T> & dest,
                                 const NumericVector<T> & arg) const libmesh_override;
 
-  /**
-   * Copies the diagonal part of the matrix into \p dest.
-   */
   virtual void get_diagonal (NumericVector<T> & dest) const libmesh_override;
 
   /**
-   * A vector of the summands.
+   * A vector of pointers to the summands.
    */
   std::vector<ShellMatrix<T> *> matrices;
 };

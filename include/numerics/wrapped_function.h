@@ -37,7 +37,8 @@ namespace libMesh
 /**
  * This class provides a wrapper with which to evaluate a
  * (libMesh-style) function pointer in a FunctionBase-compatible
- * interface.
+ * interface. All overridden virtual functions are documented in
+ * function_base.h.
  *
  * \author Roy Stogner
  * \date 2012
@@ -69,25 +70,13 @@ public:
 
   virtual UniquePtr<FunctionBase<Output> > clone () const libmesh_override;
 
-  /**
-   * \returns The scalar function value at coordinate \p p and time \p
-   * time, which defaults to zero.
-   */
   virtual Output operator() (const Point & p,
                              const Real time = 0.) libmesh_override;
 
-  /**
-   * Evaluation function for time-dependent vector-valued functions.
-   * Sets output values in the passed-in \p output DenseVector.
-   */
   virtual void operator() (const Point & p,
                            const Real time,
                            DenseVector<Output> & output) libmesh_override;
 
-  /**
-   * \returns The vector component \p i at coordinate \p p and time \p
-   * time.
-   */
   virtual Output component (unsigned int i,
                             const Point & p,
                             Real time=0.) libmesh_override;

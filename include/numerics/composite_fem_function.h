@@ -52,9 +52,11 @@ public:
       delete subfunctions[i];
   }
 
-  // Attach a new subfunction, along with a map from the indices of
-  // that subfunction to the indices of the global function.
-  // (*this)(index_map[i]) will return f(i).
+  /**
+   * Attach a new subfunction, along with a map from the indices of
+   * that subfunction to the indices of the global function.
+   * (*this)(index_map[i]) will return f(i).
+   */
   void attach_subfunction (const FEMFunctionBase<Output> & f,
                            const std::vector<unsigned int> & index_map)
   {
@@ -113,10 +115,6 @@ public:
       }
   }
 
-  /**
-   * \returns The vector component \p i at coordinate
-   * \p p and time \p time.
-   */
   virtual Output component (const FEMContext & c,
                             unsigned int i,
                             const Point & p,
