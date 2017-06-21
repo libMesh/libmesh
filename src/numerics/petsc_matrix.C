@@ -533,8 +533,8 @@ void PetscMatrix<T>::print_matlab (const std::string & name) const
 
   semiparallel_only();
 
-  // libmesh_assert (this->closed());
-  this->close();
+  if (!this->closed())
+    libmesh_error_msg("The matrix must be assembled before calling PetscMatrix::print_matlab().");
 
   PetscErrorCode ierr=0;
   PetscViewer petsc_viewer;
@@ -615,7 +615,8 @@ void PetscMatrix<T>::print_personal(std::ostream & os) const
   // #endif
 
   // Matrix must be in an assembled state to be printed
-  this->close();
+  if (!this->closed())
+    libmesh_error_msg("The matrix must be assembled before calling PetscMatrix::print_personal().");
 
   PetscErrorCode ierr=0;
 
@@ -780,8 +781,8 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
                                     const std::vector<numeric_index_type> & cols,
                                     const bool reuse_submatrix) const
 {
-  // Can only extract submatrices from closed matrices
-  this->close();
+  if (!this->closed())
+    libmesh_error_msg("The matrix must be assembled before calling PetscMatrix::create_submatrix().");
 
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscMatrix<T> * petsc_submatrix = cast_ptr<PetscMatrix<T> *>(&submatrix);

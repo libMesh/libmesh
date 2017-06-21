@@ -228,10 +228,12 @@ void PetscVector<T>::add_vector (const NumericVector<T> & V_in,
 
   PetscErrorCode ierr=0;
 
-  A->close();
+  // We can't close() the matrix for you, as that would potentially modify the state of a const object.
+  if (!A->closed())
+    libmesh_error_msg("Matrix A must be assembled before calling PetscVector::add_vector(v, A).");
 
   // The const_cast<> is not elegant, but it is required since PETSc
-  // is not const-correct.
+  // expects a non-const Mat.
   ierr = MatMultAdd(const_cast<PetscMatrix<T> *>(A)->mat(), V->_vec, _vec, _vec);
   LIBMESH_CHKERR(ierr);
 }
@@ -249,10 +251,12 @@ void PetscVector<T>::add_vector_transpose (const NumericVector<T> & V_in,
 
   PetscErrorCode ierr=0;
 
-  A->close();
+  // We can't close() the matrix for you, as that would potentially modify the state of a const object.
+  if (!A->closed())
+    libmesh_error_msg("Matrix A must be assembled before calling PetscVector::add_vector_transpose(v, A).");
 
   // The const_cast<> is not elegant, but it is required since PETSc
-  // is not const-correct.
+  // expects a non-const Mat.
   ierr = MatMultTransposeAdd(const_cast<PetscMatrix<T> *>(A)->mat(), V->_vec, _vec, _vec);
   LIBMESH_CHKERR(ierr);
 }
@@ -279,14 +283,16 @@ void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T> & V_
   const PetscVector<T> * V = cast_ptr<const PetscVector<T> *>(&V_in);
   const PetscMatrix<T> * A = cast_ptr<const PetscMatrix<T> *>(&A_in);
 
-  A->close();
+  // We can't close() the matrix for you, as that would potentially modify the state of a const object.
+  if (!A->closed())
+    libmesh_error_msg("Matrix A must be assembled before calling PetscVector::add_vector_conjugate_transpose(v, A).");
 
   // Store a temporary copy since MatMultHermitianTransposeAdd doesn't seem to work
   // TODO: Find out why MatMultHermitianTransposeAdd doesn't work, might be a PETSc bug?
   UniquePtr< NumericVector<Number> > this_clone = this->clone();
 
   // The const_cast<> is not elegant, but it is required since PETSc
-  // is not const-correct.
+  // expects a non-const Mat.
   PetscErrorCode ierr = MatMultHermitianTranspose(const_cast<PetscMatrix<T> *>(A)->mat(), V->_vec, _vec);
   LIBMESH_CHKERR(ierr);
 
