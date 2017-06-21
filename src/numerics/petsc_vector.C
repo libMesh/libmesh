@@ -228,9 +228,14 @@ void PetscVector<T>::add_vector (const NumericVector<T> & V_in,
 
   PetscErrorCode ierr=0;
 
-  // We can't close() the matrix for you, as that would potentially modify the state of a const object.
+  // We shouldn't close() the matrix for you, as that would potentially modify the state of a const object.
   if (!A->closed())
-    libmesh_error_msg("Matrix A must be assembled before calling PetscVector::add_vector(v, A).");
+    {
+      libmesh_deprecated();
+      libmesh_warning("Matrix A must be assembled before calling PetscVector::add_vector(v, A).\n"
+                      "Please update your code, as this warning will become an error in a future release.");
+      const_cast<PetscMatrix<T> *>(A)->close();
+    }
 
   // The const_cast<> is not elegant, but it is required since PETSc
   // expects a non-const Mat.
@@ -251,9 +256,14 @@ void PetscVector<T>::add_vector_transpose (const NumericVector<T> & V_in,
 
   PetscErrorCode ierr=0;
 
-  // We can't close() the matrix for you, as that would potentially modify the state of a const object.
+  // We shouldn't close() the matrix for you, as that would potentially modify the state of a const object.
   if (!A->closed())
-    libmesh_error_msg("Matrix A must be assembled before calling PetscVector::add_vector_transpose(v, A).");
+    {
+      libmesh_deprecated();
+      libmesh_warning("Matrix A must be assembled before calling PetscVector::add_vector_transpose(v, A).\n"
+                      "Please update your code, as this warning will become an error in a future release.");
+      const_cast<PetscMatrix<T> *>(A)->close();
+    }
 
   // The const_cast<> is not elegant, but it is required since PETSc
   // expects a non-const Mat.
@@ -283,9 +293,14 @@ void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T> & V_
   const PetscVector<T> * V = cast_ptr<const PetscVector<T> *>(&V_in);
   const PetscMatrix<T> * A = cast_ptr<const PetscMatrix<T> *>(&A_in);
 
-  // We can't close() the matrix for you, as that would potentially modify the state of a const object.
+  // We shouldn't close() the matrix for you, as that would potentially modify the state of a const object.
   if (!A->closed())
-    libmesh_error_msg("Matrix A must be assembled before calling PetscVector::add_vector_conjugate_transpose(v, A).");
+    {
+      libmesh_deprecated();
+      libmesh_warning("Matrix A must be assembled before calling PetscVector::add_vector_conjugate_transpose(v, A).\n"
+                      "Please update your code, as this warning will become an error in a future release.");
+      const_cast<PetscMatrix<T> *>(A)->close();
+    }
 
   // Store a temporary copy since MatMultHermitianTransposeAdd doesn't seem to work
   // TODO: Find out why MatMultHermitianTransposeAdd doesn't work, might be a PETSc bug?

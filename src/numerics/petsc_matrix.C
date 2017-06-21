@@ -534,7 +534,12 @@ void PetscMatrix<T>::print_matlab (const std::string & name) const
   semiparallel_only();
 
   if (!this->closed())
-    libmesh_error_msg("The matrix must be assembled before calling PetscMatrix::print_matlab().");
+    {
+      libmesh_deprecated();
+      libmesh_warning("The matrix must be assembled before calling PetscMatrix::print_matlab().\n"
+                      "Please update your code, as this warning will become an error in a future release.");
+      const_cast<PetscMatrix<T> *>(this)->close();
+    }
 
   PetscErrorCode ierr=0;
   PetscViewer petsc_viewer;
@@ -616,7 +621,12 @@ void PetscMatrix<T>::print_personal(std::ostream & os) const
 
   // Matrix must be in an assembled state to be printed
   if (!this->closed())
-    libmesh_error_msg("The matrix must be assembled before calling PetscMatrix::print_personal().");
+    {
+      libmesh_deprecated();
+      libmesh_warning("The matrix must be assembled before calling PetscMatrix::print_personal().\n"
+                      "Please update your code, as this warning will become an error in a future release.");
+      const_cast<PetscMatrix<T> *>(this)->close();
+    }
 
   PetscErrorCode ierr=0;
 
@@ -782,7 +792,12 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
                                     const bool reuse_submatrix) const
 {
   if (!this->closed())
-    libmesh_error_msg("The matrix must be assembled before calling PetscMatrix::create_submatrix().");
+    {
+      libmesh_deprecated();
+      libmesh_warning("The matrix must be assembled before calling PetscMatrix::create_submatrix().\n"
+                      "Please update your code, as this warning will become an error in a future release.");
+      const_cast<PetscMatrix<T> *>(this)->close();
+    }
 
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscMatrix<T> * petsc_submatrix = cast_ptr<PetscMatrix<T> *>(&submatrix);
