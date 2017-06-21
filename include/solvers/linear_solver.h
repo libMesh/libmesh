@@ -154,10 +154,11 @@ public:
                                   const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
 
   /**
-   * This function calls the solver
-   * "_solver_type" preconditioned with the
-   * "_preconditioner_type" preconditioner.  Note that this method
-   * will compute the preconditioner from the system matrix.
+   * This function calls the solver \p _solver_type preconditioned
+   * with the \p _preconditioner_type preconditioner.
+   *
+   * \note This method will compute the preconditioner from the system
+   * matrix.
    */
   virtual std::pair<unsigned int, Real> solve (SparseMatrix<T> &,  // System Matrix
                                                NumericVector<T> &, // Solution vector
@@ -166,9 +167,11 @@ public:
                                                const unsigned int) = 0; // N. Iterations
 
   /**
-   * Function to solve the adjoint system. Note that this method
-   * will compute the preconditioner from the system matrix. This is not a pure virtual
-   * function and is defined linear_solver.C
+   * Function to solve the adjoint system.
+   *
+   * \note This method will compute the preconditioner from the system
+   * matrix. This is not a pure virtual function and is defined
+   * linear_solver.C
    */
   virtual std::pair<unsigned int, Real> adjoint_solve (SparseMatrix<T> &,  // System Matrix
                                                        NumericVector<T> &, // Solution vector

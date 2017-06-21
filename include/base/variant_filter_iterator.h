@@ -356,12 +356,15 @@ public:
    * Templated Constructor.  Allows you to construct the iterator
    * and predicate from any types.  Also advances the data pointer
    * to the first entry which satisfies the predicate.
+   *
+   * \note The initialization list uses the default IterBase copy
+   * constructor.
    */
   template<typename PredType, typename IterType>
   variant_filter_iterator (const IterType & d,
                            const IterType & e,
                            const PredType & p ):
-    data ( new Iter<IterType>(d) ), // note: uses default IterBase copy constructor
+    data ( new Iter<IterType>(d) ),
     end  ( new Iter<IterType>(e) ),
     pred ( new Pred<IterType,PredType>(p) )
   {

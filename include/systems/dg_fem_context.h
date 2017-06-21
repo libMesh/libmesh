@@ -210,7 +210,8 @@ public:
 
   /**
    * Set the neighbor element which we will use to assemble DG terms.
-   * Note that we do not assume that this element is get_elem().neighbor(side)
+   *
+   * \note We do not assume that this element is get_elem().neighbor(side)
    * because we also need to be able to handle the special case of DG terms on
    * "cracks" in a mesh to model certain types of interface conditions. In this
    * case, we need to be able to specify the neighbor element manually.

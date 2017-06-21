@@ -335,7 +335,7 @@ private:
    * and \p _values are valid.
    */
 #ifdef LIBMESH_HAVE_CXX11_THREAD
-  // Note: we can't use std::atomic_flag here because we need load and store operations
+  // We can't use std::atomic_flag here because we need load and store operations.
   mutable std::atomic<bool> _array_is_present;
 #else
   mutable bool _array_is_present;
@@ -1127,8 +1127,8 @@ template <typename T>
 inline
 void PetscVector<T>::restore_array()
 {
-  // Note _values_manually_retrieved needs to be set to false
-  // BEFORE calling _restore_array()!
+  // \note \p _values_manually_retrieved needs to be set to \p false
+  // \e before calling \p _restore_array()!
   _values_manually_retrieved = false;
   _restore_array();
 }

@@ -222,8 +222,9 @@ public:
   virtual void swap (NumericVector<T> & v) libmesh_override;
 
   /**
-   * References to the underlying Eigen data types. Note this is generally
-   * not required in user-level code.
+   * References to the underlying Eigen data types.
+   *
+   * \note This is generally not required in user-level code.
    */
   DataType &       vec ()        { return _vec; }
   const DataType & vec () const  { return _vec; }

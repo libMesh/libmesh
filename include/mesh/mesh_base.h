@@ -288,10 +288,11 @@ public:
 
   /**
    * Reserves space for a known number of nodes.
-   * Note that this method may or may not do anything, depending
-   * on the actual \p Mesh implementation.  If you know the number
-   * of nodes you will add and call this method before repeatedly
-   * calling \p add_point() the implementation will be more efficient.
+   *
+   * \note This method may or may not do anything, depending on the
+   * actual \p Mesh implementation.  If you know the number of nodes
+   * you will add and call this method before repeatedly calling \p
+   * add_point() the implementation will be more efficient.
    */
   virtual void reserve_nodes (const dof_id_type nn) = 0;
 
@@ -330,9 +331,9 @@ public:
   /**
    * Reserves space for a known number of elements.
    *
-   * Note that this method may or may not do anything, depending
-   * on the actual \p Mesh implementation.  If you know the number
-   * of elements you will add and call this method before repeatedly
+   * \note This method may or may not do anything, depending on the
+   * actual \p Mesh implementation.  If you know the number of
+   * elements you will add and call this method before repeatedly
    * calling \p add_point() the implementation will be more efficient.
    */
   virtual void reserve_elem (const dof_id_type ne) = 0;
@@ -621,13 +622,14 @@ public:
   virtual Elem * insert_elem (Elem * e) = 0;
 
   /**
-   * Removes element \p e from the mesh. Note that calling this
-   * method may produce isolated nodes, i.e. nodes not connected
-   * to any element.  This method must be implemented in derived classes
-   * in such a way that it does not invalidate element iterators.
+   * Removes element \p e from the mesh. This method must be
+   * implemented in derived classes in such a way that it does not
+   * invalidate element iterators.  Users should call
+   * MeshBase::prepare_for_use() after elements are added to and/or
+   * deleted from the mesh.
    *
-   * Users should call MeshBase::prepare_for_use() after elements are
-   * added to and/or deleted from the mesh.
+   * \note Calling this method may produce isolated nodes, i.e. nodes
+   * not connected to any element.
    */
   virtual void delete_elem (Elem * e) = 0;
 
@@ -735,16 +737,17 @@ public:
   bool allow_remote_element_removal() const { return _allow_remote_element_removal; }
 
   /**
-   * If true is passed in then this mesh will no longer be (re)partitioned.
-   * It would probably be a bad idea to call this on a Serial Mesh _before_
-   * the first partitioning has happened... because no elements would get assigned
-   * to your processor pool.
+   * If true is passed in then this mesh will no longer be
+   * (re)partitioned.  It would probably be a bad idea to call this on
+   * a DistributedMesh _before_ the first partitioning has
+   * happened... because no elements would get assigned to your
+   * processor pool.
    *
-   * Note that turning on skip_partitioning() can have adverse effects on your
-   * performance when using AMR... ie you could get large load imbalances.
-   *
-   * However you might still want to use this if the communication and computation
-   * of the rebalance and repartition is too high for your application.
+   * \note Turning on skip_partitioning() can have adverse effects on
+   * your performance when using AMR... i.e. you could get large load
+   * imbalances.  However you might still want to use this if the
+   * communication and computation of the rebalance and repartition is
+   * too high for your application.
    */
   void skip_partitioning(bool skip) { _skip_partitioning = skip; }
   bool skip_partitioning() const { return _skip_partitioning; }
@@ -800,8 +803,10 @@ public:
   /**
    * \returns The number of partitions which have been defined via
    * a call to either mesh.partition() or by building a Partitioner
-   * object and calling partition.  Note that the partitioner objects
-   * are responsible for setting this value.
+   * object and calling partition.
+   *
+   * \note The partitioner object is responsible for setting this
+   * value.
    */
   unsigned int n_partitions () const
   { return _n_parts; }
@@ -843,15 +848,15 @@ public:
   virtual void all_first_order () = 0;
 
   /**
-   * Converts a (conforming, non-refined) mesh with linear
-   * elements into a mesh with second-order elements.  For
-   * example, a mesh consisting of \p Tet4 will be converted
-   * to a mesh with \p Tet10 etc.  Note that for some elements
-   * like \p Hex8 there exist two higher order equivalents,
-   * \p Hex20 and \p Hex27.  When \p full_ordered is \p true
-   * (default), then \p Hex27 is built.  Otherwise, \p Hex20
-   * is built.  The same holds obviously for \p Quad4, \p Prism6
-   * ...
+   * Converts a (conforming, non-refined) mesh with linear elements
+   * into a mesh with second-order elements.  For example, a mesh
+   * consisting of \p Tet4 will be converted to a mesh with \p Tet10
+   * etc.
+   *
+   * \note For some elements like \p Hex8 there exist two higher order
+   * equivalents, \p Hex20 and \p Hex27.  When \p full_ordered is \p
+   * true (default), then \p Hex27 is built.  Otherwise, \p Hex20 is
+   * built.  The same holds obviously for \p Quad4, \p Prism6, etc.
    */
   virtual void all_second_order (const bool full_ordered=true) = 0;
 
@@ -863,18 +868,20 @@ public:
 
   /**
    * structs for the element_iterator's.
-   * Note that these iterators were designed so that derived mesh classes could use the
-   * _same_ base class iterators interchangeably.  Their definition comes later in the
-   * header file.
+   *
+   * \note These iterators were designed so that derived mesh classes
+   * could use the _same_ base class iterators interchangeably.  Their
+   * definition comes later in the header file.
    */
   struct element_iterator;
   struct const_element_iterator;
 
   /**
    * structs for the node_iterator's.
-   * Note that these iterators were designed so that derived mesh classes could use the
-   * _same_ base class iterators interchangeably.  Their definition comes later in the
-   * header file.
+   *
+   * \note These iterators were designed so that derived mesh classes
+   * could use the _same_ base class iterators interchangeably.  Their
+   * definition comes later in the header file.
    */
   struct node_iterator;
   struct const_node_iterator;
@@ -1292,10 +1299,11 @@ protected:
    * The number of partitions the mesh has.  This is set by
    * the partitioners, and may not be changed directly by
    * the user.
-   * **NOTE** The number of partitions *need not* equal
-   * this->n_processors(), consider for example the case
-   * where you simply want to partition a mesh on one
-   * processor and view the result in GMV.
+   *
+   * \note The number of partitions \e need \e not equal
+   * this->n_processors(), consider for example the case where you
+   * simply want to partition a mesh on one processor and view the
+   * result in GMV.
    */
   unsigned int _n_parts;
 
@@ -1455,21 +1463,23 @@ MeshBase::const_element_iterator : variant_filter_iterator<MeshBase::Predicate,
                                                            Elem * const &,
                                                            Elem * const *>
 {
-  // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
+  /**
+   * Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor.
+   */
   template <typename PredType, typename IterType>
   const_element_iterator (const IterType & d,
                           const IterType & e,
                           const PredType & p ) :
     variant_filter_iterator<MeshBase::Predicate, Elem * const, Elem * const &, Elem * const *>(d,e,p)  {}
 
-
-  // The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
-  // variant_filter_iterator copy constructor.  Note that this one is *not* templated!
+  /**
+   * The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
+   * variant_filter_iterator copy constructor.
+   *
+   * \note This one is \e not templated!
+   */
   const_element_iterator (const MeshBase::element_iterator & rhs) :
-    variant_filter_iterator<Predicate, Elem * const, Elem * const &, Elem * const *>(rhs)
-  {
-    // libMesh::out << "Called element_iterator conversion-to-const ctor." << std::endl;
-  }
+    variant_filter_iterator<Predicate, Elem * const, Elem * const &, Elem * const *>(rhs) {}
 };
 
 
@@ -1484,7 +1494,9 @@ MeshBase::const_element_iterator : variant_filter_iterator<MeshBase::Predicate,
 struct
 MeshBase::node_iterator : variant_filter_iterator<MeshBase::Predicate, Node *>
 {
-  // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
+  /**
+   * Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor.
+   */
   template <typename PredType, typename IterType>
   node_iterator (const IterType & d,
                  const IterType & e,
@@ -1505,21 +1517,23 @@ MeshBase::const_node_iterator : variant_filter_iterator<MeshBase::Predicate,
                                                         Node * const &,
                                                         Node * const *>
 {
-  // Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor
+  /**
+   * Templated forwarding ctor -- forwards to appropriate variant_filter_iterator ctor.
+   */
   template <typename PredType, typename IterType>
   const_node_iterator (const IterType & d,
                        const IterType & e,
                        const PredType & p ) :
     variant_filter_iterator<MeshBase::Predicate, Node * const, Node * const &, Node * const *>(d,e,p)  {}
 
-
-  // The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
-  // variant_filter_iterator copy constructor.  Note that this one is *not* templated!
+  /**
+   * The conversion-to-const ctor.  Takes a regular iterator and calls the appropriate
+   * variant_filter_iterator copy constructor.
+   *
+   * \note This one is *not* templated!
+   */
   const_node_iterator (const MeshBase::node_iterator & rhs) :
-    variant_filter_iterator<Predicate, Node * const, Node * const &, Node * const *>(rhs)
-  {
-    // libMesh::out << "Called node_iterator conversion-to-const ctor." << std::endl;
-  }
+    variant_filter_iterator<Predicate, Node * const, Node * const &, Node * const *>(rhs) {}
 };
 
 

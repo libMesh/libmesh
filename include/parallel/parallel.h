@@ -690,10 +690,11 @@ public:
   const communicator & get() const { return _communicator; }
 
   /**
-   * Get a tag that is unique to this Communicator.  Note that if
-   * people are also using magic numbers or copying communicators
-   * around then we can't guarantee the tag is unique to this
-   * MPI_Comm.
+   * Get a tag that is unique to this Communicator.
+   *
+   * \note If people are also using magic numbers or copying
+   * communicators around then we can't guarantee the tag is unique to
+   * this MPI_Comm.
    */
   MessageTag get_unique_tag(int tagvalue) const;
 

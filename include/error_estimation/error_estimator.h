@@ -45,9 +45,10 @@ template <typename T> class NumericVector;
  * This class holds functions that will estimate the error
  * in a finite element solution on a given mesh.  These error
  * estimates can be useful in their own right, or may be used
- * to guide adaptive mesh refinement.  Note that in general
- * the computed errors are stored as floats rather than doubles
- * since the required precision is low.
+ * to guide adaptive mesh refinement.
+ *
+ * \note The computed errors are stored as floats rather
+ * than doubles since the required precision is low.
  *
  * \author Benjamin S. Kirk
  * \date 2003

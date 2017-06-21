@@ -70,7 +70,7 @@ public:
   /**
    * Actual copying operation.
    *
-   * Note that it does not copy the mesh over (for obvious reasons).
+   * \note The copy will have a reference to the same Mesh as the original.
    */
   BoundaryInfo & operator=(const BoundaryInfo & other_boundary_info);
 
@@ -892,32 +892,39 @@ private:
   std::set<boundary_id_type> _boundary_ids;
 
   /**
-   * Set of user-specified boundary IDs for sides *only*.  Note: _boundary_ids
-   * is the union of this set, _edge_boundary_ids, _node_boundary_ids, and
+   * Set of user-specified boundary IDs for sides *only*.
+   *
+   * \note \p _boundary_ids is the union of this set, \p
+   * _edge_boundary_ids, \p _node_boundary_ids, and \p
    * _shellface_boundary_ids.
    */
   std::set<boundary_id_type> _side_boundary_ids;
 
   /**
    * Set of user-specified boundary IDs for edges *only*.
-   * This is only relevant in 3D. Note: _boundary_ids
-   * is the union of this set, _side_boundary_ids, _node_boundary_ids,
-   * and _shellface_boundary_ids.
+   * This is only relevant in 3D.
+   *
+   * \note \p _boundary_ids is the union of this set, \p _side_boundary_ids,
+   * \p _node_boundary_ids, and \p _shellface_boundary_ids.
    */
   std::set<boundary_id_type> _edge_boundary_ids;
 
   /**
-   * Set of user-specified boundary IDs for nodes *only*.  Note: _boundary_ids
-   * is the union of this set, _edge_boundary_ids, _side_boundary_ids, and
+   * Set of user-specified boundary IDs for nodes *only*.
+   *
+   * \note \p _boundary_ids is the union of this set, \p
+   * _edge_boundary_ids, \p _side_boundary_ids, and \p
    * _shellface_boundary_ids.
    */
   std::set<boundary_id_type> _node_boundary_ids;
 
   /**
    * Set of user-specified boundary IDs for shellfaces *only*.
-   * This is only relevant for shell elements. Note: _boundary_ids
-   * is the union of this set, _side_boundary_ids, _edge_boundary_ids,
-   * and _node_boundary_ids.
+   * This is only relevant for shell elements.
+   *
+   * \note \p _boundary_ids is the union of this set, \p
+   * _side_boundary_ids, \p _edge_boundary_ids, and \p
+   * _node_boundary_ids.
    */
   std::set<boundary_id_type> _shellface_boundary_ids;
 

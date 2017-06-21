@@ -113,9 +113,10 @@ typedef uint16_t processor_id_type;
 typedef uint8_t subdomain_id_type;
 #elif LIBMESH_SUBDOMAIN_ID_BYTES == 4
 /**
- * Note: subdomain_id_types are positive integers - however limitation in the exodusII
- * API force us to use a signed integer here to represent subdomains.  This gives us 2^31
- * possible unique blocks
+ * \note \p subdomain_id_type should be a positive integer, but due to
+ * a limitation in the exodusII API, we are forced to use a signed
+ * integer here to represent subdomains.  This gives us 2^31 possible
+ * unique blocks.
  */
 typedef int32_t subdomain_id_type;
 #elif LIBMESH_SUBDOMAIN_ID_BYTES == 8

@@ -98,10 +98,10 @@ public:
    * smallest chunk the range may be broken into for parallel
    * execution.
    *
-   * Note: The std::vector passed in here MUST live for the
+   * \note The std::vector passed in here MUST live for the
    * lifetime of this StoredRange!
    *
-   * TODO: This should be a std::shared_ptr in the future!
+   * \todo This should be a std::shared_ptr in the future!
    */
   StoredRange (std::vector<object_type> * objs,
                const unsigned int new_grainsize = 1000) :

@@ -135,8 +135,10 @@ protected:
      * associated with this infinite element.
      * Either way, if the modes are stored as nodal dofs (\p n_dofs_at_node)
      * or as element dofs (\p n_dofs_per_elem), in each case we have the
-     * same number of modes in radial direction. Note that for the case of 1D
-     * infinite elements, in the base the dof-per-node scheme is used.
+     * same number of modes in radial direction.
+     *
+     * \note For the case of 1D infinite elements, in the base the
+     * dof-per-node scheme is used.
      *
      * From the formulation of the infinite elements, we have
      * 1 mode, when \p o_radial=CONST.
@@ -160,7 +162,8 @@ protected:
     /**
      * \returns The number of modes in radial direction interior to the element,
      * not associated with any interior nodes.
-     * Note that these modes are a discontinuous approximation, therefore
+     *
+     * \note These modes are a discontinuous approximation, therefore
      * we have no special formulation for coupling in the base, like in the
      * case of associating (possibly) multiple dofs per (outer) node.
      */
@@ -247,12 +250,13 @@ public:
    * \returns The value of the \f$ i^{th} \f$ shape function at
    * point \p p.  This method lets you specify the relevant
    * data directly, and is therefore allowed to be static.
-   * Note that this class member is by far not as efficient as
-   * its counterpart in \p FE<Dim,T>, and is not employed
-   * in the \p reinit() cycle.
-   * Also note that this method does not return physically
-   * correct shapes, instead use \p compute_data().  The \p shape()
-   * methods should only be used for mapping.
+   *
+   * \note This class member is not as efficient as its counterpart in
+   * \p FE<Dim,T>, and is not employed in the \p reinit() cycle.
+   *
+   * \note This method does not return physically correct shapes,
+   * instead use \p compute_data().  The \p shape() methods should
+   * only be used for mapping.
    */
   static Real shape(const FEType & fet,
                     const ElemType t,
@@ -263,12 +267,13 @@ public:
    * \returns The value of the \f$ i^{th} \f$ shape function at
    * point \p p.  This method lets you specify the relevant
    * data directly, and is therefore allowed to be static.
-   * Note that this class member is not as efficient as its
-   * counterpart in \p FE<Dim,T>, and is not employed
-   * in the \p reinit() cycle.
-   * Also note that this method does not return physically
-   * correct shapes, instead use \p compute_data().  The \p shape()
-   * methods should only be used for mapping.
+   *
+   * \note This class member is not as efficient as its counterpart in
+   * \p FE<Dim,T>, and is not employed in the \p reinit() cycle.
+   *
+   * \note This method does not return physically correct shapes,
+   * instead use \p compute_data().  The \p shape() methods should
+   * only be used for mapping.
    */
   static Real shape(const FEType & fet,
                     const Elem * elem,
@@ -279,10 +284,11 @@ public:
    * Generalized version of \p shape(), takes an \p Elem *.  The \p data
    * contains both input and output parameters.  For frequency domain
    * simulations, the complex-valued shape is returned.  In time domain
-   * both the computed shape, and the phase is returned.  Note that
-   * the phase (proportional to the distance of the \p Point \p data.p
-   * from the envelope) is actually a measure how far into the future
-   * the results are.  Pretty weird, hm!?
+   * both the computed shape, and the phase is returned.
+   *
+   * \note The phase (proportional to the distance of the \p Point \p
+   * data.p from the envelope) is actually a measure how far into the
+   * future the results are.
    */
   static void compute_data(const FEType & fe_t,
                            const Elem * inf_elem,
@@ -613,10 +619,11 @@ protected:
   std::vector<Real> dweightdv;
 
   /**
-   * the radial decay \f$ 1/r \f$ in local coordinates.
-   * Needed when setting up the overall shape functions.
-   * Note that it is this decay which assures to satisfy
-   * the Sommerfeld radiation condition in advance.
+   * the radial decay \f$ 1/r \f$ in local coordinates.  Needed when
+   * setting up the overall shape functions.
+   *
+   * \note It is this decay which ensures that the Sommerfeld
+   * radiation condition is satisfied in advance.
    */
   std::vector<Real> som;
   /**
@@ -764,11 +771,12 @@ protected:
   UniquePtr<FEBase> base_fe;
 
   /**
-   * This \p FEType stores the characteristics for which
-   * the data structures \p phi, \p phi_map etc are currently
-   * initialized.  This avoids re-initializing the radial
-   * part.  But note that currently only \p order may change,
-   * neither the FE families nor \p base_order!
+   * This \p FEType stores the characteristics for which the data
+   * structures \p phi, \p phi_map etc are currently initialized.
+   * This avoids re-initializing the radial part.
+   *
+   * \note Currently only \p order may change, both the FE families
+   * and \p base_order must remain constant.
    */
   FEType current_fe_type;
 

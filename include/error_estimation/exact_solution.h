@@ -48,13 +48,13 @@ typedef VectorValue<Number> NumberVectorValue;
 typedef NumberVectorValue   Gradient;
 
 /**
- * This class handles the computation of the L2 and/or H1
- * error for the Systems in the EquationSystems object
- * which is passed to it.  Note that for it to be useful,
- * the user must attach at least one, and possibly two functions
- * which can compute the exact solution and its derivative
- * for any component of any system.  These are the exact_value
- * and exact_deriv functions below.
+ * This class handles the computation of the L2 and/or H1 error for
+ * the Systems in the EquationSystems object which is passed to it.
+ *
+ * \note For this to be useful, the user must attach at least one, and
+ * possibly two, functions which can compute the exact solution and
+ * its derivative for any component of any system.  These are the \p
+ * exact_value and \p exact_deriv functions below.
  *
  * \author Benjamin S. Kirk
  * \author John W. Peterson (modifications for libmesh)

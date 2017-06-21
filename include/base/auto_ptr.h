@@ -227,14 +227,15 @@ public:
    * \param  p  A pointer (defaults to NULL).
    *
    * This object now owns the object pointed to by \p p.
+   *
+   * \note We can't call libmesh_deprecated() in this function, since
+   * global AutoPtr variables are sometimes created before the
+   * libMesh::out stream is ready.
    */
   explicit
   AutoPtr(element_type * p = 0)
     : _ptr(p)
   {
-    // Note: we can't call libmesh_deprecated() here, since global
-    // AutoPtr variables are sometimes created before the libMesh::out
-    // stream is ready.
   }
 
   /**

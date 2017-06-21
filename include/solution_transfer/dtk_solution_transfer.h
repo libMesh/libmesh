@@ -64,10 +64,10 @@ public:
    * This is meant for transferring values from one EquationSystems to
    * another even in the case of having different meshes.
    *
-   * Note that the first time this function is called for one
-   * combination of EquationSystems a lot of setup and caching is
-   * done.  Subsequent transfers between the same EquationSystems will
-   * be _much_ faster.
+   * \note The first time this function is called for one combination
+   * of EquationSystems, a lot of setup and caching is done.
+   * Subsequent transfers between the same EquationSystems will be \e
+   * much faster.
    */
   virtual void transfer(const Variable & from_var, const Variable & to_var) libmesh_override;
 

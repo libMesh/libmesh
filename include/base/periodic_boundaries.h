@@ -40,8 +40,10 @@ class PointLocatorBase;
 
 /**
  * We're using a class instead of a typedef to allow forward
- * declarations and future flexibility.  Note that std::map has no
- * virtual destructor, so downcasting here would be dangerous.
+ * declarations and future flexibility.
+ *
+ * \note \p std::map has no virtual destructor, so downcasting here
+ * would be dangerous.
  *
  * \author Roy Stogner
  * \date 2010

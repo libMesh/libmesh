@@ -269,9 +269,11 @@ public:
 
   /**
    * Fill the input vector \p soln with the solution values for the
-   * system named \p name.  Note that the input
-   * vector \p soln will only be assembled on processor 0, so this
-   * method is only applicable to outputting plot files from processor 0.
+   * system named \p name.
+   *
+   * \note The input vector \p soln will only be assembled on
+   * processor 0, so this method is only applicable to outputting plot
+   * files from processor 0.
    */
   void build_solution_vector (std::vector<Number> & soln,
                               const std::string & system_name,
@@ -325,7 +327,7 @@ public:
    * read all sections of the file, set read_flags to:
    * (READ_HEADER | READ_DATA | READ_ADDITIONAL_DATA)
    *
-   * Note that the equation system can be defined without initializing
+   * \note The equation system can be defined without initializing
    * the data vectors to any solution values.  This can be done
    * by omitting READ_DATA in the read_flags parameter.
    *
@@ -338,7 +340,7 @@ public:
    * \param partition_agnostic If true then the mesh and degrees of freedom
    * will be temporarily renumbered in a partition agnostic way so that
    * files written using "n" mpi processes can be re-read on "m" mpi
-   * processes.  Note that this renumbering is not compatible with meshes
+   * processes.  This renumbering is not compatible with meshes
    * that have two nodes in exactly the same position!
    */
   template <typename InValType>
@@ -373,7 +375,7 @@ public:
    * the enumeration values. Write everything by setting write_flags to:
    * (WRITE_DATA | WRITE_ADDITIONAL_DATA)
    *
-   * Note that the solution data can be omitted by calling
+   * \note The solution data can be omitted by calling
    * this routine with WRITE_DATA omitted in the write_flags argument.
    *
    * If XdrMODE is omitted, it will be inferred as WRITE for filenames
@@ -385,7 +387,7 @@ public:
    * \param partition_agnostic If true then the mesh and degrees of freedom
    * will be temporarily renumbered in a partition agnostic way so that
    * files written using "n" mpi processes can be re-read on "m" mpi
-   * processes.  Note that this renumbering is not compatible with meshes
+   * processes.  This renumbering is not compatible with meshes
    * that have two nodes in exactly the same position!
    */
   void write (const std::string & name,
@@ -503,8 +505,10 @@ private:
    * \param partition_agnostic If true then the mesh and degrees of freedom
    * will be temporarily renumbered in a partition agnostic way so that
    * files written using "n" mpi processes can be re-read on "m" mpi
-   * processes.  Note that this renumbering is not compatible with meshes
-   * that have two nodes in exactly the same position!
+   * processes.
+   *
+   * \note This renumbering is not compatible with meshes that have
+   * two nodes in exactly the same position!
    */
   template <typename InValType>
   void _read_impl (const std::string & name,

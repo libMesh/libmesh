@@ -83,12 +83,15 @@ public:
    * If we want the DofMap to be able to make copies of references and
    * store them in the underlying map, this class must be clone'able,
    * i.e. have a kind of virtual construction mechanism.  The user can
-   * also pass a flag to enable an 'inverse transformation' to be cloned
-   * from a forward transformation.  Note that not every transformation
-   * needs to provide an automatic way to clone an inverse: you can simply
-   * add a pair of PeriodicBoundaryBase objects using the appropriate
-   * DofMap interface instead.  The simplest way to implement a clone
-   * function like this is in terms of a copy constructor, see periodic_boundary.h.
+   * also pass a flag to enable an 'inverse transformation' to be
+   * cloned from a forward transformation. The simplest way to
+   * implement a clone function like this is in terms of a copy
+   * constructor, see periodic_boundary.h.
+   *
+   * \note Not every transformation needs to provide an automatic way
+   * to clone an inverse: you can simply add a pair of
+   * PeriodicBoundaryBase objects using the appropriate DofMap
+   * interface instead.
    */
   virtual UniquePtr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const = 0;
 

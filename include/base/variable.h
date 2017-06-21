@@ -127,9 +127,11 @@ public:
 
   /**
    * \returns \p true if this variable is active on subdomain \p sid,
-   * \p false otherwise.  Note that we interperet the special case of an
-   * empty \p _active_subdomains container as active everywhere, i.e.
-   * for all subdomains.
+   * \p false otherwise.
+   *
+   * \note We interperet the special case of an empty \p
+   * _active_subdomains container as active everywhere, i.e. for all
+   * subdomains.
    */
   bool active_on_subdomain (subdomain_id_type sid) const
   { return (_active_subdomains.empty() || _active_subdomains.count(sid));  }

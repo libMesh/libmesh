@@ -193,7 +193,7 @@ public:
   /**
    * Computes the size of ||u^{n+1} - u^{n}|| in some norm.
    *
-   * Note that, while you can always call this function, its
+   * \note While you can always call this function, its
    * result may or may not be very meaningful.  For example, if
    * you call this function right after calling advance_timestep()
    * then you'll get a result of zero since old_nonlinear_solution
@@ -209,9 +209,10 @@ public:
   /**
    * This value (which defaults to zero) is the number of times the
    * TimeSolver is allowed to halve deltat and let the DiffSolver
-   * repeat the latest failed solve with a reduced timestep.  Note
-   * that this has no effect for SteadySolvers.  Note that you must
-   * set at least one of the DiffSolver flags
+   * repeat the latest failed solve with a reduced timestep.
+   *
+   * \note This has no effect for SteadySolvers.
+   * \note You must set at least one of the DiffSolver flags
    * "continue_after_max_iterations" or
    * "continue_after_backtrack_failure" to allow the TimeSolver to
    * retry the solve.

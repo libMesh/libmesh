@@ -45,8 +45,7 @@
  * code that wishes to be more expressive/correct should use
  * 'libmesh_nullptr' for maximum backwards compatibility.
  *
- * Note: the leading const applies to the following nullptr
- * instance.
+ * \note The leading const applies to the following nullptr instance.
  *
  * Code originally coped from:
  * https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/nullptr#Solution_and_Sample_Code

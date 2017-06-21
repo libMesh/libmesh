@@ -69,23 +69,23 @@ class InfFE;
 
 
 /**
- * This class forms the foundation from which generic finite
- * elements may be derived.  In the current implementation the
- * templated derived class \p FE offers a wide variety of commonly
- * used finite element concepts.  Check there for details.
- * Use the \p FEAbstract::build() method to create an object of any of
- * the derived classes.
- * Note that the amount of virtual members is kept to a minimum,
- * and the sophisticated template scheme of \p FE is quite
- * likely to offer acceptably fast code.
+ * This class forms the foundation from which generic finite elements
+ * may be derived.  In the current implementation, the templated
+ * derived class \p FE offers a wide variety of commonly used finite
+ * element concepts.  Check there for details.  Use the \p
+ * FEAbstract::build() method to create an object of any of the
+ * derived classes.
+ *
+ * \note In the present design, the number of virtual members is kept
+ * to a minimum for performance reasons, although this is not based on
+ * rigorous profiling.
  *
  * All calls to static members of the \p FE classes should be
  * requested through the \p FEInterface.  This interface class
- * offers sort-of runtime polymorphism for the templated finite
- * element classes.  Even internal library classes, like \p DofMap,
- * request the number of dof's through this interface class.
- * Note that this also enables the co-existence of various
- * element-based schemes.
+ * approximates runtime polymorphism for the templated finite element
+ * classes.  Even internal library classes, like \p DofMap, request
+ * the number of DOFs through this interface class.  This approach
+ * also enables the co-existence of various element-based schemes.
  *
  * \author Benjamin S. Kirk
  * \date 2002
@@ -127,10 +127,10 @@ public:
    * of points on the reference element may be specified in the optional
    * argument \p pts.
    *
-   * Note that the FE classes decide which data to initialize based on
-   * which accessor functions such as \p get_phi() or \p get_d2phi() have
-   * been called, so all such accessors should be called before the first
-   * \p reinit().
+   * \note The FE classes decide which data to initialize based on
+   * which accessor functions such as \p get_phi() or \p get_d2phi()
+   * have been called, so all such accessors should be called before
+   * the first \p reinit().
    */
   virtual void reinit (const Elem * elem,
                        const std::vector<Point> * const pts = libmesh_nullptr,
@@ -554,8 +554,9 @@ protected:
 
 
   /**
-   * The finite element type for this object.  Note that this
-   * should be constant for the object.
+   * The finite element type for this object.
+   *
+   * \note This should be constant for the object.
    */
   FEType fe_type;
 

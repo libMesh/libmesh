@@ -281,7 +281,7 @@ public:
    * \returns The \f$ \ell_1 \f$-norm of the vector, i.e. the sum of the
    * absolute values for the specified entries in the vector.
    *
-   * Note that the indices must necessarily live on this processor.
+   * \note The indices must necessarily live on this processor.
    */
   virtual Real subset_l1_norm (const std::set<numeric_index_type> & indices) const;
 
@@ -290,7 +290,7 @@ public:
    * of the sum of the squares of the elements for the specified
    * entries in the vector.
    *
-   * Note that the indices must necessarily live on this processor.
+   * \note The indices must necessarily live on this processor.
    */
   virtual Real subset_l2_norm (const std::set<numeric_index_type> & indices) const;
 
@@ -298,7 +298,7 @@ public:
    * \returns The maximum absolute value of the specified entries of
    * this vector, which is the \f$ \ell_{\infty} \f$-norm of a vector.
    *
-   * Note that the indices must necessarily live on this processor.
+   * \note The indices must necessarily live on this processor.
    */
   virtual Real subset_linfty_norm (const std::set<numeric_index_type> & indices) const;
 
@@ -567,13 +567,15 @@ public:
 
   /**
    * Fill in the local std::vector "v_local" with the global indices
-   * given in "indices".  Note that indices can be different on every
-   * processor, and the same index can be localized to more than one
-   * processor.  The resulting v_local can be shorter than the
-   * original, and the entries will be in the order specified by
-   * indices.
+   * given in "indices".
+   *
+   * \note The indices can be different on every processor, and the
+   * same index can be localized to more than one processor.  The
+   * resulting v_local can be shorter than the original, and the
+   * entries will be in the order specified by indices.
    *
    * Example:
+   * \verbatim
    *   On 4 procs *this = {a, b, c, d, e, f, g, h, i} is a parallel vector.
    *   On each proc, the indices arrays are set up as:
    *   proc0, indices = {1,2,4,5}
@@ -586,6 +588,7 @@ public:
    *   proc1, v_local = {c,f,g,i}
    *   proc2, v_local = {c,d,g,h}
    *   proc3, v_local = {a,b,c,d}
+   * \endverbatim
    *
    * This function is useful in parallel I/O routines, when you have a
    * parallel vector of solution values which you want to write a

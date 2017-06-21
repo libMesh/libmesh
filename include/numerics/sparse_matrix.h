@@ -299,14 +299,14 @@ public:
    * friend std::ostream & operator << (std::ostream & os, const SparseMatrix<U> & m);
    * \endcode
    *
-   * Obscure C++ note 1: the above syntax, which does not require any
+   * \note The above syntax, which does not require any
    * prior declaration of operator<<, declares *any* instantiation of
    * SparseMatrix<X> is friend to *any* instantiation of
    * operator<<(ostream &, SparseMatrix<Y> &).  It would not happen in
    * practice, but in principle it means that SparseMatrix<Complex>
    * would be friend to operator<<(ostream &, SparseMatrix<Real>).
    *
-   * Obscure C++ note 2: The form below, which requires a previous
+   * \note The form below, which requires a previous
    * declaration of the operator<<(stream &, SparseMatrix<T> &) function
    * (see top of this file), means that any instantiation of
    * SparseMatrix<T> is friend to the specialization
@@ -395,8 +395,10 @@ protected:
 
   /**
    * Protected implementation of the create_submatrix and reinit_submatrix
-   * routines.  Note that this function must be redefined in derived classes
-   * for it to work properly!
+   * routines.
+   *
+   * \note This function must be overridden in derived classes for it
+   * to work properly!
    */
   virtual void _get_submatrix(SparseMatrix<T> & /*submatrix*/,
                               const std::vector<numeric_index_type> & /*rows*/,

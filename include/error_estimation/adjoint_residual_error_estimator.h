@@ -102,11 +102,13 @@ public:
 
   /**
    * Compute the adjoint-weighted error on each element and place it
-   * in the \p error_per_cell vector.  Note that this->error_norm is
-   * ignored; the error estimate is in the seminorm given by the
-   * absolute value of the error in the quantity of interest
-   * functional.  The primal and dual subestimator error_norm values
-   * are used, and should be chosen appropriately for your model.
+   * in the \p error_per_cell vector.
+   *
+   * \note \p this->error_norm is ignored; the error estimate is in
+   * the seminorm given by the absolute value of the error in the
+   * quantity of interest functional.  The primal and dual
+   * subestimator error_norm values are used, and should be chosen
+   * appropriately for your model.
    */
   virtual void estimate_error (const System & system,
                                ErrorVector & error_per_cell,

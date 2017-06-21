@@ -189,7 +189,8 @@ public:
    * deltat, the result is first-order accurate.  If you set this to
    * false, you can grow (shrink) your timestep based on the local
    * accuracy rather than the global accuracy of the core TimeSolver.
-   * Note that by setting this value to false you may fail to achieve
+   *
+   * \note By setting this value to false you may fail to achieve
    * the predicted convergence in time of the underlying method, however
    * it may be possible to get more fine-grained control over step sizes
    * as well.

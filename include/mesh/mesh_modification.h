@@ -108,8 +108,9 @@ void scale (MeshBase & mesh,
 /**
  * Converts the 2D quadrilateral elements of a Mesh into
  * triangular elements.
- * Note: Only works for 2D elements!  3D elements are ignored.
- * Note: Probably won't do the right thing for meshes which
+ *
+ * \note Only works for 2D elements!  3D elements are ignored.
+ * \note Probably won't do the right thing for meshes which
  * have been refined previously.
  */
 void all_tri (MeshBase & mesh);
@@ -133,10 +134,11 @@ void smooth(MeshBase &, unsigned int, Real);
  * Removes all the refinement tree structure of Mesh, leaving
  * only the highest-level (most-refined) elements.  This is useful
  * when you want to write out a uniformly-refined grid to be treated later
- * as an initial mesh.  Note that many functions in LibMesh assume a
- * conforming (with no hanging nodes) grid exists at some level, so
- * you probably only want to do this on meshes which have been uniformly
- * refined.
+ * as an initial mesh.
+ *
+ * \note Many functions in LibMesh assume a conforming (with no
+ * hanging nodes) grid exists at some level, so you probably only want
+ * to do this on meshes which have been uniformly refined.
  */
 void flatten(MeshBase & mesh);
 #endif // #ifdef LIBMESH_ENABLE_AMR

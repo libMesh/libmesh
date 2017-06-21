@@ -628,8 +628,10 @@ public:
   /**
    * Fills the vector \p di with the global degree of freedom indices
    * corresponding to the SCALAR variable vn. If old_dofs=true,
-   * the old SCALAR dof indices are returned. Note that we do not
-   * need to pass in an element since SCALARs are global variables.
+   * the old SCALAR dof indices are returned.
+   *
+   * \note We do not need to pass in an element since SCALARs are
+   * global variables.
    */
   void SCALAR_dof_indices (std::vector<dof_id_type> & di,
                            const unsigned int vn,
@@ -676,7 +678,7 @@ public:
    * without constrained degrees of freedom this is the trivial mapping
    * \f$ Ue[i] = Ug[dof_indices[i]] \f$
    *
-   * Note that the user must ensure that the element vector \p Ue is
+   * \note The user must ensure that the element vector \p Ue is
    * properly sized when calling this method.  This is because there
    * is no \p resize() method in the \p DenseVectorBase<> class.
    */
@@ -1289,16 +1291,15 @@ private:
                                         MeshBase & mesh);
 
   /**
-   * Distributes the global degrees of freedom, for dofs on
-   * this processor.  In this format all the
-   * degrees of freedom at a node/element are in contiguous
-   * blocks.  Note in particular that the degrees of freedom
-   * for a given variable are not in contiguous blocks, as
-   * in the case of \p distribute_local_dofs_var_major.
-   * Starts at index next_free_dof, and increments it to
-   * the post-final index.
-   * If build_send_list is true, builds the send list.  If
-   * false, clears and reserves the send list
+   * Distributes the global degrees of freedom for dofs on this
+   * processor.  In this format all the degrees of freedom at a
+   * node/element are in contiguous blocks.  Starts at index \p
+   * next_free_dof, and increments it to the post-final index.  If \p
+   * build_send_list is \p true, builds the send list.  If \p false,
+   * clears and reserves the send list.
+   *
+   * \note The degrees of freedom for a given variable are not in
+   * contiguous blocks, as in the case of \p distribute_local_dofs_var_major.
    */
   void distribute_local_dofs_node_major (dof_id_type & next_free_dof,
                                          MeshBase & mesh);

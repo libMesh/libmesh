@@ -200,8 +200,9 @@ public:
   //
 
   /**
-   * Reset the proxy to point to a different \p target.  Note that this
-   * does not delete the previous target.
+   * Reset the proxy to point to a different \p target.
+   *
+   * \note This does not delete the previous target.
    */
   void reset (streamT & target) { _target = &target; }
 

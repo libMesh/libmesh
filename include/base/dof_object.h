@@ -432,7 +432,8 @@ private:
    * \endverbatim
    *
    * where 'end_s' is the index past the end of the variable group storage for system \p s.
-   * Note that we specifically do not store the end for the last system - this always _idx_buf.size().
+   *
+   * \note We specifically do not store the end for the last system - this always _idx_buf.size().
    *
    * Specifically, consider the case of 4 systems, with 3, 0, 1, 2 variable groups, respectively.  The _idx_buf then looks like:
    *
@@ -465,7 +466,7 @@ private:
    *
    * idx_var = idx_# + n_comp*v + c
    *
-   * note there is a subtlety here - "variable v within that group" usually means nothing to the
+   * \note There is a subtlety here - "variable v within that group" usually means nothing to the
    * user. This class is either indexed with variable group numbers, or variable numbers counted
    * *within the system*. So for a system with 2 variable groups, 4 and 8 variables each,
    * the 5th variable in the system is the 1st variable in 2nd variable group.

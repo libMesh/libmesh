@@ -126,8 +126,10 @@ public:
    * \returns The variance of the data set.
    *
    * Uses a recurrence relation to prevent data overflow for large
-   * sums.  Note: The variance is equal to the standard deviation
-   * squared.  Source: GNU Scientific Library.
+   * sums.
+   *
+   * \note The variance is equal to the standard deviation squared.
+   * Source: GNU Scientific Library.
    */
   virtual Real variance() const
   { return this->variance(this->mean()); }
@@ -138,8 +140,10 @@ public:
    *
    * This is useful for efficiency when you have already calculated
    * the mean. Uses a recurrence relation to prevent data overflow for
-   * large sums.  Note: The variance is equal to the standard
-   * deviation squared.  Source: GNU Scientific Library.
+   * large sums.
+   *
+   * \note The variance is equal to the standard deviation squared.
+   * Source: GNU Scientific Library.
    */
   virtual Real variance(const Real known_mean) const;
 

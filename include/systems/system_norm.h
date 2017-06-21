@@ -382,8 +382,8 @@ Real SystemNorm::calculate_norm(const std::vector<Real> & v1,
       std::size_t ncols = this->_off_diagonal_weights[i].size();
       for (std::size_t j=0; j != ncols; j++)
         {
-          // Note that the diagonal weights here were set to zero
-          // in the constructor
+          // The diagonal weights here were set to zero in the
+          // constructor.
           val += this->_off_diagonal_weights[i][j] * v1[i] * v2[j];
         }
     }

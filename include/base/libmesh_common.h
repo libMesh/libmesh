@@ -569,9 +569,13 @@ inline Tnew libmesh_cast_int (Told oldvar)
 #define LIBMESH_VERSION_ID(major,minor,patch) (((major) << 16) | ((minor) << 8) | ((patch) & 0xFF))
 
 
-// Allow for marking functions with "override" if the compiler supports it.
-// Note: override ensures that the function is virtual and is
-// overriding a virtual function from the base class.
+/**
+ * Allow for marking functions with \p override if the compiler
+ * supports it.
+ *
+ * \note \p override ensures that the function is virtual and is
+ * overriding a virtual function from the base class.
+ */
 #ifdef LIBMESH_HAVE_CXX11_OVERRIDE
 #define libmesh_override override
 #else

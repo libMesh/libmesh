@@ -76,7 +76,7 @@ protected:
   /**
    * Small helper function for finding the system containing the variable.
    *
-   * Note that this implies that variable names are unique across all systems!
+   * \note This implies that variable names are unique across all systems!
    */
   System * find_sys(std::string var_name);
 

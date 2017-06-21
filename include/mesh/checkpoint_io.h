@@ -220,10 +220,12 @@ private:
   void read_bc_names(Xdr & io, BoundaryInfo & info, bool is_sideset);
 
   /**
-   * Return the number of levels of refinement in the active mesh on this processor.
-   * NOTE: This includes _all_ elements on this processor even those not owned by this processor!
-   * Implemented by looping over all the active elements and finding
-   * the maximum level.
+   * \returns The number of levels of refinement in the active mesh on
+   * this processor.
+   *
+   * \note This includes _all_ elements on this processor even those
+   * not owned by this processor!  Implemented by looping over all the
+   * active elements and finding the maximum level.
    */
   unsigned int n_active_levels_in(MeshBase::const_element_iterator begin,
                                   MeshBase::const_element_iterator end) const;

@@ -155,7 +155,8 @@ protected:
 
   /**
    * Gathers source points and values that have been added on other processors.
-   * Note the user is responsible for adding points only once per processor if this
+   *
+   * \note The user is responsible for adding points only once per processor if this
    * method is called.  No attempt is made to identify duplicate points.
    *
    * This method is virtual so that it can be overwritten or extended as required

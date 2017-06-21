@@ -29,7 +29,7 @@ namespace libMesh
  * Implementation of a SolutionTransfer object that only works for
  * transferring the solution using a MeshFunction
  *
- * Note: A serialization of the "from" solution vector will be
+ * \note A serialization of the "from" solution vector will be
  * performed!  This can be slow in parallel and take a lot of memory!
  *
  * \author Derek Gaston

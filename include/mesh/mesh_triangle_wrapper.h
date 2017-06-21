@@ -68,15 +68,14 @@ enum IO_Type {
 void init(triangulateio & t);
 
 /**
- * Frees any memory which has been dynamically allocated by
- * Triangle.  Note the following facts:
- * 1) Triangle does not free any memory itself
- * 2) It is always safe to call free on a NULL pointer.
+ * Frees any memory which has been dynamically allocated by Triangle.
  *
- * However, triangle *does* shallow-copy (for example)
- * the holelist pointer from the input to output struct **without**
- * performing a deep copy of the holelist itself.  Therefore, double-free
- * will occur without additional care!
+ * \note Triangle does not free any memory itself.
+ * \note It is always safe to call free on a NULL pointer.
+ * \note Triangle \e does shallow-copy (for example) the holelist
+ * pointer from the input to output struct \e without performing a
+ * deep copy of the holelist itself.  Therefore, double-free will
+ * occur without additional care!
  */
 void destroy(triangulateio & t, IO_Type);
 
