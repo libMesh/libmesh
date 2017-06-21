@@ -153,8 +153,9 @@ public:
 
   /**
    * \returns The second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
-   * shape function at the point \p p.  Note that cross-derivatives are
-   * also possible, i.e.
+   * shape function at the point \p p.
+   *
+   * \note Cross-derivatives are indexed according to:
    * j = 0 ==> d^2 phi / dxi^2
    * j = 1 ==> d^2 phi / dxi deta
    * j = 2 ==> d^2 phi / deta^2
@@ -162,10 +163,11 @@ public:
    * j = 4 ==> d^2 phi / deta dzeta
    * j = 5 ==> d^2 phi / dzeta^2
    *
-   * Note:  Computing second derivatives is not currently supported
-   * for all element types: C1 (Clough, Hermite and Subdivision), Lagrange,
-   * Hierarchic, L2_Hierarchic, and Monomial are supported.
-   * All other element types return an error when asked for second derivatives.
+   * \note Computing second derivatives is not currently supported for
+   * all element types: \f$ C^1 \f$ (Clough, Hermite and Subdivision),
+   * Lagrange, Hierarchic, L2_Hierarchic, and Monomial are supported.
+   * All other element types return an error when asked for second
+   * derivatives.
    *
    * On a p-refined element, \p o should be the total order of the element.
    */
@@ -177,8 +179,9 @@ public:
 
   /**
    * \returns The second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
-   * shape function at the point \p p.  Note that cross-derivatives are
-   * also possible, i.e.
+   * shape function at the point \p p.
+   *
+   * \note Cross-derivatives are indexed according to:
    * j = 0 ==> d^2 phi / dxi^2
    * j = 1 ==> d^2 phi / dxi deta
    * j = 2 ==> d^2 phi / deta^2
@@ -186,10 +189,11 @@ public:
    * j = 4 ==> d^2 phi / deta dzeta
    * j = 5 ==> d^2 phi / dzeta^2
    *
-   * Note:  Computing second derivatives is not currently supported
-   * for all element types: C1 (Clough, Hermite and Subdivision), Lagrange,
-   * Hierarchic, L2_Hierarchic, and Monomial are supported.
-   * All other element types return an error when asked for second derivatives.
+   * \note Computing second derivatives is not currently supported for
+   * all element types: \f$ C^1 \f$ (Clough, Hermite and Subdivision),
+   * Lagrange, Hierarchic, L2_Hierarchic, and Monomial are supported.
+   * All other element types return an error when asked for second
+   * derivatives.
    *
    * On a p-refined element, \p o should be the base order of the element.
    */

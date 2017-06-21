@@ -45,10 +45,12 @@ class SumShellMatrix : public ShellMatrix<T>
 {
 public:
   /**
-   * Constructor; initializes an empty sum.  Note that an empty sum is
-   * not a valid object in that a call to \p m() or \p n() will result
-   * in an error.  However, an empty sum is allowed to be multiplied
-   * with a vector and will give the expected result.
+   * Constructor; initializes an empty sum.
+   *
+   * \note An empty sum is not a valid object since a call to \p m()
+   * or \p n() will result in an error.  However, an empty sum is
+   * allowed to be multiplied with a vector and will give the expected
+   * result.
    */
   SumShellMatrix (const Parallel::Communicator & comm_in
                   LIBMESH_CAN_DEFAULT_TO_COMMWORLD);

@@ -200,11 +200,11 @@ public:
    * A static integral constant representing an invalid subdomain id.
    * See also DofObject::{invalid_id, invalid_unique_id, invalid_processor_id}.
    *
-   * Note 1: we don't use the static_cast(-1) trick here since
-   * subdomain_id_type is sometimes a *signed* integer for
+   * \note We don't use the static_cast(-1) trick here since
+   * \p subdomain_id_type is sometimes a *signed* integer for
    * compatibility reasons (see libmesh/id_types.h).
    *
-   * Note 2: Normally you can declare static const integral types
+   * \note Normally you can declare static const integral types
    * directly in the header file (C++ standard, 9.4.2/4) but
    * std::numeric_limits<T>::max() is not considered a "constant
    * expression".  This one is therefore defined in elem.C.
@@ -967,8 +967,9 @@ public:
    * elements.
    *
    * This method is useful when converting linear elements to quadratic
-   * elements.  Note that \p n has to be greater than or equal to
-   * \p this->n_vertices().
+   * elements.
+   *
+   * \note \p n has to be greater than or equal to \p this->n_vertices().
    */
   virtual unsigned int n_second_order_adjacent_vertices (const unsigned int n) const;
 
@@ -990,12 +991,13 @@ public:
    *      second-order node on the parent element.
    * For linear elements, (0,0) is returned.
    *
-   * Notes:
-   * .) The return values are always less than \p this->n_children()
-   *    and \p this->child_ptr(c)->n_vertices().
-   * .) \p n has to be greater than or equal to \p this->n_vertices().
-   * .) On refined second-order elements, the return value will
-   *    satisfy \p this->node_ptr(n) == this->child_ptr(c)->node_ptr(v).
+   * \note The return values are always less than \p this->n_children()
+   * and \p this->child_ptr(c)->n_vertices().
+   *
+   * \note \p n has to be greater than or equal to \p this->n_vertices().
+   *
+   * \note On refined second-order elements, the return value will
+   * satisfy \p this->node_ptr(n) == this->child_ptr(c)->node_ptr(v).
    */
   virtual std::pair<unsigned short int, unsigned short int>
   second_order_child_vertex (const unsigned int n) const;
@@ -1271,7 +1273,8 @@ public:
 
   /**
    * Sets the value of the p-refinement level for the element.
-   * Note that the maximum p-refinement level is currently 255.
+   *
+   * \note The maximum p-refinement level is currently 255.
    */
   void set_p_level (const unsigned int p);
 

@@ -100,8 +100,10 @@ public:
   virtual ~ExodusII_IO_Helper();
 
   /**
-   * \returns The current element type.  Note: the default behavior is
-   * for this value to be in all capital letters, e.g. \p HEX27.
+   * \returns The current element type.
+   *
+   * \note The default behavior is for this value to be in all capital
+   * letters, e.g. \p HEX27.
    */
   const char * get_elem_type() const;
 

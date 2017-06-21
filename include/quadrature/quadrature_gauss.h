@@ -41,17 +41,18 @@ class QGauss : public QBase
 public:
 
   /**
-   * Constructor.  Declares the order of the quadrature rule.
+   * Constructor.  Declares the order of the quadrature rule.  We
+   * explicitly call the \p init function in 1D since the other
+   * tensor-product rules require this one.
+   *
+   * \note The element type, EDGE2, will not be used internally,
+   * however if we called the function with INVALID_ELEM it would try
+   * to be smart and return, thinking it had already done the work.
    */
   QGauss (const unsigned int _dim,
           const Order _order=INVALID_ORDER) :
     QBase(_dim, _order)
   {
-    // Explicitly call the init function in 1D since the other
-    // tensor-product rules require this one.  Note that the element
-    // type, EDGE2, will not be used internally, however if we called
-    // the function with INVALID_ELEM it would try to be smart and
-    // return, thinking it had already done the work.
     if (_dim == 1)
       init(EDGE2);
   }

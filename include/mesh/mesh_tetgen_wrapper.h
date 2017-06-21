@@ -208,10 +208,12 @@ public:
   void set_vertex(unsigned i, unsigned j, unsigned k, int nodeindex);
 
   /**
-   * Sets coordinates, attribute, and volume constraint for
-   * region i in the TetGen input.  Note that coordinates and attributes
-   * will only be considered if the corresponding switches are
-   * enabled.  See TetGen documentation for more details.
+   * Sets coordinates, attribute, and volume constraint for region i
+   * in the TetGen input.
+   *
+   * \note Coordinates and attributes will only be considered if the
+   * corresponding switches are enabled.  See TetGen documentation for
+   * more details.
    */
   void set_region(unsigned i, REAL x, REAL y, REAL z,
                   REAL attribute, REAL vol_constraint);

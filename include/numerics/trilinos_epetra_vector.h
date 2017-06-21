@@ -178,9 +178,9 @@ public:
 
   virtual T operator() (const numeric_index_type i) const libmesh_override;
 
-  virtual NumericVector<T> & operator += (const NumericVector<T> & V) libmesh_override;
+  virtual NumericVector<T> & operator += (const NumericVector<T> & v) libmesh_override;
 
-  virtual NumericVector<T> & operator -= (const NumericVector<T> & V) libmesh_override;
+  virtual NumericVector<T> & operator -= (const NumericVector<T> & v) libmesh_override;
 
   virtual NumericVector<T> & operator /= (NumericVector<T> & v) libmesh_override;
 
@@ -194,7 +194,7 @@ public:
 
   virtual void add (const T s) libmesh_override;
 
-  virtual void add (const NumericVector<T> & V) libmesh_override;
+  virtual void add (const NumericVector<T> & v) libmesh_override;
 
   virtual void add (const T a, const NumericVector<T> & v) libmesh_override;
 
@@ -226,7 +226,7 @@ public:
 
   virtual void abs() libmesh_override;
 
-  virtual T dot(const NumericVector<T> & V) const libmesh_override;
+  virtual T dot(const NumericVector<T> & v) const libmesh_override;
 
   virtual void localize (std::vector<T> & v_local) const libmesh_override;
 

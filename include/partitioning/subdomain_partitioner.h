@@ -38,7 +38,7 @@ namespace libMesh
  * subodmains 1, 2, and 4, once for subdomains 3, 7, and 8, and once
  * for subdomains 5 and 6.
  *
- * Note: this Partitioner may produce highly non-optimal communication
+ * \note This Partitioner may produce highly non-optimal communication
  * patterns and is likely to place geometrically disjoint sets of
  * elements on the same processor. Its intended use is to help
  * facilitate load balancing. That is, if the user knows that certain
@@ -80,13 +80,17 @@ public:
 
   /**
    * Get a reference to the Partitioner used internally by the
-   * SubdomainPartitioner.  Note: the internal Partitioner cannot also
-   * be a SubdomainPartitioner, otherwise an infinite loop will
-   * result.  To have this class use e.g. the space-filling curve
-   * Partitioner internally, one could do:
+   * SubdomainPartitioner.
    *
+   * \note The internal Partitioner cannot also be a
+   * SubdomainPartitioner, otherwise an infinite loop will result. To
+   * have this class use e.g. the space-filling curve Partitioner
+   * internally, one could do:
+   *
+   * \code
    * SubdomainPartitioner sp;
    * sp.internal_partitioner().reset(new SFCPartitioner);
+   * \endcode
    */
   UniquePtr<Partitioner> & internal_partitioner() { return _internal_partitioner; }
 

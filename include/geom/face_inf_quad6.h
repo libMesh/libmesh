@@ -152,7 +152,8 @@ public:
   /**
    * \returns The element-local number of the \f$ v^{th} \f$ vertex
    * that defines the \f$ n^{th} \f$ second-order node.
-   * Note that \p n is counted as depicted above, \f$ 4 \le n < 6 \f$.
+   *
+   * \note \p n is counted as depicted above, \f$ 4 \le n < 6 \f$.
    */
   virtual unsigned short int second_order_adjacent_vertex (const unsigned int n,
                                                            const unsigned int v) const libmesh_override;

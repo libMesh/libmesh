@@ -153,8 +153,9 @@ public:
   /**
    * Function that computes either the residual \f$ R(X) \f$ or the
    * Jacobian \f$ J(X) \f$ of the nonlinear system at the input
-   * iterate \f$ X \f$.  Note that either \p R or \p J could be
-   * \p NULL.
+   * iterate \f$ X \f$.
+   *
+   * \note Either \p R or \p J could be \p NULL.
    */
   void (* matvec) (const NumericVector<Number> & X,
                    NumericVector<Number> * R,
@@ -164,8 +165,9 @@ public:
   /**
    * Object that computes either the residual \f$ R(X) \f$ or the
    * Jacobian \f$ J(X) \f$ of the nonlinear system at the input
-   * iterate \f$ X \f$.  Note that either \p R or \p J could be
-   * \p NULL.
+   * iterate \f$ X \f$.
+   *
+   * \note Either \p R or \p J could be \p NULL.
    */
   NonlinearImplicitSystem::ComputeResidualandJacobian * residual_and_jacobian_object;
 
@@ -297,7 +299,7 @@ public:
    * Users should increase any of these tolerances that they want to use for a
    * stopping condition.
    *
-   * Note that not all NonlinearSolvers support relative_step_tolerance!
+   * \note Not all NonlinearSolvers support \p relative_step_tolerance!
    */
   Real absolute_step_tolerance;
   Real relative_step_tolerance;

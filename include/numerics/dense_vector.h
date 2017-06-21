@@ -451,7 +451,7 @@ typename CompareTypes<T, T2>::supertype DenseVector<T>::dot (const DenseVector<T
   libmesh_assert_equal_to (this->size(), vec.size());
 
 #ifdef LIBMESH_HAVE_EIGEN
-  // Note: we reverse the order of the arguments to dot() here since
+  // We reverse the order of the arguments to dot() here since
   // the convention in Eigen is to take the complex conjugate of the
   // *first* argument, while ours is to take the complex conjugate of
   // the second.

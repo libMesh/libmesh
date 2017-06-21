@@ -48,12 +48,12 @@ namespace libMesh
  * val2 = vmap[key2];
  * \endverbatim
  *
- * Note in particular the two-phase usage.  It is not advised to do
- * intermediate insert/lookups, as each time an insertion is done the
- * sort is invalidated, and must be reperformed. Additionally, during
- * the insersion phase, there is no accounting for duplicate keys.
- * Each insertion is accepted regardless of key value, and then
- * duplicate keys are removed later.
+ * \note The two-phase usage.  It is not advised to do intermediate
+ * insert/lookups, as each time an insertion is done the sort is
+ * invalidated, and must be reperformed. Additionally, during the
+ * insersion phase, there is no accounting for duplicate keys.  Each
+ * insertion is accepted regardless of key value, and then duplicate
+ * keys are removed later.
  *
  * \author  Benjamin S. Kirk
  */

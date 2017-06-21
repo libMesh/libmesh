@@ -38,9 +38,10 @@ class FEMContext;
 /**
  * This class provides a specific system class.  It aims
  * at nonlinear implicit systems, requiring only a
- * cell residual calculation from the user.  Note
- * that still additional vectors/matrices may be added,
- * as offered in the class \p ExplicitSystem.
+ * cell residual calculation from the user.
+ *
+ * \note Additional vectors/matrices can be added via parent class
+ * interfaces.
  *
  * This class is part of the new DifferentiableSystem framework,
  * which is still experimental.  Users of this framework should

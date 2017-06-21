@@ -147,7 +147,7 @@ public:
 
   virtual NumericVector<T> & operator= (const T s) libmesh_override;
 
-  virtual NumericVector<T> & operator= (const NumericVector<T> & V) libmesh_override;
+  virtual NumericVector<T> & operator= (const NumericVector<T> & v) libmesh_override;
 
   virtual NumericVector<T> & operator= (const std::vector<T> & v) libmesh_override;
 
@@ -156,7 +156,7 @@ public:
    *
    * \returns A reference to *this as the derived type.
    */
-  PetscVector<T> & operator= (const PetscVector<T> & V);
+  PetscVector<T> & operator= (const PetscVector<T> & v);
 
   virtual Real min () const libmesh_override;
 
@@ -216,9 +216,9 @@ public:
    */
   void restore_array();
 
-  virtual NumericVector<T> & operator += (const NumericVector<T> & V) libmesh_override;
+  virtual NumericVector<T> & operator += (const NumericVector<T> & v) libmesh_override;
 
-  virtual NumericVector<T> & operator -= (const NumericVector<T> & V) libmesh_override;
+  virtual NumericVector<T> & operator -= (const NumericVector<T> & v) libmesh_override;
 
   virtual void reciprocal() libmesh_override;
 
@@ -232,7 +232,7 @@ public:
 
   virtual void add (const T s) libmesh_override;
 
-  virtual void add (const NumericVector<T> & V) libmesh_override;
+  virtual void add (const NumericVector<T> & v) libmesh_override;
 
   virtual void add (const T a, const NumericVector<T> & v) libmesh_override;
 
@@ -245,7 +245,7 @@ public:
   virtual void add_vector (const T * v,
                            const std::vector<numeric_index_type> & dof_indices) libmesh_override;
 
-  virtual void add_vector (const NumericVector<T> & V,
+  virtual void add_vector (const NumericVector<T> & v,
                            const SparseMatrix<T> & A) libmesh_override;
 
   virtual void add_vector_transpose (const NumericVector<T> & v,
@@ -335,7 +335,7 @@ private:
    * and \p _values are valid.
    */
 #ifdef LIBMESH_HAVE_CXX11_THREAD
-  // Note: we can't use std::atomic_flag here because we need load and store operations
+  // We can't use std::atomic_flag here because we need load and store operations.
   mutable std::atomic<bool> _array_is_present;
 #else
   mutable bool _array_is_present;
@@ -1127,8 +1127,8 @@ template <typename T>
 inline
 void PetscVector<T>::restore_array()
 {
-  // Note _values_manually_retrieved needs to be set to false
-  // BEFORE calling _restore_array()!
+  // \note \p _values_manually_retrieved needs to be set to \p false
+  // \e before calling \p _restore_array()!
   _values_manually_retrieved = false;
   _restore_array();
 }

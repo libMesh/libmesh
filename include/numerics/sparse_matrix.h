@@ -160,7 +160,7 @@ public:
   virtual void zero () = 0;
 
   /**
-   * Sets all row entries to 0 then puts diag_value in the diagonal entry.
+   * Sets all row entries to 0 then puts \p diag_value in the diagonal entry.
    */
   virtual void zero_rows (std::vector<numeric_index_type> & rows, T diag_value = 0.0);
 
@@ -244,7 +244,7 @@ public:
   { this->add_block_matrix (dm, dof_indices, dof_indices); }
 
   /**
-   * Compute A += a*X for scalar \p a, matrix \p X.
+   * Compute \f$ A \leftarrow A + a*X \f$ for scalar \p a, matrix \p X.
    */
   virtual void add (const T a, SparseMatrix<T> & X) = 0;
 
@@ -258,22 +258,23 @@ public:
                          const numeric_index_type j) const = 0;
 
   /**
-   * \returns The l1-norm of the matrix, that is the max column sum:
-   * \f$ |M|_1 = \max_{all columns j} \sum_{all rows i} |M_ij|\f$
+   * \returns The \f$ \ell_1 \f$-norm of the matrix, that is the max column sum:
+   * \f$ |M|_1 = \max_{j} \sum_{i} |M_{ij}| \f$
    *
    * This is the natural matrix norm that is compatible with the
-   * l1-norm for vectors, i.e. \f$ |Mv|_1 \leq |M|_1 |v|_1 \f$.
+   * \f$ \ell_1 \f$-norm for vectors, i.e. \f$ |Mv|_1 \leq |M|_1 |v|_1 \f$.
    * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
    */
   virtual Real l1_norm () const = 0;
 
   /**
-   * Return the linfty-norm of the matrix, that is the max row sum:
+   * \returns The \f$ \ell_{\infty} \f$-norm of the matrix, that is the max row sum:
    *
-   * \f$ |M|_infty = \max_{all rows i} \sum_{all columns j} |M_ij| \f$
+   * \f$ |M|_{\infty} = \max_{i} \sum_{j} |M_{ij}| \f$
    *
    * This is the natural matrix norm that is compatible to the
-   * linfty-norm of vectors, i.e. \f$ |Mv|_infty \leq |M|_infty |v|_infty \f$.
+   * \f$ \ell_{\infty} \f$-norm of vectors, i.e.
+   * \f$ |Mv|_{\infty} \leq |M|_{\infty} |v|_{\infty} \f$.
    * (cf. Haemmerlin-Hoffmann : Numerische Mathematik)
    */
   virtual Real linfty_norm () const = 0;
@@ -298,14 +299,14 @@ public:
    * friend std::ostream & operator << (std::ostream & os, const SparseMatrix<U> & m);
    * \endcode
    *
-   * Obscure C++ note 1: the above syntax, which does not require any
+   * \note The above syntax, which does not require any
    * prior declaration of operator<<, declares *any* instantiation of
    * SparseMatrix<X> is friend to *any* instantiation of
    * operator<<(ostream &, SparseMatrix<Y> &).  It would not happen in
    * practice, but in principle it means that SparseMatrix<Complex>
    * would be friend to operator<<(ostream &, SparseMatrix<Real>).
    *
-   * Obscure C++ note 2: The form below, which requires a previous
+   * \note The form below, which requires a previous
    * declaration of the operator<<(stream &, SparseMatrix<T> &) function
    * (see top of this file), means that any instantiation of
    * SparseMatrix<T> is friend to the specialization
@@ -394,8 +395,10 @@ protected:
 
   /**
    * Protected implementation of the create_submatrix and reinit_submatrix
-   * routines.  Note that this function must be redefined in derived classes
-   * for it to work properly!
+   * routines.
+   *
+   * \note This function must be overridden in derived classes for it
+   * to work properly!
    */
   virtual void _get_submatrix(SparseMatrix<T> & /*submatrix*/,
                               const std::vector<numeric_index_type> & /*rows*/,

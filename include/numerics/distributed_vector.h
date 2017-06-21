@@ -39,9 +39,11 @@ namespace libMesh
 /**
  * This class provides a simple parallel, distributed vector datatype
  * which is specific to libmesh. Offers some collective communication
- * capabilities.  Note that the class will sill function without MPI,
- * but only on one processor. All overridden virtual functions are
- * documented in numeric_vector.h.
+ * capabilities.
+ *
+ * \note The class will sill function without MPI, but only on one
+ * processor. All overridden virtual functions are documented in
+ * numeric_vector.h.
  *
  * \author Benjamin S. Kirk
  * \date 2003

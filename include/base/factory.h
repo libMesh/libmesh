@@ -151,17 +151,6 @@ UniquePtr<Base> Factory<Base>::build (const std::string & name)
 
 
 
-// Note - this cannot be inlined!
-// template <class Base>
-// std::map<std::string, Factory<Base> *> & Factory<Base>::factory_map()
-// {
-//   static std::map<std::string, Factory<Base> *> _factory_map;
-
-//   return _factory_map;
-// }
-
-
-
 template <class Derived, class Base>
 inline
 UniquePtr<Base> FactoryImp<Derived,Base>::create ()

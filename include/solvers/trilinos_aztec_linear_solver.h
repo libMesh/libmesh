@@ -88,8 +88,9 @@ public:
 
   /**
    * This method allows you to call a linear solver while specifying
-   * the matrix to use as the (left) preconditioning matrix.  Note
-   * that the linear solver will not compute a preconditioner in this
+   * the matrix to use as the (left) preconditioning matrix.
+   *
+   * \note The linear solver will not compute a preconditioner in this
    * case, and will instead premultiply by the matrix you provide.
    */
   virtual std::pair<unsigned int, Real>

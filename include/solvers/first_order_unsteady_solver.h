@@ -57,10 +57,12 @@ namespace libMesh
  * If you have a second order variable, you pass that variable index and
  * get_second_order_dot_var will return the index of the corresponding velocity
  * variable, \f$v\f$ in the notation above. Then, the user knows what blocks to
- * populate. Note that the API is designed so that if the user codes to this
- * paradigm, the TimeSolver will be interchangeable for those element kernels.
- * That is, they'll be able to use either a FirstOrderUnsteadySolver or a
- * SecondOrderUnsteadySolver.
+ * populate.
+ *
+ * \note The API is designed so that if the user codes to this
+ * paradigm, the TimeSolver will be interchangeable for those element
+ * kernels.  That is, they'll be able to use either a
+ * FirstOrderUnsteadySolver or a SecondOrderUnsteadySolver.
  *
  * This class is part of the new DifferentiableSystem framework,
  * which is still experimental.  Users of this framework should

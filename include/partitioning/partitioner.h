@@ -71,8 +71,8 @@ public:
    * Partitions the \p MeshBase into \p n parts by setting
    * processor_id() on Nodes and Elems.
    *
-   * NOTE: If you are implementing a new type of Partitioner, you most
-   * likely do *not* want to override the partition() function, see
+   * \note If you are implementing a new type of Partitioner, you most
+   * likely do \e not want to override the partition() function, see
    * instead the protected virtual _do_partition() method below.  The
    * partition() function is responsible for doing a lot of
    * libmesh-internals-specific setup and finalization before and
@@ -89,8 +89,8 @@ public:
    * Partitions the \p MeshBase into \p mesh.n_processors() by setting
    * processor_id() on Nodes and Elems.
    *
-   * NOTE: If you are implementing a new type of Partitioner, you most
-   * likely do *not* want to override the partition() function, see
+   * \note If you are implementing a new type of Partitioner, you most
+   * likely do \e not want to override the partition() function, see
    * instead the protected virtual _do_partition() method below.  The
    * partition() function is responsible for doing a lot of
    * libmesh-internals-specific setup and finalization before and
@@ -196,8 +196,10 @@ protected:
 
   /**
    * This is the actual re-partitioning method which can be overridden
-   * in derived classes.  Note that the default behavior is to simply
-   * call the partition function.
+   * in derived classes.
+   *
+   * \note The default behavior is to simply call the partition
+   * function.
    */
   virtual void _do_repartition (MeshBase & mesh,
                                 const unsigned int n) { this->_do_partition (mesh, n); }

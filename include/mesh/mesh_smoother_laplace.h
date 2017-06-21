@@ -24,19 +24,19 @@
 #include <vector>
 
 // Local Includes
-#include "libmesh/libmesh.h" // libMesh::out/err
+#include "libmesh/libmesh.h"
 #include "libmesh/mesh_smoother.h"
 
 namespace libMesh
 {
 
 /**
- * This class defines the data structures necessary
- * for Laplace smoothing.  Note that this is a simple
- * averaging smoother, which does NOT guarantee that
- * points will be smoothed to valid locations, e.g.
- * locations inside the boundary!  This aspect could
- * use work.
+ * This class defines the data structures necessary for Laplace
+ * smoothing.
+ *
+ * \note This is a simple averaging smoother, which does \e not
+ * guarantee that points will be smoothed to valid locations, e.g.
+ * locations inside the boundary!  This aspect could use work.
  *
  * \author John W. Peterson
  * \date 2002-2007

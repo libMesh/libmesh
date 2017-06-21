@@ -72,9 +72,10 @@ public:
 
   /**
    * \returns \p true if the point p is on the surface,
-   * false otherwise.  Note that the definition of on
-   * the surface really means "very close" to account
-   * for roundoff error.
+   * false otherwise.
+   *
+   * \note The definition of "on the surface" really means "very
+   * close" to account for roundoff error.
    */
   virtual bool on_surface (const Point & p) const = 0;
 

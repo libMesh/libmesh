@@ -218,7 +218,8 @@ private:
 
   /**
    * Map from abaqus node number -> sequential, 0-based libmesh node numbering.
-   * Note that in every Abaqus file I've ever seen the node numbers were 1-based,
+   *
+   * \note In every Abaqus file I've ever seen the node numbers were 1-based,
    * sequential, and all in order, so that this map is probably overkill.
    * Nevertheless, it is the most general solution in case we come across a
    * weird Abaqus file some day.

@@ -526,12 +526,15 @@ namespace Private {
 /**
  * There is no reason for a user to ever call this function.
  *
- * This function determines partition-agnostic global indices for all nodes and elements
- * in the mesh.  Note that after this function is called the mesh will likely be in an
- * inconsistent state, i.e. \p mesh.nodes(i)->id() != i in the nodes container.
- * Direct node/element access via the \p mesh.node(n) or \p mesh.elem(e) functions will
- * likely fail. The original numbering can (and should) be restored with a subsequent call to
- * \p fix_node_and_element_numbering().
+ * This function determines partition-agnostic global indices for all
+ * nodes and elements in the mesh.
+ *
+ * \note After this function is called, the mesh will likely be in an
+ * inconsistent state, i.e. \p mesh.nodes(i)->id() != i in the nodes
+ * container.  Direct node/element access via the \p mesh.node(n) or
+ * \p mesh.elem(e) functions will likely fail. The original numbering
+ * can (and should) be restored with a subsequent call to \p
+ * fix_node_and_element_numbering().
  *
  */
 void globally_renumber_nodes_and_elements (MeshBase &);

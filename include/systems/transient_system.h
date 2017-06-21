@@ -38,9 +38,10 @@ class EigenSystem;
 /**
  * This class provides a specific system class.  It aims
  * at transient systems, offering nothing more than just
- * the essentials needed to solve a system.  Note
- * that still additional vectors/matrices may be added,
- * as offered in the parent classes.
+ * the essentials needed to solve a system.
+ *
+ * \note Additional vectors/matrices can be added via parent class
+ * interfaces.
  *
  * \author Benjamin S. Kirk
  * \date 2004

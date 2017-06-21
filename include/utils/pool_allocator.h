@@ -39,9 +39,11 @@ namespace libMesh
 /**
  * An allocator which can be used in standard containers.  Uses
  * pool-based memory allocation to efficiently allocate many small
- * objects.  Note that object destruction returns memory to the pool
- * rather than deallocate it.  It must be explicitly deallocated
- * prior to program termination.
+ * objects.
+ *
+ * \note Object destruction returns memory to the pool rather than
+ * deallocate it.  It must be explicitly deallocated prior to program
+ * termination.
  *
  * \author Benjamin S. Kirk
  * \date 2011
@@ -95,9 +97,11 @@ public:
 /**
  * An allocator which can be used in standard containers.  Uses
  * pool-based memory allocation to efficiently allocate many small
- * objects.  Note that object destruction returns memory to the pool
- * rather than deallocate it.  It must be explicitly deallocated
- * prior to program termination.
+ * objects.
+ *
+ * \note Object destruction returns memory to the pool rather than
+ * deallocate it.  It must be explicitly deallocated prior to program
+ * termination.
  *
  * \author Benjamin S. Kirk
  * \date 2011

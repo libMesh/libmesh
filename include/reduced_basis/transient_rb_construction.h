@@ -200,8 +200,10 @@ public:
   /**
    * Get/set max_truth_solves, the maximum number of RB
    * truth solves we are willing to compute in the transient
-   * case. Note in the steady state case max_truth_solves is
-   * not needed since equivalent to Nmax.
+   * case.
+   *
+   * \note In the steady state case, \p max_truth_solves is not needed
+   * since it is equivalent to \p Nmax.
    */
   int get_max_truth_solves() const                   { return max_truth_solves; }
   void set_max_truth_solves(int max_truth_solves_in) { this->max_truth_solves = max_truth_solves_in; }

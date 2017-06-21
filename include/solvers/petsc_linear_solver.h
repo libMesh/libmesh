@@ -159,18 +159,19 @@ public:
 
   /**
    * This method allows you to call a linear solver while specifying
-   * the matrix to use as the (left) preconditioning matrix.  Note
-   * that the linear solver will not compute a preconditioner in this
-   * case, and will instead premultiply by the matrix you provide.
+   * the matrix to use as the (left) preconditioning matrix.
    *
-   * In PETSc, this is accomplished by calling
-   *
+   * \note The linear solver will not compute a preconditioner in this
+   * case, and will instead premultiply by the matrix you provide.  In
+   * PETSc, this is accomplished by calling
+   * \code
    * PCSetType(_pc, PCMAT);
+   * \endcode
+   * before invoking KSPSolve().
    *
-   * before invoking KSPSolve().  Note: this functionality is not implemented
-   * in the LinearSolver class since there is not a built-in analog
-   * to this method for LasPack -- You could probably implement it by hand
-   * if you wanted.
+   * \note This functionality is not implemented in the LinearSolver
+   * class since there is not a built-in analog to this method for
+   * LASPACK. You could probably implement it by hand if you wanted.
    */
   virtual std::pair<unsigned int, Real>
   solve (SparseMatrix<T> & matrix,

@@ -69,7 +69,6 @@ class SystemNorm;
  * algorithmic flags that may be used to control the numerical methods
  * employed.  In general, use an \p EqnSystems<T_sys> object to handle
  * one or more of the children of this class.
- * Note that templating \p EqnSystems relaxes the use of virtual members.
  *
  * \author Benjamin S. Kirk
  * \date 2003-2004
@@ -237,10 +236,12 @@ public:
   void init ();
 
   /**
-   * Reinitializes degrees of freedom and other
-   * required data on the current mesh.  Note that the matrix
-   * is not initialized at this time since it may not be required
-   * for all applications. Should be overridden in derived classes.
+   * Reinitializes degrees of freedom and other required data on the
+   * current mesh.
+   *
+   * \note The matrix is not initialized at this time since it may not
+   * be required for all applications. Should be overridden in derived
+   * classes.
    */
   virtual void reinit ();
 
@@ -384,7 +385,7 @@ public:
    * in \p parameters, placing the result for qoi \p i and parameter
    * \p j into \p sensitivities[i][j].
    *
-   * Note that parameters is a const vector, not a vector-of-const;
+   * \note \p parameters is a const vector, not a vector-of-const;
    * parameter values in this vector need to be mutable for finite
    * differencing to work.
    *
@@ -1342,7 +1343,8 @@ public:
 
   /**
    * Register a user class to use to initialize the system.
-   * Note this is exclusive with the \p attach_init_function.
+   *
+   * \note This is exclusive with the \p attach_init_function.
    */
   void attach_init_object (Initialization & init);
 
@@ -1483,9 +1485,8 @@ public:
    * for optional use by e.g. stabilized methods.
    * False by default.
    *
-   * Note for FEMSystem users:
-   * Warning: if this variable is set to true, it must be before init_data() is
-   * called.
+   * \note For FEMSystem users, if this variable is set to true, it
+   * must be before init_data() is called.
    */
   bool use_fixed_solution;
 
@@ -1493,14 +1494,14 @@ public:
    * A member int that can be employed to indicate increased or
    * reduced quadrature order.
    *
-   * Note for FEMSystem users:
-   * By default, when calling the user-defined residual functions, the
-   * FEMSystem will first set up an appropriate
-   * FEType::default_quadrature_rule() object for performing the integration.
-   * This rule will integrate elements of order up to 2*p+1 exactly (where p is
-   * the sum of the base FEType and local p refinement levels), but if
-   * additional (or reduced) quadrature accuracy is desired then this
-   * extra_quadrature_order (default 0) will be added.
+   * \note For FEMSystem users, by default, when calling the
+   * user-defined residual functions, the FEMSystem will first set up
+   * an appropriate FEType::default_quadrature_rule() object for
+   * performing the integration.  This rule will integrate elements of
+   * order up to 2*p+1 exactly (where p is the sum of the base FEType
+   * and local p refinement levels), but if additional (or reduced)
+   * quadrature accuracy is desired then this extra_quadrature_order
+   * (default 0) will be added.
    */
   int extra_quadrature_order;
 
@@ -1535,10 +1536,9 @@ public:
    * For time-dependent problems, this is the time t at the beginning of
    * the current timestep.
    *
-   * Note for DifferentiableSystem users:
-   * do *not* access this time during an assembly!
-   * Use the DiffContext::time value instead to get correct
-   * results.
+   * \note For DifferentiableSystem users: do \e not access this time
+   * during an assembly!  Use the DiffContext::time value instead to
+   * get correct results.
    */
   Real time;
 
@@ -1555,7 +1555,7 @@ public:
    * point \p p in the mesh, without knowing a priori which element
    * contains \p p.
    *
-   * Note that this function uses \p MeshBase::sub_point_locator(); users
+   * \note This function uses \p MeshBase::sub_point_locator(); users
    * may or may not want to call \p MeshBase::clear_point_locator()
    * afterward.  Also, point_locator() is expensive (N log N for
    * initial construction, log N for evaluations).  Avoid using this
@@ -1657,9 +1657,10 @@ public:
 protected:
 
   /**
-   * Initializes the data for the system.  Note that this is called
-   * before any user-supplied intitialization function so that all
-   * required storage will be available.
+   * Initializes the data for the system.
+   *
+   * \note This is called before any user-supplied intitialization
+   * function so that all required storage will be available.
    */
   virtual void init_data ();
 

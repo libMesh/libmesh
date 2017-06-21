@@ -162,7 +162,8 @@ public:
   /**
    * Write out all the data to text files in order to segregate the
    * Offline stage from the Online stage.
-   * Note: This is a legacy method, use RBDataSerialization instead.
+   *
+   * \note This is a legacy method, use RBDataSerialization instead.
    */
   virtual void legacy_write_offline_data_to_files(const std::string & directory_name = "offline_data",
                                                   const bool write_binary_data=true);
@@ -170,7 +171,8 @@ public:
   /**
    * Read in the saved Offline reduced basis data
    * to initialize the system for Online solves.
-   * Note: This is a legacy method, use RBDataSerialization instead.
+   *
+   * \note This is a legacy method, use RBDataSerialization instead.
    */
   virtual void legacy_read_offline_data_from_files(const std::string & directory_name = "offline_data",
                                                    bool read_error_bound_data=true,
@@ -199,10 +201,10 @@ public:
 
   /**
    * Read in all the basis functions from file.
-   * \p sys is used for file IO
-   * \p directory_name specifies which directory to write files to
-   * \p read_binary_basis_functions indicates whether to expect
-   * binary or ASCII data
+   *
+   * \param sys Used for file IO.
+   * \param directory_name Specifies which directory to write files to.
+   * \param read_binary_basis_functions Indicates whether to expect binary or ASCII data.
    */
   virtual void read_in_basis_functions(System & sys,
                                        const std::string & directory_name = "offline_data",
@@ -342,7 +344,8 @@ private:
   /**
    * A pointer to to the object that stores the theta expansion.
    * This is not a UniquePtr since we may want to share it.
-   * (Note: a shared_ptr would be a good option here.)
+   *
+   * \note A \p shared_ptr would be a good option here.
    */
   RBThetaExpansion * rb_theta_expansion;
 

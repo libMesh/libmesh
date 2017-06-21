@@ -355,8 +355,10 @@ public:
    * factorization.  Therefore you can use this method if you know a-priori
    * that the matrix is SPD.  If the matrix is not SPD, an error is generated.
    * One nice property of Cholesky decompositions is that they do not require
-   * pivoting for stability. Note that this method may also be used when
-   * A is real-valued and x and b are complex-valued.
+   * pivoting for stability.
+   *
+   * \note This method may also be used when A is real-valued and x
+   * and b are complex-valued.
    */
   template <typename T2>
   void cholesky_solve(const DenseVector<T2> & b,
@@ -450,7 +452,7 @@ public:
    * \f$ A v_j = lambda_j v_j \f$
    * where \f$ lambda_j \f$ is its corresponding eigenvalue.
    *
-   * Note: If the j-th and (j+1)-st eigenvalues form a complex
+   * \note If the j-th and (j+1)-st eigenvalues form a complex
    * conjugate pair, then the j-th and (j+1)-st columns of VR "share"
    * their real-valued storage in the following way:
    * v_j     = VR(:,j) + i*VR(:,j+1) and
@@ -480,9 +482,9 @@ public:
   /**
    * \returns The determinant of the matrix.
    *
-   * Note that this means doing an LU decomposition and then computing
-   * the product of the diagonal terms.  Therefore this is a non-const
-   * method.
+   * \note Implemented by computing an LU decomposition and then
+   * taking the product of the diagonal terms.  Therefore this is a
+   * non-const method which modifies the entries of the matrix.
    */
   T det();
 
@@ -531,15 +533,17 @@ private:
   /**
    * Decomposes a symmetric positive definite matrix into a
    * product of two lower triangular matrices according to
-   * A = LL^T.  Note that this program generates an error
-   * if the matrix is not SPD.
+   * A = LL^T.
+   *
+   * \note This program generates an error if the matrix is not SPD.
    */
   void _cholesky_decompose();
 
   /**
    * Solves the equation Ax=b for the unknown value x and rhs
-   * b based on the Cholesky factorization of A. Note that
-   * this method may be used when A is real-valued and b and x
+   * b based on the Cholesky factorization of A.
+   *
+   * \note This method may be used when A is real-valued and b and x
    * are complex-valued.
    */
   template <typename T2>
@@ -699,13 +703,11 @@ namespace DenseMatrices
 typedef DenseMatrix<Real> RealDenseMatrix;
 
 /**
- * Note that this typedef may be either
- * a real-only matrix, or a truly complex
- * matrix, depending on how \p Number
- * was defined in \p libmesh_common.h.
- * Be also aware of the fact that \p DenseMatrix<T>
- * is likely to be more efficient for
- * real than for complex data.
+ * This typedef may be either a real-only matrix, or a truly complex
+ * matrix, depending on how \p Number was defined in \p
+ * libmesh_common.h.  Also, be aware of the fact that \p
+ * DenseMatrix<T> is likely to be more efficient for real than for
+ * complex data.
  */
 typedef DenseMatrix<Complex> ComplexDenseMatrix;
 

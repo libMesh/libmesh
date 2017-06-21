@@ -239,12 +239,12 @@ void EigenSparseVector<T>::abs()
 
 
 template <typename T>
-T EigenSparseVector<T>::dot (const NumericVector<T> & V) const
+T EigenSparseVector<T>::dot (const NumericVector<T> & v_in) const
 {
   libmesh_assert (this->initialized());
 
   // Make sure the NumericVector passed in is really a EigenSparseVector
-  const EigenSparseVector<T> * v = cast_ptr<const EigenSparseVector<T> *>(&V);
+  const EigenSparseVector<T> * v = cast_ptr<const EigenSparseVector<T> *>(&v_in);
   libmesh_assert(v);
 
   return _vec.dot(v->_vec);

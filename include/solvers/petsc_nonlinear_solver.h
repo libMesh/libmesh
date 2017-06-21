@@ -34,7 +34,7 @@
 
 namespace libMesh
 {
-// Allow users access to these functions in case they want to reuse them.  Note that users shouldn't
+// Allow users access to these functions in case they want to reuse them.  Users shouldn't
 // need access to these most of the time as they are used internally by this object.
 extern "C"
 {
@@ -161,10 +161,13 @@ protected:
 
   /**
    * Store the reason for SNES convergence/divergence for use even after the _snes
-   * has been cleared.  Note that print_converged_reason() will always *try* to
-   * get the current reason with SNESGetConvergedReason(), but if the SNES object
-   * has already been cleared, it will fall back on this stored value.  Note that
-   * this value is therefore necessarily *not* cleared by the clear() function.
+   * has been cleared.
+   *
+   * \note \p print_converged_reason() will always \e try to get the
+   * current reason with SNESGetConvergedReason(), but if the SNES
+   * object has already been cleared, it will fall back on this stored
+   * value.  This value is therefore necessarily \e not cleared by the
+   * \p clear() function.
    */
   SNESConvergedReason _reason;
 

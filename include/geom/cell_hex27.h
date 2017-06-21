@@ -178,7 +178,8 @@ public:
   /**
    * \returns The element-local number of the \f$ v^{th} \f$ vertex
    * that defines the \f$ n^{th} \f$ second-order node.
-   * Note that \p n is counted as depicted above, \f$ 8 \le n < 27 \f$.
+   *
+   * \note \p n is counted as depicted above, \f$ 8 \le n < 27 \f$.
    */
   virtual unsigned short int second_order_adjacent_vertex (const unsigned int n,
                                                            const unsigned int v) const libmesh_override;
@@ -246,9 +247,10 @@ private:
    * covers the nodes that are unique to \p Hex27, while the
    * second-order-nodes that are identical with \p Hex20 are covered
    * through the \p _second_order_adjacent_vertices matrix in
-   * \p cell_hex.C.  Note that this matrix also does not
-   * cover the bubble node.  The interpolation
-   * is trivial and would only blow up the size of this
+   * \p cell_hex.C.
+   *
+   * \note This matrix also does not cover the bubble node.  The
+   * interpolation is trivial and would only blow up the size of this
    * matrix.
    */
   static const unsigned short int _remaining_second_order_adjacent_vertices[6][4];

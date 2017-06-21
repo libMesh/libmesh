@@ -16,7 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// Note: _No_ include guards!
+// This file can be included multiple times in a single translation
+// unit, therefore there are no include guards!
 
 
 

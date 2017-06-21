@@ -192,10 +192,10 @@ public:
 
   /**
    * Outputs initial information for communication maps.
-   * Note: the order of the arguments specified in the Nemsis
-   * User's Manual is *wrong*.  The correct order is
-   * (ids, counts, ids, counts).
-   * Must be called after put_loadbal_param().
+   *
+   * \note The order of the arguments specified in the Nemsis User's
+   * Manual is \e wrong.  The correct order is (ids, counts, ids,
+   * counts).  Must be called after put_loadbal_param().
    */
   void put_cmap_params(std::vector<int> & node_cmap_ids,
                        std::vector<int> & node_cmap_node_cnts,
@@ -213,10 +213,8 @@ public:
    * In the Nemesis file, these all appeart to be written to the same chunks of data:
    * n_comm_nids and n_comm_proc, but don't rely on these names...
    *
-   * Note: this class contains vector<vectors>:
-   * node_cmap_node_ids
-   * node_cmap_proc_ids
-   * which can be used when calling this function.
+   * \note This class contains \p node_cmap_node_ids and \p
+   * node_cmap_proc_ids which can be used when calling this function.
    *
    * Must be called after put_cmap_params().
    */
@@ -235,10 +233,9 @@ public:
   /**
    * Writes information about elemental communication map.
    *
-   * Note: this class contains vector<vectors>:
-   * elem_cmap_elem_ids
-   * elem_cmap_side_ids
-   * elem_cmap_proc_ids
+   * \note This class contains \p elem_cmap_elem_ids, \p
+   * elem_cmap_side_ids, abd \p elem_cmap_proc_ids which can be used
+   * when calling this function.
    *
    * Must be called after put_cmap_params().
    */
@@ -302,7 +299,7 @@ public:
    * Takes a parallel solution vector containing the node-major
    * solution vector for all variables and outputs it to the files.
    *
-   * Note: This version of write_nodal_solution() is called by the
+   * \note This version of write_nodal_solution() is called by the
    * parallel version of Nemesis_IO::write_nodal_data(), which is
    * called by MeshOutput::write_equation_systems() for parallel I/O
    * formats like Nemesis.  The other version is still available to

@@ -61,9 +61,10 @@ public:
 
   /**
    * Tell the EnsightIO interface to output the finite element (not
-   * SCALAR) variable named "s".  Note: you must call add_scalar() or
-   * add_vector() (see below) at least once, otherwise only the Mesh
-   * will be written out.
+   * SCALAR) variable named "s".
+   *
+   * \note You must call add_scalar() or add_vector() (see below) at
+   * least once, otherwise only the Mesh will be written out.
    */
   void add_scalar (const std::string & system,
                    const std::string & scalar_description,
@@ -71,8 +72,10 @@ public:
 
   /**
    * Tell the EnsightIO interface that the variables (u,v) constitute
-   * a vector.  Note: u and v must have the same FEType, and be
-   * defined in the same system.
+   * a vector.
+   *
+   * \note \p u and \p v must have the same FEType, and be defined in
+   * the same system.
    */
   void add_vector (const std::string & system,
                    const std::string & vec_description,
@@ -81,8 +84,10 @@ public:
 
   /**
    * Tell the EnsightIO interface that the variables (u, v, w)
-   * constitute a vector.  Note: Requires a 3D mesh, u, v, and must
-   * have the same FEType, and must be defined in the same system.
+   * constitute a vector.
+   *
+   * \note Requires a 3D mesh, \p u, \p v, and \p w must have the same
+   * FEType, and must be defined in the same system.
    */
   void add_vector (const std::string & system,
                    const std::string & vec_description,

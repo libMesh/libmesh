@@ -40,18 +40,19 @@ class QSimpson : public QBase
 public:
 
   /**
-   * Constructor.  Declares the order of the quadrature rule.
+   * Constructor.  Declares the order of the quadrature rule.  We
+   * explicitly call the \p init function in 1D since the other
+   * tensor-product rules require this one.
+   *
+   * \note The element type, EDGE2, will not be used internally,
+   * however if we called the function with INVALID_ELEM it would try
+   * to be smart and return, thinking it had already done the work.
    */
   explicit
   QSimpson (const unsigned int _dim,
             const Order o=THIRD) :
     QBase(_dim, o)
   {
-    // explicitly call the init function in 1D since the
-    // other tensor-product rules require this one.
-    // note that EDGE will not be used internally, however
-    // if we called the function with INVALID_ELEM it would try to
-    // be smart and return, thinking it had already done the work.
     if (_dim == 1)
       init(EDGE2);
   }

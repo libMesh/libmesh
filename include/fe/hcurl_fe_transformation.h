@@ -58,11 +58,12 @@ public:
   virtual void init_map_d2phi(const FEGenericBase<OutputShape> & fe) const libmesh_override;
 
   /**
-   * Evaluates shape functions in physical coordinates for HCurl
-   * conforming elements.  In this case \f$ \phi = (dx/d\xi)^{-T}
+   * Evaluates shape functions in physical coordinates for \f$ H(curl)
+   * \f$ conforming elements.  In this case \f$ \phi = (dx/d\xi)^{-T}
    * \hat{\phi} \f$, where \f$ (dx/d\xi)^{-T} \f$ is the
-   * inverse-transpose of the Jacobian matrix of the element map. Note
-   * here \f$ x, \xi \f$ are vectors.
+   * inverse-transpose of the Jacobian matrix of the element map.
+   *
+   * \note Here \f$ x, \xi \f$ are vectors.
    */
   virtual void map_phi(const unsigned int dim,
                        const Elem * const elem,
@@ -72,7 +73,7 @@ public:
 
   /**
    * Evaluates shape function gradients in physical coordinates for
-   * HCurl conforming elements.
+   * \f$ H(curl) \f$ conforming elements.
    */
   virtual void map_dphi(const unsigned int /*dim*/,
                         const Elem * const /*elem*/,
@@ -89,7 +90,7 @@ public:
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Evaluates shape function Hessians in physical coordinates based
-   * on HCurl conforming finite element transformation.
+   * on \f$ H(curl) \f$ conforming finite element transformation.
    */
   virtual void map_d2phi(const unsigned int /*dim*/,
                          const std::vector<Point> & /*qp*/,
@@ -107,7 +108,7 @@ public:
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
-   * Evaluates the shape function curl in physical coordinates based on HCurl conforming
+   * Evaluates the shape function curl in physical coordinates based on \f$ H(curl) \f$ conforming
    * finite element transformation.
    * In 2-D, the transformation is \f$ \nabla \times \phi = J^{-1} * \nabla \times \hat{\phi} \f$ where
    * \f$ J = \det( dx/d\xi ) \f$
@@ -121,7 +122,7 @@ public:
 
   /**
    * Evaluates the shape function divergence in physical coordinates
-   * based on HCurl conforming finite element transformation.
+   * based on \f$ H(curl) \f$ conforming finite element transformation.
    */
   virtual void map_div(const unsigned int /*dim*/,
                        const Elem * const /*elem*/,

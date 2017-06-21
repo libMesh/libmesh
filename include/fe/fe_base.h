@@ -79,18 +79,6 @@ class InfFE;
  * object of any of the derived classes which is compatible with
  * OutputType.
  *
- * Note that the amount of virtual members is kept to a minimum,
- * and the sophisticated template scheme of \p FE is quite
- * likely to offer acceptably fast code.
- *
- * All calls to static members of the \p FE classes should be
- * requested through the \p FEInterface.  This interface class
- * offers sort-of runtime polymorphism for the templated finite
- * element classes.  Even internal library classes, like \p DofMap,
- * request the number of dof's through this interface class.
- * Note that this also enables the co-existence of various
- * element-based schemes.
- *
  * \author Benjamin S. Kirk
  * \date 2002
  */
