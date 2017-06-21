@@ -1,4 +1,3 @@
-
 // rbOOmit: An implementation of the Certified Reduced Basis method.
 // Copyright (C) 2009, 2010 David J. Knezevic
 
