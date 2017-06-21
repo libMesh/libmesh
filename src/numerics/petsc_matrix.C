@@ -878,7 +878,7 @@ void PetscMatrix<T>::get_transpose (SparseMatrix<T> & dest) const
 
 
 template <typename T>
-void PetscMatrix<T>::close () const
+void PetscMatrix<T>::close ()
 {
   semiparallel_only();
 

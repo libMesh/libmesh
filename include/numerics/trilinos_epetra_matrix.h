@@ -121,7 +121,7 @@ public:
 
   virtual void zero () libmesh_override;
 
-  virtual void close () const libmesh_override;
+  virtual void close () libmesh_override;
 
   virtual numeric_index_type m () const libmesh_override;
 
