@@ -70,13 +70,13 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MOVE_CONSTRUCTORS],
     {
     public:
       move_constructable_base() {}
-      move_constructable_base(move_constructable_base && other) {}
+      move_constructable_base(move_constructable_base && other) noexcept {}
     };
     class move_constructable : public move_constructable_base
     {
     public:
       move_constructable() {}
-      move_constructable(move_constructable && other) : move_constructable_base(std::move(other)) {}
+      move_constructable(move_constructable && other) noexcept : move_constructable_base(std::move(other)) {}
     };
     ]], [[
         move_constructable m1;
