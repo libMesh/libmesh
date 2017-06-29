@@ -14,13 +14,17 @@ if [ "x`which bibtex2html`" == "x" ]; then
 fi
 
 # Declare array of year names and numbers.  Zero-based indexing!
-year_names=( libmesh theses preprints seventeen sixteen fifteen fourteen thirteen twelve eleven ten nine eight seven six five four )
-year_numbers=( 'Please use the following citation to reference libMesh' 'Dissertations & Theses' Preprints 2017 2016 2015 2014 2013 2012 2011 2010 2009 2008 2007 2006 2005 2004 )
-link_names=( 'skip me' 'Dissertations' 'Preprints' 'Articles' )
+year_names=( libmesh preprints theses seventeen sixteen fifteen fourteen thirteen twelve eleven ten nine eight seven six five four )
+year_numbers=( 'Please use the following citation to reference libMesh' 'Preprints' 'Dissertations & Theses' 2017 2016 2015 2014 2013 2012 2011 2010 2009 2008 2007 2006 2005 2004 )
+link_names=( 'skip me' 'Preprints' 'Dissertations' 'Articles' )
+# The short_numbers are used for making Python strings of the years.
+short_numbers=( 'na' 'na' \'T\' \'\\\'17\' \'\\\'16\' \'\\\'15\' \'\\\'14\' \'\\\'13\' \'\\\'12\' \'\\\'11\' \'\\\'10\' \'\\\'09\' \'\\\'08\' \'\\\'07\' \'\\\'06\' \'\\\'05\' \'\\\'04\')
+
+# Stores strings to be output in reverse
+output_strings=()
 
 # Length of the arrays
 N=${#year_names[@]}
-# echo "N=$N"
 
 # Remove previous file, if it exists
 if [ -f master.html ]; then
@@ -29,8 +33,19 @@ fi
 
 for ((i=0; i < $N ; i++))
 do
-  # echo $i
-  make libmesh_html SOURCE=${year_names[$i]}.bib
+  # Store the bibtex2html output in $output_filename so we can comb through it later.
+  input_filename=${year_names[$i]}.bib
+  output_filename=${year_names[$i]}.b2h
+  make libmesh_html SOURCE=$input_filename &> $output_filename
+
+  # This strips the number of entries from the bibtex2thml
+  # output. There is probably a better, cleaner way to do this with
+  # perl, but I have not bothered to look it up yet.
+  n_entries=`cat $output_filename | grep -m 1 "entries)" | cut -d"(" -f 2 | cut -d" " -f 1`
+  output_strings+=("${short_numbers[$i]}, $n_entries,")
+
+  # Clean up the temporary file.
+  rm $output_filename
 
   # Add header
   # echo "<h2>${year_numbers[$i]}</h2>" >> master.html
@@ -63,3 +78,10 @@ cat master.html >> $final_file
 
 # bibtex2html unhelpfully inserts trailing whitespace, so kill that off
 perl -pli -e 's/\s+$//' $final_file
+
+# Print the citation count results by year, in reverse, and we don't
+# care about the first two categories.
+for ((i=$[$N-1]; i > 1 ; i--))
+do
+    echo ${output_strings[$i]}
+done
