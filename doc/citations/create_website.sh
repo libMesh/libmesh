@@ -13,6 +13,24 @@ if [ "x`which bibtex2html`" == "x" ]; then
   exit 1;
 fi
 
+# Process command line arguments.
+# https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
+count_only=false
+while [[ $# -ge 1 ]]
+do
+    key="$1"
+    case $key in
+        -c|--count-only)
+            count_only=true
+            shift # past argument
+            ;;
+        *)
+            # unknown option
+            shift
+            ;;
+    esac
+done
+
 # Declare array of year names and numbers.  Zero-based indexing!
 year_names=( libmesh preprints theses seventeen sixteen fifteen fourteen thirteen twelve eleven ten nine eight seven six five four )
 year_numbers=( 'Please use the following citation to reference libMesh' 'Preprints' 'Dissertations & Theses' 2017 2016 2015 2014 2013 2012 2011 2010 2009 2008 2007 2006 2005 2004 )
@@ -65,19 +83,21 @@ do
   cat ${year_names[$i]}.html >> master.html
 done
 
-# The name of the final file that we will produce
-final_file=../html/src/publications.html
-
 # Create publications.html
-if [ -f $final_file ]; then
-  rm $final_file
+if [ "$count_only" = false ] ; then
+    # The name of the final file that we will produce
+    final_file=../html/src/publications.html
+
+    if [ -f $final_file ]; then
+        rm $final_file
+    fi
+
+    # Inject all the references
+    cat master.html >> $final_file
+
+    # bibtex2html unhelpfully inserts trailing whitespace, so kill that off
+    perl -pli -e 's/\s+$//' $final_file
 fi
-
-# Inject all the references
-cat master.html >> $final_file
-
-# bibtex2html unhelpfully inserts trailing whitespace, so kill that off
-perl -pli -e 's/\s+$//' $final_file
 
 # Print the citation count results by year, in reverse, and we don't
 # care about the first two categories.
