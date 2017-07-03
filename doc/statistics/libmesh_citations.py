@@ -20,22 +20,26 @@ This script creates a bar graph of the number of "papers using libmesh" by year.
   site at the time.
 """
 
+# These counts can be generated from the latest Bibtex files by
+# running the create_website.sh script in the doc/publications
+# directory. Note: you must have bibtex2html in your PATH in order to
+# run this script.
 data = [
-    '\'04',  5,
-    '\'05',  2,
-    '\'06', 13,
-    '\'07',  8,
-    '\'08', 23,
-    '\'09', 29,
-    '\'10', 25,
-    '\'11', 32,
-    '\'12', 53,
-    '\'13', 78,
-    '\'14', 63,
-    '\'15', 79,
-    '\'16', 83,
-    '\'17', 41,
-    'T',    66
+'\'04', 5,
+'\'05', 2,
+'\'06', 14,
+'\'07', 8,
+'\'08', 23,
+'\'09', 29,
+'\'10', 25,
+'\'11', 32,
+'\'12', 53,
+'\'13', 78,
+'\'14', 63,
+'\'15', 79,
+'\'16', 104,
+'\'17', 49,
+'T', 67,
     ]
 
 # Extract the x-axis labels from the data array

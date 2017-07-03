@@ -9,11 +9,11 @@ from matplotlib.dates import date2num
 # Hits/month, pages, and gigabytes served.
 
 # To get the Google analytics data:
-# .) go to analytics.google.com
-# .) click on libmesh
-# .) click View Report
-# .) Adjust date range to previous month
-# .) Record the number of "Pageviews" in the "Hits" column below
+# .) Go to analytics.google.com.
+# .) There should be (as of July 2017) a "Google Analytics Home" box at the top left of the dashboard.
+# .) Click the "Audience Overview" link at the bottom right corner of this box.
+# .) Adjust date range to previous month.
+# .) Record the number of "Pageviews" in the "Hits" column below.
 
 # The data below are from the libmesh.github.io site, which uses the
 # number UA-24978333-1.
@@ -204,6 +204,7 @@ data = [
     'Mar 2017',  12986,      0, 0.0,
     'Apr 2017',   9773,      0, 0.0,
     'May 2017',  10880,      0, 0.0,
+    'Jun 2017',   9179,      0, 0.0,
 ]
 
 # Extract number of hits/month
