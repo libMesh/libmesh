@@ -141,6 +141,13 @@ protected:
    * makes it up-to-date on the current mesh.
    */
   virtual void re_update () libmesh_override;
+
+private:
+
+  /**
+   * Helper function for (re-)adding old and older solution vectors.
+   */
+  virtual void add_old_vectors ();
 };
 
 
