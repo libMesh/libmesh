@@ -83,19 +83,6 @@ void TransientSystem<Base>::clear ()
 
 
 
-
-template <class Base>
-void TransientSystem<Base>::init_data ()
-{
-  // initialize parent data
-  Base::init_data();
-
-  // old & older solutions are now registered with and initialized by
-  // parent class.
-}
-
-
-
 template <class Base>
 void TransientSystem<Base>::reinit ()
 {

@@ -116,15 +116,6 @@ public:
   NumericVector<Number> * rhs;
 
 
-protected:
-
-  /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
-   */
-  virtual void init_data () libmesh_override;
-
-
 private:
 
   /**

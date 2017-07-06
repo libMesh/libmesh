@@ -36,7 +36,8 @@ ExplicitSystem::ExplicitSystem (EquationSystems & es,
   rhs(libmesh_nullptr)
 
 {
-  //rhs = &(this->add_vector ("RHS Vector"));
+  // Add the system RHS.
+  this->add_system_rhs ();
 }
 
 
@@ -45,6 +46,8 @@ ExplicitSystem::~ExplicitSystem ()
 {
   // clear data
   this->clear();
+
+  remove_vector("RHS Vector");
 }
 
 
@@ -54,22 +57,8 @@ void ExplicitSystem::clear ()
   // Clear the parent data
   Parent::clear();
 
-  // NULL-out the vector.  Note that
-  // System::clear() actually deleted it.
-  rhs = libmesh_nullptr;
-}
-
-
-
-void ExplicitSystem::init_data ()
-{
-  // Add the system RHS.
-  // (We must do this before initializing the System data,
-  //  then we lose the opportunity to add vectors).
+  // Restore us to a "basic" state
   this->add_system_rhs ();
-
-  // initialize parent data
-  Parent::init_data();
 }
 
 

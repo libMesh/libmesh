@@ -293,6 +293,11 @@ public:
   SparseMatrix<Number> & add_matrix (const std::string & mat_name);
 
   /**
+   * Removes the additional matrix \p mat_name from this system
+   */
+  void remove_matrix(const std::string & mat_name);
+
+  /**
    * \returns \p true if this \p System has a matrix associated with the
    * given name, \p false otherwise.
    */
@@ -351,7 +356,6 @@ public:
    */
   bool zero_out_matrix_and_rhs;
 
-
 protected:
 
   /**
@@ -364,8 +368,6 @@ protected:
    * Initializes the matrices associated with this system.
    */
   virtual void init_matrices ();
-
-
 
 private:
 
