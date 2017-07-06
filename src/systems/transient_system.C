@@ -42,21 +42,7 @@ TransientSystem<Base>::TransientSystem (EquationSystems & es,
 
   Base                 (es, name_in, number_in)
 {
-#ifdef LIBMESH_ENABLE_GHOSTED
-  old_local_solution =
-    UniquePtr<NumericVector<Number> >
-    (&(this->add_vector("_transient_old_local_solution", true, GHOSTED)));
-  older_local_solution =
-    UniquePtr<NumericVector<Number> >
-    (&(this->add_vector("_transient_older_local_solution", true, GHOSTED)));
-#else
-  old_local_solution =
-    UniquePtr<NumericVector<Number> >
-    (&(this->add_vector("_transient_old_local_solution", true, SERIAL)));
-  older_local_solution =
-    UniquePtr<NumericVector<Number> >
-    (&(this->add_vector("_transient_older_local_solution", true, SERIAL)));
-#endif
+  this->add_old_vectors();
 }
 
 
@@ -91,12 +77,8 @@ void TransientSystem<Base>::clear ()
   old_local_solution.release();
   older_local_solution.release();
 
-  old_local_solution =
-    UniquePtr<NumericVector<Number> >
-    (&(this->add_vector("_transient_old_local_solution")));
-  older_local_solution =
-    UniquePtr<NumericVector<Number> >
-    (&(this->add_vector("_transient_older_local_solution")));
+  // Restore us to a "basic" state
+  this->add_old_vectors();
 }
 
 
@@ -108,19 +90,8 @@ void TransientSystem<Base>::init_data ()
   // initialize parent data
   Base::init_data();
 
-  // Initialize the old & older solutions
-  // Using new ghosted vectors if enabled
-#ifdef LIBMESH_ENABLE_GHOSTED
-  old_local_solution->init   (this->n_dofs(), this->n_local_dofs(),
-                              this->get_dof_map().get_send_list(), false,
-                              GHOSTED);
-  older_local_solution->init (this->n_dofs(), this->n_local_dofs(),
-                              this->get_dof_map().get_send_list(), false,
-                              GHOSTED);
-#else
-  old_local_solution->init   (this->n_dofs(), false, SERIAL);
-  older_local_solution->init (this->n_dofs(), false, SERIAL);
-#endif
+  // old & older solutions are now registered with and initialized by
+  // parent class.
 }
 
 
@@ -198,6 +169,25 @@ Number TransientSystem<Base>::older_solution (const dof_id_type global_dof_numbe
 
 
 
+template <class Base>
+void TransientSystem<Base>::add_old_vectors()
+{
+#ifdef LIBMESH_ENABLE_GHOSTED
+  old_local_solution =
+    UniquePtr<NumericVector<Number> >
+    (&(this->add_vector("_transient_old_local_solution", true, GHOSTED)));
+  older_local_solution =
+    UniquePtr<NumericVector<Number> >
+    (&(this->add_vector("_transient_older_local_solution", true, GHOSTED)));
+#else
+  old_local_solution =
+    UniquePtr<NumericVector<Number> >
+    (&(this->add_vector("_transient_old_local_solution", true, SERIAL)));
+  older_local_solution =
+    UniquePtr<NumericVector<Number> >
+    (&(this->add_vector("_transient_older_local_solution", true, SERIAL)));
+#endif
+}
 
 // ------------------------------------------------------------
 // TransientSystem instantiations
