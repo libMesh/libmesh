@@ -42,16 +42,6 @@ ExplicitSystem::ExplicitSystem (EquationSystems & es,
 
 
 
-ExplicitSystem::~ExplicitSystem ()
-{
-  // clear data
-  this->clear();
-
-  remove_vector("RHS Vector");
-}
-
-
-
 void ExplicitSystem::clear ()
 {
   // Clear the parent data

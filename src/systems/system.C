@@ -133,7 +133,10 @@ System::~System ()
   _qoi_evaluate_derivative_object = libmesh_nullptr;
 
   // Clear data
-  this->clear ();
+  // Note: although clear() is virtual, C++ only calls
+  // the clear() of the base class in the destructor.
+  // Thus we add System namespace to make it clear.
+  System::clear ();
 
   libmesh_exceptionless_assert (!libMesh::closed());
 }

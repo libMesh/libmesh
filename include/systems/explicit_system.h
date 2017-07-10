@@ -50,11 +50,6 @@ public:
                   const unsigned int number);
 
   /**
-   * Destructor.
-   */
-  ~ExplicitSystem ();
-
-  /**
    * The type of system.
    */
   typedef ExplicitSystem sys_type;
