@@ -50,11 +50,6 @@ public:
                   const unsigned int number);
 
   /**
-   * Destructor.
-   */
-  ~ExplicitSystem ();
-
-  /**
    * The type of system.
    */
   typedef ExplicitSystem sys_type;
@@ -114,15 +109,6 @@ public:
    * right-hand-side vector b.
    */
   NumericVector<Number> * rhs;
-
-
-protected:
-
-  /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
-   */
-  virtual void init_data () libmesh_override;
 
 
 private:

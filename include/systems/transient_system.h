@@ -130,12 +130,6 @@ public:
 protected:
 
   /**
-   * Initializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
-   */
-  virtual void init_data () libmesh_override;
-
-  /**
    * Re-update the local values when the mesh has changed.
    * This method takes the data updated by \p update() and
    * makes it up-to-date on the current mesh.

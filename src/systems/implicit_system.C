@@ -47,6 +47,8 @@ ImplicitSystem::ImplicitSystem (EquationSystems & es,
   zero_out_matrix_and_rhs(true),
   _can_add_matrices (true)
 {
+  // Add the system matrix.
+  this->add_system_matrix ();
 }
 
 
@@ -55,6 +57,8 @@ ImplicitSystem::~ImplicitSystem ()
 {
   // Clear data
   this->clear();
+
+  remove_matrix("System Matrix");
 }
 
 
@@ -78,8 +82,8 @@ void ImplicitSystem::clear ()
     _can_add_matrices = true;
   }
 
-  // NULL the matrix.
-  matrix = libmesh_nullptr;
+  // Restore us to a "basic" state
+  this->add_system_matrix ();
 }
 
 
@@ -93,9 +97,6 @@ void ImplicitSystem::init_data ()
   for (matrices_iterator pos = _matrices.begin();
        pos != _matrices.end(); ++pos)
     pos->second->clear();
-
-  // Add the system matrix.
-  this->add_system_matrix ();
 
   // Initialize the matrices for the system
   this->init_matrices ();
@@ -222,6 +223,20 @@ SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string & mat_name)
   _matrices.insert (std::make_pair (mat_name, buf));
 
   return *buf;
+}
+
+
+void ImplicitSystem::remove_matrix (const std::string & mat_name)
+{
+  matrices_iterator pos = _matrices.find (mat_name);
+
+  //Return if the matrix does not exist
+  if (pos == _matrices.end())
+    return;
+
+  delete pos->second;
+
+  _matrices.erase(pos);
 }
 
 

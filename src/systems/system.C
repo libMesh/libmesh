@@ -133,7 +133,10 @@ System::~System ()
   _qoi_evaluate_derivative_object = libmesh_nullptr;
 
   // Clear data
-  this->clear ();
+  // Note: although clear() is virtual, C++ only calls
+  // the clear() of the base class in the destructor.
+  // Thus we add System namespace to make it clear.
+  System::clear ();
 
   libmesh_exceptionless_assert (!libMesh::closed());
 }
@@ -713,15 +716,16 @@ NumericVector<Number> & System::add_vector (const std::string & vec_name,
 
 void System::remove_vector (const std::string & vec_name)
 {
+  vectors_iterator pos = _vectors.find(vec_name);
+
   //Return if the vector does not exist
-  if (!(this->have_vector(vec_name)))
+  if (pos == _vectors.end())
     return;
 
-  _vectors[vec_name]->clear();
-  delete _vectors[vec_name];
-  _vectors[vec_name] = libmesh_nullptr;
+  delete pos->second;
 
-  _vectors.erase(vec_name);
+  _vectors.erase(pos);
+
   _vector_projections.erase(vec_name);
   _vector_is_adjoint.erase(vec_name);
   _vector_types.erase(vec_name);
