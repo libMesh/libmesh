@@ -233,11 +233,6 @@ public:
                                            const std::vector<std::string> & multiple_data_names,
                                            const bool read_binary_vectors);
 
-  /**
-   * Version string that we need to use for writing/reading basis functions.
-   */
-  static std::string get_io_version_string();
-
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**

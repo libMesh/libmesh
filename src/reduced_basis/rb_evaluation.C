@@ -932,7 +932,14 @@ void RBEvaluation::write_out_vectors(System & sys,
   file_name << directory_name << "/" << data_name << "_header" << basis_function_suffix;
   Xdr header_data(file_name.str(),
                   write_binary_vectors ? ENCODE : WRITE);
-  sys.write_header(header_data, get_io_version_string(), /*write_additional_data=*/false);
+
+  std::string version("libMesh-" + libMesh::get_io_compatibility_version());
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  version += " with infinite elements";
+#endif
+  header_data.data(version ,"# File Format Identifier");
+
+  sys.write_header(header_data, /*(unused arg)*/ version, /*write_additional_data=*/false);
 
   // Following EquationSystemsIO::write, we use a temporary numbering (node major)
   // before writing out the data
@@ -1054,11 +1061,11 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
   Xdr header_data(file_name.str(),
                   read_binary_vectors ? DECODE : READ);
 
-  // set the version number in header_data from io_version_string
-  // (same code as in EquationSystemsIO::_read_impl)
-  std::string io_version_string = get_io_version_string();
-  std::string::size_type lm_pos = io_version_string.find("libMesh");
-  std::istringstream iss(io_version_string.substr(lm_pos + 8));
+  // Set up the header info (based on EquationSystems::_read_impl).
+  std::string version;
+  header_data.data(version);
+  std::string::size_type lm_pos = version.find("libMesh");
+  std::istringstream iss(version.substr(lm_pos + 8));
   int ver_major = 0, ver_minor = 0, ver_patch = 0;
   char dot;
   iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
@@ -1066,7 +1073,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
 
   // We need to call sys.read_header (e.g. to set _written_var_indices properly),
   // but by setting the read_header argument to false, it doesn't reinitialize the system
-  sys.read_header(header_data, io_version_string, /*read_header=*/false, /*read_additional_data=*/false);
+  sys.read_header(header_data, version, /*read_header=*/false, /*read_additional_data=*/false);
 
   // Following EquationSystemsIO::read, we use a temporary numbering (node major)
   // before writing out the data
@@ -1118,17 +1125,6 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
 
   // Undo the temporary renumbering
   sys.get_mesh().fix_broken_node_and_element_numbering();
-}
-
-std::string RBEvaluation::get_io_version_string()
-{
-  std::string retval("libMesh-" + libMesh::get_io_compatibility_version());
-
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  retval += " with infinite elements";
-#endif
-
-  return retval;
 }
 
 } // namespace libMesh
