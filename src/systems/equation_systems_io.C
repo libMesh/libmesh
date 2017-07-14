@@ -234,9 +234,10 @@ void EquationSystems::_read_impl (const std::string & name,
         this->comm().broadcast(version);
 
         // All processors have the version header, if it does not contain
-        // "libMesh" something then it is a legacy file.
-        std::string::size_type lm_pos = version.find("libMesh");
-        if (!(lm_pos < version.size()))
+        // the libMesh_label string then it is a legacy file.
+        const std::string libMesh_label = "libMesh-";
+        std::string::size_type lm_pos = version.find(libMesh_label);
+        if (lm_pos==std::string::npos)
           {
             io.close();
 
@@ -247,7 +248,7 @@ void EquationSystems::_read_impl (const std::string & name,
           }
 
         // Figure out the libMesh version that created this file
-        std::istringstream iss(version.substr(lm_pos + 8));
+        std::istringstream iss(version.substr(lm_pos + libMesh_label.size()));
         int ver_major = 0, ver_minor = 0, ver_patch = 0;
         char dot;
         iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
