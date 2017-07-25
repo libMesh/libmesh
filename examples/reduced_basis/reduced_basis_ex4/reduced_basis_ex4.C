@@ -59,6 +59,10 @@ int main (int argc, char ** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+  // This example requires a linear solver package.
+  libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
+                           "--enable-petsc, --enable-trilinos, or --enable-eigen");
+
 #if !defined(LIBMESH_HAVE_XDR)
   // We need XDR support to write out reduced bases
   libmesh_example_requires(false, "--enable-xdr");

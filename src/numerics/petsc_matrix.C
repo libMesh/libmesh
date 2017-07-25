@@ -808,7 +808,7 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
                          &iscol); LIBMESH_CHKERR(ierr);
 
   // Extract submatrix
-  ierr = MatGetSubMatrix(_mat,
+  ierr = LibMeshCreateSubMatrix(_mat,
                          isrow,
                          iscol,
 #if PETSC_RELEASE_LESS_THAN(3,0,1)

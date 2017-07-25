@@ -1,3 +1,10 @@
+1.2.0 -> 1.2.1
+  * Bugfix/compatibility release.
+  * Update bundled NetCDF from 4.3.1 -> 4.4.1.1.
+  * Fix for upcoming MatGetSubMatrix name change.
+  * 64-bit indices fix in src/apps/amr.C.
+  * Add empty LIBMESH_PARALLEL_FLOAT_OPS macro for --disable-mpi case.
+
 1.1.0 -> 1.2.0
   * 1.2.0 is the last release that does not require a C++11 compiler.
   * Add Eigen optimizations for DenseVector::l2_norm(), l1_norm(), linfty_norm(), dot().

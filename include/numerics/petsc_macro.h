@@ -96,6 +96,13 @@ typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCop
 #  define ISCreateLibMesh(comm,n,idx,mode,is) ISCreateGeneral((comm),(n),(idx),(mode),(is))
 #endif
 
+// As of release 3.8.0, MatGetSubMatrix was renamed to MatCreateSubMatrix.
+#if PETSC_RELEASE_LESS_THAN(3,8,0)
+# define LibMeshCreateSubMatrix MatGetSubMatrix
+#else
+# define LibMeshCreateSubMatrix MatCreateSubMatrix
+#endif
+
 #else // LIBMESH_HAVE_PETSC
 
 #define PETSC_VERSION_LESS_THAN(major,minor,subminor) 1

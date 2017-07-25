@@ -1,0 +1,14 @@
+netcdf tst_ncml {
+dimensions:
+   m = 2;
+   t = unlimited;
+variables:
+   float var (t, m);
+     var:tatt = "text attribute value" ;
+     var:natt = 1, 2;
+     var:datt = 7.02788826649782e-09, -7.02788826649782e-09 ;
+   :gtatt = "<, >, \', \", and &" ;
+   :gnatt = 3, 4;
+   :gdatt = -7.02788826649782e-09, 7.02788826649782e-09 ;
+   char :gnul = "\000abcd\000\000hello\000" ;
+}

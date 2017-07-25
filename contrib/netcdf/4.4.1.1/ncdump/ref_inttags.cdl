@@ -1,0 +1,15 @@
+netcdf inttags {
+dimensions:
+	d = 3 ;
+variables:
+	byte b(d) ;
+	short s(d) ;
+	int i(d) ;
+data:
+
+ b = -127, 127, -1 ;
+
+ s = 32767, -32766, -1 ;
+
+ i = -2147483646, 2147483647, -1 ;
+}

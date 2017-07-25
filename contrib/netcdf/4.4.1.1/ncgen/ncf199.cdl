@@ -1,0 +1,13 @@
+netcdf ncf199 {
+dimensions:
+        F1 = 3 ;
+	R1 = UNLIMITED ; // (2 currently)
+variables:
+	int fr(F1,R1);
+data:
+
+	fr =
+       {1,2},
+       {3,4},
+       {5,6} ;
+}
