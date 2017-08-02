@@ -15,21 +15,26 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
+#include "libmesh/perf_log.h"
 
 // C++ includes
 #include <iostream>
 #include <iomanip>
 #include <ctime>
 #include <unistd.h>
-#include <sys/utsname.h>
 #include <sys/types.h>
-#include <pwd.h>
 #include <vector>
 #include <sstream>
 
+#ifdef LIBMESH_HAVE_SYS_UTSNAME_H
+#include <sys/utsname.h>
+#endif
+
+#ifdef LIBMESH_HAVE_PWD_H
+#include <pwd.h>
+#endif
+
 // Local includes
-#include "libmesh/perf_log.h"
 #include "libmesh/timestamp.h"
 
 namespace libMesh
@@ -96,9 +101,11 @@ std::string PerfLog::get_info_header() const
     {
       std::string date = Utility::get_timestamp();
 
+#ifdef LIBMESH_HAVE_SYS_UTSNAME_H
       // Get system information
       struct utsname sysInfo;
       uname(&sysInfo);
+#endif
 
       // Get user information
       //
@@ -147,12 +154,28 @@ std::string PerfLog::get_info_header() const
           nprocs_stream  << "| Num Processors: " << libMesh::global_n_processors();
         }
 
-      time_stream    << "| Time:           " << date                   ;
-      os_stream      << "| OS:             " << sysInfo.sysname        ;
-      host_stream    << "| HostName:       " << sysInfo.nodename       ;
-      osrel_stream   << "| OS Release:     " << sysInfo.release        ;
-      osver_stream   << "| OS Version:     " << sysInfo.version        ;
-      machine_stream << "| Machine:        " << sysInfo.machine        ;
+      time_stream    << "| Time:           ";
+      os_stream      << "| OS:             ";
+      host_stream    << "| HostName:       ";
+      osrel_stream   << "| OS Release:     ";
+      osver_stream   << "| OS Version:     ";
+      machine_stream << "| Machine:        ";
+
+      time_stream << date;
+#ifdef LIBMESH_HAVE_SYS_UTSNAME_H
+      os_stream      << sysInfo.sysname     ;
+      host_stream    << sysInfo.nodename    ;
+      osrel_stream   << sysInfo.release     ;
+      osver_stream   << sysInfo.version     ;
+      machine_stream << sysInfo.machine     ;
+#else
+      os_stream      << "Unknown";
+      host_stream    << "Unknown";
+      osrel_stream   << "Unknown";
+      osver_stream   << "Unknown";
+      machine_stream << "Unknown";
+
+#endif
       user_stream    << "| Username:       ";
 #ifdef LIBMESH_HAVE_GETPWUID
       if (p && p->pw_name)

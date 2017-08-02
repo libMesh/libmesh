@@ -5,6 +5,9 @@
 *-dbg
 *-opt
 *-devel
+*-dbg.exe
+*-opt.exe
+*-devel.exe
 *~
 *.pyc
 contrib/bin/xda2mgf

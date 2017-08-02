@@ -64,11 +64,16 @@ AC_C_RESTRICT
 # difficult.  If you know that you are on such a system, configure with
 # --disable-getpwuid.
 # --------------------------------------------------------------
+
+AC_CHECK_HEADERS(pwd.h, [have_pwd_h=yes], [have_pwd_h=no])
+# Assume that we do not have getpwuid if pwd.h is not found. Can be 
+# overwritten by the getpwuid flag.
+
 AC_ARG_ENABLE(getpwuid,
               AS_HELP_STRING([--disable-getpwuid],
                              [do not make calls to getpwuid]),
               enablegetpwuid=$enableval,
-              enablegetpwuid=yes)
+              enablegetpwuid=$have_pwd_h)
 
 if test "$enablegetpwuid" != no ; then
   AC_DEFINE(HAVE_GETPWUID, 1,
@@ -158,6 +163,27 @@ AC_CHECK_HEADERS(xmmintrin.h)
 
 # See if we can actually compile code using the fe{enable,disable}except functions
 AC_HAVE_FEEXCEPT
+
+# Check if we have new-style signal handlers
+AC_CHECK_DECLS([sigaction], [], [], [#include <signal.h>])
+
+# Check for mkdir
+AC_MSG_CHECKING([for mkdir with two arguments])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([
+        #include <sys/stat.h>
+        #include <sys/types.h> ],[ 
+        mkdir("test-dir", 0); ])],
+    [AC_DEFINE(HAVE_MKDIR, [], "The make directory command")
+     AC_MSG_RESULT(yes)],
+    [AC_MSG_RESULT(no)])
+AC_CHECK_HEADERS(direct.h)
+AC_CHECK_DECLS([_mkdir], [], [], [
+    #include <direct.h>
+])
+
+# Check for uname header.
+AC_CHECK_HEADERS(sys/utsname.h)
 
 AC_ARG_ENABLE(unordered-containers,
               AS_HELP_STRING([--disable-unordered-containers],
