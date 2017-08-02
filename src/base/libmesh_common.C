@@ -50,12 +50,12 @@ void stop(const char * file, int line, const char * date, const char * time)
   if (libMesh::global_n_processors() == 1)
     {
       libMesh::MacroFunctions::here(file, line, date, time);
-#ifdef LIBMESH_HAVE_CSIGNAL
+#if defined(LIBMESH_HAVE_CSIGNAL) && defined(SIGSTOP)
       libMesh::out << "Stopping process " << getpid() << "..." << std::endl;
       std::raise(SIGSTOP);
       libMesh::out << "Continuing process " << getpid() << "..." << std::endl;
 #else
-      libMesh::out << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl;
+      libMesh::out << "WARNING:  libmesh_stop() does not work; no operating system support." << std::endl;
 #endif
     }
 }
