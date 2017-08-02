@@ -21,10 +21,22 @@
 
 // System includes
 #include <sys/time.h>
-#include <pwd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
-#include <sys/utsname.h>
 #include <sstream>
+
+#ifdef LIBMESH_HAVE_SYS_UTSNAME_H
+#include <sys/utsname.h>
+#endif
+
+#ifdef LIBMESH_HAVE_PWD_H
+#include <pwd.h>
+#endif
+
+#ifdef LIBMESH_HAVE_DIRECT_H
+#include <direct.h>
+#endif
 
 // Local includes
 #include "libmesh/utility.h"
@@ -48,9 +60,11 @@ std::string Utility::system_info()
 
   std::string date = Utility::get_timestamp();
 
+#ifdef LIBMESH_HAVE_SYS_UTSNAME_H
   // Get system information
   struct utsname sysInfo;
   uname(&sysInfo);
+#endif
 
   // Get user information
 #ifdef LIBMESH_HAVE_GETPWUID
@@ -61,11 +75,19 @@ std::string Utility::system_info()
   oss << '\n'
       << " ---------------------------------------------------------------------\n"
       << "| Time:           " << date             << '\n'
+#ifdef LIBMESH_HAVE_SYS_UTSNAME_H
       << "| OS:             " << sysInfo.sysname  << '\n'
       << "| HostName:       " << sysInfo.nodename << '\n'
       << "| OS Release      " << sysInfo.release  << '\n'
       << "| OS Version:     " << sysInfo.version  << '\n'
       << "| Machine:        " << sysInfo.machine  << '\n'
+#else
+      << "| OS:             " << "Unknown"        << '\n'
+      << "| HostName:       " << "Unknown"        << '\n'
+      << "| OS Release      " << "Unknown"        << '\n'
+      << "| OS Version:     " << "Unknown"        << '\n'
+      << "| Machine:        " << "Unknown"        << '\n'
+#endif
 #ifdef LIBMESH_HAVE_GETPWUID
       << "| Username:       " << p->pw_name       << '\n'
 #else
@@ -113,5 +135,17 @@ void Utility::prepare_complex_data(const std::vector<Complex> & source,
 }
 
 #endif // #ifdef LIBMESH_USE_COMPLEX_NUMBERS
+
+
+int Utility::mkdir(const char* pathname) {
+#if defined(LIBMESH_HAVE_MKDIR)
+  return ::mkdir(pathname, 0755);
+#elif LIBMESH_HAVE_DECL__MKDIR
+  return _mkdir(pathname);
+#else
+  libmesh_error_msg("Function mkdir not available on this system.");
+#endif
+
+}
 
 } // namespace libMesh

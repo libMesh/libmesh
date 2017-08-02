@@ -29,6 +29,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/mesh_tools.h"
+#include "libmesh/utility.h"
 
 // C/C++ includes
 #include <sys/types.h>
@@ -438,7 +439,7 @@ void RBEvaluation::legacy_write_offline_data_to_files(const std::string & direct
     {
 
       // Make a directory to store all the data files
-      mkdir(directory_name.c_str(), 0777);
+      Utility::mkdir(directory_name.c_str());
       //    if (mkdir(directory_name.c_str(), 0777) == -1)
       //    {
       //      libMesh::out << "In RBEvaluation::write_offline_data_to_files, directory "
@@ -920,7 +921,7 @@ void RBEvaluation::write_out_vectors(System & sys,
   if (this->processor_id() == 0)
     {
       // Make a directory to store all the data files
-      mkdir(directory_name.c_str(), 0777);
+      Utility::mkdir(directory_name.c_str());
     }
 
   // Make sure processors are synced up before we begin

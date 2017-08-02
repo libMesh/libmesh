@@ -269,6 +269,11 @@ void prepare_complex_data (const std::vector<Complex> & source,
 #endif // #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
 
+/**
+ * Create a directory.
+ */
+int mkdir(const char* pathname);
+
 
 /**
  * This Functor simply takes an object and reverses its byte

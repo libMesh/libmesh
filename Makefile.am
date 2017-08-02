@@ -8,6 +8,14 @@ ACLOCAL_AMFLAGS  = -I m4
 AM_CFLAGS        = $(libmesh_CFLAGS)
 AM_LDFLAGS       = $(libmesh_LDFLAGS)
 
+
+# We need to set the no-undefined flag for linking
+# with libtool, because Windows requires all shared
+# libraries to include all used symbols. This flag
+# should do no harm on other platforms.
+AM_LDFLAGS +="-no-undefined"
+
+
 # AM_CPPFLAGS are method-independent cppflags that
 # we use when compiling libmesh proper, or its utility
 # codes.  These will be augmented with method-specific

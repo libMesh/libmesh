@@ -110,6 +110,7 @@ bool libmesh_initialized_slepc = false;
 /**
  * Floating point exception handler -- courtesy of Cody Permann & MOOSE team
  */
+#if LIBMESH_HAVE_DECL_SIGACTION
 void libmesh_handleFPE(int /*signo*/, siginfo_t * info, void * /*context*/)
 {
   libMesh::err << std::endl;
@@ -152,6 +153,7 @@ void libmesh_handleSEGV(int /*signo*/, siginfo_t * info, void * /*context*/)
                     << "  run ...\n"                                    \
                     << "  bt");
 }
+#endif
 }
 
 
@@ -848,8 +850,6 @@ void enableFPE(bool on)
 
   if (on)
     {
-      struct sigaction new_action, old_action;
-
 #ifdef LIBMESH_HAVE_FEENABLEEXCEPT
       feenableexcept(FE_DIVBYZERO | FE_INVALID);
 #elif  LIBMESH_HAVE_XMMINTRIN_H
@@ -859,6 +859,8 @@ void enableFPE(bool on)
 #  endif
 #endif
 
+#if LIBMESH_HAVE_DECL_SIGACTION
+      struct sigaction new_action, old_action;
 
       // Set up the structure to specify the new action.
       new_action.sa_sigaction = libmesh_handleFPE;
@@ -868,6 +870,7 @@ void enableFPE(bool on)
       sigaction (SIGFPE, libmesh_nullptr, &old_action);
       if (old_action.sa_handler != SIG_IGN)
         sigaction (SIGFPE, &new_action, libmesh_nullptr);
+#endif
     }
   else
     {
@@ -887,6 +890,7 @@ void enableFPE(bool on)
 // (potentially instead of PETSc)
 void enableSEGV(bool on)
 {
+#if LIBMESH_HAVE_DECL_SIGACTION
   static struct sigaction old_action;
   static bool was_on = false;
 
@@ -907,6 +911,9 @@ void enableSEGV(bool on)
       was_on = false;
       sigaction (SIGSEGV, &old_action, libmesh_nullptr);
     }
+#else
+  libmesh_error_msg("System call sigaction not supported.");
+#endif
 }
 
 

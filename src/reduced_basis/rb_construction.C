@@ -44,6 +44,7 @@
 #include "libmesh/coupling_matrix.h"
 #include "libmesh/face_tri3_subdivision.h"
 #include "libmesh/quadrature.h"
+#include "libmesh/utility.h"
 
 // C++ includes
 #include <sys/types.h>
@@ -1926,7 +1927,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string & riesz
 
   // Residual representors written out to their own separate directory
   if ( this->processor_id() == 0)
-    if ( mkdir(riesz_representors_dir.c_str(), 0755) != 0)
+    if ( Utility::mkdir(riesz_representors_dir.c_str()) != 0)
       libMesh::out << "Skipping creating residual_representors directory: " << strerror(errno) << std::endl;
 
   for (std::size_t i=0; i<Fq_representor.size(); ++i)
