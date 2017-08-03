@@ -55,8 +55,11 @@
 // cannot be included while wrapped in a namespace (as we do with the exII
 // namespace below).  A workaround for this is to simply include errno.h
 // not in any namespace prior to including exodusII.h.
+//
+// The same is also true for string.h.
 #ifdef LIBMESH_COMPILER_HAS_BROKEN_ERRNO_T
 #include <errno.h>
+#include <string.h>
 #endif
 
 

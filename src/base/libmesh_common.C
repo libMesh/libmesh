@@ -22,7 +22,12 @@
 #include "libmesh/print_trace.h"
 
 // C/C++ includes
+#ifdef LIBMESH_HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#ifdef LIBMESH_HAVE_UNISTD_H
 #include <unistd.h>  // needed for getpid()
+#endif
 
 #ifdef LIBMESH_HAVE_CSIGNAL
 #  include <csignal>

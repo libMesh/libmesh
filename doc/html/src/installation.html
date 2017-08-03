@@ -1,7 +1,7 @@
 <h1>Installation Instructions</h1>
 
 
-<a name="getsoftware"></a><h2>Getting the Software</h2>
+<a id="getsoftware"></a><h2>Getting the Software</h2>
 
 The <code>libMesh</code> source can be <a href="https://github.com/libMesh/libmesh/releases">downloaded from our GitHub release page</a>.
 Stable releases are located there as compressed tar archives.
@@ -25,7 +25,7 @@ modified Git tree simply do:
 <br>
 in the top-level directory. You can then submit the file <code>patch</code>.
 
-<a name="compilers"></a><h2>Compilers</h2>
+<a id="compilers"></a><h2>Compilers</h2>
 
 <code>libMesh</code> makes extensive use of the standard C++ library,
 so you will need a decent, standards-compliant compiler. We have tried
@@ -39,7 +39,7 @@ The library is continuously tested with the following compilers:
 
 <br>
 <ul>
-  <li>GNU GCC</li>
+  <li>GNU GCC
     <ul>
       <li><code>gcc</code> 3.4</li>
       <li><code>gcc</code> 4.2</li>
@@ -49,36 +49,41 @@ The library is continuously tested with the following compilers:
       <li><code>gcc</code> 4.7</li>
       <li><code>gcc</code> 4.8</li>
     </ul>
-  <li>Intel ICC</li>
+  </li>
+  <li>Intel ICC
     <ul>
       <li><code>icc</code> 11.1</li>
       <li><code>icc</code> 12.0</li>
       <li><code>icc</code> 12.1</li>
       <li><code>icc</code> 13.0</li>
     </ul>
-  <li>Clang</li>
+  </li>
+  <li>Clang
     <ul>
       <li><code>clang++</code> 2.9</li>
       <li><code>clang++</code> 3.0</li>
       <li><code>clang++</code> 3.1</li>
       <li><code>clang++</code> 3.2</li>
     </ul>
-  <li>Sun Studio/Oracle</li>
+  </li>
+  <li>Sun Studio/Oracle
     <ul>
       <li><code>CC</code> 12.3</li>
-      <tt>$ ./configure --disable-fparser CXXFLAGS=-library=stlport4 --disable-unordered-containers</tt>
     </ul>
-  <li> Portland Group</li>
+    <code>$ ./configure --disable-fparser CXXFLAGS=-library=stlport4 --disable-unordered-containers</code>
+  </li>
+  <li> Portland Group
     <ul>
       <li><code>pgi</code> 11.7</li>
       <li><code>pgi</code> 12.9</li>
       <li><code>pgi</code> 13.4</li>
-      <tt>$ ./configure --disable-unordered-containers --disable-fparser --enable-static --disable-shared</tt>
     </ul>
+    <code>$ ./configure --disable-unordered-containers --disable-fparser --enable-static --disable-shared</code>
+  </li>
 </ul>
 
 
-<a name="conf"></a><h2>Configuration</h2>
+<a id="conf"></a><h2>Configuration</h2>
 
 Configuring the library is straightforward. The GNU autoconf package is used
 to determine site-specific configuration parameters. A standard build will
@@ -114,7 +119,7 @@ optional libraries:
        --with-vtk-include=/opt/local/include/vtk-5.10 \
        --with-vtk-lib=/opt/local/lib/vtk-5.10 \
        --with-eigen-include=/opt/local/include/eigen3 \
-       --with-cxx=clang++-mp-3.2 --with-cc=clang-mp-3.2 --disable-fortran
+       --with-cxx=clang++-mp-3.2 --with-cc=clang-mp-3.2 --disable-fortran</pre>
 </div>
 
 <br>
@@ -122,7 +127,7 @@ Note that the Fortran compiler is not actually used to compile any part of the l
 but <code>configure</code> uses it to find out how to link Fortran libraries with C++ code, and it is possible to compile <code>libMesh</code> without a Fortran compiler.
 
 
-<a name="build"></a><h2>Building the Library</h2>
+<a id="build"></a><h2>Building the Library</h2>
 
 To build the library you need <code>GNU</code> <code>Make</code> and a supported compiler,
 as listed in the <a href="installation.php#compilers">Compiler</a> section. After the library
@@ -140,7 +145,7 @@ Once the library is configured you can build it simply by typing
 </div>
 
 
-<a name="test"></a><h2>Testing the Library</h2>
+<a id="test"></a><h2>Testing the Library</h2>
 <h3>Running the Examples</h3>
 <code>libMesh</code> includes a number of examples in the <code>examples</code>
 directory. From the top-level directory you can build and run the example programs
@@ -172,7 +177,7 @@ to run properly.  To run the unit test suite, from the <i>build</i> directory, s
   <pre>make -C tests check </pre>
 </div>
 
-<a name="link"></a><h2>Linking With Your Application</h2>
+<a id="link"></a><h2>Linking With Your Application</h2>
 
 Since <code>libMesh</code> can be configured with many additional packages we recommend
 including the <code>Make.common</code> file created in the top-level directory in the
@@ -193,4 +198,58 @@ used by <code>libMesh</code>. For example, you could build the application <code
 
 <br>
 
+
+<a id="windows"></a><h2>Building on Windows</h2>
+
+<p>
+The <code>libMesh</code> library can be built on Microsoft Windows using the
+<a href="http://www.msys2.org/">msys2</a> software distribution and the
+<a href="http://mingw-w64.org/">mingw-w64</a> compiler. There are, however, a few
+specifics that need to be taken into account.
 </p>
+
+<p>
+After installing msys2 you need to install the mingw-w64 C++ compiler. To check that
+the installation was successfull, you can run
+</p>
+<div class="fragment">
+<pre>g++ --version</pre>
+</div>
+<p>
+in the msys2 shell.
+</p>
+
+<p>
+When you checkout the current version of <code>libMesh</code> using Git on Windows
+symlinks might not work. You can check whether your symlinks are set correctly by
+inspecting whether the README file points to the README.md file. If this is not the
+case, you should run the <code>contrib/bin/fix_windows_symlinks.sh</code> from within
+the git repository using the msys2 shell. This script removes all symlinks and copies
+the symlink targets to the corresponding places.
+</p>
+
+<p>
+Not all <em>optional</em>
+dependencies are available on Windows.
+It is known that the following packages do not compile on Windows.
+</p>
+<ul>
+    <li>fparser, Function Parser for C++</li>
+    <li>METIS, Serial Graph Partitioning and Fill-reducing Matrix Ordering</li>
+</ul>
+<p>
+Hence, these libraries need to be deactivated, using the corresponding flags.
+For example by configuring <code>libMesh</code> with the following command.
+</p>
+<div class="fragment">
+<pre>./configure --prefix=c:/libmesh \
+    --disable-metis \
+    --with-fparser=none</pre>
+</div>
+<p>
+Then, the library can be built and installed using:
+</p>
+<div class="fragment">
+<pre>make
+make install</pre>
+</div>
