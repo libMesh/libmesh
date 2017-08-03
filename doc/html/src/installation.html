@@ -203,8 +203,8 @@ used by <code>libMesh</code>. For example, you could build the application <code
 
 <p>
 The <code>libMesh</code> library can be built on Microsoft Windows using the
-<a href="http://www.msys2.org/">msys2</a> software distribution and the 
-<a href="http://mingw-w64.org/">mingw-w64</a> compiler. There are, however, a few 
+<a href="http://www.msys2.org/">msys2</a> software distribution and the
+<a href="http://mingw-w64.org/">mingw-w64</a> compiler. There are, however, a few
 specifics that need to be taken into account.
 </p>
 
@@ -221,7 +221,7 @@ in the msys2 shell.
 
 <p>
 When you checkout the current version of <code>libMesh</code> using Git on Windows
-symlinks might not work. You can check whether your symlinks are set correctly by 
+symlinks might not work. You can check whether your symlinks are set correctly by
 inspecting whether the README file points to the README.md file. If this is not the
 case, you should run the <code>contrib/bin/fix_windows_symlinks.sh</code> from within
 the git repository using the msys2 shell. This script removes all symlinks and copies
@@ -229,7 +229,7 @@ the symlink targets to the corresponding places.
 </p>
 
 <p>
-Not all <em>optional</em> 
+Not all <em>optional</em>
 dependencies are available on Windows.
 It is known that the following packages do not compile on Windows.
 </p>
@@ -253,5 +253,3 @@ Then, the library can be built and installed using:
 <pre>make
 make install</pre>
 </div>
-
-
