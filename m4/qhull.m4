@@ -27,7 +27,7 @@ AC_DEFUN([CONFIGURE_QHULL],
 
       # The QHULL API is distributed with libmesh, so we don't have to guess
       # where it might be installed...
-      QHULL_INCLUDE="-I\$(top_srcdir)/contrib/qhull/qhull/src -I\$(top_srcdir)/contrib/qhull/qhull/src/libqhull -I\$(top_srcdir)/contrib/qhull/qhull/src/libqhullcpp"
+      QHULL_INCLUDE="-I\$(top_srcdir)/contrib/qhull/qhull/src -I\$(top_srcdir)/contrib/qhull/qhull/src/libqhullcpp"
       AC_DEFINE(HAVE_QHULL_API, 1, [Flag indicating whether the library will be compiled with Qhull support])
       AC_MSG_RESULT(<<< Configuring library with Qhull version 2012.1 support >>>)
   fi
