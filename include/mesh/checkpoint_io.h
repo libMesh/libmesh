@@ -153,7 +153,7 @@ private:
                            const std::set<const Elem *, CompareElemIdsByLevel> & elements) const;
 
   /**
-   * Write the remote_elem neighbor links for part of a mesh
+   * Write the remote_elem neighbor and child links for part of a mesh
    */
   void write_remote_elem (Xdr & io,
                           const std::set<const Elem *, CompareElemIdsByLevel> & elements) const;
@@ -195,7 +195,7 @@ private:
   void read_connectivity (Xdr & io);
 
   /**
-   * Read the remote_elem neighbor links for a parallel, distributed mesh
+   * Read the remote_elem neighbor and child links for a parallel, distributed mesh
    */
   void read_remote_elem (Xdr & io);
 
