@@ -163,16 +163,29 @@ void CheckpointIO::write (const std::string & name)
 
       std::set<const Elem *, CompareElemIdsByLevel> elements;
 
-      // For serial files we write everything
-      if (!_parallel)
+      // For serial files or for already-distributed meshs, we write
+      // everything we can see.
+      if (!_parallel || !mesh.is_serial())
         elements.insert(mesh.elements_begin(), mesh.elements_end());
-      // For parallel files we write what we're asked plus what the
-      // ghosting functors and mesh structure say is associated with
-      // what we're asked.
+      // For parallel files written from serial meshes we write what
+      // we'd be required to keep if we were to be deleting remote
+      // elements.  This allows us to write proper parallel files even
+      // from a ReplicateMesh.
+      //
+      // WARNING: If we have a DistributedMesh which used
+      // "add_extra_ghost_elem" rather than ghosting functors to
+      // preserve elements and which is *also* currently serialized
+      // then we're not preserving those elements here.  As a quick
+      // workaround user code should delete_remote_elements() before
+      // writing the checkpoint; as a long term workaround user code
+      // should use ghosting functors instead of extra_ghost_elem
+      // lists.
       else
         {
           query_ghosting_functors(mesh, my_pid, false, elements);
+          query_ghosting_functors(mesh, DofObject::invalid_processor_id, false, elements);
           connect_children(mesh, my_pid, elements);
+          connect_children(mesh, DofObject::invalid_processor_id, elements);
           connect_families(elements);
         }
 
@@ -290,7 +303,7 @@ void CheckpointIO::write_connectivity (Xdr & io,
 
   // Put these out here to reduce memory churn
   // id type pid subdomain_id parent_id
-  std::vector<largest_id_type> elem_data(5);
+  std::vector<largest_id_type> elem_data(6);
   std::vector<largest_id_type> conn_data;
 
   dof_id_type n_elems_here = elements.size();
@@ -310,9 +323,15 @@ void CheckpointIO::write_connectivity (Xdr & io,
       elem_data[3] = elem.subdomain_id();
 
       if (elem.parent() != libmesh_nullptr)
-        elem_data[4] = elem.parent()->id();
+        {
+          elem_data[4] = elem.parent()->id();
+          elem_data[5] = elem.parent()->which_child_am_i(&elem);
+        }
       else
-        elem_data[4] = DofObject::invalid_processor_id;
+        {
+          elem_data[4] = DofObject::invalid_processor_id;
+          elem_data[5] = DofObject::invalid_processor_id;
+        }
 
       conn_data.resize(n_nodes);
 
@@ -331,8 +350,13 @@ void CheckpointIO::write_connectivity (Xdr & io,
 
 #ifdef LIBMESH_ENABLE_AMR
       unsigned int p_level = elem.p_level();
-
       io.data(p_level, "# p_level");
+
+      unsigned short rflag = elem.refinement_flag();
+      io.data(rflag, "# rflag");
+
+      unsigned short pflag = elem.p_refinement_flag();
+      io.data(pflag, "# pflag");
 #endif
       io.data_stream(&conn_data[0],
                      cast_int<unsigned int>(conn_data.size()),
@@ -346,10 +370,9 @@ void CheckpointIO::write_remote_elem (Xdr & io,
 {
   libmesh_assert (io.writing());
 
-  // Find the number of remote_elem links
-  dof_id_type n_remote_elem = 0;
-  std::vector<dof_id_type> elem_ids;
-  std::vector<unsigned short int> elem_sides;
+  // Find the remote_elem neighbor and child links
+  std::vector<dof_id_type> elem_ids, parent_ids;
+  std::vector<unsigned short int> elem_sides, child_numbers;
 
   for (std::set<const Elem *, CompareElemIdsByLevel>::const_iterator it = elements.begin(),
          end = elements.end(); it != end; ++it)
@@ -364,18 +387,26 @@ void CheckpointIO::write_remote_elem (Xdr & io,
             {
               elem_ids.push_back(elem.id());
               elem_sides.push_back(n);
-              n_remote_elem++;
+            }
+        }
+
+      if (elem.has_children())
+        for (unsigned int c = 0; c != elem.n_children(); ++c)
+        {
+          const Elem * child = elem.child_ptr(c);
+          if (child == remote_elem ||
+              (child && !elements.count(child)))
+            {
+              parent_ids.push_back(elem.id());
+              child_numbers.push_back(c);
             }
         }
     }
 
-  io.data(n_remote_elem, "# n_remote_elem");
-
-  if (n_remote_elem)
-    {
-      io.data_stream(&elem_ids[0], n_remote_elem);
-      io.data_stream(&elem_sides[0], n_remote_elem);
-    }
+  io.data(elem_ids, "# remote neighbor elem_ids");
+  io.data(elem_sides, "# remote neighbor elem_sides");
+  io.data(parent_ids, "# remote child parent_ids");
+  io.data(child_numbers, "# remote child_numbers");
 }
 
 
@@ -754,7 +785,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
   for (unsigned int i=0; i<n_elems_here; i++)
     {
       // id type pid subdomain_id parent_id
-      std::vector<largest_id_type> elem_data(5);
+      std::vector<largest_id_type> elem_data(6);
       io.data_stream
         (&elem_data[0], cast_int<unsigned int>(elem_data.size()),
          cast_int<unsigned int>(elem_data.size()));
@@ -766,8 +797,11 @@ void CheckpointIO::read_connectivity (Xdr & io)
 
 #ifdef LIBMESH_ENABLE_AMR
       unsigned int p_level = 0;
-
       io.data(p_level, "# p_level");
+
+      unsigned short rflag, pflag;
+      io.data(rflag, "# rflag");
+      io.data(pflag, "# pflag");
 #endif
 
       unsigned int n_nodes = Elem::type_to_n_nodes_map[elem_data[1]];
@@ -789,10 +823,16 @@ void CheckpointIO::read_connectivity (Xdr & io)
         cast_int<subdomain_id_type>(elem_data[3]);
       const dof_id_type parent_id          =
         cast_int<dof_id_type>      (elem_data[4]);
+      const unsigned short int child_num   =
+        cast_int<dof_id_type>      (elem_data[5]);
 
       Elem * parent =
         (parent_id == DofObject::invalid_processor_id) ?
         libmesh_nullptr : mesh.elem_ptr(parent_id);
+
+      if (!parent)
+        libmesh_assert_equal_to
+          (child_num, DofObject::invalid_processor_id);
 
       Elem * old_elem = mesh.query_elem_ptr(id);
 
@@ -838,12 +878,15 @@ void CheckpointIO::read_connectivity (Xdr & io)
 #ifdef LIBMESH_ENABLE_AMR
           elem->hack_p_level(p_level);
 
+          elem->set_refinement_flag  (cast_int<Elem::RefinementState>(rflag));
+          elem->set_p_refinement_flag(cast_int<Elem::RefinementState>(pflag));
+
           // Set parent connections
           if (parent)
             {
-              parent->add_child(elem);
-              parent->set_refinement_flag (Elem::INACTIVE);
-              elem->set_refinement_flag   (Elem::JUST_REFINED);
+              // We must specify a child_num, because we will have
+              // skipped adding any preceding remote_elem children
+              parent->add_child(elem, child_num);
             }
 #endif
 
@@ -867,25 +910,43 @@ void CheckpointIO::read_remote_elem (Xdr & io)
   // convenient reference to our mesh
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
-  // Find the number of remote_elem links
-  dof_id_type n_remote_elem = 0;
+  // Find the remote_elem neighbor links
+  std::vector<dof_id_type> elem_ids;
+  std::vector<unsigned short int> elem_sides;
 
-  io.data(n_remote_elem, "# n_remote_elem");
+  io.data(elem_ids, "# remote neighbor elem_ids");
+  io.data(elem_sides, "# remote neighbor elem_sides");
 
-  std::vector<dof_id_type> elem_ids(n_remote_elem);
-  std::vector<unsigned short int> elem_sides(n_remote_elem);
+  libmesh_assert_equal_to(elem_ids.size(), elem_sides.size());
 
-  if (n_remote_elem)
+  for (std::size_t i=0; i != elem_ids.size(); ++i)
     {
-      io.data_stream(&elem_ids[0], n_remote_elem);
-      io.data_stream(&elem_sides[0], n_remote_elem);
+      Elem & elem = mesh.elem_ref(elem_ids[i]);
+      libmesh_assert(!elem.neighbor(elem_sides[i]));
+      elem.set_neighbor(elem_sides[i],
+                        const_cast<RemoteElem *>(remote_elem));
+    }
 
-      for (std::size_t i=0; i != n_remote_elem; ++i)
-        {
-          Elem & elem = mesh.elem_ref(elem_ids[i]);
-          elem.set_neighbor(elem_sides[i],
-                            const_cast<RemoteElem *>(remote_elem));
-        }
+  // Find the remote_elem children links
+  std::vector<dof_id_type> parent_ids;
+  std::vector<unsigned short int> child_numbers;
+
+  io.data(parent_ids, "# remote child parent_ids");
+  io.data(child_numbers, "# remote child_numbers");
+
+  for (std::size_t i=0; i != parent_ids.size(); ++i)
+    {
+      Elem & elem = mesh.elem_ref(parent_ids[i]);
+
+      // We'd like to assert that no child pointer already exists to
+      // be overwritten by remote_elem, but Elem doesn't actually have
+      // an API that will return a child pointer without asserting
+      // that it isn't NULL
+      //
+      // libmesh_assert(!elem.child_ptr(child_numbers[i]));
+
+      elem.add_child(const_cast<RemoteElem *>(remote_elem),
+                     child_numbers[i]);
     }
 }
 

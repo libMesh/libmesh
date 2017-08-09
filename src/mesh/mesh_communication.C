@@ -1820,10 +1820,11 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
 
       std::vector<const Elem *> active_family;
 #ifdef LIBMESH_ENABLE_AMR
-      elem->active_family_tree(active_family);
-#else
-      active_family.push_back(elem);
+      if (!elem->subactive())
+        elem->active_family_tree(active_family);
+      else
 #endif
+        active_family.push_back(elem);
 
       for (std::size_t i=0; i != active_family.size(); ++i)
         elements_to_keep.insert(active_family[i]);
