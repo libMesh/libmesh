@@ -322,12 +322,14 @@ void CheckpointIO::write_connectivity (Xdr & io,
       elem_data[2] = elem.processor_id();
       elem_data[3] = elem.subdomain_id();
 
+#ifdef LIBMESH_ENABLE_AMR
       if (elem.parent() != libmesh_nullptr)
         {
           elem_data[4] = elem.parent()->id();
           elem_data[5] = elem.parent()->which_child_am_i(&elem);
         }
       else
+#endif
         {
           elem_data[4] = DofObject::invalid_processor_id;
           elem_data[5] = DofObject::invalid_processor_id;
@@ -390,6 +392,7 @@ void CheckpointIO::write_remote_elem (Xdr & io,
             }
         }
 
+#ifdef LIBMESH_ENABLE_AMR
       if (elem.has_children())
         for (unsigned int c = 0; c != elem.n_children(); ++c)
         {
@@ -401,6 +404,7 @@ void CheckpointIO::write_remote_elem (Xdr & io,
               child_numbers.push_back(c);
             }
         }
+#endif
     }
 
   io.data(elem_ids, "# remote neighbor elem_ids");
@@ -934,6 +938,7 @@ void CheckpointIO::read_remote_elem (Xdr & io)
   io.data(parent_ids, "# remote child parent_ids");
   io.data(child_numbers, "# remote child_numbers");
 
+#ifdef LIBMESH_ENABLE_AMR
   for (std::size_t i=0; i != parent_ids.size(); ++i)
     {
       Elem & elem = mesh.elem_ref(parent_ids[i]);
@@ -948,6 +953,7 @@ void CheckpointIO::read_remote_elem (Xdr & io)
       elem.add_child(const_cast<RemoteElem *>(remote_elem),
                      child_numbers[i]);
     }
+#endif
 }
 
 
