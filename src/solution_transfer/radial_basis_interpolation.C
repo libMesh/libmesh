@@ -27,6 +27,9 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/eigen_core_support.h"
 
+#ifdef LIBMESH_HAVE_EIGEN
+#include <Eigen/Dense>
+#endif
 
 
 namespace libMesh
