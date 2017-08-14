@@ -57,6 +57,9 @@ public:
   template <typename MeshA, typename MeshB>
   void testSplitter(bool binary, bool using_distmesh)
   {
+    // The CheckpointIO-based spltter requires XDR.
+#ifdef LIBMESH_HAVE_XDR
+
     // In this test, we partition the mesh into n_procs parts.  Don't
     // try to partition a DistributedMesh into more parts than we have
     // processors, though.
@@ -122,6 +125,7 @@ public:
       // Verify that we read in exactly as many elements as we started with.
       CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(read_in_elements), original_n_elem);
     }
+#endif // LIBMESH_HAVE_XDR
   }
 
   void testAsciiDistRepSplitter()
