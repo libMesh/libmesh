@@ -96,6 +96,12 @@ int main (int argc, char ** argv)
   libmesh_example_requires(false, "--enable-eigen");
 #endif
 
+  // This example converts between ExodusII and XDR files, therefore
+  // it requires XDR support in libmesh.
+#ifndef LIBMESH_HAVE_XDR
+  libmesh_example_requires (false, "XDR support");
+#endif
+
   // Read the "distributed_load" flag from the command line
   GetPot command_line (argc, argv);
   int distributed_load = 0;
