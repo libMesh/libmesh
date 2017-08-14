@@ -1364,7 +1364,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
   // counter indexes into the block_ids vector
   unsigned int counter = 0;
-  for (subdomain_map_type::iterator it=subdomain_map.begin(); it!=subdomain_map.end(); ++it)
+  for (subdomain_map_type::iterator it=subdomain_map.begin(); it!=subdomain_map.end(); ++it, ++counter)
     {
       block_ids[counter] = (*it).first;
       names_table.push_back_entry(mesh.subdomain_name((*it).first));
@@ -1393,8 +1393,6 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       nedges.push_back(0);
       nfaces.push_back(0);
       nattr.push_back(0);
-
-      counter++;
     }
 
   exII::ex_block_params blocks;
