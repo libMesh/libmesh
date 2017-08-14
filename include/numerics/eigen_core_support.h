@@ -45,7 +45,7 @@
 #include "libmesh/ignore_warnings.h"
 
 // Eigen includes
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <Eigen/Sparse>
 
 #include "libmesh/restore_warnings.h"

@@ -28,7 +28,7 @@
 
 #ifdef LIBMESH_HAVE_EIGEN
 #include "libmesh/ignore_warnings.h"
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include "libmesh/restore_warnings.h"
 #endif
 
