@@ -1132,7 +1132,7 @@ unit_tests_sources = driver.C test_comm.h stream_redirector.h \
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_LDADD = $(top_builddir)/libmesh_oprof.la
 @LIBMESH_ENABLE_CPPUNIT_TRUE@TESTS = run_unit_tests.sh
-CLEANFILES = cube_mesh.xdr checkpoint_splitter.cpr* \
+CLEANFILES = cube_mesh.xda checkpoint_splitter.cpr* \
 	checkpoint_splitter.cpa* slit_mesh.xda slit_solution.xda \
 	$(am__append_12)
 all: all-am

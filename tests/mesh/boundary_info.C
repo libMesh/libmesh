@@ -144,7 +144,7 @@ public:
   void testEdgeBoundaryConditions()
   {
     const unsigned int n_elem = 5;
-    const std::string mesh_filename = "cube_mesh.xdr";
+    const std::string mesh_filename = "cube_mesh.xda";
 
     {
       Mesh mesh(*TestCommWorld);
