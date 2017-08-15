@@ -4719,7 +4719,7 @@ AM_CFLAGS = $(libmesh_CFLAGS)
 # with libtool, because Windows requires all shared
 # libraries to include all used symbols. This flag
 # should do no harm on other platforms.
-AM_LDFLAGS = $(libmesh_LDFLAGS) "-no-undefined"
+AM_LDFLAGS = $(libmesh_LDFLAGS) -no-undefined
 
 # AM_CPPFLAGS are method-independent cppflags that
 # we use when compiling libmesh proper, or its utility
