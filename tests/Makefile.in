@@ -179,7 +179,7 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_7 = unit_tests-dbg$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
-	stream_redirector.h base/dof_object_test.h \
+	stream_redirector.h base/dof_object_test.h base/dof_map_test.h \
 	base/default_coupling_test.C base/getpot_test.C \
 	base/point_neighbor_coupling_test.C base/unique_ptr_test.C \
 	fe/fe_bernstein_test.C fe/fe_clough_test.C \
@@ -279,7 +279,7 @@ unit_tests_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
-	stream_redirector.h base/dof_object_test.h \
+	stream_redirector.h base/dof_object_test.h base/dof_map_test.h \
 	base/default_coupling_test.C base/getpot_test.C \
 	base/point_neighbor_coupling_test.C base/unique_ptr_test.C \
 	fe/fe_bernstein_test.C fe/fe_clough_test.C \
@@ -375,7 +375,7 @@ unit_tests_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
-	stream_redirector.h base/dof_object_test.h \
+	stream_redirector.h base/dof_object_test.h base/dof_map_test.h \
 	base/default_coupling_test.C base/getpot_test.C \
 	base/point_neighbor_coupling_test.C base/unique_ptr_test.C \
 	fe/fe_bernstein_test.C fe/fe_clough_test.C \
@@ -471,7 +471,7 @@ unit_tests_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
-	stream_redirector.h base/dof_object_test.h \
+	stream_redirector.h base/dof_object_test.h base/dof_map_test.h \
 	base/default_coupling_test.C base/getpot_test.C \
 	base/point_neighbor_coupling_test.C base/unique_ptr_test.C \
 	fe/fe_bernstein_test.C fe/fe_clough_test.C \
@@ -566,7 +566,7 @@ unit_tests_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
-	stream_redirector.h base/dof_object_test.h \
+	stream_redirector.h base/dof_object_test.h base/dof_map_test.h \
 	base/default_coupling_test.C base/getpot_test.C \
 	base/point_neighbor_coupling_test.C base/unique_ptr_test.C \
 	fe/fe_bernstein_test.C fe/fe_clough_test.C \
@@ -1078,16 +1078,16 @@ AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
 
 AM_LDFLAGS = $(libmesh_LDFLAGS)
 unit_tests_sources = driver.C test_comm.h stream_redirector.h \
-	base/dof_object_test.h base/default_coupling_test.C \
-	base/getpot_test.C base/point_neighbor_coupling_test.C \
-	base/unique_ptr_test.C fe/fe_bernstein_test.C \
-	fe/fe_clough_test.C fe/fe_hermite_test.C \
-	fe/fe_hierarchic_test.C fe/fe_l2_hierarchic_test.C \
-	fe/fe_l2_lagrange_test.C fe/fe_lagrange_test.C \
-	fe/fe_monomial_test.C fe/fe_szabab_test.C fe/fe_test.h \
-	fe/fe_xyz_test.C geom/elem_test.C geom/node_test.C \
-	geom/point_test.C geom/point_test.h \
-	geom/which_node_am_i_test.C mesh/all_tri.C \
+	base/dof_object_test.h base/dof_map_test.h \
+	base/default_coupling_test.C base/getpot_test.C \
+	base/point_neighbor_coupling_test.C base/unique_ptr_test.C \
+	fe/fe_bernstein_test.C fe/fe_clough_test.C \
+	fe/fe_hermite_test.C fe/fe_hierarchic_test.C \
+	fe/fe_l2_hierarchic_test.C fe/fe_l2_lagrange_test.C \
+	fe/fe_lagrange_test.C fe/fe_monomial_test.C \
+	fe/fe_szabab_test.C fe/fe_test.h fe/fe_xyz_test.C \
+	geom/elem_test.C geom/node_test.C geom/point_test.C \
+	geom/point_test.h geom/which_node_am_i_test.C mesh/all_tri.C \
 	mesh/boundary_mesh.C mesh/boundary_info.C mesh/checkpoint.C \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
