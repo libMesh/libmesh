@@ -578,6 +578,16 @@ public:
   dof_id_type end_dof() const
   { return this->end_dof(this->processor_id()); }
 
+  /**
+   * \returns The processor id that owns the dof index \p dof
+   */
+  processor_id_type dof_owner(const dof_id_type dof) const
+  { std::vector<dof_id_type>::const_iterator ub =
+      std::upper_bound(_end_df.begin(), _end_df.end(), dof);
+    libmesh_assert (ub != _end_df.end());
+    return (ub - _end_df.begin());
+  }
+
 #ifdef LIBMESH_ENABLE_AMR
   /**
    * \returns The first old dof index that is after all indices local
