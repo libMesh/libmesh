@@ -31945,6 +31945,10 @@ else
 fi
 
 
+                  if test "$enableallstatic" = yes ; then
+    ac_cv_cxx_dlopen=no
+  fi
+
     if (test "$ac_cv_cxx_dlopen" = yes); then
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the c++ compiler supports dlopen/dlsym/dlclose" >&5
 $as_echo_n "checking whether the c++ compiler supports dlopen/dlsym/dlclose... " >&6; }
@@ -42596,6 +42600,10 @@ else
 
 fi
 
+
+                  if test "$enableallstatic" = yes ; then
+    ac_cv_cxx_dlopen=no
+  fi
 
     if (test "$ac_cv_cxx_dlopen" = yes); then
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the c++ compiler supports dlopen/dlsym/dlclose" >&5
