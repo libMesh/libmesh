@@ -615,6 +615,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 
     # Enable the address sanitizer stuff if the test code compiled
     if test "x$have_address_sanitizer" = xyes; then
+      # As of clang 3.9.0 or so, we also need to pass the sanitize flag to the linker
+      # if it's being used during compiling. It seems that we do not need to pass all
+      # the flags above, just the sanitize flag itself.
+      libmesh_LDFLAGS="$libmesh_LDFLAGS -Wc,-fsanitize=address"
+
       for method in ${SANITIZE_METHODS}; do
           case "${method}" in
               optimized|opt)
