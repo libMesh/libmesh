@@ -138,6 +138,13 @@ public:
   { return true; }
 
   /**
+   * \returns \p true if all elements and nodes of the mesh
+   * exist on the processor 0, \p false otherwise
+   */
+  virtual bool is_serial_on_zero () const
+  { return true; }
+
+  /**
    * Asserts that not all elements and nodes of the mesh necessarily
    * exist on the current processor.  Only valid to call on classes
    * which can be created in a distributed form.
