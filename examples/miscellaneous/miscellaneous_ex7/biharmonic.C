@@ -246,12 +246,12 @@ void Biharmonic::step(const Real & dt_in)
 
 
 
+#ifdef LIBMESH_HAVE_EXODUS_API
 void Biharmonic::output(int timestep,
                         const Real & t,
                         Real & o_t,
                         bool force)
 {
-#ifdef LIBMESH_HAVE_EXODUS_API
   if (!force && t - o_t < _o_dt)
     return;
 
@@ -272,8 +272,14 @@ void Biharmonic::output(int timestep,
 
   if (!force)
     o_t = t;
-#endif // #ifdef LIBMESH_HAVE_EXODUS_API
 }
+
+#else
+
+// Avoid compiler warnings in non-standard build configurations.
+void Biharmonic::output(int, const Real &, Real &, bool) {}
+
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
 
 
