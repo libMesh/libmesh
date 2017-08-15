@@ -69,6 +69,13 @@ public:
   FEMContext (const System & sys);
 
   /**
+   * Constructor.  Specify the extra quadrature order instead
+   * of getting it from \p sys.
+   */
+  explicit
+  FEMContext (const System & sys, int extra_quadrature_order);
+
+  /**
    * Destructor.
    */
   virtual ~FEMContext ();
@@ -1136,7 +1143,17 @@ protected:
    */
   UniquePtr<QBase> _edge_qrule;
 
+  /**
+   * The extra quadrature order for this context.
+   */
+  int _extra_quadrature_order;
+
 private:
+  /**
+   * Helper function used in constructors to set up internal data.
+   */
+  void init_internal_data(const System & sys);
+
   /**
    * Uses the coordinate data specified by mesh_*_position configuration
    * to set the geometry of \p elem to the value it would take after a fraction

@@ -49,7 +49,34 @@ FEMContext::FEMContext (const System & sys)
     _elem_dim(0), /* This will be reset in set_elem(). */
     _elem_dims(sys.get_mesh().elem_dimensions()),
     _element_qrule(4,libmesh_nullptr),
-    _side_qrule(4,libmesh_nullptr)
+    _side_qrule(4,libmesh_nullptr),
+    _extra_quadrature_order(sys.extra_quadrature_order)
+{
+  init_internal_data(sys);
+}
+
+FEMContext::FEMContext (const System & sys, int extra_quadrature_order)
+  : DiffContext(sys),
+    _mesh_sys(libmesh_nullptr),
+    _mesh_x_var(0),
+    _mesh_y_var(0),
+    _mesh_z_var(0),
+    side(0), edge(0),
+    _atype(CURRENT),
+    _custom_solution(libmesh_nullptr),
+    _boundary_info(sys.get_mesh().get_boundary_info()),
+    _elem(libmesh_nullptr),
+    _dim(sys.get_mesh().mesh_dimension()),
+    _elem_dim(0), /* This will be reset in set_elem(). */
+    _elem_dims(sys.get_mesh().elem_dimensions()),
+    _element_qrule(4,libmesh_nullptr),
+    _side_qrule(4,libmesh_nullptr),
+    _extra_quadrature_order(extra_quadrature_order)
+{
+  init_internal_data(sys);
+}
+
+void FEMContext::init_internal_data(const System & sys)
 {
   // Reserve space for the FEAbstract and QBase objects for each
   // element dimension possiblity (0,1,2,3)
@@ -104,12 +131,12 @@ FEMContext::FEMContext (const System & sys)
 
       // Create an adequate quadrature rule
       _element_qrule[dim] = hardest_fe_type.default_quadrature_rule
-        (dim, sys.extra_quadrature_order).release();
+        (dim, _extra_quadrature_order).release();
       _side_qrule[dim] = hardest_fe_type.default_quadrature_rule
-        (dim-1, sys.extra_quadrature_order).release();
+        (dim-1, _extra_quadrature_order).release();
       if (dim == 3)
         _edge_qrule.reset(hardest_fe_type.default_quadrature_rule
-                          (1, sys.extra_quadrature_order).release());
+                          (1, _extra_quadrature_order).release());
 
       // Next, create finite element objects
       _element_fe_var[dim].resize(nv);
