@@ -28,8 +28,10 @@ AC_DEFUN([CONFIGURE_METIS],
 
   # If PETSc has its own METIS, default to using that one regardless
   # of what the user specified (if anything) in --with-metis.
-  if (test $petsc_have_metis -gt 0) ; then
-    build_metis=no
+  if (test "x$petsc_have_metis" != "x") ; then
+    if (test $petsc_have_metis -gt 0) ; then
+      build_metis=no
+    fi
   fi
 
   # Conversely, if:
@@ -39,7 +41,7 @@ AC_DEFUN([CONFIGURE_METIS],
   # then we need to make sure that libmesh builds its own METIS!
   if (test $enablemetis = yes) ; then
     if (test $build_metis = no) ; then
-      if (test $petsc_have_metis -eq 0) ; then
+      if (test "x$petsc_have_metis" = "x0") ; then
         build_metis=yes
       fi
       if (test $enablepetsc = no) ; then
