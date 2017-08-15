@@ -12,14 +12,14 @@ using namespace FUNCTIONPARSERTYPES;
 using namespace FPoptimizer_CodeTree;
 
 #include <iostream>
+#include <fstream>
+#include <cstdio>
+#include <sys/stat.h>
+#include <errno.h>
+#include <unistd.h>
 
 #if LIBMESH_HAVE_FPARSER_JIT
-#  include <fstream>
-#  include <cstdio>
-#  include <unistd.h>
 #  include <dlfcn.h>
-#  include <errno.h>
-#  include <sys/stat.h>
 #endif
 
 #include "lib/sha1.h"

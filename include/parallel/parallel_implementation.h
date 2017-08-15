@@ -4006,7 +4006,7 @@ Communicator::send_receive_packed_range (const unsigned int dest_processor_id,
  * Gather-to-root on one processor.
  */
 template <typename T>
-inline void Communicator::gather(const unsigned int root_id,
+inline void Communicator::gather(const unsigned int libmesh_dbg_var(root_id),
                                  const T & send_val,
                                  std::vector<T> & recv_val) const
 {
@@ -4016,10 +4016,10 @@ inline void Communicator::gather(const unsigned int root_id,
 }
 
 template <typename T>
-inline void Communicator::gather(const unsigned int root_id,
+inline void Communicator::gather(const unsigned int libmesh_dbg_var(root_id),
                                  const std::basic_string<T> & sendval,
                                  std::vector<std::basic_string<T> > & recv,
-                                 const bool identical_buffer_sizes) const
+                                 const bool /*identical_buffer_sizes*/) const
 {
   libmesh_assert_equal_to (root_id, 0);
   recv.resize(1);
@@ -4046,7 +4046,7 @@ inline void Communicator::allgather(std::vector<T> &,
 template <typename T>
 inline void Communicator::scatter(const std::vector<T> & data,
                                   T & recv,
-                                  const unsigned int root_id) const
+                                  const unsigned int libmesh_dbg_var(root_id)) const
 {
   libmesh_assert_equal_to (root_id, 0);
   recv = data[0];
@@ -4056,7 +4056,7 @@ inline void Communicator::scatter(const std::vector<T> & data,
 template <typename T>
 inline void Communicator::scatter(const std::vector<T> & data,
                                   std::vector<T> & recv,
-                                  const unsigned int root_id) const
+                                  const unsigned int libmesh_dbg_var(root_id)) const
 {
   libmesh_assert_equal_to (root_id, 0);
   recv.assign(data.begin(), data.end());
@@ -4067,7 +4067,7 @@ template <typename T>
 inline void Communicator::scatter(const std::vector<T> & data,
                                   const std::vector<int> counts,
                                   std::vector<T> & recv,
-                                  const unsigned int root_id) const
+                                  const unsigned int libmesh_dbg_var(root_id)) const
 {
   libmesh_assert_equal_to (root_id, 0);
   libmesh_assert_equal_to (counts.size(), 1);
@@ -4078,8 +4078,8 @@ inline void Communicator::scatter(const std::vector<T> & data,
 template <typename T>
 inline void Communicator::scatter(const std::vector<std::vector<T> > & data,
                                   std::vector<T> & recv,
-                                  const unsigned int root_id,
-                                  const bool identical_buffer_sizes) const
+                                  const unsigned int libmesh_dbg_var(root_id),
+                                  const bool /*identical_buffer_sizes*/) const
 {
   libmesh_assert_equal_to (root_id, 0);
   libmesh_assert_equal_to (data.size(), 1);
@@ -4093,7 +4093,7 @@ inline void Communicator::alltoall(std::vector<T> &) const {}
 
 template <typename T>
 inline void Communicator::broadcast (T &,
-                                     const unsigned int root_id) const
+                                     const unsigned int libmesh_dbg_var(root_id)) const
 { libmesh_assert_equal_to(root_id, 0); }
 
 #endif // LIBMESH_HAVE_MPI

@@ -16,6 +16,18 @@ AC_DEFUN([AX_CXX_DLOPEN],
       ac_cv_cxx_dlopen=no
     ])
 
+  dnl dlopen cannot be used if we are configured with
+  dnl --enable-all-static, otherwise we get linker warnings like:
+  dnl
+  dnl warning: Using 'dlopen' in statically linked applications
+  dnl requires at runtime the shared libraries from the glibc version used
+  dnl for linking
+  dnl
+  dnl and runtime errors.
+  if test "$enableallstatic" = yes ; then
+    ac_cv_cxx_dlopen=no
+  fi
+
   dnl If AC_SEARCH_LIBS worked, try to compile a test code
   if (test "$ac_cv_cxx_dlopen" = yes); then
     AC_MSG_CHECKING([whether the c++ compiler supports dlopen/dlsym/dlclose])

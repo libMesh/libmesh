@@ -223,7 +223,6 @@ void process_cmd_line(int argc,
 
 #endif
 
-  bool b_mesh_b_given = false;
   bool b_mesh_B_given = false;
 
   int opt;
@@ -347,7 +346,6 @@ void process_cmd_line(int argc,
             if (b_mesh_B_given)
               libmesh_error_msg("ERROR: Do not use -b and -B concurrently!");
 
-            b_mesh_b_given = true;
             write_bndry = BM_MESH_ONLY;
             break;
           }
