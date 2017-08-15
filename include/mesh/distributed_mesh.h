@@ -122,6 +122,13 @@ public:
   { return _is_serial; }
 
   /**
+   * \returns \p true if all elements and nodes of the mesh
+   * exist on the processor 0, \p false otherwise
+   */
+  virtual bool is_serial_on_zero () const libmesh_override
+  { return _is_serial || _is_serial_on_proc_0; }
+
+  /**
    * Asserts that not all elements and nodes of the mesh necessarily
    * exist on the current processor.
    */
