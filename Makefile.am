@@ -13,7 +13,7 @@ AM_LDFLAGS       = $(libmesh_LDFLAGS)
 # with libtool, because Windows requires all shared
 # libraries to include all used symbols. This flag
 # should do no harm on other platforms.
-AM_LDFLAGS +="-no-undefined"
+AM_LDFLAGS += -no-undefined
 
 
 # AM_CPPFLAGS are method-independent cppflags that
