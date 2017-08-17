@@ -196,8 +196,12 @@ private:
 
   /**
    * Read the remote_elem neighbor and child links for a parallel, distributed mesh
+   *
+   * If we expect all these remote_elem links to truly be remote,
+   * because we aren't doing an N -> M restart with M < N, then we set
+   * \p expect_all_remote to true and test more assertions.
    */
-  void read_remote_elem (Xdr & io);
+  void read_remote_elem (Xdr & io, bool expect_all_remote);
 
   /**
    * Read the nodal locations for a parallel, distributed mesh

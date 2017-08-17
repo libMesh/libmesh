@@ -650,8 +650,14 @@ void CheckpointIO::read (const std::string & name)
           // read connectivity
           this->read_connectivity (io);
 
+          // Do we expect all our files' remote_elem entries to really
+          // be remote?  Only if we're not reading multiple input
+          // files on the same processor.
+          const bool expect_all_remote =
+            (input_n_procs <= mesh.n_processors());
+
           // read remote_elem connectivity
-          this->read_remote_elem (io);
+          this->read_remote_elem (io, expect_all_remote);
 
           // read the boundary conditions
           this->read_bcs (io);
@@ -909,7 +915,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
 }
 
 
-void CheckpointIO::read_remote_elem (Xdr & io)
+void CheckpointIO::read_remote_elem (Xdr & io, bool libmesh_dbg_var(expect_all_remote))
 {
   // convenient reference to our mesh
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
@@ -926,9 +932,11 @@ void CheckpointIO::read_remote_elem (Xdr & io)
   for (std::size_t i=0; i != elem_ids.size(); ++i)
     {
       Elem & elem = mesh.elem_ref(elem_ids[i]);
-      libmesh_assert(!elem.neighbor(elem_sides[i]));
-      elem.set_neighbor(elem_sides[i],
-                        const_cast<RemoteElem *>(remote_elem));
+      if (!elem.neighbor(elem_sides[i]))
+        elem.set_neighbor(elem_sides[i],
+                          const_cast<RemoteElem *>(remote_elem));
+      else
+        libmesh_assert(!expect_all_remote);
     }
 
   // Find the remote_elem children links
@@ -948,10 +956,13 @@ void CheckpointIO::read_remote_elem (Xdr & io)
       // an API that will return a child pointer without asserting
       // that it isn't NULL
       //
-      // libmesh_assert(!elem.child_ptr(child_numbers[i]));
+      const Elem * child = elem.raw_child_ptr(child_numbers[i]);
 
-      elem.add_child(const_cast<RemoteElem *>(remote_elem),
-                     child_numbers[i]);
+      if (!child)
+        elem.add_child(const_cast<RemoteElem *>(remote_elem),
+                       child_numbers[i]);
+      else
+        libmesh_assert(!expect_all_remote);
     }
 #endif
 }
