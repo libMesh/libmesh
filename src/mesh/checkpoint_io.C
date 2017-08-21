@@ -654,7 +654,8 @@ void CheckpointIO::read (const std::string & name)
           // be remote?  Only if we're not reading multiple input
           // files on the same processor.
           const bool expect_all_remote =
-            (input_n_procs <= mesh.n_processors());
+            (input_n_procs <= mesh.n_processors() &&
+             !mesh.is_replicated());
 
           // read remote_elem connectivity
           this->read_remote_elem (io, expect_all_remote);
