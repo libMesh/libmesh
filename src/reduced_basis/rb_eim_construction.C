@@ -821,33 +821,6 @@ void RBEIMConstruction::update_system()
   update_RB_system_matrices();
 }
 
-bool RBEIMConstruction::greedy_termination_test(Real abs_greedy_error,
-                                                Real initial_error,
-                                                int)
-{
-  if (abs_greedy_error < get_abs_training_tolerance())
-    {
-      libMesh::out << "Absolute error tolerance reached." << std::endl;
-      return true;
-    }
-
-  Real rel_greedy_error = abs_greedy_error/initial_error;
-  if (rel_greedy_error < get_rel_training_tolerance())
-    {
-      libMesh::out << "Relative error tolerance reached." << std::endl;
-      return true;
-    }
-
-  if (get_rb_evaluation().get_n_basis_functions() >= this->get_Nmax())
-    {
-      libMesh::out << "Maximum number of basis functions reached: Nmax = "
-                   << get_Nmax() << "." << std::endl;
-      return true;
-    }
-
-  return false;
-}
-
 void RBEIMConstruction::set_explicit_sys_subvector(NumericVector<Number> & dest,
                                                    unsigned int var,
                                                    NumericVector<Number> & source)

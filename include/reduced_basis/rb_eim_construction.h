@@ -275,14 +275,6 @@ protected:
   virtual Real get_RB_error_bound() libmesh_override;
 
   /**
-   * Function that indicates when to terminate the Greedy
-   * basis training. Override in subclasses to specialize.
-   */
-  virtual bool greedy_termination_test(Real abs_greedy_error,
-                                       Real initial_greedy_error,
-                                       int count) libmesh_override;
-
-  /**
    * Loop over the training set and compute the parametrized function for each
    * training index.
    */
