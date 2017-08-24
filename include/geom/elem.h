@@ -1065,6 +1065,12 @@ public:
 
   /**
    * \returns A constant pointer to the \f$ i^{th} \f$ child for this element.
+   * For internal use only - skips assertions about null pointers.
+   */
+  const Elem * raw_child_ptr (unsigned int i) const;
+
+  /**
+   * \returns A constant pointer to the \f$ i^{th} \f$ child for this element.
    * Do not call if this element has no children, i.e. is active.
    */
   const Elem * child_ptr (unsigned int i) const;
@@ -2227,6 +2233,15 @@ unsigned int Elem::p_level() const
 
 
 #ifdef LIBMESH_ENABLE_AMR
+
+inline
+const Elem * Elem::raw_child_ptr (unsigned int i) const
+{
+  if (!_children)
+    return libmesh_nullptr;
+
+  return _children[i];
+}
 
 inline
 const Elem * Elem::child_ptr (unsigned int i) const
