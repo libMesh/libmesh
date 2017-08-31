@@ -176,22 +176,27 @@ void TetGenIO::element_in (std::istream & ele_stream)
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   // Read the elements from the ele_stream (*.ele file).
-  unsigned int element_lab=0, n_nodes=0, nAttri=0;
+  unsigned int element_lab=0, n_nodes=0, region_attribute=0;
 
   ele_stream >> _num_elements // Read the number of tetrahedrons from the stream.
              >> n_nodes       // Read the number of nodes per tetrahedron from the stream (defaults to 4).
-             >> nAttri;       // Read the number of attributes from stream.
+             >> region_attribute; // Read the number of attributes from stream.
+
+  // According to the Tetgen docs for .ele files:
+  // http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#ff_ele
+  // region_attribute can either 0 or 1, and specifies whether, for
+  // each tetrahedron, there is an extra integer specifying which
+  // region it belongs to. Normally, this id matches a value in a
+  // corresponding .poly or .smesh file, but here we simply use it to
+  // set the subdomain_id of the element in question.
+  if (region_attribute > 1)
+    libmesh_error_msg("Invalid region_attribute " << region_attribute << " specified in .ele file.");
 
   // Vector that assigns element nodes to their correct position.
   // TetGen is normaly 0-based
   // (right now this is strictly not necessary since it is the identity map,
   //  but in the future TetGen could change their numbering scheme.)
   static const unsigned int assign_elm_nodes[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-
-  // If present, make room for element attributes to be stored.
-  this->element_attributes.resize(nAttri);
-  for (unsigned i=0; i<nAttri; ++i)
-    this->element_attributes[i].resize(_num_elements);
 
   for (dof_id_type i=0; i<_num_elements; i++)
     {
@@ -216,7 +221,10 @@ void TetGenIO::element_in (std::istream & ele_stream)
       libmesh_assert(elem);
       libmesh_assert_equal_to (elem->n_nodes(), n_nodes);
 
-      // Read the element label
+      // The first number on the line is the tetrahedron number. We
+      // have previously ignored this, preferring to set our own ids,
+      // but this could be changed to respect the Tetgen numbering if
+      // desired.
       ele_stream >> element_lab;
 
       // Read node labels
@@ -230,9 +238,16 @@ void TetGenIO::element_in (std::istream & ele_stream)
             mesh.node_ptr(_assign_nodes[node_label]);
         }
 
-      // Read and store attributes from the stream.
-      for (unsigned int j=0; j<nAttri; j++)
-        ele_stream >> this->element_attributes[j][i];
+      // Read the region attribute (if present) and use it to set the subdomain id.
+      if (region_attribute)
+        {
+          unsigned int region;
+          ele_stream >> region;
+
+          // Make sure that the id we read can be successfully cast to
+          // an integral value of type subdomain_id_type.
+          elem->subdomain_id() = cast_int<subdomain_id_type>(region);
+        }
     }
 }
 
