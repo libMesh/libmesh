@@ -125,8 +125,8 @@ NameBasedIO::is_parallel_file_format (const std::string & name)
 {
   return ((name.rfind(".xda") < name.size()) ||
           (name.rfind(".xdr") < name.size()) ||
-          (name.rfind(".nem") < name.size()) ||
-          (name.rfind(".n") < name.size())   ||
+          (name.rfind(".nem") + 4 == name.size()) ||
+          (name.rfind(".n") + 2 == name.size()) ||
           (name.rfind(".cp") < name.size())
           );
 }
