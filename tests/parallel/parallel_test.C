@@ -28,6 +28,7 @@ public:
   CPPUNIT_TEST( testAllGather );
   CPPUNIT_TEST( testGatherString );
   CPPUNIT_TEST( testAllGatherString );
+  CPPUNIT_TEST( testAllGatherVectorString );
   CPPUNIT_TEST( testBroadcast );
   CPPUNIT_TEST( testScatter );
   CPPUNIT_TEST( testBarrier );
@@ -109,6 +110,22 @@ public:
 
     for (processor_id_type i=0; i<vals.size(); i++)
       CPPUNIT_ASSERT_EQUAL( "Processor" + _number[i % 10] , vals[i] );
+  }
+
+
+
+  void testAllGatherVectorString()
+  {
+    std::vector<std::string> vals;
+    vals.push_back("Processor" + _number[TestCommWorld->rank() % 10] + "A");
+    vals.push_back("Processor" + _number[TestCommWorld->rank() % 10] + "B");
+    TestCommWorld->allgather(vals);
+
+    for (processor_id_type i=0; i<(vals.size()/2); i++)
+      {
+        CPPUNIT_ASSERT_EQUAL( "Processor" + _number[i % 10] + "A" , vals[2*i] );
+        CPPUNIT_ASSERT_EQUAL( "Processor" + _number[i % 10] + "B" , vals[2*i+1] );
+      }
   }
 
 
