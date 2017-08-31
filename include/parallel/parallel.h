@@ -1196,7 +1196,6 @@ public:
                         std::vector<std::basic_string<T> > & recv,
                         const bool identical_buffer_sizes=false) const;
 
-
   /**
    * Take a vector of local variables and expand it to include
    * values from all processors. By default, each processor is
@@ -1223,6 +1222,13 @@ public:
    */
   template <typename T>
   inline void allgather(std::vector<T> & r,
+                        const bool identical_buffer_sizes = false) const;
+
+  /**
+   * AllGather overload for vectors of string types
+   */
+  template <typename T>
+  inline void allgather(std::vector<std::basic_string<T> > & r,
                         const bool identical_buffer_sizes = false) const;
 
   //-------------------------------------------------------------------
