@@ -94,6 +94,7 @@ membership_data = [
     'Jun 2017', 118, 245,
     'Jul 2017', 109, 226,
     'Aug 2017', 109, 226,
+    'Sep 2017', 28, 56,   # Sourceforge must have finally dropped the people who didn't reconfirm their mailing list subscriptions!
 ]
 
 # Strip out the dates from membership_data
@@ -165,7 +166,7 @@ devel_data = [
     '2014',   47,  62,  27,   8,  12,   2,  22,  22,   0,  17,  20,  12,
     '2015',   25,   2,  16,  13,  21,   5,   1,   8,   9,  30,   8,   0,
     '2016',   16,  31,  43,  18,  21,  11,  17,  26,   4,  16,   5,   6,
-    '2017',    1,   2,   5,   4,   1,  11,   5,
+    '2017',    1,   2,   5,   4,   1,  11,   5,   0,
 ]
 
 # libmesh-users starts in Sept 2003!
@@ -186,7 +187,7 @@ users_data = [
     '2014',   38,  45,  26,  41, 125,  70,  61,  66,  60, 110,  27,  30,
     '2015',   43,  67,  71,  92,  39,  15,  46,  63,  84,  82,  69,  45,
     '2016',   92,  91, 148,  43,  58, 117,  92, 140,  49,  33,  85,  40,
-    '2017',   41,  36,  49,  41,  73,  51,  12,
+    '2017',   41,  36,  49,  41,  73,  51,  12,  69,
 ]
 
 # Make plot of monthly data
