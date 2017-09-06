@@ -3302,6 +3302,93 @@ inline void Communicator::allgather(std::vector<T> & r,
 
 
 template <typename T>
+inline void Communicator::allgather(std::vector<std::basic_string<T> > & r,
+                                    const bool identical_buffer_sizes) const
+{
+  if (this->size() < 2)
+    return;
+
+  LOG_SCOPE("allgather()", "Parallel");
+
+  if (identical_buffer_sizes)
+    {
+      libmesh_assert(this->verify(r.size()));
+
+      // identical_buffer_sizes doesn't buy us much since we have to
+      // communicate the lengths of strings within each buffer anyway
+      if (r.empty())
+        return;
+    }
+
+  // Concatenate the input buffer into a send buffer, and keep track
+  // of input string lengths
+  std::vector<int> mystrlengths (r.size());
+  std::vector<T> concat_src;
+
+  int myconcatsize = 0;
+  for (unsigned int i=0; i != r.size(); ++i)
+    {
+      int stringlen = cast_int<int>(r[i].size());
+      mystrlengths[i] = stringlen;
+      myconcatsize += stringlen;
+    }
+  concat_src.reserve(myconcatsize);
+  for (unsigned int i=0; i != r.size(); ++i)
+    concat_src.insert
+      (concat_src.end(), r[i].begin(), r[i].end());
+
+  // Get the string lengths from all other processors
+  std::vector<int> strlengths = mystrlengths;
+  this->allgather(strlengths, identical_buffer_sizes);
+
+  // We now know how many strings we'll be receiving
+  r.resize(strlengths.size());
+
+  // Get the concatenated data sizes from all other processors
+  std::vector<int> concat_sizes;
+  this->allgather(myconcatsize, concat_sizes);
+
+  // Find the total size of the final concatenated array and
+  // set up the displacement offsets for each processor.
+  std::vector<int> displacements(this->size(), 0);
+  unsigned int globalsize = 0;
+  for (unsigned int i=0; i != this->size(); ++i)
+    {
+      displacements[i] = globalsize;
+      globalsize += concat_sizes[i];
+    }
+
+  // Check for quick return
+  if (globalsize == 0)
+    return;
+
+  // Get the concatenated data from the remote processors.
+  // Pass NULL if our vector is empty.
+  std::vector<T> concat(globalsize);
+
+  // We may have concat_src.empty(), but we know concat has at least
+  // one element we can use as an example for StandardType
+  StandardType<T> send_type(&concat[0]);
+
+  libmesh_call_mpi
+    (MPI_Allgatherv (concat_src.empty() ?
+                       libmesh_nullptr : &concat_src[0], myconcatsize,
+                     send_type, &concat[0], &concat_sizes[0],
+                     &displacements[0], send_type, this->get()));
+
+  // Finally, split concatenated data into strings
+  const T * begin = &concat[0];
+  for (unsigned int i=0; i != r.size(); ++i)
+    {
+      const T * end = begin + strlengths[i];
+      r[i].assign(begin, end);
+      begin = end;
+    }
+}
+
+
+
+template <typename T>
 void Communicator::scatter(const std::vector<T> & data,
                            T & recv,
                            const unsigned int root_id) const
