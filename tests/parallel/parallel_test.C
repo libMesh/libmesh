@@ -29,6 +29,8 @@ public:
   CPPUNIT_TEST( testGatherString );
   CPPUNIT_TEST( testAllGatherString );
   CPPUNIT_TEST( testAllGatherVectorString );
+  CPPUNIT_TEST( testAllGatherEmptyVectorString );
+  CPPUNIT_TEST( testAllGatherHalfEmptyVectorString );
   CPPUNIT_TEST( testBroadcast );
   CPPUNIT_TEST( testScatter );
   CPPUNIT_TEST( testBarrier );
@@ -126,6 +128,30 @@ public:
         CPPUNIT_ASSERT_EQUAL( "Processor" + _number[i % 10] + "A" , vals[2*i] );
         CPPUNIT_ASSERT_EQUAL( "Processor" + _number[i % 10] + "B" , vals[2*i+1] );
       }
+  }
+
+
+
+  void testAllGatherEmptyVectorString()
+  {
+    std::vector<std::string> vals;
+    TestCommWorld->allgather(vals);
+
+    CPPUNIT_ASSERT( vals.empty() );
+  }
+
+
+
+  void testAllGatherHalfEmptyVectorString()
+  {
+    std::vector<std::string> vals;
+
+    if (!TestCommWorld->rank())
+      vals.push_back("Proc 0 only");
+
+    TestCommWorld->allgather(vals);
+
+    CPPUNIT_ASSERT_EQUAL( vals[0], std::string("Proc 0 only") );
   }
 
 
