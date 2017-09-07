@@ -108,13 +108,13 @@ void CheckpointIO::write (const std::string & name)
       // Write out the max mesh dimension for backwards compatibility
       // with code that sets it independently of element dimensions
       {
-        unsigned short mesh_dimension = mesh.mesh_dimension();
+        uint16_t mesh_dimension = mesh.mesh_dimension();
         io.data(mesh_dimension, "# dimensions");
       }
 
       // Write out whether or not this is serial output
       {
-        unsigned short parallel = _parallel;
+        uint16_t parallel = _parallel;
         io.data(parallel, "# parallel");
       }
 
@@ -360,13 +360,13 @@ void CheckpointIO::write_connectivity (Xdr & io,
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
-      unsigned int p_level = elem.p_level();
+      uint16_t p_level = elem.p_level();
       io.data(p_level, "# p_level");
 
-      unsigned short rflag = elem.refinement_flag();
+      uint16_t rflag = elem.refinement_flag();
       io.data(rflag, "# rflag");
 
-      unsigned short pflag = elem.p_refinement_flag();
+      uint16_t pflag = elem.p_refinement_flag();
       io.data(pflag, "# pflag");
 #endif
       io.data_stream(&conn_data[0],
@@ -383,7 +383,7 @@ void CheckpointIO::write_remote_elem (Xdr & io,
 
   // Find the remote_elem neighbor and child links
   std::vector<largest_id_type> elem_ids, parent_ids;
-  std::vector<unsigned short int> elem_sides, child_numbers;
+  std::vector<uint16_t> elem_sides, child_numbers;
 
   for (std::set<const Elem *, CompareElemIdsByLevel>::const_iterator it = elements.begin(),
          end = elements.end(); it != end; ++it)
@@ -436,7 +436,7 @@ void CheckpointIO::write_bcs (Xdr & io,
   const BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
   std::vector<dof_id_type> full_element_id_list;
-  std::vector<unsigned short int> full_side_list;
+  std::vector<uint16_t> full_side_list;
   std::vector<boundary_id_type> full_bc_id_list;
 
   boundary_info.build_side_list(full_element_id_list, full_side_list, full_bc_id_list);
@@ -446,7 +446,7 @@ void CheckpointIO::write_bcs (Xdr & io,
   libmesh_assert_equal_to(bc_size, full_bc_id_list.size());
 
   std::vector<largest_id_type> element_id_list;
-  std::vector<unsigned short int> side_list;
+  std::vector<uint16_t> side_list;
   std::vector<largest_id_type> bc_id_list;
 
   element_id_list.reserve(bc_size);
@@ -672,10 +672,10 @@ file_id_type CheckpointIO::read_header (const std::string & name)
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   // Hack for codes which don't look at all elem dimensions
-  unsigned short mesh_dimension;
+  uint16_t mesh_dimension;
 
   // Will this be a parallel input file?  With how many processors?  Stay tuned!
-  unsigned short input_parallel;
+  uint16_t input_parallel;
   file_id_type input_n_procs;
 
   // We'll write a header file from processor 0 and broadcast.
@@ -692,7 +692,6 @@ file_id_type CheckpointIO::read_header (const std::string & name)
       io.data (data_size);
 
       // read the dimension
-      unsigned short mesh_dimension;
       io.data (mesh_dimension);
 
       // Read whether or not this is a parallel file
@@ -886,10 +885,10 @@ void CheckpointIO::read_connectivity (Xdr & io)
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
-      unsigned int p_level = 0;
+      uint16_t p_level = 0;
       io.data(p_level, "# p_level");
 
-      unsigned short rflag, pflag;
+      uint16_t rflag, pflag;
       io.data(rflag, "# rflag");
       io.data(pflag, "# pflag");
 #endif
@@ -1003,7 +1002,7 @@ void CheckpointIO::read_remote_elem (Xdr & io, bool libmesh_dbg_var(expect_all_r
 
   // Find the remote_elem neighbor links
   std::vector<file_id_type> elem_ids;
-  std::vector<unsigned short int> elem_sides;
+  std::vector<uint16_t> elem_sides;
 
   io.data(elem_ids, "# remote neighbor elem_ids");
   io.data(elem_sides, "# remote neighbor elem_sides");
@@ -1022,7 +1021,7 @@ void CheckpointIO::read_remote_elem (Xdr & io, bool libmesh_dbg_var(expect_all_r
 
   // Find the remote_elem children links
   std::vector<file_id_type> parent_ids;
-  std::vector<unsigned short int> child_numbers;
+  std::vector<uint16_t> child_numbers;
 
   io.data(parent_ids, "# remote child parent_ids");
   io.data(child_numbers, "# remote child_numbers");
@@ -1060,7 +1059,7 @@ void CheckpointIO::read_bcs (Xdr & io)
   BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
   std::vector<file_id_type> element_id_list;
-  std::vector<unsigned short int> side_list;
+  std::vector<uint16_t> side_list;
   std::vector<file_id_type> bc_id_list;
 
   io.data(element_id_list, "# element ids for bcs");
