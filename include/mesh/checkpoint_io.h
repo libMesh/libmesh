@@ -56,7 +56,7 @@ public:
   typedef largest_id_type xdr_id_type;
 
   // The size type used to read header sizes (meta data information)
-  typedef uint32_t header_id_type;
+  typedef uint64_t header_id_type;
 
   /**
    * Constructor.  Takes a writable reference to a mesh object.
@@ -142,7 +142,7 @@ private:
   // Write Implementation
 
   /**
-   * Write subdomain name information - NEW in 0.9.2 format
+   * Write subdomain name information
    */
   void write_subdomain_names(Xdr & io) const;
 
@@ -177,21 +177,38 @@ private:
                        const std::set<const Node *> & nodeset) const;
 
   /**
-   * Write boundary names information (sideset and nodeset) - NEW in 0.9.2 format
+   * Write boundary names information (sideset and nodeset)
    */
   void write_bc_names (Xdr & io, const BoundaryInfo & info, bool is_sideset) const;
 
 
   //---------------------------------------------------------------------------
   // Read Implementation
+
   /**
-   * Read subdomain name information - NEW in 0.9.2 format
+   * Read header data on processor 0, then broadcast.  Returns the
+   * number of processors for which parallel non-header files have
+   * been written, or 0 if files were written in serial.
    */
+  template <typename file_id_type>
+  file_id_type read_header(const std::string & name);
+
+  /**
+   * Read a non-header file
+   */
+  template <typename file_id_type>
+  void read_subfile(Xdr & io, bool expect_all_remote);
+
+  /**
+   * Read subdomain name information
+   */
+  template <typename file_id_type>
   void read_subdomain_names(Xdr & io);
 
   /**
    * Read the connectivity for a parallel, distributed mesh
    */
+  template <typename file_id_type>
   void read_connectivity (Xdr & io);
 
   /**
@@ -201,26 +218,31 @@ private:
    * because we aren't doing an N -> M restart with M < N, then we set
    * \p expect_all_remote to true and test more assertions.
    */
+  template <typename file_id_type>
   void read_remote_elem (Xdr & io, bool expect_all_remote);
 
   /**
    * Read the nodal locations for a parallel, distributed mesh
    */
+  template <typename file_id_type>
   void read_nodes (Xdr & io);
 
   /**
    * Read the boundary conditions for a parallel, distributed mesh
    */
+  template <typename file_id_type>
   void read_bcs (Xdr & io);
 
   /**
    * Read the nodeset conditions for a parallel, distributed mesh
    */
+  template <typename file_id_type>
   void read_nodesets (Xdr & io);
 
   /**
-   * Read boundary names information (sideset and nodeset) - NEW in 0.9.2 format
+   * Read boundary names information (sideset and nodeset)
    */
+  template <typename file_id_type>
   void read_bc_names(Xdr & io, BoundaryInfo & info, bool is_sideset);
 
   /**
@@ -237,7 +259,6 @@ private:
   bool _binary;
   bool _parallel;
   std::string _version;
-  unsigned int _mesh_dimension;
 
   // The processor ids to write
   std::vector<processor_id_type> _my_processor_ids;

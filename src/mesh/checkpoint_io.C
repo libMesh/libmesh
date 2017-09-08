@@ -53,7 +53,7 @@ CheckpointIO::CheckpointIO (MeshBase & mesh, const bool binary_in) :
   ParallelObject      (mesh),
   _binary             (binary_in),
   _parallel           (false),
-  _version            ("checkpoint-1.1"),
+  _version            ("checkpoint-1.2"),
   _my_processor_ids   (1, processor_id()),
   _my_n_processors    (n_processors())
 {
@@ -101,16 +101,20 @@ void CheckpointIO::write (const std::string & name)
       // write the version
       io.data(_version, "# version");
 
+      // write what kind of data type we're using
+      header_id_type data_size = sizeof(largest_id_type);
+      io.data(data_size, "# integer size");
+
       // Write out the max mesh dimension for backwards compatibility
       // with code that sets it independently of element dimensions
       {
-        unsigned int mesh_dimension = mesh.mesh_dimension();
+        uint16_t mesh_dimension = mesh.mesh_dimension();
         io.data(mesh_dimension, "# dimensions");
       }
 
       // Write out whether or not this is serial output
       {
-        unsigned int parallel = _parallel;
+        uint16_t parallel = _parallel;
         io.data(parallel, "# parallel");
       }
 
@@ -118,7 +122,7 @@ void CheckpointIO::write (const std::string & name)
       // so we can check it upon reading the file
       if (_parallel)
         {
-          processor_id_type n_procs = _my_n_processors;
+          largest_id_type n_procs = _my_n_processors;
           io.data(n_procs, "# n_procs");
         }
 
@@ -226,13 +230,13 @@ void CheckpointIO::write_subdomain_names(Xdr & io) const
 
     const std::map<subdomain_id_type, std::string> & subdomain_map = mesh.get_subdomain_name_map();
 
-    std::vector<header_id_type> subdomain_ids;   subdomain_ids.reserve(subdomain_map.size());
+    std::vector<largest_id_type> subdomain_ids;   subdomain_ids.reserve(subdomain_map.size());
     std::vector<std::string>  subdomain_names; subdomain_names.reserve(subdomain_map.size());
 
     // We need to loop over the map and make sure that there aren't any invalid entries.  Since we
     // return writable references in mesh_base, it's possible for the user to leave some entity names
     // blank.  We can't write those to the XDA file.
-    header_id_type n_subdomain_names = 0;
+    largest_id_type n_subdomain_names = 0;
     std::map<subdomain_id_type, std::string>::const_iterator it_end = subdomain_map.end();
     for (std::map<subdomain_id_type, std::string>::const_iterator it = subdomain_map.begin(); it != it_end; ++it)
       {
@@ -259,7 +263,7 @@ void CheckpointIO::write_subdomain_names(Xdr & io) const
 void CheckpointIO::write_nodes (Xdr & io,
                                 const std::set<const Node *> & nodeset) const
 {
-  dof_id_type n_nodes_here = nodeset.size();
+  largest_id_type n_nodes_here = nodeset.size();
 
   io.data(n_nodes_here, "# n_nodes on proc");
 
@@ -311,7 +315,7 @@ void CheckpointIO::write_connectivity (Xdr & io,
   std::vector<largest_id_type> elem_data(6);
   std::vector<largest_id_type> conn_data;
 
-  dof_id_type n_elems_here = elements.size();
+  largest_id_type n_elems_here = elements.size();
 
   io.data(n_elems_here, "# number of elements");
 
@@ -356,13 +360,13 @@ void CheckpointIO::write_connectivity (Xdr & io,
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
-      unsigned int p_level = elem.p_level();
+      uint16_t p_level = elem.p_level();
       io.data(p_level, "# p_level");
 
-      unsigned short rflag = elem.refinement_flag();
+      uint16_t rflag = elem.refinement_flag();
       io.data(rflag, "# rflag");
 
-      unsigned short pflag = elem.p_refinement_flag();
+      uint16_t pflag = elem.p_refinement_flag();
       io.data(pflag, "# pflag");
 #endif
       io.data_stream(&conn_data[0],
@@ -378,8 +382,8 @@ void CheckpointIO::write_remote_elem (Xdr & io,
   libmesh_assert (io.writing());
 
   // Find the remote_elem neighbor and child links
-  std::vector<dof_id_type> elem_ids, parent_ids;
-  std::vector<unsigned short int> elem_sides, child_numbers;
+  std::vector<largest_id_type> elem_ids, parent_ids;
+  std::vector<uint16_t> elem_sides, child_numbers;
 
   for (std::set<const Elem *, CompareElemIdsByLevel>::const_iterator it = elements.begin(),
          end = elements.end(); it != end; ++it)
@@ -432,7 +436,7 @@ void CheckpointIO::write_bcs (Xdr & io,
   const BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
   std::vector<dof_id_type> full_element_id_list;
-  std::vector<unsigned short int> full_side_list;
+  std::vector<uint16_t> full_side_list;
   std::vector<boundary_id_type> full_bc_id_list;
 
   boundary_info.build_side_list(full_element_id_list, full_side_list, full_bc_id_list);
@@ -441,9 +445,9 @@ void CheckpointIO::write_bcs (Xdr & io,
   libmesh_assert_equal_to(bc_size, full_side_list.size());
   libmesh_assert_equal_to(bc_size, full_bc_id_list.size());
 
-  std::vector<dof_id_type> element_id_list;
-  std::vector<unsigned short int> side_list;
-  std::vector<boundary_id_type> bc_id_list;
+  std::vector<largest_id_type> element_id_list;
+  std::vector<uint16_t> side_list;
+  std::vector<largest_id_type> bc_id_list;
 
   element_id_list.reserve(bc_size);
   side_list.reserve(bc_size);
@@ -484,8 +488,8 @@ void CheckpointIO::write_nodesets (Xdr & io,
   std::size_t nodeset_size = full_node_id_list.size();
   libmesh_assert_equal_to(nodeset_size, full_bc_id_list.size());
 
-  std::vector<dof_id_type> node_id_list;
-  std::vector<boundary_id_type> bc_id_list;
+  std::vector<largest_id_type> node_id_list;
+  std::vector<largest_id_type> bc_id_list;
 
   node_id_list.reserve(nodeset_size);
   bc_id_list.reserve(nodeset_size);
@@ -508,13 +512,13 @@ void CheckpointIO::write_bc_names (Xdr & io, const BoundaryInfo & info, bool is_
   const std::map<boundary_id_type, std::string> & boundary_map = is_sideset ?
     info.get_sideset_name_map() : info.get_nodeset_name_map();
 
-  std::vector<boundary_id_type> boundary_ids;   boundary_ids.reserve(boundary_map.size());
+  std::vector<largest_id_type> boundary_ids;   boundary_ids.reserve(boundary_map.size());
   std::vector<std::string>  boundary_names; boundary_names.reserve(boundary_map.size());
 
   // We need to loop over the map and make sure that there aren't any invalid entries.  Since we
   // return writable references in boundary_info, it's possible for the user to leave some entity names
   // blank.  We can't write those to the XDA file.
-  header_id_type n_boundary_names = 0;
+  largest_id_type n_boundary_names = 0;
   std::map<boundary_id_type, std::string>::const_iterator it_end = boundary_map.end();
   for (std::map<boundary_id_type, std::string>::const_iterator it = boundary_map.begin(); it != it_end; ++it)
     {
@@ -539,7 +543,6 @@ void CheckpointIO::write_bc_names (Xdr & io, const BoundaryInfo & info, bool is_
 }
 
 
-
 void CheckpointIO::read (const std::string & name)
 {
   LOG_SCOPE("read()","CheckpointIO");
@@ -548,11 +551,13 @@ void CheckpointIO::read (const std::string & name)
 
   libmesh_assert(!mesh.n_elem());
 
-  // Will this be a parallel input file?  With how many processors?  Stay tuned!
-  unsigned int input_parallel;
-  processor_id_type input_n_procs;
+  // What size data is being used in this file?
+  header_id_type data_size;
 
-  // We'll write a header file from processor 0 and broadcast.
+  // How many per-processor files are here?
+  largest_id_type input_n_procs;
+
+  // We'll read a header file from processor 0 and broadcast.
   if (this->processor_id() == 0)
     {
       {
@@ -568,62 +573,29 @@ void CheckpointIO::read (const std::string & name)
       std::string input_version;
       io.data(input_version);
 
-      // read the dimension
-      io.data (_mesh_dimension);
-      this->comm().broadcast(_mesh_dimension);
-      mesh.set_mesh_dimension(_mesh_dimension);
+      // read the data type
+      io.data (data_size);
+  }
 
-      // Read whether or not this is a parallel file
-      io.data(input_parallel);
-      this->comm().broadcast(input_parallel);
+  this->comm().broadcast(data_size);
 
-      // With how many processors?
-      if (input_parallel)
-        {
-          io.data(input_n_procs);
-          this->comm().broadcast(input_n_procs);
-        }
-      else
-        input_n_procs = 1;
+  switch (data_size) {
+  case 2:
+    input_n_procs = this->read_header<uint16_t>(name);
+    break;
+  case 4:
+    input_n_procs = this->read_header<uint32_t>(name);
+    break;
+  case 8:
+    input_n_procs = this->read_header<uint64_t>(name);
+    break;
+  default:
+    libmesh_error();
+  }
 
-      // read and broadcast subdomain names
-      this->read_subdomain_names(io);
-
-      std::map<subdomain_id_type, std::string> & subdomain_map =
-        mesh.set_subdomain_name_map();
-
-      this->comm().broadcast(subdomain_map);
-
-      // read and broadcast boundary names
-      BoundaryInfo & boundary_info = mesh.get_boundary_info();
-
-      read_bc_names(io, boundary_info, true);  // sideset names
-      this->comm().broadcast(boundary_info.set_sideset_name_map());
-
-      read_bc_names(io, boundary_info, false); // nodeset names
-      this->comm().broadcast(boundary_info.set_nodeset_name_map());
-    }
-  // We'll receive the header broadcast everywhere else.
-  else
-    {
-      this->comm().broadcast(_mesh_dimension);
-      mesh.set_mesh_dimension(_mesh_dimension);
-
-      this->comm().broadcast(input_parallel);
-      if (input_parallel)
-        this->comm().broadcast(input_n_procs);
-      else
-        input_n_procs = 1;
-
-      std::map<subdomain_id_type, std::string> & subdomain_map =
-        mesh.set_subdomain_name_map();
-      this->comm().broadcast(subdomain_map);
-
-      BoundaryInfo & boundary_info = mesh.get_boundary_info();
-      this->comm().broadcast(boundary_info.set_sideset_name_map());
-      this->comm().broadcast(boundary_info.set_nodeset_name_map());
-    }
-
+  bool input_parallel = input_n_procs;
+  if (!input_n_procs)
+    input_n_procs = 1;
 
   // If this is a serial read then we're going to only read the mesh
   // on processor 0, then broadcast it
@@ -656,14 +628,6 @@ void CheckpointIO::read (const std::string & name)
               libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << file_name_stream.str());
           }
 
-          Xdr io (file_name_stream.str(), this->binary() ? DECODE : READ);
-
-          // read the nodal locations
-          this->read_nodes (io);
-
-          // read connectivity
-          this->read_connectivity (io);
-
           // Do we expect all our files' remote_elem entries to really
           // be remote?  Only if we're not reading multiple input
           // files on the same processor.
@@ -671,14 +635,21 @@ void CheckpointIO::read (const std::string & name)
             (input_n_procs <= mesh.n_processors() &&
              !mesh.is_replicated());
 
-          // read remote_elem connectivity
-          this->read_remote_elem (io, expect_all_remote);
+          Xdr io (file_name_stream.str(), this->binary() ? DECODE : READ);
 
-          // read the boundary conditions
-          this->read_bcs (io);
-
-          // read the nodesets
-          this->read_nodesets (io);
+          switch (data_size) {
+          case 2:
+            this->read_subfile<uint16_t>(io, expect_all_remote);
+            break;
+          case 4:
+            this->read_subfile<uint32_t>(io, expect_all_remote);
+            break;
+          case 8:
+            this->read_subfile<uint64_t>(io, expect_all_remote);
+            break;
+          default:
+            libmesh_error();
+          }
 
           io.close();
         }
@@ -695,6 +666,97 @@ void CheckpointIO::read (const std::string & name)
 
 
 
+template <typename file_id_type>
+file_id_type CheckpointIO::read_header (const std::string & name)
+{
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
+
+  // Hack for codes which don't look at all elem dimensions
+  uint16_t mesh_dimension;
+
+  // Will this be a parallel input file?  With how many processors?  Stay tuned!
+  uint16_t input_parallel;
+  file_id_type input_n_procs;
+
+  // We'll write a header file from processor 0 and broadcast.
+  if (this->processor_id() == 0)
+    {
+      Xdr io (name, this->binary() ? DECODE : READ);
+
+      // read the version, but don't care about it
+      std::string input_version;
+      io.data(input_version);
+
+      // read the data type, don't care about it this time
+      header_id_type data_size;
+      io.data (data_size);
+
+      // read the dimension
+      io.data (mesh_dimension);
+
+      // Read whether or not this is a parallel file
+      io.data(input_parallel);
+
+      // With how many processors?
+      if (input_parallel)
+        io.data(input_n_procs);
+
+      // read subdomain names
+      this->read_subdomain_names<file_id_type>(io);
+
+      // read boundary names
+      BoundaryInfo & boundary_info = mesh.get_boundary_info();
+
+      this->read_bc_names<file_id_type>(io, boundary_info, true);  // sideset names
+      this->read_bc_names<file_id_type>(io, boundary_info, false); // nodeset names
+    }
+
+  // broadcast data from processor 0, set values everywhere
+  this->comm().broadcast(mesh_dimension);
+  mesh.set_mesh_dimension(mesh_dimension);
+
+  this->comm().broadcast(input_parallel);
+
+  if (input_parallel)
+    this->comm().broadcast(input_n_procs);
+  else
+    input_n_procs = 1;
+
+  std::map<subdomain_id_type, std::string> & subdomain_map =
+    mesh.set_subdomain_name_map();
+  this->comm().broadcast(subdomain_map);
+
+  BoundaryInfo & boundary_info = mesh.get_boundary_info();
+  this->comm().broadcast(boundary_info.set_sideset_name_map());
+  this->comm().broadcast(boundary_info.set_nodeset_name_map());
+
+  return input_parallel ? input_n_procs : 0;
+}
+
+
+
+template <typename file_id_type>
+void CheckpointIO::read_subfile (Xdr & io, bool expect_all_remote)
+{
+  // read the nodal locations
+  this->read_nodes<file_id_type> (io);
+
+  // read connectivity
+  this->read_connectivity<file_id_type> (io);
+
+  // read remote_elem connectivity
+  this->read_remote_elem<file_id_type> (io, expect_all_remote);
+
+  // read the boundary conditions
+  this->read_bcs<file_id_type> (io);
+
+  // read the nodesets
+  this->read_nodesets<file_id_type> (io);
+}
+ 
+
+
+template <typename file_id_type>
 void CheckpointIO::read_subdomain_names(Xdr & io)
 {
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
@@ -702,13 +764,13 @@ void CheckpointIO::read_subdomain_names(Xdr & io)
   std::map<subdomain_id_type, std::string> & subdomain_map =
     mesh.set_subdomain_name_map();
 
-  std::vector<header_id_type> subdomain_ids;
+  std::vector<file_id_type> subdomain_ids;
   subdomain_ids.reserve(subdomain_map.size());
 
   std::vector<std::string>  subdomain_names;
   subdomain_names.reserve(subdomain_map.size());
 
-  header_id_type n_subdomain_names = 0;
+  file_id_type n_subdomain_names = 0;
   io.data(n_subdomain_names, "# subdomain id to name map");
 
   if (n_subdomain_names)
@@ -724,16 +786,17 @@ void CheckpointIO::read_subdomain_names(Xdr & io)
 
 
 
+template <typename file_id_type>
 void CheckpointIO::read_nodes (Xdr & io)
 {
   // convenient reference to our mesh
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
-  unsigned int n_nodes_here;
+  file_id_type n_nodes_here;
   io.data(n_nodes_here, "# n_nodes on proc");
 
   // Will hold the node id and pid
-  std::vector<largest_id_type> id_pid(2);
+  std::vector<file_id_type> id_pid(2);
 
   // For the coordinates
   std::vector<Real> coords(LIBMESH_DIM);
@@ -743,7 +806,7 @@ void CheckpointIO::read_nodes (Xdr & io)
       io.data_stream(&id_pid[0], 2, 2);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      largest_id_type unique_id = 0;
+      file_id_type unique_id = 0;
       io.data(unique_id, "# unique id");
 #endif
 
@@ -796,12 +859,13 @@ void CheckpointIO::read_nodes (Xdr & io)
 
 
 
+template <typename file_id_type>
 void CheckpointIO::read_connectivity (Xdr & io)
 {
   // convenient reference to our mesh
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
-  dof_id_type n_elems_here;
+  file_id_type n_elems_here;
   io.data(n_elems_here);
 
   // Keep track of the highest dimensional element we've added to the mesh
@@ -810,21 +874,21 @@ void CheckpointIO::read_connectivity (Xdr & io)
   for (unsigned int i=0; i<n_elems_here; i++)
     {
       // id type pid subdomain_id parent_id
-      std::vector<largest_id_type> elem_data(6);
+      std::vector<file_id_type> elem_data(6);
       io.data_stream
         (&elem_data[0], cast_int<unsigned int>(elem_data.size()),
          cast_int<unsigned int>(elem_data.size()));
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      largest_id_type unique_id = 0;
+      file_id_type unique_id = 0;
       io.data(unique_id, "# unique id");
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
-      unsigned int p_level = 0;
+      uint16_t p_level = 0;
       io.data(p_level, "# p_level");
 
-      unsigned short rflag, pflag;
+      uint16_t rflag, pflag;
       io.data(rflag, "# rflag");
       io.data(pflag, "# pflag");
 #endif
@@ -832,7 +896,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
       unsigned int n_nodes = Elem::type_to_n_nodes_map[elem_data[1]];
 
       // Snag the node ids this element was connected to
-      std::vector<largest_id_type> conn_data(n_nodes);
+      std::vector<file_id_type> conn_data(n_nodes);
       io.data_stream
         (&conn_data[0], cast_int<unsigned int>(conn_data.size()),
          cast_int<unsigned int>(conn_data.size()));
@@ -930,14 +994,15 @@ void CheckpointIO::read_connectivity (Xdr & io)
 }
 
 
+template <typename file_id_type>
 void CheckpointIO::read_remote_elem (Xdr & io, bool libmesh_dbg_var(expect_all_remote))
 {
   // convenient reference to our mesh
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   // Find the remote_elem neighbor links
-  std::vector<dof_id_type> elem_ids;
-  std::vector<unsigned short int> elem_sides;
+  std::vector<file_id_type> elem_ids;
+  std::vector<uint16_t> elem_sides;
 
   io.data(elem_ids, "# remote neighbor elem_ids");
   io.data(elem_sides, "# remote neighbor elem_sides");
@@ -946,7 +1011,7 @@ void CheckpointIO::read_remote_elem (Xdr & io, bool libmesh_dbg_var(expect_all_r
 
   for (std::size_t i=0; i != elem_ids.size(); ++i)
     {
-      Elem & elem = mesh.elem_ref(elem_ids[i]);
+      Elem & elem = mesh.elem_ref(cast_int<dof_id_type>(elem_ids[i]));
       if (!elem.neighbor(elem_sides[i]))
         elem.set_neighbor(elem_sides[i],
                           const_cast<RemoteElem *>(remote_elem));
@@ -955,8 +1020,8 @@ void CheckpointIO::read_remote_elem (Xdr & io, bool libmesh_dbg_var(expect_all_r
     }
 
   // Find the remote_elem children links
-  std::vector<dof_id_type> parent_ids;
-  std::vector<unsigned short int> child_numbers;
+  std::vector<file_id_type> parent_ids;
+  std::vector<uint16_t> child_numbers;
 
   io.data(parent_ids, "# remote child parent_ids");
   io.data(child_numbers, "# remote child_numbers");
@@ -964,7 +1029,7 @@ void CheckpointIO::read_remote_elem (Xdr & io, bool libmesh_dbg_var(expect_all_r
 #ifdef LIBMESH_ENABLE_AMR
   for (std::size_t i=0; i != parent_ids.size(); ++i)
     {
-      Elem & elem = mesh.elem_ref(parent_ids[i]);
+      Elem & elem = mesh.elem_ref(cast_int<dof_id_type>(parent_ids[i]));
 
       // We'd like to assert that no child pointer already exists to
       // be overwritten by remote_elem, but Elem doesn't actually have
@@ -984,6 +1049,7 @@ void CheckpointIO::read_remote_elem (Xdr & io, bool libmesh_dbg_var(expect_all_r
 
 
 
+template <typename file_id_type>
 void CheckpointIO::read_bcs (Xdr & io)
 {
   // convenient reference to our mesh
@@ -992,20 +1058,23 @@ void CheckpointIO::read_bcs (Xdr & io)
   // and our boundary info object
   BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
-  std::vector<dof_id_type> element_id_list;
-  std::vector<unsigned short int> side_list;
-  std::vector<boundary_id_type> bc_id_list;
+  std::vector<file_id_type> element_id_list;
+  std::vector<uint16_t> side_list;
+  std::vector<file_id_type> bc_id_list;
 
   io.data(element_id_list, "# element ids for bcs");
   io.data(side_list, "# sides of elements for bcs");
   io.data(bc_id_list, "# bc ids");
 
   for (std::size_t i=0; i<element_id_list.size(); i++)
-    boundary_info.add_side(element_id_list[i], side_list[i], bc_id_list[i]);
+    boundary_info.add_side
+      (cast_int<dof_id_type>(element_id_list[i]), side_list[i],
+       cast_int<dof_id_type>(bc_id_list[i]));
 }
 
 
 
+template <typename file_id_type>
 void CheckpointIO::read_nodesets (Xdr & io)
 {
   // convenient reference to our mesh
@@ -1014,27 +1083,30 @@ void CheckpointIO::read_nodesets (Xdr & io)
   // and our boundary info object
   BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
-  std::vector<dof_id_type> node_id_list;
-  std::vector<boundary_id_type> bc_id_list;
+  std::vector<file_id_type> node_id_list;
+  std::vector<file_id_type> bc_id_list;
 
   io.data(node_id_list, "# node id list");
   io.data(bc_id_list, "# nodeset bc id list");
 
   for (std::size_t i=0; i<node_id_list.size(); i++)
-    boundary_info.add_node(node_id_list[i], bc_id_list[i]);
+    boundary_info.add_node
+      (cast_int<dof_id_type>(node_id_list[i]),
+       cast_int<boundary_id_type>(bc_id_list[i]));
 }
 
 
 
+template <typename file_id_type>
 void CheckpointIO::read_bc_names(Xdr & io, BoundaryInfo & info, bool is_sideset)
 {
   std::map<boundary_id_type, std::string> & boundary_map = is_sideset ?
     info.set_sideset_name_map() : info.set_nodeset_name_map();
 
-  std::vector<boundary_id_type> boundary_ids;
+  std::vector<file_id_type> boundary_ids;
   std::vector<std::string>  boundary_names;
 
-  header_id_type n_boundary_names = 0;
+  file_id_type n_boundary_names = 0;
 
   if (is_sideset)
     io.data(n_boundary_names, "# sideset id to name map");
@@ -1049,7 +1121,8 @@ void CheckpointIO::read_bc_names(Xdr & io, BoundaryInfo & info, bool is_sideset)
 
   // Add them back into the map
   for (std::size_t i=0; i<boundary_ids.size(); i++)
-    boundary_map[boundary_ids[i]] = boundary_names[i];
+    boundary_map[cast_int<boundary_id_type>(boundary_ids[i])] =
+      boundary_names[i];
 }
 
 
