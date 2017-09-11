@@ -356,6 +356,7 @@ unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
     case QUAD8:
       if (o <= 2)
         return 0;
+      /* FALLTHROUGH */
     case QUAD9:
       return ((o-1)*(o-1));
     case HEX8:
