@@ -1,26 +1,16 @@
-libMesh-specific configuration options
-======================================
-
-For generic installation instructions, refer also to the INSTALL file.
-
-Build Process
--------------
-0. ./bootstrap (optional, needed *only* if you add/modify m4 files or configure.ac)
-
-1. ./configure --prefix=/path/to/libmesh/install
-
-2. make
-
-3. make check
-   (optional, runs the example programs and unit tests when possible)
-
-4. make install
+## Build Instructions
+The default is to build libmesh "out of tree," i.e. within a separate `build` directory, rather than in the source tree itself. This simplifies the process of having multiple, independently-configured builds.
+1. `cd` to location of libmesh clone or extracted tarball.
+1. `mkdir build`
+1. `cd build`
+1. `../configure --prefix=/path/to/libmesh/install`
+1. `make`
+1. `make check` (optional, runs the example programs and unit tests when possible)
+1. `make install`
 
 
-METHODS
--------
-
-libMesh supports the notion of multiple methods - that is, compilation
+## METHODS
+libMesh supports the notion of multiple methods, that is, configuration
 settings used to build the library.  The major methods supported by
 the library are:
 
@@ -28,7 +18,7 @@ the library are:
   symbols are included in the resulting library.  Aggressive optimization
   flags are used.
 
-* dbg: Full debugging mode - all useful compiler warnings are enabled,
+* dbg: Full debugging mode. All useful compiler warnings are enabled,
   as well as robust internal state checking. The asymptotic complexity
   of some algorithms is allowed to be worse than the design spec states.
 
@@ -41,51 +31,40 @@ the library are:
 
 * oprof: Optimized code path with compiler flags suitable for use with oprofile.
 
-
 To select a set of methods, you can pass them to configure in one of two ways:
 
-    $ ./configure --with-methods="opt dbg devel"
+    ../configure --with-methods="opt dbg devel"
 
 or
 
-    $ ./configure METHODS="devel oprof"
+    ../configure METHODS="devel oprof"
 
-If unspecified, the three METHODS="opt dbg devel" are default.
+If unspecified, `METHODS="opt dbg devel"` is the default.
 
 
-Multiple Builds with Different Compilers
-----------------------------------------
-
+## Multiple Builds with Different Compilers
 libMesh fully supports out-of-tree builds, and users are encouraged to use this
 feature when needed to support multiple compilers. For example, on a system
 where multiple compilers are available and accessible via modules, you can share
 the same source tree by creating a subdirectory for each compiler build:
 
-    $ export LIBMESH_SRC=/local/libmesh
-    $ cd $LIBMESH_SRC
-    $ module load gcc/6.3
-    $ cd $LIBMESH_SRC && mkdir gcc-6.3 && cd gcc-6.3 && ../configure && make && make install
-    $ module swap gcc/6.3 intel/17.0
-    $ cd $LIBMESH_SRC && mkdir intel-17.0 && cd intel-17.0 && ../configure && make && make install
+    export LIBMESH_SRC=/local/libmesh
+    cd $LIBMESH_SRC
+    module load gcc/6.3
+    cd $LIBMESH_SRC && mkdir gcc-6.3 && cd gcc-6.3 && ../configure && make && make install
+    module swap gcc/6.3 intel/17.0
+    cd $LIBMESH_SRC && mkdir intel-17.0 && cd intel-17.0 && ../configure && make && make install
 
 
-Dependencies
-------------
-
+## Dependencies
 libMesh has no required dependencies other than a reasonably modern C
-& C++ compiler.  To run on distributed memory platforms in parallel
+& C++ compiler.  To run on distributed memory platforms in parallel,
 you will also need MPI.
 
-Optional Packages
------------------
+## Optional Packages
+We support a [large number](http://libmesh.github.io/externalsoftware.html) of
+optional packages. Some of these are distributed inside the `contrib` directory
+and compiled directly with libMesh, others can be used via third-party installations.
 
-We support a large number of optional packages, some of which are
-distributed inside the ./contrib directory and are compiled directly
-with libMesh, others can be used from third-party installations.  For a
-list of supported packages and optional dependencies see
-[here](http://libmesh.github.io/externalsoftware.html)
-
-License
--------
-
+## License
 LibMesh is open source software distributed under the LGPL license, version 2.1.
