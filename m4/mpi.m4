@@ -33,7 +33,7 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
   echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
 
 
-  # Ensure the comiler finds the library...
+  # Ensure the compiler finds the library...
   tmpLIBS=$LIBS
   AC_LANG_SAVE
   AC_LANG_CPLUSPLUS
@@ -51,7 +51,7 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
                ],
                [])
 
-  # Quadricss MPI requires the elan library to be included too
+  # Quadrics MPI requires the elan library to be included too
   if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
     echo "note: MPI found to use Quadrics switch, looking for elan library"
     AC_CHECK_LIB([elan],
@@ -69,7 +69,7 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
                  MPI_LIBS="-lmpi $MPI_LIBS"
                  MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
                  MPI_IMPL="mpi"
-                 AC_MSG_RESULT([Found valid MPI installlaion...])
+                 AC_MSG_RESULT([Found valid MPI installation...])
                ],
                [AC_MSG_RESULT([Could not link in the MPI library...]); enablempi=no])
 
@@ -80,7 +80,7 @@ fi
 if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
   echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
 
-  # Ensure the comiler finds the library...
+  # Ensure the compiler finds the library...
   tmpLIBS=$LIBS
   AC_LANG_SAVE
   AC_LANG_CPLUSPLUS
@@ -146,7 +146,7 @@ fi
 
 if (test "x$MPI_IMPL" != x) ; then
 
-  # Ensure the comiler finds the header file...
+  # Ensure the compiler finds the header file...
   if test -e $MPI_INCLUDES_PATH/mpi.h; then
     echo "note: using $MPI_INCLUDES_PATH/mpi.h"
     tmpCPPFLAGS=$CPPFLAGS
@@ -179,8 +179,9 @@ if (test "x$MPI_IMPL" != x) ; then
 
 else
 
-  # no MPI install found, see if the compiler supports it
-  AC_TRY_COMPILE([@%:@include <mpi.h>],
+  # no MPI install found, see if the compiler "natively" supports it by
+  # attempting to link a test application without any special flags.
+  AC_TRY_LINK([@%:@include <mpi.h>],
                  [int np; MPI_Comm_size (MPI_COMM_WORLD, &np);],
                  [
                    MPI_IMPL="built-in"

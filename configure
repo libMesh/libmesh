@@ -34670,7 +34670,7 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
   echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
 
 
-  # Ensure the comiler finds the library...
+  # Ensure the compiler finds the library...
   tmpLIBS=$LIBS
 
   ac_ext=cpp
@@ -34729,7 +34729,7 @@ if test "x$ac_cv_lib_lam_lam_show_version" = xyes; then :
 fi
 
 
-  # Quadricss MPI requires the elan library to be included too
+  # Quadrics MPI requires the elan library to be included too
   if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
     echo "note: MPI found to use Quadrics switch, looking for elan library"
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for elan_init in -lelan" >&5
@@ -34820,8 +34820,8 @@ if test "x$ac_cv_lib_mpi_MPI_Init" = xyes; then :
                  MPI_LIBS="-lmpi $MPI_LIBS"
                  MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
                  MPI_IMPL="mpi"
-                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installlaion..." >&5
-$as_echo "Found valid MPI installlaion..." >&6; }
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installation..." >&5
+$as_echo "Found valid MPI installation..." >&6; }
 
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
@@ -34841,7 +34841,7 @@ fi
 if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
   echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
 
-  # Ensure the comiler finds the library...
+  # Ensure the compiler finds the library...
   tmpLIBS=$LIBS
 
   ac_ext=cpp
@@ -35038,7 +35038,7 @@ fi
 
 if (test "x$MPI_IMPL" != x) ; then
 
-  # Ensure the comiler finds the header file...
+  # Ensure the compiler finds the header file...
   if test -e $MPI_INCLUDES_PATH/mpi.h; then
     echo "note: using $MPI_INCLUDES_PATH/mpi.h"
     tmpCPPFLAGS=$CPPFLAGS
@@ -35108,7 +35108,8 @@ $as_echo "Could not find MPI header <mpi.h>..." >&6; }
 
 else
 
-  # no MPI install found, see if the compiler supports it
+  # no MPI install found, see if the compiler "natively" supports it by
+  # attempting to link a test application without any special flags.
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <mpi.h>
@@ -35120,7 +35121,7 @@ int np; MPI_Comm_size (MPI_COMM_WORLD, &np);
   return 0;
 }
 _ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
+if ac_fn_cxx_try_link "$LINENO"; then :
 
                    MPI_IMPL="built-in"
                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
@@ -35133,7 +35134,8 @@ else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Does NOT Support MPI..." >&5
 $as_echo "$CXX Compiler Does NOT Support MPI..." >&6; }; enablempi=no
 fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
 fi
 
 # Save variables...
@@ -35406,7 +35408,7 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
   echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
 
 
-  # Ensure the comiler finds the library...
+  # Ensure the compiler finds the library...
   tmpLIBS=$LIBS
 
   ac_ext=cpp
@@ -35465,7 +35467,7 @@ if test "x$ac_cv_lib_lam_lam_show_version" = xyes; then :
 fi
 
 
-  # Quadricss MPI requires the elan library to be included too
+  # Quadrics MPI requires the elan library to be included too
   if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
     echo "note: MPI found to use Quadrics switch, looking for elan library"
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for elan_init in -lelan" >&5
@@ -35556,8 +35558,8 @@ if test "x$ac_cv_lib_mpi_MPI_Init" = xyes; then :
                  MPI_LIBS="-lmpi $MPI_LIBS"
                  MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
                  MPI_IMPL="mpi"
-                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installlaion..." >&5
-$as_echo "Found valid MPI installlaion..." >&6; }
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installation..." >&5
+$as_echo "Found valid MPI installation..." >&6; }
 
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
@@ -35577,7 +35579,7 @@ fi
 if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
   echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
 
-  # Ensure the comiler finds the library...
+  # Ensure the compiler finds the library...
   tmpLIBS=$LIBS
 
   ac_ext=cpp
@@ -35774,7 +35776,7 @@ fi
 
 if (test "x$MPI_IMPL" != x) ; then
 
-  # Ensure the comiler finds the header file...
+  # Ensure the compiler finds the header file...
   if test -e $MPI_INCLUDES_PATH/mpi.h; then
     echo "note: using $MPI_INCLUDES_PATH/mpi.h"
     tmpCPPFLAGS=$CPPFLAGS
@@ -35844,7 +35846,8 @@ $as_echo "Could not find MPI header <mpi.h>..." >&6; }
 
 else
 
-  # no MPI install found, see if the compiler supports it
+  # no MPI install found, see if the compiler "natively" supports it by
+  # attempting to link a test application without any special flags.
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <mpi.h>
@@ -35856,7 +35859,7 @@ int np; MPI_Comm_size (MPI_COMM_WORLD, &np);
   return 0;
 }
 _ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
+if ac_fn_cxx_try_link "$LINENO"; then :
 
                    MPI_IMPL="built-in"
                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
@@ -35869,7 +35872,8 @@ else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Does NOT Support MPI..." >&5
 $as_echo "$CXX Compiler Does NOT Support MPI..." >&6; }; enablempi=no
 fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
 fi
 
 # Save variables...
@@ -35923,7 +35927,7 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
   echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
 
 
-  # Ensure the comiler finds the library...
+  # Ensure the compiler finds the library...
   tmpLIBS=$LIBS
 
   ac_ext=cpp
@@ -35982,7 +35986,7 @@ if test "x$ac_cv_lib_lam_lam_show_version" = xyes; then :
 fi
 
 
-  # Quadricss MPI requires the elan library to be included too
+  # Quadrics MPI requires the elan library to be included too
   if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
     echo "note: MPI found to use Quadrics switch, looking for elan library"
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for elan_init in -lelan" >&5
@@ -36073,8 +36077,8 @@ if test "x$ac_cv_lib_mpi_MPI_Init" = xyes; then :
                  MPI_LIBS="-lmpi $MPI_LIBS"
                  MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
                  MPI_IMPL="mpi"
-                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installlaion..." >&5
-$as_echo "Found valid MPI installlaion..." >&6; }
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installation..." >&5
+$as_echo "Found valid MPI installation..." >&6; }
 
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
@@ -36094,7 +36098,7 @@ fi
 if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
   echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
 
-  # Ensure the comiler finds the library...
+  # Ensure the compiler finds the library...
   tmpLIBS=$LIBS
 
   ac_ext=cpp
@@ -36291,7 +36295,7 @@ fi
 
 if (test "x$MPI_IMPL" != x) ; then
 
-  # Ensure the comiler finds the header file...
+  # Ensure the compiler finds the header file...
   if test -e $MPI_INCLUDES_PATH/mpi.h; then
     echo "note: using $MPI_INCLUDES_PATH/mpi.h"
     tmpCPPFLAGS=$CPPFLAGS
@@ -36361,7 +36365,8 @@ $as_echo "Could not find MPI header <mpi.h>..." >&6; }
 
 else
 
-  # no MPI install found, see if the compiler supports it
+  # no MPI install found, see if the compiler "natively" supports it by
+  # attempting to link a test application without any special flags.
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <mpi.h>
@@ -36373,7 +36378,7 @@ int np; MPI_Comm_size (MPI_COMM_WORLD, &np);
   return 0;
 }
 _ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
+if ac_fn_cxx_try_link "$LINENO"; then :
 
                    MPI_IMPL="built-in"
                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
@@ -36386,7 +36391,8 @@ else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Does NOT Support MPI..." >&5
 $as_echo "$CXX Compiler Does NOT Support MPI..." >&6; }; enablempi=no
 fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
 fi
 
 # Save variables...
@@ -36438,7 +36444,7 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
   echo "note: using $MPI_LIBS_PATH/libmpi(.a/.so)"
 
 
-  # Ensure the comiler finds the library...
+  # Ensure the compiler finds the library...
   tmpLIBS=$LIBS
 
   ac_ext=cpp
@@ -36497,7 +36503,7 @@ if test "x$ac_cv_lib_lam_lam_show_version" = xyes; then :
 fi
 
 
-  # Quadricss MPI requires the elan library to be included too
+  # Quadrics MPI requires the elan library to be included too
   if (nm $MPI_LIBS_PATH/libmpi.* | grep elan > /dev/null); then
     echo "note: MPI found to use Quadrics switch, looking for elan library"
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for elan_init in -lelan" >&5
@@ -36588,8 +36594,8 @@ if test "x$ac_cv_lib_mpi_MPI_Init" = xyes; then :
                  MPI_LIBS="-lmpi $MPI_LIBS"
                  MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
                  MPI_IMPL="mpi"
-                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installlaion..." >&5
-$as_echo "Found valid MPI installlaion..." >&6; }
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPI installation..." >&5
+$as_echo "Found valid MPI installation..." >&6; }
 
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
@@ -36609,7 +36615,7 @@ fi
 if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; then
   echo "note: using $MPI_LIBS_PATH/libmpich(.a/.so)"
 
-  # Ensure the comiler finds the library...
+  # Ensure the compiler finds the library...
   tmpLIBS=$LIBS
 
   ac_ext=cpp
@@ -36806,7 +36812,7 @@ fi
 
 if (test "x$MPI_IMPL" != x) ; then
 
-  # Ensure the comiler finds the header file...
+  # Ensure the compiler finds the header file...
   if test -e $MPI_INCLUDES_PATH/mpi.h; then
     echo "note: using $MPI_INCLUDES_PATH/mpi.h"
     tmpCPPFLAGS=$CPPFLAGS
@@ -36876,7 +36882,8 @@ $as_echo "Could not find MPI header <mpi.h>..." >&6; }
 
 else
 
-  # no MPI install found, see if the compiler supports it
+  # no MPI install found, see if the compiler "natively" supports it by
+  # attempting to link a test application without any special flags.
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <mpi.h>
@@ -36888,7 +36895,7 @@ int np; MPI_Comm_size (MPI_COMM_WORLD, &np);
   return 0;
 }
 _ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
+if ac_fn_cxx_try_link "$LINENO"; then :
 
                    MPI_IMPL="built-in"
                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Supports MPI " >&5
@@ -36901,7 +36908,8 @@ else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CXX Compiler Does NOT Support MPI..." >&5
 $as_echo "$CXX Compiler Does NOT Support MPI..." >&6; }; enablempi=no
 fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
 fi
 
 # Save variables...
