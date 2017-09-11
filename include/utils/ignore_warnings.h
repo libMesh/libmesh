@@ -52,6 +52,7 @@
 #pragma GCC diagnostic ignored "-Wplacement-new"
 #if (__GNUC__ > 6)
 #pragma GCC diagnostic ignored "-Wint-in-bool-context"
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 #endif // GCC > 6
 #endif // GCC > 5
 #endif // GCC > 4.1
