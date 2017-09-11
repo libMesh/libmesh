@@ -1593,6 +1593,8 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
     case 1:
       {
         build_line (mesh, 3, -rad, rad, type);
+
+        break;
       }
 
 
