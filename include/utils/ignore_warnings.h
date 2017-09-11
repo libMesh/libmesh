@@ -50,6 +50,9 @@
 #pragma GCC diagnostic ignored "-Wmisleading-indentation"
 // Ignore warnings from bad placement new use
 #pragma GCC diagnostic ignored "-Wplacement-new"
+#if (__GNUC__ > 6)
+#pragma GCC diagnostic ignored "-Wint-in-bool-context"
+#endif // GCC > 6
 #endif // GCC > 5
 #endif // GCC > 4.1
 #endif // __GNUC__ && !__INTEL_COMPILER
