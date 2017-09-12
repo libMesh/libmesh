@@ -1285,18 +1285,24 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
   for (dof_id_type i=0; i != pmax_elem_id; ++i)
     {
       const Elem * elem = mesh.query_elem_ptr(i);
-      unsigned int n_nodes = elem ? elem->n_nodes() : 0;
-      unsigned int n_edges = elem ? elem->n_edges() : 0;
-      unsigned int n_sides = elem ? elem->n_sides() : 0;
-      libmesh_assert(mesh.comm().semiverify
-                     (elem ? &n_nodes : libmesh_nullptr));
-      libmesh_assert(mesh.comm().semiverify
-                     (elem ? &n_edges : libmesh_nullptr));
-      libmesh_assert(mesh.comm().semiverify
-                     (elem ? &n_sides : libmesh_nullptr));
+      const unsigned int my_n_nodes = elem ? elem->n_nodes() : 0;
+      const unsigned int my_n_edges = elem ? elem->n_edges() : 0;
+      const unsigned int my_n_sides = elem ? elem->n_sides() : 0;
+      unsigned int n_nodes = my_n_nodes,
+                   n_edges = my_n_edges,
+                   n_sides = my_n_sides;
+
       mesh.comm().max(n_nodes);
       mesh.comm().max(n_edges);
       mesh.comm().max(n_sides);
+
+      if (elem)
+        {
+          libmesh_assert_equal_to(my_n_nodes, n_nodes);
+          libmesh_assert_equal_to(my_n_edges, n_edges);
+          libmesh_assert_equal_to(my_n_sides, n_sides);
+        }
+
       for (unsigned int n=0; n != n_nodes; ++n)
         {
           std::vector<boundary_id_type> bcids;
