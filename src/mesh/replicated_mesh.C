@@ -871,6 +871,8 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
   if ((this_mesh_boundary_id  != BoundaryInfo::invalid_id) &&
       (other_mesh_boundary_id != BoundaryInfo::invalid_id))
     {
+      LOG_SCOPE("stitch_meshes node merging", "ReplicatedMesh");
+
       // While finding nodes on the boundary, also find the minimum edge length
       // of all faces on both boundaries.  This will later be used in relative
       // distance checks when stitching nodes.
@@ -1183,6 +1185,8 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
   // in order to copy it to this mesh
   if (this!=other_mesh)
     {
+      LOG_SCOPE("stitch_meshes copying", "ReplicatedMesh");
+
       // need to increment node and element IDs of other_mesh before copying to this mesh
       MeshBase::node_iterator node_it  = other_mesh->nodes_begin();
       MeshBase::node_iterator node_end = other_mesh->nodes_end();
@@ -1295,6 +1299,9 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
   std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it     = node_to_elems_map.begin();
   std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it_end = node_to_elems_map.end();
+  {
+  LOG_SCOPE("stitch_meshes node updates", "ReplicatedMesh");
+
   for ( ; elem_map_it != elem_map_it_end; ++elem_map_it)
     {
       dof_id_type target_node_id = elem_map_it->first;
@@ -1317,9 +1324,12 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
           this->get_boundary_info().add_node(&target_node, bc_ids);
         }
     }
+  }
 
   std::map<dof_id_type, dof_id_type>::iterator node_map_it     = node_to_node_map.begin();
   std::map<dof_id_type, dof_id_type>::iterator node_map_it_end = node_to_node_map.end();
+  {
+  LOG_SCOPE("stitch_meshes node deletion", "ReplicatedMesh");
   for ( ; node_map_it != node_map_it_end; ++node_map_it)
     {
       // In the case that this==other_mesh, the two nodes might be the same (e.g. if
@@ -1330,6 +1340,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
       dof_id_type this_node_id = node_map_it->second;
       this->delete_node( this->node_ptr(this_node_id) );
     }
+  }
 
   // If find_neighbors() wasn't called in prepare_for_use(), we need to
   // manually loop once more over all elements adjacent to the stitched boundary
@@ -1340,6 +1351,8 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
   //   3. Update the corresponding side in side_to_elem_map as well
   if (skip_find_neighbors)
     {
+      LOG_SCOPE("stitch_meshes neighbor fixes", "ReplicatedMesh");
+
       elem_map_it     = node_to_elems_map.begin();
       elem_map_it_end = node_to_elems_map.end();
       std::set<dof_id_type> fixed_elems;
@@ -1433,6 +1446,8 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
   // faces that are now internal to the mesh
   if (clear_stitched_boundary_ids)
     {
+      LOG_SCOPE("stitch_meshes clear bcids", "ReplicatedMesh");
+
       // Container to catch boundary IDs passed back from BoundaryInfo.
       std::vector<boundary_id_type> bc_ids;
 
