@@ -993,6 +993,8 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
 #ifdef DEBUG
 void MeshTools::libmesh_assert_equal_n_systems (const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_equal_n_systems()", "MeshTools");
+
   MeshBase::const_element_iterator el =
     mesh.elements_begin();
   const MeshBase::const_element_iterator el_end =
@@ -1028,6 +1030,8 @@ void MeshTools::libmesh_assert_equal_n_systems (const MeshBase & mesh)
 #ifdef LIBMESH_ENABLE_AMR
 void MeshTools::libmesh_assert_old_dof_objects (const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_old_dof_objects()", "MeshTools");
+
   MeshBase::const_element_iterator el =
     mesh.elements_begin();
   const MeshBase::const_element_iterator el_end =
@@ -1060,6 +1064,8 @@ void MeshTools::libmesh_assert_old_dof_objects (const MeshBase &) {}
 
 void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_node_pointers()", "MeshTools");
+
   const MeshBase::const_element_iterator el_end =
     mesh.elements_end();
   for (MeshBase::const_element_iterator el =
@@ -1084,6 +1090,8 @@ void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase & mesh)
 
 void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_remote_elems()", "MeshTools");
+
   const MeshBase::const_element_iterator el_end =
     mesh.local_elements_end();
   for (MeshBase::const_element_iterator el =
@@ -1138,6 +1146,8 @@ void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase & mesh,
 
 void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_elem_ids()", "MeshTools");
+
   processor_id_type lastprocid = 0;
   dof_id_type lastelemid = 0;
 
@@ -1163,6 +1173,8 @@ void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase & mesh)
 
 void MeshTools::libmesh_assert_valid_amr_elem_ids(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_amr_elem_ids()", "MeshTools");
+
   const MeshBase::const_element_iterator el_end =
     mesh.elements_end();
   for (MeshBase::const_element_iterator el =
@@ -1185,6 +1197,8 @@ void MeshTools::libmesh_assert_valid_amr_elem_ids(const MeshBase & mesh)
 
 void MeshTools::libmesh_assert_valid_amr_interior_parents(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_amr_interior_parents()", "MeshTools");
+
   const MeshBase::const_element_iterator el_end =
     mesh.elements_end();
   for (MeshBase::const_element_iterator el =
@@ -1223,6 +1237,8 @@ void MeshTools::libmesh_assert_valid_amr_interior_parents(const MeshBase & mesh)
 
 void MeshTools::libmesh_assert_connected_nodes (const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_connected_nodes()", "MeshTools");
+
   std::set<const Node *> used_nodes;
 
   const MeshBase::const_element_iterator el_end =
@@ -1254,6 +1270,8 @@ namespace MeshTools {
 
 void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_boundary_ids()", "MeshTools");
+
   if (mesh.n_processors() == 1)
     return;
 
@@ -1378,6 +1396,8 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
 
 void libmesh_assert_valid_dof_ids(const MeshBase & mesh, unsigned int sysnum)
 {
+  LOG_SCOPE("libmesh_assert_valid_dof_ids()", "MeshTools");
+
   if (mesh.n_processors() == 1)
     return;
 
@@ -1404,6 +1424,8 @@ void libmesh_assert_valid_dof_ids(const MeshBase & mesh, unsigned int sysnum)
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 void libmesh_assert_valid_unique_ids(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_unique_ids()", "MeshTools");
+
   libmesh_parallel_only(mesh.comm());
 
   dof_id_type pmax_elem_id = mesh.max_elem_id();
@@ -1433,6 +1455,8 @@ void libmesh_assert_valid_unique_ids(const MeshBase & mesh)
 template <>
 void libmesh_assert_topology_consistent_procids<Elem>(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_topology_consistent_procids()", "MeshTools");
+
   // This parameter is not used when !LIBMESH_ENABLE_AMR
   libmesh_ignore(mesh);
 
@@ -1485,6 +1509,8 @@ void libmesh_assert_topology_consistent_procids<Elem>(const MeshBase & mesh)
 template <>
 void libmesh_assert_parallel_consistent_procids<Elem>(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_parallel_consistent_procids()", "MeshTools");
+
   if (mesh.n_processors() == 1)
     return;
 
@@ -1527,6 +1553,8 @@ void libmesh_assert_parallel_consistent_procids<Elem>(const MeshBase & mesh)
 template <>
 void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_topology_consistent_procids()", "MeshTools");
+
   if (mesh.n_processors() == 1)
     return;
 
@@ -1575,6 +1603,8 @@ void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
 template <>
 void libmesh_assert_parallel_consistent_procids<Node>(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_parallel_consistent_procids()", "MeshTools");
+
   if (mesh.n_processors() == 1)
     return;
 
@@ -1643,6 +1673,8 @@ void libmesh_assert_parallel_consistent_procids<Node>(const MeshBase & mesh)
 #ifdef LIBMESH_ENABLE_AMR
 void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_refinement_flags()", "MeshTools");
+
   libmesh_parallel_only(mesh.comm());
   if (mesh.n_processors() == 1)
     return;
@@ -1693,6 +1725,8 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &)
 #ifdef LIBMESH_ENABLE_AMR
 void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_refinement_tree()", "MeshTools");
+
   const MeshBase::const_element_iterator el_end =
     mesh.elements_end();
   for (MeshBase::const_element_iterator el =
@@ -1734,6 +1768,8 @@ void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &)
 void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
                                                bool assert_valid_remote_elems)
 {
+  LOG_SCOPE("libmesh_assert_valid_neighbors()", "MeshTools");
+
   const MeshBase::const_element_iterator el_end = mesh.elements_end();
   for (MeshBase::const_element_iterator el = mesh.elements_begin();
        el != el_end; ++el)
