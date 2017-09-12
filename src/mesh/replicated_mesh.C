@@ -1178,8 +1178,8 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
 
 
-  dof_id_type node_delta = this->n_nodes();
-  dof_id_type elem_delta = this->n_elem();
+  dof_id_type node_delta = this->max_node_id();
+  dof_id_type elem_delta = this->max_elem_id();
 
   // If other_mesh!=NULL, then we have to do a bunch of work
   // in order to copy it to this mesh
