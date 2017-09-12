@@ -119,7 +119,6 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
     MeshBase::const_element_iterator it = other_mesh.elements_begin();
     const MeshBase::const_element_iterator end = other_mesh.elements_end();
 
-    // FIXME: Where do we set element IDs??
     for (; it != end; ++it)
       {
         //Look at the old element
@@ -166,7 +165,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
         // And start it off in the same subdomain
         el->processor_id() = old->processor_id();
 
-        // Give it the same ids
+        // Give it the same element and unique ids
         el->set_id(old->id());
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
