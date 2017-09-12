@@ -71,6 +71,8 @@ UnstructuredMesh::UnstructuredMesh (unsigned char d) :
 void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_mesh,
                                                const bool skip_find_neighbors)
 {
+  LOG_SCOPE("copy_nodes_and_elements()", "UnstructuredMesh");
+
   // We're assuming our subclass data needs no copy
   libmesh_assert_equal_to (_n_parts, other_mesh._n_parts);
   libmesh_assert_equal_to (_is_prepared, other_mesh._is_prepared);
