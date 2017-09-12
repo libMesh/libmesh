@@ -113,7 +113,8 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
     this->reserve_elem(other_mesh.n_elem());
 
     // Declare a map linking old and new elements, needed to copy the neighbor lists
-    std::map<const Elem *, Elem *> old_elems_to_new_elems;
+    typedef LIBMESH_BEST_UNORDERED_MAP<const Elem *, Elem *> map_type;
+    map_type old_elems_to_new_elems;
 
     // Loop over the elements
     MeshBase::const_element_iterator it = other_mesh.elements_begin();
