@@ -1251,7 +1251,7 @@ Real FE<3,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
             /* FALLTHROUGH */
 
           case HEX27:
-            // triquadraic hexahedral shape funcions
+            // triquadratic hexahedral shape functions
             {
               libmesh_assert_less (i, 27);
 
