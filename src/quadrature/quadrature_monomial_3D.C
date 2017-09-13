@@ -317,6 +317,7 @@ void QMonomial::init_3D(const ElemType type_in,
           } // end switch(_order + 2*p)
       } // end case HEX8/20/27
 
+      libmesh_fallthrough;
 
       // By default: construct and use a Gauss quadrature rule
     default:
