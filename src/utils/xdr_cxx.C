@@ -553,17 +553,69 @@ bool xdr_translate(XDR * x, std::vector<std::string> & s)
 }
 
 template <>
-xdrproc_t xdr_translator<int>() { return (xdrproc_t)(xdr_int); }
+xdrproc_t xdr_translator<int>()
+{
+  // Don't let XDR truncate anything on systems where int is 64-bit;
+  // xdr_int is hard-coded to write 32 bits.
+  if (sizeof(int) <= 4)
+    return (xdrproc_t)(xdr_int);
+  else if (sizeof(int) == sizeof(long long))
+    return (xdrproc_t)(xdr_longlong_t);
+  else if (sizeof(int) == sizeof(long))
+    return (xdrproc_t)(xdr_long);
+  else
+    libmesh_error();
+}
 
 template <>
-xdrproc_t xdr_translator<unsigned int>() { return (xdrproc_t)(xdr_u_int); }
+xdrproc_t xdr_translator<unsigned int>()
+{
+  // Don't let XDR truncate anything on systems where int is 64-bit;
+  // xdr_u_int is hard-coded to write 32 bits.
+  if (sizeof(unsigned int) <= 4)
+    return (xdrproc_t)(xdr_u_int);
+  else if (sizeof(unsigned int) == sizeof(unsigned long))
+    return (xdrproc_t)(xdr_u_long);
+  else if (sizeof(unsigned int) == sizeof(unsigned long long))
+    return (xdrproc_t)(xdr_u_longlong_t);
+  else
+    libmesh_error();
+}
 
 template <>
-xdrproc_t xdr_translator<long int>() { return (xdrproc_t)(xdr_long); }
+xdrproc_t xdr_translator<long int>()
+{
+  // Don't let XDR truncate anything on systems where long is 64-bit;
+  // xdr_long is hard-coded to write 32 bits.
+  if (sizeof(long int) <= 4)
+    return (xdrproc_t)(xdr_long);
+  else if (sizeof(long int) == sizeof(long long))
+    return (xdrproc_t)(xdr_longlong_t);
+  else
+    libmesh_error();
+}
 
 template <>
-xdrproc_t xdr_translator<unsigned long int>() { return (xdrproc_t)(xdr_u_long); }
+xdrproc_t xdr_translator<unsigned long int>()
+{
+  // Don't let XDR truncate anything on systems where long is 64-bit;
+  // xdr_u_long is hard-coded to write 32 bits.  This bit us HARD.
+  if (sizeof(unsigned long int) <= 4)
+    return (xdrproc_t)(xdr_u_long);
+  else if (sizeof(unsigned long int) == sizeof(unsigned long long))
+    return (xdrproc_t)(xdr_u_longlong_t);
+  else
+    libmesh_error();
+}
 
+// All the other XDR routines should be safe, unless
+// 1. You're on a system with sizeof(short)==8 and you want to store
+// n>2^32 in a short; this will never happen since we assume
+// sizeof(short) may be as small as 2 bytes and we use at least int
+// for anything larger.
+// 2. You're on a system with sizeof(long long) > 8, and you want to
+// store n>2^64 in one.  Welcome, 22nd century programmers; sorry we
+// couldn't accomodate you.
 template <>
 xdrproc_t xdr_translator<long long>() { return (xdrproc_t)(xdr_longlong_t); }
 
