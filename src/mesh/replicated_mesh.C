@@ -871,6 +871,8 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
   if ((this_mesh_boundary_id  != BoundaryInfo::invalid_id) &&
       (other_mesh_boundary_id != BoundaryInfo::invalid_id))
     {
+      LOG_SCOPE("stitch_meshes node merging", "ReplicatedMesh");
+
       // While finding nodes on the boundary, also find the minimum edge length
       // of all faces on both boundaries.  This will later be used in relative
       // distance checks when stitching nodes.
@@ -1176,13 +1178,15 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
 
 
-  dof_id_type node_delta = this->n_nodes();
-  dof_id_type elem_delta = this->n_elem();
+  dof_id_type node_delta = this->max_node_id();
+  dof_id_type elem_delta = this->max_elem_id();
 
   // If other_mesh!=NULL, then we have to do a bunch of work
   // in order to copy it to this mesh
   if (this!=other_mesh)
     {
+      LOG_SCOPE("stitch_meshes copying", "ReplicatedMesh");
+
       // need to increment node and element IDs of other_mesh before copying to this mesh
       MeshBase::node_iterator node_it  = other_mesh->nodes_begin();
       MeshBase::node_iterator node_end = other_mesh->nodes_end();
@@ -1243,44 +1247,66 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
         {
           Elem * other_elem = *elem_it;
 
-          // Find the corresponding element on this mesh
-          Elem * this_elem = this->elem_ptr(other_elem->id());
-
           // Decrement elem IDs of other_mesh to return it to original state
           dof_id_type new_id = other_elem->id() - elem_delta;
           other_elem->set_id(new_id);
-
-          unsigned int other_n_nodes = other_elem->n_nodes();
-          for (unsigned int n=0; n != other_n_nodes; ++n)
-            {
-              other_mesh->get_boundary_info().boundary_ids(other_elem->node_ptr(n), bc_ids);
-              this->get_boundary_info().add_node(this_elem->node_ptr(n), bc_ids);
-            }
-
-          // Copy edge boundary info
-          unsigned int n_edges = other_elem->n_edges();
-          for (unsigned short edge=0; edge != n_edges; ++edge)
-            {
-              other_mesh->get_boundary_info().edge_boundary_ids(other_elem, edge, bc_ids);
-              this->get_boundary_info().add_edge(this_elem, edge, bc_ids);
-            }
-
-          unsigned int n_sides = other_elem->n_sides();
-          for (unsigned short s=0; s != n_sides; ++s)
-            {
-              other_mesh->get_boundary_info().boundary_ids(other_elem, s, bc_ids);
-              this->get_boundary_info().add_side(this_elem, s, bc_ids);
-            }
-
-          // Copy shellface boundary ids
-          unsigned int n_shellfaces = 2;
-          for (unsigned short shellface=0; shellface != n_shellfaces; ++shellface)
-            {
-              other_mesh->get_boundary_info().shellface_boundary_ids(other_elem, shellface, bc_ids);
-              this->get_boundary_info().add_shellface(this_elem, shellface, bc_ids);
-            }
         }
 
+      // Copy BoundaryInfo from other_mesh too.  We do this via the
+      // list APIs rather than element-by-element for speed.
+      BoundaryInfo & boundary = this->get_boundary_info();
+      const BoundaryInfo & other_boundary = other_mesh->get_boundary_info();
+
+      {
+        std::vector<dof_id_type>      node_id_list;
+        std::vector<boundary_id_type> bc_id_list;
+
+        other_boundary.build_node_list(node_id_list, bc_id_list);
+        for (std::size_t i=0; i != node_id_list.size(); ++i)
+          {
+            const dof_id_type our_id = node_id_list[i] + node_delta;
+            boundary.add_node(our_id, bc_id_list[i]);
+          }
+      }
+
+      {
+        std::vector<dof_id_type>        elem_id_list;
+        std::vector<unsigned short int> side_list;
+        std::vector<boundary_id_type>   bc_id_list;
+
+        other_boundary.build_side_list(elem_id_list, side_list, bc_id_list);
+        for (std::size_t i=0; i != elem_id_list.size(); ++i)
+          {
+            const dof_id_type our_id = elem_id_list[i] + elem_delta;
+            boundary.add_side(our_id, side_list[i], bc_id_list[i]);
+          }
+      }
+
+      {
+        std::vector<dof_id_type>        elem_id_list;
+        std::vector<unsigned short int> edge_list;
+        std::vector<boundary_id_type>   bc_id_list;
+
+        other_boundary.build_edge_list(elem_id_list, edge_list, bc_id_list);
+        for (std::size_t i=0; i != elem_id_list.size(); ++i)
+          {
+            const dof_id_type our_id = elem_id_list[i] + elem_delta;
+            boundary.add_edge(our_id, edge_list[i], bc_id_list[i]);
+          }
+      }
+
+      {
+        std::vector<dof_id_type>        elem_id_list;
+        std::vector<unsigned short int> shellface_list;
+        std::vector<boundary_id_type>   bc_id_list;
+
+        other_boundary.build_shellface_list(elem_id_list, shellface_list, bc_id_list);
+        for (std::size_t i=0; i != elem_id_list.size(); ++i)
+          {
+            const dof_id_type our_id = elem_id_list[i] + elem_delta;
+            boundary.add_shellface(our_id, shellface_list[i], bc_id_list[i]);
+          }
+      }
     } // end if (other_mesh)
 
   // Finally, we need to "merge" the overlapping nodes
@@ -1295,6 +1321,9 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
   std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it     = node_to_elems_map.begin();
   std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it_end = node_to_elems_map.end();
+  {
+  LOG_SCOPE("stitch_meshes node updates", "ReplicatedMesh");
+
   for ( ; elem_map_it != elem_map_it_end; ++elem_map_it)
     {
       dof_id_type target_node_id = elem_map_it->first;
@@ -1317,9 +1346,12 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
           this->get_boundary_info().add_node(&target_node, bc_ids);
         }
     }
+  }
 
   std::map<dof_id_type, dof_id_type>::iterator node_map_it     = node_to_node_map.begin();
   std::map<dof_id_type, dof_id_type>::iterator node_map_it_end = node_to_node_map.end();
+  {
+  LOG_SCOPE("stitch_meshes node deletion", "ReplicatedMesh");
   for ( ; node_map_it != node_map_it_end; ++node_map_it)
     {
       // In the case that this==other_mesh, the two nodes might be the same (e.g. if
@@ -1330,6 +1362,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
       dof_id_type this_node_id = node_map_it->second;
       this->delete_node( this->node_ptr(this_node_id) );
     }
+  }
 
   // If find_neighbors() wasn't called in prepare_for_use(), we need to
   // manually loop once more over all elements adjacent to the stitched boundary
@@ -1340,6 +1373,8 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
   //   3. Update the corresponding side in side_to_elem_map as well
   if (skip_find_neighbors)
     {
+      LOG_SCOPE("stitch_meshes neighbor fixes", "ReplicatedMesh");
+
       elem_map_it     = node_to_elems_map.begin();
       elem_map_it_end = node_to_elems_map.end();
       std::set<dof_id_type> fixed_elems;
@@ -1433,6 +1468,8 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
   // faces that are now internal to the mesh
   if (clear_stitched_boundary_ids)
     {
+      LOG_SCOPE("stitch_meshes clear bcids", "ReplicatedMesh");
+
       // Container to catch boundary IDs passed back from BoundaryInfo.
       std::vector<boundary_id_type> bc_ids;
 

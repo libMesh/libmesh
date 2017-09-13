@@ -993,6 +993,8 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
 #ifdef DEBUG
 void MeshTools::libmesh_assert_equal_n_systems (const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_equal_n_systems()", "MeshTools");
+
   MeshBase::const_element_iterator el =
     mesh.elements_begin();
   const MeshBase::const_element_iterator el_end =
@@ -1028,6 +1030,8 @@ void MeshTools::libmesh_assert_equal_n_systems (const MeshBase & mesh)
 #ifdef LIBMESH_ENABLE_AMR
 void MeshTools::libmesh_assert_old_dof_objects (const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_old_dof_objects()", "MeshTools");
+
   MeshBase::const_element_iterator el =
     mesh.elements_begin();
   const MeshBase::const_element_iterator el_end =
@@ -1060,6 +1064,8 @@ void MeshTools::libmesh_assert_old_dof_objects (const MeshBase &) {}
 
 void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_node_pointers()", "MeshTools");
+
   const MeshBase::const_element_iterator el_end =
     mesh.elements_end();
   for (MeshBase::const_element_iterator el =
@@ -1084,6 +1090,8 @@ void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase & mesh)
 
 void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_remote_elems()", "MeshTools");
+
   const MeshBase::const_element_iterator el_end =
     mesh.local_elements_end();
   for (MeshBase::const_element_iterator el =
@@ -1138,6 +1146,8 @@ void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase & mesh,
 
 void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_elem_ids()", "MeshTools");
+
   processor_id_type lastprocid = 0;
   dof_id_type lastelemid = 0;
 
@@ -1163,6 +1173,8 @@ void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase & mesh)
 
 void MeshTools::libmesh_assert_valid_amr_elem_ids(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_amr_elem_ids()", "MeshTools");
+
   const MeshBase::const_element_iterator el_end =
     mesh.elements_end();
   for (MeshBase::const_element_iterator el =
@@ -1185,6 +1197,8 @@ void MeshTools::libmesh_assert_valid_amr_elem_ids(const MeshBase & mesh)
 
 void MeshTools::libmesh_assert_valid_amr_interior_parents(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_amr_interior_parents()", "MeshTools");
+
   const MeshBase::const_element_iterator el_end =
     mesh.elements_end();
   for (MeshBase::const_element_iterator el =
@@ -1223,6 +1237,8 @@ void MeshTools::libmesh_assert_valid_amr_interior_parents(const MeshBase & mesh)
 
 void MeshTools::libmesh_assert_connected_nodes (const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_connected_nodes()", "MeshTools");
+
   std::set<const Node *> used_nodes;
 
   const MeshBase::const_element_iterator el_end =
@@ -1254,6 +1270,8 @@ namespace MeshTools {
 
 void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_boundary_ids()", "MeshTools");
+
   if (mesh.n_processors() == 1)
     return;
 
@@ -1267,18 +1285,29 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
   for (dof_id_type i=0; i != pmax_elem_id; ++i)
     {
       const Elem * elem = mesh.query_elem_ptr(i);
-      unsigned int n_nodes = elem ? elem->n_nodes() : 0;
-      unsigned int n_edges = elem ? elem->n_edges() : 0;
-      unsigned int n_sides = elem ? elem->n_sides() : 0;
-      libmesh_assert(mesh.comm().semiverify
-                     (elem ? &n_nodes : libmesh_nullptr));
-      libmesh_assert(mesh.comm().semiverify
-                     (elem ? &n_edges : libmesh_nullptr));
-      libmesh_assert(mesh.comm().semiverify
-                     (elem ? &n_sides : libmesh_nullptr));
+      const unsigned int my_n_nodes = elem ? elem->n_nodes() : 0;
+      const unsigned int my_n_edges = elem ? elem->n_edges() : 0;
+      const unsigned int my_n_sides = elem ? elem->n_sides() : 0;
+      unsigned int n_nodes = my_n_nodes,
+                   n_edges = my_n_edges,
+                   n_sides = my_n_sides;
+
       mesh.comm().max(n_nodes);
       mesh.comm().max(n_edges);
       mesh.comm().max(n_sides);
+
+      if (elem)
+        {
+          libmesh_assert_equal_to(my_n_nodes, n_nodes);
+          libmesh_assert_equal_to(my_n_edges, n_edges);
+          libmesh_assert_equal_to(my_n_sides, n_sides);
+        }
+
+      // Let's test all IDs on the element with one communication
+      // rather than n_nodes + n_edges + n_sides communications, to
+      // cut down on latency in dbg modes.
+      std::vector<boundary_id_type> all_bcids;
+
       for (unsigned int n=0; n != n_nodes; ++n)
         {
           std::vector<boundary_id_type> bcids;
@@ -1289,8 +1318,13 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
               // Ordering of boundary ids shouldn't matter
               std::sort(bcids.begin(), bcids.end());
             }
-          libmesh_assert(mesh.comm().semiverify
-                         (elem ? &bcids : libmesh_nullptr));
+//          libmesh_assert(mesh.comm().semiverify
+//                         (elem ? &bcids : libmesh_nullptr));
+
+          all_bcids.insert(all_bcids.end(), bcids.begin(),
+                           bcids.end());
+          // Separator
+          all_bcids.push_back(BoundaryInfo::invalid_id);
         }
 
       for (unsigned short e=0; e != n_edges; ++e)
@@ -1305,8 +1339,13 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
               std::sort(bcids.begin(), bcids.end());
             }
 
-          libmesh_assert(mesh.comm().semiverify
-                         (elem ? &bcids : libmesh_nullptr));
+//          libmesh_assert(mesh.comm().semiverify
+//                         (elem ? &bcids : libmesh_nullptr));
+
+          all_bcids.insert(all_bcids.end(), bcids.begin(),
+                           bcids.end());
+          // Separator
+          all_bcids.push_back(BoundaryInfo::invalid_id);
 
           if (elem)
             {
@@ -1314,10 +1353,15 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
 
               // Ordering of boundary ids shouldn't matter
               std::sort(bcids.begin(), bcids.end());
+
+              all_bcids.insert(all_bcids.end(), bcids.begin(),
+                               bcids.end());
+              // Separator
+              all_bcids.push_back(BoundaryInfo::invalid_id);
             }
 
-          libmesh_assert(mesh.comm().semiverify
-                         (elem ? &bcids : libmesh_nullptr));
+//          libmesh_assert(mesh.comm().semiverify
+//                         (elem ? &bcids : libmesh_nullptr));
         }
 
       for (unsigned short s=0; s != n_sides; ++s)
@@ -1330,10 +1374,15 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
 
               // Ordering of boundary ids shouldn't matter
               std::sort(bcids.begin(), bcids.end());
+
+              all_bcids.insert(all_bcids.end(), bcids.begin(),
+                               bcids.end());
+              // Separator
+              all_bcids.push_back(BoundaryInfo::invalid_id);
             }
 
-          libmesh_assert(mesh.comm().semiverify
-                         (elem ? &bcids : libmesh_nullptr));
+//          libmesh_assert(mesh.comm().semiverify
+//                         (elem ? &bcids : libmesh_nullptr));
 
           if (elem)
             {
@@ -1341,10 +1390,15 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
 
               // Ordering of boundary ids shouldn't matter
               std::sort(bcids.begin(), bcids.end());
+
+              all_bcids.insert(all_bcids.end(), bcids.begin(),
+                               bcids.end());
+              // Separator
+              all_bcids.push_back(BoundaryInfo::invalid_id);
             }
 
-          libmesh_assert(mesh.comm().semiverify
-                         (elem ? &bcids : libmesh_nullptr));
+//          libmesh_assert(mesh.comm().semiverify
+//                         (elem ? &bcids : libmesh_nullptr));
         }
 
       for (unsigned short sf=0; sf != 2; ++sf)
@@ -1357,10 +1411,15 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
 
               // Ordering of boundary ids shouldn't matter
               std::sort(bcids.begin(), bcids.end());
+
+              all_bcids.insert(all_bcids.end(), bcids.begin(),
+                               bcids.end());
+              // Separator
+              all_bcids.push_back(BoundaryInfo::invalid_id);
             }
 
-          libmesh_assert(mesh.comm().semiverify
-                         (elem ? &bcids : libmesh_nullptr));
+//          libmesh_assert(mesh.comm().semiverify
+//                         (elem ? &bcids : libmesh_nullptr));
 
           if (elem)
             {
@@ -1368,16 +1427,26 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
 
               // Ordering of boundary ids shouldn't matter
               std::sort(bcids.begin(), bcids.end());
+
+              all_bcids.insert(all_bcids.end(), bcids.begin(),
+                               bcids.end());
+              // Separator
+              all_bcids.push_back(BoundaryInfo::invalid_id);
             }
 
-          libmesh_assert(mesh.comm().semiverify
-                         (elem ? &bcids : libmesh_nullptr));
+//          libmesh_assert(mesh.comm().semiverify
+//                         (elem ? &bcids : libmesh_nullptr));
         }
+
+      libmesh_assert(mesh.comm().semiverify
+                     (elem ? &all_bcids : libmesh_nullptr));
     }
 }
 
 void libmesh_assert_valid_dof_ids(const MeshBase & mesh, unsigned int sysnum)
 {
+  LOG_SCOPE("libmesh_assert_valid_dof_ids()", "MeshTools");
+
   if (mesh.n_processors() == 1)
     return;
 
@@ -1404,6 +1473,8 @@ void libmesh_assert_valid_dof_ids(const MeshBase & mesh, unsigned int sysnum)
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 void libmesh_assert_valid_unique_ids(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_unique_ids()", "MeshTools");
+
   libmesh_parallel_only(mesh.comm());
 
   dof_id_type pmax_elem_id = mesh.max_elem_id();
@@ -1433,6 +1504,8 @@ void libmesh_assert_valid_unique_ids(const MeshBase & mesh)
 template <>
 void libmesh_assert_topology_consistent_procids<Elem>(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_topology_consistent_procids()", "MeshTools");
+
   // This parameter is not used when !LIBMESH_ENABLE_AMR
   libmesh_ignore(mesh);
 
@@ -1485,6 +1558,8 @@ void libmesh_assert_topology_consistent_procids<Elem>(const MeshBase & mesh)
 template <>
 void libmesh_assert_parallel_consistent_procids<Elem>(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_parallel_consistent_procids()", "MeshTools");
+
   if (mesh.n_processors() == 1)
     return;
 
@@ -1527,6 +1602,8 @@ void libmesh_assert_parallel_consistent_procids<Elem>(const MeshBase & mesh)
 template <>
 void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_topology_consistent_procids()", "MeshTools");
+
   if (mesh.n_processors() == 1)
     return;
 
@@ -1575,6 +1652,8 @@ void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
 template <>
 void libmesh_assert_parallel_consistent_procids<Node>(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_parallel_consistent_procids()", "MeshTools");
+
   if (mesh.n_processors() == 1)
     return;
 
@@ -1643,6 +1722,8 @@ void libmesh_assert_parallel_consistent_procids<Node>(const MeshBase & mesh)
 #ifdef LIBMESH_ENABLE_AMR
 void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_refinement_flags()", "MeshTools");
+
   libmesh_parallel_only(mesh.comm());
   if (mesh.n_processors() == 1)
     return;
@@ -1693,6 +1774,8 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &)
 #ifdef LIBMESH_ENABLE_AMR
 void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase & mesh)
 {
+  LOG_SCOPE("libmesh_assert_valid_refinement_tree()", "MeshTools");
+
   const MeshBase::const_element_iterator el_end =
     mesh.elements_end();
   for (MeshBase::const_element_iterator el =
@@ -1734,6 +1817,8 @@ void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &)
 void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
                                                bool assert_valid_remote_elems)
 {
+  LOG_SCOPE("libmesh_assert_valid_neighbors()", "MeshTools");
+
   const MeshBase::const_element_iterator el_end = mesh.elements_end();
   for (MeshBase::const_element_iterator el = mesh.elements_begin();
        el != el_end; ++el)

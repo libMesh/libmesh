@@ -71,6 +71,8 @@ UnstructuredMesh::UnstructuredMesh (unsigned char d) :
 void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_mesh,
                                                const bool skip_find_neighbors)
 {
+  LOG_SCOPE("copy_nodes_and_elements()", "UnstructuredMesh");
+
   // We're assuming our subclass data needs no copy
   libmesh_assert_equal_to (_n_parts, other_mesh._n_parts);
   libmesh_assert_equal_to (_is_prepared, other_mesh._is_prepared);
@@ -111,13 +113,13 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
     this->reserve_elem(other_mesh.n_elem());
 
     // Declare a map linking old and new elements, needed to copy the neighbor lists
-    std::map<const Elem *, Elem *> old_elems_to_new_elems;
+    typedef LIBMESH_BEST_UNORDERED_MAP<const Elem *, Elem *> map_type;
+    map_type old_elems_to_new_elems;
 
     // Loop over the elements
     MeshBase::const_element_iterator it = other_mesh.elements_begin();
     const MeshBase::const_element_iterator end = other_mesh.elements_end();
 
-    // FIXME: Where do we set element IDs??
     for (; it != end; ++it)
       {
         //Look at the old element
@@ -164,7 +166,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
         // And start it off in the same subdomain
         el->processor_id() = old->processor_id();
 
-        // Give it the same ids
+        // Give it the same element and unique ids
         el->set_id(old->id());
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID

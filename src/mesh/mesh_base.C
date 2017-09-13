@@ -172,6 +172,8 @@ void MeshBase::set_spatial_dimension(unsigned char d)
 
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors)
 {
+  LOG_SCOPE("prepare_for_use()", "MeshBase");
+
   parallel_object_only();
 
   libmesh_assert(this->comm().verify(this->is_serial()));
