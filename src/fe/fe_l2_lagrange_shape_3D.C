@@ -1248,7 +1248,7 @@ Real FE<3,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
                              << std::endl;
               warning_given_HEX20 = true;
             }
-            /* FALLTHROUGH */
+            libmesh_fallthrough;
 
           case HEX27:
             // triquadratic hexahedral shape functions

@@ -145,7 +145,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
     case TRI3:
     case TRISHELL3:
       libmesh_assert_less (totalorder, 2);
-      /* FALLTHROUGH */
+      libmesh_fallthrough;
     case TRI6:
       switch (totalorder)
         {
@@ -518,7 +518,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem * elem,
     case TRI3:
     case TRISHELL3:
       libmesh_assert_less (totalorder, 2);
-      /* FALLTHROUGH */
+      libmesh_fallthrough;
     case TRI6:
       {
         // I have been lazy here and am using finite differences

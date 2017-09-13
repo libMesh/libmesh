@@ -47,28 +47,28 @@ void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T> & other,
         if (other.n() == this->m())
           break;
       }
-        /* FALLTHROUGH */
+      libmesh_fallthrough;
     case RIGHT_MULTIPLY:
       {
         result_size = other.n() * this->m();
         if (other.m() == this->n())
           break;
       }
-        /* FALLTHROUGH */
+      libmesh_fallthrough;
     case LEFT_MULTIPLY_TRANSPOSE:
       {
         result_size = other.n() * this->n();
         if (other.m() == this->m())
           break;
       }
-        /* FALLTHROUGH */
+      libmesh_fallthrough;
     case RIGHT_MULTIPLY_TRANSPOSE:
       {
         result_size = other.m() * this->m();
         if (other.n() == this->n())
           break;
       }
-        /* FALLTHROUGH */
+      libmesh_fallthrough;
     default:
       libmesh_error_msg("Unknown flag selected or matrices are incompatible for multiplication.");
     }
