@@ -172,12 +172,12 @@ uint32_t hashword(const uint32_t * k, size_t length, uint32_t initval=0)
   switch(length)                     // all the case statements fall through
     {
     case 3 : c+=k[2];
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     case 2 : b+=k[1];
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     case 1 : a+=k[0];
       final(a,b,c);
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     default:     // case 0: nothing left to add
       break;
     }

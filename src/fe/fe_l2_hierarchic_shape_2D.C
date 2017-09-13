@@ -157,7 +157,7 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem * elem,
     case QUAD4:
     case QUADSHELL4:
       libmesh_assert_less (totalorder, 2);
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     case QUAD8:
     case QUAD9:
       {
@@ -296,7 +296,7 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const Elem * elem,
     case QUAD4:
     case QUADSHELL4:
       libmesh_assert_less (totalorder, 2);
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     case QUAD8:
     case QUAD9:
       {

@@ -113,21 +113,21 @@ unsigned int hierarchic_n_dofs(const ElemType t, const Order o)
     case QUAD4:
     case QUADSHELL4:
       libmesh_assert_less (o, 2);
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     case QUAD8:
     case QUAD9:
       return ((o+1)*(o+1));
     case HEX8:
       libmesh_assert_less (o, 2);
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     case HEX20:
       libmesh_assert_less (o, 2);
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     case HEX27:
       return ((o+1)*(o+1)*(o+1));
     case TRI3:
       libmesh_assert_less (o, 2);
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     case TRI6:
       return ((o+1)*(o+2)/2);
     case INVALID_ELEM:
@@ -168,7 +168,7 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
     case TRI3:
       libmesh_assert_less (n, 3);
       libmesh_assert_less (o, 2);
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     case TRI6:
       switch (n)
         {
@@ -190,7 +190,7 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
     case QUADSHELL4:
       libmesh_assert_less (n, 4);
       libmesh_assert_less (o, 2);
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     case QUAD8:
     case QUAD9:
       switch (n)
@@ -217,11 +217,11 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
     case HEX8:
       libmesh_assert_less (n, 8);
       libmesh_assert_less (o, 2);
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     case HEX20:
       libmesh_assert_less (n, 20);
       libmesh_assert_less (o, 2);
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     case HEX27:
       switch (n)
         {

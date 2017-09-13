@@ -523,7 +523,7 @@ void QMonomial::init_2D(const ElemType type_in,
           } // end switch(_order + 2*p)
       } // end case QUAD4/8/9
 
-      libmesh_fallthrough;
+      libmesh_fallthrough();
 
       // By default: construct and use a Gauss quadrature rule
     default:

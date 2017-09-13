@@ -619,7 +619,7 @@ void DenseMatrix<T>::lu_solve (const DenseVector<T> & b,
         if (this->use_blas_lapack)
           break;
       }
-      libmesh_fallthrough;
+      libmesh_fallthrough();
 
     case LU:
       {
@@ -627,7 +627,7 @@ void DenseMatrix<T>::lu_solve (const DenseVector<T> & b,
         if (!(this->use_blas_lapack))
           break;
       }
-      libmesh_fallthrough;
+      libmesh_fallthrough();
 
     default:
       libmesh_error_msg("Error! This matrix already has a different decomposition...");

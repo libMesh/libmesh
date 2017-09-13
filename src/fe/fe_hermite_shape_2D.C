@@ -226,7 +226,7 @@ Real FE<2,HERMITE>::shape(const Elem * elem,
     case QUAD4:
     case QUADSHELL4:
       libmesh_assert_less (totalorder, 4);
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     case QUAD8:
     case QUAD9:
       {
@@ -293,7 +293,7 @@ Real FE<2,HERMITE>::shape_deriv(const Elem * elem,
     case QUAD4:
     case QUADSHELL4:
       libmesh_assert_less (totalorder, 4);
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     case QUAD8:
     case QUAD9:
       {
@@ -358,7 +358,7 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem * elem,
     case QUAD4:
     case QUADSHELL4:
       libmesh_assert_less (totalorder, 4);
-      libmesh_fallthrough;
+      libmesh_fallthrough();
     case QUAD8:
     case QUAD9:
       {
