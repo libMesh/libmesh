@@ -4131,6 +4131,10 @@ inline void Communicator::allgather(std::vector<T> &,
                                     const bool) const {}
 
 template <typename T>
+inline void Communicator::allgather(std::vector<std::basic_string<T> > &,
+                                    const bool) const {}
+
+template <typename T>
 inline void Communicator::scatter(const std::vector<T> & data,
                                   T & recv,
                                   const unsigned int libmesh_dbg_var(root_id)) const
