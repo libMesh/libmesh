@@ -417,6 +417,12 @@
 /* Compiler supports std::make_unique, but it is disabled in libmesh */
 #undef HAVE_CXX14_MAKE_UNIQUE_BUT_DISABLED
 
+/* Flag indicating whether compiler supports fallthrough attribute */
+#undef HAVE_CXX17_FALLTHROUGH_ATTRIBUTE
+
+/* Compiler supports fallthrough attribute, but it is disabled in libmesh */
+#undef HAVE_CXX17_FALLTHROUGH_ATTRIBUTE_BUT_DISABLED
+
 /* Define to 1 if you have the declaration of `sigaction', and to 0 if you
    don't. */
 #undef HAVE_DECL_SIGACTION
@@ -433,6 +439,9 @@
 
 /* define if the compiler supports dlopen/dlsym/dlclose */
 #undef HAVE_DLOPEN
+
+/* Flag indicating whether compiler supports __attribute__ ((fallthrough)) */
+#undef HAVE_DOUBLE_UNDERSCORE_ATTRIBUTE_FALLTHROUGH
 
 /* Flag indicating whether the library will be compiled with Eigen support */
 #undef HAVE_EIGEN
