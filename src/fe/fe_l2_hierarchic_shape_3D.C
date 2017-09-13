@@ -671,6 +671,7 @@ Real FE<3,L2_HIERARCHIC>::shape(const Elem * elem,
     case HEX8:
     case HEX20:
       libmesh_assert_less (totalorder, 2);
+      libmesh_fallthrough();
     case HEX27:
       {
         libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u)*(totalorder+1u));

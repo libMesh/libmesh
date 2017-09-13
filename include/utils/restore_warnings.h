@@ -32,6 +32,10 @@
 #if (__GNUC__ > 5)
 #pragma GCC diagnostic warning "-Wplacement-new"
 #pragma GCC diagnostic warning "-Wmisleading-indentation"
+#if (__GNUC__ > 6)
+#pragma GCC diagnostic warning "-Wint-in-bool-context"
+#pragma GCC diagnostic warning "-Wimplicit-fallthrough"
+#endif // GCC > 6
 #endif // GCC > 5
 #pragma GCC diagnostic warning "-Wdeprecated-declarations"
 #pragma GCC diagnostic warning "-Wunused-parameter"

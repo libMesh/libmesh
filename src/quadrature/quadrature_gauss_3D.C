@@ -217,7 +217,7 @@ void QGauss::init_3D(const ElemType type_in,
               // Note: if !allow_rules_with_negative_weights, fall through to next case.
             }
 
-
+            libmesh_fallthrough();
 
 
             // Walkington's fifth-order 14-point rule from
@@ -452,6 +452,9 @@ void QGauss::init_3D(const ElemType type_in,
                 } // end if (allow_rules_with_negative_weights)
               // Note: if !allow_rules_with_negative_weights, fall through to next case.
             }
+
+            libmesh_fallthrough();
+
 
             // Fall back on Grundmann-Moller or Conical Product rules at high orders.
           default:

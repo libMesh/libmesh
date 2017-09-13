@@ -596,6 +596,15 @@ inline Tnew libmesh_cast_int (Told oldvar)
 #define libmesh_final
 #endif
 
+// Define backwards-compatible fallthrough attribute.
+// We should add support for standard C++17 [[fallthrough]]
+// Maybe [[clang::fallthrough]] or [[gcc::fallthough]] too?
+#if defined(__GNUC__) && (__GNUC__ > 6)
+#define libmesh_fallthrough() __attribute__((fallthrough))
+#else
+#define libmesh_fallthrough() ((void) 0)
+#endif
+
 } // namespace libMesh
 
 

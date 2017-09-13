@@ -30,7 +30,7 @@
 #include <stdint.h> // uint32_t, uint64_t
 #include <vector>
 
-#include "libmesh_common.h" // libmesh_error_msg()
+#include "libmesh_common.h" // libmesh_error_msg(), libmesh_fallthrough
 
 // Anonymous namespace for utility functions used locally
 namespace
@@ -172,9 +172,12 @@ uint32_t hashword(const uint32_t * k, size_t length, uint32_t initval=0)
   switch(length)                     // all the case statements fall through
     {
     case 3 : c+=k[2];
+      libmesh_fallthrough();
     case 2 : b+=k[1];
+      libmesh_fallthrough();
     case 1 : a+=k[0];
       final(a,b,c);
+      libmesh_fallthrough();
     default:     // case 0: nothing left to add
       break;
     }
