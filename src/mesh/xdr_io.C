@@ -176,16 +176,16 @@ void XdrIO::write (const std::string & name)
   // convenient reference to our mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  header_id_type n_elem  = mesh.n_elem();
-  header_id_type n_nodes = mesh.n_nodes();
+  new_header_id_type n_elem  = mesh.n_elem();
+  new_header_id_type n_nodes = mesh.n_nodes();
 
   libmesh_assert(n_elem == mesh.n_elem());
   libmesh_assert(n_nodes == mesh.n_nodes());
 
-  header_id_type n_side_bcs = cast_int<header_id_type>(mesh.get_boundary_info().n_boundary_conds());
-  header_id_type n_edge_bcs = cast_int<header_id_type>(mesh.get_boundary_info().n_edge_conds());
-  header_id_type n_shellface_bcs = cast_int<header_id_type>(mesh.get_boundary_info().n_shellface_conds());
-  header_id_type n_nodesets = cast_int<header_id_type>(mesh.get_boundary_info().n_nodeset_conds());
+  new_header_id_type n_side_bcs = mesh.get_boundary_info().n_boundary_conds();
+  new_header_id_type n_edge_bcs = mesh.get_boundary_info().n_edge_conds();
+  new_header_id_type n_shellface_bcs = mesh.get_boundary_info().n_shellface_conds();
+  new_header_id_type n_nodesets = mesh.get_boundary_info().n_nodeset_conds();
   unsigned int n_p_levels = MeshTools::n_p_levels (mesh);
 
   bool write_parallel_files = this->write_parallel();
@@ -229,7 +229,7 @@ void XdrIO::write (const std::string & name)
       io.data (this->polynomial_level_file_name(),   "# p-level specification file");
 
       // Version 0.9.2+ introduces sizes for each type
-      header_id_type write_size = sizeof(xdr_id_type), zero_size = 0;
+      new_header_id_type write_size = sizeof(xdr_id_type), zero_size = 0;
 
       const bool
         write_p_level      = ("." == this->polynomial_level_file_name()),
@@ -320,13 +320,16 @@ void XdrIO::write_serialized_subdomain_names(Xdr & io) const
 
       const std::map<subdomain_id_type, std::string> & subdomain_map = mesh.get_subdomain_name_map();
 
-      std::vector<header_id_type> subdomain_ids;   subdomain_ids.reserve(subdomain_map.size());
-      std::vector<std::string>  subdomain_names; subdomain_names.reserve(subdomain_map.size());
+      std::vector<xdr_id_type> subdomain_ids;
+      subdomain_ids.reserve(subdomain_map.size());
+
+      std::vector<std::string> subdomain_names;
+      subdomain_names.reserve(subdomain_map.size());
 
       // We need to loop over the map and make sure that there aren't any invalid entries.  Since we
       // return writable references in mesh_base, it's possible for the user to leave some entity names
       // blank.  We can't write those to the XDA file.
-      header_id_type n_subdomain_names = 0;
+      xdr_id_type n_subdomain_names = 0;
       std::map<subdomain_id_type, std::string>::const_iterator it_end = subdomain_map.end();
       for (std::map<subdomain_id_type, std::string>::const_iterator it = subdomain_map.begin(); it != it_end; ++it)
         {
@@ -1043,7 +1046,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
 
 
 
-void XdrIO::write_serialized_bcs_helper (Xdr & io, const header_id_type n_bcs, const std::string bc_type) const
+void XdrIO::write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_bcs, const std::string bc_type) const
 {
   libmesh_assert (io.writing());
 
@@ -1056,7 +1059,7 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const header_id_type n_bcs, c
   // Version 0.9.2+ introduces entity names
   write_serialized_bc_names(io, boundary_info, true);  // sideset names
 
-  header_id_type n_bcs_out = n_bcs;
+  new_header_id_type n_bcs_out = n_bcs;
   if (this->processor_id() == 0)
     {
       std::stringstream comment_string;
@@ -1176,28 +1179,28 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const header_id_type n_bcs, c
 
 
 
-void XdrIO::write_serialized_side_bcs (Xdr & io, const header_id_type n_side_bcs) const
+void XdrIO::write_serialized_side_bcs (Xdr & io, const new_header_id_type n_side_bcs) const
 {
   write_serialized_bcs_helper(io, n_side_bcs, "side");
 }
 
 
 
-void XdrIO::write_serialized_edge_bcs (Xdr & io, const header_id_type n_edge_bcs) const
+void XdrIO::write_serialized_edge_bcs (Xdr & io, const new_header_id_type n_edge_bcs) const
 {
   write_serialized_bcs_helper(io, n_edge_bcs, "edge");
 }
 
 
 
-void XdrIO::write_serialized_shellface_bcs (Xdr & io, const header_id_type n_shellface_bcs) const
+void XdrIO::write_serialized_shellface_bcs (Xdr & io, const new_header_id_type n_shellface_bcs) const
 {
   write_serialized_bcs_helper(io, n_shellface_bcs, "shellface");
 }
 
 
 
-void XdrIO::write_serialized_nodesets (Xdr & io, const header_id_type n_nodesets) const
+void XdrIO::write_serialized_nodesets (Xdr & io, const new_header_id_type n_nodesets) const
 {
   libmesh_assert (io.writing());
 
@@ -1210,7 +1213,7 @@ void XdrIO::write_serialized_nodesets (Xdr & io, const header_id_type n_nodesets
   // Version 0.9.2+ introduces entity names
   write_serialized_bc_names(io, boundary_info, false);  // nodeset names
 
-  header_id_type n_nodesets_out = n_nodesets;
+  new_header_id_type n_nodesets_out = n_nodesets;
   if (this->processor_id() == 0)
     io.data (n_nodesets_out, "# number of nodesets");
   n_nodesets_out = 0;
@@ -1286,13 +1289,16 @@ void XdrIO::write_serialized_bc_names (Xdr & io, const BoundaryInfo & info, bool
       const std::map<boundary_id_type, std::string> & boundary_map = is_sideset ?
         info.get_sideset_name_map() : info.get_nodeset_name_map();
 
-      std::vector<header_id_type> boundary_ids;   boundary_ids.reserve(boundary_map.size());
-      std::vector<std::string>  boundary_names; boundary_names.reserve(boundary_map.size());
+      std::vector<new_header_id_type> boundary_ids;
+      boundary_ids.reserve(boundary_map.size());
+
+      std::vector<std::string>  boundary_names;
+      boundary_names.reserve(boundary_map.size());
 
       // We need to loop over the map and make sure that there aren't any invalid entries.  Since we
       // return writable references in boundary_info, it's possible for the user to leave some entity names
       // blank.  We can't write those to the XDA file.
-      header_id_type n_boundary_names = 0;
+      new_header_id_type n_boundary_names = 0;
       std::map<boundary_id_type, std::string>::const_iterator it_end = boundary_map.end();
       for (std::map<boundary_id_type, std::string>::const_iterator it = boundary_map.begin(); it != it_end; ++it)
         {
@@ -1321,6 +1327,8 @@ void XdrIO::write_serialized_bc_names (Xdr & io, const BoundaryInfo & info, bool
 
 void XdrIO::read (const std::string & name)
 {
+  LOG_SCOPE("read()","XdrIO");
+
   // Only open the file on processor 0 -- this is especially important because
   // there may be an underlying bzip/bunzip going on, and multiple simultaneous
   // calls will produce a race condition.
@@ -1342,53 +1350,24 @@ void XdrIO::read (const std::string & name)
   if (this->legacy())
     libmesh_error_msg("We no longer support reading files in the legacy format.");
 
-  START_LOG("read()","XdrIO");
-
-  std::vector<header_id_type> meta_data(10, sizeof(xdr_id_type));
-  // type_size, uid_size, pid_size, sid_size, p_level_size, eid_size, side_size, bid_size;
-  header_id_type pos=0;
-
-  if (this->processor_id() == 0)
+  // Read headers with the old id type if they're pre-1.3.0, or with
+  // the new id type if they're post-1.3.0
+  std::vector<new_header_id_type> meta_data(10, sizeof(xdr_id_type));
+  if (this->version_at_least_1_3_0())
     {
-      io.data (meta_data[pos++]);
-      io.data (meta_data[pos++]);
-      io.data (this->boundary_condition_file_name()); // libMesh::out << "bc_file="  << this->boundary_condition_file_name() << std::endl;
-      io.data (this->subdomain_map_file_name());      // libMesh::out << "sid_file=" << this->subdomain_map_file_name()      << std::endl;
-      io.data (this->partition_map_file_name());      // libMesh::out << "pid_file=" << this->partition_map_file_name()      << std::endl;
-      io.data (this->polynomial_level_file_name());   // libMesh::out << "pl_file="  << this->polynomial_level_file_name()   << std::endl;
+      this->read_header(io, meta_data);
+    }
+  else
+    {
+      std::vector<old_header_id_type> old_data(10, sizeof(xdr_id_type));
 
-      if (version_at_least_0_9_2())
-        {
-          io.data (meta_data[pos++], "# type size");
-          io.data (meta_data[pos++], "# uid size");
-          io.data (meta_data[pos++], "# pid size");
-          io.data (meta_data[pos++], "# sid size");
-          io.data (meta_data[pos++], "# p-level size");
-          // Boundary Condition sizes
-          io.data (meta_data[pos++], "# eid size");   // elem id
-          io.data (meta_data[pos++], "# side size");  // side number
-          io.data (meta_data[pos++], "# bid size");   // boundary id
-        }
+      this->read_header(io, old_data);
+
+      meta_data.assign(old_data.begin(), old_data.end());
     }
 
-  // broadcast the n_elems, n_nodes, and size information
-  this->comm().broadcast (meta_data);
-
-  this->comm().broadcast (this->boundary_condition_file_name());
-  this->comm().broadcast (this->subdomain_map_file_name());
-  this->comm().broadcast (this->partition_map_file_name());
-  this->comm().broadcast (this->polynomial_level_file_name());
-
-  // Tell the mesh how many nodes/elements to expect. Depending on the mesh type,
-  // this may allow for efficient adding of nodes/elements.
-  header_id_type n_elem = meta_data[0];
-  header_id_type n_nodes = meta_data[1];
-
-  mesh.reserve_elem(n_elem);
-  mesh.reserve_nodes(n_nodes);
-
-  // Our mesh is pre-partitioned as it's created
-  this->set_n_partitions(this->n_processors());
+  const new_header_id_type & n_elem = meta_data[0];
+  const new_header_id_type & n_nodes = meta_data[1];
 
   /**
    * We are future proofing the layout of this file by adding in size information for all stored types.
@@ -1469,11 +1448,71 @@ void XdrIO::read (const std::string & name)
         }
     }
 
-
-  STOP_LOG("read()","XdrIO");
-
   // set the node processor ids
   Partitioner::set_node_processor_ids(mesh);
+}
+
+
+
+template <typename T>
+void XdrIO::read_header (Xdr & io, std::vector<T> & meta_data)
+{
+  LOG_SCOPE("read_header()","XdrIO");
+
+  // convenient reference to our mesh
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
+
+  if (this->processor_id() == 0)
+    {
+      unsigned int pos=0;
+
+      io.data (meta_data[pos++]);
+      io.data (meta_data[pos++]);
+      io.data (this->boundary_condition_file_name()); // libMesh::out << "bc_file="  << this->boundary_condition_file_name() << std::endl;
+      io.data (this->subdomain_map_file_name());      // libMesh::out << "sid_file=" << this->subdomain_map_file_name()      << std::endl;
+      io.data (this->partition_map_file_name());      // libMesh::out << "pid_file=" << this->partition_map_file_name()      << std::endl;
+      io.data (this->polynomial_level_file_name());   // libMesh::out << "pl_file="  << this->polynomial_level_file_name()   << std::endl;
+
+      if (version_at_least_0_9_2())
+        {
+          io.data (meta_data[pos++], "# type size");
+          io.data (meta_data[pos++], "# uid size");
+          io.data (meta_data[pos++], "# pid size");
+          io.data (meta_data[pos++], "# sid size");
+          io.data (meta_data[pos++], "# p-level size");
+          // Boundary Condition sizes
+          io.data (meta_data[pos++], "# eid size");   // elem id
+          io.data (meta_data[pos++], "# side size");  // side number
+          io.data (meta_data[pos++], "# bid size");   // boundary id
+        }
+    }
+
+  // broadcast the n_elems, n_nodes, and size information
+  this->comm().broadcast (meta_data);
+
+  this->comm().broadcast (this->boundary_condition_file_name());
+  this->comm().broadcast (this->subdomain_map_file_name());
+  this->comm().broadcast (this->partition_map_file_name());
+  this->comm().broadcast (this->polynomial_level_file_name());
+
+  // Tell the mesh how many nodes/elements to expect. Depending on the mesh type,
+  // this may allow for efficient adding of nodes/elements.
+  const T & n_elem = meta_data[0];
+  const T & n_nodes = meta_data[1];
+
+  mesh.reserve_elem(n_elem);
+  mesh.reserve_nodes(n_nodes);
+
+  // Our mesh is pre-partitioned as it's created
+  this->set_n_partitions(this->n_processors());
+
+  /**
+   * We are future proofing the layout of this file by adding in size information for all stored types.
+   * TODO: All types are stored as the same size. Use the size information to pack things efficiently.
+   * For now we will assume that "type size" is how the entire file will be encoded.
+   */
+  if (version_at_least_0_9_2())
+    _field_width = meta_data[2];
 }
 
 
@@ -1481,25 +1520,41 @@ void XdrIO::read (const std::string & name)
 void XdrIO::read_serialized_subdomain_names(Xdr & io)
 {
   const bool read_entity_info = version_at_least_0_9_2();
+  const bool use_new_header_type (this->version_at_least_1_3_0());
   if (read_entity_info)
     {
       MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
-      unsigned int n_subdomain_names = 0;
-      std::vector<header_id_type> subdomain_ids;
+      new_header_id_type n_subdomain_names = 0;
+      std::vector<new_header_id_type> subdomain_ids;
       std::vector<std::string>  subdomain_names;
 
       // Read the sideset names
       if (this->processor_id() == 0)
         {
-          io.data(n_subdomain_names);
+          if (use_new_header_type)
+            io.data(n_subdomain_names);
+          else
+            {
+              old_header_id_type temp;
+              io.data(temp);
+              n_subdomain_names = temp;
+            }
 
           subdomain_ids.resize(n_subdomain_names);
           subdomain_names.resize(n_subdomain_names);
 
           if (n_subdomain_names)
             {
-              io.data(subdomain_ids);
+              if (use_new_header_type)
+                io.data(subdomain_ids);
+              else
+                {
+                  std::vector<old_header_id_type> temp;
+                  io.data(temp);
+                  subdomain_ids.assign(temp.begin(), temp.end());
+                }
+
               io.data(subdomain_names);
             }
         }
@@ -1524,7 +1579,7 @@ void XdrIO::read_serialized_subdomain_names(Xdr & io)
 
 
 template <typename T>
-void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, std::vector<header_id_type> & sizes, T)
+void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, std::vector<new_header_id_type> & sizes, T)
 {
   libmesh_assert (io.reading());
 
@@ -1879,9 +1934,18 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
   std::vector<DofBCData> dof_bc_data;
   std::vector<T> input_buffer;
 
-  header_id_type n_bcs=0;
+  new_header_id_type n_bcs=0;
   if (this->processor_id() == 0)
-    io.data (n_bcs);
+    {
+      if (this->version_at_least_1_3_0())
+        io.data (n_bcs);
+      else
+        {
+          old_header_id_type temp;
+          io.data (temp);
+          n_bcs = temp;
+        }
+    }
   this->comm().broadcast (n_bcs);
 
   for (std::size_t blk=0, first_bc=0, last_bc=0; last_bc<n_bcs; blk++)
@@ -2002,9 +2066,18 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
   std::vector<DofBCData> node_bc_data;
   std::vector<T> input_buffer;
 
-  header_id_type n_nodesets=0;
+  new_header_id_type n_nodesets=0;
   if (this->processor_id() == 0)
-    io.data (n_nodesets);
+    {
+      if (this->version_at_least_1_3_0())
+        io.data (n_nodesets);
+      else
+        {
+          old_header_id_type temp;
+          io.data (temp);
+          n_nodesets = temp;
+        }
+    }
   this->comm().broadcast (n_nodesets);
 
   for (std::size_t blk=0, first_bc=0, last_bc=0; last_bc<n_nodesets; blk++)
@@ -2063,23 +2136,37 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
 void XdrIO::read_serialized_bc_names(Xdr & io, BoundaryInfo & info, bool is_sideset)
 {
   const bool read_entity_info = version_at_least_0_9_2();
+  const bool use_new_header_type (this->version_at_least_1_3_0());
   if (read_entity_info)
     {
-      header_id_type n_boundary_names = 0;
-      std::vector<header_id_type> boundary_ids;
+      new_header_id_type n_boundary_names = 0;
+      std::vector<new_header_id_type> boundary_ids;
       std::vector<std::string>  boundary_names;
 
       // Read the sideset names
       if (this->processor_id() == 0)
         {
-          io.data(n_boundary_names);
+          if (use_new_header_type)
+            io.data(n_boundary_names);
+          else
+            {
+              old_header_id_type temp;
+              io.data(temp);
+              n_boundary_names = temp;
+            }
 
-          boundary_ids.resize(n_boundary_names);
           boundary_names.resize(n_boundary_names);
 
           if (n_boundary_names)
             {
-              io.data(boundary_ids);
+              if (use_new_header_type)
+                io.data(boundary_ids);
+              else
+                {
+                  std::vector<old_header_id_type> temp(n_boundary_names);
+                  io.data(temp);
+                  boundary_ids.assign(temp.begin(), temp.end());
+                }
               io.data(boundary_names);
             }
         }
@@ -2099,7 +2186,7 @@ void XdrIO::read_serialized_bc_names(Xdr & io, BoundaryInfo & info, bool is_side
         info.set_sideset_name_map() : info.set_nodeset_name_map();
 
       for (unsigned int i=0; i<n_boundary_names; ++i)
-        boundary_map.insert(std::make_pair(boundary_ids[i], boundary_names[i]));
+        boundary_map.insert(std::make_pair(cast_int<boundary_id_type>(boundary_ids[i]), boundary_names[i]));
     }
 }
 
