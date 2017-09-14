@@ -241,7 +241,7 @@
 /* Flag indicating whether compiler supports constexpr */
 #undef HAVE_CXX11_CONSTEXPR
 
-/* Compiler supports constexper, but it is disabled in libmesh */
+/* Compiler supports constexpr, but it is disabled in libmesh */
 #undef HAVE_CXX11_CONSTEXPR_BUT_DISABLED
 
 /* Flag indicating whether compiler supports decltype */
@@ -732,7 +732,7 @@
 /* header file for the final detected unordered_set type */
 #undef INCLUDE_UNORDERED_SET
 
-/* libMesh I/O file format compatiblity string */
+/* libMesh I/O file format compatibility string */
 #undef IO_COMPATIBILITY_VERSION
 
 /* libMesh source code version */
@@ -866,7 +866,7 @@
 /* size of unique_id */
 #undef UNIQUE_ID_BYTES
 
-/* Flag indicating if the library should be built using complxex numbers */
+/* Flag indicating if the library should be built using complex numbers */
 #undef USE_COMPLEX_NUMBERS
 
 /* Flag indicating if the library should be built using real numbers */
