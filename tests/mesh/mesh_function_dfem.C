@@ -118,7 +118,7 @@ protected:
     }
 
     // libMesh will renumber, but we numbered according to its scheme
-    // anyway. We do this because when we call uniformly_refine subsequenly,
+    // anyway. We do this because when we call uniformly_refine subsequently,
     // it's going use skip_renumber=false.
     _mesh->prepare_for_use(false /*skip_renumber*/);
 

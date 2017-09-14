@@ -64,7 +64,7 @@ protected:
         _internal_boundary_mesh->skip_partitioning(true);
       }
 
-    // Set subdomain ids for specfic elements. This allows us to later
+    // Set subdomain ids for specific elements. This allows us to later
     // build an internal sideset with respect to a given
     // subdomain. The element subdomains look like:
     // ___________________

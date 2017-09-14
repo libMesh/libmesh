@@ -65,7 +65,7 @@ public:
 
     v.restore_array();
 
-    // Test getting a read only array after getting a writeable array
+    // Test getting a read only array after getting a writable array
     values = v.get_array();
     read_only_values = v.get_array_read();
     CPPUNIT_ASSERT_EQUAL((intptr_t)read_only_values, (intptr_t)values);

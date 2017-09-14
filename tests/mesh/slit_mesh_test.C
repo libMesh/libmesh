@@ -75,7 +75,7 @@ public:
 class SlitMeshTest : public CppUnit::TestCase {
   /**
    * The goal of this test is to ensure that a 2D mesh with nodes overlapping
-   * on opposite sides of an internal, "slit" edge is useable.
+   * on opposite sides of an internal, "slit" edge is usable.
    */
 public:
   CPPUNIT_TEST_SUITE( SlitMeshTest );
