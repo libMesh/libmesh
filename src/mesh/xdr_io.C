@@ -102,6 +102,17 @@ struct CompareIntDofBCData
   }
 };
 #endif
+
+template <class T, class U>
+struct libmesh_type_is_same {
+  static const bool value = false;
+};
+
+template <class T>
+struct libmesh_type_is_same<T, T> {
+  static const bool value = true;
+};
+
 }
 
 
@@ -128,7 +139,7 @@ XdrIO::XdrIO (MeshBase & mesh, const bool binary_in) :
   _write_unique_id    (false),
 #endif
   _field_width        (4),   // In 0.7.0, all fields are 4 bytes, in 0.9.2+ they can vary
-  _version            ("libMesh-1.1.0"),
+  _version            ("libMesh-1.3.0"),
   _bc_file_name       ("n/a"),
   _partition_map_file ("n/a"),
   _subdomain_map_file ("n/a"),
@@ -1387,7 +1398,19 @@ void XdrIO::read (const std::string & name)
   if (version_at_least_0_9_2())
     _field_width = meta_data[2];
 
-  if (_field_width == 4)
+  // On systems where uint64_t==unsigned long, we were previously
+  // writing 64-bit unsigned integers via xdr_u_long(), a function
+  // which is literally less suited for that task than abort() would
+  // have been, because at least abort() would have *known* it
+  // couldn't write rather than truncating writes to 32 bits.
+  //
+  // If we have files with version < 1.3.0, then we'll continue to use
+  // 32 bit field width, regardless of whether the file thinks we
+  // should, whenever we're on a system where the problem would have
+  // occurred.
+  if ((_field_width == 4) ||
+      (!version_at_least_1_3_0() &&
+       libmesh_type_is_same<uint64_t, unsigned long>::value))
     {
       uint32_t type_size = 0;
 
@@ -2120,20 +2143,29 @@ bool XdrIO::version_at_least_0_9_2() const
   return
     (this->version().find("0.9.2") != std::string::npos) ||
     (this->version().find("0.9.6") != std::string::npos) ||
-    (this->version().find("1.1.0") != std::string::npos);
+    (this->version().find("1.1.0") != std::string::npos) ||
+    (this->version().find("1.3.0") != std::string::npos);
 }
 
 bool XdrIO::version_at_least_0_9_6() const
 {
   return
     (this->version().find("0.9.6") != std::string::npos) ||
-    (this->version().find("1.1.0") != std::string::npos);
+    (this->version().find("1.1.0") != std::string::npos) ||
+    (this->version().find("1.3.0") != std::string::npos);
 }
 
 bool XdrIO::version_at_least_1_1_0() const
 {
   return
-    (this->version().find("1.1.0") != std::string::npos);
+    (this->version().find("1.1.0") != std::string::npos) ||
+    (this->version().find("1.3.0") != std::string::npos);
+}
+
+bool XdrIO::version_at_least_1_3_0() const
+{
+  return
+    (this->version().find("1.3.0") != std::string::npos);
 }
 
 } // namespace libMesh

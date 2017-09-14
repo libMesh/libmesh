@@ -164,20 +164,39 @@ public:
   /**
    * \returns \p true if the current file has an XDR/XDA version that
    * matches or exceeds 0.9.2.
+   *
+   * As of this version we encode integer field widths, nodesets,
+   * subdomain names, boundary names, and element unique_id values (if
+   * they exist) into our files.
    */
   bool version_at_least_0_9_2() const;
 
   /**
    * \returns \p true if the current file has an XDR/XDA version that
    * matches or exceeds 0.9.6.
+   *
+   * In this version we add node unique_id values to our files, if
+   * they exist.
    */
   bool version_at_least_0_9_6() const;
 
   /**
    * \returns \p true if the current file has an XDR/XDA version that
    * matches or exceeds 1.1.0.
+   *
+   * In this version we add edge and shellface boundary conditions to
+   * our files.
    */
   bool version_at_least_1_1_0() const;
+
+  /**
+   * \returns \p true if the current file has an XDR/XDA version that
+   * matches or exceeds 1.3.0.
+   *
+   * In this version we fix handling of uint64_t binary values on
+   * Linux, which were previously miswritten as 32 bit via xdr_long.
+   */
+  bool version_at_least_1_3_0() const;
 
 private:
 
