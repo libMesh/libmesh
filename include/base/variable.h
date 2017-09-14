@@ -129,7 +129,7 @@ public:
    * \returns \p true if this variable is active on subdomain \p sid,
    * \p false otherwise.
    *
-   * \note We interperet the special case of an empty \p
+   * \note We interpret the special case of an empty \p
    * _active_subdomains container as active everywhere, i.e. for all
    * subdomains.
    */

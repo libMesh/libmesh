@@ -17,8 +17,8 @@
 
 
 // Open the mesh named in command line arguments,
-// update ids of one or more of the following enties
-// as perscribed on the command line:
+// update ids of one or more of the following entries
+// as prescribed on the command line:
 // blocks, sidesets and nodesets
 
 #include <iostream>
@@ -112,7 +112,7 @@ int main(int argc, char ** argv)
 
   for (unsigned char mask = 8; mask; mask/=2)
     {
-      // These are char *'s #defined in exodsuII_int.h
+      // These are char *'s #defined in exodusII_int.h
       switch (flags & mask)
         {
         case BLOCKS:
@@ -223,7 +223,7 @@ int main(int, char **)
 
 void handle_error(int error, std::string message)
 {
-  std::cout << "Error " << error << " occured while working with the netCDF API" << std::endl;
+  std::cout << "Error " << error << " occurred while working with the netCDF API" << std::endl;
   std::cout << message << std::endl;
 
   exit(1);

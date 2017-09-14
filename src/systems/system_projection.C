@@ -516,7 +516,7 @@ public:
 /**
  * This class implements projecting an arbitrary
  * boundary function to the current mesh.  This
- * may be exectued in parallel on multiple threads.
+ * may be executed in parallel on multiple threads.
  */
 class BoundaryProjectSolution
 {
@@ -992,7 +992,7 @@ void System::boundary_project_solution (const std::set<boundary_id_type> & b,
 
 
 /**
- * This method projects an arbitary boundary function onto the
+ * This method projects an arbitrary boundary function onto the
  * solution via L2 projections and nodal interpolations on each
  * element.
  */

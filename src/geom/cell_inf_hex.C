@@ -174,7 +174,7 @@ Real InfHex::quality (const ElemQuality q) const
     {
 
       /**
-       * Compue the min/max diagonal ratio.
+       * Compute the min/max diagonal ratio.
        * Source: CUBIT User's Manual.
        *
        * For infinite elements, we just only compute

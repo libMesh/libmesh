@@ -58,7 +58,7 @@ public:
    * the processor id, and a reference to a vector of data
    * to be sorted.  This vector is sorted by
    * the constructor, therefore, construction of
-   * a Sort object takes O(nlogn) time,
+   * a Sort object takes O(n log n) time,
    * where n is the length of the vector.
    */
   Sort (const Parallel::Communicator & comm,

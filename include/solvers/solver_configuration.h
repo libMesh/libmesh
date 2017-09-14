@@ -67,7 +67,7 @@ public:
    * This method can be called after the solver has failed (e.g. on
    * catching an exception thrown by a solver). It allows an appropriate
    * response to the failure, e.g. terminate the program, or change
-   * configuation options and try again.
+   * configuration options and try again.
    * \p solve_failure_count specifies the number of times we've tried to
    * recover from a failure.
    */

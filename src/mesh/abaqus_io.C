@@ -85,7 +85,7 @@ void add_eletype_entry(ElemType libmesh_elem_type,
 void init_eletypes ()
 {
   // This should happen only once.  The first time this method is
-  // called the eletypes data struture will be empty, and we will
+  // called the eletypes data structure will be empty, and we will
   // fill it.  Any subsequent calls will find an initialized
   // eletypes map and will do nothing.
   if (eletypes.empty())

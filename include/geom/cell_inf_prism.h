@@ -81,7 +81,7 @@ public:
   virtual unsigned int n_vertices() const libmesh_override { return 6; }
 
   /**
-   * \returns 6.  All infinite prismahedrals have 6 edges,
+   * \returns 6.  All infinite prisms have 6 edges,
    * 3 lying in the base, and 3 perpendicular to the base.
    */
   virtual unsigned int n_edges() const libmesh_override { return 6; }

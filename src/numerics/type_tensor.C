@@ -32,7 +32,7 @@ namespace libMesh
 
 
 // ------------------------------------------------------------
-// TypeTensor<T> class member funcions
+// TypeTensor<T> class member functions
 
 
 template <typename T>

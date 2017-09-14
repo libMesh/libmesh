@@ -67,7 +67,7 @@ int main (int argc, char ** argv)
   // Parse the input file
   GetPot infile("fem_system_ex3.in");
 
-  // Override input file arguments from the commannd line
+  // Override input file arguments from the command line
   infile.parse_command_line(argc, argv);
 
   // Read in parameters from the input file
@@ -212,7 +212,7 @@ int main (int argc, char ** argv)
       libmesh_assert_equal_to (n_timesteps, 1);
     }
   else
-    libmesh_error_msg(std::string("ERROR: invalud time_solver ")+time_solver);
+    libmesh_error_msg(std::string("ERROR: invalid time_solver ")+time_solver);
 
   // Initialize the system
   equation_systems.init ();

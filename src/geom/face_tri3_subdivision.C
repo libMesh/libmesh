@@ -69,7 +69,7 @@ void Tri3Subdivision::prepare_subdivision_properties()
   /*
    * Rotate ordered vertices such that ordered_nodes[0] is the
    * irregular vertex. Doing this once in advance lets the evaluation
-   * of subdivision interpolation be much more efficient afterwards.
+   * of subdivision interpolation be much more efficient afterward.
    */
   switch (irregular_idx)
     {

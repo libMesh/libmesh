@@ -394,7 +394,7 @@ void Parameters::print (std::ostream & os) const
 
 
 
-// Declare this now that Paramers::print() is defined.
+// Declare this now that Parameters::print() is defined.
 // By declaring this early we can use it in subsequent
 // methods.  Required for gcc-4.0.2 -- 11/30/2005, BSK
 inline

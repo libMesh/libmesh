@@ -118,7 +118,7 @@ void all_tri (MeshBase & mesh);
 /**
  * Smooth the mesh with a simple Laplace smoothing algorithm.  The mesh is
  * smoothed \p n_iterations times.  If the parameter \p power is 0, each
- * node is moved to the average postition of the neighboring connected
+ * node is moved to the average position of the neighboring connected
  * nodes. If \p power > 0, the node positions are weighted by their
  * distance.  The positions of higher order nodes, and nodes living in
  * refined elements, are calculated from the vertex positions of their

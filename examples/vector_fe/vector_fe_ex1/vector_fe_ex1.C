@@ -214,7 +214,7 @@ void assemble_poisson(EquationSystems & es,
   // boundary integration.
   UniquePtr<FEVectorBase> fe_face (FEVectorBase::build(dim, fe_type));
 
-  // Boundary integration requires one quadraure rule,
+  // Boundary integration requires one quadrature rule,
   // with dimensionality one less than the dimensionality
   // of the element.
   QGauss qface(dim-1, FIFTH);
@@ -311,7 +311,7 @@ void assemble_poisson(EquationSystems & es,
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
           // Now we will build the element matrix.  This involves
-          // a double loop to integrate the test funcions (i) against
+          // a double loop to integrate the test functions (i) against
           // the trial functions (j).
           for (std::size_t i=0; i<phi.size(); i++)
             for (std::size_t j=0; j<phi.size(); j++)

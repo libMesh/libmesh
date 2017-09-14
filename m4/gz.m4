@@ -5,7 +5,7 @@ AC_DEFUN([CONFIGURE_GZ],
 [
   AC_ARG_ENABLE(gzstreams,
                 AS_HELP_STRING([--disable-gzstreams],
-                               [build without gzstreams compressed I/O suppport]),
+                               [build without gzstreams compressed I/O support]),
                 [case "${enableval}" in
                   yes)  enablegz=yes ;;
                   no)  enablegz=no ;;
@@ -23,7 +23,7 @@ if (test "$have_zlib_h" != yes -o "$have_libz" != yes) ; then
   enablegz=no
 fi
 
-# If both tests succeded, continue the configuration process.
+# If both tests succeeded, continue the configuration process.
 if (test "$enablegz" = yes) ; then
   GZSTREAM_INCLUDE="-I\$(top_srcdir)/contrib/gzstream"
   GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"

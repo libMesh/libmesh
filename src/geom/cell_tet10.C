@@ -676,7 +676,7 @@ float Tet10::embedding_matrix (const unsigned int i,
   // libMesh::err << "jp=" << jp << std::endl;
   // libMesh::err << "kp=" << kp << std::endl;
 
-  // Call embedding matrx with permuted indices
+  // Call embedding matrix with permuted indices
   return this->_embedding_matrix[i][jp][kp];
 }
 

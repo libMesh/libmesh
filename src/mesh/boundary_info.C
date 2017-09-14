@@ -354,7 +354,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
       const Elem * boundary_elem = *el;
       const Elem * interior_parent = boundary_elem->interior_parent();
 
-      // Find out which side of interior_parent boundary_elem correponds to.
+      // Find out which side of interior_parent boundary_elem corresponds to.
       // Use centroid comparison as a way to check.
       unsigned char interior_parent_side_index = 0;
       bool found_matching_sides = false;

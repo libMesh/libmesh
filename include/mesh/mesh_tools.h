@@ -77,7 +77,7 @@ public:
 
 
 /**
- * \returns The sum over all the elemenents of the number
+ * \returns The sum over all the elements of the number
  * of nodes per element.
  *
  * This can be useful for partitioning hybrid meshes.  A feasible load
@@ -87,7 +87,7 @@ public:
 dof_id_type total_weight (const MeshBase & mesh);
 
 /**
- * \returns The sum over all the elemenents on processor \p pid
+ * \returns The sum over all the elements on processor \p pid
  * of nodes per element.
  *
  * This can be useful for partitioning hybrid meshes.  A feasible load
@@ -133,8 +133,8 @@ void find_boundary_nodes (const MeshBase & mesh,
 
 /**
  * \returns Two points defining a cartesian box that bounds the
- * mesh.  The first entry in the pair is the mininum, the second
- * is the maximim.
+ * mesh.  The first entry in the pair is the minimum, the second
+ * is the maximum.
  *
  * \deprecated Use create_bounding_box() instead.
  */
@@ -286,7 +286,7 @@ unsigned int n_local_levels(const MeshBase & mesh);
  * \returns The number of levels of refinement in the active mesh.
  *
  * Implemented by looping over all the active local elements and finding
- * the maximum level, then maxxing in parallel.
+ * the maximum level, then taking the max in parallel.
  */
 unsigned int n_active_levels(const MeshBase & mesh);
 
@@ -343,7 +343,7 @@ dof_id_type n_nodes (const MeshBase::const_node_iterator & begin,
 
 
 /**
- * Find the maxium h-refinement level in a mesh.
+ * Find the maximum h-refinement level in a mesh.
  */
 unsigned int max_level (const MeshBase & mesh);
 

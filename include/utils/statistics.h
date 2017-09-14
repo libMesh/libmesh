@@ -37,7 +37,7 @@ namespace libMesh
  * therefore has all of its useful features.  It was designed to not
  * have any internal state, i.e. no public or private data members.
  * Also, it was only designed for classes and types for which the
- * operators +,*,/ have meaining, specifically floats, doubles, ints,
+ * operators +,*,/ have meaning, specifically floats, doubles, ints,
  * etc.  The main reason for this design decision was to allow a
  * std::vector<> to be successfully cast to a StatisticsVector,
  * thereby enabling its additional functionality.  We do not
@@ -117,7 +117,7 @@ public:
   virtual Real median();
 
   /**
-   * A const version of the median funtion.  Requires twice the memory
+   * A const version of the median function.  Requires twice the memory
    * of original data set but does not change the original.
    */
   virtual Real median() const;

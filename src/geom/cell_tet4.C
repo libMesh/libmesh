@@ -410,7 +410,7 @@ float Tet4::embedding_matrix (const unsigned int i,
   // libMesh::err << "jp=" << jp << std::endl;
   // libMesh::err << "kp=" << kp << std::endl;
 
-  // Call embedding matrx with permuted indices
+  // Call embedding matrix with permuted indices
   return this->_embedding_matrix[i][jp][kp];
 }
 
@@ -468,7 +468,7 @@ float Tet4::embedding_matrix (const unsigned int i,
 //  value.  */
 //       if (first_05_in_embedding_matrix==libMesh::invalid_uint)
 // {
-//   /* First time, so just remeber this position.  */
+//   /* First time, so just remember this position.  */
 //   first_05_in_embedding_matrix = n;
 // }
 //       else

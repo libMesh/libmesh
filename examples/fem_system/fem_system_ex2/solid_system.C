@@ -246,7 +246,7 @@ bool SolidSystem::element_time_derivative(bool request_jacobian,
       // gradient
       material.init_for_qp(grad_u, qp);
 
-      // Aquire, scale and assemble residual and stiffness
+      // Acquire, scale and assemble residual and stiffness
       for (unsigned int i = 0; i < n_u_dofs; i++)
         {
           res.resize(dim);

@@ -57,7 +57,7 @@ public:
   template <typename MeshA, typename MeshB>
   void testSplitter(bool binary, bool using_distmesh)
   {
-    // The CheckpointIO-based spltter requires XDR.
+    // The CheckpointIO-based splitter requires XDR.
 #ifdef LIBMESH_HAVE_XDR
 
     // In this test, we partition the mesh into n_procs parts.  Don't

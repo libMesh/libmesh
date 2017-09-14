@@ -279,7 +279,7 @@ AC_ARG_ENABLE(everything,
 # -------------------------------------------------------------
 AC_ARG_ENABLE(unique-id,
               AS_HELP_STRING([--enable-unique-id],
-                             [build with unique id suppport]),
+                             [build with unique id support]),
               [case "${enableval}" in
                 yes)  enableuniqueid=yes ;;
                 no) enableuniqueid=no ;;
@@ -346,7 +346,7 @@ fi
 # -------------------------------------------------------------
 AC_ARG_ENABLE(amr,
               AS_HELP_STRING([--disable-amr],
-                             [build without adaptive mesh refinement (AMR) suppport]),
+                             [build without adaptive mesh refinement (AMR) support]),
               enableamr=$enableval,
               enableamr=yes)
 
@@ -364,7 +364,7 @@ fi
 # -------------------------------------------------------------
 AC_ARG_ENABLE(vsmoother,
               AS_HELP_STRING([--disable-vsmoother],
-                             [build without variational smoother suppport]),
+                             [build without variational smoother support]),
               enablevsmoother=$enableval,
               enablevsmoother=yes)
 
@@ -382,7 +382,7 @@ fi
 # -------------------------------------------------------------
 AC_ARG_ENABLE(periodic,
               AS_HELP_STRING([--disable-periodic],
-                             [build without periodic boundary condition suppport]),
+                             [build without periodic boundary condition support]),
               enableperiodic=$enableval,
               enableperiodic=yes)
 
@@ -418,7 +418,7 @@ fi
 # -------------------------------------------------------------
 AC_ARG_ENABLE(nodeconstraint,
               AS_HELP_STRING([--enable-nodeconstraint],
-                             [build with node constraints suppport]),
+                             [build with node constraints support]),
               enablenodeconstraint=$enableval,
               enablenodeconstraint=$enableeverything)
 
@@ -627,7 +627,7 @@ AC_ARG_ENABLE(complex,
 
 if test "$enablecomplex" != no ; then
   AC_DEFINE(USE_COMPLEX_NUMBERS, 1,
-     [Flag indicating if the library should be built using complxex numbers])
+     [Flag indicating if the library should be built using complex numbers])
   AC_MSG_RESULT(<<< Configuring library with complex number support >>>)
 
 else

@@ -53,7 +53,7 @@ extern "C"
   PetscErrorCode __libmesh_petsc_preconditioner_setup (void * ctx);
 
   /**
-   * This function is called by PETSc to acctually apply the preconditioner.
+   * This function is called by PETSc to actually apply the preconditioner.
    * ctx will hold the Preconditioner.
    */
   PetscErrorCode __libmesh_petsc_preconditioner_apply(void * ctx, Vec x, Vec y);

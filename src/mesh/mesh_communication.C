@@ -685,7 +685,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
 
   std::vector<dof_id_type> common_interface_node_list;
 
-  // we expect two classess of messages -
+  // we expect two classes of messages -
   // (1) incoming interface node lists, to which we will reply with our elements
   //     touching nodes in the list, and
   // (2) replies from the requests we sent off previously.
@@ -1001,7 +1001,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
           const std::vector<Elem *> & elems = it->second;
           libmesh_assert(elems.size());
 
-          // Make some fakey element iterators defining this vector of
+          // Make some fake element iterators defining this vector of
           // elements
           Elem * const * elempp = const_cast<Elem * const *>(&elems[0]);
           Elem * const * elemend = elempp+elems.size();

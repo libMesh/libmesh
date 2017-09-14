@@ -25,7 +25,7 @@
 #include "libmesh/mesh_input.h"
 #include "libmesh/mesh_output.h"
 
-// C++ inludes
+// C++ includes
 #include <cstddef>
 #include <map>
 #include <string>
@@ -83,7 +83,7 @@ public:
   virtual void write (const std::string &) libmesh_override;
 
   /**
-   * Set the flag indicationg if we should be verbose.
+   * Set the flag indicating if we should be verbose.
    */
   bool & verbose ();
 

@@ -43,7 +43,7 @@ class Point;
  * Use the constructors of the derived classes for creating new
  * objects. The required input of each derived class thwarts the
  * effective use of the commonly used \p build() member.  But
- * afterwards the virtual members allow the convenient and
+ * afterward the virtual members allow the convenient and
  * libMesh-common usage through a \p FunctionBase *.
  *
  * \note For functor objects for vector-valued variables, it is

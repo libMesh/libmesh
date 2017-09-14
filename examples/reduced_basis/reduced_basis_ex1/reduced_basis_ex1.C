@@ -33,7 +33,7 @@
 // dependent functions and a^q, f^q are parameter independent
 // operators (\mu denotes a parameter).
 //
-// We first attach the parameter dependent functions and paramater
+// We first attach the parameter dependent functions and parameter
 // independent operators to the RBSystem. Then in Offline mode, a
 // reduced basis space is generated and written out to the directory
 // "offline_data". In Online mode, the reduced basis data in

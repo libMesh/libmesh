@@ -210,7 +210,7 @@ typedef tbb::spin_mutex spin_mutex;
 
 /**
  * Recursive mutex.  Implements mutual exclusion by busy-waiting in user
- * space for the lock to be acquired.  The same thread can aquire the
+ * space for the lock to be acquired.  The same thread can acquire the
  * same lock multiple times
  */
 typedef tbb::recursive_mutex recursive_mutex;

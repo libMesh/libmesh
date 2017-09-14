@@ -29,7 +29,7 @@ namespace libMesh
 class MeshBase;
 
 /**
- * This class is repsonsible for reading an unstructured, triangulated
+ * This class is responsible for reading an unstructured, triangulated
  * surface in the standard OFF OOGL format.
  *
  * \author John W. Peterson

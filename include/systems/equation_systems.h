@@ -139,7 +139,7 @@ public:
   const T_sys & get_system (const std::string & name) const;
 
   /**
-   * \returns A writable referene to the system named \p name.
+   * \returns A writable reference to the system named \p name.
    * The template argument defines the return type.  For example,
    * const SteadySystem & sys = eq.get_system<SteadySystem> ("sys");
    * is an example of how the method might be used
@@ -157,7 +157,7 @@ public:
   const T_sys & get_system (const unsigned int num) const;
 
   /**
-   * \returns A writable referene to the system number \p num.
+   * \returns A writable reference to the system number \p num.
    * The template argument defines the return type.  For example,
    * const SteadySystem & sys = eq.get_system<SteadySystem> (0);
    * is an example of how the method might be used
@@ -171,7 +171,7 @@ public:
   const System & get_system (const std::string & name) const;
 
   /**
-   * \returns A writable referene to the system named \p name.
+   * \returns A writable reference to the system named \p name.
    */
   System & get_system (const std::string & name);
 
@@ -181,7 +181,7 @@ public:
   const System & get_system (const unsigned int num) const;
 
   /**
-   * \returns A writable referene to the system number \p num.
+   * \returns A writable reference to the system number \p num.
    */
   System & get_system (const unsigned int num);
 
@@ -484,7 +484,7 @@ protected:
   typedef std::map<std::string, System *>::iterator       system_iterator;
 
   /**
-   * Typedef for constatnt system iterators
+   * Typedef for constant system iterators
    */
   typedef std::map<std::string, System *>::const_iterator const_system_iterator;
 

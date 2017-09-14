@@ -55,7 +55,7 @@ namespace libMesh
 
 // As of 10/2/2012, this function implements a 'brute-force' adjoint based QoI
 // error estimator, using the following relationship:
-// Q(u) - Q(u_h) \aprrox - R( (u_h)_(h/2), z_(h/2) ) .
+// Q(u) - Q(u_h) \approx - R( (u_h)_(h/2), z_(h/2) ) .
 // where: Q(u) is the true QoI
 // u_h is the approximate primal solution on the current FE space
 // Q(u_h) is the approximate QoI
@@ -132,7 +132,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
               system.add_vector(liftfunc_name.str());
 
-              // Intialize lift with coarse adjoint solve associate with this flux QoI to begin with
+              // Initialize lift with coarse adjoint solve associate with this flux QoI to begin with
               system.get_vector(liftfunc_name.str()).init(system.get_adjoint_solution(j), false);
 
               // Build the actual lift using adjoint dirichlet conditions
@@ -464,7 +464,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // The global DOF indices, we will use these later on when we compute the element wise indicators
   std::vector<dof_id_type> dof_indices;
 
-  // Localize the global rhs and adjoint solution vectors (which might be shared on multiple processsors) onto a
+  // Localize the global rhs and adjoint solution vectors (which might be shared on multiple processors) onto a
   // local ghosted vector, this ensures each processor has all the dof_indices to compute an error indicator for
   // an element it owns
   UniquePtr<NumericVector<Number> > localized_projected_residual = NumericVector<Number>::build(system.comm());
@@ -600,7 +600,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   mesh.partitioner().reset(old_partitioner.release());
   mesh.allow_renumbering(old_renumbering_setting);
 
-  // Fiinally sum the vector of estimated error values.
+  // Finally sum the vector of estimated error values.
   this->reduce_error(error_per_cell, system.comm());
 
   // We don't take a square root here; this is a goal-oriented

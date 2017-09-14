@@ -482,7 +482,7 @@ void nedelec_one_compute_constraints (DofConstraints & /*constraints*/,
   }
   }
   */
-} // nedelec_one_compute_constrants()
+} // nedelec_one_compute_constraints()
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 } // anonymous namespace

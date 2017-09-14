@@ -29,7 +29,7 @@
 namespace libMesh
 {
 
-// Forward Delcarations
+// Forward declarations
 template <typename T> class DenseVectorBase;
 
 /**

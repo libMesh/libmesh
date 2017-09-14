@@ -83,7 +83,7 @@ std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
   // builds psi vector of form 1 x y z x^2 xy xz y^2 yz z^2 etc..
   // I haven't added 1D support here
   for (unsigned int poly_deg=0; poly_deg <= static_cast<unsigned int>(order) ; poly_deg++)
-    { // loop over all polynomials of total degreee = poly_deg
+    { // loop over all polynomials of total degree = poly_deg
 
       switch (dim)
         {
@@ -343,7 +343,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
           // global DOF indices
           std::vector<dof_id_type> dof_indices;
 
-          // Compute the approprite size for the patch projection matrices
+          // Compute the appropriate size for the patch projection matrices
           // and vectors;
           unsigned int matsize = element_order + 1;
           if (dim > 1)

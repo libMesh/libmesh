@@ -34,7 +34,7 @@ namespace libMesh
  * user will typically want to instantiate and use the
  * Mesh class in her applications, which is currently a simple
  * derived class of UnstructuredMesh.
- * In order to use the adaptive mesh refinment capabilities
+ * In order to use the adaptive mesh refinement capabilities
  * of the library, first instantiate a MeshRefinement object
  * with a reference to this class.  Then call the appropriate
  * refinement functions from that object.  To interact with the

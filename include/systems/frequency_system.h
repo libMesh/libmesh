@@ -211,7 +211,7 @@ protected:
   /**
    * Initializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
-   * The frequenices have to be set prior to calling
+   * The frequencies have to be set prior to calling
    * \p init().
    */
   virtual void init_data () libmesh_override;

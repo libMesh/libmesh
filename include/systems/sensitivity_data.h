@@ -32,7 +32,7 @@
 namespace libMesh
 {
 
-// Forward declaractions
+// Forward declarations
 class QoISet;
 
 /**

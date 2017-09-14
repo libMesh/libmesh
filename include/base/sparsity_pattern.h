@@ -30,7 +30,7 @@
 namespace libMesh
 {
 
-// Forward declaractions
+// Forward declarations
 class MeshBase;
 class DofMap;
 class CouplingMatrix;

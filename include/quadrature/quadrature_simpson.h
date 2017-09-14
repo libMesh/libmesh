@@ -27,7 +27,7 @@ namespace libMesh
 {
 
 /**
- * This class implemenets Simpson quadrature.
+ * This class implements Simpson quadrature.
  * This is the same thing as Newton-Cotes quadrature with three points.
  * Simpson's rule can integrate polynomials of degree three exactly.
  *

@@ -236,7 +236,7 @@ public:
 
   /**
    * Sets number of variables in each group associated with system \p s for this
-   * \p DofObject. Implicit in this is salso setting the number of \p VariableGroup
+   * \p DofObject. Implicit in this is also setting the number of \p VariableGroup
    * variable groups for the system.
    * Has the effect of setting the number of components
    * to 0 even when called even with (nvg == this->n_var_groups(s)).
@@ -329,12 +329,12 @@ public:
                           const unsigned int vg) const;
 
   /**
-   * An invaild \p id to distinguish an uninitialized \p DofObject
+   * An invalid \p id to distinguish an uninitialized \p DofObject
    */
   static const dof_id_type invalid_id = static_cast<dof_id_type>(-1);
 
   /**
-   * An invaild \p unique_id to distinguish an uninitialized \p DofObject
+   * An invalid \p unique_id to distinguish an uninitialized \p DofObject
    */
   static const unique_id_type invalid_unique_id = static_cast<unique_id_type>(-1);
 
@@ -399,7 +399,7 @@ private:
                                      const unsigned int var) const;
 
   /**
-   * A globally unique id, guarenteed not to change as the mesh is repartioned or adapted
+   * A globally unique id, guaranteed not to change as the mesh is repartitioned or adapted
    */
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   unique_id_type _unique_id;
@@ -483,7 +483,7 @@ private:
    * and nc is the number of components for this set of variables.
    *
    * It is hoped that by setting this to a power of two, an optimizing compiler
-   * will recgnize later that  #/ncv_magic is simply a bitshift
+   * will recognize later that  #/ncv_magic is simply a bitshift
    */
   static const index_t ncv_magic = 256; // = 2^8, in case we want to manually bitshift
   static const index_t ncv_magic_exp = 8; // Let's manually bitshift
@@ -822,7 +822,7 @@ dof_id_type DofObject::dof_number(const unsigned int s,
     return invalid_id;
 
   // otherwise the index is the first component
-  // index augemented by the component number
+  // index augmented by the component number
   else
     {
       const unsigned int

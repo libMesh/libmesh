@@ -107,7 +107,7 @@ protected:
   UniquePtr<NumericVector<Number> > _old_local_solution_rate;
 
   /**
-   * Serial vector of previous time step accleration \f$ \ddot{u}_n \f$
+   * Serial vector of previous time step acceleration \f$ \ddot{u}_n \f$
    */
   UniquePtr<NumericVector<Number> > _old_local_solution_accel;
 };

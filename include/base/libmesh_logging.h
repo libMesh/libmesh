@@ -36,7 +36,7 @@ namespace libMesh
 
 
 // Forward declaration, required when included
-// in perf_log.{C,h} because the preceeding
+// in perf_log.{C,h} because the preceding
 // #include "libmesh/perf_log.h" is ineffective.
 // Multiple inclusion avoidance problem...
 // LIBMESH_PERF_LOG_H already #define'd, but the

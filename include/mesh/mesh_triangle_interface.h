@@ -66,7 +66,7 @@ public:
 
   /**
    * The TriangulationType is used with the general triangulate function
-   * defind below.
+   * defined below.
    */
   enum TriangulationType
     {

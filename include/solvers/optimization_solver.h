@@ -42,7 +42,7 @@ template <typename T> class Preconditioner;
 
 /**
  * This base class can be inherited from to provide interfaces to
- * optimziation solvers from different packages like PETSc/TAO and
+ * optimization solvers from different packages like PETSc/TAO and
  * nlopt.
  *
  * \author David Knezevic

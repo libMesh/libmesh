@@ -339,7 +339,7 @@ void JumpErrorEstimator::estimate_error (const System & system,
                         this->coarse_n_flux_faces_increment();
                     }
                 } // end if (case1 || case2)
-            } // if (e->neigbor(n_e) != libmesh_nullptr)
+            } // if (e->neighbor(n_e) != libmesh_nullptr)
 
           // Otherwise, e is on the boundary.  If it happens to
           // be on a Dirichlet boundary, we need not do anything.
@@ -369,7 +369,7 @@ void JumpErrorEstimator::estimate_error (const System & system,
     } // End loop over active local elements
 
 
-  // Each processor has now computed the error contribuions
+  // Each processor has now computed the error contributions
   // for its local elements.  We need to sum the vector
   // and then take the square-root of each component.  Note
   // that we only need to sum if we are running on multiple

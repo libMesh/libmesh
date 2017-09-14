@@ -28,11 +28,11 @@
  *    - 4 and 6 noded infinite quadrilaterals (\p InfQuad4, \p InfQuad6).
  *
  *  - Generic 3D Finite Elements
- *    - 4 and 10 noded tetrahedrals (\p Tet4, \p Tet10).
- *    - 8, 20, and 27 noded hexahedrals (\p Hex8, \p Hex20, \p Hex27).
+ *    - 4 and 10 noded tetrahedra (\p Tet4, \p Tet10).
+ *    - 8, 20, and 27 noded hexahedra (\p Hex8, \p Hex20, \p Hex27).
  *    - 6, 15, and 18 noded prisms (\p Prism6, \p Prism15, \p Prism18).
  *    - 5, 13, and 14 noded pyramids (\p Pyramid5, \p Pyramid13, \p Pyramid14).
- *    - 8, 16, and 18 noded infinite hexahedrals (\p InfHex8, \p InfHex16, \p InfHex18).
+ *    - 8, 16, and 18 noded infinite hexahedra (\p InfHex8, \p InfHex16, \p InfHex18).
  *    - 6 and 12 noded infinite prisms (\p InfPrism6, \p InfPrism12).
  *
  *  - Generic Finite Element Families

@@ -119,7 +119,7 @@ public:
   void set_compression(bool b);
 
   /**
-   * Get a pointer to the VTK unstructed grid data structure.
+   * Get a pointer to the VTK unstructured grid data structure.
    */
   vtkUnstructuredGrid * get_vtk_grid();
 

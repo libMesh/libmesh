@@ -81,7 +81,7 @@ public:
   void write_dat (const std::string & name,
                   const unsigned int version=10) const;
 
-  // BSK - this functionality requires FORTRAN subrouitine calls,
+  // BSK - this functionality requires FORTRAN subroutine calls,
   //       and there is no need to "dirty up" \p libMesh with FORTRAN
   //       just to enable these methods.
   //   /**

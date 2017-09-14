@@ -30,7 +30,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/petsc_vector.h"
 
-// For some reason, the blocked matrix API calls below seem to break with PETSC 3.2 & presumably earier.
+// For some reason, the blocked matrix API calls below seem to break with PETSC 3.2 & presumably earlier.
 // For example:
 // [0]PETSC ERROR: --------------------- Error Message ------------------------------------
 // [0]PETSC ERROR: Nonconforming object sizes!

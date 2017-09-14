@@ -53,7 +53,7 @@ void add_cube_convex_hull_to_mesh(MeshBase & mesh, Point lower_limit, Point uppe
 // Begin the main program.
 int main (int argc, char ** argv)
 {
-  // Initialize libMesh and any dependent libaries, like in example 2.
+  // Initialize libMesh and any dependent libraries, like in example 2.
   LibMeshInit init (argc, argv);
 
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");

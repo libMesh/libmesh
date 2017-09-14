@@ -397,7 +397,7 @@ void UnstructuredMesh::all_first_order ()
 
       /**
        * If the second order element had any boundary conditions they
-       * should be transfered to the first-order element.  The old
+       * should be transferred to the first-order element.  The old
        * boundary conditions will be removed from the BoundaryInfo
        * data structure by insert_elem.
        */
@@ -580,7 +580,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * the new_elements list.  Note that this here
        * is the only point where \p full_ordered
        * is necessary.  The remaining code works well
-       * for either type of seconrd-order equivalent, e.g.
+       * for either type of second-order equivalent, e.g.
        * Hex20 or Hex27, as equivalents for Hex8
        */
       Elem * so_elem =
@@ -706,7 +706,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
       /**
        * If the linear element had any boundary conditions they
-       * should be transfered to the second-order element.  The old
+       * should be transferred to the second-order element.  The old
        * boundary conditions will be removed from the BoundaryInfo
        * data structure by insert_elem.
        *
@@ -1737,7 +1737,7 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
           {
             /*
              * Now handle the additional second_order nodes by calculating
-             * their position based on the vertex postitions
+             * their position based on the vertex positions
              * we do a second loop over the level elements
              */
             MeshBase::element_iterator       el  = mesh.level_elements_begin(refinement_level);

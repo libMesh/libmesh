@@ -473,7 +473,7 @@ void TaoOptimizationSolver<T>::solve ()
   // programmatically set tolerance and max. function evaluation
   // values when "-tao_type ipm" was specified on the command line: we
   // call TaoSetFromOptions twice (both before and after setting
-  // custom options programatically)
+  // custom options programmatically)
   ierr = TaoSetFromOptions(_tao);
   LIBMESH_CHKERR(ierr);
 

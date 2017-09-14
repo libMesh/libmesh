@@ -133,19 +133,19 @@ protected:
                                 const std::vector<Real> & vertex_distance_func);
 
   /**
-   * cutting algoritm in 1D.
+   * cutting algorithm in 1D.
    */
   void cut_1D(const Elem & elem,
               const std::vector<Real> & vertex_distance_func);
 
   /**
-   * cutting algoritm in 2D.
+   * cutting algorithm in 2D.
    */
   void cut_2D(const Elem & elem,
               const std::vector<Real> & vertex_distance_func);
 
   /**
-   * cutting algoritm in 3D.
+   * cutting algorithm in 3D.
    */
   void cut_3D(const Elem & elem,
               const std::vector<Real> & vertex_distance_func);

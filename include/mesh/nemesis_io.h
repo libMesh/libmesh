@@ -101,7 +101,7 @@ public:
                                  const std::vector<std::string> & names) libmesh_override;
 
   /**
-   * Set the flag indicationg if we should be verbose.
+   * Set the flag indicating if we should be verbose.
    */
   void verbose (bool set_verbosity);
 

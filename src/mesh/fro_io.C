@@ -133,7 +133,7 @@ void FroIO::write (const std::string & fname)
                   // a---b b---c c---d d---e
                   // and piece them together.
                   //
-                  // so, for an arbitray edge n0---n1, we build the
+                  // so, for an arbitrary edge n0---n1, we build the
                   // "forward_edges"  map n0-->n1
                   // "backward_edges" map n1-->n0
                   // and then start with one chain link, and add on...

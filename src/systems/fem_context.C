@@ -79,7 +79,7 @@ FEMContext::FEMContext (const System & sys, int extra_quadrature_order)
 void FEMContext::init_internal_data(const System & sys)
 {
   // Reserve space for the FEAbstract and QBase objects for each
-  // element dimension possiblity (0,1,2,3)
+  // element dimension possibility (0,1,2,3)
   _element_fe.resize(4);
   _side_fe.resize(4);
   _element_fe_var.resize(4);

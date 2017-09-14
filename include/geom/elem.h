@@ -755,7 +755,7 @@ public:
   virtual Order default_order () const = 0;
 
   /**
-   * \returns The centriod of the element. The centroid is
+   * \returns The centroid of the element. The centroid is
    * computed as the average of all the element vertices.
    *
    * This method is virtual since some derived elements
@@ -932,7 +932,7 @@ public:
   /**
    * \returns The higher-dimensional Elem for which this Elem is a face.
    *
-   * In some cases it is desireable to extract the boundary (or a subset thereof)
+   * In some cases it is desirable to extract the boundary (or a subset thereof)
    * of a D-dimensional mesh as a (D-1)-dimensional manifold.  In this case
    * we may want to know the 'parent' element from which the manifold elements
    * were extracted.  We can easily do that for the level-0 manifold elements
@@ -2570,7 +2570,7 @@ public:
 
   // Consults the parent Elem to determine if the side
   // is a boundary side.  Note: currently side N is a
-  // boundary side if nieghbor N is NULL.  Be careful,
+  // boundary side if neighbor N is NULL.  Be careful,
   // this could possibly change in the future?
   bool side_on_boundary() const
   {
@@ -2652,7 +2652,7 @@ Elem::side_iterator : variant_filter_iterator<Elem::Predicate, Elem *>
 } // namespace libMesh
 
 
-// Helper function for default caches in Elem subclases
+// Helper function for default caches in Elem subclasses
 
 #define LIBMESH_ENABLE_TOPOLOGY_CACHES                                  \
   virtual                                                               \

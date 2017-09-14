@@ -218,7 +218,7 @@ void assemble_ellipticdg(EquationSystems & es,
   DenseVector<Number> Fe;
 
   // Data structures to contain the element and neighbor boundary matrix
-  // contribution. This matrices will do the coupling beetwen the dofs of
+  // contribution. This matrices will do the coupling between the dofs of
   // the element and those of his neighbors.
   // Ken: matrix coupling elem and neighbor dofs
   DenseMatrix<Number> Kne;
@@ -264,14 +264,14 @@ void assemble_ellipticdg(EquationSystems & es,
       Fe.resize (n_dofs);
 
       // Now we will build the element interior matrix.  This involves
-      // a double loop to integrate the test funcions (i) against
+      // a double loop to integrate the test functions (i) against
       // the trial functions (j).
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         for (unsigned int i=0; i<n_dofs; i++)
           for (unsigned int j=0; j<n_dofs; j++)
             Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
 
-      // Now we adress boundary conditions.
+      // Now we address boundary conditions.
       // We consider Dirichlet bc imposed via the interior penalty method
       // The following loops over the sides of the element.
       // If the element has no neighbor on a side then that
@@ -284,7 +284,7 @@ void assemble_ellipticdg(EquationSystems & es,
               fe_elem_face->reinit(elem, side);
 
               UniquePtr<const Elem> elem_side (elem->build_side_ptr(side));
-              // h elemet dimension to compute the interior penalty penalty parameter
+              // h element dimension to compute the interior penalty penalty parameter
               const unsigned int elem_b_order = static_cast<unsigned int> (fe_elem_face->get_order());
               const double h_elem = elem->volume()/elem_side->volume() * 1./pow(elem_b_order, 2.);
 
@@ -399,7 +399,7 @@ void assemble_ellipticdg(EquationSystems & es,
 
                   // Now we will build the element and neighbor
                   // boundary matrices.  This involves
-                  // a double loop to integrate the test funcions
+                  // a double loop to integrate the test functions
                   // (i) against the trial functions (j).
                   for (unsigned int qp=0; qp<qface.n_points(); qp++)
                     {

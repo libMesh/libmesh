@@ -40,7 +40,7 @@ template <typename T> class SparseMatrix;
  * This class provides a specific system class.  It aims
  * at solving eigenvalue problems.  Currently, this class
  * is able  to handle standard eigenvalue problems
- * \p A*x=lambda*x  and generalited eigenvalue problems
+ * \p A*x=lambda*x  and generalized eigenvalue problems
  * \p A*x=lambda*B*x.
  *
  * \author Steffen Peterson
@@ -155,7 +155,7 @@ public:
   UniquePtr<SparseMatrix<Number> > matrix_B;
 
   /**
-   * The EigenSolver, definig which interface, i.e solver
+   * The EigenSolver, defining which interface, i.e solver
    * package to use.
    */
   UniquePtr<EigenSolver<Number> > eigen_solver;

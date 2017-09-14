@@ -193,7 +193,7 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
   libmesh_assert(!need_map_update);
 #endif
 
-  // Count the objectss to ask each processor about
+  // Count the objects to ask each processor about
   std::vector<dof_id_type>
     ghost_objects_from_proc(comm.size(), 0);
 
@@ -673,7 +673,7 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
               const Node & node = elem.node_ref(n);
 
               // This isn't a safe assertion in the case where we're
-              // synching processor ids
+              // syncing processor ids
               // libmesh_assert_equal_to (node->processor_id(), comm.rank());
 
               request_to_fill_id[i] = node.id();

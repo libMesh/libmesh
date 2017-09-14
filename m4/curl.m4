@@ -1,4 +1,4 @@
-# The CURL API allows one to interact with URLs programatically.
+# The CURL API allows one to interact with URLs programmatically.
 AC_DEFUN([CONFIGURE_CURL],
 [
   AC_ARG_ENABLE(curl,

@@ -114,7 +114,7 @@ protected:
  * The \p PerfLog class allows monitoring of specific events.
  * An event is defined by a unique string that functions as
  * a label.  Each time the event is executed data are recorded.
- * This class is particulary useful for finding performance
+ * This class is particularly useful for finding performance
  * bottlenecks.
  *
  * \author Benjamin Kirk
@@ -307,7 +307,7 @@ private:
 
 
 // ------------------------------------------------------------
-// PerfData class member funcions
+// PerfData class member functions
 inline
 void PerfData::start ()
 {
@@ -376,7 +376,7 @@ double PerfData::stopit ()
 
 
 // ------------------------------------------------------------
-// PerfLog class inline member funcions
+// PerfLog class inline member functions
 inline
 void PerfLog::push (const std::string & label,
                     const std::string & header)

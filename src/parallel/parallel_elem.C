@@ -468,7 +468,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
       libmesh_assert_equal_to (elem->level(), level);
       libmesh_assert_equal_to (elem->id(), id);
       //#ifdef LIBMESH_ENABLE_UNIQUE_ID
-      // No check for unqiue id sanity
+      // No check for unique id sanity
       //#endif
       libmesh_assert_equal_to (elem->processor_id(), processor_id);
       libmesh_assert_equal_to (elem->subdomain_id(), subdomain_id);

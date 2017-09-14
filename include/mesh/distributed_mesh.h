@@ -507,7 +507,7 @@ public:
 protected:
 
   /**
-   * The verices (spatial coordinates) of the mesh.
+   * The vertices (spatial coordinates) of the mesh.
    */
   mapvector<Node *, dof_id_type> _nodes;
 

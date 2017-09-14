@@ -36,7 +36,7 @@ class Elem;
  *
  * \author Benjamin S. Kirk
  * \date 2013
- * \brief Namespace providing access to reference geoemtric element types.
+ * \brief Namespace providing access to reference geometric element types.
  */
 namespace ReferenceElem
 {

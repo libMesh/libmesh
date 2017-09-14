@@ -38,8 +38,8 @@ namespace libMesh
 {
 /**
  * This class forms the base class for all other classes
- * that are expected to be implemented in paralel. Each
- * \p ParalelObject *requires* a \p Parallel::Communicator object
+ * that are expected to be implemented in parallel. Each
+ * \p ParallelObject *requires* a \p Parallel::Communicator object
  * for construction.
  *
  * \author Benjamin S. Kirk

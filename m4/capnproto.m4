@@ -2,7 +2,7 @@
 # The Reduced Basis code uses Cap'n Proto to write training data to
 # disk.  By default, we check for the Capn'n Proto installation files
 # in the directory provided to configure via --with-capnproto=xxx,
-# which is superceded by $CAPNPROTO_DIR if it is set.
+# which is superseded by $CAPNPROTO_DIR if it is set.
 # ----------------------------------------------------------------
 
 AC_DEFUN([CONFIGURE_CAPNPROTO],

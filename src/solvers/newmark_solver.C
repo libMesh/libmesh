@@ -108,7 +108,7 @@ void NewmarkSolver::compute_initial_accel()
   // We need to compute the initial acceleration based off of
   // the initial position and velocity and, thus, acceleration
   // is the unknown in diff_solver and not the displacement. So,
-  // We swap solution and acceleration. NewarkSolver::_general_residual
+  // We swap solution and acceleration. NewmarkSolver::_general_residual
   // will check _is_accel_solve and provide the correct
   // values to the FEMContext assuming this swap was made.
   this->_is_accel_solve = true;
@@ -259,7 +259,7 @@ bool NewmarkSolver::_general_residual (bool request_jacobian,
       request_jacobian = false;
     }
   // Otherwise, the unknowns are the displacements and everything is straight
-  // foward and is what you think it is
+  // forward and is what you think it is
   else
     {
       if (request_jacobian)

@@ -116,7 +116,7 @@ public:
                         const Elem * side);
 
   /**
-   * Initalizes the reference to physical element map for a side.
+   * Initializes the reference to physical element map for a side.
    * This is used for boundary integration.
    */
   template< unsigned int Dim>
@@ -615,19 +615,19 @@ protected:
   std::vector<Point> xyz;
 
   /**
-   * Vector of parital derivatives:
+   * Vector of partial derivatives:
    * d(x)/d(xi), d(y)/d(xi), d(z)/d(xi)
    */
   std::vector<RealGradient> dxyzdxi_map;
 
   /**
-   * Vector of parital derivatives:
+   * Vector of partial derivatives:
    * d(x)/d(eta), d(y)/d(eta), d(z)/d(eta)
    */
   std::vector<RealGradient> dxyzdeta_map;
 
   /**
-   * Vector of parital derivatives:
+   * Vector of partial derivatives:
    * d(x)/d(zeta), d(y)/d(zeta), d(z)/d(zeta)
    */
   std::vector<RealGradient> dxyzdzeta_map;

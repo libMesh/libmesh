@@ -1955,14 +1955,13 @@ Optional Features:
   --enable-legacy-using-namespace
                           add "using namespace libMesh" to libMesh headers
   --enable-everything     enable all non-conflicting options
-  --enable-unique-id      build with unique id suppport
+  --enable-unique-id      build with unique id support
   --enable-tracefiles     write stack trace files on unexpected errors
-  --disable-amr           build without adaptive mesh refinement (AMR)
-                          suppport
-  --disable-vsmoother     build without variational smoother suppport
-  --disable-periodic      build without periodic boundary condition suppport
+  --disable-amr           build without adaptive mesh refinement (AMR) support
+  --disable-vsmoother     build without variational smoother support
+  --disable-periodic      build without periodic boundary condition support
   --disable-dirichlet     build without Dirichlet boundary constraint support
-  --enable-nodeconstraint build with node constraints suppport
+  --enable-nodeconstraint build with node constraints support
   --enable-parmesh        Use distributed ParallelMesh as Mesh
   --disable-ghosted       Use dense instead of sparse/ghosted local vectors
   --disable-node-valence  Do not compute and store node valence values
@@ -1986,7 +1985,7 @@ Optional Features:
   --disable-hinnant-unique-ptr
                           build without Howard Hinnant's unique_ptr
                           implementation
-  --disable-petsc         build without PETSc iterative solver suppport
+  --disable-petsc         build without PETSc iterative solver support
   --enable-petsc-required Error if PETSc is not detected by configure
   --disable-slepc         build without SLEPc eigen solver support
   --disable-trilinos      build without Trilinos support
@@ -1994,19 +1993,19 @@ Optional Features:
                           Building Blocks
   --disable-pthreads      build without POSIX threading (pthreads) support
   --disable-openmp        Build without OpenMP Support
-  --disable-laspack       build without LASPACK iterative solver suppport
-  --disable-sfc           build without space-filling curves suppport
-  --disable-gzstreams     build without gzstreams compressed I/O suppport
-  --disable-bzip2         build without bzip2 compressed I/O suppport
-  --disable-xz            build without xz compressed I/O suppport
+  --disable-laspack       build without LASPACK iterative solver support
+  --disable-sfc           build without space-filling curves support
+  --disable-gzstreams     build without gzstreams compressed I/O support
+  --disable-bzip2         build without bzip2 compressed I/O support
+  --disable-xz            build without xz compressed I/O support
   --disable-tecio         build without Tecplot TecIO API support (from
                           source)
   --enable-tecplot        build with Tecplot binary file I/O support (using
                           distributed libraries)
-  --disable-metis         build without Metis graph partitioning suppport
+  --disable-metis         build without Metis graph partitioning support
   --disable-parmetis      build without Parmetis parallel graph partitioning
-                          suppport
-  --disable-tetgen        build without TetGen tetrahedrization library
+                          support
+  --disable-tetgen        build without TetGen tetrahedralization library
                           support
   --disable-triangle      build without Triangle Delaunay triangulation
                           library support
@@ -2028,7 +2027,7 @@ Optional Features:
   --enable-fparser-debugging
                           Build fparser with bytecode debugging functions
   --disable-cppunit       Build without cppunit C++ unit testing support
-  --disable-nanoflann     build without nanoflann KD-tree suppport
+  --disable-nanoflann     build without nanoflann KD-tree support
   --enable-curl           link against libcurl, for using the cURL API
 
 Optional Packages:
@@ -2088,7 +2087,7 @@ Optional Packages:
                           Path to X11 header files. E.g. /usr/include but
                           _not_ /usr/include/X11
   --with-metis=<internal,PETSc>
-                          metis to use. interal: build from contrib, PETSc:
+                          metis to use. internal: build from contrib, PETSc:
                           rely on PETSc
   --with-vtk-include=PATH Specify the path for VTK header files
   --with-vtk-lib=PATH     Specify the path for VTK libs
@@ -2131,9 +2130,9 @@ Some influential environment variables:
   libmesh_CPPFLAGS
               User-specified C/C++ preprocessor flags
   libmesh_CXXFLAGS
-              User-specified C++ compliation flags
+              User-specified C++ compilation flags
   libmesh_CFLAGS
-              User-specified C compliation flags
+              User-specified C compilation flags
   LT_SYS_LIBRARY_PATH
               User-defined run-time library search path.
   CPP         C preprocessor
@@ -6505,7 +6504,7 @@ fi
   #
   # note though than on OSX for example the XCode tools provide
   # a 'mpif77' which will be detected below but is actually an
-  # emtpy shell script wrapper.  Then the compiler will fail to
+  # empty shell script wrapper.  Then the compiler will fail to
   # make executables and we will wind up with static libraries
   # due to a bizarre chain of events.  So, add support for
   # --disable-fortran
@@ -8062,8 +8061,8 @@ fi
               ;;
 
           *)
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: Unknown Intel complier" >&5
-$as_echo "Unknown Intel complier" >&6; }
+              { $as_echo "$as_me:${as_lineno-$LINENO}: result: Unknown Intel compiler" >&5
+$as_echo "Unknown Intel compiler" >&6; }
               ;;
         esac
       ;;
@@ -9969,7 +9968,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
       template <typename T>
       T sum(T t) { return t; }
 
-      // Compute sum of arbitary number of passed parameters.
+      // Compute sum of arbitrary number of passed parameters.
       template <typename T, typename ...P>
       T sum(T t, P ...p)
       {
@@ -28980,9 +28979,9 @@ $as_echo "$ac_cv_path_SED" >&6; }
 
 
 # -------------------------------------------------------------
-# pkg-config - used to configure installed pakages.  We can
+# pkg-config - used to configure installed packages.  We can
 # use it to query our installed targets, if it exists.
-# Otherwise we caln fall back to libmesh-config.
+# Otherwise we can fall back to libmesh-config.
 #
 # Not required to build libmesh, but we can install a config
 # file so that users can use 'pkg-config libmesh ...'
@@ -39080,7 +39079,7 @@ if (test "$have_zlib_h" != yes -o "$have_libz" != yes) ; then
   enablegz=no
 fi
 
-# If both tests succeded, continue the configuration process.
+# If both tests succeeded, continue the configuration process.
 if (test "$enablegz" = yes) ; then
   GZSTREAM_INCLUDE="-I\$(top_srcdir)/contrib/gzstream"
   GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
@@ -42020,7 +42019,7 @@ $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
 $as_echo "<<< Configuring library with NetCDF version 3 support >>>" >&6; }
 
         # pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
-        # note this is maddness - we will run configure in the subdirectory v4, but not use it,
+        # note this is madness - we will run configure in the subdirectory v4, but not use it,
         # so this is nothing more than a hedge against that failing.  we need it to work for
         # 'make dist' to work
         libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
@@ -42033,7 +42032,7 @@ $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
 
         # building netcdf-4 requires that we support nested subpackages
         if (test "x$enablenested" = "xno"); then
-          as_fn_error $? "NetCDF v4 requres nested subpackages, try --enable-nested" "$LINENO" 5
+          as_fn_error $? "NetCDF v4 requires nested subpackages, try --enable-nested" "$LINENO" 5
         fi
 
         if (test "x$enablehdf5" = "xno"); then

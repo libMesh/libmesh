@@ -80,7 +80,7 @@ void init(triangulateio & t);
 void destroy(triangulateio & t, IO_Type);
 
 /**
- * Copies triangulation data computed by triange from a triangulateio object
+ * Copies triangulation data computed by triangle from a triangulateio object
  * to a LibMesh mesh.   This routine is used internally by the
  * MeshTools::Generation::build_delaunay_square(...) and
  * MeshTools::Generation::build_delaunay_square_with_hole(...) routines.

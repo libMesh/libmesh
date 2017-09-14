@@ -659,7 +659,7 @@ void Nemesis_IO::read (const std::string & base_filename)
                   nemhelper->node_num_map[local_node_idx] = global_node_idx;
 
                   // we are not really going to use my_next_node again, but we can
-                  // keep incrimenting it to track how many nodes we have added
+                  // keep incrementing it to track how many nodes we have added
                   // to the mesh
                   my_next_node++;
                 }
@@ -1096,7 +1096,7 @@ void Nemesis_IO::read (const std::string & base_filename)
   // For each nodeset,
   for (int nodeset=0; nodeset<nemhelper->num_node_sets; nodeset++)
     {
-      // Get the user-defined ID associcated with the nodeset
+      // Get the user-defined ID associated with the nodeset
       int nodeset_id = nemhelper->nodeset_ids[nodeset];
 
       if (_verbose)
@@ -1196,7 +1196,7 @@ void Nemesis_IO::write (const std::string & base_filename)
 
   nemhelper->create(nemesis_filename);
 
-  // Initialize data structures and write some global Nemesis-specifc data, such as
+  // Initialize data structures and write some global Nemesis-specific data, such as
   // communication maps, to file.
   nemhelper->initialize(nemesis_filename,mesh);
 

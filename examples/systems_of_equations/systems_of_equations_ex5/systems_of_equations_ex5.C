@@ -78,7 +78,7 @@ Real eval_elasticity_tensor(unsigned int i,
 // Begin the main program.
 int main (int argc, char ** argv)
 {
-  // Initialize libMesh and any dependent libaries
+  // Initialize libMesh and any dependent libraries
   LibMeshInit init (argc, argv);
 
   // This example requires a linear solver package.

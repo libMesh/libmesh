@@ -366,7 +366,7 @@ std::vector<dof_id_type> StatisticsVector<T>::cut_above(Real cut) const
 
 
 //------------------------------------------------------------
-// Explicit Instantions
+// Explicit Instantiations
 template class StatisticsVector<float>;
 template class StatisticsVector<double>;
 #ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION

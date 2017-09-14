@@ -142,7 +142,7 @@ public:
   /**
    * For the specified range of active elements, what other elements
    * currently living (whether local or ghosted) on this processor
-   * need to be coupled/ghosted to accomodate them?  Don't bother to
+   * need to be coupled/ghosted to accommodate them?  Don't bother to
    * return any results which already have processor_id p.
    *
    * This API is new, and we should replace "ignoring those on

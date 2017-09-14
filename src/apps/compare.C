@@ -24,7 +24,7 @@
 #include <string>
 #ifdef LIBMESH_HAVE_GETOPT_H
 // GCC 2.95.3 (and maybe others) do not include
-// getopt.h in unistd.h...  Hower IBM xlC has no
+// getopt.h in unistd.h...  However IBM xlC has no
 // getopt.h!  This works around that.
 #include <getopt.h>
 #endif
@@ -119,7 +119,7 @@ void process_cmd_line(int argc,
             if (names.empty())
               names.push_back(optarg);
             else
-              libmesh_error_msg("ERROR: Mesh file name must preceed left file name!");
+              libmesh_error_msg("ERROR: Mesh file name must precede left file name!");
             break;
           }
 
@@ -143,7 +143,7 @@ void process_cmd_line(int argc,
                 left_name_set = true;
               }
             else
-              libmesh_error_msg("ERROR: Mesh file name must preceed right file name!");
+              libmesh_error_msg("ERROR: Mesh file name must precede right file name!");
             break;
           }
 
@@ -155,7 +155,7 @@ void process_cmd_line(int argc,
             if ((!names.empty()) && (left_name_set))
               names.push_back(optarg);
             else
-              libmesh_error_msg("ERROR: Mesh file name and left file name must preceed right file name!");
+              libmesh_error_msg("ERROR: Mesh file name and left file name must precede right file name!");
             break;
           }
 
@@ -323,7 +323,7 @@ int main (int argc, char ** argv)
 
 
   /**
-   * build the left and right mesh for left, inut them
+   * build the left and right mesh for left, init them
    */
   Mesh left_mesh  (init.comm(), dim);
   Mesh right_mesh (init.comm(), dim);
@@ -380,9 +380,9 @@ int main (int argc, char ** argv)
     {
       if (!quiet)
         libMesh::out << std::endl
-                     << " Oops, differences occured!"
+                     << " Oops, differences occurred!"
                      << std::endl
-                     << " Use -v to obtain more information where differences occured."
+                     << " Use -v to obtain more information where differences occurred."
                      << std::endl;
       our_result=1;
     }

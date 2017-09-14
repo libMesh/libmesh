@@ -96,7 +96,7 @@ public:
   virtual Real median() libmesh_override;
 
   /**
-   * A const version of the median funtion.
+   * A const version of the median function.
    * Requires twice the memory of original
    * data set but does not change the original.
    */

@@ -22,7 +22,7 @@
 #include <fstream>
 #ifdef LIBMESH_HAVE_GETOPT_H
 // GCC 2.95.3 (and maybe others) do not include
-// getopt.h in unistd.h...  Hower IBM xlC has no
+// getopt.h in unistd.h...  However IBM xlC has no
 // getopt.h!  This works around that.
 #include <getopt.h>
 #endif
@@ -109,7 +109,7 @@ void usage(const std::string & progName)
     // <<   "    -L                            Build the script L connectivity matrix \n"
            << "\n"
            << "\n"
-           << " This program is used to convert and partions from/to a variety of\n"
+           << " This program is used to convert and partition from/to a variety of\n"
            << " formats.  File types are inferred from file extensions.  For example,\n"
            << " the command:\n"
            << "\n"
@@ -606,7 +606,7 @@ int main (int argc, char ** argv)
    */
   if (names.size() == 3)
     {
-      // TODO: Read XDR/A mesh file, contstruct an EquationSystems
+      // TODO: Read XDR/A mesh file, construct an EquationSystems
       // object, read XDR/A solution file by calling
       // es.read(file, READ_HEADER|READ_DATA|READ_ADDITIONAL_DATA);
       // then store a localized copy of the solution vector into 'soln'.
@@ -793,7 +793,7 @@ int main (int argc, char ** argv)
    */
   if (dist_fact > 0.)
     {
-      libMesh::out << "Distoring the mesh by a factor of "
+      libMesh::out << "Distorting the mesh by a factor of "
                    << dist_fact
                    << std::endl;
 

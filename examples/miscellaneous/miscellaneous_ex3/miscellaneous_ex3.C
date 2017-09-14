@@ -133,7 +133,7 @@ private:
 // Begin the main program.
 int main (int argc, char ** argv)
 {
-  // Initialize libMesh and any dependent libaries, like in example 2.
+  // Initialize libMesh and any dependent libraries, like in example 2.
   LibMeshInit init (argc, argv);
 
   // This example requires a NonlinearSolver.
@@ -192,7 +192,7 @@ int main (int argc, char ** argv)
   if (command_line.search(2, "-FEFamily", "-f"))
     family = command_line.next(family);
 
-  // Cannot use dicontinuous basis.
+  // Cannot use discontinuous basis.
   if ((family == "MONOMIAL") || (family == "XYZ"))
     libmesh_error_msg("This example requires a C^0 (or higher) FE basis.");
 
@@ -251,7 +251,7 @@ int main (int argc, char ** argv)
                       Utility::string_to_enum<Order>   (order),
                       Utility::string_to_enum<FEFamily>(family));
 
-  // Consruct object which provides the residual and jacobian
+  // Construct object which provides the residual and jacobian
   // computations and tell the solver to use it.
   LaplaceYoung laplace_young;
   system.nonlinear_solver->residual_object = &laplace_young;
@@ -334,12 +334,12 @@ void LaplaceYoung::residual (const NumericVector<Number> & soln,
   // boundary integration.
   UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
 
-  // Boundary integration requires one quadraure rule,
+  // Boundary integration requires one quadrature rule,
   // with dimensionality one less than the dimensionality
   // of the element.
   QGauss qface(dim-1, FIFTH);
 
-  // Tell the finte element object to use our
+  // Tell the finite element object to use our
   // quadrature rule.
   fe_face->attach_quadrature_rule (&qface);
 
@@ -356,7 +356,7 @@ void LaplaceYoung::residual (const NumericVector<Number> & soln,
   // points.
   const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
 
-  // Define data structures to contain the resdual contributions
+  // Define data structures to contain the residual contributions
   DenseVector<Number> Re;
 
   // This vector will hold the degree of freedom indices for
@@ -562,7 +562,7 @@ void LaplaceYoung::jacobian (const NumericVector<Number> & soln,
                  dof_indices.size());
 
       // Now we will build the element Jacobian.  This involves
-      // a double loop to integrate the test funcions (i) against
+      // a double loop to integrate the test functions (i) against
       // the trial functions (j). Note that the Jacobian depends
       // on the current solution x, which we access using the soln
       // vector.

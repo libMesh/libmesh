@@ -69,7 +69,7 @@ void EigenSparseMatrix<T>::init ()
   // We need the DofMap for this!
   libmesh_assert(this->_dof_map);
 
-  // Clear intialized matrices
+  // Clear initialized matrices
   if (this->initialized())
     this->clear();
 

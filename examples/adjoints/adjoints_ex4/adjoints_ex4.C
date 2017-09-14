@@ -367,7 +367,7 @@ int main (int argc, char** argv)
         // solves the resulting system
         system.adjoint_solve();
 
-        // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+        // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unnecessarily in the error estimator
         system.set_adjoint_already_solved(true);
 
         // Get a pointer to the solution vector of the adjoint problem for QoI 0
@@ -442,7 +442,7 @@ int main (int argc, char** argv)
                      << std::endl
                      << std::endl;
 
-        // Also print out effecitivity indices (estimated error/true error)
+        // Also print out effectivity indices (estimated error/true error)
         libMesh::out << "The effectivity index for the computed error in QoI 0 is "
                      << std::setprecision(17)
                      << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) / std::abs(QoI_0_computed - QoI_0_exact)
@@ -526,7 +526,7 @@ int main (int argc, char** argv)
         linear_solver->reuse_preconditioner(param.reuse_preconditioner);
         system.adjoint_solve();
 
-        // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+        // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unnecessarily in the error estimator
         system.set_adjoint_already_solved(true);
 
         NumericVector<Number> & dual_solution_0 = system.get_adjoint_solution(0);
@@ -597,7 +597,7 @@ int main (int argc, char** argv)
                      << std::endl
                      << std::endl;
 
-        // Also print out effecitivity indices (estimated error/true error)
+        // Also print out effectivity indices (estimated error/true error)
         libMesh::out << "The effectivity index for the computed error in QoI 0 is "
                      << std::setprecision(17)
                      << std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) / std::abs(QoI_0_computed - QoI_0_exact)
@@ -611,7 +611,7 @@ int main (int argc, char** argv)
 
         // Hard coded assert to ensure that the actual numbers we are getting are what they should be
 
-        // The effectivity index isn't exactly reproduceable at single precision
+        // The effectivity index isn't exactly reproducible at single precision
         // libmesh_assert_less(std::abs(std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(0)) / std::abs(QoI_0_computed - QoI_0_exact) - 0.84010976704434637), 1.e-5);
         // libmesh_assert_less(std::abs(std::abs(adjoint_refinement_error_estimator->get_global_QoI_error_estimate(1)) / std::abs(QoI_1_computed - QoI_1_exact) - 0.48294428289950514), 1.e-5);
 

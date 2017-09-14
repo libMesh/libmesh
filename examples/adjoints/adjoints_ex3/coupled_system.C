@@ -405,7 +405,7 @@ void CoupledSystem::postprocess()
 // ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2} + ||e(u2 C,2_h)||_{L2} ||e(C^*)||_{L2}
 // These functions compute (u_1)_h or C,1_h , and (u_2)_h or C,2_h , and supply it to the weighted patch recovery error estimator
 // In CoupledFEMFunctionsx, the object built with var = 0, returns the (u_1)_h weight, while
-// the object built with var = 1, returns the C,1_h weight. The switch statment
+// the object built with var = 1, returns the C,1_h weight. The switch statement
 // distinguishes the behavior of the two objects
 // Same thing for CoupledFEMFunctionsy
 Number CoupledFEMFunctionsx::operator()(const FEMContext & c,

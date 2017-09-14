@@ -274,7 +274,7 @@ int main(int argc, char ** argv)
       rb_eval.legacy_read_offline_data_from_files();
 #endif
 
-      // Iinitialize online parameters
+      // Initialize online parameters
       Real online_x_scaling = infile("online_x_scaling", 0.);
       Real online_load_Fx   = infile("online_load_Fx",   0.);
       Real online_load_Fy   = infile("online_load_Fy",   0.);

@@ -64,7 +64,7 @@ using namespace libMesh;
 // Function prototype.  This function will assemble the system
 // matrix and right-hand-side at each time step.  Note that
 // since the system is linear we technically do not need to
-// assmeble the matrix at each time step, but we will anyway.
+// assemble the matrix at each time step, but we will anyway.
 // In subsequent examples we will employ adaptive mesh refinement,
 // and with a changing mesh it will be necessary to rebuild the
 // system matrix.
@@ -191,7 +191,7 @@ int main (int argc, char ** argv)
 
   for (unsigned int t_step = 0; t_step < 50; t_step++)
     {
-      // Incremenet the time counter, set the time and the
+      // Increment the time counter, set the time and the
       // time step size as parameters in the EquationSystem.
       system.time += dt;
 
@@ -233,7 +233,7 @@ int main (int argc, char ** argv)
       // Assemble & solve the linear system
       equation_systems.get_system("Convection-Diffusion").solve();
 
-      // Output evey 10 timesteps to file.
+      // Output every 10 timesteps to file.
       if ((t_step+1)%10 == 0)
         {
 

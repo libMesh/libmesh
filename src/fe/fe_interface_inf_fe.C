@@ -190,7 +190,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
         switch (fe_t.radial_family)
           {
           case INFINITE_MAP:
-            libmesh_error_msg("ERROR: INFINTE_MAP is not a valid shape family for radial approximation.");
+            libmesh_error_msg("ERROR: INFINITE_MAP is not a valid shape family for radial approximation.");
 
           case JACOBI_20_00:
             {
@@ -268,7 +268,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
         switch (fe_t.radial_family)
           {
           case INFINITE_MAP:
-            libmesh_error_msg("ERROR: INFINTE_MAP is not a valid shape family for radial approximation.");
+            libmesh_error_msg("ERROR: INFINITE_MAP is not a valid shape family for radial approximation.");
 
           case JACOBI_20_00:
             {
@@ -346,7 +346,7 @@ void FEInterface::ifem_nodal_soln(const unsigned int dim,
         switch (fe_t.radial_family)
           {
           case INFINITE_MAP:
-            libmesh_error_msg("ERROR: INFINTE_MAP is not a valid shape family for radial approximation.");
+            libmesh_error_msg("ERROR: INFINITE_MAP is not a valid shape family for radial approximation.");
 
           case JACOBI_20_00:
             {

@@ -298,7 +298,7 @@ void Nemesis_IO_Helper::get_node_map()
 
   if (verbose)
     {
-      // Remark: The Exodus/Nemesis node numbring is always (?) 1-based!  This means the first interior node id will
+      // Remark: The Exodus/Nemesis node numbering is always (?) 1-based!  This means the first interior node id will
       // always be == 1.
       libMesh::out << "[" << this->processor_id() << "] " << "first interior node id=" << node_mapi[0] << std::endl;
       libMesh::out << "[" << this->processor_id() << "] " << "last interior node id=" << node_mapi.back() << std::endl;
@@ -766,7 +766,7 @@ void Nemesis_IO_Helper::initialize(std::string title_in, const MeshBase & mesh, 
 
 
   // Gather global "initial" information for Nemesis.  This consists of
-  // three parts labelled I, II, and III below...
+  // three parts labeled I, II, and III below...
 
   //
   // I.) Need to compute the number of global element blocks.  To be consistent with
@@ -876,7 +876,7 @@ void Nemesis_IO_Helper::initialize(std::string title_in, const MeshBase & mesh, 
                       this->node_cmap_proc_ids);
 
 
-  // Ready the node maps.  These have nothing to do with communiction, they map
+  // Ready the node maps.  These have nothing to do with communication, they map
   // the nodes to internal, border, and external nodes in the file.
   this->compute_node_maps();
 
@@ -1791,7 +1791,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
                        << std::endl;
         }
 
-      // *it.first is the subodmain ID, *it.second is the number of elements it contains
+      // *it.first is the subdomain ID, *it.second is the number of elements it contains
       this->subdomain_map[ cur_subdomain ].reserve( it->second );
     }
 
@@ -2276,8 +2276,8 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
             {
               const ExodusII_IO_Helper::Conversion conv = em.assign_conversion(f.type());
 
-              // Use the libmesh to exodus datastructure map to get the proper sideset IDs
-              // The datastructure contains the "collapsed" contiguous ids.
+              // Use the libmesh to exodus data structure map to get the proper sideset IDs
+              // The data structure contains the "collapsed" contiguous ids.
               //
               // We know the parent element is local, but let's be absolutely sure that all the children have been
               // actually mapped to Exodus IDs before we blindly try to add them...
@@ -2407,7 +2407,7 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool /*us
   y.resize(local_num_nodes);
   z.resize(local_num_nodes);
 
-  // Just loop over our list outputing the nodes the way we built the map
+  // Just loop over our list outputting the nodes the way we built the map
   for (unsigned int i=0; i<local_num_nodes; ++i)
     {
       const Point & pt = mesh.point(this->exodus_node_num_to_libmesh[i]);

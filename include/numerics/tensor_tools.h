@@ -276,7 +276,7 @@ VectorValue<Number> curl_from_grad( const TensorValue<Number> & grad );
   curl of a tensor given the gradient of that tensor. */
 TensorValue<Number> curl_from_grad( const TypeNTensor<3,Number> & grad );
 
-//! Dummy. Divgerence of a scalar not defined, but is needed for ExactSolution to compile
+//! Dummy. Divergence of a scalar not defined, but is needed for ExactSolution to compile
 Number div_from_grad( const VectorValue<Number> & grad );
 
 //! Computes the divergence of a vector given the gradient of that vector

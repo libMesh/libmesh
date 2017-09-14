@@ -97,7 +97,7 @@ QuadratureType quad_type=INVALID_Q_RULE;
 // Begin the main program.
 int main (int argc, char ** argv)
 {
-  // Initialize libMesh and any dependent libaries, like in example 2.
+  // Initialize libMesh and any dependent libraries, like in example 2.
   LibMeshInit init (argc, argv);
 
   // This example requires a linear solver package.
@@ -242,7 +242,7 @@ void assemble_poisson(EquationSystems & es,
   // quadrature rules support this order.
   UniquePtr<QBase> qrule(QBase::build(quad_type, dim, THIRD));
 
-  // Tell the finte element object to use our
+  // Tell the finite element object to use our
   // quadrature rule.  Note that a UniquePtr<QBase> returns
   // a QBase* pointer to the object it handles with get().
   // However, using get(), the UniquePtr<QBase> qrule is
@@ -270,13 +270,13 @@ void assemble_poisson(EquationSystems & es,
   // THIRD));
   // \endverbatim
   // And again: using the UniquePtr<QBase> relaxes
-  // the need to delete the object afterwards,
+  // the need to delete the object afterward,
   // they clean up themselves.
   UniquePtr<QBase>  qface (QBase::build(quad_type,
                                         dim-1,
                                         THIRD));
 
-  // Tell the finte element object to use our
+  // Tell the finite element object to use our
   // quadrature rule.  Note that a UniquePtr<QBase> returns
   // a QBase* pointer to the object it handles with get().
   // However, using get(), the UniquePtr<QBase> qface is

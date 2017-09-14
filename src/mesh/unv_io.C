@@ -234,7 +234,7 @@ void UNVIO::read_implementation (std::istream & in_stream)
 #endif
 
     // Delete any lower-dimensional elements that might have been
-    // added to the mesh stricly for setting BCs.
+    // added to the mesh strictly for setting BCs.
     {
       // Grab reference to the Mesh
       MeshBase & mesh = MeshInput<MeshBase>::mesh();
@@ -905,7 +905,7 @@ void UNVIO::nodes_out (std::ostream & out_file)
   // A reference to the parent class's mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  // Use scientific notation with captial E and 16 digits for printing out the coordinates
+  // Use scientific notation with capital E and 16 digits for printing out the coordinates
   out_file << std::scientific << std::setprecision(16) << std::uppercase;
 
   MeshBase::const_node_iterator       nd  = mesh.nodes_begin();

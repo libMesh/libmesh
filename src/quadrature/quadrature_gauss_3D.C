@@ -165,7 +165,7 @@ void QGauss::init_3D(const ElemType type_in,
                 } // end if (allow_rules_with_negative_weights)
               else
                 {
-                  // If a rule with postive weights is required, the 2x2x2 conical
+                  // If a rule with positive weights is required, the 2x2x2 conical
                   // product rule is third-order accurate and has less points than
                   // the next-available positive-weight rule at FIFTH order.
                   QConical conical_rule(3, _order);
@@ -462,7 +462,7 @@ void QGauss::init_3D(const ElemType type_in,
               if ((allow_rules_with_negative_weights) && (_order + 2*p < 34))
                 {
                   // The Grundmann-Moller rules are defined to arbitrary order and
-                  // can have significantly fewer evaluation points than concial product
+                  // can have significantly fewer evaluation points than conical product
                   // rules.  If you allow rules with negative weights, the GM rules
                   // will be more efficient for degree up to 33 (for degree 34 and
                   // higher, CP is more efficient!) but may be more susceptible

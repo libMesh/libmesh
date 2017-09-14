@@ -70,7 +70,7 @@ extern "C" {
 // implementations, for example Sun Studio and PGI C++.  However,
 // this necessarily requires breaking the ISO-C++ standard, and is
 // really just a hack.  As such, only do it if we are building the
-// libmesh library itself.  Specifially, *DO NOT* export this to
+// libmesh library itself.  Specifically, *DO NOT* export this to
 // user code or install this header.
 #ifdef LIBMESH_IS_COMPILING_ITSELF
 #  include "libmesh/libmesh_augment_std_namespace.h"
@@ -255,9 +255,9 @@ extern bool warned_about_auto_ptr;
   } while (0)
 
 // the libmesh_stop() macro will stop the code until a SIGCONT signal
-// is recieved.  This is useful, for example, when determining the
+// is received.  This is useful, for example, when determining the
 // memory used by a given operation.  A libmesh_stop() could be
-// instered before and after a questionable operation and the delta
+// inserted before and after a questionable operation and the delta
 // memory can be obtained from a ps or top.  This macro only works for
 // serial cases.
 #define libmesh_stop()                                                  \

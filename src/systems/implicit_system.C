@@ -737,7 +737,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity (const QoISet & qoi_indic
 
   this->assemble_residual_derivatives(parameters_in);
 
-  // Get ready to fill in senstivities:
+  // Get ready to fill in sensitivities:
   sensitivities.allocate_data(qoi_indices, *this, parameters);
 
   // We use the identities:
@@ -843,7 +843,7 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity (const QoISet & qoi_indic
 
   this->sensitivity_solve(parameters);
 
-  // Get ready to fill in senstivities:
+  // Get ready to fill in sensitivities:
   sensitivities.allocate_data(qoi_indices, *this, parameters);
 
   // We use the identity:
@@ -950,7 +950,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
       this->adjoint_solve(qoi_indices);
     }
 
-  // Get ready to fill in senstivities:
+  // Get ready to fill in sensitivities:
   sensitivities.allocate_data(qoi_indices, *this, parameters);
 
   // We can't solve for all the solution sensitivities u'_l or for all
@@ -967,12 +967,12 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
   for (unsigned int k=0; k != Np; ++k)
     {
       // We approximate sum_l(w_l * Q''_{kl}) with a central
-      // differencing pertubation:
+      // differencing perturbation:
       // sum_l(w_l * Q''_{kl}) ~=
       // (Q(p + dp*w_l*e_l + dp*e_k) - Q(p - dp*w_l*e_l + dp*e_k) -
       // Q(p + dp*w_l*e_l - dp*e_k) + Q(p - dp*w_l*e_l - dp*e_k))/(4*dp^2)
 
-      // The sum(w_l*R''_kl) term requires the same sort of pertubation,
+      // The sum(w_l*R''_kl) term requires the same sort of perturbation,
       // and so we subtract it in at the same time:
       // sum_l(w_l * R''_{kl}) ~=
       // (R(p + dp*w_l*e_l + dp*e_k) - R(p - dp*w_l*e_l + dp*e_k) -

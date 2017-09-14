@@ -307,7 +307,7 @@ public:
 // Anonymous namespace for helper functions
 namespace {
 
-// Internal helper function to create vector<something_useable> from
+// Internal helper function to create vector<something_usable> from
 // vector<bool> for compatibility with MPI bitwise operations
 template <typename T>
 inline void pack_vector_bool(const std::vector<bool> & vec_in,
@@ -1018,7 +1018,7 @@ inline void Communicator::barrier () const {}
 #endif
 
 
-// legacy e.g. Paralell::send() methods, requires
+// legacy e.g. Parallel::send() methods, requires
 // Communicator_World
 #ifndef LIBMESH_DISABLE_COMMWORLD
 inline void barrier (const Communicator & comm = Communicator_World)
@@ -3730,7 +3730,7 @@ inline void Communicator::broadcast (std::vector<std::basic_string<T> > & data,
           for (std::size_t j=0; j != data[i].size(); ++j)
             /**
              * The strings will be packed in one long array with the size of each
-             * string preceeding the actual characters
+             * string preceding the actual characters
              */
             temp.push_back(data[i][j]);
         }

@@ -144,7 +144,7 @@ namespace GETPOT_NAMESPACE {
 #endif
 
 /**
- * GetPot - A class for parsing comand line arguments and
+ * GetPot - A class for parsing command line arguments and
  * configuration files.
  *
  * \author Frank R. Schaefer
@@ -283,7 +283,7 @@ public:
   inline const char* operator()(const std::string& VarName, const char* Default, unsigned Idx) const;
 
   /**
-   * access varibles, but error out if not present
+   * access variables, but error out if not present
    * scalar values
    */
   template<typename T>
@@ -495,7 +495,7 @@ private:
     const std::string* get_element(unsigned Idx) const;
 
     /**
-     * data memebers
+     * data members
      */
     std::string name;      // identifier of variable
     STRING_VECTOR value;     // value of variable stored in vector
@@ -522,7 +522,7 @@ private:
    * nominus vector
    */
   int nominus_cursor;  // cursor for nominus_pointers
-  std::vector<unsigned> idx_nominus;     // indecies of 'no minus' arguments
+  std::vector<unsigned> idx_nominus;     // indices of 'no minus' arguments
 
   /**
    * variables (arguments of the form "variable=value")
@@ -822,7 +822,7 @@ GetPot::parse_command_line(const int argc_, const char * const * argv_,
   for (int i=1; i<argc_; i++)
     {
       std::string tmp(argv_[i]);   // recall the problem with temporaries,
-      _apriori_argv.push_back(tmp);       // reference counting in arguement lists ...
+      _apriori_argv.push_back(tmp);       // reference counting in argument lists ...
     }
   _parse_argument_vector(_apriori_argv);
 }
@@ -1207,7 +1207,7 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
       if (equals_pos != std::string::npos)
         {
           // (*) record for later ufo detection
-          //     arguments carriying variables are always treated as 'requested' arguments.
+          //     arguments carrying variables are always treated as 'requested' arguments.
           //     unrequested variables have to be detected with the ufo-variable
           //     detection routine.
           if (request_recording_f)
@@ -2914,7 +2914,7 @@ GetPot::_DBE_get_variable(const std::string& VarName)
 
   prefix = secure_Prefix;
 
-  // error occured => variable name == ""
+  // error occurred => variable name == ""
   ev.original = "<<${ } variable '";
   ev.original += VarName + "' undefined>>";
   return &ev;
@@ -2929,7 +2929,7 @@ GetPot::_DBE_expand(const std::string& expr)
   if (expr[0] == ':')
     return expr.substr(1);
 
-  // ${& expr expr ... } text concatination
+  // ${& expr expr ... } text concatenation
   else if (expr[0] == '&')
     {
       const STRING_VECTOR A = _DBE_get_expr_list(expr.substr(1), 1);
@@ -3376,7 +3376,7 @@ GetPot::_DBE_expand(const std::string& expr)
       // error
       if (Var->name == "")
         {
-          // make a copy of the string if an error occured
+          // make a copy of the string if an error occurred
           // (since the error variable is a static variable inside get_variable())
           return std::string(Var->original);
         }
@@ -3411,7 +3411,7 @@ GetPot::_DBE_expand(const std::string& expr)
   const STRING_VECTOR    A = _DBE_get_expr_list(expr, 1);
   const GetPot::variable* B = _DBE_get_variable(A[0]);
 
-  // make a copy of the string if an error occured
+  // make a copy of the string if an error occurred
   // (since the error variable is a static variable inside get_variable())
   if (B->name == "")
     return std::string(B->original);

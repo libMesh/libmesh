@@ -243,7 +243,7 @@ public:
    * \param  a  Another AutoPtr of the same type.
    *
    * This object now owns the object previously owned by \p a, which has
-   * given up ownsership.
+   * given up ownership.
    */
   AutoPtr(AutoPtr & a)
     : _ptr(a.release())
@@ -257,7 +257,7 @@ public:
    * A pointer-to-Tp1 must be convertible to a pointer-to-Tp/element_type.
    *
    * This object now owns the object previously owned by \p a, which has
-   * given up ownsership.
+   * given up ownership.
    */
   template<typename Tp1>
   AutoPtr(AutoPtr<Tp1> & a)
@@ -270,7 +270,7 @@ public:
    * \param  a  Another AutoPtr of the same type.
    *
    * This object now owns the object previously owned by \p a, which has
-   * given up ownsership.  The object that this one used to own and
+   * given up ownership.  The object that this one used to own and
    * track has been deleted.
    */
   AutoPtr &
@@ -287,7 +287,7 @@ public:
    * A pointer-to-Tp1 must be convertible to a pointer-to-Tp/element_type.
    *
    * This object now owns the object previously owned by \p a, which has
-   * given up ownsership.  The object that this one used to own and
+   * given up ownership.  The object that this one used to own and
    * track has been deleted.
    */
   template <typename Tp1>

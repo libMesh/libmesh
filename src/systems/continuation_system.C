@@ -133,7 +133,7 @@ void ContinuationSystem::initialize_tangent()
   // Be sure the tangent was not already initialized.
   libmesh_assert (!tangent_initialized);
 
-  // Compute delta_s_zero, the initial arclength travelled during the
+  // Compute delta_s_zero, the initial arclength traveled during the
   // first step.  Here we assume that previous_u and lambda_old store
   // the previous solution and control parameter.  You may need to
   // read in an old solution (or solve the non-continuation system)
@@ -1224,7 +1224,7 @@ void ContinuationSystem::update_solution()
   previous_ds = ds_current;
 
   // // 1.) Cosine method (for some reason this always predicts the angle is ~0)
-  // // Don't try divinding by zero
+  // // Don't try dividing by zero
   // if ((yoldnorm > 1.e-12) && (ynorm > 1.e-12))
   //   tau = std::abs(yoldy) / yoldnorm  / ynorm;
   // else

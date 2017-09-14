@@ -784,7 +784,7 @@ void PetscVector<T>::init (const NumericVector<T> & other,
 
   this->_global_to_local_map = v._global_to_local_map;
 
-  // Even if we're initializeing sizes based on an uninitialized or
+  // Even if we're initializing sizes based on an uninitialized or
   // unclosed vector, *this* vector is being initialized now and is
   // initially closed.
   this->_is_closed      = true; // v._is_closed;

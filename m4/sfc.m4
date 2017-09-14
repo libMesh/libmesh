@@ -5,7 +5,7 @@ AC_DEFUN([CONFIGURE_SFC],
 [
   AC_ARG_ENABLE(sfc,
                 AS_HELP_STRING([--disable-sfc],
-                               [build without space-filling curves suppport]),
+                               [build without space-filling curves support]),
                 [case "${enableval}" in
                   yes)  enablesfc=yes ;;
                   no)  enablesfc=no ;;

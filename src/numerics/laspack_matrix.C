@@ -59,7 +59,7 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph & s
   }
 
 
-  // Initize the _csr data structure.
+  // Initialize the _csr data structure.
   {
     std::vector<numeric_index_type>::iterator position = _csr.begin();
 
@@ -155,7 +155,7 @@ void LaspackMatrix<T>::init ()
   // We need the DofMap for this!
   libmesh_assert(this->_dof_map);
 
-  // Clear intialized matrices
+  // Clear initialized matrices
   if (this->initialized())
     this->clear();
 

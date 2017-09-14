@@ -150,7 +150,7 @@ public:
    * \returns The actual set of dofs that the subset consists of.
    *
    * The result will contain local dofs on each processor only and
-   * will not contain duplictates.
+   * will not contain duplicates.
    */
   virtual const std::vector<unsigned int> & dof_ids () const libmesh_override;
 

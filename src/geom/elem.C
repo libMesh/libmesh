@@ -230,7 +230,7 @@ const unsigned int Elem::type_to_n_edges_map [] =
   };
 
 // ------------------------------------------------------------
-// Elem class member funcions
+// Elem class member functions
 UniquePtr<Elem> Elem::build(const ElemType type,
                             Elem * p)
 {
@@ -1861,7 +1861,7 @@ void Elem::family_tree_by_subneighbor (std::vector<const Elem *> & family,
   if (reset)
     family.clear();
 
-  // To simplifly this function we need an existing neighbor
+  // To simplify this function we need an existing neighbor
   libmesh_assert (neighbor_in);
   libmesh_assert_not_equal_to (neighbor_in, remote_elem);
   libmesh_assert (this->has_neighbor(neighbor_in));
@@ -1906,7 +1906,7 @@ void Elem::total_family_tree_by_subneighbor (std::vector<const Elem *> & family,
   if (reset)
     family.clear();
 
-  // To simplifly this function we need an existing neighbor
+  // To simplify this function we need an existing neighbor
   libmesh_assert (neighbor_in);
   libmesh_assert_not_equal_to (neighbor_in, remote_elem);
   libmesh_assert (this->has_neighbor(neighbor_in));

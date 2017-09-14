@@ -29,7 +29,7 @@
 #
 #   Your configure.ac script should contain both macros in this order, and
 #   unlike the earlier variations of this prefix-macro it is okay to place
-#   the AX_PREFIX_CONFIG_H call before the AC_OUTPUT invokation.
+#   the AX_PREFIX_CONFIG_H call before the AC_OUTPUT invocation.
 #
 #   Example:
 #

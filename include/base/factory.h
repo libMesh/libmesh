@@ -36,7 +36,7 @@ namespace libMesh
 
 
 /**
- * Factory class defintion.
+ * Factory class definition.
  *
  * \author Benjamin S. Kirk
  * \date 2002

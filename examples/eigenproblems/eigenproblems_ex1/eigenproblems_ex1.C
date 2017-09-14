@@ -122,7 +122,7 @@ int main (int argc, char ** argv)
   // function defined below.
   eigen_system.attach_assemble_function (assemble_mass);
 
-  // Set necessary parametrs used in EigenSystem::solve(),
+  // Set necessary parameters used in EigenSystem::solve(),
   // i.e. the number of requested eigenpairs nev and the number
   // of basis vectors ncv used in the solution algorithm. Note that
   // ncv >= nev must hold and ncv >= 2*nev is recommended.
@@ -276,7 +276,7 @@ void assemble_mass(EquationSystems & es,
       // the numeric integration.
       //
       // We will build the element matrix.  This involves
-      // a double loop to integrate the test funcions (i) against
+      // a double loop to integrate the test functions (i) against
       // the trial functions (j).
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         for (std::size_t i=0; i<phi.size(); i++)

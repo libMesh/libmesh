@@ -25,8 +25,8 @@ class ContainsPointTest : public CppUnit::TestCase
 {
   /**
    * The goal of this test is to verify proper operation of the contains_point
-   * method that is used extensively in the point locator. This test focusses on
-   * the specializes contains_point implementaion in TRI3.
+   * method that is used extensively in the point locator. This test focuses on
+   * the specializes contains_point implementation in TRI3.
    */
 public:
   CPPUNIT_TEST_SUITE( ContainsPointTest );
