@@ -1166,8 +1166,16 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   for (; it!=end; ++it)
     {
       const Elem * elem = *it;
-      subdomain_id_type cur_subdomain = elem->subdomain_id();
 
+      // We skip writing infinite elements to the Exodus file, so
+      // don't put them in the subdomain_map. That way the number of
+      // blocks should be correct.
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      if (elem->infinite())
+        continue;
+#endif
+
+      subdomain_id_type cur_subdomain = elem->subdomain_id();
       subdomain_map[cur_subdomain].push_back(elem->id());
     }
   num_elem_blk = cast_int<int>(subdomain_map.size());
@@ -1339,6 +1347,15 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   for (; mesh_it!=end; ++mesh_it)
     {
       const Elem * elem = *mesh_it;
+
+      // We skip writing infinite elements to the Exodus file, so
+      // don't put them in the subdomain_map. That way the number of
+      // blocks should be correct.
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      if (elem->infinite())
+        continue;
+#endif
+
       subdomain_map[ elem->subdomain_id() ].push_back(elem->id());
     }
 
@@ -1348,13 +1365,11 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   elem_num_map.resize(n_active_elem);
   std::vector<int>::iterator curr_elem_map_end = elem_num_map.begin();
 
-  std::vector<int> blkid;
-  std::vector<int> nelems;
-  std::vector<int> nnodes;
-  std::vector<int> nedges;
-  std::vector<int> nfaces;
-  std::vector<int> nattr;
-  NamesData types_table(num_elem_blk, MAX_STR_LENGTH);
+  std::vector<int> elem_blk_id;
+  std::vector<int> num_elem_this_blk_vec;
+  std::vector<int> num_nodes_per_elem_vec;
+  std::vector<int> num_attr_vec;
+  NamesData elem_type_table(num_elem_blk, MAX_STR_LENGTH);
 
   // Note: It appears that there is a bug in exodusII::ex_put_name where
   // the index returned from the ex_id_lkup is erroneously used.  For now
@@ -1372,49 +1387,30 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       // Get a reference to a vector of element IDs for this subdomain.
       subdomain_map_type::mapped_type & tmp_vec = (*it).second;
 
-      ExodusII_IO_Helper::ElementMaps em;
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-      // Skip infinite element-blocks; they can not be viewed in most visualization software
-      // as paraview.
-      if (mesh.elem_ref(tmp_vec[0]).infinite())
-        continue;
-#endif
       // Use the first element in this block to get representative information.
       // Note that Exodus assumes all elements in a block are of the same type!
       // We are using that same assumption here!
+      ExodusII_IO_Helper::ElementMaps em;
       const ExodusII_IO_Helper::Conversion conv =
         em.assign_conversion(mesh.elem_ref(tmp_vec[0]).type());
       num_nodes_per_elem = mesh.elem_ref(tmp_vec[0]).n_nodes();
 
-      blkid.push_back((*it).first);
-      types_table.push_back_entry(conv.exodus_elem_type().c_str());
-      nelems.push_back(tmp_vec.size());
-      nnodes.push_back(num_nodes_per_elem);
-      nedges.push_back(0);
-      nfaces.push_back(0);
-      nattr.push_back(0);
+      elem_blk_id.push_back((*it).first);
+      elem_type_table.push_back_entry(conv.exodus_elem_type().c_str());
+      num_elem_this_blk_vec.push_back(tmp_vec.size());
+      num_nodes_per_elem_vec.push_back(num_nodes_per_elem);
+      num_attr_vec.push_back(0); // we don't currently use elem block attributes.
     }
 
-  exII::ex_block_params blocks;
-  blocks.edge_blk_id = libmesh_nullptr;
-  blocks.edge_type = libmesh_nullptr;
-  blocks.num_edge_this_blk = libmesh_nullptr;
-  blocks.num_nodes_per_edge = libmesh_nullptr;
-  blocks.num_attr_edge = libmesh_nullptr;
-  blocks.face_blk_id = libmesh_nullptr;
-  blocks.face_type = libmesh_nullptr;
-  blocks.num_face_this_blk = libmesh_nullptr;
-  blocks.num_nodes_per_face = libmesh_nullptr;
-  blocks.num_attr_face = libmesh_nullptr;
-  blocks.elem_blk_id = &blkid[0];
-  blocks.elem_type = types_table.get_char_star_star();
-  blocks.num_elem_this_blk = &nelems[0];
-  blocks.num_nodes_per_elem = &nnodes[0];
-  blocks.num_edges_per_elem = &nedges[0];
-  blocks.num_faces_per_elem = &nfaces[0];
-  blocks.num_attr_elem = &nattr[0];
-  blocks.define_maps = 0;
-  ex_err = exII::ex_put_concat_all_blocks(ex_id, &blocks);
+  // The "define_maps" parameter should be 0 if node_number_map and
+  // elem_number_map will not be written later, and nonzero otherwise.
+  ex_err = exII::ex_put_concat_elem_block(ex_id,
+                                          &elem_blk_id[0],
+                                          elem_type_table.get_char_star_star(),
+                                          &num_elem_this_blk_vec[0],
+                                          &num_nodes_per_elem_vec[0],
+                                          &num_attr_vec[0],
+                                          /*define_maps=*/0);
   EX_CHECK_ERR(ex_err, "Error writing element blocks.");
 
   // This counter is used to fill up the libmesh_elem_num_to_exodus map in the loop below.
@@ -1427,17 +1423,10 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       // Get a reference to a vector of element IDs for this subdomain.
       subdomain_map_type::mapped_type & tmp_vec = (*it).second;
 
-      ExodusII_IO_Helper::ElementMaps em;
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-      // Skip infinite element-blocks; they can not be viewed in most visualization software
-      // as paraview.
-      if (mesh.elem_ref(tmp_vec[0]).infinite())
-        continue;
-#endif
-
       //Use the first element in this block to get representative information.
       //Note that Exodus assumes all elements in a block are of the same type!
       //We are using that same assumption here!
+      ExodusII_IO_Helper::ElementMaps em;
       const ExodusII_IO_Helper::Conversion conv =
         em.assign_conversion(mesh.elem_ref(tmp_vec[0]).type());
       num_nodes_per_elem = mesh.elem_ref(tmp_vec[0]).n_nodes();
