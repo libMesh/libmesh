@@ -71,8 +71,8 @@ enum PositionOfSpectrum {LARGEST_MAGNITUDE=0,
                          LARGEST_IMAGINARY,
                          SMALLEST_IMAGINARY,
                          TARGET_IMAGINARY,
-
-                         INVALID_Postion_of_Spectrum};
+                         INVALID_Postion_of_Spectrum,
+                         INVALID_POSITION_OF_SPECTRUM};
 }
 
 #endif // LIBMESH_ENUM_EIGENSOLVER_TYPE_H
