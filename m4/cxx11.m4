@@ -334,7 +334,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_CONSTEXPR],
         have_cxx11_constexpr=yes
       else
         AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_CONSTEXPR_BUT_DISABLED, 1, [Compiler supports constexper, but it is disabled in libmesh])
+        AC_DEFINE(HAVE_CXX11_CONSTEXPR_BUT_DISABLED, 1, [Compiler supports constexpr, but it is disabled in libmesh])
       fi
     ],[
         AC_MSG_RESULT(no)
@@ -773,7 +773,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_VARIADIC_TEMPLATES],
       template <typename T>
       T sum(T t) { return t; }
 
-      // Compute sum of arbitary number of passed parameters.
+      // Compute sum of arbitrary number of passed parameters.
       template <typename T, typename ...P>
       T sum(T t, P ...p)
       {

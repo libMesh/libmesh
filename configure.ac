@@ -247,7 +247,7 @@ AC_DEFINE_UNQUOTED(MICRO_VERSION,            [$AX_POINT_VERSION],  [libMesh micr
 AC_DEFINE_UNQUOTED(LIB_VERSION,              ["$VERSION"],         [libMesh version number])
 AC_DEFINE_UNQUOTED(LIB_RELEASE,              ["$BUILD_DEVSTATUS"], [libMesh source code version])
 AC_DEFINE_UNQUOTED(CXX,                      ["$CXX"],             [C++ compiler])
-AC_DEFINE_UNQUOTED(IO_COMPATIBILITY_VERSION, ["0.7.4"],            [libMesh I/O file format compatiblity string])
+AC_DEFINE_UNQUOTED(IO_COMPATIBILITY_VERSION, ["0.7.4"],            [libMesh I/O file format compatibility string])
 
 
 
@@ -279,9 +279,9 @@ AC_SUBST(SED)
 
 
 # -------------------------------------------------------------
-# pkg-config - used to configure installed pakages.  We can
+# pkg-config - used to configure installed packages.  We can
 # use it to query our installed targets, if it exists.
-# Otherwise we caln fall back to libmesh-config.
+# Otherwise we can fall back to libmesh-config.
 #
 # Not required to build libmesh, but we can install a config
 # file so that users can use 'pkg-config libmesh ...'

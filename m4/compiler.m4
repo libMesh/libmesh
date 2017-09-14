@@ -75,7 +75,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
   #
   # note though than on OSX for example the XCode tools provide
   # a 'mpif77' which will be detected below but is actually an
-  # emtpy shell script wrapper.  Then the compiler will fail to
+  # empty shell script wrapper.  Then the compiler will fail to
   # make executables and we will wind up with static libraries
   # due to a bizarre chain of events.  So, add support for
   # --disable-fortran
@@ -1009,7 +1009,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               ;;
 
           *)
-              AC_MSG_RESULT(Unknown Intel complier, "$GXX_VERSION")
+              AC_MSG_RESULT(Unknown Intel compiler, "$GXX_VERSION")
               ;;
         esac
       ;;

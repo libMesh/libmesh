@@ -5,7 +5,7 @@ AC_DEFUN([CONFIGURE_METIS],
 [
   AC_ARG_ENABLE(metis,
                 AS_HELP_STRING([--disable-metis],
-                               [build without Metis graph partitioning suppport]),
+                               [build without Metis graph partitioning support]),
                 [case "${enableval}" in
                   yes)  enablemetis=yes ;;
                   no)  enablemetis=no ;;
@@ -15,7 +15,7 @@ AC_DEFUN([CONFIGURE_METIS],
 
   AC_ARG_WITH(metis,
              AS_HELP_STRING([--with-metis=<internal,PETSc>],
-                            [metis to use. interal: build from contrib, PETSc: rely on PETSc]),
+                            [metis to use. internal: build from contrib, PETSc: rely on PETSc]),
              [case "${withval}" in
                internal)
                  build_metis=yes ;;

@@ -5,7 +5,7 @@ AC_DEFUN([CONFIGURE_NANOFLANN],
 [
   AC_ARG_ENABLE(nanoflann,
                 AS_HELP_STRING([--disable-nanoflann],
-                               [build without nanoflann KD-tree suppport]),
+                               [build without nanoflann KD-tree support]),
                 [case "${enableval}" in
                   yes)  enablenanoflann=yes ;;
                   no)  enablenanoflann=no ;;

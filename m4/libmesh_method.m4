@@ -29,8 +29,8 @@
 #  AM_CONDITIONAL(LIBMESH_DEVEL_MODE, test x$METHOD = xdevel)
 
 #  AC_ARG_VAR([libmesh_CPPFLAGS], [User-specified C/C++ preprocessor flags])
-#  AC_ARG_VAR([libmesh_CXXFLAGS], [User-specified C++ compliation flags])
-#  AC_ARG_VAR([libmesh_CFLAGS],   [User-specified C compliation flags])
+#  AC_ARG_VAR([libmesh_CXXFLAGS], [User-specified C++ compilation flags])
+#  AC_ARG_VAR([libmesh_CFLAGS],   [User-specified C compilation flags])
 
 #  case "${METHOD}" in
 #     opt)
@@ -122,8 +122,8 @@ AC_DEFUN([LIBMESH_SET_METHODS],
  AC_MSG_RESULT([<<< Configuring libMesh with methods "$METHODS" >>>])
 
  AC_ARG_VAR([libmesh_CPPFLAGS], [User-specified C/C++ preprocessor flags])
- AC_ARG_VAR([libmesh_CXXFLAGS], [User-specified C++ compliation flags])
- AC_ARG_VAR([libmesh_CFLAGS],   [User-specified C compliation flags])
+ AC_ARG_VAR([libmesh_CXXFLAGS], [User-specified C++ compilation flags])
+ AC_ARG_VAR([libmesh_CFLAGS],   [User-specified C compilation flags])
 
  build_opt=no
  build_dbg=no

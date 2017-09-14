@@ -5,7 +5,7 @@ AC_DEFUN([CONFIGURE_LASPACK],
 [
   AC_ARG_ENABLE(laspack,
                 AS_HELP_STRING([--disable-laspack],
-                               [build without LASPACK iterative solver suppport]),
+                               [build without LASPACK iterative solver support]),
                 [case "${enableval}" in
                   yes)  enablelaspack=yes ;;
                   no)  enablelaspack=no ;;

@@ -5,7 +5,7 @@ AC_DEFUN([CONFIGURE_PETSC],
 [
   AC_ARG_ENABLE(petsc,
                 AS_HELP_STRING([--disable-petsc],
-                               [build without PETSc iterative solver suppport]),
+                               [build without PETSc iterative solver support]),
                 [case "${enableval}" in
                   yes)  enablepetsc=yes ;;
                    no)  enablepetsc=no ;;

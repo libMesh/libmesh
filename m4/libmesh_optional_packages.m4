@@ -258,7 +258,7 @@ AC_CONFIG_FILES([contrib/gzstream/Makefile])
 # -------------------------------------------------------------
 AC_ARG_ENABLE(bzip2,
               AS_HELP_STRING([--disable-bzip2],
-                             [build without bzip2 compressed I/O suppport]),
+                             [build without bzip2 compressed I/O support]),
               enablebz2=$enableval,
               enablebz2=$enableoptional)
 
@@ -282,7 +282,7 @@ fi
 # -------------------------------------------------------------
 AC_ARG_ENABLE(xz,
               AS_HELP_STRING([--disable-xz],
-                             [build without xz compressed I/O suppport]),
+                             [build without xz compressed I/O support]),
               enablexz=$enableval,
               enablexz=$enableoptional)
 
