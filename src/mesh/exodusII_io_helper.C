@@ -1357,9 +1357,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   NamesData types_table(num_elem_blk, MAX_STR_LENGTH);
 
   // Note: It appears that there is a bug in exodusII::ex_put_name where
-  // the index returned from the ex_id_lkup is erronously used.  For now
+  // the index returned from the ex_id_lkup is erroneously used.  For now
   // the work around is to use the alternative function ex_put_names, but
-  // this function requires a char ** datastructure.
+  // this function requires a char ** data structure.
   NamesData names_table(num_elem_blk, MAX_STR_LENGTH);
 
   // counter indexes into the block_ids vector
@@ -1585,8 +1585,8 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
             const ExodusII_IO_Helper::Conversion conv =
               em.assign_conversion(mesh.elem_ptr(family[j]->id())->type());
 
-            // Use the libmesh to exodus datastructure map to get the proper sideset IDs
-            // The datastructure contains the "collapsed" contiguous ids
+            // Use the libmesh to exodus data structure map to get the proper sideset IDs
+            // The data structure contains the "collapsed" contiguous ids
             elem[il[i]].push_back(libmesh_elem_num_to_exodus[family[j]->id()]);
             side[il[i]].push_back(conv.get_inverse_side_map(sl[i]));
           }
@@ -1623,8 +1623,8 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
             const ExodusII_IO_Helper::Conversion conv =
               em.assign_conversion(mesh.elem_ptr(family[j]->id())->type());
 
-            // Use the libmesh to exodus datastructure map to get the proper sideset IDs
-            // The datastructure contains the "collapsed" contiguous ids
+            // Use the libmesh to exodus data structure map to get the proper sideset IDs
+            // The data structure contains the "collapsed" contiguous ids
             elem[il[i]].push_back(libmesh_elem_num_to_exodus[family[j]->id()]);
             side[il[i]].push_back(conv.get_inverse_shellface_map(sl[i]));
           }

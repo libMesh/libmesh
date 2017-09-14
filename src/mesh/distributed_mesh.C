@@ -749,7 +749,7 @@ void DistributedMesh::renumber_node(const dof_id_type old_id,
   // use, then those nodes will exist in _nodes, but may not be
   // locatable via a TopologyMap due to the insufficiency of elements
   // connecting to them.  If local refinement then wants to create a
-  // *new* node in the same location, it will initally get a temporary
+  // *new* node in the same location, it will initially get a temporary
   // id, and then make_node_ids_parallel_consistent() will try to move
   // it to the canonical id.  We need to account for this case to
   // avoid false positives and memory leaks.
@@ -1049,7 +1049,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
     requested_unique_ids(this->n_processors());
 #endif
 
-  // We know how many objects live on each processor, so reseve() space for
+  // We know how many objects live on each processor, so reserve() space for
   // each.
   for (processor_id_type p=0; p != this->n_processors(); ++p)
     if (p != this->processor_id())

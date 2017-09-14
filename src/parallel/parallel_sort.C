@@ -35,7 +35,7 @@ namespace Parallel {
 
 // The Constructor sorts the local data using
 // std::sort().  Therefore, the construction of
-// a Parallel::Sort object takes O(nlogn) time,
+// a Parallel::Sort object takes O(n log n) time,
 // where n is the length of _data.
 template <typename KeyType, typename IdxType>
 Sort<KeyType,IdxType>::Sort(const Parallel::Communicator & comm_in,

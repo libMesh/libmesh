@@ -124,7 +124,7 @@ public:
   { libmesh_not_implemented(); }
 
   /**
-   * Repartitions the \p MeshBase into \p n parts. (Some partitoning
+   * Repartitions the \p MeshBase into \p n parts. (Some partitioning
    * algorithms can repartition more efficiently than computing a new
    * partitioning from scratch.)  The default behavior is to simply
    * call this->partition(mesh,n).
@@ -134,7 +134,7 @@ public:
 
   /**
    * Repartitions the \p MeshBase into \p mesh.n_processors() parts.  This
-   * is required since some partitoning algorithms can repartition
+   * is required since some partitioning algorithms can repartition
    * more efficiently than computing a new partitioning from scratch.
    */
   void repartition (MeshBase & mesh);

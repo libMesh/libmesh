@@ -239,7 +239,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                                        const bool reset_current_list)
 {
   // We might actually want to run this on an empty mesh
-  // (e.g. the boundary mesh for a nonexistant bcid!)
+  // (e.g. the boundary mesh for a nonexistent bcid!)
   // libmesh_assert_not_equal_to (this->n_nodes(), 0);
   // libmesh_assert_not_equal_to (this->n_elem(), 0);
 
@@ -731,7 +731,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
     new_mesh.delete_remote_elements();
 
   // Fail if (*this == new_mesh), we cannot create a submesh inside ourself!
-  // This may happen if the user accidently passes the original mesh into
+  // This may happen if the user accidentally passes the original mesh into
   // this function!  We will check this by making sure we did not just
   // clear ourself.
   libmesh_assert_not_equal_to (this->n_nodes(), 0);

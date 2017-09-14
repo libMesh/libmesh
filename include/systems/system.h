@@ -87,9 +87,9 @@ public:
           const unsigned int number);
 
   /**
-   * Abstract base class to be used for sysem initialization.
+   * Abstract base class to be used for system initialization.
    * A user class derived from this class may be used to
-   * intialize the system values by attaching an object
+   * initialize the system values by attaching an object
    * with the method \p attach_init_object.
    */
   class Initialization
@@ -111,7 +111,7 @@ public:
 
 
   /**
-   * Abstract base class to be used for sysem assembly.
+   * Abstract base class to be used for system assembly.
    * A user class derived from this class may be used to
    * assemble the system by attaching an object
    * with the method \p attach_assemble_object.
@@ -135,7 +135,7 @@ public:
 
 
   /**
-   * Abstract base class to be used for sysem constraints.
+   * Abstract base class to be used for system constraints.
    * A user class derived from this class may be used to
    * constrain the system by attaching an object
    * with the method \p attach_constraint_object.
@@ -173,7 +173,7 @@ public:
     virtual ~QOI () {}
 
     /**
-     * Quantitiy of interest function.  This function will be called
+     * Quantity of interest function.  This function will be called
      * to compute quantities of interest and must be provided by the
      * user in a derived class.
      */
@@ -197,8 +197,8 @@ public:
     virtual ~QOIDerivative () {}
 
     /**
-     * Quantitiy of interest derivative function. This function will
-     * be called to compute derivatived of quantities of interest and
+     * Quantity of interest derivative function. This function will
+     * be called to compute derivatives of quantities of interest and
      * must be provided by the user in a derived class.
      */
     virtual void qoi_derivative (const QoISet & qoi_indices,
@@ -771,7 +771,7 @@ public:
   /**
    * Adds the additional vector \p vec_name to this system.  All the
    * additional vectors are similarly distributed, like the \p
-   * solution, and inititialized to zero.
+   * solution, and initialized to zero.
    *
    * By default vectors added by add_vector are projected to changed grids by
    * reinit().  To zero them instead (more efficient), pass "false" as the
@@ -1033,7 +1033,7 @@ public:
    * \returns The number of matrices
    * handled by this system.
    *
-   * This will return 0 by default but can be overriden.
+   * This will return 0 by default but can be overridden.
    */
   virtual unsigned int n_matrices () const;
 
@@ -1144,7 +1144,7 @@ public:
   const std::string & variable_name(const unsigned int i) const;
 
   /**
-   * \returns The variable number assoicated with
+   * \returns The variable number associated with
    * the user-specified variable named \p var.
    */
   unsigned short int variable_number (const std::string & var) const;
@@ -1659,7 +1659,7 @@ protected:
   /**
    * Initializes the data for the system.
    *
-   * \note This is called before any user-supplied intitialization
+   * \note This is called before any user-supplied initialization
    * function so that all required storage will be available.
    */
   virtual void init_data ();

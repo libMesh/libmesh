@@ -309,7 +309,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
 
     communicator.allgather (my_max, /* identical_buffer_sizes = */ true);
 
-    // Be cereful here.  The *_upper_bounds will be used to find the processor
+    // Be careful here.  The *_upper_bounds will be used to find the processor
     // a given object belongs to.  So, if a processor contains no objects (possible!)
     // then copy the bound from the lower processor id.
     for (processor_id_type p=0; p<communicator.size(); p++)
@@ -748,7 +748,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
 
   communicator.allgather (upper_bounds, /* identical_buffer_sizes = */ true);
 
-  // Be cereful here.  The *_upper_bounds will be used to find the processor
+  // Be careful here.  The *_upper_bounds will be used to find the processor
   // a given object belongs to.  So, if a processor contains no objects (possible!)
   // then copy the bound from the lower processor id.
   for (unsigned int p=1; p<communicator.size(); p++)

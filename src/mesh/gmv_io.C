@@ -98,7 +98,7 @@ void init_eletypes ()
   if (eletypes.empty())
     {
       // This should happen only once.  The first time this method
-      // is called the eletypes data struture will be empty, and
+      // is called the eletypes data structure will be empty, and
       // we will fill it.  Any subsequent calls will find an initialized
       // eletypes map and will do nothing.
 
@@ -2039,7 +2039,7 @@ void GMVIO::read (const std::string & name)
   // from GMV to libmesh indices, so initialize that data now.
   init_eletypes();
 
-  // Clear the mesh so we are sure to start from a pristeen state.
+  // Clear the mesh so we are sure to start from a pristine state.
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
   mesh.clear();
 
@@ -2345,7 +2345,7 @@ ElemType GMVIO::gmv_elem_to_libmesh_elem(std::string elemname)
   std::map<std::string, ElemType>::iterator it = _reading_element_map.find(elemname);
 
   if (it == _reading_element_map.end())
-    libmesh_error_msg("Uknown/unsupported element: " << elemname << " was read.");
+    libmesh_error_msg("Unknown/unsupported element: " << elemname << " was read.");
 
   return it->second;
 }
@@ -2378,7 +2378,7 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
   // that has the same variable key name.
   for (unsigned int sys=0; sys<es.n_systems(); ++sys)
     {
-      // Get a generic refernence to the current System
+      // Get a generic reference to the current System
       System & system = es.get_system(sys);
 
       // And a reference to that system's dof_map

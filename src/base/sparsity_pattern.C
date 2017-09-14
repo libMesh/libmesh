@@ -202,7 +202,7 @@ void Build::handle_vi_vj(const Elem * partner,
 void Build::operator()(const ConstElemRange & range)
 {
   // Compute the sparsity structure of the global matrix.  This can be
-  // fed into a PetscMatrix to allocate exacly the number of nonzeros
+  // fed into a PetscMatrix to allocate exactly the number of nonzeros
   // necessary to store the matrix.  This algorithm should be linear
   // in the (# of elements)*(# nodes per element)
   const processor_id_type proc_id           = mesh.processor_id();
@@ -223,7 +223,7 @@ void Build::operator()(const ConstElemRange & range)
       {
         const Elem * const elem = *elem_it;
 
-        // Make some fakey element iterators defining a range
+        // Make some fake element iterators defining a range
         // pointing to only this element.
         Elem * const * elempp = const_cast<Elem * const *>(&elem);
         Elem * const * elemend = elempp+1;

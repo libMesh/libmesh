@@ -445,7 +445,7 @@ public:
 protected:
 
   /**
-   * The verices (spatial coordinates) of the mesh.
+   * The vertices (spatial coordinates) of the mesh.
    */
   std::vector<Node *> _nodes;
 

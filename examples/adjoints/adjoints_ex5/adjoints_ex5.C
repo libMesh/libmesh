@@ -483,7 +483,7 @@ int main (int argc, char ** argv)
 
       // Since we have specified an adjoint solution for the current
       // time (T), set the adjoint_already_solved boolean to true, so
-      // we dont solve unneccesarily in the adjoint sensitivity method
+      // we dont solve unnecessarily in the adjoint sensitivity method
       system.set_adjoint_already_solved(true);
 
       libMesh::out << "|Z("
@@ -536,7 +536,7 @@ int main (int argc, char ** argv)
 
           // Now that we have solved the adjoint, set the
           // adjoint_already_solved boolean to true, so we dont solve
-          // unneccesarily in the error estimator
+          // unnecessarily in the error estimator
           system.set_adjoint_already_solved(true);
 
           libMesh::out << "|Z("
@@ -562,7 +562,7 @@ int main (int argc, char ** argv)
         }
       // End adjoint timestep loop
 
-      // Now that we have computed both the primal and adjoint solutions, we compute the sensitivties to the parameter p
+      // Now that we have computed both the primal and adjoint solutions, we compute the sensitivities to the parameter p
       // dQ/dp = partialQ/partialp - partialR/partialp
       // partialQ/partialp = (Q(p+dp) - Q(p-dp))/(2*dp), this is not supported by the library yet
       // partialR/partialp = (R(u,z;p+dp) - R(u,z;p-dp))/(2*dp), where

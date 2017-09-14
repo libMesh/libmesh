@@ -40,7 +40,7 @@ void CentroidPartitioner::partition_range(MeshBase & /*mesh*/,
 
   // Compute the element centroids.  Note: we used to skip this step
   // if the number of elements was unchanged from the last call, but
-  // that doesn't account for elements that have moved alot since the
+  // that doesn't account for elements that have moved a lot since the
   // last time the Partitioner was called...
   this->compute_centroids (it, end);
 

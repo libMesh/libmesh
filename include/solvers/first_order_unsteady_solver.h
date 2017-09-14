@@ -39,7 +39,7 @@ namespace libMesh
  * of the variable \f$u\f$ is 2 when adding the variable using
  * FEMSystem::time_evolving. This class will then add the \f$v\f$ variables
  * to the FEMSystem (named "dot_u" if the second order variable name is "u").
- * Sublasses will then need to make sure to use the function
+ * Subclasses will then need to make sure to use the function
  * FirstOrderUnsteadySolver::prepare_accel() to prepare data structures for the
  * users to use from FEMContext. Furthermore, subclasses will need to appropriately
  * call damping_residual functions. Finally, subclasses will call

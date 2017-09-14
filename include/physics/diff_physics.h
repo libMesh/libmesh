@@ -53,7 +53,7 @@ class DiffContext;
  * for unsteady TimeSolver and \f$ F(u) = 0\f$ for steady
  * TimeSolver. \f$F(u)\f$ is computed by element/side_time_derivative,
  * \f$G(u)\f$ is computed using element/side_constraint,
- * \f$C(u,\dot{u})\dot{u}\f$ is computed using the dampling_residual methods
+ * \f$C(u,\dot{u})\dot{u}\f$ is computed using the damping_residual methods
  * and \f$ -M(u,\ddot{u})\ddot{u}\f$ is computed using the mass_residual
  * methods. This is the sign convention used by the default implementation;
  * if the method is overridden, the user can choose any self-consistent sign
@@ -221,7 +221,7 @@ public:
    * should return false.
    *
    * Users may need to reimplement this for PDEs on systems to which
-   * SCALAR variables with non-tranient equations have been added.
+   * SCALAR variables with non-transient equations have been added.
    */
   virtual bool nonlocal_constraint (bool request_jacobian,
                                     DiffContext &) {
@@ -236,7 +236,7 @@ public:
    * behave like du/dt = F(u), and should not call time_evolving()
    * for any variables which behave like 0 = G(u).
    *
-   * Most derived systems will not have to reimplment this function; however
+   * Most derived systems will not have to reimplement this function; however
    * any system which reimplements mass_residual() may have to reimplement
    * time_evolving() to prepare data structures.
    *
@@ -258,7 +258,7 @@ public:
    * behave like d^2u/dt^2 = F(u), and should not call time_evolving()
    * for any variables which behave like 0 = G(u).
    *
-   * Most derived systems will not have to reimplment this function; however
+   * Most derived systems will not have to reimplement this function; however
    * any system which reimplements mass_residual() may have to reimplement
    * time_evolving() to prepare data structures.
    */

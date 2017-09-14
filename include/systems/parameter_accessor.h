@@ -47,7 +47,7 @@ class ConstParameterProxy;
  *
  * \author Roy Stogner
  * \date 2015
- * \brief Base class for reading/writing sensitivty parameters.
+ * \brief Base class for reading/writing sensitivity parameters.
  */
 template <typename T=Number>
 class ParameterAccessor

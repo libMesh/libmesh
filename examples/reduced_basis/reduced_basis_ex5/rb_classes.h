@@ -81,7 +81,7 @@ public:
     // Generate a DirichletBoundary object
     dirichlet_bc = build_zero_dirichlet_boundary_object();
 
-    // Set the Dirichet boundary condition
+    // Set the Dirichlet boundary condition
     dirichlet_bc->b.insert(BOUNDARY_ID_MIN_X); // Dirichlet boundary at x=0
     dirichlet_bc->variables.push_back(u_var);
     dirichlet_bc->variables.push_back(v_var);

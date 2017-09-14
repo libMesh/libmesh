@@ -39,7 +39,7 @@ namespace Parallel
 {
 
 /**
- * Defines a histogram to be used in parallel in conjuction with
+ * Defines a histogram to be used in parallel in conjunction with
  * a \p BinSorter.
  *
  * \author Benjamin S. Kirk

@@ -123,7 +123,7 @@ MeshfreeSolutionTransfer::transfer(const Variable & from_var,
       }
   }
 
-  // We have only set local values - prepare for use by gathering remote gata
+  // We have only set local values - prepare for use by gathering remote data
   idi.prepare_for_use();
 
   // Create a MeshlessInterpolationFunction that uses our

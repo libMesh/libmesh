@@ -43,7 +43,7 @@ namespace libMesh
 {
 
 /**
- * The DTKAdapter is used with the DTKSolutionTranfer object to adapt
+ * The DTKAdapter is used with the DTKSolutionTransfer object to adapt
  * libmesh data to the DTK interface.
  *
  * \author Derek Gaston

@@ -98,7 +98,7 @@ void NonlinearImplicitSystem::set_solver_parameters ()
   const EquationSystems & es =
     this->get_equation_systems();
 
-  // Get the user-specifiied nonlinear solver tolerances
+  // Get the user-specified nonlinear solver tolerances
   const unsigned int maxits =
     es.parameters.get<unsigned int>("nonlinear solver maximum iterations");
 
@@ -117,7 +117,7 @@ void NonlinearImplicitSystem::set_solver_parameters ()
   const Real rel_step_tol =
     es.parameters.get<Real>("nonlinear solver relative step tolerance");
 
-  // Get the user-specified linear solver toleranaces
+  // Get the user-specified linear solver tolerances
   const unsigned int maxlinearits =
     es.parameters.get<unsigned int>("linear solver maximum iterations");
 
@@ -220,13 +220,13 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
   // if the user has provided both function pointers and objects only the pointer
   // will be used, so catch that as an error
   if (nonlinear_solver->jacobian && nonlinear_solver->jacobian_object)
-    libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the Jacobian!");
+    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the Jacobian!");
 
   if (nonlinear_solver->residual && nonlinear_solver->residual_object)
-    libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the Residual!");
+    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the Residual!");
 
   if (nonlinear_solver->matvec && nonlinear_solver->residual_and_jacobian_object)
-    libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!");
+    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
 
   if (get_jacobian)

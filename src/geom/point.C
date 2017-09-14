@@ -27,7 +27,7 @@
 
 
 // ------------------------------------------------------------
-// Point class member funcions
+// Point class member functions
 // unsigned int Point::key() const
 // {
 //   unsigned int tempx,tempy,tempz;

@@ -132,7 +132,7 @@ void System::read_header (Xdr & io,
   //
   //     6.) The name of the variable (string)
   //
-  //     6.1.) Variable subdmains
+  //     6.1.) Variable subdomains
   //
   //     7.) Combined in an FEType:
   //         - The approximation order(s) of the variable
@@ -224,7 +224,7 @@ void System::read_header (Xdr & io,
         // changed for the monomial and xyz finite element families to
         // simplify extension to arbitrary p.  The consequence is that
         // old restart files will not be read correctly.  This is expected
-        // to be an unlikely occurance, but catch it anyway.
+        // to be an unlikely occurence, but catch it anyway.
         if (read_legacy_format)
           if ((type.family == MONOMIAL || type.family == XYZ) &&
               ((type.order.get_order() > 2 && this->get_mesh().mesh_dimension() == 2) ||
@@ -888,7 +888,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
   // ------------------------------------------------------
   // First pass - count the number of objects in each block
   // traverse all the objects and figure out which block they
-  // will utlimately live in.
+  // will ultimately live in.
   std::vector<std::size_t>
     xfer_ids_size  (num_blks,0),
     recv_vals_size (num_blks,0);
@@ -998,7 +998,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
           input_vals.resize(tot_vals_size[blk]);
           input_vals_tmp.resize(tot_vals_size[blk]);
 
-          // a ThreadedIO object to perform asychronous file IO
+          // a ThreadedIO object to perform asynchronous file IO
           ThreadedIO<InValType> threaded_io(io, input_vals_tmp);
           Threads::Thread async_io(threaded_io);
 
@@ -1052,7 +1052,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 #endif
             }
 
-          // We need the offests into the input_vals vector for each object.
+          // We need the offsets into the input_vals vector for each object.
           // fortunately, this is simply the partial sum of the total number
           // of components for each object
           std::partial_sum(obj_val_offsets.begin(), obj_val_offsets.end(),
@@ -1915,7 +1915,7 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
   // ------------------------------------------------------
   // First pass - count the number of objects in each block
   // traverse all the objects and figure out which block they
-  // will utlimately live in.
+  // will ultimately live in.
   std::vector<unsigned int>
     xfer_ids_size  (num_blks,0),
     send_vals_size (num_blks,0);
@@ -2018,7 +2018,7 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
       std::vector<unsigned int> obj_val_offsets;          // map to traverse entry-wise rather than processor-wise
       std::vector<Number>       output_vals;              // The output buffer for the current block
 
-      // a ThreadedIO object to perform asychronous file IO
+      // a ThreadedIO object to perform asynchronous file IO
       ThreadedIO<Number> threaded_io(io, output_vals);
       UniquePtr<Threads::Thread> async_io;
 
@@ -2083,7 +2083,7 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
               n_val_recvd_blk += vals.size();
             }
 
-          // We need the offests into the output_vals vector for each object.
+          // We need the offsets into the output_vals vector for each object.
           // fortunately, this is simply the partial sum of the total number
           // of components for each object
           std::partial_sum(obj_val_offsets.begin(), obj_val_offsets.end(),

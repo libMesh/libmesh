@@ -88,7 +88,7 @@ public:
    * region attributes are present in the .ele file, they are used to
    * set the subdomain ids of the elements as they are created.
    *
-   * \depcreated This member, since it was originally a part of the
+   * \deprecated This member, since it was originally a part of the
    * public interface, remains for now, but will be removed some time
    * in the near future.
    */

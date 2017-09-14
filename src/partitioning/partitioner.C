@@ -218,7 +218,7 @@ void Partitioner::partition_unpartitioned_elements (MeshBase & mesh,
   libmesh_assert_equal_to (subdomain_bounds.back(), n_unpartitioned_elements);
 
   // create the unique mapping for all unpartitioned elements independent of partitioning
-  // determine the global indexing for all the unpartitoned elements
+  // determine the global indexing for all the unpartitioned elements
   std::vector<dof_id_type> global_indices;
 
   // Calling this on all processors a unique range in [0,n_unpartitioned_elements) is constructed.
@@ -264,7 +264,7 @@ void Partitioner::set_parent_processor_ids(MeshBase & mesh)
 
   // If the mesh is serial we have access to all the elements,
   // in particular all the active ones.  We can therefore set
-  // the parent processor ids indirecly through their children, and
+  // the parent processor ids indirectly through their children, and
   // set the subactive processor ids while examining their active
   // ancestors.
   // By convention a parent is assigned to the minimum processor
@@ -590,7 +590,7 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
           const processor_id_type new_pid = node.processor_id();
 
           // We may have an invalid processor_id() on nodes that have been
-          // "detatched" from coarsened-away elements but that have not yet
+          // "detached" from coarsened-away elements but that have not yet
           // themselves been removed.
           // libmesh_assert_not_equal_to (new_pid, DofObject::invalid_processor_id);
           // libmesh_assert_less (new_pid, mesh.n_partitions()); // this is the correct test --
@@ -612,7 +612,7 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
           // not equal the number of processors
 
           // But: we may have an invalid processor_id() on nodes that
-          // have been "detatched" from coarsened-away elements but
+          // have been "detached" from coarsened-away elements but
           // that have not yet themselves been removed.
           // libmesh_assert_less (filled_request[i], mesh.n_partitions());
 

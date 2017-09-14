@@ -220,7 +220,7 @@ std::string Quality::describe (const ElemQuality q)
 
     case TAPER:
       desc << "Maximum ratio of lengths\n"
-           << "derived from opposited edges.\n"
+           << "derived from opposite edges.\n"
            << '\n'
            << "Suggested ranges:\n"
            << "Quads: (0.7 -> 1)\n"

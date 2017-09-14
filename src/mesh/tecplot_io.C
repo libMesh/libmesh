@@ -516,7 +516,7 @@ void TecplotIO::write_binary (const std::string & fname,
         for (; it != end; ++it)
           n_subcells_in_subdomain += (*it)->n_sub_elem();
 
-        // update the connectivty array to include only the elements in this subdomain
+        // update the connectivity array to include only the elements in this subdomain
         tm.set_n_cells (n_subcells_in_subdomain);
 
         unsigned int te = 0;

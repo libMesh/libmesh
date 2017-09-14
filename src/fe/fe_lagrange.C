@@ -812,7 +812,7 @@ void lagrange_compute_constraints (DofConstraints & constraints,
                 }
             }
         }
-} // lagrange_compute_constrants()
+} // lagrange_compute_constraints()
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 } // anonymous namespace

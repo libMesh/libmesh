@@ -288,7 +288,7 @@ void assemble_stokes (EquationSystems & es,
       //        | Kpu Kpv Kpp |        | Fp |
       //         -           -          -  -
       //
-      // The DenseSubMatrix.repostition () member takes the
+      // The DenseSubMatrix.reposition () member takes the
       // (row_offset, column_offset, row_size, column_size).
       //
       // Similarly, the DenseSubVector.reposition () member

@@ -67,7 +67,7 @@ class ReferenceCountedObject : public ReferenceCounter
 protected:
 
   /**
-   * Constructor. Protected so that you cannont
+   * Constructor. Protected so that you cannot
    * instantiate a \p ReferenceCountedObject, only derive
    * from it.
    */

@@ -27,7 +27,7 @@ namespace libMesh
 {
 
 /**
- * This class implemenets trapezoidal quadratue.  Sometimes also known
+ * This class implements trapezoidal quadrature.  Sometimes also known
  * as Newton-Cotes quadrature with two points.  These rules sample at
  * the corners and will integrate linears exactly.
  *

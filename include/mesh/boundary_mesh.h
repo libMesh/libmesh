@@ -40,7 +40,7 @@ class BoundaryMesh : public Mesh
 {
 public:
   /**
-   * Constructor. Initializes dimenstion and processor id.
+   * Constructor. Initializes dimension and processor id.
    */
   explicit
   BoundaryMesh (const Parallel::Communicator & comm_in,

@@ -663,7 +663,7 @@ public:
                                const bool reset_current_list    = true) = 0;
 
   /**
-   * After partitoning a mesh it is useful to renumber the nodes and elements
+   * After partitioning a mesh it is useful to renumber the nodes and elements
    * so that they lie in contiguous blocks on the processors.  This method
    * does just that.
    */
@@ -728,7 +728,7 @@ public:
   /**
    * If false is passed in then this mesh will no longer be renumbered
    * when being prepared for use.  This may slightly adversely affect
-   * performance during subsequent element access, particulary when
+   * performance during subsequent element access, particularly when
    * using a distributed mesh.
    */
   void allow_renumbering(bool allow) { _skip_renumber_nodes_and_elements = !allow; }
@@ -1270,7 +1270,7 @@ public:
 
 
   /**
-   * Search the mesh and cache the different dimenions of the elements
+   * Search the mesh and cache the different dimensions of the elements
    * present in the mesh.  This is done in prepare_for_use(), but can
    * be done manually by other classes after major mesh modifications.
    */
@@ -1355,7 +1355,7 @@ protected:
   bool _skip_partitioning;
 
   /**
-   * If this is true then renumbering will be kept to a miniumum.
+   * If this is true then renumbering will be kept to a minimum.
    *
    * This is set when prepare_for_use() is called.
    */

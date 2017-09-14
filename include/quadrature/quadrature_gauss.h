@@ -27,7 +27,7 @@ namespace libMesh
 {
 
 /**
- * This class implemenets specific orders of Gauss quadrature.  The
+ * This class implements specific orders of Gauss quadrature.  The
  * rules of Order \p p are capable of integrating polynomials of
  * degree \p p exactly.
  *

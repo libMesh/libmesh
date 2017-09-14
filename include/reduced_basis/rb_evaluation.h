@@ -223,7 +223,7 @@ public:
 
   /**
    * Performs read_in_vectors for a list of directory names and data names.
-   * Reading in vectors requires us to renumber the dofs in a partition-indepdent
+   * Reading in vectors requires us to renumber the dofs in a partition-independent
    * way. This function only renumbers the dofs once at the start (and reverts
    * it at the end), which can save a lot of work compared to renumbering on every read.
    */

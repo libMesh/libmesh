@@ -114,7 +114,7 @@ int main (int argc, char ** argv)
 
   // Quadrisect the mesh triangles a few times to obtain a
   // finer mesh.  Subdivision surface elements require the
-  // refinement data to be removed afterwards.
+  // refinement data to be removed afterward.
   MeshRefinement mesh_refinement (mesh);
   mesh_refinement.uniformly_refine (3);
   MeshTools::Modification::flatten (mesh);
@@ -401,7 +401,7 @@ void assemble_shell (EquationSystems & es,
       //        | Kwu Kwv Kww |        | Fw |
       //         -           -          -  -
       //
-      // The DenseSubMatrix.repostition () member takes the
+      // The DenseSubMatrix.reposition () member takes the
       // (row_offset, column_offset, row_size, column_size).
       //
       // Similarly, the DenseSubVector.reposition () member
@@ -457,7 +457,7 @@ void assemble_shell (EquationSystems & es,
           // covariant components of the first fundamental form rather
           // than the contravariant components, exploiting that the
           // contravariant first fundamental form is the inverse of the
-          // covatiant first fundamental form (hence the determinant etc.).
+          // covariant first fundamental form (hence the determinant etc.).
           RealTensorValue H;
           H(0,0) = a(1) * a(1);
           H(0,1) = H(1,0) = nu * a(1) * a(0) + (1-nu) * a(2) * a(2);

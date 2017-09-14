@@ -755,7 +755,7 @@ void H1FETransformation<RealGradient>::map_div(const unsigned int dim,
   return;
 }
 
-// Explicit Instantations
+// Explicit Instantiations
 template class H1FETransformation<Real>;
 template class H1FETransformation<RealGradient>;
 

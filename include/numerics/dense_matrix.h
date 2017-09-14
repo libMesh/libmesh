@@ -580,7 +580,7 @@ private:
    * The _multiply_blas function computes A <- op(A) * op(B) using
    * BLAS gemm function.  Used in the right_multiply(),
    * left_multiply(), right_multiply_transpose(), and
-   * left_multiply_tranpose() routines.
+   * left_multiply_transpose() routines.
    * [ Implementation in dense_matrix_blas_lapack.C ]
    */
   void _multiply_blas(const DenseMatrixBase<T> & other,

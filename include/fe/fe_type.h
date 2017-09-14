@@ -72,7 +72,7 @@ public:
   }
 
   /**
-   * Explicity request the order as an int.
+   * Explicitly request the order as an int.
    */
   int get_order() const
   {

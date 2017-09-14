@@ -274,7 +274,7 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
                                     std::vector<int> & edges,
                                     std::vector<int> & hnodes)
 {
-  libMesh::out << "Sarting readgr" << std::endl;
+  libMesh::out << "Starting readgr" << std::endl;
   // add error messages where format can be inconsistent
 
   // Find the boundary nodes
@@ -347,7 +347,7 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
                     // Only try each pairing once
                     for (std::size_t b=a+1; b<thetas.size(); b++)
                       {
-                        // Find if the two neighbor nodes angles are 180 degrees (pi) off of eachother (withing a tolerance)
+                        // Find if the two neighbor nodes angles are 180 degrees (pi) off of each other (withing a tolerance)
                         // In order to make this a true movable boundary node... the two that forma  straight line with
                         // it must also be on the boundary
                         if (on_boundary[neighbors[a]->id()] &&
@@ -898,7 +898,7 @@ void VariationalMeshSmoother::full_smooth(Array2D<double> & R,
                                           int adp,
                                           int gr)
 {
-  // Control the amount of print statements in this funcion
+  // Control the amount of print statements in this function
   int msglev = 1;
 
   dof_id_type afun_size = 0;
@@ -1050,7 +1050,7 @@ void VariationalMeshSmoother::full_smooth(Array2D<double> & R,
         // Outrageous Enm1 to make sure we hit this at least once
         Enm1 = 99999;
 
-        // Now that we've moved the boundary nodes (or not) we need to resmoooth
+        // Now that we've moved the boundary nodes (or not) we need to resmooth
         for (int j=0; j<iter[1]; j++)
           {
             if (std::abs(emax-Enm1) < 1e-2)
@@ -1958,7 +1958,7 @@ double VariationalMeshSmoother::minJ(Array2D<double> & R,
         }
       for (unsigned index=0; index<_dim; index++)
         {
-          // initialise local matrices
+          // initialize local matrices
           for (unsigned k=0; k<3*_dim + _dim%2; k++)
             {
               F[index][k] = 0;
@@ -3397,7 +3397,7 @@ double VariationalMeshSmoother::avertex(const std::vector<double> & afun,
 
 
 
-// Computes local matrics W and local rhs F on one basis
+// Computes local matrix W and local rhs F on one basis
 double VariationalMeshSmoother::vertex(Array3D<double> & W,
                                        Array2D<double> & F,
                                        const Array2D<double> & R,
@@ -3999,7 +3999,7 @@ void VariationalMeshSmoother::metr_data_gen(std::string grid,
 
   readgr(R, mask, cells, mcells, mcells, mcells);
 
-  // genetrate metric file
+  // generate metric file
   std::ofstream metric_file(metr.c_str());
   if (!metric_file.good())
     libmesh_error_msg("Error opening metric output file.");

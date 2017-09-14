@@ -30,7 +30,7 @@
 namespace libMesh {
 
 /**
- * Base class for objects that allow transfering variable values
+ * Base class for objects that allow transferring variable values
  * between different systems with different meshes.
  *
  * \author Derek Gaston

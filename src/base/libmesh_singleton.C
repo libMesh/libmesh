@@ -26,7 +26,7 @@
 
 
 // --------------------------------------------------------
-// Local anonymous namespace to hold miscelaneous bits
+// Local anonymous namespace to hold miscellaneous bits
 namespace
 {
 using namespace libMesh;
@@ -57,7 +57,7 @@ SetupList & get_setup_cache()
 
 
 // --------------------------------------------------------
-// Local anonymous namespace to hold miscelaneous bits
+// Local anonymous namespace to hold miscellaneous bits
 namespace libMesh
 {
 

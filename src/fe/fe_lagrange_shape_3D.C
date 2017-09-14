@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ inlcludes
+// C++ includes
 
 // Local includes
 #include "libmesh/fe.h"
@@ -247,7 +247,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
                 }
             }
 
-            // triquadraic hexahedral shape funcions
+            // triquadratic hexahedral shape functions
           case HEX27:
             {
               libmesh_assert_less (i, 27);
@@ -379,7 +379,7 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
                 }
             }
 
-            // quadradic prism shape functions
+            // quadratic prism shape functions
           case PRISM18:
             {
               libmesh_assert_less (i, 18);
@@ -1122,7 +1122,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
                 }
             }
 
-            // triquadraic hexahedral shape funcions
+            // triquadratic hexahedral shape functions
           case HEX27:
             {
               libmesh_assert_less (i, 27);
@@ -1456,7 +1456,7 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
 
 
 
-            // quadradic prism shape functions
+            // quadratic prism shape functions
           case PRISM18:
             {
               libmesh_assert_less (i, 18);
@@ -2420,7 +2420,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
                 }
             }
 
-            // triquadraic hexahedral shape funcions
+            // triquadratic hexahedral shape functions
           case HEX27:
             {
               libmesh_assert_less (i, 27);
@@ -2767,7 +2767,7 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
 
 
 
-            // quadradic prism shape functions
+            // quadratic prism shape functions
           case PRISM18:
             {
               libmesh_assert_less (i, 18);

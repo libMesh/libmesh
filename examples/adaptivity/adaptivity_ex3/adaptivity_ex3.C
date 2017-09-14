@@ -83,7 +83,7 @@ using namespace libMesh;
 // the linear system for our Laplace problem.  Note that the
 // function will take the EquationSystems object and the
 // name of the system we are assembling as input.  From the
-// EquationSystems object we have acess to the Mesh and
+// EquationSystems object we have access to the Mesh and
 // other objects we might need.
 void assemble_laplace(EquationSystems & es,
                       const std::string & system_name);
@@ -749,7 +749,7 @@ void assemble_laplace(EquationSystems & es,
       perf_log.pop("elem init");
 
       // Now we will build the element matrix.  This involves
-      // a double loop to integrate the test funcions (i) against
+      // a double loop to integrate the test functions (i) against
       // the trial functions (j).
       //
       // Now start logging the element matrix computation

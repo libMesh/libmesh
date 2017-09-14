@@ -186,7 +186,7 @@ void LinearElasticityWithContact::initialize_contact_load_paths()
                       }
                 }
 
-            } // end if nieghbor(side_) != libmesh_nullptr
+            } // end if neighbor(side_) != libmesh_nullptr
         } // end for side
     } // end for el
 

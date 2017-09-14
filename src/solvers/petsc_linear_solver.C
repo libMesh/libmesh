@@ -423,7 +423,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
   UniquePtr<PetscMatrix<Number> > subprecond_matrix;
 
   // Set operators.  Also restrict rhs and solution vector to
-  // subdomain if neccessary.
+  // subdomain if necessary.
   if (_restrict_solve_to_is != libmesh_nullptr)
     {
       PetscInt is_local_size = this->_restrict_solve_to_is_local_size();
@@ -690,7 +690,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
   UniquePtr<PetscMatrix<Number> > subprecond_matrix;
 
   // Set operators.  Also restrict rhs and solution vector to
-  // subdomain if neccessary.
+  // subdomain if necessary.
   if (_restrict_solve_to_is != libmesh_nullptr)
     {
       PetscInt is_local_size = this->_restrict_solve_to_is_local_size();

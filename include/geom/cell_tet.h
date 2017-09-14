@@ -68,17 +68,17 @@ public:
   virtual unsigned int n_sides() const libmesh_override { return 4; }
 
   /**
-   * \returns 4.  All tetrahedrals have 4 vertices.
+   * \returns 4.  All tetrahedra have 4 vertices.
    */
   virtual unsigned int n_vertices() const libmesh_override { return 4; }
 
   /**
-   * \returns 6.  All tetrahedrals have 6 edges.
+   * \returns 6.  All tetrahedra have 6 edges.
    */
   virtual unsigned int n_edges() const libmesh_override { return 6; }
 
   /**
-   * \returns 4.  All tetrahedrals have 4 faces.
+   * \returns 4.  All tetrahedra have 4 faces.
    */
   virtual unsigned int n_faces() const libmesh_override { return 4; }
 

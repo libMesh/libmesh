@@ -112,7 +112,7 @@ public:
                       const std::vector<Real> & v2);
 
   /**
-   * \returns \p true if no weight matrix W is specified or an identiy matrix is specified, otherwise returns false
+   * \returns \p true if no weight matrix W is specified or an identity matrix is specified, otherwise returns false
    */
   bool is_identity();
 

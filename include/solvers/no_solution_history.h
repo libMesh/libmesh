@@ -29,7 +29,7 @@ namespace libMesh
  *
  * \author Vikram Garg
  * \date 2012
- * \brief For storing and retrieiving timestep data.
+ * \brief For storing and retrieving timestep data.
  */
 class NoSolutionHistory : public SolutionHistory
 {

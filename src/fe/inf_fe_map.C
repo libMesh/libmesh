@@ -104,7 +104,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
   const ElemType inf_elem_type = inf_elem->type();
   if (inf_elem_type != INFHEX8 &&
       inf_elem_type != INFPRISM6)
-    libmesh_error_msg("ERROR: InfFE::inverse_map is currently implemented only for \ninfinite elments of type InfHex8 and InfPrism6.");
+    libmesh_error_msg("ERROR: InfFE::inverse_map is currently implemented only for \ninfinite elements of type InfHex8 and InfPrism6.");
 
   // 2.)
   // just like in FE<Dim-1,LAGRANGE>::inverse_map(): compute
@@ -130,7 +130,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
   // element and the physical point.
   Point intersection;
 
-  // the origin of the infinite lement
+  // the origin of the infinite element
   const Point o = inf_elem->origin();
 
   switch (Dim)

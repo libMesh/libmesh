@@ -62,7 +62,7 @@ Real integrand (const Point & p)
 // Begin the main program.
 int main (int argc, char ** argv)
 {
-  // Initialize libMesh and any dependent libaries, like in example 2.
+  // Initialize libMesh and any dependent libraries, like in example 2.
   LibMeshInit init (argc, argv);
 
   // This example requires Adaptive Mesh Refinement support - although

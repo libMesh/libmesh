@@ -531,7 +531,7 @@ private:
   void _smooth_flags (bool refining, bool coarsening);
 
   //------------------------------------------------------
-  // "Smoothing" algorthms for refined meshes
+  // "Smoothing" algorithms for refined meshes
 
   /**
    * This algorithm restricts the maximum level mismatch

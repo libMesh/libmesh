@@ -65,7 +65,7 @@ using namespace libMesh;
 // the linear system for our Biharmonic problem.  Note that the
 // function will take the EquationSystems object and the
 // name of the system we are assembling as input.  From the
-// EquationSystems object we have acess to the Mesh and
+// EquationSystems object we have access to the Mesh and
 // other objects we might need.
 void assemble_biharmonic(EquationSystems & es,
                          const std::string & system_name);
@@ -709,13 +709,13 @@ void assemble_biharmonic(EquationSystems & es,
   // boundary integration.
   UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
 
-  // Boundary integration requires another quadraure rule,
+  // Boundary integration requires another quadrature rule,
   // with dimensionality one less than the dimensionality
   // of the element.
   // In 1D, the Clough and Gauss quadrature rules are identical.
   UniquePtr<QBase> qface(fe_type.default_quadrature_rule(dim-1));
 
-  // Tell the finte element object to use our
+  // Tell the finite element object to use our
   // quadrature rule.
   fe_face->attach_quadrature_rule (qface.get());
 
@@ -800,7 +800,7 @@ void assemble_biharmonic(EquationSystems & es,
       perf_log.pop("elem init");
 
       // Now we will build the element matrix.  This involves
-      // a double loop to integrate laplacians of the test funcions
+      // a double loop to integrate laplacians of the test functions
       // (i) against laplacians of the trial functions (j).
       //
       // This step is why we need the Clough-Tocher elements -
@@ -875,7 +875,7 @@ void assemble_biharmonic(EquationSystems & es,
               // face.
               fe_face->reinit(elem, s);
 
-              // Loop over the face quagrature points for integration.
+              // Loop over the face quadrature points for integration.
               for (unsigned int qp=0; qp<qface->n_points(); qp++)
                 {
                   // The boundary value.

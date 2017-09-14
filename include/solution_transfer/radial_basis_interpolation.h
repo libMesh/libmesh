@@ -33,7 +33,7 @@ namespace libMesh
 {
 
 /**
- * Radial Basis Function interplation.
+ * Radial Basis Function interpolation.
  *
  * \author Benjamin S. Kirk
  * \date 2013
@@ -96,7 +96,7 @@ public:
 
   /**
    * Interpolate source data at target points.
-   * Pure virtual, must be overriden in derived classes.
+   * Pure virtual, must be overridden in derived classes.
    */
   virtual void interpolate_field_data (const std::vector<std::string> & field_names,
                                        const std::vector<Point> & tgt_pts,

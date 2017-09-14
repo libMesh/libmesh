@@ -108,7 +108,7 @@ Biharmonic::Biharmonic(ReplicatedMesh & mesh) :
   else if (initialState == std::string("rod"))
     _initialState = ROD;
   else
-    libmesh_error_msg("Unknown initial state: neither ball nor rod nor srip");
+    libmesh_error_msg("Unknown initial state: neither ball nor rod nor strip");
 
   std::vector<Real> icenter;
   command_line_vector("initial_center", icenter);

@@ -821,7 +821,7 @@ private:
                 boundary_id_type> _boundary_node_id;
 
   /**
-   * Typdef for iterators into the _boundary_node_id container.
+   * Typedef for iterators into the _boundary_node_id container.
    */
   typedef std::multimap<const Node *, boundary_id_type>::const_iterator boundary_node_iter;
 
@@ -841,7 +841,7 @@ private:
   _boundary_edge_id;
 
   /**
-   * Typdef for iterators into the _boundary_edge_id container.
+   * Typedef for iterators into the _boundary_edge_id container.
    */
   typedef std::multimap<const Elem *,
                         std::pair<unsigned short int, boundary_id_type> >::const_iterator boundary_edge_iter;
@@ -855,7 +855,7 @@ private:
   _boundary_shellface_id;
 
   /**
-   * Typdef for iterators into the _boundary_shellface_id container.
+   * Typedef for iterators into the _boundary_shellface_id container.
    */
   typedef std::multimap<const Elem *,
                         std::pair<unsigned short int, boundary_id_type> >::const_iterator boundary_shellface_iter;
@@ -870,7 +870,7 @@ private:
   _boundary_side_id;
 
   /**
-   * Typdef for iterators into the _boundary_side_id container.
+   * Typedef for iterators into the _boundary_side_id container.
    */
   typedef std::multimap<const Elem *,
                         std::pair<unsigned short int, boundary_id_type> >::const_iterator boundary_side_iter;

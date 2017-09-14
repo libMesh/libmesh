@@ -255,7 +255,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
           // global DOF indices
           std::vector<dof_id_type> dof_indices;
 
-          // Compute the approprite size for the patch projection matrices
+          // Compute the appropriate size for the patch projection matrices
           // and vectors;
           unsigned int matsize = element_order + 1;
           if (dim > 1)

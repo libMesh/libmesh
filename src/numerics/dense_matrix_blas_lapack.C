@@ -917,7 +917,7 @@ void DenseMatrix<T>::_lu_back_substitute_lapack (const DenseVector<T> & b,
   // dgetrs(TRANS, N, NRHS, A, LDA, IPIV, B, LDB, INFO)
 
   // trans (input)
-  //       'n' for no tranpose, 't' for transpose
+  //       'n' for no transpose, 't' for transpose
   char TRANS[] = "t";
 
   // N (input)

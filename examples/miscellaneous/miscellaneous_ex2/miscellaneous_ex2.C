@@ -416,7 +416,7 @@ void assemble_helmholtz(EquationSystems & es,
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
           // Now we will build the element matrix.  This involves
-          // a double loop to integrate the test funcions (i) against
+          // a double loop to integrate the test functions (i) against
           // the trial functions (j).
           for (std::size_t i=0; i<phi.size(); i++)
             for (std::size_t j=0; j<phi.size(); j++)
@@ -444,12 +444,12 @@ void assemble_helmholtz(EquationSystems & es,
             // boundary integration.
             UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
 
-            // Boundary integration requires one quadraure rule,
+            // Boundary integration requires one quadrature rule,
             // with dimensionality one less than the dimensionality
             // of the element.
             QGauss qface(dim-1, SECOND);
 
-            // Tell the finte element object to use our
+            // Tell the finite element object to use our
             // quadrature rule.
             fe_face->attach_quadrature_rule (&qface);
 
@@ -467,13 +467,13 @@ void assemble_helmholtz(EquationSystems & es,
             fe_face->reinit(elem, side);
 
             // For the Robin BCs, consider a normal admittance an=1
-            // at some parts of the bounfdary
+            // at some parts of the boundary
             const Real an_value = 1.;
 
             // Loop over the face quadrature points for integration.
             for (unsigned int qp=0; qp<qface.n_points(); qp++)
               {
-                // Element matrix contributrion due to prescribed
+                // Element matrix contribution due to prescribed
                 // admittance boundary conditions.
                 for (std::size_t i=0; i<phi_face.size(); i++)
                   for (std::size_t j=0; j<phi_face.size(); j++)

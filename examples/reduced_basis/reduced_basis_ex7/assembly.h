@@ -106,7 +106,7 @@ struct AcousticsInnerProduct : ElemAssembly
     // Now we will build the affine operator
     unsigned int n_qpoints = c.get_element_qrule().n_points();
 
-    // We don't need to conjudate phi or dphi, since basis functions are real-valued
+    // We don't need to conjugate phi or dphi, since basis functions are real-valued
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_p_dofs; i++)
         for (unsigned int j=0; j != n_p_dofs; j++)

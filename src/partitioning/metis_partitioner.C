@@ -488,7 +488,7 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
 
     } // end processor 0 part
 
-  // Broadcase the resutling partition
+  // Broadcast the resulting partition
   mesh.comm().broadcast(part);
 
   // Assign the returned processor ids.  The part array contains

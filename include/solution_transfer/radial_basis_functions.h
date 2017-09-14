@@ -50,7 +50,7 @@ namespace libMesh
 //   {}
 
 //   /**
-//    * Evaluate the radial basis function at the reqested location.
+//    * Evaluate the radial basis function at the requested location.
 //    */
 //   Real operator()(Real rad) const
 //   {
@@ -87,7 +87,7 @@ public:
   { libmesh_experimental(); }
 
   /**
-   * Evaluate the radial basis function at the reqested location.
+   * Evaluate the radial basis function at the requested location.
    */
   Real operator()(Real /* rad */) const { libmesh_not_implemented(); return 0.; }
 };

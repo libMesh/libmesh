@@ -83,7 +83,7 @@
 #endif
 
 // --------------------------------------------------------
-// Local anonymous namespace to hold miscelaneous bits
+// Local anonymous namespace to hold miscellaneous bits
 namespace {
 
 libMesh::UniquePtr<GetPot> command_line;
@@ -564,7 +564,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 #endif
 
 #if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
-  // Do MPI initializtion for VTK.
+  // Do MPI initialization for VTK.
   _vtk_mpi_controller = vtkMPIController::New();
   _vtk_mpi_controller->Initialize(&argc, const_cast<char ***>(&argv), /*initialized_externally=*/1);
   _vtk_mpi_controller->SetGlobalController(_vtk_mpi_controller);
@@ -585,7 +585,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   // C and C++ style access to output streams is not required.
   // The amount of benefit which occurs is probably implementation
   // defined, and may be nothing.  On the other hand, I have seen
-  // some IO tests where IO peformance improves by a factor of two.
+  // some IO tests where IO performance improves by a factor of two.
   if (!libMesh::on_command_line ("--sync-with-stdio"))
     std::ios::sync_with_stdio(false);
 

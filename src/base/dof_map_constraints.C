@@ -3069,7 +3069,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
                         nodes_requested.insert(node);
 
                       // We can have 0 nodal constraint
-                      // coefficients, where no Lagrange constrant
+                      // coefficients, where no Lagrange constraint
                       // exists but non-Lagrange basis constraints
                       // might.
                       // libmesh_assert(j->second);
@@ -3860,7 +3860,7 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
                   // from Number, which may be std::complex, in which
                   // case quiet_NaN() silently returns zero, rather
                   // than sanely returning NaN or throwing an
-                  // exception or sending Stroustrop hate mail.
+                  // exception or sending Stroustrup hate mail.
                   dof_row_rhss[i] =
                     std::numeric_limits<Real>::quiet_NaN();
 

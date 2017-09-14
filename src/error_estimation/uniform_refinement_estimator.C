@@ -561,7 +561,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
 #endif
 
                   // Compute solution values at the current
-                  // quadrature point.  This reqiures a sum
+                  // quadrature point.  This requires a sum
                   // over all the shape functions evaluated
                   // at the quadrature point.
                   for (unsigned int i=0; i<n_sf; i++)
@@ -666,7 +666,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
   // We should be back where we started
   libmesh_assert_equal_to (n_coarse_elem, mesh.n_elem());
 
-  // Each processor has now computed the error contribuions
+  // Each processor has now computed the error contributions
   // for its local elements.  We need to sum the vector
   // and then take the square-root of each component.  Note
   // that we only need to sum if we are running on multiple

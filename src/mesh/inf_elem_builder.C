@@ -181,7 +181,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
 
       // First use a std::vector<dof_id_type> that holds
       // the global node numbers.  Then sort this vector,
-      // so that it can be made unique (no multiple occurence
+      // so that it can be made unique (no multiple occurrence
       // of a node), and then finally insert the Node * in
       // the vector inner_boundary_nodes.
       //

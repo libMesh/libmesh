@@ -196,7 +196,7 @@ protected:
     /**
      * Build the base element of an infinite element.  Be careful,
      * this method allocates memory!  So be sure to delete the
-     * new element afterwards.
+     * new element afterward.
      */
     static Elem * build_elem (const Elem * inf_elem);
 
@@ -547,7 +547,7 @@ protected:
    * Combines the shape functions, which were formed in
    * \p init_shape_functions(Elem *), with geometric data.
    * Has to be called every time the geometric configuration
-   * changes.  Afterwards, the fields are ready to be used
+   * changes.  Afterward, the fields are ready to be used
    * to compute global derivatives, the jacobian etc, see
    * \p FEAbstract::compute_map().
    */
@@ -686,7 +686,7 @@ protected:
    * -- tensor product of base element times radial
    * nodes -- has to be determined from the node numbering
    * of the current infinite element.  This vector
-   * maps the infinte \p Elem node number to the
+   * maps the infinite \p Elem node number to the
    * radial node (either 0 or 1).
    */
   std::vector<unsigned int> _radial_node_index;
@@ -696,7 +696,7 @@ protected:
    * -- tensor product of base element times radial
    * nodes -- has to be determined from the node numbering
    * of the current element.  This vector
-   * maps the infinte \p Elem node number to the
+   * maps the infinite \p Elem node number to the
    * associated node in the base element.
    */
   std::vector<unsigned int> _base_node_index;

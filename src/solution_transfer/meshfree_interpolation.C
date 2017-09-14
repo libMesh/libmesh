@@ -259,7 +259,7 @@ void InverseDistanceInterpolation<KDDim>::interpolate (const Point              
                                                        std::vector<Number>::iterator & out_it) const
 {
   // We explicitly assume that the input source points are sorted from closest to
-  // farthests.  assert that assumption in DEBUG mode.
+  // farthest.  assert that assumption in DEBUG mode.
 #ifdef DEBUG
   if (!src_dist_sqr.empty())
     {

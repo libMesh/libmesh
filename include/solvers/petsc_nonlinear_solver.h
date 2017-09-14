@@ -149,7 +149,7 @@ public:
   void set_jacobian_zero_out(bool state) { _zero_out_jacobian = state; }
 
   /**
-   * Set to true to use the libMeash's default monitor, set to false to use your own
+   * Set to true to use the libMesh's default monitor, set to false to use your own
    */
   void use_default_monitor(bool state) { _default_monitor = state; }
 

@@ -204,7 +204,7 @@ template <> bool FE<2,L2_HIERARCHIC>::is_hierarchic() const { return true; }
 template <> bool FE<3,L2_HIERARCHIC>::is_hierarchic() const { return true; }
 
 #ifdef LIBMESH_ENABLE_AMR
-// compute_constraints() is a NOOP for DISCONTINOUS FE's
+// compute_constraints() is a NOOP for DISCONTINUOUS FE's
 template <>
 void FE<2,L2_HIERARCHIC>::compute_constraints (DofConstraints &,
                                                DofMap &,

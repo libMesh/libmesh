@@ -32,7 +32,7 @@ namespace libMesh
 
 
 // ------------------------------------------------------------
-// TypeVector<T> class member funcions
+// TypeVector<T> class member functions
 template <typename T>
 TypeVector<T> TypeVector<T>::unit() const
 {

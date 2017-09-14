@@ -35,7 +35,7 @@ namespace libMesh
  * chunks[1] = {3, 7, 8}
  * chunks[2] = {5, 6}
  * then we will call the internal Partitioner three times, once for
- * subodmains 1, 2, and 4, once for subdomains 3, 7, and 8, and once
+ * subdomains 1, 2, and 4, once for subdomains 3, 7, and 8, and once
  * for subdomains 5 and 6.
  *
  * \note This Partitioner may produce highly non-optimal communication

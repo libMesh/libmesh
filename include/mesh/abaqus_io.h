@@ -160,7 +160,7 @@ private:
 
   /**
    * This function assigns boundary IDs to node sets based on the
-   * alphabetical order in which the sets are labelled in the Abaqus
+   * alphabetical order in which the sets are labeled in the Abaqus
    * file.  We choose the alphabetical ordering simply because
    * Abaqus does not provide a numerical one within the file.
    */

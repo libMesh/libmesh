@@ -148,7 +148,7 @@ private:
   static std::map<Eigen::ComputationInfo, LinearConvergenceReason> _convergence_reasons;
 
   /**
-   * Static function used to initialize _covergence_reasons map
+   * Static function used to initialize _convergence_reasons map
    */
   static std::map<Eigen::ComputationInfo, LinearConvergenceReason> build_map()
   {

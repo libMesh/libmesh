@@ -155,7 +155,7 @@ public:
    * The id is not necessarily unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    *
-   * We reimplemenet this method here for the \p InfHex18 since we can
+   * We reimplement this method here for the \p InfHex18 since we can
    * use the center node of the bottom face to provide a perfect (unique)
    * key.
    */

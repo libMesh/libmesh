@@ -512,7 +512,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
   // Make sure we aren't "overconfigured"
   libmesh_assert (!(_exact_values.size() && _equation_systems_fine));
 
-  // We need a commmunicator.
+  // We need a communicator.
   const Parallel::Communicator & communicator(_equation_systems.comm());
 
   // This function must be run on all processors at once
@@ -724,7 +724,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
           typename FEGenericBase<OutputShape>::OutputNumberDivergence div_u_h = 0.0;
 
           // Compute solution values at the current
-          // quadrature point.  This reqiures a sum
+          // quadrature point.  This requires a sum
           // over all the shape functions evaluated
           // at the quadrature point.
           for (unsigned int i=0; i<n_sf; i++)

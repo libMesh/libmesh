@@ -69,7 +69,7 @@ struct FEOutputType<NEDELEC_ONE>
 
 
 /**
- * A specific instatiation of the \p FEBase class. This
+ * A specific instantiation of the \p FEBase class. This
  * class is templated, and specific template instantiations
  * will result in different Finite Element families. Full specialization
  * of the template for specific dimensions(\p Dim) and families
@@ -335,7 +335,7 @@ public:
 
   /**
    * Reinitializes all the physical element-dependent data based on
-   * the \p side of \p face.  The \p tolerance paremeter is passed to
+   * the \p side of \p face.  The \p tolerance parameter is passed to
    * the involved call to \p inverse_map().  By default the shape
    * functions and associated data are computed at the quadrature
    * points specified by the quadrature rule \p qrule, but may be any
@@ -350,7 +350,7 @@ public:
 
   /**
    * Reinitializes all the physical element-dependent data based on
-   * the \p edge.  The \p tolerance paremeter is passed to the
+   * the \p edge.  The \p tolerance parameter is passed to the
    * involved call to \p inverse_map().  By default the shape
    * functions and associated data are computed at the quadrature
    * points specified by the quadrature rule \p qrule, but may be any
@@ -792,7 +792,7 @@ public:
 
 
 /**
- * The FEScalar class is used for workign with SCALAR variables.
+ * The FEScalar class is used for working with SCALAR variables.
  */
 template <unsigned int Dim>
 class FEScalar : public FE<Dim,SCALAR>

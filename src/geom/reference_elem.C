@@ -117,7 +117,7 @@ void read_ref_elem (const ElemType type_in,
   // Construct elem of appropriate type
   UniquePtr<Elem> uelem = Elem::build(type_in);
 
-  // We are expecing an identity map, so assert it!
+  // We are expecting an identity map, so assert it!
   for (unsigned int n=0; n<n_nodes; n++)
     {
       in >> nn;
@@ -151,7 +151,7 @@ void read_ref_elem (const ElemType type_in,
 
 void init_ref_elem_table()
 {
-  // ouside mutex - if this pointer is set, we can trust it.
+  // outside mutex - if this pointer is set, we can trust it.
   if (singleton_cache != libmesh_nullptr)
     return;
 

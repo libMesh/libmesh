@@ -82,7 +82,7 @@ using namespace libMesh;
 // the linear system for our Poisson problem.  Note that the
 // function will take the EquationSystems object and the
 // name of the system we are assembling as input.  From the
-// EquationSystems object we have acess to the Mesh and
+// EquationSystems object we have access to the Mesh and
 // other objects we might need.
 void assemble_poisson(EquationSystems & es,
                       const std::string & system_name);
@@ -95,7 +95,7 @@ Real exact_solution (const Real x,
 // Begin the main program.
 int main (int argc, char ** argv)
 {
-  // Initialize libMesh and any dependent libaries, like in example 2.
+  // Initialize libMesh and any dependent libraries, like in example 2.
   LibMeshInit init (argc, argv);
 
   // Only our PETSc interface currently supports solves restricted to
@@ -206,7 +206,7 @@ int main (int argc, char ** argv)
     }
 
 
-  // To demonstate solving on a subdomain, we will solve only on the
+  // To demonstrate solving on a subdomain, we will solve only on the
   // interior of a circle (ball in 3d) with radius 0.8.  So show that
   // this also works well on locally refined meshes, we refine once
   // all elements that are located on the boundary of this circle (or
@@ -397,12 +397,12 @@ void assemble_poisson(EquationSystems & es,
   // boundary integration.
   UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
 
-  // Boundary integration requires one quadraure rule,
+  // Boundary integration requires one quadrature rule,
   // with dimensionality one less than the dimensionality
   // of the element.
   QGauss qface(dim-1, FIFTH);
 
-  // Tell the finte element object to use our
+  // Tell the finite element object to use our
   // quadrature rule.
   fe_face->attach_quadrature_rule (&qface);
 
@@ -487,12 +487,12 @@ void assemble_poisson(EquationSystems & es,
           perf_log.pop("elem init");
 
           // Now we will build the element matrix.  This involves
-          // a double loop to integrate the test funcions (i) against
+          // a double loop to integrate the test functions (i) against
           // the trial functions (j).
           //
           // We have split the numeric integration into two loops
           // so that we can log the matrix and right-hand-side
-          // computation seperately.
+          // computation separately.
           //
           // Now start logging the element matrix computation
           perf_log.push ("Ke");

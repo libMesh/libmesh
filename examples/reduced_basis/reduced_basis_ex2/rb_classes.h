@@ -123,7 +123,7 @@ public:
     // Generate a DirichletBoundary object
     dirichlet_bc = build_zero_dirichlet_boundary_object();
 
-    // Set the Dirichet boundary IDs
+    // Set the Dirichlet boundary IDs
     // and the Dirichlet boundary variable numbers
     dirichlet_bc->b.insert(3);
     dirichlet_bc->variables.push_back(u_var);

@@ -42,7 +42,7 @@ class Elem;
 
 /**
  * Class \p TetGenMeshInterface provides an interface for
- * tetrahedrization of meshes using the TetGen library.  For
+ * tetrahedralization of meshes using the TetGen library.  For
  * information about TetGen cf.
  * <a href="http://tetgen.org/">TetGen home page</a>.
  *
@@ -67,24 +67,24 @@ public:
   ~TetGenMeshInterface() {}
 
   /**
-   * Method to set swithes to tetgen, allowing for different behaviours
+   * Method to set switches to tetgen, allowing for different behaviours
    */
   void set_switches(const std::string &);
 
   /**
-   * Method invokes TetGen library to compute a Delaunay tetrahedrization
+   * Method invokes TetGen library to compute a Delaunay tetrahedralization
    * from the nodes point set.
    */
   void triangulate_pointset ();
 
   /**
-   * Method invokes TetGen library to compute a Delaunay tetrahedrization
+   * Method invokes TetGen library to compute a Delaunay tetrahedralization
    * from the nodes point set. Stores only 2D hull surface elements.
    */
   void pointset_convexhull ();
 
   /**
-   * Method invokes TetGen library to compute a Delaunay tetrahedrization
+   * Method invokes TetGen library to compute a Delaunay tetrahedralization
    * from the nodes point set. Boundary constraints are taken from
    * elements array.
    */
@@ -92,7 +92,7 @@ public:
                                            double volume_constraint=0.);
 
   /**
-   * Method invokes TetGen library to compute a Delaunay tetrahedrization
+   * Method invokes TetGen library to compute a Delaunay tetrahedralization
    * from the nodes point set. Boundary constraints are taken from
    * elements array. Include carve-out functionality.
    */
@@ -165,7 +165,7 @@ protected:
   MeshSerializer _serializer;
 
   /**
-   * Parameter controling the behaviour of tetgen.
+   * Parameter controlling the behaviour of tetgen.
    * By default quiet.
    */
   std::string _switches;

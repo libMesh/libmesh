@@ -193,7 +193,7 @@ void TetGenIO::element_in (std::istream & ele_stream)
     libmesh_error_msg("Invalid region_attribute " << region_attribute << " specified in .ele file.");
 
   // Vector that assigns element nodes to their correct position.
-  // TetGen is normaly 0-based
+  // TetGen is normally 0-based
   // (right now this is strictly not necessary since it is the identity map,
   //  but in the future TetGen could change their numbering scheme.)
   static const unsigned int assign_elm_nodes[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9};

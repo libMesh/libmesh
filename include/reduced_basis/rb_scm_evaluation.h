@@ -150,7 +150,7 @@ public:
   virtual void save_current_parameters();
 
   /**
-   * Helper functiont to (re)load current_parameters
+   * Helper function to (re)load current_parameters
    * from saved_parameters.
    */
   virtual void reload_current_parameters();

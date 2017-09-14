@@ -592,7 +592,7 @@ bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const R
     case TRISHELL3:
     case TRI6:
       {
-        // The reference triangle is isocoles
+        // The reference triangle is isosceles
         // and is bound by xi=0, eta=0, and xi+eta=1.
         if ((xi  >= 0.-eps) &&
             (eta >= 0.-eps) &&
@@ -622,7 +622,7 @@ bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const R
     case TET4:
     case TET10:
       {
-        // The reference tetrahedral is isocoles
+        // The reference tetrahedral is isosceles
         // and is bound by xi=0, eta=0, zeta=0,
         // and xi+eta+zeta=1.
         if ((xi   >= 0.-eps) &&
@@ -670,7 +670,7 @@ bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const R
     case PRISM18:
       {
         // Figure this one out...
-        // inside the reference triange with zeta in [-1,1]
+        // inside the reference triangle with zeta in [-1,1]
         if ((xi   >=  0.-eps) &&
             (eta  >=  0.-eps) &&
             (zeta >= -1.-eps) &&
@@ -722,7 +722,7 @@ bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const R
 
     case INFPRISM6:
       {
-        // inside the reference triange with zeta in [-1,1]
+        // inside the reference triangle with zeta in [-1,1]
         if ((xi   >=  0.-eps) &&
             (eta  >=  0.-eps) &&
             (zeta >= -1.-eps) &&

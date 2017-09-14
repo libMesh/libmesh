@@ -64,7 +64,7 @@ public:
 
   // The application number controls what boundary conditions and/or
   // forcing functions are applied.  Current options are:
-  // 0 - discontinuous lid velociy driven cavity
+  // 0 - discontinuous lid velocity driven cavity
   // 1 - homogeneous Dirichlet BC with smooth forcing
   unsigned int application;
 

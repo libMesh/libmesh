@@ -234,7 +234,7 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
   // use mesh.n_active_elem() in general since this only returns the number
   // of active elements which are stored on the calling processor.
   // We should not use n_active_elem for any allocation because that will
-  // be inheritly unscalable, but it can be useful for libmesh_assertions.
+  // be inherently unscalable, but it can be useful for libmesh_assertions.
   dof_id_type n_active_elem=0;
 
   // Set up the vtxdist array.  This will be the same on each processor.
@@ -258,7 +258,7 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
   // unique range [0,n_active_elem) which is *independent* of the current partitioning.
   // This can be fed to ParMetis as the initial partitioning of the subdomains (decoupled
   // from the partitioning of the objects themselves).  This allows us to get the same
-  // resultant partitioning independed of the input partitioning.
+  // resultant partitioning independent of the input partitioning.
   libMesh::BoundingBox bbox =
     MeshTools::create_bounding_box(mesh);
 
@@ -615,7 +615,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
   for (std::size_t r=0; r<graph.size(); r++)
     {
       _pmetis->xadj.push_back(_pmetis->adjncy.size());
-      std::vector<dof_id_type> graph_row; // build this emtpy
+      std::vector<dof_id_type> graph_row; // build this empty
       graph_row.swap(graph[r]); // this will deallocate at the end of scope
       _pmetis->adjncy.insert(_pmetis->adjncy.end(),
                              graph_row.begin(),

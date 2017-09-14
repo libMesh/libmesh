@@ -35,7 +35,7 @@ namespace libMesh
  *
  * In the algorithm implemented here the system is solved for
  * displacements.
- * Curently the Newmark scheme is implemented for constant
+ * Currently the Newmark scheme is implemented for constant
  * time step sizes only. This time step is stored in the
  * \p EquationSystems parameter named \p "Newmark \p time \p step".
  * For the case of constant time steps the matrix only has to be

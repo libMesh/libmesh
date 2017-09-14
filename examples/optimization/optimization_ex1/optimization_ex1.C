@@ -222,7 +222,7 @@ void AssembleOptimization::gradient (const NumericVector<Number> & soln,
 {
   grad_f.zero();
 
-  // Since we've enforced constaints on soln, A and F,
+  // Since we've enforced constraints on soln, A and F,
   // this automatically sets grad_f to zero for constrained
   // dofs.
   A_matrix->vector_mult(grad_f, soln);

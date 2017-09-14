@@ -394,7 +394,7 @@ int main (int argc, char ** argv)
         // Compute the sensitivities
         system.adjoint_qoi_parameter_sensitivity(qois, system.get_parameter_vector(), sensitivities);
 
-        // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+        // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unnecessarily in the error estimator
         system.set_adjoint_already_solved(true);
 
         GetPot infile_l_shaped("l-shaped.in");
@@ -523,7 +523,7 @@ int main (int argc, char ** argv)
 
         system.adjoint_qoi_parameter_sensitivity(qois, system.get_parameter_vector(), sensitivities);
 
-        // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+        // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unnecessarily in the error estimator
         system.set_adjoint_already_solved(true);
 
         GetPot infile_l_shaped("l-shaped.in");

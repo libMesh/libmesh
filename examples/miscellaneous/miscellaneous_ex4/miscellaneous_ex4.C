@@ -186,7 +186,7 @@ int main (int argc, char ** argv)
   // Prints information about the system to the screen.
   equation_systems.print_info();
 
-  // Before the assemblation of the matrix, we have to clear the two
+  // Before assembling the matrix, we have to clear the two
   // vectors that form the tensor matrix (since this is not performed
   // automatically).
   system.get_vector("v").init(system.n_dofs(), system.n_local_dofs());
@@ -431,7 +431,7 @@ void assemble (EquationSystems & es,
 
       // However, constraining both the sparse matrix (and right hand
       // side) plus the rank 1 matrix is tricky.  The dof_indices
-      // vector has to be backuped for that because the constraining
+      // vector has to be backed up for that because the constraining
       // functions modify it.
 
       std::vector<dof_id_type> dof_indices_backup(dof_indices);
@@ -449,7 +449,7 @@ void assemble (EquationSystems & es,
       system.get_vector("v").add_vector(Ve, dof_indices);
       system.get_vector("w").add_vector(We, dof_indices);
     }
-  // Finished computing the sytem matrix and right-hand side.
+  // Finished computing the system matrix and right-hand side.
 
   // Matrices and vectors must be closed manually.  This is necessary
   // because the matrix is not directly used as the system matrix (in

@@ -145,7 +145,7 @@ Real Tri::quality (const ElemQuality q) const
   /**
    * I don't know what to do for this metric.
    * Maybe the base class knows.  We won't get
-   * here because of the defualt case above.
+   * here because of the default case above.
    */
   return Elem::quality(q);
 

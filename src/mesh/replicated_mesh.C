@@ -95,7 +95,7 @@ public:
     return (*this)(lhs.first, rhs.first);
   }
 
-  // Comparsion function where lhs is a Point and rhs is a pair<Point,dof_id_type>.
+  // comparison function where lhs is a Point and rhs is a pair<Point,dof_id_type>.
   // This is used in routines like lower_bound, where a specific value is being
   // searched for.
   bool operator()(const Point & lhs, std::pair<Point, dof_id_type> & rhs)

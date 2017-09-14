@@ -365,7 +365,7 @@ void VTKIO::nodes_to_vtk()
   // containers for points and coordinates of points
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
-  // if this grid is to be used in VTK then the dimesion of the points should be 3
+  // if this grid is to be used in VTK then the dimension of the points should be 3
   pcoords->SetNumberOfComponents(LIBMESH_DIM);
   pcoords->Allocate(3*mesh.n_local_nodes());
   points->SetNumberOfPoints(mesh.n_local_nodes()); // it seems that it needs this to prevent a segfault

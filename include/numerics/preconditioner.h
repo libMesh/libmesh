@@ -128,12 +128,12 @@ protected:
 
   /**
    * The matrix P... ie the matrix to be preconditioned.
-   * This is often the actual system matrix of a linear sytem.
+   * This is often the actual system matrix of a linear system.
    */
   SparseMatrix<T> * _matrix;
 
   /**
-   * Enum statitng with type of preconditioner to use.
+   * Enum stating with type of preconditioner to use.
    */
   PreconditionerType _preconditioner_type;
 

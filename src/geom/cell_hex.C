@@ -192,7 +192,7 @@ Real Hex::quality (const ElemQuality q) const
     {
 
       /**
-       * Compue the min/max diagonal ratio.
+       * Compute the min/max diagonal ratio.
        * Source: CUBIT User's Manual.
        */
     case DIAGONAL:

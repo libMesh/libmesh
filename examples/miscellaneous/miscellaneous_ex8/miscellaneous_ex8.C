@@ -265,7 +265,7 @@ int main(int argc, char ** argv)
         rbi.get_source_vals()   = idi.get_source_vals();
       }
 
-      // We have only set local values - prepare for use by gathering remote gata
+      // We have only set local values - prepare for use by gathering remote data
       idi.prepare_for_use();
       rbi.prepare_for_use();
 

@@ -229,7 +229,7 @@ public:
   bool is_attached (SparseMatrix<Number> & matrix);
 
   /**
-   * Distrubute dofs on the current mesh.  Also builds the send list for
+   * Distribute dofs on the current mesh.  Also builds the send list for
    * processor \p proc_id, which defaults to 0 for ease of use in serial
    * applications.
    */
@@ -1194,7 +1194,7 @@ public:
 #endif // LIBMESH_ENABLE_AMR
 
   /**
-   * Reinitialize the underlying data strucures conformal to the current mesh.
+   * Reinitialize the underlying data structures conformal to the current mesh.
    */
   void reinit (MeshBase & mesh);
 
@@ -1361,7 +1361,7 @@ private:
    *
    * The forcing vector will depend on which solution's heterogenous
    * constraints are being applied.  For the default \p qoi_index this
-   * will be the primal solutoin; for \p qoi_index >= 0 the
+   * will be the primal solution; for \p qoi_index >= 0 the
    * corresponding adjoint solution's constraints will be used.
    */
   void build_constraint_matrix_and_vector (DenseMatrix<Number> & C,
@@ -1441,7 +1441,7 @@ private:
   std::vector<dof_id_type> _send_list;
 
   /**
-   * Funtion object to call to add extra entries to the sparsity pattern
+   * Function object to call to add extra entries to the sparsity pattern
    */
   AugmentSparsityPattern * _augment_sparsity_pattern;
 
@@ -1453,7 +1453,7 @@ private:
                                    std::vector<dof_id_type> & n_oz,
                                    void *);
   /**
-   * A pointer associcated with the extra sparsity that can optionally be passed in
+   * A pointer associated with the extra sparsity that can optionally be passed in
    */
   void * _extra_sparsity_context;
 
@@ -1468,7 +1468,7 @@ private:
   void (*_extra_send_list_function)(std::vector<dof_id_type> &, void *);
 
   /**
-   * A pointer associcated with the extra send list that can optionally be passed in
+   * A pointer associated with the extra send list that can optionally be passed in
    */
   void * _extra_send_list_context;
 

@@ -613,7 +613,7 @@ UniquePtr<ErrorEstimator> build_error_estimator(FEMParameters & /* param */)
 }
 
 // Functions to build the adjoint based error indicators
-// The error_non_pressure and error_pressure constributions are estimated using
+// The error_non_pressure and error_pressure contributions are estimated using
 // the build_error_estimator_component_wise function below
 UniquePtr<ErrorEstimator>
 build_error_estimator_component_wise (FEMParameters & param,
@@ -866,7 +866,7 @@ int main (int argc, char ** argv)
           libMesh::out<< "Solving the adjoint problem" <<std::endl;
           system.adjoint_solve();
 
-          // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+          // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unnecessarily in the error estimator
           system.set_adjoint_already_solved(true);
 
           // To plot the adjoint solution, we swap it with the primal solution
@@ -1069,7 +1069,7 @@ int main (int argc, char ** argv)
           coupled_system_weight_functions_y.push_back(&convdiffy3);
 
           // Build the error estimator to estimate the contributions
-          // to the QoI error from the convection diffsion y term
+          // to the QoI error from the convection diffusion y term
           UniquePtr<ErrorEstimator> error_estimator_convection_diffusion_y =
             build_weighted_error_estimator_component_wise (param,
                                                            weights_matrix_convection_diffusion_y,

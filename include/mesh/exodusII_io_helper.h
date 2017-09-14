@@ -80,7 +80,7 @@ class MeshBase;
  * implementation details of interfacing with the Exodus binary
  * format.
  *
- * \author Johw W. Peterson
+ * \author John W. Peterson
  * \date 2002
  */
 class ExodusII_IO_Helper : public ParallelObject
@@ -1114,19 +1114,19 @@ public:
    */
 
   /**
-   * Maps the Exodus face numbering for general hexahedrals.
+   * Maps the Exodus face numbering for general hexahedra.
    * Useful for reading sideset information.
    */
   static const int hex_face_map[6];
 
   /**
-   * Maps the Exodus face numbering for 27-noded hexahedrals.
+   * Maps the Exodus face numbering for 27-noded hexahedra.
    * Useful for reading sideset information.
    */
   static const int hex27_face_map[6];
 
   /**
-   * Maps the Exodus face numbering for general tetrahedrals.
+   * Maps the Exodus face numbering for general tetrahedra.
    * Useful for reading sideset information.
    */
   static const int tet_face_map[4];
@@ -1144,19 +1144,19 @@ public:
   static const int pyramid_face_map[5];
 
   /**
-   * Maps the Exodus face numbering for general hexahedrals.
+   * Maps the Exodus face numbering for general hexahedra.
    * Useful for writing sideset information.
    */
   static const int hex_inverse_face_map[6];
 
   /**
-   * Maps the Exodus face numbering for 27-noded hexahedrals.
+   * Maps the Exodus face numbering for 27-noded hexahedra.
    * Useful for writing sideset information.
    */
   static const int hex27_inverse_face_map[6];
 
   /**
-   * Maps the Exodus face numbering for general tetrahedrals.
+   * Maps the Exodus face numbering for general tetrahedra.
    * Useful for writing sideset information.
    */
   static const int tet_inverse_face_map[4];

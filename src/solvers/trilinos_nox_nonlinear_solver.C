@@ -122,10 +122,10 @@ bool Problem_Interface::computeF(const Epetra_Vector & x,
   // will be used, so catch that as an error
 
   if (_solver->residual && _solver->residual_object)
-    libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the Residual!");
+    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the Residual!");
 
   if (_solver->matvec && _solver->residual_and_jacobian_object)
-    libmesh_error_msg("ERROR: cannot specifiy both a function and object to compute the combined Residual & Jacobian!");
+    libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
   if (_solver->residual != libmesh_nullptr)
     _solver->residual(*sys.current_local_solution.get(), R, sys);

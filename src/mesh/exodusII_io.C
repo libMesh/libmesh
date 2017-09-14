@@ -372,7 +372,7 @@ void ExodusII_IO::read (const std::string & fname)
         for (std::size_t node=0; node<exio_helper->node_list.size(); node++)
           {
             // As before, the entries in 'node_list' are 1-based
-            // indcies into the node_num_map array, so we have to map
+            // indices into the node_num_map array, so we have to map
             // them.  See comment above.
             int libmesh_node_id = exio_helper->node_num_map[exio_helper->node_list[node] - 1] - 1;
             mesh.get_boundary_info().add_node(cast_int<dof_id_type>(libmesh_node_id),

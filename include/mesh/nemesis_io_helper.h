@@ -193,7 +193,7 @@ public:
   /**
    * Outputs initial information for communication maps.
    *
-   * \note The order of the arguments specified in the Nemsis User's
+   * \note The order of the arguments specified in the Nemesis User's
    * Manual is \e wrong.  The correct order is (ids, counts, ids,
    * counts).  Must be called after put_loadbal_param().
    */
@@ -210,7 +210,7 @@ public:
    * .) node_cmap_node_ids = Nodal IDs of the FEM nodes in this communication map
    * .) node_cmap_proc_ids = processor IDs associated with each of the nodes in node_ids
    *
-   * In the Nemesis file, these all appeart to be written to the same chunks of data:
+   * In the Nemesis file, these all appear to be written to the same chunks of data:
    * n_comm_nids and n_comm_proc, but don't rely on these names...
    *
    * \note This class contains \p node_cmap_node_ids and \p
@@ -632,7 +632,7 @@ private:
   void compute_communication_map_parameters();
 
   /**
-   * Compute the node communcation maps (really just pack vectors)
+   * Compute the node communication maps (really just pack vectors)
    * in preparation for writing them to file.
    */
   void compute_node_communication_maps();

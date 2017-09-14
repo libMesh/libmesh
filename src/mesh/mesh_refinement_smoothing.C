@@ -94,7 +94,7 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
         const unsigned int elem_p_level = elem->p_level();
 
         // Skip the element if it is already fully flagged
-        // unless we are enforcing mismatch prior to refienemnt and may need to
+        // unless we are enforcing mismatch prior to refinement and may need to
         // remove the refinement flag(s)
         if (elem->refinement_flag() == Elem::REFINE &&
             elem->p_refinement_flag() == Elem::REFINE

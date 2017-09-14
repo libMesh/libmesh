@@ -446,7 +446,7 @@ void assemble_wave(EquationSystems & es,
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
           // Now we will build the element matrix.  This involves
-          // a double loop to integrate the test funcions (i) against
+          // a double loop to integrate the test functions (i) against
           // the trial functions (j).
           for (std::size_t i=0; i<phi.size(); i++)
             for (std::size_t j=0; j<phi.size(); j++)
@@ -474,12 +474,12 @@ void assemble_wave(EquationSystems & es,
               // boundary integration.
               UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
 
-              // Boundary integration requires one quadraure rule,
+              // Boundary integration requires one quadrature rule,
               // with dimensionality one less than the dimensionality
               // of the element.
               QGauss qface(dim-1, SECOND);
 
-              // Tell the finte element object to use our
+              // Tell the finite element object to use our
               // quadrature rule.
               fe_face->attach_quadrature_rule (&qface);
 
@@ -513,7 +513,7 @@ void assemble_wave(EquationSystems & es,
             } // end if (elem->neighbor_ptr(side) == libmesh_nullptr)
 
         // In this example the Dirichlet boundary conditions will be
-        // imposed via panalty method after the
+        // imposed via penalty method after the
         // system is assembled.
 
       } // end boundary condition section
@@ -558,7 +558,7 @@ void apply_initial(EquationSystems & es,
 
   // Assume our fluid to be at rest, which would
   // also be the default conditions in class NewmarkSystem,
-  // but let us do it explicetly here.
+  // but let us do it explicitly here.
   pres_vec.zero();
   vel_vec.zero();
   acc_vec.zero();
@@ -624,7 +624,7 @@ void fill_dirichlet_bc(EquationSystems & es,
           // Now add the contributions to the matrix and the rhs.
           rhs.add(dn, p_value*penalty);
 
-          // Add the panalty parameter to the global matrix
+          // Add the penalty parameter to the global matrix
           // if desired.
           if (do_for_matrix)
             matrix.add(dn, dn, penalty);

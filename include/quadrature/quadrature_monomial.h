@@ -142,7 +142,7 @@ private:
    * The rules are obtained by considering the group G^{rot} of rotations of the reference
    * hex, and the invariant polynomials of this group.
    *
-   * In Kim and Song's rules, quadrauture points are described by the following points
+   * In Kim and Song's rules, quadrature points are described by the following points
    * and their unique permutations under the G^{rot} group:
    *
    * 0.) (0,0,0) ( 1 perm ) -> [0, 0, 0]

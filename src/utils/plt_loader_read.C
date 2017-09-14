@@ -198,7 +198,7 @@ void PltLoader::read_header (std::istream & in)
             // Found a Zone marker
             else if (f == 299.)
               {
-                // Incriment the Zone counter
+                // Increment the Zone counter
                 nz++;
 
                 // Read the zone name
@@ -400,7 +400,7 @@ void PltLoader::read_header (std::istream & in)
             // Found a Zone marker
             else if (f == 299.)
               {
-                // Incriment the Zone counter
+                // Increment the Zone counter
                 nz++;
 
                 // Read the zone name
@@ -515,7 +515,7 @@ void PltLoader::read_header (std::istream & in)
                   std::memcpy  (&k_max, buf, LIBMESH_SIZEOF_INT);
                   rb(k_max);
 
-                  // These are only useful for orderd data.  Otherwise
+                  // These are only useful for ordered data.  Otherwise
                   // we grabbed the relevant values above.
                   if (ztype.back() != ORDERED)
                     {

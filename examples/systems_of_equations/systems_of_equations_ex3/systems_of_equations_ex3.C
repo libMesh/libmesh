@@ -166,7 +166,7 @@ int main (int argc, char ** argv)
   const Real nonlinear_tolerance = TOLERANCE*10;
 
   // We also set a standard linear solver flag in the EquationSystems object
-  // which controls the maxiumum number of linear solver iterations allowed.
+  // which controls the maximum number of linear solver iterations allowed.
   equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 250;
 
   // Tell the system of equations what the timestep is by using
@@ -193,7 +193,7 @@ int main (int argc, char ** argv)
 
   for (unsigned int t_step=1; t_step<=n_timesteps; ++t_step)
     {
-      // Incremenet the time counter, set the time and the
+      // Increment the time counter, set the time and the
       // time step size as parameters in the EquationSystem.
       navier_stokes_system.time += dt;
 
@@ -496,7 +496,7 @@ void assemble_stokes (EquationSystems & es,
       //        | Kpu Kpv Kpp |        | Fp |
       //         -           -          -  -
       //
-      // The DenseSubMatrix.repostition () member takes the
+      // The DenseSubMatrix.reposition () member takes the
       // (row_offset, column_offset, row_size, column_size).
       //
       // Similarly, the DenseSubVector.reposition () member

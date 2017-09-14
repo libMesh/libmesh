@@ -1566,7 +1566,7 @@ void libmesh_assert_parallel_consistent_procids<Elem>(const MeshBase & mesh)
   libmesh_parallel_only(mesh.comm());
 
   // We want this test to be valid even when called even after nodes
-  // have been added asynchonously but before they're renumbered
+  // have been added asynchronously but before they're renumbered
   dof_id_type parallel_max_elem_id = mesh.max_elem_id();
   mesh.comm().max(parallel_max_elem_id);
 
@@ -1610,7 +1610,7 @@ void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
   libmesh_parallel_only(mesh.comm());
 
   // We want this test to be valid even when called even after nodes
-  // have been added asynchonously but before they're renumbered
+  // have been added asynchronously but before they're renumbered
   dof_id_type parallel_max_node_id = mesh.max_node_id();
   mesh.comm().max(parallel_max_node_id);
 
@@ -1660,7 +1660,7 @@ void libmesh_assert_parallel_consistent_procids<Node>(const MeshBase & mesh)
   libmesh_parallel_only(mesh.comm());
 
   // We want this test to be valid even when called even after nodes
-  // have been added asynchonously but before they're renumbered
+  // have been added asynchronously but before they're renumbered
   dof_id_type parallel_max_node_id = mesh.max_node_id();
   mesh.comm().max(parallel_max_node_id);
 

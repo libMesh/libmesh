@@ -70,7 +70,7 @@ public:
 
   /**
    * Return a reference to the global \p RemoteElem
-   * sigleton object.
+   * singleton object.
    */
   static const Elem & create ();
 

@@ -266,7 +266,7 @@ protected:
   SolverType _solver_type;
 
   /**
-   * Enum statitng with type of preconditioner to use.
+   * Enum stating with type of preconditioner to use.
    */
   PreconditionerType _preconditioner_type;
 

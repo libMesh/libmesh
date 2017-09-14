@@ -42,7 +42,7 @@ namespace libMesh
 
 
 // ------------------------------------------------------------
-// PerfLog class member funcions
+// PerfLog class member functions
 
 bool PerfLog::called = false;
 
@@ -77,7 +77,7 @@ void PerfLog::clear()
       for (std::map<std::pair<std::string,std::string>, PerfData>::iterator
              pos = log.begin(); pos != log.end(); ++pos)
         if (pos->second.open)
-          libmesh_error_msg("ERROR clearning performance log for class " \
+          libmesh_error_msg("ERROR clearing performance log for class " \
                             << label_name                             \
                             << "\nevent "                             \
                             << pos->first.second                      \

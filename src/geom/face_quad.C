@@ -154,7 +154,7 @@ Real Quad::quality (const ElemQuality q) const
     {
 
       /**
-       * Compue the min/max diagonal ratio.
+       * Compute the min/max diagonal ratio.
        * This is modeled after the Hex element
        */
     case DISTORTION:

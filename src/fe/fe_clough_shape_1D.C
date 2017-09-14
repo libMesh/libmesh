@@ -16,14 +16,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ inlcludes
+// C++ includes
 
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 
 
-// Anonymous namespace for persistant variables.
+// Anonymous namespace for persistent variables.
 // This allows us to cache the global-to-local mapping transformation
 // This should also screw up multithreading royally
 namespace

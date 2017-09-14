@@ -121,7 +121,7 @@ void LinearImplicitSystem::solve ()
   else
     linear_solver->init();
 
-  // Get the user-specifiied linear solver tolerance
+  // Get the user-specified linear solver tolerance
   const Real tol            =
     es.parameters.get<Real>("linear solver tolerance");
 
@@ -178,7 +178,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number> * shell_matr
   const EquationSystems & es =
   this->get_equation_systems();
 
-  // Get the user-specifiied linear solver tolerance
+  // Get the user-specified linear solver tolerance
   const Real tol            =
   es.parameters.get<Real>("sensitivity solver tolerance");
 
@@ -245,7 +245,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number> * shell_matr
   const EquationSystems & es =
   this->get_equation_systems();
 
-  // Get the user-specifiied linear solver tolerance
+  // Get the user-specified linear solver tolerance
   const Real tol            =
   es.parameters.get<Real>("adjoint solver tolerance");
 
@@ -301,7 +301,7 @@ void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number> * shell_matr
 
   this->sensitivity_solve(parameters);
 
-  // Get ready to fill in senstivities:
+  // Get ready to fill in sensitivities:
   sensitivities.allocate_data(qoi_indices, *this, parameters);
 
   // We use the identity:

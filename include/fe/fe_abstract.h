@@ -138,7 +138,7 @@ public:
 
   /**
    * Reinitializes all the physical element-dependent data based on
-   * the \p side of the element \p elem.  The \p tolerance paremeter
+   * the \p side of the element \p elem.  The \p tolerance parameter
    * is passed to the involved call to \p inverse_map().  By default the
    * element data are computed at the quadrature points specified by the
    * quadrature rule \p qrule, but any set of points on the reference
@@ -152,7 +152,7 @@ public:
 
   /**
    * Reinitializes all the physical element-dependent data based on
-   * the \p edge of the element \p elem.  The \p tolerance paremeter
+   * the \p edge of the element \p elem.  The \p tolerance parameter
    * is passed to the involved call to \p inverse_map().  By default the
    * element data are computed at the quadrature points specified by the
    * quadrature rule \p qrule, but any set of points on the reference

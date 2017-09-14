@@ -74,7 +74,7 @@ using namespace libMesh;
 // Function prototype.  This function will assemble the system
 // matrix and right-hand-side at each time step.  Note that
 // since the system is linear we technically do not need to
-// assmeble the matrix at each time step, but we will anyway.
+// assemble the matrix at each time step, but we will anyway.
 // In subsequent examples we will employ adaptive mesh refinement,
 // and with a changing mesh it will be necessary to rebuild the
 // system matrix.
@@ -709,6 +709,6 @@ void assemble_cd (EquationSystems & es,
       system.rhs->add_vector    (Fe, dof_indices);
 
     }
-  // Finished computing the sytem matrix and right-hand side.
+  // Finished computing the system matrix and right-hand side.
 }
 #endif // #ifdef LIBMESH_ENABLE_AMR

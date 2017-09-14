@@ -249,7 +249,7 @@ void System::init ()
   if (!this->n_vars())
     return;
 
-  // Then call the user-provided intialization function
+  // Then call the user-provided initialization function
   this->user_initialization();
 }
 
@@ -562,7 +562,7 @@ bool System::compare (const System & other_system,
       if (solu_result == -1)
         libMesh::out << " identical up to threshold." << std::endl;
       else
-        libMesh::out << "  first difference occured at index = "
+        libMesh::out << "  first difference occurred at index = "
                      << solu_result << "." << std::endl;
     }
 
@@ -611,7 +611,7 @@ bool System::compare (const System & other_system,
               if (ov_result[ov_result.size()-1] == -1)
                 libMesh::out << " identical up to threshold." << std::endl;
               else
-                libMesh::out << " first difference occured at" << std::endl
+                libMesh::out << " first difference occurred at" << std::endl
                              << "   index = " << ov_result[ov_result.size()-1] << "." << std::endl;
             }
 
@@ -1142,7 +1142,7 @@ unsigned int System::add_variable (const std::string & var,
       if (their_active_subdomains && !active_subdomains)
         should_be_in_vg = false;
 
-      // they aren't restriced, we are?
+      // they aren't restricted, we are?
       if (!their_active_subdomains && active_subdomains)
         should_be_in_vg = false;
 
@@ -1945,7 +1945,7 @@ void System::attach_QOI_derivative_object (QOIDerivative & qoi_derivative)
 
 void System::user_initialization ()
 {
-  // Call the user-provided intialization function,
+  // Call the user-provided initialization function,
   // if it was provided
   if (_init_system_function != libmesh_nullptr)
     this->_init_system_function (_equation_systems, this->name());
@@ -2090,7 +2090,7 @@ Number System::point_value(unsigned int var, const Point & p, const Elem & e) co
   // Fill in the dof_indices for our element
   dof_map.dof_indices (&e, dof_indices, var);
 
-  // Get the no of dofs assciated with this point
+  // Get the no of dofs associated with this point
   const unsigned int num_dofs = cast_int<unsigned int>
     (dof_indices.size());
 
@@ -2203,7 +2203,7 @@ Gradient System::point_gradient(unsigned int var, const Point & p, const Elem & 
   // Fill in the dof_indices for our element
   dof_map.dof_indices (&e, dof_indices, var);
 
-  // Get the no of dofs assciated with this point
+  // Get the no of dofs associated with this point
   const unsigned int num_dofs = cast_int<unsigned int>
     (dof_indices.size());
 
@@ -2317,7 +2317,7 @@ Tensor System::point_hessian(unsigned int var, const Point & p, const Elem & e) 
   // Fill in the dof_indices for our element
   dof_map.dof_indices (&e, dof_indices, var);
 
-  // Get the no of dofs assciated with this point
+  // Get the no of dofs associated with this point
   const unsigned int num_dofs = cast_int<unsigned int>
     (dof_indices.size());
 
