@@ -224,6 +224,7 @@ LIBMESH_TEST_CXX11_FINAL
 LIBMESH_TEST_CXX11_NULLPTR
 LIBMESH_TEST_CXX11_TO_STRING
 LIBMESH_TEST_CXX11_NOEXCEPT
+LIBMESH_TEST_CXX17_FALLTHROUGH_ATTRIBUTE
 
 #-----------------------------------------------------
 # Initialize libtool.  By default, we will build
