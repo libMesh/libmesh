@@ -63,6 +63,7 @@ AC_DEFUN([LIBMESH_TEST_CXX17_FALLTHROUGH_ATTRIBUTE],
               default:
                 j=2;
             }
+          (void)j; // Avoid unused variable warning
           ]]
           )],[
           AC_MSG_RESULT(yes)
