@@ -132,9 +132,7 @@ while [ "x$1" != "x" ]; do
 	    ;;
 	
 	"--libs")
-	    return_val="@libmesh_optional_LIBS@ 
-                        -Wl,-rpath,${libdir} -L${libdir} -lmesh${libext} 
-                        $return_val"
+	    return_val="-Wl,-rpath,${libdir} -L${libdir} -lmesh${libext} @libmesh_optional_LIBS@ $return_val"
 	    ;;
 
 	"--ldflags")
