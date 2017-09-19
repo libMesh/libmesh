@@ -639,19 +639,45 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
           if (node.processor_id() == this->comm().rank())
             {
               // Get the values to add to the rhs vector
-              std::map<numeric_index_type, Number> rhs_values;
-              elem_assembly->get_nodal_rhs_values(rhs_values, *this, node);
+              std::vector<dof_id_type> nodal_dof_indices;
+              DenseMatrix<Number> nodal_matrix;
+              DenseVector<Number> nodal_rhs;
+              elem_assembly->get_nodal_values(
+                nodal_dof_indices, nodal_matrix, nodal_rhs, *this, node);
 
-              std::map<numeric_index_type, Number>::const_iterator it =
-                rhs_values.begin();
-              const std::map<numeric_index_type, Number>::const_iterator it_end =
-                rhs_values.end();
-              for ( ; it != it_end; ++it)
+              if(!nodal_dof_indices.empty())
                 {
-                  numeric_index_type dof_index = it->first;
-                  Number value = it->second;
+                  if(assemble_vector)
+                    {
+                      input_vector->add_vector(nodal_rhs, nodal_dof_indices);
+                    }
 
-                  input_vector->add( dof_index, value);
+                  if(assemble_matrix)
+                    {
+                      input_matrix->add_matrix(nodal_matrix, nodal_dof_indices);
+                    }
+                }
+
+              if(elem_assembly->is_nodal_rhs_values_overriden)
+                {
+                  // This is the "old" implementation, to be deprecated soon.
+                  // Only enter this if ElemAssembly::get_nodal_rhs_values has
+                  // a non-default implementation.
+                  libmesh_deprecated();
+
+                  std::map<numeric_index_type, Number> rhs_values;
+                  elem_assembly->get_nodal_rhs_values(rhs_values, *this, node);
+
+                  std::map<numeric_index_type, Number>::const_iterator it =
+                    rhs_values.begin();
+                  const std::map<numeric_index_type, Number>::const_iterator it_end =
+                    rhs_values.end();
+                  for ( ; it != it_end; ++it)
+                    {
+                      numeric_index_type dof_index = it->first;
+                      Number value = it->second;
+                      input_vector->add( dof_index, value);
+                    }
                 }
             }
         }

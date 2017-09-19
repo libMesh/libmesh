@@ -19,6 +19,7 @@
 #define LIBMESH_ELEM_ASSEMBLY_H
 
 #include "libmesh/reference_counted_object.h"
+#include "libmesh/dense_matrix.h"
 
 namespace libMesh
 {
@@ -42,7 +43,10 @@ public:
    * Constructor.  Initializes required
    * data structures.
    */
-  ElemAssembly () {}
+  ElemAssembly ()
+  :
+  is_nodal_rhs_values_overriden(true)
+  {}
 
   /**
    * Destructor.
@@ -60,17 +64,48 @@ public:
   virtual void boundary_assembly(FEMContext &) { }
 
   /**
+   * Get values to add to the matrix or rhs vector based on \p node.
+   * This allows one to impose point loads or springs, for example.
+   */
+  virtual void
+  get_nodal_values(std::vector<dof_id_type> ,
+                   DenseMatrix<Number>& ,
+                   DenseVector<Number>& ,
+                   const System & ,
+                   const Node &)
+  {
+    // Do nothing by default
+  }
+
+  /**
    * Get values to add to the RHS vector based on \p node.
    * This allows one to impose point loads, for example.
+   * Get values to add to the matrix or rhs vector based on \p node.
+   * This allows one to impose point loads or springs, for example.
    */
   virtual void
   get_nodal_rhs_values(std::map<numeric_index_type, Number> & values,
                        const System &,
                        const Node &)
   {
+    // use get_nodal_values instead, since that enables matrix and vector assembly
+    libmesh_deprecated();
+
     // By default, just clear the values map
     values.clear();
+
+    // Set flag so that we know this is the default implementation
+    is_nodal_rhs_values_overriden = false;
   }
+
+  /**
+   * Temporary flag to help us figure out if we should call the
+   * deprecated get_nodal_rhs_values method or not.
+   */
+  bool is_nodal_rhs_values_overriden;
+
+protected:
+
 };
 
 }
