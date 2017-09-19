@@ -56,8 +56,11 @@ public:
   // The size used for encoding all id types in this file
   typedef largest_id_type xdr_id_type;
 
-  // The size type used to read header sizes (meta data information)
-  typedef uint32_t header_id_type;
+  // The size type used to read pre-1.3.0 header sizes (meta data information)
+  typedef uint32_t old_header_id_type;
+
+  // Likewise, but for 1.3.0 and newer header files
+  typedef uint64_t new_header_id_type;
 
   /**
    * Constructor.  Takes a writable reference to a mesh object.
@@ -164,20 +167,39 @@ public:
   /**
    * \returns \p true if the current file has an XDR/XDA version that
    * matches or exceeds 0.9.2.
+   *
+   * As of this version we encode integer field widths, nodesets,
+   * subdomain names, boundary names, and element unique_id values (if
+   * they exist) into our files.
    */
   bool version_at_least_0_9_2() const;
 
   /**
    * \returns \p true if the current file has an XDR/XDA version that
    * matches or exceeds 0.9.6.
+   *
+   * In this version we add node unique_id values to our files, if
+   * they exist.
    */
   bool version_at_least_0_9_6() const;
 
   /**
    * \returns \p true if the current file has an XDR/XDA version that
    * matches or exceeds 1.1.0.
+   *
+   * In this version we add edge and shellface boundary conditions to
+   * our files.
    */
   bool version_at_least_1_1_0() const;
+
+  /**
+   * \returns \p true if the current file has an XDR/XDA version that
+   * matches or exceeds 1.3.0.
+   *
+   * In this version we fix handling of uint64_t binary values on
+   * Linux, which were previously miswritten as 32 bit via xdr_long.
+   */
+  bool version_at_least_1_3_0() const;
 
 private:
 
@@ -203,29 +225,29 @@ private:
    * Helper function used in write_serialized_side_bcs, write_serialized_edge_bcs, and
    * write_serialized_shellface_bcs.
    */
-  void write_serialized_bcs_helper (Xdr & io, const header_id_type n_side_bcs, const std::string bc_type) const;
+  void write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_side_bcs, const std::string bc_type) const;
 
   /**
    * Write the side boundary conditions for a parallel, distributed mesh
    */
-  void write_serialized_side_bcs (Xdr & io, const header_id_type n_side_bcs) const;
+  void write_serialized_side_bcs (Xdr & io, const new_header_id_type n_side_bcs) const;
 
   /**
    * Write the edge boundary conditions for a parallel, distributed mesh.
    * NEW in 1.1.0 format.
    */
-  void write_serialized_edge_bcs (Xdr & io, const header_id_type n_edge_bcs) const;
+  void write_serialized_edge_bcs (Xdr & io, const new_header_id_type n_edge_bcs) const;
 
   /**
    * Write the "shell face" boundary conditions for a parallel, distributed mesh.
    * NEW in 1.1.0 format.
    */
-  void write_serialized_shellface_bcs (Xdr & io, const header_id_type n_shellface_bcs) const;
+  void write_serialized_shellface_bcs (Xdr & io, const new_header_id_type n_shellface_bcs) const;
 
   /**
    * Write the boundary conditions for a parallel, distributed mesh
    */
-  void write_serialized_nodesets (Xdr & io, const header_id_type n_nodesets) const;
+  void write_serialized_nodesets (Xdr & io, const new_header_id_type n_nodesets) const;
 
   /**
    * Write boundary names information (sideset and nodeset) - NEW in 0.9.2 format
@@ -235,6 +257,14 @@ private:
 
   //---------------------------------------------------------------------------
   // Read Implementation
+
+  /**
+   * Read header information - templated to handle old (4-byte) or new
+   * (8-byte) header id types.
+   */
+  template <typename T>
+  void read_header(Xdr & io, std::vector<T> & meta_data);
+
   /**
    * Read subdomain name information - NEW in 0.9.2 format
    */
@@ -244,7 +274,7 @@ private:
    * Read the connectivity for a parallel, distributed mesh
    */
   template <typename T>
-  void read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, std::vector<header_id_type> & sizes, T);
+  void read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, std::vector<new_header_id_type> & sizes, T);
 
   /**
    * Read the nodal locations for a parallel, distributed mesh
@@ -307,7 +337,7 @@ private:
   bool _write_serial;
   bool _write_parallel;
   bool _write_unique_id;
-  header_id_type _field_width;
+  unsigned int _field_width;
   std::string _version;
   std::string _bc_file_name;
   std::string _partition_map_file;
