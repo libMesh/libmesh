@@ -2402,25 +2402,36 @@ void DofMap::SCALAR_dof_indices (std::vector<dof_id_type> & di,
 
 
 
+bool DofMap::semilocal_index (dof_id_type dof_index) const
+{
+  // If it's not in the local indices
+  if (dof_index < this->first_dof() ||
+      dof_index >= this->end_dof())
+    {
+      // and if it's not in the ghost indices, then we're not
+      // semilocal
+      if (!std::binary_search(_send_list.begin(), _send_list.end(), dof_index))
+        return false;
+    }
+
+  return true;
+}
+
+
+
 bool DofMap::all_semilocal_indices (const std::vector<dof_id_type> & dof_indices_in) const
 {
   // We're all semilocal unless we find a counterexample
   for (std::size_t i=0; i != dof_indices_in.size(); ++i)
     {
       const dof_id_type di = dof_indices_in[i];
-      // If it's not in the local indices
-      if (di < this->first_dof() ||
-          di >= this->end_dof())
-        {
-          // and if it's not in the ghost indices, then we're not
-          // semilocal
-          if (!std::binary_search(_send_list.begin(), _send_list.end(), di))
-            return false;
-        }
+      if (!this->semilocal_index(di))
+        return false;
     }
 
   return true;
 }
+
 
 
 template <typename DofObjectSubclass>
@@ -2438,22 +2449,7 @@ bool DofMap::is_evaluable(const DofObjectSubclass & obj,
   else
     this->dof_indices(&obj, di, var_num);
 
-  // We're all semilocal unless we find a counterexample
-  for (std::size_t i=0; i != di.size(); ++i)
-    {
-      const dof_id_type dof_id = di[i];
-      // If it's not in the local indices
-      if (dof_id < this->first_dof() ||
-          dof_id >= this->end_dof())
-        {
-          // and if it's not in the ghost indices, then we're not
-          // evaluable
-          if (!std::binary_search(_send_list.begin(), _send_list.end(), dof_id))
-            return false;
-        }
-    }
-
-  return true;
+  return this->all_semilocal_indices(di);
 }
 
 

@@ -648,11 +648,20 @@ public:
                            const bool old_dofs=false) const;
 
   /**
+   * \returns \p true if degree of freedom index \p dof_index
+   * is either a local index or in the \p send_list.
+   *
+   * \note This is an O(logN) operation for a send_list of size N; we
+   * don't cache enough information for O(1) right now.
+   */
+  bool semilocal_index (dof_id_type dof_index) const;
+
+  /**
    * \returns \p true if all degree of freedom indices in \p
    * dof_indices are either local indices or in the \p send_list.
    *
-   * \note This is an O(logN) operation, not O(1); we don't cache
-   * enough information for O(1) right now.
+   * \note This is an O(logN) operation for a send_list of size N; we
+   * don't cache enough information for O(1) right now.
    */
   bool all_semilocal_indices (const std::vector<dof_id_type> & dof_indices) const;
 
