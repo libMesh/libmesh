@@ -320,7 +320,7 @@ void XdrIO::write_serialized_subdomain_names(Xdr & io) const
 
       const std::map<subdomain_id_type, std::string> & subdomain_map = mesh.get_subdomain_name_map();
 
-      std::vector<xdr_id_type> subdomain_ids;
+      std::vector<new_header_id_type> subdomain_ids;
       subdomain_ids.reserve(subdomain_map.size());
 
       std::vector<std::string> subdomain_names;
@@ -329,7 +329,7 @@ void XdrIO::write_serialized_subdomain_names(Xdr & io) const
       // We need to loop over the map and make sure that there aren't any invalid entries.  Since we
       // return writable references in mesh_base, it's possible for the user to leave some entity names
       // blank.  We can't write those to the XDA file.
-      xdr_id_type n_subdomain_names = 0;
+      new_header_id_type n_subdomain_names = 0;
       std::map<subdomain_id_type, std::string>::const_iterator it_end = subdomain_map.end();
       for (std::map<subdomain_id_type, std::string>::const_iterator it = subdomain_map.begin(); it != it_end; ++it)
         {
