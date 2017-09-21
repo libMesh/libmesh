@@ -657,8 +657,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
                       input_matrix->add_matrix(nodal_matrix, nodal_dof_indices);
                     }
                 }
-
-              if(elem_assembly->is_nodal_rhs_values_overriden)
+              else if(elem_assembly->is_nodal_rhs_values_overriden)
                 {
                   // This is the "old" implementation, to be deprecated soon.
                   // Only enter this if ElemAssembly::get_nodal_rhs_values has

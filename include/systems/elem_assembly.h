@@ -68,7 +68,7 @@ public:
    * This allows one to impose point loads or springs, for example.
    */
   virtual void
-  get_nodal_values(std::vector<dof_id_type> ,
+  get_nodal_values(std::vector<dof_id_type>& ,
                    DenseMatrix<Number>& ,
                    DenseVector<Number>& ,
                    const System & ,
