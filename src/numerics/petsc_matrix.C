@@ -913,6 +913,19 @@ void PetscMatrix<T>::close ()
   LIBMESH_CHKERR(ierr);
 }
 
+template <typename T>
+void PetscMatrix<T>::flush ()
+{
+  semiparallel_only();
+
+  PetscErrorCode ierr=0;
+
+  ierr = MatAssemblyBegin (_mat, MAT_FLUSH_ASSEMBLY);
+  LIBMESH_CHKERR(ierr);
+  ierr = MatAssemblyEnd   (_mat, MAT_FLUSH_ASSEMBLY);
+  LIBMESH_CHKERR(ierr);
+}
+
 
 
 template <typename T>

@@ -150,6 +150,8 @@ public:
 
   virtual void close () libmesh_override;
 
+  virtual void flush () libmesh_override;
+
   virtual numeric_index_type m () const libmesh_override;
 
   virtual numeric_index_type n () const libmesh_override;
