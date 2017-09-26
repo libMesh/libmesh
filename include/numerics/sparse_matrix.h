@@ -171,6 +171,13 @@ public:
   virtual void close () = 0;
 
   /**
+   *  For PETSc matrix , this function is similar to close but without shrinking memory.
+   *  This is useful when we want to switch between ADD_VALUES and INSERT_VALUES.
+   *  close should be called before using the matrix.
+   */
+  virtual void flush () { close(); }
+
+  /**
    * \returns The row-dimension of the matrix.
    */
   virtual numeric_index_type m () const = 0;
