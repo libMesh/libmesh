@@ -37,9 +37,9 @@ data = [
 '\'13', 78,
 '\'14', 63,
 '\'15', 79,
-'\'16', 104,
-'\'17', 72,
-'T', 73,
+'\'16', 105,
+'\'17', 89,
+'T', 75,
     ]
 
 # Extract the x-axis labels from the data array
@@ -63,9 +63,12 @@ x = np.linspace(1, N, N)
 # Width of the bars
 width = 0.8
 
-# Make the bar chart.  Plot years in blue, preprints and theses in green.
-ax.bar(x[0:N-1], n_papers[0:N-1], width, color='b')
-ax.bar(x[N-1:N], n_papers[N-1:N], width, color='g')
+# Make the bar chart.
+# The colors used come from sns.color_palette("muted").as_hex() They
+# are the "same basic order of hues as the default matplotlib color
+# cycle but more attractive colors."
+ax.bar(x[0:N-1], n_papers[0:N-1], width, color=u'#4878cf')
+ax.bar(x[N-1:N], n_papers[N-1:N], width, color=u'#6acc65')
 
 # Label the x-axis
 plt.xlabel('T=PhD, MS, and BS Theses')

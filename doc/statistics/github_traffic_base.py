@@ -91,9 +91,15 @@ class PlotData(object):
     # Get a reference to the figure
     fig = plt.figure()
 
+    # The colors used come from sns.color_palette("muted").as_hex() They
+    # are the "same basic order of hues as the default matplotlib color
+    # cycle but more attractive colors."
+    muted_dark_blue = u'#4878cf'
+    muted_green = u'#6acc65'
+
     # 111 is equivalent to Matlab's subplot(1,1,1) command
     ax1 = fig.add_subplot(111)
-    ax1.plot(x_axis, weekly_column2, 'bo-')
+    ax1.plot(x_axis, weekly_column2, color=muted_dark_blue, marker='o', linestyle='-', markersize=3)
     ax1.set_ylabel(self.left_axis_label + ' (blue circles)')
 
     # Choose the number of labels to create, then use linspace to create
@@ -107,7 +113,7 @@ class PlotData(object):
 
     # Plot the weekly column 3 data.
     ax2 = ax1.twinx()
-    ax2.plot(x_axis, weekly_column3, 'gs--')
+    ax2.plot(x_axis, weekly_column3, color=muted_green, marker='s', linestyle='-', markersize=3)
     ax2.set_ylabel(self.right_axis_label + ' (green squares)')
 
     # Add title
@@ -163,7 +169,7 @@ class PlotData(object):
 
     # 111 is equivalent to Matlab's subplot(1,1,1) command
     ax1 = fig.add_subplot(111)
-    ax1.plot(x_axis, monthly_column2, 'bo-')
+    ax1.plot(x_axis, monthly_column2, color=muted_dark_blue, marker='o', linestyle='-')
     ax1.set_ylabel(self.left_axis_label + ' (blue circles)')
 
     # Place an x-axis tick mark every x_step months.  As we get more data,
@@ -177,7 +183,7 @@ class PlotData(object):
 
     # Plot the average weekly unique visitors
     ax2 = ax1.twinx()
-    ax2.plot(x_axis, monthly_column3, 'gs--')
+    ax2.plot(x_axis, monthly_column3, color=muted_green, marker='s', linestyle='-')
     ax2.set_ylabel(self.right_axis_label + ' (green squares)')
 
     # Save as PDF

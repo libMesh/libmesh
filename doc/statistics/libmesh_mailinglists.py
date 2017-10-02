@@ -95,6 +95,7 @@ membership_data = [
     'Jul 2017', 109, 226,
     'Aug 2017', 109, 226,
     'Sep 2017', 28, 56,   # Sourceforge must have finally dropped the people who didn't reconfirm their mailing list subscriptions!
+    'Oct 2017', 30, 63,
 ]
 
 # Strip out the dates from membership_data
@@ -117,11 +118,25 @@ fig = plt.figure()
 # 111 is equivalent to Matlab's subplot(1,1,1) command
 ax = fig.add_subplot(111)
 
-# Plot libmesh-devel mailing list membership over time
-ax.plot(date_nums, devel_count, 'bo-', label='libmesh-devel')
+# The colors used come from sns.color_palette("muted").as_hex() They
+# are the "same basic order of hues as the default matplotlib color
+# cycle but more attractive colors."
+muted_dark_blue = u'#4878cf'
+muted_green = u'#6acc65'
+muted_red = u'#d65f5f'
+muted_purple = u'#b47cc7'
+muted_yellow = u'#c4ad66'
+muted_light_blue = u'#77bedb'
+
+# Choose colors from the list above.
+primary = muted_dark_blue
+secondary = muted_light_blue
 
 # Plot libmesh-users mailing list membership over time
-ax.plot(date_nums, users_count, 'gs--', label='libmesh-users')
+ax.plot(date_nums, users_count, color=primary, marker='s', linestyle='--', label='libmesh-users')
+
+# Plot libmesh-devel mailing list membership over time
+ax.plot(date_nums, devel_count, color=secondary, marker='o', linestyle='-', label='libmesh-devel')
 
 # Add a legend to the plot.
 plt.legend(loc='upper left')
@@ -166,7 +181,7 @@ devel_data = [
     '2014',   47,  62,  27,   8,  12,   2,  22,  22,   0,  17,  20,  12,
     '2015',   25,   2,  16,  13,  21,   5,   1,   8,   9,  30,   8,   0,
     '2016',   16,  31,  43,  18,  21,  11,  17,  26,   4,  16,   5,   6,
-    '2017',    1,   2,   5,   4,   1,  11,   5,   0,
+    '2017',    1,   2,   5,   4,   1,  11,   5,   0,   3,
 ]
 
 # libmesh-users starts in Sept 2003!
@@ -187,7 +202,7 @@ users_data = [
     '2014',   38,  45,  26,  41, 125,  70,  61,  66,  60, 110,  27,  30,
     '2015',   43,  67,  71,  92,  39,  15,  46,  63,  84,  82,  69,  45,
     '2016',   92,  91, 148,  43,  58, 117,  92, 140,  49,  33,  85,  40,
-    '2017',   41,  36,  49,  41,  73,  51,  12,  69,
+    '2017',   41,  36,  49,  41,  73,  51,  12,  69,  26,
 ]
 
 # Make plot of monthly data
@@ -221,10 +236,10 @@ for i in range(0, 12):
   x = np.linspace(1, N, N)
 
   # Plot the summed data
-  ax.bar(x, combined_data_current_month, width, color='c')
+  ax.bar(x, combined_data_current_month, width, color=primary)
 
   # Plot only the libmesh-devel data
-  ax.bar(x, devel_data_current_month, width, color='b')
+  ax.bar(x, devel_data_current_month, width, color=secondary)
 
   # Set up the xticks and labels
   xticks = [0, N-1]
@@ -271,10 +286,10 @@ N = len(combined_devel_users_number)
 x = np.linspace(1, N, N)
 
 # Plot the combined data
-ax.bar(x, combined_devel_users_number, width, color='c', label='libmesh-users')
+ax.bar(x, combined_devel_users_number, width, color=primary, label='libmesh-users')
 
 # Plot the libmesh-devel data alone
-ax.bar(x, devel_numbers, width, color='b', label='libmesh-devel')
+ax.bar(x, devel_numbers, width, color=secondary, label='libmesh-devel')
 
 # Set bi-yearly xticklabels
 ax.set_xticklabels(['2003', '2005', '2007', '2009', '2011', '2013', '2015', '2017'])

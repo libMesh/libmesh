@@ -207,6 +207,7 @@ data = [
     'Jun 2017',   9179,      0, 0.0,
     'Jul 2017',   8344,      0, 0.0,
     'Aug 2017',   8617,      0, 0.0,
+    'Sep 2017',   8576,      0, 0.0,
 ]
 
 # Extract number of hits/month
@@ -231,7 +232,10 @@ ax = fig.add_subplot(111)
 
 # Make the bar chart.  We have one number/month, there are about 30
 # days in each month, this defines the bar width...
-ax.bar(date_nums, n_hits_month, width=30, color='b')
+# The color used comes from sns.color_palette("muted").as_hex() They
+# are the "same basic order of hues as the default matplotlib color
+# cycle but more attractive colors."
+ax.bar(date_nums, n_hits_month, width=30, color=u'#4878cf')
 
 # Create title
 fig.suptitle('LibMesh Page Hits/Month (in Thousands)')

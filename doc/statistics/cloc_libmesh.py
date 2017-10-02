@@ -224,13 +224,16 @@ n_lines = data[2::3]
 # Get a reference to the figure
 fig = plt.figure()
 
-# 111 is equivalent to Matlab's subplot(1,1,1) command
+# 111 is equivalent to Matlab's subplot(1,1,1) command.
+# The colors used come from sns.color_palette("muted").as_hex() They
+# are the "same basic order of hues as the default matplotlib color
+# cycle but more attractive colors."
 ax1 = fig.add_subplot(111)
-ax1.plot(date_nums, n_files, 'bo-')
+ax1.plot(date_nums, n_files, color=u'#4878cf', marker='o', linestyle='-', markersize=3)
 ax1.set_ylabel('Files (blue circles)')
 
 # Set up x-tick locations
-ticks_names = ['2003', '2005', '2007', '2009', '2011', '2013', '2015']
+ticks_names = ['2003', '2005', '2007', '2009', '2011', '2013', '2015', '2017']
 
 # Get numerical values for the names
 tick_nums = []
@@ -243,7 +246,7 @@ ax1.set_xticklabels(ticks_names)
 
 # Use the twinx() command to plot more data on the other axis
 ax2 = ax1.twinx()
-ax2.plot(date_nums, np.divide(n_lines, 1000.), 'gs-')
+ax2.plot(date_nums, np.divide(n_lines, 1000.), color=u'#6acc65', marker='s', linestyle='-', markersize=3)
 ax2.set_ylabel('Lines of code in thousands (green squares)')
 
 # Create linear curve fits of the data
