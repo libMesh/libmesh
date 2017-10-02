@@ -813,7 +813,7 @@ void FEMContext::point_value(unsigned int var,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
-  UniquePtr<FEGenericBase<OutputShape> > fe_new =
+  FEGenericBase<OutputShape> * fe_new =
     this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
@@ -863,7 +863,7 @@ void FEMContext::point_gradient(unsigned int var,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
-  UniquePtr<FEGenericBase<OutputShape> > fe_new =
+  FEGenericBase<OutputShape> * fe_new =
     this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
@@ -914,7 +914,7 @@ void FEMContext::point_hessian(unsigned int var,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
-  UniquePtr<FEGenericBase<OutputShape> > fe_new =
+  FEGenericBase<OutputShape> * fe_new =
     this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
@@ -952,7 +952,7 @@ void FEMContext::point_curl(unsigned int var,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
-  UniquePtr<FEGenericBase<OutputShape> > fe_new =
+  FEGenericBase<OutputShape> * fe_new =
     this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
@@ -1148,7 +1148,7 @@ void FEMContext::fixed_point_value(unsigned int var,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
-  UniquePtr<FEGenericBase<OutputShape> > fe_new =
+  FEGenericBase<OutputShape> * fe_new =
     this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
@@ -1198,7 +1198,7 @@ void FEMContext::fixed_point_gradient(unsigned int var,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
-  UniquePtr<FEGenericBase<OutputShape> > fe_new =
+  FEGenericBase<OutputShape> * fe_new =
     this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
@@ -1249,7 +1249,7 @@ void FEMContext::fixed_point_hessian(unsigned int var,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Build a FE for calculating u(p)
-  UniquePtr<FEGenericBase<OutputShape> > fe_new =
+  FEGenericBase<OutputShape> * fe_new =
     this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
@@ -1804,8 +1804,81 @@ void FEMContext::_update_time_from_system(Real theta)
 
 
 
+template<>
+FEGenericBase<Real> *
+FEMContext::cached_fe( const unsigned int elem_dim,
+                       const FEType fe_type ) const
+{
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  const bool fe_needs_inf =
+    this->has_elem() && this->get_elem().infinite();
+#endif
+
+  if (!_real_fe ||
+      elem_dim != _real_fe->get_dim() ||
+      fe_type != _real_fe->get_fe_type())
+    _real_fe =
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      fe_needs_inf ?
+        FEGenericBase<Real>::build_InfFE(elem_dim, fe_type) :
+#endif
+        FEGenericBase<Real>::build(elem_dim, fe_type);
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  else if (fe_needs_inf && !_real_fe_is_inf)
+    _real_fe =
+      FEGenericBase<Real>::build_InfFE(elem_dim, fe_type);
+  else if (!fe_needs_inf && _real_fe_is_inf)
+    _real_fe =
+      FEGenericBase<Real>::build(elem_dim, fe_type);
+
+  _real_fe_is_inf =
+    (this->has_elem() && this->get_elem().infinite());
+#endif
+
+  return _real_fe.get();
+}
+
+
+template<>
+FEGenericBase<RealGradient> *
+FEMContext::cached_fe( const unsigned int elem_dim,
+                       const FEType fe_type ) const
+{
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  const bool fe_needs_inf =
+    this->has_elem() && this->get_elem().infinite();
+#endif
+
+  if (!_real_grad_fe ||
+      elem_dim != _real_grad_fe->get_dim() ||
+      fe_type != _real_grad_fe->get_fe_type())
+    _real_grad_fe =
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      fe_needs_inf ?
+        FEGenericBase<RealGradient>::build_InfFE(elem_dim, fe_type) :
+#endif
+        FEGenericBase<RealGradient>::build(elem_dim, fe_type);
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  else if (fe_needs_inf && !_real_grad_fe_is_inf)
+    _real_grad_fe =
+      FEGenericBase<RealGradient>::build_InfFE(elem_dim, fe_type);
+  else if (!fe_needs_inf && _real_grad_fe_is_inf)
+    _real_grad_fe =
+      FEGenericBase<RealGradient>::build(elem_dim, fe_type);
+
+  _real_grad_fe_is_inf =
+    (this->has_elem() && this->get_elem().infinite());
+#endif
+
+  return _real_grad_fe.get();
+}
+
+
+
 template<typename OutputShape>
-UniquePtr<FEGenericBase<OutputShape> >
+FEGenericBase<OutputShape> *
 FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
                           const Point & p,
                           const Real tolerance) const
@@ -1830,12 +1903,7 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
 
   const unsigned int elem_dim = this->has_elem() ? this->get_elem().dim() : 0;
 
-  FEGenericBase<OutputShape>* fe_new =
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-    (this->has_elem() && this->get_elem().infinite()) ?
-    FEGenericBase<OutputShape>::build_InfFE(elem_dim, fe_type).release() :
-#endif
-    FEGenericBase<OutputShape>::build(elem_dim, fe_type).release();
+  FEGenericBase<OutputShape>* fe_new = cached_fe<OutputShape>(elem_dim, fe_type);
 
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit
@@ -1855,7 +1923,7 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
     // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
     fe_new->reinit (libmesh_nullptr, &coor);
 
-  return UniquePtr<FEGenericBase<OutputShape> >(fe_new);
+  return fe_new;
 }
 
 
@@ -1979,12 +2047,12 @@ template void FEMContext::interior_accel<Gradient>(unsigned int, unsigned int, G
 template void FEMContext::side_accel<Number>(unsigned int, unsigned int, Number &) const;
 template void FEMContext::side_accel<Gradient>(unsigned int, unsigned int, Gradient &) const;
 
-template UniquePtr<FEGenericBase<Real> >
+template FEGenericBase<Real> *
 FEMContext::build_new_fe(const FEGenericBase<Real>*,
                          const Point &,
                          const Real) const;
 
-template UniquePtr<FEGenericBase<RealGradient> >
+template FEGenericBase<RealGradient> *
 FEMContext::build_new_fe(const FEGenericBase<RealGradient>*,
                          const Point &,
                          const Real) const;

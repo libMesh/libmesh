@@ -995,9 +995,21 @@ protected:
    * Helper function to reduce some code duplication in the *_point_* methods.
    */
   template<typename OutputShape>
-  UniquePtr<FEGenericBase<OutputShape> > build_new_fe( const FEGenericBase<OutputShape> * fe,
-                                                       const Point & p,
-                                                       const Real tolerance = TOLERANCE) const;
+  FEGenericBase<OutputShape> * build_new_fe( const FEGenericBase<OutputShape> * fe,
+                                             const Point & p,
+                                             const Real tolerance = TOLERANCE) const;
+
+  mutable UniquePtr<FEGenericBase<Real> >         _real_fe;
+  mutable UniquePtr<FEGenericBase<RealGradient> > _real_grad_fe;
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  mutable bool _real_fe_is_inf;
+  mutable bool _real_grad_fe_is_inf;
+#endif
+
+  template<typename OutputShape>
+  FEGenericBase<OutputShape> * cached_fe( const unsigned int elem_dim,
+                                          const FEType fe_type ) const;
 
   /**
    * Helper function to promote accessor usage
