@@ -1178,6 +1178,10 @@ void FEMSystem::assemble_qoi_derivative (const QoISet & qoi_indices,
                                                     *(this->diff_qoi),
                                                     include_liftfunc,
                                                     apply_constraints));
+
+  for (std::size_t i=0; i != qoi.size(); ++i)
+    if (qoi_indices.has_index(i))
+      this->diff_qoi->finalize_derivative(this->get_adjoint_rhs(i),i);
 }
 
 
