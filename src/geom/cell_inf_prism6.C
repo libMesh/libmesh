@@ -48,12 +48,12 @@ const unsigned int InfPrism6::side_nodes_map[4][4] =
 
 const unsigned int InfPrism6::edge_nodes_map[6][2] =
   {
-    { 0, 1}, // Side 0
-    { 1, 2},  // Side 1
-    { 0, 2},  // Side 2
-    { 0, 3},  // Side 3
-    { 1, 4},  // Side 4
-    { 2, 5}   // Side 5
+    {0, 1}, // Edge 0
+    {1, 2}, // Edge 1
+    {0, 2}, // Edge 2
+    {0, 3}, // Edge 3
+    {1, 4}, // Edge 4
+    {2, 5}  // Edge 5
   };
 
 

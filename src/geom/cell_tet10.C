@@ -41,12 +41,12 @@ const unsigned int Tet10::side_nodes_map[4][6] =
 
 const unsigned int Tet10::edge_nodes_map[6][3] =
   {
-    {0, 1, 4}, // Side 0
-    {1, 2, 5}, // Side 1
-    {0, 2, 6}, // Side 2
-    {0, 3, 7}, // Side 3
-    {1, 3, 8}, // Side 4
-    {2, 3, 9}  // Side 5
+    {0, 1, 4}, // Edge 0
+    {1, 2, 5}, // Edge 1
+    {0, 2, 6}, // Edge 2
+    {0, 3, 7}, // Edge 3
+    {1, 3, 8}, // Edge 4
+    {2, 3, 9}  // Edge 5
   };
 
 

@@ -47,14 +47,14 @@ const unsigned int InfHex16::side_nodes_map[5][8] =
 
 const unsigned int InfHex16::edge_nodes_map[8][3] =
   {
-    { 0, 1, 8},  // Side 0
-    { 1, 2, 9},  // Side 1
-    { 2, 3, 10}, // Side 2
-    { 0, 3, 11}, // Side 3
-    { 0, 4, 99}, // Side 4
-    { 1, 5, 99}, // Side 5
-    { 2, 6, 99}, // Side 6
-    { 3, 7, 99}  // Side 7
+    {0, 1,  8}, // Edge 0
+    {1, 2,  9}, // Edge 1
+    {2, 3, 10}, // Edge 2
+    {0, 3, 11}, // Edge 3
+    {0, 4, 99}, // Edge 4
+    {1, 5, 99}, // Edge 5
+    {2, 6, 99}, // Edge 6
+    {3, 7, 99}  // Edge 7
   };
 
 
