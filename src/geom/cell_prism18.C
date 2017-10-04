@@ -43,15 +43,15 @@ const unsigned int Prism18::side_nodes_map[5][9] =
 
 const unsigned int Prism18::edge_nodes_map[9][3] =
   {
-    {0, 1, 6},  // Side 0
-    {1, 2, 7},  // Side 1
-    {0, 2, 8},  // Side 2
-    {0, 3, 9},  // Side 3
-    {1, 4, 10}, // Side 4
-    {2, 5, 11}, // Side 5
-    {3, 4, 12}, // Side 6
-    {4, 5, 13}, // Side 7
-    {3, 5, 14}  // Side 8
+    {0, 1,  6}, // Edge 0
+    {1, 2,  7}, // Edge 1
+    {0, 2,  8}, // Edge 2
+    {0, 3,  9}, // Edge 3
+    {1, 4, 10}, // Edge 4
+    {2, 5, 11}, // Edge 5
+    {3, 4, 12}, // Edge 6
+    {4, 5, 13}, // Edge 7
+    {3, 5, 14}  // Edge 8
   };
 
 
