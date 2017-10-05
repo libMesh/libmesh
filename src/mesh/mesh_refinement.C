@@ -524,7 +524,10 @@ bool MeshRefinement::refine_and_coarsen_elements ()
     libmesh_assert(test_level_one(true));
 
   // Possibly clean up the refinement flags from
-  // a previous step
+  // a previous step.  While we're at it, see if this method should be
+  // a no-op.
+  bool elements_flagged = false;
+
   MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
   const MeshBase::element_iterator elem_end = _mesh.elements_end();
 
@@ -533,6 +536,9 @@ bool MeshRefinement::refine_and_coarsen_elements ()
       // Pointer to the element
       Elem * elem = *elem_it;
 
+      // This might be left over from the last step
+      const Elem::RefinementState flag = elem->refinement_flag();
+
       // Set refinement flag to INACTIVE if the
       // element isn't active
       if ( !elem->active())
@@ -540,11 +546,29 @@ bool MeshRefinement::refine_and_coarsen_elements ()
           elem->set_refinement_flag(Elem::INACTIVE);
           elem->set_p_refinement_flag(Elem::INACTIVE);
         }
-
-      // This might be left over from the last step
-      if (elem->refinement_flag() == Elem::JUST_REFINED)
+      else if (flag == Elem::JUST_REFINED)
         elem->set_refinement_flag(Elem::DO_NOTHING);
+      else if (!elements_flagged)
+        {
+          if (flag == Elem::REFINE || flag == Elem::COARSEN)
+            elements_flagged = true;
+          else
+            {
+              const Elem::RefinementState pflag =
+                elem->p_refinement_flag();
+              if (pflag == Elem::REFINE || pflag == Elem::COARSEN)
+                elements_flagged = true;
+            }
+        }
     }
+
+  // Did *any* processor find elements flagged for AMR/C?
+  _mesh.comm().max(elements_flagged);
+
+  // If we have nothing to do, let's not bother verifying that nothing
+  // is compatible with nothing.
+  if (!elements_flagged)
+    return false;
 
   // Parallel consistency has to come first, or coarsening
   // along processor boundaries might occasionally be falsely
