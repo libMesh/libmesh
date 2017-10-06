@@ -348,10 +348,11 @@ void UnstructuredMesh::all_first_order ()
        * Reset the parent links of any child elements
        */
       if (so_elem->has_children())
-        for (unsigned int c=0; c != so_elem->n_children(); ++c)
+        for (unsigned int c = 0, nc = so_elem->n_children(); c != nc; ++c)
           {
-            so_elem->child_ptr(c)->set_parent(lo_elem);
-            lo_elem->add_child(so_elem->child_ptr(c), c);
+            Elem * child = so_elem->child_ptr(c);
+            child->set_parent(lo_elem);
+            lo_elem->add_child(child, c);
           }
 
       /*
