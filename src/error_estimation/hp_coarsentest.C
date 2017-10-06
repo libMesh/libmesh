@@ -31,6 +31,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/error_vector.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/mesh_refinement.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/system.h"
 #include "libmesh/tensor_value.h"
@@ -580,6 +581,13 @@ void HPCoarsenTest::select_refinement (System & system)
           elem->set_refinement_flag(Elem::DO_NOTHING);
         }
     }
+
+  // libMesh::MeshRefinement will now assume that users have set
+  // refinement flags consistently on all processors, but all we've
+  // done so far is set refinement flags on local elements.  Let's
+  // make sure that flags on geometrically ghosted elements are all
+  // set to whatever their owners decided.
+  MeshRefinement(mesh).make_flags_parallel_consistent();
 }
 
 } // namespace libMesh
