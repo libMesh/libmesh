@@ -268,6 +268,23 @@ public:
    */
   Elem * neighbor (const unsigned int i) const;
 
+  /**
+   * Nested "classes" for use iterating over all neighbors of an element.
+   */
+  typedef Elem * const *       NeighborPtrIter;
+  typedef const Elem * const * ConstNeighborPtrIter;
+
+  /**
+   * Returns a range with all neighbors of an element, usable in
+   * range-based for loops.  The exact type of the return value here
+   * may be subject to change in future libMesh releases, but the
+   * iterators will always dereference to produce a pointer to a
+   * neighbor element (or a null pointer, for sides which have no
+   * neighbors).
+   */
+  SimpleRange<NeighborPtrIter> neighbor_ptr_range();
+
+  SimpleRange<ConstNeighborPtrIter> neighbor_ptr_range() const;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   /**
@@ -2701,6 +2718,21 @@ SimpleRange<Elem::ConstChildRefIter> Elem::child_ref_range() const
   return {_children, _children + this->n_children()};
 }
 #endif // LIBMESH_ENABLE_AMR
+
+
+inline
+SimpleRange<Elem::NeighborPtrIter> Elem::neighbor_ptr_range()
+{
+  return {_elemlinks+1, _elemlinks + 1 + this->n_neighbors()};
+}
+
+
+inline
+SimpleRange<Elem::ConstNeighborPtrIter> Elem::neighbor_ptr_range() const
+{
+  return {_elemlinks+1, _elemlinks + 1 + this->n_neighbors()};
+}
+
 
 } // namespace libMesh
 
