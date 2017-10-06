@@ -1691,37 +1691,31 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
                     /*
                      * find out which child I am
                      */
-                    for (unsigned int c=0; c < parent->n_children(); c++)
+                    unsigned int c = parent->which_child_am_i(elem);
+                    /*
+                     *loop over the childs (that is, the current elements) nodes
+                     */
+                    for (unsigned int nc=0; nc < elem->n_nodes(); nc++)
                       {
-                        if (parent->child_ptr(c) == elem)
+                        /*
+                         * the new position of the node
+                         */
+                        Point point;
+                        for (unsigned int n=0; n<parent->n_nodes(); n++)
                           {
                             /*
-                             *loop over the childs (that is, the current elements) nodes
+                             * The value from the embedding matrix
                              */
-                            for (unsigned int nc=0; nc < elem->n_nodes(); nc++)
-                              {
-                                /*
-                                 * the new position of the node
-                                 */
-                                Point point;
-                                for (unsigned int n=0; n<parent->n_nodes(); n++)
-                                  {
-                                    /*
-                                     * The value from the embedding matrix
-                                     */
-                                    const float em_val = parent->embedding_matrix(c,nc,n);
+                            const float em_val = parent->embedding_matrix(c,nc,n);
 
-                                    if (em_val != 0.)
-                                      point.add_scaled (parent->point(n), em_val);
-                                  }
+                            if (em_val != 0.)
+                              point.add_scaled (parent->point(n), em_val);
+                          }
 
-                                const dof_id_type id = elem->node_ptr(nc)->id();
-                                new_positions[id] = point;
-                                weight[id] = 1.;
-                              }
-
-                          } // if parent->child == elem
-                      } // for parent->n_children
+                        const dof_id_type id = elem->node_ptr(nc)->id();
+                        new_positions[id] = point;
+                        weight[id] = 1.;
+                      }
                   } // if element refinement_level
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
