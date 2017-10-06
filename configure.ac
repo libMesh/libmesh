@@ -129,19 +129,25 @@ LIBMESH_SET_COMPILERS
 
 # --------------------------------------------------------------
 # Allow the user to explicitly turn off C++11 support by saying
-# --disable-cxx11.  Otherwise, C++11 support is enabled by default
-# although libmesh does not (currently) use any C++11 features.
+# --disable-cxx11?  This is no longer supported.
+#
+# We'll leave the "option" in place for a release, though, just in
+# case anyone is specifying --enable-cxx11 in their build scripts
 # --------------------------------------------------------------
 AC_ARG_ENABLE(cxx11,
               AC_HELP_STRING([--disable-cxx11],
-                             [build without C++11 support]),
+                             [build without C++11 support (no longer supported!)]),
                              [case "${enableval}" in
                    yes) enablecxx11=yes ;;
-                   no)  enablecxx11=no ;;
+                   no)  AC_MSG_ERROR(libMesh now requires C++11) ;;
                    *)   AC_MSG_ERROR(bad value ${enableval} for --disable-cxx11) ;;
                    esac],
-                   [enablecxx11=yes])
+                   [enablecxx11=irrelevant])
 
+if (test $enablecxx11 != irrelevant) ; then
+  AC_MSG_WARN([--enable/disable-cxx11 are now deprecated])
+fi
+enablecxx11=yes
 
 # --------------------------------------------------------------
 # Setting --enable-cxx11-required causes an error to be emitted during
@@ -159,18 +165,18 @@ AC_ARG_ENABLE(cxx11-required,
                    no)  cxx11required=no ;;
                    *)   AC_MSG_ERROR(bad value ${enableval} for --enable-cxx11-required) ;;
                    esac],
-                   [cxx11required=no])
+                   [cxx11required=irrelevant])
+
+if (test $cxx11required != irrelevant) ; then
+  AC_MSG_WARN([C++11 is now always required for libMesh])
+fi
 
 # --------------------------------------------------------------
 # Standard autoconf macro for determining the proper -std=c++11
 # flag for the current compiler.  Adds the result to CXXFLAGS if
 # one is found.  See ax_cxx_compile_stdcxx_11.m4 for details.
 # --------------------------------------------------------------
-if (test $cxx11required = yes); then
-  AX_CXX_COMPILE_STDCXX_11([],[mandatory])
-else
-  AX_CXX_COMPILE_STDCXX_11([],[optional])
-fi
+AX_CXX_COMPILE_STDCXX_11([],[mandatory])
 
 # --------------------------------------------------------------
 # See compiler.m4 for the definition of this function.  It uses the
@@ -194,9 +200,7 @@ libmesh_CXXFLAGS="$GCOV_FLAGS $libmesh_CXXFLAGS"
 LIBMESH_SET_METHODS
 
 # --------------------------------------------------------------
-# Test for specific C++11 features.  Note, we still run these
-# tests even when C++11 has been explicitly disabled even though
-# we know they will fail, since they contain AM_CONDITIONALs.
+# Test for specific C++11 features.
 # --------------------------------------------------------------
 LIBMESH_TEST_CXX11_MOVE
 LIBMESH_TEST_CXX11_MOVE_CONSTRUCTORS
