@@ -33,6 +33,8 @@
 #include "libmesh/enum_io_package.h"
 #include "libmesh/auto_ptr.h"
 #include "libmesh/multi_predicates.h"
+#include "libmesh/ppiter.h"
+#include "libmesh/simple_range.h"
 #include "libmesh/variant_filter_iterator.h"
 #include "libmesh/hashword.h" // Used in compute_key() functions
 
@@ -1089,6 +1091,23 @@ public:
    */
   Elem * child (const unsigned int i) const;
 
+  /**
+   * Nested classes for use iterating over all children of a parent
+   * element.
+   */
+  class ChildRefIter;
+  class ConstChildRefIter;
+
+  /**
+   * Returns a range with all children of a parent element, usable in
+   * range-based for loops.  The exact type of the return value here
+   * may be subject to change in future libMesh releases, but the
+   * iterators will always dereference to produce a reference to a
+   * child element.
+   */
+  SimpleRange<ChildRefIter> child_ref_range();
+
+  SimpleRange<ConstChildRefIter> child_ref_range() const;
 
 private:
   /**
@@ -2648,6 +2667,40 @@ Elem::side_iterator : variant_filter_iterator<Elem::Predicate, Elem *>
     variant_filter_iterator<Elem::Predicate, Elem *>(d,e,p) {}
 };
 
+
+
+#ifdef LIBMESH_ENABLE_AMR
+class
+Elem::ChildRefIter : public PPIter<Elem>
+{
+public:
+  ChildRefIter (Elem * const * childpp) : PPIter<Elem>(childpp) {}
+};
+
+
+class
+Elem::ConstChildRefIter : public PPIter<const Elem>
+{
+public:
+  ConstChildRefIter (const Elem * const * childpp) : PPIter<const Elem>(childpp) {}
+};
+
+
+inline
+SimpleRange<Elem::ChildRefIter> Elem::child_ref_range()
+{
+  libmesh_assert(_children);
+  return {_children, _children + this->n_children()};
+}
+
+
+inline
+SimpleRange<Elem::ConstChildRefIter> Elem::child_ref_range() const
+{
+  libmesh_assert(_children);
+  return {_children, _children + this->n_children()};
+}
+#endif // LIBMESH_ENABLE_AMR
 
 } // namespace libMesh
 
