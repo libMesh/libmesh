@@ -1609,6 +1609,45 @@ protected:
 
 
 // ------------------------------------------------------------
+// Elem helper classes
+
+#ifdef LIBMESH_ENABLE_AMR
+class
+Elem::ChildRefIter : public PPIter<Elem>
+{
+public:
+  ChildRefIter (Elem * const * childpp) : PPIter<Elem>(childpp) {}
+};
+
+
+class
+Elem::ConstChildRefIter : public PPIter<const Elem>
+{
+public:
+  ConstChildRefIter (const Elem * const * childpp) : PPIter<const Elem>(childpp) {}
+};
+
+
+inline
+SimpleRange<Elem::ChildRefIter> Elem::child_ref_range()
+{
+  libmesh_assert(_children);
+  return {_children, _children + this->n_children()};
+}
+
+
+inline
+SimpleRange<Elem::ConstChildRefIter> Elem::child_ref_range() const
+{
+  libmesh_assert(_children);
+  return {_children, _children + this->n_children()};
+}
+#endif // LIBMESH_ENABLE_AMR
+
+
+
+
+// ------------------------------------------------------------
 // global Elem functions
 
 inline
@@ -2150,8 +2189,8 @@ bool Elem::has_ancestor_children() const
   if (_children == libmesh_nullptr)
     return false;
   else
-    for (unsigned int c=0; c != this->n_children(); c++)
-      if (this->child_ptr(c)->has_children())
+    for (auto & c : child_ref_range())
+      if (c.has_children())
         return true;
 #endif
   return false;
@@ -2325,7 +2364,8 @@ unsigned int Elem::which_child_am_i (const Elem * e) const
   libmesh_assert(e);
   libmesh_assert (this->has_children());
 
-  for (unsigned int c=0; c<this->n_children(); c++)
+  unsigned int nc = this->n_children();
+  for (unsigned int c=0; c != nc; c++)
     if (this->child_ptr(c) == e)
       return c;
 
@@ -2382,9 +2422,9 @@ unsigned int Elem::max_descendant_p_level () const
     return this->p_level();
 
   unsigned int max_p_level = _p_level;
-  for (unsigned int c=0; c != this->n_children(); c++)
+  for (auto & c : child_ref_range())
     max_p_level = std::max(max_p_level,
-                           this->child_ptr(c)->max_descendant_p_level());
+                           c.max_descendant_p_level());
   return max_p_level;
 }
 
@@ -2413,9 +2453,9 @@ void Elem::set_p_level(unsigned int p)
         {
           _p_level = cast_int<unsigned char>(p);
           parent_p_level = cast_int<unsigned char>(p);
-          for (unsigned int c=0; c != this->parent()->n_children(); c++)
+          for (auto & c : this->parent()->child_ref_range())
             parent_p_level = std::min(parent_p_level,
-                                      this->parent()->child_ptr(c)->p_level());
+                                      c.p_level());
 
           // When its children all have a higher p level, the parent's
           // should rise
@@ -2684,40 +2724,6 @@ Elem::side_iterator : variant_filter_iterator<Elem::Predicate, Elem *>
     variant_filter_iterator<Elem::Predicate, Elem *>(d,e,p) {}
 };
 
-
-
-#ifdef LIBMESH_ENABLE_AMR
-class
-Elem::ChildRefIter : public PPIter<Elem>
-{
-public:
-  ChildRefIter (Elem * const * childpp) : PPIter<Elem>(childpp) {}
-};
-
-
-class
-Elem::ConstChildRefIter : public PPIter<const Elem>
-{
-public:
-  ConstChildRefIter (const Elem * const * childpp) : PPIter<const Elem>(childpp) {}
-};
-
-
-inline
-SimpleRange<Elem::ChildRefIter> Elem::child_ref_range()
-{
-  libmesh_assert(_children);
-  return {_children, _children + this->n_children()};
-}
-
-
-inline
-SimpleRange<Elem::ConstChildRefIter> Elem::child_ref_range() const
-{
-  libmesh_assert(_children);
-  return {_children, _children + this->n_children()};
-}
-#endif // LIBMESH_ENABLE_AMR
 
 
 inline
