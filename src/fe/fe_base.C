@@ -814,6 +814,9 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
   // FIXME: what about 2D shells in 3D space?
   unsigned int dim = elem->dim();
 
+  // Cache n_children(); it's a virtual call but it's const.
+  const unsigned int n_children = elem->n_children();
+
   // We use local FE objects for now
   // FIXME: we should use more, external objects instead for efficiency
   const FEType & base_fe_type = dof_map.variable_type(var);
@@ -961,8 +964,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
 
         // Add projection terms from each child sharing
         // this edge
-        for (unsigned int c=0; c != elem->n_children();
-             ++c)
+        for (unsigned int c=0; c != n_children; ++c)
           {
             if (!elem->is_child_on_edge(c,e))
               continue;
@@ -1099,8 +1101,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
 
         // Add projection terms from each child sharing
         // this side
-        for (unsigned int c=0; c != elem->n_children();
-             ++c)
+        for (unsigned int c=0; c != n_children; ++c)
           {
             if (!elem->is_child_on_side(c,s))
               continue;
@@ -1230,16 +1231,14 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
   DenseVector<Number> Uint(free_dofs);
 
   // Add projection terms from each child
-  for (unsigned int c=0; c != elem->n_children(); ++c)
+  for (auto & child : elem->child_ref_range())
     {
-      const Elem * child = elem->child_ptr(c);
-
       std::vector<dof_id_type> child_dof_indices;
       if (use_old_dof_indices)
-        dof_map.old_dof_indices (child,
+        dof_map.old_dof_indices (&child,
                                  child_dof_indices, var);
       else
-        dof_map.dof_indices (child,
+        dof_map.dof_indices (&child,
                              child_dof_indices, var);
       const unsigned int child_n_dofs =
         cast_int<unsigned int>
@@ -1248,7 +1247,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
       // Initialize both child and parent FE data
       // on the child's quadrature points
       fe->attach_quadrature_rule (qrule.get());
-      fe->reinit (child);
+      fe->reinit (&child);
       const unsigned int n_qp = qrule->n_points();
 
       FEInterface::inverse_map (dim, fe_type, elem,
