@@ -673,8 +673,11 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
       // all of them for now, for consistency.  Later unpacked
       // elements may overwrite that.
       if (has_children)
-        for (unsigned int c=0; c != elem->n_children(); ++c)
-          elem->add_child(const_cast<RemoteElem *>(remote_elem), c);
+        {
+          const unsigned int nc = elem->n_children();
+          for (unsigned int c=0; c != nc; ++c)
+            elem->add_child(const_cast<RemoteElem *>(remote_elem), c);
+        }
 
 #endif // LIBMESH_ENABLE_AMR
 
