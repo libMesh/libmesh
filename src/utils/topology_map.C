@@ -23,6 +23,7 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/node.h"
 #include "libmesh/parallel.h"
+#include "libmesh/remote_elem.h"
 
 // C++ Includes
 #include <limits>
@@ -150,9 +151,10 @@ void TopologyMap::fill(const MeshBase & mesh)
       if (!elem->has_children())
         continue;
 
-      for (unsigned int c = 0; c != elem->n_children(); ++c)
+      for (unsigned int c = 0, nc = elem->n_children(); c != nc; ++c)
         {
-          if (elem->child_ptr(c)->is_remote())
+          const Elem * child = elem->child_ptr(c);
+          if (child == remote_elem)
             continue;
 
           for (unsigned int n = 0; n != elem->n_nodes_in_child(c); ++n)
@@ -160,8 +162,7 @@ void TopologyMap::fill(const MeshBase & mesh)
               const std::vector<std::pair<dof_id_type, dof_id_type> >
                 bracketing_nodes = elem->bracketing_nodes(c,n);
 
-              this->add_node(elem->child_ptr(c)->node_ref(n),
-                             bracketing_nodes);
+              this->add_node(child->node_ref(n), bracketing_nodes);
             }
         }
     }
