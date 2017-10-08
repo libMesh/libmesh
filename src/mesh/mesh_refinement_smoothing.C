@@ -548,11 +548,11 @@ bool MeshRefinement::eliminate_unrefined_patches ()
           // coarsen
           if (elem->refinement_flag() == Elem::COARSEN_INACTIVE)
             {
-              for (unsigned int c=0; c<elem->n_children(); c++)
+              for (auto & child : elem->child_ref_range())
                 {
-                  libmesh_assert_equal_to (elem->child_ptr(c)->refinement_flag(),
+                  libmesh_assert_equal_to (child.refinement_flag(),
                                            Elem::COARSEN);
-                  elem->child_ptr(c)->set_refinement_flag(Elem::DO_NOTHING);
+                  child.set_refinement_flag(Elem::DO_NOTHING);
                 }
               elem->set_refinement_flag(Elem::INACTIVE);
             }
