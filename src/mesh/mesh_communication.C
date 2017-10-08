@@ -205,12 +205,9 @@ void connect_children(const MeshBase & mesh,
     {
       const Elem * elem = *elem_it;
       if (elem->has_children())
-        for (unsigned int c=0; c != elem->n_children(); ++c)
-          {
-            const Elem * child = elem->child_ptr(c);
-            if (child != remote_elem)
-              connected_elements.insert(child);
-          }
+        for (auto & child : elem->child_ref_range())
+          if (&child != remote_elem)
+            connected_elements.insert(&child);
     }
 #endif // LIBMESH_ENABLE_AMR
 }
