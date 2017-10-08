@@ -298,14 +298,12 @@ void Partitioner::set_parent_processor_ids(MeshBase & mesh)
               // than all the children!
               parent->invalidate_processor_id();
 
-              for (unsigned int c=0; c<parent->n_children(); c++)
+              for (auto & child : parent->child_ref_range())
                 {
-                  child = parent->child_ptr(c);
-                  libmesh_assert(child);
-                  libmesh_assert(!child->is_remote());
-                  libmesh_assert_not_equal_to (child->processor_id(), DofObject::invalid_processor_id);
+                  libmesh_assert(!child.is_remote());
+                  libmesh_assert_not_equal_to (child.processor_id(), DofObject::invalid_processor_id);
                   parent->processor_id() = std::min(parent->processor_id(),
-                                                    child->processor_id());
+                                                    child.processor_id());
                 }
               parent = parent->parent();
             }
