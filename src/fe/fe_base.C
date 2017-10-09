@@ -78,8 +78,8 @@ const Elem * primary_boundary_point_neighbor(const Elem * elem,
       // one of its sides is on a relevant boundary and that side
       // contains this vertex
       bool vertex_on_periodic_side = false;
-      for (unsigned short int ns = 0;
-           ns != pt_neighbor->n_sides(); ++ns)
+      for (unsigned short int ns = 0, max_ns = pt_neighbor->n_sides();
+           ns != max_ns; ++ns)
         {
           boundary_info.boundary_ids (pt_neighbor, ns, bc_ids);
 
@@ -142,8 +142,8 @@ const Elem * primary_boundary_edge_neighbor(const Elem * elem,
       // one of its sides is on this periodic boundary and that
       // side contains this edge
       bool vertex_on_periodic_side = false;
-      for (unsigned short int ns = 0;
-           ns != e_neighbor->n_sides(); ++ns)
+      for (unsigned short int ns = 0, max_ns = e_neighbor->n_sides();
+           ns != max_ns; ++ns)
         {
           boundary_info.boundary_ids (e_neighbor, ns, bc_ids);
 
@@ -1083,7 +1083,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
 
   // Project any side values (edges in 2D, faces in 3D)
   if (dim > 1 && cont != DISCONTINUOUS)
-    for (unsigned int s=0; s != elem->n_sides(); ++s)
+    for (unsigned int s=0, max_ns = elem->n_sides(); s != max_ns; ++s)
       {
         FEInterface::dofs_on_side(elem, dim, fe_type,
                                   s, new_side_dofs);
@@ -1437,7 +1437,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
-  for (unsigned int s=0; s<elem->n_sides(); s++)
+  for (unsigned int s = 0, max_ns = elem->n_sides(); s != max_ns; ++s)
     if (elem->neighbor_ptr(s) != libmesh_nullptr)
       {
         // Get pointers to the element's neighbor.
@@ -1733,7 +1733,8 @@ compute_periodic_constraints (DofConstraints & constraints,
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
-  for (unsigned short int s=0; s<elem->n_sides(); s++)
+  const unsigned short int max_ns = elem->n_sides();
+  for (unsigned short int s = 0; s != max_ns; ++s)
     {
       if (elem->neighbor_ptr(s))
         continue;
@@ -1948,8 +1949,8 @@ compute_periodic_constraints (DofConstraints & constraints,
                           // conditions for this variable
                           std::set<boundary_id_type> point_bcids;
 
-                          for (unsigned int new_s = 0; new_s !=
-                                 elem->n_sides(); ++new_s)
+                          for (unsigned int new_s = 0;
+                               new_s != max_ns; ++new_s)
                             {
                               if (!elem->is_node_on_side(n,new_s))
                                 continue;
@@ -2093,8 +2094,8 @@ compute_periodic_constraints (DofConstraints & constraints,
                           // conditions for this variable
                           std::set<boundary_id_type> edge_bcids;
 
-                          for (unsigned int new_s = 0; new_s !=
-                                 elem->n_sides(); ++new_s)
+                          for (unsigned int new_s = 0;
+                               new_s != max_ns; ++new_s)
                             {
                               if (!elem->is_node_on_side(n,new_s))
                                 continue;
