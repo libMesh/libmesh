@@ -40,22 +40,26 @@ public:
 
   T & operator* () const { return **_it; }
 
-  const PointerToPointerIter & operator++ () {
+  const PointerToPointerIter & operator++ ()
+  {
     ++_it;
     return *this;
   }
 
-  PointerToPointerIter operator++ (int) {
+  PointerToPointerIter operator++ (int)
+  {
     PointerToPointerIter returnval(*this);
     ++_it;
     return returnval;
   }
 
-  bool operator== (const PointerToPointerIter & j) const {
+  bool operator== (const PointerToPointerIter & j) const
+  {
     return ( _it == j._it );
   }
 
-  bool operator!= (const PointerToPointerIter & j) const {
+  bool operator!= (const PointerToPointerIter & j) const
+  {
     return !(*this == j);
   }
 
