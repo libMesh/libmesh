@@ -415,8 +415,8 @@ include_HEADERS =  \
         utils/plt_loader.h \
         utils/point_locator_base.h \
         utils/point_locator_tree.h \
+        utils/pointer_to_pointer_iter.h \
         utils/pool_allocator.h \
-        utils/ppiter.h \
         utils/restore_warnings.h \
         utils/safe_bool.h \
         utils/simple_range.h \

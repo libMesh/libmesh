@@ -411,8 +411,8 @@ BUILT_SOURCES = \
         plt_loader.h \
         point_locator_base.h \
         point_locator_tree.h \
+        pointer_to_pointer_iter.h \
         pool_allocator.h \
-        ppiter.h \
         restore_warnings.h \
         safe_bool.h \
         simple_range.h \
@@ -1747,10 +1747,10 @@ point_locator_base.h: $(top_srcdir)/include/utils/point_locator_base.h
 point_locator_tree.h: $(top_srcdir)/include/utils/point_locator_tree.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-pool_allocator.h: $(top_srcdir)/include/utils/pool_allocator.h
+pointer_to_pointer_iter.h: $(top_srcdir)/include/utils/pointer_to_pointer_iter.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-ppiter.h: $(top_srcdir)/include/utils/ppiter.h
+pool_allocator.h: $(top_srcdir)/include/utils/pool_allocator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 restore_warnings.h: $(top_srcdir)/include/utils/restore_warnings.h

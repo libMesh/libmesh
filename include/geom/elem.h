@@ -33,7 +33,7 @@
 #include "libmesh/enum_io_package.h"
 #include "libmesh/auto_ptr.h"
 #include "libmesh/multi_predicates.h"
-#include "libmesh/ppiter.h"
+#include "libmesh/pointer_to_pointer_iter.h"
 #include "libmesh/simple_range.h"
 #include "libmesh/variant_filter_iterator.h"
 #include "libmesh/hashword.h" // Used in compute_key() functions
