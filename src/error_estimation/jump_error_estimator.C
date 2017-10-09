@@ -193,8 +193,8 @@ void JumpErrorEstimator::estimate_error (const System & system,
       if (!parent || !estimate_parent_error)
         compute_on_parent = false;
       else
-        for (unsigned int c=0; c != parent->n_children(); ++c)
-          if (!parent->child_ptr(c)->active())
+        for (auto & child : parent->child_ref_range())
+          if (!child.active())
             compute_on_parent = false;
 
       if (compute_on_parent &&

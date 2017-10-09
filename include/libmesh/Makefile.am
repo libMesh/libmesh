@@ -411,9 +411,11 @@ BUILT_SOURCES = \
         plt_loader.h \
         point_locator_base.h \
         point_locator_tree.h \
+        pointer_to_pointer_iter.h \
         pool_allocator.h \
         restore_warnings.h \
         safe_bool.h \
+        simple_range.h \
         statistics.h \
         string_to_enum.h \
         timestamp.h \
@@ -1745,6 +1747,9 @@ point_locator_base.h: $(top_srcdir)/include/utils/point_locator_base.h
 point_locator_tree.h: $(top_srcdir)/include/utils/point_locator_tree.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+pointer_to_pointer_iter.h: $(top_srcdir)/include/utils/pointer_to_pointer_iter.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 pool_allocator.h: $(top_srcdir)/include/utils/pool_allocator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1752,6 +1757,9 @@ restore_warnings.h: $(top_srcdir)/include/utils/restore_warnings.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 safe_bool.h: $(top_srcdir)/include/utils/safe_bool.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+simple_range.h: $(top_srcdir)/include/utils/simple_range.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 statistics.h: $(top_srcdir)/include/utils/statistics.h

@@ -43,13 +43,15 @@ void Elem::refine (MeshRefinement & mesh_refinement)
   libmesh_assert_equal_to (this->refinement_flag(), Elem::REFINE);
   libmesh_assert (this->active());
 
+  const unsigned int nc = this->n_children();
+
   // Create my children if necessary
   if (!_children)
     {
-      _children = new Elem *[this->n_children()];
+      _children = new Elem *[nc];
 
       unsigned int parent_p_level = this->p_level();
-      for (unsigned int c=0; c<this->n_children(); c++)
+      for (unsigned int c = 0; c != nc; c++)
         {
           _children[c] = Elem::build(this->type(), this).release();
           Elem * current_child = this->child_ptr(c);
@@ -74,7 +76,7 @@ void Elem::refine (MeshRefinement & mesh_refinement)
   else
     {
       unsigned int parent_p_level = this->p_level();
-      for (unsigned int c=0; c<this->n_children(); c++)
+      for (unsigned int c = 0; c != nc; c++)
         {
           Elem * current_child = this->child_ptr(c);
           libmesh_assert(current_child->subactive());
@@ -91,7 +93,7 @@ void Elem::refine (MeshRefinement & mesh_refinement)
   // projection operations correct
   // this->set_p_refinement_flag(Elem::INACTIVE);
 
-  for (unsigned int c=0; c<this->n_children(); c++)
+  for (unsigned int c = 0; c != nc; c++)
     {
       libmesh_assert_equal_to (this->child_ptr(c)->parent(), this);
       libmesh_assert(this->child_ptr(c)->active());
@@ -113,12 +115,12 @@ void Elem::coarsen()
   unsigned int parent_p_level = 0;
 
   // re-compute hanging node nodal locations
-  for (unsigned int c=0; c<this->n_children(); c++)
+  for (unsigned int c = 0, nc = this->n_children(); c != nc; ++c)
     {
       Elem * mychild = this->child_ptr(c);
       if (mychild == remote_elem)
         continue;
-      for (unsigned int nc=0; nc<mychild->n_nodes(); nc++)
+      for (unsigned int nc=0; nc != mychild->n_nodes(); nc++)
         {
           Point new_pos;
           bool calculated_new_pos = false;
@@ -148,15 +150,14 @@ void Elem::coarsen()
         }
     }
 
-  for (unsigned int c=0; c<this->n_children(); c++)
+  for (auto & mychild : this->child_ref_range())
     {
-      Elem * mychild = this->child_ptr(c);
-      if (mychild == remote_elem)
+      if (&mychild == remote_elem)
         continue;
-      libmesh_assert_equal_to (mychild->refinement_flag(), Elem::COARSEN);
-      mychild->set_refinement_flag(Elem::INACTIVE);
-      if (mychild->p_level() > parent_p_level)
-        parent_p_level = mychild->p_level();
+      libmesh_assert_equal_to (mychild.refinement_flag(), Elem::COARSEN);
+      mychild.set_refinement_flag(Elem::INACTIVE);
+      if (mychild.p_level() > parent_p_level)
+        parent_p_level = mychild.p_level();
     }
 
   this->set_refinement_flag(Elem::JUST_COARSENED);

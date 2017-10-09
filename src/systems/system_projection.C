@@ -327,10 +327,10 @@ protected:
             // that boundary.
             const Real master_tol = out_of_elem_tol / elem.hmax() * 2;
 
-            for (unsigned int c=0; c != elem.n_children(); ++c)
-              if (elem.child_ptr(c)->close_to_point(p, master_tol))
+            for (auto & child : elem.child_ref_range())
+              if (child.close_to_point(p, master_tol))
                 {
-                  old_context.pre_fe_reinit(sys, elem.child_ptr(c));
+                  old_context.pre_fe_reinit(sys, &child);
                   break;
                 }
 
@@ -358,10 +358,10 @@ protected:
             libmesh_assert_equal_to
               (elem.refinement_flag(), Elem::JUST_COARSENED);
 
-            for (unsigned int c=0; c != elem.n_children(); ++c)
-              if (elem.child_ptr(c)->close_to_point(p, master_tol))
+            for (auto & child : elem.child_ref_range())
+              if (child.close_to_point(p, master_tol))
                 {
-                  old_context.pre_fe_reinit(sys, elem.child_ptr(c));
+                  old_context.pre_fe_reinit(sys, &child);
                   break;
                 }
 
@@ -1566,8 +1566,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                       const std::vector<Point> & child_xyz =
                         fine_fe->get_xyz();
 
-                      for (unsigned int c = 0;
-                           c != elem->n_children(); ++c)
+                      for (unsigned int c = 0, nc = elem->n_children();
+                           c != nc; ++c)
                         {
                           if (!elem->is_child_on_edge(c, e))
                             continue;
@@ -1759,8 +1759,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                       const std::vector<Point> & child_xyz =
                         fine_fe->get_xyz();
 
-                      for (unsigned int c = 0;
-                           c != elem->n_children(); ++c)
+                      for (unsigned int c = 0, nc = elem->n_children();
+                           c != nc; ++c)
                         {
                           if (!elem->is_child_on_side(c, s))
                             continue;
@@ -1898,10 +1898,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                   const std::vector<Point> & child_xyz =
                     fine_fe->get_xyz();
 
-                  for (unsigned int c = 0;
-                       c != elem->n_children(); ++c)
+                  for (auto & child : elem->child_ref_range())
                     {
-                      fine_fe->reinit(elem->child_ptr(c));
+                      fine_fe->reinit(&child);
                       fine_points.insert(fine_points.end(),
                                          child_xyz.begin(),
                                          child_xyz.end());
@@ -2097,9 +2096,9 @@ void BuildProjectionList::operator()(const ConstElemRange & range)
         {
           std::vector<dof_id_type> di_child;
           di.clear();
-          for (unsigned int c=0; c != elem->n_children(); ++c)
+          for (auto & child : elem->child_ref_range())
             {
-              dof_map.old_dof_indices (elem->child_ptr(c), di_child);
+              dof_map.old_dof_indices (&child, di_child);
               di.insert(di.end(), di_child.begin(), di_child.end());
             }
         }

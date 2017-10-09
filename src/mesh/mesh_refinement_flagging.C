@@ -426,13 +426,12 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
             continue;
 
           libmesh_assert(parent->has_children());
-          for (unsigned int c=0; c != parent->n_children(); ++c)
+          for (auto & elem : parent->child_ref_range())
             {
-              Elem * elem = parent->child_ptr(c);
-              if (elem && elem != remote_elem)
+              if (&elem != remote_elem)
                 {
-                  libmesh_assert(elem->active());
-                  elem->set_refinement_flag(Elem::COARSEN);
+                  libmesh_assert(elem.active());
+                  elem.set_refinement_flag(Elem::COARSEN);
                   successful_coarsen_count++;
                 }
             }

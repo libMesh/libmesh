@@ -534,16 +534,16 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
             const dof_id_type parent_id  = pos->second.second;
             parent_id_map.erase(pos);
 
-            for (unsigned int c=0; c<parent->n_children(); c++, my_next_elem++)
+            for (auto & child : parent->child_ref_range())
               {
-                const Elem * child = parent->child_ptr(c);
-                pack_element (xfer_conn, child, parent_id, parent_pid);
+                pack_element (xfer_conn, &child, parent_id, parent_pid);
 
                 // this aproach introduces the possibility that we write
                 // non-local elements.  These elements may well be parents
                 // at the next step
-                child_id_map[child->id()] = std::make_pair (child->processor_id(),
-                                                            my_n_elem_written_at_level++);
+                child_id_map[child.id()] = std::make_pair (child.processor_id(),
+                                                           my_n_elem_written_at_level++);
+                my_next_elem++;
               }
           }
       xfer_conn.push_back(my_n_elem_written_at_level);

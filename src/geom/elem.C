@@ -875,13 +875,12 @@ void Elem::find_interior_neighbors(std::set<const Elem *> & neighbor_set) const
 #ifdef LIBMESH_ENABLE_AMR
   while (!ip->active()) // only possible with AMR, be careful because
     {                   // ip->child_ptr(c) is only good with AMR.
-      for (unsigned int c = 0; c != ip->n_children(); ++c)
+      for (auto & child : ip->child_ref_range())
         {
-          const Elem * child = ip->child_ptr(c);
-          if (child->contains_vertex_of(this) ||
-              this->contains_vertex_of(child))
+          if (child.contains_vertex_of(this) ||
+              this->contains_vertex_of(&child))
             {
-              ip = child;
+              ip = &child;
               break;
             }
         }
@@ -1287,11 +1286,8 @@ void Elem::make_links_to_me_remote()
   // We need to have handled any children first
 #if defined(LIBMESH_ENABLE_AMR) && defined(DEBUG)
   if (this->has_children())
-    for (unsigned int c = 0; c != this->n_children(); ++c)
-      {
-        Elem * current_child = this->child_ptr(c);
-        libmesh_assert_equal_to (current_child, remote_elem);
-      }
+    for (auto & child : this->child_ref_range())
+      libmesh_assert_equal_to (&child, remote_elem);
 #endif
 
   // Remotify any neighbor links
@@ -1578,13 +1574,12 @@ bool Elem::ancestor() const
 #ifdef DEBUG
   if (!is_ancestor && this->has_children())
     {
-      for (unsigned int c=0; c != this->n_children(); ++c)
+      for (auto & c : this->child_ref_range())
         {
-          const Elem * kid = this->child_ptr(c);
-          if (kid != remote_elem)
+          if (&c != remote_elem)
             {
-              libmesh_assert(!kid->active());
-              libmesh_assert(!kid->ancestor());
+              libmesh_assert(!c.active());
+              libmesh_assert(!c.ancestor());
             }
         }
     }
@@ -1603,15 +1598,17 @@ bool Elem::ancestor() const
 
 void Elem::add_child (Elem * elem)
 {
+  const unsigned int nc = this->n_children();
+
   if (_children == libmesh_nullptr)
     {
-      _children = new Elem *[this->n_children()];
+      _children = new Elem *[nc];
 
-      for (unsigned int c=0; c<this->n_children(); c++)
+      for (unsigned int c = 0; c != nc; c++)
         this->set_child(c, libmesh_nullptr);
     }
 
-  for (unsigned int c=0; c<this->n_children(); c++)
+  for (unsigned int c = 0; c != nc; c++)
     {
       if (this->_children[c] == libmesh_nullptr || this->_children[c] == remote_elem)
         {
@@ -1630,9 +1627,10 @@ void Elem::add_child (Elem * elem, unsigned int c)
 {
   if (!this->has_children())
     {
-      _children = new Elem *[this->n_children()];
+      const unsigned int nc = this->n_children();
+      _children = new Elem *[nc];
 
-      for (unsigned int i=0; i<this->n_children(); i++)
+      for (unsigned int i = 0; i != nc; i++)
         this->set_child(i, libmesh_nullptr);
     }
 
@@ -1687,9 +1685,9 @@ void Elem::family_tree (std::vector<const Elem *> & family,
   // Recurse into the elements children, if it has them.
   // Do not clear the vector any more.
   if (!this->active())
-    for (unsigned int c=0; c<this->n_children(); c++)
-      if (!this->child_ptr(c)->is_remote())
-        this->child_ptr(c)->family_tree (family, false);
+    for (auto & c : this->child_ref_range())
+      if (!c.is_remote())
+        c.family_tree (family, false);
 }
 
 
@@ -1707,9 +1705,9 @@ void Elem::total_family_tree (std::vector<const Elem *> & family,
   // Recurse into the elements children, if it has them.
   // Do not clear the vector any more.
   if (this->has_children())
-    for (unsigned int c=0; c<this->n_children(); c++)
-      if (!this->child_ptr(c)->is_remote())
-        this->child_ptr(c)->total_family_tree (family, false);
+    for (auto & c : this->child_ref_range())
+      if (!c.is_remote())
+        c.total_family_tree (family, false);
 }
 
 
@@ -1731,9 +1729,9 @@ void Elem::active_family_tree (std::vector<const Elem *> & active_family,
   // Otherwise recurse into the element's children.
   // Do not clear the vector any more.
   else
-    for (unsigned int c=0; c<this->n_children(); c++)
-      if (!this->child_ptr(c)->is_remote())
-        this->child_ptr(c)->active_family_tree (active_family, false);
+    for (auto & c : this->child_ref_range())
+      if (!c.is_remote())
+        c.active_family_tree (active_family, false);
 }
 
 
@@ -1757,9 +1755,12 @@ void Elem::family_tree_by_side (std::vector<const Elem *> & family,
   // Recurse into the elements children, if it has them.
   // Do not clear the vector any more.
   if (!this->active())
-    for (unsigned int c=0; c<this->n_children(); c++)
-      if (!this->child_ptr(c)->is_remote() && this->is_child_on_side(c, s))
-        this->child_ptr(c)->family_tree_by_side (family, s, false);
+    {
+      const unsigned int nc = this->n_children();
+      for (unsigned int c = 0; c != nc; c++)
+        if (!this->child_ptr(c)->is_remote() && this->is_child_on_side(c, s))
+          this->child_ptr(c)->family_tree_by_side (family, s, false);
+    }
 }
 
 
@@ -1785,9 +1786,12 @@ void Elem::active_family_tree_by_side (std::vector<const Elem *> & family,
   // Or recurse into an ancestor element's children.
   // Do not clear the vector any more.
   else
-    for (unsigned int c=0; c<this->n_children(); c++)
-      if (!this->child_ptr(c)->is_remote() && this->is_child_on_side(c, s))
-        this->child_ptr(c)->active_family_tree_by_side (family, s, false);
+    {
+      const unsigned int nc = this->n_children();
+      for (unsigned int c = 0; c != nc; c++)
+        if (!this->child_ptr(c)->is_remote() && this->is_child_on_side(c, s))
+          this->child_ptr(c)->active_family_tree_by_side (family, s, false);
+    }
 }
 
 
@@ -1812,12 +1816,9 @@ void Elem::family_tree_by_neighbor (std::vector<const Elem *> & family,
   // Recurse into the elements children, if it's not active.
   // Do not clear the vector any more.
   if (!this->active())
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-        const Elem * current_child = this->child_ptr(c);
-        if (current_child != remote_elem && current_child->has_neighbor(neighbor_in))
-          current_child->family_tree_by_neighbor (family, neighbor_in, false);
-      }
+    for (auto & c : this->child_ref_range())
+      if (&c != remote_elem && c.has_neighbor(neighbor_in))
+        c.family_tree_by_neighbor (family, neighbor_in, false);
 }
 
 
@@ -1839,12 +1840,9 @@ void Elem::total_family_tree_by_neighbor (std::vector<const Elem *> & family,
   // Recurse into the elements children, if it has any.
   // Do not clear the vector any more.
   if (this->has_children())
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-        const Elem * current_child = this->child_ptr(c);
-        if (current_child != remote_elem && current_child->has_neighbor(neighbor_in))
-          current_child->total_family_tree_by_neighbor (family, neighbor_in, false);
-      }
+    for (auto & c : this->child_ref_range())
+      if (&c != remote_elem && c.has_neighbor(neighbor_in))
+        c.total_family_tree_by_neighbor (family, neighbor_in, false);
 }
 
 
@@ -1878,21 +1876,18 @@ void Elem::family_tree_by_subneighbor (std::vector<const Elem *> & family,
   // Recurse into the elements children, if it's not active.
   // Do not clear the vector any more.
   if (!this->active())
-    for (unsigned int c=0; c != this->n_children(); ++c)
-      {
-        const Elem * current_child = this->child_ptr(c);
-        if (current_child != remote_elem)
-          for (unsigned int s=0; s != current_child->n_sides(); ++s)
-            {
-              const Elem * child_neigh = current_child->neighbor_ptr(s);
-              if (child_neigh &&
-                  (child_neigh == neighbor_in ||
-                   (child_neigh->parent() == neighbor_in &&
-                    child_neigh->is_ancestor_of(subneighbor))))
-                current_child->family_tree_by_subneighbor (family, child_neigh,
-                                                           subneighbor, false);
-            }
-      }
+    for (auto & c : this->child_ref_range())
+      if (&c != remote_elem)
+        for (unsigned int s=0; s != c.n_sides(); ++s)
+          {
+            const Elem * child_neigh = c.neighbor_ptr(s);
+            if (child_neigh &&
+                (child_neigh == neighbor_in ||
+                 (child_neigh->parent() == neighbor_in &&
+                  child_neigh->is_ancestor_of(subneighbor))))
+              c.family_tree_by_subneighbor (family, child_neigh,
+                                            subneighbor, false);
+          }
 }
 
 
@@ -1923,21 +1918,18 @@ void Elem::total_family_tree_by_subneighbor (std::vector<const Elem *> & family,
   // Recurse into the elements children, if it has any.
   // Do not clear the vector any more.
   if (this->has_children())
-    for (unsigned int c=0; c != this->n_children(); ++c)
-      {
-        const Elem * current_child = this->child_ptr(c);
-        if (current_child != remote_elem)
-          for (unsigned int s=0; s != current_child->n_sides(); ++s)
-            {
-              const Elem * child_neigh = current_child->neighbor_ptr(s);
-              if (child_neigh &&
-                  (child_neigh == neighbor_in ||
-                   (child_neigh->parent() == neighbor_in &&
-                    child_neigh->is_ancestor_of(subneighbor))))
-                current_child->total_family_tree_by_subneighbor
-                  (family, child_neigh, subneighbor, false);
-            }
-      }
+    for (auto & c : this->child_ref_range())
+      if (&c != remote_elem)
+        for (unsigned int s=0; s != c.n_sides(); ++s)
+          {
+            const Elem * child_neigh = c.neighbor_ptr(s);
+            if (child_neigh &&
+                (child_neigh == neighbor_in ||
+                 (child_neigh->parent() == neighbor_in &&
+                  child_neigh->is_ancestor_of(subneighbor))))
+              c.total_family_tree_by_subneighbor
+                (family, child_neigh, subneighbor, false);
+          }
 }
 
 
@@ -1976,17 +1968,12 @@ active_family_tree_by_topological_neighbor(std::vector<const Elem *> & family,
   // Or recurse into an ancestor element's children.
   // Do not clear the vector any more.
   else if (!this->active())
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-        const Elem * current_child = this->child_ptr(c);
-        if (current_child != remote_elem &&
-            current_child->has_topological_neighbor(neighbor_in,
-                                                    mesh,
-                                                    point_locator,
-                                                    pb))
-          current_child->active_family_tree_by_topological_neighbor
-            (family, neighbor_in, mesh, point_locator, pb, false);
-      }
+    for (auto & c : this->child_ref_range())
+      if (&c != remote_elem &&
+          c.has_topological_neighbor(neighbor_in, mesh, point_locator,
+                                     pb))
+        c.active_family_tree_by_topological_neighbor
+          (family, neighbor_in, mesh, point_locator, pb, false);
 }
 
 
@@ -2017,12 +2004,9 @@ void Elem::active_family_tree_by_neighbor (std::vector<const Elem *> & family,
   // Or recurse into an ancestor element's children.
   // Do not clear the vector any more.
   else if (!this->active())
-    for (unsigned int c=0; c<this->n_children(); c++)
-      {
-        const Elem * current_child = this->child_ptr(c);
-        if (current_child != remote_elem && current_child->has_neighbor(neighbor_in))
-          current_child->active_family_tree_by_neighbor (family, neighbor_in, false);
-      }
+    for (auto & c : this->child_ref_range())
+      if (&c != remote_elem && c.has_neighbor(neighbor_in))
+        c.active_family_tree_by_neighbor (family, neighbor_in, false);
 }
 
 
@@ -2047,14 +2031,10 @@ unsigned int Elem::min_p_level_by_neighbor(const Elem * neighbor_in,
 
   unsigned int min_p_level = current_min;
 
-  for (unsigned int c=0; c<this->n_children(); c++)
-    {
-      const Elem * const current_child = this->child_ptr(c);
-      if (current_child != remote_elem && current_child->has_neighbor(neighbor_in))
-        min_p_level =
-          current_child->min_p_level_by_neighbor(neighbor_in,
-                                                 min_p_level);
-    }
+  for (auto & c : this->child_ref_range())
+    if (&c != remote_elem && c.has_neighbor(neighbor_in))
+      min_p_level =
+        c.min_p_level_by_neighbor(neighbor_in, min_p_level);
 
   return min_p_level;
 }
@@ -2084,15 +2064,10 @@ unsigned int Elem::min_new_p_level_by_neighbor(const Elem * neighbor_in,
 
   unsigned int min_p_level = current_min;
 
-  for (unsigned int c=0; c<this->n_children(); c++)
-    {
-      const Elem * const current_child = this->child_ptr(c);
-      if (current_child && current_child != remote_elem)
-        if (current_child->has_neighbor(neighbor_in))
-          min_p_level =
-            current_child->min_new_p_level_by_neighbor(neighbor_in,
-                                                       min_p_level);
-    }
+  for (auto & c : this->child_ref_range())
+    if (&c != remote_elem && c.has_neighbor(neighbor_in))
+      min_p_level =
+        c.min_new_p_level_by_neighbor(neighbor_in, min_p_level);
 
   return min_p_level;
 }
@@ -2102,7 +2077,8 @@ unsigned int Elem::min_new_p_level_by_neighbor(const Elem * neighbor_in,
 unsigned int Elem::as_parent_node (unsigned int child,
                                    unsigned int child_node) const
 {
-  libmesh_assert_less(child, this->n_children());
+  const unsigned int nc = this->n_children();
+  libmesh_assert_less(child, nc);
 
   // Cached return values, indexed first by embedding_matrix version,
   // then by child number, then by child node number.
@@ -2122,9 +2098,9 @@ unsigned int Elem::as_parent_node (unsigned int child,
     {
       const unsigned int nn = this->n_nodes();
 
-      cached_parent_indices[em_vers].resize(this->n_children());
+      cached_parent_indices[em_vers].resize(nc);
 
-      for (unsigned int c = 0; c != this->n_children(); ++c)
+      for (unsigned int c = 0; c != nc; ++c)
         {
           const unsigned int ncn = this->n_nodes_in_child(c);
           cached_parent_indices[em_vers][c].resize(ncn);

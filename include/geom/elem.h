@@ -33,6 +33,8 @@
 #include "libmesh/enum_io_package.h"
 #include "libmesh/auto_ptr.h"
 #include "libmesh/multi_predicates.h"
+#include "libmesh/pointer_to_pointer_iter.h"
+#include "libmesh/simple_range.h"
 #include "libmesh/variant_filter_iterator.h"
 #include "libmesh/hashword.h" // Used in compute_key() functions
 
@@ -266,6 +268,23 @@ public:
    */
   Elem * neighbor (const unsigned int i) const;
 
+  /**
+   * Nested "classes" for use iterating over all neighbors of an element.
+   */
+  typedef Elem * const *       NeighborPtrIter;
+  typedef const Elem * const * ConstNeighborPtrIter;
+
+  /**
+   * Returns a range with all neighbors of an element, usable in
+   * range-based for loops.  The exact type of the return value here
+   * may be subject to change in future libMesh releases, but the
+   * iterators will always dereference to produce a pointer to a
+   * neighbor element (or a null pointer, for sides which have no
+   * neighbors).
+   */
+  SimpleRange<NeighborPtrIter> neighbor_ptr_range();
+
+  SimpleRange<ConstNeighborPtrIter> neighbor_ptr_range() const;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   /**
@@ -1089,6 +1108,23 @@ public:
    */
   Elem * child (const unsigned int i) const;
 
+  /**
+   * Nested classes for use iterating over all children of a parent
+   * element.
+   */
+  class ChildRefIter;
+  class ConstChildRefIter;
+
+  /**
+   * Returns a range with all children of a parent element, usable in
+   * range-based for loops.  The exact type of the return value here
+   * may be subject to change in future libMesh releases, but the
+   * iterators will always dereference to produce a reference to a
+   * child element.
+   */
+  SimpleRange<ChildRefIter> child_ref_range();
+
+  SimpleRange<ConstChildRefIter> child_ref_range() const;
 
 private:
   /**
@@ -1569,6 +1605,45 @@ protected:
   unsigned char _p_level;
 #endif
 };
+
+
+
+// ------------------------------------------------------------
+// Elem helper classes
+
+#ifdef LIBMESH_ENABLE_AMR
+class
+Elem::ChildRefIter : public PointerToPointerIter<Elem>
+{
+public:
+  ChildRefIter (Elem * const * childpp) : PointerToPointerIter<Elem>(childpp) {}
+};
+
+
+class
+Elem::ConstChildRefIter : public PointerToPointerIter<const Elem>
+{
+public:
+  ConstChildRefIter (const Elem * const * childpp) : PointerToPointerIter<const Elem>(childpp) {}
+};
+
+
+inline
+SimpleRange<Elem::ChildRefIter> Elem::child_ref_range()
+{
+  libmesh_assert(_children);
+  return {_children, _children + this->n_children()};
+}
+
+
+inline
+SimpleRange<Elem::ConstChildRefIter> Elem::child_ref_range() const
+{
+  libmesh_assert(_children);
+  return {_children, _children + this->n_children()};
+}
+#endif // LIBMESH_ENABLE_AMR
+
 
 
 
@@ -2114,8 +2189,8 @@ bool Elem::has_ancestor_children() const
   if (_children == libmesh_nullptr)
     return false;
   else
-    for (unsigned int c=0; c != this->n_children(); c++)
-      if (this->child_ptr(c)->has_children())
+    for (auto & c : child_ref_range())
+      if (c.has_children())
         return true;
 #endif
   return false;
@@ -2289,7 +2364,8 @@ unsigned int Elem::which_child_am_i (const Elem * e) const
   libmesh_assert(e);
   libmesh_assert (this->has_children());
 
-  for (unsigned int c=0; c<this->n_children(); c++)
+  unsigned int nc = this->n_children();
+  for (unsigned int c=0; c != nc; c++)
     if (this->child_ptr(c) == e)
       return c;
 
@@ -2346,9 +2422,9 @@ unsigned int Elem::max_descendant_p_level () const
     return this->p_level();
 
   unsigned int max_p_level = _p_level;
-  for (unsigned int c=0; c != this->n_children(); c++)
+  for (auto & c : child_ref_range())
     max_p_level = std::max(max_p_level,
-                           this->child_ptr(c)->max_descendant_p_level());
+                           c.max_descendant_p_level());
   return max_p_level;
 }
 
@@ -2377,9 +2453,9 @@ void Elem::set_p_level(unsigned int p)
         {
           _p_level = cast_int<unsigned char>(p);
           parent_p_level = cast_int<unsigned char>(p);
-          for (unsigned int c=0; c != this->parent()->n_children(); c++)
+          for (auto & c : this->parent()->child_ref_range())
             parent_p_level = std::min(parent_p_level,
-                                      this->parent()->child_ptr(c)->p_level());
+                                      c.p_level());
 
           // When its children all have a higher p level, the parent's
           // should rise
@@ -2647,6 +2723,21 @@ Elem::side_iterator : variant_filter_iterator<Elem::Predicate, Elem *>
                  const PredType & p ) :
     variant_filter_iterator<Elem::Predicate, Elem *>(d,e,p) {}
 };
+
+
+
+inline
+SimpleRange<Elem::NeighborPtrIter> Elem::neighbor_ptr_range()
+{
+  return {_elemlinks+1, _elemlinks + 1 + this->n_neighbors()};
+}
+
+
+inline
+SimpleRange<Elem::ConstNeighborPtrIter> Elem::neighbor_ptr_range() const
+{
+  return {_elemlinks+1, _elemlinks + 1 + this->n_neighbors()};
+}
 
 
 } // namespace libMesh

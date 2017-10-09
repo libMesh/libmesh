@@ -138,7 +138,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 
 #ifdef LIBMESH_ENABLE_AMR
         if (old->has_children())
-          for (unsigned int c=0; c != old->n_children(); ++c)
+          for (unsigned int c = 0, nc = old->n_children(); c != nc; ++c)
             if (old->child_ptr(c) == remote_elem)
               el->add_child(const_cast<RemoteElem *>(remote_elem), c);
 
@@ -448,11 +448,9 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                       // situation is actually the case
                       libmesh_assert(neigh->has_children());
                       bool neigh_has_remote_children = false;
-                      for (unsigned int c = 0; c != neigh->n_children(); ++c)
-                        {
-                          if (neigh->child_ptr(c) == remote_elem)
-                            neigh_has_remote_children = true;
-                        }
+                      for (auto & child : neigh->child_ref_range())
+                        if (&child == remote_elem)
+                          neigh_has_remote_children = true;
                       libmesh_assert(neigh_has_remote_children);
 
                       // And let's double-check that we don't have
@@ -480,9 +478,8 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                              neigh->has_children())
                         {
                           bool found_neigh = false;
-                          for (unsigned int c = 0;
-                               !found_neigh &&
-                               c != neigh->n_children(); ++c)
+                          for (unsigned int c = 0, nc = neigh->n_children();
+                               !found_neigh && c != nc; ++c)
                             {
                               Elem * child = neigh->child_ptr(c);
                               if (child == remote_elem)
@@ -566,14 +563,12 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
           // Otherwise our interior_parent should be a child of our
           // parent's interior_parent.
-          for (unsigned int c=0; c != pip->n_children(); ++c)
+          for (auto & child : pip->child_ref_range())
             {
-              Elem * child = pip->child_ptr(c);
-
               // If we have a remote_elem, that might be our
               // interior_parent.  We'll set it provisionally now and
               // keep trying to find something better.
-              if (child == remote_elem)
+              if (&child == remote_elem)
                 {
                   current_elem->set_interior_parent
                     (const_cast<RemoteElem *>(remote_elem));
@@ -585,9 +580,9 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                    ++n)
                 {
                   bool child_contains_this_node = false;
-                  for (unsigned int cn=0; cn != child->n_nodes();
+                  for (unsigned int cn=0; cn != child.n_nodes();
                        ++cn)
-                    if (child->point(cn).absolute_fuzzy_equals
+                    if (child.point(cn).absolute_fuzzy_equals
                         (current_elem->point(n), node_tolerance))
                       {
                         child_contains_this_node = true;
@@ -601,7 +596,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                 }
               if (child_contains_our_nodes)
                 {
-                  current_elem->set_interior_parent(child);
+                  current_elem->set_interior_parent(&child);
                   break;
                 }
             }

@@ -403,15 +403,18 @@ void CheckpointIO::write_remote_elem (Xdr & io,
 
 #ifdef LIBMESH_ENABLE_AMR
       if (elem.has_children())
-        for (unsigned int c = 0; c != elem.n_children(); ++c)
         {
-          const Elem * child = elem.child_ptr(c);
-          if (child == remote_elem ||
-              (child && !elements.count(child)))
-            {
-              parent_ids.push_back(elem.id());
-              child_numbers.push_back(c);
-            }
+          const unsigned int nc = elem.n_children();
+          for (unsigned int c = 0; c != nc; ++c)
+          {
+            const Elem * child = elem.child_ptr(c);
+            if (child == remote_elem ||
+                (child && !elements.count(child)))
+              {
+                parent_ids.push_back(elem.id());
+                child_numbers.push_back(c);
+              }
+          }
         }
 #endif
     }

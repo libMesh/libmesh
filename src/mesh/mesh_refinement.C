@@ -70,12 +70,11 @@ struct SyncCoarsenInactive
     //
     // Either way there's nothing we need to communicate.
     bool found_remote_child = false;
-    for (unsigned int c=0; c<elem->n_children(); c++)
+    for (auto & child : elem->child_ref_range())
       {
-        const Elem * child = elem->child_ptr(c);
-        if (child->refinement_flag() != Elem::COARSEN)
+        if (child.refinement_flag() != Elem::COARSEN)
           return false;
-        if (child == remote_elem)
+        if (&child == remote_elem)
           found_remote_child = true;
       }
     return found_remote_child;
@@ -1004,22 +1003,19 @@ bool MeshRefinement::make_coarsening_compatible()
                               // grandchildren
 
                               libmesh_assert(neighbor->has_children());
-                              for (unsigned int c=0; c!=neighbor->n_children(); c++)
-                                {
-                                  const Elem * subneighbor = neighbor->child_ptr(c);
-                                  if (subneighbor != remote_elem &&
-                                      subneighbor->active() &&
-                                      has_topological_neighbor(subneighbor, point_locator.get(), elem))
-                                    if ((subneighbor->p_level() > my_p_level &&
-                                         subneighbor->p_refinement_flag() != Elem::COARSEN)
-                                        || (subneighbor->p_level() == my_p_level &&
-                                            subneighbor->p_refinement_flag() == Elem::REFINE))
-                                      {
-                                        elem->set_p_refinement_flag(Elem::DO_NOTHING);
-                                        my_flag_changed = true;
-                                        break;
-                                      }
-                                }
+                              for (auto & subneighbor : neighbor->child_ref_range())
+                                if (&subneighbor != remote_elem &&
+                                    subneighbor.active() &&
+                                    has_topological_neighbor(&subneighbor, point_locator.get(), elem))
+                                  if ((subneighbor.p_level() > my_p_level &&
+                                       subneighbor.p_refinement_flag() != Elem::COARSEN)
+                                      || (subneighbor.p_level() == my_p_level &&
+                                          subneighbor.p_refinement_flag() == Elem::REFINE))
+                                    {
+                                      elem->set_p_refinement_flag(Elem::DO_NOTHING);
+                                      my_flag_changed = true;
+                                      break;
+                                    }
                               if (my_flag_changed)
                                 break;
                             }
@@ -1055,9 +1051,9 @@ bool MeshRefinement::make_coarsening_compatible()
                     // FIXME - for non-level one meshes we should
                     // test all descendants
                     if (neigh->has_children())
-                      for (unsigned int c=0; c != neigh->n_children(); ++c)
-                        if (neigh->child_ptr(c) == remote_elem ||
-                            neigh->child_ptr(c)->processor_id() !=
+                      for (auto & child : neigh->child_ref_range())
+                        if (&child == remote_elem ||
+                            child.processor_id() !=
                             this->processor_id())
                           {
                             compatible_with_refinement = false;
@@ -1092,13 +1088,12 @@ bool MeshRefinement::make_coarsening_compatible()
               bool is_a_candidate = true;
               bool found_remote_child = false;
 
-              for (unsigned int c=0; c<elem->n_children(); c++)
+              for (auto & child : elem->child_ref_range())
                 {
-                  Elem * child = elem->child_ptr(c);
-                  if (child == remote_elem)
+                  if (&child == remote_elem)
                     found_remote_child = true;
-                  else if ((child->refinement_flag() != Elem::COARSEN) ||
-                           !child->active() )
+                  else if ((child.refinement_flag() != Elem::COARSEN) ||
+                           !child.active() )
                     is_a_candidate = false;
                 }
 
@@ -1106,15 +1101,14 @@ bool MeshRefinement::make_coarsening_compatible()
                 {
                   elem->set_refinement_flag(Elem::INACTIVE);
 
-                  for (unsigned int c=0; c<elem->n_children(); c++)
+                  for (auto & child : elem->child_ref_range())
                     {
-                      Elem * child = elem->child_ptr(c);
-                      if (child == remote_elem)
+                      if (&child == remote_elem)
                         continue;
-                      if (child->refinement_flag() == Elem::COARSEN)
+                      if (child.refinement_flag() == Elem::COARSEN)
                         {
                           level_one_satisfied = false;
-                          child->set_refinement_flag(Elem::DO_NOTHING);
+                          child.set_refinement_flag(Elem::DO_NOTHING);
                         }
                     }
                 }
@@ -1156,16 +1150,15 @@ bool MeshRefinement::make_coarsening_compatible()
       // then look for a contradiction
       bool all_children_flagged_for_coarsening = true;
 
-      for (unsigned int c=0; c<elem->n_children(); c++)
+      for (auto & child : elem->child_ref_range())
         {
-          Elem * child = elem->child_ptr(c);
-          if (child != remote_elem &&
-              child->refinement_flag() != Elem::COARSEN)
+          if (&child != remote_elem &&
+              child.refinement_flag() != Elem::COARSEN)
             {
               all_children_flagged_for_coarsening = false;
               if (!distributed_mesh)
                 break;
-              if (child->processor_id() != elem->processor_id())
+              if (child.processor_id() != elem->processor_id())
                 {
                   uncoarsenable_parents[elem->processor_id()].push_back(elem->id());
                   break;
@@ -1380,34 +1373,29 @@ bool MeshRefinement::make_refinement_compatible()
                           else // I have an inactive neighbor
                             {
                               libmesh_assert(neighbor->has_children());
-                              for (unsigned int c=0; c!=neighbor->n_children(); c++)
-                                {
-                                  Elem * subneighbor = neighbor->child_ptr(c);
-                                  if (subneighbor == remote_elem)
-                                    continue;
-                                  if (subneighbor->active() &&
-                                      has_topological_neighbor(subneighbor, point_locator.get(), elem))
-                                    {
-                                      if (subneighbor->p_level() < my_p_level &&
-                                          subneighbor->p_refinement_flag() != Elem::REFINE)
-                                        {
-                                          // We should already be level one
-                                          // compatible
-                                          libmesh_assert_greater (subneighbor->p_level() + 2u,
-                                                                  my_p_level);
-                                          subneighbor->set_p_refinement_flag(Elem::REFINE);
-                                          level_one_satisfied = false;
-                                          compatible_with_coarsening = false;
-                                        }
-                                      if (subneighbor->p_level() == my_p_level &&
-                                          subneighbor->p_refinement_flag() == Elem::COARSEN)
-                                        {
-                                          subneighbor->set_p_refinement_flag(Elem::DO_NOTHING);
-                                          level_one_satisfied = false;
-                                          compatible_with_coarsening = false;
-                                        }
-                                    }
-                                }
+                              for (auto & subneighbor : neighbor->child_ref_range())
+                                if (&subneighbor != remote_elem && subneighbor.active() &&
+                                    has_topological_neighbor(&subneighbor, point_locator.get(), elem))
+                                  {
+                                    if (subneighbor.p_level() < my_p_level &&
+                                        subneighbor.p_refinement_flag() != Elem::REFINE)
+                                      {
+                                        // We should already be level one
+                                        // compatible
+                                        libmesh_assert_greater (subneighbor.p_level() + 2u,
+                                                                my_p_level);
+                                        subneighbor.set_p_refinement_flag(Elem::REFINE);
+                                        level_one_satisfied = false;
+                                        compatible_with_coarsening = false;
+                                      }
+                                    if (subneighbor.p_level() == my_p_level &&
+                                        subneighbor.p_refinement_flag() == Elem::COARSEN)
+                                      {
+                                        subneighbor.set_p_refinement_flag(Elem::DO_NOTHING);
+                                        level_one_satisfied = false;
+                                        compatible_with_coarsening = false;
+                                      }
+                                  }
                             }
                         }
                     }

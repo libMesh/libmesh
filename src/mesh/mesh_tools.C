@@ -1122,8 +1122,8 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase & mesh)
       // We can only be strict about active elements' subactive
       // children
       if (elem->active() && elem->has_children())
-        for (unsigned int c=0; c != elem->n_children(); ++c)
-          libmesh_assert_not_equal_to (elem->child_ptr(c), remote_elem);
+        for (auto & child : elem->child_ref_range())
+          libmesh_assert_not_equal_to (&child, remote_elem);
 #endif
     }
 }
@@ -1144,8 +1144,8 @@ void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase & mesh,
         libmesh_assert_not_equal_to (elem->neighbor_ptr(n), bad_elem);
 #ifdef LIBMESH_ENABLE_AMR
       if (elem->has_children())
-        for (unsigned int c=0; c != elem->n_children(); ++c)
-          libmesh_assert_not_equal_to (elem->child_ptr(c), bad_elem);
+        for (auto & child : elem->child_ref_range())
+          libmesh_assert_not_equal_to (&child, bad_elem);
 #endif
     }
 }
@@ -1542,19 +1542,14 @@ void libmesh_assert_topology_consistent_procids<Elem>(const MeshBase & mesh)
           libmesh_assert(parent->has_children());
           processor_id_type parent_procid = parent->processor_id();
           bool matching_child_id = false;
-          for (unsigned int c = 0; c != parent->n_children(); ++c)
-            {
-              const Elem * child = parent->child_ptr(c);
-              libmesh_assert(child);
-
-              // If we've got a remote_elem then we don't know whether
-              // it's responsible for the parent's processor id; all
-              // we can do is assume it is and let its processor fail
-              // an assert if there's something wrong.
-              if (child == remote_elem ||
-                  child->processor_id() == parent_procid)
-                matching_child_id = true;
-            }
+          // If we've got a remote_elem then we don't know whether
+          // it's responsible for the parent's processor id; all
+          // we can do is assume it is and let its processor fail
+          // an assert if there's something wrong.
+          for (auto & child : parent->child_ref_range())
+            if (&child == remote_elem ||
+                child.processor_id() == parent_procid)
+              matching_child_id = true;
           libmesh_assert(matching_child_id);
         }
     }
@@ -1792,12 +1787,9 @@ void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase & mesh)
       const Elem * elem = *el;
       libmesh_assert(elem);
       if (elem->has_children())
-        for (unsigned int n=0; n != elem->n_children(); ++n)
-          {
-            libmesh_assert(elem->child_ptr(n));
-            if (elem->child_ptr(n) != remote_elem)
-              libmesh_assert_equal_to (elem->child_ptr(n)->parent(), elem);
-          }
+        for (auto & child : elem->child_ref_range())
+          if (&child != remote_elem)
+            libmesh_assert_equal_to (child.parent(), elem);
       if (elem->active())
         {
           libmesh_assert(!elem->ancestor());
