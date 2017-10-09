@@ -1613,18 +1613,18 @@ protected:
 
 #ifdef LIBMESH_ENABLE_AMR
 class
-Elem::ChildRefIter : public PPIter<Elem>
+Elem::ChildRefIter : public PointerToPointerIter<Elem>
 {
 public:
-  ChildRefIter (Elem * const * childpp) : PPIter<Elem>(childpp) {}
+  ChildRefIter (Elem * const * childpp) : PointerToPointerIter<Elem>(childpp) {}
 };
 
 
 class
-Elem::ConstChildRefIter : public PPIter<const Elem>
+Elem::ConstChildRefIter : public PointerToPointerIter<const Elem>
 {
 public:
-  ConstChildRefIter (const Elem * const * childpp) : PPIter<const Elem>(childpp) {}
+  ConstChildRefIter (const Elem * const * childpp) : PointerToPointerIter<const Elem>(childpp) {}
 };
 
 

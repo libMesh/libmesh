@@ -25,7 +25,7 @@ namespace libMesh
 {
 
 /**
- * The \p PPIter templated class is intended to wrap
+ * The \p PointerToPointerIter templated class is intended to wrap
  * pointer-to-pointer iterators in an interface which works more like
  * a standard iterator, by returning a value rather than a pointer.
  *
@@ -33,29 +33,29 @@ namespace libMesh
  */
 
 template <typename T>
-class PPIter
+class PointerToPointerIter
 {
 public:
-  PPIter (T * const * it) : _it(it) {}
+  PointerToPointerIter (T * const * it) : _it(it) {}
 
   T & operator* () const { return **_it; }
 
-  const PPIter & operator++ () {
+  const PointerToPointerIter & operator++ () {
     ++_it;
     return *this;
   }
 
-  PPIter operator++ (int) {
-    PPIter returnval(*this);
+  PointerToPointerIter operator++ (int) {
+    PointerToPointerIter returnval(*this);
     ++_it;
     return returnval;
   }
 
-  bool operator== (const PPIter & j) const {
+  bool operator== (const PointerToPointerIter & j) const {
     return ( _it == j._it );
   }
 
-  bool operator!= (const PPIter & j) const {
+  bool operator!= (const PointerToPointerIter & j) const {
     return !(*this == j);
   }
 
