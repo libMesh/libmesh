@@ -727,9 +727,30 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
           if ((context.get_elem().neighbor_ptr(context.get_side()) != libmesh_nullptr) && !impose_internal_fluxes)
             continue;
 
-          // Impose boundary (e.g. Neumann) term
-          context.side_fe_reinit();
-          elem_assembly->boundary_assembly(context);
+          bool reinit_succeeded = false;
+
+          // Exceptions can be thrown in side_fe_reinit, e.g. due to a zero or negative
+          // Jacobian on an element side. This is sometimes intentional, e.g. some people
+          // use "degenerate HEX" elements when generating meshes. In order to support this
+          // case we just print a message and skip the side assembly on this element
+          // if an exception occurs during side_fe_reinit.
+          try
+            {
+              context.side_fe_reinit();
+              reinit_succeeded = true;
+            }
+          catch(std::exception& e)
+            {
+              libMesh::err << std::endl << "Error detected when computing element data on side "
+                << static_cast<int>(context.side) << " of element "
+                << context.get_elem().id() << std::endl;
+              libMesh::err << "Skipping assembly on this element side" << std::endl << std::endl;
+            }
+
+          if(reinit_succeeded)
+            {
+              elem_assembly->boundary_assembly(context);
+            }
 
           if (context.dg_terms_are_active())
             {
