@@ -200,14 +200,34 @@ libmesh_CXXFLAGS="$GCOV_FLAGS $libmesh_CXXFLAGS"
 LIBMESH_SET_METHODS
 
 # --------------------------------------------------------------
-# Test for specific C++11 features.
+# Test for mandatory C++11 features, those which libMesh now requires
+# for internal use.
+# --------------------------------------------------------------
+LIBMESH_TEST_CXX11_AUTO
+if (test "x$have_cxx11_auto" != "xyes"); then
+  AC_MSG_ERROR([libMesh requires C++11 auto variable support])
+fi
+
+LIBMESH_TEST_CXX11_RANGEFOR
+if (test "x$have_cxx11_rangefor" != "xyes"); then
+  AC_MSG_ERROR([libMesh requires C++11 ranged-for loop support])
+fi
+
+# Technically we require uniform initialization, but this is the
+# closest test we have
+LIBMESH_TEST_CXX11_INITIALIZER_LIST
+if (test "x$have_cxx11_initializer_list" != "xyes"); then
+  AC_MSG_ERROR([libMesh requires C++11 initializer list support])
+fi
+
+# --------------------------------------------------------------
+# Test for optional modern C++ features, which libMesh offers shims
+# for and/or which libMesh applications may want to selectively use.
 # --------------------------------------------------------------
 LIBMESH_TEST_CXX11_MOVE
 LIBMESH_TEST_CXX11_MOVE_CONSTRUCTORS
-LIBMESH_TEST_CXX11_RANGEFOR
 LIBMESH_TEST_CXX11_DECLTYPE
 LIBMESH_TEST_CXX11_RVALUE_REFERENCES
-LIBMESH_TEST_CXX11_AUTO
 LIBMESH_TEST_CXX11_LAMBDA
 LIBMESH_TEST_CXX11_CONSTEXPR
 LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS
@@ -217,7 +237,6 @@ LIBMESH_TEST_CXX14_MAKE_UNIQUE
 LIBMESH_TEST_CXX11_MAKE_UNIQUE_WORKAROUND
 LIBMESH_TEST_CXX11_REGEX
 LIBMESH_TEST_CXX11_OVERRIDE
-LIBMESH_TEST_CXX11_INITIALIZER_LIST
 LIBMESH_TEST_CXX11_VARIADIC_TEMPLATES
 LIBMESH_TEST_CXX11_THREAD
 LIBMESH_TEST_CXX11_CONDITION_VARIABLE
