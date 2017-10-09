@@ -933,8 +933,6 @@ HAVE_CXX11_THREAD_FALSE
 HAVE_CXX11_THREAD_TRUE
 HAVE_CXX11_VARIADIC_TEMPLATES_FALSE
 HAVE_CXX11_VARIADIC_TEMPLATES_TRUE
-HAVE_CXX11_INITIALIZER_LIST_FALSE
-HAVE_CXX11_INITIALIZER_LIST_TRUE
 HAVE_CXX11_OVERRIDE_FALSE
 HAVE_CXX11_OVERRIDE_TRUE
 HAVE_CXX11_REGEX_FALSE
@@ -953,18 +951,20 @@ HAVE_CXX11_CONSTEXPR_FALSE
 HAVE_CXX11_CONSTEXPR_TRUE
 HAVE_CXX11_LAMBDA_FALSE
 HAVE_CXX11_LAMBDA_TRUE
-HAVE_CXX11_AUTO_FALSE
-HAVE_CXX11_AUTO_TRUE
 HAVE_CXX11_RVALUE_REFERENCES_FALSE
 HAVE_CXX11_RVALUE_REFERENCES_TRUE
 HAVE_CXX11_DECLTYPE_FALSE
 HAVE_CXX11_DECLTYPE_TRUE
-HAVE_CXX11_RANGEFOR_FALSE
-HAVE_CXX11_RANGEFOR_TRUE
 HAVE_CXX11_MOVE_CONSTRUCTORS_FALSE
 HAVE_CXX11_MOVE_CONSTRUCTORS_TRUE
 HAVE_CXX11_MOVE_FALSE
 HAVE_CXX11_MOVE_TRUE
+HAVE_CXX11_INITIALIZER_LIST_FALSE
+HAVE_CXX11_INITIALIZER_LIST_TRUE
+HAVE_CXX11_RANGEFOR_FALSE
+HAVE_CXX11_RANGEFOR_TRUE
+HAVE_CXX11_AUTO_FALSE
+HAVE_CXX11_AUTO_TRUE
 CFLAGS_OPROF
 CXXFLAGS_OPROF
 CPPFLAGS_OPROF
@@ -8381,7 +8381,263 @@ fi
 
 
 # --------------------------------------------------------------
-# Test for specific C++11 features.
+# Test for mandatory C++11 features, those which libMesh now requires
+# for internal use.
+# --------------------------------------------------------------
+
+    have_cxx11_auto=no
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 auto keyword support" >&5
+$as_echo_n "checking for C++11 auto keyword support... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+
+      int x = 5;
+      auto y = x;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+      if (test "x$enablecxx11" = "xyes"); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_AUTO 1" >>confdefs.h
+
+        have_cxx11_auto=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_AUTO_BUT_DISABLED 1" >>confdefs.h
+
+      fi
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+     if test x$have_cxx11_auto == xyes; then
+  HAVE_CXX11_AUTO_TRUE=
+  HAVE_CXX11_AUTO_FALSE='#'
+else
+  HAVE_CXX11_AUTO_TRUE='#'
+  HAVE_CXX11_AUTO_FALSE=
+fi
+
+
+if (test "x$have_cxx11_auto" != "xyes"); then
+  as_fn_error $? "libMesh requires C++11 auto variable support" "$LINENO" 5
+fi
+
+
+    have_cxx11_rangefor=no
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 range-based for loop support" >&5
+$as_echo_n "checking for C++11 range-based for loop support... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        #include <iostream>
+        #include <vector>
+        void print(const std::vector<int> & v)
+        {
+          for (const int & x : v)
+            std::cout << x << ' ';
+          std::cout << std::endl;
+        }
+
+int
+main ()
+{
+
+        std::vector<int> v(3);
+        print(v);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+      if (test "x$enablecxx11" = "xyes"); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_RANGEFOR 1" >>confdefs.h
+
+        have_cxx11_rangefor=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_RANGEFOR_BUT_DISABLED 1" >>confdefs.h
+
+      fi
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+     if test x$have_cxx11_rangefor == xyes; then
+  HAVE_CXX11_RANGEFOR_TRUE=
+  HAVE_CXX11_RANGEFOR_FALSE='#'
+else
+  HAVE_CXX11_RANGEFOR_TRUE='#'
+  HAVE_CXX11_RANGEFOR_FALSE=
+fi
+
+
+if (test "x$have_cxx11_rangefor" != "xyes"); then
+  as_fn_error $? "libMesh requires C++11 ranged-for loop support" "$LINENO" 5
+fi
+
+# Technically we require uniform initialization, but this is the
+# closest test we have
+
+    have_cxx11_initializer_list=no
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 initializer list support" >&5
+$as_echo_n "checking for C++11 initializer list support... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    # Save the original flags before appending the $switch determined
+    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
+    # same flag twice, but that shouldn't matter...
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+      #include <vector>
+      #include <string>
+
+int
+main ()
+{
+
+      std::vector<std::string> v = { "xyzzy", "plugh", "abracadabra" };
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+      if (test "x$enablecxx11" = "xyes"); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_INITIALIZER_LIST 1" >>confdefs.h
+
+        have_cxx11_initializer_list=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_INITIALIZER_LIST_BUT_DISABLED 1" >>confdefs.h
+
+      fi
+
+else
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+     if test x$have_cxx11_initializer_list == xyes; then
+  HAVE_CXX11_INITIALIZER_LIST_TRUE=
+  HAVE_CXX11_INITIALIZER_LIST_FALSE='#'
+else
+  HAVE_CXX11_INITIALIZER_LIST_TRUE='#'
+  HAVE_CXX11_INITIALIZER_LIST_FALSE=
+fi
+
+
+if (test "x$have_cxx11_initializer_list" != "xyes"); then
+  as_fn_error $? "libMesh requires C++11 initializer list support" "$LINENO" 5
+fi
+
+# --------------------------------------------------------------
+# Test for optional modern C++ features, which libMesh offers shims
+# for and/or which libMesh applications may want to selectively use.
 # --------------------------------------------------------------
 
     have_cxx11_move=no
@@ -8557,90 +8813,6 @@ fi
 
 
 
-    have_cxx11_rangefor=no
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 range-based for loop support" >&5
-$as_echo_n "checking for C++11 range-based for loop support... " >&6; }
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
-    old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
-
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-        #include <iostream>
-        #include <vector>
-        void print(const std::vector<int> & v)
-        {
-          for (const int & x : v)
-            std::cout << x << ' ';
-          std::cout << std::endl;
-        }
-
-int
-main ()
-{
-
-        std::vector<int> v(3);
-        print(v);
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-      if (test "x$enablecxx11" = "xyes"); then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-$as_echo "#define HAVE_CXX11_RANGEFOR 1" >>confdefs.h
-
-        have_cxx11_rangefor=yes
-      else
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
-$as_echo "yes, but disabled." >&6; }
-
-$as_echo "#define HAVE_CXX11_RANGEFOR_BUT_DISABLED 1" >>confdefs.h
-
-      fi
-
-else
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-    # Reset the flags
-    CXXFLAGS="$old_CXXFLAGS"
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-     if test x$have_cxx11_rangefor == xyes; then
-  HAVE_CXX11_RANGEFOR_TRUE=
-  HAVE_CXX11_RANGEFOR_FALSE='#'
-else
-  HAVE_CXX11_RANGEFOR_TRUE='#'
-  HAVE_CXX11_RANGEFOR_FALSE=
-fi
-
-
-
     have_cxx11_decltype=no
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 decltype support" >&5
@@ -8791,82 +8963,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 else
   HAVE_CXX11_RVALUE_REFERENCES_TRUE='#'
   HAVE_CXX11_RVALUE_REFERENCES_FALSE=
-fi
-
-
-
-    have_cxx11_auto=no
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 auto keyword support" >&5
-$as_echo_n "checking for C++11 auto keyword support... " >&6; }
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
-    old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
-
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-
-      int x = 5;
-      auto y = x;
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-      if (test "x$enablecxx11" = "xyes"); then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-$as_echo "#define HAVE_CXX11_AUTO 1" >>confdefs.h
-
-        have_cxx11_auto=yes
-      else
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
-$as_echo "yes, but disabled." >&6; }
-
-$as_echo "#define HAVE_CXX11_AUTO_BUT_DISABLED 1" >>confdefs.h
-
-      fi
-
-else
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-    # Reset the flags
-    CXXFLAGS="$old_CXXFLAGS"
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-     if test x$have_cxx11_auto == xyes; then
-  HAVE_CXX11_AUTO_TRUE=
-  HAVE_CXX11_AUTO_FALSE='#'
-else
-  HAVE_CXX11_AUTO_TRUE='#'
-  HAVE_CXX11_AUTO_FALSE=
 fi
 
 
@@ -9655,83 +9751,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 else
   HAVE_CXX11_OVERRIDE_TRUE='#'
   HAVE_CXX11_OVERRIDE_FALSE=
-fi
-
-
-
-    have_cxx11_initializer_list=no
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 initializer list support" >&5
-$as_echo_n "checking for C++11 initializer list support... " >&6; }
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
-    old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
-
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-      #include <vector>
-      #include <string>
-
-int
-main ()
-{
-
-      std::vector<std::string> v = { "xyzzy", "plugh", "abracadabra" };
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-      if (test "x$enablecxx11" = "xyes"); then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-$as_echo "#define HAVE_CXX11_INITIALIZER_LIST 1" >>confdefs.h
-
-        have_cxx11_initializer_list=yes
-      else
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
-$as_echo "yes, but disabled." >&6; }
-
-$as_echo "#define HAVE_CXX11_INITIALIZER_LIST_BUT_DISABLED 1" >>confdefs.h
-
-      fi
-
-else
-
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-    # Reset the flags
-    CXXFLAGS="$old_CXXFLAGS"
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-     if test x$have_cxx11_initializer_list == xyes; then
-  HAVE_CXX11_INITIALIZER_LIST_TRUE=
-  HAVE_CXX11_INITIALIZER_LIST_FALSE='#'
-else
-  HAVE_CXX11_INITIALIZER_LIST_TRUE='#'
-  HAVE_CXX11_INITIALIZER_LIST_FALSE=
 fi
 
 
@@ -43568,6 +43587,18 @@ if test -z "${LIBMESH_OPROF_MODE_TRUE}" && test -z "${LIBMESH_OPROF_MODE_FALSE}"
   as_fn_error $? "conditional \"LIBMESH_OPROF_MODE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${HAVE_CXX11_AUTO_TRUE}" && test -z "${HAVE_CXX11_AUTO_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_AUTO\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_RANGEFOR_TRUE}" && test -z "${HAVE_CXX11_RANGEFOR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_RANGEFOR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_INITIALIZER_LIST_TRUE}" && test -z "${HAVE_CXX11_INITIALIZER_LIST_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_INITIALIZER_LIST\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${HAVE_CXX11_MOVE_TRUE}" && test -z "${HAVE_CXX11_MOVE_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX11_MOVE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -43576,20 +43607,12 @@ if test -z "${HAVE_CXX11_MOVE_CONSTRUCTORS_TRUE}" && test -z "${HAVE_CXX11_MOVE_
   as_fn_error $? "conditional \"HAVE_CXX11_MOVE_CONSTRUCTORS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${HAVE_CXX11_RANGEFOR_TRUE}" && test -z "${HAVE_CXX11_RANGEFOR_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_CXX11_RANGEFOR\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 if test -z "${HAVE_CXX11_DECLTYPE_TRUE}" && test -z "${HAVE_CXX11_DECLTYPE_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX11_DECLTYPE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_RVALUE_REFERENCES_TRUE}" && test -z "${HAVE_CXX11_RVALUE_REFERENCES_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX11_RVALUE_REFERENCES\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${HAVE_CXX11_AUTO_TRUE}" && test -z "${HAVE_CXX11_AUTO_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_CXX11_AUTO\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_LAMBDA_TRUE}" && test -z "${HAVE_CXX11_LAMBDA_FALSE}"; then
@@ -43626,10 +43649,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_OVERRIDE_TRUE}" && test -z "${HAVE_CXX11_OVERRIDE_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX11_OVERRIDE\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${HAVE_CXX11_INITIALIZER_LIST_TRUE}" && test -z "${HAVE_CXX11_INITIALIZER_LIST_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_CXX11_INITIALIZER_LIST\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_VARIADIC_TEMPLATES_TRUE}" && test -z "${HAVE_CXX11_VARIADIC_TEMPLATES_FALSE}"; then
