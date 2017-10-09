@@ -625,10 +625,11 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	libmesh_nullptr.h location_maps.h mapvector.h \
 	null_output_iterator.h number_lookups.h ostream_proxy.h \
 	parameters.h perf_log.h perfmon.h plt_loader.h \
-	point_locator_base.h point_locator_tree.h pool_allocator.h \
-	ppiter.h restore_warnings.h safe_bool.h simple_range.h \
-	statistics.h string_to_enum.h timestamp.h topology_map.h \
-	tree.h tree_base.h tree_node.h utility.h vectormap.h xdr_cxx.h \
+	point_locator_base.h point_locator_tree.h \
+	pointer_to_pointer_iter.h pool_allocator.h restore_warnings.h \
+	safe_bool.h simple_range.h statistics.h string_to_enum.h \
+	timestamp.h topology_map.h tree.h tree_base.h tree_node.h \
+	utility.h vectormap.h xdr_cxx.h \
 	parallel_communicator_specializations $(am__append_1) \
 	$(am__append_3) $(am__append_5) $(am__append_7) \
 	$(am__append_9) $(am__append_11) $(am__append_13) \
@@ -2090,10 +2091,10 @@ point_locator_base.h: $(top_srcdir)/include/utils/point_locator_base.h
 point_locator_tree.h: $(top_srcdir)/include/utils/point_locator_tree.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-pool_allocator.h: $(top_srcdir)/include/utils/pool_allocator.h
+pointer_to_pointer_iter.h: $(top_srcdir)/include/utils/pointer_to_pointer_iter.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-ppiter.h: $(top_srcdir)/include/utils/ppiter.h
+pool_allocator.h: $(top_srcdir)/include/utils/pool_allocator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 restore_warnings.h: $(top_srcdir)/include/utils/restore_warnings.h
