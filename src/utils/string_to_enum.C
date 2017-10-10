@@ -119,6 +119,7 @@ void init_elem_type_to_enum ()
       elem_type_to_enum["QUAD4"          ]=QUAD4;
       elem_type_to_enum["QUADSHELL4"     ]=QUADSHELL4;
       elem_type_to_enum["QUAD8"          ]=QUAD8;
+      elem_type_to_enum["QUADSHELL8"     ]=QUADSHELL8;
       elem_type_to_enum["QUAD9"          ]=QUAD9;
 
       elem_type_to_enum["TET"            ]=TET4;

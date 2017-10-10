@@ -124,6 +124,7 @@ unsigned int bernstein_n_dofs(const ElemType t, const Order o)
       libmesh_assert_less (o, 2);
       libmesh_fallthrough();
     case QUAD8:
+    case QUADSHELL8:
       {
         if (o == 1)
           return 4;
@@ -354,6 +355,7 @@ unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
     case TRI6:
       return ((o-1)*(o-2)/2);
     case QUAD8:
+    case QUADSHELL8:
       if (o <= 2)
         return 0;
       libmesh_fallthrough();

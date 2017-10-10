@@ -358,6 +358,7 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             return 4;
 
@@ -517,6 +518,7 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             {
               switch (n)

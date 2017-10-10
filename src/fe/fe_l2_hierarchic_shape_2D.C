@@ -159,6 +159,7 @@ Real FE<2,L2_HIERARCHIC>::shape(const Elem * elem,
       libmesh_assert_less (totalorder, 2);
       libmesh_fallthrough();
     case QUAD8:
+    case QUADSHELL8:
     case QUAD9:
       {
         // Compute quad shape functions as a tensor-product
@@ -298,6 +299,7 @@ Real FE<2,L2_HIERARCHIC>::shape_deriv(const Elem * elem,
       libmesh_assert_less (totalorder, 2);
       libmesh_fallthrough();
     case QUAD8:
+    case QUADSHELL8:
     case QUAD9:
       {
         // Compute quad shape functions as a tensor-product

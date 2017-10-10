@@ -36,6 +36,7 @@ void QMonomial::init_2D(const ElemType type_in,
     case QUAD4:
     case QUADSHELL4:
     case QUAD8:
+    case QUADSHELL8:
     case QUAD9:
       {
         switch(_order + 2*p)

@@ -115,6 +115,7 @@ unsigned int hierarchic_n_dofs(const ElemType t, const Order o)
       libmesh_assert_less (o, 2);
       libmesh_fallthrough();
     case QUAD8:
+    case QUADSHELL8:
     case QUAD9:
       return ((o+1)*(o+1));
     case HEX8:
@@ -192,6 +193,7 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
       libmesh_assert_less (o, 2);
       libmesh_fallthrough();
     case QUAD8:
+    case QUADSHELL8:
     case QUAD9:
       switch (n)
         {
@@ -297,6 +299,7 @@ unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
     case TRI6:
       return ((o-1)*(o-2)/2);
     case QUAD8:
+    case QUADSHELL8:
     case QUAD9:
       return ((o-1)*(o-1));
     case HEX8:

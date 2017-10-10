@@ -85,7 +85,9 @@ void init_element_equivalence_map()
 
       // QUAD8 equivalences
       element_equivalence_map["QUAD8"]  = QUAD8;
-      // element_equivalence_map["SHELL8"] = QUAD8;
+
+      // QUADSHELL8 equivalences
+      element_equivalence_map["SHELL8"] = QUADSHELL8;
 
       // QUAD9 equivalences
       element_equivalence_map["QUAD9"]  = QUAD9;
@@ -2174,6 +2176,25 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
                               QUAD8,
                               "QUAD8");
         return conv;
+      }
+
+    case QUADSHELL8:
+      {
+        return Conversion(quad8_node_map,
+                          ARRAY_LENGTH(quad8_node_map), // node mapping is the same as for quad8
+                          quad8_node_map,
+                          ARRAY_LENGTH(quad8_node_map),
+                          quadshell4_edge_map,
+                          ARRAY_LENGTH(quadshell4_edge_map),
+                          quadshell4_inverse_edge_map,
+                          ARRAY_LENGTH(quadshell4_inverse_edge_map),
+                          quadshell4_shellface_map,
+                          ARRAY_LENGTH(quadshell4_shellface_map),
+                          quadshell4_inverse_shellface_map,
+                          ARRAY_LENGTH(quadshell4_inverse_shellface_map),
+                          2, // the side index offset for QUADSHELL8 is 2
+                          QUADSHELL8,
+                          "SHELL8");
       }
 
     case QUAD9:

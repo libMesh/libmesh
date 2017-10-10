@@ -113,6 +113,7 @@ unsigned int l2_hierarchic_n_dofs(const ElemType t, const Order o)
     case QUAD4:
     case QUADSHELL4:
     case QUAD8:
+    case QUADSHELL8:
     case QUAD9:
       return ((o+1)*(o+1));
     case HEX8:

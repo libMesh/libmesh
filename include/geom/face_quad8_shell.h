@@ -15,40 +15,40 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#ifndef LIBMESH_FACE_QUAD8_SHELL_H
+#define LIBMESH_FACE_QUAD8_SHELL_H
 
-
-// Local includes
-#include "libmesh/quadrature_gauss_lobatto.h"
+#include "face_quad8.h"
 
 namespace libMesh
 {
 
-void QGaussLobatto::init_2D(const ElemType type_in,
-                            unsigned int p)
+/**
+ * QuadShell8 is almost identical to Quad8. The only difference is
+ * with the type of boundary data we store for this case. We need this
+ * "stub" class in order to differentiate between this class and other
+ * classes when reading/writing Mesh files.
+ *
+ * \author Sylvain Vallaghe 
+ * \date 2017
+ * \brief A 2D quadrilateral shell element with 8 nodes.
+ */
+class QuadShell8 : public Quad8
 {
-  switch (type_in)
-    {
-    case QUAD4:
-    case QUADSHELL4:
-    case QUAD8:
-    case QUADSHELL8:
-    case QUAD9:
-      {
-        // We compute the 2D quadrature rule as a tensor
-        // product of the 1D quadrature rule.
-        QGaussLobatto q1D(1, _order);
-        q1D.init(EDGE2, p);
-        tensor_product_quad(q1D);
-        return;
-      }
+public:
+  /**
+   * Constructor.  By default this element has no parent.
+   */
+  explicit
+  QuadShell8 (Elem * p=libmesh_nullptr) :
+    Quad8(p) {}
 
-      // We *could* fall back to a Gauss type rule for other types
-      // elements, but the assumption here is that the user has asked
-      // for a Gauss-Lobatto rule, i.e. a rule with integration points
-      // on the element boundary, for a reason.
-    default:
-      libmesh_error_msg("Element type not supported!:" << type_in);
-    }
-}
+  /**
+   * \returns \p QUADSHELL8.
+   */
+  virtual ElemType type () const libmesh_override { return QUADSHELL8; }
+};
 
 } // namespace libMesh
+
+#endif

@@ -46,6 +46,7 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
@@ -241,6 +242,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product
@@ -588,6 +590,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             {
               // Compute quad shape functions as a tensor-product

@@ -128,6 +128,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             return 3;
 
@@ -173,6 +174,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             return 6;
 
@@ -218,6 +220,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             return 10;
 
@@ -262,6 +265,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             return 15;
 
@@ -305,6 +309,7 @@ unsigned int xyz_n_dofs(const ElemType t, const Order o)
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             return (order+1)*(order+2)/2;
 
@@ -369,6 +374,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             return 3;
 
@@ -417,6 +423,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             return 6;
 
@@ -463,6 +470,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             return 10;
 
@@ -508,6 +516,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             return 15;
 
@@ -550,6 +559,7 @@ unsigned int xyz_n_dofs_per_elem(const ElemType t,
           case QUAD4:
           case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
             return (order+1)*(order+2)/2;
 
