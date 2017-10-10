@@ -40,6 +40,7 @@
 #include "libmesh/face_quad4.h"
 #include "libmesh/face_quad4_shell.h"
 #include "libmesh/face_quad8.h"
+#include "libmesh/face_quad8_shell.h"
 #include "libmesh/face_quad9.h"
 #include "libmesh/face_inf_quad4.h"
 #include "libmesh/face_inf_quad6.h"
