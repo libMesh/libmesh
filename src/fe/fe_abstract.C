@@ -306,6 +306,7 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
         return;
       }
     case QUAD8:
+    case QUADSHELL8:
       {
         nodes.resize(8);
         nodes[0] = Point (-1.,-1.,0.);
@@ -606,6 +607,7 @@ bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const R
     case QUAD4:
     case QUADSHELL4:
     case QUAD8:
+    case QUADSHELL8:
     case QUAD9:
       {
         // The reference quadrilateral element is [-1,1]^2.

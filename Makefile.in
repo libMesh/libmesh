@@ -296,8 +296,8 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/geom/face_inf_quad.C src/geom/face_inf_quad4.C \
 	src/geom/face_inf_quad6.C src/geom/face_quad.C \
 	src/geom/face_quad4.C src/geom/face_quad4_shell.C \
-	src/geom/face_quad8.C src/geom/face_quad9.C \
-	src/geom/face_tri.C src/geom/face_tri3.C \
+	src/geom/face_quad8.C src/geom/face_quad8_shell.C \
+	src/geom/face_quad9.C src/geom/face_tri.C src/geom/face_tri3.C \
 	src/geom/face_tri3_shell.C src/geom/face_tri3_subdivision.C \
 	src/geom/face_tri6.C src/geom/node.C src/geom/node_elem.C \
 	src/geom/plane.C src/geom/point.C src/geom/reference_elem.C \
@@ -654,6 +654,7 @@ am__objects_1 = src/base/libmesh_dbg_la-default_coupling.lo \
 	src/geom/libmesh_dbg_la-face_quad4.lo \
 	src/geom/libmesh_dbg_la-face_quad4_shell.lo \
 	src/geom/libmesh_dbg_la-face_quad8.lo \
+	src/geom/libmesh_dbg_la-face_quad8_shell.lo \
 	src/geom/libmesh_dbg_la-face_quad9.lo \
 	src/geom/libmesh_dbg_la-face_tri.lo \
 	src/geom/libmesh_dbg_la-face_tri3.lo \
@@ -1020,8 +1021,8 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/geom/face_inf_quad.C src/geom/face_inf_quad4.C \
 	src/geom/face_inf_quad6.C src/geom/face_quad.C \
 	src/geom/face_quad4.C src/geom/face_quad4_shell.C \
-	src/geom/face_quad8.C src/geom/face_quad9.C \
-	src/geom/face_tri.C src/geom/face_tri3.C \
+	src/geom/face_quad8.C src/geom/face_quad8_shell.C \
+	src/geom/face_quad9.C src/geom/face_tri.C src/geom/face_tri3.C \
 	src/geom/face_tri3_shell.C src/geom/face_tri3_subdivision.C \
 	src/geom/face_tri6.C src/geom/node.C src/geom/node_elem.C \
 	src/geom/plane.C src/geom/point.C src/geom/reference_elem.C \
@@ -1377,6 +1378,7 @@ am__objects_2 = src/base/libmesh_devel_la-default_coupling.lo \
 	src/geom/libmesh_devel_la-face_quad4.lo \
 	src/geom/libmesh_devel_la-face_quad4_shell.lo \
 	src/geom/libmesh_devel_la-face_quad8.lo \
+	src/geom/libmesh_devel_la-face_quad8_shell.lo \
 	src/geom/libmesh_devel_la-face_quad9.lo \
 	src/geom/libmesh_devel_la-face_tri.lo \
 	src/geom/libmesh_devel_la-face_tri3.lo \
@@ -1740,8 +1742,8 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/geom/face_inf_quad.C src/geom/face_inf_quad4.C \
 	src/geom/face_inf_quad6.C src/geom/face_quad.C \
 	src/geom/face_quad4.C src/geom/face_quad4_shell.C \
-	src/geom/face_quad8.C src/geom/face_quad9.C \
-	src/geom/face_tri.C src/geom/face_tri3.C \
+	src/geom/face_quad8.C src/geom/face_quad8_shell.C \
+	src/geom/face_quad9.C src/geom/face_tri.C src/geom/face_tri3.C \
 	src/geom/face_tri3_shell.C src/geom/face_tri3_subdivision.C \
 	src/geom/face_tri6.C src/geom/node.C src/geom/node_elem.C \
 	src/geom/plane.C src/geom/point.C src/geom/reference_elem.C \
@@ -2097,6 +2099,7 @@ am__objects_3 = src/base/libmesh_oprof_la-default_coupling.lo \
 	src/geom/libmesh_oprof_la-face_quad4.lo \
 	src/geom/libmesh_oprof_la-face_quad4_shell.lo \
 	src/geom/libmesh_oprof_la-face_quad8.lo \
+	src/geom/libmesh_oprof_la-face_quad8_shell.lo \
 	src/geom/libmesh_oprof_la-face_quad9.lo \
 	src/geom/libmesh_oprof_la-face_tri.lo \
 	src/geom/libmesh_oprof_la-face_tri3.lo \
@@ -2460,8 +2463,8 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/geom/face_inf_quad.C src/geom/face_inf_quad4.C \
 	src/geom/face_inf_quad6.C src/geom/face_quad.C \
 	src/geom/face_quad4.C src/geom/face_quad4_shell.C \
-	src/geom/face_quad8.C src/geom/face_quad9.C \
-	src/geom/face_tri.C src/geom/face_tri3.C \
+	src/geom/face_quad8.C src/geom/face_quad8_shell.C \
+	src/geom/face_quad9.C src/geom/face_tri.C src/geom/face_tri3.C \
 	src/geom/face_tri3_shell.C src/geom/face_tri3_subdivision.C \
 	src/geom/face_tri6.C src/geom/node.C src/geom/node_elem.C \
 	src/geom/plane.C src/geom/point.C src/geom/reference_elem.C \
@@ -2817,6 +2820,7 @@ am__objects_4 = src/base/libmesh_opt_la-default_coupling.lo \
 	src/geom/libmesh_opt_la-face_quad4.lo \
 	src/geom/libmesh_opt_la-face_quad4_shell.lo \
 	src/geom/libmesh_opt_la-face_quad8.lo \
+	src/geom/libmesh_opt_la-face_quad8_shell.lo \
 	src/geom/libmesh_opt_la-face_quad9.lo \
 	src/geom/libmesh_opt_la-face_tri.lo \
 	src/geom/libmesh_opt_la-face_tri3.lo \
@@ -3179,8 +3183,8 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/geom/face_inf_quad.C src/geom/face_inf_quad4.C \
 	src/geom/face_inf_quad6.C src/geom/face_quad.C \
 	src/geom/face_quad4.C src/geom/face_quad4_shell.C \
-	src/geom/face_quad8.C src/geom/face_quad9.C \
-	src/geom/face_tri.C src/geom/face_tri3.C \
+	src/geom/face_quad8.C src/geom/face_quad8_shell.C \
+	src/geom/face_quad9.C src/geom/face_tri.C src/geom/face_tri3.C \
 	src/geom/face_tri3_shell.C src/geom/face_tri3_subdivision.C \
 	src/geom/face_tri6.C src/geom/node.C src/geom/node_elem.C \
 	src/geom/plane.C src/geom/point.C src/geom/reference_elem.C \
@@ -3536,6 +3540,7 @@ am__objects_5 = src/base/libmesh_prof_la-default_coupling.lo \
 	src/geom/libmesh_prof_la-face_quad4.lo \
 	src/geom/libmesh_prof_la-face_quad4_shell.lo \
 	src/geom/libmesh_prof_la-face_quad8.lo \
+	src/geom/libmesh_prof_la-face_quad8_shell.lo \
 	src/geom/libmesh_prof_la-face_quad9.lo \
 	src/geom/libmesh_prof_la-face_tri.lo \
 	src/geom/libmesh_prof_la-face_tri3.lo \
@@ -4964,6 +4969,7 @@ libmesh_SOURCES = \
         src/geom/face_quad4.C \
         src/geom/face_quad4_shell.C \
         src/geom/face_quad8.C \
+        src/geom/face_quad8_shell.C \
         src/geom/face_quad9.C \
         src/geom/face_tri.C \
         src/geom/face_tri3.C \
@@ -5966,6 +5972,8 @@ src/geom/libmesh_dbg_la-face_quad4.lo: src/geom/$(am__dirstamp) \
 src/geom/libmesh_dbg_la-face_quad4_shell.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_dbg_la-face_quad8.lo: src/geom/$(am__dirstamp) \
+	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/libmesh_dbg_la-face_quad8_shell.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_dbg_la-face_quad9.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
@@ -7066,6 +7074,8 @@ src/geom/libmesh_devel_la-face_quad4_shell.lo:  \
 	src/geom/$(am__dirstamp) src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_devel_la-face_quad8.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/libmesh_devel_la-face_quad8_shell.lo:  \
+	src/geom/$(am__dirstamp) src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_devel_la-face_quad9.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_devel_la-face_tri.lo: src/geom/$(am__dirstamp) \
@@ -8102,6 +8112,8 @@ src/geom/libmesh_oprof_la-face_quad4_shell.lo:  \
 	src/geom/$(am__dirstamp) src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_oprof_la-face_quad8.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/libmesh_oprof_la-face_quad8_shell.lo:  \
+	src/geom/$(am__dirstamp) src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_oprof_la-face_quad9.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_oprof_la-face_tri.lo: src/geom/$(am__dirstamp) \
@@ -9138,6 +9150,8 @@ src/geom/libmesh_opt_la-face_quad4_shell.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_opt_la-face_quad8.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/libmesh_opt_la-face_quad8_shell.lo: src/geom/$(am__dirstamp) \
+	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_opt_la-face_quad9.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_opt_la-face_tri.lo: src/geom/$(am__dirstamp) \
@@ -10171,6 +10185,8 @@ src/geom/libmesh_prof_la-face_quad4_shell.lo:  \
 	src/geom/$(am__dirstamp) src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_prof_la-face_quad8.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/libmesh_prof_la-face_quad8_shell.lo:  \
+	src/geom/$(am__dirstamp) src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_prof_la-face_quad9.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_prof_la-face_tri.lo: src/geom/$(am__dirstamp) \
@@ -12052,6 +12068,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-face_quad4.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-face_quad4_shell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-face_quad8.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-face_quad8_shell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-face_quad9.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-face_tri.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-face_tri3.Plo@am__quote@
@@ -12107,6 +12124,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-face_quad4.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-face_quad4_shell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-face_quad8.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-face_quad8_shell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-face_quad9.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-face_tri.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-face_tri3.Plo@am__quote@
@@ -12162,6 +12180,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-face_quad4.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-face_quad4_shell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-face_quad8.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-face_quad8_shell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-face_quad9.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-face_tri.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-face_tri3.Plo@am__quote@
@@ -12217,6 +12236,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-face_quad4.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-face_quad4_shell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-face_quad8.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-face_quad8_shell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-face_quad9.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-face_tri.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-face_tri3.Plo@am__quote@
@@ -12272,6 +12292,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-face_quad4.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-face_quad4_shell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-face_quad8.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-face_quad8_shell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-face_quad9.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-face_tri.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-face_tri3.Plo@am__quote@
@@ -14665,6 +14686,13 @@ src/geom/libmesh_dbg_la-face_quad8.lo: src/geom/face_quad8.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/face_quad8.C' object='src/geom/libmesh_dbg_la-face_quad8.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_dbg_la-face_quad8.lo `test -f 'src/geom/face_quad8.C' || echo '$(srcdir)/'`src/geom/face_quad8.C
+
+src/geom/libmesh_dbg_la-face_quad8_shell.lo: src/geom/face_quad8_shell.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_dbg_la-face_quad8_shell.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_dbg_la-face_quad8_shell.Tpo -c -o src/geom/libmesh_dbg_la-face_quad8_shell.lo `test -f 'src/geom/face_quad8_shell.C' || echo '$(srcdir)/'`src/geom/face_quad8_shell.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_dbg_la-face_quad8_shell.Tpo src/geom/$(DEPDIR)/libmesh_dbg_la-face_quad8_shell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/face_quad8_shell.C' object='src/geom/libmesh_dbg_la-face_quad8_shell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_dbg_la-face_quad8_shell.lo `test -f 'src/geom/face_quad8_shell.C' || echo '$(srcdir)/'`src/geom/face_quad8_shell.C
 
 src/geom/libmesh_dbg_la-face_quad9.lo: src/geom/face_quad9.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_dbg_la-face_quad9.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_dbg_la-face_quad9.Tpo -c -o src/geom/libmesh_dbg_la-face_quad9.lo `test -f 'src/geom/face_quad9.C' || echo '$(srcdir)/'`src/geom/face_quad9.C
@@ -17613,6 +17641,13 @@ src/geom/libmesh_devel_la-face_quad8.lo: src/geom/face_quad8.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_devel_la-face_quad8.lo `test -f 'src/geom/face_quad8.C' || echo '$(srcdir)/'`src/geom/face_quad8.C
 
+src/geom/libmesh_devel_la-face_quad8_shell.lo: src/geom/face_quad8_shell.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_devel_la-face_quad8_shell.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_devel_la-face_quad8_shell.Tpo -c -o src/geom/libmesh_devel_la-face_quad8_shell.lo `test -f 'src/geom/face_quad8_shell.C' || echo '$(srcdir)/'`src/geom/face_quad8_shell.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_devel_la-face_quad8_shell.Tpo src/geom/$(DEPDIR)/libmesh_devel_la-face_quad8_shell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/face_quad8_shell.C' object='src/geom/libmesh_devel_la-face_quad8_shell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_devel_la-face_quad8_shell.lo `test -f 'src/geom/face_quad8_shell.C' || echo '$(srcdir)/'`src/geom/face_quad8_shell.C
+
 src/geom/libmesh_devel_la-face_quad9.lo: src/geom/face_quad9.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_devel_la-face_quad9.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_devel_la-face_quad9.Tpo -c -o src/geom/libmesh_devel_la-face_quad9.lo `test -f 'src/geom/face_quad9.C' || echo '$(srcdir)/'`src/geom/face_quad9.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_devel_la-face_quad9.Tpo src/geom/$(DEPDIR)/libmesh_devel_la-face_quad9.Plo
@@ -20559,6 +20594,13 @@ src/geom/libmesh_oprof_la-face_quad8.lo: src/geom/face_quad8.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/face_quad8.C' object='src/geom/libmesh_oprof_la-face_quad8.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_oprof_la-face_quad8.lo `test -f 'src/geom/face_quad8.C' || echo '$(srcdir)/'`src/geom/face_quad8.C
+
+src/geom/libmesh_oprof_la-face_quad8_shell.lo: src/geom/face_quad8_shell.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_oprof_la-face_quad8_shell.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_oprof_la-face_quad8_shell.Tpo -c -o src/geom/libmesh_oprof_la-face_quad8_shell.lo `test -f 'src/geom/face_quad8_shell.C' || echo '$(srcdir)/'`src/geom/face_quad8_shell.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_oprof_la-face_quad8_shell.Tpo src/geom/$(DEPDIR)/libmesh_oprof_la-face_quad8_shell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/face_quad8_shell.C' object='src/geom/libmesh_oprof_la-face_quad8_shell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_oprof_la-face_quad8_shell.lo `test -f 'src/geom/face_quad8_shell.C' || echo '$(srcdir)/'`src/geom/face_quad8_shell.C
 
 src/geom/libmesh_oprof_la-face_quad9.lo: src/geom/face_quad9.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_oprof_la-face_quad9.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_oprof_la-face_quad9.Tpo -c -o src/geom/libmesh_oprof_la-face_quad9.lo `test -f 'src/geom/face_quad9.C' || echo '$(srcdir)/'`src/geom/face_quad9.C
@@ -23507,6 +23549,13 @@ src/geom/libmesh_opt_la-face_quad8.lo: src/geom/face_quad8.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_opt_la-face_quad8.lo `test -f 'src/geom/face_quad8.C' || echo '$(srcdir)/'`src/geom/face_quad8.C
 
+src/geom/libmesh_opt_la-face_quad8_shell.lo: src/geom/face_quad8_shell.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_opt_la-face_quad8_shell.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_opt_la-face_quad8_shell.Tpo -c -o src/geom/libmesh_opt_la-face_quad8_shell.lo `test -f 'src/geom/face_quad8_shell.C' || echo '$(srcdir)/'`src/geom/face_quad8_shell.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_opt_la-face_quad8_shell.Tpo src/geom/$(DEPDIR)/libmesh_opt_la-face_quad8_shell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/face_quad8_shell.C' object='src/geom/libmesh_opt_la-face_quad8_shell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_opt_la-face_quad8_shell.lo `test -f 'src/geom/face_quad8_shell.C' || echo '$(srcdir)/'`src/geom/face_quad8_shell.C
+
 src/geom/libmesh_opt_la-face_quad9.lo: src/geom/face_quad9.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_opt_la-face_quad9.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_opt_la-face_quad9.Tpo -c -o src/geom/libmesh_opt_la-face_quad9.lo `test -f 'src/geom/face_quad9.C' || echo '$(srcdir)/'`src/geom/face_quad9.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_opt_la-face_quad9.Tpo src/geom/$(DEPDIR)/libmesh_opt_la-face_quad9.Plo
@@ -26453,6 +26502,13 @@ src/geom/libmesh_prof_la-face_quad8.lo: src/geom/face_quad8.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/face_quad8.C' object='src/geom/libmesh_prof_la-face_quad8.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_prof_la-face_quad8.lo `test -f 'src/geom/face_quad8.C' || echo '$(srcdir)/'`src/geom/face_quad8.C
+
+src/geom/libmesh_prof_la-face_quad8_shell.lo: src/geom/face_quad8_shell.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_prof_la-face_quad8_shell.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_prof_la-face_quad8_shell.Tpo -c -o src/geom/libmesh_prof_la-face_quad8_shell.lo `test -f 'src/geom/face_quad8_shell.C' || echo '$(srcdir)/'`src/geom/face_quad8_shell.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_prof_la-face_quad8_shell.Tpo src/geom/$(DEPDIR)/libmesh_prof_la-face_quad8_shell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/face_quad8_shell.C' object='src/geom/libmesh_prof_la-face_quad8_shell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_prof_la-face_quad8_shell.lo `test -f 'src/geom/face_quad8_shell.C' || echo '$(srcdir)/'`src/geom/face_quad8_shell.C
 
 src/geom/libmesh_prof_la-face_quad9.lo: src/geom/face_quad9.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_prof_la-face_quad9.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_prof_la-face_quad9.Tpo -c -o src/geom/libmesh_prof_la-face_quad9.lo `test -f 'src/geom/face_quad9.C' || echo '$(srcdir)/'`src/geom/face_quad9.C

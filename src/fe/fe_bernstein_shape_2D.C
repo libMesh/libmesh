@@ -120,6 +120,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
       }
       // handle serendipity QUAD8 element separately
     case QUAD8:
+    case QUADSHELL8:
       {
         libmesh_assert_less (totalorder, 3);
 

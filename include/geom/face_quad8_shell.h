@@ -15,4 +15,40 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// The QuadShell4 functions are all declared inline.
+#ifndef LIBMESH_FACE_QUAD8_SHELL_H
+#define LIBMESH_FACE_QUAD8_SHELL_H
+
+#include "face_quad8.h"
+
+namespace libMesh
+{
+
+/**
+ * QuadShell8 is almost identical to Quad8. The only difference is
+ * with the type of boundary data we store for this case. We need this
+ * "stub" class in order to differentiate between this class and other
+ * classes when reading/writing Mesh files.
+ *
+ * \author Sylvain Vallaghe 
+ * \date 2017
+ * \brief A 2D quadrilateral shell element with 8 nodes.
+ */
+class QuadShell8 : public Quad8
+{
+public:
+  /**
+   * Constructor.  By default this element has no parent.
+   */
+  explicit
+  QuadShell8 (Elem * p=libmesh_nullptr) :
+    Quad8(p) {}
+
+  /**
+   * \returns \p QUADSHELL8.
+   */
+  virtual ElemType type () const libmesh_override { return QUADSHELL8; }
+};
+
+} // namespace libMesh
+
+#endif

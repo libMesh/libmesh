@@ -1040,6 +1040,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case QUADSHELL4:
           return 1;
         case QUAD8:
+        case QUADSHELL8:
         case QUAD9:
           return 2;
         case TET4:
@@ -1077,6 +1078,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case QUAD4:
         case QUADSHELL4:
         case QUAD8:
+        case QUADSHELL8:
         case QUAD9:
         case TET4:
         case TET10:
@@ -1111,6 +1113,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case QUADSHELL4:
           return 1;
         case QUAD8:
+        case QUADSHELL8:
         case QUAD9:
           return unlimited;
         case TET4:
@@ -1151,6 +1154,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case QUADSHELL4:
           return 1;
         case QUAD8:
+        case QUADSHELL8:
         case QUAD9:
           return 7;
         case TET4:
@@ -1182,6 +1186,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case QUAD4:
         case QUADSHELL4:
         case QUAD8:
+        case QUADSHELL8:
         case QUAD9:
         case TET4:
         case TET10:
@@ -1214,6 +1219,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case QUAD4:
         case QUADSHELL4:
         case QUAD8:
+        case QUADSHELL8:
         case QUAD9:
         case TET4:
         case TET10:
@@ -1246,6 +1252,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case QUADSHELL4:
           return 3;
         case QUAD8:
+        case QUADSHELL8:
         case QUAD9:
           return unlimited;
         case TET4:
@@ -1283,6 +1290,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case QUADSHELL4:
           return 1;
         case QUAD8:
+        case QUADSHELL8:
         case QUAD9:
           return unlimited;
         case TET4:
@@ -1320,6 +1328,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case QUADSHELL4:
           return 1;
         case QUAD8:
+        case QUADSHELL8:
         case QUAD9:
           return unlimited;
         case TET4:

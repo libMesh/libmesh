@@ -712,6 +712,7 @@ include_HEADERS = \
         geom/face_quad4.h \
         geom/face_quad4_shell.h \
         geom/face_quad8.h \
+        geom/face_quad8_shell.h \
         geom/face_quad9.h \
         geom/face_tri.h \
         geom/face_tri3.h \

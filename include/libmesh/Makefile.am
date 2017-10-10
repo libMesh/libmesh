@@ -133,6 +133,7 @@ BUILT_SOURCES = \
         face_quad4.h \
         face_quad4_shell.h \
         face_quad8.h \
+        face_quad8_shell.h \
         face_quad9.h \
         face_tri.h \
         face_tri3.h \
@@ -911,6 +912,9 @@ face_quad4_shell.h: $(top_srcdir)/include/geom/face_quad4_shell.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_quad8.h: $(top_srcdir)/include/geom/face_quad8.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+face_quad8_shell.h: $(top_srcdir)/include/geom/face_quad8_shell.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_quad9.h: $(top_srcdir)/include/geom/face_quad9.h
