@@ -199,7 +199,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
           {
             Elem * old_elem = *it;
             Elem * new_elem = old_elems_to_new_elems[old_elem];
-            for (unsigned int s=0; s != old_elem->n_neighbors(); ++s)
+            for (auto s : old_elem->side_index_range())
               {
                 const Elem * old_neighbor = old_elem->neighbor_ptr(s);
                 Elem * new_neighbor = old_elems_to_new_elems[old_neighbor];
@@ -257,7 +257,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
     for (element_iterator el = this->elements_begin(); el != el_end; ++el)
       {
         Elem * e = *el;
-        for (unsigned int s=0; s<e->n_neighbors(); s++)
+        for (auto s : e->side_index_range())
           if (e->neighbor_ptr(s) != remote_elem ||
               reset_remote_elements)
             e->set_neighbor(s, libmesh_nullptr);
@@ -283,7 +283,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
       {
         Elem * element = *el;
 
-        for (unsigned char ms=0; ms<element->n_neighbors(); ms++)
+        for (auto ms : element->side_index_range())
           {
           next_side:
             // If we haven't yet found a neighbor on this side, try.
@@ -424,7 +424,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
           libmesh_assert(parent);
           const unsigned int my_child_num = parent->which_child_am_i(current_elem);
 
-          for (unsigned int s=0; s < current_elem->n_neighbors(); s++)
+          for (auto s : current_elem->side_index_range())
             {
               if (current_elem->neighbor_ptr(s) == libmesh_nullptr ||
                   (current_elem->neighbor_ptr(s) == remote_elem &&
@@ -486,10 +486,8 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                               Elem * child = neigh->child_ptr(c);
                               if (child == remote_elem)
                                 continue;
-                              unsigned int n_neigh = child->n_neighbors();
-                              for (unsigned int n=0; n != n_neigh; ++n)
+                              for (auto ncn : child->neighbor_ptr_range())
                                 {
-                                  Elem * ncn = child->neighbor_ptr(n);
                                   if (ncn != remote_elem &&
                                       ncn->is_ancestor_of(current_elem))
                                     {

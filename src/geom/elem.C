@@ -1110,7 +1110,7 @@ bool Elem::has_topological_neighbor (const Elem * elem,
   if (has_neighbor(elem))
     return true;
 
-  for (unsigned int n=0; n<this->n_neighbors(); n++)
+  for (auto n : this->side_index_range())
     if (this->topological_neighbor(n, mesh, point_locator, pb))
       return true;
 
@@ -1136,9 +1136,9 @@ void Elem::libmesh_assert_valid_node_pointers() const
 
 void Elem::libmesh_assert_valid_neighbors() const
 {
-  for (unsigned int s=0; s<this->n_neighbors(); s++)
+  for (auto n : this->side_index_range())
     {
-      const Elem * neigh = this->neighbor_ptr(s);
+      const Elem * neigh = this->neighbor_ptr(n);
 
       // Any element might have a remote neighbor; checking
       // to make sure that's not inaccurate is tough.
@@ -1197,7 +1197,7 @@ void Elem::libmesh_assert_valid_neighbors() const
               // is an interior mesh element for which we're on a side.
               // Nothing to test for in that case.
               (my_parent->dim() == this->dim()))
-            libmesh_assert (!my_parent->neighbor_ptr(s));
+            libmesh_assert (!my_parent->neighbor_ptr(n));
         }
     }
 }
@@ -2673,7 +2673,7 @@ void Elem::nullify_neighbors ()
 {
   // Tell any of my neighbors about my death...
   // Looks strange, huh?
-  for (unsigned int n=0; n<this->n_neighbors(); n++)
+  for (auto n : this->side_index_range())
     {
       Elem * current_neighbor = this->neighbor_ptr(n);
       if (current_neighbor && current_neighbor != remote_elem)

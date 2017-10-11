@@ -312,7 +312,7 @@ void MeshTools::find_boundary_nodes (const MeshBase & mesh,
     {
       const Elem * elem = *el;
 
-      for (unsigned int s=0; s<elem->n_neighbors(); s++)
+      for (auto s : elem->side_index_range())
         if (elem->neighbor_ptr(s) == libmesh_nullptr) // on the boundary
           {
             const UniquePtr<const Elem> side = elem->build_side_ptr(s);
@@ -1090,10 +1090,9 @@ void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase & mesh)
       while (elem)
         {
           elem->libmesh_assert_valid_node_pointers();
-          for (unsigned int n=0; n != elem->n_neighbors(); ++n)
-            if (elem->neighbor_ptr(n) &&
-                elem->neighbor_ptr(n) != remote_elem)
-              elem->neighbor_ptr(n)->libmesh_assert_valid_node_pointers();
+          for (auto n : elem->neighbor_ptr_range())
+            if (n && n != remote_elem)
+              n->libmesh_assert_valid_node_pointers();
 
           libmesh_assert_not_equal_to (elem->parent(), remote_elem);
           elem = elem->parent();
@@ -1117,8 +1116,8 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase & mesh)
       // We currently don't allow active_local_elements to have
       // remote_elem neighbors
       if (elem->active())
-        for (unsigned int n=0; n != elem->n_neighbors(); ++n)
-          libmesh_assert_not_equal_to (elem->neighbor_ptr(n), remote_elem);
+        for (auto n : elem->neighbor_ptr_range())
+          libmesh_assert_not_equal_to (n, remote_elem);
 
 #ifdef LIBMESH_ENABLE_AMR
       const Elem * parent = elem->parent();
@@ -1146,8 +1145,9 @@ void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase & mesh,
       const Elem * elem = *el;
       libmesh_assert (elem);
       libmesh_assert_not_equal_to (elem->parent(), bad_elem);
-      for (unsigned int n=0; n != elem->n_neighbors(); ++n)
-        libmesh_assert_not_equal_to (elem->neighbor_ptr(n), bad_elem);
+      for (auto n : elem->neighbor_ptr_range())
+        libmesh_assert_not_equal_to (n, bad_elem);
+
 #ifdef LIBMESH_ENABLE_AMR
       if (elem->has_children())
         for (auto & child : elem->child_ref_range())

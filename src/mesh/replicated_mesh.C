@@ -1390,7 +1390,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                 {
                   Elem * el = this->elem_ptr(elem_id);
                   fixed_elems.insert(elem_id);
-                  for (unsigned int s = 0; s < el->n_neighbors(); ++s)
+                  for (auto s : el->side_index_range())
                     {
                       if (el->neighbor_ptr(s) == libmesh_nullptr)
                         {

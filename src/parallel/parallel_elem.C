@@ -146,9 +146,10 @@ Packing<const Elem *>::packable_size (const Elem * const & elem,
                                       const MeshBase * mesh)
 {
   unsigned int total_packed_bcs = 0;
+  const unsigned short n_sides = elem->n_sides();
+
   if (elem->level() == 0)
     {
-      const unsigned short n_sides = elem->n_sides();
       total_packed_bcs += n_sides;
       for (unsigned short s = 0; s != n_sides; ++s)
         total_packed_bcs +=
@@ -170,8 +171,7 @@ Packing<const Elem *>::packable_size (const Elem * const & elem,
 #ifndef NDEBUG
     1 + // add an int for the magic header when testing
 #endif
-    header_size + elem->n_nodes() +
-    elem->n_neighbors() +
+    header_size + elem->n_nodes() + n_sides +
     elem->packed_indexing_size() + total_packed_bcs;
 }
 
@@ -273,9 +273,8 @@ Packing<const Elem *>::pack (const Elem * const & elem,
   for (unsigned int n=0; n<elem->n_nodes(); n++)
     *data_out++ = (elem->node_id(n));
 
-  for (unsigned int n=0; n<elem->n_neighbors(); n++)
+  for (auto neigh : elem->neighbor_ptr_range())
     {
-      const Elem * neigh = elem->neighbor_ptr(n);
       if (neigh)
         *data_out++ = (neigh->id());
       else
@@ -557,7 +556,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
       // links in good shape, so there's nothing we need to set or can
       // safely assert here.
       if (!elem->subactive())
-        for (unsigned int n=0; n != elem->n_neighbors(); ++n)
+        for (auto n : elem->side_index_range())
           {
             const dof_id_type neighbor_id =
               cast_int<dof_id_type>(*in++);
@@ -724,7 +723,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           }
       }
 
-      for (unsigned int n=0; n<elem->n_neighbors(); n++)
+      for (auto n : elem->side_index_range())
         {
           const dof_id_type neighbor_id =
             cast_int<dof_id_type>(*in++);

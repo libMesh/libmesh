@@ -1647,7 +1647,7 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
                  */
                 if (refinement_level == 0)
                   {
-                    for (unsigned int s=0; s<elem->n_neighbors(); s++)
+                    for (auto s : elem->side_index_range())
                       {
                         /*
                          * Only operate on sides which are on the

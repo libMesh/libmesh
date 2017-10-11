@@ -468,9 +468,8 @@ bool MeshRefinement::eliminate_unrefined_patches ()
         my_p_adjustment;
 
       // Check all the element neighbors
-      for (unsigned int n=0; n<elem->n_neighbors(); n++)
+      for (auto neighbor : elem->neighbor_ptr_range())
         {
-          const Elem * neighbor = elem->neighbor_ptr(n);
           // Quit if the element is on a local boundary
           if (neighbor == libmesh_nullptr || neighbor == remote_elem)
             {

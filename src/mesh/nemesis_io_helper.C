@@ -1304,7 +1304,7 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
         } // end loop over element's nodes
 
       // Loop over element's neighbors, see if it has a neighbor which is off-processor
-      for (unsigned int n=0; n<elem->n_neighbors(); ++n)
+      for (auto n : elem->side_index_range())
         {
           if (elem->neighbor_ptr(n) != libmesh_nullptr)
             {

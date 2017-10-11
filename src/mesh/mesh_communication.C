@@ -1601,9 +1601,8 @@ struct ElemNodesMaybeNew
     // If this element has remote_elem neighbors then there may have
     // been refinement of those neighbors that affect its nodes'
     // processor_id()
-    unsigned int n_neigh = elem->n_neighbors();
-    for (unsigned int s=0; s != n_neigh; ++s)
-      if (elem->neighbor_ptr(s) == remote_elem)
+    for (auto neigh : elem->neighbor_ptr_range())
+      if (neigh == remote_elem)
         return true;
     return false;
   }
@@ -1632,9 +1631,8 @@ struct NodeMaybeNew
     // If this node is on a side with a remote element then there may
     // have been refinement of that element which affects this node's
     // processor_id()
-    unsigned int n_neigh = elem->n_neighbors();
-    for (unsigned int s=0; s != n_neigh; ++s)
-      if (elem->neighbor_ptr(s) == remote_elem)
+    for (auto s : elem->side_index_range())
+      if (elem->neighbor(s) == remote_elem)
         if (elem->is_node_on_side(local_node_num, s))
           return true;
 

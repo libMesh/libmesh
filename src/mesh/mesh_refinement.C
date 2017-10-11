@@ -408,7 +408,7 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
       // Pointer to the element
       Elem * elem = *elem_it;
 
-      for (unsigned int n=0; n<elem->n_neighbors(); n++)
+      for (auto n : elem->side_index_range())
         {
           Elem * neighbor =
             topological_neighbor(elem, point_locator.get(), n);
@@ -938,7 +938,7 @@ bool MeshRefinement::make_coarsening_compatible()
                 {
                   const unsigned int my_level = elem->level();
 
-                  for (unsigned int n=0; n<elem->n_neighbors(); n++)
+                  for (auto n : elem->side_index_range())
                     {
                       const Elem * neighbor =
                         topological_neighbor(elem, point_locator.get(), n);
@@ -974,7 +974,7 @@ bool MeshRefinement::make_coarsening_compatible()
                 {
                   const unsigned int my_p_level = elem->p_level();
 
-                  for (unsigned int n=0; n<elem->n_neighbors(); n++)
+                  for (auto n : elem->side_index_range())
                     {
                       const Elem * neighbor =
                         topological_neighbor(elem, point_locator.get(), n);
@@ -1034,7 +1034,7 @@ bool MeshRefinement::make_coarsening_compatible()
               // our change has to propagate to neighboring
               // processors.
               if (my_flag_changed && !_mesh.is_serial())
-                for (unsigned int n=0; n != elem->n_neighbors(); ++n)
+                for (auto n : elem->side_index_range())
                   {
                     Elem * neigh =
                       topological_neighbor(elem, point_locator.get(), n);
