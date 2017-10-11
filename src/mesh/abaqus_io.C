@@ -1088,7 +1088,7 @@ void AbaqusIO::assign_sideset_ids()
               // information for it.  Note that we have not yet called
               // find_neighbors(), so we can't use elem->neighbor(sn) in
               // this algorithm...
-              for (unsigned short sn=0; sn<elem->n_sides(); sn++)
+              for (auto sn : elem->side_index_range())
                 {
                   std::pair<provide_bcs_t::const_iterator,
                             provide_bcs_t::const_iterator>
