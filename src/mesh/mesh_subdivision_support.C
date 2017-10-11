@@ -117,7 +117,7 @@ void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
 
       if (mesh_has_boundary_data)
         {
-          for (unsigned short side = 0; side < elem->n_sides(); ++side)
+          for (auto side : elem->side_index_range())
             {
               mesh.get_boundary_info().boundary_ids(elem, side, ids);
 
@@ -219,7 +219,7 @@ void MeshTools::Subdivision::tag_boundary_ghosts(MeshBase & mesh)
       libmesh_assert_equal_to(elem->type(), TRI3SUBDIVISION);
 
       Tri3Subdivision * sd_elem = static_cast<Tri3Subdivision *>(elem);
-      for (unsigned int i = 0; i < elem->n_sides(); ++i)
+      for (auto i : elem->side_index_range())
         {
           if (elem->neighbor_ptr(i) == libmesh_nullptr)
             {
@@ -260,7 +260,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
       // triangle.  This prevents degenerated triangles in the mesh
       // corners and guarantees that the node in the middle of the
       // loop is of valence=6.
-      for (unsigned int i = 0; i < elem->n_sides(); ++i)
+      for (auto i : elem->side_index_range())
         {
           libmesh_assert_not_equal_to(elem->neighbor_ptr(i), elem);
 
@@ -339,7 +339,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
             }
         }
 
-      for (unsigned int i = 0; i < elem->n_sides(); ++i)
+      for (auto i : elem->side_index_range())
         {
           libmesh_assert_not_equal_to(elem->neighbor_ptr(i), elem);
           if (elem->neighbor_ptr(i) == libmesh_nullptr)
@@ -397,7 +397,7 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
       Tri3Subdivision * elem = *ghost_el;
       libmesh_assert(elem->is_ghost());
 
-      for (unsigned int i = 0; i < elem->n_sides(); ++i)
+      for (auto i : elem->side_index_range())
         {
           if (elem->neighbor_ptr(i) == libmesh_nullptr &&
               elem->neighbor_ptr(prev[i]) != libmesh_nullptr)
