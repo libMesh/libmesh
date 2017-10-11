@@ -264,12 +264,12 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
   const MeshBase::const_element_iterator end = mesh.elements_end();
 
   for (; el != end; ++el)
-    for (unsigned int n=0; n<(*el)->n_nodes(); n++)
+    for (auto & node : (*el)->node_ref_range())
       {
-        libmesh_assert_less ((*el)->node_id(n), nodes_to_elem_map.size());
+        libmesh_assert_less (node.id(), nodes_to_elem_map.size());
         libmesh_assert_less ((*el)->id(), mesh.n_elem());
 
-        nodes_to_elem_map[(*el)->node_id(n)].push_back((*el)->id());
+        nodes_to_elem_map[node.id()].push_back((*el)->id());
       }
 }
 
@@ -284,11 +284,11 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
   const MeshBase::const_element_iterator end = mesh.elements_end();
 
   for (; el != end; ++el)
-    for (unsigned int n=0; n<(*el)->n_nodes(); n++)
+    for (auto & node : (*el)->node_ref_range())
       {
-        libmesh_assert_less ((*el)->node_id(n), nodes_to_elem_map.size());
+        libmesh_assert_less (node.id(), nodes_to_elem_map.size());
 
-        nodes_to_elem_map[(*el)->node_id(n)].push_back(*el);
+        nodes_to_elem_map[node.id()].push_back(*el);
       }
 }
 
@@ -317,8 +317,8 @@ void MeshTools::find_boundary_nodes (const MeshBase & mesh,
           {
             const UniquePtr<const Elem> side = elem->build_side_ptr(s);
 
-            for (unsigned int n=0; n<side->n_nodes(); n++)
-              on_boundary[side->node_id(n)] = true;
+            for (auto & node : side->node_ref_range())
+              on_boundary[node.id()] = true;
           }
     }
 }
@@ -680,8 +680,8 @@ void MeshTools::get_not_subactive_node_ids(const MeshBase & mesh,
     {
       const Elem * elem = (*el);
       if (!elem->subactive())
-        for (unsigned int n=0; n<elem->n_nodes(); ++n)
-          not_subactive_node_ids.insert(elem->node_id(n));
+        for (auto & n : elem->node_ref_range())
+          not_subactive_node_ids.insert(n.id());
     }
 }
 
@@ -767,8 +767,10 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
           // Make sure it was found
           libmesh_assert_not_equal_to(local_node_number, libMesh::invalid_uint);
 
+          const unsigned short n_edges = elem->n_edges();
+
           // If this element has no edges, the edge-based algorithm below doesn't make sense.
-          if (elem->n_edges() == 0)
+          if (!n_edges)
             {
               switch (elem->type())
                 {
@@ -854,11 +856,13 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
           // Index of the current edge
           unsigned current_edge = 0;
 
-          while (current_edge < elem->n_edges())
+          const unsigned short n_nodes = elem->n_nodes();
+
+          while (current_edge < n_edges)
             {
               // Find the edge the node is on
               bool found_edge = false;
-              for (; current_edge<elem->n_edges(); ++current_edge)
+              for (; current_edge<n_edges; ++current_edge)
                 if (elem->is_node_on_edge(local_node_number, current_edge))
                   {
                     found_edge = true;
@@ -871,7 +875,7 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
                   const Node * node_to_save = libmesh_nullptr;
 
                   // Find another node in this element on this edge
-                  for (unsigned other_node_this_edge = 0; other_node_this_edge<elem->n_nodes(); other_node_this_edge++)
+                  for (unsigned other_node_this_edge = 0; other_node_this_edge != n_nodes; other_node_this_edge++)
                     if ( (elem->is_node_on_edge(other_node_this_edge, current_edge)) && // On the current edge
                          (elem->node_id(other_node_this_edge) != global_id))               // But not the original node
                       {
@@ -918,14 +922,13 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
         {
           //Loop over the sides looking for sides that have hanging nodes
           //This code is inspired by compute_proj_constraints()
-          for (unsigned int s=0; s<elem->n_sides(); s++)
+          for (auto s : elem->side_index_range())
             {
-              //If not a boundary node
-              if (elem->neighbor_ptr(s) != libmesh_nullptr)
-                {
-                  // Get pointers to the element's neighbor.
-                  const Elem * neigh = elem->neighbor_ptr(s);
+              const Elem * neigh = elem->neighbor_ptr(s);
 
+              //If not a boundary side
+              if (neigh != libmesh_nullptr)
+                {
                   //Is there a coarser element next to this one?
                   if (neigh->level() < elem->level())
                     {
@@ -1062,12 +1065,9 @@ void MeshTools::libmesh_assert_old_dof_objects (const MeshBase & mesh)
       if (elem->has_dofs())
         libmesh_assert(elem->old_dof_object);
 
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
-        {
-          const Node & node = elem->node_ref(n);
-          if (node.has_dofs())
-            libmesh_assert(node.old_dof_object);
-        }
+      for (auto & node : elem->node_ref_range())
+        if (node.has_dofs())
+          libmesh_assert(node.old_dof_object);
     }
 }
 #else
@@ -1263,8 +1263,8 @@ void MeshTools::libmesh_assert_connected_nodes (const MeshBase & mesh)
       const Elem * elem = *el;
       libmesh_assert (elem);
 
-      for (unsigned int n=0; n<elem->n_nodes(); ++n)
-        used_nodes.insert(elem->node_ptr(n));
+      for (auto & n : elem->node_ref_range())
+        used_nodes.insert(&n);
     }
 
   const MeshBase::const_node_iterator node_end = mesh.nodes_end();
@@ -1633,9 +1633,8 @@ void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
       const Elem * elem = *el;
       libmesh_assert (elem);
 
-      for (unsigned int i=0; i != elem->n_nodes(); ++i)
+      for (auto & node : elem->node_ref_range())
         {
-          const Node & node = elem->node_ref(i);
           dof_id_type nodeid = node.id();
           node_touched_by_me[nodeid] = true;
         }
@@ -1683,9 +1682,8 @@ void libmesh_assert_parallel_consistent_procids<Node>(const MeshBase & mesh)
       const Elem * elem = *el;
       libmesh_assert (elem);
 
-      for (unsigned int i=0; i != elem->n_nodes(); ++i)
+      for (auto & node : elem->node_ref_range())
         {
-          const Node & node = elem->node_ref(i);
           dof_id_type nodeid = node.id();
           node_touched_by_anyone[nodeid] = true;
         }
@@ -1973,9 +1971,8 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
       Elem * elem = *e_it;
       processor_id_type pid = elem->processor_id();
 
-      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+      for (auto & node : elem->node_ref_range())
         {
-          const Node & node = elem->node_ref(n);
           const dof_id_type id = node.id();
           const proc_id_map_type::iterator it = new_proc_ids.find(id);
           if (it == new_proc_ids.end())
