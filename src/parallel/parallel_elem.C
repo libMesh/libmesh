@@ -148,13 +148,15 @@ Packing<const Elem *>::packable_size (const Elem * const & elem,
   unsigned int total_packed_bcs = 0;
   if (elem->level() == 0)
     {
-      total_packed_bcs += elem->n_sides();
-      for (unsigned short s = 0; s != elem->n_sides(); ++s)
+      const unsigned short n_sides = elem->n_sides();
+      total_packed_bcs += n_sides;
+      for (unsigned short s = 0; s != n_sides; ++s)
         total_packed_bcs +=
           mesh->get_boundary_info().n_boundary_ids(elem,s);
 
-      total_packed_bcs += elem->n_edges();
-      for (unsigned short e = 0; e != elem->n_edges(); ++e)
+      const unsigned short n_edges = elem->n_edges();
+      total_packed_bcs += n_edges;
+      for (unsigned short e = 0; e != n_edges; ++e)
         total_packed_bcs +=
           mesh->get_boundary_info().n_edge_boundary_ids(elem,e);
 
@@ -288,7 +290,7 @@ Packing<const Elem *>::pack (const Elem * const & elem,
   if (elem->level() == 0)
     {
       std::vector<boundary_id_type> bcs;
-      for (unsigned short s = 0; s != elem->n_sides(); ++s)
+      for (auto s : elem->side_index_range())
         {
           mesh->get_boundary_info().boundary_ids(elem, s, bcs);
 
@@ -299,7 +301,7 @@ Packing<const Elem *>::pack (const Elem * const & elem,
             *data_out++ =(*bc_it);
         }
 
-      for (unsigned short e = 0; e != elem->n_edges(); ++e)
+      for (auto e : elem->edge_index_range())
         {
           mesh->get_boundary_info().edge_boundary_ids(elem, e, bcs);
 
@@ -767,7 +769,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
   // add any element side or edge boundary condition ids
   if (level == 0)
     {
-      for (unsigned short s = 0; s != elem->n_sides(); ++s)
+      for (auto s : elem->side_index_range())
         {
           const boundary_id_type num_bcs =
             cast_int<boundary_id_type>(*in++);
@@ -777,7 +779,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
               (elem, s, cast_int<boundary_id_type>(*in++));
         }
 
-      for (unsigned short e = 0; e != elem->n_edges(); ++e)
+      for (auto e : elem->edge_index_range())
         {
           const boundary_id_type num_bcs =
             cast_int<boundary_id_type>(*in++);
