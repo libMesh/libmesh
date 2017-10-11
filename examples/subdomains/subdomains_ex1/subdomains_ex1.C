@@ -227,9 +227,9 @@ int main (int argc, char ** argv)
             // node inside and one node outside the circle.
             bool node_in = false;
             bool node_out = false;
-            for (unsigned int i=0; i<elem->n_nodes(); i++)
+            for (auto & n : elem->node_ref_range())
               {
-                double d = elem->point(i).norm();
+                double d = n.norm();
                 if (d<0.8)
                   {
                     node_in = true;
@@ -592,7 +592,7 @@ void assemble_poisson(EquationSystems & es,
             // neighbor, check that neighbor's subdomain_id; if that
             // is different from 1, the side is also located on the
             // boundary.
-            for (unsigned int side=0; side<elem->n_sides(); side++)
+            for (auto side : elem->side_index_range())
               if ((elem->neighbor_ptr(side) == libmesh_nullptr) ||
                   (elem->neighbor_ptr(side)->subdomain_id()!=1))
                 {

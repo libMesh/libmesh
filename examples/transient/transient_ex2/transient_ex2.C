@@ -466,7 +466,7 @@ void assemble_wave(EquationSystems & es,
         // be extended.
         //
         // don't do this for any side
-        for (unsigned int side=0; side<elem->n_sides(); side++)
+        for (auto side : elem->side_index_range())
           if (!true)
             // if (elem->neighbor_ptr(side) == libmesh_nullptr)
             {

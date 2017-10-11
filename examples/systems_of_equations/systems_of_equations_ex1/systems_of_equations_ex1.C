@@ -361,13 +361,13 @@ void assemble_stokes (EquationSystems & es,
         // The following loops over the sides of the element.
         // If the element has no neighbor on a side then that
         // side MUST live on a boundary of the domain.
-        for (unsigned int s=0; s<elem->n_sides(); s++)
+        for (auto s : elem->side_index_range())
           if (elem->neighbor_ptr(s) == libmesh_nullptr)
             {
               UniquePtr<const Elem> side (elem->build_side_ptr(s));
 
               // Loop over the nodes on the side.
-              for (unsigned int ns=0; ns<side->n_nodes(); ns++)
+              for (auto ns : side->node_index_range())
                 {
                   // The location on the boundary of the current
                   // node.
@@ -389,7 +389,7 @@ void assemble_stokes (EquationSystems & es,
                   // Find the node on the element matching this node on
                   // the side.  That defined where in the element matrix
                   // the boundary condition will be applied.
-                  for (unsigned int n=0; n<elem->n_nodes(); n++)
+                  for (auto n : elem->node_index_range())
                     if (elem->node_id(n) == side->node_id(ns))
                       {
                         // Matrix contribution.

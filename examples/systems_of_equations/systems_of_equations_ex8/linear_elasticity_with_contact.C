@@ -90,7 +90,7 @@ void LinearElasticityWithContact::move_mesh (MeshBase & input_mesh,
       Elem * elem = *el;
       Elem * orig_elem = _sys.get_mesh().elem_ptr(elem->id());
 
-      for (unsigned int node_id=0; node_id<elem->n_nodes(); node_id++)
+      for (auto node_id : elem->node_index_range())
         {
           Node & node = elem->node_ref(node_id);
 
@@ -158,7 +158,7 @@ void LinearElasticityWithContact::initialize_contact_load_paths()
     {
       const Elem * elem = *el;
 
-      for (unsigned int side=0; side<elem->n_sides(); side++)
+      for (auto side : elem->side_index_range())
         {
           if (elem->neighbor_ptr(side) == libmesh_nullptr)
             {
@@ -173,7 +173,7 @@ void LinearElasticityWithContact::initialize_contact_load_paths()
 
               if (on_lower_contact_surface || on_upper_contact_surface)
                 {
-                  for (unsigned int node_index=0; node_index<elem->n_nodes(); node_index++)
+                  for (auto node_index : elem->node_index_range())
                     if (elem->is_node_on_side(node_index, side))
                       {
                         if (on_lower_contact_surface)

@@ -642,7 +642,7 @@ void assemble_stokes (EquationSystems & es,
           const Real penalty = 1.e10;
           const unsigned int pressure_node = 0;
           const Real p_value               = 0.0;
-          for (unsigned int c=0; c<elem->n_nodes(); c++)
+          for (auto c : elem->node_index_range())
             if (elem->node_id(c) == pressure_node)
               {
                 Kpp(c,c) += penalty;
