@@ -548,7 +548,7 @@ void GmshIO::read_mesh(std::istream & in)
                             // the Mesh's BoundaryInfo object with the
                             // lower-dimensional element's subdomain
                             // ID.
-                            for (unsigned n=0; n<elem->n_nodes(); n++)
+                            for (auto n : elem->node_index_range())
                               mesh.get_boundary_info().add_node(elem->node_id(n),
                                                                 elem->subdomain_id());
 
@@ -579,7 +579,7 @@ void GmshIO::read_mesh(std::istream & in)
                             // Note that we have not yet called
                             // find_neighbors(), so we can't use
                             // elem->neighbor(sn) in this algorithm...
-                            for (unsigned short sn=0; sn<elem->n_sides(); sn++)
+                            for (auto sn : elem->side_index_range())
                               {
                                 // Look for the current side in the provide_bcs multimap.
                                 std::pair<provide_container_t::iterator,
@@ -754,11 +754,11 @@ void GmshIO::write_mesh (std::ostream & out_stream)
 
         // if there is a node translation table, use it
         if (eletype.nodes.size() > 0)
-          for (unsigned int i=0; i < elem->n_nodes(); i++)
+          for (auto i : elem->node_index_range())
             out_stream << elem->node_id(eletype.nodes[i])+1 << " "; // gmsh is 1-based
         // otherwise keep the same node order
         else
-          for (unsigned int i=0; i < elem->n_nodes(); i++)
+          for (auto i : elem->node_index_range())
             out_stream << elem->node_id(i)+1 << " ";                  // gmsh is 1-based
         out_stream << "\n";
       } // element loop
@@ -827,12 +827,12 @@ void GmshIO::write_mesh (std::ostream & out_stream)
 
             // if there is a node translation table, use it
             if (eletype.nodes.size() > 0)
-              for (unsigned int i=0; i < side->n_nodes(); i++)
+              for (auto i : side->node_index_range())
                 out_stream << side->node_id(eletype.nodes[i])+1 << " "; // gmsh is 1-based
 
             // otherwise keep the same node order
             else
-              for (unsigned int i=0; i < side->n_nodes(); i++)
+              for (auto i : side->node_index_range())
                 out_stream << side->node_id(i)+1 << " ";                // gmsh is 1-based
 
             // Go to the next line
