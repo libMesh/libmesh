@@ -625,9 +625,8 @@ void Elem::find_point_neighbors(const Point & p,
         {
           const Elem * elem = *it;
 
-          for (unsigned int s=0; s<elem->n_sides(); s++)
+          for (auto current_neighbor : elem->neighbor_ptr_range())
             {
-              const Elem * current_neighbor = elem->neighbor_ptr(s);
               if (current_neighbor &&
                   current_neighbor != remote_elem)    // we have a real neighbor on this side
                 {
@@ -712,9 +711,8 @@ void Elem::find_point_neighbors(std::set<const Elem *> & neighbor_set,
         {
           const Elem * elem = *it;
 
-          for (unsigned int s=0; s<elem->n_sides(); s++)
+          for (auto current_neighbor : elem->neighbor_ptr_range())
             {
-              const Elem * current_neighbor = elem->neighbor_ptr(s);
               if (current_neighbor &&
                   current_neighbor != remote_elem)    // we have a real neighbor on this side
                 {
@@ -816,9 +814,8 @@ void Elem::find_edge_neighbors(std::set<const Elem *> & neighbor_set) const
         {
           const Elem * elem = *it;
 
-          for (unsigned int s=0; s<elem->n_sides(); s++)
+          for (auto current_neighbor : elem->neighbor_ptr_range())
             {
-              const Elem * current_neighbor = elem->neighbor_ptr(s);
               if (current_neighbor &&
                   current_neighbor != remote_elem)    // we have a real neighbor on this side
                 {
@@ -1305,9 +1302,8 @@ void Elem::make_links_to_me_remote()
 #endif
 
   // Remotify any neighbor links
-  for (unsigned int s = 0; s != this->n_sides(); ++s)
+  for (auto neigh : this->neighbor_ptr_range())
     {
-      Elem * neigh = this->neighbor_ptr(s);
       if (neigh && neigh != remote_elem)
         {
           // My neighbor should never be more refined than me; my real
@@ -1415,9 +1411,8 @@ void Elem::remove_links_to_me()
 #endif
 
   // Nullify any neighbor links
-  for (unsigned int s = 0; s != this->n_sides(); ++s)
+  for (auto neigh : this->neighbor_ptr_range())
     {
-      Elem * neigh = this->neighbor_ptr(s);
       if (neigh && neigh != remote_elem)
         {
           // My neighbor should never be more refined than me; my real
@@ -1892,16 +1887,13 @@ void Elem::family_tree_by_subneighbor (std::vector<const Elem *> & family,
   if (!this->active())
     for (auto & c : this->child_ref_range())
       if (&c != remote_elem)
-        for (unsigned int s=0; s != c.n_sides(); ++s)
-          {
-            const Elem * child_neigh = c.neighbor_ptr(s);
-            if (child_neigh &&
-                (child_neigh == neighbor_in ||
-                 (child_neigh->parent() == neighbor_in &&
-                  child_neigh->is_ancestor_of(subneighbor))))
-              c.family_tree_by_subneighbor (family, child_neigh,
-                                            subneighbor, false);
-          }
+        for (auto child_neigh : c.neighbor_ptr_range())
+          if (child_neigh &&
+              (child_neigh == neighbor_in ||
+               (child_neigh->parent() == neighbor_in &&
+                child_neigh->is_ancestor_of(subneighbor))))
+            c.family_tree_by_subneighbor (family, child_neigh,
+                                          subneighbor, false);
 }
 
 
@@ -1934,16 +1926,13 @@ void Elem::total_family_tree_by_subneighbor (std::vector<const Elem *> & family,
   if (this->has_children())
     for (auto & c : this->child_ref_range())
       if (&c != remote_elem)
-        for (unsigned int s=0; s != c.n_sides(); ++s)
-          {
-            const Elem * child_neigh = c.neighbor_ptr(s);
-            if (child_neigh &&
-                (child_neigh == neighbor_in ||
-                 (child_neigh->parent() == neighbor_in &&
-                  child_neigh->is_ancestor_of(subneighbor))))
-              c.total_family_tree_by_subneighbor
-                (family, child_neigh, subneighbor, false);
-          }
+        for (auto child_neigh : c.neighbor_ptr_range())
+          if (child_neigh &&
+              (child_neigh == neighbor_in ||
+               (child_neigh->parent() == neighbor_in &&
+                child_neigh->is_ancestor_of(subneighbor))))
+            c.total_family_tree_by_subneighbor
+              (family, child_neigh, subneighbor, false);
 }
 
 
