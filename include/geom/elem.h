@@ -2009,8 +2009,8 @@ void Elem::set_neighbor (const unsigned int i, Elem * n)
 inline
 bool Elem::has_neighbor (const Elem * elem) const
 {
-  for (unsigned int n=0; n<this->n_neighbors(); n++)
-    if (this->neighbor_ptr(n) == elem)
+  for (auto n : this->neighbor_ptr_range())
+    if (n == elem)
       return true;
 
   return false;
@@ -2021,10 +2021,9 @@ bool Elem::has_neighbor (const Elem * elem) const
 inline
 Elem * Elem::child_neighbor (Elem * elem)
 {
-  for (unsigned int n=0; n<elem->n_neighbors(); n++)
-    if (elem->neighbor_ptr(n) &&
-        elem->neighbor_ptr(n)->parent() == this)
-      return elem->neighbor_ptr(n);
+  for (auto n : elem->neighbor_ptr_range())
+    if (n && n->parent() == this)
+      return n;
 
   return libmesh_nullptr;
 }
@@ -2034,10 +2033,9 @@ Elem * Elem::child_neighbor (Elem * elem)
 inline
 const Elem * Elem::child_neighbor (const Elem * elem) const
 {
-  for (unsigned int n=0; n<elem->n_neighbors(); n++)
-    if (elem->neighbor_ptr(n) &&
-        elem->neighbor_ptr(n)->parent() == this)
-      return elem->neighbor_ptr(n);
+  for (auto n : elem->neighbor_ptr_range())
+    if (n && n->parent() == this)
+      return n;
 
   return libmesh_nullptr;
 }
@@ -2192,7 +2190,7 @@ unsigned int Elem::which_neighbor_am_i (const Elem * e) const
       libmesh_assert(eparent);
     }
 
-  for (unsigned int s=0; s<this->n_neighbors(); s++)
+  for (unsigned int s=0, n_s = this->n_sides(); s != n_s; ++s)
     if (this->neighbor_ptr(s) == eparent)
       return s;
 
