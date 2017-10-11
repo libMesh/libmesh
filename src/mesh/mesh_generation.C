@@ -1332,7 +1332,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                   // Container to catch ids handed back from BoundaryInfo
                   std::vector<boundary_id_type> ids;
 
-                  for (unsigned short s=0; s<base_hex->n_sides(); ++s)
+                  for (auto s : base_hex->side_index_range())
                     {
                       // Get the boundary ID(s) for this side
                       boundary_info.boundary_ids(*el, s, ids);
@@ -1919,13 +1919,13 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
         {
           Elem * elem = *it;
 
-          for (unsigned int s=0; s<elem->n_sides(); s++)
+          for (auto s : elem->side_index_range())
             if (elem->neighbor_ptr(s) == libmesh_nullptr || (mesh.mesh_dimension() == 2 && !flat))
               {
                 UniquePtr<Elem> side(elem->build_side_ptr(s));
 
                 // Pop each point to the sphere boundary
-                for (unsigned int n=0; n<side->n_nodes(); n++)
+                for (auto n : side->node_index_range())
                   side->point(n) =
                     sphere.closest_point(side->point(n));
               }
@@ -1966,13 +1966,13 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
         {
           Elem * elem = *it;
 
-          for (unsigned int s=0; s<elem->n_sides(); s++)
+          for (auto s : elem->side_index_range())
             if (elem->neighbor_ptr(s) == libmesh_nullptr)
               {
                 UniquePtr<Elem> side(elem->build_side_ptr(s));
 
                 // Pop each point to the sphere boundary
-                for (unsigned int n=0; n<side->n_nodes(); n++)
+                for (auto n : side->node_index_range())
                   side->point(n) =
                     sphere.closest_point(side->point(n));
               }
@@ -1992,7 +1992,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
     for (; it != end; ++it)
       {
         Elem * elem = *it;
-        for (unsigned short s=0; s != elem->n_sides(); ++s)
+        for (auto s : elem->side_index_range())
           if (!elem->neighbor_ptr(s))
             boundary_info.add_side(elem, s, 0);
       }
@@ -2288,7 +2288,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
           new_elem = mesh.add_elem(new_elem);
 
           // Copy any old boundary ids on all sides
-          for (unsigned short s = 0; s != elem->n_sides(); ++s)
+          for (auto s : elem->side_index_range())
             {
               cross_section_boundary_info.boundary_ids(elem, s, ids_to_copy);
 
@@ -2411,7 +2411,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
     {
       const Elem * elem = *el;
 
-      for (unsigned int s=0; s<elem->n_sides(); s++)
+      for (auto s : elem->side_index_range())
         if (elem->neighbor_ptr(s) == libmesh_nullptr)
           {
             UniquePtr<const Elem> side (elem->build_side_ptr(s));
