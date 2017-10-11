@@ -605,11 +605,12 @@ public:
    * \returns The number of neighbors the element that has been derived
    * from this class has.
    *
-   * By default, only face (or edge in 2D) neighbors are stored, so
-   * this method returns n_sides(), however it may be overridden in a
-   * derived class.
+   * Only face (or edge in 2D) neighbors are stored, so this method
+   * returns n_sides().  At one point we intended to allow derived
+   * classes to override this, but too much current libMesh code
+   * assumes n_neighbors==n_sides.
    */
-  virtual unsigned int n_neighbors () const
+  unsigned int n_neighbors () const
   { return this->n_sides(); }
 
   /**
