@@ -62,7 +62,7 @@ public:
     // libmesh_assert_less (_side_number, this->parent()->n_sides());
     libmesh_assert_equal_to ((this->dim()+1), this->parent()->dim());
 
-    for (unsigned int n=0; n != this->n_nodes(); ++n)
+    for (auto n : this->node_index_range())
       this->_nodes[n] = this->parent()->node_ptr
         (ParentType::side_nodes_map[_side_number][n]);
   }
@@ -124,7 +124,7 @@ public:
     libmesh_assert_less (_edge_number, this->parent()->n_edges());
     libmesh_assert_equal_to (this->dim(), 1);
 
-    for (unsigned int n=0; n != this->n_nodes(); ++n)
+    for (auto n : this->node_index_range())
       this->_nodes[n] = this->parent()->node_ptr
         (ParentType::edge_nodes_map[_edge_number][n]);
   }
