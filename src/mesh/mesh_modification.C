@@ -90,9 +90,9 @@ void MeshTools::Modification::distort (MeshBase & mesh,
   const MeshBase::element_iterator end = mesh.active_elements_end();
 
   for (; el!=end; ++el)
-    for (unsigned int n=0; n<(*el)->n_nodes(); n++)
-      hmin[(*el)->node_id(n)] = std::min(hmin[(*el)->node_id(n)],
-                                         static_cast<float>((*el)->hmin()));
+    for (auto & n : (*el)->node_ref_range())
+      hmin[n.id()] = std::min(hmin[n.id()],
+                              static_cast<float>((*el)->hmin()));
 
 
   // Now actually move the nodes
@@ -339,7 +339,9 @@ void UnstructuredMesh::all_first_order ()
         (Elem::first_order_equivalent_type
          (so_elem->type()), so_elem->parent()).release();
 
-      for (unsigned int s=0; s != so_elem->n_sides(); ++s)
+      const unsigned short n_sides = so_elem->n_sides();
+
+      for (unsigned short s=0; s != n_sides; ++s)
         if (so_elem->neighbor_ptr(s) == remote_elem)
           lo_elem->set_neighbor(s, const_cast<RemoteElem *>(remote_elem));
 
@@ -390,7 +392,7 @@ void UnstructuredMesh::all_first_order ()
        * find_neighbors relies on remote_elem neighbor links being
        * properly maintained.
        */
-      for (unsigned short s=0; s<so_elem->n_sides(); s++)
+      for (unsigned short s=0; s != n_sides; s++)
         {
           if (so_elem->neighbor_ptr(s) == remote_elem)
             lo_elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
@@ -699,7 +701,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * find_neighbors relies on remote_elem neighbor links being
        * properly maintained.
        */
-      for (unsigned short s=0; s<lo_elem->n_sides(); s++)
+      for (auto s : lo_elem->side_index_range())
         {
           if (lo_elem->neighbor_ptr(s) == remote_elem)
             so_elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
@@ -1443,7 +1445,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
             // Container to key boundary IDs handed back by the BoundaryInfo object.
             std::vector<boundary_id_type> bc_ids;
 
-            for (unsigned int sn=0; sn<elem->n_sides(); ++sn)
+            for (auto sn : elem->side_index_range())
               {
                 mesh.get_boundary_info().boundary_ids(*el, sn, bc_ids);
                 for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
@@ -1463,7 +1465,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                     for (unsigned int i=0; i != max_subelems; ++i)
                       if (subelem[i])
                         {
-                          for (unsigned int subside=0; subside < subelem[i]->n_sides(); ++subside)
+                          for (auto subside : subelem[i]->side_index_range())
                             {
                               UniquePtr<Elem> subside_elem = subelem[i]->build_side_ptr(subside);
 
@@ -1695,13 +1697,13 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
                     /*
                      *loop over the childs (that is, the current elements) nodes
                      */
-                    for (unsigned int nc=0; nc < elem->n_nodes(); nc++)
+                    for (auto nc : elem->node_index_range())
                       {
                         /*
                          * the new position of the node
                          */
                         Point point;
-                        for (unsigned int n=0; n<parent->n_nodes(); n++)
+                        for (auto n : parent->node_index_range())
                           {
                             /*
                              * The value from the embedding matrix
@@ -1808,7 +1810,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
         Elem * copy = Elem::build(elem->type()).release();
 
         // Set node pointers (they still point to nodes in the original mesh)
-        for (unsigned int n=0; n<elem->n_nodes(); n++)
+        for (auto n : elem->node_index_range())
           copy->set_node(n) = elem->node_ptr(n);
 
         // Copy over ids
@@ -1825,7 +1827,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
         // This element could have boundary info or DistributedMesh
         // remote_elem links as well.  We need to save the (elem,
         // side, bc_id) triples and those links
-        for (unsigned short s=0; s<elem->n_sides(); s++)
+        for (auto s : elem->side_index_range())
           {
             if (elem->neighbor_ptr(s) == remote_elem)
               copy->set_neighbor(s, const_cast<RemoteElem *>(remote_elem));
