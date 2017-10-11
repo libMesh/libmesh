@@ -272,9 +272,8 @@ struct facelocal_pid : predicate<T>
   {
     if ((*it)->processor_id() == _pid)
       return true;
-    for (unsigned int n = 0; n != (*it)->n_neighbors(); ++n)
-      if ((*it)->neighbor_ptr(n) &&
-          (*it)->neighbor_ptr(n)->processor_id() == _pid)
+    for (auto n : (*it)->neighbor_ptr_range())
+      if (n && n->processor_id() == _pid)
         return true;
     return false;
   }
