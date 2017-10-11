@@ -101,6 +101,7 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
         switch (type)
           {
           case QUAD8:
+          case QUADSHELL8:
             {
               const Real xi  = p(0);
               const Real eta = p(1);
@@ -341,6 +342,7 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
         switch (type)
           {
           case QUAD8:
+          case QUADSHELL8:
             {
               const Real xi  = p(0);
               const Real eta = p(1);
@@ -644,6 +646,7 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
         switch (type)
           {
           case QUAD8:
+          case QUADSHELL8:
             {
               const Real xi  = p(0);
               const Real eta = p(1);

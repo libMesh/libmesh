@@ -2826,6 +2826,15 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
           return QUAD8;
       }
 
+    case QUADSHELL4:
+    case QUADSHELL8:
+      {
+        if (full_ordered)
+          libmesh_error();
+        else
+          return QUADSHELL8;
+      }
+
     case QUAD9:
       {
         // full_ordered not relevant
