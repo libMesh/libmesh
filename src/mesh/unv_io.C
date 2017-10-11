@@ -997,8 +997,6 @@ void UNVIO::elements_out(std::ostream & out_file)
     {
       const Elem * elem = *it;
 
-      elem->n_nodes();
-
       switch (elem->type())
         {
 
