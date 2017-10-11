@@ -78,8 +78,7 @@ const Elem * primary_boundary_point_neighbor(const Elem * elem,
       // one of its sides is on a relevant boundary and that side
       // contains this vertex
       bool vertex_on_periodic_side = false;
-      for (unsigned short int ns = 0, max_ns = pt_neighbor->n_sides();
-           ns != max_ns; ++ns)
+      for (auto ns : pt_neighbor->side_index_range())
         {
           boundary_info.boundary_ids (pt_neighbor, ns, bc_ids);
 
@@ -142,8 +141,7 @@ const Elem * primary_boundary_edge_neighbor(const Elem * elem,
       // one of its sides is on this periodic boundary and that
       // side contains this edge
       bool vertex_on_periodic_side = false;
-      for (unsigned short int ns = 0, max_ns = e_neighbor->n_sides();
-           ns != max_ns; ++ns)
+      for (auto ns : e_neighbor->side_index_range())
         {
           boundary_info.boundary_ids (e_neighbor, ns, bc_ids);
 
@@ -946,7 +944,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
 
   // In 3D, project any edge values next
   if (dim > 2 && cont != DISCONTINUOUS)
-    for (unsigned int e=0; e != elem->n_edges(); ++e)
+    for (auto e : elem->edge_index_range())
       {
         FEInterface::dofs_on_edge(elem, dim, fe_type,
                                   e, new_side_dofs);
@@ -1083,7 +1081,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
 
   // Project any side values (edges in 2D, faces in 3D)
   if (dim > 1 && cont != DISCONTINUOUS)
-    for (unsigned int s=0, max_ns = elem->n_sides(); s != max_ns; ++s)
+    for (auto s : elem->side_index_range())
       {
         FEInterface::dofs_on_side(elem, dim, fe_type,
                                   s, new_side_dofs);
@@ -1437,7 +1435,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
-  for (unsigned int s = 0, max_ns = elem->n_sides(); s != max_ns; ++s)
+  for (auto s : elem->side_index_range())
     if (elem->neighbor_ptr(s) != libmesh_nullptr)
       {
         // Get pointers to the element's neighbor.
