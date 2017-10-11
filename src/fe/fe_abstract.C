@@ -812,7 +812,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
-  for (unsigned int s=0; s<elem->n_sides(); s++)
+  for (auto s : elem->side_index_range())
     if (elem->neighbor_ptr(s) != libmesh_nullptr &&
         elem->neighbor_ptr(s) != remote_elem)
       if (elem->neighbor_ptr(s)->level() < elem->level()) // constrain dofs shared between
@@ -959,7 +959,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
   // Look at the element faces.  Check to see if we need to
   // build constraints.
   std::vector<boundary_id_type> bc_ids;
-  for (unsigned short int s=0; s<elem->n_sides(); s++)
+  for (auto s : elem->side_index_range())
     {
       if (elem->neighbor_ptr(s))
         continue;
