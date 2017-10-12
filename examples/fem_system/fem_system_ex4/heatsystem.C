@@ -46,7 +46,7 @@ void HeatSystem::init_data ()
 
 void HeatSystem::init_context(DiffContext & context)
 {
-  FEMContext & c = libmesh_cast_ref<FEMContext &>(context);
+  FEMContext & c = cast_ref<FEMContext &>(context);
 
   const std::set<unsigned char> & elem_dims =
     c.elem_dimensions();
@@ -73,7 +73,7 @@ void HeatSystem::init_context(DiffContext & context)
 bool HeatSystem::element_time_derivative (bool request_jacobian,
                                           DiffContext & context)
 {
-  FEMContext & c = libmesh_cast_ref<FEMContext &>(context);
+  FEMContext & c = cast_ref<FEMContext &>(context);
 
   const unsigned int mesh_dim =
     c.get_system().get_mesh().mesh_dimension();

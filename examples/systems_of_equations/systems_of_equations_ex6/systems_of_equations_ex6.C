@@ -530,7 +530,7 @@ int main (int argc, char ** argv)
 #ifdef LIBMESH_HAVE_PETSC
   // Attach a SolverConfiguration object to system.linear_solver
   PetscLinearSolver<Number> * petsc_linear_solver =
-    libmesh_cast_ptr<PetscLinearSolver<Number>*>(system.get_linear_solver());
+    cast_ptr<PetscLinearSolver<Number>*>(system.get_linear_solver());
   libmesh_assert(petsc_linear_solver);
   PetscSolverConfiguration petsc_solver_config(*petsc_linear_solver);
   petsc_linear_solver->set_solver_configuration(petsc_solver_config);
