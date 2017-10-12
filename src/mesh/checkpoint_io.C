@@ -1015,7 +1015,7 @@ void CheckpointIO::read_remote_elem (Xdr & io, bool libmesh_dbg_var(expect_all_r
   for (std::size_t i=0; i != elem_ids.size(); ++i)
     {
       Elem & elem = mesh.elem_ref(cast_int<dof_id_type>(elem_ids[i]));
-      if (!elem.neighbor(elem_sides[i]))
+      if (!elem.neighbor_ptr(elem_sides[i]))
         elem.set_neighbor(elem_sides[i],
                           const_cast<RemoteElem *>(remote_elem));
       else
