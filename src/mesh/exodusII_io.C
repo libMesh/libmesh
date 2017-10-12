@@ -419,7 +419,7 @@ void ExodusII_IO::write_as_dimension(unsigned dim)
 
 void ExodusII_IO::set_coordinate_offset(Point p)
 {
-  libmesh_deprecated();
+  libmesh_warning("This method may be deprecated in the future");
   exio_helper->set_coordinate_offset(p);
 }
 
