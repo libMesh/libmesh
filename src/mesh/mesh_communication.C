@@ -1604,7 +1604,7 @@ struct ElemNodesMaybeNew
     // processor_id()
     unsigned int n_neigh = elem->n_neighbors();
     for (unsigned int s=0; s != n_neigh; ++s)
-      if (elem->neighbor(s) == remote_elem)
+      if (elem->neighbor_ptr(s) == remote_elem)
         return true;
     return false;
   }
@@ -1635,7 +1635,7 @@ struct NodeMaybeNew
     // processor_id()
     unsigned int n_neigh = elem->n_neighbors();
     for (unsigned int s=0; s != n_neigh; ++s)
-      if (elem->neighbor(s) == remote_elem)
+      if (elem->neighbor_ptr(s) == remote_elem)
         if (elem->is_node_on_side(local_node_num, s))
           return true;
 
