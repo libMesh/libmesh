@@ -66,6 +66,7 @@ public:
    * \deprecated This is included for backward compatibility, but
    * should no longer be used.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   virtual ParameterAccessor<T> &
   operator= (T * new_ptr) libmesh_override
   {
@@ -73,6 +74,7 @@ public:
     _ptr = new_ptr;
     return *this;
   }
+#endif
 
   /**
    * \returns A new copy of the accessor.

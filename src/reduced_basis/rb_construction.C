@@ -657,6 +657,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
                       input_matrix->add_matrix(nodal_matrix, nodal_dof_indices);
                     }
                 }
+#ifdef LIBMESH_ENABLE_DEPRECATED
               else if(elem_assembly->is_nodal_rhs_values_overriden)
                 {
                   // This is the "old" implementation, to be deprecated soon.
@@ -678,6 +679,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
                       input_vector->add( dof_index, value);
                     }
                 }
+#endif
             }
         }
     }

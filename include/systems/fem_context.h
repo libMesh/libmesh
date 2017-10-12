@@ -91,7 +91,9 @@ public:
    * \deprecated Instead, use the version that takes a reference to a
    * std::set.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   std::vector<boundary_id_type> side_boundary_ids() const;
+#endif
 
   /**
    * As above, but fills in the std::set provided by the user.

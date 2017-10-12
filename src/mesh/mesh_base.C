@@ -74,6 +74,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
 
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
+#ifdef LIBMESH_ENABLE_DEPRECATED
 MeshBase::MeshBase (unsigned char d) :
   ParallelObject (CommWorld),
   boundary_info  (new BoundaryInfo(*this)),
@@ -97,6 +98,7 @@ MeshBase::MeshBase (unsigned char d) :
   libmesh_assert_greater_equal (LIBMESH_DIM, d);
   libmesh_assert (libMesh::initialized());
 }
+#endif
 #endif // !LIBMESH_DISABLE_COMMWORLD
 
 
@@ -512,6 +514,7 @@ unsigned int MeshBase::recalculate_n_partitions()
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 const PointLocatorBase & MeshBase::point_locator () const
 {
   libmesh_deprecated();
@@ -526,6 +529,7 @@ const PointLocatorBase & MeshBase::point_locator () const
 
   return *_point_locator;
 }
+#endif
 
 
 UniquePtr<PointLocatorBase> MeshBase::sub_point_locator () const

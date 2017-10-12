@@ -1027,6 +1027,7 @@ bool BoundaryInfo::has_boundary_id(const Node * const node,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 std::vector<boundary_id_type> BoundaryInfo::boundary_ids(const Node * node) const
 {
   libmesh_deprecated();
@@ -1035,6 +1036,7 @@ std::vector<boundary_id_type> BoundaryInfo::boundary_ids(const Node * node) cons
   this->boundary_ids(node, ids);
   return ids;
 }
+#endif
 
 
 
@@ -1062,6 +1064,7 @@ unsigned int BoundaryInfo::n_boundary_ids(const Node * node) const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem * const elem,
                                                                const unsigned short int edge) const
 {
@@ -1071,6 +1074,7 @@ std::vector<boundary_id_type> BoundaryInfo::edge_boundary_ids (const Elem * cons
   this->edge_boundary_ids(elem, edge, ids);
   return ids;
 }
+#endif
 
 
 
@@ -1144,6 +1148,7 @@ unsigned int BoundaryInfo::n_edge_boundary_ids (const Elem * const elem,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 std::vector<boundary_id_type> BoundaryInfo::raw_edge_boundary_ids (const Elem * const elem,
                                                                    const unsigned short int edge) const
 {
@@ -1153,6 +1158,7 @@ std::vector<boundary_id_type> BoundaryInfo::raw_edge_boundary_ids (const Elem * 
   this->raw_edge_boundary_ids(elem, edge, ids);
   return ids;
 }
+#endif
 
 
 
@@ -1253,6 +1259,7 @@ void BoundaryInfo::raw_shellface_boundary_ids (const Elem * const elem,
 }
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 boundary_id_type BoundaryInfo::boundary_id(const Elem * const elem,
                                            const unsigned short int side) const
 {
@@ -1269,6 +1276,7 @@ boundary_id_type BoundaryInfo::boundary_id(const Elem * const elem,
   // element on this side.
   return *(ids.begin());
 }
+#endif
 
 
 
@@ -1283,6 +1291,7 @@ bool BoundaryInfo::has_boundary_id(const Elem * const elem,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 std::vector<boundary_id_type> BoundaryInfo::boundary_ids (const Elem * const elem,
                                                           const unsigned short int side) const
 {
@@ -1292,6 +1301,7 @@ std::vector<boundary_id_type> BoundaryInfo::boundary_ids (const Elem * const ele
   this->boundary_ids(elem, side, ids);
   return ids;
 }
+#endif
 
 
 
@@ -1345,6 +1355,7 @@ unsigned int BoundaryInfo::n_boundary_ids (const Elem * const elem,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 std::vector<boundary_id_type> BoundaryInfo::raw_boundary_ids (const Elem * const elem,
                                                               const unsigned short int side) const
 {
@@ -1354,6 +1365,7 @@ std::vector<boundary_id_type> BoundaryInfo::raw_boundary_ids (const Elem * const
   this->raw_boundary_ids(elem, side, ids);
   return ids;
 }
+#endif
 
 
 

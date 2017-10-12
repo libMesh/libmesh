@@ -1236,8 +1236,10 @@ public:
    * "legacy") XDR format has been deprecated for many years, this
    * capability may soon disappear altogether.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   void read_legacy_data (Xdr & io,
                          const bool read_additional_data=true);
+#endif
 
   /**
    * Reads additional data, namely vectors, for this System.

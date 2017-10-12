@@ -133,6 +133,7 @@ ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
 
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
+#ifdef LIBMESH_ENABLE_DEPRECATED
 ReplicatedMesh::ReplicatedMesh (unsigned char d) :
   UnstructuredMesh (d)
 {
@@ -144,6 +145,7 @@ ReplicatedMesh::ReplicatedMesh (unsigned char d) :
 #endif
   _partitioner = UniquePtr<Partitioner>(new MetisPartitioner());
 }
+#endif
 #endif
 
 

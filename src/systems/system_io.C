@@ -306,6 +306,7 @@ void System::read_header (Xdr & io,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void System::read_legacy_data (Xdr & io,
                                const bool read_additional_data)
 {
@@ -508,6 +509,7 @@ void System::read_legacy_data (Xdr & io,
         }
     } // end if (_additional_data_written)
 }
+#endif
 
 
 

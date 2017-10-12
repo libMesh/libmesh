@@ -505,6 +505,7 @@ inline Tnew cast_ref(Told & oldvar)
 #endif
 }
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <typename Tnew, typename Told>
 inline Tnew libmesh_cast_ref(Told & oldvar)
 {
@@ -512,6 +513,7 @@ inline Tnew libmesh_cast_ref(Told & oldvar)
   libmesh_deprecated();
   return cast_ref<Tnew>(oldvar);
 }
+#endif
 
 // We use two different function names to avoid an odd overloading
 // ambiguity bug with icc 10.1.008

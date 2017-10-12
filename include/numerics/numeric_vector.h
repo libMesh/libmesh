@@ -124,8 +124,10 @@ public:
    * \deprecated LIBMESH_DISABLE_COMMWORLD is now the default, use the
    * build() method that takes a Parallel::Communicator instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   static UniquePtr<NumericVector<T> >
   build(const SolverPackage solver_package = libMesh::default_solver_package());
+#endif
 #endif
 
   /**

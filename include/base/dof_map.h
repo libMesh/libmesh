@@ -556,6 +556,7 @@ public:
    * \deprecated This function returns nonsense in the rare case where
    * \p proc has no local dof indices.  Use end_dof() instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   dof_id_type last_dof(const processor_id_type proc) const
   {
     libmesh_deprecated();
@@ -565,6 +566,7 @@ public:
 
   dof_id_type last_dof() const
   { return this->last_dof(this->processor_id()); }
+#endif
 
   /**
    * \returns The first dof index that is after all indices local to

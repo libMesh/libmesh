@@ -58,12 +58,14 @@ UnstructuredMesh::UnstructuredMesh (const Parallel::Communicator & comm_in,
 
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
+#ifdef LIBMESH_ENABLE_DEPRECATED
 UnstructuredMesh::UnstructuredMesh (unsigned char d) :
   MeshBase (d)
 {
   libmesh_deprecated();
   libmesh_assert (libMesh::initialized());
 }
+#endif
 #endif
 
 

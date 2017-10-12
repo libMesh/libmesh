@@ -206,7 +206,9 @@ public:
    * delete a System from an EquationSystems object, it could probably
    * be added.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   void delete_system (const std::string & name);
+#endif
 
   /**
    * \returns The total number of variables in all

@@ -54,6 +54,7 @@ DistributedMesh::DistributedMesh (const Parallel::Communicator & comm_in,
 
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
+#ifdef LIBMESH_ENABLE_DEPRECATED
 DistributedMesh::DistributedMesh (unsigned char d) :
   UnstructuredMesh (d), _is_serial(true), _is_serial_on_proc_0(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
@@ -74,6 +75,7 @@ DistributedMesh::DistributedMesh (unsigned char d) :
   // FIXME: give parmetis the communicator!
   _partitioner = UniquePtr<Partitioner>(new ParmetisPartitioner());
 }
+#endif
 #endif
 
 

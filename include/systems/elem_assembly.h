@@ -83,6 +83,7 @@ public:
    * Get values to add to the matrix or rhs vector based on \p node.
    * This allows one to impose point loads or springs, for example.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   virtual void
   get_nodal_rhs_values(std::map<numeric_index_type, Number> & values,
                        const System &,
@@ -97,6 +98,7 @@ public:
     // Set flag so that we know this is the default implementation
     is_nodal_rhs_values_overriden = false;
   }
+#endif
 
   /**
    * Temporary flag to help us figure out if we should call the

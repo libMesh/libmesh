@@ -280,7 +280,9 @@ public:
    *
    * \deprecated Use the norm() function instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   Real size() const;
+#endif
 
   /**
    * \returns The magnitude of the vector, i.e. the square-root of the
@@ -294,7 +296,9 @@ public:
    *
    * \deprecated Use the norm_sq() function instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   Real size_sq() const;
+#endif
 
   /**
    * \returns The magnitude of the vector squared, i.e. the sum of the
@@ -888,6 +892,7 @@ TypeVector<T>::cross(const TypeVector<T2> & p) const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <typename T>
 inline
 Real TypeVector<T>::size() const
@@ -895,6 +900,7 @@ Real TypeVector<T>::size() const
   libmesh_deprecated();
   return this->norm();
 }
+#endif
 
 
 
@@ -917,6 +923,7 @@ void TypeVector<T>::zero()
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <typename T>
 inline
 Real TypeVector<T>::size_sq() const
@@ -924,6 +931,7 @@ Real TypeVector<T>::size_sq() const
   libmesh_deprecated();
   return this->norm_sq();
 }
+#endif
 
 
 

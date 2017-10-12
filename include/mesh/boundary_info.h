@@ -364,7 +364,9 @@ public:
    * \deprecated Instead, use the version of this function that fills
    * a std::vector.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   std::vector<boundary_id_type> boundary_ids (const Node * node) const;
+#endif
 
   /**
    * Fills a user-provided std::vector with the boundary ids associated
@@ -398,8 +400,10 @@ public:
    * \deprecated Instead, use the version of this function that fills
    * a std::vector.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   std::vector<boundary_id_type> edge_boundary_ids (const Elem * const elem,
                                                    const unsigned short int edge) const;
+#endif
 
   /**
    * \returns The list of boundary ids associated with the \p edge edge of
@@ -425,8 +429,10 @@ public:
    * \deprecated Instead, use the version of this function that fills
    * a std::vector.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   std::vector<boundary_id_type> raw_edge_boundary_ids (const Elem * const elem,
                                                        const unsigned short int edge) const;
+#endif
 
   /**
    * \returns The list of raw boundary ids associated with the \p edge
@@ -496,8 +502,10 @@ public:
    * BoundaryInfo::boundary_ids() or BoundaryInfo::has_boundary_id()
    * instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   boundary_id_type boundary_id (const Elem * const elem,
                                 const unsigned short int side) const;
+#endif
 
   /**
    * \returns The number of boundary ids associated with the \p side
@@ -513,8 +521,10 @@ public:
    * \deprecated Instead, use the version of this function that fills
    * a std::vector.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   std::vector<boundary_id_type> boundary_ids (const Elem * const elem,
                                               const unsigned short int side) const;
+#endif
 
   /**
    * \returns The list of boundary ids associated with the \p side side of
@@ -536,8 +546,10 @@ public:
    * \deprecated Instead, use the version of this function that fills
    * a std::vector.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   std::vector<boundary_id_type> raw_boundary_ids (const Elem * const elem,
                                                   const unsigned short int side) const;
+#endif
 
   /**
    * \returns The list of raw boundary ids associated with the \p side
