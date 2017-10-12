@@ -16,8 +16,9 @@ using namespace libMesh;
 
 void LaplaceSystem::init_data ()
 {
-  this->add_variable ("T", static_cast<Order>(_fe_order),
-                      Utility::string_to_enum<FEFamily>(_fe_family));
+  unsigned int T_var =
+    this->add_variable ("T", static_cast<Order>(_fe_order),
+                        Utility::string_to_enum<FEFamily>(_fe_family));
 
   GetPot infile("l-shaped.in");
   exact_QoI[0] = infile("QoI_0", 0.0);
@@ -26,7 +27,8 @@ void LaplaceSystem::init_data ()
   // Do the parent's initialization after variables are defined
   FEMSystem::init_data();
 
-  this->time_evolving(0);
+  // The temperature is evolving, with a first order time derivative
+  this->time_evolving(T_var, 1);
 }
 
 void LaplaceSystem::init_context(DiffContext & context)

@@ -38,7 +38,8 @@ void HeatSystem::init_data ()
   // Do the parent's initialization after variables are defined
   FEMSystem::init_data();
 
-  this->time_evolving(0);
+  // The temperature is evolving, with a first-order time derivative
+  this->time_evolving(T_var, 1);
 }
 
 

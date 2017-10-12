@@ -104,11 +104,12 @@ void CoupledSystem::init_data ()
   C_var = this->add_variable ("C", static_cast<Order>(pressure_p+1),
                               fefamily);
 
-  // Tell the system to march velocity forward in time, but
-  // leave p as a constraint only
-  this->time_evolving(u_var);
-  this->time_evolving(v_var);
-  this->time_evolving(C_var);
+  // Tell the system to march velocity and concentration forward in
+  // time, with first order time derivatives, but leave pressure as a
+  // constraint only
+  this->time_evolving(u_var, 1);
+  this->time_evolving(v_var, 1);
+  this->time_evolving(C_var, 1);
 
   // Useful debugging options
   this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
