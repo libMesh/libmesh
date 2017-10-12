@@ -13,7 +13,7 @@ unit_tests_sources = \
   test_comm.h \
   stream_redirector.h \
   base/dof_object_test.h \
-  base/dof_map_test.h \
+  base/dof_map_test.C \
   base/default_coupling_test.C \
   base/getpot_test.C \
   base/point_neighbor_coupling_test.C \
