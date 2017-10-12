@@ -29,7 +29,7 @@ public:
   // reference to the system where it applies and a separate context
   // object (or multiple separate context objects, in the threaded
   // case) for that system.
-  libMesh::AutoPtr<libMesh::FEMFunctionBase<libMesh::Number> > goal_func;
+  libMesh::UniquePtr<libMesh::FEMFunctionBase<libMesh::Number> > goal_func;
 
   libMesh::System * input_system;
 
