@@ -460,8 +460,13 @@ extern bool warned_about_auto_ptr;
 
 // The libmesh_deprecated macro warns that you are using obsoleted code
 #undef libmesh_deprecated
+#ifndef LIBMESH_ENABLE_DEPRECATED
+#define libmesh_deprecated()                                            \
+  libmesh_error_msg("*** Error, This code is deprecated, and likely to be removed in future library versions! ");
+#else
 #define libmesh_deprecated()                                            \
   libmesh_warning("*** Warning, This code is deprecated, and likely to be removed in future library versions! ");
+#endif
 
 // A function template for ignoring unused variables.  This is a way
 // to shut up unused variable compiler warnings on a case by case
