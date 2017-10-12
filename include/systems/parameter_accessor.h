@@ -74,8 +74,10 @@ public:
    * This is included for backward compatibility, but will be
    * deprecated in some classes and not implemented in others.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   virtual ParameterAccessor<T> &
   operator= (T * /* new_ptr */) { libmesh_error(); return *this; }
+#endif
 
   /**
    * Proxy: for backward compatibility, we allow codes to treat a
