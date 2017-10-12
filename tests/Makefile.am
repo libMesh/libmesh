@@ -30,7 +30,6 @@ unit_tests_sources = \
   fe/fe_test.h \
   fe/fe_xyz_test.C \
   geom/elem_test.C \
-  geom/node_test.C \
   geom/point_test.C \
   geom/point_test.h \
   geom/which_node_am_i_test.C \
