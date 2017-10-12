@@ -7,6 +7,7 @@
 #include <libmesh/equation_systems.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
+#include <libmesh/elem.h>
 #include <libmesh/dof_map.h>
 
 #include "test_comm.h"
@@ -75,8 +76,8 @@ public:
     for (dof_id_type id = 0; id != dof_map.n_dofs(); ++id)
       {
         const processor_id_type pid = dof_map.dof_owner(id);
-        CPPUNIT_ASSERT_LESS_EQUAL(dof_map.first_dof(pid), id);
-        CPPUNIT_ASSERT_LESS(id, dof_map.end_dof(pid));
+        CPPUNIT_ASSERT(dof_map.first_dof(pid) <= id);
+        CPPUNIT_ASSERT(id < dof_map.end_dof(pid));
       }
   }
 
