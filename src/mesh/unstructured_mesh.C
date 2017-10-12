@@ -487,7 +487,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                               unsigned int n_neigh = child->n_neighbors();
                               for (unsigned int n=0; n != n_neigh; ++n)
                                 {
-                                  Elem * ncn = child->neighbor(n);
+                                  Elem * ncn = child->neighbor_ptr(n);
                                   if (ncn != remote_elem &&
                                       ncn->is_ancestor_of(current_elem))
                                     {
