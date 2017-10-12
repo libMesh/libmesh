@@ -124,6 +124,9 @@
 /* Flag indicating if the library should use blocked matrix/vector storage */
 #undef ENABLE_BLOCKED_STORAGE
 
+/* Flag indicating if the library should support deprecated code */
+#undef ENABLE_DEPRECATED
+
 /* Flag indicating if the library should be built with Dirichlet boundary
    constraint support */
 #undef ENABLE_DIRICHLET
