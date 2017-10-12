@@ -392,7 +392,7 @@ void UnstructuredMesh::all_first_order ()
        */
       for (unsigned short s=0; s<so_elem->n_sides(); s++)
         {
-          if (so_elem->neighbor(s) == remote_elem)
+          if (so_elem->neighbor_ptr(s) == remote_elem)
             lo_elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
         }
 
