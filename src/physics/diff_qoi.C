@@ -48,4 +48,9 @@ void DifferentiableQoI::parallel_op(const Parallel::Communicator & communicator,
   sys_qoi = local_qoi;
 }
 
+void DifferentiableQoI::finalize_derivative(NumericVector<Number> &, std::size_t)
+{
+  // by default, do nothing
+}
+
 } // namespace libMesh

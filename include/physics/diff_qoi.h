@@ -23,6 +23,7 @@
 // Local Includes
 #include "libmesh/auto_ptr.h"
 #include "libmesh/parallel.h"
+#include "libmesh/diff_context.h"
 
 // C++ includes
 
@@ -170,6 +171,12 @@ public:
                            std::vector<Number> & sys_qoi,
                            std::vector<Number> & local_qoi,
                            const QoISet & qoi_indices);
+
+  /**
+   * Method to finalize qoi derivatives which require more than just a simple
+   * sum of element contributions.
+   */
+  virtual void finalize_derivative(NumericVector<Number> & derivatives, std::size_t qoi_index);
 };
 
 } // namespace libMesh
