@@ -68,16 +68,6 @@ protected:
    */
   ~DofObject ();
 
-  /**
-   * Copy-constructor.
-   */
-  DofObject (const DofObject &);
-
-  /**
-   * Deep-copying assignment operator
-   */
-  DofObject & operator= (const DofObject & dof_obj);
-
 public:
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -380,6 +370,24 @@ public:
    * Print out info for debugging.
    */
   void print_dof_info() const;
+
+  // Deep copy (or almost-copy) of DofObjects is now deprecated in
+  // derived classes; we keep these methods around solely for a couple
+  // tricky internal uses.
+#ifndef LIBMESH_ENABLE_DEPRECATED
+private:
+#endif
+
+  /**
+   * "Copy"-constructor.  Does not copy old_dof_object, but leaves it
+   * null in the new object.
+   */
+  DofObject (const DofObject &);
+
+  /**
+   * Deep-copying assignment operator
+   */
+  DofObject & operator= (const DofObject & dof_obj);
 
 private:
 
