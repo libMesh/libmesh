@@ -51,7 +51,7 @@ void L2System::init_data ()
 
 void L2System::init_context(DiffContext & context)
 {
-  FEMContext & c = libmesh_cast_ref<FEMContext &>(context);
+  FEMContext & c = cast_ref<FEMContext &>(context);
 
   // Now make sure we have requested all the data
   // we need to build the L2 system.
@@ -78,7 +78,7 @@ void L2System::init_context(DiffContext & context)
 bool L2System::element_time_derivative (bool request_jacobian,
                                         DiffContext & context)
 {
-  FEMContext & c = libmesh_cast_ref<FEMContext &>(context);
+  FEMContext & c = cast_ref<FEMContext &>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.

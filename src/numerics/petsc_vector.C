@@ -231,9 +231,9 @@ void PetscVector<T>::add_vector (const NumericVector<T> & v_in,
   // We shouldn't close() the matrix for you, as that would potentially modify the state of a const object.
   if (!A->closed())
     {
-      libmesh_deprecated();
       libmesh_warning("Matrix A must be assembled before calling PetscVector::add_vector(v, A).\n"
                       "Please update your code, as this warning will become an error in a future release.");
+      libmesh_deprecated();
       const_cast<PetscMatrix<T> *>(A)->close();
     }
 
@@ -259,9 +259,9 @@ void PetscVector<T>::add_vector_transpose (const NumericVector<T> & v_in,
   // We shouldn't close() the matrix for you, as that would potentially modify the state of a const object.
   if (!A->closed())
     {
-      libmesh_deprecated();
       libmesh_warning("Matrix A must be assembled before calling PetscVector::add_vector_transpose(v, A).\n"
                       "Please update your code, as this warning will become an error in a future release.");
+      libmesh_deprecated();
       const_cast<PetscMatrix<T> *>(A)->close();
     }
 
@@ -296,9 +296,9 @@ void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T> & v_
   // We shouldn't close() the matrix for you, as that would potentially modify the state of a const object.
   if (!A->closed())
     {
-      libmesh_deprecated();
       libmesh_warning("Matrix A must be assembled before calling PetscVector::add_vector_conjugate_transpose(v, A).\n"
                       "Please update your code, as this warning will become an error in a future release.");
+      libmesh_deprecated();
       const_cast<PetscMatrix<T> *>(A)->close();
     }
 

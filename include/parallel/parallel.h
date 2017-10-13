@@ -41,6 +41,7 @@ namespace libMesh
 // Macro to identify and debug functions which should only be called in
 // parallel on every processor at once
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 #undef parallel_only
 #ifndef NDEBUG
 #define parallel_only() do {                                            \
@@ -50,6 +51,7 @@ namespace libMesh
     libmesh_assert(CommWorld.verify(__LINE__)); } while (0)
 #else
 #define parallel_only()  ((void) 0)
+#endif
 #endif
 
 #undef libmesh_parallel_only
@@ -65,6 +67,7 @@ namespace libMesh
 // Macro to identify and debug functions which should only be called in
 // parallel on every processor at once
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 #undef parallel_only_on
 #ifndef NDEBUG
 #define parallel_only_on(comm_arg) do {                                 \
@@ -74,6 +77,7 @@ namespace libMesh
     libmesh_assert(CommWorld.verify(__LINE__), comm_arg); } while (0)
 #else
 #define parallel_only_on(comm_arg)  ((void) 0)
+#endif
 #endif
 
 #undef libmesh_parallel_only_on

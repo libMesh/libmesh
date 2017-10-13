@@ -60,12 +60,14 @@ public:
   /**
    * A simple reseater won't work with a multipointer
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   virtual ParameterAccessor<T> &
   operator= (T * /* new_ptr */) libmesh_override
   {
     libmesh_error();
     return *this;
   }
+#endif
 
   /**
    * Setter: change the value of the parameter we access.

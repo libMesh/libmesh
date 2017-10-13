@@ -244,11 +244,13 @@ public:
    * the order-in-time of the variable, either 1 or 2. This method
    * assumes the variable is first order for backward compatibility.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   virtual void time_evolving (unsigned int var)
   {
     libmesh_deprecated();
     this->time_evolving(var,1);
   }
+#endif
 
   /**
    * Tells the DiffSystem that variable var is evolving with

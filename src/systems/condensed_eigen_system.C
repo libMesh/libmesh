@@ -118,8 +118,16 @@ void CondensedEigenSystem::solve()
   libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
 
   if (this->assemble_before_solve)
-    // Assemble the linear system
-    this->assemble ();
+    {
+      // Assemble the linear system
+      this->assemble ();
+
+      // And close the assembled matrices; using a non-closed matrix
+      // with create_submatrix() is deprecated.
+      matrix_A->close();
+      if (generalized())
+        matrix_B->close();
+    }
 
   // If we reach here, then there should be some non-condensed dofs
   libmesh_assert(!local_non_condensed_dofs_vector.empty());

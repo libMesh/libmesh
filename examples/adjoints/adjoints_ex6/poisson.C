@@ -54,19 +54,18 @@ private:
 
 void PoissonSystem::init_data ()
 {
-  this->add_variable ("T", static_cast<Order>(_fe_order),
-                      Utility::string_to_enum<FEFamily>(_fe_family));
+  T_var =
+    this->add_variable ("T", static_cast<Order>(_fe_order),
+                        Utility::string_to_enum<FEFamily>(_fe_family));
 
   GetPot infile("poisson.in");
   exact_QoI[0] = infile("QoI_0", 0.0);
   alpha = infile("alpha", 100.0);
 
-  // Now we will set the Dirichlet boundary conditions
+  // The temperature is evolving, with a first order time derivative
+  this->time_evolving(T_var, 1);
 
-  // Get the variable number of the variable for which we will set
-  // the Dirichlet boundary conditions
-  T_var = this->variable_number ("T");
-  this->time_evolving(T_var);
+  // Now we will set the Dirichlet boundary conditions
 
   // Get boundary ids for all the boundaries
   const boundary_id_type all_bdry_id[4] = {0, 1, 2, 3};

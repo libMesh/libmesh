@@ -136,7 +136,9 @@ public:
    *
    * \deprecated Use the less ambiguously named node_id() instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   dof_id_type node (const unsigned int i) const;
+#endif
 
   /**
    * \returns The local id number of global \p Node id \p i,
@@ -180,7 +182,9 @@ public:
    *
    * \deprecated Use the less ambiguously named node_ptr() instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   Node * get_node (const unsigned int i) const;
+#endif
 
   /**
    * \returns The pointer to local \p Node \p i as a writable reference.
@@ -266,7 +270,9 @@ public:
   /**
    * \deprecated Use the const-correct neighbor_ptr() function instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   Elem * neighbor (const unsigned int i) const;
+#endif
 
   /**
    * Nested "classes" for use iterating over all neighbors of an element.
@@ -704,7 +710,9 @@ public:
    * indirectly modify this.  Please use the the const-correct
    * side_ptr() function instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   UniquePtr<Elem> side (const unsigned int i) const;
+#endif
 
   /**
    * \returns An element coincident with side \p i wrapped in a smart pointer.
@@ -738,7 +746,9 @@ public:
    * indirectly modify this.  Please use the the const-correct
    * build_side_ptr() function instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   UniquePtr<Elem> build_side (const unsigned int i, bool proxy=true) const;
+#endif
 
   /**
    * \returns An element coincident with edge \p i wrapped in a smart pointer.
@@ -764,7 +774,9 @@ public:
    * indirectly modify this Elem.  Please use the the const-correct
    * build_edge_ptr() function instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   UniquePtr<Elem> build_edge (const unsigned int i) const;
+#endif
 
   /**
    * \returns The default approximation order for this element type.
@@ -1106,7 +1118,9 @@ public:
    * \deprecated Use the more accurately-named and const correct
    * child_ptr() function instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   Elem * child (const unsigned int i) const;
+#endif
 
   /**
    * Nested classes for use iterating over all children of a parent
@@ -1772,12 +1786,14 @@ dof_id_type Elem::node_id (const unsigned int i) const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 inline
 dof_id_type Elem::node (const unsigned int i) const
 {
   libmesh_deprecated();
   return this->node_id(i);
 }
+#endif
 
 
 
@@ -1839,6 +1855,7 @@ Node & Elem::node_ref (const unsigned int i)
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 inline
 Node * Elem::get_node (const unsigned int i) const
 {
@@ -1851,6 +1868,7 @@ Node * Elem::get_node (const unsigned int i) const
   libmesh_deprecated();
   return const_cast<Node *>(this->node_ptr(i));
 }
+#endif
 
 
 
@@ -1912,6 +1930,7 @@ Elem * Elem::neighbor_ptr (unsigned int i)
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 inline
 Elem * Elem::neighbor (const unsigned int i) const
 {
@@ -1920,6 +1939,7 @@ Elem * Elem::neighbor (const unsigned int i) const
   libmesh_deprecated();
   return const_cast<Elem *>(this->neighbor_ptr(i));
 }
+#endif
 
 
 
@@ -1983,6 +2003,7 @@ UniquePtr<const Elem> Elem::side_ptr (unsigned int i) const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 inline
 UniquePtr<Elem> Elem::side (const unsigned int i) const
 {
@@ -1991,6 +2012,7 @@ UniquePtr<Elem> Elem::side (const unsigned int i) const
   Elem * s = const_cast<Elem *>(this->side_ptr(i).release());
   return UniquePtr<Elem>(s);
 }
+#endif
 
 
 
@@ -2007,6 +2029,7 @@ Elem::build_side_ptr (const unsigned int i, bool proxy) const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 inline
 UniquePtr<Elem>
 Elem::build_side (const unsigned int i, bool proxy) const
@@ -2016,6 +2039,7 @@ Elem::build_side (const unsigned int i, bool proxy) const
   Elem * s = const_cast<Elem *>(this->build_side_ptr(i, proxy).release());
   return UniquePtr<Elem>(s);
 }
+#endif
 
 
 
@@ -2032,6 +2056,7 @@ Elem::build_edge_ptr (const unsigned int i) const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 inline
 UniquePtr<Elem>
 Elem::build_edge (const unsigned int i) const
@@ -2041,6 +2066,7 @@ Elem::build_edge (const unsigned int i) const
   Elem * e = const_cast<Elem *>(this->build_edge_ptr(i).release());
   return UniquePtr<Elem>(e);
 }
+#endif
 
 
 
@@ -2337,6 +2363,7 @@ Elem * Elem::child_ptr (unsigned int i)
 }
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 inline
 Elem * Elem::child (const unsigned int i) const
 {
@@ -2345,6 +2372,7 @@ Elem * Elem::child (const unsigned int i) const
   libmesh_deprecated();
   return const_cast<Elem *>(this->child_ptr(i));
 }
+#endif
 
 
 

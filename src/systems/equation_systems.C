@@ -431,6 +431,7 @@ System & EquationSystems::add_system (const std::string & sys_type,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void EquationSystems::delete_system (const std::string & name)
 {
   libmesh_deprecated();
@@ -442,6 +443,7 @@ void EquationSystems::delete_system (const std::string & name)
 
   _systems.erase (name);
 }
+#endif
 
 
 

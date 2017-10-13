@@ -74,6 +74,7 @@ void ExodusII_IO::set_output_variables(const std::vector<std::string> & output_v
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void ExodusII_IO::copy_nodal_solution(System & system,
                                       std::string var_name,
                                       unsigned int timestep)
@@ -81,6 +82,7 @@ void ExodusII_IO::copy_nodal_solution(System & system,
   libmesh_deprecated();
   copy_nodal_solution(system, var_name, var_name, timestep);
 }
+#endif
 
 
 
@@ -419,7 +421,7 @@ void ExodusII_IO::write_as_dimension(unsigned dim)
 
 void ExodusII_IO::set_coordinate_offset(Point p)
 {
-  libmesh_deprecated();
+  libmesh_warning("This method may be deprecated in the future");
   exio_helper->set_coordinate_offset(p);
 }
 

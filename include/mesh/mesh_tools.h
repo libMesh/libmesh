@@ -56,6 +56,7 @@ namespace MeshTools
  *
  * \deprecated Use libMesh::BoundingBox instead.
  */
+#ifdef LIBMESH_ENABLE_DEPRECATED
 class BoundingBox : public libMesh::BoundingBox
 {
 public:
@@ -74,6 +75,7 @@ public:
     libmesh_deprecated(); // Switch to libMesh::BoundingBox
   }
 };
+#endif
 
 
 /**
@@ -138,8 +140,10 @@ void find_boundary_nodes (const MeshBase & mesh,
  *
  * \deprecated Use create_bounding_box() instead.
  */
+#ifdef LIBMESH_ENABLE_DEPRECATED
 BoundingBox
 bounding_box (const MeshBase & mesh);
+#endif
 
 /**
  * The same functionality as the deprecated MeshTools::bounding_box().
@@ -182,9 +186,11 @@ create_local_bounding_box (const MeshBase & mesh);
  *
  * \deprecated Use create_processor_bounding_box() instead.
  */
+#ifdef LIBMESH_ENABLE_DEPRECATED
 BoundingBox
 processor_bounding_box (const MeshBase & mesh,
                         const processor_id_type pid);
+#endif
 
 /**
  * The same functionality as the deprecated MeshTools::processor_bounding_box().
@@ -208,9 +214,11 @@ processor_bounding_sphere (const MeshBase & mesh,
  *
  * \deprecated Use create_subdomain_bounding_box() instead.
  */
+#ifdef LIBMESH_ENABLE_DEPRECATED
 BoundingBox
 subdomain_bounding_box (const MeshBase & mesh,
                         const subdomain_id_type sid);
+#endif
 
 
 /**

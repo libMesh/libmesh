@@ -46,7 +46,8 @@ void LaplaceSystem::init_data ()
   // Add the solution variable
   u_var = this->add_variable ("u", FIRST, LAGRANGE_VEC);
 
-  this->time_evolving(u_var);
+  // The solution is evolving, with a first order time derivative
+  this->time_evolving(u_var, 1);
 
   // Useful debugging options
   // Set verify_analytic_jacobians to 1e-6 to use

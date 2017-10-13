@@ -1024,6 +1024,7 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 enabledefaultcommworld = @enabledefaultcommworld@
+enabledeprecated = @enabledeprecated@
 enablelegacyincludepaths = @enablelegacyincludepaths@
 enablepetsc = @enablepetsc@
 enableuniqueptr = @enableuniqueptr@

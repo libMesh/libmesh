@@ -108,9 +108,11 @@ public:
    *
    * \deprecated Use the version of copy_nodal_solution() that takes two names.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   void copy_nodal_solution(System & system,
                            std::string var_name,
                            unsigned int timestep=1);
+#endif
 
   /**
    * If we read in a nodal solution while reading in a mesh, we can attempt

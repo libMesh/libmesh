@@ -75,6 +75,26 @@ fi
 
 
 # --------------------------------------------------------------
+# library deprecated code - enable by default
+# --------------------------------------------------------------
+AC_ARG_ENABLE(deprecated,
+              [AS_HELP_STRING([--disable-deprecated],[Deprecated code use gives errors rather than warnings])],
+              enabledeprecated=$enableval,
+              enabledeprecated=yes)
+
+AC_SUBST(enabledeprecated)
+if test "$enabledeprecated" != yes ; then
+  AC_MSG_RESULT([>>> INFO: Disabling library deprecated code <<<])
+  AC_MSG_RESULT([>>> Configuring library without deprecated code support <<<])
+else
+  AC_MSG_RESULT([<<< Configuring library with deprecated code support >>>])
+  AC_DEFINE(ENABLE_DEPRECATED, 1,
+           [Flag indicating if the library should support deprecated code])
+fi
+# --------------------------------------------------------------
+
+
+# --------------------------------------------------------------
 # blocked matrix/vector storage - disabled by default.
 #   See http://sourceforge.net/mailarchive/forum.php?thread_name=B4613A7D-0033-43C7-A9DF-5A801217A097%40nasa.gov&forum_name=libmesh-devel
 # --------------------------------------------------------------

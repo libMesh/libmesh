@@ -337,7 +337,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
         for (unsigned int s=0; s<elem->n_neighbors(); s++)
           {
             // check if element e is on the boundary
-            if (elem->neighbor(s) == libmesh_nullptr)
+            if (elem->neighbor_ptr(s) == libmesh_nullptr)
               {
                 // note that it is safe to use the Elem::side() method,
                 // which gives a non-full-ordered element

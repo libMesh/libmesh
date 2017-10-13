@@ -53,7 +53,8 @@ void HeatSystem::init_data ()
   // Set equation system parameters _k and theta, so they can be read by the exact solution
   this->get_equation_systems().parameters.set<Real>("_k") = _k;
 
-  this->time_evolving(T_var);
+  // The temperature is evolving, with a first order time derivative
+  this->time_evolving(T_var, 1);
 
   const boundary_id_type all_ids[4] = {0, 1, 2, 3};
   std::set<boundary_id_type> all_bdys(all_ids, all_ids+(2*2));

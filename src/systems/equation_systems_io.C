@@ -342,7 +342,9 @@ void EquationSystems::_read_impl (const std::string & name,
         if (read_legacy_format)
           {
             libmesh_deprecated();
+#ifdef LIBMESH_ENABLE_DEPRECATED
             pos->second->read_legacy_data (io, read_additional_data);
+#endif
           }
         else
           if (read_parallel_files)

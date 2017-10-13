@@ -477,7 +477,9 @@ public:
    *
    * \deprecated Use enforce_mismatch_limit_prior_to_refinement() instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   bool get_enforce_mismatch_limit_prior_to_refinement();
+#endif
 
   /**
    * Set _enforce_mismatch_limit_prior_to_refinement option.
@@ -485,7 +487,9 @@ public:
    *
    * \deprecated Use enforce_mismatch_limit_prior_to_refinement() instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   void set_enforce_mismatch_limit_prior_to_refinement(bool enforce);
+#endif
 
   /**
    * Get/set the _enforce_mismatch_limit_prior_to_refinement flag.
@@ -928,6 +932,7 @@ inline signed char & MeshRefinement::underrefined_boundary_limit()
   return _underrefined_boundary_limit;
 }
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 inline bool MeshRefinement::get_enforce_mismatch_limit_prior_to_refinement()
 {
   libmesh_deprecated();
@@ -939,6 +944,7 @@ inline void MeshRefinement::set_enforce_mismatch_limit_prior_to_refinement(bool 
   libmesh_deprecated();
   enforce_mismatch_limit_prior_to_refinement() = enforce;
 }
+#endif
 
 inline bool & MeshRefinement::enforce_mismatch_limit_prior_to_refinement()
 {
