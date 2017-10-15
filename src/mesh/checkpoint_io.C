@@ -96,7 +96,11 @@ void CheckpointIO::write (const std::string & name)
   // restarts later:
   if (this->processor_id() == 0)
     {
-      Xdr io (name, this->binary() ? ENCODE : WRITE);
+      std::ostringstream file_name_stream;
+
+      file_name_stream << name << "-" << (_parallel ? _my_n_processors : 1);
+
+      Xdr io (file_name_stream.str(), this->binary() ? ENCODE : WRITE);
 
       // write the version
       io.data(_version, "# version");
@@ -563,14 +567,22 @@ void CheckpointIO::read (const std::string & name)
   // We'll read a header file from processor 0 and broadcast.
   if (this->processor_id() == 0)
     {
+      std::string header_name = name;
+
       {
-        std::ifstream in (name.c_str());
+        std::ostringstream file_name_stream;
+
+        file_name_stream << name << "-" << (!mesh.is_replicated() ? _my_n_processors : 1);
+
+        header_name = file_name_stream.str();
+
+        std::ifstream in (header_name.c_str());
 
         if (!in.good())
-          libmesh_error_msg("ERROR: cannot locate header file:\n\t" << name);
+            libmesh_error_msg("ERROR: cannot locate header file:\n\t" << header_name);
       }
 
-      Xdr io (name, this->binary() ? DECODE : READ);
+      Xdr io (header_name, this->binary() ? DECODE : READ);
 
       // read the version, but don't care about it
       std::string input_version;
@@ -684,7 +696,10 @@ file_id_type CheckpointIO::read_header (const std::string & name)
   // We'll write a header file from processor 0 and broadcast.
   if (this->processor_id() == 0)
     {
-      Xdr io (name, this->binary() ? DECODE : READ);
+      std::ostringstream file_name_stream;
+      file_name_stream << name << "-" << (!mesh.is_replicated() ? _my_n_processors : 1);
+
+      Xdr io (file_name_stream.str(), this->binary() ? DECODE : READ);
 
       // read the version, but don't care about it
       std::string input_version;
@@ -756,7 +771,7 @@ void CheckpointIO::read_subfile (Xdr & io, bool expect_all_remote)
   // read the nodesets
   this->read_nodesets<file_id_type> (io);
 }
- 
+
 
 
 template <typename file_id_type>
