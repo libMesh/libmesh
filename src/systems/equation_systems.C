@@ -799,6 +799,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
       std::vector<Number>      nodal_soln;  // The FE solution interpolated to the nodes
       std::vector<dof_id_type> dof_indices; // The DOF indices for the finite element
 
+      unsigned var_inc = 0;
       for (unsigned int var=0; var<nv_sys; var++)
         {
           const FEType & fe_type           = system.variable_type(var);
@@ -842,10 +843,10 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                             {
                               // For vector-valued elements, all components are in nodal_soln. For each
                               // node, the components are stored in order, i.e. node_0 -> s0_x, s0_y, s0_z
-                              parallel_soln.add(nv*(elem->node_id(n)) + (var+d + var_num), nodal_soln[n_vec_dim*n+d]);
+                              parallel_soln.add(nv*(elem->node_id(n)) + (var_inc+d + var_num), nodal_soln[n_vec_dim*n+d]);
 
                               // Increment the repeat count for this position
-                              repeat_count.add(nv*(elem->node_id(n)) + (var+d + var_num), 1);
+                              repeat_count.add(nv*(elem->node_id(n)) + (var_inc+d + var_num), 1);
                             }
                         }
                     }
@@ -858,6 +859,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                       repeat_count.add(nv*(elem->node_id(n)) + (var+d + var_num), 1);
 
             } // end loop over elements
+          var_inc += n_vec_dim;
         } // end loop on variables in this system
 
       var_num += nv_sys_split;
