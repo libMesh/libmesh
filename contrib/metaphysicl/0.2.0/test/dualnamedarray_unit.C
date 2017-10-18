@@ -46,7 +46,8 @@ namespace MetaPhysicL {
 #endif
 
 #include "metaphysicl/sparsenumbervector.h"
-#include "metaphysicl/dualnamedarray.h"
+//#include "metaphysicl/dualnamedarray.h"
+#include "metaphysicl/namedindexarray.h"
 
 #include "metaphysicl/metaphysicl_asserts.h"
 
@@ -69,6 +70,7 @@ int main(void)
           ULongSetConstructor<3>::type> >
     indexed_by_three;
 
+  /*
   typedef
     DualExpression<indexed_by_three, indexed_by_three> dual_three;
 
@@ -77,18 +79,20 @@ int main(void)
   test_val.derivatives().raw_data() = 1;
   test_val.value().raw_sizes().get<3>() = 1;
   test_val.derivatives().raw_sizes().get<3>() = 1;
+  */
 
   indexed_by_three val;
   val.raw_data() = 0.5;
   val.raw_sizes().get<3>() = 1;
 
+  /*
   auto test_eight = make_dual_expression_copy(val,val)*val;
 
   double test_eight_output =
     test_eight.derivatives().raw_data();
 
   metaphysicl_assert_equal_to(test_eight_output, 0.25);
-
+  */
 #ifdef METAPHYSICL_HAVE_VEXCL
   // Passes, as it should
   ctassert<BuiltinTraits<vex::vector<double> >::value>::apply();
@@ -98,7 +102,7 @@ int main(void)
 
   vex::Context ctx (vex::Filter::Env && vex::Filter::Count(1));
   std::cout << ctx << std::endl;
-      
+
 
   typedef
     NamedIndexArray
