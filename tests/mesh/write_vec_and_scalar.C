@@ -102,7 +102,7 @@ public:
     for (const auto & var_name : nodal_vars)
       exio.copy_nodal_solution(sys2, var_name, var_name, 1);
 
-    std::vector<Number> gold_vector(
+    std::vector<Real> gold_vector(
         {-0.020949, -0.020949, 0., 0.009495,  0.183852,  0.,       -0.010570, -0.010570, 0.250000,
          0.000000,  0.066228,  0., 0.002165,  0.174356,  0.125000, -0.113646, 0.071746,  0.125000,
          -0.177428, 0.019003,  0., -0.196431, 0.009296,  0.125000, -0.119165, -0.000000, 0.,
@@ -113,10 +113,10 @@ public:
          -0.010761, -0.010761, 0., 0.087454,  0.000000,  0.,       0.081935,  -0.103458, 0.125000,
          -0.000000, -0.097939, 0});
 
-    Number tol = 1e-5;
+    Real tol = 1e-5;
     NumericVector<Number> & sys2_soln(*sys2.solution);
     for (unsigned i = 0; i < sys2_soln.size(); i++)
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(sys2_soln(i), gold_vector[i], tol);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys2_soln(i)), gold_vector[i], tol);
 
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
   }

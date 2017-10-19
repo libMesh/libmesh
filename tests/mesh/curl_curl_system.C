@@ -41,7 +41,7 @@ void CurlCurlSystem::init_dirichlet_bcs()
   std::vector<unsigned int> vars;
   vars.push_back(v_var);
 
-  ZeroFunction<Real> func;
+  ZeroFunction<Number> func;
 
   this->get_dof_map().add_dirichlet_boundary(libMesh::DirichletBoundary(boundary_ids, vars, &func));
 }
@@ -127,10 +127,10 @@ bool CurlCurlSystem::element_time_derivative (bool request_jacobian,
   // Loop over quadrature points
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
-      RealGradient u;
-      RealGradient curl_u;
-      Real v;
-      RealGradient grad_v;
+      Gradient u;
+      Gradient curl_u;
+      Number v;
+      Gradient grad_v;
 
       c.interior_value(u_var, qp, u);
       c.interior_curl(u_var, qp, curl_u);
