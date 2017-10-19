@@ -115,8 +115,14 @@ public:
 
     Real tol = 1e-5;
     NumericVector<Number> & sys2_soln(*sys2.solution);
-    for (unsigned i = 0; i < sys2_soln.size(); i++)
+    for (unsigned i = 0; i < gold_vector.size(); i++)
+    {
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys2_soln(3*i)), gold_vector[i], tol);
+#else
       CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys2_soln(i)), gold_vector[i], tol);
+#endif // #ifdef LIBMESH_USE_COMPLEX_NUMBERS
+    }
 
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
   }
