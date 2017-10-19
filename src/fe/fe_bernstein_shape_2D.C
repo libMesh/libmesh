@@ -481,6 +481,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem * elem,
       // Bernstein shape functions on the 8-noded quadrilateral
       // is handled separately.
     case QUAD8:
+    case QUADSHELL8:
       {
         libmesh_assert_less (totalorder, 3);
 
