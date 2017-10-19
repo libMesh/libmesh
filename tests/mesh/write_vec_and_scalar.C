@@ -1,4 +1,4 @@
-#ifdef LIBMESH_HAVE_EXODUS_API
+#include "libmesh/exodusII_io.h"
 
 // Ignore unused parameter warnings coming from cppunit headers
 #include <libmesh/ignore_warnings.h>
@@ -8,7 +8,6 @@
 
 // Basic include files
 #include "libmesh/equation_systems.h"
-#include "libmesh/exodusII_io.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/string_to_enum.h"
@@ -19,6 +18,7 @@
 #include "libmesh/steady_solver.h"
 
 #include "mesh/curl_curl_system.h"
+#include "test_comm.h"
 
 // THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
 // std::auto_ptr, which in turn produces -Wdeprecated-declarations
@@ -45,13 +45,9 @@ public:
 
   CPPUNIT_TEST_SUITE_END();
 
-  testWrite()
+  void testWrite()
   {
-    LibMeshInit init();
-
-    // Create a mesh, with dimension to be overridden later, on the
-    // default MPI communicator.
-    Mesh mesh(init.comm());
+    Mesh mesh(*TestCommWorld);
 
     MeshTools::Generation::build_square(
         mesh, 2, 2, -1., 1., -1., 1., Utility::string_to_enum<ElemType>("TRI6"));
@@ -83,11 +79,13 @@ public:
 
     system.solve();
 
+#ifdef LIBMESH_HAVE_EXODUS_API
+
     // We write the file in the ExodusII format.
     ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
 
     // Now read it back in
-    Mesh read_mesh(init.comm());
+    Mesh read_mesh(*TestCommWorld);
     ExodusII_IO exio(read_mesh);
     exio.read("out.e");
     read_mesh.prepare_for_use();
@@ -118,10 +116,10 @@ public:
     Number tol = 1e-5;
     NumericVector<Number> & sys2_soln(*sys2.solution);
     for (unsigned i = 0; i < sys2_soln.size(); i++)
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(sys2(soln(i)), gold_vector[i], tol);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(sys2_soln(i), gold_vector[i], tol);
+
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
   }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(WriteVecAndScalar);
-
-#endif // #ifdef LIBMESH_HAVE_EXODUS_API
