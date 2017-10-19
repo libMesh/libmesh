@@ -81,6 +81,16 @@ public:
    */
   bool initialized () const { return _is_initialized; }
 
+  /**
+  * \returns \p true if we want to close the matrix before solve,
+  * false otherwise. It is true by default.
+  */
+  bool close_matrix_before_solve() const { return _close_matrix_before_solve; }
+
+  /**
+  * Set if or not to close the matrix before solve
+  */
+  void close_matrix_before_solve(bool close_matrix) { _close_matrix_before_solve = close_matrix; }
 
   /**
    * Release all memory and clear data structures.
@@ -269,6 +279,8 @@ protected:
   SolverConfiguration * _solver_configuration;
 
   Real _target_val;
+
+  bool _close_matrix_before_solve;
 };
 
 
@@ -283,7 +295,8 @@ EigenSolver<T>::EigenSolver (const Parallel::Communicator & comm_in) :
   _eigen_problem_type   (NHEP),
   _position_of_spectrum (LARGEST_MAGNITUDE),
   _is_initialized       (false),
-  _solver_configuration(libmesh_nullptr)
+  _solver_configuration(libmesh_nullptr),
+  _close_matrix_before_solve(true)
 {
 }
 
