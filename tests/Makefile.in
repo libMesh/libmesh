@@ -195,7 +195,7 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_vec_and_scalar.C \
-	mesh/curl_curl_system.C numerics/composite_function_test.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -248,7 +248,6 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-mesh_function_dfem.$(OBJEXT) \
 	mesh/unit_tests_dbg-write_vec_and_scalar.$(OBJEXT) \
-	mesh/unit_tests_dbg-curl_curl_system.$(OBJEXT) \
 	numerics/unit_tests_dbg-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-coupling_matrix_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-distributed_vector_test.$(OBJEXT) \
@@ -299,7 +298,7 @@ am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_vec_and_scalar.C \
-	mesh/curl_curl_system.C numerics/composite_function_test.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -351,7 +350,6 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	mesh/unit_tests_devel-mapped_subdomain_partitioner_test.$(OBJEXT) \
 	mesh/unit_tests_devel-mesh_function_dfem.$(OBJEXT) \
 	mesh/unit_tests_devel-write_vec_and_scalar.$(OBJEXT) \
-	mesh/unit_tests_devel-curl_curl_system.$(OBJEXT) \
 	numerics/unit_tests_devel-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_devel-coupling_matrix_test.$(OBJEXT) \
 	numerics/unit_tests_devel-distributed_vector_test.$(OBJEXT) \
@@ -399,7 +397,7 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_vec_and_scalar.C \
-	mesh/curl_curl_system.C numerics/composite_function_test.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -451,7 +449,6 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-mesh_function_dfem.$(OBJEXT) \
 	mesh/unit_tests_oprof-write_vec_and_scalar.$(OBJEXT) \
-	mesh/unit_tests_oprof-curl_curl_system.$(OBJEXT) \
 	numerics/unit_tests_oprof-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-coupling_matrix_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-distributed_vector_test.$(OBJEXT) \
@@ -499,7 +496,7 @@ am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_vec_and_scalar.C \
-	mesh/curl_curl_system.C numerics/composite_function_test.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -551,7 +548,6 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	mesh/unit_tests_opt-mapped_subdomain_partitioner_test.$(OBJEXT) \
 	mesh/unit_tests_opt-mesh_function_dfem.$(OBJEXT) \
 	mesh/unit_tests_opt-write_vec_and_scalar.$(OBJEXT) \
-	mesh/unit_tests_opt-curl_curl_system.$(OBJEXT) \
 	numerics/unit_tests_opt-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_opt-coupling_matrix_test.$(OBJEXT) \
 	numerics/unit_tests_opt-distributed_vector_test.$(OBJEXT) \
@@ -598,7 +594,7 @@ am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_vec_and_scalar.C \
-	mesh/curl_curl_system.C numerics/composite_function_test.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -650,7 +646,6 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	mesh/unit_tests_prof-mapped_subdomain_partitioner_test.$(OBJEXT) \
 	mesh/unit_tests_prof-mesh_function_dfem.$(OBJEXT) \
 	mesh/unit_tests_prof-write_vec_and_scalar.$(OBJEXT) \
-	mesh/unit_tests_prof-curl_curl_system.$(OBJEXT) \
 	numerics/unit_tests_prof-composite_function_test.$(OBJEXT) \
 	numerics/unit_tests_prof-coupling_matrix_test.$(OBJEXT) \
 	numerics/unit_tests_prof-distributed_vector_test.$(OBJEXT) \
@@ -1115,7 +1110,7 @@ unit_tests_sources = driver.C test_comm.h stream_redirector.h \
 	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_vec_and_scalar.C \
-	mesh/curl_curl_system.C numerics/composite_function_test.C \
+	numerics/composite_function_test.C \
 	numerics/coupling_matrix_test.C \
 	numerics/distributed_vector_test.C \
 	numerics/eigen_sparse_vector_test.C \
@@ -1298,8 +1293,6 @@ mesh/unit_tests_dbg-mesh_function_dfem.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-write_vec_and_scalar.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
-mesh/unit_tests_dbg-curl_curl_system.$(OBJEXT): mesh/$(am__dirstamp) \
-	mesh/$(DEPDIR)/$(am__dirstamp)
 numerics/$(am__dirstamp):
 	@$(MKDIR_P) numerics
 	@: > numerics/$(am__dirstamp)
@@ -1457,8 +1450,6 @@ mesh/unit_tests_devel-mesh_function_dfem.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-write_vec_and_scalar.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
-mesh/unit_tests_devel-curl_curl_system.$(OBJEXT):  \
-	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_devel-composite_function_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_devel-coupling_matrix_test.$(OBJEXT):  \
@@ -1573,8 +1564,6 @@ mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.$(OBJEXT):  \
 mesh/unit_tests_oprof-mesh_function_dfem.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-write_vec_and_scalar.$(OBJEXT):  \
-	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
-mesh/unit_tests_oprof-curl_curl_system.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_oprof-composite_function_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
@@ -1691,8 +1680,6 @@ mesh/unit_tests_opt-mesh_function_dfem.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-write_vec_and_scalar.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
-mesh/unit_tests_opt-curl_curl_system.$(OBJEXT): mesh/$(am__dirstamp) \
-	mesh/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_opt-composite_function_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_opt-coupling_matrix_test.$(OBJEXT):  \
@@ -1808,8 +1795,6 @@ mesh/unit_tests_prof-mesh_function_dfem.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-write_vec_and_scalar.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
-mesh/unit_tests_prof-curl_curl_system.$(OBJEXT): mesh/$(am__dirstamp) \
-	mesh/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_prof-composite_function_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_prof-coupling_matrix_test.$(OBJEXT):  \
@@ -1989,7 +1974,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-boundary_mesh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-checkpoint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-contains_point.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-curl_curl_system.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mapped_subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Po@am__quote@
@@ -2003,7 +1987,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-boundary_mesh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-checkpoint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-contains_point.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-curl_curl_system.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mapped_subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Po@am__quote@
@@ -2017,7 +2000,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-boundary_mesh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-checkpoint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-contains_point.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-curl_curl_system.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mapped_subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Po@am__quote@
@@ -2031,7 +2013,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-boundary_mesh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-checkpoint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-contains_point.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-curl_curl_system.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mapped_subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Po@am__quote@
@@ -2045,7 +2026,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-boundary_mesh.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-checkpoint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-contains_point.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-curl_curl_system.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mapped_subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Po@am__quote@
@@ -2650,20 +2630,6 @@ mesh/unit_tests_dbg-write_vec_and_scalar.obj: mesh/write_vec_and_scalar.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/write_vec_and_scalar.C' object='mesh/unit_tests_dbg-write_vec_and_scalar.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-write_vec_and_scalar.obj `if test -f 'mesh/write_vec_and_scalar.C'; then $(CYGPATH_W) 'mesh/write_vec_and_scalar.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_vec_and_scalar.C'; fi`
-
-mesh/unit_tests_dbg-curl_curl_system.o: mesh/curl_curl_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-curl_curl_system.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-curl_curl_system.Tpo -c -o mesh/unit_tests_dbg-curl_curl_system.o `test -f 'mesh/curl_curl_system.C' || echo '$(srcdir)/'`mesh/curl_curl_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-curl_curl_system.Tpo mesh/$(DEPDIR)/unit_tests_dbg-curl_curl_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/curl_curl_system.C' object='mesh/unit_tests_dbg-curl_curl_system.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-curl_curl_system.o `test -f 'mesh/curl_curl_system.C' || echo '$(srcdir)/'`mesh/curl_curl_system.C
-
-mesh/unit_tests_dbg-curl_curl_system.obj: mesh/curl_curl_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-curl_curl_system.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-curl_curl_system.Tpo -c -o mesh/unit_tests_dbg-curl_curl_system.obj `if test -f 'mesh/curl_curl_system.C'; then $(CYGPATH_W) 'mesh/curl_curl_system.C'; else $(CYGPATH_W) '$(srcdir)/mesh/curl_curl_system.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-curl_curl_system.Tpo mesh/$(DEPDIR)/unit_tests_dbg-curl_curl_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/curl_curl_system.C' object='mesh/unit_tests_dbg-curl_curl_system.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-curl_curl_system.obj `if test -f 'mesh/curl_curl_system.C'; then $(CYGPATH_W) 'mesh/curl_curl_system.C'; else $(CYGPATH_W) '$(srcdir)/mesh/curl_curl_system.C'; fi`
 
 numerics/unit_tests_dbg-composite_function_test.o: numerics/composite_function_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_dbg-composite_function_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_dbg-composite_function_test.Tpo -c -o numerics/unit_tests_dbg-composite_function_test.o `test -f 'numerics/composite_function_test.C' || echo '$(srcdir)/'`numerics/composite_function_test.C
@@ -3449,20 +3415,6 @@ mesh/unit_tests_devel-write_vec_and_scalar.obj: mesh/write_vec_and_scalar.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-write_vec_and_scalar.obj `if test -f 'mesh/write_vec_and_scalar.C'; then $(CYGPATH_W) 'mesh/write_vec_and_scalar.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_vec_and_scalar.C'; fi`
 
-mesh/unit_tests_devel-curl_curl_system.o: mesh/curl_curl_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-curl_curl_system.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-curl_curl_system.Tpo -c -o mesh/unit_tests_devel-curl_curl_system.o `test -f 'mesh/curl_curl_system.C' || echo '$(srcdir)/'`mesh/curl_curl_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-curl_curl_system.Tpo mesh/$(DEPDIR)/unit_tests_devel-curl_curl_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/curl_curl_system.C' object='mesh/unit_tests_devel-curl_curl_system.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-curl_curl_system.o `test -f 'mesh/curl_curl_system.C' || echo '$(srcdir)/'`mesh/curl_curl_system.C
-
-mesh/unit_tests_devel-curl_curl_system.obj: mesh/curl_curl_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-curl_curl_system.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-curl_curl_system.Tpo -c -o mesh/unit_tests_devel-curl_curl_system.obj `if test -f 'mesh/curl_curl_system.C'; then $(CYGPATH_W) 'mesh/curl_curl_system.C'; else $(CYGPATH_W) '$(srcdir)/mesh/curl_curl_system.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-curl_curl_system.Tpo mesh/$(DEPDIR)/unit_tests_devel-curl_curl_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/curl_curl_system.C' object='mesh/unit_tests_devel-curl_curl_system.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-curl_curl_system.obj `if test -f 'mesh/curl_curl_system.C'; then $(CYGPATH_W) 'mesh/curl_curl_system.C'; else $(CYGPATH_W) '$(srcdir)/mesh/curl_curl_system.C'; fi`
-
 numerics/unit_tests_devel-composite_function_test.o: numerics/composite_function_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_devel-composite_function_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_devel-composite_function_test.Tpo -c -o numerics/unit_tests_devel-composite_function_test.o `test -f 'numerics/composite_function_test.C' || echo '$(srcdir)/'`numerics/composite_function_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_devel-composite_function_test.Tpo numerics/$(DEPDIR)/unit_tests_devel-composite_function_test.Po
@@ -4246,20 +4198,6 @@ mesh/unit_tests_oprof-write_vec_and_scalar.obj: mesh/write_vec_and_scalar.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/write_vec_and_scalar.C' object='mesh/unit_tests_oprof-write_vec_and_scalar.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-write_vec_and_scalar.obj `if test -f 'mesh/write_vec_and_scalar.C'; then $(CYGPATH_W) 'mesh/write_vec_and_scalar.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_vec_and_scalar.C'; fi`
-
-mesh/unit_tests_oprof-curl_curl_system.o: mesh/curl_curl_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-curl_curl_system.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-curl_curl_system.Tpo -c -o mesh/unit_tests_oprof-curl_curl_system.o `test -f 'mesh/curl_curl_system.C' || echo '$(srcdir)/'`mesh/curl_curl_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-curl_curl_system.Tpo mesh/$(DEPDIR)/unit_tests_oprof-curl_curl_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/curl_curl_system.C' object='mesh/unit_tests_oprof-curl_curl_system.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-curl_curl_system.o `test -f 'mesh/curl_curl_system.C' || echo '$(srcdir)/'`mesh/curl_curl_system.C
-
-mesh/unit_tests_oprof-curl_curl_system.obj: mesh/curl_curl_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-curl_curl_system.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-curl_curl_system.Tpo -c -o mesh/unit_tests_oprof-curl_curl_system.obj `if test -f 'mesh/curl_curl_system.C'; then $(CYGPATH_W) 'mesh/curl_curl_system.C'; else $(CYGPATH_W) '$(srcdir)/mesh/curl_curl_system.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-curl_curl_system.Tpo mesh/$(DEPDIR)/unit_tests_oprof-curl_curl_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/curl_curl_system.C' object='mesh/unit_tests_oprof-curl_curl_system.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-curl_curl_system.obj `if test -f 'mesh/curl_curl_system.C'; then $(CYGPATH_W) 'mesh/curl_curl_system.C'; else $(CYGPATH_W) '$(srcdir)/mesh/curl_curl_system.C'; fi`
 
 numerics/unit_tests_oprof-composite_function_test.o: numerics/composite_function_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_oprof-composite_function_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_oprof-composite_function_test.Tpo -c -o numerics/unit_tests_oprof-composite_function_test.o `test -f 'numerics/composite_function_test.C' || echo '$(srcdir)/'`numerics/composite_function_test.C
@@ -5045,20 +4983,6 @@ mesh/unit_tests_opt-write_vec_and_scalar.obj: mesh/write_vec_and_scalar.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-write_vec_and_scalar.obj `if test -f 'mesh/write_vec_and_scalar.C'; then $(CYGPATH_W) 'mesh/write_vec_and_scalar.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_vec_and_scalar.C'; fi`
 
-mesh/unit_tests_opt-curl_curl_system.o: mesh/curl_curl_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-curl_curl_system.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-curl_curl_system.Tpo -c -o mesh/unit_tests_opt-curl_curl_system.o `test -f 'mesh/curl_curl_system.C' || echo '$(srcdir)/'`mesh/curl_curl_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-curl_curl_system.Tpo mesh/$(DEPDIR)/unit_tests_opt-curl_curl_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/curl_curl_system.C' object='mesh/unit_tests_opt-curl_curl_system.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-curl_curl_system.o `test -f 'mesh/curl_curl_system.C' || echo '$(srcdir)/'`mesh/curl_curl_system.C
-
-mesh/unit_tests_opt-curl_curl_system.obj: mesh/curl_curl_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-curl_curl_system.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-curl_curl_system.Tpo -c -o mesh/unit_tests_opt-curl_curl_system.obj `if test -f 'mesh/curl_curl_system.C'; then $(CYGPATH_W) 'mesh/curl_curl_system.C'; else $(CYGPATH_W) '$(srcdir)/mesh/curl_curl_system.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-curl_curl_system.Tpo mesh/$(DEPDIR)/unit_tests_opt-curl_curl_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/curl_curl_system.C' object='mesh/unit_tests_opt-curl_curl_system.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-curl_curl_system.obj `if test -f 'mesh/curl_curl_system.C'; then $(CYGPATH_W) 'mesh/curl_curl_system.C'; else $(CYGPATH_W) '$(srcdir)/mesh/curl_curl_system.C'; fi`
-
 numerics/unit_tests_opt-composite_function_test.o: numerics/composite_function_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_opt-composite_function_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_opt-composite_function_test.Tpo -c -o numerics/unit_tests_opt-composite_function_test.o `test -f 'numerics/composite_function_test.C' || echo '$(srcdir)/'`numerics/composite_function_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_opt-composite_function_test.Tpo numerics/$(DEPDIR)/unit_tests_opt-composite_function_test.Po
@@ -5842,20 +5766,6 @@ mesh/unit_tests_prof-write_vec_and_scalar.obj: mesh/write_vec_and_scalar.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/write_vec_and_scalar.C' object='mesh/unit_tests_prof-write_vec_and_scalar.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-write_vec_and_scalar.obj `if test -f 'mesh/write_vec_and_scalar.C'; then $(CYGPATH_W) 'mesh/write_vec_and_scalar.C'; else $(CYGPATH_W) '$(srcdir)/mesh/write_vec_and_scalar.C'; fi`
-
-mesh/unit_tests_prof-curl_curl_system.o: mesh/curl_curl_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-curl_curl_system.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-curl_curl_system.Tpo -c -o mesh/unit_tests_prof-curl_curl_system.o `test -f 'mesh/curl_curl_system.C' || echo '$(srcdir)/'`mesh/curl_curl_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-curl_curl_system.Tpo mesh/$(DEPDIR)/unit_tests_prof-curl_curl_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/curl_curl_system.C' object='mesh/unit_tests_prof-curl_curl_system.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-curl_curl_system.o `test -f 'mesh/curl_curl_system.C' || echo '$(srcdir)/'`mesh/curl_curl_system.C
-
-mesh/unit_tests_prof-curl_curl_system.obj: mesh/curl_curl_system.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-curl_curl_system.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-curl_curl_system.Tpo -c -o mesh/unit_tests_prof-curl_curl_system.obj `if test -f 'mesh/curl_curl_system.C'; then $(CYGPATH_W) 'mesh/curl_curl_system.C'; else $(CYGPATH_W) '$(srcdir)/mesh/curl_curl_system.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-curl_curl_system.Tpo mesh/$(DEPDIR)/unit_tests_prof-curl_curl_system.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/curl_curl_system.C' object='mesh/unit_tests_prof-curl_curl_system.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-curl_curl_system.obj `if test -f 'mesh/curl_curl_system.C'; then $(CYGPATH_W) 'mesh/curl_curl_system.C'; else $(CYGPATH_W) '$(srcdir)/mesh/curl_curl_system.C'; fi`
 
 numerics/unit_tests_prof-composite_function_test.o: numerics/composite_function_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_prof-composite_function_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_prof-composite_function_test.Tpo -c -o numerics/unit_tests_prof-composite_function_test.o `test -f 'numerics/composite_function_test.C' || echo '$(srcdir)/'`numerics/composite_function_test.C
