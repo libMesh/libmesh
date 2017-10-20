@@ -46,6 +46,7 @@ unit_tests_sources = \
   mesh/spatial_dimension_test.C \
   mesh/mapped_subdomain_partitioner_test.C \
   mesh/mesh_function_dfem.C \
+  mesh/write_vec_and_scalar.C \
   numerics/composite_function_test.C \
   numerics/coupling_matrix_test.C \
   numerics/distributed_vector_test.C \
