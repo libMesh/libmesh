@@ -17,7 +17,6 @@
 #include "libmesh/diff_solver.h"
 #include "libmesh/steady_solver.h"
 
-#include "mesh/curl_curl_system.h"
 #include "test_comm.h"
 
 // THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
@@ -55,29 +54,42 @@ public:
     // Create an equation systems object.
     EquationSystems equation_systems(mesh);
 
-    // Declare the system "Navier-Stokes" and its variables.
-    CurlCurlSystem & system = equation_systems.add_system<CurlCurlSystem>("CurlCurl");
-
-    // This example only implements the steady-state problem
-    system.time_solver = UniquePtr<TimeSolver>(new SteadySolver(system));
+    ExplicitSystem & system = equation_systems.add_system<ExplicitSystem>("Tester");
+    system.add_variable("u", FIRST, NEDELEC_ONE);
+    system.add_variable("v", FIRST, LAGRANGE);
 
     // Initialize the system
     equation_systems.init();
 
-    // And the nonlinear solver options
-    DiffSolver & solver = *(system.time_solver->diff_solver().get());
-    solver.quiet = true;
-    solver.verbose = !solver.quiet;
-    solver.max_nonlinear_iterations = 15;
-    solver.relative_step_tolerance = 1.e-3;
-    solver.relative_residual_tolerance = 1.0e-13;
-    solver.absolute_residual_tolerance = 0.0;
+    std::vector<Real> gold_solution({0.000000000010418385555305976,
+                                     0.1743561867338195,
+                                     -0.041899936369794721,
+                                     -0.19643153680419781,
+                                     -0.0000000000067936995445650305,
+                                     -0.000000000010194851982520449,
+                                     -0.000000000010194851982520419,
+                                     0.20284410873063882,
+                                     0.19643153680181882,
+                                     -0.17435618673478825,
+                                     -0.13942148221042558,
+                                     0.0000000000087210975169893594,
+                                     0.0000000000065418642410839133,
+                                     0.000000000010446687286090026,
+                                     -0.021522690153508699,
+                                     -0.0000000000089446310895455743,
+                                     0,
+                                     0,
+                                     0.25000000000000006,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0});
 
-    // And the linear solver options
-    solver.max_linear_iterations = 50000;
-    solver.initial_linear_tolerance = 1.e-10;
-
-    system.solve();
+    NumericVector<Number> & sys_solution = *(system.solution);
+    for (unsigned i = 0; i < gold_solution.size(); i++)
+      sys_solution.set(i, gold_solution[i]);
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
@@ -118,7 +130,7 @@ public:
     for (unsigned i = 0; i < gold_vector.size(); i++)
     {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys2_soln(3*i)), gold_vector[i], tol);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys2_soln(3 * i)), gold_vector[i], tol);
 #else
       CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys2_soln(i)), gold_vector[i], tol);
 #endif // #ifdef LIBMESH_USE_COMPLEX_NUMBERS
