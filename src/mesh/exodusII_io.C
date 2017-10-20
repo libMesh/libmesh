@@ -493,7 +493,7 @@ void ExodusII_IO::copy_elemental_solution(System & system,
                                           std::string exodus_var_name,
                                           unsigned int timestep)
 {
-  if(system.comm().rank() == 0)
+  if (system.comm().rank() == 0)
     {
       if (!exio_helper->opened_for_reading)
         libmesh_error_msg("ERROR, ExodusII file must be opened for reading before copying an elemental solution!");
