@@ -493,36 +493,36 @@ void ExodusII_IO::copy_elemental_solution(System & system,
                                           std::string exodus_var_name,
                                           unsigned int timestep)
 {
-  if (!exio_helper->opened_for_reading)
-    libmesh_error_msg("ERROR, ExodusII file must be opened for reading before copying an elemental solution!");
-
-  // Map from element ID to elemental variable value.  We need to use
-  // a map here rather than a vector (e.g. elem_var_values) since the
-  // libmesh element numbering can contain "holes".  This is the case
-  // if we are reading elemental var values from an adaptively refined
-  // mesh that has not been sequentially renumbered.
-  std::map<dof_id_type, Real> elem_var_value_map;
-  exio_helper->read_elemental_var_values(exodus_var_name, timestep, elem_var_value_map);
-
-  const unsigned int var_num = system.variable_number(system_var_name);
-  if (system.variable_type(var_num) != FEType(CONSTANT, MONOMIAL))
-    libmesh_error_msg("Error! Trying to copy elemental solution into a variable that is not of CONSTANT MONOMIAL type.");
-
-  std::map<dof_id_type, Real>::iterator
-    it = elem_var_value_map.begin(),
-    end = elem_var_value_map.end();
-
-  for (; it!=end; ++it)
+  if (system.comm().rank() == 0)
     {
-      const Elem * elem = MeshInput<MeshBase>::mesh().query_elem_ptr(it->first);
+      if (!exio_helper->opened_for_reading)
+        libmesh_error_msg("ERROR, ExodusII file must be opened for reading before copying an elemental solution!");
 
-      if (elem && elem->n_comp(system.number(), var_num) > 0)
+      // Map from element ID to elemental variable value.  We need to use
+      // a map here rather than a vector (e.g. elem_var_values) since the
+      // libmesh element numbering can contain "holes".  This is the case
+      // if we are reading elemental var values from an adaptively refined
+      // mesh that has not been sequentially renumbered.
+      std::map<dof_id_type, Real> elem_var_value_map;
+      exio_helper->read_elemental_var_values(exodus_var_name, timestep, elem_var_value_map);
+
+      const unsigned int var_num = system.variable_number(system_var_name);
+      if (system.variable_type(var_num) != FEType(CONSTANT, MONOMIAL))
+        libmesh_error_msg("Error! Trying to copy elemental solution into a variable that is not of CONSTANT MONOMIAL type.");
+
+      std::map<dof_id_type, Real>::iterator
+        it = elem_var_value_map.begin(),
+        end = elem_var_value_map.end();
+
+      for (; it!=end; ++it)
         {
-          dof_id_type dof_index = elem->dof_number(system.number(), var_num, 0);
+          const Elem * elem = MeshInput<MeshBase>::mesh().query_elem_ptr(it->first);
 
-          // If the dof_index is local to this processor, set the value
-          if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
-            system.solution->set (dof_index, it->second);
+          if (elem && elem->n_comp(system.number(), var_num) > 0)
+            {
+              dof_id_type dof_index = elem->dof_number(system.number(), var_num, 0);
+              system.solution->set (dof_index, it->second);
+            }
         }
     }
 
