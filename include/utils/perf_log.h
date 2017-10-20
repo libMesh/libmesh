@@ -166,24 +166,61 @@ public:
 
   /**
    * Push the event \p label onto the stack, pausing any active event.
+   *
+   * Note - for speed the PerfLog directly considers the *pointers*
+   * here.  Supply pointers to string literals or other character
+   * arrays whose lifetime will exceed the lifetime of the PerfLog
+   * object, not to temporarily allocated arrays.
+   */
+  void fast_push (const char * label,
+                  const char * header="");
+
+  /**
+   * Push the event \p label onto the stack, pausing any active event.
+   *
+   * This method will eventually be deprecated.  For backwards
+   * compatibility, the PerfLog must copy the contents of these
+   * character arrays into strings, which ironically damages the
+   * performance we are trying to profile.  Use fast_push() (with
+   * compatible long-lived character array data) instead.
    */
   void push (const char * label,
              const char * header="");
 
   /**
    * Push the event \p label onto the stack, pausing any active event.
+   *
+   * This method will eventually be deprecated.  String manipulation
+   * is too low performance to use when performance monitoring hot
+   * spots.  Use fast_push() instead.
    */
   void push (const std::string & label,
              const std::string & header="");
 
   /**
    * Pop the event \p label off the stack, resuming any lower event.
+   *
+   * This method must be passed the exact same pointers as were passed
+   * to fast_push, not merely pointers to identical strings.
+   */
+  void fast_pop (const char * label,
+                 const char * header="");
+
+  /**
+   * Pop the event \p label off the stack, resuming any lower event.
+   *
+   * This method will eventually be deprecated.  Use fast_pop() (with
+   * the exact same pointers supplied to fast_push()) instead.
    */
   void pop (const char * label,
             const char * header="");
 
   /**
    * Pop the event \p label off the stack, resuming any lower event.
+   *
+   * This method will eventually be deprecated.  String manipulation
+   * is too low performance to use when performance monitoring hot
+   * spots.  Use fast_pop() instead.
    */
   void pop (const std::string & label,
             const std::string & header="");
@@ -251,8 +288,19 @@ public:
 
   /**
    * \returns the raw underlying data structure for the entire performance log.
+   *
+   * \deprecated because encapsulation is good.
+   *
+   * Also probably broken by the switch from string to const char *,
+   * though users who are liberal with "auto" might be safe.
    */
-  const std::map < std::pair<std::string, std::string>, PerfData > & get_log_raw() const { return log; }
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  const std::map < std::pair<const char *, const char *>, PerfData > & get_log_raw() const
+  {
+    libmesh_deprecated();
+    return log;
+  }
+#endif
 
 private:
 
@@ -280,8 +328,8 @@ private:
   /**
    * The actual log.
    */
-  std::map<std::pair<std::string,
-                     std::string>,
+  std::map<std::pair<const char *,
+                     const char *>,
            PerfData> log;
 
   /**
@@ -302,6 +350,16 @@ private:
    */
   void split_on_whitespace(const std::string & input,
                            std::vector<std::string> & output) const;
+
+  /**
+   * Workaround to give us fixed pointers to character arrays for
+   * every string.  Using std::set instead might work: it won't
+   * invalidate iterators, which I *think* means it doesn't have any
+   * reason to modify or copy their contents or otherwise invalidate
+   * their c_str() pointers... but I can't prove it from the standards
+   * doc, so let's be safe.
+   */
+  std::map<std::string, const char *> non_temporary_strings;
 };
 
 
@@ -378,8 +436,8 @@ double PerfData::stopit ()
 // ------------------------------------------------------------
 // PerfLog class inline member functions
 inline
-void PerfLog::push (const std::string & label,
-                    const std::string & header)
+void PerfLog::fast_push (const char * label,
+                         const char * header)
 {
   if (this->log_events)
     {
@@ -399,18 +457,8 @@ void PerfLog::push (const std::string & label,
 
 
 inline
-void PerfLog::push (const char * label,
-                    const char * header)
-{
-  if (this->log_events)
-    this->push(std::string(label), std::string(header));
-}
-
-
-
-inline
-void PerfLog::pop (const std::string & libmesh_dbg_var(label),
-                   const std::string & libmesh_dbg_var(header))
+void PerfLog::fast_pop(const char * libmesh_dbg_var(label),
+                       const char * libmesh_dbg_var(header))
 {
   if (this->log_events)
     {
@@ -422,11 +470,9 @@ void PerfLog::pop (const std::string & libmesh_dbg_var(label),
         {
           libMesh::err << "PerfLog can't pop (" << header << ',' << label << ')' << std::endl;
           libMesh::err << "From top of stack of running logs:" << std::endl;
-          std::map<std::pair<std::string, std::string>, PerfData>::iterator
-            i = log.begin(), endi = log.end();
-          for (; i != endi; ++i)
-            if (&(i->second) == log_stack.top())
-              libMesh::err << '(' << i->first.first << ',' << i->first.second << ')' << std::endl;
+          for (auto i : log)
+            if (&(i.second) == log_stack.top())
+              libMesh::err << '(' << i.first.first << ',' << i.first.second << ')' << std::endl;
 
           libmesh_assert_equal_to (perf_data, log_stack.top());
         }
@@ -439,16 +485,6 @@ void PerfLog::pop (const std::string & libmesh_dbg_var(label),
       if (!log_stack.empty())
         log_stack.top()->restart();
     }
-}
-
-
-
-inline
-void PerfLog::pop(const char * label,
-                  const char * header)
-{
-  if (this->log_events)
-    this->pop(std::string(label), std::string(header));
 }
 
 
