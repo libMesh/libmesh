@@ -82,15 +82,14 @@ public:
   bool initialized () const { return _is_initialized; }
 
   /**
-  * \returns \p true if we want to close the matrix before solve,
-  * false otherwise. It is true by default.
-  */
-  bool close_matrix_before_solve() const { return _close_matrix_before_solve; }
-
-  /**
-  * Set if or not to close the matrix before solve
-  */
-  void close_matrix_before_solve(bool close_matrix) { _close_matrix_before_solve = close_matrix; }
+   * \returns \p true if we want to close the matrix before solve,
+   * false otherwise. It is true by default.
+   */
+  bool & close_matrix_before_solve()
+  {
+    libmesh_experimental();
+    return _close_matrix_before_solve;
+  }
 
   /**
    * Release all memory and clear data structures.
