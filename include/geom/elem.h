@@ -34,6 +34,7 @@
 #include "libmesh/auto_ptr.h"
 #include "libmesh/multi_predicates.h"
 #include "libmesh/pointer_to_pointer_iter.h"
+#include "libmesh/int_range.h"
 #include "libmesh/simple_range.h"
 #include "libmesh/variant_filter_iterator.h"
 #include "libmesh/hashword.h" // Used in compute_key() functions
@@ -190,6 +191,23 @@ public:
    * \returns The pointer to local \p Node \p i as a writable reference.
    */
   virtual Node * & set_node (const unsigned int i);
+
+  /**
+   * Nested classes for use iterating over all nodes of an element.
+   */
+  class NodeRefIter;
+  class ConstNodeRefIter;
+
+  /**
+   * Returns a range with all nodes of an element, usable in
+   * range-based for loops.  The exact type of the return value here
+   * may be subject to change in future libMesh releases, but the
+   * iterators will always dereference to produce a reference to a
+   * Node.
+   */
+  SimpleRange<NodeRefIter> node_ref_range();
+
+  SimpleRange<ConstNodeRefIter> node_ref_range() const;
 
   /**
    * \returns The subdomain that this element belongs to.
@@ -551,6 +569,12 @@ public:
   virtual unsigned int n_nodes () const = 0;
 
   /**
+   * \returns An integer range from 0 up to (but not including)
+   * the number of nodes this element contains.
+   */
+  IntRange<unsigned short> node_index_range () const;
+
+  /**
    * \returns The number of nodes the given child of this element
    * contains.  Except in odd cases like pyramid refinement this will
    * be the same as the number of nodes in the parent element.
@@ -572,14 +596,21 @@ public:
   virtual unsigned int n_sides () const = 0;
 
   /**
+   * \returns An integer range from 0 up to (but not including)
+   * the number of sides this element has.
+   */
+  IntRange<unsigned short> side_index_range () const;
+
+  /**
    * \returns The number of neighbors the element that has been derived
    * from this class has.
    *
-   * By default, only face (or edge in 2D) neighbors are stored, so
-   * this method returns n_sides(), however it may be overridden in a
-   * derived class.
+   * Only face (or edge in 2D) neighbors are stored, so this method
+   * returns n_sides().  At one point we intended to allow derived
+   * classes to override this, but too much current libMesh code
+   * assumes n_neighbors==n_sides.
    */
-  virtual unsigned int n_neighbors () const
+  unsigned int n_neighbors () const
   { return this->n_sides(); }
 
   /**
@@ -593,6 +624,12 @@ public:
    * from this class has.
    */
   virtual unsigned int n_edges () const = 0;
+
+  /**
+   * \returns An integer range from 0 up to (but not including)
+   * the number of edges this element has.
+   */
+  IntRange<unsigned short> edge_index_range () const;
 
   /**
    * This array maps the integer representation of the \p ElemType enum
@@ -1624,6 +1661,22 @@ protected:
 
 // ------------------------------------------------------------
 // Elem helper classes
+//
+class
+Elem::NodeRefIter : public PointerToPointerIter<Node>
+{
+public:
+  NodeRefIter (Node * const * nodepp) : PointerToPointerIter<Node>(nodepp) {}
+};
+
+
+class
+Elem::ConstNodeRefIter : public PointerToPointerIter<const Node>
+{
+public:
+  ConstNodeRefIter (const Node * const * nodepp) : PointerToPointerIter<const Node>(nodepp) {}
+};
+
 
 #ifdef LIBMESH_ENABLE_AMR
 class
@@ -1956,8 +2009,8 @@ void Elem::set_neighbor (const unsigned int i, Elem * n)
 inline
 bool Elem::has_neighbor (const Elem * elem) const
 {
-  for (unsigned int n=0; n<this->n_neighbors(); n++)
-    if (this->neighbor_ptr(n) == elem)
+  for (auto n : this->neighbor_ptr_range())
+    if (n == elem)
       return true;
 
   return false;
@@ -1968,10 +2021,9 @@ bool Elem::has_neighbor (const Elem * elem) const
 inline
 Elem * Elem::child_neighbor (Elem * elem)
 {
-  for (unsigned int n=0; n<elem->n_neighbors(); n++)
-    if (elem->neighbor_ptr(n) &&
-        elem->neighbor_ptr(n)->parent() == this)
-      return elem->neighbor_ptr(n);
+  for (auto n : elem->neighbor_ptr_range())
+    if (n && n->parent() == this)
+      return n;
 
   return libmesh_nullptr;
 }
@@ -1981,13 +2033,58 @@ Elem * Elem::child_neighbor (Elem * elem)
 inline
 const Elem * Elem::child_neighbor (const Elem * elem) const
 {
-  for (unsigned int n=0; n<elem->n_neighbors(); n++)
-    if (elem->neighbor_ptr(n) &&
-        elem->neighbor_ptr(n)->parent() == this)
-      return elem->neighbor_ptr(n);
+  for (auto n : elem->neighbor_ptr_range())
+    if (n && n->parent() == this)
+      return n;
 
   return libmesh_nullptr;
 }
+
+
+
+inline
+SimpleRange<Elem::NodeRefIter>
+Elem::node_ref_range()
+{
+  return {_nodes, _nodes+this->n_nodes()};
+}
+
+
+
+inline
+SimpleRange<Elem::ConstNodeRefIter>
+Elem::node_ref_range() const
+{
+  return {_nodes, _nodes+this->n_nodes()};
+}
+
+
+
+inline
+IntRange<unsigned short>
+Elem::node_index_range() const
+{
+  return {0, cast_int<unsigned short>(this->n_nodes())};
+}
+
+
+
+inline
+IntRange<unsigned short>
+Elem::edge_index_range() const
+{
+  return {0, cast_int<unsigned short>(this->n_edges())};
+}
+
+
+
+inline
+IntRange<unsigned short>
+Elem::side_index_range() const
+{
+  return {0, cast_int<unsigned short>(this->n_sides())};
+}
+
 
 
 
@@ -2093,7 +2190,7 @@ unsigned int Elem::which_neighbor_am_i (const Elem * e) const
       libmesh_assert(eparent);
     }
 
-  for (unsigned int s=0; s<this->n_neighbors(); s++)
+  for (unsigned int s=0, n_s = this->n_sides(); s != n_s; ++s)
     if (this->neighbor_ptr(s) == eparent)
       return s;
 

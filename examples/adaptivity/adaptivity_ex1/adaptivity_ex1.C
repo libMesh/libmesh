@@ -304,7 +304,7 @@ void assemble_1D(EquationSystems & es,
       // Loop over the sides of this element. For a 1D element, the "sides"
       // are defined as the nodes on each edge of the element, i.e. 1D elements
       // have 2 sides.
-      for (unsigned int s=0; s<elem->n_sides(); s++)
+      for (auto s : elem->side_index_range())
         {
           // If this element has a NULL neighbor, then it is on the edge of the
           // mesh and we need to enforce a boundary condition using the penalty

@@ -114,7 +114,7 @@ int main (int argc, char ** argv)
       bool
         found_side_max_x = false, found_side_max_y = false,
         found_side_min_y = false, found_side_max_z = false;
-      for (unsigned int side=0; side<elem->n_sides(); side++)
+      for (auto side : elem->side_index_range())
         {
           if (mesh.get_boundary_info().has_boundary_id(elem, side, BOUNDARY_ID_MAX_X))
             {
@@ -145,7 +145,7 @@ int main (int argc, char ** argv)
       // BOUNDARY_ID_MAX_X, BOUNDARY_ID_MAX_Y, BOUNDARY_ID_MAX_Z
       // then let's set a node boundary condition
       if (found_side_max_x && found_side_max_y && found_side_max_z)
-        for (unsigned int n=0; n<elem->n_nodes(); n++)
+        for (auto n : elem->node_index_range())
           if (elem->is_node_on_side(n, side_max_x) &&
               elem->is_node_on_side(n, side_max_y) &&
               elem->is_node_on_side(n, side_max_z))
@@ -155,7 +155,7 @@ int main (int argc, char ** argv)
       // BOUNDARY_ID_MAX_X and BOUNDARY_ID_MIN_Y
       // then let's set an edge boundary condition
       if (found_side_max_x && found_side_min_y)
-        for (unsigned int e=0; e<elem->n_edges(); e++)
+        for (auto e : elem->edge_index_range())
           if (elem->is_edge_on_side(e, side_max_x) &&
               elem->is_edge_on_side(e, side_min_y))
             mesh.get_boundary_info().add_edge(elem, e, EDGE_BOUNDARY_ID);

@@ -434,21 +434,25 @@ private:
         if (f_system && context.get())
           context->pre_fe_reinit(*f_system, elem);
 
+        const unsigned short n_sides = elem->n_sides();
+        const unsigned short n_edges = elem->n_edges();
+        const unsigned short n_nodes = elem->n_nodes();
+
         // Find out which nodes, edges, sides and shellfaces are on a requested
         // boundary:
-        std::vector<bool> is_boundary_node(elem->n_nodes(), false),
-          is_boundary_edge(elem->n_edges(), false),
-          is_boundary_side(elem->n_sides(), false),
+        std::vector<bool> is_boundary_node(n_nodes, false),
+          is_boundary_edge(n_edges, false),
+          is_boundary_side(n_sides, false),
           is_boundary_shellface(2, false);
 
         // We also maintain a separate list of nodeset-based boundary nodes
-        std::vector<bool> is_boundary_nodeset(elem->n_nodes(), false);
+        std::vector<bool> is_boundary_nodeset(n_nodes, false);
 
         // Container to catch boundary ids handed back for sides,
         // nodes, and edges in the loops below.
         std::vector<boundary_id_type> ids_vec;
 
-        for (unsigned char s=0; s != elem->n_sides(); ++s)
+        for (unsigned char s = 0; s != n_sides; ++s)
           {
             // First see if this side has been requested
             boundary_info.boundary_ids (elem, s, ids_vec);
@@ -467,17 +471,17 @@ private:
             is_boundary_side[s] = true;
 
             // Then see what nodes and what edges are on it
-            for (unsigned int n=0; n != elem->n_nodes(); ++n)
+            for (unsigned int n = 0; n != n_nodes; ++n)
               if (elem->is_node_on_side(n,s))
                 is_boundary_node[n] = true;
-            for (unsigned int e=0; e != elem->n_edges(); ++e)
+            for (unsigned int e = 0; e != n_edges; ++e)
               if (elem->is_edge_on_side(e,s))
                 is_boundary_edge[e] = true;
           }
 
         // We can also impose Dirichlet boundary conditions on nodes, so we should
         // also independently check whether the nodes have been requested
-        for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        for (unsigned int n=0; n != n_nodes; ++n)
           {
             boundary_info.boundary_ids (elem->node_ptr(n), ids_vec);
 
@@ -492,7 +496,7 @@ private:
 
         // We can also impose Dirichlet boundary conditions on edges, so we should
         // also independently check whether the edges have been requested
-        for (unsigned short e=0; e != elem->n_edges(); ++e)
+        for (unsigned short e=0; e != n_edges; ++e)
           {
             boundary_info.edge_boundary_ids (elem, e, ids_vec);
 
@@ -528,9 +532,6 @@ private:
 
         // The element type
         const ElemType elem_type = elem->type();
-
-        // The number of nodes on the new element
-        const unsigned int n_nodes = elem->n_nodes();
 
         // Zero the interpolated values
         Ue.resize (n_dofs); Ue.zero();
@@ -706,7 +707,7 @@ private:
 
         // In 3D, project any edge values next
         if (dim > 2 && cont != DISCONTINUOUS)
-          for (unsigned int e=0; e != elem->n_edges(); ++e)
+          for (unsigned int e=0; e != n_edges; ++e)
             {
               if (!is_boundary_edge[e])
                 continue;
@@ -826,7 +827,7 @@ private:
 
         // Project any side values (edges in 2D, faces in 3D)
         if (dim > 1 && cont != DISCONTINUOUS)
-          for (unsigned int s=0; s != elem->n_sides(); ++s)
+          for (unsigned int s=0; s != n_sides; ++s)
             {
               if (!is_boundary_side[s])
                 continue;
@@ -2663,6 +2664,8 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
       {
         const Elem * elem = *foreign_elem_it;
 
+        const unsigned short n_nodes = elem->n_nodes();
+
         // Just checking dof_indices on the foreign element isn't
         // enough.  Consider a central hanging node between a coarse
         // Q2/Q1 element and its finer neighbors on a higher-ranked
@@ -2688,7 +2691,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
             }
         }
 
-        for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        for (unsigned short n = 0; n != n_nodes; ++n)
           {
             const Node & node = elem->node_ref(n);
             const unsigned int n_vars = node.n_vars(sys_num);
@@ -2706,7 +2709,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
           }
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-        for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        for (unsigned short n = 0; n != n_nodes; ++n)
           if (this->is_constrained_node(elem->node_ptr(n)))
             pushed_node_ids[elem->processor_id()].insert(elem->node_id(n));
 #endif

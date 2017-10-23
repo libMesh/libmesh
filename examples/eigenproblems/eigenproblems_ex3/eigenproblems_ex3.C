@@ -168,7 +168,7 @@ int main (int argc, char ** argv)
       {
         const Elem * elem = *el;
 
-        for (unsigned int side=0; side<elem->n_sides(); side++)
+        for (auto side : elem->side_index_range())
           if (elem->neighbor_ptr (side) == NULL)
             mesh.get_boundary_info().add_side(elem, side, BOUNDARY_ID);
       }

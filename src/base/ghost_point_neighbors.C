@@ -67,9 +67,8 @@ void GhostPointNeighbors::operator()
       if (elem->processor_id() != p)
         coupled_elements.insert (std::make_pair(elem,nullcm));
 
-      for (unsigned int s=0; s != elem->n_sides(); ++s)
+      for (auto neigh : elem->neighbor_ptr_range())
         {
-          const Elem * neigh = elem->neighbor_ptr(s);
           if (neigh && neigh != remote_elem)
             {
 #ifdef LIBMESH_ENABLE_AMR
@@ -105,7 +104,7 @@ void GhostPointNeighbors::operator()
         interior_parents.insert (elem->interior_parent());
 
       // Add nodes connected to active local elements
-      for (unsigned int n=0; n<elem->n_nodes(); n++)
+      for (auto n : elem->node_index_range())
         connected_nodes.insert (elem->node_ptr(n));
     }
 
@@ -142,8 +141,8 @@ void GhostPointNeighbors::operator()
 
         // Add elements connected to nodes on active local elements
         if (elem->processor_id() != p)
-          for (unsigned int n=0; n<elem->n_nodes(); n++)
-            if (connected_nodes.count(elem->node_ptr(n)))
+          for (auto & n : elem->node_ref_range())
+            if (connected_nodes.count(&n))
               coupled_elements.insert
                 (std::make_pair(elem, nullcm));
       }

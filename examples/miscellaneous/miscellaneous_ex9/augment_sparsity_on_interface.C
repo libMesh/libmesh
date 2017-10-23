@@ -42,7 +42,7 @@ void AugmentSparsityOnInterface::mesh_reinit ()
       const Elem * elem = *el;
 
       {
-        for (unsigned char side=0; side<elem->n_sides(); side++)
+        for (auto side : elem->side_index_range())
           if (elem->neighbor_ptr(side) == libmesh_nullptr)
             {
               if (_mesh.get_boundary_info().has_boundary_id(elem, side, _crack_boundary_lower))
@@ -51,13 +51,7 @@ void AugmentSparsityOnInterface::mesh_reinit ()
 
                   lower_centroids[std::make_pair(elem, side)] = side_elem->centroid();
                 }
-            }
-      }
 
-      {
-        for (unsigned char side=0; side<elem->n_sides(); side++)
-          if (elem->neighbor_ptr(side) == libmesh_nullptr)
-            {
               if (_mesh.get_boundary_info().has_boundary_id(elem, side, _crack_boundary_upper))
                 {
                   UniquePtr<const Elem> side_elem = elem->build_side_ptr(side);
@@ -163,7 +157,7 @@ void AugmentSparsityOnInterface::operator()
       if (elem->processor_id() != p)
         coupled_elements.insert (std::make_pair(elem, null_mat));
 
-      for (unsigned int side=0; side<elem->n_sides(); side++)
+      for (auto side : elem->side_index_range())
         if (elem->neighbor_ptr(side) == libmesh_nullptr)
           {
             ElementSideMap::const_iterator ltu_it =

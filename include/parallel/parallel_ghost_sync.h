@@ -572,7 +572,7 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
               proc_id == DofObject::invalid_processor_id)
             continue;
 
-          for (unsigned int n=0; n != elem->n_nodes(); ++n)
+          for (auto n : elem->node_index_range())
             {
               if (!node_check(elem, n))
                 continue;
@@ -619,7 +619,7 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
 
           const dof_id_type elem_id = elem->id();
 
-          for (unsigned int n=0; n != elem->n_nodes(); ++n)
+          for (auto n : elem->node_index_range())
             {
               if (!node_check(elem, n))
                 continue;

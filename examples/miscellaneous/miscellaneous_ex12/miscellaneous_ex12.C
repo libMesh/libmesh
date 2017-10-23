@@ -445,7 +445,7 @@ void assemble_shell (EquationSystems & es,
 
       // First compute element data at the nodes
       std::vector<Point> nodes;
-      for (unsigned int i=0; i<elem->n_nodes(); ++i)
+      for (auto i : elem->node_index_range())
         nodes.push_back(elem->reference_elem()->node_ref(i));
       fe->reinit (elem, &nodes);
 
@@ -458,7 +458,7 @@ void assemble_shell (EquationSystems & es,
       //Store covariant basis and local orthonormal basis at the nodes
       std::vector<Eigen::Matrix3d> F0node;
       std::vector<Eigen::Matrix3d> Qnode;
-      for (unsigned int i=0; i<elem->n_nodes(); ++i)
+      for (auto i : elem->node_index_range())
         {
           Eigen::Vector3d a1;
           a1 << dxyzdxi[i](0), dxyzdxi[i](1), dxyzdxi[i](2);

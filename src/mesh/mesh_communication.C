@@ -300,8 +300,8 @@ void reconnect_nodes (const std::set<const Elem *, CompareElemIdsByLevel> & conn
     {
       const Elem * elem = *elem_it;
 
-      for (unsigned int n=0; n<elem->n_nodes(); n++)
-        connected_nodes.insert(elem->node_ptr(n));
+      for (auto & n : elem->node_ref_range())
+        connected_nodes.insert(&n);
     }
 }
 
@@ -630,7 +630,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
           {
             my_interface_elements.push_back(elem); // add the element, but only once, even
             // if there are multiple NULL neighbors
-            for (unsigned int s=0; s<elem->n_sides(); s++)
+            for (auto s : elem->side_index_range())
               if (elem->neighbor_ptr(s) == libmesh_nullptr)
                 {
                   UniquePtr<const Elem> side(elem->build_side_ptr(s));
@@ -820,8 +820,8 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
                           elem = family_tree[leaf];
                           elements_to_send.insert (elem);
 
-                          for (unsigned int n=0; n<elem->n_nodes(); n++)
-                            connected_nodes.insert (elem->node_ptr(n));
+                          for (auto & n : elem->node_ref_range())
+                            connected_nodes.insert (&n);
                         }
                     }
                 }
@@ -1029,9 +1029,8 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
                     {
                       libmesh_assert(elem != remote_elem);
                       elements_to_send.insert(elem);
-                      for (unsigned int n=0, n_nodes = elem->n_nodes();
-                           n != n_nodes; ++n)
-                        nodes_to_send.insert(elem->node_ptr(n));
+                      for (auto & n : elem->node_ref_range())
+                        nodes_to_send.insert(&n);
                       elem = elem->parent();
                     }
                 }
@@ -1602,9 +1601,8 @@ struct ElemNodesMaybeNew
     // If this element has remote_elem neighbors then there may have
     // been refinement of those neighbors that affect its nodes'
     // processor_id()
-    unsigned int n_neigh = elem->n_neighbors();
-    for (unsigned int s=0; s != n_neigh; ++s)
-      if (elem->neighbor_ptr(s) == remote_elem)
+    for (auto neigh : elem->neighbor_ptr_range())
+      if (neigh == remote_elem)
         return true;
     return false;
   }
@@ -1633,9 +1631,8 @@ struct NodeMaybeNew
     // If this node is on a side with a remote element then there may
     // have been refinement of that element which affects this node's
     // processor_id()
-    unsigned int n_neigh = elem->n_neighbors();
-    for (unsigned int s=0; s != n_neigh; ++s)
-      if (elem->neighbor_ptr(s) == remote_elem)
+    for (auto s : elem->side_index_range())
+      if (elem->neighbor(s) == remote_elem)
         if (elem->is_node_on_side(local_node_num, s))
           return true;
 

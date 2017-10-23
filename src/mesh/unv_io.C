@@ -567,7 +567,7 @@ void UNVIO::groups_in (std::istream & in_file)
             // information for it.  Note that we have not yet called
             // find_neighbors(), so we can't use elem->neighbor(sn) in
             // this algorithm...
-            for (unsigned short sn=0; sn<elem->n_sides(); sn++)
+            for (auto sn : elem->side_index_range())
               {
                 // Look for this key in the provide_bcs map
                 std::pair<map_type::const_iterator,
@@ -997,8 +997,6 @@ void UNVIO::elements_out(std::ostream & out_file)
     {
       const Elem * elem = *it;
 
-      elem->n_nodes();
-
       switch (elem->type())
         {
 
@@ -1158,7 +1156,7 @@ void UNVIO::elements_out(std::ostream & out_file)
                << std::setw(10) << elem->n_nodes()     // No. of nodes per element
                << '\n';
 
-      for (unsigned int j=0; j<elem->n_nodes(); j++)
+      for (auto j : elem->node_index_range())
         {
           // assign_elem_nodes[j]-th node: i.e., j loops over the
           // libMesh numbering, and assign_elem_nodes[j] over the

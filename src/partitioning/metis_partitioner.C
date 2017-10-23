@@ -222,10 +222,8 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
 
             // Loop over the element's neighbors.  An element
             // adjacency corresponds to a face neighbor
-            for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
+            for (auto neighbor : elem->neighbor_ptr_range())
               {
-                const Elem * neighbor = elem->neighbor_ptr(ms);
-
                 if (neighbor != libmesh_nullptr)
                   {
                     // If the neighbor is active, but is not in the
@@ -330,10 +328,8 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
 
             // Loop over the element's neighbors.  An element
             // adjacency corresponds to a face neighbor
-            for (unsigned int ms=0; ms<elem->n_neighbors(); ms++)
+            for (auto neighbor : elem->neighbor_ptr_range())
               {
-                const Elem * neighbor = elem->neighbor_ptr(ms);
-
                 if (neighbor != libmesh_nullptr)
                   {
                     // If the neighbor is active, but is not in the

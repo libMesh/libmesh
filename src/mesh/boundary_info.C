@@ -305,7 +305,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
     {
       Elem * new_elem = *el;
 
-      for (unsigned int nn=0; nn<new_elem->n_nodes(); ++nn)
+      for (auto nn : new_elem->node_index_range())
         {
           // Get the correct node pointer, based on the id()
           Node * new_node =
@@ -358,7 +358,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
       // Use centroid comparison as a way to check.
       unsigned char interior_parent_side_index = 0;
       bool found_matching_sides = false;
-      for (unsigned char side=0; side<interior_parent->n_sides(); side++)
+      for (auto side : interior_parent->side_index_range())
         {
           UniquePtr<const Elem> interior_parent_side = interior_parent->build_side_ptr(side);
           Real centroid_distance = (boundary_elem->centroid() - interior_parent_side->centroid()).norm();
@@ -379,7 +379,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
       side_id_map[boundary_elem->id()] = interior_parent_side_index;
 
       UniquePtr<const Elem> interior_parent_side = interior_parent->build_side_ptr(interior_parent_side_index);
-      for (unsigned char local_node_index=0; local_node_index<boundary_elem->n_nodes(); local_node_index++)
+      for (auto local_node_index : boundary_elem->node_index_range())
         {
           dof_id_type boundary_node_id = boundary_elem->node_id(local_node_index);
           dof_id_type interior_node_id = interior_parent_side->node_id(local_node_index);
@@ -456,7 +456,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
       const std::pair<boundary_side_iter, boundary_side_iter>
         range = _boundary_side_id.equal_range(top_parent);
 
-      for (unsigned int s=0; s<elem->n_sides(); s++)
+      for (auto s : elem->side_index_range())
         {
           bool add_this_side = false;
           boundary_id_type this_bcid = invalid_id;
@@ -571,10 +571,13 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
       if (!_mesh.is_serial() &&
           (elem->processor_id() != this->processor_id()))
         {
+          const unsigned short n_nodes = elem->n_nodes();
+
+          const unsigned short bdy_n_sides = new_elem->n_sides();
+          const unsigned short bdy_n_nodes = new_elem->n_nodes();
+
           // Check every interior side for a RemoteElem
-          for (unsigned int interior_side = 0;
-               interior_side != elem->n_sides();
-               ++interior_side)
+          for (auto interior_side : elem->side_index_range())
             {
               // Might this interior side have a RemoteElem that
               // needs a corresponding Remote on a boundary side?
@@ -582,25 +585,22 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
                 continue;
 
               // Which boundary side?
-              for (unsigned int boundary_side = 0;
-                   boundary_side != new_elem->n_sides();
-                   ++boundary_side)
+              for (unsigned short boundary_side = 0;
+                   boundary_side != bdy_n_sides; ++boundary_side)
                 {
                   // Look for matching node points.  This is safe in
                   // *this* context.
                   bool found_all_nodes = true;
-                  for (unsigned int boundary_node = 0;
-                       boundary_node != new_elem->n_nodes();
-                       ++boundary_node)
+                  for (unsigned short boundary_node = 0;
+                       boundary_node != bdy_n_nodes; ++boundary_node)
                     {
                       if (!new_elem->is_node_on_side(boundary_node,
                                                      boundary_side))
                         continue;
 
                       bool found_this_node = false;
-                      for (unsigned int interior_node = 0;
-                           interior_node != elem->n_nodes();
-                           ++interior_node)
+                      for (unsigned short interior_node = 0;
+                           interior_node != n_nodes; ++interior_node)
                         {
                           if (!elem->is_node_on_side(interior_node,
                                                      interior_side))
@@ -1097,7 +1097,7 @@ void BoundaryInfo::edge_boundary_ids (const Elem * const elem,
       // side, then this must be a boundary edge. In that case, we just use the
       // top-level parent.
       bool found_boundary_edge = false;
-      for (unsigned int side=0; side<elem->n_sides(); side++)
+      for (auto side : elem->side_index_range())
         {
           if (elem->is_edge_on_side(edge,side))
             {
@@ -1402,13 +1402,13 @@ void BoundaryInfo::copy_boundary_ids (const BoundaryInfo & old_boundary_info,
 
   std::vector<boundary_id_type> bndry_ids;
 
-  for (unsigned short s=0; s<old_elem->n_sides(); s++)
+  for (auto s : old_elem->side_index_range())
     {
       old_boundary_info.raw_boundary_ids (old_elem, s, bndry_ids);
       this->add_side (new_elem, s, bndry_ids);
     }
 
-  for (unsigned short e=0; e<old_elem->n_edges(); e++)
+  for (auto e : old_elem->edge_index_range())
     {
       old_boundary_info.raw_edge_boundary_ids (old_elem, e, bndry_ids);
       this->add_edge (new_elem, e, bndry_ids);
@@ -1928,7 +1928,7 @@ BoundaryInfo::build_node_list_from_side_list()
           UniquePtr<const Elem> side = cur_elem->build_side_ptr(pos->second.first);
 
           // Add each node node on the side with the side's boundary id
-          for (unsigned int i=0; i<side->n_nodes(); i++)
+          for (auto i : side->node_index_range())
             {
               const boundary_id_type bcid = pos->second.second;
               this->add_node(side->node_ptr(i), bcid);
@@ -2099,13 +2099,15 @@ void BoundaryInfo::build_side_list_from_node_list()
     {
       const Elem * elem = *el;
 
-      for (unsigned short side=0; side<elem->n_sides(); ++side)
+      for (auto side : elem->side_index_range())
         {
           UniquePtr<const Elem> side_elem = elem->build_side_ptr(side);
 
+          const unsigned short n_nodes = side_elem->n_nodes();
+
           // map from nodeset_id to count for that ID
           std::map<boundary_id_type, unsigned> nodesets_node_count;
-          for (unsigned node_num=0; node_num < side_elem->n_nodes(); ++node_num)
+          for (unsigned node_num=0; node_num < n_nodes; ++node_num)
             {
               const Node * node = side_elem->node_ptr(node_num);
               std::pair<boundary_node_iter, boundary_node_iter>
@@ -2123,7 +2125,7 @@ void BoundaryInfo::build_side_list_from_node_list()
           // nodeset's name, if there is one.
           std::map<boundary_id_type, unsigned>::const_iterator nodesets = nodesets_node_count.begin();
           for (; nodesets != nodesets_node_count.end(); ++nodesets)
-            if (nodesets->second == side_elem->n_nodes())
+            if (nodesets->second == n_nodes)
               {
                 add_side(elem, side, nodesets->first);
 
@@ -2560,7 +2562,7 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
       const std::pair<boundary_side_iter, boundary_side_iter>
         range = _boundary_side_id.equal_range(top_parent);
 
-      for (unsigned char s=0; s<elem->n_sides(); s++)
+      for (auto s : elem->side_index_range())
         {
           bool add_this_side = false;
           boundary_id_type this_bcid = invalid_id;
@@ -2607,7 +2609,7 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
 
               // Use a proxy element for the side to query nodes
               UniquePtr<const Elem> side (elem->build_side_ptr(s));
-              for (unsigned int n = 0; n != side->n_nodes(); ++n)
+              for (auto n : side->node_index_range())
                 {
                   const Node & node = side->node_ref(n);
 

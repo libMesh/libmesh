@@ -187,8 +187,8 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	fe/fe_l2_hierarchic_test.C fe/fe_l2_lagrange_test.C \
 	fe/fe_lagrange_test.C fe/fe_monomial_test.C \
 	fe/fe_szabab_test.C fe/fe_test.h fe/fe_xyz_test.C \
-	geom/elem_test.C geom/node_test.C geom/point_test.C \
-	geom/point_test.h geom/which_node_am_i_test.C mesh/all_tri.C \
+	geom/elem_test.C geom/point_test.C geom/point_test.h \
+	geom/which_node_am_i_test.C mesh/all_tri.C \
 	mesh/boundary_mesh.C mesh/boundary_info.C mesh/checkpoint.C \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
@@ -232,7 +232,6 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	fe/unit_tests_dbg-fe_szabab_test.$(OBJEXT) \
 	fe/unit_tests_dbg-fe_xyz_test.$(OBJEXT) \
 	geom/unit_tests_dbg-elem_test.$(OBJEXT) \
-	geom/unit_tests_dbg-node_test.$(OBJEXT) \
 	geom/unit_tests_dbg-point_test.$(OBJEXT) \
 	geom/unit_tests_dbg-which_node_am_i_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-all_tri.$(OBJEXT) \
@@ -290,8 +289,8 @@ am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 	fe/fe_l2_hierarchic_test.C fe/fe_l2_lagrange_test.C \
 	fe/fe_lagrange_test.C fe/fe_monomial_test.C \
 	fe/fe_szabab_test.C fe/fe_test.h fe/fe_xyz_test.C \
-	geom/elem_test.C geom/node_test.C geom/point_test.C \
-	geom/point_test.h geom/which_node_am_i_test.C mesh/all_tri.C \
+	geom/elem_test.C geom/point_test.C geom/point_test.h \
+	geom/which_node_am_i_test.C mesh/all_tri.C \
 	mesh/boundary_mesh.C mesh/boundary_info.C mesh/checkpoint.C \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
@@ -334,7 +333,6 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	fe/unit_tests_devel-fe_szabab_test.$(OBJEXT) \
 	fe/unit_tests_devel-fe_xyz_test.$(OBJEXT) \
 	geom/unit_tests_devel-elem_test.$(OBJEXT) \
-	geom/unit_tests_devel-node_test.$(OBJEXT) \
 	geom/unit_tests_devel-point_test.$(OBJEXT) \
 	geom/unit_tests_devel-which_node_am_i_test.$(OBJEXT) \
 	mesh/unit_tests_devel-all_tri.$(OBJEXT) \
@@ -389,8 +387,8 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 	fe/fe_l2_hierarchic_test.C fe/fe_l2_lagrange_test.C \
 	fe/fe_lagrange_test.C fe/fe_monomial_test.C \
 	fe/fe_szabab_test.C fe/fe_test.h fe/fe_xyz_test.C \
-	geom/elem_test.C geom/node_test.C geom/point_test.C \
-	geom/point_test.h geom/which_node_am_i_test.C mesh/all_tri.C \
+	geom/elem_test.C geom/point_test.C geom/point_test.h \
+	geom/which_node_am_i_test.C mesh/all_tri.C \
 	mesh/boundary_mesh.C mesh/boundary_info.C mesh/checkpoint.C \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
@@ -433,7 +431,6 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	fe/unit_tests_oprof-fe_szabab_test.$(OBJEXT) \
 	fe/unit_tests_oprof-fe_xyz_test.$(OBJEXT) \
 	geom/unit_tests_oprof-elem_test.$(OBJEXT) \
-	geom/unit_tests_oprof-node_test.$(OBJEXT) \
 	geom/unit_tests_oprof-point_test.$(OBJEXT) \
 	geom/unit_tests_oprof-which_node_am_i_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-all_tri.$(OBJEXT) \
@@ -488,8 +485,8 @@ am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 	fe/fe_l2_hierarchic_test.C fe/fe_l2_lagrange_test.C \
 	fe/fe_lagrange_test.C fe/fe_monomial_test.C \
 	fe/fe_szabab_test.C fe/fe_test.h fe/fe_xyz_test.C \
-	geom/elem_test.C geom/node_test.C geom/point_test.C \
-	geom/point_test.h geom/which_node_am_i_test.C mesh/all_tri.C \
+	geom/elem_test.C geom/point_test.C geom/point_test.h \
+	geom/which_node_am_i_test.C mesh/all_tri.C \
 	mesh/boundary_mesh.C mesh/boundary_info.C mesh/checkpoint.C \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
@@ -532,7 +529,6 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	fe/unit_tests_opt-fe_szabab_test.$(OBJEXT) \
 	fe/unit_tests_opt-fe_xyz_test.$(OBJEXT) \
 	geom/unit_tests_opt-elem_test.$(OBJEXT) \
-	geom/unit_tests_opt-node_test.$(OBJEXT) \
 	geom/unit_tests_opt-point_test.$(OBJEXT) \
 	geom/unit_tests_opt-which_node_am_i_test.$(OBJEXT) \
 	mesh/unit_tests_opt-all_tri.$(OBJEXT) \
@@ -586,8 +582,8 @@ am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 	fe/fe_l2_hierarchic_test.C fe/fe_l2_lagrange_test.C \
 	fe/fe_lagrange_test.C fe/fe_monomial_test.C \
 	fe/fe_szabab_test.C fe/fe_test.h fe/fe_xyz_test.C \
-	geom/elem_test.C geom/node_test.C geom/point_test.C \
-	geom/point_test.h geom/which_node_am_i_test.C mesh/all_tri.C \
+	geom/elem_test.C geom/point_test.C geom/point_test.h \
+	geom/which_node_am_i_test.C mesh/all_tri.C \
 	mesh/boundary_mesh.C mesh/boundary_info.C mesh/checkpoint.C \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
@@ -630,7 +626,6 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	fe/unit_tests_prof-fe_szabab_test.$(OBJEXT) \
 	fe/unit_tests_prof-fe_xyz_test.$(OBJEXT) \
 	geom/unit_tests_prof-elem_test.$(OBJEXT) \
-	geom/unit_tests_prof-node_test.$(OBJEXT) \
 	geom/unit_tests_prof-point_test.$(OBJEXT) \
 	geom/unit_tests_prof-which_node_am_i_test.$(OBJEXT) \
 	mesh/unit_tests_prof-all_tri.$(OBJEXT) \
@@ -1102,8 +1097,8 @@ unit_tests_sources = driver.C test_comm.h stream_redirector.h \
 	fe/fe_l2_hierarchic_test.C fe/fe_l2_lagrange_test.C \
 	fe/fe_lagrange_test.C fe/fe_monomial_test.C \
 	fe/fe_szabab_test.C fe/fe_test.h fe/fe_xyz_test.C \
-	geom/elem_test.C geom/node_test.C geom/point_test.C \
-	geom/point_test.h geom/which_node_am_i_test.C mesh/all_tri.C \
+	geom/elem_test.C geom/point_test.C geom/point_test.h \
+	geom/which_node_am_i_test.C mesh/all_tri.C \
 	mesh/boundary_mesh.C mesh/boundary_info.C mesh/checkpoint.C \
 	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
 	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
@@ -1254,8 +1249,6 @@ geom/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) geom/$(DEPDIR)
 	@: > geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_dbg-elem_test.$(OBJEXT): geom/$(am__dirstamp) \
-	geom/$(DEPDIR)/$(am__dirstamp)
-geom/unit_tests_dbg-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_dbg-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
@@ -1418,8 +1411,6 @@ fe/unit_tests_devel-fe_xyz_test.$(OBJEXT): fe/$(am__dirstamp) \
 	fe/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-elem_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
-geom/unit_tests_devel-node_test.$(OBJEXT): geom/$(am__dirstamp) \
-	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_devel-which_node_am_i_test.$(OBJEXT):  \
@@ -1532,8 +1523,6 @@ fe/unit_tests_oprof-fe_szabab_test.$(OBJEXT): fe/$(am__dirstamp) \
 fe/unit_tests_oprof-fe_xyz_test.$(OBJEXT): fe/$(am__dirstamp) \
 	fe/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-elem_test.$(OBJEXT): geom/$(am__dirstamp) \
-	geom/$(DEPDIR)/$(am__dirstamp)
-geom/unit_tests_oprof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_oprof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
@@ -1648,8 +1637,6 @@ fe/unit_tests_opt-fe_xyz_test.$(OBJEXT): fe/$(am__dirstamp) \
 	fe/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-elem_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
-geom/unit_tests_opt-node_test.$(OBJEXT): geom/$(am__dirstamp) \
-	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_opt-which_node_am_i_test.$(OBJEXT):  \
@@ -1762,8 +1749,6 @@ fe/unit_tests_prof-fe_szabab_test.$(OBJEXT): fe/$(am__dirstamp) \
 fe/unit_tests_prof-fe_xyz_test.$(OBJEXT): fe/$(am__dirstamp) \
 	fe/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-elem_test.$(OBJEXT): geom/$(am__dirstamp) \
-	geom/$(DEPDIR)/$(am__dirstamp)
-geom/unit_tests_prof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 geom/unit_tests_prof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
@@ -1950,23 +1935,18 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@fparser/$(DEPDIR)/unit_tests_opt-autodiff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@fparser/$(DEPDIR)/unit_tests_prof-autodiff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-elem_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-node_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-point_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_dbg-which_node_am_i_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-elem_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-node_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-point_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-which_node_am_i_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-elem_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-node_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-point_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-which_node_am_i_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-elem_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-node_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-point_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-which_node_am_i_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-elem_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-node_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-point_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-which_node_am_i_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-all_tri.Po@am__quote@
@@ -2406,20 +2386,6 @@ geom/unit_tests_dbg-elem_test.obj: geom/elem_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_test.C' object='geom/unit_tests_dbg-elem_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_dbg-elem_test.obj `if test -f 'geom/elem_test.C'; then $(CYGPATH_W) 'geom/elem_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_test.C'; fi`
-
-geom/unit_tests_dbg-node_test.o: geom/node_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-node_test.Tpo -c -o geom/unit_tests_dbg-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_dbg-node_test.Tpo geom/$(DEPDIR)/unit_tests_dbg-node_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_dbg-node_test.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_dbg-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
-
-geom/unit_tests_dbg-node_test.obj: geom/node_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-node_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-node_test.Tpo -c -o geom/unit_tests_dbg-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_dbg-node_test.Tpo geom/$(DEPDIR)/unit_tests_dbg-node_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_dbg-node_test.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_dbg-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
 
 geom/unit_tests_dbg-point_test.o: geom/point_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_dbg-point_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_dbg-point_test.Tpo -c -o geom/unit_tests_dbg-point_test.o `test -f 'geom/point_test.C' || echo '$(srcdir)/'`geom/point_test.C
@@ -3191,20 +3157,6 @@ geom/unit_tests_devel-elem_test.obj: geom/elem_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-elem_test.obj `if test -f 'geom/elem_test.C'; then $(CYGPATH_W) 'geom/elem_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_test.C'; fi`
 
-geom/unit_tests_devel-node_test.o: geom/node_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-node_test.Tpo -c -o geom/unit_tests_devel-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-node_test.Tpo geom/$(DEPDIR)/unit_tests_devel-node_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_devel-node_test.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
-
-geom/unit_tests_devel-node_test.obj: geom/node_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-node_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-node_test.Tpo -c -o geom/unit_tests_devel-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-node_test.Tpo geom/$(DEPDIR)/unit_tests_devel-node_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_devel-node_test.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
-
 geom/unit_tests_devel-point_test.o: geom/point_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-point_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-point_test.Tpo -c -o geom/unit_tests_devel-point_test.o `test -f 'geom/point_test.C' || echo '$(srcdir)/'`geom/point_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-point_test.Tpo geom/$(DEPDIR)/unit_tests_devel-point_test.Po
@@ -3974,20 +3926,6 @@ geom/unit_tests_oprof-elem_test.obj: geom/elem_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_test.C' object='geom/unit_tests_oprof-elem_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-elem_test.obj `if test -f 'geom/elem_test.C'; then $(CYGPATH_W) 'geom/elem_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_test.C'; fi`
-
-geom/unit_tests_oprof-node_test.o: geom/node_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-node_test.Tpo -c -o geom/unit_tests_oprof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_oprof-node_test.Tpo geom/$(DEPDIR)/unit_tests_oprof-node_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_oprof-node_test.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
-
-geom/unit_tests_oprof-node_test.obj: geom/node_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-node_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-node_test.Tpo -c -o geom/unit_tests_oprof-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_oprof-node_test.Tpo geom/$(DEPDIR)/unit_tests_oprof-node_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_oprof-node_test.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
 
 geom/unit_tests_oprof-point_test.o: geom/point_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-point_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-point_test.Tpo -c -o geom/unit_tests_oprof-point_test.o `test -f 'geom/point_test.C' || echo '$(srcdir)/'`geom/point_test.C
@@ -4759,20 +4697,6 @@ geom/unit_tests_opt-elem_test.obj: geom/elem_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-elem_test.obj `if test -f 'geom/elem_test.C'; then $(CYGPATH_W) 'geom/elem_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_test.C'; fi`
 
-geom/unit_tests_opt-node_test.o: geom/node_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-node_test.Tpo -c -o geom/unit_tests_opt-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-node_test.Tpo geom/$(DEPDIR)/unit_tests_opt-node_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_opt-node_test.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
-
-geom/unit_tests_opt-node_test.obj: geom/node_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-node_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-node_test.Tpo -c -o geom/unit_tests_opt-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-node_test.Tpo geom/$(DEPDIR)/unit_tests_opt-node_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_opt-node_test.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
-
 geom/unit_tests_opt-point_test.o: geom/point_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-point_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-point_test.Tpo -c -o geom/unit_tests_opt-point_test.o `test -f 'geom/point_test.C' || echo '$(srcdir)/'`geom/point_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-point_test.Tpo geom/$(DEPDIR)/unit_tests_opt-point_test.Po
@@ -5542,20 +5466,6 @@ geom/unit_tests_prof-elem_test.obj: geom/elem_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/elem_test.C' object='geom/unit_tests_prof-elem_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-elem_test.obj `if test -f 'geom/elem_test.C'; then $(CYGPATH_W) 'geom/elem_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/elem_test.C'; fi`
-
-geom/unit_tests_prof-node_test.o: geom/node_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-node_test.Tpo -c -o geom/unit_tests_prof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_prof-node_test.Tpo geom/$(DEPDIR)/unit_tests_prof-node_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_prof-node_test.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
-
-geom/unit_tests_prof-node_test.obj: geom/node_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-node_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-node_test.Tpo -c -o geom/unit_tests_prof-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_prof-node_test.Tpo geom/$(DEPDIR)/unit_tests_prof-node_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_prof-node_test.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
 
 geom/unit_tests_prof-point_test.o: geom/point_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-point_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-point_test.Tpo -c -o geom/unit_tests_prof-point_test.o `test -f 'geom/point_test.C' || echo '$(srcdir)/'`geom/point_test.C

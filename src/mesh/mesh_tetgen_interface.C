@@ -419,9 +419,9 @@ unsigned TetGenMeshInterface::check_hull_integrity()
           return 1;
         }
 
-      for (unsigned int i=0; i<elem->n_neighbors(); ++i)
+      for (auto neigh : elem->neighbor_ptr_range())
         {
-          if (elem->neighbor(i) == libmesh_nullptr)
+          if (neigh == libmesh_nullptr)
             {
               // libmesh_error_msg("ERROR: Non-convex hull, cannot be tetrahedralized.");
               return 2;

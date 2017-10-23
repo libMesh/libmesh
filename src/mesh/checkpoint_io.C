@@ -390,7 +390,7 @@ void CheckpointIO::write_remote_elem (Xdr & io,
     {
       const Elem & elem = **it;
 
-      for (unsigned int n=0; n != elem.n_neighbors(); ++n)
+      for (auto n : elem.side_index_range())
         {
           const Elem * neigh = elem.neighbor_ptr(n);
           if (neigh == remote_elem ||

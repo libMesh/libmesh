@@ -206,7 +206,7 @@ void JumpErrorEstimator::estimate_error (const System & system,
             (*(system.solution), dof_map, parent, Uparent, false);
 
           // Loop over the neighbors of the parent
-          for (unsigned int n_p=0; n_p<parent->n_neighbors(); n_p++)
+          for (auto n_p : parent->side_index_range())
             {
               if (parent->neighbor_ptr(n_p) != libmesh_nullptr) // parent has a neighbor here
                 {
@@ -295,7 +295,7 @@ void JumpErrorEstimator::estimate_error (const System & system,
       fine_context->pre_fe_reinit(system, e);
 
       // Loop over the neighbors of element e
-      for (unsigned int n_e=0; n_e<e->n_neighbors(); n_e++)
+      for (auto n_e : e->side_index_range())
         {
           if ((e->neighbor_ptr(n_e) != libmesh_nullptr) ||
               integrate_boundary_sides)

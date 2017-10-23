@@ -591,7 +591,7 @@ void assemble_shell (EquationSystems & es,
 
       // Find the side which is part of the physical plate boundary,
       // that is, the boundary of the original mesh without ghosts.
-      for (unsigned int s=0; s<elem->n_sides(); ++s)
+      for (auto s : elem->side_index_range())
         {
           const Tri3Subdivision * nb_elem = static_cast<const Tri3Subdivision *> (elem->neighbor_ptr(s));
           if (nb_elem == libmesh_nullptr || nb_elem->is_ghost())

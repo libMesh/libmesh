@@ -282,13 +282,13 @@ void add_cube_convex_hull_to_mesh(MeshBase & mesh,
       {
         Elem * elem = *it;
 
-        for (unsigned s=0; s<elem->n_sides(); ++s)
+        for (auto s : elem->side_index_range())
           if (elem->neighbor(s) == libmesh_nullptr)
             {
               // Add the node IDs of this side to the set
               UniquePtr<Elem> side = elem->side(s);
 
-              for (unsigned n=0; n<side->n_nodes(); ++n)
+              for (auto n : side->node_index_range())
                 node_id_map.insert(std::make_pair(side->node_id(n), /*dummy_value=*/0));
             }
       }
@@ -328,7 +328,7 @@ void add_cube_convex_hull_to_mesh(MeshBase & mesh,
 
             // Assign nodes in new elements.  Since this is an example,
             // we'll do it in several steps.
-            for (unsigned i=0; i<old_elem->n_nodes(); ++i)
+            for (auto i : old_elem->node_index_range())
               {
                 // Locate old node ID in the map
                 iterator it = node_id_map.find(old_elem->node_id(i));

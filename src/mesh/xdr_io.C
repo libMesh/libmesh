@@ -1088,7 +1088,7 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_bc
 
       if (bc_type == "side")
         {
-          for (unsigned short s=0; s<elem->n_sides(); s++)
+          for (auto s : elem->side_index_range())
             {
               boundary_info.boundary_ids (elem, s, bc_ids);
               for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
@@ -1105,7 +1105,7 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_bc
         }
       else if (bc_type == "edge")
         {
-          for (unsigned short e=0; e<elem->n_edges(); e++)
+          for (auto e : elem->edge_index_range())
             {
               boundary_info.edge_boundary_ids (elem, e, bc_ids);
               for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
@@ -1733,7 +1733,8 @@ void XdrIO::read_serialized_connectivity (Xdr & io, const dof_id_type n_elem, st
             }
 #endif
 
-          for (unsigned int n=0; n<elem->n_nodes(); n++, ++it)
+          for (unsigned int n=0, n_n = elem->n_nodes(); n != n_n;
+               n++, ++it)
             {
               const dof_id_type global_node_number =
                 cast_int<dof_id_type>(*it);
@@ -2221,7 +2222,7 @@ void XdrIO::pack_element (std::vector<xdr_id_type> & conn, const Elem * elem,
   conn.push_back (elem->p_level());
 #endif
 
-  for (unsigned int n=0; n<elem->n_nodes(); n++)
+  for (auto n : elem->node_index_range())
     conn.push_back (elem->node_id(n));
 }
 

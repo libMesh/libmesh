@@ -68,8 +68,14 @@ public:
 
   /**
    * Copy-constructor.
+   *
+   * \deprecated - anyone copying a Node would almost certainly be
+   * better off copying the much cheaper Point or taking a reference
+   * to the Node.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   Node (const Node & n);
+#endif
 
   /**
    * Copy-constructor from a \p Point.  Optionally assigned the \p id.
@@ -89,8 +95,14 @@ public:
 
   /**
    * \returns A \p Node copied from \p n and wrapped in a smart pointer.
+   *
+   * \deprecated - anyone copying a Node would almost certainly be
+   * better off copying the much cheaper Point or taking a reference
+   * to the Node.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   static UniquePtr<Node> build (const Node & n);
+#endif
 
   /**
    * \returns A \p Node copied from \p p with id == \id and wrapped in a smart pointer.
@@ -222,6 +234,7 @@ Node::Node (const Real x,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 inline
 Node::Node (const Node & n) :
   Point(n),
@@ -232,7 +245,9 @@ Node::Node (const Node & n) :
   _valence(n._valence)
 #endif
 {
+  libmesh_deprecated();
 }
+#endif
 
 
 
@@ -278,11 +293,14 @@ Node & Node::operator= (const Point & p)
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 inline
 UniquePtr<Node> Node::build(const Node & n)
 {
+  libmesh_deprecated();
   return UniquePtr<Node>(new Node(n));
 }
+#endif
 
 
 

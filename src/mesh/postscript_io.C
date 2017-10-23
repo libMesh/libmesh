@@ -236,7 +236,7 @@ void PostscriptIO::plot_linear_elem(const Elem * elem)
 
 void PostscriptIO::plot_quadratic_elem(const Elem * elem)
 {
-  for (unsigned int ns=0; ns<elem->n_sides(); ++ns)
+  for (auto ns : elem->side_index_range())
     {
       // Build the quadratic side
       UniquePtr<const Elem> side = elem->build_side_ptr(ns);

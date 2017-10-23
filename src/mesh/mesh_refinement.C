@@ -175,7 +175,7 @@ Node * MeshRefinement::add_node(Elem & parent,
 
   Point p; // defaults to 0,0,0
 
-  for (unsigned int n=0; n != parent.n_nodes(); ++n)
+  for (auto n : parent.node_index_range())
     {
       // The value from the embedding matrix
       const float em_val = parent.embedding_matrix(child,node,n);
@@ -408,7 +408,7 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
       // Pointer to the element
       Elem * elem = *elem_it;
 
-      for (unsigned int n=0; n<elem->n_neighbors(); n++)
+      for (auto n : elem->side_index_range())
         {
           Elem * neighbor =
             topological_neighbor(elem, point_locator.get(), n);
@@ -938,7 +938,7 @@ bool MeshRefinement::make_coarsening_compatible()
                 {
                   const unsigned int my_level = elem->level();
 
-                  for (unsigned int n=0; n<elem->n_neighbors(); n++)
+                  for (auto n : elem->side_index_range())
                     {
                       const Elem * neighbor =
                         topological_neighbor(elem, point_locator.get(), n);
@@ -974,7 +974,7 @@ bool MeshRefinement::make_coarsening_compatible()
                 {
                   const unsigned int my_p_level = elem->p_level();
 
-                  for (unsigned int n=0; n<elem->n_neighbors(); n++)
+                  for (auto n : elem->side_index_range())
                     {
                       const Elem * neighbor =
                         topological_neighbor(elem, point_locator.get(), n);
@@ -1034,7 +1034,7 @@ bool MeshRefinement::make_coarsening_compatible()
               // our change has to propagate to neighboring
               // processors.
               if (my_flag_changed && !_mesh.is_serial())
-                for (unsigned int n=0; n != elem->n_neighbors(); ++n)
+                for (auto n : elem->side_index_range())
                   {
                     Elem * neigh =
                       topological_neighbor(elem, point_locator.get(), n);
@@ -1282,12 +1282,16 @@ bool MeshRefinement::make_refinement_compatible()
           for (; el != end_el; ++el)
             {
               Elem * elem = *el;
+
+              const unsigned short n_sides = elem->n_sides();
+
               if (elem->refinement_flag() == Elem::REFINE)  // If the element is active and the
                 // h refinement flag is set
                 {
                   const unsigned int my_level = elem->level();
 
-                  for (unsigned int side=0; side != elem->n_sides(); side++)
+                  for (unsigned short side = 0; side != n_sides;
+                       ++side)
                     {
                       Elem * neighbor =
                         topological_neighbor(elem, point_locator.get(), side);
@@ -1345,7 +1349,7 @@ bool MeshRefinement::make_refinement_compatible()
                 {
                   const unsigned int my_p_level = elem->p_level();
 
-                  for (unsigned int side=0; side != elem->n_sides(); side++)
+                  for (unsigned int side=0; side != n_sides; side++)
                     {
                       Elem * neighbor =
                         topological_neighbor(elem, point_locator.get(), side);

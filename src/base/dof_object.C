@@ -51,6 +51,14 @@ DofObject::DofObject (const DofObject & dof_obj) :
   _processor_id  (dof_obj._processor_id),
   _idx_buf       (dof_obj._idx_buf)
 {
+  // DO NOT copy old_dof_object, because this isn't a *real* copy
+  // constructor, it's a "copy almost everything" constructor that
+  // is intended to be used solely for internal construction of
+  // old_dof_object, never for a true deep copy where the newly
+  // created object really matches the source object.
+  //
+  // if (dof_obj.old_dof_object)
+  //  this->old_dof_object = new DofObject(*(dof_obj.old_dof_object));
 
   // Check that everything worked
 #ifdef DEBUG

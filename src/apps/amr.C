@@ -235,7 +235,7 @@ void assemble(EquationSystems & es,
       // You can't compute "area" (perimeter) if you are in 2D
       if (dim == 3)
         {
-          for (unsigned int side=0; side<elem->n_sides(); side++)
+          for (auto side : elem->side_index_range())
             if (elem->neighbor_ptr(side) == libmesh_nullptr)
               {
                 fe_face->reinit (elem, side);

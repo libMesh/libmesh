@@ -125,7 +125,7 @@ void DefaultCoupling::operator()
           if (elem->processor_id() != p)
             coupled_elements.insert (std::make_pair(elem,_dof_coupling));
 
-          for (unsigned int s=0; s<elem->n_sides(); s++)
+          for (auto s : elem->side_index_range())
             {
               const Elem * neigh = elem->neighbor_ptr(s);
 

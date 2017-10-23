@@ -624,7 +624,7 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	steady_system.h system.h system_norm.h system_subset.h \
 	system_subset_by_subdomain.h transient_system.h \
 	compare_types.h error_vector.h hashword.h ignore_warnings.h \
-	libmesh_nullptr.h location_maps.h mapvector.h \
+	int_range.h libmesh_nullptr.h location_maps.h mapvector.h \
 	null_output_iterator.h number_lookups.h ostream_proxy.h \
 	parameters.h perf_log.h perfmon.h plt_loader.h \
 	point_locator_base.h point_locator_tree.h \
@@ -2058,6 +2058,9 @@ hashword.h: $(top_srcdir)/include/utils/hashword.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 ignore_warnings.h: $(top_srcdir)/include/utils/ignore_warnings.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+int_range.h: $(top_srcdir)/include/utils/int_range.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_nullptr.h: $(top_srcdir)/include/utils/libmesh_nullptr.h

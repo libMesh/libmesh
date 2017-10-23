@@ -309,7 +309,7 @@ void assemble_elasticity(EquationSystems & es,
         }
 
       {
-        for (unsigned int side=0; side<elem->n_sides(); side++)
+        for (auto side : elem->side_index_range())
           if (elem->neighbor_ptr(side) == libmesh_nullptr)
             {
               const std::vector<std::vector<Real> > & phi_face = fe_face->get_phi();

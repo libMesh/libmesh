@@ -1547,7 +1547,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 #endif
                   &(edge_fe->get_dphi());
 
-              for (unsigned char e=0; e != elem->n_edges(); ++e)
+              for (auto e : elem->edge_index_range())
                 {
                   context.edge = e;
 
@@ -1721,7 +1721,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 #endif // LIBMESH_ENABLE_AMR
                   &(side_fe->get_dphi());
 
-              for (unsigned char s=0; s != elem->n_sides(); ++s)
+              for (auto s : elem->side_index_range())
                 {
                   FEInterface::dofs_on_side(elem, dim, base_fe_type,
                                             s, side_dofs);
@@ -2067,10 +2067,9 @@ void BuildProjectionList::operator()(const ConstElemRange & range)
 
           dof_map.old_dof_indices (parent, di);
 
-          for (unsigned int n=0; n != elem->n_nodes(); ++n)
+          for (auto & node : elem->node_ref_range())
             {
-              const Node * node = elem->node_ptr(n);
-              const DofObject * old_dofs = node->old_dof_object;
+              const DofObject * old_dofs = node.old_dof_object;
 
               if (old_dofs)
                 {
@@ -2224,12 +2223,16 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
           if (!variable.active_on_subdomain(elem->subdomain_id()))
             continue;
 
+          const unsigned short n_nodes = elem->n_nodes();
+          const unsigned short n_edges = elem->n_edges();
+          const unsigned short n_sides = elem->n_sides();
+
           // Find out which nodes, edges and sides are on a requested
           // boundary:
-          std::vector<bool> is_boundary_node(elem->n_nodes(), false),
-            is_boundary_edge(elem->n_edges(), false),
-            is_boundary_side(elem->n_sides(), false);
-          for (unsigned char s=0; s != elem->n_sides(); ++s)
+          std::vector<bool> is_boundary_node(n_nodes, false),
+            is_boundary_edge(n_edges, false),
+            is_boundary_side(n_sides, false);
+          for (unsigned char s=0; s != n_sides; ++s)
             {
               // First see if this side has been requested
               boundary_info.boundary_ids (elem, s, bc_ids);
@@ -2247,10 +2250,10 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
               is_boundary_side[s] = true;
 
               // Then see what nodes and what edges are on it
-              for (unsigned int n=0; n != elem->n_nodes(); ++n)
+              for (unsigned int n=0; n != n_nodes; ++n)
                 if (elem->is_node_on_side(n,s))
                   is_boundary_node[n] = true;
-              for (unsigned int e=0; e != elem->n_edges(); ++e)
+              for (unsigned int e=0; e != n_edges; ++e)
                 if (elem->is_edge_on_side(e,s))
                   is_boundary_edge[e] = true;
             }
@@ -2270,9 +2273,6 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
           // The element type
           const ElemType elem_type = elem->type();
 
-          // The number of nodes on the new element
-          const unsigned int n_nodes = elem->n_nodes();
-
           // Zero the interpolated values
           Ue.resize (n_dofs); Ue.zero();
 
@@ -2284,7 +2284,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
 
           // Interpolate node values first
           unsigned int current_dof = 0;
-          for (unsigned int n=0; n!= n_nodes; ++n)
+          for (unsigned short n = 0; n != n_nodes; ++n)
             {
               // FIXME: this should go through the DofMap,
               // not duplicate dof_indices code badly!
@@ -2440,7 +2440,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
 
           // In 3D, project any edge values next
           if (dim > 2 && cont != DISCONTINUOUS)
-            for (unsigned int e=0; e != elem->n_edges(); ++e)
+            for (unsigned short e = 0; e != n_edges; ++e)
               {
                 if (!is_boundary_edge[e])
                   continue;
@@ -2538,7 +2538,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
 
           // Project any side values (edges in 2D, faces in 3D)
           if (dim > 1 && cont != DISCONTINUOUS)
-            for (unsigned int s=0; s != elem->n_sides(); ++s)
+            for (unsigned short s = 0; s != n_sides; ++s)
               {
                 if (!is_boundary_side[s])
                   continue;

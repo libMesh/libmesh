@@ -502,9 +502,11 @@ Real Elem::length(const unsigned int n1,
 
 dof_id_type Elem::key () const
 {
-  std::vector<dof_id_type> node_ids(this->n_nodes());
+  const unsigned short n_n = this->n_nodes();
 
-  for (unsigned n=0; n<this->n_nodes(); n++)
+  std::vector<dof_id_type> node_ids(n_n);
+
+  for (unsigned short n=0; n != n_n; ++n)
     node_ids[n] = this->node_id(n);
 
   // Always sort, so that different local node numberings hash to the
@@ -522,13 +524,16 @@ bool Elem::operator == (const Elem & rhs) const
   if (this->type() != rhs.type())
     return false;
 
+  const unsigned short n_n = this->n_nodes();
+  libmesh_assert_equal_to(n_n, rhs.n_nodes());
+
   // Make two sorted vectors of global node ids and compare them for
   // equality.
   std::vector<dof_id_type>
-    this_ids(this->n_nodes()),
-    rhs_ids(rhs.n_nodes());
+    this_ids(n_n),
+    rhs_ids(n_n);
 
-  for (unsigned n=0; n<this->n_nodes(); n++)
+  for (unsigned short n = 0; n != n_n; n++)
     {
       this_ids[n] = this->node_id(n);
       rhs_ids[n] = rhs.node_id(n);
@@ -620,9 +625,8 @@ void Elem::find_point_neighbors(const Point & p,
         {
           const Elem * elem = *it;
 
-          for (unsigned int s=0; s<elem->n_sides(); s++)
+          for (auto current_neighbor : elem->neighbor_ptr_range())
             {
-              const Elem * current_neighbor = elem->neighbor_ptr(s);
               if (current_neighbor &&
                   current_neighbor != remote_elem)    // we have a real neighbor on this side
                 {
@@ -707,9 +711,8 @@ void Elem::find_point_neighbors(std::set<const Elem *> & neighbor_set,
         {
           const Elem * elem = *it;
 
-          for (unsigned int s=0; s<elem->n_sides(); s++)
+          for (auto current_neighbor : elem->neighbor_ptr_range())
             {
-              const Elem * current_neighbor = elem->neighbor_ptr(s);
               if (current_neighbor &&
                   current_neighbor != remote_elem)    // we have a real neighbor on this side
                 {
@@ -811,9 +814,8 @@ void Elem::find_edge_neighbors(std::set<const Elem *> & neighbor_set) const
         {
           const Elem * elem = *it;
 
-          for (unsigned int s=0; s<elem->n_sides(); s++)
+          for (auto current_neighbor : elem->neighbor_ptr_range())
             {
-              const Elem * current_neighbor = elem->neighbor_ptr(s);
               if (current_neighbor &&
                   current_neighbor != remote_elem)    // we have a real neighbor on this side
                 {
@@ -920,8 +922,8 @@ void Elem::find_interior_neighbors(std::set<const Elem *> & neighbor_set) const
       if (elem->level() > this->level())
         {
           unsigned int vertices_contained = 0;
-          for (unsigned int p=0; p < elem->n_nodes(); ++p)
-            if (this->contains_point(elem->point(p)))
+          for (auto & n : elem->node_ref_range())
+            if (this->contains_point(n))
               vertices_contained++;
 
           if (vertices_contained <= this->dim())
@@ -932,9 +934,9 @@ void Elem::find_interior_neighbors(std::set<const Elem *> & neighbor_set) const
         }
       else
         {
-          for (unsigned int p=0; p < this->n_nodes(); ++p)
+          for (auto & n : this->node_ref_range())
             {
-              if (!elem->contains_point(this->point(p)))
+              if (!elem->contains_point(n))
                 {
                   neighbor_set.erase(current);
                   break;
@@ -1108,7 +1110,7 @@ bool Elem::has_topological_neighbor (const Elem * elem,
   if (has_neighbor(elem))
     return true;
 
-  for (unsigned int n=0; n<this->n_neighbors(); n++)
+  for (auto n : this->side_index_range())
     if (this->topological_neighbor(n, mesh, point_locator, pb))
       return true;
 
@@ -1134,9 +1136,9 @@ void Elem::libmesh_assert_valid_node_pointers() const
 
 void Elem::libmesh_assert_valid_neighbors() const
 {
-  for (unsigned int s=0; s<this->n_neighbors(); s++)
+  for (auto n : this->side_index_range())
     {
-      const Elem * neigh = this->neighbor_ptr(s);
+      const Elem * neigh = this->neighbor_ptr(n);
 
       // Any element might have a remote neighbor; checking
       // to make sure that's not inaccurate is tough.
@@ -1195,7 +1197,7 @@ void Elem::libmesh_assert_valid_neighbors() const
               // is an interior mesh element for which we're on a side.
               // Nothing to test for in that case.
               (my_parent->dim() == this->dim()))
-            libmesh_assert (!my_parent->neighbor_ptr(s));
+            libmesh_assert (!my_parent->neighbor_ptr(n));
         }
     }
 }
@@ -1300,9 +1302,8 @@ void Elem::make_links_to_me_remote()
 #endif
 
   // Remotify any neighbor links
-  for (unsigned int s = 0; s != this->n_sides(); ++s)
+  for (auto neigh : this->neighbor_ptr_range())
     {
-      Elem * neigh = this->neighbor_ptr(s);
       if (neigh && neigh != remote_elem)
         {
           // My neighbor should never be more refined than me; my real
@@ -1410,9 +1411,8 @@ void Elem::remove_links_to_me()
 #endif
 
   // Nullify any neighbor links
-  for (unsigned int s = 0; s != this->n_sides(); ++s)
+  for (auto neigh : this->neighbor_ptr_range())
     {
-      Elem * neigh = this->neighbor_ptr(s);
       if (neigh && neigh != remote_elem)
         {
           // My neighbor should never be more refined than me; my real
@@ -1530,7 +1530,7 @@ void Elem::write_connectivity (std::ostream & out_stream,
 
     case UCD:
       {
-        for (unsigned int i=0; i<this->n_nodes(); i++)
+        for (auto i : this->node_index_range())
           out_stream << this->node_id(i)+1 << "\t";
 
         out_stream << '\n';
@@ -1887,16 +1887,13 @@ void Elem::family_tree_by_subneighbor (std::vector<const Elem *> & family,
   if (!this->active())
     for (auto & c : this->child_ref_range())
       if (&c != remote_elem)
-        for (unsigned int s=0; s != c.n_sides(); ++s)
-          {
-            const Elem * child_neigh = c.neighbor_ptr(s);
-            if (child_neigh &&
-                (child_neigh == neighbor_in ||
-                 (child_neigh->parent() == neighbor_in &&
-                  child_neigh->is_ancestor_of(subneighbor))))
-              c.family_tree_by_subneighbor (family, child_neigh,
-                                            subneighbor, false);
-          }
+        for (auto child_neigh : c.neighbor_ptr_range())
+          if (child_neigh &&
+              (child_neigh == neighbor_in ||
+               (child_neigh->parent() == neighbor_in &&
+                child_neigh->is_ancestor_of(subneighbor))))
+            c.family_tree_by_subneighbor (family, child_neigh,
+                                          subneighbor, false);
 }
 
 
@@ -1929,16 +1926,13 @@ void Elem::total_family_tree_by_subneighbor (std::vector<const Elem *> & family,
   if (this->has_children())
     for (auto & c : this->child_ref_range())
       if (&c != remote_elem)
-        for (unsigned int s=0; s != c.n_sides(); ++s)
-          {
-            const Elem * child_neigh = c.neighbor_ptr(s);
-            if (child_neigh &&
-                (child_neigh == neighbor_in ||
-                 (child_neigh->parent() == neighbor_in &&
-                  child_neigh->is_ancestor_of(subneighbor))))
-              c.total_family_tree_by_subneighbor
-                (family, child_neigh, subneighbor, false);
-          }
+        for (auto child_neigh : c.neighbor_ptr_range())
+          if (child_neigh &&
+              (child_neigh == neighbor_in ||
+               (child_neigh->parent() == neighbor_in &&
+                child_neigh->is_ancestor_of(subneighbor))))
+            c.total_family_tree_by_subneighbor
+              (family, child_neigh, subneighbor, false);
 }
 
 
@@ -2366,8 +2360,8 @@ Elem::bracketing_nodes(unsigned int child,
 
   for (std::size_t i = 0; i != pbc.size(); ++i)
     {
-      if (pbc[i].first < this->n_nodes() &&
-          pbc[i].second < this->n_nodes())
+      const unsigned short n_n = this->n_nodes();
+      if (pbc[i].first < n_n && pbc[i].second < n_n)
         returnval.push_back(std::make_pair(this->node_id(pbc[i].first),
                                            this->node_id(pbc[i].second)));
       else
@@ -2514,18 +2508,17 @@ bool Elem::point_test(const Point & p, Real box_tol, Real map_tol) const
       // For relative bounding box checks in physical space
       const Real my_hmax = this->hmax();
 
-      for (unsigned int n=0; n != this->n_nodes(); ++n)
+      for (auto & n : this->node_ref_range())
         {
-          Point pe = this->point(n);
-          point_above_min_x = point_above_min_x || (pe(0) - my_hmax*box_tol <= p(0));
-          point_below_max_x = point_below_max_x || (pe(0) + my_hmax*box_tol >= p(0));
+          point_above_min_x = point_above_min_x || (n(0) - my_hmax*box_tol <= p(0));
+          point_below_max_x = point_below_max_x || (n(0) + my_hmax*box_tol >= p(0));
 #if LIBMESH_DIM > 1
-          point_above_min_y = point_above_min_y || (pe(1) - my_hmax*box_tol <= p(1));
-          point_below_max_y = point_below_max_y || (pe(1) + my_hmax*box_tol >= p(1));
+          point_above_min_y = point_above_min_y || (n(1) - my_hmax*box_tol <= p(1));
+          point_below_max_y = point_below_max_y || (n(1) + my_hmax*box_tol >= p(1));
 #endif
 #if LIBMESH_DIM > 2
-          point_above_min_z = point_above_min_z || (pe(2) - my_hmax*box_tol <= p(2));
-          point_below_max_z = point_below_max_z || (pe(2) + my_hmax*box_tol >= p(2));
+          point_above_min_z = point_above_min_z || (n(2) - my_hmax*box_tol <= p(2));
+          point_below_max_z = point_below_max_z || (n(2) + my_hmax*box_tol >= p(2));
 #endif
         }
 
@@ -2680,7 +2673,7 @@ void Elem::nullify_neighbors ()
 {
   // Tell any of my neighbors about my death...
   // Looks strange, huh?
-  for (unsigned int n=0; n<this->n_neighbors(); n++)
+  for (auto n : this->side_index_range())
     {
       Elem * current_neighbor = this->neighbor_ptr(n);
       if (current_neighbor && current_neighbor != remote_elem)

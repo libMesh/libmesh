@@ -667,7 +667,7 @@ void assemble_cd (EquationSystems & es,
         // The following loops over the sides of the element.
         // If the element has no neighbor on a side then that
         // side MUST live on a boundary of the domain.
-        for (unsigned int s=0; s<elem->n_sides(); s++)
+        for (auto s : elem->side_index_range())
           if (elem->neighbor_ptr(s) == libmesh_nullptr)
             {
               fe_face->reinit(elem, s);

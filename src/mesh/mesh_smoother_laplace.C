@@ -193,7 +193,7 @@ void LaplaceMeshSmoother::init()
             // Constant handle for the element
             const Elem * elem = *el;
 
-            for (unsigned int s=0; s<elem->n_neighbors(); s++)
+            for (auto s : elem->side_index_range())
               {
                 // Only operate on sides which are on the
                 // boundary or for which the current element's
@@ -225,7 +225,7 @@ void LaplaceMeshSmoother::init()
             // Shortcut notation for simplicity
             const Elem * elem = *el;
 
-            for (unsigned int f=0; f<elem->n_neighbors(); f++) // Loop over faces
+            for (auto f : elem->side_index_range()) // Loop over faces
               if ((elem->neighbor_ptr(f) == libmesh_nullptr) ||
                   (elem->id() > elem->neighbor_ptr(f)->id()))
                 {
@@ -233,7 +233,7 @@ void LaplaceMeshSmoother::init()
                   // be looking at its sides as well!
                   UniquePtr<const Elem> face = elem->build_side_ptr(f, /*proxy=*/false);
 
-                  for (unsigned int s=0; s<face->n_neighbors(); s++) // Loop over face's edges
+                  for (auto s : face->side_index_range()) // Loop over face's edges
                     {
                       // Here we can use a proxy
                       UniquePtr<const Elem> side = face->build_side_ptr(s);
