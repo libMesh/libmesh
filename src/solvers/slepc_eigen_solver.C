@@ -96,7 +96,8 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> & matrix_A_in,
     libmesh_error_msg("Error: input matrix to solve_standard() must be a PetscMatrix.");
 
   // Close the matrix and vectors in case this wasn't already done.
-  matrix_A->close ();
+  if (this->_close_matrix_before_solve)
+    matrix_A->close ();
 
   return _solve_standard_helper(matrix_A->mat(), nev, ncv, tol, m_its);
 }
@@ -282,8 +283,11 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
     libmesh_error_msg("Error: inputs to solve_generalized() must be of type PetscMatrix.");
 
   // Close the matrix and vectors in case this wasn't already done.
-  matrix_A->close ();
-  matrix_B->close ();
+  if (this->_close_matrix_before_solve)
+  {
+    matrix_A->close ();
+    matrix_B->close ();
+  }
 
   return _solve_generalized_helper (matrix_A->mat(), matrix_B->mat(), nev, ncv, tol, m_its);
 }
@@ -321,7 +325,8 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
     libmesh_error_msg("Error: inputs to solve_generalized() must be of type PetscMatrix.");
 
   // Close the matrix and vectors in case this wasn't already done.
-  matrix_B->close ();
+  if (this->_close_matrix_before_solve)
+    matrix_B->close ();
 
   ierr = MatShellSetOperation(mat_A,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
   LIBMESH_CHKERR(ierr);
@@ -350,7 +355,8 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
     libmesh_error_msg("Error: inputs to solve_generalized() must be of type PetscMatrix.");
 
   // Close the matrix and vectors in case this wasn't already done.
-  matrix_A->close ();
+  if (this->_close_matrix_before_solve)
+    matrix_A->close ();
 
   // Prepare the matrix.  Note that the const_cast is only necessary
   // because PETSc does not accept a const void *.  Inside the member

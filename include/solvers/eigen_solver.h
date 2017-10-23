@@ -81,6 +81,26 @@ public:
    */
   bool initialized () const { return _is_initialized; }
 
+  /**
+   * \returns \p The value of the flag which controls whether libmesh
+   * closes the eigenproblem matrices before solving. \true by
+   * default.
+   */
+  bool get_close_matrix_before_solve() const
+  {
+    libmesh_experimental();
+    return _close_matrix_before_solve;
+  }
+
+  /**
+   * Set the flag which controls whether libmesh closes the
+   * eigenproblem matrices before solving.
+   */
+  void set_close_matrix_before_solve(bool val)
+  {
+    libmesh_experimental();
+    _close_matrix_before_solve = val;
+  }
 
   /**
    * Release all memory and clear data structures.
@@ -269,6 +289,8 @@ protected:
   SolverConfiguration * _solver_configuration;
 
   Real _target_val;
+
+  bool _close_matrix_before_solve;
 };
 
 
@@ -283,7 +305,8 @@ EigenSolver<T>::EigenSolver (const Parallel::Communicator & comm_in) :
   _eigen_problem_type   (NHEP),
   _position_of_spectrum (LARGEST_MAGNITUDE),
   _is_initialized       (false),
-  _solver_configuration(libmesh_nullptr)
+  _solver_configuration(libmesh_nullptr),
+  _close_matrix_before_solve(true)
 {
 }
 
