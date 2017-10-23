@@ -82,13 +82,24 @@ public:
   bool initialized () const { return _is_initialized; }
 
   /**
-   * \returns \p true if we want to close the matrix before solve,
-   * false otherwise. It is true by default.
+   * \returns \p The value of the flag which controls whether libmesh
+   * closes the eigenproblem matrices before solving. \true by
+   * default.
    */
-  bool & close_matrix_before_solve()
+  bool get_close_matrix_before_solve() const
   {
     libmesh_experimental();
     return _close_matrix_before_solve;
+  }
+
+  /**
+   * Set the flag which controls whether libmesh closes the
+   * eigenproblem matrices before solving.
+   */
+  void set_close_matrix_before_solve(bool val)
+  {
+    libmesh_experimental();
+    _close_matrix_before_solve = val;
   }
 
   /**
