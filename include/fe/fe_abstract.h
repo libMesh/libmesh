@@ -218,6 +218,12 @@ public:
 #endif // LIBMESH_ENABLE_PERIODIC
 
   /**
+   * \returns the dimension of this FE
+   */
+  unsigned int get_dim() const
+  { return dim; }
+
+  /**
    * \returns The \p xyz spatial locations of the quadrature
    * points on the element.
    */
