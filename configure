@@ -30150,14 +30150,6 @@ $as_echo "#define BEST_UNORDERED_MULTIMAP std::unordered_multimap" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MULTIMAP <unordered_map>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_specializations" != yes; then
-
-$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
-
-
-$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
-
-  fi
 else
   as_fn_error $? "libMesh requires a working std::unordered_multimap implementation" "$LINENO" 5
 fi
@@ -30216,14 +30208,6 @@ $as_echo "#define BEST_UNORDERED_MAP std::unordered_map" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MAP <unordered_map>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_specializations" != yes; then
-
-$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
-
-
-$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
-
-  fi
 else
   as_fn_error $? "libMesh requires a working std::unordered_map implementation" "$LINENO" 5
 fi
@@ -30284,14 +30268,6 @@ $as_echo "#define BEST_UNORDERED_MULTISET std::unordered_multiset" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MULTISET <unordered_set>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_specializations" != yes; then
-
-$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
-
-
-$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
-
-  fi
 else
   as_fn_error $? "libMesh requires a working std::unordered_multiset implementation" "$LINENO" 5
 fi
@@ -30351,21 +30327,13 @@ $as_echo "#define BEST_UNORDERED_SET std::unordered_set" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_SET <unordered_set>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_specializations" != yes; then
-
-$as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
-
-
-$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
-
-  fi
 else
   as_fn_error $? "libMesh requires a working std::unordered_set implementation" "$LINENO" 5
 fi
 
 
 
-# Determine which of std::hash, std::tr1::hash, or __gnu_cxx::hash is available
+# libMesh also requires C++11 std::hash.
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::hash" >&5
 $as_echo_n "checking whether the compiler supports std::hash... " >&6; }
@@ -30381,13 +30349,18 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#include <functional>
+
+  #include <functional>
+  #include <string>
+
 int
 main ()
 {
 
   std::hash<int> m;
   std::size_t hashed = m(12345);
+  std::hash<std::string> m2;
+  std::size_t hashed2 = m2(std::string("foo"));
 
   ;
   return 0;
@@ -30420,18 +30393,20 @@ $as_echo "#define BEST_HASH std::hash" >>confdefs.h
 
 $as_echo "#define INCLUDE_HASH <functional>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_specializations" != yes; then
+else
+  as_fn_error $? "libMesh requires a working std::hash implementation" "$LINENO" 5
+fi
+
+
+
+# C++11 provides std::hash<T*> and std::hash<std::string>
+# implementations, but we keep these defines around for backward
+# compatibility.
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
 
 
 $as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
-
-  fi
-else
-  as_fn_error $? "libMesh requires a working std::hash implementation" "$LINENO" 5
-fi
-
 
 
 
