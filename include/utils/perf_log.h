@@ -99,6 +99,7 @@ public:
   void   start ();
   void   restart ();
   double pause ();
+  double pause_for(PerfData & other);
   double stopit ();
 
   int called_recursively;
@@ -426,6 +427,24 @@ double PerfData::stop_or_pause(const bool do_stop)
 
 
 inline
+double PerfData::pause_for(PerfData & other)
+{
+  gettimeofday (&(other.tstart), libmesh_nullptr);
+
+  const double elapsed_time = (static_cast<double>(other.tstart.tv_sec  - this->tstart.tv_sec) +
+                               static_cast<double>(other.tstart.tv_usec - this->tstart.tv_usec)*1.e-6);
+  this->tot_time += elapsed_time;
+
+  other.count++;
+  other.called_recursively++;
+  other.tstart_incl_sub = other.tstart;
+
+  return elapsed_time;
+}
+
+
+
+inline
 double PerfData::stopit ()
 {
   // stopit is just similar to pause except that it decrements the
@@ -450,10 +469,9 @@ void PerfLog::fast_push (const char * label,
       PerfData * perf_data = &(log[std::make_pair(header,label)]);
 
       if (!log_stack.empty())
-        total_time +=
-          log_stack.top()->pause();
-
-      perf_data->start();
+        total_time += log_stack.top()->pause_for(*perf_data);
+      else
+        perf_data->start();
       log_stack.push(perf_data);
     }
 }
