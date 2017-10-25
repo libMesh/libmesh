@@ -101,11 +101,6 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
   // build a base element to do the map inversion in the base face
   UniquePtr<Elem> base_elem (Base::build_elem (inf_elem));
 
-  const ElemType inf_elem_type = inf_elem->type();
-  if (inf_elem_type != INFHEX8 &&
-      inf_elem_type != INFPRISM6)
-    libmesh_error_msg("ERROR: InfFE::inverse_map is currently implemented only for \ninfinite elements of type InfHex8 and InfPrism6.");
-
   // 2.)
   // just like in FE<Dim-1,LAGRANGE>::inverse_map(): compute
   // the local coordinates, but only in the base element.
@@ -382,6 +377,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
         {
           // in this case, physical_point is not in this element.
           // We therefore give back the best approximation:
+          // TODO: is there a strict argument for this?
           p(Dim-1) = -1;
           return p;
         }
