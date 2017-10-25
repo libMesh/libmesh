@@ -2102,7 +2102,7 @@ inline Status Communicator::packed_range_probe (const unsigned int src_processor
                                                 const MessageTag & tag,
                                                 bool & flag) const
 {
-  START_LOG("packed_range_probe()", "Parallel");
+  LOG_SCOPE("packed_range_probe()", "Parallel");
 
   libmesh_experimental();
 
@@ -2117,8 +2117,6 @@ inline Status Communicator::packed_range_probe (const unsigned int src_processor
                               stat.get()));
 
   flag = int_flag;
-
-  STOP_LOG("packed_range_probe()", "Parallel");
 
   return stat;
 }
