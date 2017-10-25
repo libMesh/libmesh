@@ -28,9 +28,6 @@
 // C++ includes
 #include <unordered_map>
 #include <unordered_set>
-#include <functional> // std::hash
-LIBMESH_DEFINE_HASH_POINTERS
-
 
 namespace
 {

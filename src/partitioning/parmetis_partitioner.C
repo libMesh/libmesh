@@ -44,10 +44,8 @@ extern "C" {
 #endif
 
 
-// Hash maps for interior->boundary element lookups
+// C++ includes
 #include <unordered_map>
-#include <functional> // std::hash
-LIBMESH_DEFINE_HASH_POINTERS
 
 
 namespace libMesh
