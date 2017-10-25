@@ -22,12 +22,6 @@ if test "$ac_cv_cxx_unordered_map" = yes; then
             [definition of the final detected unordered_map type])
   AC_DEFINE(INCLUDE_UNORDERED_MAP,<unordered_map>,
             [header file for the final detected unordered_map type])
-  if test "$ac_cv_cxx_hash_specializations" != yes; then
-    AC_DEFINE(DEFINE_HASH_STRING,,
-              [workaround for potentially missing hash<string>])
-    AC_DEFINE(DEFINE_HASH_POINTERS,,
-              [workaround for potentially missing hash<T*>])
-  fi
 else
   AC_MSG_ERROR([libMesh requires a working std::unordered_map implementation])
 fi
@@ -61,12 +55,6 @@ if test "$ac_cv_cxx_unordered_multimap" = yes; then
             [definition of the final detected unordered_multimap type])
   AC_DEFINE(INCLUDE_UNORDERED_MULTIMAP,<unordered_map>,
             [header file for the final detected unordered_multimap type])
-  if test "$ac_cv_cxx_hash_specializations" != yes; then
-    AC_DEFINE(DEFINE_HASH_STRING,,
-              [workaround for potentially missing hash<string>])
-    AC_DEFINE(DEFINE_HASH_POINTERS,,
-              [workaround for potentially missing hash<T*>])
-  fi
 else
   AC_MSG_ERROR([libMesh requires a working std::unordered_multimap implementation])
 fi
@@ -101,12 +89,6 @@ if test "$ac_cv_cxx_unordered_multiset" = yes; then
             [definition of the final detected unordered_multiset type])
   AC_DEFINE(INCLUDE_UNORDERED_MULTISET,<unordered_set>,
             [header file for the final detected unordered_multiset type])
-  if test "$ac_cv_cxx_hash_specializations" != yes; then
-    AC_DEFINE(DEFINE_HASH_STRING,,
-              [workaround for potentially missing hash<string>])
-    AC_DEFINE(DEFINE_HASH_POINTERS,,
-              [workaround for potentially missing hash<T*>])
-  fi
 else
   AC_MSG_ERROR([libMesh requires a working std::unordered_multiset implementation])
 fi
@@ -139,12 +121,6 @@ if test "$ac_cv_cxx_unordered_set" = yes; then
             [definition of the final detected unordered_set type])
   AC_DEFINE(INCLUDE_UNORDERED_SET,<unordered_set>,
             [header file for the final detected unordered_set type])
-  if test "$ac_cv_cxx_hash_specializations" != yes; then
-    AC_DEFINE(DEFINE_HASH_STRING,,
-              [workaround for potentially missing hash<string>])
-    AC_DEFINE(DEFINE_HASH_POINTERS,,
-              [workaround for potentially missing hash<T*>])
-  fi
 else
   AC_MSG_ERROR([libMesh requires a working std::unordered_set implementation])
 fi
@@ -161,10 +137,16 @@ AC_DEFUN([ACX_STD_HASH],
 ac_cv_cxx_hash,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([@%:@include <functional>],
+ AC_TRY_COMPILE(
+[
+  @%:@include <functional>
+  @%:@include <string>
+],
 [
   std::hash<int> m;
   std::size_t hashed = m(12345);
+  std::hash<std::string> m2;
+  std::size_t hashed2 = m2(std::string("foo"));
 ],
  ac_cv_cxx_hash=yes, ac_cv_cxx_hash=no)
  AC_LANG_RESTORE
@@ -177,12 +159,6 @@ if test "$ac_cv_cxx_hash" = yes; then
             [definition of the final detected hash type])
   AC_DEFINE(INCLUDE_HASH,<functional>,
             [header file for the final detected hash type])
-  if test "$ac_cv_cxx_hash_specializations" != yes; then
-    AC_DEFINE(DEFINE_HASH_STRING,,
-              [workaround for potentially missing hash<string>])
-    AC_DEFINE(DEFINE_HASH_POINTERS,,
-              [workaround for potentially missing hash<T*>])
-  fi
 else
   AC_MSG_ERROR([libMesh requires a working std::hash implementation])
 fi

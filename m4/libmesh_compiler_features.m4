@@ -220,8 +220,14 @@ ACX_BEST_UNORDERED_MAP
 ACX_BEST_UNORDERED_MULTISET
 ACX_BEST_UNORDERED_SET
 
-# Determine which of std::hash, std::tr1::hash, or __gnu_cxx::hash is available
+# libMesh also requires C++11 std::hash.
 ACX_BEST_HASH
+
+# C++11 provides std::hash<T*> and std::hash<std::string>
+# implementations, but we keep these defines around for backward
+# compatibility.
+AC_DEFINE(DEFINE_HASH_STRING,,[workaround for potentially missing hash<string>])
+AC_DEFINE(DEFINE_HASH_POINTERS,,[workaround for potentially missing hash<T*>])
 
 AX_CXX_DLOPEN
 
