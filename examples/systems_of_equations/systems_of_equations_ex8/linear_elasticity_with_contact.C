@@ -5,6 +5,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <unordered_set>
 
 // Various include files needed for the mesh & solver functionality.
 #include "libmesh/libmesh.h"
@@ -22,7 +23,6 @@
 #include "libmesh/fe_compute_data.h"
 #include "libmesh/petsc_matrix.h"
 #include "libmesh/edge_edge2.h"
-#include LIBMESH_INCLUDE_UNORDERED_SET
 
 // The nonlinear solver and system we will be using
 #include "libmesh/nonlinear_solver.h"
@@ -72,7 +72,7 @@ void LinearElasticityWithContact::move_mesh (MeshBase & input_mesh,
                                              const NumericVector<Number> & input_solution)
 {
   // Maintain a set of node ids that we've encountered.
-  LIBMESH_BEST_UNORDERED_SET<dof_id_type> encountered_node_ids;
+  std::unordered_set<dof_id_type> encountered_node_ids;
 
   // Localize input_solution so that we have the data to move all
   // elements (not just elements local to this processor).

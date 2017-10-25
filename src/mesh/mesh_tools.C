@@ -35,13 +35,12 @@
 #  include "libmesh/remote_elem.h"
 #endif
 
-#include LIBMESH_INCLUDE_UNORDERED_MAP
-#include LIBMESH_INCLUDE_UNORDERED_SET
-
 // C++ includes
 #include <limits>
 #include <numeric> // for std::accumulate
 #include <set>
+#include <unordered_map>
+#include <unordered_set>
 
 
 
@@ -1885,7 +1884,7 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
 // Functors for correct_node_proc_ids
 namespace {
 
-typedef LIBMESH_BEST_UNORDERED_MAP<dof_id_type, processor_id_type> proc_id_map_type;
+typedef std::unordered_map<dof_id_type, processor_id_type> proc_id_map_type;
 
 struct SyncProcIdsFromMap
 {
@@ -2046,7 +2045,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   // ask every other processor about the nodes they used to own.  But
   // first we'll need to keep track of which nodes we used to own,
   // lest we get them confused with nodes we newly own.
-  LIBMESH_BEST_UNORDERED_SET<Node *> ex_local_nodes;
+  std::unordered_set<Node *> ex_local_nodes;
   for (MeshBase::node_iterator
          n_it = mesh.local_nodes_begin(),
          n_end = mesh.local_nodes_end();
@@ -2066,7 +2065,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
     (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync);
 
   // And finally let's update the nodes we used to own.
-  for (LIBMESH_BEST_UNORDERED_SET<Node *>::iterator
+  for (std::unordered_set<Node *>::iterator
          n_it = ex_local_nodes.begin(),
          n_end = ex_local_nodes.end();
        n_it != n_end; ++n_it)

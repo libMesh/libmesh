@@ -32,7 +32,6 @@
 #include "libmesh/cell_hex20.h"
 #include "libmesh/cell_tet10.h"
 #include "libmesh/cell_prism6.h"
-#include LIBMESH_INCLUDE_UNORDERED_MAP
 
 // C++ includes
 #include <iomanip>
@@ -40,6 +39,7 @@
 #include <fstream>
 #include <ctype.h> // isspace
 #include <sstream> // std::istringstream
+#include <unordered_map>
 
 #ifdef LIBMESH_HAVE_GZSTREAM
 # include "gzstream.h" // For reading/writing compressed streams
@@ -424,7 +424,7 @@ void UNVIO::groups_in (std::istream & in_file)
   // this turns out to be much slower on the search side, since we
   // have to build an entire side in order to search, rather than just
   // calling elem->key(side) to compute a key.
-  typedef LIBMESH_BEST_UNORDERED_MULTIMAP<dof_id_type, Elem *> map_type;
+  typedef std::unordered_multimap<dof_id_type, Elem *> map_type;
   map_type provide_bcs;
 
   // Read groups until there aren't any more to read...

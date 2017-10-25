@@ -39,7 +39,8 @@
 // C++ Includes
 #include <numeric>
 #include <set>
-
+#include <unordered_set>
+#include <unordered_map>
 
 
 
@@ -938,9 +939,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
   // coarsen an element will send all the associated ghosted elements
   // to all processors which own any of the coarsened-away-element's
   // siblings.
-  typedef LIBMESH_BEST_UNORDERED_MAP
-    <processor_id_type, std::vector<Elem *> >
-    ghost_map;
+  typedef std::unordered_map<processor_id_type, std::vector<Elem *> > ghost_map;
   ghost_map elements_to_ghost;
 
   const processor_id_type proc_id = mesh.processor_id();
@@ -1288,13 +1287,13 @@ struct SyncNodeIds
   // We only know a Node id() is definitive if we own the Node or if
   // we're told it's definitive.  We keep track of the latter cases by
   // putting ghost node definitive ids into this set.
-  typedef LIBMESH_BEST_UNORDERED_SET<dof_id_type> uset_type;
+  typedef std::unordered_set<dof_id_type> uset_type;
   uset_type definitive_ids;
 
   // We should never be told two different definitive ids for the same
   // node, but let's check on that in debug mode.
 #ifdef DEBUG
-  typedef LIBMESH_BEST_UNORDERED_MAP<dof_id_type, dof_id_type> umap_type;
+  typedef std::unordered_map<dof_id_type, dof_id_type> umap_type;
   umap_type definitive_renumbering;
 #endif
 

@@ -27,7 +27,7 @@
 #include "libmesh/point.h"
 
 // C++ Includes
-#include LIBMESH_INCLUDE_UNORDERED_MULTIMAP
+#include <unordered_map>
 #include <vector>
 
 namespace libMesh
@@ -52,7 +52,7 @@ class Node;
 template <typename T>
 class LocationMap
 {
-  typedef LIBMESH_BEST_UNORDERED_MULTIMAP<unsigned int, T *> map_type;
+  typedef std::unordered_multimap<unsigned int, T *> map_type;
 public:
   void init(MeshBase &);
 

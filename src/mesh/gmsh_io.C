@@ -20,6 +20,7 @@
 #include <set>
 #include <cstring> // std::memcpy
 #include <numeric>
+#include <unordered_map>
 
 // Local includes
 #include "libmesh/libmesh_config.h"
@@ -28,7 +29,6 @@
 #include "libmesh/elem.h"
 #include "libmesh/gmsh_io.h"
 #include "libmesh/mesh_base.h"
-#include LIBMESH_INCLUDE_UNORDERED_MAP
 
 namespace libMesh
 {
@@ -528,7 +528,7 @@ void GmshIO::read_mesh(std::istream & in)
                   // single side.  These lower-dimensional elements
                   // will all hash to the same value, and we need to
                   // be able to store all of them.
-                  typedef LIBMESH_BEST_UNORDERED_MULTIMAP<dof_id_type, Elem *> provide_container_t;
+                  typedef std::unordered_multimap<dof_id_type, Elem *> provide_container_t;
                   provide_container_t provide_bcs;
 
                   // 1st loop over active elements - get info about lower-dimensional elements.

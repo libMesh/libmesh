@@ -21,6 +21,8 @@
 #include <cmath>    // for sqrt
 #include <set>
 #include <sstream> // for ostringstream
+#include <unordered_map>
+#include <unordered_set>
 
 // Local Includes
 #include "libmesh/dof_map.h"
@@ -42,8 +44,6 @@
 #include "libmesh/partitioner.h"
 #include "libmesh/adjoint_refinement_estimator.h"
 
-#include LIBMESH_INCLUDE_UNORDERED_MAP
-#include LIBMESH_INCLUDE_UNORDERED_SET
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -360,14 +360,14 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // belongs to
 
   // A map that relates a node id to an int that will tell us how many elements it is a node of
-  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, unsigned int>shared_element_count;
+  std::unordered_map<dof_id_type, unsigned int> shared_element_count;
 
   // To fill this map, we will loop over elements, and then in each element, we will loop
   // over the nodes each element contains, and then query it for the number of coarse
   // grid elements it was a node of
 
   // Keep track of which nodes we have already dealt with
-  LIBMESH_BEST_UNORDERED_SET<dof_id_type> processed_node_ids;
+  std::unordered_set<dof_id_type> processed_node_ids;
 
   // We will be iterating over all the active elements in the fine mesh that live on
   // this processor

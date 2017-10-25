@@ -25,8 +25,8 @@
 #include "libmesh/libmesh_common.h"
 
 // C++ Includes
-#include LIBMESH_INCLUDE_UNORDERED_MAP
-#include LIBMESH_INCLUDE_HASH
+#include <unordered_map>
+#include <functional> // std::hash
 #include <vector>
 
 namespace libMesh
@@ -45,7 +45,7 @@ public:
   {
     // recommendation from
     // http://stackoverflow.com/questions/5889238/why-is-xor-the-default-way-to-combine-hashes
-    return 3 * LIBMESH_BEST_HASH<T1>()(x.first) + LIBMESH_BEST_HASH<T2>()(x.second);
+    return 3 * std::hash<T1>()(x.first) + std::hash<T2>()(x.second);
   }
 };
 
@@ -68,18 +68,8 @@ public:
  */
 class TopologyMap
 {
-  // We need to supply our own hash function if we're hashing
-#if defined(LIBMESH_HAVE_STD_UNORDERED_MAP) ||  \
-  defined(LIBMESH_HAVE_TR1_UNORDERED_MAP) ||    \
-  defined(LIBMESH_HAVE_EXT_HASH_MAP) ||         \
-  defined(LIBMESH_HAVE_HASH_MAP)
-#  define MYHASH ,myhash
-#else
-#  define MYHASH
-#endif
-
-  typedef LIBMESH_BEST_UNORDERED_MAP<std::pair<dof_id_type, dof_id_type>,
-                                     dof_id_type MYHASH> map_type;
+  // We need to supply our own hash function.
+  typedef std::unordered_map<std::pair<dof_id_type, dof_id_type>, dof_id_type, myhash> map_type;
 public:
   void init(MeshBase &);
 

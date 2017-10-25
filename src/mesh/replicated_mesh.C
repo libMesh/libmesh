@@ -25,9 +25,10 @@
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/utility.h"
 
-#include LIBMESH_INCLUDE_UNORDERED_MAP
-#include LIBMESH_INCLUDE_UNORDERED_SET
-#include LIBMESH_INCLUDE_HASH
+// C++ includes
+#include <unordered_map>
+#include <unordered_set>
+#include <functional> // std::hash
 LIBMESH_DEFINE_HASH_POINTERS
 
 
@@ -641,7 +642,7 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
   dof_id_type next_free_node = 0;
 
   // Will hold the set of nodes that are currently connected to elements
-  LIBMESH_BEST_UNORDERED_SET<Node *> connected_nodes;
+  std::unordered_set<Node *> connected_nodes;
 
   // Loop over the elements.  Note that there may
   // be NULLs in the _elements vector from the coarsening
@@ -860,7 +861,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
   typedef dof_id_type                     key_type;
   typedef std::pair<Elem *, unsigned char> val_type;
   typedef std::pair<key_type, val_type>   key_val_pair;
-  typedef LIBMESH_BEST_UNORDERED_MULTIMAP<key_type, val_type> map_type;
+  typedef std::unordered_multimap<key_type, val_type> map_type;
   // Mapping between all side keys in this mesh and elements+side numbers relevant to the boundary in this mesh as well.
   map_type side_to_elem_map;
 
@@ -957,12 +958,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                               key_val_pair kvp;
                               kvp.first = key;
                               kvp.second = val;
-                              // side_to_elem_map[key] = val;
-#if defined(LIBMESH_HAVE_UNORDERED_MAP) || defined(LIBMESH_HAVE_TR1_UNORDERED_MAP) || defined(LIBMESH_HAVE_HASH_MAP) || defined(LIBMESH_HAVE_EXT_HASH_MAP)
                               side_to_elem_map.insert (kvp);
-#else
-                              side_to_elem_map.insert (side_to_elem_map.begin(),kvp);
-#endif
                             }
                         }
 

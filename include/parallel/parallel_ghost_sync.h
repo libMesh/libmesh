@@ -27,9 +27,6 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/parallel.h"
 
-// C++ Includes
-#include LIBMESH_INCLUDE_UNORDERED_SET
-
 
 namespace libMesh
 {
@@ -536,7 +533,7 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
 
   // Keep track of which nodes we've asked about, so we only hit each
   // once?
-  // LIBMESH_BEST_UNORDERED_SET<dof_id_type> queried_nodes;
+  // std::unordered_set<dof_id_type> queried_nodes;
 
   // No.  We need to ask every neighboring processor about every node,
   // probably repeatedly.  Imagine a vertex surrounded by triangles,

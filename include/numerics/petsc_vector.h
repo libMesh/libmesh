@@ -31,7 +31,6 @@
 #include "libmesh/petsc_macro.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/petsc_solver_exception.h"
-#include LIBMESH_INCLUDE_UNORDERED_MAP
 
 // PETSc include files.
 #include <petscvec.h>
@@ -40,6 +39,7 @@
 #include <cstddef>
 #include <cstring>
 #include <vector>
+#include <unordered_map>
 
 #ifdef LIBMESH_HAVE_CXX11_THREAD
 #include <atomic>
@@ -415,7 +415,7 @@ private:
   /**
    * Type for map that maps global to local ghost cells.
    */
-  typedef LIBMESH_BEST_UNORDERED_MAP<numeric_index_type,numeric_index_type> GlobalToLocalMap;
+  typedef std::unordered_map<numeric_index_type,numeric_index_type> GlobalToLocalMap;
 
   /**
    * Map that maps global to local ghost cells (will be empty if not
