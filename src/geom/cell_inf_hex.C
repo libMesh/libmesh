@@ -17,6 +17,7 @@
 
 // Local includes
 #include "libmesh/libmesh_config.h"
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
@@ -33,6 +34,7 @@
 
 namespace libMesh
 {
+
 
 
 // ------------------------------------------------------------
@@ -354,6 +356,9 @@ std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
 }
 
 
+
+
+
 const unsigned short int InfHex::_second_order_adjacent_vertices[8][2] =
   {
     { 0,  1}, // vertices adjacent to node 8
@@ -429,6 +434,36 @@ bool InfHex::contains_point (const Point & p, Real tol) const
 
 
   if (conservative_p_dist_sq < min_distance_sq)
+    {
+      /*
+       * the physical point is definitely not contained in the element
+       */
+      return false;
+    }
+  /*
+   * this captures the case that the point is not (almost) in the direction of the element.:
+   * first, project the problem onto the unit sphere:
+   */
+
+
+  Point p_o(p-my_origin);
+  pt0_o/=pt0_o.norm();
+  pt1_o/=pt1_o.norm();
+  pt2_o/=pt2_o.norm();
+  pt3_o/=pt3_o.norm();
+  p_o/=p_o.norm();
+
+
+  /*
+   * now, check if it is in the projected face; using that the diagonal contains
+   * the largest distance between points in it
+  */
+  Real max_h=std::max( (pt0_o-pt2_o).norm_sq(),(pt1_o-pt2_o).norm_sq())*1.01; 
+
+  if ((p_o-pt0_o).norm_sq() > max_h ||
+      (p_o-pt1_o).norm_sq() > max_h || 
+      (p_o-pt2_o).norm_sq() > max_h ||
+      (p_o-pt3_o).norm_sq() > max_h )
     {
       /*
        * the physical point is definitely not contained in the element
