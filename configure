@@ -1948,6 +1948,7 @@ Optional Features:
                           (helps ccache)
   --disable-unordered-containers
                           Use map/set instead of unordered_map/unordered_set
+                          (no longer supported)
   --disable-unique-ptr    Use libMesh's deprecated, less safe AutoPtr
   --disable-warnings      Do not warn about deprecated, experimental, or
                           questionable code
@@ -30075,15 +30076,25 @@ done
 
 # Check whether --enable-unordered-containers was given.
 if test "${enable_unordered_containers+set}" = set; then :
-  enableval=$enable_unordered_containers; enableunorderedcontainers=$enableval
+  enableval=$enable_unordered_containers; case "${enableval}" in
+                               yes) enableunorderedcontainers=yes ;;
+                                no)  as_fn_error $? "libMesh now requires unordered containers" "$LINENO" 5 ;;
+                                 *)   as_fn_error $? "bad value ${enableval} for --disable-unordered-containers" "$LINENO" 5 ;;
+                              esac
 else
-  enableunorderedcontainers=yes
+  enableunorderedcontainers=irrelevant
 fi
 
 
-  if test "$enableunorderedcontainers" != no ; then
-    # The following routines, defined in unordered.m4, check to see if the compiler can compile programs using
-    # various quasi-standard hash containers.
+if (test $enableunorderedcontainers != irrelevant) ; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: --enable/disable-unordered-containers are now deprecated" >&5
+$as_echo "$as_me: WARNING: --enable/disable-unordered-containers are now deprecated" >&2;}
+fi
+enableunorderedcontainers=yes
+
+# The following routines, defined in unordered.m4, check to see if
+# the compiler can compile programs using the std::unordered
+# containers.
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports std::unordered_multimap" >&5
 $as_echo_n "checking whether the compiler supports std::unordered_multimap... " >&6; }
@@ -30353,12 +30364,6 @@ else
 fi
 
 
-  else
-    ACX_STD_MAP
-    ACX_STD_MULTIMAP
-    ACX_STD_SET
-    ACX_STD_MULTISET
-  fi
 
 # Determine which of std::hash, std::tr1::hash, or __gnu_cxx::hash is available
 
