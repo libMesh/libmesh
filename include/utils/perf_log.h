@@ -327,6 +327,10 @@ private:
 
   /**
    * The actual log.
+   *
+   * An unsorted_map would work fine here and would be asymptotically
+   * faster, but in my tests for our log sizes there was no
+   * improvement.
    */
   std::map<std::pair<const char *,
                      const char *>,
