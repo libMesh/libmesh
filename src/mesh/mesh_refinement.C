@@ -527,14 +527,8 @@ bool MeshRefinement::refine_and_coarsen_elements ()
   // a no-op.
   bool elements_flagged = false;
 
-  MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
+  for (auto & elem : _mesh.elements_range())
     {
-      // Pointer to the element
-      Elem * elem = *elem_it;
-
       // This might be left over from the last step
       const Elem::RefinementState flag = elem->refinement_flag();
 
