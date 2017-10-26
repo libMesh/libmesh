@@ -679,11 +679,8 @@ void MeshRefinement::switch_h_to_p_refinement ()
 
 void MeshRefinement::add_p_to_h_refinement ()
 {
-  MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
-    (*elem_it)->set_p_refinement_flag((*elem_it)->refinement_flag());
+  for (auto & elem : _mesh.elements_range())
+    elem->set_p_refinement_flag(elem->refinement_flag());
 }
 
 
