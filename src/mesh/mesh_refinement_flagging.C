@@ -660,20 +660,17 @@ void MeshRefinement::flag_elements_by (ElementFlagging & element_flagging)
 
 void MeshRefinement::switch_h_to_p_refinement ()
 {
-  MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
+  for (auto & elem : _mesh.elements_range())
     {
-      if ((*elem_it)->active())
+      if (elem->active())
         {
-          (*elem_it)->set_p_refinement_flag((*elem_it)->refinement_flag());
-          (*elem_it)->set_refinement_flag(Elem::DO_NOTHING);
+          elem->set_p_refinement_flag(elem->refinement_flag());
+          elem->set_refinement_flag(Elem::DO_NOTHING);
         }
       else
         {
-          (*elem_it)->set_p_refinement_flag((*elem_it)->refinement_flag());
-          (*elem_it)->set_refinement_flag(Elem::INACTIVE);
+          elem->set_p_refinement_flag(elem->refinement_flag());
+          elem->set_refinement_flag(Elem::INACTIVE);
         }
     }
 }
