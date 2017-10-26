@@ -1100,12 +1100,8 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase & mesh)
 void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase & mesh,
                                                 const Elem * bad_elem)
 {
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
       libmesh_assert_not_equal_to (elem->parent(), bad_elem);
       for (auto n : elem->neighbor_ptr_range())
