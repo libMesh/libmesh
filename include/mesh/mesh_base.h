@@ -30,6 +30,7 @@
 #include "libmesh/point_locator_base.h"
 #include "libmesh/variant_filter_iterator.h"
 #include "libmesh/parallel_object.h"
+#include "libmesh/simple_range.h"
 
 // C++ Includes
 #include <cstddef>
@@ -987,6 +988,7 @@ public:
   virtual element_iterator elements_end () = 0;
   virtual const_element_iterator elements_begin () const = 0;
   virtual const_element_iterator elements_end () const = 0;
+  virtual SimpleRange<element_iterator> elements_range() = 0;
 
   /**
    * Iterate over elements for which elem->ancestor() is true.

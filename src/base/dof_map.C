@@ -501,13 +501,10 @@ void DofMap::reinit(MeshBase & mesh)
         libmesh_assert (!(*node_it)->old_dof_object);
       }
 
-    MeshBase::element_iterator       elem_it  = mesh.elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.elements_end();
-
-    for ( ; elem_it != elem_end; ++elem_it)
+    for (auto & elem : mesh.elements_range())
       {
-        (*elem_it)->clear_old_dof_object();
-        libmesh_assert (!(*elem_it)->old_dof_object);
+        elem->clear_old_dof_object();
+        libmesh_assert (!elem->old_dof_object);
       }
   }
 
