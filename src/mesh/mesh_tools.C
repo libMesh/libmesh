@@ -642,14 +642,9 @@ unsigned int MeshTools::paranoid_n_levels(const MeshBase & mesh)
 {
   libmesh_parallel_only(mesh.comm());
 
-  MeshBase::const_element_iterator el =
-    mesh.elements_begin();
-  const MeshBase::const_element_iterator end_el =
-    mesh.elements_end();
-
   unsigned int nl = 0;
-  for ( ; el != end_el; ++el)
-    nl = std::max((*el)->level() + 1, nl);
+  for (const auto & elem : mesh.elements_range())
+    nl = std::max(elem->level() + 1, nl);
 
   mesh.comm().max(nl);
   return nl;
