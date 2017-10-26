@@ -1757,11 +1757,8 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
 {
   LOG_SCOPE("libmesh_assert_valid_neighbors()", "MeshTools");
 
-  const MeshBase::const_element_iterator el_end = mesh.elements_end();
-  for (MeshBase::const_element_iterator el = mesh.elements_begin();
-       el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
       elem->libmesh_assert_valid_neighbors();
     }
