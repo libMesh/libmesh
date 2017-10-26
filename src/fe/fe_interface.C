@@ -455,6 +455,21 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 
 
 
+FEInterface::n_dofs_at_node_ptr
+FEInterface::n_dofs_at_node_function(const unsigned int dim,
+                                     const FEType & fe_t)
+{
+  const Order o = fe_t.order;
+
+  fe_with_vec_switch(n_dofs_at_node);
+
+  libmesh_error_msg("We'll never get here!");
+  return libmesh_nullptr;
+}
+
+
+
+
 
 
 unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
