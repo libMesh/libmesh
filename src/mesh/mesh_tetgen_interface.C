@@ -132,12 +132,8 @@ void TetGenMeshInterface::pointset_convexhull ()
   // Delete *all* old elements.  Yes, we legally delete elements while
   // iterating over them because no entries from the underlying container
   // are actually erased.
-  {
-    MeshBase::element_iterator       it  = this->_mesh.elements_begin();
-    const MeshBase::element_iterator end = this->_mesh.elements_end();
-    for ( ; it != end; ++it)
-      this->_mesh.delete_elem (*it);
-  }
+  for (auto & elem : this->_mesh.elements_range())
+    this->_mesh.delete_elem (elem);
 
   // We just removed any boundary info associated with element faces
   // or edges, so let's update the boundary id caches.
