@@ -513,32 +513,26 @@ void DofMap::reinit(MeshBase & mesh)
   // Set the old_dof_objects for the elements that
   // weren't just created, if these old dof objects
   // had variables
-  {
-    MeshBase::element_iterator       elem_it  = mesh.elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.elements_end();
+  for (auto & elem : mesh.elements_range())
+    {
+      // Skip the elements that were just refined
+      if (elem->refinement_flag() == Elem::JUST_REFINED)
+        continue;
 
-    for ( ; elem_it != elem_end; ++elem_it)
-      {
-        Elem * elem = *elem_it;
+      for (unsigned int n=0; n<elem->n_nodes(); n++)
+        {
+          Node & node = elem->node_ref(n);
 
-        // Skip the elements that were just refined
-        if (elem->refinement_flag() == Elem::JUST_REFINED) continue;
+          if (node.old_dof_object == libmesh_nullptr)
+            if (node.has_dofs(sys_num))
+              node.set_old_dof_object();
+        }
 
-        for (unsigned int n=0; n<elem->n_nodes(); n++)
-          {
-            Node & node = elem->node_ref(n);
+      libmesh_assert (!elem->old_dof_object);
 
-            if (node.old_dof_object == libmesh_nullptr)
-              if (node.has_dofs(sys_num))
-                node.set_old_dof_object();
-          }
-
-        libmesh_assert (!elem->old_dof_object);
-
-        if (elem->has_dofs(sys_num))
-          elem->set_old_dof_object();
-      }
-  }
+      if (elem->has_dofs(sys_num))
+        elem->set_old_dof_object();
+    }
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
@@ -556,11 +550,8 @@ void DofMap::reinit(MeshBase & mesh)
       (*node_it)->set_n_vars_per_group(sys_num, n_vars_per_group);
 
     // All the elements
-    MeshBase::element_iterator       elem_it  = mesh.elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.elements_end();
-
-    for ( ; elem_it != elem_end; ++elem_it)
-      (*elem_it)->set_n_vars_per_group(sys_num, n_vars_per_group);
+    for (auto & elem : mesh.elements_range())
+      elem->set_n_vars_per_group(sys_num, n_vars_per_group);
   }
 
 
