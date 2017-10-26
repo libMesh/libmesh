@@ -295,6 +295,10 @@ public:
   {
     return {elements_begin(), elements_end()};
   }
+  virtual SimpleRange<const_element_iterator> elements_range() const libmesh_override
+  {
+    return {elements_begin(), elements_end()};
+  }
 
   virtual element_iterator active_elements_begin () libmesh_override;
   virtual element_iterator active_elements_end () libmesh_override;
