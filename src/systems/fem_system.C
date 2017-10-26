@@ -854,7 +854,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
                           bool apply_no_constraints)
 {
   libmesh_assert(get_residual || get_jacobian);
-  std::string log_name;
+  const char * log_name;
   if (get_residual && get_jacobian)
     log_name = "assembly()";
   else if (get_residual)
@@ -862,7 +862,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
   else
     log_name = "assembly(get_jacobian)";
 
-  LOG_SCOPE(log_name.c_str(), "FEMSystem");
+  LOG_SCOPE(log_name, "FEMSystem");
 
   const MeshBase & mesh = this->get_mesh();
 

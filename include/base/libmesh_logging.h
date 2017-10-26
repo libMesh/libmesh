@@ -71,13 +71,13 @@ struct PerfItem
     _enabled(enabled)
   {
     if (_enabled)
-      libMesh::perflog.push(label, header);
+      libMesh::perflog.fast_push(label, header);
   }
 
   ~PerfItem()
   {
     if (_enabled)
-      libMesh::perflog.pop(_label, _header);
+      libMesh::perflog.fast_pop(_label, _header);
   }
 
 private:
