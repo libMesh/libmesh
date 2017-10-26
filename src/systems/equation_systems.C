@@ -173,14 +173,8 @@ void EquationSystems::reinit ()
       }
 
     // All the elements
-    MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
-    for ( ; elem_it != elem_end; ++elem_it)
-      {
-        Elem * elem = *elem_it;
-        elem->set_n_systems(this->n_systems());
-      }
+    for (auto & elem : _mesh.elements_range())
+      elem->set_n_systems(this->n_systems());
   }
 
   // Localize each system's vectors
