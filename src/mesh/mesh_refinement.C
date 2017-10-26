@@ -1425,18 +1425,12 @@ bool MeshRefinement::_coarsen_elements ()
   // do the coarsening; otherwise it is possible to coarsen away a
   // one-element-thick layer partition and leave the partitions on
   // either side unable to figure out how to talk to each other.
-  for (MeshBase::element_iterator
-         it  = _mesh.elements_begin(),
-         end = _mesh.elements_end();
-       it != end; ++it)
-    {
-      Elem * elem = *it;
-      if (elem->refinement_flag() == Elem::COARSEN)
-        {
-          mesh_changed = true;
-          break;
-        }
-    }
+  for (auto & elem : _mesh.elements_range())
+    if (elem->refinement_flag() == Elem::COARSEN)
+      {
+        mesh_changed = true;
+        break;
+      }
 
   // If the mesh changed on any processor, it changed globally
   this->comm().max(mesh_changed);
@@ -1445,13 +1439,8 @@ bool MeshRefinement::_coarsen_elements ()
   if (mesh_changed)
     MeshCommunication().send_coarse_ghosts(_mesh);
 
-  for (MeshBase::element_iterator
-         it  = _mesh.elements_begin(),
-         end = _mesh.elements_end();
-       it != end; ++it)
+  for (auto & elem : _mesh.elements_range())
     {
-      Elem * elem = *it;
-
       // active elements flagged for coarsening will
       // no longer be deleted until MeshRefinement::contract()
       if (elem->refinement_flag() == Elem::COARSEN)
