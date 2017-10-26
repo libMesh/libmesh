@@ -179,16 +179,16 @@ bool InfPrism::contains_point (const Point & p, Real tol) const
   // determine the minimal distance of the base from the origin
   // use norm_sq(), it is faster than norm() and produces
   // the same behavior. Shift my_origin to center first:
-  Point pt0_o(this->point(0)-my_origin);
-  Point pt1_o(this->point(1)-my_origin);
-  Point pt2_o(this->point(2)-my_origin);
+  Point pt0_o(this->point(0) - my_origin);
+  Point pt1_o(this->point(1) - my_origin);
+  Point pt2_o(this->point(2) - my_origin);
   const Real min_distance_sq = std::min(pt0_o.norm_sq(),
                                std::min(pt1_o.norm_sq(),
                                         pt2_o.norm_sq()));
 
   // work with 1% allowable deviation.  We can still fall
   // back to the InfFE::inverse_map()
-  const Real conservative_p_dist_sq = 1.01 * (Point(p-my_origin).norm_sq());
+  const Real conservative_p_dist_sq = 1.01 * (Point(p - my_origin).norm_sq());
 
   if (conservative_p_dist_sq < min_distance_sq)
     {
@@ -198,18 +198,18 @@ bool InfPrism::contains_point (const Point & p, Real tol) const
 
   // this captures the case that the point is not (almost) in the direction of the element.:
   // first, project the problem onto the unit sphere:
-  Point p_o(p-my_origin);
-  pt0_o/=pt0_o.norm();
-  pt1_o/=pt1_o.norm();
-  pt2_o/=pt2_o.norm();
-  p_o/=p_o.norm();
+  Point p_o(p - my_origin);
+  pt0_o /= pt0_o.norm();
+  pt1_o /= pt1_o.norm();
+  pt2_o /= pt2_o.norm();
+  p_o /= p_o.norm();
 
   // now, check if it is in the projected face; by comparing the distance of
   // any point in the element to \p p with the largest distance between this point
   // to any other point in the element.
-  if ((p_o-pt0_o).norm_sq() > std::max((pt0_o-pt1_o).norm_sq(), (pt0_o-pt2_o).norm_sq()) ||
-      (p_o-pt1_o).norm_sq() > std::max((pt1_o-pt2_o).norm_sq(), (pt1_o-pt0_o).norm_sq()) ||
-      (p_o-pt2_o).norm_sq() > std::max((pt2_o-pt0_o).norm_sq(), (pt2_o-pt1_o).norm_sq()) )
+  if ((p_o - pt0_o).norm_sq() > std::max((pt0_o - pt1_o).norm_sq(), (pt0_o - pt2_o).norm_sq()) ||
+      (p_o - pt1_o).norm_sq() > std::max((pt1_o - pt2_o).norm_sq(), (pt1_o - pt0_o).norm_sq()) ||
+      (p_o - pt2_o).norm_sq() > std::max((pt2_o - pt0_o).norm_sq(), (pt2_o - pt1_o).norm_sq()) )
     {
       // the physical point is definitely not contained in the element
       return false;

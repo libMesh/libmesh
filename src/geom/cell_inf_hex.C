@@ -410,10 +410,10 @@ bool InfHex::contains_point (const Point & p, Real tol) const
 
   // determine the minimal distance of the base from the origin
   // Use norm_sq() instead of norm(), it is faster
-  Point pt0_o(this->point(0)-my_origin);
-  Point pt1_o(this->point(1)-my_origin);
-  Point pt2_o(this->point(2)-my_origin);
-  Point pt3_o(this->point(3)-my_origin);
+  Point pt0_o(this->point(0) - my_origin);
+  Point pt1_o(this->point(1) - my_origin);
+  Point pt2_o(this->point(2) - my_origin);
+  Point pt3_o(this->point(3) - my_origin);
   const Real min_distance_sq = std::min(pt0_o.norm_sq(),
                                std::min(pt1_o.norm_sq(),
                                std::min(pt2_o.norm_sq(),
@@ -421,7 +421,7 @@ bool InfHex::contains_point (const Point & p, Real tol) const
 
   // work with 1% allowable deviation.  We can still fall
   // back to the InfFE::inverse_map()
-  const Real conservative_p_dist_sq = 1.01 * (Point(p-my_origin).norm_sq());
+  const Real conservative_p_dist_sq = 1.01 * (Point(p - my_origin).norm_sq());
 
 
 
@@ -433,22 +433,23 @@ bool InfHex::contains_point (const Point & p, Real tol) const
 
   // this captures the case that the point is not (almost) in the direction of the element.:
   // first, project the problem onto the unit sphere:
-  Point p_o(p-my_origin);
-  pt0_o/=pt0_o.norm();
-  pt1_o/=pt1_o.norm();
-  pt2_o/=pt2_o.norm();
-  pt3_o/=pt3_o.norm();
-  p_o/=p_o.norm();
+  Point p_o(p - my_origin);
+  pt0_o /= pt0_o.norm();
+  pt1_o /= pt1_o.norm();
+  pt2_o /= pt2_o.norm();
+  pt3_o /= pt3_o.norm();
+  p_o /= p_o.norm();
 
 
   // now, check if it is in the projected face; using that the diagonal contains
   // the largest distance between points in it
-  Real max_h=std::max( (pt0_o-pt2_o).norm_sq(),(pt1_o-pt2_o).norm_sq())*1.01;
+  Real max_h = std::max((pt0_o - pt2_o).norm_sq(),
+                        (pt1_o - pt2_o).norm_sq())*1.01;
 
-  if ((p_o-pt0_o).norm_sq() > max_h ||
-      (p_o-pt1_o).norm_sq() > max_h ||
-      (p_o-pt2_o).norm_sq() > max_h ||
-      (p_o-pt3_o).norm_sq() > max_h )
+  if ((p_o - pt0_o).norm_sq() > max_h ||
+      (p_o - pt1_o).norm_sq() > max_h ||
+      (p_o - pt2_o).norm_sq() > max_h ||
+      (p_o - pt3_o).norm_sq() > max_h )
     {
       // the physical point is definitely not contained in the element
       return false;
