@@ -1206,12 +1206,8 @@ void MeshTools::libmesh_assert_connected_nodes (const MeshBase & mesh)
 
   std::set<const Node *> used_nodes;
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
 
       for (auto & n : elem->node_ref_range())
