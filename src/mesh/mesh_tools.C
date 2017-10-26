@@ -988,19 +988,14 @@ void MeshTools::libmesh_assert_equal_n_systems (const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_equal_n_systems()", "MeshTools");
 
-  MeshBase::const_element_iterator el =
-    mesh.elements_begin();
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  if (el == el_end)
-    return;
+  unsigned int n_sys = libMesh::invalid_uint;
 
-  const unsigned int n_sys = (*el)->n_systems();
-
-  for (; el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
-      libmesh_assert_equal_to (elem->n_systems(), n_sys);
+      if (n_sys == libMesh::invalid_uint)
+        n_sys = elem->n_systems();
+      else
+        libmesh_assert_equal_to (elem->n_systems(), n_sys);
     }
 
   MeshBase::const_node_iterator node_it =
