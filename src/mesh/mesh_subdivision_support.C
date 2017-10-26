@@ -194,14 +194,12 @@ void MeshTools::Subdivision::prepare_subdivision_mesh(MeshBase & mesh, bool ghos
       node->set_valence(valence);
     }
 
-  MeshBase::const_element_iterator       el     = mesh.elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.elements_end();
-  for (; el != end_el; ++el)
+  for (auto & elem : mesh.elements_range())
     {
-      Tri3Subdivision * elem = dynamic_cast<Tri3Subdivision *>(*el);
-      libmesh_assert(elem);
-      if (!elem->is_ghost())
-        elem->prepare_subdivision_properties();
+      Tri3Subdivision * tri3s = dynamic_cast<Tri3Subdivision *>(elem);
+      libmesh_assert(tri3s);
+      if (!tri3s->is_ghost())
+        tri3s->prepare_subdivision_properties();
     }
 }
 
