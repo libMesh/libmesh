@@ -1476,13 +1476,8 @@ void libmesh_assert_topology_consistent_procids<Elem>(const MeshBase & mesh)
 
   // Ancestor elements we won't worry about, but subactive and active
   // elements ought to have parents with consistent processor ids
-
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert(elem);
 
       if (!elem->active() && !elem->subactive())
