@@ -656,17 +656,11 @@ bool MeshRefinement::coarsen_elements ()
 
   // Possibly clean up the refinement flags from
   // a previous step
-  MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
+  for (auto & elem : _mesh.elements_range())
     {
-      // Pointer to the element
-      Elem * elem = *elem_it;
-
       // Set refinement flag to INACTIVE if the
       // element isn't active
-      if ( !elem->active())
+      if (!elem->active())
         {
           elem->set_refinement_flag(Elem::INACTIVE);
           elem->set_p_refinement_flag(Elem::INACTIVE);
