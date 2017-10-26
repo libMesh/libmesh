@@ -655,15 +655,10 @@ unsigned int MeshTools::paranoid_n_levels(const MeshBase & mesh)
 void MeshTools::get_not_subactive_node_ids(const MeshBase & mesh,
                                            std::set<dof_id_type> & not_subactive_node_ids)
 {
-  MeshBase::const_element_iterator el           = mesh.elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.elements_end();
-  for ( ; el != end_el; ++el)
-    {
-      const Elem * elem = (*el);
-      if (!elem->subactive())
-        for (auto & n : elem->node_ref_range())
-          not_subactive_node_ids.insert(n.id());
-    }
+  for (const auto & elem : mesh.elements_range())
+    if (!elem->subactive())
+      for (auto & n : elem->node_ref_range())
+        not_subactive_node_ids.insert(n.id());
 }
 
 
