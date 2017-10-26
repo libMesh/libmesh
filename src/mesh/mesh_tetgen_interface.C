@@ -201,14 +201,10 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
   // from the convex hull.
   {
     int insertnum = 0;
-    MeshBase::element_iterator it        = this->_mesh.elements_begin();
-    const MeshBase::element_iterator end = this->_mesh.elements_end();
-    for (; it != end ; ++it)
+    for (auto & elem : this->_mesh.elements_range())
       {
         tetgen_wrapper.allocate_facet_polygonlist(insertnum, 1);
         tetgen_wrapper.allocate_polygon_vertexlist(insertnum, 0, 3);
-
-        Elem * elem = *it;
 
         for (unsigned int j=0; j<elem->n_nodes(); ++j)
           {
