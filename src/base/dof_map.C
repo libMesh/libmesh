@@ -2437,18 +2437,21 @@ void DofMap::old_dof_indices (const Elem * const elem,
 
   // Determine the nodes contributing to element elem
   std::vector<const Node *> elem_nodes;
+  const Node * const * nodes_ptr;
+  unsigned int n_nodes;
   if (elem->type() == TRI3SUBDIVISION)
     {
       // Subdivision surface FE require the 1-ring around elem
       const Tri3Subdivision * sd_elem = static_cast<const Tri3Subdivision *>(elem);
       MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
+      nodes_ptr = &elem_nodes[0];
+      n_nodes = elem_nodes.size();
     }
   else
     {
       // All other FE use only the nodes of elem itself
-      elem_nodes.resize(elem->n_nodes(), libmesh_nullptr);
-      for (unsigned int i=0; i<elem->n_nodes(); i++)
-        elem_nodes[i] = elem->node_ptr(i);
+      nodes_ptr = elem->get_nodes();
+      n_nodes = elem->n_nodes();
     }
 
   // Get the dof numbers
@@ -2494,9 +2497,9 @@ void DofMap::old_dof_indices (const Elem * const elem,
                 FEInterface::n_dofs_at_node_function(dim, fe_type);
 
               // Get the node-based DOF numbers
-              for (std::size_t n=0; n<elem_nodes.size(); n++)
+              for (std::size_t n=0; n<n_nodes; n++)
                 {
-                  const Node * node      = elem_nodes[n];
+                  const Node * node = nodes_ptr[n];
 
                   // There is a potential problem with h refinement.  Imagine a
                   // quad9 that has a linear FE on it.  Then, on the hanging side,
