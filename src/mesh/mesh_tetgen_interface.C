@@ -445,13 +445,8 @@ void TetGenMeshInterface::process_hull_integrity_result(unsigned result)
 
 void TetGenMeshInterface::delete_2D_hull_elements()
 {
-  MeshBase::element_iterator it        = this->_mesh.elements_begin();
-  const MeshBase::element_iterator end = this->_mesh.elements_end();
-
-  for (; it != end ; ++it)
+  for (auto & elem : this->_mesh.elements_range())
     {
-      Elem * elem = *it;
-
       // Check for proper element type. Yes, we legally delete elements while
       // iterating over them because no entries from the underlying container
       // are actually erased.
