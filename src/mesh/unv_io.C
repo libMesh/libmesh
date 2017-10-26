@@ -983,13 +983,8 @@ void UNVIO::elements_out(std::ostream & out_file)
   // A reference to the parent class's mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  MeshBase::const_element_iterator it  = mesh.elements_begin();
-  const MeshBase::const_element_iterator end = mesh.elements_end();
-
-  for (; it != end; ++it)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *it;
-
       switch (elem->type())
         {
 
