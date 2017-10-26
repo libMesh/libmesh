@@ -106,11 +106,8 @@ void EquationSystems::init ()
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->set_n_systems(n_sys);
 
-    MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
-    for ( ; elem_it != elem_end; ++elem_it)
-      (*elem_it)->set_n_systems(n_sys);
+    for (auto & elem : _mesh.elements_range())
+      elem->set_n_systems(n_sys);
   }
 
   for (unsigned int i=0; i != this->n_systems(); ++i)
