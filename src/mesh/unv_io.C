@@ -241,16 +241,9 @@ void UNVIO::read_implementation (std::istream & in_stream)
 
       unsigned char max_dim = this->max_elem_dimension_seen();
 
-      MeshBase::const_element_iterator       el     = mesh.elements_begin();
-      const MeshBase::const_element_iterator end_el = mesh.elements_end();
-
-      for (; el != end_el; ++el)
-        {
-          Elem * elem = *el;
-
-          if (elem->dim() < max_dim)
-            mesh.delete_elem(elem);
-        }
+      for (const auto & elem : mesh.elements_range())
+        if (elem->dim() < max_dim)
+          mesh.delete_elem(elem);
     }
 
     if (this->verbose())
