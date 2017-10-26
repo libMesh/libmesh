@@ -2009,7 +2009,8 @@ void DofMap::dof_indices (const Elem * const elem,
       return;
     }
 
-  // Get the dof numbers
+  // Get the dof numbers for each variable
+  const unsigned int n_nodes = elem ? elem->n_nodes() : 0;
   for (unsigned int v=0; v<n_vars; v++)
     {
       const Variable & var = this->variable(v);
@@ -2026,7 +2027,7 @@ void DofMap::dof_indices (const Elem * const elem,
         }
       else if (elem)
         _dof_indices(elem, elem->p_level(), di, v, elem->get_nodes(),
-                     elem->n_nodes()
+                     n_nodes
 #ifdef DEBUG
                      , tot_size
 #endif
