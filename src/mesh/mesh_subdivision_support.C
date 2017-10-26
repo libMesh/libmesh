@@ -206,11 +206,8 @@ void MeshTools::Subdivision::prepare_subdivision_mesh(MeshBase & mesh, bool ghos
 
 void MeshTools::Subdivision::tag_boundary_ghosts(MeshBase & mesh)
 {
-  MeshBase::element_iterator       el     = mesh.elements_begin();
-  const MeshBase::element_iterator end_el = mesh.elements_end();
-  for (; el != end_el; ++el)
+  for (auto & elem : mesh.elements_range())
     {
-      Elem * elem = *el;
       libmesh_assert_equal_to(elem->type(), TRI3SUBDIVISION);
 
       Tri3Subdivision * sd_elem = static_cast<Tri3Subdivision *>(elem);
