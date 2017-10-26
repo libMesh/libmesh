@@ -403,16 +403,9 @@ void AbaqusIO::read (const std::string & fname)
   {
     unsigned char max_dim = this->max_elem_dimension_seen();
 
-    MeshBase::element_iterator       el     = the_mesh.elements_begin();
-    const MeshBase::element_iterator end_el = the_mesh.elements_end();
-
-    for (; el != end_el; ++el)
-      {
-        Elem * elem = *el;
-
-        if (elem->dim() < max_dim)
-          the_mesh.delete_elem(elem);
-      }
+    for (auto & elem : the_mesh.elements_range())
+      if (elem->dim() < max_dim)
+        the_mesh.delete_elem(elem);
   }
 }
 
