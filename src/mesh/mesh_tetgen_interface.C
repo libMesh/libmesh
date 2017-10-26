@@ -397,13 +397,8 @@ unsigned TetGenMeshInterface::check_hull_integrity()
   if (_mesh.n_elem() == 0)
     return 3;
 
-  MeshBase::element_iterator it        = this->_mesh.elements_begin();
-  const MeshBase::element_iterator end = this->_mesh.elements_end();
-
-  for (; it != end ; ++it)
+  for (auto & elem : this->_mesh.elements_range())
     {
-      Elem * elem = *it;
-
       // Check for proper element type
       if (elem->type() != TRI3)
         {
