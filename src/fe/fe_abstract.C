@@ -708,6 +708,8 @@ bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const R
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
     case INFHEX8:
+    case INFHEX16:
+    case INFHEX18:
       {
         // The reference infhex8 is a [-1,1]^3.
         if ((xi   >= -1.-eps) &&
@@ -723,6 +725,7 @@ bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const R
       }
 
     case INFPRISM6:
+    case INFPRISM12:
       {
         // inside the reference triangle with zeta in [-1,1]
         if ((xi   >=  0.-eps) &&

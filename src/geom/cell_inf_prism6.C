@@ -27,7 +27,6 @@
 #include "libmesh/edge_edge2.h"
 #include "libmesh/edge_inf_edge2.h"
 #include "libmesh/fe_interface.h"
-#include "libmesh/fe_type.h"
 #include "libmesh/side.h"
 #include "libmesh/face_inf_quad4.h"
 #include "libmesh/face_tri3.h"
@@ -171,70 +170,6 @@ UniquePtr<Elem> InfPrism6::build_edge_ptr (const unsigned int i)
     return UniquePtr<Elem>(new SideEdge<Edge2,InfPrism6>(this,i));
   return UniquePtr<Elem>(new SideEdge<InfEdge2,InfPrism6>(this,i));
 }
-
-
-bool InfPrism6::contains_point (const Point & p, Real tol) const
-{
-  /*
-   * For infinite elements with linear base interpolation:
-   *
-   * make use of the fact that infinite elements do not
-   * live inside the envelope.  Use a fast scheme to
-   * check whether point \p p is inside or outside
-   * our relevant part of the envelope.  Note that
-   * this is not exclusive: only when the distance is less,
-   * we are safe.  Otherwise, we cannot say anything. The
-   * envelope may be non-spherical, the physical point may lie
-   * inside the envelope, outside the envelope, or even inside
-   * this infinite element.  Therefore if this fails,
-   * fall back to the FEInterface::inverse_map()
-   */
-  const Point my_origin (this->origin());
-
-  /*
-   * determine the minimal distance of the base from the origin
-   * use norm_sq(), it is faster than norm() and produces
-   * the same behavior
-   */
-  const Real min_distance_sq = std::min((Point(this->point(0)-my_origin)).norm_sq(),
-                                        std::min((Point(this->point(1)-my_origin)).norm_sq(),
-                                                 (Point(this->point(2)-my_origin)).norm_sq()));
-
-  /*
-   * work with 1% allowable deviation.  We can still fall
-   * back to the InfFE::inverse_map()
-   */
-  const Real conservative_p_dist_sq = 1.01 * (Point(p-my_origin).norm_sq());
-
-
-  if (conservative_p_dist_sq < min_distance_sq)
-    {
-      /*
-       * the physical point is definitely not contained in the element
-       */
-      return false;
-    }
-  else
-    {
-      /*
-       * Declare a basic FEType.  Will use default in the base,
-       * and something else (not important) in radial direction.
-       */
-      FEType fe_type(default_order());
-
-      const Point mapped_point = FEInterface::inverse_map(dim(),
-                                                          fe_type,
-                                                          this,
-                                                          p,
-                                                          tol,
-                                                          false);
-
-      return FEInterface::on_reference_element(mapped_point, this->type(), tol);
-    }
-}
-
-
-
 
 void InfPrism6::connectivity(const unsigned int libmesh_dbg_var(sc),
                              const IOPackage iop,

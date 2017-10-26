@@ -137,13 +137,6 @@ public:
                             std::vector<dof_id_type> & conn) const libmesh_override;
 
   /**
-   * \returns \p true when this element contains the point
-   * \p p.  Customized for infinite elements, since knowledge
-   * about the envelope can be helpful.
-   */
-  virtual bool contains_point (const Point & p, Real tol=TOLERANCE) const libmesh_override;
-
-  /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
    * element node numbers.
    */

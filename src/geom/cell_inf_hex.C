@@ -29,6 +29,8 @@
 #include "libmesh/cell_inf_hex8.h"
 #include "libmesh/face_quad4.h"
 #include "libmesh/face_inf_quad4.h"
+#include "libmesh/fe_type.h"
+#include "libmesh/fe_interface.h"
 
 namespace libMesh
 {
@@ -389,6 +391,83 @@ const unsigned short int InfHex::_second_order_vertex_child_index[18] =
     5,6,7,7,2,               // Faces
     6                        // Interior
   };
+
+
+bool InfHex::contains_point (const Point & p, Real tol) const
+{
+  // For infinite elements with linear base interpolation:
+  // make use of the fact that infinite elements do not
+  // live inside the envelope.  Use a fast scheme to
+  // check whether point \p p is inside or outside
+  // our relevant part of the envelope.  Note that
+  // this is not exclusive: only when the distance is less,
+  // we are safe.  Otherwise, we cannot say anything. The
+  // envelope may be non-spherical, the physical point may lie
+  // inside the envelope, outside the envelope, or even inside
+  // this infinite element.  Therefore if this fails,
+  // fall back to the FEInterface::inverse_map()
+  const Point my_origin (this->origin());
+
+  // determine the minimal distance of the base from the origin
+  // Use norm_sq() instead of norm(), it is faster
+  Point pt0_o(this->point(0) - my_origin);
+  Point pt1_o(this->point(1) - my_origin);
+  Point pt2_o(this->point(2) - my_origin);
+  Point pt3_o(this->point(3) - my_origin);
+  const Real min_distance_sq = std::min(pt0_o.norm_sq(),
+                               std::min(pt1_o.norm_sq(),
+                               std::min(pt2_o.norm_sq(),
+                                        pt3_o.norm_sq())));
+
+  // work with 1% allowable deviation.  We can still fall
+  // back to the InfFE::inverse_map()
+  const Real conservative_p_dist_sq = 1.01 * (Point(p - my_origin).norm_sq());
+
+
+
+  if (conservative_p_dist_sq < min_distance_sq)
+    {
+      // the physical point is definitely not contained in the element
+      return false;
+    }
+
+  // this captures the case that the point is not (almost) in the direction of the element.:
+  // first, project the problem onto the unit sphere:
+  Point p_o(p - my_origin);
+  pt0_o /= pt0_o.norm();
+  pt1_o /= pt1_o.norm();
+  pt2_o /= pt2_o.norm();
+  pt3_o /= pt3_o.norm();
+  p_o /= p_o.norm();
+
+
+  // now, check if it is in the projected face; using that the diagonal contains
+  // the largest distance between points in it
+  Real max_h = std::max((pt0_o - pt2_o).norm_sq(),
+                        (pt1_o - pt2_o).norm_sq())*1.01;
+
+  if ((p_o - pt0_o).norm_sq() > max_h ||
+      (p_o - pt1_o).norm_sq() > max_h ||
+      (p_o - pt2_o).norm_sq() > max_h ||
+      (p_o - pt3_o).norm_sq() > max_h )
+    {
+      // the physical point is definitely not contained in the element
+      return false;
+    }
+
+  // Declare a basic FEType.  Will use default in the base,
+  // and something else (not important) in radial direction.
+  FEType fe_type(default_order());
+
+  const Point mapped_point = FEInterface::inverse_map(dim(),
+                                                      fe_type,
+                                                      this,
+                                                      p,
+                                                      tol,
+                                                      false);
+
+  return FEInterface::on_reference_element(mapped_point, this->type(), tol);
+}
 
 } // namespace libMesh
 
