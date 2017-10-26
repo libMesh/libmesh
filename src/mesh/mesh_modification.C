@@ -1855,16 +1855,9 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
     libmesh_assert_equal_to (saved_bc_ids.size(), saved_bc_sides.size());
   }
 
-
   // Loop again, delete any remaining elements
-  {
-    MeshBase::element_iterator       it  = mesh.elements_begin();
-    const MeshBase::element_iterator end = mesh.elements_end();
-
-    for (; it != end; ++it)
-      mesh.delete_elem( *it );
-  }
-
+  for (auto & elem : mesh.elements_range())
+    mesh.delete_elem(elem);
 
   // Add the copied (now level-0) elements back to the mesh
   {
