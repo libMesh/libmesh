@@ -1683,12 +1683,8 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase & mesh)
   std::vector<unsigned char> my_elem_h_state(pmax_elem_id, 255);
   std::vector<unsigned char> my_elem_p_state(pmax_elem_id, 255);
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
       dof_id_type elemid = elem->id();
 
