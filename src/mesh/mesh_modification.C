@@ -810,13 +810,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
     unique_id_type max_unique_id = mesh.parallel_max_unique_id();
 #endif
 
-    MeshBase::element_iterator       el  = mesh.elements_begin();
-    const MeshBase::element_iterator end = mesh.elements_end();
-
-    for (; el!=end; ++el)
+    for (auto & elem : mesh.elements_range())
       {
-        Elem * elem = *el;
-
         const ElemType etype = elem->type();
 
         // all_tri currently only works on coarse meshes
@@ -1447,7 +1442,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
             for (auto sn : elem->side_index_range())
               {
-                mesh.get_boundary_info().boundary_ids(*el, sn, bc_ids);
+                mesh.get_boundary_info().boundary_ids(elem, sn, bc_ids);
                 for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
                   {
                     const boundary_id_type b_id = *id_it;
