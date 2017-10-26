@@ -1043,11 +1043,11 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
   // for non-local object ids
 
   // Request sets to send to each processor
-  std::vector<std::vector<dof_id_type> >
+  std::vector<std::vector<dof_id_type>>
     requested_ids(this->n_processors());
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  std::vector<std::vector<unique_id_type> >
+  std::vector<std::vector<unique_id_type>>
     requested_unique_ids(this->n_processors());
 #endif
 

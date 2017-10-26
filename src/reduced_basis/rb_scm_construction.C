@@ -129,7 +129,7 @@ void RBSCMConstruction::process_parameters_file(const std::string & parameters_f
       }
     }
 
-  std::map< std::string, std::vector<Real> > discrete_parameter_values_in;
+  std::map<std::string, std::vector<Real>> discrete_parameter_values_in;
 
   unsigned int n_discrete_parameters = infile.vector_variable_size("discrete_parameter_names");
   for (unsigned int i=0; i<n_discrete_parameters; i++)

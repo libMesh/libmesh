@@ -325,7 +325,7 @@ void LaplaceMeshSmoother::allgather_graph()
   // Now reconstruct _graph from the allgathered flat_graph.
 
   // // (Delete me later, the copy is just for printing purposes.)
-  // std::vector<std::vector<unsigned > > copy_of_graph(_graph);
+  // std::vector<std::vector<unsigned >> copy_of_graph(_graph);
 
   // Make sure the old graph is cleared out
   _graph.clear();

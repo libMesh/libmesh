@@ -203,7 +203,7 @@ template <>
 template <>
 void
 Packing<const Elem *>::pack (const Elem * const & elem,
-                             std::back_insert_iterator<std::vector<largest_id_type> > data_out,
+                             std::back_insert_iterator<std::vector<largest_id_type>> data_out,
                              const MeshBase * mesh)
 {
   libmesh_assert(elem);
@@ -330,7 +330,7 @@ template <>
 template <>
 void
 Packing<const Elem *>::pack (const Elem * const & elem,
-                             std::back_insert_iterator<std::vector<largest_id_type> > data_out,
+                             std::back_insert_iterator<std::vector<largest_id_type>> data_out,
                              const DistributedMesh * mesh)
 {
   pack(elem, data_out, static_cast<const MeshBase*>(mesh));
@@ -342,7 +342,7 @@ template <>
 template <>
 void
 Packing<const Elem *>::pack (const Elem * const & elem,
-                             std::back_insert_iterator<std::vector<largest_id_type> > data_out,
+                             std::back_insert_iterator<std::vector<largest_id_type>> data_out,
                              const ParallelMesh * mesh)
 {
   pack(elem, data_out, static_cast<const MeshBase*>(mesh));

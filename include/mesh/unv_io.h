@@ -211,7 +211,7 @@ private:
    * Map from libMesh Node* to data at that node, as read in by the
    * read_dataset() function.
    */
-  std::map<Node *, std::vector<Number> > _node_data;
+  std::map<Node *, std::vector<Number>> _node_data;
 };
 
 

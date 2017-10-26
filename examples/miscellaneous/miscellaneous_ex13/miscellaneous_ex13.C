@@ -393,9 +393,9 @@ void assemble_shell (EquationSystems & es,
   const std::vector<RealGradient> & d2xyzdxi2 = fe->get_d2xyzdxi2();
   const std::vector<RealGradient> & d2xyzdeta2 = fe->get_d2xyzdeta2();
   const std::vector<RealGradient> & d2xyzdxideta = fe->get_d2xyzdxideta();
-  const std::vector<std::vector<Real> > & dphidxi = fe->get_dphidxi();
-  const std::vector<std::vector<Real> > & dphideta = fe->get_dphideta();
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real>> & dphidxi = fe->get_dphidxi();
+  const std::vector<std::vector<Real>> & dphideta = fe->get_dphideta();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
   // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
@@ -425,7 +425,7 @@ void assemble_shell (EquationSystems & es,
   DenseSubVector<Number> Fe_w(Fe);
 
   std::vector<dof_id_type> dof_indices;
-  std::vector< std::vector<dof_id_type> > dof_indices_var(6);
+  std::vector<std::vector<dof_id_type>> dof_indices_var(6);
 
   // Now we will loop over all the elements in the mesh.  We will
   // compute the element matrix and right-hand-side contribution.

@@ -287,7 +287,7 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
     const MeshBase::const_node_iterator end = _mesh.nodes_end();
 
     // Only compute the node to elem map once
-    std::vector<std::vector<const Elem *> > nodes_to_elem_map;
+    std::vector<std::vector<const Elem *>> nodes_to_elem_map;
     MeshTools::build_nodes_to_elem_map(_mesh, nodes_to_elem_map);
 
     for (int i=0; it != end; ++it)
@@ -469,7 +469,7 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
 
   // Grab hanging node connectivity
   {
-    std::map<dof_id_type, std::vector<dof_id_type> >::iterator
+    std::map<dof_id_type, std::vector<dof_id_type>>::iterator
       it = _hanging_nodes.begin(),
       end = _hanging_nodes.end();
 

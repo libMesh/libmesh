@@ -202,9 +202,9 @@ void RadialBasisInterpolation<KDDim,RBF>::interpolate_field_data (const std::vec
 
 // ------------------------------------------------------------
 // Explicit Instantiations
-template class RadialBasisInterpolation<3, WendlandRBF<3,0> >;
-template class RadialBasisInterpolation<3, WendlandRBF<3,2> >;
-template class RadialBasisInterpolation<3, WendlandRBF<3,4> >;
-template class RadialBasisInterpolation<3, WendlandRBF<3,8> >;
+template class RadialBasisInterpolation<3, WendlandRBF<3,0>>;
+template class RadialBasisInterpolation<3, WendlandRBF<3,2>>;
+template class RadialBasisInterpolation<3, WendlandRBF<3,4>>;
+template class RadialBasisInterpolation<3, WendlandRBF<3,8>>;
 
 } // namespace libMesh

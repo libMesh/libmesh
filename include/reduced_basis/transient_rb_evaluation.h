@@ -176,19 +176,19 @@ public:
   /**
    * Dense matrices for the RB mass matrices.
    */
-  std::vector< DenseMatrix<Number> > RB_M_q_vector;
+  std::vector<DenseMatrix<Number>> RB_M_q_vector;
 
   /**
    * The RB outputs for all time-levels from the
    * most recent rb_solve.
    */
-  std::vector< std::vector<Number> > RB_outputs_all_k;
+  std::vector<std::vector<Number>> RB_outputs_all_k;
 
   /**
    * The error bounds for each RB output for all
    * time-levels from the most recent rb_solve.
    */
-  std::vector< std::vector<Real> > RB_output_error_bounds_all_k;
+  std::vector<std::vector<Real>> RB_output_error_bounds_all_k;
 
   /**
    * The RB solution at the previous time-level.
@@ -198,13 +198,13 @@ public:
   /**
    * Array storing the solution data at each time level from the most recent solve.
    */
-  std::vector< DenseVector<Number> > RB_temporal_solution_data;
+  std::vector<DenseVector<Number>> RB_temporal_solution_data;
 
   /**
    * The error bound data for all time-levels from the
    * most recent rb_solve.
    */
-  std::vector< Real > error_bound_all_k;
+  std::vector<Real > error_bound_all_k;
 
   /**
    * Vector storing initial L2 error for all
@@ -216,15 +216,15 @@ public:
    * The RB initial conditions (i.e. L2 projection of the truth
    * initial condition) for each N.
    */
-  std::vector< DenseVector<Number> > RB_initial_condition_all_N;
+  std::vector<DenseVector<Number>> RB_initial_condition_all_N;
 
   /**
    * Vectors storing the residual representor inner products
    * to be used in computing the residuals online.
    */
-  std::vector< std::vector< std::vector<Number> > > Fq_Mq_representor_innerprods;
-  std::vector< std::vector< std::vector<Number> > > Mq_Mq_representor_innerprods;
-  std::vector< std::vector< std::vector< std::vector<Number> > > > Aq_Mq_representor_innerprods;
+  std::vector<std::vector<std::vector<Number>>> Fq_Mq_representor_innerprods;
+  std::vector<std::vector<std::vector<Number>>> Mq_Mq_representor_innerprods;
+  std::vector<std::vector<std::vector<std::vector<Number>>>> Aq_Mq_representor_innerprods;
 
 
   /**
@@ -242,7 +242,7 @@ public:
    * Vector storing the mass matrix representors.
    * These are basis dependent and hence stored here.
    */
-  std::vector< std::vector< NumericVector<Number> * > > M_q_representor;
+  std::vector<std::vector<NumericVector<Number> * >> M_q_representor;
 
   /**
    * Check that the data has been cached in case of using rb_solve_again

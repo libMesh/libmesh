@@ -164,7 +164,7 @@ MeshFunction::clear ()
 
 
 
-UniquePtr<FunctionBase<Number> > MeshFunction::clone () const
+UniquePtr<FunctionBase<Number>> MeshFunction::clone () const
 {
   FunctionBase<Number> * mf_clone =
     new MeshFunction(_eqn_systems, _vector, _dof_map, _system_vars, this);
@@ -172,7 +172,7 @@ UniquePtr<FunctionBase<Number> > MeshFunction::clone () const
   if (this->initialized())
     mf_clone->init();
 
-  return UniquePtr< FunctionBase<Number> >(mf_clone);
+  return UniquePtr<FunctionBase<Number>>(mf_clone);
 }
 
 
@@ -192,10 +192,10 @@ std::map<const Elem *, Number> MeshFunction::discontinuous_value (const Point & 
 {
   libmesh_assert (this->initialized());
 
-  std::map<const Elem *, DenseVector<Number> > buffer;
+  std::map<const Elem *, DenseVector<Number>> buffer;
   this->discontinuous_value (p, time, buffer);
   std::map<const Elem *, Number> return_value;
-  for (std::map<const Elem *, DenseVector<Number> >::const_iterator it = buffer.begin(); it != buffer.end(); ++it)
+  for (std::map<const Elem *, DenseVector<Number>>::const_iterator it = buffer.begin(); it != buffer.end(); ++it)
     return_value[it->first] = it->second(0);
   // NOTE: If no suitable element is found, then the map return_value is empty. This
   // puts burden on the user of this function but I don't really see a better way.
@@ -217,10 +217,10 @@ std::map<const Elem *, Gradient> MeshFunction::discontinuous_gradient (const Poi
 {
   libmesh_assert (this->initialized());
 
-  std::map<const Elem *, std::vector<Gradient> > buffer;
+  std::map<const Elem *, std::vector<Gradient>> buffer;
   this->discontinuous_gradient (p, time, buffer);
   std::map<const Elem *, Gradient> return_value;
-  for (std::map<const Elem *, std::vector<Gradient> >::const_iterator it = buffer.begin(); it != buffer.end(); ++it)
+  for (std::map<const Elem *, std::vector<Gradient>>::const_iterator it = buffer.begin(); it != buffer.end(); ++it)
     return_value[it->first] = it->second[0];
   // NOTE: If no suitable element is found, then the map return_value is empty. This
   // puts burden on the user of this function but I don't really see a better way.
@@ -337,7 +337,7 @@ void MeshFunction::operator() (const Point & p,
 
 void MeshFunction::discontinuous_value (const Point & p,
                                         const Real time,
-                                        std::map<const Elem *, DenseVector<Number> > & output)
+                                        std::map<const Elem *, DenseVector<Number>> & output)
 {
   this->discontinuous_value (p, time, output, libmesh_nullptr);
 }
@@ -346,7 +346,7 @@ void MeshFunction::discontinuous_value (const Point & p,
 
 void MeshFunction::discontinuous_value (const Point & p,
                                         const Real,
-                                        std::map<const Elem *, DenseVector<Number> > & output,
+                                        std::map<const Elem *, DenseVector<Number>> & output,
                                         const std::set<subdomain_id_type> * subdomain_ids)
 {
   libmesh_assert (this->initialized());
@@ -487,7 +487,7 @@ void MeshFunction::gradient (const Point & p,
             const FEType & fe_type = this->_dof_map.variable_type(var);
 
             UniquePtr<FEBase> point_fe (FEBase::build(dim, fe_type));
-            const std::vector<std::vector<RealGradient> > & dphi = point_fe->get_dphi();
+            const std::vector<std::vector<RealGradient>> & dphi = point_fe->get_dphi();
             point_fe->reinit(element, &point_list);
 
             // where the solution values for the var-th variable are stored
@@ -509,7 +509,7 @@ void MeshFunction::gradient (const Point & p,
 
 void MeshFunction::discontinuous_gradient (const Point & p,
                                            const Real time,
-                                           std::map<const Elem *, std::vector<Gradient> > & output)
+                                           std::map<const Elem *, std::vector<Gradient>> & output)
 {
   this->discontinuous_gradient (p, time, output, libmesh_nullptr);
 }
@@ -518,7 +518,7 @@ void MeshFunction::discontinuous_gradient (const Point & p,
 
 void MeshFunction::discontinuous_gradient (const Point & p,
                                            const Real,
-                                           std::map<const Elem *, std::vector<Gradient> > & output,
+                                           std::map<const Elem *, std::vector<Gradient>> & output,
                                            const std::set<subdomain_id_type> * subdomain_ids)
 {
   libmesh_assert (this->initialized());
@@ -571,7 +571,7 @@ void MeshFunction::discontinuous_gradient (const Point & p,
           const FEType & fe_type = this->_dof_map.variable_type(var);
 
           UniquePtr<FEBase> point_fe (FEBase::build(dim, fe_type));
-          const std::vector<std::vector<RealGradient> > & dphi = point_fe->get_dphi();
+          const std::vector<std::vector<RealGradient>> & dphi = point_fe->get_dphi();
           point_fe->reinit(element, &point_list);
 
           // where the solution values for the var-th variable are stored
@@ -650,7 +650,7 @@ void MeshFunction::hessian (const Point & p,
             const FEType & fe_type = this->_dof_map.variable_type(var);
 
             UniquePtr<FEBase> point_fe (FEBase::build(dim, fe_type));
-            const std::vector<std::vector<RealTensor> > & d2phi =
+            const std::vector<std::vector<RealTensor>> & d2phi =
               point_fe->get_d2phi();
             point_fe->reinit(element, &point_list);
 

@@ -1001,8 +1001,8 @@ protected:
                                              const Point & p,
                                              const Real tolerance = TOLERANCE) const;
 
-  mutable UniquePtr<FEGenericBase<Real> >         _real_fe;
-  mutable UniquePtr<FEGenericBase<RealGradient> > _real_grad_fe;
+  mutable UniquePtr<FEGenericBase<Real>>         _real_fe;
+  mutable UniquePtr<FEGenericBase<RealGradient>> _real_grad_fe;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   mutable bool _real_fe_is_inf;
@@ -1090,8 +1090,8 @@ protected:
    * We store FE objects for each element dimension present in the mesh,
    * except for edge_fe which only applies to 3D elements.
    */
-  std::vector<std::map<FEType, FEAbstract *> > _element_fe;
-  std::vector<std::map<FEType, FEAbstract *> > _side_fe;
+  std::vector<std::map<FEType, FEAbstract *>> _element_fe;
+  std::vector<std::map<FEType, FEAbstract *>> _side_fe;
   std::map<FEType, FEAbstract *> _edge_fe;
 
 
@@ -1101,8 +1101,8 @@ protected:
    * present in the mesh, except for edge_fe_var which only applies
    * for 3D elements.
    */
-  std::vector<std::vector<FEAbstract *> > _element_fe_var;
-  std::vector<std::vector<FEAbstract *> > _side_fe_var;
+  std::vector<std::vector<FEAbstract *>> _element_fe_var;
+  std::vector<std::vector<FEAbstract *>> _side_fe_var;
   std::vector<FEAbstract *> _edge_fe_var;
 
   /**

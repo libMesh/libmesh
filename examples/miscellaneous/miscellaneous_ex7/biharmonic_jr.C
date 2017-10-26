@@ -225,13 +225,13 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
   const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
   // The element shape functions' derivatives evaluated at the quadrature points.
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   // The element shape functions'  second derivatives evaluated at the quadrature points.
-  const std::vector<std::vector<RealTensor> > & d2phi = fe->get_d2phi();
+  const std::vector<std::vector<RealTensor>> & d2phi = fe->get_d2phi();
 
   // For efficiency we will compute shape function laplacians n times,
   // not n^2
@@ -526,7 +526,7 @@ void Biharmonic::JR::bounds(NumericVector<Number> & XL,
   for ( ; el != end_el; ++el)
     {
       // Extract the shape function to be evaluated at the nodes
-      const std::vector<std::vector<Real> > & phi = fe->get_phi();
+      const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
       // Get the degree of freedom indices for the current element.
       // They are in 1-1 correspondence with shape functions phi

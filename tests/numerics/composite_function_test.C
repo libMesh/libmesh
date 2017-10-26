@@ -41,7 +41,7 @@ public:
 private:
   void testRemap()
   {
-    std::vector<std::vector<unsigned int> > index_sets(4);
+    std::vector<std::vector<unsigned int>> index_sets(4);
     index_sets[0].resize(2);
     index_sets[0][0] = 3;
     index_sets[0][1] = 4;

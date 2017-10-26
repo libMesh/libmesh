@@ -161,17 +161,17 @@ void TransientSystem<Base>::add_old_vectors()
 {
 #ifdef LIBMESH_ENABLE_GHOSTED
   old_local_solution =
-    UniquePtr<NumericVector<Number> >
+    UniquePtr<NumericVector<Number>>
     (&(this->add_vector("_transient_old_local_solution", true, GHOSTED)));
   older_local_solution =
-    UniquePtr<NumericVector<Number> >
+    UniquePtr<NumericVector<Number>>
     (&(this->add_vector("_transient_older_local_solution", true, GHOSTED)));
 #else
   old_local_solution =
-    UniquePtr<NumericVector<Number> >
+    UniquePtr<NumericVector<Number>>
     (&(this->add_vector("_transient_old_local_solution", true, SERIAL)));
   older_local_solution =
-    UniquePtr<NumericVector<Number> >
+    UniquePtr<NumericVector<Number>>
     (&(this->add_vector("_transient_older_local_solution", true, SERIAL)));
 #endif
 }

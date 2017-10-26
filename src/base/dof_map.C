@@ -340,7 +340,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 #endif
 
   // Request sets to send to each processor
-  std::vector<std::vector<dof_id_type> >
+  std::vector<std::vector<dof_id_type>>
     requested_ids(this->n_processors());
 
   // We know how many of our objects live on each processor, so
@@ -1598,7 +1598,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
   // Making a list of non-zero coupling matrix columns is an
   // O(N_var^2) operation.  We cache it so we only have to do it once
   // per CouplingMatrix and not once per element.
-  std::map<const CouplingMatrix *, std::vector<unsigned int> >
+  std::map<const CouplingMatrix *, std::vector<unsigned int>>
     column_variable_lists;
 
   GhostingFunctor::map_type::iterator        etg_it = elements_to_send.begin();
@@ -1621,13 +1621,13 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
           libmesh_assert_equal_to (ghost_coupling->size(), n_var);
 
           // Try to find a cached list of column variables.
-          std::map<const CouplingMatrix *, std::vector<unsigned int> >::const_iterator
+          std::map<const CouplingMatrix *, std::vector<unsigned int>>::const_iterator
             column_variable_list = column_variable_lists.find(ghost_coupling);
 
           // If we didn't find it, then we need to create it.
           if (column_variable_list == column_variable_lists.end())
             {
-              std::pair<std::map<const CouplingMatrix *, std::vector<unsigned int> >::iterator, bool>
+              std::pair<std::map<const CouplingMatrix *, std::vector<unsigned int>>::iterator, bool>
                 inserted_variable_list_pair = column_variable_lists.insert(std::make_pair(ghost_coupling,
                                                                                           std::vector<unsigned int>()));
               column_variable_list = inserted_variable_list_pair.first;
@@ -2768,7 +2768,7 @@ std::string DofMap::get_info() const
 
   // If we calculated the exact sparsity pattern, then we can report
   // exact bandwidth figures:
-  std::vector<SparseMatrix<Number> * >::const_iterator
+  std::vector<SparseMatrix<Number> *>::const_iterator
     pos = _matrices.begin(),
     end = _matrices.end();
 

@@ -57,7 +57,7 @@ template <typename T> class NumericVector;
  * \author Derek Gaston
  * \date 2013
  */
-class DTKEvaluator : public DataTransferKit::FieldEvaluator<int,DataTransferKit::FieldContainer<double> >
+class DTKEvaluator : public DataTransferKit::FieldEvaluator<int,DataTransferKit::FieldContainer<double>>
 {
 public:
   typedef DataTransferKit::MeshContainer<int> MeshContainerType;

@@ -75,7 +75,7 @@ protected:
   typedef DataTransferKit::SharedDomainMap<DTKAdapter::MeshContainerType,DTKAdapter::MeshContainerType> shared_domain_map_type;
 
   /// COMM_WORLD for now
-  Teuchos::RCP<const Teuchos::Comm<int> > comm_default;
+  Teuchos::RCP<const Teuchos::Comm<int>> comm_default;
 
   /// The DTKAdapter associated with each EquationSystems
   std::map<EquationSystems *, DTKAdapter *> adapters;

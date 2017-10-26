@@ -69,7 +69,7 @@ public:
 
   void testAllGatherPairPointPoint()
   {
-    std::vector<std::pair<Point, Point> > vals;
+    std::vector<std::pair<Point, Point>> vals;
     Real myrank = TestCommWorld->rank();
     TestCommWorld->allgather
       (std::make_pair(Point(myrank, myrank+0.125, myrank+0.25), Point(myrank+0.5, myrank+0.625, myrank+0.75)), vals);
@@ -93,7 +93,7 @@ public:
 
   void testAllGatherPairRealPoint()
   {
-    std::vector<std::pair<Real, Point> > vals;
+    std::vector<std::pair<Real, Point>> vals;
     Real myrank = TestCommWorld->rank();
     TestCommWorld->allgather
       (std::make_pair(Real(myrank+0.75), Point(myrank, myrank+0.25, myrank+0.5)), vals);
@@ -117,7 +117,7 @@ public:
   template <typename T>
   void testBroadcastVectorValue()
   {
-    std::vector<VectorValue<T> > src(3), dest(3);
+    std::vector<VectorValue<T>> src(3), dest(3);
 
     {
       T val=T(0);

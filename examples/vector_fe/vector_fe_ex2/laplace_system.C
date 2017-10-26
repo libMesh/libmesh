@@ -122,11 +122,11 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
   const std::vector<Real> & JxW = fe->get_JxW();
 
   // The velocity shape functions at interior quadrature points.
-  const std::vector<std::vector<RealGradient> > & phi = fe->get_phi();
+  const std::vector<std::vector<RealGradient>> & phi = fe->get_phi();
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealTensor> > & grad_phi = fe->get_dphi();
+  const std::vector<std::vector<RealTensor>> & grad_phi = fe->get_dphi();
 
   const std::vector<Point> & qpoint = fe->get_xyz();
 
@@ -189,7 +189,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
 //   const std::vector<Real> & JxW = side_fe->get_JxW();
 //
 //   // The velocity shape functions at interior quadrature points.
-//   const std::vector<std::vector<RealGradient> > & phi = side_fe->get_phi();
+//   const std::vector<std::vector<RealGradient>> & phi = side_fe->get_phi();
 //
 //   // The number of local degrees of freedom in each variable
 //   const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();

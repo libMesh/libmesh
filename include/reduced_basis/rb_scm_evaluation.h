@@ -190,7 +190,7 @@ public:
    * Vector storing the greedily selected parameters
    * during SCM training.
    */
-  std::vector< RBParameters > C_J;
+  std::vector<RBParameters > C_J;
 
   /**
    * Vector storing the (truth) stability values
@@ -204,7 +204,7 @@ public:
    * C_J, which are used in computing the SCM
    * upper bounds.
    */
-  std::vector< std::vector<Real> > SCM_UB_vectors;
+  std::vector<std::vector<Real>> SCM_UB_vectors;
 
 private:
 

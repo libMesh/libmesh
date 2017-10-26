@@ -455,8 +455,8 @@ typename CompareTypes<T, T2>::supertype DenseVector<T>::dot (const DenseVector<T
   // the convention in Eigen is to take the complex conjugate of the
   // *first* argument, while ours is to take the complex conjugate of
   // the second.
-  return Eigen::Map<const typename Eigen::Matrix<T2, Eigen::Dynamic, 1> >(&(vec.get_values()[0]), vec.size())
-    .dot(Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1> >(&_val[0], _val.size()));
+  return Eigen::Map<const typename Eigen::Matrix<T2, Eigen::Dynamic, 1>>(&(vec.get_values()[0]), vec.size())
+    .dot(Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1>>(&_val[0], _val.size()));
 #else
   typename CompareTypes<T, T2>::supertype val = 0.;
 
@@ -599,7 +599,7 @@ Real DenseVector<T>::l1_norm () const
     return 0.;
 
 #ifdef LIBMESH_HAVE_EIGEN
-  return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1> >(&_val[0], _val.size()).template lpNorm<1>();
+  return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1>>(&_val[0], _val.size()).template lpNorm<1>();
 #else
   Real my_norm = 0.;
   const int N = cast_int<int>(_val.size());
@@ -620,7 +620,7 @@ Real DenseVector<T>::l2_norm () const
     return 0.;
 
 #ifdef LIBMESH_HAVE_EIGEN
-  return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1> >(&_val[0], _val.size()).norm();
+  return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1>>(&_val[0], _val.size()).norm();
 #else
   Real my_norm = 0.;
   const int N = cast_int<int>(_val.size());
@@ -646,7 +646,7 @@ Real DenseVector<T>::linfty_norm () const
     return 0.;
 
 #ifdef LIBMESH_HAVE_EIGEN
-  return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1> >(&_val[0], _val.size()).template lpNorm<Eigen::Infinity>();
+  return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1>>(&_val[0], _val.size()).template lpNorm<Eigen::Infinity>();
 #else
   Real my_norm = TensorTools::norm_sq((*this)(0));
 

@@ -111,7 +111,7 @@ Number exact_value (const Point & p,
 
 // With --enable-fparser, the user can also optionally set their own
 // exact solution equations.
-UniquePtr<FunctionBase<Number> > parsed_solution;
+UniquePtr<FunctionBase<Number>> parsed_solution;
 
 
 // Returns a string with 'number' formatted and placed directly
@@ -608,11 +608,11 @@ void assemble_cd (EquationSystems & es,
   const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers

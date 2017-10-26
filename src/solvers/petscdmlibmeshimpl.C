@@ -61,7 +61,7 @@ struct DM_libMesh
   std::map<std::string, unsigned int> * blockids;
   std::map<unsigned int, std::string> * blocknames;
   unsigned int decomposition_type;
-  std::vector<std::set<unsigned int> > * decomposition;
+  std::vector<std::set<unsigned int>> * decomposition;
   unsigned int embedding_type;
   IS embedding;
   unsigned int vec_count;
@@ -498,7 +498,7 @@ PetscErrorCode DMlibMeshCreateFieldDecompositionDM(DM dm, PetscInt dnumber, Pets
   ddlm->varnames = dlm->varnames;
   ddlm->blockids = dlm->blockids;
   ddlm->blocknames = dlm->blocknames;
-  ddlm->decomposition = new(std::vector<std::set<unsigned int> >);
+  ddlm->decomposition = new(std::vector<std::set<unsigned int>>);
   ddlm->decomposition_type = DMLIBMESH_FIELD_DECOMPOSITION;
   if (dnumber) {
     for (PetscInt d = 0; d < dnumber; ++d) {
@@ -551,7 +551,7 @@ PetscErrorCode DMlibMeshCreateDomainDecompositionDM(DM dm, PetscInt dnumber, Pet
   ddlm->varnames = dlm->varnames;
   ddlm->blockids   = dlm->blockids;
   ddlm->blocknames = dlm->blocknames;
-  ddlm->decomposition = new(std::vector<std::set<unsigned int> >);
+  ddlm->decomposition = new(std::vector<std::set<unsigned int>>);
   ddlm->decomposition_type = DMLIBMESH_DOMAIN_DECOMPOSITION;
   if (dnumber) {
     for (PetscInt d = 0; d < dnumber; ++d) {
@@ -789,8 +789,8 @@ static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
   NonlinearImplicitSystem * _sys;
   ierr = DMlibMeshGetSystem(dm, _sys);CHKERRQ(ierr);
   NonlinearImplicitSystem & sys = *_sys;
-  PetscVector<Number> & X_sys = *libmesh_cast_ptr<PetscVector<Number> * >(sys.solution.get());
-  PetscVector<Number> & R_sys = *libmesh_cast_ptr<PetscVector<Number> * >(sys.rhs);
+  PetscVector<Number> & X_sys = *libmesh_cast_ptr<PetscVector<Number> *>(sys.solution.get());
+  PetscVector<Number> & R_sys = *libmesh_cast_ptr<PetscVector<Number> *>(sys.rhs);
   PetscVector<Number> X_global(x, _sys->comm()), R(r, _sys->comm());
 
   // Use the systems update() to get a good local version of the parallel solution

@@ -86,7 +86,7 @@ bool L2System::element_time_derivative (bool request_jacobian,
   // Element Jacobian * quadrature weights for interior integration
   const std::vector<Real> & JxW = c.get_element_fe(0)->get_JxW();
 
-  const std::vector<std::vector<Real> > & phi = c.get_element_fe(0)->get_phi();
+  const std::vector<std::vector<Real>> & phi = c.get_element_fe(0)->get_phi();
 
   const std::vector<Point> & xyz = c.get_element_fe(0)->get_xyz();
 

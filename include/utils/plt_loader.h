@@ -242,7 +242,7 @@ public:
   /**
    * \returns A reference to the data read from the file
    */
-  const std::vector<std::vector<std::vector<float> > > & get_data () const;
+  const std::vector<std::vector<std::vector<float>>> & get_data () const;
 
   /**
    * Enum defining the number of nodes for each element type.
@@ -427,13 +427,13 @@ private:
   /**
    * Vector to hold the data.
    */
-  std::vector<std::vector<std::vector<float> > >  _data;
+  std::vector<std::vector<std::vector<float>>>  _data;
 
   /**
    * Vectors to hold the connectivity for each zone
    * (only for unstructured files).
    */
-  std::vector<std::vector<int> > _conn;
+  std::vector<std::vector<int>> _conn;
 
   /**
    * Scratch data & relevant sizes.
@@ -700,7 +700,7 @@ PltLoader::FEType PltLoader::elem_type (const unsigned int z) const
 
 
 inline
-const std::vector<std::vector<std::vector<float> > > &
+const std::vector<std::vector<std::vector<float>>> &
 PltLoader::get_data () const
 {
   return _data;

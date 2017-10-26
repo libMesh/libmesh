@@ -166,7 +166,7 @@ private:
   /**
    * Map for hanging_nodes
    */
-  std::map<dof_id_type, std::vector<dof_id_type> > _hanging_nodes;
+  std::map<dof_id_type, std::vector<dof_id_type>> _hanging_nodes;
 
   /**
    * Vector for holding adaptive data
@@ -233,7 +233,7 @@ private:
     const std::vector<T> & operator[](unsigned i) const {return _data[i];}
 
   private:
-    std::vector<std::vector<T> > _data;
+    std::vector<std::vector<T>> _data;
   };
 
 
@@ -254,7 +254,7 @@ private:
     const Array2D<T> & operator[](unsigned i) const {return _data[i];}
 
   private:
-    std::vector<Array2D<T> > _data;
+    std::vector<Array2D<T>> _data;
   };
 
 

@@ -248,13 +248,13 @@ public:
    * and n_dofs_per_constraint[i] gives the indices that are non-zero
    * in row i of the Jacobian.
    */
-  void initialize_equality_constraints_storage(const std::vector< std::set<numeric_index_type> > & constraint_jac_sparsity);
+  void initialize_equality_constraints_storage(const std::vector<std::set<numeric_index_type>> & constraint_jac_sparsity);
 
   /**
    * Initialize storage for the inequality constraints, as per
    * initialize_equality_constraints_storage.
    */
-  void initialize_inequality_constraints_storage(const std::vector< std::set<numeric_index_type> > & constraint_jac_sparsity);
+  void initialize_inequality_constraints_storage(const std::vector<std::set<numeric_index_type>> & constraint_jac_sparsity);
 
   /**
    * \returns \p "Optimization".  Helps in identifying
@@ -265,41 +265,41 @@ public:
   /**
    * The \p OptimizationSolver that is used for performing the optimization.
    */
-  UniquePtr<OptimizationSolver<Number> > optimization_solver;
+  UniquePtr<OptimizationSolver<Number>> optimization_solver;
 
   /**
    * The vector that stores equality constraints.
    */
-  UniquePtr<NumericVector<Number> > C_eq;
+  UniquePtr<NumericVector<Number>> C_eq;
 
   /**
    * The sparse matrix that stores the Jacobian of C_eq.
    */
-  UniquePtr<SparseMatrix<Number> > C_eq_jac;
+  UniquePtr<SparseMatrix<Number>> C_eq_jac;
 
   /**
    * The vector that stores inequality constraints.
    */
-  UniquePtr<NumericVector<Number> > C_ineq;
+  UniquePtr<NumericVector<Number>> C_ineq;
 
   /**
    * The sparse matrix that stores the Jacobian of C_ineq.
    */
-  UniquePtr<SparseMatrix<Number> > C_ineq_jac;
+  UniquePtr<SparseMatrix<Number>> C_ineq_jac;
 
   /**
    * Vectors to store the dual variables associated with equality
    * and inequality constraints.
    */
-  UniquePtr<NumericVector<Number> > lambda_eq;
-  UniquePtr<NumericVector<Number> > lambda_ineq;
+  UniquePtr<NumericVector<Number>> lambda_eq;
+  UniquePtr<NumericVector<Number>> lambda_ineq;
 
   /**
    * A copy of the equality and inequality constraint Jacobian sparsity
    * patterns.
    */
-  std::vector< std::set<numeric_index_type> > eq_constraint_jac_sparsity;
-  std::vector< std::set<numeric_index_type> > ineq_constraint_jac_sparsity;
+  std::vector<std::set<numeric_index_type>> eq_constraint_jac_sparsity;
+  std::vector<std::set<numeric_index_type>> ineq_constraint_jac_sparsity;
 };
 
 } // namespace libMesh

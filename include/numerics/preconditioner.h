@@ -54,7 +54,7 @@ template <typename T> class ShellMatrix;
  * \date 2009
  */
 template <typename T>
-class Preconditioner : public ReferenceCountedObject<Preconditioner<T> >,
+class Preconditioner : public ReferenceCountedObject<Preconditioner<T>>,
                        public ParallelObject
 {
 public:

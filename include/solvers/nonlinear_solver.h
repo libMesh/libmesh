@@ -49,7 +49,7 @@ class SolverConfiguration;
  * \date 2005
  */
 template <typename T>
-class NonlinearSolver : public ReferenceCountedObject<NonlinearSolver<T> >,
+class NonlinearSolver : public ReferenceCountedObject<NonlinearSolver<T>>,
                         public ParallelObject
 {
 public:
@@ -73,7 +73,7 @@ public:
    * Builds a \p NonlinearSolver using the nonlinear solver package specified by
    * \p solver_package
    */
-  static UniquePtr<NonlinearSolver<T> > build(sys_type & s,
+  static UniquePtr<NonlinearSolver<T>> build(sys_type & s,
                                               const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**

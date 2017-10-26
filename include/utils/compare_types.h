@@ -75,7 +75,7 @@ ScalarTraits_true(double);
 ScalarTraits_true(long double);
 
 template<typename T>
-struct ScalarTraits<std::complex<T> > { static const bool value = ScalarTraits<T>::value; };
+struct ScalarTraits<std::complex<T>> { static const bool value = ScalarTraits<T>::value; };
 
 
 
@@ -97,7 +97,7 @@ struct CompareTypes<T, T> {
 };
 
 template<typename T>
-struct CompareTypes<T, std::complex<T> > {
+struct CompareTypes<T, std::complex<T>> {
   typedef std::complex<T> supertype;
 };
 
@@ -160,7 +160,7 @@ SUPERTYPE(double, long double);
 // gcc can't tell which of the following is the most specialized?  Weak.
 /*
   template<typename S, typename T>
-  struct CompareTypes<std::complex<S>, std::complex<T> > {
+  struct CompareTypes<std::complex<S>, std::complex<T>> {
   typedef std::complex<typename CompareTypes<S, T>::supertype> supertype;
   };
 
@@ -170,7 +170,7 @@ SUPERTYPE(double, long double);
   };
 
   template<typename S, typename T>
-  struct CompareTypes<S, std::complex<T> > {
+  struct CompareTypes<S, std::complex<T>> {
   typedef std::complex<typename CompareTypes<S, T>::supertype> supertype;
   };
 */

@@ -62,7 +62,7 @@ void TrilinosPreconditioner<T>::init ()
   // Clear the preconditioner in case it has been created in the past
   if (!this->_is_initialized)
     {
-      EpetraMatrix<T> * matrix = cast_ptr<EpetraMatrix<T> *, SparseMatrix<T> >(this->_matrix);
+      EpetraMatrix<T> * matrix = cast_ptr<EpetraMatrix<T> *, SparseMatrix<T>>(this->_matrix);
       _mat = matrix->mat();
     }
 

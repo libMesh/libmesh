@@ -227,10 +227,10 @@ void assemble_1D(EquationSystems & es,
   const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature points.
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   // Declare a dense matrix and dense vector to hold the element matrix
   // and right-hand-side contribution

@@ -197,11 +197,11 @@ void assemble_stokes (EquationSystems & es,
 
   // The element shape function gradients for the velocity
   // variables evaluated at the quadrature points.
-  const std::vector<std::vector<RealGradient> > & dphi = fe_vel->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe_vel->get_dphi();
 
   // The element shape functions for the pressure variable
   // evaluated at the quadrature points.
-  const std::vector<std::vector<Real> > & psi = fe_pres->get_phi();
+  const std::vector<std::vector<Real>> & psi = fe_pres->get_phi();
 
   // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers

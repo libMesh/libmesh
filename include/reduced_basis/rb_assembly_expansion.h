@@ -188,7 +188,7 @@ private:
    * Vector storing the function pointers to the assembly
    * routines for the outputs. Element interior part.
    */
-  std::vector< std::vector<ElemAssembly *> > _output_assembly_vector;
+  std::vector<std::vector<ElemAssembly *>> _output_assembly_vector;
 };
 
 }

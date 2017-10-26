@@ -529,7 +529,7 @@ void DofObject::unpack_indexing(std::vector<largest_id_type>::const_iterator beg
 
 // FIXME: it'll be tricky getting this to work with 64-bit dof_id_type
 void
-DofObject::pack_indexing(std::back_insert_iterator<std::vector<largest_id_type> > target) const
+DofObject::pack_indexing(std::back_insert_iterator<std::vector<largest_id_type>> target) const
 {
 #ifdef LIBMESH_ENABLE_AMR
   // We might need to pack old_dof_object too

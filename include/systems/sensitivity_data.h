@@ -145,8 +145,8 @@ private:
   /**
    * Data storage; currently pretty trivial
    */
-  std::vector<std::vector<Number> > _grad_data;
-  std::vector<std::vector<std::vector<Number> > > _hess_data;
+  std::vector<std::vector<Number>> _grad_data;
+  std::vector<std::vector<std::vector<Number>>> _hess_data;
 };
 
 

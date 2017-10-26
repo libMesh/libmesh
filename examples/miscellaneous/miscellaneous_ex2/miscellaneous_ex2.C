@@ -344,11 +344,11 @@ void assemble_helmholtz(EquationSystems & es,
   const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   // Here we do not assemble directly in the System matrix, but to the
   // additional matrices "stiffness_mass" and "damping".  The same
@@ -455,7 +455,7 @@ void assemble_helmholtz(EquationSystems & es,
 
             // The value of the shape functions at the quadrature
             // points.
-            const std::vector<std::vector<Real> > & phi_face =
+            const std::vector<std::vector<Real>> & phi_face =
               fe_face->get_phi();
 
             // The Jacobian times the quadrature weight at the quadrature

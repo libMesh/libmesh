@@ -222,7 +222,7 @@ void assemble_mass(EquationSystems & es,
   const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
   // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers

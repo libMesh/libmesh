@@ -118,7 +118,7 @@ public:
   /**
    * Overwrite the training parameters with new_training_set.
    */
-  virtual void load_training_set(std::map< std::string, std::vector<Number> > & new_training_set);
+  virtual void load_training_set(std::map<std::string, std::vector<Number>> & new_training_set);
 
   /**
    * Broadcasts parameters on processor proc_id
@@ -209,7 +209,7 @@ protected:
    */
   static void generate_training_parameters_deterministic(const Parallel::Communicator & communicator,
                                                          std::map<std::string, bool> log_param_scale,
-                                                         std::map< std::string, NumericVector<Number> * > & training_parameters_in,
+                                                         std::map<std::string, NumericVector<Number> * > & training_parameters_in,
                                                          unsigned int n_training_samples_in,
                                                          const RBParameters & min_parameters,
                                                          const RBParameters & max_parameters,
@@ -231,7 +231,7 @@ protected:
    * performing inner products (avoids unnecessary memory
    * allocation/deallocation).
    */
-  UniquePtr< NumericVector<Number> > inner_product_storage_vector;
+  UniquePtr<NumericVector<Number>> inner_product_storage_vector;
 
 
 private:
@@ -245,7 +245,7 @@ private:
   /**
    * The training samples.
    */
-  std::map< std::string, NumericVector<Number> * > training_parameters;
+  std::map<std::string, NumericVector<Number> * > training_parameters;
 
   /**
    * If < 0, use std::time() * processor_id() to seed the random

@@ -70,7 +70,7 @@ void iota (ForwardIter first, ForwardIter last, T value)
  * sorted in non-decreasing order, ie. for each "i" in
  * [first,last) *i <= *(i+1).
  */
-template< class InputIterator >
+template<class InputIterator >
 bool is_sorted(InputIterator first, InputIterator last)
 {
   if (first == last)
@@ -107,7 +107,7 @@ bool is_sorted(InputIterator first, InputIterator last)
   //
   // return (last ==
   // std::adjacent_find(first, last,
-  // std::greater< typename InputIterator::value_type >()));
+  // std::greater<typename InputIterator::value_type >()));
 
   // A second one-linear attempt.  This one checks for a **strictly
   // increasing** (no duplicate entries) range.  Also doesn't work

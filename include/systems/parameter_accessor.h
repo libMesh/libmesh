@@ -94,7 +94,7 @@ public:
    * be as shallow as possible, but should still access the same
    * parameter.
    */
-  virtual UniquePtr<ParameterAccessor<T> > clone() const = 0;
+  virtual UniquePtr<ParameterAccessor<T>> clone() const = 0;
 };
 
 template <typename T=Number>

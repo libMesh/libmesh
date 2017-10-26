@@ -65,7 +65,7 @@ void petsc_auto_fieldsplit (PC my_pc,
       sys_prefix = sys_prefix + sys.name() + "_";
     }
 
-  std::map<std::string, std::vector<dof_id_type> > group_indices;
+  std::map<std::string, std::vector<dof_id_type>> group_indices;
 
   if (libMesh::on_command_line("--solver_variable_names"))
     {
@@ -101,7 +101,7 @@ void petsc_auto_fieldsplit (PC my_pc,
         }
     }
 
-  for (std::map<std::string, std::vector<dof_id_type> >::const_iterator
+  for (std::map<std::string, std::vector<dof_id_type>>::const_iterator
          i = group_indices.begin(); i != group_indices.end(); ++i)
     {
       indices_to_fieldsplit(sys.comm(), i->second, my_pc, i->first);

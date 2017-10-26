@@ -84,14 +84,14 @@ public:
   std::map<libMesh::boundary_id_type, libMesh::FunctionBase<libMesh::Number> *>
   dirichlet_conditions,
     neumann_conditions;
-  std::map<libMesh::boundary_id_type, std::vector<unsigned int> >
+  std::map<libMesh::boundary_id_type, std::vector<unsigned int>>
   dirichlet_condition_variables,
     neumann_condition_variables;
   std::map<int, std::map<libMesh::subdomain_id_type,
-                         libMesh::FunctionBase<libMesh::Number> *> >
+                         libMesh::FunctionBase<libMesh::Number> *>>
   other_interior_functions;
   std::map<int, std::map<libMesh::boundary_id_type,
-                         libMesh::FunctionBase<libMesh::Number> *> >
+                         libMesh::FunctionBase<libMesh::Number> *>>
   other_boundary_functions;
 
   //   Execution type

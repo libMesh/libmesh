@@ -140,7 +140,7 @@ int main(int argc, char ** argv)
           const System & coarse_sys = coarse_es.get_system(sysname);
           const System & fine_sys = fine_es.get_system(sysname);
 
-          UniquePtr<NumericVector<Number> > fine_solution = fine_sys.solution->clone();
+          UniquePtr<NumericVector<Number>> fine_solution = fine_sys.solution->clone();
           fine_sys.solution->zero();
 
           std::vector<unsigned int>

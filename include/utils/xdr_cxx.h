@@ -180,7 +180,7 @@ private:
   void do_read(std::vector<T> & a);
 
   template <typename T>
-  void do_read(std::vector<std::complex<T> > & a);
+  void do_read(std::vector<std::complex<T>> & a);
 
   /**
    * Helper method for writing different data types
@@ -195,7 +195,7 @@ private:
   void do_write(std::vector<T> & a);
 
   template <typename T>
-  void do_write(std::vector<std::complex<T> > & a);
+  void do_write(std::vector<std::complex<T>> & a);
 
   /**
    * The mode used for accessing the file.

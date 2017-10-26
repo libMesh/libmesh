@@ -1155,7 +1155,7 @@ public:
   template <typename T>
   inline void gather(const unsigned int root_id,
                      const std::basic_string<T> & send,
-                     std::vector<std::basic_string<T> > & recv,
+                     std::vector<std::basic_string<T>> & recv,
                      const bool identical_buffer_sizes=false) const;
 
   /**
@@ -1197,7 +1197,7 @@ public:
    */
   template <typename T>
   inline void allgather(const std::basic_string<T> & send,
-                        std::vector<std::basic_string<T> > & recv,
+                        std::vector<std::basic_string<T>> & recv,
                         const bool identical_buffer_sizes=false) const;
 
   /**
@@ -1232,7 +1232,7 @@ public:
    * AllGather overload for vectors of string types
    */
   template <typename T>
-  inline void allgather(std::vector<std::basic_string<T> > & r,
+  inline void allgather(std::vector<std::basic_string<T>> & r,
                         const bool identical_buffer_sizes = false) const;
 
   //-------------------------------------------------------------------
@@ -1274,7 +1274,7 @@ public:
    * The recv buffer does not have to be sized prior to this operation.
    */
   template <typename T>
-  inline void scatter(const std::vector<std::vector<T> > & data,
+  inline void scatter(const std::vector<std::vector<T>> & data,
                       std::vector<T> & recv,
                       const unsigned int root_id=0,
                       const bool identical_buffer_sizes=false) const;

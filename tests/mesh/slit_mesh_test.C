@@ -38,10 +38,10 @@ public:
 
   virtual void init_context (const FEMContext &) libmesh_override {}
 
-  virtual UniquePtr<FEMFunctionBase<Number> >
+  virtual UniquePtr<FEMFunctionBase<Number>>
   clone () const libmesh_override
   {
-    return UniquePtr<FEMFunctionBase<Number> > (new SlitFunc());
+    return UniquePtr<FEMFunctionBase<Number>> (new SlitFunc());
   }
 
   virtual Number operator() (const FEMContext & c,

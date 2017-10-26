@@ -86,8 +86,8 @@ public:
   /**
    * \returns A new copy of the accessor.
    */
-  virtual UniquePtr<ParameterAccessor<T> > clone() const {
-    return UniquePtr<ParameterAccessor<T> >
+  virtual UniquePtr<ParameterAccessor<T>> clone() const {
+    return UniquePtr<ParameterAccessor<T>>
       (new ParsedFEMFunctionParameter<T>(_func, _name));
   }
 

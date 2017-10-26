@@ -26,7 +26,7 @@ void CoupledSystemQoI::side_qoi_derivative (DiffContext & context,
   const std::vector<Real> & JxW = side_fe->get_JxW();
 
   // Side basis functions
-  const std::vector<std::vector<Real> > & phi = side_fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = side_fe->get_phi();
   const std::vector<Point > & q_point = side_fe->get_xyz();
 
   // The number of local degrees of freedom in each variable

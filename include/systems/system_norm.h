@@ -87,7 +87,7 @@ public:
    * norm_u^T*R*norm_z where R is a scaling matrix
    */
   SystemNorm(const std::vector<FEMNormType> & norms,
-             std::vector<std::vector<Real> > & weights);
+             std::vector<std::vector<Real>> & weights);
 
   /**
    * Copy Constructor
@@ -159,7 +159,7 @@ private:
    * One more data structure needed to store the off diagonal
    * components for the generalize SystemNorm case
    */
-  std::vector<std::vector<Real> > _off_diagonal_weights;
+  std::vector<std::vector<Real>> _off_diagonal_weights;
 };
 
 
@@ -210,7 +210,7 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> & norms,
 
 inline
 SystemNorm::SystemNorm(const std::vector<FEMNormType> & norms,
-                       std::vector<std::vector<Real> > & weights):
+                       std::vector<std::vector<Real>> & weights):
   _norms(norms),
   _weights(weights.size()),
   _weights_sq(weights.size()),

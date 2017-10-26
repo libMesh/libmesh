@@ -256,7 +256,7 @@ void ExactErrorEstimator::estimate_error (const System & system,
 
       // Prepare a global solution and a MeshFunction of the fine system if we need one
       UniquePtr<MeshFunction> fine_values;
-      UniquePtr<NumericVector<Number> > fine_soln = NumericVector<Number>::build(system.comm());
+      UniquePtr<NumericVector<Number>> fine_soln = NumericVector<Number>::build(system.comm());
       if (_equation_systems_fine)
         {
           const System & fine_system = _equation_systems_fine->get_system(system.name());
@@ -440,12 +440,12 @@ Real ExactErrorEstimator::find_squared_element_error(const System & system,
   fe->reinit (elem);
 
   // Get the data we need to compute with
-  const std::vector<Real> &                       JxW          = fe->get_JxW();
-  const std::vector<std::vector<Real> > &         phi_values   = fe->get_phi();
-  const std::vector<std::vector<RealGradient> > & dphi_values  = fe->get_dphi();
-  const std::vector<Point> &                      q_point      = fe->get_xyz();
+  const std::vector<Real> &                      JxW          = fe->get_JxW();
+  const std::vector<std::vector<Real>> &         phi_values   = fe->get_phi();
+  const std::vector<std::vector<RealGradient>> & dphi_values  = fe->get_dphi();
+  const std::vector<Point> &                     q_point      = fe->get_xyz();
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  const std::vector<std::vector<RealTensor> > &   d2phi_values = fe->get_d2phi();
+  const std::vector<std::vector<RealTensor>> &   d2phi_values = fe->get_d2phi();
 #endif
 
   // The number of shape functions

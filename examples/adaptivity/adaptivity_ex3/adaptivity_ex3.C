@@ -675,12 +675,12 @@ void assemble_laplace(EquationSystems & es,
   // The element shape functions evaluated at the quadrature points.
   // For this simple problem we usually only need them on element
   // boundaries.
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
-  const std::vector<std::vector<Real> > & psi = fe_face->get_phi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
+  const std::vector<std::vector<Real>> & psi = fe_face->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   // The XY locations of the quadrature points used for face integration
   const std::vector<Point> & qface_points = fe_face->get_xyz();

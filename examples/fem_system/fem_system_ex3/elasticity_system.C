@@ -107,8 +107,8 @@ bool ElasticitySystem::element_time_derivative(bool request_jacobian,
   // Element Jacobian * quadrature weights for interior integration
   const std::vector<Real> & JxW = u_elem_fe->get_JxW();
 
-  const std::vector<std::vector<Real> > & phi = u_elem_fe->get_phi();
-  const std::vector<std::vector<RealGradient> > & grad_phi = u_elem_fe->get_dphi();
+  const std::vector<std::vector<Real>> & phi = u_elem_fe->get_phi();
+  const std::vector<std::vector<RealGradient>> & grad_phi = u_elem_fe->get_dphi();
 
   DenseSubVector<Number> & Fu = c.get_elem_residual(u_dot_var);
   DenseSubVector<Number> & Fv = c.get_elem_residual(v_dot_var);
@@ -227,7 +227,7 @@ bool ElasticitySystem::side_time_derivative (bool request_jacobian,
       // Element Jacobian * quadrature weights for interior integration
       const std::vector<Real> & JxW = u_side_fe->get_JxW();
 
-      const std::vector<std::vector<Real> > & phi = u_side_fe->get_phi();
+      const std::vector<std::vector<Real>> & phi = u_side_fe->get_phi();
 
       unsigned int n_qpoints = c.get_side_qrule().n_points();
 
@@ -276,7 +276,7 @@ bool ElasticitySystem::mass_residual(bool request_jacobian,
   // Element Jacobian * quadrature weights for interior integration
   const std::vector<Real> & JxW = u_elem_fe->get_JxW();
 
-  const std::vector<std::vector<Real> > & phi = u_elem_fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = u_elem_fe->get_phi();
 
   // Residuals that we're populating
   libMesh::DenseSubVector<libMesh::Number> & Fu = c.get_elem_residual(u_dot_var);

@@ -466,7 +466,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
   std::vector<const Elem *> neighbors_offspring;
 #endif
 
-  std::vector<std::vector<dof_id_type> > graph(n_active_local_elem);
+  std::vector<std::vector<dof_id_type>> graph(n_active_local_elem);
   dof_id_type graph_size=0;
 
   const dof_id_type first_local_elem = _pmetis->vtxdist[mesh.processor_id()];
@@ -640,7 +640,7 @@ void ParmetisPartitioner::assign_partitioning (MeshBase & mesh)
   const dof_id_type n_active_local_elem = mesh.n_active_local_elem();
 #endif
 
-  std::vector<std::vector<dof_id_type> >
+  std::vector<std::vector<dof_id_type>>
     requested_ids(mesh.n_processors()),
     requests_to_fill(mesh.n_processors());
 

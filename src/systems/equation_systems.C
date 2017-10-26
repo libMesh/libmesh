@@ -666,7 +666,7 @@ void EquationSystems::build_solution_vector (std::vector<Number> &,
 
 
 
-UniquePtr<NumericVector<Number> >
+UniquePtr<NumericVector<Number>>
 EquationSystems::build_parallel_solution_vector(const std::set<std::string> * system_names) const
 {
   LOG_SCOPE("build_parallel_solution_vector()", "EquationSystems");
@@ -729,13 +729,13 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                    _mesh.local_nodes_end()));
 
   // Create a NumericVector to hold the parallel solution
-  UniquePtr<NumericVector<Number> > parallel_soln_ptr = NumericVector<Number>::build(_communicator);
+  UniquePtr<NumericVector<Number>> parallel_soln_ptr = NumericVector<Number>::build(_communicator);
   NumericVector<Number> & parallel_soln = *parallel_soln_ptr;
   parallel_soln.init(nn*nv, n_local_nodes*nv, false, PARALLEL);
 
   // Create a NumericVector to hold the "repeat_count" for each node - this is essentially
   // the number of elements contributing to that node's value
-  UniquePtr<NumericVector<Number> > repeat_count_ptr = NumericVector<Number>::build(_communicator);
+  UniquePtr<NumericVector<Number>> repeat_count_ptr = NumericVector<Number>::build(_communicator);
   NumericVector<Number> & repeat_count = *repeat_count_ptr;
   repeat_count.init(nn*nv, n_local_nodes*nv, false, PARALLEL);
 
@@ -871,7 +871,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
   // Divide to get the average value at the nodes
   parallel_soln /= repeat_count;
 
-  return UniquePtr<NumericVector<Number> >(parallel_soln_ptr.release());
+  return UniquePtr<NumericVector<Number>>(parallel_soln_ptr.release());
 }
 
 
@@ -882,7 +882,7 @@ void EquationSystems::build_solution_vector (std::vector<Number> & soln,
   LOG_SCOPE("build_solution_vector()", "EquationSystems");
 
   // Call the parallel implementation
-  UniquePtr<NumericVector<Number> > parallel_soln =
+  UniquePtr<NumericVector<Number>> parallel_soln =
     this->build_parallel_solution_vector(system_names);
 
   // Localize the NumericVector into the provided std::vector.
@@ -917,7 +917,7 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
   dof_id_type nv = 0;
 
   // Find the total number of variables to output
-  std::vector<std::vector<unsigned> > do_output(_systems.size());
+  std::vector<std::vector<unsigned>> do_output(_systems.size());
   {
     const_system_iterator       pos = _systems.begin();
     const const_system_iterator end = _systems.end();
@@ -962,7 +962,7 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
     parallel_soln_local_size = div+1;
 
   // Create a NumericVector to hold the parallel solution
-  UniquePtr<NumericVector<Number> > parallel_soln_ptr = NumericVector<Number>::build(_communicator);
+  UniquePtr<NumericVector<Number>> parallel_soln_ptr = NumericVector<Number>::build(_communicator);
   NumericVector<Number> & parallel_soln = *parallel_soln_ptr;
   parallel_soln.init(parallel_soln_global_size,
                      parallel_soln_local_size,

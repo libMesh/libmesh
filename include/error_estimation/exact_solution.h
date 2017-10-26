@@ -310,7 +310,7 @@ private:
    * The name of the unknown is
    * the key for the map.
    */
-  typedef std::map<std::string, std::vector<Real> > SystemErrorMap;
+  typedef std::map<std::string, std::vector<Real>> SystemErrorMap;
 
   /**
    * A map of SystemErrorMaps, which contains entries

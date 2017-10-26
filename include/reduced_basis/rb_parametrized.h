@@ -66,7 +66,7 @@ public:
    */
   void initialize_parameters(const RBParameters & mu_min_in,
                              const RBParameters & mu_max_in,
-                             const std::map< std::string, std::vector<Real> > & discrete_parameter_values);
+                             const std::map<std::string, std::vector<Real>> & discrete_parameter_values);
 
   /**
    * Initialize the parameter ranges and set current_parameters.
@@ -152,7 +152,7 @@ public:
   /**
    * Get a const reference to the discrete parameter values.
    */
-  const std::map< std::string, std::vector<Real> > & get_discrete_parameter_values() const;
+  const std::map<std::string, std::vector<Real>> & get_discrete_parameter_values() const;
 
   /**
    * Print out all the discrete parameter values.
@@ -197,7 +197,7 @@ private:
    */
   void read_discrete_parameter_values_from_file(const std::string & file_name,
                                                 const bool read_binary_data,
-                                                std::map< std::string, std::vector<Real> > & discrete_parameter_values_in);
+                                                std::map<std::string, std::vector<Real>> & discrete_parameter_values_in);
 
   /**
    * Helper function to check that \p params is valid.
@@ -232,7 +232,7 @@ private:
   /**
    * Map that defines the allowable values of any discrete parameters.
    */
-  std::map< std::string, std::vector<Real> > _discrete_parameter_values;
+  std::map<std::string, std::vector<Real>> _discrete_parameter_values;
 
 };
 

@@ -59,8 +59,8 @@ public:
     output(_w_var) = (_Re+1)*(x*x + y*y);
   }
 
-  virtual UniquePtr<FunctionBase<Number> > clone() const
-  { return UniquePtr<FunctionBase<Number> > (new BdyFunction(_u_var, _v_var, _w_var, _Re)); }
+  virtual UniquePtr<FunctionBase<Number>> clone() const
+  { return UniquePtr<FunctionBase<Number>> (new BdyFunction(_u_var, _v_var, _w_var, _Re)); }
 
 private:
   const unsigned int _u_var, _v_var, _w_var;
@@ -220,15 +220,15 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
   const std::vector<Real> & JxW = u_elem_fe->get_JxW();
 
   // The velocity shape functions at interior quadrature points.
-  const std::vector<std::vector<Real> > & phi = u_elem_fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = u_elem_fe->get_phi();
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealGradient> > & dphi = u_elem_fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = u_elem_fe->get_dphi();
 
   // The pressure shape functions at interior
   // quadrature points.
-  const std::vector<std::vector<Real> > & psi = p_elem_fe->get_phi();
+  const std::vector<std::vector<Real>> & psi = p_elem_fe->get_phi();
 
   // Physical location of the quadrature points
   const std::vector<Point> & qpoint = u_elem_fe->get_xyz();
@@ -405,11 +405,11 @@ bool NavierSystem::element_constraint (bool request_jacobian,
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealGradient> > & dphi = u_elem_fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = u_elem_fe->get_dphi();
 
   // The pressure shape functions at interior
   // quadrature points.
-  const std::vector<std::vector<Real> > & psi = p_elem_fe->get_phi();
+  const std::vector<std::vector<Real>> & psi = p_elem_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
@@ -541,7 +541,7 @@ bool NavierSystem::mass_residual (bool request_jacobian,
   const std::vector<Real> & JxW = u_elem_fe->get_JxW();
 
   // The velocity shape functions at interior quadrature points.
-  const std::vector<std::vector<Real> > & phi = u_elem_fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = u_elem_fe->get_phi();
 
   // The subvectors and submatrices we need to fill:
   DenseSubVector<Number> & Fu = c.get_elem_residual(u_var);

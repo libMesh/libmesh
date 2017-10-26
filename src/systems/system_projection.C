@@ -172,7 +172,7 @@ public:
   { libmesh_error(); }
 
 private:
-  UniquePtr<FEMFunctionBase<Output> > _f;
+  UniquePtr<FEMFunctionBase<Output>> _f;
 };
 
 
@@ -524,8 +524,8 @@ private:
   const std::set<boundary_id_type> & b;
   const std::vector<unsigned int>  & variables;
   const System                     & system;
-  UniquePtr<FunctionBase<Number> >   f;
-  UniquePtr<FunctionBase<Gradient> > g;
+  UniquePtr<FunctionBase<Number>>   f;
+  UniquePtr<FunctionBase<Gradient>> g;
   const Parameters                 & parameters;
   NumericVector<Number>            & new_vector;
 
@@ -540,8 +540,8 @@ public:
     b(b_in),
     variables(variables_in),
     system(system_in),
-    f(f_in ? f_in->clone() : UniquePtr<FunctionBase<Number> >()),
-    g(g_in ? g_in->clone() : UniquePtr<FunctionBase<Gradient> >()),
+    f(f_in ? f_in->clone() : UniquePtr<FunctionBase<Number>>()),
+    g(g_in ? g_in->clone() : UniquePtr<FunctionBase<Gradient>>()),
     parameters(parameters_in),
     new_vector(new_v_in)
   {
@@ -555,8 +555,8 @@ public:
     b(in.b),
     variables(in.variables),
     system(in.system),
-    f(in.f.get() ? in.f->clone() : UniquePtr<FunctionBase<Number> >()),
-    g(in.g.get() ? in.g->clone() : UniquePtr<FunctionBase<Gradient> >()),
+    f(in.f.get() ? in.f->clone() : UniquePtr<FunctionBase<Number>>()),
+    g(in.g.get() ? in.g->clone() : UniquePtr<FunctionBase<Gradient>>()),
     parameters(in.parameters),
     new_vector(in.new_vector)
   {
@@ -578,7 +578,7 @@ void System::project_vector (NumericVector<Number> & vector,
 {
   // Create a copy of the vector, which currently
   // contains the old data.
-  UniquePtr<NumericVector<Number> >
+  UniquePtr<NumericVector<Number>>
     old_vector (vector.clone());
 
   // Project the old vector to the new vector
@@ -613,9 +613,9 @@ void System::project_vector (const NumericVector<Number> & old_v,
 
   // Resize the new vector and get a serial version.
   NumericVector<Number> * new_vector_ptr = libmesh_nullptr;
-  UniquePtr<NumericVector<Number> > new_vector_built;
+  UniquePtr<NumericVector<Number>> new_vector_built;
   NumericVector<Number> * local_old_vector;
-  UniquePtr<NumericVector<Number> > local_old_vector_built;
+  UniquePtr<NumericVector<Number>> local_old_vector_built;
   const NumericVector<Number> * old_vector_ptr = libmesh_nullptr;
 
   ConstElemRange active_local_elem_range
@@ -700,7 +700,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
       typedef
         GenericProjector<OldSolutionValue<Number,   &FEMContext::point_value>,
                          OldSolutionValue<Gradient, &FEMContext::point_gradient>,
-                         Number, VectorSetAction<Number> > FEMProjector;
+                         Number, VectorSetAction<Number>> FEMProjector;
 
       OldSolutionValue<Number,   &FEMContext::point_value>    f(*this, old_vector);
       OldSolutionValue<Gradient, &FEMContext::point_gradient> g(*this, old_vector);
@@ -742,7 +742,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
   // creating a temporary parallel vector to use localize! - RHS
   if (old_v.type() == SERIAL)
     {
-      UniquePtr<NumericVector<Number> > dist_v = NumericVector<Number>::build(this->comm());
+      UniquePtr<NumericVector<Number>> dist_v = NumericVector<Number>::build(this->comm());
       dist_v->init(this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       dist_v->close();
 
@@ -905,7 +905,7 @@ void System::project_vector (NumericVector<Number> & new_vector,
   // Use a typedef to make the calling sequence for parallel_for() a bit more readable
   typedef
     GenericProjector<FEMFunctionWrapper<Number>, FEMFunctionWrapper<Gradient>,
-                     Number, VectorSetAction<Number> > FEMProjector;
+                     Number, VectorSetAction<Number>> FEMProjector;
 
   FEMFunctionWrapper<Number> fw(*f);
 
@@ -1532,13 +1532,13 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 #endif
                 edge_fe->get_JxW();
 
-              const std::vector<std::vector<Real> > & phi =
+              const std::vector<std::vector<Real>> & phi =
 #ifdef LIBMESH_ENABLE_AMR
                 (elem->refinement_flag() == Elem::JUST_COARSENED) ?
                 fe->get_phi() :
 #endif
                 edge_fe->get_phi();
-              const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
+              const std::vector<std::vector<RealGradient>> * dphi = libmesh_nullptr;
               if (cont == C_ONE)
                 dphi =
 #ifdef LIBMESH_ENABLE_AMR
@@ -1707,13 +1707,13 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 fe->get_JxW() :
 #endif // LIBMESH_ENABLE_AMR
                 side_fe->get_JxW();
-              const std::vector<std::vector<Real> > & phi =
+              const std::vector<std::vector<Real>> & phi =
 #ifdef LIBMESH_ENABLE_AMR
                 (elem->refinement_flag() == Elem::JUST_COARSENED) ?
                 fe->get_phi() :
 #endif // LIBMESH_ENABLE_AMR
                 side_fe->get_phi();
-              const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
+              const std::vector<std::vector<RealGradient>> * dphi = libmesh_nullptr;
               if (cont == C_ONE)
                 dphi =
 #ifdef LIBMESH_ENABLE_AMR
@@ -1878,8 +1878,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               const std::vector<Point> & xyz_values = fe->get_xyz();
               const std::vector<Real> & JxW = fe->get_JxW();
 
-              const std::vector<std::vector<Real> > & phi = fe->get_phi();
-              const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
+              const std::vector<std::vector<Real>> & phi = fe->get_phi();
+              const std::vector<std::vector<RealGradient>> * dphi = libmesh_nullptr;
               if (cont == C_ONE)
                 dphi = &(fe->get_dphi());
 
@@ -2179,11 +2179,11 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
 
       // The values of the shape functions at the quadrature
       // points
-      const std::vector<std::vector<Real> > & phi = fe->get_phi();
+      const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
       // The gradients of the shape functions at the quadrature
       // points on the child element.
-      const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
+      const std::vector<std::vector<RealGradient>> * dphi = libmesh_nullptr;
 
       const FEContinuity cont = fe->get_continuity();
 
@@ -2192,7 +2192,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
           // We'll need gradient data for a C1 projection
           libmesh_assert(g.get());
 
-          const std::vector<std::vector<RealGradient> > &
+          const std::vector<std::vector<RealGradient>> &
             ref_dphi = fe->get_dphi();
           dphi = &ref_dphi;
         }

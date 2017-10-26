@@ -191,7 +191,7 @@ void EnsightIO::write_geometry_ascii()
   mesh_nodes_map_t mesh_nodes_map;
 
   // Map for grouping elements of the same type
-  typedef std::map<ElemType, std::vector<const Elem *> > ensight_parts_map_t;
+  typedef std::map<ElemType, std::vector<const Elem *>> ensight_parts_map_t;
   typedef ensight_parts_map_t::iterator ensight_parts_iterator;
   ensight_parts_map_t ensight_parts_map;
 
@@ -494,7 +494,7 @@ void EnsightIO::write_vector_ascii(const std::string & sys,
   // Map from node id -> solution value.  We end up just writing this
   // map out in order, not sure what would happen if there were holes
   // in the numbering...
-  typedef std::map<int,std::vector<Real> > map_local_soln;
+  typedef std::map<int,std::vector<Real>> map_local_soln;
   typedef map_local_soln::iterator  local_soln_iterator;
   map_local_soln local_soln;
 

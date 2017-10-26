@@ -69,7 +69,7 @@ void AdaptiveTimeSolver::init()
   // This leaves us with two UniquePtrs holding the same pointer - dangerous
   // for future use.  Replace with shared_ptr?
   old_local_nonlinear_solution =
-    UniquePtr<NumericVector<Number> >(core_time_solver->old_local_nonlinear_solution.get());
+    UniquePtr<NumericVector<Number>>(core_time_solver->old_local_nonlinear_solution.get());
 }
 
 
@@ -146,7 +146,7 @@ UniquePtr<DiffSolver> & AdaptiveTimeSolver::diff_solver()
 
 
 
-UniquePtr<LinearSolver<Number> > & AdaptiveTimeSolver::linear_solver()
+UniquePtr<LinearSolver<Number>> & AdaptiveTimeSolver::linear_solver()
 {
   return core_time_solver->linear_solver();
 }

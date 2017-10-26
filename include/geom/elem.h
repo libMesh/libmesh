@@ -1505,7 +1505,7 @@ public:
    * should bracket node \p n of child \p c.
    */
   virtual
-  const std::vector<std::pair<unsigned char, unsigned char> > &
+  const std::vector<std::pair<unsigned char, unsigned char>> &
   parent_bracketing_nodes(unsigned int c,
                           unsigned int n) const;
 
@@ -1514,7 +1514,7 @@ public:
    * should bracket node \p n of child \p c.
    */
   virtual
-  const std::vector<std::pair<dof_id_type, dof_id_type> >
+  const std::vector<std::pair<dof_id_type, dof_id_type>>
   bracketing_nodes(unsigned int c,
                    unsigned int n) const;
 
@@ -1575,10 +1575,10 @@ protected:
    * default calculation is slow.
    */
   virtual
-  std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char> > > > > &
+  std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char>>>>> &
   _get_bracketing_node_cache() const
   {
-    static std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char> > > > > c;
+    static std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char>>>>> c;
     libmesh_error();
     return c;
   }
@@ -1589,10 +1589,10 @@ protected:
    * default calculation is slow.
    */
   virtual
-  std::vector<std::vector<std::vector<signed char> > > &
+  std::vector<std::vector<std::vector<signed char>>> &
   _get_parent_indices_cache() const
   {
-    static std::vector<std::vector<std::vector<signed char> > > c;
+    static std::vector<std::vector<std::vector<signed char>>> c;
     libmesh_error();
     return c;
   }
@@ -2872,18 +2872,18 @@ SimpleRange<Elem::ConstNeighborPtrIter> Elem::neighbor_ptr_range() const
 
 #define LIBMESH_ENABLE_TOPOLOGY_CACHES                                  \
   virtual                                                               \
-  std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char> > > > > & \
+  std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char>>>>> & \
   _get_bracketing_node_cache() const libmesh_override                   \
   {                                                                     \
-    static std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char> > > > > c; \
+    static std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char>>>>> c; \
     return c;                                                           \
   }                                                                     \
                                                                         \
   virtual                                                               \
-  std::vector<std::vector<std::vector<signed char> > > &                \
+  std::vector<std::vector<std::vector<signed char>>> &                \
   _get_parent_indices_cache() const libmesh_override                    \
   {                                                                     \
-    static std::vector<std::vector<std::vector<signed char> > > c;      \
+    static std::vector<std::vector<std::vector<signed char>>> c;      \
     return c;                                                           \
   }
 

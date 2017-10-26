@@ -144,12 +144,12 @@ public:
       component(reverse_index_map[i].second,p,time);
   }
 
-  virtual UniquePtr<FunctionBase<Output> > clone() const libmesh_override
+  virtual UniquePtr<FunctionBase<Output>> clone() const libmesh_override
   {
     CompositeFunction * returnval = new CompositeFunction();
     for (std::size_t i=0; i != subfunctions.size(); ++i)
       returnval->attach_subfunction(*subfunctions[i], index_maps[i]);
-    return UniquePtr<FunctionBase<Output> > (returnval);
+    return UniquePtr<FunctionBase<Output>> (returnval);
   }
 
   unsigned int n_subfunctions () const
@@ -167,10 +167,10 @@ private:
   std::vector<FunctionBase<Output> *> subfunctions;
 
   // for each function, list of which global indices it fills in
-  std::vector<std::vector<unsigned int> > index_maps;
+  std::vector<std::vector<unsigned int>> index_maps;
 
   // for each global index, which local index of which function is it?
-  std::vector<std::pair<unsigned int, unsigned int> > reverse_index_map;
+  std::vector<std::pair<unsigned int, unsigned int>> reverse_index_map;
 };
 
 

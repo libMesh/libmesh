@@ -394,7 +394,7 @@ void FE<Dim,T>::side_map (const Elem * elem,
   std::vector<Point> refspace_nodes;
   this->get_refspace_nodes(elem->type(), refspace_nodes);
 
-  const std::vector<std::vector<Real> > & psi_map = this->_fe_map->get_psi();
+  const std::vector<std::vector<Real>> & psi_map = this->_fe_map->get_psi();
 
   for (std::size_t i=0; i<psi_map.size(); i++) // sum over the nodes
     {

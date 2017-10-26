@@ -28,7 +28,7 @@ void LaplaceSystem::side_qoi_derivative (DiffContext & context,
   const std::vector<Real> & JxW = side_fe->get_JxW();
 
   // The basis functions for the side
-  const std::vector<std::vector<RealGradient> > & dphi = side_fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = side_fe->get_dphi();
 
   // The side quadrature points
   const std::vector<Point > & q_point = side_fe->get_xyz();

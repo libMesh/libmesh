@@ -229,15 +229,15 @@ void assemble_poisson(EquationSystems & es,
   fe_neighbor_face->attach_quadrature_rule (&qface);
 
   const std::vector<Real> & JxW = fe->get_JxW();
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   const std::vector<Real> & JxW_face = fe_elem_face->get_JxW();
 
   const std::vector<Point> & qface_points = fe_elem_face->get_xyz();
 
-  const std::vector<std::vector<Real> > & phi_face          = fe_elem_face->get_phi();
-  const std::vector<std::vector<Real> > & phi_neighbor_face = fe_neighbor_face->get_phi();
+  const std::vector<std::vector<Real>> & phi_face          = fe_elem_face->get_phi();
+  const std::vector<std::vector<Real>> & phi_neighbor_face = fe_neighbor_face->get_phi();
 
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;

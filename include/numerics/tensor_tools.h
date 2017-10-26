@@ -96,33 +96,33 @@ struct IncrementRank
 };
 
 template <typename T>
-struct IncrementRank<VectorValue<T> >
+struct IncrementRank<VectorValue<T>>
 {
   typedef TensorValue<T> type;
 };
 
 
 template <typename T>
-struct IncrementRank<TypeVector<T> >
+struct IncrementRank<TypeVector<T>>
 {
   typedef TensorValue<T> type;
 };
 
 template <typename T>
-struct IncrementRank<TypeTensor<T> >
+struct IncrementRank<TypeTensor<T>>
 {
   typedef TypeNTensor<3,T> type;
 };
 
 
 template <typename T>
-struct IncrementRank<TensorValue<T> >
+struct IncrementRank<TensorValue<T>>
 {
   typedef TypeNTensor<3,T> type;
 };
 
 template <unsigned int N, typename T>
-struct IncrementRank<TypeNTensor<N,T> >
+struct IncrementRank<TypeNTensor<N,T>>
 {
   typedef TypeNTensor<N+1,T> type;
 };
@@ -139,31 +139,31 @@ struct DecrementRank
 };
 
 template <typename T>
-struct DecrementRank<VectorValue<T> >
+struct DecrementRank<VectorValue<T>>
 {
   typedef T type;
 };
 
 template <typename T>
-struct DecrementRank<TypeVector<T> >
+struct DecrementRank<TypeVector<T>>
 {
   typedef T type;
 };
 
 template <typename T>
-struct DecrementRank<TensorValue<T> >
+struct DecrementRank<TensorValue<T>>
 {
   typedef VectorValue<T> type;
 };
 
 template <typename T>
-struct DecrementRank<TypeTensor<T> >
+struct DecrementRank<TypeTensor<T>>
 {
   typedef VectorValue<T> type;
 };
 
 template <unsigned int N, typename T>
-struct DecrementRank<TypeNTensor<N,T> >
+struct DecrementRank<TypeNTensor<N,T>>
 {
   typedef TypeNTensor<N-1,T> type;
 };
@@ -180,7 +180,7 @@ struct MakeNumber
 };
 
 template <typename T>
-struct MakeNumber<std::complex<T> >
+struct MakeNumber<std::complex<T>>
 {
   // Compile-time error: we shouldn't need to make numbers out of
   // numbers
@@ -189,34 +189,34 @@ struct MakeNumber<std::complex<T> >
 
 
 template <typename T>
-struct MakeNumber<TypeVector<T> >
+struct MakeNumber<TypeVector<T>>
 {
   typedef TypeVector<typename MakeNumber<T>::type > type;
 };
 
 template <typename T>
-struct MakeNumber<VectorValue<T> >
+struct MakeNumber<VectorValue<T>>
 {
   typedef VectorValue<typename MakeNumber<T>::type > type;
 };
 
 template <typename T>
-struct MakeNumber<TypeTensor<T> >
+struct MakeNumber<TypeTensor<T>>
 {
   typedef TypeTensor<typename MakeNumber<T>::type> type;
 };
 
 template <typename T>
-struct MakeNumber<TensorValue<T> >
+struct MakeNumber<TensorValue<T>>
 {
   typedef TypeTensor<typename MakeNumber<T>::type> type;
 };
 
 template <unsigned int N, typename T>
-struct MakeNumber<TypeNTensor<N,T> >
+struct MakeNumber<TypeNTensor<N,T>>
 {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-  typedef TypeNTensor<N,std::complex<T> > type;
+  typedef TypeNTensor<N,std::complex<T>> type;
 #else
   typedef TypeNTensor<N,T> type;
 #endif
@@ -231,37 +231,37 @@ struct MakeReal
 };
 
 template <typename T>
-struct MakeReal<std::complex<T> >
+struct MakeReal<std::complex<T>>
 {
   typedef T type;
 };
 
 template <typename T>
-struct MakeReal<TypeVector<T> >
+struct MakeReal<TypeVector<T>>
 {
   typedef TypeVector<typename MakeReal<T>::type > type;
 };
 
 template <typename T>
-struct MakeReal<VectorValue<T> >
+struct MakeReal<VectorValue<T>>
 {
   typedef VectorValue<typename MakeReal<T>::type > type;
 };
 
 template <typename T>
-struct MakeReal<TypeTensor<T> >
+struct MakeReal<TypeTensor<T>>
 {
   typedef TypeTensor<typename MakeReal<T>::type> type;
 };
 
 template <typename T>
-struct MakeReal<TensorValue<T> >
+struct MakeReal<TensorValue<T>>
 {
   typedef TypeTensor<typename MakeReal<T>::type> type;
 };
 
 template <unsigned int N, typename T>
-struct MakeReal<TypeNTensor<N,T> >
+struct MakeReal<TypeNTensor<N,T>>
 {
   typedef TypeNTensor<N,typename MakeReal<T>::type> type;
 };

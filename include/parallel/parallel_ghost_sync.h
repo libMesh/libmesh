@@ -204,12 +204,12 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
     }
 
   // Request sets to send to each processor
-  std::vector<std::vector<Real> >
+  std::vector<std::vector<Real>>
     requested_objs_x(comm.size()),
     requested_objs_y(comm.size()),
     requested_objs_z(comm.size());
   // Corresponding ids to keep track of
-  std::vector<std::vector<dof_id_type> >
+  std::vector<std::vector<dof_id_type>>
     requested_objs_id(comm.size());
 
   // We know how many objects live on each processor, so reserve()
@@ -337,7 +337,7 @@ void sync_dofobject_data_by_id(const Communicator & comm,
     }
 
   // Request sets to send to each processor
-  std::vector<std::vector<dof_id_type> >
+  std::vector<std::vector<dof_id_type>>
     requested_objs_id(comm.size());
 
   // We know how many objects live on each processor, so reserve()
@@ -423,10 +423,10 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
     }
 
   // Request sets to send to each processor
-  std::vector<std::vector<dof_id_type> >
+  std::vector<std::vector<dof_id_type>>
     requested_objs_id(comm.size()),
     requested_objs_parent_id(comm.size());
-  std::vector<std::vector<unsigned char> >
+  std::vector<std::vector<unsigned char>>
     requested_objs_child_num(comm.size());
 
   // We know how many objects live on each processor, so reserve()
@@ -581,13 +581,13 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
       // Now repeat that iteration, filling request sets this time.
 
       // Request sets to send to each processor
-      std::vector<std::vector<dof_id_type> >
+      std::vector<std::vector<dof_id_type>>
         requested_objs_elem_id(comm.size());
-      std::vector<std::vector<unsigned char> >
+      std::vector<std::vector<unsigned char>>
         requested_objs_node_num(comm.size());
 
       // Keep track of current local ids for each too
-      std::vector<std::vector<dof_id_type> >
+      std::vector<std::vector<dof_id_type>>
         requested_objs_id(comm.size());
 
       // We know how many objects live on each processor, so reserve()

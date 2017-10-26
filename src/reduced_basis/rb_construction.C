@@ -260,7 +260,7 @@ void RBConstruction::process_parameters_file (const std::string & parameters_fil
       }
     }
 
-  std::map< std::string, std::vector<Real> > discrete_parameter_values_in;
+  std::map<std::string, std::vector<Real>> discrete_parameter_values_in;
 
   unsigned int n_discrete_parameters = infile.vector_variable_size("discrete_parameter_names");
   for (unsigned int i=0; i<n_discrete_parameters; i++)
@@ -314,7 +314,7 @@ void RBConstruction::set_rb_construction_parameters(
                                                     bool normalize_rb_bound_in_greedy_in,
                                                     RBParameters mu_min_in,
                                                     RBParameters mu_max_in,
-                                                    std::map< std::string, std::vector<Real> > discrete_parameter_values_in,
+                                                    std::map<std::string, std::vector<Real>> discrete_parameter_values_in,
                                                     std::map<std::string,bool> log_scaling_in)
 {
   // Read in training_parameters_random_seed value.  This is used to
@@ -385,7 +385,7 @@ void RBConstruction::print_info()
 
 void RBConstruction::print_basis_function_orthogonality()
 {
-  UniquePtr< NumericVector<Number> > temp = solution->clone();
+  UniquePtr<NumericVector<Number>> temp = solution->clone();
 
   for (unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
     {
@@ -876,7 +876,7 @@ void RBConstruction::truth_assembly()
         matrix->add(get_rb_theta_expansion().eval_A_theta(q_a, mu), *get_Aq(q_a));
       }
 
-    UniquePtr< NumericVector<Number> > temp_vec = NumericVector<Number>::build(this->comm());
+    UniquePtr<NumericVector<Number>> temp_vec = NumericVector<Number>::build(this->comm());
     temp_vec->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
     for (unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
       {
@@ -1423,7 +1423,7 @@ void RBConstruction::update_RB_system_matrices()
 
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
-  UniquePtr< NumericVector<Number> > temp = NumericVector<Number>::build(this->comm());
+  UniquePtr<NumericVector<Number>> temp = NumericVector<Number>::build(this->comm());
   temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
   for (unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
@@ -1606,7 +1606,7 @@ void RBConstruction::compute_output_dual_innerprods()
       for (unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
         max_Q_l = (get_rb_theta_expansion().get_n_output_terms(n) > max_Q_l) ? get_rb_theta_expansion().get_n_output_terms(n) : max_Q_l;
 
-      std::vector< NumericVector<Number> * > L_q_representor(max_Q_l);
+      std::vector<NumericVector<Number> *> L_q_representor(max_Q_l);
       for (unsigned int q=0; q<max_Q_l; q++)
         {
           L_q_representor[q] = (NumericVector<Number>::build(this->comm()).release());
@@ -1786,10 +1786,10 @@ void RBConstruction::load_rb_solution()
 //   // Note that this only works in serial since otherwise each processor will
 //   // have a different parameter value during the Greedy training.
 //
-//   UniquePtr< NumericVector<Number> > RB_sol = NumericVector<Number>::build();
+//   UniquePtr<NumericVector<Number>> RB_sol = NumericVector<Number>::build();
 //   RB_sol->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 //
-//   UniquePtr< NumericVector<Number> > temp = NumericVector<Number>::build();
+//   UniquePtr<NumericVector<Number>> temp = NumericVector<Number>::build();
 //   temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 //
 //   for (unsigned int i=0; i<N; i++)

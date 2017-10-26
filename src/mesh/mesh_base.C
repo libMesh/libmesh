@@ -685,7 +685,7 @@ void MeshBase::detect_interior_parents()
     return;
 
   //This map will be used to set interior parents
-  std::unordered_map<dof_id_type, std::vector<dof_id_type> > node_to_elem;
+  std::unordered_map<dof_id_type, std::vector<dof_id_type>> node_to_elem;
 
   const_element_iterator el  = this->active_elements_begin();
   const_element_iterator end = this->active_elements_end();
@@ -717,7 +717,7 @@ void MeshBase::detect_interior_parents()
       // element at each vertex of the current element, thus ignoring interior nodes.
       // If one of the SET of elements is empty, then we will not have an interior parent
       // since an interior parent must be connected to all vertices of the current element
-      std::vector< std::set<dof_id_type> > neighbors( element->n_vertices() );
+      std::vector<std::set<dof_id_type>> neighbors( element->n_vertices() );
 
       bool found_interior_parents = false;
 

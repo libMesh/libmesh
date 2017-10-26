@@ -71,7 +71,7 @@ void PetscPreconditioner<T>::init ()
       int ierr = PCCreate(this->comm().get(),&_pc);
       LIBMESH_CHKERR(ierr);
 
-      PetscMatrix<T> * pmatrix = cast_ptr<PetscMatrix<T> *, SparseMatrix<T> >(this->_matrix);
+      PetscMatrix<T> * pmatrix = cast_ptr<PetscMatrix<T> *, SparseMatrix<T>>(this->_matrix);
 
       _mat = pmatrix->mat();
     }

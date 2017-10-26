@@ -92,7 +92,7 @@ public:
     create<int, int> ();
     create<int*,int> ();
     create<int*,int*>();
-    create<int, std::vector<int> >();
+    create<int, std::vector<int>>();
   }
 
   void testInsert()
@@ -100,7 +100,7 @@ public:
     insert<int, int> ();
     insert<char,int> ();
     insert<long,int*>();
-    insert<int, std::vector<int> >();
+    insert<int, std::vector<int>>();
   }
 
   void testIterate()

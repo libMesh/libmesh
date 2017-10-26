@@ -80,7 +80,7 @@ void QGrundmann_Moller::gm_rule(unsigned int s, unsigned int dim)
   int one_pm=1;
 
   // Where we store all the integer point compositions/permutations
-  std::vector<std::vector<unsigned int> > permutations;
+  std::vector<std::vector<unsigned int>> permutations;
 
   // Index into the vector where we should start adding the next round of points/weights
   std::size_t offset=0;
@@ -157,7 +157,7 @@ void QGrundmann_Moller::gm_rule(unsigned int s, unsigned int dim)
 // why it works, but it does.
 void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositioned
                                     unsigned int p, // # of partitions
-                                    std::vector<std::vector<unsigned int> > & result)
+                                    std::vector<std::vector<unsigned int>> & result)
 {
   // Clear out results remaining from previous calls
   result.clear();

@@ -21,7 +21,7 @@
 namespace libMesh
 {
 
-template< typename OutputShape >
+template<typename OutputShape>
 void HCurlFETransformation<OutputShape>::init_map_phi(const FEGenericBase<OutputShape> & fe) const
 {
   fe.get_fe_map().get_dxidx();
@@ -29,7 +29,7 @@ void HCurlFETransformation<OutputShape>::init_map_phi(const FEGenericBase<Output
 
 
 
-template< typename OutputShape >
+template<typename OutputShape>
 void HCurlFETransformation<OutputShape>::init_map_dphi(const FEGenericBase<OutputShape> & fe) const
 {
   fe.get_fe_map().get_dxidx();
@@ -37,7 +37,7 @@ void HCurlFETransformation<OutputShape>::init_map_dphi(const FEGenericBase<Outpu
 
 
 
-template< typename OutputShape >
+template<typename OutputShape>
 void HCurlFETransformation<OutputShape>::init_map_d2phi(const FEGenericBase<OutputShape> & fe) const
 {
   fe.get_fe_map().get_dxidx();
@@ -48,12 +48,12 @@ void HCurlFETransformation<OutputShape>::init_map_d2phi(const FEGenericBase<Outp
 
 
 
-template< typename OutputShape >
+template<typename OutputShape>
 void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
                                                  const Elem * const elem,
                                                  const std::vector<Point> & qp,
                                                  const FEGenericBase<OutputShape> & fe,
-                                                 std::vector<std::vector<OutputShape> > & phi) const
+                                                 std::vector<std::vector<OutputShape>> & phi) const
 {
   switch (dim)
     {
@@ -149,12 +149,12 @@ void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
     } // switch(dim)
 }
 
-template< typename OutputShape >
+template<typename OutputShape>
 void HCurlFETransformation<OutputShape>::map_curl(const unsigned int dim,
                                                   const Elem * const,
                                                   const std::vector<Point> &,
                                                   const FEGenericBase<OutputShape> & fe,
-                                                  std::vector<std::vector<OutputShape> > & curl_phi) const
+                                                  std::vector<std::vector<OutputShape>> & curl_phi) const
 {
   switch (dim)
     {
@@ -164,8 +164,8 @@ void HCurlFETransformation<OutputShape>::map_curl(const unsigned int dim,
 
     case 2:
       {
-        const std::vector<std::vector<OutputShape> > & dphi_dxi = fe.get_dphidxi();
-        const std::vector<std::vector<OutputShape> > & dphi_deta = fe.get_dphideta();
+        const std::vector<std::vector<OutputShape>> & dphi_dxi = fe.get_dphidxi();
+        const std::vector<std::vector<OutputShape>> & dphi_deta = fe.get_dphideta();
 
         const std::vector<Real> & J = fe.get_fe_map().get_jacobian();
 
@@ -184,9 +184,9 @@ void HCurlFETransformation<OutputShape>::map_curl(const unsigned int dim,
 
     case 3:
       {
-        const std::vector<std::vector<OutputShape> > & dphi_dxi = fe.get_dphidxi();
-        const std::vector<std::vector<OutputShape> > & dphi_deta = fe.get_dphideta();
-        const std::vector<std::vector<OutputShape> > & dphi_dzeta = fe.get_dphidzeta();
+        const std::vector<std::vector<OutputShape>> & dphi_dxi = fe.get_dphidxi();
+        const std::vector<std::vector<OutputShape>> & dphi_deta = fe.get_dphideta();
+        const std::vector<std::vector<OutputShape>> & dphi_dzeta = fe.get_dphidzeta();
 
         const std::vector<RealGradient> & dxyz_dxi   = fe.get_fe_map().get_dxyzdxi();
         const std::vector<RealGradient> & dxyz_deta  = fe.get_fe_map().get_dxyzdeta();
@@ -276,7 +276,7 @@ void HCurlFETransformation<Real>::map_phi(const unsigned int,
                                           const Elem * const,
                                           const std::vector<Point> &,
                                           const FEGenericBase<Real> &,
-                                          std::vector<std::vector<Real> > &) const
+                                          std::vector<std::vector<Real>> &) const
 {
   libmesh_error_msg("HCurl transformations only make sense for vector-valued elements.");
 }
@@ -286,7 +286,7 @@ void HCurlFETransformation<Real>::map_curl(const unsigned int,
                                            const Elem * const,
                                            const std::vector<Point> &,
                                            const FEGenericBase<Real> &,
-                                           std::vector<std::vector<Real> > &) const
+                                           std::vector<std::vector<Real>> &) const
 {
   libmesh_error_msg("HCurl transformations only make sense for vector-valued elements.");
 }

@@ -150,7 +150,7 @@ protected:
    * details of interfacing with various linear algebra packages
    * like PETSc or LASPACK.
    */
-  UniquePtr<LinearSolver<Number> > _linear_solver;
+  UniquePtr<LinearSolver<Number>> _linear_solver;
 
   /**
    * This does a line search in the direction opposite \p linear_solution

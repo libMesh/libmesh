@@ -21,7 +21,7 @@
 
 using namespace libMesh;
 
-class LaspackVectorTest : public NumericVectorTest<LaspackVector<Number> >
+class LaspackVectorTest : public NumericVectorTest<LaspackVector<Number>>
 {
 public:
   void setUp()

@@ -59,7 +59,7 @@ void RBParametrized::clear()
 
 void RBParametrized::initialize_parameters(const RBParameters & mu_min_in,
                                            const RBParameters & mu_max_in,
-                                           const std::map< std::string, std::vector<Real> > & discrete_parameter_values)
+                                           const std::map<std::string, std::vector<Real>> & discrete_parameter_values)
 {
   // Check that the min/max vectors are valid
   {
@@ -86,9 +86,9 @@ void RBParametrized::initialize_parameters(const RBParameters & mu_min_in,
 
   // Add in min/max values due to the discrete parameters
   {
-    std::map< std::string, std::vector<Real> >::const_iterator it =
+    std::map<std::string, std::vector<Real>>::const_iterator it =
       discrete_parameter_values.begin();
-    const std::map< std::string, std::vector<Real> >::const_iterator it_end =
+    const std::map<std::string, std::vector<Real>>::const_iterator it_end =
       discrete_parameter_values.end();
     for ( ; it != it_end; ++it)
       {
@@ -278,9 +278,9 @@ void RBParametrized::write_discrete_parameter_values_to_file(const std::string &
       unsigned int n_discrete_params = get_n_discrete_params();
       discrete_parameters_out << n_discrete_params;
 
-      std::map< std::string, std::vector<Real> >::const_iterator discrete_it =
+      std::map<std::string, std::vector<Real>>::const_iterator discrete_it =
         get_discrete_parameter_values().begin();
-      const std::map< std::string, std::vector<Real> >::const_iterator discrete_it_end =
+      const std::map<std::string, std::vector<Real>>::const_iterator discrete_it_end =
         get_discrete_parameter_values().end();
       for ( ; discrete_it != discrete_it_end; ++discrete_it)
         {
@@ -309,7 +309,7 @@ void RBParametrized::read_parameter_data_from_files(const std::string & continuo
                                   param_min,
                                   param_max);
 
-  std::map< std::string, std::vector<Real> > discrete_parameter_values_in;
+  std::map<std::string, std::vector<Real>> discrete_parameter_values_in;
   read_discrete_parameter_values_from_file(discrete_param_file_name,
                                            read_binary_data,
                                            discrete_parameter_values_in);
@@ -356,7 +356,7 @@ void RBParametrized::read_parameter_ranges_from_file(const std::string & file_na
 
 void RBParametrized::read_discrete_parameter_values_from_file(const std::string & file_name,
                                                               const bool read_binary_data,
-                                                              std::map< std::string, std::vector<Real> > & discrete_parameter_values)
+                                                              std::map<std::string, std::vector<Real>> & discrete_parameter_values)
 {
   // read in the discrete parameters, if we have any
   std::ifstream check_if_file_exists(file_name.c_str());
@@ -400,7 +400,7 @@ bool RBParametrized::is_discrete_parameter(const std::string & mu_name) const
   return (_discrete_parameter_values.find(mu_name) != _discrete_parameter_values.end());
 }
 
-const std::map< std::string, std::vector<Real> > & RBParametrized::get_discrete_parameter_values() const
+const std::map<std::string, std::vector<Real>> & RBParametrized::get_discrete_parameter_values() const
 {
   if (!parameters_initialized)
     libmesh_error_msg("Error: parameters not initialized in RBParametrized::get_discrete_parameter_values");
@@ -410,9 +410,9 @@ const std::map< std::string, std::vector<Real> > & RBParametrized::get_discrete_
 
 void RBParametrized::print_discrete_parameter_values() const
 {
-  std::map< std::string, std::vector<Real> >::const_iterator it =
+  std::map<std::string, std::vector<Real>>::const_iterator it =
     get_discrete_parameter_values().begin();
-  const std::map< std::string, std::vector<Real> >::const_iterator it_end =
+  const std::map<std::string, std::vector<Real>>::const_iterator it_end =
     get_discrete_parameter_values().end();
 
   for ( ; it != it_end; ++it)

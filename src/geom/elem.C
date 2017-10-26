@@ -2085,7 +2085,7 @@ unsigned int Elem::as_parent_node (unsigned int child,
 
   // Cached return values, indexed first by embedding_matrix version,
   // then by child number, then by child node number.
-  std::vector<std::vector<std::vector<signed char> > > &
+  std::vector<std::vector<std::vector<signed char>>> &
     cached_parent_indices = this->_get_parent_indices_cache();
 
   unsigned int em_vers = this->embedding_matrix_version();
@@ -2144,13 +2144,13 @@ unsigned int Elem::as_parent_node (unsigned int child,
 
 
 
-const std::vector<std::pair<unsigned char, unsigned char> > &
+const std::vector<std::pair<unsigned char, unsigned char>> &
 Elem::parent_bracketing_nodes(unsigned int child,
                               unsigned int child_node) const
 {
   // Indexed first by embedding matrix type, then by child id, then by
   // child node, then by bracketing pair
-  std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char> > > > > &
+  std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char>>>>> &
     cached_bracketing_nodes = this->_get_bracketing_node_cache();
 
   const unsigned int em_vers = this->embedding_matrix_version();
@@ -2349,13 +2349,13 @@ Elem::parent_bracketing_nodes(unsigned int child,
 }
 
 
-const std::vector<std::pair<dof_id_type, dof_id_type> >
+const std::vector<std::pair<dof_id_type, dof_id_type>>
 Elem::bracketing_nodes(unsigned int child,
                        unsigned int child_node) const
 {
-  std::vector<std::pair<dof_id_type, dof_id_type> > returnval;
+  std::vector<std::pair<dof_id_type, dof_id_type>> returnval;
 
-  const std::vector<std::pair<unsigned char, unsigned char> > & pbc =
+  const std::vector<std::pair<unsigned char, unsigned char>> & pbc =
     this->parent_bracketing_nodes(child,child_node);
 
   for (std::size_t i = 0; i != pbc.size(); ++i)

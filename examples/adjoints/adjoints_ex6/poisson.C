@@ -31,12 +31,12 @@ public:
     : _T_var(T_var)
   { this->_initialized = true; }
 
-  virtual Number operator() (const Point&, const Real = 0)
+  virtual Number operator() (const Point &, const Real = 0)
   { libmesh_not_implemented(); }
 
-  virtual void operator() (const Point& p,
+  virtual void operator() (const Point & p,
                            const Real,
-                           DenseVector<Number>& output)
+                           DenseVector<Number> & output)
   {
     output.resize(2);
     output.zero();
@@ -45,8 +45,8 @@ public:
     output(_T_var) = -x * (1 - x);
   }
 
-  virtual UniquePtr<FunctionBase<Number> > clone() const
-  { return UniquePtr<FunctionBase<Number> > (new BdyFunction(_T_var)); }
+  virtual UniquePtr<FunctionBase<Number>> clone() const
+  { return UniquePtr<FunctionBase<Number>> (new BdyFunction(_T_var)); }
 
 private:
   const unsigned int _T_var;
@@ -92,9 +92,9 @@ void PoissonSystem::init_data ()
   FEMSystem::init_data();
 }
 
-void PoissonSystem::init_context(DiffContext &context)
+void PoissonSystem::init_context(DiffContext & context)
 {
-  FEMContext &c = cast_ref<FEMContext&>(context);
+  FEMContext & c = cast_ref<FEMContext &>(context);
 
   // Now make sure we have requested all the data
   // we need to build the linear system.
@@ -119,12 +119,12 @@ void PoissonSystem::init_context(DiffContext &context)
 
 // Assemble the element contributions to the stiffness matrix
 bool PoissonSystem::element_time_derivative (bool request_jacobian,
-                                             DiffContext &context)
+                                             DiffContext & context)
 {
   // Are the jacobians specified analytically ?
   bool compute_jacobian = request_jacobian && _analytic_jacobians;
 
-  FEMContext &c = cast_ref<FEMContext&>(context);
+  FEMContext & c = cast_ref<FEMContext &>(context);
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
@@ -132,21 +132,21 @@ bool PoissonSystem::element_time_derivative (bool request_jacobian,
   c.get_element_fe( 0, elem_fe );
 
   // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = elem_fe->get_JxW();
+  const std::vector<Real> & JxW = elem_fe->get_JxW();
 
   // Element basis functions
-  const std::vector<std::vector<Real> >          &phi = elem_fe->get_phi();
-  const std::vector<std::vector<RealGradient> > &dphi = elem_fe->get_dphi();
+  const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
+  const std::vector<std::vector<RealGradient>> & dphi = elem_fe->get_dphi();
 
   // Quadrature point locations
-  const std::vector<Point > &q_point = elem_fe->get_xyz();
+  const std::vector<Point > & q_point = elem_fe->get_xyz();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_T_dofs = c.get_dof_indices(0).size();
 
   // The subvectors and submatrices we need to fill:
-  DenseSubMatrix<Number> &K = c.get_elem_jacobian(0,0);
-  DenseSubVector<Number> &F = c.get_elem_residual(0);
+  DenseSubMatrix<Number> & K = c.get_elem_jacobian(0,0);
+  DenseSubVector<Number> & F = c.get_elem_residual(0);
 
   // Now we will build the element Jacobian and residual.
   // Constructing the residual requires the solution and its

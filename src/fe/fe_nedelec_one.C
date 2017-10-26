@@ -114,7 +114,7 @@ void nedelec_one_nodal_soln(const Elem * elem,
         // applied to it.
         UniquePtr<FEVectorBase> vis_fe = FEVectorBase::build(dim,fe_type);
 
-        const std::vector<std::vector<RealGradient> > & vis_phi = vis_fe->get_phi();
+        const std::vector<std::vector<RealGradient>> & vis_phi = vis_fe->get_phi();
 
         vis_fe->reinit(elem,&refspace_nodes);
 

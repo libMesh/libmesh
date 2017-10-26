@@ -77,7 +77,7 @@ public:
 
   virtual void init_context (const FEMContext & c) libmesh_override;
 
-  virtual UniquePtr<FEMFunctionBase<Output> > clone () const libmesh_override;
+  virtual UniquePtr<FEMFunctionBase<Output>> clone () const libmesh_override;
 
   virtual Output operator() (const FEMContext & c,
                              const Point & p,
@@ -152,7 +152,7 @@ private:
     _n_requested_hess_components;
   bool _requested_normals;
 #ifdef LIBMESH_HAVE_FPARSER
-  std::vector<FunctionParserBase<Output> > parsers;
+  std::vector<FunctionParserBase<Output>> parsers;
 #else
   std::vector<char> parsers;
 #endif
@@ -369,10 +369,10 @@ ParsedFEMFunction<Output>::init_context (const FEMContext & c)
 
 template <typename Output>
 inline
-UniquePtr<FEMFunctionBase<Output> >
+UniquePtr<FEMFunctionBase<Output>>
 ParsedFEMFunction<Output>::clone () const
 {
-  return UniquePtr<FEMFunctionBase<Output> >
+  return UniquePtr<FEMFunctionBase<Output>>
     (new ParsedFEMFunction(_sys, _expression, &_additional_vars, &_initial_vals));
 }
 

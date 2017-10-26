@@ -258,7 +258,7 @@ void load_parameter_ranges(RBParametrized & rb_evaluation,
   }
 
   // Discrete parameters
-  std::map< std::string, std::vector<Real> > discrete_parameter_values;
+  std::map<std::string, std::vector<Real>> discrete_parameter_values;
   {
     unsigned int n_discrete_parameters = discrete_parameters_list.getNames().size();
 

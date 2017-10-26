@@ -76,7 +76,7 @@ bool FEMPhysics::eulerian_residual (bool request_jacobian,
   libmesh_assert(!n_z_dofs || context.element_fe_var[_mesh_z_var] ==
                  context.element_fe_var[mesh_xyz_var]);
 
-  const std::vector<std::vector<Real> >     & psi =
+  const std::vector<std::vector<Real>>     & psi =
     context.element_fe_var[mesh_xyz_var]->get_phi();
 
   for (unsigned int var = 0; var != context.n_vars(); ++var)
@@ -109,10 +109,10 @@ bool FEMPhysics::eulerian_residual (bool request_jacobian,
       const std::vector<Real> & JxW =
         context.element_fe_var[var]->get_JxW();
 
-      const std::vector<std::vector<Real> > & phi =
+      const std::vector<std::vector<Real>> & phi =
         context.element_fe_var[var]->get_phi();
 
-      const std::vector<std::vector<RealGradient> > & dphi =
+      const std::vector<std::vector<RealGradient>> & dphi =
         context.element_fe_var[var]->get_dphi();
 
       const unsigned int n_u_dofs = context.dof_indices_var[var].size();
@@ -215,7 +215,7 @@ bool FEMPhysics::mass_residual (bool request_jacobian,
 
       const std::vector<Real> & JxW = elem_fe->get_JxW();
 
-      const std::vector<std::vector<Real> > & phi = elem_fe->get_phi();
+      const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
 
       const unsigned int n_dofs = cast_int<unsigned int>
         (context.get_dof_indices(var).size());

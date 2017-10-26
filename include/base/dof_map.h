@@ -85,7 +85,7 @@ template <typename T> class NumericVector;
  */
 typedef std::map<dof_id_type, Real,
                  std::less<dof_id_type>,
-                 Threads::scalable_allocator<std::pair<const dof_id_type, Real> > > DofConstraintRow;
+                 Threads::scalable_allocator<std::pair<const dof_id_type, Real>>> DofConstraintRow;
 
 /**
  * The constraint matrix storage format.
@@ -96,7 +96,7 @@ typedef std::map<dof_id_type, Real,
 class DofConstraints : public std::map<dof_id_type,
                                        DofConstraintRow,
                                        std::less<dof_id_type>,
-                                       Threads::scalable_allocator<std::pair<const dof_id_type, DofConstraintRow> > >
+                                       Threads::scalable_allocator<std::pair<const dof_id_type, DofConstraintRow>>>
 {
 };
 
@@ -108,7 +108,7 @@ class DofConstraints : public std::map<dof_id_type,
 class DofConstraintValueMap :
     public std::map<dof_id_type, Number,
                     std::less<dof_id_type>,
-                    Threads::scalable_allocator<std::pair<const dof_id_type, Number> > >
+                    Threads::scalable_allocator<std::pair<const dof_id_type, Number>>>
 {
 };
 
@@ -120,7 +120,7 @@ class AdjointDofConstraintValues :
     public std::map<unsigned int, DofConstraintValueMap,
                     std::less<unsigned int>,
                     Threads::scalable_allocator
-                    <std::pair<const unsigned int, DofConstraintValueMap> > >
+                    <std::pair<const unsigned int, DofConstraintValueMap>>>
 {
 };
 
@@ -133,7 +133,7 @@ class AdjointDofConstraintValues :
  */
 typedef std::map<const Node *, Real,
                  std::less<const Node *>,
-                 Threads::scalable_allocator<std::pair<const Node * const, Real> > > NodeConstraintRow;
+                 Threads::scalable_allocator<std::pair<const Node * const, Real>>> NodeConstraintRow;
 
 /**
  * The Node constraint storage format.
@@ -144,7 +144,7 @@ typedef std::map<const Node *, Real,
 class NodeConstraints : public std::map<const Node *,
                                         std::pair<NodeConstraintRow,Point>,
                                         std::less<const Node *>,
-                                        Threads::scalable_allocator<std::pair<const Node * const, std::pair<NodeConstraintRow,Point> > > >
+                                        Threads::scalable_allocator<std::pair<const Node * const, std::pair<NodeConstraintRow,Point>>>>
 {
 };
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS

@@ -109,7 +109,7 @@ struct AssemblyA0 : ElemAssemblyWithConstruction
 
           const std::vector<Real> & JxW_side = side_fe->get_JxW();
 
-          const std::vector<std::vector<Real> > & phi_side = side_fe->get_phi();
+          const std::vector<std::vector<Real>> & phi_side = side_fe->get_phi();
 
           // The number of local degrees of freedom in each variable
           const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
@@ -152,7 +152,7 @@ struct AssemblyA1 : ElemAssemblyWithConstruction
 
           const std::vector<Real> & JxW_side = side_fe->get_JxW();
 
-          const std::vector<std::vector<Real> > & phi_side = side_fe->get_phi();
+          const std::vector<std::vector<Real>> & phi_side = side_fe->get_phi();
 
           const std::vector<Point> & xyz = side_fe->get_xyz();
 
@@ -199,7 +199,7 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
 
           const std::vector<Real> & JxW_side = side_fe->get_JxW();
 
-          const std::vector<std::vector<Real> > & phi_side = side_fe->get_phi();
+          const std::vector<std::vector<Real>> & phi_side = side_fe->get_phi();
 
           // The number of local degrees of freedom in each variable
           const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
@@ -265,7 +265,7 @@ struct AssemblyEIM : RBEIMAssembly
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
 
-    const std::vector<std::vector<RealGradient> > & dphi = elem_fe->get_dphi();
+    const std::vector<std::vector<RealGradient>> & dphi = elem_fe->get_dphi();
 
     // The number of local degrees of freedom in each variable
     const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
@@ -318,7 +318,7 @@ struct AssemblyF0 : ElemAssembly
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
 
-    const std::vector<std::vector<Real> > & phi = elem_fe->get_phi();
+    const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
 
     // The number of local degrees of freedom in each variable
     const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
@@ -352,7 +352,7 @@ struct AssemblyF1 : ElemAssembly
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
 
-    const std::vector<std::vector<Real> > & phi = elem_fe->get_phi();
+    const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
 
     const std::vector<Point> & xyz = elem_fe->get_xyz();
 
@@ -384,7 +384,7 @@ struct Ex6InnerProduct : ElemAssembly
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
 
-    const std::vector<std::vector<RealGradient> > & dphi = elem_fe->get_dphi();
+    const std::vector<std::vector<RealGradient>> & dphi = elem_fe->get_dphi();
 
     // The number of local degrees of freedom in each variable
     const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();
@@ -409,7 +409,7 @@ struct Ex6EIMInnerProduct : ElemAssembly
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
 
-    const std::vector<std::vector<Real> > & phi = elem_fe->get_phi();
+    const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
 
     const unsigned int n_dofs = c.get_dof_indices().size();
 

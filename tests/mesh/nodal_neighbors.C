@@ -59,7 +59,7 @@ protected:
                                       elem_type);
 
     // find_nodal_neighbors() needs a data structure which is prepared by another function
-    std::vector<std::vector<const Elem*> > nodes_to_elem_map;
+    std::vector<std::vector<const Elem *>> nodes_to_elem_map;
     MeshTools::build_nodes_to_elem_map(mesh, nodes_to_elem_map);
 
     // Loop over the nodes and call find_nodal_neighbors()

@@ -263,7 +263,7 @@ protected:
    * The number of iterations and the final residual
    * when the Ax=b is solved for multiple frequencies.
    */
-  std::vector<std::pair<unsigned int, Real> > vec_rval;
+  std::vector<std::pair<unsigned int, Real>> vec_rval;
 
 };
 

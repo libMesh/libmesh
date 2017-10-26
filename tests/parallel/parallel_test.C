@@ -240,7 +240,7 @@ public:
 
     // Test Vector of Vector Scatter
     {
-      std::vector<std::vector<unsigned int> > src;
+      std::vector<std::vector<unsigned int>> src;
       std::vector<unsigned int> dest;
 
       if (TestCommWorld->rank() == 0)

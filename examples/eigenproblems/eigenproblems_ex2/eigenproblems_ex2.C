@@ -171,7 +171,7 @@ int main (int argc, char ** argv)
 #else
   // Get the SLEPc solver object and set initial guess for one basis vector
   // this has to be done _after_ the EquationSystems object is initialized
-  UniquePtr<EigenSolver<Number> > & slepc_eps = eigen_system.eigen_solver;
+  UniquePtr<EigenSolver<Number>> & slepc_eps = eigen_system.eigen_solver;
   NumericVector<Number> & initial_space = eigen_system.add_vector("initial_space");
   initial_space.add(1.0);
   slepc_eps->set_initial_space(initial_space);
@@ -255,11 +255,11 @@ void assemble_mass(EquationSystems & es,
   const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers

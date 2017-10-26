@@ -370,7 +370,7 @@ void compute_stresses(EquationSystems & es)
   fe->attach_quadrature_rule (&qrule);
 
   const std::vector<Real> & JxW = fe->get_JxW();
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   // Also, get a reference to the ExplicitSystem
   ExplicitSystem & stress_system = es.get_system<ExplicitSystem>("StressSystem");
@@ -388,7 +388,7 @@ void compute_stresses(EquationSystems & es)
   unsigned int vonMises_var = stress_system.variable_number ("vonMises");
 
   // Storage for the stress dof indices on each element
-  std::vector<std::vector<dof_id_type> > dof_indices_var(system.n_vars());
+  std::vector<std::vector<dof_id_type>> dof_indices_var(system.n_vars());
   std::vector<dof_id_type> stress_dof_indices_var;
 
   // To store the stress tensor on each element

@@ -164,7 +164,7 @@ public:
     sys.get_all_variable_numbers(variables);
     std::sort(variables.begin(),variables.end());
 
-    UniquePtr< NumericVector<Number> > mesh_function_vector =
+    UniquePtr<NumericVector<Number>> mesh_function_vector =
       NumericVector<Number>::build(es.comm());
     mesh_function_vector->init(sys.n_dofs(), false, SERIAL);
     sys.solution->localize( *mesh_function_vector );

@@ -50,7 +50,7 @@ void TopologyMap::init(MeshBase & mesh)
 
 
 void TopologyMap::add_node(const Node & mid_node,
-                           const std::vector<std::pair<dof_id_type, dof_id_type> > & bracketing_nodes)
+                           const std::vector<std::pair<dof_id_type, dof_id_type>> & bracketing_nodes)
 {
   const dof_id_type mid_node_id = mid_node.id();
 
@@ -79,7 +79,7 @@ void TopologyMap::add_node(const Node & mid_node,
 }
 
 
-dof_id_type TopologyMap::find(const std::vector<std::pair<dof_id_type, dof_id_type> > & bracketing_nodes) const
+dof_id_type TopologyMap::find(const std::vector<std::pair<dof_id_type, dof_id_type>> & bracketing_nodes) const
 {
   dof_id_type new_node_id = DofObject::invalid_id;
 
@@ -159,7 +159,7 @@ void TopologyMap::fill(const MeshBase & mesh)
 
           for (unsigned int n = 0; n != elem->n_nodes_in_child(c); ++n)
             {
-              const std::vector<std::pair<dof_id_type, dof_id_type> >
+              const std::vector<std::pair<dof_id_type, dof_id_type>>
                 bracketing_nodes = elem->bracketing_nodes(c,n);
 
               this->add_node(child->node_ref(n), bracketing_nodes);

@@ -400,7 +400,7 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
     xfer_buf_sizes(this->n_processors());
 
 #ifdef LIBMESH_ENABLE_AMR
-  typedef std::map<dof_id_type, std::pair<processor_id_type, dof_id_type> > id_map_type;
+  typedef std::map<dof_id_type, std::pair<processor_id_type, dof_id_type>> id_map_type;
   id_map_type parent_id_map, child_id_map;
 #endif
 
@@ -655,7 +655,7 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
       // those parents may have been written by other processors (at this step),
       // so we need to gather them into our *_id_maps.
       {
-        std::vector<std::vector<dof_id_type> > requested_ids(this->n_processors());
+        std::vector<std::vector<dof_id_type>> requested_ids(this->n_processors());
         std::vector<dof_id_type> request_to_fill;
 
         it  = mesh.local_level_elements_begin(level);
@@ -726,13 +726,13 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
   std::vector<Real> xfer_coords;
   std::vector<Real> & coords=xfer_coords;
 
-  std::vector<std::vector<dof_id_type> > recv_ids   (this->n_processors());
-  std::vector<std::vector<Real> >         recv_coords(this->n_processors());
+  std::vector<std::vector<dof_id_type>> recv_ids   (this->n_processors());
+  std::vector<std::vector<Real>>         recv_coords(this->n_processors());
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   std::vector<xdr_id_type> xfer_unique_ids;
   std::vector<xdr_id_type> & unique_ids=xfer_unique_ids;
-  std::vector<std::vector<xdr_id_type> > recv_unique_ids (this->n_processors());
+  std::vector<std::vector<xdr_id_type>> recv_unique_ids (this->n_processors());
 #endif // LIBMESH_ENABLE_UNIQUE_ID
 
   std::size_t n_written=0;

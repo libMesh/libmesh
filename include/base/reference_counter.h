@@ -116,7 +116,7 @@ protected:
    * identified by the class name.
    */
   typedef std::map<std::string, std::pair<unsigned int,
-                                          unsigned int> > Counts;
+                                          unsigned int>> Counts;
 
   /**
    * Actually holds the data.

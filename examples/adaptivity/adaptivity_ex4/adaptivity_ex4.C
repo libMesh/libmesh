@@ -731,12 +731,12 @@ void assemble_biharmonic(EquationSystems & es,
   const std::vector<Point> & q_point = fe->get_xyz();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
   // The element shape function second derivatives evaluated at the
   // quadrature points.  Note that for the simple biharmonic, shape
   // function first derivatives are unnecessary.
-  const std::vector<std::vector<RealTensor> > & d2phi = fe->get_d2phi();
+  const std::vector<std::vector<RealTensor>> & d2phi = fe->get_d2phi();
 
   // For efficiency we will compute shape function laplacians n times,
   // not n^2
@@ -853,12 +853,12 @@ void assemble_biharmonic(EquationSystems & es,
             {
               // The value of the shape functions at the quadrature
               // points.
-              const std::vector<std::vector<Real> > & phi_face =
+              const std::vector<std::vector<Real>> & phi_face =
                 fe_face->get_phi();
 
               // The value of the shape function derivatives at the
               // quadrature points.
-              const std::vector<std::vector<RealGradient> > & dphi_face =
+              const std::vector<std::vector<RealGradient>> & dphi_face =
                 fe_face->get_dphi();
 
               // The Jacobian * Quadrature Weight at the quadrature

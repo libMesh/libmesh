@@ -165,7 +165,7 @@ public:
    * segments[3] = (3,0)
    * For this case you could actually use the implicit ordering!
    */
-  std::vector<std::pair<unsigned int, unsigned int> > segments;
+  std::vector<std::pair<unsigned int, unsigned int>> segments;
 
 private:
   /**

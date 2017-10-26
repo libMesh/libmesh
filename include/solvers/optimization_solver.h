@@ -49,7 +49,7 @@ template <typename T> class Preconditioner;
  * \date 2015
  */
 template <typename T>
-class OptimizationSolver : public ReferenceCountedObject<OptimizationSolver<T> >,
+class OptimizationSolver : public ReferenceCountedObject<OptimizationSolver<T>>,
                            public ParallelObject
 {
 public:
@@ -73,7 +73,7 @@ public:
    * Builds an \p OptimizationSolver using the package specified by
    * \p solver_package
    */
-  static UniquePtr<OptimizationSolver<T> > build(sys_type & s,
+  static UniquePtr<OptimizationSolver<T>> build(sys_type & s,
                                                  const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**

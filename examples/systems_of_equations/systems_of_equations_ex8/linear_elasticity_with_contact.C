@@ -76,7 +76,7 @@ void LinearElasticityWithContact::move_mesh (MeshBase & input_mesh,
 
   // Localize input_solution so that we have the data to move all
   // elements (not just elements local to this processor).
-  UniquePtr< NumericVector<Number> > localized_input_solution =
+  UniquePtr<NumericVector<Number>> localized_input_solution =
     NumericVector<Number>::build(input_solution.comm());
 
   localized_input_solution->init (input_solution.size(), false, SERIAL);
@@ -271,7 +271,7 @@ void LinearElasticityWithContact::residual_and_jacobian (const NumericVector<Num
   fe_neighbor_face->attach_quadrature_rule (&qface);
 
   const std::vector<Real> & JxW = fe->get_JxW();
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   if (jacobian)
     jacobian->zero();
@@ -296,7 +296,7 @@ void LinearElasticityWithContact::residual_and_jacobian (const NumericVector<Num
     };
 
   std::vector<dof_id_type> dof_indices;
-  std::vector< std::vector<dof_id_type> > dof_indices_var(3);
+  std::vector<std::vector<dof_id_type>> dof_indices_var(3);
 
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
@@ -519,7 +519,7 @@ void LinearElasticityWithContact::compute_stresses()
   fe->attach_quadrature_rule (&qrule);
 
   const std::vector<Real> & JxW = fe->get_JxW();
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   // Also, get a reference to the ExplicitSystem
   ExplicitSystem & stress_system = es.get_system<ExplicitSystem>("StressSystem");
@@ -534,7 +534,7 @@ void LinearElasticityWithContact::compute_stresses()
   unsigned int vonMises_var = stress_system.variable_number ("vonMises");
 
   // Storage for the stress dof indices on each element
-  std::vector< std::vector<dof_id_type> > dof_indices_var(_sys.n_vars());
+  std::vector<std::vector<dof_id_type>> dof_indices_var(_sys.n_vars());
   std::vector<dof_id_type> stress_dof_indices_var;
 
   // To store the stress tensor on each element

@@ -102,7 +102,7 @@ DTKSolutionTransfer::transfer(const Variable & from_var,
     }
 
   DTKAdapter::RCP_Evaluator from_evaluator = from_adapter->get_variable_evaluator(from_var.name());
-  Teuchos::RCP<DataTransferKit::FieldManager<DTKAdapter::FieldContainerType> > to_values = to_adapter->get_values_to_fill(to_var.name());
+  Teuchos::RCP<DataTransferKit::FieldManager<DTKAdapter::FieldContainerType>> to_values = to_adapter->get_values_to_fill(to_var.name());
 
   dtk_maps[from_to]->apply(from_evaluator, to_values);
 

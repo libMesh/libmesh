@@ -179,7 +179,7 @@ void assemble_elasticity(EquationSystems & es,
   fe_face->attach_quadrature_rule (&qface);
 
   const std::vector<Real> & JxW = fe->get_JxW();
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;
@@ -312,7 +312,7 @@ void assemble_elasticity(EquationSystems & es,
         for (auto side : elem->side_index_range())
           if (elem->neighbor_ptr(side) == libmesh_nullptr)
             {
-              const std::vector<std::vector<Real> > & phi_face = fe_face->get_phi();
+              const std::vector<std::vector<Real>> & phi_face = fe_face->get_phi();
               const std::vector<Real> & JxW_face = fe_face->get_JxW();
 
               fe_face->reinit(elem, side);

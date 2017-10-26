@@ -176,13 +176,13 @@ FEMContext::~FEMContext()
 {
   // We don't want to store UniquePtrs in STL containers, but we don't
   // want to leak memory either
-  for (std::vector<std::map<FEType, FEAbstract *> >::iterator d = _element_fe.begin();
+  for (std::vector<std::map<FEType, FEAbstract *>>::iterator d = _element_fe.begin();
        d != _element_fe.end(); ++d)
     for (std::map<FEType, FEAbstract *>::iterator i = d->begin();
          i != d->end(); ++i)
       delete i->second;
 
-  for (std::vector<std::map<FEType, FEAbstract *> >::iterator d = _side_fe.begin();
+  for (std::vector<std::map<FEType, FEAbstract *>>::iterator d = _side_fe.begin();
        d != _side_fe.end(); ++d)
     for (std::map<FEType, FEAbstract *>::iterator i = d->begin();
          i != d->end(); ++i)
@@ -246,7 +246,7 @@ void FEMContext::some_value(unsigned int var, unsigned int qp, OutputType & u) c
 
   // Get shape function values at quadrature point
   const std::vector<std::vector
-                    <typename FENeeded<OutputType>::value_shape> > & phi = fe->get_phi();
+                    <typename FENeeded<OutputType>::value_shape>> & phi = fe->get_phi();
 
   // Accumulate solution value
   u = 0.;
@@ -275,7 +275,7 @@ void FEMContext::some_gradient(unsigned int var, unsigned int qp, OutputType & d
 
   // Get shape function values at quadrature point
   const std::vector<std::vector
-                    <typename FENeeded<OutputType>::grad_base::OutputGradient> >
+                    <typename FENeeded<OutputType>::grad_base::OutputGradient>>
     & dphi = fe->get_dphi();
 
   // Accumulate solution derivatives
@@ -308,7 +308,7 @@ void FEMContext::some_hessian(unsigned int var, unsigned int qp, OutputType & d2
 
   // Get shape function values at quadrature point
   const std::vector<std::vector
-                    <typename FENeeded<OutputType>::hess_base::OutputTensor> >
+                    <typename FENeeded<OutputType>::hess_base::OutputTensor>>
     & d2phi = fe->get_d2phi();
 
   // Accumulate solution second derivatives
@@ -361,7 +361,7 @@ void FEMContext::interior_values (unsigned int var,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<OutputShape> > & phi = fe->get_phi();
+  const std::vector<std::vector<OutputShape>> & phi = fe->get_phi();
 
   // Loop over all the q_points on this element
   for (std::size_t qp=0; qp != u_vals.size(); qp++)
@@ -425,7 +425,7 @@ void FEMContext::interior_gradients(unsigned int var,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient>> & dphi = fe->get_dphi();
 
   // Loop over all the q_points in this finite element
   for (std::size_t qp=0; qp != du_vals.size(); qp++)
@@ -487,7 +487,7 @@ void FEMContext::interior_hessians(unsigned int var,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > & d2phi = fe->get_d2phi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> & d2phi = fe->get_d2phi();
 
   // Loop over all the q_points in this finite element
   for (std::size_t qp=0; qp != d2u_vals.size(); qp++)
@@ -527,7 +527,7 @@ void FEMContext::interior_curl(unsigned int var, unsigned int qp,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape> > & curl_phi = fe->get_curl_phi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape>> & curl_phi = fe->get_curl_phi();
 
   // Accumulate solution curl
   curl_u = 0.;
@@ -560,7 +560,7 @@ void FEMContext::interior_div(unsigned int var, unsigned int qp,
   this->get_element_fe<OutputShape>( var, fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> > & div_phi = fe->get_div_phi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence>> & div_phi = fe->get_div_phi();
 
   // Accumulate solution curl
   div_u = 0.;
@@ -613,7 +613,7 @@ void FEMContext::side_values(unsigned int var,
   this->get_side_fe<OutputShape>( var, the_side_fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<OutputShape> > & phi = the_side_fe->get_phi();
+  const std::vector<std::vector<OutputShape>> & phi = the_side_fe->get_phi();
 
   // Loop over all the q_points on this element
   for (std::size_t qp=0; qp != u_vals.size(); qp++)
@@ -661,7 +661,7 @@ void FEMContext::side_gradient(unsigned int var, unsigned int qp,
   this->get_side_fe<OutputShape>( var, the_side_fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector< typename FEGenericBase<OutputShape>::OutputGradient> > & dphi = the_side_fe->get_dphi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient>> & dphi = the_side_fe->get_dphi();
 
   // Accumulate solution derivatives
   du = 0.;
@@ -695,7 +695,7 @@ void FEMContext::side_gradients(unsigned int var,
   this->get_side_fe<OutputShape>( var, the_side_fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > & dphi = the_side_fe->get_dphi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient>> & dphi = the_side_fe->get_dphi();
 
   // Loop over all the q_points in this finite element
   for (std::size_t qp=0; qp != du_vals.size(); qp++)
@@ -762,7 +762,7 @@ void FEMContext::side_hessians(unsigned int var,
   this->get_side_fe<OutputShape>( var, the_side_fe, this->get_elem_dim() );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > & d2phi = the_side_fe->get_d2phi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> & d2phi = the_side_fe->get_d2phi();
 
   // Loop over all the q_points in this finite element
   for (std::size_t qp=0; qp != d2u_vals.size(); qp++)
@@ -819,7 +819,7 @@ void FEMContext::point_value(unsigned int var,
     this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
-  const std::vector<std::vector<OutputShape> > &  phi = fe_new->get_phi();
+  const std::vector<std::vector<OutputShape>> &  phi = fe_new->get_phi();
 
   u = 0.;
 
@@ -869,7 +869,7 @@ void FEMContext::point_gradient(unsigned int var,
     this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > &  dphi = fe_new->get_dphi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient>> &  dphi = fe_new->get_dphi();
 
   grad_u = 0.0;
 
@@ -920,7 +920,7 @@ void FEMContext::point_hessian(unsigned int var,
     this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > &  d2phi = fe_new->get_d2phi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> &  d2phi = fe_new->get_d2phi();
 
   hess_u = 0.0;
 
@@ -958,7 +958,7 @@ void FEMContext::point_curl(unsigned int var,
     this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape> > &  curl_phi = fe_new->get_curl_phi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape>> &  curl_phi = fe_new->get_curl_phi();
 
   curl_u = 0.0;
 
@@ -1154,7 +1154,7 @@ void FEMContext::fixed_point_value(unsigned int var,
     this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
-  const std::vector<std::vector<OutputShape> > &  phi = fe_new->get_phi();
+  const std::vector<std::vector<OutputShape>> &  phi = fe_new->get_phi();
 
   u = 0.;
 
@@ -1204,7 +1204,7 @@ void FEMContext::fixed_point_gradient(unsigned int var,
     this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > &  dphi = fe_new->get_dphi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient>> &  dphi = fe_new->get_dphi();
 
   grad_u = 0.0;
 
@@ -1255,7 +1255,7 @@ void FEMContext::fixed_point_hessian(unsigned int var,
     this->build_new_fe( fe, p, tolerance );
 
   // Get the values of the shape function derivatives
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > &  d2phi = fe_new->get_d2phi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> &  d2phi = fe_new->get_d2phi();
 
   hess_u = 0.0;
 

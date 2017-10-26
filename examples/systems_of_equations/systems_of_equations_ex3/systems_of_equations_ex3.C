@@ -180,7 +180,7 @@ int main (int argc, char ** argv)
   // The first thing to do is to get a copy of the solution at
   // the current nonlinear iteration.  This value will be used to
   // determine if we can exit the nonlinear loop.
-  UniquePtr<NumericVector<Number> >
+  UniquePtr<NumericVector<Number>>
     last_nonlinear_soln (navier_stokes_system.solution->clone());
 
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -381,18 +381,18 @@ void assemble_stokes (EquationSystems & es,
   const std::vector<Real> & JxW = fe_vel->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> > & phi = fe_vel->get_phi();
+  const std::vector<std::vector<Real>> & phi = fe_vel->get_phi();
 
   // The element shape function gradients for the velocity
   // variables evaluated at the quadrature points.
-  const std::vector<std::vector<RealGradient> > & dphi = fe_vel->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe_vel->get_dphi();
 
   // The element shape functions for the pressure variable
   // evaluated at the quadrature points.
-  const std::vector<std::vector<Real> > & psi = fe_pres->get_phi();
+  const std::vector<std::vector<Real>> & psi = fe_pres->get_phi();
 
   // The value of the linear shape function gradients at the quadrature points
-  // const std::vector<std::vector<RealGradient> > & dpsi = fe_pres->get_dphi();
+  // const std::vector<std::vector<RealGradient>> & dpsi = fe_pres->get_dphi();
 
   // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers

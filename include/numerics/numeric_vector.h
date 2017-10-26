@@ -58,7 +58,7 @@ template <typename T> class ShellMatrix;
  * \date 2003
  */
 template <typename T>
-class NumericVector : public ReferenceCountedObject<NumericVector<T> >,
+class NumericVector : public ReferenceCountedObject<NumericVector<T>>,
                       public ParallelObject
 {
 public:
@@ -111,7 +111,7 @@ public:
    * \p comm using the linear solver package specified by
    * \p solver_package
    */
-  static UniquePtr<NumericVector<T> >
+  static UniquePtr<NumericVector<T>>
   build(const Parallel::Communicator & comm,
         const SolverPackage solver_package = libMesh::default_solver_package());
 
@@ -125,7 +125,7 @@ public:
    * build() method that takes a Parallel::Communicator instead.
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
-  static UniquePtr<NumericVector<T> >
+  static UniquePtr<NumericVector<T>>
   build(const SolverPackage solver_package = libMesh::default_solver_package());
 #endif
 #endif
@@ -175,14 +175,14 @@ public:
    *
    * \note This must be overridden in the derived classes.
    */
-  virtual UniquePtr<NumericVector<T> > zero_clone () const = 0;
+  virtual UniquePtr<NumericVector<T>> zero_clone () const = 0;
 
   /**
    * \returns A copy of this vector wrapped in a smart pointer.
    *
    * \note This must be overridden in the derived classes.
    */
-  virtual UniquePtr<NumericVector<T> > clone () const = 0;
+  virtual UniquePtr<NumericVector<T>> clone () const = 0;
 
   /**
    * Change the dimension of the vector to \p N. The reserved memory

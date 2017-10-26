@@ -158,8 +158,8 @@ void assemble(EquationSystems & es,
   const std::vector<Real> & JxW_face                   = fe_face->get_JxW();
   const std::vector<Real> & JxW                        = fe->get_JxW();
   const std::vector<Point> & q_point                   = fe->get_xyz();
-  const std::vector<std::vector<Real> > & phi          = fe->get_phi();
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<Real>> & phi          = fe->get_phi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   std::vector<dof_id_type> dof_indices_U;
   std::vector<dof_id_type> dof_indices_V;

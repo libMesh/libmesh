@@ -362,11 +362,11 @@ void assemble_poisson(EquationSystems & es,
   const std::vector<Point> & q_point = fe->get_xyz();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   // Define data structures to contain the element matrix
   // and right-hand-side vector contribution.  Following
@@ -552,7 +552,7 @@ void assemble_poisson(EquationSystems & es,
 
               // The value of the shape functions at the quadrature
               // points.
-              const std::vector<std::vector<Real> > & phi_face = fe_face->get_phi();
+              const std::vector<std::vector<Real>> & phi_face = fe_face->get_phi();
 
               // The Jacobian * Quadrature Weight at the quadrature
               // points on the face.

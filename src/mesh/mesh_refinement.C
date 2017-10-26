@@ -149,7 +149,7 @@ Node * MeshRefinement::add_node(Elem & parent,
   if (parent_n != libMesh::invalid_uint)
     return parent.node_ptr(parent_n);
 
-  const std::vector<std::pair<dof_id_type, dof_id_type> >
+  const std::vector<std::pair<dof_id_type, dof_id_type>>
     bracketing_nodes = parent.bracketing_nodes(child, node);
 
   // If we're not a parent node, we *must* be bracketed by at least
@@ -1135,7 +1135,7 @@ bool MeshRefinement::make_coarsening_compatible()
   const processor_id_type my_proc_id = _mesh.processor_id();
   const bool distributed_mesh = !_mesh.is_replicated();
 
-  std::vector<std::vector<dof_id_type> >
+  std::vector<std::vector<dof_id_type>>
     uncoarsenable_parents(n_proc);
 
   MeshBase::element_iterator       ancestor_el =
@@ -1853,7 +1853,7 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
           const processor_id_type n_proc = _mesh.n_processors();
           const processor_id_type my_proc_id = _mesh.processor_id();
 
-          std::vector<std::vector<dof_id_type> >
+          std::vector<std::vector<dof_id_type>>
             parents_to_coarsen(n_proc);
 
           MeshBase::const_element_iterator       elem_it  = _mesh.ancestor_elements_begin();

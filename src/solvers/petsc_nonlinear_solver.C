@@ -511,7 +511,7 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
                                               MatNullSpace * msp)
 {
   PetscErrorCode ierr;
-  std::vector<NumericVector<Number> * > sp;
+  std::vector<NumericVector<Number> *> sp;
   if (computeSubspaceObject)
     (*computeSubspaceObject)(sp, this->system());
   else

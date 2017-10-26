@@ -106,7 +106,7 @@ public:
    * An implicit linear solver to use for adjoint and sensitivity
    * problems.
    */
-  virtual UniquePtr<LinearSolver<Number> > & linear_solver() libmesh_override;
+  virtual UniquePtr<LinearSolver<Number>> & linear_solver() libmesh_override;
 
   /**
    * This object is used to take timesteps

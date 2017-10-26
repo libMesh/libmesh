@@ -1351,7 +1351,7 @@ void UNVIO::read_dataset(std::string file_name)
 const std::vector<Number> *
 UNVIO::get_data (Node * node) const
 {
-  std::map<Node *, std::vector<Number> >::const_iterator
+  std::map<Node *, std::vector<Number>>::const_iterator
     it = _node_data.find(node);
 
   if (it == _node_data.end())

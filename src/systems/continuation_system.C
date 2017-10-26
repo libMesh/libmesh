@@ -779,7 +779,7 @@ void ContinuationSystem::continuation_solve()
                     }
 
                   // Save a copy of the solution from before the Newton step.
-                  //UniquePtr<NumericVector<Number> > prior_iterate = solution->clone();
+                  //UniquePtr<NumericVector<Number>> prior_iterate = solution->clone();
                 }
             } // end if (attempte_backtracking)
 

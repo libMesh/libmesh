@@ -335,7 +335,7 @@ void FrequencySystem::solve (const unsigned int n_start,
 
 
   //   // return values
-  //   std::vector< std::pair<unsigned int, Real> > vec_rval;
+  //   std::vector<std::pair<unsigned int, Real>> vec_rval;
 
   // start solver loop
   for (unsigned int n=n_start; n<= n_stop; n++)

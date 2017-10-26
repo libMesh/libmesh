@@ -76,7 +76,7 @@ public:
    * called once for each entry of chunks, and the resulting
    * partitioning will simply be the union of all these partitionings.
    */
-  std::vector<std::set<subdomain_id_type> > chunks;
+  std::vector<std::set<subdomain_id_type>> chunks;
 
   /**
    * Get a reference to the Partitioner used internally by the

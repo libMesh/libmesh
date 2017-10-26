@@ -98,15 +98,15 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
                                                   const System * _system,
                                                   ErrorVector * error_per_cell,
                                                   ErrorMap * errors_per_cell,
-                                                  const std::map<const System *, SystemNorm > * _error_norms,
+                                                  const std::map<const System *, SystemNorm> * _error_norms,
                                                   const std::map<const System *, const NumericVector<Number> *> * solution_vectors,
                                                   bool)
 {
   // Get a vector of the Systems we're going to work on,
   // and set up a error_norms map if necessary
   std::vector<System *> system_list;
-  UniquePtr<std::map<const System *, SystemNorm > > error_norms =
-    UniquePtr<std::map<const System *, SystemNorm > >
+  UniquePtr<std::map<const System *, SystemNorm>> error_norms =
+    UniquePtr<std::map<const System *, SystemNorm>>
     (new std::map<const System *, SystemNorm>);
 
   if (_es)
@@ -197,7 +197,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
     }
 
   // We'll want to back up all coarse grid vectors
-  std::vector<std::map<std::string, NumericVector<Number> *> >
+  std::vector<std::map<std::string, NumericVector<Number> *>>
     coarse_vectors(system_list.size());
   std::vector<NumericVector<Number> *>
     coarse_solutions(system_list.size());
@@ -498,11 +498,11 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
           fe->attach_quadrature_rule (qrule.get());
 
           const std::vector<Real> &  JxW = fe->get_JxW();
-          const std::vector<std::vector<Real> > & phi = fe->get_phi();
-          const std::vector<std::vector<RealGradient> > & dphi =
+          const std::vector<std::vector<Real>> & phi = fe->get_phi();
+          const std::vector<std::vector<RealGradient>> & dphi =
             fe->get_dphi();
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          const std::vector<std::vector<RealTensor> > & d2phi =
+          const std::vector<std::vector<RealTensor>> & d2phi =
             fe->get_d2phi();
 #endif
 

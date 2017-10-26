@@ -207,7 +207,7 @@ struct AutoPtrRef
  * purpose.  It is provided "as is" without express or implied warranty.
  */
 template<typename Tp>
-class AutoPtr : public safe_bool<AutoPtr<Tp> >
+class AutoPtr : public safe_bool<AutoPtr<Tp>>
 {
 private:
 
