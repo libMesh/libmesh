@@ -1253,7 +1253,7 @@ private:
    * In DEBUG mode, the tot_size parameter will add up the total
    * number of dof indices that should have been added to di.
    */
-  void _dof_indices (const Elem * const elem,
+  void _dof_indices (const Elem & elem,
                      int p_level,
                      std::vector<dof_id_type> & di,
                      const unsigned int v,

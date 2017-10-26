@@ -1986,8 +1986,9 @@ void DofMap::dof_indices (const Elem * const elem,
           // Get the dof numbers
           for (unsigned int v=0; v<n_vars; v++)
             {
-              if (this->variable(v).type().family == SCALAR &&
-                  this->variable(v).active_on_subdomain(elem->subdomain_id()))
+              const Variable & var = this->variable(v);
+              if (var.type().family == SCALAR &&
+                  var.active_on_subdomain(elem->subdomain_id()))
                 {
 #ifdef DEBUG
                   tot_size += this->variable(v).type().order;
@@ -1997,7 +1998,7 @@ void DofMap::dof_indices (const Elem * const elem,
                   di.insert( di.end(), di_new.begin(), di_new.end());
                 }
               else
-                _dof_indices(elem, elem->p_level(), di, v,
+                _dof_indices(*elem, elem->p_level(), di, v,
                              &elem_nodes[0], elem_nodes.size()
 #ifdef DEBUG
                              , tot_size
@@ -2026,7 +2027,7 @@ void DofMap::dof_indices (const Elem * const elem,
           di.insert( di.end(), di_new.begin(), di_new.end());
         }
       else if (elem)
-        _dof_indices(elem, elem->p_level(), di, v, elem->get_nodes(),
+        _dof_indices(*elem, elem->p_level(), di, v, elem->get_nodes(),
                      n_nodes
 #ifdef DEBUG
                      , tot_size
@@ -2074,7 +2075,7 @@ void DofMap::dof_indices (const Elem * const elem,
           std::vector<const Node *> elem_nodes;
           MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
 
-          _dof_indices(elem, p_level, di, vn, &elem_nodes[0],
+          _dof_indices(*elem, p_level, di, vn, &elem_nodes[0],
                        elem_nodes.size()
 #ifdef DEBUG
                        , tot_size
@@ -2100,7 +2101,7 @@ void DofMap::dof_indices (const Elem * const elem,
       di.insert( di.end(), di_new.begin(), di_new.end());
     }
   else if (elem)
-    _dof_indices(elem, p_level, di, vn, elem->get_nodes(),
+    _dof_indices(*elem, p_level, di, vn, elem->get_nodes(),
                  elem->n_nodes()
 #ifdef DEBUG
                  , tot_size
@@ -2194,7 +2195,7 @@ void DofMap::dof_indices (const Node * const node,
 }
 
 
-void DofMap::_dof_indices (const Elem * const elem,
+void DofMap::_dof_indices (const Elem & elem,
                            int p_level,
                            std::vector<dof_id_type> & di,
                            const unsigned int v,
@@ -2206,18 +2207,15 @@ void DofMap::_dof_indices (const Elem * const elem,
 #endif
                            ) const
 {
-  // This internal function is only useful on valid elements
-  libmesh_assert(elem);
-
   const Variable & var = this->variable(v);
 
-  if (var.active_on_subdomain(elem->subdomain_id()))
+  if (var.active_on_subdomain(elem.subdomain_id()))
     {
-      const ElemType type        = elem->type();
+      const ElemType type        = elem.type();
       const unsigned int sys_num = this->sys_number();
-      const unsigned int dim     = elem->dim();
+      const unsigned int dim     = elem.dim();
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-      const bool is_inf          = elem->infinite();
+      const bool is_inf          = elem.infinite();
 #endif
 
       // Increase the polynomial order on p refined elements
@@ -2258,7 +2256,7 @@ void DofMap::_dof_indices (const Elem * const elem,
           // degrees of freedom, we use the non-vertex dofs (which
           // come in reverse order starting from the end, to
           // simplify p refinement)
-          if (extra_hanging_dofs && !elem->is_vertex(n))
+          if (extra_hanging_dofs && !elem.is_vertex(n))
             {
               const int dof_offset = node->n_comp(sys_num,v) - nc;
 
@@ -2267,7 +2265,7 @@ void DofMap::_dof_indices (const Elem * const elem,
               // and we should never need the indices on such a node
               if (dof_offset < 0)
                 {
-                  libmesh_assert(!elem->active());
+                  libmesh_assert(!elem.active());
                   di.resize(di.size() + nc, DofObject::invalid_id);
                 }
               else
@@ -2299,20 +2297,20 @@ void DofMap::_dof_indices (const Elem * const elem,
       // and we should never need those indices
       if (nc != 0)
         {
-          if (elem->n_systems() > sys_num &&
-              nc <= elem->n_comp(sys_num,v))
+          if (elem.n_systems() > sys_num &&
+              nc <= elem.n_comp(sys_num,v))
             {
               for (unsigned int i=0; i<nc; i++)
                 {
-                  libmesh_assert_not_equal_to (elem->dof_number(sys_num,v,i),
+                  libmesh_assert_not_equal_to (elem.dof_number(sys_num,v,i),
                                                DofObject::invalid_id);
 
-                  di.push_back(elem->dof_number(sys_num,v,i));
+                  di.push_back(elem.dof_number(sys_num,v,i));
                 }
             }
           else
             {
-              libmesh_assert(!elem->active() || fe_type.family == LAGRANGE || fe_type.family == SUBDIVISION);
+              libmesh_assert(!elem.active() || fe_type.family == LAGRANGE || fe_type.family == SUBDIVISION);
               di.resize(di.size() + nc, DofObject::invalid_id);
             }
         }
