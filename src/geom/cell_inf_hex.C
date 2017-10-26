@@ -458,10 +458,10 @@ bool InfHex::contains_point (const Point & p, Real tol) const
    * now, check if it is in the projected face; using that the diagonal contains
    * the largest distance between points in it
   */
-  Real max_h=std::max( (pt0_o-pt2_o).norm_sq(),(pt1_o-pt2_o).norm_sq())*1.01; 
+  Real max_h=std::max( (pt0_o-pt2_o).norm_sq(),(pt1_o-pt2_o).norm_sq())*1.01;
 
   if ((p_o-pt0_o).norm_sq() > max_h ||
-      (p_o-pt1_o).norm_sq() > max_h || 
+      (p_o-pt1_o).norm_sq() > max_h ||
       (p_o-pt2_o).norm_sq() > max_h ||
       (p_o-pt3_o).norm_sq() > max_h )
     {

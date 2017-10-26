@@ -209,7 +209,7 @@ bool InfPrism::contains_point (const Point & p, Real tol) const
    * this captures the case that the point is not (almost) in the direction of the element.:
    * first, project the problem onto the unit sphere:
    */
-  
+
   Point p_o(p-my_origin);
   pt0_o/=pt0_o.norm();
   pt1_o/=pt1_o.norm();
@@ -222,7 +222,7 @@ bool InfPrism::contains_point (const Point & p, Real tol) const
    * to any other point in the element.
   */
   if ((p_o-pt0_o).norm_sq() > std::max((pt0_o-pt1_o).norm_sq(), (pt0_o-pt2_o).norm_sq()) ||
-      (p_o-pt1_o).norm_sq() > std::max((pt1_o-pt2_o).norm_sq(), (pt1_o-pt0_o).norm_sq()) || 
+      (p_o-pt1_o).norm_sq() > std::max((pt1_o-pt2_o).norm_sq(), (pt1_o-pt0_o).norm_sq()) ||
       (p_o-pt2_o).norm_sq() > std::max((pt2_o-pt0_o).norm_sq(), (pt2_o-pt1_o).norm_sq()) )
     {
       /*
