@@ -1543,15 +1543,9 @@ bool MeshRefinement::_refine_elements ()
   // flagged for h refinement.
   dof_id_type n_elems_flagged = 0;
 
-  MeshBase::element_iterator       it  = _mesh.elements_begin();
-  const MeshBase::element_iterator end = _mesh.elements_end();
-
-  for (; it != end; ++it)
-    {
-      Elem * elem = *it;
-      if (elem->refinement_flag() == Elem::REFINE)
-        n_elems_flagged++;
-    }
+  for (auto & elem : _mesh.elements_range())
+    if (elem->refinement_flag() == Elem::REFINE)
+      n_elems_flagged++;
 
   // Construct a local vector of Elem * which have been
   // previously marked for refinement.  We reserve enough
