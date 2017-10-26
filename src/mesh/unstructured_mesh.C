@@ -119,14 +119,9 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
     map_type old_elems_to_new_elems;
 
     // Loop over the elements
-    MeshBase::const_element_iterator it = other_mesh.elements_begin();
-    const MeshBase::const_element_iterator end = other_mesh.elements_end();
-
-    for (; it != end; ++it)
+    for (const auto & old : other_mesh.elements_range())
       {
-        //Look at the old element
-        const Elem * old = *it;
-        //Build a new element
+        // Build a new element
         Elem * newparent = old->parent() ?
           this->elem_ptr(old->parent()->id()) : libmesh_nullptr;
         UniquePtr<Elem> ap = Elem::build(old->type(), newparent);
@@ -194,10 +189,8 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
     // Loop (again) over the elements to fill in the neighbors
     if (skip_find_neighbors)
       {
-        it = other_mesh.elements_begin();
-        for (; it != end; ++it)
+        for (const auto & old_elem : other_mesh.elements_range())
           {
-            Elem * old_elem = *it;
             Elem * new_elem = old_elems_to_new_elems[old_elem];
             for (auto s : old_elem->side_index_range())
               {
