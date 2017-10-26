@@ -44,10 +44,8 @@ extern "C" {
 #endif
 
 
-// Hash maps for interior->boundary element lookups
-#include LIBMESH_INCLUDE_UNORDERED_MULTIMAP
-#include LIBMESH_INCLUDE_HASH
-LIBMESH_DEFINE_HASH_POINTERS
+// C++ includes
+#include <unordered_map>
 
 
 namespace libMesh
@@ -421,8 +419,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
   // interior elements from boundary elements, but we need to build up
   // a lookup map to do the reverse.
 
-  typedef LIBMESH_BEST_UNORDERED_MULTIMAP<const Elem *, const Elem *>
-    map_type;
+  typedef std::unordered_multimap<const Elem *, const Elem *> map_type;
   map_type interior_to_boundary_map;
 
   {

@@ -21,6 +21,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <unordered_map>
 
 // C includes
 #include <sys/types.h> // for pid_t
@@ -39,7 +40,6 @@
 // For most I/O
 #include "libmesh/namebased_io.h"
 
-#include LIBMESH_INCLUDE_UNORDERED_MAP
 
 
 namespace libMesh
@@ -115,7 +115,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
     this->reserve_elem(other_mesh.n_elem());
 
     // Declare a map linking old and new elements, needed to copy the neighbor lists
-    typedef LIBMESH_BEST_UNORDERED_MAP<const Elem *, Elem *> map_type;
+    typedef std::unordered_map<const Elem *, Elem *> map_type;
     map_type old_elems_to_new_elems;
 
     // Loop over the elements
@@ -272,7 +272,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
     typedef std::pair<Elem *, unsigned char> val_type;
     typedef std::pair<key_type, val_type>   key_val_pair;
 
-    typedef LIBMESH_BEST_UNORDERED_MULTIMAP<key_type, val_type> map_type;
+    typedef std::unordered_multimap<key_type, val_type> map_type;
 
     // A map from side keys to corresponding elements & side numbers
     map_type side_to_elem_map;
@@ -369,14 +369,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                 kvp.first         = key;
                 kvp.second.first  = element;
                 kvp.second.second = ms;
-
-                // use the lower bound as a hint for
-                // where to put it.
-#if defined(LIBMESH_HAVE_UNORDERED_MAP) || defined(LIBMESH_HAVE_TR1_UNORDERED_MAP) || defined(LIBMESH_HAVE_HASH_MAP) || defined(LIBMESH_HAVE_EXT_HASH_MAP)
                 side_to_elem_map.insert (kvp);
-#else
-                side_to_elem_map.insert (bounds.first,kvp);
-#endif
               }
           }
       }

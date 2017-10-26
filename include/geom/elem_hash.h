@@ -19,8 +19,9 @@
 #define LIBMESH_ELEM_HASH_H
 
 #include "elem.h"
-#include LIBMESH_INCLUDE_UNORDERED_MAP
-#include LIBMESH_INCLUDE_UNORDERED_SET
+
+// C++ includes
+#include <unordered_set>
 
 // This header defines some typedefs that are useful for working with
 // "unordered" containers of Elem * that use Elem::key() as a hash
@@ -73,7 +74,7 @@ public:
 };
 
 // A convenient type for working with unordered_multiset<Elem *>
-typedef LIBMESH_BEST_UNORDERED_MULTISET<Elem *, ElemHashUtils, ElemHashUtils> unordered_multiset_elem;
+typedef std::unordered_multiset<Elem *, ElemHashUtils, ElemHashUtils> unordered_multiset_elem;
 
 }
 

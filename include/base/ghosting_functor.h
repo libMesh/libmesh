@@ -27,7 +27,7 @@
 #include "libmesh/reference_counted_object.h"
 
 // C++ Includes
-#include LIBMESH_INCLUDE_UNORDERED_MAP
+#include <unordered_map>
 
 namespace libMesh
 {
@@ -137,7 +137,7 @@ public:
    * What elements do we care about and what variables do we care
    * about on each element?
    */
-  typedef LIBMESH_BEST_UNORDERED_MAP<const Elem*, const CouplingMatrix*> map_type;
+  typedef std::unordered_map<const Elem*, const CouplingMatrix*> map_type;
 
   /**
    * For the specified range of active elements, what other elements

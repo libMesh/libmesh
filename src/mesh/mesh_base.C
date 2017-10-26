@@ -24,7 +24,7 @@
 #include <algorithm> // for std::min
 #include <map>       // for std::multimap
 #include <sstream>   // for std::ostringstream
-
+#include <unordered_map>
 
 // Local includes
 #include "libmesh/boundary_info.h"
@@ -38,7 +38,6 @@
 #include "libmesh/point_locator_base.h"
 #include "libmesh/threads.h"
 
-#include LIBMESH_INCLUDE_UNORDERED_MAP
 
 namespace libMesh
 {
@@ -686,7 +685,7 @@ void MeshBase::detect_interior_parents()
     return;
 
   //This map will be used to set interior parents
-  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, std::vector<dof_id_type> > node_to_elem;
+  std::unordered_map<dof_id_type, std::vector<dof_id_type> > node_to_elem;
 
   const_element_iterator el  = this->active_elements_begin();
   const_element_iterator end = this->active_elements_end();

@@ -26,7 +26,7 @@
 #include "libmesh/remote_elem.h"
 
 // C++ Includes
-#include LIBMESH_INCLUDE_UNORDERED_SET
+#include <unordered_set>
 
 namespace libMesh
 {
@@ -102,7 +102,7 @@ void DefaultCoupling::operator()
       return;
     }
 
-  typedef LIBMESH_BEST_UNORDERED_SET<const Elem*> set_type;
+  typedef std::unordered_set<const Elem*> set_type;
   set_type next_elements_to_check(range_begin, range_end);
   set_type elements_to_check;
   set_type elements_checked;

@@ -461,21 +461,6 @@
 /* Flag indicating whether an external Boost was found */
 #undef HAVE_EXTERNAL_BOOST
 
-/* define if the compiler supports __gnu_cxx::hash */
-#undef HAVE_EXT_HASH
-
-/* define if the compiler supports __gnu_cxx::hash_map */
-#undef HAVE_EXT_HASH_MAP
-
-/* define if the compiler supports __gnu_cxx::hash_multimap */
-#undef HAVE_EXT_HASH_MULTIMAP
-
-/* define if the compiler supports __gnu_cxx::hash_multiset */
-#undef HAVE_EXT_HASH_MULTISET
-
-/* define if the compiler supports __gnu_cxx::hash_set */
-#undef HAVE_EXT_HASH_SET
-
 /* define if the compiler supports fedisableexcept */
 #undef HAVE_FEDISABLEEXCEPT
 
@@ -516,18 +501,6 @@
 
 /* Flag indicating whether or not gzstreams are available */
 #undef HAVE_GZSTREAM
-
-/* define if the compiler supports std::hash_map */
-#undef HAVE_HASH_MAP
-
-/* define if the compiler supports std::hash_multimap */
-#undef HAVE_HASH_MULTIMAP
-
-/* define if the compiler supports std::hash_multiset */
-#undef HAVE_HASH_MULTISET
-
-/* define if the compiler supports std::hash_set */
-#undef HAVE_HASH_SET
 
 /* Define if HDF5 is available */
 #undef HAVE_HDF5
@@ -687,21 +660,6 @@
 
 /* Flag indicating whether the library will be compiled with Tetgen support */
 #undef HAVE_TETGEN
-
-/* define if the compiler supports std::tr1::hash */
-#undef HAVE_TR1_HASH
-
-/* define if the compiler supports std::tr1::unordered_map */
-#undef HAVE_TR1_UNORDERED_MAP
-
-/* define if the compiler supports std::tr1::unordered_multimap */
-#undef HAVE_TR1_UNORDERED_MULTIMAP
-
-/* define if the compiler supports std::tr1::unordered_multiset */
-#undef HAVE_TR1_UNORDERED_MULTISET
-
-/* define if the compiler supports std::tr1::unordered_set */
-#undef HAVE_TR1_UNORDERED_SET
 
 /* Flag indicating whether the library will be compiled with Triangle support
    */

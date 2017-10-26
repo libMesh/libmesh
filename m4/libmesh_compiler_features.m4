@@ -199,26 +199,35 @@ AC_CHECK_HEADERS(sys/utsname.h)
 
 AC_ARG_ENABLE(unordered-containers,
               AS_HELP_STRING([--disable-unordered-containers],
-                             [Use map/set instead of unordered_map/unordered_set]),
-              enableunorderedcontainers=$enableval,
-              enableunorderedcontainers=yes)
+                             [Use map/set instead of unordered_map/unordered_set (no longer supported)]),
+                             [case "${enableval}" in
+                               yes) enableunorderedcontainers=yes ;;
+                                no)  AC_MSG_ERROR(libMesh now requires unordered containers) ;;
+                                 *)   AC_MSG_ERROR(bad value ${enableval} for --disable-unordered-containers) ;;
+                              esac],
+              [enableunorderedcontainers=irrelevant])
 
-  if test "$enableunorderedcontainers" != no ; then
-    # The following routines, defined in unordered.m4, check to see if the compiler can compile programs using
-    # various quasi-standard hash containers.
-    ACX_BEST_UNORDERED_MULTIMAP
-    ACX_BEST_UNORDERED_MAP
-    ACX_BEST_UNORDERED_MULTISET
-    ACX_BEST_UNORDERED_SET
-  else
-    ACX_STD_MAP
-    ACX_STD_MULTIMAP
-    ACX_STD_SET
-    ACX_STD_MULTISET
-  fi
+if (test $enableunorderedcontainers != irrelevant) ; then
+  AC_MSG_WARN([--enable/disable-unordered-containers are now deprecated])
+fi
+enableunorderedcontainers=yes
 
-# Determine which of std::hash, std::tr1::hash, or __gnu_cxx::hash is available
+# The following routines, defined in unordered.m4, check to see if
+# the compiler can compile programs using the std::unordered
+# containers.
+ACX_BEST_UNORDERED_MULTIMAP
+ACX_BEST_UNORDERED_MAP
+ACX_BEST_UNORDERED_MULTISET
+ACX_BEST_UNORDERED_SET
+
+# libMesh also requires C++11 std::hash.
 ACX_BEST_HASH
+
+# C++11 provides std::hash<T*> and std::hash<std::string>
+# implementations, but we keep these defines around for backward
+# compatibility.
+AC_DEFINE(DEFINE_HASH_STRING,,[workaround for potentially missing hash<string>])
+AC_DEFINE(DEFINE_HASH_POINTERS,,[workaround for potentially missing hash<T*>])
 
 AX_CXX_DLOPEN
 
