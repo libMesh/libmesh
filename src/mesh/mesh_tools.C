@@ -517,18 +517,11 @@ MeshTools::subdomain_bounding_sphere (const MeshBase & mesh,
 void MeshTools::elem_types (const MeshBase & mesh,
                             std::vector<ElemType> & et)
 {
-  MeshBase::const_element_iterator       el  = mesh.elements_begin();
-  const MeshBase::const_element_iterator end = mesh.elements_end();
-
-  // Automatically get the first type
-  et.push_back((*el)->type());  ++el;
-
-  // Loop over the rest of the elements.
-  // If the current element type isn't in the
-  // vector, insert it.
-  for (; el != end; ++el)
-    if (!std::count(et.begin(), et.end(), (*el)->type()))
-      et.push_back((*el)->type());
+  // Loop over the the elements.  If the current element type isn't in
+  // the vector, insert it.
+  for (const auto & elem : mesh.elements_range())
+    if (!std::count(et.begin(), et.end(), elem->type()))
+      et.push_back(elem->type());
 }
 
 
