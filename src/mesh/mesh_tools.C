@@ -259,16 +259,13 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
 {
   nodes_to_elem_map.resize (mesh.n_nodes());
 
-  MeshBase::const_element_iterator       el  = mesh.elements_begin();
-  const MeshBase::const_element_iterator end = mesh.elements_end();
-
-  for (; el != end; ++el)
-    for (auto & node : (*el)->node_ref_range())
+  for (const auto & elem : mesh.elements_range())
+    for (auto & node : elem->node_ref_range())
       {
         libmesh_assert_less (node.id(), nodes_to_elem_map.size());
-        libmesh_assert_less ((*el)->id(), mesh.n_elem());
+        libmesh_assert_less (elem->id(), mesh.n_elem());
 
-        nodes_to_elem_map[node.id()].push_back((*el)->id());
+        nodes_to_elem_map[node.id()].push_back(elem->id());
       }
 }
 
@@ -279,15 +276,12 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
 {
   nodes_to_elem_map.resize (mesh.n_nodes());
 
-  MeshBase::const_element_iterator       el  = mesh.elements_begin();
-  const MeshBase::const_element_iterator end = mesh.elements_end();
-
-  for (; el != end; ++el)
-    for (auto & node : (*el)->node_ref_range())
+  for (const auto & elem : mesh.elements_range())
+    for (auto & node : elem->node_ref_range())
       {
         libmesh_assert_less (node.id(), nodes_to_elem_map.size());
 
-        nodes_to_elem_map[node.id()].push_back(*el);
+        nodes_to_elem_map[node.id()].push_back(elem);
       }
 }
 
