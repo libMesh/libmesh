@@ -1020,15 +1020,8 @@ void MeshTools::libmesh_assert_old_dof_objects (const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_old_dof_objects()", "MeshTools");
 
-  MeshBase::const_element_iterator el =
-    mesh.elements_begin();
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-
-  for (; el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
-
       if (elem->refinement_flag() == Elem::JUST_REFINED ||
           elem->refinement_flag() == Elem::INACTIVE)
         continue;
