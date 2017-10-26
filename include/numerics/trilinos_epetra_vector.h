@@ -121,9 +121,9 @@ public:
 
   virtual void zero () libmesh_override;
 
-  virtual UniquePtr<NumericVector<T> > zero_clone () const libmesh_override;
+  virtual UniquePtr<NumericVector<T>> zero_clone () const libmesh_override;
 
-  virtual UniquePtr<NumericVector<T> > clone () const libmesh_override;
+  virtual UniquePtr<NumericVector<T>> clone () const libmesh_override;
 
   virtual void init (const numeric_index_type N,
                      const numeric_index_type n_local,
@@ -700,23 +700,23 @@ void EpetraVector<T>::zero ()
 
 template <typename T>
 inline
-UniquePtr<NumericVector<T> > EpetraVector<T>::zero_clone () const
+UniquePtr<NumericVector<T>> EpetraVector<T>::zero_clone () const
 {
   NumericVector<T> * cloned_vector = new EpetraVector<T>(this->comm(), AUTOMATIC);
   cloned_vector->init(*this);
-  return UniquePtr<NumericVector<T> >(cloned_vector);
+  return UniquePtr<NumericVector<T>>(cloned_vector);
 }
 
 
 
 template <typename T>
 inline
-UniquePtr<NumericVector<T> > EpetraVector<T>::clone () const
+UniquePtr<NumericVector<T>> EpetraVector<T>::clone () const
 {
   NumericVector<T> * cloned_vector = new EpetraVector<T>(this->comm(), AUTOMATIC);
   cloned_vector->init(*this, true);
   *cloned_vector = *this;
-  return UniquePtr<NumericVector<T> >(cloned_vector);
+  return UniquePtr<NumericVector<T>>(cloned_vector);
 }
 
 

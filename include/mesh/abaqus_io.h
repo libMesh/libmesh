@@ -69,14 +69,14 @@ private:
   /**
    * The type of data structure used to store Node and Elemset IDs.
    */
-  typedef std::map<std::string, std::vector<dof_id_type> > container_t;
+  typedef std::map<std::string, std::vector<dof_id_type>> container_t;
 
   /**
    * Type of the data structure for storing the (elem ID, side) pairs
    * defining sidesets.  These come from the *Surface sections of the
    * input file.
    */
-  typedef std::map<std::string, std::vector<std::pair<dof_id_type, unsigned> > > sideset_container_t;
+  typedef std::map<std::string, std::vector<std::pair<dof_id_type, unsigned>>> sideset_container_t;
 
   /**
    * This function parses a block of nodes in the Abaqus file once

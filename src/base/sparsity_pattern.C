@@ -461,7 +461,7 @@ void Build::parallel_sync ()
       // Pack the sparsity pattern rows to push to procup
       std::vector<dof_id_type> pushed_row_ids,
         pushed_row_ids_to_me;
-      std::vector<std::vector<dof_id_type> > pushed_rows,
+      std::vector<std::vector<dof_id_type>> pushed_rows,
         pushed_rows_to_me;
 
       // Move nonlocal row information to a structure to send it from;

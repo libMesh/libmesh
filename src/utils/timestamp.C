@@ -39,7 +39,7 @@ std::string get_timestamp()
 #ifdef LIBMESH_HAVE_LOCALE
   // Create time_put "facet"
   std::locale loc;
-  const std::time_put<char> & tp = std::use_facet <std::time_put<char> > (loc);
+  const std::time_put<char> & tp = std::use_facet <std::time_put<char>> (loc);
 
   // Call C-style time getting functions
   time_t now = time(NULL);

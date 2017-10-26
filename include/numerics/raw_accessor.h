@@ -55,7 +55,7 @@ struct RawFieldType<Tensor>
 };
 
 template<>
-struct RawFieldType<TypeNTensor<3, Number> >
+struct RawFieldType<TypeNTensor<3, Number>>
 {
   typedef Number type;
 };
@@ -80,7 +80,7 @@ struct RawFieldType<RealTensor>
 };
 
 template<>
-struct RawFieldType<TypeNTensor<3, Real> >
+struct RawFieldType<TypeNTensor<3, Real>>
 {
   typedef Real type;
 };
@@ -147,7 +147,7 @@ Number & RawAccessor<Tensor>::operator()( unsigned int k )
  * Stub implementations for stub TypeNTensor object
  */
 template <unsigned int N, typename ScalarType>
-class RawAccessor<TypeNTensor<N, ScalarType> >
+class RawAccessor<TypeNTensor<N, ScalarType>>
 {
 public:
 

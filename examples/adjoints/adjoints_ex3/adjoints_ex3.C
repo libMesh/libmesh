@@ -617,7 +617,7 @@ UniquePtr<ErrorEstimator> build_error_estimator(FEMParameters & /* param */)
 // the build_error_estimator_component_wise function below
 UniquePtr<ErrorEstimator>
 build_error_estimator_component_wise (FEMParameters & param,
-                                      std::vector<std::vector<Real> > & term_weights,
+                                      std::vector<std::vector<Real>> & term_weights,
                                       std::vector<FEMNormType> & primal_error_norm_type,
                                       std::vector<FEMNormType> & dual_error_norm_type)
 {
@@ -665,7 +665,7 @@ build_error_estimator_component_wise (FEMParameters & param,
 // are computed using the build_weighted_error_estimator_component_wise below
 UniquePtr<ErrorEstimator>
 build_weighted_error_estimator_component_wise (FEMParameters & param,
-                                               std::vector<std::vector<Real> > & term_weights,
+                                               std::vector<std::vector<Real>> & term_weights,
                                                std::vector<FEMNormType> & primal_error_norm_type,
                                                std::vector<FEMNormType> & dual_error_norm_type,
                                                std::vector<FEMFunctionBase<Number> *> coupled_system_weight_functions)
@@ -907,7 +907,7 @@ int main (int argc, char ** argv)
           dual_norm_type_vector_non_pressure.push_back(L2);
           dual_norm_type_vector_non_pressure.push_back(H1_SEMINORM);
 
-          std::vector<std::vector<Real> >
+          std::vector<std::vector<Real>>
             weights_matrix_non_pressure(system.n_vars(),
                                         std::vector<Real>(system.n_vars(), 0.0));
           weights_matrix_non_pressure[0][0] = 1.;
@@ -947,7 +947,7 @@ int main (int argc, char ** argv)
           dual_norm_type_vector_with_pressure.push_back(L2);
           dual_norm_type_vector_with_pressure.push_back(L2);
 
-          std::vector<std::vector<Real> >
+          std::vector<std::vector<Real>>
             weights_matrix_with_pressure (system.n_vars(),
                                           std::vector<Real>(system.n_vars(), 0.0));
           weights_matrix_with_pressure[0][2] = 1.;
@@ -987,7 +987,7 @@ int main (int argc, char ** argv)
           // Note that we need the error of the dual concentration in L2
           dual_norm_type_vector_convection_diffusion_x.push_back(L2);
 
-          std::vector<std::vector<Real> >
+          std::vector<std::vector<Real>>
             weights_matrix_convection_diffusion_x (system.n_vars(),
                                                    std::vector<Real>(system.n_vars(), 0.0));
           weights_matrix_convection_diffusion_x[0][3] = 1.;
@@ -1050,7 +1050,7 @@ int main (int argc, char ** argv)
           // Note that we need the error of the dual concentration in L2
           dual_norm_type_vector_convection_diffusion_y.push_back(L2);
 
-          std::vector<std::vector<Real> >
+          std::vector<std::vector<Real>>
             weights_matrix_convection_diffusion_y (system.n_vars(),
                                                    std::vector<Real>(system.n_vars(), 0.0));
           weights_matrix_convection_diffusion_y[1][3] = 1.;

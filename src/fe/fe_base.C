@@ -180,7 +180,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // FEBase class members
 template <>
-UniquePtr<FEGenericBase<Real> >
+UniquePtr<FEGenericBase<Real>>
 FEGenericBase<Real>::build (const unsigned int dim,
                             const FEType & fet)
 {
@@ -381,7 +381,7 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
 
 template <>
-UniquePtr<FEGenericBase<RealGradient> >
+UniquePtr<FEGenericBase<RealGradient>>
 FEGenericBase<RealGradient>::build (const unsigned int dim,
                                     const FEType & fet)
 {
@@ -457,7 +457,7 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
 
 
 template <>
-UniquePtr<FEGenericBase<Real> >
+UniquePtr<FEGenericBase<Real>>
 FEGenericBase<Real>::build_InfFE (const unsigned int dim,
                                   const FEType & fet)
 {
@@ -664,7 +664,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
 
 
 template <>
-UniquePtr<FEGenericBase<RealGradient> >
+UniquePtr<FEGenericBase<RealGradient>>
 FEGenericBase<RealGradient>::build_InfFE (const unsigned int,
                                           const FEType & )
 {
@@ -818,9 +818,9 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
   // We use local FE objects for now
   // FIXME: we should use more, external objects instead for efficiency
   const FEType & base_fe_type = dof_map.variable_type(var);
-  UniquePtr<FEGenericBase<OutputShape> > fe
+  UniquePtr<FEGenericBase<OutputShape>> fe
     (FEGenericBase<OutputShape>::build(dim, base_fe_type));
-  UniquePtr<FEGenericBase<OutputShape> > fe_coarse
+  UniquePtr<FEGenericBase<OutputShape>> fe_coarse
     (FEGenericBase<OutputShape>::build(dim, base_fe_type));
 
   UniquePtr<QBase> qrule     (base_fe_type.default_quadrature_rule(dim));
@@ -830,26 +830,26 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
 
   // The values of the shape functions at the quadrature
   // points
-  const std::vector<std::vector<OutputShape> > & phi_values =
+  const std::vector<std::vector<OutputShape>> & phi_values =
     fe->get_phi();
-  const std::vector<std::vector<OutputShape> > & phi_coarse =
+  const std::vector<std::vector<OutputShape>> & phi_coarse =
     fe_coarse->get_phi();
 
   // The gradients of the shape functions at the quadrature
   // points on the child element.
-  const std::vector<std::vector<OutputGradient> > * dphi_values =
+  const std::vector<std::vector<OutputGradient>> * dphi_values =
     libmesh_nullptr;
-  const std::vector<std::vector<OutputGradient> > * dphi_coarse =
+  const std::vector<std::vector<OutputGradient>> * dphi_coarse =
     libmesh_nullptr;
 
   const FEContinuity cont = fe->get_continuity();
 
   if (cont == C_ONE)
     {
-      const std::vector<std::vector<OutputGradient> > &
+      const std::vector<std::vector<OutputGradient>> &
         ref_dphi_values = fe->get_dphi();
       dphi_values = &ref_dphi_values;
-      const std::vector<std::vector<OutputGradient> > &
+      const std::vector<std::vector<OutputGradient>> &
         ref_dphi_coarse = fe_coarse->get_dphi();
       dphi_coarse = &ref_dphi_coarse;
     }
@@ -1388,7 +1388,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
   const FEType & base_fe_type = dof_map.variable_type(variable_number);
 
   // Construct FE objects for this element and its neighbors.
-  UniquePtr<FEGenericBase<OutputShape> > my_fe
+  UniquePtr<FEGenericBase<OutputShape>> my_fe
     (FEGenericBase<OutputShape>::build(Dim, base_fe_type));
   const FEContinuity cont = my_fe->get_continuity();
 
@@ -1397,7 +1397,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
     return;
   libmesh_assert (cont == C_ZERO || cont == C_ONE);
 
-  UniquePtr<FEGenericBase<OutputShape> > neigh_fe
+  UniquePtr<FEGenericBase<OutputShape>> neigh_fe
     (FEGenericBase<OutputShape>::build(Dim, base_fe_type));
 
   QGauss my_qface(Dim-1, base_fe_type.default_quadrature_order());
@@ -1406,12 +1406,12 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
 
   const std::vector<Real> & JxW = my_fe->get_JxW();
   const std::vector<Point> & q_point = my_fe->get_xyz();
-  const std::vector<std::vector<OutputShape> > & phi = my_fe->get_phi();
-  const std::vector<std::vector<OutputShape> > & neigh_phi =
+  const std::vector<std::vector<OutputShape>> & phi = my_fe->get_phi();
+  const std::vector<std::vector<OutputShape>> & neigh_phi =
     neigh_fe->get_phi();
   const std::vector<Point> * face_normals = libmesh_nullptr;
-  const std::vector<std::vector<OutputGradient> > * dphi = libmesh_nullptr;
-  const std::vector<std::vector<OutputGradient> > * neigh_dphi = libmesh_nullptr;
+  const std::vector<std::vector<OutputGradient>> * dphi = libmesh_nullptr;
+  const std::vector<std::vector<OutputGradient>> * neigh_dphi = libmesh_nullptr;
 
   std::vector<dof_id_type> my_dof_indices, neigh_dof_indices;
   std::vector<unsigned int> my_side_dofs, neigh_side_dofs;
@@ -1421,17 +1421,17 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints & constraint
       const std::vector<Point> & ref_face_normals =
         my_fe->get_normals();
       face_normals = &ref_face_normals;
-      const std::vector<std::vector<OutputGradient> > & ref_dphi =
+      const std::vector<std::vector<OutputGradient>> & ref_dphi =
         my_fe->get_dphi();
       dphi = &ref_dphi;
-      const std::vector<std::vector<OutputGradient> > & ref_neigh_dphi =
+      const std::vector<std::vector<OutputGradient>> & ref_neigh_dphi =
         neigh_fe->get_dphi();
       neigh_dphi = &ref_neigh_dphi;
     }
 
   DenseMatrix<Real> Ke;
   DenseVector<Real> Fe;
-  std::vector<DenseVector<Real> > Ue;
+  std::vector<DenseVector<Real>> Ue;
 
   // Look at the element faces.  Check to see if we need to
   // build constraints.
@@ -1679,7 +1679,7 @@ compute_periodic_constraints (DofConstraints & constraints,
   const FEType & base_fe_type = dof_map.variable_type(variable_number);
 
   // Construct FE objects for this element and its pseudo-neighbors.
-  UniquePtr<FEGenericBase<OutputShape> > my_fe
+  UniquePtr<FEGenericBase<OutputShape>> my_fe
     (FEGenericBase<OutputShape>::build(Dim, base_fe_type));
   const FEContinuity cont = my_fe->get_continuity();
 
@@ -1691,7 +1691,7 @@ compute_periodic_constraints (DofConstraints & constraints,
   // We'll use element size to generate relative tolerances later
   const Real primary_hmin = elem->hmin();
 
-  UniquePtr<FEGenericBase<OutputShape> > neigh_fe
+  UniquePtr<FEGenericBase<OutputShape>> neigh_fe
     (FEGenericBase<OutputShape>::build(Dim, base_fe_type));
 
   QGauss my_qface(Dim-1, base_fe_type.default_quadrature_order());
@@ -1700,12 +1700,12 @@ compute_periodic_constraints (DofConstraints & constraints,
 
   const std::vector<Real> & JxW = my_fe->get_JxW();
   const std::vector<Point> & q_point = my_fe->get_xyz();
-  const std::vector<std::vector<OutputShape> > & phi = my_fe->get_phi();
-  const std::vector<std::vector<OutputShape> > & neigh_phi =
+  const std::vector<std::vector<OutputShape>> & phi = my_fe->get_phi();
+  const std::vector<std::vector<OutputShape>> & neigh_phi =
     neigh_fe->get_phi();
   const std::vector<Point> * face_normals = libmesh_nullptr;
-  const std::vector<std::vector<OutputGradient> > * dphi = libmesh_nullptr;
-  const std::vector<std::vector<OutputGradient> > * neigh_dphi = libmesh_nullptr;
+  const std::vector<std::vector<OutputGradient>> * dphi = libmesh_nullptr;
+  const std::vector<std::vector<OutputGradient>> * neigh_dphi = libmesh_nullptr;
   std::vector<dof_id_type> my_dof_indices, neigh_dof_indices;
   std::vector<unsigned int> my_side_dofs, neigh_side_dofs;
 
@@ -1714,17 +1714,17 @@ compute_periodic_constraints (DofConstraints & constraints,
       const std::vector<Point> & ref_face_normals =
         my_fe->get_normals();
       face_normals = &ref_face_normals;
-      const std::vector<std::vector<OutputGradient> > & ref_dphi =
+      const std::vector<std::vector<OutputGradient>> & ref_dphi =
         my_fe->get_dphi();
       dphi = &ref_dphi;
-      const std::vector<std::vector<OutputGradient> > & ref_neigh_dphi =
+      const std::vector<std::vector<OutputGradient>> & ref_neigh_dphi =
         neigh_fe->get_dphi();
       neigh_dphi = &ref_neigh_dphi;
     }
 
   DenseMatrix<Real> Ke;
   DenseVector<Real> Fe;
-  std::vector<DenseVector<Real> > Ue;
+  std::vector<DenseVector<Real>> Ue;
 
   // Container to catch the boundary ids that BoundaryInfo hands us.
   std::vector<boundary_id_type> bc_ids;

@@ -263,16 +263,16 @@ private:
    * Element residual subvectors and Jacobian submatrices
    */
   std::vector<DenseSubVector<Number> *> _neighbor_subresiduals;
-  std::vector<std::vector<DenseSubMatrix<Number> *> > _elem_elem_subjacobians;
-  std::vector<std::vector<DenseSubMatrix<Number> *> > _elem_neighbor_subjacobians;
-  std::vector<std::vector<DenseSubMatrix<Number> *> > _neighbor_elem_subjacobians;
-  std::vector<std::vector<DenseSubMatrix<Number> *> > _neighbor_neighbor_subjacobians;
+  std::vector<std::vector<DenseSubMatrix<Number> *>> _elem_elem_subjacobians;
+  std::vector<std::vector<DenseSubMatrix<Number> *>> _elem_neighbor_subjacobians;
+  std::vector<std::vector<DenseSubMatrix<Number> *>> _neighbor_elem_subjacobians;
+  std::vector<std::vector<DenseSubMatrix<Number> *>> _neighbor_neighbor_subjacobians;
 
   /**
    * Global Degree of freedom index lists for the neighbor element
    */
   std::vector<dof_id_type> _neighbor_dof_indices;
-  std::vector<std::vector<dof_id_type> > _neighbor_dof_indices_var;
+  std::vector<std::vector<dof_id_type>> _neighbor_dof_indices_var;
 
   /**
    * Finite element objects for each variable's

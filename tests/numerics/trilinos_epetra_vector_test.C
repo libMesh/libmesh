@@ -19,7 +19,7 @@
 
 using namespace libMesh;
 
-class EpetraVectorTest : public NumericVectorTest<EpetraVector<Real> > {
+class EpetraVectorTest : public NumericVectorTest<EpetraVector<Real>> {
 public:
   CPPUNIT_TEST_SUITE( EpetraVectorTest );
 

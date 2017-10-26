@@ -161,8 +161,8 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
       // Form the list of faces of elements which finally
       // will tell us which nodes should receive boundary
       // conditions (to form the std::vector<const Node *>)
-      std::set< std::pair<dof_id_type,
-                          unsigned int> > inner_faces;
+      std::set<std::pair<dof_id_type,
+                          unsigned int>> inner_faces;
 
 
       // build infinite elements
@@ -196,8 +196,8 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
 
       // Now transform the set of pairs to a list of (possibly
       // duplicate) global node numbers.
-      std::set< std::pair<dof_id_type,unsigned int> >::iterator face_it = inner_faces.begin();
-      const std::set< std::pair<dof_id_type,unsigned int> >::iterator face_end = inner_faces.end();
+      std::set<std::pair<dof_id_type,unsigned int>>::iterator face_it = inner_faces.begin();
+      const std::set<std::pair<dof_id_type,unsigned int>>::iterator face_end = inner_faces.end();
       for (; face_it!=face_end; ++face_it)
         {
           std::pair<dof_id_type,unsigned int> p = *face_it;
@@ -206,7 +206,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
           UniquePtr<Elem> side(this->_mesh.elem_ref(p.first).build_side_ptr(p.second));
 
           // insert all the node numbers in inner_boundary_node_numbers
-          for (unsigned int n=0; n< side->n_nodes(); n++)
+          for (unsigned int n=0; n<side->n_nodes(); n++)
             inner_boundary_node_numbers.push_back(side->node_id(n));
         }
 
@@ -279,8 +279,8 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
                                     const bool y_sym,
                                     const bool z_sym,
                                     const bool be_verbose,
-                                    std::set< std::pair<dof_id_type,
-                                    unsigned int> > * inner_faces)
+                                    std::set<std::pair<dof_id_type,
+                                    unsigned int>> * inner_faces)
 {
   if (be_verbose)
     {
@@ -300,8 +300,8 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
   // A set for storing element number, side number pairs.
   // pair.first == element number, pair.second == side number
-  std::set< std::pair<dof_id_type,unsigned int> > faces;
-  std::set< std::pair<dof_id_type,unsigned int> > ofaces;
+  std::set<std::pair<dof_id_type,unsigned int>> faces;
+  std::set<std::pair<dof_id_type,unsigned int>> ofaces;
 
   // A set for storing node numbers on the outer faces.
   std::set<dof_id_type> onodes;
@@ -422,7 +422,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
 
   {
-    std::set< std::pair<dof_id_type,unsigned int> >::iterator face_it = faces.begin();
+    std::set<std::pair<dof_id_type,unsigned int>>::iterator face_it = faces.begin();
     unsigned int facesfound=0;
     while (face_it != faces.end()) {
 
@@ -528,7 +528,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
 
   // build Elems based on boundary side type
-  std::set< std::pair<dof_id_type,unsigned int> >::iterator face_it = ofaces.begin();
+  std::set<std::pair<dof_id_type,unsigned int>>::iterator face_it = ofaces.begin();
   for ( ; face_it != ofaces.end(); ++face_it)
     {
       // Shortcut to the pair being iterated over

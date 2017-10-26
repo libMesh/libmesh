@@ -180,7 +180,7 @@ void MeshTools::Subdivision::prepare_subdivision_mesh(MeshBase & mesh, bool ghos
 
   mesh.prepare_for_use();
 
-  std::vector<std::vector<const Elem *> > nodes_to_elem_map;
+  std::vector<std::vector<const Elem *>> nodes_to_elem_map;
   MeshTools::build_nodes_to_elem_map(mesh, nodes_to_elem_map);
 
   // compute the node valences

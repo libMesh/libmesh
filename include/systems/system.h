@@ -1520,7 +1520,7 @@ public:
   /**
    * Data structure to hold solution values.
    */
-  UniquePtr<NumericVector<Number> > solution;
+  UniquePtr<NumericVector<Number>> solution;
 
   /**
    * All the values I need to compute my contribution
@@ -1532,7 +1532,7 @@ public:
    * the contents of the \p solution and \p current_local_solution
    * vectors.
    */
-  UniquePtr<NumericVector<Number> > current_local_solution;
+  UniquePtr<NumericVector<Number>> current_local_solution;
 
   /**
    * For time-dependent problems, this is the time t at the beginning of

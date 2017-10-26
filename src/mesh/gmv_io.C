@@ -1514,8 +1514,8 @@ void GMVIO::write_binary (const std::string & fname,
     {
       libMesh::err << "Cell-centered data not (yet) supported in binary I/O mode!" << std::endl;
 
-      //        std::map<std::string, const std::vector<Real> * >::iterator       it  = this->_cell_centered_data.begin();
-      //        const std::map<std::string, const std::vector<Real> * >::iterator end = this->_cell_centered_data.end();
+      //        std::map<std::string, const std::vector<Real> *>::iterator       it  = this->_cell_centered_data.begin();
+      //        const std::map<std::string, const std::vector<Real> *>::iterator end = this->_cell_centered_data.end();
 
       //        for (; it != end; ++it)
       //  {
@@ -2386,8 +2386,8 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
 
       // For each var entry in the _nodal_data map, try to find
       // that var in the system
-      std::map<std::string, std::vector<Number> >::iterator it = _nodal_data.begin();
-      const std::map<std::string, std::vector<Number> >::iterator end = _nodal_data.end();
+      std::map<std::string, std::vector<Number>>::iterator it = _nodal_data.begin();
+      const std::map<std::string, std::vector<Number>>::iterator end = _nodal_data.end();
       for (; it != end; ++it)
         {
           std::string var_name = it->first;
@@ -2455,8 +2455,8 @@ void GMVIO::copy_nodal_solution(EquationSystems & es)
 
   // Warn the user if any GMV variables were not successfully copied over to the EquationSystems object
   {
-    std::map<std::string, std::vector<Number> >::iterator it = _nodal_data.begin();
-    const std::map<std::string, std::vector<Number> >::iterator end = _nodal_data.end();
+    std::map<std::string, std::vector<Number>>::iterator it = _nodal_data.begin();
+    const std::map<std::string, std::vector<Number>>::iterator end = _nodal_data.end();
 
     for (; it != end; ++it)
       {

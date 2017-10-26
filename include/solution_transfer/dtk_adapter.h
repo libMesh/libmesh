@@ -52,7 +52,7 @@ namespace libMesh
 class DTKAdapter
 {
 public:
-  DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, EquationSystems & in_es);
+  DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int>> in_comm, EquationSystems & in_es);
 
   typedef DataTransferKit::MeshContainer<int>                                  MeshContainerType;
   typedef DataTransferKit::FieldContainer<double>                              FieldContainerType;
@@ -61,10 +61,10 @@ public:
   typedef Teuchos::RCP<EvaluatorType>                                          RCP_Evaluator;
 
 
-  Teuchos::RCP<DataTransferKit::MeshManager<MeshContainerType> > get_mesh_manager() { return mesh_manager; }
+  Teuchos::RCP<DataTransferKit::MeshManager<MeshContainerType>> get_mesh_manager() { return mesh_manager; }
   RCP_Evaluator get_variable_evaluator(std::string var_name);
-  Teuchos::RCP<DataTransferKit::FieldManager<MeshContainerType> > get_target_coords() { return target_coords; }
-  Teuchos::RCP<DataTransferKit::FieldManager<FieldContainerType> > get_values_to_fill(std::string var_name);
+  Teuchos::RCP<DataTransferKit::FieldManager<MeshContainerType>> get_target_coords() { return target_coords; }
+  Teuchos::RCP<DataTransferKit::FieldManager<FieldContainerType>> get_values_to_fill(std::string var_name);
 
   /**
    * After computing values for a variable in this EquationSystems
@@ -91,7 +91,7 @@ protected:
    */
   void get_semi_local_nodes(std::set<unsigned int> & semi_local_nodes);
 
-  Teuchos::RCP<const Teuchos::Comm<int> > comm;
+  Teuchos::RCP<const Teuchos::Comm<int>> comm;
   EquationSystems & es;
   const MeshBase & mesh;
   unsigned int dim;
@@ -99,12 +99,12 @@ protected:
   unsigned int num_local_nodes;
   Teuchos::ArrayRCP<int> vertices;
 
-  Teuchos::RCP<DataTransferKit::MeshManager<MeshContainerType> > mesh_manager;
+  Teuchos::RCP<DataTransferKit::MeshManager<MeshContainerType>> mesh_manager;
   RCP_Evaluator field_evaluator;
-  Teuchos::RCP<DataTransferKit::FieldManager<MeshContainerType> > target_coords;
+  Teuchos::RCP<DataTransferKit::FieldManager<MeshContainerType>> target_coords;
 
   /// Map of variable names to arrays to be filled by a transfer
-  std::map<std::string, Teuchos::RCP<DataTransferKit::FieldManager<FieldContainerType> > > values_to_fill;
+  std::map<std::string, Teuchos::RCP<DataTransferKit::FieldManager<FieldContainerType>>> values_to_fill;
 
   /// Map of variable names to RCP_Evaluator objects
   std::map<std::string, RCP_Evaluator> evaluators;

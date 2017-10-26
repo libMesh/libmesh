@@ -368,7 +368,7 @@ public:
   /**
    * \returns The tangent vectors for face integration.
    */
-  const std::vector<std::vector<Point> > & get_tangents() const
+  const std::vector<std::vector<Point>> & get_tangents() const
   { return this->_fe_map->get_tangents(); }
 
   /**

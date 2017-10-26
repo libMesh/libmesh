@@ -105,7 +105,7 @@ private:
    * empirical interpolation approximation. This will be a GHOSTED
    * vector to facilitate interpolation in the case of multiple processors.
    */
-  UniquePtr<NumericVector<Number> > _ghosted_basis_function;
+  UniquePtr<NumericVector<Number>> _ghosted_basis_function;
 
   /**
    * We store an FE object and an associated quadrature rule.

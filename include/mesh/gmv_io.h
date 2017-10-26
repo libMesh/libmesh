@@ -233,7 +233,7 @@ private:
   ElemType gmv_elem_to_libmesh_elem(std::string elemname);
   void _read_materials();
   void _read_var();
-  std::map<std::string, std::vector<Number> > _nodal_data;
+  std::map<std::string, std::vector<Number>> _nodal_data;
 
   /**
    * Static map from string -> ElementType for

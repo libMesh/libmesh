@@ -89,9 +89,9 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
 
   const std::vector<Point> & xyz = fe->get_xyz();
 
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_T_dofs = c.get_dof_indices(T_var).size();

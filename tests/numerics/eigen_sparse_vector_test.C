@@ -21,7 +21,7 @@
 
 using namespace libMesh;
 
-class EigenSparseVectorTest : public NumericVectorTest<EigenSparseVector<libMesh::Number> > {
+class EigenSparseVectorTest : public NumericVectorTest<EigenSparseVector<libMesh::Number>> {
 public:
   void setUp()
   {

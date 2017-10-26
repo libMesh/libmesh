@@ -1161,7 +1161,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   num_node_sets = cast_int<int>(unique_node_boundaries.size());
 
   //loop through element and map between block and element vector
-  std::map<subdomain_id_type, std::vector<unsigned int>  > subdomain_map;
+  std::map<subdomain_id_type, std::vector<unsigned int>> subdomain_map;
 
   MeshBase::const_element_iterator it = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
@@ -1340,7 +1340,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
   // Map from block ID to a vector of element IDs in that block.  Element
   // IDs are now of type dof_id_type, subdomain IDs are of type subdomain_id_type.
-  typedef std::map<subdomain_id_type, std::vector<dof_id_type> > subdomain_map_type;
+  typedef std::map<subdomain_id_type, std::vector<dof_id_type>> subdomain_map_type;
   subdomain_map_type subdomain_map;
 
   MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin();
@@ -1546,14 +1546,14 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
   ExodusII_IO_Helper::ElementMaps em;
 
   // Maps from sideset id to the element and sides
-  std::map<int, std::vector<int> > elem;
-  std::map<int, std::vector<int> > side;
+  std::map<int, std::vector<int>> elem;
+  std::map<int, std::vector<int>> side;
   std::vector<boundary_id_type> side_boundary_ids;
 
   {
-    std::vector< dof_id_type > el;
-    std::vector< unsigned short int > sl;
-    std::vector< boundary_id_type > il;
+    std::vector<dof_id_type > el;
+    std::vector<unsigned short int > sl;
+    std::vector<boundary_id_type > il;
 
     mesh.get_boundary_info().build_side_list(el, sl, il);
 
@@ -1589,9 +1589,9 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
   {
     // add data for shell faces, if needed
 
-    std::vector< dof_id_type > el;
-    std::vector< unsigned short int > sl;
-    std::vector< boundary_id_type > il;
+    std::vector<dof_id_type > el;
+    std::vector<unsigned short int > sl;
+    std::vector<boundary_id_type > il;
 
     mesh.get_boundary_info().build_shellface_list(el, sl, il);
 
@@ -1663,13 +1663,13 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  std::vector< dof_id_type > nl;
-  std::vector< boundary_id_type > il;
+  std::vector<dof_id_type > nl;
+  std::vector<boundary_id_type > il;
 
   mesh.get_boundary_info().build_node_list(nl, il);
 
   // Maps from nodeset id to the nodes
-  std::map<boundary_id_type, std::vector<int> > node;
+  std::map<boundary_id_type, std::vector<int>> node;
 
   // Accumulate the vectors to pass into ex_put_node_set
   for (std::size_t i=0; i<nl.size(); i++)
@@ -1864,7 +1864,7 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
     return;
 
   // Loop over the element blocks and write the data one block at a time
-  std::map<unsigned int, std::vector<unsigned int> > subdomain_map;
+  std::map<unsigned int, std::vector<unsigned int>> subdomain_map;
 
   // Ask the file how many element vars it has, store it in the num_elem_vars variable.
   ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
@@ -1891,7 +1891,7 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
   for (unsigned int i=0; i<static_cast<unsigned>(num_elem_vars); ++i)
     {
       // The size of the subdomain map is the number of blocks.
-      std::map<unsigned int, std::vector<unsigned int> >::iterator it = subdomain_map.begin();
+      std::map<unsigned int, std::vector<unsigned int>>::iterator it = subdomain_map.begin();
 
       for (unsigned int j=0; it!=subdomain_map.end(); ++it, ++j)
         {

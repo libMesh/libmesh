@@ -79,9 +79,9 @@ public:
   /**
    * \returns A new copy of the accessor.
    */
-  virtual UniquePtr<ParameterAccessor<T> > clone() const libmesh_override
+  virtual UniquePtr<ParameterAccessor<T>> clone() const libmesh_override
   {
-    return UniquePtr<ParameterAccessor<T> >(new ParameterPointer<T>(_ptr));
+    return UniquePtr<ParameterAccessor<T>>(new ParameterPointer<T>(_ptr));
   }
 
 private:

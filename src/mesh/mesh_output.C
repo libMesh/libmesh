@@ -81,7 +81,7 @@ void MeshOutput<MT>::write_equation_systems (const std::string & fname,
     }
   else // _is_parallel_format
     {
-      UniquePtr<NumericVector<Number> > parallel_soln =
+      UniquePtr<NumericVector<Number>> parallel_soln =
         es.build_parallel_solution_vector(system_names);
 
       this->write_nodal_data (fname, *parallel_soln, names);

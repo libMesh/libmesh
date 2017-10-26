@@ -281,7 +281,7 @@ void parallel_for (const Range & range, const Body & body)
   unsigned int n_threads = num_pthreads(range);
 
   std::vector<Range *> ranges(n_threads);
-  std::vector<RangeBody<const Range, const Body> > range_bodies(n_threads);
+  std::vector<RangeBody<const Range, const Body>> range_bodies(n_threads);
   std::vector<pthread_t> threads(n_threads);
 
   // Create the ranges for each thread
@@ -379,7 +379,7 @@ void parallel_reduce (const Range & range, Body & body)
 
   std::vector<Range *> ranges(n_threads);
   std::vector<Body *> bodies(n_threads);
-  std::vector<RangeBody<Range, Body> > range_bodies(n_threads);
+  std::vector<RangeBody<Range, Body>> range_bodies(n_threads);
 
   // Create copies of the body for each thread
   bodies[0] = &body; // Use the original body for the first one

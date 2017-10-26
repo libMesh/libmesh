@@ -24,7 +24,7 @@ using namespace libMesh;
   TYPEVECTORTEST                                \
   CPPUNIT_TEST( testScalarInit );               \
 
-class RealVectorValueTest : public TypeVectorTestBase<VectorValue<Real> > {
+class RealVectorValueTest : public TypeVectorTestBase<VectorValue<Real>> {
 public:
   CPPUNIT_TEST_SUITE( RealVectorValueTest );
 
@@ -33,7 +33,7 @@ public:
   CPPUNIT_TEST_SUITE_END();
 };
 
-class NumberVectorValueTest : public TypeVectorTestBase<VectorValue<Number> > {
+class NumberVectorValueTest : public TypeVectorTestBase<VectorValue<Number>> {
 public:
   CPPUNIT_TEST_SUITE( NumberVectorValueTest );
 
@@ -42,7 +42,7 @@ public:
   CPPUNIT_TEST_SUITE_END();
 };
 
-class ComplexVectorValueTest : public TypeVectorTestBase<VectorValue<Complex> > {
+class ComplexVectorValueTest : public TypeVectorTestBase<VectorValue<Complex>> {
 public:
   CPPUNIT_TEST_SUITE( NumberVectorValueTest );
 

@@ -348,7 +348,7 @@ public:
     // simply be the element length for weighted quadrature rules like
     // Jacobi.  For general alpha and beta=0, the sum of the weights
     // on the interval [-1,1] is 2^(alpha+1) / (alpha+1).
-    std::vector<std::vector<Real> > true_integrals(2);
+    std::vector<std::vector<Real>> true_integrals(2);
 
     // alpha=1 integral values
     // int((1-x)*x^p, x=0..1) = 1 / (p^2 + 3p + 2)

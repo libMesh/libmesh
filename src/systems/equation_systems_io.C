@@ -217,7 +217,7 @@ void EquationSystems::_read_impl (const std::string & name,
   const bool read_basic_only      = read_flags & EquationSystems::READ_BASIC_ONLY;
   bool read_parallel_files  = false;
 
-  std::vector<std::pair<std::string, System *> > xda_systems;
+  std::vector<std::pair<std::string, System *>> xda_systems;
 
   // This will unzip a file with .bz2 as the extension, otherwise it
   // simply returns the name if the file need not be unzipped.
@@ -335,7 +335,7 @@ void EquationSystems::_read_impl (const std::string & name,
 
       Xdr local_io (read_parallel_files ? local_file_name(this->processor_id(),name) : "", mode);
 
-      std::vector<std::pair<std::string, System *> >::iterator
+      std::vector<std::pair<std::string, System *>>::iterator
         pos = xda_systems.begin();
 
       for (; pos != xda_systems.end(); ++pos)

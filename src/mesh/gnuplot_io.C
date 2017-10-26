@@ -172,8 +172,8 @@ void GnuPlotIO::write_solution(const std::string & fname,
         libmesh_error_msg("ERROR: opening output data file " << data_file_name);
 
       // get ordered nodal data using a map
-      typedef std::pair<Real, std::vector<Number> > key_value_pair;
-      typedef std::map<Real, std::vector<Number> > map_type;
+      typedef std::pair<Real, std::vector<Number>> key_value_pair;
+      typedef std::map<Real, std::vector<Number>> map_type;
       typedef map_type::iterator map_iterator;
 
       map_type node_map;

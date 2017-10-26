@@ -61,8 +61,8 @@ public:
     output(_v_var) = 0;
   }
 
-  virtual UniquePtr<FunctionBase<Number> > clone() const
-  { return UniquePtr<FunctionBase<Number> > (new BdyFunction(_u_var, _v_var, _sign)); }
+  virtual UniquePtr<FunctionBase<Number>> clone() const
+  { return UniquePtr<FunctionBase<Number>> (new BdyFunction(_u_var, _v_var, _sign)); }
 
 private:
   const unsigned int _u_var, _v_var;
@@ -215,18 +215,18 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
   const std::vector<Real> & JxW = u_elem_fe->get_JxW();
 
   // The velocity shape functions at interior quadrature points.
-  const std::vector<std::vector<Real> > & phi = u_elem_fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = u_elem_fe->get_phi();
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealGradient> > & dphi = u_elem_fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = u_elem_fe->get_dphi();
 
   // The pressure shape functions at interior
   // quadrature points.
   FEBase * p_elem_fe = libmesh_nullptr;
   c.get_element_fe(p_var, p_elem_fe);
 
-  const std::vector<std::vector<Real> > & psi = p_elem_fe->get_phi();
+  const std::vector<std::vector<Real>> & psi = p_elem_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_p_dofs = c.get_dof_indices(p_var).size();
@@ -345,11 +345,11 @@ bool CoupledSystem::element_constraint (bool request_jacobian,
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealGradient> > & dphi = u_elem_fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = u_elem_fe->get_dphi();
 
   // The pressure shape functions at interior
   // quadrature points.
-  const std::vector<std::vector<Real> > & psi = p_elem_fe->get_phi();
+  const std::vector<std::vector<Real>> & psi = p_elem_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();

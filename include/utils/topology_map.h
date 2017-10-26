@@ -81,7 +81,7 @@ public:
    */
   void add_node(const Node & mid_node,
                 const std::vector<
-                std::pair<dof_id_type, dof_id_type> > &
+                std::pair<dof_id_type, dof_id_type>> &
                 bracketing_nodes);
 
   bool empty() const { return _map.empty(); }
@@ -90,7 +90,7 @@ public:
                    dof_id_type bracket_node2) const;
 
   dof_id_type find(const std::vector<
-                   std::pair<dof_id_type, dof_id_type> > &
+                   std::pair<dof_id_type, dof_id_type>> &
                    bracketing_nodes) const;
 
 protected:

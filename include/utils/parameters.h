@@ -49,7 +49,7 @@ template<typename P>
 void print_helper(std::ostream & os, const std::vector<P> * param);
 
 template<typename P>
-void print_helper(std::ostream & os, const std::vector<std::vector<P> > * param);
+void print_helper(std::ostream & os, const std::vector<std::vector<P>> * param);
 
 /**
  * This class provides the ability to map between
@@ -567,7 +567,7 @@ void print_helper(std::ostream & os, const std::vector<P> * param)
 
 //non-member vector<vector> print function
 template<typename P>
-void print_helper(std::ostream & os, const std::vector<std::vector<P> > * param)
+void print_helper(std::ostream & os, const std::vector<std::vector<P>> * param)
 {
   for (std::size_t i=0; i<param->size(); ++i)
     for (std::size_t j=0; j<(*param)[i].size(); ++j)

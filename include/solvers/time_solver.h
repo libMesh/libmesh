@@ -183,7 +183,7 @@ public:
   /**
    * An implicit linear solver to use for adjoint and sensitivity problems.
    */
-  virtual UniquePtr<LinearSolver<Number> > & linear_solver() { return _linear_solver; }
+  virtual UniquePtr<LinearSolver<Number>> & linear_solver() { return _linear_solver; }
 
   /**
    * Print extra debugging information if quiet ==  false.
@@ -249,7 +249,7 @@ protected:
   /**
    * An implicit linear solver to use for adjoint problems.
    */
-  UniquePtr<LinearSolver<Number> > _linear_solver;
+  UniquePtr<LinearSolver<Number>> _linear_solver;
 
   /**
    * A reference to the system we are solving.

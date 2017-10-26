@@ -51,14 +51,14 @@ namespace Parallel {
 // have vptrs, and I'd rather not have the datatype break in those
 // cases.
 template <typename T>
-class StandardType<TypeVector<T> > : public DataType
+class StandardType<TypeVector<T>> : public DataType
 {
 public:
   explicit
   StandardType(const TypeVector<T> * example=libmesh_nullptr) {
     // We need an example for MPI_Address to use
     TypeVector<T> * ex;
-    UniquePtr<TypeVector<T> > temp;
+    UniquePtr<TypeVector<T>> temp;
     if (example)
       ex = const_cast<TypeVector<T> *>(example);
     else
@@ -135,14 +135,14 @@ public:
 };
 
 template <typename T>
-class StandardType<VectorValue<T> > : public DataType
+class StandardType<VectorValue<T>> : public DataType
 {
 public:
   explicit
   StandardType(const VectorValue<T> * example=libmesh_nullptr) {
     // We need an example for MPI_Address to use
     VectorValue<T> * ex;
-    UniquePtr<VectorValue<T> > temp;
+    UniquePtr<VectorValue<T>> temp;
     if (example)
       ex = const_cast<VectorValue<T> *>(example);
     else
@@ -408,10 +408,10 @@ public:
 };
 
 template <typename T>
-class OpFunction<TypeVector<T> > : public TypeVectorOpFunction<TypeVector<T> > {};
+class OpFunction<TypeVector<T>> : public TypeVectorOpFunction<TypeVector<T>> {};
 
 template <typename T>
-class OpFunction<VectorValue<T> > : public TypeVectorOpFunction<VectorValue<T> > {};
+class OpFunction<VectorValue<T>> : public TypeVectorOpFunction<VectorValue<T>> {};
 
 template <>
 class OpFunction<Point> : public TypeVectorOpFunction<Point> {};
@@ -421,7 +421,7 @@ class OpFunction<Point> : public TypeVectorOpFunction<Point> {};
 //
 // We assume contiguous storage here
 template <typename T>
-class StandardType<TypeTensor<T> > : public DataType
+class StandardType<TypeTensor<T>> : public DataType
 {
 public:
   explicit
@@ -432,7 +432,7 @@ public:
 };
 
 template <typename T>
-class StandardType<TensorValue<T> > : public DataType
+class StandardType<TensorValue<T>> : public DataType
 {
 public:
   explicit

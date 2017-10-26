@@ -389,7 +389,7 @@ void TreeNode<N>::print_elements(std::ostream & out_stream) const
 
 
 template <unsigned int N>
-void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Elem *> > & nodes_to_elem)
+void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Elem *>> & nodes_to_elem)
 {
   if (this->active())
     {

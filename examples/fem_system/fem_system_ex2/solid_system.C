@@ -190,7 +190,7 @@ bool SolidSystem::element_time_derivative(bool request_jacobian,
   const std::vector<Real> & JxW = elem_fe->get_JxW();
 
   // Element basis functions
-  const std::vector<std::vector<RealGradient> > & dphi = elem_fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = elem_fe->get_dphi();
 
   // Dimension of the mesh
   const unsigned int dim = this->get_mesh().mesh_dimension();
@@ -324,7 +324,7 @@ bool SolidSystem::side_time_derivative(bool request_jacobian,
       FEBase * fe = libmesh_nullptr;
       c.get_side_fe(0, fe);
 
-      const std::vector<std::vector<Real> > & phi = fe->get_phi();
+      const std::vector<std::vector<Real>> & phi = fe->get_phi();
       const std::vector<Real> & JxW = fe->get_JxW();
       const std::vector<Point> & coords = fe->get_xyz();
 

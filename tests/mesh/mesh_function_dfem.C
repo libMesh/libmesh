@@ -190,7 +190,7 @@ public:
 
     std::vector<unsigned int> variables;
     sys.get_all_variable_numbers(variables);
-    UniquePtr< NumericVector<Number> > mesh_function_vector =
+    UniquePtr<NumericVector<Number>> mesh_function_vector =
       NumericVector<Number>::build(es.comm());
     mesh_function_vector->init(sys.n_dofs(), false, SERIAL);
     sys.solution->localize(*mesh_function_vector);
@@ -258,7 +258,7 @@ public:
 
     std::vector<unsigned int> variables;
     sys.get_all_variable_numbers(variables);
-    UniquePtr< NumericVector<Number> > mesh_function_vector =
+    UniquePtr<NumericVector<Number>> mesh_function_vector =
       NumericVector<Number>::build(es.comm());
     mesh_function_vector->init(sys.n_dofs(), false, SERIAL);
     sys.solution->localize(*mesh_function_vector);

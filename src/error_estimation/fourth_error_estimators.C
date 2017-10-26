@@ -93,8 +93,8 @@ LaplacianErrorEstimator::internal_side_integration ()
   Real error = 1.e-30;
   unsigned int n_qp = fe_fine->n_quadrature_points();
 
-  std::vector<std::vector<RealTensor> > d2phi_coarse = fe_coarse->get_d2phi();
-  std::vector<std::vector<RealTensor> > d2phi_fine = fe_fine->get_d2phi();
+  std::vector<std::vector<RealTensor>> d2phi_coarse = fe_coarse->get_d2phi();
+  std::vector<std::vector<RealTensor>> d2phi_fine = fe_fine->get_d2phi();
   std::vector<Real> JxW_face = fe_fine->get_JxW();
 
   for (unsigned int qp=0; qp != n_qp; ++qp)

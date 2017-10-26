@@ -197,18 +197,18 @@ void assemble_ellipticdg(EquationSystems & es,
   // will be used to assemble the linear system.
   // Data for interior volume integrals
   const std::vector<Real> & JxW = fe->get_JxW();
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   // Data for surface integrals on the element boundary
-  const std::vector<std::vector<Real> > &  phi_face = fe_elem_face->get_phi();
-  const std::vector<std::vector<RealGradient> > & dphi_face = fe_elem_face->get_dphi();
+  const std::vector<std::vector<Real>> &  phi_face = fe_elem_face->get_phi();
+  const std::vector<std::vector<RealGradient>> & dphi_face = fe_elem_face->get_dphi();
   const std::vector<Real> & JxW_face = fe_elem_face->get_JxW();
   const std::vector<Point> & qface_normals = fe_elem_face->get_normals();
   const std::vector<Point> & qface_points = fe_elem_face->get_xyz();
 
   // Data for surface integrals on the neighbor boundary
-  const std::vector<std::vector<Real> > &  phi_neighbor_face = fe_neighbor_face->get_phi();
-  const std::vector<std::vector<RealGradient> > & dphi_neighbor_face = fe_neighbor_face->get_dphi();
+  const std::vector<std::vector<Real>> &  phi_neighbor_face = fe_neighbor_face->get_phi();
+  const std::vector<std::vector<RealGradient>> & dphi_neighbor_face = fe_neighbor_face->get_dphi();
 
   // Define data structures to contain the element interior matrix
   // and right-hand-side vector contribution.  Following

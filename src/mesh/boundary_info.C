@@ -429,7 +429,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
   // boundary_mesh and _mesh are the same then those additions can
   // invalidate our element iterators.  So we just use the element
   // loop to make a list of sides to add.
-  typedef std::vector<std::pair<dof_id_type, unsigned char> >
+  typedef std::vector<std::pair<dof_id_type, unsigned char>>
     side_container;
   side_container sides_to_add;
 
@@ -1899,7 +1899,7 @@ BoundaryInfo::build_node_list_from_side_list()
   // might have a boundary side.
   const bool mesh_is_serial = _mesh.is_serial();
 
-  typedef std::set<std::pair<dof_id_type, boundary_id_type> > set_type;
+  typedef std::set<std::pair<dof_id_type, boundary_id_type>> set_type;
 
   const processor_id_type n_proc     = this->n_processors();
   const processor_id_type my_proc_id = this->processor_id();
@@ -1986,7 +1986,7 @@ BoundaryInfo::build_node_list_from_side_list()
   //
   // FIXME - parallel_ghost_sync.h doesn't work here because it
   // assumes a fixed size datum on each node.
-  std::vector<std::vector<dof_id_type> > node_ids_requested(n_proc);
+  std::vector<std::vector<dof_id_type>> node_ids_requested(n_proc);
 
   // Determine what nodes we need to request
   for (MeshBase::const_node_iterator it = _mesh.nodes_begin(),
@@ -1998,7 +1998,7 @@ BoundaryInfo::build_node_list_from_side_list()
         node_ids_requested[pid].push_back(node->id());
     }
 
-  typedef std::vector<std::pair<dof_id_type, boundary_id_type> > vec_type;
+  typedef std::vector<std::pair<dof_id_type, boundary_id_type>> vec_type;
 
   std::vector<Parallel::Request>
     node_pull_requests(n_proc-1),
@@ -2184,7 +2184,7 @@ void BoundaryInfo::build_active_side_list (std::vector<dof_id_type> & el,
         continue;
 
       // Loop over the sides of possible children
-      std::vector< const Elem * > family;
+      std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
       pos->first->active_family_tree_by_side(family, pos->second.first);
 #else

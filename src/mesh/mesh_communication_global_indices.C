@@ -335,10 +335,10 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
     // Nodes first -- all nodes, not just local ones
     {
       // Request sets to send to each processor
-      std::vector<std::vector<Parallel::DofObjectKey> >
+      std::vector<std::vector<Parallel::DofObjectKey>>
         requested_ids (communicator.size());
       // Results to gather from each processor
-      std::vector<std::vector<dof_id_type> >
+      std::vector<std::vector<dof_id_type>>
         filled_request (communicator.size());
 
       {
@@ -453,10 +453,10 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
     // elements next -- all elements, not just local ones
     {
       // Request sets to send to each processor
-      std::vector<std::vector<Parallel::DofObjectKey> >
+      std::vector<std::vector<Parallel::DofObjectKey>>
         requested_ids (communicator.size());
       // Results to gather from each processor
-      std::vector<std::vector<dof_id_type> >
+      std::vector<std::vector<dof_id_type>>
         filled_request (communicator.size());
 
       {
@@ -763,10 +763,10 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
     // all objects, not just local ones
 
     // Request sets to send to each processor
-    std::vector<std::vector<Parallel::DofObjectKey> >
+    std::vector<std::vector<Parallel::DofObjectKey>>
       requested_ids (communicator.size());
     // Results to gather from each processor
-    std::vector<std::vector<dof_id_type> >
+    std::vector<std::vector<dof_id_type>>
       filled_request (communicator.size());
 
     // build up list of requests

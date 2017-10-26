@@ -148,7 +148,7 @@ private:
    */
   void compose_all(unsigned int s, // number to be compositioned
                    unsigned int p, // # of partitions
-                   std::vector<std::vector<unsigned int> > & result);
+                   std::vector<std::vector<unsigned int>> & result);
 };
 
 } // namespace libMesh

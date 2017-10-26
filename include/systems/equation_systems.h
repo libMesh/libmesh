@@ -299,7 +299,7 @@ public:
    * length n_nodes*n_vars that various I/O classes can then use to
    * get the local values they need to write on each processor.
    */
-  UniquePtr<NumericVector<Number> >
+  UniquePtr<NumericVector<Number>>
   build_parallel_solution_vector(const std::set<std::string> * system_names=libmesh_nullptr) const;
 
   /**

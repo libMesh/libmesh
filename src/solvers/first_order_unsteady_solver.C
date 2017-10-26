@@ -51,7 +51,7 @@ bool FirstOrderUnsteadySolver::compute_second_order_eqns(bool compute_jacobian, 
 
       const std::vector<Real> & JxW = elem_fe->get_JxW();
 
-      const std::vector<std::vector<Real> > & phi = elem_fe->get_phi();
+      const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
 
       const unsigned int n_dofs = cast_int<unsigned int>
         (context.get_dof_indices(dot_var).size());

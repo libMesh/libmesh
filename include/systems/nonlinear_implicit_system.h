@@ -253,7 +253,7 @@ public:
    * details of interfacing with various nonlinear algebra packages
    * like PETSc or LASPACK.
    */
-  UniquePtr<NonlinearSolver<Number> > nonlinear_solver;
+  UniquePtr<NonlinearSolver<Number>> nonlinear_solver;
 
   /**
    * The \p DiffSolver defines an optional interface used to

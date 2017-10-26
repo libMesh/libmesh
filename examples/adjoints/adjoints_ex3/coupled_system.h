@@ -56,7 +56,7 @@ public:
     if (!parameter_vector.size())
       for (std::size_t i = 0; i != parameters.size(); ++i)
         parameter_vector.push_back
-          (UniquePtr<ParameterAccessor<Number> >
+          (UniquePtr<ParameterAccessor<Number>>
             (new ParameterPointer<Number>(&parameters[i])));
 
     return parameter_vector;
@@ -116,9 +116,9 @@ public:
   // Destructor
   virtual ~CoupledFEMFunctionsx () {}
 
-  virtual UniquePtr<FEMFunctionBase<Number> > clone () const
+  virtual UniquePtr<FEMFunctionBase<Number>> clone () const
   {
-    return UniquePtr<FEMFunctionBase<Number> >(new CoupledFEMFunctionsx(*this));
+    return UniquePtr<FEMFunctionBase<Number>>(new CoupledFEMFunctionsx(*this));
   }
 
   virtual void operator() (const FEMContext &,
@@ -147,9 +147,9 @@ public:
   // Destructor
   virtual ~CoupledFEMFunctionsy () {}
 
-  virtual UniquePtr<FEMFunctionBase<Number> > clone () const
+  virtual UniquePtr<FEMFunctionBase<Number>> clone () const
   {
-    return UniquePtr<FEMFunctionBase<Number> >(new CoupledFEMFunctionsy(*this));
+    return UniquePtr<FEMFunctionBase<Number>>(new CoupledFEMFunctionsy(*this));
   }
 
   virtual void operator() (const FEMContext &,

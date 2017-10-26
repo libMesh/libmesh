@@ -47,7 +47,7 @@ void HeatSystem::element_qoi_derivative (DiffContext & context,
   const std::vector<Real> & JxW = elem_fe->get_JxW();
 
   // The basis functions for the element
-  const std::vector<std::vector<Real> > & phi = elem_fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_T_dofs = c.get_dof_indices(0).size();

@@ -820,7 +820,7 @@ void AbaqusIO::generate_ids(std::string set_name, container_t & container)
 void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t & container)
 {
   // Grab a reference to a vector that will hold all the IDs
-  std::vector<std::pair<dof_id_type, unsigned> > & id_storage = container[sideset_name];
+  std::vector<std::pair<dof_id_type, unsigned>> & id_storage = container[sideset_name];
 
   // Variables for storing values read in from file
   dof_id_type elem_id=0;
@@ -972,7 +972,7 @@ void AbaqusIO::assign_sideset_ids()
         the_mesh.get_boundary_info().sideset_name(current_id) = it->first;
 
         // Get a reference to the current vector of nodeset ID values
-        std::vector<std::pair<dof_id_type,unsigned> > & sideset_ids = it->second;
+        std::vector<std::pair<dof_id_type,unsigned>> & sideset_ids = it->second;
 
         for (std::size_t i=0; i<sideset_ids.size(); ++i)
           {
@@ -1024,7 +1024,7 @@ void AbaqusIO::assign_sideset_ids()
     // because the lower-dimensional elements can belong to more than
     // 1 sideset, and multiple lower-dimensional elements can hash to
     // the same value, but this is very rare.
-    typedef std::unordered_multimap<dof_id_type, std::pair<Elem *, boundary_id_type> > provide_bcs_t;
+    typedef std::unordered_multimap<dof_id_type, std::pair<Elem *, boundary_id_type>> provide_bcs_t;
     provide_bcs_t provide_bcs;
 
     // The elemset_id counter assigns a logical numbering to the

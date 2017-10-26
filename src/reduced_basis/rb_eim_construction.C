@@ -444,13 +444,13 @@ void RBEIMConstruction::enrich_RB_space()
       // In order to speed up dot products, we store the product
       // of the basis function and the inner product matrix
 
-      UniquePtr< NumericVector<Number> > implicit_sys_temp1 = this->solution->zero_clone();
-      UniquePtr< NumericVector<Number> > implicit_sys_temp2 = this->solution->zero_clone();
+      UniquePtr<NumericVector<Number>> implicit_sys_temp1 = this->solution->zero_clone();
+      UniquePtr<NumericVector<Number>> implicit_sys_temp2 = this->solution->zero_clone();
       NumericVector<Number>* matrix_times_new_bf =
         get_explicit_system().solution->zero_clone().release();
 
       // We must localize new_bf before calling get_explicit_sys_subvector
-      UniquePtr<NumericVector<Number> > localized_new_bf =
+      UniquePtr<NumericVector<Number>> localized_new_bf =
         NumericVector<Number>::build(this->comm());
       localized_new_bf->init(get_explicit_system().n_dofs(), false, SERIAL);
       new_bf->localize(*localized_new_bf);
@@ -626,9 +626,9 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
       init_context_with_sys(context, *this);
 
       // First cache all the element data
-      std::vector< std::vector< std::vector<Number> > > parametrized_fn_vals(mesh.n_elem());
-      std::vector< std::vector<Real> > JxW_values(mesh.n_elem());
-      std::vector< std::vector<std::vector<Real> > > phi_values(mesh.n_elem());
+      std::vector<std::vector<std::vector<Number>>> parametrized_fn_vals(mesh.n_elem());
+      std::vector<std::vector<Real>> JxW_values(mesh.n_elem());
+      std::vector<std::vector<std::vector<Real>>> phi_values(mesh.n_elem());
 
       MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
       const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
@@ -644,7 +644,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
           context.get_element_fe( 0, elem_fe );
           unsigned int n_qpoints = context.get_element_qrule().n_points();
           const std::vector<Real> & JxW = elem_fe->get_JxW();
-          const std::vector<std::vector<Real> > & phi = elem_fe->get_phi();
+          const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
           const std::vector<Point> & xyz = elem_fe->get_xyz();
 
           // Loop over qp before var because parametrized functions often use
@@ -754,11 +754,11 @@ void RBEIMConstruction::update_RB_system_matrices()
   {
     unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
-    UniquePtr< NumericVector<Number> > explicit_sys_temp =
+    UniquePtr<NumericVector<Number>> explicit_sys_temp =
       get_explicit_system().solution->zero_clone();
 
-    UniquePtr< NumericVector<Number> > temp1 = this->solution->zero_clone();
-    UniquePtr< NumericVector<Number> > temp2 = this->solution->zero_clone();
+    UniquePtr<NumericVector<Number>> temp1 = this->solution->zero_clone();
+    UniquePtr<NumericVector<Number>> temp2 = this->solution->zero_clone();
 
     for (unsigned int i=(RB_size-1); i<RB_size; i++)
       {
@@ -766,7 +766,7 @@ void RBEIMConstruction::update_RB_system_matrices()
           {
             // We must localize get_rb_evaluation().get_basis_function(j) before calling
             // get_explicit_sys_subvector
-            UniquePtr<NumericVector<Number> > localized_basis_function =
+            UniquePtr<NumericVector<Number>> localized_basis_function =
               NumericVector<Number>::build(this->comm());
             localized_basis_function->init(get_explicit_system().n_dofs(), false, SERIAL);
             get_rb_evaluation().get_basis_function(j).localize(*localized_basis_function);
@@ -829,7 +829,7 @@ void RBEIMConstruction::set_explicit_sys_subvector(NumericVector<Number> & dest,
 
   // For convenience we localize the source vector first to make it easier to
   // copy over (no need to do distinct send/receives).
-  UniquePtr<NumericVector<Number> > localized_source =
+  UniquePtr<NumericVector<Number>> localized_source =
     NumericVector<Number>::build(this->comm());
   localized_source->init(this->n_dofs(), false, SERIAL);
   source.localize(*localized_source);

@@ -453,7 +453,7 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
   //
   // The only remaining issue is what to do with unpartitioned nodes.  Since they are required
   // to live on all processors we can simply rely on ourselves to number them properly.
-  std::vector<std::vector<dof_id_type> >
+  std::vector<std::vector<dof_id_type>>
     requested_node_ids(mesh.n_processors());
 
   // Loop over all the nodes, count the ones on each processor.  We can skip ourself

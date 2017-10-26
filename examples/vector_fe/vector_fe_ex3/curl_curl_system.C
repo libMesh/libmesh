@@ -117,11 +117,11 @@ bool CurlCurlSystem::element_time_derivative (bool request_jacobian,
   const std::vector<Real> & JxW = fe->get_JxW();
 
   // The velocity shape functions at interior quadrature points.
-  const std::vector<std::vector<RealGradient> > & phi = fe->get_phi();
+  const std::vector<std::vector<RealGradient>> & phi = fe->get_phi();
 
   // The velocity shape function gradients at interior
   // quadrature points.
-  const std::vector<std::vector<RealGradient> > & curl_phi = fe->get_curl_phi();
+  const std::vector<std::vector<RealGradient>> & curl_phi = fe->get_curl_phi();
 
   const std::vector<Point> & qpoint = fe->get_xyz();
 
@@ -186,7 +186,7 @@ bool CurlCurlSystem::side_time_derivative (bool request_jacobian,
   const std::vector<Real> & JxW = side_fe->get_JxW();
 
   // The velocity shape functions at interior quadrature points.
-  const std::vector<std::vector<RealGradient> > & phi = side_fe->get_phi();
+  const std::vector<std::vector<RealGradient>> & phi = side_fe->get_phi();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_u_dofs = c.get_dof_indices(u_var).size();

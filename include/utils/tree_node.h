@@ -139,7 +139,7 @@ public:
   /**
    * Transforms node numbers to element pointers.
    */
-  void transform_nodes_to_elements (std::vector<std::vector<const Elem *> > & nodes_to_elem);
+  void transform_nodes_to_elements (std::vector<std::vector<const Elem *>> & nodes_to_elem);
 
   /**
    * \returns The number of active bins below

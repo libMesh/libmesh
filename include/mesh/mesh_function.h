@@ -115,7 +115,7 @@ public:
    * \note This implies the copy should not be used after the
    * original is destroyed.
    */
-  virtual UniquePtr<FunctionBase<Number> > clone () const libmesh_override;
+  virtual UniquePtr<FunctionBase<Number>> clone () const libmesh_override;
 
   /**
    * \returns The value of variable 0 at point \p p and for \p time,
@@ -187,7 +187,7 @@ public:
    */
   void discontinuous_value (const Point & p,
                             const Real time,
-                            std::map<const Elem *, DenseVector<Number> > & output);
+                            std::map<const Elem *, DenseVector<Number>> & output);
 
   /**
    * Similar to operator() with the same parameter list, but with the difference
@@ -196,7 +196,7 @@ public:
    */
   void discontinuous_value (const Point & p,
                             const Real time,
-                            std::map<const Elem *, DenseVector<Number> > & output,
+                            std::map<const Elem *, DenseVector<Number>> & output,
                             const std::set<subdomain_id_type> * subdomain_ids);
 
   /**
@@ -217,7 +217,7 @@ public:
    */
   void discontinuous_gradient (const Point & p,
                                const Real time,
-                               std::map<const Elem *, std::vector<Gradient> > & output);
+                               std::map<const Elem *, std::vector<Gradient>> & output);
 
   /**
    * Similar to gradient, but with the difference
@@ -226,7 +226,7 @@ public:
    */
   void discontinuous_gradient (const Point & p,
                                const Real time,
-                               std::map<const Elem *, std::vector<Gradient> > & output,
+                               std::map<const Elem *, std::vector<Gradient>> & output,
                                const std::set<subdomain_id_type> * subdomain_ids);
 
   /**

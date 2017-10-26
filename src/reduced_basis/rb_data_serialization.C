@@ -297,7 +297,7 @@ void add_parameter_ranges_to_builder(const RBParametrized & rb_evaluation,
     auto names = discrete_parameters_list.initNames(n_discrete_parameters);
     auto values_outer = discrete_parameters_list.initValues(n_discrete_parameters);
 
-    const std::map< std::string, std::vector<Real> > & discrete_parameters =
+    const std::map<std::string, std::vector<Real>> & discrete_parameters =
       rb_evaluation.get_discrete_parameter_values();
 
     unsigned int count = 0;

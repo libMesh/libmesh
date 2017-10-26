@@ -51,7 +51,7 @@ class SolverConfiguration;
  * \brief Base class which defines the interface for solving eigenproblems.
  */
 template <typename T>
-class EigenSolver : public ReferenceCountedObject<EigenSolver<T> >,
+class EigenSolver : public ReferenceCountedObject<EigenSolver<T>>,
                     public ParallelObject
 {
 public:
@@ -71,7 +71,7 @@ public:
    * Builds an \p EigenSolver using the linear solver package specified by
    * \p solver_package
    */
-  static UniquePtr<EigenSolver<T> > build(const Parallel::Communicator & comm_in
+  static UniquePtr<EigenSolver<T>> build(const Parallel::Communicator & comm_in
                                           LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
                                           const SolverPackage solver_package = SLEPC_SOLVERS);
 

@@ -119,7 +119,7 @@ public:
   template <typename Scalar>
   typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
-    TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype> >::type
+    TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>>::type
   operator * (const Scalar) const
   { return TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>(); }
 
@@ -135,7 +135,7 @@ public:
   template <typename Scalar>
   typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
-    TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype> >::type
+    TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>>::type
   operator / (const Scalar) const { return *this; }
 
   /**

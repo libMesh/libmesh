@@ -313,9 +313,9 @@ void assemble_shell (EquationSystems & es,
 
   // The element shape function and its derivatives evaluated at the
   // quadrature points.
-  const std::vector<std::vector<Real> > &          phi = fe->get_phi();
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
-  const std::vector<std::vector<RealTensor> > &  d2phi = fe->get_d2phi();
+  const std::vector<std::vector<Real>> &          phi = fe->get_phi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealTensor>> &  d2phi = fe->get_d2phi();
 
   // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers

@@ -113,7 +113,7 @@ public:
 
   void testNewmarkSolverConstantSecondOrderODESecondOrderStyle()
   {
-    this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemSecondOrderTimeSolverBase> >(0.5,10);
+    this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemSecondOrderTimeSolverBase>>(0.5,10);
   }
 
   void testNewmarkSolverLinearTimeSecondOrderODESecondOrderStyle()
@@ -122,12 +122,12 @@ public:
     // we should be able to exactly integrate linear (in time) acceleration
     // functions.
     this->set_beta(1.0/6.0);
-    this->run_test_with_exact_soln<LinearTimeSecondOrderODE<SecondOrderScalarSystemSecondOrderTimeSolverBase> >(0.5,10);
+    this->run_test_with_exact_soln<LinearTimeSecondOrderODE<SecondOrderScalarSystemSecondOrderTimeSolverBase>>(0.5,10);
   }
 
   void testNewmarkSolverConstantSecondOrderODEFirstOrderStyle()
   {
-    this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase> >(0.5,10);
+    this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase>>(0.5,10);
   }
 
   void testNewmarkSolverLinearTimeSecondOrderODEFirstOrderStyle()
@@ -136,7 +136,7 @@ public:
     // we should be able to exactly integrate linear (in time) acceleration
     // functions.
     this->set_beta(1.0/6.0);
-    this->run_test_with_exact_soln<LinearTimeSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase> >(0.5,10);
+    this->run_test_with_exact_soln<LinearTimeSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase>>(0.5,10);
   }
 
 };
@@ -176,7 +176,7 @@ public:
   void testEulerSolverConstantSecondOrderODE()
   {
     this->set_theta(0.5);
-    this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase> >(0.5,10);
+    this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase>>(0.5,10);
   }
 
 };
@@ -195,7 +195,7 @@ public:
   void testEuler2SolverConstantSecondOrderODE()
   {
     this->set_theta(0.5);
-    this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase> >(0.5,10);
+    this->run_test_with_exact_soln<ConstantSecondOrderODE<SecondOrderScalarSystemFirstOrderTimeSolverBase>>(0.5,10);
   }
 };
 

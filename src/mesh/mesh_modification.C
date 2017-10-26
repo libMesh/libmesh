@@ -158,7 +158,7 @@ void MeshTools::Modification::redistribute (MeshBase & mesh,
   DenseVector<Real> output_vec(LIBMESH_DIM);
 
   // FIXME - we should thread this later.
-  UniquePtr<FunctionBase<Real> > myfunc = mapfunc.clone();
+  UniquePtr<FunctionBase<Real>> myfunc = mapfunc.clone();
 
   MeshBase::node_iterator       it  = mesh.nodes_begin();
   const MeshBase::node_iterator end = mesh.nodes_end();

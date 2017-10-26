@@ -38,7 +38,7 @@ namespace libMesh
  * \author Roy Stogner
  * \date 2010
  */
-template <typename charT=char, typename traits=std::char_traits<charT> >
+template <typename charT=char, typename traits=std::char_traits<charT>>
 class BasicOStreamProxy
 {
 public:

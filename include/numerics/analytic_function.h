@@ -86,7 +86,7 @@ public:
 
   virtual void clear () libmesh_override;
 
-  virtual UniquePtr<FunctionBase<Output> > clone () const libmesh_override;
+  virtual UniquePtr<FunctionBase<Output>> clone () const libmesh_override;
 
   virtual Output operator() (const Point & p,
                              const Real time=0.) libmesh_override;
@@ -188,10 +188,10 @@ void AnalyticFunction<Output>::clear ()
 
 template <typename Output>
 inline
-UniquePtr<FunctionBase<Output> >
+UniquePtr<FunctionBase<Output>>
 AnalyticFunction<Output>::clone () const
 {
-  return UniquePtr<FunctionBase<Output> >
+  return UniquePtr<FunctionBase<Output>>
     ( _number_fptr ?
       new AnalyticFunction<Output>(_number_fptr) :
       new AnalyticFunction<Output>(_vector_fptr) );

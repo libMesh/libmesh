@@ -87,7 +87,7 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
       get_fe().attach_quadrature_rule (_qrule.get());
     }
 
-  const std::vector<std::vector<Real> > & phi = get_fe().get_phi();
+  const std::vector<std::vector<Real>> & phi = get_fe().get_phi();
 
   // The FE object caches data, hence we recompute as little as
   // possible on the call to reinit.

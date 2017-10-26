@@ -280,7 +280,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
   // Create an vector with active element errors and ids,
   // sorted by highest errors first
   const dof_id_type max_elem_id = _mesh.max_elem_id();
-  std::vector<std::pair<ErrorVectorReal, dof_id_type> > sorted_error;
+  std::vector<std::pair<ErrorVectorReal, dof_id_type>> sorted_error;
 
   sorted_error.reserve (n_active_elem);
 
@@ -312,7 +312,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
   // Create a sorted error vector with coarsenable parent elements
   // only, sorted by lowest errors first
   ErrorVector error_per_parent;
-  std::vector<std::pair<ErrorVectorReal, dof_id_type> > sorted_parent_error;
+  std::vector<std::pair<ErrorVectorReal, dof_id_type>> sorted_parent_error;
   Real parent_error_min, parent_error_max;
 
   create_parent_error_vector(error_per_cell,

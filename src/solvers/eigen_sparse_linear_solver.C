@@ -178,7 +178,7 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
         // Build the SparseLU solver object.  Note, there is one other
         // sparse direct solver available in Eigen:
         //
-        // Eigen::SparseQR<EigenSM, Eigen::AMDOrdering<int> > solver;
+        // Eigen::SparseQR<EigenSM, Eigen::AMDOrdering<int>> solver;
         //
         // I've tested it, and it works, but it is much slower than
         // SparseLU.  The main benefit of SparseQR is that it can

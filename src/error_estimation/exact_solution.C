@@ -504,7 +504,7 @@ Real ExactSolution::h2_error(const std::string & sys_name,
 
 
 
-template< typename OutputShape>
+template<typename OutputShape>
 void ExactSolution::_compute_error(const std::string & sys_name,
                                    const std::string & unknown_name,
                                    std::vector<Real> & error_vals)
@@ -534,7 +534,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
 
   // Prepare a global solution and a MeshFunction of the coarse system if we need one
   UniquePtr<MeshFunction> coarse_values;
-  UniquePtr<NumericVector<Number> > comparison_soln = NumericVector<Number>::build(_equation_systems.comm());
+  UniquePtr<NumericVector<Number>> comparison_soln = NumericVector<Number>::build(_equation_systems.comm());
   if (_equation_systems_fine)
     {
       const System & comparison_system
@@ -663,19 +663,19 @@ void ExactSolution::_compute_error(const std::string & sys_name,
 
       // The value of the shape functions at the quadrature points
       // i.e. phi(i) = phi_values[i][qp]
-      const std::vector<std::vector<OutputShape> > &  phi_values = fe->get_phi();
+      const std::vector<std::vector<OutputShape>> &  phi_values = fe->get_phi();
 
       // The value of the shape function gradients at the quadrature points
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > &
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient>> &
         dphi_values = fe->get_dphi();
 
       // The value of the shape function curls at the quadrature points
       // Only computed for vector-valued elements
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape> > * curl_values = libmesh_nullptr;
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape>> * curl_values = libmesh_nullptr;
 
       // The value of the shape function divergences at the quadrature points
       // Only computed for vector-valued elements
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> > * div_values = libmesh_nullptr;
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence>> * div_values = libmesh_nullptr;
 
       if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
         {
@@ -685,7 +685,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       // The value of the shape function second derivatives at the quadrature points
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > &
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> &
         d2phi_values = fe->get_d2phi();
 #endif
 

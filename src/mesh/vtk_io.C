@@ -493,7 +493,7 @@ void VTKIO::cells_to_vtk()
 // {
 //   if (MeshOutput<MeshBase>::mesh().processor_id() == 0)
 //     {
-//       std::map<std::string, std::vector<Number> > vecs;
+//       std::map<std::string, std::vector<Number>> vecs;
 //       for (unsigned int i=0; i<es.n_systems(); ++i)
 //         {
 //           const System & sys = es.get_system(i);
@@ -511,7 +511,7 @@ void VTKIO::cells_to_vtk()
 //             }
 //         }
 //
-//       std::map<std::string, std::vector<Number> >::iterator it = vecs.begin();
+//       std::map<std::string, std::vector<Number>>::iterator it = vecs.begin();
 //
 //       for (; it!=vecs.end(); ++it)
 //         {

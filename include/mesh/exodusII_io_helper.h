@@ -1219,7 +1219,7 @@ public:
 
 private:
   // C++ data structures for managing string memory
-  std::vector<std::vector<char> > data_table;
+  std::vector<std::vector<char>> data_table;
   std::vector<char *> data_table_pointers;
 
   size_t counter;

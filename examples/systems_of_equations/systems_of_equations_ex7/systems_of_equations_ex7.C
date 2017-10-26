@@ -151,8 +151,8 @@ public:
     fe_face->attach_quadrature_rule (&qface);
 
     const std::vector<Real> & JxW = fe->get_JxW();
-    const std::vector<std::vector<Real> > & phi = fe->get_phi();
-    const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+    const std::vector<std::vector<Real>> & phi = fe->get_phi();
+    const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
     DenseMatrix<Number> Ke;
     DenseSubMatrix<Number> Ke_var[3][3] =
@@ -163,7 +163,7 @@ public:
       };
 
     std::vector<dof_id_type> dof_indices;
-    std::vector<std::vector<dof_id_type> > dof_indices_var(3);
+    std::vector<std::vector<dof_id_type>> dof_indices_var(3);
 
     jacobian.zero();
 
@@ -294,8 +294,8 @@ public:
     fe_face->attach_quadrature_rule (&qface);
 
     const std::vector<Real> & JxW = fe->get_JxW();
-    const std::vector<std::vector<Real> > & phi = fe->get_phi();
-    const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+    const std::vector<std::vector<Real>> & phi = fe->get_phi();
+    const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
     DenseVector<Number> Re;
 
@@ -305,7 +305,7 @@ public:
        DenseSubVector<Number>(Re)};
 
     std::vector<dof_id_type> dof_indices;
-    std::vector< std::vector<dof_id_type> > dof_indices_var(3);
+    std::vector<std::vector<dof_id_type>> dof_indices_var(3);
 
     residual.zero();
 
@@ -421,7 +421,7 @@ public:
     fe->attach_quadrature_rule (&qrule);
 
     const std::vector<Real> & JxW = fe->get_JxW();
-    const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+    const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
     // Also, get a reference to the ExplicitSystem
     ExplicitSystem & stress_system = es.get_system<ExplicitSystem>("StressSystem");
@@ -435,7 +435,7 @@ public:
     sigma_vars[5] = stress_system.variable_number ("sigma_22");
 
     // Storage for the stress dof indices on each element
-    std::vector< std::vector<dof_id_type> > dof_indices_var(system.n_vars());
+    std::vector<std::vector<dof_id_type>> dof_indices_var(system.n_vars());
     std::vector<dof_id_type> stress_dof_indices_var;
 
     // To store the stress tensor on each element

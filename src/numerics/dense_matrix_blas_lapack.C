@@ -79,7 +79,7 @@ void DenseMatrix<T>::_multiply_blas(const DenseMatrixBase<T> & other,
   // Also, although 'that' is logically const in this BLAS routine,
   // the PETSc BLAS interface does not specify that any of the inputs are
   // const.  To use it, I must cast away const-ness.
-  DenseMatrix<T> * that = const_cast< DenseMatrix<T> * > (const_that);
+  DenseMatrix<T> * that = const_cast<DenseMatrix<T> *> (const_that);
 
   // Initialize A, B pointers for LEFT_MULTIPLY* cases
   DenseMatrix<T> * A = this;
@@ -1056,7 +1056,7 @@ void DenseMatrix<T>::_matvec_blas(T alpha,
   // a const function, vector_mult(), and so we have made this function const
   // as well.  Since BLAS knows nothing about const, we have to cast it away
   // now.
-  DenseMatrix<T> & a_ref = const_cast< DenseMatrix<T> &> ( *this );
+  DenseMatrix<T> & a_ref = const_cast<DenseMatrix<T> &> ( *this );
   std::vector<T> & a = a_ref.get_values();
 
   // LDA (input)
@@ -1073,7 +1073,7 @@ void DenseMatrix<T>::_matvec_blas(T alpha,
   //   vector x.
   // Here, we must cast away the const-ness of "arg" since BLAS knows
   // nothing about const
-  DenseVector<T> & x_ref = const_cast< DenseVector<T> &> ( arg );
+  DenseVector<T> & x_ref = const_cast<DenseVector<T> &> ( arg );
   std::vector<T> & x = x_ref.get_values();
 
   // INCX (input)

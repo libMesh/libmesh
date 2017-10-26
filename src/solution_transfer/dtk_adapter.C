@@ -39,7 +39,7 @@
 namespace libMesh
 {
 
-DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, EquationSystems & in_es):
+DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int>> in_comm, EquationSystems & in_es):
   comm(in_comm),
   es(in_es),
   mesh(in_es.get_mesh()),
@@ -164,7 +164,7 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
                                                         permutation_list));
 
   // We only have 1 element topology in this grid so we make just one mesh block
-  Teuchos::ArrayRCP<Teuchos::RCP<MeshContainerType> > mesh_blocks(1);
+  Teuchos::ArrayRCP<Teuchos::RCP<MeshContainerType>> mesh_blocks(1);
   mesh_blocks[0] = mesh_container;
 
   // Create the MeshManager
@@ -188,7 +188,7 @@ DTKAdapter::get_variable_evaluator(std::string var_name)
   return evaluators[var_name];
 }
 
-Teuchos::RCP<DataTransferKit::FieldManager<DTKAdapter::FieldContainerType> >
+Teuchos::RCP<DataTransferKit::FieldManager<DTKAdapter::FieldContainerType>>
 DTKAdapter::get_values_to_fill(std::string var_name)
 {
   if (values_to_fill.find(var_name) == values_to_fill.end())

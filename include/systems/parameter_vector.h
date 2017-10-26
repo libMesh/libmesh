@@ -103,7 +103,7 @@ public:
    * request that it be passed to us as a UniquePtr to reflect that
    * fact in the API.
    */
-  void push_back(UniquePtr<ParameterAccessor<Number> > new_accessor);
+  void push_back(UniquePtr<ParameterAccessor<Number>> new_accessor);
 
   /**
    * Sets the number of parameters to be used.  This method is for
@@ -180,7 +180,7 @@ ParameterVector::clear()
 
 
 inline
-void ParameterVector::push_back(UniquePtr<ParameterAccessor<Number> > new_accessor)
+void ParameterVector::push_back(UniquePtr<ParameterAccessor<Number>> new_accessor)
 {
   // Can't append stuff we are responsible for if we're already a shallow copy.
   libmesh_assert(!_is_shallow_copy);

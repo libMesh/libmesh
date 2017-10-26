@@ -150,7 +150,7 @@ private:
   /**
    * Vector storing the RBTheta functors for the affine expansion of the outputs.
    */
-  std::vector< std::vector<RBTheta *> > _output_theta_vector;
+  std::vector<std::vector<RBTheta *>> _output_theta_vector;
 
 };
 

@@ -291,9 +291,9 @@ void assemble_poisson(EquationSystems & es,
 
   const std::vector<Point> & q_point = fe->get_xyz();
 
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;

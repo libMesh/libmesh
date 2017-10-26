@@ -144,8 +144,8 @@ void AssembleOptimization::assemble_A_and_F()
   fe->attach_quadrature_rule (&qrule);
 
   const std::vector<Real> & JxW = fe->get_JxW();
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   std::vector<dof_id_type> dof_indices;
 
@@ -205,7 +205,7 @@ void AssembleOptimization::assemble_A_and_F()
 Number AssembleOptimization::objective (const NumericVector<Number> & soln,
                                         OptimizationSystem & /*sys*/)
 {
-  UniquePtr< NumericVector<Number> > AxU = soln.zero_clone();
+  UniquePtr<NumericVector<Number>> AxU = soln.zero_clone();
 
   A_matrix->vector_mult(*AxU, soln);
 
@@ -297,7 +297,7 @@ int main (int argc, char ** argv)
     const std::string optimization_solver_type = infile("optimization_solver_type",
                                                         "PETSC_SOLVERS");
     SolverPackage sp = Utility::string_to_enum<SolverPackage>(optimization_solver_type);
-    UniquePtr<OptimizationSolver<Number> > new_solver =
+    UniquePtr<OptimizationSolver<Number>> new_solver =
       OptimizationSolver<Number>::build(system, sp);
     system.optimization_solver.reset(new_solver.release());
   }

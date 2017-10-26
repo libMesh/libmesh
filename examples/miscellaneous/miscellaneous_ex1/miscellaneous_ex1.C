@@ -370,11 +370,11 @@ void assemble_wave(EquationSystems & es,
       const std::vector<Real> & JxW = cfe->get_JxW();
 
       // The element shape functions evaluated at the quadrature points.
-      const std::vector<std::vector<Real> > & phi = cfe->get_phi();
+      const std::vector<std::vector<Real>> & phi = cfe->get_phi();
 
       // The element shape function gradients evaluated at the quadrature
       // points.
-      const std::vector<std::vector<RealGradient> > & dphi = cfe->get_dphi();
+      const std::vector<std::vector<RealGradient>> & dphi = cfe->get_dphi();
 
       // The infinite elements need more data fields than conventional FE.
       // These are the gradients of the phase term dphase, an additional

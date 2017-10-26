@@ -173,11 +173,11 @@ public:
   std::set<boundary_id_type> b;
   std::vector<unsigned int> variables;
 
-  UniquePtr<FunctionBase<Number> > f;
-  UniquePtr<FunctionBase<Gradient> > g;
+  UniquePtr<FunctionBase<Number>> f;
+  UniquePtr<FunctionBase<Gradient>> g;
 
-  UniquePtr<FEMFunctionBase<Number> > f_fem;
-  UniquePtr<FEMFunctionBase<Gradient> > g_fem;
+  UniquePtr<FEMFunctionBase<Number>> f_fem;
+  UniquePtr<FEMFunctionBase<Gradient>> g_fem;
 
   const System * f_system;
 };

@@ -290,7 +290,7 @@ protected:
    * The libMesh vectors storing the finite element coefficients
    * of the RB basis functions.
    */
-  std::vector< NumericVector<Number> * > _parametrized_functions_in_training_set;
+  std::vector<NumericVector<Number> * > _parametrized_functions_in_training_set;
 
 private:
 
@@ -303,7 +303,7 @@ private:
    * We also need an extra vector in which we can store a ghosted
    * copy of the vector that we wish to use MeshFunction on.
    */
-  UniquePtr< NumericVector<Number> > _ghosted_meshfunction_vector;
+  UniquePtr<NumericVector<Number>> _ghosted_meshfunction_vector;
 
   /**
    * We initialize RBEIMConstruction so that it has an "empty" RBAssemblyExpansion,
@@ -329,13 +329,13 @@ private:
   /**
    * The index map between the explicit system and the implicit system.
    */
-  std::vector< std::vector<dof_id_type> > _dof_map_between_systems;
+  std::vector<std::vector<dof_id_type>> _dof_map_between_systems;
 
   /**
    * This vector is used to store inner_product_matrix * basis_function[i] for each i,
    * since we frequently use this data.
    */
-  std::vector< NumericVector<Number>* > _matrix_times_bfs;
+  std::vector<NumericVector<Number>* > _matrix_times_bfs;
 
   /**
    * The point locator tolerance.

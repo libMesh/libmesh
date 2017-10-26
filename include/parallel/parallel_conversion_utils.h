@@ -91,7 +91,7 @@ struct Convert {
  * A pseudoinverse for converting bounds back to pairs of key types.
  */
 template <typename FirstKeyType, typename SecondKeyType>
-struct Convert<std::pair<FirstKeyType, SecondKeyType> > {
+struct Convert<std::pair<FirstKeyType, SecondKeyType>> {
   inline static
   std::pair<FirstKeyType,SecondKeyType> to_key_type (const double f)
   {

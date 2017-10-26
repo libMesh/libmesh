@@ -145,7 +145,7 @@ private:
    * Vector which holds pairs of centroids and their respective
    * element pointers.
    */
-  std::vector<std::pair<Point, Elem *> > _elem_centroids;
+  std::vector<std::pair<Point, Elem *>> _elem_centroids;
 };
 
 } // namespace libMesh

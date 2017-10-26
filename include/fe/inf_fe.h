@@ -636,24 +636,24 @@ protected:
    * the radial approximation shapes in local coordinates
    * Needed when setting up the overall shape functions.
    */
-  std::vector<std::vector<Real> > mode;
+  std::vector<std::vector<Real>> mode;
 
   /**
    * the first local derivative of the radial approximation shapes.
    * Needed when setting up the overall shape functions.
    */
-  std::vector<std::vector<Real> > dmodedv;
+  std::vector<std::vector<Real>> dmodedv;
 
   /**
    * the radial mapping shapes in local coordinates
    */
-  std::vector<std::vector<Real> > radial_map;
+  std::vector<std::vector<Real>> radial_map;
 
 
   /**
    * the first local derivative of the radial mapping shapes
    */
-  std::vector<std::vector<Real> > dradialdv_map;
+  std::vector<std::vector<Real>> dradialdv_map;
 
   /**
    * the first local derivative (for 3D, the first in the base)

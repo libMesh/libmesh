@@ -655,7 +655,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
   // MPI 2.1 standard seeks to remove this restriction as unnecessary, so in
   // the future we should change this to send the same buffer to each of the
   // adjacent processors. - BSK 11/17/2008
-  std::vector<std::vector<dof_id_type> >
+  std::vector<std::vector<dof_id_type>>
     my_interface_node_xfer_buffers (n_adjacent_processors, my_interface_node_list);
   std::map<processor_id_type, unsigned char> n_comm_steps;
 
@@ -939,7 +939,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
   // coarsen an element will send all the associated ghosted elements
   // to all processors which own any of the coarsened-away-element's
   // siblings.
-  typedef std::unordered_map<processor_id_type, std::vector<Elem *> > ghost_map;
+  typedef std::unordered_map<processor_id_type, std::vector<Elem *>> ghost_map;
   ghost_map elements_to_ghost;
 
   const processor_id_type proc_id = mesh.processor_id();

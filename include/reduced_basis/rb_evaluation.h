@@ -258,12 +258,12 @@ public:
   /**
    * Dense matrices for the RB computations.
    */
-  std::vector<DenseMatrix<Number> > RB_Aq_vector;
+  std::vector<DenseMatrix<Number>> RB_Aq_vector;
 
   /**
    * Dense vector for the RHS.
    */
-  std::vector<DenseVector<Number> > RB_Fq_vector;
+  std::vector<DenseVector<Number>> RB_Fq_vector;
 
   /**
    * The RB solution vector.
@@ -273,14 +273,14 @@ public:
   /**
    * The vectors storing the RB output vectors.
    */
-  std::vector<std::vector<DenseVector<Number> > > RB_output_vectors;
+  std::vector<std::vector<DenseVector<Number>>> RB_output_vectors;
 
   /**
    * The vectors storing the RB output values and
    * corresponding error bounds.
    */
-  std::vector< Number > RB_outputs;
-  std::vector< Real > RB_output_error_bounds;
+  std::vector<Number > RB_outputs;
+  std::vector<Real > RB_output_error_bounds;
 
   /**
    * Vectors storing the residual representor inner products
@@ -297,8 +297,8 @@ public:
    * on a reduced basis space. The basis independent representors
    * are stored in RBSystem.
    */
-  std::vector< std::vector< std::vector<Number> > > Fq_Aq_representor_innerprods;
-  std::vector< std::vector< std::vector<Number> > > Aq_Aq_representor_innerprods;
+  std::vector<std::vector<std::vector<Number>>> Fq_Aq_representor_innerprods;
+  std::vector<std::vector<std::vector<Number>>> Aq_Aq_representor_innerprods;
 
   /**
    * The vector storing the dual norm inner product terms
@@ -306,7 +306,7 @@ public:
    * These values are independent of a basis, hence they can
    * be copied over directly from an RBSystem.
    */
-  std::vector< std::vector< Number > > output_dual_innerprods;
+  std::vector<std::vector<Number >> output_dual_innerprods;
 
   /**
    * Vector storing the residual representors associated with the
@@ -314,7 +314,7 @@ public:
    * These are basis dependent and hence stored here, whereas
    * the Fq_representors are stored in RBSystem.
    */
-  std::vector< std::vector< NumericVector<Number> *> > Aq_representor;
+  std::vector<std::vector<NumericVector<Number> *>> Aq_representor;
 
   /**
    * Boolean to indicate whether we evaluate a posteriori error bounds

@@ -86,7 +86,7 @@ public:
     return false;
   }
 
-  // Needed by std::sort on vector< pair<Point,id> >
+  // Needed by std::sort on vector<pair<Point,id>>
   bool operator()(const std::pair<Point, dof_id_type> & lhs,
                   const std::pair<Point, dof_id_type> & rhs)
   {
@@ -853,7 +853,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                                        bool skip_find_neighbors)
 {
   std::map<dof_id_type, dof_id_type> node_to_node_map, other_to_this_node_map; // The second is the inverse map of the first
-  std::map<dof_id_type, std::vector<dof_id_type> > node_to_elems_map;
+  std::map<dof_id_type, std::vector<dof_id_type>> node_to_elems_map;
 
   typedef dof_id_type                     key_type;
   typedef std::pair<Elem *, unsigned char> val_type;
@@ -1008,7 +1008,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
         {
           // Store points from both stitched faces in sorted vectors for faster
           // searching later.
-          typedef std::vector< std::pair<Point, dof_id_type> > PointVector;
+          typedef std::vector<std::pair<Point, dof_id_type>> PointVector;
           PointVector
             this_sorted_bndry_nodes(this_boundary_node_ids.size()),
             other_sorted_bndry_nodes(other_boundary_node_ids.size());
@@ -1208,8 +1208,8 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
         {
           node_map_it->second += node_delta;
         }
-      std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it     = node_to_elems_map.begin();
-      std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it_end = node_to_elems_map.end();
+      std::map<dof_id_type, std::vector<dof_id_type>>::iterator elem_map_it     = node_to_elems_map.begin();
+      std::map<dof_id_type, std::vector<dof_id_type>>::iterator elem_map_it_end = node_to_elems_map.end();
       for ( ; elem_map_it != elem_map_it_end; ++elem_map_it)
         {
           std::size_t n_elems = elem_map_it->second.size();
@@ -1314,8 +1314,8 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
   // Container to catch boundary IDs passed back from BoundaryInfo.
   std::vector<boundary_id_type> bc_ids;
 
-  std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it     = node_to_elems_map.begin();
-  std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it_end = node_to_elems_map.end();
+  std::map<dof_id_type, std::vector<dof_id_type>>::iterator elem_map_it     = node_to_elems_map.begin();
+  std::map<dof_id_type, std::vector<dof_id_type>>::iterator elem_map_it_end = node_to_elems_map.end();
   {
   LOG_SCOPE("stitch_meshes node updates", "ReplicatedMesh");
 

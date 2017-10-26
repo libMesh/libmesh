@@ -72,7 +72,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
   const std::vector<Real> & JxW = elem_fe->get_JxW();
 
   // Element basis functions
-  const std::vector<std::vector<RealGradient> > & dphi = elem_fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = elem_fe->get_dphi();
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_T_dofs = c.get_dof_indices(0).size();
@@ -125,7 +125,7 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
   const std::vector<Real> & JxW = side_fe->get_JxW();
 
   // Side basis functions
-  const std::vector<std::vector<Real> > & phi = side_fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = side_fe->get_phi();
 
   // Side Quadrature points
   const std::vector<Point > & qside_point = side_fe->get_xyz();

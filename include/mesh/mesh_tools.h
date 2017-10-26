@@ -110,13 +110,13 @@ dof_id_type weight (const MeshBase & mesh)
  * element connected to node \p i.
  */
 void build_nodes_to_elem_map (const MeshBase & mesh,
-                              std::vector<std::vector<dof_id_type> > & nodes_to_elem_map);
+                              std::vector<std::vector<dof_id_type>> & nodes_to_elem_map);
 
 /**
  * The same, except element pointers are returned instead of indices.
  */
 void build_nodes_to_elem_map (const MeshBase & mesh,
-                              std::vector<std::vector<const Elem *> > & nodes_to_elem_map);
+                              std::vector<std::vector<const Elem *>> & nodes_to_elem_map);
 
 
 //   /**
@@ -362,7 +362,7 @@ unsigned int max_level (const MeshBase & mesh);
  */
 void find_nodal_neighbors(const MeshBase & mesh,
                           const Node & n,
-                          const std::vector<std::vector<const Elem *> > & nodes_to_elem_map,
+                          const std::vector<std::vector<const Elem *>> & nodes_to_elem_map,
                           std::vector<const Node *> & neighbors);
 
 /**
@@ -372,7 +372,7 @@ void find_nodal_neighbors(const MeshBase & mesh,
  * the side the hanging node is on.
  */
 void find_hanging_nodes_and_parents(const MeshBase & mesh,
-                                    std::map<dof_id_type, std::vector<dof_id_type> > & hanging_nodes);
+                                    std::map<dof_id_type, std::vector<dof_id_type>> & hanging_nodes);
 
 /**
  * Changes the processor ids on each node so be the same as the id of the

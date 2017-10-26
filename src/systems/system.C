@@ -1463,7 +1463,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
     }
 
   // Localize the potentially parallel vector
-  UniquePtr<NumericVector<Number> > local_v = NumericVector<Number>::build(this->comm());
+  UniquePtr<NumericVector<Number>> local_v = NumericVector<Number>::build(this->comm());
   local_v->init(v.size(), true, SERIAL);
   v.localize (*local_v, _dof_map->get_send_list());
 
@@ -1555,7 +1555,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
           libmesh_assert(qrule);
 
           const std::vector<Real> &               JxW = fe->get_JxW();
-          const std::vector<std::vector<Real> > * phi = libmesh_nullptr;
+          const std::vector<std::vector<Real>> * phi = libmesh_nullptr;
           if (norm_type == H1 ||
               norm_type == H2 ||
               norm_type == L2 ||
@@ -1563,14 +1563,14 @@ Real System::calculate_norm(const NumericVector<Number> & v,
               norm_type == L_INF)
             phi = &(fe->get_phi());
 
-          const std::vector<std::vector<RealGradient> > * dphi = libmesh_nullptr;
+          const std::vector<std::vector<RealGradient>> * dphi = libmesh_nullptr;
           if (norm_type == H1 ||
               norm_type == H2 ||
               norm_type == H1_SEMINORM ||
               norm_type == W1_INF_SEMINORM)
             dphi = &(fe->get_dphi());
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          const std::vector<std::vector<RealTensor> > *   d2phi = libmesh_nullptr;
+          const std::vector<std::vector<RealTensor>> *   d2phi = libmesh_nullptr;
           if (norm_type == H2 ||
               norm_type == H2_SEMINORM ||
               norm_type == W2_INF_SEMINORM)
@@ -2104,7 +2104,7 @@ Number System::point_value(unsigned int var, const Point & p, const Elem & e) co
   std::vector<Point> coor(1, FEInterface::inverse_map(e.dim(), fe_type, &e, p));
 
   // Get the shape function values
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
   // Reinitialize the element and compute the shape function values at coor
   fe->reinit (&e, &coor);
@@ -2217,7 +2217,7 @@ Gradient System::point_gradient(unsigned int var, const Point & p, const Elem & 
   std::vector<Point> coor(1, FEInterface::inverse_map(e.dim(), fe_type, &e, p));
 
   // Get the values of the shape function derivatives
-  const std::vector<std::vector<RealGradient> > &  dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> &  dphi = fe->get_dphi();
 
   // Reinitialize the element and compute the shape function values at coor
   fe->reinit (&e, &coor);
@@ -2331,7 +2331,7 @@ Tensor System::point_hessian(unsigned int var, const Point & p, const Elem & e) 
   std::vector<Point> coor(1, FEInterface::inverse_map(e.dim(), fe_type, &e, p));
 
   // Get the values of the shape function derivatives
-  const std::vector<std::vector<RealTensor> > &  d2phi = fe->get_d2phi();
+  const std::vector<std::vector<RealTensor>> &  d2phi = fe->get_d2phi();
 
   // Reinitialize the element and compute the shape function values at coor
   fe->reinit (&e, &coor);

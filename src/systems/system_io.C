@@ -416,7 +416,7 @@ void System::read_legacy_data (Xdr & io,
         libmesh_error_msg
           ("Additional vectors in file do not match system");
 
-      std::map<std::string, NumericVector<Number> * >::iterator
+      std::map<std::string, NumericVector<Number> *>::iterator
         pos = this->_vectors.begin();
 
       for (std::size_t i = 0; i != this->_additional_data_written; ++i)
@@ -657,7 +657,7 @@ void System::read_parallel_data (Xdr & io,
         libmesh_error_msg
           ("Additional vectors in file do not match system");
 
-      std::map<std::string, NumericVector<Number> * >::const_iterator
+      std::map<std::string, NumericVector<Number> *>::const_iterator
         pos = _vectors.begin();
 
       for (std::size_t i = 0; i != this->_additional_data_written; ++i)
@@ -798,7 +798,7 @@ void System::read_serialized_data (Xdr & io,
         libmesh_error_msg
           ("Additional vectors in file do not match system");
 
-      std::map<std::string, NumericVector<Number> * >::const_iterator
+      std::map<std::string, NumericVector<Number> *>::const_iterator
         pos = _vectors.begin();
 
       for (std::size_t i = 0; i != this->_additional_data_written; ++i)
@@ -882,8 +882,8 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 
   std::size_t n_read_values=0;
 
-  std::vector<std::vector<dof_id_type> > xfer_ids(num_blks);  // The global IDs and # of components for the local objects in all blocks
-  std::vector<std::vector<Number> >      recv_vals(num_blks); // The raw values for the local objects in all blocks
+  std::vector<std::vector<dof_id_type>> xfer_ids(num_blks);  // The global IDs and # of components for the local objects in all blocks
+  std::vector<std::vector<Number>>      recv_vals(num_blks); // The raw values for the local objects in all blocks
   std::vector<Parallel::Request>
     id_requests(num_blks), val_requests(num_blks);
 
@@ -975,8 +975,8 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
   // do not exhaust memory on processor 0.
 
   // give these variables scope outside the block to avoid reallocation
-  std::vector<std::vector<dof_id_type> > recv_ids       (this->n_processors());
-  std::vector<std::vector<Number> >      send_vals      (this->n_processors());
+  std::vector<std::vector<dof_id_type>> recv_ids       (this->n_processors());
+  std::vector<std::vector<Number>>      send_vals      (this->n_processors());
   std::vector<Parallel::Request>         reply_requests (this->n_processors());
   std::vector<unsigned int>              obj_val_offsets;          // map to traverse entry-wise rather than processor-wise
   std::vector<Number>                    input_vals;               // The input buffer for the current block
@@ -1520,7 +1520,7 @@ void System::write_header (Xdr & io,
 
     if (write_additional_data)
       {
-        std::map<std::string, NumericVector<Number> * >::const_iterator
+        std::map<std::string, NumericVector<Number> *>::const_iterator
           vec_pos = this->_vectors.begin();
         unsigned int cnt=0;
 
@@ -1833,7 +1833,7 @@ void System::write_serialized_data (Xdr & io,
   //   // Only write additional vectors if wanted
   //   if (write_additional_data)
   //     {
-  // std::map<std::string, NumericVector<Number> * >::const_iterator
+  // std::map<std::string, NumericVector<Number> *>::const_iterator
   //   pos = _vectors.begin();
 
   // for (; pos != this->_vectors.end(); ++pos)
@@ -1909,8 +1909,8 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
   //     << std::endl;
 
   dof_id_type written_length=0;                                   // The numer of values written.  This will be returned
-  std::vector<std::vector<dof_id_type> > xfer_ids(num_blks);      // The global IDs and # of components for the local objects in all blocks
-  std::vector<std::vector<Number> >      send_vals(num_blks);     // The raw values for the local objects in all blocks
+  std::vector<std::vector<dof_id_type>> xfer_ids(num_blks);      // The global IDs and # of components for the local objects in all blocks
+  std::vector<std::vector<Number>>      send_vals(num_blks);     // The raw values for the local objects in all blocks
   std::vector<Parallel::Request>
     id_requests(num_blks), val_requests(num_blks);                 // send request handle for each block
 
@@ -2015,8 +2015,8 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
 
   if (this->processor_id() == 0)
     {
-      std::vector<std::vector<dof_id_type> > recv_ids  (this->n_processors());
-      std::vector<std::vector<Number> >      recv_vals (this->n_processors());
+      std::vector<std::vector<dof_id_type>> recv_ids  (this->n_processors());
+      std::vector<std::vector<Number>>      recv_vals (this->n_processors());
       std::vector<unsigned int> obj_val_offsets;          // map to traverse entry-wise rather than processor-wise
       std::vector<Number>       output_vals;              // The output buffer for the current block
 

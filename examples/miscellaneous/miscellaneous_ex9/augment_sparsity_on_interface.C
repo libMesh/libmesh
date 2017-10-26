@@ -34,8 +34,8 @@ void AugmentSparsityOnInterface::mesh_reinit ()
   const MeshBase::const_element_iterator end_el = _mesh.active_elements_end();
 
   // Map from (elem, side) to centroid
-  std::map< std::pair<const Elem *, unsigned char>, Point> lower_centroids;
-  std::map< std::pair<const Elem *, unsigned char>, Point> upper_centroids;
+  std::map<std::pair<const Elem *, unsigned char>, Point> lower_centroids;
+  std::map<std::pair<const Elem *, unsigned char>, Point> upper_centroids;
 
   for ( ; el != end_el; ++el)
     {
@@ -79,8 +79,8 @@ void AugmentSparsityOnInterface::mesh_reinit ()
   // We do an N^2 search to find elements with matching centroids. This could be optimized,
   // e.g. by first sorting the centroids based on their (x,y,z) location.
   {
-    std::map< std::pair<const Elem *, unsigned char>, Point>::iterator it     = lower_centroids.begin();
-    std::map< std::pair<const Elem *, unsigned char>, Point>::iterator it_end = lower_centroids.end();
+    std::map<std::pair<const Elem *, unsigned char>, Point>::iterator it     = lower_centroids.begin();
+    std::map<std::pair<const Elem *, unsigned char>, Point>::iterator it_end = lower_centroids.end();
     for ( ; it != it_end; ++it)
       {
         Point lower_centroid = it->second;
@@ -88,8 +88,8 @@ void AugmentSparsityOnInterface::mesh_reinit ()
         // find closest centroid in upper_centroids
         Real min_distance = std::numeric_limits<Real>::max();
 
-        std::map< std::pair<const Elem *, unsigned char>, Point>::iterator inner_it     = upper_centroids.begin();
-        std::map< std::pair<const Elem *, unsigned char>, Point>::iterator inner_it_end = upper_centroids.end();
+        std::map<std::pair<const Elem *, unsigned char>, Point>::iterator inner_it     = upper_centroids.begin();
+        std::map<std::pair<const Elem *, unsigned char>, Point>::iterator inner_it_end = upper_centroids.end();
 
         for ( ; inner_it != inner_it_end; ++inner_it)
           {
@@ -123,8 +123,8 @@ void AugmentSparsityOnInterface::mesh_reinit ()
 
     // Let's make sure we didn't miss any upper elements either
 #ifndef NDEBUG
-    std::map< std::pair<const Elem *, unsigned char>, Point>::iterator inner_it     = upper_centroids.begin();
-    std::map< std::pair<const Elem *, unsigned char>, Point>::iterator inner_it_end = upper_centroids.end();
+    std::map<std::pair<const Elem *, unsigned char>, Point>::iterator inner_it     = upper_centroids.begin();
+    std::map<std::pair<const Elem *, unsigned char>, Point>::iterator inner_it_end = upper_centroids.end();
 
     for ( ; inner_it != inner_it_end; ++inner_it)
       {

@@ -58,7 +58,7 @@ OptimizationSolver<T>::~OptimizationSolver ()
 
 
 template <typename T>
-UniquePtr<OptimizationSolver<T> >
+UniquePtr<OptimizationSolver<T>>
 OptimizationSolver<T>::build(sys_type & s, const SolverPackage solver_package)
 {
   // Prevent unused variables warnings when Tao is not available
@@ -70,12 +70,12 @@ OptimizationSolver<T>::build(sys_type & s, const SolverPackage solver_package)
 
 #if defined(LIBMESH_HAVE_PETSC_TAO) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
     case PETSC_SOLVERS:
-      return UniquePtr<OptimizationSolver<T> >(new TaoOptimizationSolver<T>(s));
+      return UniquePtr<OptimizationSolver<T>>(new TaoOptimizationSolver<T>(s));
 #endif // #if defined(LIBMESH_HAVE_PETSC_TAO) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
 #if defined(LIBMESH_HAVE_NLOPT) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
     case NLOPT_SOLVERS:
-      return UniquePtr<OptimizationSolver<T> >(new NloptOptimizationSolver<T>(s));
+      return UniquePtr<OptimizationSolver<T>>(new NloptOptimizationSolver<T>(s));
 #endif // #if defined(LIBMESH_HAVE_NLOPT) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
     default:
@@ -83,7 +83,7 @@ OptimizationSolver<T>::build(sys_type & s, const SolverPackage solver_package)
     }
 
   libmesh_error_msg("We'll never get here!");
-  return UniquePtr<OptimizationSolver<T> >();
+  return UniquePtr<OptimizationSolver<T>>();
 }
 
 

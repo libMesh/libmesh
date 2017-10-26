@@ -44,9 +44,9 @@ class ExampleOneFunction : public FunctionBase<Number>
 
   virtual void init() {}
   virtual void clear() {}
-  virtual UniquePtr<FunctionBase<Number> > clone() const
+  virtual UniquePtr<FunctionBase<Number>> clone() const
   {
-    return UniquePtr<FunctionBase<Number> >(new ExampleOneFunction());
+    return UniquePtr<FunctionBase<Number>>(new ExampleOneFunction());
   }
 };
 
@@ -55,17 +55,17 @@ namespace libMesh {
 #endif
 
 //-------------------------------------------------
-// Full specialization for the Factory<FunctionBase<Number> >
+// Full specialization for the Factory<FunctionBase<Number>>
 // So we can look up hand-coded functions by name string
 template<>
-std::map<std::string, Factory<FunctionBase<Number> >*> &
-Factory<FunctionBase<Number> >::factory_map()
+std::map<std::string, Factory<FunctionBase<Number>> *> &
+Factory<FunctionBase<Number>>::factory_map()
 {
-  static std::map<std::string, Factory<FunctionBase<Number> > *> _map;
+  static std::map<std::string, Factory<FunctionBase<Number>> *> _map;
   return _map;
 }
 
-FactoryImp<ExampleOneFunction, FunctionBase<Number> > example_one_factory ("example_one");
+FactoryImp<ExampleOneFunction, FunctionBase<Number>> example_one_factory ("example_one");
 
 #ifdef LIBMESH_USE_SEPARATE_NAMESPACE
 } // namespace libMesh

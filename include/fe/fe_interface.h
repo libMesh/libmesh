@@ -257,7 +257,7 @@ public:
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
    */
-  template< typename OutputType>
+  template<typename OutputType>
   static void shape(const unsigned int dim,
                     const FEType & fe_t,
                     const ElemType t,
@@ -274,7 +274,7 @@ public:
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
    */
-  template< typename OutputType>
+  template<typename OutputType>
   static void shape(const unsigned int dim,
                     const FEType & fe_t,
                     const Elem * elem,

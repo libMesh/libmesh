@@ -88,7 +88,7 @@ void OptimizationSystem::reinit ()
 
 
 void OptimizationSystem::
-initialize_equality_constraints_storage(const std::vector< std::set<numeric_index_type> > & constraint_jac_sparsity)
+initialize_equality_constraints_storage(const std::vector<std::set<numeric_index_type>> & constraint_jac_sparsity)
 {
   unsigned int n_eq_constraints = constraint_jac_sparsity.size();
 
@@ -122,7 +122,7 @@ initialize_equality_constraints_storage(const std::vector< std::set<numeric_inde
 
 
 void OptimizationSystem::
-initialize_inequality_constraints_storage(const std::vector<std::set<numeric_index_type> > & constraint_jac_sparsity)
+initialize_inequality_constraints_storage(const std::vector<std::set<numeric_index_type>> & constraint_jac_sparsity)
 {
   unsigned int n_ineq_constraints = constraint_jac_sparsity.size();
 

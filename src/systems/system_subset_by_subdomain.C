@@ -116,7 +116,7 @@ init (const SubdomainSelection & subdomain_selection)
 {
   _dof_ids.clear();
 
-  std::vector<std::vector<dof_id_type> > dof_ids_per_processor(this->n_processors());
+  std::vector<std::vector<dof_id_type>> dof_ids_per_processor(this->n_processors());
 
   const DofMap & dof_map = _system.get_dof_map();
   std::vector<dof_id_type> dof_indices;

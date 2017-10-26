@@ -327,13 +327,13 @@ public:
   /**
    * Const accessor for QoI derivatives.
    */
-  const std::vector<DenseVector<Number> > & get_qoi_derivatives() const
+  const std::vector<DenseVector<Number>> & get_qoi_derivatives() const
   { return _elem_qoi_derivative; }
 
   /**
    * Non-const accessor for QoI derivatives.
    */
-  std::vector<DenseVector<Number> > & get_qoi_derivatives()
+  std::vector<DenseVector<Number>> & get_qoi_derivatives()
   { return _elem_qoi_derivative; }
 
   /**
@@ -524,7 +524,7 @@ public:
   /**
    * Typedef for the localized_vectors iterator
    */
-  typedef std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *> > >::iterator localized_vectors_iterator;
+  typedef std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *>>>::iterator localized_vectors_iterator;
 
   /**
    * Return a reference to DenseVector localization of localized_vector
@@ -555,7 +555,7 @@ protected:
    * pairs of element localized versions of that vector and per variable views
    */
 
-  std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *> > > _localized_vectors;
+  std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *>>> _localized_vectors;
 
   /**
    * Element by element components of nonlinear_solution
@@ -605,20 +605,20 @@ protected:
   /**
    * Element quantity of interest derivative contributions
    */
-  std::vector<DenseVector<Number> > _elem_qoi_derivative;
-  std::vector<std::vector<DenseSubVector<Number> *> > _elem_qoi_subderivatives;
+  std::vector<DenseVector<Number>> _elem_qoi_derivative;
+  std::vector<std::vector<DenseSubVector<Number> *>> _elem_qoi_subderivatives;
 
   /**
    * Element residual subvectors and Jacobian submatrices
    */
   std::vector<DenseSubVector<Number> *> _elem_subresiduals;
-  std::vector<std::vector<DenseSubMatrix<Number> *> > _elem_subjacobians;
+  std::vector<std::vector<DenseSubMatrix<Number> *>> _elem_subjacobians;
 
   /**
    * Global Degree of freedom index lists
    */
   std::vector<dof_id_type> _dof_indices;
-  std::vector<std::vector<dof_id_type> > _dof_indices_var;
+  std::vector<std::vector<dof_id_type>> _dof_indices_var;
 
 private:
 

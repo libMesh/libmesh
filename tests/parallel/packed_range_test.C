@@ -24,7 +24,7 @@
 namespace libMesh {
 namespace Parallel {
 template <typename T>
-class Packing<std::basic_string<T> > {
+class Packing<std::basic_string<T>> {
 public:
 
   static const unsigned int size_bytes = 4;

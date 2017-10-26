@@ -21,7 +21,7 @@
 
 using namespace libMesh;
 
-class PetscVectorTest : public NumericVectorTest<PetscVector<Number> > {
+class PetscVectorTest : public NumericVectorTest<PetscVector<Number>> {
 public:
   CPPUNIT_TEST_SUITE( PetscVectorTest );
 

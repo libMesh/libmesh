@@ -359,7 +359,7 @@ public:
    * basically a copy with prepended size with our current
    * implementation.
    */
-  void pack_indexing(std::back_insert_iterator<std::vector<largest_id_type> > target) const;
+  void pack_indexing(std::back_insert_iterator<std::vector<largest_id_type>> target) const;
 
   /**
    * Print our buffer for debugging.

@@ -79,7 +79,7 @@ public:
    * Data structure to hold node attributes read in from file.
    * What you do with these is up to you!
    */
-  std::vector<std::vector<Real> > node_attributes;
+  std::vector<std::vector<Real>> node_attributes;
 
   /**
    * Data structure to hold element attributes read in from file.
@@ -92,7 +92,7 @@ public:
    * public interface, remains for now, but will be removed some time
    * in the near future.
    */
-  std::vector<std::vector<Real> > element_attributes;
+  std::vector<std::vector<Real>> element_attributes;
 
 private:
 

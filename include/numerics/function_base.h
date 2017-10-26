@@ -92,7 +92,7 @@ public:
    * independent destruction and simultaneous evaluations of the
    * copies in different threads.
    */
-  virtual UniquePtr<FunctionBase<Output> > clone () const = 0;
+  virtual UniquePtr<FunctionBase<Output>> clone () const = 0;
 
   /**
    * \returns The scalar function value at coordinate \p p and time \p

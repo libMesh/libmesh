@@ -28,7 +28,7 @@ namespace
 using namespace libMesh;
 
 // Compute the static coefficients for an element
-void hermite_compute_coefs(const Elem * elem, std::vector<std::vector<Real> > & dxdxi
+void hermite_compute_coefs(const Elem * elem, std::vector<std::vector<Real>> & dxdxi
 #ifdef DEBUG
                            , std::vector<Real> & dxdeta, std::vector<Real> & dydxi
 #endif
@@ -81,7 +81,7 @@ void hermite_compute_coefs(const Elem * elem, std::vector<std::vector<Real> > & 
 
 
 Real hermite_bases_2D (std::vector<unsigned int> & bases1D,
-                       const std::vector<std::vector<Real> > & dxdxi,
+                       const std::vector<std::vector<Real>> & dxdxi,
                        const Order & o,
                        unsigned int i)
 {
@@ -205,7 +205,7 @@ Real FE<2,HERMITE>::shape(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  std::vector<std::vector<Real> > dxdxi(2, std::vector<Real>(2, 0));
+  std::vector<std::vector<Real>> dxdxi(2, std::vector<Real>(2, 0));
 
 #ifdef DEBUG
   std::vector<Real> dxdeta(2), dydxi(2);
@@ -273,7 +273,7 @@ Real FE<2,HERMITE>::shape_deriv(const Elem * elem,
   libmesh_assert(elem);
   libmesh_assert (j == 0 || j == 1);
 
-  std::vector<std::vector<Real> > dxdxi(2, std::vector<Real>(2, 0));
+  std::vector<std::vector<Real>> dxdxi(2, std::vector<Real>(2, 0));
 
 #ifdef DEBUG
   std::vector<Real> dxdeta(2), dydxi(2);
@@ -339,7 +339,7 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem * elem,
   libmesh_assert(elem);
   libmesh_assert (j == 0 || j == 1 || j == 2);
 
-  std::vector<std::vector<Real> > dxdxi(2, std::vector<Real>(2, 0));
+  std::vector<std::vector<Real>> dxdxi(2, std::vector<Real>(2, 0));
 
 #ifdef DEBUG
   std::vector<Real> dxdeta(2), dydxi(2);

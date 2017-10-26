@@ -1003,7 +1003,7 @@ void RBEvaluation::read_in_vectors(System & sys,
 }
 
 void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
-                                                       std::vector< std::vector<NumericVector<Number> *> * > multiple_vectors,
+                                                       std::vector<std::vector<NumericVector<Number> *> *> multiple_vectors,
                                                        const std::vector<std::string> & multiple_directory_names,
                                                        const std::vector<std::string> & multiple_data_names,
                                                        const bool read_binary_vectors)

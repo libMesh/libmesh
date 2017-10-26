@@ -58,7 +58,7 @@ namespace libMesh
  * \author  Benjamin S. Kirk
  */
 template <typename Key, typename Tp>
-class vectormap : public std::vector<std::pair<Key, Tp> >
+class vectormap : public std::vector<std::pair<Key, Tp>>
 {
 
 public:
@@ -106,7 +106,7 @@ public:
    * Copy constructor.
    */
   vectormap(const vectormap<Key,Tp> & other) :
-    std::vector<std::pair<Key, Tp> > (other),
+    std::vector<std::pair<Key, Tp>> (other),
     _sorted(other._sorted)
   {}
 

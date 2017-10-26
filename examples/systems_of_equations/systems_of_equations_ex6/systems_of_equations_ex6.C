@@ -174,8 +174,8 @@ public:
     fe_face->attach_quadrature_rule (&qface);
 
     const std::vector<Real> & JxW = fe->get_JxW();
-    const std::vector<std::vector<Real> > & phi = fe->get_phi();
-    const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+    const std::vector<std::vector<Real>> & phi = fe->get_phi();
+    const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
     DenseMatrix<Number> Ke;
     DenseSubMatrix<Number> Ke_var[3][3] =
@@ -193,7 +193,7 @@ public:
        DenseSubVector<Number>(Fe)};
 
     std::vector<dof_id_type> dof_indices;
-    std::vector< std::vector<dof_id_type> > dof_indices_var(3);
+    std::vector<std::vector<dof_id_type>> dof_indices_var(3);
 
     MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
     const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
@@ -251,7 +251,7 @@ public:
           for (auto side : elem->side_index_range())
             if (elem->neighbor_ptr(side) == libmesh_nullptr)
               {
-                const std::vector<std::vector<Real> > & phi_face = fe_face->get_phi();
+                const std::vector<std::vector<Real>> & phi_face = fe_face->get_phi();
                 const std::vector<Real> & JxW_face = fe_face->get_JxW();
 
                 fe_face->reinit(elem, side);
@@ -293,8 +293,8 @@ public:
     fe->attach_quadrature_rule (&qrule);
 
     const std::vector<Real> & JxW = fe->get_JxW();
-    const std::vector<std::vector<Real> > & phi = fe->get_phi();
-    const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+    const std::vector<std::vector<Real>> & phi = fe->get_phi();
+    const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
     // Also, get a reference to the ExplicitSystem
     ExplicitSystem & stress_system = es.get_system<ExplicitSystem>("StressSystem");
@@ -309,7 +309,7 @@ public:
     unsigned int vonMises_var = stress_system.variable_number ("vonMises");
 
     // Storage for the stress dof indices on each element
-    std::vector< std::vector<dof_id_type> > dof_indices_var(system.n_vars());
+    std::vector<std::vector<dof_id_type>> dof_indices_var(system.n_vars());
     std::vector<dof_id_type> stress_dof_indices_var;
     std::vector<dof_id_type> vonmises_dof_indices_var;
 
@@ -327,7 +327,7 @@ public:
 
         fe->reinit (elem);
 
-        std::vector< DenseMatrix<Number> > stress_tensor_qp(qrule.n_points());
+        std::vector<DenseMatrix<Number>> stress_tensor_qp(qrule.n_points());
         for (unsigned int qp=0; qp<qrule.n_points(); qp++)
           {
             stress_tensor_qp[qp].resize(3,3);
@@ -347,7 +347,7 @@ public:
           }
 
         stress_dof_map.dof_indices (elem, vonmises_dof_indices_var, vonMises_var);
-        std::vector< DenseMatrix<Number> > elem_sigma_vec(vonmises_dof_indices_var.size());
+        std::vector<DenseMatrix<Number>> elem_sigma_vec(vonmises_dof_indices_var.size());
         for (std::size_t index=0; index<elem_sigma_vec.size(); index++)
           elem_sigma_vec[index].resize(3,3);
 

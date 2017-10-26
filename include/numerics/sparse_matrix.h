@@ -60,7 +60,7 @@ std::ostream & operator << (std::ostream & os, const SparseMatrix<T> & m);
  * \date 2003
  */
 template <typename T>
-class SparseMatrix : public ReferenceCountedObject<SparseMatrix<T> >,
+class SparseMatrix : public ReferenceCountedObject<SparseMatrix<T>>,
                      public ParallelObject
 {
 public:
@@ -89,7 +89,7 @@ public:
    * Builds a \p SparseMatrix<T> using the linear solver package specified by
    * \p solver_package
    */
-  static UniquePtr<SparseMatrix<T> >
+  static UniquePtr<SparseMatrix<T>>
   build(const Parallel::Communicator & comm,
         const SolverPackage solver_package = libMesh::default_solver_package());
 

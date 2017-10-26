@@ -350,11 +350,11 @@ void LaplaceYoung::residual (const NumericVector<Number> & soln,
   const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   // Define data structures to contain the residual contributions
   DenseVector<Number> Re;
@@ -437,7 +437,7 @@ void LaplaceYoung::residual (const NumericVector<Number> & soln,
           {
             // The value of the shape functions at the quadrature
             // points.
-            const std::vector<std::vector<Real> > & phi_face = fe_face->get_phi();
+            const std::vector<std::vector<Real>> & phi_face = fe_face->get_phi();
 
             // The Jacobian * Quadrature Weight at the quadrature
             // points on the face.
@@ -512,11 +512,11 @@ void LaplaceYoung::jacobian (const NumericVector<Number> & soln,
   const std::vector<Real> & JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
-  const std::vector<std::vector<Real> > & phi = fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = fe->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
-  const std::vector<std::vector<RealGradient> > & dphi = fe->get_dphi();
+  const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
   // Define data structures to contain the Jacobian element matrix.
   // Following basic finite element terminology we will denote these

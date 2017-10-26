@@ -104,12 +104,12 @@ protected:
   /**
    * Serial vector of previous time step velocity \f$ \dot{u}_n \f$
    */
-  UniquePtr<NumericVector<Number> > _old_local_solution_rate;
+  UniquePtr<NumericVector<Number>> _old_local_solution_rate;
 
   /**
    * Serial vector of previous time step acceleration \f$ \ddot{u}_n \f$
    */
-  UniquePtr<NumericVector<Number> > _old_local_solution_accel;
+  UniquePtr<NumericVector<Number>> _old_local_solution_accel;
 };
 
 } // end namespace libMesh

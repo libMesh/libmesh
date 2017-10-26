@@ -44,7 +44,7 @@ template <typename T> class NumericVector;
  * \date 2008
  */
 template <typename T>
-class ShellMatrix : public ReferenceCountedObject<ShellMatrix<T> >,
+class ShellMatrix : public ReferenceCountedObject<ShellMatrix<T>>,
                     public ParallelObject
 {
 public:

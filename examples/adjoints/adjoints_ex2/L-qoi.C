@@ -79,7 +79,7 @@ void LaplaceQoI::element_qoi_derivative (DiffContext & context,
   const std::vector<Real> & JxW = elem_fe->get_JxW();
 
   // The basis functions for the element
-  const std::vector<std::vector<Real> > & phi = elem_fe->get_phi();
+  const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
 
   // The element quadrature points
   const std::vector<Point > & q_point = elem_fe->get_xyz();

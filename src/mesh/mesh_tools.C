@@ -255,7 +255,7 @@ dof_id_type MeshTools::weight(const MeshBase & mesh, const processor_id_type pid
 
 
 void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
-                                         std::vector<std::vector<dof_id_type> > & nodes_to_elem_map)
+                                         std::vector<std::vector<dof_id_type>> & nodes_to_elem_map)
 {
   nodes_to_elem_map.resize (mesh.n_nodes());
 
@@ -275,7 +275,7 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
 
 
 void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
-                                         std::vector<std::vector<const Elem *> > & nodes_to_elem_map)
+                                         std::vector<std::vector<const Elem *>> & nodes_to_elem_map)
 {
   nodes_to_elem_map.resize (mesh.n_nodes());
 
@@ -731,7 +731,7 @@ unsigned int MeshTools::n_p_levels (const MeshBase & mesh)
 
 void MeshTools::find_nodal_neighbors(const MeshBase &,
                                      const Node & node,
-                                     const std::vector<std::vector<const Elem *> > & nodes_to_elem_map,
+                                     const std::vector<std::vector<const Elem *>> & nodes_to_elem_map,
                                      std::vector<const Node *> & neighbors)
 {
   // We'll refer back to the Node ID several times
@@ -904,7 +904,7 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
 
 
 void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
-                                               std::map<dof_id_type, std::vector<dof_id_type> > & hanging_nodes)
+                                               std::map<dof_id_type, std::vector<dof_id_type>> & hanging_nodes)
 {
   MeshBase::const_element_iterator it  = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
@@ -1982,7 +1982,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
     }
 
   // Sort the new pids to push to each processor
-  std::vector<std::vector<std::pair<dof_id_type, processor_id_type> > >
+  std::vector<std::vector<std::pair<dof_id_type, processor_id_type>>>
     ids_to_push(mesh.n_processors());
 
   for (MeshBase::const_node_iterator
@@ -2018,7 +2018,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
         ((mesh.comm().size() + mesh.comm().rank() - p) %
          mesh.comm().size());
 
-      std::vector<std::pair<dof_id_type, processor_id_type> >
+      std::vector<std::pair<dof_id_type, processor_id_type>>
         ids_to_pull;
 
       if (p)
@@ -2026,7 +2026,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
       else
         ids_to_pull.swap(ids_to_push[procdown]);
 
-      std::vector<std::pair<dof_id_type, processor_id_type> >::iterator
+      std::vector<std::pair<dof_id_type, processor_id_type>>::iterator
         pulled_ids_it = ids_to_pull.begin(),
         pulled_ids_end = ids_to_pull.end();
       for (; pulled_ids_it != pulled_ids_end; ++pulled_ids_it)

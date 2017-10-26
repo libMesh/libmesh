@@ -242,7 +242,7 @@ public:
   template <typename Scalar>
   typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
-    TypeTensor<typename CompareTypes<T, Scalar>::supertype> >::type
+    TypeTensor<typename CompareTypes<T, Scalar>::supertype>>::type
   operator * (const Scalar) const;
 
   /**
@@ -261,7 +261,7 @@ public:
   template <typename Scalar>
   typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
-    TypeTensor<typename CompareTypes<T, Scalar>::supertype> >::type
+    TypeTensor<typename CompareTypes<T, Scalar>::supertype>>::type
   operator / (const Scalar) const;
 
   /**
@@ -889,7 +889,7 @@ template <typename Scalar>
 inline
 typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
-  TypeTensor<typename CompareTypes<T, Scalar>::supertype> >::type
+  TypeTensor<typename CompareTypes<T, Scalar>::supertype>>::type
 TypeTensor<T>::operator * (const Scalar factor) const
 {
   typedef typename CompareTypes<T, Scalar>::supertype TS;
@@ -925,7 +925,7 @@ template <typename T, typename Scalar>
 inline
 typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
-  TypeTensor<typename CompareTypes<T, Scalar>::supertype> >::type
+  TypeTensor<typename CompareTypes<T, Scalar>::supertype>>::type
 operator * (const Scalar factor,
             const TypeTensor<T> & t)
 {
@@ -953,7 +953,7 @@ template <typename Scalar>
 inline
 typename boostcopy::enable_if_c<
   ScalarTraits<Scalar>::value,
-  TypeTensor<typename CompareTypes<T, Scalar>::supertype> >::type
+  TypeTensor<typename CompareTypes<T, Scalar>::supertype>>::type
 TypeTensor<T>::operator / (const Scalar factor) const
 {
   libmesh_assert_not_equal_to (factor, static_cast<T>(0.));

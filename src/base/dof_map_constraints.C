@@ -345,7 +345,7 @@ private:
       variable.first_scalar_number();
 
     // Get FE objects of the appropriate type
-    UniquePtr<FEGenericBase<OutputType> > fe = FEGenericBase<OutputType>::build(dim, fe_type);
+    UniquePtr<FEGenericBase<OutputType>> fe = FEGenericBase<OutputType>::build(dim, fe_type);
 
     // Prepare variables for projection
     UniquePtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
@@ -354,11 +354,11 @@ private:
 
     // The values of the shape functions at the quadrature
     // points
-    const std::vector<std::vector<OutputShape> > & phi = fe->get_phi();
+    const std::vector<std::vector<OutputShape>> & phi = fe->get_phi();
 
     // The gradients of the shape functions at the quadrature
     // points on the child element.
-    const std::vector<std::vector<OutputGradient> > * dphi = libmesh_nullptr;
+    const std::vector<std::vector<OutputGradient>> * dphi = libmesh_nullptr;
 
     const FEContinuity cont = fe->get_continuity();
 
@@ -373,7 +373,7 @@ private:
         libmesh_assert(!(f && g_fem));
         libmesh_assert(!(f_fem && g));
 
-        const std::vector<std::vector<OutputGradient> > & ref_dphi = fe->get_dphi();
+        const std::vector<std::vector<OutputGradient>> & ref_dphi = fe->get_dphi();
         dphi = &ref_dphi;
       }
 
@@ -2092,7 +2092,7 @@ void DofMap::enforce_constraints_exactly (const System & system,
 
   NumericVector<Number> * v_local  = libmesh_nullptr; // will be initialized below
   NumericVector<Number> * v_global = libmesh_nullptr; // will be initialized below
-  UniquePtr<NumericVector<Number> > v_built;
+  UniquePtr<NumericVector<Number>> v_built;
   if (v->type() == SERIAL)
     {
       v_built = NumericVector<Number>::build(this->comm());
@@ -2187,7 +2187,7 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
 
   NumericVector<Number> * v_local  = libmesh_nullptr; // will be initialized below
   NumericVector<Number> * v_global = libmesh_nullptr; // will be initialized below
-  UniquePtr<NumericVector<Number> > v_built;
+  UniquePtr<NumericVector<Number>> v_built;
   if (v.type() == SERIAL)
     {
       v_built = NumericVector<Number>::build(this->comm());
@@ -2647,10 +2647,10 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
   // which have support on other processors.
   // Push these out first.
   {
-    std::vector<std::set<dof_id_type> > pushed_ids(this->n_processors());
+    std::vector<std::set<dof_id_type>> pushed_ids(this->n_processors());
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-    std::vector<std::set<dof_id_type> > pushed_node_ids(this->n_processors());
+    std::vector<std::set<dof_id_type>> pushed_node_ids(this->n_processors());
 #endif
 
     const unsigned int sys_num = this->sys_number();
@@ -2729,11 +2729,11 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
 
         // Pack the dof constraint rows and rhs's to push to procup
         const std::size_t pushed_ids_size = pushed_ids[procup].size();
-        std::vector<std::vector<dof_id_type> > pushed_keys(pushed_ids_size);
-        std::vector<std::vector<Real> > pushed_vals(pushed_ids_size);
+        std::vector<std::vector<dof_id_type>> pushed_keys(pushed_ids_size);
+        std::vector<std::vector<Real>> pushed_vals(pushed_ids_size);
         std::vector<Number> pushed_rhss(pushed_ids_size);
 
-        std::vector<std::vector<Number> >
+        std::vector<std::vector<Number>>
           pushed_adj_rhss(max_qoi_num,
                           std::vector<Number>(pushed_ids_size));
         std::set<dof_id_type>::const_iterator it = pushed_ids[procup].begin();
@@ -2781,8 +2781,8 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
         // Pack the node constraint rows to push to procup
         const std::size_t pushed_nodes_size = pushed_node_ids[procup].size();
-        std::vector<std::vector<dof_id_type> > pushed_node_keys(pushed_nodes_size);
-        std::vector<std::vector<Real> > pushed_node_vals(pushed_nodes_size);
+        std::vector<std::vector<dof_id_type>> pushed_node_keys(pushed_nodes_size);
+        std::vector<std::vector<Real>> pushed_node_vals(pushed_nodes_size);
         std::vector<Point> pushed_node_offsets(pushed_nodes_size);
         std::set<dof_id_type>::const_iterator node_it = pushed_node_ids[procup].begin();
         for (std::size_t i = 0; node_it != pushed_node_ids[procup].end();
@@ -2807,10 +2807,10 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
         std::vector<dof_id_type> pushed_ids_from_me
           (pushed_ids[procup].begin(), pushed_ids[procup].end());
         std::vector<dof_id_type> pushed_ids_to_me;
-        std::vector<std::vector<dof_id_type> > pushed_keys_to_me;
-        std::vector<std::vector<Real> > pushed_vals_to_me;
+        std::vector<std::vector<dof_id_type>> pushed_keys_to_me;
+        std::vector<std::vector<Real>> pushed_vals_to_me;
         std::vector<Number> pushed_rhss_to_me;
-        std::vector<std::vector<Number> > pushed_adj_rhss_to_me;
+        std::vector<std::vector<Number>> pushed_adj_rhss_to_me;
         this->comm().send_receive(procup, pushed_ids_from_me,
                                   procdown, pushed_ids_to_me);
         this->comm().send_receive(procup, pushed_keys,
@@ -2830,8 +2830,8 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
         std::vector<dof_id_type> pushed_node_ids_from_me
           (pushed_node_ids[procup].begin(), pushed_node_ids[procup].end());
         std::vector<dof_id_type> pushed_node_ids_to_me;
-        std::vector<std::vector<dof_id_type> > pushed_node_keys_to_me;
-        std::vector<std::vector<Real> > pushed_node_vals_to_me;
+        std::vector<std::vector<dof_id_type>> pushed_node_keys_to_me;
+        std::vector<std::vector<Real>> pushed_node_vals_to_me;
         std::vector<Point> pushed_node_offsets_to_me;
         this->comm().send_receive(procup, pushed_node_ids_from_me,
                                   procdown, pushed_node_ids_to_me);
@@ -2969,7 +2969,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
       Node_RCSet node_request_set;
 
       // Request sets to send to each processor
-      std::vector<std::vector<dof_id_type> >
+      std::vector<std::vector<dof_id_type>>
         requested_node_ids(this->n_processors());
 
       // And the sizes of each
@@ -3037,9 +3037,9 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
                                     procdown, node_request_to_fill);
 
           // Fill those requests
-          std::vector<std::vector<dof_id_type> >
+          std::vector<std::vector<dof_id_type>>
             node_row_keys(node_request_to_fill.size());
-          std::vector<std::vector<Real> >
+          std::vector<std::vector<Real>>
             node_row_vals(node_request_to_fill.size());
           std::vector<Point>
             node_row_rhss(node_request_to_fill.size());
@@ -3082,8 +3082,8 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
             }
 
           // Trade back the results
-          std::vector<std::vector<dof_id_type> > node_filled_keys;
-          std::vector<std::vector<Real> > node_filled_vals;
+          std::vector<std::vector<dof_id_type>> node_filled_keys;
+          std::vector<std::vector<Real>> node_filled_vals;
           std::vector<Point> node_filled_rhss;
 
           this->comm().send_receive(procdown, node_row_keys,
@@ -3266,10 +3266,10 @@ void DofMap::scatter_constraints(MeshBase & mesh)
     return;
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  std::vector<std::set<dof_id_type> > pushed_node_ids(this->n_processors());
+  std::vector<std::set<dof_id_type>> pushed_node_ids(this->n_processors());
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
-  std::vector<std::set<dof_id_type> > pushed_ids(this->n_processors());
+  std::vector<std::set<dof_id_type>> pushed_ids(this->n_processors());
 
   // Collect the dof constraints I need to push to each processor
   dof_id_type constrained_proc_id = 0;
@@ -3336,8 +3336,8 @@ void DofMap::scatter_constraints(MeshBase & mesh)
 
       // Pack the dof constraint rows and rhs's to push to procup
       const std::size_t pushed_ids_size = pushed_ids[procup].size();
-      std::vector<std::vector<dof_id_type> > pushed_keys(pushed_ids_size);
-      std::vector<std::vector<Real> > pushed_vals(pushed_ids_size);
+      std::vector<std::vector<dof_id_type>> pushed_keys(pushed_ids_size);
+      std::vector<std::vector<Real>> pushed_vals(pushed_ids_size);
       std::vector<Number> pushed_rhss(pushed_ids_size);
 
       std::set<dof_id_type>::const_iterator it;
@@ -3366,8 +3366,8 @@ void DofMap::scatter_constraints(MeshBase & mesh)
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       // Pack the node constraint rows to push to procup
       const std::size_t pushed_node_ids_size = pushed_node_ids[procup].size();
-      std::vector<std::vector<dof_id_type> > pushed_node_keys(pushed_node_ids_size);
-      std::vector<std::vector<Real> > pushed_node_vals(pushed_node_ids_size);
+      std::vector<std::vector<dof_id_type>> pushed_node_keys(pushed_node_ids_size);
+      std::vector<std::vector<Real>> pushed_node_vals(pushed_node_ids_size);
       std::vector<Point> pushed_node_offsets(pushed_node_ids_size);
       std::set<const Node *> pushed_nodes;
 
@@ -3402,8 +3402,8 @@ void DofMap::scatter_constraints(MeshBase & mesh)
       std::vector<dof_id_type> pushed_ids_from_me
         (pushed_ids[procup].begin(), pushed_ids[procup].end());
       std::vector<dof_id_type> pushed_ids_to_me;
-      std::vector<std::vector<dof_id_type> > pushed_keys_to_me;
-      std::vector<std::vector<Real> > pushed_vals_to_me;
+      std::vector<std::vector<dof_id_type>> pushed_keys_to_me;
+      std::vector<std::vector<Real>> pushed_vals_to_me;
       std::vector<Number> pushed_rhss_to_me;
       this->comm().send_receive(procup, pushed_ids_from_me,
                                 procdown, pushed_ids_to_me);
@@ -3422,8 +3422,8 @@ void DofMap::scatter_constraints(MeshBase & mesh)
       std::vector<dof_id_type> pushed_node_ids_from_me
         (pushed_node_ids[procup].begin(), pushed_node_ids[procup].end());
       std::vector<dof_id_type> pushed_node_ids_to_me;
-      std::vector<std::vector<dof_id_type> > pushed_node_keys_to_me;
-      std::vector<std::vector<Real> > pushed_node_vals_to_me;
+      std::vector<std::vector<dof_id_type>> pushed_node_keys_to_me;
+      std::vector<std::vector<Real>> pushed_node_vals_to_me;
       std::vector<Point> pushed_node_offsets_to_me;
       this->comm().send_receive(procup, pushed_node_ids_from_me,
                                 procdown, pushed_node_ids_to_me);
@@ -3506,7 +3506,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
   //
   // Getting distributed adaptive sparsity patterns right is hard.
 
-  typedef std::map<dof_id_type, std::set<dof_id_type> > DofConstrainsMap;
+  typedef std::map<dof_id_type, std::set<dof_id_type>> DofConstrainsMap;
   DofConstrainsMap dof_id_constrains;
 
   for (DofConstraints::iterator i = _dof_constraints.begin();
@@ -3580,8 +3580,8 @@ void DofMap::scatter_constraints(MeshBase & mesh)
 
       // Pack the dof constraint rows and rhs's to push to procup
       const std::size_t pushed_ids_size = pushed_ids[procup].size();
-      std::vector<std::vector<dof_id_type> > pushed_keys(pushed_ids_size);
-      std::vector<std::vector<Real> > pushed_vals(pushed_ids_size);
+      std::vector<std::vector<dof_id_type>> pushed_keys(pushed_ids_size);
+      std::vector<std::vector<Real>> pushed_vals(pushed_ids_size);
       std::vector<Number> pushed_rhss(pushed_ids_size);
 
       // As long as we're declaring them outside the loop, let's initialize them too!
@@ -3611,8 +3611,8 @@ void DofMap::scatter_constraints(MeshBase & mesh)
       std::vector<dof_id_type> pushed_ids_from_me
         (pushed_ids[procup].begin(), pushed_ids[procup].end());
       std::vector<dof_id_type> pushed_ids_to_me;
-      std::vector<std::vector<dof_id_type> > pushed_keys_to_me;
-      std::vector<std::vector<Real> > pushed_vals_to_me;
+      std::vector<std::vector<dof_id_type>> pushed_keys_to_me;
+      std::vector<std::vector<Real>> pushed_vals_to_me;
       std::vector<Number> pushed_rhss_to_me;
       this->comm().send_receive(procup, pushed_ids_from_me,
                                 procdown, pushed_ids_to_me);
@@ -3718,7 +3718,7 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
       DoF_RCSet   dof_request_set;
 
       // Request sets to send to each processor
-      std::vector<std::vector<dof_id_type> >
+      std::vector<std::vector<dof_id_type>>
         requested_dof_ids(this->n_processors());
 
       // And the sizes of each
@@ -3808,11 +3808,11 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
                                     procdown, dof_request_to_fill);
 
           // Fill those requests
-          std::vector<std::vector<dof_id_type> > dof_row_keys(dof_request_to_fill.size());
+          std::vector<std::vector<dof_id_type>> dof_row_keys(dof_request_to_fill.size());
 
-          std::vector<std::vector<Real> > dof_row_vals(dof_request_to_fill.size());
+          std::vector<std::vector<Real>> dof_row_vals(dof_request_to_fill.size());
           std::vector<Number> dof_row_rhss(dof_request_to_fill.size());
-          std::vector<std::vector<Number> >
+          std::vector<std::vector<Number>>
             dof_adj_rhss(max_qoi_num,
                          std::vector<Number>(dof_request_to_fill.size()));
           for (std::size_t i=0; i != dof_request_to_fill.size(); ++i)
@@ -3874,10 +3874,10 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
             }
 
           // Trade back the results
-          std::vector<std::vector<dof_id_type> > dof_filled_keys;
-          std::vector<std::vector<Real> > dof_filled_vals;
+          std::vector<std::vector<dof_id_type>> dof_filled_keys;
+          std::vector<std::vector<Real>> dof_filled_vals;
           std::vector<Number> dof_filled_rhss;
-          std::vector<std::vector<Number> > adj_filled_rhss;
+          std::vector<std::vector<Number>> adj_filled_rhss;
           this->comm().send_receive(procdown, dof_row_keys,
                                     procup, dof_filled_keys);
           this->comm().send_receive(procdown, dof_row_vals,
