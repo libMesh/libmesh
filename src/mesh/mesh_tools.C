@@ -1148,12 +1148,8 @@ void MeshTools::libmesh_assert_valid_amr_elem_ids(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_amr_elem_ids()", "MeshTools");
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
 
       const Elem * parent = elem->parent();
