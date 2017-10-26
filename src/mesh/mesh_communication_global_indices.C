@@ -459,28 +459,22 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
       std::vector<std::vector<dof_id_type>>
         filled_request (communicator.size());
 
-      {
-        MeshBase::const_element_iterator       it  = mesh.elements_begin();
-        const MeshBase::const_element_iterator end = mesh.elements_end();
+      for (const auto & elem : mesh.elements_range())
+        {
+          libmesh_assert(elem);
+          const Parallel::DofObjectKey hi =
+            get_hilbert_index (elem, bbox);
+          const processor_id_type pid =
+            cast_int<processor_id_type>
+            (std::distance (elem_upper_bounds.begin(),
+                            std::lower_bound(elem_upper_bounds.begin(),
+                                             elem_upper_bounds.end(),
+                                             hi)));
 
-        for (; it != end; ++it)
-          {
-            const Elem * elem = (*it);
-            libmesh_assert(elem);
-            const Parallel::DofObjectKey hi =
-              get_hilbert_index (elem, bbox);
-            const processor_id_type pid =
-              cast_int<processor_id_type>
-              (std::distance (elem_upper_bounds.begin(),
-                              std::lower_bound(elem_upper_bounds.begin(),
-                                               elem_upper_bounds.end(),
-                                               hi)));
+          libmesh_assert_less (pid, communicator.size());
 
-            libmesh_assert_less (pid, communicator.size());
-
-            requested_ids[pid].push_back(hi);
-          }
-      }
+          requested_ids[pid].push_back(hi);
+        }
 
       // The number of objects in my_elem_bin on each processor
       std::vector<dof_id_type> elem_bin_sizes(communicator.size());
@@ -536,33 +530,27 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
         for (processor_id_type pid=0; pid<communicator.size(); pid++)
           next_obj_on_proc.push_back(filled_request[pid].begin());
 
-        {
-          MeshBase::element_iterator       it  = mesh.elements_begin();
-          const MeshBase::element_iterator end = mesh.elements_end();
+        for (auto & elem : mesh.elements_range())
+          {
+            libmesh_assert(elem);
+            const Parallel::DofObjectKey hi =
+              get_hilbert_index (elem, bbox);
+            const processor_id_type pid =
+              cast_int<processor_id_type>
+              (std::distance (elem_upper_bounds.begin(),
+                              std::lower_bound(elem_upper_bounds.begin(),
+                                               elem_upper_bounds.end(),
+                                               hi)));
 
-          for (; it != end; ++it)
-            {
-              Elem * elem = (*it);
-              libmesh_assert(elem);
-              const Parallel::DofObjectKey hi =
-                get_hilbert_index (elem, bbox);
-              const processor_id_type pid =
-                cast_int<processor_id_type>
-                (std::distance (elem_upper_bounds.begin(),
-                                std::lower_bound(elem_upper_bounds.begin(),
-                                                 elem_upper_bounds.end(),
-                                                 hi)));
+            libmesh_assert_less (pid, communicator.size());
+            libmesh_assert (next_obj_on_proc[pid] != filled_request[pid].end());
 
-              libmesh_assert_less (pid, communicator.size());
-              libmesh_assert (next_obj_on_proc[pid] != filled_request[pid].end());
+            const dof_id_type global_index = *next_obj_on_proc[pid];
+            libmesh_assert_less (global_index, mesh.n_elem());
+            elem->set_id() = global_index;
 
-              const dof_id_type global_index = *next_obj_on_proc[pid];
-              libmesh_assert_less (global_index, mesh.n_elem());
-              elem->set_id() = global_index;
-
-              ++next_obj_on_proc[pid];
-            }
-        }
+            ++next_obj_on_proc[pid];
+          }
       }
     }
   }
