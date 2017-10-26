@@ -1016,11 +1016,9 @@ void DofMap::distribute_dofs (MeshBase & mesh)
             }
       }
 
-    MeshBase::const_element_iterator       elem_it  = mesh.elements_begin();
-    const MeshBase::const_element_iterator elem_end = mesh.elements_end();
-    for ( ; elem_it != elem_end; ++elem_it)
+    for (auto & elem : mesh.elements_range())
       {
-        DofObject const * const dofobj = *elem_it;
+        DofObject const * const dofobj = elem;
         const processor_id_type obj_proc_id = dofobj->processor_id();
 
         for (unsigned int v=0; v != dofobj->n_vars(sys_num); ++v)
