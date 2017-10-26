@@ -2215,6 +2215,9 @@ void DofMap::_dof_indices (const Elem * const elem,
       const ElemType type        = elem->type();
       const unsigned int sys_num = this->sys_number();
       const unsigned int dim     = elem->dim();
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      const bool is_inf          = elem->infinite();
+#endif
 
       // Increase the polynomial order on p refined elements
       FEType fe_type = var.type();
@@ -2231,6 +2234,9 @@ void DofMap::_dof_indices (const Elem * const elem,
         tot_size += FEInterface::n_dofs(dim,fe_type,type);
 #endif
 
+      const FEInterface::n_dofs_at_node_ptr ndan =
+        FEInterface::n_dofs_at_node_function(dim, fe_type);
+
       // Get the node-based DOF numbers
       for (unsigned int n=0; n<n_nodes; n++)
         {
@@ -2239,11 +2245,13 @@ void DofMap::_dof_indices (const Elem * const elem,
           // There is a potential problem with h refinement.  Imagine a
           // quad9 that has a linear FE on it.  Then, on the hanging side,
           // it can falsely identify a DOF at the mid-edge node. This is why
-          // we call FEInterface instead of node->n_comp() directly.
-          const unsigned int nc = FEInterface::n_dofs_at_node (dim,
-                                                               fe_type,
-                                                               type,
-                                                               n);
+          // we go through FEInterface instead of node->n_comp() directly.
+          const unsigned int nc =
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+            is_inf ?
+              FEInterface::n_dofs_at_node(dim, fe_type, type, n) :
+#endif
+              ndan (type, fe_type.order, n);
 
           // If this is a non-vertex on a hanging node with extra
           // degrees of freedom, we use the non-vertex dofs (which
@@ -2414,6 +2422,9 @@ void DofMap::old_dof_indices (const Elem * const elem,
   const unsigned int sys_num = this->sys_number();
   const unsigned int n_vars  = this->n_variables();
   const unsigned int dim     = elem->dim();
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  const bool is_inf          = elem->infinite();
+#endif
 
   // If we have dof indices stored on the elem, and there's no chance
   // that we only have those indices because we were just p refined,
@@ -2480,6 +2491,9 @@ void DofMap::old_dof_indices (const Elem * const elem,
               const bool extra_hanging_dofs =
                 FEInterface::extra_hanging_dofs(fe_type);
 
+              const FEInterface::n_dofs_at_node_ptr ndan =
+                FEInterface::n_dofs_at_node_function(dim, fe_type);
+
               // Get the node-based DOF numbers
               for (std::size_t n=0; n<elem_nodes.size(); n++)
                 {
@@ -2489,10 +2503,13 @@ void DofMap::old_dof_indices (const Elem * const elem,
                   // quad9 that has a linear FE on it.  Then, on the hanging side,
                   // it can falsely identify a DOF at the mid-edge node. This is why
                   // we call FEInterface instead of node->n_comp() directly.
-                  const unsigned int nc = FEInterface::n_dofs_at_node (dim,
-                                                                       fe_type,
-                                                                       type,
-                                                                       n);
+                  const unsigned int nc =
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+                    is_inf ?
+                      FEInterface::n_dofs_at_node(dim, fe_type, type, n) :
+#endif
+                      ndan (type, fe_type.order, n);
+
                   libmesh_assert(node->old_dof_object);
 
                   // If this is a non-vertex on a hanging node with extra
