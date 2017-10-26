@@ -139,13 +139,8 @@ dof_id_type TopologyMap::find(dof_id_type bracket_node1,
 void TopologyMap::fill(const MeshBase & mesh)
 {
   // Populate the nodes map
-  MeshBase::const_element_iterator
-    it = mesh.elements_begin(),
-    end = mesh.elements_end();
-  for (; it != end; ++it)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *it;
-
       // We only need to add nodes which might be added during mesh
       // refinement; this means they need to be child nodes.
       if (!elem->has_children())
