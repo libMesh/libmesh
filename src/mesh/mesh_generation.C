@@ -2079,11 +2079,8 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
   // fix that.
   cross_section.comm().max(next_side_id);
 
-  MeshBase::const_element_iterator       el  = cross_section.elements_begin();
-  const MeshBase::const_element_iterator end = cross_section.elements_end();
-  for (; el!=end; ++el)
+  for (const auto & elem : cross_section.elements_range())
     {
-      const Elem * elem = *el;
       const ElemType etype = elem->type();
 
       // build_extrusion currently only works on coarse meshes
