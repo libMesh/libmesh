@@ -1044,12 +1044,11 @@ void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_node_pointers()", "MeshTools");
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  // Here we specifically do not want "auto &" because we need to
+  // reseat the (temporary) pointer variable in the loop below,
+  // without modifying the original.
+  for (const Elem * elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
       while (elem)
         {
