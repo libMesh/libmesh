@@ -2389,54 +2389,48 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
   // The mesh is now generated, but we still need to mark the boundaries
   // to be consistent with the other build_square routines.  Note that all
   // hole boundary elements get the same ID, 4.
-  MeshBase::element_iterator       el     = mesh.elements_begin();
-  const MeshBase::element_iterator end_el = mesh.elements_end();
-  for ( ; el != end_el; ++el)
-    {
-      const Elem * elem = *el;
+  for (auto & elem : mesh.elements_range())
+    for (auto s : elem->side_index_range())
+      if (elem->neighbor_ptr(s) == libmesh_nullptr)
+        {
+          UniquePtr<const Elem> side (elem->build_side_ptr(s));
 
-      for (auto s : elem->side_index_range())
-        if (elem->neighbor_ptr(s) == libmesh_nullptr)
-          {
-            UniquePtr<const Elem> side (elem->build_side_ptr(s));
+          // Check the location of the side's midpoint.  Since
+          // the square has straight sides, the midpoint is not
+          // on the corner and thus it is uniquely on one of the
+          // sides.
+          Point side_midpoint= 0.5f*( side->point(0) + side->point(1) );
 
-            // Check the location of the side's midpoint.  Since
-            // the square has straight sides, the midpoint is not
-            // on the corner and thus it is uniquely on one of the
-            // sides.
-            Point side_midpoint= 0.5f*( side->point(0) + side->point(1) );
+          // The boundary ids are set following the same convention as Quad4 sides
+          // bottom = 0
+          // right  = 1
+          // top = 2
+          // left = 3
+          // hole = 4
+          boundary_id_type bc_id=4;
 
-            // The boundary ids are set following the same convention as Quad4 sides
-            // bottom = 0
-            // right  = 1
-            // top = 2
-            // left = 3
-            // hole = 4
-            boundary_id_type bc_id=4;
+          // bottom
+          if      (std::fabs(side_midpoint(1) - ymin) < TOLERANCE)
+            bc_id=0;
 
-            // bottom
-            if      (std::fabs(side_midpoint(1) - ymin) < TOLERANCE)
-              bc_id=0;
+          // right
+          else if (std::fabs(side_midpoint(0) - xmax) < TOLERANCE)
+            bc_id=1;
 
-            // right
-            else if (std::fabs(side_midpoint(0) - xmax) < TOLERANCE)
-              bc_id=1;
+          // top
+          else if (std::fabs(side_midpoint(1) - ymax) < TOLERANCE)
+            bc_id=2;
 
-            // top
-            else if (std::fabs(side_midpoint(1) - ymax) < TOLERANCE)
-              bc_id=2;
+          // left
+          else if (std::fabs(side_midpoint(0) - xmin) < TOLERANCE)
+            bc_id=3;
 
-            // left
-            else if (std::fabs(side_midpoint(0) - xmin) < TOLERANCE)
-              bc_id=3;
+          // If the point is not on any of the external boundaries, it
+          // is on one of the holes....
 
-            // If the point is not on any of the external boundaries, it
-            // is on one of the holes....
-
-            // Finally, add this element's information to the boundary info object.
-            boundary_info.add_side(elem->id(), s, bc_id);
-          }
-    }
+          // Finally, add this element's information to the boundary info object.
+          boundary_info.add_side(elem->id(), s, bc_id);
+        }
 
 } // end build_delaunay_square
 
