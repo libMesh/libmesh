@@ -1254,11 +1254,8 @@ void EquationSystems::_add_system_to_nodes_and_elems()
     (*node_it)->add_system();
 
   // All the elements
-  MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
-    (*elem_it)->add_system();
+  for (auto & elem : _mesh.elements_range())
+    elem->add_system();
 }
 
 } // namespace libMesh
