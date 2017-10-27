@@ -1217,6 +1217,8 @@ public:
   virtual node_iterator nodes_end () = 0;
   virtual const_node_iterator nodes_begin () const = 0;
   virtual const_node_iterator nodes_end () const = 0;
+  virtual SimpleRange<node_iterator> nodes_range() = 0;
+  virtual SimpleRange<const_node_iterator> nodes_range() const = 0;
 
   /**
    * Iterate over only the active nodes in the Mesh.

@@ -415,6 +415,8 @@ public:
   virtual node_iterator nodes_end () libmesh_override;
   virtual const_node_iterator nodes_begin () const libmesh_override;
   virtual const_node_iterator nodes_end () const libmesh_override;
+  virtual SimpleRange<node_iterator> nodes_range() libmesh_override { return {nodes_begin(), nodes_end()}; }
+  virtual SimpleRange<const_node_iterator> nodes_range() const libmesh_override { return {nodes_begin(), nodes_end()}; }
 
   virtual node_iterator active_nodes_begin () libmesh_override;
   virtual node_iterator active_nodes_end () libmesh_override;
