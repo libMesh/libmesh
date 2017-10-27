@@ -183,11 +183,8 @@ void MeshTools::Modification::translate (MeshBase & mesh,
 {
   const Point p(xt, yt, zt);
 
-  const MeshBase::node_iterator nd_end = mesh.nodes_end();
-
-  for (MeshBase::node_iterator nd = mesh.nodes_begin();
-       nd != nd_end; ++nd)
-    **nd += p;
+  for (auto & node : mesh.nodes_range())
+    *node += p;
 }
 
 
