@@ -181,11 +181,8 @@ void MeshTools::Subdivision::prepare_subdivision_mesh(MeshBase & mesh, bool ghos
   MeshTools::build_nodes_to_elem_map(mesh, nodes_to_elem_map);
 
   // compute the node valences
-  MeshBase::const_node_iterator       nd     = mesh.nodes_begin();
-  const MeshBase::const_node_iterator end_nd = mesh.nodes_end();
-  for (; nd != end_nd; ++nd)
+  for (auto & node : mesh.nodes_range())
     {
-      Node * node = *nd;
       std::vector<const Node *> neighbors;
       MeshTools::find_nodal_neighbors(mesh, *node, nodes_to_elem_map, neighbors);
       const unsigned int valence =
