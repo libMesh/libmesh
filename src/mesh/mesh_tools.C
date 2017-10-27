@@ -1208,12 +1208,8 @@ void MeshTools::libmesh_assert_connected_nodes (const MeshBase & mesh)
         used_nodes.insert(&n);
     }
 
-  const MeshBase::const_node_iterator node_end = mesh.nodes_end();
-
-  for (MeshBase::const_node_iterator node_it = mesh.nodes_begin();
-       node_it != node_end; ++node_it)
+  for (const auto & node : mesh.nodes_range())
     {
-      Node * node = *node_it;
       libmesh_assert(node);
       libmesh_assert(used_nodes.count(node));
     }
