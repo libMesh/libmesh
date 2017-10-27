@@ -225,27 +225,25 @@ int VariationalMeshSmoother::writegr(const Array2D<double> & R)
 
   // Adjust nodal coordinates to new positions
   {
-    MeshBase::node_iterator       it  = _mesh.nodes_begin();
-    const MeshBase::node_iterator end = _mesh.nodes_end();
-
     libmesh_assert_equal_to(_dist_norm, 0.);
     _dist_norm = 0;
-    for (int i=0; it!=end; ++it)
+    int i = 0;
+    for (auto & node : _mesh.nodes_range())
       {
         double total_dist = 0.;
+
+        // Get a reference to the node
+        Node & node_ref = *node;
 
         // For each node set its X Y [Z] coordinates
         for (unsigned int j=0; j<_dim; j++)
           {
-            // Get a reference to the node
-            Node & node = *(*it);
-
-            double distance = R[i][j] - node(j);
+            double distance = R[i][j] - node_ref(j);
 
             // Save the squares of the distance
             total_dist += Utility::pow<2>(distance);
 
-            node(j) += distance*_percent_to_move;
+            node_ref(j) += distance * _percent_to_move;
           }
 
         libmesh_assert_greater_equal (total_dist, 0.);
@@ -283,21 +281,19 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
 
   // Grab node coordinates and set mask
   {
-    MeshBase::const_node_iterator       it  = _mesh.nodes_begin();
-    const MeshBase::const_node_iterator end = _mesh.nodes_end();
-
     // Only compute the node to elem map once
     std::vector<std::vector<const Elem *>> nodes_to_elem_map;
     MeshTools::build_nodes_to_elem_map(_mesh, nodes_to_elem_map);
 
-    for (int i=0; it != end; ++it)
+    int i = 0;
+    for (auto & node : _mesh.nodes_range())
       {
         // Get a reference to the node
-        Node & node = *(*it);
+        Node & node_ref = *node;
 
         // For each node grab its X Y [Z] coordinates
         for (unsigned int j=0; j<_dim; j++)
-          R[i][j] = node(j);
+          R[i][j] = node_ref(j);
 
         // Set the Proper Mask
         // Internal nodes are 0
@@ -311,14 +307,14 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
                 // Find all the nodal neighbors... that is the nodes directly connected
                 // to this node through one edge
                 std::vector<const Node *> neighbors;
-                MeshTools::find_nodal_neighbors(_mesh, node, nodes_to_elem_map, neighbors);
+                MeshTools::find_nodal_neighbors(_mesh, node_ref, nodes_to_elem_map, neighbors);
 
                 std::vector<const Node *>::const_iterator ne = neighbors.begin();
                 std::vector<const Node *>::const_iterator ne_end = neighbors.end();
 
                 // Grab the x,y coordinates
-                Real x = node(0);
-                Real y = node(1);
+                Real x = node_ref(0);
+                Real y = node_ref(1);
 
                 // Theta will represent the atan2 angle (meaning with the proper quadrant in mind)
                 // of the neighbor node in a system where the current node is at the origin
