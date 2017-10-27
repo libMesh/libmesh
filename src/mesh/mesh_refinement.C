@@ -527,14 +527,8 @@ bool MeshRefinement::refine_and_coarsen_elements ()
   // a no-op.
   bool elements_flagged = false;
 
-  MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
+  for (auto & elem : _mesh.elements_range())
     {
-      // Pointer to the element
-      Elem * elem = *elem_it;
-
       // This might be left over from the last step
       const Elem::RefinementState flag = elem->refinement_flag();
 
@@ -662,17 +656,11 @@ bool MeshRefinement::coarsen_elements ()
 
   // Possibly clean up the refinement flags from
   // a previous step
-  MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
+  for (auto & elem : _mesh.elements_range())
     {
-      // Pointer to the element
-      Elem * elem = *elem_it;
-
       // Set refinement flag to INACTIVE if the
       // element isn't active
-      if ( !elem->active())
+      if (!elem->active())
         {
           elem->set_refinement_flag(Elem::INACTIVE);
           elem->set_p_refinement_flag(Elem::INACTIVE);
@@ -742,17 +730,11 @@ bool MeshRefinement::refine_elements ()
 
   // Possibly clean up the refinement flags from
   // a previous step
-  MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
+  for (auto & elem : _mesh.elements_range())
     {
-      // Pointer to the element
-      Elem * elem = *elem_it;
-
       // Set refinement flag to INACTIVE if the
       // element isn't active
-      if ( !elem->active())
+      if (!elem->active())
         {
           elem->set_refinement_flag(Elem::INACTIVE);
           elem->set_p_refinement_flag(Elem::INACTIVE);
@@ -1443,18 +1425,12 @@ bool MeshRefinement::_coarsen_elements ()
   // do the coarsening; otherwise it is possible to coarsen away a
   // one-element-thick layer partition and leave the partitions on
   // either side unable to figure out how to talk to each other.
-  for (MeshBase::element_iterator
-         it  = _mesh.elements_begin(),
-         end = _mesh.elements_end();
-       it != end; ++it)
-    {
-      Elem * elem = *it;
-      if (elem->refinement_flag() == Elem::COARSEN)
-        {
-          mesh_changed = true;
-          break;
-        }
-    }
+  for (auto & elem : _mesh.elements_range())
+    if (elem->refinement_flag() == Elem::COARSEN)
+      {
+        mesh_changed = true;
+        break;
+      }
 
   // If the mesh changed on any processor, it changed globally
   this->comm().max(mesh_changed);
@@ -1463,13 +1439,8 @@ bool MeshRefinement::_coarsen_elements ()
   if (mesh_changed)
     MeshCommunication().send_coarse_ghosts(_mesh);
 
-  for (MeshBase::element_iterator
-         it  = _mesh.elements_begin(),
-         end = _mesh.elements_end();
-       it != end; ++it)
+  for (auto & elem : _mesh.elements_range())
     {
-      Elem * elem = *it;
-
       // active elements flagged for coarsening will
       // no longer be deleted until MeshRefinement::contract()
       if (elem->refinement_flag() == Elem::COARSEN)
@@ -1572,15 +1543,9 @@ bool MeshRefinement::_refine_elements ()
   // flagged for h refinement.
   dof_id_type n_elems_flagged = 0;
 
-  MeshBase::element_iterator       it  = _mesh.elements_begin();
-  const MeshBase::element_iterator end = _mesh.elements_end();
-
-  for (; it != end; ++it)
-    {
-      Elem * elem = *it;
-      if (elem->refinement_flag() == Elem::REFINE)
-        n_elems_flagged++;
-    }
+  for (auto & elem : _mesh.elements_range())
+    if (elem->refinement_flag() == Elem::REFINE)
+      n_elems_flagged++;
 
   // Construct a local vector of Elem * which have been
   // previously marked for refinement.  We reserve enough

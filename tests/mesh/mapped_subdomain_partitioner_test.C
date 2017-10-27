@@ -87,14 +87,9 @@ public:
 
     // Assign subdomain ids to elements sequentially.
     {
-      MeshBase::element_iterator       el     = mesh.elements_begin();
-      const MeshBase::element_iterator end_el = mesh.elements_end();
-
       subdomain_id_type current_subdomain_id = 0;
-      for ( ; el != end_el; ++el)
+      for (auto & elem : mesh.elements_range())
         {
-          Elem * elem = *el;
-
           elem->subdomain_id() = current_subdomain_id++;
 
           // Wrap around
@@ -107,20 +102,12 @@ public:
     mesh.partition();
 
     // Assert that the partitioning worked as expected.
-    {
-      MeshBase::element_iterator       el     = mesh.elements_begin();
-      const MeshBase::element_iterator end_el = mesh.elements_end();
-
-      for ( ; el != end_el; ++el)
-        {
-          Elem * elem = *el;
-
-          // Subdomain id n should map to processor id n/2.
-          CPPUNIT_ASSERT_EQUAL(static_cast<int>(elem->subdomain_id()/2),
-                               static_cast<int>(elem->processor_id()));
-        }
-    }
-
+    for (auto & elem : mesh.elements_range())
+      {
+        // Subdomain id n should map to processor id n/2.
+        CPPUNIT_ASSERT_EQUAL(static_cast<int>(elem->subdomain_id()/2),
+                             static_cast<int>(elem->processor_id()));
+      }
   }
 };
 

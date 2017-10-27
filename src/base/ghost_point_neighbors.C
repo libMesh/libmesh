@@ -109,25 +109,20 @@ void GhostPointNeighbors::operator()
     }
 
   // Connect any interior_parents who are really in our mesh
-  {
-    MeshBase::const_element_iterator       elem_it  = _mesh.elements_begin();
-    const MeshBase::const_element_iterator elem_end = _mesh.elements_end();
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        const Elem * elem = *elem_it;
-        std::set<const Elem *>::iterator ip_it =
-          interior_parents.find(elem);
+  for (const auto & elem : _mesh.elements_range())
+    {
+      std::set<const Elem *>::iterator ip_it =
+        interior_parents.find(elem);
 
-        if (ip_it != interior_parents.end())
-          {
-            coupled_elements.insert
-              (std::make_pair(elem, nullcm));
+      if (ip_it != interior_parents.end())
+        {
+          coupled_elements.insert
+            (std::make_pair(elem, nullcm));
 
-            // Shrink the set ASAP to speed up subsequent searches
-            interior_parents.erase(ip_it);
-          }
-      }
-  }
+          // Shrink the set ASAP to speed up subsequent searches
+          interior_parents.erase(ip_it);
+        }
+    }
 
   // Connect any active elements which are connected to our range's
   // elements' nodes

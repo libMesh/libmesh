@@ -259,16 +259,13 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
 {
   nodes_to_elem_map.resize (mesh.n_nodes());
 
-  MeshBase::const_element_iterator       el  = mesh.elements_begin();
-  const MeshBase::const_element_iterator end = mesh.elements_end();
-
-  for (; el != end; ++el)
-    for (auto & node : (*el)->node_ref_range())
+  for (const auto & elem : mesh.elements_range())
+    for (auto & node : elem->node_ref_range())
       {
         libmesh_assert_less (node.id(), nodes_to_elem_map.size());
-        libmesh_assert_less ((*el)->id(), mesh.n_elem());
+        libmesh_assert_less (elem->id(), mesh.n_elem());
 
-        nodes_to_elem_map[node.id()].push_back((*el)->id());
+        nodes_to_elem_map[node.id()].push_back(elem->id());
       }
 }
 
@@ -279,15 +276,12 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase & mesh,
 {
   nodes_to_elem_map.resize (mesh.n_nodes());
 
-  MeshBase::const_element_iterator       el  = mesh.elements_begin();
-  const MeshBase::const_element_iterator end = mesh.elements_end();
-
-  for (; el != end; ++el)
-    for (auto & node : (*el)->node_ref_range())
+  for (const auto & elem : mesh.elements_range())
+    for (auto & node : elem->node_ref_range())
       {
         libmesh_assert_less (node.id(), nodes_to_elem_map.size());
 
-        nodes_to_elem_map[node.id()].push_back(*el);
+        nodes_to_elem_map[node.id()].push_back(elem);
       }
 }
 
@@ -523,18 +517,11 @@ MeshTools::subdomain_bounding_sphere (const MeshBase & mesh,
 void MeshTools::elem_types (const MeshBase & mesh,
                             std::vector<ElemType> & et)
 {
-  MeshBase::const_element_iterator       el  = mesh.elements_begin();
-  const MeshBase::const_element_iterator end = mesh.elements_end();
-
-  // Automatically get the first type
-  et.push_back((*el)->type());  ++el;
-
-  // Loop over the rest of the elements.
-  // If the current element type isn't in the
-  // vector, insert it.
-  for (; el != end; ++el)
-    if (!std::count(et.begin(), et.end(), (*el)->type()))
-      et.push_back((*el)->type());
+  // Loop over the the elements.  If the current element type isn't in
+  // the vector, insert it.
+  for (const auto & elem : mesh.elements_range())
+    if (!std::count(et.begin(), et.end(), elem->type()))
+      et.push_back(elem->type());
 }
 
 
@@ -655,14 +642,9 @@ unsigned int MeshTools::paranoid_n_levels(const MeshBase & mesh)
 {
   libmesh_parallel_only(mesh.comm());
 
-  MeshBase::const_element_iterator el =
-    mesh.elements_begin();
-  const MeshBase::const_element_iterator end_el =
-    mesh.elements_end();
-
   unsigned int nl = 0;
-  for ( ; el != end_el; ++el)
-    nl = std::max((*el)->level() + 1, nl);
+  for (const auto & elem : mesh.elements_range())
+    nl = std::max(elem->level() + 1, nl);
 
   mesh.comm().max(nl);
   return nl;
@@ -673,15 +655,10 @@ unsigned int MeshTools::paranoid_n_levels(const MeshBase & mesh)
 void MeshTools::get_not_subactive_node_ids(const MeshBase & mesh,
                                            std::set<dof_id_type> & not_subactive_node_ids)
 {
-  MeshBase::const_element_iterator el           = mesh.elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.elements_end();
-  for ( ; el != end_el; ++el)
-    {
-      const Elem * elem = (*el);
-      if (!elem->subactive())
-        for (auto & n : elem->node_ref_range())
-          not_subactive_node_ids.insert(n.id());
-    }
+  for (const auto & elem : mesh.elements_range())
+    if (!elem->subactive())
+      for (auto & n : elem->node_ref_range())
+        not_subactive_node_ids.insert(n.id());
 }
 
 
@@ -1011,19 +988,14 @@ void MeshTools::libmesh_assert_equal_n_systems (const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_equal_n_systems()", "MeshTools");
 
-  MeshBase::const_element_iterator el =
-    mesh.elements_begin();
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  if (el == el_end)
-    return;
+  unsigned int n_sys = libMesh::invalid_uint;
 
-  const unsigned int n_sys = (*el)->n_systems();
-
-  for (; el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
-      libmesh_assert_equal_to (elem->n_systems(), n_sys);
+      if (n_sys == libMesh::invalid_uint)
+        n_sys = elem->n_systems();
+      else
+        libmesh_assert_equal_to (elem->n_systems(), n_sys);
     }
 
   MeshBase::const_node_iterator node_it =
@@ -1048,15 +1020,8 @@ void MeshTools::libmesh_assert_old_dof_objects (const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_old_dof_objects()", "MeshTools");
 
-  MeshBase::const_element_iterator el =
-    mesh.elements_begin();
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-
-  for (; el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
-
       if (elem->refinement_flag() == Elem::JUST_REFINED ||
           elem->refinement_flag() == Elem::INACTIVE)
         continue;
@@ -1079,12 +1044,11 @@ void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_node_pointers()", "MeshTools");
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  // Here we specifically do not want "auto &" because we need to
+  // reseat the (temporary) pointer variable in the loop below,
+  // without modifying the original.
+  for (const Elem * elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
       while (elem)
         {
@@ -1136,12 +1100,8 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase & mesh)
 void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase & mesh,
                                                 const Elem * bad_elem)
 {
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
       libmesh_assert_not_equal_to (elem->parent(), bad_elem);
       for (auto n : elem->neighbor_ptr_range())
@@ -1188,12 +1148,8 @@ void MeshTools::libmesh_assert_valid_amr_elem_ids(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_amr_elem_ids()", "MeshTools");
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
 
       const Elem * parent = elem->parent();
@@ -1212,12 +1168,8 @@ void MeshTools::libmesh_assert_valid_amr_interior_parents(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_amr_interior_parents()", "MeshTools");
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
 
       // We can skip to the next element if we're full-dimension
@@ -1254,12 +1206,8 @@ void MeshTools::libmesh_assert_connected_nodes (const MeshBase & mesh)
 
   std::set<const Node *> used_nodes;
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
 
       for (auto & n : elem->node_ref_range())
@@ -1528,13 +1476,8 @@ void libmesh_assert_topology_consistent_procids<Elem>(const MeshBase & mesh)
 
   // Ancestor elements we won't worry about, but subactive and active
   // elements ought to have parents with consistent processor ids
-
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert(elem);
 
       if (!elem->active() && !elem->subactive())
@@ -1740,12 +1683,8 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase & mesh)
   std::vector<unsigned char> my_elem_h_state(pmax_elem_id, 255);
   std::vector<unsigned char> my_elem_p_state(pmax_elem_id, 255);
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
       dof_id_type elemid = elem->id();
 
@@ -1782,12 +1721,8 @@ void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_refinement_tree()", "MeshTools");
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.elements_begin(); el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert(elem);
       if (elem->has_children())
         for (auto & child : elem->child_ref_range())
@@ -1822,11 +1757,8 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
 {
   LOG_SCOPE("libmesh_assert_valid_neighbors()", "MeshTools");
 
-  const MeshBase::const_element_iterator el_end = mesh.elements_end();
-  for (MeshBase::const_element_iterator el = mesh.elements_begin();
-       el != el_end; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
       elem->libmesh_assert_valid_neighbors();
     }

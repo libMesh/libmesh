@@ -298,19 +298,13 @@ void UCDIO::write_nodes(std::ostream & out_stream,
 void UCDIO::write_interior_elems(std::ostream & out_stream,
                                  const MeshBase & mesh)
 {
-  MeshBase::const_element_iterator it  = mesh.elements_begin();
-  const MeshBase::const_element_iterator end = mesh.elements_end();
-
   // 1-based element number for UCD
   unsigned int e=1;
 
   // Write element information
-  for (; it != end; ++it)
+  for (const auto & elem : mesh.elements_range())
     {
       libmesh_assert (out_stream.good());
-
-      // Get pointer to Elem for convenience.
-      const Elem * elem = *it;
 
       // Look up the corresponding UCD element type in the static map.
       const ElemType etype = elem->type();

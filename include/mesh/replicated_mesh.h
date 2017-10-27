@@ -232,6 +232,14 @@ public:
   virtual element_iterator elements_end () libmesh_override;
   virtual const_element_iterator elements_begin() const libmesh_override;
   virtual const_element_iterator elements_end() const libmesh_override;
+  virtual SimpleRange<element_iterator> elements_range() libmesh_override
+  {
+    return {elements_begin(), elements_end()};
+  }
+  virtual SimpleRange<const_element_iterator> elements_range() const libmesh_override
+  {
+    return {elements_begin(), elements_end()};
+  }
 
   virtual element_iterator active_elements_begin () libmesh_override;
   virtual element_iterator active_elements_end () libmesh_override;

@@ -810,13 +810,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
     unique_id_type max_unique_id = mesh.parallel_max_unique_id();
 #endif
 
-    MeshBase::element_iterator       el  = mesh.elements_begin();
-    const MeshBase::element_iterator end = mesh.elements_end();
-
-    for (; el!=end; ++el)
+    for (auto & elem : mesh.elements_range())
       {
-        Elem * elem = *el;
-
         const ElemType etype = elem->type();
 
         // all_tri currently only works on coarse meshes
@@ -1447,7 +1442,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
             for (auto sn : elem->side_index_range())
               {
-                mesh.get_boundary_info().boundary_ids(*el, sn, bc_ids);
+                mesh.get_boundary_info().boundary_ids(elem, sn, bc_ids);
                 for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
                   {
                     const boundary_id_type b_id = *id_it;
@@ -1860,16 +1855,9 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
     libmesh_assert_equal_to (saved_bc_ids.size(), saved_bc_sides.size());
   }
 
-
   // Loop again, delete any remaining elements
-  {
-    MeshBase::element_iterator       it  = mesh.elements_begin();
-    const MeshBase::element_iterator end = mesh.elements_end();
-
-    for (; it != end; ++it)
-      mesh.delete_elem( *it );
-  }
-
+  for (auto & elem : mesh.elements_range())
+    mesh.delete_elem(elem);
 
   // Add the copied (now level-0) elements back to the mesh
   {
@@ -2071,13 +2059,8 @@ void MeshTools::Modification::change_subdomain_id (MeshBase & mesh,
       return;
     }
 
-  MeshBase::element_iterator           el = mesh.elements_begin();
-  const MeshBase::element_iterator end_el = mesh.elements_end();
-
-  for (; el != end_el; ++el)
+  for (auto & elem : mesh.elements_range())
     {
-      Elem * elem = *el;
-
       if (elem->subdomain_id() == old_id)
         elem->subdomain_id() = new_id;
     }

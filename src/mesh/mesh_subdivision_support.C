@@ -101,19 +101,16 @@ void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
   // Container to catch ids handed back from BoundaryInfo
   std::vector<boundary_id_type> ids;
 
-  MeshBase::const_element_iterator       el     = mesh.elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.elements_end();
-  for (; el != end_el; ++el)
+  for (const auto & elem : mesh.elements_range())
     {
-      const Elem * elem = *el;
       libmesh_assert_equal_to(elem->type(), TRI3);
 
       Elem * tri = new Tri3Subdivision;
       tri->set_id(elem->id());
       tri->subdomain_id() = elem->subdomain_id();
-      tri->set_node(0) = (*el)->node_ptr(0);
-      tri->set_node(1) = (*el)->node_ptr(1);
-      tri->set_node(2) = (*el)->node_ptr(2);
+      tri->set_node(0) = elem->node_ptr(0);
+      tri->set_node(1) = elem->node_ptr(1);
+      tri->set_node(2) = elem->node_ptr(2);
 
       if (mesh_has_boundary_data)
         {
@@ -197,25 +194,20 @@ void MeshTools::Subdivision::prepare_subdivision_mesh(MeshBase & mesh, bool ghos
       node->set_valence(valence);
     }
 
-  MeshBase::const_element_iterator       el     = mesh.elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.elements_end();
-  for (; el != end_el; ++el)
+  for (auto & elem : mesh.elements_range())
     {
-      Tri3Subdivision * elem = dynamic_cast<Tri3Subdivision *>(*el);
-      libmesh_assert(elem);
-      if (!elem->is_ghost())
-        elem->prepare_subdivision_properties();
+      Tri3Subdivision * tri3s = dynamic_cast<Tri3Subdivision *>(elem);
+      libmesh_assert(tri3s);
+      if (!tri3s->is_ghost())
+        tri3s->prepare_subdivision_properties();
     }
 }
 
 
 void MeshTools::Subdivision::tag_boundary_ghosts(MeshBase & mesh)
 {
-  MeshBase::element_iterator       el     = mesh.elements_begin();
-  const MeshBase::element_iterator end_el = mesh.elements_end();
-  for (; el != end_el; ++el)
+  for (auto & elem : mesh.elements_range())
     {
-      Elem * elem = *el;
       libmesh_assert_equal_to(elem->type(), TRI3SUBDIVISION);
 
       Tri3Subdivision * sd_elem = static_cast<Tri3Subdivision *>(elem);

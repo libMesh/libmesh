@@ -1317,93 +1317,80 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               new_elements.reserve(6*mesh.n_elem());
 
             // Create tetrahedra or pyramids
-            {
-              MeshBase::element_iterator       el     = mesh.elements_begin();
-              const MeshBase::element_iterator end_el = mesh.elements_end();
+            for (auto & base_hex : mesh.elements_range())
+              {
+                // Get a pointer to the node located at the HEX27 centroid
+                Node * apex_node = base_hex->node_ptr(26);
 
-              for ( ; el != end_el;  ++el)
-                {
-                  // Get a pointer to the HEX27 element.
-                  Elem * base_hex = *el;
+                // Container to catch ids handed back from BoundaryInfo
+                std::vector<boundary_id_type> ids;
 
-                  // Get a pointer to the node located at the HEX27 centroid
-                  Node * apex_node = base_hex->node_ptr(26);
+                for (auto s : base_hex->side_index_range())
+                  {
+                    // Get the boundary ID(s) for this side
+                    boundary_info.boundary_ids(base_hex, s, ids);
 
-                  // Container to catch ids handed back from BoundaryInfo
-                  std::vector<boundary_id_type> ids;
+                    // We're creating this Mesh, so there should be 0 or 1 boundary IDs.
+                    libmesh_assert(ids.size() <= 1);
 
-                  for (auto s : base_hex->side_index_range())
-                    {
-                      // Get the boundary ID(s) for this side
-                      boundary_info.boundary_ids(*el, s, ids);
+                    // A convenient name for the side's ID.
+                    boundary_id_type b_id = ids.empty() ? BoundaryInfo::invalid_id : ids[0];
 
-                      // We're creating this Mesh, so there should be 0 or 1 boundary IDs.
-                      libmesh_assert(ids.size() <= 1);
+                    // Need to build the full-ordered side!
+                    UniquePtr<Elem> side = base_hex->build_side_ptr(s);
 
-                      // A convenient name for the side's ID.
-                      boundary_id_type b_id = ids.empty() ? BoundaryInfo::invalid_id : ids[0];
+                    if ((type == TET4) || (type == TET10))
+                      {
+                        // Build 4 sub-tets per side
+                        for (unsigned int sub_tet=0; sub_tet<4; ++sub_tet)
+                          {
+                            new_elements.push_back( new Tet4 );
+                            Elem * sub_elem = new_elements.back();
+                            sub_elem->set_node(0) = side->node_ptr(sub_tet);
+                            sub_elem->set_node(1) = side->node_ptr(8);                           // centroid of the face
+                            sub_elem->set_node(2) = side->node_ptr(sub_tet==3 ? 0 : sub_tet+1 ); // wrap-around
+                            sub_elem->set_node(3) = apex_node;                                   // apex node always used!
 
-                      // Need to build the full-ordered side!
-                      UniquePtr<Elem> side = base_hex->build_side_ptr(s);
+                            // If the original hex was a boundary hex, add the new sub_tet's side
+                            // 0 with the same b_id.  Note: the tets are all aligned so that their
+                            // side 0 is on the boundary.
+                            if (b_id != BoundaryInfo::invalid_id)
+                              boundary_info.add_side(sub_elem, 0, b_id);
+                          }
+                      } // end if ((type == TET4) || (type == TET10))
 
-                      if ((type == TET4) || (type == TET10))
-                        {
-                          // Build 4 sub-tets per side
-                          for (unsigned int sub_tet=0; sub_tet<4; ++sub_tet)
-                            {
-                              new_elements.push_back( new Tet4 );
-                              Elem * sub_elem = new_elements.back();
-                              sub_elem->set_node(0) = side->node_ptr(sub_tet);
-                              sub_elem->set_node(1) = side->node_ptr(8);                           // centroid of the face
-                              sub_elem->set_node(2) = side->node_ptr(sub_tet==3 ? 0 : sub_tet+1 ); // wrap-around
-                              sub_elem->set_node(3) = apex_node;                                   // apex node always used!
+                    else // type==PYRAMID5 || type==PYRAMID13 || type==PYRAMID14
+                      {
+                        // Build 1 sub-pyramid per side.
+                        new_elements.push_back(new Pyramid5);
+                        Elem * sub_elem = new_elements.back();
 
-                              // If the original hex was a boundary hex, add the new sub_tet's side
-                              // 0 with the same b_id.  Note: the tets are all aligned so that their
-                              // side 0 is on the boundary.
-                              if (b_id != BoundaryInfo::invalid_id)
-                                boundary_info.add_side(sub_elem, 0, b_id);
-                            }
-                        } // end if ((type == TET4) || (type == TET10))
+                        // Set the base.  Note that since the apex is *inside* the base_hex,
+                        // and the pyramid uses a counter-clockwise base numbering, we need to
+                        // reverse the [1] and [3] node indices.
+                        sub_elem->set_node(0) = side->node_ptr(0);
+                        sub_elem->set_node(1) = side->node_ptr(3);
+                        sub_elem->set_node(2) = side->node_ptr(2);
+                        sub_elem->set_node(3) = side->node_ptr(1);
 
-                      else // type==PYRAMID5 || type==PYRAMID13 || type==PYRAMID14
-                        {
-                          // Build 1 sub-pyramid per side.
-                          new_elements.push_back(new Pyramid5);
-                          Elem * sub_elem = new_elements.back();
+                        // Set the apex
+                        sub_elem->set_node(4) = apex_node;
 
-                          // Set the base.  Note that since the apex is *inside* the base_hex,
-                          // and the pyramid uses a counter-clockwise base numbering, we need to
-                          // reverse the [1] and [3] node indices.
-                          sub_elem->set_node(0) = side->node_ptr(0);
-                          sub_elem->set_node(1) = side->node_ptr(3);
-                          sub_elem->set_node(2) = side->node_ptr(2);
-                          sub_elem->set_node(3) = side->node_ptr(1);
-
-                          // Set the apex
-                          sub_elem->set_node(4) = apex_node;
-
-                          // If the original hex was a boundary hex, add the new sub_pyr's side
-                          // 4 (the square base) with the same b_id.
-                          if (b_id != BoundaryInfo::invalid_id)
-                            boundary_info.add_side(sub_elem, 4, b_id);
-                        } // end else type==PYRAMID5 || type==PYRAMID13 || type==PYRAMID14
-                    }
-                }
-            }
+                        // If the original hex was a boundary hex, add the new sub_pyr's side
+                        // 4 (the square base) with the same b_id.
+                        if (b_id != BoundaryInfo::invalid_id)
+                          boundary_info.add_side(sub_elem, 4, b_id);
+                      } // end else type==PYRAMID5 || type==PYRAMID13 || type==PYRAMID14
+                  }
+              }
 
 
             // Delete the original HEX27 elements from the mesh, and the boundary info structure.
-            {
-              MeshBase::element_iterator       el     = mesh.elements_begin();
-              const MeshBase::element_iterator end_el = mesh.elements_end();
-
-              for ( ; el != end_el;  ++el)
-                {
-                  boundary_info.remove(*el); // Safe even if *el has no boundary info.
-                  mesh.delete_elem(*el);
-                }
-            }
+            for (auto & elem : mesh.elements_range())
+              {
+                boundary_info.remove(elem); // Safe even if elem has no boundary info.
+                mesh.delete_elem(elem);
+              }
 
             // Add the new elements
             for (std::size_t i=0; i<new_elements.size(); ++i)
@@ -2092,11 +2079,8 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
   // fix that.
   cross_section.comm().max(next_side_id);
 
-  MeshBase::const_element_iterator       el  = cross_section.elements_begin();
-  const MeshBase::const_element_iterator end = cross_section.elements_end();
-  for (; el!=end; ++el)
+  for (const auto & elem : cross_section.elements_range())
     {
-      const Elem * elem = *el;
       const ElemType etype = elem->type();
 
       // build_extrusion currently only works on coarse meshes
@@ -2405,54 +2389,48 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
   // The mesh is now generated, but we still need to mark the boundaries
   // to be consistent with the other build_square routines.  Note that all
   // hole boundary elements get the same ID, 4.
-  MeshBase::element_iterator       el     = mesh.elements_begin();
-  const MeshBase::element_iterator end_el = mesh.elements_end();
-  for ( ; el != end_el; ++el)
-    {
-      const Elem * elem = *el;
+  for (auto & elem : mesh.elements_range())
+    for (auto s : elem->side_index_range())
+      if (elem->neighbor_ptr(s) == libmesh_nullptr)
+        {
+          UniquePtr<const Elem> side (elem->build_side_ptr(s));
 
-      for (auto s : elem->side_index_range())
-        if (elem->neighbor_ptr(s) == libmesh_nullptr)
-          {
-            UniquePtr<const Elem> side (elem->build_side_ptr(s));
+          // Check the location of the side's midpoint.  Since
+          // the square has straight sides, the midpoint is not
+          // on the corner and thus it is uniquely on one of the
+          // sides.
+          Point side_midpoint= 0.5f*( side->point(0) + side->point(1) );
 
-            // Check the location of the side's midpoint.  Since
-            // the square has straight sides, the midpoint is not
-            // on the corner and thus it is uniquely on one of the
-            // sides.
-            Point side_midpoint= 0.5f*( side->point(0) + side->point(1) );
+          // The boundary ids are set following the same convention as Quad4 sides
+          // bottom = 0
+          // right  = 1
+          // top = 2
+          // left = 3
+          // hole = 4
+          boundary_id_type bc_id=4;
 
-            // The boundary ids are set following the same convention as Quad4 sides
-            // bottom = 0
-            // right  = 1
-            // top = 2
-            // left = 3
-            // hole = 4
-            boundary_id_type bc_id=4;
+          // bottom
+          if      (std::fabs(side_midpoint(1) - ymin) < TOLERANCE)
+            bc_id=0;
 
-            // bottom
-            if      (std::fabs(side_midpoint(1) - ymin) < TOLERANCE)
-              bc_id=0;
+          // right
+          else if (std::fabs(side_midpoint(0) - xmax) < TOLERANCE)
+            bc_id=1;
 
-            // right
-            else if (std::fabs(side_midpoint(0) - xmax) < TOLERANCE)
-              bc_id=1;
+          // top
+          else if (std::fabs(side_midpoint(1) - ymax) < TOLERANCE)
+            bc_id=2;
 
-            // top
-            else if (std::fabs(side_midpoint(1) - ymax) < TOLERANCE)
-              bc_id=2;
+          // left
+          else if (std::fabs(side_midpoint(0) - xmin) < TOLERANCE)
+            bc_id=3;
 
-            // left
-            else if (std::fabs(side_midpoint(0) - xmin) < TOLERANCE)
-              bc_id=3;
+          // If the point is not on any of the external boundaries, it
+          // is on one of the holes....
 
-            // If the point is not on any of the external boundaries, it
-            // is on one of the holes....
-
-            // Finally, add this element's information to the boundary info object.
-            boundary_info.add_side(elem->id(), s, bc_id);
-          }
-    }
+          // Finally, add this element's information to the boundary info object.
+          boundary_info.add_side(elem->id(), s, bc_id);
+        }
 
 } // end build_delaunay_square
 

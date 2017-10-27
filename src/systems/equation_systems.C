@@ -106,11 +106,8 @@ void EquationSystems::init ()
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->set_n_systems(n_sys);
 
-    MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
-    for ( ; elem_it != elem_end; ++elem_it)
-      (*elem_it)->set_n_systems(n_sys);
+    for (auto & elem : _mesh.elements_range())
+      elem->set_n_systems(n_sys);
   }
 
   for (unsigned int i=0; i != this->n_systems(); ++i)
@@ -147,11 +144,8 @@ void EquationSystems::reinit ()
       for ( ; node_it != node_end; ++node_it)
         (*node_it)->set_n_systems(n_sys);
 
-      MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-      const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
-      for ( ; elem_it != elem_end; ++elem_it)
-        (*elem_it)->set_n_systems(n_sys);
+      for (auto & elem : _mesh.elements_range())
+        elem->set_n_systems(n_sys);
 
       // And any new systems will need initialization
       for (unsigned int i=0; i != n_sys; ++i)
@@ -179,14 +173,8 @@ void EquationSystems::reinit ()
       }
 
     // All the elements
-    MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
-    for ( ; elem_it != elem_end; ++elem_it)
-      {
-        Elem * elem = *elem_it;
-        elem->set_n_systems(this->n_systems());
-      }
+    for (auto & elem : _mesh.elements_range())
+      elem->set_n_systems(this->n_systems());
   }
 
   // Localize each system's vectors
@@ -310,11 +298,8 @@ void EquationSystems::allgather ()
     for ( ; node_it != node_end; ++node_it)
       (*node_it)->set_n_systems(n_sys);
 
-    MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
-    for ( ; elem_it != elem_end; ++elem_it)
-      (*elem_it)->set_n_systems(n_sys);
+    for (auto & elem : _mesh.elements_range())
+      elem->set_n_systems(n_sys);
   }
 
   // And distribute each system's dofs
@@ -583,84 +568,8 @@ void EquationSystems::build_solution_vector (std::vector<Number> &,
                                              const std::string &,
                                              const std::string &) const
 {
-  //TODO:[BSK] re-implement this from the method below
+  // TODO:[BSK] re-implement this from the method below
   libmesh_not_implemented();
-
-  //   // Get a reference to the named system
-  //   const System & system = this->get_system(system_name);
-
-  //   // Get the number associated with the variable_name we are passed
-  //   const unsigned short int variable_num = system.variable_number(variable_name);
-
-  //   // Get the dimension of the current mesh
-  //   const unsigned int dim = _mesh.mesh_dimension();
-
-  //   // If we're on processor 0, allocate enough memory to hold the solution.
-  //   // Since we're only looking at one variable, there will be one solution value
-  //   // for each node in the mesh.
-  //   if (_mesh.processor_id() == 0)
-  //     soln.resize(_mesh.n_nodes());
-
-  //   // Vector to hold the global solution from all processors
-  //   std::vector<Number> sys_soln;
-
-  //   // Update the global solution from all processors
-  //   system.update_global_solution (sys_soln, 0);
-
-  //   // Temporary vector to store the solution on an individual element.
-  //   std::vector<Number>       elem_soln;
-
-  //   // The FE solution interpolated to the nodes
-  //   std::vector<Number>       nodal_soln;
-
-  //   // The DOF indices for the element
-  //   std::vector<dof_id_type> dof_indices;
-
-  //   // Determine the finite/infinite element type used in this system
-  //   const FEType & fe_type    = system.variable_type(variable_num);
-
-  //   // Define iterators to iterate over all the elements of the mesh
-  //   const_active_elem_iterator       it (_mesh.elements_begin());
-  //   const const_active_elem_iterator end(_mesh.elements_end());
-
-  //   // Loop over elements
-  //   for ( ; it != end; ++it)
-  //     {
-  //       // Convenient shortcut to the element pointer
-  //       const Elem * elem = *it;
-
-  //       // Fill the dof_indices vector for this variable
-  //       system.get_dof_map().dof_indices(elem,
-  //        dof_indices,
-  //        variable_num);
-
-  //       // Resize the element solution vector to fit the
-  //       // dof_indices for this element.
-  //       elem_soln.resize(dof_indices.size());
-
-  //       // Transfer the system solution to the element
-  //       // solution by mapping it through the dof_indices vector.
-  //       for (std::size_t i=0; i<dof_indices.size(); i++)
-  // elem_soln[i] = sys_soln[dof_indices[i]];
-
-  //       // Using the FE interface, compute the nodal_soln
-  //       // for the current element type given the elem_soln
-  //       FEInterface::nodal_soln (dim,
-  //        fe_type,
-  //        elem,
-  //        elem_soln,
-  //        nodal_soln);
-
-  //       // Sanity check -- make sure that there are the same number
-  //       // of entries in the nodal_soln as there are nodes in the
-  //       // element!
-  //       libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
-
-  //       // Copy the nodal solution over into the correct place in
-  //       // the global soln vector which will be returned to the user.
-  //       for (unsigned int n=0; n<elem->n_nodes(); n++)
-  // soln[elem->node_id(n)] = nodal_soln[n];
-  //     }
 }
 
 
@@ -1345,11 +1254,8 @@ void EquationSystems::_add_system_to_nodes_and_elems()
     (*node_it)->add_system();
 
   // All the elements
-  MeshBase::element_iterator       elem_it  = _mesh.elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
-    (*elem_it)->add_system();
+  for (auto & elem : _mesh.elements_range())
+    elem->add_system();
 }
 
 } // namespace libMesh
