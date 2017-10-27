@@ -49,15 +49,12 @@ Tree<N>::Tree (const MeshBase & m,
     {
       // Add all the nodes to the root node.  It will
       // automagically build the tree for us.
-      MeshBase::const_node_iterator       it  = mesh.nodes_begin();
-      const MeshBase::const_node_iterator end = mesh.nodes_end();
-
-      for (; it != end; ++it)
+      for (const auto & node : mesh.nodes_range())
         {
 #ifndef NDEBUG
           bool node_was_inserted =
 #endif
-            root.insert (*it);
+            root.insert (node);
           libmesh_assert(node_was_inserted);
         }
 
