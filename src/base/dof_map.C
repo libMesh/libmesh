@@ -987,11 +987,9 @@ void DofMap::distribute_dofs (MeshBase & mesh)
     MeshTools::libmesh_assert_valid_dof_ids(mesh, sys_num);
 
     // DoF processor ids should match DofObject processor ids
-    MeshBase::const_node_iterator       node_it  = mesh.nodes_begin();
-    const MeshBase::const_node_iterator node_end = mesh.nodes_end();
-    for ( ; node_it != node_end; ++node_it)
+    for (auto & node : mesh.nodes_range())
       {
-        DofObject const * const dofobj = *node_it;
+        DofObject const * const dofobj = node;
         const processor_id_type obj_proc_id = dofobj->processor_id();
 
         for (unsigned int v=0; v != dofobj->n_vars(sys_num); ++v)
