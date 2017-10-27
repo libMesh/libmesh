@@ -160,13 +160,8 @@ void MeshTools::Modification::redistribute (MeshBase & mesh,
   // FIXME - we should thread this later.
   UniquePtr<FunctionBase<Real>> myfunc = mapfunc.clone();
 
-  MeshBase::node_iterator       it  = mesh.nodes_begin();
-  const MeshBase::node_iterator end = mesh.nodes_end();
-
-  for (; it != end; ++it)
+  for (auto & node : mesh.nodes_range())
     {
-      Node * node = *it;
-
       (*myfunc)(*node, output_vec);
 
       (*node)(0) = output_vec(0);
