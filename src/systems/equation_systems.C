@@ -1228,11 +1228,8 @@ std::size_t EquationSystems::n_active_dofs () const
 void EquationSystems::_add_system_to_nodes_and_elems()
 {
   // All the nodes
-  MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-  const MeshBase::node_iterator node_end = _mesh.nodes_end();
-
-  for ( ; node_it != node_end; ++node_it)
-    (*node_it)->add_system();
+  for (auto & node : _mesh.nodes_range())
+    node->add_system();
 
   // All the elements
   for (auto & elem : _mesh.elements_range())
