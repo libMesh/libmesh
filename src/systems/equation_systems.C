@@ -133,11 +133,8 @@ void EquationSystems::reinit ()
   if (_added_new_systems)
     {
       // Our DofObjects will need space for the additional systems
-      MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-      const MeshBase::node_iterator node_end = _mesh.nodes_end();
-
-      for ( ; node_it != node_end; ++node_it)
-        (*node_it)->set_n_systems(n_sys);
+      for (auto & node : _mesh.nodes_range())
+        node->set_n_systems(n_sys);
 
       for (auto & elem : _mesh.elements_range())
         elem->set_n_systems(n_sys);
@@ -158,14 +155,8 @@ void EquationSystems::reinit ()
   // there are.
   {
     // All the nodes
-    MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-    const MeshBase::node_iterator node_end = _mesh.nodes_end();
-
-    for ( ; node_it != node_end; ++node_it)
-      {
-        Node * node = *node_it;
-        node->set_n_systems(this->n_systems());
-      }
+    for (auto & node : _mesh.nodes_range())
+      node->set_n_systems(this->n_systems());
 
     // All the elements
     for (auto & elem : _mesh.elements_range())
