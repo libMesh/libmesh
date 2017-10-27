@@ -299,7 +299,7 @@ void UCDIO::write_interior_elems(std::ostream & out_stream,
   unsigned int e=1;
 
   // Write element information
-  for (const auto & elem : mesh.elements_range())
+  for (const auto & elem : mesh.element_ptr_range())
     {
       libmesh_assert (out_stream.good());
 

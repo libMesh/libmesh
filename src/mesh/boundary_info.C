@@ -291,7 +291,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
   // This side's Node pointers still point to the nodes of the original mesh.
   // We need to re-point them to the boundary mesh's nodes!  Since we copied *ALL* of
   // the original mesh's nodes over, we should be guaranteed to have the same ordering.
-  for (auto & new_elem : boundary_mesh.elements_range())
+  for (auto & new_elem : boundary_mesh.element_ptr_range())
     {
       for (auto nn : new_elem->node_index_range())
         {
@@ -421,7 +421,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
     side_container;
   side_container sides_to_add;
 
-  for (const auto & elem : _mesh.elements_range())
+  for (const auto & elem : _mesh.element_ptr_range())
     {
       // If the subdomains_relative_to container has the
       // invalid_subdomain_id, we fall back on the "old" behavior of

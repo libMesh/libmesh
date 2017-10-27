@@ -140,7 +140,7 @@ int main(int argc, char ** argv)
   const std::vector<Point> & face_points = fe->get_xyz();
   const std::vector<Point> & face_normals = fe->get_normals();
 
-  for (auto & elem : mesh.elements_range())
+  for (auto & elem : mesh.element_ptr_range())
     {
       unsigned int n_sides = elem->n_sides();
 

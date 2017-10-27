@@ -219,7 +219,7 @@ void ErrorVector::plot_error(const std::string & filename,
 #ifdef LIBMESH_ENABLE_AMR
   // We don't want p elevation when plotting a single constant value
   // per element
-  for (auto & elem : mesh.elements_range())
+  for (auto & elem : mesh.element_ptr_range())
     {
       elem->set_p_refinement_flag(Elem::DO_NOTHING);
       elem->set_p_level(0);

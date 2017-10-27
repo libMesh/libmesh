@@ -793,7 +793,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
     unique_id_type max_unique_id = mesh.parallel_max_unique_id();
 #endif
 
-    for (auto & elem : mesh.elements_range())
+    for (auto & elem : mesh.element_ptr_range())
       {
         const ElemType etype = elem->type();
 
@@ -1839,7 +1839,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
   }
 
   // Loop again, delete any remaining elements
-  for (auto & elem : mesh.elements_range())
+  for (auto & elem : mesh.element_ptr_range())
     mesh.delete_elem(elem);
 
   // Add the copied (now level-0) elements back to the mesh
@@ -2042,7 +2042,7 @@ void MeshTools::Modification::change_subdomain_id (MeshBase & mesh,
       return;
     }
 
-  for (auto & elem : mesh.elements_range())
+  for (auto & elem : mesh.element_ptr_range())
     {
       if (elem->subdomain_id() == old_id)
         elem->subdomain_id() = new_id;

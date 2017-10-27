@@ -102,7 +102,7 @@ void EquationSystems::init ()
   for (auto & node : _mesh.nodes_range())
     node->set_n_systems(n_sys);
 
-  for (auto & elem : _mesh.elements_range())
+  for (auto & elem : _mesh.element_ptr_range())
     elem->set_n_systems(n_sys);
 
   for (unsigned int i=0; i != this->n_systems(); ++i)
@@ -136,7 +136,7 @@ void EquationSystems::reinit ()
       for (auto & node : _mesh.nodes_range())
         node->set_n_systems(n_sys);
 
-      for (auto & elem : _mesh.elements_range())
+      for (auto & elem : _mesh.element_ptr_range())
         elem->set_n_systems(n_sys);
 
       // And any new systems will need initialization
@@ -159,7 +159,7 @@ void EquationSystems::reinit ()
       node->set_n_systems(this->n_systems());
 
     // All the elements
-    for (auto & elem : _mesh.elements_range())
+    for (auto & elem : _mesh.element_ptr_range())
       elem->set_n_systems(this->n_systems());
   }
 
@@ -280,7 +280,7 @@ void EquationSystems::allgather ()
   for (auto & node : _mesh.nodes_range())
     node->set_n_systems(n_sys);
 
-  for (auto & elem : _mesh.elements_range())
+  for (auto & elem : _mesh.element_ptr_range())
     elem->set_n_systems(n_sys);
 
   // And distribute each system's dofs
@@ -1232,7 +1232,7 @@ void EquationSystems::_add_system_to_nodes_and_elems()
     node->add_system();
 
   // All the elements
-  for (auto & elem : _mesh.elements_range())
+  for (auto & elem : _mesh.element_ptr_range())
     elem->add_system();
 }
 

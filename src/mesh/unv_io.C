@@ -241,7 +241,7 @@ void UNVIO::read_implementation (std::istream & in_stream)
 
       unsigned char max_dim = this->max_elem_dimension_seen();
 
-      for (const auto & elem : mesh.elements_range())
+      for (const auto & elem : mesh.element_ptr_range())
         if (elem->dim() < max_dim)
           mesh.delete_elem(elem);
     }
@@ -978,7 +978,7 @@ void UNVIO::elements_out(std::ostream & out_file)
   // A reference to the parent class's mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  for (const auto & elem : mesh.elements_range())
+  for (const auto & elem : mesh.element_ptr_range())
     {
       switch (elem->type())
         {

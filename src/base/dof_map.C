@@ -497,7 +497,7 @@ void DofMap::reinit(MeshBase & mesh)
       libmesh_assert (!node->old_dof_object);
     }
 
-  for (auto & elem : mesh.elements_range())
+  for (auto & elem : mesh.element_ptr_range())
     {
       elem->clear_old_dof_object();
       libmesh_assert (!elem->old_dof_object);
@@ -508,7 +508,7 @@ void DofMap::reinit(MeshBase & mesh)
   // Set the old_dof_objects for the elements that
   // weren't just created, if these old dof objects
   // had variables
-  for (auto & elem : mesh.elements_range())
+  for (auto & elem : mesh.element_ptr_range())
     {
       // Skip the elements that were just refined
       if (elem->refinement_flag() == Elem::JUST_REFINED)
@@ -542,7 +542,7 @@ void DofMap::reinit(MeshBase & mesh)
     node->set_n_vars_per_group(sys_num, n_vars_per_group);
 
   // All the elements
-  for (auto & elem : mesh.elements_range())
+  for (auto & elem : mesh.element_ptr_range())
     elem->set_n_vars_per_group(sys_num, n_vars_per_group);
 
   // Zero _n_SCALAR_dofs, it will be updated below.
@@ -1001,7 +1001,7 @@ void DofMap::distribute_dofs (MeshBase & mesh)
             }
       }
 
-    for (auto & elem : mesh.elements_range())
+    for (auto & elem : mesh.element_ptr_range())
       {
         DofObject const * const dofobj = elem;
         const processor_id_type obj_proc_id = dofobj->processor_id();

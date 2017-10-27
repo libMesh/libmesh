@@ -132,7 +132,7 @@ void TetGenMeshInterface::pointset_convexhull ()
   // Delete *all* old elements.  Yes, we legally delete elements while
   // iterating over them because no entries from the underlying container
   // are actually erased.
-  for (auto & elem : this->_mesh.elements_range())
+  for (auto & elem : this->_mesh.element_ptr_range())
     this->_mesh.delete_elem (elem);
 
   // We just removed any boundary info associated with element faces
@@ -201,7 +201,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
   // from the convex hull.
   {
     int insertnum = 0;
-    for (auto & elem : this->_mesh.elements_range())
+    for (auto & elem : this->_mesh.element_ptr_range())
       {
         tetgen_wrapper.allocate_facet_polygonlist(insertnum, 1);
         tetgen_wrapper.allocate_polygon_vertexlist(insertnum, 0, 3);
@@ -395,7 +395,7 @@ unsigned TetGenMeshInterface::check_hull_integrity()
   if (_mesh.n_elem() == 0)
     return 3;
 
-  for (auto & elem : this->_mesh.elements_range())
+  for (auto & elem : this->_mesh.element_ptr_range())
     {
       // Check for proper element type
       if (elem->type() != TRI3)
@@ -443,7 +443,7 @@ void TetGenMeshInterface::process_hull_integrity_result(unsigned result)
 
 void TetGenMeshInterface::delete_2D_hull_elements()
 {
-  for (auto & elem : this->_mesh.elements_range())
+  for (auto & elem : this->_mesh.element_ptr_range())
     {
       // Check for proper element type. Yes, we legally delete elements while
       // iterating over them because no entries from the underlying container

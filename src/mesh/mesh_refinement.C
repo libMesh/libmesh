@@ -527,7 +527,7 @@ bool MeshRefinement::refine_and_coarsen_elements ()
   // a no-op.
   bool elements_flagged = false;
 
-  for (auto & elem : _mesh.elements_range())
+  for (auto & elem : _mesh.element_ptr_range())
     {
       // This might be left over from the last step
       const Elem::RefinementState flag = elem->refinement_flag();
@@ -656,7 +656,7 @@ bool MeshRefinement::coarsen_elements ()
 
   // Possibly clean up the refinement flags from
   // a previous step
-  for (auto & elem : _mesh.elements_range())
+  for (auto & elem : _mesh.element_ptr_range())
     {
       // Set refinement flag to INACTIVE if the
       // element isn't active
@@ -730,7 +730,7 @@ bool MeshRefinement::refine_elements ()
 
   // Possibly clean up the refinement flags from
   // a previous step
-  for (auto & elem : _mesh.elements_range())
+  for (auto & elem : _mesh.element_ptr_range())
     {
       // Set refinement flag to INACTIVE if the
       // element isn't active
@@ -1425,7 +1425,7 @@ bool MeshRefinement::_coarsen_elements ()
   // do the coarsening; otherwise it is possible to coarsen away a
   // one-element-thick layer partition and leave the partitions on
   // either side unable to figure out how to talk to each other.
-  for (auto & elem : _mesh.elements_range())
+  for (auto & elem : _mesh.element_ptr_range())
     if (elem->refinement_flag() == Elem::COARSEN)
       {
         mesh_changed = true;
@@ -1439,7 +1439,7 @@ bool MeshRefinement::_coarsen_elements ()
   if (mesh_changed)
     MeshCommunication().send_coarse_ghosts(_mesh);
 
-  for (auto & elem : _mesh.elements_range())
+  for (auto & elem : _mesh.element_ptr_range())
     {
       // active elements flagged for coarsening will
       // no longer be deleted until MeshRefinement::contract()
@@ -1543,7 +1543,7 @@ bool MeshRefinement::_refine_elements ()
   // flagged for h refinement.
   dof_id_type n_elems_flagged = 0;
 
-  for (auto & elem : _mesh.elements_range())
+  for (auto & elem : _mesh.element_ptr_range())
     if (elem->refinement_flag() == Elem::REFINE)
       n_elems_flagged++;
 
