@@ -90,13 +90,8 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
     //Preallocate Memory if necessary
     this->reserve_nodes(other_mesh.n_nodes());
 
-    const_node_iterator it = other_mesh.nodes_begin();
-    const_node_iterator end = other_mesh.nodes_end();
-
-    for (; it != end; ++it)
+    for (const auto & oldn : other_mesh.nodes_range())
       {
-        const Node * oldn = *it;
-
         // Add new nodes in old node Point locations
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
         Node * newn =
