@@ -264,13 +264,8 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
   this->_find_id_maps(requested_boundary_ids, 0, &node_id_map, 0, &side_id_map, subdomains_relative_to);
 
   // Let's add all the boundary nodes we found to the boundary mesh
-
-  MeshBase::const_node_iterator n_end  = _mesh.nodes_end();
-
-  for (MeshBase::const_node_iterator n_it = _mesh.nodes_begin();
-       n_it != n_end; ++n_it)
+  for (const auto & node : _mesh.nodes_range())
     {
-      const Node * node = *n_it;
       dof_id_type node_id = node->id();
       if (node_id_map.count(node_id))
         {
