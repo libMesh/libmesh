@@ -64,16 +64,11 @@ protected:
 
     // Loop over the nodes and call find_nodal_neighbors()
     {
-      MeshBase::const_node_iterator       nd     = mesh.nodes_begin();
-      const MeshBase::const_node_iterator end_nd = mesh.nodes_end();
-
       std::vector<const Node*> neighbor_nodes;
 
       unsigned ctr = 0;
-      for (; nd != end_nd; ++nd, ++ctr)
+      for (const auto & node : mesh.nodes_range())
         {
-          Node* node = *nd;
-
           MeshTools::find_nodal_neighbors(mesh, *node, nodes_to_elem_map, neighbor_nodes);
 
           // The entries in neighbor_nodes are just sorted according
@@ -89,6 +84,8 @@ protected:
             {
               CPPUNIT_ASSERT_EQUAL( validation_data[2*ctr + j], neighbor_node_ids[j] );
             }
+
+          ++ctr;
         }
     }
   }
