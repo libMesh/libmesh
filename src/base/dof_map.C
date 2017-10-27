@@ -798,11 +798,8 @@ void DofMap::invalidate_dofs(MeshBase & mesh) const
   const unsigned int sys_num = this->sys_number();
 
   // All the nodes
-  MeshBase::node_iterator       node_it  = mesh.nodes_begin();
-  const MeshBase::node_iterator node_end = mesh.nodes_end();
-
-  for ( ; node_it != node_end; ++node_it)
-    (*node_it)->invalidate_dofs(sys_num);
+  for (auto & node : mesh.nodes_range())
+    node->invalidate_dofs(sys_num);
 
   // All the elements
   MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
