@@ -193,10 +193,8 @@ template <>
 void LocationMap<Node>::fill(MeshBase & mesh)
 {
   // Populate the nodes map
-  MeshBase::node_iterator  it = mesh.nodes_begin(),
-    end = mesh.nodes_end();
-  for (; it != end; ++it)
-    this->insert(**it);
+  for (auto & node : mesh.nodes_range())
+    this->insert(*node);
 }
 
 
