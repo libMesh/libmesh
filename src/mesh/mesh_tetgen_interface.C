@@ -357,7 +357,7 @@ void TetGenMeshInterface::fill_pointlist(TetGenWrapper & wrapper)
 
   {
     unsigned index = 0;
-    for (auto & node : this->_mesh.nodes_range())
+    for (auto & node : this->_mesh.node_ptr_range())
       {
         _sequential_to_libmesh_node_map[index] = node->id();
         wrapper.set_node(index++, (*node)(0), (*node)(1), (*node)(2));

@@ -61,7 +61,7 @@ void LocationMap<T>::init(MeshBase & mesh)
   _upper_bound.clear();
   _upper_bound.resize(LIBMESH_DIM, -std::numeric_limits<Real>::max());
 
-  for (auto & node : mesh.nodes_range())
+  for (auto & node : mesh.node_ptr_range())
     for (unsigned int i=0; i != LIBMESH_DIM; ++i)
       {
         // Expand the bounding box if necessary
@@ -193,7 +193,7 @@ template <>
 void LocationMap<Node>::fill(MeshBase & mesh)
 {
   // Populate the nodes map
-  for (auto & node : mesh.nodes_range())
+  for (auto & node : mesh.node_ptr_range())
     this->insert(*node);
 }
 

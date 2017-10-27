@@ -281,7 +281,7 @@ void UCDIO::write_nodes(std::ostream & out_stream,
   unsigned int n=1;
 
   // Write the node coordinates
-  for (auto & node : mesh.nodes_range())
+  for (auto & node : mesh.node_ptr_range())
     {
       libmesh_assert (out_stream.good());
 

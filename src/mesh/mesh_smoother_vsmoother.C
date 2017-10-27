@@ -228,7 +228,7 @@ int VariationalMeshSmoother::writegr(const Array2D<double> & R)
     libmesh_assert_equal_to(_dist_norm, 0.);
     _dist_norm = 0;
     int i = 0;
-    for (auto & node : _mesh.nodes_range())
+    for (auto & node : _mesh.node_ptr_range())
       {
         double total_dist = 0.;
 
@@ -286,7 +286,7 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
     MeshTools::build_nodes_to_elem_map(_mesh, nodes_to_elem_map);
 
     int i = 0;
-    for (auto & node : _mesh.nodes_range())
+    for (auto & node : _mesh.node_ptr_range())
       {
         // Get a reference to the node
         Node & node_ref = *node;

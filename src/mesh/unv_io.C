@@ -901,7 +901,7 @@ void UNVIO::nodes_out (std::ostream & out_file)
   // Use scientific notation with capital E and 16 digits for printing out the coordinates
   out_file << std::scientific << std::setprecision(16) << std::uppercase;
 
-  for (const auto & current_node : mesh.nodes_range())
+  for (const auto & current_node : mesh.node_ptr_range())
     {
       dof_id_type node_id = current_node->id();
 

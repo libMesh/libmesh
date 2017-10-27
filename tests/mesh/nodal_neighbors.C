@@ -67,7 +67,7 @@ protected:
       std::vector<const Node*> neighbor_nodes;
 
       unsigned ctr = 0;
-      for (const auto & node : mesh.nodes_range())
+      for (const auto & node : mesh.node_ptr_range())
         {
           MeshTools::find_nodal_neighbors(mesh, *node, nodes_to_elem_map, neighbor_nodes);
 

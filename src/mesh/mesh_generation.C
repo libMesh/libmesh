@@ -2038,7 +2038,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
   // Container to catch the boundary IDs handed back by the BoundaryInfo object
   std::vector<boundary_id_type> ids_to_copy;
 
-  for (const auto & node : cross_section.nodes_range())
+  for (const auto & node : cross_section.node_ptr_range())
     {
       for (unsigned int k=0; k != order*nz+1; ++k)
         {

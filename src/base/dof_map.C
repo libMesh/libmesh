@@ -491,7 +491,7 @@ void DofMap::reinit(MeshBase & mesh)
   //------------------------------------------------------------
   // Clear the old_dof_objects for all the nodes
   // and elements so that we can overwrite them
-  for (auto & node : mesh.nodes_range())
+  for (auto & node : mesh.node_ptr_range())
     {
       node->clear_old_dof_object();
       libmesh_assert (!node->old_dof_object);
@@ -538,7 +538,7 @@ void DofMap::reinit(MeshBase & mesh)
   // handle new \p DofObjects that may have just been created
 
   // All the nodes
-  for (auto & node : mesh.nodes_range())
+  for (auto & node : mesh.node_ptr_range())
     node->set_n_vars_per_group(sys_num, n_vars_per_group);
 
   // All the elements
@@ -798,7 +798,7 @@ void DofMap::invalidate_dofs(MeshBase & mesh) const
   const unsigned int sys_num = this->sys_number();
 
   // All the nodes
-  for (auto & node : mesh.nodes_range())
+  for (auto & node : mesh.node_ptr_range())
     node->invalidate_dofs(sys_num);
 
   // All the elements
@@ -987,7 +987,7 @@ void DofMap::distribute_dofs (MeshBase & mesh)
     MeshTools::libmesh_assert_valid_dof_ids(mesh, sys_num);
 
     // DoF processor ids should match DofObject processor ids
-    for (auto & node : mesh.nodes_range())
+    for (auto & node : mesh.node_ptr_range())
       {
         DofObject const * const dofobj = node;
         const processor_id_type obj_proc_id = dofobj->processor_id();

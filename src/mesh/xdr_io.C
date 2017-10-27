@@ -1788,7 +1788,7 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
   // need to be corrected.
   std::vector<dof_id_type> needed_nodes; needed_nodes.reserve (mesh.n_nodes());
   {
-    for (auto & node : mesh.nodes_range())
+    for (auto & node : mesh.node_ptr_range())
       needed_nodes.push_back(node->id());
 
     std::sort (needed_nodes.begin(), needed_nodes.end());
@@ -2106,7 +2106,7 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
       // Look for BCs in this block for all nodes we have
       // (not just local ones).  Do this by finding all the entries
       // in node_bc_data whose dof_id(node_id)  match the ID of the current node.
-      for (auto & node : mesh.nodes_range())
+      for (auto & node : mesh.node_ptr_range())
         {
           std::pair<std::vector<DofBCData>::iterator,
                     std::vector<DofBCData>::iterator> pos =

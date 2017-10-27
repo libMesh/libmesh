@@ -99,7 +99,7 @@ void EquationSystems::init ()
 
   // Tell all the \p DofObject entities how many systems
   // there are.
-  for (auto & node : _mesh.nodes_range())
+  for (auto & node : _mesh.node_ptr_range())
     node->set_n_systems(n_sys);
 
   for (auto & elem : _mesh.element_ptr_range())
@@ -133,7 +133,7 @@ void EquationSystems::reinit ()
   if (_added_new_systems)
     {
       // Our DofObjects will need space for the additional systems
-      for (auto & node : _mesh.nodes_range())
+      for (auto & node : _mesh.node_ptr_range())
         node->set_n_systems(n_sys);
 
       for (auto & elem : _mesh.element_ptr_range())
@@ -155,7 +155,7 @@ void EquationSystems::reinit ()
   // there are.
   {
     // All the nodes
-    for (auto & node : _mesh.nodes_range())
+    for (auto & node : _mesh.node_ptr_range())
       node->set_n_systems(this->n_systems());
 
     // All the elements
@@ -277,7 +277,7 @@ void EquationSystems::allgather ()
 
   // Tell all the \p DofObject entities how many systems
   // there are.
-  for (auto & node : _mesh.nodes_range())
+  for (auto & node : _mesh.node_ptr_range())
     node->set_n_systems(n_sys);
 
   for (auto & elem : _mesh.element_ptr_range())
@@ -1228,7 +1228,7 @@ std::size_t EquationSystems::n_active_dofs () const
 void EquationSystems::_add_system_to_nodes_and_elems()
 {
   // All the nodes
-  for (auto & node : _mesh.nodes_range())
+  for (auto & node : _mesh.node_ptr_range())
     node->add_system();
 
   // All the elements

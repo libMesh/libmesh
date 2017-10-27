@@ -49,7 +49,7 @@ Tree<N>::Tree (const MeshBase & m,
     {
       // Add all the nodes to the root node.  It will
       // automagically build the tree for us.
-      for (const auto & node : mesh.nodes_range())
+      for (const auto & node : mesh.node_ptr_range())
         {
 #ifndef NDEBUG
           bool node_was_inserted =

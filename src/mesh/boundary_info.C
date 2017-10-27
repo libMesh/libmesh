@@ -264,7 +264,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
   this->_find_id_maps(requested_boundary_ids, 0, &node_id_map, 0, &side_id_map, subdomains_relative_to);
 
   // Let's add all the boundary nodes we found to the boundary mesh
-  for (const auto & node : _mesh.nodes_range())
+  for (const auto & node : _mesh.node_ptr_range())
     {
       dof_id_type node_id = node->id();
       if (node_id_map.count(node_id))
@@ -1973,7 +1973,7 @@ BoundaryInfo::build_node_list_from_side_list()
   std::vector<std::vector<dof_id_type>> node_ids_requested(n_proc);
 
   // Determine what nodes we need to request
-  for (const auto & node : _mesh.nodes_range())
+  for (const auto & node : _mesh.node_ptr_range())
     {
       const processor_id_type pid = node->processor_id();
       if (pid != my_proc_id)

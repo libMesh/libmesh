@@ -75,7 +75,7 @@ void TriangleInterface::triangulate()
       // Make a copy of the original points from the Mesh
       std::vector<Point> original_points;
       original_points.reserve (_mesh.n_nodes());
-      for (auto & node : _mesh.nodes_range())
+      for (auto & node : _mesh.node_ptr_range())
         original_points.push_back(*node);
 
       // Clear out the mesh
@@ -180,7 +180,7 @@ void TriangleInterface::triangulate()
   // Copy all the non-hole points and segments into the triangle struct.
   {
     dof_id_type ctr=0;
-    for (auto & node : _mesh.nodes_range())
+    for (auto & node : _mesh.node_ptr_range())
       {
         dof_id_type index = 2*hole_offset + ctr;
 

@@ -998,7 +998,7 @@ void MeshTools::libmesh_assert_equal_n_systems (const MeshBase & mesh)
         libmesh_assert_equal_to (elem->n_systems(), n_sys);
     }
 
-  for (const auto & node : mesh.nodes_range())
+  for (const auto & node : mesh.node_ptr_range())
     {
       if (n_sys == libMesh::invalid_uint)
         n_sys = node->n_systems();
@@ -1208,7 +1208,7 @@ void MeshTools::libmesh_assert_connected_nodes (const MeshBase & mesh)
         used_nodes.insert(&n);
     }
 
-  for (const auto & node : mesh.nodes_range())
+  for (const auto & node : mesh.node_ptr_range())
     {
       libmesh_assert(node);
       libmesh_assert(used_nodes.count(node));
@@ -1907,7 +1907,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   std::vector<std::vector<std::pair<dof_id_type, processor_id_type>>>
     ids_to_push(mesh.n_processors());
 
-  for (const auto & node : mesh.nodes_range())
+  for (const auto & node : mesh.node_ptr_range())
     {
       const dof_id_type id = node->id();
       const proc_id_map_type::iterator it = new_proc_ids.find(id);

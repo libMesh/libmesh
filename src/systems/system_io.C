@@ -358,7 +358,7 @@ void System::read_legacy_data (Xdr & io,
         const unsigned int var = _written_var_indices[data_var];
 
         // First reorder the nodal DOF values
-        for (auto & node : this->get_mesh().nodes_range())
+        for (auto & node : this->get_mesh().node_ptr_range())
           for (unsigned int index=0; index<node->n_comp(sys,var); index++)
             {
               libmesh_assert_not_equal_to (node->dof_number(sys, var, index),
@@ -454,7 +454,7 @@ void System::read_legacy_data (Xdr & io,
                 {
                   const unsigned int var = _written_var_indices[data_var];
                   // First reorder the nodal DOF values
-                  for (auto & node : this->get_mesh().nodes_range())
+                  for (auto & node : this->get_mesh().node_ptr_range())
                     for (unsigned int index=0; index<node->n_comp(sys,var); index++)
                       {
                         libmesh_assert_not_equal_to (node->dof_number(sys, var, index),

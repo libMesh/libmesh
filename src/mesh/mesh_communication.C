@@ -1870,7 +1870,7 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
     }
 
   // Delete all the nodes we have no reason to save
-  for (auto & node : mesh.nodes_range())
+  for (auto & node : mesh.node_ptr_range())
     {
       libmesh_assert(node);
       if (!connected_nodes.count(node))

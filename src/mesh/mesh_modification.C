@@ -160,7 +160,7 @@ void MeshTools::Modification::redistribute (MeshBase & mesh,
   // FIXME - we should thread this later.
   UniquePtr<FunctionBase<Real>> myfunc = mapfunc.clone();
 
-  for (auto & node : mesh.nodes_range())
+  for (auto & node : mesh.node_ptr_range())
     {
       (*myfunc)(*node, output_vec);
 
@@ -183,7 +183,7 @@ void MeshTools::Modification::translate (MeshBase & mesh,
 {
   const Point p(xt, yt, zt);
 
-  for (auto & node : mesh.nodes_range())
+  for (auto & node : mesh.node_ptr_range())
     *node += p;
 }
 
@@ -227,7 +227,7 @@ void MeshTools::Modification::rotate (MeshBase & mesh,
   // (equations 6-14 give the entries of the composite transformation matrix).
   // The rotations are performed sequentially about the z, x, and z axes, in that order.
   // A positive angle yields a counter-clockwise rotation about the axis in question.
-  for (auto & node : mesh.nodes_range())
+  for (auto & node : mesh.node_ptr_range())
     {
       const Point pt = *node;
       const Real  x  = pt(0);
@@ -260,21 +260,21 @@ void MeshTools::Modification::scale (MeshBase & mesh,
     }
 
   // Scale the x coordinate in all dimensions
-  for (auto & node : mesh.nodes_range())
+  for (auto & node : mesh.node_ptr_range())
     (*node)(0) *= x_scale;
 
   // Only scale the y coordinate in 2 and 3D
   if (LIBMESH_DIM < 2)
     return;
 
-  for (auto & node : mesh.nodes_range())
+  for (auto & node : mesh.node_ptr_range())
     (*node)(1) *= y_scale;
 
   // Only scale the z coordinate in 3D
   if (LIBMESH_DIM < 3)
     return;
 
-  for (auto & node : mesh.nodes_range())
+  for (auto & node : mesh.node_ptr_range())
     (*node)(2) *= z_scale;
 }
 

@@ -342,7 +342,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
         filled_request (communicator.size());
 
       // build up list of requests
-      for (const auto & node : mesh.nodes_range())
+      for (const auto & node : mesh.node_ptr_range())
         {
           libmesh_assert(node);
           const Parallel::DofObjectKey hi =
@@ -413,7 +413,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
         for (processor_id_type pid=0; pid<communicator.size(); pid++)
           next_obj_on_proc.push_back(filled_request[pid].begin());
 
-        for (auto & node : mesh.nodes_range())
+        for (auto & node : mesh.node_ptr_range())
           {
             libmesh_assert(node);
             const Parallel::DofObjectKey hi =
