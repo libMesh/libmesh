@@ -1788,12 +1788,8 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
   // need to be corrected.
   std::vector<dof_id_type> needed_nodes; needed_nodes.reserve (mesh.n_nodes());
   {
-    MeshBase::node_iterator
-      it  = mesh.nodes_begin(),
-      end = mesh.nodes_end();
-
-    for (; it!=end; ++it)
-      needed_nodes.push_back((*it)->id());
+    for (auto & node : mesh.nodes_range())
+      needed_nodes.push_back(node->id());
 
     std::sort (needed_nodes.begin(), needed_nodes.end());
 
