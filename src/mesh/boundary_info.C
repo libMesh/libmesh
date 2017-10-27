@@ -1973,10 +1973,8 @@ BoundaryInfo::build_node_list_from_side_list()
   std::vector<std::vector<dof_id_type>> node_ids_requested(n_proc);
 
   // Determine what nodes we need to request
-  for (MeshBase::const_node_iterator it = _mesh.nodes_begin(),
-         end = _mesh.nodes_end(); it != end; ++it)
+  for (const auto & node : _mesh.nodes_range())
     {
-      const Node *node = *it;
       const processor_id_type pid = node->processor_id();
       if (pid != my_proc_id)
         node_ids_requested[pid].push_back(node->id());
