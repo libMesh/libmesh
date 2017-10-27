@@ -260,28 +260,22 @@ void MeshTools::Modification::scale (MeshBase & mesh,
     }
 
   // Scale the x coordinate in all dimensions
-  const MeshBase::node_iterator nd_end = mesh.nodes_end();
-
-  for (MeshBase::node_iterator nd = mesh.nodes_begin();
-       nd != nd_end; ++nd)
-    (**nd)(0) *= x_scale;
-
+  for (auto & node : mesh.nodes_range())
+    (*node)(0) *= x_scale;
 
   // Only scale the y coordinate in 2 and 3D
   if (LIBMESH_DIM < 2)
     return;
 
-  for (MeshBase::node_iterator nd = mesh.nodes_begin();
-       nd != nd_end; ++nd)
-    (**nd)(1) *= y_scale;
+  for (auto & node : mesh.nodes_range())
+    (*node)(1) *= y_scale;
 
   // Only scale the z coordinate in 3D
   if (LIBMESH_DIM < 3)
     return;
 
-  for (MeshBase::node_iterator nd = mesh.nodes_begin();
-       nd != nd_end; ++nd)
-    (**nd)(2) *= z_scale;
+  for (auto & node : mesh.nodes_range())
+    (*node)(2) *= z_scale;
 }
 
 
