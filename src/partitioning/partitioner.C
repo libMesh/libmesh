@@ -459,12 +459,8 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
   // Loop over all the nodes, count the ones on each processor.  We can skip ourself
   std::vector<dof_id_type> ghost_nodes_from_proc(mesh.n_processors(), 0);
 
-  MeshBase::node_iterator       node_it  = mesh.nodes_begin();
-  const MeshBase::node_iterator node_end = mesh.nodes_end();
-
-  for (; node_it != node_end; ++node_it)
+  for (auto & node : mesh.nodes_range())
     {
-      Node * node = *node_it;
       libmesh_assert(node);
       const processor_id_type current_pid = node->processor_id();
       if (current_pid != mesh.processor_id() &&
@@ -482,9 +478,8 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
 
   // We need to get the new pid for each node from the processor
   // which *currently* owns the node.  We can safely skip ourself
-  for (node_it = mesh.nodes_begin(); node_it != node_end; ++node_it)
+  for (auto & node : mesh.nodes_range())
     {
-      Node * node = *node_it;
       libmesh_assert(node);
       const processor_id_type current_pid = node->processor_id();
       if (current_pid != mesh.processor_id() &&
