@@ -1907,12 +1907,8 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   std::vector<std::vector<std::pair<dof_id_type, processor_id_type>>>
     ids_to_push(mesh.n_processors());
 
-  for (MeshBase::const_node_iterator
-         n_it = mesh.nodes_begin(),
-         n_end = mesh.nodes_end();
-       n_it != n_end; ++n_it)
+  for (const auto & node : mesh.nodes_range())
     {
-      const Node * node = *n_it;
       const dof_id_type id = node->id();
       const proc_id_map_type::iterator it = new_proc_ids.find(id);
       if (it == new_proc_ids.end())
