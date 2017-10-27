@@ -341,29 +341,23 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
       std::vector<std::vector<dof_id_type>>
         filled_request (communicator.size());
 
-      {
-        MeshBase::const_node_iterator       it  = mesh.nodes_begin();
-        const MeshBase::const_node_iterator end = mesh.nodes_end();
+      // build up list of requests
+      for (const auto & node : mesh.nodes_range())
+        {
+          libmesh_assert(node);
+          const Parallel::DofObjectKey hi =
+            get_hilbert_index (node, bbox);
+          const processor_id_type pid =
+            cast_int<processor_id_type>
+            (std::distance (node_upper_bounds.begin(),
+                            std::lower_bound(node_upper_bounds.begin(),
+                                             node_upper_bounds.end(),
+                                             hi)));
 
-        // build up list of requests
-        for (; it != end; ++it)
-          {
-            const Node * node = (*it);
-            libmesh_assert(node);
-            const Parallel::DofObjectKey hi =
-              get_hilbert_index (node, bbox);
-            const processor_id_type pid =
-              cast_int<processor_id_type>
-              (std::distance (node_upper_bounds.begin(),
-                              std::lower_bound(node_upper_bounds.begin(),
-                                               node_upper_bounds.end(),
-                                               hi)));
+          libmesh_assert_less (pid, communicator.size());
 
-            libmesh_assert_less (pid, communicator.size());
-
-            requested_ids[pid].push_back(hi);
-          }
-      }
+          requested_ids[pid].push_back(hi);
+        }
 
       // The number of objects in my_node_bin on each processor
       std::vector<dof_id_type> node_bin_sizes(communicator.size());
@@ -419,33 +413,27 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
         for (processor_id_type pid=0; pid<communicator.size(); pid++)
           next_obj_on_proc.push_back(filled_request[pid].begin());
 
-        {
-          MeshBase::node_iterator       it  = mesh.nodes_begin();
-          const MeshBase::node_iterator end = mesh.nodes_end();
+        for (auto & node : mesh.nodes_range())
+          {
+            libmesh_assert(node);
+            const Parallel::DofObjectKey hi =
+              get_hilbert_index (node, bbox);
+            const processor_id_type pid =
+              cast_int<processor_id_type>
+              (std::distance (node_upper_bounds.begin(),
+                              std::lower_bound(node_upper_bounds.begin(),
+                                               node_upper_bounds.end(),
+                                               hi)));
 
-          for (; it != end; ++it)
-            {
-              Node * node = (*it);
-              libmesh_assert(node);
-              const Parallel::DofObjectKey hi =
-                get_hilbert_index (node, bbox);
-              const processor_id_type pid =
-                cast_int<processor_id_type>
-                (std::distance (node_upper_bounds.begin(),
-                                std::lower_bound(node_upper_bounds.begin(),
-                                                 node_upper_bounds.end(),
-                                                 hi)));
+            libmesh_assert_less (pid, communicator.size());
+            libmesh_assert (next_obj_on_proc[pid] != filled_request[pid].end());
 
-              libmesh_assert_less (pid, communicator.size());
-              libmesh_assert (next_obj_on_proc[pid] != filled_request[pid].end());
+            const dof_id_type global_index = *next_obj_on_proc[pid];
+            libmesh_assert_less (global_index, mesh.n_nodes());
+            node->set_id() = global_index;
 
-              const dof_id_type global_index = *next_obj_on_proc[pid];
-              libmesh_assert_less (global_index, mesh.n_nodes());
-              node->set_id() = global_index;
-
-              ++next_obj_on_proc[pid];
-            }
-        }
+            ++next_obj_on_proc[pid];
+          }
       }
     }
 
