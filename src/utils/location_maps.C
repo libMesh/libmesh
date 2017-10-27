@@ -61,22 +61,15 @@ void LocationMap<T>::init(MeshBase & mesh)
   _upper_bound.clear();
   _upper_bound.resize(LIBMESH_DIM, -std::numeric_limits<Real>::max());
 
-  MeshBase::node_iterator       it  = mesh.nodes_begin();
-  const MeshBase::node_iterator end = mesh.nodes_end();
-
-  for (; it != end; ++it)
-    {
-      Node * node = *it;
-
-      for (unsigned int i=0; i != LIBMESH_DIM; ++i)
-        {
-          // Expand the bounding box if necessary
-          _lower_bound[i] = std::min(_lower_bound[i],
-                                     (*node)(i));
-          _upper_bound[i] = std::max(_upper_bound[i],
-                                     (*node)(i));
-        }
-    }
+  for (auto & node : mesh.nodes_range())
+    for (unsigned int i=0; i != LIBMESH_DIM; ++i)
+      {
+        // Expand the bounding box if necessary
+        _lower_bound[i] = std::min(_lower_bound[i],
+                                   (*node)(i));
+        _upper_bound[i] = std::max(_upper_bound[i],
+                                   (*node)(i));
+      }
 
   // On a parallel mesh we might not yet have a full bounding box
   if (!mesh.is_serial())
