@@ -291,14 +291,8 @@ public:
   virtual element_iterator elements_end () libmesh_override;
   virtual const_element_iterator elements_begin() const libmesh_override;
   virtual const_element_iterator elements_end() const libmesh_override;
-  virtual SimpleRange<element_iterator> elements_range() libmesh_override
-  {
-    return {elements_begin(), elements_end()};
-  }
-  virtual SimpleRange<const_element_iterator> elements_range() const libmesh_override
-  {
-    return {elements_begin(), elements_end()};
-  }
+  virtual SimpleRange<element_iterator> element_ptr_range() libmesh_override { return {elements_begin(), elements_end()}; }
+  virtual SimpleRange<const_element_iterator> element_ptr_range() const libmesh_override { return {elements_begin(), elements_end()}; }
 
   virtual element_iterator active_elements_begin () libmesh_override;
   virtual element_iterator active_elements_end () libmesh_override;
@@ -474,6 +468,8 @@ public:
   virtual node_iterator nodes_end () libmesh_override;
   virtual const_node_iterator nodes_begin () const libmesh_override;
   virtual const_node_iterator nodes_end () const libmesh_override;
+  virtual SimpleRange<node_iterator> node_ptr_range() libmesh_override { return {nodes_begin(), nodes_end()}; }
+  virtual SimpleRange<const_node_iterator> node_ptr_range() const libmesh_override { return {nodes_begin(), nodes_end()}; }
 
   virtual node_iterator active_nodes_begin () libmesh_override;
   virtual node_iterator active_nodes_end () libmesh_override;

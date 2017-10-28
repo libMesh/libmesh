@@ -264,13 +264,8 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
   this->_find_id_maps(requested_boundary_ids, 0, &node_id_map, 0, &side_id_map, subdomains_relative_to);
 
   // Let's add all the boundary nodes we found to the boundary mesh
-
-  MeshBase::const_node_iterator n_end  = _mesh.nodes_end();
-
-  for (MeshBase::const_node_iterator n_it = _mesh.nodes_begin();
-       n_it != n_end; ++n_it)
+  for (const auto & node : _mesh.node_ptr_range())
     {
-      const Node * node = *n_it;
       dof_id_type node_id = node->id();
       if (node_id_map.count(node_id))
         {
@@ -296,7 +291,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
   // This side's Node pointers still point to the nodes of the original mesh.
   // We need to re-point them to the boundary mesh's nodes!  Since we copied *ALL* of
   // the original mesh's nodes over, we should be guaranteed to have the same ordering.
-  for (auto & new_elem : boundary_mesh.elements_range())
+  for (auto & new_elem : boundary_mesh.element_ptr_range())
     {
       for (auto nn : new_elem->node_index_range())
         {
@@ -426,7 +421,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
     side_container;
   side_container sides_to_add;
 
-  for (const auto & elem : _mesh.elements_range())
+  for (const auto & elem : _mesh.element_ptr_range())
     {
       // If the subdomains_relative_to container has the
       // invalid_subdomain_id, we fall back on the "old" behavior of
@@ -1978,10 +1973,8 @@ BoundaryInfo::build_node_list_from_side_list()
   std::vector<std::vector<dof_id_type>> node_ids_requested(n_proc);
 
   // Determine what nodes we need to request
-  for (MeshBase::const_node_iterator it = _mesh.nodes_begin(),
-         end = _mesh.nodes_end(); it != end; ++it)
+  for (const auto & node : _mesh.node_ptr_range())
     {
-      const Node *node = *it;
       const processor_id_type pid = node->processor_id();
       if (pid != my_proc_id)
         node_ids_requested[pid].push_back(node->id());

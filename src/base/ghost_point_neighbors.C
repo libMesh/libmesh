@@ -109,7 +109,7 @@ void GhostPointNeighbors::operator()
     }
 
   // Connect any interior_parents who are really in our mesh
-  for (const auto & elem : _mesh.elements_range())
+  for (const auto & elem : _mesh.element_ptr_range())
     {
       std::set<const Elem *>::iterator ip_it =
         interior_parents.find(elem);

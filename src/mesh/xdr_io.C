@@ -1788,12 +1788,8 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
   // need to be corrected.
   std::vector<dof_id_type> needed_nodes; needed_nodes.reserve (mesh.n_nodes());
   {
-    MeshBase::node_iterator
-      it  = mesh.nodes_begin(),
-      end = mesh.nodes_end();
-
-    for (; it!=end; ++it)
-      needed_nodes.push_back((*it)->id());
+    for (auto & node : mesh.node_ptr_range())
+      needed_nodes.push_back(node->id());
 
     std::sort (needed_nodes.begin(), needed_nodes.end());
 
@@ -2107,28 +2103,29 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
       // node id this is not necessarily guaranteed.
       std::sort (node_bc_data.begin(), node_bc_data.end());
 
-      MeshBase::const_node_iterator
-        it  = mesh.nodes_begin(),
-        end = mesh.nodes_end();
-
       // Look for BCs in this block for all nodes we have
       // (not just local ones).  Do this by finding all the entries
       // in node_bc_data whose dof_id(node_id)  match the ID of the current node.
-      for (std::pair<std::vector<DofBCData>::iterator,
-             std::vector<DofBCData>::iterator> pos; it!=end; ++it)
+      for (auto & node : mesh.node_ptr_range())
+        {
+          std::pair<std::vector<DofBCData>::iterator,
+                    std::vector<DofBCData>::iterator> pos =
+            std::equal_range (node_bc_data.begin(),
+                              node_bc_data.end(),
+                              node->id()
 #if defined(__SUNPRO_CC) || defined(__PGI)
-        for (pos = std::equal_range (node_bc_data.begin(), node_bc_data.end(), (*it)->id(), CompareIntDofBCData());
-             pos.first != pos.second; ++pos.first)
-#else
-          for (pos = std::equal_range (node_bc_data.begin(), node_bc_data.end(), (*it)->id());
-               pos.first != pos.second; ++pos.first)
+                              , CompareIntDofBCData()
 #endif
-            {
-              // Note: dof_id from ElmeBCData is being used to hold node_id here
-              libmesh_assert_equal_to (pos.first->dof_id, (*it)->id());
+                              );
 
-              boundary_info.add_node (*it, pos.first->bc_id);
-            }
+        for (; pos.first != pos.second; ++pos.first)
+          {
+            // Note: dof_id from ElmeBCData is being used to hold node_id here
+            libmesh_assert_equal_to (pos.first->dof_id, node->id());
+
+            boundary_info.add_node (node, pos.first->bc_id);
+          }
+        }
     }
 }
 

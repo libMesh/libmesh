@@ -101,7 +101,7 @@ void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
   // Container to catch ids handed back from BoundaryInfo
   std::vector<boundary_id_type> ids;
 
-  for (const auto & elem : mesh.elements_range())
+  for (const auto & elem : mesh.element_ptr_range())
     {
       libmesh_assert_equal_to(elem->type(), TRI3);
 
@@ -181,11 +181,8 @@ void MeshTools::Subdivision::prepare_subdivision_mesh(MeshBase & mesh, bool ghos
   MeshTools::build_nodes_to_elem_map(mesh, nodes_to_elem_map);
 
   // compute the node valences
-  MeshBase::const_node_iterator       nd     = mesh.nodes_begin();
-  const MeshBase::const_node_iterator end_nd = mesh.nodes_end();
-  for (; nd != end_nd; ++nd)
+  for (auto & node : mesh.node_ptr_range())
     {
-      Node * node = *nd;
       std::vector<const Node *> neighbors;
       MeshTools::find_nodal_neighbors(mesh, *node, nodes_to_elem_map, neighbors);
       const unsigned int valence =
@@ -194,7 +191,7 @@ void MeshTools::Subdivision::prepare_subdivision_mesh(MeshBase & mesh, bool ghos
       node->set_valence(valence);
     }
 
-  for (auto & elem : mesh.elements_range())
+  for (auto & elem : mesh.element_ptr_range())
     {
       Tri3Subdivision * tri3s = dynamic_cast<Tri3Subdivision *>(elem);
       libmesh_assert(tri3s);
@@ -206,7 +203,7 @@ void MeshTools::Subdivision::prepare_subdivision_mesh(MeshBase & mesh, bool ghos
 
 void MeshTools::Subdivision::tag_boundary_ghosts(MeshBase & mesh)
 {
-  for (auto & elem : mesh.elements_range())
+  for (auto & elem : mesh.element_ptr_range())
     {
       libmesh_assert_equal_to(elem->type(), TRI3SUBDIVISION);
 

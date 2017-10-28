@@ -56,16 +56,8 @@ public:
 
     // 2.) Move the nodes in the y-direction, test that spatial_dimension==2
     // The spatial dimension is updated during prepare_for_use().
-    {
-      MeshBase::node_iterator node_it  = mesh.nodes_begin();
-      MeshBase::node_iterator node_end = mesh.nodes_end();
-
-      for (; node_it != node_end; ++node_it)
-        {
-          Node & node = **node_it;
-          node(1) = node(0)*node(0);
-        }
-    }
+    for (auto & node : mesh.node_ptr_range())
+      (*node)(1) = (*node)(0) * (*node)(0);
 
     mesh.prepare_for_use();
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), mesh.mesh_dimension());
@@ -73,16 +65,9 @@ public:
 
 
     // 3.) Move nodes back to zero, check that spatial_dimension is *not* decreased
-    {
-      MeshBase::node_iterator node_it  = mesh.nodes_begin();
-      MeshBase::node_iterator node_end = mesh.nodes_end();
+    for (auto & node : mesh.node_ptr_range())
+      (*node)(1) = 0.;
 
-      for (; node_it != node_end; ++node_it)
-        {
-          Node & node = **node_it;
-          node(1) = 0.;
-        }
-    }
     mesh.prepare_for_use();
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), mesh.mesh_dimension());
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), mesh.spatial_dimension());
@@ -90,16 +75,8 @@ public:
 
     // 4.) Move z-coordinate of nodes, check that spatial_dimension is now 3.
 #if LIBMESH_DIM == 3
-    {
-      MeshBase::node_iterator node_it  = mesh.nodes_begin();
-      MeshBase::node_iterator node_end = mesh.nodes_end();
-
-      for (; node_it != node_end; ++node_it)
-        {
-          Node & node = **node_it;
-          node(2) = node(0)*node(0);
-        }
-    }
+    for (auto & node : mesh.node_ptr_range())
+      (*node)(2) = (*node)(0) * (*node)(0);
 
     mesh.prepare_for_use();
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), mesh.mesh_dimension());
@@ -122,16 +99,10 @@ public:
 
     // 2.) Move the nodes in the z-direction, test that spatial_dimension==3
     // The spatial dimension is updated during prepare_for_use().
-    {
-      MeshBase::node_iterator node_it  = mesh.nodes_begin();
-      MeshBase::node_iterator node_end = mesh.nodes_end();
-
-      for (; node_it != node_end; ++node_it)
-        {
-          Node & node = **node_it;
-          node(2) = node(0)*node(0) + node(1)*node(1);
-        }
-    }
+    for (auto & node : mesh.node_ptr_range())
+      (*node)(2) =
+        (*node)(0) * (*node)(0) +
+        (*node)(1) * (*node)(1);
 
     mesh.prepare_for_use();
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), mesh.mesh_dimension());
@@ -139,16 +110,9 @@ public:
 
 
     // 3.) Move nodes back to zero, check that spatial_dimension is *not* decreased
-    {
-      MeshBase::node_iterator node_it  = mesh.nodes_begin();
-      MeshBase::node_iterator node_end = mesh.nodes_end();
+    for (auto & node : mesh.node_ptr_range())
+      (*node)(2) = 0.;
 
-      for (; node_it != node_end; ++node_it)
-        {
-          Node & node = **node_it;
-          node(2) = 0.;
-        }
-    }
     mesh.prepare_for_use();
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), mesh.mesh_dimension());
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(3), mesh.spatial_dimension());

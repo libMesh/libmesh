@@ -241,7 +241,7 @@ void UNVIO::read_implementation (std::istream & in_stream)
 
       unsigned char max_dim = this->max_elem_dimension_seen();
 
-      for (const auto & elem : mesh.elements_range())
+      for (const auto & elem : mesh.element_ptr_range())
         if (elem->dim() < max_dim)
           mesh.delete_elem(elem);
     }
@@ -901,13 +901,8 @@ void UNVIO::nodes_out (std::ostream & out_file)
   // Use scientific notation with capital E and 16 digits for printing out the coordinates
   out_file << std::scientific << std::setprecision(16) << std::uppercase;
 
-  MeshBase::const_node_iterator       nd  = mesh.nodes_begin();
-  const MeshBase::const_node_iterator end = mesh.nodes_end();
-
-  for (; nd != end; ++nd)
+  for (const auto & current_node : mesh.node_ptr_range())
     {
-      const Node * current_node = *nd;
-
       dof_id_type node_id = current_node->id();
 
       out_file << std::setw(10) << node_id
@@ -983,7 +978,7 @@ void UNVIO::elements_out(std::ostream & out_file)
   // A reference to the parent class's mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  for (const auto & elem : mesh.elements_range())
+  for (const auto & elem : mesh.element_ptr_range())
     {
       switch (elem->type())
         {

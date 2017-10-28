@@ -1317,7 +1317,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               new_elements.reserve(6*mesh.n_elem());
 
             // Create tetrahedra or pyramids
-            for (auto & base_hex : mesh.elements_range())
+            for (auto & base_hex : mesh.element_ptr_range())
               {
                 // Get a pointer to the node located at the HEX27 centroid
                 Node * apex_node = base_hex->node_ptr(26);
@@ -1386,7 +1386,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
             // Delete the original HEX27 elements from the mesh, and the boundary info structure.
-            for (auto & elem : mesh.elements_range())
+            for (auto & elem : mesh.element_ptr_range())
               {
                 boundary_info.remove(elem); // Safe even if elem has no boundary info.
                 mesh.delete_elem(elem);
@@ -2038,12 +2038,8 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
   // Container to catch the boundary IDs handed back by the BoundaryInfo object
   std::vector<boundary_id_type> ids_to_copy;
 
-  MeshBase::const_node_iterator       nd  = cross_section.nodes_begin();
-  const MeshBase::const_node_iterator nend = cross_section.nodes_end();
-  for (; nd!=nend; ++nd)
+  for (const auto & node : cross_section.node_ptr_range())
     {
-      const Node * node = *nd;
-
       for (unsigned int k=0; k != order*nz+1; ++k)
         {
           Node * new_node =
@@ -2079,7 +2075,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
   // fix that.
   cross_section.comm().max(next_side_id);
 
-  for (const auto & elem : cross_section.elements_range())
+  for (const auto & elem : cross_section.element_ptr_range())
     {
       const ElemType etype = elem->type();
 
@@ -2389,7 +2385,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
   // The mesh is now generated, but we still need to mark the boundaries
   // to be consistent with the other build_square routines.  Note that all
   // hole boundary elements get the same ID, 4.
-  for (auto & elem : mesh.elements_range())
+  for (auto & elem : mesh.element_ptr_range())
     for (auto s : elem->side_index_range())
       if (elem->neighbor_ptr(s) == libmesh_nullptr)
         {

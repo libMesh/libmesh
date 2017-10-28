@@ -277,19 +277,16 @@ void UCDIO::write_header(std::ostream & out_stream,
 void UCDIO::write_nodes(std::ostream & out_stream,
                         const MeshBase & mesh)
 {
-  MeshBase::const_node_iterator       it  = mesh.nodes_begin();
-  const MeshBase::const_node_iterator end = mesh.nodes_end();
-
   // 1-based node number for UCD
   unsigned int n=1;
 
   // Write the node coordinates
-  for (; it != end; ++it)
+  for (auto & node : mesh.node_ptr_range())
     {
       libmesh_assert (out_stream.good());
 
       out_stream << n++ << "\t";
-      (*it)->write_unformatted(out_stream);
+      node->write_unformatted(out_stream);
     }
 }
 
@@ -302,7 +299,7 @@ void UCDIO::write_interior_elems(std::ostream & out_stream,
   unsigned int e=1;
 
   // Write element information
-  for (const auto & elem : mesh.elements_range())
+  for (const auto & elem : mesh.element_ptr_range())
     {
       libmesh_assert (out_stream.good());
 

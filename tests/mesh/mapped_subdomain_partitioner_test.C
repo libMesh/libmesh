@@ -88,7 +88,7 @@ public:
     // Assign subdomain ids to elements sequentially.
     {
       subdomain_id_type current_subdomain_id = 0;
-      for (auto & elem : mesh.elements_range())
+      for (auto & elem : mesh.element_ptr_range())
         {
           elem->subdomain_id() = current_subdomain_id++;
 
@@ -102,7 +102,7 @@ public:
     mesh.partition();
 
     // Assert that the partitioning worked as expected.
-    for (auto & elem : mesh.elements_range())
+    for (auto & elem : mesh.element_ptr_range())
       {
         // Subdomain id n should map to processor id n/2.
         CPPUNIT_ASSERT_EQUAL(static_cast<int>(elem->subdomain_id()/2),

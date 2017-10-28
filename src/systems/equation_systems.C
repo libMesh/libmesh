@@ -99,16 +99,11 @@ void EquationSystems::init ()
 
   // Tell all the \p DofObject entities how many systems
   // there are.
-  {
-    MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-    const MeshBase::node_iterator node_end = _mesh.nodes_end();
+  for (auto & node : _mesh.node_ptr_range())
+    node->set_n_systems(n_sys);
 
-    for ( ; node_it != node_end; ++node_it)
-      (*node_it)->set_n_systems(n_sys);
-
-    for (auto & elem : _mesh.elements_range())
-      elem->set_n_systems(n_sys);
-  }
+  for (auto & elem : _mesh.element_ptr_range())
+    elem->set_n_systems(n_sys);
 
   for (unsigned int i=0; i != this->n_systems(); ++i)
     this->get_system(i).init();
@@ -138,13 +133,10 @@ void EquationSystems::reinit ()
   if (_added_new_systems)
     {
       // Our DofObjects will need space for the additional systems
-      MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-      const MeshBase::node_iterator node_end = _mesh.nodes_end();
+      for (auto & node : _mesh.node_ptr_range())
+        node->set_n_systems(n_sys);
 
-      for ( ; node_it != node_end; ++node_it)
-        (*node_it)->set_n_systems(n_sys);
-
-      for (auto & elem : _mesh.elements_range())
+      for (auto & elem : _mesh.element_ptr_range())
         elem->set_n_systems(n_sys);
 
       // And any new systems will need initialization
@@ -163,17 +155,11 @@ void EquationSystems::reinit ()
   // there are.
   {
     // All the nodes
-    MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-    const MeshBase::node_iterator node_end = _mesh.nodes_end();
-
-    for ( ; node_it != node_end; ++node_it)
-      {
-        Node * node = *node_it;
-        node->set_n_systems(this->n_systems());
-      }
+    for (auto & node : _mesh.node_ptr_range())
+      node->set_n_systems(this->n_systems());
 
     // All the elements
-    for (auto & elem : _mesh.elements_range())
+    for (auto & elem : _mesh.element_ptr_range())
       elem->set_n_systems(this->n_systems());
   }
 
@@ -291,16 +277,11 @@ void EquationSystems::allgather ()
 
   // Tell all the \p DofObject entities how many systems
   // there are.
-  {
-    MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-    const MeshBase::node_iterator node_end = _mesh.nodes_end();
+  for (auto & node : _mesh.node_ptr_range())
+    node->set_n_systems(n_sys);
 
-    for ( ; node_it != node_end; ++node_it)
-      (*node_it)->set_n_systems(n_sys);
-
-    for (auto & elem : _mesh.elements_range())
-      elem->set_n_systems(n_sys);
-  }
+  for (auto & elem : _mesh.element_ptr_range())
+    elem->set_n_systems(n_sys);
 
   // And distribute each system's dofs
   for (unsigned int i=0; i != this->n_systems(); ++i)
@@ -1247,14 +1228,11 @@ std::size_t EquationSystems::n_active_dofs () const
 void EquationSystems::_add_system_to_nodes_and_elems()
 {
   // All the nodes
-  MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-  const MeshBase::node_iterator node_end = _mesh.nodes_end();
-
-  for ( ; node_it != node_end; ++node_it)
-    (*node_it)->add_system();
+  for (auto & node : _mesh.node_ptr_range())
+    node->add_system();
 
   // All the elements
-  for (auto & elem : _mesh.elements_range())
+  for (auto & elem : _mesh.element_ptr_range())
     elem->add_system();
 }
 

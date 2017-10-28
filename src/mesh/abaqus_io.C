@@ -403,7 +403,7 @@ void AbaqusIO::read (const std::string & fname)
   {
     unsigned char max_dim = this->max_elem_dimension_seen();
 
-    for (auto & elem : the_mesh.elements_range())
+    for (auto & elem : the_mesh.element_ptr_range())
       if (elem->dim() < max_dim)
         the_mesh.delete_elem(elem);
   }

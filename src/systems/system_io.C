@@ -358,23 +358,17 @@ void System::read_legacy_data (Xdr & io,
         const unsigned int var = _written_var_indices[data_var];
 
         // First reorder the nodal DOF values
-        {
-          MeshBase::node_iterator
-            it  = this->get_mesh().nodes_begin(),
-            end = this->get_mesh().nodes_end();
+        for (auto & node : this->get_mesh().node_ptr_range())
+          for (unsigned int index=0; index<node->n_comp(sys,var); index++)
+            {
+              libmesh_assert_not_equal_to (node->dof_number(sys, var, index),
+                                           DofObject::invalid_id);
 
-          for (; it != end; ++it)
-            for (unsigned int index=0; index<(*it)->n_comp(sys,var); index++)
-              {
-                libmesh_assert_not_equal_to ((*it)->dof_number(sys, var, index),
-                                             DofObject::invalid_id);
+              libmesh_assert_less (cnt, global_vector.size());
 
-                libmesh_assert_less (cnt, global_vector.size());
-
-                reordered_vector[(*it)->dof_number(sys, var, index)] =
-                  global_vector[cnt++];
-              }
-        }
+              reordered_vector[node->dof_number(sys, var, index)] =
+                global_vector[cnt++];
+            }
 
         // Then reorder the element DOF values
         {
@@ -460,23 +454,17 @@ void System::read_legacy_data (Xdr & io,
                 {
                   const unsigned int var = _written_var_indices[data_var];
                   // First reorder the nodal DOF values
-                  {
-                    MeshBase::node_iterator
-                      it  = this->get_mesh().nodes_begin(),
-                      end = this->get_mesh().nodes_end();
+                  for (auto & node : this->get_mesh().node_ptr_range())
+                    for (unsigned int index=0; index<node->n_comp(sys,var); index++)
+                      {
+                        libmesh_assert_not_equal_to (node->dof_number(sys, var, index),
+                                                     DofObject::invalid_id);
 
-                    for (; it!=end; ++it)
-                      for (unsigned int index=0; index<(*it)->n_comp(sys,var); index++)
-                        {
-                          libmesh_assert_not_equal_to ((*it)->dof_number(sys, var, index),
-                                                       DofObject::invalid_id);
+                        libmesh_assert_less (cnt, global_vector.size());
 
-                          libmesh_assert_less (cnt, global_vector.size());
-
-                          reordered_vector[(*it)->dof_number(sys, var, index)] =
-                            global_vector[cnt++];
-                        }
-                  }
+                        reordered_vector[node->dof_number(sys, var, index)] =
+                          global_vector[cnt++];
+                      }
 
                   // Then reorder the element DOF values
                   {

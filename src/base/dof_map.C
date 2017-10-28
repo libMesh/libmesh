@@ -491,29 +491,24 @@ void DofMap::reinit(MeshBase & mesh)
   //------------------------------------------------------------
   // Clear the old_dof_objects for all the nodes
   // and elements so that we can overwrite them
-  {
-    MeshBase::node_iterator       node_it  = mesh.nodes_begin();
-    const MeshBase::node_iterator node_end = mesh.nodes_end();
+  for (auto & node : mesh.node_ptr_range())
+    {
+      node->clear_old_dof_object();
+      libmesh_assert (!node->old_dof_object);
+    }
 
-    for ( ; node_it != node_end; ++node_it)
-      {
-        (*node_it)->clear_old_dof_object();
-        libmesh_assert (!(*node_it)->old_dof_object);
-      }
-
-    for (auto & elem : mesh.elements_range())
-      {
-        elem->clear_old_dof_object();
-        libmesh_assert (!elem->old_dof_object);
-      }
-  }
+  for (auto & elem : mesh.element_ptr_range())
+    {
+      elem->clear_old_dof_object();
+      libmesh_assert (!elem->old_dof_object);
+    }
 
 
   //------------------------------------------------------------
   // Set the old_dof_objects for the elements that
   // weren't just created, if these old dof objects
   // had variables
-  for (auto & elem : mesh.elements_range())
+  for (auto & elem : mesh.element_ptr_range())
     {
       // Skip the elements that were just refined
       if (elem->refinement_flag() == Elem::JUST_REFINED)
@@ -541,19 +536,14 @@ void DofMap::reinit(MeshBase & mesh)
   // Then set the number of variables for each \p DofObject
   // equal to n_variables() for this system.  This will
   // handle new \p DofObjects that may have just been created
-  {
-    // All the nodes
-    MeshBase::node_iterator       node_it  = mesh.nodes_begin();
-    const MeshBase::node_iterator node_end = mesh.nodes_end();
 
-    for ( ; node_it != node_end; ++node_it)
-      (*node_it)->set_n_vars_per_group(sys_num, n_vars_per_group);
+  // All the nodes
+  for (auto & node : mesh.node_ptr_range())
+    node->set_n_vars_per_group(sys_num, n_vars_per_group);
 
-    // All the elements
-    for (auto & elem : mesh.elements_range())
-      elem->set_n_vars_per_group(sys_num, n_vars_per_group);
-  }
-
+  // All the elements
+  for (auto & elem : mesh.element_ptr_range())
+    elem->set_n_vars_per_group(sys_num, n_vars_per_group);
 
   // Zero _n_SCALAR_dofs, it will be updated below.
   this->_n_SCALAR_dofs = 0;
@@ -808,11 +798,8 @@ void DofMap::invalidate_dofs(MeshBase & mesh) const
   const unsigned int sys_num = this->sys_number();
 
   // All the nodes
-  MeshBase::node_iterator       node_it  = mesh.nodes_begin();
-  const MeshBase::node_iterator node_end = mesh.nodes_end();
-
-  for ( ; node_it != node_end; ++node_it)
-    (*node_it)->invalidate_dofs(sys_num);
+  for (auto & node : mesh.node_ptr_range())
+    node->invalidate_dofs(sys_num);
 
   // All the elements
   MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
@@ -1000,11 +987,9 @@ void DofMap::distribute_dofs (MeshBase & mesh)
     MeshTools::libmesh_assert_valid_dof_ids(mesh, sys_num);
 
     // DoF processor ids should match DofObject processor ids
-    MeshBase::const_node_iterator       node_it  = mesh.nodes_begin();
-    const MeshBase::const_node_iterator node_end = mesh.nodes_end();
-    for ( ; node_it != node_end; ++node_it)
+    for (auto & node : mesh.node_ptr_range())
       {
-        DofObject const * const dofobj = *node_it;
+        DofObject const * const dofobj = node;
         const processor_id_type obj_proc_id = dofobj->processor_id();
 
         for (unsigned int v=0; v != dofobj->n_vars(sys_num); ++v)
@@ -1016,7 +1001,7 @@ void DofMap::distribute_dofs (MeshBase & mesh)
             }
       }
 
-    for (auto & elem : mesh.elements_range())
+    for (auto & elem : mesh.element_ptr_range())
       {
         DofObject const * const dofobj = elem;
         const processor_id_type obj_proc_id = dofobj->processor_id();

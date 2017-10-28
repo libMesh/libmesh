@@ -73,13 +73,10 @@ void TriangleInterface::triangulate()
   if ((_triangulation_type==PSLG) && (_insert_extra_points))
     {
       // Make a copy of the original points from the Mesh
-      std::vector<Point> original_points (_mesh.n_nodes());
-
-      MeshBase::node_iterator       node_it  = _mesh.nodes_begin();
-      const MeshBase::node_iterator node_end = _mesh.nodes_end();
-
-      for (unsigned int ctr=0; node_it != node_end; ++node_it)
-        original_points[ctr++] = **node_it;
+      std::vector<Point> original_points;
+      original_points.reserve (_mesh.n_nodes());
+      for (auto & node : _mesh.node_ptr_range())
+        original_points.push_back(*node);
 
       // Clear out the mesh
       _mesh.clear();
@@ -182,15 +179,10 @@ void TriangleInterface::triangulate()
 
   // Copy all the non-hole points and segments into the triangle struct.
   {
-    MeshBase::node_iterator it = _mesh.nodes_begin();
-    const MeshBase::node_iterator end = _mesh.nodes_end();
-
-    for (dof_id_type ctr=0; it != end; ctr+=2, ++it)
+    dof_id_type ctr=0;
+    for (auto & node : _mesh.node_ptr_range())
       {
         dof_id_type index = 2*hole_offset + ctr;
-
-        // Get pointer to the current node
-        Node * node = *it;
 
         // Set x,y values in pointlist
         initial.pointlist[index] = (*node)(0);
@@ -207,6 +199,8 @@ void TriangleInterface::triangulate()
                 initial.segmentlist[index+1] = (n==_mesh.n_nodes()-1) ? hole_offset : hole_offset+n+1; // wrap around
               }
           }
+
+        ctr +=2;
       }
   }
 

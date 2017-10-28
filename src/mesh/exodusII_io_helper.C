@@ -1236,11 +1236,9 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
 
   if (!use_discontinuous)
     {
-      MeshBase::const_node_iterator it = mesh.nodes_begin();
-      const MeshBase::const_node_iterator end = mesh.nodes_end();
-      for (; it != end; ++it)
+      for (const auto & node_ptr : mesh.node_ptr_range())
         {
-          const Node & node = **it;
+          const Node & node = *node_ptr;
 
           x.push_back(node(0) + _coordinate_offset(0));
 

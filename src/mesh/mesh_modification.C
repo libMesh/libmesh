@@ -160,13 +160,8 @@ void MeshTools::Modification::redistribute (MeshBase & mesh,
   // FIXME - we should thread this later.
   UniquePtr<FunctionBase<Real>> myfunc = mapfunc.clone();
 
-  MeshBase::node_iterator       it  = mesh.nodes_begin();
-  const MeshBase::node_iterator end = mesh.nodes_end();
-
-  for (; it != end; ++it)
+  for (auto & node : mesh.node_ptr_range())
     {
-      Node * node = *it;
-
       (*myfunc)(*node, output_vec);
 
       (*node)(0) = output_vec(0);
@@ -188,11 +183,8 @@ void MeshTools::Modification::translate (MeshBase & mesh,
 {
   const Point p(xt, yt, zt);
 
-  const MeshBase::node_iterator nd_end = mesh.nodes_end();
-
-  for (MeshBase::node_iterator nd = mesh.nodes_begin();
-       nd != nd_end; ++nd)
-    **nd += p;
+  for (auto & node : mesh.node_ptr_range())
+    *node += p;
 }
 
 
@@ -235,18 +227,15 @@ void MeshTools::Modification::rotate (MeshBase & mesh,
   // (equations 6-14 give the entries of the composite transformation matrix).
   // The rotations are performed sequentially about the z, x, and z axes, in that order.
   // A positive angle yields a counter-clockwise rotation about the axis in question.
-  const MeshBase::node_iterator nd_end = mesh.nodes_end();
-
-  for (MeshBase::node_iterator nd = mesh.nodes_begin();
-       nd != nd_end; ++nd)
+  for (auto & node : mesh.node_ptr_range())
     {
-      const Point pt = **nd;
+      const Point pt = *node;
       const Real  x  = pt(0);
       const Real  y  = pt(1);
       const Real  z  = pt(2);
-      **nd = Point(( cp*cs-sp*ct*ss)*x + ( sp*cs+cp*ct*ss)*y + (st*ss)*z,
-                   (-cp*ss-sp*ct*cs)*x + (-sp*ss+cp*ct*cs)*y + (st*cs)*z,
-                   ( sp*st)*x          + (-cp*st)*y          + (ct)*z   );
+      *node = Point(( cp*cs-sp*ct*ss)*x + ( sp*cs+cp*ct*ss)*y + (st*ss)*z,
+                    (-cp*ss-sp*ct*cs)*x + (-sp*ss+cp*ct*cs)*y + (st*cs)*z,
+                    ( sp*st)*x          + (-cp*st)*y          + (ct)*z   );
     }
 #else
   libmesh_error_msg("MeshTools::Modification::rotate() requires libMesh to be compiled with LIBMESH_DIM==3");
@@ -271,28 +260,22 @@ void MeshTools::Modification::scale (MeshBase & mesh,
     }
 
   // Scale the x coordinate in all dimensions
-  const MeshBase::node_iterator nd_end = mesh.nodes_end();
-
-  for (MeshBase::node_iterator nd = mesh.nodes_begin();
-       nd != nd_end; ++nd)
-    (**nd)(0) *= x_scale;
-
+  for (auto & node : mesh.node_ptr_range())
+    (*node)(0) *= x_scale;
 
   // Only scale the y coordinate in 2 and 3D
   if (LIBMESH_DIM < 2)
     return;
 
-  for (MeshBase::node_iterator nd = mesh.nodes_begin();
-       nd != nd_end; ++nd)
-    (**nd)(1) *= y_scale;
+  for (auto & node : mesh.node_ptr_range())
+    (*node)(1) *= y_scale;
 
   // Only scale the z coordinate in 3D
   if (LIBMESH_DIM < 3)
     return;
 
-  for (MeshBase::node_iterator nd = mesh.nodes_begin();
-       nd != nd_end; ++nd)
-    (**nd)(2) *= z_scale;
+  for (auto & node : mesh.node_ptr_range())
+    (*node)(2) *= z_scale;
 }
 
 
@@ -810,7 +793,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
     unique_id_type max_unique_id = mesh.parallel_max_unique_id();
 #endif
 
-    for (auto & elem : mesh.elements_range())
+    for (auto & elem : mesh.element_ptr_range())
       {
         const ElemType etype = elem->type();
 
@@ -1856,7 +1839,7 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
   }
 
   // Loop again, delete any remaining elements
-  for (auto & elem : mesh.elements_range())
+  for (auto & elem : mesh.element_ptr_range())
     mesh.delete_elem(elem);
 
   // Add the copied (now level-0) elements back to the mesh
@@ -2059,7 +2042,7 @@ void MeshTools::Modification::change_subdomain_id (MeshBase & mesh,
       return;
     }
 
-  for (auto & elem : mesh.elements_range())
+  for (auto & elem : mesh.element_ptr_range())
     {
       if (elem->subdomain_id() == old_id)
         elem->subdomain_id() = new_id;

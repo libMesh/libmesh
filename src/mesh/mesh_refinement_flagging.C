@@ -660,7 +660,7 @@ void MeshRefinement::flag_elements_by (ElementFlagging & element_flagging)
 
 void MeshRefinement::switch_h_to_p_refinement ()
 {
-  for (auto & elem : _mesh.elements_range())
+  for (auto & elem : _mesh.element_ptr_range())
     {
       if (elem->active())
         {
@@ -679,7 +679,7 @@ void MeshRefinement::switch_h_to_p_refinement ()
 
 void MeshRefinement::add_p_to_h_refinement ()
 {
-  for (auto & elem : _mesh.elements_range())
+  for (auto & elem : _mesh.element_ptr_range())
     elem->set_p_refinement_flag(elem->refinement_flag());
 }
 
@@ -689,7 +689,7 @@ void MeshRefinement::clean_refinement_flags ()
 {
   // Possibly clean up the refinement flags from
   // a previous step
-  for (auto & elem : _mesh.elements_range())
+  for (auto & elem : _mesh.element_ptr_range())
     {
       if (elem->active())
         {
