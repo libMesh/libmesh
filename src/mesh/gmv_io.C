@@ -660,13 +660,8 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
     // The same temporary storage will be used for each element
     std::vector<dof_id_type> conn;
 
-    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-    for ( ; it != end; ++it)
+    for (const auto & elem : mesh.active_element_ptr_range())
       {
-        const Elem * elem = *it;
-
         mesh_max_p_level = std::max(mesh_max_p_level,
                                     elem->p_level());
 
@@ -675,10 +670,10 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           case 1:
             {
               if (this->subdivide_second_order())
-                for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+                for (unsigned int se=0; se<elem->n_sub_elem(); se++)
                   {
                     out_stream << "line 2\n";
-                    (*it)->connectivity(se, TECPLOT, conn);
+                    elem->connectivity(se, TECPLOT, conn);
                     for (std::size_t i=0; i<conn.size(); i++)
                       out_stream << conn[i] << " ";
 
@@ -687,13 +682,13 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
               else
                 {
                   out_stream << "line 2\n";
-                  if ((*it)->default_order() == FIRST)
-                    (*it)->connectivity(0, TECPLOT, conn);
+                  if (elem->default_order() == FIRST)
+                    elem->connectivity(0, TECPLOT, conn);
                   else
                     {
-                      UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type((*it)->type()));
+                      UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
                       for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
-                        lo_elem->set_node(i) = (*it)->node_ptr(i);
+                        lo_elem->set_node(i) = elem->node_ptr(i);
                       lo_elem->connectivity(0, TECPLOT, conn);
                     }
                   for (std::size_t i=0; i<conn.size(); i++)
@@ -708,79 +703,79 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           case 2:
             {
               if (this->subdivide_second_order())
-                for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+                for (unsigned int se=0; se<elem->n_sub_elem(); se++)
                   {
                     // Quad elements
-                    if (((*it)->type() == QUAD4) ||
-                        ((*it)->type() == QUAD8) || // Note: QUAD8 will be output as one central quad and
+                    if ((elem->type() == QUAD4) ||
+                        (elem->type() == QUAD8) || // Note: QUAD8 will be output as one central quad and
                         // four surrounding triangles (though they will be written
                         // to GMV as QUAD4s).
-                        ((*it)->type() == QUAD9)
+                        (elem->type() == QUAD9)
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-                        || ((*it)->type() == INFQUAD4)
-                        || ((*it)->type() == INFQUAD6)
+                        || (elem->type() == INFQUAD4)
+                        || (elem->type() == INFQUAD6)
 #endif
                         )
                       {
                         out_stream << "quad 4\n";
-                        (*it)->connectivity(se, TECPLOT, conn);
+                        elem->connectivity(se, TECPLOT, conn);
                         for (std::size_t i=0; i<conn.size(); i++)
                           out_stream << conn[i] << " ";
                       }
 
                     // Triangle elements
-                    else if (((*it)->type() == TRI3) ||
-                             ((*it)->type() == TRI6))
+                    else if ((elem->type() == TRI3) ||
+                             (elem->type() == TRI6))
                       {
                         out_stream << "tri 3\n";
-                        (*it)->connectivity(se, TECPLOT, conn);
+                        elem->connectivity(se, TECPLOT, conn);
                         for (unsigned int i=0; i<3; i++)
                           out_stream << conn[i] << " ";
                       }
                     else
-                      libmesh_error_msg("Unsupported element type: " << Utility::enum_to_string((*it)->type()));
+                      libmesh_error_msg("Unsupported element type: " << Utility::enum_to_string(elem->type()));
                   }
               else // !this->subdivide_second_order()
                 {
                   // Quad elements
-                  if (((*it)->type() == QUAD4)
+                  if ((elem->type() == QUAD4)
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-                      || ((*it)->type() == INFQUAD4)
+                      || (elem->type() == INFQUAD4)
 #endif
                       )
                     {
-                      (*it)->connectivity(0, TECPLOT, conn);
+                      elem->connectivity(0, TECPLOT, conn);
                       out_stream << "quad 4\n";
                       for (std::size_t i=0; i<conn.size(); i++)
                         out_stream << conn[i] << " ";
                     }
-                  else if (((*it)->type() == QUAD8) ||
-                           ((*it)->type() == QUAD9)
+                  else if ((elem->type() == QUAD8) ||
+                           (elem->type() == QUAD9)
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-                           || ((*it)->type() == INFQUAD6)
+                           || (elem->type() == INFQUAD6)
 #endif
                            )
                     {
-                      UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type((*it)->type()));
+                      UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
                       for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
-                        lo_elem->set_node(i) = (*it)->node_ptr(i);
+                        lo_elem->set_node(i) = elem->node_ptr(i);
                       lo_elem->connectivity(0, TECPLOT, conn);
                       out_stream << "quad 4\n";
                       for (std::size_t i=0; i<conn.size(); i++)
                         out_stream << conn[i] << " ";
                     }
-                  else if ((*it)->type() == TRI3)
+                  else if (elem->type() == TRI3)
                     {
-                      (*it)->connectivity(0, TECPLOT, conn);
+                      elem->connectivity(0, TECPLOT, conn);
                       out_stream << "tri 3\n";
                       for (unsigned int i=0; i<3; i++)
                         out_stream << conn[i] << " ";
                     }
-                  else if ((*it)->type() == TRI6)
+                  else if (elem->type() == TRI6)
                     {
-                      UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type((*it)->type()));
+                      UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
                       for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
-                        lo_elem->set_node(i) = (*it)->node_ptr(i);
+                        lo_elem->set_node(i) = elem->node_ptr(i);
                       lo_elem->connectivity(0, TECPLOT, conn);
                       out_stream << "tri 3\n";
                       for (unsigned int i=0; i<3; i++)
@@ -796,42 +791,42 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           case 3:
             {
               if (this->subdivide_second_order())
-                for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+                for (unsigned int se=0; se<elem->n_sub_elem(); se++)
                   {
 
 #ifndef  LIBMESH_ENABLE_INFINITE_ELEMENTS
-                    if (((*it)->type() == HEX8)   ||
-                        ((*it)->type() == HEX27))
+                    if ((elem->type() == HEX8)   ||
+                        (elem->type() == HEX27))
                       {
                         out_stream << "phex8 8\n";
-                        (*it)->connectivity(se, TECPLOT, conn);
+                        elem->connectivity(se, TECPLOT, conn);
                         for (std::size_t i=0; i<conn.size(); i++)
                           out_stream << conn[i] << " ";
                       }
 
-                    else if ((*it)->type() == HEX20)
+                    else if (elem->type() == HEX20)
                       {
                         out_stream << "phex20 20\n";
-                        out_stream << (*it)->node_id(0)+1  << " "
-                                   << (*it)->node_id(1)+1  << " "
-                                   << (*it)->node_id(2)+1  << " "
-                                   << (*it)->node_id(3)+1  << " "
-                                   << (*it)->node_id(4)+1  << " "
-                                   << (*it)->node_id(5)+1  << " "
-                                   << (*it)->node_id(6)+1  << " "
-                                   << (*it)->node_id(7)+1  << " "
-                                   << (*it)->node_id(8)+1  << " "
-                                   << (*it)->node_id(9)+1  << " "
-                                   << (*it)->node_id(10)+1 << " "
-                                   << (*it)->node_id(11)+1 << " "
-                                   << (*it)->node_id(16)+1 << " "
-                                   << (*it)->node_id(17)+1 << " "
-                                   << (*it)->node_id(18)+1 << " "
-                                   << (*it)->node_id(19)+1 << " "
-                                   << (*it)->node_id(12)+1 << " "
-                                   << (*it)->node_id(13)+1 << " "
-                                   << (*it)->node_id(14)+1 << " "
-                                   << (*it)->node_id(15)+1 << " ";
+                        out_stream << elem->node_id(0)+1  << " "
+                                   << elem->node_id(1)+1  << " "
+                                   << elem->node_id(2)+1  << " "
+                                   << elem->node_id(3)+1  << " "
+                                   << elem->node_id(4)+1  << " "
+                                   << elem->node_id(5)+1  << " "
+                                   << elem->node_id(6)+1  << " "
+                                   << elem->node_id(7)+1  << " "
+                                   << elem->node_id(8)+1  << " "
+                                   << elem->node_id(9)+1  << " "
+                                   << elem->node_id(10)+1 << " "
+                                   << elem->node_id(11)+1 << " "
+                                   << elem->node_id(16)+1 << " "
+                                   << elem->node_id(17)+1 << " "
+                                   << elem->node_id(18)+1 << " "
+                                   << elem->node_id(19)+1 << " "
+                                   << elem->node_id(12)+1 << " "
+                                   << elem->node_id(13)+1 << " "
+                                   << elem->node_id(14)+1 << " "
+                                   << elem->node_id(15)+1 << " ";
                       }
 
                     // According to our copy of gmvread.c, this is the
@@ -852,38 +847,38 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                     // Hex27::n_sub_elem() to return 1, not sure how
                     // much other code that would affect...
 
-                    // else if ((*it)->type() == HEX27)
+                    // else if (elem->type() == HEX27)
                     //   {
                     //     out_stream << "phex27 27\n";
-                    //     out_stream << (*it)->node_id(0)+1  << " "
-                    //                << (*it)->node_id(1)+1  << " "
-                    //                << (*it)->node_id(2)+1  << " "
-                    //                << (*it)->node_id(3)+1  << " "
-                    //                << (*it)->node_id(4)+1  << " "
-                    //                << (*it)->node_id(5)+1  << " "
-                    //                << (*it)->node_id(6)+1  << " "
-                    //                << (*it)->node_id(7)+1  << " "
-                    //                << (*it)->node_id(8)+1  << " "
-                    //                << (*it)->node_id(9)+1  << " "
-                    //                << (*it)->node_id(10)+1 << " "
-                    //                << (*it)->node_id(11)+1 << " "
-                    //                << (*it)->node_id(16)+1 << " "
-                    //                << (*it)->node_id(17)+1 << " "
-                    //                << (*it)->node_id(18)+1 << " "
-                    //                << (*it)->node_id(19)+1 << " "
-                    //                << (*it)->node_id(12)+1 << " "
-                    //                << (*it)->node_id(13)+1 << " "
-                    //                << (*it)->node_id(14)+1 << " "
-                    //                << (*it)->node_id(15)+1 << " "
+                    //     out_stream << elem->node_id(0)+1  << " "
+                    //                << elem->node_id(1)+1  << " "
+                    //                << elem->node_id(2)+1  << " "
+                    //                << elem->node_id(3)+1  << " "
+                    //                << elem->node_id(4)+1  << " "
+                    //                << elem->node_id(5)+1  << " "
+                    //                << elem->node_id(6)+1  << " "
+                    //                << elem->node_id(7)+1  << " "
+                    //                << elem->node_id(8)+1  << " "
+                    //                << elem->node_id(9)+1  << " "
+                    //                << elem->node_id(10)+1 << " "
+                    //                << elem->node_id(11)+1 << " "
+                    //                << elem->node_id(16)+1 << " "
+                    //                << elem->node_id(17)+1 << " "
+                    //                << elem->node_id(18)+1 << " "
+                    //                << elem->node_id(19)+1 << " "
+                    //                << elem->node_id(12)+1 << " "
+                    //                << elem->node_id(13)+1 << " "
+                    //                << elem->node_id(14)+1 << " "
+                    //                << elem->node_id(15)+1 << " "
                     //       // mid-face nodes
-                    //                << (*it)->node_id(21)+1 << " " // GMV front
-                    //                << (*it)->node_id(22)+1 << " " // GMV right
-                    //                << (*it)->node_id(23)+1 << " " // GMV back
-                    //                << (*it)->node_id(24)+1 << " " // GMV left
-                    //                << (*it)->node_id(20)+1 << " " // GMV bottom
-                    //                << (*it)->node_id(25)+1 << " " // GMV top
+                    //                << elem->node_id(21)+1 << " " // GMV front
+                    //                << elem->node_id(22)+1 << " " // GMV right
+                    //                << elem->node_id(23)+1 << " " // GMV back
+                    //                << elem->node_id(24)+1 << " " // GMV left
+                    //                << elem->node_id(20)+1 << " " // GMV bottom
+                    //                << elem->node_id(25)+1 << " " // GMV top
                     //       // center node
-                    //                << (*it)->node_id(26)+1 << " ";
+                    //                << elem->node_id(26)+1 << " ";
                     //   }
 
 #else // LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -891,59 +886,59 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                     // In case of infinite elements, HEX20
                     // should be handled just like the
                     // INFHEX16, since these connect to each other
-                    if (((*it)->type() == HEX8)     ||
-                        ((*it)->type() == HEX27)    ||
-                        ((*it)->type() == INFHEX8)  ||
-                        ((*it)->type() == INFHEX16) ||
-                        ((*it)->type() == INFHEX18) ||
-                        ((*it)->type() == HEX20))
+                    if ((elem->type() == HEX8)     ||
+                        (elem->type() == HEX27)    ||
+                        (elem->type() == INFHEX8)  ||
+                        (elem->type() == INFHEX16) ||
+                        (elem->type() == INFHEX18) ||
+                        (elem->type() == HEX20))
                       {
                         out_stream << "phex8 8\n";
-                        (*it)->connectivity(se, TECPLOT, conn);
+                        elem->connectivity(se, TECPLOT, conn);
                         for (std::size_t i=0; i<conn.size(); i++)
                           out_stream << conn[i] << " ";
                       }
 #endif
 
-                    else if (((*it)->type() == TET4)  ||
-                             ((*it)->type() == TET10))
+                    else if ((elem->type() == TET4)  ||
+                             (elem->type() == TET10))
                       {
                         out_stream << "tet 4\n";
                         // Tecplot connectivity returns 8 entries for
                         // the Tet, enough to store it as a degenerate Hex.
                         // For GMV we only pick out the four relevant node
                         // indices.
-                        (*it)->connectivity(se, TECPLOT, conn);
+                        elem->connectivity(se, TECPLOT, conn);
                         out_stream << conn[0] << " "  // libmesh tet node 0
                                    << conn[2] << " "  // libmesh tet node 2
                                    << conn[1] << " "  // libmesh tet node 1
                                    << conn[4] << " "; // libmesh tet node 3
                       }
 #ifndef  LIBMESH_ENABLE_INFINITE_ELEMENTS
-                    else if (((*it)->type() == PRISM6)  ||
-                             ((*it)->type() == PRISM15) ||
-                             ((*it)->type() == PRISM18) ||
-                             ((*it)->type() == PYRAMID5))
+                    else if ((elem->type() == PRISM6)  ||
+                             (elem->type() == PRISM15) ||
+                             (elem->type() == PRISM18) ||
+                             (elem->type() == PYRAMID5))
 #else
-                    else if (((*it)->type() == PRISM6)     ||
-                             ((*it)->type() == PRISM15)    ||
-                             ((*it)->type() == PRISM18)    ||
-                             ((*it)->type() == PYRAMID5)   ||
-                             ((*it)->type() == INFPRISM6)  ||
-                             ((*it)->type() == INFPRISM12))
+                    else if ((elem->type() == PRISM6)     ||
+                             (elem->type() == PRISM15)    ||
+                             (elem->type() == PRISM18)    ||
+                             (elem->type() == PYRAMID5)   ||
+                             (elem->type() == INFPRISM6)  ||
+                             (elem->type() == INFPRISM12))
 #endif
                       {
                         // Note that the prisms are treated as
                         // degenerated phex8's.
                         out_stream << "phex8 8\n";
-                        (*it)->connectivity(se, TECPLOT, conn);
+                        elem->connectivity(se, TECPLOT, conn);
                         for (std::size_t i=0; i<conn.size(); i++)
                           out_stream << conn[i] << " ";
                       }
 
                     else
                       libmesh_error_msg("Encountered an unrecognized element " \
-                                        << "type: " << (*it)->type()  \
+                                        << "type: " << elem->type()  \
                                         << "\nPossibly a dim-1 dimensional " \
                                         << "element?  Aborting...");
 
@@ -951,9 +946,9 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                   }
               else // !this->subdivide_second_order()
                 {
-                  UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type((*it)->type()));
+                  UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
                   for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
-                    lo_elem->set_node(i) = (*it)->node_ptr(i);
+                    lo_elem->set_node(i) = elem->node_ptr(i);
                   if ((lo_elem->type() == HEX8)
 #ifdef  LIBMESH_ENABLE_INFINITE_ELEMENTS
                       || (lo_elem->type() == HEX27)
@@ -1026,16 +1021,10 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           // which we can write to file.
           std::map<subdomain_id_type, unsigned> sbdid_map;
           typedef std::map<subdomain_id_type, unsigned>::iterator sbdid_map_iter;
-          {
-            MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-            const MeshBase::const_element_iterator end = mesh.active_elements_end();
 
-            for ( ; it != end; ++it)
-              {
-                // Try to insert with dummy value
-                sbdid_map.insert( std::make_pair((*it)->subdomain_id(), 0) );
-              }
-          }
+          // Try to insert with dummy value
+          for (const auto & elem : mesh.active_element_ptr_range())
+            sbdid_map.insert(std::make_pair(elem->subdomain_id(), 0));
 
           // Map is created, iterate through it to set indices.  They will be
           // used repeatedly below.
@@ -1052,17 +1041,14 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           for (std::size_t sbdid=0; sbdid<sbdid_map.size(); sbdid++)
             out_stream << "proc_" << sbdid << "\n";
 
-          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-          for ( ; it != end; ++it)
+          for (const auto & elem : mesh.active_element_ptr_range())
             {
-              // Find the unique index for (*it)->subdomain_id(), print that to file
-              sbdid_map_iter map_iter = sbdid_map.find( (*it)->subdomain_id() );
+              // Find the unique index for elem->subdomain_id(), print that to file
+              sbdid_map_iter map_iter = sbdid_map.find( elem->subdomain_id() );
               unsigned gmv_mat_number = (*map_iter).second;
 
               if (this->subdivide_second_order())
-                for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+                for (unsigned int se=0; se<elem->n_sub_elem(); se++)
                   out_stream << gmv_mat_number+1 << '\n';
               else
                 out_stream << gmv_mat_number+1 << "\n";
@@ -1079,15 +1065,12 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           for (unsigned int proc=0; proc<mesh.n_partitions(); proc++)
             out_stream << "proc_" << proc << '\n';
 
-          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-          for ( ; it != end; ++it)
+          for (const auto & elem : mesh.active_element_ptr_range())
             if (this->subdivide_second_order())
-              for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-                out_stream << (*it)->processor_id()+1 << '\n';
+              for (unsigned int se=0; se<elem->n_sub_elem(); se++)
+                out_stream << elem->processor_id()+1 << '\n';
             else
-              out_stream << (*it)->processor_id()+1 << '\n';
+              out_stream << elem->processor_id()+1 << '\n';
 
           out_stream << '\n';
         }
@@ -1121,15 +1104,12 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
     {
       out_stream << "p_level 0\n";
 
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-      for ( ; it != end; ++it)
+      for (const auto & elem : mesh.active_element_ptr_range())
         if (this->subdivide_second_order())
-          for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-            out_stream << (*it)->p_level() << " ";
+          for (unsigned int se=0; se<elem->n_sub_elem(); se++)
+            out_stream << elem->p_level() << " ";
         else
-          out_stream << (*it)->p_level() << " ";
+          out_stream << elem->p_level() << " ";
       out_stream << "\n\n";
     }
 
@@ -1152,19 +1132,14 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           // Loop over active elements, write out cell data.  If second-order cells
           // are split into sub-elements, the sub-elements inherit their parent's
           // cell-centered data.
-          MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator elem_end = mesh.active_elements_end();
-
-          for (; elem_it != elem_end; ++elem_it)
+          for (const auto & elem : mesh.active_element_ptr_range())
             {
-              const Elem * e = *elem_it;
-
               // Use the element's ID to find the value...
-              libmesh_assert_less (e->id(), the_array->size());
-              const Real the_value = the_array->operator[](e->id());
+              libmesh_assert_less (elem->id(), the_array->size());
+              const Real the_value = the_array->operator[](elem->id());
 
               if (this->subdivide_second_order())
-                for (unsigned int se=0; se < e->n_sub_elem(); se++)
+                for (unsigned int se=0; se < elem->n_sub_elem(); se++)
                   out_stream << the_value << " ";
               else
                 out_stream << the_value << " ";
