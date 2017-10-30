@@ -692,14 +692,9 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
 
           unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type );
 
-          MeshBase::element_iterator       it       = _mesh.active_local_elements_begin();
-          const MeshBase::element_iterator end_elem = _mesh.active_local_elements_end();
-
-          for ( ; it != end_elem; ++it)
+          for (const auto & elem : _mesh.active_local_element_ptr_range())
             {
-              const Elem * elem = *it;
-
-              if (var_description.active_on_subdomain((*it)->subdomain_id()))
+              if (var_description.active_on_subdomain(elem->subdomain_id()))
                 {
                   dof_map.dof_indices (elem, dof_indices, var);
 
