@@ -1544,31 +1544,18 @@ bool MeshRefinement::_refine_elements ()
   // assigns temporary ids, so we need to synchronize ids afterward to
   // be safe anyway, so we might as well use the distributed mesh code
   // path.
-  {
-    MeshBase::element_iterator
-      elem_it  = _mesh.active_local_elements_begin(),
-      elem_end = _mesh.active_local_elements_end();
-
-    if (_mesh.is_replicated())
-      {
-        elem_it  = _mesh.active_elements_begin();
-        elem_end = _mesh.active_elements_end();
-      }
-
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        Elem * elem = *elem_it;
-        if (elem->refinement_flag() == Elem::REFINE)
-          local_copy_of_elements.push_back(elem);
-        if (elem->p_refinement_flag() == Elem::REFINE &&
-            elem->active())
-          {
-            elem->set_p_level(elem->p_level()+1);
-            elem->set_p_refinement_flag(Elem::JUST_REFINED);
-            mesh_p_changed = true;
-          }
-      }
-  }
+  for (auto & elem : _mesh.is_replicated() ? _mesh.active_element_ptr_range() : _mesh.active_local_element_ptr_range())
+    {
+      if (elem->refinement_flag() == Elem::REFINE)
+        local_copy_of_elements.push_back(elem);
+      if (elem->p_refinement_flag() == Elem::REFINE &&
+          elem->active())
+        {
+          elem->set_p_level(elem->p_level()+1);
+          elem->set_p_refinement_flag(Elem::JUST_REFINED);
+          mesh_p_changed = true;
+        }
+    }
 
   if (!_mesh.is_replicated())
     {
