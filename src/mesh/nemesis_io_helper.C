@@ -1269,13 +1269,8 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
   // element numberings into Nemesis numberings.
   ExodusII_IO_Helper::ElementMaps element_mapper;
 
-  MeshBase::const_element_iterator elem_it = pmesh.active_local_elements_begin();
-  MeshBase::const_element_iterator elem_end = pmesh.active_local_elements_end();
-
-  for (; elem_it != elem_end; ++elem_it)
+  for (const auto & elem : pmesh.active_local_element_ptr_range())
     {
-      const Elem * elem = *elem_it;
-
       // Add this Elem's ID to all_elem_ids, later we will take the difference
       // between this set and the set of border_elem_ids, to get the set of
       // internal_elem_ids.
