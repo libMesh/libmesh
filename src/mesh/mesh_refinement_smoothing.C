@@ -49,83 +49,71 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
   std::vector<unsigned char> max_p_level_at_node (_mesh.n_nodes(), 0);
 
   // Loop over all the active elements & fill the vector
-  {
-    MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+  for (auto & elem : _mesh.active_element_ptr_range())
+    {
+      const unsigned char elem_level =
+        cast_int<unsigned char>(elem->level() +
+                                ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0));
+      const unsigned char elem_p_level =
+        cast_int<unsigned char>(elem->p_level() +
+                                ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
 
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        const Elem * elem = *elem_it;
-        const unsigned char elem_level =
-          cast_int<unsigned char>(elem->level() +
-                                  ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0));
-        const unsigned char elem_p_level =
-          cast_int<unsigned char>(elem->p_level() +
-                                  ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
+      // Set the max_level at each node
+      for (unsigned int n=0; n<elem->n_nodes(); n++)
+        {
+          const dof_id_type node_number = elem->node_id(n);
 
-        // Set the max_level at each node
-        for (unsigned int n=0; n<elem->n_nodes(); n++)
-          {
-            const dof_id_type node_number = elem->node_id(n);
+          libmesh_assert_less (node_number, max_level_at_node.size());
 
-            libmesh_assert_less (node_number, max_level_at_node.size());
-
-            max_level_at_node[node_number] =
-              std::max (max_level_at_node[node_number], elem_level);
-            max_p_level_at_node[node_number] =
-              std::max (max_p_level_at_node[node_number], elem_p_level);
-          }
-      }
-  }
+          max_level_at_node[node_number] =
+            std::max (max_level_at_node[node_number], elem_level);
+          max_p_level_at_node[node_number] =
+            std::max (max_p_level_at_node[node_number], elem_p_level);
+        }
+    }
 
 
   // Now loop over the active elements and flag the elements
   // who violate the requested level mismatch. Alternatively, if
   // _enforce_mismatch_limit_prior_to_refinement is true, swap refinement flags
   // accordingly.
-  {
-    MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+  for (auto & elem : _mesh.active_element_ptr_range())
+    {
+      const unsigned int elem_level = elem->level();
+      const unsigned int elem_p_level = elem->p_level();
 
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        Elem * elem = *elem_it;
-        const unsigned int elem_level = elem->level();
-        const unsigned int elem_p_level = elem->p_level();
+      // Skip the element if it is already fully flagged
+      // unless we are enforcing mismatch prior to refinement and may need to
+      // remove the refinement flag(s)
+      if (elem->refinement_flag() == Elem::REFINE &&
+          elem->p_refinement_flag() == Elem::REFINE
+          && !_enforce_mismatch_limit_prior_to_refinement)
+        continue;
 
-        // Skip the element if it is already fully flagged
-        // unless we are enforcing mismatch prior to refinement and may need to
-        // remove the refinement flag(s)
-        if (elem->refinement_flag() == Elem::REFINE &&
-            elem->p_refinement_flag() == Elem::REFINE
-            && !_enforce_mismatch_limit_prior_to_refinement)
-          continue;
+      // Loop over the nodes, check for possible mismatch
+      for (unsigned int n=0; n<elem->n_nodes(); n++)
+        {
+          const dof_id_type node_number = elem->node_id(n);
 
-        // Loop over the nodes, check for possible mismatch
-        for (unsigned int n=0; n<elem->n_nodes(); n++)
-          {
-            const dof_id_type node_number = elem->node_id(n);
+          // Flag the element for refinement if it violates
+          // the requested level mismatch
+          if ((elem_level + max_mismatch) < max_level_at_node[node_number]
+              && elem->refinement_flag() != Elem::REFINE)
+            {
+              elem->set_refinement_flag (Elem::REFINE);
+              flags_changed = true;
+            }
+          if ((elem_p_level + max_mismatch) < max_p_level_at_node[node_number]
+              && elem->p_refinement_flag() != Elem::REFINE)
+            {
+              elem->set_p_refinement_flag (Elem::REFINE);
+              flags_changed = true;
+            }
 
-            // Flag the element for refinement if it violates
-            // the requested level mismatch
-            if ((elem_level + max_mismatch) < max_level_at_node[node_number]
-                && elem->refinement_flag() != Elem::REFINE)
-              {
-                elem->set_refinement_flag (Elem::REFINE);
-                flags_changed = true;
-              }
-            if ((elem_p_level + max_mismatch) < max_p_level_at_node[node_number]
-                && elem->p_refinement_flag() != Elem::REFINE)
-              {
-                elem->set_p_refinement_flag (Elem::REFINE);
-                flags_changed = true;
-              }
-
-            // Possibly enforce limit mismatch prior to refinement
-            flags_changed |= this->enforce_mismatch_limit_prior_to_refinement(elem, POINT, max_mismatch);
-          }
-      }
-  }
+          // Possibly enforce limit mismatch prior to refinement
+          flags_changed |= this->enforce_mismatch_limit_prior_to_refinement(elem, POINT, max_mismatch);
+        }
+    }
 
   // If flags changed on any processor then they changed globally
   this->comm().max(flags_changed);
