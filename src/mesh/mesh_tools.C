@@ -1111,12 +1111,8 @@ void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase & mesh)
   processor_id_type lastprocid = 0;
   dof_id_type lastelemid = 0;
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.active_elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.active_elements_begin(); el != el_end; ++el)
+  for (const auto & elem : mesh.active_element_ptr_range())
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
       processor_id_type elemprocid = elem->processor_id();
       dof_id_type elemid = elem->id();
