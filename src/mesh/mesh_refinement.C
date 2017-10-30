@@ -384,9 +384,6 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
     point_locator = _mesh.sub_point_locator();
 #endif
 
-  MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
-
   bool failure = false;
 
 #ifndef NDEBUG
@@ -394,33 +391,28 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
   Elem * failed_neighbor = libmesh_nullptr;
 #endif // !NDEBUG
 
-  for ( ; elem_it != elem_end && !failure; ++elem_it)
-    {
-      // Pointer to the element
-      Elem * elem = *elem_it;
+  for (auto & elem : _mesh.active_local_element_ptr_range())
+    for (auto n : elem->side_index_range())
+      {
+        Elem * neighbor =
+          topological_neighbor(elem, point_locator.get(), n);
 
-      for (auto n : elem->side_index_range())
-        {
-          Elem * neighbor =
-            topological_neighbor(elem, point_locator.get(), n);
+        if (!neighbor || !neighbor->active() ||
+            neighbor == remote_elem)
+          continue;
 
-          if (!neighbor || !neighbor->active() ||
-              neighbor == remote_elem)
-            continue;
-
-          if ((neighbor->level() + 1 < elem->level()) ||
-              (neighbor->p_level() + 1 < elem->p_level()) ||
-              (neighbor->p_level() > elem->p_level() + 1))
-            {
-              failure = true;
+        if ((neighbor->level() + 1 < elem->level()) ||
+            (neighbor->p_level() + 1 < elem->p_level()) ||
+            (neighbor->p_level() > elem->p_level() + 1))
+          {
+            failure = true;
 #ifndef NDEBUG
-              failed_elem = elem;
-              failed_neighbor = neighbor;
+            failed_elem = elem;
+            failed_neighbor = neighbor;
 #endif // !NDEBUG
-              break;
-            }
-        }
-    }
+            break;
+          }
+      }
 
   // If any processor failed, we failed globally
   this->comm().max(failure);
