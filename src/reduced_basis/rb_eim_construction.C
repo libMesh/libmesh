@@ -627,14 +627,11 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
       std::vector<std::vector<Real>> JxW_values(mesh.n_elem());
       std::vector<std::vector<std::vector<Real>>> phi_values(mesh.n_elem());
 
-      MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-      const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-      for ( ; el != end_el; ++el)
+      for (const auto & elem : mesh.active_local_element_ptr_range())
         {
-          dof_id_type elem_id = (*el)->id();
+          dof_id_type elem_id = elem->id();
 
-          context.pre_fe_reinit(*this, *el);
+          context.pre_fe_reinit(*this, elem);
           context.elem_fe_reinit();
 
           FEBase * elem_fe = libmesh_nullptr;
@@ -663,7 +660,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
               parametrized_fn_vals[elem_id][qp].resize(get_explicit_system().n_vars());
               for (unsigned int var=0; var<get_explicit_system().n_vars(); var++)
                 {
-                  Number eval_result = eim_eval.evaluate_parametrized_function(var, xyz[qp], *(*el));
+                  Number eval_result = eim_eval.evaluate_parametrized_function(var, xyz[qp], *elem);
                   parametrized_fn_vals[elem_id][qp][var] = eval_result;
                 }
             }
@@ -674,14 +671,11 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
         {
           rhs->zero();
 
-          MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-          const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-          for ( ; el != end_el; ++el)
+          for (const auto & elem : mesh.active_local_element_ptr_range())
             {
-              dof_id_type elem_id = (*el)->id();
+              dof_id_type elem_id = elem->id();
 
-              context.pre_fe_reinit(*this, *el);
+              context.pre_fe_reinit(*this, elem);
               //context.elem_fe_reinit(); <--- skip this because we cached all the FE data
 
               // Loop over qp before var because parametrized functions often use
