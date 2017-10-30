@@ -1874,11 +1874,8 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   // We build up a set of compatible processor ids for each node
   proc_id_map_type new_proc_ids;
 
-  MeshBase::element_iterator       e_it  = mesh.active_elements_begin();
-  const MeshBase::element_iterator e_end = mesh.active_elements_end();
-  for (; e_it != e_end; ++e_it)
+  for (auto & elem : mesh.active_element_ptr_range())
     {
-      Elem * elem = *e_it;
       processor_id_type pid = elem->processor_id();
 
       for (auto & node : elem->node_ref_range())
