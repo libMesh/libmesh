@@ -1585,13 +1585,10 @@ void GMVIO::write_discontinuous_gmv (const std::string & name,
 
     // Compute the total weight
     {
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
       unsigned int tw=0;
 
-      for ( ; it != end; ++it)
-        tw += (*it)->n_nodes();
+      for (const auto & elem : mesh.active_element_ptr_range())
+        tw += elem->n_nodes();
 
       out_stream << "nodes " << tw << std::endl;
     }
@@ -1600,12 +1597,9 @@ void GMVIO::write_discontinuous_gmv (const std::string & name,
 
     // Write all the x values
     {
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-      for ( ; it != end; ++it)
-        for (unsigned int n=0; n<(*it)->n_nodes(); n++)
-          out_stream << (*it)->point(n)(0) << " ";
+      for (const auto & elem : mesh.active_element_ptr_range())
+        for (unsigned int n=0; n<elem->n_nodes(); n++)
+          out_stream << elem->point(n)(0) << " ";
 
       out_stream << std::endl;
     }
@@ -1613,13 +1607,10 @@ void GMVIO::write_discontinuous_gmv (const std::string & name,
 
     // Write all the y values
     {
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-      for ( ; it != end; ++it)
-        for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+      for (const auto & elem : mesh.active_element_ptr_range())
+        for (unsigned int n=0; n<elem->n_nodes(); n++)
 #if LIBMESH_DIM > 1
-          out_stream << (*it)->point(n)(1) << " ";
+          out_stream << elem->point(n)(1) << " ";
 #else
       out_stream << 0. << " ";
 #endif
@@ -1630,13 +1621,10 @@ void GMVIO::write_discontinuous_gmv (const std::string & name,
 
     // Write all the z values
     {
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-      for ( ; it != end; ++it)
-        for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+      for (const auto & elem : mesh.active_element_ptr_range())
+        for (unsigned int n=0; n<elem->n_nodes(); n++)
 #if LIBMESH_DIM > 2
-          out_stream << (*it)->point(n)(2) << " ";
+          out_stream << elem->point(n)(2) << " ";
 #else
       out_stream << 0. << " ";
 #endif
@@ -1652,33 +1640,30 @@ void GMVIO::write_discontinuous_gmv (const std::string & name,
 
     out_stream << "cells " << n_active_elem << std::endl;
 
-    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
     unsigned int nn=1;
 
     switch (mesh.mesh_dimension())
       {
       case 1:
         {
-          for ( ; it != end; ++it)
-            for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+          for (const auto & elem : mesh.active_element_ptr_range())
+            for (unsigned int se=0; se<elem->n_sub_elem(); se++)
               {
-                if (((*it)->type() == EDGE2) ||
-                    ((*it)->type() == EDGE3) ||
-                    ((*it)->type() == EDGE4)
+                if ((elem->type() == EDGE2) ||
+                    (elem->type() == EDGE3) ||
+                    (elem->type() == EDGE4)
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-                    || ((*it)->type() == INFEDGE2)
+                    || (elem->type() == INFEDGE2)
 #endif
                     )
                   {
                     out_stream << "line 2" << std::endl;
-                    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+                    for (unsigned int i=0; i<elem->n_nodes(); i++)
                       out_stream << nn++ << " ";
 
                   }
                 else
-                  libmesh_error_msg("Unsupported 1D element type: " << Utility::enum_to_string((*it)->type()));
+                  libmesh_error_msg("Unsupported 1D element type: " << Utility::enum_to_string(elem->type()));
 
                 out_stream << std::endl;
               }
@@ -1688,35 +1673,35 @@ void GMVIO::write_discontinuous_gmv (const std::string & name,
 
       case 2:
         {
-          for ( ; it != end; ++it)
-            for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+          for (const auto & elem : mesh.active_element_ptr_range())
+            for (unsigned int se=0; se<elem->n_sub_elem(); se++)
               {
-                if (((*it)->type() == QUAD4) ||
-                    ((*it)->type() == QUAD8) || // Note: QUAD8 will be output as one central quad and
+                if ((elem->type() == QUAD4) ||
+                    (elem->type() == QUAD8) || // Note: QUAD8 will be output as one central quad and
                     // four surrounding triangles (though they will be written
                     // to GMV as QUAD4s).
-                    ((*it)->type() == QUAD9)
+                    (elem->type() == QUAD9)
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-                    || ((*it)->type() == INFQUAD4)
-                    || ((*it)->type() == INFQUAD6)
+                    || (elem->type() == INFQUAD4)
+                    || (elem->type() == INFQUAD6)
 #endif
                     )
                   {
                     out_stream << "quad 4" << std::endl;
-                    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+                    for (unsigned int i=0; i<elem->n_nodes(); i++)
                       out_stream << nn++ << " ";
 
                   }
-                else if (((*it)->type() == TRI3) ||
-                         ((*it)->type() == TRI6))
+                else if ((elem->type() == TRI3) ||
+                         (elem->type() == TRI6))
                   {
                     out_stream << "tri 3" << std::endl;
-                    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+                    for (unsigned int i=0; i<elem->n_nodes(); i++)
                       out_stream << nn++ << " ";
 
                   }
                 else
-                  libmesh_error_msg("Unsupported 2D element type: " << Utility::enum_to_string((*it)->type()));
+                  libmesh_error_msg("Unsupported 2D element type: " << Utility::enum_to_string(elem->type()));
 
                 out_stream << std::endl;
               }
@@ -1727,45 +1712,45 @@ void GMVIO::write_discontinuous_gmv (const std::string & name,
 
       case 3:
         {
-          for ( ; it != end; ++it)
-            for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+          for (const auto & elem : mesh.active_element_ptr_range())
+            for (unsigned int se=0; se<elem->n_sub_elem(); se++)
               {
-                if (((*it)->type() == HEX8) ||
-                    ((*it)->type() == HEX20) ||
-                    ((*it)->type() == HEX27)
+                if ((elem->type() == HEX8) ||
+                    (elem->type() == HEX20) ||
+                    (elem->type() == HEX27)
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-                    || ((*it)->type() == INFHEX8)
-                    || ((*it)->type() == INFHEX16)
-                    || ((*it)->type() == INFHEX18)
+                    || (elem->type() == INFHEX8)
+                    || (elem->type() == INFHEX16)
+                    || (elem->type() == INFHEX18)
 #endif
                     )
                   {
                     out_stream << "phex8 8" << std::endl;
-                    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+                    for (unsigned int i=0; i<elem->n_nodes(); i++)
                       out_stream << nn++ << " ";
                   }
-                else if (((*it)->type() == PRISM6) ||
-                         ((*it)->type() == PRISM15) ||
-                         ((*it)->type() == PRISM18)
+                else if ((elem->type() == PRISM6) ||
+                         (elem->type() == PRISM15) ||
+                         (elem->type() == PRISM18)
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-                         || ((*it)->type() == INFPRISM6)
-                         || ((*it)->type() == INFPRISM12)
+                         || (elem->type() == INFPRISM6)
+                         || (elem->type() == INFPRISM12)
 #endif
                          )
                   {
                     out_stream << "pprism6 6" << std::endl;
-                    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+                    for (unsigned int i=0; i<elem->n_nodes(); i++)
                       out_stream << nn++ << " ";
                   }
-                else if (((*it)->type() == TET4) ||
-                         ((*it)->type() == TET10))
+                else if ((elem->type() == TET4) ||
+                         (elem->type() == TET10))
                   {
                     out_stream << "tet 4" << std::endl;
-                    for (unsigned int i=0; i<(*it)->n_nodes(); i++)
+                    for (unsigned int i=0; i<elem->n_nodes(); i++)
                       out_stream << nn++ << " ";
                   }
                 else
-                  libmesh_error_msg("Unsupported 3D element type: " << Utility::enum_to_string((*it)->type()));
+                  libmesh_error_msg("Unsupported 3D element type: " << Utility::enum_to_string(elem->type()));
 
                 out_stream << std::endl;
               }
@@ -1797,11 +1782,8 @@ void GMVIO::write_discontinuous_gmv (const std::string & name,
           for (unsigned int proc=0; proc<mesh.n_processors(); proc++)
             out_stream << "proc_" << proc << std::endl;
 
-          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-          for ( ; it != end; ++it)
-            out_stream << (*it)->processor_id()+1 << std::endl;
+          for (const auto & elem : mesh.active_element_ptr_range())
+            out_stream << elem->processor_id()+1 << std::endl;
 
           out_stream << std::endl;
         }
@@ -1836,52 +1818,34 @@ void GMVIO::write_discontinuous_gmv (const std::string & name,
 
         // this is the real part
         out_stream << "r_" << solution_names[c] << " 1" << std::endl;
-        {
-          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-          for ( ; it != end; ++it)
-            for (unsigned int n=0; n<(*it)->n_nodes(); n++)
-              out_stream << v[(n++)*n_vars + c].real() << " ";
-        }
+        for (const auto & elem : mesh.active_element_ptr_range())
+          for (unsigned int n=0; n<elem->n_nodes(); n++)
+            out_stream << v[(n++)*n_vars + c].real() << " ";
         out_stream << std::endl << std::endl;
 
 
         // this is the imaginary part
         out_stream << "i_" << solution_names[c] << " 1" << std::endl;
-        {
-          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-          for ( ; it != end; ++it)
-            for (unsigned int n=0; n<(*it)->n_nodes(); n++)
-              out_stream << v[(n++)*n_vars + c].imag() << " ";
-        }
+        for (const auto & elem : mesh.active_element_ptr_range())
+          for (unsigned int n=0; n<elem->n_nodes(); n++)
+            out_stream << v[(n++)*n_vars + c].imag() << " ";
         out_stream << std::endl << std::endl;
 
         // this is the magnitude
         out_stream << "a_" << solution_names[c] << " 1" << std::endl;
-        {
-          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-          for ( ; it != end; ++it)
-            for (unsigned int n=0; n<(*it)->n_nodes(); n++)
-              out_stream << std::abs(v[(n++)*n_vars + c]) << " ";
-        }
+        for (const auto & elem : mesh.active_element_ptr_range())
+          for (unsigned int n=0; n<elem->n_nodes(); n++)
+            out_stream << std::abs(v[(n++)*n_vars + c]) << " ";
         out_stream << std::endl << std::endl;
 
 #else
 
         out_stream << solution_names[c] << " 1" << std::endl;
         {
-          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
           unsigned int nn=0;
 
-          for ( ; it != end; ++it)
-            for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+          for (const auto & elem : mesh.active_element_ptr_range())
+            for (unsigned int n=0; n<elem->n_nodes(); n++)
               out_stream << v[(nn++)*n_vars + c] << " ";
         }
         out_stream << std::endl << std::endl;
