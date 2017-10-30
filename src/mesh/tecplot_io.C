@@ -209,10 +209,8 @@ unsigned TecplotIO::elem_dimension()
 
   // Loop over all the elements and mark the proper dimension entry in
   // the elem_dims vector.
-  MeshBase::const_element_iterator       it  = the_mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = the_mesh.active_elements_end();
-  for ( ; it != end; ++it)
-    elem_dims[(*it)->dim() - 1] = 1;
+  for (const auto & elem : the_mesh.active_element_ptr_range())
+    elem_dims[elem->dim() - 1] = 1;
 
   // Detect and disallow (for now) the writing of mixed dimension meshes.
   if (std::count(elem_dims.begin(), elem_dims.end(), 1) > 1)
