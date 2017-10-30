@@ -1073,15 +1073,10 @@ void FEMSystem::mesh_position_set()
   this->init_context(_femcontext);
 
   // Move every mesh element we can
-  MeshBase::const_element_iterator el =
-    mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el =
-    mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
       // We need the algebraic data
-      _femcontext.pre_fe_reinit(*this, *el);
+      _femcontext.pre_fe_reinit(*this, elem);
       // And when asserts are on, we also need the FE so
       // we can assert that the mesh data is of the right type.
 #ifndef NDEBUG
