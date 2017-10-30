@@ -1312,13 +1312,8 @@ void GMVIO::write_binary (const std::string & fname,
     unsigned int tempint = n_active_elem;
     out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
-    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-    for ( ; it != end; ++it)
+    for (const auto & elem : mesh.active_element_ptr_range())
       {
-        const Elem * elem = *it;
-
         mesh_max_p_level = std::max(mesh_max_p_level,
                                     elem->p_level());
 
@@ -1396,18 +1391,10 @@ void GMVIO::write_binary (const std::string & fname,
 
           unsigned int n=0;
 
-          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-          for ( ; it != end; ++it)
-            {
-              const Elem * elem = *it;
-
-              // We no longer write sub-elems in GMV, so just assign a
-              // processor id value to each element.
-              proc_id[n++] = elem->processor_id() + 1;
-            }
-
+          // We no longer write sub-elems in GMV, so just assign a
+          // processor id value to each element.
+          for (const auto & elem : mesh.active_element_ptr_range())
+            proc_id[n++] = elem->processor_id() + 1;
 
           out_stream.write(reinterpret_cast<char *>(&proc_id[0]),
                            sizeof(unsigned int)*proc_id.size());
@@ -1453,13 +1440,10 @@ void GMVIO::write_binary (const std::string & fname,
       unsigned int tempint = 0; // p levels are cell data
       out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
 
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end();
       unsigned int n=0;
-
-      for (; it != end; ++it)
-        for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
-          temp[n++] = static_cast<float>( (*it)->p_level() );
+      for (const auto & elem : mesh.active_element_ptr_range())
+        for (unsigned int se=0; se<elem->n_sub_elem(); se++)
+          temp[n++] = static_cast<float>( elem->p_level() );
 
       out_stream.write(reinterpret_cast<char *>(&temp[0]),
                        sizeof(float)*n_floats);
