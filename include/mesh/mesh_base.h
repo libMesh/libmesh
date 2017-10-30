@@ -1125,6 +1125,8 @@ public:
   virtual element_iterator active_elements_end () = 0;
   virtual const_element_iterator active_elements_begin () const = 0;
   virtual const_element_iterator active_elements_end () const = 0;
+  virtual SimpleRange<element_iterator> active_element_ptr_range() = 0;
+  virtual SimpleRange<const_element_iterator> active_element_ptr_range() const = 0;
 
   virtual element_iterator local_elements_begin () = 0;
   virtual element_iterator local_elements_end () = 0;

@@ -646,13 +646,8 @@ int main (int argc, char ** argv)
                    << ") "
                    << std::endl;
 
-      MeshBase::const_element_iterator it  = mesh.active_elements_begin(),
-        end = mesh.active_elements_end();
-      for (; it != end; ++it)
-        {
-          Elem * e = *it;
-          sv.push_back(e->quality(quality_type));
-        }
+      for (const auto & elem : mesh.active_element_ptr_range())
+        sv.push_back(elem->quality(quality_type));
 
       const unsigned int n_bins = 10;
       libMesh::out << "Avg. shape quality: " << sv.mean() << std::endl;
