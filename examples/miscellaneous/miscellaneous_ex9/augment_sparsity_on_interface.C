@@ -30,37 +30,28 @@ void AugmentSparsityOnInterface::mesh_reinit ()
   // Loop over all elements (not just local elements) to make sure we find
   // "neighbor" elements on opposite sides of the crack.
 
-  MeshBase::const_element_iterator       el     = _mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end_el = _mesh.active_elements_end();
-
   // Map from (elem, side) to centroid
   std::map<std::pair<const Elem *, unsigned char>, Point> lower_centroids;
   std::map<std::pair<const Elem *, unsigned char>, Point> upper_centroids;
 
-  for ( ; el != end_el; ++el)
-    {
-      const Elem * elem = *el;
-
-      {
-        for (auto side : elem->side_index_range())
-          if (elem->neighbor_ptr(side) == libmesh_nullptr)
+  for (const auto & elem : _mesh.active_element_ptr_range())
+    for (auto side : elem->side_index_range())
+      if (elem->neighbor_ptr(side) == libmesh_nullptr)
+        {
+          if (_mesh.get_boundary_info().has_boundary_id(elem, side, _crack_boundary_lower))
             {
-              if (_mesh.get_boundary_info().has_boundary_id(elem, side, _crack_boundary_lower))
-                {
-                  UniquePtr<const Elem> side_elem = elem->build_side_ptr(side);
+              UniquePtr<const Elem> side_elem = elem->build_side_ptr(side);
 
-                  lower_centroids[std::make_pair(elem, side)] = side_elem->centroid();
-                }
-
-              if (_mesh.get_boundary_info().has_boundary_id(elem, side, _crack_boundary_upper))
-                {
-                  UniquePtr<const Elem> side_elem = elem->build_side_ptr(side);
-
-                  upper_centroids[std::make_pair(elem, side)] = side_elem->centroid();
-                }
+              lower_centroids[std::make_pair(elem, side)] = side_elem->centroid();
             }
-      }
-    }
+
+          if (_mesh.get_boundary_info().has_boundary_id(elem, side, _crack_boundary_upper))
+            {
+              UniquePtr<const Elem> side_elem = elem->build_side_ptr(side);
+
+              upper_centroids[std::make_pair(elem, side)] = side_elem->centroid();
+            }
+        }
 
   // If we're doing a reinit on a distributed mesh then we may not see
   // all the centroids, or even a matching number of centroids.
