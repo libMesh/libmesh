@@ -199,12 +199,8 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector & error
                                  parent_error_max);
     }
 
-  MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
-
-  for (; elem_it != elem_end; ++elem_it)
+  for (auto & elem : _mesh.active_element_ptr_range())
     {
-      Elem * elem = *elem_it;
       Elem * parent = elem->parent();
       const dof_id_type elem_number    = elem->id();
       const ErrorVectorReal elem_error = error_per_cell_in[elem_number];
