@@ -275,24 +275,16 @@ void add_cube_convex_hull_to_mesh(MeshBase & mesh,
   std::map<unsigned, unsigned> node_id_map;
   typedef std::map<unsigned, unsigned>::iterator iterator;
 
-  {
-    MeshBase::element_iterator it = cube_mesh.elements_begin();
-    const MeshBase::element_iterator end = cube_mesh.elements_end();
-    for ( ; it != end; ++it)
-      {
-        Elem * elem = *it;
+  for (auto & elem : cube_mesh.element_ptr_range())
+    for (auto s : elem->side_index_range())
+      if (elem->neighbor(s) == libmesh_nullptr)
+        {
+          // Add the node IDs of this side to the set
+          UniquePtr<Elem> side = elem->side(s);
 
-        for (auto s : elem->side_index_range())
-          if (elem->neighbor(s) == libmesh_nullptr)
-            {
-              // Add the node IDs of this side to the set
-              UniquePtr<Elem> side = elem->side(s);
-
-              for (auto n : side->node_index_range())
-                node_id_map.insert(std::make_pair(side->node_id(n), /*dummy_value=*/0));
-            }
-      }
-  }
+          for (auto n : side->node_index_range())
+            node_id_map.insert(std::make_pair(side->node_id(n), /*dummy_value=*/0));
+        }
 
   // For each node in the map, insert it into the input mesh and keep
   // track of the ID assigned.
@@ -314,38 +306,29 @@ void add_cube_convex_hull_to_mesh(MeshBase & mesh,
   // With the points added and the map data structure in place, we are
   // ready to add each TRI3 element of the cube_mesh to the input Mesh
   // with proper node assignments
-  {
-    MeshBase::element_iterator       el     = cube_mesh.elements_begin();
-    const MeshBase::element_iterator end_el = cube_mesh.elements_end();
-
-    for (; el != end_el; ++el)
+  for (auto & old_elem : cube_mesh.element_ptr_range())
+    if (old_elem->type() == TRI3)
       {
-        Elem * old_elem = *el;
+        Elem * new_elem = mesh.add_elem(new Tri3);
 
-        if (old_elem->type() == TRI3)
+        // Assign nodes in new elements.  Since this is an example,
+        // we'll do it in several steps.
+        for (auto i : old_elem->node_index_range())
           {
-            Elem * new_elem = mesh.add_elem(new Tri3);
+            // Locate old node ID in the map
+            iterator it = node_id_map.find(old_elem->node_id(i));
 
-            // Assign nodes in new elements.  Since this is an example,
-            // we'll do it in several steps.
-            for (auto i : old_elem->node_index_range())
-              {
-                // Locate old node ID in the map
-                iterator it = node_id_map.find(old_elem->node_id(i));
+            // Check for not found
+            if (it == node_id_map.end())
+              libmesh_error_msg("Node id " << old_elem->node_id(i) << " not found in map!");
 
-                // Check for not found
-                if (it == node_id_map.end())
-                  libmesh_error_msg("Node id " << old_elem->node_id(i) << " not found in map!");
+            // Mapping to node ID in input mesh
+            unsigned new_node_id = (*it).second;
 
-                // Mapping to node ID in input mesh
-                unsigned new_node_id = (*it).second;
-
-                // Node pointer assigned from input mesh
-                new_elem->set_node(i) = mesh.node_ptr(new_node_id);
-              }
+            // Node pointer assigned from input mesh
+            new_elem->set_node(i) = mesh.node_ptr(new_node_id);
           }
       }
-  }
 #else
   // Avoid compiler warnings
   libmesh_ignore(mesh);

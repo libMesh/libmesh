@@ -216,43 +216,28 @@ int main (int argc, char ** argv)
     MeshRefinement meshRefinement(mesh);
 
     // Loop over all elements.
-    MeshBase::element_iterator       elem_it  = mesh.elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.elements_end();
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        Elem * elem = *elem_it;
-        if (elem->active())
-          {
-            // Just check whether the current element has at least one
-            // node inside and one node outside the circle.
-            bool node_in = false;
-            bool node_out = false;
-            for (auto & n : elem->node_ref_range())
-              {
-                double d = n.norm();
-                if (d<0.8)
-                  {
-                    node_in = true;
-                  }
-                else
-                  {
-                    node_out = true;
-                  }
-              }
-            if (node_in && node_out)
-              {
-                elem->set_refinement_flag(Elem::REFINE);
-              }
-            else
-              {
-                elem->set_refinement_flag(Elem::DO_NOTHING);
-              }
-          }
-        else
-          {
-            elem->set_refinement_flag(Elem::INACTIVE);
-          }
-      }
+    for (auto & elem : mesh.element_ptr_range())
+      if (elem->active())
+        {
+          // Just check whether the current element has at least one
+          // node inside and one node outside the circle.
+          bool node_in = false;
+          bool node_out = false;
+          for (auto & n : elem->node_ref_range())
+            {
+              double d = n.norm();
+              if (d<0.8)
+                node_in = true;
+              else
+                node_out = true;
+            }
+          if (node_in && node_out)
+            elem->set_refinement_flag(Elem::REFINE);
+          else
+            elem->set_refinement_flag(Elem::DO_NOTHING);
+        }
+      else
+        elem->set_refinement_flag(Elem::INACTIVE);
 
     // Now actually refine.
     meshRefinement.refine_elements();
@@ -263,20 +248,12 @@ int main (int argc, char ** argv)
 
   // Now set the subdomain_id of all elements whose centroid is inside
   // the circle to 1.
-  {
-    // Loop over all elements.
-    MeshBase::element_iterator       elem_it  = mesh.elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.elements_end();
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        Elem * elem = *elem_it;
-        double d = elem->centroid().norm();
-        if (d<0.8)
-          {
-            elem->subdomain_id() = 1;
-          }
-      }
-  }
+  for (auto elem : mesh.element_ptr_range())
+    {
+      double d = elem->centroid().norm();
+      if (d < 0.8)
+        elem->subdomain_id() = 1;
+    }
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
