@@ -556,11 +556,8 @@ unsigned int MeshTools::n_active_local_levels(const MeshBase & mesh)
 {
   unsigned int nl = 0;
 
-  MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
-    nl = std::max((*el)->level() + 1, nl);
+  for (auto & elem : mesh.active_local_element_ptr_range())
+    nl = std::max(elem->level() + 1, nl);
 
   return nl;
 }
