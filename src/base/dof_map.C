@@ -793,12 +793,9 @@ void DofMap::invalidate_dofs(MeshBase & mesh) const
   for (auto & node : mesh.node_ptr_range())
     node->invalidate_dofs(sys_num);
 
-  // All the elements
-  MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-  const MeshBase::element_iterator elem_end = mesh.active_elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
-    (*elem_it)->invalidate_dofs(sys_num);
+  // All the active elements.
+  for (auto & elem : mesh.active_element_ptr_range())
+    elem->invalidate_dofs(sys_num);
 }
 
 
