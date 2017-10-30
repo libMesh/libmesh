@@ -619,12 +619,8 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
     std::set<dof_id_type> my_interface_node_set;
 
     // since parent nodes are a subset of children nodes, this should be sufficient
-    MeshBase::const_element_iterator       it     = mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator it_end = mesh.active_local_elements_end();
-
-    for (; it != it_end; ++it)
+    for (const auto & elem : mesh.active_local_element_ptr_range())
       {
-        const Elem * const elem = *it;
         libmesh_assert(elem);
 
         if (elem->on_boundary()) // denotes *any* side has a NULL neighbor
