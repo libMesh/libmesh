@@ -1156,14 +1156,10 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
 
   //-------------------------------------------------------------------------
   // First count and assign temporary numbers to local dofs
-  MeshBase::element_iterator       elem_it  = mesh.active_local_elements_begin();
-  const MeshBase::element_iterator elem_end = mesh.active_local_elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
+  for (auto & elem : mesh.active_local_element_ptr_range())
     {
       // Only number dofs connected to active
       // elements on this processor.
-      Elem * elem                 = *elem_it;
       const unsigned int n_nodes = elem->n_nodes();
 
       // First number the nodal DOFS
