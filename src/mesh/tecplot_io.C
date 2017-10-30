@@ -341,11 +341,8 @@ void TecplotIO::write_ascii (const std::string & fname,
       out_stream << '\n';
     }
 
-  MeshBase::const_element_iterator       it  = the_mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = the_mesh.active_elements_end();
-
-  for ( ; it != end; ++it)
-    (*it)->write_connectivity(out_stream, TECPLOT);
+  for (const auto & elem : the_mesh.active_element_ptr_range())
+    elem->write_connectivity(out_stream, TECPLOT);
 }
 
 
