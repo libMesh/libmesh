@@ -357,13 +357,8 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
     // initialize the eletypes map (eletypes is a file-global variable)
     init_eletypes();
 
-    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-    for ( ; it != end; ++it)
+    for (const auto & elem : mesh.active_element_ptr_range())
       {
-        const Elem * elem = *it;
-
         mesh_max_p_level = std::max(mesh_max_p_level,
                                     elem->p_level());
 
@@ -410,12 +405,9 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
           for (unsigned int proc=0; proc<mesh.n_partitions(); proc++)
             out_stream << "proc_" << proc << "\n";
 
-          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
           // FIXME - don't we need to use an ElementDefinition here? - RHS
-          for ( ; it != end; ++it)
-            out_stream << (*it)->processor_id()+1 << "\n";
+          for (const auto & elem : mesh.active_element_ptr_range())
+            out_stream << elem->processor_id()+1 << "\n";
           out_stream << "\n";
         }
     }
@@ -450,13 +442,8 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
     {
       out_stream << "p_level 0\n";
 
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-      for ( ; it != end; ++it)
+      for (const auto & elem : mesh.active_element_ptr_range())
         {
-          const Elem * elem = *it;
-
           const ElementDefinition & ele = eletypes[elem->type()];
 
           // The element mapper better not require any more nodes
@@ -486,19 +473,14 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
           // Loop over active elements, write out cell data.  If second-order cells
           // are split into sub-elements, the sub-elements inherit their parent's
           // cell-centered data.
-          MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator elem_end = mesh.active_elements_end();
-
-          for (; elem_it != elem_end; ++elem_it)
+          for (const auto & elem : mesh.active_element_ptr_range())
             {
-              const Elem * e = *elem_it;
-
               // Use the element's ID to find the value.
-              libmesh_assert_less (e->id(), the_array->size());
-              const Real the_value = the_array->operator[](e->id());
+              libmesh_assert_less (elem->id(), the_array->size());
+              const Real the_value = the_array->operator[](elem->id());
 
               if (this->subdivide_second_order())
-                for (unsigned int se=0; se < e->n_sub_elem(); se++)
+                for (unsigned int se=0; se < elem->n_sub_elem(); se++)
                   out_stream << the_value << " ";
               else
                 out_stream << the_value << " ";
