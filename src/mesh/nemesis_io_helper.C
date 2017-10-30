@@ -1642,13 +1642,8 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase & pmesh)
   // This map keeps track of the number of elements in each subdomain over all processors
   std::map<subdomain_id_type, unsigned> global_subdomain_counts;
 
-  MeshBase::const_element_iterator elem_it = pmesh.active_local_elements_begin();
-  MeshBase::const_element_iterator elem_end = pmesh.active_local_elements_end();
-
-  for (; elem_it != elem_end; ++elem_it)
+  for (const auto & elem : pmesh.active_local_element_ptr_range())
     {
-      const Elem * elem = *elem_it;
-
       subdomain_id_type cur_subdomain = elem->subdomain_id();
 
       /*
