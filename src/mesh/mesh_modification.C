@@ -86,13 +86,10 @@ void MeshTools::Modification::distort (MeshBase & mesh,
   std::vector<float> hmin (mesh.max_node_id(),
                            std::numeric_limits<float>::max());
 
-  MeshBase::element_iterator       el  = mesh.active_elements_begin();
-  const MeshBase::element_iterator end = mesh.active_elements_end();
-
-  for (; el!=end; ++el)
-    for (auto & n : (*el)->node_ref_range())
+  for (const auto & elem : mesh.active_element_ptr_range())
+    for (auto & n : elem->node_ref_range())
       hmin[n.id()] = std::min(hmin[n.id()],
-                              static_cast<float>((*el)->hmin()));
+                              static_cast<float>(elem->hmin()));
 
 
   // Now actually move the nodes
