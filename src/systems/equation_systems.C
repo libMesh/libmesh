@@ -607,12 +607,6 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
     nv = n_scalar_vars + dim*n_vector_vars;
   }
 
-  // Get the number of elements that share each node.  We will
-  // compute the average value at each node.  This is particularly
-  // useful for plotting discontinuous data.
-  MeshBase::element_iterator       e_it  = _mesh.active_local_elements_begin();
-  const MeshBase::element_iterator e_end = _mesh.active_local_elements_end();
-
   // Get the number of local nodes
   dof_id_type n_local_nodes = cast_int<dof_id_type>
     (std::distance(_mesh.local_nodes_begin(),
