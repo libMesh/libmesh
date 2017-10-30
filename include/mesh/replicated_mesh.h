@@ -296,6 +296,8 @@ public:
   virtual element_iterator active_local_elements_end () libmesh_override;
   virtual const_element_iterator active_local_elements_begin () const libmesh_override;
   virtual const_element_iterator active_local_elements_end () const libmesh_override;
+  virtual SimpleRange<element_iterator> active_local_element_ptr_range() libmesh_override { return {active_local_elements_begin(), active_local_elements_end()}; }
+  virtual SimpleRange<const_element_iterator> active_local_element_ptr_range() const libmesh_override  { return {active_local_elements_begin(), active_local_elements_end()}; }
 
   virtual element_iterator active_not_local_elements_begin () libmesh_override;
   virtual element_iterator active_not_local_elements_end () libmesh_override;
