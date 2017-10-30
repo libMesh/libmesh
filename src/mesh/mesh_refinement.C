@@ -1713,17 +1713,12 @@ void MeshRefinement::uniformly_p_refine (unsigned int n)
 {
   // Refine n times
   for (unsigned int rstep=0; rstep<n; rstep++)
-    {
-      // P refine all the active elements
-      MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-      const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
-
-      for ( ; elem_it != elem_end; ++elem_it)
-        {
-          (*elem_it)->set_p_level((*elem_it)->p_level()+1);
-          (*elem_it)->set_p_refinement_flag(Elem::JUST_REFINED);
-        }
-    }
+    for (auto & elem : _mesh.active_element_ptr_range())
+      {
+        // P refine all the active elements
+        elem->set_p_level(elem->p_level()+1);
+        elem->set_p_refinement_flag(Elem::JUST_REFINED);
+      }
 }
 
 
