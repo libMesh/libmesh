@@ -741,15 +741,12 @@ void TecplotIO::write_binary (const std::string & fname,
   {
     unsigned int te = 0;
 
-    MeshBase::const_element_iterator       it  = the_mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = the_mesh.active_elements_end();
-
-    for ( ; it != end; ++it)
+    for (const auto & elem : the_mesh.active_element_ptr_range())
       {
         std::vector<dof_id_type> conn;
-        for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+        for (unsigned int se=0; se<elem->n_sub_elem(); se++)
           {
-            (*it)->connectivity(se, TECPLOT, conn);
+            elem->connectivity(se, TECPLOT, conn);
 
             for (std::size_t node=0; node<conn.size(); node++)
               tm.cd(node,te) = conn[node];
