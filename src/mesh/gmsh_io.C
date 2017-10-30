@@ -867,13 +867,9 @@ void GmshIO::write_post (const std::string & fname,
       unsigned int nb_text2d=0, nb_text2d_chars=0, nb_text3d=0, nb_text3d_chars=0;
 
       {
-        MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-        const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-
-        for ( ; it != end; ++it)
+        for (const auto & elem : mesh.active_element_ptr_range())
           {
-            const ElemType elemtype = (*it)->type();
+            const ElemType elemtype = elem->type();
 
             switch (elemtype)
               {
@@ -923,7 +919,7 @@ void GmshIO::write_post (const std::string & fname,
                   break;
                 }
               default:
-                libmesh_error_msg("ERROR: Nonexistent element type " << (*it)->type());
+                libmesh_error_msg("ERROR: Nonexistent element type " << elem->type());
               }
           }
       }
@@ -990,13 +986,8 @@ void GmshIO::write_post (const std::string & fname,
             out_stream << "1\n";
 
           // Loop over the elements and write out the data
-          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-          for ( ; it != end; ++it)
+          for (const auto & elem : mesh.active_element_ptr_range())
             {
-              const Elem * elem = *it;
-
               // this is quite crappy, but I did not invent that file format!
               for (unsigned int d=0; d<3; d++)  // loop over the dimensions
                 {
