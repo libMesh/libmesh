@@ -1452,48 +1452,7 @@ void GMVIO::write_binary (const std::string & fname,
 
   // optionally write cell-centered data
   if (!(this->_cell_centered_data.empty()))
-    {
-      libMesh::err << "Cell-centered data not (yet) supported in binary I/O mode!" << std::endl;
-
-      //        std::map<std::string, const std::vector<Real> *>::iterator       it  = this->_cell_centered_data.begin();
-      //        const std::map<std::string, const std::vector<Real> *>::iterator end = this->_cell_centered_data.end();
-
-      //        for (; it != end; ++it)
-      //  {
-      //    // Write out the variable name ...
-      //    out_stream.write(it->first.c_str(), it->first.size());
-
-      //    // ... followed by a zero.
-      //    unsigned int tempint = 0; // 0 signifies cell data
-      //    out_stream.write(reinterpret_cast<char *>(&tempint), sizeof(unsigned int));
-
-      //    // Get a pointer to the array of cell-centered data values
-      //    const std::vector<Real> * the_array = (*it).second;
-
-      //   // Since the_array might contain zeros (for inactive elements) we need to
-      //   // make a copy of it containing just values for active elements.
-      //   const unsigned int n_floats = n_active_elem * (1<<mesh.mesh_dimension());
-      //   std::vector<float> temp(n_floats);
-
-      //   MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
-      //   const MeshBase::const_element_iterator elem_end = mesh.active_elements_end();
-      //   unsigned int n=0;
-
-      //   for (; elem_it != elem_end; ++elem_it)
-      //     {
-      //       // If there's a seg-fault, it will probably be here!
-      //       const float the_value = static_cast<float>(the_array->operator[]((*elem_it)->id()));
-
-      //       for (unsigned int se=0; se<(*elem_it)->n_sub_elem(); se++)
-      // temp[n++] = the_value;
-      //     }
-
-
-      //    // Write "the_array" directly to the file
-      //    out_stream.write(reinterpret_cast<char *>(&temp[0]),
-      //      sizeof(float)*n_floats);
-      //  }
-    }
+    libMesh::err << "Cell-centered data not (yet) supported in binary I/O mode!" << std::endl;
 
 
 
