@@ -109,16 +109,10 @@ void GnuPlotIO::write_solution(const std::string & fname,
       // construct string for xtic positions at element edges
       std::stringstream xtics_stream;
 
-      MeshBase::const_element_iterator it = the_mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end_it =
-        the_mesh.active_elements_end();
-
       unsigned int count = 0;
 
-      for ( ; it != end_it; ++it)
+      for (const auto & el : the_mesh.active_element_ptr_range())
         {
-          const Elem * el = *it;
-
           // if el is the left edge of the mesh, print its left node position
           if (el->neighbor_ptr(0) == libmesh_nullptr)
             {
@@ -178,29 +172,19 @@ void GnuPlotIO::write_solution(const std::string & fname,
 
       map_type node_map;
 
+      for (const auto & elem : the_mesh.active_element_ptr_range())
+        for (unsigned int i=0; i<elem->n_nodes(); i++)
+          {
+            std::vector<Number> values;
 
-      it  = the_mesh.active_elements_begin();
+            // Get the global id of the node
+            dof_id_type global_id = elem->node_id(i);
 
-      for ( ; it != end_it; ++it)
-        {
-          const Elem * elem = *it;
+            for (unsigned int c=0; c<n_vars; c++)
+              values.push_back( (*soln)[global_id*n_vars + c] );
 
-          for (unsigned int i=0; i<elem->n_nodes(); i++)
-            {
-              std::vector<Number> values;
-
-              // Get the global id of the node
-              dof_id_type global_id = elem->node_id(i);
-
-              for (unsigned int c=0; c<n_vars; c++)
-                {
-                  values.push_back( (*soln)[global_id*n_vars + c] );
-                }
-
-              node_map[ the_mesh.point(global_id)(0) ] = values;
-            }
-        }
-
+            node_map[ the_mesh.point(global_id)(0) ] = values;
+          }
 
       map_iterator map_it = node_map.begin();
       const map_iterator end_map_it = node_map.end();
