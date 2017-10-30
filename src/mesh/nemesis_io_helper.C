@@ -1787,13 +1787,8 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
 
 
   // First loop over the elements to figure out which elements are in which subdomain
-  MeshBase::const_element_iterator elem_it = pmesh.active_local_elements_begin();
-  MeshBase::const_element_iterator elem_end = pmesh.active_local_elements_end();
-
-  for (; elem_it != elem_end; ++elem_it)
+  for (const auto & elem : pmesh.active_local_element_ptr_range())
     {
-      const Elem * elem = *elem_it;
-
       // Grab the nodes while we're here.
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
         this->nodes_attached_to_local_elems.insert( elem->node_id(n) );
