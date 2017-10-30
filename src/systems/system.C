@@ -1525,14 +1525,8 @@ Real System::calculate_norm(const NumericVector<Number> & v,
       std::vector<dof_id_type> dof_indices;
 
       // Begin the loop over the elements
-      MeshBase::const_element_iterator       el     =
-        this->get_mesh().active_local_elements_begin();
-      const MeshBase::const_element_iterator end_el =
-        this->get_mesh().active_local_elements_end();
-
-      for ( ; el != end_el; ++el)
+      for (const auto & elem : this->get_mesh().active_local_element_ptr_range())
         {
-          const Elem * elem = *el;
           const unsigned int dim = elem->dim();
 
           if (skip_dimensions && skip_dimensions->find(dim) != skip_dimensions->end())
