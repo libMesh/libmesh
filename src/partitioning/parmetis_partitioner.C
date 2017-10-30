@@ -621,13 +621,8 @@ void ParmetisPartitioner::assign_partitioning (MeshBase & mesh)
     requested_ids(mesh.n_processors()),
     requests_to_fill(mesh.n_processors());
 
-  MeshBase::element_iterator elem_it  = mesh.active_elements_begin();
-  MeshBase::element_iterator elem_end = mesh.active_elements_end();
-
-  for (; elem_it != elem_end; ++elem_it)
+  for (auto & elem : mesh.active_element_ptr_range())
     {
-      Elem * elem = *elem_it;
-
       // we need to get the index from the owning processor
       // (note we cannot assign it now -- we are iterating
       // over elements again and this will be bad!)
@@ -680,14 +675,9 @@ void ParmetisPartitioner::assign_partitioning (MeshBase & mesh)
   // note we are iterating in exactly the same order
   // used to build up the request, so we can expect the
   // required entries to be in the proper sequence.
-  elem_it  = mesh.active_elements_begin();
-  elem_end = mesh.active_elements_end();
-
-  for (std::vector<unsigned int> counters(mesh.n_processors(), 0);
-       elem_it != elem_end; ++elem_it)
+  std::vector<unsigned int> counters(mesh.n_processors(), 0);
+  for (auto & elem : mesh.active_element_ptr_range())
     {
-      Elem * elem = *elem_it;
-
       const processor_id_type current_pid = elem->processor_id();
 
       libmesh_assert_less (counters[current_pid], requested_ids[current_pid].size());
