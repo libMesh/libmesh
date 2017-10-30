@@ -370,93 +370,72 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   std::unordered_set<dof_id_type> processed_node_ids;
 
   // We will be iterating over all the active elements in the fine mesh that live on
-  // this processor
-  {
-    MeshBase::const_element_iterator elem_it = mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
-
-    // Start loop over elems
-    for (; elem_it != elem_end; ++elem_it)
+  // this processor.
+  for (const auto & elem : mesh.active_local_element_ptr_range())
+    for (unsigned int n=0; n != elem->n_nodes(); ++n)
       {
-        // Pointer to this element
-        const Elem * elem = *elem_it;
+        // Get a reference to the current node
+        const Node & node = elem->node_ref(n);
 
-        // Loop over the nodes in the element
-        for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        // Get the id of this node
+        dof_id_type node_id = node.id();
+
+        // If we havent already processed this node, do so now
+        if (processed_node_ids.find(node_id) == processed_node_ids.end())
           {
-            // Get a reference to the current node
-            const Node & node = elem->node_ref(n);
+            // Declare a neighbor_set to be filled by the find_point_neighbors
+            std::set<const Elem *> fine_grid_neighbor_set;
 
-            // Get the id of this node
-            dof_id_type node_id = node.id();
+            // Call find_point_neighbors to fill the neighbor_set
+            elem->find_point_neighbors(node, fine_grid_neighbor_set);
 
-            // If we havent already processed this node, do so now
-            if (processed_node_ids.find(node_id) == processed_node_ids.end())
+            // A vector to hold the coarse grid parents neighbors
+            std::vector<dof_id_type> coarse_grid_neighbors;
+
+            // Iterators over the fine grid neighbors set
+            std::set<const Elem *>::iterator fine_neighbor_it = fine_grid_neighbor_set.begin();
+            const std::set<const Elem *>::iterator fine_neighbor_end = fine_grid_neighbor_set.end();
+
+            // Loop over all the fine neighbors of this node
+            for (; fine_neighbor_it != fine_neighbor_end ; ++fine_neighbor_it)
               {
-                // Declare a neighbor_set to be filled by the find_point_neighbors
-                std::set<const Elem *> fine_grid_neighbor_set;
+                // Pointer to the current fine neighbor element
+                const Elem * fine_elem = *fine_neighbor_it;
 
-                // Call find_point_neighbors to fill the neighbor_set
-                elem->find_point_neighbors(node, fine_grid_neighbor_set);
-
-                // A vector to hold the coarse grid parents neighbors
-                std::vector<dof_id_type> coarse_grid_neighbors;
-
-                // Iterators over the fine grid neighbors set
-                std::set<const Elem *>::iterator fine_neighbor_it = fine_grid_neighbor_set.begin();
-                const std::set<const Elem *>::iterator fine_neighbor_end = fine_grid_neighbor_set.end();
-
-                // Loop over all the fine neighbors of this node
-                for (; fine_neighbor_it != fine_neighbor_end ; ++fine_neighbor_it)
+                // Find the element id for the corresponding coarse grid element
+                const Elem * coarse_elem = fine_elem;
+                for (unsigned int j = 0; j != number_h_refinements; ++j)
                   {
-                    // Pointer to the current fine neighbor element
-                    const Elem * fine_elem = *fine_neighbor_it;
+                    libmesh_assert (coarse_elem->parent());
 
-                    // Find the element id for the corresponding coarse grid element
-                    const Elem * coarse_elem = fine_elem;
-                    for (unsigned int j = 0; j != number_h_refinements; ++j)
-                      {
-                        libmesh_assert (coarse_elem->parent());
+                    coarse_elem = coarse_elem->parent();
+                  }
 
-                        coarse_elem = coarse_elem->parent();
-                      }
+                // Loop over the existing coarse neighbors and check if this one is
+                // already in there
+                const dof_id_type coarse_id = coarse_elem->id();
+                std::size_t j = 0;
 
-                    // Loop over the existing coarse neighbors and check if this one is
-                    // already in there
-                    const dof_id_type coarse_id = coarse_elem->id();
-                    std::size_t j = 0;
-                    for (; j != coarse_grid_neighbors.size(); j++)
-                      {
-                        // If the set already contains this element break out of the loop
-                        if (coarse_grid_neighbors[j] == coarse_id)
-                          {
-                            break;
-                          }
-                      }
+                // If the set already contains this element break out of the loop
+                for (; j != coarse_grid_neighbors.size(); j++)
+                  if (coarse_grid_neighbors[j] == coarse_id)
+                    break;
 
-                    // If we didn't leave the loop even at the last element,
-                    // this is a new neighbour, put in the coarse_grid_neighbor_set
-                    if (j == coarse_grid_neighbors.size())
-                      {
-                        coarse_grid_neighbors.push_back(coarse_id);
-                      }
+                // If we didn't leave the loop even at the last element,
+                // this is a new neighbour, put in the coarse_grid_neighbor_set
+                if (j == coarse_grid_neighbors.size())
+                  coarse_grid_neighbors.push_back(coarse_id);
+              } // End loop over fine neighbors
 
-                  } // End loop over fine neighbors
+            // Set the shared_neighbour index for this node to the
+            // size of the coarse grid neighbor set
+            shared_element_count[node_id] =
+              cast_int<unsigned int>(coarse_grid_neighbors.size());
 
-                // Set the shared_neighbour index for this node to the
-                // size of the coarse grid neighbor set
-                shared_element_count[node_id] =
-                  cast_int<unsigned int>(coarse_grid_neighbors.size());
-
-                // Add this node to processed_node_ids vector
-                processed_node_ids.insert(node_id);
-
-              } // End if not processed node
-
-          } // End loop over nodes
-
-      }  // End loop over elems
-  }
+            // Add this node to processed_node_ids vector
+            processed_node_ids.insert(node_id);
+          } // End if not processed node
+      } // End loop over nodes
 
   // Get a DoF map, will be used to get the nodal dof_indices for each element
   DofMap & dof_map = system.get_dof_map();
@@ -488,14 +467,8 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
           (system.get_adjoint_solution(i)).localize(*localized_adjoint_solution, system.get_dof_map().get_send_list());
 
           // Loop over elements
-          MeshBase::const_element_iterator elem_it = mesh.active_local_elements_begin();
-          const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
-
-          for (; elem_it != elem_end; ++elem_it)
+          for (const auto & elem : mesh.active_local_element_ptr_range())
             {
-              // Pointer to the element
-              const Elem * elem = *elem_it;
-
               // Go up number_h_refinements levels up to find the coarse parent
               const Elem * coarse = elem;
 
@@ -529,18 +502,12 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
                 (std::abs(local_contribution));
 
             } // End loop over elements
-
         } // End if belong to QoI set
-
     } // End loop over QoIs
 
   for (std::size_t j=0; j != system.qoi.size(); j++)
-    {
-      if (_qoi_set.has_index(j))
-        {
-          delete coarse_adjoints[j];
-        }
-    }
+    if (_qoi_set.has_index(j))
+      delete coarse_adjoints[j];
 
   // Don't bother projecting the solution; we'll restore from backup
   // after coarsening
