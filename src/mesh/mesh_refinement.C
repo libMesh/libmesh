@@ -1727,20 +1727,13 @@ void MeshRefinement::uniformly_p_coarsen (unsigned int n)
 {
   // Coarsen p times
   for (unsigned int rstep=0; rstep<n; rstep++)
-    {
-      // P coarsen all the active elements
-      MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-      const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
-
-      for ( ; elem_it != elem_end; ++elem_it)
+    for (auto & elem : _mesh.active_element_ptr_range())
+      if (elem->p_level() > 0)
         {
-          if ((*elem_it)->p_level() > 0)
-            {
-              (*elem_it)->set_p_level((*elem_it)->p_level()-1);
-              (*elem_it)->set_p_refinement_flag(Elem::JUST_COARSENED);
-            }
+          // P coarsen all the active elements
+          elem->set_p_level(elem->p_level()-1);
+          elem->set_p_refinement_flag(Elem::JUST_COARSENED);
         }
-    }
 }
 
 
