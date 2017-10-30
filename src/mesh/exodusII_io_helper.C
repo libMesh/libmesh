@@ -1851,15 +1851,9 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
   ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
-  MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
   // loop through element and map between block and element vector
-  for (; mesh_it!=end; ++mesh_it)
-    {
-      const Elem * elem = *mesh_it;
-      subdomain_map[elem->subdomain_id()].push_back(elem->id());
-    }
+  for (const auto & elem : mesh.active_element_ptr_range())
+    subdomain_map[elem->subdomain_id()].push_back(elem->id());
 
   // Use mesh.n_elem() to access into the values vector rather than
   // the number of elements the Exodus writer thinks the mesh has,
