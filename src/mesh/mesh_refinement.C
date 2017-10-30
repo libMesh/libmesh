@@ -1749,11 +1749,8 @@ void MeshRefinement::uniformly_refine (unsigned int n)
       this->clean_refinement_flags();
 
       // Flag all the active elements for refinement.
-      MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-      const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
-
-      for ( ; elem_it != elem_end; ++elem_it)
-        (*elem_it)->set_refinement_flag(Elem::REFINE);
+      for (auto & elem : _mesh.active_element_ptr_range())
+        elem->set_refinement_flag(Elem::REFINE);
 
       // Refine all the elements we just flagged.
       this->_refine_elements();
