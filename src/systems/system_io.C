@@ -371,23 +371,17 @@ void System::read_legacy_data (Xdr & io,
             }
 
         // Then reorder the element DOF values
-        {
-          MeshBase::element_iterator
-            it  = this->get_mesh().active_elements_begin(),
-            end = this->get_mesh().active_elements_end();
+        for (auto & elem : this->get_mesh().active_element_ptr_range())
+          for (unsigned int index=0; index<elem->n_comp(sys,var); index++)
+            {
+              libmesh_assert_not_equal_to (elem->dof_number(sys, var, index),
+                                           DofObject::invalid_id);
 
-          for (; it != end; ++it)
-            for (unsigned int index=0; index<(*it)->n_comp(sys,var); index++)
-              {
-                libmesh_assert_not_equal_to ((*it)->dof_number(sys, var, index),
-                                             DofObject::invalid_id);
+              libmesh_assert_less (cnt, global_vector.size());
 
-                libmesh_assert_less (cnt, global_vector.size());
-
-                reordered_vector[(*it)->dof_number(sys, var, index)] =
-                  global_vector[cnt++];
-              }
-        }
+              reordered_vector[elem->dof_number(sys, var, index)] =
+                global_vector[cnt++];
+            }
       }
 
     *(this->solution) = reordered_vector;
@@ -467,23 +461,17 @@ void System::read_legacy_data (Xdr & io,
                       }
 
                   // Then reorder the element DOF values
-                  {
-                    MeshBase::element_iterator
-                      it  = this->get_mesh().active_elements_begin(),
-                      end = this->get_mesh().active_elements_end();
+                  for (auto & elem : this->get_mesh().active_element_ptr_range())
+                    for (unsigned int index=0; index<elem->n_comp(sys,var); index++)
+                      {
+                        libmesh_assert_not_equal_to (elem->dof_number(sys, var, index),
+                                                     DofObject::invalid_id);
 
-                    for (; it!=end; ++it)
-                      for (unsigned int index=0; index<(*it)->n_comp(sys,var); index++)
-                        {
-                          libmesh_assert_not_equal_to ((*it)->dof_number(sys, var, index),
-                                                       DofObject::invalid_id);
+                        libmesh_assert_less (cnt, global_vector.size());
 
-                          libmesh_assert_less (cnt, global_vector.size());
-
-                          reordered_vector[(*it)->dof_number(sys, var, index)] =
-                            global_vector[cnt++];
-                        }
-                  }
+                        reordered_vector[elem->dof_number(sys, var, index)] =
+                          global_vector[cnt++];
+                      }
                 }
 
               // use the overloaded operator=(std::vector) to assign the values
