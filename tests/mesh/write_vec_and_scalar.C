@@ -10,6 +10,7 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
+#include "libmesh/node.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/explicit_system.h"
@@ -46,6 +47,9 @@ public:
   {
     Mesh mesh(*TestCommWorld);
 
+    // We set our initial conditions based on build_square node ids
+    mesh.allow_renumbering(false);
+
     MeshTools::Generation::build_square(
         mesh, 1, 1, -1., 1., -1., 1., Utility::string_to_enum<ElemType>("TRI6"));
 
@@ -59,9 +63,32 @@ public:
     // Initialize the system
     equation_systems.init();
 
+    // Mimic the initial conditions of u(i)=2*i in the serial case,
+    // but indexed by node id rather than dof id.
+    std::vector<Real> initial_vector({10, 0, 12, 8, 4, 2, 16, 6, 14});
+
     NumericVector<Number> & sys_solution = *(system.solution);
-    for (unsigned i = 0; i < 9; i++)
-      sys_solution.set(i, Real(2 * i));
+    for (MeshBase::const_node_iterator it = mesh.local_nodes_begin(),
+                                      end = mesh.local_nodes_end();
+         it != end; ++it)
+      {
+        const Node *node = *it;
+        dof_id_type dof_id;
+        if (node->n_comp(0,0))
+          {
+            dof_id = node->dof_number(0,0,0);
+          }
+        else
+          {
+            CPPUNIT_ASSERT(node->n_comp(0,1));
+            dof_id = node->dof_number(0,1,0);
+          }
+        if (dof_id >= sys_solution.first_local_index() &&
+            dof_id < sys_solution.last_local_index())
+          sys_solution.set(dof_id, initial_vector[node->id()]);
+        if (mesh.n_processors() == 1)
+          CPPUNIT_ASSERT_EQUAL(initial_vector[node->id()], dof_id*Real(2));
+      }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
