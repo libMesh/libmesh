@@ -447,31 +447,23 @@ bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass))
 
   bool found_flag = false;
 
-  // Search for local flags
-  MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
-
 #ifndef NDEBUG
   Elem * failed_elem = libmesh_nullptr;
 #endif
 
-  for ( ; elem_it != elem_end; ++elem_it)
-    {
-      // Pointer to the element
-      Elem * elem = *elem_it;
-
-      if (elem->refinement_flag() == Elem::REFINE ||
-          elem->refinement_flag() == Elem::COARSEN ||
-          elem->p_refinement_flag() == Elem::REFINE ||
-          elem->p_refinement_flag() == Elem::COARSEN)
-        {
-          found_flag = true;
+  // Search for local flags
+  for (auto & elem : _mesh.active_local_element_ptr_range())
+    if (elem->refinement_flag() == Elem::REFINE ||
+        elem->refinement_flag() == Elem::COARSEN ||
+        elem->p_refinement_flag() == Elem::REFINE ||
+        elem->p_refinement_flag() == Elem::COARSEN)
+      {
+        found_flag = true;
 #ifndef NDEBUG
-          failed_elem = elem;
+        failed_elem = elem;
 #endif
-          break;
-        }
-    }
+        break;
+      }
 
   // If we found a flag on any processor, it counts
   this->comm().max(found_flag);
