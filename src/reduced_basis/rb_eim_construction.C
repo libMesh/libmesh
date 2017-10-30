@@ -884,13 +884,8 @@ void RBEIMConstruction::init_dof_map_between_systems()
   std::vector<dof_id_type> implicit_sys_dof_indices;
   std::vector<dof_id_type> explicit_sys_dof_indices;
 
-  MeshBase::const_element_iterator       el     = get_mesh().active_elements_begin();
-  const MeshBase::const_element_iterator end_el = get_mesh().active_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : get_mesh().active_element_ptr_range())
     {
-      const Elem * elem = *el;
-
       this->get_dof_map().dof_indices (elem, implicit_sys_dof_indices);
 
       const unsigned int n_dofs = implicit_sys_dof_indices.size();
