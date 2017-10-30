@@ -138,123 +138,111 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
     max_p_level_at_edge;
 
   // Loop over all the active elements & fill the maps
-  {
-    MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+  for (auto & elem : _mesh.active_element_ptr_range())
+    {
+      const unsigned char elem_level =
+        cast_int<unsigned char>(elem->level() +
+                                ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0));
+      const unsigned char elem_p_level =
+        cast_int<unsigned char>(elem->p_level() +
+                                ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
 
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        const Elem * elem = *elem_it;
-        const unsigned char elem_level =
-          cast_int<unsigned char>(elem->level() +
-                                  ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0));
-        const unsigned char elem_p_level =
-          cast_int<unsigned char>(elem->p_level() +
-                                  ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
+      // Set the max_level at each edge
+      for (unsigned int n=0; n<elem->n_edges(); n++)
+        {
+          UniquePtr<const Elem> edge = elem->build_edge_ptr(n);
+          dof_id_type childnode0 = edge->node_id(0);
+          dof_id_type childnode1 = edge->node_id(1);
+          if (childnode1 < childnode0)
+            std::swap(childnode0, childnode1);
 
-        // Set the max_level at each edge
-        for (unsigned int n=0; n<elem->n_edges(); n++)
-          {
-            UniquePtr<const Elem> edge = elem->build_edge_ptr(n);
-            dof_id_type childnode0 = edge->node_id(0);
-            dof_id_type childnode1 = edge->node_id(1);
-            if (childnode1 < childnode0)
-              std::swap(childnode0, childnode1);
+          for (const Elem * p = elem; p != libmesh_nullptr; p = p->parent())
+            {
+              UniquePtr<const Elem> pedge = p->build_edge_ptr(n);
+              dof_id_type node0 = pedge->node_id(0);
+              dof_id_type node1 = pedge->node_id(1);
 
-            for (const Elem * p = elem; p != libmesh_nullptr; p = p->parent())
-              {
-                UniquePtr<const Elem> pedge = p->build_edge_ptr(n);
-                dof_id_type node0 = pedge->node_id(0);
-                dof_id_type node1 = pedge->node_id(1);
+              if (node1 < node0)
+                std::swap(node0, node1);
 
-                if (node1 < node0)
-                  std::swap(node0, node1);
+              // If elem does not share this edge with its ancestor
+              // p, refinement levels of elements sharing p's edge
+              // are not restricted by refinement levels of elem.
+              // Furthermore, elem will not share this edge with any
+              // of p's ancestors, so we can safely break out of the
+              // for loop early.
+              if (node0 != childnode0 && node1 != childnode1)
+                break;
 
-                // If elem does not share this edge with its ancestor
-                // p, refinement levels of elements sharing p's edge
-                // are not restricted by refinement levels of elem.
-                // Furthermore, elem will not share this edge with any
-                // of p's ancestors, so we can safely break out of the
-                // for loop early.
-                if (node0 != childnode0 && node1 != childnode1)
-                  break;
+              childnode0 = node0;
+              childnode1 = node1;
 
-                childnode0 = node0;
-                childnode1 = node1;
+              std::pair<unsigned int, unsigned int> edge_key =
+                std::make_pair(node0, node1);
 
-                std::pair<unsigned int, unsigned int> edge_key =
-                  std::make_pair(node0, node1);
-
-                if (max_level_at_edge.find(edge_key) ==
-                    max_level_at_edge.end())
-                  {
-                    max_level_at_edge[edge_key] = elem_level;
-                    max_p_level_at_edge[edge_key] = elem_p_level;
-                  }
-                else
-                  {
-                    max_level_at_edge[edge_key] =
-                      std::max (max_level_at_edge[edge_key], elem_level);
-                    max_p_level_at_edge[edge_key] =
-                      std::max (max_p_level_at_edge[edge_key], elem_p_level);
-                  }
-              }
-          }
-      }
-  }
+              if (max_level_at_edge.find(edge_key) ==
+                  max_level_at_edge.end())
+                {
+                  max_level_at_edge[edge_key] = elem_level;
+                  max_p_level_at_edge[edge_key] = elem_p_level;
+                }
+              else
+                {
+                  max_level_at_edge[edge_key] =
+                    std::max (max_level_at_edge[edge_key], elem_level);
+                  max_p_level_at_edge[edge_key] =
+                    std::max (max_p_level_at_edge[edge_key], elem_p_level);
+                }
+            }
+        }
+    }
 
 
   // Now loop over the active elements and flag the elements
   // who violate the requested level mismatch
-  {
-    MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+  for (auto & elem : _mesh.active_element_ptr_range())
+    {
+      const unsigned int elem_level = elem->level();
+      const unsigned int elem_p_level = elem->p_level();
 
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        Elem * elem = *elem_it;
-        const unsigned int elem_level = elem->level();
-        const unsigned int elem_p_level = elem->p_level();
+      // Skip the element if it is already fully flagged
+      if (elem->refinement_flag() == Elem::REFINE &&
+          elem->p_refinement_flag() == Elem::REFINE
+          && !_enforce_mismatch_limit_prior_to_refinement)
+        continue;
 
-        // Skip the element if it is already fully flagged
-        if (elem->refinement_flag() == Elem::REFINE &&
-            elem->p_refinement_flag() == Elem::REFINE
-            && !_enforce_mismatch_limit_prior_to_refinement)
-          continue;
+      // Loop over the nodes, check for possible mismatch
+      for (unsigned int n=0; n<elem->n_edges(); n++)
+        {
+          UniquePtr<Elem> edge = elem->build_edge_ptr(n);
+          dof_id_type node0 = edge->node_id(0);
+          dof_id_type node1 = edge->node_id(1);
+          if (node1 < node0)
+            std::swap(node0, node1);
 
-        // Loop over the nodes, check for possible mismatch
-        for (unsigned int n=0; n<elem->n_edges(); n++)
-          {
-            UniquePtr<Elem> edge = elem->build_edge_ptr(n);
-            dof_id_type node0 = edge->node_id(0);
-            dof_id_type node1 = edge->node_id(1);
-            if (node1 < node0)
-              std::swap(node0, node1);
+          std::pair<dof_id_type, dof_id_type> edge_key =
+            std::make_pair(node0, node1);
 
-            std::pair<dof_id_type, dof_id_type> edge_key =
-              std::make_pair(node0, node1);
+          // Flag the element for refinement if it violates
+          // the requested level mismatch
+          if ((elem_level + max_mismatch) < max_level_at_edge[edge_key]
+              && elem->refinement_flag() != Elem::REFINE)
+            {
+              elem->set_refinement_flag (Elem::REFINE);
+              flags_changed = true;
+            }
 
-            // Flag the element for refinement if it violates
-            // the requested level mismatch
-            if ((elem_level + max_mismatch) < max_level_at_edge[edge_key]
-                && elem->refinement_flag() != Elem::REFINE)
-              {
-                elem->set_refinement_flag (Elem::REFINE);
-                flags_changed = true;
-              }
+          if ((elem_p_level + max_mismatch) < max_p_level_at_edge[edge_key]
+              && elem->p_refinement_flag() != Elem::REFINE)
+            {
+              elem->set_p_refinement_flag (Elem::REFINE);
+              flags_changed = true;
+            }
 
-            if ((elem_p_level + max_mismatch) < max_p_level_at_edge[edge_key]
-                && elem->p_refinement_flag() != Elem::REFINE)
-              {
-                elem->set_p_refinement_flag (Elem::REFINE);
-                flags_changed = true;
-              }
-
-            // Possibly enforce limit mismatch prior to refinement
-            flags_changed |= this->enforce_mismatch_limit_prior_to_refinement(elem, EDGE, max_mismatch);
-          } // loop over edges
-      } // loop over active elements
-  }
+          // Possibly enforce limit mismatch prior to refinement
+          flags_changed |= this->enforce_mismatch_limit_prior_to_refinement(elem, EDGE, max_mismatch);
+        } // loop over edges
+    } // loop over active elements
 
   // If flags changed on any processor then they changed globally
   this->comm().max(flags_changed);
