@@ -1772,14 +1772,11 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
       this->clean_refinement_flags();
 
       // Flag all the active elements for coarsening.
-      MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-      const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
-
-      for ( ; elem_it != elem_end; ++elem_it)
+      for (auto & elem : _mesh.active_element_ptr_range())
         {
-          (*elem_it)->set_refinement_flag(Elem::COARSEN);
-          if ((*elem_it)->parent())
-            (*elem_it)->parent()->set_refinement_flag(Elem::COARSEN_INACTIVE);
+          elem->set_refinement_flag(Elem::COARSEN);
+          if (elem->parent())
+            elem->parent()->set_refinement_flag(Elem::COARSEN_INACTIVE);
         }
 
       // On a distributed mesh, we may have parent elements with
