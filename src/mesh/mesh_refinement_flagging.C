@@ -488,11 +488,8 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector & error_p
 
   // Loop over the active elements and create the entry
   // in the sorted_error vector
-  MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
-
-  for (; elem_it != elem_end; ++elem_it)
-    sorted_error.push_back (error_per_cell[(*elem_it)->id()]);
+  for (auto & elem : _mesh.active_local_element_ptr_range())
+    sorted_error.push_back (error_per_cell[elem->id()]);
 
   this->comm().allgather(sorted_error);
 
