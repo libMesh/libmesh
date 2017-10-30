@@ -198,19 +198,13 @@ void EnsightIO::write_geometry_ascii()
   const MeshBase & the_mesh = MeshOutput<MeshBase>::mesh();
 
   // Construct the various required maps
-  {
-    MeshBase::const_element_iterator       el     = the_mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator end_el = the_mesh.active_local_elements_end();
+  for (const auto & elem : the_mesh.active_local_element_ptr_range())
+    {
+      ensight_parts_map[elem->type()].push_back(elem);
 
-    for ( ; el != end_el ; ++el)
-      {
-        const Elem * elem = *el;
-        ensight_parts_map[elem->type()].push_back(elem);
-
-        for (unsigned int i = 0; i < elem->n_nodes(); i++)
-          mesh_nodes_map[elem->node_id(i)] = elem->point(i);
-      }
-  }
+      for (unsigned int i = 0; i < elem->n_nodes(); i++)
+        mesh_nodes_map[elem->node_id(i)] = elem->point(i);
+    }
 
   // Write number of local points
   mesh_stream << std::setw(10) << mesh_nodes_map.size() << "\n";
