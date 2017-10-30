@@ -1137,10 +1137,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
     }
   else
     {
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end();
-      for (; it!=end; ++it)
-        num_nodes += (*it)->n_nodes();
+      for (const auto & elem : mesh.active_element_ptr_range())
+        num_nodes += elem->n_nodes();
     }
 
   std::vector<boundary_id_type> unique_side_boundaries;
@@ -1163,12 +1161,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   //loop through element and map between block and element vector
   std::map<subdomain_id_type, std::vector<unsigned int>> subdomain_map;
 
-  MeshBase::const_element_iterator it = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
-  for (; it!=end; ++it)
+  for (const auto & elem : mesh.active_element_ptr_range())
     {
-      const Elem * elem = *it;
-
       // We skip writing infinite elements to the Exodus file, so
       // don't put them in the subdomain_map. That way the number of
       // blocks should be correct.
