@@ -967,14 +967,8 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number> &
   unsigned int tw=0;
 
   // get the total weight
-  {
-    MeshBase::element_iterator       it  = _mesh.active_elements_begin();
-    const MeshBase::element_iterator end = _mesh.active_elements_end();
-
-    for ( ; it != end; ++it)
-      tw += (*it)->n_nodes();
-  }
-
+  for (const auto & elem : _mesh.active_element_ptr_range())
+    tw += elem->n_nodes();
 
   // Only if we are on processor zero, allocate the storage
   // to hold (number_of_nodes)*(number_of_variables) entries.
@@ -1019,14 +1013,10 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number> &
               {
                 const FEType & fe_type    = system.variable_type(var);
 
-                MeshBase::element_iterator       it       = _mesh.active_elements_begin();
-                const MeshBase::element_iterator end_elem = _mesh.active_elements_end();
-
                 unsigned int nn=0;
 
-                for ( ; it != end_elem; ++it)
+                for (auto & elem : _mesh.active_element_ptr_range())
                   {
-                    const Elem * elem = *it;
                     system.get_dof_map().dof_indices (elem, dof_indices, var);
 
                     elem_soln.resize(dof_indices.size());
