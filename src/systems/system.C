@@ -1300,19 +1300,13 @@ void System::local_dof_indices(const unsigned int var,
 
   std::vector<dof_id_type> dof_indices;
 
-  // Begin the loop over the elements
-  MeshBase::const_element_iterator       el     =
-    this->get_mesh().active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el =
-    this->get_mesh().active_local_elements_end();
-
   const dof_id_type
     first_local = this->get_dof_map().first_dof(),
     end_local   = this->get_dof_map().end_dof();
 
-  for ( ; el != end_el; ++el)
+  // Begin the loop over the elements
+  for (const auto & elem : this->get_mesh().active_local_element_ptr_range())
     {
-      const Elem * elem = *el;
       this->get_dof_map().dof_indices (elem, dof_indices, var);
 
       for (std::size_t i=0; i<dof_indices.size(); i++)
