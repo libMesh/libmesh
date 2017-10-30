@@ -630,14 +630,10 @@ void ExactSolution::_compute_error(const std::string & sys_name,
   // TODO: this ought to be threaded (and using subordinate
   // MeshFunction objects in each thread rather than a single
   // master)
-  MeshBase::const_element_iterator       el     = _mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = _mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : _mesh.active_local_element_ptr_range())
     {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
-      const Elem * elem = *el;
       const unsigned int dim = elem->dim();
 
       const subdomain_id_type elem_subid = elem->subdomain_id();
