@@ -377,12 +377,9 @@ void RBEIMConstruction::enrich_RB_space()
   DGFEMContext & explicit_context = cast_ref<DGFEMContext &>(*explicit_c);
   init_context_with_sys(explicit_context, get_explicit_system());
 
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      explicit_context.pre_fe_reinit(get_explicit_system(), *el);
+      explicit_context.pre_fe_reinit(get_explicit_system(), elem);
       explicit_context.elem_fe_reinit();
 
       for (unsigned int var=0; var<get_explicit_system().n_vars(); var++)
@@ -399,7 +396,7 @@ void RBEIMConstruction::enrich_RB_space()
                   optimal_value = value;
                   largest_abs_value = abs_value;
                   optimal_var = var;
-                  optimal_elem_id = (*el)->id();
+                  optimal_elem_id = elem->id();
 
                   FEBase * elem_fe = libmesh_nullptr;
                   explicit_context.get_element_fe( var, elem_fe );
