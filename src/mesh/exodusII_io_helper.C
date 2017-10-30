@@ -1258,35 +1258,28 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
     }
   else
     {
-      MeshBase::const_element_iterator it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-      for (; it!=end; ++it)
-        {
-          const Elem * elem = *it;
-
-          for (unsigned int n=0; n<elem->n_nodes(); n++)
-            {
-              x.push_back(elem->point(n)(0));
+      for (const auto & elem : mesh.active_element_ptr_range())
+        for (unsigned int n=0; n<elem->n_nodes(); n++)
+          {
+            x.push_back(elem->point(n)(0));
 #if LIBMESH_DIM > 1
-              y.push_back(elem->point(n)(1));
+            y.push_back(elem->point(n)(1));
 #else
-              y.push_back(0.);
+            y.push_back(0.);
 #endif
 #if LIBMESH_DIM > 2
-              z.push_back(elem->point(n)(2));
+            z.push_back(elem->point(n)(2));
 #else
-              z.push_back(0.);
+            z.push_back(0.);
 #endif
 
-              // Let's skip the node_num_map in the discontinuous
-              // case, since we're effectively duplicating nodes for
-              // the sake of discontinuous visualization, so it isn't
-              // clear how to deal with node_num_map here. This means
-              // that writing discontinuous meshes won't work with
-              // element numberings that have "holes".
-            }
-        }
+            // Let's skip the node_num_map in the discontinuous
+            // case, since we're effectively duplicating nodes for
+            // the sake of discontinuous visualization, so it isn't
+            // clear how to deal with node_num_map here. This means
+            // that writing discontinuous meshes won't work with
+            // element numberings that have "holes".
+          }
     }
 
   if (_single_precision)
