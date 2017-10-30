@@ -68,11 +68,8 @@ public:
     std::vector<Real> initial_vector({10, 0, 12, 8, 4, 2, 16, 6, 14});
 
     NumericVector<Number> & sys_solution = *(system.solution);
-    for (MeshBase::const_node_iterator it = mesh.local_nodes_begin(),
-                                      end = mesh.local_nodes_end();
-         it != end; ++it)
+    for (const auto & node : mesh.node_ptr_range())
       {
-        const Node *node = *it;
         dof_id_type dof_id;
         if (node->n_comp(0,0))
           {
