@@ -685,14 +685,9 @@ void GmshIO::write_mesh (std::ostream & out_stream)
     out_stream << "$Elements\n";
     out_stream << mesh.n_active_elem() + n_boundary_faces << '\n';
 
-    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
     // loop over the elements
-    for ( ; it != end; ++it)
+    for (const auto & elem : mesh.active_element_ptr_range())
       {
-        const Elem * elem = *it;
-
         // Make sure we have a valid entry for
         // the current element type.
         libmesh_assert (_element_maps.out.count(elem->type()));
