@@ -332,14 +332,8 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
   node_id_map.clear();
   side_id_map.clear();
 
-  MeshBase::const_element_iterator el =
-    boundary_mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end_el =
-    boundary_mesh.active_elements_end();
-
-  for (; el != end_el; ++el)
+  for (const auto & boundary_elem : boundary_mesh.active_element_ptr_range())
     {
-      const Elem * boundary_elem = *el;
       const Elem * interior_parent = boundary_elem->interior_parent();
 
       // Find out which side of interior_parent boundary_elem corresponds to.
@@ -360,9 +354,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
         }
 
       if (!found_matching_sides)
-        {
-          libmesh_error_msg("No matching side found within the specified tolerance");
-        }
+        libmesh_error_msg("No matching side found within the specified tolerance");
 
       side_id_map[boundary_elem->id()] = interior_parent_side_index;
 
@@ -374,7 +366,6 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
 
           node_id_map[interior_node_id] = boundary_node_id;
         }
-
     }
 }
 
