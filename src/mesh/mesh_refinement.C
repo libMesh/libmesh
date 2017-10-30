@@ -856,12 +856,8 @@ bool MeshRefinement::make_coarsening_compatible()
     // First we look at all the active level-0 elements.  Since it doesn't make
     // sense to coarsen them we must un-set their coarsen flags if
     // they are set.
-    MeshBase::element_iterator       el     = _mesh.active_elements_begin();
-    const MeshBase::element_iterator end_el = _mesh.active_elements_end();
-
-    for (; el != end_el; ++el)
+    for (auto & elem : _mesh.active_element_ptr_range())
       {
-        Elem * elem = *el;
         max_level = std::max(max_level, elem->level());
         max_p_level =
           std::max(max_p_level,
@@ -907,12 +903,8 @@ bool MeshRefinement::make_coarsening_compatible()
         {
           level_one_satisfied = true;
 
-          MeshBase::element_iterator       el     = _mesh.active_elements_begin();
-          const MeshBase::element_iterator end_el = _mesh.active_elements_end();
-
-          for (; el != end_el; ++el)
+          for (auto & elem : _mesh.active_element_ptr_range())
             {
-              Elem * elem = *el;
               bool my_flag_changed = false;
 
               if (elem->refinement_flag() == Elem::COARSEN) // If the element is active and
