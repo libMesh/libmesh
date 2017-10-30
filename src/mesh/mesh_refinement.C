@@ -263,11 +263,8 @@ void MeshRefinement::create_parent_error_vector(const ErrorVector & error_per_ce
 
   {
     // Find which elements are uncoarsenable
-    MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
-    for (; elem_it != elem_end; ++elem_it)
+    for (auto & elem : _mesh.active_local_element_ptr_range())
       {
-        Elem * elem   = *elem_it;
         Elem * parent = elem->parent();
 
         // Active elements are uncoarsenable
@@ -301,30 +298,24 @@ void MeshRefinement::create_parent_error_vector(const ErrorVector & error_per_ce
   // calculate local contributions to the parents' errors squared
   // first, then sum across processors and take the square roots
   // second.
-  {
-    MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
+  for (auto & elem : _mesh.active_local_element_ptr_range())
+    {
+      Elem * parent = elem->parent();
 
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        Elem * elem   = *elem_it;
-        Elem * parent = elem->parent();
+      // Calculate each contribution to parent cells
+      if (parent)
+        {
+          const dof_id_type parentid  = parent->id();
+          libmesh_assert_less (parentid, error_per_parent.size());
 
-        // Calculate each contribution to parent cells
-        if (parent)
-          {
-            const dof_id_type parentid  = parent->id();
-            libmesh_assert_less (parentid, error_per_parent.size());
-
-            // If the parent has grandchildren we won't be able to
-            // coarsen it, so forget it.  Otherwise, add this child's
-            // contribution to the sum of the squared child errors
-            if (error_per_parent[parentid] != -1.0)
-              error_per_parent[parentid] += (error_per_cell[elem->id()] *
-                                             error_per_cell[elem->id()]);
-          }
-      }
-  }
+          // If the parent has grandchildren we won't be able to
+          // coarsen it, so forget it.  Otherwise, add this child's
+          // contribution to the sum of the squared child errors
+          if (error_per_parent[parentid] != -1.0)
+            error_per_parent[parentid] += (error_per_cell[elem->id()] *
+                                           error_per_cell[elem->id()]);
+        }
+    }
 
   // Sum the vector across all processors
   this->comm().sum(static_cast<std::vector<ErrorVectorReal> &>(error_per_parent));
