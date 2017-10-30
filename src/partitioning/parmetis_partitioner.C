@@ -436,12 +436,7 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
 
       std::set<const Elem *>::iterator n_it = neighbor_set.begin();
       for (; n_it != neighbor_set.end(); ++n_it)
-        {
-          // FIXME - non-const versions of the Elem set methods
-          // would be nice
-          Elem * neighbor = const_cast<Elem *>(*n_it);
-          interior_to_boundary_map.insert(std::make_pair(neighbor, elem));
-        }
+        interior_to_boundary_map.insert(std::make_pair(*n_it, elem));
     }
 
 #ifdef LIBMESH_ENABLE_AMR
