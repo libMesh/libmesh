@@ -40,15 +40,8 @@ void HPSingularity::select_refinement (System & system)
   // The current mesh
   MeshBase & mesh = system.get_mesh();
 
-  MeshBase::element_iterator       elem_it  =
-    mesh.active_elements_begin();
-  const MeshBase::element_iterator elem_end =
-    mesh.active_elements_end();
-
-  for (; elem_it != elem_end; ++elem_it)
+  for (auto & elem : mesh.active_element_ptr_range())
     {
-      Elem * elem = *elem_it;
-
       // We're only checking elements that are already flagged for h
       // refinement
       if (elem->refinement_flag() != Elem::REFINE)
