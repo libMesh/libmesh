@@ -132,14 +132,8 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector & error_
 
   // Loop over the elements and flag them for coarsening or
   // refinement based on the element error
-
-  MeshBase::element_iterator       e_it  =
-    _mesh.active_elements_begin();
-  const MeshBase::element_iterator e_end =
-    _mesh.active_elements_end();
-  for (; e_it != e_end; ++e_it)
+  for (auto & elem : _mesh.active_element_ptr_range())
     {
-      Elem * elem           = *e_it;
       const dof_id_type id = elem->id();
 
       libmesh_assert_less (id, error_per_cell.size());
