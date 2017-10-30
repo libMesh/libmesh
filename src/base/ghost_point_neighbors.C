@@ -125,23 +125,13 @@ void GhostPointNeighbors::operator()
     }
 
   // Connect any active elements which are connected to our range's
-  // elements' nodes
-  {
-    MeshBase::const_element_iterator       elem_it  = _mesh.active_elements_begin();
-    const MeshBase::const_element_iterator elem_end = _mesh.active_elements_end();
-
-    for (; elem_it!=elem_end; ++elem_it)
-      {
-        const Elem * elem = *elem_it;
-
-        // Add elements connected to nodes on active local elements
-        if (elem->processor_id() != p)
-          for (auto & n : elem->node_ref_range())
-            if (connected_nodes.count(&n))
-              coupled_elements.insert
-                (std::make_pair(elem, nullcm));
-      }
-  }
+  // elements' nodes by addin elements connected to nodes on active
+  // local elements.
+  for (const auto & elem : _mesh.active_element_ptr_range())
+    if (elem->processor_id() != p)
+      for (auto & n : elem->node_ref_range())
+        if (connected_nodes.count(&n))
+          coupled_elements.insert(std::make_pair(elem, nullcm));
 }
 
 } // namespace libMesh
