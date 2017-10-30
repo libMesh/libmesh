@@ -173,13 +173,8 @@ void PostscriptIO::write (const std::string & fname)
       // line sits between each pair of vertices.  Also we draw every edge
       // for an element regardless of the fact that it may overlap with
       // another.  This would probably be a useful optimization...
-      MeshBase::const_element_iterator       el     = the_mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end_el = the_mesh.active_elements_end();
-      for ( ; el != end_el; ++el)
-        {
-          this->plot_linear_elem(*el);
-          //this->plot_quadratic_elem(*el); // Experimental
-        }
+      for (const auto & elem : the_mesh.active_element_ptr_range())
+        this->plot_linear_elem(elem);
 
       // Issue the showpage command, and we're done.
       _out << "showpage" << std::endl;
