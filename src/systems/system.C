@@ -1350,21 +1350,16 @@ void System::zero_variable (NumericVector<Number> & v,
       }
   }
 
-  /* Loop over elements.  */
-  {
-    MeshBase::const_element_iterator it = mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator end_it = mesh.active_local_elements_end();
-    for ( ; it != end_it; ++it)
-      {
-        const Elem * elem = *it;
-        unsigned int n_comp = elem->n_comp(sys_num,var_num);
-        for (unsigned int i=0; i<n_comp; i++)
-          {
-            const dof_id_type index = elem->dof_number(sys_num,var_num,i);
-            v.set(index,0.0);
-          }
-      }
-  }
+  // Loop over elements.
+  for (const auto & elem : mesh.active_local_element_ptr_range())
+    {
+      unsigned int n_comp = elem->n_comp(sys_num,var_num);
+      for (unsigned int i=0; i<n_comp; i++)
+        {
+          const dof_id_type index = elem->dof_number(sys_num,var_num,i);
+          v.set(index,0.0);
+        }
+    }
 }
 
 
