@@ -130,14 +130,8 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
   // finally adjust the second order nodes (those located between vertices)
   // these nodes will be located between their adjacent nodes
   // do this element-wise
-  MeshBase::element_iterator       el  = _mesh.active_elements_begin();
-  const MeshBase::element_iterator end = _mesh.active_elements_end();
-
-  for (; el != end; ++el)
+  for (auto & elem : _mesh.active_element_ptr_range())
     {
-      // Constant handle for the element
-      const Elem * elem = *el;
-
       // get the second order nodes (son)
       // their element indices start at n_vertices and go to n_nodes
       const unsigned int son_begin = elem->n_vertices();
