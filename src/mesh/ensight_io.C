@@ -476,10 +476,6 @@ void EnsightIO::write_vector_ascii(const std::string & sys,
   std::vector<dof_id_type> dof_indices_v;
   std::vector<dof_id_type> dof_indices_w;
 
-  // Now we will loop over all the elements in the mesh.
-  MeshBase::const_element_iterator       el     = the_mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = the_mesh.active_local_elements_end();
-
   // Map from node id -> solution value.  We end up just writing this
   // map out in order, not sure what would happen if there were holes
   // in the numbering...
@@ -487,10 +483,9 @@ void EnsightIO::write_vector_ascii(const std::string & sys,
   typedef map_local_soln::iterator  local_soln_iterator;
   map_local_soln local_soln;
 
-  for ( ; el != end_el ; ++el)
+  // Now we will loop over all the elements in the mesh.
+  for (const auto & elem : the_mesh.active_local_element_ptr_range())
     {
-      const Elem * elem = *el;
-
       const FEType & fe_type = system.variable_type(u_var);
 
       dof_map.dof_indices (elem, dof_indices_u, u_var);
