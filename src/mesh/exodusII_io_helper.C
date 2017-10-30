@@ -1328,13 +1328,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   typedef std::map<subdomain_id_type, std::vector<dof_id_type>> subdomain_map_type;
   subdomain_map_type subdomain_map;
 
-  MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
-  //loop through element and map between block and element vector
-  for (; mesh_it!=end; ++mesh_it)
+  // Loop through element and map between block and element vector.
+  for (const auto & elem : mesh.active_element_ptr_range())
     {
-      const Elem * elem = *mesh_it;
-
       // We skip writing infinite elements to the Exodus file, so
       // don't put them in the subdomain_map. That way the number of
       // blocks should be correct.
