@@ -71,18 +71,13 @@ transfer_volume_boundary(const Variable & from_var, const Variable & to_var)
   // Sanity check that the variables have the same number of components
   libmesh_assert_equal_to(from_n_comp, to_n_comp);
 
-  // Iterator for BoundaryMesh.
-  MeshBase::const_element_iterator       el     = to_mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = to_mesh.active_local_elements_end();
-
   // Construct map from "from" dofs to "to" dofs.
   typedef std::map<numeric_index_type, numeric_index_type> DofMapping;
   DofMapping dof_mapping;
 
   // Loop through all boundary elements.
-  for ( ; el != end_el; ++el)
+  for (const auto & to_elem : to_mesh.active_local_element_ptr_range())
     {
-      const Elem * to_elem = *el;
       const Elem * from_elem = to_elem->interior_parent();
 
       if (!from_elem)
