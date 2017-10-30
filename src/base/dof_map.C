@@ -1316,17 +1316,11 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
       if (vg_description.type().family == SCALAR)
         continue;
 
-      MeshBase::element_iterator       elem_it  = mesh.active_local_elements_begin();
-      const MeshBase::element_iterator elem_end = mesh.active_local_elements_end();
-
-      for ( ; elem_it != elem_end; ++elem_it)
+      for (auto & elem : mesh.active_local_element_ptr_range())
         {
-          // Only number dofs connected to active
-          // elements on this processor.
-          Elem * elem  = *elem_it;
-
-          // ... and only variables which are active on
-          // on this element's subdomain
+          // Only number dofs connected to active elements on this
+          // processor and only variables which are active on on this
+          // element's subdomain.
           if (!vg_description.active_on_subdomain(elem->subdomain_id()))
             continue;
 
