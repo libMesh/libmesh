@@ -833,10 +833,8 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string & fname,
 
   int num_vars = cast_int<int>(names.size());
   int num_nodes = 0;
-  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
-  for ( ; it != end; ++it)
-    num_nodes += (*it)->n_nodes();
+  for (const auto & elem : mesh.active_element_ptr_range())
+    num_nodes += elem->n_nodes();
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
