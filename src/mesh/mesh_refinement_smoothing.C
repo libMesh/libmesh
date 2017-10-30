@@ -260,57 +260,50 @@ bool MeshRefinement::limit_overrefined_boundary(const signed char max_mismatch)
   bool flags_changed = false;
 
   // Loop over all the active elements & look for mismatches to fix.
-  {
-    MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+  for (auto & elem : _mesh.active_element_ptr_range())
+    {
+      // If we don't have an interior_parent then there's nothing to
+      // be mismatched with.
+      if ((elem->dim() >= LIBMESH_DIM) ||
+          !elem->interior_parent())
+        continue;
 
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        Elem * elem = *elem_it;
+      const unsigned char elem_level =
+        cast_int<unsigned char>(elem->level() +
+                                ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0));
+      const unsigned char elem_p_level =
+        cast_int<unsigned char>(elem->p_level() +
+                                ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
 
-        // If we don't have an interior_parent then there's nothing to
-        // be mismatched with.
-        if ((elem->dim() >= LIBMESH_DIM) ||
-            !elem->interior_parent())
-          continue;
+      // get all relevant interior elements
+      std::set<const Elem *> neighbor_set;
+      elem->find_interior_neighbors(neighbor_set);
 
-        const unsigned char elem_level =
-          cast_int<unsigned char>(elem->level() +
-                                  ((elem->refinement_flag() == Elem::REFINE) ? 1 : 0));
-        const unsigned char elem_p_level =
-          cast_int<unsigned char>(elem->p_level() +
-                                  ((elem->p_refinement_flag() == Elem::REFINE) ? 1 : 0));
+      std::set<const Elem *>::iterator n_it = neighbor_set.begin();
+      for (; n_it != neighbor_set.end(); ++n_it)
+        {
+          // FIXME - non-const versions of the Elem set methods
+          // would be nice
+          Elem * neighbor = const_cast<Elem *>(*n_it);
 
-        // get all relevant interior elements
-        std::set<const Elem *> neighbor_set;
-        elem->find_interior_neighbors(neighbor_set);
+          if (max_mismatch >= 0)
+            {
+              if ((elem_level > neighbor->level() + max_mismatch) &&
+                  (neighbor->refinement_flag() != Elem::REFINE))
+                {
+                  neighbor->set_refinement_flag(Elem::REFINE);
+                  flags_changed = true;
+                }
 
-        std::set<const Elem *>::iterator n_it = neighbor_set.begin();
-        for (; n_it != neighbor_set.end(); ++n_it)
-          {
-            // FIXME - non-const versions of the Elem set methods
-            // would be nice
-            Elem * neighbor = const_cast<Elem *>(*n_it);
-
-            if (max_mismatch >= 0)
-              {
-                if ((elem_level > neighbor->level() + max_mismatch) &&
-                    (neighbor->refinement_flag() != Elem::REFINE))
-                  {
-                    neighbor->set_refinement_flag(Elem::REFINE);
-                    flags_changed = true;
-                  }
-
-                if ((elem_p_level > neighbor->p_level() + max_mismatch) &&
-                    (neighbor->p_refinement_flag() != Elem::REFINE))
-                  {
-                    neighbor->set_p_refinement_flag(Elem::REFINE);
-                    flags_changed = true;
-                  }
-              }
-          } // loop over interior neighbors
-      }
-  }
+              if ((elem_p_level > neighbor->p_level() + max_mismatch) &&
+                  (neighbor->p_refinement_flag() != Elem::REFINE))
+                {
+                  neighbor->set_p_refinement_flag(Elem::REFINE);
+                  flags_changed = true;
+                }
+            }
+        } // loop over interior neighbors
+    }
 
   // If flags changed on any processor then they changed globally
   this->comm().max(flags_changed);
