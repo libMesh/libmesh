@@ -689,15 +689,11 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
 
   this->init_context(context);
 
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
       // Subdivision elements need special care:
       // - skip ghost elements
       // - init special quadrature rule
-      const Elem * elem = *el;
       UniquePtr<QBase> qrule;
       if (elem->type() == TRI3SUBDIVISION)
         {
@@ -717,7 +713,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
           elem_fe->attach_quadrature_rule (qrule.get());
         }
 
-      context.pre_fe_reinit(*this, *el);
+      context.pre_fe_reinit(*this, elem);
       context.elem_fe_reinit();
       elem_assembly->interior_assembly(context);
 
