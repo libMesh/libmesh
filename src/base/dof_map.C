@@ -1073,14 +1073,10 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
   // dofs on the mesh
   if (this->variable_type(var_num).family != SCALAR)
     {
-      MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-      const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
-
-      for ( ; elem_it != elem_end; ++elem_it)
+      for (auto & elem : mesh.active_local_element_ptr_range())
         {
           // Only count dofs connected to active
           // elements on this processor.
-          Elem * elem                 = *elem_it;
           const unsigned int n_nodes = elem->n_nodes();
 
           // First get any new nodal DOFS
