@@ -274,11 +274,9 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector & error_pe
   {
     std::vector<bool> is_active(max_elem_id, false);
 
-    MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
-    for (; elem_it != elem_end; ++elem_it)
+    for (auto & elem : _mesh.active_local_element_ptr_range())
       {
-        const dof_id_type eid = (*elem_it)->id();
+        const dof_id_type eid = elem->id();
         is_active[eid] = true;
         libmesh_assert_less (eid, error_per_cell.size());
         sorted_error.push_back
