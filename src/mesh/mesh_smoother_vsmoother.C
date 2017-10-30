@@ -375,13 +375,9 @@ int VariationalMeshSmoother::readgr(Array2D<double> & R,
   // Grab the connectivity
   // FIXME: Generalize this!
   {
-    MeshBase::const_element_iterator it  = _mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = _mesh.active_elements_end();
-
-    for (int i=0; it != end; ++it)
+    int i = 0;
+    for (const auto & elem : _mesh.active_element_ptr_range())
       {
-        const Elem * elem = *it;
-
         // Keep track of the number of nodes
         // there must be 6 for 2D
         // 10 for 3D
