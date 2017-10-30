@@ -1250,13 +1250,8 @@ bool MeshRefinement::make_refinement_compatible()
         {
           level_one_satisfied = true;
 
-          MeshBase::element_iterator       el     = _mesh.active_elements_begin();
-          const MeshBase::element_iterator end_el = _mesh.active_elements_end();
-
-          for (; el != end_el; ++el)
+          for (auto & elem : _mesh.active_element_ptr_range())
             {
-              Elem * elem = *el;
-
               const unsigned short n_sides = elem->n_sides();
 
               if (elem->refinement_flag() == Elem::REFINE)  // If the element is active and the
