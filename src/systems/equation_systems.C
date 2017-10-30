@@ -894,22 +894,15 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
           const Variable & variable = system.variable(var);
           const DofMap & dof_map = system.get_dof_map();
 
-          MeshBase::element_iterator       it       = _mesh.active_local_elements_begin();
-          const MeshBase::element_iterator end_elem = _mesh.active_local_elements_end();
+          for (const auto & elem : _mesh.active_local_element_ptr_range())
+            if (variable.active_on_subdomain(elem->subdomain_id()))
+              {
+                dof_map.dof_indices (elem, dof_indices, var);
 
-          for ( ; it != end_elem; ++it)
-            {
-              const Elem * elem = *it;
+                libmesh_assert_equal_to (1, dof_indices.size());
 
-              if (variable.active_on_subdomain(elem->subdomain_id()))
-                {
-                  dof_map.dof_indices (elem, dof_indices, var);
-
-                  libmesh_assert_equal_to (1, dof_indices.size());
-
-                  parallel_soln.set((ne*var_num)+elem->id(), sys_soln(dof_indices[0]));
-                }
-            }
+                parallel_soln.set((ne*var_num)+elem->id(), sys_soln(dof_indices[0]));
+              }
 
           var_num++;
         } // end loop on variables in this system
