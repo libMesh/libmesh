@@ -362,13 +362,8 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
 
     libmesh_assert_equal_to (subdomain_bounds.back(), n_active_elem);
 
-    MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
-
-    for (; elem_it != elem_end; ++elem_it)
+    for (const auto & elem : mesh.active_local_element_ptr_range())
       {
-        const Elem * elem = *elem_it;
-
         libmesh_assert (_global_index_by_pid_map.count(elem->id()));
         const dof_id_type global_index_by_pid =
           _global_index_by_pid_map[elem->id()];
