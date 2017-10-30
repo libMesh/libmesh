@@ -298,22 +298,15 @@ void MeshTools::find_boundary_nodes (const MeshBase & mesh,
 
   // Loop over elements, find those on boundary, and
   // mark them as true in on_boundary.
-  MeshBase::const_element_iterator       el  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
+  for (const auto & elem : mesh.active_element_ptr_range())
+    for (auto s : elem->side_index_range())
+      if (elem->neighbor_ptr(s) == libmesh_nullptr) // on the boundary
+        {
+          const UniquePtr<const Elem> side = elem->build_side_ptr(s);
 
-  for (; el != end; ++el)
-    {
-      const Elem * elem = *el;
-
-      for (auto s : elem->side_index_range())
-        if (elem->neighbor_ptr(s) == libmesh_nullptr) // on the boundary
-          {
-            const UniquePtr<const Elem> side = elem->build_side_ptr(s);
-
-            for (auto & node : side->node_ref_range())
-              on_boundary[node.id()] = true;
-          }
-    }
+          for (auto & node : side->node_ref_range())
+            on_boundary[node.id()] = true;
+        }
 }
 
 
