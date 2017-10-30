@@ -2568,62 +2568,6 @@ void DofMap::old_dof_indices (const Elem * const elem,
       } // end loop over variables
 }
 
-
-
-/*
-  void DofMap::augment_send_list_for_projection(const MeshBase & mesh)
-  {
-  // Loop over the active local elements in the mesh.
-  // If the element was just refined and its parent lives
-  // on a different processor then we need to augment the
-  // _send_list with the parent's DOF indices so that we
-  // can access the parent's data for computing solution
-  // projections, etc...
-
-  // The DOF indices for the parent
-  std::vector<dof_id_type> di;
-
-  // Flag telling us if we need to re-sort the send_list.
-  // Note we won't need to re-sort unless a child with a
-  // parent belonging to a different processor is found
-  bool needs_sorting = false;
-
-
-  MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
-  {
-  const Elem * const elem   = *elem_it;
-
-  // We only need to consider the children that
-  // were just refined
-  if (elem->refinement_flag() != Elem::JUST_REFINED) continue;
-
-  const Elem * const parent = elem->parent();
-
-  // If the parent lives on another processor
-  // than the child
-  if (parent != libmesh_nullptr)
-  if (parent->processor_id() != elem->processor_id())
-  {
-  // Get the DOF indices for the parent
-  this->dof_indices (parent, di);
-
-  // Insert the DOF indices into the send list
-  _send_list.insert (_send_list.end(),
-  di.begin(), di.end());
-
-  // We will need to re-sort the send list
-  needs_sorting = true;
-  }
-  }
-
-  // The send-list might need to be sorted again.
-  if (needs_sorting) this->sort_send_list ();
-  }
-*/
-
 #endif // LIBMESH_ENABLE_AMR
 
 
