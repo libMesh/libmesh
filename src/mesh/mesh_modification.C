@@ -1773,67 +1773,61 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
   saved_boundary_elements.reserve(mesh.get_boundary_info().n_boundary_conds());
   saved_bc_ids.reserve(mesh.get_boundary_info().n_boundary_conds());
   saved_bc_sides.reserve(mesh.get_boundary_info().n_boundary_conds());
-  {
-    MeshBase::element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator end = mesh.active_elements_end();
 
-    for (; it != end; ++it)
-      {
-        Elem * elem = *it;
+  for (auto & elem : mesh.active_element_ptr_range())
+    {
+      // Make a new element of the same type
+      Elem * copy = Elem::build(elem->type()).release();
 
-        // Make a new element of the same type
-        Elem * copy = Elem::build(elem->type()).release();
+      // Set node pointers (they still point to nodes in the original mesh)
+      for (auto n : elem->node_index_range())
+        copy->set_node(n) = elem->node_ptr(n);
 
-        // Set node pointers (they still point to nodes in the original mesh)
-        for (auto n : elem->node_index_range())
-          copy->set_node(n) = elem->node_ptr(n);
+      // Copy over ids
+      copy->processor_id() = elem->processor_id();
+      copy->subdomain_id() = elem->subdomain_id();
 
-        // Copy over ids
-        copy->processor_id() = elem->processor_id();
-        copy->subdomain_id() = elem->subdomain_id();
-
-        // Retain the original element's ID(s) as well, otherwise
-        // the Mesh may try to create them for you...
-        copy->set_id( elem->id() );
+      // Retain the original element's ID(s) as well, otherwise
+      // the Mesh may try to create them for you...
+      copy->set_id( elem->id() );
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-        copy->set_unique_id() = elem->unique_id();
+      copy->set_unique_id() = elem->unique_id();
 #endif
 
-        // This element could have boundary info or DistributedMesh
-        // remote_elem links as well.  We need to save the (elem,
-        // side, bc_id) triples and those links
-        for (auto s : elem->side_index_range())
-          {
-            if (elem->neighbor_ptr(s) == remote_elem)
-              copy->set_neighbor(s, const_cast<RemoteElem *>(remote_elem));
+      // This element could have boundary info or DistributedMesh
+      // remote_elem links as well.  We need to save the (elem,
+      // side, bc_id) triples and those links
+      for (auto s : elem->side_index_range())
+        {
+          if (elem->neighbor_ptr(s) == remote_elem)
+            copy->set_neighbor(s, const_cast<RemoteElem *>(remote_elem));
 
-            mesh.get_boundary_info().boundary_ids(elem, s, bc_ids);
-            for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
-              {
-                const boundary_id_type bc_id = *id_it;
+          mesh.get_boundary_info().boundary_ids(elem, s, bc_ids);
+          for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+            {
+              const boundary_id_type bc_id = *id_it;
 
-                if (bc_id != BoundaryInfo::invalid_id)
-                  {
-                    saved_boundary_elements.push_back(copy);
-                    saved_bc_ids.push_back(bc_id);
-                    saved_bc_sides.push_back(s);
-                  }
-              }
-          }
+              if (bc_id != BoundaryInfo::invalid_id)
+                {
+                  saved_boundary_elements.push_back(copy);
+                  saved_bc_ids.push_back(bc_id);
+                  saved_bc_sides.push_back(s);
+                }
+            }
+        }
 
 
-        // We're done with this element
-        mesh.delete_elem(elem);
+      // We're done with this element
+      mesh.delete_elem(elem);
 
-        // But save the copy
-        new_elements.push_back(copy);
-      }
+      // But save the copy
+      new_elements.push_back(copy);
+    }
 
-    // Make sure we saved the same number of boundary conditions
-    // in each vector.
-    libmesh_assert_equal_to (saved_boundary_elements.size(), saved_bc_ids.size());
-    libmesh_assert_equal_to (saved_bc_ids.size(), saved_bc_sides.size());
-  }
+  // Make sure we saved the same number of boundary conditions
+  // in each vector.
+  libmesh_assert_equal_to (saved_boundary_elements.size(), saved_bc_ids.size());
+  libmesh_assert_equal_to (saved_bc_ids.size(), saved_bc_sides.size());
 
   // Loop again, delete any remaining elements
   for (auto & elem : mesh.element_ptr_range())
