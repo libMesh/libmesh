@@ -95,14 +95,9 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector & error_
     }
 
   // We need to loop over all active elements to find the minimum
-  MeshBase::element_iterator       el_it  =
-    _mesh.active_local_elements_begin();
-  const MeshBase::element_iterator el_end =
-    _mesh.active_local_elements_end();
-
-  for (; el_it != el_end; ++el_it)
+  for (auto & elem : _mesh.active_local_element_ptr_range())
     {
-      const dof_id_type id  = (*el_it)->id();
+      const dof_id_type id  = elem->id();
       libmesh_assert_less (id, error_per_cell.size());
 
       error_max = std::max (error_max, error_per_cell[id]);
