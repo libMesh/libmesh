@@ -569,14 +569,9 @@ void DofMap::reinit(MeshBase & mesh)
       const bool extra_hanging_dofs =
         FEInterface::extra_hanging_dofs(base_fe_type);
 
-      // For all the active elements
-      MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-      const MeshBase::element_iterator elem_end = mesh.active_elements_end();
-
-      // Count vertex degrees of freedom first
-      for ( ; elem_it != elem_end; ++elem_it)
+      // For all the active elements, count vertex degrees of freedom.
+      for (auto & elem : mesh.active_element_ptr_range())
         {
-          Elem * elem  = *elem_it;
           libmesh_assert(elem);
 
           // Skip the numbering if this variable is
@@ -664,11 +659,8 @@ void DofMap::reinit(MeshBase & mesh)
         } // done counting vertex dofs
 
       // count edge & face dofs next
-      elem_it = mesh.active_elements_begin();
-
-      for ( ; elem_it != elem_end; ++elem_it)
+      for (auto & elem : mesh.active_element_ptr_range())
         {
-          Elem * elem = *elem_it;
           libmesh_assert(elem);
 
           // Skip the numbering if this variable is
