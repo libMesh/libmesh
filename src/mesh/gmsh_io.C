@@ -745,9 +745,6 @@ void GmshIO::write_mesh (std::ostream & out_stream)
     unsigned int e_id = mesh.max_elem_id();
 
     // loop over the elements, writing out boundary faces
-    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
     if (n_boundary_faces)
       {
         // Construct the list of boundary sides
