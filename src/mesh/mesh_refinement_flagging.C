@@ -554,10 +554,8 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector & error_p
     top_error = sorted_error[sorted_error.size() - n_elem_refine];
 
   // Finally, let's do the element flagging
-  elem_it  = _mesh.active_elements_begin();
-  for (; elem_it != elem_end; ++elem_it)
+  for (auto & elem : _mesh.active_element_ptr_range())
     {
-      Elem * elem = *elem_it;
       Elem * parent = elem->parent();
 
       if (_coarsen_by_parents && parent && n_elem_coarsen &&
