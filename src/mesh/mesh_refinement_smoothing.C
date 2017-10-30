@@ -384,12 +384,11 @@ bool MeshRefinement::eliminate_unrefined_patches ()
 
   bool flags_changed = false;
 
-  MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
-
-  for (; elem_it != elem_end; ++elem_it)
+  // Note: we *cannot* use a reference to the real pointer here, since
+  // the pointer may be reseated below and we don't want to reseat
+  // pointers held by the Mesh.
+  for (Elem * elem : _mesh.active_element_ptr_range())
     {
-      Elem * elem = *elem_it;
       // First assume that we'll have to flag this element for both h
       // and p refinement, then change our minds if we see any
       // neighbors that are as coarse or coarser than us.
