@@ -483,12 +483,8 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
     }
 
   // Loop over all the active elements
-  MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-  const MeshBase::element_iterator elem_end = mesh.active_elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
+  for (auto & elem : mesh.active_element_ptr_range())
     {
-      Elem * elem = *elem_it;
       libmesh_assert(elem);
 
       libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);
