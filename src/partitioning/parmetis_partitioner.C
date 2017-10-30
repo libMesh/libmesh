@@ -422,45 +422,27 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
   typedef std::unordered_multimap<const Elem *, const Elem *> map_type;
   map_type interior_to_boundary_map;
 
-  {
-    MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator elem_end = mesh.active_elements_end();
+  for (const auto & elem : mesh.active_element_ptr_range())
+    {
+      // If we don't have an interior_parent then there's nothing to look us
+      // up.
+      if ((elem->dim() >= LIBMESH_DIM) ||
+          !elem->interior_parent())
+        continue;
 
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        const Elem * elem = *elem_it;
+      // get all relevant interior elements
+      std::set<const Elem *> neighbor_set;
+      elem->find_interior_neighbors(neighbor_set);
 
-        // If we don't have an interior_parent then there's nothing to look us
-        // up.
-        if ((elem->dim() >= LIBMESH_DIM) ||
-            !elem->interior_parent())
-          continue;
-
-        // get all relevant interior elements
-        std::set<const Elem *> neighbor_set;
-        elem->find_interior_neighbors(neighbor_set);
-
-        std::set<const Elem *>::iterator n_it = neighbor_set.begin();
-        for (; n_it != neighbor_set.end(); ++n_it)
-          {
-            // FIXME - non-const versions of the Elem set methods
-            // would be nice
-            Elem * neighbor = const_cast<Elem *>(*n_it);
-
-#if defined(LIBMESH_HAVE_UNORDERED_MULTIMAP) || \
-  defined(LIBMESH_HAVE_TR1_UNORDERED_MAP) ||    \
-  defined(LIBMESH_HAVE_HASH_MAP) ||             \
-  defined(LIBMESH_HAVE_EXT_HASH_MAP)
-            interior_to_boundary_map.insert
-              (std::make_pair(neighbor, elem));
-#else
-            interior_to_boundary_map.insert
-              (interior_to_boundary_map.begin(),
-               std::make_pair(neighbor, elem));
-#endif
-          }
-      }
-  }
+      std::set<const Elem *>::iterator n_it = neighbor_set.begin();
+      for (; n_it != neighbor_set.end(); ++n_it)
+        {
+          // FIXME - non-const versions of the Elem set methods
+          // would be nice
+          Elem * neighbor = const_cast<Elem *>(*n_it);
+          interior_to_boundary_map.insert(std::make_pair(neighbor, elem));
+        }
+    }
 
 #ifdef LIBMESH_ENABLE_AMR
   std::vector<const Elem *> neighbors_offspring;
