@@ -2298,15 +2298,8 @@ DofMap::max_constraint_error (const System & system,
   // indices on each element
   std::vector<dof_id_type> local_dof_indices;
 
-  MeshBase::const_element_iterator       elem_it  =
-    mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator elem_end =
-    mesh.active_local_elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      const Elem * elem = *elem_it;
-
       this->dof_indices(elem, local_dof_indices);
       std::vector<dof_id_type> raw_dof_indices = local_dof_indices;
 
