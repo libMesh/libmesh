@@ -169,18 +169,13 @@ transfer_boundary_volume(const Variable & from_var, const Variable & to_var)
   const unsigned short int from_var_number = from_var.number();
   const unsigned short int to_n_comp = to_var.n_components();
 
-  // Iterator for BoundaryMesh.
-  MeshBase::const_element_iterator       el     = from_mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = from_mesh.active_local_elements_end();
-
   // In order to get solution vectors from BoundaryMesh
   std::vector<dof_id_type> from_dof_indices;
   std::vector<Number> value;
 
   // Loop through all boundary elements.
-  for (; el != end_el; ++el)
+  for (const auto & from_elem : from_mesh.active_local_element_ptr_range())
     {
-      const Elem * from_elem = *el;
       const Elem * to_elem = from_elem->interior_parent();
 
       if (!to_elem)
