@@ -388,10 +388,6 @@ void EnsightIO::write_scalar_ascii(const std::string & sys,
 
   std::vector<dof_id_type> dof_indices_scl;
 
-  // Loop over active local elements, construct the nodal solution, and write it to file.
-  MeshBase::const_element_iterator       el     = the_mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = the_mesh.active_local_elements_end();
-
   // Map from node id -> solution value.  We end up just writing this
   // map out in order, not sure what would happen if there were holes
   // in the numbering...
@@ -402,10 +398,9 @@ void EnsightIO::write_scalar_ascii(const std::string & sys,
   std::vector<Number> elem_soln;
   std::vector<Number> nodal_soln;
 
-  for ( ; el != end_el ; ++el)
+  // Loop over active local elements, construct the nodal solution, and write it to file.
+  for (const auto & elem : the_mesh.active_local_element_ptr_range())
     {
-      const Elem * elem = *el;
-
       const FEType & fe_type = system.variable_type(var);
 
       dof_map.dof_indices (elem, dof_indices_scl, var);
