@@ -1286,13 +1286,10 @@ void BoundaryInfo::boundary_ids (const Elem * const elem,
 #endif
     }
 
-  std::pair<boundary_side_iter, boundary_side_iter>
-    e = _boundary_side_id.equal_range(searched_elem);
-
   // Check each element in the range to see if its side matches the requested side.
-  for (; e.first != e.second; ++e.first)
-    if (e.first->second.first == side)
-      vec_to_fill.push_back(e.first->second.second);
+  for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
+    if (pr.second.first == side)
+      vec_to_fill.push_back(pr.second.second);
 }
 
 
