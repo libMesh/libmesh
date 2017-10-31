@@ -86,6 +86,7 @@ public:
         if (mesh.n_processors() == 1)
           CPPUNIT_ASSERT_EQUAL(initial_vector[node->id()], dof_id*Real(2));
       }
+    sys_solution.close();
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
