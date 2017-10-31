@@ -1,0 +1,4 @@
+nev = 1        # any integer
+Energy = -0.5  # set the energy-offset ( target energy: Energy= ... and spect = sm, sr or similar)
+order=1
+maxiter=1400
