@@ -111,8 +111,24 @@ public:
     for (const auto & var_name : nodal_vars)
       exio.copy_nodal_solution(sys2, var_name, var_name, 1);
 
-    std::vector<Real> gold_vector({-1, 3,   10,  0,  1, 12, 2,  0, 14,  0,  1.5, 11, 0.5, 1,
-                                   13, 0.5, 1.5, 12, 3, 4,  16, 3, 1.5, 15, 0.5, 4,  13});
+    // VariableGroup optimization means that DoFs iterate over each of
+    // the 3 variables on each node before proceeding to the next
+    // node.
+                                    //  u_x, u_y,    v
+    const std::vector<Real> gold_vector({-1,   3,   10,
+                                          0,   1,   12,
+                                          2,   0,   14,
+                                          0,   1.5, 11,
+                                          0.5, 1,   13,
+                                          0.5, 1.5, 12,
+                                          3,   4,   16,
+                                          3,   1.5, 15,
+                                          0.5, 4,   13});
+
+    // Translation from node id to dof indexing order as gets done in
+    // serial
+    const std::vector<dof_id_type>
+      node_reordering({0, 3, 1, 8, 5, 4, 6, 7, 2});
 
     Real tol = 1e-12;
     NumericVector<Number> & sys2_soln(*sys2.solution);
