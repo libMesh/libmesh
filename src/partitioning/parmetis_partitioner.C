@@ -552,13 +552,9 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
         }
 
       // Check for any boundary neighbors
-      typedef map_type::iterator map_it_type;
-      std::pair<map_it_type, map_it_type>
-        bounds = interior_to_boundary_map.equal_range(elem);
-
-      for (map_it_type it = bounds.first; it != bounds.second; ++it)
+      for (const auto & pr : as_range(interior_to_boundary_map.equal_range(elem)))
         {
-          const Elem * neighbor = it->second;
+          const Elem * neighbor = pr.second;
 
           const dof_id_type neighbor_global_index_by_pid =
             _global_index_by_pid_map[neighbor->id()];
