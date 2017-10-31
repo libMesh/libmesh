@@ -20,6 +20,7 @@
 #ifndef LIBMESH_SIMPLERANGE_H
 #define LIBMESH_SIMPLERANGE_H
 
+#include <utility>
 
 namespace libMesh
 {
@@ -44,6 +45,19 @@ public:
 private:
   I _begin, _end;
 };
+
+
+
+/**
+ * Helper function that allows us to treat a homogenous pair as a
+ * range. Useful for writing range-based for loops over the pair
+ * returned by std::equal_range() and std::map::equal_range().
+ */
+template<typename I>
+SimpleRange<I> as_range(const std::pair<I, I> & p)
+{
+  return {p.first, p.second};
+}
 
 } // namespace libMesh
 
