@@ -983,10 +983,8 @@ void BoundaryInfo::add_side(const Elem * elem,
 bool BoundaryInfo::has_boundary_id(const Node * const node,
                                    const boundary_id_type id) const
 {
-  std::pair<boundary_node_iter, boundary_node_iter> pos = _boundary_node_id.equal_range(node);
-
-  for (; pos.first != pos.second; ++pos.first)
-    if (pos.first->second == id)
+  for (const auto & pr : as_range(_boundary_node_id.equal_range(node)))
+    if (pr.second == id)
       return true;
 
   return false;
