@@ -2046,13 +2046,11 @@ void BoundaryInfo::build_side_list_from_node_list()
         for (unsigned node_num=0; node_num < n_nodes; ++node_num)
           {
             const Node * node = side_elem->node_ptr(node_num);
-            std::pair<boundary_node_iter, boundary_node_iter>
-              range = _boundary_node_id.equal_range(node);
 
             // For each nodeset that this node is a member of, increment the associated
             // nodeset ID count
-            for (boundary_node_iter pos = range.first; pos != range.second; ++pos)
-              nodesets_node_count[pos->second]++;
+            for (const auto & pr : as_range(_boundary_node_id.equal_range(node)))
+              nodesets_node_count[pr.second]++;
           }
 
         // Now check to see what nodeset_counts have the correct
