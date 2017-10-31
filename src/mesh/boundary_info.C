@@ -1637,17 +1637,14 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
   if (elem->level() != 0)
     searched_elem = elem->top_parent();
 
-  std::pair<boundary_side_iter, boundary_side_iter>
-    e = _boundary_side_id.equal_range(searched_elem);
-
   // elem may have zero or multiple occurrences
-  for (; e.first != e.second; ++e.first)
+  for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
     {
       // if this is true we found the requested boundary_id
       // of the element and want to return the side
-      if (e.first->second.second == boundary_id_in)
+      if (pr.second.second == boundary_id_in)
         {
-          unsigned int side = e.first->second.first;
+          unsigned int side = pr.second.first;
 
           // If we're on this external boundary then we share this
           // external boundary id
