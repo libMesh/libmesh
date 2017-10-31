@@ -915,11 +915,9 @@ void BoundaryInfo::add_side(const Elem * elem,
                       << "\n That is reserved for internal use.");
 
   // Don't add the same ID twice
-  std::pair<boundary_side_iter, boundary_side_iter> pos = _boundary_side_id.equal_range(elem);
-
-  for (; pos.first != pos.second; ++pos.first)
-    if (pos.first->second.first == side &&
-        pos.first->second.second == id)
+  for (const auto & pr : as_range(_boundary_side_id.equal_range(elem)))
+    if (pr.second.first == side &&
+        pr.second.second == id)
       return;
 
   _boundary_side_id.insert(std::make_pair(elem, std::make_pair(side, id)));
