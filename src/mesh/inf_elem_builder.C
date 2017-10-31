@@ -326,81 +326,69 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
   // Iterate through all elements and sides, collect indices of all active
   // boundary sides in the faces set. Skip sides which lie in symmetry planes.
   // Later, sides of the inner boundary will be sorted out.
-  {
-    MeshBase::element_iterator       it  = this->_mesh.active_elements_begin();
-    const MeshBase::element_iterator end = this->_mesh.active_elements_end();
+  for (const auto & elem : _mesh.active_element_ptr_range())
+    for (auto s : elem->side_index_range())
+      if (elem->neighbor_ptr(s) == libmesh_nullptr)
+        {
+          // note that it is safe to use the Elem::side() method,
+          // which gives a non-full-ordered element
+          UniquePtr<Elem> side(elem->build_side_ptr(s));
 
-    for (; it != end; ++it)
-      {
-        Elem * elem = *it;
-
-        for (auto s : elem->side_index_range())
-          {
-            // check if element e is on the boundary
-            if (elem->neighbor_ptr(s) == libmesh_nullptr)
-              {
-                // note that it is safe to use the Elem::side() method,
-                // which gives a non-full-ordered element
-                UniquePtr<Elem> side(elem->build_side_ptr(s));
-
-                // bool flags for symmetry detection
-                bool sym_side=false;
-                bool on_x_sym=true;
-                bool on_y_sym=true;
-                bool on_z_sym=true;
+          // bool flags for symmetry detection
+          bool sym_side=false;
+          bool on_x_sym=true;
+          bool on_y_sym=true;
+          bool on_z_sym=true;
 
 
-                // Loop over the nodes to check whether they are on the symmetry planes,
-                // and therefore sufficient to use a non-full-ordered side element
-                for (unsigned int n=0; n<side->n_nodes(); n++)
-                  {
-                    const Point dist_from_origin =
-                      this->_mesh.point(side->node_id(n)) - origin;
+          // Loop over the nodes to check whether they are on the symmetry planes,
+          // and therefore sufficient to use a non-full-ordered side element
+          for (unsigned int n=0; n<side->n_nodes(); n++)
+            {
+              const Point dist_from_origin =
+                this->_mesh.point(side->node_id(n)) - origin;
 
-                    if (x_sym)
-                      if (std::abs(dist_from_origin(0)) > 1.e-3)
-                        on_x_sym=false;
+              if (x_sym)
+                if (std::abs(dist_from_origin(0)) > 1.e-3)
+                  on_x_sym=false;
 
-                    if (y_sym)
-                      if (std::abs(dist_from_origin(1)) > 1.e-3)
-                        on_y_sym=false;
+              if (y_sym)
+                if (std::abs(dist_from_origin(1)) > 1.e-3)
+                  on_y_sym=false;
 
-                    if (z_sym)
-                      if (std::abs(dist_from_origin(2)) > 1.e-3)
-                        on_z_sym=false;
+              if (z_sym)
+                if (std::abs(dist_from_origin(2)) > 1.e-3)
+                  on_z_sym=false;
 
-                    //       if (x_sym)
-                    // if (std::abs(dist_from_origin(0)) > 1.e-6)
-                    //   on_x_sym=false;
+              //       if (x_sym)
+              // if (std::abs(dist_from_origin(0)) > 1.e-6)
+              //   on_x_sym=false;
 
-                    //       if (y_sym)
-                    // if (std::abs(dist_from_origin(1)) > 1.e-6)
-                    //   on_y_sym=false;
+              //       if (y_sym)
+              // if (std::abs(dist_from_origin(1)) > 1.e-6)
+              //   on_y_sym=false;
 
-                    //       if (z_sym)
-                    // if (std::abs(dist_from_origin(2)) > 1.e-6)
-                    //   on_z_sym=false;
+              //       if (z_sym)
+              // if (std::abs(dist_from_origin(2)) > 1.e-6)
+              //   on_z_sym=false;
 
-                    //find the node most distant from origin
+              //find the node most distant from origin
 
-                    Real r = dist_from_origin.norm();
-                    if (r > max_r)
-                      {
-                        max_r = r;
-                        max_r_node=side->node_id(n);
-                      }
+              Real r = dist_from_origin.norm();
+              if (r > max_r)
+                {
+                  max_r = r;
+                  max_r_node=side->node_id(n);
+                }
 
-                  }
+            }
 
-                sym_side = (x_sym && on_x_sym) || (y_sym && on_y_sym) || (z_sym && on_z_sym);
+          sym_side = (x_sym && on_x_sym) || (y_sym && on_y_sym) || (z_sym && on_z_sym);
 
-                if (!sym_side)
-                  faces.insert( std::make_pair(elem->id(), s) );
+          if (!sym_side)
+            faces.insert( std::make_pair(elem->id(), s) );
 
-              } // neighbor(s) == libmesh_nullptr
-          } // sides
-      } // elems
-  }
+        } // neighbor(s) == libmesh_nullptr
 
 
 

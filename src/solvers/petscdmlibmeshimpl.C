@@ -117,10 +117,8 @@ PetscErrorCode DMlibMeshSetSystem_libMesh(DM dm, NonlinearImplicitSystem & sys)
   /* The following effectively is a verbatim copy of MeshBase::n_subdomains(). */
   // This requires an inspection on every processor
   libmesh_parallel_only(mesh.comm());
-  MeshBase::const_element_iterator       el  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
-  for (; el!=end; ++el)
-    blocks.insert((*el)->subdomain_id());
+  for (const auto & elem : mesh.active_element_ptr_range())
+    blocks.insert(elem->subdomain_id());
   // Some subdomains may only live on other processors
   comm.set_union(blocks);
 

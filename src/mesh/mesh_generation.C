@@ -1899,24 +1899,17 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
     {
       mesh_refinement.uniformly_refine(1);
 
-      MeshBase::element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::element_iterator end = mesh.active_elements_end();
+      for (const auto & elem : mesh.active_element_ptr_range())
+        for (auto s : elem->side_index_range())
+          if (elem->neighbor_ptr(s) == libmesh_nullptr || (mesh.mesh_dimension() == 2 && !flat))
+            {
+              UniquePtr<Elem> side(elem->build_side_ptr(s));
 
-      for (; it != end; ++it)
-        {
-          Elem * elem = *it;
-
-          for (auto s : elem->side_index_range())
-            if (elem->neighbor_ptr(s) == libmesh_nullptr || (mesh.mesh_dimension() == 2 && !flat))
-              {
-                UniquePtr<Elem> side(elem->build_side_ptr(s));
-
-                // Pop each point to the sphere boundary
-                for (auto n : side->node_index_range())
-                  side->point(n) =
-                    sphere.closest_point(side->point(n));
-              }
-        }
+              // Pop each point to the sphere boundary
+              for (auto n : side->node_index_range())
+                side->point(n) =
+                  sphere.closest_point(side->point(n));
+            }
     }
 
   // The mesh now contains a refinement hierarchy due to the refinements
@@ -1946,24 +1939,17 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
       mesh.all_second_order(full_ordered);
 
       // And pop to the boundary again...
-      MeshBase::element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::element_iterator end = mesh.active_elements_end();
+      for (const auto & elem : mesh.active_element_ptr_range())
+        for (auto s : elem->side_index_range())
+          if (elem->neighbor_ptr(s) == libmesh_nullptr)
+            {
+              UniquePtr<Elem> side(elem->build_side_ptr(s));
 
-      for (; it != end; ++it)
-        {
-          Elem * elem = *it;
-
-          for (auto s : elem->side_index_range())
-            if (elem->neighbor_ptr(s) == libmesh_nullptr)
-              {
-                UniquePtr<Elem> side(elem->build_side_ptr(s));
-
-                // Pop each point to the sphere boundary
-                for (auto n : side->node_index_range())
-                  side->point(n) =
-                    sphere.closest_point(side->point(n));
-              }
-        }
+              // Pop each point to the sphere boundary
+              for (auto n : side->node_index_range())
+                side->point(n) =
+                  sphere.closest_point(side->point(n));
+            }
     }
 
 
@@ -1972,18 +1958,10 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
   smoother.smooth(n_smooth);
 
   // We'll give the whole sphere surface a boundary id of 0
-  {
-    MeshBase::element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::element_iterator end = mesh.active_elements_end();
-
-    for (; it != end; ++it)
-      {
-        Elem * elem = *it;
-        for (auto s : elem->side_index_range())
-          if (!elem->neighbor_ptr(s))
-            boundary_info.add_side(elem, s, 0);
-      }
-  }
+  for (const auto & elem : mesh.active_element_ptr_range())
+    for (auto s : elem->side_index_range())
+      if (!elem->neighbor_ptr(s))
+        boundary_info.add_side(elem, s, 0);
 
   STOP_LOG("build_sphere()", "MeshTools::Generation");
 

@@ -422,45 +422,22 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
   typedef std::unordered_multimap<const Elem *, const Elem *> map_type;
   map_type interior_to_boundary_map;
 
-  {
-    MeshBase::const_element_iterator       elem_it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator elem_end = mesh.active_elements_end();
+  for (const auto & elem : mesh.active_element_ptr_range())
+    {
+      // If we don't have an interior_parent then there's nothing to look us
+      // up.
+      if ((elem->dim() >= LIBMESH_DIM) ||
+          !elem->interior_parent())
+        continue;
 
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        const Elem * elem = *elem_it;
+      // get all relevant interior elements
+      std::set<const Elem *> neighbor_set;
+      elem->find_interior_neighbors(neighbor_set);
 
-        // If we don't have an interior_parent then there's nothing to look us
-        // up.
-        if ((elem->dim() >= LIBMESH_DIM) ||
-            !elem->interior_parent())
-          continue;
-
-        // get all relevant interior elements
-        std::set<const Elem *> neighbor_set;
-        elem->find_interior_neighbors(neighbor_set);
-
-        std::set<const Elem *>::iterator n_it = neighbor_set.begin();
-        for (; n_it != neighbor_set.end(); ++n_it)
-          {
-            // FIXME - non-const versions of the Elem set methods
-            // would be nice
-            Elem * neighbor = const_cast<Elem *>(*n_it);
-
-#if defined(LIBMESH_HAVE_UNORDERED_MULTIMAP) || \
-  defined(LIBMESH_HAVE_TR1_UNORDERED_MAP) ||    \
-  defined(LIBMESH_HAVE_HASH_MAP) ||             \
-  defined(LIBMESH_HAVE_EXT_HASH_MAP)
-            interior_to_boundary_map.insert
-              (std::make_pair(neighbor, elem));
-#else
-            interior_to_boundary_map.insert
-              (interior_to_boundary_map.begin(),
-               std::make_pair(neighbor, elem));
-#endif
-          }
-      }
-  }
+      std::set<const Elem *>::iterator n_it = neighbor_set.begin();
+      for (; n_it != neighbor_set.end(); ++n_it)
+        interior_to_boundary_map.insert(std::make_pair(*n_it, elem));
+    }
 
 #ifdef LIBMESH_ENABLE_AMR
   std::vector<const Elem *> neighbors_offspring;
@@ -644,13 +621,8 @@ void ParmetisPartitioner::assign_partitioning (MeshBase & mesh)
     requested_ids(mesh.n_processors()),
     requests_to_fill(mesh.n_processors());
 
-  MeshBase::element_iterator elem_it  = mesh.active_elements_begin();
-  MeshBase::element_iterator elem_end = mesh.active_elements_end();
-
-  for (; elem_it != elem_end; ++elem_it)
+  for (auto & elem : mesh.active_element_ptr_range())
     {
-      Elem * elem = *elem_it;
-
       // we need to get the index from the owning processor
       // (note we cannot assign it now -- we are iterating
       // over elements again and this will be bad!)
@@ -703,14 +675,9 @@ void ParmetisPartitioner::assign_partitioning (MeshBase & mesh)
   // note we are iterating in exactly the same order
   // used to build up the request, so we can expect the
   // required entries to be in the proper sequence.
-  elem_it  = mesh.active_elements_begin();
-  elem_end = mesh.active_elements_end();
-
-  for (std::vector<unsigned int> counters(mesh.n_processors(), 0);
-       elem_it != elem_end; ++elem_it)
+  std::vector<unsigned int> counters(mesh.n_processors(), 0);
+  for (auto & elem : mesh.active_element_ptr_range())
     {
-      Elem * elem = *elem_it;
-
       const processor_id_type current_pid = elem->processor_id();
 
       libmesh_assert_less (counters[current_pid], requested_ids[current_pid].size());

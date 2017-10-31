@@ -82,12 +82,8 @@ void LinearElasticityWithContact::move_mesh (MeshBase & input_mesh,
   localized_input_solution->init (input_solution.size(), false, SERIAL);
   input_solution.localize(*localized_input_solution);
 
-  MeshBase::const_element_iterator       el     = input_mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end_el = input_mesh.active_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : input_mesh.active_element_ptr_range())
     {
-      Elem * elem = *el;
       Elem * orig_elem = _sys.get_mesh().elem_ptr(elem->id());
 
       for (auto node_id : elem->node_index_range())
@@ -150,45 +146,35 @@ void LinearElasticityWithContact::initialize_contact_load_paths()
   std::vector<dof_id_type> nodes_on_lower_surface;
   std::vector<dof_id_type> nodes_on_upper_surface;
 
-  MeshBase::const_element_iterator       el     = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_elements_end();
-
   _lambdas.clear();
-  for ( ; el != end_el; ++el)
-    {
-      const Elem * elem = *el;
-
-      for (auto side : elem->side_index_range())
+  for (const auto & elem : mesh.active_element_ptr_range())
+    for (auto side : elem->side_index_range())
+      if (elem->neighbor_ptr(side) == libmesh_nullptr)
         {
-          if (elem->neighbor_ptr(side) == libmesh_nullptr)
+          bool on_lower_contact_surface =
+            mesh.get_boundary_info().has_boundary_id (elem, side, CONTACT_BOUNDARY_LOWER);
+
+          bool on_upper_contact_surface =
+            mesh.get_boundary_info().has_boundary_id (elem, side, CONTACT_BOUNDARY_UPPER);
+
+          if (on_lower_contact_surface && on_upper_contact_surface)
+            libmesh_error_msg("Should not be on both surfaces at the same time");
+
+          if (on_lower_contact_surface || on_upper_contact_surface)
             {
-              bool on_lower_contact_surface =
-                mesh.get_boundary_info().has_boundary_id (elem, side, CONTACT_BOUNDARY_LOWER);
-
-              bool on_upper_contact_surface =
-                mesh.get_boundary_info().has_boundary_id (elem, side, CONTACT_BOUNDARY_UPPER);
-
-              if (on_lower_contact_surface && on_upper_contact_surface)
-                libmesh_error_msg("Should not be on both surfaces at the same time");
-
-              if (on_lower_contact_surface || on_upper_contact_surface)
-                {
-                  for (auto node_index : elem->node_index_range())
-                    if (elem->is_node_on_side(node_index, side))
+              for (auto node_index : elem->node_index_range())
+                if (elem->is_node_on_side(node_index, side))
+                  {
+                    if (on_lower_contact_surface)
+                      nodes_on_lower_surface.push_back(elem->node_id(node_index));
+                    else
                       {
-                        if (on_lower_contact_surface)
-                          nodes_on_lower_surface.push_back(elem->node_id(node_index));
-                        else
-                          {
-                            _lambdas[elem->node_id(node_index)] = 0.;
-                            nodes_on_upper_surface.push_back(elem->node_id(node_index));
-                          }
+                        _lambdas[elem->node_id(node_index)] = 0.;
+                        nodes_on_upper_surface.push_back(elem->node_id(node_index));
                       }
-                }
-
-            } // end if neighbor(side_) != libmesh_nullptr
-        } // end for side
-    } // end for el
+                  }
+            }
+        } // end if neighbor(side_) != libmesh_nullptr
 
   // In this example, we expect the number of upper and lower nodes to match
   libmesh_assert(nodes_on_lower_surface.size() == nodes_on_upper_surface.size());

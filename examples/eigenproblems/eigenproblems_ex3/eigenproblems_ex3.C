@@ -158,21 +158,13 @@ int main (int argc, char ** argv)
 
   mesh.read(mesh_name_exodus.str());
 
-  {
-    // Add boundary IDs to this mesh so that we can use DirichletBoundary
-    // Each processor should know about each boundary condition it can
-    // see, so we loop over all elements, not just local elements.
-    MeshBase::const_element_iterator       el     = mesh.elements_begin();
-    const MeshBase::const_element_iterator end_el = mesh.elements_end();
-    for ( ; el != end_el; ++el)
-      {
-        const Elem * elem = *el;
-
-        for (auto side : elem->side_index_range())
-          if (elem->neighbor_ptr (side) == NULL)
-            mesh.get_boundary_info().add_side(elem, side, BOUNDARY_ID);
-      }
-  }
+  // Add boundary IDs to this mesh so that we can use DirichletBoundary
+  // Each processor should know about each boundary condition it can
+  // see, so we loop over all elements, not just local elements.
+  for (const auto & elem : mesh.element_ptr_range())
+    for (auto side : elem->side_index_range())
+      if (elem->neighbor_ptr (side) == NULL)
+        mesh.get_boundary_info().add_side(elem, side, BOUNDARY_ID);
 
   // Print information about the mesh to the screen.
   mesh.print_info();

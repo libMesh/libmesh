@@ -197,26 +197,17 @@ int main (int argc, char ** argv)
                                          ((dim == 2) ? QUAD9 : HEX27));
     }
 
-  {
-    MeshBase::element_iterator       el     = mesh.elements_begin();
-    const MeshBase::element_iterator end_el = mesh.elements_end();
-
-    for ( ; el != end_el; ++el)
-      {
-        Elem * elem = *el;
-        const Point cent = elem->centroid();
-        if (dim > 1)
-          {
-            if ((cent(0) > 0) == (cent(1) > 0))
-              elem->subdomain_id() = 1;
-          }
-        else
-          {
-            if (cent(0) > 0)
-              elem->subdomain_id() = 1;
-          }
-      }
-  }
+  for (auto & elem : mesh.element_ptr_range())
+    {
+      const Point cent = elem->centroid();
+      if (dim > 1)
+        {
+          if ((cent(0) > 0) == (cent(1) > 0))
+            elem->subdomain_id() = 1;
+        }
+      else if (cent(0) > 0)
+        elem->subdomain_id() = 1;
+    }
 
   // Print information about the mesh to the screen.
   mesh.print_info();

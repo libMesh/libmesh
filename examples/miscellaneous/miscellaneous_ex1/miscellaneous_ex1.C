@@ -140,18 +140,9 @@ int main (int argc, char ** argv)
 
   // Reassign subdomain_id() of all infinite elements.
   // Otherwise, the exodus-api will fail on the mesh.
-  MeshBase::element_iterator       elem_it  = mesh.elements_begin();
-  const MeshBase::element_iterator elem_end = mesh.elements_end();
-  for (; elem_it != elem_end; ++elem_it)
-    {
-      Elem * elem = *elem_it;
-      if(elem->infinite())
-        {
-          elem->subdomain_id() = 1;
-        }
-    }
-
-
+  for (auto & elem : mesh.element_ptr_range())
+    if (elem->infinite())
+      elem->subdomain_id() = 1;
 
   // Print information about the mesh to the screen.
   mesh.print_info();

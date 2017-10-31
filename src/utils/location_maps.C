@@ -203,10 +203,8 @@ template <>
 void LocationMap<Elem>::fill(MeshBase & mesh)
 {
   // Populate the elem map
-  MeshBase::element_iterator       it  = mesh.active_elements_begin(),
-    end = mesh.active_elements_end();
-  for (; it != end; ++it)
-    this->insert(**it);
+  for (auto & elem : mesh.active_element_ptr_range())
+    this->insert(*elem);
 }
 
 

@@ -332,14 +332,8 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
   node_id_map.clear();
   side_id_map.clear();
 
-  MeshBase::const_element_iterator el =
-    boundary_mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end_el =
-    boundary_mesh.active_elements_end();
-
-  for (; el != end_el; ++el)
+  for (const auto & boundary_elem : boundary_mesh.active_element_ptr_range())
     {
-      const Elem * boundary_elem = *el;
       const Elem * interior_parent = boundary_elem->interior_parent();
 
       // Find out which side of interior_parent boundary_elem corresponds to.
@@ -360,9 +354,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
         }
 
       if (!found_matching_sides)
-        {
-          libmesh_error_msg("No matching side found within the specified tolerance");
-        }
+        libmesh_error_msg("No matching side found within the specified tolerance");
 
       side_id_map[boundary_elem->id()] = interior_parent_side_index;
 
@@ -374,7 +366,6 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
 
           node_id_map[interior_node_id] = boundary_node_id;
         }
-
     }
 }
 
@@ -2074,51 +2065,44 @@ void BoundaryInfo::build_side_list_from_node_list()
       return;
     }
 
-  MeshBase::const_element_iterator el = _mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end_el = _mesh.active_elements_end();
+  for (const auto & elem : _mesh.active_element_ptr_range())
+    for (auto side : elem->side_index_range())
+      {
+        UniquePtr<const Elem> side_elem = elem->build_side_ptr(side);
 
-  for (; el != end_el; ++el)
-    {
-      const Elem * elem = *el;
+        const unsigned short n_nodes = side_elem->n_nodes();
 
-      for (auto side : elem->side_index_range())
-        {
-          UniquePtr<const Elem> side_elem = elem->build_side_ptr(side);
+        // map from nodeset_id to count for that ID
+        std::map<boundary_id_type, unsigned> nodesets_node_count;
+        for (unsigned node_num=0; node_num < n_nodes; ++node_num)
+          {
+            const Node * node = side_elem->node_ptr(node_num);
+            std::pair<boundary_node_iter, boundary_node_iter>
+              range = _boundary_node_id.equal_range(node);
 
-          const unsigned short n_nodes = side_elem->n_nodes();
+            // For each nodeset that this node is a member of, increment the associated
+            // nodeset ID count
+            for (boundary_node_iter pos = range.first; pos != range.second; ++pos)
+              nodesets_node_count[pos->second]++;
+          }
 
-          // map from nodeset_id to count for that ID
-          std::map<boundary_id_type, unsigned> nodesets_node_count;
-          for (unsigned node_num=0; node_num < n_nodes; ++node_num)
+        // Now check to see what nodeset_counts have the correct
+        // number of nodes in them.  For any that do, add this side to
+        // the sideset, making sure the sideset inherits the
+        // nodeset's name, if there is one.
+        std::map<boundary_id_type, unsigned>::const_iterator nodesets = nodesets_node_count.begin();
+        for (; nodesets != nodesets_node_count.end(); ++nodesets)
+          if (nodesets->second == n_nodes)
             {
-              const Node * node = side_elem->node_ptr(node_num);
-              std::pair<boundary_node_iter, boundary_node_iter>
-                range = _boundary_node_id.equal_range(node);
+              add_side(elem, side, nodesets->first);
 
-              // For each nodeset that this node is a member of, increment the associated
-              // nodeset ID count
-              for (boundary_node_iter pos = range.first; pos != range.second; ++pos)
-                nodesets_node_count[pos->second]++;
+              // Let the sideset inherit any non-empty name from the nodeset
+              std::string & nset_name = nodeset_name(nodesets->first);
+
+              if (nset_name != "")
+                sideset_name(nodesets->first) = nset_name;
             }
-
-          // Now check to see what nodeset_counts have the correct
-          // number of nodes in them.  For any that do, add this side to
-          // the sideset, making sure the sideset inherits the
-          // nodeset's name, if there is one.
-          std::map<boundary_id_type, unsigned>::const_iterator nodesets = nodesets_node_count.begin();
-          for (; nodesets != nodesets_node_count.end(); ++nodesets)
-            if (nodesets->second == n_nodes)
-              {
-                add_side(elem, side, nodesets->first);
-
-                // Let the sideset inherit any non-empty name from the nodeset
-                std::string & nset_name = nodeset_name(nodesets->first);
-
-                if (nset_name != "")
-                  sideset_name(nodesets->first) = nset_name;
-              }
-        } // end for side
-    } // end for el
+      } // end for side
 }
 
 

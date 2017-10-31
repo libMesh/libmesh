@@ -145,16 +145,9 @@ int main (int argc, char ** argv)
   // of different dimensionality to belong to different subdomains.
   // Our interior elements defaulted to subdomain id 0, so we'll set
   // boundary elements to subdomain 1.
-  {
-    const MeshBase::element_iterator end_el = mesh.elements_end();
-    for (MeshBase::element_iterator el = mesh.elements_begin();
-         el != end_el; ++el)
-      {
-        Elem * elem = *el;
-        if (elem->dim() < dim)
-          elem->subdomain_id() = 1;
-      }
-  }
+  for (auto & elem : mesh.element_ptr_range())
+    if (elem->dim() < dim)
+      elem->subdomain_id() = 1;
 
   mesh_refinement.uniformly_refine(coarserefinements);
 

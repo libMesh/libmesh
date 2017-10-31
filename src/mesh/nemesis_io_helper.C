@@ -1938,23 +1938,16 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase & pmesh)
   {
     // Loop over active (not just active local) elements, make sets of node IDs for each
     // processor which has an element that "touches" a node.
-    {
-      MeshBase::const_element_iterator elem_it = pmesh.active_elements_begin();
-      MeshBase::const_element_iterator elem_end = pmesh.active_elements_end();
+    for (const auto & elem : pmesh.active_element_ptr_range())
+      {
+        // Get reference to the set for this processor.  If it does not exist
+        // it will be created.
+        std::set<unsigned> & set_p = proc_nodes_touched[ elem->processor_id() ];
 
-      for (; elem_it != elem_end; ++elem_it)
-        {
-          const Elem * elem = *elem_it;
-
-          // Get reference to the set for this processor.  If it does not exist
-          // it will be created.
-          std::set<unsigned> & set_p = proc_nodes_touched[ elem->processor_id() ];
-
-          // Insert all nodes touched by this element into the set
-          for (unsigned int node=0; node<elem->n_nodes(); ++node)
-            set_p.insert(elem->node_id(node));
-        }
-    }
+        // Insert all nodes touched by this element into the set
+        for (unsigned int node=0; node<elem->n_nodes(); ++node)
+          set_p.insert(elem->node_id(node));
+      }
 
     // The number of node communication maps is the number of other processors
     // with which we share nodes. (I think.) This is just the size of the map we just

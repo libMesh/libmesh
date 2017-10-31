@@ -1137,10 +1137,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
     }
   else
     {
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end();
-      for (; it!=end; ++it)
-        num_nodes += (*it)->n_nodes();
+      for (const auto & elem : mesh.active_element_ptr_range())
+        num_nodes += elem->n_nodes();
     }
 
   std::vector<boundary_id_type> unique_side_boundaries;
@@ -1163,12 +1161,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   //loop through element and map between block and element vector
   std::map<subdomain_id_type, std::vector<unsigned int>> subdomain_map;
 
-  MeshBase::const_element_iterator it = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
-  for (; it!=end; ++it)
+  for (const auto & elem : mesh.active_element_ptr_range())
     {
-      const Elem * elem = *it;
-
       // We skip writing infinite elements to the Exodus file, so
       // don't put them in the subdomain_map. That way the number of
       // blocks should be correct.
@@ -1264,35 +1258,28 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
     }
   else
     {
-      MeshBase::const_element_iterator it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-      for (; it!=end; ++it)
-        {
-          const Elem * elem = *it;
-
-          for (unsigned int n=0; n<elem->n_nodes(); n++)
-            {
-              x.push_back(elem->point(n)(0));
+      for (const auto & elem : mesh.active_element_ptr_range())
+        for (unsigned int n=0; n<elem->n_nodes(); n++)
+          {
+            x.push_back(elem->point(n)(0));
 #if LIBMESH_DIM > 1
-              y.push_back(elem->point(n)(1));
+            y.push_back(elem->point(n)(1));
 #else
-              y.push_back(0.);
+            y.push_back(0.);
 #endif
 #if LIBMESH_DIM > 2
-              z.push_back(elem->point(n)(2));
+            z.push_back(elem->point(n)(2));
 #else
-              z.push_back(0.);
+            z.push_back(0.);
 #endif
 
-              // Let's skip the node_num_map in the discontinuous
-              // case, since we're effectively duplicating nodes for
-              // the sake of discontinuous visualization, so it isn't
-              // clear how to deal with node_num_map here. This means
-              // that writing discontinuous meshes won't work with
-              // element numberings that have "holes".
-            }
-        }
+            // Let's skip the node_num_map in the discontinuous
+            // case, since we're effectively duplicating nodes for
+            // the sake of discontinuous visualization, so it isn't
+            // clear how to deal with node_num_map here. This means
+            // that writing discontinuous meshes won't work with
+            // element numberings that have "holes".
+          }
     }
 
   if (_single_precision)
@@ -1341,13 +1328,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   typedef std::map<subdomain_id_type, std::vector<dof_id_type>> subdomain_map_type;
   subdomain_map_type subdomain_map;
 
-  MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
-  //loop through element and map between block and element vector
-  for (; mesh_it!=end; ++mesh_it)
+  // Loop through element and map between block and element vector.
+  for (const auto & elem : mesh.active_element_ptr_range())
     {
-      const Elem * elem = *mesh_it;
-
       // We skip writing infinite elements to the Exodus file, so
       // don't put them in the subdomain_map. That way the number of
       // blocks should be correct.
@@ -1868,15 +1851,9 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
   ex_err = exII::ex_get_var_param(ex_id, "e", &num_elem_vars);
   EX_CHECK_ERR(ex_err, "Error reading number of elemental variables.");
 
-  MeshBase::const_element_iterator mesh_it = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
   // loop through element and map between block and element vector
-  for (; mesh_it!=end; ++mesh_it)
-    {
-      const Elem * elem = *mesh_it;
-      subdomain_map[elem->subdomain_id()].push_back(elem->id());
-    }
+  for (const auto & elem : mesh.active_element_ptr_range())
+    subdomain_map[elem->subdomain_id()].push_back(elem->id());
 
   // Use mesh.n_elem() to access into the values vector rather than
   // the number of elements the Exodus writer thinks the mesh has,

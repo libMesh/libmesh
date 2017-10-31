@@ -293,18 +293,12 @@ void TetGenIO::write (const std::string & fname)
     out_stream << "# Facets:\n"
                << mesh.n_elem() << " 0\n";
 
-    //     const_active_elem_iterator       it (mesh.elements_begin());
-    //     const const_active_elem_iterator end(mesh.elements_end());
-
-    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-    for ( ; it != end; ++it)
+    for (const auto & elem : mesh.active_element_ptr_range())
       out_stream << "1\n3 " // no. of facet polygons
-        //  << (*it)->n_nodes() << " "
-                 << (*it)->node_id(0)   << " "
-                 << (*it)->node_id(1)   << " "
-                 << (*it)->node_id(2)   << "\n";
+        //  << elem->n_nodes() << " "
+                 << elem->node_id(0)   << " "
+                 << elem->node_id(1)   << " "
+                 << elem->node_id(2)   << "\n";
   }
 
   // end of the file

@@ -1065,49 +1065,39 @@ void AbaqusIO::assign_sideset_ids()
       }
 
     // Loop over elements and try to assign boundary information
-    {
-      MeshBase::element_iterator       e_it  = the_mesh.active_elements_begin();
-      const MeshBase::element_iterator end = the_mesh.active_elements_end();
-      for ( ; e_it != end; ++e_it)
-        {
-          Elem * elem = *e_it;
+    for (auto & elem : the_mesh.active_element_ptr_range())
+      if (elem->dim() == max_dim)
+        for (auto sn : elem->side_index_range())
+          {
+            // This is a max-dimension element that may require BCs.
+            // For each of its sides, including internal sides, we'll
+            // see if a lower-dimensional element provides boundary
+            // information for it.  Note that we have not yet called
+            // find_neighbors(), so we can't use elem->neighbor(sn) in
+            // this algorithm...
+            std::pair<provide_bcs_t::const_iterator,
+                      provide_bcs_t::const_iterator>
+              range = provide_bcs.equal_range (elem->key(sn));
 
-          if (elem->dim() == max_dim)
-            {
-              // This is a max-dimension element that may require BCs.
-              // For each of its sides, including internal sides, we'll
-              // see if a lower-dimensional element provides boundary
-              // information for it.  Note that we have not yet called
-              // find_neighbors(), so we can't use elem->neighbor(sn) in
-              // this algorithm...
-              for (auto sn : elem->side_index_range())
-                {
-                  std::pair<provide_bcs_t::const_iterator,
-                            provide_bcs_t::const_iterator>
-                    range = provide_bcs.equal_range (elem->key(sn));
+            // Add boundary information for each side in the range.
+            for (provide_bcs_t::const_iterator s_it = range.first;
+                 s_it != range.second; ++s_it)
+              {
+                // We'll need to compare the lower dimensional element against the current side.
+                UniquePtr<Elem> side (elem->build_side_ptr(sn));
 
-                  // Add boundary information for each side in the range.
-                  for (provide_bcs_t::const_iterator s_it = range.first;
-                       s_it != range.second; ++s_it)
-                    {
-                      // We'll need to compare the lower dimensional element against the current side.
-                      UniquePtr<Elem> side (elem->build_side_ptr(sn));
+                // Get the value mapped by the iterator.
+                std::pair<Elem *, boundary_id_type> p = s_it->second;
 
-                      // Get the value mapped by the iterator.
-                      std::pair<Elem *, boundary_id_type> p = s_it->second;
+                // Extract the relevant data from the iterator.
+                Elem * lower_dim_elem = p.first;
+                boundary_id_type bid = p.second;
 
-                      // Extract the relevant data from the iterator.
-                      Elem * lower_dim_elem = p.first;
-                      boundary_id_type bid = p.second;
-
-                      // This was a hash, so it might not be perfect.  Let's verify...
-                      if (*lower_dim_elem == *side)
-                        the_mesh.get_boundary_info().add_side(elem, sn, bid);
-                    }
-                }
-            }
-        }
-    }
+                // This was a hash, so it might not be perfect.  Let's verify...
+                if (*lower_dim_elem == *side)
+                  the_mesh.get_boundary_info().add_side(elem, sn, bid);
+              }
+          }
   }
 }
 

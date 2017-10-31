@@ -298,22 +298,15 @@ void MeshTools::find_boundary_nodes (const MeshBase & mesh,
 
   // Loop over elements, find those on boundary, and
   // mark them as true in on_boundary.
-  MeshBase::const_element_iterator       el  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
+  for (const auto & elem : mesh.active_element_ptr_range())
+    for (auto s : elem->side_index_range())
+      if (elem->neighbor_ptr(s) == libmesh_nullptr) // on the boundary
+        {
+          const UniquePtr<const Elem> side = elem->build_side_ptr(s);
 
-  for (; el != end; ++el)
-    {
-      const Elem * elem = *el;
-
-      for (auto s : elem->side_index_range())
-        if (elem->neighbor_ptr(s) == libmesh_nullptr) // on the boundary
-          {
-            const UniquePtr<const Elem> side = elem->build_side_ptr(s);
-
-            for (auto & node : side->node_ref_range())
-              on_boundary[node.id()] = true;
-          }
-    }
+          for (auto & node : side->node_ref_range())
+            on_boundary[node.id()] = true;
+        }
 }
 
 
@@ -1118,12 +1111,8 @@ void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase & mesh)
   processor_id_type lastprocid = 0;
   dof_id_type lastelemid = 0;
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.active_elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.active_elements_begin(); el != el_end; ++el)
+  for (const auto & elem : mesh.active_element_ptr_range())
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
       processor_id_type elemprocid = elem->processor_id();
       dof_id_type elemid = elem->id();
@@ -1885,11 +1874,8 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   // We build up a set of compatible processor ids for each node
   proc_id_map_type new_proc_ids;
 
-  MeshBase::element_iterator       e_it  = mesh.active_elements_begin();
-  const MeshBase::element_iterator e_end = mesh.active_elements_end();
-  for (; e_it != e_end; ++e_it)
+  for (auto & elem : mesh.active_element_ptr_range())
     {
-      Elem * elem = *e_it;
       processor_id_type pid = elem->processor_id();
 
       for (auto & node : elem->node_ref_range())

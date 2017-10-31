@@ -272,23 +272,15 @@ void Partitioner::set_parent_processor_ids(MeshBase & mesh)
   // of its active ancestor.
   if (mesh.is_serial())
     {
-      // Loop over all the active elements in the mesh
-      MeshBase::element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::element_iterator end = mesh.active_elements_end();
-
-      for ( ; it!=end; ++it)
+      for (auto & child : mesh.active_element_ptr_range())
         {
-          Elem * child  = *it;
-
           // First set descendents
-
           std::vector<const Elem *> subactive_family;
           child->total_family_tree(subactive_family);
           for (std::size_t i = 0; i != subactive_family.size(); ++i)
             const_cast<Elem *>(subactive_family[i])->processor_id() = child->processor_id();
 
           // Then set ancestors
-
           Elem * parent = child->parent();
 
           while (parent)
@@ -318,13 +310,8 @@ void Partitioner::set_parent_processor_ids(MeshBase & mesh)
       // that children have access to all their parents.
 
       // Loop over all the active elements in the mesh
-      MeshBase::element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::element_iterator end = mesh.active_elements_end();
-
-      for ( ; it!=end; ++it)
+      for (auto & child : mesh.active_element_ptr_range())
         {
-          Elem * child  = *it;
-
           std::vector<const Elem *> subactive_family;
           child->total_family_tree(subactive_family);
           for (std::size_t i = 0; i != subactive_family.size(); ++i)
@@ -496,12 +483,8 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
     }
 
   // Loop over all the active elements
-  MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
-  const MeshBase::element_iterator elem_end = mesh.active_elements_end();
-
-  for ( ; elem_it != elem_end; ++elem_it)
+  for (auto & elem : mesh.active_element_ptr_range())
     {
-      Elem * elem = *elem_it;
       libmesh_assert(elem);
 
       libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);

@@ -457,12 +457,8 @@ int main (int argc, char ** argv)
   // Let's add some node and edge boundary conditions
   // Each processor should know about each boundary condition it can
   // see, so we loop over all elements, not just local elements.
-  MeshBase::const_element_iterator       el     = mesh.elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.elements_end();
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : mesh.element_ptr_range())
     {
-      const Elem * elem = *el;
-
       unsigned int
         side_max_x = 0, side_min_y = 0,
         side_max_y = 0, side_max_z = 0;

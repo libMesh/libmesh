@@ -158,26 +158,17 @@ int main (int argc, char ** argv)
   for (unsigned int i=0; i<2; i++)
     {
       MeshRefinement mesh_refinement(mesh);
-      MeshBase::element_iterator       elem_it  = mesh.elements_begin();
-      const MeshBase::element_iterator elem_end = mesh.elements_end();
-      for (; elem_it != elem_end; ++elem_it)
+      for (auto & elem : mesh.element_ptr_range())
         {
-          Elem * elem = *elem_it;
           if (elem->active())
             {
               if ((elem->id()%20)>8)
-                {
-                  elem->set_refinement_flag(Elem::REFINE);
-                }
+                elem->set_refinement_flag(Elem::REFINE);
               else
-                {
-                  elem->set_refinement_flag(Elem::DO_NOTHING);
-                }
+                elem->set_refinement_flag(Elem::DO_NOTHING);
             }
           else
-            {
-              elem->set_refinement_flag(Elem::INACTIVE);
-            }
+            elem->set_refinement_flag(Elem::INACTIVE);
         }
       mesh_refinement.refine_elements();
       equation_systems.reinit();

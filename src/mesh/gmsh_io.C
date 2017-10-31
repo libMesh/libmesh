@@ -532,98 +532,73 @@ void GmshIO::read_mesh(std::istream & in)
                   provide_container_t provide_bcs;
 
                   // 1st loop over active elements - get info about lower-dimensional elements.
-                  {
-                    MeshBase::element_iterator       it  = mesh.active_elements_begin();
-                    const MeshBase::element_iterator end = mesh.active_elements_end();
-                    for ( ; it != end; ++it)
+                  for (auto & elem : mesh.active_element_ptr_range())
+                    if (elem->dim() < max_elem_dimension_seen &&
+                        !lower_dimensional_blocks.count(elem->subdomain_id()))
                       {
-                        Elem * elem = *it;
+                        // To be consistent with the previous
+                        // GmshIO behavior, add all the
+                        // lower-dimensional elements' nodes to
+                        // the Mesh's BoundaryInfo object with the
+                        // lower-dimensional element's subdomain
+                        // ID.
+                        for (auto n : elem->node_index_range())
+                          mesh.get_boundary_info().add_node(elem->node_id(n),
+                                                            elem->subdomain_id());
 
-                        if (elem->dim() < max_elem_dimension_seen &&
-                            !lower_dimensional_blocks.count(elem->subdomain_id()))
-                          {
-                            // To be consistent with the previous
-                            // GmshIO behavior, add all the
-                            // lower-dimensional elements' nodes to
-                            // the Mesh's BoundaryInfo object with the
-                            // lower-dimensional element's subdomain
-                            // ID.
-                            for (auto n : elem->node_index_range())
-                              mesh.get_boundary_info().add_node(elem->node_id(n),
-                                                                elem->subdomain_id());
-
-                            // Store this elem in a quickly-searchable
-                            // container to use it to assign boundary
-                            // conditions later.
-                            provide_bcs.insert(std::make_pair(elem->key(), elem));
-                          }
+                        // Store this elem in a quickly-searchable
+                        // container to use it to assign boundary
+                        // conditions later.
+                        provide_bcs.insert(std::make_pair(elem->key(), elem));
                       }
-                  }
 
                   // 2nd loop over active elements - use lower dimensional element data to set BCs for higher dimensional elements
-                  {
-                    MeshBase::element_iterator       it  = mesh.active_elements_begin();
-                    const MeshBase::element_iterator end = mesh.active_elements_end();
-
-                    for ( ; it != end; ++it)
+                  for (auto & elem : mesh.active_element_ptr_range())
+                    if (elem->dim() == max_elem_dimension_seen)
                       {
-                        Elem * elem = *it;
-
-                        if (elem->dim() == max_elem_dimension_seen)
+                        // This is a max-dimension element that
+                        // may require BCs.  For each of its
+                        // sides, including internal sides, we'll
+                        // see if one more more lower-dimensional elements
+                        // provides boundary information for it.
+                        // Note that we have not yet called
+                        // find_neighbors(), so we can't use
+                        // elem->neighbor(sn) in this algorithm...
+                        for (auto sn : elem->side_index_range())
                           {
-                            // This is a max-dimension element that
-                            // may require BCs.  For each of its
-                            // sides, including internal sides, we'll
-                            // see if one more more lower-dimensional elements
-                            // provides boundary information for it.
-                            // Note that we have not yet called
-                            // find_neighbors(), so we can't use
-                            // elem->neighbor(sn) in this algorithm...
-                            for (auto sn : elem->side_index_range())
+                            // Look for the current side in the provide_bcs multimap.
+                            std::pair<provide_container_t::iterator,
+                                      provide_container_t::iterator>
+                              rng = provide_bcs.equal_range(elem->key(sn));
+
+                            for (provide_container_t::iterator iter = rng.first;
+                                 iter != rng.second; ++iter)
                               {
-                                // Look for the current side in the provide_bcs multimap.
-                                std::pair<provide_container_t::iterator,
-                                          provide_container_t::iterator>
-                                  rng = provide_bcs.equal_range(elem->key(sn));
+                                // Construct the side for hash verification.
+                                UniquePtr<Elem> side (elem->build_side_ptr(sn));
 
-                                for (provide_container_t::iterator iter = rng.first;
-                                     iter != rng.second; ++iter)
+                                // Construct the lower-dimensional element to compare to the side.
+                                Elem * lower_dim_elem = iter->second;
+
+                                // This was a hash, so it might not be perfect.  Let's verify...
+                                if (*lower_dim_elem == *side)
                                   {
-                                    // Construct the side for hash verification.
-                                    UniquePtr<Elem> side (elem->build_side_ptr(sn));
-
-                                    // Construct the lower-dimensional element to compare to the side.
-                                    Elem * lower_dim_elem = iter->second;
-
-                                    // This was a hash, so it might not be perfect.  Let's verify...
-                                    if (*lower_dim_elem == *side)
-                                      {
-                                        // Add the lower-dimensional
-                                        // element's subdomain_id as a
-                                        // boundary_id for the
-                                        // higher-dimensional element.
-                                        boundary_id_type bid = cast_int<boundary_id_type>(lower_dim_elem->subdomain_id());
-                                        mesh.get_boundary_info().add_side(elem, sn, bid);
-                                      }
+                                    // Add the lower-dimensional
+                                    // element's subdomain_id as a
+                                    // boundary_id for the
+                                    // higher-dimensional element.
+                                    boundary_id_type bid = cast_int<boundary_id_type>(lower_dim_elem->subdomain_id());
+                                    mesh.get_boundary_info().add_side(elem, sn, bid);
                                   }
                               }
                           }
                       }
-                  } // end 2nd loop over active elements
 
                   // 3rd loop over active elements - Remove the lower-dimensional elements
-                  {
-                    MeshBase::element_iterator       it  = mesh.active_elements_begin();
-                    const MeshBase::element_iterator end = mesh.active_elements_end();
-                    for ( ; it != end; ++it)
-                      {
-                        Elem * elem = *it;
-
-                        if (elem->dim() < max_elem_dimension_seen &&
-                            !lower_dimensional_blocks.count(elem->subdomain_id()))
-                          mesh.delete_elem(elem);
-                      }
-                  } // end 3rd loop over active elements
+                  for (auto & elem : mesh.active_element_ptr_range())
+                    if (elem->dim() < max_elem_dimension_seen &&
+                        !lower_dimensional_blocks.count(elem->subdomain_id()))
+                      mesh.delete_elem(elem);
                 } // end if (n_dims_seen > 1)
             } // if $ELM
 
@@ -710,14 +685,9 @@ void GmshIO::write_mesh (std::ostream & out_stream)
     out_stream << "$Elements\n";
     out_stream << mesh.n_active_elem() + n_boundary_faces << '\n';
 
-    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
     // loop over the elements
-    for ( ; it != end; ++it)
+    for (const auto & elem : mesh.active_element_ptr_range())
       {
-        const Elem * elem = *it;
-
         // Make sure we have a valid entry for
         // the current element type.
         libmesh_assert (_element_maps.out.count(elem->type()));
@@ -775,9 +745,6 @@ void GmshIO::write_mesh (std::ostream & out_stream)
     unsigned int e_id = mesh.max_elem_id();
 
     // loop over the elements, writing out boundary faces
-    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
     if (n_boundary_faces)
       {
         // Construct the list of boundary sides
@@ -900,13 +867,9 @@ void GmshIO::write_post (const std::string & fname,
       unsigned int nb_text2d=0, nb_text2d_chars=0, nb_text3d=0, nb_text3d_chars=0;
 
       {
-        MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-        const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-
-        for ( ; it != end; ++it)
+        for (const auto & elem : mesh.active_element_ptr_range())
           {
-            const ElemType elemtype = (*it)->type();
+            const ElemType elemtype = elem->type();
 
             switch (elemtype)
               {
@@ -956,7 +919,7 @@ void GmshIO::write_post (const std::string & fname,
                   break;
                 }
               default:
-                libmesh_error_msg("ERROR: Nonexistent element type " << (*it)->type());
+                libmesh_error_msg("ERROR: Nonexistent element type " << elem->type());
               }
           }
       }
@@ -1023,13 +986,8 @@ void GmshIO::write_post (const std::string & fname,
             out_stream << "1\n";
 
           // Loop over the elements and write out the data
-          MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-          const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-          for ( ; it != end; ++it)
+          for (const auto & elem : mesh.active_element_ptr_range())
             {
-              const Elem * elem = *it;
-
               // this is quite crappy, but I did not invent that file format!
               for (unsigned int d=0; d<3; d++)  // loop over the dimensions
                 {

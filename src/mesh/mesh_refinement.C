@@ -856,12 +856,8 @@ bool MeshRefinement::make_coarsening_compatible()
     // First we look at all the active level-0 elements.  Since it doesn't make
     // sense to coarsen them we must un-set their coarsen flags if
     // they are set.
-    MeshBase::element_iterator       el     = _mesh.active_elements_begin();
-    const MeshBase::element_iterator end_el = _mesh.active_elements_end();
-
-    for (; el != end_el; ++el)
+    for (auto & elem : _mesh.active_element_ptr_range())
       {
-        Elem * elem = *el;
         max_level = std::max(max_level, elem->level());
         max_p_level =
           std::max(max_p_level,
@@ -907,12 +903,8 @@ bool MeshRefinement::make_coarsening_compatible()
         {
           level_one_satisfied = true;
 
-          MeshBase::element_iterator       el     = _mesh.active_elements_begin();
-          const MeshBase::element_iterator end_el = _mesh.active_elements_end();
-
-          for (; el != end_el; ++el)
+          for (auto & elem : _mesh.active_element_ptr_range())
             {
-              Elem * elem = *el;
               bool my_flag_changed = false;
 
               if (elem->refinement_flag() == Elem::COARSEN) // If the element is active and
@@ -1258,13 +1250,8 @@ bool MeshRefinement::make_refinement_compatible()
         {
           level_one_satisfied = true;
 
-          MeshBase::element_iterator       el     = _mesh.active_elements_begin();
-          const MeshBase::element_iterator end_el = _mesh.active_elements_end();
-
-          for (; el != end_el; ++el)
+          for (auto & elem : _mesh.active_element_ptr_range())
             {
-              Elem * elem = *el;
-
               const unsigned short n_sides = elem->n_sides();
 
               if (elem->refinement_flag() == Elem::REFINE)  // If the element is active and the
@@ -1726,17 +1713,12 @@ void MeshRefinement::uniformly_p_refine (unsigned int n)
 {
   // Refine n times
   for (unsigned int rstep=0; rstep<n; rstep++)
-    {
-      // P refine all the active elements
-      MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-      const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
-
-      for ( ; elem_it != elem_end; ++elem_it)
-        {
-          (*elem_it)->set_p_level((*elem_it)->p_level()+1);
-          (*elem_it)->set_p_refinement_flag(Elem::JUST_REFINED);
-        }
-    }
+    for (auto & elem : _mesh.active_element_ptr_range())
+      {
+        // P refine all the active elements
+        elem->set_p_level(elem->p_level()+1);
+        elem->set_p_refinement_flag(Elem::JUST_REFINED);
+      }
 }
 
 
@@ -1745,20 +1727,13 @@ void MeshRefinement::uniformly_p_coarsen (unsigned int n)
 {
   // Coarsen p times
   for (unsigned int rstep=0; rstep<n; rstep++)
-    {
-      // P coarsen all the active elements
-      MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-      const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
-
-      for ( ; elem_it != elem_end; ++elem_it)
+    for (auto & elem : _mesh.active_element_ptr_range())
+      if (elem->p_level() > 0)
         {
-          if ((*elem_it)->p_level() > 0)
-            {
-              (*elem_it)->set_p_level((*elem_it)->p_level()-1);
-              (*elem_it)->set_p_refinement_flag(Elem::JUST_COARSENED);
-            }
+          // P coarsen all the active elements
+          elem->set_p_level(elem->p_level()-1);
+          elem->set_p_refinement_flag(Elem::JUST_COARSENED);
         }
-    }
 }
 
 
@@ -1774,11 +1749,8 @@ void MeshRefinement::uniformly_refine (unsigned int n)
       this->clean_refinement_flags();
 
       // Flag all the active elements for refinement.
-      MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-      const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
-
-      for ( ; elem_it != elem_end; ++elem_it)
-        (*elem_it)->set_refinement_flag(Elem::REFINE);
+      for (auto & elem : _mesh.active_element_ptr_range())
+        elem->set_refinement_flag(Elem::REFINE);
 
       // Refine all the elements we just flagged.
       this->_refine_elements();
@@ -1800,14 +1772,11 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
       this->clean_refinement_flags();
 
       // Flag all the active elements for coarsening.
-      MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-      const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
-
-      for ( ; elem_it != elem_end; ++elem_it)
+      for (auto & elem : _mesh.active_element_ptr_range())
         {
-          (*elem_it)->set_refinement_flag(Elem::COARSEN);
-          if ((*elem_it)->parent())
-            (*elem_it)->parent()->set_refinement_flag(Elem::COARSEN_INACTIVE);
+          elem->set_refinement_flag(Elem::COARSEN);
+          if (elem->parent())
+            elem->parent()->set_refinement_flag(Elem::COARSEN_INACTIVE);
         }
 
       // On a distributed mesh, we may have parent elements with
