@@ -136,8 +136,8 @@ public:
    * to a separate \p NumericVector.  This feature
    * can be disabled with \p allocate_solution_duplicates=false.
    */
-  void set_frequencies_by_steps (const Real base_freq,
-                                 const Real freq_step=0.,
+  void set_frequencies_by_steps (const Number base_freq,
+                                 const Number freq_step=0.,
                                  const unsigned int n_freq=1,
                                  const bool allocate_solution_duplicates=true);
 
@@ -150,8 +150,8 @@ public:
    * to a separate \p NumericVector.  This feature
    * can be disabled with \p allocate_solution_duplicates=false.
    */
-  void set_frequencies_by_range (const Real min_freq,
-                                 const Real max_freq,
+  void set_frequencies_by_range (const Number min_freq,
+                                 const Number max_freq,
                                  const unsigned int n_freq,
                                  const bool allocate_solution_duplicates=true);
 
@@ -163,6 +163,10 @@ public:
    * can be disabled with \p allocate_solution_duplicates=false.
    */
   void set_frequencies (const std::vector<Real> & frequencies,
+                        const bool allocate_solution_duplicates=true);
+
+
+  void set_frequencies (const std::vector<Number> & frequencies,
                         const bool allocate_solution_duplicates=true);
 
   /**

@@ -96,9 +96,10 @@ public:
 #if defined LIBMESH_ENABLE_INFINITE_ELEMENTS && defined(LIBMESH_USE_COMPLEX_NUMBERS)
   /**
    * The frequency to evaluate shape functions
-   * including the wave number depending terms
+   * including the wave number depending terms.
+   * Use imaginary contributions for exponential damping
    */
-  Real frequency;
+  Number frequency;
 #endif
 
   /**

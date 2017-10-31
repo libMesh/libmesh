@@ -113,9 +113,9 @@ int main (int argc, char ** argv)
   // This example requires at least 2D support.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
-  // Check for proper usage.
-  if (argc < 3)
-    libmesh_error_msg("Usage: " << argv[0] << " -f [frequency]");
+  // Check for proper usage. frequency has two terms:
+  if ( argc <4 )
+    libmesh_error_msg("Usage: " << argv[0] << " -f [real_frequency imag_frequency]");
 
   if (init.comm().size() > 1)
     {
@@ -140,7 +140,12 @@ int main (int argc, char ** argv)
 
   // Get the frequency from argv[2] as a float, solve for 1/3rd, 2/3rd
   // and 1/1th of the given frequency.
-  const Real frequency_in = atof(argv[2]);
+
+  const Number frequency_in (atof(argv[2]), atof(argv[3]));
+
+  // this must work as well, but is deprecated.
+  // const Real frequency_in = atof(argv[2]);
+
   const unsigned int n_frequencies = 3;
 
   // Create a mesh, with dimension to be overridden later, distributed
@@ -203,7 +208,7 @@ int main (int argc, char ** argv)
   // may directly access them. Must be called before the
   // EquationSystems object is initialized.  Will solve for 1/3,
   // 2/3, and 1 times the given frequency.
-  f_system.set_frequencies_by_steps (frequency_in/n_frequencies,
+  f_system.set_frequencies_by_steps (frequency_in/static_cast<Number>(n_frequencies),
                                      frequency_in,
                                      n_frequencies);
 
@@ -436,7 +441,7 @@ void assemble_helmholtz(EquationSystems & es,
       // If the element has no neighbor on a side then that
       // side MUST live on a boundary of the domain.
       for (auto side : elem->side_index_range())
-        if (elem->neighbor(side) == libmesh_nullptr)
+        if (elem->neighbor_ptr(side) == libmesh_nullptr)
           {
             LOG_SCOPE("damping", "assemble_helmholtz");
 
@@ -519,13 +524,13 @@ void add_M_C_K_helmholtz(EquationSystems & es,
     es.get_system<FrequencySystem> (system_name);
 
   // Get the frequency, fluid density, and sound speed of the current solve.
-  const Real frequency = es.parameters.get<Real> ("current frequency");
+  const Number frequency = es.parameters.get<Number> ("current frequency");
   const Real rho       = es.parameters.get<Real> ("rho");
   const Real speed     = es.parameters.get<Real> ("wave speed");
 
   // Compute angular frequency omega and wave number k
-  const Real omega = 2.0*libMesh::pi*frequency;
-  const Real k     = omega / speed;
+  const Number omega = 2.0*libMesh::pi*frequency;
+  const Number k     = omega / speed;
 
   // Get writable references to the system matrix and vector, where the
   // frequency-dependent system is to be collected.
@@ -541,11 +546,13 @@ void add_M_C_K_helmholtz(EquationSystems & es,
   SparseMatrix<Number> & mass = f_system.get_matrix("mass");
   NumericVector<Number> & freq_indep_rhs = f_system.get_vector("rhs");
 
+  Number unit_i (0,1);
+
   // Compute the scale values for the different operators.
   const Number scale_stiffness (1., 0.);
-  const Number scale_damping (0., omega);
-  const Number scale_mass (-k*k, 0.);
-  const Number scale_rhs (0., -(rho*omega));
+  const Number scale_damping=unit_i*omega; // I is imaginary unit (from complex.h)
+  const Number scale_mass=-k*k;
+  const Number scale_rhs=-unit_i*rho*omega;
 
   // Now simply add the matrices together, store the result
   // in matrix and rhs.  Clear them first.

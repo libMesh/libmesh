@@ -1,6 +1,5 @@
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2017 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
@@ -58,14 +57,23 @@ void FEComputeData::init ()
     this->speed = this->equation_systems.parameters.get<Real>("speed");
 
   if (equation_systems.parameters.have_parameter<Real>("current frequency"))
-    this->frequency = this->equation_systems.parameters.get<Real>("current frequency");
+    {
+
+    // please use the type Number instead.
+    libmesh_deprecated();
+    this->frequency = static_cast<Number> (this->equation_systems.parameters.get<Real>("current frequency"));
+    }
+
+  else if (equation_systems.parameters.have_parameter<Number>("current frequency"))
+
+    this->frequency = this->equation_systems.parameters.get<Number>("current frequency");
 
 #endif
   // ensure that the wavenumber k=2. * libMesh::pi * this->frequency / this->speed
   // in src/fe/inf_fe_static.C: 310
   // is well-defined. 0 as well as NaN will lead to problems here.
 #if defined(LIBMESH_ENABLE_INFINITE_ELEMENTS) && defined(LIBMESH_USE_COMPLEX_NUMBERS)
-  libmesh_assert_not_equal_to(this->frequency, 0);
+  libmesh_assert_not_equal_to(this->frequency, 0.);
 #endif
 #if defined(LIBMESH_ENABLE_INFINITE_ELEMENTS)
   libmesh_assert_not_equal_to(this->speed, 0);
