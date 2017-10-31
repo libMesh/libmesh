@@ -2109,7 +2109,7 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
       for (auto & node : mesh.node_ptr_range())
         {
           std::pair<std::vector<DofBCData>::iterator,
-                    std::vector<DofBCData>::iterator> pos =
+                    std::vector<DofBCData>::iterator> bounds =
             std::equal_range (node_bc_data.begin(),
                               node_bc_data.end(),
                               node->id()
@@ -2118,13 +2118,13 @@ void XdrIO::read_serialized_nodesets (Xdr & io, T)
 #endif
                               );
 
-        for (; pos.first != pos.second; ++pos.first)
-          {
-            // Note: dof_id from ElmeBCData is being used to hold node_id here
-            libmesh_assert_equal_to (pos.first->dof_id, node->id());
+          for (const auto & data : as_range(bounds))
+            {
+              // Note: dof_id from ElmeBCData is being used to hold node_id here
+              libmesh_assert_equal_to (data.dof_id, node->id());
 
-            boundary_info.add_node (node, pos.first->bc_id);
-          }
+              boundary_info.add_node (node, data.bc_id);
+            }
         }
     }
 }
