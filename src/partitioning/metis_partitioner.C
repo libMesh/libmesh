@@ -426,13 +426,9 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
               }
 
             // Check for any boundary neighbors
-            typedef map_type::iterator map_it_type;
-            std::pair<map_it_type, map_it_type>
-              bounds = interior_to_boundary_map.equal_range(elem);
-
-            for (map_it_type it = bounds.first; it != bounds.second; ++it)
+            for (const auto & pr : as_range(interior_to_boundary_map.equal_range(elem)))
               {
-                const Elem * neighbor = it->second;
+                const Elem * neighbor = pr.second;
                 csr_graph(elem_global_index, connection++) =
                   global_index_map[neighbor->id()];
               }
