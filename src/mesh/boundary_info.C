@@ -1011,11 +1011,8 @@ void BoundaryInfo::boundary_ids (const Node * node,
   // Clear out any previous contents
   vec_to_fill.clear();
 
-  std::pair<boundary_node_iter, boundary_node_iter>
-    pos = _boundary_node_id.equal_range(node);
-
-  for (; pos.first != pos.second; ++pos.first)
-    vec_to_fill.push_back(pos.first->second);
+  for (const auto & pr : as_range(_boundary_node_id.equal_range(node)))
+    vec_to_fill.push_back(pr.second);
 }
 
 
