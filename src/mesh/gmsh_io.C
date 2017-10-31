@@ -565,33 +565,26 @@ void GmshIO::read_mesh(std::istream & in)
                         // find_neighbors(), so we can't use
                         // elem->neighbor(sn) in this algorithm...
                         for (auto sn : elem->side_index_range())
-                          {
-                            // Look for the current side in the provide_bcs multimap.
-                            std::pair<provide_container_t::iterator,
-                                      provide_container_t::iterator>
-                              rng = provide_bcs.equal_range(elem->key(sn));
+                          for (const auto & pr : as_range(provide_bcs.equal_range(elem->key(sn))))
+                            {
+                              // For each side side in the provide_bcs multimap...
+                              // Construct the side for hash verification.
+                              UniquePtr<Elem> side (elem->build_side_ptr(sn));
 
-                            for (provide_container_t::iterator iter = rng.first;
-                                 iter != rng.second; ++iter)
-                              {
-                                // Construct the side for hash verification.
-                                UniquePtr<Elem> side (elem->build_side_ptr(sn));
+                              // Construct the lower-dimensional element to compare to the side.
+                              Elem * lower_dim_elem = pr.second;
 
-                                // Construct the lower-dimensional element to compare to the side.
-                                Elem * lower_dim_elem = iter->second;
-
-                                // This was a hash, so it might not be perfect.  Let's verify...
-                                if (*lower_dim_elem == *side)
-                                  {
-                                    // Add the lower-dimensional
-                                    // element's subdomain_id as a
-                                    // boundary_id for the
-                                    // higher-dimensional element.
-                                    boundary_id_type bid = cast_int<boundary_id_type>(lower_dim_elem->subdomain_id());
-                                    mesh.get_boundary_info().add_side(elem, sn, bid);
-                                  }
-                              }
-                          }
+                              // This was a hash, so it might not be perfect.  Let's verify...
+                              if (*lower_dim_elem == *side)
+                                {
+                                  // Add the lower-dimensional
+                                  // element's subdomain_id as a
+                                  // boundary_id for the
+                                  // higher-dimensional element.
+                                  boundary_id_type bid = cast_int<boundary_id_type>(lower_dim_elem->subdomain_id());
+                                  mesh.get_boundary_info().add_side(elem, sn, bid);
+                                }
+                            }
                       }
 
                   // 3rd loop over active elements - Remove the lower-dimensional elements
