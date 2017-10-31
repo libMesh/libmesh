@@ -117,15 +117,9 @@ T * LocationMap<T>::find(const Point & p,
   unsigned int pointkey = this->key(p);
 
   // Look for the exact key first
-  std::pair<typename map_type::iterator,
-            typename map_type::iterator>
-    pos = _map.equal_range(pointkey);
-
-  while (pos.first != pos.second)
-    if (p.absolute_fuzzy_equals(this->point_of(*(pos.first->second)), tol))
-      return pos.first->second;
-    else
-      ++pos.first;
+  for (const auto & pr : as_range(_map.equal_range(pointkey)))
+    if (p.absolute_fuzzy_equals(this->point_of(*(pr.second)), tol))
+      return pr.second;
 
   // Look for neighboring bins' keys next
   for (int xoffset = -1; xoffset != 2; ++xoffset)
@@ -140,11 +134,9 @@ T * LocationMap<T>::find(const Point & p,
                                            xoffset*chunkmax*chunkmax +
                                            yoffset*chunkmax +
                                            zoffset);
-              while (key_pos.first != key_pos.second)
-                if (p.absolute_fuzzy_equals(this->point_of(*(key_pos.first->second)), tol))
-                  return key_pos.first->second;
-                else
-                  ++key_pos.first;
+              for (const auto & pr : as_range(key_pos))
+                if (p.absolute_fuzzy_equals(this->point_of(*(pr.second)), tol))
+                  return pr.second;
             }
         }
     }
