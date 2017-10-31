@@ -940,7 +940,7 @@ void BoundaryInfo::add_side(const Elem * elem,
   libmesh_assert_equal_to (elem->level(), 0);
 
   // Don't add the same ID twice
-  std::pair<boundary_side_iter, boundary_side_iter> pos = _boundary_side_id.equal_range(elem);
+  std::pair<boundary_side_iter, boundary_side_iter> bounds = _boundary_side_id.equal_range(elem);
 
   // The entries in the ids vector may be non-unique.  If we expected
   // *lots* of ids, it might be fastest to construct a std::set from
@@ -963,8 +963,8 @@ void BoundaryInfo::add_side(const Elem * elem,
                           << "\n That is reserved for internal use.");
 
       bool already_inserted = false;
-      for (boundary_side_iter p = pos.first; p != pos.second; ++p)
-        if (p->second.first == side && p->second.second == id)
+      for (const auto & pr : as_range(bounds))
+        if (pr.second.first == side && pr.second.second == id)
           {
             already_inserted = true;
             break;
