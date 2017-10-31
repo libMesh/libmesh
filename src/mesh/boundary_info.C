@@ -851,7 +851,7 @@ void BoundaryInfo::add_shellface(const Elem * elem,
   libmesh_assert_less(shellface, 2);
 
   // Don't add the same ID twice
-  std::pair<boundary_shellface_iter, boundary_shellface_iter> pos = _boundary_shellface_id.equal_range(elem);
+  std::pair<boundary_shellface_iter, boundary_shellface_iter> bounds = _boundary_shellface_id.equal_range(elem);
 
   // The entries in the ids vector may be non-unique.  If we expected
   // *lots* of ids, it might be fastest to construct a std::set from
@@ -874,9 +874,9 @@ void BoundaryInfo::add_shellface(const Elem * elem,
                           << "\n That is reserved for internal use.");
 
       bool already_inserted = false;
-      for (boundary_shellface_iter p = pos.first; p != pos.second; ++p)
-        if (p->second.first == shellface &&
-            p->second.second == id)
+      for (const auto & pr : as_range(bounds))
+        if (pr.second.first == shellface &&
+            pr.second.second == id)
           {
             already_inserted = true;
             break;
