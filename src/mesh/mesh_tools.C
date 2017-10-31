@@ -556,11 +556,8 @@ unsigned int MeshTools::n_active_local_levels(const MeshBase & mesh)
 {
   unsigned int nl = 0;
 
-  MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
-    nl = std::max((*el)->level() + 1, nl);
+  for (auto & elem : mesh.active_local_element_ptr_range())
+    nl = std::max(elem->level() + 1, nl);
 
   return nl;
 }
@@ -876,102 +873,88 @@ void MeshTools::find_nodal_neighbors(const MeshBase &,
 void MeshTools::find_hanging_nodes_and_parents(const MeshBase & mesh,
                                                std::map<dof_id_type, std::vector<dof_id_type>> & hanging_nodes)
 {
-  MeshBase::const_element_iterator it  = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
-
-  //Loop through all the elements
-  for (; it != end; ++it)
-    {
-      //Save it off for easier access
-      const Elem * elem = (*it);
-
-      //Right now this only works for quad4's
-      //libmesh_assert_equal_to (elem->type(), QUAD4);
-      if (elem->type() == QUAD4)
+  // Loop through all the elements
+  for (auto & elem : mesh.active_local_element_ptr_range())
+    if (elem->type() == QUAD4)
+      for (auto s : elem->side_index_range())
         {
-          //Loop over the sides looking for sides that have hanging nodes
-          //This code is inspired by compute_proj_constraints()
-          for (auto s : elem->side_index_range())
+          // Loop over the sides looking for sides that have hanging nodes
+          // This code is inspired by compute_proj_constraints()
+          const Elem * neigh = elem->neighbor_ptr(s);
+
+          // If not a boundary side
+          if (neigh != libmesh_nullptr)
             {
-              const Elem * neigh = elem->neighbor_ptr(s);
-
-              //If not a boundary side
-              if (neigh != libmesh_nullptr)
+              // Is there a coarser element next to this one?
+              if (neigh->level() < elem->level())
                 {
-                  //Is there a coarser element next to this one?
-                  if (neigh->level() < elem->level())
+                  const Elem * ancestor = elem;
+                  while (neigh->level() < ancestor->level())
+                    ancestor = ancestor->parent();
+                  unsigned int s_neigh = neigh->which_neighbor_am_i(ancestor);
+                  libmesh_assert_less (s_neigh, neigh->n_neighbors());
+
+                  // Couple of helper uints...
+                  unsigned int local_node1=0;
+                  unsigned int local_node2=0;
+
+                  bool found_in_neighbor = false;
+
+                  // Find the two vertices that make up this side
+                  while (!elem->is_node_on_side(local_node1++,s)) { }
+                  local_node1--;
+
+                  // Start looking for the second one with the next node
+                  local_node2=local_node1+1;
+
+                  // Find the other one
+                  while (!elem->is_node_on_side(local_node2++,s)) { }
+                  local_node2--;
+
+                  //Pull out their global ids:
+                  dof_id_type node1 = elem->node_id(local_node1);
+                  dof_id_type node2 = elem->node_id(local_node2);
+
+                  // Now find which node is present in the neighbor
+                  // FIXME This assumes a level one rule!
+                  // The _other_ one is the hanging node
+
+                  // First look for the first one
+                  // FIXME could be streamlined a bit
+                  for (unsigned int n=0;n<neigh->n_sides();n++)
+                    if (neigh->node_id(n) == node1)
+                      found_in_neighbor=true;
+
+                  dof_id_type hanging_node=0;
+
+                  if (!found_in_neighbor)
+                    hanging_node=node1;
+                  else // If it wasn't node1 then it must be node2!
+                    hanging_node=node2;
+
+                  // Reset these for reuse
+                  local_node1=0;
+                  local_node2=0;
+
+                  // Find the first node that makes up the side in the neighbor (these should be the parent nodes)
+                  while (!neigh->is_node_on_side(local_node1++,s_neigh)) { }
+                  local_node1--;
+
+                  local_node2=local_node1+1;
+
+                  // Find the second node...
+                  while (!neigh->is_node_on_side(local_node2++,s_neigh)) { }
+                  local_node2--;
+
+                  // Save them if we haven't already found the parents for this one
+                  if (hanging_nodes[hanging_node].size()<2)
                     {
-                      const Elem * ancestor = elem;
-                      while (neigh->level() < ancestor->level())
-                        ancestor = ancestor->parent();
-                      unsigned int s_neigh = neigh->which_neighbor_am_i(ancestor);
-                      libmesh_assert_less (s_neigh, neigh->n_neighbors());
-
-                      //Couple of helper uints...
-                      unsigned int local_node1=0;
-                      unsigned int local_node2=0;
-
-                      bool found_in_neighbor = false;
-
-                      // Find the two vertices that make up this side
-                      while (!elem->is_node_on_side(local_node1++,s)) { }
-                      local_node1--;
-
-                      // Start looking for the second one with the next node
-                      local_node2=local_node1+1;
-
-                      // Find the other one
-                      while (!elem->is_node_on_side(local_node2++,s)) { }
-                      local_node2--;
-
-                      //Pull out their global ids:
-                      dof_id_type node1 = elem->node_id(local_node1);
-                      dof_id_type node2 = elem->node_id(local_node2);
-
-                      //Now find which node is present in the neighbor
-                      //FIXME This assumes a level one rule!
-                      //The _other_ one is the hanging node
-
-                      //First look for the first one
-                      //FIXME could be streamlined a bit
-                      for (unsigned int n=0;n<neigh->n_sides();n++)
-                        {
-                          if (neigh->node_id(n) == node1)
-                            found_in_neighbor=true;
-                        }
-
-                      dof_id_type hanging_node=0;
-
-                      if (!found_in_neighbor)
-                        hanging_node=node1;
-                      else // If it wasn't node1 then it must be node2!
-                        hanging_node=node2;
-
-                      // Reset these for reuse
-                      local_node1=0;
-                      local_node2=0;
-
-                      // Find the first node that makes up the side in the neighbor (these should be the parent nodes)
-                      while (!neigh->is_node_on_side(local_node1++,s_neigh)) { }
-                      local_node1--;
-
-                      local_node2=local_node1+1;
-
-                      //Find the second node...
-                      while (!neigh->is_node_on_side(local_node2++,s_neigh)) { }
-                      local_node2--;
-
-                      //Save them if we haven't already found the parents for this one
-                      if (hanging_nodes[hanging_node].size()<2)
-                        {
-                          hanging_nodes[hanging_node].push_back(neigh->node_id(local_node1));
-                          hanging_nodes[hanging_node].push_back(neigh->node_id(local_node2));
-                        }
+                      hanging_nodes[hanging_node].push_back(neigh->node_id(local_node1));
+                      hanging_nodes[hanging_node].push_back(neigh->node_id(local_node2));
                     }
                 }
             }
         }
-    }
 }
 
 

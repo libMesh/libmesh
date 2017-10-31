@@ -284,13 +284,8 @@ void LinearElasticityWithContact::residual_and_jacobian (const NumericVector<Num
   std::vector<dof_id_type> dof_indices;
   std::vector<std::vector<dof_id_type>> dof_indices_var(3);
 
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      const Elem * elem = *el;
-
       if( elem->type() == EDGE2 )
         {
           // We do not do any assembly on the contact connector elements.
@@ -526,13 +521,8 @@ void LinearElasticityWithContact::compute_stresses()
   // To store the stress tensor on each element
   DenseMatrix<Number> elem_avg_stress_tensor(3, 3);
 
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      const Elem * elem = *el;
-
       if( elem->type() == EDGE2 )
         {
           // We do not compute stress on the contact connector elements.

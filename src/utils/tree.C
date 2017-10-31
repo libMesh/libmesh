@@ -85,15 +85,12 @@ Tree<N>::Tree (const MeshBase & m,
     {
       // Add all active, local elements to the root node.  It will
       // automatically build the tree for us.
-      MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
-
-      for (; it != end; ++it)
+      for (const auto & elem : mesh.active_local_element_ptr_range())
         {
 #ifndef NDEBUG
           bool elem_was_inserted =
 #endif
-            root.insert (*it);
+            root.insert (elem);
           libmesh_assert(elem_was_inserted);
         }
     }

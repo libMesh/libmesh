@@ -381,15 +381,8 @@ public:
     if (!_mesh->is_serial())
       locator->enable_out_of_mesh_mode();
 
-    MeshBase::const_element_iterator       el     =
-      mesh2.active_local_elements_begin();
-    const MeshBase::const_element_iterator end_el =
-      mesh2.active_local_elements_end();
-
-    for (; el != end_el; ++el)
+    for (const auto & elem : mesh2.active_local_element_ptr_range())
       {
-        const Elem * elem = *el;
-
         const Elem * mesh1_elem = (*locator)(elem->centroid());
         if (mesh1_elem)
           {

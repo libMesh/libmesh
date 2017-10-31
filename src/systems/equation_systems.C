@@ -607,12 +607,6 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
     nv = n_scalar_vars + dim*n_vector_vars;
   }
 
-  // Get the number of elements that share each node.  We will
-  // compute the average value at each node.  This is particularly
-  // useful for plotting discontinuous data.
-  MeshBase::element_iterator       e_it  = _mesh.active_local_elements_begin();
-  const MeshBase::element_iterator e_end = _mesh.active_local_elements_end();
-
   // Get the number of local nodes
   dof_id_type n_local_nodes = cast_int<dof_id_type>
     (std::distance(_mesh.local_nodes_begin(),
@@ -698,14 +692,9 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
 
           unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type );
 
-          MeshBase::element_iterator       it       = _mesh.active_local_elements_begin();
-          const MeshBase::element_iterator end_elem = _mesh.active_local_elements_end();
-
-          for ( ; it != end_elem; ++it)
+          for (const auto & elem : _mesh.active_local_element_ptr_range())
             {
-              const Elem * elem = *it;
-
-              if (var_description.active_on_subdomain((*it)->subdomain_id()))
+              if (var_description.active_on_subdomain(elem->subdomain_id()))
                 {
                   dof_map.dof_indices (elem, dof_indices, var);
 
@@ -905,22 +894,15 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
           const Variable & variable = system.variable(var);
           const DofMap & dof_map = system.get_dof_map();
 
-          MeshBase::element_iterator       it       = _mesh.active_local_elements_begin();
-          const MeshBase::element_iterator end_elem = _mesh.active_local_elements_end();
+          for (const auto & elem : _mesh.active_local_element_ptr_range())
+            if (variable.active_on_subdomain(elem->subdomain_id()))
+              {
+                dof_map.dof_indices (elem, dof_indices, var);
 
-          for ( ; it != end_elem; ++it)
-            {
-              const Elem * elem = *it;
+                libmesh_assert_equal_to (1, dof_indices.size());
 
-              if (variable.active_on_subdomain(elem->subdomain_id()))
-                {
-                  dof_map.dof_indices (elem, dof_indices, var);
-
-                  libmesh_assert_equal_to (1, dof_indices.size());
-
-                  parallel_soln.set((ne*var_num)+elem->id(), sys_soln(dof_indices[0]));
-                }
-            }
+                parallel_soln.set((ne*var_num)+elem->id(), sys_soln(dof_indices[0]));
+              }
 
           var_num++;
         } // end loop on variables in this system

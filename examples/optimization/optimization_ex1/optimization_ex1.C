@@ -152,13 +152,8 @@ void AssembleOptimization::assemble_A_and_F()
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;
 
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      const Elem * elem = *el;
-
       dof_map.dof_indices (elem, dof_indices);
 
       const unsigned int n_dofs = dof_indices.size();

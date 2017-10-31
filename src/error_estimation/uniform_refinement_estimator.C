@@ -511,14 +511,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
 
           // Iterate over all the active elements in the fine mesh
           // that live on this processor.
-          MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-          const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
-
-          for (; elem_it != elem_end; ++elem_it)
+          for (const auto & elem : mesh.active_local_element_ptr_range())
             {
-              // e is necessarily an active element on the local processor
-              const Elem * elem = *elem_it;
-
               // Find the element id for the corresponding coarse grid element
               const Elem * coarse = elem;
               dof_id_type e_id = coarse->id();

@@ -316,15 +316,8 @@ void ExactErrorEstimator::estimate_error (const System & system,
 
       // Iterate over all the active elements in the mesh
       // that live on this processor.
-      MeshBase::const_element_iterator
-        elem_it  = mesh.active_local_elements_begin();
-      const MeshBase::const_element_iterator
-        elem_end = mesh.active_local_elements_end();
-
-      for (;elem_it != elem_end; ++elem_it)
+      for (const auto & elem : mesh.active_local_element_ptr_range())
         {
-          // e is necessarily an active element on the local processor
-          const Elem * elem = *elem_it;
           const dof_id_type e_id = elem->id();
 
 #ifdef LIBMESH_ENABLE_AMR

@@ -255,16 +255,8 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> & u,
   // Now we will loop over all the elements in the mesh.  We will
   // compute the element matrix and right-hand-side contribution.  See
   // example 3 for a discussion of the element iterators.
-
-  MeshBase::const_element_iterator       el     = _biharmonic._mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = _biharmonic._mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : _biharmonic._mesh.active_local_element_ptr_range())
     {
-      // Store a pointer to the element we are currently
-      // working on.  This allows for nicer syntax later.
-      const Elem * elem = *el;
-
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
       // matrix and right-hand-side this element will
@@ -520,10 +512,7 @@ void Biharmonic::JR::bounds(NumericVector<Number> & XL,
   // the element degrees of freedom get mapped.
   std::vector<dof_id_type> dof_indices;
 
-  MeshBase::const_element_iterator       el     = _biharmonic._mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = _biharmonic._mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : _biharmonic._mesh.active_local_element_ptr_range())
     {
       // Extract the shape function to be evaluated at the nodes
       const std::vector<std::vector<Real>> & phi = fe->get_phi();
@@ -531,7 +520,7 @@ void Biharmonic::JR::bounds(NumericVector<Number> & XL,
       // Get the degree of freedom indices for the current element.
       // They are in 1-1 correspondence with shape functions phi
       // and define where in the global vector this element will.
-      dof_map.dof_indices (*el, dof_indices);
+      dof_map.dof_indices (elem, dof_indices);
 
       // Resize the local bounds vectors (zeroing them out in the process).
       XLe.resize(dof_indices.size());
@@ -539,10 +528,10 @@ void Biharmonic::JR::bounds(NumericVector<Number> & XL,
 
       // Extract the element node coordinates in the reference frame
       std::vector<Point> nodes;
-      fe->get_refspace_nodes((*el)->type(), nodes);
+      fe->get_refspace_nodes(elem->type(), nodes);
 
       // Evaluate the shape functions at the nodes
-      fe->reinit(*el, &nodes);
+      fe->reinit(elem, &nodes);
 
       // Construct the bounds based on the value of the i-th phi at the nodes.
       // Observe that this doesn't really work in general: we rely on the fact

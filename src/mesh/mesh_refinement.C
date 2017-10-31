@@ -263,11 +263,8 @@ void MeshRefinement::create_parent_error_vector(const ErrorVector & error_per_ce
 
   {
     // Find which elements are uncoarsenable
-    MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
-    for (; elem_it != elem_end; ++elem_it)
+    for (auto & elem : _mesh.active_local_element_ptr_range())
       {
-        Elem * elem   = *elem_it;
         Elem * parent = elem->parent();
 
         // Active elements are uncoarsenable
@@ -301,30 +298,24 @@ void MeshRefinement::create_parent_error_vector(const ErrorVector & error_per_ce
   // calculate local contributions to the parents' errors squared
   // first, then sum across processors and take the square roots
   // second.
-  {
-    MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
-    const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
+  for (auto & elem : _mesh.active_local_element_ptr_range())
+    {
+      Elem * parent = elem->parent();
 
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        Elem * elem   = *elem_it;
-        Elem * parent = elem->parent();
+      // Calculate each contribution to parent cells
+      if (parent)
+        {
+          const dof_id_type parentid  = parent->id();
+          libmesh_assert_less (parentid, error_per_parent.size());
 
-        // Calculate each contribution to parent cells
-        if (parent)
-          {
-            const dof_id_type parentid  = parent->id();
-            libmesh_assert_less (parentid, error_per_parent.size());
-
-            // If the parent has grandchildren we won't be able to
-            // coarsen it, so forget it.  Otherwise, add this child's
-            // contribution to the sum of the squared child errors
-            if (error_per_parent[parentid] != -1.0)
-              error_per_parent[parentid] += (error_per_cell[elem->id()] *
-                                             error_per_cell[elem->id()]);
-          }
-      }
-  }
+          // If the parent has grandchildren we won't be able to
+          // coarsen it, so forget it.  Otherwise, add this child's
+          // contribution to the sum of the squared child errors
+          if (error_per_parent[parentid] != -1.0)
+            error_per_parent[parentid] += (error_per_cell[elem->id()] *
+                                           error_per_cell[elem->id()]);
+        }
+    }
 
   // Sum the vector across all processors
   this->comm().sum(static_cast<std::vector<ErrorVectorReal> &>(error_per_parent));
@@ -393,9 +384,6 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
     point_locator = _mesh.sub_point_locator();
 #endif
 
-  MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
-
   bool failure = false;
 
 #ifndef NDEBUG
@@ -403,33 +391,28 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
   Elem * failed_neighbor = libmesh_nullptr;
 #endif // !NDEBUG
 
-  for ( ; elem_it != elem_end && !failure; ++elem_it)
-    {
-      // Pointer to the element
-      Elem * elem = *elem_it;
+  for (auto & elem : _mesh.active_local_element_ptr_range())
+    for (auto n : elem->side_index_range())
+      {
+        Elem * neighbor =
+          topological_neighbor(elem, point_locator.get(), n);
 
-      for (auto n : elem->side_index_range())
-        {
-          Elem * neighbor =
-            topological_neighbor(elem, point_locator.get(), n);
+        if (!neighbor || !neighbor->active() ||
+            neighbor == remote_elem)
+          continue;
 
-          if (!neighbor || !neighbor->active() ||
-              neighbor == remote_elem)
-            continue;
-
-          if ((neighbor->level() + 1 < elem->level()) ||
-              (neighbor->p_level() + 1 < elem->p_level()) ||
-              (neighbor->p_level() > elem->p_level() + 1))
-            {
-              failure = true;
+        if ((neighbor->level() + 1 < elem->level()) ||
+            (neighbor->p_level() + 1 < elem->p_level()) ||
+            (neighbor->p_level() > elem->p_level() + 1))
+          {
+            failure = true;
 #ifndef NDEBUG
-              failed_elem = elem;
-              failed_neighbor = neighbor;
+            failed_elem = elem;
+            failed_neighbor = neighbor;
 #endif // !NDEBUG
-              break;
-            }
-        }
-    }
+            break;
+          }
+      }
 
   // If any processor failed, we failed globally
   this->comm().max(failure);
@@ -464,31 +447,23 @@ bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass))
 
   bool found_flag = false;
 
-  // Search for local flags
-  MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
-
 #ifndef NDEBUG
   Elem * failed_elem = libmesh_nullptr;
 #endif
 
-  for ( ; elem_it != elem_end; ++elem_it)
-    {
-      // Pointer to the element
-      Elem * elem = *elem_it;
-
-      if (elem->refinement_flag() == Elem::REFINE ||
-          elem->refinement_flag() == Elem::COARSEN ||
-          elem->p_refinement_flag() == Elem::REFINE ||
-          elem->p_refinement_flag() == Elem::COARSEN)
-        {
-          found_flag = true;
+  // Search for local flags
+  for (auto & elem : _mesh.active_local_element_ptr_range())
+    if (elem->refinement_flag() == Elem::REFINE ||
+        elem->refinement_flag() == Elem::COARSEN ||
+        elem->p_refinement_flag() == Elem::REFINE ||
+        elem->p_refinement_flag() == Elem::COARSEN)
+      {
+        found_flag = true;
 #ifndef NDEBUG
-          failed_elem = elem;
+        failed_elem = elem;
 #endif
-          break;
-        }
-    }
+        break;
+      }
 
   // If we found a flag on any processor, it counts
   this->comm().max(found_flag);
@@ -1569,31 +1544,18 @@ bool MeshRefinement::_refine_elements ()
   // assigns temporary ids, so we need to synchronize ids afterward to
   // be safe anyway, so we might as well use the distributed mesh code
   // path.
-  {
-    MeshBase::element_iterator
-      elem_it  = _mesh.active_local_elements_begin(),
-      elem_end = _mesh.active_local_elements_end();
-
-    if (_mesh.is_replicated())
-      {
-        elem_it  = _mesh.active_elements_begin();
-        elem_end = _mesh.active_elements_end();
-      }
-
-    for (; elem_it != elem_end; ++elem_it)
-      {
-        Elem * elem = *elem_it;
-        if (elem->refinement_flag() == Elem::REFINE)
-          local_copy_of_elements.push_back(elem);
-        if (elem->p_refinement_flag() == Elem::REFINE &&
-            elem->active())
-          {
-            elem->set_p_level(elem->p_level()+1);
-            elem->set_p_refinement_flag(Elem::JUST_REFINED);
-            mesh_p_changed = true;
-          }
-      }
-  }
+  for (auto & elem : _mesh.is_replicated() ? _mesh.active_element_ptr_range() : _mesh.active_local_element_ptr_range())
+    {
+      if (elem->refinement_flag() == Elem::REFINE)
+        local_copy_of_elements.push_back(elem);
+      if (elem->p_refinement_flag() == Elem::REFINE &&
+          elem->active())
+        {
+          elem->set_p_level(elem->p_level()+1);
+          elem->set_p_refinement_flag(Elem::JUST_REFINED);
+          mesh_p_changed = true;
+        }
+    }
 
   if (!_mesh.is_replicated())
     {

@@ -246,15 +246,8 @@ void assemble_1D(EquationSystems & es,
   // the matrix and right-hand-side contribution from each element. Use a
   // const_element_iterator to loop over the elements. We make
   // el_end const as it is used only for the stopping condition of the loop.
-  MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator el_end = mesh.active_local_elements_end();
-
-  // Note that ++el is preferred to el++ when using loops with iterators
-  for ( ; el != el_end; ++el)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      // It is convenient to store a pointer to the current element
-      const Elem * elem = *el;
-
       // Get the degree of freedom indices for the current element.
       // These define where in the global matrix and right-hand-side this
       // element will contribute to.

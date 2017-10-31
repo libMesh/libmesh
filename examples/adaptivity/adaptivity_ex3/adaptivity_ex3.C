@@ -706,19 +706,12 @@ void assemble_laplace(EquationSystems & es,
   // processor to compute its components of the global matrix for
   // active elements while ignoring parent elements which have been
   // refined.
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
       // Start logging the shape function initialization.
       // This is done through a simple function call with
       // the name of the event to log.
       perf_log.push("elem init");
-
-      // Store a pointer to the element we are currently
-      // working on.  This allows for nicer syntax later.
-      const Elem * elem = *el;
 
       // Get the degree of freedom indices for the
       // current element.  These define where in the global

@@ -240,16 +240,8 @@ void HPCoarsenTest::select_refinement (System & system)
 
       // Iterate over all the active elements in the mesh
       // that live on this processor.
-
-      MeshBase::const_element_iterator       elem_it  =
-        mesh.active_local_elements_begin();
-      const MeshBase::const_element_iterator elem_end =
-        mesh.active_local_elements_end();
-
-      for (; elem_it != elem_end; ++elem_it)
+      for (const auto & elem : mesh.active_local_element_ptr_range())
         {
-          const Elem * elem = *elem_it;
-
           // We're only checking elements that are already flagged for h
           // refinement
           if (elem->refinement_flag() != Elem::REFINE)
@@ -517,16 +509,8 @@ void HPCoarsenTest::select_refinement (System & system)
 
   // Iterate over all the active elements in the mesh
   // that live on this processor.
-
-  MeshBase::element_iterator       elem_it  =
-    mesh.active_local_elements_begin();
-  const MeshBase::element_iterator elem_end =
-    mesh.active_local_elements_end();
-
-  for (; elem_it != elem_end; ++elem_it)
+  for (auto & elem : mesh.active_local_element_ptr_range())
     {
-      Elem * elem = *elem_it;
-
       // We're only checking elements that are already flagged for h
       // refinement
       if (elem->refinement_flag() != Elem::REFINE)

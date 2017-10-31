@@ -108,52 +108,46 @@ public:
     es.init();
     sys.project_solution(cubic_point_neighbor_coupling_test, NULL, es.parameters);
 
-    for (MeshBase::const_element_iterator
-           elem_it  = mesh.active_local_elements_begin(),
-           elem_end = mesh.active_local_elements_end();
-         elem_it != elem_end; ++elem_it)
-      {
-        const Elem * elem = *elem_it;
-        for (unsigned int s1=0; s1 != elem->n_neighbors(); ++s1)
-          {
-            const Elem * n1 = elem->neighbor_ptr(s1);
-            if (!n1)
-              continue;
+    for (const auto & elem : mesh.active_local_element_ptr_range())
+      for (unsigned int s1=0; s1 != elem->n_neighbors(); ++s1)
+        {
+          const Elem * n1 = elem->neighbor_ptr(s1);
+          if (!n1)
+            continue;
 
-            libmesh_assert(sys.get_dof_map().is_evaluable(*n1, 0));
+          libmesh_assert(sys.get_dof_map().is_evaluable(*n1, 0));
 
-            // Let's speed up this test by only checking the ghosted
-            // elements which are most likely to break.
-            if (n1->processor_id() == mesh.processor_id())
-              continue;
+          // Let's speed up this test by only checking the ghosted
+          // elements which are most likely to break.
+          if (n1->processor_id() == mesh.processor_id())
+            continue;
 
-            for (unsigned int s2=0; s2 != elem->n_neighbors(); ++s2)
-              {
-                const Elem * n2 = elem->neighbor_ptr(s2);
-                if (!n2 ||
-                    n2->processor_id() == mesh.processor_id())
-                  continue;
+          for (unsigned int s2=0; s2 != elem->n_neighbors(); ++s2)
+            {
+              const Elem * n2 = elem->neighbor_ptr(s2);
+              if (!n2 ||
+                  n2->processor_id() == mesh.processor_id())
+                continue;
 
-                libmesh_assert(sys.get_dof_map().is_evaluable(*n2, 0));
+              libmesh_assert(sys.get_dof_map().is_evaluable(*n2, 0));
 
-                for (unsigned int s3=0; s3 != elem->n_neighbors(); ++s3)
-                  {
-                    const Elem * n3 = elem->neighbor_ptr(s3);
-                    if (!n3 ||
-                        n3->processor_id() == mesh.processor_id())
-                      continue;
+              for (unsigned int s3=0; s3 != elem->n_neighbors(); ++s3)
+                {
+                  const Elem * n3 = elem->neighbor_ptr(s3);
+                  if (!n3 ||
+                      n3->processor_id() == mesh.processor_id())
+                    continue;
 
-                    libmesh_assert(sys.get_dof_map().is_evaluable(*n3, 0));
+                  libmesh_assert(sys.get_dof_map().is_evaluable(*n3, 0));
 
-                    Point p = n3->centroid();
+                  Point p = n3->centroid();
 
-                    CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p,n3)),
-                                                 libmesh_real(cubic_point_neighbor_coupling_test(p,es.parameters,"","")),
-                                                 TOLERANCE*TOLERANCE);
-                  }
-              }
-          }
-      }
+                  CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys.point_value(0,p,n3)),
+                                               libmesh_real(cubic_point_neighbor_coupling_test(p,es.parameters,"","")),
+                                               TOLERANCE*TOLERANCE);
+                }
+            }
+        }
   }
 
 

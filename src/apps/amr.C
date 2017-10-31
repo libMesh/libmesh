@@ -172,13 +172,8 @@ void assemble(EquationSystems & es,
 
   Real vol=0., area=0.;
 
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for (; el != end_el; ++el)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      const Elem * elem = *el;
-
       // recompute the element-specific data for the current element
       fe->reinit (elem);
 

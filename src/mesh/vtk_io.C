@@ -410,7 +410,6 @@ void VTKIO::cells_to_vtk()
   vtkSmartPointer<vtkIdList> pts = vtkSmartPointer<vtkIdList>::New();
 
   std::vector<int> types(mesh.n_active_local_elem());
-  unsigned active_element_counter = 0;
 
   vtkSmartPointer<vtkIntArray> elem_id = vtkSmartPointer<vtkIntArray>::New();
   elem_id->SetName("libmesh_elem_id");
@@ -424,12 +423,9 @@ void VTKIO::cells_to_vtk()
   elem_proc_id->SetName("processor_id");
   elem_proc_id->SetNumberOfComponents(1);
 
-  MeshBase::const_element_iterator it = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
-  for (; it != end; ++it, ++active_element_counter)
+  unsigned active_element_counter = 0;
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      Elem * elem = *it;
-
       pts->SetNumberOfIds(elem->n_nodes());
 
       // get the connectivity for this element
@@ -471,6 +467,7 @@ void VTKIO::cells_to_vtk()
       elem_id->InsertTuple1(vtkcellid, elem->id());
       subdomain_id->InsertTuple1(vtkcellid, elem->subdomain_id());
       elem_proc_id->InsertTuple1(vtkcellid, elem->processor_id());
+      ++active_element_counter;
     } // end loop over active elements
 
   _vtk_grid->SetCells(&types[0], cells);

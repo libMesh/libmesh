@@ -275,28 +275,25 @@ const Elem * PointLocatorTree::perform_linear_search(const Point & p,
   // used for this PointLocator.  If it's
   // TREE_LOCAL_ELEMENTS, we only want to double check
   // local elements during this linear search.
-  MeshBase::const_element_iterator pos =
+  SimpleRange<MeshBase::const_element_iterator> r =
     this->_build_type == Trees::LOCAL_ELEMENTS ?
-    this->_mesh.active_local_elements_begin() : this->_mesh.active_elements_begin();
+    this->_mesh.active_local_element_ptr_range() :
+    this->_mesh.active_element_ptr_range();
 
-  const MeshBase::const_element_iterator end_pos =
-    this->_build_type == Trees::LOCAL_ELEMENTS ?
-    this->_mesh.active_local_elements_end() : this->_mesh.active_elements_end();
-
-  for ( ; pos != end_pos; ++pos)
+  for (const auto & elem : r)
     {
       if (!allowed_subdomains ||
-          allowed_subdomains->count((*pos)->subdomain_id()))
+          allowed_subdomains->count(elem->subdomain_id()))
         {
           if (!use_close_to_point)
             {
-              if ((*pos)->contains_point(p))
-                return (*pos);
+              if (elem->contains_point(p))
+                return elem;
             }
           else
             {
-              if ((*pos)->close_to_point(p, close_to_point_tolerance))
-                return (*pos);
+              if (elem->close_to_point(p, close_to_point_tolerance))
+                return elem;
             }
         }
     }
@@ -317,20 +314,14 @@ std::set<const Elem *> PointLocatorTree::perform_fuzzy_linear_search(const Point
   // used for this PointLocator.  If it's
   // TREE_LOCAL_ELEMENTS, we only want to double check
   // local elements during this linear search.
-  MeshBase::const_element_iterator pos =
+  SimpleRange<MeshBase::const_element_iterator> r =
     this->_build_type == Trees::LOCAL_ELEMENTS ?
-    this->_mesh.active_local_elements_begin() : this->_mesh.active_elements_begin();
+    this->_mesh.active_local_element_ptr_range() :
+    this->_mesh.active_element_ptr_range();
 
-  const MeshBase::const_element_iterator end_pos =
-    this->_build_type == Trees::LOCAL_ELEMENTS ?
-    this->_mesh.active_local_elements_end() : this->_mesh.active_elements_end();
-
-  for ( ; pos != end_pos; ++pos)
-    {
-      if ((!allowed_subdomains || allowed_subdomains->count((*pos)->subdomain_id())) &&
-          (*pos)->close_to_point(p, close_to_point_tolerance))
-        candidate_elements.insert(*pos);
-    }
+  for (const auto & elem : r)
+    if ((!allowed_subdomains || allowed_subdomains->count(elem->subdomain_id())) && elem->close_to_point(p, close_to_point_tolerance))
+      candidate_elements.insert(elem);
 
   return candidate_elements;
 }

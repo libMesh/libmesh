@@ -427,15 +427,8 @@ void assemble_shell (EquationSystems & es,
 
   // Now we will loop over all the elements in the mesh.  We will
   // compute the element matrix and right-hand-side contribution.
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for (; el != end_el; ++el)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      // Store a pointer to the element we are currently
-      // working on.  This allows for nicer syntax later.
-      const Elem * elem = *el;
-
       dof_map.dof_indices (elem, dof_indices);
       for (unsigned int var=0; var<6; var++)
         dof_map.dof_indices (elem, dof_indices_var[var], var);
