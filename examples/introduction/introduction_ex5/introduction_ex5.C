@@ -301,13 +301,8 @@ void assemble_poisson(EquationSystems & es,
 
   // Now we will loop over all the elements in the mesh.
   // See example 3 for details.
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      const Elem * elem = *el;
-
       dof_map.dof_indices (elem, dof_indices);
 
       fe->reinit (elem);

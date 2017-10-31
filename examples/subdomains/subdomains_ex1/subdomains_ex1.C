@@ -417,15 +417,8 @@ void assemble_poisson(EquationSystems & es,
   // We will compute the element matrix and right-hand-side
   // contribution.  See example 3 for a discussion of the
   // element iterators.
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      // Store a pointer to the element we are currently
-      // working on.  This allows for nicer syntax later.
-      const Elem * elem = *el;
-
       // Elements with subdomain_id other than 1 are not in the active
       // subdomain.  We don't assemble anything for them.
       if (elem->subdomain_id()==1)

@@ -209,13 +209,8 @@ void assemble_elasticity(EquationSystems & es,
   std::vector<dof_id_type> dof_indices_v;
   std::vector<dof_id_type> dof_indices_lambda;
 
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      const Elem * elem = *el;
-
       dof_map.dof_indices (elem, dof_indices);
       dof_map.dof_indices (elem, dof_indices_u, u_var);
       dof_map.dof_indices (elem, dof_indices_v, v_var);

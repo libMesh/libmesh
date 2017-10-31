@@ -120,8 +120,6 @@ int main (int argc, char ** argv)
 void integrate_function (const MeshBase & mesh)
 {
 #if defined(LIBMESH_HAVE_TRIANGLE) && defined(LIBMESH_HAVE_TETGEN)
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
   std::vector<Real> vertex_distance;
 
@@ -135,10 +133,8 @@ void integrate_function (const MeshBase & mesh)
   const std::vector<Point> & q_points = fe->get_xyz();
   const std::vector<Real>  & JxW      = fe->get_JxW();
 
-  for (; el!=end_el; ++el)
+  for (const auto & elem : mesh.active_local_element_ptr_range())
     {
-      const Elem * elem = *el;
-
       vertex_distance.clear();
 
       for (unsigned int v=0; v<elem->n_vertices(); v++)
