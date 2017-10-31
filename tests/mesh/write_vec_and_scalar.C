@@ -162,15 +162,15 @@ public:
         CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,1,0))),
                                      0.0, tol);
         CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,2,0))),
-                                     gold_vector[gold_i_ux], tol);
+                                     std::abs(gold_vector[gold_i_ux]), tol);
         CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,4,0))),
                                      0.0, tol);
         CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,5,0))),
-                                     gold_vector[gold_i_uy], tol);
+                                     std::abs(gold_vector[gold_i_uy]), tol);
         CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,7,0))),
                                      0.0, tol);
         CPPUNIT_ASSERT_DOUBLES_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,8,0))),
-                                     gold_vector[gold_i_v], tol);
+                                     std::abs(gold_vector[gold_i_v]), tol);
 #endif
       }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
