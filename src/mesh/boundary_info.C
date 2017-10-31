@@ -429,20 +429,20 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
 
       // Find all the boundary side ids for this Elem.
       const std::pair<boundary_side_iter, boundary_side_iter>
-        range = _boundary_side_id.equal_range(top_parent);
+        bounds = _boundary_side_id.equal_range(top_parent);
 
       for (auto s : elem->side_index_range())
         {
           bool add_this_side = false;
           boundary_id_type this_bcid = invalid_id;
 
-          for (boundary_side_iter bsi = range.first; bsi != range.second; ++bsi)
+          for (const auto & pr : as_range(bounds))
             {
-              this_bcid = bsi->second.second;
+              this_bcid = pr.second.second;
 
               // if this side is flagged with a boundary condition
               // and the user wants this id
-              if ((bsi->second.first == s) &&
+              if ((pr.second.first == s) &&
                   (requested_boundary_ids.count(this_bcid)))
                 {
                   add_this_side = true;
@@ -456,7 +456,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
           // boundary was copied to the BoundaryMesh, and handles the
           // case where elements on the geometric boundary are not in
           // any sidesets.
-          if (range.first == range.second              &&
+          if (bounds.first == bounds.second            &&
               requested_boundary_ids.count(invalid_id) &&
               elem->neighbor_ptr(s) == libmesh_nullptr)
             add_this_side = true;
@@ -641,10 +641,8 @@ void BoundaryInfo::add_node(const Node * node,
                       << "\n That is reserved for internal use.");
 
   // Don't add the same ID twice
-  std::pair<boundary_node_iter, boundary_node_iter> pos = _boundary_node_id.equal_range(node);
-
-  for (; pos.first != pos.second; ++pos.first)
-    if (pos.first->second == id)
+  for (const auto & pr : as_range(_boundary_node_id.equal_range(node)))
+    if (pr.second == id)
       return;
 
   _boundary_node_id.insert(std::make_pair(node, id));
@@ -663,7 +661,7 @@ void BoundaryInfo::add_node(const Node * node,
   libmesh_assert(node);
 
   // Don't add the same ID twice
-  std::pair<boundary_node_iter, boundary_node_iter> pos = _boundary_node_id.equal_range(node);
+  std::pair<boundary_node_iter, boundary_node_iter> bounds = _boundary_node_id.equal_range(node);
 
   // The entries in the ids vector may be non-unique.  If we expected
   // *lots* of ids, it might be fastest to construct a std::set from
@@ -686,8 +684,8 @@ void BoundaryInfo::add_node(const Node * node,
                           << "\n That is reserved for internal use.");
 
       bool already_inserted = false;
-      for (boundary_node_iter p = pos.first; p != pos.second; ++p)
-        if (p->second == id)
+      for (const auto & pr : as_range(bounds))
+        if (pr.second == id)
           {
             already_inserted = true;
             break;
@@ -732,11 +730,9 @@ void BoundaryInfo::add_edge(const Elem * elem,
                       << "\n That is reserved for internal use.");
 
   // Don't add the same ID twice
-  std::pair<boundary_edge_iter, boundary_edge_iter> pos = _boundary_edge_id.equal_range(elem);
-
-  for (; pos.first != pos.second; ++pos.first)
-    if (pos.first->second.first == edge &&
-        pos.first->second.second == id)
+  for (const auto & pr : as_range(_boundary_edge_id.equal_range(elem)))
+    if (pr.second.first == edge &&
+        pr.second.second == id)
       return;
 
   _boundary_edge_id.insert(std::make_pair(elem, std::make_pair(edge, id)));
@@ -759,7 +755,7 @@ void BoundaryInfo::add_edge(const Elem * elem,
   libmesh_assert_equal_to (elem->level(), 0);
 
   // Don't add the same ID twice
-  std::pair<boundary_edge_iter, boundary_edge_iter> pos = _boundary_edge_id.equal_range(elem);
+  std::pair<boundary_edge_iter, boundary_edge_iter> bounds = _boundary_edge_id.equal_range(elem);
 
   // The entries in the ids vector may be non-unique.  If we expected
   // *lots* of ids, it might be fastest to construct a std::set from
@@ -782,9 +778,9 @@ void BoundaryInfo::add_edge(const Elem * elem,
                           << "\n That is reserved for internal use.");
 
       bool already_inserted = false;
-      for (boundary_edge_iter p = pos.first; p != pos.second; ++p)
-        if (p->second.first == edge &&
-            p->second.second == id)
+      for (const auto & pr : as_range(bounds))
+        if (pr.second.first == edge &&
+            pr.second.second == id)
           {
             already_inserted = true;
             break;
@@ -827,11 +823,9 @@ void BoundaryInfo::add_shellface(const Elem * elem,
                       << "\n That is reserved for internal use.");
 
   // Don't add the same ID twice
-  std::pair<boundary_shellface_iter, boundary_shellface_iter> pos = _boundary_shellface_id.equal_range(elem);
-
-  for (; pos.first != pos.second; ++pos.first)
-    if (pos.first->second.first == shellface &&
-        pos.first->second.second == id)
+  for (const auto & pr : as_range(_boundary_shellface_id.equal_range(elem)))
+    if (pr.second.first == shellface &&
+        pr.second.second == id)
       return;
 
   _boundary_shellface_id.insert(std::make_pair(elem, std::make_pair(shellface, id)));
