@@ -1077,21 +1077,17 @@ void AbaqusIO::assign_sideset_ids()
             // this algorithm...
             std::pair<provide_bcs_t::const_iterator,
                       provide_bcs_t::const_iterator>
-              range = provide_bcs.equal_range (elem->key(sn));
+              bounds = provide_bcs.equal_range (elem->key(sn));
 
             // Add boundary information for each side in the range.
-            for (provide_bcs_t::const_iterator s_it = range.first;
-                 s_it != range.second; ++s_it)
+            for (const auto & pr : as_range(bounds))
               {
                 // We'll need to compare the lower dimensional element against the current side.
                 UniquePtr<Elem> side (elem->build_side_ptr(sn));
 
-                // Get the value mapped by the iterator.
-                std::pair<Elem *, boundary_id_type> p = s_it->second;
-
-                // Extract the relevant data from the iterator.
-                Elem * lower_dim_elem = p.first;
-                boundary_id_type bid = p.second;
+                // Extract the relevant data. We don't need the key for anything.
+                Elem * lower_dim_elem = pr.second.first;
+                boundary_id_type bid = pr.second.second;
 
                 // This was a hash, so it might not be perfect.  Let's verify...
                 if (*lower_dim_elem == *side)
