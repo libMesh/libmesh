@@ -2493,20 +2493,20 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
 
       // Find all the boundary side ids for this Elem.
       const std::pair<boundary_side_iter, boundary_side_iter>
-        range = _boundary_side_id.equal_range(top_parent);
+        bounds = _boundary_side_id.equal_range(top_parent);
 
       for (auto s : elem->side_index_range())
         {
           bool add_this_side = false;
           boundary_id_type this_bcid = invalid_id;
 
-          for (boundary_side_iter bsi = range.first; bsi != range.second; ++bsi)
+          for (const auto & pr : as_range(bounds))
             {
-              this_bcid = bsi->second.second;
+              this_bcid = pr.second.second;
 
               // if this side is flagged with a boundary condition
               // and the user wants this id
-              if ((bsi->second.first == s) &&
+              if ((pr.second.first == s) &&
                   (requested_boundary_ids.count(this_bcid)))
                 {
                   add_this_side = true;
@@ -2520,7 +2520,7 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
           // boundary was copied to the BoundaryMesh, and handles the
           // case where elements on the geometric boundary are not in
           // any sidesets.
-          if (range.first == range.second              &&
+          if (bounds.first == bounds.second            &&
               requested_boundary_ids.count(invalid_id) &&
               elem->neighbor_ptr(s) == libmesh_nullptr)
             add_this_side = true;
