@@ -1137,13 +1137,10 @@ void BoundaryInfo::raw_edge_boundary_ids (const Elem * const elem,
   if (elem->parent())
     return;
 
-  std::pair<boundary_edge_iter, boundary_edge_iter>
-    e = _boundary_edge_id.equal_range(elem);
-
   // Check each element in the range to see if its edge matches the requested edge.
-  for (; e.first != e.second; ++e.first)
-    if (e.first->second.first == edge)
-      vec_to_fill.push_back(e.first->second.second);
+  for (const auto & pr : as_range(_boundary_edge_id.equal_range(elem)))
+    if (pr.second.first == edge)
+      vec_to_fill.push_back(pr.second.second);
 }
 
 
