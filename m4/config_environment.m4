@@ -35,7 +35,7 @@ BUILD_DATE=`date +'%F %H:%M'`
 
 AC_PATH_PROG(gitquery,git)
 
-if (test "x${gitquery}" = "x" -o ! -d $srcdir/.git) ; then
+if (test "x${gitquery}" = "x" -o ! -e $srcdir/.git) ; then
    GIT_REVISION="external" #"cat $srcdir/dist_version"
    GIT_CHECKOUT=false
    BUILD_DEVSTATUS="External Release"
