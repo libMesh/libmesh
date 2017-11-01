@@ -548,34 +548,25 @@ void UNVIO::groups_in (std::istream & in_file)
   for (auto & elem : mesh.active_element_ptr_range())
     if (elem->dim() == max_dim)
       for (auto sn : elem->side_index_range())
-        {
-          // This is a max-dimension element that may require BCs.
-          // For each of its sides, including internal sides, we'll
-          // see if a lower-dimensional element provides boundary
-          // information for it.  Note that we have not yet called
-          // find_neighbors(), so we can't use elem->neighbor(sn) in
-          // this algorithm...
+        for (const auto & pr : as_range(provide_bcs.equal_range (elem->key(sn))))
+          {
+            // This is a max-dimension element that may require BCs.
+            // For each of its sides, including internal sides, we'll
+            // see if a lower-dimensional element provides boundary
+            // information for it.  Note that we have not yet called
+            // find_neighbors(), so we can't use elem->neighbor(sn) in
+            // this algorithm...
 
-          // Look for this key in the provide_bcs map
-          std::pair<map_type::const_iterator,
-                    map_type::const_iterator>
-            range = provide_bcs.equal_range (elem->key(sn));
+            // Build a side to confirm the hash mapped to the correct side.
+            UniquePtr<Elem> side (elem->build_side_ptr(sn));
 
-          // Add boundary information for each side in the range.
-          for (map_type::const_iterator iter = range.first;
-               iter != range.second; ++iter)
-            {
-              // Build a side to confirm the hash mapped to the correct side.
-              UniquePtr<Elem> side (elem->build_side_ptr(sn));
+            // Get a pointer to the lower-dimensional element
+            Elem * lower_dim_elem = pr.second;
 
-              // Get a pointer to the lower-dimensional element
-              Elem * lower_dim_elem = iter->second;
-
-              // This was a hash, so it might not be perfect.  Let's verify...
-              if (*lower_dim_elem == *side)
-                mesh.get_boundary_info().add_side(elem, sn, lower_dim_elem->subdomain_id());
-            }
-        }
+            // This was a hash, so it might not be perfect.  Let's verify...
+            if (*lower_dim_elem == *side)
+              mesh.get_boundary_info().add_side(elem, sn, lower_dim_elem->subdomain_id());
+          }
 }
 
 
