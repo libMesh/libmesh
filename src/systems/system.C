@@ -1334,21 +1334,16 @@ void System::zero_variable (NumericVector<Number> & v,
   /* Check which system we are.  */
   const unsigned int sys_num = this->number();
 
-  /* Loop over nodes.  */
-  {
-    MeshBase::const_node_iterator it = mesh.local_nodes_begin();
-    const MeshBase::const_node_iterator end_it = mesh.local_nodes_end();
-    for ( ; it != end_it; ++it)
-      {
-        const Node * node = *it;
-        unsigned int n_comp = node->n_comp(sys_num,var_num);
-        for (unsigned int i=0; i<n_comp; i++)
-          {
-            const dof_id_type index = node->dof_number(sys_num,var_num,i);
-            v.set(index,0.0);
-          }
-      }
-  }
+  // Loop over nodes.
+  for (const auto & node : mesh.local_node_ptr_range())
+    {
+      unsigned int n_comp = node->n_comp(sys_num,var_num);
+      for (unsigned int i=0; i<n_comp; i++)
+        {
+          const dof_id_type index = node->dof_number(sys_num,var_num,i);
+          v.set(index,0.0);
+        }
+    }
 
   // Loop over elements.
   for (const auto & elem : mesh.active_local_element_ptr_range())
