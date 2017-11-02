@@ -93,10 +93,14 @@ public:
     // We write the file in the ExodusII format.
     ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
 
+    // Make sure that the writing is done before the reading starts.
+    TestCommWorld->barrier();
+
     // Now read it back in
     Mesh read_mesh(*TestCommWorld);
     ExodusII_IO exio(read_mesh);
     exio.read("out.e");
+
     read_mesh.prepare_for_use();
     EquationSystems es2(read_mesh);
     ExplicitSystem & sys2 = es2.add_system<ExplicitSystem>("Test");
