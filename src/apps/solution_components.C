@@ -105,15 +105,11 @@ int main(int argc, char ** argv)
   // non-solution vectors too.
 
   // Copy over any nodal degree of freedom coefficients
+  MeshBase::const_node_iterator new_nit = mesh2.local_nodes_begin();
 
-  MeshBase::const_node_iterator       old_nit     = mesh1.local_nodes_begin(),
-    new_nit     = mesh2.local_nodes_begin();
-  const MeshBase::const_node_iterator old_nit_end = mesh1.local_nodes_end();
-
-  for (; old_nit != old_nit_end; ++old_nit, ++new_nit)
+  for (const auto & old_node : mesh1.local_node_ptr_range())
     {
-      const Node * old_node = *old_nit;
-      const Node * new_node = *new_nit;
+      const Node * new_node = *new_nit++;
 
       // Mesh::operator= hopefully preserved elem/node orderings...
       libmesh_assert (*old_node == *new_node);
