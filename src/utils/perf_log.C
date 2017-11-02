@@ -703,9 +703,11 @@ PerfData PerfLog::get_perf_data(const std::string & label, const std::string & h
       return log[std::make_pair(header_c_str, label_c_str)];
     }
 
+  typedef decltype(*log.begin()) map_pair;
+
   auto iter = std::find_if
     (log.begin(), log.end(),
-     [&label, &header] (const auto & a)
+     [&label, &header] (const map_pair & a)
      { return !std::strcmp(header.c_str(), a.first.first) &&
               !std::strcmp(label.c_str(), a.first.second); });
 
