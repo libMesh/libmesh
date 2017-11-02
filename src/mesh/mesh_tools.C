@@ -1929,12 +1929,8 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   // first we'll need to keep track of which nodes we used to own,
   // lest we get them confused with nodes we newly own.
   std::unordered_set<Node *> ex_local_nodes;
-  for (MeshBase::node_iterator
-         n_it = mesh.local_nodes_begin(),
-         n_end = mesh.local_nodes_end();
-       n_it != n_end; ++n_it)
+  for (auto & node : mesh.local_node_ptr_range())
     {
-      Node * node = *n_it;
       const proc_id_map_type::iterator it = new_proc_ids.find(node->id());
       if (it != new_proc_ids.end() && it->second != mesh.processor_id())
         ex_local_nodes.insert(node);
