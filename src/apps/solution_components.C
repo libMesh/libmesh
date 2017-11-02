@@ -140,15 +140,11 @@ int main(int argc, char ** argv)
 
 
   // Copy over any element degree of freedom coefficients
+  MeshBase::const_element_iterator new_eit = mesh2.active_local_elements_begin();
 
-  MeshBase::const_element_iterator       old_eit     = mesh1.active_local_elements_begin(),
-    new_eit     = mesh2.active_local_elements_begin();
-  const MeshBase::const_element_iterator old_eit_end = mesh1.active_local_elements_end();
-
-  for (; old_eit != old_eit_end; ++old_eit, ++new_eit)
+  for (const auto & old_elem : mesh1.active_local_element_ptr_range())
     {
-      const Elem * old_elem = *old_eit;
-      const Elem * new_elem = *new_eit;
+      const Elem * new_elem = *new_eit++;
 
       // Mesh::operator= hopefully preserved elem/node orderings...
       libmesh_assert (*old_elem == *new_elem);
