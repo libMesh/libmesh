@@ -1546,13 +1546,9 @@ void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
   std::vector<bool> node_touched_by_anyone(node_touched_by_me);
   mesh.comm().max(node_touched_by_anyone);
 
-  const MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
-  for (MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
-       nd != nd_end; ++nd)
+  for (const auto & node : mesh.local_node_ptr_range())
     {
-      const Node * node = *nd;
       libmesh_assert(node);
-
       dof_id_type nodeid = node->id();
       libmesh_assert(!node_touched_by_anyone[nodeid] ||
                      node_touched_by_me[nodeid]);
