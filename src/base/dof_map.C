@@ -1118,24 +1118,18 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
       // *connected* to elements which do.  in this scenario these nodes
       // will presently have unnumbered DOFs. we need to take care of
       // them here since we own them and no other processor will touch them.
-      {
-        MeshBase::const_node_iterator       node_it  = mesh.local_nodes_begin();
-        const MeshBase::const_node_iterator node_end = mesh.local_nodes_end();
+      for (const auto & node : mesh.local_node_ptr_range())
+        {
+          libmesh_assert(node);
 
-        for (; node_it != node_end; ++node_it)
-          {
-            Node * node = *node_it;
-            libmesh_assert(node);
-
-            const unsigned int n_comp = node->n_comp(sys_num, var_num);
-            for (unsigned int i=0; i<n_comp; i++)
-              {
-                const dof_id_type index = node->dof_number(sys_num,var_num,i);
-                if (idx.empty() || index > idx.back())
-                  idx.push_back(index);
-              }
-          }
-      }
+          const unsigned int n_comp = node->n_comp(sys_num, var_num);
+          for (unsigned int i=0; i<n_comp; i++)
+            {
+              const dof_id_type index = node->dof_number(sys_num,var_num,i);
+              if (idx.empty() || index > idx.back())
+                idx.push_back(index);
+            }
+        }
     }
   // Otherwise, count up the SCALAR dofs, if we're on the processor
   // that holds this SCALAR variable
