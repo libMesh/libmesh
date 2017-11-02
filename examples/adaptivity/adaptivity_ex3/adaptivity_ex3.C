@@ -153,6 +153,13 @@ int main(int argc, char ** argv)
   const bool output_intermediate    = input_file("output_intermediate", false);
 #endif
 
+  // If libmesh is configured without second derivative support, we
+  // can't run this example with Hermite elements and will therefore
+  // fail gracefully.
+#if !defined(LIBMESH_ENABLE_SECOND_DERIVATIVES)
+  libmesh_example_requires(approx_type != "HERMITE", "--enable-second");
+#endif
+
   dim = input_file("dimension", 2);
   const std::string indicator_type = input_file("indicator_type", "kelly");
   singularity = input_file("singularity", true);
