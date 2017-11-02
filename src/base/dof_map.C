@@ -1348,27 +1348,17 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
       // *connected* to elements which do.  in this scenario these nodes
       // will presently have unnumbered DOFs. we need to take care of
       // them here since we own them and no other processor will touch them.
-      {
-        MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
-        const MeshBase::node_iterator node_end = mesh.local_nodes_end();
+      for (auto & node : mesh.local_node_ptr_range())
+        if (node->n_comp_group(sys_num,vg))
+          if (node->vg_dof_base(sys_num,vg) == DofObject::invalid_id)
+            {
+              node->set_vg_dof_base (sys_num,
+                                     vg,
+                                     next_free_dof);
 
-        for (; node_it != node_end; ++node_it)
-          {
-            Node * node = *node_it;
-            libmesh_assert(node);
-
-            if (node->n_comp_group(sys_num,vg))
-              if (node->vg_dof_base(sys_num,vg) == DofObject::invalid_id)
-                {
-                  node->set_vg_dof_base (sys_num,
-                                         vg,
-                                         next_free_dof);
-
-                  next_free_dof += (n_vars_in_group*
-                                    node->n_comp_group(sys_num,vg));
-                }
-          }
-      }
+              next_free_dof += (n_vars_in_group*
+                                node->n_comp_group(sys_num,vg));
+            }
     } // end loop on variable groups
 
   // Finally, count up the SCALAR dofs
