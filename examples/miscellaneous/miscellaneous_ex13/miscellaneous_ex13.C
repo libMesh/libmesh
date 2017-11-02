@@ -255,16 +255,13 @@ int main (int argc, char ** argv)
         // Find the closest local node.  On a DistributedMesh we may
         // not even know about the existence of closer non-local
         // nodes.
-        libMesh::MeshBase::const_node_iterator it = mesh.local_nodes_begin();
-        const libMesh::MeshBase::const_node_iterator end = mesh.local_nodes_end();
-        for (; it != end; ++it)
+        for (const auto & node : mesh.local_node_ptr_range())
           {
-            Node * n = *it;
-            const Real dist_sq = (*n-point_C).norm_sq();
+            const Real dist_sq = (*node - point_C).norm_sq();
             if (dist_sq < nearest_dist_sq)
               {
                 nearest_dist_sq = dist_sq;
-                node_C = n;
+                node_C = node;
               }
           }
 
