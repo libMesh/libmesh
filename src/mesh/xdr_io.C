@@ -743,31 +743,26 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
       last_node = std::min((blk+1)*io_blksize, std::size_t(n_nodes));
 
       // Build up the xfer buffers on each processor
-      MeshBase::const_node_iterator
-        it  = mesh.local_nodes_begin(),
-        end = mesh.local_nodes_end();
-
       xfer_ids.clear();
       xfer_coords.clear();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
       xfer_unique_ids.clear();
 #endif // LIBMESH_ENABLE_UNIQUE_ID
 
-      for (; it!=end; ++it)
-        if (((*it)->id() >= first_node) && // node in [first_node, last_node)
-            ((*it)->id() <  last_node))
+      for (const auto & node : mesh.local_node_ptr_range())
+        if ((node->id() >= first_node) && // node in [first_node, last_node)
+            (node->id() <  last_node))
           {
-            xfer_ids.push_back((*it)->id());
+            xfer_ids.push_back(node->id());
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-            xfer_unique_ids.push_back((*it)->unique_id());
+            xfer_unique_ids.push_back(node->unique_id());
 #endif // LIBMESH_ENABLE_UNIQUE_ID
-            const Point & p = **it;
-            xfer_coords.push_back(p(0));
+            xfer_coords.push_back((*node)(0));
 #if LIBMESH_DIM > 1
-            xfer_coords.push_back(p(1));
+            xfer_coords.push_back((*node)(1));
 #endif
 #if LIBMESH_DIM > 2
-            xfer_coords.push_back(p(2));
+            xfer_coords.push_back((*node)(2));
 #endif
           }
 
