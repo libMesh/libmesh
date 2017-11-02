@@ -65,58 +65,44 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
     {
       new_positions.resize(_mesh.max_node_id());
 
-      {
-        MeshBase::node_iterator       it     = _mesh.local_nodes_begin();
-        const MeshBase::node_iterator it_end = _mesh.local_nodes_end();
-        for (; it != it_end; ++it)
-          {
-            Node * node = *it;
+      for (auto & node : _mesh.local_node_ptr_range())
+        {
+          if (node == libmesh_nullptr)
+            libmesh_error_msg("[" << _mesh.processor_id() << "]: Node iterator returned NULL pointer.");
 
-            if (node == libmesh_nullptr)
-              libmesh_error_msg("[" << _mesh.processor_id() << "]: Node iterator returned NULL pointer.");
+          // leave the boundary intact
+          // Only relocate the nodes which are vertices of an element
+          // All other entries of _graph (the secondary nodes) are empty
+          if (!on_boundary[node->id()] && (_graph[node->id()].size() > 0))
+            {
+              Point avg_position(0.,0.,0.);
 
-            // leave the boundary intact
-            // Only relocate the nodes which are vertices of an element
-            // All other entries of _graph (the secondary nodes) are empty
-            if (!on_boundary[node->id()] && (_graph[node->id()].size() > 0))
-              {
-                Point avg_position(0.,0.,0.);
+              for (std::size_t j=0; j<_graph[node->id()].size(); ++j)
+                {
+                  // Will these nodal positions always be available
+                  // or will they refer to remote nodes?  This will
+                  // fail an assertion in the latter case, which
+                  // shouldn't occur if DistributedMesh is working
+                  // correctly.
+                  const Point & connected_node = _mesh.point(_graph[node->id()][j]);
 
-                for (std::size_t j=0; j<_graph[node->id()].size(); ++j)
-                  {
-                    // Will these nodal positions always be available
-                    // or will they refer to remote nodes?  This will
-                    // fail an assertion in the latter case, which
-                    // shouldn't occur if DistributedMesh is working
-                    // correctly.
-                    const Point & connected_node = _mesh.point(_graph[node->id()][j]);
+                  avg_position.add( connected_node );
+                } // end for (j)
 
-                    avg_position.add( connected_node );
-                  } // end for (j)
-
-                // Compute the average, store in the new_positions vector
-                new_positions[node->id()] = avg_position / static_cast<Real>(_graph[node->id()].size());
-              } // end if
-          } // end for
-      } // end scope
+              // Compute the average, store in the new_positions vector
+              new_positions[node->id()] = avg_position / static_cast<Real>(_graph[node->id()].size());
+            } // end if
+        } // end for
 
 
       // now update the node positions (local node positions only)
-      {
-        MeshBase::node_iterator it           = _mesh.local_nodes_begin();
-        const MeshBase::node_iterator it_end = _mesh.local_nodes_end();
-        for (; it != it_end; ++it)
+      for (auto & node : _mesh.local_node_ptr_range())
+        if (!on_boundary[node->id()] && (_graph[node->id()].size() > 0))
           {
-            Node * node = *it;
-
-            if (!on_boundary[node->id()] && (_graph[node->id()].size() > 0))
-              {
-                // Should call Point::op=
-                // libMesh::out << "Setting node id " << node->id() << " to position " << new_positions[node->id()];
-                _mesh.node_ref(node->id()) = new_positions[node->id()];
-              }
-          } // end for
-      } // end scope
+            // Should call Point::op=
+            // libMesh::out << "Setting node id " << node->id() << " to position " << new_positions[node->id()];
+            _mesh.node_ref(node->id()) = new_positions[node->id()];
+          }
 
       // Now the nodes which are ghosts on this processor may have been moved on
       // the processors which own them.  So we need to synchronize with our neighbors
