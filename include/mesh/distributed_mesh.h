@@ -484,6 +484,8 @@ public:
   virtual node_iterator local_nodes_end () libmesh_override;
   virtual const_node_iterator local_nodes_begin () const libmesh_override;
   virtual const_node_iterator local_nodes_end () const libmesh_override;
+  virtual SimpleRange<node_iterator> local_node_ptr_range() libmesh_override { return {local_nodes_begin(), local_nodes_end()}; }
+  virtual SimpleRange<const_node_iterator> local_node_ptr_range() const libmesh_override { return {local_nodes_begin(), local_nodes_end()}; }
 
   virtual node_iterator pid_nodes_begin (processor_id_type proc_id) libmesh_override;
   virtual node_iterator pid_nodes_end (processor_id_type proc_id) libmesh_override;
