@@ -372,11 +372,9 @@ void VTKIO::nodes_to_vtk()
 
   unsigned int local_node_counter = 0;
 
-  MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
-  MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
-  for (; nd != nd_end; nd++, ++local_node_counter)
+  for (const auto & node_ptr : mesh.local_node_ptr_range())
     {
-      Node & node = **nd;
+      const Node & node = *node_ptr;
 
       double pnt[3] = {0, 0, 0};
       for (unsigned int i=0; i<LIBMESH_DIM; ++i)
@@ -391,6 +389,7 @@ void VTKIO::nodes_to_vtk()
 #else
       pcoords->InsertNextTuple(pnt);
 #endif
+      ++local_node_counter;
     }
 
   // add coordinates to points
