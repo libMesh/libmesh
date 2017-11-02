@@ -27,6 +27,7 @@
 // C++ includes
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
+#include <vector>
 
 namespace libMesh
 {
@@ -46,13 +47,13 @@ template <unsigned int N, typename T>
 class TypeNTensor
 {
 public:
-  TypeNTensor () {}
+  TypeNTensor () : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N))) {}
 
-  TypeNTensor (const T &) {}
+  TypeNTensor (const T &) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N))) {}
 
-  TypeNTensor (const TypeVector<T> &) {}
+  TypeNTensor (const TypeVector<T> &) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N))) {}
 
-  TypeNTensor (const TypeTensor<T> &) {}
+  TypeNTensor (const TypeTensor<T> &) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N))) {}
 
   operator TypeVector<T> () const { libmesh_not_implemented(); return 0; }
   operator VectorValue<T> () const { libmesh_not_implemented(); return 0; }
@@ -205,9 +206,37 @@ public:
     t.print(os);
     return os;
   }
+
+  /**
+   * Add a scaled type N tensor to this type N tensor without creating a temporary.
+   */
+  template<typename T2>
+  void add_scaled (const TypeNTensor<N, T2> &, const T &);
+
+  /**
+   * The coordinates of the \p TypeNTensor
+   */
+  std::vector<T> _coords;
+
+private:
+  static constexpr int int_pow(int b, int e)
+    {
+      return (e == 0) ? 1 : b * int_pow(b, e - 1);
+    }
 };
 
 
+template<unsigned int N, typename T>
+template<typename T2>
+inline
+void TypeNTensor<N, T>::add_scaled (const TypeNTensor<N, T2> & p, const T & factor)
+{
+  unsigned int size = int_pow(LIBMESH_DIM, N);
+  for (unsigned int i = 0; i < size ; i++)
+    _coords[i] += factor*p._coords[i];
+}
+
 } // namespace libMesh
+
 
 #endif // LIBMESH_TYPE_N_TENSOR_H
