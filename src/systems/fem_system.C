@@ -854,6 +854,9 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
                           bool apply_no_constraints)
 {
   libmesh_assert(get_residual || get_jacobian);
+
+// Log residual and jacobian and combined performance separately
+#ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
   const char * log_name;
   if (get_residual && get_jacobian)
     log_name = "assembly()";
@@ -863,6 +866,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
     log_name = "assembly(get_jacobian)";
 
   LOG_SCOPE(log_name, "FEMSystem");
+#endif
 
   const MeshBase & mesh = this->get_mesh();
 
