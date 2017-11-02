@@ -1385,19 +1385,15 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
     // Make sure we didn't miss any nodes
     MeshTools::libmesh_assert_valid_procids<Node>(mesh);
 
-    MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
-    const MeshBase::node_iterator node_end = mesh.local_nodes_end();
-    for (; node_it != node_end; ++node_it)
+    for (auto & node : mesh.local_node_ptr_range())
       {
-        Node * obj = *node_it;
-        libmesh_assert(obj);
-        unsigned int n_var_g = obj->n_var_groups(this->sys_number());
+        unsigned int n_var_g = node->n_var_groups(this->sys_number());
         for (unsigned int vg=0; vg != n_var_g; ++vg)
           {
             unsigned int n_comp_g =
-              obj->n_comp_group(this->sys_number(), vg);
+              node->n_comp_group(this->sys_number(), vg);
             dof_id_type my_first_dof = n_comp_g ?
-              obj->vg_dof_base(this->sys_number(), vg) : 0;
+              node->vg_dof_base(this->sys_number(), vg) : 0;
             libmesh_assert_not_equal_to (my_first_dof, DofObject::invalid_id);
           }
       }
