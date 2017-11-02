@@ -111,17 +111,11 @@ MeshfreeSolutionTransfer::transfer(const Variable & from_var,
 
   // We now will loop over every node in the source mesh
   // and add it to a source point list, along with the solution
-  {
-    MeshBase::const_node_iterator nd  = from_mesh.local_nodes_begin();
-    MeshBase::const_node_iterator end = from_mesh.local_nodes_end();
-
-    for (; nd!=end; ++nd)
-      {
-        const Node * node = *nd;
-        src_pts.push_back(*node);
-        src_vals.push_back((*from_sys->solution)(node->dof_number(from_sys->number(),from_var.number(),0)));
-      }
-  }
+  for (const auto & node : from_mesh.local_node_ptr_range())
+    {
+      src_pts.push_back(*node);
+      src_vals.push_back((*from_sys->solution)(node->dof_number(from_sys->number(),from_var.number(),0)));
+    }
 
   // We have only set local values - prepare for use by gathering remote data
   idi.prepare_for_use();
