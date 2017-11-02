@@ -1217,21 +1217,16 @@ void XdrIO::write_serialized_nodesets (Xdr & io, const new_header_id_type n_node
   // Container to catch boundary IDs handed back by BoundaryInfo
   std::vector<boundary_id_type> nodeset_ids;
 
-  MeshBase::const_node_iterator
-    it  = mesh.local_nodes_begin(),
-    end = mesh.local_nodes_end();
-
   dof_id_type n_node=0;
-  for (; it!=end; ++it)
+  for (const auto & node : mesh.local_node_ptr_range())
     {
-      const Node * node = *it;
       boundary_info.boundary_ids (node, nodeset_ids);
       for (std::vector<boundary_id_type>::const_iterator id_it=nodeset_ids.begin(); id_it!=nodeset_ids.end(); ++id_it)
         {
           const boundary_id_type bc_id = *id_it;
           if (bc_id != BoundaryInfo::invalid_id)
             {
-              xfer_bcs.push_back ((*it)->id());
+              xfer_bcs.push_back (node->id());
               xfer_bcs.push_back (bc_id);
             }
         }
