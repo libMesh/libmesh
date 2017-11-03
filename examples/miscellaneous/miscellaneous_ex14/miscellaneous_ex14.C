@@ -569,10 +569,6 @@ void SlepcSolverConfiguration::configure_solver()
 #endif
           break;
         case CAYLEY:
-#if SLEPC_VERSION_LESS_THAN(2,2,1)
-          libmesh_error_msg("SLEPc 2.2.1 is required to call CAYLEY transform.");
-          break;
-#else
           ierr = STSetType(st, STCAYLEY);
           break;
 #endif
