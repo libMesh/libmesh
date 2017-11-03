@@ -10,11 +10,13 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MOVE],
     AC_MSG_CHECKING(for C++11 std::move support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
+    # For this and all of the C++ standards tests: Save the original
+    # CXXFLAGS (if any) before appending the $switch determined by
+    # AX_CXX_COMPILE_STDCXX_11, and any compiler flags specified by
+    # the user in the libmesh_CXXFLAGS environment variable, letting
+    # that override everything else.
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <utility>
@@ -58,11 +60,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MOVE_CONSTRUCTORS],
     AC_MSG_CHECKING(for C++11 move constructor support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <utility>
@@ -109,11 +108,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_RANGEFOR],
     AC_MSG_CHECKING(for C++11 range-based for loop support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
         @%:@include <iostream>
@@ -155,11 +151,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_DECLTYPE],
     AC_MSG_CHECKING(for C++11 decltype support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     ]], [[
@@ -193,11 +186,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_RVALUE_REFERENCES],
     AC_MSG_CHECKING(for C++11 rvalue references support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       int foo(int && x) { return x; }
@@ -233,11 +223,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_AUTO],
     AC_MSG_CHECKING(for C++11 auto keyword support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     ]], [[
@@ -271,11 +258,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_LAMBDA],
     AC_MSG_CHECKING(for C++11 lambda support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       // typedef for a function pointer that takes int and returns bool.
@@ -316,11 +300,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_CONSTEXPR],
     AC_MSG_CHECKING(for C++11 constexpr support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       constexpr int multiply (int x, int y) { return x * y; }
@@ -355,11 +336,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS],
     AC_MSG_CHECKING(for C++11 alias declarations support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       template <typename T>
@@ -427,10 +405,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_SHARED_PTR],
             ;;
         esac
 
-        # Also append the $switch determined in AX_CXX_COMPILE_STDCXX_11.
-        # Note that this might append the same flag twice, but that
-        # shouldn't matter...
-        CXXFLAGS="$CXXFLAGS $switch"
+        CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
         # If compilation fails for *any* of the methods, we'll disable
         # shared_ptr support for *all* methods.
@@ -486,11 +461,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_UNIQUE_PTR],
     AC_MSG_CHECKING(for C++11 std::unique_ptr support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <iostream>
@@ -530,14 +502,14 @@ AC_DEFUN([LIBMESH_TEST_CXX14_MAKE_UNIQUE],
   [
     have_cxx14_make_unique=no
 
-    AC_MSG_CHECKING(for C++14 std::make_unique support)
-    AC_LANG_PUSH([C++])
-
     # std::make_unique is actually part of the C++14 standard, but some
     # compilers might (?) support it via the -std=c++11 flag, or eventually
     # with no flag at all.
+    AC_MSG_CHECKING(for C++14 std::make_unique support)
+    AC_LANG_PUSH([C++])
+
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <memory>
@@ -572,15 +544,15 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MAKE_UNIQUE_WORKAROUND],
   [
     have_cxx11_make_unique_workaround=no
 
-    AC_MSG_CHECKING(for C++11 std::make_unique workaround support)
-    AC_LANG_PUSH([C++])
-
     # This is a simple workaround for no std::make_unique in C++11:
     # http://stackoverflow.com/questions/7038357/make-unique-and-perfect-forwarding
     # Requires working rvalue references, std::forward, variadic
     # templates, and std::unique_ptr from C++11.
+    AC_MSG_CHECKING(for C++11 std::make_unique workaround support)
+    AC_LANG_PUSH([C++])
+
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <memory>
@@ -628,11 +600,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_REGEX],
     AC_MSG_CHECKING(for C++11 std::regex support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     dnl We actually have to try and *run* the test program, since
     dnl GCC up to 4.8 will compile this but then is not able to run it.
@@ -680,11 +649,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_OVERRIDE],
     AC_MSG_CHECKING(for C++11 override keyword support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     ]], [[
@@ -723,11 +689,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_INITIALIZER_LIST],
     AC_MSG_CHECKING(for C++11 initializer list support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       @%:@include <vector>
@@ -762,11 +725,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_VARIADIC_TEMPLATES],
     AC_MSG_CHECKING(for C++11 variadic template support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       // Base case
@@ -810,11 +770,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_THREAD],
     AC_MSG_CHECKING(for C++11 <thread> support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       @%:@include <thread>
@@ -864,11 +821,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_CONDITION_VARIABLE],
     AC_MSG_CHECKING(for C++11 <condition_variable> support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     # Test code is from the accepted answer on:
     # http://stackoverflow.com/questions/16350473/why-do-i-need-stdcondition-variable
@@ -940,11 +894,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TYPE_TRAITS],
     AC_MSG_CHECKING(for C++11 <type_traits> support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       @%:@include <iostream>
@@ -1090,11 +1041,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MATH_FUNCS],
 
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     # Test for asinh
     AC_MSG_CHECKING(for C++11 std::asinh support in <cmath>)
@@ -1257,11 +1205,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_DELETED_FUNCTIONS],
     AC_MSG_CHECKING(for C++11 deleted functions support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     class Foo
@@ -1298,11 +1243,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_FINAL],
     AC_MSG_CHECKING(for C++11 'final' keyword support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     // Test that a function can be declared final.
@@ -1427,11 +1369,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_NULLPTR],
     AC_MSG_CHECKING(for C++11 nullptr support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
     @%:@include <cstddef>
@@ -1514,11 +1453,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TO_STRING],
     AC_MSG_CHECKING(for C++11 std::to_string() support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       @%:@include <string>
@@ -1562,11 +1498,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_NOEXCEPT],
     AC_MSG_CHECKING(for C++11 noexcept support)
     AC_LANG_PUSH([C++])
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
       @%:@include <stdexcept>
