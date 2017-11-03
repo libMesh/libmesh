@@ -7136,7 +7136,7 @@ if eval \${$cachevar+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_save_CXXFLAGS="$CXXFLAGS"
-         CXXFLAGS="$CXXFLAGS $switch"
+         CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
          cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -7201,7 +7201,7 @@ if eval \${$cachevar+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_save_CXXFLAGS="$CXXFLAGS"
-         CXXFLAGS="$CXXFLAGS $switch"
+         CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
          cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -8401,11 +8401,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -8481,11 +8478,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -8571,11 +8565,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -8656,11 +8647,13 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
+    # For this and all of the C++ standards tests: Save the original
+    # CXXFLAGS (if any) before appending the $switch determined by
+    # AX_CXX_COMPILE_STDCXX_11, and any compiler flags specified by
+    # the user in the libmesh_CXXFLAGS environment variable, letting
+    # that override everything else.
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -8740,11 +8733,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -8829,11 +8819,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -8905,11 +8892,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -8983,11 +8967,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -9066,11 +9047,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -9143,11 +9121,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -9252,10 +9227,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
             ;;
         esac
 
-        # Also append the $switch determined in AX_CXX_COMPILE_STDCXX_11.
-        # Note that this might append the same flag twice, but that
-        # shouldn't matter...
-        CXXFLAGS="$CXXFLAGS $switch"
+        CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
         # If compilation fails for *any* of the methods, we'll disable
         # shared_ptr support for *all* methods.
@@ -9350,11 +9322,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -9426,6 +9395,9 @@ fi
 
     have_cxx14_make_unique=no
 
+    # std::make_unique is actually part of the C++14 standard, but some
+    # compilers might (?) support it via the -std=c++11 flag, or eventually
+    # with no flag at all.
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++14 std::make_unique support" >&5
 $as_echo_n "checking for C++14 std::make_unique support... " >&6; }
     ac_ext=cpp
@@ -9435,11 +9407,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # std::make_unique is actually part of the C++14 standard, but some
-    # compilers might (?) support it via the -std=c++11 flag, or eventually
-    # with no flag at all.
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -9506,6 +9475,10 @@ fi
 
     have_cxx11_make_unique_workaround=no
 
+    # This is a simple workaround for no std::make_unique in C++11:
+    # http://stackoverflow.com/questions/7038357/make-unique-and-perfect-forwarding
+    # Requires working rvalue references, std::forward, variadic
+    # templates, and std::unique_ptr from C++11.
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::make_unique workaround support" >&5
 $as_echo_n "checking for C++11 std::make_unique workaround support... " >&6; }
     ac_ext=cpp
@@ -9515,12 +9488,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # This is a simple workaround for no std::make_unique in C++11:
-    # http://stackoverflow.com/questions/7038357/make-unique-and-perfect-forwarding
-    # Requires working rvalue references, std::forward, variadic
-    # templates, and std::unique_ptr from C++11.
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -9604,11 +9573,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
                                 if test "$cross_compiling" = yes; then :
 
@@ -9691,11 +9657,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -9771,11 +9734,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -9857,11 +9817,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -9949,11 +9906,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     # Test code is from the accepted answer on:
     # http://stackoverflow.com/questions/16350473/why-do-i-need-stdcondition-variable
@@ -10063,11 +10017,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -10250,11 +10201,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     # Test for asinh
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::asinh support in <cmath>" >&5
@@ -10642,11 +10590,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -10721,11 +10666,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -10936,11 +10878,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -11097,11 +11036,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -11182,11 +11118,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-    # Save the original flags before appending the $switch determined
-    # by AX_CXX_COMPILE_STDCXX_11.  Note that this might append the
-    # same flag twice, but that shouldn't matter...
     old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
