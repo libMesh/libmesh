@@ -468,12 +468,12 @@ void assemble_wave(EquationSystems & es,
   // Note that we have not applied any boundary conditions so far.
   // Here we apply a unit load at the node located at (0,0,0).
   for (const auto & node : mesh.local_node_ptr_range())
-    if (std::abs(node(0)) < TOLERANCE &&
-        std::abs(node(1)) < TOLERANCE &&
-        std::abs(node(2)) < TOLERANCE)
+    if (std::abs((*node)(0)) < TOLERANCE &&
+        std::abs((*node)(1)) < TOLERANCE &&
+        std::abs((*node)(2)) < TOLERANCE)
       {
         // The global number of the respective degree of freedom.
-        unsigned int dn = node.dof_number(0,0,0);
+        unsigned int dn = node->dof_number(0,0,0);
 
         system.rhs->add (dn, 1.);
       }
