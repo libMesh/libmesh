@@ -1546,13 +1546,9 @@ void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
   std::vector<bool> node_touched_by_anyone(node_touched_by_me);
   mesh.comm().max(node_touched_by_anyone);
 
-  const MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
-  for (MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
-       nd != nd_end; ++nd)
+  for (const auto & node : mesh.local_node_ptr_range())
     {
-      const Node * node = *nd;
       libmesh_assert(node);
-
       dof_id_type nodeid = node->id();
       libmesh_assert(!node_touched_by_anyone[nodeid] ||
                      node_touched_by_me[nodeid]);
@@ -1933,12 +1929,8 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   // first we'll need to keep track of which nodes we used to own,
   // lest we get them confused with nodes we newly own.
   std::unordered_set<Node *> ex_local_nodes;
-  for (MeshBase::node_iterator
-         n_it = mesh.local_nodes_begin(),
-         n_end = mesh.local_nodes_end();
-       n_it != n_end; ++n_it)
+  for (auto & node : mesh.local_node_ptr_range())
     {
-      Node * node = *n_it;
       const proc_id_map_type::iterator it = new_proc_ids.find(node->id());
       if (it != new_proc_ids.end() && it->second != mesh.processor_id())
         ex_local_nodes.insert(node);

@@ -1239,6 +1239,8 @@ public:
   virtual node_iterator local_nodes_end () = 0;
   virtual const_node_iterator local_nodes_begin () const = 0;
   virtual const_node_iterator local_nodes_end () const = 0;
+  virtual SimpleRange<node_iterator> local_node_ptr_range() = 0;
+  virtual SimpleRange<const_node_iterator> local_node_ptr_range() const = 0;
 
   /**
    * Iterate over nodes with processor_id() == proc_id
