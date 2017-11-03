@@ -22,7 +22,7 @@
 //
 // This example uses second order infinite elements to solve the Schroedinger equation to obtain
 // the wave function of the Hydrogen atom.
-// To speed up the calculation, the SlepcSolver is configured to use the Cayley-transfor for solving
+// To speed up the calculation, the SlepcSolver is configured to use the shift-and-invert-transform for solving
 // the resulting generalised eigensystem.
 //
 // The result is printed in exodus-format and along the x-axis in a free format. 
