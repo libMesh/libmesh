@@ -8,5 +8,5 @@ example_name=miscellaneous_ex14
 
 example_dir=examples/miscellaneous/miscellaneous_ex14
 
-run_example "$example_name" sample_inp
+run_example "$example_name" $srcdir/sample.in
 
