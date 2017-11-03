@@ -229,14 +229,16 @@ void HPCoarsenTest::select_refinement (System & system)
           dphi_coarse = &(fe_coarse->get_dphi());
         }
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       // The shape function second derivatives
       if (cont == C_ONE)
         {
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
           d2phi = &(fe->get_d2phi());
           d2phi_coarse = &(fe_coarse->get_d2phi());
+#else
+          libmesh_error_msg("Minimization of H2 error without second derivatives is not possible.");
+#endif
         }
-#endif // defined (LIBMESH_ENABLE_SECOND_DERIVATIVES)
 
       // Iterate over all the active elements in the mesh
       // that live on this processor.
