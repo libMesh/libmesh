@@ -285,7 +285,7 @@ int main (int argc, char** argv)
       std::pair<Real,Real> eigpair = eig_sys.get_eigenpair(i);
 
       // get the complete eigenvalue:
-      Number eigenvalue(eigpair.first, eigpair.second);
+      Complex eigenvalue(eigpair.first, eigpair.second);
       out<<"        "<<eigenvalue<<std::endl;
 
       // Here, one needs to formally distinguish between bound states (negative energy)
@@ -294,15 +294,15 @@ int main (int argc, char** argv)
       // rise instead of exponential decay when computing the shape functions in the infinite element region.
       if (eigpair.first > 0.)
         // positive eigen energy
-        eq_sys.parameters.set<Number>("momentum")=sqrt(eigenvalue*2.);
+        eq_sys.parameters.set<Complex>("momentum")=sqrt(eigenvalue*2.);
       else
         {
           // for negative energies: ensure that imaginary contribution is positive!
-          Number k= sqrt(2.*eigenvalue);
-          if (imag(k)>0)
-            eq_sys.parameters.set<Number>("momentum")=k;
+          Complex k= sqrt(2.*eigenvalue);
+          if (std::imag(k)>0)
+            eq_sys.parameters.set<Complex>("momentum")=k;
           else
-            eq_sys.parameters.set<Number>("momentum")=conj(k);
+            eq_sys.parameters.set<Complex>("momentum")=std::conj(k);
         }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -571,7 +571,6 @@ void SlepcSolverConfiguration::configure_solver()
         case CAYLEY:
           ierr = STSetType(st, STCAYLEY);
           break;
-#endif
         default:
           // print a warning but do nothing more.
           break;
