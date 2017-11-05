@@ -680,6 +680,8 @@ void FEInterface::shape<Real>(const unsigned int dim,
   if (is_InfFE_elem(t))
     phi = ifem_shape(dim, fe_t, t, i, p);
 
+  // here we should need an 'or'-statement, right? Else, we will run in trouble!?
+
 #endif
 
   const Order o = fe_t.order;
@@ -717,7 +719,7 @@ void FEInterface::shape<Real>(const unsigned int dim,
 
   if (elem && is_InfFE_elem(elem->type()))
     phi = ifem_shape(dim, fe_t, elem, i, p);
-
+  // here we should need an 'or'-statement, right? Else, we will run in trouble!?
 #endif
 
   const Order o = fe_t.order;
@@ -751,6 +753,7 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
                                       const Point & p,
                                       RealGradient & phi)
 {
+   // This even does not handle infinite elements at all!?
   const Order o = fe_t.order;
 
   switch(dim)

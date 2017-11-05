@@ -178,6 +178,8 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType & fet,
   compute_shape_indices(fet, inf_elem_type, i, i_base, i_radial);
 
   //TODO:[SP/DD]  exp(ikr) is still missing here!
+  // but is it intended?  It would be probably somehow nice, but than it would be Number, not Real !
+  // --> thus it would destroy the interface...
   if (Dim > 1)
     return FEInterface::shape(Dim-1, fet, base_et, i_base, p)
       * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
