@@ -486,6 +486,11 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
   dof_id_type old_max_node_id = _mesh.max_node_id();
   dof_id_type old_max_elem_id = _mesh.max_elem_id();
 
+  // Likewise with our unique_ids
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  dof_id_type old_max_unique_id = _mesh.parallel_max_unique_id();
+#endif
+
   // for each boundary node, add an outer_node with
   // double distance from origin.
   std::set<dof_id_type>::iterator on_it = onodes.begin();
@@ -502,9 +507,13 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
           // Pick a unique id in parallel
           Node & bnode = _mesh.node_ref(*on_it);
           dof_id_type new_id = bnode.id() + old_max_node_id;
-          outer_nodes[*on_it] =
+          Node * new_node =
             this->_mesh.add_point(p, new_id,
                                   bnode.processor_id());
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+          new_node->set_unique_id() = old_max_unique_id + bnode.id();
+#endif
+          outer_nodes[*on_it] = new_node;
         }
     }
 
