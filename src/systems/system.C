@@ -2111,9 +2111,9 @@ Number System::point_value(unsigned int var, const Point & p, const Elem & e) co
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h.
   Point coor = FEInterface::inverse_map(e.dim(), fe_type, &e, p);
 
-  // create this object to handle the correct
+  // get the shape function value via the FEInterface to also handle the case
+  // of infinite elements correcly, the shape function is not fe->phi().
   FEComputeData fe_data(this->get_equation_systems(), coor);
-
   FEInterface::compute_data(e.dim(), fe_type, &e, fe_data);
 
   // Get ready to accumulate a value
