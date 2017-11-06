@@ -691,7 +691,10 @@ void FEInterface::shape<Real>(const unsigned int dim,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (is_InfFE_elem(t))
-    phi = ifem_shape(dim, fe_t, t, i, p);
+    {
+      phi = ifem_shape(dim, fe_t, t, i, p);
+      return;
+    }
 
 #endif
 
@@ -729,8 +732,10 @@ void FEInterface::shape<Real>(const unsigned int dim,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (elem && is_InfFE_elem(elem->type()))
-    phi = ifem_shape(dim, fe_t, elem, i, p);
-
+    {
+      phi = ifem_shape(dim, fe_t, elem, i, p);
+      return;
+    }
 #endif
 
   const Order o = fe_t.order;
@@ -764,6 +769,7 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
                                       const Point & p,
                                       RealGradient & phi)
 {
+   // This even does not handle infinite elements at all!?
   const Order o = fe_t.order;
 
   switch(dim)

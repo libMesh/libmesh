@@ -37,6 +37,8 @@
 #include "libmesh/utility.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_type.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fe_compute_data.h"
 
 // includes for calculate_norm, point_*
 #include "libmesh/fe_base.h"
@@ -1524,6 +1526,16 @@ Real System::calculate_norm(const NumericVector<Number> & v,
         {
           const unsigned int dim = elem->dim();
 
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+          // One way for implementing this would be to exchange the fe with the FEInterface- class.
+          // However, it needs to be discussed whether integral-norms make sense for infinite elements.
+          // or in which sense they could make sense.
+          if (elem->infinite() )
+            libmesh_not_implemented();
+
+#endif
+
           if (skip_dimensions && skip_dimensions->find(dim) != skip_dimensions->end())
             continue;
 
@@ -2074,25 +2086,20 @@ Number System::point_value(unsigned int var, const Point & p, const Elem & e) co
 
   FEType fe_type = dof_map.variable_type(var);
 
-  // Build a FE so we can calculate u(p)
-  UniquePtr<FEBase> fe (FEBase::build(e.dim(), fe_type));
+  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h.
+  Point coor = FEInterface::inverse_map(e.dim(), fe_type, &e, p);
 
-  // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
-  // Build a vector of point co-ordinates to send to reinit
-  std::vector<Point> coor(1, FEInterface::inverse_map(e.dim(), fe_type, &e, p));
-
-  // Get the shape function values
-  const std::vector<std::vector<Real>> & phi = fe->get_phi();
-
-  // Reinitialize the element and compute the shape function values at coor
-  fe->reinit (&e, &coor);
+  // get the shape function value via the FEInterface to also handle the case
+  // of infinite elements correcly, the shape function is not fe->phi().
+  FEComputeData fe_data(this->get_equation_systems(), coor);
+  FEInterface::compute_data(e.dim(), fe_type, &e, fe_data);
 
   // Get ready to accumulate a value
   Number u = 0;
 
   for (unsigned int l=0; l<num_dofs; l++)
     {
-      u += phi[l][0]*this->current_solution (dof_indices[l]);
+      u += fe_data.shape[l]*this->current_solution (dof_indices[l]);
     }
 
   return u;
@@ -2168,6 +2175,11 @@ Gradient System::point_gradient(unsigned int var, const Point & p, const Elem & 
   // expensive assert, but as long as debugging is turned on we might
   // as well try to catch a particularly nasty potential error
   libmesh_assert (e.contains_point(p));
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+   if (e.infinite())
+     libmesh_not_implemented();
+#endif
 
   // Get the dof map to get the proper indices for our computation
   const DofMap & dof_map = this->get_dof_map();
@@ -2282,6 +2294,11 @@ Tensor System::point_hessian(unsigned int var, const Point & p, const Elem & e) 
   // expensive assert, but as long as debugging is turned on we might
   // as well try to catch a particularly nasty potential error
   libmesh_assert (e.contains_point(p));
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+   if (e.infinite())
+     libmesh_not_implemented();
+#endif
 
   // Get the dof map to get the proper indices for our computation
   const DofMap & dof_map = this->get_dof_map();
