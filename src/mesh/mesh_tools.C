@@ -1879,7 +1879,8 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
       if (it == new_proc_ids.end())
         continue;
       const processor_id_type pid = it->second;
-      ids_to_push[node->processor_id()].push_back(std::make_pair(id, pid));
+      if (node->processor_id() != DofObject::invalid_processor_id)
+        ids_to_push[node->processor_id()].push_back(std::make_pair(id, pid));
     }
 
   // Push using non-blocking I/O
