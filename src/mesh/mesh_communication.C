@@ -1627,7 +1627,7 @@ struct NodeMaybeNew
     // have been refinement of that element which affects this node's
     // processor_id()
     for (auto s : elem->side_index_range())
-      if (elem->neighbor(s) == remote_elem)
+      if (elem->neighbor_ptr(s) == remote_elem)
         if (elem->is_node_on_side(local_node_num, s))
           return true;
 
