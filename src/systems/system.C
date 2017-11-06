@@ -1464,15 +1464,6 @@ Real System::calculate_norm(const NumericVector<Number> & v,
       return v_norm;
     }
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
-  // One way for implementing this would be to exchange the fe with the FEInterface- class.
-  // However, it needs to be discussed whether integral-norms make sense for infinite elements.
-  // or in which sense they could make sense.
-  libmesh_not_implemented();
-
-#endif
-
   // Localize the potentially parallel vector
   UniquePtr<NumericVector<Number>> local_v = NumericVector<Number>::build(this->comm());
   local_v->init(v.size(), true, SERIAL);
@@ -1556,6 +1547,16 @@ Real System::calculate_norm(const NumericVector<Number> & v,
         {
           const Elem * elem = *el;
           const unsigned int dim = elem->dim();
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+          // One way for implementing this would be to exchange the fe with the FEInterface- class.
+          // However, it needs to be discussed whether integral-norms make sense for infinite elements.
+          // or in which sense they could make sense.
+          if (elem->infinite() )
+            libmesh_not_implemented();
+
+#endif
 
           if (skip_dimensions && skip_dimensions->find(dim) != skip_dimensions->end())
             continue;
