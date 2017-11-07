@@ -69,7 +69,7 @@ PerfLog::~PerfLog()
     this->print_log();
 
   for (const auto & pos : non_temporary_strings)
-    delete pos.second;
+    delete [] pos.second;
 }
 
 
