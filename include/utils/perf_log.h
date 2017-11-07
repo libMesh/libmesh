@@ -288,6 +288,12 @@ public:
   PerfData get_perf_data(const std::string & label, const std::string & header="");
 
   /**
+   * Typdef for the underlying logging data structure.
+   */
+  typedef std::map<std::pair<const char *,
+                             const char *>,
+                   PerfData> log_type;
+  /**
    * \returns the raw underlying data structure for the entire performance log.
    *
    * \deprecated because encapsulation is good.
@@ -296,7 +302,7 @@ public:
    * though users who are liberal with "auto" might be safe.
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
-  const std::map < std::pair<const char *, const char *>, PerfData > & get_log_raw() const
+  const log_type & get_log_raw() const
   {
     libmesh_deprecated();
     return log;
@@ -333,9 +339,7 @@ private:
    * faster, but in my tests for our log sizes there was no
    * improvement.
    */
-  std::map<std::pair<const char *,
-                     const char *>,
-           PerfData> log;
+  log_type log;
 
   /**
    * A stack to hold the current performance log trace.
