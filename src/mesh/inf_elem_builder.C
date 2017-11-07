@@ -33,6 +33,7 @@
 #include "libmesh/cell_inf_hex16.h"
 #include "libmesh/cell_inf_hex18.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/remote_elem.h"
 
 namespace libMesh
 {
@@ -486,6 +487,11 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
   dof_id_type old_max_node_id = _mesh.max_node_id();
   dof_id_type old_max_elem_id = _mesh.max_elem_id();
 
+  // Likewise with our unique_ids
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  dof_id_type old_max_unique_id = _mesh.parallel_max_unique_id();
+#endif
+
   // for each boundary node, add an outer_node with
   // double distance from origin.
   std::set<dof_id_type>::iterator on_it = onodes.begin();
@@ -502,9 +508,13 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
           // Pick a unique id in parallel
           Node & bnode = _mesh.node_ref(*on_it);
           dof_id_type new_id = bnode.id() + old_max_node_id;
-          outer_nodes[*on_it] =
+          Node * new_node =
             this->_mesh.add_point(p, new_id,
                                   bnode.processor_id());
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+          new_node->set_unique_id() = old_max_unique_id + bnode.id();
+#endif
+          outer_nodes[*on_it] = new_node;
         }
     }
 
@@ -517,13 +527,12 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
   // build Elems based on boundary side type
   std::set<std::pair<dof_id_type,unsigned int>>::iterator face_it = ofaces.begin();
-  for ( ; face_it != ofaces.end(); ++face_it)
+  for (auto & p : ofaces)
     {
-      // Shortcut to the pair being iterated over
-      std::pair<dof_id_type,unsigned int> p = *face_it;
+      Elem & belem = this->_mesh.elem_ref(p.first);
 
       // build a full-ordered side element to get the base nodes
-      UniquePtr<Elem> side(this->_mesh.elem_ref(p.first).build_side_ptr(p.second));
+      UniquePtr<Elem> side(belem.build_side_ptr(p.second));
 
       // create cell depending on side type, assign nodes,
       // use braces to force scope.
@@ -582,17 +591,57 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
           continue;
         }
 
-      // In parallel, assign unique ids to the new element
+      const unsigned int n_base_vertices = side->n_vertices();
+
+      // On a distributed mesh, manually assign unique ids to the new
+      // element, and make sure any RemoteElem neighbor links are set.
       if (!_mesh.is_serial())
         {
-          Elem & belem = _mesh.elem_ref(p.first);
           el->processor_id() = belem.processor_id();
+
           // We'd better not have elements with more than 6 sides
+          libmesh_assert_less_equal(el->n_sides(), 6);
           el->set_id (belem.id() * 6 + p.second + old_max_elem_id);
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+          el->set_unique_id() = old_max_unique_id + old_max_node_id + belem.id();
+#endif
+
+          // If we have a remote neighbor on a boundary element side
+          if (belem.dim() > 1)
+            for (auto s : belem.side_index_range())
+              if (belem.neighbor_ptr(s) == remote_elem)
+                {
+                  // Find any corresponding infinite element side
+                  UniquePtr<const Elem> remote_side(belem.build_side_ptr(s));
+
+                  for (auto inf_s : el->side_index_range())
+                    {
+                      // The base side 0 shares all vertices but isn't
+                      // remote
+                      if (!inf_s)
+                        continue;
+
+                      // But another side, one which shares enough
+                      // vertices to show it's the same side, is.
+                      unsigned int n_shared_vertices = 0;
+                      for (unsigned int i = 0; i != n_base_vertices; ++i)
+                        for (auto & node : remote_side->node_ref_range())
+                          if (side->node_ptr(i) == &node &&
+                              el->is_node_on_side(i,inf_s))
+                            ++n_shared_vertices;
+
+                      if (n_shared_vertices + 1 >= belem.dim())
+                        {
+                          el->set_neighbor
+                            (inf_s, const_cast<RemoteElem *>(remote_elem));
+                          break;
+                        }
+                    }
+                }
         }
 
       // assign vertices to the new infinite element
-      const unsigned int n_base_vertices = side->n_vertices();
       for (unsigned int i=0; i<n_base_vertices; i++)
         {
           el->set_node(i                ) = side->node_ptr(i);

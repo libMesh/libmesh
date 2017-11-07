@@ -38,10 +38,10 @@
 #include <algorithm>
 #include <math.h>
 
-// Basic include file needed for the mesh functionality.
+// Basic include files needed for the mesh functionality.
 #include "libmesh/exodusII_io.h"
 #include "libmesh/libmesh.h"
-#include "libmesh/replicated_mesh.h"
+#include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/equation_systems.h"
@@ -98,10 +98,7 @@ int main (int argc, char ** argv)
 
   // Create a serialized mesh, distributed across the default MPI
   // communicator.
-  // InfElemBuilder still requires some updates to be DistributedMesh
-  // compatible
-
-  ReplicatedMesh mesh(init.comm());
+  Mesh mesh(init.comm());
 
   // Use the internal mesh generator to create elements
   // on the square [-1,1]^3, of type Hex8.
@@ -201,6 +198,8 @@ int main (int argc, char ** argv)
   // Solve the system "Wave".
   equation_systems.get_system("Wave").solve();
 
+  libMesh::out << "Wave system solved" << std::endl;
+
   // Write the whole EquationSystems object to file.
   // For infinite elements, the concept of nodal_soln()
   // is not applicable. Therefore, writing the mesh in
@@ -210,6 +209,8 @@ int main (int argc, char ** argv)
   // determine physically correct results within an
   // infinite element.
   equation_systems.write ("eqn_sys.dat", WRITE);
+
+  libMesh::out << "eqn_sys.dat written" << std::endl;
 
   // All done.
   return 0;
