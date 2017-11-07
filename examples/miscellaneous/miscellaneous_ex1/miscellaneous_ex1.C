@@ -198,6 +198,8 @@ int main (int argc, char ** argv)
   // Solve the system "Wave".
   equation_systems.get_system("Wave").solve();
 
+  libMesh::out << "Wave system solved" << std::endl;
+
   // Write the whole EquationSystems object to file.
   // For infinite elements, the concept of nodal_soln()
   // is not applicable. Therefore, writing the mesh in
@@ -207,6 +209,8 @@ int main (int argc, char ** argv)
   // determine physically correct results within an
   // infinite element.
   equation_systems.write ("eqn_sys.dat", WRITE);
+
+  libMesh::out << "eqn_sys.dat written" << std::endl;
 
   // All done.
   return 0;
