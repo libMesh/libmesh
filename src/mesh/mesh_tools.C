@@ -302,7 +302,7 @@ void MeshTools::find_boundary_nodes (const MeshBase & mesh,
     for (auto s : elem->side_index_range())
       if (elem->neighbor_ptr(s) == libmesh_nullptr) // on the boundary
         {
-          const UniquePtr<const Elem> side = elem->build_side_ptr(s);
+          UniquePtr<const Elem> side = elem->build_side_ptr(s);
 
           for (auto & node : side->node_ref_range())
             on_boundary[node.id()] = true;
