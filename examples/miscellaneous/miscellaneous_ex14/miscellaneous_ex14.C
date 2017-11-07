@@ -598,22 +598,13 @@ void line_print(EquationSystems& es, std::string output, std::string SysName)
   //Since we don't need any functionality that is special for EigenSystem,
   // we can use the base class here, thus keeping this function more general.
   System & system = es.get_system<System> (SysName);
-  const MeshBase & mesh = es.get_mesh();
-  const DofMap & dof_map = system.get_dof_map();
    
   Real r = 2*es.parameters.get<Real>("radius");
-  std::vector<dof_id_type> dof_indices;
-   
-  //In this function, the dimensionality is hard coded for simplicity.
-  const FEType & fe_type = dof_map.variable_type(0);
-  UniquePtr<FEBase> fe (FEBase::build(3, fe_type));
-  UniquePtr<FEBase> inf_fe (FEBase::build_InfFE(3, fe_type));
-  FEBase * cfe = libmesh_nullptr;
 
-  // Tell the finite element object which quadrature rule te be used.
-  QGauss qrule (3, fe_type.default_quadrature_order());
-  fe->attach_quadrature_rule (&qrule);
-  inf_fe->attach_quadrature_rule (&qrule);
+  // get the variable number to specify, at which quantity we want to look later:
+  unsigned short int phi_var=system.variable_number("phi");
+
+
   // set the full name of output-files:
   std::ostringstream re_output;
   re_output<<"re_"<<output;
@@ -627,44 +618,18 @@ void line_print(EquationSystems& es, std::string output, std::string SysName)
   std::ofstream re_out(im_output.str());
   std::ofstream abs_out(abs_output.str());
 
-  // The point locator tree finds the element, an arbitrary point is located in.
-  PointLocatorTree pt_lctr(mesh);
-
-  Real N = 50.;
+  Real N = 100.;
   Point q_point;
   const Real start=-r;
+  Number soln;
 
-  for (int pts=1;pts<=2*N;pts++) 
+  for (int pts=1;pts<=N;pts++)
     {
 
-      //specify the point to look at:
-      q_point = Point(start+ pts*r/N, 0., 0.);
-    
-      // find the element, it is located in
-      const Elem * elem=pt_lctr(q_point);
+      //specify the point to look at; going from -r to +r.
+      q_point = Point(start+ 2*pts*r/N, 0., 0.);
 
-      dof_map.dof_indices (elem, dof_indices);
-
-      // initialise the shape functions at \p q_point.
-      Point map_point=FEInterface::inverse_map(3, fe_type, elem, q_point, TOLERANCE, true); 
-      FEComputeData data(es, map_point); 
-      FEInterface::compute_data(3, fe_type, elem, data);
-    
-      //compute solution value at \p q_point.
-      Number soln=0;
-      if (elem->infinite())
-        cfe = inf_fe.get();
-      else
-        cfe = fe.get();
-      cfe->reinit(elem);
-
-      unsigned int n_sf= cfe->n_shape_functions();
-
-      // sum the contributions from all degrees of freedoms:
-      for (unsigned int i=0; i<n_sf; i++)
-        {
-          soln+=system.solution->operator()(dof_indices[i])*data.shape[i];
-        }
+      soln=system.point_value(phi_var, q_point);
 
       // and print them to the output-file:
       re_out<<" "<<std::setw(12)<<q_point(0);
