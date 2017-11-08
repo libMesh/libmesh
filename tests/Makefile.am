@@ -186,7 +186,8 @@ endif
 
 CLEANFILES = cube_mesh.xda \
              checkpoint_splitter.cpr* checkpoint_splitter.cpa* \
-             slit_mesh.xda slit_solution.xda
+             slit_mesh.xda slit_solution.xda \
+	     out.e
 
 ######################################################################
 #
