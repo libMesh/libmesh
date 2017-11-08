@@ -5542,6 +5542,11 @@ fi
     # find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
+      *gcc\ version\ 7.*)
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-7.x >>>" >&5
+$as_echo "<<< C++ compiler is gcc-7.x >>>" >&6; }
+        GXX_VERSION=gcc7
+        ;;
       *gcc\ version\ 6.*)
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-6.x >>>" >&5
 $as_echo "<<< C++ compiler is gcc-6.x >>>" >&6; }

@@ -176,6 +176,10 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
     # find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
+      *gcc\ version\ 7.*)
+        AC_MSG_RESULT(<<< C++ compiler is gcc-7.x >>>)
+        GXX_VERSION=gcc7
+        ;;
       *gcc\ version\ 6.*)
         AC_MSG_RESULT(<<< C++ compiler is gcc-6.x >>>)
         GXX_VERSION=gcc6
