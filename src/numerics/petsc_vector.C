@@ -1072,7 +1072,7 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex> & v_local,
     v_local[i] = 0.;
 
   // only one processor
-  if (n == nl)
+  if (n_processors() == 1)
     {
       ierr = VecGetArray (_vec, &values);
       LIBMESH_CHKERR(ierr);
