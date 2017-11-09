@@ -109,7 +109,8 @@ public:
   virtual void init ();
 
   /**
-   * Reinitialize all the systems
+   * Handle any mesh changes and reinitialize all the systems on the
+   * updated mesh
    */
   virtual void reinit ();
 
@@ -460,6 +461,18 @@ public:
    **/
   bool refine_in_reinit_flag() { return this->_refine_in_reinit; }
 
+  /**
+   * Handle any mesh changes and project any solutions onto the
+   * updated mesh.
+   *
+   * \returns Whether or not the mesh may have changed.
+   */
+  bool reinit_solutions ();
+
+  /**
+   * Reinitialize all systems on the current mesh.
+   */
+  virtual void reinit_systems ();
 
   /**
    * Data structure holding arbitrary parameters.

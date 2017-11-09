@@ -118,6 +118,18 @@ void EquationSystems::init ()
 
 void EquationSystems::reinit ()
 {
+  const bool mesh_changed = this->reinit_solutions();
+
+  // If the mesh has changed, systems will need to reinitialize their
+  // own data on the new mesh.
+  if (mesh_changed)
+    this->reinit_systems();
+}
+
+
+
+bool EquationSystems::reinit_solutions ()
+{
   parallel_object_only();
 
   const unsigned int n_sys = this->n_systems();
@@ -249,15 +261,17 @@ void EquationSystems::reinit ()
           // dof_constraints_created = true;
         }
     }
-
-  // If the mesh has changed, systems will need to create new dof
-  // constraints and update their global solution vectors
-  if (mesh_changed)
-    {
-      for (unsigned int i=0; i != this->n_systems(); ++i)
-        this->get_system(i).reinit();
-    }
 #endif // #ifdef LIBMESH_ENABLE_AMR
+
+  return mesh_changed;
+}
+
+
+
+void EquationSystems::reinit_systems()
+{
+  for (unsigned int i=0; i != this->n_systems(); ++i)
+    this->get_system(i).reinit();
 }
 
 
