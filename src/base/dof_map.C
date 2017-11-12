@@ -2424,9 +2424,10 @@ void DofMap::old_dof_indices (const Elem * const elem,
   for (unsigned int v=0; v<n_vars; v++)
     if ((v == vn) || (vn == libMesh::invalid_uint))
       {
-        if (this->variable(v).type().family == SCALAR &&
+        const Variable & var = this->variable(v);
+        if (var.type().family == SCALAR &&
             (!elem ||
-             this->variable(v).active_on_subdomain(elem->subdomain_id())))
+             var.active_on_subdomain(elem->subdomain_id())))
           {
             // We asked for this variable, so add it to the vector.
             std::vector<dof_id_type> di_new;
@@ -2434,7 +2435,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
             di.insert( di.end(), di_new.begin(), di_new.end());
           }
         else
-          if (this->variable(v).active_on_subdomain(elem->subdomain_id()))
+          if (var.active_on_subdomain(elem->subdomain_id()))
             { // Do this for all the variables if one was not specified
               // or just for the specified variable
 
@@ -2451,7 +2452,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
                 {
                   p_adjustment = 1;
                 }
-              FEType fe_type = this->variable_type(v);
+              FEType fe_type = var.type();
               fe_type.order = static_cast<Order>(fe_type.order +
                                                  elem->p_level() +
                                                  p_adjustment);
@@ -2486,8 +2487,8 @@ void DofMap::old_dof_indices (const Elem * const elem,
                   // simplify p refinement)
                   if (extra_hanging_dofs && !elem->is_vertex(n))
                     {
-                      const int dof_offset =
-                        node->old_dof_object->n_comp(sys_num,v) - nc;
+                      const int n_comp = node->old_dof_object->n_comp(sys_num,v);
+                      const int dof_offset = n_comp - nc;
 
                       // We should never have fewer dofs than necessary on a
                       // node unless we're getting indices on a parent element
@@ -2499,8 +2500,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
                           di.resize(di.size() + nc, DofObject::invalid_id);
                         }
                       else
-                        for (int i=node->old_dof_object->n_comp(sys_num,v)-1;
-                             i>=dof_offset; i--)
+                        for (int i=n_comp-1; i>=dof_offset; i--)
                           {
                             libmesh_assert_not_equal_to (node->old_dof_object->dof_number(sys_num,v,i),
                                                          DofObject::invalid_id);
