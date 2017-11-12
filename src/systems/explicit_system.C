@@ -53,18 +53,6 @@ void ExplicitSystem::clear ()
 
 
 
-void ExplicitSystem::reinit ()
-{
-  // initialize parent data
-  Parent::reinit();
-
-  // not necessary, handled by the parent!
-  // Resize the RHS conformal to the current mesh
-  //rhs->init (this->n_dofs(), this->n_local_dofs());
-}
-
-
-
 void ExplicitSystem::assemble_qoi (const QoISet & qoi_indices)
 {
   // The user quantity of interest assembly gets to expect to

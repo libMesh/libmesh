@@ -84,20 +84,6 @@ void TransientSystem<Base>::clear ()
 
 
 template <class Base>
-void TransientSystem<Base>::reinit ()
-{
-  // initialize parent data
-  Base::reinit();
-
-  // Project the old & older vectors to the new mesh
-  // The System::reinit handles this now
-  // this->project_vector (*old_local_solution);
-  // this->project_vector (*older_local_solution);
-}
-
-
-
-template <class Base>
 void TransientSystem<Base>::re_update ()
 {
   // re_update the parent system

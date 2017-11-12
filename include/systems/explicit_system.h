@@ -71,12 +71,6 @@ public:
   virtual void clear () libmesh_override;
 
   /**
-   * Reinitializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
-   */
-  virtual void reinit () libmesh_override;
-
-  /**
    * Prepares \p qoi for quantity of interest assembly, then calls
    * user qoi function.
    * Can be overridden in derived classes.
