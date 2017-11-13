@@ -261,9 +261,12 @@ bool EquationSystems::reinit_solutions ()
           // dof_constraints_created = true;
         }
     }
-#endif // #ifdef LIBMESH_ENABLE_AMR
 
   return mesh_changed;
+
+#endif // #ifdef LIBMESH_ENABLE_AMR
+
+  return false;
 }
 
 
