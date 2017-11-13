@@ -14,6 +14,8 @@
 #include "libmesh/parsed_function.h"
 #include "libmesh/system.h"
 
+#ifdef LIBMESH_HAVE_FPARSER
+
 // test includes
 #include "test_comm.h"
 
@@ -127,3 +129,5 @@ private:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ParsedFunctionTest);
+
+#endif // #ifdef LIBMESH_HAVE_FPARSER
