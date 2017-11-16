@@ -140,6 +140,18 @@ public:
                                      const std::set<std::string> * system_names=libmesh_nullptr);
 
   /**
+   * Writes a discontinuous solution at a specific timestep
+   * \param fname Name of the file to be written
+   * \param es EquationSystems object which contains the solution vector
+   * \param timestep The timestep to write out. (should be _1_ indexed)
+   * \param time The current simulation time
+   */
+  void write_timestep_discontinuous (const std::string &fname,
+                                     const EquationSystems &es,
+                                     const int timestep,
+                                     const Real time);
+
+  /**
    * Write out element solution.
    */
   void write_element_data (const EquationSystems & es);
