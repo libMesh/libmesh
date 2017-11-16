@@ -100,7 +100,19 @@ void ExodusII_IO::write_discontinuous_exodusII(const std::string & name,
 }
 
 
+void ExodusII_IO::write_timestep_discontinuous (const std::string &fname,
+                                                const EquationSystems &es,
+                                                const int timestep,
+                                                const Real time)
+{
+  _timestep = timestep;
+  write_discontinuous_exodusII(fname,es);
 
+  if (MeshOutput<MeshBase>::mesh().processor_id())
+    return;
+
+  exio_helper->write_timestep(timestep, time);
+}
 
 // ------------------------------------------------------------
 // When the Exodus API is present...
