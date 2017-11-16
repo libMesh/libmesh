@@ -355,6 +355,9 @@ void System::restrict_vectors ()
   // Restrict the solution on the coarsened cells
   if (_solution_projection)
     this->project_vector (*solution);
+  // Or at least make sure the solution vector is the correct size
+  else
+    solution->init (this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
 
 #ifdef LIBMESH_ENABLE_GHOSTED
   current_local_solution->init(this->n_dofs(),
@@ -384,30 +387,8 @@ void System::prolong_vectors ()
 
 void System::reinit ()
 {
-  //If no variables have been added to this system
-  //don't do anything
-  if (!this->n_vars())
-    return;
-
-  // Constraints get handled in EquationSystems::reinit now
-  //  _dof_map->create_dof_constraints(this->get_mesh());
-
-  // Update the solution based on the projected
-  // current_local_solution.
-  solution->init (this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
-
+  // project_vector handles vector initialization now
   libmesh_assert_equal_to (solution->size(), current_local_solution->size());
-  // Not true with ghosted vectors
-  // libmesh_assert_equal_to (solution->size(), current_local_solution->local_size());
-
-  const dof_id_type first_local_dof = solution->first_local_index();
-  const dof_id_type local_size      = solution->local_size();
-
-  for (dof_id_type i=0; i<local_size; i++)
-    solution->set(i+first_local_dof,
-                  (*current_local_solution)(i+first_local_dof));
-
-  solution->close();
 }
 
 

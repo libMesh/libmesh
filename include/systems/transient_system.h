@@ -82,12 +82,6 @@ public:
   virtual void clear () libmesh_override;
 
   /**
-   * Reinitializes the member data fields associated with
-   * the system, so that, e.g., \p assemble() may be used.
-   */
-  virtual void reinit () libmesh_override;
-
-  /**
    * \returns \p "Transient" prepended to T::system_type().
    * Helps in identifying the system type in an equation
    * system file.
