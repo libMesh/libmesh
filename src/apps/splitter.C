@@ -153,8 +153,7 @@ int main (int argc, char ** argv)
           cpr.parallel() = true;
           cpr.binary() = binary;
           std::ostringstream outputname;
-          outputname << remove_extension(filename) << '.' << n_procs
-            << (binary ? ".cpr" : ".cpa");
+          outputname << remove_extension(filename) << (binary ? ".cpr" : ".cpa");
           cpr.write(outputname.str());
         }
     }
