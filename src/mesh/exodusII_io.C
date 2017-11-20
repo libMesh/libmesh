@@ -100,6 +100,7 @@ void ExodusII_IO::write_discontinuous_exodusII(const std::string & name,
 }
 
 
+#ifdef LIBMESH_HAVE_EXODUS_API
 void ExodusII_IO::write_timestep_discontinuous (const std::string &fname,
                                                 const EquationSystems &es,
                                                 const int timestep,
@@ -113,6 +114,15 @@ void ExodusII_IO::write_timestep_discontinuous (const std::string &fname,
 
   exio_helper->write_timestep(timestep, time);
 }
+
+#else
+void ExodusII_IO::write_timestep_discontinuous (const std::string & /* fname */,
+                                                const EquationSystems & /* es */,
+                                                const int /* timestep */,
+                                                const Real /* time */)
+{ libmesh_error(); }
+#endif
+
 
 // ------------------------------------------------------------
 // When the Exodus API is present...
