@@ -446,13 +446,13 @@ public:
   OldSolutionCoefs(const libMesh::System & sys_in) :
     OldSolutionBase<Output, point_output>(sys_in)
   {
-    this->old_context.set_algebraic_type(FEMContext::DOFS_ONLY);
+    this->old_context.set_algebraic_type(FEMContext::OLD_DOFS_ONLY);
   }
 
   OldSolutionCoefs(const OldSolutionCoefs & in) :
     OldSolutionBase<Output, point_output>(in.sys)
   {
-    this->old_context.set_algebraic_type(FEMContext::DOFS_ONLY);
+    this->old_context.set_algebraic_type(FEMContext::OLD_DOFS_ONLY);
   }
 
   DSNA eval_at_node (const FEMContext & c,
