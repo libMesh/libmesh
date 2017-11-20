@@ -1657,6 +1657,18 @@ public:
    */
   bool & hide_output() { return _hide_output; }
 
+  /**
+   * This method creates a projection matrix which corresponds to the
+   * operation of project_vector between old and new solution spaces.
+   *
+   * Heterogeneous Dirichlet boundary conditions are *not* taken into
+   * account here; if this matrix is used for prolongation (mesh
+   * refinement) on a side with a heterogeneous BC, the newly created
+   * degrees of freedom on that side will still match the coarse grid
+   * approximation of the BC, not the fine grid approximation.
+   */
+  void projection_matrix (SparseMatrix<Number> & proj_mat) const;
+
 protected:
 
   /**
@@ -1688,18 +1700,6 @@ protected:
   void project_vector (const NumericVector<Number> &,
                        NumericVector<Number> &,
                        int is_adjoint = -1) const;
-
-  /**
-   * This method creates a projection matrix which corresponds to the
-   * operation of project_vector between old and new solution spaces.
-   *
-   * Heterogeneous Dirichlet boundary conditions are *not* taken into
-   * account here; if this matrix is used for prolongation (mesh
-   * refinement) on a side with a heterogeneous BC, the newly created
-   * degrees of freedom on that side will still match the coarse grid
-   * approximation of the BC, not the fine grid approximation.
-   */
-  void projection_matrix (SparseMatrix<Number> & proj_mat) const;
 
 private:
   /**
