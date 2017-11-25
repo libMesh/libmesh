@@ -54,6 +54,7 @@ public:
   CPPUNIT_TEST( testProjectMeshFunctionHex27 );
 
   CPPUNIT_TEST( testProjectMatrixEdge2 );
+  CPPUNIT_TEST( testProjectMatrixQuad4 );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -304,6 +305,140 @@ public:
     CPPUNIT_ASSERT(diff_norm/gold_norm < TOLERANCE*TOLERANCE);
   }
 
+  void testProjectMatrix2D(const ElemType elem_type)
+  {
+    Mesh mesh(*TestCommWorld);
+
+    // fix the node numbering to resolve dof_id numbering issues in parallel tests
+    mesh.allow_renumbering(false);
+
+    // init a simple 1d system
+    EquationSystems es(mesh);
+    System &sys = es.add_system<System> ("SimpleSystem");
+    sys.add_variable("u", FIRST, LAGRANGE);
+
+    MeshTools::Generation::build_square (mesh,
+                                         2, 2,
+                                         0., 1., 0., 1.,
+                                         elem_type);
+
+    es.init();
+
+    // static sets of nodes and their neighbors
+    std::set<dof_id_type> coarse_nodes({0,1,2,3,4,5,6,7,8});
+    std::map<dof_id_type, std::vector<dof_id_type>> side_nbr_nodes;
+    std::map<dof_id_type, std::vector<dof_id_type>> int_nbr_nodes;
+
+    // fill neighbor maps based on static node numbering
+    side_nbr_nodes.insert({9, {0,1}});
+    side_nbr_nodes.insert({14, {1,2}});
+    side_nbr_nodes.insert({11, {0,3}});
+    side_nbr_nodes.insert({12, {1,4}});
+    side_nbr_nodes.insert({16, {2,5}});
+    side_nbr_nodes.insert({13, {3,4}});
+    side_nbr_nodes.insert({17, {4,5}});
+    side_nbr_nodes.insert({19, {3,6}});
+    side_nbr_nodes.insert({20, {4,7}});
+    side_nbr_nodes.insert({23, {5,8}});
+    side_nbr_nodes.insert({21, {6,7}});
+    side_nbr_nodes.insert({24, {7,8}});
+
+    int_nbr_nodes.insert({10, {0,1,3,4}});
+    int_nbr_nodes.insert({15, {1,2,4,5}});
+    int_nbr_nodes.insert({18, {3,4,6,7}});
+    int_nbr_nodes.insert({22, {4,5,7,8}});
+
+    // stash number of dofs on coarse grid for projection sizing
+    int n_old_dofs = sys.n_dofs();
+
+    // save old coarse dof_ids in order of coarse nodes
+    std::map <dof_id_type, dof_id_type> node2dof_c;
+    for ( const auto & node : mesh.node_ptr_range() )
+      {
+        dof_id_type cdof_id = node->dof_number(0,0,0);
+        node2dof_c.insert( std::pair<dof_id_type,dof_id_type>( node->id() , cdof_id) );
+      }
+
+    // refine the mesh so we can utilize old_dof_indices for projection_matrix
+    MeshRefinement mr(mesh);
+    mr.uniformly_refine(1);
+    sys.get_dof_map().distribute_dofs(mesh);
+
+    // fine node to dof map
+    std::map <dof_id_type, dof_id_type> node2dof_f;
+    for ( const auto & node : mesh.local_node_ptr_range() )
+      {
+        dof_id_type fdof_id = node->dof_number(0,0,0);
+        node2dof_f.insert( std::pair<dof_id_type,dof_id_type>(node->id() , fdof_id) );
+        //out << "proc: "<< sys.processor_id() << " nod: " << node->id() << " dof: " << fdof_id <<
+        //   " at " << *static_cast<const Point *>(node) << std::endl;
+      }
+
+    // local and global projection_matrix sizes infos
+    int n_new_dofs = sys.n_dofs();
+    int n_new_dofs_local = sys.get_dof_map().n_dofs_on_processor(sys.processor_id());
+    int ndofs_old_first = sys.get_dof_map().first_old_dof(sys.processor_id());
+    int ndofs_old_end   = sys.get_dof_map().end_old_dof(sys.processor_id());
+    int n_old_dofs_local = ndofs_old_end - ndofs_old_first;
+
+    // init and compute the projection matrix using GenericProjector
+    PetscMatrix<Number> proj_mat(*TestCommWorld);
+    proj_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs_local);
+    sys.projection_matrix(proj_mat);
+    proj_mat.close();
+
+    // init the gold standard projection matrix
+    PetscMatrix<Number> gold_mat(*TestCommWorld);
+    gold_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs);
+
+    // construct the gold projection matrix using static node numbering as reference info
+    for ( const auto & node : mesh.local_node_ptr_range() )
+      {
+        dof_id_type node_id = node->id();
+        dof_id_type fdof_id = (node2dof_f.find(node_id))->second;
+
+        if (coarse_nodes.find(node_id) != coarse_nodes.end() )
+          { // direct inject coarse nodes
+            if (fdof_id >= gold_mat.row_start() && fdof_id < gold_mat.row_stop())
+              {
+                auto cdof_id = node2dof_c.find(node_id);
+                gold_mat.set(fdof_id, cdof_id->second, 1.0);
+              }
+          }
+        else if ( side_nbr_nodes.find(node_id) != side_nbr_nodes.end() )
+          { // new side nodes with old_dof neighbor contributions
+            if (fdof_id >= gold_mat.row_start() && fdof_id < gold_mat.row_stop())
+              {
+                auto node_nbrs = side_nbr_nodes.find(node_id);
+                for (auto nbr : node_nbrs->second)
+                  {
+                    auto nbr_dof = node2dof_c.find(nbr);
+                    gold_mat.set(fdof_id, nbr_dof->second, 0.5);
+                  }
+              }
+          }
+        else
+          { // new interior nodes with old_dof neighbor contributions
+            if (fdof_id >= gold_mat.row_start() && fdof_id < gold_mat.row_stop())
+              {
+                auto node_nbrs = int_nbr_nodes.find(node_id);
+                for (auto nbr : node_nbrs->second)
+                  {
+                    auto nbr_dof = node2dof_c.find(nbr);
+                    gold_mat.set(fdof_id, nbr_dof->second, 0.25);
+                  }
+              }
+          }
+      } // end gold mat build
+    gold_mat.close();
+
+    // calculate relative difference norm between the two projection matrices
+    Real gold_norm = gold_mat.linfty_norm();
+    proj_mat.add(-1.0, gold_mat);
+    Real diff_norm = proj_mat.linfty_norm();
+    CPPUNIT_ASSERT(diff_norm/gold_norm < TOLERANCE*TOLERANCE);
+  }
+
   void testProjectHierarchicEdge3() { testProjectLine(EDGE3); }
   void testProjectHierarchicQuad9() { testProjectSquare(QUAD9); }
   void testProjectHierarchicTri6()  { testProjectSquare(TRI6); }
@@ -312,6 +447,7 @@ public:
 
   // projection matrix tests
   void testProjectMatrixEdge2() { testProjectMatrix1D(EDGE2); }
+  void testProjectMatrixQuad4() { testProjectMatrix2D(QUAD4); }
 
 };
 
