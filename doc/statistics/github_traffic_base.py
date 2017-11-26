@@ -2,7 +2,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-import csv
 
 # Import stuff for working with dates
 from datetime import datetime
@@ -58,15 +57,13 @@ class PlotData(object):
 
   # Function which plots the two datasets on a single plot with two y axes.
   def plot_data(self):
-    # Read the data from the CSV file.
-    date_strings = []
-    data_column2 = []
-    data_column3 = []
-    with open(self.data_file, 'r') as f:
-      for row in csv.reader(f):
-        date_strings.append(row[0])
-        data_column2.append(int(row[1]))
-        data_column3.append(int(row[2]))
+    # Read the data from the CSV file. "|S11" refers to an 11 character string.
+    # When you specify the dtype argument, the data is read into a structured
+    # array and the columns can be accessed with the 'f0', 'f1', etc. names.
+    data = np.genfromtxt(self.data_file, delimiter=',', dtype=("|S11", int, int))
+    date_strings = data['f0']
+    data_column2 = data['f1']
+    data_column3 = data['f2']
 
     # Convert date strings into numbers.
     date_nums = []
