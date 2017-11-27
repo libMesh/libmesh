@@ -55,6 +55,7 @@ public:
 
   CPPUNIT_TEST( testProjectMatrixEdge2 );
   CPPUNIT_TEST( testProjectMatrixQuad4 );
+  CPPUNIT_TEST( testProjectMatrixTri3 );
   CPPUNIT_TEST( testProjectMatrixHex8 );
 
   CPPUNIT_TEST_SUITE_END();
@@ -318,36 +319,57 @@ public:
     System &sys = es.add_system<System> ("SimpleSystem");
     sys.add_variable("u", FIRST, LAGRANGE);
 
-    MeshTools::Generation::build_square (mesh,
-                                         2, 2,
-                                         0., 1., 0., 1.,
-                                         elem_type);
+    if (elem_type == Utility::string_to_enum<ElemType>("QUAD4"))
+      MeshTools::Generation::build_square (mesh,
+                                           2, 2,
+                                           0., 1., 0., 1.,
+                                           elem_type);
+    else if (elem_type == Utility::string_to_enum<ElemType>("TRI3"))
+      MeshTools::Generation::build_square (mesh,
+                                           1, 1,
+                                           0., 1., 0., 1.,
+                                           elem_type);
 
     es.init();
 
     // static sets of nodes and their neighbors
-    std::set<dof_id_type> coarse_nodes({0,1,2,3,4,5,6,7,8});
+    std::set<dof_id_type> coarse_nodes;
     std::map<dof_id_type, std::vector<dof_id_type>> side_nbr_nodes;
     std::map<dof_id_type, std::vector<dof_id_type>> int_nbr_nodes;
 
     // fill neighbor maps based on static node numbering
-    side_nbr_nodes.insert({9, {0,1}});
-    side_nbr_nodes.insert({14, {1,2}});
-    side_nbr_nodes.insert({11, {0,3}});
-    side_nbr_nodes.insert({12, {1,4}});
-    side_nbr_nodes.insert({16, {2,5}});
-    side_nbr_nodes.insert({13, {3,4}});
-    side_nbr_nodes.insert({17, {4,5}});
-    side_nbr_nodes.insert({19, {3,6}});
-    side_nbr_nodes.insert({20, {4,7}});
-    side_nbr_nodes.insert({23, {5,8}});
-    side_nbr_nodes.insert({21, {6,7}});
-    side_nbr_nodes.insert({24, {7,8}});
+    if (elem_type == Utility::string_to_enum<ElemType>("QUAD4"))
+      {
+        coarse_nodes.insert({0,1,2,3,4,5,6,7,8});
 
-    int_nbr_nodes.insert({10, {0,1,3,4}});
-    int_nbr_nodes.insert({15, {1,2,4,5}});
-    int_nbr_nodes.insert({18, {3,4,6,7}});
-    int_nbr_nodes.insert({22, {4,5,7,8}});
+        side_nbr_nodes.insert({9, {0,1}});
+        side_nbr_nodes.insert({14, {1,2}});
+        side_nbr_nodes.insert({11, {0,3}});
+        side_nbr_nodes.insert({12, {1,4}});
+        side_nbr_nodes.insert({16, {2,5}});
+        side_nbr_nodes.insert({13, {3,4}});
+        side_nbr_nodes.insert({17, {4,5}});
+        side_nbr_nodes.insert({19, {3,6}});
+        side_nbr_nodes.insert({20, {4,7}});
+        side_nbr_nodes.insert({23, {5,8}});
+        side_nbr_nodes.insert({21, {6,7}});
+        side_nbr_nodes.insert({24, {7,8}});
+
+        int_nbr_nodes.insert({10, {0,1,3,4}});
+        int_nbr_nodes.insert({15, {1,2,4,5}});
+        int_nbr_nodes.insert({18, {3,4,6,7}});
+        int_nbr_nodes.insert({22, {4,5,7,8}});
+      }
+    else if (elem_type == Utility::string_to_enum<ElemType>("TRI3"))
+      {
+        coarse_nodes.insert({0,1,2,3});
+
+        side_nbr_nodes.insert({4, {0,1}});
+        side_nbr_nodes.insert({5, {0,3}});
+        side_nbr_nodes.insert({6, {1,3}});
+        side_nbr_nodes.insert({7, {0,2}});
+        side_nbr_nodes.insert({8, {2,3}});
+      }
 
     // stash number of dofs on coarse grid for projection sizing
     int n_old_dofs = sys.n_dofs();
@@ -598,6 +620,7 @@ public:
   // projection matrix tests
   void testProjectMatrixEdge2() { testProjectMatrix1D(EDGE2); }
   void testProjectMatrixQuad4() { testProjectMatrix2D(QUAD4); }
+  void testProjectMatrixTri3() { testProjectMatrix2D(TRI3); }
   void testProjectMatrixHex8() { testProjectMatrix3D(HEX8); }
 
 };
