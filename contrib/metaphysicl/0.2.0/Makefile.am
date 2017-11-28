@@ -1,7 +1,8 @@
 # Doxygen support
 include $(top_srcdir)/doxygen/aminclude.am
 
-AUTOMAKE_OPTIONS = foreign
+# AUTOMAKE_OPTIONS = foreign # Conflicts with libMesh options
+AUTOMAKE_OPTIONS = gnu
 ACLOCAL_AMFLAGS  = -I m4 -I m4/common
 
 SUBDIRS          = src test doxygen
