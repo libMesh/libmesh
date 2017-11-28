@@ -225,9 +225,10 @@ am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/metaphysicl.pc.in \
 	$(top_srcdir)/doxygen/aminclude.am \
 	$(top_srcdir)/doxygen/txt_common/about_vpath.page.in \
 	$(top_srcdir)/src/utilities/include/metaphysicl/metaphysicl_version.h.in \
-	AUTHORS COPYING build-aux/compile build-aux/config.guess \
-	build-aux/config.sub build-aux/depcomp build-aux/install-sh \
-	build-aux/ltmain.sh build-aux/missing
+	AUTHORS COPYING ChangeLog INSTALL NEWS README \
+	build-aux/compile build-aux/config.guess build-aux/config.sub \
+	build-aux/depcomp build-aux/install-sh build-aux/ltmain.sh \
+	build-aux/missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -512,7 +513,9 @@ PECOS_extra_dependencies = $(top_srcdir)/doxygen/metaphysicl.page \
 
 
 # Doxygen support
-AUTOMAKE_OPTIONS = foreign
+
+# AUTOMAKE_OPTIONS = foreign # Conflicts with libMesh options
+AUTOMAKE_OPTIONS = gnu
 ACLOCAL_AMFLAGS = -I m4 -I m4/common
 SUBDIRS = src test doxygen
 EXTRA_DIST = CHANGES LICENSE COPYING share docs
@@ -566,15 +569,15 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/doxygen/aminclude.am
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign'; \
-	      $(am__cd) $(srcdir) && $(AUTOMAKE) --foreign \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --gnu'; \
+	      $(am__cd) $(srcdir) && $(AUTOMAKE) --gnu \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign Makefile
+	  $(AUTOMAKE) --gnu Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
