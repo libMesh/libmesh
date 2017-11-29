@@ -1,0 +1,19 @@
+0.1.0 -> 0.2.0
+  * Build system fixes
+  * New unit test
+  * Many more assorted bug fixes
+
+0.0.0 -> 0.1.0
+  * Compile-time sparse array/vector types
+  * Run-time sparse array/vector types
+  * DualExpression for performance with expression templates
+  * NamedIndexArray for physics kernel experimentation
+  * VexCL integration
+  * More logical operators
+  * Many more unit tests
+  * Many assorted bug fixes
+
+0.0.0
+  * DualNumber recursive automatic differentiation
+  * NumberVector, NumberArray operator overloading
+  * Recursive gradients, tensors, etc.

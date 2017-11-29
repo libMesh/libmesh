@@ -638,6 +638,18 @@ AC_CONFIG_FILES([contrib/nanoflann/Makefile])
 
 
 # -------------------------------------------------------------
+# MetaPhysicL -- enabled by default
+# -------------------------------------------------------------
+CONFIGURE_METAPHYSICL
+if (test $enablemetaphysicl = yes); then
+  libmesh_contrib_INCLUDES="$METAPHYSICL_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_METAPHYSICL, test x$enablemetaphysicl = xyes)
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
 # libcurl -- enabled by default
 # Note: I tried to use the m4 files ax_lib_curl.m4 and
 # ax_path_generic.m4 from the autoconf-archive for this, but they

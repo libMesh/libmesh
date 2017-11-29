@@ -1,0 +1,13 @@
+# @PACKAGE_NAME@ installation details
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: @PACKAGE_TARNAME@
+Description: @PACKAGE_DESCRIPTION@
+URL: @PACKAGE_URL@
+Requires:
+Version: @VERSION@
+Libs: -L${libdir} -l@PACKAGE_TARNAME@
+Cflags: -I${includedir}

@@ -529,6 +529,10 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* Flag indicating whether the library will be compiled with MetaPhysicL
+   support */
+#undef HAVE_METAPHYSICL
+
 /* Flag indicating whether the library will be compiled with Metis support */
 #undef HAVE_METIS
 

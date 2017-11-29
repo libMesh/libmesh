@@ -934,7 +934,9 @@ public:
                        DOFS_ONLY, // Reinitialize dof_indices, not
                                   // algebraic structures
                        CURRENT,   // Use dof_indices, current solution
-                       OLD };     // Use old_dof_indices, custom solution
+                       OLD,       // Use old_dof_indices, custom solution
+                       OLD_DOFS_ONLY}; // Reinitialize old_dof_indices, not
+                                       // algebraic structures
 
   /**
    * Setting which determines whether to initialize algebraic
@@ -981,6 +983,14 @@ public:
    */
   unsigned char edge;
 
+  /**
+   * Helper function to reduce some code duplication in the *_point_* methods.
+   */
+  template<typename OutputShape>
+  FEGenericBase<OutputShape> * build_new_fe(const FEGenericBase<OutputShape> * fe,
+                                            const Point & p,
+                                            const Real tolerance = TOLERANCE) const;
+
 protected:
 
   /**
@@ -992,14 +1002,6 @@ protected:
    * Data with which to do algebra reinitialization
    */
   const NumericVector<Number> * _custom_solution;
-
-  /**
-   * Helper function to reduce some code duplication in the *_point_* methods.
-   */
-  template<typename OutputShape>
-  FEGenericBase<OutputShape> * build_new_fe( const FEGenericBase<OutputShape> * fe,
-                                             const Point & p,
-                                             const Real tolerance = TOLERANCE) const;
 
   mutable UniquePtr<FEGenericBase<Real>>         _real_fe;
   mutable UniquePtr<FEGenericBase<RealGradient>> _real_grad_fe;

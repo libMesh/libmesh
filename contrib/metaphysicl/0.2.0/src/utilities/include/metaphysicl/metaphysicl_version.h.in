@@ -1,0 +1,56 @@
+//-----------------------------------------------------------------------bl-
+//--------------------------------------------------------------------------
+// 
+// MetaPhysicL - A metaprogramming library for physics calculations
+//
+// Copyright (C) 2013 The PECOS Development Team
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the Version 2.1 GNU Lesser General
+// Public License as published by the Free Software Foundation.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc. 51 Franklin Street, Fifth Floor,
+// Boston, MA  02110-1301  USA
+//
+//-----------------------------------------------------------------------el-
+//
+// $Id$
+//
+//--------------------------------------------------------------------------
+//--------------------------------------------------------------------------
+#ifndef METAPHYSICL_VERSION_H
+#define METAPHYSICL_VERSION_H
+
+#define METAPHYSICL_MAJOR_VERSION  @GENERIC_MAJOR_VERSION@
+#define METAPHYSICL_MINOR_VERSION  @GENERIC_MINOR_VERSION@
+#define METAPHYSICL_MICRO_VERSION  @GENERIC_MICRO_VERSION@
+
+#define METAPHYSICL_BUILD_USER     "@BUILD_USER@"
+#define METAPHYSICL_BUILD_ARCH     "@BUILD_ARCH@"
+#define METAPHYSICL_BUILD_HOST     "@BUILD_HOST@"
+#define METAPHYSICL_BUILD_DATE     "@BUILD_DATE@"
+#define METAPHYSICL_BUILD_VERSION  "@BUILD_VERSION@"
+
+#define METAPHYSICL_LIB_VERSION    "@VERSION@"
+#define METAPHYSICL_LIB_RELEASE    "@BUILD_DEVSTATUS@"
+
+#define METAPHYSICL_CXX            "@CXX@"
+#define METAPHYSICL_CXXFLAGS       "@CXXFLAGS@"
+
+#include <iostream>
+#include <iomanip>
+
+namespace MetaPhysicL
+{
+  void metaphysicl_version_stdout();
+  int  get_metaphysicl_version();
+} // end namespace MetaPhysicL
+
+#endif // METAPHYSICL_VERISON_H

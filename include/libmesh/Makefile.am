@@ -212,6 +212,7 @@ BUILT_SOURCES = \
         coupling_matrix.h \
         dense_matrix.h \
         dense_matrix_base.h \
+        dense_matrix_impl.h \
         dense_submatrix.h \
         dense_subvector.h \
         dense_vector.h \
@@ -378,6 +379,7 @@ BUILT_SOURCES = \
         fem_context.h \
         fem_system.h \
         frequency_system.h \
+        generic_projector.h \
         implicit_system.h \
         linear_implicit_system.h \
         newmark_system.h \
@@ -1152,6 +1154,9 @@ dense_matrix.h: $(top_srcdir)/include/numerics/dense_matrix.h
 dense_matrix_base.h: $(top_srcdir)/include/numerics/dense_matrix_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+dense_matrix_impl.h: $(top_srcdir)/include/numerics/dense_matrix_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 dense_submatrix.h: $(top_srcdir)/include/numerics/dense_submatrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1648,6 +1653,9 @@ fem_system.h: $(top_srcdir)/include/systems/fem_system.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 frequency_system.h: $(top_srcdir)/include/systems/frequency_system.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+generic_projector.h: $(top_srcdir)/include/systems/generic_projector.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 implicit_system.h: $(top_srcdir)/include/systems/implicit_system.h

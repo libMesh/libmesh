@@ -134,6 +134,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/laspack.m4 $(top_srcdir)/m4/libhilbert.m4 \
 	$(top_srcdir)/m4/libmesh_compiler_features.m4 \
 	$(top_srcdir)/m4/libmesh_core_features.m4 \
+	$(top_srcdir)/m4/libmesh_metaphysicl.m4 \
 	$(top_srcdir)/m4/libmesh_method.m4 \
 	$(top_srcdir)/m4/libmesh_optional_packages.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/locale.m4 \
@@ -305,6 +306,7 @@ LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
+METAPHYSICL_INCLUDE = @METAPHYSICL_INCLUDE@
 METHOD = @METHOD@
 METHODS = @METHODS@
 METIS_INCLUDE = @METIS_INCLUDE@
@@ -552,18 +554,19 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	analytic_function.h composite_fem_function.h \
 	composite_function.h const_fem_function.h const_function.h \
 	coupling_matrix.h dense_matrix.h dense_matrix_base.h \
-	dense_submatrix.h dense_subvector.h dense_vector.h \
-	dense_vector_base.h distributed_vector.h eigen_core_support.h \
-	eigen_preconditioner.h eigen_sparse_matrix.h \
-	eigen_sparse_vector.h fem_function_base.h function_base.h \
-	laspack_matrix.h laspack_vector.h numeric_vector.h \
-	parsed_fem_function.h parsed_fem_function_parameter.h \
-	parsed_function.h parsed_function_parameter.h petsc_macro.h \
-	petsc_matrix.h petsc_preconditioner.h petsc_solver_exception.h \
-	petsc_vector.h preconditioner.h raw_accessor.h \
-	refinement_selector.h shell_matrix.h sparse_matrix.h \
-	sparse_shell_matrix.h sum_shell_matrix.h tensor_shell_matrix.h \
-	tensor_tools.h tensor_value.h trilinos_epetra_matrix.h \
+	dense_matrix_impl.h dense_submatrix.h dense_subvector.h \
+	dense_vector.h dense_vector_base.h distributed_vector.h \
+	eigen_core_support.h eigen_preconditioner.h \
+	eigen_sparse_matrix.h eigen_sparse_vector.h \
+	fem_function_base.h function_base.h laspack_matrix.h \
+	laspack_vector.h numeric_vector.h parsed_fem_function.h \
+	parsed_fem_function_parameter.h parsed_function.h \
+	parsed_function_parameter.h petsc_macro.h petsc_matrix.h \
+	petsc_preconditioner.h petsc_solver_exception.h petsc_vector.h \
+	preconditioner.h raw_accessor.h refinement_selector.h \
+	shell_matrix.h sparse_matrix.h sparse_shell_matrix.h \
+	sum_shell_matrix.h tensor_shell_matrix.h tensor_tools.h \
+	tensor_value.h trilinos_epetra_matrix.h \
 	trilinos_epetra_vector.h trilinos_preconditioner.h \
 	type_n_tensor.h type_tensor.h type_vector.h vector_value.h \
 	wrapped_function.h wrapped_functor.h zero_function.h \
@@ -616,22 +619,22 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	dg_fem_context.h diff_context.h diff_system.h eigen_system.h \
 	elem_assembly.h equation_systems.h explicit_system.h \
 	fem_context.h fem_system.h frequency_system.h \
-	implicit_system.h linear_implicit_system.h newmark_system.h \
-	nonlinear_implicit_system.h optimization_system.h \
-	parameter_accessor.h parameter_multiaccessor.h \
-	parameter_multipointer.h parameter_pointer.h \
-	parameter_vector.h qoi_set.h sensitivity_data.h \
-	steady_system.h system.h system_norm.h system_subset.h \
-	system_subset_by_subdomain.h transient_system.h \
-	compare_types.h error_vector.h hashword.h ignore_warnings.h \
-	int_range.h libmesh_nullptr.h location_maps.h mapvector.h \
-	null_output_iterator.h number_lookups.h ostream_proxy.h \
-	parameters.h perf_log.h perfmon.h plt_loader.h \
-	point_locator_base.h point_locator_tree.h \
-	pointer_to_pointer_iter.h pool_allocator.h restore_warnings.h \
-	safe_bool.h simple_range.h statistics.h string_to_enum.h \
-	timestamp.h topology_map.h tree.h tree_base.h tree_node.h \
-	utility.h vectormap.h xdr_cxx.h \
+	generic_projector.h implicit_system.h linear_implicit_system.h \
+	newmark_system.h nonlinear_implicit_system.h \
+	optimization_system.h parameter_accessor.h \
+	parameter_multiaccessor.h parameter_multipointer.h \
+	parameter_pointer.h parameter_vector.h qoi_set.h \
+	sensitivity_data.h steady_system.h system.h system_norm.h \
+	system_subset.h system_subset_by_subdomain.h \
+	transient_system.h compare_types.h error_vector.h hashword.h \
+	ignore_warnings.h int_range.h libmesh_nullptr.h \
+	location_maps.h mapvector.h null_output_iterator.h \
+	number_lookups.h ostream_proxy.h parameters.h perf_log.h \
+	perfmon.h plt_loader.h point_locator_base.h \
+	point_locator_tree.h pointer_to_pointer_iter.h \
+	pool_allocator.h restore_warnings.h safe_bool.h simple_range.h \
+	statistics.h string_to_enum.h timestamp.h topology_map.h \
+	tree.h tree_base.h tree_node.h utility.h vectormap.h xdr_cxx.h \
 	parallel_communicator_specializations $(am__append_1) \
 	$(am__append_3) $(am__append_5) $(am__append_7) \
 	$(am__append_9) $(am__append_11) $(am__append_13) \
@@ -1496,6 +1499,9 @@ dense_matrix.h: $(top_srcdir)/include/numerics/dense_matrix.h
 dense_matrix_base.h: $(top_srcdir)/include/numerics/dense_matrix_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+dense_matrix_impl.h: $(top_srcdir)/include/numerics/dense_matrix_impl.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 dense_submatrix.h: $(top_srcdir)/include/numerics/dense_submatrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1992,6 +1998,9 @@ fem_system.h: $(top_srcdir)/include/systems/fem_system.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 frequency_system.h: $(top_srcdir)/include/systems/frequency_system.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+generic_projector.h: $(top_srcdir)/include/systems/generic_projector.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 implicit_system.h: $(top_srcdir)/include/systems/implicit_system.h

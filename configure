@@ -654,6 +654,9 @@ LIBMESH_ENABLE_CURL_FALSE
 LIBMESH_ENABLE_CURL_TRUE
 CURL_LIBRARY
 CURL_INCLUDE
+LIBMESH_ENABLE_METAPHYSICL_FALSE
+LIBMESH_ENABLE_METAPHYSICL_TRUE
+METAPHYSICL_INCLUDE
 LIBMESH_ENABLE_NANOFLANN_FALSE
 LIBMESH_ENABLE_NANOFLANN_TRUE
 NANOFLANN_INCLUDE
@@ -1254,6 +1257,7 @@ enable_cppunit
 with_cppunit_prefix
 with_cppunit_exec_prefix
 enable_nanoflann
+enable_metaphysicl
 enable_curl
 with_curl_include
 with_curl_lib
@@ -1289,7 +1293,8 @@ VTK_DIR
 HDF5_DIR
 YACC
 YFLAGS'
-ac_subdirs_all='contrib/netcdf/v4'
+ac_subdirs_all='contrib/netcdf/v4
+contrib/metaphysicl/0.2.0'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -2037,6 +2042,7 @@ Optional Features:
                           Build fparser with bytecode debugging functions
   --disable-cppunit       Build without cppunit C++ unit testing support
   --disable-nanoflann     build without nanoflann KD-tree support
+  --disable-metaphysicl   build without MetaPhysicL suppport
   --enable-curl           link against libcurl, for using the cURL API
 
 Optional Packages:
@@ -41586,6 +41592,56 @@ ac_config_files="$ac_config_files contrib/nanoflann/Makefile"
 
 
 # -------------------------------------------------------------
+# MetaPhysicL -- enabled by default
+# -------------------------------------------------------------
+
+  # Check whether --enable-metaphysicl was given.
+if test "${enable_metaphysicl+set}" = set; then :
+  enableval=$enable_metaphysicl; case "${enableval}" in
+                  yes)  enablemetaphysicl=yes ;;
+                  no)  enablemetaphysicl=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-metaphysicl" "$LINENO" 5 ;;
+                esac
+else
+  enablemetaphysicl=$enablenested
+fi
+
+
+  # The MetaPhysicL API is distributed with libmesh, so we don't have
+  # to guess where it might be installed.  This needs to be replaced
+  # someday with an option to include an external version instead.
+  if (test $enablemetaphysicl = yes); then
+     METAPHYSICL_INCLUDE="-I\$(top_srcdir)/contrib/metaphysicl/0.2.0/src/numerics/include -I\$(top_srcdir)/contrib/metaphysicl/0.2.0/src/core/include -I\$(top_srcdir)/contrib/metaphysicl/0.2.0/src/utilities/include"
+
+$as_echo "#define HAVE_METAPHYSICL 1" >>confdefs.h
+
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with MetaPhysicL support >>>" >&5
+$as_echo "<<< Configuring library with MetaPhysicL support >>>" >&6; }
+     subdirs="$subdirs contrib/metaphysicl/0.2.0"
+
+  else
+     METAPHYSICL_INCLUDE=""
+     enablemetaphysicl=no
+  fi
+
+
+
+if (test $enablemetaphysicl = yes); then
+  libmesh_contrib_INCLUDES="$METAPHYSICL_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+ if test x$enablemetaphysicl = xyes; then
+  LIBMESH_ENABLE_METAPHYSICL_TRUE=
+  LIBMESH_ENABLE_METAPHYSICL_FALSE='#'
+else
+  LIBMESH_ENABLE_METAPHYSICL_TRUE='#'
+  LIBMESH_ENABLE_METAPHYSICL_FALSE=
+fi
+
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
 # libcurl -- enabled by default
 # Note: I tried to use the m4 files ax_lib_curl.m4 and
 # ax_path_generic.m4 from the autoconf-archive for this, but they
@@ -42437,6 +42493,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_NANOFLANN_TRUE}" && test -z "${LIBMESH_ENABLE_NANOFLANN_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_NANOFLANN\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${LIBMESH_ENABLE_METAPHYSICL_TRUE}" && test -z "${LIBMESH_ENABLE_METAPHYSICL_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_METAPHYSICL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_CURL_TRUE}" && test -z "${LIBMESH_ENABLE_CURL_FALSE}"; then
