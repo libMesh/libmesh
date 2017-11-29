@@ -83,7 +83,7 @@ struct CompareTypes<MetaPhysicL::DynamicSparseNumberArray<T,I>, T2>
 #include "libmesh/dense_matrix_impl.h"
 
 namespace libMesh {
-typedef DynamicSparseNumberArray<Number, dof_id_type> DSNAN;
+typedef DynamicSparseNumberArray<Real, dof_id_type> DSNAN;
 
 template void DenseMatrix<Real>::cholesky_solve
   (const DenseVector<DSNAN> &, DenseVector<DSNAN> &);
@@ -493,8 +493,8 @@ public:
 
 template<>
 inline
-DynamicSparseNumberArray<Number, dof_id_type>
-OldSolutionCoefs<Number, &FEMContext::point_value>::
+DynamicSparseNumberArray<Real, dof_id_type>
+OldSolutionCoefs<Real, &FEMContext::point_value>::
 eval_at_point(const FEMContext & c,
               unsigned int i,
               const Point & p,
@@ -506,12 +506,12 @@ eval_at_point(const FEMContext & c,
     return 0;
 
   // Get finite element object
-  FEGenericBase<Number> * fe = libmesh_nullptr;
-  this->old_context.get_element_fe<Number>
+  FEGenericBase<Real> * fe = libmesh_nullptr;
+  this->old_context.get_element_fe<Real>
     (i, fe, this->old_context.get_elem_dim());
 
   // Build a FE for calculating phi(p)
-  FEGenericBase<Number> * fe_new =
+  FEGenericBase<Real> * fe_new =
     this->old_context.build_new_fe(fe, p);
 
   // Get the values and global indices of the shape functions
@@ -522,7 +522,7 @@ eval_at_point(const FEMContext & c,
   const std::size_t n_dofs = phi.size();
   libmesh_assert_equal_to(n_dofs, dof_indices.size());
 
-  DynamicSparseNumberArray<Number, dof_id_type> returnval;
+  DynamicSparseNumberArray<Real, dof_id_type> returnval;
   returnval.resize(n_dofs);
 
   for (std::size_t i = 0; i != n_dofs; ++i)
@@ -538,8 +538,8 @@ eval_at_point(const FEMContext & c,
 
 template<>
 inline
-VectorValue<DynamicSparseNumberArray<Number, dof_id_type> >
-OldSolutionCoefs<Gradient, &FEMContext::point_gradient>::
+VectorValue<DynamicSparseNumberArray<Real, dof_id_type> >
+OldSolutionCoefs<RealGradient, &FEMContext::point_gradient>::
 eval_at_point(const FEMContext & c,
               unsigned int i,
               const Point & p,
@@ -551,12 +551,12 @@ eval_at_point(const FEMContext & c,
     return 0;
 
   // Get finite element object
-  FEGenericBase<Number> * fe = libmesh_nullptr;
-  this->old_context.get_element_fe<Number>
+  FEGenericBase<Real> * fe = libmesh_nullptr;
+  this->old_context.get_element_fe<Real>
     (i, fe, this->old_context.get_elem_dim());
 
   // Build a FE for calculating phi(p)
-  FEGenericBase<Number> * fe_new =
+  FEGenericBase<Real> * fe_new =
     this->old_context.build_new_fe(fe, p);
 
   // Get the values and global indices of the shape functions
@@ -567,7 +567,7 @@ eval_at_point(const FEMContext & c,
   const std::size_t n_dofs = dphi.size();
   libmesh_assert_equal_to(n_dofs, dof_indices.size());
 
-  VectorValue<DynamicSparseNumberArray<Number, dof_id_type> > returnval;
+  VectorValue<DynamicSparseNumberArray<Real, dof_id_type> > returnval;
 
   for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
     returnval(d).resize(n_dofs);
@@ -587,15 +587,15 @@ eval_at_point(const FEMContext & c,
 
 template<>
 inline
-DynamicSparseNumberArray<Number, dof_id_type>
-OldSolutionCoefs<Number, &FEMContext::point_value>::
+DynamicSparseNumberArray<Real, dof_id_type>
+OldSolutionCoefs<Real, &FEMContext::point_value>::
 eval_at_node(const FEMContext & c,
              unsigned int i,
              unsigned int /* elem_dim */,
              const Node & n,
              Real /* time */)
 {
-  LOG_SCOPE ("Number eval_at_node()", "OldSolutionCoefs");
+  LOG_SCOPE ("Real eval_at_node()", "OldSolutionCoefs");
 
   // Optimize for the common case, where this node was part of the
   // old solution.
@@ -608,7 +608,7 @@ eval_at_node(const FEMContext & c,
       n.old_dof_object->n_vars(sys.number()) &&
       n.old_dof_object->n_comp(sys.number(), i))
     {
-      DynamicSparseNumberArray<Number, dof_id_type> returnval;
+      DynamicSparseNumberArray<Real, dof_id_type> returnval;
       const dof_id_type old_id =
         n.old_dof_object->dof_number(sys.number(), i, 0);
       returnval.resize(1);
@@ -624,15 +624,15 @@ eval_at_node(const FEMContext & c,
 
 template<>
 inline
-VectorValue<DynamicSparseNumberArray<Number, dof_id_type> >
-OldSolutionCoefs<Gradient, &FEMContext::point_gradient>::
+VectorValue<DynamicSparseNumberArray<Real, dof_id_type> >
+OldSolutionCoefs<RealGradient, &FEMContext::point_gradient>::
 eval_at_node(const FEMContext & c,
              unsigned int i,
              unsigned int elem_dim,
              const Node & n,
              Real /* time */)
 {
-  LOG_SCOPE ("Gradient eval_at_node()", "OldSolutionCoefs");
+  LOG_SCOPE ("RealGradient eval_at_node()", "OldSolutionCoefs");
 
   // Optimize for the common case, where this node was part of the
   // old solution.
@@ -645,7 +645,7 @@ eval_at_node(const FEMContext & c,
       n.old_dof_object->n_vars(sys.number()) &&
       n.old_dof_object->n_comp(sys.number(), i))
     {
-      VectorValue<DynamicSparseNumberArray<Number, dof_id_type> > g;
+      VectorValue<DynamicSparseNumberArray<Real, dof_id_type> > g;
       for (unsigned int d = 0; d != elem_dim; ++d)
         {
           const dof_id_type old_id =
@@ -724,7 +724,7 @@ public:
  * This method creates a projection matrix which corresponds to the
  * operation of project_vector between old and new solution spaces.
  */
-void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
+void System::projection_matrix (SparseMatrix<Real> & proj_mat) const
 {
   LOG_SCOPE ("projection_matrix()", "System");
 
@@ -741,9 +741,9 @@ void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
         vars[i] = i;
 
       // Use a typedef to make the calling sequence for parallel_for() a bit more readable
-      typedef OldSolutionCoefs<Number,   &FEMContext::point_value>
+      typedef OldSolutionCoefs<Real,         &FEMContext::point_value>
               OldSolutionValueCoefs;
-      typedef OldSolutionCoefs<Gradient, &FEMContext::point_gradient>
+      typedef OldSolutionCoefs<RealGradient, &FEMContext::point_gradient>
               OldSolutionGradientCoefs;
 
       typedef

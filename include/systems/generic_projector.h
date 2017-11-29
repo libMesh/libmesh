@@ -449,6 +449,24 @@ OldSolutionBase<Gradient, &FEMContext::point_gradient>::get_shape_outputs(FEBase
 }
 
 
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+template<>
+inline void
+OldSolutionBase<Real, &FEMContext::point_value>::get_shape_outputs(FEBase & fe)
+{
+  fe.get_phi();
+}
+
+
+template<>
+inline void
+OldSolutionBase<RealGradient, &FEMContext::point_gradient>::get_shape_outputs(FEBase & fe)
+{
+  fe.get_dphi();
+}
+#endif // LIBMESH_USE_COMPLEX_NUMBERS
+
+
 template<>
 inline
 Number
@@ -527,6 +545,14 @@ const Real OldSolutionBase <Number, &FEMContext::point_value>::out_of_elem_tol =
 
 template <>
 const Real OldSolutionBase <Gradient, &FEMContext::point_gradient>::out_of_elem_tol = 10*TOLERANCE;
+
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+template <>
+const Real OldSolutionBase <Real, &FEMContext::point_value>::out_of_elem_tol = 10*TOLERANCE;
+
+template <>
+const Real OldSolutionBase <RealGradient, &FEMContext::point_gradient>::out_of_elem_tol = 10*TOLERANCE;
+#endif // LIBMESH_USE_COMPLEX_NUMBERS
 
 #endif // LIBMESH_ENABLE_AMR
 

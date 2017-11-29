@@ -1667,7 +1667,7 @@ public:
    * degrees of freedom on that side will still match the coarse grid
    * approximation of the BC, not the fine grid approximation.
    */
-  void projection_matrix (SparseMatrix<Number> & proj_mat) const;
+  void projection_matrix (SparseMatrix<Real> & proj_mat) const;
 
 protected:
 
