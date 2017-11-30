@@ -670,19 +670,19 @@ eval_at_node(const FEMContext & c,
  * \author Roy H. Stogner
  * \date 2017
  */
-template <typename Val>
+template <typename ValIn, typename ValOut>
 class MatrixFillAction
 {
 private:
-  SparseMatrix<Val> & target_matrix;
+  SparseMatrix<ValOut> & target_matrix;
 
 public:
-  MatrixFillAction(SparseMatrix<Val> & target_mat) :
+  MatrixFillAction(SparseMatrix<ValOut> & target_mat) :
     target_matrix(target_mat) {}
 
   void insert(const FEMContext & c,
               unsigned int var_num,
-              const DenseVector<DynamicSparseNumberArray<Val, dof_id_type> > & Ue)
+              const DenseVector<DynamicSparseNumberArray<ValIn, dof_id_type> > & Ue)
   {
     const numeric_index_type
       begin_dof = target_matrix.row_start(),
@@ -704,12 +704,12 @@ public:
           const dof_id_type dof_i = dof_indices[i];
           if ((dof_i >= begin_dof) && (dof_i < end_dof))
             {
-              const DynamicSparseNumberArray<Val,dof_id_type> & dnsa = Ue(i);
+              const DynamicSparseNumberArray<ValIn,dof_id_type> & dnsa = Ue(i);
               const std::size_t size = dnsa.size();
               for (unsigned int j = 0; j != size; ++j)
                 {
                   const dof_id_type dof_j = dnsa.raw_index(j);
-                  const Val dof_val = dnsa.raw_at(j);
+                  const ValIn dof_val = dnsa.raw_at(j);
                   target_matrix.set(dof_i, dof_j, dof_val);
                 }
             }
@@ -724,7 +724,7 @@ public:
  * This method creates a projection matrix which corresponds to the
  * operation of project_vector between old and new solution spaces.
  */
-void System::projection_matrix (SparseMatrix<Real> & proj_mat) const
+void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
 {
   LOG_SCOPE ("projection_matrix()", "System");
 
@@ -750,11 +750,11 @@ void System::projection_matrix (SparseMatrix<Real> & proj_mat) const
         GenericProjector<OldSolutionValueCoefs,
                          OldSolutionGradientCoefs,
                          DynamicSparseNumberArray<Real,dof_id_type>,
-                         MatrixFillAction<Real> > ProjMatFiller;
+                         MatrixFillAction<Real, Number> > ProjMatFiller;
 
       OldSolutionValueCoefs    f(*this);
       OldSolutionGradientCoefs g(*this);
-      MatrixFillAction<Real> setter(proj_mat);
+      MatrixFillAction<Real, Number> setter(proj_mat);
 
       Threads::parallel_for (active_local_elem_range,
                              ProjMatFiller(*this, f, &g, setter, vars));
