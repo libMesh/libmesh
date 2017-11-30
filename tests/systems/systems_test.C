@@ -53,10 +53,12 @@ public:
   CPPUNIT_TEST( testProjectHierarchicHex27 );
   CPPUNIT_TEST( testProjectMeshFunctionHex27 );
 
+#ifdef LIBMESH_ENABLE_AMR
   CPPUNIT_TEST( testProjectMatrixEdge2 );
   CPPUNIT_TEST( testProjectMatrixQuad4 );
   CPPUNIT_TEST( testProjectMatrixTri3 );
   CPPUNIT_TEST( testProjectMatrixHex8 );
+#endif // LIBMESH_ENABLE_AMR
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -206,6 +208,7 @@ public:
           }
   }
 
+#ifdef LIBMESH_ENABLE_AMR
   void testProjectMatrix1D(const ElemType elem_type)
   {
     Mesh mesh(*TestCommWorld);
@@ -621,6 +624,7 @@ public:
     Real diff_norm = proj_mat.linfty_norm();
     CPPUNIT_ASSERT(diff_norm/gold_norm < TOLERANCE*TOLERANCE);
   }
+#endif // LIBMESH_ENABLE_AMR
 
 
   void testProjectHierarchicEdge3() { testProjectLine(EDGE3); }
@@ -629,11 +633,13 @@ public:
   void testProjectHierarchicHex27() { testProjectCube(HEX27); }
   void testProjectMeshFunctionHex27() { testProjectCubeWithMeshFunction(HEX27); }
 
+#ifdef LIBMESH_ENABLE_AMR
   // projection matrix tests
   void testProjectMatrixEdge2() { testProjectMatrix1D(EDGE2); }
   void testProjectMatrixQuad4() { testProjectMatrix2D(QUAD4); }
   void testProjectMatrixTri3() { testProjectMatrix2D(TRI3); }
   void testProjectMatrixHex8() { testProjectMatrix3D(HEX8); }
+#endif // LIBMESH_ENABLE_AMR
 
 };
 
