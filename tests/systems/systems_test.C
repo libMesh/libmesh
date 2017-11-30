@@ -211,7 +211,9 @@ public:
 #ifdef LIBMESH_ENABLE_AMR
   void testProjectMatrix1D(const ElemType elem_type)
   {
-    Mesh mesh(*TestCommWorld);
+    // Use ReplicatedMesh to get consistent child element node
+    // numbering during refinement
+    ReplicatedMesh mesh(*TestCommWorld);
 
     // fix the node numbering to resolve dof_id numbering issues in parallel tests
     mesh.allow_renumbering(false);
@@ -316,7 +318,9 @@ public:
 
   void testProjectMatrix2D(const ElemType elem_type)
   {
-    Mesh mesh(*TestCommWorld);
+    // Use ReplicatedMesh to get consistent child element node
+    // numbering during refinement
+    ReplicatedMesh mesh(*TestCommWorld);
 
     // fix the node numbering to resolve dof_id numbering issues in parallel tests
     mesh.allow_renumbering(false);
@@ -473,7 +477,9 @@ public:
 
   void testProjectMatrix3D(const ElemType elem_type)
   {
-    Mesh mesh(*TestCommWorld);
+    // Use ReplicatedMesh to get consistent child element node
+    // numbering during refinement
+    ReplicatedMesh mesh(*TestCommWorld);
 
     // fix the node numbering to resolve dof_id numbering issues in parallel tests
     mesh.allow_renumbering(false);
