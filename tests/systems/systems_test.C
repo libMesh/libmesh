@@ -15,6 +15,7 @@
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/sparse_matrix.h>
 #include "libmesh/string_to_enum.h"
+#include <libmesh/cell_tet4.h>
 
 #include "test_comm.h"
 
@@ -58,6 +59,7 @@ public:
   CPPUNIT_TEST( testProjectMatrixQuad4 );
   CPPUNIT_TEST( testProjectMatrixTri3 );
   CPPUNIT_TEST( testProjectMatrixHex8 );
+  CPPUNIT_TEST( testProjectMatrixTet4 );
 #endif // LIBMESH_ENABLE_AMR
 
   CPPUNIT_TEST_SUITE_END();
@@ -489,42 +491,76 @@ public:
     System &sys = es.add_system<System> ("SimpleSystem");
     sys.add_variable("u", FIRST, LAGRANGE);
 
-    MeshTools::Generation::build_cube (mesh,
-                                       1, 1, 1,
-                                       0., 1., 0., 1., 0., 1.,
-                                       elem_type);
+    if (elem_type == Utility::string_to_enum<ElemType>("HEX8"))
+      MeshTools::Generation::build_cube (mesh,
+                                         1, 1, 1,
+                                         0., 1., 0., 1., 0., 1.,
+                                         elem_type);
+    else if (elem_type == Utility::string_to_enum<ElemType>("TET4"))
+      {
+        // manually build a Tet4 element
+        mesh.add_point( Point(0,0,0), 0 );
+        mesh.add_point( Point(1,0,0), 1 );
+        mesh.add_point( Point(0,1,0), 2 );
+        mesh.add_point( Point(1./3.,1./3.,1), 3 );
 
+        Elem * elem = new Tet4();
+        elem->set_id(0);
+        elem = mesh.add_elem(elem);
+        elem->set_node(0) = mesh.node_ptr(0);
+        elem->set_node(1) = mesh.node_ptr(1);
+        elem->set_node(2) = mesh.node_ptr(2);
+        elem->set_node(3) = mesh.node_ptr(3);
+
+        mesh.prepare_for_use();
+      }
     es.init();
 
     // static sets of nodes and their neighbors
-    std::set<dof_id_type> coarse_nodes({0,1,2,3,4,5,6,7});
+    std::set<dof_id_type> coarse_nodes;
     std::map<dof_id_type, std::vector<dof_id_type>> side_nbr_nodes;
     std::map<dof_id_type, std::vector<dof_id_type>> face_nbr_nodes;
     std::map<dof_id_type, std::vector<dof_id_type>> int_nbr_nodes;
 
-    // fill neighbor maps based on static node numbering
-    side_nbr_nodes.insert({8, {0,1}});
-    side_nbr_nodes.insert({10, {0,2}});
-    side_nbr_nodes.insert({15, {1,3}});
-    side_nbr_nodes.insert({18, {2,3}});
-    side_nbr_nodes.insert({11, {0,4}});
-    side_nbr_nodes.insert({16, {1,5}});
-    side_nbr_nodes.insert({21, {3,7}});
-    side_nbr_nodes.insert({20, {2,6}});
-    side_nbr_nodes.insert({22, {4,5}});
-    side_nbr_nodes.insert({24, {4,6}});
-    side_nbr_nodes.insert({25, {5,7}});
-    side_nbr_nodes.insert({26, {6,7}});
+    if (elem_type == Utility::string_to_enum<ElemType>("HEX8"))
+      {
+        coarse_nodes.insert({0,1,2,3,4,5,6,7});
 
-    face_nbr_nodes.insert({12, {0,1,4,5}});
-    face_nbr_nodes.insert({9 , {0,1,2,3}});
-    face_nbr_nodes.insert({14, {0,2,4,6}});
-    face_nbr_nodes.insert({17, {1,3,5,7}});
-    face_nbr_nodes.insert({19, {2,3,6,7}});
-    face_nbr_nodes.insert({23, {4,5,6,7}});
+        // fill neighbor maps based on static node numbering
+        side_nbr_nodes.insert({8, {0,1}});
+        side_nbr_nodes.insert({10, {0,2}});
+        side_nbr_nodes.insert({15, {1,3}});
+        side_nbr_nodes.insert({18, {2,3}});
+        side_nbr_nodes.insert({11, {0,4}});
+        side_nbr_nodes.insert({16, {1,5}});
+        side_nbr_nodes.insert({21, {3,7}});
+        side_nbr_nodes.insert({20, {2,6}});
+        side_nbr_nodes.insert({22, {4,5}});
+        side_nbr_nodes.insert({24, {4,6}});
+        side_nbr_nodes.insert({25, {5,7}});
+        side_nbr_nodes.insert({26, {6,7}});
 
-    int_nbr_nodes.insert({13, {0,1,2,3,4,5,6,7}});
+        face_nbr_nodes.insert({12, {0,1,4,5}});
+        face_nbr_nodes.insert({9 , {0,1,2,3}});
+        face_nbr_nodes.insert({14, {0,2,4,6}});
+        face_nbr_nodes.insert({17, {1,3,5,7}});
+        face_nbr_nodes.insert({19, {2,3,6,7}});
+        face_nbr_nodes.insert({23, {4,5,6,7}});
 
+        int_nbr_nodes.insert({13, {0,1,2,3,4,5,6,7}});
+      }
+    else if (elem_type == Utility::string_to_enum<ElemType>("TET4"))
+      {
+        coarse_nodes.insert({0,1,2,3});
+
+        // fill neighbor maps based on static node numbering
+        side_nbr_nodes.insert({4, {0,1}});
+        side_nbr_nodes.insert({5, {0,2}});
+        side_nbr_nodes.insert({6, {0,3}});
+        side_nbr_nodes.insert({7, {1,2}});
+        side_nbr_nodes.insert({8, {1,3}});
+        side_nbr_nodes.insert({9, {2,3}});
+      }
 
     // stash number of dofs on coarse grid for projection sizing
     int n_old_dofs = sys.n_dofs();
@@ -645,6 +681,7 @@ public:
   void testProjectMatrixQuad4() { testProjectMatrix2D(QUAD4); }
   void testProjectMatrixTri3() { testProjectMatrix2D(TRI3); }
   void testProjectMatrixHex8() { testProjectMatrix3D(HEX8); }
+  void testProjectMatrixTet4() { testProjectMatrix3D(TET4); }
 #endif // LIBMESH_ENABLE_AMR
 
 };
