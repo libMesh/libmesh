@@ -81,10 +81,10 @@ int vectester (void)
 
   std::srand(12345); // Fixed seed for reproduceability of failures
 
-  // Avoid divide by zero errors later
+  // Avoid divide by zero errors or acos(x>1) NaNs later
   for (unsigned int i=0; i != N; ++i)
     {
-      random_vec[i] = .25 + (static_cast<Scalar>(std::rand())/RAND_MAX);
+      random_vec[i] = .25 + (static_cast<Scalar>(std::rand())/RAND_MAX/2);
       random_vec[i].derivatives() = 1;
     }
 
