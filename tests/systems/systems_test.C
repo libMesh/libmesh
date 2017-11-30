@@ -13,7 +13,7 @@
 #include <libmesh/mesh_function.h>
 #include <libmesh/numeric_vector.h>
 #include <libmesh/mesh_refinement.h>
-#include <libmesh/petsc_matrix.h>
+#include <libmesh/sparse_matrix.h>
 #include "libmesh/string_to_enum.h"
 
 #include "test_comm.h"
@@ -260,13 +260,17 @@ public:
     int n_old_dofs_local = ndofs_old_end - ndofs_old_first;
 
     // init and compute the projection matrix using GenericProjector
-    PetscMatrix<Number> proj_mat(*TestCommWorld);
+    UniquePtr<SparseMatrix<Number> > proj_mat_ptr =
+      SparseMatrix<Number>::build(*TestCommWorld);
+    SparseMatrix<Number> & proj_mat = *proj_mat_ptr;
     proj_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs_local);
     sys.projection_matrix(proj_mat);
     proj_mat.close();
 
     // init the gold standard projection matrix
-    PetscMatrix<Number> gold_mat(*TestCommWorld);
+    UniquePtr<SparseMatrix<Number> > gold_mat_ptr =
+      SparseMatrix<Number>::build(*TestCommWorld);
+    SparseMatrix<Number> & gold_mat = *gold_mat_ptr;
     gold_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs);
 
     // construct the gold projection matrix using static node numbering as reference info
@@ -403,13 +407,17 @@ public:
     int n_old_dofs_local = ndofs_old_end - ndofs_old_first;
 
     // init and compute the projection matrix using GenericProjector
-    PetscMatrix<Number> proj_mat(*TestCommWorld);
+    UniquePtr<SparseMatrix<Number> > proj_mat_ptr =
+      SparseMatrix<Number>::build(*TestCommWorld);
+    SparseMatrix<Number> & proj_mat = *proj_mat_ptr;
     proj_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs_local);
     sys.projection_matrix(proj_mat);
     proj_mat.close();
 
     // init the gold standard projection matrix
-    PetscMatrix<Number> gold_mat(*TestCommWorld);
+    UniquePtr<SparseMatrix<Number> > gold_mat_ptr =
+      SparseMatrix<Number>::build(*TestCommWorld);
+    SparseMatrix<Number> & gold_mat = *gold_mat_ptr;
     gold_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs);
 
     // construct the gold projection matrix using static node numbering as reference info
@@ -541,13 +549,17 @@ public:
     int n_old_dofs_local = ndofs_old_end - ndofs_old_first;
 
     // init and compute the projection matrix using GenericProjector
-    PetscMatrix<Number> proj_mat(*TestCommWorld);
+    UniquePtr<SparseMatrix<Number> > proj_mat_ptr =
+      SparseMatrix<Number>::build(*TestCommWorld);
+    SparseMatrix<Number> & proj_mat = *proj_mat_ptr;
     proj_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs_local);
     sys.projection_matrix(proj_mat);
     proj_mat.close();
 
     // init the gold standard projection matrix
-    PetscMatrix<Number> gold_mat(*TestCommWorld);
+    UniquePtr<SparseMatrix<Number> > gold_mat_ptr =
+      SparseMatrix<Number>::build(*TestCommWorld);
+    SparseMatrix<Number> & gold_mat = *gold_mat_ptr;
     gold_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs);
 
     // construct the gold projection matrix using static node numbering as reference info
