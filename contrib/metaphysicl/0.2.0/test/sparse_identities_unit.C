@@ -11,7 +11,7 @@
 #include "metaphysicl/sparsenumberarray.h"
 #include "metaphysicl/sparsenumbervector.h"
 
-static const unsigned int N = 10; // test pts.
+static const unsigned int N = 20; // test pts.
 
 using namespace MetaPhysicL;
 
