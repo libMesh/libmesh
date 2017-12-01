@@ -434,7 +434,7 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
     const std::string jitdir = ".jitcache";
     if (cached)
     {
-      // generate a sha1 hash of the Value type size, byte code, and immediate list
+      // generate a sha1 hash of the Value type size, byte code, immediate list, and registered derivatives
       SHA1 *sha1 = new SHA1();
       char result[41]; // 40 sha1 chars plus null
       size_t value_t_size = sizeof(Value_t);
@@ -442,6 +442,8 @@ int FunctionParserADBase<Value_t>::AutoDiff(const std::string& var_name)
       sha1->addBytes(reinterpret_cast<const char *>(&this->mData->mByteCode[0]), this->mData->mByteCode.size() * sizeof(unsigned));
       if (!this->mData->mImmed.empty())
         sha1->addBytes(reinterpret_cast<const char *>(&this->mData->mImmed[0]), this->mData->mImmed.size() * sizeof(Value_t));
+      for (const auto & reg : this->mRegisteredDerivatives)
+        sha1->addBytes(reinterpret_cast<const char *>(&reg), sizeof(VariableDerivative));
 
       unsigned char* digest = sha1->getDigest();
       for (unsigned int i = 0; i<20; ++i)

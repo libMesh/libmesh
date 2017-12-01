@@ -23,6 +23,7 @@ public:
 
   CPPUNIT_TEST ( runTests );
   CPPUNIT_TEST ( registerDerivativeTest );
+  CPPUNIT_TEST ( registerDerivativeRepeatTest );
 
   CPPUNIT_TEST_SUITE_END ();
 
@@ -146,6 +147,7 @@ public:
   {
     FunctionParserAD R;
     std::string func = "x*a";
+    R.SetADFlags(FunctionParserAD::ADCacheDerivatives, true);
 
     // Parse the input expression into bytecode
     R.Parse(func, "x,a");
@@ -178,6 +180,48 @@ public:
             CPPUNIT_ASSERT_DOUBLES_EQUAL(R.Eval(p), x*a, 1.e-12);
             CPPUNIT_ASSERT_DOUBLES_EQUAL(dR.Eval(p), a+x*y, 1.e-12);
             CPPUNIT_ASSERT_DOUBLES_EQUAL(d2R.Eval(p), 2*y, 1.e-12);
+          }
+  }
+
+  void registerDerivativeRepeatTest()
+  {
+    // now do the same functional form but with a different mapping to see if the cache
+    // signature was correctly updated
+    FunctionParserAD R;
+    std::string func = "x*a";
+    R.SetADFlags(FunctionParserAD::ADCacheDerivatives, true);
+
+    // Parse the input expression into bytecode
+    R.Parse(func, "x,a");
+
+    // add a new variable y but do not map it to the da/dx derivative!
+    R.AddVariable("y");
+    R.RegisterDerivative("a", "x", "a");
+
+    // parameter vector
+    double p[3];
+    double & x = p[0];
+    double & a = p[1];
+    double & y = p[2];
+
+    FunctionParserAD dR(R);
+    CPPUNIT_ASSERT_EQUAL (dR.AutoDiff("x"), -1);
+    dR.Optimize();
+    // dR = a + x*a
+
+    FunctionParserAD d2R(dR);
+    CPPUNIT_ASSERT_EQUAL (d2R.AutoDiff("x"), -1);
+    d2R.Optimize();
+    // d2R = 2*a + x*a
+
+    // we probe the parsers and check if they agree with the reference solution
+    for (x = -1.0; x < 1.0; x+=0.3726)
+      for (a = -1.0; a < 1.0; a+=0.2642)
+        for (y = -1.0; y < 1.0; y+=0.3156)
+          {
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(R.Eval(p), x*a, 1.e-12);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(dR.Eval(p), a+x*a, 1.e-12);
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(d2R.Eval(p), 2*a+x*a, 1.e-12);
           }
   }
 };
