@@ -96,6 +96,12 @@ public:
   const T& operator[](std::size_t i) const
     { return _data[i]; }
 
+  T& raw_at (std::size_t i)
+    { return _data[i]; }
+
+  const T& raw_at (std::size_t i) const
+    { return _data[i]; }
+
   template <std::size_t i>
   typename entry_type<i>::type& get()
     { return _data[i]; }

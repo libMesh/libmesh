@@ -11,7 +11,7 @@
 #include "metaphysicl/sparsenumberarray.h"
 #include "metaphysicl/sparsenumbervector.h"
 
-static const unsigned int N = 10; // test pts.
+static const unsigned int N = 20; // test pts.
 
 using namespace MetaPhysicL;
 
@@ -37,15 +37,16 @@ int test_error_vec (const Vector& random_vec,
 
   for (unsigned int i=0; i != error_vec.size(); ++i)
     {
-      max_abs_error = max(max_abs_error, fabs(error_vec[i]));
+      Scalar err_i = error_vec.raw_at(i);
+      max_abs_error = max(max_abs_error, fabs(err_i));
 
       // Handle NaNs properly.  Testing max_abs_error for NaN is
       // impossible because IEEE sucks:
       // https://en.wikipedia.org/wiki/IEEE_754_revision#min_and_max
-      if (max_abs_error > tol || error_vec[i] != error_vec[i])
+      if (max_abs_error > tol || err_i != err_i)
         {
 	  std::cerr << "Value " << random_vec[i] <<
-		       "\nError " << error_vec[i] <<
+		       "\nError " << err_i <<
 		       "\nTol   " << tol << std::endl;
 	  return 1;
         }
@@ -77,7 +78,7 @@ int vectester (Vector zerovec)
 
   // Avoid divide by zero errors or acos(x>1) NaNs later
   for (unsigned int i=0; i != random_vec.size(); ++i)
-    random_vec[i] = .25 + (static_cast<Scalar>(std::rand())/RAND_MAX/2);
+    random_vec.raw_at(i) = .25 + (static_cast<Scalar>(std::rand())/RAND_MAX/2);
 
   int returnval = 0;
 
@@ -117,19 +118,33 @@ int if_else_tester (Vector zerovec)
   std::srand(12345); // Fixed seed for reproduceability of failures
 
   for (unsigned int i=0; i != random_vec.size(); ++i)
-    random_vec[i] = .25 + (static_cast<Scalar>(std::rand())/RAND_MAX);
+    random_vec.raw_at(i) = .25 + (static_cast<Scalar>(std::rand())/RAND_MAX);
 
   int returnval = 0;
 
   one_test((random_vec > 0.75) * 1.0 - (2*random_vec > 1.5) * 1.0);
 
-  one_test(if_else(random_vec > 0.75,  random_vec, sin(random_vec)) -
-           if_else(2*random_vec > 1.5, random_vec, sin(random_vec)));
+  one_test(if_else(random_vec > 0.4,  random_vec, sin(random_vec)) -
+           if_else(2*random_vec > 0.8, random_vec, sin(random_vec)));
 
   return returnval;
 }
 
 
+template <typename Vector>
+int dynamic_tester (Vector zerovec)
+{
+  int returnval = 0;
+  zerovec.resize(N);
+  // Create sparse arrays with some sparsity.
+  for (unsigned int i=0; i != N; ++i)
+    zerovec.raw_index(i) = static_cast<unsigned int>(1.5*i);
+
+  returnval = returnval || vectester(zerovec);
+  returnval = returnval || if_else_tester(zerovec);
+
+  return returnval;
+}
 
 int main(void)
 {
@@ -173,52 +188,22 @@ int main(void)
                               2, long double, 3, long double>::type());
 
   DynamicSparseNumberArray<float, unsigned int> float_dsna;
-    float_dsna.resize(4);
-    float_dsna.raw_index(1) = 1;
-    float_dsna.raw_index(2) = 2;
-    float_dsna.raw_index(3) = 3;
-  returnval = returnval || vectester(float_dsna);
-  returnval = returnval || if_else_tester(float_dsna);
+  returnval = returnval || dynamic_tester(float_dsna);
 
   DynamicSparseNumberArray<double, unsigned int> double_dsna;
-    double_dsna.resize(4);
-    double_dsna.raw_index(1) = 1;
-    double_dsna.raw_index(2) = 2;
-    double_dsna.raw_index(3) = 3;
-  returnval = returnval || vectester(double_dsna);
-  returnval = returnval || if_else_tester(double_dsna);
+  returnval = returnval || dynamic_tester(double_dsna);
 
   DynamicSparseNumberArray<long double, unsigned int> long_double_dsna;
-    long_double_dsna.resize(4);
-    long_double_dsna.raw_index(1) = 1;
-    long_double_dsna.raw_index(2) = 2;
-    long_double_dsna.raw_index(3) = 3;
-  returnval = returnval || vectester(long_double_dsna);
-  returnval = returnval || if_else_tester(long_double_dsna);
+  returnval = returnval || dynamic_tester(long_double_dsna);
 
   DynamicSparseNumberVector<float, unsigned int> float_dsnv;
-    float_dsnv.resize(4);
-    float_dsnv.raw_index(1) = 1;
-    float_dsnv.raw_index(2) = 2;
-    float_dsnv.raw_index(3) = 3;
-  returnval = returnval || vectester(float_dsnv);
-  returnval = returnval || if_else_tester(float_dsnv);
+  returnval = returnval || dynamic_tester(float_dsna);
 
   DynamicSparseNumberVector<double, unsigned int> double_dsnv;
-    double_dsnv.resize(4);
-    double_dsnv.raw_index(1) = 1;
-    double_dsnv.raw_index(2) = 2;
-    double_dsnv.raw_index(3) = 3;
-  returnval = returnval || vectester(double_dsnv);
-  returnval = returnval || if_else_tester(double_dsnv);
+  returnval = returnval || dynamic_tester(double_dsnv);
 
   DynamicSparseNumberVector<long double, unsigned int> long_double_dsnv;
-    long_double_dsnv.resize(4);
-    long_double_dsnv.raw_index(1) = 1;
-    long_double_dsnv.raw_index(2) = 2;
-    long_double_dsnv.raw_index(3) = 3;
-  returnval = returnval || vectester(long_double_dsnv);
-  returnval = returnval || if_else_tester(long_double_dsnv);
+  returnval = returnval || dynamic_tester(long_double_dsnv);
 
   return returnval;
 }
