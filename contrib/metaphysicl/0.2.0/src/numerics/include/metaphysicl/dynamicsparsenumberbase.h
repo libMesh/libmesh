@@ -151,7 +151,7 @@ template <typename T, typename I, template <typename, typename> class SubType>
 inline
 T&
 DynamicSparseNumberBase<T,I,SubType>::operator[](index_value_type i)
-{ return _data[runtime_index_of(i)]; }
+{ return this->query(i); }
 
 template <typename T, typename I, template <typename, typename> class SubType>
 inline
