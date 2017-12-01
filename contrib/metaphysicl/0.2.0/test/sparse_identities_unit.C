@@ -124,8 +124,8 @@ int if_else_tester (Vector zerovec)
 
   one_test((random_vec > 0.75) * 1.0 - (2*random_vec > 1.5) * 1.0);
 
-  one_test(if_else(random_vec > 0.75,  random_vec, sin(random_vec)) -
-           if_else(2*random_vec > 1.5, random_vec, sin(random_vec)));
+  one_test(if_else(random_vec > 0.4,  random_vec, sin(random_vec)) -
+           if_else(2*random_vec > 0.8, random_vec, sin(random_vec)));
 
   return returnval;
 }
