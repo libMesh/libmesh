@@ -761,6 +761,11 @@ if_else (const DynamicSparseNumberBase<B, IB,SubType> & condition,
                ++indextrue_it;
                ++datatrue_it;
              }
+           if (*indexfalse_it == *indexcond_it)
+             {
+               ++indexfalse_it;
+               ++datafalse_it;
+             }
          }
        else
          {
@@ -826,6 +831,11 @@ if_else (const DynamicSparseNumberBase<B, IB,SubType> & condition,
                ++datareturn_it;
                ++indextrue_it;
                ++datatrue_it;
+             }
+           if (*indexfalse_it == *indexcond_it)
+             {
+               ++indexfalse_it;
+               ++datafalse_it;
              }
          }
        else
