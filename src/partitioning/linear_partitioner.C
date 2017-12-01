@@ -25,7 +25,7 @@
 namespace libMesh
 {
 
-void LinearPartitioner::partition_range(MeshBase & /*mesh*/,
+void LinearPartitioner::partition_range(MeshBase & mesh,
                                         MeshBase::element_iterator it,
                                         MeshBase::element_iterator end,
                                         const unsigned int n)
@@ -42,19 +42,59 @@ void LinearPartitioner::partition_range(MeshBase & /*mesh*/,
   // Create a simple linear partitioning
   LOG_SCOPE ("partition_range()", "LinearPartitioner");
 
-  const dof_id_type blksize = std::distance(it, end) / n;
+  const bool mesh_is_serial = mesh.is_serial();
 
-  dof_id_type e = 0;
-  for ( ; it != end; ++it)
+  // This has to be an ordered set
+  std::set<dof_id_type> element_ids;
+
+  // If we're on a serialized mesh, we know our range is the same on
+  // every processor.
+  if (mesh_is_serial)
     {
-      Elem * elem = *it;
-      if ((e/blksize) < n)
-        elem->processor_id() = cast_int<processor_id_type>(e/blksize);
+      const dof_id_type blksize = std::distance(it, end) / n;
 
-      else
-        elem->processor_id() = 0;
+      dof_id_type e = 0;
+      for ( ; it != end; ++it)
+        {
+          Elem * elem = *it;
+          if ((e/blksize) < n)
+            elem->processor_id() = cast_int<processor_id_type>(e/blksize);
+          else
+            elem->processor_id() = 0;
 
-      e++;
+          e++;
+        }
+    }
+  // If we're on a replicated mesh, we might have different ranges on
+  // different processors, and we'll need to gather the full range.
+  //
+  // This is not an efficient way to do this, but if you want to be
+  // efficient then you want to be using a different partitioner to
+  // begin with; LinearPartitioner is more for debugging than
+  // performance.
+  else
+    {
+      for (; it != end; ++it)
+        element_ids.insert((*it)->id());
+
+      mesh.comm().set_union(element_ids);
+
+      const dof_id_type blksize = element_ids.size();
+
+      dof_id_type e = 0;
+      for (auto eid : element_ids)
+        {
+          Elem * elem = mesh.query_elem_ptr(eid);
+          if (elem)
+            {
+              if ((e/blksize) < n)
+                elem->processor_id() = cast_int<processor_id_type>(e/blksize);
+              else
+                elem->processor_id() = 0;
+            }
+
+          e++;
+        }
     }
 }
 
