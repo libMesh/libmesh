@@ -27,7 +27,7 @@ public:
   ~FEMParameters();
 
   void read(GetPot & input,
-            const std::vector<std::string> * other_variable_names = NULL);
+            const std::vector<std::string> * other_variable_names = libmesh_nullptr);
 
   // Parameters applicable to entire EquationSystems:
 
@@ -77,7 +77,9 @@ public:
 
   //   Boundary and initial conditions
 
+#ifdef LIBMESH_ENABLE_PERIODIC
   std::vector<libMesh::PeriodicBoundary> periodic_boundaries;
+#endif
 
   std::map<libMesh::subdomain_id_type, libMesh::FunctionBase<libMesh::Number> *>
   initial_conditions;
@@ -146,4 +148,4 @@ public:
   std::string system_config_file;
 };
 
-#endif // __fem_parameters_h__
+#endif // FEMPARAMETERS_H
