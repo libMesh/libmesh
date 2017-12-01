@@ -37,15 +37,16 @@ int test_error_vec (const Vector& random_vec,
 
   for (unsigned int i=0; i != error_vec.size(); ++i)
     {
-      max_abs_error = max(max_abs_error, fabs(error_vec[i]));
+      Scalar err_i = error_vec.raw_at(i);
+      max_abs_error = max(max_abs_error, fabs(err_i));
 
       // Handle NaNs properly.  Testing max_abs_error for NaN is
       // impossible because IEEE sucks:
       // https://en.wikipedia.org/wiki/IEEE_754_revision#min_and_max
-      if (max_abs_error > tol || error_vec[i] != error_vec[i])
+      if (max_abs_error > tol || err_i != err_i)
         {
 	  std::cerr << "Value " << random_vec[i] <<
-		       "\nError " << error_vec[i] <<
+		       "\nError " << err_i <<
 		       "\nTol   " << tol << std::endl;
 	  return 1;
         }
@@ -77,7 +78,7 @@ int vectester (Vector zerovec)
 
   // Avoid divide by zero errors or acos(x>1) NaNs later
   for (unsigned int i=0; i != random_vec.size(); ++i)
-    random_vec[i] = .25 + (static_cast<Scalar>(std::rand())/RAND_MAX/2);
+    random_vec.raw_at(i) = .25 + (static_cast<Scalar>(std::rand())/RAND_MAX/2);
 
   int returnval = 0;
 
@@ -117,7 +118,7 @@ int if_else_tester (Vector zerovec)
   std::srand(12345); // Fixed seed for reproduceability of failures
 
   for (unsigned int i=0; i != random_vec.size(); ++i)
-    random_vec[i] = .25 + (static_cast<Scalar>(std::rand())/RAND_MAX);
+    random_vec.raw_at(i) = .25 + (static_cast<Scalar>(std::rand())/RAND_MAX);
 
   int returnval = 0;
 
