@@ -42,7 +42,6 @@ using libMesh::RBThetaExpansion;
 using libMesh::RBAssemblyExpansion;
 using libMesh::DirichletBoundary;
 using libMesh::Real;
-using libMesh::UniquePtr;
 
 // local include
 #include "assembly.h"
@@ -172,7 +171,7 @@ public:
   /**
    * The object that defines which degrees of freedom are on a Dirichlet boundary.
    */
-  UniquePtr<DirichletBoundary> dirichlet_bc;
+  std::unique_ptr<DirichletBoundary> dirichlet_bc;
 
 };
 

@@ -163,7 +163,7 @@ int main (int argc, char ** argv)
 
   // Solve this as a steady system
   system.time_solver =
-    UniquePtr<TimeSolver>(new SteadySolver(system));
+    std::unique_ptr<TimeSolver>(new SteadySolver(system));
 
   // Initialize the system
   equation_systems.init ();
@@ -197,7 +197,7 @@ int main (int argc, char ** argv)
 
       ErrorVector error;
 
-      UniquePtr<ErrorEstimator> error_estimator;
+      std::unique_ptr<ErrorEstimator> error_estimator;
 
       // To solve to a tolerance in this problem we
       // need a better estimator than Kelly

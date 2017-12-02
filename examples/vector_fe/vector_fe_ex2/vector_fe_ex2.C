@@ -92,7 +92,7 @@ int main (int argc, char** argv)
 
   // This example only implements the steady-state problem
   system.time_solver =
-    UniquePtr<TimeSolver>(new SteadySolver(system));
+    std::unique_ptr<TimeSolver>(new SteadySolver(system));
 
   // Initialize the system
   equation_systems.init();

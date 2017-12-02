@@ -288,13 +288,13 @@ void assemble_shell (EquationSystems & es,
   FEType fe_type = system.variable_type (u_var);
 
   // Build a Finite Element object of the specified type.
-  UniquePtr<FEBase> fe (FEBase::build(2, fe_type));
+  std::unique_ptr<FEBase> fe (FEBase::build(2, fe_type));
 
   // A Gauss quadrature rule for numerical integration.
   // For subdivision shell elements, a single Gauss point per
   // element is sufficient, hence we use extraorder = 0.
   const int extraorder = 0;
-  UniquePtr<QBase> qrule (fe_type.default_quadrature_rule (2, extraorder));
+  std::unique_ptr<QBase> qrule (fe_type.default_quadrature_rule (2, extraorder));
 
   // Tell the finite element object to use our quadrature rule.
   fe->attach_quadrature_rule (qrule.get());

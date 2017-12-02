@@ -35,7 +35,6 @@ using libMesh::FEMContext;
 using libMesh::RBConstruction;
 using libMesh::RBEvaluation;
 using libMesh::Real;
-using libMesh::UniquePtr;
 
 
 // A simple subclass of RBEvaluation, which just needs to specify
@@ -80,7 +79,7 @@ public:
                         const unsigned int number_in)
     : Parent(es, name_in, number_in),
       ex6_assembly_expansion(*this),
-      dirichlet_bc(UniquePtr<DirichletBoundary>())
+      dirichlet_bc(std::unique_ptr<DirichletBoundary>())
   {}
 
   /**
@@ -164,7 +163,7 @@ public:
   /**
    * The object that defines which degrees of freedom are on a Dirichlet boundary.
    */
-  UniquePtr<DirichletBoundary> dirichlet_bc;
+  std::unique_ptr<DirichletBoundary> dirichlet_bc;
 };
 
 #endif

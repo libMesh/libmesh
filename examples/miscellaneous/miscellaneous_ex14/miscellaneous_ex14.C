@@ -248,7 +248,7 @@ int main (int argc, char** argv)
   //fetch the solver-object used internally to be able to manipulate it using the self-written class
   // to set the transformation
   SlepcEigenSolver<Number> * solver = 
-                     libmesh_cast_ptr<SlepcEigenSolver<Number>* >( &(*eig_sys.eigen_solver) );
+    libmesh_cast_ptr<SlepcEigenSolver<Number>* >( &(*eig_sys.eigen_solver) );
 
   // setup of our class @SlepcSolverConfiguration
   SlepcSolverConfiguration ConfigSolver(*solver);
@@ -306,26 +306,25 @@ int main (int argc, char** argv)
         }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-    // set the name of the Exodus-file
-    std::ostringstream eigenvector_output_name;
-    eigenvector_output_name<<"U"<<"-"<<i<<"_inf.e" ;
-    ExodusII_IO (mesh).write_equation_systems(eigenvector_output_name.str(), eq_sys);
+      // set the name of the Exodus-file
+      std::ostringstream eigenvector_output_name;
+      eigenvector_output_name << "U" << "-" << i << "_inf.e";
+      ExodusII_IO (mesh).write_equation_systems(eigenvector_output_name.str(), eq_sys);
 #endif
 
-    // set the base-name for the free-format file.
-    // This file can be viewed e.g. with gnuplot using
-    // p 're_infini_0.txt' w l 
-    std::ostringstream file;
-    file<<"infini_"<<i<<".txt";
-    // print the solution along the x-coordinate
-    line_print(eq_sys, file.str(), "EigenSE");
+      // set the base-name for the free-format file.
+      // This file can be viewed e.g. with gnuplot using
+      // p 're_infini_0.txt' w l
+      std::ostringstream file;
+      file << "infini_" << i << ".txt";
+      // print the solution along the x-coordinate
+      line_print(eq_sys, file.str(), "EigenSE");
+    }
 
-  }
-
-// All done.
+  // All done.
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
 #endif // LIBMESH_HAVE_SLEPC
-   return 0;
+  return 0;
 }
 
 /**
@@ -364,10 +363,10 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
 
   // Build a Finite Element object of the specified type.  Since the
   // \p FEBase::build() member dynamically creates memory we will
-  // store the object as an \p UniquePtr<FEBase>.  This can be thought
+  // store the object as an \p std::unique_ptr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
-  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));  
-  UniquePtr<FEBase> inf_fe (FEBase::build_InfFE(dim, fe_type));
+  std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> inf_fe (FEBase::build_InfFE(dim, fe_type));
       
   // Tell the finite element object to use our quadrature rule.
   fe->attach_quadrature_rule (&qrule);
@@ -432,8 +431,8 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
         {
           // We have an infinite element.  Let \p cfe point
           // to our \p InfFE object.  This is handled through
-          // an UniquePtr.  Through the \p UniquePtr::get() we "borrow"
-          // the pointer, while the \p  UniquePtr \p inf_fe is
+          // an std::unique_ptr.  Through the \p std::unique_ptr::get() we "borrow"
+          // the pointer, while the \p  std::unique_ptr \p inf_fe is
           // still in charge of memory management.
           cfe = inf_fe.get();
         }

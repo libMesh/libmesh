@@ -92,7 +92,7 @@ void run_timestepping(EquationSystems & systems, GetPot & args)
 
   SolidSystem & solid_system = systems.get_system<SolidSystem>("solid");
 
-  UniquePtr<VTKIO> io = UniquePtr<VTKIO>(new VTKIO(systems.get_mesh()));
+  std::unique_ptr<VTKIO> io = std::unique_ptr<VTKIO>(new VTKIO(systems.get_mesh()));
 
   Real duration = args("duration", 1.0);
 

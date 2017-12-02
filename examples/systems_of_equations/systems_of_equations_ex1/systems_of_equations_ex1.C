@@ -175,11 +175,11 @@ void assemble_stokes (EquationSystems & es,
 
   // Build a Finite Element object of the specified type for
   // the velocity variables.
-  UniquePtr<FEBase> fe_vel  (FEBase::build(dim, fe_vel_type));
+  std::unique_ptr<FEBase> fe_vel  (FEBase::build(dim, fe_vel_type));
 
   // Build a Finite Element object of the specified type for
   // the pressure variables.
-  UniquePtr<FEBase> fe_pres (FEBase::build(dim, fe_pres_type));
+  std::unique_ptr<FEBase> fe_pres (FEBase::build(dim, fe_pres_type));
 
   // A Gauss quadrature rule for numerical integration.
   // Let the FEType object decide what order rule is appropriate.
@@ -356,7 +356,7 @@ void assemble_stokes (EquationSystems & es,
         for (auto s : elem->side_index_range())
           if (elem->neighbor_ptr(s) == libmesh_nullptr)
             {
-              UniquePtr<const Elem> side (elem->build_side_ptr(s));
+              std::unique_ptr<const Elem> side (elem->build_side_ptr(s));
 
               // Loop over the nodes on the side.
               for (auto ns : side->node_index_range())

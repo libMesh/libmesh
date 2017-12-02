@@ -131,19 +131,20 @@ FEMParameters::~FEMParameters()
 }
 
 
-AutoPtr<FunctionBase<Number>> new_function_base(const std::string& func_type,
-                                                 const std::string& func_value)
+std::unique_ptr<FunctionBase<Number>>
+new_function_base(const std::string & func_type,
+                  const std::string & func_value)
 {
   if (func_type == "parsed")
-    return AutoPtr<FunctionBase<Number>>
+    return std::unique_ptr<FunctionBase<Number>>
       (new ParsedFunction<Number>(func_value));
   else if (func_type == "zero")
-    return AutoPtr<FunctionBase<Number>>
+    return std::unique_ptr<FunctionBase<Number>>
       (new ZeroFunction<Number>);
   else
     libmesh_not_implemented();
 
-  return AutoPtr<FunctionBase<Number>>();
+  return std::unique_ptr<FunctionBase<Number>>();
 }
 
 

@@ -256,11 +256,11 @@ void assemble_wave(EquationSystems & es,
 
   // Build a Finite Element object of the specified type.  Since the
   // FEBase::build() member dynamically creates memory we will
-  // store the object as a UniquePtr<FEBase>.
-  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
+  // store the object as a std::unique_ptr<FEBase>.
+  std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
 
   // Do the same for an infinite element.
-  UniquePtr<FEBase> inf_fe (FEBase::build_InfFE(dim, fe_type));
+  std::unique_ptr<FEBase> inf_fe (FEBase::build_InfFE(dim, fe_type));
 
   // A 2nd order Gauss quadrature rule for numerical integration.
   QGauss qrule (dim, SECOND);
@@ -325,8 +325,8 @@ void assemble_wave(EquationSystems & es,
         {
           // We have an infinite element.  Let cfe point
           // to our InfFE object.  This is handled through
-          // a UniquePtr.  Through the UniquePtr::get() we "borrow"
-          // the pointer, while the  UniquePtr inf_fe is
+          // a std::unique_ptr.  Through the std::unique_ptr::get() we "borrow"
+          // the pointer, while the  std::unique_ptr inf_fe is
           // still in charge of memory management.
           cfe = inf_fe.get();
         }

@@ -13,7 +13,6 @@ using libMesh::ExodusII_IO;
 using libMesh::Point;
 using libMesh::Real;
 using libMesh::ReplicatedMesh;
-using libMesh::UniquePtr;
 
 #ifdef LIBMESH_ENABLE_AMR
 using libMesh::MeshRefinement;
@@ -104,7 +103,7 @@ private:
   Real _cnWeight;
   //
   std::string  _ofile_base, _ofile;
-  UniquePtr<ExodusII_IO> _exio;
+  std::unique_ptr<ExodusII_IO> _exio;
   Real    _o_dt;
   int     _o_count;
   //

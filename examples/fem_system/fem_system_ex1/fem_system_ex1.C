@@ -147,11 +147,11 @@ int main (int argc, char ** argv)
   // Solve this as a time-dependent or steady system
   if (transient)
     system.time_solver =
-      UniquePtr<TimeSolver>(new EulerSolver(system));
+      std::unique_ptr<TimeSolver>(new EulerSolver(system));
   else
     {
       system.time_solver =
-        UniquePtr<TimeSolver>(new SteadySolver(system));
+        std::unique_ptr<TimeSolver>(new SteadySolver(system));
       libmesh_assert_equal_to (n_timesteps, 1);
     }
 
@@ -204,7 +204,7 @@ int main (int argc, char ** argv)
 
           ErrorVector error;
 
-          UniquePtr<ErrorEstimator> error_estimator;
+          std::unique_ptr<ErrorEstimator> error_estimator;
 
           // To solve to a tolerance in this problem we
           // need a better estimator than Kelly

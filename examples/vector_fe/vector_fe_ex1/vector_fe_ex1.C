@@ -202,7 +202,7 @@ void assemble_poisson(EquationSystems & es,
   // Build a Finite Element object of the specified type.
   // Note that FEVectorBase is a typedef for the templated FE
   // class.
-  UniquePtr<FEVectorBase> fe (FEVectorBase::build(dim, fe_type));
+  std::unique_ptr<FEVectorBase> fe (FEVectorBase::build(dim, fe_type));
 
   // A 5th order Gauss quadrature rule for numerical integration.
   QGauss qrule (dim, FIFTH);
@@ -212,7 +212,7 @@ void assemble_poisson(EquationSystems & es,
 
   // Declare a special finite element object for
   // boundary integration.
-  UniquePtr<FEVectorBase> fe_face (FEVectorBase::build(dim, fe_type));
+  std::unique_ptr<FEVectorBase> fe_face (FEVectorBase::build(dim, fe_type));
 
   // Boundary integration requires one quadrature rule,
   // with dimensionality one less than the dimensionality

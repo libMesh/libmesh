@@ -44,9 +44,9 @@ class ExampleOneFunction : public FunctionBase<Number>
 
   virtual void init() {}
   virtual void clear() {}
-  virtual UniquePtr<FunctionBase<Number>> clone() const
+  virtual std::unique_ptr<FunctionBase<Number>> clone() const
   {
-    return UniquePtr<FunctionBase<Number>>(new ExampleOneFunction());
+    return std::unique_ptr<FunctionBase<Number>>(new ExampleOneFunction());
   }
 };
 

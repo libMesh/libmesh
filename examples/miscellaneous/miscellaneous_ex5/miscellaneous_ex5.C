@@ -169,11 +169,11 @@ void assemble_ellipticdg(EquationSystems & es,
 
   // Build a Finite Element object of the specified type.  Since the
   // FEBase::build() member dynamically creates memory we will
-  // store the object as a UniquePtr<FEBase>.  This can be thought
+  // store the object as a std::unique_ptr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
-  UniquePtr<FEBase> fe  (FEBase::build(dim, fe_type));
-  UniquePtr<FEBase> fe_elem_face(FEBase::build(dim, fe_type));
-  UniquePtr<FEBase> fe_neighbor_face(FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe  (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe_elem_face(FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe_neighbor_face(FEBase::build(dim, fe_type));
 
   // Quadrature rules for numerical integration.
 #ifdef QORDER
@@ -276,7 +276,7 @@ void assemble_ellipticdg(EquationSystems & es,
               // Pointer to the element face
               fe_elem_face->reinit(elem, side);
 
-              UniquePtr<const Elem> elem_side (elem->build_side_ptr(side));
+              std::unique_ptr<const Elem> elem_side (elem->build_side_ptr(side));
               // h element dimension to compute the interior penalty penalty parameter
               const unsigned int elem_b_order = static_cast<unsigned int> (fe_elem_face->get_order());
               const double h_elem = elem->volume()/elem_side->volume() * 1./pow(elem_b_order, 2.);
@@ -334,7 +334,7 @@ void assemble_ellipticdg(EquationSystems & es,
                   (neighbor->level() < elem->level()))
                 {
                   // Pointer to the element side
-                  UniquePtr<const Elem> elem_side (elem->build_side_ptr(side));
+                  std::unique_ptr<const Elem> elem_side (elem->build_side_ptr(side));
 
                   // h dimension to compute the interior penalty penalty parameter
                   const unsigned int elem_b_order = static_cast<unsigned int>(fe_elem_face->get_order());

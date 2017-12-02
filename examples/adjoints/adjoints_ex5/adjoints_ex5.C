@@ -208,11 +208,11 @@ void set_system_parameters(HeatSystem & system,
         libmesh_error_msg("This example (and unsteady adjoints in libMesh) only support Backward Euler and explicit methods.");
 
       system.time_solver =
-        UniquePtr<TimeSolver>(innersolver);
+        std::unique_ptr<TimeSolver>(innersolver);
     }
   else
     system.time_solver =
-      UniquePtr<TimeSolver>(new SteadySolver(system));
+      std::unique_ptr<TimeSolver>(new SteadySolver(system));
 
   // The Memory Solution History object we will set the system SolutionHistory object to
   MemorySolutionHistory heatsystem_solution_history(system);
@@ -255,7 +255,7 @@ void set_system_parameters(HeatSystem & system,
     {
 #ifdef LIBMESH_HAVE_PETSC
       PetscDiffSolver *solver = new PetscDiffSolver(system);
-      system.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver);
+      system.time_solver->diff_solver() = std::unique_ptr<DiffSolver>(solver);
 #else
       libmesh_error_msg("This example requires libMesh to be compiled with PETSc support.");
 #endif
@@ -263,7 +263,7 @@ void set_system_parameters(HeatSystem & system,
   else
     {
       NewtonSolver *solver = new NewtonSolver(system);
-      system.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver);
+      system.time_solver->diff_solver() = std::unique_ptr<DiffSolver>(solver);
 
       solver->quiet                       = param.solver_quiet;
       solver->verbose                     = param.solver_verbose;
@@ -323,7 +323,7 @@ int main (int argc, char ** argv)
   Mesh mesh(init.comm(), param.dimension);
 
   // And an object to refine it
-  UniquePtr<MeshRefinement> mesh_refinement(new MeshRefinement(mesh));
+  std::unique_ptr<MeshRefinement> mesh_refinement(new MeshRefinement(mesh));
 
   // And an EquationSystems to run on it
   EquationSystems equation_systems (mesh);

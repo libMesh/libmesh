@@ -28,7 +28,6 @@
 using libMesh::DirichletBoundary;
 using libMesh::RBConstruction;
 using libMesh::RBEvaluation;
-using libMesh::UniquePtr;
 
 // A simple subclass of RBEvaluation.
 class SimpleRBEvaluation : public RBEvaluation
@@ -59,7 +58,7 @@ public:
                         const std::string & name_in,
                         const unsigned int number_in)
     : Parent(es, name_in, number_in),
-      dirichlet_bc(UniquePtr<DirichletBoundary>())
+      dirichlet_bc(std::unique_ptr<DirichletBoundary>())
   {}
 
   /**
@@ -144,7 +143,7 @@ public:
   /**
    * The object that defines which degrees of freedom are on a Dirichlet boundary.
    */
-  UniquePtr<DirichletBoundary> dirichlet_bc;
+  std::unique_ptr<DirichletBoundary> dirichlet_bc;
 };
 
 #endif

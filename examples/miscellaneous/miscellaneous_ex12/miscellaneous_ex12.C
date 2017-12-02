@@ -374,7 +374,7 @@ void assemble_shell (EquationSystems & es,
   // the same for all variables.
   FEType fe_type = system.variable_type (0);
 
-  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
   QGauss qrule (dim, fe_type.default_quadrature_order());
   fe->attach_quadrature_rule (&qrule);
 

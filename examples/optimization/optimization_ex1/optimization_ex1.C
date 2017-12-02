@@ -139,7 +139,7 @@ void AssembleOptimization::assemble_A_and_F()
 
   const DofMap & dof_map = _sys.get_dof_map();
   FEType fe_type = dof_map.variable_type(u_var);
-  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
   QGauss qrule (dim, fe_type.default_quadrature_order());
   fe->attach_quadrature_rule (&qrule);
 
@@ -200,7 +200,7 @@ void AssembleOptimization::assemble_A_and_F()
 Number AssembleOptimization::objective (const NumericVector<Number> & soln,
                                         OptimizationSystem & /*sys*/)
 {
-  UniquePtr<NumericVector<Number>> AxU = soln.zero_clone();
+  std::unique_ptr<NumericVector<Number>> AxU = soln.zero_clone();
 
   A_matrix->vector_mult(*AxU, soln);
 
@@ -292,7 +292,7 @@ int main (int argc, char ** argv)
     const std::string optimization_solver_type = infile("optimization_solver_type",
                                                         "PETSC_SOLVERS");
     SolverPackage sp = Utility::string_to_enum<SolverPackage>(optimization_solver_type);
-    UniquePtr<OptimizationSolver<Number>> new_solver =
+    std::unique_ptr<OptimizationSolver<Number>> new_solver =
       OptimizationSolver<Number>::build(system, sp);
     system.optimization_solver.reset(new_solver.release());
   }

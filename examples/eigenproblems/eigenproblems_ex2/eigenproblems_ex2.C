@@ -171,7 +171,7 @@ int main (int argc, char ** argv)
 #else
   // Get the SLEPc solver object and set initial guess for one basis vector
   // this has to be done _after_ the EquationSystems object is initialized
-  UniquePtr<EigenSolver<Number>> & slepc_eps = eigen_system.eigen_solver;
+  std::unique_ptr<EigenSolver<Number>> & slepc_eps = eigen_system.eigen_solver;
   NumericVector<Number> & initial_space = eigen_system.add_vector("initial_space");
   initial_space.add(1.0);
   slepc_eps->set_initial_space(initial_space);
@@ -240,9 +240,9 @@ void assemble_mass(EquationSystems & es,
 
   // Build a Finite Element object of the specified type.  Since the
   // FEBase::build() member dynamically creates memory we will
-  // store the object as a UniquePtr<FEBase>.  This can be thought
+  // store the object as a std::unique_ptr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
-  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
 
   // A  Gauss quadrature rule for numerical integration.
   // Use the default quadrature order.
