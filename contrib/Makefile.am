@@ -22,10 +22,6 @@ if LIBMESH_ENABLE_CAPNPROTO
   oprof_libs += capnproto/liboprof.la
 endif
 
-if LIBMESH_INSTALL_HINNANT_UNIQUE_PTR
-  SUBDIRS += unique_ptr
-endif
-
 if LIBMESH_INSTALL_INTERNAL_BOOST
    SUBDIRS += boost/include
 endif
