@@ -171,7 +171,7 @@ public:
     sys.get_all_variable_numbers(variables);
     std::sort(variables.begin(),variables.end());
 
-    UniquePtr< NumericVector<Number> > mesh_function_vector =
+    std::unique_ptr< NumericVector<Number> > mesh_function_vector =
       NumericVector<Number>::build(es.comm());
     mesh_function_vector->init(sys.n_dofs(), false, SERIAL);
     sys.solution->localize( *mesh_function_vector );
@@ -265,7 +265,7 @@ public:
     int n_old_dofs_local = ndofs_old_end - ndofs_old_first;
 
     // init and compute the projection matrix using GenericProjector
-    UniquePtr<SparseMatrix<Number> > proj_mat_ptr =
+    std::unique_ptr<SparseMatrix<Number> > proj_mat_ptr =
       SparseMatrix<Number>::build(*TestCommWorld);
     SparseMatrix<Number> & proj_mat = *proj_mat_ptr;
     proj_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs_local);
@@ -273,7 +273,7 @@ public:
     proj_mat.close();
 
     // init the gold standard projection matrix
-    UniquePtr<SparseMatrix<Number> > gold_mat_ptr =
+    std::unique_ptr<SparseMatrix<Number> > gold_mat_ptr =
       SparseMatrix<Number>::build(*TestCommWorld);
     SparseMatrix<Number> & gold_mat = *gold_mat_ptr;
     gold_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs);
@@ -414,7 +414,7 @@ public:
     int n_old_dofs_local = ndofs_old_end - ndofs_old_first;
 
     // init and compute the projection matrix using GenericProjector
-    UniquePtr<SparseMatrix<Number> > proj_mat_ptr =
+    std::unique_ptr<SparseMatrix<Number> > proj_mat_ptr =
       SparseMatrix<Number>::build(*TestCommWorld);
     SparseMatrix<Number> & proj_mat = *proj_mat_ptr;
     proj_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs_local);
@@ -422,7 +422,7 @@ public:
     proj_mat.close();
 
     // init the gold standard projection matrix
-    UniquePtr<SparseMatrix<Number> > gold_mat_ptr =
+    std::unique_ptr<SparseMatrix<Number> > gold_mat_ptr =
       SparseMatrix<Number>::build(*TestCommWorld);
     SparseMatrix<Number> & gold_mat = *gold_mat_ptr;
     gold_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs);
@@ -558,7 +558,7 @@ public:
     int n_old_dofs_local = ndofs_old_end - ndofs_old_first;
 
     // init and compute the projection matrix using GenericProjector
-    UniquePtr<SparseMatrix<Number> > proj_mat_ptr =
+    std::unique_ptr<SparseMatrix<Number> > proj_mat_ptr =
       SparseMatrix<Number>::build(*TestCommWorld);
     SparseMatrix<Number> & proj_mat = *proj_mat_ptr;
     proj_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs_local);
@@ -566,7 +566,7 @@ public:
     proj_mat.close();
 
     // init the gold standard projection matrix
-    UniquePtr<SparseMatrix<Number> > gold_mat_ptr =
+    std::unique_ptr<SparseMatrix<Number> > gold_mat_ptr =
       SparseMatrix<Number>::build(*TestCommWorld);
     SparseMatrix<Number> & gold_mat = *gold_mat_ptr;
     gold_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs);

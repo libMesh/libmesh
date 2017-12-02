@@ -127,10 +127,10 @@ public:
 
 
 private:
-  UniquePtr<UnstructuredMesh> mesh;
-  UniquePtr<EquationSystems> es;
+  std::unique_ptr<UnstructuredMesh> mesh;
+  std::unique_ptr<EquationSystems> es;
   System * sys;
-  UniquePtr<FEMContext> c, s;
+  std::unique_ptr<FEMContext> c, s;
 
   void testValues()
   {

@@ -55,7 +55,7 @@ public:
     sys.add_variable("u", THIRD, HIERARCHIC);
 
     const unsigned n_elem_per_side = 3;
-    const UniquePtr<Elem> test_elem = Elem::build(elem_type);
+    const std::unique_ptr<Elem> test_elem = Elem::build(elem_type);
     const Real ymax = test_elem->dim() > 1;
     const Real zmax = test_elem->dim() > 2;
     const unsigned int ny = ymax * n_elem_per_side;

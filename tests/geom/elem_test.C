@@ -33,7 +33,7 @@ public:
     const unsigned int N = 2;
 
     _mesh = new Mesh(*TestCommWorld);
-    const UniquePtr<Elem> test_elem = Elem::build(elem_type);
+    const std::unique_ptr<Elem> test_elem = Elem::build(elem_type);
     const unsigned int dim = test_elem->dim();
     const unsigned int use_y = dim > 1;
     const unsigned int use_z = dim > 2;

@@ -50,8 +50,11 @@ public:
     // We set our initial conditions based on build_square node ids
     mesh.allow_renumbering(false);
 
-    MeshTools::Generation::build_square(
-        mesh, 1, 1, -1., 1., -1., 1., Utility::string_to_enum<ElemType>("TRI6"));
+    MeshTools::Generation::build_square(mesh,
+                                        1, 1,
+                                        -1., 1.,
+                                        -1., 1.,
+                                        Utility::string_to_enum<ElemType>("TRI6"));
 
     // Create an equation systems object.
     EquationSystems equation_systems(mesh);
@@ -118,16 +121,16 @@ public:
     // VariableGroup optimization means that DoFs iterate over each of
     // the 3 variables on each node before proceeding to the next
     // node.
-                                    //  u_x, u_y,    v
-    const std::vector<Real> gold_vector({-1,   3,   10,
-                                          0,   1,   12,
-                                          2,   0,   14,
-                                          0,   1.5, 11,
-                                          0.5, 1,   13,
-                                          0.5, 1.5, 12,
-                                          3,   4,   16,
-                                          3,   1.5, 15,
-                                          0.5, 4,   13});
+    //                                     u_x, u_y, v
+    const std::vector<Real> gold_vector = {-1,  3,   10,
+                                           0,   1,   12,
+                                           2,   0,   14,
+                                           0,   1.5, 11,
+                                           0.5, 1,   13,
+                                           0.5, 1.5, 12,
+                                           3,   4,   16,
+                                           3,   1.5, 15,
+                                           0.5, 4,   13};
 
     // Translation from node id to dof indexing order as gets done in
     // serial

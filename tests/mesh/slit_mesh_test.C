@@ -38,10 +38,10 @@ public:
 
   virtual void init_context (const FEMContext &) libmesh_override {}
 
-  virtual UniquePtr<FEMFunctionBase<Number>>
+  virtual std::unique_ptr<FEMFunctionBase<Number>>
   clone () const libmesh_override
   {
-    return UniquePtr<FEMFunctionBase<Number>> (new SlitFunc());
+    return std::unique_ptr<FEMFunctionBase<Number>> (new SlitFunc());
   }
 
   virtual Number operator() (const FEMContext & c,
@@ -376,7 +376,7 @@ public:
 
     // While we're in the middle of a unique id based test case, let's
     // make sure our unique ids were all read in correctly too.
-    UniquePtr<PointLocatorBase> locator = _mesh->sub_point_locator();
+    std::unique_ptr<PointLocatorBase> locator = _mesh->sub_point_locator();
 
     if (!_mesh->is_serial())
       locator->enable_out_of_mesh_mode();
