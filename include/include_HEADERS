@@ -422,7 +422,6 @@ include_HEADERS =  \
         utils/pointer_to_pointer_iter.h \
         utils/pool_allocator.h \
         utils/restore_warnings.h \
-        utils/safe_bool.h \
         utils/simple_range.h \
         utils/statistics.h \
         utils/string_to_enum.h \
