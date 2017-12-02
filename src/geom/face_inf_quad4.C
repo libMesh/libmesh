@@ -164,7 +164,7 @@ bool InfQuad4::contains_point (const Point & p, Real tol) const
 
 
 std::unique_ptr<Elem> InfQuad4::build_side_ptr (const unsigned int i,
-                                          bool proxy)
+                                                bool proxy)
 {
   // libmesh_assert_less (i, this->n_sides());
 

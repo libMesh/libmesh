@@ -117,7 +117,7 @@ unsigned int InfPrism12::which_node_am_i(unsigned int side,
 
 
 std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
-                                            bool proxy)
+                                                  bool proxy)
 {
   libmesh_assert_less (i, this->n_sides());
 

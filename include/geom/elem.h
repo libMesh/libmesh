@@ -1488,7 +1488,7 @@ public:
    * \returns An Elem of type \p type wrapped in a smart pointer.
    */
   static std::unique_ptr<Elem> build (const ElemType type,
-                                Elem * p=libmesh_nullptr);
+                                      Elem * p=libmesh_nullptr);
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -2880,10 +2880,10 @@ SimpleRange<Elem::ConstNeighborPtrIter> Elem::neighbor_ptr_range() const
   }                                                                     \
                                                                         \
   virtual                                                               \
-  std::vector<std::vector<std::vector<signed char>>> &                \
+  std::vector<std::vector<std::vector<signed char>>> &                  \
   _get_parent_indices_cache() const libmesh_override                    \
   {                                                                     \
-    static std::vector<std::vector<std::vector<signed char>>> c;      \
+    static std::vector<std::vector<std::vector<signed char>>> c;        \
     return c;                                                           \
   }
 

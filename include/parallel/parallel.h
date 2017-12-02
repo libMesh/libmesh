@@ -421,20 +421,18 @@ class OpFunction
    * attempt to perform a reduction on an unspecialized type will be a
    * compile-time rather than a run-time failure.
    */
-/*
-  static MPI_Op max();
-  static MPI_Op min();
-  static MPI_Op sum();
-  static MPI_Op product();
-  static MPI_Op logical_and();
-  static MPI_Op bitwise_and();
-  static MPI_Op logical_or();
-  static MPI_Op bitwise_or();
-  static MPI_Op logical_xor();
-  static MPI_Op bitwise_xor();
-  static MPI_Op max_loc();
-  static MPI_Op min_loc();
- */
+  // static MPI_Op max();
+  // static MPI_Op min();
+  // static MPI_Op sum();
+  // static MPI_Op product();
+  // static MPI_Op logical_and();
+  // static MPI_Op bitwise_and();
+  // static MPI_Op logical_or();
+  // static MPI_Op bitwise_or();
+  // static MPI_Op logical_xor();
+  // static MPI_Op bitwise_xor();
+  // static MPI_Op max_loc();
+  // static MPI_Op min_loc();
 };
 
 /*

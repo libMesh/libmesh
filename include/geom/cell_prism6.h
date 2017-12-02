@@ -114,7 +114,7 @@ public:
    * The \p std::unique_ptr<Elem> handles the memory aspect.
    */
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                          bool proxy) libmesh_override;
+                                                bool proxy) libmesh_override;
 
   /**
    * Builds a \p EDGE2 or \p INFEDGE2 built coincident with face i.

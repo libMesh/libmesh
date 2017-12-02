@@ -1829,9 +1829,9 @@ FEMContext::cached_fe( const unsigned int elem_dim,
     _real_fe =
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       fe_needs_inf ?
-        FEGenericBase<Real>::build_InfFE(elem_dim, fe_type) :
+      FEGenericBase<Real>::build_InfFE(elem_dim, fe_type) :
 #endif
-        FEGenericBase<Real>::build(elem_dim, fe_type);
+      FEGenericBase<Real>::build(elem_dim, fe_type);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   else if (fe_needs_inf && !_real_fe_is_inf)
@@ -1865,9 +1865,9 @@ FEMContext::cached_fe( const unsigned int elem_dim,
     _real_grad_fe =
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       fe_needs_inf ?
-        FEGenericBase<RealGradient>::build_InfFE(elem_dim, fe_type) :
+      FEGenericBase<RealGradient>::build_InfFE(elem_dim, fe_type) :
 #endif
-        FEGenericBase<RealGradient>::build(elem_dim, fe_type);
+      FEGenericBase<RealGradient>::build(elem_dim, fe_type);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   else if (fe_needs_inf && !_real_grad_fe_is_inf)

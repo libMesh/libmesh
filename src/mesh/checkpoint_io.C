@@ -160,7 +160,7 @@ void CheckpointIO::write (const std::string & name)
 
   for (std::vector<processor_id_type>::const_iterator
          id_it = ids_to_write.begin(), id_end = ids_to_write.end();
-         id_it != id_end; ++id_it)
+       id_it != id_end; ++id_it)
     {
       const processor_id_type my_pid = *id_it;
 
@@ -406,15 +406,15 @@ void CheckpointIO::write_remote_elem (Xdr & io,
         {
           const unsigned int nc = elem.n_children();
           for (unsigned int c = 0; c != nc; ++c)
-          {
-            const Elem * child = elem.child_ptr(c);
-            if (child == remote_elem ||
-                (child && !elements.count(child)))
-              {
-                parent_ids.push_back(elem.id());
-                child_numbers.push_back(c);
-              }
-          }
+            {
+              const Elem * child = elem.child_ptr(c);
+              if (child == remote_elem ||
+                  (child && !elements.count(child)))
+                {
+                  parent_ids.push_back(elem.id());
+                  child_numbers.push_back(c);
+                }
+            }
         }
 #endif
     }
@@ -578,7 +578,7 @@ void CheckpointIO::read (const std::string & name)
 
       // read the data type
       io.data (data_size);
-  }
+    }
 
   this->comm().broadcast(data_size);
 
@@ -1135,7 +1135,7 @@ unsigned int CheckpointIO::n_active_levels_in(MeshBase::const_element_iterator b
   unsigned int max_level = 0;
 
   for (MeshBase::const_element_iterator it = begin;
-         it != end; ++it)
+       it != end; ++it)
     max_level = std::max((*it)->level(), max_level);
 
   return max_level + 1;

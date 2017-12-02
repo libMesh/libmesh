@@ -2158,8 +2158,8 @@ Gradient System::point_gradient(unsigned int var, const Point & p, const Elem & 
   libmesh_assert (e.contains_point(p));
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-   if (e.infinite())
-     libmesh_not_implemented();
+  if (e.infinite())
+    libmesh_not_implemented();
 #endif
 
   // Get the dof map to get the proper indices for our computation
@@ -2277,8 +2277,8 @@ Tensor System::point_hessian(unsigned int var, const Point & p, const Elem & e) 
   libmesh_assert (e.contains_point(p));
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-   if (e.infinite())
-     libmesh_not_implemented();
+  if (e.infinite())
+    libmesh_not_implemented();
 #endif
 
   // Get the dof map to get the proper indices for our computation

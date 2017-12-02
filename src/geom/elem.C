@@ -236,7 +236,7 @@ const unsigned int Elem::type_to_n_edges_map [] =
 // ------------------------------------------------------------
 // Elem class member functions
 std::unique_ptr<Elem> Elem::build(const ElemType type,
-                            Elem * p)
+                                  Elem * p)
 {
   Elem * elem = libmesh_nullptr;
 
@@ -2972,7 +2972,7 @@ Real Elem::volume () const
   FEType fe_type (this->default_order() , LAGRANGE);
 
   std::unique_ptr<FEBase> fe (FEBase::build(this->dim(),
-                                      fe_type));
+                                            fe_type));
 
   const std::vector<Real> & JxW = fe->get_JxW();
 

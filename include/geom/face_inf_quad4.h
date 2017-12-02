@@ -115,7 +115,7 @@ public:
    * the sides 1, 2.
    */
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                          bool proxy) libmesh_override;
+                                                bool proxy) libmesh_override;
 
   virtual void connectivity(const unsigned int sf,
                             const IOPackage iop,

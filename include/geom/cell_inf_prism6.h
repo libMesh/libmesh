@@ -122,7 +122,7 @@ public:
    * \note The \p std::unique_ptr<Elem> takes care of freeing memory.
    */
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                          bool proxy) libmesh_override;
+                                                bool proxy) libmesh_override;
 
   /**
    * \returns An \p EDGE2 built coincident with edges 0 to 2, an \p INFEDGE2

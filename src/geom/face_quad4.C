@@ -125,7 +125,7 @@ bool Quad4::has_affine_map() const
 
 
 std::unique_ptr<Elem> Quad4::build_side_ptr (const unsigned int i,
-                                       bool proxy)
+                                             bool proxy)
 {
   libmesh_assert_less (i, this->n_sides());
 

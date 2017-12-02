@@ -2214,9 +2214,9 @@ void DofMap::_dof_indices (const Elem & elem,
           const unsigned int nc =
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
             is_inf ?
-              FEInterface::n_dofs_at_node(dim, fe_type, type, n) :
+            FEInterface::n_dofs_at_node(dim, fe_type, type, n) :
 #endif
-              ndan (type, fe_type.order, n);
+            ndan (type, fe_type.order, n);
 
           // If this is a non-vertex on a hanging node with extra
           // degrees of freedom, we use the non-vertex dofs (which
@@ -2475,9 +2475,9 @@ void DofMap::old_dof_indices (const Elem * const elem,
                   const unsigned int nc =
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
                     is_inf ?
-                      FEInterface::n_dofs_at_node(dim, fe_type, type, n) :
+                    FEInterface::n_dofs_at_node(dim, fe_type, type, n) :
 #endif
-                      ndan (type, fe_type.order, n);
+                    ndan (type, fe_type.order, n);
 
                   libmesh_assert(node->old_dof_object);
 

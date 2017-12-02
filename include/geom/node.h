@@ -108,16 +108,16 @@ public:
    * \returns A \p Node copied from \p p with id == \id and wrapped in a smart pointer.
    */
   static std::unique_ptr<Node> build (const Point & p,
-                                const dof_id_type id);
+                                      const dof_id_type id);
 
   /**
    * \returns A \p Node created from the specified (x,y,z) positions
    * with id == \id and wrapped in a smart pointer.
    */
   static std::unique_ptr<Node> build (const Real x,
-                                const Real y,
-                                const Real z,
-                                const dof_id_type id);
+                                      const Real y,
+                                      const Real z,
+                                      const dof_id_type id);
 
   /**
    * \returns \p true if the node is active.  An active node is
@@ -306,7 +306,7 @@ std::unique_ptr<Node> Node::build(const Node & n)
 
 inline
 std::unique_ptr<Node> Node::build(const Point & p,
-                            const dof_id_type id)
+                                  const dof_id_type id)
 {
   return std::unique_ptr<Node>(new Node(p,id));
 }
@@ -315,9 +315,9 @@ std::unique_ptr<Node> Node::build(const Point & p,
 
 inline
 std::unique_ptr<Node> Node::build(const Real x,
-                            const Real y,
-                            const Real z,
-                            const dof_id_type id)
+                                  const Real y,
+                                  const Real z,
+                                  const dof_id_type id)
 {
   return std::unique_ptr<Node>(new Node(x,y,z,id));
 }

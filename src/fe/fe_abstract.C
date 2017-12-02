@@ -42,7 +42,7 @@ namespace libMesh
 {
 
 std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
-                                        const FEType & fet)
+                                              const FEType & fet)
 {
   switch (dim)
     {

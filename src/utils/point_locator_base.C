@@ -63,8 +63,8 @@ bool PointLocatorBase::initialized () const
 
 
 std::unique_ptr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
-                                                     const MeshBase & mesh,
-                                                     const PointLocatorBase * master)
+                                                           const MeshBase & mesh,
+                                                           const PointLocatorBase * master)
 {
   switch (t)
     {

@@ -769,7 +769,7 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
                                       const Point & p,
                                       RealGradient & phi)
 {
-   // This even does not handle infinite elements at all!?
+  // This even does not handle infinite elements at all!?
   const Order o = fe_t.order;
 
   switch(dim)

@@ -43,36 +43,36 @@ namespace Parallel {
       StandardType(const cxxtype * = libmesh_nullptr) : DataType(mpitype) {} \
   }
 
-#define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)                           \
-  template<>                                                            \
-  class OpFunction<cxxtype>                                             \
-  {                                                                     \
-  public:                                                               \
-    static MPI_Op max()          { return MPI_MAX; }                    \
-    static MPI_Op min()          { return MPI_MIN; }                    \
-    static MPI_Op sum()          { return MPI_SUM; }                    \
-    static MPI_Op product()      { return MPI_PROD; }                   \
-    static MPI_Op logical_and()  { return MPI_LAND; }                   \
-    static MPI_Op bitwise_and()  { return MPI_BAND; }                   \
-    static MPI_Op logical_or()   { return MPI_LOR; }                    \
-    static MPI_Op bitwise_or()   { return MPI_BOR; }                    \
-    static MPI_Op logical_xor()  { return MPI_LXOR; }                   \
-    static MPI_Op bitwise_xor()  { return MPI_BXOR; }                   \
-    static MPI_Op max_location() { return MPI_MAXLOC; }                 \
-    static MPI_Op min_location() { return MPI_MINLOC; }                 \
+#define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)           \
+  template<>                                            \
+  class OpFunction<cxxtype>                             \
+  {                                                     \
+  public:                                               \
+    static MPI_Op max()          { return MPI_MAX; }    \
+    static MPI_Op min()          { return MPI_MIN; }    \
+    static MPI_Op sum()          { return MPI_SUM; }    \
+    static MPI_Op product()      { return MPI_PROD; }   \
+    static MPI_Op logical_and()  { return MPI_LAND; }   \
+    static MPI_Op bitwise_and()  { return MPI_BAND; }   \
+    static MPI_Op logical_or()   { return MPI_LOR; }    \
+    static MPI_Op bitwise_or()   { return MPI_BOR; }    \
+    static MPI_Op logical_xor()  { return MPI_LXOR; }   \
+    static MPI_Op bitwise_xor()  { return MPI_BXOR; }   \
+    static MPI_Op max_location() { return MPI_MAXLOC; } \
+    static MPI_Op min_location() { return MPI_MINLOC; } \
   }
 
-#define LIBMESH_PARALLEL_FLOAT_OPS(cxxtype)                             \
-  template<>                                                            \
-  class OpFunction<cxxtype>                                             \
-  {                                                                     \
-  public:                                                               \
-    static MPI_Op max()          { return MPI_MAX; }                    \
-    static MPI_Op min()          { return MPI_MIN; }                    \
-    static MPI_Op sum()          { return MPI_SUM; }                    \
-    static MPI_Op product()      { return MPI_PROD; }                   \
-    static MPI_Op max_location() { return MPI_MAXLOC; }                 \
-    static MPI_Op min_location() { return MPI_MINLOC; }                 \
+#define LIBMESH_PARALLEL_FLOAT_OPS(cxxtype)             \
+  template<>                                            \
+  class OpFunction<cxxtype>                             \
+  {                                                     \
+  public:                                               \
+    static MPI_Op max()          { return MPI_MAX; }    \
+    static MPI_Op min()          { return MPI_MIN; }    \
+    static MPI_Op sum()          { return MPI_SUM; }    \
+    static MPI_Op product()      { return MPI_PROD; }   \
+    static MPI_Op max_location() { return MPI_MAXLOC; } \
+    static MPI_Op min_location() { return MPI_MINLOC; } \
   }
 
 #else
@@ -86,16 +86,16 @@ namespace Parallel {
       StandardType(const cxxtype * = libmesh_nullptr) : DataType() {}   \
   }
 
-#define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)                           \
-  template<>                                                            \
-  class OpFunction<cxxtype>                                             \
-  {                                                                     \
+#define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)   \
+  template<>                                    \
+  class OpFunction<cxxtype>                     \
+  {                                             \
   }
 
-#define LIBMESH_PARALLEL_FLOAT_OPS(cxxtype)                             \
-  template<>                                                            \
-  class OpFunction<cxxtype>                                             \
-  {                                                                     \
+#define LIBMESH_PARALLEL_FLOAT_OPS(cxxtype)     \
+  template<>                                    \
+  class OpFunction<cxxtype>                     \
+  {                                             \
   }
 
 #endif
@@ -126,7 +126,7 @@ namespace Parallel {
 
 #define LIBMESH_CONTAINER_TYPE(cxxtype)                                 \
   template<typename T>                                                  \
-  struct Attributes<cxxtype<T>>                                        \
+  struct Attributes<cxxtype<T>>                                         \
   {                                                                     \
     static const bool has_min_max = Attributes<T>::has_min_max;         \
     static void set_lowest(cxxtype<T> & x) {                            \
@@ -3370,7 +3370,7 @@ inline void Communicator::allgather(std::vector<std::basic_string<T>> & r,
 
   libmesh_call_mpi
     (MPI_Allgatherv (concat_src.empty() ?
-                       libmesh_nullptr : &concat_src[0], myconcatsize,
+                     libmesh_nullptr : &concat_src[0], myconcatsize,
                      send_type, &concat[0], &concat_sizes[0],
                      &displacements[0], send_type, this->get()));
 

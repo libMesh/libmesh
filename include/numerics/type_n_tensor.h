@@ -220,9 +220,9 @@ public:
 
 private:
   static constexpr int int_pow(int b, int e)
-    {
-      return (e == 0) ? 1 : b * int_pow(b, e - 1);
-    }
+  {
+    return (e == 0) ? 1 : b * int_pow(b, e - 1);
+  }
 };
 
 

@@ -284,10 +284,10 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
 
   // Close the matrix and vectors in case this wasn't already done.
   if (this->_close_matrix_before_solve)
-  {
-    matrix_A->close ();
-    matrix_B->close ();
-  }
+    {
+      matrix_A->close ();
+      matrix_B->close ();
+    }
 
   return _solve_generalized_helper (matrix_A->mat(), matrix_B->mat(), nev, ncv, tol, m_its);
 }

@@ -58,14 +58,12 @@ void FEComputeData::init ()
 
   if (equation_systems.parameters.have_parameter<Real>("current frequency"))
     {
-
-    // please use the type Number instead.
-    libmesh_deprecated();
-    this->frequency = static_cast<Number> (this->equation_systems.parameters.get<Real>("current frequency"));
+      // please use the type Number instead.
+      libmesh_deprecated();
+      this->frequency = static_cast<Number> (this->equation_systems.parameters.get<Real>("current frequency"));
     }
 
   else if (equation_systems.parameters.have_parameter<Number>("current frequency"))
-
     this->frequency = this->equation_systems.parameters.get<Number>("current frequency");
 
 #endif

@@ -47,8 +47,8 @@ template <typename T, typename I, typename T2>
 struct CompareTypes<MetaPhysicL::DynamicSparseNumberArray<T,I>, T2>
 {
   typedef typename
-    MetaPhysicL::DynamicSparseNumberArray
-      <typename CompareTypes<T,T2>::supertype,I> supertype;
+  MetaPhysicL::DynamicSparseNumberArray
+  <typename CompareTypes<T,T2>::supertype,I> supertype;
 };
 }
 
@@ -85,10 +85,12 @@ struct CompareTypes<MetaPhysicL::DynamicSparseNumberArray<T,I>, T2>
 namespace libMesh {
 typedef DynamicSparseNumberArray<Real, dof_id_type> DSNAN;
 
-template void DenseMatrix<Real>::cholesky_solve
-  (const DenseVector<DSNAN> &, DenseVector<DSNAN> &);
-template void DenseMatrix<Real>::_cholesky_back_substitute
-  (const DenseVector<DSNAN> &, DenseVector<DSNAN> &) const;
+template void
+DenseMatrix<Real>::cholesky_solve(const DenseVector<DSNAN> &,
+                                  DenseVector<DSNAN> &);
+template void
+DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<DSNAN> &,
+                                             DenseVector<DSNAN> &) const;
 }
 #endif
 
@@ -741,10 +743,8 @@ void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
         vars[i] = i;
 
       // Use a typedef to make the calling sequence for parallel_for() a bit more readable
-      typedef OldSolutionCoefs<Real,         &FEMContext::point_value>
-              OldSolutionValueCoefs;
-      typedef OldSolutionCoefs<RealGradient, &FEMContext::point_gradient>
-              OldSolutionGradientCoefs;
+      typedef OldSolutionCoefs<Real, &FEMContext::point_value> OldSolutionValueCoefs;
+      typedef OldSolutionCoefs<RealGradient, &FEMContext::point_gradient> OldSolutionGradientCoefs;
 
       typedef
         GenericProjector<OldSolutionValueCoefs,

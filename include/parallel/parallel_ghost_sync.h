@@ -323,7 +323,7 @@ void sync_dofobject_data_by_id(const Communicator & comm,
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
-       DofObject * obj = *it;
+      DofObject * obj = *it;
       libmesh_assert (obj);
 
       // We may want to pass Elem* or Node* to the check function, not

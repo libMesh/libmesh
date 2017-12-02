@@ -142,7 +142,7 @@ public:
    * \returns A pointer to a NodeElem for the specified node.
    */
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                          bool proxy) libmesh_override;
+                                                bool proxy) libmesh_override;
 
   /**
    * The \p Elem::build_edge_ptr() member makes no sense for edges.

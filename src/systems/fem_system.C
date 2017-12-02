@@ -855,7 +855,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
 {
   libmesh_assert(get_residual || get_jacobian);
 
-// Log residual and jacobian and combined performance separately
+  // Log residual and jacobian and combined performance separately
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
   const char * log_name;
   if (get_residual && get_jacobian)

@@ -136,7 +136,7 @@ public:
                                        unsigned int side_node) const libmesh_override;
 
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                          bool proxy) libmesh_override;
+                                                bool proxy) libmesh_override;
 
   virtual void connectivity(const unsigned int sf,
                             const IOPackage iop,

@@ -74,7 +74,7 @@ public:
    * \p solver_package
    */
   static std::unique_ptr<OptimizationSolver<T>> build(sys_type & s,
-                                                 const SolverPackage solver_package = libMesh::default_solver_package());
+                                                      const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
    * \returns \p true if the data structures are

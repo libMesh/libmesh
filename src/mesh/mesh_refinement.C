@@ -1152,8 +1152,8 @@ bool MeshRefinement::make_coarsening_compatible()
              uncoarsenable_tag);
 
           for (std::vector<dof_id_type>::const_iterator
-               it = my_uncoarsenable_parents.begin(),
-               end = my_uncoarsenable_parents.end(); it != end; ++it)
+                 it = my_uncoarsenable_parents.begin(),
+                 end = my_uncoarsenable_parents.end(); it != end; ++it)
             {
               Elem & elem = _mesh.elem_ref(*it);
               libmesh_assert(elem.refinement_flag() == Elem::INACTIVE ||
@@ -1787,8 +1787,8 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
                  coarsen_tag);
 
               for (std::vector<dof_id_type>::const_iterator
-                   it = my_parents_to_coarsen.begin(),
-                   end = my_parents_to_coarsen.end(); it != end; ++it)
+                     it = my_parents_to_coarsen.begin(),
+                     end = my_parents_to_coarsen.end(); it != end; ++it)
                 {
                   Elem & elem = _mesh.elem_ref(*it);
                   libmesh_assert(elem.refinement_flag() == Elem::INACTIVE ||

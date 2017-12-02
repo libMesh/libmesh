@@ -123,7 +123,7 @@ unsigned int InfHex16::which_node_am_i(unsigned int side,
 
 
 std::unique_ptr<Elem> InfHex16::build_side_ptr (const unsigned int i,
-                                          bool proxy)
+                                                bool proxy)
 {
   libmesh_assert_less (i, this->n_sides());
 

@@ -76,7 +76,7 @@ public:
    * \p solver_package
    */
   static std::unique_ptr<LinearSolver<T>> build(const libMesh::Parallel::Communicator & comm_in,
-                                           const SolverPackage solver_package = libMesh::default_solver_package());
+                                                const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
    * \returns \p true if the data structures are

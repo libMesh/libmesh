@@ -116,7 +116,7 @@ public:
    * memory leaks.
    */
   static std::unique_ptr<FEAbstract> build (const unsigned int dim,
-                                      const FEType & type);
+                                            const FEType & type);
 
   /**
    * This is at the core of this class. Use this for each

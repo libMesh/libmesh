@@ -83,8 +83,8 @@ public:
    * is returned so that the user does not accidentally leak it.
    */
   static std::unique_ptr<QBase> build (const std::string & name,
-                                 const unsigned int dim,
-                                 const Order order=INVALID_ORDER);
+                                       const unsigned int dim,
+                                       const Order order=INVALID_ORDER);
 
   /**
    * Builds a specific quadrature rule based on the QuadratureType.
@@ -94,8 +94,8 @@ public:
    * is returned so that the user does not accidentally leak it.
    */
   static std::unique_ptr<QBase> build (const QuadratureType qt,
-                                 const unsigned int dim,
-                                 const Order order=INVALID_ORDER);
+                                       const unsigned int dim,
+                                       const Order order=INVALID_ORDER);
 
   /**
    * \returns The element type we're currently using.

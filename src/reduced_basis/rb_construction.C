@@ -642,20 +642,19 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
               std::vector<dof_id_type> nodal_dof_indices;
               DenseMatrix<Number> nodal_matrix;
               DenseVector<Number> nodal_rhs;
-              elem_assembly->get_nodal_values(
-                nodal_dof_indices, nodal_matrix, nodal_rhs, *this, node);
+              elem_assembly->get_nodal_values(nodal_dof_indices,
+                                              nodal_matrix,
+                                              nodal_rhs,
+                                              *this,
+                                              node);
 
-              if(!nodal_dof_indices.empty())
+              if (!nodal_dof_indices.empty())
                 {
-                  if(assemble_vector)
-                    {
-                      input_vector->add_vector(nodal_rhs, nodal_dof_indices);
-                    }
+                  if (assemble_vector)
+                    input_vector->add_vector(nodal_rhs, nodal_dof_indices);
 
-                  if(assemble_matrix)
-                    {
-                      input_matrix->add_matrix(nodal_matrix, nodal_dof_indices);
-                    }
+                  if (assemble_matrix)
+                    input_matrix->add_matrix(nodal_matrix, nodal_dof_indices);
                 }
 #ifdef LIBMESH_ENABLE_DEPRECATED
               else if(elem_assembly->is_nodal_rhs_values_overriden)
@@ -740,8 +739,8 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
           catch(std::exception& e)
             {
               libMesh::err << std::endl << "Error detected when computing element data on side "
-                << static_cast<int>(context.side) << " of element "
-                << context.get_elem().id() << std::endl;
+                           << static_cast<int>(context.side) << " of element "
+                           << context.get_elem().id() << std::endl;
               libMesh::err << "Skipping assembly on this element side" << std::endl << std::endl;
             }
 

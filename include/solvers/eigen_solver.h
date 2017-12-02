@@ -72,8 +72,8 @@ public:
    * \p solver_package
    */
   static std::unique_ptr<EigenSolver<T>> build(const Parallel::Communicator & comm_in
-                                          LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
-                                          const SolverPackage solver_package = SLEPC_SOLVERS);
+                                               LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
+                                               const SolverPackage solver_package = SLEPC_SOLVERS);
 
   /**
    * \returns \p true if the data structures are

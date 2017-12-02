@@ -183,8 +183,8 @@ bool InfPrism::contains_point (const Point & p, Real tol) const
   Point pt1_o(this->point(1) - my_origin);
   Point pt2_o(this->point(2) - my_origin);
   const Real min_distance_sq = std::min(pt0_o.norm_sq(),
-                               std::min(pt1_o.norm_sq(),
-                                        pt2_o.norm_sq()));
+                                        std::min(pt1_o.norm_sq(),
+                                                 pt2_o.norm_sq()));
 
   // work with 1% allowable deviation.  We can still fall
   // back to the InfFE::inverse_map()

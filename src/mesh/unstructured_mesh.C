@@ -419,10 +419,10 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                   // neighbor
                   if (neigh &&
                       (neigh->ancestor() ||
-                  // If neigh has subactive children which should have
-                  // matched as neighbors of the current element but
-                  // did not, then those likewise must be remote
-                  // children.
+                       // If neigh has subactive children which should have
+                       // matched as neighbors of the current element but
+                       // did not, then those likewise must be remote
+                       // children.
                        (current_elem->subactive() && neigh->has_children() &&
                         (neigh->level()+1) == current_elem->level())))
                     {
@@ -479,7 +479,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                                 }
                             }
                           if (!found_neigh)
-                          neigh = const_cast<RemoteElem *>(remote_elem);
+                            neigh = const_cast<RemoteElem *>(remote_elem);
                         }
                     }
                   current_elem->set_neighbor(s, neigh);
