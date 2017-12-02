@@ -17,7 +17,6 @@ unit_tests_sources = \
   base/default_coupling_test.C \
   base/getpot_test.C \
   base/point_neighbor_coupling_test.C \
-  base/unique_ptr_test.C \
   fe/fe_bernstein_test.C \
   fe/fe_clough_test.C \
   fe/fe_hermite_test.C \
