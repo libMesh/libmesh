@@ -226,7 +226,7 @@ public:
   /**
    * TetGen output structure.
    */
-  UniquePtr<tetgenio> tetgen_output;
+  std::unique_ptr<tetgenio> tetgen_output;
 
   /**
    * TetGen mesh structure (from the TetGen library).

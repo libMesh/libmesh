@@ -35,7 +35,7 @@ namespace libMesh
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_base>
 Elem * InfFE<Dim,T_radial,T_base>::Base::build_elem (const Elem * inf_elem)
 {
-  UniquePtr<const Elem> ape(inf_elem->build_side_ptr(0));
+  std::unique_ptr<const Elem> ape(inf_elem->build_side_ptr(0));
 
   // The incoming inf_elem is const, but this function is required to
   // return a non-const Elem * so that it can be used by

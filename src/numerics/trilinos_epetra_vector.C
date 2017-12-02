@@ -231,7 +231,7 @@ void EpetraVector<T>::add_vector (const NumericVector<T> & v_in,
   const EpetraMatrix<T> * A = cast_ptr<const EpetraMatrix<T> *>(&A_in);
 
   // FIXME - does Trilinos let us do this *without* memory allocation?
-  UniquePtr<NumericVector<T>> temp = v->zero_clone();
+  std::unique_ptr<NumericVector<T>> temp = v->zero_clone();
   EpetraVector<T> * temp_v = cast_ptr<EpetraVector<T> *>(temp.get());
   A->mat()->Multiply(false, *v->_vec, *temp_v->_vec);
   *this += *temp;

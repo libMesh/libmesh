@@ -51,7 +51,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // DofMap member functions
-UniquePtr<SparsityPattern::Build>
+std::unique_ptr<SparsityPattern::Build>
 DofMap::build_sparsity (const MeshBase & mesh) const
 {
   libmesh_assert (mesh.is_prepared());
@@ -79,7 +79,7 @@ DofMap::build_sparsity (const MeshBase & mesh) const
   // Even better, if the full sparsity pattern is not needed then
   // the number of nonzeros per row can be estimated from the
   // sparsity patterns created on each thread.
-  UniquePtr<SparsityPattern::Build> sp
+  std::unique_ptr<SparsityPattern::Build> sp
     (new SparsityPattern::Build (mesh,
                                  *this,
                                  this->_dof_coupling,
@@ -119,7 +119,7 @@ DofMap::build_sparsity (const MeshBase & mesh) const
     _augment_sparsity_pattern->augment_sparsity_pattern
       (sp->sparsity_pattern, sp->n_nz, sp->n_oz);
 
-  return UniquePtr<SparsityPattern::Build>(sp.release());
+  return std::unique_ptr<SparsityPattern::Build>(sp.release());
 }
 
 

@@ -216,7 +216,7 @@ private:
 
   /**
    * A pointer to to the object that stores the theta expansion.
-   * This is not a UniquePtr since we may want to share it.
+   * This is not a std::unique_ptr since we may want to share it.
    *
    * \note A \p shared_ptr would be a good option here.
    */

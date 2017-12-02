@@ -50,9 +50,9 @@ public:
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
    */
-  virtual UniquePtr<Partitioner> clone () const libmesh_override
+  virtual std::unique_ptr<Partitioner> clone () const libmesh_override
   {
-    return UniquePtr<Partitioner>(new MappedSubdomainPartitioner());
+    return std::unique_ptr<Partitioner>(new MappedSubdomainPartitioner());
   }
 
   /**

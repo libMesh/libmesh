@@ -43,7 +43,7 @@ Point InfFE<Dim,T_radial,T_map>::map (const Elem * inf_elem,
   libmesh_assert(inf_elem);
   libmesh_assert_not_equal_to (Dim, 0);
 
-  UniquePtr<Elem>      base_elem (Base::build_elem (inf_elem));
+  std::unique_ptr<Elem>      base_elem (Base::build_elem (inf_elem));
 
   const Order        radial_mapping_order (Radial::mapping_order());
   const Real         v                    (reference_point(Dim-1));
@@ -99,7 +99,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem * inf_elem,
 
   // 1.)
   // build a base element to do the map inversion in the base face
-  UniquePtr<Elem> base_elem (Base::build_elem (inf_elem));
+  std::unique_ptr<Elem> base_elem (Base::build_elem (inf_elem));
 
   // 2.)
   // just like in FE<Dim-1,LAGRANGE>::inverse_map(): compute

@@ -144,7 +144,7 @@ unsigned int InfQuad6::which_node_am_i(unsigned int side,
 
 
 
-UniquePtr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
+std::unique_ptr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
                                           bool proxy)
 {
   // libmesh_assert_less (i, this->n_sides());
@@ -154,11 +154,11 @@ UniquePtr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
       switch (i)
         {
         case 0:
-          return UniquePtr<Elem>(new Side<Edge3,InfQuad6>(this,i));
+          return std::unique_ptr<Elem>(new Side<Edge3,InfQuad6>(this,i));
 
         case 1:
         case 2:
-          return UniquePtr<Elem>(new Side<InfEdge2,InfQuad6>(this,i));
+          return std::unique_ptr<Elem>(new Side<InfEdge2,InfQuad6>(this,i));
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -196,11 +196,11 @@ UniquePtr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
       for (unsigned n=0; n<edge->n_nodes(); ++n)
         edge->set_node(n) = this->node_ptr(InfQuad6::side_nodes_map[i][n]);
 
-      return UniquePtr<Elem>(edge);
+      return std::unique_ptr<Elem>(edge);
     }
 
   libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+  return std::unique_ptr<Elem>();
 }
 
 

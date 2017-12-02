@@ -60,8 +60,8 @@ public:
 
   ParallelMesh (const UnstructuredMesh & other_mesh) : DistributedMesh(other_mesh) {}
 
-  virtual UniquePtr<MeshBase> clone () const libmesh_override
-  { return UniquePtr<MeshBase>(new ParallelMesh(*this)); }
+  virtual std::unique_ptr<MeshBase> clone () const libmesh_override
+  { return std::unique_ptr<MeshBase>(new ParallelMesh(*this)); }
 
   ~ParallelMesh() {}
 };

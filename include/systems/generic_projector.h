@@ -183,7 +183,7 @@ public:
   { libmesh_error(); }
 
 private:
-  UniquePtr<FEMFunctionBase<Output>> _f;
+  std::unique_ptr<FEMFunctionBase<Output>> _f;
 };
 
 
@@ -570,7 +570,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
   ProjectionAction action(master_action);
   FFunctor f(master_f);
-  UniquePtr<GFunctor> g;
+  std::unique_ptr<GFunctor> g;
   if (master_g)
     g.reset(new GFunctor(*master_g));
 
@@ -1046,10 +1046,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                     {
                       std::vector<Point> fine_points;
 
-                      UniquePtr<FEBase> fine_fe
+                      std::unique_ptr<FEBase> fine_fe
                         (FEBase::build (dim, base_fe_type));
 
-                      UniquePtr<QBase> qrule
+                      std::unique_ptr<QBase> qrule
                         (base_fe_type.default_quadrature_rule(1));
                       fine_fe->attach_quadrature_rule(qrule.get());
 
@@ -1239,10 +1239,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                     {
                       std::vector<Point> fine_points;
 
-                      UniquePtr<FEBase> fine_fe
+                      std::unique_ptr<FEBase> fine_fe
                         (FEBase::build (dim, base_fe_type));
 
-                      UniquePtr<QBase> qrule
+                      std::unique_ptr<QBase> qrule
                         (base_fe_type.default_quadrature_rule(dim-1));
                       fine_fe->attach_quadrature_rule(qrule.get());
 
@@ -1378,10 +1378,10 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 {
                   std::vector<Point> fine_points;
 
-                  UniquePtr<FEBase> fine_fe
+                  std::unique_ptr<FEBase> fine_fe
                     (FEBase::build (dim, base_fe_type));
 
-                  UniquePtr<QBase> qrule
+                  std::unique_ptr<QBase> qrule
                     (base_fe_type.default_quadrature_rule(dim));
                   fine_fe->attach_quadrature_rule(qrule.get());
 

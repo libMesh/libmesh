@@ -342,7 +342,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
       bool found_matching_sides = false;
       for (auto side : interior_parent->side_index_range())
         {
-          UniquePtr<const Elem> interior_parent_side = interior_parent->build_side_ptr(side);
+          std::unique_ptr<const Elem> interior_parent_side = interior_parent->build_side_ptr(side);
           Real centroid_distance = (boundary_elem->centroid() - interior_parent_side->centroid()).norm();
 
           if (centroid_distance < (tolerance * boundary_elem->hmin()))
@@ -358,7 +358,7 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
 
       side_id_map[boundary_elem->id()] = interior_parent_side_index;
 
-      UniquePtr<const Elem> interior_parent_side = interior_parent->build_side_ptr(interior_parent_side_index);
+      std::unique_ptr<const Elem> interior_parent_side = interior_parent->build_side_ptr(interior_parent_side_index);
       for (auto local_node_index : boundary_elem->node_index_range())
         {
           dof_id_type boundary_node_id = boundary_elem->node_id(local_node_index);
@@ -480,7 +480,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
       // Build the side - do not use a "proxy" element here:
       // This will be going into the boundary_mesh and needs to
       // stand on its own.
-      UniquePtr<Elem> side (elem->build_side_ptr(s, false));
+      std::unique_ptr<Elem> side (elem->build_side_ptr(s, false));
 
       side->processor_id() = elem->processor_id();
 
@@ -1866,7 +1866,7 @@ BoundaryInfo::build_node_list_from_side_list()
         {
           const Elem * cur_elem = family[elem_it];
 
-          UniquePtr<const Elem> side = cur_elem->build_side_ptr(pos->second.first);
+          std::unique_ptr<const Elem> side = cur_elem->build_side_ptr(pos->second.first);
 
           // Add each node node on the side with the side's boundary id
           for (auto i : side->node_index_range())
@@ -2034,7 +2034,7 @@ void BoundaryInfo::build_side_list_from_node_list()
   for (const auto & elem : _mesh.active_element_ptr_range())
     for (auto side : elem->side_index_range())
       {
-        UniquePtr<const Elem> side_elem = elem->build_side_ptr(side);
+        std::unique_ptr<const Elem> side_elem = elem->build_side_ptr(side);
 
         const unsigned short n_nodes = side_elem->n_nodes();
 
@@ -2538,7 +2538,7 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
                 }
 
               // Use a proxy element for the side to query nodes
-              UniquePtr<const Elem> side (elem->build_side_ptr(s));
+              std::unique_ptr<const Elem> side (elem->build_side_ptr(s));
               for (auto n : side->node_index_range())
                 {
                   const Node & node = side->node_ref(n);

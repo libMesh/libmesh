@@ -149,7 +149,7 @@ public:
    * details of interfacing with various linear algebra packages
    * like PETSc or LASPACK.
    */
-  UniquePtr<LinearSolver<Number>> linear_solver;
+  std::unique_ptr<LinearSolver<Number>> linear_solver;
 
   /**
    * \returns The number of iterations

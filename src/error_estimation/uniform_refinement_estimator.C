@@ -105,8 +105,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
   // Get a vector of the Systems we're going to work on,
   // and set up a error_norms map if necessary
   std::vector<System *> system_list;
-  UniquePtr<std::map<const System *, SystemNorm>> error_norms =
-    UniquePtr<std::map<const System *, SystemNorm>>
+  std::unique_ptr<std::map<const System *, SystemNorm>> error_norms =
+    std::unique_ptr<std::map<const System *, SystemNorm>>
     (new std::map<const System *, SystemNorm>);
 
   if (_es)
@@ -211,7 +211,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
   std::vector<bool> old_projection_settings(system_list.size());
 
   // And it'll be best to avoid any repartitioning
-  UniquePtr<Partitioner> old_partitioner(mesh.partitioner().release());
+  std::unique_ptr<Partitioner> old_partitioner(mesh.partitioner().release());
 
   for (std::size_t i=0; i != system_list.size(); ++i)
     {
@@ -491,10 +491,10 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
           const FEType & fe_type = dof_map.variable_type (var);
 
           // Finite element object for each fine element
-          UniquePtr<FEBase> fe (FEBase::build (dim, fe_type));
+          std::unique_ptr<FEBase> fe (FEBase::build (dim, fe_type));
 
           // Build and attach an appropriate quadrature rule
-          UniquePtr<QBase> qrule = fe_type.default_quadrature_rule(dim);
+          std::unique_ptr<QBase> qrule = fe_type.default_quadrature_rule(dim);
           fe->attach_quadrature_rule (qrule.get());
 
           const std::vector<Real> &  JxW = fe->get_JxW();

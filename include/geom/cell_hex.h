@@ -134,7 +134,7 @@ public:
   /**
    * \returns A primitive (4-noded) quad for face i.
    */
-  virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;
+  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) libmesh_override;
 
   /**
    * \returns A quantitative assessment of element quality based on

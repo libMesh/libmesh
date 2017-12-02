@@ -68,7 +68,7 @@ public:
       _parameters = &sys.get_equation_systems().parameters;
   }
 
-  virtual UniquePtr<FunctionBase<Output>> clone () const libmesh_override;
+  virtual std::unique_ptr<FunctionBase<Output>> clone () const libmesh_override;
 
   virtual Output operator() (const Point & p,
                              const Real time = 0.) libmesh_override;
@@ -116,10 +116,10 @@ Output WrappedFunction<Output>::operator() (const Point & p,
 
 template <typename Output>
 inline
-UniquePtr<FunctionBase<Output>>
+std::unique_ptr<FunctionBase<Output>>
 WrappedFunction<Output>::clone () const
 {
-  return UniquePtr<FunctionBase<Output>>
+  return std::unique_ptr<FunctionBase<Output>>
     (new WrappedFunction<Output>
      (_sys, _fptr, _parameters, _varnum));
 }

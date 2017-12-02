@@ -180,7 +180,7 @@ public:
    * This is pure virtual, override in subclasses to specify the appropriate
    * ElemAssembly object.
    */
-  virtual UniquePtr<ElemAssembly> build_eim_assembly(unsigned int bf_index) = 0;
+  virtual std::unique_ptr<ElemAssembly> build_eim_assembly(unsigned int bf_index) = 0;
 
   /**
    * Get the ExplicitSystem associated with this system.
@@ -297,13 +297,13 @@ private:
   /**
    * A mesh function to interpolate on the mesh.
    */
-  UniquePtr<MeshFunction> _mesh_function;
+  std::unique_ptr<MeshFunction> _mesh_function;
 
   /**
    * We also need an extra vector in which we can store a ghosted
    * copy of the vector that we wish to use MeshFunction on.
    */
-  UniquePtr<NumericVector<Number>> _ghosted_meshfunction_vector;
+  std::unique_ptr<NumericVector<Number>> _ghosted_meshfunction_vector;
 
   /**
    * We initialize RBEIMConstruction so that it has an "empty" RBAssemblyExpansion,

@@ -143,21 +143,21 @@ public:
   /**
    * We don't allow systems to be attached to each other
    */
-  virtual UniquePtr<DifferentiablePhysics> clone_physics() libmesh_override
+  virtual std::unique_ptr<DifferentiablePhysics> clone_physics() libmesh_override
   {
     libmesh_not_implemented();
     // dummy
-    return UniquePtr<DifferentiablePhysics>(this);
+    return std::unique_ptr<DifferentiablePhysics>(this);
   }
 
   /**
    * We don't allow systems to be attached to each other
    */
-  virtual UniquePtr<DifferentiableQoI> clone() libmesh_override
+  virtual std::unique_ptr<DifferentiableQoI> clone() libmesh_override
   {
     libmesh_not_implemented();
     // dummy
-    return UniquePtr<DifferentiableQoI>(this);
+    return std::unique_ptr<DifferentiableQoI>(this);
   }
 
   /**
@@ -218,7 +218,7 @@ public:
    * A pointer to the solver object we're going to use.
    * This must be instantiated by the user before solving!
    */
-  UniquePtr<TimeSolver> time_solver;
+  std::unique_ptr<TimeSolver> time_solver;
 
   /**
    * Sets the time_solver
@@ -226,7 +226,7 @@ public:
    * from the TimeSolver creator to this class.  The user must no longer
    * access his original TimeSolver object after calling this function.
    */
-  void set_time_solver(UniquePtr<TimeSolver> _time_solver)
+  void set_time_solver(std::unique_ptr<TimeSolver> _time_solver)
   {
     time_solver.reset(_time_solver.release());
   }
@@ -255,7 +255,7 @@ public:
    * reimplementation is correct; users who subclass FEMContext will need to
    * also reimplement this method to build it.
    */
-  virtual UniquePtr<DiffContext> build_context();
+  virtual std::unique_ptr<DiffContext> build_context();
 
   /**
    * Executes a postprocessing loop over all elements, and if

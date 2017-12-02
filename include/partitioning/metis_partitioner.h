@@ -46,9 +46,9 @@ public:
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
    */
-  virtual UniquePtr<Partitioner> clone () const libmesh_override
+  virtual std::unique_ptr<Partitioner> clone () const libmesh_override
   {
-    return UniquePtr<Partitioner>(new MetisPartitioner());
+    return std::unique_ptr<Partitioner>(new MetisPartitioner());
   }
 
   virtual void attach_weights(ErrorVector * weights) libmesh_override { _weights = weights; }

@@ -123,9 +123,9 @@ public:
 
   virtual void zero () libmesh_override;
 
-  virtual UniquePtr<NumericVector<T>> zero_clone () const libmesh_override;
+  virtual std::unique_ptr<NumericVector<T>> zero_clone () const libmesh_override;
 
-  virtual UniquePtr<NumericVector<T>> clone () const libmesh_override;
+  virtual std::unique_ptr<NumericVector<T>> clone () const libmesh_override;
 
   virtual void init (const numeric_index_type N,
                      const numeric_index_type n_local,
@@ -893,23 +893,23 @@ void PetscVector<T>::zero ()
 
 template <typename T>
 inline
-UniquePtr<NumericVector<T>> PetscVector<T>::zero_clone () const
+std::unique_ptr<NumericVector<T>> PetscVector<T>::zero_clone () const
 {
   NumericVector<T> * cloned_vector = new PetscVector<T>(this->comm(), this->type());
   cloned_vector->init(*this);
-  return UniquePtr<NumericVector<T>>(cloned_vector);
+  return std::unique_ptr<NumericVector<T>>(cloned_vector);
 }
 
 
 
 template <typename T>
 inline
-UniquePtr<NumericVector<T>> PetscVector<T>::clone () const
+std::unique_ptr<NumericVector<T>> PetscVector<T>::clone () const
 {
   NumericVector<T> * cloned_vector = new PetscVector<T>(this->comm(), this->type());
   cloned_vector->init(*this, true);
   *cloned_vector = *this;
-  return UniquePtr<NumericVector<T>>(cloned_vector);
+  return std::unique_ptr<NumericVector<T>>(cloned_vector);
 }
 
 

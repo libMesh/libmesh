@@ -186,7 +186,7 @@ int main(int argc, char ** argv)
       unsigned int n_vars = old_sys.n_vars();
       libmesh_assert_equal_to (new_sys.n_vars(), n_vars);
 
-      UniquePtr<NumericVector<Number>> comparison_soln =
+      std::unique_ptr<NumericVector<Number>> comparison_soln =
         NumericVector<Number>::build(old_sys.comm());
       std::vector<Number> global_soln;
       old_sys.update_global_solution(global_soln);

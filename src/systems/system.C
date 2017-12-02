@@ -1430,7 +1430,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
     }
 
   // Localize the potentially parallel vector
-  UniquePtr<NumericVector<Number>> local_v = NumericVector<Number>::build(this->comm());
+  std::unique_ptr<NumericVector<Number>> local_v = NumericVector<Number>::build(this->comm());
   local_v->init(v.size(), true, SERIAL);
   v.localize (*local_v, _dof_map->get_send_list());
 
@@ -2011,7 +2011,7 @@ Number System::point_value(unsigned int var, const Point & p, const bool insist_
   const MeshBase & mesh = this->get_mesh();
 
   // Use an existing PointLocator or create a new one
-  UniquePtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
+  std::unique_ptr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase & locator = *locator_ptr;
 
   if (!insist_on_success || !mesh.is_serial())
@@ -2118,7 +2118,7 @@ Gradient System::point_gradient(unsigned int var, const Point & p, const bool in
   const MeshBase & mesh = this->get_mesh();
 
   // Use an existing PointLocator or create a new one
-  UniquePtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
+  std::unique_ptr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase & locator = *locator_ptr;
 
   if (!insist_on_success || !mesh.is_serial())
@@ -2181,7 +2181,7 @@ Gradient System::point_gradient(unsigned int var, const Point & p, const Elem & 
   FEType fe_type = dof_map.variable_type(var);
 
   // Build a FE again so we can calculate u(p)
-  UniquePtr<FEBase> fe (FEBase::build(e.dim(), fe_type));
+  std::unique_ptr<FEBase> fe (FEBase::build(e.dim(), fe_type));
 
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit
@@ -2238,7 +2238,7 @@ Tensor System::point_hessian(unsigned int var, const Point & p, const bool insis
   const MeshBase & mesh = this->get_mesh();
 
   // Use an existing PointLocator or create a new one
-  UniquePtr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
+  std::unique_ptr<PointLocatorBase> locator_ptr = mesh.sub_point_locator();
   PointLocatorBase & locator = *locator_ptr;
 
   if (!insist_on_success || !mesh.is_serial())
@@ -2300,7 +2300,7 @@ Tensor System::point_hessian(unsigned int var, const Point & p, const Elem & e) 
   FEType fe_type = dof_map.variable_type(var);
 
   // Build a FE again so we can calculate u(p)
-  UniquePtr<FEBase> fe (FEBase::build(e.dim(), fe_type));
+  std::unique_ptr<FEBase> fe (FEBase::build(e.dim(), fe_type));
 
   // Map the physical co-ordinates to the master co-ordinates using the inverse_map from fe_interface.h
   // Build a vector of point co-ordinates to send to reinit

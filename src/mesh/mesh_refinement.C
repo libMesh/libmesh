@@ -373,7 +373,7 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
   // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
   // processors at once.
-  UniquePtr<PointLocatorBase> point_locator;
+  std::unique_ptr<PointLocatorBase> point_locator;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool has_periodic_boundaries =
@@ -800,7 +800,7 @@ bool MeshRefinement::make_coarsening_compatible()
   // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
   // processors at once.
-  UniquePtr<PointLocatorBase> point_locator;
+  std::unique_ptr<PointLocatorBase> point_locator;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool has_periodic_boundaries =
@@ -1196,7 +1196,7 @@ bool MeshRefinement::make_refinement_compatible()
   // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
   // processors at once.
-  UniquePtr<PointLocatorBase> point_locator;
+  std::unique_ptr<PointLocatorBase> point_locator;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool has_periodic_boundaries =

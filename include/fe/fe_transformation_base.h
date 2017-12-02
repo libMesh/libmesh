@@ -49,7 +49,7 @@ public:
   /**
    * Builds an FETransformation object based on the finite element type
    */
-  static UniquePtr<FETransformationBase<OutputShape>> build(const FEType & type);
+  static std::unique_ptr<FETransformationBase<OutputShape>> build(const FEType & type);
 
   /**
    * Pre-requests any necessary data from FEMap

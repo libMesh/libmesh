@@ -87,7 +87,7 @@ private:
 
 #if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
   // VTK object for dealing with MPI stuff in VTK.
-  // This can't be a UniquePtr because VTK makes the destructor
+  // This can't be a std::unique_ptr because VTK makes the destructor
   // protected and forces us to use a named destructor manually
   vtkMPIController * _vtk_mpi_controller;
 #endif

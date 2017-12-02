@@ -296,7 +296,7 @@ protected:
   typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<Real, PointListAdaptor<KDDim>>,
                                               PointListAdaptor<KDDim>, KDDim> kd_tree_t;
 
-  mutable UniquePtr<kd_tree_t> _kd_tree;
+  mutable std::unique_ptr<kd_tree_t> _kd_tree;
 
 #endif // LIBMESH_HAVE_NANOFLANN
 

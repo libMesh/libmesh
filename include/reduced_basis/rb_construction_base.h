@@ -231,7 +231,7 @@ protected:
    * performing inner products (avoids unnecessary memory
    * allocation/deallocation).
    */
-  UniquePtr<NumericVector<Number>> inner_product_storage_vector;
+  std::unique_ptr<NumericVector<Number>> inner_product_storage_vector;
 
 
 private:

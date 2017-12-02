@@ -75,7 +75,7 @@ void SumShellMatrix<T>::vector_mult_add (NumericVector<T> & dest,
 template <typename T>
 void SumShellMatrix<T>::get_diagonal (NumericVector<T> & dest) const
 {
-  UniquePtr<NumericVector<T>> a = dest.zero_clone();
+  std::unique_ptr<NumericVector<T>> a = dest.zero_clone();
   for (std::size_t i=0; i<matrices.size(); ++i)
     {
       matrices[i]->get_diagonal(*a);

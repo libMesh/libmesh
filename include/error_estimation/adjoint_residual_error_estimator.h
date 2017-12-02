@@ -71,13 +71,13 @@ public:
    * Access to the "subestimator" (default: PatchRecovery) to use on
    * the primal/forward solution
    */
-  UniquePtr<ErrorEstimator> & primal_error_estimator() { return _primal_error_estimator; }
+  std::unique_ptr<ErrorEstimator> & primal_error_estimator() { return _primal_error_estimator; }
 
   /**
    * Access to the "subestimator" (default: PatchRecovery) to use on
    * the dual/adjoint solution
    */
-  UniquePtr<ErrorEstimator> & dual_error_estimator() { return _dual_error_estimator; }
+  std::unique_ptr<ErrorEstimator> & dual_error_estimator() { return _dual_error_estimator; }
 
   /**
    * Access to the QoISet (default: weight all QoIs equally) to use
@@ -123,12 +123,12 @@ protected:
   /**
    * An error estimator for the forward problem
    */
-  UniquePtr<ErrorEstimator> _primal_error_estimator;
+  std::unique_ptr<ErrorEstimator> _primal_error_estimator;
 
   /**
    * An error estimator for the adjoint problem
    */
-  UniquePtr<ErrorEstimator> _dual_error_estimator;
+  std::unique_ptr<ErrorEstimator> _dual_error_estimator;
 
   /**
    * A QoISet to handle cases with multiple QoIs available

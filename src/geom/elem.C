@@ -235,7 +235,7 @@ const unsigned int Elem::type_to_n_edges_map [] =
 
 // ------------------------------------------------------------
 // Elem class member functions
-UniquePtr<Elem> Elem::build(const ElemType type,
+std::unique_ptr<Elem> Elem::build(const ElemType type,
                             Elem * p)
 {
   Elem * elem = libmesh_nullptr;
@@ -431,7 +431,7 @@ UniquePtr<Elem> Elem::build(const ElemType type,
       libmesh_error_msg("ERROR: Undefined element type!");
     }
 
-  return UniquePtr<Elem>(elem);
+  return std::unique_ptr<Elem>(elem);
 }
 
 
@@ -1235,11 +1235,11 @@ void Elem::make_links_to_me_local(unsigned int n)
 
   // What side of neigh are we on?  We can't use the usual Elem
   // method because we're in the middle of restoring topology
-  const UniquePtr<Elem> my_side = this->side_ptr(n);
+  const std::unique_ptr<Elem> my_side = this->side_ptr(n);
   unsigned int nn = 0;
   for (; nn != neigh->n_sides(); ++nn)
     {
-      const UniquePtr<Elem> neigh_side = neigh->side_ptr(nn);
+      const std::unique_ptr<Elem> neigh_side = neigh->side_ptr(nn);
       if (*my_side == *neigh_side)
         break;
     }
@@ -1668,8 +1668,8 @@ bool Elem::is_child_on_edge(const unsigned int libmesh_dbg_var(c),
   libmesh_assert_less (c, this->n_children());
   libmesh_assert_less (e, this->n_edges());
 
-  UniquePtr<const Elem> my_edge = this->build_edge_ptr(e);
-  UniquePtr<const Elem> child_edge = this->build_edge_ptr(e);
+  std::unique_ptr<const Elem> my_edge = this->build_edge_ptr(e);
+  std::unique_ptr<const Elem> child_edge = this->build_edge_ptr(e);
 
   // We're assuming that an overlapping child edge has the same
   // number and orientation as its parent
@@ -2184,7 +2184,7 @@ Elem::parent_bracketing_nodes(unsigned int child,
           // Build the full-order type
           ElemType full_type =
             second_order_equivalent_type(this->type(), /*full_ordered=*/ true);
-          UniquePtr<Elem> full_elem = Elem::build(full_type);
+          std::unique_ptr<Elem> full_elem = Elem::build(full_type);
 
           // This won't work for elements with multiple
           // embedding_matrix versions, but every such element is full
@@ -2380,7 +2380,7 @@ Elem::bracketing_nodes(unsigned int child,
           // Build the full-order type
           ElemType full_type =
             second_order_equivalent_type(this->type(), /*full_ordered=*/ true);
-          UniquePtr<Elem> full_elem = Elem::build(full_type);
+          std::unique_ptr<Elem> full_elem = Elem::build(full_type);
 
           dof_id_type pt1 = DofObject::invalid_id;
           dof_id_type pt2 = DofObject::invalid_id;
@@ -2971,7 +2971,7 @@ Real Elem::volume () const
   // the volume more efficiently.
   FEType fe_type (this->default_order() , LAGRANGE);
 
-  UniquePtr<FEBase> fe (FEBase::build(this->dim(),
+  std::unique_ptr<FEBase> fe (FEBase::build(this->dim(),
                                       fe_type));
 
   const std::vector<Real> & JxW = fe->get_JxW();

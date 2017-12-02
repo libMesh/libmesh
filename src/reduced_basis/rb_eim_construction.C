@@ -373,7 +373,7 @@ void RBEIMConstruction::enrich_RB_space()
   // Compute truth representation via projection
   MeshBase & mesh = this->get_mesh();
 
-  UniquePtr<DGFEMContext> explicit_c(new DGFEMContext( get_explicit_system() ));
+  std::unique_ptr<DGFEMContext> explicit_c(new DGFEMContext( get_explicit_system() ));
   DGFEMContext & explicit_context = cast_ref<DGFEMContext &>(*explicit_c);
   init_context_with_sys(explicit_context, get_explicit_system());
 
@@ -441,13 +441,13 @@ void RBEIMConstruction::enrich_RB_space()
       // In order to speed up dot products, we store the product
       // of the basis function and the inner product matrix
 
-      UniquePtr<NumericVector<Number>> implicit_sys_temp1 = this->solution->zero_clone();
-      UniquePtr<NumericVector<Number>> implicit_sys_temp2 = this->solution->zero_clone();
+      std::unique_ptr<NumericVector<Number>> implicit_sys_temp1 = this->solution->zero_clone();
+      std::unique_ptr<NumericVector<Number>> implicit_sys_temp2 = this->solution->zero_clone();
       NumericVector<Number>* matrix_times_new_bf =
         get_explicit_system().solution->zero_clone().release();
 
       // We must localize new_bf before calling get_explicit_sys_subvector
-      UniquePtr<NumericVector<Number>> localized_new_bf =
+      std::unique_ptr<NumericVector<Number>> localized_new_bf =
         NumericVector<Number>::build(this->comm());
       localized_new_bf->init(get_explicit_system().n_dofs(), false, SERIAL);
       new_bf->localize(*localized_new_bf);
@@ -618,7 +618,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
       // Compute truth representation via L2 projection
       const MeshBase & mesh = this->get_mesh();
 
-      UniquePtr<DGFEMContext> c(new DGFEMContext( *this ));
+      std::unique_ptr<DGFEMContext> c(new DGFEMContext( *this ));
       DGFEMContext & context = cast_ref<DGFEMContext &>(*c);
       init_context_with_sys(context, *this);
 
@@ -745,11 +745,11 @@ void RBEIMConstruction::update_RB_system_matrices()
   {
     unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
-    UniquePtr<NumericVector<Number>> explicit_sys_temp =
+    std::unique_ptr<NumericVector<Number>> explicit_sys_temp =
       get_explicit_system().solution->zero_clone();
 
-    UniquePtr<NumericVector<Number>> temp1 = this->solution->zero_clone();
-    UniquePtr<NumericVector<Number>> temp2 = this->solution->zero_clone();
+    std::unique_ptr<NumericVector<Number>> temp1 = this->solution->zero_clone();
+    std::unique_ptr<NumericVector<Number>> temp2 = this->solution->zero_clone();
 
     for (unsigned int i=(RB_size-1); i<RB_size; i++)
       {
@@ -757,7 +757,7 @@ void RBEIMConstruction::update_RB_system_matrices()
           {
             // We must localize get_rb_evaluation().get_basis_function(j) before calling
             // get_explicit_sys_subvector
-            UniquePtr<NumericVector<Number>> localized_basis_function =
+            std::unique_ptr<NumericVector<Number>> localized_basis_function =
               NumericVector<Number>::build(this->comm());
             localized_basis_function->init(get_explicit_system().n_dofs(), false, SERIAL);
             get_rb_evaluation().get_basis_function(j).localize(*localized_basis_function);
@@ -820,7 +820,7 @@ void RBEIMConstruction::set_explicit_sys_subvector(NumericVector<Number> & dest,
 
   // For convenience we localize the source vector first to make it easier to
   // copy over (no need to do distinct send/receives).
-  UniquePtr<NumericVector<Number>> localized_source =
+  std::unique_ptr<NumericVector<Number>> localized_source =
     NumericVector<Number>::build(this->comm());
   localized_source->init(this->n_dofs(), false, SERIAL);
   source.localize(*localized_source);

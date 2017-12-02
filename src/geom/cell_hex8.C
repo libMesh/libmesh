@@ -117,13 +117,13 @@ bool Hex8::has_affine_map() const
 
 
 
-UniquePtr<Elem> Hex8::build_side_ptr (const unsigned int i,
+std::unique_ptr<Elem> Hex8::build_side_ptr (const unsigned int i,
                                       bool proxy)
 {
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    return UniquePtr<Elem>(new Side<Quad4,Hex8>(this,i));
+    return std::unique_ptr<Elem>(new Side<Quad4,Hex8>(this,i));
 
   else
     {
@@ -133,20 +133,20 @@ UniquePtr<Elem> Hex8::build_side_ptr (const unsigned int i,
       for (unsigned n=0; n<face->n_nodes(); ++n)
         face->set_node(n) = this->node_ptr(Hex8::side_nodes_map[i][n]);
 
-      return UniquePtr<Elem>(face);
+      return std::unique_ptr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+  return std::unique_ptr<Elem>();
 }
 
 
 
-UniquePtr<Elem> Hex8::build_edge_ptr (const unsigned int i)
+std::unique_ptr<Elem> Hex8::build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());
 
-  return UniquePtr<Elem>(new SideEdge<Edge2,Hex8>(this,i));
+  return std::unique_ptr<Elem>(new SideEdge<Edge2,Hex8>(this,i));
 }
 
 

@@ -76,9 +76,9 @@ void TwostepTimeSolver::solve()
 
       // Save a copy of the double-length nonlinear solution
       // and the old nonlinear solution
-      UniquePtr<NumericVector<Number>> double_solution =
+      std::unique_ptr<NumericVector<Number>> double_solution =
         _system.solution->clone();
-      UniquePtr<NumericVector<Number>> old_solution =
+      std::unique_ptr<NumericVector<Number>> old_solution =
         _system.get_vector("_old_nonlinear_solution").clone();
 
       double_norm = calculate_norm(_system, *double_solution);

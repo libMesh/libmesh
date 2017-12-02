@@ -261,13 +261,13 @@ public:
   /**
    * The L2 matrix.
    */
-  UniquePtr<SparseMatrix<Number>> L2_matrix;
+  std::unique_ptr<SparseMatrix<Number>> L2_matrix;
 
   /**
    * The L2 matrix without Dirichlet conditions enforced.
    * (This is only computed if store_non_dirichlet_operators == true.)
    */
-  UniquePtr<SparseMatrix<Number>> non_dirichlet_L2_matrix;
+  std::unique_ptr<SparseMatrix<Number>> non_dirichlet_L2_matrix;
 
   /**
    * Vector storing the Q_m matrices from the mass operator

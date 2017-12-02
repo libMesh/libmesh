@@ -94,7 +94,7 @@ unsigned int Hex::which_node_am_i(unsigned int side,
 
 
 
-UniquePtr<Elem> Hex::side_ptr (const unsigned int i)
+std::unique_ptr<Elem> Hex::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -103,7 +103,7 @@ UniquePtr<Elem> Hex::side_ptr (const unsigned int i)
   for (unsigned n=0; n<face->n_nodes(); ++n)
     face->set_node(n) = this->node_ptr(Hex8::side_nodes_map[i][n]);
 
-  return UniquePtr<Elem>(face);
+  return std::unique_ptr<Elem>(face);
 }
 
 

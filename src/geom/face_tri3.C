@@ -106,13 +106,13 @@ bool Tri3::is_node_on_side(const unsigned int n,
   return false;
 }
 
-UniquePtr<Elem> Tri3::build_side_ptr (const unsigned int i,
+std::unique_ptr<Elem> Tri3::build_side_ptr (const unsigned int i,
                                       bool proxy)
 {
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    return UniquePtr<Elem>(new Side<Edge2,Tri3>(this,i));
+    return std::unique_ptr<Elem>(new Side<Edge2,Tri3>(this,i));
 
   else
     {
@@ -123,11 +123,11 @@ UniquePtr<Elem> Tri3::build_side_ptr (const unsigned int i,
       for (unsigned n=0; n<edge->n_nodes(); ++n)
         edge->set_node(n) = this->node_ptr(Tri3::side_nodes_map[i][n]);
 
-      return UniquePtr<Elem>(edge);
+      return std::unique_ptr<Elem>(edge);
     }
 
   libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+  return std::unique_ptr<Elem>();
 }
 
 

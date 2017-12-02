@@ -569,7 +569,7 @@ void GmshIO::read_mesh(std::istream & in)
                             {
                               // For each side side in the provide_bcs multimap...
                               // Construct the side for hash verification.
-                              UniquePtr<Elem> side (elem->build_side_ptr(sn));
+                              std::unique_ptr<Elem> side (elem->build_side_ptr(sn));
 
                               // Construct the lower-dimensional element to compare to the side.
                               Elem * lower_dim_elem = pr.second;
@@ -752,7 +752,7 @@ void GmshIO::write_mesh (std::ostream & out_stream)
           {
             const Elem & elem = mesh.elem_ref(element_id_list[idx]);
 
-            UniquePtr<const Elem> side = elem.build_side_ptr(side_list[idx]);
+            std::unique_ptr<const Elem> side = elem.build_side_ptr(side_list[idx]);
 
             // Map from libmesh elem type to gmsh elem type.
             std::map<ElemType, ElementDefinition>::iterator def_it =

@@ -125,7 +125,7 @@ ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
   // here in the constructor.
   _next_unique_id = 0;
 #endif
-  _partitioner = UniquePtr<Partitioner>(new MetisPartitioner());
+  _partitioner = std::unique_ptr<Partitioner>(new MetisPartitioner());
 }
 
 
@@ -141,7 +141,7 @@ ReplicatedMesh::ReplicatedMesh (unsigned char d) :
   // here in the constructor.
   _next_unique_id = 0;
 #endif
-  _partitioner = UniquePtr<Partitioner>(new MetisPartitioner());
+  _partitioner = std::unique_ptr<Partitioner>(new MetisPartitioner());
 }
 #endif
 #endif
@@ -937,7 +937,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
                       if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
                         {
-                          UniquePtr<Elem> side (el->build_side_ptr(side_id));
+                          std::unique_ptr<Elem> side (el->build_side_ptr(side_id));
                           for (auto & n : side->node_ref_range())
                             set_array[i]->insert(n.id());
 
@@ -971,7 +971,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
                               if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
                                 {
-                                  UniquePtr<Elem> edge (el->build_edge_ptr(edge_id));
+                                  std::unique_ptr<Elem> edge (el->build_edge_ptr(edge_id));
                                   for (auto & n : edge->node_ref_range())
                                     set_array[i]->insert( n.id() );
 
@@ -1395,7 +1395,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                           if (bounds.first != bounds.second)
                             {
                               // Get the side for this element
-                              const UniquePtr<Elem> my_side(el->side_ptr(s));
+                              const std::unique_ptr<Elem> my_side(el->side_ptr(s));
 
                               // Look at all the entries with an equivalent key
                               while (bounds.first != bounds.second)
@@ -1405,7 +1405,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
                                   // Get the side for the neighboring element
                                   const unsigned int ns = bounds.first->second.second;
-                                  const UniquePtr<Elem> their_side(neighbor->side_ptr(ns));
+                                  const std::unique_ptr<Elem> their_side(neighbor->side_ptr(ns));
                                   //libmesh_assert(my_side.get());
                                   //libmesh_assert(their_side.get());
 

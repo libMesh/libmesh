@@ -73,7 +73,7 @@ public:
    * Builds an \p OptimizationSolver using the package specified by
    * \p solver_package
    */
-  static UniquePtr<OptimizationSolver<T>> build(sys_type & s,
+  static std::unique_ptr<OptimizationSolver<T>> build(sys_type & s,
                                                  const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**

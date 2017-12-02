@@ -213,7 +213,7 @@ private:
    * Pointer to the standard XDR struct.  See the standard header file
    * rpc/rpc.h for more information.
    */
-  UniquePtr<XDR> xdrs;
+  std::unique_ptr<XDR> xdrs;
 
   /**
    * File pointer.
@@ -225,12 +225,12 @@ private:
   /**
    * The input file stream.
    */
-  UniquePtr<std::istream> in;
+  std::unique_ptr<std::istream> in;
 
   /**
    * The output file stream.
    */
-  UniquePtr<std::ostream> out;
+  std::unique_ptr<std::ostream> out;
 
   /**
    * A buffer to put comment strings into.

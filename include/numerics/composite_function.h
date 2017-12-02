@@ -144,12 +144,12 @@ public:
       component(reverse_index_map[i].second,p,time);
   }
 
-  virtual UniquePtr<FunctionBase<Output>> clone() const libmesh_override
+  virtual std::unique_ptr<FunctionBase<Output>> clone() const libmesh_override
   {
     CompositeFunction * returnval = new CompositeFunction();
     for (std::size_t i=0; i != subfunctions.size(); ++i)
       returnval->attach_subfunction(*subfunctions[i], index_maps[i]);
-    return UniquePtr<FunctionBase<Output>> (returnval);
+    return std::unique_ptr<FunctionBase<Output>> (returnval);
   }
 
   unsigned int n_subfunctions () const

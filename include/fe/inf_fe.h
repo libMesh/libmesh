@@ -748,19 +748,19 @@ protected:
    * The quadrature rule for the base element associated
    * with the current infinite element
    */
-  UniquePtr<QBase> base_qrule;
+  std::unique_ptr<QBase> base_qrule;
 
   /**
    * The quadrature rule for the base element associated
    * with the current infinite element
    */
-  UniquePtr<QBase> radial_qrule;
+  std::unique_ptr<QBase> radial_qrule;
 
   /**
    * The base element associated with the
    * current infinite element
    */
-  UniquePtr<Elem> base_elem;
+  std::unique_ptr<Elem> base_elem;
 
   /**
    * Have a \p FE<Dim-1,T_base> handy for base approximation.
@@ -768,7 +768,7 @@ protected:
    * the \p InfFE class is not required to be templated w.r.t.
    * to the base approximation shape.
    */
-  UniquePtr<FEBase> base_fe;
+  std::unique_ptr<FEBase> base_fe;
 
   /**
    * This \p FEType stores the characteristics for which the data

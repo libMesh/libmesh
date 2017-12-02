@@ -103,7 +103,7 @@ private:
   /**
    * Lagrange FE to use for subcell mapping.
    */
-  UniquePtr<FEBase> _lagrange_fe;
+  std::unique_ptr<FEBase> _lagrange_fe;
 };
 
 } // namespace libMesh

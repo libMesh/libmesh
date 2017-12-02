@@ -58,7 +58,7 @@ public:
   StandardType(const TypeVector<T> * example=libmesh_nullptr) {
     // We need an example for MPI_Address to use
     TypeVector<T> * ex;
-    UniquePtr<TypeVector<T>> temp;
+    std::unique_ptr<TypeVector<T>> temp;
     if (example)
       ex = const_cast<TypeVector<T> *>(example);
     else
@@ -142,7 +142,7 @@ public:
   StandardType(const VectorValue<T> * example=libmesh_nullptr) {
     // We need an example for MPI_Address to use
     VectorValue<T> * ex;
-    UniquePtr<VectorValue<T>> temp;
+    std::unique_ptr<VectorValue<T>> temp;
     if (example)
       ex = const_cast<VectorValue<T> *>(example);
     else
@@ -240,7 +240,7 @@ public:
         // We need an example for MPI_Address to use
         Point * ex;
 
-        UniquePtr<Point> temp;
+        std::unique_ptr<Point> temp;
         if (example)
           ex = const_cast<Point *>(example);
         else

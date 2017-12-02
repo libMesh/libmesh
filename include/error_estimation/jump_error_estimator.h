@@ -131,7 +131,7 @@ protected:
    * Context objects for integrating on the fine and coarse elements
    * sharing a face
    */
-  UniquePtr<FEMContext> fine_context, coarse_context;
+  std::unique_ptr<FEMContext> fine_context, coarse_context;
 
   /**
    * The fine and coarse error values to be set by each side_integration();

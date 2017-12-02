@@ -616,7 +616,7 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector & parameters_i
   this->assembly(true, false, true);
   this->rhs->close();
 
-  UniquePtr<NumericVector<Number>> temprhs = this->rhs->clone();
+  std::unique_ptr<NumericVector<Number>> temprhs = this->rhs->clone();
 
   oldparameters.value_copy(parameters);
   parameterperturbation *= -1.0;
@@ -919,7 +919,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
     const_cast<ParameterVector &>(parameters_in);
 
   // We'll use a single temporary vector for matrix-vector-vector products
-  UniquePtr<NumericVector<Number>> tempvec = this->solution->zero_clone();
+  std::unique_ptr<NumericVector<Number>> tempvec = this->solution->zero_clone();
 
   const unsigned int Np = cast_int<unsigned int>
     (parameters.size());
@@ -1124,11 +1124,11 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
     const_cast<ParameterVector &>(parameters_in);
 
   // We'll use one temporary vector for matrix-vector-vector products
-  UniquePtr<NumericVector<Number>> tempvec = this->solution->zero_clone();
+  std::unique_ptr<NumericVector<Number>> tempvec = this->solution->zero_clone();
 
   // And another temporary vector to hold a copy of the true solution
   // so we can safely perturb this->solution.
-  UniquePtr<NumericVector<Number>> oldsolution = this->solution->clone();
+  std::unique_ptr<NumericVector<Number>> oldsolution = this->solution->clone();
 
   const unsigned int Np = cast_int<unsigned int>
     (parameters.size());

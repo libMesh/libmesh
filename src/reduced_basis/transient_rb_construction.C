@@ -288,7 +288,7 @@ void TransientRBConstruction::assemble_affine_expansion(bool skip_matrix_assembl
       // Load the initial condition into the solution vector
       initialize_truth();
 
-      UniquePtr<NumericVector<Number>> temp1 = NumericVector<Number>::build(this->comm());
+      std::unique_ptr<NumericVector<Number>> temp1 = NumericVector<Number>::build(this->comm());
       temp1->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
       // First compute the right-hand side vector for the L2 projection
@@ -407,7 +407,7 @@ void TransientRBConstruction::mass_matrix_scaled_matvec(Number scalar,
 
   const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
 
-  UniquePtr<NumericVector<Number>> temp_vec = NumericVector<Number>::build(this->comm());
+  std::unique_ptr<NumericVector<Number>> temp_vec = NumericVector<Number>::build(this->comm());
   temp_vec->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
   for (unsigned int q=0; q<Q_m; q++)
@@ -445,7 +445,7 @@ void TransientRBConstruction::truth_assembly()
     add_scaled_mass_matrix(1./dt, matrix);
     mass_matrix_scaled_matvec(1./dt, *rhs, *current_local_solution);
 
-    UniquePtr<NumericVector<Number>> temp_vec = NumericVector<Number>::build(this->comm());
+    std::unique_ptr<NumericVector<Number>> temp_vec = NumericVector<Number>::build(this->comm());
     temp_vec->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
     for (unsigned int q_a=0; q_a<Q_a; q_a++)
@@ -542,7 +542,7 @@ Real TransientRBConstruction::truth_solve(int write_interval)
   const unsigned int n_time_steps = get_n_time_steps();
 
   //   // NumericVector for computing true L2 error
-  //   UniquePtr<NumericVector<Number>> temp = NumericVector<Number>::build();
+  //   std::unique_ptr<NumericVector<Number>> temp = NumericVector<Number>::build();
   //   temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
   // Apply initial condition again.
@@ -666,7 +666,7 @@ Number TransientRBConstruction::set_error_temporal_data()
     {
       unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
-      UniquePtr<NumericVector<Number>> temp = NumericVector<Number>::build(this->comm());
+      std::unique_ptr<NumericVector<Number>> temp = NumericVector<Number>::build(this->comm());
       temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
       // First compute the right-hand side vector for the projection
@@ -996,7 +996,7 @@ void TransientRBConstruction::update_RB_system_matrices()
 
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
-  UniquePtr<NumericVector<Number>> temp = NumericVector<Number>::build(this->comm());
+  std::unique_ptr<NumericVector<Number>> temp = NumericVector<Number>::build(this->comm());
   temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
   for (unsigned int i=(RB_size-delta_N); i<RB_size; i++)
@@ -1184,10 +1184,10 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
   // Load the initial condition into the solution vector
   initialize_truth();
 
-  UniquePtr<NumericVector<Number>> temp1 = NumericVector<Number>::build(this->comm());
+  std::unique_ptr<NumericVector<Number>> temp1 = NumericVector<Number>::build(this->comm());
   temp1->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
-  UniquePtr<NumericVector<Number>> temp2 = NumericVector<Number>::build(this->comm());
+  std::unique_ptr<NumericVector<Number>> temp2 = NumericVector<Number>::build(this->comm());
   temp2->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
 
@@ -1252,16 +1252,16 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
 //
 //   // Assemble the right-hand side to find the Reisz representor
 //   // of the residual in the X norm
-//   UniquePtr<NumericVector<Number>> RB_sol = NumericVector<Number>::build();
+//   std::unique_ptr<NumericVector<Number>> RB_sol = NumericVector<Number>::build();
 //   RB_sol->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 //   RB_sol->zero();
 //
-//   UniquePtr<NumericVector<Number>> ghosted_temp = NumericVector<Number>::build();
+//   std::unique_ptr<NumericVector<Number>> ghosted_temp = NumericVector<Number>::build();
 //   ghosted_temp->init (this->n_dofs(), this->n_local_dofs(),
 //                       this->get_dof_map().get_send_list(), false,
 //                       GHOSTED);
 //
-//   UniquePtr<NumericVector<Number>> parallel_temp = NumericVector<Number>::build();
+//   std::unique_ptr<NumericVector<Number>> parallel_temp = NumericVector<Number>::build();
 //   parallel_temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 //
 //   // Store current_local_solution, since we don't want to corrupt it

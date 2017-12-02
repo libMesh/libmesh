@@ -77,7 +77,7 @@ public:
 
   virtual void init_context (const FEMContext & c) libmesh_override;
 
-  virtual UniquePtr<FEMFunctionBase<Output>> clone () const libmesh_override;
+  virtual std::unique_ptr<FEMFunctionBase<Output>> clone () const libmesh_override;
 
   virtual Output operator() (const FEMContext & c,
                              const Point & p,
@@ -369,10 +369,10 @@ ParsedFEMFunction<Output>::init_context (const FEMContext & c)
 
 template <typename Output>
 inline
-UniquePtr<FEMFunctionBase<Output>>
+std::unique_ptr<FEMFunctionBase<Output>>
 ParsedFEMFunction<Output>::clone () const
 {
-  return UniquePtr<FEMFunctionBase<Output>>
+  return std::unique_ptr<FEMFunctionBase<Output>>
     (new ParsedFEMFunction(_sys, _expression, &_additional_vars, &_initial_vals));
 }
 

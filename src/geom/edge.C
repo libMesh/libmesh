@@ -33,23 +33,23 @@ unsigned int Edge::which_node_am_i(unsigned int side,
 
 
 
-UniquePtr<Elem> Edge::side_ptr (const unsigned int i)
+std::unique_ptr<Elem> Edge::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, 2);
   const Elem * the_parent = this;
   Elem * nodeelem = new NodeElem(const_cast<Elem *>(the_parent));
   nodeelem->set_node(0) = this->node_ptr(i);
-  return UniquePtr<Elem>(nodeelem);
+  return std::unique_ptr<Elem>(nodeelem);
 }
 
 
-UniquePtr<Elem> Edge::build_side_ptr (const unsigned int i, bool)
+std::unique_ptr<Elem> Edge::build_side_ptr (const unsigned int i, bool)
 {
   libmesh_assert_less (i, 2);
   const Elem * the_parent = this;
   Elem * nodeelem = new NodeElem(const_cast<Elem *>(the_parent));
   nodeelem->set_node(0) = this->node_ptr(i);
-  return UniquePtr<Elem>(nodeelem);
+  return std::unique_ptr<Elem>(nodeelem);
 }
 
 

@@ -1083,7 +1083,7 @@ void AbaqusIO::assign_sideset_ids()
             for (const auto & pr : as_range(bounds))
               {
                 // We'll need to compare the lower dimensional element against the current side.
-                UniquePtr<Elem> side (elem->build_side_ptr(sn));
+                std::unique_ptr<Elem> side (elem->build_side_ptr(sn));
 
                 // Extract the relevant data. We don't need the key for anything.
                 Elem * lower_dim_elem = pr.second.first;

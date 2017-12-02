@@ -125,7 +125,7 @@ public:
 
 private:
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-  UniquePtr<Nemesis_IO_Helper> nemhelper;
+  std::unique_ptr<Nemesis_IO_Helper> nemhelper;
 
   /**
    * Keeps track of the current timestep index being written. Used

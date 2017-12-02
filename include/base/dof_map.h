@@ -1268,7 +1268,7 @@ private:
   /**
    * Builds a sparsity pattern
    */
-  UniquePtr<SparsityPattern::Build> build_sparsity(const MeshBase & mesh) const;
+  std::unique_ptr<SparsityPattern::Build> build_sparsity(const MeshBase & mesh) const;
 
   /**
    * Invalidates all active DofObject dofs for this system
@@ -1487,17 +1487,17 @@ private:
    * The default coupling GhostingFunctor, used to implement standard
    * libMesh sparsity pattern construction.
    *
-   * We use a UniquePtr here to reduce header dependencies.
+   * We use a std::unique_ptr here to reduce header dependencies.
    */
-  UniquePtr<DefaultCoupling> _default_coupling;
+  std::unique_ptr<DefaultCoupling> _default_coupling;
 
   /**
    * The default algebraic GhostingFunctor, used to implement standard
    * libMesh send_list construction.
    *
-   * We use a UniquePtr here to reduce header dependencies.
+   * We use a std::unique_ptr here to reduce header dependencies.
    */
-  UniquePtr<DefaultCoupling> _default_evaluating;
+  std::unique_ptr<DefaultCoupling> _default_evaluating;
 
   /**
    * The list of all GhostingFunctor objects to be used when
@@ -1532,7 +1532,7 @@ private:
    * The sparsity pattern of the global matrix, kept around if it
    * might be needed by future additions of the same type of matrix.
    */
-  UniquePtr<SparsityPattern::Build> _sp;
+  std::unique_ptr<SparsityPattern::Build> _sp;
 
   /**
    * The number of on-processor nonzeros in my portion of the
@@ -1609,7 +1609,7 @@ private:
    * Data structure containing periodic boundaries.  The ith
    * entry is the constraint matrix row for boundaryid i.
    */
-  UniquePtr<PeriodicBoundaries> _periodic_boundaries;
+  std::unique_ptr<PeriodicBoundaries> _periodic_boundaries;
 #endif
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
@@ -1623,7 +1623,7 @@ private:
    * Data structure containing Dirichlet functions.  The ith
    * entry is the constraint matrix row for boundaryid i.
    */
-  UniquePtr<DirichletBoundaries> _dirichlet_boundaries;
+  std::unique_ptr<DirichletBoundaries> _dirichlet_boundaries;
 
   /**
    * Data structure containing Dirichlet functions.  The ith

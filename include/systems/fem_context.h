@@ -1003,8 +1003,8 @@ protected:
    */
   const NumericVector<Number> * _custom_solution;
 
-  mutable UniquePtr<FEGenericBase<Real>>         _real_fe;
-  mutable UniquePtr<FEGenericBase<RealGradient>> _real_grad_fe;
+  mutable std::unique_ptr<FEGenericBase<Real>>         _real_fe;
+  mutable std::unique_ptr<FEGenericBase<RealGradient>> _real_grad_fe;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   mutable bool _real_fe_is_inf;
@@ -1157,7 +1157,7 @@ protected:
    * Because edge rules only apply to 3D elements, we don't need to
    * worry about multiple dimensions
    */
-  UniquePtr<QBase> _edge_qrule;
+  std::unique_ptr<QBase> _edge_qrule;
 
   /**
    * The extra quadrature order for this context.

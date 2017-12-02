@@ -174,7 +174,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   system.project_solution_on_reinit() = true;
 
   // And it'll be best to avoid any repartitioning
-  UniquePtr<Partitioner> old_partitioner(mesh.partitioner().release());
+  std::unique_ptr<Partitioner> old_partitioner(mesh.partitioner().release());
 
   // And we can't allow any renumbering
   const bool old_renumbering_setting = mesh.allow_renumbering();
@@ -446,12 +446,12 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // Localize the global rhs and adjoint solution vectors (which might be shared on multiple processors) onto a
   // local ghosted vector, this ensures each processor has all the dof_indices to compute an error indicator for
   // an element it owns
-  UniquePtr<NumericVector<Number>> localized_projected_residual = NumericVector<Number>::build(system.comm());
+  std::unique_ptr<NumericVector<Number>> localized_projected_residual = NumericVector<Number>::build(system.comm());
   localized_projected_residual->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_send_list(), false, GHOSTED);
   projected_residual.localize(*localized_projected_residual, system.get_dof_map().get_send_list());
 
   // Each adjoint solution will also require ghosting; for efficiency we'll reuse the same memory
-  UniquePtr<NumericVector<Number>> localized_adjoint_solution = NumericVector<Number>::build(system.comm());
+  std::unique_ptr<NumericVector<Number>> localized_adjoint_solution = NumericVector<Number>::build(system.comm());
   localized_adjoint_solution->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_send_list(), false, GHOSTED);
 
   // We will loop over each adjoint solution, localize that adjoint

@@ -385,7 +385,7 @@ void RBConstruction::print_info()
 
 void RBConstruction::print_basis_function_orthogonality()
 {
-  UniquePtr<NumericVector<Number>> temp = solution->clone();
+  std::unique_ptr<NumericVector<Number>> temp = solution->clone();
 
   for (unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
     {
@@ -596,9 +596,9 @@ void RBConstruction::allocate_data_structures()
   truth_outputs.resize(this->get_rb_theta_expansion().get_n_outputs());
 }
 
-UniquePtr<DGFEMContext> RBConstruction::build_context ()
+std::unique_ptr<DGFEMContext> RBConstruction::build_context ()
 {
-  return UniquePtr<DGFEMContext>(new DGFEMContext(*this));
+  return std::unique_ptr<DGFEMContext>(new DGFEMContext(*this));
 }
 
 void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
@@ -684,7 +684,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
         }
     }
 
-  UniquePtr<DGFEMContext> c = this->build_context();
+  std::unique_ptr<DGFEMContext> c = this->build_context();
   DGFEMContext & context  = cast_ref<DGFEMContext &>(*c);
 
   this->init_context(context);
@@ -694,7 +694,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
       // Subdivision elements need special care:
       // - skip ghost elements
       // - init special quadrature rule
-      UniquePtr<QBase> qrule;
+      std::unique_ptr<QBase> qrule;
       if (elem->type() == TRI3SUBDIVISION)
         {
           const Tri3Subdivision * gh_elem = static_cast<const Tri3Subdivision *> (elem);
@@ -872,7 +872,7 @@ void RBConstruction::truth_assembly()
         matrix->add(get_rb_theta_expansion().eval_A_theta(q_a, mu), *get_Aq(q_a));
       }
 
-    UniquePtr<NumericVector<Number>> temp_vec = NumericVector<Number>::build(this->comm());
+    std::unique_ptr<NumericVector<Number>> temp_vec = NumericVector<Number>::build(this->comm());
     temp_vec->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
     for (unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
       {
@@ -1419,7 +1419,7 @@ void RBConstruction::update_RB_system_matrices()
 
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
-  UniquePtr<NumericVector<Number>> temp = NumericVector<Number>::build(this->comm());
+  std::unique_ptr<NumericVector<Number>> temp = NumericVector<Number>::build(this->comm());
   temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
   for (unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
@@ -1782,10 +1782,10 @@ void RBConstruction::load_rb_solution()
 //   // Note that this only works in serial since otherwise each processor will
 //   // have a different parameter value during the Greedy training.
 //
-//   UniquePtr<NumericVector<Number>> RB_sol = NumericVector<Number>::build();
+//   std::unique_ptr<NumericVector<Number>> RB_sol = NumericVector<Number>::build();
 //   RB_sol->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 //
-//   UniquePtr<NumericVector<Number>> temp = NumericVector<Number>::build();
+//   std::unique_ptr<NumericVector<Number>> temp = NumericVector<Number>::build();
 //   temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 //
 //   for (unsigned int i=0; i<N; i++)
@@ -1943,7 +1943,7 @@ void RBConstruction::get_output_vectors(std::map<std::string, NumericVector<Numb
       }
 }
 
-UniquePtr<DirichletBoundary> RBConstruction::build_zero_dirichlet_boundary_object()
+std::unique_ptr<DirichletBoundary> RBConstruction::build_zero_dirichlet_boundary_object()
 {
   ZeroFunction<> zf;
 
@@ -1951,7 +1951,7 @@ UniquePtr<DirichletBoundary> RBConstruction::build_zero_dirichlet_boundary_objec
   std::vector<unsigned int> variables;
 
   // The DirichletBoundary constructor clones zf, so it's OK that zf is only in local scope
-  return UniquePtr<DirichletBoundary> (new DirichletBoundary(dirichlet_ids, variables, &zf));
+  return std::unique_ptr<DirichletBoundary> (new DirichletBoundary(dirichlet_ids, variables, &zf));
 }
 
 void RBConstruction::write_riesz_representors_to_files(const std::string & riesz_representors_dir,

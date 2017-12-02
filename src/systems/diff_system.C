@@ -134,11 +134,11 @@ void DifferentiableSystem::init_data ()
   time_solver->init_data();
 }
 
-UniquePtr<DiffContext> DifferentiableSystem::build_context ()
+std::unique_ptr<DiffContext> DifferentiableSystem::build_context ()
 {
   DiffContext * context = new DiffContext(*this);
   context->set_deltat_pointer( &this->deltat );
-  return UniquePtr<DiffContext>(context);
+  return std::unique_ptr<DiffContext>(context);
 }
 
 

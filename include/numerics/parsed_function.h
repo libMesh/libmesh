@@ -97,7 +97,7 @@ public:
    */
   virtual Output & getVarAddress(const std::string & variable_name);
 
-  virtual UniquePtr<FunctionBase<Output>> clone() const libmesh_override;
+  virtual std::unique_ptr<FunctionBase<Output>> clone() const libmesh_override;
 
   /**
    * \returns The value of an inline variable.
@@ -326,10 +326,10 @@ ParsedFunction<Output,OutputGradient>::getVarAddress (const std::string & variab
 
 template <typename Output, typename OutputGradient>
 inline
-UniquePtr<FunctionBase<Output>>
+std::unique_ptr<FunctionBase<Output>>
 ParsedFunction<Output,OutputGradient>::clone() const
 {
-  return UniquePtr<FunctionBase<Output>>
+  return std::unique_ptr<FunctionBase<Output>>
     (new ParsedFunction(_expression, &_additional_vars, &_initial_vals));
 }
 
@@ -706,9 +706,9 @@ public:
   virtual void init() {}
   virtual void clear() {}
   virtual Output & getVarAddress(const std::string & /*variable_name*/) { return _dummy; }
-  virtual UniquePtr<FunctionBase<Output>> clone() const
+  virtual std::unique_ptr<FunctionBase<Output>> clone() const
   {
-    return UniquePtr<FunctionBase<Output>> (new ParsedFunction<Output>(""));
+    return std::unique_ptr<FunctionBase<Output>> (new ParsedFunction<Output>(""));
   }
 private:
   Output _dummy;

@@ -137,7 +137,7 @@ public:
    * \returns A primitive (3-noded) tri or (4-noded) infquad for
    * face i.
    */
-  virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;
+  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) libmesh_override;
 
    /**
    * @returns \p true when this element contains the point

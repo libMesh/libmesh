@@ -58,10 +58,10 @@ public:
   virtual void retrieve() = 0;
 
   /**
-   * Cloning function for a UniquePtr, pure virtual, used in the
+   * Cloning function for a std::unique_ptr, pure virtual, used in the
    * setter function in time_solver.C
    */
-  virtual UniquePtr<SolutionHistory > clone() const = 0;
+  virtual std::unique_ptr<SolutionHistory > clone() const = 0;
 
   /**
    * Turn on overwrite_previously_stored to overwrite any

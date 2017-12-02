@@ -115,7 +115,7 @@ public:
    * \note This implies the copy should not be used after the
    * original is destroyed.
    */
-  virtual UniquePtr<FunctionBase<Number>> clone () const libmesh_override;
+  virtual std::unique_ptr<FunctionBase<Number>> clone () const libmesh_override;
 
   /**
    * \returns The value of variable 0 at point \p p and for \p time,

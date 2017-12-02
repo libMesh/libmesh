@@ -842,7 +842,7 @@ inline Request::Request (const Request & other) :
   post_wait_work(other.post_wait_work)
 {
   if (other._prior_request.get())
-    _prior_request = UniquePtr<Request>
+    _prior_request = std::unique_ptr<Request>
       (new Request(*other._prior_request.get()));
 
   // operator= should behave like a shared pointer
@@ -880,7 +880,7 @@ inline Request & Request::operator = (const Request & other)
   post_wait_work = other.post_wait_work;
 
   if (other._prior_request.get())
-    _prior_request = UniquePtr<Request>
+    _prior_request = std::unique_ptr<Request>
       (new Request(*other._prior_request.get()));
 
   // operator= should behave like a shared pointer

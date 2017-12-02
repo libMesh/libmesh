@@ -155,7 +155,7 @@ void MeshTools::Modification::redistribute (MeshBase & mesh,
   DenseVector<Real> output_vec(LIBMESH_DIM);
 
   // FIXME - we should thread this later.
-  UniquePtr<FunctionBase<Real>> myfunc = mapfunc.clone();
+  std::unique_ptr<FunctionBase<Real>> myfunc = mapfunc.clone();
 
   for (auto & node : mesh.node_ptr_range())
     {
@@ -1431,7 +1431,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                       continue;
 
                     // Make a sorted list of node ids for elem->side(sn)
-                    UniquePtr<Elem> elem_side = elem->build_side_ptr(sn);
+                    std::unique_ptr<Elem> elem_side = elem->build_side_ptr(sn);
                     std::vector<dof_id_type> elem_side_nodes(elem_side->n_nodes());
                     for (std::size_t esn=0; esn<elem_side_nodes.size(); ++esn)
                       elem_side_nodes[esn] = elem_side->node_id(esn);
@@ -1442,7 +1442,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                         {
                           for (auto subside : subelem[i]->side_index_range())
                             {
-                              UniquePtr<Elem> subside_elem = subelem[i]->build_side_ptr(subside);
+                              std::unique_ptr<Elem> subside_elem = subelem[i]->build_side_ptr(subside);
 
                               // Make a list of *vertex* node ids for this subside, see if they are all present
                               // in elem->side(sn).  Note 1: we can't just compare elem->key(sn) to
@@ -1633,7 +1633,7 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
                         if ((elem->neighbor_ptr(s) != libmesh_nullptr) &&
                             (elem->id() > elem->neighbor_ptr(s)->id()))
                           {
-                            UniquePtr<const Elem> side(elem->build_side_ptr(s));
+                            std::unique_ptr<const Elem> side(elem->build_side_ptr(s));
 
                             const Node & node0 = side->node_ref(0);
                             const Node & node1 = side->node_ref(1);

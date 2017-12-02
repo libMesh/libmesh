@@ -79,10 +79,10 @@ public:
    * run-time.  The input parameter \p name must be mappable through
    * the \p Utility::string_to_enum<>() function.
    *
-   * This function allocates memory, therefore a \p UniquePtr<QBase>
+   * This function allocates memory, therefore a \p std::unique_ptr<QBase>
    * is returned so that the user does not accidentally leak it.
    */
-  static UniquePtr<QBase> build (const std::string & name,
+  static std::unique_ptr<QBase> build (const std::string & name,
                                  const unsigned int dim,
                                  const Order order=INVALID_ORDER);
 
@@ -90,10 +90,10 @@ public:
    * Builds a specific quadrature rule based on the QuadratureType.
    * This enables selection of the quadrature rule at run-time.
    *
-   * This function allocates memory, therefore a \p UniquePtr<QBase>
+   * This function allocates memory, therefore a \p std::unique_ptr<QBase>
    * is returned so that the user does not accidentally leak it.
    */
-  static UniquePtr<QBase> build (const QuadratureType qt,
+  static std::unique_ptr<QBase> build (const QuadratureType qt,
                                  const unsigned int dim,
                                  const Order order=INVALID_ORDER);
 

@@ -531,7 +531,7 @@ const PointLocatorBase & MeshBase::point_locator () const
 #endif
 
 
-UniquePtr<PointLocatorBase> MeshBase::sub_point_locator () const
+std::unique_ptr<PointLocatorBase> MeshBase::sub_point_locator () const
 {
   // If there's no master point locator, then we need one.
   if (_point_locator.get() == libmesh_nullptr)

@@ -105,7 +105,7 @@ bool Pyramid5::has_affine_map() const
 
 
 
-UniquePtr<Elem> Pyramid5::build_side_ptr (const unsigned int i,
+std::unique_ptr<Elem> Pyramid5::build_side_ptr (const unsigned int i,
                                           bool proxy)
 {
   libmesh_assert_less (i, this->n_sides());
@@ -118,10 +118,10 @@ UniquePtr<Elem> Pyramid5::build_side_ptr (const unsigned int i,
         case 1:
         case 2:
         case 3:
-          return UniquePtr<Elem>(new Side<Tri3,Pyramid5>(this,i));
+          return std::unique_ptr<Elem>(new Side<Tri3,Pyramid5>(this,i));
 
         case 4:
-          return UniquePtr<Elem>(new Side<Quad4,Pyramid5>(this,i));
+          return std::unique_ptr<Elem>(new Side<Quad4,Pyramid5>(this,i));
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -158,20 +158,20 @@ UniquePtr<Elem> Pyramid5::build_side_ptr (const unsigned int i,
       for (unsigned n=0; n<face->n_nodes(); ++n)
         face->set_node(n) = this->node_ptr(Pyramid5::side_nodes_map[i][n]);
 
-      return UniquePtr<Elem>(face);
+      return std::unique_ptr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+  return std::unique_ptr<Elem>();
 }
 
 
 
-UniquePtr<Elem> Pyramid5::build_edge_ptr (const unsigned int i)
+std::unique_ptr<Elem> Pyramid5::build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());
 
-  return UniquePtr<Elem>(new SideEdge<Edge2,Pyramid5>(this,i));
+  return std::unique_ptr<Elem>(new SideEdge<Edge2,Pyramid5>(this,i));
 }
 
 

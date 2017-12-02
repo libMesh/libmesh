@@ -50,9 +50,9 @@ DiffSolver::DiffSolver (sys_type & s) :
 
 
 
-UniquePtr<DiffSolver> DiffSolver::build (sys_type & s)
+std::unique_ptr<DiffSolver> DiffSolver::build (sys_type & s)
 {
-  return UniquePtr<DiffSolver>(new NewtonSolver(s));
+  return std::unique_ptr<DiffSolver>(new NewtonSolver(s));
 }
 
 

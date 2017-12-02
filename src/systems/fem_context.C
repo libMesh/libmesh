@@ -174,7 +174,7 @@ void FEMContext::init_internal_data(const System & sys)
 
 FEMContext::~FEMContext()
 {
-  // We don't want to store UniquePtrs in STL containers, but we don't
+  // We don't want to store std::unique_ptrs in STL containers, but we don't
   // want to leak memory either
   for (std::vector<std::map<FEType, FEAbstract *>>::iterator d = _element_fe.begin();
        d != _element_fe.end(); ++d)

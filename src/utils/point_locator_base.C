@@ -62,27 +62,27 @@ bool PointLocatorBase::initialized () const
 
 
 
-UniquePtr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
+std::unique_ptr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
                                                      const MeshBase & mesh,
                                                      const PointLocatorBase * master)
 {
   switch (t)
     {
     case TREE:
-      return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, /*Trees::NODES,*/ master));
+      return std::unique_ptr<PointLocatorBase>(new PointLocatorTree(mesh, /*Trees::NODES,*/ master));
 
     case TREE_ELEMENTS:
-      return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, Trees::ELEMENTS, master));
+      return std::unique_ptr<PointLocatorBase>(new PointLocatorTree(mesh, Trees::ELEMENTS, master));
 
     case TREE_LOCAL_ELEMENTS:
-      return UniquePtr<PointLocatorBase>(new PointLocatorTree(mesh, Trees::LOCAL_ELEMENTS, master));
+      return std::unique_ptr<PointLocatorBase>(new PointLocatorTree(mesh, Trees::LOCAL_ELEMENTS, master));
 
     default:
       libmesh_error_msg("ERROR: Bad PointLocatorType = " << t);
     }
 
   libmesh_error_msg("We'll never get here!");
-  return UniquePtr<PointLocatorBase>();
+  return std::unique_ptr<PointLocatorBase>();
 }
 
 void PointLocatorBase::set_close_to_point_tol (Real close_to_point_tol)

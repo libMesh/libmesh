@@ -147,18 +147,18 @@ public:
   /**
    * The system matrix for standard eigenvalue problems.
    */
-  UniquePtr<SparseMatrix<Number>> matrix_A;
+  std::unique_ptr<SparseMatrix<Number>> matrix_A;
 
   /**
    * A second system matrix for generalized eigenvalue problems.
    */
-  UniquePtr<SparseMatrix<Number>> matrix_B;
+  std::unique_ptr<SparseMatrix<Number>> matrix_B;
 
   /**
    * The EigenSolver, defining which interface, i.e solver
    * package to use.
    */
-  UniquePtr<EigenSolver<Number>> eigen_solver;
+  std::unique_ptr<EigenSolver<Number>> eigen_solver;
 
 
 protected:

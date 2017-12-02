@@ -86,15 +86,15 @@
 // Local anonymous namespace to hold miscellaneous bits
 namespace {
 
-libMesh::UniquePtr<GetPot> command_line;
-libMesh::UniquePtr<std::ofstream> _ofstream;
+std::unique_ptr<GetPot> command_line;
+std::unique_ptr<std::ofstream> _ofstream;
 // If std::cout and std::cerr are redirected, we need to
 // be a little careful and save the original streambuf objects,
 // replacing them in the destructor before program termination.
 std::streambuf * out_buf (libmesh_nullptr);
 std::streambuf * err_buf (libmesh_nullptr);
 
-libMesh::UniquePtr<libMesh::Threads::task_scheduler_init> task_scheduler;
+std::unique_ptr<libMesh::Threads::task_scheduler_init> task_scheduler;
 #if defined(LIBMESH_HAVE_MPI)
 bool libmesh_initialized_mpi = false;
 #endif

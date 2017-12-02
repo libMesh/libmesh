@@ -96,11 +96,11 @@ unsigned int InfHex::which_node_am_i(unsigned int side,
 
 
 
-UniquePtr<Elem> InfHex::side_ptr (const unsigned int i)
+std::unique_ptr<Elem> InfHex::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
-  // To be returned wrapped in a UniquePtr
+  // To be returned wrapped in a std::unique_ptr
   Elem * face = libmesh_nullptr;
 
   // Think of a unit cube: (-1,1) x (-1,1) x (-1,1),
@@ -141,7 +141,7 @@ UniquePtr<Elem> InfHex::side_ptr (const unsigned int i)
   for (unsigned n=0; n<face->n_nodes(); ++n)
     face->set_node(n) = this->node_ptr(InfHex8::side_nodes_map[i][n]);
 
-  return UniquePtr<Elem>(face);
+  return std::unique_ptr<Elem>(face);
 }
 
 

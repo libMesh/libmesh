@@ -1521,7 +1521,7 @@ public:
   /**
    * Data structure to hold solution values.
    */
-  UniquePtr<NumericVector<Number>> solution;
+  std::unique_ptr<NumericVector<Number>> solution;
 
   /**
    * All the values I need to compute my contribution
@@ -1533,7 +1533,7 @@ public:
    * the contents of the \p solution and \p current_local_solution
    * vectors.
    */
-  UniquePtr<NumericVector<Number>> current_local_solution;
+  std::unique_ptr<NumericVector<Number>> current_local_solution;
 
   /**
    * For time-dependent problems, this is the time t at the beginning of
@@ -1875,7 +1875,7 @@ private:
    * Data structure describing the relationship between
    * nodes, variables, etc... and degrees of freedom.
    */
-  UniquePtr<DofMap> _dof_map;
+  std::unique_ptr<DofMap> _dof_map;
 
   /**
    * Constant reference to the \p EquationSystems object

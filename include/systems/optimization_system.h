@@ -265,34 +265,34 @@ public:
   /**
    * The \p OptimizationSolver that is used for performing the optimization.
    */
-  UniquePtr<OptimizationSolver<Number>> optimization_solver;
+  std::unique_ptr<OptimizationSolver<Number>> optimization_solver;
 
   /**
    * The vector that stores equality constraints.
    */
-  UniquePtr<NumericVector<Number>> C_eq;
+  std::unique_ptr<NumericVector<Number>> C_eq;
 
   /**
    * The sparse matrix that stores the Jacobian of C_eq.
    */
-  UniquePtr<SparseMatrix<Number>> C_eq_jac;
+  std::unique_ptr<SparseMatrix<Number>> C_eq_jac;
 
   /**
    * The vector that stores inequality constraints.
    */
-  UniquePtr<NumericVector<Number>> C_ineq;
+  std::unique_ptr<NumericVector<Number>> C_ineq;
 
   /**
    * The sparse matrix that stores the Jacobian of C_ineq.
    */
-  UniquePtr<SparseMatrix<Number>> C_ineq_jac;
+  std::unique_ptr<SparseMatrix<Number>> C_ineq_jac;
 
   /**
    * Vectors to store the dual variables associated with equality
    * and inequality constraints.
    */
-  UniquePtr<NumericVector<Number>> lambda_eq;
-  UniquePtr<NumericVector<Number>> lambda_ineq;
+  std::unique_ptr<NumericVector<Number>> lambda_eq;
+  std::unique_ptr<NumericVector<Number>> lambda_ineq;
 
   /**
    * A copy of the equality and inequality constraint Jacobian sparsity
