@@ -189,7 +189,7 @@ public:
    */
   virtual std::unique_ptr<FunctionBase<Real>> clone () const libmesh_override
   {
-    return std::unique_ptr<FunctionBase<Real>> (new GaussLobattoRedistributionFunction(*this));
+    return libmesh_make_unique<GaussLobattoRedistributionFunction>(*this);
   }
 
   /**

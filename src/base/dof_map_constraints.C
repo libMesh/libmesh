@@ -397,7 +397,7 @@ private:
         libmesh_assert(f_system);
         if (f_system->current_local_solution->initialized())
           {
-            context = std::unique_ptr<FEMContext>(new FEMContext(*f_system));
+            context = libmesh_make_unique<FEMContext>(*f_system);
             f_fem->init_context(*context);
             if (g_fem)
               g_fem->init_context(*context);

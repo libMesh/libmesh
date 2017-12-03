@@ -43,7 +43,7 @@ EigenSolver<T>::build(const Parallel::Communicator & comm,
 
 #ifdef LIBMESH_HAVE_SLEPC
     case SLEPC_SOLVERS:
-      return std::unique_ptr<EigenSolver<T>>(new SlepcEigenSolver<T>(comm));
+      return libmesh_make_unique<SlepcEigenSolver<T>>(comm);
 #endif
 
     default:

@@ -125,7 +125,7 @@ ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
   // here in the constructor.
   _next_unique_id = 0;
 #endif
-  _partitioner = std::unique_ptr<Partitioner>(new MetisPartitioner());
+  _partitioner = libmesh_make_unique<MetisPartitioner>();
 }
 
 
@@ -141,7 +141,7 @@ ReplicatedMesh::ReplicatedMesh (unsigned char d) :
   // here in the constructor.
   _next_unique_id = 0;
 #endif
-  _partitioner = std::unique_ptr<Partitioner>(new MetisPartitioner());
+  _partitioner = libmesh_make_unique<MetisPartitioner>();
 }
 #endif
 #endif

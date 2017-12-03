@@ -148,7 +148,7 @@ std::unique_ptr<Elem> Hex20::build_side_ptr (const unsigned int i,
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    return std::unique_ptr<Elem>(new Side<Quad8,Hex20>(this,i));
+    return libmesh_make_unique<Side<Quad8,Hex20>>(this,i);
 
   else
     {
@@ -182,7 +182,7 @@ std::unique_ptr<Elem> Hex20::build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());
 
-  return std::unique_ptr<Elem>(new SideEdge<Edge3,Hex20>(this,i));
+  return libmesh_make_unique<SideEdge<Edge3,Hex20>>(this,i);
 }
 
 

@@ -43,12 +43,12 @@ NonlinearSolver<T>::build(sys_type & s, const SolverPackage solver_package)
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-      return std::unique_ptr<NonlinearSolver<T>>(new PetscNonlinearSolver<T>(s));
+      return libmesh_make_unique<PetscNonlinearSolver<T>>(s);
 #endif // LIBMESH_HAVE_PETSC
 
 #if defined(LIBMESH_TRILINOS_HAVE_NOX) && defined(LIBMESH_TRILINOS_HAVE_EPETRA)
     case TRILINOS_SOLVERS:
-      return std::unique_ptr<NonlinearSolver<T>>(new NoxNonlinearSolver<T>(s));
+      return libmesh_make_unique<NoxNonlinearSolver<T>>(s);
 #endif
 
     default:

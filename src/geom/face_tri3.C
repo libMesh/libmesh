@@ -112,7 +112,7 @@ std::unique_ptr<Elem> Tri3::build_side_ptr (const unsigned int i,
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    return std::unique_ptr<Elem>(new Side<Edge2,Tri3>(this,i));
+    return libmesh_make_unique<Side<Edge2,Tri3>>(this,i);
 
   else
     {

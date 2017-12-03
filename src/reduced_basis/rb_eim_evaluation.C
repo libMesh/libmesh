@@ -222,7 +222,7 @@ std::vector<RBTheta *> RBEIMEvaluation::get_eim_theta_objects()
 
 std::unique_ptr<RBTheta> RBEIMEvaluation::build_eim_theta(unsigned int index)
 {
-  return std::unique_ptr<RBTheta>( new RBEIMTheta(*this, index) );
+  return libmesh_make_unique<RBEIMTheta>(*this, index);
 }
 
 void RBEIMEvaluation::legacy_write_offline_data_to_files(const std::string & directory_name,

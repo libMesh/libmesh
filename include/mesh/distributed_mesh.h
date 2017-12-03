@@ -91,7 +91,7 @@ public:
    * Virtual copy-constructor, creates a copy of this mesh
    */
   virtual std::unique_ptr<MeshBase> clone () const libmesh_override
-  { return std::unique_ptr<MeshBase>(new DistributedMesh(*this)); }
+  { return libmesh_make_unique<DistributedMesh>(*this); }
 
   /**
    * Destructor.

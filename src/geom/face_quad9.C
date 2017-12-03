@@ -225,7 +225,7 @@ std::unique_ptr<Elem> Quad9::build_side_ptr (const unsigned int i,
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    return std::unique_ptr<Elem>(new Side<Edge3,Quad9>(this,i));
+    return libmesh_make_unique<Side<Edge3,Quad9>>(this,i);
 
   else
     {

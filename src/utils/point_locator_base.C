@@ -69,13 +69,13 @@ std::unique_ptr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
   switch (t)
     {
     case TREE:
-      return std::unique_ptr<PointLocatorBase>(new PointLocatorTree(mesh, /*Trees::NODES,*/ master));
+      return libmesh_make_unique<PointLocatorTree>(mesh, /*Trees::NODES,*/ master);
 
     case TREE_ELEMENTS:
-      return std::unique_ptr<PointLocatorBase>(new PointLocatorTree(mesh, Trees::ELEMENTS, master));
+      return libmesh_make_unique<PointLocatorTree>(mesh, Trees::ELEMENTS, master);
 
     case TREE_LOCAL_ELEMENTS:
-      return std::unique_ptr<PointLocatorBase>(new PointLocatorTree(mesh, Trees::LOCAL_ELEMENTS, master));
+      return libmesh_make_unique<PointLocatorTree>(mesh, Trees::LOCAL_ELEMENTS, master);
 
     default:
       libmesh_error_msg("ERROR: Bad PointLocatorType = " << t);

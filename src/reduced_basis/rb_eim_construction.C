@@ -373,7 +373,7 @@ void RBEIMConstruction::enrich_RB_space()
   // Compute truth representation via projection
   MeshBase & mesh = this->get_mesh();
 
-  std::unique_ptr<DGFEMContext> explicit_c(new DGFEMContext( get_explicit_system() ));
+  std::unique_ptr<DGFEMContext> explicit_c = libmesh_make_unique<DGFEMContext>(get_explicit_system());
   DGFEMContext & explicit_context = cast_ref<DGFEMContext &>(*explicit_c);
   init_context_with_sys(explicit_context, get_explicit_system());
 
@@ -618,7 +618,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
       // Compute truth representation via L2 projection
       const MeshBase & mesh = this->get_mesh();
 
-      std::unique_ptr<DGFEMContext> c(new DGFEMContext( *this ));
+      std::unique_ptr<DGFEMContext> c = libmesh_make_unique<DGFEMContext>(*this);
       DGFEMContext & context = cast_ref<DGFEMContext &>(*c);
       init_context_with_sys(context, *this);
 

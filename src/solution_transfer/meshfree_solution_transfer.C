@@ -52,7 +52,7 @@ public:
 
   virtual std::unique_ptr<FunctionBase<Number>> clone () const
   {
-    return std::unique_ptr<FunctionBase<Number>> (new MeshlessInterpolationFunction (_mfi, _mutex) );
+    return libmesh_make_unique<MeshlessInterpolationFunction>(_mfi, _mutex);
   }
 
   Number operator() (const Point & p,

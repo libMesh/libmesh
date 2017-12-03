@@ -46,7 +46,7 @@ public:
   ~ConstFEMFunction() {}
 
   virtual std::unique_ptr<FEMFunctionBase<Output>> clone () const
-  {return std::unique_ptr<FEMFunctionBase<Output>>( new ConstFEMFunction(*this) ); }
+  {return libmesh_make_unique<ConstFEMFunction>(*this); }
 
   virtual Output operator() (const FEMContext &,
                              const Point &,

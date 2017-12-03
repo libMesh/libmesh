@@ -49,7 +49,7 @@ DistributedMesh::DistributedMesh (const Parallel::Communicator & comm_in,
 #endif
 
   // FIXME: give parmetis the communicator!
-  _partitioner = std::unique_ptr<Partitioner>(new ParmetisPartitioner());
+  _partitioner = libmesh_make_unique<ParmetisPartitioner>();
 }
 
 
@@ -73,7 +73,7 @@ DistributedMesh::DistributedMesh (unsigned char d) :
 #endif
 
   // FIXME: give parmetis the communicator!
-  _partitioner = std::unique_ptr<Partitioner>(new ParmetisPartitioner());
+  _partitioner = libmesh_make_unique<ParmetisPartitioner>();
 }
 #endif
 #endif

@@ -43,11 +43,11 @@ std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputSh
     case L2_LAGRANGE: // PB: Shouldn't this be L2 conforming?
     case JACOBI_20_00: // PB: For infinite elements...
     case JACOBI_30_00: // PB: For infinite elements...
-      return std::unique_ptr<FETransformationBase<OutputShape>>(new H1FETransformation<OutputShape>);
+      return libmesh_make_unique<H1FETransformation<OutputShape>>();
 
       // HCurl Conforming Elements
     case NEDELEC_ONE:
-      return std::unique_ptr<FETransformationBase<OutputShape>>(new HCurlFETransformation<OutputShape>);
+      return libmesh_make_unique<HCurlFETransformation<OutputShape>>();
 
       // HDiv Conforming Elements
       // L2 Conforming Elements
@@ -55,7 +55,7 @@ std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputSh
       // Other...
     case SCALAR:
       // Should never need this for SCALARs
-      return std::unique_ptr<FETransformationBase<OutputShape>>(new H1FETransformation<OutputShape>);
+      return libmesh_make_unique<H1FETransformation<OutputShape>>();
 
     default:
       libmesh_error_msg("Unknown family = " << fe_type.family);

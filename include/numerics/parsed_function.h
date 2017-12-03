@@ -329,8 +329,9 @@ inline
 std::unique_ptr<FunctionBase<Output>>
 ParsedFunction<Output,OutputGradient>::clone() const
 {
-  return std::unique_ptr<FunctionBase<Output>>
-    (new ParsedFunction(_expression, &_additional_vars, &_initial_vals));
+  return libmesh_make_unique<ParsedFunction>(_expression,
+                                             &_additional_vars,
+                                             &_initial_vals);
 }
 
 template <typename Output, typename OutputGradient>
@@ -708,7 +709,7 @@ public:
   virtual Output & getVarAddress(const std::string & /*variable_name*/) { return _dummy; }
   virtual std::unique_ptr<FunctionBase<Output>> clone() const
   {
-    return std::unique_ptr<FunctionBase<Output>> (new ParsedFunction<Output>(""));
+    return libmesh_make_unique<ParsedFunction<Output>>("");
   }
 private:
   Output _dummy;

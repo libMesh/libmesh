@@ -71,7 +71,7 @@ public:
    */
   virtual std::unique_ptr<Partitioner> clone () const libmesh_override
   {
-    return std::unique_ptr<Partitioner>(new CentroidPartitioner(sort_method()));
+    return libmesh_make_unique<CentroidPartitioner>(sort_method());
   }
 
   /**

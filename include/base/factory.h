@@ -146,7 +146,7 @@ std::unique_ptr<Base> Factory<Base>::build (const std::string & name)
     }
 
   Factory<Base> * f = factory_map()[name];
-  return std::unique_ptr<Base>(f->create());
+  return libmesh_make_unique<Base>(f->create());
 }
 
 
@@ -155,7 +155,7 @@ template <class Derived, class Base>
 inline
 std::unique_ptr<Base> FactoryImp<Derived,Base>::create ()
 {
-  return std::unique_ptr<Base>(new Derived);
+  return libmesh_make_unique<Derived>();
 }
 
 

@@ -111,14 +111,14 @@ std::unique_ptr<Elem> InfHex8::build_side_ptr (const unsigned int i,
         {
           // base
         case 0:
-          return std::unique_ptr<Elem>(new Side<Quad4,InfHex8>(this,i));
+          return libmesh_make_unique<Side<Quad4,InfHex8>>(this,i);
 
           // ifem sides
         case 1:
         case 2:
         case 3:
         case 4:
-          return std::unique_ptr<Elem>(new Side<InfQuad4,InfHex8>(this,i));
+          return libmesh_make_unique<Side<InfQuad4,InfHex8>>(this,i);
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -172,9 +172,10 @@ std::unique_ptr<Elem> InfHex8::build_edge_ptr (const unsigned int i)
   libmesh_assert_less (i, this->n_edges());
 
   if (i < 4) // base edges
-    return std::unique_ptr<Elem>(new SideEdge<Edge2,InfHex8>(this,i));
+    return libmesh_make_unique<SideEdge<Edge2,InfHex8>>(this,i);
+
   // infinite edges
-  return std::unique_ptr<Elem>(new SideEdge<InfEdge2,InfHex8>(this,i));
+  return libmesh_make_unique<SideEdge<InfEdge2,InfHex8>>(this,i);
 }
 
 

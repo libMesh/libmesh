@@ -64,7 +64,7 @@ Point PeriodicBoundary::get_corresponding_pos(const Point & pt) const
 
 std::unique_ptr<PeriodicBoundaryBase> PeriodicBoundary::clone(TransformationType t) const
 {
-  return std::unique_ptr<PeriodicBoundaryBase>(new PeriodicBoundary(*this, t));
+  return libmesh_make_unique<PeriodicBoundary>(*this, t);
 }
 
 

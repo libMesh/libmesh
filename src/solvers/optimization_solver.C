@@ -70,12 +70,12 @@ OptimizationSolver<T>::build(sys_type & s, const SolverPackage solver_package)
 
 #if defined(LIBMESH_HAVE_PETSC_TAO) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
     case PETSC_SOLVERS:
-      return std::unique_ptr<OptimizationSolver<T>>(new TaoOptimizationSolver<T>(s));
+      return libmesh_make_unique<TaoOptimizationSolver<T>>(s);
 #endif // #if defined(LIBMESH_HAVE_PETSC_TAO) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
 #if defined(LIBMESH_HAVE_NLOPT) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
     case NLOPT_SOLVERS:
-      return std::unique_ptr<OptimizationSolver<T>>(new NloptOptimizationSolver<T>(s));
+      return libmesh_make_unique<NloptOptimizationSolver<T>>(s);
 #endif // #if defined(LIBMESH_HAVE_NLOPT) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
     default:

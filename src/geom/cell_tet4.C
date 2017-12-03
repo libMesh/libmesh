@@ -133,7 +133,7 @@ std::unique_ptr<Elem> Tet4::build_side_ptr (const unsigned int i,
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    return std::unique_ptr<Elem>(new Side<Tri3,Tet4>(this,i));
+    return libmesh_make_unique<Side<Tri3,Tet4>>(this,i);
 
   else
     {
@@ -155,7 +155,7 @@ std::unique_ptr<Elem> Tet4::build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());
 
-  return std::unique_ptr<Elem>(new SideEdge<Edge2,Tet4>(this,i));
+  return libmesh_make_unique<SideEdge<Edge2,Tet4>>(this,i);
 }
 
 

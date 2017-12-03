@@ -130,7 +130,7 @@ std::unique_ptr<Elem> Quad4::build_side_ptr (const unsigned int i,
   libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
-    return std::unique_ptr<Elem>(new Side<Edge2,Quad4>(this,i));
+    return libmesh_make_unique<Side<Edge2,Quad4>>(this,i);
 
   else
     {

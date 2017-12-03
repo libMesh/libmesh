@@ -54,7 +54,7 @@ public:
    */
   virtual std::unique_ptr<Partitioner> clone () const libmesh_override
   {
-    return std::unique_ptr<Partitioner>(new SFCPartitioner());
+    return libmesh_make_unique<SFCPartitioner>();
   }
 
   /**

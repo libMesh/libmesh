@@ -110,13 +110,13 @@ std::unique_ptr<Elem> InfPrism6::build_side_ptr (const unsigned int i,
         {
           // base
         case 0:
-          return std::unique_ptr<Elem>(new Side<Tri3,InfPrism6>(this,i));
+          return libmesh_make_unique<Side<Tri3,InfPrism6>>(this,i);
 
           // ifem sides
         case 1:
         case 2:
         case 3:
-          return std::unique_ptr<Elem>(new Side<InfQuad4,InfPrism6>(this,i));
+          return libmesh_make_unique<Side<InfQuad4,InfPrism6>>(this,i);
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -167,8 +167,10 @@ std::unique_ptr<Elem> InfPrism6::build_edge_ptr (const unsigned int i)
   libmesh_assert_less (i, n_edges());
 
   if (i < 3)
-    return std::unique_ptr<Elem>(new SideEdge<Edge2,InfPrism6>(this,i));
-  return std::unique_ptr<Elem>(new SideEdge<InfEdge2,InfPrism6>(this,i));
+    return libmesh_make_unique<SideEdge<Edge2,InfPrism6>>(this,i);
+
+  // infinite edges
+  return libmesh_make_unique<SideEdge<InfEdge2,InfPrism6>>(this,i);
 }
 
 void InfPrism6::connectivity(const unsigned int libmesh_dbg_var(sc),

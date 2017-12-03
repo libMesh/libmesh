@@ -199,12 +199,12 @@ std::unique_ptr<Elem> Prism18::build_side_ptr (const unsigned int i,
         {
         case 0:
         case 4:
-          return std::unique_ptr<Elem>(new Side<Tri6,Prism18>(this,i));
+          return libmesh_make_unique<Side<Tri6,Prism18>>(this,i);
 
         case 1:
         case 2:
         case 3:
-          return std::unique_ptr<Elem>(new Side<Quad9,Prism18>(this,i));
+          return libmesh_make_unique<Side<Quad9,Prism18>>(this,i);
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -254,7 +254,7 @@ std::unique_ptr<Elem> Prism18::build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());
 
-  return std::unique_ptr<Elem>(new SideEdge<Edge3,Prism18>(this,i));
+  return libmesh_make_unique<SideEdge<Edge3,Prism18>>(this,i);
 }
 
 

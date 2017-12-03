@@ -81,7 +81,7 @@ public:
    */
   virtual std::unique_ptr<ParameterAccessor<T>> clone() const libmesh_override
   {
-    return std::unique_ptr<ParameterAccessor<T>>(new ParameterPointer<T>(_ptr));
+    return libmesh_make_unique<ParameterPointer<T>>(_ptr);
   }
 
 private:

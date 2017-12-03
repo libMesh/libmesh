@@ -60,7 +60,7 @@ public:
    */
   virtual std::unique_ptr<SolutionHistory > clone() const libmesh_override
   {
-    return std::unique_ptr<SolutionHistory >(new NoSolutionHistory());
+    return libmesh_make_unique<NoSolutionHistory>();
   }
 };
 

@@ -39,7 +39,7 @@ public:
 
   virtual std::unique_ptr<FunctionBase<Output>> clone() const libmesh_override
   {
-    return std::unique_ptr<FunctionBase<Output>>(new ZeroFunction<Output>());
+    return libmesh_make_unique<ZeroFunction<Output>>();
   }
 };
 

@@ -50,25 +50,25 @@ LinearSolver<T>::build(const libMesh::Parallel::Communicator & comm,
     {
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
-      return std::unique_ptr<LinearSolver<T>>(new LaspackLinearSolver<T>(comm));
+      return libmesh_make_unique<LaspackLinearSolver<T>>(comm);
 #endif
 
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-      return std::unique_ptr<LinearSolver<T>>(new PetscLinearSolver<T>(comm));
+      return libmesh_make_unique<PetscLinearSolver<T>>(comm);
 #endif
 
 
 #ifdef LIBMESH_TRILINOS_HAVE_AZTECOO
     case TRILINOS_SOLVERS:
-      return std::unique_ptr<LinearSolver<T>>(new AztecLinearSolver<T>(comm));
+      return libmesh_make_unique<AztecLinearSolver<T>>(comm);
 #endif
 
 
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
-      return std::unique_ptr<LinearSolver<T>>(new EigenSparseLinearSolver<T>(comm));
+      return libmesh_make_unique<EigenSparseLinearSolver<T>>(comm);
 #endif
 
     default:

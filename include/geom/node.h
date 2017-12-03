@@ -298,7 +298,7 @@ inline
 std::unique_ptr<Node> Node::build(const Node & n)
 {
   libmesh_deprecated();
-  return std::unique_ptr<Node>(new Node(n));
+  return libmesh_make_unique<Node>(n);
 }
 #endif
 
@@ -308,7 +308,7 @@ inline
 std::unique_ptr<Node> Node::build(const Point & p,
                                   const dof_id_type id)
 {
-  return std::unique_ptr<Node>(new Node(p,id));
+  return libmesh_make_unique<Node>(p,id);
 }
 
 
@@ -319,7 +319,7 @@ std::unique_ptr<Node> Node::build(const Real x,
                                   const Real z,
                                   const dof_id_type id)
 {
-  return std::unique_ptr<Node>(new Node(x,y,z,id));
+  return libmesh_make_unique<Node>(x,y,z,id);
 }
 
 

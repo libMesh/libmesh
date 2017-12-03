@@ -75,7 +75,7 @@ public:
    */
   virtual std::unique_ptr<SolutionHistory > clone() const libmesh_override
   {
-    return std::unique_ptr<SolutionHistory >(new MemorySolutionHistory(_system));
+    return libmesh_make_unique<MemorySolutionHistory>(_system);
   }
 
 private:

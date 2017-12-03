@@ -174,12 +174,12 @@ std::unique_ptr<Elem> InfQuad4::build_side_ptr (const unsigned int i,
         {
           // base
         case 0:
-          return std::unique_ptr<Elem>(new Side<Edge2,InfQuad4>(this,i));
+          return libmesh_make_unique<Side<Edge2,InfQuad4>>(this,i);
 
           // ifem edges
         case 1:
         case 2:
-          return std::unique_ptr<Elem>(new Side<InfEdge2,InfQuad4>(this,i));
+          return libmesh_make_unique<Side<InfEdge2,InfQuad4>>(this,i);
 
         default:
           libmesh_error_msg("Invalid side i = " << i);

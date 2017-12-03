@@ -52,10 +52,10 @@ std::unique_ptr<FEMap> FEMap::build( FEType fe_type )
   switch( fe_type.family )
     {
     case XYZ:
-      return std::unique_ptr<FEMap>(new FEXYZMap);
+      return libmesh_make_unique<FEXYZMap>();
 
     default:
-      return std::unique_ptr<FEMap>(new FEMap);
+      return libmesh_make_unique<FEMap>();
     }
 
   libmesh_error_msg("We'll never get here!");

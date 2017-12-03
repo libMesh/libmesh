@@ -51,26 +51,26 @@ NumericVector<T>::build(const Parallel::Communicator & comm, const SolverPackage
 
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
-      return std::unique_ptr<NumericVector<T>>(new LaspackVector<T>(comm, AUTOMATIC));
+      return libmesh_make_unique<LaspackVector<T>>(comm, AUTOMATIC);
 #endif
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-      return std::unique_ptr<NumericVector<T>>(new PetscVector<T>(comm, AUTOMATIC));
+      return libmesh_make_unique<PetscVector<T>>(comm, AUTOMATIC);
 #endif
 
 #ifdef LIBMESH_TRILINOS_HAVE_EPETRA
     case TRILINOS_SOLVERS:
-      return std::unique_ptr<NumericVector<T>>(new EpetraVector<T>(comm, AUTOMATIC));
+      return libmesh_make_unique<EpetraVector<T>>(comm, AUTOMATIC);
 #endif
 
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
-      return std::unique_ptr<NumericVector<T>>(new EigenSparseVector<T>(comm, AUTOMATIC));
+      return libmesh_make_unique<EigenSparseVector<T>>(comm, AUTOMATIC);
 #endif
 
     default:
-      return std::unique_ptr<NumericVector<T>>(new DistributedVector<T>(comm, AUTOMATIC));
+      return libmesh_make_unique<DistributedVector<T>>(comm, AUTOMATIC);
     }
 
   libmesh_error_msg("We'll never get here!");

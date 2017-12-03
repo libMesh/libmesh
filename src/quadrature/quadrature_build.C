@@ -67,7 +67,7 @@ std::unique_ptr<QBase> QBase::build(const QuadratureType _qt,
           }
 #endif
 
-        return std::unique_ptr<QBase>(new QClough(_dim, _order));
+        return libmesh_make_unique<QClough>(_dim, _order);
       }
 
     case QGAUSS:
@@ -81,7 +81,7 @@ std::unique_ptr<QBase> QBase::build(const QuadratureType _qt,
           }
 #endif
 
-        return std::unique_ptr<QBase>(new QGauss(_dim, _order));
+        return libmesh_make_unique<QGauss>(_dim, _order);
       }
 
     case QJACOBI_1_0:
@@ -101,7 +101,7 @@ std::unique_ptr<QBase> QBase::build(const QuadratureType _qt,
           }
 #endif
 
-        return std::unique_ptr<QBase>(new QJacobi(_dim, _order, 1, 0));
+        return libmesh_make_unique<QJacobi>(_dim, _order, 1, 0);
       }
 
     case QJACOBI_2_0:
@@ -121,7 +121,7 @@ std::unique_ptr<QBase> QBase::build(const QuadratureType _qt,
           }
 #endif
 
-        return std::unique_ptr<QBase>(new QJacobi(_dim, _order, 2, 0));
+        return libmesh_make_unique<QJacobi>(_dim, _order, 2, 0);
       }
 
     case QSIMPSON:
@@ -135,7 +135,7 @@ std::unique_ptr<QBase> QBase::build(const QuadratureType _qt,
           }
 #endif
 
-        return std::unique_ptr<QBase>(new QSimpson(_dim));
+        return libmesh_make_unique<QSimpson>(_dim);
       }
 
     case QTRAP:
@@ -149,23 +149,23 @@ std::unique_ptr<QBase> QBase::build(const QuadratureType _qt,
           }
 #endif
 
-        return std::unique_ptr<QBase>(new QTrap(_dim));
+        return libmesh_make_unique<QTrap>(_dim);
       }
 
     case QGRID:
-      return std::unique_ptr<QBase>(new QGrid(_dim, _order));
+      return libmesh_make_unique<QGrid>(_dim, _order);
 
     case QGRUNDMANN_MOLLER:
-      return std::unique_ptr<QBase>(new QGrundmann_Moller(_dim, _order));
+      return libmesh_make_unique<QGrundmann_Moller>(_dim, _order);
 
     case QMONOMIAL:
-      return std::unique_ptr<QBase>(new QMonomial(_dim, _order));
+      return libmesh_make_unique<QMonomial>(_dim, _order);
 
     case QGAUSS_LOBATTO:
-      return std::unique_ptr<QBase>(new QGaussLobatto(_dim, _order));
+      return libmesh_make_unique<QGaussLobatto>(_dim, _order);
 
     case QCONICAL:
-      return std::unique_ptr<QBase>(new QConical(_dim, _order));
+      return libmesh_make_unique<QConical>(_dim, _order);
 
     default:
       libmesh_error_msg("ERROR: Bad qt=" << _qt);
