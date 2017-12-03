@@ -182,8 +182,7 @@
 /* Flag indicating if the library should be built with unique id support */
 #undef ENABLE_UNIQUE_ID
 
-/* Flag indicating if the library should use a non-deprecated UniquePtr
-   implementation */
+/* Flag indicating the library uses std::unique_ptr */
 #undef ENABLE_UNIQUE_PTR
 
 /* Flag indicating if the library should be built with variational smoother
@@ -507,10 +506,6 @@
 
 /* Define if the HDF5 C++ interface is available */
 #undef HAVE_HDF5_CXX
-
-/* Flag indicating whether the library will be compiled with Howard Hinnant's
-   C++03 unique_ptr implementation */
-#undef HAVE_HINNANT_UNIQUE_PTR
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
