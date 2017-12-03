@@ -526,7 +526,6 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
 
   // build Elems based on boundary side type
-  std::set<std::pair<dof_id_type,unsigned int>>::iterator face_it = ofaces.begin();
   for (auto & p : ofaces)
     {
       Elem & belem = this->_mesh.elem_ref(p.first);
