@@ -210,6 +210,9 @@ users_data = [
 # Make plot of monthly data
 fig.clf()
 
+# Use a smaller font size on these plots since they are... smaller.
+by_month_fontsize = 7
+
 month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 # Strip out the year strings
@@ -248,10 +251,10 @@ for i in range(0, 12):
   xticks = [x + 1.5*width for x in xticks]
   xticklabels = [year_strings[0], year_strings[N-1]]
   ax.set_xticks(xticks)
-  ax.set_xticklabels(xticklabels, fontsize=10)
+  ax.set_xticklabels(xticklabels, fontsize=by_month_fontsize)
 
   # Set month name as subplot title
-  ax.set_title(month_names[i] + ' (max ' + str(max(combined_data_current_month)) + ')', fontsize=10)
+  ax.set_title(month_names[i] + ' (max ' + str(max(combined_data_current_month)) + ')', fontsize=by_month_fontsize)
 
   # Set an empty set of ticks for the y-axis to turn it off.  This
   # is necessary to declutter the figure.
