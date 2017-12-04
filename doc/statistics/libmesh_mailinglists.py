@@ -298,10 +298,12 @@ ax.bar(x, devel_numbers, width, color=secondary, label='libmesh-devel')
 # Set bi-yearly xticklabels
 ax.set_xticklabels(['2003', '2005', '2007', '2009', '2011', '2013', '2015', '2017'])
 
-# Set up the corresponding tick locations
-xticks = [1]
+# Set up the corresponding tick locations. This starting point was chosen by
+# trial and error because it lined up the tick marks fairly well, but I don't
+# understand the logic behind it.
+xticks = [.55]
 for i in xrange(1,len(ax.get_xticklabels())):
-  xticks.append(xticks[i-1] + 24)
+  xticks.append(xticks[i-1] + 24) # 2 years = 24 months
 
 # Center the ticks slightly
 xticks = [x+width/2. for x in xticks]
