@@ -210,6 +210,9 @@ users_data = [
 # Make plot of monthly data
 fig.clf()
 
+# Use a smaller font size on these plots since they are... smaller.
+by_month_fontsize = 7
+
 month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 # Strip out the year strings
@@ -244,14 +247,13 @@ for i in range(0, 12):
   ax.bar(x, devel_data_current_month, width, color=secondary)
 
   # Set up the xticks and labels
-  xticks = [0, N-1]
-  xticks = [x + 1.5*width for x in xticks]
+  xticks = [1, N]
   xticklabels = [year_strings[0], year_strings[N-1]]
   ax.set_xticks(xticks)
-  ax.set_xticklabels(xticklabels, fontsize=10)
+  ax.set_xticklabels(xticklabels, fontsize=by_month_fontsize)
 
   # Set month name as subplot title
-  ax.set_title(month_names[i] + ' (max ' + str(max(combined_data_current_month)) + ')', fontsize=10)
+  ax.set_title(month_names[i] + ' (max ' + str(max(combined_data_current_month)) + ')', fontsize=by_month_fontsize)
 
   # Set an empty set of ticks for the y-axis to turn it off.  This
   # is necessary to declutter the figure.
@@ -296,10 +298,12 @@ ax.bar(x, devel_numbers, width, color=secondary, label='libmesh-devel')
 # Set bi-yearly xticklabels
 ax.set_xticklabels(['2003', '2005', '2007', '2009', '2011', '2013', '2015', '2017'])
 
-# Set up the corresponding tick locations
-xticks = [1]
+# Set up the corresponding tick locations. This starting point was chosen by
+# trial and error because it lined up the tick marks fairly well, but I don't
+# understand the logic behind it.
+xticks = [.55]
 for i in xrange(1,len(ax.get_xticklabels())):
-  xticks.append(xticks[i-1] + 24)
+  xticks.append(xticks[i-1] + 24) # 2 years = 24 months
 
 # Center the ticks slightly
 xticks = [x+width/2. for x in xticks]

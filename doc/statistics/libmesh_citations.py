@@ -44,13 +44,13 @@ data = [
     ]
 
 # Extract the x-axis labels from the data array
-xlabels = data[0::2]
+ticklabels = data[0::2]
 
 # Extract the publication counts from the data array
 n_papers = data[1::2]
 
 # The number of data points
-N = len(xlabels);
+N = len(ticklabels);
 
 # Get a reference to the figure
 fig = plt.figure()
@@ -77,8 +77,8 @@ plt.xlabel('T=PhD, MS, and BS Theses')
 # Set up the xtick locations and labels.  Note that you have to offset
 # the position of the ticks by width/2, where width is the width of
 # the bars.
-ax.set_xticks(np.linspace(1,N,N) + width/2)
-ax.set_xticklabels(xlabels)
+ax.set_xticks(np.linspace(1,N,N))
+ax.set_xticklabels(ticklabels)
 
 # Create a title string
 title_string = 'Papers by People Using LibMesh, (' + str(sum(n_papers)) + ' Total)'

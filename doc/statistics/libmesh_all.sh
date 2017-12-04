@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Still being updated
-python libmesh_pagehits.py
-python libmesh_citations.py
-python github_traffic.py
-python cloc_libmesh.py
-python libmesh_mailinglists.py
+./libmesh_pagehits.py
+./libmesh_citations.py
+./github_traffic.py
+./cloc_libmesh.py
+./libmesh_mailinglists.py
