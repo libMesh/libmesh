@@ -247,8 +247,7 @@ for i in range(0, 12):
   ax.bar(x, devel_data_current_month, width, color=secondary)
 
   # Set up the xticks and labels
-  xticks = [0, N-1]
-  xticks = [x + 1.5*width for x in xticks]
+  xticks = [1, N]
   xticklabels = [year_strings[0], year_strings[N-1]]
   ax.set_xticks(xticks)
   ax.set_xticklabels(xticklabels, fontsize=by_month_fontsize)
