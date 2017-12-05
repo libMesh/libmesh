@@ -46,7 +46,7 @@ class ExampleOneFunction : public FunctionBase<Number>
   virtual void clear() {}
   virtual std::unique_ptr<FunctionBase<Number>> clone() const
   {
-    return std::unique_ptr<FunctionBase<Number>>(new ExampleOneFunction());
+    return libmesh_make_unique<ExampleOneFunction>();
   }
 };
 

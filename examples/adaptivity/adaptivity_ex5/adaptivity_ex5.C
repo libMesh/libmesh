@@ -217,8 +217,7 @@ int main (int argc, char ** argv)
   const bool have_expression = false;
 #endif
   if (have_expression)
-    parsed_solution.reset
-      (new ParsedFunction<Number>(command_line.next(std::string())));
+    parsed_solution = libmesh_make_unique<ParsedFunction<Number>>(command_line.next(std::string()));
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
@@ -447,7 +446,6 @@ int main (int argc, char ** argv)
               // solution and assigns to each element a positive error value.
               // This value is used for deciding which elements to refine
               // and which to coarsen.
-              //ErrorEstimator* error_estimator = new KellyErrorEstimator;
               KellyErrorEstimator error_estimator;
 
               // Compute the error for each active element using the provided

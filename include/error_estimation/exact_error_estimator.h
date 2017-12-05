@@ -222,19 +222,19 @@ private:
    * User-provided functors which compute the exact value of the
    * solution for each system.
    */
-  std::vector<FunctionBase<Number> *> _exact_values;
+  std::vector<std::unique_ptr<FunctionBase<Number>>> _exact_values;
 
   /**
    * User-provided functors which compute the exact derivative of the
    * solution for each system.
    */
-  std::vector<FunctionBase<Gradient> *> _exact_derivs;
+  std::vector<std::unique_ptr<FunctionBase<Gradient>>> _exact_derivs;
 
   /**
    * User-provided functors which compute the exact hessians of the
    * solution for each system.
    */
-  std::vector<FunctionBase<Tensor> *> _exact_hessians;
+  std::vector<std::unique_ptr<FunctionBase<Tensor>>> _exact_hessians;
 
   /**
    * Constant pointer to the \p EquationSystems object

@@ -26,7 +26,7 @@ public:
    */
   virtual std::unique_ptr<RBTheta> build_eim_theta(unsigned int index)
   {
-    return std::unique_ptr<RBTheta>(new ThetaEIM(*this, index));
+    return libMesh::libmesh_make_unique<ThetaEIM>(*this, index);
   }
 
   /**
@@ -62,7 +62,7 @@ public:
    */
   virtual std::unique_ptr<ElemAssembly> build_eim_assembly(unsigned int index)
   {
-    return std::unique_ptr<ElemAssembly>(new AssemblyEIM(*this, index));
+    return libMesh::libmesh_make_unique<AssemblyEIM>(*this, index);
   }
 
   /**

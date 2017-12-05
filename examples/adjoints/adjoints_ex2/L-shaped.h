@@ -34,10 +34,9 @@ public:
 
   ParameterVector & get_parameter_vector()
   {
-    typedef ParameterPointer<Number> PP;
     parameter_vector.clear();
     for (std::size_t i = 0; i != parameters.size(); ++i)
-      parameter_vector.push_back(std::unique_ptr<ParameterAccessor<Number>>(new PP(&parameters[i])));
+      parameter_vector.push_back(libmesh_make_unique<ParameterPointer<Number>>(&parameters[i]));
 
     return parameter_vector;
   }
