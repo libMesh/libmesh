@@ -54,12 +54,12 @@ int main(int argc, char ** argv)
   es1.print_info();
 
   std::vector<std::string> sysnames;
-  std::vector<NumericVector<libMesh::Number> *> summed_solutions;
+  std::vector<std::unique_ptr<NumericVector<libMesh::Number>>> summed_solutions;
 
   for (unsigned int s = 0; s != es1.n_systems(); ++s)
     {
       sysnames.push_back(es1.get_system(s).name());
-      summed_solutions.push_back(es1.get_system(s).solution->clone().release());
+      summed_solutions.emplace_back(es1.get_system(s).solution->clone());
     }
 
   for (int i=4; i < argc; ++i)
@@ -89,8 +89,6 @@ int main(int argc, char ** argv)
       (*summed_solutions[s]) /= n_solutions;
       es1.get_system(s).solution->swap(*summed_solutions[s]);
       es1.get_system(s).solution->close();
-
-      delete summed_solutions[s];
     }
 
   NameBasedIO(mesh1).write_equation_systems (argv[1], es1);
