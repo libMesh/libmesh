@@ -560,22 +560,20 @@ void ExactSolution::_compute_error(const std::string & sys_name,
 
 
   // Allow space for dims 0-3, even if we don't use them all
-  std::vector<FEGenericBase<OutputShape> *> fe_ptrs(4, libmesh_nullptr);
-  std::vector<QBase *> q_rules(4, libmesh_nullptr);
+  std::vector<std::unique_ptr<FEGenericBase<OutputShape>>> fe_ptrs(4);
+  std::vector<std::unique_ptr<QBase>> q_rules(4);
 
   // Prepare finite elements for each dimension present in the mesh
-  for (std::set<unsigned char>::const_iterator d_it = elem_dims.begin();
-       d_it != elem_dims.end(); ++d_it)
+  for (const auto dim : elem_dims)
     {
-      q_rules[*d_it] =
-        fe_type.default_quadrature_rule (*d_it, _extra_order).release();
+      // Build a quadrature rule.
+      q_rules[dim] = fe_type.default_quadrature_rule (dim, _extra_order);
 
       // Construct finite element object
-
-      fe_ptrs[*d_it] = FEGenericBase<OutputShape>::build(*d_it, fe_type).release();
+      fe_ptrs[dim] = FEGenericBase<OutputShape>::build(dim, fe_type);
 
       // Attach quadrature rule to FE object
-      fe_ptrs[*d_it]->attach_quadrature_rule (q_rules[*d_it]);
+      fe_ptrs[dim]->attach_quadrature_rule (q_rules[dim].get());
     }
 
   // The global degree of freedom indices associated
@@ -608,8 +606,8 @@ void ExactSolution::_compute_error(const std::string & sys_name,
       std::set<subdomain_id_type> subdomain_id;
       subdomain_id.insert(elem_subid);
 
-      FEGenericBase<OutputShape> * fe = fe_ptrs[dim];
-      QBase * qrule = q_rules[dim];
+      FEGenericBase<OutputShape> * fe = fe_ptrs[dim].get();
+      QBase * qrule = q_rules[dim].get();
       libmesh_assert(fe);
       libmesh_assert(qrule);
 
@@ -823,14 +821,6 @@ void ExactSolution::_compute_error(const std::string & sys_name,
 
         } // end qp loop
     } // end element loop
-
-  // Clean up the FE and QBase pointers we created
-  for (std::set<unsigned char>::const_iterator d_it = elem_dims.begin();
-       d_it != elem_dims.end(); ++d_it)
-    {
-      delete fe_ptrs[*d_it];
-      delete q_rules[*d_it];
-    }
 
   // Add up the error values on all processors, except for the L-infty
   // norm, for which the maximum is computed.
