@@ -4,22 +4,23 @@
 #include "libmesh/parsed_function.h"
 #include "libmesh/zero_function.h"
 
+#include <unordered_set>
+
 using namespace libMesh;
 
 #define GETPOT_INPUT(A) { A = input(#A, A);                             \
+    variable_names.insert(#A);                                          \
     const std::string stringval = input(#A, std::string());             \
-    variable_names.push_back(std::string(#A "=") + stringval); }
+    variable_assignments.push_back(std::string(#A "=") + stringval); }
 #define GETPOT_INT_INPUT(A) { A = input(#A, (int)A);                    \
+    variable_names.insert(#A);                                          \
     const std::string stringval = input(#A, std::string());             \
-    variable_names.push_back(std::string(#A "=") + stringval); }
+    variable_assignments.push_back(std::string(#A "=") + stringval); }
 
-#define GETPOT_FUNCTION_INPUT(A) {                              \
-    const std::string type  = input(#A "_type", "zero");        \
-    const std::string value = input(#A "_value", "");           \
-    A = new_function_base(type, value); }
 #define GETPOT_REGISTER(A) {                                            \
+    variable_names.insert(#A);                                          \
     std::string stringval = input(#A, std::string());                   \
-    variable_names.push_back(std::string(#A "=") + stringval); }
+    variable_assignments.push_back(std::string(#A "=") + stringval); }
 
 FEMParameters::FEMParameters(const Parallel::Communicator & comm_in) :
   ParallelObject(comm_in),
@@ -150,13 +151,14 @@ std::unique_ptr<FunctionBase<Number>> new_function_base(const std::string & func
 void FEMParameters::read(GetPot & input,
                          const std::vector<std::string> * other_variable_names)
 {
-  std::vector<std::string> variable_names;
+  std::vector<std::string> variable_assignments;
+  std::unordered_set<std::string> variable_names;
   if (other_variable_names)
     for (std::size_t i=0; i != other_variable_names->size(); ++i)
       {
         const std::string & name = (*other_variable_names)[i];
         const std::string stringval = input(name, std::string());
-        variable_names.push_back(name + "=" + stringval);
+        variable_assignments.push_back(name + "=" + stringval);
       }
 
   GETPOT_INT_INPUT(initial_timestep);
@@ -703,16 +705,41 @@ void FEMParameters::read(GetPot & input,
   GETPOT_INPUT(system_config_file);
 
   std::vector<std::string> bad_variables =
-    input.unidentified_arguments(variable_names);
+    input.unidentified_arguments(variable_assignments);
 
-  if (this->comm().rank() == 0 && !bad_variables.empty())
+  // The way unidentified_arguments() works can give us false
+  // positives from repeated (overridden) variable assignments or from
+  // other (e.g. PETSc) command line arguments.
+  std::vector<std::string> actually_bad_variables;
+  for (std::size_t i = 0; i < bad_variables.size(); ++i)
+    {
+      // If any of our ufo arguments start with a -, that's a false
+      // positive from an unrelated command line argument.
+      if (bad_variables[i].empty() || bad_variables[i][0] != '-')
+        {
+          std::string bad_variable_name =
+            bad_variables[i].substr(0, bad_variables[i].find('='));
+          if (!variable_names.count(bad_variable_name))
+            actually_bad_variables.push_back(bad_variables[i]);
+        }
+      // Skip any option variable and (to be safe from false
+      // positives, though it can create false negatives) any
+      // subsequent potential argument
+      else
+        if (bad_variables.size() > (i+1) &&
+            !bad_variables[i+1].empty() &&
+            bad_variables[i+1][0] != '-')
+          ++i;
+    }
+
+  if (this->comm().rank() == 0 && !actually_bad_variables.empty())
     {
       libMesh::err << "ERROR: Unrecognized variables:" << std::endl;
-      for (std::size_t i = 0; i != bad_variables.size(); ++i)
-        libMesh::err << bad_variables[i] << std::endl;
+      for (auto var : actually_bad_variables)
+        libMesh::err << var << std::endl;
       libMesh::err << "Not found among recognized variables:" << std::endl;
       for (std::size_t i = 0; i != variable_names.size(); ++i)
-        libMesh::err << variable_names[i] << std::endl;
+        libMesh::err << variable_assignments[i] << std::endl;
       libmesh_error();
     }
 }
