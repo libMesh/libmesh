@@ -126,7 +126,7 @@ void EigenSystem::init_data ()
     _is_generalized_eigenproblem = true;
 
   // build the system matrix
-  matrix_A.reset(SparseMatrix<Number>::build(this->comm()).release());
+  matrix_A = SparseMatrix<Number>::build(this->comm());
 
   this->init_matrices();
 }
@@ -143,7 +143,7 @@ void EigenSystem::init_matrices ()
   // generalized problem
   if (_is_generalized_eigenproblem)
     {
-      matrix_B.reset(SparseMatrix<Number>::build(this->comm()).release());
+      matrix_B = SparseMatrix<Number>::build(this->comm());
       dof_map.attach_matrix(*matrix_B);
     }
 

@@ -58,7 +58,7 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType & fet) :
 
   // build the base_fe object
   if (Dim != 1)
-    base_fe.reset(FEBase::build(Dim-1, fet).release());
+    base_fe = FEBase::build(Dim-1, fet);
 }
 
 
@@ -67,7 +67,7 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::attach_quadrature_rule (QBase * q)
 {
   libmesh_assert(q);
-  libmesh_assert(base_fe.get());
+  libmesh_assert(base_fe);
 
   const Order base_int_order   = q->get_order();
   const Order radial_int_order = static_cast<Order>(2 * (static_cast<unsigned int>(fe_type.radial_order.get_order()) + 1) +2);
@@ -76,7 +76,7 @@ void InfFE<Dim,T_radial,T_map>::attach_quadrature_rule (QBase * q)
   if (Dim != 1)
     {
       // build a Dim-1 quadrature rule of the type that we received
-      base_qrule.reset(QBase::build(q->type(), qrule_dim-1, base_int_order).release());
+      base_qrule = QBase::build(q->type(), qrule_dim-1, base_int_order);
       base_fe->attach_quadrature_rule(base_qrule.get());
     }
 
@@ -243,7 +243,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       this->update_base_elem(inf_elem);
 
       // the finite element on the ifem base
-      base_fe.reset(FEBase::build(Dim-1, this->fe_type).release());
+      base_fe = FEBase::build(Dim-1, this->fe_type);
 
       base_fe->calculate_phi = base_fe->calculate_dphi = base_fe->calculate_dphiref = true;
       base_fe->get_xyz();

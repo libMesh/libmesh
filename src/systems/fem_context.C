@@ -135,8 +135,7 @@ void FEMContext::init_internal_data(const System & sys)
       _side_qrule[dim] = hardest_fe_type.default_quadrature_rule
         (dim-1, _extra_quadrature_order).release();
       if (dim == 3)
-        _edge_qrule.reset(hardest_fe_type.default_quadrature_rule
-                          (1, _extra_quadrature_order).release());
+        _edge_qrule = hardest_fe_type.default_quadrature_rule(1, _extra_quadrature_order);
 
       // Next, create finite element objects
       _element_fe_var[dim].resize(nv);
