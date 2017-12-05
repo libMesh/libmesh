@@ -53,7 +53,7 @@ public:
       global_size += (block_size + static_cast<unsigned int>(p));
 
     {
-      std::unique_ptr<Base> v_ptr(new Derived(*my_comm, global_size, local_size));
+      auto v_ptr = libMesh::libmesh_make_unique<Derived>(*my_comm, global_size, local_size);
       Base & v = *v_ptr;
       std::vector<libMesh::Number> l(global_size);
 

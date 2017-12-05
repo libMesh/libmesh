@@ -41,7 +41,7 @@ public:
   virtual std::unique_ptr<FEMFunctionBase<Number>>
   clone () const libmesh_override
   {
-    return std::unique_ptr<FEMFunctionBase<Number>> (new SlitFunc());
+    return libmesh_make_unique<SlitFunc>();
   }
 
   virtual Number operator() (const FEMContext & c,
