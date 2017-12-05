@@ -91,8 +91,7 @@ int main (int argc, char** argv)
     equation_systems.add_system<LaplaceSystem> ("Laplace");
 
   // This example only implements the steady-state problem
-  system.time_solver =
-    std::unique_ptr<TimeSolver>(new SteadySolver(system));
+  system.time_solver = libmesh_make_unique<SteadySolver>(system);
 
   // Initialize the system
   equation_systems.init();

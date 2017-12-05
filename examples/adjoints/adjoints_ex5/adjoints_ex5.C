@@ -211,8 +211,7 @@ void set_system_parameters(HeatSystem & system,
         std::unique_ptr<TimeSolver>(innersolver);
     }
   else
-    system.time_solver =
-      std::unique_ptr<TimeSolver>(new SteadySolver(system));
+    system.time_solver = libmesh_make_unique<SteadySolver>(system);
 
   // The Memory Solution History object we will set the system SolutionHistory object to
   MemorySolutionHistory heatsystem_solution_history(system);
@@ -323,7 +322,7 @@ int main (int argc, char ** argv)
   Mesh mesh(init.comm(), param.dimension);
 
   // And an object to refine it
-  std::unique_ptr<MeshRefinement> mesh_refinement(new MeshRefinement(mesh));
+  auto mesh_refinement = libmesh_make_unique<MeshRefinement>(mesh);
 
   // And an EquationSystems to run on it
   EquationSystems equation_systems (mesh);

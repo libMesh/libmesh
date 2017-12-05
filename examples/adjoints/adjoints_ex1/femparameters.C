@@ -137,9 +137,9 @@ std::unique_ptr<FunctionBase<Number>> new_function_base(const std::string & func
                                                         const std::string & func_value)
 {
   if (func_type == "parsed")
-    return std::unique_ptr<FunctionBase<Number>>(new ParsedFunction<Number>(func_value));
+    return libmesh_make_unique<ParsedFunction<Number>>(func_value);
   else if (func_type == "zero")
-    return std::unique_ptr<FunctionBase<Number>>(new ZeroFunction<Number>);
+    return libmesh_make_unique<ZeroFunction<Number>>();
   else
     libmesh_not_implemented();
 

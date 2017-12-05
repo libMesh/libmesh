@@ -32,7 +32,7 @@ public:
 
   virtual std::unique_ptr<DifferentiableQoI> clone()
   {
-    return std::unique_ptr<DifferentiableQoI> (new LaplaceQoI(*this));
+    return libmesh_make_unique<LaplaceQoI>(*this);
   }
 
 };
