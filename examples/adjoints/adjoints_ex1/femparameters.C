@@ -44,6 +44,8 @@ FEMParameters::FEMParameters(const Parallel::Communicator & comm_in) :
   coarserefinements(0), extrarefinements(0),
   mesh_redistribute_func("0"),
 
+  mesh_partitioner_type("Default"),
+
   nelem_target(8000), global_tolerance(0.0),
   refine_fraction(0.3), coarsen_fraction(0.3), coarsen_threshold(10),
   max_adaptivesteps(1),
@@ -213,6 +215,9 @@ void FEMParameters::read(GetPot & input,
   GETPOT_INT_INPUT(coarserefinements);
   GETPOT_INT_INPUT(extrarefinements);
   GETPOT_INPUT(mesh_redistribute_func);
+
+
+  GETPOT_INPUT(mesh_partitioner_type);
 
 
   GETPOT_INT_INPUT(nelem_target);
