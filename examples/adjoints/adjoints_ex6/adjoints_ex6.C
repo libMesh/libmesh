@@ -134,8 +134,7 @@ void set_system_parameters(PoissonSystem & system, FEMParameters & param)
   system.print_jacobians      = param.print_jacobians;
 
   // No transient time solver
-  system.time_solver =
-    std::unique_ptr<TimeSolver>(new SteadySolver(system));
+  system.time_solver = libmesh_make_unique<SteadySolver>(system);
 
   // Nonlinear solver options
   {

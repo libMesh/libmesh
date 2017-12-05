@@ -146,12 +146,10 @@ int main (int argc, char ** argv)
 
   // Solve this as a time-dependent or steady system
   if (transient)
-    system.time_solver =
-      std::unique_ptr<TimeSolver>(new EulerSolver(system));
+    system.time_solver = libmesh_make_unique<EulerSolver>(system);
   else
     {
-      system.time_solver =
-        std::unique_ptr<TimeSolver>(new SteadySolver(system));
+      system.time_solver = libmesh_make_unique<SteadySolver>(system);
       libmesh_assert_equal_to (n_timesteps, 1);
     }
 

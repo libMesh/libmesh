@@ -609,7 +609,7 @@ std::unique_ptr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
 // for comparisons of adjoint and non-adjoint based error indicators
 std::unique_ptr<ErrorEstimator> build_error_estimator(FEMParameters & /* param */)
 {
-  return std::unique_ptr<ErrorEstimator>(new KellyErrorEstimator);
+  return libmesh_make_unique<KellyErrorEstimator>();
 }
 
 // Functions to build the adjoint based error indicators

@@ -144,7 +144,7 @@ inline
 std::unique_ptr<FunctionBase<Number>>
 MeshlessInterpolationFunction::clone () const
 {
-  return std::unique_ptr<FunctionBase<Number>> (new MeshlessInterpolationFunction (_mfi, _mutex));
+  return libmesh_make_unique<MeshlessInterpolationFunction>(_mfi, _mutex);
 }
 
 

@@ -185,8 +185,7 @@ void set_system_parameters(LaplaceSystem & system, FEMParameters & param)
   system.print_jacobians      = param.print_jacobians;
 
   // No transient time solver
-  system.time_solver =
-    std::unique_ptr<TimeSolver>(new SteadySolver(system));
+  system.time_solver = libmesh_make_unique<SteadySolver>(system);
 
   // Nonlinear solver options
   {
@@ -246,7 +245,7 @@ std::unique_ptr<ErrorEstimator> build_error_estimator(FEMParameters & param)
     {
       libMesh::out << "Using Kelly Error Estimator" << std::endl;
 
-      return std::unique_ptr<ErrorEstimator>(new KellyErrorEstimator);
+      return libmesh_make_unique<KellyErrorEstimator>();
     }
   else if (param.indicator_type == "adjoint_residual")
     {

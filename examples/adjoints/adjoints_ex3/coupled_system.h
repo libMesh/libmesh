@@ -55,7 +55,7 @@ public:
   {
     if (!parameter_vector.size())
       for (std::size_t i = 0; i != parameters.size(); ++i)
-        parameter_vector.push_back(std::unique_ptr<ParameterAccessor<Number>>(new ParameterPointer<Number>(&parameters[i])));
+        parameter_vector.push_back(libmesh_make_unique<ParameterPointer<Number>>(&parameters[i]));
 
     return parameter_vector;
   }
@@ -116,7 +116,7 @@ public:
 
   virtual std::unique_ptr<FEMFunctionBase<Number>> clone () const
   {
-    return std::unique_ptr<FEMFunctionBase<Number>>(new CoupledFEMFunctionsx(*this));
+    return libmesh_make_unique<CoupledFEMFunctionsx>(*this);
   }
 
   virtual void operator() (const FEMContext &,
@@ -147,7 +147,7 @@ public:
 
   virtual std::unique_ptr<FEMFunctionBase<Number>> clone () const
   {
-    return std::unique_ptr<FEMFunctionBase<Number>>(new CoupledFEMFunctionsy(*this));
+    return libmesh_make_unique<CoupledFEMFunctionsy>(*this);
   }
 
   virtual void operator() (const FEMContext &,

@@ -10,6 +10,9 @@
 // Just the bits we're using, since this is a header.
 using libMesh::EquationSystems;
 using libMesh::RBEIMEvaluation;
+#ifndef LIBMESH_HAVE_CXX14_MAKE_UNIQUE
+using libMesh::make_unique;
+#endif
 
 // A simple subclass of RBEIMEvaluation. Overload
 // evaluate_parametrized_function to define the
@@ -55,7 +58,7 @@ public:
    */
   virtual std::unique_ptr<ElemAssembly> build_eim_assembly(unsigned int index)
   {
-    return std::unique_ptr<ElemAssembly>(new EIM_F(*this, index));
+    return libmesh_make_unique<EIM_F>(*this, index);
   }
 
   /**

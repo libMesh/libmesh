@@ -162,8 +162,7 @@ int main (int argc, char ** argv)
     equation_systems.add_system<HeatSystem> ("Heat");
 
   // Solve this as a steady system
-  system.time_solver =
-    std::unique_ptr<TimeSolver>(new SteadySolver(system));
+  system.time_solver = libmesh_make_unique<SteadySolver>(system);
 
   // Initialize the system
   equation_systems.init ();
