@@ -379,9 +379,8 @@ DynamicSparseNumberBase<T,I,SubType>::sparsity_intersection (const std::vector<I
   metaphysicl_assert(std::is_sorted(new_indices.begin(), new_indices.end()));
 #endif
 
-  typedef typename CompareTypes<I,I2>::supertype max_index_type;
-
 #ifndef NDEBUG
+  typedef typename CompareTypes<I,I2>::supertype max_index_type;
   typename std::vector<I>::iterator index_it = _indices.begin();
   typename std::vector<I2>::const_iterator index2_it = new_indices.begin();
 

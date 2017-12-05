@@ -108,12 +108,12 @@ template <typename T>
  
  
 template <typename T, typename U> 
-  inline void operator==(const safe_bool<T>& lhs,const safe_bool<U>& rhs) {
+  inline void operator==(const safe_bool<T>& lhs,const safe_bool<U>& /*rhs*/) {
       lhs.this_type_does_not_support_comparisons();  
   }
  
 template <typename T,typename U> 
-  inline void operator!=(const safe_bool<T>& lhs,const safe_bool<U>& rhs) {
+  inline void operator!=(const safe_bool<T>& lhs,const safe_bool<U>& /*rhs*/) {
     lhs.this_type_does_not_support_comparisons();
   }
 
