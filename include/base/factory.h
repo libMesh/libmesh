@@ -146,7 +146,7 @@ std::unique_ptr<Base> Factory<Base>::build (const std::string & name)
     }
 
   Factory<Base> * f = factory_map()[name];
-  return libmesh_make_unique<Base>(f->create());
+  return std::unique_ptr<Base>(f->create());
 }
 
 
