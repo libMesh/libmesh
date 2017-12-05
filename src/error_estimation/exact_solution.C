@@ -70,17 +70,6 @@ ExactSolution::ExactSolution(const EquationSystems & es) :
 
 ExactSolution::~ExactSolution()
 {
-  // delete will clean up any cloned functors and no-op on any NULL
-  // pointers
-
-  for (std::size_t i=0; i != _exact_values.size(); ++i)
-    delete (_exact_values[i]);
-
-  for (std::size_t i=0; i != _exact_derivs.size(); ++i)
-    delete (_exact_derivs[i]);
-
-  for (std::size_t i=0; i != _exact_hessians.size(); ++i)
-    delete (_exact_hessians[i]);
 }
 
 
@@ -110,9 +99,7 @@ void ExactSolution::attach_exact_value (Number fptr(const Point & p,
   for (unsigned int sys=0; sys<_equation_systems.n_systems(); ++sys)
     {
       const System & system = _equation_systems.get_system(sys);
-      _exact_values.push_back
-        (new WrappedFunction<Number>
-         (system, fptr, &_equation_systems.parameters));
+      _exact_values.emplace_back(libmesh_make_unique<WrappedFunction<Number>>(system, fptr, &_equation_systems.parameters));
     }
 
   // If we're using exact values, we're not using a fine grid solution
@@ -122,20 +109,12 @@ void ExactSolution::attach_exact_value (Number fptr(const Point & p,
 
 void ExactSolution::attach_exact_values (const std::vector<FunctionBase<Number> *> & f)
 {
-  // Clear out any previous _exact_values entries, then add a new
+  // Automatically delete any previous _exact_values entries, then add a new
   // entry for each system.
-  for (std::size_t i=0; i != _exact_values.size(); ++i)
-    delete (_exact_values[i]);
-
   _exact_values.clear();
-  _exact_values.resize(f.size(), libmesh_nullptr);
 
-  // We use clone() to get non-sliced copies of FunctionBase
-  // subclasses, but we don't currently put the resulting std::unique_ptrs
-  // into an STL container.
-  for (std::size_t i=0; i != f.size(); ++i)
-    if (f[i])
-      _exact_values[i] = f[i]->clone().release();
+  for (auto ptr : f)
+    _exact_values.emplace_back(ptr ? ptr->clone() : libmesh_nullptr);
 }
 
 
@@ -143,10 +122,10 @@ void ExactSolution::attach_exact_value (unsigned int sys_num,
                                         FunctionBase<Number> * f)
 {
   if (_exact_values.size() <= sys_num)
-    _exact_values.resize(sys_num+1, libmesh_nullptr);
+    _exact_values.resize(sys_num+1);
 
   if (f)
-    _exact_values[sys_num] = f->clone().release();
+    _exact_values[sys_num] = f->clone();
 }
 
 
@@ -164,9 +143,7 @@ void ExactSolution::attach_exact_deriv (Gradient gptr(const Point & p,
   for (unsigned int sys=0; sys<_equation_systems.n_systems(); ++sys)
     {
       const System & system = _equation_systems.get_system(sys);
-      _exact_derivs.push_back
-        (new WrappedFunction<Gradient>
-         (system, gptr, &_equation_systems.parameters));
+      _exact_derivs.emplace_back(libmesh_make_unique<WrappedFunction<Gradient>>(system, gptr, &_equation_systems.parameters));
     }
 
   // If we're using exact values, we're not using a fine grid solution
@@ -176,20 +153,12 @@ void ExactSolution::attach_exact_deriv (Gradient gptr(const Point & p,
 
 void ExactSolution::attach_exact_derivs (const std::vector<FunctionBase<Gradient> *> & g)
 {
-  // Clear out any previous _exact_derivs entries, then add a new
+  // Automatically delete any previous _exact_derivs entries, then add a new
   // entry for each system.
-  for (std::size_t i=0; i != _exact_derivs.size(); ++i)
-    delete (_exact_derivs[i]);
-
   _exact_derivs.clear();
-  _exact_derivs.resize(g.size(), libmesh_nullptr);
 
-  // We use clone() to get non-sliced copies of FunctionBase
-  // subclasses, but we don't currently put the resulting std::unique_ptrs
-  // into an STL container.
-  for (std::size_t i=0; i != g.size(); ++i)
-    if (g[i])
-      _exact_derivs[i] = g[i]->clone().release();
+  for (auto ptr : g)
+    _exact_derivs.emplace_back(ptr ? ptr->clone() : libmesh_nullptr);
 }
 
 
@@ -197,10 +166,10 @@ void ExactSolution::attach_exact_deriv (unsigned int sys_num,
                                         FunctionBase<Gradient> * g)
 {
   if (_exact_derivs.size() <= sys_num)
-    _exact_derivs.resize(sys_num+1, libmesh_nullptr);
+    _exact_derivs.resize(sys_num+1);
 
   if (g)
-    _exact_derivs[sys_num] = g->clone().release();
+    _exact_derivs[sys_num] = g->clone();
 }
 
 
@@ -218,9 +187,7 @@ void ExactSolution::attach_exact_hessian (Tensor hptr(const Point & p,
   for (unsigned int sys=0; sys<_equation_systems.n_systems(); ++sys)
     {
       const System & system = _equation_systems.get_system(sys);
-      _exact_hessians.push_back
-        (new WrappedFunction<Tensor>
-         (system, hptr, &_equation_systems.parameters));
+      _exact_hessians.emplace_back(libmesh_make_unique<WrappedFunction<Tensor>>(system, hptr, &_equation_systems.parameters));
     }
 
   // If we're using exact values, we're not using a fine grid solution
@@ -230,20 +197,12 @@ void ExactSolution::attach_exact_hessian (Tensor hptr(const Point & p,
 
 void ExactSolution::attach_exact_hessians (std::vector<FunctionBase<Tensor> *> h)
 {
-  // Clear out any previous _exact_hessians entries, then add a new
+  // Automatically delete any previous _exact_hessians entries, then add a new
   // entry for each system.
-  for (std::size_t i=0; i != _exact_hessians.size(); ++i)
-    delete (_exact_hessians[i]);
-
   _exact_hessians.clear();
-  _exact_hessians.resize(h.size(), libmesh_nullptr);
 
-  // We use clone() to get non-sliced copies of FunctionBase
-  // subclasses, but we don't currently put the resulting std::unique_ptrs
-  // into an STL container.
-  for (std::size_t i=0; i != h.size(); ++i)
-    if (h[i])
-      _exact_hessians[i] = h[i]->clone().release();
+  for (auto ptr : h)
+    _exact_hessians.emplace_back(ptr ? ptr->clone() : libmesh_nullptr);
 }
 
 
@@ -251,10 +210,10 @@ void ExactSolution::attach_exact_hessian (unsigned int sys_num,
                                           FunctionBase<Tensor> * h)
 {
   if (_exact_hessians.size() <= sys_num)
-    _exact_hessians.resize(sys_num+1, libmesh_nullptr);
+    _exact_hessians.resize(sys_num+1);
 
   if (h)
-    _exact_hessians[sys_num] = h->clone().release();
+    _exact_hessians[sys_num] = h->clone();
 }
 
 
