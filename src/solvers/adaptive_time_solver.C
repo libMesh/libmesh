@@ -66,10 +66,10 @@ void AdaptiveTimeSolver::init()
   // As an UnsteadySolver, we have an old_local_nonlinear_solution, but it
   // isn't pointing to the right place - fix it
   //
-  // This leaves us with two UniquePtrs holding the same pointer - dangerous
+  // This leaves us with two std::unique_ptrs holding the same pointer - dangerous
   // for future use.  Replace with shared_ptr?
   old_local_nonlinear_solution =
-    UniquePtr<NumericVector<Number>>(core_time_solver->old_local_nonlinear_solution.get());
+    std::unique_ptr<NumericVector<Number>>(core_time_solver->old_local_nonlinear_solution.get());
 }
 
 
@@ -139,14 +139,14 @@ bool AdaptiveTimeSolver::nonlocal_residual (bool request_jacobian,
 
 
 
-UniquePtr<DiffSolver> & AdaptiveTimeSolver::diff_solver()
+std::unique_ptr<DiffSolver> & AdaptiveTimeSolver::diff_solver()
 {
   return core_time_solver->diff_solver();
 }
 
 
 
-UniquePtr<LinearSolver<Number>> & AdaptiveTimeSolver::linear_solver()
+std::unique_ptr<LinearSolver<Number>> & AdaptiveTimeSolver::linear_solver()
 {
   return core_time_solver->linear_solver();
 }

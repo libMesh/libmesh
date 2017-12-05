@@ -99,7 +99,7 @@ public:
   /**
    * Virtual "copy constructor"
    */
-  virtual UniquePtr<MeshBase> clone() const = 0;
+  virtual std::unique_ptr<MeshBase> clone() const = 0;
 
   /**
    * Destructor.
@@ -109,7 +109,7 @@ public:
   /**
    * A partitioner to use at each prepare_for_use()
    */
-  virtual UniquePtr<Partitioner> & partitioner() { return _partitioner; }
+  virtual std::unique_ptr<Partitioner> & partitioner() { return _partitioner; }
 
   /**
    * The information about boundary ids on the mesh
@@ -936,7 +936,7 @@ public:
    * non-parallel_only code unless the master has already been
    * constructed.
    */
-  UniquePtr<PointLocatorBase> sub_point_locator () const;
+  std::unique_ptr<PointLocatorBase> sub_point_locator () const;
 
   /**
    * Releases the current \p PointLocator object.
@@ -1318,7 +1318,7 @@ public:
    * Direct access to this class will be removed in future libMesh
    * versions.  Use the \p get_boundary_info() accessor instead.
    */
-  UniquePtr<BoundaryInfo> boundary_info;
+  std::unique_ptr<BoundaryInfo> boundary_info;
 
 
 protected:
@@ -1353,7 +1353,7 @@ protected:
    * this needs to be mutable.  Since the PointLocatorBase::build() member is used,
    * and it operates on a constant reference to the mesh, this is OK.
    */
-  mutable UniquePtr<PointLocatorBase> _point_locator;
+  mutable std::unique_ptr<PointLocatorBase> _point_locator;
 
   /**
    * Do we count lower dimensional elements in point locator refinement?
@@ -1367,7 +1367,7 @@ protected:
    * This will be built in the constructor of each derived class, but
    * can be replaced by the user through the partitioner() accessor.
    */
-  UniquePtr<Partitioner> _partitioner;
+  std::unique_ptr<Partitioner> _partitioner;
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   /**
@@ -1421,7 +1421,7 @@ protected:
    * libMesh element ghosting behavior.  We use a base class pointer
    * here to avoid dragging in more header dependencies.
    */
-  UniquePtr<GhostingFunctor> _default_ghosting;
+  std::unique_ptr<GhostingFunctor> _default_ghosting;
 
   /**
    * The list of all GhostingFunctor objects to be used when

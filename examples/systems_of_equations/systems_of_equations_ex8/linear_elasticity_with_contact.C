@@ -76,7 +76,7 @@ void LinearElasticityWithContact::move_mesh (MeshBase & input_mesh,
 
   // Localize input_solution so that we have the data to move all
   // elements (not just elements local to this processor).
-  UniquePtr<NumericVector<Number>> localized_input_solution =
+  std::unique_ptr<NumericVector<Number>> localized_input_solution =
     NumericVector<Number>::build(input_solution.comm());
 
   localized_input_solution->init (input_solution.size(), false, SERIAL);
@@ -245,15 +245,15 @@ void LinearElasticityWithContact::residual_and_jacobian (const NumericVector<Num
   DofMap & dof_map = _sys.get_dof_map();
 
   FEType fe_type = dof_map.variable_type(u_var);
-  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
   QGauss qrule (dim, fe_type.default_quadrature_order());
   fe->attach_quadrature_rule (&qrule);
 
-  UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe_face (FEBase::build(dim, fe_type));
   QGauss qface (dim-1, fe_type.default_quadrature_order());
   fe_face->attach_quadrature_rule (&qface);
 
-  UniquePtr<FEBase> fe_neighbor_face (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe_neighbor_face (FEBase::build(dim, fe_type));
   fe_neighbor_face->attach_quadrature_rule (&qface);
 
   const std::vector<Real> & JxW = fe->get_JxW();
@@ -355,7 +355,7 @@ void LinearElasticityWithContact::residual_and_jacobian (const NumericVector<Num
   // mesh. Avoiding the mesh clone would be important for production-scale
   // contact solves, but for the sake of this example, using the clone is
   // simple and fast enough.
-  UniquePtr<MeshBase> mesh_clone = mesh.clone();
+  std::unique_ptr<MeshBase> mesh_clone = mesh.clone();
   move_mesh(*mesh_clone, soln);
 
   // Add contributions due to contact penalty forces. Only need to do this on
@@ -495,7 +495,7 @@ void LinearElasticityWithContact::compute_stresses()
 
   const DofMap & dof_map = _sys.get_dof_map();
   FEType fe_type = dof_map.variable_type(u_var);
-  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
   QGauss qrule (dim, fe_type.default_quadrature_order());
   fe->attach_quadrature_rule (&qrule);
 
@@ -637,7 +637,7 @@ std::pair<Real, Real> LinearElasticityWithContact::update_lambdas()
 
 std::pair<Real, Real> LinearElasticityWithContact::get_least_and_max_gap_function()
 {
-  UniquePtr<MeshBase> mesh_clone = _sys.get_mesh().clone();
+  std::unique_ptr<MeshBase> mesh_clone = _sys.get_mesh().clone();
   move_mesh(*mesh_clone, *_sys.solution);
 
   Real least_value = std::numeric_limits<Real>::max();

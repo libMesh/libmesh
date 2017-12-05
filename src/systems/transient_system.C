@@ -52,7 +52,7 @@ TransientSystem<Base>::~TransientSystem ()
 {
   this->clear();
 
-  // We still have UniquePtrs for API compatibility, but
+  // We still have std::unique_ptrs for API compatibility, but
   // now that we're System::add_vector()ing these, we can trust
   // the base class to handle memory management
   old_local_solution.release();
@@ -147,17 +147,17 @@ void TransientSystem<Base>::add_old_vectors()
 {
 #ifdef LIBMESH_ENABLE_GHOSTED
   old_local_solution =
-    UniquePtr<NumericVector<Number>>
+    std::unique_ptr<NumericVector<Number>>
     (&(this->add_vector("_transient_old_local_solution", true, GHOSTED)));
   older_local_solution =
-    UniquePtr<NumericVector<Number>>
+    std::unique_ptr<NumericVector<Number>>
     (&(this->add_vector("_transient_older_local_solution", true, GHOSTED)));
 #else
   old_local_solution =
-    UniquePtr<NumericVector<Number>>
+    std::unique_ptr<NumericVector<Number>>
     (&(this->add_vector("_transient_old_local_solution", true, SERIAL)));
   older_local_solution =
-    UniquePtr<NumericVector<Number>>
+    std::unique_ptr<NumericVector<Number>>
     (&(this->add_vector("_transient_older_local_solution", true, SERIAL)));
 #endif
 }

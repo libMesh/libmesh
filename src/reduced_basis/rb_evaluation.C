@@ -1075,9 +1075,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
         const std::string libMesh_label = "libMesh-";
         std::string::size_type lm_pos = version.find(libMesh_label);
         if (lm_pos==std::string::npos)
-        {
           libmesh_error_msg("version info missing in Xdr header");
-        }
 
         std::istringstream iss(version.substr(lm_pos + libMesh_label.size()));
         int ver_major = 0, ver_minor = 0, ver_patch = 0;

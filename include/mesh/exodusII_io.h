@@ -274,7 +274,7 @@ private:
    * functionality when LIBMESH_HAVE_EXODUS_API is not defined.
    */
 #ifdef LIBMESH_HAVE_EXODUS_API
-  UniquePtr<ExodusII_IO_Helper> exio_helper;
+  std::unique_ptr<ExodusII_IO_Helper> exio_helper;
 
   /**
    * Stores the current value of the timestep when calling

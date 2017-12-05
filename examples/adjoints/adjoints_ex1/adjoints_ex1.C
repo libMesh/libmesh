@@ -181,12 +181,12 @@ void set_system_parameters(LaplaceSystem & system,
 
   // No transient time solver
   system.time_solver =
-    UniquePtr<TimeSolver>(new SteadySolver(system));
+    std::unique_ptr<TimeSolver>(new SteadySolver(system));
 
   // Nonlinear solver options
   {
     NewtonSolver * solver = new NewtonSolver(system);
-    system.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver);
+    system.time_solver->diff_solver() = std::unique_ptr<DiffSolver>(solver);
 
     solver->quiet                       = param.solver_quiet;
     solver->verbose                     = param.solver_verbose;
@@ -213,8 +213,8 @@ void set_system_parameters(LaplaceSystem & system,
 
 #ifdef LIBMESH_ENABLE_AMR
 
-UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
-                                                FEMParameters & param)
+std::unique_ptr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
+                                                      FEMParameters & param)
 {
   MeshRefinement * mesh_refinement = new MeshRefinement(mesh);
   mesh_refinement->coarsen_by_parents() = true;
@@ -224,7 +224,7 @@ UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
   mesh_refinement->coarsen_fraction()  = param.coarsen_fraction;
   mesh_refinement->coarsen_threshold() = param.coarsen_threshold;
 
-  return UniquePtr<MeshRefinement>(mesh_refinement);
+  return std::unique_ptr<MeshRefinement>(mesh_refinement);
 }
 
 #endif // LIBMESH_ENABLE_AMR
@@ -236,14 +236,14 @@ UniquePtr<MeshRefinement> build_mesh_refinement(MeshBase & mesh,
 // forward and adjoint weights. The H1 seminorm component of the error is used
 // as dictated by the weak form the Laplace equation.
 
-UniquePtr<ErrorEstimator> build_error_estimator(FEMParameters & param,
-                                                QoISet & qois)
+std::unique_ptr<ErrorEstimator> build_error_estimator(FEMParameters & param,
+                                                      QoISet & qois)
 {
   if (param.indicator_type == "kelly")
     {
       libMesh::out << "Using Kelly Error Estimator" << std::endl;
 
-      return UniquePtr<ErrorEstimator>(new KellyErrorEstimator);
+      return std::unique_ptr<ErrorEstimator>(new KellyErrorEstimator);
     }
   else if (param.indicator_type == "adjoint_residual")
     {
@@ -267,7 +267,7 @@ UniquePtr<ErrorEstimator> build_error_estimator(FEMParameters & param,
       adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(0, H1_SEMINORM);
       p2->set_patch_reuse(param.patch_reuse);
 
-      return UniquePtr<ErrorEstimator>(adjoint_residual_estimator);
+      return std::unique_ptr<ErrorEstimator>(adjoint_residual_estimator);
     }
   else
     libmesh_error_msg("Unknown indicator_type = " << param.indicator_type);
@@ -310,7 +310,7 @@ int main (int argc, char ** argv)
   Mesh mesh(init.comm());
 
   // And an object to refine it
-  UniquePtr<MeshRefinement> mesh_refinement =
+  std::unique_ptr<MeshRefinement> mesh_refinement =
     build_mesh_refinement(mesh, param);
 
   // And an EquationSystems to run on it
@@ -452,7 +452,7 @@ int main (int argc, char ** argv)
         ErrorVector error;
 
         // Build an error estimator object
-        UniquePtr<ErrorEstimator> error_estimator =
+        std::unique_ptr<ErrorEstimator> error_estimator =
           build_error_estimator(param, qois);
 
         // Estimate the error in each element using the Adjoint Residual or Kelly error estimator

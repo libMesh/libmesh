@@ -131,7 +131,7 @@ public:
    * \returns A primitive triangle or quad for
    * face i.
    */
-  virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;
+  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) libmesh_override;
 
 
 protected:

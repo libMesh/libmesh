@@ -84,8 +84,8 @@ public:
   /**
    * \returns A new copy of the accessor.
    */
-  virtual UniquePtr<ParameterAccessor<T>> clone() const {
-    return UniquePtr<ParameterAccessor<T>>
+  virtual std::unique_ptr<ParameterAccessor<T>> clone() const {
+    return std::unique_ptr<ParameterAccessor<T>>
       (new ParsedFunctionParameter<T>(_func, _name));
   }
 

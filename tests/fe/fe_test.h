@@ -73,7 +73,7 @@ public:
   void setUp()
   {
     _mesh = new Mesh(*TestCommWorld);
-    const UniquePtr<Elem> test_elem = Elem::build(elem_type);
+    const std::unique_ptr<Elem> test_elem = Elem::build(elem_type);
     _dim = test_elem->dim();
     const unsigned int ny = _dim > 1;
     const unsigned int nz = _dim > 2;

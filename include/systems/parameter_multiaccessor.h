@@ -116,13 +116,13 @@ public:
   /**
    * \returns A new copy of the accessor.
    */
-  virtual UniquePtr<ParameterAccessor<T>> clone() const libmesh_override
+  virtual std::unique_ptr<ParameterAccessor<T>> clone() const libmesh_override
   {
     ParameterMultiAccessor * pmp = new ParameterMultiAccessor<T>();
     for (std::size_t i=0; i != _accessors.size(); ++i)
       pmp->_accessors.push_back(_accessors[i]->clone().release());
 
-    return UniquePtr<ParameterAccessor<T>>(pmp);
+    return std::unique_ptr<ParameterAccessor<T>>(pmp);
   }
 
 

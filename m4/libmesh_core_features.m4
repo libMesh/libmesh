@@ -26,31 +26,22 @@ AC_MSG_RESULT([configuring gdb command... "$gdb_command"])
 
 
 # --------------------------------------------------------------
-# Use a true unique_ptr implementation - enabled by default.
-#
-# When enabled, the 'UniquePtr' type in libMesh is a C++03/11
-# compatible (non-deprecated) unique_ptr type.  Otherwise, it is
-# libMesh's (deprecated) AutoPtr type, allowing for backwards
-# compatibility.
-#
-# We now have about a year of experience using --enable-unique-ptr
-# in MOOSE (first enabled April 2015) in both C++11 and C++03 modes,
-# and I'm reasonably confident about enabling this by default.
-# Turning this on also prevents really annoying bugs like the one
-# discussed in http://tinyurl.com/hz63wje
+# The --enable/disable-unique-ptr is now deprecated and a warning
+# message is printed if you attempt to use it.
 # --------------------------------------------------------------
 AC_ARG_ENABLE(unique-ptr,
               [AS_HELP_STRING([--disable-unique-ptr],[Use libMesh's deprecated, less safe AutoPtr])],
               enableuniqueptr=$enableval,
-              enableuniqueptr=yes)
+              enableuniqueptr=irrelevant)
 
-AC_SUBST(enableuniqueptr)
-
-if test "$enableuniqueptr" = yes ; then
-  AC_MSG_RESULT([<<< Configuring library with a non-deprecated UniquePtr implementation >>>])
-  AC_DEFINE(ENABLE_UNIQUE_PTR, 1,
-           [Flag indicating if the library should use a non-deprecated UniquePtr implementation])
+if test "$enableuniqueptr" != irrelevant ; then
+  enableuniqueptr=yes
+  AC_MSG_WARN([--enable/disable-unique-ptr are now deprecated])
 fi
+
+# Keep #define and Makefile variables around for backwards compatibility.
+AC_SUBST(enableuniqueptr)
+AC_DEFINE(ENABLE_UNIQUE_PTR, 1, [Flag indicating the library uses std::unique_ptr])
 # --------------------------------------------------------------
 
 

@@ -105,7 +105,7 @@ unsigned int InfPrism::which_node_am_i(unsigned int side,
 
 
 
-UniquePtr<Elem> InfPrism::side_ptr (const unsigned int i)
+std::unique_ptr<Elem> InfPrism::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -135,7 +135,7 @@ UniquePtr<Elem> InfPrism::side_ptr (const unsigned int i)
   for (unsigned n=0; n<face->n_nodes(); ++n)
     face->set_node(n) = this->node_ptr(InfPrism6::side_nodes_map[i][n]);
 
-  return UniquePtr<Elem>(face);
+  return std::unique_ptr<Elem>(face);
 }
 
 
@@ -183,8 +183,8 @@ bool InfPrism::contains_point (const Point & p, Real tol) const
   Point pt1_o(this->point(1) - my_origin);
   Point pt2_o(this->point(2) - my_origin);
   const Real min_distance_sq = std::min(pt0_o.norm_sq(),
-                               std::min(pt1_o.norm_sq(),
-                                        pt2_o.norm_sq()));
+                                        std::min(pt1_o.norm_sq(),
+                                                 pt2_o.norm_sq()));
 
   // work with 1% allowable deviation.  We can still fall
   // back to the InfFE::inverse_map()

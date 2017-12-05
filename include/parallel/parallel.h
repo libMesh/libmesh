@@ -421,20 +421,18 @@ class OpFunction
    * attempt to perform a reduction on an unspecialized type will be a
    * compile-time rather than a run-time failure.
    */
-/*
-  static MPI_Op max();
-  static MPI_Op min();
-  static MPI_Op sum();
-  static MPI_Op product();
-  static MPI_Op logical_and();
-  static MPI_Op bitwise_and();
-  static MPI_Op logical_or();
-  static MPI_Op bitwise_or();
-  static MPI_Op logical_xor();
-  static MPI_Op bitwise_xor();
-  static MPI_Op max_loc();
-  static MPI_Op min_loc();
- */
+  // static MPI_Op max();
+  // static MPI_Op min();
+  // static MPI_Op sum();
+  // static MPI_Op product();
+  // static MPI_Op logical_and();
+  // static MPI_Op bitwise_and();
+  // static MPI_Op logical_or();
+  // static MPI_Op bitwise_or();
+  // static MPI_Op logical_xor();
+  // static MPI_Op bitwise_xor();
+  // static MPI_Op max_loc();
+  // static MPI_Op min_loc();
 };
 
 /*
@@ -550,7 +548,7 @@ private:
 
   // Breaking non-blocking sends into multiple requests can require chaining
   // multiple requests into a single Request
-  UniquePtr<Request> _prior_request;
+  std::unique_ptr<Request> _prior_request;
 
   // post_wait_work->first is a vector of work to do after a wait
   // finishes; post_wait_work->second is a reference count so that

@@ -43,9 +43,8 @@ public:
    * Constructor.  Initializes required
    * data structures.
    */
-  ElemAssembly ()
-  :
-  is_nodal_rhs_values_overriden(true)
+  ElemAssembly () :
+    is_nodal_rhs_values_overriden(true)
   {}
 
   /**

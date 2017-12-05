@@ -844,8 +844,6 @@ MPI
 PETSCARCH
 PETSC_ARCH
 PETSC_DIR
-LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_FALSE
-LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE
 LIBMESH_INSTALL_INTERNAL_BOOST_FALSE
 LIBMESH_INSTALL_INTERNAL_BOOST_TRUE
 BOOST_LDFLAGS
@@ -941,12 +939,8 @@ HAVE_CXX11_OVERRIDE_FALSE
 HAVE_CXX11_OVERRIDE_TRUE
 HAVE_CXX11_REGEX_FALSE
 HAVE_CXX11_REGEX_TRUE
-HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_FALSE
-HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_TRUE
 HAVE_CXX14_MAKE_UNIQUE_FALSE
 HAVE_CXX14_MAKE_UNIQUE_TRUE
-HAVE_CXX11_UNIQUE_PTR_FALSE
-HAVE_CXX11_UNIQUE_PTR_TRUE
 HAVE_CXX11_SHARED_PTR_FALSE
 HAVE_CXX11_SHARED_PTR_TRUE
 HAVE_CXX11_ALIAS_DECLARATIONS_FALSE
@@ -963,6 +957,10 @@ HAVE_CXX11_MOVE_CONSTRUCTORS_FALSE
 HAVE_CXX11_MOVE_CONSTRUCTORS_TRUE
 HAVE_CXX11_MOVE_FALSE
 HAVE_CXX11_MOVE_TRUE
+HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_FALSE
+HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_TRUE
+HAVE_CXX11_UNIQUE_PTR_FALSE
+HAVE_CXX11_UNIQUE_PTR_TRUE
 HAVE_CXX11_INITIALIZER_LIST_FALSE
 HAVE_CXX11_INITIALIZER_LIST_TRUE
 HAVE_CXX11_RANGEFOR_FALSE
@@ -1196,7 +1194,6 @@ enable_nested
 enable_boost
 with_boost
 with_boost_libdir
-enable_hinnant_unique_ptr
 enable_petsc
 enable_petsc_required
 with_mpi
@@ -1996,9 +1993,6 @@ Optional Features:
   --disable-nested        Do not use nested autoconf subpackages
   --disable-boost         build without either external or built-in BOOST
                           support
-  --disable-hinnant-unique-ptr
-                          build without Howard Hinnant's unique_ptr
-                          implementation
   --disable-petsc         build without PETSc iterative solver support
   --enable-petsc-required Error if PETSc is not detected by configure
   --disable-slepc         build without SLEPc eigen solver support
@@ -8647,6 +8641,185 @@ if (test "x$have_cxx11_initializer_list" != "xyes"); then
   as_fn_error $? "libMesh requires C++11 initializer list support" "$LINENO" 5
 fi
 
+
+    have_cxx11_unique_ptr=no
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::unique_ptr support" >&5
+$as_echo_n "checking for C++11 std::unique_ptr support... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include <iostream>
+    #include <memory>
+    struct Foo
+    {
+      Foo()      { std::cout << "Foo::Foo\n";  }
+      ~Foo()     { std::cout << "Foo::~Foo\n"; }
+    };
+
+int
+main ()
+{
+
+    {
+      // up now owns a Foo
+      std::unique_ptr<Foo> up(new Foo);
+    } // Foo deleted when up goes out of scope
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+      if (test "x$enablecxx11" = "xyes"); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_UNIQUE_PTR 1" >>confdefs.h
+
+        have_cxx11_unique_ptr=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_UNIQUE_PTR_BUT_DISABLED 1" >>confdefs.h
+
+      fi
+
+else
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+     if test x$have_cxx11_unique_ptr == xyes; then
+  HAVE_CXX11_UNIQUE_PTR_TRUE=
+  HAVE_CXX11_UNIQUE_PTR_FALSE='#'
+else
+  HAVE_CXX11_UNIQUE_PTR_TRUE='#'
+  HAVE_CXX11_UNIQUE_PTR_FALSE=
+fi
+
+
+if (test "x$have_cxx11_unique_ptr" != "xyes"); then
+  as_fn_error $? "libMesh requires C++11 std::unique_ptr support" "$LINENO" 5
+fi
+
+
+    have_cxx11_make_unique_workaround=no
+
+    # This is a simple workaround for no std::make_unique in C++11:
+    # http://stackoverflow.com/questions/7038357/make-unique-and-perfect-forwarding
+    # Requires working rvalue references, std::forward, variadic
+    # templates, and std::unique_ptr from C++11.
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::make_unique workaround support" >&5
+$as_echo_n "checking for C++11 std::make_unique workaround support... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include <memory>
+    namespace local
+    {
+      template<typename T, typename... Args>
+      std::unique_ptr<T> make_unique(Args&&... args)
+      {
+        return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+      }
+    }
+
+int
+main ()
+{
+
+    {
+      // Normally, you would use "auto" on the LHS here to avoid
+      // repeating the type name, but we are not testing auto here.
+      std::unique_ptr<int> up = local::make_unique<int>(42);
+    } // Foo deleted when up goes out of scope
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+      if (test "x$enablecxx11" = "xyes"); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_MAKE_UNIQUE_WORKAROUND 1" >>confdefs.h
+
+        have_cxx11_make_unique_workaround=yes
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_BUT_DISABLED 1" >>confdefs.h
+
+      fi
+
+else
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+     if test x$have_cxx11_make_unique_workaround == xyes; then
+  HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_TRUE=
+  HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_FALSE='#'
+else
+  HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_TRUE='#'
+  HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_FALSE=
+fi
+
+
+if (test "x$have_cxx11_make_unique_workaround" != "xyes"); then
+  as_fn_error $? "libMesh requires C++11 variadic template support" "$LINENO" 5
+fi
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
@@ -9327,88 +9500,6 @@ fi
 
 
 
-    have_cxx11_unique_ptr=no
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::unique_ptr support" >&5
-$as_echo_n "checking for C++11 std::unique_ptr support... " >&6; }
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-    old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
-
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-    #include <iostream>
-    #include <memory>
-    struct Foo
-    {
-      Foo()      { std::cout << "Foo::Foo\n";  }
-      ~Foo()     { std::cout << "Foo::~Foo\n"; }
-    };
-
-int
-main ()
-{
-
-    {
-      // up now owns a Foo
-      std::unique_ptr<Foo> up(new Foo);
-    } // Foo deleted when up goes out of scope
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-      if (test "x$enablecxx11" = "xyes"); then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-$as_echo "#define HAVE_CXX11_UNIQUE_PTR 1" >>confdefs.h
-
-        have_cxx11_unique_ptr=yes
-      else
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
-$as_echo "yes, but disabled." >&6; }
-
-$as_echo "#define HAVE_CXX11_UNIQUE_PTR_BUT_DISABLED 1" >>confdefs.h
-
-      fi
-
-else
-
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-    # Reset the flags
-    CXXFLAGS="$old_CXXFLAGS"
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-     if test x$have_cxx11_unique_ptr == xyes; then
-  HAVE_CXX11_UNIQUE_PTR_TRUE=
-  HAVE_CXX11_UNIQUE_PTR_FALSE='#'
-else
-  HAVE_CXX11_UNIQUE_PTR_TRUE='#'
-  HAVE_CXX11_UNIQUE_PTR_FALSE=
-fi
-
-
-
     have_cxx14_make_unique=no
 
     # std::make_unique is actually part of the C++14 standard, but some
@@ -9485,95 +9576,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 else
   HAVE_CXX14_MAKE_UNIQUE_TRUE='#'
   HAVE_CXX14_MAKE_UNIQUE_FALSE=
-fi
-
-
-
-    have_cxx11_make_unique_workaround=no
-
-    # This is a simple workaround for no std::make_unique in C++11:
-    # http://stackoverflow.com/questions/7038357/make-unique-and-perfect-forwarding
-    # Requires working rvalue references, std::forward, variadic
-    # templates, and std::unique_ptr from C++11.
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 std::make_unique workaround support" >&5
-$as_echo_n "checking for C++11 std::make_unique workaround support... " >&6; }
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-    old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
-
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-    #include <memory>
-    namespace local
-    {
-      template<typename T, typename... Args>
-      std::unique_ptr<T> make_unique(Args&&... args)
-      {
-        return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-      }
-    }
-
-int
-main ()
-{
-
-    {
-      // Normally, you would use "auto" on the LHS here to avoid
-      // repeating the type name, but we are not testing auto here.
-      std::unique_ptr<int> up = local::make_unique<int>(42);
-    } // Foo deleted when up goes out of scope
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-      if (test "x$enablecxx11" = "xyes"); then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-$as_echo "#define HAVE_CXX11_MAKE_UNIQUE_WORKAROUND 1" >>confdefs.h
-
-        have_cxx11_make_unique_workaround=yes
-      else
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
-$as_echo "yes, but disabled." >&6; }
-
-$as_echo "#define HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_BUT_DISABLED 1" >>confdefs.h
-
-      fi
-
-else
-
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-    # Reset the flags
-    CXXFLAGS="$old_CXXFLAGS"
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-     if test x$have_cxx11_make_unique_workaround == xyes; then
-  HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_TRUE=
-  HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_FALSE='#'
-else
-  HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_TRUE='#'
-  HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_FALSE=
 fi
 
 
@@ -30920,36 +30922,28 @@ $as_echo "configuring gdb command... \"$gdb_command\"" >&6; }
 
 
 # --------------------------------------------------------------
-# Use a true unique_ptr implementation - enabled by default.
-#
-# When enabled, the 'UniquePtr' type in libMesh is a C++03/11
-# compatible (non-deprecated) unique_ptr type.  Otherwise, it is
-# libMesh's (deprecated) AutoPtr type, allowing for backwards
-# compatibility.
-#
-# We now have about a year of experience using --enable-unique-ptr
-# in MOOSE (first enabled April 2015) in both C++11 and C++03 modes,
-# and I'm reasonably confident about enabling this by default.
-# Turning this on also prevents really annoying bugs like the one
-# discussed in http://tinyurl.com/hz63wje
+# The --enable/disable-unique-ptr is now deprecated and a warning
+# message is printed if you attempt to use it.
 # --------------------------------------------------------------
 # Check whether --enable-unique-ptr was given.
 if test "${enable_unique_ptr+set}" = set; then :
   enableval=$enable_unique_ptr; enableuniqueptr=$enableval
 else
-  enableuniqueptr=yes
+  enableuniqueptr=irrelevant
 fi
 
 
+if test "$enableuniqueptr" != irrelevant ; then
+  enableuniqueptr=yes
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: --enable/disable-unique-ptr are now deprecated" >&5
+$as_echo "$as_me: WARNING: --enable/disable-unique-ptr are now deprecated" >&2;}
+fi
 
+# Keep #define and Makefile variables around for backwards compatibility.
 
-if test "$enableuniqueptr" = yes ; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with a non-deprecated UniquePtr implementation >>>" >&5
-$as_echo "<<< Configuring library with a non-deprecated UniquePtr implementation >>>" >&6; }
 
 $as_echo "#define ENABLE_UNIQUE_PTR 1" >>confdefs.h
 
-fi
 # --------------------------------------------------------------
 
 
@@ -32661,283 +32655,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
   fi
 
 ac_config_files="$ac_config_files contrib/boost/include/Makefile"
-
-# --------------------------------------------------------------
-
-
-# --------------------------------------------------------------
-# Howard Hinnant's unique_ptr implementation.  Must be tested after
-# Boost and requires a working Boost installation.
-
-  # Howard Hinnant's unique_ptr is enabled by default, but we allow it to be explicitly disabled.
-  # Check whether --enable-hinnant-unique-ptr was given.
-if test "${enable_hinnant_unique_ptr+set}" = set; then :
-  enableval=$enable_hinnant_unique_ptr; case "${enableval}" in
-                  yes)  enablehinnant=yes ;;
-                   no)  enablehinnant=no ;;
-                    *)  as_fn_error $? "bad value ${enableval} for --enable-boost" "$LINENO" 5 ;;
-                esac
-else
-  enablehinnant=yes
-fi
-
-
-  # Shell variable that will eventually be used to set the AM_CONDITIONAL
-  install_hinnant_unique_ptr=no
-
-  if (test x$have_boost_unique_ptr = xyes); then
-    enablehinnant=no
-  fi
-
-  # If the user did not explicitly disable it, do some more testing
-  if (test x$enablehinnant = xyes); then
-
-    # We require boost to be enabled for Hinnant's unique pointer to be installed.
-    if (test x$enableboost = xyes); then
-
-      # Try to compile a test program that uses the unique_ptr.hpp header file
-      ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-      # Save any original value that CXXFLAGS had
-      saveCXXFLAGS="$CXXFLAGS"
-
-      # Add location of contrib header file to CXXFLAGS
-      CXXFLAGS="$saveCXXFLAGS -I$top_srcdir/contrib/unique_ptr";
-
-      # Depending on whether the boost installation found is external
-      # or internal, also add that path (see also boost.m4)
-      if (test x$install_internal_boost = xyes); then
-        CXXFLAGS="$CXXFLAGS -I$top_srcdir/contrib/boost/include"
-      else
-        CXXFLAGS="$CXXFLAGS $BOOST_CPPFLAGS"
-      fi
-
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking if Howard Hinnant's C++03 unique_ptr implementation can be compiled" >&5
-$as_echo_n "checking if Howard Hinnant's C++03 unique_ptr implementation can be compiled... " >&6; }
-
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-      #include <iostream>
-      #include "unique_ptr.hpp"
-      struct Foo
-      {
-        Foo()      { std::cout << "Foo::Foo\n";  }
-        ~Foo()     { std::cout << "Foo::~Foo\n"; }
-      };
-
-int
-main ()
-{
-
-      {
-        // up now owns a Foo
-        boost::unique_ptr<Foo> up(new Foo);
-      } // Foo deleted when up goes out of scope
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-        install_hinnant_unique_ptr=yes
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-else
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-      # Restore the original flags, whatever they were.
-      CXXFLAGS="$saveCXXFLAGS"
-
-      ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-      # Set the header file define and print a message on compilation success
-      if (test x$install_hinnant_unique_ptr = xyes); then
-
-$as_echo "#define HAVE_HINNANT_UNIQUE_PTR 1" >>confdefs.h
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Installing Howard Hinnant's unique_ptr implementation >>>" >&5
-$as_echo "<<< Installing Howard Hinnant's unique_ptr implementation >>>" >&6; }
-      fi
-
-    else
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< No boost, Howard Hinnant's unique_ptr implementation not available >>>" >&5
-$as_echo "<<< No boost, Howard Hinnant's unique_ptr implementation not available >>>" >&6; }
-    fi
-
-  else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Howard Hinnant's unique_ptr implementation explicitly disabled >>>" >&5
-$as_echo "<<< Howard Hinnant's unique_ptr implementation explicitly disabled >>>" >&6; }
-  fi
-
-  # Set Makefile.am conditional variable.  This call must be outside of all if-statements
-   if test x$install_hinnant_unique_ptr = xyes; then
-  LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE=
-  LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_FALSE='#'
-else
-  LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE='#'
-  LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_FALSE=
-fi
-
-
-ac_config_files="$ac_config_files contrib/unique_ptr/Makefile"
-
-# --------------------------------------------------------------
-
-
-# --------------------------------------------------------------
-# Test whether safe_bool<T> works as intended
-
-  # Try to compile a test program that uses the unique_ptr.hpp header file
-  ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-  # Save any original value that CXXFLAGS had
-  saveCXXFLAGS="$CXXFLAGS"
-
-  # Add location of contrib header file to CXXFLAGS
-  CXXFLAGS="$saveCXXFLAGS -I$top_srcdir/include/utils";
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if safe_bool<T> allows boolean comparisons" >&5
-$as_echo_n "checking if safe_bool<T> allows boolean comparisons... " >&6; }
-
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-  #include "safe_bool.h"
-  using namespace libMesh;
-  class Foo : public safe_bool<Foo>
-  {
-  public:
-    bool boolean_test() const
-    {
-      // This dummy class just returns true for operator bool()
-      return true;
-    }
-  };
-
-int
-main ()
-{
-
-  {
-    Foo foo1;
-    if (foo1)
-      return 0;
-    return 1;
-  }
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-    safe_bool_comparison_works=yes
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-else
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-  # This test should not compile, so a failure indicates success :-)
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if safe_bool<T> prevents implicit conversions" >&5
-$as_echo_n "checking if safe_bool<T> prevents implicit conversions... " >&6; }
-
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-  #include "safe_bool.h"
-  using namespace libMesh;
-  class Foo : public safe_bool<Foo>
-  {
-  public:
-    bool boolean_test() const
-    {
-      // This dummy class just returns true for operator bool()
-      return true;
-    }
-  };
-
-int
-main ()
-{
-
-  {
-    Foo foo1, foo2;
-    if (foo1 == foo2)
-      return 1;
-    return 0;
-  }
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-else
-
-    safe_bool_equality_fails=yes
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-  # Restore the original flags, whatever they were.
-  CXXFLAGS="$saveCXXFLAGS"
-
-  ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-  # safe_bool<T> must provide at least basic functionality.
-  if (test x$safe_bool_comparison_works = xyes); then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Compiling libmesh with safe_bool<T> support >>>" >&5
-$as_echo "<<< Compiling libmesh with safe_bool<T> support >>>" >&6; }
-  else
-    as_fn_error $? "libMesh requires a working safe_bool<T> implementation" "$LINENO" 5
-  fi
-
-  # It would be *nice* if safe_bool prevented incorrect code from
-  # compiling, but we don't require that.
-  if (test x$safe_bool_equality_fails = xno); then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: safe_bool<T> does not prevent incorrect equality comparisons" >&5
-$as_echo "$as_me: WARNING: safe_bool<T> does not prevent incorrect equality comparisons" >&2;}
-  fi
 
 # --------------------------------------------------------------
 
@@ -42191,6 +41908,14 @@ if test -z "${HAVE_CXX11_INITIALIZER_LIST_TRUE}" && test -z "${HAVE_CXX11_INITIA
   as_fn_error $? "conditional \"HAVE_CXX11_INITIALIZER_LIST\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${HAVE_CXX11_UNIQUE_PTR_TRUE}" && test -z "${HAVE_CXX11_UNIQUE_PTR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_UNIQUE_PTR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_TRUE}" && test -z "${HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_MAKE_UNIQUE_WORKAROUND\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${HAVE_CXX11_MOVE_TRUE}" && test -z "${HAVE_CXX11_MOVE_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX11_MOVE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -42223,16 +41948,8 @@ if test -z "${HAVE_CXX11_SHARED_PTR_TRUE}" && test -z "${HAVE_CXX11_SHARED_PTR_F
   as_fn_error $? "conditional \"HAVE_CXX11_SHARED_PTR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${HAVE_CXX11_UNIQUE_PTR_TRUE}" && test -z "${HAVE_CXX11_UNIQUE_PTR_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_CXX11_UNIQUE_PTR\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 if test -z "${HAVE_CXX14_MAKE_UNIQUE_TRUE}" && test -z "${HAVE_CXX14_MAKE_UNIQUE_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX14_MAKE_UNIQUE\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_TRUE}" && test -z "${HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_CXX11_MAKE_UNIQUE_WORKAROUND\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_REGEX_TRUE}" && test -z "${HAVE_CXX11_REGEX_FALSE}"; then
@@ -42333,10 +42050,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_INSTALL_INTERNAL_BOOST_TRUE}" && test -z "${LIBMESH_INSTALL_INTERNAL_BOOST_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_INSTALL_INTERNAL_BOOST\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_TRUE}" && test -z "${LIBMESH_INSTALL_HINNANT_UNIQUE_PTR_FALSE}"; then
-  as_fn_error $? "conditional \"LIBMESH_INSTALL_HINNANT_UNIQUE_PTR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_PETSC_TRUE}" && test -z "${LIBMESH_ENABLE_PETSC_FALSE}"; then
@@ -43679,7 +43392,6 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "contrib/boost/include/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/boost/include/Makefile" ;;
-    "contrib/unique_ptr/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/unique_ptr/Makefile" ;;
     "contrib/laspack/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/laspack/Makefile" ;;
     "contrib/sfcurves/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/sfcurves/Makefile" ;;
     "contrib/gzstream/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/gzstream/Makefile" ;;

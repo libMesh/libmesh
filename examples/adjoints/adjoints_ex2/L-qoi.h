@@ -30,9 +30,9 @@ public:
 
   virtual void element_qoi (DiffContext & context, const QoISet & qois);
 
-  virtual UniquePtr<DifferentiableQoI> clone()
+  virtual std::unique_ptr<DifferentiableQoI> clone()
   {
-    return UniquePtr<DifferentiableQoI> (new LaplaceQoI(*this));
+    return std::unique_ptr<DifferentiableQoI> (new LaplaceQoI(*this));
   }
 
 };

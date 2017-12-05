@@ -81,7 +81,7 @@ dof_id_type Quad::key () const
 
 
 
-UniquePtr<Elem> Quad::side_ptr (const unsigned int i)
+std::unique_ptr<Elem> Quad::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -90,7 +90,7 @@ UniquePtr<Elem> Quad::side_ptr (const unsigned int i)
   for (unsigned n=0; n<edge->n_nodes(); ++n)
     edge->set_node(n) = this->node_ptr(Quad4::side_nodes_map[i][n]);
 
-  return UniquePtr<Elem>(edge);
+  return std::unique_ptr<Elem>(edge);
 }
 
 

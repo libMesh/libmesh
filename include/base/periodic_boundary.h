@@ -76,7 +76,7 @@ public:
    * store them in the underlying map, this class must be clone'able,
    * i.e. have a kind of virtual construction mechanism.
    */
-  virtual UniquePtr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const libmesh_override;
+  virtual std::unique_ptr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const libmesh_override;
 
 protected:
   // One of these days we'll support rotated boundaries

@@ -65,7 +65,7 @@ public:
    * This is used when copying meshes, and must be overridden in the
    * derived classes.
    */
-  virtual UniquePtr<Partitioner> clone () const = 0;
+  virtual std::unique_ptr<Partitioner> clone () const = 0;
 
   /**
    * Partitions the \p MeshBase into \p n parts by setting

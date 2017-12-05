@@ -131,7 +131,7 @@ void SparseMatrix<Complex>::print(std::ostream & os, const bool sparse) const
 
 // Full specialization for Real datatypes
 template <typename T>
-UniquePtr<SparseMatrix<T>>
+std::unique_ptr<SparseMatrix<T>>
 SparseMatrix<T>::build(const Parallel::Communicator & comm,
                        const SolverPackage solver_package)
 {
@@ -144,25 +144,25 @@ SparseMatrix<T>::build(const Parallel::Communicator & comm,
 
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
-      return UniquePtr<SparseMatrix<T>>(new LaspackMatrix<T>(comm));
+      return libmesh_make_unique<LaspackMatrix<T>>(comm);
 #endif
 
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-      return UniquePtr<SparseMatrix<T>>(new PetscMatrix<T>(comm));
+      return libmesh_make_unique<PetscMatrix<T>>(comm);
 #endif
 
 
 #ifdef LIBMESH_TRILINOS_HAVE_EPETRA
     case TRILINOS_SOLVERS:
-      return UniquePtr<SparseMatrix<T>>(new EpetraMatrix<T>(comm));
+      return libmesh_make_unique<EpetraMatrix<T>>(comm);
 #endif
 
 
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
-      return UniquePtr<SparseMatrix<T>>(new EigenSparseMatrix<T>(comm));
+      return libmesh_make_unique<EigenSparseMatrix<T>>(comm);
 #endif
 
     default:
@@ -170,7 +170,7 @@ SparseMatrix<T>::build(const Parallel::Communicator & comm,
     }
 
   libmesh_error_msg("We'll never get here!");
-  return UniquePtr<SparseMatrix<T>>();
+  return std::unique_ptr<SparseMatrix<T>>();
 }
 
 

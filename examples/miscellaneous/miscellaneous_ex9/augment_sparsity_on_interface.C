@@ -40,14 +40,14 @@ void AugmentSparsityOnInterface::mesh_reinit ()
         {
           if (_mesh.get_boundary_info().has_boundary_id(elem, side, _crack_boundary_lower))
             {
-              UniquePtr<const Elem> side_elem = elem->build_side_ptr(side);
+              std::unique_ptr<const Elem> side_elem = elem->build_side_ptr(side);
 
               lower_centroids[std::make_pair(elem, side)] = side_elem->centroid();
             }
 
           if (_mesh.get_boundary_info().has_boundary_id(elem, side, _crack_boundary_upper))
             {
-              UniquePtr<const Elem> side_elem = elem->build_side_ptr(side);
+              std::unique_ptr<const Elem> side_elem = elem->build_side_ptr(side);
 
               upper_centroids[std::make_pair(elem, side)] = side_elem->centroid();
             }

@@ -304,7 +304,7 @@ void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T> & v_
 
   // Store a temporary copy since MatMultHermitianTransposeAdd doesn't seem to work
   // TODO: Find out why MatMultHermitianTransposeAdd doesn't work, might be a PETSc bug?
-  UniquePtr<NumericVector<Number>> this_clone = this->clone();
+  std::unique_ptr<NumericVector<Number>> this_clone = this->clone();
 
   // The const_cast<> is not elegant, but it is required since PETSc
   // expects a non-const Mat.

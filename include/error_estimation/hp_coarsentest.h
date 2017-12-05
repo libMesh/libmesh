@@ -29,7 +29,7 @@
 #include "libmesh/libmesh_common.h"
 
 #include "libmesh/fe.h"         // MipsPro requires fe.h and quadrature.h in order to
-#include "libmesh/quadrature.h" //  delete UniquePtrs<> upon destruction
+#include "libmesh/quadrature.h" //  delete std::unique_ptrs<> upon destruction
 
 // C++ includes
 #include <vector>
@@ -117,7 +117,7 @@ protected:
   /**
    * The finite element objects for fine and coarse elements
    */
-  UniquePtr<FEBase> fe, fe_coarse;
+  std::unique_ptr<FEBase> fe, fe_coarse;
 
   /**
    * The shape functions and their derivatives
@@ -140,7 +140,7 @@ protected:
   /**
    * The quadrature rule for the fine element
    */
-  UniquePtr<QBase> qrule;
+  std::unique_ptr<QBase> qrule;
 
   /**
    * Linear system for projections

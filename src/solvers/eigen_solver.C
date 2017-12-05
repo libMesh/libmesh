@@ -33,7 +33,7 @@ namespace libMesh
 //------------------------------------------------------------------
 // EigenSolver members
 template <typename T>
-UniquePtr<EigenSolver<T>>
+std::unique_ptr<EigenSolver<T>>
 EigenSolver<T>::build(const Parallel::Communicator & comm,
                       const SolverPackage solver_package)
 {
@@ -43,14 +43,14 @@ EigenSolver<T>::build(const Parallel::Communicator & comm,
 
 #ifdef LIBMESH_HAVE_SLEPC
     case SLEPC_SOLVERS:
-      return UniquePtr<EigenSolver<T>>(new SlepcEigenSolver<T>(comm));
+      return libmesh_make_unique<SlepcEigenSolver<T>>(comm);
 #endif
 
     default:
       libmesh_error_msg("ERROR:  Unrecognized eigen solver package: " << solver_package);
     }
 
-  return UniquePtr<EigenSolver<T>>();
+  return std::unique_ptr<EigenSolver<T>>();
 }
 
 

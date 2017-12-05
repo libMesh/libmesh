@@ -117,18 +117,18 @@ public:
    * \returns A \p QUAD4 built coincident with face 0, or an \p INFQUAD4
    * built coincident with faces 1 to 4.
    *
-   * \note that the \p UniquePtr<Elem> takes care of freeing memory.
+   * \note that the \p std::unique_ptr<Elem> takes care of freeing memory.
    */
-  virtual UniquePtr<Elem> build_side_ptr (const unsigned int i,
-                                          bool proxy) libmesh_override;
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
+                                                bool proxy) libmesh_override;
 
   /**
    * \returns An \p EDGE2 built coincident with edges 0 to 3, or an \p INFEDGE2
    * built coincident with edges 4 to 7.
    *
-   * \note The \p UniquePtr<Elem> takes care of freeing memory.
+   * \note The \p std::unique_ptr<Elem> takes care of freeing memory.
    */
-  virtual UniquePtr<Elem> build_edge_ptr (const unsigned int i) libmesh_override;
+  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int i) libmesh_override;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,

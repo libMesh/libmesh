@@ -712,8 +712,8 @@ void lagrange_compute_constraints (DofConstraints & constraints,
           // level than their neighbors!
           libmesh_assert(parent);
 
-          const UniquePtr<const Elem> my_side     (elem->build_side_ptr(s));
-          const UniquePtr<const Elem> parent_side (parent->build_side_ptr(s));
+          const std::unique_ptr<const Elem> my_side     (elem->build_side_ptr(s));
+          const std::unique_ptr<const Elem> parent_side (parent->build_side_ptr(s));
 
           // This function gets called element-by-element, so there
           // will be a lot of memory allocation going on.  We can

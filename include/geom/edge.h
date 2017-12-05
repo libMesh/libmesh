@@ -136,19 +136,19 @@ public:
   /**
    * \returns A pointer to a NodeElem for the specified node.
    */
-  virtual UniquePtr<Elem> side_ptr (const unsigned int i) libmesh_override;
+  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) libmesh_override;
 
   /**
    * \returns A pointer to a NodeElem for the specified node.
    */
-  virtual UniquePtr<Elem> build_side_ptr (const unsigned int i,
-                                          bool proxy) libmesh_override;
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
+                                                bool proxy) libmesh_override;
 
   /**
    * The \p Elem::build_edge_ptr() member makes no sense for edges.
    */
-  virtual UniquePtr<Elem> build_edge_ptr (const unsigned int) libmesh_override
-  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
+  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int) libmesh_override
+  { libmesh_not_implemented(); return std::unique_ptr<Elem>(); }
 
 
 protected:

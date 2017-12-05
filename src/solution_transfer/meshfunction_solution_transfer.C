@@ -54,7 +54,7 @@ MeshFunctionSolutionTransfer::transfer(const Variable & from_var,
   EquationSystems & from_es = from_sys->get_equation_systems();
 
   //Create a serialized version of the solution vector
-  UniquePtr<NumericVector<Number>> serialized_solution = NumericVector<Number>::build(from_sys->get_mesh().comm());
+  std::unique_ptr<NumericVector<Number>> serialized_solution = NumericVector<Number>::build(from_sys->get_mesh().comm());
   serialized_solution->init(from_sys->n_dofs(), false, SERIAL);
 
   // Need to pull down a full copy of this vector on every processor

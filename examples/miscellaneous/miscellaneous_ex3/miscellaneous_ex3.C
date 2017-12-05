@@ -320,9 +320,9 @@ void LaplaceYoung::residual (const NumericVector<Number> & soln,
 
   // Build a Finite Element object of the specified type.  Since the
   // FEBase::build() member dynamically creates memory we will
-  // store the object as a UniquePtr<FEBase>.  This can be thought
+  // store the object as a std::unique_ptr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
-  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
 
   // A 5th order Gauss quadrature rule for numerical integration.
   QGauss qrule (dim, FIFTH);
@@ -332,7 +332,7 @@ void LaplaceYoung::residual (const NumericVector<Number> & soln,
 
   // Declare a special finite element object for
   // boundary integration.
-  UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe_face (FEBase::build(dim, fe_type));
 
   // Boundary integration requires one quadrature rule,
   // with dimensionality one less than the dimensionality
@@ -488,9 +488,9 @@ void LaplaceYoung::jacobian (const NumericVector<Number> & soln,
 
   // Build a Finite Element object of the specified type.  Since the
   // FEBase::build() member dynamically creates memory we will
-  // store the object as a UniquePtr<FEBase>.  This can be thought
+  // store the object as a std::unique_ptr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
-  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
 
   // A 5th order Gauss quadrature rule for numerical integration.
   QGauss qrule (dim, FIFTH);

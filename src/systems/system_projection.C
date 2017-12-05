@@ -47,8 +47,8 @@ template <typename T, typename I, typename T2>
 struct CompareTypes<MetaPhysicL::DynamicSparseNumberArray<T,I>, T2>
 {
   typedef typename
-    MetaPhysicL::DynamicSparseNumberArray
-      <typename CompareTypes<T,T2>::supertype,I> supertype;
+  MetaPhysicL::DynamicSparseNumberArray
+  <typename CompareTypes<T,T2>::supertype,I> supertype;
 };
 }
 
@@ -85,10 +85,12 @@ struct CompareTypes<MetaPhysicL::DynamicSparseNumberArray<T,I>, T2>
 namespace libMesh {
 typedef DynamicSparseNumberArray<Real, dof_id_type> DSNAN;
 
-template void DenseMatrix<Real>::cholesky_solve
-  (const DenseVector<DSNAN> &, DenseVector<DSNAN> &);
-template void DenseMatrix<Real>::_cholesky_back_substitute
-  (const DenseVector<DSNAN> &, DenseVector<DSNAN> &) const;
+template void
+DenseMatrix<Real>::cholesky_solve(const DenseVector<DSNAN> &,
+                                  DenseVector<DSNAN> &);
+template void
+DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<DSNAN> &,
+                                             DenseVector<DSNAN> &) const;
 }
 #endif
 
@@ -148,8 +150,8 @@ private:
   const std::set<boundary_id_type> & b;
   const std::vector<unsigned int>  & variables;
   const System                     & system;
-  UniquePtr<FunctionBase<Number>>   f;
-  UniquePtr<FunctionBase<Gradient>> g;
+  std::unique_ptr<FunctionBase<Number>>   f;
+  std::unique_ptr<FunctionBase<Gradient>> g;
   const Parameters                 & parameters;
   NumericVector<Number>            & new_vector;
 
@@ -164,8 +166,8 @@ public:
     b(b_in),
     variables(variables_in),
     system(system_in),
-    f(f_in ? f_in->clone() : UniquePtr<FunctionBase<Number>>()),
-    g(g_in ? g_in->clone() : UniquePtr<FunctionBase<Gradient>>()),
+    f(f_in ? f_in->clone() : std::unique_ptr<FunctionBase<Number>>()),
+    g(g_in ? g_in->clone() : std::unique_ptr<FunctionBase<Gradient>>()),
     parameters(parameters_in),
     new_vector(new_v_in)
   {
@@ -179,8 +181,8 @@ public:
     b(in.b),
     variables(in.variables),
     system(in.system),
-    f(in.f.get() ? in.f->clone() : UniquePtr<FunctionBase<Number>>()),
-    g(in.g.get() ? in.g->clone() : UniquePtr<FunctionBase<Gradient>>()),
+    f(in.f.get() ? in.f->clone() : std::unique_ptr<FunctionBase<Number>>()),
+    g(in.g.get() ? in.g->clone() : std::unique_ptr<FunctionBase<Gradient>>()),
     parameters(in.parameters),
     new_vector(in.new_vector)
   {
@@ -202,7 +204,7 @@ void System::project_vector (NumericVector<Number> & vector,
 {
   // Create a copy of the vector, which currently
   // contains the old data.
-  UniquePtr<NumericVector<Number>>
+  std::unique_ptr<NumericVector<Number>>
     old_vector (vector.clone());
 
   // Project the old vector to the new vector
@@ -237,9 +239,9 @@ void System::project_vector (const NumericVector<Number> & old_v,
 
   // Resize the new vector and get a serial version.
   NumericVector<Number> * new_vector_ptr = libmesh_nullptr;
-  UniquePtr<NumericVector<Number>> new_vector_built;
+  std::unique_ptr<NumericVector<Number>> new_vector_built;
   NumericVector<Number> * local_old_vector;
-  UniquePtr<NumericVector<Number>> local_old_vector_built;
+  std::unique_ptr<NumericVector<Number>> local_old_vector_built;
   const NumericVector<Number> * old_vector_ptr = libmesh_nullptr;
 
   ConstElemRange active_local_elem_range
@@ -366,7 +368,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
   // creating a temporary parallel vector to use localize! - RHS
   if (old_v.type() == SERIAL)
     {
-      UniquePtr<NumericVector<Number>> dist_v = NumericVector<Number>::build(this->comm());
+      std::unique_ptr<NumericVector<Number>> dist_v = NumericVector<Number>::build(this->comm());
       dist_v->init(this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       dist_v->close();
 
@@ -741,10 +743,8 @@ void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
         vars[i] = i;
 
       // Use a typedef to make the calling sequence for parallel_for() a bit more readable
-      typedef OldSolutionCoefs<Real,         &FEMContext::point_value>
-              OldSolutionValueCoefs;
-      typedef OldSolutionCoefs<RealGradient, &FEMContext::point_gradient>
-              OldSolutionGradientCoefs;
+      typedef OldSolutionCoefs<Real, &FEMContext::point_value> OldSolutionValueCoefs;
+      typedef OldSolutionCoefs<RealGradient, &FEMContext::point_gradient> OldSolutionGradientCoefs;
 
       typedef
         GenericProjector<OldSolutionValueCoefs,
@@ -1247,11 +1247,11 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
         system.variable_scalar_number(var, 0);
 
       // Get FE objects of the appropriate type
-      UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
+      std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
 
       // Prepare variables for projection
-      UniquePtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
-      UniquePtr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
+      std::unique_ptr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
+      std::unique_ptr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
 
       // The values of the shape functions at the quadrature
       // points

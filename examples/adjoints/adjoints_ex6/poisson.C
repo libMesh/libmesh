@@ -45,8 +45,8 @@ public:
     output(_T_var) = -x * (1 - x);
   }
 
-  virtual UniquePtr<FunctionBase<Number>> clone() const
-  { return UniquePtr<FunctionBase<Number>> (new BdyFunction(_T_var)); }
+  virtual std::unique_ptr<FunctionBase<Number>> clone() const
+  { return std::unique_ptr<FunctionBase<Number>> (new BdyFunction(_T_var)); }
 
 private:
   const unsigned int _T_var;

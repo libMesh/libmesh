@@ -27,11 +27,11 @@ public:
   virtual void side_qoi(DiffContext & context,
                         const QoISet & qois);
 
-  virtual UniquePtr<DifferentiableQoI> clone()
+  virtual std::unique_ptr<DifferentiableQoI> clone()
   {
     DifferentiableQoI * my_clone = new CoupledSystemQoI;
     *my_clone = *this;
-    return UniquePtr<DifferentiableQoI>(my_clone);
+    return std::unique_ptr<DifferentiableQoI>(my_clone);
   }
 };
 

@@ -50,9 +50,9 @@ public:
   void init () {}
   void clear () {}
 
-  virtual UniquePtr<FunctionBase<Number>> clone () const
+  virtual std::unique_ptr<FunctionBase<Number>> clone () const
   {
-    return UniquePtr<FunctionBase<Number>> (new MeshlessInterpolationFunction (_mfi, _mutex) );
+    return libmesh_make_unique<MeshlessInterpolationFunction>(_mfi, _mutex);
   }
 
   Number operator() (const Point & p,

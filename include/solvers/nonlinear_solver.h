@@ -73,8 +73,8 @@ public:
    * Builds a \p NonlinearSolver using the nonlinear solver package specified by
    * \p solver_package
    */
-  static UniquePtr<NonlinearSolver<T>> build(sys_type & s,
-                                              const SolverPackage solver_package = libMesh::default_solver_package());
+  static std::unique_ptr<NonlinearSolver<T>> build(sys_type & s,
+                                                   const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
    * \returns \p true if the data structures are

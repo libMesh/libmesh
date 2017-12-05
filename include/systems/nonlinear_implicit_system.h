@@ -253,13 +253,13 @@ public:
    * details of interfacing with various nonlinear algebra packages
    * like PETSc or LASPACK.
    */
-  UniquePtr<NonlinearSolver<Number>> nonlinear_solver;
+  std::unique_ptr<NonlinearSolver<Number>> nonlinear_solver;
 
   /**
    * The \p DiffSolver defines an optional interface used to
    * solve the nonlinear_implicit system.
    */
-  UniquePtr<DiffSolver> diff_solver;
+  std::unique_ptr<DiffSolver> diff_solver;
 
   /**
    * \returns The number of iterations

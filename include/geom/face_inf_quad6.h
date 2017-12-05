@@ -136,8 +136,8 @@ public:
    * \returns An \p Edge3 for the base (0) side, and an \p InfEdge2 for
    * the sides 1, 2.
    */
-  virtual UniquePtr<Elem> build_side_ptr (const unsigned int i,
-                                          bool proxy) libmesh_override;
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
+                                                bool proxy) libmesh_override;
 
   virtual void connectivity(const unsigned int sf,
                             const IOPackage iop,

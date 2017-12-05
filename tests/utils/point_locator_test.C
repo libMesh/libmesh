@@ -50,7 +50,7 @@ public:
     Mesh mesh(*TestCommWorld);
 
     const unsigned n_elem_per_side = 5;
-    const UniquePtr<Elem> test_elem = Elem::build(elem_type);
+    const std::unique_ptr<Elem> test_elem = Elem::build(elem_type);
     const Real ymax = test_elem->dim() > 1;
     const Real zmax = test_elem->dim() > 2;
     const unsigned int ny = ymax * n_elem_per_side;
@@ -65,7 +65,7 @@ public:
                                        0., zmax,
                                        elem_type);
 
-    UniquePtr<PointLocatorBase> locator = mesh.sub_point_locator();
+    std::unique_ptr<PointLocatorBase> locator = mesh.sub_point_locator();
 
     if (!mesh.is_serial())
       locator->enable_out_of_mesh_mode();

@@ -160,7 +160,7 @@ unsigned int Pyramid14::which_node_am_i(unsigned int side,
 
 
 
-UniquePtr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool proxy)
+std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool proxy)
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -172,10 +172,10 @@ UniquePtr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool proxy)
         case 1:
         case 2:
         case 3:
-          return UniquePtr<Elem>(new Side<Tri6,Pyramid14>(this,i));
+          return libmesh_make_unique<Side<Tri6,Pyramid14>>(this,i);
 
         case 4:
-          return UniquePtr<Elem>(new Side<Quad9,Pyramid14>(this,i));
+          return libmesh_make_unique<Side<Quad9,Pyramid14>>(this,i);
 
         default:
           libmesh_error_msg("Invalid side i = " << i);
@@ -212,20 +212,20 @@ UniquePtr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool proxy)
       for (unsigned n=0; n<face->n_nodes(); ++n)
         face->set_node(n) = this->node_ptr(Pyramid14::side_nodes_map[i][n]);
 
-      return UniquePtr<Elem>(face);
+      return std::unique_ptr<Elem>(face);
     }
 
   libmesh_error_msg("We'll never get here!");
-  return UniquePtr<Elem>();
+  return std::unique_ptr<Elem>();
 }
 
 
 
-UniquePtr<Elem> Pyramid14::build_edge_ptr (const unsigned int i)
+std::unique_ptr<Elem> Pyramid14::build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());
 
-  return UniquePtr<Elem>(new SideEdge<Edge3,Pyramid14>(this,i));
+  return libmesh_make_unique<SideEdge<Edge3,Pyramid14>>(this,i);
 }
 
 

@@ -412,7 +412,7 @@ public:
    * It's helpful to be able to generate a DirichletBoundary that stores a ZeroFunction in order
    * to impose Dirichlet boundary conditions.
    */
-  static UniquePtr<DirichletBoundary> build_zero_dirichlet_boundary_object();
+  static std::unique_ptr<DirichletBoundary> build_zero_dirichlet_boundary_object();
 
   /**
    * Setter for the flag determining if convergence should be
@@ -436,7 +436,7 @@ public:
    * use for solving all systems in which the system matrix is set
    * to inner_product_matrix.
    */
-  UniquePtr<LinearSolver<Number>> inner_product_solver;
+  std::unique_ptr<LinearSolver<Number>> inner_product_solver;
 
   /**
    * Also, we store a pointer to an extra linear solver. This can be
@@ -449,7 +449,7 @@ public:
   /**
    * The inner product matrix.
    */
-  UniquePtr<SparseMatrix<Number>> inner_product_matrix;
+  std::unique_ptr<SparseMatrix<Number>> inner_product_matrix;
 
   /**
    * Vector storing the truth output values from the most
@@ -543,7 +543,7 @@ protected:
    * evaluations on each element. We use DGFEMContext since it
    * allows for both DG and continuous Galerkin formulations.
    */
-  virtual UniquePtr<DGFEMContext> build_context();
+  virtual std::unique_ptr<DGFEMContext> build_context();
 
   /**
    * Return the matrix for the output residual dual

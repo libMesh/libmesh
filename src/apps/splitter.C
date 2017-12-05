@@ -154,7 +154,7 @@ int main (int argc, char ** argv)
           cpr.binary() = binary;
           std::ostringstream outputname;
           outputname << remove_extension(filename) << '.' << n_procs
-            << (binary ? ".cpr" : ".cpa");
+                     << (binary ? ".cpr" : ".cpa");
           cpr.write(outputname.str());
         }
     }

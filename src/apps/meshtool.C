@@ -521,7 +521,7 @@ int main (int argc, char ** argv)
 
                    x_sym, y_sym, z_sym);
 
-  UniquePtr<Mesh> mesh_ptr;
+  std::unique_ptr<Mesh> mesh_ptr;
   if (dim == static_cast<unsigned char>(-1))
     {
       mesh_ptr.reset(new Mesh(init.comm()));

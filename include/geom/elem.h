@@ -736,8 +736,8 @@ public:
    * simply calls the virtual non-const version and const_casts the
    * return type.
    */
-  virtual UniquePtr<Elem> side_ptr (unsigned int i) = 0;
-  UniquePtr<const Elem> side_ptr (unsigned int i) const;
+  virtual std::unique_ptr<Elem> side_ptr (unsigned int i) = 0;
+  std::unique_ptr<const Elem> side_ptr (unsigned int i) const;
 
   /**
    * \returns A proxy element coincident with side \p i.
@@ -748,7 +748,7 @@ public:
    * side_ptr() function instead.
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
-  UniquePtr<Elem> side (const unsigned int i) const;
+  std::unique_ptr<Elem> side (const unsigned int i) const;
 #endif
 
   /**
@@ -757,7 +757,7 @@ public:
    * The element returned is full-ordered, in contrast to the side
    * method.  For example, calling build_side_ptr(0) on a 20-noded hex
    * will build a 8-noded quadrilateral coincident with face 0 and
-   * pass back the pointer.  A \p UniquePtr<Elem> is returned to
+   * pass back the pointer.  A \p std::unique_ptr<Elem> is returned to
    * prevent a memory leak.  This way the user need not remember to
    * delete the object.
    *
@@ -772,8 +772,8 @@ public:
    * calls the virtual non-const version and const_casts the return
    * type.
    */
-  virtual UniquePtr<Elem> build_side_ptr (const unsigned int i, bool proxy=true) = 0;
-  UniquePtr<const Elem> build_side_ptr (const unsigned int i, bool proxy=true) const;
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i, bool proxy=true) = 0;
+  std::unique_ptr<const Elem> build_side_ptr (const unsigned int i, bool proxy=true) const;
 
   /**
    * \returns A proxy element coincident with side \p i.
@@ -784,7 +784,7 @@ public:
    * build_side_ptr() function instead.
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
-  UniquePtr<Elem> build_side (const unsigned int i, bool proxy=true) const;
+  std::unique_ptr<Elem> build_side (const unsigned int i, bool proxy=true) const;
 #endif
 
   /**
@@ -793,15 +793,15 @@ public:
    * The element returned is full-ordered.  For example, calling
    * build_edge_ptr(0) on a 20-noded hex will build a 3-noded edge
    * coincident with edge 0 and pass back the pointer.  A \p
-   * UniquePtr<Elem> is returned to prevent a memory leak.  This way
+   * std::unique_ptr<Elem> is returned to prevent a memory leak.  This way
    * the user need not remember to delete the object.
    *
    * The const version of this function is non-virtual; it simply
    * calls the virtual non-const version and const_casts the return
    * type.
    */
-  virtual UniquePtr<Elem> build_edge_ptr (const unsigned int i) = 0;
-  UniquePtr<const Elem> build_edge_ptr (const unsigned int i) const;
+  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int i) = 0;
+  std::unique_ptr<const Elem> build_edge_ptr (const unsigned int i) const;
 
   /**
    * Creates an element coincident with edge \p i.
@@ -812,7 +812,7 @@ public:
    * build_edge_ptr() function instead.
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
-  UniquePtr<Elem> build_edge (const unsigned int i) const;
+  std::unique_ptr<Elem> build_edge (const unsigned int i) const;
 #endif
 
   /**
@@ -1487,8 +1487,8 @@ public:
   /**
    * \returns An Elem of type \p type wrapped in a smart pointer.
    */
-  static UniquePtr<Elem> build (const ElemType type,
-                                Elem * p=libmesh_nullptr);
+  static std::unique_ptr<Elem> build (const ElemType type,
+                                      Elem * p=libmesh_nullptr);
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -2089,79 +2089,79 @@ Elem::side_index_range() const
 
 
 inline
-UniquePtr<const Elem> Elem::side_ptr (unsigned int i) const
+std::unique_ptr<const Elem> Elem::side_ptr (unsigned int i) const
 {
   // Call the non-const version of this function, return the result as
-  // a UniquePtr<const Elem>.
+  // a std::unique_ptr<const Elem>.
   Elem * me = const_cast<Elem *>(this);
   const Elem * s = const_cast<const Elem *>(me->side_ptr(i).release());
-  return UniquePtr<const Elem>(s);
+  return std::unique_ptr<const Elem>(s);
 }
 
 
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
 inline
-UniquePtr<Elem> Elem::side (const unsigned int i) const
+std::unique_ptr<Elem> Elem::side (const unsigned int i) const
 {
   // Call the const version of side_ptr(), and const_cast the result.
   libmesh_deprecated();
   Elem * s = const_cast<Elem *>(this->side_ptr(i).release());
-  return UniquePtr<Elem>(s);
+  return std::unique_ptr<Elem>(s);
 }
 #endif
 
 
 
 inline
-UniquePtr<const Elem>
+std::unique_ptr<const Elem>
 Elem::build_side_ptr (const unsigned int i, bool proxy) const
 {
   // Call the non-const version of this function, return the result as
-  // a UniquePtr<const Elem>.
+  // a std::unique_ptr<const Elem>.
   Elem * me = const_cast<Elem *>(this);
   const Elem * s = const_cast<const Elem *>(me->build_side_ptr(i, proxy).release());
-  return UniquePtr<const Elem>(s);
+  return std::unique_ptr<const Elem>(s);
 }
 
 
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
 inline
-UniquePtr<Elem>
+std::unique_ptr<Elem>
 Elem::build_side (const unsigned int i, bool proxy) const
 {
   // Call the const version of build_side_ptr(), and const_cast the result.
   libmesh_deprecated();
   Elem * s = const_cast<Elem *>(this->build_side_ptr(i, proxy).release());
-  return UniquePtr<Elem>(s);
+  return std::unique_ptr<Elem>(s);
 }
 #endif
 
 
 
 inline
-UniquePtr<const Elem>
+std::unique_ptr<const Elem>
 Elem::build_edge_ptr (const unsigned int i) const
 {
   // Call the non-const version of this function, return the result as
-  // a UniquePtr<const Elem>.
+  // a std::unique_ptr<const Elem>.
   Elem * me = const_cast<Elem *>(this);
   const Elem * e = const_cast<const Elem *>(me->build_edge_ptr(i).release());
-  return UniquePtr<const Elem>(e);
+  return std::unique_ptr<const Elem>(e);
 }
 
 
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
 inline
-UniquePtr<Elem>
+std::unique_ptr<Elem>
 Elem::build_edge (const unsigned int i) const
 {
   // Call the const version of build_edge_ptr(), and const_cast the result.
   libmesh_deprecated();
   Elem * e = const_cast<Elem *>(this->build_edge_ptr(i).release());
-  return UniquePtr<Elem>(e);
+  return std::unique_ptr<Elem>(e);
 }
 #endif
 
@@ -2746,7 +2746,7 @@ public:
   // unary op*
   Elem *& operator*() const
   {
-    // Set the UniquePtr
+    // Set the std::unique_ptr
     this->_update_side_ptr();
 
     // Return a reference to _side_ptr
@@ -2783,22 +2783,22 @@ private:
   // This has to be called before dereferencing.
   void _update_side_ptr() const
   {
-    // Construct new side, store in UniquePtr
+    // Construct new side, store in std::unique_ptr
     this->_side = this->_parent->build_side_ptr(this->_side_number);
 
     // Also set our internal naked pointer.  Memory is still owned
-    // by the UniquePtr.
+    // by the std::unique_ptr.
     this->_side_ptr = _side.get();
   }
 
-  // UniquePtr to the actual side, handles memory management for
+  // std::unique_ptr to the actual side, handles memory management for
   // the sides which are created during the course of iteration.
-  mutable UniquePtr<Elem> _side;
+  mutable std::unique_ptr<Elem> _side;
 
   // Raw pointer needed to facilitate passing back to the user a
   // reference to a non-temporary raw pointer in order to conform to
   // the variant_filter_iterator interface.  It points to the same
-  // thing the UniquePtr "_side" above holds.  What happens if the user
+  // thing the std::unique_ptr "_side" above holds.  What happens if the user
   // calls delete on the pointer passed back?  Well, this is an issue
   // which is not addressed by the iterators in libMesh.  Basically it
   // is a bad idea to ever call delete on an iterator from the library.
@@ -2880,10 +2880,10 @@ SimpleRange<Elem::ConstNeighborPtrIter> Elem::neighbor_ptr_range() const
   }                                                                     \
                                                                         \
   virtual                                                               \
-  std::vector<std::vector<std::vector<signed char>>> &                \
+  std::vector<std::vector<std::vector<signed char>>> &                  \
   _get_parent_indices_cache() const libmesh_override                    \
   {                                                                     \
-    static std::vector<std::vector<std::vector<signed char>>> c;      \
+    static std::vector<std::vector<std::vector<signed char>>> c;        \
     return c;                                                           \
   }
 

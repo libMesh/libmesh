@@ -79,7 +79,7 @@ dof_id_type Tri::key () const
 
 
 
-UniquePtr<Elem> Tri::side_ptr (const unsigned int i)
+std::unique_ptr<Elem> Tri::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
@@ -88,7 +88,7 @@ UniquePtr<Elem> Tri::side_ptr (const unsigned int i)
   for (unsigned n=0; n<edge->n_nodes(); ++n)
     edge->set_node(n) = this->node_ptr(Tri3::side_nodes_map[i][n]);
 
-  return UniquePtr<Elem>(edge);
+  return std::unique_ptr<Elem>(edge);
 }
 
 

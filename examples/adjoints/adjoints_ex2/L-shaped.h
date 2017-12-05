@@ -37,7 +37,7 @@ public:
     typedef ParameterPointer<Number> PP;
     parameter_vector.clear();
     for (std::size_t i = 0; i != parameters.size(); ++i)
-      parameter_vector.push_back(UniquePtr<ParameterAccessor<Number>>(new PP(&parameters[i])));
+      parameter_vector.push_back(std::unique_ptr<ParameterAccessor<Number>>(new PP(&parameters[i])));
 
     return parameter_vector;
   }

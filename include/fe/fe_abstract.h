@@ -112,11 +112,11 @@ public:
   /**
    * Builds a specific finite element type.
    *
-   * \returns A UniquePtr<FEAbstract> to the FE object to prevent
+   * \returns A std::unique_ptr<FEAbstract> to the FE object to prevent
    * memory leaks.
    */
-  static UniquePtr<FEAbstract> build (const unsigned int dim,
-                                      const FEType & type);
+  static std::unique_ptr<FEAbstract> build (const unsigned int dim,
+                                            const FEType & type);
 
   /**
    * This is at the core of this class. Use this for each
@@ -514,7 +514,7 @@ protected:
    */
   virtual void compute_shape_functions(const Elem *, const std::vector<Point> & ) =0;
 
-  UniquePtr<FEMap> _fe_map;
+  std::unique_ptr<FEMap> _fe_map;
 
 
   /**

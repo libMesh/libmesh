@@ -131,7 +131,7 @@ void ExactSolution::attach_exact_values (const std::vector<FunctionBase<Number> 
   _exact_values.resize(f.size(), libmesh_nullptr);
 
   // We use clone() to get non-sliced copies of FunctionBase
-  // subclasses, but we don't currently put the resulting UniquePtrs
+  // subclasses, but we don't currently put the resulting std::unique_ptrs
   // into an STL container.
   for (std::size_t i=0; i != f.size(); ++i)
     if (f[i])
@@ -185,7 +185,7 @@ void ExactSolution::attach_exact_derivs (const std::vector<FunctionBase<Gradient
   _exact_derivs.resize(g.size(), libmesh_nullptr);
 
   // We use clone() to get non-sliced copies of FunctionBase
-  // subclasses, but we don't currently put the resulting UniquePtrs
+  // subclasses, but we don't currently put the resulting std::unique_ptrs
   // into an STL container.
   for (std::size_t i=0; i != g.size(); ++i)
     if (g[i])
@@ -239,7 +239,7 @@ void ExactSolution::attach_exact_hessians (std::vector<FunctionBase<Tensor> *> h
   _exact_hessians.resize(h.size(), libmesh_nullptr);
 
   // We use clone() to get non-sliced copies of FunctionBase
-  // subclasses, but we don't currently put the resulting UniquePtrs
+  // subclasses, but we don't currently put the resulting std::unique_ptrs
   // into an STL container.
   for (std::size_t i=0; i != h.size(); ++i)
     if (h[i])
@@ -533,8 +533,8 @@ void ExactSolution::_compute_error(const std::string & sys_name,
     computed_system.variable_scalar_number(var, 0);
 
   // Prepare a global solution and a MeshFunction of the coarse system if we need one
-  UniquePtr<MeshFunction> coarse_values;
-  UniquePtr<NumericVector<Number>> comparison_soln = NumericVector<Number>::build(_equation_systems.comm());
+  std::unique_ptr<MeshFunction> coarse_values;
+  std::unique_ptr<NumericVector<Number>> comparison_soln = NumericVector<Number>::build(_equation_systems.comm());
   if (_equation_systems_fine)
     {
       const System & comparison_system
@@ -545,7 +545,7 @@ void ExactSolution::_compute_error(const std::string & sys_name,
       comparison_soln->init(comparison_system.solution->size(), true, SERIAL);
       (*comparison_soln) = global_soln;
 
-      coarse_values = UniquePtr<MeshFunction>
+      coarse_values = std::unique_ptr<MeshFunction>
         (new MeshFunction(_equation_systems,
                           *comparison_soln,
                           comparison_system.get_dof_map(),

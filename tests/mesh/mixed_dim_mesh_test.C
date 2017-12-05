@@ -176,7 +176,7 @@ public:
 
   void testPointLocatorTree()
   {
-    UniquePtr<PointLocatorBase> locator = _mesh->sub_point_locator();
+    std::unique_ptr<PointLocatorBase> locator = _mesh->sub_point_locator();
 
     Point top_point(0.5, 0.5);
     const Elem* top_elem = (*locator)(top_point);

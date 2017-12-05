@@ -53,9 +53,9 @@ public:
     : _func(func.clone())
   { }
 
-  virtual UniquePtr<FEMFunctionBase<Output>> clone () const libmesh_override
+  virtual std::unique_ptr<FEMFunctionBase<Output>> clone () const libmesh_override
   {
-    return UniquePtr<FEMFunctionBase<Output>>
+    return std::unique_ptr<FEMFunctionBase<Output>>
       (new WrappedFunctor<Output> (*_func));
   }
 
@@ -78,7 +78,7 @@ public:
 
 protected:
 
-  UniquePtr<FunctionBase<Output>> _func;
+  std::unique_ptr<FunctionBase<Output>> _func;
 };
 
 

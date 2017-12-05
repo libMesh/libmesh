@@ -118,20 +118,20 @@ public:
   /**
    * The \p Elem::side() member makes no sense for nodes.
    */
-  virtual UniquePtr<Elem> side_ptr (const unsigned int) libmesh_override
-  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
+  virtual std::unique_ptr<Elem> side_ptr (const unsigned int) libmesh_override
+  { libmesh_not_implemented(); return std::unique_ptr<Elem>(); }
 
   /**
    * The \p Elem::build_side_ptr() member makes no sense for nodes.
    */
-  virtual UniquePtr<Elem> build_side_ptr (const unsigned int, bool) libmesh_override
-  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int, bool) libmesh_override
+  { libmesh_not_implemented(); return std::unique_ptr<Elem>(); }
 
   /**
    * The \p Elem::build_edge_ptr() member makes no sense for nodes.
    */
-  virtual UniquePtr<Elem> build_edge_ptr (const unsigned int) libmesh_override
-  { libmesh_not_implemented(); return UniquePtr<Elem>(); }
+  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int) libmesh_override
+  { libmesh_not_implemented(); return std::unique_ptr<Elem>(); }
 
   /**
    * \returns 1.

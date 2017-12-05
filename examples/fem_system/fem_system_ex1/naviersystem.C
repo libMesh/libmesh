@@ -59,8 +59,8 @@ public:
     output(_w_var) = (_Re+1)*(x*x + y*y);
   }
 
-  virtual UniquePtr<FunctionBase<Number>> clone() const
-  { return UniquePtr<FunctionBase<Number>> (new BdyFunction(_u_var, _v_var, _w_var, _Re)); }
+  virtual std::unique_ptr<FunctionBase<Number>> clone() const
+  { return std::unique_ptr<FunctionBase<Number>> (new BdyFunction(_u_var, _v_var, _w_var, _Re)); }
 
 private:
   const unsigned int _u_var, _v_var, _w_var;
@@ -271,12 +271,12 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       // Compute the solution & its gradient at the old Newton iterate
-      c.interior_value(p_var, qp, p),
-      c.interior_value(u_var, qp, u),
-      c.interior_value(v_var, qp, v),
+      c.interior_value(p_var, qp, p);
+      c.interior_value(u_var, qp, u);
+      c.interior_value(v_var, qp, v);
       c.interior_value(w_var, qp, w);
-      c.interior_gradient(u_var, qp, grad_u),
-      c.interior_gradient(v_var, qp, grad_v),
+      c.interior_gradient(u_var, qp, grad_u);
+      c.interior_gradient(v_var, qp, grad_v);
       c.interior_gradient(w_var, qp, grad_w);
 
       // Definitions for convenience.  It is sometimes simpler to do a
@@ -432,8 +432,8 @@ bool NavierSystem::element_constraint (bool request_jacobian,
     {
       // Compute the velocity gradient at the old Newton iterate
       c.interior_gradient(u_var, qp, grad_u),
-      c.interior_gradient(v_var, qp, grad_v),
-      c.interior_gradient(w_var, qp, grad_w);
+        c.interior_gradient(v_var, qp, grad_v),
+        c.interior_gradient(w_var, qp, grad_w);
 
       // Now a loop over the pressure degrees of freedom.  This
       // computes the contributions of the continuity equation.
@@ -563,8 +563,8 @@ bool NavierSystem::mass_residual (bool request_jacobian,
     {
       // Compute time derivatives
       c.interior_rate(u_var, qp, u_dot),
-      c.interior_rate(v_var, qp, v_dot),
-      c.interior_rate(w_var, qp, w_dot);
+        c.interior_rate(v_var, qp, v_dot),
+        c.interior_rate(w_var, qp, w_dot);
 
       // We pull as many calculations as possible outside of loops
       Number JxWxRe   = JxW[qp] * Reynolds;

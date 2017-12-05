@@ -23,7 +23,7 @@
 //
 // This is the fifth example program.  It builds on
 // the previous two examples, and extends the use
-// of the UniquePtr as a convenient build method to
+// of the std::unique_ptr as a convenient build method to
 // determine the quadrature rule at run time.
 
 
@@ -231,31 +231,31 @@ void assemble_poisson(EquationSystems & es,
 
   // Build a Finite Element object of the specified type.  Since the
   // FEBase::build() member dynamically creates memory we will
-  // store the object as a UniquePtr<FEBase>.  Below, the
-  // functionality of UniquePtr's is described more detailed in
+  // store the object as a std::unique_ptr<FEBase>.  Below, the
+  // functionality of std::unique_ptr's is described more detailed in
   // the context of building quadrature rules.
-  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
 
   // Now this deviates from example 4.  we create a
   // 5th order quadrature rule of user-specified type
   // for numerical integration.  Note that not all
   // quadrature rules support this order.
-  UniquePtr<QBase> qrule(QBase::build(quad_type, dim, THIRD));
+  std::unique_ptr<QBase> qrule(QBase::build(quad_type, dim, THIRD));
 
   // Tell the finite element object to use our
-  // quadrature rule.  Note that a UniquePtr<QBase> returns
+  // quadrature rule.  Note that a std::unique_ptr<QBase> returns
   // a QBase* pointer to the object it handles with get().
-  // However, using get(), the UniquePtr<QBase> qrule is
+  // However, using get(), the std::unique_ptr<QBase> qrule is
   // still in charge of this pointer. I.e., when qrule goes
   // out of scope, it will safely delete the QBase object it
   // points to.  This behavior may be overridden using
-  // UniquePtr<Xyz>::release(), but is currently not
+  // std::unique_ptr<Xyz>::release(), but is currently not
   // recommended.
   fe->attach_quadrature_rule (qrule.get());
 
   // Declare a special finite element object for
   // boundary integration.
-  UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe_face (FEBase::build(dim, fe_type));
 
   // As already seen in example 3, boundary integration
   // requires a quadrature rule.  Here, however,
@@ -265,25 +265,25 @@ void assemble_poisson(EquationSystems & es,
   // with the type directly determined from qrule, namely
   // through:
   // \verbatim
-  // UniquePtr<QBase>  qface (QBase::build(qrule->type(),
+  // std::unique_ptr<QBase>  qface (QBase::build(qrule->type(),
   // dim-1,
   // THIRD));
   // \endverbatim
-  // And again: using the UniquePtr<QBase> relaxes
+  // And again: using the std::unique_ptr<QBase> relaxes
   // the need to delete the object afterward,
   // they clean up themselves.
-  UniquePtr<QBase>  qface (QBase::build(quad_type,
-                                        dim-1,
-                                        THIRD));
+  std::unique_ptr<QBase>  qface (QBase::build(quad_type,
+                                              dim-1,
+                                              THIRD));
 
   // Tell the finite element object to use our
-  // quadrature rule.  Note that a UniquePtr<QBase> returns
+  // quadrature rule.  Note that a std::unique_ptr<QBase> returns
   // a QBase* pointer to the object it handles with get().
-  // However, using get(), the UniquePtr<QBase> qface is
+  // However, using get(), the std::unique_ptr<QBase> qface is
   // still in charge of this pointer. I.e., when qface goes
   // out of scope, it will safely delete the QBase object it
   // points to.  This behavior may be overridden using
-  // UniquePtr<Xyz>::release(), but is not recommended.
+  // std::unique_ptr<Xyz>::release(), but is not recommended.
   fe_face->attach_quadrature_rule (qface.get());
 
   // This is again identical to example 4, and not commented.

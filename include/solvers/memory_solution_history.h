@@ -73,9 +73,9 @@ public:
   /**
    * Definition of the clone function needed for the setter function
    */
-  virtual UniquePtr<SolutionHistory > clone() const libmesh_override
+  virtual std::unique_ptr<SolutionHistory > clone() const libmesh_override
   {
-    return UniquePtr<SolutionHistory >(new MemorySolutionHistory(_system));
+    return libmesh_make_unique<MemorySolutionHistory>(_system);
   }
 
 private:

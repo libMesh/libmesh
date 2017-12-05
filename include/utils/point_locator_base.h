@@ -73,12 +73,12 @@ public:
   /**
    * Builds an PointLocator for the mesh \p mesh.
    * Optionally takes a master PointLocator to save memory.
-   * An \p UniquePtr<PointLocatorBase> is returned to prevent memory leak.
+   * An \p std::unique_ptr<PointLocatorBase> is returned to prevent memory leak.
    * This way the user need not remember to delete the object.
    */
-  static UniquePtr<PointLocatorBase> build (PointLocatorType t,
-                                            const MeshBase & mesh,
-                                            const PointLocatorBase * master = libmesh_nullptr);
+  static std::unique_ptr<PointLocatorBase> build (PointLocatorType t,
+                                                  const MeshBase & mesh,
+                                                  const PointLocatorBase * master = libmesh_nullptr);
 
   /**
    * Clears the \p PointLocator.

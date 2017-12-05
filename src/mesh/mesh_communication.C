@@ -630,7 +630,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
             for (auto s : elem->side_index_range())
               if (elem->neighbor_ptr(s) == libmesh_nullptr)
                 {
-                  UniquePtr<const Elem> side(elem->build_side_ptr(s));
+                  std::unique_ptr<const Elem> side(elem->build_side_ptr(s));
 
                   for (unsigned int n=0; n<side->n_vertices(); n++)
                     my_interface_node_set.insert (side->node_id(n));

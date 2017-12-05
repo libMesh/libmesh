@@ -68,9 +68,7 @@ public:
   {
     if (!parameter_vector.size())
       for (std::size_t i = 0; i != parameters.size(); ++i)
-        parameter_vector.push_back
-          (UniquePtr<ParameterAccessor<Number>>
-            (new ParameterPointer<Number>(&parameters[i])));
+        parameter_vector.push_back(std::unique_ptr<ParameterAccessor<Number>>(new ParameterPointer<Number>(&parameters[i])));
 
     return parameter_vector;
   }

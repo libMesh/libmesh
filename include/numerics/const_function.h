@@ -62,9 +62,9 @@ public:
       output(i) = _c;
   }
 
-  virtual UniquePtr<FunctionBase<Output>> clone() const libmesh_override
+  virtual std::unique_ptr<FunctionBase<Output>> clone() const libmesh_override
   {
-    return UniquePtr<FunctionBase<Output>>
+    return std::unique_ptr<FunctionBase<Output>>
       (new ConstFunction<Output>(_c));
   }
 

@@ -135,7 +135,7 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
       const MeshBase & mesh = this->_eqn_systems.get_mesh();
 
       // build the point locator.  Only \p TREE version available
-      //UniquePtr<PointLocatorBase> ap (PointLocatorBase::build (TREE, mesh));
+      //std::unique_ptr<PointLocatorBase> ap (PointLocatorBase::build (TREE, mesh));
       //this->_point_locator = ap.release();
       // this->_point_locator = new PointLocatorTree (mesh, point_locator_build_type);
       this->_point_locator = mesh.sub_point_locator().release();
@@ -164,7 +164,7 @@ MeshFunction::clear ()
 
 
 
-UniquePtr<FunctionBase<Number>> MeshFunction::clone () const
+std::unique_ptr<FunctionBase<Number>> MeshFunction::clone () const
 {
   FunctionBase<Number> * mf_clone =
     new MeshFunction(_eqn_systems, _vector, _dof_map, _system_vars, this);
@@ -172,7 +172,7 @@ UniquePtr<FunctionBase<Number>> MeshFunction::clone () const
   if (this->initialized())
     mf_clone->init();
 
-  return UniquePtr<FunctionBase<Number>>(mf_clone);
+  return std::unique_ptr<FunctionBase<Number>>(mf_clone);
 }
 
 
@@ -486,7 +486,7 @@ void MeshFunction::gradient (const Point & p,
 
             const FEType & fe_type = this->_dof_map.variable_type(var);
 
-            UniquePtr<FEBase> point_fe (FEBase::build(dim, fe_type));
+            std::unique_ptr<FEBase> point_fe (FEBase::build(dim, fe_type));
             const std::vector<std::vector<RealGradient>> & dphi = point_fe->get_dphi();
             point_fe->reinit(element, &point_list);
 
@@ -570,7 +570,7 @@ void MeshFunction::discontinuous_gradient (const Point & p,
 
           const FEType & fe_type = this->_dof_map.variable_type(var);
 
-          UniquePtr<FEBase> point_fe (FEBase::build(dim, fe_type));
+          std::unique_ptr<FEBase> point_fe (FEBase::build(dim, fe_type));
           const std::vector<std::vector<RealGradient>> & dphi = point_fe->get_dphi();
           point_fe->reinit(element, &point_list);
 
@@ -649,7 +649,7 @@ void MeshFunction::hessian (const Point & p,
               }
             const FEType & fe_type = this->_dof_map.variable_type(var);
 
-            UniquePtr<FEBase> point_fe (FEBase::build(dim, fe_type));
+            std::unique_ptr<FEBase> point_fe (FEBase::build(dim, fe_type));
             const std::vector<std::vector<RealTensor>> & d2phi =
               point_fe->get_d2phi();
             point_fe->reinit(element, &point_list);

@@ -81,7 +81,7 @@ void DefaultCoupling::operator()
   bool check_periodic_bcs =
     (_periodic_bcs && !_periodic_bcs->empty());
 
-  UniquePtr<PointLocatorBase> point_locator;
+  std::unique_ptr<PointLocatorBase> point_locator;
   if (check_periodic_bcs)
     {
       libmesh_assert(_mesh);

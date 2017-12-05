@@ -65,9 +65,9 @@ public:
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
    */
-  virtual UniquePtr<Partitioner> clone () const libmesh_override
+  virtual std::unique_ptr<Partitioner> clone () const libmesh_override
   {
-    return UniquePtr<Partitioner>(new SubdomainPartitioner());
+    return libmesh_make_unique<SubdomainPartitioner>();
   }
 
   /**
@@ -92,14 +92,14 @@ public:
    * sp.internal_partitioner().reset(new SFCPartitioner);
    * \endcode
    */
-  UniquePtr<Partitioner> & internal_partitioner() { return _internal_partitioner; }
+  std::unique_ptr<Partitioner> & internal_partitioner() { return _internal_partitioner; }
 
 protected:
   /**
    * The internal Partitioner we use. Public access via the
    * internal_partitioner() member function.
    */
-  UniquePtr<Partitioner> _internal_partitioner;
+  std::unique_ptr<Partitioner> _internal_partitioner;
 
   /**
    * Partition the \p MeshBase into \p n subdomains.

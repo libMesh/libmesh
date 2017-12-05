@@ -227,7 +227,7 @@ Number UnsteadySolver::old_nonlinear_solution(const dof_id_type global_dof_numbe
 Real UnsteadySolver::du(const SystemNorm & norm) const
 {
 
-  UniquePtr<NumericVector<Number>> solution_copy =
+  std::unique_ptr<NumericVector<Number>> solution_copy =
     _system.solution->clone();
 
   solution_copy->add(-1., _system.get_vector("_old_nonlinear_solution"));

@@ -296,11 +296,11 @@ public:
    * A version of build_solution_vector which is appropriate for
    * "parallel" output formats like Nemesis.
    *
-   * \returns A UniquePtr to a node-major NumericVector of total
+   * \returns A std::unique_ptr to a node-major NumericVector of total
    * length n_nodes*n_vars that various I/O classes can then use to
    * get the local values they need to write on each processor.
    */
-  UniquePtr<NumericVector<Number>>
+  std::unique_ptr<NumericVector<Number>>
   build_parallel_solution_vector(const std::set<std::string> * system_names=libmesh_nullptr) const;
 
   /**

@@ -86,8 +86,8 @@ public:
   /**
    * Virtual copy-constructor, creates a copy of this mesh
    */
-  virtual UniquePtr<MeshBase> clone () const libmesh_override
-  { return UniquePtr<MeshBase>(new ReplicatedMesh(*this)); }
+  virtual std::unique_ptr<MeshBase> clone () const libmesh_override
+  { return libmesh_make_unique<ReplicatedMesh>(*this); }
 
   /**
    * Destructor.

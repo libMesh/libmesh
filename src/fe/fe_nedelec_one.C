@@ -112,7 +112,7 @@ void nedelec_one_nodal_soln(const Elem * elem,
 
         // Need to create new fe object so the shape function as the FETransformation
         // applied to it.
-        UniquePtr<FEVectorBase> vis_fe = FEVectorBase::build(dim,fe_type);
+        std::unique_ptr<FEVectorBase> vis_fe = FEVectorBase::build(dim,fe_type);
 
         const std::vector<std::vector<RealGradient>> & vis_phi = vis_fe->get_phi();
 
@@ -407,8 +407,8 @@ void nedelec_one_compute_constraints (DofConstraints & /*constraints*/,
   // level than their neighbors!
   libmesh_assert(parent);
 
-  const UniquePtr<const Elem> my_side     (elem->build_side_ptr(s));
-  const UniquePtr<const Elem> parent_side (parent->build_side_ptr(s));
+  const std::unique_ptr<const Elem> my_side     (elem->build_side_ptr(s));
+  const std::unique_ptr<const Elem> parent_side (parent->build_side_ptr(s));
 
   // This function gets called element-by-element, so there
   // will be a lot of memory allocation going on.  We can

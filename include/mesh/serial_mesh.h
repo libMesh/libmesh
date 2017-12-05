@@ -60,8 +60,8 @@ public:
 
   SerialMesh (const UnstructuredMesh & other_mesh) : ReplicatedMesh(other_mesh) {}
 
-  virtual UniquePtr<MeshBase> clone () const libmesh_override
-  { return UniquePtr<MeshBase>(new SerialMesh(*this)); }
+  virtual std::unique_ptr<MeshBase> clone () const libmesh_override
+  { return libmesh_make_unique<SerialMesh>(*this); }
 
   ~SerialMesh() {}
 };

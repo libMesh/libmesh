@@ -420,7 +420,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
   Vec subrhs = libmesh_nullptr;
   Vec subsolution = libmesh_nullptr;
   VecScatter scatter = libmesh_nullptr;
-  UniquePtr<PetscMatrix<Number>> subprecond_matrix;
+  std::unique_ptr<PetscMatrix<Number>> subprecond_matrix;
 
   // Set operators.  Also restrict rhs and solution vector to
   // subdomain if necessary.
@@ -687,7 +687,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
   Vec subrhs = libmesh_nullptr;
   Vec subsolution = libmesh_nullptr;
   VecScatter scatter = libmesh_nullptr;
-  UniquePtr<PetscMatrix<Number>> subprecond_matrix;
+  std::unique_ptr<PetscMatrix<Number>> subprecond_matrix;
 
   // Set operators.  Also restrict rhs and solution vector to
   // subdomain if necessary.
@@ -1223,7 +1223,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
   Vec subrhs = libmesh_nullptr;
   Vec subsolution = libmesh_nullptr;
   VecScatter scatter = libmesh_nullptr;
-  UniquePtr<PetscMatrix<Number>> subprecond_matrix;
+  std::unique_ptr<PetscMatrix<Number>> subprecond_matrix;
 
   // Close the matrices and vectors in case this wasn't already done.
   solution->close ();

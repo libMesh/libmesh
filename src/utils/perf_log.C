@@ -706,8 +706,11 @@ PerfData PerfLog::get_perf_data(const std::string & label, const std::string & h
   auto iter = std::find_if
     (log.begin(), log.end(),
      [&label, &header] (log_type::const_reference a)
-     { return !std::strcmp(header.c_str(), a.first.first) &&
-              !std::strcmp(label.c_str(), a.first.second); });
+     {
+       return
+       !std::strcmp(header.c_str(), a.first.first) &&
+       !std::strcmp(label.c_str(), a.first.second);
+     });
 
   libmesh_assert(iter != log.end());
 

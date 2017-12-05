@@ -37,10 +37,10 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
                   const FunctionBase<Gradient> * g_in) :
   b(b_in),
   variables(variables_in),
-  f(f_in ? f_in->clone() : UniquePtr<FunctionBase<Number>>()),
-  g(g_in ? g_in->clone() : UniquePtr<FunctionBase<Gradient>>()),
-  f_fem(UniquePtr<FEMFunctionBase<Number>>()),
-  g_fem(UniquePtr<FEMFunctionBase<Gradient>>()),
+  f(f_in ? f_in->clone() : std::unique_ptr<FunctionBase<Number>>()),
+  g(g_in ? g_in->clone() : std::unique_ptr<FunctionBase<Gradient>>()),
+  f_fem(std::unique_ptr<FEMFunctionBase<Number>>()),
+  g_fem(std::unique_ptr<FEMFunctionBase<Gradient>>()),
   f_system(libmesh_nullptr)
 {
   libmesh_assert(f.get());
@@ -57,10 +57,10 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
                   VariableIndexing type) :
   b(b_in),
   variables(variables_in),
-  f(UniquePtr<FunctionBase<Number>>()),
-  g(UniquePtr<FunctionBase<Gradient>>()),
-  f_fem(UniquePtr<FEMFunctionBase<Number>>()),
-  g_fem(UniquePtr<FEMFunctionBase<Gradient>>()),
+  f(std::unique_ptr<FunctionBase<Number>>()),
+  g(std::unique_ptr<FunctionBase<Gradient>>()),
+  f_fem(std::unique_ptr<FEMFunctionBase<Number>>()),
+  g_fem(std::unique_ptr<FEMFunctionBase<Gradient>>()),
   f_system(libmesh_nullptr)
 {
   if (type == LOCAL_VARIABLE_ORDER)
@@ -86,10 +86,10 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
                   VariableIndexing type) :
   b(b_in),
   variables(variables_in),
-  f(UniquePtr<FunctionBase<Number>>()),
-  g(UniquePtr<FunctionBase<Gradient>>()),
-  f_fem(UniquePtr<FEMFunctionBase<Number>>()),
-  g_fem(UniquePtr<FEMFunctionBase<Gradient>>()),
+  f(std::unique_ptr<FunctionBase<Number>>()),
+  g(std::unique_ptr<FunctionBase<Gradient>>()),
+  f_fem(std::unique_ptr<FEMFunctionBase<Number>>()),
+  g_fem(std::unique_ptr<FEMFunctionBase<Gradient>>()),
   f_system(libmesh_nullptr)
 {
   if (type == LOCAL_VARIABLE_ORDER)
@@ -122,10 +122,10 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
                   const FEMFunctionBase<Gradient> * g_in) :
   b(b_in),
   variables(variables_in),
-  f(UniquePtr<FunctionBase<Number>>()),
-  g(UniquePtr<FunctionBase<Gradient>>()),
-  f_fem(f_in ? f_in->clone() : UniquePtr<FEMFunctionBase<Number>>()),
-  g_fem(g_in ? g_in->clone() : UniquePtr<FEMFunctionBase<Gradient>>()),
+  f(std::unique_ptr<FunctionBase<Number>>()),
+  g(std::unique_ptr<FunctionBase<Gradient>>()),
+  f_fem(f_in ? f_in->clone() : std::unique_ptr<FEMFunctionBase<Number>>()),
+  g_fem(g_in ? g_in->clone() : std::unique_ptr<FEMFunctionBase<Gradient>>()),
   f_system(&f_sys_in)
 {
   libmesh_assert(f_fem.get());
@@ -140,10 +140,10 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
                   VariableIndexing type) :
   b(b_in),
   variables(variables_in),
-  f(UniquePtr<FunctionBase<Number>>()),
-  g(UniquePtr<FunctionBase<Gradient>>()),
-  f_fem(UniquePtr<FEMFunctionBase<Number>>()),
-  g_fem(UniquePtr<FEMFunctionBase<Gradient>>()),
+  f(std::unique_ptr<FunctionBase<Number>>()),
+  g(std::unique_ptr<FunctionBase<Gradient>>()),
+  f_fem(std::unique_ptr<FEMFunctionBase<Number>>()),
+  g_fem(std::unique_ptr<FEMFunctionBase<Gradient>>()),
   f_system(&f_sys_in)
 {
   if (type == LOCAL_VARIABLE_ORDER)
@@ -168,10 +168,10 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
                   VariableIndexing type) :
   b(b_in),
   variables(variables_in),
-  f(UniquePtr<FunctionBase<Number>>()),
-  g(UniquePtr<FunctionBase<Gradient>>()),
-  f_fem(UniquePtr<FEMFunctionBase<Number>>()),
-  g_fem(UniquePtr<FEMFunctionBase<Gradient>>()),
+  f(std::unique_ptr<FunctionBase<Number>>()),
+  g(std::unique_ptr<FunctionBase<Gradient>>()),
+  f_fem(std::unique_ptr<FEMFunctionBase<Number>>()),
+  g_fem(std::unique_ptr<FEMFunctionBase<Gradient>>()),
   f_system(&f_sys_in)
 {
   if (type == LOCAL_VARIABLE_ORDER)
@@ -198,13 +198,13 @@ DirichletBoundary(const DirichletBoundary & dirichlet_in) :
   b(dirichlet_in.b),
   variables(dirichlet_in.variables),
   f(dirichlet_in.f.get() ?
-    dirichlet_in.f->clone() : UniquePtr<FunctionBase<Number>>()),
+    dirichlet_in.f->clone() : std::unique_ptr<FunctionBase<Number>>()),
   g(dirichlet_in.g.get() ?
-    dirichlet_in.g->clone() : UniquePtr<FunctionBase<Gradient>>()),
+    dirichlet_in.g->clone() : std::unique_ptr<FunctionBase<Gradient>>()),
   f_fem(dirichlet_in.f_fem.get() ?
-        dirichlet_in.f_fem->clone() : UniquePtr<FEMFunctionBase<Number>>()),
+        dirichlet_in.f_fem->clone() : std::unique_ptr<FEMFunctionBase<Number>>()),
   g_fem(dirichlet_in.g_fem.get() ?
-        dirichlet_in.g_fem->clone() : UniquePtr<FEMFunctionBase<Gradient>>()),
+        dirichlet_in.g_fem->clone() : std::unique_ptr<FEMFunctionBase<Gradient>>()),
   f_system(dirichlet_in.f_system)
 {
   libmesh_assert(f.get() || f_fem.get());

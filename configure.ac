@@ -220,6 +220,16 @@ if (test "x$have_cxx11_initializer_list" != "xyes"); then
   AC_MSG_ERROR([libMesh requires C++11 initializer list support])
 fi
 
+LIBMESH_TEST_CXX11_UNIQUE_PTR
+if (test "x$have_cxx11_unique_ptr" != "xyes"); then
+  AC_MSG_ERROR([libMesh requires C++11 std::unique_ptr support])
+fi
+
+LIBMESH_TEST_CXX11_MAKE_UNIQUE_WORKAROUND
+if (test "x$have_cxx11_make_unique_workaround" != "xyes"); then
+  AC_MSG_ERROR([libMesh requires C++11 variadic template support])
+fi
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
@@ -232,9 +242,7 @@ LIBMESH_TEST_CXX11_LAMBDA
 LIBMESH_TEST_CXX11_CONSTEXPR
 LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS
 LIBMESH_TEST_CXX11_SHARED_PTR
-LIBMESH_TEST_CXX11_UNIQUE_PTR
 LIBMESH_TEST_CXX14_MAKE_UNIQUE
-LIBMESH_TEST_CXX11_MAKE_UNIQUE_WORKAROUND
 LIBMESH_TEST_CXX11_REGEX
 LIBMESH_TEST_CXX11_OVERRIDE
 LIBMESH_TEST_CXX11_VARIADIC_TEMPLATES

@@ -126,9 +126,9 @@ public:
 
         for (int order=0; order<7; ++order)
           {
-            UniquePtr<QBase> qrule = QBase::build(QMONOMIAL,
-                                                  dims[i],
-                                                  static_cast<Order>(order));
+            std::unique_ptr<QBase> qrule = QBase::build(QMONOMIAL,
+                                                        dims[i],
+                                                        static_cast<Order>(order));
             qrule->init(elem_type[i]);
 
             // In 3D, max(z_power)==order, in 2D max(z_power)==0
@@ -182,9 +182,9 @@ public:
     for (int qt=0; qt<3; ++qt)
       for (int order=0; order<7; ++order)
         {
-          UniquePtr<QBase> qrule = QBase::build(qtype[qt],
-                                                /*dim=*/3,
-                                                static_cast<Order>(order));
+          std::unique_ptr<QBase> qrule = QBase::build(qtype[qt],
+                                                      /*dim=*/3,
+                                                      static_cast<Order>(order));
 
           // Initialize on a TET element
           qrule->init (TET4);
@@ -263,9 +263,9 @@ public:
     for (int qt=0; qt<4; ++qt)
       for (int order=0; order<10; ++order)
         {
-          UniquePtr<QBase> qrule = QBase::build(qtype[qt],
-                                                /*dim=*/2,
-                                                static_cast<Order>(order));
+          std::unique_ptr<QBase> qrule = QBase::build(qtype[qt],
+                                                      /*dim=*/2,
+                                                      static_cast<Order>(order));
 
           // Initialize on a TRI element
           qrule->init (TRI3);
@@ -367,9 +367,9 @@ public:
       {
         for (int order=0; order<10; ++order)
           {
-            UniquePtr<QBase> qrule = QBase::build(qtype[qt],
-                                                  /*dim=*/1,
-                                                  static_cast<Order>(order));
+            std::unique_ptr<QBase> qrule = QBase::build(qtype[qt],
+                                                        /*dim=*/1,
+                                                        static_cast<Order>(order));
 
             // Initialize on a 1D element, EDGE2/3/4 should not matter...
             qrule->init (EDGE2);
@@ -405,9 +405,9 @@ public:
   template <QuadratureType qtype, Order order>
   void testBuild ()
   {
-    UniquePtr<QBase> qrule1D = QBase::build (qtype, 1, order);
-    UniquePtr<QBase> qrule2D = QBase::build (qtype, 2, order);
-    UniquePtr<QBase> qrule3D = QBase::build (qtype, 3, order);
+    std::unique_ptr<QBase> qrule1D = QBase::build (qtype, 1, order);
+    std::unique_ptr<QBase> qrule2D = QBase::build (qtype, 2, order);
+    std::unique_ptr<QBase> qrule3D = QBase::build (qtype, 3, order);
 
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(1) , qrule1D->get_dim() );
     CPPUNIT_ASSERT_EQUAL ( static_cast<unsigned int>(2) , qrule2D->get_dim() );
@@ -425,7 +425,7 @@ public:
   template <QuadratureType qtype, Order order, unsigned int exactorder>
   void test1DWeights ()
   {
-    UniquePtr<QBase> qrule = QBase::build(qtype , 1, order);
+    std::unique_ptr<QBase> qrule = QBase::build(qtype , 1, order);
     qrule->init (EDGE3);
 
     for (unsigned int mode=0; mode <= exactorder; ++mode)
@@ -459,7 +459,7 @@ public:
   template <QuadratureType qtype, Order order, unsigned int exactorder>
   void test2DWeights ()
   {
-    UniquePtr<QBase> qrule = QBase::build(qtype, 2, order);
+    std::unique_ptr<QBase> qrule = QBase::build(qtype, 2, order);
     qrule->init (QUAD8);
 
     for (unsigned int modex=0; modex <= exactorder; ++modex)
@@ -504,7 +504,7 @@ public:
   template <QuadratureType qtype, Order order, unsigned int exactorder>
   void test3DWeights ()
   {
-    UniquePtr<QBase> qrule = QBase::build(qtype, 3, order);
+    std::unique_ptr<QBase> qrule = QBase::build(qtype, 3, order);
     qrule->init (HEX20);
 
     for (unsigned int modex=0; modex <= exactorder; ++modex)

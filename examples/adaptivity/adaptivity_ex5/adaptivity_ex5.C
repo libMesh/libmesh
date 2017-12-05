@@ -111,7 +111,7 @@ Number exact_value (const Point & p,
 
 // With --enable-fparser, the user can also optionally set their own
 // exact solution equations.
-UniquePtr<FunctionBase<Number>> parsed_solution;
+std::unique_ptr<FunctionBase<Number>> parsed_solution;
 
 
 // Returns a string with 'number' formatted and placed directly
@@ -588,10 +588,10 @@ void assemble_cd (EquationSystems & es,
 
   // Build a Finite Element object of the specified type.  Since the
   // FEBase::build() member dynamically creates memory we will
-  // store the object as a UniquePtr<FEBase>.  This can be thought
+  // store the object as a std::unique_ptr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
-  UniquePtr<FEBase> fe      (FEBase::build(dim, fe_type));
-  UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe      (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe_face (FEBase::build(dim, fe_type));
 
   // A Gauss quadrature rule for numerical integration.
   // Let the FEType object decide what order rule is appropriate.

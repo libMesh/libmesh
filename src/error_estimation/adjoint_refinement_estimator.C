@@ -114,38 +114,38 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
           // If the residual physics pointer is not null, use it when
           // evaluating here.
-            {
-              const bool swapping_physics = _residual_evaluation_physics;
-              if (swapping_physics)
-                dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
+          {
+            const bool swapping_physics = _residual_evaluation_physics;
+            if (swapping_physics)
+              dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
 
-              // Assemble without applying constraints, to capture the solution values on the boundary
-              (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false, false, true);
+            // Assemble without applying constraints, to capture the solution values on the boundary
+            (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false, false, true);
 
-              // Get the residual vector (no constraints applied on boundary, so we wont blow away the lift)
-              coarse_residual = &(dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
-              coarse_residual->close();
+            // Get the residual vector (no constraints applied on boundary, so we wont blow away the lift)
+            coarse_residual = &(dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
+            coarse_residual->close();
 
-              // Now build the lift function and add it to the system vectors
-              std::ostringstream liftfunc_name;
-              liftfunc_name << "adjoint_lift_function" << j;
+            // Now build the lift function and add it to the system vectors
+            std::ostringstream liftfunc_name;
+            liftfunc_name << "adjoint_lift_function" << j;
 
-              system.add_vector(liftfunc_name.str());
+            system.add_vector(liftfunc_name.str());
 
-              // Initialize lift with coarse adjoint solve associate with this flux QoI to begin with
-              system.get_vector(liftfunc_name.str()).init(system.get_adjoint_solution(j), false);
+            // Initialize lift with coarse adjoint solve associate with this flux QoI to begin with
+            system.get_vector(liftfunc_name.str()).init(system.get_adjoint_solution(j), false);
 
-              // Build the actual lift using adjoint dirichlet conditions
-              system.get_dof_map().enforce_adjoint_constraints_exactly
-                (system.get_vector(liftfunc_name.str()), static_cast<unsigned int>(j));
+            // Build the actual lift using adjoint dirichlet conditions
+            system.get_dof_map().enforce_adjoint_constraints_exactly
+              (system.get_vector(liftfunc_name.str()), static_cast<unsigned int>(j));
 
-              // Compute the flux R(u^h, L)
-              std::cout<<"The flux QoI "<<static_cast<unsigned int>(j)<<" is: "<<coarse_residual->dot(system.get_vector(liftfunc_name.str()))<<std::endl<<std::endl;
+            // Compute the flux R(u^h, L)
+            std::cout<<"The flux QoI "<<static_cast<unsigned int>(j)<<" is: "<<coarse_residual->dot(system.get_vector(liftfunc_name.str()))<<std::endl<<std::endl;
 
-              // Swap back if needed
-              if (swapping_physics)
-                dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
-            }
+            // Swap back if needed
+            if (swapping_physics)
+              dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
+          }
         } // End if QoI in set and flux/dirichlet boundary QoI
     } // End loop over QoIs
 
@@ -174,7 +174,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   system.project_solution_on_reinit() = true;
 
   // And it'll be best to avoid any repartitioning
-  UniquePtr<Partitioner> old_partitioner(mesh.partitioner().release());
+  std::unique_ptr<Partitioner> old_partitioner(mesh.partitioner().release());
 
   // And we can't allow any renumbering
   const bool old_renumbering_setting = mesh.allow_renumbering();
@@ -247,20 +247,20 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
   // If the residual physics pointer is not null, use it when
   // evaluating here.
-    {
-      const bool swapping_physics = _residual_evaluation_physics;
-      if (swapping_physics)
-        dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
+  {
+    const bool swapping_physics = _residual_evaluation_physics;
+    if (swapping_physics)
+      dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
 
-      // Rebuild the rhs with the projected primal solution, constraints
-      // have to be applied to get the correct error estimate since error
-      // on the Dirichlet boundary is zero
-      (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
+    // Rebuild the rhs with the projected primal solution, constraints
+    // have to be applied to get the correct error estimate since error
+    // on the Dirichlet boundary is zero
+    (dynamic_cast<ImplicitSystem &>(system)).assembly(true, false);
 
-      // Swap back if needed
-      if (swapping_physics)
-        dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
-    }
+    // Swap back if needed
+    if (swapping_physics)
+      dynamic_cast<DifferentiableSystem &>(system).swap_physics(_residual_evaluation_physics);
+  }
 
   NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem &>(system)).get_vector("RHS Vector");
   projected_residual.close();
@@ -446,12 +446,12 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // Localize the global rhs and adjoint solution vectors (which might be shared on multiple processors) onto a
   // local ghosted vector, this ensures each processor has all the dof_indices to compute an error indicator for
   // an element it owns
-  UniquePtr<NumericVector<Number>> localized_projected_residual = NumericVector<Number>::build(system.comm());
+  std::unique_ptr<NumericVector<Number>> localized_projected_residual = NumericVector<Number>::build(system.comm());
   localized_projected_residual->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_send_list(), false, GHOSTED);
   projected_residual.localize(*localized_projected_residual, system.get_dof_map().get_send_list());
 
   // Each adjoint solution will also require ghosting; for efficiency we'll reuse the same memory
-  UniquePtr<NumericVector<Number>> localized_adjoint_solution = NumericVector<Number>::build(system.comm());
+  std::unique_ptr<NumericVector<Number>> localized_adjoint_solution = NumericVector<Number>::build(system.comm());
   localized_adjoint_solution->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_send_list(), false, GHOSTED);
 
   // We will loop over each adjoint solution, localize that adjoint

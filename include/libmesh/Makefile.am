@@ -418,7 +418,6 @@ BUILT_SOURCES = \
         pointer_to_pointer_iter.h \
         pool_allocator.h \
         restore_warnings.h \
-        safe_bool.h \
         simple_range.h \
         statistics.h \
         string_to_enum.h \
@@ -502,16 +501,6 @@ netcdf.h: $(top_srcdir)/contrib/netcdf/v4/include/netcdf.h
 
   BUILT_SOURCES  += netcdf.h
   DISTCLEANFILES += netcdf.h
-
-endif
-
-if LIBMESH_INSTALL_HINNANT_UNIQUE_PTR
-
-unique_ptr.hpp: $(top_srcdir)/contrib/unique_ptr/unique_ptr.hpp
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
-
-  BUILT_SOURCES  += unique_ptr.hpp
-  DISTCLEANFILES += unique_ptr.hpp
 
 endif
 
@@ -1770,9 +1759,6 @@ pool_allocator.h: $(top_srcdir)/include/utils/pool_allocator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 restore_warnings.h: $(top_srcdir)/include/utils/restore_warnings.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-safe_bool.h: $(top_srcdir)/include/utils/safe_bool.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 simple_range.h: $(top_srcdir)/include/utils/simple_range.h

@@ -142,7 +142,7 @@ int main(int argc, char ** argv)
   L2System & new_sys = new_es.add_system<L2System>(current_sys_name);
 
   new_sys.time_solver =
-    UniquePtr<TimeSolver>(new SteadySolver(new_sys));
+    libmesh_make_unique<SteadySolver>(new_sys);
 
   new_sys.fe_family() =
     cl.follow(std::string("LAGRANGE"), "--family");

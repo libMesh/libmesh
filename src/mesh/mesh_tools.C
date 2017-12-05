@@ -302,7 +302,7 @@ void MeshTools::find_boundary_nodes (const MeshBase & mesh,
     for (auto s : elem->side_index_range())
       if (elem->neighbor_ptr(s) == libmesh_nullptr) // on the boundary
         {
-          UniquePtr<const Elem> side = elem->build_side_ptr(s);
+          std::unique_ptr<const Elem> side = elem->build_side_ptr(s);
 
           for (auto & node : side->node_ref_range())
             on_boundary[node.id()] = true;
@@ -1211,9 +1211,10 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
       const unsigned int my_n_nodes = elem ? elem->n_nodes() : 0;
       const unsigned int my_n_edges = elem ? elem->n_edges() : 0;
       const unsigned int my_n_sides = elem ? elem->n_sides() : 0;
-      unsigned int n_nodes = my_n_nodes,
-                   n_edges = my_n_edges,
-                   n_sides = my_n_sides;
+      unsigned int
+        n_nodes = my_n_nodes,
+        n_edges = my_n_edges,
+        n_sides = my_n_sides;
 
       mesh.comm().max(n_nodes);
       mesh.comm().max(n_edges);
@@ -1241,8 +1242,7 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
               // Ordering of boundary ids shouldn't matter
               std::sort(bcids.begin(), bcids.end());
             }
-//          libmesh_assert(mesh.comm().semiverify
-//                         (elem ? &bcids : libmesh_nullptr));
+          // libmesh_assert(mesh.comm().semiverify (elem ? &bcids : libmesh_nullptr));
 
           all_bcids.insert(all_bcids.end(), bcids.begin(),
                            bcids.end());
@@ -1262,8 +1262,7 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
               std::sort(bcids.begin(), bcids.end());
             }
 
-//          libmesh_assert(mesh.comm().semiverify
-//                         (elem ? &bcids : libmesh_nullptr));
+          // libmesh_assert(mesh.comm().semiverify (elem ? &bcids : libmesh_nullptr));
 
           all_bcids.insert(all_bcids.end(), bcids.begin(),
                            bcids.end());
@@ -1283,8 +1282,7 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
               all_bcids.push_back(BoundaryInfo::invalid_id);
             }
 
-//          libmesh_assert(mesh.comm().semiverify
-//                         (elem ? &bcids : libmesh_nullptr));
+          // libmesh_assert(mesh.comm().semiverify (elem ? &bcids : libmesh_nullptr));
         }
 
       for (unsigned short s=0; s != n_sides; ++s)
@@ -1304,8 +1302,7 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
               all_bcids.push_back(BoundaryInfo::invalid_id);
             }
 
-//          libmesh_assert(mesh.comm().semiverify
-//                         (elem ? &bcids : libmesh_nullptr));
+          // libmesh_assert(mesh.comm().semiverify (elem ? &bcids : libmesh_nullptr));
 
           if (elem)
             {
@@ -1320,8 +1317,7 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
               all_bcids.push_back(BoundaryInfo::invalid_id);
             }
 
-//          libmesh_assert(mesh.comm().semiverify
-//                         (elem ? &bcids : libmesh_nullptr));
+          // libmesh_assert(mesh.comm().semiverify (elem ? &bcids : libmesh_nullptr));
         }
 
       for (unsigned short sf=0; sf != 2; ++sf)
@@ -1341,8 +1337,7 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
               all_bcids.push_back(BoundaryInfo::invalid_id);
             }
 
-//          libmesh_assert(mesh.comm().semiverify
-//                         (elem ? &bcids : libmesh_nullptr));
+          // libmesh_assert(mesh.comm().semiverify (elem ? &bcids : libmesh_nullptr));
 
           if (elem)
             {
@@ -1357,8 +1352,7 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
               all_bcids.push_back(BoundaryInfo::invalid_id);
             }
 
-//          libmesh_assert(mesh.comm().semiverify
-//                         (elem ? &bcids : libmesh_nullptr));
+          // libmesh_assert(mesh.comm().semiverify (elem ? &bcids : libmesh_nullptr));
         }
 
       libmesh_assert(mesh.comm().semiverify

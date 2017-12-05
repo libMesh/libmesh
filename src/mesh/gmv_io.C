@@ -686,7 +686,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                     elem->connectivity(0, TECPLOT, conn);
                   else
                     {
-                      UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
+                      std::unique_ptr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
                       for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
                         lo_elem->set_node(i) = elem->node_ptr(i);
                       lo_elem->connectivity(0, TECPLOT, conn);
@@ -756,7 +756,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
 #endif
                            )
                     {
-                      UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
+                      std::unique_ptr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
                       for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
                         lo_elem->set_node(i) = elem->node_ptr(i);
                       lo_elem->connectivity(0, TECPLOT, conn);
@@ -773,7 +773,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                     }
                   else if (elem->type() == TRI6)
                     {
-                      UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
+                      std::unique_ptr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
                       for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
                         lo_elem->set_node(i) = elem->node_ptr(i);
                       lo_elem->connectivity(0, TECPLOT, conn);
@@ -946,7 +946,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
                   }
               else // !this->subdivide_second_order()
                 {
-                  UniquePtr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
+                  std::unique_ptr<Elem> lo_elem = Elem::build(Elem::first_order_equivalent_type(elem->type()));
                   for (unsigned int i = 0; i != lo_elem->n_nodes(); ++i)
                     lo_elem->set_node(i) = elem->node_ptr(i);
                   if ((lo_elem->type() == HEX8)

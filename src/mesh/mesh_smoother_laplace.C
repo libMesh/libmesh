@@ -175,7 +175,7 @@ void LaplaceMeshSmoother::init()
               if ((elem->neighbor_ptr(s) == libmesh_nullptr) ||
                   (elem->id() > elem->neighbor_ptr(s)->id()))
                 {
-                  UniquePtr<const Elem> side(elem->build_side_ptr(s));
+                  std::unique_ptr<const Elem> side(elem->build_side_ptr(s));
                   _graph[side->node_id(0)].push_back(side->node_id(1));
                   _graph[side->node_id(1)].push_back(side->node_id(0));
                 }
@@ -196,12 +196,12 @@ void LaplaceMeshSmoother::init()
               {
                 // We need a full (i.e. non-proxy) element for the face, since we will
                 // be looking at its sides as well!
-                UniquePtr<const Elem> face = elem->build_side_ptr(f, /*proxy=*/false);
+                std::unique_ptr<const Elem> face = elem->build_side_ptr(f, /*proxy=*/false);
 
                 for (auto s : face->side_index_range()) // Loop over face's edges
                   {
                     // Here we can use a proxy
-                    UniquePtr<const Elem> side = face->build_side_ptr(s);
+                    std::unique_ptr<const Elem> side = face->build_side_ptr(s);
 
                     // At this point, we just insert the node numbers
                     // again.  At the end we'll call sort and unique

@@ -211,10 +211,10 @@ void assemble_1D(EquationSystems & es,
   FEType fe_type = dof_map.variable_type(0);
 
   // Build a finite element object of the specified type. The build
-  // function dynamically allocates memory so we use a UniquePtr in this case.
-  // A UniquePtr is a pointer that cleans up after itself. See examples 3 and 4
-  // for more details on UniquePtr.
-  UniquePtr<FEBase> fe(FEBase::build(dim, fe_type));
+  // function dynamically allocates memory so we use a std::unique_ptr in this case.
+  // A std::unique_ptr is a pointer that cleans up after itself. See examples 3 and 4
+  // for more details on std::unique_ptr.
+  std::unique_ptr<FEBase> fe(FEBase::build(dim, fe_type));
 
   // Tell the finite element object to use fifth order Gaussian quadrature
   QGauss qrule(dim, FIFTH);

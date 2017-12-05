@@ -95,7 +95,7 @@ public:
   /**
    * Copy of this object. User should override to copy any needed state.
    */
-  virtual UniquePtr<DifferentiablePhysics> clone_physics() = 0;
+  virtual std::unique_ptr<DifferentiablePhysics> clone_physics() = 0;
 
   /**
    * Clear any data structures associated with the physics.

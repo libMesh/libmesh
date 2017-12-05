@@ -94,20 +94,6 @@ AC_CONFIG_FILES([contrib/boost/include/Makefile])
 # --------------------------------------------------------------
 
 
-# --------------------------------------------------------------
-# Howard Hinnant's unique_ptr implementation.  Must be tested after
-# Boost and requires a working Boost installation.
-CONFIGURE_HINNANT_UNIQUE_PTR
-AC_CONFIG_FILES([contrib/unique_ptr/Makefile])
-# --------------------------------------------------------------
-
-
-# --------------------------------------------------------------
-# Test whether safe_bool<T> works as intended
-CONFIGURE_SAFE_BOOL
-# --------------------------------------------------------------
-
-
 # -------------------------------------------------------------
 # Petsc -- enabled by default
 # -------------------------------------------------------------

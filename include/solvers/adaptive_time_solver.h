@@ -100,18 +100,18 @@ public:
   /**
    * An implicit linear or nonlinear solver to use at each timestep.
    */
-  virtual UniquePtr<DiffSolver> & diff_solver() libmesh_override;
+  virtual std::unique_ptr<DiffSolver> & diff_solver() libmesh_override;
 
   /**
    * An implicit linear solver to use for adjoint and sensitivity
    * problems.
    */
-  virtual UniquePtr<LinearSolver<Number>> & linear_solver() libmesh_override;
+  virtual std::unique_ptr<LinearSolver<Number>> & linear_solver() libmesh_override;
 
   /**
    * This object is used to take timesteps
    */
-  UniquePtr<UnsteadySolver> core_time_solver;
+  std::unique_ptr<UnsteadySolver> core_time_solver;
 
   /**
    * Error calculations are done in this norm, DISCRETE_L2 by default.

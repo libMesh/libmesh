@@ -373,7 +373,7 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
   // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
   // processors at once.
-  UniquePtr<PointLocatorBase> point_locator;
+  std::unique_ptr<PointLocatorBase> point_locator;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool has_periodic_boundaries =
@@ -800,7 +800,7 @@ bool MeshRefinement::make_coarsening_compatible()
   // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
   // processors at once.
-  UniquePtr<PointLocatorBase> point_locator;
+  std::unique_ptr<PointLocatorBase> point_locator;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool has_periodic_boundaries =
@@ -1152,8 +1152,8 @@ bool MeshRefinement::make_coarsening_compatible()
              uncoarsenable_tag);
 
           for (std::vector<dof_id_type>::const_iterator
-               it = my_uncoarsenable_parents.begin(),
-               end = my_uncoarsenable_parents.end(); it != end; ++it)
+                 it = my_uncoarsenable_parents.begin(),
+                 end = my_uncoarsenable_parents.end(); it != end; ++it)
             {
               Elem & elem = _mesh.elem_ref(*it);
               libmesh_assert(elem.refinement_flag() == Elem::INACTIVE ||
@@ -1196,7 +1196,7 @@ bool MeshRefinement::make_refinement_compatible()
   // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
   // processors at once.
-  UniquePtr<PointLocatorBase> point_locator;
+  std::unique_ptr<PointLocatorBase> point_locator;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool has_periodic_boundaries =
@@ -1787,8 +1787,8 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
                  coarsen_tag);
 
               for (std::vector<dof_id_type>::const_iterator
-                   it = my_parents_to_coarsen.begin(),
-                   end = my_parents_to_coarsen.end(); it != end; ++it)
+                     it = my_parents_to_coarsen.begin(),
+                     end = my_parents_to_coarsen.end(); it != end; ++it)
                 {
                   Elem & elem = _mesh.elem_ref(*it);
                   libmesh_assert(elem.refinement_flag() == Elem::INACTIVE ||

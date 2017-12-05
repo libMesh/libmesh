@@ -316,8 +316,8 @@ public:
    * matrix for such an element exactly.  Higher or lower degree rules can
    * be chosen by changing the extraorder parameter.
    */
-  UniquePtr<QBase> default_quadrature_rule (const unsigned int dim,
-                                            const int extraorder=0) const;
+  std::unique_ptr<QBase> default_quadrature_rule (const unsigned int dim,
+                                                  const int extraorder=0) const;
 
 
 private:

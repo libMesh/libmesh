@@ -26,7 +26,7 @@ namespace libMesh
 // ---------------------------------------
 // FEType class members
 
-UniquePtr<QBase>
+std::unique_ptr<QBase>
 FEType::default_quadrature_rule (const unsigned int dim,
                                  const int extraorder) const
 {
@@ -38,7 +38,7 @@ FEType::default_quadrature_rule (const unsigned int dim,
       // this when using complex numbers (spetersen 04/20/06)
       const unsigned int seven = 7;
 
-      return UniquePtr<QBase>
+      return std::unique_ptr<QBase>
         (new QClough(dim,
                      static_cast<Order>
                      (std::max(static_cast<unsigned int>
@@ -46,10 +46,10 @@ FEType::default_quadrature_rule (const unsigned int dim,
     }
 
   if (family == SUBDIVISION)
-    return UniquePtr<QBase>
+    return std::unique_ptr<QBase>
       (new QGauss(dim, static_cast<Order>(1 + extraorder)));
 
-  return UniquePtr<QBase>
+  return std::unique_ptr<QBase>
     (new QGauss(dim, static_cast<Order>(this->default_quadrature_order()
                                         + extraorder)));
 }

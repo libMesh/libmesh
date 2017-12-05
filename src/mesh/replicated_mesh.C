@@ -125,7 +125,7 @@ ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
   // here in the constructor.
   _next_unique_id = 0;
 #endif
-  _partitioner = UniquePtr<Partitioner>(new MetisPartitioner());
+  _partitioner = libmesh_make_unique<MetisPartitioner>();
 }
 
 
@@ -141,7 +141,7 @@ ReplicatedMesh::ReplicatedMesh (unsigned char d) :
   // here in the constructor.
   _next_unique_id = 0;
 #endif
-  _partitioner = UniquePtr<Partitioner>(new MetisPartitioner());
+  _partitioner = libmesh_make_unique<MetisPartitioner>();
 }
 #endif
 #endif
@@ -937,7 +937,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
                       if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
                         {
-                          UniquePtr<Elem> side (el->build_side_ptr(side_id));
+                          std::unique_ptr<Elem> side (el->build_side_ptr(side_id));
                           for (auto & n : side->node_ref_range())
                             set_array[i]->insert(n.id());
 
@@ -971,7 +971,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
                               if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
                                 {
-                                  UniquePtr<Elem> edge (el->build_edge_ptr(edge_id));
+                                  std::unique_ptr<Elem> edge (el->build_edge_ptr(edge_id));
                                   for (auto & n : edge->node_ref_range())
                                     set_array[i]->insert( n.id() );
 
@@ -1317,46 +1317,46 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
   std::map<dof_id_type, std::vector<dof_id_type>>::iterator elem_map_it     = node_to_elems_map.begin();
   std::map<dof_id_type, std::vector<dof_id_type>>::iterator elem_map_it_end = node_to_elems_map.end();
   {
-  LOG_SCOPE("stitch_meshes node updates", "ReplicatedMesh");
+    LOG_SCOPE("stitch_meshes node updates", "ReplicatedMesh");
 
-  for ( ; elem_map_it != elem_map_it_end; ++elem_map_it)
-    {
-      dof_id_type target_node_id = elem_map_it->first;
-      dof_id_type other_node_id = node_to_node_map[target_node_id];
-      Node & target_node = this->node_ref(target_node_id);
+    for ( ; elem_map_it != elem_map_it_end; ++elem_map_it)
+      {
+        dof_id_type target_node_id = elem_map_it->first;
+        dof_id_type other_node_id = node_to_node_map[target_node_id];
+        Node & target_node = this->node_ref(target_node_id);
 
-      std::size_t n_elems = elem_map_it->second.size();
-      for (std::size_t i=0; i<n_elems; i++)
-        {
-          dof_id_type elem_id = elem_map_it->second[i];
-          Elem * el = this->elem_ptr(elem_id);
+        std::size_t n_elems = elem_map_it->second.size();
+        for (std::size_t i=0; i<n_elems; i++)
+          {
+            dof_id_type elem_id = elem_map_it->second[i];
+            Elem * el = this->elem_ptr(elem_id);
 
-          // find the local node index that we want to update
-          unsigned int local_node_index = el->local_node(other_node_id);
+            // find the local node index that we want to update
+            unsigned int local_node_index = el->local_node(other_node_id);
 
-          // We also need to copy over the nodeset info here,
-          // because the node will get deleted below
-          this->get_boundary_info().boundary_ids(el->node_ptr(local_node_index), bc_ids);
-          el->set_node(local_node_index) = &target_node;
-          this->get_boundary_info().add_node(&target_node, bc_ids);
-        }
-    }
+            // We also need to copy over the nodeset info here,
+            // because the node will get deleted below
+            this->get_boundary_info().boundary_ids(el->node_ptr(local_node_index), bc_ids);
+            el->set_node(local_node_index) = &target_node;
+            this->get_boundary_info().add_node(&target_node, bc_ids);
+          }
+      }
   }
 
   std::map<dof_id_type, dof_id_type>::iterator node_map_it     = node_to_node_map.begin();
   std::map<dof_id_type, dof_id_type>::iterator node_map_it_end = node_to_node_map.end();
   {
-  LOG_SCOPE("stitch_meshes node deletion", "ReplicatedMesh");
-  for ( ; node_map_it != node_map_it_end; ++node_map_it)
-    {
-      // In the case that this==other_mesh, the two nodes might be the same (e.g. if
-      // we're stitching a "sliver"), hence we need to skip node deletion in that case.
-      if ((this == other_mesh) && (node_map_it->second == node_map_it->first))
-        continue;
+    LOG_SCOPE("stitch_meshes node deletion", "ReplicatedMesh");
+    for ( ; node_map_it != node_map_it_end; ++node_map_it)
+      {
+        // In the case that this==other_mesh, the two nodes might be the same (e.g. if
+        // we're stitching a "sliver"), hence we need to skip node deletion in that case.
+        if ((this == other_mesh) && (node_map_it->second == node_map_it->first))
+          continue;
 
-      dof_id_type this_node_id = node_map_it->second;
-      this->delete_node( this->node_ptr(this_node_id) );
-    }
+        dof_id_type this_node_id = node_map_it->second;
+        this->delete_node( this->node_ptr(this_node_id) );
+      }
   }
 
   // If find_neighbors() wasn't called in prepare_for_use(), we need to
@@ -1395,7 +1395,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
                           if (bounds.first != bounds.second)
                             {
                               // Get the side for this element
-                              const UniquePtr<Elem> my_side(el->side_ptr(s));
+                              const std::unique_ptr<Elem> my_side(el->side_ptr(s));
 
                               // Look at all the entries with an equivalent key
                               while (bounds.first != bounds.second)
@@ -1405,7 +1405,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
                                   // Get the side for the neighboring element
                                   const unsigned int ns = bounds.first->second.second;
-                                  const UniquePtr<Elem> their_side(neighbor->side_ptr(ns));
+                                  const std::unique_ptr<Elem> their_side(neighbor->side_ptr(ns));
                                   //libmesh_assert(my_side.get());
                                   //libmesh_assert(their_side.get());
 

@@ -56,8 +56,8 @@ public:
     return soln(x, y)(component_in);
   }
 
-  virtual UniquePtr<FunctionBase<Number>> clone() const
-  { return UniquePtr<FunctionBase<Number>> (new SolutionFunction(_u_var)); }
+  virtual std::unique_ptr<FunctionBase<Number>> clone() const
+  { return std::unique_ptr<FunctionBase<Number>> (new SolutionFunction(_u_var)); }
 
 private:
 
@@ -94,8 +94,8 @@ public:
     return soln.grad(x, y).row(component_in);
   }
 
-  virtual UniquePtr<FunctionBase<Gradient>> clone() const
-  { return UniquePtr<FunctionBase<Gradient>> (new SolutionGradient(_u_var)); }
+  virtual std::unique_ptr<FunctionBase<Gradient>> clone() const
+  { return std::unique_ptr<FunctionBase<Gradient>> (new SolutionGradient(_u_var)); }
 
 private:
 

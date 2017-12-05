@@ -101,23 +101,23 @@ public:
    * to the Node.
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
-  static UniquePtr<Node> build (const Node & n);
+  static std::unique_ptr<Node> build (const Node & n);
 #endif
 
   /**
    * \returns A \p Node copied from \p p with id == \id and wrapped in a smart pointer.
    */
-  static UniquePtr<Node> build (const Point & p,
-                                const dof_id_type id);
+  static std::unique_ptr<Node> build (const Point & p,
+                                      const dof_id_type id);
 
   /**
    * \returns A \p Node created from the specified (x,y,z) positions
    * with id == \id and wrapped in a smart pointer.
    */
-  static UniquePtr<Node> build (const Real x,
-                                const Real y,
-                                const Real z,
-                                const dof_id_type id);
+  static std::unique_ptr<Node> build (const Real x,
+                                      const Real y,
+                                      const Real z,
+                                      const dof_id_type id);
 
   /**
    * \returns \p true if the node is active.  An active node is
@@ -295,31 +295,31 @@ Node & Node::operator= (const Point & p)
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
 inline
-UniquePtr<Node> Node::build(const Node & n)
+std::unique_ptr<Node> Node::build(const Node & n)
 {
   libmesh_deprecated();
-  return UniquePtr<Node>(new Node(n));
+  return libmesh_make_unique<Node>(n);
 }
 #endif
 
 
 
 inline
-UniquePtr<Node> Node::build(const Point & p,
-                            const dof_id_type id)
+std::unique_ptr<Node> Node::build(const Point & p,
+                                  const dof_id_type id)
 {
-  return UniquePtr<Node>(new Node(p,id));
+  return libmesh_make_unique<Node>(p,id);
 }
 
 
 
 inline
-UniquePtr<Node> Node::build(const Real x,
-                            const Real y,
-                            const Real z,
-                            const dof_id_type id)
+std::unique_ptr<Node> Node::build(const Real x,
+                                  const Real y,
+                                  const Real z,
+                                  const dof_id_type id)
 {
-  return UniquePtr<Node>(new Node(x,y,z,id));
+  return libmesh_make_unique<Node>(x,y,z,id);
 }
 
 

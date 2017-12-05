@@ -88,7 +88,7 @@ public:
    *
    * \returns A NewtonSolver by default.
    */
-  static UniquePtr<DiffSolver> build(sys_type & s);
+  static std::unique_ptr<DiffSolver> build(sys_type & s);
 
   /**
    * Destructor.
@@ -285,7 +285,7 @@ public:
   /**
    * Pointer to functor which is called right after each linear solve
    */
-  UniquePtr<LinearSolutionMonitor> linear_solution_monitor;
+  std::unique_ptr<LinearSolutionMonitor> linear_solution_monitor;
 
 protected:
 

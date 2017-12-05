@@ -60,9 +60,9 @@ public:
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
    */
-  virtual UniquePtr<Partitioner> clone () const libmesh_override
+  virtual std::unique_ptr<Partitioner> clone () const libmesh_override
   {
-    return UniquePtr<Partitioner>(new ParmetisPartitioner());
+    return libmesh_make_unique<ParmetisPartitioner>();
   }
 
 
@@ -122,7 +122,7 @@ private:
    * Pointer to the Parmetis-specific data structures.  Lets us avoid
    * including parmetis.h here.
    */
-  UniquePtr<ParmetisHelper> _pmetis;
+  std::unique_ptr<ParmetisHelper> _pmetis;
 
 #endif
 };

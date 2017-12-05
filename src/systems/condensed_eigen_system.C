@@ -198,7 +198,7 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(dof_id_type i)
 
   // This function assumes that condensed_solve has just been called.
   // If this is not the case, then we will trip an asset in get_eigenpair
-  UniquePtr<NumericVector<Number>> temp = NumericVector<Number>::build(this->comm());
+  std::unique_ptr<NumericVector<Number>> temp = NumericVector<Number>::build(this->comm());
   dof_id_type n_local = local_non_condensed_dofs_vector.size();
   dof_id_type n       = n_local;
   this->comm().sum(n);

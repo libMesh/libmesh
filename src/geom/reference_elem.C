@@ -115,7 +115,7 @@ void read_ref_elem (const ElemType type_in,
   libmesh_assert_equal_to (n_nodes, Elem::type_to_n_nodes_map[elem_type_read]);
 
   // Construct elem of appropriate type
-  UniquePtr<Elem> uelem = Elem::build(type_in);
+  std::unique_ptr<Elem> uelem = Elem::build(type_in);
 
   // We are expecting an identity map, so assert it!
   for (unsigned int n=0; n<n_nodes; n++)

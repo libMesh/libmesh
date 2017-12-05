@@ -118,7 +118,7 @@ public:
    * who subclass FEMContext will need to also reimplement this method to build
    * it.
    */
-  virtual UniquePtr<DiffContext> build_context() libmesh_override;
+  virtual std::unique_ptr<DiffContext> build_context() libmesh_override;
 
   /*
    * Prepares the result of a build_context() call for use.

@@ -251,10 +251,10 @@ void assemble_poisson(EquationSystems & es,
   const DofMap & dof_map = system.get_dof_map();
 
   FEType fe_type = dof_map.variable_type(0);
-  UniquePtr<FEBase> fe (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
   QGauss qrule (dim, FIFTH);
   fe->attach_quadrature_rule (&qrule);
-  UniquePtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe_face (FEBase::build(dim, fe_type));
   QGauss qface(dim-1, FIFTH);
   fe_face->attach_quadrature_rule (&qface);
 
