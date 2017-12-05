@@ -573,8 +573,18 @@ int main (int argc, char ** argv)
                      << std::endl;
 
         // Hard coded asserts to ensure that the actual numbers we are getting are what they should be
-        libmesh_assert_less(std::abs(QoI_0_computed - QoI_0_exact)/std::abs(QoI_0_exact), 4.e-5);
-        libmesh_assert_less(std::abs(QoI_1_computed - QoI_1_exact)/std::abs(QoI_1_exact), 1.e-4);
+        if (param.max_adaptivesteps > 5 && param.coarserefinements > 2)
+          {
+            libmesh_assert_less(std::abs(QoI_0_computed - QoI_0_exact)/std::abs(QoI_0_exact), 4.e-5);
+            libmesh_assert_less(std::abs(QoI_1_computed - QoI_1_exact)/std::abs(QoI_1_exact), 1.e-4);
+          }
+        else
+          {
+            // This seems to be loose enough for the case of 2 coarse
+            // refinements, 4 adaptive steps
+            libmesh_assert_less(std::abs(QoI_0_computed - QoI_0_exact)/std::abs(QoI_0_exact), 4.e-4);
+            libmesh_assert_less(std::abs(QoI_1_computed - QoI_1_exact)/std::abs(QoI_1_exact), 2.e-3);
+          }
       }
   }
 
