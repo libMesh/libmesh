@@ -295,9 +295,13 @@ int main (int argc, char ** argv)
     if (!i)
       libmesh_error_msg('[' << init.comm().rank() << "] Can't find general.in; exiting early.");
   }
-  GetPot infile("general.in");
 
   // Read in parameters from the input file
+  GetPot infile("general.in");
+
+  // But allow the command line to override it.
+  infile.parse_command_line(argc, argv);
+
   FEMParameters param(init.comm());
   param.read(infile);
 
