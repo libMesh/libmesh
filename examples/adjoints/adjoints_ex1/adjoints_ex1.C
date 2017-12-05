@@ -58,12 +58,14 @@
 
 // General libMesh includes
 #include "libmesh/equation_systems.h"
-#include "libmesh/linear_solver.h"
 #include "libmesh/error_vector.h"
+#include "libmesh/factory.h"
+#include "libmesh/linear_solver.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/newton_solver.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/partitioner.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/system_norm.h"
 
@@ -311,6 +313,30 @@ int main (int argc, char ** argv)
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.
   Mesh mesh(init.comm());
+
+  // Give the mesh a non-default partitioner if we can try to do so
+  // safely
+  if (param.mesh_partitioner_type != "Default")
+    {
+#ifndef LIBMESH_HAVE_RTTI
+      libmesh_example_requires(false, "RTTI support");
+#else
+      // Factory failures are *verbose* in parallel; let's silence
+      // cerr temporarily.
+      auto oldbuf = libMesh::err.rdbuf();
+      libMesh::err.rdbuf(libmesh_nullptr);
+      try
+        {
+          mesh.partitioner() =
+            Factory<Partitioner>::build(param.mesh_partitioner_type);
+        }
+      catch (...)
+        {
+          libmesh_example_requires(false, param.mesh_partitioner_type + " partitioner support");
+        }
+      libMesh::err.rdbuf(oldbuf);
+#endif // LIBMESH_HAVE_RTI
+    }
 
   // And an object to refine it
   std::unique_ptr<MeshRefinement> mesh_refinement =
