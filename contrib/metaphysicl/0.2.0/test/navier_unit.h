@@ -19,17 +19,16 @@ static double evaluate_q (const Vector& xyz, const int);
 
 int main(void)
 {
-  int err = 0;
   int N   = 2; // mesh pts. in x and y
-  double su,sv,s2u,s2v,sp,se,s2e,s2p;
-  double pnorm, unorm, vnorm, enorm;
-  double pnorm_max, unorm_max, vnorm_max, enorm_max;
-  double prnorm_max = 0., urnorm_max = 0., vrnorm_max = 0., ernorm_max = 0.;
+  double s2u,s2v,s2e,s2p;
 
-  unorm_max = 0;
-  vnorm_max = 0;
-  pnorm_max = 0;
-  enorm_max = 0;
+#ifdef METAPHYSICL_HAVE_MASA
+  int err = 0;
+  double su,sv,sp,se;
+  double pnorm, unorm, vnorm, enorm;
+  double pnorm_max = 0., unorm_max = 0., vnorm_max = 0., enorm_max = 0.;
+  double prnorm_max = 0., urnorm_max = 0., vrnorm_max = 0., ernorm_max = 0.;
+#endif
 
   RawVector xvecinit(0), yvecinit(0);
   xvecinit.insert<0>() = 1.;

@@ -41,6 +41,8 @@ DynamicSparseNumberArray<T,I>::DynamicSparseNumberArray() {}
 template <typename T, typename I>
 inline
 DynamicSparseNumberArray<T,I>::DynamicSparseNumberArray(const T& val) {
+  // Avoid unused variable warnings in opt mode.
+  (void)val;
   // This makes no sense unless val is 0!
 #ifndef NDEBUG
   if (val)
@@ -52,6 +54,8 @@ template <typename T, typename I>
 template <typename T2>
 inline
 DynamicSparseNumberArray<T,I>::DynamicSparseNumberArray(const T2& val) {
+  // Avoid unused variable warnings in opt mode.
+  (void)val;
   // This makes no sense unless val is 0!
 #ifndef NDEBUG
   if (val)
@@ -72,7 +76,7 @@ inline
 DynamicSparseNumberArray
   <typename DotType<T,T2>::supertype,
    typename CompareTypes<I, I2>::supertype>
-DynamicSparseNumberArray<T,I>::dot (const DynamicSparseNumberArray<T2,I2>& a) const
+DynamicSparseNumberArray<T,I>::dot (const DynamicSparseNumberArray<T2,I2>& /*a*/) const
 {
   typedef typename DotType<T,T2>::supertype TS;
   typedef typename CompareTypes<I, I2>::supertype IS;
@@ -91,7 +95,7 @@ inline
 DynamicSparseNumberArray<
   typename OuterProductType<T,T2>::supertype,
   typename CompareTypes<I, I2>::supertype>
-DynamicSparseNumberArray<T,I>::outerproduct (const DynamicSparseNumberArray<T2, I2>& a) const
+DynamicSparseNumberArray<T,I>::outerproduct (const DynamicSparseNumberArray<T2, I2>& /*a*/) const
 {
   typedef typename OuterProductType<T,T2>::supertype TS;
   typedef typename CompareTypes<I, I2>::supertype IS;
