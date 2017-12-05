@@ -20,7 +20,9 @@
   CPPUNIT_TEST( testLocalizeToOne );            \
   CPPUNIT_TEST( testLocalizeToOneBase );
 
+#ifndef LIBMESH_HAVE_CXX14_MAKE_UNIQUE
 using libMesh::make_unique;
+#endif
 
 template <class DerivedClass>
 class NumericVectorTest : public CppUnit::TestCase {
