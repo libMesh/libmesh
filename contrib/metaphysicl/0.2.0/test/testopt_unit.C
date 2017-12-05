@@ -30,7 +30,7 @@ int main(void)
   NumberArray<3, float> NA = 0;
   std::cos(NA);
 
-  NumberVector<3, float> NV = 0;
+  // NumberVector<3, float> NV = 0;
   // std::cos(NV);
 
   SparseNumberVectorUnitVector<3, 2, float>::type SNV;
