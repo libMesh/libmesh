@@ -425,7 +425,7 @@ extern bool warned_about_auto_ptr;
 #define libmesh_example_requires(condition, option)                     \
   do {                                                                  \
     if (!(condition)) {                                                 \
-      libMesh::out << "Configuring libMesh with " #option " is required to run this example." << std::endl; \
+      libMesh::out << "Configuring libMesh with " << option << " is required to run this example." << std::endl; \
       return 77;                                                        \
     } } while (0)
 
