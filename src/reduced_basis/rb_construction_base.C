@@ -66,16 +66,6 @@ void RBConstructionBase<Base>::clear ()
   // clear the parent data
   Base::clear();
   RBParametrized::clear();
-
-  std::map<std::string, NumericVector<Number> *>::iterator it           = training_parameters.begin();
-  std::map<std::string, NumericVector<Number> *>::const_iterator it_end = training_parameters.end();
-
-  for ( ; it != it_end; ++it)
-    {
-      NumericVector<Number> * training_vector = it->second;
-      delete training_vector;
-      training_vector = libmesh_nullptr;
-    }
   training_parameters.clear();
 }
 
@@ -150,8 +140,8 @@ RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int
                   (index < this->get_last_local_training_index()) );
 
   RBParameters params;
-  std::map<std::string, NumericVector<Number> *>::const_iterator it     = training_parameters.begin();
-  std::map<std::string, NumericVector<Number> *>::const_iterator it_end = training_parameters.end();
+  std::map<std::string, std::unique_ptr<NumericVector<Number>>>::const_iterator it     = training_parameters.begin();
+  std::map<std::string, std::unique_ptr<NumericVector<Number>>>::const_iterator it_end = training_parameters.end();
   for ( ; it != it_end; ++it)
     {
       std::string param_name = it->first;
@@ -237,8 +227,8 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
   // allowable discrete value
   if (get_n_discrete_params() > 0)
     {
-      std::map<std::string, NumericVector<Number> *>::iterator it           = training_parameters.begin();
-      std::map<std::string, NumericVector<Number> *>::const_iterator it_end = training_parameters.end();
+      std::map<std::string, std::unique_ptr<NumericVector<Number>>>::iterator it           = training_parameters.begin();
+      std::map<std::string, std::unique_ptr<NumericVector<Number>>>::const_iterator it_end = training_parameters.end();
       for ( ; it != it_end; ++it)
         {
           std::string param_name = it->first;
@@ -247,7 +237,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
               std::vector<Real> discrete_values =
                 get_discrete_parameter_values().find(param_name)->second;
 
-              NumericVector<Number> * training_vector = it->second;
+              NumericVector<Number> * training_vector = it->second.get();
 
               for (numeric_index_type index=training_vector->first_local_index();
                    index<training_vector->last_local_index();
@@ -276,15 +266,11 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
   if (new_training_set.size() != get_n_params())
     libmesh_error_msg("Error: Incorrect number of parameters in load_training_set.");
 
-  // Clear the training set
-  std::map<std::string, NumericVector<Number> *>::iterator it           = training_parameters.begin();
-  std::map<std::string, NumericVector<Number> *>::const_iterator it_end = training_parameters.end();
+  // Delete the training set vectors (but don't remove the existing keys!)
+  std::map<std::string, std::unique_ptr<NumericVector<Number>>>::iterator it           = training_parameters.begin();
+  std::map<std::string, std::unique_ptr<NumericVector<Number>>>::const_iterator it_end = training_parameters.end();
   for ( ; it != it_end; ++it)
-    {
-      NumericVector<Number> * training_vector = it->second;
-      delete training_vector;
-      training_vector = libmesh_nullptr;
-    }
+    it->second.reset(libmesh_nullptr);
 
   // Get the number of local and global training parameters
   numeric_index_type n_local_training_samples  =
@@ -295,7 +281,7 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
   it = training_parameters.begin();
   for ( ; it != it_end; ++it)
     {
-      it->second = NumericVector<Number>::build(this->comm()).release();
+      it->second = NumericVector<Number>::build(this->comm());
       it->second->init(n_global_training_samples, n_local_training_samples, false, PARALLEL);
     }
 
@@ -303,7 +289,7 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
   for ( ; it != it_end; ++it)
     {
       std::string param_name = it->first;
-      NumericVector<Number> * training_vector = it->second;
+      NumericVector<Number> * training_vector = it->second.get();
 
       numeric_index_type first_index = training_vector->first_local_index();
       for (numeric_index_type i=0; i<n_local_training_samples; i++)
@@ -318,7 +304,7 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
 template <class Base>
 void RBConstructionBase<Base>::generate_training_parameters_random(const Parallel::Communicator & communicator,
                                                                    std::map<std::string, bool> log_param_scale,
-                                                                   std::map<std::string, NumericVector<Number> *> & training_parameters_in,
+                                                                   std::map<std::string, std::unique_ptr<NumericVector<Number>>> & training_parameters_in,
                                                                    unsigned int n_training_samples_in,
                                                                    const RBParameters & min_parameters,
                                                                    const RBParameters & max_parameters,
@@ -329,18 +315,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
   const unsigned int num_params = min_parameters.n_parameters();
 
   // Clear training_parameters_in
-  {
-    std::map<std::string, NumericVector<Number> *>::iterator it           = training_parameters_in.begin();
-    std::map<std::string, NumericVector<Number> *>::const_iterator it_end = training_parameters_in.end();
-
-    for ( ; it != it_end; ++it)
-      {
-        NumericVector<Number> * training_vector = it->second;
-        delete training_vector;
-        training_vector = libmesh_nullptr;
-      }
-    training_parameters_in.clear();
-  }
+  training_parameters_in.clear();
 
   if (num_params == 0)
     return;
@@ -390,7 +365,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
     for ( ; it != it_end; ++it)
       {
         std::string param_name = it->first;
-        training_parameters_in[param_name] = NumericVector<Number>::build(communicator).release();
+        training_parameters_in[param_name] = NumericVector<Number>::build(communicator);
 
         if (!serial_training_set)
           {
@@ -414,13 +389,13 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
 
   // finally, set the values
   {
-    std::map<std::string, NumericVector<Number> *>::iterator it           = training_parameters_in.begin();
-    std::map<std::string, NumericVector<Number> *>::const_iterator it_end = training_parameters_in.end();
+    std::map<std::string, std::unique_ptr<NumericVector<Number>>>::iterator it           = training_parameters_in.begin();
+    std::map<std::string, std::unique_ptr<NumericVector<Number>>>::const_iterator it_end = training_parameters_in.end();
 
     for ( ; it != it_end; ++it)
       {
         std::string param_name = it->first;
-        NumericVector<Number> * training_vector = it->second;
+        NumericVector<Number> * training_vector = it->second.get();
 
         numeric_index_type first_index = training_vector->first_local_index();
         for (numeric_index_type i=0; i<training_vector->local_size(); i++)
@@ -450,7 +425,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
 template <class Base>
 void RBConstructionBase<Base>::generate_training_parameters_deterministic(const Parallel::Communicator & communicator,
                                                                           std::map<std::string, bool> log_param_scale,
-                                                                          std::map<std::string, NumericVector<Number> *> & training_parameters_in,
+                                                                          std::map<std::string, std::unique_ptr<NumericVector<Number>>> & training_parameters_in,
                                                                           unsigned int n_training_samples_in,
                                                                           const RBParameters & min_parameters,
                                                                           const RBParameters & max_parameters,
@@ -469,17 +444,13 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
       libmesh_not_implemented();
     }
 
-  // Clear training_parameters_in
+  // Clear training_parameters_in (but don't remove existing keys!)
   {
-    std::map<std::string, NumericVector<Number> *>::iterator it           = training_parameters_in.begin();
-    std::map<std::string, NumericVector<Number> *>::const_iterator it_end = training_parameters_in.end();
+    std::map<std::string, std::unique_ptr<NumericVector<Number>>>::iterator it           = training_parameters_in.begin();
+    std::map<std::string, std::unique_ptr<NumericVector<Number>>>::const_iterator it_end = training_parameters_in.end();
 
     for ( ; it != it_end; ++it)
-      {
-        NumericVector<Number> * training_vector = it->second;
-        delete training_vector;
-        training_vector = libmesh_nullptr;
-      }
+      it->second.reset(libmesh_nullptr);
   }
 
   // Initialize training_parameters_in
@@ -489,7 +460,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
     for ( ; it != it_end; ++it)
       {
         std::string param_name = it->first;
-        training_parameters_in[param_name] = NumericVector<Number>::build(communicator).release();
+        training_parameters_in[param_name] = NumericVector<Number>::build(communicator);
 
         if (!serial_training_set)
           {
@@ -513,7 +484,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
 
   if (num_params == 1)
     {
-      NumericVector<Number> * training_vector = training_parameters_in.begin()->second;
+      NumericVector<Number> * training_vector = training_parameters_in.begin()->second.get();
       bool use_log_scaling = log_param_scale.begin()->second;
       Real min_param = min_parameters.begin()->second;
       Real max_param = max_parameters.begin()->second;
@@ -614,11 +585,11 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
         }
 
       // now load into training_samples_in:
-      std::map<std::string, NumericVector<Number> *>::iterator new_it = training_parameters_in.begin();
+      std::map<std::string, std::unique_ptr<NumericVector<Number>>>::iterator new_it = training_parameters_in.begin();
 
-      NumericVector<Number> * training_vector_0 = new_it->second;
+      NumericVector<Number> * training_vector_0 = new_it->second.get();
       ++new_it;
-      NumericVector<Number> * training_vector_1 = new_it->second;
+      NumericVector<Number> * training_vector_1 = new_it->second.get();
 
       for (unsigned int index1=0; index1<n_training_parameters_per_var; index1++)
         {
