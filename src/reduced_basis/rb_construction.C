@@ -112,12 +112,7 @@ void RBConstruction::clear()
   if (store_non_dirichlet_operators)
     {
       non_dirichlet_Aq_vector.clear();
-
-      for (std::size_t q=0; q<non_dirichlet_Fq_vector.size(); q++)
-        {
-          delete non_dirichlet_Fq_vector[q];
-          non_dirichlet_Fq_vector[q] = libmesh_nullptr;
-        }
+      non_dirichlet_Fq_vector.clear();
 
       for (std::size_t i=0; i<non_dirichlet_outputs_vector.size(); i++)
         for (std::size_t q_l=0; q_l<non_dirichlet_outputs_vector[i].size(); q_l++)
@@ -548,7 +543,7 @@ void RBConstruction::allocate_data_structures()
       for (unsigned int q=0; q<get_rb_theta_expansion().get_n_F_terms(); q++)
         {
           // Initialize the memory for the vectors
-          non_dirichlet_Fq_vector[q] = NumericVector<Number>::build(this->comm()).release();
+          non_dirichlet_Fq_vector[q] = NumericVector<Number>::build(this->comm());
           non_dirichlet_Fq_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
         }
     }
@@ -1846,7 +1841,7 @@ NumericVector<Number> * RBConstruction::get_non_dirichlet_Fq(unsigned int q)
   if (q >= get_rb_theta_expansion().get_n_F_terms())
     libmesh_error_msg("Error: We must have q < Q_f in get_Fq.");
 
-  return non_dirichlet_Fq_vector[q];
+  return non_dirichlet_Fq_vector[q].get();
 }
 
 NumericVector<Number> * RBConstruction::get_output_vector(unsigned int n, unsigned int q_l)
