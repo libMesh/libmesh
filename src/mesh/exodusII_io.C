@@ -147,10 +147,6 @@ void ExodusII_IO::read (const std::string & fname)
   elems_of_dimension.clear();
   elems_of_dimension.resize(4, false);
 
-#ifdef DEBUG
-  this->verbose(true);
-#endif
-
   // Instantiate the ElementMaps interface
   ExodusII_IO_Helper::ElementMaps em;
 
