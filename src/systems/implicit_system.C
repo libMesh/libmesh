@@ -460,10 +460,10 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
   // We'll use temporary rhs vectors, because we haven't (yet) found
   // any good reasons why users might want to save these:
 
-  std::vector<NumericVector<Number> *> temprhs(this->qoi.size());
+  std::vector<std::unique_ptr<NumericVector<Number>>> temprhs(this->qoi.size());
   for (std::size_t i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
-      temprhs[i] = this->rhs->zero_clone().release();
+      temprhs[i] = this->rhs->zero_clone();
 
   // We approximate the _l partial derivatives via a central
   // differencing perturbation in the w_l direction:
@@ -559,10 +559,6 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
       }
 
   this->release_linear_solver(linear_solver);
-
-  for (std::size_t i=0; i != this->qoi.size(); ++i)
-    if (qoi_indices.has_index(i))
-      delete temprhs[i];
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
