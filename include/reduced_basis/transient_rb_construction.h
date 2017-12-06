@@ -405,7 +405,7 @@ private:
   /**
    * Dense matrix to store the data that we use for the temporal POD.
    */
-  std::vector<NumericVector<Number> * > temporal_data;
+  std::vector<std::unique_ptr<NumericVector<Number>>> temporal_data;
 };
 
 } // namespace libMesh

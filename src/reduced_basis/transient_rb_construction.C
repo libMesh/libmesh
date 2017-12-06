@@ -71,8 +71,6 @@ TransientRBConstruction::TransientRBConstruction (EquationSystems & es,
   // inner product matrix in this case
   compute_RB_inner_product = true;
 
-  temporal_data.resize(0);
-
   // We should not necessarily exit the greedy due to repeated parameters in
   // the transient case
   exit_on_repeated_greedy_parameters = false;
@@ -97,16 +95,7 @@ void TransientRBConstruction::clear()
     non_dirichlet_M_q_vector.clear();
 
   // clear the temporal_data
-  for (std::size_t i=0; i<temporal_data.size(); i++)
-    {
-      if (temporal_data[i])
-        {
-          temporal_data[i]->clear();
-          delete temporal_data[i];
-          temporal_data[i] = libmesh_nullptr;
-        }
-    }
-  temporal_data.resize(0);
+  temporal_data.clear();
 }
 
 void TransientRBConstruction::initialize_rb_construction(bool skip_matrix_assembly,
@@ -245,7 +234,7 @@ void TransientRBConstruction::allocate_data_structures()
 
   for (unsigned int i=0; i<n_time_levels; i++)
     {
-      temporal_data[i] = (NumericVector<Number>::build(this->comm()).release());
+      temporal_data[i] = NumericVector<Number>::build(this->comm());
       temporal_data[i]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
     }
 
