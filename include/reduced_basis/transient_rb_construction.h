@@ -279,7 +279,7 @@ public:
    * that do not have the Dirichlet boundary conditions
    * enforced.
    */
-  std::vector<SparseMatrix<Number> *> non_dirichlet_M_q_vector;
+  std::vector<std::unique_ptr<SparseMatrix<Number>>> non_dirichlet_M_q_vector;
 
   /**
    * The truth outputs for all time-levels from the
