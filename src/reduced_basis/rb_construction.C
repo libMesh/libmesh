@@ -132,11 +132,8 @@ void RBConstruction::clear()
     }
 
   // Also delete the Fq representors
-  for (std::size_t q_f=0; q_f<Fq_representor.size(); q_f++)
-    {
-      delete Fq_representor[q_f];
-      Fq_representor[q_f] = libmesh_nullptr;
-    }
+  Fq_representor.clear();
+
   // Set Fq_representor_innerprods_computed flag to false now
   // that we've cleared the Fq representors
   Fq_representor_innerprods_computed = false;
@@ -1688,7 +1685,7 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
         {
           if (!Fq_representor[q_f])
             {
-              Fq_representor[q_f] = (NumericVector<Number>::build(this->comm()).release());
+              Fq_representor[q_f] = NumericVector<Number>::build(this->comm());
               Fq_representor[q_f]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
             }
 
@@ -1966,7 +1963,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string & riesz
 
   for (std::size_t i=0; i<Fq_representor.size(); ++i)
     {
-      if (Fq_representor[i] != libmesh_nullptr)
+      if (Fq_representor[i])
         {
           file_name.str(""); // reset filename
           file_name << riesz_representors_dir << "/Fq_representor" << i << riesz_representor_suffix;
@@ -2066,7 +2063,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
   // should we be worried about leaks here?
   for (std::size_t i=0; i<Fq_representor.size(); ++i)
     {
-      if (Fq_representor[i] != libmesh_nullptr)
+      if (Fq_representor[i])
         libmesh_error_msg("Error, must delete existing Fq_representor before reading in from file.");
     }
 
@@ -2090,7 +2087,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
 
       read_serialized_data(fqr_data, false);
 
-      Fq_representor[i] = NumericVector<Number>::build(this->comm()).release();
+      Fq_representor[i] = NumericVector<Number>::build(this->comm());
       Fq_representor[i]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
       // No need to copy, just swap

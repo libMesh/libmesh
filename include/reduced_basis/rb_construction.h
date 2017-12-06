@@ -469,7 +469,7 @@ public:
    * These are basis independent and hence stored here, whereas
    * the Aq_representors are stored in RBEvaluation
    */
-  std::vector<NumericVector<Number> * > Fq_representor;
+  std::vector<std::unique_ptr<NumericVector<Number>>> Fq_representor;
 
   /**
    * Vectors storing the residual representor inner products
