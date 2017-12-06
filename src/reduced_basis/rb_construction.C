@@ -1568,10 +1568,10 @@ void RBConstruction::compute_output_dual_innerprods()
       for (unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
         max_Q_l = (get_rb_theta_expansion().get_n_output_terms(n) > max_Q_l) ? get_rb_theta_expansion().get_n_output_terms(n) : max_Q_l;
 
-      std::vector<NumericVector<Number> *> L_q_representor(max_Q_l);
+      std::vector<std::unique_ptr<NumericVector<Number>>> L_q_representor(max_Q_l);
       for (unsigned int q=0; q<max_Q_l; q++)
         {
-          L_q_representor[q] = (NumericVector<Number>::build(this->comm()).release());
+          L_q_representor[q] = NumericVector<Number>::build(this->comm());
           L_q_representor[q]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
         }
 
@@ -1625,16 +1625,6 @@ void RBConstruction::compute_output_dual_innerprods()
 
                   q++;
                 }
-            }
-        }
-
-      // Finally clear the L_q_representor vectors
-      for (unsigned int q=0; q<max_Q_l; q++)
-        {
-          if (L_q_representor[q])
-            {
-              delete L_q_representor[q];
-              L_q_representor[q] = libmesh_nullptr;
             }
         }
 
