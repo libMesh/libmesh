@@ -65,7 +65,12 @@ run_example() {
 	
 	message_running $example_name $executable $options
 
-	$LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS || exit $?
+	$LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS
+        RETVAL=$?
+        # If we don't return 'success' or 'skip', quit
+        if [ $RETVAL -ne 0 -a $RETVAL -ne 77 ]; then
+          exit $RETVAL
+        fi
 	
 	message_done_running $example_name $executable $options
     done

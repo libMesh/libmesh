@@ -51,6 +51,9 @@ public:
   unsigned int coarserefinements, extrarefinements;
   std::string mesh_redistribute_func;
 
+  //   Mesh partitioning
+  std::string mesh_partitioner_type;
+
   //   Mesh refinement
 
   unsigned int nelem_target;

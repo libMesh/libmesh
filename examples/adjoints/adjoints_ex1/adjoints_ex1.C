@@ -58,12 +58,14 @@
 
 // General libMesh includes
 #include "libmesh/equation_systems.h"
-#include "libmesh/linear_solver.h"
 #include "libmesh/error_vector.h"
+#include "libmesh/factory.h"
+#include "libmesh/linear_solver.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/newton_solver.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/partitioner.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/system_norm.h"
 
@@ -295,9 +297,13 @@ int main (int argc, char ** argv)
     if (!i)
       libmesh_error_msg('[' << init.comm().rank() << "] Can't find general.in; exiting early.");
   }
-  GetPot infile("general.in");
 
   // Read in parameters from the input file
+  GetPot infile("general.in");
+
+  // But allow the command line to override it.
+  infile.parse_command_line(argc, argv);
+
   FEMParameters param(init.comm());
   param.read(infile);
 
@@ -307,6 +313,41 @@ int main (int argc, char ** argv)
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.
   Mesh mesh(init.comm());
+
+  // Give the mesh a non-default partitioner if we can try to do so
+  // safely
+  if (param.mesh_partitioner_type != "Default")
+    {
+#ifndef LIBMESH_HAVE_RTTI
+      libmesh_example_requires(false, "RTTI support");
+#else
+      // Factory failures are *verbose* in parallel; let's silence
+      // cerr temporarily.
+      auto oldbuf = libMesh::err.rdbuf();
+      libMesh::err.rdbuf(libmesh_nullptr);
+      try
+        {
+          // Many partitioners won't work on a distributed Mesh, and
+          // even a currently serialized DistributedMesh won't stay
+          // that way through AMR/C
+          if (!mesh.is_replicated() &&
+              (param.mesh_partitioner_type == "Centroid" ||
+               param.mesh_partitioner_type == "Hilbert" ||
+               param.mesh_partitioner_type == "Morton" ||
+               param.mesh_partitioner_type == "SFCurves" ||
+               param.mesh_partitioner_type == "Metis"))
+            libmesh_example_requires(false, "--disable-parmesh");
+
+          mesh.partitioner() =
+            Factory<Partitioner>::build(param.mesh_partitioner_type);
+        }
+      catch (...)
+        {
+          libmesh_example_requires(false, param.mesh_partitioner_type + " partitioner support");
+        }
+      libMesh::err.rdbuf(oldbuf);
+#endif // LIBMESH_HAVE_RTI
+    }
 
   // And an object to refine it
   std::unique_ptr<MeshRefinement> mesh_refinement =
@@ -569,8 +610,18 @@ int main (int argc, char ** argv)
                      << std::endl;
 
         // Hard coded asserts to ensure that the actual numbers we are getting are what they should be
-        libmesh_assert_less(std::abs(QoI_0_computed - QoI_0_exact)/std::abs(QoI_0_exact), 4.e-5);
-        libmesh_assert_less(std::abs(QoI_1_computed - QoI_1_exact)/std::abs(QoI_1_exact), 1.e-4);
+        if (param.max_adaptivesteps > 5 && param.coarserefinements > 2)
+          {
+            libmesh_assert_less(std::abs(QoI_0_computed - QoI_0_exact)/std::abs(QoI_0_exact), 4.e-5);
+            libmesh_assert_less(std::abs(QoI_1_computed - QoI_1_exact)/std::abs(QoI_1_exact), 1.e-4);
+          }
+        else
+          {
+            // This seems to be loose enough for the case of 2 coarse
+            // refinements, 4 adaptive steps
+            libmesh_assert_less(std::abs(QoI_0_computed - QoI_0_exact)/std::abs(QoI_0_exact), 4.e-4);
+            libmesh_assert_less(std::abs(QoI_1_computed - QoI_1_exact)/std::abs(QoI_1_exact), 2.e-3);
+          }
       }
   }
 

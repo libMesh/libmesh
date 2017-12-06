@@ -68,6 +68,10 @@ void SFCPartitioner::partition_range(MeshBase & mesh,
 
   LOG_SCOPE("partition_range()", "SFCPartitioner");
 
+  // We don't yet support distributed meshes with this Partitioner
+  if (!mesh.is_serial())
+    libmesh_not_implemented();
+
   const dof_id_type n_range_elem = std::distance(beg, end);
   const dof_id_type n_elem = mesh.n_elem();
 
