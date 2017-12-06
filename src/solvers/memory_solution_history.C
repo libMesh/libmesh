@@ -22,27 +22,9 @@
 
 namespace libMesh
 {
-// The Destructor
+
 MemorySolutionHistory::~MemorySolutionHistory ()
 {
-  stored_solutions_iterator stored_sols_it = stored_solutions.begin();
-  const stored_solutions_iterator stored_sols_end = stored_solutions.end();
-
-  for (; stored_sols_it != stored_sols_end; ++stored_sols_it)
-    {
-      // The saved vectors at this timestep
-      std::map<std::string, NumericVector<Number> *> saved_vectors = stored_sols_it->second;
-
-      std::map<std::string, NumericVector<Number> *>::iterator vec = saved_vectors.begin();
-      std::map<std::string, NumericVector<Number> *>::iterator vec_end = saved_vectors.end();
-
-      // Loop over all the saved vectors
-      for (; vec != vec_end; ++vec)
-        {
-          // Delete this saved vector
-          delete vec->second;
-        }
-    }
 }
 
 // This function finds, if it can, the entry where we're supposed to
@@ -89,9 +71,7 @@ void MemorySolutionHistory::store()
   // In an empty history we create the first entry
   if (stored_solutions.begin() == stored_solutions.end())
     {
-      stored_solutions.push_back
-        (std::make_pair(_system.time,
-                        std::map<std::string, NumericVector<Number> *>()));
+      stored_solutions.push_back(std::make_pair(_system.time, map_type()));
       stored_sols = stored_solutions.begin();
     }
 
@@ -102,9 +82,7 @@ void MemorySolutionHistory::store()
       ++stored_sols;
       libmesh_assert (stored_sols == stored_solutions.end());
 #endif
-      stored_solutions.push_back
-        (std::make_pair(_system.time,
-                        std::map<std::string, NumericVector<Number> *>()));
+      stored_solutions.push_back(std::make_pair(_system.time, map_type()));
       stored_sols = stored_solutions.end();
       --stored_sols;
     }
@@ -113,9 +91,7 @@ void MemorySolutionHistory::store()
   else if (stored_sols->first - _system.time > TOLERANCE)
     {
       libmesh_assert (stored_sols == stored_solutions.begin());
-      stored_solutions.push_front
-        (std::make_pair(_system.time,
-                        std::map<std::string, NumericVector<Number> *>()));
+      stored_solutions.push_front(std::make_pair(_system.time, map_type()));
       stored_sols = stored_solutions.begin();
     }
 
@@ -123,7 +99,7 @@ void MemorySolutionHistory::store()
   libmesh_assert(std::abs(stored_sols->first - _system.time) < TOLERANCE);
 
   // Map of stored vectors for this solution step
-  std::map<std::string, NumericVector<Number> *> & saved_vectors = stored_sols->second;
+  std::map<std::string, std::unique_ptr<NumericVector<Number>>> & saved_vectors = stored_sols->second;
 
   // Loop over all the system vectors
   for (System::vectors_iterator vec = _system.vectors_begin(); vec != _system.vectors_end(); ++vec)
@@ -133,23 +109,21 @@ void MemorySolutionHistory::store()
 
       // If we haven't seen this vector before or if we have and
       // want to overwrite it
-      if ((overwrite_previously_stored ||
-           !saved_vectors.count(vec_name)) &&
+      if ((overwrite_previously_stored || !saved_vectors.count(vec_name)) &&
           // and if we think it's worth preserving
           _system.vector_preservation(vec_name))
         {
           // Then we save it.
-          saved_vectors[vec_name] = vec->second->clone().release();
+          saved_vectors[vec_name] = vec->second->clone();
         }
     }
 
   // Of course, we will usually save the actual solution
   std::string _solution("_solution");
-  if ((overwrite_previously_stored ||
-       !saved_vectors.count(_solution)) &&
+  if ((overwrite_previously_stored || !saved_vectors.count(_solution)) &&
       // and if we think it's worth preserving
       _system.project_solution_on_reinit())
-    saved_vectors[_solution] = _system.solution->clone().release();
+    saved_vectors[_solution] = _system.solution->clone();
 }
 
 void MemorySolutionHistory::retrieve()
@@ -174,10 +148,10 @@ void MemorySolutionHistory::retrieve()
     }
 
   // Get the saved vectors at this timestep
-  std::map<std::string, NumericVector<Number> *> & saved_vectors = stored_sols->second;
+  map_type & saved_vectors = stored_sols->second;
 
-  std::map<std::string, NumericVector<Number> *>::iterator vec = saved_vectors.begin();
-  std::map<std::string, NumericVector<Number> *>::iterator vec_end = saved_vectors.end();
+  map_type::iterator vec = saved_vectors.begin();
+  map_type::iterator vec_end = saved_vectors.end();
 
   // Loop over all the saved vectors
   for (; vec != vec_end; ++vec)
@@ -197,4 +171,3 @@ void MemorySolutionHistory::retrieve()
 }
 
 }
-// End namespace libMesh
