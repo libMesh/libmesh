@@ -272,7 +272,7 @@ public:
   /**
    * Vector storing the Q_m matrices from the mass operator
    */
-  std::vector<SparseMatrix<Number> *> M_q_vector;
+  std::vector<std::unique_ptr<SparseMatrix<Number>>> M_q_vector;
 
   /**
    * We sometimes also need a second set of M_q matrices

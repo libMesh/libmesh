@@ -91,11 +91,7 @@ void TransientRBConstruction::clear()
   Parent::clear();
 
   // clear the mass matrices
-  for (std::size_t q=0; q<M_q_vector.size(); q++)
-    {
-      delete M_q_vector[q];
-      M_q_vector[q] = libmesh_nullptr;
-    }
+  M_q_vector.clear();
 
   if (store_non_dirichlet_operators)
     {
@@ -228,7 +224,7 @@ void TransientRBConstruction::allocate_data_structures()
     for (unsigned int q=0; q<Q_m; q++)
       {
         // Initialize the memory for the matrices
-        M_q_vector[q] = SparseMatrix<Number>::build(this->comm()).release();
+        M_q_vector[q] = SparseMatrix<Number>::build(this->comm());
         dof_map.attach_matrix(*M_q_vector[q]);
         M_q_vector[q]->init();
         M_q_vector[q]->zero();
@@ -318,7 +314,7 @@ SparseMatrix<Number> * TransientRBConstruction::get_M_q(unsigned int q)
   if (q >= trans_theta_expansion.get_n_M_terms())
     libmesh_error_msg("Error: We must have q < Q_m in get_M_q.");
 
-  return M_q_vector[q];
+  return M_q_vector[q].get();
 }
 
 SparseMatrix<Number> * TransientRBConstruction::get_non_dirichlet_M_q(unsigned int q)
