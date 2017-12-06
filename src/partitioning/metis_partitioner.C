@@ -59,7 +59,10 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                                        unsigned int n_pieces)
 {
   libmesh_assert_greater (n_pieces, 0);
-  libmesh_assert (mesh.is_serial());
+
+  // We don't yet support distributed meshes with this Partitioner
+  if (!mesh.is_serial())
+    libmesh_not_implemented();
 
   // Check for an easy return
   if (n_pieces == 1)
