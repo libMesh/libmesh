@@ -102,15 +102,7 @@ void RBEIMConstruction::clear()
   _rb_eim_assembly_objects.clear();
 
   // clear the parametrized functions from the training set
-  for (std::size_t i=0; i<_parametrized_functions_in_training_set.size(); i++)
-    {
-      if (_parametrized_functions_in_training_set[i])
-        {
-          _parametrized_functions_in_training_set[i]->clear();
-          delete _parametrized_functions_in_training_set[i];
-          _parametrized_functions_in_training_set[i] = libmesh_nullptr;
-        }
-    }
+  _parametrized_functions_in_training_set.clear();
   _parametrized_functions_in_training_set_initialized = false;
 
   for (std::size_t i=0; i<_matrix_times_bfs.size(); i++)
@@ -487,7 +479,7 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
       set_params_from_training_set(i);
       truth_solve(-1);
 
-      _parametrized_functions_in_training_set[i] = get_explicit_system().solution->clone().release();
+      _parametrized_functions_in_training_set[i] = get_explicit_system().solution->clone();
 
       libMesh::out << "Completed solve for training sample " << (i+1) << " of " << get_n_training_samples() << std::endl;
     }

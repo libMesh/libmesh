@@ -290,7 +290,7 @@ protected:
    * The libMesh vectors storing the finite element coefficients
    * of the RB basis functions.
    */
-  std::vector<NumericVector<Number> * > _parametrized_functions_in_training_set;
+  std::vector<std::unique_ptr<NumericVector<Number>>> _parametrized_functions_in_training_set;
 
 private:
 
