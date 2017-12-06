@@ -97,8 +97,6 @@ void RBEIMConstruction::clear()
   _mesh_function.reset();
 
   // clear the eim assembly vector
-  for (std::size_t i=0; i<_rb_eim_assembly_objects.size(); i++)
-    delete _rb_eim_assembly_objects[i];
   _rb_eim_assembly_objects.clear();
 
   // clear the parametrized functions from the training set
@@ -259,9 +257,7 @@ void RBEIMConstruction::initialize_eim_assembly_objects()
 {
   _rb_eim_assembly_objects.clear();
   for (unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
-    {
-      _rb_eim_assembly_objects.push_back( build_eim_assembly(i).release() );
-    }
+    _rb_eim_assembly_objects.push_back(build_eim_assembly(i));
 }
 
 ExplicitSystem & RBEIMConstruction::get_explicit_system()
@@ -298,7 +294,7 @@ void RBEIMConstruction::load_rb_solution()
   get_explicit_system().update();
 }
 
-std::vector<ElemAssembly *> RBEIMConstruction::get_eim_assembly_objects()
+std::vector<std::unique_ptr<ElemAssembly>> & RBEIMConstruction::get_eim_assembly_objects()
 {
   return _rb_eim_assembly_objects;
 }

@@ -172,7 +172,7 @@ public:
   /**
    * \returns The vector of assembly objects that point to this RBEIMConstruction.
    */
-  std::vector<ElemAssembly *> get_eim_assembly_objects();
+  std::vector<std::unique_ptr<ElemAssembly>> & get_eim_assembly_objects();
 
   /**
    * Build an element assembly object that will access basis function
@@ -315,7 +315,7 @@ private:
    * The vector of assembly objects that are created to point to
    * this RBEIMConstruction.
    */
-  std::vector<ElemAssembly *> _rb_eim_assembly_objects;
+  std::vector<std::unique_ptr<ElemAssembly>> _rb_eim_assembly_objects;
 
   /**
    * We use an ExplicitSystem to store the EIM basis functions.

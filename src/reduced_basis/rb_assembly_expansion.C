@@ -133,10 +133,10 @@ void RBAssemblyExpansion::attach_A_assembly(ElemAssembly * Aq_assembly)
   _A_assembly_vector.push_back(Aq_assembly);
 }
 
-void RBAssemblyExpansion::attach_multiple_A_assembly(std::vector<ElemAssembly *> Aq_assembly)
+void RBAssemblyExpansion::attach_multiple_A_assembly(std::vector<std::unique_ptr<ElemAssembly>> & Aq_assembly)
 {
   for (std::size_t i=0; i<Aq_assembly.size(); i++)
-    _A_assembly_vector.push_back(Aq_assembly[i]);
+    _A_assembly_vector.push_back(Aq_assembly[i].get());
 }
 
 void RBAssemblyExpansion::attach_F_assembly(ElemAssembly * Fq_assembly)
@@ -144,10 +144,10 @@ void RBAssemblyExpansion::attach_F_assembly(ElemAssembly * Fq_assembly)
   _F_assembly_vector.push_back(Fq_assembly);
 }
 
-void RBAssemblyExpansion::attach_multiple_F_assembly(std::vector<ElemAssembly *> Fq_assembly)
+void RBAssemblyExpansion::attach_multiple_F_assembly(std::vector<std::unique_ptr<ElemAssembly>> & Fq_assembly)
 {
   for (std::size_t i=0; i<Fq_assembly.size(); i++)
-    _F_assembly_vector.push_back(Fq_assembly[i]);
+    _F_assembly_vector.push_back(Fq_assembly[i].get());
 }
 
 void RBAssemblyExpansion::attach_output_assembly(std::vector<ElemAssembly *> output_assembly)
