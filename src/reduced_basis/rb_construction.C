@@ -113,13 +113,7 @@ void RBConstruction::clear()
     {
       non_dirichlet_Aq_vector.clear();
       non_dirichlet_Fq_vector.clear();
-
-      for (std::size_t i=0; i<non_dirichlet_outputs_vector.size(); i++)
-        for (std::size_t q_l=0; q_l<non_dirichlet_outputs_vector[i].size(); q_l++)
-          {
-            delete non_dirichlet_outputs_vector[i][q_l];
-            non_dirichlet_outputs_vector[i][q_l] = libmesh_nullptr;
-          }
+      non_dirichlet_outputs_vector.clear();
     }
 
   // Also delete the Fq representors
@@ -565,7 +559,7 @@ void RBConstruction::allocate_data_structures()
           for (unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
             {
               // Initialize the memory for the truth output vectors
-              non_dirichlet_outputs_vector[n][q_l] = (NumericVector<Number>::build(this->comm()).release());
+              non_dirichlet_outputs_vector[n][q_l] = NumericVector<Number>::build(this->comm());
               non_dirichlet_outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
             }
         }
@@ -1859,7 +1853,7 @@ NumericVector<Number> * RBConstruction::get_non_dirichlet_output_vector(unsigned
     libmesh_error_msg("Error: We must have n < n_outputs and "          \
                       << "q_l < get_rb_theta_expansion().get_n_output_terms(n) in get_non_dirichlet_output_vector.");
 
-  return non_dirichlet_outputs_vector[n][q_l];
+  return non_dirichlet_outputs_vector[n][q_l].get();
 }
 
 void RBConstruction::get_all_matrices(std::map<std::string, SparseMatrix<Number> *> & all_matrices)

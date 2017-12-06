@@ -762,7 +762,7 @@ private:
    */
   std::vector<std::unique_ptr<SparseMatrix<Number>>> non_dirichlet_Aq_vector;
   std::vector<std::unique_ptr<NumericVector<Number>>> non_dirichlet_Fq_vector;
-  std::vector<std::vector<NumericVector<Number> * >> non_dirichlet_outputs_vector;
+  std::vector<std::vector<std::unique_ptr<NumericVector<Number>>>> non_dirichlet_outputs_vector;
 
   /**
    * Relative and absolute tolerances for training reduced basis
