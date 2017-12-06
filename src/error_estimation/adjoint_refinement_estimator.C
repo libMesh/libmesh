@@ -150,21 +150,19 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
     } // End loop over QoIs
 
   // We'll want to back up all coarse grid vectors
-  std::map<std::string, NumericVector<Number> *> coarse_vectors;
+  std::map<std::string, std::unique_ptr<NumericVector<Number>>> coarse_vectors;
   for (System::vectors_iterator vec = system.vectors_begin(); vec !=
          system.vectors_end(); ++vec)
     {
       // The (string) name of this vector
       const std::string & var_name = vec->first;
 
-      coarse_vectors[var_name] = vec->second->clone().release();
+      coarse_vectors[var_name] = vec->second->clone();
     }
 
   // Back up the coarse solution and coarse local solution
-  NumericVector<Number> * coarse_solution =
-    system.solution->clone().release();
-  NumericVector<Number> * coarse_local_solution =
-    system.current_local_solution->clone().release();
+  std::unique_ptr<NumericVector<Number>> coarse_solution = system.solution->clone();
+  std::unique_ptr<NumericVector<Number>> coarse_local_solution = system.current_local_solution->clone();
 
   // And we'll need to temporarily change solution projection settings
   bool old_projection_setting;
@@ -222,13 +220,12 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
   // Copy the projected coarse grid solutions, which will be
   // overwritten by solve()
-  std::vector<NumericVector<Number> *> coarse_adjoints;
+  std::vector<std::unique_ptr<NumericVector<Number>>> coarse_adjoints;
   for (std::size_t j=0; j != system.qoi.size(); j++)
     {
       if (_qoi_set.has_index(j))
         {
-          NumericVector<Number> * coarse_adjoint =
-            NumericVector<Number>::build(mesh.comm()).release();
+          auto coarse_adjoint = NumericVector<Number>::build(mesh.comm());
 
           // Can do "fast" init since we're overwriting this in a sec
           coarse_adjoint->init(system.get_adjoint_solution(j),
@@ -236,10 +233,10 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
           *coarse_adjoint = system.get_adjoint_solution(j);
 
-          coarse_adjoints.push_back(coarse_adjoint);
+          coarse_adjoints.emplace_back(std::move(coarse_adjoint));
         }
       else
-        coarse_adjoints.push_back(static_cast<NumericVector<Number> *>(libmesh_nullptr));
+        coarse_adjoints.emplace_back(libmesh_nullptr);
     }
 
   // Next, we are going to build up the residual for evaluating the
@@ -505,10 +502,6 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
         } // End if belong to QoI set
     } // End loop over QoIs
 
-  for (std::size_t j=0; j != system.qoi.size(); j++)
-    if (_qoi_set.has_index(j))
-      delete coarse_adjoints[j];
-
   // Don't bother projecting the solution; we'll restore from backup
   // after coarsening
   system.project_solution_on_reinit() = false;
@@ -539,9 +532,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
   // Restore the coarse solution vectors and delete their copies
   *system.solution = *coarse_solution;
-  delete coarse_solution;
   *system.current_local_solution = *coarse_local_solution;
-  delete coarse_local_solution;
 
   for (System::vectors_iterator vec = system.vectors_begin(); vec !=
          system.vectors_end(); ++vec)
@@ -551,15 +542,14 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
       // If it's a vector we already had (and not a newly created
       // vector like an adjoint rhs), we need to restore it.
-      std::map<std::string, NumericVector<Number> *>::iterator it =
+      std::map<std::string, std::unique_ptr<NumericVector<Number>>>::iterator it =
         coarse_vectors.find(var_name);
       if (it != coarse_vectors.end())
         {
-          NumericVector<Number> * coarsevec = it->second;
+          NumericVector<Number> * coarsevec = it->second.get();
           system.get_vector(var_name) = *coarsevec;
 
           coarsevec->clear();
-          delete coarsevec;
         }
     }
 
