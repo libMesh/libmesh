@@ -262,11 +262,11 @@ private:
   /**
    * Element residual subvectors and Jacobian submatrices
    */
-  std::vector<DenseSubVector<Number> *> _neighbor_subresiduals;
-  std::vector<std::vector<DenseSubMatrix<Number> *>> _elem_elem_subjacobians;
-  std::vector<std::vector<DenseSubMatrix<Number> *>> _elem_neighbor_subjacobians;
-  std::vector<std::vector<DenseSubMatrix<Number> *>> _neighbor_elem_subjacobians;
-  std::vector<std::vector<DenseSubMatrix<Number> *>> _neighbor_neighbor_subjacobians;
+  std::vector<std::unique_ptr<DenseSubVector<Number>>> _neighbor_subresiduals;
+  std::vector<std::vector<std::unique_ptr<DenseSubMatrix<Number>>>> _elem_elem_subjacobians;
+  std::vector<std::vector<std::unique_ptr<DenseSubMatrix<Number>>>> _elem_neighbor_subjacobians;
+  std::vector<std::vector<std::unique_ptr<DenseSubMatrix<Number>>>> _neighbor_elem_subjacobians;
+  std::vector<std::vector<std::unique_ptr<DenseSubMatrix<Number>>>> _neighbor_neighbor_subjacobians;
 
   /**
    * Global Degree of freedom index lists for the neighbor element
@@ -281,7 +281,7 @@ private:
    * interior since we just need to handle DG interface
    * terms here.
    */
-  std::map<FEType, FEAbstract *> _neighbor_side_fe;
+  std::map<FEType, std::unique_ptr<FEAbstract>> _neighbor_side_fe;
 
   /**
    * Pointers to the same finite element objects on the neighbor element,
