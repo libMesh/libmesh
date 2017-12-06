@@ -140,7 +140,7 @@ public:
   /**
    * \returns The vector of theta objects that point to this RBEIMEvaluation.
    */
-  std::vector<RBTheta *> get_eim_theta_objects();
+  std::vector<std::unique_ptr<RBTheta>> & get_eim_theta_objects();
 
   /**
    * Build a theta object corresponding to EIM index \p index.
@@ -217,7 +217,7 @@ private:
    * The vector of RBTheta objects that are created to point to
    * this RBEIMEvaluation.
    */
-  std::vector<RBTheta *> _rb_eim_theta_objects;
+  std::vector<std::unique_ptr<RBTheta>> _rb_eim_theta_objects;
 
   /**
    * We initialize RBEIMEvaluation so that it has an "empty" RBThetaExpansion, because
