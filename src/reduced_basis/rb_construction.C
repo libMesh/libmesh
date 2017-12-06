@@ -101,13 +101,7 @@ void RBConstruction::clear()
 
   Aq_vector.clear();
   Fq_vector.clear();
-
-  for (std::size_t i=0; i<outputs_vector.size(); i++)
-    for (std::size_t q_l=0; q_l<outputs_vector[i].size(); q_l++)
-      {
-        delete outputs_vector[i][q_l];
-        outputs_vector[i][q_l] = libmesh_nullptr;
-      }
+  outputs_vector.clear();
 
   if (store_non_dirichlet_operators)
     {
@@ -546,7 +540,7 @@ void RBConstruction::allocate_data_structures()
     for (unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
       {
         // Initialize the memory for the truth output vectors
-        outputs_vector[n][q_l] = (NumericVector<Number>::build(this->comm()).release());
+        outputs_vector[n][q_l] = NumericVector<Number>::build(this->comm());
         outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       }
 
@@ -1844,7 +1838,7 @@ NumericVector<Number> * RBConstruction::get_output_vector(unsigned int n, unsign
     libmesh_error_msg("Error: We must have n < n_outputs and "          \
                       << "q_l < get_rb_theta_expansion().get_n_output_terms(n) in get_output_vector.");
 
-  return outputs_vector[n][q_l];
+  return outputs_vector[n][q_l].get();
 }
 
 NumericVector<Number> * RBConstruction::get_non_dirichlet_output_vector(unsigned int n, unsigned int q_l)

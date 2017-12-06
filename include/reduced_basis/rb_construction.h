@@ -753,7 +753,7 @@ private:
    * The libMesh vectors that define the output functionals.
    * Each row corresponds to the affine expansion of an output.
    */
-  std::vector<std::vector<NumericVector<Number> * >> outputs_vector;
+  std::vector<std::vector<std::unique_ptr<NumericVector<Number>>>> outputs_vector;
 
   /**
    * We may also need a second set of matrices/vectors
