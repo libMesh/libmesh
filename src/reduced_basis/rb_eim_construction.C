@@ -431,10 +431,12 @@ void RBEIMConstruction::enrich_RB_space()
   Elem * elem_ptr = mesh.elem_ptr(optimal_elem_id);
   eim_eval.interpolation_points_elem.push_back( elem_ptr );
 
-  NumericVector<Number> * new_bf = NumericVector<Number>::build(this->comm()).release();
-  new_bf->init (get_explicit_system().n_dofs(), get_explicit_system().n_local_dofs(), false, PARALLEL);
-  *new_bf = *get_explicit_system().solution;
-  get_rb_evaluation().basis_functions.push_back( new_bf );
+  {
+    auto new_bf = NumericVector<Number>::build(this->comm());
+    new_bf->init (get_explicit_system().n_dofs(), get_explicit_system().n_local_dofs(), false, PARALLEL);
+    *new_bf = *get_explicit_system().solution;
+    get_rb_evaluation().basis_functions.emplace_back( std::move(new_bf) );
+  }
 
   if (best_fit_type_flag == PROJECTION_BEST_FIT)
     {
@@ -450,7 +452,7 @@ void RBEIMConstruction::enrich_RB_space()
       std::unique_ptr<NumericVector<Number>> localized_new_bf =
         NumericVector<Number>::build(this->comm());
       localized_new_bf->init(get_explicit_system().n_dofs(), false, SERIAL);
-      new_bf->localize(*localized_new_bf);
+      get_rb_evaluation().basis_functions.back()->localize(*localized_new_bf);
 
       for (unsigned int var=0; var<get_explicit_system().n_vars(); var++)
         {

@@ -150,7 +150,7 @@ public:
    * Set the number of basis functions. Useful when reading in
    * stored data.
    */
-  virtual void set_n_basis_functions(unsigned int n_bfs) { basis_functions.resize(n_bfs); }
+  virtual void set_n_basis_functions(unsigned int n_bfs);
 
   /**
    * Clear all the Riesz representors that are used to compute the RB residual
@@ -194,7 +194,7 @@ public:
    * written.
    */
   virtual void write_out_vectors(System & sys,
-                                 std::vector<NumericVector<Number> *> & vectors,
+                                 std::vector<std::unique_ptr<NumericVector<Number>>> & vectors,
                                  const std::string & directory_name = "offline_data",
                                  const std::string & data_name = "bf",
                                  const bool write_binary_basis_functions = true);
@@ -216,7 +216,7 @@ public:
    * that need to be read in.
    */
   void read_in_vectors(System & sys,
-                       std::vector<NumericVector<Number> *> & vectors,
+                       std::vector<std::unique_ptr<NumericVector<Number>>> & vectors,
                        const std::string & directory_name,
                        const std::string & data_name,
                        const bool read_binary_vectors);
@@ -228,7 +228,7 @@ public:
    * it at the end), which can save a lot of work compared to renumbering on every read.
    */
   void read_in_vectors_from_multiple_files(System & sys,
-                                           std::vector<std::vector<NumericVector<Number> *> *> multiple_vectors,
+                                           std::vector<std::vector<std::unique_ptr<NumericVector<Number>>> *> multiple_vectors,
                                            const std::vector<std::string> & multiple_directory_names,
                                            const std::vector<std::string> & multiple_data_names,
                                            const bool read_binary_vectors);
@@ -239,7 +239,7 @@ public:
    * The libMesh vectors storing the finite element coefficients
    * of the RB basis functions.
    */
-  std::vector<NumericVector<Number> *> basis_functions;
+  std::vector<std::unique_ptr<NumericVector<Number>>> basis_functions;
 
   /**
    * The list of parameters selected by the Greedy algorithm in generating

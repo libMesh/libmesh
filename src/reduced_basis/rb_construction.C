@@ -1229,7 +1229,7 @@ void RBConstruction::enrich_RB_space()
 {
   LOG_SCOPE("enrich_RB_space()", "RBConstruction");
 
-  NumericVector<Number> * new_bf = NumericVector<Number>::build(this->comm()).release();
+  auto new_bf = NumericVector<Number>::build(this->comm());
   new_bf->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
   *new_bf = *solution;
 
@@ -1256,7 +1256,7 @@ void RBConstruction::enrich_RB_space()
     }
 
   // load the new basis function into the basis_functions vector.
-  get_rb_evaluation().basis_functions.push_back( new_bf );
+  get_rb_evaluation().basis_functions.emplace_back( std::move(new_bf) );
 }
 
 void RBConstruction::update_system()

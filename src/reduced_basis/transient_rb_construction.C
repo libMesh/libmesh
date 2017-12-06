@@ -758,7 +758,7 @@ void TransientRBConstruction::add_IC_to_RB_space()
   initialize_truth();
 
   // load the new basis function into the basis_functions vector.
-  get_rb_evaluation().basis_functions.push_back( NumericVector<Number>::build(this->comm()).release() );
+  get_rb_evaluation().basis_functions.emplace_back(NumericVector<Number>::build(this->comm()));
   NumericVector<Number> & current_bf = get_rb_evaluation().get_basis_function(get_rb_evaluation().get_n_basis_functions()-1);
   current_bf.init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
   current_bf = *solution;
@@ -877,7 +877,7 @@ void TransientRBConstruction::enrich_RB_space()
   while (true)
     {
       // load the new basis function into the basis_functions vector.
-      get_rb_evaluation().basis_functions.push_back( NumericVector<Number>::build(this->comm()).release() );
+      get_rb_evaluation().basis_functions.emplace_back(NumericVector<Number>::build(this->comm()));
       NumericVector<Number> & current_bf = get_rb_evaluation().get_basis_function(get_rb_evaluation().get_n_basis_functions()-1);
       current_bf.init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       current_bf.zero();
