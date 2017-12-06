@@ -1477,8 +1477,8 @@ Real System::calculate_norm(const NumericVector<Number> & v,
       const FEType & fe_type = this->get_dof_map().variable_type(var);
 
       // Allow space for dims 0-3, even if we don't use them all
-      std::vector<FEBase *> fe_ptrs(4,libmesh_nullptr);
-      std::vector<QBase *> q_rules(4,libmesh_nullptr);
+      std::vector<std::unique_ptr<FEBase>> fe_ptrs(4);
+      std::vector<std::unique_ptr<QBase>> q_rules(4);
 
       const std::set<unsigned char> & elem_dims = _mesh.elem_dimensions();
 
@@ -1489,15 +1489,12 @@ Real System::calculate_norm(const NumericVector<Number> & v,
           if (skip_dimensions && skip_dimensions->find(*d_it) != skip_dimensions->end())
             continue;
 
-          q_rules[*d_it] =
-            fe_type.default_quadrature_rule (*d_it).release();
-
-          // Construct finite element object
-
-          fe_ptrs[*d_it] = FEBase::build(*d_it, fe_type).release();
+          // Construct quadrature and finite element objects
+          q_rules[*d_it] = fe_type.default_quadrature_rule (*d_it);
+          fe_ptrs[*d_it] = FEBase::build(*d_it, fe_type);
 
           // Attach quadrature rule to FE object
-          fe_ptrs[*d_it]->attach_quadrature_rule (q_rules[*d_it]);
+          fe_ptrs[*d_it]->attach_quadrature_rule (q_rules[*d_it].get());
         }
 
       std::vector<dof_id_type> dof_indices;
@@ -1520,8 +1517,8 @@ Real System::calculate_norm(const NumericVector<Number> & v,
           if (skip_dimensions && skip_dimensions->find(dim) != skip_dimensions->end())
             continue;
 
-          FEBase * fe = fe_ptrs[dim];
-          QBase * qrule = q_rules[dim];
+          FEBase * fe = fe_ptrs[dim].get();
+          QBase * qrule = q_rules[dim].get();
           libmesh_assert(fe);
           libmesh_assert(qrule);
 
@@ -1628,15 +1625,6 @@ Real System::calculate_norm(const NumericVector<Number> & v,
 #endif
             }
         }
-
-      // Need to delete the FE and quadrature objects to prevent a memory leak
-      for (std::size_t i=0; i<fe_ptrs.size(); i++)
-        if (fe_ptrs[i])
-          delete fe_ptrs[i];
-
-      for (std::size_t i=0; i<q_rules.size(); i++)
-        if (q_rules[i])
-          delete q_rules[i];
     }
 
   if (using_hilbert_norm)
