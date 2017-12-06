@@ -525,7 +525,7 @@ public:
   /**
    * Typedef for the localized_vectors iterator
    */
-  typedef std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *>>>::iterator localized_vectors_iterator;
+  typedef std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<std::unique_ptr<DenseSubVector<Number>>>>>::iterator localized_vectors_iterator;
 
   /**
    * Return a reference to DenseVector localization of localized_vector
@@ -556,7 +556,7 @@ protected:
    * pairs of element localized versions of that vector and per variable views
    */
 
-  std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *>>> _localized_vectors;
+  std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<std::unique_ptr<DenseSubVector<Number>>>>> _localized_vectors;
 
   /**
    * Element by element components of nonlinear_solution
