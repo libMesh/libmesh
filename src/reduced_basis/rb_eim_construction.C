@@ -105,15 +105,7 @@ void RBEIMConstruction::clear()
   _parametrized_functions_in_training_set.clear();
   _parametrized_functions_in_training_set_initialized = false;
 
-  for (std::size_t i=0; i<_matrix_times_bfs.size(); i++)
-    {
-      if (_matrix_times_bfs[i])
-        {
-          _matrix_times_bfs[i]->clear();
-          delete _matrix_times_bfs[i];
-          _matrix_times_bfs[i] = libmesh_nullptr;
-        }
-    }
+  _matrix_times_bfs.clear();
 }
 
 void RBEIMConstruction::process_parameters_file (const std::string & parameters_filename)
@@ -437,8 +429,7 @@ void RBEIMConstruction::enrich_RB_space()
 
       std::unique_ptr<NumericVector<Number>> implicit_sys_temp1 = this->solution->zero_clone();
       std::unique_ptr<NumericVector<Number>> implicit_sys_temp2 = this->solution->zero_clone();
-      NumericVector<Number>* matrix_times_new_bf =
-        get_explicit_system().solution->zero_clone().release();
+      auto matrix_times_new_bf = get_explicit_system().solution->zero_clone();
 
       // We must localize new_bf before calling get_explicit_sys_subvector
       std::unique_ptr<NumericVector<Number>> localized_new_bf =
@@ -459,7 +450,7 @@ void RBEIMConstruction::enrich_RB_space()
                                      *implicit_sys_temp2);
         }
 
-      _matrix_times_bfs.push_back(matrix_times_new_bf);
+      _matrix_times_bfs.emplace_back(std::move(matrix_times_new_bf));
     }
 }
 

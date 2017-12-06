@@ -335,7 +335,7 @@ private:
    * This vector is used to store inner_product_matrix * basis_function[i] for each i,
    * since we frequently use this data.
    */
-  std::vector<NumericVector<Number>* > _matrix_times_bfs;
+  std::vector<std::unique_ptr<NumericVector<Number>>> _matrix_times_bfs;
 
   /**
    * The point locator tolerance.
