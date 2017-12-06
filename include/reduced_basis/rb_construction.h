@@ -747,7 +747,7 @@ private:
    * Vector storing the Q_f vectors in the affine decomposition
    * of the right-hand side.
    */
-  std::vector<NumericVector<Number> * > Fq_vector;
+  std::vector<std::unique_ptr<NumericVector<Number>>> Fq_vector;
 
   /**
    * The libMesh vectors that define the output functionals.
