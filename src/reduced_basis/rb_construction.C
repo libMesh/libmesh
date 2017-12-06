@@ -111,11 +111,7 @@ void RBConstruction::clear()
 
   if (store_non_dirichlet_operators)
     {
-      for (std::size_t q=0; q<non_dirichlet_Aq_vector.size(); q++)
-        {
-          delete non_dirichlet_Aq_vector[q];
-          non_dirichlet_Aq_vector[q] = libmesh_nullptr;
-        }
+      non_dirichlet_Aq_vector.clear();
 
       for (std::size_t q=0; q<non_dirichlet_Fq_vector.size(); q++)
         {
@@ -529,7 +525,7 @@ void RBConstruction::allocate_data_structures()
         for (unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
           {
             // Initialize the memory for the matrices
-            non_dirichlet_Aq_vector[q] = SparseMatrix<Number>::build(this->comm()).release();
+            non_dirichlet_Aq_vector[q] = SparseMatrix<Number>::build(this->comm());
             dof_map.attach_matrix(*non_dirichlet_Aq_vector[q]);
             non_dirichlet_Aq_vector[q]->init();
             non_dirichlet_Aq_vector[q]->zero();
@@ -1831,7 +1827,7 @@ SparseMatrix<Number> * RBConstruction::get_non_dirichlet_Aq(unsigned int q)
   if (q >= get_rb_theta_expansion().get_n_A_terms())
     libmesh_error_msg("Error: We must have q < Q_a in get_Aq.");
 
-  return non_dirichlet_Aq_vector[q];
+  return non_dirichlet_Aq_vector[q].get();
 }
 
 NumericVector<Number> * RBConstruction::get_Fq(unsigned int q)
