@@ -327,14 +327,19 @@ int main (int argc, char ** argv)
       libMesh::err.rdbuf(libmesh_nullptr);
       try
         {
-          // Some partitioners won't work on a distributed Mesh, and
+          // Many partitioners won't work on a distributed Mesh, and
           // even a currently serialized DistributedMesh won't stay
           // that way through AMR/C
-          if (mesh.is_replicated() ||
-              (param.mesh_partitioner_type != "Metis" &&
-               param.mesh_partitioner_type != "Centroid"))
-            mesh.partitioner() =
-              Factory<Partitioner>::build(param.mesh_partitioner_type);
+          if (!mesh.is_replicated() &&
+              (param.mesh_partitioner_type == "Centroid" ||
+               param.mesh_partitioner_type == "Hilbert" ||
+               param.mesh_partitioner_type == "Morton" ||
+               param.mesh_partitioner_type == "SFCurves" ||
+               param.mesh_partitioner_type == "Metis"))
+            libmesh_example_requires(false, "--disable-parmesh");
+
+          mesh.partitioner() =
+            Factory<Partitioner>::build(param.mesh_partitioner_type);
         }
       catch (...)
         {
