@@ -1461,7 +1461,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
           // Initialize the vector in which we'll store the representor
           if (!get_rb_evaluation().Aq_representor[q_a][i])
             {
-              get_rb_evaluation().Aq_representor[q_a][i] = (NumericVector<Number>::build(this->comm()).release());
+              get_rb_evaluation().Aq_representor[q_a][i] = NumericVector<Number>::build(this->comm());
               get_rb_evaluation().Aq_representor[q_a][i]->init(this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
             }
 
@@ -2112,7 +2112,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
 
         read_serialized_data(aqr_data, false);
 
-        get_rb_evaluation().Aq_representor[i][j] = NumericVector<Number>::build(this->comm()).release();
+        get_rb_evaluation().Aq_representor[i][j] = NumericVector<Number>::build(this->comm());
         get_rb_evaluation().Aq_representor[i][j]->init (n_dofs(), n_local_dofs(),
                                                         false, PARALLEL);
 

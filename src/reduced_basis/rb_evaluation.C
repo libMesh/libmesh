@@ -408,14 +408,7 @@ Real RBEvaluation::eval_output_dual_norm(unsigned int n, const RBParameters & mu
 
 void RBEvaluation::clear_riesz_representors()
 {
-
-  // Clear the Aq_representors
-  for (std::size_t q_a=0; q_a<Aq_representor.size(); q_a++)
-    for (std::size_t i=0; i<Aq_representor[q_a].size(); i++)
-      {
-        delete Aq_representor[q_a][i];
-        Aq_representor[q_a][i] = libmesh_nullptr;
-      }
+  Aq_representor.clear();
 }
 
 void RBEvaluation::legacy_write_offline_data_to_files(const std::string & directory_name,

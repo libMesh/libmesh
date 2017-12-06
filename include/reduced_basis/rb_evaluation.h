@@ -314,7 +314,7 @@ public:
    * These are basis dependent and hence stored here, whereas
    * the Fq_representors are stored in RBSystem.
    */
-  std::vector<std::vector<NumericVector<Number> *>> Aq_representor;
+  std::vector<std::vector<std::unique_ptr<NumericVector<Number>>>> Aq_representor;
 
   /**
    * Boolean to indicate whether we evaluate a posteriori error bounds
