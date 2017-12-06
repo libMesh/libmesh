@@ -99,11 +99,7 @@ void RBConstruction::clear()
 
   Parent::clear();
 
-  for (std::size_t q=0; q<Aq_vector.size(); q++)
-    {
-      delete Aq_vector[q];
-      Aq_vector[q] = libmesh_nullptr;
-    }
+  Aq_vector.clear();
 
   for (std::size_t q=0; q<Fq_vector.size(); q++)
     {
@@ -528,7 +524,7 @@ void RBConstruction::allocate_data_structures()
     for (unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
       {
         // Initialize the memory for the matrices
-        Aq_vector[q] = SparseMatrix<Number>::build(this->comm()).release();
+        Aq_vector[q] = SparseMatrix<Number>::build(this->comm());
         dof_map.attach_matrix(*Aq_vector[q]);
         Aq_vector[q]->init();
         Aq_vector[q]->zero();
@@ -1832,7 +1828,7 @@ SparseMatrix<Number> * RBConstruction::get_Aq(unsigned int q)
   if (q >= get_rb_theta_expansion().get_n_A_terms())
     libmesh_error_msg("Error: We must have q < Q_a in get_Aq.");
 
-  return Aq_vector[q];
+  return Aq_vector[q].get();
 }
 
 SparseMatrix<Number> * RBConstruction::get_non_dirichlet_Aq(unsigned int q)

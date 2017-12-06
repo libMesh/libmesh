@@ -741,7 +741,7 @@ private:
   /**
    * Vector storing the Q_a matrices from the affine expansion
    */
-  std::vector<SparseMatrix<Number> * > Aq_vector;
+  std::vector<std::unique_ptr<SparseMatrix<Number>>> Aq_vector;
 
   /**
    * Vector storing the Q_f vectors in the affine decomposition
