@@ -375,7 +375,6 @@ int main (int argc, char ** argv)
               // solution and assigns to each element a positive error value.
               // This value is used for deciding which elements to refine
               // and which to coarsen.
-              //ErrorEstimator* error_estimator = new KellyErrorEstimator;
               KellyErrorEstimator error_estimator;
 
               // Compute the error for each active element using the provided

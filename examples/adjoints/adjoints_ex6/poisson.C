@@ -46,7 +46,7 @@ public:
   }
 
   virtual std::unique_ptr<FunctionBase<Number>> clone() const
-  { return std::unique_ptr<FunctionBase<Number>> (new BdyFunction(_T_var)); }
+  { return libmesh_make_unique<BdyFunction>(_T_var); }
 
 private:
   const unsigned int _T_var;

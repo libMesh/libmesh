@@ -57,7 +57,7 @@ public:
   }
 
   virtual std::unique_ptr<FunctionBase<Number>> clone() const
-  { return std::unique_ptr<FunctionBase<Number>> (new SolutionFunction(_u_var)); }
+  { return libmesh_make_unique<SolutionFunction>(_u_var); }
 
 private:
 
@@ -95,7 +95,7 @@ public:
   }
 
   virtual std::unique_ptr<FunctionBase<Gradient>> clone() const
-  { return std::unique_ptr<FunctionBase<Gradient>> (new SolutionGradient(_u_var)); }
+  { return libmesh_make_unique<SolutionGradient>(_u_var); }
 
 private:
 
