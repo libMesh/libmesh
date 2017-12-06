@@ -1043,7 +1043,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
           // Initialize the vectors when we need them
           if (!trans_rb_eval.M_q_representor[q_m][i])
             {
-              trans_rb_eval.M_q_representor[q_m][i] = (NumericVector<Number>::build(this->comm()).release());
+              trans_rb_eval.M_q_representor[q_m][i] = NumericVector<Number>::build(this->comm());
               trans_rb_eval.M_q_representor[q_m][i]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
             }
 
@@ -1393,7 +1393,7 @@ void TransientRBConstruction::read_riesz_representors_from_files(const std::stri
 
         read_serialized_data(aqr_data, false);
 
-        trans_rb_eval.M_q_representor[i][j] = NumericVector<Number>::build(this->comm()).release();
+        trans_rb_eval.M_q_representor[i][j] = NumericVector<Number>::build(this->comm());
         trans_rb_eval.M_q_representor[i][j]->init (n_dofs(), n_local_dofs(),
                                                    false, PARALLEL);
 
