@@ -146,8 +146,11 @@ void JumpErrorEstimator::estimate_error (const System & system,
   // pre-request
   for (var=0; var<n_vars; var++)
     {
-      // Possibly skip this variable
-      if (error_norm.weight(var) == 0.0) continue;
+      // Skip variables which aren't part of our norm,
+      // as well as SCALAR variables, which have no jumps
+      if (error_norm.weight(var) == 0.0 ||
+          system.variable_type(var).family == SCALAR)
+        continue;
 
       // FIXME: Need to generalize this to vector-valued elements. [PB]
       FEBase * side_fe = libmesh_nullptr;
@@ -161,8 +164,6 @@ void JumpErrorEstimator::estimate_error (const System & system,
           const unsigned char dim = *dim_it;
 
           fine_context->get_side_fe( var, side_fe, dim );
-
-          libmesh_assert_not_equal_to(side_fe->get_fe_type().family, SCALAR);
 
           side_fe->get_xyz();
         }
@@ -230,7 +231,8 @@ void JumpErrorEstimator::estimate_error (const System & system,
 
                           // Loop over all significant variables in the system
                           for (var=0; var<n_vars; var++)
-                            if (error_norm.weight(var) != 0.0)
+                            if (error_norm.weight(var) != 0.0 &&
+                                system.variable_type(var).family != SCALAR)
                               {
                                 this->internal_side_integration();
 
@@ -269,7 +271,8 @@ void JumpErrorEstimator::estimate_error (const System & system,
                   bool found_boundary_flux = false;
 
                   for (var=0; var<n_vars; var++)
-                    if (error_norm.weight(var) != 0.0)
+                    if (error_norm.weight(var) != 0.0 &&
+                        system.variable_type(var).family != SCALAR)
                       {
                         if (this->boundary_side_integration())
                           {
@@ -315,7 +318,8 @@ void JumpErrorEstimator::estimate_error (const System & system,
 
                   // Loop over all significant variables in the system
                   for (var=0; var<n_vars; var++)
-                    if (error_norm.weight(var) != 0.0)
+                    if (error_norm.weight(var) != 0.0 &&
+                        system.variable_type(var).family != SCALAR)
                       {
                         this->internal_side_integration();
 
@@ -349,7 +353,8 @@ void JumpErrorEstimator::estimate_error (const System & system,
               bool found_boundary_flux = false;
 
               for (var=0; var<n_vars; var++)
-                if (error_norm.weight(var) != 0.0)
+                if (error_norm.weight(var) != 0.0 &&
+                    system.variable_type(var).family != SCALAR)
                   if (this->boundary_side_integration())
                     {
                       error_per_cell[fine_context->get_elem().id()] +=
@@ -447,7 +452,8 @@ JumpErrorEstimator::reinit_sides ()
 
   // Calculate all coarse element shape functions at those locations
   for (unsigned int v=0; v<n_vars; v++)
-    if (error_norm.weight(v) != 0.0)
+    if (error_norm.weight(v) != 0.0 &&
+        fine_context->get_system().variable_type(v).family != SCALAR)
       {
         coarse_context->get_side_fe( v, fe_coarse, dim );
         fe_coarse->reinit (&coarse_context->get_elem(), &qp_coarse);
