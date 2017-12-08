@@ -82,6 +82,7 @@
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/system_norm.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"

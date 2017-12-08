@@ -21,18 +21,17 @@
 #define LIBMESH_HP_COARSENTEST_H
 
 // Local Includes
-#include "libmesh/auto_ptr.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/hp_selector.h"
 #include "libmesh/id_types.h"
 #include "libmesh/libmesh_common.h"
-
-#include "libmesh/fe.h"         // MipsPro requires fe.h and quadrature.h in order to
-#include "libmesh/quadrature.h" //  delete std::unique_ptrs<> upon destruction
+#include "libmesh/fe.h"         // MipsPro requires fe.h and quadrature.h
+#include "libmesh/quadrature.h" // Required for inline deletion std::unique_ptrs<> in destructor
 
 // C++ includes
 #include <vector>
+#include <memory>
 
 #ifdef LIBMESH_ENABLE_AMR
 

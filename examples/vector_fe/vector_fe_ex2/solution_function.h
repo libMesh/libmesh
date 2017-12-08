@@ -15,7 +15,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+// libMesh includes
 #include "libmesh/function_base.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// Example includes
 #include "laplace_exact_solution.h"
 
 using namespace libMesh;

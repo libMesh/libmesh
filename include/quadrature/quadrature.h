@@ -27,12 +27,12 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/enum_quadrature_type.h"
-#include "libmesh/auto_ptr.h"
 
 // C++ includes
 #include <vector>
 #include <string>
 #include <utility>
+#include <memory>
 
 namespace libMesh
 {

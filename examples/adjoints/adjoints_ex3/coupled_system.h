@@ -24,6 +24,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parameter_pointer.h"
 #include "libmesh/parameter_vector.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 using namespace libMesh;
 

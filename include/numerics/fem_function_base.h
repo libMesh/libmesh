@@ -20,15 +20,13 @@
 #ifndef LIBMESH_FEM_FUNCTION_BASE_H
 #define LIBMESH_FEM_FUNCTION_BASE_H
 
-// C++ includes
-
-
-
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/dense_vector.h" // required to instantiate a DenseVector<> below
-#include "libmesh/auto_ptr.h"
 #include "libmesh/fem_context.h"
+
+// C++ includes
+#include <memory>
 
 namespace libMesh
 {

@@ -1,9 +1,12 @@
 #ifndef EIM_CLASSES_H
 #define EIM_CLASSES_H
 
-// local includes
+// libMesh includes
 #include "libmesh/rb_eim_construction.h"
 #include "libmesh/rb_eim_evaluation.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// Example includes
 #include "assembly.h"
 
 // Bring in bits from the libMesh namespace.

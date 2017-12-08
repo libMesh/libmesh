@@ -25,10 +25,10 @@
 
 // Local Includes
 #include "libmesh/point.h"
-#include "libmesh/auto_ptr.h"
 
 // C++ Includes
 #include <set>
+#include <memory>
 
 namespace libMesh
 {

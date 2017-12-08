@@ -21,13 +21,13 @@
 #define LIBMESH_DIFF_SOLVER_H
 
 // Local includes
-#include "libmesh/auto_ptr.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {

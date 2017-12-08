@@ -22,6 +22,7 @@
 
 // Local Includes
 #include "libmesh/partitioner.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ Includes
 #include <string>

@@ -5,7 +5,6 @@
 #include <libmesh/restore_warnings.h>
 
 // libmesh includes
-#include "libmesh/auto_ptr.h"
 #include "libmesh/elem.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/mesh.h"
@@ -16,6 +15,9 @@
 
 // test includes
 #include "test_comm.h"
+
+// C++ includes
+#include <memory>
 
 // THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
 // std::auto_ptr, which in turn produces -Wdeprecated-declarations

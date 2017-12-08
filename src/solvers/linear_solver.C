@@ -17,11 +17,9 @@
 
 
 
-// C++ includes
-
 // Local Includes
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/auto_ptr.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/laspack_linear_solver.h"
 #include "libmesh/eigen_sparse_linear_solver.h"

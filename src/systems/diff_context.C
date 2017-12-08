@@ -20,6 +20,7 @@
 #include "libmesh/diff_system.h"
 #include "libmesh/diff_system.h"
 #include "libmesh/unsteady_solver.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {

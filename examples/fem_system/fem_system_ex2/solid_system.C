@@ -36,6 +36,7 @@
 #include "libmesh/transient_system.h"
 #include "libmesh/node.h"
 #include "libmesh/elem.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #include "nonlinear_neohooke_cc.h"
 #include "solid_system.h"

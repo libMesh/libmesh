@@ -22,7 +22,6 @@
 // libMesh Includes
 #include "libmesh/libmesh_common.h" // libmesh_assert, cast_int
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/auto_ptr.h"
 
 // C++ includes
 #include <cstddef>
@@ -33,6 +32,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {

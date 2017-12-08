@@ -24,10 +24,12 @@
 #include "libmesh/elem_assembly.h"
 
 // libMesh includes
-#include "libmesh/auto_ptr.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/point.h"
 #include "libmesh/fe.h"
+
+// C++ includes
+#include <memory>
 
 namespace libMesh
 {

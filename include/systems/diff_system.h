@@ -21,7 +21,6 @@
 #define LIBMESH_DIFF_SYSTEM_H
 
 // Local Includes
-#include "libmesh/auto_ptr.h"
 #include "libmesh/diff_context.h"
 #include "libmesh/diff_physics.h"
 #include "libmesh/diff_qoi.h"
@@ -29,6 +28,7 @@
 #include "libmesh/time_solver.h"
 
 // C++ includes
+#include <memory>
 
 namespace libMesh
 {

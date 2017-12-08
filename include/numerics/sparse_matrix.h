@@ -24,7 +24,6 @@
 // Local includes
 #include "libmesh/libmesh.h"
 #include "libmesh/libmesh_common.h"
-#include "libmesh/auto_ptr.h"
 #include "libmesh/id_types.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/parallel_object.h"
@@ -33,6 +32,7 @@
 #include <cstddef>
 #include <iomanip>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {

@@ -17,13 +17,11 @@
 
 
 
-// C++ includes
-
 // Local Includes
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/nonlinear_solver.h"
 #include "libmesh/petsc_nonlinear_solver.h"
 #include "libmesh/trilinos_nox_nonlinear_solver.h"
-#include "libmesh/auto_ptr.h"
 #include "libmesh/solver_configuration.h"
 
 namespace libMesh

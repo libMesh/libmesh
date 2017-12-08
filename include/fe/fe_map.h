@@ -20,12 +20,15 @@
 #ifndef LIBMESH_FE_MAP_H
 #define LIBMESH_FE_MAP_H
 
+// libMesh includes
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/point.h"
 #include "libmesh/vector_value.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/fe_type.h"
-#include "libmesh/auto_ptr.h"
+
+// C++ includes
+#include <memory>
 
 namespace libMesh
 {

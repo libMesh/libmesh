@@ -21,7 +21,6 @@
 #define LIBMESH_FE_TYPE_H
 
 // Local includes
-#include "libmesh/auto_ptr.h"
 #include "libmesh/compare_types.h"
 #include "libmesh/libmesh_config.h"
 #include "libmesh/enum_order.h"
@@ -29,6 +28,7 @@
 #include "libmesh/enum_inf_map_type.h"
 
 // C++ includes
+#include <memory>
 
 namespace libMesh
 {

@@ -24,9 +24,9 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/enum_xdr_mode.h"
-#include "libmesh/auto_ptr.h"
 
 // C++ includes
+#include <memory>
 #ifdef LIBMESH_HAVE_XDR
 #  ifdef LIBMESH_HAVE_RPC_RPC_H
 #    include <rpc/rpc.h>

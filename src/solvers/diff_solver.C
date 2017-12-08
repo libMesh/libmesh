@@ -20,10 +20,10 @@
 #include "libmesh/diff_solver.h"
 #include "libmesh/newton_solver.h"
 #include "libmesh/implicit_system.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
 namespace libMesh
 {
-
-
 
 DiffSolver::DiffSolver (sys_type & s) :
   ParallelObject(s),

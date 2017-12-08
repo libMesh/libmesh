@@ -23,17 +23,15 @@
 // Local Includes
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh_common.h"
-#include "libmesh/auto_ptr.h"
 #include "libmesh/enum_point_locator_type.h"
 
 // C++ includes
 #include <cstddef>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {
-
-
 
 // Forward Declarations
 class PointLocatorBase;

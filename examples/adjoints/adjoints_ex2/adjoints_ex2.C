@@ -70,6 +70,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/system_norm.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // Sensitivity Calculation related includes
 #include "libmesh/parameter_vector.h"

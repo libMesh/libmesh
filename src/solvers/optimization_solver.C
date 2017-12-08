@@ -23,6 +23,7 @@
 #include "libmesh/optimization_solver.h"
 #include "libmesh/tao_optimization_solver.h"
 #include "libmesh/nlopt_optimization_solver.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {

@@ -19,6 +19,7 @@
 #include "libmesh/fe_type.h"
 #include "libmesh/quadrature_clough.h"
 #include "libmesh/quadrature_gauss.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {
@@ -30,28 +31,18 @@ std::unique_ptr<QBase>
 FEType::default_quadrature_rule (const unsigned int dim,
                                  const int extraorder) const
 {
-
   // Clough elements have at least piecewise cubic functions
   if (family == CLOUGH)
     {
-      // this seems ridiculous but for some reason gcc 3.3.5 wants
-      // this when using complex numbers (spetersen 04/20/06)
-      const unsigned int seven = 7;
-
-      return std::unique_ptr<QBase>
-        (new QClough(dim,
-                     static_cast<Order>
-                     (std::max(static_cast<unsigned int>
-                               (this->default_quadrature_order()), seven + extraorder))));
+      Order o = static_cast<Order>(std::max(static_cast<unsigned int>(this->default_quadrature_order()),
+                                            static_cast<unsigned int>(7 + extraorder)));
+      return libmesh_make_unique<QClough>(dim, o);
     }
 
   if (family == SUBDIVISION)
-    return std::unique_ptr<QBase>
-      (new QGauss(dim, static_cast<Order>(1 + extraorder)));
+    return libmesh_make_unique<QGauss>(dim, static_cast<Order>(1 + extraorder));
 
-  return std::unique_ptr<QBase>
-    (new QGauss(dim, static_cast<Order>(this->default_quadrature_order()
-                                        + extraorder)));
+  return libmesh_make_unique<QGauss>(dim, static_cast<Order>(this->default_quadrature_order() + extraorder));
 }
 
 } // namespace libMesh

@@ -19,6 +19,7 @@
 #include "libmesh/h1_fe_transformation.h"
 #include "libmesh/hcurl_fe_transformation.h"
 #include "libmesh/fe_type.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {

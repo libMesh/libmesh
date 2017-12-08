@@ -31,7 +31,6 @@
 #include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
-#include "libmesh/auto_ptr.h"
 
 // Trilinos includes.  Ignore many unused parameter warnings coming
 // from these headers.

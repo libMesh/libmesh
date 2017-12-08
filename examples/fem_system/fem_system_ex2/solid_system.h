@@ -24,7 +24,6 @@
 #define SOLID_SYSTEM_H_
 
 #include "libmesh/fem_system.h"
-#include "libmesh/auto_ptr.h"
 
 using namespace libMesh;
 

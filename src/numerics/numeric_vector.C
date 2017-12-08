@@ -31,6 +31,7 @@
 #include "libmesh/trilinos_epetra_vector.h"
 #include "libmesh/shell_matrix.h"
 #include "libmesh/tensor_tools.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {

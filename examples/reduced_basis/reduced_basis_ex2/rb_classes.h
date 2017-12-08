@@ -22,10 +22,10 @@
 
 #if defined(LIBMESH_HAVE_SLEPC) && defined(LIBMESH_HAVE_GLPK)
 
+// libMesh includes
 #include "libmesh/rb_construction.h"
 #include "libmesh/rb_scm_construction.h"
 #include "libmesh/fe_base.h"
-#include "libmesh/auto_ptr.h"
 #include "libmesh/rb_evaluation.h"
 #include "libmesh/rb_scm_evaluation.h"
 

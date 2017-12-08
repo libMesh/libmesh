@@ -27,11 +27,11 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/point.h"
-#include "libmesh/auto_ptr.h"
 #include "libmesh/parallel.h"
 
 // C++ includes
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {

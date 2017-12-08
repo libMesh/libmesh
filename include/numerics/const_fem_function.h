@@ -18,10 +18,13 @@
 #ifndef LIBMESH_CONST_FEM_FUNCTION_H
 #define LIBMESH_CONST_FEM_FUNCTION_H
 
-#include <string>
-
+// libMesh includes
 #include "libmesh/dense_vector.h"
 #include "libmesh/fem_function_base.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
+
+// C++ includes
+#include <string>
 
 namespace libMesh
 {

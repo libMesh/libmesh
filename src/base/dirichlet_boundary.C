@@ -25,7 +25,7 @@
 #include "libmesh/composite_fem_function.h"
 #include "libmesh/composite_function.h"
 #include "libmesh/vector_value.h"
-
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {

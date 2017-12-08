@@ -24,7 +24,9 @@
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/compare_types.h" // remove_const
-#include "libmesh/auto_ptr.h"
+
+// C++ includes
+#include <memory>
 
 namespace libMesh
 {

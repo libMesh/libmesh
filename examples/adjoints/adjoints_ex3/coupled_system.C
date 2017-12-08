@@ -27,6 +27,7 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/zero_function.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #include "coupled_system.h"
 

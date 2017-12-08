@@ -25,7 +25,6 @@
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
 // Local Includes
-#include "libmesh/auto_ptr.h"
 #include "libmesh/id_types.h"
 #include "libmesh/vector_value.h"
 
@@ -33,6 +32,7 @@
 #include <cstddef>
 #include <set>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {

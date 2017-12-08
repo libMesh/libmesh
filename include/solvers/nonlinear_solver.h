@@ -27,10 +27,10 @@
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
-#include "libmesh/auto_ptr.h"
 
 // C++ includes
 #include <cstddef>
+#include <memory>
 
 namespace libMesh
 {

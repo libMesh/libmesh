@@ -26,10 +26,10 @@
 // libMesh includes
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
-#include "libmesh/auto_ptr.h"
 #include "libmesh/parallel_object.h"
 
 // C++ includes
+#include <memory>
 
 namespace libMesh
 {

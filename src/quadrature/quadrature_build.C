@@ -16,10 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-
-
-
 // Local includes
 #include "libmesh/quadrature_clough.h"
 #include "libmesh/quadrature_gauss.h"
@@ -32,6 +28,7 @@
 #include "libmesh/quadrature_gauss_lobatto.h"
 #include "libmesh/quadrature_conical.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {

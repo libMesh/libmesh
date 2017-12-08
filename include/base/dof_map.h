@@ -22,7 +22,6 @@
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/auto_ptr.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h" // libMesh::invalid_uint
@@ -42,6 +41,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {

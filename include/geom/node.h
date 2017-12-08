@@ -24,7 +24,7 @@
 #include "libmesh/point.h"
 #include "libmesh/dof_object.h"
 #include "libmesh/reference_counted_object.h"
-#include "libmesh/auto_ptr.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <iostream>

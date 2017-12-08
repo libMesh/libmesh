@@ -20,6 +20,7 @@
 
 // Local includes
 #include "libmesh/const_function.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {

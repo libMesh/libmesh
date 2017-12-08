@@ -20,11 +20,11 @@
 #ifndef LIBMESH_MESHLESS_INTERPOLATION_FUNCTION_H
 #define LIBMESH_MESHLESS_INTERPOLATION_FUNCTION_H
 
-// Local Includes
+// libMesh Includes
 #include "libmesh/function_base.h"
 #include "libmesh/meshfree_interpolation.h"
 #include "libmesh/threads.h"
-
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ includes
 #include <cstddef>

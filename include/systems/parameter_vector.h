@@ -24,10 +24,10 @@
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parameter_accessor.h"
-#include "libmesh/auto_ptr.h"
 
 // C++ Includes
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {
