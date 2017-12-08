@@ -25,6 +25,7 @@
 #include <cmath>     // for std::sqrt()
 
 // Local includes
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/elem.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_interface.h"
@@ -238,200 +239,94 @@ const unsigned int Elem::type_to_n_edges_map [] =
 std::unique_ptr<Elem> Elem::build(const ElemType type,
                                   Elem * p)
 {
-  Elem * elem = libmesh_nullptr;
-
   switch (type)
     {
       // 0D elements
     case NODEELEM:
-      {
-        elem = new NodeElem(p);
-        break;
-      }
+      return libmesh_make_unique<NodeElem>(p);
 
       // 1D elements
     case EDGE2:
-      {
-        elem = new Edge2(p);
-        break;
-      }
+      return libmesh_make_unique<Edge2>(p);
     case EDGE3:
-      {
-        elem = new Edge3(p);
-        break;
-      }
+      return libmesh_make_unique<Edge3>(p);
     case EDGE4:
-      {
-        elem = new Edge4(p);
-        break;
-      }
-
-
+      return libmesh_make_unique<Edge4>(p);
 
       // 2D elements
     case TRI3:
-      {
-        elem = new Tri3(p);
-        break;
-      }
+      return libmesh_make_unique<Tri3>(p);
     case TRISHELL3:
-      {
-        elem = new TriShell3(p);
-        break;
-      }
+      return libmesh_make_unique<TriShell3>(p);
     case TRI3SUBDIVISION:
-      {
-        elem = new Tri3Subdivision(p);
-        break;
-      }
+      return libmesh_make_unique<Tri3Subdivision>(p);
     case TRI6:
-      {
-        elem = new Tri6(p);
-        break;
-      }
+      return libmesh_make_unique<Tri6>(p);
     case QUAD4:
-      {
-        elem = new Quad4(p);
-        break;
-      }
+      return libmesh_make_unique<Quad4>(p);
     case QUADSHELL4:
-      {
-        elem = new QuadShell4(p);
-        break;
-      }
+      return libmesh_make_unique<QuadShell4>(p);
     case QUAD8:
-      {
-        elem = new Quad8(p);
-        break;
-      }
+      return libmesh_make_unique<Quad8>(p);
     case QUADSHELL8:
-      {
-        elem = new QuadShell8(p);
-        break;
-      }
+      return libmesh_make_unique<QuadShell8>(p);
     case QUAD9:
-      {
-        elem = new Quad9(p);
-        break;
-      }
-
+      return libmesh_make_unique<Quad9>(p);
 
       // 3D elements
     case TET4:
-      {
-        elem = new Tet4(p);
-        break;
-      }
+      return libmesh_make_unique<Tet4>(p);
     case TET10:
-      {
-        elem = new Tet10(p);
-        break;
-      }
+      return libmesh_make_unique<Tet10>(p);
     case HEX8:
-      {
-        elem = new Hex8(p);
-        break;
-      }
+      return libmesh_make_unique<Hex8>(p);
     case HEX20:
-      {
-        elem = new Hex20(p);
-        break;
-      }
+      return libmesh_make_unique<Hex20>(p);
     case HEX27:
-      {
-        elem = new Hex27(p);
-        break;
-      }
+      return libmesh_make_unique<Hex27>(p);
     case PRISM6:
-      {
-        elem = new Prism6(p);
-        break;
-      }
+      return libmesh_make_unique<Prism6>(p);
     case PRISM15:
-      {
-        elem = new Prism15(p);
-        break;
-      }
+      return libmesh_make_unique<Prism15>(p);
     case PRISM18:
-      {
-        elem = new Prism18(p);
-        break;
-      }
+      return libmesh_make_unique<Prism18>(p);
     case PYRAMID5:
-      {
-        elem = new Pyramid5(p);
-        break;
-      }
+      return libmesh_make_unique<Pyramid5>(p);
     case PYRAMID13:
-      {
-        elem = new Pyramid13(p);
-        break;
-      }
+      return libmesh_make_unique<Pyramid13>(p);
     case PYRAMID14:
-      {
-        elem = new Pyramid14(p);
-        break;
-      }
-
-
+      return libmesh_make_unique<Pyramid14>(p);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
       // 1D infinite elements
     case INFEDGE2:
-      {
-        elem = new InfEdge2(p);
-        break;
-      }
-
+      return libmesh_make_unique<InfEdge2>(p);
 
       // 2D infinite elements
     case INFQUAD4:
-      {
-        elem = new InfQuad4(p);
-        break;
-      }
+      return libmesh_make_unique<InfQuad4>(p);
     case INFQUAD6:
-      {
-        elem = new InfQuad6(p);
-        break;
-      }
-
+      return libmesh_make_unique<InfQuad6>(p);
 
       // 3D infinite elements
     case INFHEX8:
-      {
-        elem = new InfHex8(p);
-        break;
-      }
+      return libmesh_make_unique<InfHex8>(p);
     case INFHEX16:
-      {
-        elem = new InfHex16(p);
-        break;
-      }
+      return libmesh_make_unique<InfHex16>(p);
     case INFHEX18:
-      {
-        elem = new InfHex18(p);
-        break;
-      }
+      return libmesh_make_unique<InfHex18>(p);
     case INFPRISM6:
-      {
-        elem = new InfPrism6(p);
-        break;
-      }
+      return libmesh_make_unique<InfPrism6>(p);
     case INFPRISM12:
-      {
-        elem = new InfPrism12(p);
-        break;
-      }
-
+      return libmesh_make_unique<InfPrism12>(p);
 #endif
 
     default:
       libmesh_error_msg("ERROR: Undefined element type!");
     }
 
-  return std::unique_ptr<Elem>(elem);
+  // We'll never get here.
+  return libmesh_nullptr;
 }
 
 
