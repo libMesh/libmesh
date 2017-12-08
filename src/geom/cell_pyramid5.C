@@ -130,8 +130,8 @@ std::unique_ptr<Elem> Pyramid5::build_side_ptr (const unsigned int i,
 
   else
     {
-      // Create NULL pointer to be initialized, returned later.
-      Elem * face = libmesh_nullptr;
+      // Return value
+      std::unique_ptr<Elem> face;
 
       switch (i)
         {
@@ -140,12 +140,12 @@ std::unique_ptr<Elem> Pyramid5::build_side_ptr (const unsigned int i,
         case 2: // triangular face 3
         case 3: // triangular face 4
           {
-            face = new Tri3;
+            face = libmesh_make_unique<Tri3>();
             break;
           }
         case 4: // the quad face at z=0
           {
-            face = new Quad4;
+            face = libmesh_make_unique<Quad4>();
             break;
           }
         default:
@@ -158,7 +158,7 @@ std::unique_ptr<Elem> Pyramid5::build_side_ptr (const unsigned int i,
       for (unsigned n=0; n<face->n_nodes(); ++n)
         face->set_node(n) = this->node_ptr(Pyramid5::side_nodes_map[i][n]);
 
-      return std::unique_ptr<Elem>(face);
+      return face;
     }
 
   libmesh_error_msg("We'll never get here!");

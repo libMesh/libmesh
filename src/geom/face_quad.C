@@ -85,12 +85,12 @@ std::unique_ptr<Elem> Quad::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
-  Elem * edge = new Edge2;
+  auto edge = libmesh_make_unique<Edge2>();
 
   for (unsigned n=0; n<edge->n_nodes(); ++n)
     edge->set_node(n) = this->node_ptr(Quad4::side_nodes_map[i][n]);
 
-  return std::unique_ptr<Elem>(edge);
+  return edge;
 }
 
 

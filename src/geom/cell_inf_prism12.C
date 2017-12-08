@@ -142,14 +142,14 @@ std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
 
   else
     {
-      // Create NULL pointer to be initialized, returned later.
-      Elem * face = libmesh_nullptr;
+      // Return value
+      std::unique_ptr<Elem> face;
 
       switch (i)
         {
         case 0: // the triangular face at z=-1, base face
           {
-            face = new Tri6;
+            face = libmesh_make_unique<Tri6>();
             break;
           }
 
@@ -157,7 +157,7 @@ std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
         case 2: // the other quad face
         case 3: // the quad face at x=0
           {
-            face = new InfQuad6;
+            face = libmesh_make_unique<InfQuad6>();
             break;
           }
 
@@ -171,7 +171,7 @@ std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
       for (unsigned n=0; n<face->n_nodes(); ++n)
         face->set_node(n) = this->node_ptr(InfPrism12::side_nodes_map[i][n]);
 
-      return std::unique_ptr<Elem>(face);
+      return face;
     }
 
   libmesh_error_msg("We'll never get here!");
