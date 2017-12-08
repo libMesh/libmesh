@@ -62,16 +62,7 @@ void TransientRBEvaluation::clear_riesz_representors()
   Parent::clear_riesz_representors();
 
   // Delete the M_q representors
-  for (std::size_t q_m=0; q_m<M_q_representor.size(); q_m++)
-    for (std::size_t i=0; i<M_q_representor[q_m].size(); i++)
-      {
-        if (M_q_representor[q_m][i])
-          {
-            M_q_representor[q_m][i]->clear();
-            delete M_q_representor[q_m][i];
-            M_q_representor[q_m][i] = libmesh_nullptr;
-          }
-      }
+  M_q_representor.clear();
 }
 
 void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax,

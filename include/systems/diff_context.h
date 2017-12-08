@@ -31,6 +31,7 @@
 #include <cstddef>
 #include <map>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {
@@ -524,7 +525,7 @@ public:
   /**
    * Typedef for the localized_vectors iterator
    */
-  typedef std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *>>>::iterator localized_vectors_iterator;
+  typedef std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<std::unique_ptr<DenseSubVector<Number>>>>>::iterator localized_vectors_iterator;
 
   /**
    * Return a reference to DenseVector localization of localized_vector
@@ -555,28 +556,28 @@ protected:
    * pairs of element localized versions of that vector and per variable views
    */
 
-  std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *>>> _localized_vectors;
+  std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<std::unique_ptr<DenseSubVector<Number>>>>> _localized_vectors;
 
   /**
    * Element by element components of nonlinear_solution
    * as adjusted by a time_solver
    */
   DenseVector<Number> _elem_solution;
-  std::vector<DenseSubVector<Number> *> _elem_subsolutions;
+  std::vector<std::unique_ptr<DenseSubVector<Number>>> _elem_subsolutions;
 
   /**
    * Element by element components of du/dt
    * as adjusted by a time_solver
    */
   DenseVector<Number> _elem_solution_rate;
-  std::vector<DenseSubVector<Number> *> _elem_subsolution_rates;
+  std::vector<std::unique_ptr<DenseSubVector<Number>>> _elem_subsolution_rates;
 
   /**
    * Element by element components of du/dt
    * as adjusted by a time_solver
    */
   DenseVector<Number> _elem_solution_accel;
-  std::vector<DenseSubVector<Number> *> _elem_subsolution_accels;
+  std::vector<std::unique_ptr<DenseSubVector<Number>>> _elem_subsolution_accels;
 
   /**
    * Element by element components of nonlinear_solution
@@ -584,7 +585,7 @@ protected:
    * stabilized methods
    */
   DenseVector<Number> _elem_fixed_solution;
-  std::vector<DenseSubVector<Number> *> _elem_fixed_subsolutions;
+  std::vector<std::unique_ptr<DenseSubVector<Number>>> _elem_fixed_subsolutions;
 
   /**
    * Element residual vector
@@ -606,13 +607,13 @@ protected:
    * Element quantity of interest derivative contributions
    */
   std::vector<DenseVector<Number>> _elem_qoi_derivative;
-  std::vector<std::vector<DenseSubVector<Number> *>> _elem_qoi_subderivatives;
+  std::vector<std::vector<std::unique_ptr<DenseSubVector<Number>>>> _elem_qoi_subderivatives;
 
   /**
    * Element residual subvectors and Jacobian submatrices
    */
-  std::vector<DenseSubVector<Number> *> _elem_subresiduals;
-  std::vector<std::vector<DenseSubMatrix<Number> *>> _elem_subjacobians;
+  std::vector<std::unique_ptr<DenseSubVector<Number>>> _elem_subresiduals;
+  std::vector<std::vector<std::unique_ptr<DenseSubMatrix<Number>>>> _elem_subjacobians;
 
   /**
    * Global Degree of freedom index lists

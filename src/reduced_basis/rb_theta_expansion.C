@@ -66,12 +66,12 @@ void RBThetaExpansion::attach_A_theta(RBTheta * theta_q_a)
   _A_theta_vector.push_back(theta_q_a);
 }
 
-void RBThetaExpansion::attach_multiple_A_theta(std::vector<RBTheta *> theta_q_a)
+void RBThetaExpansion::attach_multiple_A_theta(std::vector<std::unique_ptr<RBTheta>> & theta_q_a)
 {
   for (std::size_t i=0; i<theta_q_a.size(); i++)
     {
       libmesh_assert(theta_q_a[i]);
-      _A_theta_vector.push_back(theta_q_a[i]);
+      _A_theta_vector.push_back(theta_q_a[i].get());
     }
 }
 
@@ -82,12 +82,12 @@ void RBThetaExpansion::attach_F_theta(RBTheta * theta_q_f)
   _F_theta_vector.push_back(theta_q_f);
 }
 
-void RBThetaExpansion::attach_multiple_F_theta(std::vector<RBTheta *> theta_q_f)
+void RBThetaExpansion::attach_multiple_F_theta(std::vector<std::unique_ptr<RBTheta>> & theta_q_f)
 {
   for (std::size_t i=0; i<theta_q_f.size(); i++)
     {
       libmesh_assert(theta_q_f[i]);
-      _F_theta_vector.push_back(theta_q_f[i]);
+      _F_theta_vector.push_back(theta_q_f[i].get());
     }
 }
 

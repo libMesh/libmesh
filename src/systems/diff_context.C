@@ -60,10 +60,10 @@ DiffContext::DiffContext (const System & sys) :
 
   for (unsigned int i=0; i != nv; ++i)
     {
-      _elem_subsolutions.push_back(new DenseSubVector<Number>(_elem_solution));
-      _elem_subresiduals.push_back(new DenseSubVector<Number>(_elem_residual));
+      _elem_subsolutions.emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_elem_solution));
+      _elem_subresiduals.emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_elem_residual));
       for (std::size_t q=0; q != n_qoi; ++q)
-        _elem_qoi_subderivatives[q].push_back(new DenseSubVector<Number>(_elem_qoi_derivative[q]));
+        _elem_qoi_subderivatives[q].emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_elem_qoi_derivative[q]));
       _elem_subjacobians[i].reserve(nv);
 
       // Only make space for these if we're using DiffSystem
@@ -74,25 +74,21 @@ DiffContext::DiffContext (const System & sys) :
           // Now, we only need these if the solver is unsteady
           if (!diff_system->get_time_solver().is_steady())
             {
-              _elem_subsolution_rates.push_back(new DenseSubVector<Number>(_elem_solution_rate));
+              _elem_subsolution_rates.emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_elem_solution_rate));
 
               // We only need accel space if the TimeSolver is second order
               const UnsteadySolver & time_solver = cast_ref<const UnsteadySolver &>(diff_system->get_time_solver());
 
               if (time_solver.time_order() >= 2 || !diff_system->get_second_order_vars().empty())
-                _elem_subsolution_accels.push_back(new DenseSubVector<Number>(_elem_solution_accel));
+                _elem_subsolution_accels.emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_elem_solution_accel));
             }
         }
 
       if (sys.use_fixed_solution)
-        _elem_fixed_subsolutions.push_back
-          (new DenseSubVector<Number>(_elem_fixed_solution));
+        _elem_fixed_subsolutions.emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_elem_fixed_solution));
 
       for (unsigned int j=0; j != nv; ++j)
-        {
-          _elem_subjacobians[i].push_back
-            (new DenseSubMatrix<Number>(_elem_jacobian));
-        }
+        _elem_subjacobians[i].emplace_back(libmesh_make_unique<DenseSubMatrix<Number>>(_elem_jacobian));
     }
 }
 
@@ -100,38 +96,6 @@ DiffContext::DiffContext (const System & sys) :
 
 DiffContext::~DiffContext ()
 {
-  for (std::size_t i=0; i != _elem_subsolutions.size(); ++i)
-    {
-      delete _elem_subsolutions[i];
-      delete _elem_subresiduals[i];
-      for (std::size_t q=0; q != _elem_qoi_subderivatives.size(); ++q)
-        delete _elem_qoi_subderivatives[q][i];
-      if (!_elem_subsolution_rates.empty())
-        delete _elem_subsolution_rates[i];
-      if (!_elem_subsolution_accels.empty())
-        delete _elem_subsolution_accels[i];
-      if (!_elem_fixed_subsolutions.empty())
-        delete _elem_fixed_subsolutions[i];
-
-      for (std::size_t j=0; j != _elem_subjacobians[i].size(); ++j)
-        delete _elem_subjacobians[i][j];
-    }
-
-  // We also need to delete all the DenseSubVectors from the localized_vectors map
-  // localized_vectors iterators
-  std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *>>>::iterator localized_vectors_it = _localized_vectors.begin();
-  std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *>>>::iterator localized_vectors_end = _localized_vectors.end();
-
-  // Loop over every localized_vector
-  for (; localized_vectors_it != localized_vectors_end; ++localized_vectors_it)
-    {
-      // Grab the DenseSubVector to be deleted
-      std::vector<DenseSubVector<Number> *> &  localized_vector_dsv = localized_vectors_it->second.second;
-
-      // Loop over that vector and delete each entry
-      for (std::size_t i=0; i != localized_vector_dsv.size(); ++i)
-        delete localized_vector_dsv[i];
-    }
 }
 
 
@@ -154,7 +118,7 @@ Real DiffContext::get_deltat_value()
 void DiffContext::add_localized_vector (NumericVector<Number> & localized_vector, const System & sys)
 {
   // Make an empty pair keyed with a reference to this _localized_vector
-  _localized_vectors[&localized_vector] = std::make_pair(DenseVector<Number>(), std::vector<DenseSubVector<Number> *>());
+  _localized_vectors[&localized_vector] = std::make_pair(DenseVector<Number>(), std::vector<std::unique_ptr<DenseSubVector<Number>>>());
 
   unsigned int nv = sys.n_vars();
 
@@ -162,7 +126,7 @@ void DiffContext::add_localized_vector (NumericVector<Number> & localized_vector
 
   // Fill the DenseSubVector with nv copies of DenseVector
   for (unsigned int i=0; i != nv; ++i)
-    _localized_vectors[&localized_vector].second.push_back(new DenseSubVector<Number>(_localized_vectors[&localized_vector].first));
+    _localized_vectors[&localized_vector].second.emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_localized_vectors[&localized_vector].first));
 }
 
 
@@ -174,8 +138,7 @@ DenseVector<Number> & DiffContext::get_localized_vector (const NumericVector<Num
 
 const DenseVector<Number> & DiffContext::get_localized_vector (const NumericVector<Number> & localized_vector) const
 {
-  std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *>>>::const_iterator
-    localized_vectors_it = _localized_vectors.find(&localized_vector);
+  auto localized_vectors_it = _localized_vectors.find(&localized_vector);
   libmesh_assert(localized_vectors_it != _localized_vectors.end());
   return localized_vectors_it->second.first;
 }
@@ -189,8 +152,7 @@ DenseSubVector<Number> & DiffContext::get_localized_subvector (const NumericVect
 
 const DenseSubVector<Number> & DiffContext::get_localized_subvector (const NumericVector<Number> & localized_vector, unsigned int var) const
 {
-  std::map<const NumericVector<Number> *, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number> *>>>::const_iterator
-    localized_vectors_it = _localized_vectors.find(&localized_vector);
+  auto localized_vectors_it = _localized_vectors.find(&localized_vector);
   libmesh_assert(localized_vectors_it != _localized_vectors.end());
   return *localized_vectors_it->second.second[var];
 }

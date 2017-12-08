@@ -172,7 +172,7 @@ public:
   /**
    * \returns The vector of assembly objects that point to this RBEIMConstruction.
    */
-  std::vector<ElemAssembly *> get_eim_assembly_objects();
+  std::vector<std::unique_ptr<ElemAssembly>> & get_eim_assembly_objects();
 
   /**
    * Build an element assembly object that will access basis function
@@ -290,7 +290,7 @@ protected:
    * The libMesh vectors storing the finite element coefficients
    * of the RB basis functions.
    */
-  std::vector<NumericVector<Number> * > _parametrized_functions_in_training_set;
+  std::vector<std::unique_ptr<NumericVector<Number>>> _parametrized_functions_in_training_set;
 
 private:
 
@@ -315,7 +315,7 @@ private:
    * The vector of assembly objects that are created to point to
    * this RBEIMConstruction.
    */
-  std::vector<ElemAssembly *> _rb_eim_assembly_objects;
+  std::vector<std::unique_ptr<ElemAssembly>> _rb_eim_assembly_objects;
 
   /**
    * We use an ExplicitSystem to store the EIM basis functions.
@@ -335,7 +335,7 @@ private:
    * This vector is used to store inner_product_matrix * basis_function[i] for each i,
    * since we frequently use this data.
    */
-  std::vector<NumericVector<Number>* > _matrix_times_bfs;
+  std::vector<std::unique_ptr<NumericVector<Number>>> _matrix_times_bfs;
 
   /**
    * The point locator tolerance.

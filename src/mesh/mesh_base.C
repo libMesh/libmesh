@@ -523,7 +523,7 @@ const PointLocatorBase & MeshBase::point_locator () const
       // PointLocator construction may not be safe within threads
       libmesh_assert(!Threads::in_threads);
 
-      _point_locator.reset (PointLocatorBase::build(TREE_ELEMENTS, *this).release());
+      _point_locator = PointLocatorBase::build(TREE_ELEMENTS, *this);
     }
 
   return *_point_locator;
@@ -542,7 +542,7 @@ std::unique_ptr<PointLocatorBase> MeshBase::sub_point_locator () const
       // And it may require parallel communication
       parallel_object_only();
 
-      _point_locator.reset (PointLocatorBase::build(TREE_ELEMENTS, *this).release());
+      _point_locator = PointLocatorBase::build(TREE_ELEMENTS, *this);
     }
 
   // Otherwise there was a master point locator, and we can grab a

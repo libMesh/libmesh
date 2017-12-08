@@ -99,53 +99,20 @@ void RBConstruction::clear()
 
   Parent::clear();
 
-  for (std::size_t q=0; q<Aq_vector.size(); q++)
-    {
-      delete Aq_vector[q];
-      Aq_vector[q] = libmesh_nullptr;
-    }
-
-  for (std::size_t q=0; q<Fq_vector.size(); q++)
-    {
-      delete Fq_vector[q];
-      Fq_vector[q] = libmesh_nullptr;
-    }
-
-  for (std::size_t i=0; i<outputs_vector.size(); i++)
-    for (std::size_t q_l=0; q_l<outputs_vector[i].size(); q_l++)
-      {
-        delete outputs_vector[i][q_l];
-        outputs_vector[i][q_l] = libmesh_nullptr;
-      }
+  Aq_vector.clear();
+  Fq_vector.clear();
+  outputs_vector.clear();
 
   if (store_non_dirichlet_operators)
     {
-      for (std::size_t q=0; q<non_dirichlet_Aq_vector.size(); q++)
-        {
-          delete non_dirichlet_Aq_vector[q];
-          non_dirichlet_Aq_vector[q] = libmesh_nullptr;
-        }
-
-      for (std::size_t q=0; q<non_dirichlet_Fq_vector.size(); q++)
-        {
-          delete non_dirichlet_Fq_vector[q];
-          non_dirichlet_Fq_vector[q] = libmesh_nullptr;
-        }
-
-      for (std::size_t i=0; i<non_dirichlet_outputs_vector.size(); i++)
-        for (std::size_t q_l=0; q_l<non_dirichlet_outputs_vector[i].size(); q_l++)
-          {
-            delete non_dirichlet_outputs_vector[i][q_l];
-            non_dirichlet_outputs_vector[i][q_l] = libmesh_nullptr;
-          }
+      non_dirichlet_Aq_vector.clear();
+      non_dirichlet_Fq_vector.clear();
+      non_dirichlet_outputs_vector.clear();
     }
 
   // Also delete the Fq representors
-  for (std::size_t q_f=0; q_f<Fq_representor.size(); q_f++)
-    {
-      delete Fq_representor[q_f];
-      Fq_representor[q_f] = libmesh_nullptr;
-    }
+  Fq_representor.clear();
+
   // Set Fq_representor_innerprods_computed flag to false now
   // that we've cleared the Fq representors
   Fq_representor_innerprods_computed = false;
@@ -528,7 +495,7 @@ void RBConstruction::allocate_data_structures()
     for (unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
       {
         // Initialize the memory for the matrices
-        Aq_vector[q] = SparseMatrix<Number>::build(this->comm()).release();
+        Aq_vector[q] = SparseMatrix<Number>::build(this->comm());
         dof_map.attach_matrix(*Aq_vector[q]);
         Aq_vector[q]->init();
         Aq_vector[q]->zero();
@@ -541,7 +508,7 @@ void RBConstruction::allocate_data_structures()
         for (unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
           {
             // Initialize the memory for the matrices
-            non_dirichlet_Aq_vector[q] = SparseMatrix<Number>::build(this->comm()).release();
+            non_dirichlet_Aq_vector[q] = SparseMatrix<Number>::build(this->comm());
             dof_map.attach_matrix(*non_dirichlet_Aq_vector[q]);
             non_dirichlet_Aq_vector[q]->init();
             non_dirichlet_Aq_vector[q]->zero();
@@ -553,7 +520,7 @@ void RBConstruction::allocate_data_structures()
   for (unsigned int q=0; q<get_rb_theta_expansion().get_n_F_terms(); q++)
     {
       // Initialize the memory for the vectors
-      Fq_vector[q] = NumericVector<Number>::build(this->comm()).release();
+      Fq_vector[q] = NumericVector<Number>::build(this->comm());
       Fq_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
     }
 
@@ -564,7 +531,7 @@ void RBConstruction::allocate_data_structures()
       for (unsigned int q=0; q<get_rb_theta_expansion().get_n_F_terms(); q++)
         {
           // Initialize the memory for the vectors
-          non_dirichlet_Fq_vector[q] = NumericVector<Number>::build(this->comm()).release();
+          non_dirichlet_Fq_vector[q] = NumericVector<Number>::build(this->comm());
           non_dirichlet_Fq_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
         }
     }
@@ -573,7 +540,7 @@ void RBConstruction::allocate_data_structures()
     for (unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
       {
         // Initialize the memory for the truth output vectors
-        outputs_vector[n][q_l] = (NumericVector<Number>::build(this->comm()).release());
+        outputs_vector[n][q_l] = NumericVector<Number>::build(this->comm());
         outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       }
 
@@ -586,7 +553,7 @@ void RBConstruction::allocate_data_structures()
           for (unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
             {
               // Initialize the memory for the truth output vectors
-              non_dirichlet_outputs_vector[n][q_l] = (NumericVector<Number>::build(this->comm()).release());
+              non_dirichlet_outputs_vector[n][q_l] = NumericVector<Number>::build(this->comm());
               non_dirichlet_outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
             }
         }
@@ -1262,7 +1229,7 @@ void RBConstruction::enrich_RB_space()
 {
   LOG_SCOPE("enrich_RB_space()", "RBConstruction");
 
-  NumericVector<Number> * new_bf = NumericVector<Number>::build(this->comm()).release();
+  auto new_bf = NumericVector<Number>::build(this->comm());
   new_bf->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
   *new_bf = *solution;
 
@@ -1289,7 +1256,7 @@ void RBConstruction::enrich_RB_space()
     }
 
   // load the new basis function into the basis_functions vector.
-  get_rb_evaluation().basis_functions.push_back( new_bf );
+  get_rb_evaluation().basis_functions.emplace_back( std::move(new_bf) );
 }
 
 void RBConstruction::update_system()
@@ -1494,7 +1461,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
           // Initialize the vector in which we'll store the representor
           if (!get_rb_evaluation().Aq_representor[q_a][i])
             {
-              get_rb_evaluation().Aq_representor[q_a][i] = (NumericVector<Number>::build(this->comm()).release());
+              get_rb_evaluation().Aq_representor[q_a][i] = NumericVector<Number>::build(this->comm());
               get_rb_evaluation().Aq_representor[q_a][i]->init(this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
             }
 
@@ -1601,10 +1568,10 @@ void RBConstruction::compute_output_dual_innerprods()
       for (unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
         max_Q_l = (get_rb_theta_expansion().get_n_output_terms(n) > max_Q_l) ? get_rb_theta_expansion().get_n_output_terms(n) : max_Q_l;
 
-      std::vector<NumericVector<Number> *> L_q_representor(max_Q_l);
+      std::vector<std::unique_ptr<NumericVector<Number>>> L_q_representor(max_Q_l);
       for (unsigned int q=0; q<max_Q_l; q++)
         {
-          L_q_representor[q] = (NumericVector<Number>::build(this->comm()).release());
+          L_q_representor[q] = NumericVector<Number>::build(this->comm());
           L_q_representor[q]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
         }
 
@@ -1661,16 +1628,6 @@ void RBConstruction::compute_output_dual_innerprods()
             }
         }
 
-      // Finally clear the L_q_representor vectors
-      for (unsigned int q=0; q<max_Q_l; q++)
-        {
-          if (L_q_representor[q])
-            {
-              delete L_q_representor[q];
-              L_q_representor[q] = libmesh_nullptr;
-            }
-        }
-
       // We may not need to use linear_solver again (e.g. this would happen if we use
       // extra_linear_solver for the truth_solves). As a result, let's clear linear_solver
       // to release any memory it may be taking up. If we do need it again, it will
@@ -1697,7 +1654,7 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
         {
           if (!Fq_representor[q_f])
             {
-              Fq_representor[q_f] = (NumericVector<Number>::build(this->comm()).release());
+              Fq_representor[q_f] = NumericVector<Number>::build(this->comm());
               Fq_representor[q_f]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
             }
 
@@ -1832,7 +1789,7 @@ SparseMatrix<Number> * RBConstruction::get_Aq(unsigned int q)
   if (q >= get_rb_theta_expansion().get_n_A_terms())
     libmesh_error_msg("Error: We must have q < Q_a in get_Aq.");
 
-  return Aq_vector[q];
+  return Aq_vector[q].get();
 }
 
 SparseMatrix<Number> * RBConstruction::get_non_dirichlet_Aq(unsigned int q)
@@ -1843,7 +1800,7 @@ SparseMatrix<Number> * RBConstruction::get_non_dirichlet_Aq(unsigned int q)
   if (q >= get_rb_theta_expansion().get_n_A_terms())
     libmesh_error_msg("Error: We must have q < Q_a in get_Aq.");
 
-  return non_dirichlet_Aq_vector[q];
+  return non_dirichlet_Aq_vector[q].get();
 }
 
 NumericVector<Number> * RBConstruction::get_Fq(unsigned int q)
@@ -1851,7 +1808,7 @@ NumericVector<Number> * RBConstruction::get_Fq(unsigned int q)
   if (q >= get_rb_theta_expansion().get_n_F_terms())
     libmesh_error_msg("Error: We must have q < Q_f in get_Fq.");
 
-  return Fq_vector[q];
+  return Fq_vector[q].get();
 }
 
 NumericVector<Number> * RBConstruction::get_non_dirichlet_Fq(unsigned int q)
@@ -1862,7 +1819,7 @@ NumericVector<Number> * RBConstruction::get_non_dirichlet_Fq(unsigned int q)
   if (q >= get_rb_theta_expansion().get_n_F_terms())
     libmesh_error_msg("Error: We must have q < Q_f in get_Fq.");
 
-  return non_dirichlet_Fq_vector[q];
+  return non_dirichlet_Fq_vector[q].get();
 }
 
 NumericVector<Number> * RBConstruction::get_output_vector(unsigned int n, unsigned int q_l)
@@ -1871,7 +1828,7 @@ NumericVector<Number> * RBConstruction::get_output_vector(unsigned int n, unsign
     libmesh_error_msg("Error: We must have n < n_outputs and "          \
                       << "q_l < get_rb_theta_expansion().get_n_output_terms(n) in get_output_vector.");
 
-  return outputs_vector[n][q_l];
+  return outputs_vector[n][q_l].get();
 }
 
 NumericVector<Number> * RBConstruction::get_non_dirichlet_output_vector(unsigned int n, unsigned int q_l)
@@ -1880,7 +1837,7 @@ NumericVector<Number> * RBConstruction::get_non_dirichlet_output_vector(unsigned
     libmesh_error_msg("Error: We must have n < n_outputs and "          \
                       << "q_l < get_rb_theta_expansion().get_n_output_terms(n) in get_non_dirichlet_output_vector.");
 
-  return non_dirichlet_outputs_vector[n][q_l];
+  return non_dirichlet_outputs_vector[n][q_l].get();
 }
 
 void RBConstruction::get_all_matrices(std::map<std::string, SparseMatrix<Number> *> & all_matrices)
@@ -1975,7 +1932,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string & riesz
 
   for (std::size_t i=0; i<Fq_representor.size(); ++i)
     {
-      if (Fq_representor[i] != libmesh_nullptr)
+      if (Fq_representor[i])
         {
           file_name.str(""); // reset filename
           file_name << riesz_representors_dir << "/Fq_representor" << i << riesz_representor_suffix;
@@ -2075,7 +2032,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
   // should we be worried about leaks here?
   for (std::size_t i=0; i<Fq_representor.size(); ++i)
     {
-      if (Fq_representor[i] != libmesh_nullptr)
+      if (Fq_representor[i])
         libmesh_error_msg("Error, must delete existing Fq_representor before reading in from file.");
     }
 
@@ -2099,7 +2056,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
 
       read_serialized_data(fqr_data, false);
 
-      Fq_representor[i] = NumericVector<Number>::build(this->comm()).release();
+      Fq_representor[i] = NumericVector<Number>::build(this->comm());
       Fq_representor[i]->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
       // No need to copy, just swap
@@ -2145,7 +2102,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string & ries
 
         read_serialized_data(aqr_data, false);
 
-        get_rb_evaluation().Aq_representor[i][j] = NumericVector<Number>::build(this->comm()).release();
+        get_rb_evaluation().Aq_representor[i][j] = NumericVector<Number>::build(this->comm());
         get_rb_evaluation().Aq_representor[i][j]->init (n_dofs(), n_local_dofs(),
                                                         false, PARALLEL);
 

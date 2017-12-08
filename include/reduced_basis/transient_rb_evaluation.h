@@ -242,7 +242,7 @@ public:
    * Vector storing the mass matrix representors.
    * These are basis dependent and hence stored here.
    */
-  std::vector<std::vector<NumericVector<Number> * >> M_q_representor;
+  std::vector<std::vector<std::unique_ptr<NumericVector<Number>>>> M_q_representor;
 
   /**
    * Check that the data has been cached in case of using rb_solve_again

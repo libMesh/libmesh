@@ -1092,9 +1092,9 @@ protected:
    * We store FE objects for each element dimension present in the mesh,
    * except for edge_fe which only applies to 3D elements.
    */
-  std::vector<std::map<FEType, FEAbstract *>> _element_fe;
-  std::vector<std::map<FEType, FEAbstract *>> _side_fe;
-  std::map<FEType, FEAbstract *> _edge_fe;
+  std::vector<std::map<FEType, std::unique_ptr<FEAbstract>>> _element_fe;
+  std::vector<std::map<FEType, std::unique_ptr<FEAbstract>>> _side_fe;
+  std::map<FEType, std::unique_ptr<FEAbstract>> _edge_fe;
 
 
   /**
@@ -1140,7 +1140,7 @@ protected:
    * correctly integrates all variables. We prepare quadrature
    * rules for each element dimension in the mesh.
    */
-  std::vector<QBase *> _element_qrule;
+  std::vector<std::unique_ptr<QBase>> _element_qrule;
 
   /**
    * Quadrature rules for element sides
@@ -1148,7 +1148,7 @@ protected:
    * correctly integrates all variables. We prepare quadrature
    * rules for each element dimension in the mesh.
    */
-  std::vector<QBase *> _side_qrule;
+  std::vector<std::unique_ptr<QBase>> _side_qrule;
 
   /**
    * Quadrature rules for element edges.  If the FEM context is told

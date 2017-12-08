@@ -48,8 +48,8 @@ FEMContext::FEMContext (const System & sys)
     _dim(sys.get_mesh().mesh_dimension()),
     _elem_dim(0), /* This will be reset in set_elem(). */
     _elem_dims(sys.get_mesh().elem_dimensions()),
-    _element_qrule(4,libmesh_nullptr),
-    _side_qrule(4,libmesh_nullptr),
+    _element_qrule(4),
+    _side_qrule(4),
     _extra_quadrature_order(sys.extra_quadrature_order)
 {
   init_internal_data(sys);
@@ -69,8 +69,8 @@ FEMContext::FEMContext (const System & sys, int extra_quadrature_order)
     _dim(sys.get_mesh().mesh_dimension()),
     _elem_dim(0), /* This will be reset in set_elem(). */
     _elem_dims(sys.get_mesh().elem_dimensions()),
-    _element_qrule(4,libmesh_nullptr),
-    _side_qrule(4,libmesh_nullptr),
+    _element_qrule(4),
+    _side_qrule(4),
     _extra_quadrature_order(extra_quadrature_order)
 {
   init_internal_data(sys);
@@ -130,13 +130,12 @@ void FEMContext::init_internal_data(const System & sys)
       const unsigned char dim = *dim_it;
 
       // Create an adequate quadrature rule
-      _element_qrule[dim] = hardest_fe_type.default_quadrature_rule
-        (dim, _extra_quadrature_order).release();
-      _side_qrule[dim] = hardest_fe_type.default_quadrature_rule
-        (dim-1, _extra_quadrature_order).release();
+      _element_qrule[dim] =
+        hardest_fe_type.default_quadrature_rule(dim, _extra_quadrature_order);
+      _side_qrule[dim] =
+        hardest_fe_type.default_quadrature_rule(dim-1, _extra_quadrature_order);
       if (dim == 3)
-        _edge_qrule.reset(hardest_fe_type.default_quadrature_rule
-                          (1, _extra_quadrature_order).release());
+        _edge_qrule = hardest_fe_type.default_quadrature_rule(1, _extra_quadrature_order);
 
       // Next, create finite element objects
       _element_fe_var[dim].resize(nv);
@@ -151,22 +150,22 @@ void FEMContext::init_internal_data(const System & sys)
 
           if (_element_fe[dim][fe_type] == libmesh_nullptr)
             {
-              _element_fe[dim][fe_type] = FEAbstract::build(dim, fe_type).release();
-              _element_fe[dim][fe_type]->attach_quadrature_rule(_element_qrule[dim]);
-              _side_fe[dim][fe_type] = FEAbstract::build(dim, fe_type).release();
-              _side_fe[dim][fe_type]->attach_quadrature_rule(_side_qrule[dim]);
+              _element_fe[dim][fe_type] = FEAbstract::build(dim, fe_type);
+              _element_fe[dim][fe_type]->attach_quadrature_rule(_element_qrule[dim].get());
+              _side_fe[dim][fe_type] = FEAbstract::build(dim, fe_type);
+              _side_fe[dim][fe_type]->attach_quadrature_rule(_side_qrule[dim].get());
 
               if (dim == 3)
                 {
-                  _edge_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
+                  _edge_fe[fe_type] = FEAbstract::build(dim, fe_type);
                   _edge_fe[fe_type]->attach_quadrature_rule(_edge_qrule.get());
                 }
             }
 
-          _element_fe_var[dim][i] = _element_fe[dim][fe_type];
-          _side_fe_var[dim][i] = _side_fe[dim][fe_type];
+          _element_fe_var[dim][i] = _element_fe[dim][fe_type].get();
+          _side_fe_var[dim][i] = _side_fe[dim][fe_type].get();
           if ((dim) == 3)
-            _edge_fe_var[i] = _edge_fe[fe_type];
+            _edge_fe_var[i] = _edge_fe[fe_type].get();
 
         }
     }
@@ -174,34 +173,6 @@ void FEMContext::init_internal_data(const System & sys)
 
 FEMContext::~FEMContext()
 {
-  // We don't want to store std::unique_ptrs in STL containers, but we don't
-  // want to leak memory either
-  for (std::vector<std::map<FEType, FEAbstract *>>::iterator d = _element_fe.begin();
-       d != _element_fe.end(); ++d)
-    for (std::map<FEType, FEAbstract *>::iterator i = d->begin();
-         i != d->end(); ++i)
-      delete i->second;
-
-  for (std::vector<std::map<FEType, FEAbstract *>>::iterator d = _side_fe.begin();
-       d != _side_fe.end(); ++d)
-    for (std::map<FEType, FEAbstract *>::iterator i = d->begin();
-         i != d->end(); ++i)
-      delete i->second;
-
-  for (std::map<FEType, FEAbstract *>::iterator i = _edge_fe.begin();
-       i != _edge_fe.end(); ++i)
-    delete i->second;
-  _edge_fe.clear();
-
-  for (std::vector<QBase *>::iterator i = _element_qrule.begin();
-       i != _element_qrule.end(); ++i)
-    delete *i;
-  _element_qrule.clear();
-
-  for (std::vector<QBase *>::iterator i = _side_qrule.begin();
-       i != _side_qrule.end(); ++i)
-    delete *i;
-  _side_qrule.clear();
 }
 
 
@@ -1389,8 +1360,8 @@ void FEMContext::elem_fe_reinit(const std::vector<Point> * const pts)
 
   libmesh_assert( !_element_fe[dim].empty() );
 
-  std::map<FEType, FEAbstract *>::iterator local_fe_end = _element_fe[dim].end();
-  for (std::map<FEType, FEAbstract *>::iterator i = _element_fe[dim].begin();
+  std::map<FEType, std::unique_ptr<FEAbstract>>::iterator local_fe_end = _element_fe[dim].end();
+  for (std::map<FEType, std::unique_ptr<FEAbstract>>::iterator i = _element_fe[dim].begin();
        i != local_fe_end; ++i)
     {
       if (this->has_elem())
@@ -1412,8 +1383,8 @@ void FEMContext::side_fe_reinit ()
 
   libmesh_assert( !_side_fe[dim].empty() );
 
-  std::map<FEType, FEAbstract *>::iterator local_fe_end = _side_fe[dim].end();
-  for (std::map<FEType, FEAbstract *>::iterator i = _side_fe[dim].begin();
+  std::map<FEType, std::unique_ptr<FEAbstract>>::iterator local_fe_end = _side_fe[dim].end();
+  for (std::map<FEType, std::unique_ptr<FEAbstract>>::iterator i = _side_fe[dim].begin();
        i != local_fe_end; ++i)
     {
       i->second->reinit(&(this->get_elem()), this->get_side());
@@ -1428,8 +1399,8 @@ void FEMContext::edge_fe_reinit ()
 
   // Initialize all the interior FE objects on elem/edge.
   // Logging of FE::reinit is done in the FE functions
-  std::map<FEType, FEAbstract *>::iterator local_fe_end = _edge_fe.end();
-  for (std::map<FEType, FEAbstract *>::iterator i = _edge_fe.begin();
+  std::map<FEType, std::unique_ptr<FEAbstract>>::iterator local_fe_end = _edge_fe.end();
+  for (std::map<FEType, std::unique_ptr<FEAbstract>>::iterator i = _edge_fe.begin();
        i != local_fe_end; ++i)
     {
       i->second->edge_reinit(&(this->get_elem()), this->get_edge());

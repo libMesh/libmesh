@@ -134,16 +134,10 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
       // constant reference to the other mesh
       const MeshBase & mesh = this->_eqn_systems.get_mesh();
 
-      // build the point locator.  Only \p TREE version available
-      //std::unique_ptr<PointLocatorBase> ap (PointLocatorBase::build (TREE, mesh));
-      //this->_point_locator = ap.release();
-      // this->_point_locator = new PointLocatorTree (mesh, point_locator_build_type);
+      // Get PointLocator object from the Mesh. We are responsible for
+      // deleting this only if we are the master.
       this->_point_locator = mesh.sub_point_locator().release();
-
-      // Point locator no longer needs to be initialized.
-      //      this->_point_locator->init();
     }
-
 
   // ready for use
   this->_initialized = true;

@@ -196,7 +196,7 @@ protected:
    */
   static void generate_training_parameters_random(const Parallel::Communicator & communicator,
                                                   std::map<std::string, bool> log_param_scale,
-                                                  std::map<std::string, NumericVector<Number> * > & training_parameters_in,
+                                                  std::map<std::string, std::unique_ptr<NumericVector<Number>>> & training_parameters_in,
                                                   unsigned int n_training_samples_in,
                                                   const RBParameters & min_parameters,
                                                   const RBParameters & max_parameters,
@@ -209,7 +209,7 @@ protected:
    */
   static void generate_training_parameters_deterministic(const Parallel::Communicator & communicator,
                                                          std::map<std::string, bool> log_param_scale,
-                                                         std::map<std::string, NumericVector<Number> * > & training_parameters_in,
+                                                         std::map<std::string, std::unique_ptr<NumericVector<Number>>> & training_parameters_in,
                                                          unsigned int n_training_samples_in,
                                                          const RBParameters & min_parameters,
                                                          const RBParameters & max_parameters,
@@ -245,7 +245,7 @@ private:
   /**
    * The training samples.
    */
-  std::map<std::string, NumericVector<Number> * > training_parameters;
+  std::map<std::string, std::unique_ptr<NumericVector<Number>>> training_parameters;
 
   /**
    * If < 0, use std::time() * processor_id() to seed the random

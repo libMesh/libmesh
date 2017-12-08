@@ -97,31 +97,13 @@ void RBEIMConstruction::clear()
   _mesh_function.reset();
 
   // clear the eim assembly vector
-  for (std::size_t i=0; i<_rb_eim_assembly_objects.size(); i++)
-    delete _rb_eim_assembly_objects[i];
   _rb_eim_assembly_objects.clear();
 
   // clear the parametrized functions from the training set
-  for (std::size_t i=0; i<_parametrized_functions_in_training_set.size(); i++)
-    {
-      if (_parametrized_functions_in_training_set[i])
-        {
-          _parametrized_functions_in_training_set[i]->clear();
-          delete _parametrized_functions_in_training_set[i];
-          _parametrized_functions_in_training_set[i] = libmesh_nullptr;
-        }
-    }
+  _parametrized_functions_in_training_set.clear();
   _parametrized_functions_in_training_set_initialized = false;
 
-  for (std::size_t i=0; i<_matrix_times_bfs.size(); i++)
-    {
-      if (_matrix_times_bfs[i])
-        {
-          _matrix_times_bfs[i]->clear();
-          delete _matrix_times_bfs[i];
-          _matrix_times_bfs[i] = libmesh_nullptr;
-        }
-    }
+  _matrix_times_bfs.clear();
 }
 
 void RBEIMConstruction::process_parameters_file (const std::string & parameters_filename)
@@ -275,9 +257,7 @@ void RBEIMConstruction::initialize_eim_assembly_objects()
 {
   _rb_eim_assembly_objects.clear();
   for (unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
-    {
-      _rb_eim_assembly_objects.push_back( build_eim_assembly(i).release() );
-    }
+    _rb_eim_assembly_objects.push_back(build_eim_assembly(i));
 }
 
 ExplicitSystem & RBEIMConstruction::get_explicit_system()
@@ -314,7 +294,7 @@ void RBEIMConstruction::load_rb_solution()
   get_explicit_system().update();
 }
 
-std::vector<ElemAssembly *> RBEIMConstruction::get_eim_assembly_objects()
+std::vector<std::unique_ptr<ElemAssembly>> & RBEIMConstruction::get_eim_assembly_objects()
 {
   return _rb_eim_assembly_objects;
 }
@@ -431,10 +411,12 @@ void RBEIMConstruction::enrich_RB_space()
   Elem * elem_ptr = mesh.elem_ptr(optimal_elem_id);
   eim_eval.interpolation_points_elem.push_back( elem_ptr );
 
-  NumericVector<Number> * new_bf = NumericVector<Number>::build(this->comm()).release();
-  new_bf->init (get_explicit_system().n_dofs(), get_explicit_system().n_local_dofs(), false, PARALLEL);
-  *new_bf = *get_explicit_system().solution;
-  get_rb_evaluation().basis_functions.push_back( new_bf );
+  {
+    auto new_bf = NumericVector<Number>::build(this->comm());
+    new_bf->init (get_explicit_system().n_dofs(), get_explicit_system().n_local_dofs(), false, PARALLEL);
+    *new_bf = *get_explicit_system().solution;
+    get_rb_evaluation().basis_functions.emplace_back( std::move(new_bf) );
+  }
 
   if (best_fit_type_flag == PROJECTION_BEST_FIT)
     {
@@ -443,14 +425,13 @@ void RBEIMConstruction::enrich_RB_space()
 
       std::unique_ptr<NumericVector<Number>> implicit_sys_temp1 = this->solution->zero_clone();
       std::unique_ptr<NumericVector<Number>> implicit_sys_temp2 = this->solution->zero_clone();
-      NumericVector<Number>* matrix_times_new_bf =
-        get_explicit_system().solution->zero_clone().release();
+      auto matrix_times_new_bf = get_explicit_system().solution->zero_clone();
 
       // We must localize new_bf before calling get_explicit_sys_subvector
       std::unique_ptr<NumericVector<Number>> localized_new_bf =
         NumericVector<Number>::build(this->comm());
       localized_new_bf->init(get_explicit_system().n_dofs(), false, SERIAL);
-      new_bf->localize(*localized_new_bf);
+      get_rb_evaluation().basis_functions.back()->localize(*localized_new_bf);
 
       for (unsigned int var=0; var<get_explicit_system().n_vars(); var++)
         {
@@ -465,7 +446,7 @@ void RBEIMConstruction::enrich_RB_space()
                                      *implicit_sys_temp2);
         }
 
-      _matrix_times_bfs.push_back(matrix_times_new_bf);
+      _matrix_times_bfs.emplace_back(std::move(matrix_times_new_bf));
     }
 }
 
@@ -485,7 +466,7 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
       set_params_from_training_set(i);
       truth_solve(-1);
 
-      _parametrized_functions_in_training_set[i] = get_explicit_system().solution->clone().release();
+      _parametrized_functions_in_training_set[i] = get_explicit_system().solution->clone();
 
       libMesh::out << "Completed solve for training sample " << (i+1) << " of " << get_n_training_samples() << std::endl;
     }

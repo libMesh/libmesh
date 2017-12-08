@@ -45,7 +45,7 @@ DGFEMContext::DGFEMContext (const System & sys)
 
   for (unsigned int i=0; i != nv; ++i)
     {
-      _neighbor_subresiduals.push_back(new DenseSubVector<Number>(_neighbor_residual));
+      _neighbor_subresiduals.emplace_back(libmesh_make_unique<DenseSubVector<Number>>(_neighbor_residual));
       _elem_elem_subjacobians[i].reserve(nv);
       _elem_neighbor_subjacobians[i].reserve(nv);
       _neighbor_elem_subjacobians[i].reserve(nv);
@@ -53,14 +53,10 @@ DGFEMContext::DGFEMContext (const System & sys)
 
       for (unsigned int j=0; j != nv; ++j)
         {
-          _elem_elem_subjacobians[i].push_back
-            (new DenseSubMatrix<Number>(_elem_elem_jacobian));
-          _elem_neighbor_subjacobians[i].push_back
-            (new DenseSubMatrix<Number>(_elem_neighbor_jacobian));
-          _neighbor_elem_subjacobians[i].push_back
-            (new DenseSubMatrix<Number>(_neighbor_elem_jacobian));
-          _neighbor_neighbor_subjacobians[i].push_back
-            (new DenseSubMatrix<Number>(_neighbor_neighbor_jacobian));
+          _elem_elem_subjacobians[i].emplace_back(libmesh_make_unique<DenseSubMatrix<Number>>(_elem_elem_jacobian));
+          _elem_neighbor_subjacobians[i].emplace_back(libmesh_make_unique<DenseSubMatrix<Number>>(_elem_neighbor_jacobian));
+          _neighbor_elem_subjacobians[i].emplace_back(libmesh_make_unique<DenseSubMatrix<Number>>(_neighbor_elem_jacobian));
+          _neighbor_neighbor_subjacobians[i].emplace_back(libmesh_make_unique<DenseSubMatrix<Number>>(_neighbor_neighbor_jacobian));
         }
     }
 
@@ -70,33 +66,14 @@ DGFEMContext::DGFEMContext (const System & sys)
       FEType fe_type = sys.variable_type(i);
 
       if (_neighbor_side_fe[fe_type] == libmesh_nullptr)
-        _neighbor_side_fe[fe_type] = FEAbstract::build(this->_dim, fe_type).release();
+        _neighbor_side_fe[fe_type] = FEAbstract::build(this->_dim, fe_type);
 
-      _neighbor_side_fe_var[i] = _neighbor_side_fe[fe_type];
+      _neighbor_side_fe_var[i] = _neighbor_side_fe[fe_type].get();
     }
 }
 
 DGFEMContext::~DGFEMContext()
 {
-
-  for (std::size_t i=0; i != _neighbor_subresiduals.size(); ++i)
-    {
-      delete _neighbor_subresiduals[i];
-
-      for (std::size_t j=0; j != _elem_elem_subjacobians[i].size(); ++j)
-        {
-          delete _elem_elem_subjacobians[i][j];
-          delete _elem_neighbor_subjacobians[i][j];
-          delete _neighbor_elem_subjacobians[i][j];
-          delete _neighbor_neighbor_subjacobians[i][j];
-        }
-    }
-
-  // Delete the FE objects
-  for (std::map<FEType, FEAbstract *>::iterator i = _neighbor_side_fe.begin();
-       i != _neighbor_side_fe.end(); ++i)
-    delete i->second;
-  _neighbor_side_fe.clear();
 }
 
 void DGFEMContext::side_fe_reinit()
@@ -116,12 +93,12 @@ void DGFEMContext::neighbor_side_fe_reinit ()
   // the quadrature points on the current side
   std::vector<Point> qface_side_points;
   std::vector<Point> qface_neighbor_points;
-  std::map<FEType, FEAbstract *>::iterator local_fe_end = _neighbor_side_fe.end();
-  for (std::map<FEType, FEAbstract *>::iterator i = _neighbor_side_fe.begin();
+  std::map<FEType, std::unique_ptr<FEAbstract>>::iterator local_fe_end = _neighbor_side_fe.end();
+  for (std::map<FEType, std::unique_ptr<FEAbstract>>::iterator i = _neighbor_side_fe.begin();
        i != local_fe_end; ++i)
     {
       FEType neighbor_side_fe_type = i->first;
-      FEAbstract * side_fe = _side_fe[this->get_dim()][neighbor_side_fe_type];
+      FEAbstract * side_fe = _side_fe[this->get_dim()][neighbor_side_fe_type].get();
       qface_side_points = side_fe->get_xyz();
 
       FEInterface::inverse_map (this->get_dim(),

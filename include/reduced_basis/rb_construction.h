@@ -469,7 +469,7 @@ public:
    * These are basis independent and hence stored here, whereas
    * the Aq_representors are stored in RBEvaluation
    */
-  std::vector<NumericVector<Number> * > Fq_representor;
+  std::vector<std::unique_ptr<NumericVector<Number>>> Fq_representor;
 
   /**
    * Vectors storing the residual representor inner products
@@ -741,28 +741,28 @@ private:
   /**
    * Vector storing the Q_a matrices from the affine expansion
    */
-  std::vector<SparseMatrix<Number> * > Aq_vector;
+  std::vector<std::unique_ptr<SparseMatrix<Number>>> Aq_vector;
 
   /**
    * Vector storing the Q_f vectors in the affine decomposition
    * of the right-hand side.
    */
-  std::vector<NumericVector<Number> * > Fq_vector;
+  std::vector<std::unique_ptr<NumericVector<Number>>> Fq_vector;
 
   /**
    * The libMesh vectors that define the output functionals.
    * Each row corresponds to the affine expansion of an output.
    */
-  std::vector<std::vector<NumericVector<Number> * >> outputs_vector;
+  std::vector<std::vector<std::unique_ptr<NumericVector<Number>>>> outputs_vector;
 
   /**
    * We may also need a second set of matrices/vectors
    * that do not have the Dirichlet boundary conditions
    * enforced.
    */
-  std::vector<SparseMatrix<Number> * > non_dirichlet_Aq_vector;
-  std::vector<NumericVector<Number> * > non_dirichlet_Fq_vector;
-  std::vector<std::vector<NumericVector<Number> * >> non_dirichlet_outputs_vector;
+  std::vector<std::unique_ptr<SparseMatrix<Number>>> non_dirichlet_Aq_vector;
+  std::vector<std::unique_ptr<NumericVector<Number>>> non_dirichlet_Fq_vector;
+  std::vector<std::vector<std::unique_ptr<NumericVector<Number>>>> non_dirichlet_outputs_vector;
 
   /**
    * Relative and absolute tolerances for training reduced basis

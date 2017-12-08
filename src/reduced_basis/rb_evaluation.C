@@ -62,15 +62,7 @@ void RBEvaluation::clear()
   LOG_SCOPE("clear()", "RBEvaluation");
 
   // Clear the basis functions
-  for (std::size_t i=0; i<basis_functions.size(); i++)
-    {
-      if (basis_functions[i])
-        {
-          basis_functions[i]->clear();
-          delete basis_functions[i];
-          basis_functions[i] = libmesh_nullptr;
-        }
-    }
+  basis_functions.clear();
   set_n_basis_functions(0);
 
   clear_riesz_representors();
@@ -79,6 +71,11 @@ void RBEvaluation::clear()
   for (std::size_t i=0; i<greedy_param_list.size(); i++)
     greedy_param_list[i].clear();
   greedy_param_list.clear();
+}
+
+void RBEvaluation::set_n_basis_functions(unsigned int n_bfs)
+{
+  basis_functions.resize(n_bfs);
 }
 
 void RBEvaluation::set_rb_theta_expansion(RBThetaExpansion & rb_theta_expansion_in)
@@ -411,14 +408,7 @@ Real RBEvaluation::eval_output_dual_norm(unsigned int n, const RBParameters & mu
 
 void RBEvaluation::clear_riesz_representors()
 {
-
-  // Clear the Aq_representors
-  for (std::size_t q_a=0; q_a<Aq_representor.size(); q_a++)
-    for (std::size_t i=0; i<Aq_representor[q_a].size(); i++)
-      {
-        delete Aq_representor[q_a][i];
-        Aq_representor[q_a][i] = libmesh_nullptr;
-      }
+  Aq_representor.clear();
 }
 
 void RBEvaluation::legacy_write_offline_data_to_files(const std::string & directory_name,
@@ -879,16 +869,8 @@ void RBEvaluation::legacy_read_offline_data_from_files(const std::string & direc
   // Resize basis_functions even if we don't read them in so that
   // get_n_bfs() returns the correct value. Initialize the pointers
   // to NULL
+  basis_functions.clear();
   set_n_basis_functions(n_bfs);
-  for (std::size_t i=0; i<basis_functions.size(); i++)
-    {
-      if (basis_functions[i])
-        {
-          basis_functions[i]->clear();
-          delete basis_functions[i];
-        }
-      basis_functions[i] = libmesh_nullptr;
-    }
 }
 
 void RBEvaluation::assert_file_exists(const std::string & file_name)
@@ -911,7 +893,7 @@ void RBEvaluation::write_out_basis_functions(System & sys,
 }
 
 void RBEvaluation::write_out_vectors(System & sys,
-                                     std::vector<NumericVector<Number> *> & vectors,
+                                     std::vector<std::unique_ptr<NumericVector<Number>>> & vectors,
                                      const std::string & directory_name,
                                      const std::string & data_name,
                                      const bool write_binary_vectors)
@@ -949,8 +931,10 @@ void RBEvaluation::write_out_vectors(System & sys,
   // Write all vectors at once.
   {
     // Note the API wants pointers to constant vectors, hence this...
-    std::vector<const NumericVector<Number> *> bf_out(vectors.begin(),
-                                                      vectors.end());
+    std::vector<const NumericVector<Number> *> bf_out;
+    for (const auto & vec : vectors)
+      bf_out.push_back(vec.get());
+
     // for (std::size_t i=0; i<vectors.size(); i++)
     //   bf_out.push_back(vectors[i]);
     sys.write_serialized_vectors (bf_data, bf_out);
@@ -981,12 +965,12 @@ void RBEvaluation::read_in_basis_functions(System & sys,
 }
 
 void RBEvaluation::read_in_vectors(System & sys,
-                                   std::vector<NumericVector<Number> *> & vectors,
+                                   std::vector<std::unique_ptr<NumericVector<Number>>> & vectors,
                                    const std::string & directory_name,
                                    const std::string & data_name,
                                    const bool read_binary_vectors)
 {
-  std::vector<std::vector<NumericVector<Number> *> *> vectors_vec;
+  std::vector<std::vector<std::unique_ptr<NumericVector<Number>>> *> vectors_vec;
   vectors_vec.push_back(&vectors);
 
   std::vector<std::string> directory_name_vec;
@@ -1003,7 +987,7 @@ void RBEvaluation::read_in_vectors(System & sys,
 }
 
 void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
-                                                       std::vector<std::vector<NumericVector<Number> *> *> multiple_vectors,
+                                                       std::vector<std::vector<std::unique_ptr<NumericVector<Number>>> *> multiple_vectors,
                                                        const std::vector<std::string> & multiple_directory_names,
                                                        const std::vector<std::string> & multiple_data_names,
                                                        const bool read_binary_vectors)
@@ -1030,7 +1014,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
 
   for (unsigned int data_index=0; data_index<n_directories; data_index++)
     {
-      std::vector<NumericVector<Number> *> & vectors = *multiple_vectors[data_index];
+      std::vector<std::unique_ptr<NumericVector<Number>>> & vectors = *multiple_vectors[data_index];
 
       // Allocate storage for each vector
       for (std::size_t i=0; i<vectors.size(); i++)
@@ -1040,7 +1024,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
           if (vectors[i])
             libmesh_error_msg("Non-NULL vector passed to read_in_vectors_from_multiple_files");
 
-          vectors[i] = NumericVector<Number>::build(sys.comm()).release();
+          vectors[i] = NumericVector<Number>::build(sys.comm());
 
           vectors[i]->init (sys.n_dofs(),
                             sys.n_local_dofs(),
@@ -1089,7 +1073,12 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
         sys.read_header(vector_data, version, /*read_header=*/false, /*read_additional_data=*/false);
       }
 
-      sys.read_serialized_vectors (vector_data, vectors);
+      // Comply with the System::read_serialized_vectors() interface which uses dumb pointers.
+      std::vector<NumericVector<Number> *> vec_in;
+      for (auto & vec : vectors)
+        vec_in.push_back(vec.get());
+
+      sys.read_serialized_vectors (vector_data, vec_in);
     }
 
   // Undo the temporary renumbering

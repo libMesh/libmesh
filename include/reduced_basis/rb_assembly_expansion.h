@@ -125,7 +125,7 @@ public:
    * Attach multiple ElemAssembly objects for the left-hand side
    * (both interior and boundary assembly).
    */
-  void attach_multiple_A_assembly(std::vector<ElemAssembly *> Aq_assembly);
+  void attach_multiple_A_assembly(std::vector<std::unique_ptr<ElemAssembly>> & Aq_assembly);
 
   /**
    * Attach ElemAssembly object for the right-hand side
@@ -137,7 +137,7 @@ public:
    * Attach multiple ElemAssembly objects for the right-hand side
    * (both interior and boundary assembly).
    */
-  void attach_multiple_F_assembly(std::vector<ElemAssembly *> Fq_assembly);
+  void attach_multiple_F_assembly(std::vector<std::unique_ptr<ElemAssembly>> & Fq_assembly);
 
   /**
    * Attach ElemAssembly object for an output
