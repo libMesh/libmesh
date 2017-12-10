@@ -31,6 +31,7 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
+#include "libmesh/auto_ptr.h" // deprecated
 
 // C++ includes
 #include <memory>

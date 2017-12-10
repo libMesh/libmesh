@@ -26,6 +26,7 @@
 #include "libmesh/vector_value.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/fe_type.h"
+#include "libmesh/auto_ptr.h" // deprecated
 
 // C++ includes
 #include <memory>

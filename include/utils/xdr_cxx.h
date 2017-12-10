@@ -24,6 +24,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/enum_xdr_mode.h"
+#include "libmesh/auto_ptr.h" // deprecated
 
 // C++ includes
 #include <memory>

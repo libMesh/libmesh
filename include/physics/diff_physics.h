@@ -22,6 +22,7 @@
 
 // Local Includes
 #include "libmesh/libmesh.h"
+#include "libmesh/auto_ptr.h" // deprecated
 
 // C++ includes
 #include <vector>

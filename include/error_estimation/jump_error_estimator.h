@@ -21,6 +21,7 @@
 #define LIBMESH_JUMP_ERROR_ESTIMATOR_H
 
 // Local Includes
+#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/dense_vector.h"
 #include "libmesh/error_estimator.h"
 #include "libmesh/fem_context.h"

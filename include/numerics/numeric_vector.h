@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/enum_parallel_type.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/id_types.h"

@@ -25,6 +25,7 @@
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
 // Local Includes
+#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/id_types.h"
 #include "libmesh/vector_value.h"
 

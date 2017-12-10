@@ -25,6 +25,7 @@
 
 // Local Includes
 #include "libmesh/point.h"
+#include "libmesh/auto_ptr.h" // deprecated
 
 // C++ Includes
 #include <set>

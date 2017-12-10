@@ -31,6 +31,7 @@
 #include "libmesh/enum_elem_quality.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/enum_io_package.h"
+#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/multi_predicates.h"
 #include "libmesh/pointer_to_pointer_iter.h"
 #include "libmesh/int_range.h"

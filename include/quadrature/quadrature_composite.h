@@ -28,6 +28,7 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/elem_cutter.h"
 #include "libmesh/fe_base.h"
+#include "libmesh/auto_ptr.h" // deprecated
 
 // C++ includes
 #include <memory>
