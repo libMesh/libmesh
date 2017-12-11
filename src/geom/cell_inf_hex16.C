@@ -149,8 +149,8 @@ std::unique_ptr<Elem> InfHex16::build_side_ptr (const unsigned int i,
 
   else
     {
-      // Create NULL pointer to be initialized, returned later.
-      Elem * face = libmesh_nullptr;
+      // Return value
+      std::unique_ptr<Elem> face;
 
       // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
       switch (i)
@@ -158,7 +158,7 @@ std::unique_ptr<Elem> InfHex16::build_side_ptr (const unsigned int i,
           // the base face
         case 0:
           {
-            face = new Quad8;
+            face = libmesh_make_unique<Quad8>();
             break;
           }
 
@@ -168,7 +168,7 @@ std::unique_ptr<Elem> InfHex16::build_side_ptr (const unsigned int i,
         case 3:
         case 4:
           {
-            face = new InfQuad6;
+            face = libmesh_make_unique<InfQuad6>();
             break;
           }
 
@@ -182,7 +182,7 @@ std::unique_ptr<Elem> InfHex16::build_side_ptr (const unsigned int i,
       for (unsigned n=0; n<face->n_nodes(); ++n)
         face->set_node(n) = this->node_ptr(InfHex16::side_nodes_map[i][n]);
 
-      return std::unique_ptr<Elem>(face);
+      return face;
     }
 
   libmesh_error_msg("We'll never get here!");

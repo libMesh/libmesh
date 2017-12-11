@@ -5,7 +5,6 @@
 #include <libmesh/restore_warnings.h>
 
 // libmesh includes
-#include "libmesh/auto_ptr.h"
 #include "libmesh/elem.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/mesh.h"

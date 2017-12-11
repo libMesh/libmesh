@@ -26,11 +26,12 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
-#include "libmesh/auto_ptr.h"
+#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/optimization_system.h"
 
 // C++ includes
 #include <cstddef>
+#include <memory>
 
 namespace libMesh
 {

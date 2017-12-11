@@ -21,7 +21,7 @@
 #define LIBMESH_ADJOINT_RESIDUAL_ERROR_ESTIMATOR_H
 
 // Local Includes
-#include "libmesh/auto_ptr.h"
+#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/error_estimator.h"
 #include "libmesh/qoi_set.h"
 
@@ -29,16 +29,10 @@
 #include <cstddef>
 #include <string>
 #include <vector>
-
-// Forward Declarations
-
-
-
+#include <memory>
 
 namespace libMesh
 {
-
-
 /**
  * This class implements a goal oriented error indicator, by weighting
  * residual-based estimates from the primal problem against estimates

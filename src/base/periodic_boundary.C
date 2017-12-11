@@ -22,6 +22,7 @@
 
 #include "libmesh/libmesh.h" // libMesh::invalid_uint
 #include "libmesh/periodic_boundary.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {

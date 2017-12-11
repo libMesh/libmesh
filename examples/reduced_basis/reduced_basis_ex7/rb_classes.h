@@ -20,9 +20,9 @@
 #ifndef RB_CLASSES_H
 #define RB_CLASSES_H
 
+// libMesh includes
 #include "libmesh/rb_construction.h"
 #include "libmesh/fe_base.h"
-#include "libmesh/auto_ptr.h"
 #include "libmesh/rb_evaluation.h"
 
 // local include

@@ -3,6 +3,7 @@
 
 #include "libmesh/parsed_function.h"
 #include "libmesh/zero_function.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #include <unordered_set>
 

@@ -18,7 +18,6 @@
 
 // Local includes
 #include "libmesh/libmesh.h"
-#include "libmesh/auto_ptr.h"
 #include "libmesh/getpot.h"
 #include "libmesh/parallel.h"
 #include "libmesh/reference_counter.h"

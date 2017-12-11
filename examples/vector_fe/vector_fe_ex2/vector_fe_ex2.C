@@ -34,6 +34,7 @@
 #include "libmesh/mesh_generation.h"
 #include "libmesh/exact_solution.h"
 #include "libmesh/ucd_io.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // The systems and solvers we may use
 #include "laplace_system.h"

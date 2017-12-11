@@ -27,6 +27,7 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/vector_value.h"
 #include "libmesh/point.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // FParser includes
 #include "libmesh/fparser_ad.hh"

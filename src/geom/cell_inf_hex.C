@@ -100,8 +100,8 @@ std::unique_ptr<Elem> InfHex::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
-  // To be returned wrapped in a std::unique_ptr
-  Elem * face = libmesh_nullptr;
+  // Return value
+  std::unique_ptr<Elem> face;
 
   // Think of a unit cube: (-1,1) x (-1,1) x (-1,1),
   // with (in general) the normals pointing outwards
@@ -119,7 +119,7 @@ std::unique_ptr<Elem> InfHex::side_ptr (const unsigned int i)
         // Why is that? - In agreement with build_side_ptr(),
         // which in turn _has_ to build the face in this
         // way as to enable the cool way \p InfFE re-uses \p FE.
-        face = new Quad4;
+        face = libmesh_make_unique<Quad4>();
         break;
       }
 
@@ -129,7 +129,7 @@ std::unique_ptr<Elem> InfHex::side_ptr (const unsigned int i)
     case 3: // the face at y = 1
     case 4: // the face at x = -1
       {
-        face = new InfQuad4;
+        face = libmesh_make_unique<InfQuad4>();
         break;
       }
 
@@ -141,7 +141,7 @@ std::unique_ptr<Elem> InfHex::side_ptr (const unsigned int i)
   for (unsigned n=0; n<face->n_nodes(); ++n)
     face->set_node(n) = this->node_ptr(InfHex8::side_nodes_map[i][n]);
 
-  return std::unique_ptr<Elem>(face);
+  return face;
 }
 
 

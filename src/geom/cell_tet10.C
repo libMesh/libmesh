@@ -174,13 +174,13 @@ std::unique_ptr<Elem> Tet10::build_side_ptr (const unsigned int i,
 
   else
     {
-      Elem * face = new Tri6;
+      auto face = libmesh_make_unique<Tri6>();
       face->subdomain_id() = this->subdomain_id();
 
       for (unsigned n=0; n<face->n_nodes(); ++n)
         face->set_node(n) = this->node_ptr(Tet10::side_nodes_map[i][n]);
 
-      return std::unique_ptr<Elem>(face);
+      return face;
     }
 
   libmesh_error_msg("We'll never get here!");

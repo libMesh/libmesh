@@ -21,6 +21,7 @@
 #include "libmesh/fe.h"
 #include "libmesh/inf_fe.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 // For projection code:
 #include "libmesh/boundary_info.h"
 #include "libmesh/mesh_base.h"

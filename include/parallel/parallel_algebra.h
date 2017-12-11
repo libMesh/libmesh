@@ -26,8 +26,7 @@
 
 // Local Includes
 #include "libmesh/libmesh_config.h"
-
-#include "libmesh/auto_ptr.h"
+#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/parallel.h"
 #include "libmesh/point.h"
 #include "libmesh/tensor_value.h"
@@ -35,6 +34,7 @@
 
 // C++ includes
 #include <cstddef>
+#include <memory>
 
 namespace libMesh {
 namespace Parallel {

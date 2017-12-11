@@ -26,16 +26,16 @@
 #include "libmesh/vector_value.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/fe_type.h"
-#include "libmesh/auto_ptr.h"
+#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/fe_map.h"
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#include "libmesh/tensor_value.h"
+#endif
 
 // C++ includes
 #include <cstddef>
 #include <vector>
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-#include "libmesh/tensor_value.h"
-#endif
+#include <memory>
 
 namespace libMesh
 {

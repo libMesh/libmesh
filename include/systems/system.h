@@ -21,7 +21,7 @@
 #define LIBMESH_SYSTEM_H
 
 // Local Includes
-#include "libmesh/auto_ptr.h"
+#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/elem_range.h"
 #include "libmesh/enum_norm_type.h"
 #include "libmesh/enum_xdr_mode.h"
@@ -39,6 +39,7 @@
 #include <cstddef>
 #include <set>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {

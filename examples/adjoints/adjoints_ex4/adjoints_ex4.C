@@ -66,6 +66,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/system_norm.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // Adjoint Related includes
 #include "libmesh/qoi_set.h"

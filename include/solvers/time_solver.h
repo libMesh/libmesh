@@ -21,7 +21,7 @@
 #define LIBMESH_TIME_SOLVER_H
 
 // Local includes
-#include "libmesh/auto_ptr.h"
+#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/libmesh_common.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/numeric_vector.h"
@@ -29,6 +29,7 @@
 #include "libmesh/solution_history.h"
 
 // C++ includes
+#include <memory>
 
 namespace libMesh
 {

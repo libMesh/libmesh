@@ -24,6 +24,7 @@
 #include "libmesh/id_types.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/vectormap.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ Includes
 #include <cstddef>

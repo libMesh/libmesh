@@ -31,6 +31,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/elem.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {

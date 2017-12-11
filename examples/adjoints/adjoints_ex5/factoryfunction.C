@@ -21,6 +21,7 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/factory.h"
 #include "libmesh/function_base.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 using namespace libMesh;
 

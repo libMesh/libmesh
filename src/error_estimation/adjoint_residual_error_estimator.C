@@ -16,11 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-
 // Local Includes
 #include "libmesh/adjoint_residual_error_estimator.h"
 #include "libmesh/error_vector.h"
@@ -31,6 +26,10 @@
 #include "libmesh/system_norm.h"
 #include "libmesh/qoi_set.h"
 
+// C++ includes
+#include <iostream>
+#include <iomanip>
+#include <sstream>
 
 namespace libMesh
 {

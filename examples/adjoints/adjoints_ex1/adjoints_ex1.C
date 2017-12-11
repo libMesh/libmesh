@@ -68,6 +68,7 @@
 #include "libmesh/partitioner.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/system_norm.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // Error Estimator includes
 #include "libmesh/kelly_error_estimator.h"

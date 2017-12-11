@@ -22,12 +22,12 @@
 
 // Local Includes
 #include "libmesh/libmesh.h"
-#include "libmesh/auto_ptr.h"
 #include "libmesh/id_types.h"
 #include "libmesh/mesh_base.h" // for MeshBase::element_iterator
 
 // C++ Includes
 #include <cstddef>
+#include <memory>
 
 namespace libMesh
 {

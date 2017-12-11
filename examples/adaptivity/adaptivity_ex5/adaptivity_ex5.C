@@ -34,7 +34,7 @@
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
 
-// Basic include file needed for the mesh functionality.
+// libMesh includes
 #include "libmesh/libmesh.h"
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/mesh_refinement.h"
@@ -48,13 +48,12 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
-
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/periodic_boundary.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/parsed_function.h"
-
 #include "libmesh/getpot.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // This example will solve a linear transient system,
 // so we need to include the TransientLinearImplicitSystem definition.

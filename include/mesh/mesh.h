@@ -22,6 +22,7 @@
 #include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_PARMESH
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 #include "libmesh/distributed_mesh.h"
 namespace libMesh {
 typedef DistributedMesh DefaultMesh;

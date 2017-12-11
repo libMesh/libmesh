@@ -66,6 +66,7 @@
 
 // Libmesh includes
 #include "libmesh/equation_systems.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #include "libmesh/twostep_time_solver.h"
 #include "libmesh/euler_solver.h"

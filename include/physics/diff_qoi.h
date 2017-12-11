@@ -21,11 +21,12 @@
 #define LIBMESH_DIFF_QOI_H
 
 // Local Includes
-#include "libmesh/auto_ptr.h"
+#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/parallel.h"
 #include "libmesh/diff_context.h"
 
 // C++ includes
+#include <memory>
 
 namespace libMesh
 {

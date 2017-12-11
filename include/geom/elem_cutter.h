@@ -27,11 +27,12 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/point.h"
-#include "libmesh/auto_ptr.h"
+#include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/parallel.h"
 
 // C++ includes
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {
@@ -153,16 +154,18 @@ protected:
   std::vector<Elem const *> _inside_elem;
   std::vector<Elem const *> _outside_elem;
 
-  std::unique_ptr<ReplicatedMesh> _inside_mesh_2D;
-  std::unique_ptr<ReplicatedMesh> _outside_mesh_2D;
-  std::unique_ptr<ReplicatedMesh> _inside_mesh_3D;
-  std::unique_ptr<ReplicatedMesh> _outside_mesh_3D;
-
   Parallel::Communicator _comm_self; // defaults to MPI_COMM_SELF
 
-  std::unique_ptr<TriangleInterface>   _triangle_inside;
-  std::unique_ptr<TriangleInterface>   _triangle_outside;
+  std::unique_ptr<ReplicatedMesh> _inside_mesh_2D;
+  std::unique_ptr<TriangleInterface> _triangle_inside;
+
+  std::unique_ptr<ReplicatedMesh> _outside_mesh_2D;
+  std::unique_ptr<TriangleInterface> _triangle_outside;
+
+  std::unique_ptr<ReplicatedMesh> _inside_mesh_3D;
   std::unique_ptr<TetGenMeshInterface> _tetgen_inside;
+
+  std::unique_ptr<ReplicatedMesh> _outside_mesh_3D;
   std::unique_ptr<TetGenMeshInterface> _tetgen_outside;
 
   std::vector<Point> _intersection_pts;

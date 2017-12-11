@@ -31,6 +31,7 @@
 #include "libmesh/time_solver.h"
 #include "libmesh/transient_system.h"
 #include "libmesh/vtk_io.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 #include <cstdio>
 #include <ctime>

@@ -19,12 +19,11 @@
 #include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_HAVE_SLEPC
 
-// C++ includes
-
 // Local Includes
 #include "libmesh/eigen_solver.h"
 #include "libmesh/slepc_eigen_solver.h"
 #include "libmesh/solver_configuration.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 namespace libMesh
 {

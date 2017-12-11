@@ -16,6 +16,7 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/fem_context.h"
 #include "libmesh/zero_function.h"
+#include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // Local includes
 #include "poisson.h"
