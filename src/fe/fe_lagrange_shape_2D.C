@@ -199,10 +199,9 @@ Real FE<2,LAGRANGE>::shape(const ElemType type,
     default:
       libmesh_error_msg("ERROR: Unsupported 2D FE order: " << order);
     }
-
-  libmesh_error_msg("We'll never get here!");
-#endif // LIBMESH_DIM > 1
+#else // LIBMESH_DIM > 1
   return 0.;
+#endif
 }
 
 
@@ -542,11 +541,9 @@ Real FE<2,LAGRANGE>::shape_deriv(const ElemType type,
     default:
       libmesh_error_msg("ERROR: Unsupported 2D FE order: " << order);
     }
-
-
-  libmesh_error_msg("We'll never get here!");
-#endif // LIBMESH_DIM > 1
+#else // LIBMESH_DIM > 1
   return 0.;
+#endif
 }
 
 
@@ -900,9 +897,9 @@ Real FE<2,LAGRANGE>::shape_second_deriv(const ElemType type,
 
     } // end switch (order)
 
-  libmesh_error_msg("We'll never get here!");
-#endif // LIBMESH_DIM > 1
+#else // LIBMESH_DIM > 1
   return 0.;
+#endif
 }
 
 

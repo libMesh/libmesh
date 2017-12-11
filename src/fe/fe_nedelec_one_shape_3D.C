@@ -182,10 +182,9 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << totalorder);
     }
-#endif
-
-  libmesh_error_msg("We'll never get here!");
+#else
   return RealGradient();
+#endif
 }
 
 
@@ -481,10 +480,9 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
       libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << totalorder);
     }
 
-#endif
-
-  libmesh_error_msg("We'll never get here!");
+#else
   return RealGradient();
+#endif
 }
 
 
@@ -740,10 +738,9 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
       libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << totalorder);
     }
 
-#endif
-
-  libmesh_error_msg("We'll never get here!");
+#else
   return RealGradient();
+#endif
 }
 
 } // namespace libMesh

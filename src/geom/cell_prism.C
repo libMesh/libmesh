@@ -83,9 +83,6 @@ dof_id_type Prism::key (const unsigned int s) const
     default:
       libmesh_error_msg("Invalid side " << s);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
 }
 
 

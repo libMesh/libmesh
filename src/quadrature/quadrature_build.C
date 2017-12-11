@@ -167,10 +167,6 @@ std::unique_ptr<QBase> QBase::build(const QuadratureType _qt,
     default:
       libmesh_error_msg("ERROR: Bad qt=" << _qt);
     }
-
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<QBase>();
 }
 
 } // namespace libMesh

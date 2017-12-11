@@ -2053,9 +2053,6 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     return assign_conversion( it->second );
   else
     libmesh_error_msg("ERROR! Unrecognized element type_str: " << type_str);
-
-  libmesh_error_msg("We'll never get here!");
-  return assign_conversion (EDGE2);
 }
 
 
@@ -2418,19 +2415,6 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
     default:
       libmesh_error_msg("Unsupported element type: " << type);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  const Conversion conv(tri3_node_map,
-                        ARRAY_LENGTH(tri3_node_map),
-                        tri3_node_map, // inverse node map same as forward node map
-                        ARRAY_LENGTH(tri3_node_map),
-                        tri_edge_map,
-                        ARRAY_LENGTH(tri_edge_map),
-                        tri_inverse_edge_map,
-                        ARRAY_LENGTH(tri_inverse_edge_map),
-                        TRI3,
-                        "TRI3");
-  return conv;
 }
 
 

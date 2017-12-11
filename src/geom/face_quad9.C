@@ -194,9 +194,6 @@ dof_id_type Quad9::key (const unsigned int s) const
     default:
       libmesh_error_msg("Invalid side s = " << s);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
 }
 
 
@@ -238,9 +235,6 @@ std::unique_ptr<Elem> Quad9::build_side_ptr (const unsigned int i,
 
       return edge;
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<Elem>();
 }
 
 
@@ -454,9 +448,6 @@ unsigned int Quad9::n_second_order_adjacent_vertices (const unsigned int n) cons
     default:
       libmesh_error_msg("Invalid n = " << n);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return libMesh::invalid_uint;
 }
 
 

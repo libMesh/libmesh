@@ -126,9 +126,6 @@ dof_id_type InfQuad6::key (const unsigned int s) const
     default:
       libmesh_error_msg("Invalid side s = " << s);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
 }
 
 
@@ -198,9 +195,6 @@ std::unique_ptr<Elem> InfQuad6::build_side_ptr (const unsigned int i,
 
       return edge;
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<Elem>();
 }
 
 

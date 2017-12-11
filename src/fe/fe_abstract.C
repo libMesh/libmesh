@@ -251,9 +251,6 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
     default:
       libmesh_error_msg("Invalid dimension dim = " << dim);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<FEAbstract>();
 }
 
 void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> & nodes)

@@ -378,9 +378,6 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported element type = " << type);
     } // switch type
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -558,9 +555,6 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported element type = " << type);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 

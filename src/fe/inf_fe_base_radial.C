@@ -88,9 +88,6 @@ ElemType InfFE<Dim,T_radial,T_base>::Base::get_elem_type (const ElemType type)
     default:
       libmesh_error_msg("ERROR: Unsupported element type!: " << type);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return INVALID_ELEM;
 }
 
 

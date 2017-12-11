@@ -277,9 +277,6 @@ Real InfHex::quality (const ElemQuality q) const
     default:
       return Elem::quality(q);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 

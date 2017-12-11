@@ -136,9 +136,6 @@ unsigned int hierarchic_n_dofs(const ElemType t, const Order o)
     default:
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for HIERARCHIC FE family!");
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
 } // hierarchic_n_dofs()
 
 
@@ -272,9 +269,6 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
     default:
       libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
 } // hierarchic_n_dofs_at_node()
 
 
@@ -313,9 +307,6 @@ unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
     default:
       libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
 } // hierarchic_n_dofs_per_elem()
 
 } // anonymous namespace

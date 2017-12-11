@@ -80,9 +80,6 @@ std::unique_ptr<PointLocatorBase> PointLocatorBase::build (PointLocatorType t,
     default:
       libmesh_error_msg("ERROR: Bad PointLocatorType = " << t);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<PointLocatorBase>();
 }
 
 void PointLocatorBase::set_close_to_point_tol (Real close_to_point_tol)

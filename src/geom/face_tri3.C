@@ -125,9 +125,6 @@ std::unique_ptr<Elem> Tri3::build_side_ptr (const unsigned int i,
 
       return edge;
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<Elem>();
 }
 
 

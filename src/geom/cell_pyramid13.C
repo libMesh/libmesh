@@ -185,9 +185,6 @@ std::unique_ptr<Elem> Pyramid13::build_side_ptr (const unsigned int i, bool prox
 
       return face;
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<Elem>();
 }
 
 
@@ -247,9 +244,6 @@ unsigned int Pyramid13::n_second_order_adjacent_vertices (const unsigned int n) 
     default:
       libmesh_error_msg("Invalid node n = " << n);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return libMesh::invalid_uint;
 }
 
 
@@ -294,9 +288,6 @@ unsigned short int Pyramid13::second_order_adjacent_vertex (const unsigned int n
       libmesh_error_msg("Invalid n = " << n);
 
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return static_cast<unsigned short int>(-1);
 }
 
 

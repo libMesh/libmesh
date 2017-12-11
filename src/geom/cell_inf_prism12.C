@@ -173,9 +173,6 @@ std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
 
       return face;
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<Elem>();
 }
 
 

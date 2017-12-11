@@ -955,8 +955,7 @@ unsigned int DofObject::var_to_vg (const unsigned int s,
       if (var < vg_end) return vg;
     }
 
-  libmesh_error_msg("We'll never get here!");
-  return 0;
+  libmesh_error_msg("Error: could not map variable " << var << " to variable group.");
 }
 
 

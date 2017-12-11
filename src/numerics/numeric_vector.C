@@ -73,9 +73,6 @@ NumericVector<T>::build(const Parallel::Communicator & comm, const SolverPackage
     default:
       return libmesh_make_unique<DistributedVector<T>>(comm, AUTOMATIC);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<NumericVector<T>>();
 }
 
 

@@ -169,9 +169,6 @@ SparseMatrix<T>::build(const Parallel::Communicator & comm,
     default:
       libmesh_error_msg("ERROR:  Unrecognized solver package: " << solver_package);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<SparseMatrix<T>>();
 }
 
 

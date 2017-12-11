@@ -547,10 +547,9 @@ Real FE<3,LAGRANGE>::shape(const ElemType type,
       libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << order);
     }
 
-#endif
-
-  libmesh_error_msg("We'll never get here!");
+#else
   return 0.;
+#endif
 }
 
 
@@ -1904,10 +1903,9 @@ Real FE<3,LAGRANGE>::shape_deriv(const ElemType type,
       libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << order);
     }
 
-#endif
-
-  libmesh_error_msg("We'll never get here!");
+#else
   return 0.;
+#endif
 }
 
 
@@ -3636,10 +3634,9 @@ Real FE<3,LAGRANGE>::shape_second_deriv(const ElemType type,
       libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << order);
     }
 
-#endif
-
-  libmesh_error_msg("We'll never get here!");
+#else
   return 0.;
+#endif
 }
 
 

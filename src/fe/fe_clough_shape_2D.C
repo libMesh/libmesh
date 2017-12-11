@@ -1121,9 +1121,6 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
       libmesh_error_msg("Invalid shape function derivative j = " <<
                         deriv_type);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -1561,9 +1558,6 @@ Real clough_raw_shape_deriv(const unsigned int basis_num,
       libmesh_error_msg("Invalid shape function derivative j = " <<
                         deriv_type);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 Real clough_raw_shape(const unsigned int basis_num,
@@ -1794,9 +1788,6 @@ Real clough_raw_shape(const unsigned int basis_num,
       libmesh_error_msg("Invalid shape function index i = " <<
                         basis_num);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -1995,9 +1986,6 @@ Real FE<2,CLOUGH>::shape(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported polynomial order = " << order);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -2192,9 +2180,6 @@ Real FE<2,CLOUGH>::shape_deriv(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported polynomial order = " << order);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -2372,9 +2357,6 @@ Real FE<2,CLOUGH>::shape_second_deriv(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported polynomial order = " << order);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 } // namespace libMesh
