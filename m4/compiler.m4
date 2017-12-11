@@ -150,30 +150,30 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
 
 
 
-# -------------------------------------------------------------
-# Determine the C++ compiler in use. Return the name and possibly
-# version of this compiler in GXX_VERSION.
-#
-# Usage: DETERMINE_CXX_BRAND
-#
-# -------------------------------------------------------------
+dnl -------------------------------------------------------------
+dnl Determine the C++ compiler in use. Return the name and possibly
+dnl version of this compiler in GXX_VERSION.
+dnl
+dnl Usage: DETERMINE_CXX_BRAND
+dnl
+dnl -------------------------------------------------------------
 AC_DEFUN([DETERMINE_CXX_BRAND],
 [
-  # First check for gcc version, avoids intel's icc from
-  # pretending to be gcc
+  dnl Set this flag once the compiler "brand" has been detected to skip remaining tests.
+  compiler_brand_detected=no
+
+  dnl First check for gcc version, prevents intel's icc from
+  dnl pretending to be gcc
   REAL_GXX=`($CXX -v 2>&1) | grep "gcc version"`
 
-  # Intel's v12.1 does this:
-  # $ icpc -v
-  #   icpc version 12.1.0 (gcc version 4.4.4 compatibility)
-  # cath that and do not interpret it as 'REAL_GXX' compiler
+  dnl Do not allow Intel to masquerade as a "real" GCC.
   is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
   if test "x$is_intel_icc" != "x" ; then
     REAL_GXX=""
   fi
 
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
-    # find out the right version
+    dnl find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
       *gcc\ version\ 7.*)
@@ -204,325 +204,126 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
         AC_MSG_RESULT(<<< C++ compiler is gcc-4.6 >>>)
         GXX_VERSION=gcc4.6
         ;;
-      *4.5.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-4.5 >>>)
-        GXX_VERSION=gcc4.5
-        ;;
-      *4.4.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-4.4 >>>)
-        GXX_VERSION=gcc4.4
-        ;;
-      *4.3.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-4.3 >>>)
-        GXX_VERSION=gcc4.3
-        ;;
-      *4.2.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-4.2 >>>)
-        GXX_VERSION=gcc4.2
-        ;;
-      *4.1.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-4.1 >>>)
-        GXX_VERSION=gcc4.1
-        ;;
-      *4.0.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-4.0 >>>)
-        GXX_VERSION=gcc4.0
-        ;;
-      *3.4.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-3.4 >>>)
-        GXX_VERSION=gcc3.4
-        ;;
-      *3.3.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-3.3 >>>)
-        GXX_VERSION=gcc3.3
-        ;;
-      *3.2.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-3.2 >>>)
-        GXX_VERSION=gcc3.2
-        ;;
-      *3.1.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-3.1 >>>)
-        GXX_VERSION=gcc3.1
-        ;;
-      *3.0.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-3.0 >>>)
-        GXX_VERSION=gcc3.0
-        ;;
-      *2.97*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-2.97 >>>)
-        GXX_VERSION=gcc2.97
-        ;;
-      *2.96*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-2.96 >>>)
-        GXX_VERSION=gcc2.96
-        AC_DEFINE(BROKEN_IOSTREAM, 1,
-                  [This compiler is known not to support some iostream functionality])
-        AC_MSG_RESULT(<<< Configuring library for broken iostream >>>)
-        ;;
-      *2.95*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-2.95 >>>)
-        GXX_VERSION=gcc2.95
-        AC_DEFINE(BROKEN_IOSTREAM, 1,
-                  [This compiler is known not to support some iostream functionality])
-        AC_MSG_RESULT(<<< Configuring library for broken iostream >>>)
-        ;;
-      *"egcs-1.1"*)
-        AC_MSG_RESULT(<<< C++ compiler is egcs-1.1 >>>)
-        GXX_VERSION=egcs1.1
-        ;;
-      *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
-        # These compilers are too old to support a useful subset
-        # of modern C++, so we don't support them
-        AC_MSG_RESULT(<<< C++ compiler is $GXX_VERSION_STRING >>>)
-        AC_MSG_ERROR(<<< C++ compiler is not supported >>>)
-        ;;
       *)
-  AC_MSG_RESULT(<<< C++ compiler is unknown but accepted gcc version >>>)
-  GXX_VERSION=gcc-other
-  ;;
-    esac
-    # Check for Apple compilers
-    case "$GXX_VERSION_STRING" in
-      *Apple*)
-        AC_MSG_RESULT(<<< C++ compiler is built by Apple >>>)
-        APPLE_GCC=true
-        ;;
-      *)
-        APPLE_GCC=false
+        AC_MSG_RESULT(<<< C++ compiler is unknown but accepted gcc version >>>)
+        GXX_VERSION=gcc-other
         ;;
     esac
-  else
-    # Check other (non-gcc) compilers
 
-    # Check for IBM xlC. For some reasons, depending on some environment
-    # variables, moon position, and other reasons unknown to me, the
-    # compiler displays different names in the first line of output, so
-    # check various possibilities.  Calling xlC with no arguments displays
-    # the man page.  Grepping for case-sensitive xlc is not enough if the
-    # user wants xlC, so we used case-insensitive grep instead.
+    dnl Detection was successful, so set the flag.
+    compiler_brand_detected=yes
+  fi
+
+  dnl Clang/LLVM C++?
+  if (test "x$compiler_brand_detected" = "xno"); then
+    clang_version="`($CXX --version 2>&1)`"
+    is_clang="`echo $clang_version | grep 'clang'`"
+
+    if test "x$is_clang" != "x" ; then
+      dnl Detect if clang is the version built by
+      dnl Apple, because then the version number means
+      dnl something different...
+      is_apple_clang="`echo $clang_version | grep 'Apple'`"
+      clang_vendor="clang"
+      if test "x$is_apple_clang" != "x" ; then
+        clang_vendor="Apple clang"
+      fi
+
+      dnl If we have perl, we can also pull out the clang version number using regexes.
+      dnl Note that @S|@ is a quadrigraph for the dollar sign.
+      clang_major_minor=unknown
+
+      if test "x$PERL" != "x" ; then
+         clang_major_minor=`echo $clang_version | $PERL -ne 'print @S|@1 if /version\s(\d+\.\d+)/'`
+         if test "x$clang_major_minor" = "x" ; then
+           clang_major_minor=unknown
+         fi
+      fi
+
+      AC_MSG_RESULT([<<< C++ compiler is ${clang_vendor}, version ${clang_major_minor} >>>])
+      GXX_VERSION=clang
+      compiler_brand_detected=yes
+    fi
+  fi
+
+  dnl Intel's ICC C++ compiler?
+  if (test "x$compiler_brand_detected" = "xno"); then
+    is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
+    if test "x$is_intel_icc" != "x" ; then
+      GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
+      case "$GXX_VERSION_STRING" in
+        *18.*)
+          AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 18 >>>)
+          GXX_VERSION=intel_icc_v18.x
+          ;;
+        *17.*)
+          AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 17 >>>)
+          GXX_VERSION=intel_icc_v17.x
+          ;;
+        *16.*)
+          AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 16 >>>)
+          GXX_VERSION=intel_icc_v16.x
+          ;;
+        *15.*)
+          AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 15 >>>)
+          GXX_VERSION=intel_icc_v15.x
+          ;;
+        *14.*)
+          AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 14 >>>)
+          GXX_VERSION=intel_icc_v14.x
+          ;;
+        *13.*)
+          AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 13 >>>)
+          GXX_VERSION=intel_icc_v13.x
+          ;;
+      esac
+      compiler_brand_detected=yes
+    fi
+  fi
+
+  dnl Check for IBM xlC. Depending on environment
+  dnl variables, moon position, and other reasons unknown to me, this
+  dnl compiler can display different names in the first line of output, so
+  dnl check various possibilities.  Calling xlC with no arguments displays
+  dnl the man page.  Grepping for case-sensitive xlc is not enough if the
+  dnl user wants xlC, so we use case-insensitive grep instead.
+  if (test "x$compiler_brand_detected" = "xno"); then
     is_ibm_xlc="`($CXX 2>&1) | egrep -i 'xlc'`"
     if test "x$is_ibm_xlc" != "x"  ; then
-      # IBM's C++ compiler.
       AC_MSG_RESULT(<<< C++ compiler is IBM xlC >>>)
       GXX_VERSION=ibm_xlc
-    else
-
-      # Check whether we are dealing with the MIPSpro C++ compiler
-      is_mips_pro="`($CXX -version 2>&1) | grep MIPSpro`"
-      if test "x$is_mips_pro" != "x" ; then
-        AC_MSG_RESULT(<<< C++ compiler is MIPSpro C++ compiler >>>)
-        GXX_VERSION=MIPSpro
-      else
-
-        # Intel's ICC C++ compiler for Itanium?
-        is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Itanium(R)' | grep 'Compiler'`"
-        if test "x$is_intel_ecc" = "x" ; then
-          is_intel_ecc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'IA-64' | grep 'Compiler'`"
-        fi
-        if test "x$is_intel_ecc" != "x" ; then
-          GXX_VERSION_STRING="`($CXX -V -help 2>&1) | grep 'Version '`"
-          case "$GXX_VERSION_STRING" in
-            *10.1*)
-              AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 10.1 >>>)
-              GXX_VERSION=intel_itanium_icc_v10.1
-              ;;
-            *10.0*)
-              AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 10.0 >>>)
-              GXX_VERSION=intel_itanium_icc_v10.0
-              ;;
-            *9.1*)
-              AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 9.1 >>>)
-              GXX_VERSION=intel_itanium_icc_v9.1
-              ;;
-            *9.0*)
-              AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 9.0 >>>)
-              GXX_VERSION=intel_itanium_icc_v9.0
-              ;;
-            *8.1*)
-              AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 8.1 >>>)
-              GXX_VERSION=intel_itanium_icc_v8.1
-              ;;
-            *8.0*)
-              AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 8.0 >>>)
-              GXX_VERSION=intel_itanium_icc_v8.0
-              ;;
-            *7.1*)
-              AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 7.1 >>>)
-              GXX_VERSION=intel_itanium_icc_v7.1
-              ;;
-            *7.0*)
-              AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 7.0 >>>)
-              GXX_VERSION=intel_itanium_icc_v7.0
-              ;;
-          esac
-        else
-
-          # Intel's ICC C++ compiler?
-          is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
-          if test "x$is_intel_icc" != "x" ; then
-            GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
-            case "$GXX_VERSION_STRING" in
-              *18.*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 18 >>>)
-                GXX_VERSION=intel_icc_v18.x
-                ;;
-              *17.*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 17 >>>)
-                GXX_VERSION=intel_icc_v17.x
-                ;;
-              *16.*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 16 >>>)
-                GXX_VERSION=intel_icc_v16.x
-                ;;
-              *15.*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 15 >>>)
-                GXX_VERSION=intel_icc_v15.x
-                ;;
-              *14.*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 14 >>>)
-                GXX_VERSION=intel_icc_v14.x
-                ;;
-              *13.*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 13 >>>)
-                GXX_VERSION=intel_icc_v13.x
-                ;;
-              *12.1*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 12.1 >>>)
-                GXX_VERSION=intel_icc_v12.x
-                ;;
-              *12.*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 12 >>>)
-                GXX_VERSION=intel_icc_v12.x
-                ;;
-              *11.*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 11 >>>)
-                GXX_VERSION=intel_icc_v11.x
-                ;;
-              *10.1*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 10.1 >>>)
-                GXX_VERSION=intel_icc_v10.1
-                ;;
-              *10.0*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 10.0 >>>)
-                GXX_VERSION=intel_icc_v10.0
-                ;;
-              *9.1*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 9.1 >>>)
-                GXX_VERSION=intel_icc_v9.1
-                ;;
-              *9.0*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 9.0 >>>)
-                GXX_VERSION=intel_icc_v9.0
-                ;;
-              *8.1*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 8.1 >>>)
-                GXX_VERSION=intel_icc_v8.1
-                ;;
-              *8.0*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 8.0 >>>)
-                GXX_VERSION=intel_icc_v8.0
-                ;;
-              *7.1*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 7.1 >>>)
-                GXX_VERSION=intel_icc_v7.1
-                ;;
-              *7.0*)
-                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 7.0 >>>)
-                GXX_VERSION=intel_icc_v7.0
-                ;;
-            esac
-          else
-
-          # Or Compaq's cxx compiler?
-          is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
-          if test "x$is_dec_cxx" != "x" ; then
-            AC_MSG_RESULT(<<< C++ compiler is Compaq cxx >>>)
-            GXX_VERSION=compaq_cxx
-          else
-
-            # Sun Studio?
-            is_sun_cc="`($CXX -V 2>&1) | grep 'Sun C++'`"
-            if test "x$is_sun_cc" != "x" ; then
-              AC_MSG_RESULT(<<< C++ compiler is Sun Studio compiler >>>)
-              GXX_VERSION=sun_studio
-            else
-
-              # Sun Forte?
-              is_sun_forte_cc="`($CXX -V 2>&1) | grep 'Forte'`"
-              if test "x$is_sun_forte_cc" != "x" ; then
-                AC_MSG_RESULT(<<< C++ compiler is Sun Forte compiler >>>)
-                GXX_VERSION=sun_forte
-              else
-
-                # Cray C++?
-                is_cray_cc="`($CXX -V 2>&1) | grep 'Cray '`"
-                if test "x$is_cray_cc" != "x" ; then
-                  AC_MSG_RESULT(<<< C++ compiler is Cray C++ >>>)
-                  GXX_VERSION=cray_cc
-                else
-
-                  # Portland Group C++?
-                  is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
-                  if test "x$is_pgcc" != "x" ; then
-                    AC_MSG_RESULT(<<< C++ compiler is Portland Group C++ >>>)
-                    GXX_VERSION=portland_group
-                  else
-
-                    # HP-UX 11.11 aCC?
-                    is_hpux_acc="`($CXX -V 2>&1) | grep 'aCC: HP ANSI C++'`"
-                    if test "x$is_hpux_acc" != "x" ; then
-                      AC_MSG_RESULT(<<< C++ compiler is HP-UX C++ >>>)
-                      GXX_VERSION=hpux_acc
-                    else
-
-                      # Clang/LLVM C++?
-                      clang_version="`($CXX --version 2>&1)`"
-                      is_clang="`echo $clang_version | grep 'clang'`"
-
-                        if test "x$is_clang" != "x" ; then
-                          # Detect if clang is the version built by
-                          # Apple, because then the version number means
-                          # something different...
-                          is_apple_clang="`echo $clang_version | grep 'Apple'`"
-                          clang_vendor="clang"
-                          if test "x$is_apple_clang" != "x" ; then
-                            clang_vendor="Apple clang"
-                          fi
-
-                          # If we have perl, we can also pull out the clang version number using regexes.
-                          # Note that @S|@ is a quadrigraph for the dollar sign.
-                          clang_major_minor=unknown
-
-                          if test "x$PERL" != "x" ; then
-                             clang_major_minor=`echo $clang_version | $PERL -ne 'print @S|@1 if /version\s(\d+\.\d+)/'`
-                             if test "x$clang_major_minor" = "x" ; then
-                               clang_major_minor=unknown
-                             fi
-                          fi
-
-                          AC_MSG_RESULT([<<< C++ compiler is ${clang_vendor}, version ${clang_major_minor} >>>])
-                          GXX_VERSION=clang
-                        else
-
-                          # No recognized compiler found...
-                          # warn the user and continue
-                          AC_MSG_RESULT( WARNING:)
-                          AC_MSG_RESULT( >>> Unrecognized compiler: "$CXX" <<<)
-                          AC_MSG_RESULT( You will likely need to modify)
-                          AC_MSG_RESULT( Make.common directly to specify)
-                          AC_MSG_RESULT( proper compiler flags)
-                          GXX_VERSION=unknown
-                        fi
-                      fi
-                    fi
-                  fi
-                fi
-              fi
-            fi
-          fi
-        fi
-      fi
+      compiler_brand_detected=yes
     fi
+  fi
+
+  dnl Cray C++?
+  if (test "x$compiler_brand_detected" = "xno"); then
+    is_cray_cc="`($CXX -V 2>&1) | grep 'Cray '`"
+    if test "x$is_cray_cc" != "x" ; then
+      AC_MSG_RESULT(<<< C++ compiler is Cray C++ >>>)
+      GXX_VERSION=cray_cc
+      compiler_brand_detected=yes
+    fi
+  fi
+
+  dnl Portland Group C++?
+  if (test "x$compiler_brand_detected" = "xno"); then
+    is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
+    if test "x$is_pgcc" != "x" ; then
+      AC_MSG_RESULT(<<< C++ compiler is Portland Group C++ >>>)
+      GXX_VERSION=portland_group
+      compiler_brand_detected=yes
+    fi
+  fi
+
+  dnl Could not recognize the compiler. Warn the user and continue.
+  if (test "x$compiler_brand_detected" = "xno"); then
+    AC_MSG_RESULT( WARNING:)
+    AC_MSG_RESULT( >>> Unrecognized compiler: "$CXX" <<<)
+    AC_MSG_RESULT( You will likely need to modify)
+    AC_MSG_RESULT( Make.common directly to specify)
+    AC_MSG_RESULT( proper compiler flags)
+    GXX_VERSION=unknown
   fi
 ])
 
