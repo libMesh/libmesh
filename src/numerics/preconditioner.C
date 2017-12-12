@@ -28,44 +28,61 @@
 namespace libMesh
 {
 
-//------------------------------------------------------------------
-// Preconditioner members
 template <typename T>
-Preconditioner<T> *
-Preconditioner<T>::build(const libMesh::Parallel::Communicator & comm,
-                         const SolverPackage solver_package)
+std::unique_ptr<Preconditioner<T>>
+Preconditioner<T>::build_preconditioner(const libMesh::Parallel::Communicator & comm,
+                                        const SolverPackage solver_package)
 {
   // Avoid unused parameter warnings when no solver packages are enabled.
   libmesh_ignore(comm);
 
-  // Build the appropriate solver
+  // Build and return the appropriate Preconditioner object.
   switch (solver_package)
     {
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
       {
-        return new PetscPreconditioner<T>(comm);
+        return libmesh_make_unique<PetscPreconditioner<T>>(comm);
       }
 #endif
 
 #ifdef LIBMESH_TRILINOS_HAVE_EPETRA
     case TRILINOS_SOLVERS:
-      return new TrilinosPreconditioner<T>(comm);
+      return libmesh_make_unique<TrilinosPreconditioner<T>>(comm);
 #endif
 
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
-      return new EigenPreconditioner<T>(comm);
+      return libmesh_make_unique<EigenPreconditioner<T>>(comm);
 #endif
 
     default:
       libmesh_error_msg("ERROR:  Unrecognized solver package: " << solver_package);
     }
-
-  return libmesh_nullptr;
 }
 
+
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+
+template <typename T>
+Preconditioner<T> *
+Preconditioner<T>::build(const libMesh::Parallel::Communicator & comm,
+                         const SolverPackage solver_package)
+{
+  // You should be calling build_preconditioner() instead.
+  libmesh_deprecated();
+
+  // Call the non-deprecated method
+  std::unique_ptr<Preconditioner<T>> ptr =
+    Preconditioner<T>::build_preconditioner(comm, solver_package);
+
+  // Vaya con dios
+  return ptr.release();
+}
+
+#endif
 
 
 //------------------------------------------------------------------
