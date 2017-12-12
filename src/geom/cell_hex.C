@@ -98,7 +98,7 @@ std::unique_ptr<Elem> Hex::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
-  auto face = libmesh_make_unique<Quad4>();
+  std::unique_ptr<Elem> face = libmesh_make_unique<Quad4>();
 
   for (unsigned n=0; n<face->n_nodes(); ++n)
     face->set_node(n) = this->node_ptr(Hex8::side_nodes_map[i][n]);

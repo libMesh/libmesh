@@ -152,7 +152,7 @@ std::unique_ptr<Elem> Hex20::build_side_ptr (const unsigned int i,
 
   else
     {
-      auto face = libmesh_make_unique<Quad8>();
+      std::unique_ptr<Elem> face = libmesh_make_unique<Quad8>();
       face->subdomain_id() = this->subdomain_id();
 
       for (unsigned n=0; n<face->n_nodes(); ++n)

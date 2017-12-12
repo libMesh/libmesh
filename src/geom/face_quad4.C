@@ -134,7 +134,7 @@ std::unique_ptr<Elem> Quad4::build_side_ptr (const unsigned int i,
 
   else
     {
-      auto edge = libmesh_make_unique<Edge2>();
+      std::unique_ptr<Elem> edge = libmesh_make_unique<Edge2>();
       edge->subdomain_id() = this->subdomain_id();
 
       // Set the nodes
