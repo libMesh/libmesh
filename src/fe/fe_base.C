@@ -374,9 +374,6 @@ FEGenericBase<Real>::build (const unsigned int dim,
     default:
       libmesh_error_msg("Invalid dimension dim = " << dim);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<FEBase>();
 }
 
 
@@ -443,9 +440,6 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
     default:
       libmesh_error_msg("Invalid dimension dim = " << dim);
     } // switch(dim)
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<FEVectorBase>();
 }
 
 
@@ -657,9 +651,6 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
     default:
       libmesh_error_msg("Invalid dimension dim = " << dim);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<FEBase>();
 }
 
 

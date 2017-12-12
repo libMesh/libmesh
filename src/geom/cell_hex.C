@@ -179,9 +179,6 @@ unsigned int Hex::opposite_node(const unsigned int node_in,
     default:
       libmesh_error_msg("Unsupported side_in = " << side_in);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 255;
 }
 
 
@@ -322,9 +319,6 @@ Real Hex::quality (const ElemQuality q) const
     default:
       return Elem::quality(q);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 

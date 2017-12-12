@@ -62,9 +62,6 @@ Real FE<1,MONOMIAL>::shape(const ElemType,
         val *= xi;
       return val;
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -121,9 +118,6 @@ Real FE<1,MONOMIAL>::shape_deriv(const ElemType,
         val *= xi;
       return val;
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -179,9 +173,6 @@ Real FE<1,MONOMIAL>::shape_second_deriv(const ElemType,
         val *= (index+1) * xi;
       return val;
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 

@@ -324,9 +324,6 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
     default:
       libmesh_error_msg("ERROR: Undefined element type!");
     }
-
-  // We'll never get here.
-  return libmesh_nullptr;
 }
 
 
@@ -1459,9 +1456,6 @@ Real Elem::quality (const ElemQuality q) const
         return 1.;
       }
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 

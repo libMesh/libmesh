@@ -348,9 +348,6 @@ Real FE<3,L2_LAGRANGE>::shape(const ElemType type,
     }
 
 #endif
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -1190,9 +1187,6 @@ Real FE<3,L2_LAGRANGE>::shape_deriv(const ElemType type,
     }
 
 #endif
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -1446,9 +1440,6 @@ Real FE<3,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
     }
 
 #endif
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 

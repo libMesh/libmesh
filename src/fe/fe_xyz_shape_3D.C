@@ -211,10 +211,9 @@ Real FE<3,XYZ>::shape(const Elem * elem,
       return val;
     }
 
-#endif
-
-  libmesh_error_msg("We'll never get here!");
+#else
   return 0.;
+#endif
 }
 
 
@@ -686,10 +685,9 @@ Real FE<3,XYZ>::shape_deriv(const Elem * elem,
       libmesh_error_msg("Invalid j = " << j);
     }
 
-#endif
-
-  libmesh_error_msg("We'll never get here!");
+#else
   return 0.;
+#endif
 }
 
 
@@ -1379,10 +1377,9 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem * elem,
       libmesh_error_msg("Invalid j = " << j);
     }
 
-#endif
-
-  libmesh_error_msg("We'll never get here!");
+#else
   return 0.;
+#endif
 }
 
 } // namespace libMesh

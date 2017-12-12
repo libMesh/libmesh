@@ -183,9 +183,6 @@ Real FESubdivision::regular_shape(const unsigned int i,
     default:
       libmesh_error_msg("Invalid i = " << i);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -275,9 +272,6 @@ Real FESubdivision::regular_shape_deriv(const unsigned int i,
     default:
       libmesh_error_msg("Invalid j = " << j);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -391,9 +385,6 @@ Real FESubdivision::regular_shape_second_deriv(const unsigned int i,
     default:
       libmesh_error_msg("Invalid j = " << j);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -727,9 +718,6 @@ Real FE<2,SUBDIVISION>::shape(const ElemType type,
     default:
       libmesh_error_msg("ERROR: Unsupported polynomial order!");
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -769,9 +757,6 @@ Real FE<2,SUBDIVISION>::shape_deriv(const ElemType type,
     default:
       libmesh_error_msg("ERROR: Unsupported polynomial order!");
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -812,9 +797,6 @@ Real FE<2,SUBDIVISION>::shape_second_deriv(const ElemType type,
     default:
       libmesh_error_msg("ERROR: Unsupported polynomial order!");
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 

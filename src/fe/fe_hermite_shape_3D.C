@@ -439,9 +439,6 @@ Real FE<3,HERMITE>::shape(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported polynomial order " << totalorder);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -536,9 +533,6 @@ Real FE<3,HERMITE>::shape_deriv(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported polynomial order " << totalorder);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -637,9 +631,6 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported polynomial order " << totalorder);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 } // namespace libMesh

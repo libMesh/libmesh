@@ -137,9 +137,6 @@ dof_id_type Pyramid14::key (const unsigned int s) const
     default:
       libmesh_error_msg("Invalid side s = " << s);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
 }
 
 
@@ -214,9 +211,6 @@ std::unique_ptr<Elem> Pyramid14::build_side_ptr (const unsigned int i, bool prox
 
       return face;
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<Elem>();
 }
 
 
@@ -279,9 +273,6 @@ unsigned int Pyramid14::n_second_order_adjacent_vertices (const unsigned int n) 
     default:
       libmesh_error_msg("Invalid node n = " << n);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return libMesh::invalid_uint;
 }
 
 
@@ -337,9 +328,6 @@ unsigned short int Pyramid14::second_order_adjacent_vertex (const unsigned int n
       libmesh_error_msg("Invalid n = " << n);
 
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return static_cast<unsigned short int>(-1);
 }
 
 

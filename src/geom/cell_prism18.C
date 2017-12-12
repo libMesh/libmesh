@@ -165,9 +165,6 @@ dof_id_type Prism18::key (const unsigned int s) const
     default:
       libmesh_error_msg("Invalid side " << s);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
 }
 
 
@@ -243,9 +240,6 @@ std::unique_ptr<Elem> Prism18::build_side_ptr (const unsigned int i,
 
       return face;
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<Elem>();
 }
 
 
@@ -554,9 +548,6 @@ unsigned int Prism18::n_second_order_adjacent_vertices (const unsigned int n) co
     default:
       libmesh_error_msg("Invalid node n = " << n);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return libMesh::invalid_uint;
 }
 
 

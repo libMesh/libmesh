@@ -126,9 +126,6 @@ unsigned int clough_n_dofs(const ElemType t, const Order o)
     default:
       libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for CLOUGH FE family!");
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
 } // clough_n_dofs()
 
 
@@ -202,9 +199,6 @@ unsigned int clough_n_dofs_at_node(const ElemType t,
     default:
       libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for CLOUGH FE family!");
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
 } // clough_n_dofs_at_node()
 
 
@@ -233,9 +227,6 @@ unsigned int clough_n_dofs_per_elem(const ElemType t, const Order o)
     default:
       libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for CLOUGH FE family!");
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
 } // clough_n_dofs_per_elem()
 
 } // anonymous

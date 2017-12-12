@@ -140,9 +140,6 @@ std::unique_ptr<Base> Factory<Base>::build (const std::string & name)
         libMesh::err << "  " << it->first << std::endl;
 
       libmesh_error_msg("Exiting...");
-
-      // We'll never get here
-      return std::unique_ptr<Base>();
     }
 
   Factory<Base> * f = factory_map()[name];

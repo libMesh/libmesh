@@ -727,9 +727,6 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported polynomial order!");
     } // switch order
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -1395,9 +1392,6 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported polynomial order!");
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 

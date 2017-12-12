@@ -141,9 +141,8 @@ Real FE<2,XYZ>::shape(const Elem * elem,
       return val;
     }
 
-  libmesh_error_msg("We'll never get here!");
+#else
   return 0.;
-
 #endif
 }
 
@@ -346,9 +345,8 @@ Real FE<2,XYZ>::shape_deriv(const Elem * elem,
       libmesh_error_msg("Invalid j = " << j);
     }
 
-  libmesh_error_msg("We'll never get here!");
+#else
   return 0.;
-
 #endif
 }
 
@@ -598,9 +596,8 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem * elem,
       libmesh_error_msg("Invalid shape function derivative j = " << j);
     }
 
-  libmesh_error_msg("We'll never get here!");
+#else
   return 0.;
-
 #endif
 }
 

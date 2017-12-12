@@ -61,9 +61,6 @@ std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputSh
     default:
       libmesh_error_msg("Unknown family = " << fe_type.family);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<FETransformationBase<OutputShape>>();
 }
 
 template class FETransformationBase<Real>;

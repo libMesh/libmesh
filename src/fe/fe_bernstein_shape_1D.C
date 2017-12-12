@@ -181,9 +181,6 @@ Real FE<1,BERNSTEIN>::shape(const ElemType,
           }
       }
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -354,9 +351,6 @@ Real FE<1,BERNSTEIN>::shape_deriv(const ElemType,
       }
 
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 

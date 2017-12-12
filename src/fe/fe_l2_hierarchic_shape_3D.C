@@ -695,9 +695,6 @@ Real FE<3,L2_HIERARCHIC>::shape(const Elem * elem,
     }
 
 #endif
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -765,9 +762,6 @@ Real FE<3,L2_HIERARCHIC>::shape_deriv(const Elem * elem,
   return (FE<3,L2_HIERARCHIC>::shape(elem, order, i, pp) -
           FE<3,L2_HIERARCHIC>::shape(elem, order, i, pm))/2./eps;
 #endif
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 

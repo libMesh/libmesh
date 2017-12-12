@@ -130,9 +130,6 @@ unsigned int l2_hierarchic_n_dofs(const ElemType t, const Order o)
     default:
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for L2_HIERARCHIC FE family!");
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0;
 } // l2_hierarchic_n_dofs()
 
 

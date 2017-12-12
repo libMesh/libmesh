@@ -103,9 +103,6 @@ Real FEHermite<1>::hermite_raw_shape_second_deriv (const unsigned int i, const R
               (8.*(i-4)+4.)*xi*xi*xipower*(xi*xi-1.) +
               (i-4)*(i-5)*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -139,9 +136,6 @@ Real FEHermite<1>::hermite_raw_shape_deriv(const unsigned int i, const Real xi)
       return (4*xi*xi*xi*xipower*(xi*xi-1.) +
               (i-4)*xi*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 template<>
@@ -174,9 +168,6 @@ Real FEHermite<1>::hermite_raw_shape(const unsigned int i, const Real xi)
       return (xi*xi*xipower*(xi*xi-1.)*(xi*xi-1.))/denominator;
 
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -238,9 +229,6 @@ Real FE<1,HERMITE>::shape(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported element type = " << type);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -305,9 +293,6 @@ Real FE<1,HERMITE>::shape_deriv(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported element type = " << type);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -359,9 +344,6 @@ Real FE<1,HERMITE>::shape_second_deriv(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported element type = " << type);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 } // namespace libMesh

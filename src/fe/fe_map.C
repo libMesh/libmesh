@@ -58,9 +58,6 @@ std::unique_ptr<FEMap> FEMap::build( FEType fe_type )
     default:
       return libmesh_make_unique<FEMap>();
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<FEMap>();
 }
 
 

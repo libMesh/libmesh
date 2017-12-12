@@ -82,9 +82,6 @@ OptimizationSolver<T>::build(sys_type & s, const SolverPackage solver_package)
     default:
       libmesh_error_msg("ERROR:  Unrecognized solver package: " << solver_package);
     }
-
-  libmesh_error_msg("We'll never get here!");
-  return std::unique_ptr<OptimizationSolver<T>>();
 }
 
 

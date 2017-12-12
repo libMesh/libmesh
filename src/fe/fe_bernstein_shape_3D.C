@@ -1373,9 +1373,6 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
     }
 
 #endif
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
@@ -2960,9 +2957,6 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
     }
 
 #endif
-
-  libmesh_error_msg("We'll never get here!");
-  return 0.;
 }
 
 
