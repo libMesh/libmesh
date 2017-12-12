@@ -20,6 +20,7 @@
 // for reading into a DistributedMesh
 #include "libmesh/libmesh.h"
 #include "libmesh/replicated_mesh.h"
+#include "libmesh/default_coupling.h"
 #include "libmesh/checkpoint_io.h"
 #include "libmesh/metis_partitioner.h"
 #include "libmesh/getpot.h"
@@ -43,9 +44,11 @@ int main (int argc, char ** argv)
 
   if (libMesh::on_command_line("--help") || argc < 3)
     {
-      libMesh::out << "Example: " << argv[0] << " --mesh=filename.e --n-procs='4 8 16' [--dry-run] [--ascii]\n\n"
+      libMesh::out << "Example: " << argv[0] << " --mesh=filename.e --n-procs='4 8 16' "
+                                                "[--num-ghost-layers <n>] [--dry-run] [--ascii]\n\n"
                    << "--mesh             Full name of the mesh file to read in. \n"
                    << "--n-procs          Vector of number of processors.\n"
+                   << "--num-ghost-layers Number of layers to ghost when partitioning (Default: 1).\n"
                    << "--dry-run          Only test the partitioning, don't write any files.\n"
                    << "--ascii            Write ASCII cpa files rather than binary cpr files.\n"
                    << std::endl;
@@ -58,9 +61,19 @@ int main (int argc, char ** argv)
   std::vector<int> all_n_procs;
   libMesh::command_line_vector("--n-procs", all_n_procs);
 
+  unsigned int num_ghost_layers = libMesh::command_line_value("--num-ghost-layers", 1);
+
   Parallel::Communicator & comm = init.comm();
 
   ReplicatedMesh mesh(init.comm());
+
+  // If the user has requested additional ghosted layers, we need to add a ghosting functor.
+  DefaultCoupling default_coupling;
+  if (num_ghost_layers > 1)
+    {
+      default_coupling.set_n_levels(num_ghost_layers);
+      mesh.add_ghosting_functor(default_coupling);
+    }
 
   libMesh::out << "Reading " << filename << std::endl;
 
