@@ -18,9 +18,6 @@
 /* size of boundary_id */
 #undef BOUNDARY_ID_BYTES
 
-/* This compiler is known not to support some iostream functionality */
-#undef BROKEN_IOSTREAM
-
 /* Architecture of the build host */
 #undef BUILD_ARCH
 
