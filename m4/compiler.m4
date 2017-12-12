@@ -497,65 +497,19 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 
   # First the flags for gcc compilers
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
-    CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors"
-    CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized"
-    CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses"
+    CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization"
+    CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -funroll-loops -fstrict-aliasing -Woverloaded-virtual -Wdisabled-optimization"
+    CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Woverloaded-virtual"
     NODEPRECATEDFLAG="-Wno-deprecated"
 
-    CFLAGS_OPT="-O2"
-    CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit"
+    CFLAGS_OPT="-O2 -funroll-loops -fstrict-aliasing"
+    CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -funroll-loops -fstrict-aliasing"
     CFLAGS_DBG="-g -Wimplicit"
     ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
 
-    # set some flags that are specific to some versions of the
-    # compiler:
-    # - egcs1.1 yielded incorrect code with some loop unrolling
-    # - after egcs1.1, the optimization flag -fstrict-aliasing was
-    #   introduced, which enables better optimizations for
-    #   well-written C++ code. (Your code *is* well-written, right?)
-
-    case "$GXX_VERSION" in
-      egcs1.1)
-          ;;
-
-      # All other gcc versions
-      *)
-          CXXFLAGS_OPT="$CXXFLAGS_OPT -funroll-loops -fstrict-aliasing"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -funroll-loops -fstrict-aliasing"
-
-          CFLAGS_OPT="$CFLAGS_OPT -funroll-loops -fstrict-aliasing"
-          CFLAGS_DEVEL="$CFLAGS_DEVEL -funroll-loops -fstrict-aliasing"
-          ;;
-    esac
-
-
-    case "$GXX_VERSION" in
-      # - after gcc2.95, some flags were deemed obsolete for C++
-      #   (and are only supported for C any more), so only define them for
-      #   previous compilers
-      egcs1.1 | gcc2.95)
-         CXXFLAGS_OPT="$CXXFLAGS_OPT -fnonnull-objects"
-         CXXFLAGS_DBG="$CXXFLAGS_DBG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
-         ;;
-
-      # - define additional debug flags for newer versions of gcc which support them.
-      #
-      # Note:  do not use -Wold-style-cast...  creates a lot of unavoidable warnings
-      #        when dealing with C APIs that take void* pointers.
-      gcc3.* | gcc4.* | gcc5 | gcc6)
-        CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
-        CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
-        CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
-
-        if (test "x$enableglibcxxdebugging" = "xyes"); then
-          CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
-        fi
-        ;;
-
-      *)
-        ;;
-    esac
-
+    if (test "x$enableglibcxxdebugging" = "xyes"); then
+      CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
+    fi
 
     # GCC 4.6.3 warns about variadic macros but supports them just
     # fine, so let's turn off that warning.
@@ -600,26 +554,6 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           CFLAGS_DEVEL="$CFLAGS_DBG"
           ;;
 
-      MIPSpro)
-          CXXFLAGS_OPT="-LANG:std -LANG:libc_in_namespace_std -no_auto_include -ansi -O2 -w"
-          CXXFLAGS_DBG="-LANG:std -LANG:libc_in_namespace_std -no_auto_include -ansi -g -woff 1460"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
-          NODEPRECATEDFLAG=""
-          CFLAGS_OPT="-O2 -w"
-          CFLAGS_DBG="-g"
-          CFLAGS_DEVEL="$CFLAGS_DBG"
-
-          # For some reason, CC forgets to add the math lib to the
-          # linker line, so we do that ourselves
-          LDFLAGS="$LDFLAGS -lm"
-
-          # Augment CXXFLAGS to include -LANG:std if not there.  This is
-          # needed to compile the remaining configure tests
-          if test "x`echo $CXXFLAGS | grep 'LANG:std'`" = "x" ; then
-            CXXFLAGS="$CXXFLAGS -LANG:std"
-          fi
-          ;;
-
       # All Intel ICC/ECC flavors
       intel_*)
 
@@ -638,8 +572,8 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
         # Specific flags for specific versions
         case "$GXX_VERSION" in
 
-          # Intel ICC >= v11.x
-          intel_icc_v11.x | intel_icc_v12.x | intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x)
+          # Intel ICC >= v13.x
+          intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x)
               # Disable some warning messages:
               # #161: 'unrecognized #pragma
               #       #pragma GCC diagnostic warning "-Wdeprecated-declarations"'
@@ -671,226 +605,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
 
-          intel_icc_v10.1)
-              # Disable some warning messages:
-              # #175: 'subscript out of range'
-              #       FIN-S application code causes many false
-              #       positives with this
-              # #266: 'function declared implicitly'
-              #       Metis function "GKfree" caused this error
-              #       in almost every file.
-              # #1476: 'field uses tail padding of a base class'
-              # #1505: 'size of class is affected by tail padding'
-              #        simply warns of a possible incompatibility with
-              #        the g++ ABI for this case
-              # #1572: 'floating-point equality and inequality comparisons are unreliable'
-              #        Well, duh, when the tested value is computed...  OK when it
-              #        was from an assignment.
-              PROFILING_FLAGS="-p"
-              CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
-              CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
-              CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
-              CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572"
-              CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
-              CFLAGS_DEVEL="$CFLAGS_DBG"
-              ;;
-
-          # Intel ICC >= 10.0
-          intel_icc_v10.0)
-              # Disable some warning messages:
-              # #266: 'function declared implicitly'
-              #       Metis function "GKfree" caused this error
-              #       in almost every file.
-              # #1572: 'floating-point equality and inequality comparisons are unreliable'
-              #        Well, duh, when the tested value is computed...  OK when it
-              #        was from an assignment.
-              # Note: In Version 8.1 (and possibly newer?) the -inline_debug_info
-              #       option causes a segmentation fault in libmesh.C, probably others...
-
-              # CPU-specific flags: -axK is for ia32, -xW is for x86_64
-              INTEL_AX_FLAG="-tpp6 -axK"
-              if test $target_cpu = "x86_64" ; then
-                INTEL_AX_FLAG="-xW"
-              fi
-
-              PROFILING_FLAGS="-p"
-              CXXFLAGS_DBG="$CXXFLAGS_DBG -Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
-              CXXFLAGS_OPT="$CXXFLAGS_OPT -Kc++eh -Krtti -O2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-              CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
-              CFLAGS_DBG="$CFLAGS_DBG -w1 -g -inline_debug_info -wd266 -wd1572"
-              CFLAGS_OPT="$CFLAGS_OPT -O2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-              CFLAGS_DEVEL="$CFLAGS_DBG"
-              ;;
-
-          # Intel ICC >= 8.1
-          intel_icc_v8.1 | intel_icc_v9.0 | intel_icc_v9.1 | intel_icc_v10.0)
-              # Disable some warning messages:
-              # #266: 'function declared implicitly'
-              #       Metis function "GKfree" caused this error
-              #       in almost every file.
-              # #1572: 'floating-point equality and inequality comparisons are unreliable'
-              #        Well, duh, when the tested value is computed...  OK when it
-              #        was from an assignment.
-              # Note: In Version 8.1 (and possibly newer?) the -inline_debug_info
-              #       option causes a segmentation fault in libmesh.C, probably others...
-
-              # CPU-specific flags: -axK is for ia32, -xW is for x86_64
-              INTEL_AX_FLAG="-tpp6 -axK"
-              if test $target_cpu = "x86_64" ; then
-                INTEL_AX_FLAG="-xW"
-              fi
-
-              CXXFLAGS_DBG="$CXXFLAGS_DBG -Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
-              CXXFLAGS_OPT="$CXXFLAGS_OPT -Kc++eh -Krtti -O2 -Ob2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-              CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
-              CFLAGS_DBG="$CFLAGS_DBG -w1 -g -inline_debug_info -wd266 -wd1572"
-              CFLAGS_OPT="$CFLAGS_OPT -O2 -Ob2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-              CFLAGS_DEVEL="$CFLAGS_DBG"
-              ;;
-
-          # Intel ICC < v8.1
-          intel_icc*)
-              # Disable some warning messages:
-              # #266: 'function declared implicitly'
-              #       Metis function "GKfree" caused this error
-              #       in almost every file.
-              CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -Ob2 -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-              CXXFLAGS_DEVEL="-Kc++eh -Krtti -O1 -w1 -inline_debug_info -g -wd504"
-              CXXFLAGS_DBG="-Kc++eh -Krtti -O0 -w1 -inline_debug_info -g -wd504"
-              CFLAGS_DBG="-w1 -inline_debug_info -wd266"
-              CFLAGS_OPT="-O2 -Ob2 -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-              CFLAGS_DEVEL="$CFLAGS_DBG"
-              ;;
-
-          # Intel Itanium ICC >= v10.1
-          intel_itanium_icc_v10.1)
-              # Disable some warning messages:
-              # #266: 'function declared implicitly'
-              #       Metis function "GKfree" caused this error
-              #       in almost every file.
-              # #1476: 'field uses tail padding of a base class'
-              # #1505: 'size of class is affected by tail padding'
-              #        simply warns of a possible incompatibility with
-              #        the g++ ABI for this case
-              # #1572: 'floating-point equality and inequality comparisons are unreliable'
-              #        Well, duh, when the tested value is computed...  OK when it
-              #        was from an assignment.
-              CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -inline_debug_info -g -wd1476 -wd1505 -wd1572"
-              CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
-              CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
-              CFLAGS_DBG="$CFLAGS_DBG -w1 -inline_debug_info -g -wd266 -wd1572"
-              CFLAGS_OPT="$CFLAGS_OPT -O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
-              CFLAGS_DEVEL="$CFLAGS_DBG"
-              ;;
-
-          intel_itanium_icc_v8.1 | intel_itanium_icc_v9.0 | intel_itanium_icc_v9.1 | intel_itanium_icc_v10.0)
-              # Disable some warning messages:
-              # #266: 'function declared implicitly'
-              #       Metis function "GKfree" caused this error
-              #       in almost every file.
-              # #1476: 'field uses tail padding of a base class'
-              # #1505: 'size of class is affected by tail padding'
-              #        simply warns of a possible incompatibility with
-              #        the g++ ABI for this case
-              # #1572: 'floating-point equality and inequality comparisons are unreliable'
-              #        Well, duh, when the tested value is computed...  OK when it
-              #        was from an assignment.
-              CXXFLAGS_DBG="$CXXFLAGS_DBG -Kc++eh -Krtti -w1 -inline_debug_info -g -wd1476 -wd1505 -wd1572"
-              CXXFLAGS_OPT="$CXXFLAGS_OPT -Kc++eh -Krtti -O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
-              CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
-              CFLAGS_DBG="$CFLAGS_DBG -w1 -inline_debug_info -g -wd266 -wd1572"
-              CFLAGS_OPT="$CFLAGS_OPT -O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
-              CFLAGS_DEVEL="$CFLAGS_DBG"
-              ;;
-
-          # Intel Itanium ICC < v8.1
-          intel_itanium_icc*)
-              # Disable some warning messages:
-              # #266: 'function declared implicitly'
-              #       Metis function "GKfree" caused this error
-              #       in almost every file.
-              CXXFLAGS_DBG="-Kc++eh -Krtti -w1 -inline_debug_info -g"
-              CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -unroll -w0 -ftz"
-              CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
-              CFLAGS_DBG="-w1 -inline_debug_info -g -wd266"
-              CFLAGS_OPT="-O2 -unroll -w0 -ftz"
-              CFLAGS_DEVEL="$CFLAGS_DBG"
-              ;;
-
           *)
               AC_MSG_RESULT(Unknown Intel compiler, "$GXX_VERSION")
               ;;
         esac
       ;;
-
-      compaq_cxx)
-          # Disable some warning messages:
-          # #175: `subscript out of range' (detected when instantiating a
-          #       template and looking at the indices of an array of
-          #       template dependent size, this error is triggered in a
-          #       branch that is not taken for the present space dimension)
-          # #236 and
-          # #237: `controlling expression is constant' (in while(true), or
-          #       switch(dim))
-          # #487: `Inline function ... cannot be explicitly instantiated'
-          #       (also reported when we instantiate the entire class)
-          # #1136:`conversion to integral type of smaller size could lose data'
-          #       (occurs rather often in addition of int and x.size(),
-          #       because the latter is size_t=long unsigned int on Alpha)
-          # #1156:`meaningless qualifiers not compatible with "..." and "..."'
-          #       (cause unknown, happens when taking the address of a
-          #       template member function)
-          # #111 and
-          # #1182:`statement either is unreachable or causes unreachable code'
-          #       (happens in switch(dim) clauses for other dimensions than
-          #       the present one)
-          #
-          # Also disable the following error:
-          # #265: `class "..." is inaccessible' (happens when we try to
-          #       initialize a static member variable in terms of another
-          #       static member variable of the same class if the latter is
-          #       not public and therefore not accessible at global scope in
-          #       general. I nevertheless think that this is valid.)
-          #
-          # Besides this, choose the most standard conforming mode of the
-          # compiler, i.e. -model ansi and -std strict_ansi. Unfortunately,
-          # we have to also add the flag -implicit_local (generating implicit
-          # instantiations of template with the `weak' link flag) since
-          # otherwise not all templates are instantiated (also some from the
-          # standards library are missing).
-
-          CXXFLAGS_DBG="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local"
-          CXXFLAGS_OPT="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -O2 -fast"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
-          CFLAGS_DBG="-w1 -msg_display_number -timplicit_local"
-          CFLAGS_OPT="-w2 -msg_display_number -timplicit_local -O2 -fast"
-          CFLAGS_DEVEL="$CFLAGS_DBG"
-
-          NODEPRECATEDFLAG=""
-
-          for i in 175 236 237 487 1136 1156 111 1182 265 ; do
-            CXXFLAGS_DBG="$CXXFLAGS_DBG -msg_disable $i"
-            CXXFLAGS_OPT="$CXXFLAGS_OPT -msg_disable $i"
-            CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -msg_disable $i"
-          done
-
-          # For some reason, cxx also forgets to add the math lib to the
-          # linker line, so we do that ourselves
-          LDFLAGS="$LDFLAGS -lm"
-          ;;
-
-      sun_studio | sun_forte)
-          CXXFLAGS_DBG="-library=stlport4 -g"
-          CXXFLAGS_OPT="-library=stlport4 -fast -xO4"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
-          NODEPRECATEDFLAG=""
-          CFLAGS_DBG="-g"
-          CFLAGS_OPT="-xO4"
-          CFLAGS_DEVEL="$CFLAGS_DBG"
-
-          # librpcsvc for XDR
-          LIBS="-lrpcsvc $LIBS"
-          ;;
 
       portland_group)
           CXXFLAGS_DBG="-g --no_using_std"
@@ -909,32 +628,6 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
             CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
             CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
           fi
-          ;;
-
-      hpux_acc)
-          # This is for aCC A.03.31
-          # +DA2.0W requires that the code is only working on
-          #  PA-RISC 2.0 systems, i.e. for 64bit
-          # -ext allows various C++ extensions
-          # +z Cause the compiler to generate position independent
-          #  code (PIC) for use in building shared libraries.
-          #  However, currently only static lib seems to work.
-          # for aCC:
-          #  -Aa turns on  newly supported ANSI C++ Standard features
-          #  -AA turns on full new ANSI C++ (this includes -Aa)
-          # for cc:
-          #  -Aa compiles under true ANSI mode
-          #  -Ae turns on ANSI C with some HP extensions
-          CXXFLAGS_DBG="+DA2.0W -AA +z -ext -g"
-          CXXFLAGS_OPT="+DA2.0W -AA +z -ext -O +Onolimit"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
-          NODEPRECATEDFLAG=""
-          CFLAGS_DBG="+DA2.0W -Aa +z -Ae -g"
-          CFLAGS_OPT="+DA2.0W -Aa +z -Ae -O +Onolimit"
-          CFLAGS_DEVEL="$CFLAGS_DBG"
-          LDFLAGS="$LDFLAGS -I/usr/lib/pa20_64"
-          LIBS="$LIBS -lrpcsvc"
-          FLIBS="$FLIBS -lF90 -lcl -I/opt/fortran90/lib/pa20_64"
           ;;
 
       cray_cc)
