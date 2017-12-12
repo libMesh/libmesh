@@ -220,7 +220,7 @@ std::unique_ptr<Elem> Hex27::build_side_ptr (const unsigned int i,
 
   else
     {
-      auto face = libmesh_make_unique<Quad9>();
+      std::unique_ptr<Elem> face = libmesh_make_unique<Quad9>();
       face->subdomain_id() = this->subdomain_id();
 
       for (unsigned n=0; n<face->n_nodes(); ++n)
