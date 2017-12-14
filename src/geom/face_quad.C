@@ -149,8 +149,8 @@ Real Quad::quality (const ElemQuality q) const
 {
   switch (q)
     {
-    // CUBIT 15.1 User Documentation:
-    // Aspect Ratio: Maximum edge length ratios
+      // CUBIT 15.1 User Documentation:
+      // Aspect Ratio: Maximum edge length ratios
     case ASPECT_RATIO:
       {
         Real l_min, l_max;
@@ -164,32 +164,32 @@ Real Quad::quality (const ElemQuality q) const
         const Real l30 = this->length(3,0);
         // Find the largest and smallest edges
         if ((l01 > 0.) && (l12 > 0.) && (l23 > 0.) && (l30 > 0.))
-        {
-          if (l01 > l12)
           {
-            l_min = l12;
-            l_max = l01;
+            if (l01 > l12)
+              {
+                l_min = l12;
+                l_max = l01;
+              }
+            else
+              {
+                l_min = l01;
+                l_max = l12;
+              }
+
+            // smallest edge
+            if (l_min > l23)
+              l_min = l23;
+
+            if (l_min > l30)
+              l_min = l30;
+
+            // largest edge
+            if (l_max < l23)
+              l_max = l23;
+
+            if (l_max < l30)
+              l_max = l30;
           }
-          else
-          {
-            l_min = l01;
-            l_max = l12;
-          }
-
-          // smallest edge
-          if (l_min > l23)
-            l_min = l23;
-
-          if (l_min > l30)
-            l_min = l30;
-
-          // largest edge
-          if (l_max < l23)
-            l_max = l23;
-
-          if (l_max < l30)
-            l_max = l30;
-        }
         else
           return 0.;
 
@@ -217,8 +217,8 @@ Real Quad::quality (const ElemQuality q) const
           return 0.;
         break;
       }
-    // CUBIT 15.1 User Documentation:
-    // Stretch: Sqrt(2) * minimum edge length / maximum diagonal length
+      // CUBIT 15.1 User Documentation:
+      // Stretch: Sqrt(2) * minimum edge length / maximum diagonal length
     case STRETCH:
       {
         Real d_max;
@@ -228,12 +228,12 @@ Real Quad::quality (const ElemQuality q) const
         const Real d13 = this->length(1,3);
         // Find the largest diagonal
         if ((d02 > 0.) && (d13 > 0.))
-        {
-          if (d02 > d13)
-            d_max = d02;
-          else
-            d_max = d13;
-        }
+          {
+            if (d02 > d13)
+              d_max = d02;
+            else
+              d_max = d13;
+          }
         else
           return 0.;
 
@@ -248,18 +248,18 @@ Real Quad::quality (const ElemQuality q) const
         const Real l30 = this->length(3,0);
         // Find the smallest edge
         if ((l01 > 0.) && (l12 > 0.) && (l23 > 0.) && (l30 > 0.))
-        {
-          if (l01 > l12)
-            l_min = l12;
-          else
-            l_min = l01;
+          {
+            if (l01 > l12)
+              l_min = l12;
+            else
+              l_min = l01;
 
-          if (l_min > l23)
-            l_min = l23;
+            if (l_min > l23)
+              l_min = l23;
 
-          if (l_min > l30)
-            l_min = l30;
-        }
+            if (l_min > l30)
+              l_min = l30;
+          }
         else
           return 0.;
 
