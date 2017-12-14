@@ -218,7 +218,7 @@ Real Quad::quality (const ElemQuality q) const
 
         // Nodal Jacobians. These are 3x2 matrices, hence we represent
         // them by Array6.
-        std::vector<Array6> A(4);
+        std::array<Array6, 4> A;
         for (unsigned int k=0; k<4; ++k)
           {
             unsigned int
@@ -234,7 +234,7 @@ Real Quad::quality (const ElemQuality q) const
 
         // Compute metric tensors, T_k = A_k^T * A_k. These are 2x2
         // square matrices, hence we represent them by Array4.
-        std::vector<Array4> T(4);
+        std::array<Array4, 4> T;
         for (unsigned int k=0; k<4; ++k)
           {
             Real
