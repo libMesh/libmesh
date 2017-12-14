@@ -149,14 +149,26 @@ Real Quad::quality (const ElemQuality q) const
 {
   switch (q)
     {
+      // CUBIT 15.1 User Documentation:
+      // Aspect Ratio: Maximum edge length ratios
+    case ASPECT_RATIO:
+      {
+        Real lengths[4] = {this->length(0,1), this->length(1,2), this->length(2,3), this->length(3,0)};
+        Real
+          max = *std::max_element(lengths, lengths+4),
+          min = *std::min_element(lengths, lengths+4);
 
-      /**
-       * Compute the min/max diagonal ratio.
-       * This is modeled after the Hex element
-       */
+        // Return 0. instead of dividing by zero.
+        if (min == 0.)
+          return 0.;
+        else
+          return max / min;
+      }
+
+      // Compute the min/max diagonal ratio.
+      // This is modeled after the Hex element
     case DISTORTION:
     case DIAGONAL:
-    case STRETCH:
       {
         // Diagonal between node 0 and node 2
         const Real d02 = this->length(0,2);
@@ -173,15 +185,28 @@ Real Quad::quality (const ElemQuality q) const
         break;
       }
 
+      // CUBIT 15.1 User Documentation:
+      // Stretch: Sqrt(2) * minimum edge length / maximum diagonal length
+    case STRETCH:
+      {
+        Real lengths[4] = {this->length(0,1), this->length(1,2), this->length(2,3), this->length(3,0)};
+        Real min_edge = *std::min_element(lengths, lengths+4);
+        Real d_max = std::max(this->length(0,2), this->length(1,3));
+
+        // Return 0. instead of dividing by zero.
+        if (d_max == 0.)
+          return 0.;
+        else
+          return std::sqrt(2) * min_edge / d_max;
+      }
+
     default:
       return Elem::quality(q);
     }
 
-  /**
-   * I don't know what to do for this metric.
-   * Maybe the base class knows.  We won't get
-   * here because of the default case above.
-   */
+  // I don't know what to do for this metric.
+  // Maybe the base class knows.  We won't get
+  // here because of the default case above.
   return Elem::quality(q);
 }
 
