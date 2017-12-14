@@ -184,54 +184,19 @@ Real Quad::quality (const ElemQuality q) const
           return 0.;
         break;
       }
+
       // CUBIT 15.1 User Documentation:
       // Stretch: Sqrt(2) * minimum edge length / maximum diagonal length
     case STRETCH:
       {
-        Real d_max;
-        // Diagonal between node 0 and node 2
-        const Real d02 = this->length(0,2);
-        // Diagonal between node 1 and node 3
-        const Real d13 = this->length(1,3);
-        // Find the largest diagonal
-        if ((d02 > 0.) && (d13 > 0.))
-          {
-            if (d02 > d13)
-              d_max = d02;
-            else
-              d_max = d13;
-          }
-        else
+        Real lengths[4] = {this->length(0,1), this->length(1,2), this->length(2,3), this->length(3,0)};
+        Real min_edge = *std::min_element(lengths, lengths+4);
+        Real d_max = std::max(this->length(0,2), this->length(1,3));
+
+        if (d_max == 0.)
           return 0.;
-
-        Real l_min;
-        // Edge between node 0 and node 1
-        const Real l01 = this->length(0,1);
-        // Edge between node 1 and node 2
-        const Real l12 = this->length(1,2);
-        // Edge between node 2 and node 3
-        const Real l23 = this->length(2,3);
-        // Edge between node 3 and node 0
-        const Real l30 = this->length(3,0);
-        // Find the smallest edge
-        if ((l01 > 0.) && (l12 > 0.) && (l23 > 0.) && (l30 > 0.))
-          {
-            if (l01 > l12)
-              l_min = l12;
-            else
-              l_min = l01;
-
-            if (l_min > l23)
-              l_min = l23;
-
-            if (l_min > l30)
-              l_min = l30;
-          }
         else
-          return 0.;
-
-        return std::sqrt(2) * l_min / d_max;
-        break;
+          return std::sqrt(2) * min_edge / d_max;
       }
 
     default:
