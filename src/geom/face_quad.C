@@ -15,12 +15,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// C++ includes
-
 // Local includes
 #include "libmesh/face_quad.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/face_quad4.h"
+
+// C++ includes
+#include <array>
 
 
 namespace libMesh
@@ -200,14 +201,85 @@ Real Quad::quality (const ElemQuality q) const
           return std::sqrt(2) * min_edge / d_max;
       }
 
+    case SHAPE:
+    case SKEW:
+      {
+        // From: P. Knupp, "Algebraic mesh quality metrics for
+        // unstructured initial meshes," Finite Elements in Analysis
+        // and Design 39, 2003, p. 217-241, Sections 5.2 and 5.3.
+        typedef std::array<Real, 4> Array4;
+        typedef std::array<Real, 6> Array6;
+
+        // x, y, z node coordinates.
+        std::vector<Real>
+          x = {this->point(0)(0), this->point(1)(0), this->point(2)(0), this->point(3)(0)},
+          y = {this->point(0)(1), this->point(1)(1), this->point(2)(1), this->point(3)(1)},
+          z = {this->point(0)(2), this->point(1)(2), this->point(2)(2), this->point(3)(2)};
+
+        // Nodal Jacobians. These are 3x2 matrices, hence we represent
+        // them by Array6.
+        std::vector<Array6> A(4);
+        for (unsigned int k=0; k<4; ++k)
+          {
+            unsigned int
+              kp1 = k+1 > 3 ? k+1-4 : k+1,
+              kp3 = k+3 > 3 ? k+3-4 : k+3;
+
+            // To initialize std::array we need double curly braces in
+            // C++11 but not C++14 apparently.
+            A[k] = {{x[kp1] - x[k], x[kp3] - x[k],
+                     y[kp1] - y[k], y[kp3] - y[k],
+                     z[kp1] - z[k], z[kp3] - z[k]}};
+          }
+
+        // Compute metric tensors, T_k = A_k^T * A_k. These are 2x2
+        // square matrices, hence we represent them by Array4.
+        std::vector<Array4> T(4);
+        for (unsigned int k=0; k<4; ++k)
+          {
+            Real
+              top_left = A[k][0]*A[k][0] + A[k][2]*A[k][2] + A[k][4]*A[k][4],
+              off_diag = A[k][0]*A[k][1] + A[k][2]*A[k][3] + A[k][4]*A[k][5],
+              bot_rigt = A[k][1]*A[k][1] + A[k][3]*A[k][3] + A[k][5]*A[k][5];
+
+            T[k] = {{top_left, off_diag,
+                     off_diag, bot_rigt}};
+          }
+
+
+        // Nodal areas. These are approximated as sqrt(det(A^T * A))
+        // to handle the general case of a 2D element living in 3D.
+        Array4 alpha;
+        for (unsigned int k=0; k<4; ++k)
+          alpha[k] = std::sqrt(T[k][0]*T[k][3] - T[k][1]*T[k][2]);
+
+        // All nodal areas must be strictly positive. Return 0 (the
+        // lowest quality) otherwise. We know they can't be negative
+        // because they are the result of a sqrt, but they might be
+        // identically 0.
+        if (*std::min_element(alpha.begin(), alpha.end()) == 0.)
+          return 0.;
+
+        // Compute and return the shape metric. These only use the
+        // digonal entries of the T_k.
+        Real den = 0.;
+        if (q == SHAPE)
+          {
+            for (unsigned int k=0; k<4; ++k)
+              den += (T[k][0] + T[k][3]) / alpha[k];
+            return (den == 0.) ? 0 : (8. / den);
+          }
+        else
+          {
+            for (unsigned int k=0; k<4; ++k)
+              den += std::sqrt(T[k][0] * T[k][3]) / alpha[k];
+            return (den == 0.) ? 0 : (4. / den);
+          }
+      }
+
     default:
       return Elem::quality(q);
     }
-
-  // I don't know what to do for this metric.
-  // Maybe the base class knows.  We won't get
-  // here because of the default case above.
-  return Elem::quality(q);
 }
 
 
