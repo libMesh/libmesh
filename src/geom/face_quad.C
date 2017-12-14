@@ -153,53 +153,20 @@ Real Quad::quality (const ElemQuality q) const
       // Aspect Ratio: Maximum edge length ratios
     case ASPECT_RATIO:
       {
-        Real l_min, l_max;
-        // Edge between node 0 and node 1
-        const Real l01 = this->length(0,1);
-        // Edge between node 1 and node 2
-        const Real l12 = this->length(1,2);
-        // Edge between node 2 and node 3
-        const Real l23 = this->length(2,3);
-        // Edge between node 3 and node 0
-        const Real l30 = this->length(3,0);
-        // Find the largest and smallest edges
-        if ((l01 > 0.) && (l12 > 0.) && (l23 > 0.) && (l30 > 0.))
-          {
-            if (l01 > l12)
-              {
-                l_min = l12;
-                l_max = l01;
-              }
-            else
-              {
-                l_min = l01;
-                l_max = l12;
-              }
+        Real lengths[4] = {this->length(0,1), this->length(1,2), this->length(2,3), this->length(3,0)};
+        Real
+          max = *std::max_element(lengths, lengths+4),
+          min = *std::min_element(lengths, lengths+4);
 
-            // smallest edge
-            if (l_min > l23)
-              l_min = l23;
-
-            if (l_min > l30)
-              l_min = l30;
-
-            // largest edge
-            if (l_max < l23)
-              l_max = l23;
-
-            if (l_max < l30)
-              l_max = l30;
-          }
-        else
+        // Return 0. instead of dividing by zero.
+        if (min == 0.)
           return 0.;
-
-        return l_max / l_min;
-        break;
+        else
+          return max / min;
       }
-      /**
-       * Compute the min/max diagonal ratio.
-       * This is modeled after the Hex element
-       */
+
+      // Compute the min/max diagonal ratio.
+      // This is modeled after the Hex element
     case DISTORTION:
     case DIAGONAL:
       {
