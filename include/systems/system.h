@@ -1658,6 +1658,7 @@ public:
    */
   bool & hide_output() { return _hide_output; }
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
   /**
    * This method creates a projection matrix which corresponds to the
    * operation of project_vector between old and new solution spaces.
@@ -1669,6 +1670,7 @@ public:
    * approximation of the BC, not the fine grid approximation.
    */
   void projection_matrix (SparseMatrix<Number> & proj_mat) const;
+#endif // LIBMESH_HAVE_METAPHYSICL
 
 protected:
 
