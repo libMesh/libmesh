@@ -632,17 +632,17 @@ void CheckpointIO::read (const std::string & input_name)
 
       for (processor_id_type proc_id = begin_proc_id; proc_id < input_n_procs; proc_id += stride)
         {
-          std::ostringstream file_name_stream;
+          std::string file_name = input_name;
 
-          file_name_stream << name;
-
-          file_name_stream << "-" << (input_parallel ? input_n_procs : 1) << "-" << proc_id;
+          file_name += "-" +
+            std::to_string(input_parallel ?  input_n_procs : 1) +
+            "-" + std::to_string(proc_id);
 
           {
-            std::ifstream in (file_name_stream.str().c_str());
+            std::ifstream in (file_name.c_str());
 
             if (!in.good())
-              libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << file_name_stream.str());
+              libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << file_name);
           }
 
           // Do we expect all our files' remote_elem entries to really
@@ -652,7 +652,7 @@ void CheckpointIO::read (const std::string & input_name)
             (input_n_procs <= mesh.n_processors() &&
              !mesh.is_replicated());
 
-          Xdr io (file_name_stream.str(), this->binary() ? DECODE : READ);
+          Xdr io (file_name, this->binary() ? DECODE : READ);
 
           switch (data_size) {
           case 2:
