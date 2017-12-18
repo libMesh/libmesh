@@ -133,6 +133,32 @@ public:
                                unsigned int timestep=1);
 
   /**
+   * Given an elemental variable and a time step, returns a mapping from the
+   * elements (top parent) unique IDs to the value of the elemental variable at
+   * the corresponding time step index.
+   * Note that this function MUST only be called before renumbering!
+   * This function is essentially a wrapper for read_elemental_var_values from
+   * the exodus helper (which is not accessible outside this class).
+   * \param elemental_var_name Name of an elemental variable
+   * \param timestep The corresponding time step index
+   * \param unique_id_to_value_map The map to be filled
+   */
+  void read_elemental_variable(std::string elemental_var_name,
+                               unsigned int timestep,
+                               std::map<unsigned int, Real> & unique_id_to_value_map);
+
+  /**
+   * Given a vector of global variables and a time step, returns the values
+   * of the global variable at the corresponding time step index.
+   * \param global_var_names Vector of names of global variables
+   * \param timestep The corresponding time step index
+   * \param global_values The vector to be filled
+   */
+  void read_global_variable(std::vector<std::string> global_var_names,
+                            unsigned int timestep,
+                            std::vector<Real> & global_values);
+
+  /**
    * Writes a exodusII file with discontinuous data
    */
   void write_discontinuous_exodusII (const std::string & name,

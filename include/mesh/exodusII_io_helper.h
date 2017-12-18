@@ -335,6 +335,11 @@ public:
   void write_global_values(const std::vector<Real> & values, int timestep);
 
   /**
+   * Reads the vector of global variables.
+   */
+  void read_global_values(std::vector<Real> & values, int timestep);
+
+  /**
    * Sets the underlying value of the boolean flag
    * _use_mesh_dimension_instead_of_spatial_dimension.  By default,
    * the value of this flag is false.
