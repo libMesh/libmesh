@@ -548,7 +548,49 @@ void ExodusII_IO::copy_elemental_solution(System & system,
   system.update();
 }
 
+void ExodusII_IO::read_elemental_variable(std::string elemental_var_name,
+                                          unsigned int timestep,
+                                          std::map<unsigned int, Real> & unique_id_to_value_map)
+{
+  // Note that this function MUST be called before renumbering
+  std::map<dof_id_type, Real> elem_var_value_map;
 
+  exio_helper->read_elemental_var_values(elemental_var_name, timestep, elem_var_value_map);
+  for (auto it = elem_var_value_map.begin(); it != elem_var_value_map.end(); ++it)
+    {
+      const Elem * elem = MeshInput<MeshBase>::mesh().query_elem_ptr(it->first);
+      unique_id_to_value_map.insert(std::make_pair(elem->top_parent()->unique_id(), it->second));
+    }
+}
+
+void ExodusII_IO::read_global_variable(std::vector<std::string> global_var_names,
+                                       unsigned int timestep,
+                                       std::vector<Real> & global_values)
+{
+  unsigned int size = global_var_names.size();
+  if (size == 0)
+    libmesh_error_msg("ERROR, empty list of global variables to read from the Exodus file.");
+
+  // read the values for all global variables
+  std::vector<Real> values_from_exodus;
+  exio_helper->read_var_names(ExodusII_IO_Helper::GLOBAL);
+  exio_helper->read_global_values(values_from_exodus, timestep);
+  std::vector<std::string> global_var_names_exodus = exio_helper->global_var_names;
+
+  global_values.clear();
+  for (unsigned int i = 0; i < size; ++i)
+    {
+      // for each global variable in global_var_names, look the corresponding one in global_var_names_from_exodus
+      // and fill global_values accordingly
+      auto it = find(global_var_names_exodus.begin(), global_var_names_exodus.end(), global_var_names[i]);
+      if (it != global_var_names_exodus.end())
+        global_values.push_back(values_from_exodus[it - global_var_names_exodus.begin()]);
+      else
+        libmesh_error_msg("ERROR, Global variable " << global_var_names[i] << \
+                          " not found in Exodus file.");
+    }
+
+}
 
 void ExodusII_IO::write_element_data (const EquationSystems & es)
 {

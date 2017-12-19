@@ -1991,6 +1991,19 @@ void ExodusII_IO_Helper::write_global_values(const std::vector<Real> & values, i
 
 
 
+void ExodusII_IO_Helper::read_global_values(std::vector<Real> & values, int timestep)
+{
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
+    return;
+
+  values.clear();
+  values.resize(num_global_vars);
+  ex_err = exII::ex_get_glob_vars(ex_id, timestep, num_global_vars, &values[0]);
+  EX_CHECK_ERR(ex_err, "Error reading global values.");
+}
+
+
+
 void ExodusII_IO_Helper::use_mesh_dimension_instead_of_spatial_dimension(bool val)
 {
   _use_mesh_dimension_instead_of_spatial_dimension = val;
