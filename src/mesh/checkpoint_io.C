@@ -546,7 +546,7 @@ void CheckpointIO::write_bc_names (Xdr & io, const BoundaryInfo & info, bool is_
 }
 
 
-void CheckpointIO::read (const std::string & name)
+void CheckpointIO::read (const std::string & input_name)
 {
   LOG_SCOPE("read()","CheckpointIO");
 
@@ -560,17 +560,31 @@ void CheckpointIO::read (const std::string & name)
   // How many per-processor files are here?
   largest_id_type input_n_procs;
 
+  // We might read an exact name like "foo.cpr", or we might read a
+  // generated name like "foo.cpr.128" that we expect to be presplit
+  // for our current number of processors.
+  std::string header_name = input_name;
+
   // We'll read a header file from processor 0 and broadcast.
   if (this->processor_id() == 0)
     {
       {
-        std::ifstream in (name.c_str());
+        // Try the exact given name first
+        std::ifstream in (header_name.c_str());
 
         if (!in.good())
-          libmesh_error_msg("ERROR: cannot locate header file:\n\t" << name);
+          {
+            header_name += "-" + std::to_string(mesh.n_processors());
+
+            std::ifstream in_nproc (header_name.c_str());
+
+            if (!in_nproc.good())
+              libmesh_error_msg("ERROR: cannot locate header file:\n\t" <<
+                                input_name << "\nor\n\t" << header_name);
+          }
       }
 
-      Xdr io (name, this->binary() ? DECODE : READ);
+      Xdr io (header_name, this->binary() ? DECODE : READ);
 
       // read the version, but don't care about it
       std::string input_version;
@@ -584,13 +598,13 @@ void CheckpointIO::read (const std::string & name)
 
   switch (data_size) {
   case 2:
-    input_n_procs = this->read_header<uint16_t>(name);
+    input_n_procs = this->read_header<uint16_t>(header_name);
     break;
   case 4:
-    input_n_procs = this->read_header<uint32_t>(name);
+    input_n_procs = this->read_header<uint32_t>(header_name);
     break;
   case 8:
-    input_n_procs = this->read_header<uint64_t>(name);
+    input_n_procs = this->read_header<uint64_t>(header_name);
     break;
   default:
     libmesh_error();
@@ -618,17 +632,17 @@ void CheckpointIO::read (const std::string & name)
 
       for (processor_id_type proc_id = begin_proc_id; proc_id < input_n_procs; proc_id += stride)
         {
-          std::ostringstream file_name_stream;
+          std::string file_name = input_name;
 
-          file_name_stream << name;
-
-          file_name_stream << "-" << (input_parallel ? input_n_procs : 1) << "-" << proc_id;
+          file_name += "-" +
+            std::to_string(input_parallel ?  input_n_procs : 1) +
+            "-" + std::to_string(proc_id);
 
           {
-            std::ifstream in (file_name_stream.str().c_str());
+            std::ifstream in (file_name.c_str());
 
             if (!in.good())
-              libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << file_name_stream.str());
+              libmesh_error_msg("ERROR: cannot locate specified file:\n\t" << file_name);
           }
 
           // Do we expect all our files' remote_elem entries to really
@@ -638,7 +652,7 @@ void CheckpointIO::read (const std::string & name)
             (input_n_procs <= mesh.n_processors() &&
              !mesh.is_replicated());
 
-          Xdr io (file_name_stream.str(), this->binary() ? DECODE : READ);
+          Xdr io (file_name, this->binary() ? DECODE : READ);
 
           switch (data_size) {
           case 2:
