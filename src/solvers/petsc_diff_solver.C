@@ -310,10 +310,6 @@ unsigned int PetscDiffSolver::solve()
   PetscVector<Number> & r =
     *(cast_ptr<PetscVector<Number> *>(_system.rhs));
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  _system.get_dof_map().enforce_constraints_exactly(_system);
-#endif
-
   int ierr = 0;
 
   ierr = SNESSetFunction (_snes, r.vec(),
@@ -326,6 +322,10 @@ unsigned int PetscDiffSolver::solve()
 
   ierr = SNESSolve (_snes, PETSC_NULL, x.vec());
   LIBMESH_CHKERR(ierr);
+
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+  _system.get_dof_map().enforce_constraints_exactly(_system);
+#endif
 
   SNESConvergedReason reason;
   SNESGetConvergedReason(_snes, &reason);
