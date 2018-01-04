@@ -109,11 +109,11 @@ extern "C"
     X_input.swap(X_system);
     R_input.swap(R_system);
 
-    // We may need to correct a non-conforming solution
-    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
-
     // We may need to localize a parallel solution
     sys.update();
+
+    // We may need to correct a non-conforming solution
+    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
     // Do DiffSystem assembly
     sys.assembly(true, false);
@@ -176,11 +176,11 @@ extern "C"
     X_input.swap(X_system);
     J_input.swap(J_system);
 
-    // We may need to correct a non-conforming solution
-    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
-
     // We may need to localize a parallel solution
     sys.update();
+
+    // We may need to correct a non-conforming solution
+    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
     // Do DiffSystem assembly
     sys.assembly(false, true);
