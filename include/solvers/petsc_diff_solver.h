@@ -93,6 +93,13 @@ protected:
    * Nonlinear solver context
    */
   SNES _snes;
+
+private:
+
+  /**
+   * Common helper function to setup PETSc data structures
+   */
+  void setup_petsc_data();
 };
 
 } // namespace libMesh

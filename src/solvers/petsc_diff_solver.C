@@ -212,33 +212,7 @@ void PetscDiffSolver::init ()
 
   Parent::init();
 
-  int ierr=0;
-
-  ierr = SNESCreate(this->comm().get(),&_snes);
-  LIBMESH_CHKERR(ierr);
-
-  ierr = SNESMonitorSet (_snes, __libmesh_petsc_diff_solver_monitor,
-                         this, PETSC_NULL);
-  LIBMESH_CHKERR(ierr);
-
-  if (libMesh::on_command_line("--solver_system_names"))
-    {
-      ierr = SNESSetOptionsPrefix(_snes, (_system.name()+"_").c_str());
-      LIBMESH_CHKERR(ierr);
-    }
-
-  ierr = SNESSetFromOptions(_snes);
-  LIBMESH_CHKERR(ierr);
-
-  KSP my_ksp;
-  ierr = SNESGetKSP(_snes, &my_ksp);
-  LIBMESH_CHKERR(ierr);
-
-  PC my_pc;
-  ierr = KSPGetPC(my_ksp, &my_pc);
-  LIBMESH_CHKERR(ierr);
-
-  petsc_auto_fieldsplit(my_pc, _system);
+  this->setup_petsc_data();
 }
 
 
@@ -363,6 +337,36 @@ unsigned int PetscDiffSolver::solve()
   return convert_solve_result(reason);
 }
 
+void PetscDiffSolver::setup_petsc_data()
+{
+  int ierr=0;
+
+  ierr = SNESCreate(this->comm().get(),&_snes);
+  LIBMESH_CHKERR(ierr);
+
+  ierr = SNESMonitorSet (_snes, __libmesh_petsc_diff_solver_monitor,
+                         this, PETSC_NULL);
+  LIBMESH_CHKERR(ierr);
+
+  if (libMesh::on_command_line("--solver_system_names"))
+    {
+      ierr = SNESSetOptionsPrefix(_snes, (_system.name()+"_").c_str());
+      LIBMESH_CHKERR(ierr);
+    }
+
+  ierr = SNESSetFromOptions(_snes);
+  LIBMESH_CHKERR(ierr);
+
+  KSP my_ksp;
+  ierr = SNESGetKSP(_snes, &my_ksp);
+  LIBMESH_CHKERR(ierr);
+
+  PC my_pc;
+  ierr = KSPGetPC(my_ksp, &my_pc);
+  LIBMESH_CHKERR(ierr);
+
+  petsc_auto_fieldsplit(my_pc, _system);
+}
 
 } // namespace libMesh
 
