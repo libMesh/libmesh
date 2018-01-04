@@ -219,6 +219,7 @@ void PetscDiffSolver::init ()
 
 PetscDiffSolver::~PetscDiffSolver ()
 {
+  this->clear();
 }
 
 
@@ -235,17 +236,16 @@ void PetscDiffSolver::clear()
 
 void PetscDiffSolver::reinit()
 {
+  LOG_SCOPE("reinit()", "PetscDiffSolver");
+
+  // We need to wipe out all the old PETSc data
+  // if we are reinit'ing, since we'll need to build
+  // it all back up again.
+  this->clear();
+
   Parent::reinit();
 
-  KSP my_ksp;
-  int ierr = SNESGetKSP(_snes, &my_ksp);
-  LIBMESH_CHKERR(ierr);
-
-  PC my_pc;
-  ierr = KSPGetPC(my_ksp, &my_pc);
-  LIBMESH_CHKERR(ierr);
-
-  petsc_auto_fieldsplit(my_pc, _system);
+  this->setup_petsc_data();
 }
 
 
@@ -301,8 +301,6 @@ DiffSolver::SolveResult convert_solve_result(SNESConvergedReason r)
 
 unsigned int PetscDiffSolver::solve()
 {
-  this->init();
-
   LOG_SCOPE("solve()", "PetscDiffSolver");
 
   PetscVector<Number> & x =
@@ -331,8 +329,6 @@ unsigned int PetscDiffSolver::solve()
 
   SNESConvergedReason reason;
   SNESGetConvergedReason(_snes, &reason);
-
-  this->clear();
 
   return convert_solve_result(reason);
 }
