@@ -164,6 +164,8 @@ void HeatSystem::perturb_accumulate_residuals(ParameterVector & parameters_in)
 {
   const unsigned int Np = parameters_in.size();
 
+  this->update();
+
   for (unsigned int j=0; j != Np; ++j)
     {
       Number old_parameter = *parameters_in[j];
