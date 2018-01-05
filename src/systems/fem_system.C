@@ -873,7 +873,6 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
   //  this->get_vector("_nonlinear_solution").localize
   //    (*current_local_nonlinear_solution,
   //     dof_map.get_send_list());
-  this->update();
 
   if (print_solution_norms)
     {
