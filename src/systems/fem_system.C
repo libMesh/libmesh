@@ -870,19 +870,13 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
 
   const MeshBase & mesh = this->get_mesh();
 
-  //  this->get_vector("_nonlinear_solution").localize
-  //    (*current_local_nonlinear_solution,
-  //     dof_map.get_send_list());
-
   if (print_solution_norms)
     {
-      //      this->get_vector("_nonlinear_solution").close();
       this->solution->close();
 
       std::streamsize old_precision = libMesh::out.precision();
       libMesh::out.precision(16);
       libMesh::out << "|U| = "
-        //                    << this->get_vector("_nonlinear_solution").l1_norm()
                    << this->solution->l1_norm()
                    << std::endl;
       libMesh::out.precision(old_precision);
@@ -891,7 +885,6 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
     {
       std::streamsize old_precision = libMesh::out.precision();
       libMesh::out.precision(16);
-      //      libMesh::out << "U = [" << this->get_vector("_nonlinear_solution")
       libMesh::out << "U = [" << *(this->solution)
                    << "];" << std::endl;
       libMesh::out.precision(old_precision);
