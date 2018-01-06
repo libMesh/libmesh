@@ -1323,6 +1323,10 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
       *this->solution = this->get_sensitivity_solution(k);
       *this->solution *= delta_p;
       *this->solution += *oldsolution;
+
+      // We've modified solution, so we need to update before calling
+      // assembly since assembly may only use current_local_solution
+      this->update();
       this->assembly(false, true);
       this->matrix->close();
       this->assemble_qoi_derivative(qoi_indices,
@@ -1355,6 +1359,10 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
       *this->solution = this->get_sensitivity_solution(k);
       *this->solution *= -delta_p;
       *this->solution += *oldsolution;
+
+      // We've modified solution, so we need to update before calling
+      // assembly since assembly may only use current_local_solution
+      this->update();
       this->assembly(false, true);
       this->matrix->close();
       this->assemble_qoi_derivative(qoi_indices,
@@ -1384,6 +1392,9 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
   // All parameters have been reset.
   // Don't leave the qoi or system changed - principle of least
   // surprise.
+  // We've modified solution, so we need to update before calling
+  // assembly since assembly may only use current_local_solution
+  this->update();
   this->assembly(true, true);
   this->rhs->close();
   this->matrix->close();
