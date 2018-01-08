@@ -256,6 +256,13 @@ public:
    * H_ij = (d^2 q)/(d p_i d p_j)
    * This Hessian is the output of this method, where for each q_i,
    * H_jk is stored in \p hessian.second_derivative(i,j,k).
+   *
+   * Note that in some cases only
+   * \link current_local_solution \endlink is used during assembly,
+   * and, therefore, if \link solution \endlink has been altered
+   * without \link update() \endlink being called, then the
+   * user must call \link update() \endlink before calling
+   * this function.
    */
   virtual void qoi_parameter_hessian(const QoISet & qoi_indices,
                                      const ParameterVector & parameters,
