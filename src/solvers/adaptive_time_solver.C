@@ -90,7 +90,6 @@ void AdaptiveTimeSolver::advance_timestep ()
     _system.get_vector("_old_nonlinear_solution");
   NumericVector<Number> & nonlinear_solution =
     *(_system.solution);
-  //    _system.get_vector("_nonlinear_solution");
 
   old_nonlinear_soln = nonlinear_solution;
 

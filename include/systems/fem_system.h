@@ -81,7 +81,13 @@ public:
   /**
    * Prepares \p matrix or \p rhs for matrix assembly.
    * Users may reimplement this to add pre- or post-assembly
-   * code before or after calling FEMSystem::assembly()
+   * code before or after calling FEMSystem::assembly().
+   * Note that in some cases only
+   * \link current_local_solution \endlink is used during assembly,
+   * and, therefore, if \link solution \endlink has been altered
+   * without \link update() \endlink being called, then the
+   * user must call \link update() \endlink before calling
+   * this function.
    */
   virtual void assembly (bool get_residual,
                          bool get_jacobian,

@@ -79,6 +79,9 @@ Real NewtonSolver::line_search(Real tol,
         libMesh::out << "  Shrinking Newton step to "
                      << bx << std::endl;
 
+      // We may need to localize a parallel solution
+      _system.update();
+
       // Check residual with fractional Newton step
       _system.assembly (true, false);
 
@@ -186,6 +189,8 @@ Real NewtonSolver::line_search(Real tol,
         libMesh::out << "  Shrinking Newton step to "
                      << bx << std::endl;
 
+      // We may need to localize a parallel solution
+      _system.update();
       _system.assembly (true, false);
 
       rhs.close();
@@ -307,6 +312,9 @@ unsigned int NewtonSolver::solve()
   for (_outer_iterations=0; _outer_iterations<max_nonlinear_iterations;
        ++_outer_iterations)
     {
+      // We may need to localize a parallel solution
+      _system.update();
+
       if (verbose)
         libMesh::out << "Assembling the System" << std::endl;
 
@@ -459,6 +467,7 @@ unsigned int NewtonSolver::solve()
           _outer_iterations+1 < max_nonlinear_iterations ||
           !continue_after_max_iterations)
         {
+          _system.update ();
           _system.assembly(true, false);
 
           rhs.close();
