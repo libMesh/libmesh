@@ -160,8 +160,6 @@ public:
    */
   void print (std::ostream & os=libMesh::out) const;
 
-private:
-
   /**
    * Abstract definition of a parameter value.
    */
@@ -194,8 +192,6 @@ private:
      */
     virtual Value * clone () const = 0;
   };
-
-public:
 
   /**
    * Concrete definition of a parameter value
