@@ -39,7 +39,6 @@
 
 namespace libMesh
 {
-
 //--------------------------------------------------------------------
 // Functions with C linkage to pass to PETSc.  PETSc will call these
 // methods as needed.
@@ -146,7 +145,133 @@ extern "C"
     return ierr;
   }
 
+  //-----------------------------------------------------------------------------------------
+  // this function is called by PETSc to approximate the Jacobian at X via finite differences
+  PetscErrorCode
+  __libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx)
+  {
+    LOG_SCOPE("residual()", "PetscNonlinearSolver");
 
+    PetscErrorCode ierr=0;
+
+    libmesh_assert(x);
+    libmesh_assert(r);
+    libmesh_assert(ctx);
+
+    // No way to safety-check this cast, since we got a void *...
+    PetscNonlinearSolver<Number> * solver =
+      static_cast<PetscNonlinearSolver<Number> *> (ctx);
+
+    // Get the current iteration number from the snes object,
+    // store it in the PetscNonlinearSolver object for possible use
+    // by the user's residual function.
+    {
+      PetscInt n_iterations = 0;
+      ierr = SNESGetIterationNumber(snes, &n_iterations);
+      CHKERRABORT(solver->comm().get(),ierr);
+      solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
+    }
+
+    NonlinearImplicitSystem & sys = solver->system();
+
+    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
+    PetscVector<Number> X_global(x, sys.comm()), R(r, sys.comm());
+
+    // Use the system's update() to get a good local version of the
+    // parallel solution.  This operation does not modify the incoming
+    // "x" vector, it only localizes information from "x" into
+    // sys.current_local_solution.
+    X_global.swap(X_sys);
+    sys.update();
+    X_global.swap(X_sys);
+
+    // Enforce constraints (if any) exactly on the
+    // current_local_solution.  This is the solution vector that is
+    // actually used in the computation of the residual below, and is
+    // not locked by debug-enabled PETSc the way that "x" is.
+    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
+
+    if (solver->_zero_out_residual)
+      R.zero();
+
+    if (solver->fd_residual != libmesh_nullptr)
+      solver->fd_residual(*sys.current_local_solution.get(), R, sys);
+
+    else if (solver->residual != libmesh_nullptr)
+      solver->residual(*sys.current_local_solution.get(), R, sys);
+
+    else
+      libmesh_error_msg("Error! Unable to compute residual for forming finite difference Jacobian!");
+
+    R.close();
+
+    return ierr;
+  }
+
+  //----------------------------------------------------------------
+  // this function is called by PETSc to approximate Jacobian-vector
+  // products at X via finite differences
+  PetscErrorCode
+  __libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx)
+  {
+    LOG_SCOPE("residual()", "PetscNonlinearSolver");
+
+    PetscErrorCode ierr=0;
+
+    libmesh_assert(x);
+    libmesh_assert(r);
+    libmesh_assert(ctx);
+
+    // No way to safety-check this cast, since we got a void *...
+    PetscNonlinearSolver<Number> * solver =
+      static_cast<PetscNonlinearSolver<Number> *> (ctx);
+
+    // Get the current iteration number from the snes object,
+    // store it in the PetscNonlinearSolver object for possible use
+    // by the user's residual function.
+    {
+      PetscInt n_iterations = 0;
+      ierr = SNESGetIterationNumber(snes, &n_iterations);
+      CHKERRABORT(solver->comm().get(),ierr);
+      solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
+    }
+
+    NonlinearImplicitSystem & sys = solver->system();
+
+    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
+    PetscVector<Number> X_global(x, sys.comm()), R(r, sys.comm());
+
+    // Use the system's update() to get a good local version of the
+    // parallel solution.  This operation does not modify the incoming
+    // "x" vector, it only localizes information from "x" into
+    // sys.current_local_solution.
+    X_global.swap(X_sys);
+    sys.update();
+    X_global.swap(X_sys);
+
+    // Enforce constraints (if any) exactly on the
+    // current_local_solution.  This is the solution vector that is
+    // actually used in the computation of the residual below, and is
+    // not locked by debug-enabled PETSc the way that "x" is.
+    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
+
+    if (solver->_zero_out_residual)
+      R.zero();
+
+    if (solver->mffd_residual != libmesh_nullptr)
+      solver->mffd_residual(*sys.current_local_solution.get(), R, sys);
+
+    else if (solver->residual != libmesh_nullptr)
+      solver->residual(*sys.current_local_solution.get(), R, sys);
+
+    else
+      libmesh_error_msg("Error! Unable to compute residual for forming finite differenced"
+                        "Jacobian-vector products!");
+
+    R.close();
+
+    return ierr;
+  }
 
   //---------------------------------------------------------------
   // this function is called by PETSc to evaluate the Jacobian at X
