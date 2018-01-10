@@ -200,8 +200,8 @@ int main (int argc, char ** argv)
   // a generalized Hermitian problem.
   eigen_system.set_eigenproblem_type(GHEP);
 
-  // Order the eigenvalues "smallest first"
-  eigen_system.eigen_solver->set_position_of_spectrum(SMALLEST_MAGNITUDE);
+  // Set the target eigenvalue
+  eigen_system.eigen_solver->set_position_of_spectrum(0., TARGET_REAL);
 
   {
     std::set<boundary_id_type> boundary_ids;
