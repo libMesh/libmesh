@@ -195,7 +195,7 @@ public:
    * written.
    */
   virtual void write_out_vectors(System & sys,
-                                 std::vector<std::unique_ptr<NumericVector<Number>>> & vectors,
+                                 std::vector<NumericVector<Number>*> & vectors,
                                  const std::string & directory_name = "offline_data",
                                  const std::string & data_name = "bf",
                                  const bool write_binary_basis_functions = true);

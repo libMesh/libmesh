@@ -126,7 +126,13 @@ public:
    * Attach a vector of pointers to functor objects that define one
    * of the outputs.
    */
-  virtual void attach_output_theta(std::vector<RBTheta *> theta_q_l);
+  virtual void attach_output_theta(std::vector<std::unique_ptr<RBTheta>> & theta_q_l);
+
+  /**
+   * Attach a vector of pointers to functor objects that define one
+   * of the outputs.
+   */
+  virtual void attach_output_theta(std::vector<RBTheta*> theta_q_l);
 
   /**
    * Attach a pointer to a functor object that defines one

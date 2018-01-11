@@ -91,6 +91,16 @@ void RBThetaExpansion::attach_multiple_F_theta(std::vector<std::unique_ptr<RBThe
     }
 }
 
+void RBThetaExpansion::attach_output_theta(std::vector<std::unique_ptr<RBTheta>> & theta_q_l)
+{
+  std::vector<RBTheta *> theta_q_l_ptr;
+  for(std::size_t i=0; i<theta_q_l.size(); i++)
+  {
+    theta_q_l_ptr.push_back( theta_q_l[i].get() );
+  }
+  _output_theta_vector.push_back(theta_q_l_ptr);
+}
+
 void RBThetaExpansion::attach_output_theta(std::vector<RBTheta *> theta_q_l)
 {
   _output_theta_vector.push_back(theta_q_l);

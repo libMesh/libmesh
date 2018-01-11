@@ -885,15 +885,21 @@ void RBEvaluation::write_out_basis_functions(System & sys,
 {
   LOG_SCOPE("write_out_basis_functions()", "RBEvaluation");
 
+  std::vector<NumericVector<Number>*> basis_functions_ptrs;
+  for(std::size_t i=0; i<basis_functions.size(); i++)
+  {
+    basis_functions_ptrs.push_back(basis_functions[i].get());
+  }
+
   write_out_vectors(sys,
-                    basis_functions,
+                    basis_functions_ptrs,
                     directory_name,
                     "bf",
                     write_binary_basis_functions);
 }
 
 void RBEvaluation::write_out_vectors(System & sys,
-                                     std::vector<std::unique_ptr<NumericVector<Number>>> & vectors,
+                                     std::vector<NumericVector<Number>*> & vectors,
                                      const std::string & directory_name,
                                      const std::string & data_name,
                                      const bool write_binary_vectors)
@@ -933,7 +939,7 @@ void RBEvaluation::write_out_vectors(System & sys,
     // Note the API wants pointers to constant vectors, hence this...
     std::vector<const NumericVector<Number> *> bf_out;
     for (const auto & vec : vectors)
-      bf_out.push_back(vec.get());
+      bf_out.push_back(vec);
 
     // for (std::size_t i=0; i<vectors.size(); i++)
     //   bf_out.push_back(vectors[i]);
