@@ -47,6 +47,7 @@ namespace libMesh
 // Give them an obscure name to avoid namespace pollution.
 extern "C"
 {
+
   //-------------------------------------------------------------------
   // this function is called by PETSc at the end of each nonlinear step
   PetscErrorCode
@@ -205,6 +206,22 @@ extern "C"
 
     R.close();
 
+    return ierr;
+  }
+
+
+  //----------------------------------------------------------
+  // this function serves an interface between the petsc layer
+  // and the actual mffd residual computing routine
+  PetscErrorCode
+  __libmesh_petsc_snes_mffd_interface (void * ctx, Vec x, Vec r)
+  {
+    PetscErrorCode ierr = 0;
+    // No way to safety-check this cast, since we got a void *...
+    PetscNonlinearSolver<Number> * solver =
+      static_cast<PetscNonlinearSolver<Number> *> (ctx);
+
+    ierr = __libmesh_petsc_snes_mffd_residual(solver->snes(), x, r, ctx);
     return ierr;
   }
 
@@ -481,6 +498,7 @@ extern "C"
 template <typename T>
 PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   NonlinearSolver<T>(system_in),
+  mf(false),
   _reason(SNES_CONVERGED_ITERATING/*==0*/), // Arbitrary initial value...
   _n_linear_iterations(0),
   _current_nonlinear_iteration_number(0),
@@ -705,7 +723,7 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
 
 template <typename T>
 std::pair<unsigned int, Real>
-PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian Matrix
+PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditioning Matrix
                                 NumericVector<T> & x_in,    // Solution vector
                                 NumericVector<T> & r_in,    // Residual vector
                                 const double,              // Stopping tolerance
@@ -715,7 +733,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
   this->init ();
 
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T> * jac = cast_ptr<PetscMatrix<T> *>(&jac_in);
+  PetscMatrix<T> * pre = cast_ptr<PetscMatrix<T> *>(&pre_in);
   PetscVector<T> * x   = cast_ptr<PetscVector<T> *>(&x_in);
   PetscVector<T> * r   = cast_ptr<PetscVector<T> *>(&r_in);
 
@@ -731,9 +749,10 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
   // This allows a user to set their own jacobian function if they want to
   if (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object)
     {
-      ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
+      ierr = SNESSetJacobian (_snes, pre->mat(), pre->mat(), __libmesh_petsc_snes_jacobian, this);
       LIBMESH_CHKERR(ierr);
     }
+
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
   // Only set the nullspace if we have a way of computing it and the result is non-empty.
   if (this->nullspace || this->nullspace_object)
@@ -742,7 +761,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
       this->build_mat_null_space(this->nullspace_object, this->nullspace, &msp);
       if (msp)
         {
-          ierr = MatSetNullSpace(jac->mat(), msp);
+          ierr = MatSetNullSpace(pre->mat(), msp);
           LIBMESH_CHKERR(ierr);
 
           ierr = MatNullSpaceDestroy(&msp);
@@ -760,7 +779,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
       this->build_mat_null_space(this->transpose_nullspace_object, this->transpose_nullspace, &msp);
       if (msp)
         {
-          ierr = MatSetTransposeNullSpace(jac->mat(), msp);
+          ierr = MatSetTransposeNullSpace(pre->mat(), msp);
           LIBMESH_CHKERR(ierr);
 
           ierr = MatNullSpaceDestroy(&msp);
@@ -777,7 +796,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
 
       if (msp)
         {
-          ierr = MatSetNearNullSpace(jac->mat(), msp);
+          ierr = MatSetNearNullSpace(pre->mat(), msp);
           LIBMESH_CHKERR(ierr);
 
           ierr = MatNullSpaceDestroy(&msp);
@@ -785,6 +804,18 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
         }
     }
 #endif
+
+  // Take care of case where the user specifies matrix-free jacobian
+  Mat J;
+  if (this->mf)
+  {
+    ierr = MatCreateSNESMF(_snes, &J);
+    LIBMESH_CHKERR(ierr);
+    ierr = MatMFFDSetFunction(J, __libmesh_petsc_snes_mffd_interface, this);
+    LIBMESH_CHKERR(ierr);
+    ierr = SNESSetJacobian(_snes, J, 0, 0, 0);
+  }
+
   // Have the Krylov subspace method use our good initial guess rather than 0
   KSP ksp;
   ierr = SNESGetKSP (_snes, &ksp);
@@ -813,7 +844,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
   //Set the preconditioning matrix
   if (this->_preconditioner)
     {
-      this->_preconditioner->set_matrix(jac_in);
+      this->_preconditioner->set_matrix(pre_in);
       this->_preconditioner->init();
     }
 

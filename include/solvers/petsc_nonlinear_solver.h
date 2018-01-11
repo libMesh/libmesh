@@ -41,6 +41,7 @@ extern "C"
   PetscErrorCode __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *);
   PetscErrorCode __libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void * ctx);
   PetscErrorCode __libmesh_petsc_snes_fd_residual (SNES, Vec x, Vec r, void * ctx);
+  PetscErrorCode __libmesh_petsc_snes_mffd_interface (void * ctx, Vec x, Vec r);
   PetscErrorCode __libmesh_petsc_snes_mffd_residual (SNES, Vec x, Vec r, void * ctx);
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
   PetscErrorCode __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat * jac, Mat * pc, MatStructure * msflag, void * ctx);
@@ -155,6 +156,11 @@ public:
    */
   void use_default_monitor(bool state) { _default_monitor = state; }
 
+  /**
+   * Whether the Jacobian is matrix-free
+   */
+  bool mf;
+
 protected:
   /**
    * Nonlinear solver context
@@ -206,6 +212,7 @@ protected:
 private:
   friend PetscErrorCode __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode __libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx);
+  friend PetscErrorCode __libmesh_petsc_snes_mffd_interface (void * ctx, Vec x, Vec r);
   friend PetscErrorCode __libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx);
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
   friend PetscErrorCode __libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat * jac, Mat * pc, MatStructure * msflag, void * ctx);
