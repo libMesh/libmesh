@@ -32,8 +32,6 @@ DGFEMContext::DGFEMContext (const System & sys)
     _neighbor_dof_indices_var(sys.n_vars()),
     _dg_terms_active(false)
 {
-  libmesh_experimental();
-
   unsigned int nv = sys.n_vars();
   libmesh_assert (nv);
 
