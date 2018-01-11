@@ -150,6 +150,16 @@ void RBAssemblyExpansion::attach_multiple_F_assembly(std::vector<std::unique_ptr
     _F_assembly_vector.push_back(Fq_assembly[i].get());
 }
 
+void RBAssemblyExpansion::attach_output_assembly(std::vector<std::unique_ptr<ElemAssembly>> & output_assembly)
+{
+  std::vector<ElemAssembly *> output_assembly_ptr;
+  for(std::size_t i=0; i<output_assembly.size(); i++)
+  {
+    output_assembly_ptr.push_back( output_assembly[i].get() );
+  }
+  _output_assembly_vector.push_back(output_assembly_ptr);
+}
+
 void RBAssemblyExpansion::attach_output_assembly(std::vector<ElemAssembly *> output_assembly)
 {
   _output_assembly_vector.push_back(output_assembly);

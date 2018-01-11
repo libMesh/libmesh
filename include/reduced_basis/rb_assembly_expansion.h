@@ -144,6 +144,13 @@ public:
    * (both interior and boundary assembly).
    * In this case we pass in vector arguments to allow for Q_l > 1.
    */
+  virtual void attach_output_assembly(std::vector<std::unique_ptr<ElemAssembly>> & output_assembly);
+
+  /**
+   * Attach ElemAssembly object for an output
+   * (both interior and boundary assembly).
+   * In this case we pass in vector arguments to allow for Q_l > 1.
+   */
   virtual void attach_output_assembly(std::vector<ElemAssembly *> output_assembly);
 
   /**
