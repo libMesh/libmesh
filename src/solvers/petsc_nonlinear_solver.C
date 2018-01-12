@@ -55,14 +55,13 @@ public:
 };
 
 ResidualContext
-libmesh_petsc_snes_residual_helper (SNES snes, Vec x, Vec r, void * ctx)
+libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx)
 {
   LOG_SCOPE("residual()", "PetscNonlinearSolver");
 
   PetscErrorCode ierr = 0;
 
   libmesh_assert(x);
-  libmesh_assert(r);
   libmesh_assert(ctx);
 
   // No way to safety-check this cast, since we got a void *...
@@ -136,8 +135,9 @@ extern "C"
   PetscErrorCode
   __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx)
   {
-    ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, r, ctx);
+    ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, ctx);
 
+    libmesh_assert(r);
     PetscVector<Number> R(r, rc.sys.comm());
 
     if (rc.solver->_zero_out_residual)
@@ -177,8 +177,9 @@ extern "C"
   PetscErrorCode
   __libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx)
   {
-    ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, r, ctx);
+    ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, ctx);
 
+    libmesh_assert(r);
     PetscVector<Number> R(r, rc.sys.comm());
 
     if (rc.solver->_zero_out_residual)
@@ -220,8 +221,9 @@ extern "C"
   PetscErrorCode
   __libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx)
   {
-    ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, r, ctx);
+    ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, ctx);
 
+    libmesh_assert(r);
     PetscVector<Number> R(r, rc.sys.comm());
 
     if (rc.solver->_zero_out_residual)
@@ -766,6 +768,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
     ierr = MatMFFDSetFunction(J, __libmesh_petsc_snes_mffd_interface, this);
     LIBMESH_CHKERR(ierr);
     ierr = SNESSetJacobian(_snes, J, 0, 0, 0);
+    LIBMESH_CHKERR(ierr);
   }
 
   // Have the Krylov subspace method use our good initial guess rather than 0

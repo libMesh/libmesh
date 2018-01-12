@@ -212,7 +212,7 @@ protected:
                             MatNullSpace *);
 #endif
 private:
-  friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, Vec r, void * ctx);
+  friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);
   friend PetscErrorCode __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode __libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode __libmesh_petsc_snes_mffd_interface (void * ctx, Vec x, Vec r);
