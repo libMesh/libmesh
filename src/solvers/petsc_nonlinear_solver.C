@@ -195,11 +195,11 @@ extern "C"
     if (solver->_zero_out_residual)
       R.zero();
 
-    if (solver->fd_residual != libmesh_nullptr)
-      solver->fd_residual(*sys.current_local_solution.get(), R, sys);
+    if (solver->fd_residual_object != libmesh_nullptr)
+      solver->fd_residual_object->residual(*sys.current_local_solution.get(), R, sys);
 
-    else if (solver->residual != libmesh_nullptr)
-      solver->residual(*sys.current_local_solution.get(), R, sys);
+    else if (solver->residual_object != libmesh_nullptr)
+      solver->residual_object->residual(*sys.current_local_solution.get(), R, sys);
 
     else
       libmesh_error_msg("Error! Unable to compute residual for forming finite difference Jacobian!");
@@ -275,11 +275,11 @@ extern "C"
     if (solver->_zero_out_residual)
       R.zero();
 
-    if (solver->mffd_residual != libmesh_nullptr)
-      solver->mffd_residual(*sys.current_local_solution.get(), R, sys);
+    if (solver->mffd_residual_object != libmesh_nullptr)
+      solver->mffd_residual_object->residual(*sys.current_local_solution.get(), R, sys);
 
-    else if (solver->residual != libmesh_nullptr)
-      solver->residual(*sys.current_local_solution.get(), R, sys);
+    else if (solver->residual_object != libmesh_nullptr)
+      solver->residual_object->residual(*sys.current_local_solution.get(), R, sys);
 
     else
       libmesh_error_msg("Error! Unable to compute residual for forming finite differenced"
