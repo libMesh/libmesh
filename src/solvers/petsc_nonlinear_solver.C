@@ -37,6 +37,69 @@
 /* DMlibMesh include. */
 #include "libmesh/petscdmlibmesh.h"
 
+class ResidualContext
+{
+public:
+  ResidualContext(PetscNonlinearSolver<Number> * solver_in, NonlinearImplicitSystem & sys_in,
+                  PetscErrorCode ierr) :
+      solver(solver_in),
+      sys(sys_in),
+      ierr(ierr_in)
+    {}
+
+  PetscNonlinearSolver<Number> * solver;
+  NonlinearImplicitSystem & sys;
+  PetscErrorCode ierr;
+}
+
+ResidualInformation
+libmesh_petsc_snes_residual_helper (SNES snes, Vec x, Vec r, void * ctx)
+{
+  LOG_SCOPE("residual()", "PetscNonlinearSolver");
+
+  PetscErrorCode ierr = 0;
+
+  libmesh_assert(x);
+  libmesh_assert(r);
+  libmesh_assert(ctx);
+
+  // No way to safety-check this cast, since we got a void *...
+  PetscNonlinearSolver<Number> * solver =
+    static_cast<PetscNonlinearSolver<Number> *> (ctx);
+
+  // Get the current iteration number from the snes object,
+  // store it in the PetscNonlinearSolver object for possible use
+  // by the user's residual function.
+  {
+    PetscInt n_iterations = 0;
+    ierr = SNESGetIterationNumber(snes, &n_iterations);
+    CHKERRABORT(solver->comm().get(),ierr);
+    solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
+  }
+
+  NonlinearImplicitSystem & sys = solver->system();
+
+  PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
+
+  PetscVector<Number> X_global(x, sys.comm());
+
+  // Use the system's update() to get a good local version of the
+  // parallel solution.  This operation does not modify the incoming
+  // "x" vector, it only localizes information from "x" into
+  // sys.current_local_solution.
+  X_global.swap(X_sys);
+  sys.update();
+  X_global.swap(X_sys);
+
+  // Enforce constraints (if any) exactly on the
+  // current_local_solution.  This is the solution vector that is
+  // actually used in the computation of the residual below, and is
+  // not locked by debug-enabled PETSc the way that "x" is.
+  sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
+
+  return ResidualContext(solver, sys, R, ierr);
+}
+
 namespace libMesh
 {
 //--------------------------------------------------------------------
@@ -73,46 +136,9 @@ extern "C"
   PetscErrorCode
   __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx)
   {
-    LOG_SCOPE("residual()", "PetscNonlinearSolver");
+    ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, r, ctx);
 
-    PetscErrorCode ierr=0;
-
-    libmesh_assert(x);
-    libmesh_assert(r);
-    libmesh_assert(ctx);
-
-    // No way to safety-check this cast, since we got a void *...
-    PetscNonlinearSolver<Number> * solver =
-      static_cast<PetscNonlinearSolver<Number> *> (ctx);
-
-    // Get the current iteration number from the snes object,
-    // store it in the PetscNonlinearSolver object for possible use
-    // by the user's residual function.
-    {
-      PetscInt n_iterations = 0;
-      ierr = SNESGetIterationNumber(snes, &n_iterations);
-      CHKERRABORT(solver->comm().get(),ierr);
-      solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
-    }
-
-    NonlinearImplicitSystem & sys = solver->system();
-
-    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
-    PetscVector<Number> X_global(x, sys.comm()), R(r, sys.comm());
-
-    // Use the system's update() to get a good local version of the
-    // parallel solution.  This operation does not modify the incoming
-    // "x" vector, it only localizes information from "x" into
-    // sys.current_local_solution.
-    X_global.swap(X_sys);
-    sys.update();
-    X_global.swap(X_sys);
-
-    // Enforce constraints (if any) exactly on the
-    // current_local_solution.  This is the solution vector that is
-    // actually used in the computation of the residual below, and is
-    // not locked by debug-enabled PETSc the way that "x" is.
-    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
+    PetscVector<Number> R(r, rc.sys.comm());
 
     if (solver->_zero_out_residual)
       R.zero();
@@ -120,30 +146,30 @@ extern "C"
     //-----------------------------------------------------------------------------
     // if the user has provided both function pointers and objects only the pointer
     // will be used, so catch that as an error
-    if (solver->residual && solver->residual_object)
+    if (rc.solver->residual && rc.solver->residual_object)
       libmesh_error_msg("ERROR: cannot specify both a function and object to compute the Residual!");
 
-    if (solver->matvec && solver->residual_and_jacobian_object)
+    if (rc.solver->matvec && rc.solver->residual_and_jacobian_object)
       libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
-    if (solver->residual != libmesh_nullptr)
-      solver->residual(*sys.current_local_solution.get(), R, sys);
+    if (rc.solver->residual != libmesh_nullptr)
+      rc.solver->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
 
-    else if (solver->residual_object != libmesh_nullptr)
-      solver->residual_object->residual(*sys.current_local_solution.get(), R, sys);
+    else if (rc.solver->residual_object != libmesh_nullptr)
+      rc.solver->residual_object->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
 
-    else if (solver->matvec != libmesh_nullptr)
-      solver->matvec (*sys.current_local_solution.get(), &R, libmesh_nullptr, sys);
+    else if (rc.solver->matvec != libmesh_nullptr)
+      rc.solver->matvec (*rc.sys.current_local_solution.get(), &R, libmesh_nullptr, rc.sys);
 
-    else if (solver->residual_and_jacobian_object != libmesh_nullptr)
-      solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), &R, libmesh_nullptr, sys);
+    else if (rc.solver->residual_and_jacobian_object != libmesh_nullptr)
+      rc.solver->residual_and_jacobian_object->residual_and_jacobian (*rc.sys.current_local_solution.get(), &R, libmesh_nullptr, rc.sys);
 
     else
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
     R.close();
 
-    return ierr;
+    return rc.ierr;
   }
 
   //-----------------------------------------------------------------------------------------
@@ -151,62 +177,25 @@ extern "C"
   PetscErrorCode
   __libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx)
   {
-    LOG_SCOPE("residual()", "PetscNonlinearSolver");
+    ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, r, ctx);
 
-    PetscErrorCode ierr=0;
+    PetscVector<Number> R(r, rc.sys.comm());
 
-    libmesh_assert(x);
-    libmesh_assert(r);
-    libmesh_assert(ctx);
-
-    // No way to safety-check this cast, since we got a void *...
-    PetscNonlinearSolver<Number> * solver =
-      static_cast<PetscNonlinearSolver<Number> *> (ctx);
-
-    // Get the current iteration number from the snes object,
-    // store it in the PetscNonlinearSolver object for possible use
-    // by the user's residual function.
-    {
-      PetscInt n_iterations = 0;
-      ierr = SNESGetIterationNumber(snes, &n_iterations);
-      CHKERRABORT(solver->comm().get(),ierr);
-      solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
-    }
-
-    NonlinearImplicitSystem & sys = solver->system();
-
-    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
-    PetscVector<Number> X_global(x, sys.comm()), R(r, sys.comm());
-
-    // Use the system's update() to get a good local version of the
-    // parallel solution.  This operation does not modify the incoming
-    // "x" vector, it only localizes information from "x" into
-    // sys.current_local_solution.
-    X_global.swap(X_sys);
-    sys.update();
-    X_global.swap(X_sys);
-
-    // Enforce constraints (if any) exactly on the
-    // current_local_solution.  This is the solution vector that is
-    // actually used in the computation of the residual below, and is
-    // not locked by debug-enabled PETSc the way that "x" is.
-    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
-
-    if (solver->_zero_out_residual)
+    if (rc.solver->_zero_out_residual)
       R.zero();
 
-    if (solver->fd_residual_object != libmesh_nullptr)
-      solver->fd_residual_object->residual(*sys.current_local_solution.get(), R, sys);
+    if (rc.solver->fd_residual_object != libmesh_nullptr)
+      rc.solver->fd_residual_object->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
 
-    else if (solver->residual_object != libmesh_nullptr)
-      solver->residual_object->residual(*sys.current_local_solution.get(), R, sys);
+    else if (rc.solver->residual_object != libmesh_nullptr)
+      rc.solver->residual_object->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
 
     else
       libmesh_error_msg("Error! Unable to compute residual for forming finite difference Jacobian!");
 
     R.close();
 
-    return ierr;
+    return rc.ierr;
   }
 
 
@@ -222,7 +211,7 @@ extern "C"
       static_cast<PetscNonlinearSolver<Number> *> (ctx);
 
     ierr = __libmesh_petsc_snes_mffd_residual(solver->snes(), x, r, ctx);
-    return ierr;
+    return rc.ierr;
   }
 
   //----------------------------------------------------------------
@@ -231,55 +220,18 @@ extern "C"
   PetscErrorCode
   __libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx)
   {
-    LOG_SCOPE("residual()", "PetscNonlinearSolver");
+    ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, r, ctx);
 
-    PetscErrorCode ierr=0;
+    PetscVector<Number> R(r, rc.sys.comm());
 
-    libmesh_assert(x);
-    libmesh_assert(r);
-    libmesh_assert(ctx);
-
-    // No way to safety-check this cast, since we got a void *...
-    PetscNonlinearSolver<Number> * solver =
-      static_cast<PetscNonlinearSolver<Number> *> (ctx);
-
-    // Get the current iteration number from the snes object,
-    // store it in the PetscNonlinearSolver object for possible use
-    // by the user's residual function.
-    {
-      PetscInt n_iterations = 0;
-      ierr = SNESGetIterationNumber(snes, &n_iterations);
-      CHKERRABORT(solver->comm().get(),ierr);
-      solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
-    }
-
-    NonlinearImplicitSystem & sys = solver->system();
-
-    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
-    PetscVector<Number> X_global(x, sys.comm()), R(r, sys.comm());
-
-    // Use the system's update() to get a good local version of the
-    // parallel solution.  This operation does not modify the incoming
-    // "x" vector, it only localizes information from "x" into
-    // sys.current_local_solution.
-    X_global.swap(X_sys);
-    sys.update();
-    X_global.swap(X_sys);
-
-    // Enforce constraints (if any) exactly on the
-    // current_local_solution.  This is the solution vector that is
-    // actually used in the computation of the residual below, and is
-    // not locked by debug-enabled PETSc the way that "x" is.
-    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
-
-    if (solver->_zero_out_residual)
+    if (rc.solver->_zero_out_residual)
       R.zero();
 
-    if (solver->mffd_residual_object != libmesh_nullptr)
-      solver->mffd_residual_object->residual(*sys.current_local_solution.get(), R, sys);
+    if (rc.solver->mffd_residual_object != libmesh_nullptr)
+      rc.solver->mffd_residual_object->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
 
-    else if (solver->residual_object != libmesh_nullptr)
-      solver->residual_object->residual(*sys.current_local_solution.get(), R, sys);
+    else if (rc.solver->residual_object != libmesh_nullptr)
+      rc.solver->residual_object->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
 
     else
       libmesh_error_msg("Error! Unable to compute residual for forming finite differenced"
@@ -287,7 +239,7 @@ extern "C"
 
     R.close();
 
-    return ierr;
+    return rc.ierr;
   }
 
   //---------------------------------------------------------------
