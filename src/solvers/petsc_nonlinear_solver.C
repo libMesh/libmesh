@@ -37,11 +37,13 @@
 /* DMlibMesh include. */
 #include "libmesh/petscdmlibmesh.h"
 
+namespace libMesh
+{
 class ResidualContext
 {
 public:
   ResidualContext(PetscNonlinearSolver<Number> * solver_in, NonlinearImplicitSystem & sys_in,
-                  PetscErrorCode ierr) :
+                  PetscErrorCode ierr_in) :
       solver(solver_in),
       sys(sys_in),
       ierr(ierr_in)
@@ -50,9 +52,9 @@ public:
   PetscNonlinearSolver<Number> * solver;
   NonlinearImplicitSystem & sys;
   PetscErrorCode ierr;
-}
+};
 
-ResidualInformation
+ResidualContext
 libmesh_petsc_snes_residual_helper (SNES snes, Vec x, Vec r, void * ctx)
 {
   LOG_SCOPE("residual()", "PetscNonlinearSolver");
@@ -97,11 +99,9 @@ libmesh_petsc_snes_residual_helper (SNES snes, Vec x, Vec r, void * ctx)
   // not locked by debug-enabled PETSc the way that "x" is.
   sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
-  return ResidualContext(solver, sys, R, ierr);
+  return ResidualContext(solver, sys, ierr);
 }
 
-namespace libMesh
-{
 //--------------------------------------------------------------------
 // Functions with C linkage to pass to PETSc.  PETSc will call these
 // methods as needed.
@@ -140,7 +140,7 @@ extern "C"
 
     PetscVector<Number> R(r, rc.sys.comm());
 
-    if (solver->_zero_out_residual)
+    if (rc.solver->_zero_out_residual)
       R.zero();
 
     //-----------------------------------------------------------------------------
@@ -211,7 +211,7 @@ extern "C"
       static_cast<PetscNonlinearSolver<Number> *> (ctx);
 
     ierr = __libmesh_petsc_snes_mffd_residual(solver->snes(), x, r, ctx);
-    return rc.ierr;
+    return ierr;
   }
 
   //----------------------------------------------------------------
