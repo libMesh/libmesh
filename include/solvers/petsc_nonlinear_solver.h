@@ -159,9 +159,16 @@ public:
   void use_default_monitor(bool state) { _default_monitor = state; }
 
   /**
-   * Whether the Jacobian is matrix-free
+   * Petsc solve type
    */
-  bool mf;
+  enum SolveType
+  {
+    MF_OPERATOR, ///< Preconditioned Jacobian-free Newton
+    MF,          ///< Jacobian-free Newton
+    STANDARD     ///< Newton with explicit matrix
+  };
+
+  SolveType solve_type;
 
 protected:
   /**

@@ -452,7 +452,7 @@ extern "C"
 template <typename T>
 PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   NonlinearSolver<T>(system_in),
-  mf(false),
+  solve_type(STANDARD),
   _reason(SNES_CONVERGED_ITERATING/*==0*/), // Arbitrary initial value...
   _n_linear_iterations(0),
   _current_nonlinear_iteration_number(0),
@@ -761,14 +761,17 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
 
   // Take care of case where the user specifies matrix-free jacobian
   Mat J;
-  if (this->mf)
+  if (solve_type != STANDARD)
   {
-    ierr = MatCreateSNESMF(_snes, &J);
-    LIBMESH_CHKERR(ierr);
-    ierr = MatMFFDSetFunction(J, __libmesh_petsc_snes_mffd_interface, this);
-    LIBMESH_CHKERR(ierr);
-    ierr = SNESSetJacobian(_snes, J, 0, 0, 0);
-    LIBMESH_CHKERR(ierr);
+      ierr = MatCreateSNESMF(_snes, &J);
+      LIBMESH_CHKERR(ierr);
+      ierr = MatMFFDSetFunction(J, __libmesh_petsc_snes_mffd_interface, this);
+      LIBMESH_CHKERR(ierr);
+      if (solve_type == MF_OPERATOR)
+        ierr = SNESSetJacobian(_snes, J, 0, 0, 0);
+      else
+        ierr = SNESSetJacobian(_snes, J, J, MatMFFDComputeJacobian, 0);
+      LIBMESH_CHKERR(ierr);
   }
 
   // Have the Krylov subspace method use our good initial guess rather than 0
