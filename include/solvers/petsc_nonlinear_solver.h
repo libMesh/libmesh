@@ -34,12 +34,17 @@
 
 namespace libMesh
 {
+class ResidualContext;
+
 // Allow users access to these functions in case they want to reuse them.  Users shouldn't
 // need access to these most of the time as they are used internally by this object.
 extern "C"
 {
   PetscErrorCode __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *);
   PetscErrorCode __libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void * ctx);
+  PetscErrorCode __libmesh_petsc_snes_fd_residual (SNES, Vec x, Vec r, void * ctx);
+  PetscErrorCode __libmesh_petsc_snes_mffd_interface (void * ctx, Vec x, Vec r);
+  PetscErrorCode __libmesh_petsc_snes_mffd_residual (SNES, Vec x, Vec r, void * ctx);
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
   PetscErrorCode __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat * jac, Mat * pc, MatStructure * msflag, void * ctx);
 #else
@@ -153,7 +158,33 @@ public:
    */
   void use_default_monitor(bool state) { _default_monitor = state; }
 
+  /**
+   * Petsc solve type
+   */
+  enum SolveType
+  {
+    MF_OPERATOR, ///< Preconditioned Jacobian-free Newton-Krylov
+    MF,          ///< Jacobian-free Newton-Krylov
+    STANDARD     ///< Newton-Krylov with explicit matrix
+  };
+
+  /**
+   * \returns A constant reference to our solve type
+   */
+  const SolveType & solve_type() const { return _solve_type; }
+
+  /**
+   * \returns A writable reference to our solve type
+   */
+  SolveType & solve_type() { return _solve_type; }
+
 protected:
+
+  /**
+   * Stores the Petsc solve type
+   */
+  SolveType _solve_type;
+
   /**
    * Nonlinear solver context
    */
@@ -202,7 +233,11 @@ protected:
                             MatNullSpace *);
 #endif
 private:
+  friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);
   friend PetscErrorCode __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx);
+  friend PetscErrorCode __libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx);
+  friend PetscErrorCode __libmesh_petsc_snes_mffd_interface (void * ctx, Vec x, Vec r);
+  friend PetscErrorCode __libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx);
 #if PETSC_RELEASE_LESS_THAN(3,5,0)
   friend PetscErrorCode __libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat * jac, Mat * pc, MatStructure * msflag, void * ctx);
 #else

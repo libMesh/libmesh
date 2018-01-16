@@ -138,6 +138,19 @@ public:
   NonlinearImplicitSystem::ComputeResidual * residual_object;
 
   /**
+   * Object that computes the residual \p R(X) of the nonlinear system
+   * at the input iterate \p X for the purpose of forming a finite-differenced Jacobian.
+   */
+  NonlinearImplicitSystem::ComputeResidual * fd_residual_object;
+
+  /**
+   * Object that computes the residual \p R(X) of the nonlinear system
+   * at the input iterate \p X for the purpose of forming Jacobian-vector products
+   * via finite differencing.
+   */
+  NonlinearImplicitSystem::ComputeResidual * mffd_residual_object;
+
+  /**
    * Function that computes the Jacobian \p J(X) of the nonlinear system
    * at the input iterate \p X.
    */
@@ -366,6 +379,8 @@ NonlinearSolver<T>::NonlinearSolver (sys_type & s) :
   ParallelObject               (s),
   residual                     (libmesh_nullptr),
   residual_object              (libmesh_nullptr),
+  fd_residual_object           (libmesh_nullptr),
+  mffd_residual_object         (libmesh_nullptr),
   jacobian                     (libmesh_nullptr),
   jacobian_object              (libmesh_nullptr),
   matvec                       (libmesh_nullptr),

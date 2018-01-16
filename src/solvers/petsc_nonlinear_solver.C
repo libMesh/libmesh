@@ -39,6 +39,67 @@
 
 namespace libMesh
 {
+class ResidualContext
+{
+public:
+  ResidualContext(PetscNonlinearSolver<Number> * solver_in, NonlinearImplicitSystem & sys_in,
+                  PetscErrorCode ierr_in) :
+      solver(solver_in),
+      sys(sys_in),
+      ierr(ierr_in)
+    {}
+
+  PetscNonlinearSolver<Number> * solver;
+  NonlinearImplicitSystem & sys;
+  PetscErrorCode ierr;
+};
+
+ResidualContext
+libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx)
+{
+  LOG_SCOPE("residual()", "PetscNonlinearSolver");
+
+  PetscErrorCode ierr = 0;
+
+  libmesh_assert(x);
+  libmesh_assert(ctx);
+
+  // No way to safety-check this cast, since we got a void *...
+  PetscNonlinearSolver<Number> * solver =
+    static_cast<PetscNonlinearSolver<Number> *> (ctx);
+
+  // Get the current iteration number from the snes object,
+  // store it in the PetscNonlinearSolver object for possible use
+  // by the user's residual function.
+  {
+    PetscInt n_iterations = 0;
+    ierr = SNESGetIterationNumber(snes, &n_iterations);
+    CHKERRABORT(solver->comm().get(),ierr);
+    solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
+  }
+
+  NonlinearImplicitSystem & sys = solver->system();
+
+  PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
+
+  PetscVector<Number> X_global(x, sys.comm());
+
+  // Use the system's update() to get a good local version of the
+  // parallel solution.  This operation does not modify the incoming
+  // "x" vector, it only localizes information from "x" into
+  // sys.current_local_solution.
+  X_global.swap(X_sys);
+  sys.update();
+  X_global.swap(X_sys);
+
+  // Enforce constraints (if any) exactly on the
+  // current_local_solution.  This is the solution vector that is
+  // actually used in the computation of the residual below, and is
+  // not locked by debug-enabled PETSc the way that "x" is.
+  sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
+
+  return ResidualContext(solver, sys, ierr);
+}
 
 //--------------------------------------------------------------------
 // Functions with C linkage to pass to PETSc.  PETSc will call these
@@ -48,6 +109,7 @@ namespace libMesh
 // Give them an obscure name to avoid namespace pollution.
 extern "C"
 {
+
   //-------------------------------------------------------------------
   // this function is called by PETSc at the end of each nonlinear step
   PetscErrorCode
@@ -73,80 +135,114 @@ extern "C"
   PetscErrorCode
   __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx)
   {
-    LOG_SCOPE("residual()", "PetscNonlinearSolver");
+    ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, ctx);
 
-    PetscErrorCode ierr=0;
-
-    libmesh_assert(x);
     libmesh_assert(r);
-    libmesh_assert(ctx);
+    PetscVector<Number> R(r, rc.sys.comm());
 
-    // No way to safety-check this cast, since we got a void *...
-    PetscNonlinearSolver<Number> * solver =
-      static_cast<PetscNonlinearSolver<Number> *> (ctx);
-
-    // Get the current iteration number from the snes object,
-    // store it in the PetscNonlinearSolver object for possible use
-    // by the user's residual function.
-    {
-      PetscInt n_iterations = 0;
-      ierr = SNESGetIterationNumber(snes, &n_iterations);
-      CHKERRABORT(solver->comm().get(),ierr);
-      solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
-    }
-
-    NonlinearImplicitSystem & sys = solver->system();
-
-    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
-    PetscVector<Number> X_global(x, sys.comm()), R(r, sys.comm());
-
-    // Use the system's update() to get a good local version of the
-    // parallel solution.  This operation does not modify the incoming
-    // "x" vector, it only localizes information from "x" into
-    // sys.current_local_solution.
-    X_global.swap(X_sys);
-    sys.update();
-    X_global.swap(X_sys);
-
-    // Enforce constraints (if any) exactly on the
-    // current_local_solution.  This is the solution vector that is
-    // actually used in the computation of the residual below, and is
-    // not locked by debug-enabled PETSc the way that "x" is.
-    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
-
-    if (solver->_zero_out_residual)
+    if (rc.solver->_zero_out_residual)
       R.zero();
 
     //-----------------------------------------------------------------------------
     // if the user has provided both function pointers and objects only the pointer
     // will be used, so catch that as an error
-    if (solver->residual && solver->residual_object)
+    if (rc.solver->residual && rc.solver->residual_object)
       libmesh_error_msg("ERROR: cannot specify both a function and object to compute the Residual!");
 
-    if (solver->matvec && solver->residual_and_jacobian_object)
+    if (rc.solver->matvec && rc.solver->residual_and_jacobian_object)
       libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
-    if (solver->residual != libmesh_nullptr)
-      solver->residual(*sys.current_local_solution.get(), R, sys);
+    if (rc.solver->residual != libmesh_nullptr)
+      rc.solver->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
 
-    else if (solver->residual_object != libmesh_nullptr)
-      solver->residual_object->residual(*sys.current_local_solution.get(), R, sys);
+    else if (rc.solver->residual_object != libmesh_nullptr)
+      rc.solver->residual_object->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
 
-    else if (solver->matvec != libmesh_nullptr)
-      solver->matvec (*sys.current_local_solution.get(), &R, libmesh_nullptr, sys);
+    else if (rc.solver->matvec != libmesh_nullptr)
+      rc.solver->matvec (*rc.sys.current_local_solution.get(), &R, libmesh_nullptr, rc.sys);
 
-    else if (solver->residual_and_jacobian_object != libmesh_nullptr)
-      solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), &R, libmesh_nullptr, sys);
+    else if (rc.solver->residual_and_jacobian_object != libmesh_nullptr)
+      rc.solver->residual_and_jacobian_object->residual_and_jacobian (*rc.sys.current_local_solution.get(), &R, libmesh_nullptr, rc.sys);
 
     else
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
     R.close();
 
-    return ierr;
+    return rc.ierr;
+  }
+
+  //-----------------------------------------------------------------------------------------
+  // this function is called by PETSc to approximate the Jacobian at X via finite differences
+  PetscErrorCode
+  __libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx)
+  {
+    ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, ctx);
+
+    libmesh_assert(r);
+    PetscVector<Number> R(r, rc.sys.comm());
+
+    if (rc.solver->_zero_out_residual)
+      R.zero();
+
+    if (rc.solver->fd_residual_object != libmesh_nullptr)
+      rc.solver->fd_residual_object->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
+
+    else if (rc.solver->residual_object != libmesh_nullptr)
+      rc.solver->residual_object->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
+
+    else
+      libmesh_error_msg("Error! Unable to compute residual for forming finite difference Jacobian!");
+
+    R.close();
+
+    return rc.ierr;
   }
 
 
+  //----------------------------------------------------------
+  // this function serves an interface between the petsc layer
+  // and the actual mffd residual computing routine
+  PetscErrorCode
+  __libmesh_petsc_snes_mffd_interface (void * ctx, Vec x, Vec r)
+  {
+    PetscErrorCode ierr = 0;
+    // No way to safety-check this cast, since we got a void *...
+    PetscNonlinearSolver<Number> * solver =
+      static_cast<PetscNonlinearSolver<Number> *> (ctx);
+
+    ierr = __libmesh_petsc_snes_mffd_residual(solver->snes(), x, r, ctx);
+    return ierr;
+  }
+
+  //----------------------------------------------------------------
+  // this function is called by PETSc to approximate Jacobian-vector
+  // products at X via finite differences
+  PetscErrorCode
+  __libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx)
+  {
+    ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, ctx);
+
+    libmesh_assert(r);
+    PetscVector<Number> R(r, rc.sys.comm());
+
+    if (rc.solver->_zero_out_residual)
+      R.zero();
+
+    if (rc.solver->mffd_residual_object != libmesh_nullptr)
+      rc.solver->mffd_residual_object->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
+
+    else if (rc.solver->residual_object != libmesh_nullptr)
+      rc.solver->residual_object->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
+
+    else
+      libmesh_error_msg("Error! Unable to compute residual for forming finite differenced"
+                        "Jacobian-vector products!");
+
+    R.close();
+
+    return rc.ierr;
+  }
 
   //---------------------------------------------------------------
   // this function is called by PETSc to evaluate the Jacobian at X
@@ -356,6 +452,7 @@ extern "C"
 template <typename T>
 PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   NonlinearSolver<T>(system_in),
+  _solve_type(STANDARD),
   _reason(SNES_CONVERGED_ITERATING/*==0*/), // Arbitrary initial value...
   _n_linear_iterations(0),
   _current_nonlinear_iteration_number(0),
@@ -580,7 +677,7 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
 
 template <typename T>
 std::pair<unsigned int, Real>
-PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian Matrix
+PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditioning Matrix
                                 NumericVector<T> & x_in,    // Solution vector
                                 NumericVector<T> & r_in,    // Residual vector
                                 const double,              // Stopping tolerance
@@ -590,7 +687,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
   this->init ();
 
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T> * jac = cast_ptr<PetscMatrix<T> *>(&jac_in);
+  PetscMatrix<T> * pre = cast_ptr<PetscMatrix<T> *>(&pre_in);
   PetscVector<T> * x   = cast_ptr<PetscVector<T> *>(&x_in);
   PetscVector<T> * r   = cast_ptr<PetscVector<T> *>(&r_in);
 
@@ -606,9 +703,25 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
   // This allows a user to set their own jacobian function if they want to
   if (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object)
     {
-      ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
+      ierr = SNESSetJacobian (_snes, pre->mat(), pre->mat(), __libmesh_petsc_snes_jacobian, this);
       LIBMESH_CHKERR(ierr);
     }
+
+  // Take care of case where the user specifies matrix-free jacobian
+  Mat J;
+  if (_solve_type != STANDARD)
+  {
+      ierr = MatCreateSNESMF(_snes, &J);
+      LIBMESH_CHKERR(ierr);
+      ierr = MatMFFDSetFunction(J, __libmesh_petsc_snes_mffd_interface, this);
+      LIBMESH_CHKERR(ierr);
+      if (_solve_type == MF_OPERATOR)
+        ierr = SNESSetJacobian(_snes, J, PETSC_NULL, PETSC_NULL, PETSC_NULL);
+      else
+        ierr = SNESSetJacobian(_snes, J, J, MatMFFDComputeJacobian, PETSC_NULL);
+      LIBMESH_CHKERR(ierr);
+  }
+
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
   // Only set the nullspace if we have a way of computing it and the result is non-empty.
   if (this->nullspace || this->nullspace_object)
@@ -617,8 +730,13 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
       this->build_mat_null_space(this->nullspace_object, this->nullspace, &msp);
       if (msp)
         {
-          ierr = MatSetNullSpace(jac->mat(), msp);
+          ierr = MatSetNullSpace(pre->mat(), msp);
           LIBMESH_CHKERR(ierr);
+          if (_solve_type != STANDARD)
+          {
+            ierr = MatSetNullSpace(J, msp);
+            LIBMESH_CHKERR(ierr);
+          }
 
           ierr = MatNullSpaceDestroy(&msp);
           LIBMESH_CHKERR(ierr);
@@ -635,8 +753,13 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
       this->build_mat_null_space(this->transpose_nullspace_object, this->transpose_nullspace, &msp);
       if (msp)
         {
-          ierr = MatSetTransposeNullSpace(jac->mat(), msp);
+          ierr = MatSetTransposeNullSpace(pre->mat(), msp);
           LIBMESH_CHKERR(ierr);
+          if (_solve_type != STANDARD)
+          {
+            ierr = MatSetTransposeNullSpace(J, msp);
+            LIBMESH_CHKERR(ierr);
+          }
 
           ierr = MatNullSpaceDestroy(&msp);
           LIBMESH_CHKERR(ierr);
@@ -652,14 +775,20 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
 
       if (msp)
         {
-          ierr = MatSetNearNullSpace(jac->mat(), msp);
+          ierr = MatSetNearNullSpace(pre->mat(), msp);
           LIBMESH_CHKERR(ierr);
+          if (_solve_type != STANDARD)
+          {
+            ierr = MatSetNearNullSpace(J, msp);
+            LIBMESH_CHKERR(ierr);
+          }
 
           ierr = MatNullSpaceDestroy(&msp);
           LIBMESH_CHKERR(ierr);
         }
     }
 #endif
+
   // Have the Krylov subspace method use our good initial guess rather than 0
   KSP ksp;
   ierr = SNESGetKSP (_snes, &ksp);
@@ -688,7 +817,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // System Jacobian M
   //Set the preconditioning matrix
   if (this->_preconditioner)
     {
-      this->_preconditioner->set_matrix(jac_in);
+      this->_preconditioner->set_matrix(pre_in);
       this->_preconditioner->init();
     }
 
