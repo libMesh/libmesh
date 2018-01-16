@@ -163,14 +163,28 @@ public:
    */
   enum SolveType
   {
-    MF_OPERATOR, ///< Preconditioned Jacobian-free Newton
-    MF,          ///< Jacobian-free Newton
-    STANDARD     ///< Newton with explicit matrix
+    MF_OPERATOR, ///< Preconditioned Jacobian-free Newton-Krylov
+    MF,          ///< Jacobian-free Newton-Krylov
+    STANDARD     ///< Newton-Krylov with explicit matrix
   };
 
-  SolveType solve_type;
+  /**
+   * \returns A constant reference to our solve type
+   */
+  const SolveType & solve_type() const { return _solve_type; }
+
+  /**
+   * \returns A writable reference to our solve type
+   */
+  SolveType & solve_type() { return _solve_type; }
 
 protected:
+
+  /**
+   * Stores the Petsc solve type
+   */
+  SolveType _solve_type;
+
   /**
    * Nonlinear solver context
    */

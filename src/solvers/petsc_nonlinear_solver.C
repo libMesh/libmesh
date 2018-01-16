@@ -452,7 +452,7 @@ extern "C"
 template <typename T>
 PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   NonlinearSolver<T>(system_in),
-  solve_type(STANDARD),
+  _solve_type(STANDARD),
   _reason(SNES_CONVERGED_ITERATING/*==0*/), // Arbitrary initial value...
   _n_linear_iterations(0),
   _current_nonlinear_iteration_number(0),
@@ -709,13 +709,13 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
 
   // Take care of case where the user specifies matrix-free jacobian
   Mat J;
-  if (solve_type != STANDARD)
+  if (_solve_type != STANDARD)
   {
       ierr = MatCreateSNESMF(_snes, &J);
       LIBMESH_CHKERR(ierr);
       ierr = MatMFFDSetFunction(J, __libmesh_petsc_snes_mffd_interface, this);
       LIBMESH_CHKERR(ierr);
-      if (solve_type == MF_OPERATOR)
+      if (_solve_type == MF_OPERATOR)
         ierr = SNESSetJacobian(_snes, J, 0, 0, 0);
       else
         ierr = SNESSetJacobian(_snes, J, J, MatMFFDComputeJacobian, 0);
@@ -732,7 +732,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
         {
           ierr = MatSetNullSpace(pre->mat(), msp);
           LIBMESH_CHKERR(ierr);
-          if (solve_type != STANDARD)
+          if (_solve_type != STANDARD)
           {
             ierr = MatSetNullSpace(J, msp);
             LIBMESH_CHKERR(ierr);
@@ -755,7 +755,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
         {
           ierr = MatSetTransposeNullSpace(pre->mat(), msp);
           LIBMESH_CHKERR(ierr);
-          if (solve_type != STANDARD)
+          if (_solve_type != STANDARD)
           {
             ierr = MatSetTransposeNullSpace(J, msp);
             LIBMESH_CHKERR(ierr);
@@ -777,7 +777,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
         {
           ierr = MatSetNearNullSpace(pre->mat(), msp);
           LIBMESH_CHKERR(ierr);
-          if (solve_type != STANDARD)
+          if (_solve_type != STANDARD)
           {
             ierr = MatSetNearNullSpace(J, msp);
             LIBMESH_CHKERR(ierr);
