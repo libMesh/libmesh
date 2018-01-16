@@ -3137,6 +3137,14 @@ void DofMap::process_constraints (MeshBase & mesh)
   // non-local constraints that we'll need to take into account.
   this->allgather_recursive_constraints(mesh);
 
+  if(_error_on_cyclic_constraint)
+  {
+    // Optionally check for cyclic constraints and throw an error
+    // if they're detected. We always do this check below in dbg/devel
+    // mode but here we optionally do it in opt mode as well.
+    check_for_cyclic_constraints();
+  }
+
   // Create a set containing the DOFs we already depend on
   typedef std::set<dof_id_type> RCSet;
   RCSet unexpanded_set;
@@ -3191,6 +3199,9 @@ void DofMap::process_constraints (MeshBase & mesh)
                    it=subconstraint_row.begin();
                  it != subconstraint_row.end(); ++it)
               {
+                // Assert that the constraint is not cyclic.
+                libmesh_assert(it->first != expandable);
+
                 constraint_row[it->first] += it->second * this_coef;
               }
             DofConstraintValueMap::const_iterator subrhsit =
@@ -3232,6 +3243,116 @@ void DofMap::process_constraints (MeshBase & mesh)
   // them to the send_list
   this->add_constraints_to_send_list();
 }
+
+
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+void DofMap::check_for_cyclic_constraints()
+{
+  // Create a set containing the DOFs we already depend on
+  typedef std::set<dof_id_type> RCSet;
+  RCSet unexpanded_set;
+
+  // Use dof_constraints_copy in this method so that we don't
+  // mess with _dof_constraints.
+  DofConstraints dof_constraints_copy = _dof_constraints;
+
+  for (DofConstraints::iterator i = dof_constraints_copy.begin();
+       i != dof_constraints_copy.end(); ++i)
+    unexpanded_set.insert(i->first);
+
+  while (!unexpanded_set.empty())
+    for (RCSet::iterator i = unexpanded_set.begin();
+         i != unexpanded_set.end(); /* nothing */)
+      {
+        // If the DOF is constrained
+        DofConstraints::iterator
+          pos = dof_constraints_copy.find(*i);
+
+        libmesh_assert (pos != dof_constraints_copy.end());
+
+        DofConstraintRow & constraint_row = pos->second;
+
+        // Comment out "rhs" parts of this method copied from process_constraints
+        // DofConstraintValueMap::iterator rhsit =
+        //   _primal_constraint_values.find(*i);
+        // Number constraint_rhs = (rhsit == _primal_constraint_values.end()) ?
+        //   0 : rhsit->second;
+
+        std::vector<dof_id_type> constraints_to_expand;
+
+        for (DofConstraintRow::const_iterator
+               it=constraint_row.begin(); it != constraint_row.end();
+             ++it)
+          if (it->first != *i && this->is_constrained_dof(it->first))
+            {
+              unexpanded_set.insert(it->first);
+              constraints_to_expand.push_back(it->first);
+            }
+
+        for (std::size_t j = 0; j != constraints_to_expand.size();
+             ++j)
+          {
+            dof_id_type expandable = constraints_to_expand[j];
+
+            const Real this_coef = constraint_row[expandable];
+
+            DofConstraints::const_iterator
+              subpos = dof_constraints_copy.find(expandable);
+
+            libmesh_assert (subpos != dof_constraints_copy.end());
+
+            const DofConstraintRow & subconstraint_row = subpos->second;
+
+            for (DofConstraintRow::const_iterator
+                   it=subconstraint_row.begin();
+                 it != subconstraint_row.end(); ++it)
+              {
+
+                if(it->first == expandable)
+                  {
+                    libmesh_error_msg("Cyclic constraint detected");
+                  }
+
+                constraint_row[it->first] += it->second * this_coef;
+              }
+
+            // Comment out "rhs" parts of this method copied from process_constraints
+            // DofConstraintValueMap::const_iterator subrhsit =
+            //   _primal_constraint_values.find(expandable);
+            // if (subrhsit != _primal_constraint_values.end())
+            //   constraint_rhs += subrhsit->second * this_coef;
+
+            constraint_row.erase(expandable);
+          }
+
+        // Comment out "rhs" parts of this method copied from process_constraints
+        // if (rhsit == _primal_constraint_values.end())
+        //   {
+        //     if (constraint_rhs != Number(0))
+        //       _primal_constraint_values[*i] = constraint_rhs;
+        //     else
+        //       _primal_constraint_values.erase(*i);
+        //   }
+        // else
+        //   {
+        //     if (constraint_rhs != Number(0))
+        //       rhsit->second = constraint_rhs;
+        //     else
+        //       _primal_constraint_values.erase(rhsit);
+        //   }
+
+        if (constraints_to_expand.empty())
+          unexpanded_set.erase(i++);
+        else
+          ++i;
+      }
+}
+#else
+void DofMap::check_for_cyclic_constraints()
+{
+  // Do nothing
+}
+#endif
 
 
 void DofMap::scatter_constraints(MeshBase & mesh)

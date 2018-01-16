@@ -433,6 +433,14 @@ public:
   void add_variable_group (const VariableGroup & var_group);
 
   /**
+   * Specify whether or not we perform an extra (opt-mode enabled) check
+   * for cyclic constraints. If a cyclic constraint is present then
+   * the system constraints are not valid, so if \p error_on_cyclic_constraint
+   * is true we will throw an error in this case.
+   */
+  void set_error_on_cyclic_constraint(bool error_on_cyclic_constraint);
+
+  /**
    * \returns The \p VariableGroup description object for group \p g.
    */
   const VariableGroup & variable_group (const unsigned int c) const;
@@ -783,6 +791,13 @@ public:
    * user constraints have all been added.
    */
   void process_constraints (MeshBase &);
+
+  /**
+   * Throw an error if we detect and cyclic constraints, since these
+   * are not supported by libMesh and give erroneous results if they
+   * are present.
+   */
+  void check_for_cyclic_constraints();
 
   /**
    * Adds a copy of the user-defined row to the constraint matrix, using
@@ -1402,6 +1417,12 @@ private:
   void add_constraints_to_send_list();
 
 #endif // LIBMESH_ENABLE_CONSTRAINTS
+
+  /**
+   * This flag indicates whether or not we do an opt-mode check for
+   * the presence of cyclic constraints.
+   */
+  bool _error_on_cyclic_constraint;
 
   /**
    * The finite element type for each variable.
