@@ -716,9 +716,9 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
       ierr = MatMFFDSetFunction(J, __libmesh_petsc_snes_mffd_interface, this);
       LIBMESH_CHKERR(ierr);
       if (_solve_type == MF_OPERATOR)
-        ierr = SNESSetJacobian(_snes, J, 0, 0, 0);
+        ierr = SNESSetJacobian(_snes, J, PETSC_NULL, PETSC_NULL, PETSC_NULL);
       else
-        ierr = SNESSetJacobian(_snes, J, J, MatMFFDComputeJacobian, 0);
+        ierr = SNESSetJacobian(_snes, J, J, MatMFFDComputeJacobian, PETSC_NULL);
       LIBMESH_CHKERR(ierr);
   }
 
