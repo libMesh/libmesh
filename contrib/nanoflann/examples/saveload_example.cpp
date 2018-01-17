@@ -28,6 +28,7 @@
 
 #include <nanoflann.hpp>
 #include "utils.h"
+
 #include <ctime>
 #include <cstdlib>
 #include <iostream>
@@ -35,52 +36,58 @@
 using namespace std;
 using namespace nanoflann;
 
-template <typename num_t>
-void kdtree_demo(const size_t N)
+void kdtree_save_load_demo(const size_t N)
 {
-	PointCloud<num_t> cloud;
+	PointCloud<double> cloud;
 
 	// Generate points:
 	generateRandomPointCloud(cloud, N);
 
-	num_t query_pt[3] = { 0.5, 0.5, 0.5 };
+	double query_pt[3] = { 0.5, 0.5, 0.5 };
+
 
 	// construct a kd-tree index:
 	typedef KDTreeSingleIndexAdaptor<
-		L2_Simple_Adaptor<num_t, PointCloud<num_t> > ,
-		PointCloud<num_t>,
+		L2_Simple_Adaptor<double, PointCloud<double> > ,
+		PointCloud<double>,
 		3 /* dim */
 		> my_kd_tree_t;
 
-	dump_mem_usage();
 
-	my_kd_tree_t   index(3 /*dim*/, cloud, KDTreeSingleIndexAdaptorParams(10 /* max leaf */) );
-	index.buildIndex();
-
-	dump_mem_usage();
+	// Construct the index and save it:
+	// --------------------------------------------
 	{
+		my_kd_tree_t   index(3 /*dim*/, cloud, KDTreeSingleIndexAdaptorParams(10 /* max leaf */) );
+		index.buildIndex();
+
+		FILE *f = fopen("index.bin", "wb");
+		if (!f) throw std::runtime_error("Error writing index file!");
+		index.saveIndex(f);
+		fclose(f);
+	}
+
+
+	// Load the index from disk:
+	// --------------------------------------------
+	{
+		// Important: construct the index associated to the same dataset, since data points are NOT stored in the binary file.
+		my_kd_tree_t   index(3 /*dim*/, cloud, KDTreeSingleIndexAdaptorParams(10 /* max leaf */) );
+
+		FILE *f = fopen("index.bin", "rb");
+		if (!f) throw std::runtime_error("Error reading index file!");
+		index.loadIndex(f);
+		fclose(f);
+
 		// do a knn search
 		const size_t num_results = 1;
 		size_t ret_index;
-		num_t out_dist_sqr;
-		nanoflann::KNNResultSet<num_t> resultSet(num_results);
+		double out_dist_sqr;
+		nanoflann::KNNResultSet<double> resultSet(num_results);
 		resultSet.init(&ret_index, &out_dist_sqr );
 		index.findNeighbors(resultSet, &query_pt[0], nanoflann::SearchParams(10));
 
 		std::cout << "knnSearch(nn="<<num_results<<"): \n";
 		std::cout << "ret_index=" << ret_index << " out_dist_sqr=" << out_dist_sqr << endl;
-	}
-	{
-		// Unsorted radius search:
-		const num_t radius = 1;
-		std::vector<std::pair<size_t, num_t> > indices_dists;
-		RadiusResultSet<num_t,size_t> resultSet(radius, indices_dists);
-
-		index.findNeighbors(resultSet, query_pt, nanoflann::SearchParams());
-
-		// Get worst (furthest) point, without sorting:
-		std::pair<size_t,num_t> worst_pair = resultSet.worst_item();
-		cout << "Worst pair: idx=" << worst_pair.first << " dist=" << worst_pair.second << endl;
 	}
 
 }
@@ -89,7 +96,6 @@ int main()
 {
 	// Randomize Seed
 	srand(time(NULL));
-	kdtree_demo<float>(1000000);
-	kdtree_demo<double>(1000000);
+	kdtree_save_load_demo(100000);
 	return 0;
 }
