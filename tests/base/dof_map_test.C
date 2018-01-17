@@ -24,6 +24,35 @@
 
 using namespace libMesh;
 
+// This class is used by testCyclicConstraintDetection
+class MyConstraint : public System::Constraint
+{
+private:
+
+  System & _sys;
+
+public:
+
+  MyConstraint( System & sys ) : Constraint(), _sys(sys) {}
+
+  virtual ~MyConstraint() {}
+
+  void constrain()
+  {
+    {
+      const dof_id_type constrained_dof_index = 0;
+      DofConstraintRow constraint_row;
+      constraint_row[1] = 1.0;
+      _sys.get_dof_map().add_constraint_row( constrained_dof_index, constraint_row, 0., true);
+    }
+    {
+      const dof_id_type constrained_dof_index = 1;
+      DofConstraintRow constraint_row;
+      constraint_row[0] = 1.0;
+      _sys.get_dof_map().add_constraint_row( constrained_dof_index, constraint_row, 0., true);
+    }
+  }
+};
 
 
 class DofMapTest : public CppUnit::TestCase {
@@ -34,6 +63,10 @@ public:
   CPPUNIT_TEST( testDofOwnerOnQuad9 );
   CPPUNIT_TEST( testDofOwnerOnTri6 );
   CPPUNIT_TEST( testDofOwnerOnHex27 );
+
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+  CPPUNIT_TEST( testCyclicConstraintDetection );
+#endif // LIBMESH_ENABLE_CONSTRAINTS
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -87,6 +120,28 @@ public:
   void testDofOwnerOnQuad9() { testDofOwner(QUAD9); }
   void testDofOwnerOnTri6()  { testDofOwner(TRI6); }
   void testDofOwnerOnHex27() { testDofOwner(HEX27); }
+
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+  void testCyclicConstraintDetection()
+  {
+    Mesh mesh(*TestCommWorld);
+
+    EquationSystems es(mesh);
+    System & sys = es.add_system<System> ("SimpleSystem");
+    sys.add_variable("u", FIRST);
+
+    MyConstraint my_constraint(sys);
+    sys.attach_constraint_object(my_constraint);
+
+    MeshTools::Generation::build_square (mesh,4,4,-1., 1.,-1., 1., QUAD4);
+
+    // Tell the dof_map to check for cyclic constraints
+    DofMap & dof_map = sys.get_dof_map();
+    dof_map.set_error_on_cyclic_constraint(true);
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("Cyclic constraint not detected", es.init(), libMesh::LogicError);
+  }
+#endif // LIBMESH_ENABLE_CONSTRAINTS
 
 };
 

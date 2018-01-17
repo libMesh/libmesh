@@ -128,6 +128,7 @@ DofMap::DofMap(const unsigned int number,
                MeshBase & mesh) :
   ParallelObject (mesh.comm()),
   _dof_coupling(libmesh_nullptr),
+  _error_on_cyclic_constraint(false),
   _variables(),
   _variable_groups(),
   _sys_number(number),
@@ -228,6 +229,12 @@ bool DofMap::is_periodic_boundary (const boundary_id_type boundaryid) const
 //   libmesh_not_implemented();
 //   _variables.push_back (var);
 // }
+
+
+void DofMap::set_error_on_cyclic_constraint(bool error_on_cyclic_constraint)
+{
+  _error_on_cyclic_constraint = error_on_cyclic_constraint;
+}
 
 
 
