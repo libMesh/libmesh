@@ -49,6 +49,20 @@ public:
 
 private:
 
+  //! Takes System, empty PetscSection and populates the PetscSection
+  /**
+   * Take the System in its current take and an empty PetscSection and then
+   * populate the PetscSection. The PetscSection is comprised of global "point"
+   * numbers, where a "point" in PetscDM parlance is a geometric entity: node, edge,
+   * face, or element. Then, we also add the DoF numbering for each variable
+   * for each of the "points". The PetscSection, together the with PetscSF
+   * will allow for recursive fieldsplits from the command line using PETSc.
+   *
+   * TODO: Currently only populates nodal DoF data. Need to generalize
+   *       to edge, face, and interior DoFs as well.
+   */
+  void build_section(const System & system, PetscSection & section);
+
   //! Helper function for build_section.
   /**
    * This function will set the id for each "point" on the current processor within

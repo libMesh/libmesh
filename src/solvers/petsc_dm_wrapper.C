@@ -29,6 +29,39 @@
 namespace libMesh
 {
 
+void PetscDMWrapper::build_section( const System & system, PetscSection & section )
+{
+  START_LOG ("build_section", "PetscDMWrapper");
+
+  PetscErrorCode ierr;
+  ierr = PetscSectionCreate(system.comm().get(),&section);
+  CHKERRABORT(system.comm().get(),ierr);
+
+  ierr = PetscSectionSetNumFields(section,system.n_vars());
+  CHKERRABORT(system.comm().get(),ierr);
+
+  // First, set the actual names of all the fields variables we are interested in
+  for( unsigned int v = 0; v < system.n_vars(); v++ )
+    {
+      ierr = PetscSectionSetFieldName( section, v, system.variable_name(v).c_str() );
+      CHKERRABORT(system.comm().get(),ierr);
+    }
+
+  // Set "points" count into the section. A "point" in PETSc nomenclature
+  // is a geometric object that can have dofs associated with it, e.g.
+  // Node, Edge, Face, Elem. First we tell the PetscSection about all of our
+  // points.
+  this->set_point_range_in_section(system, section);
+
+  // Now build up the dofs per "point" in the PetscSection
+  this->add_dofs_to_section(system, section);
+
+  // Final setup of PetscSection
+  ierr = PetscSectionSetUp(section);CHKERRABORT(system.comm().get(),ierr);
+
+  STOP_LOG ("build_section", "PetscDMWrapper");
+}
+
 void PetscDMWrapper::set_point_range_in_section( const System & system, PetscSection & section)
 {
   const MeshBase & mesh = system.get_mesh();
