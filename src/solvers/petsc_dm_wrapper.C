@@ -23,6 +23,7 @@
 
 #include "libmesh/system.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
 
 namespace libMesh
@@ -79,6 +80,72 @@ void PetscDMWrapper::set_point_range_in_section( const System & system, PetscSec
 
   PetscErrorCode ierr = PetscSectionSetChart(section, pstart, pend);
   CHKERRABORT(system.comm().get(),ierr);
+}
+
+void PetscDMWrapper::add_dofs_to_section( const System & system, PetscSection & section )
+{
+  const MeshBase & mesh = system.get_mesh();
+  const DofMap & dof_map = system.get_dof_map();
+
+  PetscErrorCode ierr;
+
+  // Now we go through and add dof information for each point object.
+  // We do this by looping through all the elements on this processor
+  // and add associated dofs with that element
+  // TODO: Currently, we're only adding the dofs at nodes! We need to generalize
+  //       beyond nodal FEM!
+  for (MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
+       el != mesh.active_local_elements_end(); el++)
+    {
+      const Elem * elem = *el;
+
+      if (mesh.query_elem_ptr(elem->id()))
+        {
+          // We need to keep a count of total dofs at each point
+          // for the PetscSectionSetDof call at the end.
+          std::map<unsigned int, unsigned int> global_dofs;
+
+          // Now set the dof for each field
+          for( unsigned int v = 0; v < system.n_vars(); v++ )
+            {
+              std::vector<dof_id_type> dof_indices;
+              dof_map.dof_indices( elem, dof_indices, v );
+
+              // Right now, we're assuming at most one dof per node
+              // TODO:  Need to remove this assumption of at most one dof per node
+              for( unsigned int n = 0; n < dof_indices.size(); n++ )
+                {
+                  dof_id_type index = dof_indices[n];
+
+                  // Check if this dof index is on this processor. If so, we count it.
+                  if( index >= dof_map.first_dof() && index < dof_map.end_dof() )
+                    {
+                      // TODO: Need to remove this assumption of at most one dof per node
+                      PetscInt n_dofs_at_node = 1;
+
+                      dof_id_type global_node = elem->node(n);
+
+                      ierr = PetscSectionSetFieldDof( section, global_node, v, n_dofs_at_node );
+                      CHKERRABORT(system.comm().get(),ierr);
+
+                      global_dofs[global_node] += 1;
+                    }
+                }
+            }
+
+          // [PB]: This is redundant, but PETSc needed it at the time of writing. Perhaps
+          //       it will be fixed upstream at some point.
+          for( std::map<unsigned int, unsigned int>::const_iterator it = global_dofs.begin();
+               it != global_dofs.end(); ++it )
+            {
+              unsigned int global_node = it->first;
+              unsigned int total_n_dofs_at_node = it->second;
+
+              ierr = PetscSectionSetDof( section, global_node, total_n_dofs_at_node );
+              CHKERRABORT(system.comm().get(),ierr);
+            }
+        }
+    }
 }
 
 } // end namespace libMesh

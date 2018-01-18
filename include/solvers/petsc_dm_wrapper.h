@@ -56,6 +56,13 @@ private:
    */
   void set_point_range_in_section( const System & system, PetscSection & section);
 
+  //! Helper function for build_section.
+  /**
+   * This function will set the DoF info for each "point" in the PetscSection.
+   * Should be O(n_active_local_elems).
+   */
+  void add_dofs_to_section( const System & system, PetscSection & section );
+
 };
 
 }
