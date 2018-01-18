@@ -49,6 +49,49 @@ void PetscDMWrapper::clear()
   _star_forests.clear();
 }
 
+void PetscDMWrapper::build_section( const System & system, PetscSection & section )
+{
+  START_LOG ("build_section()", "PetscDMWrapper");
+
+  PetscErrorCode ierr;
+  ierr = PetscSectionCreate(system.comm().get(),&section);
+  CHKERRABORT(system.comm().get(),ierr);
+
+  // Tell the PetscSection about all of our System variables
+  ierr = PetscSectionSetNumFields(section,system.n_vars());
+  CHKERRABORT(system.comm().get(),ierr);
+
+  // Set the actual names of all the field variables
+  for( unsigned int v = 0; v < system.n_vars(); v++ )
+    {
+      ierr = PetscSectionSetFieldName( section, v, system.variable_name(v).c_str() );
+      CHKERRABORT(system.comm().get(),ierr);
+    }
+
+  // For building the section, we need to create local-to-global map
+  // of local "point" ids to the libMesh global id of that point.
+  // A "point" in PETSc nomenclature is a geometric object that can have
+  // dofs associated with it, e.g. Node, Edge, Face, Elem.
+  // The numbering PETSc expects is continuous for the local numbering.
+  // Since we're only using this interface for solvers, then we can just
+  // assign whatever local id to any of the global ids. But it is local
+  // so we don't need to worry about processor numbering for the local
+  // point ids.
+  std::unordered_map<dof_id_type,dof_id_type> node_map;
+
+  // First we tell the PetscSection about all of our points that have
+  // dofs associated with them.
+  this->set_point_range_in_section(system, section, node_map);
+
+  // Now we can build up the dofs per "point" in the PetscSection
+  this->add_dofs_to_section(system, section, node_map);
+
+  // Final setup of PetscSection
+  ierr = PetscSectionSetUp(section);CHKERRABORT(system.comm().get(),ierr);
+
+  STOP_LOG ("build_section()", "PetscDMWrapper");
+}
+
 void PetscDMWrapper::set_point_range_in_section (const System & system,
                                                  PetscSection & section,
                                                  std::unordered_map<dof_id_type,dof_id_type> & node_map)
