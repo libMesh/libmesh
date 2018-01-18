@@ -91,6 +91,9 @@ void PetscDMWrapper::build_section( const System & system, PetscSection & sectio
   // Final setup of PetscSection
   ierr = PetscSectionSetUp(section);CHKERRABORT(system.comm().get(),ierr);
 
+  // Sanity checking at least that local_n_dofs match
+  libmesh_assert_equal_to(system.n_local_dofs(),this->check_section_n_dofs(system, section));
+
   STOP_LOG ("build_section()", "PetscDMWrapper");
 }
 
@@ -313,6 +316,27 @@ void PetscDMWrapper::add_dofs_to_section (const System & system,
         }
     }
 
+}
+
+dof_id_type PetscDMWrapper::check_section_n_dofs( const System & system, PetscSection & section )
+{
+  PetscInt n_local_dofs = 0;
+
+  // Grap the starting and ending points from the section
+  PetscInt pstart, pend;
+  PetscErrorCode ierr = PetscSectionGetChart(section, &pstart, &pend);
+  CHKERRABORT(system.comm().get(),ierr);
+
+  // Count up the n_dofs for each point from the section
+  for( PetscInt p = pstart; p < pend; p++ )
+    {
+      PetscInt n_dofs;
+      ierr = PetscSectionGetDof(section,p,&n_dofs);CHKERRABORT(system.comm().get(),ierr);
+      n_local_dofs += n_dofs;
+    }
+
+  static_assert(sizeof(PetscInt) == sizeof(dof_id_type),"PetscInt is not a dof_id_type!");
+  return n_local_dofs;
 }
 
 void PetscDMWrapper::init_dm_data(unsigned int n_levels)

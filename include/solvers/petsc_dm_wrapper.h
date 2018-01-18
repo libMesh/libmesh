@@ -129,6 +129,13 @@ private:
                             const std::unordered_map<dof_id_type,dof_id_type> & elem_map,
                             const std::map<dof_id_type,unsigned int> & scalar_map);
 
+  //! Helper function to sanity check PetscSection construction
+  /**
+   * The PetscSection contains local dof information. This helper function just facilitates
+   * sanity checking that in fact it only has n_local_dofs.
+   */
+  dof_id_type check_section_n_dofs( const System & system, PetscSection & section );
+
 };
 
 }
