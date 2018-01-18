@@ -370,6 +370,7 @@ BUILT_SOURCES = \
         optimization_solver.h \
         petsc_auto_fieldsplit.h \
         petsc_diff_solver.h \
+        petsc_dm_wrapper.h \
         petsc_linear_solver.h \
         petsc_nonlinear_solver.h \
         petscdmlibmesh.h \
@@ -1633,6 +1634,9 @@ petsc_auto_fieldsplit.h: $(top_srcdir)/include/solvers/petsc_auto_fieldsplit.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_diff_solver.h: $(top_srcdir)/include/solvers/petsc_diff_solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+petsc_dm_wrapper.h: $(top_srcdir)/include/solvers/petsc_dm_wrapper.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_linear_solver.h: $(top_srcdir)/include/solvers/petsc_linear_solver.h
