@@ -77,6 +77,13 @@ private:
    */
   void add_dofs_to_section( const System & system, PetscSection & section );
 
+  //! Helper function to sanity check PetscSection construction
+  /**
+   * I needed this originally to help check parallel cases and the (what I think is)
+   * the redundant call to PetscSectionSetDof within add_dofs_to_section.
+   */
+  void check_section_n_dofs_match( const System & system, PetscSection & section );
+
 };
 
 }

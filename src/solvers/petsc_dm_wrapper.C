@@ -59,6 +59,11 @@ void PetscDMWrapper::build_section( const System & system, PetscSection & sectio
   // Final setup of PetscSection
   ierr = PetscSectionSetUp(section);CHKERRABORT(system.comm().get(),ierr);
 
+  // Sanity checking at least that total n_dofs match
+#ifndef NDEBUG
+  this->check_section_n_dofs_match(system, section);
+#endif
+
   STOP_LOG ("build_section", "PetscDMWrapper");
 }
 
@@ -179,6 +184,27 @@ void PetscDMWrapper::add_dofs_to_section( const System & system, PetscSection & 
             }
         }
     }
+}
+
+void PetscDMWrapper::check_section_n_dofs_match( const System & system, PetscSection & section )
+{
+  PetscInt total_n_dofs = 0;
+
+  // Grap the starting and ending points from the section
+  PetscInt pstart, pend;
+  PetscErrorCode ierr = PetscSectionGetChart(section, &pstart, &pend);
+  CHKERRABORT(system.comm().get(),ierr);
+
+  // Count up the n_dofs for each point from the section
+  for( PetscInt p = pstart; p < pend+1; p++ )
+    {
+      PetscInt n_dofs;
+      ierr = PetscSectionGetDof(section,p,&n_dofs);CHKERRABORT(system.comm().get(),ierr);
+      total_n_dofs += n_dofs;
+    }
+
+  // That should match the n_local_dofs for our system
+  libmesh_assert_equal_to(total_n_dofs,(PetscInt)system.n_local_dofs());
 }
 
 } // end namespace libMesh
