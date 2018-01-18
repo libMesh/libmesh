@@ -926,6 +926,7 @@ include_HEADERS = \
         solvers/optimization_solver.h \
         solvers/petsc_auto_fieldsplit.h \
         solvers/petsc_diff_solver.h \
+        solvers/petsc_dm_wrapper.h \
         solvers/petsc_linear_solver.h \
         solvers/petsc_nonlinear_solver.h \
         solvers/petscdmlibmesh.h \

@@ -604,7 +604,7 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	memory_solution_history.h newmark_solver.h newton_solver.h \
 	nlopt_optimization_solver.h no_solution_history.h \
 	nonlinear_solver.h optimization_solver.h \
-	petsc_auto_fieldsplit.h petsc_diff_solver.h \
+	petsc_auto_fieldsplit.h petsc_diff_solver.h petsc_dm_wrapper.h \
 	petsc_linear_solver.h petsc_nonlinear_solver.h \
 	petscdmlibmesh.h second_order_unsteady_solver.h \
 	slepc_eigen_solver.h slepc_macro.h solution_history.h \
@@ -1910,6 +1910,9 @@ petsc_auto_fieldsplit.h: $(top_srcdir)/include/solvers/petsc_auto_fieldsplit.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_diff_solver.h: $(top_srcdir)/include/solvers/petsc_diff_solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+petsc_dm_wrapper.h: $(top_srcdir)/include/solvers/petsc_dm_wrapper.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_linear_solver.h: $(top_srcdir)/include/solvers/petsc_linear_solver.h
