@@ -367,6 +367,7 @@ libmesh_SOURCES =  \
         src/solvers/optimization_solver.C \
         src/solvers/petsc_auto_fieldsplit.C \
         src/solvers/petsc_diff_solver.C \
+        src/solvers/petsc_dm_wrapper.C \
         src/solvers/petsc_linear_solver.C \
         src/solvers/petsc_nonlinear_solver.C \
         src/solvers/petscdmlibmesh.C \
