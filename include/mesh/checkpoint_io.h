@@ -35,6 +35,16 @@ namespace libMesh
 {
 // Forward declarations
 class Xdr;
+class CheckpointIO;
+
+/**
+ * split_mesh takes the given initialized/opened mesh and partitions it into nsplits pieces or
+ * chunks.  It returns a CheckpointIO object that can be used to write the mesh chunks into
+ * individual files (e.g. by calling checkpoint_obj.write(out_file_name)) - the number of files is
+ * equal to the number of chunks.  This function supports MPI parallelism and can be used with
+ * several MPI procs to speed up splitting.
+ */
+std::unique_ptr<CheckpointIO> split_mesh(MeshBase & mesh, unsigned int nsplits);
 
 /**
  * The CheckpointIO class can be used to write simplified restart
