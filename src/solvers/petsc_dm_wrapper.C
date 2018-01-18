@@ -24,6 +24,7 @@
 #include "libmesh/petsc_dm_wrapper.h"
 #include "libmesh/system.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
 #include "libmesh/dof_map.h"
 
@@ -136,6 +137,54 @@ void PetscDMWrapper::set_point_range_in_section (const System & system,
 
   PetscErrorCode ierr = PetscSectionSetChart(section, pstart, pend);
   CHKERRABORT(system.comm().get(),ierr);
+}
+
+void PetscDMWrapper::add_dofs_to_section (const System & system,
+                                          PetscSection & section,
+                                          const std::unordered_map<dof_id_type,dof_id_type> & node_map)
+{
+  const MeshBase & mesh = system.get_mesh();
+
+  PetscErrorCode ierr;
+
+  // Now we go through and add dof information for each "point".
+  // In libMesh, for most finite elements, we just associate those DoFs with the
+  // geometric nodes. So can we loop over the nodes we cached in the node_map and
+  // the DoFs for each field for that node. We need to give PETSc the local id
+  // we built up in the node map.
+  //
+  // TODO: Currently, we're only adding the dofs at nodes! We need to generalize
+  //       for element interior DoFs as well!
+  for (const auto & nmap : node_map )
+    {
+      const dof_id_type global_node_id = nmap.first;
+      const dof_id_type local_node_id = nmap.second;
+
+      libmesh_assert( mesh.query_node_ptr(global_node_id) );
+
+      const Node & node = mesh.node_ref(global_node_id);
+
+      unsigned int total_n_dofs_at_node = 0;
+
+      // We are assuming variables are also numbered 0 to n_vars()-1
+      for( unsigned int v = 0; v < system.n_vars(); v++ )
+        {
+          unsigned int n_dofs_at_node = node.n_dofs(system.number(), v);
+
+          if( n_dofs_at_node > 0 )
+            {
+              ierr = PetscSectionSetFieldDof( section, local_node_id, v, n_dofs_at_node );
+              CHKERRABORT(system.comm().get(),ierr);
+
+              total_n_dofs_at_node += n_dofs_at_node;
+            }
+        }
+
+      libmesh_assert_equal_to(total_n_dofs_at_node, node.n_dofs(system.number()));
+
+      ierr = PetscSectionSetDof( section, local_node_id, total_n_dofs_at_node );
+      CHKERRABORT(system.comm().get(),ierr);
+    }
 }
 
 void PetscDMWrapper::init_dm_data(unsigned int n_levels)

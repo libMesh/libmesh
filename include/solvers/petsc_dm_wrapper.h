@@ -105,6 +105,14 @@ private:
                                    PetscSection & section,
                                    std::unordered_map<dof_id_type,dof_id_type> & node_map);
 
+  //! Helper function for build_section.
+  /**
+   * This function will set the DoF info for each "point" in the PetscSection.
+   */
+  void add_dofs_to_section (const System & system,
+                            PetscSection & section,
+                            const std::unordered_map<dof_id_type,dof_id_type> & node_map);
+
 };
 
 }
