@@ -63,8 +63,6 @@ int main (int argc, char ** argv)
 
   unsigned int num_ghost_layers = libMesh::command_line_value("--num-ghost-layers", 1);
 
-  Parallel::Communicator & comm = init.comm();
-
   ReplicatedMesh mesh(init.comm());
 
   // If the user has requested additional ghosted layers, we need to add a ghosting functor.
@@ -79,96 +77,23 @@ int main (int argc, char ** argv)
 
   mesh.read(filename);
 
-  MetisPartitioner partitioner;
-
   for (std::size_t i = 0; i < all_n_procs.size(); i++)
     {
       processor_id_type n_procs = all_n_procs[i];
+      libMesh::out << "splitting " << n_procs << " ways..." << std::endl;
 
-      libMesh::out << "\nWriting out files for " << n_procs << " processors...\n\n" << std::endl;
-
-      // Reset the partitioning each time after the first one
-      if (i > 0)
-        {
-          libMesh::out << "Resetting Partitioning" << std::endl;
-          partitioner.partition(mesh, 1);
-        }
-
-      libMesh::out << "Partitioning" << std::endl;
-
-      // Partition it to how we want it
-      partitioner.partition(mesh, n_procs);
-
-      mesh.print_info();
-
-      // When running in parallel each processor will write out a portion of the mesh files
-
-      processor_id_type num_chunks = n_procs / comm.size();
-      processor_id_type remaining_chunks = n_procs % comm.size();
-
-      processor_id_type my_num_chunks = num_chunks;
-
-      processor_id_type my_first_chunk = 0;
-
-      processor_id_type rank = comm.rank();
-      processor_id_type comm_size = comm.size();
-
-      if (n_procs >= comm_size) // More partitions than processors
-        {
-          if (remaining_chunks) // Means that it doesn't split up evenly
-            {
-              // Spread the remainder over the first few processors
-              // There will be "remaining_chunks" number of processors that will each
-              // get one extra chunk
-              if (rank < remaining_chunks)
-                {
-                  my_num_chunks += 1;
-                  my_first_chunk = my_num_chunks * rank;
-                }
-              else // The processors beyond the "first" set that don't get an extra chunk
-                {
-                  // The number of chunks dealt with by the first processors
-                  // num chunks         // num procs
-                  processor_id_type num_chunks_in_first_procs = (my_num_chunks + 1) * remaining_chunks;
-                  processor_id_type distance_to_first_procs = rank - remaining_chunks;
-
-                  my_first_chunk = num_chunks_in_first_procs + (my_num_chunks * distance_to_first_procs);
-                }
-            }
-          else // Splits evenly
-            my_first_chunk = my_num_chunks * rank;
-        }
-      else // More processors than partitions
-        {
-          if (rank < n_procs)
-            {
-              my_num_chunks = 1;
-              my_first_chunk = rank;
-            }
-          else
-            {
-              my_num_chunks = 0;
-              my_first_chunk = std::numeric_limits<processor_id_type>::max();
-            }
-        }
+      auto cpr = split_mesh(mesh, n_procs);
 
       if (!libMesh::on_command_line("--dry-run"))
         {
-          libMesh::out << "Writing " << my_num_chunks << " Files" << std::endl;
+          libMesh::out << "    * writing " << cpr->current_processor_ids().size() << " files per process..." << std::endl;
 
           const bool binary = !libMesh::on_command_line("--ascii");
 
-          CheckpointIO cpr(mesh);
-          cpr.current_processor_ids().clear();
-          for (unsigned int i = my_first_chunk; i < my_first_chunk + my_num_chunks; i++)
-            cpr.current_processor_ids().push_back(i);
-          cpr.current_n_processors() = n_procs;
-          cpr.parallel() = true;
-          cpr.binary() = binary;
+          cpr->binary() = binary;
           std::ostringstream outputname;
-          outputname << remove_extension(filename) << '.' << n_procs
-                     << (binary ? ".cpr" : ".cpa");
-          cpr.write(outputname.str());
+          outputname << remove_extension(filename) << (binary ? ".cpr" : ".cpa");
+          cpr->write(outputname.str());
         }
     }
 

@@ -38,12 +38,62 @@
 #include "libmesh/node.h"
 #include "libmesh/parallel.h"
 #include "libmesh/partitioner.h"
+#include "libmesh/metis_partitioner.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/xdr_io.h"
 #include "libmesh/xdr_cxx.h"
 
 namespace libMesh
 {
+
+namespace
+{
+// chunking computes the number of chunks and first-chunk-offset when splitting a mesh
+// into nsplits pieces using size procs for the given MPI rank.  The number of chunks and offset
+// are stored in nchunks and first_chunk respectively.
+void chunking(processor_id_type size, processor_id_type rank, unsigned int nsplits,
+              processor_id_type & nchunks, processor_id_type & first_chunk)
+{
+  if (nsplits % size == 0) // the chunks divide evenly over the processors
+    {
+      nchunks = nsplits / size;
+      first_chunk = nchunks * rank;
+      return;
+    }
+
+  int nextra = nsplits % size;
+  if (rank < nextra) // leftover chunks cause an extra chunk to be added to this processor
+    {
+      nchunks = nsplits / size + 1;
+      first_chunk = nchunks * rank;
+    }
+  else // no extra chunks, but first chunk is offset by extras on earlier ranks
+    {
+      nchunks = nsplits / size;
+      // account for the case where nchunks is zero where we want max int
+      first_chunk = std::max((int)((nchunks + 1) * (nsplits % size) + nchunks * (rank - nsplits % size)),
+                             (1 - (int)nchunks) * std::numeric_limits<int>::max());
+    }
+}
+} // namespace
+
+std::unique_ptr<CheckpointIO> split_mesh(MeshBase & mesh, unsigned int nsplits)
+{
+  mesh.partition(1);
+
+  processor_id_type my_num_chunks = 0;
+  processor_id_type my_first_chunk = 0;
+  chunking(mesh.comm().size(), mesh.comm().rank(), nsplits, my_num_chunks, my_first_chunk);
+
+  auto cpr = libmesh_make_unique<CheckpointIO>(mesh);
+  cpr->current_processor_ids().clear();
+  for (unsigned int i = my_first_chunk; i < my_first_chunk + my_num_chunks; i++)
+    cpr->current_processor_ids().push_back(i);
+  cpr->current_n_processors() = nsplits;
+  cpr->parallel() = true;
+  return cpr;
+}
+
 
 // ------------------------------------------------------------
 // CheckpointIO members
@@ -770,7 +820,7 @@ void CheckpointIO::read_subfile (Xdr & io, bool expect_all_remote)
   // read the nodesets
   this->read_nodesets<file_id_type> (io);
 }
- 
+
 
 
 template <typename file_id_type>
