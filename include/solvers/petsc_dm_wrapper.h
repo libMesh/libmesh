@@ -52,6 +52,8 @@ public:
 
   ~PetscDMWrapper(){};
 
+  void init_and_attach_petscdm(const System & system, SNES & snes);
+
 private:
 
   //! Vector of DMs for all grid levels

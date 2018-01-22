@@ -32,6 +32,50 @@
 namespace libMesh
 {
 
+void PetscDMWrapper::init_and_attach_petscdm(const System & system, SNES & snes)
+{
+  START_LOG ("init_and_attach_petscdm", "PetscDMWrapper");
+
+  PetscErrorCode ierr;
+
+  // Eventually, we'll traverse the mesh hierarchy and cache
+  // for each grid level, but for now, we're just using the
+  // finest level
+  unsigned int n_levels = 1;
+  this->init_dm_data(n_levels);
+
+  for(unsigned int level = 0; level < n_levels; level++)
+    {
+      DM & dm = this->get_dm(level);
+      PetscSection & section = this->get_section(level);
+      PetscSF & star_forest = this->get_star_forest(level);
+
+      ierr = DMShellCreate(system.comm().get(), &dm);
+      CHKERRABORT(system.comm().get(),ierr);
+
+      // Build the PetscSection and attach it to the DM
+      this->build_section(system, section);
+      ierr = DMSetDefaultSection(dm, section);
+      CHKERRABORT(system.comm().get(),ierr);
+
+      // We only need to build the star forest if we're in a parallel environment
+      if (system.n_processors() > 1)
+        {
+          // Build the PetscSF and attach it to the DM
+          this->build_sf(system, star_forest);
+          ierr = DMSetDefaultSF(dm, star_forest);
+          CHKERRABORT(system.comm().get(),ierr);
+        }
+    }
+
+  // We need to set only the finest level DM in the SNES
+  DM & dm = this->get_dm(0);
+  ierr = SNESSetDM(snes, dm);
+  CHKERRABORT(system.comm().get(),ierr);
+
+  STOP_LOG ("init_and_attach_petscdm", "PetscDMWrapper");
+}
+
 void PetscDMWrapper::build_section( const System & system, PetscSection & section )
 {
   START_LOG ("build_section", "PetscDMWrapper");
