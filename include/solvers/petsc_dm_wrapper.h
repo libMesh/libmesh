@@ -22,8 +22,12 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
+#include <petsc.h>
+
 namespace libMesh
 {
+  // Forward declarations
+  class System;
 
 /**
  * This class defines a wrapper around the PETSc DM infrastructure.
@@ -42,6 +46,15 @@ public:
   PetscDMWrapper(){};
 
   ~PetscDMWrapper(){};
+
+private:
+
+  //! Helper function for build_section.
+  /**
+   * This function will set the id for each "point" on the current processor within
+   * the PetscSection. Should be O(n_active_local_elems).
+   */
+  void set_point_range_in_section( const System & system, PetscSection & section);
 
 };
 
