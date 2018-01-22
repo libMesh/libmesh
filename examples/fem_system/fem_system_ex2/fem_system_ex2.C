@@ -150,6 +150,9 @@ int main(int argc, char ** argv)
   // Initialize libMesh and any dependent libraries
   LibMeshInit init(argc, argv);
 
+  libMesh::out << "This example is currently skipped due to changes in 3b4b2fb." << std::endl;
+  return 77;
+
   // This example requires a linear solver package.
   libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
                            "--enable-petsc, --enable-trilinos, or --enable-eigen");
