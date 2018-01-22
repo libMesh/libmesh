@@ -97,6 +97,68 @@ void PetscDMWrapper::build_section( const System & system, PetscSection & sectio
   STOP_LOG ("build_section()", "PetscDMWrapper");
 }
 
+void PetscDMWrapper::build_sf( const System & system, PetscSF & star_forest )
+{
+  START_LOG ("build_sf()", "PetscDMWrapper");
+
+  const DofMap & dof_map = system.get_dof_map();
+
+  const std::vector<dof_id_type> & send_list = dof_map.get_send_list();
+
+  // Number of ghost dofs that send information to this processor
+  PetscInt n_leaves = send_list.size();
+
+  // Number of local dofs, including ghosts dofs
+  PetscInt n_roots = dof_map.n_local_dofs();
+  n_roots += send_list.size();
+
+  // This is the vector of dof indices coming from other processors
+  // We need to give this to the PetscSF
+  // We'll be extra paranoid about this ugly double cast
+  static_assert(sizeof(PetscInt) == sizeof(dof_id_type),"PetscInt is not a dof_id_type!");
+  PetscInt * local_dofs = reinterpret_cast<PetscInt *>(const_cast<dof_id_type *>(send_list.data()));
+
+  // This is the vector of PetscSFNode's for the local_dofs.
+  // For each entry in local_dof, we have to supply the rank from which
+  // that dof stems and its local index on that rank.
+  // PETSc documentation here:
+  // http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PetscSF/PetscSFNode.html
+  std::vector<PetscSFNode> sf_nodes(send_list.size());
+
+  for( unsigned int i = 0; i < send_list.size(); i++ )
+    {
+      dof_id_type incoming_dof = send_list[i];
+
+      PetscInt rank = dof_map.dof_owner(incoming_dof);
+
+      // Dofs are sorted and continuous on the processor so local index
+      // is counted up from the first dof on the processor.
+      PetscInt index = incoming_dof - dof_map.first_dof(rank);
+
+      sf_nodes[i].rank  = rank; /* Rank of owner */
+      sf_nodes[i].index = index;/* Index of dof on rank */
+    }
+
+  PetscSFNode * remote_dofs = sf_nodes.data();
+
+  PetscErrorCode ierr;
+  ierr = PetscSFCreate(system.comm().get(), &star_forest);CHKERRABORT(system.comm().get(),ierr);
+
+  // TODO: We should create pointers to arrays so we don't have to copy
+  //       and then can use PETSC_OWN_POINTER where PETSc will take ownership
+  //       and delete the memory for us. But then we'd have to use PetscMalloc.
+  ierr = PetscSFSetGraph(star_forest,
+                         n_roots,
+                         n_leaves,
+                         local_dofs,
+                         PETSC_COPY_VALUES,
+                         remote_dofs,
+                         PETSC_COPY_VALUES);
+  CHKERRABORT(system.comm().get(),ierr);
+
+  STOP_LOG ("build_sf()", "PetscDMWrapper");
+}
+
 void PetscDMWrapper::set_point_range_in_section (const System & system,
                                                  PetscSection & section,
                                                  std::unordered_map<dof_id_type,dof_id_type> & node_map,
