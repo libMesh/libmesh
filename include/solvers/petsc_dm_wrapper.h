@@ -57,6 +57,8 @@ public:
   //! Destroys and clears all build DM-related data
   void clear();
 
+  void init_and_attach_petscdm(System & system, SNES & snes);
+
 private:
 
   //! Vector of DMs for all grid levels
