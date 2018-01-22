@@ -27,6 +27,7 @@
 // Local includes
 #include "libmesh/diff_solver.h"
 #include "libmesh/petsc_macro.h"
+#include "libmesh/petsc_dm_wrapper.h"
 
 // PETSc includes
 # include <petscsnes.h>
@@ -91,6 +92,11 @@ protected:
    * Nonlinear solver context
    */
   SNES _snes;
+
+  /**
+   * Wrapper object for interacting with PetscDM
+   */
+  PetscDMWrapper _dm_wrapper;
 
 private:
 
