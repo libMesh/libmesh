@@ -47,7 +47,10 @@ public:
 
   PetscDMWrapper() = default;
 
-  ~PetscDMWrapper(){};
+  ~PetscDMWrapper();
+
+  //! Destroys and clears all build DM-related data
+  void clear();
 
 private:
 

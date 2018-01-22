@@ -27,6 +27,24 @@
 namespace libMesh
 {
 
+PetscDMWrapper::~PetscDMWrapper()
+{
+  this->clear();
+}
+
+void PetscDMWrapper::clear()
+{
+  // This will also Destroy the attached PetscSection and PetscSF as well
+  // Destroy doesn't free the memory, but just resets points internally
+  // in the struct, so we'd still need to wipe out the memory on our side
+  for( auto dm_it = _dms.begin(); dm_it < _dms.end(); ++dm_it )
+    DMDestroy( dm_it->get() );
+
+  _dms.clear();
+  _sections.clear();
+  _star_forests.clear();
+}
+
 void PetscDMWrapper::init_dm_data(unsigned int n_levels)
 {
   _dms.resize(n_levels);
