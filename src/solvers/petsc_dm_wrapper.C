@@ -207,6 +207,38 @@ void PetscDMWrapper::check_section_n_dofs_match( const System & system, PetscSec
   libmesh_assert_equal_to(total_n_dofs,(PetscInt)system.n_local_dofs());
 }
 
+PetscInt PetscDMWrapper::find_dof_rank( unsigned int dof, const DofMap& dof_map ) const
+{
+  libmesh_assert_greater_equal( dof, dof_map.first_dof( 0 ) );
+  libmesh_assert_less( dof, dof_map.end_dof(dof_map.comm().size()-1) );
+
+  // dofs are in order on each processor starting from processor 0, so we can
+  // use a binary search
+  unsigned int max_rank = dof_map.comm().size();
+  unsigned int current_rank = max_rank/2;
+  unsigned int min_rank = 0;
+
+  do
+    {
+      if( dof >= dof_map.first_dof(current_rank) )
+        {
+          min_rank = current_rank;
+          current_rank = (max_rank + min_rank)/2;
+        }
+      else
+        {
+          max_rank = current_rank;
+          current_rank = (max_rank + min_rank)/2;
+        }
+    }
+  while( max_rank - min_rank > 1 );
+
+  libmesh_assert_less( dof, dof_map.end_dof(current_rank) );
+  libmesh_assert_greater_equal( dof, dof_map.first_dof(current_rank) );
+
+  return current_rank;
+}
+
 } // end namespace libMesh
 
 #endif // LIBMESH_HAVE_PETSC

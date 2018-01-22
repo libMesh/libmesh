@@ -28,6 +28,7 @@ namespace libMesh
 {
   // Forward declarations
   class System;
+  class DofMap;
 
 /**
  * This class defines a wrapper around the PETSc DM infrastructure.
@@ -83,6 +84,12 @@ private:
    * the redundant call to PetscSectionSetDof within add_dofs_to_section.
    */
   void check_section_n_dofs_match( const System & system, PetscSection & section );
+
+  //! Find the MPI rank of the degree of freedom, dof.
+  /**
+   * Helper function for build_sf
+   */
+  PetscInt find_dof_rank( unsigned int dof, const DofMap & dof_map ) const;
 
 };
 
