@@ -19,6 +19,7 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
+// PETSc includes
 #include <petscsf.h>
 
 #include "libmesh/petsc_dm_wrapper.h"
@@ -304,6 +305,20 @@ PetscInt PetscDMWrapper::find_dof_rank( unsigned int dof, const DofMap& dof_map 
   libmesh_assert_greater_equal( dof, dof_map.first_dof(current_rank) );
 
   return current_rank;
+}
+
+void PetscDMWrapper::init_dm_data(unsigned int n_levels)
+{
+  _dms.resize(n_levels);
+  _sections.resize(n_levels);
+  _star_forests.resize(n_levels);
+
+  for( unsigned int i = 0; i < n_levels; i++ )
+    {
+      _dms[i] = libmesh_make_unique<DM>();
+      _sections[i] = libmesh_make_unique<PetscSection>();
+      _star_forests[i] = libmesh_make_unique<PetscSF>();
+    }
 }
 
 } // end namespace libMesh

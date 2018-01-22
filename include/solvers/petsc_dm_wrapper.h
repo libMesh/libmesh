@@ -22,6 +22,10 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
+#include <vector>
+#include <memory>
+
+// PETSc includes
 #include <petsc.h>
 
 namespace libMesh
@@ -49,6 +53,42 @@ public:
   ~PetscDMWrapper(){};
 
 private:
+
+  //! Vector of DMs for all grid levels
+  std::vector<std::unique_ptr<DM>> _dms;
+
+  //! Vector of PETScSections for all grid levels
+  std::vector<std::unique_ptr<PetscSection>> _sections;
+
+  //! Vector of star forests for all grid levels
+  std::vector<std::unique_ptr<PetscSF>> _star_forests;
+
+  //! Init all the n_mesh_level dependent data structures
+  void init_dm_data(unsigned int n_levels);
+
+  //! Get reference to DM for the given mesh level
+  /**
+   * init_dm_data() should be called before this function.
+   */
+  DM & get_dm(unsigned int level)
+  { libmesh_assert(level < _dms.size());
+    return *(_dms[level].get()); }
+
+  //! Get reference to PetscSection for the given mesh level
+  /**
+   * init_dm_data() should be called before this function.
+   */
+  PetscSection & get_section(unsigned int level)
+  { libmesh_assert(level < _sections.size());
+    return *(_sections[level].get()); }
+
+  //! Get reference to PetscSF for the given mesh level
+  /**
+   * init_dm_data() should be called before this function.
+   */
+  PetscSF & get_star_forest(unsigned int level)
+  { libmesh_assert(level < _star_forests.size());
+    return *(_star_forests[level].get()); }
 
   //! Takes System, empty PetscSection and populates the PetscSection
   /**
