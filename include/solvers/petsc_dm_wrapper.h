@@ -64,6 +64,20 @@ private:
    */
   void build_section(const System & system, PetscSection & section);
 
+  //! Takes System, empty PetscSF and populates the PetscSF
+  /**
+   * The PetscSF (star forest) is a cousin of PetscSection. PetscSection
+   * has the DoF info, and PetscSF gives the parallel distribution of the
+   * DoF info. So PetscSF should only be necessary when we have more than
+   * one MPI rank. Essentially, we are copying the DofMap.send_list(): we
+   * are specifying the local dofs, what rank communicates that dof info
+   * (for off-processor dofs that are communicated) and the dofs local
+   * index on that rank.
+   *
+   * https://jedbrown.org/files/StarForest.pdf
+   */
+  void build_sf( const System & system, PetscSF & star_forest );
+
   //! Helper function for build_section.
   /**
    * This function will set the id for each "point" on the current processor within
