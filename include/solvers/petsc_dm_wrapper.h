@@ -24,12 +24,15 @@
 
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
 // PETSc includes
 #include <petsc.h>
 
 namespace libMesh
 {
+  // Forward declarations
+  class System;
 
 /**
  * This class defines a wrapper around the PETSc DM infrastructure.
@@ -89,6 +92,18 @@ private:
   PetscSF & get_star_forest(unsigned int level)
   { libmesh_assert(level < _star_forests.size());
     return *(_star_forests[level].get()); }
+
+  //! Helper function for build_section.
+  /**
+   * This function will count how many "points" on the current processor have
+   * DoFs associated with them and give that count to PETSc. We need to cache
+   * a mapping between the global node id and our local count that we do in this
+   * function because we will need the local number again in the add_dofs_to_section
+   * function.
+   */
+  void set_point_range_in_section( const System & system,
+                                   PetscSection & section,
+                                   std::unordered_map<dof_id_type,dof_id_type> & node_map);
 
 };
 

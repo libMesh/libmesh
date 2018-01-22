@@ -22,7 +22,10 @@
 #include <petscsf.h>
 
 #include "libmesh/petsc_dm_wrapper.h"
-#include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/system.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/elem.h"
+#include "libmesh/dof_map.h"
 
 namespace libMesh
 {
@@ -43,6 +46,96 @@ void PetscDMWrapper::clear()
   _dms.clear();
   _sections.clear();
   _star_forests.clear();
+}
+
+void PetscDMWrapper::set_point_range_in_section (const System & system,
+                                                 PetscSection & section,
+                                                 std::unordered_map<dof_id_type,dof_id_type> & node_map)
+{
+  // We're expecting this to be empty coming in
+  libmesh_assert(node_map.empty());
+
+  // We need to count up the number of active "points" on this processor.
+  // Nominally, a "point" in PETSc parlance is a geometric object that can
+  // hold DoFs, i.e node, edge, face, elem. Since we handle the mesh and are only
+  // interested in solvers, then the only thing PETSc needs is a unique *local* number
+  // for each "point" that has active DoFs; note however this local numbering
+  // we construct must be continuous.
+  //
+  // In libMesh, for most finite elements, we just associate those DoFs with the
+  // geometric nodes. So can we loop over the nodes on this processor and check
+  // if any of the fields are have active DoFs on that node.
+  // If so, then we tell PETSc about that "point". At this stage, we just need
+  // to count up how many active "points" we have and cache the local number to global id
+  // mapping.
+
+
+  // These will be our local counters. pstart should always be zero.
+  // pend will track our local "point" count.
+  // If we're on a processor who coarsened the mesh to have no local elements,
+  // we should make an empty PetscSection. An empty PetscSection is specified
+  // by passing [0,0) to the PetscSectionSetChart call at the end. So, if we
+  // have nothing on this processor, these are the correct values to pass to
+  // PETSc.
+  dof_id_type pstart = 0;
+  dof_id_type pend = 0;
+
+  const MeshBase & mesh = system.get_mesh();
+
+  const DofMap & dof_map = system.get_dof_map();
+
+  // If we don't have any local dofs, then there's nothing to tell to the PetscSection
+  if (dof_map.n_local_dofs() > 0)
+    {
+      // Conservative estimate of space needed so we don't thrash
+      node_map.reserve(mesh.n_local_nodes());
+
+      // We loop over active elements and then cache the global/local node mapping to make sure
+      // we only count active nodes. For example, if we're calling this function and we're
+      // not the finest level in the Mesh tree, we don't want to include nodes of child elements
+      // that aren't active on this level.
+      for (const auto & elem : mesh.active_local_element_ptr_range())
+        {
+          for (unsigned int n = 0; n < elem->n_nodes(); n++)
+            {
+              // get the global id number of local node n
+              const Node & node = elem->node_ref(n);
+
+              // Only register nodes with the PetscSection if they have dofs that belong to
+              // this processor. Even though we're active local elements, the dofs associated
+              // with the node may belong to a different processor. The processor who owns
+              // those dofs will register that node with the PetscSection on that processor.
+              std::vector<dof_id_type> node_dof_indices;
+              dof_map.dof_indices( &node, node_dof_indices );
+              if( !node_dof_indices.empty() && dof_map.local_index(node_dof_indices[0]) )
+                {
+#ifndef NDEBUG
+                  // We're assuming that if the first dof for this node belongs to this processor,
+                  // then all of them do.
+                  for( auto dof : node_dof_indices )
+                    libmesh_assert(dof_map.local_index(dof));
+#endif
+                  // Cache the global/local mapping if we haven't already
+                  // Then increment our local count
+                  dof_id_type node_id = node.id();
+                  if( node_map.count(node_id) == 0 )
+                    {
+                      node_map.insert(std::make_pair(node_id,pend));
+                      pend++;
+                    }
+                }
+            }
+
+          // Some finite elements, e.g. Hierarchic, associate element interior DoFs with the element
+          // rather than the node (since we ought to be able to use Hierachic elements on a QUAD4,
+          // which has no interior node). Thus, we also need to check element interiors for DoFs
+          // as well and, if the finite element has them, we also need to count the Elem in our
+          // "point" accounting.
+        }
+    }
+
+  PetscErrorCode ierr = PetscSectionSetChart(section, pstart, pend);
+  CHKERRABORT(system.comm().get(),ierr);
 }
 
 void PetscDMWrapper::init_dm_data(unsigned int n_levels)
