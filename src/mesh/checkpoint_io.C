@@ -80,6 +80,7 @@ void chunking(processor_id_type size, processor_id_type rank, unsigned int nspli
 std::unique_ptr<CheckpointIO> split_mesh(MeshBase & mesh, unsigned int nsplits)
 {
   mesh.partition(1);
+  mesh.partition(nsplits);
 
   processor_id_type my_num_chunks = 0;
   processor_id_type my_first_chunk = 0;
