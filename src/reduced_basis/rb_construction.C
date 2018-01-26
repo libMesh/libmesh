@@ -157,6 +157,8 @@ void RBConstruction::solve_for_matrix_and_rhs(LinearSolver<Number> & input_solve
   _n_linear_iterations   = rval.first;
   _final_linear_residual = rval.second;
 
+  get_dof_map().enforce_constraints_exactly(*this);
+
   // Update the system after the solve
   this->update();
 }
@@ -358,7 +360,7 @@ void RBConstruction::print_basis_function_orthogonality()
     {
       for (unsigned int j=0; j<get_rb_evaluation().get_n_basis_functions(); j++)
         {
-          inner_product_matrix->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
+          get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
           Number value = temp->dot( get_rb_evaluation().get_basis_function(i) );
 
           libMesh::out << value << " ";
@@ -491,6 +493,15 @@ void RBConstruction::allocate_data_structures()
     dof_map.attach_matrix(*inner_product_matrix);
     inner_product_matrix->init();
     inner_product_matrix->zero();
+
+    if(store_non_dirichlet_operators)
+      {
+        // We also need a non-Dirichlet inner-product matrix
+        non_dirichlet_inner_product_matrix = SparseMatrix<Number>::build(this->comm());
+        dof_map.attach_matrix(*non_dirichlet_inner_product_matrix);
+        non_dirichlet_inner_product_matrix->init();
+        non_dirichlet_inner_product_matrix->zero();
+      }
 
     for (unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
       {
@@ -750,7 +761,10 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
         {
           // Apply constraints, e.g. Dirichlet and periodic constraints
           this->get_dof_map().constrain_element_matrix_and_vector
-            (context.get_elem_jacobian(), context.get_elem_residual(), context.get_dof_indices() );
+            (context.get_elem_jacobian(),
+             context.get_elem_residual(),
+             context.get_dof_indices(),
+             /*asymmetric_constraint_rows*/ false );
         }
 
       // Scale and add to global matrix and/or vector
@@ -910,6 +924,12 @@ void RBConstruction::assemble_misc_matrices()
 {
   libMesh::out << "Assembling inner product matrix" << std::endl;
   assemble_inner_product_matrix(inner_product_matrix.get());
+
+  if (store_non_dirichlet_operators)
+    {
+      libMesh::out << "Assembling non-Dirichlet inner product matrix" << std::endl;
+      assemble_inner_product_matrix(non_dirichlet_inner_product_matrix.get(), false);
+    }
 }
 
 void RBConstruction::assemble_all_affine_operators()
@@ -1203,7 +1223,7 @@ Real RBConstruction::truth_solve(int plot_solution)
 
   // Get the X norm of the truth solution
   // Useful for normalizing our true error data
-  inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
+  get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector, *solution);
   Number truth_X_norm = std::sqrt(inner_product_storage_vector->dot(*solution));
 
   return libmesh_real(truth_X_norm);
@@ -1235,7 +1255,7 @@ void RBConstruction::enrich_RB_space()
 
   for (unsigned int index=0; index<get_rb_evaluation().get_n_basis_functions(); index++)
     {
-      inner_product_matrix->vector_mult(*inner_product_storage_vector, *new_bf);
+      get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector, *new_bf);
 
       Number scalar =
         inner_product_storage_vector->dot(get_rb_evaluation().get_basis_function(index));
@@ -1243,7 +1263,7 @@ void RBConstruction::enrich_RB_space()
     }
 
   // Normalize new_bf
-  inner_product_matrix->vector_mult(*inner_product_storage_vector, *new_bf);
+  get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector, *new_bf);
   Number new_bf_norm = std::sqrt( inner_product_storage_vector->dot(*new_bf) );
 
   if (new_bf_norm == 0.)
@@ -1392,7 +1412,7 @@ void RBConstruction::update_RB_system_matrices()
     {
       for (unsigned int i=(RB_size-delta_N); i<RB_size; i++)
         {
-          get_rb_evaluation().RB_Fq_vector[q_f](i) = get_Fq(q_f)->dot(get_rb_evaluation().get_basis_function(i));
+          get_rb_evaluation().RB_Fq_vector[q_f](i) = get_non_dirichlet_Fq_if_avail(q_f)->dot(get_rb_evaluation().get_basis_function(i));
         }
     }
 
@@ -1413,7 +1433,7 @@ void RBConstruction::update_RB_system_matrices()
             {
               // Compute reduced inner_product_matrix
               temp->zero();
-              inner_product_matrix->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
+              get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
 
               value = temp->dot( get_rb_evaluation().get_basis_function(i) );
               get_rb_evaluation().RB_inner_product_matrix(i,j) = value;
@@ -1429,7 +1449,7 @@ void RBConstruction::update_RB_system_matrices()
             {
               // Compute reduced Aq matrix
               temp->zero();
-              get_Aq(q_a)->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
+              get_non_dirichlet_Aq_if_avail(q_a)->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
 
               value = (*temp).dot(get_rb_evaluation().get_basis_function(i));
               get_rb_evaluation().RB_Aq_vector[q_a](i,j) = value;
@@ -1437,7 +1457,7 @@ void RBConstruction::update_RB_system_matrices()
               if (i!=j)
                 {
                   temp->zero();
-                  get_Aq(q_a)->vector_mult(*temp, get_rb_evaluation().get_basis_function(i));
+                  get_non_dirichlet_Aq_if_avail(q_a)->vector_mult(*temp, get_rb_evaluation().get_basis_function(i));
 
                   value = (*temp).dot(get_rb_evaluation().get_basis_function(j));
                   get_rb_evaluation().RB_Aq_vector[q_a](j,i) = value;
@@ -1502,7 +1522,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
 
       for (unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
         {
-          inner_product_matrix->vector_mult(*inner_product_storage_vector,*Fq_representor[q_f]);
+          get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector,*Fq_representor[q_f]);
 
           for (unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
             {
@@ -1523,13 +1543,13 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
                 {
                   for (unsigned int j=0; j<RB_size; j++)
                     {
-                      inner_product_matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][j]);
+                      get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][j]);
                       get_rb_evaluation().Aq_Aq_representor_innerprods[q][i][j] =
                         inner_product_storage_vector->dot(*get_rb_evaluation().Aq_representor[q_a1][i]);
 
                       if (i != j)
                         {
-                          inner_product_matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][i]);
+                          get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][i]);
                           get_rb_evaluation().Aq_Aq_representor_innerprods[q][j][i] =
                             inner_product_storage_vector->dot(*get_rb_evaluation().Aq_representor[q_a1][j]);
                         }
@@ -1694,7 +1714,7 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
 
           for (unsigned int q_f1=0; q_f1<get_rb_theta_expansion().get_n_F_terms(); q_f1++)
             {
-              inner_product_matrix->vector_mult(*inner_product_storage_vector, *Fq_representor[q_f1]);
+              get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector, *Fq_representor[q_f1]);
 
               for (unsigned int q_f2=q_f1; q_f2<get_rb_theta_expansion().get_n_F_terms(); q_f2++)
                 {
@@ -1772,7 +1792,7 @@ void RBConstruction::load_rb_solution()
 //                       << this->n_linear_iterations());
 //   }
 //
-//   inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
+//   get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector, *solution);
 //
 //   Real slow_residual_norm_sq = solution->dot(*inner_product_storage_vector);
 //
@@ -1782,6 +1802,24 @@ void RBConstruction::load_rb_solution()
 SparseMatrix<Number> * RBConstruction::get_inner_product_matrix()
 {
   return inner_product_matrix.get();
+}
+
+SparseMatrix<Number> * RBConstruction::get_non_dirichlet_inner_product_matrix()
+{
+  if (!store_non_dirichlet_operators)
+    libmesh_error_msg("Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_inner_product_matrix.");
+
+  return non_dirichlet_inner_product_matrix.get();
+}
+
+SparseMatrix<Number> * RBConstruction::get_non_dirichlet_inner_product_matrix_if_avail()
+{
+  if (store_non_dirichlet_operators)
+    {
+      return get_non_dirichlet_inner_product_matrix();
+    }
+
+  return get_inner_product_matrix();
 }
 
 SparseMatrix<Number> * RBConstruction::get_Aq(unsigned int q)
@@ -1803,6 +1841,16 @@ SparseMatrix<Number> * RBConstruction::get_non_dirichlet_Aq(unsigned int q)
   return non_dirichlet_Aq_vector[q].get();
 }
 
+SparseMatrix<Number> * RBConstruction::get_non_dirichlet_Aq_if_avail(unsigned int q)
+{
+  if (store_non_dirichlet_operators)
+    {
+      return get_non_dirichlet_Aq(q);
+    }
+
+  return get_Aq(q);
+}
+
 NumericVector<Number> * RBConstruction::get_Fq(unsigned int q)
 {
   if (q >= get_rb_theta_expansion().get_n_F_terms())
@@ -1820,6 +1868,16 @@ NumericVector<Number> * RBConstruction::get_non_dirichlet_Fq(unsigned int q)
     libmesh_error_msg("Error: We must have q < Q_f in get_Fq.");
 
   return non_dirichlet_Fq_vector[q].get();
+}
+
+NumericVector<Number> * RBConstruction::get_non_dirichlet_Fq_if_avail(unsigned int q)
+{
+  if (store_non_dirichlet_operators)
+    {
+      return get_non_dirichlet_Fq(q);
+    }
+
+  return get_Fq(q);
 }
 
 NumericVector<Number> * RBConstruction::get_output_vector(unsigned int n, unsigned int q_l)
@@ -1845,6 +1903,11 @@ void RBConstruction::get_all_matrices(std::map<std::string, SparseMatrix<Number>
   all_matrices.clear();
 
   all_matrices["inner_product"] = get_inner_product_matrix();
+
+  if (store_non_dirichlet_operators)
+    {
+      all_matrices["non_dirichlet_inner_product"] = get_non_dirichlet_inner_product_matrix();
+    }
 
   for (unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
     {

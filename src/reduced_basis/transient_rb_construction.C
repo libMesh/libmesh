@@ -649,7 +649,7 @@ Number TransientRBConstruction::set_error_temporal_data()
       temp->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
       // First compute the right-hand side vector for the projection
-      inner_product_matrix->vector_mult(*temp, *solution);
+      get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*temp, *solution);
 
       //    zero_dirichlet_dofs_on_vector(*temp);
 
@@ -690,7 +690,7 @@ Number TransientRBConstruction::set_error_temporal_data()
     }
 
   // return the square of the X norm of the truth solution
-  inner_product_matrix->vector_mult(*inner_product_storage_vector,*solution);
+  get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector,*solution);
 
   return solution->dot(*inner_product_storage_vector);
 }
@@ -743,7 +743,7 @@ void TransientRBConstruction::add_IC_to_RB_space()
   current_bf = *solution;
 
   // We can just set the norm to 1.
-  inner_product_matrix->vector_mult(*inner_product_storage_vector,*solution);
+  get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector,*solution);
 
   Real current_bf_norm = libmesh_real(std::sqrt( current_bf.dot(*inner_product_storage_vector) ));
   current_bf.scale(1./current_bf_norm);
@@ -769,7 +769,7 @@ void TransientRBConstruction::enrich_RB_space()
 
   for (int i=0; i<eigen_size; i++)
     {
-      inner_product_matrix->vector_mult(*inner_product_storage_vector, *temporal_data[i]);
+      get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector, *temporal_data[i]);
 
       for (int j=i; j<eigen_size; j++)
         {
@@ -872,7 +872,7 @@ void TransientRBConstruction::enrich_RB_space()
         }
 
       // We just set the norm to 1.
-      inner_product_matrix->vector_mult(*inner_product_storage_vector,current_bf);
+      get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector,current_bf);
 
       Real current_bf_norm = std::abs( std::sqrt( current_bf.dot(*inner_product_storage_vector) ) );
       current_bf.scale(1./current_bf_norm);
@@ -1083,7 +1083,7 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
     {
       for (unsigned int q_f=0; q_f<Q_f; q_f++)
         {
-          inner_product_matrix->vector_mult(*inner_product_storage_vector, *Fq_representor[q_f]);
+          get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector, *Fq_representor[q_f]);
 
           for (unsigned int i=(RB_size-delta_N); i<RB_size; i++)
             {
@@ -1104,15 +1104,15 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
                 {
                   for (unsigned int j=0; j<RB_size; j++)
                     {
-                      inner_product_matrix->vector_mult(*inner_product_storage_vector, *trans_rb_eval.M_q_representor[q_m2][j]);
+                      get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector, *trans_rb_eval.M_q_representor[q_m2][j]);
 
                       trans_rb_eval.Mq_Mq_representor_innerprods[q][i][j] =
                         trans_rb_eval.M_q_representor[q_m1][i]->dot(*inner_product_storage_vector);
 
                       if (i != j)
                         {
-                          inner_product_matrix->vector_mult(*inner_product_storage_vector,
-                                                            *trans_rb_eval.M_q_representor[q_m2][i]);
+                          get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector,
+                                                                                         *trans_rb_eval.M_q_representor[q_m2][i]);
 
                           trans_rb_eval.Mq_Mq_representor_innerprods[q][j][i] =
                             trans_rb_eval.M_q_representor[q_m1][j]->dot(*inner_product_storage_vector);
@@ -1132,16 +1132,16 @@ void TransientRBConstruction::update_residual_terms(bool compute_inner_products)
                 {
                   for (unsigned int q_m=0; q_m<Q_m; q_m++)
                     {
-                      inner_product_matrix->vector_mult(*inner_product_storage_vector,
-                                                        *trans_rb_eval.M_q_representor[q_m][j]);
+                      get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector,
+                                                                                     *trans_rb_eval.M_q_representor[q_m][j]);
 
                       trans_rb_eval.Aq_Mq_representor_innerprods[q_a][q_m][i][j] =
                         trans_rb_eval.Aq_representor[q_a][i]->dot(*inner_product_storage_vector);
 
                       if (i != j)
                         {
-                          inner_product_matrix->vector_mult(*inner_product_storage_vector,
-                                                            *trans_rb_eval.M_q_representor[q_m][i]);
+                          get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector,
+                                                                                         *trans_rb_eval.M_q_representor[q_m][i]);
 
                           trans_rb_eval.Aq_Mq_representor_innerprods[q_a][q_m][j][i] =
                             trans_rb_eval.Aq_representor[q_a][j]->dot(*inner_product_storage_vector);
@@ -1290,7 +1290,7 @@ void TransientRBConstruction::update_RB_initial_condition_all_N()
 //                  << this->n_linear_iterations());
 //   }
 //
-//  inner_product_matrix->vector_mult(*inner_product_storage_vector, *solution);
+//  get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(*inner_product_storage_vector, *solution);
 //
 //  Real slow_residual_norm_sq = solution->dot(*inner_product_storage_vector);
 //
