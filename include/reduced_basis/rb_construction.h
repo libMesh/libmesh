@@ -234,6 +234,19 @@ public:
   SparseMatrix<Number> * get_inner_product_matrix();
 
   /**
+   * Get the non-Dirichlet (or more generally no-constraints) version
+   * of the inner-product matrix. This is useful for performing multiplications
+   * on vectors that already have constraints enforced.
+   */
+  SparseMatrix<Number> * get_non_dirichlet_inner_product_matrix();
+
+  /**
+   * Get the non-Dirichlet inner-product matrix if it's available,
+   * otherwise get the inner-product matrix with constraints.
+   */
+  SparseMatrix<Number> * get_non_dirichlet_inner_product_matrix_if_avail();
+
+  /**
    * Get a pointer to Aq.
    */
   SparseMatrix<Number> * get_Aq(unsigned int q);
@@ -242,6 +255,12 @@ public:
    * Get a pointer to non_dirichlet_Aq.
    */
   SparseMatrix<Number> * get_non_dirichlet_Aq(unsigned int q);
+
+  /**
+   * Get a pointer to non_dirichlet_Aq if it's available, otherwise
+   * get Aq.
+   */
+  SparseMatrix<Number> * get_non_dirichlet_Aq_if_avail(unsigned int q);
 
   /**
    * Allocate all the data structures necessary for the construction
@@ -264,6 +283,12 @@ public:
    * Get a pointer to non-Dirichlet Fq.
    */
   NumericVector<Number> * get_non_dirichlet_Fq(unsigned int q);
+
+  /**
+   * Get a pointer to non_dirichlet_Fq if it's available, otherwise
+   * get Fq.
+   */
+  NumericVector<Number> * get_non_dirichlet_Fq_if_avail(unsigned int q);
 
   /**
    * Get a pointer to the n^th output.
@@ -763,6 +788,7 @@ private:
   std::vector<std::unique_ptr<SparseMatrix<Number>>> non_dirichlet_Aq_vector;
   std::vector<std::unique_ptr<NumericVector<Number>>> non_dirichlet_Fq_vector;
   std::vector<std::vector<std::unique_ptr<NumericVector<Number>>>> non_dirichlet_outputs_vector;
+  std::unique_ptr<SparseMatrix<Number>> non_dirichlet_inner_product_matrix;
 
   /**
    * Relative and absolute tolerances for training reduced basis
