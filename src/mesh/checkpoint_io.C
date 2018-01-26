@@ -79,6 +79,11 @@ void chunking(processor_id_type size, processor_id_type rank, unsigned int nspli
 
 std::unique_ptr<CheckpointIO> split_mesh(MeshBase & mesh, unsigned int nsplits)
 {
+  // There is currently an issue with DofObjects not being properly
+  // reset if the mesh is not first repartitioned onto 1 processor
+  // *before* being repartitioned onto the desired number of
+  // processors. So, this is a workaround, but not a particularly
+  // onerous one.
   mesh.partition(1);
   mesh.partition(nsplits);
 
