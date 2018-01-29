@@ -713,8 +713,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   {
       ierr = MatCreateSNESMF(_snes, &J);
       LIBMESH_CHKERR(ierr);
-      ierr = MatMFFDSetFunction(J, __libmesh_petsc_snes_mffd_interface, this);
-      LIBMESH_CHKERR(ierr);
       if (_solve_type == MF_OPERATOR)
         ierr = SNESSetJacobian(_snes, J, PETSC_NULL, PETSC_NULL, PETSC_NULL);
       else
@@ -737,7 +735,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
             ierr = MatSetNullSpace(J, msp);
             LIBMESH_CHKERR(ierr);
           }
-
           ierr = MatNullSpaceDestroy(&msp);
           LIBMESH_CHKERR(ierr);
         }
@@ -760,7 +757,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
             ierr = MatSetTransposeNullSpace(J, msp);
             LIBMESH_CHKERR(ierr);
           }
-
           ierr = MatNullSpaceDestroy(&msp);
           LIBMESH_CHKERR(ierr);
         }
@@ -782,12 +778,17 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
             ierr = MatSetNearNullSpace(J, msp);
             LIBMESH_CHKERR(ierr);
           }
-
           ierr = MatNullSpaceDestroy(&msp);
           LIBMESH_CHKERR(ierr);
         }
     }
 #endif
+
+if (_solve_type != STANDARD)
+  {
+    ierr = LibMeshMatDestroy(&J);
+    LIBMESH_CHKERR(ierr);
+  }
 
   // Have the Krylov subspace method use our good initial guess rather than 0
   KSP ksp;
@@ -827,6 +828,19 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
     {
       this->_solver_configuration->configure_solver();
     }
+
+  ierr = SNESSetUp(_snes);
+  LIBMESH_CHKERR(ierr);
+
+  ierr = SNESGetJacobian(_snes,&J,PETSC_NULL,PETSC_NULL,PETSC_NULL);
+  LIBMESH_CHKERR(ierr);
+  ierr = MatMFFDSetFunction(J, __libmesh_petsc_snes_mffd_interface, this);
+  LIBMESH_CHKERR(ierr);
+#if !PETSC_RELEASE_LESS_THAN(3, 8, 4)
+  // Resue the residual vector from SNES
+  ierr = MatSNESMFSetReuseBase(J, PETSC_TRUE);
+  LIBMESH_CHKERR(ierr);
+#endif
 
   ierr = SNESSolve (_snes, PETSC_NULL, x->vec());
   LIBMESH_CHKERR(ierr);
