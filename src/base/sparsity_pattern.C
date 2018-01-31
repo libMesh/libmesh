@@ -78,9 +78,23 @@ void _dummy_function(void) {}
 
 
 
-void Build::handle_vi_vj(const Elem * partner,
-                         const std::vector<dof_id_type> & element_dofs_i,
-                         unsigned int vj)
+void Build::sorted_connected_dofs(const Elem * elem,
+                                  std::vector<dof_id_type> & dofs_vi,
+                                  unsigned int vi)
+{
+  dof_map.dof_indices (elem, dofs_vi, vi);
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+  dof_map.find_connected_dofs (dofs_vi);
+#endif
+  // We can be more efficient if we sort the element DOFs into
+  // increasing order
+  std::sort(dofs_vi.begin(), dofs_vi.end());
+}
+
+
+
+void Build::handle_vi_vj(const std::vector<dof_id_type> & element_dofs_i,
+                         const std::vector<dof_id_type> & element_dofs_j)
 {
   const unsigned int n_dofs_on_element_i =
     cast_int<unsigned int>(element_dofs_i.size());
@@ -90,18 +104,7 @@ void Build::handle_vi_vj(const Elem * partner,
   const dof_id_type end_dof_on_proc   = dof_map.end_dof(proc_id);
 
   std::vector<dof_id_type>
-    element_dofs_j,
     dofs_to_add;
-
-  // Find element dofs for variable vj
-  dof_map.dof_indices (partner, element_dofs_j, vj);
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  dof_map.find_connected_dofs (element_dofs_j);
-#endif
-
-  // We can be more efficient if we sort the element DOFs
-  // into increasing order
-  std::sort (element_dofs_j.begin(), element_dofs_j.end());
 
   const unsigned int n_dofs_on_element_j =
     cast_int<unsigned int>(element_dofs_j.size());
@@ -216,7 +219,7 @@ void Build::operator()(const ConstElemRange & range)
   {
     const unsigned int n_var = dof_map.n_variables();
 
-    std::vector<dof_id_type> element_dofs_i;
+    std::vector<std::vector<dof_id_type> > element_dofs_i(n_var);
 
     std::vector<const Elem *> coupled_neighbors;
     for (ConstElemRange::const_iterator elem_it = range.begin() ; elem_it != range.end(); ++elem_it)
@@ -250,19 +253,11 @@ void Build::operator()(const ConstElemRange & range)
                                             fake_elem_it,
                                             fake_elem_end,
                                             DofObject::invalid_processor_id);
+        for (unsigned int vi=0; vi<n_var; vi++)
+          this->sorted_connected_dofs(elem, element_dofs_i[vi], vi);
 
         for (unsigned int vi=0; vi<n_var; vi++)
           {
-            // Find element dofs for variable vi
-            dof_map.dof_indices (elem, element_dofs_i, vi);
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-            dof_map.find_connected_dofs (element_dofs_i);
-#endif
-
-            // We can be more efficient if we sort the element DOFs
-            // into increasing order
-            std::sort(element_dofs_i.begin(), element_dofs_i.end());
-
             GhostingFunctor::map_type::iterator        etg_it = elements_to_couple.begin();
             const GhostingFunctor::map_type::iterator etg_end = elements_to_couple.end();
             for (; etg_it != etg_end; ++etg_it)
@@ -280,12 +275,30 @@ void Build::operator()(const ConstElemRange & range)
                     for (ConstCouplingRow::const_iterator  it = ccr.begin(),
                            end = ccr.end();
                          it != end; ++it)
-                      this->handle_vi_vj(partner, element_dofs_i, *it);
+                      {
+                        if (partner == elem)
+                          this->handle_vi_vj(element_dofs_i[vi], element_dofs_i[*it]);
+                        else
+                          {
+                            std::vector<dof_id_type> partner_dofs;
+                            this->sorted_connected_dofs(partner, partner_dofs, *it);
+                            this->handle_vi_vj(element_dofs_i[vi], partner_dofs);
+                          }
+                      }
                   }
                 else
                   {
                     for (unsigned int vj = 0; vj != n_var; ++vj)
-                      this->handle_vi_vj(partner, element_dofs_i, vj);
+                      {
+                        if (partner == elem)
+                          this->handle_vi_vj(element_dofs_i[vi], element_dofs_i[vj]);
+                        else
+                          {
+                            std::vector<dof_id_type> partner_dofs;
+                            this->sorted_connected_dofs(partner, partner_dofs, vj);
+                            this->handle_vi_vj(element_dofs_i[vi], partner_dofs);
+                          }
+                      }
                   }
               } // End ghosted element loop
           } // End vi loop
