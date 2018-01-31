@@ -158,32 +158,7 @@ public:
    */
   void use_default_monitor(bool state) { _default_monitor = state; }
 
-  /**
-   * Petsc solve type
-   */
-  enum SolveType
-  {
-    MF_OPERATOR, ///< Preconditioned Jacobian-free Newton-Krylov
-    MF,          ///< Jacobian-free Newton-Krylov
-    STANDARD     ///< Newton-Krylov with explicit matrix
-  };
-
-  /**
-   * \returns A constant reference to our solve type
-   */
-  const SolveType & solve_type() const { return _solve_type; }
-
-  /**
-   * \returns A writable reference to our solve type
-   */
-  SolveType & solve_type() { return _solve_type; }
-
 protected:
-
-  /**
-   * Stores the Petsc solve type
-   */
-  SolveType _solve_type;
 
   /**
    * Nonlinear solver context
