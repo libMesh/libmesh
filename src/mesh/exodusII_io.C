@@ -104,10 +104,11 @@ void ExodusII_IO::write_discontinuous_exodusII(const std::string & name,
 void ExodusII_IO::write_timestep_discontinuous (const std::string &fname,
                                                 const EquationSystems &es,
                                                 const int timestep,
-                                                const Real time)
+                                                const Real time,
+                                                const std::set<std::string> * system_names)
 {
   _timestep = timestep;
-  write_discontinuous_exodusII(fname,es);
+  write_discontinuous_exodusII(fname,es,system_names);
 
   if (MeshOutput<MeshBase>::mesh().processor_id())
     return;
@@ -833,10 +834,11 @@ void ExodusII_IO::write_global_data (const std::vector<Number> & soln,
 void ExodusII_IO::write_timestep (const std::string & fname,
                                   const EquationSystems & es,
                                   const int timestep,
-                                  const Real time)
+                                  const Real time,
+                                  const std::set<std::string> * system_names)
 {
   _timestep = timestep;
-  write_equation_systems(fname,es);
+  write_equation_systems(fname,es,system_names);
 
   if (MeshOutput<MeshBase>::mesh().processor_id())
     return;
