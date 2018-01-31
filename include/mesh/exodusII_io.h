@@ -175,7 +175,8 @@ public:
   void write_timestep_discontinuous (const std::string &fname,
                                      const EquationSystems &es,
                                      const int timestep,
-                                     const Real time);
+                                     const Real time,
+                                     const std::set<std::string> * system_names=libmesh_nullptr);
 
   /**
    * Write out element solution.
@@ -223,7 +224,8 @@ public:
   void write_timestep (const std::string & fname,
                        const EquationSystems & es,
                        const int timestep,
-                       const Real time);
+                       const Real time,
+                       const std::set<std::string> * system_names=libmesh_nullptr);
 
   /**
    * Sets the list of variable names to be included in the output.
