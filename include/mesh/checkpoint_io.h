@@ -94,14 +94,27 @@ public:
   virtual ~CheckpointIO ();
 
   /**
-   * This method implements reading a mesh from a specified file.
+   * This method implements reading a mesh from a specified file.  If the mesh has been split for
+   * running on several processors, input_name should simply be the name of the mesh split
+   * directory without the "-split[n]" suffix.  The number of splits will be determined
+   * automatically by the number of processes being used for the mesh at the time of reading.
    */
-  virtual void read (const std::string &) libmesh_override;
+  virtual void read (const std::string & input_name) libmesh_override;
 
   /**
-   * This method implements writing a mesh to a specified file.
+   * This method implements writing a mesh to a specified file.  If the mesh has been split
+   * for running on several processors, this will create a subdirectory named
+   * "[name]-split[n]" where name is the given name argument and n is the number of
+   * processors the mesh is split for running on.  For example:
+   *
+   *     unsigned int n_splits = 42;
+   *     std::unique_ptr<CheckpointIO> cp = split_mesh(my_mesh, n_splits);
+   *     // ...
+   *     cp->write("foo.cpr");
+   *
+   * would create a directory named "foo.cpr-split42".
    */
-  virtual void write (const std::string &) libmesh_override;
+  virtual void write (const std::string & name) libmesh_override;
 
   /**
    * Get/Set the flag indicating if we should read/write binary.
