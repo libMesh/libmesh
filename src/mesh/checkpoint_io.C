@@ -42,6 +42,7 @@
 #include "libmesh/remote_elem.h"
 #include "libmesh/xdr_io.h"
 #include "libmesh/xdr_cxx.h"
+#include "libmesh/utility.h"
 
 namespace libMesh
 {
@@ -115,8 +116,6 @@ CheckpointIO::CheckpointIO (MeshBase & mesh, const bool binary_in) :
 {
 }
 
-
-
 CheckpointIO::CheckpointIO (const MeshBase & mesh, const bool binary_in) :
   MeshOutput<MeshBase>(mesh,/* is_parallel_format = */ true),
   ParallelObject      (mesh),
@@ -127,14 +126,17 @@ CheckpointIO::CheckpointIO (const MeshBase & mesh, const bool binary_in) :
 {
 }
 
-
-
 CheckpointIO::~CheckpointIO ()
 {
 }
 
-
-
+std::string extension(const std::string & s)
+{
+  auto pos = s.rfind(".");
+  if (pos == std::string::npos)
+    return "";
+  return s.substr(pos, s.size() - pos);
+}
 
 void CheckpointIO::write (const std::string & name)
 {
@@ -148,11 +150,32 @@ void CheckpointIO::write (const std::string & name)
   // do a gather_to_zero() and support that case too.
   _parallel = _parallel || !mesh.is_serial();
 
+  auto ext = extension(name);
+  std::string dir_name;
+  std::string str_my_n_procs = "1";
+  if (_parallel)
+    str_my_n_procs = std::to_string(_my_n_processors);
+
+  dir_name = name + "/" + str_my_n_procs;
+  std::string header_file_name = dir_name + "/header" + ext;
+
+  auto errcode = Utility::mkdir(name.c_str());
+  // error only if we failed to create dir - don't care if it was already there
+  if (errcode != 0 && errcode != -1)
+    libmesh_error_msg("Failed to create mesh split directory '" << name << "'");
+
+  errcode = Utility::mkdir(dir_name.c_str());
+  if (errcode == -1)
+    libmesh_warning("In CheckpointIO::write, directory "
+                    << dir_name << " already exists, overwriting contents.");
+  else if (errcode != 0)
+    libmesh_error_msg("Failed to create mesh split directory '" << dir_name << "'");
+
   // We'll write a header file from processor 0 to make it easier to do unambiguous
   // restarts later:
   if (this->processor_id() == 0)
     {
-      Xdr io (name, this->binary() ? ENCODE : WRITE);
+      Xdr io (header_file_name, this->binary() ? ENCODE : WRITE);
 
       // write the version
       io.data(_version, "# version");
@@ -220,11 +243,8 @@ void CheckpointIO::write (const std::string & name)
     {
       const processor_id_type my_pid = *id_it;
 
-      std::ostringstream file_name_stream;
-
-      file_name_stream << name << "-" << (_parallel ? _my_n_processors : 1) << "-" << my_pid;
-
-      Xdr io (file_name_stream.str(), this->binary() ? ENCODE : WRITE);
+      auto file_name = dir_name + "/split-" + str_my_n_procs + "-" + std::to_string(my_pid) + ext;
+      Xdr io (file_name, this->binary() ? ENCODE : WRITE);
 
       std::set<const Elem *, CompareElemIdsByLevel> elements;
 
@@ -613,33 +633,29 @@ void CheckpointIO::read (const std::string & input_name)
   // What size data is being used in this file?
   header_id_type data_size;
 
-  // How many per-processor files are here?
-  largest_id_type input_n_procs;
+  auto ext = extension(input_name);
+  std::string dir_name = input_name + "/" + std::to_string(_my_n_processors);
+  std::string header_name = dir_name + "/header" + ext;
 
-  // We might read an exact name like "foo.cpr", or we might read a
-  // generated name like "foo.cpr.128" that we expect to be presplit
-  // for our current number of processors.
-  std::string header_name = input_name;
+  {
+    // look for header+splits with nprocs equal to _my_n_processors
+    std::ifstream in (header_name.c_str());
+    if (!in.good())
+      {
+        // otherwise fall back to a serial/single-split mesh
+        dir_name = input_name + "/1";
+        header_name = dir_name + "/header" + ext;
+        std::ifstream in (header_name.c_str());
+        if (!in.good())
+          {
+            libmesh_error_msg("ERROR: cannot locate header file '" << header_name << "'");
+          }
+      }
+  }
 
   // We'll read a header file from processor 0 and broadcast.
   if (this->processor_id() == 0)
     {
-      {
-        // Try the exact given name first
-        std::ifstream in (header_name.c_str());
-
-        if (!in.good())
-          {
-            header_name += "-" + std::to_string(mesh.n_processors());
-
-            std::ifstream in_nproc (header_name.c_str());
-
-            if (!in_nproc.good())
-              libmesh_error_msg("ERROR: cannot locate header file:\n\t" <<
-                                input_name << "\nor\n\t" << header_name);
-          }
-      }
-
       Xdr io (header_name, this->binary() ? DECODE : READ);
 
       // read the version, but don't care about it
@@ -651,6 +667,9 @@ void CheckpointIO::read (const std::string & input_name)
     }
 
   this->comm().broadcast(data_size);
+
+  // How many per-processor files are here?
+  largest_id_type input_n_procs;
 
   switch (data_size) {
   case 2:
@@ -688,11 +707,9 @@ void CheckpointIO::read (const std::string & input_name)
 
       for (processor_id_type proc_id = begin_proc_id; proc_id < input_n_procs; proc_id += stride)
         {
-          std::string file_name = input_name;
-
-          file_name += "-" +
-            std::to_string(input_parallel ?  input_n_procs : 1) +
-            "-" + std::to_string(proc_id);
+          std::string file_name = dir_name + "/split-" +
+                                  std::to_string(input_parallel ? input_n_procs : 1) + "-" +
+                                  std::to_string(proc_id) + ext;
 
           {
             std::ifstream in (file_name.c_str());
