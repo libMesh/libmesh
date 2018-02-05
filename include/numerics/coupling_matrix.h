@@ -482,7 +482,7 @@ public:
     libmesh_assert_not_equal_to
       (_location, std::numeric_limits<std::size_t>::max());
 
-    if (_location == _it->second)
+    if (_location >= _it->second)
       {
         ++_it;
 
