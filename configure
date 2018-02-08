@@ -793,6 +793,8 @@ LIBMESH_ENABLE_LASPACK_FALSE
 LIBMESH_ENABLE_LASPACK_TRUE
 LASPACK_LIB
 LASPACK_INCLUDE
+TBB_INCLUDE
+TBB_LIBRARY
 OPENMP_FFLAGS
 OPENMP_CFLAGS
 OPENMP_CXXFLAGS
@@ -800,8 +802,6 @@ PTHREAD_CFLAGS
 PTHREAD_LIBS
 PTHREAD_CC
 ax_pthread_config
-TBB_INCLUDE
-TBB_LIBRARY
 TPETRA_INCLUDES
 TPETRA_LIBS
 ML_INCLUDES
@@ -1206,10 +1206,10 @@ with_ml
 with_tpetra
 with_dtk
 with_thread_model
+enable_pthreads
 enable_tbb
 with_tbb
 with_tbb_lib
-enable_pthreads
 enable_laspack
 enable_sfc
 enable_gzstreams
@@ -1996,9 +1996,9 @@ Optional Features:
   --enable-petsc-required Error if PETSc is not detected by configure
   --disable-slepc         build without SLEPc eigen solver support
   --disable-trilinos      build without Trilinos support
+  --disable-pthreads      build without POSIX threading (pthreads) support
   --disable-tbb           build without threading support via Threading
                           Building Blocks
-  --disable-pthreads      build without POSIX threading (pthreads) support
   --disable-laspack       build without LASPACK iterative solver support
   --disable-sfc           build without space-filling curves support
   --disable-gzstreams     build without gzstreams compressed I/O support
@@ -35730,247 +35730,22 @@ $as_echo "<<< User requested thread model: $requested_thread_model >>>" >&6; }
   # Set this variable when a threading model is found
   found_thread_model=none
 
-  # Only configure TBB if the user explicitly requested it.
-  if (test "x$requested_thread_model" = "xtbb"); then
-
-  # Check whether --enable-tbb was given.
-if test "${enable_tbb+set}" = set; then :
-  enableval=$enable_tbb; case "${enableval}" in
-                  yes)  enabletbb=yes ;;
-                  no)  enabletbb=no ;;
-                  *)  as_fn_error $? "bad value ${enableval} for --enable-tbb" "$LINENO" 5 ;;
-                esac
-else
-  enabletbb=$enableoptional
-fi
-
-
-  if (test $enabletbb = yes); then
-
-
-# Check whether --with-tbb was given.
-if test "${with_tbb+set}" = set; then :
-  withval=$with_tbb; withtbb=$withval
-else
-  withtbb=$TBB_DIR
-fi
-
-
-
-# Check whether --with-tbb-lib was given.
-if test "${with_tbb_lib+set}" = set; then :
-  withval=$with_tbb_lib; withtbblib=$withval
-else
-  withtbblib=$TBB_LIB_PATH
-fi
-
-
-    if test "$withtbb" != no ; then
-      if test "x$withtbb" = x ; then
-        withtbb=/usr
-      fi
-      as_ac_Header=`$as_echo "ac_cv_header_$withtbb/include/tbb/task_scheduler_init.h" | $as_tr_sh`
-ac_fn_cxx_check_header_mongrel "$LINENO" "$withtbb/include/tbb/task_scheduler_init.h" "$as_ac_Header" "$ac_includes_default"
-if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
-  TBB_INCLUDE_PATH=$withtbb/include
-fi
-
-
-      if test "x$withtbblib" != "x" ; then
-        TBB_LIBS=$withtbblib
-      else
-        TBB_LIBS=$withtbb/lib
-      fi
-    fi
-
-    if (test -r $TBB_INCLUDE_PATH/tbb/task_scheduler_init.h) ; then
-      TBB_LIBRARY="-L$TBB_LIBS -ltbb -ltbbmalloc"
-      TBB_INCLUDE=-I$TBB_INCLUDE_PATH
-
-            if (test "x$RPATHFLAG" != "x" -a -d $TBB_LIBS); then
-        TBB_LIBRARY="${RPATHFLAG}${TBB_LIBS} $TBB_LIBRARY"
-      fi
-
-                        tbbmajor=`grep "define TBB_VERSION_MAJOR" $TBB_INCLUDE_PATH/tbb/tbb_stddef.h | sed -e "s/#define TBB_VERSION_MAJOR[ ]*//g"`
-      tbbminor=`grep "define TBB_VERSION_MINOR" $TBB_INCLUDE_PATH/tbb/tbb_stddef.h | sed -e "s/#define TBB_VERSION_MINOR[ ]*//g"`
-    else
-      enabletbb=no
-    fi
-
-    # If TBB is still enabled at this point, make sure we can compile
-    # a test code which uses tbb::tbb_thread
-    if test "$enabletbb" != no ; then
-
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for tbb::tbb_thread support" >&5
-$as_echo_n "checking for tbb::tbb_thread support... " >&6; }
-      ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-      # Add TBB headers to CXXFLAGS, which will be used by AC_COMPILE_IFELSE.
-      saveCXXFLAGS="$CXXFLAGS"
-      CXXFLAGS="$saveCXXFLAGS $TBB_INCLUDE"
-
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-          #include <tbb/tbb_thread.h>
-
-int
-main ()
-{
-
-          tbb::tbb_thread t;
-          t.join();
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-          enabletbb=yes
-
-else
-
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-          enabletbb=no
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-      # Restore original flags
-      CXXFLAGS=$saveCXXFLAGS
-
-      ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-    fi
-
-
-    # If TBB is still enabled at this point, set all the necessary defines and print
-    # a success message.
-    if test "$enabletbb" != no ; then
-
-cat >>confdefs.h <<_ACEOF
-#define DETECTED_TBB_VERSION_MAJOR $tbbmajor
-_ACEOF
-
-
-
-cat >>confdefs.h <<_ACEOF
-#define DETECTED_TBB_VERSION_MINOR $tbbminor
-_ACEOF
-
-
-
-
-
-
-$as_echo "#define USING_THREADS 1" >>confdefs.h
-
-
-$as_echo "#define HAVE_TBB_API 1" >>confdefs.h
-
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Intel TBB threading support >>>" >&5
-$as_echo "<<< Configuring library with Intel TBB threading support >>>" >&6; }
-
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for thread local storage (TLS) class" >&5
-$as_echo_n "checking for thread local storage (TLS) class... " >&6; }
-  if ${ac_cv_tls+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-    ax_tls_keywords="__thread __declspec(thread) none"
-    for ax_tls_keyword in $ax_tls_keywords; do
-      case $ax_tls_keyword in
-        none) ac_cv_tls=none ; break ;;
-        *)
-           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <stdlib.h>
-               static void
-               foo(void) {
-               static  $ax_tls_keyword  int bar;
-               exit(1);
-               }
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  ac_cv_tls=$ax_tls_keyword ; break
-else
-  ac_cv_tls=none
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-      esac
-    done
-
-fi
-
-
-  if test "$ac_cv_tls" != "none"; then
-
-cat >>confdefs.h <<_ACEOF
-#define TLS $ac_cv_tls
-_ACEOF
-
-  fi
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_tls" >&5
-$as_echo "$ac_cv_tls" >&6; }
-
-    fi
-  fi
-
-
-    if (test $enabletbb = yes); then
-      libmesh_optional_INCLUDES="$TBB_INCLUDE $libmesh_optional_INCLUDES"
-      libmesh_optional_LIBS="$TBB_LIBRARY $libmesh_optional_LIBS"
-      found_thread_model=tbb
-    fi
-
-    # If TBB was not enabled, but the user requested it, we treat that as an error:
-    # we want to alert the user as soon as possible that their requested thread model
-    # could not be configured correctly.
-    if (test $enabletbb = no); then
-      as_fn_error $? "requested threading model, TBB, could not be found." "$LINENO" 5
-    fi
-  fi
-
-  # If TBB wasn't selected, try pthreads/openmp as long as the user
-  # requested it (or auto).
-  if (test "$found_thread_model" = none) ; then
-    if (test "x$requested_thread_model" = "xpthread" -o "x$requested_thread_model" = "xauto" -o "x$requested_thread_model" = "xopenmp"); then
-      # Let the user explicitly specify --{enable,disable}-pthreads.
-      # Check whether --enable-pthreads was given.
+  # First, try pthreads/openmp as long as the user requested it (or auto).
+  if (test "x$requested_thread_model" = "xpthread" -o "x$requested_thread_model" = "xauto" -o "x$requested_thread_model" = "xopenmp"); then
+    # Let the user explicitly specify --{enable,disable}-pthreads.
+    # Check whether --enable-pthreads was given.
 if test "${enable_pthreads+set}" = set; then :
   enableval=$enable_pthreads; case "${enableval}" in
-                      yes)  enablepthreads=yes ;;
-                      no)  enablepthreads=no ;;
-                      *)  as_fn_error $? "bad value ${enableval} for --enable-pthreads" "$LINENO" 5 ;;
-                    esac
+                    yes)  enablepthreads=yes ;;
+                    no)  enablepthreads=no ;;
+                    *)  as_fn_error $? "bad value ${enableval} for --enable-pthreads" "$LINENO" 5 ;;
+                  esac
 else
   enablepthreads=$enableoptional
 fi
 
 
-      if (test "$enablepthreads" = yes) ; then
+    if (test "$enablepthreads" = yes) ; then
 
 
 ac_ext=c
@@ -36383,35 +36158,35 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 
-        if (test x$ax_pthread_ok = xyes); then
+      if (test x$ax_pthread_ok = xyes); then
 
 $as_echo "#define USING_THREADS 1" >>confdefs.h
 
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with pthread support >>>" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with pthread support >>>" >&5
 $as_echo "<<< Configuring library with pthread support >>>" >&6; }
-          libmesh_optional_INCLUDES="$PTHREAD_CFLAGS $libmesh_optional_INCLUDES"
-          libmesh_optional_LIBS="$PTHREAD_LIBS $libmesh_optional_LIBS"
-          found_thread_model=pthread
-        else
-          enablepthreads=no
-        fi
+        libmesh_optional_INCLUDES="$PTHREAD_CFLAGS $libmesh_optional_INCLUDES"
+        libmesh_optional_LIBS="$PTHREAD_LIBS $libmesh_optional_LIBS"
+        found_thread_model=pthread
+      else
+        enablepthreads=no
       fi
+    fi
 
-      # If pthreads were not enabled, but the user requested it, we treat that as an error:
-      # we want to alert the user as soon as possible that their requested thread model
-      # could not be configured correctly.
-      if (test $enablepthreads = no -a "x$requested_thread_model" = "xpthread"); then
-        as_fn_error $? "requested threading model, pthreads, could not be found." "$LINENO" 5
-      fi
-      if (test $enablepthreads = no -a "x$requested_thread_model" = "xopenmp"); then
-        as_fn_error $? "openmp threading model requested, but required pthread support unavailable." "$LINENO" 5
-      fi
+    # If pthreads were not enabled, but the user requested it, we treat that as an error:
+    # we want to alert the user as soon as possible that their requested thread model
+    # could not be configured correctly.
+    if (test $enablepthreads = no -a "x$requested_thread_model" = "xpthread"); then
+      as_fn_error $? "requested threading model, pthreads, could not be found." "$LINENO" 5
+    fi
+    if (test $enablepthreads = no -a "x$requested_thread_model" = "xopenmp"); then
+      as_fn_error $? "openmp threading model requested, but required pthread support unavailable." "$LINENO" 5
+    fi
 
-      if (test "x$requested_thread_model" = "xopenmp"); then
-        # OpenMP support
-        # The pthread model can optionally use OpenMP pragmas for its
-        # parallel_for() and parallel_reduce() implementations, so we
-        # configure the compiler's OpenMP options here.
+    if (test "x$requested_thread_model" = "xopenmp"); then
+      # OpenMP support
+      # The pthread model can optionally use OpenMP pragmas for its
+      # parallel_for() and parallel_reduce() implementations, so we
+      # configure the compiler's OpenMP options here.
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenMP flag of C++ compiler" >&5
@@ -36484,29 +36259,255 @@ $as_echo "#define HAVE_OPENMP 1" >>confdefs.h
 fi
 
 
-        # The above call only sets the flag for C++
-        if (test "x$OPENMP_CXXFLAGS" != x) ; then
-           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with OpenMP support >>>" >&5
+      # The above call only sets the flag for C++
+      if (test "x$OPENMP_CXXFLAGS" != x) ; then
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with OpenMP support >>>" >&5
 $as_echo "<<< Configuring library with OpenMP support >>>" >&6; }
-           OPENMP_CFLAGS=$OPENMP_CXXFLAGS
-           OPENMP_FFLAGS=$OPENMP_CXXFLAGS
-           CXXFLAGS_OPT="$CXXFLAGS_OPT $OPENMP_CXXFLAGS"
-           CXXFLAGS_DBG="$CXXFLAGS_DBG $OPENMP_CXXFLAGS"
-           CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $OPENMP_CXXFLAGS"
-           CXXFLAGS_PROF="$CXXFLAGS_PROF $OPENMP_CXXFLAGS"
-           CXXFLAGS_OPROF="$CXXFLAGS_OPROF $OPENMP_CXXFLAGS"
-           CFLAGS_OPT="$CFLAGS_OPT $OPENMP_CFLAGS"
-           CFLAGS_DBG="$CFLAGS_DBG $OPENMP_CFLAGS"
-           CFLAGS_DEVEL="$CFLAGS_DEVEL $OPENMP_CFLAGS"
-           CFLAGS_PROF="$CFLAGS_PROF $OPENMP_CFLAGS"
-           CFLAGS_OPROF="$CFLAGS_OPROF $OPENMP_CFLAGS"
-           FFLAGS="$FFLAGS $OPENMP_FFLAGS"
+         OPENMP_CFLAGS=$OPENMP_CXXFLAGS
+         OPENMP_FFLAGS=$OPENMP_CXXFLAGS
+         CXXFLAGS_OPT="$CXXFLAGS_OPT $OPENMP_CXXFLAGS"
+         CXXFLAGS_DBG="$CXXFLAGS_DBG $OPENMP_CXXFLAGS"
+         CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $OPENMP_CXXFLAGS"
+         CXXFLAGS_PROF="$CXXFLAGS_PROF $OPENMP_CXXFLAGS"
+         CXXFLAGS_OPROF="$CXXFLAGS_OPROF $OPENMP_CXXFLAGS"
+         CFLAGS_OPT="$CFLAGS_OPT $OPENMP_CFLAGS"
+         CFLAGS_DBG="$CFLAGS_DBG $OPENMP_CFLAGS"
+         CFLAGS_DEVEL="$CFLAGS_DEVEL $OPENMP_CFLAGS"
+         CFLAGS_PROF="$CFLAGS_PROF $OPENMP_CFLAGS"
+         CFLAGS_OPROF="$CFLAGS_OPROF $OPENMP_CFLAGS"
+         FFLAGS="$FFLAGS $OPENMP_FFLAGS"
 
 
 
-        else
-           as_fn_error $? "requested openmp threading model, but compiler does not support openmp." "$LINENO" 5
-        fi
+      else
+         as_fn_error $? "requested openmp threading model, but compiler does not support openmp." "$LINENO" 5
+      fi
+    fi
+  fi
+
+  # Try to configure TBB if the user explicitly requested it, or if we
+  # are doing auto detection and pthreads/openmp detection did not
+  # succeed.
+  if (test "$found_thread_model" = none) ; then
+    if (test "x$requested_thread_model" = "xtbb" -o "x$requested_thread_model" = "xauto"); then
+
+  # Check whether --enable-tbb was given.
+if test "${enable_tbb+set}" = set; then :
+  enableval=$enable_tbb; case "${enableval}" in
+                  yes)  enabletbb=yes ;;
+                  no)  enabletbb=no ;;
+                  *)  as_fn_error $? "bad value ${enableval} for --enable-tbb" "$LINENO" 5 ;;
+                esac
+else
+  enabletbb=$enableoptional
+fi
+
+
+  if (test $enabletbb = yes); then
+
+
+# Check whether --with-tbb was given.
+if test "${with_tbb+set}" = set; then :
+  withval=$with_tbb; withtbb=$withval
+else
+  withtbb=$TBB_DIR
+fi
+
+
+
+# Check whether --with-tbb-lib was given.
+if test "${with_tbb_lib+set}" = set; then :
+  withval=$with_tbb_lib; withtbblib=$withval
+else
+  withtbblib=$TBB_LIB_PATH
+fi
+
+
+    if test "$withtbb" != no ; then
+      if test "x$withtbb" = x ; then
+        withtbb=/usr
+      fi
+      as_ac_Header=`$as_echo "ac_cv_header_$withtbb/include/tbb/task_scheduler_init.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtbb/include/tbb/task_scheduler_init.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  TBB_INCLUDE_PATH=$withtbb/include
+fi
+
+
+      if test "x$withtbblib" != "x" ; then
+        TBB_LIBS=$withtbblib
+      else
+        TBB_LIBS=$withtbb/lib
+      fi
+    fi
+
+    if (test -r $TBB_INCLUDE_PATH/tbb/task_scheduler_init.h) ; then
+      TBB_LIBRARY="-L$TBB_LIBS -ltbb -ltbbmalloc"
+      TBB_INCLUDE=-I$TBB_INCLUDE_PATH
+
+            if (test "x$RPATHFLAG" != "x" -a -d $TBB_LIBS); then
+        TBB_LIBRARY="${RPATHFLAG}${TBB_LIBS} $TBB_LIBRARY"
+      fi
+
+                        tbbmajor=`grep "define TBB_VERSION_MAJOR" $TBB_INCLUDE_PATH/tbb/tbb_stddef.h | sed -e "s/#define TBB_VERSION_MAJOR[ ]*//g"`
+      tbbminor=`grep "define TBB_VERSION_MINOR" $TBB_INCLUDE_PATH/tbb/tbb_stddef.h | sed -e "s/#define TBB_VERSION_MINOR[ ]*//g"`
+    else
+      enabletbb=no
+    fi
+
+    # If TBB is still enabled at this point, make sure we can compile
+    # a test code which uses tbb::tbb_thread
+    if test "$enabletbb" != no ; then
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for tbb::tbb_thread support" >&5
+$as_echo_n "checking for tbb::tbb_thread support... " >&6; }
+      ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+      # Add TBB headers to CXXFLAGS, which will be used by AC_COMPILE_IFELSE.
+      saveCXXFLAGS="$CXXFLAGS"
+      CXXFLAGS="$saveCXXFLAGS $TBB_INCLUDE"
+
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+          #include <tbb/tbb_thread.h>
+
+int
+main ()
+{
+
+          tbb::tbb_thread t;
+          t.join();
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+          enabletbb=yes
+
+else
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+          enabletbb=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+      # Restore original flags
+      CXXFLAGS=$saveCXXFLAGS
+
+      ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    fi
+
+
+    # If TBB is still enabled at this point, set all the necessary defines and print
+    # a success message.
+    if test "$enabletbb" != no ; then
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_TBB_VERSION_MAJOR $tbbmajor
+_ACEOF
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_TBB_VERSION_MINOR $tbbminor
+_ACEOF
+
+
+
+
+
+
+$as_echo "#define USING_THREADS 1" >>confdefs.h
+
+
+$as_echo "#define HAVE_TBB_API 1" >>confdefs.h
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Intel TBB threading support >>>" >&5
+$as_echo "<<< Configuring library with Intel TBB threading support >>>" >&6; }
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for thread local storage (TLS) class" >&5
+$as_echo_n "checking for thread local storage (TLS) class... " >&6; }
+  if ${ac_cv_tls+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+    ax_tls_keywords="__thread __declspec(thread) none"
+    for ax_tls_keyword in $ax_tls_keywords; do
+      case $ax_tls_keyword in
+        none) ac_cv_tls=none ; break ;;
+        *)
+           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdlib.h>
+               static void
+               foo(void) {
+               static  $ax_tls_keyword  int bar;
+               exit(1);
+               }
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_cv_tls=$ax_tls_keyword ; break
+else
+  ac_cv_tls=none
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+      esac
+    done
+
+fi
+
+
+  if test "$ac_cv_tls" != "none"; then
+
+cat >>confdefs.h <<_ACEOF
+#define TLS $ac_cv_tls
+_ACEOF
+
+  fi
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_tls" >&5
+$as_echo "$ac_cv_tls" >&6; }
+
+    fi
+  fi
+
+
+      if (test $enabletbb = yes); then
+        libmesh_optional_INCLUDES="$TBB_INCLUDE $libmesh_optional_INCLUDES"
+        libmesh_optional_LIBS="$TBB_LIBRARY $libmesh_optional_LIBS"
+        found_thread_model=tbb
+      fi
+
+      # If TBB was not enabled, but the user requested it, we treat that as an error:
+      # we want to alert the user as soon as possible that their requested thread model
+      # could not be configured correctly.
+      if (test $enabletbb = no); then
+        as_fn_error $? "requested threading model, TBB, could not be found." "$LINENO" 5
       fi
     fi
   fi
