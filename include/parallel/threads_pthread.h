@@ -271,13 +271,19 @@ void parallel_for (const Range & range, const Body & body)
 {
   Threads::BoolAcquire b(Threads::in_threads);
 
+  // If we're running in serial - just run!
+  if (libMesh::n_threads() == 1)
+  {
+    body(range);
+    return;
+  }
+
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
   const bool logging_was_enabled = libMesh::perflog.logging_enabled();
 
   if (libMesh::n_threads() > 1)
     libMesh::perflog.disable_logging();
 #endif
-
   unsigned int n_threads = num_pthreads(range);
 
   std::vector<Range *> ranges(n_threads);
@@ -367,6 +373,13 @@ inline
 void parallel_reduce (const Range & range, Body & body)
 {
   Threads::BoolAcquire b(Threads::in_threads);
+
+  // If we're running in serial - just run!
+  if (libMesh::n_threads() == 1)
+  {
+    body(range);
+    return;
+  }
 
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
   const bool logging_was_enabled = libMesh::perflog.logging_enabled();
