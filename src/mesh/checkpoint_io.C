@@ -21,8 +21,10 @@
 #include <iostream>
 #include <iomanip>
 #include <cstdio>
+#include <unistd.h>
 #include <vector>
 #include <string>
+#include <cstring>
 #include <fstream>
 #include <sstream> // for ostringstream
 
@@ -44,16 +46,13 @@
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/utility.h"
 
-namespace libMesh
-{
-
 namespace
 {
 // chunking computes the number of chunks and first-chunk-offset when splitting a mesh
 // into nsplits pieces using size procs for the given MPI rank.  The number of chunks and offset
 // are stored in nchunks and first_chunk respectively.
-void chunking(processor_id_type size, processor_id_type rank, unsigned int nsplits,
-              processor_id_type & nchunks, processor_id_type & first_chunk)
+void chunking(libMesh::processor_id_type size, libMesh::processor_id_type rank, unsigned int nsplits,
+              libMesh::processor_id_type & nchunks, libMesh::processor_id_type & first_chunk)
 {
   if (nsplits % size == 0) // the chunks divide evenly over the processors
     {
@@ -76,7 +75,57 @@ void chunking(processor_id_type size, processor_id_type rank, unsigned int nspli
                              (1 - (int)nchunks) * std::numeric_limits<int>::max());
     }
 }
+
+std::string extension(const std::string & s)
+{
+  auto pos = s.rfind(".");
+  if (pos == std::string::npos)
+    return "";
+  return s.substr(pos, s.size() - pos);
+}
+
+std::string split_dir(const std::string & input_name, libMesh::processor_id_type n_procs)
+{
+  return input_name + "/" + std::to_string(n_procs);
+}
+
+
+std::string header_file(const std::string & input_name, libMesh::processor_id_type n_procs)
+{
+  return split_dir(input_name, n_procs) + "/header" + extension(input_name);
+}
+
+std::string
+split_file(const std::string & input_name,
+                        libMesh::processor_id_type n_procs,
+                        libMesh::processor_id_type proc_id)
+{
+  return split_dir(input_name, n_procs) + "/split-" + std::to_string(n_procs) + "-" +
+         std::to_string(proc_id) + extension(input_name);
+}
+
+void make_dir(const std::string & input_name, libMesh::processor_id_type n_procs)
+{
+  auto ret = libMesh::Utility::mkdir(input_name.c_str());
+  // error only if we failed to create dir - don't care if it was already there
+  if (ret != 0 && ret != -1)
+    libmesh_error_msg(
+        "Failed to create mesh split directory '" << input_name << "': " << std::strerror(ret));
+
+  auto dir_name = split_dir(input_name, n_procs);
+  ret = libMesh::Utility::mkdir(dir_name.c_str());
+  if (ret == -1)
+    libmesh_warning("In CheckpointIO::write, directory '"
+                    << dir_name << "' already exists, overwriting contents.");
+  else if (ret != 0)
+    libmesh_error_msg(
+        "Failed to create mesh split directory '" << dir_name << "': " << std::strerror(ret));
+}
+
 } // namespace
+
+namespace libMesh
+{
 
 std::unique_ptr<CheckpointIO> split_mesh(MeshBase & mesh, unsigned int nsplits)
 {
@@ -130,12 +179,88 @@ CheckpointIO::~CheckpointIO ()
 {
 }
 
-std::string extension(const std::string & s)
+processor_id_type CheckpointIO::select_split_config(const std::string & input_name, header_id_type & data_size)
 {
-  auto pos = s.rfind(".");
-  if (pos == std::string::npos)
-    return "";
-  return s.substr(pos, s.size() - pos);
+  std::string header_name;
+
+  // We'll read a header file from processor 0 and broadcast.
+  if (this->processor_id() == 0)
+    {
+      header_name = header_file(input_name, _my_n_processors);
+
+      {
+        // look for header+splits with nprocs equal to _my_n_processors
+        std::ifstream in (header_name.c_str());
+        if (!in.good())
+          {
+            // otherwise fall back to a serial/single-split mesh
+            header_name = header_file(input_name, 1);
+            std::ifstream in (header_name.c_str());
+            if (!in.good())
+              {
+                libmesh_error_msg("ERROR: cannot locate header file for input '" << input_name << "'");
+              }
+          }
+      }
+
+      Xdr io (header_name, this->binary() ? DECODE : READ);
+
+      // read the version, but don't care about it
+      std::string input_version;
+      io.data(input_version);
+
+      // read the data type
+      io.data (data_size);
+    }
+
+  this->comm().broadcast(data_size);
+  this->comm().broadcast(header_name);
+
+  // How many per-processor files are here?
+  largest_id_type input_n_procs;
+
+  switch (data_size) {
+  case 2:
+    input_n_procs = this->read_header<uint16_t>(header_name);
+    break;
+  case 4:
+    input_n_procs = this->read_header<uint32_t>(header_name);
+    break;
+  case 8:
+    input_n_procs = this->read_header<uint64_t>(header_name);
+    break;
+  default:
+    libmesh_error();
+  }
+
+  if (!input_n_procs)
+    input_n_procs = 1;
+  return input_n_procs;
+}
+
+void CheckpointIO::cleanup(const std::string & input_name, processor_id_type n_procs)
+{
+  auto header = header_file(input_name, n_procs);
+  auto ret = std::remove(header.c_str());
+  if (ret != 0)
+    libmesh_warning("Failed to clean up checkpoint header '" << header << "': " << std::strerror(ret));
+
+  for (processor_id_type i = 0; i < n_procs; i++)
+    {
+      auto split = split_file(input_name, n_procs, i);
+      auto ret = std::remove(split.c_str());
+      if (ret != 0)
+        libmesh_warning("Failed to clean up checkpoint split file '" << split << "': " << std::strerror(ret));
+    }
+
+  auto dir = split_dir(input_name, n_procs);
+  ret = rmdir(dir.c_str());
+  if (ret != 0)
+    libmesh_warning("Failed to clean up checkpoint split dir '" << dir << "': " << std::strerror(ret));
+
+  // We expect that this may fail if there are other split configurations still present in this
+  // directory - so don't bother to check/warn for failure.
+  rmdir(input_name.c_str());
 }
 
 void CheckpointIO::write (const std::string & name)
@@ -150,26 +275,12 @@ void CheckpointIO::write (const std::string & name)
   // do a gather_to_zero() and support that case too.
   _parallel = _parallel || !mesh.is_serial();
 
-  auto ext = extension(name);
-  std::string dir_name;
-  std::string str_my_n_procs = "1";
+  processor_id_type use_n_procs = 1;
   if (_parallel)
-    str_my_n_procs = std::to_string(_my_n_processors);
+    use_n_procs = _my_n_processors;
 
-  dir_name = name + "/" + str_my_n_procs;
-  std::string header_file_name = dir_name + "/header" + ext;
-
-  auto errcode = Utility::mkdir(name.c_str());
-  // error only if we failed to create dir - don't care if it was already there
-  if (errcode != 0 && errcode != -1)
-    libmesh_error_msg("Failed to create mesh split directory '" << name << "'");
-
-  errcode = Utility::mkdir(dir_name.c_str());
-  if (errcode == -1)
-    libmesh_warning("In CheckpointIO::write, directory "
-                    << dir_name << " already exists, overwriting contents.");
-  else if (errcode != 0)
-    libmesh_error_msg("Failed to create mesh split directory '" << dir_name << "'");
+  std::string header_file_name = header_file(name, use_n_procs);
+  make_dir(name, use_n_procs);
 
   // We'll write a header file from processor 0 to make it easier to do unambiguous
   // restarts later:
@@ -243,7 +354,7 @@ void CheckpointIO::write (const std::string & name)
     {
       const processor_id_type my_pid = *id_it;
 
-      auto file_name = dir_name + "/split-" + str_my_n_procs + "-" + std::to_string(my_pid) + ext;
+      auto file_name = split_file(name, use_n_procs, my_pid);
       Xdr io (file_name, this->binary() ? ENCODE : WRITE);
 
       std::set<const Elem *, CompareElemIdsByLevel> elements;
@@ -621,7 +732,6 @@ void CheckpointIO::write_bc_names (Xdr & io, const BoundaryInfo & info, bool is_
     }
 }
 
-
 void CheckpointIO::read (const std::string & input_name)
 {
   LOG_SCOPE("read()","CheckpointIO");
@@ -630,64 +740,10 @@ void CheckpointIO::read (const std::string & input_name)
 
   libmesh_assert(!mesh.n_elem());
 
-  // What size data is being used in this file?
   header_id_type data_size;
-
-  auto ext = extension(input_name);
-  std::string dir_name = input_name + "/" + std::to_string(_my_n_processors);
-  std::string header_name = dir_name + "/header" + ext;
-
-  {
-    // look for header+splits with nprocs equal to _my_n_processors
-    std::ifstream in (header_name.c_str());
-    if (!in.good())
-      {
-        // otherwise fall back to a serial/single-split mesh
-        dir_name = input_name + "/1";
-        header_name = dir_name + "/header" + ext;
-        std::ifstream in (header_name.c_str());
-        if (!in.good())
-          {
-            libmesh_error_msg("ERROR: cannot locate header file '" << header_name << "'");
-          }
-      }
-  }
-
-  // We'll read a header file from processor 0 and broadcast.
-  if (this->processor_id() == 0)
-    {
-      Xdr io (header_name, this->binary() ? DECODE : READ);
-
-      // read the version, but don't care about it
-      std::string input_version;
-      io.data(input_version);
-
-      // read the data type
-      io.data (data_size);
-    }
-
-  this->comm().broadcast(data_size);
-
-  // How many per-processor files are here?
-  largest_id_type input_n_procs;
-
-  switch (data_size) {
-  case 2:
-    input_n_procs = this->read_header<uint16_t>(header_name);
-    break;
-  case 4:
-    input_n_procs = this->read_header<uint32_t>(header_name);
-    break;
-  case 8:
-    input_n_procs = this->read_header<uint64_t>(header_name);
-    break;
-  default:
-    libmesh_error();
-  }
-
-  bool input_parallel = input_n_procs;
-  if (!input_n_procs)
-    input_n_procs = 1;
+  largest_id_type input_n_procs = select_split_config(input_name, data_size);
+  auto header_name = header_file(input_name, input_n_procs);
+  bool input_parallel = input_n_procs > 0;
 
   // If this is a serial read then we're going to only read the mesh
   // on processor 0, then broadcast it
@@ -707,9 +763,7 @@ void CheckpointIO::read (const std::string & input_name)
 
       for (processor_id_type proc_id = begin_proc_id; proc_id < input_n_procs; proc_id += stride)
         {
-          std::string file_name = dir_name + "/split-" +
-                                  std::to_string(input_parallel ? input_n_procs : 1) + "-" +
-                                  std::to_string(proc_id) + ext;
+          auto file_name = split_file(input_name, input_n_procs, proc_id);
 
           {
             std::ifstream in (file_name.c_str());

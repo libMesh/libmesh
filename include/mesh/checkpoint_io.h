@@ -117,6 +117,29 @@ public:
   virtual void write (const std::string & name) libmesh_override;
 
   /**
+   * Used to remove a checkpoint directory and its corresponding files.  This effectively undoes
+   * all the work done be calls to write(...).  For example, if a checkpoint configuration was
+   * written via:
+   *
+   *     unsigned int n_splits = 42;
+   *     std::unique_ptr<CheckpointIO> cp = split_mesh(my_mesh, n_splits);
+   *     // ...
+   *     cp->write("foo.cpr");
+   *
+   * then you could remove all the corresponding created files/dirs by:
+   *
+   *     CheckpointIO::cleanup(my_mesh, n_splits);
+   *
+   * Or for cases where the split configuration was determined automatically (e.g. via number of
+   * running procs with distributed/parallel mesh), then you could:
+   *
+   *     CheckpointIO::cleanup(your_mesh, your_mesh.comm().size());
+   *
+   * Other remaining checkpoint split configurations for the mesh are left unmodified.
+   */
+  static void cleanup(const std::string & input_name, processor_id_type n_procs);
+
+  /**
    * Get/Set the flag indicating if we should read/write binary.
    */
   bool   binary() const { return _binary; }
@@ -278,6 +301,8 @@ private:
    */
   unsigned int n_active_levels_in(MeshBase::const_element_iterator begin,
                                   MeshBase::const_element_iterator end) const;
+
+  processor_id_type select_split_config(const std::string & input_name, header_id_type & data_size);
 
   bool _binary;
   bool _parallel;
