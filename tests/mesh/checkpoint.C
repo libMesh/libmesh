@@ -110,7 +110,6 @@ public:
     {
       MeshB mesh(*TestCommWorld);
       CheckpointIO cpr(mesh);
-      cpr.current_n_processors() = n_procs;
       cpr.binary() = binary;
       cpr.read(filename);
 
