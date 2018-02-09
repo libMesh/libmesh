@@ -26,20 +26,8 @@
 #endif
 
 #if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(__clang__)
-// GCC > 4.1 supports diagnostic pragmas
-#if (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ > 1)
-// TODO: use the gcc 4.6 push/pop when available
-#if (__GNUC__ > 5)
-#pragma GCC diagnostic warning "-Wplacement-new"
-#pragma GCC diagnostic warning "-Wmisleading-indentation"
-#if (__GNUC__ > 6)
-#pragma GCC diagnostic warning "-Wint-in-bool-context"
-#pragma GCC diagnostic warning "-Wimplicit-fallthrough"
-#endif // GCC > 6
-#endif // GCC > 5
-#pragma GCC diagnostic warning "-Wdeprecated-declarations"
-#pragma GCC diagnostic warning "-Wunused-parameter"
-#pragma GCC diagnostic warning "-Wdeprecated"
-#pragma GCC diagnostic warning "-Wpedantic"
-#endif // GCC > 4.1
+// GCC > 4.5 supports diagnostic pragmas with push/pop
+#if (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ > 5)
+#pragma GCC diagnostic pop
+#endif // GCC > 4.5
 #endif // __GNUC__ && !__INTEL_COMPILER
