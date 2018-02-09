@@ -36,8 +36,9 @@
 #endif
 
 #if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(__clang__)
-// GCC > 4.1 supports diagnostic pragmas
-#if (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ > 1)
+// GCC > 4.5 supports diagnostic pragmas with push/pop
+#if (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ > 5)
+#pragma GCC diagnostic push
 // These two don't work?
 #pragma GCC diagnostic ignored "-Wpedantic"
 #pragma GCC diagnostic ignored "-Wdeprecated"
@@ -55,5 +56,5 @@
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 #endif // GCC > 6
 #endif // GCC > 5
-#endif // GCC > 4.1
+#endif // GCC > 4.5
 #endif // __GNUC__ && !__INTEL_COMPILER
