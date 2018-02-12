@@ -795,13 +795,13 @@ LASPACK_LIB
 LASPACK_INCLUDE
 TBB_INCLUDE
 TBB_LIBRARY
-OPENMP_FFLAGS
-OPENMP_CFLAGS
-OPENMP_CXXFLAGS
 PTHREAD_CFLAGS
 PTHREAD_LIBS
 PTHREAD_CC
 ax_pthread_config
+OPENMP_FFLAGS
+OPENMP_CFLAGS
+OPENMP_CXXFLAGS
 TPETRA_INCLUDES
 TPETRA_LIBS
 ML_INCLUDES
@@ -35727,6 +35727,125 @@ fi
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< User requested thread model: $requested_thread_model >>>" >&5
 $as_echo "<<< User requested thread model: $requested_thread_model >>>" >&6; }
 
+  # We *always* detect the compiler's OpenMP support, because libMesh
+  # is frequently compiled with other libraries that use OpenMP
+  # directives (it can also use a few itself [0]) and if you don't set
+  # OMP_NUM_THREADS in the environment or call omp_set_num_threads()
+  # programmatically, you get the questionable default of "1 thread
+  # per CPU" [1]. This can lead to drastic over-subscription of
+  # hardware. For example, an MPI code run with "mpiexec -np 4" on a
+  # machine with 4 physical cores will try and spawn up to 16
+  # simultaneous threads in this configuration.
+  #
+  # [0]: The "pthread" threading model (see below) can optionally use
+  # OpenMP pragmas for its parallel_for() and parallel_reduce()
+  # implementations.
+  #
+  # [1]: https://gcc.gnu.org/onlinedocs/libgomp/OMP_005fNUM_005fTHREADS.html
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenMP flag of C++ compiler" >&5
+$as_echo_n "checking for OpenMP flag of C++ compiler... " >&6; }
+if ${ax_cv_cxx_openmp+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  saveCXXFLAGS=$CXXFLAGS
+ax_cv_cxx_openmp=unknown
+# Flags to try:  -fopenmp (gcc), -openmp (icc), -mp (SGI & PGI),
+#                -xopenmp (Sun), -omp (Tru64), -qsmp=omp (AIX), none
+ax_openmp_flags="-fopenmp -openmp -mp -xopenmp -omp -qsmp=omp none"
+
+if test "x$OPENMP_CXXFLAGS" != x; then
+  ax_openmp_flags="$OPENMP_CXXFLAGS $ax_openmp_flags"
+fi
+
+for ax_openmp_flag in $ax_openmp_flags; do
+  case $ax_openmp_flag in
+    none) CXXFLAGS=$saveCXX ;;
+    *)    CXXFLAGS="$saveCXXFLAGS $ax_openmp_flag" ;;
+  esac
+
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include <omp.h>
+
+int
+main ()
+{
+
+    const int N = 100000;
+    int i, arr[N];
+
+    omp_set_num_threads(2);
+
+    #pragma omp parallel for
+    for (i = 0; i < N; i++)
+    {
+      arr[i] = i;
+    }
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ax_cv_cxx_openmp=$ax_openmp_flag; break
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+done
+
+CXXFLAGS=$saveCXXFLAGS
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_cxx_openmp" >&5
+$as_echo "$ax_cv_cxx_openmp" >&6; }
+
+if test "x$ax_cv_cxx_openmp" = "xunknown"; then
+  enableopenmp=no
+else
+  if test "x$ax_cv_cxx_openmp" != "xnone"; then
+    OPENMP_CXXFLAGS=$ax_cv_cxx_openmp
+  fi
+
+$as_echo "#define HAVE_OPENMP 1" >>confdefs.h
+
+fi
+
+
+  # The call to AX_OPENMP only sets OPENMP_CXXFLAGS, so if it worked,
+  # we also set it for C, Fortran, and all the METHODs.
+  if (test "x$OPENMP_CXXFLAGS" != x) ; then
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with OpenMP support >>>" >&5
+$as_echo "<<< Configuring library with OpenMP support >>>" >&6; }
+     OPENMP_CFLAGS=$OPENMP_CXXFLAGS
+     OPENMP_FFLAGS=$OPENMP_CXXFLAGS
+     CXXFLAGS_OPT="$CXXFLAGS_OPT $OPENMP_CXXFLAGS"
+     CXXFLAGS_DBG="$CXXFLAGS_DBG $OPENMP_CXXFLAGS"
+     CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $OPENMP_CXXFLAGS"
+     CXXFLAGS_PROF="$CXXFLAGS_PROF $OPENMP_CXXFLAGS"
+     CXXFLAGS_OPROF="$CXXFLAGS_OPROF $OPENMP_CXXFLAGS"
+     CFLAGS_OPT="$CFLAGS_OPT $OPENMP_CFLAGS"
+     CFLAGS_DBG="$CFLAGS_DBG $OPENMP_CFLAGS"
+     CFLAGS_DEVEL="$CFLAGS_DEVEL $OPENMP_CFLAGS"
+     CFLAGS_PROF="$CFLAGS_PROF $OPENMP_CFLAGS"
+     CFLAGS_OPROF="$CFLAGS_OPROF $OPENMP_CFLAGS"
+     FFLAGS="$FFLAGS $OPENMP_FFLAGS"
+
+
+
+  fi
+
+  # If the user explicitly requested the openmp threading model and
+  # this compiler doesn't support OpenMP for some reason, we throw an
+  # error instead of silently continuing.
+  if (test "x$requested_thread_model" = "xopenmp"); then
+    if (test "x$enableopenmp" = "xno"); then
+      as_fn_error $? "requested openmp threading model, but compiler does not support openmp." "$LINENO" 5
+    fi
+  fi
+
   # Set this variable when a threading model is found
   found_thread_model=none
 
@@ -36180,108 +36299,6 @@ $as_echo "<<< Configuring library with pthread support >>>" >&6; }
     fi
     if (test $enablepthreads = no -a "x$requested_thread_model" = "xopenmp"); then
       as_fn_error $? "openmp threading model requested, but required pthread support unavailable." "$LINENO" 5
-    fi
-
-    if (test "x$requested_thread_model" = "xopenmp"); then
-      # OpenMP support
-      # The pthread model can optionally use OpenMP pragmas for its
-      # parallel_for() and parallel_reduce() implementations, so we
-      # configure the compiler's OpenMP options here.
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenMP flag of C++ compiler" >&5
-$as_echo_n "checking for OpenMP flag of C++ compiler... " >&6; }
-if ${ax_cv_cxx_openmp+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  saveCXXFLAGS=$CXXFLAGS
-ax_cv_cxx_openmp=unknown
-# Flags to try:  -fopenmp (gcc), -openmp (icc), -mp (SGI & PGI),
-#                -xopenmp (Sun), -omp (Tru64), -qsmp=omp (AIX), none
-ax_openmp_flags="-fopenmp -openmp -mp -xopenmp -omp -qsmp=omp none"
-
-if test "x$OPENMP_CXXFLAGS" != x; then
-  ax_openmp_flags="$OPENMP_CXXFLAGS $ax_openmp_flags"
-fi
-
-for ax_openmp_flag in $ax_openmp_flags; do
-  case $ax_openmp_flag in
-    none) CXXFLAGS=$saveCXX ;;
-    *)    CXXFLAGS="$saveCXXFLAGS $ax_openmp_flag" ;;
-  esac
-
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-    #include <omp.h>
-
-int
-main ()
-{
-
-    const int N = 100000;
-    int i, arr[N];
-
-    omp_set_num_threads(2);
-
-    #pragma omp parallel for
-    for (i = 0; i < N; i++)
-    {
-      arr[i] = i;
-    }
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ax_cv_cxx_openmp=$ax_openmp_flag; break
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-done
-
-CXXFLAGS=$saveCXXFLAGS
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_cxx_openmp" >&5
-$as_echo "$ax_cv_cxx_openmp" >&6; }
-
-if test "x$ax_cv_cxx_openmp" = "xunknown"; then
-  enableopenmp=no
-else
-  if test "x$ax_cv_cxx_openmp" != "xnone"; then
-    OPENMP_CXXFLAGS=$ax_cv_cxx_openmp
-  fi
-
-$as_echo "#define HAVE_OPENMP 1" >>confdefs.h
-
-fi
-
-
-      # The above call only sets the flag for C++
-      if (test "x$OPENMP_CXXFLAGS" != x) ; then
-         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with OpenMP support >>>" >&5
-$as_echo "<<< Configuring library with OpenMP support >>>" >&6; }
-         OPENMP_CFLAGS=$OPENMP_CXXFLAGS
-         OPENMP_FFLAGS=$OPENMP_CXXFLAGS
-         CXXFLAGS_OPT="$CXXFLAGS_OPT $OPENMP_CXXFLAGS"
-         CXXFLAGS_DBG="$CXXFLAGS_DBG $OPENMP_CXXFLAGS"
-         CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $OPENMP_CXXFLAGS"
-         CXXFLAGS_PROF="$CXXFLAGS_PROF $OPENMP_CXXFLAGS"
-         CXXFLAGS_OPROF="$CXXFLAGS_OPROF $OPENMP_CXXFLAGS"
-         CFLAGS_OPT="$CFLAGS_OPT $OPENMP_CFLAGS"
-         CFLAGS_DBG="$CFLAGS_DBG $OPENMP_CFLAGS"
-         CFLAGS_DEVEL="$CFLAGS_DEVEL $OPENMP_CFLAGS"
-         CFLAGS_PROF="$CFLAGS_PROF $OPENMP_CFLAGS"
-         CFLAGS_OPROF="$CFLAGS_OPROF $OPENMP_CFLAGS"
-         FFLAGS="$FFLAGS $OPENMP_FFLAGS"
-
-
-
-      else
-         as_fn_error $? "requested openmp threading model, but compiler does not support openmp." "$LINENO" 5
-      fi
     fi
   fi
 
