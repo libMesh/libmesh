@@ -155,45 +155,61 @@ void Build::handle_vi_vj(const std::vector<dof_id_type> & element_dofs_i,
               // sparsity pattern
               dofs_to_add.clear();
 
-              // Cache iterators.  Low will move forward, subsequent
-              // searches will be on smaller ranges
-              SparsityPattern::Row::iterator
-                low  = std::lower_bound
-                (row->begin(), row->end(), element_dofs_j.front()),
-                high = std::upper_bound
-                (low,          row->end(), element_dofs_j.back());
+              const dof_id_type jfront = element_dofs_j.front();
 
-              for (unsigned int j=0; j<n_dofs_on_element_j; j++)
-                {
-                  const dof_id_type jg = element_dofs_j[j];
-
-                  // See if jg is in the sorted range
-                  std::pair<SparsityPattern::Row::iterator,
-                            SparsityPattern::Row::iterator>
-                    pos = std::equal_range (low, high, jg);
-
-                  // Must add jg if it wasn't found
-                  if (pos.first == pos.second)
-                    dofs_to_add.push_back(jg);
-
-                  // pos.first is now a valid lower bound for any
-                  // remaining element j DOFs. (That's why we sorted them.)
-                  // Use it for the next search
-                  low = pos.first;
-                }
-
-              // Add to the sparsity pattern
-              if (!dofs_to_add.empty())
+              // Optimize for the "ranges don't overlap" case: here we
+              // don't need temporary storage and we don't need to
+              // re-sort.
+              if (jfront > row->back())
                 {
                   const std::size_t old_size = row->size();
 
                   row->insert (row->end(),
-                               dofs_to_add.begin(),
-                               dofs_to_add.end());
+                               element_dofs_j.begin(),
+                               element_dofs_j.end());
+                }
+              else
+                {
+                  // Cache iterators.  Low will move forward, subsequent
+                  // searches will be on smaller ranges
+                  SparsityPattern::Row::iterator
+                  low  = std::lower_bound
+                  (row->begin(), row->end(), jfront),
+                  high = std::upper_bound
+                  (low,          row->end(), element_dofs_j.back());
 
-                  SparsityPattern::sort_row
-                    (row->begin(), row->begin()+old_size,
-                     row->end());
+                  for (unsigned int j=0; j<n_dofs_on_element_j; j++)
+                    {
+                      const dof_id_type jg = element_dofs_j[j];
+
+                      // See if jg is in the sorted range
+                      std::pair<SparsityPattern::Row::iterator,
+                                SparsityPattern::Row::iterator>
+                        pos = std::equal_range (low, high, jg);
+
+                      // Must add jg if it wasn't found
+                      if (pos.first == pos.second)
+                        dofs_to_add.push_back(jg);
+
+                      // pos.first is now a valid lower bound for any
+                      // remaining element j DOFs. (That's why we sorted them.)
+                      // Use it for the next search
+                      low = pos.first;
+                    }
+
+                  // Add to the sparsity pattern
+                  if (!dofs_to_add.empty())
+                    {
+                      const std::size_t old_size = row->size();
+
+                      row->insert (row->end(),
+                                   dofs_to_add.begin(),
+                                   dofs_to_add.end());
+
+                      SparsityPattern::sort_row
+                        (row->begin(), row->begin()+old_size,
+                         row->end());
+                    }
                 }
             }
         } // End dofs-of-var-i loop
