@@ -18,6 +18,54 @@ AC_DEFUN([ACX_BEST_THREAD],
 
   AC_MSG_RESULT([<<< User requested thread model: $requested_thread_model >>>])
 
+  # We *always* detect the compiler's OpenMP support, because libMesh
+  # is frequently compiled with other libraries that use OpenMP
+  # directives (it can also use a few itself [0]) and if you don't set
+  # OMP_NUM_THREADS in the environment or call omp_set_num_threads()
+  # programmatically, you get the questionable default of "1 thread
+  # per CPU" [1]. This can lead to drastic over-subscription of
+  # hardware. For example, an MPI code run with "mpiexec -np 4" on a
+  # machine with 4 physical cores will try and spawn up to 16
+  # simultaneous threads in this configuration.
+  #
+  # [0]: The "pthread" threading model (see below) can optionally use
+  # OpenMP pragmas for its parallel_for() and parallel_reduce()
+  # implementations.
+  #
+  # [1]: https://gcc.gnu.org/onlinedocs/libgomp/OMP_005fNUM_005fTHREADS.html
+  AX_OPENMP([],[enableopenmp=no])
+
+  # The call to AX_OPENMP only sets OPENMP_CXXFLAGS, so if it worked,
+  # we also set it for C, Fortran, and all the METHODs.
+  if (test "x$OPENMP_CXXFLAGS" != x) ; then
+     AC_MSG_RESULT(<<< Configuring library with OpenMP support >>>)
+     OPENMP_CFLAGS=$OPENMP_CXXFLAGS
+     OPENMP_FFLAGS=$OPENMP_CXXFLAGS
+     CXXFLAGS_OPT="$CXXFLAGS_OPT $OPENMP_CXXFLAGS"
+     CXXFLAGS_DBG="$CXXFLAGS_DBG $OPENMP_CXXFLAGS"
+     CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $OPENMP_CXXFLAGS"
+     CXXFLAGS_PROF="$CXXFLAGS_PROF $OPENMP_CXXFLAGS"
+     CXXFLAGS_OPROF="$CXXFLAGS_OPROF $OPENMP_CXXFLAGS"
+     CFLAGS_OPT="$CFLAGS_OPT $OPENMP_CFLAGS"
+     CFLAGS_DBG="$CFLAGS_DBG $OPENMP_CFLAGS"
+     CFLAGS_DEVEL="$CFLAGS_DEVEL $OPENMP_CFLAGS"
+     CFLAGS_PROF="$CFLAGS_PROF $OPENMP_CFLAGS"
+     CFLAGS_OPROF="$CFLAGS_OPROF $OPENMP_CFLAGS"
+     FFLAGS="$FFLAGS $OPENMP_FFLAGS"
+     AC_SUBST(OPENMP_CXXFLAGS)
+     AC_SUBST(OPENMP_CFLAGS)
+     AC_SUBST(OPENMP_FFLAGS)
+  fi
+
+  # If the user explicitly requested the openmp threading model and
+  # this compiler doesn't support OpenMP for some reason, we throw an
+  # error instead of silently continuing.
+  if (test "x$requested_thread_model" = "xopenmp"); then
+    if (test "x$enableopenmp" = "xno"); then
+      AC_MSG_ERROR([requested openmp threading model, but compiler does not support openmp.])
+    fi
+  fi
+
   # Set this variable when a threading model is found
   found_thread_model=none
 
@@ -57,37 +105,6 @@ AC_DEFUN([ACX_BEST_THREAD],
     fi
     if (test $enablepthreads = no -a "x$requested_thread_model" = "xopenmp"); then
       AC_MSG_ERROR([openmp threading model requested, but required pthread support unavailable.])
-    fi
-
-    if (test "x$requested_thread_model" = "xopenmp"); then
-      # OpenMP support
-      # The pthread model can optionally use OpenMP pragmas for its
-      # parallel_for() and parallel_reduce() implementations, so we
-      # configure the compiler's OpenMP options here.
-      AX_OPENMP([],[enableopenmp=no])
-
-      # The above call only sets the flag for C++
-      if (test "x$OPENMP_CXXFLAGS" != x) ; then
-         AC_MSG_RESULT(<<< Configuring library with OpenMP support >>>)
-         OPENMP_CFLAGS=$OPENMP_CXXFLAGS
-         OPENMP_FFLAGS=$OPENMP_CXXFLAGS
-         CXXFLAGS_OPT="$CXXFLAGS_OPT $OPENMP_CXXFLAGS"
-         CXXFLAGS_DBG="$CXXFLAGS_DBG $OPENMP_CXXFLAGS"
-         CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $OPENMP_CXXFLAGS"
-         CXXFLAGS_PROF="$CXXFLAGS_PROF $OPENMP_CXXFLAGS"
-         CXXFLAGS_OPROF="$CXXFLAGS_OPROF $OPENMP_CXXFLAGS"
-         CFLAGS_OPT="$CFLAGS_OPT $OPENMP_CFLAGS"
-         CFLAGS_DBG="$CFLAGS_DBG $OPENMP_CFLAGS"
-         CFLAGS_DEVEL="$CFLAGS_DEVEL $OPENMP_CFLAGS"
-         CFLAGS_PROF="$CFLAGS_PROF $OPENMP_CFLAGS"
-         CFLAGS_OPROF="$CFLAGS_OPROF $OPENMP_CFLAGS"
-         FFLAGS="$FFLAGS $OPENMP_FFLAGS"
-         AC_SUBST(OPENMP_CXXFLAGS)
-         AC_SUBST(OPENMP_CFLAGS)
-         AC_SUBST(OPENMP_FFLAGS)
-      else
-         AC_MSG_ERROR([requested openmp threading model, but compiler does not support openmp.])
-      fi
     fi
   fi
 
