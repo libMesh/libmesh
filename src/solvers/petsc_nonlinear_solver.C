@@ -452,7 +452,6 @@ extern "C"
 template <typename T>
 PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   NonlinearSolver<T>(system_in),
-  _solve_type(STANDARD),
   _reason(SNES_CONVERGED_ITERATING/*==0*/), // Arbitrary initial value...
   _n_linear_iterations(0),
   _current_nonlinear_iteration_number(0),
@@ -707,18 +706,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
       LIBMESH_CHKERR(ierr);
     }
 
-  // Take care of case where the user specifies matrix-free jacobian
-  Mat J;
-  if (_solve_type != STANDARD)
-  {
-      ierr = MatCreateSNESMF(_snes, &J);
-      LIBMESH_CHKERR(ierr);
-      if (_solve_type == MF_OPERATOR)
-        ierr = SNESSetJacobian(_snes, J, PETSC_NULL, PETSC_NULL, PETSC_NULL);
-      else
-        ierr = SNESSetJacobian(_snes, J, J, MatMFFDComputeJacobian, PETSC_NULL);
-      LIBMESH_CHKERR(ierr);
-  }
 
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
   // Only set the nullspace if we have a way of computing it and the result is non-empty.
@@ -730,11 +717,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
         {
           ierr = MatSetNullSpace(pre->mat(), msp);
           LIBMESH_CHKERR(ierr);
-          if (_solve_type != STANDARD)
-          {
-            ierr = MatSetNullSpace(J, msp);
-            LIBMESH_CHKERR(ierr);
-          }
           ierr = MatNullSpaceDestroy(&msp);
           LIBMESH_CHKERR(ierr);
         }
@@ -752,11 +734,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
         {
           ierr = MatSetTransposeNullSpace(pre->mat(), msp);
           LIBMESH_CHKERR(ierr);
-          if (_solve_type != STANDARD)
-          {
-            ierr = MatSetTransposeNullSpace(J, msp);
-            LIBMESH_CHKERR(ierr);
-          }
           ierr = MatNullSpaceDestroy(&msp);
           LIBMESH_CHKERR(ierr);
         }
@@ -773,22 +750,11 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
         {
           ierr = MatSetNearNullSpace(pre->mat(), msp);
           LIBMESH_CHKERR(ierr);
-          if (_solve_type != STANDARD)
-          {
-            ierr = MatSetNearNullSpace(J, msp);
-            LIBMESH_CHKERR(ierr);
-          }
           ierr = MatNullSpaceDestroy(&msp);
           LIBMESH_CHKERR(ierr);
         }
     }
 #endif
-
-if (_solve_type != STANDARD)
-  {
-    ierr = LibMeshMatDestroy(&J);
-    LIBMESH_CHKERR(ierr);
-  }
 
   // Have the Krylov subspace method use our good initial guess rather than 0
   KSP ksp;
@@ -832,6 +798,7 @@ if (_solve_type != STANDARD)
   ierr = SNESSetUp(_snes);
   LIBMESH_CHKERR(ierr);
 
+  Mat J;
   ierr = SNESGetJacobian(_snes,&J,PETSC_NULL,PETSC_NULL,PETSC_NULL);
   LIBMESH_CHKERR(ierr);
   ierr = MatMFFDSetFunction(J, __libmesh_petsc_snes_mffd_interface, this);
