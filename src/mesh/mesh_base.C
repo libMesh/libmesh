@@ -80,6 +80,7 @@ MeshBase::MeshBase (unsigned char d) :
   _n_parts       (1),
   _is_prepared   (false),
   _point_locator (),
+  _count_lower_dim_elems_in_point_locator(true),
   _partitioner   (),
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(DofObject::invalid_unique_id),
@@ -108,6 +109,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _n_parts       (other_mesh._n_parts),
   _is_prepared   (other_mesh._is_prepared),
   _point_locator (),
+  _count_lower_dim_elems_in_point_locator(other_mesh._count_lower_dim_elems_in_point_locator),
   _partitioner   (),
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(other_mesh._next_unique_id),
