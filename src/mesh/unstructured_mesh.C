@@ -75,8 +75,12 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 {
   LOG_SCOPE("copy_nodes_and_elements()", "UnstructuredMesh");
 
+  // We expect to have at least as many processors as the other mesh
+  // is partitioned into, so that our partitioning will still be
+  // consistent afterwards.
+  libmesh_assert_greater_equal (_n_parts, other_mesh._n_parts);
+
   // We're assuming our subclass data needs no copy
-  libmesh_assert_equal_to (_n_parts, other_mesh._n_parts);
   libmesh_assert_equal_to (_is_prepared, other_mesh._is_prepared);
 
   // We're assuming the other mesh has proper element number ordering,
