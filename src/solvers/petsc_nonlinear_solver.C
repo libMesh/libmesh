@@ -21,7 +21,6 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
-
 // C++ includes
 
 // Local Includes
@@ -36,6 +35,13 @@
 
 /* DMlibMesh include. */
 #include "libmesh/petscdmlibmesh.h"
+
+// Pick the right version of the petsc line search getter function name
+#if PETSC_VERSION_LESS_THAN(3,4,0)
+#  define SNESGETLINESEARCH SNESGetSNESLineSearch
+#else
+#  define SNESGETLINESEARCH SNESGetLineSearch
+#endif
 
 namespace libMesh
 {
@@ -337,6 +343,24 @@ extern "C"
     return ierr;
   }
 
+  // This function gets called by PETSc in place of the standard Petsc line searches
+  // if a linesearch object is supplied to the PetscNonlinearSolver class. It wraps
+  // the lineserach algorithm implemented on the linesearch object.
+  // * "linesearch" is an object that can be used to access the non-linear and linear solution
+  // vectors as well as the residual and SNES object
+  // * "ctx" is the PetscNonlinearSolver context
+  PetscErrorCode libmesh_petsc_linesearch_shellfunc (SNESLineSearch linesearch, void * ctx)
+  {
+    PetscErrorCode ierr = 0;
+
+    // No way to safety-check this cast, since we got a void *...
+    PetscNonlinearSolver<Number> * solver =
+      static_cast<PetscNonlinearSolver<Number> *> (ctx);
+
+    solver->linesearch_object->linesearch(linesearch);
+    return ierr;
+  }
+
   // This function gets called by PETSc after the SNES linesearch is
   // complete.  We use it to exactly enforce any constraints on the
   // solution which may have drifted during the linear solve.  In the
@@ -452,6 +476,7 @@ extern "C"
 template <typename T>
 PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   NonlinearSolver<T>(system_in),
+  linesearch_object(nullptr),
   _reason(SNES_CONVERGED_ITERATING/*==0*/), // Arbitrary initial value...
   _n_linear_iterations(0),
   _current_nonlinear_iteration_number(0),
@@ -582,13 +607,6 @@ void PetscNonlinearSolver<T>::init (const char * name)
       LIBMESH_CHKERR(ierr);
 
 #else
-      // Pick the right version of the function name
-#if PETSC_VERSION_LESS_THAN(3,4,0)
-#  define SNESGETLINESEARCH SNESGetSNESLineSearch
-#else
-#  define SNESGETLINESEARCH SNESGetLineSearch
-#endif
-
       SNESLineSearch linesearch;
       PetscErrorCode ierr = SNESGETLINESEARCH(_snes, &linesearch);
       LIBMESH_CHKERR(ierr);
@@ -807,6 +825,22 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   // Resue the residual vector from SNES
   ierr = MatSNESMFSetReuseBase(J, PETSC_TRUE);
   LIBMESH_CHKERR(ierr);
+#endif
+
+#if PETSC_VERSION_LESS_THAN(3, 3, 0)
+  if (linesearch_object)
+    libmesh_error_msg("Line search setter interface introduced in petsc version 3.3!");
+#else
+  SNESLineSearch linesearch;
+  if (linesearch_object)
+  {
+    ierr = SNESGETLINESEARCH(_snes, &linesearch);
+    LIBMESH_CHKERR(ierr);
+    ierr = SNESLineSearchSetType(linesearch, SNESLINESEARCHSHELL);
+    LIBMESH_CHKERR(ierr);
+    ierr = SNESLineSearchShellSetUserFunc(linesearch, libmesh_petsc_linesearch_shellfunc, this);
+    LIBMESH_CHKERR(ierr);
+  }
 #endif
 
   ierr = SNESSolve (_snes, PETSC_NULL, x->vec());

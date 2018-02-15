@@ -58,6 +58,7 @@ extern "C"
                                                 SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context
 #endif
                                                 );
+  PetscErrorCode libmesh_petsc_linesearch_shellfunc(SNESLineSearch linesearch, void * ctx);
 }
 
 /**
@@ -157,6 +158,22 @@ public:
    * Set to true to use the libMesh's default monitor, set to false to use your own
    */
   void use_default_monitor(bool state) { _default_monitor = state; }
+
+  /**
+   * Abstract base class to be used to implement a custom line-search algorithm
+   */
+  class ComputeLineSearchObject
+  {
+  public:
+    virtual ~ComputeLineSearchObject () {}
+
+    virtual void linesearch (SNESLineSearch linesearch) = 0;
+  };
+
+  /**
+   * A callable object that can be used to specify a custom line-search
+   */
+  std::unique_ptr<ComputeLineSearchObject> linesearch_object;
 
 protected:
 
