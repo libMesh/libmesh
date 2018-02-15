@@ -318,6 +318,9 @@ unsigned int PetscDiffSolver::solve()
                           __libmesh_petsc_diff_solver_jacobian, this);
   LIBMESH_CHKERR(ierr);
 
+  ierr = SNESSetFromOptions(_snes);
+  LIBMESH_CHKERR(ierr);
+
   ierr = SNESSolve (_snes, PETSC_NULL, x.vec());
   LIBMESH_CHKERR(ierr);
 
@@ -354,13 +357,13 @@ void PetscDiffSolver::setup_petsc_data()
   if (use_petsc_dm)
     this->_dm_wrapper.init_and_attach_petscdm(_system, _snes);
 
-  ierr = SNESSetFromOptions(_snes);
-  LIBMESH_CHKERR(ierr);
-
   // If we're not using PETSc DM, let's keep around
   // the old style for fieldsplit
   if (!use_petsc_dm)
     {
+      ierr = SNESSetFromOptions(_snes);
+      LIBMESH_CHKERR(ierr);
+
       KSP my_ksp;
       ierr = SNESGetKSP(_snes, &my_ksp);
       LIBMESH_CHKERR(ierr);
