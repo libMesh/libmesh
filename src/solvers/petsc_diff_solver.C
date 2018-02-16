@@ -128,22 +128,18 @@ extern "C"
   }
 
 
-#if PETSC_RELEASE_LESS_THAN(3,5,0)
   PetscErrorCode
   __libmesh_petsc_diff_solver_jacobian (SNES,
                                         Vec x,
+#if PETSC_RELEASE_LESS_THAN(3,5,0)
                                         Mat * libmesh_dbg_var(j),
                                         Mat * pc,
                                         MatStructure * msflag,
-                                        void * ctx)
 #else
-    PetscErrorCode
-    __libmesh_petsc_diff_solver_jacobian (SNES,
-                                          Vec x,
-                                          Mat libmesh_dbg_var(j),
-                                          Mat pc,
-                                          void * ctx)
+                                        Mat libmesh_dbg_var(j),
+                                        Mat pc,
 #endif
+                                        void * ctx)
   {
     libmesh_assert(x);
     libmesh_assert(j);

@@ -171,6 +171,7 @@ public:
    * \param es EquationSystems object which contains the solution vector
    * \param timestep The timestep to write out. (should be _1_ indexed)
    * \param time The current simulation time
+   * \param system_names Optional list of systems to write solutions for.
    */
   void write_timestep_discontinuous (const std::string &fname,
                                      const EquationSystems &es,
@@ -220,6 +221,7 @@ public:
    * \param es EquationSystems object which contains the solution vector.
    * \param timestep The timestep to write out, should be _1_ indexed.
    * \param time The current simulation time.
+   * \param system_names Optional list of systems to write solutions for.
    */
   void write_timestep (const std::string & fname,
                        const EquationSystems & es,

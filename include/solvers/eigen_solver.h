@@ -86,7 +86,7 @@ public:
 
   /**
    * \returns \p The value of the flag which controls whether libmesh
-   * closes the eigenproblem matrices before solving. \true by
+   * closes the eigenproblem matrices before solving. \p true by
    * default.
    */
   bool get_close_matrix_before_solve() const
