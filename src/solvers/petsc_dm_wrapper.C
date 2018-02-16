@@ -33,6 +33,111 @@
 namespace libMesh
 {
 
+  //--------------------------------------------------------------------
+  // Functions with C linkage to pass to PETSc.  PETSc will call these
+  // methods as needed.
+  //
+  // Since they must have C linkage they have no knowledge of a namespace.
+  // We give them an obscure name to avoid namespace pollution.
+  //--------------------------------------------------------------------
+  extern "C"
+  {
+
+    //! Help PETSc identify the finer DM given a dmc
+    PetscErrorCode __libmesh_petsc_DMRefine(DM dmc, MPI_Comm comm, DM * dmf)
+    {
+      libmesh_assert(dmc);
+      libmesh_assert(dmf);
+      libmesh_assert(comm);
+
+      PetscErrorCode ierr;
+
+      // extract our context from the incoming dmc
+      void * ctx_c = NULL;
+      ierr = DMShellGetContext(dmc, & ctx_c);CHKERRABORT(comm, ierr);
+      libmesh_assert(ctx_c);
+      PetscDMContext * p_ctx = static_cast<PetscDMContext * >(ctx_c);
+
+      // check / set the finer DM
+      libmesh_assert(p_ctx->finer_dm);
+      libmesh_assert(*(p_ctx->finer_dm));
+      *(dmf) = *(p_ctx->finer_dm);
+
+      return 0;
+    }
+
+    //! Help PETSc identify the coarser DM given a dmf
+    PetscErrorCode __libmesh_petsc_DMCoarsen(DM dmf, MPI_Comm comm, DM * dmc)
+    {
+      libmesh_assert(dmc);
+      libmesh_assert(dmf);
+      libmesh_assert(comm);
+
+      PetscErrorCode ierr;
+
+      // extract our context from the incoming dmf
+      void * ctx_f = NULL;
+      ierr = DMShellGetContext(dmf, &ctx_f);CHKERRABORT(comm, ierr);
+      libmesh_assert(ctx_f);
+      PetscDMContext * p_ctx = static_cast<PetscDMContext*>(ctx_f);
+
+      // check / set the coarser DM
+      libmesh_assert(p_ctx->coarser_dm);
+      libmesh_assert(*(p_ctx->coarser_dm));
+      *(dmc) = *(p_ctx->coarser_dm);
+
+      return 0;
+    }
+
+    //! Function to give PETSc that sets the Interpolation Matrix between two dms
+    PetscErrorCode
+    __libmesh_petsc_DMCreateInterpolation (DM dmc /*coarse*/, DM dmf /*fine*/,
+                                         Mat * mat ,Vec * vec)
+    {
+      libmesh_assert(dmc);
+      libmesh_assert(dmf);
+      libmesh_assert(mat);
+      libmesh_assert(vec); // optional scaling (not needed for mg)
+
+      // extract our coarse context from the incoming dm
+      void * ctx_c = NULL;
+      DMShellGetContext(dmc, &ctx_c);
+      libmesh_assert(ctx_c);
+      PetscDMContext * p_ctx_c = static_cast<PetscDMContext*>(ctx_c);
+
+      // check / give PETSc its matrix
+      libmesh_assert(p_ctx_c->K_interp_ptr);
+      *(mat) = p_ctx_c->K_interp_ptr->mat();
+      *(vec) = PETSC_NULL;
+
+      return 0;
+    }
+
+    //! Function to give PETSc that sets the Restriction Matrix between two dms
+    PetscErrorCode
+    __libmesh_petsc_DMCreateRestriction (DM dmc /*coarse*/, DM dmf/*fine*/, Mat * mat)
+    {
+      libmesh_assert(dmc);
+      libmesh_assert(dmf);
+      libmesh_assert(mat);
+
+      // extract our fine context from the incoming dm
+      void * ctx_f = NULL;
+      DMShellGetContext(dmf, &ctx_f);
+      libmesh_assert(ctx_f);
+      PetscDMContext * p_ctx_f = static_cast<PetscDMContext*>(ctx_f);
+
+      // check / give PETSc its matrix
+      libmesh_assert(p_ctx_f->K_restrict_ptr);
+      *(mat) = p_ctx_f->K_restrict_ptr->mat();
+
+      return 0;
+    }
+
+  } // end extern C functions
+
+
+
 PetscDMWrapper::~PetscDMWrapper()
 {
   this->clear();
