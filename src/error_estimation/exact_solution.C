@@ -85,10 +85,7 @@ void ExactSolution::attach_reference_solution (const EquationSystems * es_fine)
 }
 
 
-void ExactSolution::attach_exact_value (Number fptr(const Point & p,
-                                                    const Parameters & parameters,
-                                                    const std::string & sys_name,
-                                                    const std::string & unknown_name))
+void ExactSolution::attach_exact_value (ValueFunctionPointer fptr)
 {
   libmesh_assert(fptr);
 
@@ -129,10 +126,7 @@ void ExactSolution::attach_exact_value (unsigned int sys_num,
 }
 
 
-void ExactSolution::attach_exact_deriv (Gradient gptr(const Point & p,
-                                                      const Parameters & parameters,
-                                                      const std::string & sys_name,
-                                                      const std::string & unknown_name))
+void ExactSolution::attach_exact_deriv (GradientFunctionPointer gptr)
 {
   libmesh_assert(gptr);
 
@@ -173,10 +167,7 @@ void ExactSolution::attach_exact_deriv (unsigned int sys_num,
 }
 
 
-void ExactSolution::attach_exact_hessian (Tensor hptr(const Point & p,
-                                                      const Parameters & parameters,
-                                                      const std::string & sys_name,
-                                                      const std::string & unknown_name))
+void ExactSolution::attach_exact_hessian (HessianFunctionPointer hptr)
 {
   libmesh_assert(hptr);
 

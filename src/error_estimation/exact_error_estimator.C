@@ -43,10 +43,7 @@ namespace libMesh
 
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
-void ExactErrorEstimator::attach_exact_value (Number fptr(const Point & p,
-                                                          const Parameters & parameters,
-                                                          const std::string & sys_name,
-                                                          const std::string & unknown_name))
+void ExactErrorEstimator::attach_exact_value (ValueFunctionPointer fptr)
 {
   libmesh_assert(fptr);
   _exact_value = fptr;
@@ -81,10 +78,7 @@ void ExactErrorEstimator::attach_exact_value (unsigned int sys_num,
 }
 
 
-void ExactErrorEstimator::attach_exact_deriv (Gradient gptr(const Point & p,
-                                                            const Parameters & parameters,
-                                                            const std::string & sys_name,
-                                                            const std::string & unknown_name))
+void ExactErrorEstimator::attach_exact_deriv (GradientFunctionPointer gptr)
 {
   libmesh_assert(gptr);
   _exact_deriv = gptr;
@@ -121,10 +115,7 @@ void ExactErrorEstimator::attach_exact_deriv (unsigned int sys_num,
 
 
 
-void ExactErrorEstimator::attach_exact_hessian (Tensor hptr(const Point & p,
-                                                            const Parameters & parameters,
-                                                            const std::string & sys_name,
-                                                            const std::string & unknown_name))
+void ExactErrorEstimator::attach_exact_hessian (HessianFunctionPointer hptr)
 {
   libmesh_assert(hptr);
   _exact_hessian = hptr;

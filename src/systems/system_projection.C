@@ -793,14 +793,8 @@ void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
  * This method projects an arbitrary function onto the solution via L2
  * projections and nodal interpolations on each element.
  */
-void System::project_solution (Number fptr(const Point & p,
-                                           const Parameters & parameters,
-                                           const std::string & sys_name,
-                                           const std::string & unknown_name),
-                               Gradient gptr(const Point & p,
-                                             const Parameters & parameters,
-                                             const std::string & sys_name,
-                                             const std::string & unknown_name),
+void System::project_solution (ValueFunctionPointer fptr,
+                               GradientFunctionPointer gptr,
                                const Parameters & parameters) const
 {
   WrappedFunction<Number> f(*this, fptr, &parameters);
@@ -839,14 +833,8 @@ void System::project_solution (FEMFunctionBase<Number> * f,
  * This method projects an arbitrary function via L2 projections and
  * nodal interpolations on each element.
  */
-void System::project_vector (Number fptr(const Point & p,
-                                         const Parameters & parameters,
-                                         const std::string & sys_name,
-                                         const std::string & unknown_name),
-                             Gradient gptr(const Point & p,
-                                           const Parameters & parameters,
-                                           const std::string & sys_name,
-                                           const std::string & unknown_name),
+void System::project_vector (ValueFunctionPointer fptr,
+                             GradientFunctionPointer gptr,
                              const Parameters & parameters,
                              NumericVector<Number> & new_vector,
                              int is_adjoint) const
@@ -980,14 +968,8 @@ void System::project_vector (NumericVector<Number> & new_vector,
  */
 void System::boundary_project_solution (const std::set<boundary_id_type> & b,
                                         const std::vector<unsigned int> & variables,
-                                        Number fptr(const Point & p,
-                                                    const Parameters & parameters,
-                                                    const std::string & sys_name,
-                                                    const std::string & unknown_name),
-                                        Gradient gptr(const Point & p,
-                                                      const Parameters & parameters,
-                                                      const std::string & sys_name,
-                                                      const std::string & unknown_name),
+                                        ValueFunctionPointer fptr,
+                                        GradientFunctionPointer gptr,
                                         const Parameters & parameters)
 {
   WrappedFunction<Number> f(*this, fptr, &parameters);
@@ -1021,14 +1003,8 @@ void System::boundary_project_solution (const std::set<boundary_id_type> & b,
  */
 void System::boundary_project_vector (const std::set<boundary_id_type> & b,
                                       const std::vector<unsigned int> & variables,
-                                      Number fptr(const Point & p,
-                                                  const Parameters & parameters,
-                                                  const std::string & sys_name,
-                                                  const std::string & unknown_name),
-                                      Gradient gptr(const Point & p,
-                                                    const Parameters & parameters,
-                                                    const std::string & sys_name,
-                                                    const std::string & unknown_name),
+                                      ValueFunctionPointer fptr,
+                                      GradientFunctionPointer gptr,
                                       const Parameters & parameters,
                                       NumericVector<Number> & new_vector,
                                       int is_adjoint) const

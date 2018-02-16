@@ -103,10 +103,11 @@ public:
    * Attach an arbitrary function which computes the exact value of
    * the solution at any point.
    */
-  void attach_exact_value ( Number fptr(const Point & p,
-                                        const Parameters & Parameters,
-                                        const std::string & sys_name,
-                                        const std::string & unknown_name));
+  typedef Number (*ValueFunctionPointer)(const Point & p,
+                                         const Parameters & Parameters,
+                                         const std::string & sys_name,
+                                         const std::string & unknown_name);
+  void attach_exact_value (ValueFunctionPointer fptr);
 
   /**
    * Clone and attach arbitrary functors which compute the exact
@@ -125,10 +126,11 @@ public:
    * Attach an arbitrary function which computes the exact gradient of
    * the solution at any point.
    */
-  void attach_exact_deriv ( Gradient gptr(const Point & p,
-                                          const Parameters & parameters,
-                                          const std::string & sys_name,
-                                          const std::string & unknown_name));
+  typedef Gradient (*GradientFunctionPointer)(const Point & p,
+                                              const Parameters & parameters,
+                                              const std::string & sys_name,
+                                              const std::string & unknown_name);
+  void attach_exact_deriv (GradientFunctionPointer gptr);
 
   /**
    * Clone and attach arbitrary functors which compute the exact
@@ -147,10 +149,11 @@ public:
    * Attach an arbitrary function which computes the exact second
    * derivatives of the solution at any point.
    */
-  void attach_exact_hessian ( Tensor hptr(const Point & p,
-                                          const Parameters & parameters,
-                                          const std::string & sys_name,
-                                          const std::string & unknown_name));
+  typedef Tensor (*HessianFunctionPointer)(const Point & p,
+                                           const Parameters & parameters,
+                                           const std::string & sys_name,
+                                           const std::string & unknown_name);
+  void attach_exact_hessian (HessianFunctionPointer hptr);
 
   /**
    * Attach function similar to system.h which
@@ -195,28 +198,19 @@ private:
    * Function pointer to user-provided function which
    * computes the exact value of the solution.
    */
-  Number (* _exact_value) (const Point & p,
-                           const Parameters & parameters,
-                           const std::string & sys_name,
-                           const std::string & unknown_name);
+  ValueFunctionPointer _exact_value;
 
   /**
    * Function pointer to user-provided function which
    * computes the exact derivative of the solution.
    */
-  Gradient (* _exact_deriv) (const Point & p,
-                             const Parameters & parameters,
-                             const std::string & sys_name,
-                             const std::string & unknown_name);
+  GradientFunctionPointer _exact_deriv;
 
   /**
    * Function pointer to user-provided function which
    * computes the exact hessian of the solution.
    */
-  Tensor (* _exact_hessian) (const Point & p,
-                             const Parameters & parameters,
-                             const std::string & sys_name,
-                             const std::string & unknown_name);
+  HessianFunctionPointer _exact_hessian;
 
   /**
    * User-provided functors which compute the exact value of the
