@@ -120,7 +120,7 @@ private:
    * init_dm_data() should be called before this function.
    */
   DM & get_dm(unsigned int level)
-  { libmesh_assert(level < _dms.size());
+    { libmesh_assert_less(level, _dms.size());
     return *(_dms[level].get()); }
 
   //! Get reference to PetscSection for the given mesh level
@@ -128,7 +128,7 @@ private:
    * init_dm_data() should be called before this function.
    */
   PetscSection & get_section(unsigned int level)
-  { libmesh_assert(level < _sections.size());
+    { libmesh_assert_less(level, _sections.size());
     return *(_sections[level].get()); }
 
   //! Get reference to PetscSF for the given mesh level
@@ -136,7 +136,7 @@ private:
    * init_dm_data() should be called before this function.
    */
   PetscSF & get_star_forest(unsigned int level)
-  { libmesh_assert(level < _star_forests.size());
+    { libmesh_assert_less(level, _star_forests.size());
     return *(_star_forests[level].get()); }
 
   //! Takes System, empty PetscSection and populates the PetscSection
