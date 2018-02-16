@@ -82,7 +82,9 @@ void setup(EquationSystems & systems,
   imms.save_initial_mesh();
 
   // Fill global solution vector from local ones
-  aux_sys.reinit();
+  aux_sys.current_local_solution->close();
+  *aux_sys.solution = *aux_sys.current_local_solution;
+  aux_sys.solution->close();
 }
 
 
@@ -119,7 +121,9 @@ void run_timestepping(EquationSystems & systems, GetPot & args)
 
       out << "Solving Solid" << std::endl;
       solid_system.solve();
-      aux_system.reinit();
+      aux_system.current_local_solution->close();
+      *aux_system.solution = *aux_system.current_local_solution;
+      aux_system.solution->close();
 
       // Carry out the adaptive mesh refinement/coarsening
       out << "Doing a reinit of the equation systems" << std::endl;
@@ -149,9 +153,6 @@ int main(int argc, char ** argv)
 {
   // Initialize libMesh and any dependent libraries
   LibMeshInit init(argc, argv);
-
-  libMesh::out << "This example is currently skipped due to changes in 3b4b2fb." << std::endl;
-  return 77;
 
   // This example requires a linear solver package.
   libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
