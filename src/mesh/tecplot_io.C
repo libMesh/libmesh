@@ -69,7 +69,6 @@ public:
   dof_id_type n_cells;
   const unsigned int n_vert;
 };
-}
 
 
 
@@ -110,6 +109,8 @@ void TecplotMacros::set_n_cells (const dof_id_type nc)
   n_cells = nc;
   connData.resize(n_cells*n_vert);
 }
+}
+
 #endif
 //--------------------------------------------------------
 

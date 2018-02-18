@@ -503,14 +503,16 @@ public:
    * A gradient \p gptr is only required/used for projecting onto
    * finite element spaces with continuous derivatives.
    */
-  void project_solution (Number fptr(const Point & p,
-                                     const Parameters & parameters,
-                                     const std::string & sys_name,
-                                     const std::string & unknown_name),
-                         Gradient gptr(const Point & p,
-                                       const Parameters & parameters,
-                                       const std::string & sys_name,
-                                       const std::string & unknown_name),
+  typedef Number (*ValueFunctionPointer)(const Point & p,
+                                         const Parameters & Parameters,
+                                         const std::string & sys_name,
+                                         const std::string & unknown_name);
+  typedef Gradient (*GradientFunctionPointer)(const Point & p,
+                                              const Parameters & parameters,
+                                              const std::string & sys_name,
+                                              const std::string & unknown_name);
+  void project_solution (ValueFunctionPointer fptr,
+                         GradientFunctionPointer gptr,
                          const Parameters & parameters) const;
 
   /**
@@ -560,14 +562,8 @@ public:
    * Constrain the new vector using the requested adjoint rather than
    * primal constraints if is_adjoint is non-negative.
    */
-  void project_vector (Number fptr(const Point & p,
-                                   const Parameters & parameters,
-                                   const std::string & sys_name,
-                                   const std::string & unknown_name),
-                       Gradient gptr(const Point & p,
-                                     const Parameters & parameters,
-                                     const std::string & sys_name,
-                                     const std::string & unknown_name),
+  void project_vector (ValueFunctionPointer fptr,
+                       GradientFunctionPointer gptr,
                        const Parameters & parameters,
                        NumericVector<Number> & new_vector,
                        int is_adjoint = -1) const;
@@ -605,14 +601,8 @@ public:
    */
   void boundary_project_solution (const std::set<boundary_id_type> & b,
                                   const std::vector<unsigned int> & variables,
-                                  Number fptr(const Point & p,
-                                              const Parameters & parameters,
-                                              const std::string & sys_name,
-                                              const std::string & unknown_name),
-                                  Gradient gptr(const Point & p,
-                                                const Parameters & parameters,
-                                                const std::string & sys_name,
-                                                const std::string & unknown_name),
+                                  ValueFunctionPointer fptr,
+                                  GradientFunctionPointer gptr,
                                   const Parameters & parameters);
 
   /**
@@ -656,14 +646,8 @@ public:
    */
   void boundary_project_vector (const std::set<boundary_id_type> & b,
                                 const std::vector<unsigned int> & variables,
-                                Number fptr(const Point & p,
-                                            const Parameters & parameters,
-                                            const std::string & sys_name,
-                                            const std::string & unknown_name),
-                                Gradient gptr(const Point & p,
-                                              const Parameters & parameters,
-                                              const std::string & sys_name,
-                                              const std::string & unknown_name),
+                                ValueFunctionPointer fptr,
+                                GradientFunctionPointer gptr,
                                 const Parameters & parameters,
                                 NumericVector<Number> & new_vector,
                                 int is_adjoint = -1) const;

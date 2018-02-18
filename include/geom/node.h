@@ -112,7 +112,7 @@ public:
 
   /**
    * \returns A \p Node created from the specified (x,y,z) positions
-   * with id == \id and wrapped in a smart pointer.
+   * with id == \p id and wrapped in a smart pointer.
    */
   static std::unique_ptr<Node> build (const Real x,
                                       const Real y,
