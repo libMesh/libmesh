@@ -575,34 +575,23 @@ void ReplicatedMesh::clear ()
   // Call parent clear function
   MeshBase::clear();
 
-
   // Clear our elements and nodes
-  {
-    std::vector<Elem *>::iterator       it  = _elements.begin();
-    const std::vector<Elem *>::iterator end = _elements.end();
+  // There is no need to remove the elements from
+  // the BoundaryInfo data structure since we
+  // already cleared it.
+  for (auto & elem : _elements)
+    delete elem;
 
-    // There is no need to remove the elements from
-    // the BoundaryInfo data structure since we
-    // already cleared it.
-    for (; it != end; ++it)
-      delete *it;
-
-    _elements.clear();
-  }
+  _elements.clear();
 
   // clear the nodes data structure
-  {
-    std::vector<Node *>::iterator       it  = _nodes.begin();
-    const std::vector<Node *>::iterator end = _nodes.end();
+  // There is no need to remove the nodes from
+  // the BoundaryInfo data structure since we
+  // already cleared it.
+  for (auto & node : _nodes)
+    delete node;
 
-    // There is no need to remove the nodes from
-    // the BoundaryInfo data structure since we
-    // already cleared it.
-    for (; it != end; ++it)
-      delete *it;
-
-    _nodes.clear();
-  }
+  _nodes.clear();
 }
 
 
@@ -751,7 +740,6 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
       // are not connected to any elements and may be deleted
       // if desired.
 
-      // (This code block will erase the unused nodes)
       // Now, delete the unused nodes
       {
         std::vector<Node *>::iterator nd        = _nodes.begin();
@@ -759,21 +747,20 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
 
         std::advance (nd, next_free_node);
 
-        for (std::vector<Node *>::iterator it=nd;
-             it != end; ++it)
+        for (auto & node : as_range(std::make_pair(nd, end)))
           {
             // Mesh modification code might have already deleted some
             // nodes
-            if (*it == libmesh_nullptr)
+            if (node == libmesh_nullptr)
               continue;
 
             // remove any boundary information associated with
             // this node
-            this->get_boundary_info().remove (*it);
+            this->get_boundary_info().remove (node);
 
             // delete the node
-            delete *it;
-            *it = libmesh_nullptr;
+            delete node;
+            node = libmesh_nullptr;
           }
 
         _nodes.erase (nd, end);
@@ -922,12 +909,8 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
             // Container to catch boundary IDs passed back from BoundaryInfo.
             std::vector<boundary_id_type> bc_ids;
 
-            MeshBase::element_iterator elem_it  = mesh_array[i]->elements_begin();
-            MeshBase::element_iterator elem_end = mesh_array[i]->elements_end();
-            for ( ; elem_it != elem_end; ++elem_it)
+            for (auto & el : mesh_array[i]->element_ptr_range())
               {
-                Elem * el = *elem_it;
-
                 // Now check whether elem has a face on the specified boundary
                 for (auto side_id : el->side_index_range())
                   if (el->neighbor_ptr(side_id) == libmesh_nullptr)
@@ -1084,21 +1067,14 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
           // Otherwise, use a simple N^2 search to find the closest matching points. This can be helpful
           // in the case that we have tolerance issues which cause mismatch between the two surfaces
           // that are being stitched.
-
-          std::set<dof_id_type>::iterator set_it     = this_boundary_node_ids.begin();
-          std::set<dof_id_type>::iterator set_it_end = this_boundary_node_ids.end();
-          for ( ; set_it != set_it_end; ++set_it)
+          for (const auto & this_node_id : this_boundary_node_ids)
             {
-              dof_id_type this_node_id = *set_it;
               Node & this_node = this->node_ref(this_node_id);
 
               bool found_matching_nodes = false;
 
-              std::set<dof_id_type>::iterator other_set_it     = other_boundary_node_ids.begin();
-              std::set<dof_id_type>::iterator other_set_it_end = other_boundary_node_ids.end();
-              for ( ; other_set_it != other_set_it_end; ++other_set_it)
+              for (const auto & other_node_id : other_boundary_node_ids)
                 {
-                  dof_id_type other_node_id = *other_set_it;
                   Node & other_node = other_mesh->node_ref(other_node_id);
 
                   Real node_distance = (this_node - other_node).norm();
@@ -1119,32 +1095,26 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
         }
 
       // Build up the node_to_elems_map, using only one loop over other_mesh
-      {
-        MeshBase::element_iterator other_elem_it  = other_mesh->elements_begin();
-        MeshBase::element_iterator other_elem_end = other_mesh->elements_end();
-        for (; other_elem_it != other_elem_end; ++other_elem_it)
-          {
-            Elem * el = *other_elem_it;
+      for (auto & el : other_mesh->element_ptr_range())
+        {
+          // For each node on the element, find the corresponding node
+          // on "this" Mesh, 'this_node_id', if it exists, and push
+          // the current element ID back onto node_to_elems_map[this_node_id].
+          // For that we will use the reverse mapping we created at
+          // the same time as the forward mapping.
+          for (auto & n : el->node_ref_range())
+            {
+              dof_id_type other_node_id = n.id();
+              std::map<dof_id_type, dof_id_type>::iterator it =
+                other_to_this_node_map.find(other_node_id);
 
-            // For each node on the element, find the corresponding node
-            // on "this" Mesh, 'this_node_id', if it exists, and push
-            // the current element ID back onto node_to_elems_map[this_node_id].
-            // For that we will use the reverse mapping we created at
-            // the same time as the forward mapping.
-            for (auto & n : el->node_ref_range())
-              {
-                dof_id_type other_node_id = n.id();
-                std::map<dof_id_type, dof_id_type>::iterator it =
-                  other_to_this_node_map.find(other_node_id);
-
-                if (it != other_to_this_node_map.end())
-                  {
-                    dof_id_type this_node_id = it->second;
-                    node_to_elems_map[this_node_id].push_back( el->id() );
-                  }
-              }
-          }
-      }
+              if (it != other_to_this_node_map.end())
+                {
+                  dof_id_type this_node_id = it->second;
+                  node_to_elems_map[this_node_id].push_back( el->id() );
+                }
+            }
+        }
 
       if (verbose)
         {
@@ -1183,52 +1153,33 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
       LOG_SCOPE("stitch_meshes copying", "ReplicatedMesh");
 
       // need to increment node and element IDs of other_mesh before copying to this mesh
-      MeshBase::node_iterator node_it  = other_mesh->nodes_begin();
-      MeshBase::node_iterator node_end = other_mesh->nodes_end();
-      for (; node_it != node_end; ++node_it)
+      for (auto & nd : other_mesh->node_ptr_range())
         {
-          Node * nd = *node_it;
           dof_id_type new_id = nd->id() + node_delta;
           nd->set_id(new_id);
         }
 
-      MeshBase::element_iterator elem_it  = other_mesh->elements_begin();
-      MeshBase::element_iterator elem_end = other_mesh->elements_end();
-      for (; elem_it != elem_end; ++elem_it)
+      for (auto & el : other_mesh->element_ptr_range())
         {
-          Elem * el = *elem_it;
           dof_id_type new_id = el->id() + elem_delta;
           el->set_id(new_id);
         }
 
       // Also, increment the node_to_node_map and node_to_elems_map
-      std::map<dof_id_type, dof_id_type>::iterator node_map_it     = node_to_node_map.begin();
-      std::map<dof_id_type, dof_id_type>::iterator node_map_it_end = node_to_node_map.end();
-      for ( ; node_map_it != node_map_it_end; ++node_map_it)
-        {
-          node_map_it->second += node_delta;
-        }
-      std::map<dof_id_type, std::vector<dof_id_type>>::iterator elem_map_it     = node_to_elems_map.begin();
-      std::map<dof_id_type, std::vector<dof_id_type>>::iterator elem_map_it_end = node_to_elems_map.end();
-      for ( ; elem_map_it != elem_map_it_end; ++elem_map_it)
-        {
-          std::size_t n_elems = elem_map_it->second.size();
-          for (std::size_t i=0; i<n_elems; i++)
-            {
-              (elem_map_it->second)[i] += elem_delta;
-            }
-        }
+      for (auto & pr : node_to_node_map)
+        pr.second += node_delta;
+
+      for (auto & pr : node_to_elems_map)
+        for (auto & entry : pr.second)
+          entry += elem_delta;
 
       // Copy mesh data. If we skip the call to find_neighbors(), the lists
       // of neighbors will be copied verbatim from the other mesh
       this->copy_nodes_and_elements(*other_mesh, skip_find_neighbors);
 
       // Decrement node IDs of mesh to return to original state
-      node_it  = other_mesh->nodes_begin();
-      node_end = other_mesh->nodes_end();
-      for (; node_it != node_end; ++node_it)
+      for (auto & nd : other_mesh->node_ptr_range())
         {
-          Node * nd = *node_it;
           dof_id_type new_id = nd->id() - node_delta;
           nd->set_id(new_id);
         }
@@ -1236,12 +1187,8 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
       // Container to catch boundary IDs passed back from BoundaryInfo.
       std::vector<boundary_id_type> bc_ids;
 
-      elem_it  = other_mesh->elements_begin();
-      elem_end = other_mesh->elements_end();
-      for (; elem_it != elem_end; ++elem_it)
+      for (auto & other_elem : other_mesh->element_ptr_range())
         {
-          Elem * other_elem = *elem_it;
-
           // Decrement elem IDs of other_mesh to return it to original state
           dof_id_type new_id = other_elem->id() - elem_delta;
           other_elem->set_id(new_id);
@@ -1314,21 +1261,19 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
   // Container to catch boundary IDs passed back from BoundaryInfo.
   std::vector<boundary_id_type> bc_ids;
 
-  std::map<dof_id_type, std::vector<dof_id_type>>::iterator elem_map_it     = node_to_elems_map.begin();
-  std::map<dof_id_type, std::vector<dof_id_type>>::iterator elem_map_it_end = node_to_elems_map.end();
   {
     LOG_SCOPE("stitch_meshes node updates", "ReplicatedMesh");
 
-    for ( ; elem_map_it != elem_map_it_end; ++elem_map_it)
+    for (const auto & pr : node_to_elems_map)
       {
-        dof_id_type target_node_id = elem_map_it->first;
+        dof_id_type target_node_id = pr.first;
         dof_id_type other_node_id = node_to_node_map[target_node_id];
         Node & target_node = this->node_ref(target_node_id);
 
-        std::size_t n_elems = elem_map_it->second.size();
+        std::size_t n_elems = pr.second.size();
         for (std::size_t i=0; i<n_elems; i++)
           {
-            dof_id_type elem_id = elem_map_it->second[i];
+            dof_id_type elem_id = pr.second[i];
             Elem * el = this->elem_ptr(elem_id);
 
             // find the local node index that we want to update
@@ -1343,18 +1288,16 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
       }
   }
 
-  std::map<dof_id_type, dof_id_type>::iterator node_map_it     = node_to_node_map.begin();
-  std::map<dof_id_type, dof_id_type>::iterator node_map_it_end = node_to_node_map.end();
   {
     LOG_SCOPE("stitch_meshes node deletion", "ReplicatedMesh");
-    for ( ; node_map_it != node_map_it_end; ++node_map_it)
+    for (const auto & pr : node_to_node_map)
       {
         // In the case that this==other_mesh, the two nodes might be the same (e.g. if
         // we're stitching a "sliver"), hence we need to skip node deletion in that case.
-        if ((this == other_mesh) && (node_map_it->second == node_map_it->first))
+        if ((this == other_mesh) && (pr.second == pr.first))
           continue;
 
-        dof_id_type this_node_id = node_map_it->second;
+        dof_id_type this_node_id = pr.second;
         this->delete_node( this->node_ptr(this_node_id) );
       }
   }
@@ -1370,15 +1313,13 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
     {
       LOG_SCOPE("stitch_meshes neighbor fixes", "ReplicatedMesh");
 
-      elem_map_it     = node_to_elems_map.begin();
-      elem_map_it_end = node_to_elems_map.end();
       std::set<dof_id_type> fixed_elems;
-      for ( ; elem_map_it != elem_map_it_end; ++elem_map_it)
+      for (const auto & pr : node_to_elems_map)
         {
-          std::size_t n_elems = elem_map_it->second.size();
+          std::size_t n_elems = pr.second.size();
           for (std::size_t i=0; i<n_elems; i++)
             {
-              dof_id_type elem_id = elem_map_it->second[i];
+              dof_id_type elem_id = pr.second[i];
               if (fixed_elems.find(elem_id) == fixed_elems.end())
                 {
                   Elem * el = this->elem_ptr(elem_id);

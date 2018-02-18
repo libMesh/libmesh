@@ -223,10 +223,8 @@ void InverseDistanceInterpolation<KDDim>::interpolate_field_data (const std::vec
     std::vector<size_t> ret_index(num_results);
     std::vector<Real>   ret_dist_sqr(num_results);
 
-    for (std::vector<Point>::const_iterator tgt_it=tgt_pts.begin();
-         tgt_it != tgt_pts.end(); ++tgt_it)
+    for (const auto & tgt : tgt_pts)
       {
-        const Point & tgt(*tgt_it);
         const Real query_pt[] = { tgt(0), tgt(1), tgt(2) };
 
         _kd_tree->knnSearch(&query_pt[0], num_results, &ret_index[0], &ret_dist_sqr[0]);

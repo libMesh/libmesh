@@ -245,17 +245,11 @@ void RBConstruction::process_parameters_file (const std::string & parameters_fil
     }
 
   std::map<std::string,bool> log_scaling_in;
-  RBParameters::const_iterator it     = mu_min_in.begin();
-  RBParameters::const_iterator it_end = mu_min_in.end();
-  for ( ; it != it_end; ++it)
-    {
-      std::string param_name = it->first;
-
-      // For now, just set all entries to false.
-      // TODO: Implement a decent way to specify log-scaling true/false
-      // in the input text file
-      log_scaling_in[param_name] = false;
-    }
+  // For now, just set all entries to false.
+  // TODO: Implement a decent way to specify log-scaling true/false
+  // in the input text file
+  for (const auto & pr : mu_min_in)
+    log_scaling_in[pr.first] = false;
 
   // Set the parameters that have been read in
   set_rb_construction_parameters(n_training_samples,
@@ -334,18 +328,14 @@ void RBConstruction::print_info()
       libMesh::out << "RBThetaExpansion member is not set yet" << std::endl;
     }
   libMesh::out << "Number of parameters: " << get_n_params() << std::endl;
-  RBParameters::const_iterator it     = get_parameters().begin();
-  RBParameters::const_iterator it_end = get_parameters().end();
-  for ( ; it != it_end; ++it)
-    {
-      std::string param_name = it->first;
-      if (!is_discrete_parameter(param_name))
-        {
-          libMesh::out <<   "Parameter " << param_name
-                       << ": Min = " << get_parameter_min(param_name)
-                       << ", Max = " << get_parameter_max(param_name) << std::endl;
-        }
-    }
+  for (const auto & pr : get_parameters())
+    if (!is_discrete_parameter(pr.first))
+      {
+        libMesh::out <<   "Parameter " << pr.first
+                     << ": Min = " << get_parameter_min(pr.first)
+                     << ", Max = " << get_parameter_max(pr.first) << std::endl;
+      }
+
   print_discrete_parameter_values();
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
   libMesh::out << "quiet mode? " << is_quiet() << std::endl;
@@ -645,16 +635,8 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
                   std::map<numeric_index_type, Number> rhs_values;
                   elem_assembly->get_nodal_rhs_values(rhs_values, *this, node);
 
-                  std::map<numeric_index_type, Number>::const_iterator it =
-                    rhs_values.begin();
-                  const std::map<numeric_index_type, Number>::const_iterator it_end =
-                    rhs_values.end();
-                  for ( ; it != it_end; ++it)
-                    {
-                      numeric_index_type dof_index = it->first;
-                      Number value = it->second;
-                      input_vector->add( dof_index, value);
-                    }
+                  for (const auto & pr : rhs_values)
+                    input_vector->add(pr.first, pr.second);
                 }
 #endif
             }
@@ -788,12 +770,8 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
               for (unsigned int var1=0; var1<n_vars(); var1++)
                 {
                   ConstCouplingRow ccr(var1, *coupling_matrix);
-                  ConstCouplingRow::const_iterator end = ccr.end();
-                  for (ConstCouplingRow::const_iterator it =
-                         ccr.begin(); it != end; ++it)
+                  for (const auto & var2 : ccr)
                     {
-                      unsigned int var2 = *it;
-
                       unsigned int sub_m = context.get_elem_jacobian( var1, var2 ).m();
                       unsigned int sub_n = context.get_elem_jacobian( var1, var2 ).n();
                       DenseMatrix<Number> sub_jac(sub_m, sub_n);

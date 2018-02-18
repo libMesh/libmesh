@@ -105,11 +105,8 @@ locate_node(const Point & p,
   std::set<const Elem *> candidate_elements;
   this->operator()(p, candidate_elements, allowed_subdomains);
 
-  for (std::set<const Elem *>::const_iterator
-         it = candidate_elements.begin();
-       it != candidate_elements.end(); ++it)
+  for (const auto & elem : candidate_elements)
     {
-      const Elem * elem = *it;
       const int elem_n_nodes = elem->n_nodes();
       const Real hmax = elem->hmax();
       const Real dist_tol_sq = (tol * hmax) * (tol * hmax);

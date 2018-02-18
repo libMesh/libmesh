@@ -200,10 +200,9 @@ void DifferentiableSystem::add_second_order_dot_vars()
   const std::set<unsigned int> & second_order_vars = this->get_second_order_vars();
   if (!second_order_vars.empty())
     {
-      for (std::set<unsigned int>::const_iterator var_it = second_order_vars.begin();
-           var_it != second_order_vars.end(); ++var_it)
+      for (const auto & var_id : second_order_vars)
         {
-          const Variable & var = this->variable(*var_it);
+          const Variable & var = this->variable(var_id);
           std::string new_var_name = std::string("dot_")+var.name();
 
           unsigned int v_var_idx;
@@ -213,14 +212,14 @@ void DifferentiableSystem::add_second_order_dot_vars()
           else
             v_var_idx = this->add_variable( new_var_name, var.type(), &var.active_subdomains() );
 
-          _second_order_dot_vars.insert( std::pair<unsigned int,unsigned int>(*var_it,v_var_idx) );
+          _second_order_dot_vars.insert(std::pair<unsigned int, unsigned int>(var_id, v_var_idx));
 
           // The new velocities are time evolving variables of first order
           this->time_evolving( v_var_idx, 1 );
 
           // And if there are any boundary conditions set on the second order
           // variable, we also need to set it on its velocity variable.
-          this->add_dot_var_dirichlet_bcs( *var_it, v_var_idx );
+          this->add_dot_var_dirichlet_bcs(var_id, v_var_idx);
         }
     }
 }
@@ -332,15 +331,9 @@ bool DifferentiableSystem::have_first_order_scalar_vars() const
   bool have_first_order_scalar_vars = false;
 
   if (this->have_first_order_vars())
-    {
-      for (std::set<unsigned int>::const_iterator var_it = this->get_first_order_vars().begin();
-           var_it != this->get_first_order_vars().end();
-           ++var_it)
-        {
-          if (this->variable(*var_it).type().family == SCALAR)
-            have_first_order_scalar_vars = true;
-        }
-    }
+    for (const auto & var : this->get_first_order_vars())
+      if (this->variable(var).type().family == SCALAR)
+        have_first_order_scalar_vars = true;
 
   return have_first_order_scalar_vars;
 }
@@ -350,15 +343,9 @@ bool DifferentiableSystem::have_second_order_scalar_vars() const
   bool have_second_order_scalar_vars = false;
 
   if (this->have_second_order_vars())
-    {
-      for (std::set<unsigned int>::const_iterator var_it = this->get_second_order_vars().begin();
-           var_it != this->get_second_order_vars().end();
-           ++var_it)
-        {
-          if (this->variable(*var_it).type().family == SCALAR)
-            have_second_order_scalar_vars = true;
-        }
-    }
+    for (const auto & var : this->get_second_order_vars())
+      if (this->variable(var).type().family == SCALAR)
+        have_second_order_scalar_vars = true;
 
   return have_second_order_scalar_vars;
 }

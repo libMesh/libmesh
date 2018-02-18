@@ -57,11 +57,9 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int>> in_comm, EquationS
   {
     unsigned int i = 0;
 
-    for (std::set<unsigned int>::iterator it = semi_local_nodes.begin();
-         it != semi_local_nodes.end();
-         ++it)
+    for (const auto & id : semi_local_nodes)
       {
-        const Node & node = mesh.node_ref(*it);
+        const Node & node = mesh.node_ref(id);
 
         vertices[i] = node.id();
 
@@ -211,7 +209,7 @@ DTKAdapter::update_variable_values(std::string var_name)
 
   unsigned int i=0;
   // Loop over the values (one for each node) and assign the value of this variable at each node
-  for (FieldContainerType::iterator it=values->begin(); it != values->end(); ++it)
+  for (const auto & value : *values)
     {
       unsigned int node_num = vertices[i];
       const Node & node = mesh.node_ref(node_num);
@@ -220,7 +218,7 @@ DTKAdapter::update_variable_values(std::string var_name)
         {
           // The 0 is for the component... this only works for LAGRANGE!
           dof_id_type dof = node.dof_number(sys->number(), var_num, 0);
-          sys->solution->set(dof, *it);
+          sys->solution->set(dof, value);
         }
 
       i++;

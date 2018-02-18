@@ -124,11 +124,8 @@ void FEMContext::init_internal_data(const System & sys)
     // SCALAR FEs have dimension 0 by assumption
     _elem_dims.insert(0);
 
-  for (std::set<unsigned char>::const_iterator dim_it = _elem_dims.begin();
-       dim_it != _elem_dims.end(); ++dim_it)
+  for (const auto & dim : _elem_dims)
     {
-      const unsigned char dim = *dim_it;
-
       // Create an adequate quadrature rule
       _element_qrule[dim] =
         hardest_fe_type.default_quadrature_rule(dim, _extra_quadrature_order);
@@ -1360,15 +1357,13 @@ void FEMContext::elem_fe_reinit(const std::vector<Point> * const pts)
 
   libmesh_assert( !_element_fe[dim].empty() );
 
-  std::map<FEType, std::unique_ptr<FEAbstract>>::iterator local_fe_end = _element_fe[dim].end();
-  for (std::map<FEType, std::unique_ptr<FEAbstract>>::iterator i = _element_fe[dim].begin();
-       i != local_fe_end; ++i)
+  for (const auto & pr : _element_fe[dim])
     {
       if (this->has_elem())
-        i->second->reinit(&(this->get_elem()), pts);
+        pr.second->reinit(&(this->get_elem()), pts);
       else
         // If !this->has_elem(), then we assume we are dealing with a SCALAR variable
-        i->second->reinit(libmesh_nullptr);
+        pr.second->reinit(libmesh_nullptr);
     }
 }
 
@@ -1383,12 +1378,8 @@ void FEMContext::side_fe_reinit ()
 
   libmesh_assert( !_side_fe[dim].empty() );
 
-  std::map<FEType, std::unique_ptr<FEAbstract>>::iterator local_fe_end = _side_fe[dim].end();
-  for (std::map<FEType, std::unique_ptr<FEAbstract>>::iterator i = _side_fe[dim].begin();
-       i != local_fe_end; ++i)
-    {
-      i->second->reinit(&(this->get_elem()), this->get_side());
-    }
+  for (auto & pr : _side_fe[dim])
+    pr.second->reinit(&(this->get_elem()), this->get_side());
 }
 
 
@@ -1399,12 +1390,8 @@ void FEMContext::edge_fe_reinit ()
 
   // Initialize all the interior FE objects on elem/edge.
   // Logging of FE::reinit is done in the FE functions
-  std::map<FEType, std::unique_ptr<FEAbstract>>::iterator local_fe_end = _edge_fe.end();
-  for (std::map<FEType, std::unique_ptr<FEAbstract>>::iterator i = _edge_fe.begin();
-       i != local_fe_end; ++i)
-    {
-      i->second->edge_reinit(&(this->get_elem()), this->get_edge());
-    }
+  for (auto & pr : _edge_fe)
+    pr.second->edge_reinit(&(this->get_elem()), this->get_edge());
 }
 
 

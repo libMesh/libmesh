@@ -70,8 +70,8 @@ public:
 
   void operator()(const ConstElemRange & range)
   {
-    for (ConstElemRange::const_iterator it = range.begin(); it !=range.end(); ++it)
-      _weight += (*it)->n_nodes();
+    for (const auto & elem : range)
+      _weight += elem->n_nodes();
   }
 
   dof_id_type weight() const
@@ -107,22 +107,18 @@ public:
 
   void operator()(const ConstNodeRange & range)
   {
-    for (ConstNodeRange::const_iterator it = range.begin(); it != range.end(); ++it)
+    for (const auto & node : range)
       {
-        const Node * node = *it;
         libmesh_assert(node);
-
         _bbox.union_with(*node);
       }
   }
 
   void operator()(const ConstElemRange & range)
   {
-    for (ConstElemRange::const_iterator it = range.begin(); it != range.end(); ++it)
+    for (const auto & elem : range)
       {
-        const Elem * elem = *it;
         libmesh_assert(elem);
-
         _bbox.union_with(elem->loose_bounding_box());
       }
   }
@@ -540,12 +536,11 @@ dof_id_type MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase & me
                                                              const unsigned int level)
 {
   dof_id_type cnt = 0;
-  // iterate over the elements of the specified type
-  MeshBase::const_element_iterator el = mesh.type_elements_begin(type);
-  const MeshBase::const_element_iterator end = mesh.type_elements_end(type);
 
-  for (; el!=end; ++el)
-    if (((*el)->level() == level) && !(*el)->subactive())
+  // iterate over the elements of the specified type
+  for (const auto & elem : as_range(std::make_pair(mesh.type_elements_begin(type),
+                                                   mesh.type_elements_end(type))))
+    if ((elem->level() == level) && !elem->subactive())
       cnt++;
 
   return cnt;
