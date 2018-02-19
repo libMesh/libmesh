@@ -26,6 +26,7 @@
 // C++ includes
 #include <map>
 #include <vector>
+#include <memory>
 
 namespace libMesh
 {
