@@ -1,6 +1,16 @@
 #!/bin/bash
 #set -e
 
+# This script is designed to be run as part of "make installcheck"
+# but you can also run it manually from the source tree if you have a
+# libMesh installed in $LIBMESH_DIR.
+
+# You can run the script on a single header file by doing:
+# test_CXXFLAGS="`$LIBMESH_DIR/bin/libmesh-config --cppflags --cxxflags --include`" HEADERS_TO_TEST=exact_solution.h ./contrib/bin/test_installed_headers.sh
+
+# To run this script on *every* header file in an installed libMesh:
+# test_CXXFLAGS="`$LIBMESH_DIR/bin/libmesh-config --cppflags --cxxflags --include`" HEADERS_TO_TEST="`find $LIBMESH_DIR/include/libmesh -name "*.h" -type f -exec basename {} \;`" ./contrib/bin/test_installed_headers.sh
+
 # Respect the JOBS environment variable, if it is set
 if [ -n "$JOBS" ]; then
     n_concurrent=$JOBS
