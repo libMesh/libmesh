@@ -23,6 +23,8 @@
 // Local Includes
 #include "libmesh/error_estimator.h"
 #include "libmesh/function_base.h"
+#include "libmesh/vector_value.h"
+#include "libmesh/tensor_value.h"
 
 // C++ includes
 #include <cstddef>
@@ -39,19 +41,7 @@ typedef FEGenericBase<Real> FEBase;
 class MeshFunction;
 class Point;
 class Parameters;
-
 template <typename T> class DenseVector;
-
-// Is there any way to simplify this?
-// All we need are Tensor and Gradient. - RHS
-template <typename T> class TensorValue;
-template <typename T> class VectorValue;
-typedef TensorValue<Number> NumberTensorValue;
-typedef NumberTensorValue   Tensor;
-typedef VectorValue<Number> NumberVectorValue;
-typedef NumberVectorValue   Gradient;
-
-
 
 /**
  * This class implements an "error estimator"

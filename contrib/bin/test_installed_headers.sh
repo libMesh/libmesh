@@ -1,6 +1,16 @@
 #!/bin/bash
 #set -e
 
+# This script is designed to be run as part of "make installcheck"
+# but you can also run it manually from the source tree if you have a
+# libMesh installed in $LIBMESH_DIR.
+
+# You can run the script on a single header file by doing:
+# test_CXXFLAGS="`$LIBMESH_DIR/bin/libmesh-config --cppflags --cxxflags --include`" HEADERS_TO_TEST=exact_solution.h ./contrib/bin/test_installed_headers.sh
+
+# To run this script on *every* header file in an installed libMesh:
+# test_CXXFLAGS="`$LIBMESH_DIR/bin/libmesh-config --cppflags --cxxflags --include`" HEADERS_TO_TEST="`find $LIBMESH_DIR/include/libmesh -name "*.h" -type f -exec basename {} \;`" ./contrib/bin/test_installed_headers.sh
+
 # Respect the JOBS environment variable, if it is set
 if [ -n "$JOBS" ]; then
     n_concurrent=$JOBS
@@ -39,14 +49,14 @@ if (test "x$test_CXXFLAGS" = "x"); then
     testing_installed_tree="yes"
 
     if (test "x$PKG_CONFIG" != "xno"); then
-	test_CXXFLAGS=`pkg-config libmesh --cflags`
+        test_CXXFLAGS=`pkg-config libmesh --cflags`
 
     elif (test -x $LIBMESH_CONFIG_PATH/libmesh-config); then
-	test_CXXFLAGS=`$LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include`
+        test_CXXFLAGS=`$LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include`
 
     else
-	echo "Cannot query package installation!!"
-	exit 1
+        echo "Cannot query package installation!!"
+        exit 1
     fi
 fi
 
@@ -115,9 +125,9 @@ for header_to_test in $HEADERS_TO_TEST ; do
     # skip the files that live in contrib that we are installing when testing
     # from the source tree - paths will not be correct
     if (test "x$testing_installed_tree" = "xno"); then
-	if (test "x`dirname $header_to_test`" = "xcontrib"); then
-	    continue
-	fi
+        if (test "x`dirname $header_to_test`" = "xcontrib"); then
+            continue
+        fi
     fi
 
     if [ $nrunning -lt $n_concurrent ]; then
@@ -138,4 +148,3 @@ done
 wait
 
 exit $returnval
-
