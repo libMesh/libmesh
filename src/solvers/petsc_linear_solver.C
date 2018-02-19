@@ -42,7 +42,7 @@ namespace libMesh
 extern "C"
 {
 #if PETSC_RELEASE_LESS_THAN(3,0,1)
-  PetscErrorCode __libmesh_petsc_preconditioner_setup (void * ctx)
+  PetscErrorCode libmesh_petsc_preconditioner_setup (void * ctx)
   {
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number> *>(ctx);
 
@@ -55,7 +55,7 @@ extern "C"
   }
 
 
-  PetscErrorCode __libmesh_petsc_preconditioner_apply(void * ctx, Vec x, Vec y)
+  PetscErrorCode libmesh_petsc_preconditioner_apply(void * ctx, Vec x, Vec y)
   {
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number> *>(ctx);
 
@@ -67,7 +67,7 @@ extern "C"
     return 0;
   }
 #else
-  PetscErrorCode __libmesh_petsc_preconditioner_setup (PC pc)
+  PetscErrorCode libmesh_petsc_preconditioner_setup (PC pc)
   {
     void * ctx;
     PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
@@ -81,7 +81,7 @@ extern "C"
     return 0;
   }
 
-  PetscErrorCode __libmesh_petsc_preconditioner_apply(PC pc, Vec x, Vec y)
+  PetscErrorCode libmesh_petsc_preconditioner_apply(PC pc, Vec x, Vec y)
   {
     void * ctx;
     PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
@@ -94,6 +94,35 @@ extern "C"
 
     return 0;
   }
+#endif
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+#if PETSC_RELEASE_LESS_THAN(3,0,1)
+  PetscErrorCode __libmesh_petsc_preconditioner_setup (void * ctx)
+  {
+    libmesh_deprecated();
+    return libmesh_petsc_preconditioner_setup(ctx);
+  }
+
+  PetscErrorCode __libmesh_petsc_preconditioner_apply(void * ctx, Vec x, Vec y)
+  {
+    libmesh_deprecated();
+    return libmesh_petsc_preconditioner_apply(ctx, x, y);
+  }
+
+#else
+  PetscErrorCode __libmesh_petsc_preconditioner_setup (PC pc)
+  {
+    libmesh_deprecated();
+    return libmesh_petsc_preconditioner_setup(pc);
+  }
+
+  PetscErrorCode __libmesh_petsc_preconditioner_apply(PC pc, Vec x, Vec y)
+  {
+    libmesh_deprecated();
+    return libmesh_petsc_preconditioner_apply(pc, x, y);
+  }
+#endif
 #endif
 } // end extern "C"
 
@@ -227,8 +256,8 @@ void PetscLinearSolver<T>::init (const char * name)
         {
           this->_preconditioner->init();
           PCShellSetContext(_pc,(void *)this->_preconditioner);
-          PCShellSetSetUp(_pc,__libmesh_petsc_preconditioner_setup);
-          PCShellSetApply(_pc,__libmesh_petsc_preconditioner_apply);
+          PCShellSetSetUp(_pc,libmesh_petsc_preconditioner_setup);
+          PCShellSetApply(_pc,libmesh_petsc_preconditioner_apply);
         }
     }
 }
@@ -330,8 +359,8 @@ void PetscLinearSolver<T>::init (PetscMatrix<T> * matrix,
           this->_preconditioner->set_matrix(*matrix);
           this->_preconditioner->init();
           PCShellSetContext(_pc,(void *)this->_preconditioner);
-          PCShellSetSetUp(_pc,__libmesh_petsc_preconditioner_setup);
-          PCShellSetApply(_pc,__libmesh_petsc_preconditioner_apply);
+          PCShellSetSetUp(_pc,libmesh_petsc_preconditioner_setup);
+          PCShellSetApply(_pc,libmesh_petsc_preconditioner_apply);
         }
     }
 }
