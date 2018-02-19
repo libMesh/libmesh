@@ -19,6 +19,7 @@
 #define LIBMESH_MULTI_PREDICATES_H
 
 // Local includes
+#include "libmesh/libmesh.h" // libMesh::invalid_uint
 #include "libmesh/single_predicates.h"
 
 // C++ includes
