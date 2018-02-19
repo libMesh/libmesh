@@ -39,14 +39,14 @@ if (test "x$test_CXXFLAGS" = "x"); then
     testing_installed_tree="yes"
 
     if (test "x$PKG_CONFIG" != "xno"); then
-	test_CXXFLAGS=`pkg-config libmesh --cflags`
+        test_CXXFLAGS=`pkg-config libmesh --cflags`
 
     elif (test -x $LIBMESH_CONFIG_PATH/libmesh-config); then
-	test_CXXFLAGS=`$LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include`
+        test_CXXFLAGS=`$LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include`
 
     else
-	echo "Cannot query package installation!!"
-	exit 1
+        echo "Cannot query package installation!!"
+        exit 1
     fi
 fi
 
@@ -115,9 +115,9 @@ for header_to_test in $HEADERS_TO_TEST ; do
     # skip the files that live in contrib that we are installing when testing
     # from the source tree - paths will not be correct
     if (test "x$testing_installed_tree" = "xno"); then
-	if (test "x`dirname $header_to_test`" = "xcontrib"); then
-	    continue
-	fi
+        if (test "x`dirname $header_to_test`" = "xcontrib"); then
+            continue
+        fi
     fi
 
     if [ $nrunning -lt $n_concurrent ]; then
@@ -138,4 +138,3 @@ done
 wait
 
 exit $returnval
-
