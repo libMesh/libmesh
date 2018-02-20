@@ -1553,7 +1553,9 @@ void FEMap::compute_inverse_map_second_derivs(unsigned p)
         // Increment the counter
         ctr++;
       }
-
+#else
+   // to avoid compiler warnings:
+   libmesh_ignore(p);
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 }
 

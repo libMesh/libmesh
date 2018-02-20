@@ -110,10 +110,10 @@ int main (int argc, char ** argv)
   libmesh_example_requires(false, "--disable-singleprecision");
 #endif
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-  // SLEPc currently gives us an "inner product not well defined" with
-  // Number==complex
-  libmesh_example_requires(false, "--disable-complex");
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS && SLEPC_VERSION_LESS_THAN(3,6,2)
+  // SLEPc used to give us an "inner product not well defined" with
+  // Number==complex; but this problem seems to be solved in newer versions.
+  libmesh_example_requires(false, "--disable-complex or use SLEPc>=3.6.2");
 #endif
 
   // Tell the user what we are doing.
