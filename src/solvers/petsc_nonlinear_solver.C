@@ -883,6 +883,19 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
       this->_solver_configuration->configure_solver();
     }
 
+  // In PETSc versions before 3.5.0, it is not possible to call
+  // SNESSetUp() before the solution and rhs vectors are initialized, as
+  // this triggers the
+  //
+  // "Solution vector cannot be right hand side vector!"
+  //
+  // error message. It is also not possible to call SNESSetSolution()
+  // in those versions of PETSc to work around the problem, since that
+  // API was removed in 3.0.0 and only restored in 3.6.0. The
+  // overzealous check was moved out of SNESSetUp in PETSc 3.5.0
+  // (petsc/petsc@154060b), so this code block should be safe to use
+  // in 3.5.0 and later.
+#if !PETSC_VERSION_LESS_THAN(3,5,0)
   ierr = SNESSetUp(_snes);
   LIBMESH_CHKERR(ierr);
 
@@ -895,6 +908,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   // Resue the residual vector from SNES
   ierr = MatSNESMFSetReuseBase(J, PETSC_TRUE);
   LIBMESH_CHKERR(ierr);
+#endif
 #endif
 
 #if PETSC_VERSION_LESS_THAN(3, 3, 0)
