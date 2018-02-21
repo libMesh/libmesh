@@ -161,7 +161,7 @@ CheckpointIO::CheckpointIO (MeshBase & mesh, const bool binary_in) :
   _parallel           (false),
   _version            ("checkpoint-1.2"),
   _my_processor_ids   (1, processor_id()),
-  _my_n_processors    (n_processors())
+  _my_n_processors    (mesh.is_replicated() ? 1 : n_processors())
 {
 }
 
@@ -171,7 +171,7 @@ CheckpointIO::CheckpointIO (const MeshBase & mesh, const bool binary_in) :
   _binary             (binary_in),
   _parallel           (false),
   _my_processor_ids   (1, processor_id()),
-  _my_n_processors    (n_processors())
+  _my_n_processors    (mesh.is_replicated() ? 1 : n_processors())
 {
 }
 
