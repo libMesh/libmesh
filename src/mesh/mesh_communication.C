@@ -940,15 +940,9 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
 
   const processor_id_type proc_id = mesh.processor_id();
   // Look for just-coarsened elements
-  MeshBase::element_iterator       it  =
-    mesh.flagged_pid_elements_begin(Elem::COARSEN, proc_id);
-  const MeshBase::element_iterator end =
-    mesh.flagged_pid_elements_end(Elem::COARSEN, proc_id);
-
-  for ( ; it != end; ++it)
+  for (auto elem : as_range(mesh.flagged_pid_elements_begin(Elem::COARSEN, proc_id),
+                            mesh.flagged_pid_elements_end(Elem::COARSEN, proc_id)))
     {
-      Elem * elem = *it;
-
       // If it's flagged for coarsening it had better have a parent
       libmesh_assert(elem->parent());
 
@@ -1802,11 +1796,8 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   std::set<const Elem *, CompareElemIdsByLevel> elements_to_keep;
 
   // Don't delete elements that we were explicitly told not to
-  for (std::set<Elem *>::iterator it = extra_ghost_elem_ids.begin();
-       it != extra_ghost_elem_ids.end(); ++it)
+  for (const auto & elem : extra_ghost_elem_ids)
     {
-      const Elem * elem = *it;
-
       std::vector<const Elem *> active_family;
 #ifdef LIBMESH_ENABLE_AMR
       if (!elem->subactive())
@@ -1845,25 +1836,21 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   unsigned int n_levels = MeshTools::n_levels(mesh);
 
   for (int l = n_levels - 1; l >= 0; --l)
-    {
-      MeshBase::element_iterator lev_elem_it = mesh.level_elements_begin(l),
-        lev_end     = mesh.level_elements_end(l);
-      for (; lev_elem_it != lev_end; ++lev_elem_it)
-        {
-          Elem * elem = *lev_elem_it;
-          libmesh_assert (elem);
-          // Make sure we don't leave any invalid pointers
-          const bool keep_me = elements_to_keep.count(elem);
+    for (auto & elem : as_range(mesh.level_elements_begin(l),
+                                mesh.level_elements_end(l)))
+      {
+        libmesh_assert (elem);
+        // Make sure we don't leave any invalid pointers
+        const bool keep_me = elements_to_keep.count(elem);
 
-          if (!keep_me)
-            elem->make_links_to_me_remote();
+        if (!keep_me)
+          elem->make_links_to_me_remote();
 
-          // delete_elem doesn't currently invalidate element
-          // iterators... that had better not change
-          if (!keep_me)
-            mesh.delete_elem(elem);
-        }
-    }
+        // delete_elem doesn't currently invalidate element
+        // iterators... that had better not change
+        if (!keep_me)
+          mesh.delete_elem(elem);
+      }
 
   // Delete all the nodes we have no reason to save
   for (auto & node : mesh.node_ptr_range())

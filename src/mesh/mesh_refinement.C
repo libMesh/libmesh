@@ -1022,48 +1022,40 @@ bool MeshRefinement::make_coarsening_compatible()
   // for unrefinement.  If all the children don't
   // all want to be unrefined then ALL of them need to have their
   // unrefinement flags cleared.
-  for (int level=(max_level); level >= 0; level--)
-    {
-      MeshBase::element_iterator       el     = _mesh.level_elements_begin(level);
-      const MeshBase::element_iterator end_el = _mesh.level_elements_end(level);
-      for (; el != end_el; ++el)
+  for (int level = max_level; level >= 0; level--)
+    for (auto & elem : as_range(_mesh.level_elements_begin(level), _mesh.level_elements_end(level)))
+      if (elem->ancestor())
         {
-          Elem * elem = *el;
-          if (elem->ancestor())
-            {
+          // right now the element hasn't been disqualified
+          // as a candidate for unrefinement
+          bool is_a_candidate = true;
+          bool found_remote_child = false;
 
-              // right now the element hasn't been disqualified
-              // as a candidate for unrefinement
-              bool is_a_candidate = true;
-              bool found_remote_child = false;
+          for (auto & child : elem->child_ref_range())
+            {
+              if (&child == remote_elem)
+                found_remote_child = true;
+              else if ((child.refinement_flag() != Elem::COARSEN) ||
+                       !child.active() )
+                is_a_candidate = false;
+            }
+
+          if (!is_a_candidate && !found_remote_child)
+            {
+              elem->set_refinement_flag(Elem::INACTIVE);
 
               for (auto & child : elem->child_ref_range())
                 {
                   if (&child == remote_elem)
-                    found_remote_child = true;
-                  else if ((child.refinement_flag() != Elem::COARSEN) ||
-                           !child.active() )
-                    is_a_candidate = false;
-                }
-
-              if (!is_a_candidate && !found_remote_child)
-                {
-                  elem->set_refinement_flag(Elem::INACTIVE);
-
-                  for (auto & child : elem->child_ref_range())
+                    continue;
+                  if (child.refinement_flag() == Elem::COARSEN)
                     {
-                      if (&child == remote_elem)
-                        continue;
-                      if (child.refinement_flag() == Elem::COARSEN)
-                        {
-                          level_one_satisfied = false;
-                          child.set_refinement_flag(Elem::DO_NOTHING);
-                        }
+                      level_one_satisfied = false;
+                      child.set_refinement_flag(Elem::DO_NOTHING);
                     }
                 }
             }
         }
-    }
 
   if (!level_one_satisfied && _face_level_mismatch_limit) goto repeat;
 
@@ -1087,14 +1079,8 @@ bool MeshRefinement::make_coarsening_compatible()
   std::vector<std::vector<dof_id_type>>
     uncoarsenable_parents(n_proc);
 
-  MeshBase::element_iterator       ancestor_el =
-    _mesh.ancestor_elements_begin();
-  const MeshBase::element_iterator ancestor_el_end =
-    _mesh.ancestor_elements_end();
-  for (; ancestor_el != ancestor_el_end; ++ancestor_el)
+  for (auto & elem : as_range(_mesh.ancestor_elements_begin(), _mesh.ancestor_elements_end()))
     {
-      Elem * elem = *ancestor_el;
-
       // Presume all the children are flagged for coarsening and
       // then look for a contradiction
       bool all_children_flagged_for_coarsening = true;
@@ -1151,11 +1137,9 @@ bool MeshRefinement::make_coarsening_compatible()
             (Parallel::any_source, my_uncoarsenable_parents,
              uncoarsenable_tag);
 
-          for (std::vector<dof_id_type>::const_iterator
-                 it = my_uncoarsenable_parents.begin(),
-                 end = my_uncoarsenable_parents.end(); it != end; ++it)
+          for (const auto & id : my_uncoarsenable_parents)
             {
-              Elem & elem = _mesh.elem_ref(*it);
+              Elem & elem = _mesh.elem_ref(id);
               libmesh_assert(elem.refinement_flag() == Elem::INACTIVE ||
                              elem.refinement_flag() == Elem::COARSEN_INACTIVE);
               elem.set_refinement_flag(Elem::INACTIVE);
@@ -1559,12 +1543,9 @@ bool MeshRefinement::_refine_elements ()
 
   if (!_mesh.is_replicated())
     {
-      for (MeshBase::element_iterator
-             elem_it = _mesh.active_not_local_elements_begin(),
-             elem_end = _mesh.active_not_local_elements_end();
-           elem_it != elem_end; ++elem_it)
+      for (auto & elem : as_range(_mesh.active_not_local_elements_begin(),
+                                  _mesh.active_not_local_elements_end()))
         {
-          Elem * elem = *elem_it;
           if (elem->refinement_flag() == Elem::REFINE)
             local_copy_of_elements.push_back(elem);
           if (elem->p_refinement_flag() == Elem::REFINE &&
@@ -1752,16 +1733,10 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
           std::vector<std::vector<dof_id_type>>
             parents_to_coarsen(n_proc);
 
-          MeshBase::const_element_iterator       elem_it  = _mesh.ancestor_elements_begin();
-          const MeshBase::const_element_iterator elem_end = _mesh.ancestor_elements_end();
-
-          for ( ; elem_it != elem_end; ++elem_it)
-            {
-              const Elem & elem = **elem_it;
-              if (elem.processor_id() != my_proc_id &&
-                  elem.refinement_flag() == Elem::COARSEN_INACTIVE)
-                parents_to_coarsen[elem.processor_id()].push_back(elem.id());
-            }
+          for (const auto & elem : as_range(_mesh.ancestor_elements_begin(), _mesh.ancestor_elements_end()))
+            if (elem->processor_id() != my_proc_id &&
+                elem->refinement_flag() == Elem::COARSEN_INACTIVE)
+              parents_to_coarsen[elem->processor_id()].push_back(elem->id());
 
           Parallel::MessageTag
             coarsen_tag = this->comm().get_unique_tag(271);
@@ -1786,11 +1761,9 @@ void MeshRefinement::uniformly_coarsen (unsigned int n)
                 (Parallel::any_source, my_parents_to_coarsen,
                  coarsen_tag);
 
-              for (std::vector<dof_id_type>::const_iterator
-                     it = my_parents_to_coarsen.begin(),
-                     end = my_parents_to_coarsen.end(); it != end; ++it)
+              for (const auto & id : my_parents_to_coarsen)
                 {
-                  Elem & elem = _mesh.elem_ref(*it);
+                  Elem & elem = _mesh.elem_ref(id);
                   libmesh_assert(elem.refinement_flag() == Elem::INACTIVE ||
                                  elem.refinement_flag() == Elem::COARSEN_INACTIVE);
                   elem.set_refinement_flag(Elem::COARSEN_INACTIVE);

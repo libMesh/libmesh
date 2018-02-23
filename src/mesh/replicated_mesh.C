@@ -1409,26 +1409,18 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
       // Container to catch boundary IDs passed back from BoundaryInfo.
       std::vector<boundary_id_type> bc_ids;
 
-      MeshBase::element_iterator elem_it  = this->elements_begin();
-      MeshBase::element_iterator elem_end = this->elements_end();
-      for (; elem_it != elem_end; ++elem_it)
-        {
-          Elem * el = *elem_it;
-
-          for (auto side_id : el->side_index_range())
+      for (auto & el : element_ptr_range())
+        for (auto side_id : el->side_index_range())
+          if (el->neighbor_ptr(side_id) != libmesh_nullptr)
             {
-              if (el->neighbor_ptr(side_id) != libmesh_nullptr)
-                {
-                  // Completely remove the side from the boundary_info object if it has either
-                  // this_mesh_boundary_id or other_mesh_boundary_id.
-                  this->get_boundary_info().boundary_ids (el, side_id, bc_ids);
+              // Completely remove the side from the boundary_info object if it has either
+              // this_mesh_boundary_id or other_mesh_boundary_id.
+              this->get_boundary_info().boundary_ids (el, side_id, bc_ids);
 
-                  if (std::find(bc_ids.begin(), bc_ids.end(), this_mesh_boundary_id) != bc_ids.end() ||
-                      std::find(bc_ids.begin(), bc_ids.end(), other_mesh_boundary_id) != bc_ids.end())
-                    this->get_boundary_info().remove_side(el, side_id);
-                }
+              if (std::find(bc_ids.begin(), bc_ids.end(), this_mesh_boundary_id) != bc_ids.end() ||
+                  std::find(bc_ids.begin(), bc_ids.end(), other_mesh_boundary_id) != bc_ids.end())
+                this->get_boundary_info().remove_side(el, side_id);
             }
-        }
 
       // Removing stitched-away boundary ids might have removed an id
       // *entirely*, so we need to recompute boundary id sets to check

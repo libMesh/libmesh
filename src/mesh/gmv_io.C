@@ -1030,8 +1030,8 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
           // used repeatedly below.
           {
             unsigned ctr=0;
-            for (sbdid_map_iter it=sbdid_map.begin(); it != sbdid_map.end(); ++it)
-              (*it).second = ctr++;
+            for (auto & pr : sbdid_map)
+              pr.second = ctr++;
           }
 
           out_stream << "material "

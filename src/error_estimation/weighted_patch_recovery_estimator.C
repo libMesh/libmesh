@@ -114,11 +114,8 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 
   //------------------------------------------------------------
   // Iterate over all the elements in the range.
-  for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it!=range.end(); ++elem_it)
+  for (const auto & elem : range)
     {
-      // elem is necessarily an active element on the local processor
-      const Elem * elem = *elem_it;
-
       // We'll need an index into the error vector
       const dof_id_type e_id=elem->id();
 

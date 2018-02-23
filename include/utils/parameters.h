@@ -341,12 +341,11 @@ Parameters & Parameters::operator= (const Parameters & source)
 inline
 Parameters & Parameters::operator+= (const Parameters & source)
 {
-  for (Parameters::const_iterator it = source._values.begin();
-       it != source._values.end(); ++it)
+  for (const auto & pr : source._values)
     {
-      if (_values.find(it->first) != _values.end())
-        delete _values[it->first];
-      _values[it->first] = it->second->clone();
+      if (_values.find(pr.first) != _values.end())
+        delete _values[pr.first];
+      _values[pr.first] = pr.second->clone();
     }
 
   return *this;

@@ -1560,14 +1560,8 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
                 {
                   ConstCouplingRow ccr(vi, *ghost_coupling);
 
-                  for (ConstCouplingRow::const_iterator
-                         it = ccr.begin(),
-                         end = ccr.end();
-                       it != end; ++it)
-                    {
-                      const unsigned int vj = *it;
-                      has_variable[vj] = true;
-                    }
+                  for (const auto & vj : ccr)
+                    has_variable[vj] = true;
                 }
               for (unsigned int vj = 0; vj != n_var; ++vj)
                 {
@@ -2709,16 +2703,15 @@ std::string DofMap::get_info() const
     n_rhss = 0;
   long double avg_constraint_length = 0.;
 
-  for (DofConstraints::const_iterator it=_dof_constraints.begin();
-       it != _dof_constraints.end(); ++it)
+  for (const auto & pr : _dof_constraints)
     {
       // Only count local constraints, then sum later
-      const dof_id_type constrained_dof = it->first;
+      const dof_id_type constrained_dof = pr.first;
       if (constrained_dof < this->first_dof() ||
           constrained_dof >= this->end_dof())
         continue;
 
-      const DofConstraintRow & row = it->second;
+      const DofConstraintRow & row = pr.second;
       std::size_t rowsize = row.size();
 
       max_constraint_length = std::max(max_constraint_length,
@@ -2753,15 +2746,14 @@ std::string DofMap::get_info() const
     n_node_rhss = 0;
   long double avg_node_constraint_length = 0.;
 
-  for (NodeConstraints::const_iterator it=_node_constraints.begin();
-       it != _node_constraints.end(); ++it)
+  for (const auto & pr : _node_constraints)
     {
       // Only count local constraints, then sum later
-      const Node * node = it->first;
+      const Node * node = pr.first;
       if (node->processor_id() != this->processor_id())
         continue;
 
-      const NodeConstraintRow & row = it->second.first;
+      const NodeConstraintRow & row = pr.second.first;
       std::size_t rowsize = row.size();
 
       max_node_constraint_length = std::max(max_node_constraint_length,
@@ -2769,7 +2761,7 @@ std::string DofMap::get_info() const
       avg_node_constraint_length += rowsize;
       n_node_constraints++;
 
-      if (it->second.second != Point(0))
+      if (pr.second.second != Point(0))
         n_node_rhss++;
     }
 

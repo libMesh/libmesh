@@ -558,10 +558,10 @@ void ExodusII_IO::read_elemental_variable(std::string elemental_var_name,
   std::map<dof_id_type, Real> elem_var_value_map;
 
   exio_helper->read_elemental_var_values(elemental_var_name, timestep, elem_var_value_map);
-  for (auto it = elem_var_value_map.begin(); it != elem_var_value_map.end(); ++it)
+  for (auto & pr : elem_var_value_map)
     {
-      const Elem * elem = MeshInput<MeshBase>::mesh().query_elem_ptr(it->first);
-      unique_id_to_value_map.insert(std::make_pair(elem->top_parent()->unique_id(), it->second));
+      const Elem * elem = MeshInput<MeshBase>::mesh().query_elem_ptr(pr.first);
+      unique_id_to_value_map.insert(std::make_pair(elem->top_parent()->unique_id(), pr.second));
     }
 }
 

@@ -470,11 +470,10 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
   unique_id_type old_max_unique_id = boundary_mesh.parallel_max_unique_id();
 #endif
 
-  for (side_container::const_iterator it = sides_to_add.begin();
-       it != sides_to_add.end(); ++it)
+  for (const auto & pr : sides_to_add)
     {
-      const dof_id_type elem_id = it->first;
-      const unsigned char s = it->second;
+      const dof_id_type elem_id = pr.first;
+      const unsigned char s = pr.second;
       Elem * elem = _mesh.elem_ptr(elem_id);
 
       // Build the side - do not use a "proxy" element here:
@@ -1917,9 +1916,8 @@ BoundaryInfo::build_node_list_from_side_list()
       this->comm().receive
         (Parallel::any_source, received_nodes, node_pushes_tag);
 
-      for (set_type::const_iterator it = received_nodes.begin(),
-             end = received_nodes.end(); it != end; ++it)
-        this->add_node(_mesh.node_ptr(it->first), it->second);
+      for (const auto & pr : received_nodes)
+        this->add_node(_mesh.node_ptr(pr.first), pr.second);
     }
 
   // At this point we should know all the BCs for our own nodes; now
@@ -1976,16 +1974,14 @@ BoundaryInfo::build_node_list_from_side_list()
 
       std::vector<boundary_id_type> bcids;
 
-      for (std::vector<dof_id_type>::const_iterator
-             it = requested_nodes.begin(),
-             end = requested_nodes.end(); it != end; ++it)
+      for (const auto & id : requested_nodes)
         {
-          this->boundary_ids(_mesh.node_ptr(*it), bcids);
+          this->boundary_ids(_mesh.node_ptr(id), bcids);
 
           for (std::size_t i=0; i != bcids.size(); ++i)
             {
               const boundary_id_type b = bcids[i];
-              responses[p-1].push_back(std::make_pair(*it, b));
+              responses[p-1].push_back(std::make_pair(id, b));
             }
         }
 
@@ -2006,12 +2002,8 @@ BoundaryInfo::build_node_list_from_side_list()
       this->comm().receive
         (source_pid, response, node_responses_tag);
 
-      for (vec_type::const_iterator
-             it = response.begin(),
-             end = response.end(); it != end; ++it)
-        {
-          this->add_node(_mesh.node_ptr(it->first), it->second);
-        }
+      for (const auto & pr : response)
+        this->add_node(_mesh.node_ptr(pr.first), pr.second);
     }
 
   Parallel::wait (node_push_requests);
@@ -2122,9 +2114,9 @@ void BoundaryInfo::build_active_side_list (std::vector<dof_id_type> & el,
 #endif
 
       // Populate the list items
-      for (std::vector<const Elem *>::iterator elem_it = family.begin(); elem_it != family.end(); elem_it++)
+      for (const auto & elem : family)
         {
-          el.push_back ((*elem_it)->id());
+          el.push_back (elem->id());
           sl.push_back (pos->second.first);
           il.push_back (pos->second.second);
         }

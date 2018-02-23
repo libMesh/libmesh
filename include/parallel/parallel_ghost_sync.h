@@ -555,10 +555,8 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
       std::vector<dof_id_type>
         ghost_objects_from_proc(comm.size(), 0);
 
-      for (MeshBase::const_element_iterator it = range_begin;
-           it != range_end; ++it)
+      for (const auto & elem : as_range(range_begin, range_end))
         {
-          const Elem * elem = *it;
           libmesh_assert (elem);
 
           if (!elem_check(elem))
@@ -600,10 +598,8 @@ void sync_node_data_by_element_id(MeshBase &       mesh,
             requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
           }
 
-      for (MeshBase::const_element_iterator it = range_begin;
-           it != range_end; ++it)
+      for (const auto & elem : as_range(range_begin, range_end))
         {
-          const Elem * elem = *it;
           libmesh_assert (elem);
 
           if (!elem_check(elem))

@@ -222,10 +222,8 @@ void Build::operator()(const ConstElemRange & range)
     std::vector<std::vector<dof_id_type> > element_dofs_i(n_var);
 
     std::vector<const Elem *> coupled_neighbors;
-    for (ConstElemRange::const_iterator elem_it = range.begin() ; elem_it != range.end(); ++elem_it)
+    for (const auto & elem : range)
       {
-        const Elem * const elem = *elem_it;
-
         // Make some fake element iterators defining a range
         // pointing to only this element.
         Elem * const * elempp = const_cast<Elem * const *>(&elem);
@@ -272,16 +270,14 @@ void Build::operator()(const ConstElemRange & range)
                     libmesh_assert_equal_to (ghost_coupling->size(), n_var);
                     ConstCouplingRow ccr(vi, *ghost_coupling);
 
-                    for (ConstCouplingRow::const_iterator  it = ccr.begin(),
-                           end = ccr.end();
-                         it != end; ++it)
+                    for (const auto & idx : ccr)
                       {
                         if (partner == elem)
-                          this->handle_vi_vj(element_dofs_i[vi], element_dofs_i[*it]);
+                          this->handle_vi_vj(element_dofs_i[vi], element_dofs_i[idx]);
                         else
                           {
                             std::vector<dof_id_type> partner_dofs;
-                            this->sorted_connected_dofs(partner, partner_dofs, *it);
+                            this->sorted_connected_dofs(partner, partner_dofs, idx);
                             this->handle_vi_vj(element_dofs_i[vi], partner_dofs);
                           }
                       }

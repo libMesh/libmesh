@@ -235,11 +235,9 @@ public:
         const std::set<unsigned char> & elem_dims =
           old_context.elem_dimensions();
 
-        for (std::set<unsigned char>::const_iterator dim_it =
-               elem_dims.begin(); dim_it != elem_dims.end(); ++dim_it)
+        for (const auto & dim : elem_dims)
           {
-            const unsigned char dim = *dim_it;
-            old_context.get_element_fe( var, fe, dim );
+            old_context.get_element_fe(var, fe, dim);
             get_shape_outputs(*fe);
           }
       }
@@ -591,10 +589,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
   // Loop over all the variables we've been requested to project, to
   // pre-request
-  for (std::size_t v=0; v!=variables.size(); v++)
+  for (const auto & var : variables)
     {
-      const unsigned int var = variables[v];
-
       // FIXME: Need to generalize this to vector-valued elements. [PB]
       FEBase * fe = libmesh_nullptr;
       FEBase * side_fe = libmesh_nullptr;
@@ -603,11 +599,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
       const std::set<unsigned char> & elem_dims =
         context.elem_dimensions();
 
-      for (std::set<unsigned char>::const_iterator dim_it =
-             elem_dims.begin(); dim_it != elem_dims.end(); ++dim_it)
+      for (const auto & dim : elem_dims)
         {
-          const unsigned char dim = *dim_it;
-
           context.get_element_fe( var, fe, dim );
           if (fe->get_fe_type().family == SCALAR)
             continue;
@@ -647,11 +640,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
   // this->init_context(context);
 
   // Iterate over all the elements in the range
-  for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end();
-       ++elem_it)
+  for (const auto & elem : range)
     {
-      const Elem * elem = *elem_it;
-
       unsigned int dim = elem->dim();
 
       context.pre_fe_reinit(system, elem);
@@ -672,10 +662,8 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
 
       // Loop over all the variables we've been requested to project, to
       // do the projection
-      for (std::size_t v=0; v!=variables.size(); v++)
+      for (const auto & var : variables)
         {
-          const unsigned int var = variables[v];
-
           const Variable & variable = dof_map.variable(var);
 
           const FEType & base_fe_type = variable.type();

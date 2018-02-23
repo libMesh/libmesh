@@ -62,8 +62,8 @@ public:
    * Destructor: delete our clones of sub-accessors
    */
   ~ParameterMultiAccessor() {
-    for (std::size_t i=0; i != _accessors.size(); ++i)
-      delete _accessors[i];
+    for (auto & accessor : _accessors)
+      delete accessor;
   }
 
   /**
@@ -88,12 +88,12 @@ public:
     // Compare other values to the last one we'll change
     const T & val = _accessors.back()->get();
 #endif
-    for (std::size_t i=0; i != _accessors.size(); ++i)
+    for (auto & accessor : _accessors)
       {
         // If you're already using inconsistent parameters we can't
         // help you.
-        libmesh_assert_equal_to(_accessors[i]->get(), val);
-        _accessors[i]->set(new_value);
+        libmesh_assert_equal_to(accessor->get(), val);
+        accessor->set(new_value);
       }
   }
 
@@ -119,8 +119,8 @@ public:
   virtual std::unique_ptr<ParameterAccessor<T>> clone() const libmesh_override
   {
     ParameterMultiAccessor * pmp = new ParameterMultiAccessor<T>();
-    for (std::size_t i=0; i != _accessors.size(); ++i)
-      pmp->_accessors.push_back(_accessors[i]->clone().release());
+    for (auto & accessor : _accessors)
+      pmp->_accessors.push_back(accessor->clone().release());
 
     return std::unique_ptr<ParameterAccessor<T>>(pmp);
   }

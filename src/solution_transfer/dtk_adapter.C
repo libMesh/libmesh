@@ -83,16 +83,13 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int>> in_comm, EquationS
   {
     unsigned int i = 0;
 
-    MeshBase::const_element_iterator end = mesh.local_elements_end();
-    for (MeshBase::const_element_iterator it = mesh.local_elements_begin();
-         it != end;
-         ++it)
+    for (const auto & elem : as_range(mesh.local_elements_begin(),
+                                      mesh.local_elements_end()))
       {
-        const Elem & elem = *(*it);
-        elements[i] = elem.id();
+        elements[i] = elem->id();
 
         for (unsigned int j=0; j<n_nodes_per_elem; j++)
-          connectivity[(j*n_local_elem)+i] = elem.node_id(j);
+          connectivity[(j*n_local_elem)+i] = elem->node_id(j);
 
         i++;
       }
@@ -277,16 +274,9 @@ DTKAdapter::get_element_topology(const Elem * elem)
 void
 DTKAdapter::get_semi_local_nodes(std::set<unsigned int> & semi_local_nodes)
 {
-  MeshBase::const_element_iterator end = mesh.local_elements_end();
-  for (MeshBase::const_element_iterator it = mesh.local_elements_begin();
-       it != end;
-       ++it)
-    {
-      const Elem & elem = *(*it);
-
-      for (unsigned int j=0; j<elem.n_nodes(); j++)
-        semi_local_nodes.insert(elem.node_id(j));
-    }
+  for (const auto & elem : as_range(mesh.local_elements_begin(), mesh.local_elements_end()))
+    for (unsigned int j=0; j<elem->n_nodes(); j++)
+      semi_local_nodes.insert(elem->node_id(j));
 }
 
 } // namespace libMesh

@@ -135,9 +135,8 @@ std::unique_ptr<Base> Factory<Base>::build (const std::string & name)
 
       libMesh::err << "valid options are:" << std::endl;
 
-      for (typename std::map<std::string,Factory<Base> *>::const_iterator
-             it = factory_map().begin(); it != factory_map().end(); ++it)
-        libMesh::err << "  " << it->first << std::endl;
+      for (const auto & pr : factory_map())
+        libMesh::err << "  " << pr.first << std::endl;
 
       libmesh_error_msg("Exiting...");
     }

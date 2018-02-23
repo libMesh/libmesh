@@ -60,12 +60,8 @@ const Elem * primary_boundary_point_neighbor(const Elem * elem,
 
   std::set<const Elem *> point_neighbors;
   elem->find_point_neighbors(p, point_neighbors);
-  for (std::set<const Elem *>::const_iterator point_neighbors_iter =
-         point_neighbors.begin();
-       point_neighbors_iter != point_neighbors.end(); ++point_neighbors_iter)
+  for (const auto & pt_neighbor : point_neighbors)
     {
-      const Elem * pt_neighbor = *point_neighbors_iter;
-
       // If this point neighbor isn't at least
       // as coarse as the current primary elem, or if it is at
       // the same level but has a lower id, then
@@ -84,9 +80,8 @@ const Elem * primary_boundary_point_neighbor(const Elem * elem,
           boundary_info.boundary_ids (pt_neighbor, ns, bc_ids);
 
           bool on_relevant_boundary = false;
-          for (std::set<boundary_id_type>::const_iterator i =
-                 boundary_ids.begin(); i != boundary_ids.end(); ++i)
-            if (std::find(bc_ids.begin(), bc_ids.end(), *i) != bc_ids.end())
+          for (const auto & id : boundary_ids)
+            if (std::find(bc_ids.begin(), bc_ids.end(), id) != bc_ids.end())
               on_relevant_boundary = true;
 
           if (!on_relevant_boundary)
@@ -123,12 +118,8 @@ const Elem * primary_boundary_edge_neighbor(const Elem * elem,
   // Container to catch boundary IDs handed back by BoundaryInfo
   std::vector<boundary_id_type> bc_ids;
 
-  for (std::set<const Elem *>::const_iterator edge_neighbors_iter =
-         edge_neighbors.begin();
-       edge_neighbors_iter != edge_neighbors.end(); ++edge_neighbors_iter)
+  for (const auto & e_neighbor : edge_neighbors)
     {
-      const Elem * e_neighbor = *edge_neighbors_iter;
-
       // If this edge neighbor isn't at least
       // as coarse as the current primary elem, or if it is at
       // the same level but has a lower id, then
@@ -147,9 +138,8 @@ const Elem * primary_boundary_edge_neighbor(const Elem * elem,
           boundary_info.boundary_ids (e_neighbor, ns, bc_ids);
 
           bool on_relevant_boundary = false;
-          for (std::set<boundary_id_type>::const_iterator i =
-                 boundary_ids.begin(); i != boundary_ids.end(); ++i)
-            if (std::find(bc_ids.begin(), bc_ids.end(), *i) != bc_ids.end())
+          for (const auto & id : boundary_ids)
+            if (std::find(bc_ids.begin(), bc_ids.end(), id) != bc_ids.end())
               on_relevant_boundary = true;
 
           if (!on_relevant_boundary)
@@ -1731,9 +1721,8 @@ compute_periodic_constraints (DofConstraints & constraints,
 
       mesh.get_boundary_info().boundary_ids (elem, s, bc_ids);
 
-      for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+      for (const auto & boundary_id : bc_ids)
         {
-          const boundary_id_type boundary_id = *id_it;
           const PeriodicBoundaryBase * periodic = boundaries.boundary(boundary_id);
           if (periodic && periodic->is_my_variable(variable_number))
             {
@@ -1947,15 +1936,11 @@ compute_periodic_constraints (DofConstraints & constraints,
 
                               mesh.get_boundary_info().boundary_ids (elem, s, new_bc_ids);
 
-                              for (std::vector<boundary_id_type>::const_iterator
-                                     new_id_it=new_bc_ids.begin(); new_id_it!=new_bc_ids.end(); ++new_id_it)
+                              for (const auto & new_boundary_id : new_bc_ids)
                                 {
-                                  const boundary_id_type new_boundary_id = *new_id_it;
                                   const PeriodicBoundaryBase * new_periodic = boundaries.boundary(new_boundary_id);
                                   if (new_periodic && new_periodic->is_my_variable(variable_number))
-                                    {
-                                      point_bcids.insert(new_boundary_id);
-                                    }
+                                    point_bcids.insert(new_boundary_id);
                                 }
                             }
 
@@ -1968,10 +1953,8 @@ compute_periodic_constraints (DofConstraints & constraints,
 
                           // Find the complementary boundary id set
                           std::set<boundary_id_type> point_pairedids;
-                          for (std::set<boundary_id_type>::const_iterator i =
-                                 point_bcids.begin(); i != point_bcids.end(); ++i)
+                          for (const auto & new_boundary_id : point_bcids)
                             {
-                              const boundary_id_type new_boundary_id = *i;
                               const PeriodicBoundaryBase * new_periodic = boundaries.boundary(new_boundary_id);
                               point_pairedids.insert(new_periodic->pairedboundary);
                             }
@@ -1982,12 +1965,10 @@ compute_periodic_constraints (DofConstraints & constraints,
                           Point main_pt = my_node,
                             primary_pt = my_node;
 
-                          for (std::set<boundary_id_type>::const_iterator i =
-                                 point_bcids.begin(); i != point_bcids.end(); ++i)
+                          for (const auto & new_boundary_id : point_bcids)
                             {
                               // Find the corresponding periodic point and
                               // its primary neighbor
-                              const boundary_id_type new_boundary_id = *i;
                               const PeriodicBoundaryBase * new_periodic = boundaries.boundary(new_boundary_id);
 
                               const Point neigh_pt =
@@ -2093,15 +2074,11 @@ compute_periodic_constraints (DofConstraints & constraints,
                               // We're reusing the new_bc_ids vector created outside the loop over nodes.
                               mesh.get_boundary_info().boundary_ids (elem, s, new_bc_ids);
 
-                              for (std::vector<boundary_id_type>::const_iterator
-                                     new_id_it=new_bc_ids.begin(); new_id_it!=new_bc_ids.end(); ++new_id_it)
+                              for (const auto & new_boundary_id : new_bc_ids)
                                 {
-                                  const boundary_id_type new_boundary_id = *new_id_it;
                                   const PeriodicBoundaryBase * new_periodic = boundaries.boundary(new_boundary_id);
                                   if (new_periodic && new_periodic->is_my_variable(variable_number))
-                                    {
-                                      edge_bcids.insert(new_boundary_id);
-                                    }
+                                    edge_bcids.insert(new_boundary_id);
                                 }
                             }
 
@@ -2114,10 +2091,8 @@ compute_periodic_constraints (DofConstraints & constraints,
 
                           // Find the complementary boundary id set
                           std::set<boundary_id_type> edge_pairedids;
-                          for (std::set<boundary_id_type>::const_iterator i =
-                                 edge_bcids.begin(); i != edge_bcids.end(); ++i)
+                          for (const auto & new_boundary_id : edge_bcids)
                             {
-                              const boundary_id_type new_boundary_id = *i;
                               const PeriodicBoundaryBase * new_periodic = boundaries.boundary(new_boundary_id);
                               edge_pairedids.insert(new_periodic->pairedboundary);
                             }
@@ -2130,12 +2105,10 @@ compute_periodic_constraints (DofConstraints & constraints,
                             primary_pt1 = *e1,
                             primary_pt2 = *e2;
 
-                          for (std::set<boundary_id_type>::const_iterator i =
-                                 edge_bcids.begin(); i != edge_bcids.end(); ++i)
+                          for (const auto & new_boundary_id : edge_bcids)
                             {
                               // Find the corresponding periodic edge and
                               // its primary neighbor
-                              const boundary_id_type new_boundary_id = *i;
                               const PeriodicBoundaryBase * new_periodic = boundaries.boundary(new_boundary_id);
 
                               Point neigh_pt1 = new_periodic->get_corresponding_pos(*e1),

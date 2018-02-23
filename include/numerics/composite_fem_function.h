@@ -48,8 +48,8 @@ public:
 
   ~CompositeFEMFunction ()
   {
-    for (std::size_t i=0; i != subfunctions.size(); ++i)
-      delete subfunctions[i];
+    for (auto & f : subfunctions)
+      delete f;
   }
 
   /**

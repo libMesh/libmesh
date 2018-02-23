@@ -391,11 +391,9 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
   const unsigned int n_levels = MeshTools::n_levels(*this);
   for (unsigned int level = 1; level < n_levels; ++level)
     {
-      element_iterator end = this->level_elements_end(level);
-      for (element_iterator el = this->level_elements_begin(level);
-           el != end; ++el)
+      for (auto & current_elem : as_range(level_elements_begin(level),
+                                          level_elements_end(level)))
         {
-          Elem * current_elem = *el;
           libmesh_assert(current_elem);
           Elem * parent = current_elem->parent();
           libmesh_assert(parent);

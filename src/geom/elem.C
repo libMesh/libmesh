@@ -932,13 +932,13 @@ Elem * Elem::topological_neighbor (const unsigned int i,
       // topological neighbor
       std::vector<boundary_id_type> bc_ids;
       mesh.get_boundary_info().boundary_ids(this, cast_int<unsigned short>(i), bc_ids);
-      for (std::vector<boundary_id_type>::iterator j = bc_ids.begin(); j != bc_ids.end(); ++j)
-        if (pb->boundary(*j))
+      for (const auto & id : bc_ids)
+        if (pb->boundary(id))
           {
             // Since the point locator inside of periodic boundaries
             // returns a const pointer we will retrieve the proper
             // pointer directly from the mesh object.
-            const Elem * const cn = pb->neighbor(*j, point_locator, this, i);
+            const Elem * const cn = pb->neighbor(id, point_locator, this, i);
             neighbor_i = const_cast<Elem *>(cn);
 
             // Since coarse elements do not have more refined
@@ -974,10 +974,10 @@ const Elem * Elem::topological_neighbor (const unsigned int i,
       // topological neighbor
       std::vector<boundary_id_type> bc_ids;
       mesh.get_boundary_info().boundary_ids(this, cast_int<unsigned short>(i), bc_ids);
-      for (std::vector<boundary_id_type>::iterator j = bc_ids.begin(); j != bc_ids.end(); ++j)
-        if (pb->boundary(*j))
+      for (const auto & id : bc_ids)
+        if (pb->boundary(id))
           {
-            neighbor_i = pb->neighbor(*j, point_locator, this, i);
+            neighbor_i = pb->neighbor(id, point_locator, this, i);
 
             // Since coarse elements do not have more refined
             // neighbors we need to make sure that we don't return one

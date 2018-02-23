@@ -565,14 +565,10 @@ unsigned int MeshTools::n_active_levels(const MeshBase & mesh)
 
   unsigned int nl = MeshTools::n_active_local_levels(mesh);
 
-  MeshBase::const_element_iterator el =
-    mesh.unpartitioned_elements_begin();
-  const MeshBase::const_element_iterator end_el =
-    mesh.unpartitioned_elements_end();
-
-  for ( ; el != end_el; ++el)
-    if ((*el)->active())
-      nl = std::max((*el)->level() + 1, nl);
+  for (const auto & elem : as_range(mesh.unpartitioned_elements_begin(),
+                                    mesh.unpartitioned_elements_end()))
+    if (elem->active())
+      nl = std::max(elem->level() + 1, nl);
 
   mesh.comm().max(nl);
   return nl;
@@ -584,11 +580,9 @@ unsigned int MeshTools::n_local_levels(const MeshBase & mesh)
 {
   unsigned int nl = 0;
 
-  MeshBase::const_element_iterator el = mesh.local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.local_elements_end();
-
-  for ( ; el != end_el; ++el)
-    nl = std::max((*el)->level() + 1, nl);
+  for (const auto & elem : as_range(mesh.local_elements_begin(),
+                                    mesh.local_elements_end()))
+    nl = std::max(elem->level() + 1, nl);
 
   return nl;
 }
@@ -601,13 +595,9 @@ unsigned int MeshTools::n_levels(const MeshBase & mesh)
 
   unsigned int nl = MeshTools::n_local_levels(mesh);
 
-  MeshBase::const_element_iterator el =
-    mesh.unpartitioned_elements_begin();
-  const MeshBase::const_element_iterator end_el =
-    mesh.unpartitioned_elements_end();
-
-  for ( ; el != end_el; ++el)
-    nl = std::max((*el)->level() + 1, nl);
+  for (const auto & elem : as_range(mesh.unpartitioned_elements_begin(),
+                                    mesh.unpartitioned_elements_end()))
+    nl = std::max(elem->level() + 1, nl);
 
   mesh.comm().max(nl);
 
@@ -671,19 +661,14 @@ unsigned int MeshTools::n_p_levels (const MeshBase & mesh)
   unsigned int max_p_level = 0;
 
   // first my local elements
-  MeshBase::const_element_iterator
-    el     = mesh.local_elements_begin(),
-    end_el = mesh.local_elements_end();
-
-  for ( ; el != end_el; ++el)
-    max_p_level = std::max((*el)->p_level(), max_p_level);
+  for (const auto & elem : as_range(mesh.local_elements_begin(),
+                                    mesh.local_elements_end()))
+    max_p_level = std::max(elem->p_level(), max_p_level);
 
   // then any unpartitioned objects
-  el     = mesh.unpartitioned_elements_begin();
-  end_el = mesh.unpartitioned_elements_end();
-
-  for ( ; el != end_el; ++el)
-    max_p_level = std::max((*el)->p_level(), max_p_level);
+  for (const auto & elem : as_range(mesh.unpartitioned_elements_begin(),
+                                    mesh.unpartitioned_elements_end()))
+    max_p_level = std::max(elem->p_level(), max_p_level);
 
   mesh.comm().max(max_p_level);
   return max_p_level + 1;
@@ -1033,12 +1018,9 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase & mesh)
 {
   LOG_SCOPE("libmesh_assert_valid_remote_elems()", "MeshTools");
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.local_elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.local_elements_begin(); el != el_end; ++el)
+  for (const auto & elem : as_range(mesh.local_elements_begin(),
+                                    mesh.local_elements_end()))
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
 
       // We currently don't allow active_local_elements to have
@@ -1518,12 +1500,9 @@ void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
 
   std::vector<bool> node_touched_by_me(parallel_max_node_id, false);
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.local_elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.local_elements_begin(); el != el_end; ++el)
+  for (const auto & elem : as_range(mesh.local_elements_begin(),
+                                    mesh.local_elements_end()))
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
 
       for (auto & node : elem->node_ref_range())
@@ -1563,12 +1542,9 @@ void libmesh_assert_parallel_consistent_procids<Node>(const MeshBase & mesh)
 
   std::vector<bool> node_touched_by_anyone(parallel_max_node_id, false);
 
-  const MeshBase::const_element_iterator el_end =
-    mesh.local_elements_end();
-  for (MeshBase::const_element_iterator el =
-         mesh.local_elements_begin(); el != el_end; ++el)
+  for (const auto & elem : as_range(mesh.local_elements_begin(),
+                                    mesh.local_elements_end()))
     {
-      const Elem * elem = *el;
       libmesh_assert (elem);
 
       for (auto & node : elem->node_ref_range())
@@ -1934,12 +1910,8 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
     (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync);
 
   // And finally let's update the nodes we used to own.
-  for (std::unordered_set<Node *>::iterator
-         n_it = ex_local_nodes.begin(),
-         n_end = ex_local_nodes.end();
-       n_it != n_end; ++n_it)
+  for (const auto & node : ex_local_nodes)
     {
-      Node * node = *n_it;
       const dof_id_type id = node->id();
       const proc_id_map_type::iterator it = new_proc_ids.find(id);
       libmesh_assert(it != new_proc_ids.end());

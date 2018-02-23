@@ -1363,13 +1363,13 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
   // counter indexes into the block_ids vector
   unsigned int counter = 0;
-  for (subdomain_map_type::iterator it=subdomain_map.begin(); it!=subdomain_map.end(); ++it, ++counter)
+  for (auto & pr : subdomain_map)
     {
-      block_ids[counter] = (*it).first;
-      names_table.push_back_entry(mesh.subdomain_name((*it).first));
+      block_ids[counter] = pr.first;
+      names_table.push_back_entry(mesh.subdomain_name(pr.first));
 
       // Get a reference to a vector of element IDs for this subdomain.
-      subdomain_map_type::mapped_type & tmp_vec = (*it).second;
+      subdomain_map_type::mapped_type & tmp_vec = pr.second;
 
       // Use the first element in this block to get representative information.
       // Note that Exodus assumes all elements in a block are of the same type!
@@ -1379,11 +1379,12 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
         em.assign_conversion(mesh.elem_ref(tmp_vec[0]).type());
       num_nodes_per_elem = mesh.elem_ref(tmp_vec[0]).n_nodes();
 
-      elem_blk_id.push_back((*it).first);
+      elem_blk_id.push_back(pr.first);
       elem_type_table.push_back_entry(conv.exodus_elem_type().c_str());
       num_elem_this_blk_vec.push_back(tmp_vec.size());
       num_nodes_per_elem_vec.push_back(num_nodes_per_elem);
       num_attr_vec.push_back(0); // we don't currently use elem block attributes.
+      ++counter;
     }
 
   // The "define_maps" parameter should be 0 if node_number_map and
@@ -1418,10 +1419,10 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
         }
   }
 
-  for (subdomain_map_type::iterator it=subdomain_map.begin(); it!=subdomain_map.end(); ++it)
+  for (auto & pr : subdomain_map)
     {
       // Get a reference to a vector of element IDs for this subdomain.
-      subdomain_map_type::mapped_type & tmp_vec = (*it).second;
+      subdomain_map_type::mapped_type & tmp_vec = pr.second;
 
       //Use the first element in this block to get representative information.
       //Note that Exodus assumes all elements in a block are of the same type!
@@ -1503,7 +1504,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
             }
         }
 
-      ex_err = exII::ex_put_elem_conn(ex_id, (*it).first, &connect[0]);
+      ex_err = exII::ex_put_elem_conn(ex_id, pr.first, &connect[0]);
       EX_CHECK_ERR(ex_err, "Error writing element connectivities");
 
       // This transform command stores its result in a range that begins at the third argument,

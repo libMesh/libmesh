@@ -348,12 +348,8 @@ void CheckpointIO::write (const std::string & name)
       libmesh_error_msg("Cannot write serial checkpoint from distributed mesh");
     }
 
-  for (std::vector<processor_id_type>::const_iterator
-         id_it = ids_to_write.begin(), id_end = ids_to_write.end();
-       id_it != id_end; ++id_it)
+  for (const auto & my_pid : ids_to_write)
     {
-      const processor_id_type my_pid = *id_it;
-
       auto file_name = split_file(name, use_n_procs, my_pid);
       Xdr io (file_name, this->binary() ? ENCODE : WRITE);
 
@@ -424,16 +420,13 @@ void CheckpointIO::write_subdomain_names(Xdr & io) const
     // return writable references in mesh_base, it's possible for the user to leave some entity names
     // blank.  We can't write those to the XDA file.
     largest_id_type n_subdomain_names = 0;
-    std::map<subdomain_id_type, std::string>::const_iterator it_end = subdomain_map.end();
-    for (std::map<subdomain_id_type, std::string>::const_iterator it = subdomain_map.begin(); it != it_end; ++it)
-      {
-        if (!it->second.empty())
-          {
-            n_subdomain_names++;
-            subdomain_ids.push_back(it->first);
-            subdomain_names.push_back(it->second);
-          }
-      }
+    for (const auto & pr : subdomain_map)
+      if (!pr.second.empty())
+        {
+          n_subdomain_names++;
+          subdomain_ids.push_back(pr.first);
+          subdomain_names.push_back(pr.second);
+        }
 
     io.data(n_subdomain_names, "# subdomain id to name map");
     // Write out the ids and names in two vectors
@@ -460,30 +453,27 @@ void CheckpointIO::write_nodes (Xdr & io,
   // For the coordinates
   std::vector<Real> coords(LIBMESH_DIM);
 
-  for (std::set<const Node *>::iterator it = nodeset.begin(),
-         end = nodeset.end(); it != end; ++it)
+  for (const auto & node : nodeset)
     {
-      const Node & node = **it;
-
-      id_pid[0] = node.id();
-      id_pid[1] = node.processor_id();
+      id_pid[0] = node->id();
+      id_pid[1] = node->processor_id();
 
       io.data_stream(&id_pid[0], 2, 2);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      largest_id_type unique_id = node.unique_id();
+      largest_id_type unique_id = node->unique_id();
 
       io.data(unique_id, "# unique id");
 #endif
 
-      coords[0] = node(0);
+      coords[0] = (*node)(0);
 
 #if LIBMESH_DIM > 1
-      coords[1] = node(1);
+      coords[1] = (*node)(1);
 #endif
 
 #if LIBMESH_DIM > 2
-      coords[2] = node(2);
+      coords[2] = (*node)(2);
 #endif
 
       io.data_stream(&coords[0], LIBMESH_DIM, 3);
@@ -506,23 +496,20 @@ void CheckpointIO::write_connectivity (Xdr & io,
 
   io.data(n_elems_here, "# number of elements");
 
-  for (std::set<const Elem *, CompareElemIdsByLevel>::const_iterator it = elements.begin(),
-         end = elements.end(); it != end; ++it)
+  for (const auto & elem : elements)
     {
-      const Elem & elem = **it;
+      unsigned int n_nodes = elem->n_nodes();
 
-      unsigned int n_nodes = elem.n_nodes();
-
-      elem_data[0] = elem.id();
-      elem_data[1] = elem.type();
-      elem_data[2] = elem.processor_id();
-      elem_data[3] = elem.subdomain_id();
+      elem_data[0] = elem->id();
+      elem_data[1] = elem->type();
+      elem_data[2] = elem->processor_id();
+      elem_data[3] = elem->subdomain_id();
 
 #ifdef LIBMESH_ENABLE_AMR
-      if (elem.parent() != libmesh_nullptr)
+      if (elem->parent() != libmesh_nullptr)
         {
-          elem_data[4] = elem.parent()->id();
-          elem_data[5] = elem.parent()->which_child_am_i(&elem);
+          elem_data[4] = elem->parent()->id();
+          elem_data[5] = elem->parent()->which_child_am_i(elem);
         }
       else
 #endif
@@ -534,26 +521,26 @@ void CheckpointIO::write_connectivity (Xdr & io,
       conn_data.resize(n_nodes);
 
       for (unsigned int i=0; i<n_nodes; i++)
-        conn_data[i] = elem.node_id(i);
+        conn_data[i] = elem->node_id(i);
 
       io.data_stream(&elem_data[0],
                      cast_int<unsigned int>(elem_data.size()),
                      cast_int<unsigned int>(elem_data.size()));
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      largest_id_type unique_id = elem.unique_id();
+      largest_id_type unique_id = elem->unique_id();
 
       io.data(unique_id, "# unique id");
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
-      uint16_t p_level = elem.p_level();
+      uint16_t p_level = elem->p_level();
       io.data(p_level, "# p_level");
 
-      uint16_t rflag = elem.refinement_flag();
+      uint16_t rflag = elem->refinement_flag();
       io.data(rflag, "# rflag");
 
-      uint16_t pflag = elem.p_refinement_flag();
+      uint16_t pflag = elem->p_refinement_flag();
       io.data(pflag, "# pflag");
 #endif
       io.data_stream(&conn_data[0],
@@ -572,33 +559,30 @@ void CheckpointIO::write_remote_elem (Xdr & io,
   std::vector<largest_id_type> elem_ids, parent_ids;
   std::vector<uint16_t> elem_sides, child_numbers;
 
-  for (std::set<const Elem *, CompareElemIdsByLevel>::const_iterator it = elements.begin(),
-         end = elements.end(); it != end; ++it)
+  for (const auto & elem : elements)
     {
-      const Elem & elem = **it;
-
-      for (auto n : elem.side_index_range())
+      for (auto n : elem->side_index_range())
         {
-          const Elem * neigh = elem.neighbor_ptr(n);
+          const Elem * neigh = elem->neighbor_ptr(n);
           if (neigh == remote_elem ||
               (neigh && !elements.count(neigh)))
             {
-              elem_ids.push_back(elem.id());
+              elem_ids.push_back(elem->id());
               elem_sides.push_back(n);
             }
         }
 
 #ifdef LIBMESH_ENABLE_AMR
-      if (elem.has_children())
+      if (elem->has_children())
         {
-          const unsigned int nc = elem.n_children();
+          const unsigned int nc = elem->n_children();
           for (unsigned int c = 0; c != nc; ++c)
             {
-              const Elem * child = elem.child_ptr(c);
+              const Elem * child = elem->child_ptr(c);
               if (child == remote_elem ||
                   (child && !elements.count(child)))
                 {
-                  parent_ids.push_back(elem.id());
+                  parent_ids.push_back(elem->id());
                   child_numbers.push_back(c);
                 }
             }
@@ -709,16 +693,13 @@ void CheckpointIO::write_bc_names (Xdr & io, const BoundaryInfo & info, bool is_
   // return writable references in boundary_info, it's possible for the user to leave some entity names
   // blank.  We can't write those to the XDA file.
   largest_id_type n_boundary_names = 0;
-  std::map<boundary_id_type, std::string>::const_iterator it_end = boundary_map.end();
-  for (std::map<boundary_id_type, std::string>::const_iterator it = boundary_map.begin(); it != it_end; ++it)
-    {
-      if (!it->second.empty())
-        {
-          n_boundary_names++;
-          boundary_ids.push_back(it->first);
-          boundary_names.push_back(it->second);
-        }
-    }
+  for (const auto & pr : boundary_map)
+    if (!pr.second.empty())
+      {
+        n_boundary_names++;
+        boundary_ids.push_back(pr.first);
+        boundary_names.push_back(pr.second);
+      }
 
   if (is_sideset)
     io.data(n_boundary_names, "# sideset id to name map");
@@ -1275,9 +1256,8 @@ unsigned int CheckpointIO::n_active_levels_in(MeshBase::const_element_iterator b
 {
   unsigned int max_level = 0;
 
-  for (MeshBase::const_element_iterator it = begin;
-       it != end; ++it)
-    max_level = std::max((*it)->level(), max_level);
+  for (const auto & elem : as_range(begin, end))
+    max_level = std::max(elem->level(), max_level);
 
   return max_level + 1;
 }

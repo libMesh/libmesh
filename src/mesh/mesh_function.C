@@ -189,8 +189,8 @@ std::map<const Elem *, Number> MeshFunction::discontinuous_value (const Point & 
   std::map<const Elem *, DenseVector<Number>> buffer;
   this->discontinuous_value (p, time, buffer);
   std::map<const Elem *, Number> return_value;
-  for (std::map<const Elem *, DenseVector<Number>>::const_iterator it = buffer.begin(); it != buffer.end(); ++it)
-    return_value[it->first] = it->second(0);
+  for (const auto & pr : buffer)
+    return_value[pr.first] = pr.second(0);
   // NOTE: If no suitable element is found, then the map return_value is empty. This
   // puts burden on the user of this function but I don't really see a better way.
   return return_value;
@@ -214,8 +214,8 @@ std::map<const Elem *, Gradient> MeshFunction::discontinuous_gradient (const Poi
   std::map<const Elem *, std::vector<Gradient>> buffer;
   this->discontinuous_gradient (p, time, buffer);
   std::map<const Elem *, Gradient> return_value;
-  for (std::map<const Elem *, std::vector<Gradient>>::const_iterator it = buffer.begin(); it != buffer.end(); ++it)
-    return_value[it->first] = it->second[0];
+  for (const auto & pr : buffer)
+    return_value[pr.first] = pr.second[0];
   // NOTE: If no suitable element is found, then the map return_value is empty. This
   // puts burden on the user of this function but I don't really see a better way.
   return return_value;
@@ -353,10 +353,8 @@ void MeshFunction::discontinuous_value (const Point & p,
 
   // loop through all candidates, if the set is empty this function will return an
   // empty map
-  for (std::set<const Elem *>::const_iterator it = candidate_element.begin(); it != candidate_element.end(); ++it)
+  for (const auto & element : candidate_element)
     {
-      const Elem * element = (*it);
-
       const unsigned int dim = element->dim();
 
       // define a temporary vector to store all values
@@ -525,10 +523,8 @@ void MeshFunction::discontinuous_gradient (const Point & p,
 
   // loop through all candidates, if the set is empty this function will return an
   // empty map
-  for (std::set<const Elem *>::const_iterator it = candidate_element.begin(); it != candidate_element.end(); ++it)
+  for (const auto & element : candidate_element)
     {
-      const Elem * element = (*it);
-
       const unsigned int dim = element->dim();
 
       // define a temporary vector to store all values
@@ -737,9 +733,8 @@ std::set<const Elem *> MeshFunction::find_elements(const Point & p,
   std::set<const Elem *> candidate_elements;
   std::set<const Elem *> final_candidate_elements;
   this->_point_locator->operator()(p,candidate_elements,subdomain_ids);
-  for (std::set<const Elem *>::const_iterator elem_it = candidate_elements.begin(); elem_it != candidate_elements.end(); ++elem_it)
+  for (const auto & element : candidate_elements)
     {
-      const Elem * element = (*elem_it);
       // If we have an element, but it's not a local element, then we
       // either need to have a serialized vector or we need to find a
       // local element sharing the same point.
@@ -750,17 +745,12 @@ std::set<const Elem *> MeshFunction::find_elements(const Point & p,
           // look for a local element containing the point
           std::set<const Elem *> point_neighbors;
           element->find_point_neighbors(p, point_neighbors);
-          std::set<const Elem *>::const_iterator       it  = point_neighbors.begin();
-          const std::set<const Elem *>::const_iterator end = point_neighbors.end();
-          for (; it != end; ++it)
-            {
-              const Elem * elem = *it;
-              if (elem->processor_id() == this->processor_id())
-                {
-                  final_candidate_elements.insert(elem);
-                  break;
-                }
-            }
+          for (const auto & elem : point_neighbors)
+            if (elem->processor_id() == this->processor_id())
+              {
+                final_candidate_elements.insert(elem);
+                break;
+              }
         }
       else
         final_candidate_elements.insert(element);
