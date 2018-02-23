@@ -538,8 +538,8 @@ dof_id_type MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase & me
   dof_id_type cnt = 0;
 
   // iterate over the elements of the specified type
-  for (const auto & elem : as_range(std::make_pair(mesh.type_elements_begin(type),
-                                                   mesh.type_elements_end(type))))
+  for (const auto & elem : as_range(mesh.type_elements_begin(type),
+                                    mesh.type_elements_end(type)))
     if ((elem->level() == level) && !elem->subactive())
       cnt++;
 

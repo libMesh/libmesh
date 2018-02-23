@@ -747,7 +747,7 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
 
         std::advance (nd, next_free_node);
 
-        for (auto & node : as_range(std::make_pair(nd, end)))
+        for (auto & node : as_range(nd, end))
           {
             // Mesh modification code might have already deleted some
             // nodes
