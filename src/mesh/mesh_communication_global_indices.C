@@ -648,6 +648,46 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase &) const
 
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 template <typename ForwardIterator>
+void MeshCommunication::find_local_indices (const libMesh::BoundingBox & bbox,
+                                            const ForwardIterator & begin,
+                                            const ForwardIterator & end,
+                                            std::unordered_map<dof_id_type, dof_id_type> & index_map) const
+{
+  LOG_SCOPE ("find_local_indices()", "MeshCommunication");
+
+  // This method determines id-agnostic local indices
+  // for nodes and elements by sorting Hilbert keys.
+
+  index_map.clear();
+
+  //-------------------------------------------------------------
+  // (1) compute Hilbert keys
+  // These aren't trivial to compute, and we will need them again.
+  // But the binsort will sort the input vector, trashing the order
+  // that we'd like to rely on.  So, two vectors...
+  std::map<Parallel::DofObjectKey, dof_id_type> hilbert_keys;
+  {
+    LOG_SCOPE("local_hilbert_indices", "MeshCommunication");
+    for (ForwardIterator it=begin; it!=end; ++it)
+      {
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+        const Parallel::DofObjectKey hi(get_hilbert_index ((*it), bbox));
+#else
+        const Parallel::DofObjectKey hi(get_hilbert_index ((*it), bbox), (*it)->unique_id());
+#endif
+        hilbert_keys.emplace(hi, (*it)->id());
+      }
+  }
+
+  {
+    dof_id_type cnt = 0;
+    for (auto key_val : hilbert_keys)
+      index_map[key_val.second] = cnt++;
+  }
+}
+
+
+template <typename ForwardIterator>
 void MeshCommunication::find_global_indices (const Parallel::Communicator & communicator,
                                              const libMesh::BoundingBox & bbox,
                                              const ForwardIterator & begin,
@@ -892,6 +932,18 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
 }
 #else // LIBMESH_HAVE_LIBHILBERT, LIBMESH_HAVE_MPI
 template <typename ForwardIterator>
+void MeshCommunication::find_local_indices (const libMesh::BoundingBox &,
+                                            const ForwardIterator & begin,
+                                            const ForwardIterator & end,
+                                            std::unordered_map<dof_id_type, dof_id_type> & index_map) const
+{
+  index_map.clear();
+  dof_id_type index = 0;
+  for (ForwardIterator it=begin; it!=end; ++it)
+    index_map[(*it)->id()] = (index++);
+}
+
+template <typename ForwardIterator>
 void MeshCommunication::find_global_indices (const Parallel::Communicator &,
                                              const libMesh::BoundingBox &,
                                              const ForwardIterator & begin,
@@ -931,5 +983,9 @@ template void MeshCommunication::find_global_indices<MeshBase::element_iterator>
                                                                                   const MeshBase::element_iterator &,
                                                                                   const MeshBase::element_iterator &,
                                                                                   std::vector<dof_id_type> &) const;
+template void MeshCommunication::find_local_indices<MeshBase::const_element_iterator> (const libMesh::BoundingBox &,
+                                                                                       const MeshBase::const_element_iterator &,
+                                                                                       const MeshBase::const_element_iterator &,
+                                                                                       std::unordered_map<dof_id_type, dof_id_type> &) const;
 
 } // namespace libMesh

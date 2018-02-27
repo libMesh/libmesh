@@ -25,6 +25,9 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_tools.h"
 
+// C++ Includes
+#include <unordered_map>
+
 namespace libMesh
 {
 
@@ -165,6 +168,16 @@ public:
    * assign_global_indices.
    */
   void check_for_duplicate_global_indices (MeshBase & ) const;
+
+  /**
+   * This method determines a locally unique, contiguous
+   * index for each object in the input range.
+   */
+  template <typename ForwardIterator>
+  void find_local_indices (const libMesh::BoundingBox &,
+                           const ForwardIterator &,
+                           const ForwardIterator &,
+                           std::unordered_map<dof_id_type, dof_id_type> &) const;
 
   /**
    * This method determines a globally unique, partition-agnostic
