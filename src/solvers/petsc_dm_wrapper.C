@@ -170,7 +170,6 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
   MeshRefinement mesh_refinement(mesh); // Used for swapping between grids
 
   // First walk over the active local elements and see how many maximum MG levels we can construct
-  // TODO: How many MG levels did the user request?
   unsigned int n_levels = 0;
   for ( auto & elem : mesh.active_local_element_ptr_range() )
     {
@@ -181,6 +180,22 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
   // these processors shouldnt make projections
   if (n_levels >= 1)
     n_levels += 1;
+
+  // How many MG levels did the user request?
+  int usr_requested_mg_lvls = 0;
+  usr_requested_mg_lvls = command_line_next("-pc_mg_levels", usr_requested_mg_lvls);
+
+  // Only construct however many levels were requested if something was actually requested
+  if ( usr_requested_mg_lvls != 0 )
+    {
+      // Dont request more than avail num levels, require at least 2 levels
+      libmesh_assert_less_equal( (unsigned int)usr_requested_mg_lvls, n_levels );
+      libmesh_assert( usr_requested_mg_lvls > 1 );
+
+      n_levels = usr_requested_mg_lvls;
+    }
+  else
+    libmesh_error_msg("ERROR: -pc_mg_levels not specified");
 
   // Init data structures: data[0] ~ coarse grid, data[n_levels-1] ~ fine grid
   this->init_dm_data(n_levels, system.comm());
