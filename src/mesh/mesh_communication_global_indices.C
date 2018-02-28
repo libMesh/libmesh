@@ -772,19 +772,50 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
       }
 
     // start with pid=0, so that we will trade with ourself
-    std::vector<Parallel::DofObjectKey> request_to_fill;
-    std::vector<dof_id_type> global_ids;
+    std::vector<std::vector<dof_id_type>> global_id_returns(communicator.size());
+
+    std::vector<Parallel::Request> key_send_requests(communicator.size()),
+      id_return_requests;
+
+    Parallel::MessageTag
+      key_send_tag = communicator.get_unique_tag(867),
+      id_return_tag = communicator.get_unique_tag(5309);
+
+    // If we have lots of empty requests, an alltoall to communicate that fact may 
+    // be cheaper than Nproc^2 individual sends.
+    std::vector<unsigned char> request_non_empty(communicator.size());
+    for (processor_id_type pid=0; pid<communicator.size(); pid++)
+      request_non_empty[pid] = !requested_ids[pid].empty();
+
+    communicator.alltoall(request_non_empty);
+
+    processor_id_type non_empty_requests = 0;
+
     for (processor_id_type pid=0; pid<communicator.size(); pid++)
       {
-        // Trade my requests with processor procup and procdown
+        // Send requests
         const processor_id_type procup = cast_int<processor_id_type>
           ((communicator.rank() + pid) % communicator.size());
-        const processor_id_type procdown = cast_int<processor_id_type>
-          ((communicator.size() + communicator.rank() - pid) %
-           communicator.size());
 
-        communicator.send_receive(procup, requested_ids[procup],
-                                  procdown, request_to_fill);
+        if (requested_ids[procup].empty())
+          continue;
+
+        communicator.send(procup, requested_ids[procup],
+                          key_send_requests[procup], key_send_tag);
+
+        non_empty_requests++;
+      }
+
+    // Receive and process requests as they come in
+    for (processor_id_type pid=0; pid<communicator.size(); pid++)
+      {
+        if (!request_non_empty[pid])
+          continue;
+
+        std::vector<Parallel::DofObjectKey> request_to_fill;
+        communicator.receive (pid, request_to_fill, key_send_tag);
+
+        std::vector<dof_id_type> & global_ids = global_id_returns[pid];
 
         // Fill the requests
         global_ids.clear(); /**/ global_ids.reserve(request_to_fill.size());
@@ -858,9 +889,24 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
             global_ids.push_back (cast_int<dof_id_type>(std::distance(my_bin.begin(), pos) + my_offset));
           }
 
-        // and trade back
-        communicator.send_receive (procdown, global_ids,
-                                   procup,   filled_request[procup]);
+        // and send back
+        id_return_requests.push_back(Parallel::Request());
+        communicator.send (pid, global_ids,
+                           id_return_requests.back(), id_return_tag);
+      }
+
+    // Receive and process returns
+    for (processor_id_type pid=0; pid<communicator.size(); pid++)
+      {
+        const processor_id_type procup = cast_int<processor_id_type>
+          ((communicator.rank() + pid) % communicator.size());
+
+        if (requested_ids[procup].empty())
+          continue;
+
+        std::vector<dof_id_type> & this_filled_request = filled_request[procup];
+
+        communicator.receive(procup, this_filled_request, id_return_tag);
       }
 
     // We now have all the filled requests, so we can loop through our
@@ -886,6 +932,9 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
           ++next_obj_on_proc[pid];
         }
     }
+
+    Parallel::wait(key_send_requests);
+    Parallel::wait(id_return_requests);
   }
 
   libmesh_assert_equal_to(index_map.size(), n_objects);
