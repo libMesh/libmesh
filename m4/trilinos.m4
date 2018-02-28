@@ -232,7 +232,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
 
     #echo "Makefile_config_trilinos="
     #cat Makefile_config_trilinos
-    TRILINOS_INCLUDES=`make -sf Makefile_config_trilinos echo_include`
+    TRILINOS_INCLUDES=`make -sf Makefile_config_trilinos echo_include | sed -e 's/-I/-isystem /g'`
     TRILINOS_LIBS=`make -sf Makefile_config_trilinos echo_libs`
 
     #echo TRILINOS_LIBS=$TRILINOS_LIBS
