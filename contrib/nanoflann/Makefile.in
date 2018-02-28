@@ -209,6 +209,24 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
+CCLD = $(CC)
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
 SOURCES = $(matrix_example_SOURCES) \
 	$(pointcloud_adaptor_example_SOURCES) \
 	$(pointcloud_example_SOURCES) $(pointcloud_kdd_radius_SOURCES) \
@@ -555,7 +573,7 @@ host_os = @host_os@
 host_vendor = @host_vendor@
 htmldir = @htmldir@
 
-# generally we do not install contributed headers, but 
+# generally we do not install contributed headers, but
 # for nanoflann we will because of its tight inlining
 # in InverseDistanceInterpolation and friends
 includedir = $(prefix)/include/libmesh
@@ -600,15 +618,15 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-AUTOMAKE_OPTIONS = subdir-objects 
+AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = -I$(srcdir)/include $(am__append_1)
 AM_CFLAGS = 
 AM_CXXFLAGS = 
 include_HEADERS = include/nanoflann.hpp
-pointcloud_kdd_radius_SOURCES = examples/pointcloud_kdd_radius.cpp
-pointcloud_example_SOURCES = examples/pointcloud_example.cpp
+pointcloud_kdd_radius_SOURCES = examples/pointcloud_kdd_radius.cpp examples/utils.h
+pointcloud_example_SOURCES = examples/pointcloud_example.cpp examples/utils.h
 pointcloud_adaptor_example_SOURCES = examples/pointcloud_adaptor_example.cpp
-vector_of_vectors_example_SOURCES = examples/vector_of_vectors_example.cpp
+vector_of_vectors_example_SOURCES = examples/vector_of_vectors_example.cpp examples/KDTreeVectorOfVectorsAdaptor.h
 @LIBMESH_ENABLE_EIGEN_TRUE@matrix_example_SOURCES = examples/matrix_example.cpp
 TESTS = $(check_PROGRAMS)
 all: all-am
