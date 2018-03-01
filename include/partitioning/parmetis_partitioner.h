@@ -23,11 +23,11 @@
 // Local Includes
 #include "libmesh/id_types.h"
 #include "libmesh/partitioner.h"
-#include "libmesh/vectormap.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
 
 // C++ Includes
 #include <cstddef>
+#include <unordered_map>
 #include <vector>
 
 namespace libMesh
@@ -117,7 +117,7 @@ private:
   /**
    * Maps active element ids into a contiguous range, as needed by ParMETIS.
    */
-  vectormap<dof_id_type, dof_id_type> _global_index_by_pid_map;
+  std::unordered_map<dof_id_type, dof_id_type> _global_index_by_pid_map;
 
   /**
    * Pointer to the Parmetis-specific data structures.  Lets us avoid

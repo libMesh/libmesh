@@ -26,6 +26,7 @@
 #include "libmesh/mesh_communication.h"
 #include "libmesh/parmetis_partitioner.h"
 #include "libmesh/metis_partitioner.h"
+#include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
 #include "libmesh/parmetis_helper.h"
@@ -191,6 +192,34 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
 // Only need to compile these methods if ParMETIS is present
 #ifdef LIBMESH_HAVE_PARMETIS
 
+struct SyncLocalIDs
+{
+  typedef dof_id_type datum;
+
+  typedef std::unordered_map<dof_id_type, dof_id_type> map_type;
+
+  SyncLocalIDs(map_type & _id_map) : id_map(_id_map) {}
+
+  map_type & id_map;
+
+  void gather_data (const std::vector<dof_id_type> & ids,
+                    std::vector<datum> & local_ids)
+  {
+    local_ids.resize(ids.size());
+
+    for (std::size_t i=0, imax = ids.size(); i != imax; ++i)
+      local_ids[i] = id_map[ids[i]];
+  }
+
+  void act_on_data (const std::vector<dof_id_type> & ids,
+                    const std::vector<datum> & local_ids)
+  {
+    for (std::size_t i=0, imax = local_ids.size(); i != imax; ++i)
+      id_map[ids[i]] = local_ids[i];
+  }
+};
+
+
 void ParmetisPartitioner::initialize (const MeshBase & mesh,
                                       const unsigned int n_sbdmns)
 {
@@ -264,35 +293,37 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
 
   // Maps active element ids into a contiguous range independent of partitioning.
   // (only needs local scope)
-  vectormap<dof_id_type, dof_id_type> global_index_map;
+  std::unordered_map<dof_id_type, dof_id_type> global_index_map;
 
   {
     std::vector<dof_id_type> global_index;
 
     // create the mapping which is contiguous by processor
+    {
+      MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
+      const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
+
+      MeshCommunication().find_local_indices (bbox, it, end,
+                                              _global_index_by_pid_map);
+    }
+
+    SyncLocalIDs sync(_global_index_by_pid_map);
+
+    Parallel::sync_dofobject_data_by_id
+      (mesh.comm(), mesh.active_elements_begin(), mesh.active_elements_end(), sync);
+
     dof_id_type pid_offset=0;
     for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
       {
         MeshBase::const_element_iterator       it  = mesh.active_pid_elements_begin(pid);
         const MeshBase::const_element_iterator end = mesh.active_pid_elements_end(pid);
 
-        // note that we may not have all (or any!) the active elements which belong on this processor,
-        // but by calling this on all processors a unique range in [0,_n_active_elem_on_proc[pid])
-        // is constructed.  Only the indices for the elements we pass in are returned in the array.
-        MeshCommunication().find_global_indices (mesh.comm(),
-                                                 bbox, it, end,
-                                                 global_index);
-
-        for (dof_id_type cnt=0; it != end; ++it)
+        for (; it != end; ++it)
           {
             const Elem * elem = *it;
-            // vectormap::count forces a sort, which is too expensive
-            // in a loop
-            // libmesh_assert (!_global_index_by_pid_map.count(elem->id()));
-            libmesh_assert_less (cnt, global_index.size());
-            libmesh_assert_less (global_index[cnt], _n_active_elem_on_proc[pid]);
+            libmesh_assert_less (_global_index_by_pid_map[elem->id()], _n_active_elem_on_proc[pid]);
 
-            _global_index_by_pid_map.insert(std::make_pair(elem->id(), global_index[cnt++] + pid_offset));
+            _global_index_by_pid_map[elem->id()] += pid_offset;
           }
 
         pid_offset += _n_active_elem_on_proc[pid];
