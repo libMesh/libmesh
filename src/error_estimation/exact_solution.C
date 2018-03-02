@@ -701,6 +701,12 @@ void ExactSolution::_compute_error(const std::string & sys_name,
               // FIXME: Needs to be updated for vector-valued elements
               DenseVector<Number> output(1);
               (*coarse_values)(q_point[qp],time,output,&subdomain_id);
+
+              if(output.size() == 0)
+              {
+                libmesh_error_msg("Mesh function failed to find point");
+              }
+
               exact_val = output(0);
             }
           const typename FEGenericBase<OutputShape>::OutputNumber val_error = u_h - exact_val;
