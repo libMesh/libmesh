@@ -61,6 +61,7 @@ void init_element_equivalence_map()
       element_equivalence_map["SPHERE"] = NODEELEM;
 
       // EDGE2 equivalences
+      element_equivalence_map["EDGE"]   = EDGE2;
       element_equivalence_map["EDGE2"]  = EDGE2;
       element_equivalence_map["TRUSS"]  = EDGE2;
       element_equivalence_map["BEAM"]   = EDGE2;
