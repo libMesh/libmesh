@@ -184,9 +184,14 @@ TESTS = run_unit_tests.sh
 endif
 
 CLEANFILES = cube_mesh.xda \
-             checkpoint_splitter.cpr* checkpoint_splitter.cpa* \
              slit_mesh.xda slit_solution.xda \
 	     out.e
+
+# CLEANFILES only applies to files, handle directories separately
+clean-local:
+	rm -rf checkpoint_splitter.cpr \
+	       checkpoint_splitter.cpa \
+	       .jitcache
 
 ######################################################################
 #
