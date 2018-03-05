@@ -1134,8 +1134,7 @@ unit_tests_sources = driver.C test_comm.h stream_redirector.h \
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_LDADD = $(top_builddir)/libmesh_oprof.la
 @LIBMESH_ENABLE_CPPUNIT_TRUE@TESTS = run_unit_tests.sh
-CLEANFILES = cube_mesh.xda checkpoint_splitter.cpr* \
-	checkpoint_splitter.cpa* slit_mesh.xda slit_solution.xda out.e \
+CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	$(am__append_12)
 all: all-am
 
@@ -6146,7 +6145,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
+clean-am: clean-checkPROGRAMS clean-generic clean-libtool clean-local \
 	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
@@ -6218,7 +6217,7 @@ uninstall-am:
 .MAKE: check-am install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am check check-TESTS check-am clean \
-	clean-checkPROGRAMS clean-generic clean-libtool \
+	clean-checkPROGRAMS clean-generic clean-libtool clean-local \
 	clean-noinstPROGRAMS cscopelist-am ctags ctags-am distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
@@ -6263,6 +6262,12 @@ $(top_builddir)/libmesh_prof.la: FORCE
 
 $(top_builddir)/libmesh_oprof.la: FORCE
 	(cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) libmesh_oprof.la)
+
+# CLEANFILES only applies to files, handle directories separately
+clean-local:
+	rm -rf checkpoint_splitter.cpr \
+	       checkpoint_splitter.cpa \
+	       .jitcache
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
