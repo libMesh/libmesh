@@ -670,11 +670,7 @@ void MeshCommunication::find_local_indices (const libMesh::BoundingBox & bbox,
     LOG_SCOPE("local_hilbert_indices", "MeshCommunication");
     for (ForwardIterator it=begin; it!=end; ++it)
       {
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
         const Parallel::DofObjectKey hi(get_hilbert_index ((*it), bbox));
-#else
-        const Parallel::DofObjectKey hi(get_hilbert_index ((*it), bbox), (*it)->unique_id());
-#endif
         hilbert_keys.emplace(hi, (*it)->id());
       }
   }
