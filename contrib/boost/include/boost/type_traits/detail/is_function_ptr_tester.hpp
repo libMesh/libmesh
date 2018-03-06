@@ -1,6 +1,6 @@
 
-//  (C) Copyright Dave Abrahams, Steve Cleary, Beman Dawes,
-//  Aleksey Gurtovoy, Howard Hinnant & John Maddock 2000.
+//  (C) Copyright Dave Abrahams, Steve Cleary, Beman Dawes, 
+//  Aleksey Gurtovoy, Howard Hinnant & John Maddock 2000.  
 //  Use, modification and distribution are subject to the Boost Software License,
 //  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt).
@@ -40,7 +40,7 @@ namespace type_traits {
 no_type BOOST_TT_DECL is_function_ptr_tester(...);
 
 #if !defined(BOOST_TT_PREPROCESSING_MODE)
-// pre-processed code, don't edit, try GNU cpp with
+// pre-processed code, don't edit, try GNU cpp with 
 // cpp -I../../../ -DBOOST_TT_PREPROCESSING_MODE -x c++ -P filename
 
 template <class R >

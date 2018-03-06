@@ -84,7 +84,7 @@ template<class C1, class C2> struct common_member_class
     >::type type;
 };
 
-//This indirection avoids compilation errors on some older
+//This indirection avoids compilation errors on some older 
 //compilers like MSVC 7.1
 template<class CT, class CB>
 struct common_member_class_pointer_to_member

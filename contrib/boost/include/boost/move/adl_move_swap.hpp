@@ -66,8 +66,8 @@ struct private_type
    private_type const &operator,(int) const;
 };
 
-typedef char yes_type;
-struct no_type{ char dummy[2]; };
+typedef char yes_type;            
+struct no_type{ char dummy[2]; }; 
 
 template<typename T>
 no_type is_private_type(T const &);
@@ -219,7 +219,7 @@ namespace boost{
 //! no rvalue references then:
 //!
 //!   -  If T has a <code>T::swap(T&)</code> member, that member is called.
-//!   -  Otherwise a move-based swap is called, equivalent to:
+//!   -  Otherwise a move-based swap is called, equivalent to: 
 //!      <code>T t(::boost::move(x)); x = ::boost::move(y); y = ::boost::move(t);</code>.
 template<class T>
 BOOST_MOVE_FORCEINLINE void adl_move_swap(T& x, T& y)
@@ -229,10 +229,10 @@ BOOST_MOVE_FORCEINLINE void adl_move_swap(T& x, T& y)
 
 //! Exchanges elements between range [first1, last1) and another range starting at first2
 //! using boost::adl_move_swap.
-//!
+//! 
 //! Parameters:
-//!   first1, last1	-	the first range of elements to swap
-//!   first2	-	beginning of the second range of elements to swap
+//!   first1, last1   -   the first range of elements to swap
+//!   first2   -   beginning of the second range of elements to swap
 //!
 //! Type requirements:
 //!   - ForwardIt1, ForwardIt2 must meet the requirements of ForwardIterator.

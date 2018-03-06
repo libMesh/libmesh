@@ -54,7 +54,7 @@
 
 //
 // define BOOST_TT_NO_CV_FUNC_TEST
-// if tests for cv-qualified member functions don't
+// if tests for cv-qualified member functions don't 
 // work in is_member_function_pointer
 //
 #if BOOST_WORKAROUND(__MWERKS__, < 0x3000) || BOOST_WORKAROUND(__IBMCPP__, <= 600)

@@ -1,5 +1,5 @@
 
-//  (C) Copyright John Maddock 2005.
+//  (C) Copyright John Maddock 2005.  
 //  Use, modification and distribution are subject to the Boost Software License,
 //  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt).
@@ -132,7 +132,7 @@ template <> struct is_unsigned<const ::boost::long_long_type> : public false_typ
 template <> struct is_unsigned<volatile ::boost::long_long_type> : public false_type{};
 template <> struct is_unsigned<const volatile ::boost::long_long_type> : public false_type{};
 #endif
-#if defined(CHAR_MIN)
+#if defined(CHAR_MIN) 
 #if CHAR_MIN == 0
 template <> struct is_unsigned<char> : public true_type{};
 template <> struct is_unsigned<const char> : public true_type{};

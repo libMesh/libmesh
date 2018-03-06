@@ -11,6 +11,7 @@
 #ifndef BOOST_TT_HAS_TRIVIAL_MOVE_CONSTRUCTOR_HPP_INCLUDED
 #define BOOST_TT_HAS_TRIVIAL_MOVE_CONSTRUCTOR_HPP_INCLUDED
 
+#include <cstddef> // size_t
 #include <boost/type_traits/intrinsics.hpp>
 #include <boost/type_traits/integral_constant.hpp>
 
@@ -50,7 +51,7 @@ template <typename T> struct has_trivial_move_constructor : public integral_cons
 
 namespace boost {
 
-template <typename T> struct has_trivial_move_constructor
+template <typename T> struct has_trivial_move_constructor 
    : public integral_constant<bool, ::boost::is_pod<T>::value && !::boost::is_volatile<T>::value SOLARIS_EXTRA_CHECK>{};
 
 #undef SOLARIS_EXTRA_CHECK

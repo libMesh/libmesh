@@ -87,7 +87,7 @@ namespace type_traits_detail
 #if !defined(BOOST_NO_CXX11_DECLTYPE)
 
 #if !defined(BOOST_NO_CXX11_TEMPLATE_ALIASES) && !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
-
+    
 #if !defined(BOOST_MSVC) || BOOST_MSVC > 1800
 
 // internal compiler error on msvc-12.0

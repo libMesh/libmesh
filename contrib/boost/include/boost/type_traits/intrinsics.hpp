@@ -78,7 +78,7 @@
 #if defined(__MSL_CPP__) && (__MSL_CPP__ >= 0x8000)
     // Metrowerks compiler is acquiring intrinsic type traits support
     // post version 8.  We hook into the published interface to pick up
-    // user defined specializations as well as compiler intrinsics as
+    // user defined specializations as well as compiler intrinsics as 
     // and when they become available:
 #   include <msl_utility>
 #   define BOOST_IS_UNION(T) BOOST_STD_EXTENSION_NAMESPACE::is_union<T>::value
@@ -158,7 +158,7 @@
 //
 // Note that these intrinsics are disabled for the CUDA meta-compiler as it appears
 // to not support them, even though the underlying clang compiler does so.
-// This is a rubbish fix as it basically stops type traits from working correctly,
+// This is a rubbish fix as it basically stops type traits from working correctly, 
 // but maybe the best we can do for now.  See https://svn.boost.org/trac/boost/ticket/10694
 //
 //

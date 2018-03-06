@@ -70,7 +70,7 @@ template<> struct is_integral< ::boost::long_long_type> : public true_type{};
 template<> struct is_integral<unsigned __int64> : public true_type{};
 template<> struct is_integral<__int64> : public true_type{};
 #endif
-
+        
 #ifdef BOOST_HAS_INT128
 template<> struct is_integral<boost::int128_type> : public true_type{};
 template<> struct is_integral<boost::uint128_type> : public true_type{};

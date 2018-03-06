@@ -9,6 +9,7 @@
 #ifndef BOOST_TT_HAS_NOTHROW_ASSIGN_HPP_INCLUDED
 #define BOOST_TT_HAS_NOTHROW_ASSIGN_HPP_INCLUDED
 
+#include <cstddef> // size_t
 #include <boost/type_traits/integral_constant.hpp>
 #include <boost/type_traits/intrinsics.hpp>
 
@@ -53,8 +54,8 @@ namespace boost {
 #ifndef BOOST_HAS_NOTHROW_ASSIGN
 #if !defined(BOOST_NO_CXX11_NOEXCEPT) && !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
       // Portable C++11 version:
-      detail::has_nothrow_assign_imp<T,
-      (is_const<typename remove_reference<T>::type>::value || is_volatile<typename remove_reference<T>::type>::value || is_reference<T>::value),
+      detail::has_nothrow_assign_imp<T, 
+      (is_const<typename remove_reference<T>::type>::value || is_volatile<typename remove_reference<T>::type>::value || is_reference<T>::value), 
       is_assignable<typename add_reference<T>::type, typename add_reference<const T>::type>::value
       >::value
 #else

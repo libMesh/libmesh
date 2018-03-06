@@ -11,7 +11,7 @@
 
 #include <boost/type_traits/remove_extent.hpp>
 
-namespace boost
+namespace boost 
 {
 
 template <class T> struct remove_bounds : public remove_extent<T> {};

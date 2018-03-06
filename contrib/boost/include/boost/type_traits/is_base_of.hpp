@@ -5,7 +5,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt).
 //
 //  See http://www.boost.org/libs/type_traits for most recent version including documentation.
-
+ 
 #ifndef BOOST_TT_IS_BASE_OF_HPP_INCLUDED
 #define BOOST_TT_IS_BASE_OF_HPP_INCLUDED
 

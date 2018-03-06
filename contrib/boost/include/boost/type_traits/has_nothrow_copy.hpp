@@ -66,7 +66,7 @@ template <class T> struct has_nothrow_copy_constructor : public integral_constan
 template <> struct has_nothrow_copy_constructor<void> : public false_type{};
 template <class T> struct has_nothrow_copy_constructor<T volatile> : public false_type{};
 template <class T> struct has_nothrow_copy_constructor<T&> : public false_type{};
-#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
+#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) 
 template <class T> struct has_nothrow_copy_constructor<T&&> : public false_type{};
 #endif
 #ifndef BOOST_NO_CV_VOID_SPECIALIZATIONS

@@ -59,8 +59,8 @@ private:
 #if defined(BOOST_HAS_LONG_LONG)
 #ifdef BOOST_HAS_INT128
                      typename conditional<
-                        sizeof(t_no_cv) == sizeof(boost::long_long_type),
-                        boost::long_long_type,
+                        sizeof(t_no_cv) == sizeof(boost::long_long_type), 
+                        boost::long_long_type, 
                         boost::int128_type
                      >::type
 #else
@@ -91,8 +91,8 @@ private:
 #if defined(BOOST_HAS_LONG_LONG)
 #ifdef BOOST_HAS_INT128
                      typename conditional<
-                        sizeof(t_no_cv) == sizeof(boost::long_long_type),
-                        boost::long_long_type,
+                        sizeof(t_no_cv) == sizeof(boost::long_long_type), 
+                        boost::long_long_type, 
                         boost::int128_type
                      >::type
 #else
@@ -109,7 +109,7 @@ private:
          >::type
       >::type
    >::type base_integer_type;
-
+   
    // Add back any const qualifier:
    typedef typename conditional<
       is_const<T>::value,
