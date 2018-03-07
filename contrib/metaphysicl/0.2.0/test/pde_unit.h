@@ -106,6 +106,12 @@ int main(void)
           vrnorm_max = std::max(vrnorm, vrnorm_max);
           prnorm_max = std::max(prnorm, prnorm_max);
           ernorm_max = std::max(ernorm, ernorm_max);
+#else
+          // Avoid "set but not used" variable warnings;
+          (void) s2u;
+          (void) s2v;
+          (void) s2p;
+          (void) s2e;
 #endif // METAPHYSICL_HAVE_MASA
 
 	}
