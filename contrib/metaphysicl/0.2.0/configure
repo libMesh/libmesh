@@ -22300,6 +22300,7 @@ fi
 
     found_boost=yes
      # Chrono introduced in 1.47
+
     # Do we have to check for Boost.System?  This link-time dependency was
 # added as of 1.35.0.  If we have a version <1.35, we must not attempt to
 # find Boost.System as it didn't exist by then.
@@ -22570,16 +22571,17 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $boost_cv_lib_system" >&5
 $as_echo "$boost_cv_lib_system" >&6; }
 case $boost_cv_lib_system in #(
-  (no) $as_echo "$as_me: failed program was:" >&5
+  (yes) $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-    as_fn_error $? "cannot find the flags to link with Boost system" "$LINENO" 5
+
+$as_echo "#define HAVE_BOOST_SYSTEM 1" >>confdefs.h
+    BOOST_SYSTEM_LDFLAGS=$boost_cv_lib_system_LDFLAGS
+    BOOST_SYSTEM_LDPATH=$boost_cv_lib_system_LDPATH
+    BOOST_LDPATH=$boost_cv_lib_system_LDPATH
+    BOOST_SYSTEM_LIBS=$boost_cv_lib_system_LIBS
     ;;
 esac
-BOOST_SYSTEM_LDFLAGS=$boost_cv_lib_system_LDFLAGS
-BOOST_SYSTEM_LDPATH=$boost_cv_lib_system_LDPATH
-BOOST_LDPATH=$boost_cv_lib_system_LDPATH
-BOOST_SYSTEM_LIBS=$boost_cv_lib_system_LIBS
 CPPFLAGS=$boost_save_CPPFLAGS
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -22861,16 +22863,17 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $boost_cv_lib_chrono" >&5
 $as_echo "$boost_cv_lib_chrono" >&6; }
 case $boost_cv_lib_chrono in #(
-  (no) $as_echo "$as_me: failed program was:" >&5
+  (yes) $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-    as_fn_error $? "cannot find the flags to link with Boost chrono" "$LINENO" 5
+
+$as_echo "#define HAVE_BOOST_CHRONO 1" >>confdefs.h
+    BOOST_CHRONO_LDFLAGS=$boost_cv_lib_chrono_LDFLAGS
+    BOOST_CHRONO_LDPATH=$boost_cv_lib_chrono_LDPATH
+    BOOST_LDPATH=$boost_cv_lib_chrono_LDPATH
+    BOOST_CHRONO_LIBS=$boost_cv_lib_chrono_LIBS
     ;;
 esac
-BOOST_CHRONO_LDFLAGS=$boost_cv_lib_chrono_LDFLAGS
-BOOST_CHRONO_LDPATH=$boost_cv_lib_chrono_LDPATH
-BOOST_LDPATH=$boost_cv_lib_chrono_LDPATH
-BOOST_CHRONO_LIBS=$boost_cv_lib_chrono_LIBS
 CPPFLAGS=$boost_save_CPPFLAGS
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -22885,6 +22888,10 @@ fi
 LIBS=$boost_filesystem_save_LIBS
 LDFLAGS=$boost_filesystem_save_LDFLAGS
 
+
+    if test "x$boost_cv_lib_chrono" != xyes; then
+      found_boost=no
+    fi
 
     if test x"$boost_cv_inc_path" = xno; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: Boost not available, not searching for the Boost date_time library" >&5
@@ -23152,16 +23159,17 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $boost_cv_lib_date_time" >&5
 $as_echo "$boost_cv_lib_date_time" >&6; }
 case $boost_cv_lib_date_time in #(
-  (no) $as_echo "$as_me: failed program was:" >&5
+  (yes) $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-    as_fn_error $? "cannot find the flags to link with Boost date_time" "$LINENO" 5
+
+$as_echo "#define HAVE_BOOST_DATE_TIME 1" >>confdefs.h
+    BOOST_DATE_TIME_LDFLAGS=$boost_cv_lib_date_time_LDFLAGS
+    BOOST_DATE_TIME_LDPATH=$boost_cv_lib_date_time_LDPATH
+    BOOST_LDPATH=$boost_cv_lib_date_time_LDPATH
+    BOOST_DATE_TIME_LIBS=$boost_cv_lib_date_time_LIBS
     ;;
 esac
-BOOST_DATE_TIME_LDFLAGS=$boost_cv_lib_date_time_LDFLAGS
-BOOST_DATE_TIME_LDPATH=$boost_cv_lib_date_time_LDPATH
-BOOST_LDPATH=$boost_cv_lib_date_time_LDPATH
-BOOST_DATE_TIME_LIBS=$boost_cv_lib_date_time_LIBS
 CPPFLAGS=$boost_save_CPPFLAGS
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -23171,6 +23179,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 fi
 
 
+
+    if test "x$boost_cv_lib_date_time" != xyes; then
+      found_boost=no
+    fi
 
     # Do we have to check for Boost.System?  This link-time dependency was
 # added as of 1.35.0.  If we have a version <1.35, we must not attempt to
@@ -23442,16 +23454,17 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $boost_cv_lib_system" >&5
 $as_echo "$boost_cv_lib_system" >&6; }
 case $boost_cv_lib_system in #(
-  (no) $as_echo "$as_me: failed program was:" >&5
+  (yes) $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-    as_fn_error $? "cannot find the flags to link with Boost system" "$LINENO" 5
+
+$as_echo "#define HAVE_BOOST_SYSTEM 1" >>confdefs.h
+    BOOST_SYSTEM_LDFLAGS=$boost_cv_lib_system_LDFLAGS
+    BOOST_SYSTEM_LDPATH=$boost_cv_lib_system_LDPATH
+    BOOST_LDPATH=$boost_cv_lib_system_LDPATH
+    BOOST_SYSTEM_LIBS=$boost_cv_lib_system_LIBS
     ;;
 esac
-BOOST_SYSTEM_LDFLAGS=$boost_cv_lib_system_LDFLAGS
-BOOST_SYSTEM_LDPATH=$boost_cv_lib_system_LDPATH
-BOOST_LDPATH=$boost_cv_lib_system_LDPATH
-BOOST_SYSTEM_LIBS=$boost_cv_lib_system_LIBS
 CPPFLAGS=$boost_save_CPPFLAGS
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -23733,16 +23746,17 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $boost_cv_lib_filesystem" >&5
 $as_echo "$boost_cv_lib_filesystem" >&6; }
 case $boost_cv_lib_filesystem in #(
-  (no) $as_echo "$as_me: failed program was:" >&5
+  (yes) $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-    as_fn_error $? "cannot find the flags to link with Boost filesystem" "$LINENO" 5
+
+$as_echo "#define HAVE_BOOST_FILESYSTEM 1" >>confdefs.h
+    BOOST_FILESYSTEM_LDFLAGS=$boost_cv_lib_filesystem_LDFLAGS
+    BOOST_FILESYSTEM_LDPATH=$boost_cv_lib_filesystem_LDPATH
+    BOOST_LDPATH=$boost_cv_lib_filesystem_LDPATH
+    BOOST_FILESYSTEM_LIBS=$boost_cv_lib_filesystem_LIBS
     ;;
 esac
-BOOST_FILESYSTEM_LDFLAGS=$boost_cv_lib_filesystem_LDFLAGS
-BOOST_FILESYSTEM_LDPATH=$boost_cv_lib_filesystem_LDPATH
-BOOST_LDPATH=$boost_cv_lib_filesystem_LDPATH
-BOOST_FILESYSTEM_LIBS=$boost_cv_lib_filesystem_LIBS
 CPPFLAGS=$boost_save_CPPFLAGS
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -23757,6 +23771,10 @@ fi
 LIBS=$boost_filesystem_save_LIBS
 LDFLAGS=$boost_filesystem_save_LDFLAGS
 
+
+    if test "x$boost_cv_lib_filesystem" != xyes; then
+      found_boost=no
+    fi
 
     if test x"$boost_cv_inc_path" = xno; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: Boost not available, not searching for the Boost system library" >&5
@@ -24024,16 +24042,17 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $boost_cv_lib_system" >&5
 $as_echo "$boost_cv_lib_system" >&6; }
 case $boost_cv_lib_system in #(
-  (no) $as_echo "$as_me: failed program was:" >&5
+  (yes) $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-    as_fn_error $? "cannot find the flags to link with Boost system" "$LINENO" 5
+
+$as_echo "#define HAVE_BOOST_SYSTEM 1" >>confdefs.h
+    BOOST_SYSTEM_LDFLAGS=$boost_cv_lib_system_LDFLAGS
+    BOOST_SYSTEM_LDPATH=$boost_cv_lib_system_LDPATH
+    BOOST_LDPATH=$boost_cv_lib_system_LDPATH
+    BOOST_SYSTEM_LIBS=$boost_cv_lib_system_LIBS
     ;;
 esac
-BOOST_SYSTEM_LDFLAGS=$boost_cv_lib_system_LDFLAGS
-BOOST_SYSTEM_LDPATH=$boost_cv_lib_system_LDPATH
-BOOST_LDPATH=$boost_cv_lib_system_LDPATH
-BOOST_SYSTEM_LIBS=$boost_cv_lib_system_LIBS
 CPPFLAGS=$boost_save_CPPFLAGS
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -24043,6 +24062,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 fi
 
 
+
+    if test "x$boost_cv_lib_system" != xyes; then
+      found_boost=no
+    fi
 
     boost_thread_save_LIBS=$LIBS
 boost_thread_save_LDFLAGS=$LDFLAGS
@@ -24315,16 +24338,17 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $boost_cv_lib_system" >&5
 $as_echo "$boost_cv_lib_system" >&6; }
 case $boost_cv_lib_system in #(
-  (no) $as_echo "$as_me: failed program was:" >&5
+  (yes) $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-    as_fn_error $? "cannot find the flags to link with Boost system" "$LINENO" 5
+
+$as_echo "#define HAVE_BOOST_SYSTEM 1" >>confdefs.h
+    BOOST_SYSTEM_LDFLAGS=$boost_cv_lib_system_LDFLAGS
+    BOOST_SYSTEM_LDPATH=$boost_cv_lib_system_LDPATH
+    BOOST_LDPATH=$boost_cv_lib_system_LDPATH
+    BOOST_SYSTEM_LIBS=$boost_cv_lib_system_LIBS
     ;;
 esac
-BOOST_SYSTEM_LDFLAGS=$boost_cv_lib_system_LDFLAGS
-BOOST_SYSTEM_LDPATH=$boost_cv_lib_system_LDPATH
-BOOST_LDPATH=$boost_cv_lib_system_LDPATH
-BOOST_SYSTEM_LIBS=$boost_cv_lib_system_LIBS
 CPPFLAGS=$boost_save_CPPFLAGS
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -24616,16 +24640,17 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $boost_cv_lib_thread" >&5
 $as_echo "$boost_cv_lib_thread" >&6; }
 case $boost_cv_lib_thread in #(
-  (no) $as_echo "$as_me: failed program was:" >&5
+  (yes) $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-    as_fn_error $? "cannot find the flags to link with Boost thread" "$LINENO" 5
+
+$as_echo "#define HAVE_BOOST_THREAD 1" >>confdefs.h
+    BOOST_THREAD_LDFLAGS=$boost_cv_lib_thread_LDFLAGS
+    BOOST_THREAD_LDPATH=$boost_cv_lib_thread_LDPATH
+    BOOST_LDPATH=$boost_cv_lib_thread_LDPATH
+    BOOST_THREAD_LIBS=$boost_cv_lib_thread_LIBS
     ;;
 esac
-BOOST_THREAD_LDFLAGS=$boost_cv_lib_thread_LDFLAGS
-BOOST_THREAD_LDPATH=$boost_cv_lib_thread_LDPATH
-BOOST_LDPATH=$boost_cv_lib_thread_LDPATH
-BOOST_THREAD_LIBS=$boost_cv_lib_thread_LIBS
 CPPFLAGS=$boost_save_CPPFLAGS
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -24647,6 +24672,9 @@ LDFLAGS=$boost_thread_save_LDFLAGS
 CPPFLAGS=$boost_thread_save_CPPFLAGS
 
 
+    if test "x$boost_cv_lib_threads" != xyes; then
+      found_boost=no
+    fi
 
     # Make sure we have OpenCL support
 
