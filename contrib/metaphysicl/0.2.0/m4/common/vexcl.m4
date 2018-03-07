@@ -84,11 +84,31 @@ if test "${with_vexcl}" != no ; then
 
     found_boost=yes
     BOOST_REQUIRE([1.47],[found_boost=no]) # Chrono introduced in 1.47
+
     BOOST_CHRONO
+    if test "x$boost_cv_lib_chrono" != xyes; then
+      found_boost=no
+    fi
+
     BOOST_DATE_TIME
+    if test "x$boost_cv_lib_date_time" != xyes; then
+      found_boost=no
+    fi
+
     BOOST_FILESYSTEM
+    if test "x$boost_cv_lib_filesystem" != xyes; then
+      found_boost=no
+    fi
+
     BOOST_SYSTEM
+    if test "x$boost_cv_lib_system" != xyes; then
+      found_boost=no
+    fi
+
     BOOST_THREADS
+    if test "x$boost_cv_lib_threads" != xyes; then
+      found_boost=no
+    fi
 
     # Make sure we have OpenCL support
     AX_CHECK_CL([C++])
