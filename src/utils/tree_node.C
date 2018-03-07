@@ -500,7 +500,7 @@ const Elem * TreeNode<N>::find_element_in_children (const Point & p,
   libmesh_assert (!this->active());
 
   // value-initialization sets all array members to false
-  std::array<bool,N> searched_child{};
+  auto searched_child = std::array<bool, N>();
 
   // First only look in the children whose bounding box
   // contain the point p.
