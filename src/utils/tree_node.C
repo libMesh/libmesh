@@ -19,6 +19,7 @@
 
 // C++ includes
 #include <set>
+#include <array>
 
 // Local includes
 #include "libmesh/libmesh_config.h"
@@ -498,7 +499,8 @@ const Elem * TreeNode<N>::find_element_in_children (const Point & p,
 {
   libmesh_assert (!this->active());
 
-  searched_child.assign(children.size(), false);
+  // value-initialization sets all array members to false
+  std::array<bool,N> searched_child{};
 
   // First only look in the children whose bounding box
   // contain the point p.
