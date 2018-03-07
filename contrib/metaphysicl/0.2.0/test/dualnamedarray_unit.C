@@ -112,8 +112,10 @@ int main(void)
           ULongSetConstructor<2>::type> >
     vex_indexed_by_two;
 
+  /*
   typedef
     DualExpression<vex_indexed_by_two, vex_indexed_by_two> dual_two;
+  */
 
   typedef
     NamedIndexArray
@@ -123,8 +125,10 @@ int main(void)
           ULongSetConstructor<1>::type> >
     vex_indexed_by_one;
 
+  /*
   typedef
     DualExpression<vex_indexed_by_one, vex_indexed_by_one> dual_one;
+  */
 
   double zeros[5];
   for (unsigned int i = 0; i != 5; ++i)
@@ -139,7 +143,7 @@ int main(void)
   vex_indexed_by_one test_one_deriv(vex::vector<double>(ctx, 5, zeros),0);
   test_one_deriv.raw_sizes().template get<1>() = 5;
 
-  dual_one test_one(test_one_val, test_one_deriv);
+  // dual_one test_one(test_one_val, test_one_deriv);
 
   vex_indexed_by_two test_two_val(vex::vector<double>(ctx, 3, zeros),0);
   test_two_val.raw_sizes().template get<2>() = 3;
@@ -148,6 +152,7 @@ int main(void)
   vex_indexed_by_two test_two_deriv(vex::vector<double>(ctx, 3, zeros),0);
   test_two_deriv.raw_sizes().template get<2>() = 3;
 
+  /*
   dual_two test_two(test_two_val, test_two_deriv);
 
   test_assert_equal_to (test_one.value().raw_data()[2], 7);
@@ -174,6 +179,7 @@ int main(void)
 
   vex::vector<double> test_make_output =
     test_make_direct.derivatives().raw_data();
+  */
 
 
   auto test_three_val_val = test_one_val * test_two_val;
@@ -193,6 +199,7 @@ int main(void)
     if (i != 2)
       test_assert_equal_to (test_output_three_ag[i], 0);
 
+  /*
   auto test_three_am = (test_one * test_one_val);
   vex::vector<double> test_output_three_am = test_three_am.value().raw_data();
   std::cout << "test_output_three_am = " << test_output_three_am << std::endl;
@@ -262,6 +269,7 @@ int main(void)
 
   vex::vector<double> test_output_ten =
     test_ten.derivatives().raw_data();
+  */
 
 #endif
 
