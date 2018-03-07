@@ -335,14 +335,16 @@ public:
   void commit ()
   {
 #ifdef LIBMESH_HAVE_MPI
-    MPI_Type_commit (&_datatype);
+    libmesh_call_mpi
+      (MPI_Type_commit (&_datatype));
 #endif
   }
 
   void free ()
   {
 #ifdef LIBMESH_HAVE_MPI
-    MPI_Type_free (&_datatype);
+    libmesh_call_mpi
+      (MPI_Type_free (&_datatype));
 #endif
   }
 
