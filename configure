@@ -5697,9 +5697,9 @@ $as_echo "proper compiler flags" >&6; }
   # --------------------------------------------------------------
   # look for a decent C compiler or honor --with-cc=...
   CC_TRY_LIST="gcc icc pgcc cc"
-  if  (test "$enablempi" != no) ; then
-    CC_TRY_LIST="mpicc $CC_TRY_LIST"
-  fi
+  if test "$enablempi" != no; then :
+  CC_TRY_LIST="mpicc $CC_TRY_LIST"
+fi
 
 # Check whether --with-cc was given.
 if test "${with_cc+set}" = set; then :
