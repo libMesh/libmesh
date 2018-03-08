@@ -20,11 +20,9 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
                    esac],
                    [enablempi=yes])
 
-  if  (test "$enablempi" != no) ; then
-    CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"
-  else
-    AC_MSG_RESULT(>>> Disabling MPI per user request <<<)
-  fi
+  AS_IF([test "$enablempi" != no],
+        [CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"],
+        AC_MSG_RESULT([>>> Disabling MPI per user request <<<]))
 
   AC_ARG_WITH([cxx],
               AS_HELP_STRING([--with-cxx=CXX], [C++ compiler to use]),
