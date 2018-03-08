@@ -156,51 +156,51 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
 
   dnl Do not allow Intel to masquerade as a "real" GCC.
   is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
-  if test "x$is_intel_icc" != "x" ; then
-    REAL_GXX=""
-  fi
+  AS_IF([test "x$is_intel_icc" != "x"],
+        [REAL_GXX=""])
 
-  if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
-    dnl find out the right version
-    GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
-    case "$GXX_VERSION_STRING" in
-      *gcc\ version\ 7.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-7.x >>>)
-        GXX_VERSION=gcc7
-        ;;
-      *gcc\ version\ 6.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-6.x >>>)
-        GXX_VERSION=gcc6
-        ;;
-      *gcc\ version\ 5.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-5.x >>>)
-        GXX_VERSION=gcc5
-        ;;
-      *4.9.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-4.9 >>>)
-        GXX_VERSION=gcc4.9
-        ;;
-      *4.8.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-4.8 >>>)
-        GXX_VERSION=gcc4.8
-        ;;
-      *4.7.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-4.7 >>>)
-        GXX_VERSION=gcc4.7
-        ;;
-      *4.6.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-4.6 >>>)
-        GXX_VERSION=gcc4.6
-        ;;
-      *)
-        AC_MSG_RESULT(<<< C++ compiler is unknown but accepted gcc version >>>)
-        GXX_VERSION=gcc-other
-        ;;
-    esac
+  AS_IF([test "$GXX" = yes -a "x$REAL_GXX" != "x"],
+        [
+          dnl find out the right version
+          GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
+          case "$GXX_VERSION_STRING" in
+            *gcc\ version\ 7.*)
+              AC_MSG_RESULT(<<< C++ compiler is gcc-7.x >>>)
+              GXX_VERSION=gcc7
+              ;;
+            *gcc\ version\ 6.*)
+              AC_MSG_RESULT(<<< C++ compiler is gcc-6.x >>>)
+              GXX_VERSION=gcc6
+              ;;
+            *gcc\ version\ 5.*)
+              AC_MSG_RESULT(<<< C++ compiler is gcc-5.x >>>)
+              GXX_VERSION=gcc5
+              ;;
+            *4.9.*)
+              AC_MSG_RESULT(<<< C++ compiler is gcc-4.9 >>>)
+              GXX_VERSION=gcc4.9
+              ;;
+            *4.8.*)
+              AC_MSG_RESULT(<<< C++ compiler is gcc-4.8 >>>)
+              GXX_VERSION=gcc4.8
+              ;;
+            *4.7.*)
+              AC_MSG_RESULT(<<< C++ compiler is gcc-4.7 >>>)
+              GXX_VERSION=gcc4.7
+              ;;
+            *4.6.*)
+              AC_MSG_RESULT(<<< C++ compiler is gcc-4.6 >>>)
+              GXX_VERSION=gcc4.6
+              ;;
+            *)
+              AC_MSG_RESULT(<<< C++ compiler is unknown but accepted gcc version >>>)
+              GXX_VERSION=gcc-other
+              ;;
+          esac
 
-    dnl Detection was successful, so set the flag.
-    compiler_brand_detected=yes
-  fi
+          dnl Detection was successful, so set the flag.
+          compiler_brand_detected=yes
+        ])
 
   dnl Clang/LLVM C++?
   if (test "x$compiler_brand_detected" = "xno"); then
