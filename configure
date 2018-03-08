@@ -4860,12 +4860,12 @@ else
 fi
 
 
-  if  (test "$enablempi" != no) ; then
-    CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"
-  else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Disabling MPI per user request <<<" >&5
+  if test "$enablempi" != no; then :
+  CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Disabling MPI per user request <<<" >&5
 $as_echo ">>> Disabling MPI per user request <<<" >&6; }
-  fi
+fi
 
 
 # Check whether --with-cxx was given.
