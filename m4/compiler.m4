@@ -87,62 +87,57 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
                 esac],
                 [enablefortran=yes])
 
-  if (test "x$enablefortran" = xyes); then
+  AS_IF([test "x$enablefortran" = xyes],
+        [
+          dnl look for a decent F90+ compiler or honor --with-fc=...
+          FC_TRY_LIST="gfortran ifort pgf90 xlf95"
+          if  (test "$enablempi" != no) ; then
+            FC_TRY_LIST="mpif90 $FC_TRY_LIST"
+          fi
+          AC_ARG_WITH([fc],
+                      AS_HELP_STRING([--with-fc=FC], [Fortran compiler to use]),
+                      [FC="$withval"],
+                      [])
 
-    # look for a decent F90+ compiler or honor --with-fc=...
-    FC_TRY_LIST="gfortran ifort pgf90 xlf95"
-    if  (test "$enablempi" != no) ; then
-      FC_TRY_LIST="mpif90 $FC_TRY_LIST"
-    fi
-    AC_ARG_WITH([fc],
-                AS_HELP_STRING([--with-fc=FC], [Fortran compiler to use]),
-                [FC="$withval"],
-                [])
+          dnl --------------------------------------------------------------
+          dnl Determine a F90+ compiler to use.
+          dnl --------------------------------------------------------------
+          AC_PROG_FC([$FC_TRY_LIST])
 
-    # --------------------------------------------------------------
-    # Determine a F90+ compiler to use.
-    # --------------------------------------------------------------
-    AC_PROG_FC([$FC_TRY_LIST])
+          if (test "x$FC" = "x"); then
+            AC_MSG_RESULT(>>> No valid Fortran compiler <<<)
+            FC=no
+            enablefortran=no
+          fi
 
-    if (test "x$FC" = "x"); then
-      AC_MSG_RESULT(>>> No valid Fortran compiler <<<)
-      FC=no
-      enablefortran=no
-    fi
-    # --------------------------------------------------------------
+          dnl look for a decent F77 compiler or honor --with-77=...
+          F77_TRY_LIST="gfortran g77 ifort f77 xlf frt pgf77 fort77 fl32 af77 f90 xlf90 pgf90 epcf90 f95 fort xlf95 ifc efc pgf95 lf95"
+          if  (test "$enablempi" != no) ; then
+            F77_TRY_LIST="mpif77 $F77_TRY_LIST"
+          fi
+          AC_ARG_WITH([f77],
+                      AS_HELP_STRING([--with-f77=F77], [Fortran compiler to use]),
+                      [F77="$withval"],
+                      [])
 
+          dnl --------------------------------------------------------------
+          dnl Determine a F77 compiler to use.
+          dnl --------------------------------------------------------------
+          AC_PROG_F77([$F77_TRY_LIST])
 
-
-    # --------------------------------------------------------------
-    # look for a decent F77 compiler or honor --with-77=...
-    F77_TRY_LIST="gfortran g77 ifort f77 xlf frt pgf77 fort77 fl32 af77 f90 xlf90 pgf90 epcf90 f95 fort xlf95 ifc efc pgf95 lf95"
-    if  (test "$enablempi" != no) ; then
-      F77_TRY_LIST="mpif77 $F77_TRY_LIST"
-    fi
-    AC_ARG_WITH([f77],
-                AS_HELP_STRING([--with-f77=F77], [Fortran compiler to use]),
-                [F77="$withval"],
-                [])
-
-    # --------------------------------------------------------------
-    # Determine a F77 compiler to use.
-    # --------------------------------------------------------------
-    AC_PROG_F77([$F77_TRY_LIST])
-
-    if (test "x$F77" = "x"); then
-      AC_MSG_RESULT(>>> No valid Fortran 77 compiler <<<)
-      F77=no
-      enablefortran=no
-    fi
-
-    # --------------------------------------------------------------
-  else
-      # when --disable-fortran is specified, explicitly set these
-      # to "no" to instruct libtool not to bother with them.
-      AC_MSG_RESULT(>>> Disabling Fortran language support per user request <<<)
-      FC=no
-      F77=no
-  fi # end enablefortran
+          if (test "x$F77" = "x"); then
+            AC_MSG_RESULT(>>> No valid Fortran 77 compiler <<<)
+            F77=no
+            enablefortran=no
+          fi
+        ],
+        [
+          dnl when --disable-fortran is specified, explicitly set these
+          dnl to "no" to instruct libtool not to bother with them.
+          AC_MSG_RESULT(>>> Disabling Fortran language support per user request <<<)
+          FC=no
+          F77=no
+        ])
 ])
 
 
