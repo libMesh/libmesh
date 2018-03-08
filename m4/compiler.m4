@@ -50,9 +50,8 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
   # --------------------------------------------------------------
   # look for a decent C compiler or honor --with-cc=...
   CC_TRY_LIST="gcc icc pgcc cc"
-  if  (test "$enablempi" != no) ; then
-    CC_TRY_LIST="mpicc $CC_TRY_LIST"
-  fi
+  AS_IF([test "$enablempi" != no],
+        [CC_TRY_LIST="mpicc $CC_TRY_LIST"])
   AC_ARG_WITH([cc],
               AS_HELP_STRING([--with-cc=CC], [C compiler to use]),
               [CC="$withval"],
