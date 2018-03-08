@@ -481,16 +481,13 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
 
       libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);
 
-      // For each node, set the processor ID to the min of
-      // its current value and this Element's processor id.
-      //
-      // TODO: we would probably get better parallel partitioning if
-      // we did something like "min for even numbered nodes, max for
-      // odd numbered".  We'd need to be careful about how that would
-      // affect solution ordering for I/O, though.
+      // Consider updating the processor id on this element's nodes
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
-        elem->node_ptr(n)->processor_id() = std::min(elem->node_ptr(n)->processor_id(),
-                                                     elem->processor_id());
+        {
+          Node & node = elem->node_ref(n);
+          processor_id_type & pid = node.processor_id();
+          pid = node.choose_processor_id(pid, elem->processor_id());
+        }
     }
 
   // And loop over the subactive elements, but don't reassign
