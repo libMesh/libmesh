@@ -303,11 +303,8 @@ void Build::operator()(const ConstElemRange & range)
               } // End ghosted element loop
           } // End vi loop
 
-        for (std::set<CouplingMatrix *>::iterator
-               it  = temporary_coupling_matrices.begin(),
-               end = temporary_coupling_matrices.begin();
-             it != end; ++it)
-          delete *it;
+        for (auto & mat : temporary_coupling_matrices)
+          delete mat;
 
       } // End range element loop
   } // End ghosting functor section
