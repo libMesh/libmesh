@@ -5535,48 +5535,41 @@ fi
   if test "$GXX" = yes -a "x$REAL_GXX" != "x"; then :
 
                     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
-          case "$GXX_VERSION_STRING" in
-            *gcc\ version\ 7.*)
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-7.x >>>" >&5
+
+          case "$GXX_VERSION_STRING" in #(
+  *gcc\ version\ 7.*) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-7.x >>>" >&5
 $as_echo "<<< C++ compiler is gcc-7.x >>>" >&6; }
-              GXX_VERSION=gcc7
-              ;;
-            *gcc\ version\ 6.*)
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-6.x >>>" >&5
+                                         GXX_VERSION=gcc7 ;; #(
+  *gcc\ version\ 6.*) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-6.x >>>" >&5
 $as_echo "<<< C++ compiler is gcc-6.x >>>" >&6; }
-              GXX_VERSION=gcc6
-              ;;
-            *gcc\ version\ 5.*)
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-5.x >>>" >&5
+                                         GXX_VERSION=gcc6 ;; #(
+  *gcc\ version\ 5.*) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-5.x >>>" >&5
 $as_echo "<<< C++ compiler is gcc-5.x >>>" >&6; }
-              GXX_VERSION=gcc5
-              ;;
-            *4.9.*)
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.9 >>>" >&5
+                                         GXX_VERSION=gcc5 ;; #(
+  *4.9.*) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.9 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-4.9 >>>" >&6; }
-              GXX_VERSION=gcc4.9
-              ;;
-            *4.8.*)
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.8 >>>" >&5
+                             GXX_VERSION=gcc4.9 ;; #(
+  *4.8.*) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.8 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-4.8 >>>" >&6; }
-              GXX_VERSION=gcc4.8
-              ;;
-            *4.7.*)
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.7 >>>" >&5
+                             GXX_VERSION=gcc4.8 ;; #(
+  *4.7.*) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.7 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-4.7 >>>" >&6; }
-              GXX_VERSION=gcc4.7
-              ;;
-            *4.6.*)
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.6 >>>" >&5
+                             GXX_VERSION=gcc4.7 ;; #(
+  *4.6.*) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.6 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-4.6 >>>" >&6; }
-              GXX_VERSION=gcc4.6
-              ;;
-            *)
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is unknown but accepted gcc version >>>" >&5
+                             GXX_VERSION=gcc4.6 ;; #(
+  *) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is unknown but accepted gcc version >>>" >&5
 $as_echo "<<< C++ compiler is unknown but accepted gcc version >>>" >&6; }
-              GXX_VERSION=gcc-other
-              ;;
-          esac
+                   GXX_VERSION=gcc-other ;;
+esac
 
                     compiler_brand_detected=yes
 
