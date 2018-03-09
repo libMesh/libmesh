@@ -210,10 +210,12 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, con
 
   // Mesh modification operations might not leave us with consistent
   // id counts, but our partitioner might need that consistency.
-  if (!_skip_renumber_nodes_and_elements)
-    this->renumber_nodes_and_elements();
-  else
-    this->update_parallel_id_counts();
+  //
+  // We just call renumber_nodes_and_elements() here because it
+  // currently handles stripping of disconnected nodes and updating of
+  // parallel id counts; it will skip renumbering if the mesh is so
+  // configured.
+  this->renumber_nodes_and_elements();
 
   // Let all the elements find their neighbors
   if (!skip_find_neighbors)
