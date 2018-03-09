@@ -163,40 +163,24 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
         [
           dnl find out the right version
           GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
-          case "$GXX_VERSION_STRING" in
-            *gcc\ version\ 7.*)
-              AC_MSG_RESULT(<<< C++ compiler is gcc-7.x >>>)
-              GXX_VERSION=gcc7
-              ;;
-            *gcc\ version\ 6.*)
-              AC_MSG_RESULT(<<< C++ compiler is gcc-6.x >>>)
-              GXX_VERSION=gcc6
-              ;;
-            *gcc\ version\ 5.*)
-              AC_MSG_RESULT(<<< C++ compiler is gcc-5.x >>>)
-              GXX_VERSION=gcc5
-              ;;
-            *4.9.*)
-              AC_MSG_RESULT(<<< C++ compiler is gcc-4.9 >>>)
-              GXX_VERSION=gcc4.9
-              ;;
-            *4.8.*)
-              AC_MSG_RESULT(<<< C++ compiler is gcc-4.8 >>>)
-              GXX_VERSION=gcc4.8
-              ;;
-            *4.7.*)
-              AC_MSG_RESULT(<<< C++ compiler is gcc-4.7 >>>)
-              GXX_VERSION=gcc4.7
-              ;;
-            *4.6.*)
-              AC_MSG_RESULT(<<< C++ compiler is gcc-4.6 >>>)
-              GXX_VERSION=gcc4.6
-              ;;
-            *)
-              AC_MSG_RESULT(<<< C++ compiler is unknown but accepted gcc version >>>)
-              GXX_VERSION=gcc-other
-              ;;
-          esac
+
+          AS_CASE("$GXX_VERSION_STRING",
+                  [*gcc\ version\ 7.*], [AC_MSG_RESULT(<<< C++ compiler is gcc-7.x >>>)
+                                         GXX_VERSION=gcc7],
+                  [*gcc\ version\ 6.*], [AC_MSG_RESULT(<<< C++ compiler is gcc-6.x >>>)
+                                         GXX_VERSION=gcc6],
+                  [*gcc\ version\ 5.*], [AC_MSG_RESULT(<<< C++ compiler is gcc-5.x >>>)
+                                         GXX_VERSION=gcc5],
+                  [*4.9.*], [AC_MSG_RESULT(<<< C++ compiler is gcc-4.9 >>>)
+                             GXX_VERSION=gcc4.9],
+                  [*4.8.*], [AC_MSG_RESULT(<<< C++ compiler is gcc-4.8 >>>)
+                             GXX_VERSION=gcc4.8],
+                  [*4.7.*], [AC_MSG_RESULT(<<< C++ compiler is gcc-4.7 >>>)
+                             GXX_VERSION=gcc4.7],
+                  [*4.6.*], [AC_MSG_RESULT(<<< C++ compiler is gcc-4.6 >>>)
+                             GXX_VERSION=gcc4.6],
+                  [AC_MSG_RESULT(<<< C++ compiler is unknown but accepted gcc version >>>)
+                   GXX_VERSION=gcc-other])
 
           dnl Detection was successful, so set the flag.
           compiler_brand_detected=yes
