@@ -820,7 +820,18 @@ bool UnstructuredMesh::contract ()
           }
       }
 
-  // Strip any newly-created nullptr voids out of the element array
+  // Strip any newly-created nullptr voids out of the element array,
+  // if we're allowed to.
+  //
+  // We just call renumber_nodes_and_elements() here because it
+  // currently handles stripping of disconnected nodes and updating of
+  // parallel id counts; it will skip renumbering if the mesh is so
+  // configured.
+  //
+  // Note that renumbering may cause node processor ids to no longer
+  // match an id-number-based canonical processor partitioning
+  // algorithm, but it's probably not a safe time for us to go back
+  // and fix that.
   this->renumber_nodes_and_elements();
 
   // FIXME: Need to understand why deleting subactive children
