@@ -197,20 +197,19 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
       dnl something different...
       is_apple_clang="`echo $clang_version | grep 'Apple'`"
       clang_vendor="clang"
-      if test "x$is_apple_clang" != "x" ; then
-        clang_vendor="Apple clang"
-      fi
+      AS_IF([test "x$is_apple_clang" != "x"],
+            [clang_vendor="Apple clang"])
 
       dnl If we have perl, we can also pull out the clang version number using regexes.
       dnl Note that @S|@ is a quadrigraph for the dollar sign.
       clang_major_minor=unknown
 
-      if test "x$PERL" != "x" ; then
-         clang_major_minor=`echo $clang_version | $PERL -ne 'print @S|@1 if /version\s(\d+\.\d+)/'`
-         if test "x$clang_major_minor" = "x" ; then
-           clang_major_minor=unknown
-         fi
-      fi
+      AS_IF([test "x$PERL" != "x"],
+            [
+              clang_major_minor=`echo $clang_version | $PERL -ne 'print @S|@1 if /version\s(\d+\.\d+)/'`
+              AS_IF([test "x$clang_major_minor" = "x"],
+                    [clang_major_minor=unknown])
+            ])
 
       AC_MSG_RESULT([<<< C++ compiler is ${clang_vendor}, version ${clang_major_minor} >>>])
       GXX_VERSION=clang
