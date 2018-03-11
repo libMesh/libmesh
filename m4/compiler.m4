@@ -506,46 +506,37 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
         # The -g flag is all OProfile needs to produce annotations
         OPROFILE_FLAGS="-g"
 
-        # Specific flags for specific versions
-        case "$GXX_VERSION" in
-
-          # Intel ICC >= v13.x
-          intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x)
-              # Disable some warning messages:
-              # #161: 'unrecognized #pragma
-              #       #pragma GCC diagnostic warning "-Wdeprecated-declarations"'
-              #       I don't understand this, pragmas for other compilers should
-              #       just be silently ignored, isn't that the whole point of pragmas?
-              # #175: 'subscript out of range'
-              #       FIN-S application code causes many false
-              #       positives with this
-              # #266: 'function declared implicitly'
-              #       Metis function "GKfree" caused this error
-              #       in almost every file.
-              # #488: 'template parameter "Scalar1" is not used in declaring the
-              #       parameter types of function template'
-              #       This warning was generated from one of the type_vector.h
-              #       constructors that uses some SFINAE tricks.
-              # #1476: 'field uses tail padding of a base class'
-              # #1505: 'size of class is affected by tail padding'
-              #        simply warns of a possible incompatibility with
-              #        the g++ ABI for this case
-              # #1572: 'floating-point equality and inequality comparisons are unreliable'
-              #        Well, duh, when the tested value is computed...  OK when it
-              #        was from an assignment.
-              PROFILING_FLAGS="-p"
-              CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
-              CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz"
-              CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
-              CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572 -wd488 -wd161"
-              CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
-              CFLAGS_DEVEL="$CFLAGS_DBG"
-              ;;
-
-          *)
-              AC_MSG_RESULT(Unknown Intel compiler, "$GXX_VERSION")
-              ;;
-        esac
+        dnl Disable some warning messages on Intel compilers:
+        dnl 161:  unrecognized pragma GCC diagnostic warning "-Wdeprecated-declarations"
+        dnl 175:  subscript out of range
+        dnl       FIN-S application code causes many false
+        dnl       positives with this
+        dnl 266:  function declared implicitly
+        dnl       Metis function "GKfree" caused this error
+        dnl       in almost every file.
+        dnl 488:  template parameter "Scalar1" is not used in declaring the
+        dnl       parameter types of function template
+        dnl       This warning was generated from one of the type_vector.h
+        dnl       constructors that uses some SFINAE tricks.
+        dnl 1476: field uses tail padding of a base class
+        dnl 1505: size of class is affected by tail padding
+        dnl       simply warns of a possible incompatibility with
+        dnl       the g++ ABI for this case
+        dnl 1572: floating-point equality and inequality comparisons are unreliable
+        dnl       Well, duh, when the tested value is computed...  OK when it
+        dnl       was from an assignment.
+        AS_CASE("$GXX_VERSION",
+                [intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x],
+                [
+                  PROFILING_FLAGS="-p"
+                  CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
+                  CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz"
+                  CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
+                  CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572 -wd488 -wd161"
+                  CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
+                  CFLAGS_DEVEL="$CFLAGS_DBG"
+                ],
+                [AC_MSG_RESULT(Unknown Intel compiler, "$GXX_VERSION")])
       ;;
 
       portland_group)
