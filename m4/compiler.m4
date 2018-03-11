@@ -437,14 +437,13 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
   # our users' systems.  However, being able to override this allows
   # us to increase our unit test coverage.
   AC_ARG_ENABLE(glibcxx-debugging-cppunit,
-	 [AS_HELP_STRING([--enable-glibcxx-debugging-cppunit],
-	                 [Use GLIBCXX debugging flags for unit tests])],
-	 [case "${enableval}" in
-	   yes)  enableglibcxxdebuggingcppunit=yes ;;
-	    no)  enableglibcxxdebuggingcppunit=no ;;
- 	     *)  AC_MSG_ERROR(bad value ${enableval} for --enable-glibcxx-debugging-cppunit) ;;
-	  esac],
-	[enableglibcxxdebuggingcppunit=no])
+                [AS_HELP_STRING([--enable-glibcxx-debugging-cppunit],
+                [Use GLIBCXX debugging flags for unit tests])],
+                [AS_CASE("${enableval}",
+                         [yes], [enableglibcxxdebuggingcppunit=yes],
+                         [no],  [enableglibcxxdebuggingcppunit=no],
+                         [AC_MSG_ERROR(bad value ${enableval} for --enable-glibcxx-debugging-cppunit)])],
+                [enableglibcxxdebuggingcppunit=no])
 
   AM_CONDITIONAL(LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT, test x$enableglibcxxdebuggingcppunit = xyes)
 
