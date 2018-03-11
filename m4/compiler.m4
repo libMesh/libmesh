@@ -442,32 +442,34 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
   # First the flags for gcc compilers
   AS_IF([test "$GXX" = yes -a "x$REAL_GXX" != "x"],
         [
-    CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization"
-    CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -funroll-loops -fstrict-aliasing -Woverloaded-virtual -Wdisabled-optimization"
-    CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Woverloaded-virtual"
-    NODEPRECATEDFLAG="-Wno-deprecated"
+          CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization"
+          dnl devel flags are added on two lines since there are so many
+          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -funroll-loops -fstrict-aliasing -Woverloaded-virtual -Wdisabled-optimization"
+          CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Woverloaded-virtual"
+          NODEPRECATEDFLAG="-Wno-deprecated"
 
-    CFLAGS_OPT="-O2 -funroll-loops -fstrict-aliasing"
-    CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -funroll-loops -fstrict-aliasing"
-    CFLAGS_DBG="-g -Wimplicit"
-    ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
+          CFLAGS_OPT="-O2 -funroll-loops -fstrict-aliasing"
+          CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -funroll-loops -fstrict-aliasing"
+          CFLAGS_DBG="-g -Wimplicit"
+          ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
 
-    AS_IF([test "x$enableglibcxxdebugging" = "xyes"],
-          [CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"])
+          AS_IF([test "x$enableglibcxxdebugging" = "xyes"],
+                [CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"])
 
-    # GCC 4.6.3 warns about variadic macros but supports them just
-    # fine, so let's turn off that warning.
-    AS_CASE("$GXX_VERSION",
-            [gcc4.6 | gcc5], [CXXFLAGS_OPT="$CXXFLAGS_OPT -Wno-variadic-macros"
-                              CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wno-variadic-macros"
-                              CXXFLAGS_DBG="$CXXFLAGS_DBG -Wno-variadic-macros"])
+          # GCC 4.6.3 warns about variadic macros but supports them just
+          # fine, so let's turn off that warning.
+          AS_CASE("$GXX_VERSION",
+                  [gcc4.6 | gcc5], [CXXFLAGS_OPT="$CXXFLAGS_OPT -Wno-variadic-macros"
+                                    CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wno-variadic-macros"
+                                    CXXFLAGS_DBG="$CXXFLAGS_DBG -Wno-variadic-macros"])
 
-    dnl Set OS-specific flags for linkers & other stuff
-    dnl For Solaris we need to pass a different flag to the linker for specifying the
-    dnl dynamic library search path and add -lrpcsvc to use XDR
-    AS_CASE("$target",
-            [*solaris*], [RPATHFLAG="-Wl,-R,"
-                          LIBS="-lrpcsvc $LIBS"])
+          dnl Set OS-specific flags for linkers & other stuff
+          dnl For Solaris we need to pass a different flag to the linker for specifying the
+          dnl dynamic library search path and add -lrpcsvc to use XDR
+          AS_CASE("$target",
+                  [*solaris*], [RPATHFLAG="-Wl,-R,"
+                                LIBS="-lrpcsvc $LIBS"])
         ],
         [
     dnl Non-gcc compilers
@@ -561,8 +563,12 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 
             [clang], [
                        CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -Qunused-arguments -Wunused-parameter -Wunused"
-                       CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
-                       CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
+                       dnl devel flags are added on two lines since there are so many
+                       CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long"
+                       CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
+                       dnl dbg flags are added on two lines since there are so many
+                       CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long"
+                       CXXFLAGS_DBG="$CXXFLAGS_DBG -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
                        NODEPRECATEDFLAG="-Wno-deprecated"
 
                        CFLAGS_OPT="-O2 -Qunused-arguments -Wunused"
