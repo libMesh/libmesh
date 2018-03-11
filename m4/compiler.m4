@@ -468,8 +468,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
     AS_CASE("$GXX_VERSION",
             [gcc4.6 | gcc5], [CXXFLAGS_OPT="$CXXFLAGS_OPT -Wno-variadic-macros"
                               CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wno-variadic-macros"
-                              CXXFLAGS_DBG="$CXXFLAGS_DBG -Wno-variadic-macros"],
-            [])
+                              CXXFLAGS_DBG="$CXXFLAGS_DBG -Wno-variadic-macros"])
 
     # Set OS-specific flags for linkers & other stuff
     case "$target" in
