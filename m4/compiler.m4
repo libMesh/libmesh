@@ -220,27 +220,29 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
         ])
 
   dnl Intel's ICC C++ compiler?
-  if (test "x$compiler_brand_detected" = "xno"); then
-    is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
-    if test "x$is_intel_icc" != "x" ; then
-      GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
-      AS_CASE("$GXX_VERSION_STRING",
-      [*18.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 18 >>>)
-                GXX_VERSION=intel_icc_v18.x],
-      [*17.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 17 >>>)
-                GXX_VERSION=intel_icc_v17.x],
-      [*16.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 16 >>>)
-                GXX_VERSION=intel_icc_v16.x],
-      [*15.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 15 >>>)
-                GXX_VERSION=intel_icc_v15.x],
-      [*14.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 14 >>>)
-                GXX_VERSION=intel_icc_v14.x],
-      [*13.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 13 >>>)
-                GXX_VERSION=intel_icc_v13.x],
-      [AC_MSG_ERROR(Unsupported Intel compiler detected)])
-      compiler_brand_detected=yes
-    fi
-  fi
+  AS_IF([test "x$compiler_brand_detected" = "xno"],
+        [
+          is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
+          AS_IF([test "x$is_intel_icc" != "x"],
+                [
+                  GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
+                  AS_CASE("$GXX_VERSION_STRING",
+                  [*18.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 18 >>>)
+                            GXX_VERSION=intel_icc_v18.x],
+                  [*17.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 17 >>>)
+                            GXX_VERSION=intel_icc_v17.x],
+                  [*16.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 16 >>>)
+                            GXX_VERSION=intel_icc_v16.x],
+                  [*15.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 15 >>>)
+                            GXX_VERSION=intel_icc_v15.x],
+                  [*14.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 14 >>>)
+                            GXX_VERSION=intel_icc_v14.x],
+                  [*13.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 13 >>>)
+                            GXX_VERSION=intel_icc_v13.x],
+                  [AC_MSG_ERROR(Unsupported Intel compiler detected)])
+                  compiler_brand_detected=yes
+                ])
+        ])
 
   dnl Check for IBM xlC. Depending on environment
   dnl variables, moon position, and other reasons unknown to me, this
