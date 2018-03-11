@@ -7270,7 +7270,8 @@ fi
 
 
   # First the flags for gcc compilers
-  if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
+  if test "$GXX" = yes -a "x$REAL_GXX" != "x"; then :
+
     CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization"
     CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -funroll-loops -fstrict-aliasing -Woverloaded-virtual -Wdisabled-optimization"
     CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Woverloaded-virtual"
@@ -7304,8 +7305,8 @@ esac
      ;;
 esac
 
-  else
-    # Non-gcc compilers
+else
+
 
     case "$GXX_VERSION" in
       ibm_xlc)
@@ -7405,7 +7406,8 @@ $as_echo "No specific options for this C++ compiler known" >&6; }
           CFLAGS_DEVEL="$CFLAGS"
           ;;
     esac
-  fi
+
+fi
 
 
 #------------------------------------------------------
