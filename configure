@@ -7296,20 +7296,13 @@ fi
      ;;
 esac
 
-    # Set OS-specific flags for linkers & other stuff
-    case "$target" in
-
-      # For Solaris we need to pass a different flag to the linker for specifying the
-      # dynamic library search path and add -lrpcsvc to use XDR
-      *solaris*)
-          RPATHFLAG="-Wl,-R,"
-          LIBS="-lrpcsvc $LIBS"
-          ;;
-
-      *)
-          ;;
-    esac
-
+                case "$target" in #(
+  *solaris*) :
+    RPATHFLAG="-Wl,-R,"
+                          LIBS="-lrpcsvc $LIBS" ;; #(
+  *) :
+     ;;
+esac
 
   else
     # Non-gcc compilers
