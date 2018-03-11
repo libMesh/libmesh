@@ -5579,29 +5579,31 @@ fi
     clang_version="`($CXX --version 2>&1)`"
     is_clang="`echo $clang_version | grep 'clang'`"
 
-    if test "x$is_clang" != "x" ; then
-                        is_apple_clang="`echo $clang_version | grep 'Apple'`"
-      clang_vendor="clang"
-      if test "x$is_apple_clang" != "x"; then :
+    if test "x$is_clang" != "x"; then :
+
+                                                is_apple_clang="`echo $clang_version | grep 'Apple'`"
+            clang_vendor="clang"
+            if test "x$is_apple_clang" != "x"; then :
   clang_vendor="Apple clang"
 fi
 
-                  clang_major_minor=unknown
+                                    clang_major_minor=unknown
 
-      if test "x$PERL" != "x"; then :
+            if test "x$PERL" != "x"; then :
 
-              clang_major_minor=`echo $clang_version | $PERL -ne 'print $1 if /version\s(\d+\.\d+)/'`
-              if test "x$clang_major_minor" = "x"; then :
+                    clang_major_minor=`echo $clang_version | $PERL -ne 'print $1 if /version\s(\d+\.\d+)/'`
+                    if test "x$clang_major_minor" = "x"; then :
   clang_major_minor=unknown
 fi
 
 fi
 
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is ${clang_vendor}, version ${clang_major_minor} >>>" >&5
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is ${clang_vendor}, version ${clang_major_minor} >>>" >&5
 $as_echo "<<< C++ compiler is ${clang_vendor}, version ${clang_major_minor} >>>" >&6; }
-      GXX_VERSION=clang
-      compiler_brand_detected=yes
-    fi
+            GXX_VERSION=clang
+            compiler_brand_detected=yes
+
+fi
   fi
 
     if (test "x$compiler_brand_detected" = "xno"); then
