@@ -13,11 +13,10 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
      AC_ARG_ENABLE(mpi,
                    AS_HELP_STRING([--disable-mpi],
                                   [build without MPI message passing support]),
-                   [case "${enableval}" in
-                     yes)  enablempi=yes ;;
-                     no)  enablempi=no ;;
-                     *)  AC_MSG_ERROR(bad value ${enableval} for --enable-mpi) ;;
-                   esac],
+                   [AS_CASE("${enableval}",
+                            [yes], [enablempi=yes],
+                            [no],  [enablempi=no],
+                            [AC_MSG_ERROR(bad value ${enableval} for --enable-mpi)])],
                    [enablempi=yes])
 
   AS_IF([test "$enablempi" != no],
