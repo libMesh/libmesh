@@ -418,11 +418,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
   AC_ARG_ENABLE(glibcxx-debugging,
                 [AS_HELP_STRING([--disable-glibcxx-debugging],
                                 [omit -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC even in dbg mode])],
-                [case "${enableval}" in
-                  yes)  enableglibcxxdebugging=yes ;;
-                  no)  enableglibcxxdebugging=no ;;
-                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-glibcxx-debugging) ;;
-                esac],
+                [AS_CASE("${enableval}",
+                         [yes], [enableglibcxxdebugging=yes],
+                         [no],  [enableglibcxxdebugging=no],
+                         [AC_MSG_ERROR(bad value ${enableval} for --enable-glibcxx-debugging)])],
                 [enableglibcxxdebugging=yes])
 
   # GLIBCXX debugging causes untold woes on mac machines - so disable it
