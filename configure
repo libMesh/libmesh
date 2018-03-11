@@ -7307,105 +7307,97 @@ esac
 
 else
 
+        case "$GXX_VERSION" in #(
+  ibm_xlc) :
 
-    case "$GXX_VERSION" in
-      ibm_xlc)
-          CXXFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
-          CXXFLAGS_DBG="-qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
-          NODEPRECATEDFLAG=""
-          CFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10"
-          CFLAGS_DBG="-qansialias -g"
-          CFLAGS_DEVEL="$CFLAGS_DBG"
-          ;;
+                          CXXFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
+                          CXXFLAGS_DBG="-qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
+                          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+                          NODEPRECATEDFLAG=""
+                          CFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10"
+                          CFLAGS_DBG="-qansialias -g"
+                          CFLAGS_DEVEL="$CFLAGS_DBG"
+                         ;; #(
+              intel_*) :
 
-      # All Intel ICC/ECC flavors
-      intel_*)
+                                                    NODEPRECATEDFLAG="-Wno-deprecated"
 
-        # Intel understands the gcc-like no-deprecated flag
-        NODEPRECATEDFLAG="-Wno-deprecated"
+                                                    PROFILING_FLAGS="-qp"
 
-        # Intel compilers use -qp for profiling
-        PROFILING_FLAGS="-qp"
+                                                    ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm -fsource-asm"
 
-        # Intel options for annotated assembly
-        ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm -fsource-asm"
+                                                    OPROFILE_FLAGS="-g"
 
-        # The -g flag is all OProfile needs to produce annotations
-        OPROFILE_FLAGS="-g"
-
-                                                                                                                                                                case "$GXX_VERSION" in #(
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        case "$GXX_VERSION" in #(
   intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x) :
 
-                  PROFILING_FLAGS="-p"
-                  CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
-                  CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz"
-                  CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
-                  CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572 -wd488 -wd161"
-                  CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
-                  CFLAGS_DEVEL="$CFLAGS_DBG"
-                 ;; #(
+                                    PROFILING_FLAGS="-p"
+                                    CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
+                                    CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz"
+                                    CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
+                                    CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572 -wd488 -wd161"
+                                    CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
+                                    CFLAGS_DEVEL="$CFLAGS_DBG"
+                                   ;; #(
   *) :
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: Unknown Intel compiler" >&5
 $as_echo "Unknown Intel compiler" >&6; } ;;
 esac
-      ;;
+                        ;; #(
+  portland_group) :
 
-      portland_group)
-          CXXFLAGS_DBG="-g --no_using_std"
-          CXXFLAGS_OPT="-O2 --no_using_std -fast -Minform=severe"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+                                CXXFLAGS_DBG="-g --no_using_std"
+                                CXXFLAGS_OPT="-O2 --no_using_std -fast -Minform=severe"
+                                CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
 
-          # PG C++ definitely doesn't understand -Wno-deprecated...
-          NODEPRECATEDFLAG=""
+                                                                NODEPRECATEDFLAG=""
 
-          CFLAGS_DBG="-g"
-          CFLAGS_OPT="-O2"
-          CFLAGS_DEVEL="$CFLAGS_DBG"
+                                CFLAGS_DBG="-g"
+                                CFLAGS_OPT="-O2"
+                                CFLAGS_DEVEL="$CFLAGS_DBG"
 
-          # Disable exception handling if we don't use it
-          if test "$enableexceptions" = no; then :
+                                                                if test "$enableexceptions" = no; then :
 
-                  CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
-                  CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
+                                        CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
+                                        CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
 
 fi
-          ;;
+                               ;; #(
+  cray_cc) :
 
-      cray_cc)
-          CXXFLAGS_DBG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
-          CXXFLAGS_OPT="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
-          CXXFLAGS_DEVEL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
-          NODEPRECATEDFLAG=""
-          CFLAGS_DBG="-G n"
-          CFLAGS_OPT="-G n"
-          CFLAGS_DEVEL="-G n"
-          ;;
+                         CXXFLAGS_DBG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+                         CXXFLAGS_OPT="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+                         CXXFLAGS_DEVEL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+                         NODEPRECATEDFLAG=""
+                         CFLAGS_DBG="-G n"
+                         CFLAGS_OPT="-G n"
+                         CFLAGS_DEVEL="-G n"
+                        ;; #(
+  clang) :
 
-      clang)
-          CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -Qunused-arguments -Wunused-parameter -Wunused"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
-          CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
-          NODEPRECATEDFLAG="-Wno-deprecated"
+                       CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -Qunused-arguments -Wunused-parameter -Wunused"
+                       CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
+                       CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
+                       NODEPRECATEDFLAG="-Wno-deprecated"
 
-          CFLAGS_OPT="-O2 -Qunused-arguments -Wunused"
-          CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -fno-limit-debug-info -Wunused"
-          CFLAGS_DBG="-g -Wimplicit -Qunused-arguments -fno-limit-debug-info -Wunused"
-          ;;
+                       CFLAGS_OPT="-O2 -Qunused-arguments -Wunused"
+                       CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -fno-limit-debug-info -Wunused"
+                       CFLAGS_DBG="-g -Wimplicit -Qunused-arguments -fno-limit-debug-info -Wunused"
+                      ;; #(
+  *) :
 
-      *)
-          { $as_echo "$as_me:${as_lineno-$LINENO}: result: No specific options for this C++ compiler known" >&5
+              { $as_echo "$as_me:${as_lineno-$LINENO}: result: No specific options for this C++ compiler known" >&5
 $as_echo "No specific options for this C++ compiler known" >&6; }
-          CXXFLAGS_DBG="$CXXFLAGS"
-          CXXFLAGS_OPT="$CXXFLAGS"
-          CXXFLAGS_DEVEL="$CXXFLAGS"
-          NODEPRECATEDFLAG=""
+              CXXFLAGS_DBG="$CXXFLAGS"
+              CXXFLAGS_OPT="$CXXFLAGS"
+              CXXFLAGS_DEVEL="$CXXFLAGS"
+              NODEPRECATEDFLAG=""
 
-          CFLAGS_DBG="$CFLAGS"
-          CFLAGS_OPT="$CFLAGS"
-          CFLAGS_DEVEL="$CFLAGS"
-          ;;
-    esac
+              CFLAGS_DBG="$CFLAGS"
+              CFLAGS_OPT="$CFLAGS"
+              CFLAGS_DEVEL="$CFLAGS"
+             ;;
+esac
 
 fi
 
