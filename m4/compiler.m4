@@ -376,58 +376,60 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
                SANITIZE_METHODS=${enableval}],
                [])
 
-  if test "x$SANITIZE_METHODS" != x; then
-    AC_MSG_RESULT([<<< Testing sanitizer flags for method(s) "$SANITIZE_METHODS" >>>])
+  AS_IF([test "x$SANITIZE_METHODS" != x],
+        [
+          AC_MSG_RESULT([<<< Testing sanitizer flags for method(s) "$SANITIZE_METHODS" >>>])
 
-    # Both Clang and GCC docs suggest using "-fsanitize=address -fno-omit-frame-pointer".
-    # The Clang documentation further suggests using "-O1 -g -fno-optimize-sibling-calls".
-    # Since these flags also work in GCC, we'll use them there as well...
-    COMMON_SANITIZE_OPTIONS="-fsanitize=address -fno-omit-frame-pointer -O1 -g -fno-optimize-sibling-calls"
+          dnl Both Clang and GCC docs suggest using "-fsanitize=address -fno-omit-frame-pointer".
+          dnl The Clang documentation further suggests using "-O1 -g -fno-optimize-sibling-calls".
+          dnl Since these flags also work in GCC, we'll use them there as well...
+          COMMON_SANITIZE_OPTIONS="-fsanitize=address -fno-omit-frame-pointer -O1 -g -fno-optimize-sibling-calls"
 
-    # Test the sanitizer flags.  Currently Clang and GCC are the only
-    # compilers that support the address sanitizer, and they use the
-    # same set of flags.  If the set of flags used by Clang and GCC ever
-    # diverges, we'll need to set up separate flags and test them in the
-    # case blocks below...  The LIBMESH_TEST_SANITIZE_FLAGS function sets
-    # the variable have_address_sanitizer to either "no" or "yes"
-    LIBMESH_TEST_SANITIZE_FLAGS([$COMMON_SANITIZE_OPTIONS])
+          dnl Test the sanitizer flags.  Currently Clang and GCC are the only
+          dnl compilers that support the address sanitizer, and they use the
+          dnl same set of flags.  If the set of flags used by Clang and GCC ever
+          dnl diverges, we'll need to set up separate flags and test them in the
+          dnl case blocks below...  The LIBMESH_TEST_SANITIZE_FLAGS function sets
+          dnl the variable have_address_sanitizer to either "no" or "yes"
+          LIBMESH_TEST_SANITIZE_FLAGS([$COMMON_SANITIZE_OPTIONS])
 
-    # Enable the address sanitizer stuff if the test code compiled
-    if test "x$have_address_sanitizer" = xyes; then
-      # As of clang 3.9.0 or so, we also need to pass the sanitize flag to the linker
-      # if it's being used during compiling. It seems that we do not need to pass all
-      # the flags above, just the sanitize flag itself.
-      libmesh_LDFLAGS="$libmesh_LDFLAGS -Wc,-fsanitize=address"
+          dnl Enable the address sanitizer stuff if the test code compiled
+          AS_IF([test "x$have_address_sanitizer" = xyes],
+                [
+                  dnl As of clang 3.9.0 or so, we also need to pass the sanitize flag to the linker
+                  dnl if it is being used during compiling. It seems that we do not need to pass all
+                  dnl the flags above, just the sanitize flag itself.
+                  libmesh_LDFLAGS="$libmesh_LDFLAGS -Wc,-fsanitize=address"
 
-      for method in ${SANITIZE_METHODS}; do
-          case "${method}" in
-              optimized|opt)
-                SANITIZE_OPT_FLAGS=$COMMON_SANITIZE_OPTIONS
-                ;;
+                  for method in ${SANITIZE_METHODS}; do
+                      case "${method}" in
+                          optimized|opt)
+                            SANITIZE_OPT_FLAGS=$COMMON_SANITIZE_OPTIONS
+                            ;;
 
-              debug|dbg)
-                SANITIZE_DBG_FLAGS=$COMMON_SANITIZE_OPTIONS
-                ;;
+                          debug|dbg)
+                            SANITIZE_DBG_FLAGS=$COMMON_SANITIZE_OPTIONS
+                            ;;
 
-              devel)
-                SANITIZE_DEVEL_FLAGS=$COMMON_SANITIZE_OPTIONS
-                ;;
+                          devel)
+                            SANITIZE_DEVEL_FLAGS=$COMMON_SANITIZE_OPTIONS
+                            ;;
 
-              profiling|pro|prof)
-                SANITIZE_PROF_FLAGS=$COMMON_SANITIZE_OPTIONS
-                ;;
+                          profiling|pro|prof)
+                            SANITIZE_PROF_FLAGS=$COMMON_SANITIZE_OPTIONS
+                            ;;
 
-              oprofile|oprof)
-                SANITIZE_OPROF_FLAGS=$COMMON_SANITIZE_OPTIONS
-                ;;
+                          oprofile|oprof)
+                            SANITIZE_OPROF_FLAGS=$COMMON_SANITIZE_OPTIONS
+                            ;;
 
-              *)
-                AC_MSG_ERROR(bad value ${method} for --enable-sanitize)
-                ;;
-          esac
-      done
-    fi
-  fi
+                          *)
+                            AC_MSG_ERROR(bad value ${method} for --enable-sanitize)
+                            ;;
+                      esac
+                  done
+                ])
+        ])
 
   # in the case blocks below we may add GLIBCXX-specific pedantic debugging preprocessor
   # definitions. however, allow the knowing user to preclude that if they need to.
@@ -442,10 +444,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
                 [enableglibcxxdebugging=yes])
 
   # GLIBCXX debugging causes untold woes on mac machines - so disable it
-  if (test `uname` = "Darwin"); then
-    AC_MSG_RESULT(<<< Disabling GLIBCXX debugging on Darwin >>>)
-    enableglibcxxdebugging=no
-  fi
+  AS_IF([test `uname` = "Darwin"],
+        [
+          AC_MSG_RESULT(<<< Disabling GLIBCXX debugging on Darwin >>>)
+          enableglibcxxdebugging=no
+        ])
   AM_CONDITIONAL(LIBMESH_ENABLE_GLIBCXX_DEBUGGING, test x$enableglibcxxdebugging = xyes)
 
 
@@ -477,9 +480,8 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
     CFLAGS_DBG="-g -Wimplicit"
     ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
 
-    if (test "x$enableglibcxxdebugging" = "xyes"); then
-      CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
-    fi
+    AS_IF([test "x$enableglibcxxdebugging" = "xyes"],
+          [CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"])
 
     # GCC 4.6.3 warns about variadic macros but supports them just
     # fine, so let's turn off that warning.
