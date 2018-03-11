@@ -402,31 +402,13 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
                   libmesh_LDFLAGS="$libmesh_LDFLAGS -Wc,-fsanitize=address"
 
                   for method in ${SANITIZE_METHODS}; do
-                      case "${method}" in
-                          optimized|opt)
-                            SANITIZE_OPT_FLAGS=$COMMON_SANITIZE_OPTIONS
-                            ;;
-
-                          debug|dbg)
-                            SANITIZE_DBG_FLAGS=$COMMON_SANITIZE_OPTIONS
-                            ;;
-
-                          devel)
-                            SANITIZE_DEVEL_FLAGS=$COMMON_SANITIZE_OPTIONS
-                            ;;
-
-                          profiling|pro|prof)
-                            SANITIZE_PROF_FLAGS=$COMMON_SANITIZE_OPTIONS
-                            ;;
-
-                          oprofile|oprof)
-                            SANITIZE_OPROF_FLAGS=$COMMON_SANITIZE_OPTIONS
-                            ;;
-
-                          *)
-                            AC_MSG_ERROR(bad value ${method} for --enable-sanitize)
-                            ;;
-                      esac
+                      AS_CASE("${method}",
+                              [optimized|opt],      [SANITIZE_OPT_FLAGS=$COMMON_SANITIZE_OPTIONS],
+                              [debug|dbg],          [SANITIZE_DBG_FLAGS=$COMMON_SANITIZE_OPTIONS],
+                              [devel],              [SANITIZE_DEVEL_FLAGS=$COMMON_SANITIZE_OPTIONS],
+                              [profiling|pro|prof], [SANITIZE_PROF_FLAGS=$COMMON_SANITIZE_OPTIONS],
+                              [oprofile|oprof],     [SANITIZE_OPROF_FLAGS=$COMMON_SANITIZE_OPTIONS],
+                              [AC_MSG_ERROR(bad value ${method} for --enable-sanitize)])
                   done
                 ])
         ])
