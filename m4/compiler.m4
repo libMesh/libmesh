@@ -360,19 +360,12 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               AS_HELP_STRING([--enable-sanitize="opt dbg devel prof oprof"],
                              [turn on sanitizer flags for the given methods]),
               [for method in ${enableval} ; do
-                 # make sure each method specified makes sense
-                 case "${method}" in
-                     optimized|opt)      ;;
-                     debug|dbg)          ;;
-                     devel)              ;;
-                     profiling|pro|prof) ;;
-                     oprofile|oprof)     ;;
-                     *)
-                         AC_MSG_ERROR(bad value ${method} for --enable-sanitize)
-                         ;;
-                 esac
+                 dnl make sure each method specified makes sense
+                 AS_CASE("${method}",
+                         [optimized|opt|debug|dbg|devel|profiling|pro|prof|oprofile|oprof], [],
+                         [AC_MSG_ERROR(bad value ${method} for --enable-sanitize)])
                done
-               # If we made it here, the case statement didn't detect any errors
+               dnl If we made it here, the case statement didn't detect any errors
                SANITIZE_METHODS=${enableval}],
                [])
 
