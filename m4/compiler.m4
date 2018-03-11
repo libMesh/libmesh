@@ -471,118 +471,116 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
         ],
         [
     dnl Non-gcc compilers
+    AS_CASE("$GXX_VERSION",
+            [ibm_xlc], [
+                          CXXFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
+                          CXXFLAGS_DBG="-qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
+                          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+                          NODEPRECATEDFLAG=""
+                          CFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10"
+                          CFLAGS_DBG="-qansialias -g"
+                          CFLAGS_DEVEL="$CFLAGS_DBG"
+                        ],
 
-    case "$GXX_VERSION" in
-      ibm_xlc)
-          CXXFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
-          CXXFLAGS_DBG="-qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
-          NODEPRECATEDFLAG=""
-          CFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10"
-          CFLAGS_DBG="-qansialias -g"
-          CFLAGS_DEVEL="$CFLAGS_DBG"
-          ;;
+            dnl All Intel ICC/ECC flavors
+            [intel_*], [
+                          dnl Intel understands the gcc-like no-deprecated flag
+                          NODEPRECATEDFLAG="-Wno-deprecated"
 
-      # All Intel ICC/ECC flavors
-      intel_*)
+                          dnl Intel compilers use -qp for profiling
+                          PROFILING_FLAGS="-qp"
 
-        # Intel understands the gcc-like no-deprecated flag
-        NODEPRECATEDFLAG="-Wno-deprecated"
+                          dnl Intel options for annotated assembly
+                          ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm -fsource-asm"
 
-        # Intel compilers use -qp for profiling
-        PROFILING_FLAGS="-qp"
+                          dnl The -g flag is all OProfile needs to produce annotations
+                          OPROFILE_FLAGS="-g"
 
-        # Intel options for annotated assembly
-        ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm -fsource-asm"
+                          dnl Disable some warning messages on Intel compilers:
+                          dnl 161:  unrecognized pragma GCC diagnostic warning "-Wdeprecated-declarations"
+                          dnl 175:  subscript out of range
+                          dnl       FIN-S application code causes many false
+                          dnl       positives with this
+                          dnl 266:  function declared implicitly
+                          dnl       Metis function "GKfree" caused this error
+                          dnl       in almost every file.
+                          dnl 488:  template parameter "Scalar1" is not used in declaring the
+                          dnl       parameter types of function template
+                          dnl       This warning was generated from one of the type_vector.h
+                          dnl       constructors that uses some SFINAE tricks.
+                          dnl 1476: field uses tail padding of a base class
+                          dnl 1505: size of class is affected by tail padding
+                          dnl       simply warns of a possible incompatibility with
+                          dnl       the g++ ABI for this case
+                          dnl 1572: floating-point equality and inequality comparisons are unreliable
+                          dnl       Well, duh, when the tested value is computed...  OK when it
+                          dnl       was from an assignment.
+                          AS_CASE("$GXX_VERSION",
+                                  [intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x],
+                                  [
+                                    PROFILING_FLAGS="-p"
+                                    CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
+                                    CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz"
+                                    CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
+                                    CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572 -wd488 -wd161"
+                                    CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
+                                    CFLAGS_DEVEL="$CFLAGS_DBG"
+                                  ],
+                                  [AC_MSG_RESULT(Unknown Intel compiler, "$GXX_VERSION")])
+                       ],
 
-        # The -g flag is all OProfile needs to produce annotations
-        OPROFILE_FLAGS="-g"
+            [portland_group], [
+                                CXXFLAGS_DBG="-g --no_using_std"
+                                CXXFLAGS_OPT="-O2 --no_using_std -fast -Minform=severe"
+                                CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
 
-        dnl Disable some warning messages on Intel compilers:
-        dnl 161:  unrecognized pragma GCC diagnostic warning "-Wdeprecated-declarations"
-        dnl 175:  subscript out of range
-        dnl       FIN-S application code causes many false
-        dnl       positives with this
-        dnl 266:  function declared implicitly
-        dnl       Metis function "GKfree" caused this error
-        dnl       in almost every file.
-        dnl 488:  template parameter "Scalar1" is not used in declaring the
-        dnl       parameter types of function template
-        dnl       This warning was generated from one of the type_vector.h
-        dnl       constructors that uses some SFINAE tricks.
-        dnl 1476: field uses tail padding of a base class
-        dnl 1505: size of class is affected by tail padding
-        dnl       simply warns of a possible incompatibility with
-        dnl       the g++ ABI for this case
-        dnl 1572: floating-point equality and inequality comparisons are unreliable
-        dnl       Well, duh, when the tested value is computed...  OK when it
-        dnl       was from an assignment.
-        AS_CASE("$GXX_VERSION",
-                [intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x],
-                [
-                  PROFILING_FLAGS="-p"
-                  CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
-                  CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz"
-                  CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
-                  CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572 -wd488 -wd161"
-                  CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
-                  CFLAGS_DEVEL="$CFLAGS_DBG"
-                ],
-                [AC_MSG_RESULT(Unknown Intel compiler, "$GXX_VERSION")])
-      ;;
+                                dnl PG C++ definitely doesnt understand -Wno-deprecated...
+                                NODEPRECATEDFLAG=""
 
-      portland_group)
-          CXXFLAGS_DBG="-g --no_using_std"
-          CXXFLAGS_OPT="-O2 --no_using_std -fast -Minform=severe"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+                                CFLAGS_DBG="-g"
+                                CFLAGS_OPT="-O2"
+                                CFLAGS_DEVEL="$CFLAGS_DBG"
 
-          # PG C++ definitely doesn't understand -Wno-deprecated...
-          NODEPRECATEDFLAG=""
+                                dnl Disable exception handling if we dont use it
+                                AS_IF([test "$enableexceptions" = no],
+                                      [
+                                        CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
+                                        CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
+                                      ])
+                              ],
 
-          CFLAGS_DBG="-g"
-          CFLAGS_OPT="-O2"
-          CFLAGS_DEVEL="$CFLAGS_DBG"
+            [cray_cc], [
+                         CXXFLAGS_DBG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+                         CXXFLAGS_OPT="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+                         CXXFLAGS_DEVEL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+                         NODEPRECATEDFLAG=""
+                         CFLAGS_DBG="-G n"
+                         CFLAGS_OPT="-G n"
+                         CFLAGS_DEVEL="-G n"
+                       ],
 
-          # Disable exception handling if we don't use it
-          AS_IF([test "$enableexceptions" = no],
-                [
-                  CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
-                  CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
-                ])
-          ;;
+            [clang], [
+                       CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -Qunused-arguments -Wunused-parameter -Wunused"
+                       CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
+                       CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
+                       NODEPRECATEDFLAG="-Wno-deprecated"
 
-      cray_cc)
-          CXXFLAGS_DBG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
-          CXXFLAGS_OPT="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
-          CXXFLAGS_DEVEL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
-          NODEPRECATEDFLAG=""
-          CFLAGS_DBG="-G n"
-          CFLAGS_OPT="-G n"
-          CFLAGS_DEVEL="-G n"
-          ;;
+                       CFLAGS_OPT="-O2 -Qunused-arguments -Wunused"
+                       CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -fno-limit-debug-info -Wunused"
+                       CFLAGS_DBG="-g -Wimplicit -Qunused-arguments -fno-limit-debug-info -Wunused"
+                     ],
 
-      clang)
-          CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -Qunused-arguments -Wunused-parameter -Wunused"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
-          CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
-          NODEPRECATEDFLAG="-Wno-deprecated"
+            dnl default case
+            [
+              AC_MSG_RESULT(No specific options for this C++ compiler known)
+              CXXFLAGS_DBG="$CXXFLAGS"
+              CXXFLAGS_OPT="$CXXFLAGS"
+              CXXFLAGS_DEVEL="$CXXFLAGS"
+              NODEPRECATEDFLAG=""
 
-          CFLAGS_OPT="-O2 -Qunused-arguments -Wunused"
-          CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -fno-limit-debug-info -Wunused"
-          CFLAGS_DBG="-g -Wimplicit -Qunused-arguments -fno-limit-debug-info -Wunused"
-          ;;
-
-      *)
-          AC_MSG_RESULT(No specific options for this C++ compiler known)
-          CXXFLAGS_DBG="$CXXFLAGS"
-          CXXFLAGS_OPT="$CXXFLAGS"
-          CXXFLAGS_DEVEL="$CXXFLAGS"
-          NODEPRECATEDFLAG=""
-
-          CFLAGS_DBG="$CFLAGS"
-          CFLAGS_OPT="$CFLAGS"
-          CFLAGS_DEVEL="$CFLAGS"
-          ;;
-    esac
+              CFLAGS_DBG="$CFLAGS"
+              CFLAGS_OPT="$CFLAGS"
+              CFLAGS_DEVEL="$CFLAGS"
+            ])
   ])
 ])
