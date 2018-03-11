@@ -5608,41 +5608,45 @@ fi
 
 fi
 
-    if (test "x$compiler_brand_detected" = "xno"); then
-    is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
-    if test "x$is_intel_icc" != "x" ; then
-      GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
-      case "$GXX_VERSION_STRING" in #(
+    if test "x$compiler_brand_detected" = "xno"; then :
+
+          is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
+          if test "x$is_intel_icc" != "x"; then :
+
+                  GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
+                  case "$GXX_VERSION_STRING" in #(
   *18.*) :
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 18 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 18 >>>" >&6; }
-                GXX_VERSION=intel_icc_v18.x ;; #(
+                            GXX_VERSION=intel_icc_v18.x ;; #(
   *17.*) :
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 17 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 17 >>>" >&6; }
-                GXX_VERSION=intel_icc_v17.x ;; #(
+                            GXX_VERSION=intel_icc_v17.x ;; #(
   *16.*) :
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 16 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 16 >>>" >&6; }
-                GXX_VERSION=intel_icc_v16.x ;; #(
+                            GXX_VERSION=intel_icc_v16.x ;; #(
   *15.*) :
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 15 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 15 >>>" >&6; }
-                GXX_VERSION=intel_icc_v15.x ;; #(
+                            GXX_VERSION=intel_icc_v15.x ;; #(
   *14.*) :
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 14 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 14 >>>" >&6; }
-                GXX_VERSION=intel_icc_v14.x ;; #(
+                            GXX_VERSION=intel_icc_v14.x ;; #(
   *13.*) :
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 13 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 13 >>>" >&6; }
-                GXX_VERSION=intel_icc_v13.x ;; #(
+                            GXX_VERSION=intel_icc_v13.x ;; #(
   *) :
     as_fn_error $? "Unsupported Intel compiler detected" "$LINENO" 5 ;;
 esac
-      compiler_brand_detected=yes
-    fi
-  fi
+                  compiler_brand_detected=yes
+
+fi
+
+fi
 
               if (test "x$compiler_brand_detected" = "xno"); then
     is_ibm_xlc="`($CXX 2>&1) | egrep -i 'xlc'`"
