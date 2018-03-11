@@ -440,7 +440,8 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 
 
   # First the flags for gcc compilers
-  if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
+  AS_IF([test "$GXX" = yes -a "x$REAL_GXX" != "x"],
+        [
     CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization"
     CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -funroll-loops -fstrict-aliasing -Woverloaded-virtual -Wdisabled-optimization"
     CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Woverloaded-virtual"
@@ -467,9 +468,9 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
     AS_CASE("$target",
             [*solaris*], [RPATHFLAG="-Wl,-R,"
                           LIBS="-lrpcsvc $LIBS"])
-
-  else
-    # Non-gcc compilers
+        ],
+        [
+    dnl Non-gcc compilers
 
     case "$GXX_VERSION" in
       ibm_xlc)
@@ -583,5 +584,5 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           CFLAGS_DEVEL="$CFLAGS"
           ;;
     esac
-  fi
+  ])
 ])
