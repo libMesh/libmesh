@@ -250,44 +250,51 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
   dnl check various possibilities.  Calling xlC with no arguments displays
   dnl the man page.  Grepping for case-sensitive xlc is not enough if the
   dnl user wants xlC, so we use case-insensitive grep instead.
-  if (test "x$compiler_brand_detected" = "xno"); then
-    is_ibm_xlc="`($CXX 2>&1) | egrep -i 'xlc'`"
-    if test "x$is_ibm_xlc" != "x"  ; then
-      AC_MSG_RESULT(<<< C++ compiler is IBM xlC >>>)
-      GXX_VERSION=ibm_xlc
-      compiler_brand_detected=yes
-    fi
-  fi
+  AS_IF([test "x$compiler_brand_detected" = "xno"],
+        [
+          is_ibm_xlc="`($CXX 2>&1) | egrep -i 'xlc'`"
+          AS_IF([test "x$is_ibm_xlc" != "x"],
+                [
+                  AC_MSG_RESULT(<<< C++ compiler is IBM xlC >>>)
+                  GXX_VERSION=ibm_xlc
+                  compiler_brand_detected=yes
+                ])
+        ])
 
   dnl Cray C++?
-  if (test "x$compiler_brand_detected" = "xno"); then
-    is_cray_cc="`($CXX -V 2>&1) | grep 'Cray '`"
-    if test "x$is_cray_cc" != "x" ; then
-      AC_MSG_RESULT(<<< C++ compiler is Cray C++ >>>)
-      GXX_VERSION=cray_cc
-      compiler_brand_detected=yes
-    fi
-  fi
+  AS_IF([test "x$compiler_brand_detected" = "xno"],
+        [
+          is_cray_cc="`($CXX -V 2>&1) | grep 'Cray '`"
+          AS_IF([test "x$is_cray_cc" != "x"],
+                [
+                  AC_MSG_RESULT(<<< C++ compiler is Cray C++ >>>)
+                  GXX_VERSION=cray_cc
+                  compiler_brand_detected=yes
+                ])
+        ])
 
   dnl Portland Group C++?
-  if (test "x$compiler_brand_detected" = "xno"); then
-    is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
-    if test "x$is_pgcc" != "x" ; then
-      AC_MSG_RESULT(<<< C++ compiler is Portland Group C++ >>>)
-      GXX_VERSION=portland_group
-      compiler_brand_detected=yes
-    fi
-  fi
+  AS_IF([test "x$compiler_brand_detected" = "xno"],
+        [
+          is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
+          AS_IF([test "x$is_pgcc" != "x"],
+          [
+            AC_MSG_RESULT(<<< C++ compiler is Portland Group C++ >>>)
+            GXX_VERSION=portland_group
+            compiler_brand_detected=yes
+          ])
+        ])
 
   dnl Could not recognize the compiler. Warn the user and continue.
-  if (test "x$compiler_brand_detected" = "xno"); then
-    AC_MSG_RESULT( WARNING:)
-    AC_MSG_RESULT( >>> Unrecognized compiler: "$CXX" <<<)
-    AC_MSG_RESULT( You will likely need to modify)
-    AC_MSG_RESULT( Make.common directly to specify)
-    AC_MSG_RESULT( proper compiler flags)
-    GXX_VERSION=unknown
-  fi
+  AS_IF([test "x$compiler_brand_detected" = "xno"],
+        [
+          AC_MSG_RESULT( WARNING:)
+          AC_MSG_RESULT( >>> Unrecognized compiler: "$CXX" <<<)
+          AC_MSG_RESULT( You will likely need to modify)
+          AC_MSG_RESULT( Make.common directly to specify)
+          AC_MSG_RESULT( proper compiler flags)
+          GXX_VERSION=unknown
+        ])
 ])
 
 
