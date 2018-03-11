@@ -13,18 +13,15 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
      AC_ARG_ENABLE(mpi,
                    AS_HELP_STRING([--disable-mpi],
                                   [build without MPI message passing support]),
-                   [case "${enableval}" in
-                     yes)  enablempi=yes ;;
-                     no)  enablempi=no ;;
-                     *)  AC_MSG_ERROR(bad value ${enableval} for --enable-mpi) ;;
-                   esac],
+                   [AS_CASE("${enableval}",
+                            [yes], [enablempi=yes],
+                            [no],  [enablempi=no],
+                            [AC_MSG_ERROR(bad value ${enableval} for --enable-mpi)])],
                    [enablempi=yes])
 
-  if  (test "$enablempi" != no) ; then
-    CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"
-  else
-    AC_MSG_RESULT(>>> Disabling MPI per user request <<<)
-  fi
+  AS_IF([test "$enablempi" != no],
+        [CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"],
+        AC_MSG_RESULT([>>> Disabling MPI per user request <<<]))
 
   AC_ARG_WITH([cxx],
               AS_HELP_STRING([--with-cxx=CXX], [C++ compiler to use]),
@@ -52,9 +49,8 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
   # --------------------------------------------------------------
   # look for a decent C compiler or honor --with-cc=...
   CC_TRY_LIST="gcc icc pgcc cc"
-  if  (test "$enablempi" != no) ; then
-    CC_TRY_LIST="mpicc $CC_TRY_LIST"
-  fi
+  AS_IF([test "$enablempi" != no],
+        [CC_TRY_LIST="mpicc $CC_TRY_LIST"])
   AC_ARG_WITH([cc],
               AS_HELP_STRING([--with-cc=CC], [C compiler to use]),
               [CC="$withval"],
@@ -83,69 +79,59 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
   AC_ARG_ENABLE(fortran,
                 AS_HELP_STRING([--disable-fortran],
                                [build without Fortran language support]),
-                [case "${enableval}" in
-                  yes)  enablefortran=yes ;;
-                  no)  enablefortran=no ;;
-                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fortran) ;;
-                esac],
+                [AS_CASE("${enableval}",
+                         [yes], [enablefortran=yes],
+                         [no],  [enablefortran=no],
+                         [AC_MSG_ERROR(bad value ${enableval} for --enable-fortran)])],
                 [enablefortran=yes])
 
-  if (test "x$enablefortran" = xyes); then
+  AS_IF([test "x$enablefortran" = xyes],
+        [
+          dnl look for a decent F90+ compiler or honor --with-fc=...
+          FC_TRY_LIST="gfortran ifort pgf90 xlf95"
+          AS_IF([test "$enablempi" != no],
+                [FC_TRY_LIST="mpif90 $FC_TRY_LIST"])
+          AC_ARG_WITH([fc],
+                      AS_HELP_STRING([--with-fc=FC], [Fortran compiler to use]),
+                      [FC="$withval"],
+                      [])
 
-    # look for a decent F90+ compiler or honor --with-fc=...
-    FC_TRY_LIST="gfortran ifort pgf90 xlf95"
-    if  (test "$enablempi" != no) ; then
-      FC_TRY_LIST="mpif90 $FC_TRY_LIST"
-    fi
-    AC_ARG_WITH([fc],
-                AS_HELP_STRING([--with-fc=FC], [Fortran compiler to use]),
-                [FC="$withval"],
-                [])
+          dnl --------------------------------------------------------------
+          dnl Determine a F90+ compiler to use.
+          dnl --------------------------------------------------------------
+          AC_PROG_FC([$FC_TRY_LIST])
 
-    # --------------------------------------------------------------
-    # Determine a F90+ compiler to use.
-    # --------------------------------------------------------------
-    AC_PROG_FC([$FC_TRY_LIST])
+          AS_IF([test "x$FC" = "x"],
+                [AC_MSG_RESULT(>>> No valid Fortran compiler <<<)
+                FC=no
+                enablefortran=no])
 
-    if (test "x$FC" = "x"); then
-      AC_MSG_RESULT(>>> No valid Fortran compiler <<<)
-      FC=no
-      enablefortran=no
-    fi
-    # --------------------------------------------------------------
+          dnl look for a decent F77 compiler or honor --with-77=...
+          F77_TRY_LIST="gfortran g77 ifort f77 xlf frt pgf77 fort77 fl32 af77 f90 xlf90 pgf90 epcf90 f95 fort xlf95 ifc efc pgf95 lf95"
+          AS_IF([test "$enablempi" != no],
+                [F77_TRY_LIST="mpif77 $F77_TRY_LIST"])
+          AC_ARG_WITH([f77],
+                      AS_HELP_STRING([--with-f77=F77], [Fortran compiler to use]),
+                      [F77="$withval"],
+                      [])
 
+          dnl --------------------------------------------------------------
+          dnl Determine a F77 compiler to use.
+          dnl --------------------------------------------------------------
+          AC_PROG_F77([$F77_TRY_LIST])
 
-
-    # --------------------------------------------------------------
-    # look for a decent F77 compiler or honor --with-77=...
-    F77_TRY_LIST="gfortran g77 ifort f77 xlf frt pgf77 fort77 fl32 af77 f90 xlf90 pgf90 epcf90 f95 fort xlf95 ifc efc pgf95 lf95"
-    if  (test "$enablempi" != no) ; then
-      F77_TRY_LIST="mpif77 $F77_TRY_LIST"
-    fi
-    AC_ARG_WITH([f77],
-                AS_HELP_STRING([--with-f77=F77], [Fortran compiler to use]),
-                [F77="$withval"],
-                [])
-
-    # --------------------------------------------------------------
-    # Determine a F77 compiler to use.
-    # --------------------------------------------------------------
-    AC_PROG_F77([$F77_TRY_LIST])
-
-    if (test "x$F77" = "x"); then
-      AC_MSG_RESULT(>>> No valid Fortran 77 compiler <<<)
-      F77=no
-      enablefortran=no
-    fi
-
-    # --------------------------------------------------------------
-  else
-      # when --disable-fortran is specified, explicitly set these
-      # to "no" to instruct libtool not to bother with them.
-      AC_MSG_RESULT(>>> Disabling Fortran language support per user request <<<)
-      FC=no
-      F77=no
-  fi # end enablefortran
+          AS_IF([test "x$F77" = "x"],
+                [AC_MSG_RESULT(>>> No valid Fortran 77 compiler <<<)
+                 F77=no
+                 enablefortran=no])
+        ],
+        [
+          dnl when --disable-fortran is specified, explicitly set these
+          dnl to "no" to instruct libtool not to bother with them.
+          AC_MSG_RESULT(>>> Disabling Fortran language support per user request <<<)
+          FC=no
+          F77=no
+        ])
 ])
 
 
@@ -168,118 +154,93 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
 
   dnl Do not allow Intel to masquerade as a "real" GCC.
   is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
-  if test "x$is_intel_icc" != "x" ; then
-    REAL_GXX=""
-  fi
+  AS_IF([test "x$is_intel_icc" != "x"],
+        [REAL_GXX=""])
 
-  if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
-    dnl find out the right version
-    GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
-    case "$GXX_VERSION_STRING" in
-      *gcc\ version\ 7.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-7.x >>>)
-        GXX_VERSION=gcc7
-        ;;
-      *gcc\ version\ 6.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-6.x >>>)
-        GXX_VERSION=gcc6
-        ;;
-      *gcc\ version\ 5.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-5.x >>>)
-        GXX_VERSION=gcc5
-        ;;
-      *4.9.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-4.9 >>>)
-        GXX_VERSION=gcc4.9
-        ;;
-      *4.8.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-4.8 >>>)
-        GXX_VERSION=gcc4.8
-        ;;
-      *4.7.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-4.7 >>>)
-        GXX_VERSION=gcc4.7
-        ;;
-      *4.6.*)
-        AC_MSG_RESULT(<<< C++ compiler is gcc-4.6 >>>)
-        GXX_VERSION=gcc4.6
-        ;;
-      *)
-        AC_MSG_RESULT(<<< C++ compiler is unknown but accepted gcc version >>>)
-        GXX_VERSION=gcc-other
-        ;;
-    esac
+  AS_IF([test "$GXX" = yes -a "x$REAL_GXX" != "x"],
+        [
+          dnl find out the right version
+          GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
 
-    dnl Detection was successful, so set the flag.
-    compiler_brand_detected=yes
-  fi
+          AS_CASE("$GXX_VERSION_STRING",
+                  [*gcc\ version\ 7.*], [AC_MSG_RESULT(<<< C++ compiler is gcc-7.x >>>)
+                                         GXX_VERSION=gcc7],
+                  [*gcc\ version\ 6.*], [AC_MSG_RESULT(<<< C++ compiler is gcc-6.x >>>)
+                                         GXX_VERSION=gcc6],
+                  [*gcc\ version\ 5.*], [AC_MSG_RESULT(<<< C++ compiler is gcc-5.x >>>)
+                                         GXX_VERSION=gcc5],
+                  [*4.9.*], [AC_MSG_RESULT(<<< C++ compiler is gcc-4.9 >>>)
+                             GXX_VERSION=gcc4.9],
+                  [*4.8.*], [AC_MSG_RESULT(<<< C++ compiler is gcc-4.8 >>>)
+                             GXX_VERSION=gcc4.8],
+                  [*4.7.*], [AC_MSG_RESULT(<<< C++ compiler is gcc-4.7 >>>)
+                             GXX_VERSION=gcc4.7],
+                  [*4.6.*], [AC_MSG_RESULT(<<< C++ compiler is gcc-4.6 >>>)
+                             GXX_VERSION=gcc4.6],
+                  [AC_MSG_RESULT(<<< C++ compiler is unknown but accepted gcc version >>>)
+                   GXX_VERSION=gcc-other])
+
+          dnl Detection was successful, so set the flag.
+          compiler_brand_detected=yes
+        ])
 
   dnl Clang/LLVM C++?
-  if (test "x$compiler_brand_detected" = "xno"); then
-    clang_version="`($CXX --version 2>&1)`"
-    is_clang="`echo $clang_version | grep 'clang'`"
+  AS_IF([test "x$compiler_brand_detected" = "xno"],
+        [
+          clang_version="`($CXX --version 2>&1)`"
+          is_clang="`echo $clang_version | grep 'clang'`"
 
-    if test "x$is_clang" != "x" ; then
-      dnl Detect if clang is the version built by
-      dnl Apple, because then the version number means
-      dnl something different...
-      is_apple_clang="`echo $clang_version | grep 'Apple'`"
-      clang_vendor="clang"
-      if test "x$is_apple_clang" != "x" ; then
-        clang_vendor="Apple clang"
-      fi
+          AS_IF([test "x$is_clang" != "x"],
+                [
+                  dnl Detect if clang is the version built by
+                  dnl Apple, because then the version number means
+                  dnl something different...
+                  is_apple_clang="`echo $clang_version | grep 'Apple'`"
+                  clang_vendor="clang"
+                  AS_IF([test "x$is_apple_clang" != "x"],
+                        [clang_vendor="Apple clang"])
 
-      dnl If we have perl, we can also pull out the clang version number using regexes.
-      dnl Note that @S|@ is a quadrigraph for the dollar sign.
-      clang_major_minor=unknown
+                  dnl If we have perl, we can also pull out the clang version number using regexes.
+                  dnl Note that @S|@ is a quadrigraph for the dollar sign.
+                  clang_major_minor=unknown
 
-      if test "x$PERL" != "x" ; then
-         clang_major_minor=`echo $clang_version | $PERL -ne 'print @S|@1 if /version\s(\d+\.\d+)/'`
-         if test "x$clang_major_minor" = "x" ; then
-           clang_major_minor=unknown
-         fi
-      fi
+                  AS_IF([test "x$PERL" != "x"],
+                        [
+                          clang_major_minor=`echo $clang_version | $PERL -ne 'print @S|@1 if /version\s(\d+\.\d+)/'`
+                          AS_IF([test "x$clang_major_minor" = "x"],
+                                [clang_major_minor=unknown])
+                        ])
 
-      AC_MSG_RESULT([<<< C++ compiler is ${clang_vendor}, version ${clang_major_minor} >>>])
-      GXX_VERSION=clang
-      compiler_brand_detected=yes
-    fi
-  fi
+                  AC_MSG_RESULT([<<< C++ compiler is ${clang_vendor}, version ${clang_major_minor} >>>])
+                  GXX_VERSION=clang
+                  compiler_brand_detected=yes
+                ])
+        ])
 
   dnl Intel's ICC C++ compiler?
-  if (test "x$compiler_brand_detected" = "xno"); then
-    is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
-    if test "x$is_intel_icc" != "x" ; then
-      GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
-      case "$GXX_VERSION_STRING" in
-        *18.*)
-          AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 18 >>>)
-          GXX_VERSION=intel_icc_v18.x
-          ;;
-        *17.*)
-          AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 17 >>>)
-          GXX_VERSION=intel_icc_v17.x
-          ;;
-        *16.*)
-          AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 16 >>>)
-          GXX_VERSION=intel_icc_v16.x
-          ;;
-        *15.*)
-          AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 15 >>>)
-          GXX_VERSION=intel_icc_v15.x
-          ;;
-        *14.*)
-          AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 14 >>>)
-          GXX_VERSION=intel_icc_v14.x
-          ;;
-        *13.*)
-          AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 13 >>>)
-          GXX_VERSION=intel_icc_v13.x
-          ;;
-      esac
-      compiler_brand_detected=yes
-    fi
-  fi
+  AS_IF([test "x$compiler_brand_detected" = "xno"],
+        [
+          is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
+          AS_IF([test "x$is_intel_icc" != "x"],
+                [
+                  GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
+                  AS_CASE("$GXX_VERSION_STRING",
+                  [*18.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 18 >>>)
+                            GXX_VERSION=intel_icc_v18.x],
+                  [*17.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 17 >>>)
+                            GXX_VERSION=intel_icc_v17.x],
+                  [*16.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 16 >>>)
+                            GXX_VERSION=intel_icc_v16.x],
+                  [*15.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 15 >>>)
+                            GXX_VERSION=intel_icc_v15.x],
+                  [*14.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 14 >>>)
+                            GXX_VERSION=intel_icc_v14.x],
+                  [*13.*], [AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 13 >>>)
+                            GXX_VERSION=intel_icc_v13.x],
+                  [AC_MSG_ERROR(Unsupported Intel compiler detected)])
+                  compiler_brand_detected=yes
+                ])
+        ])
 
   dnl Check for IBM xlC. Depending on environment
   dnl variables, moon position, and other reasons unknown to me, this
@@ -287,44 +248,51 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
   dnl check various possibilities.  Calling xlC with no arguments displays
   dnl the man page.  Grepping for case-sensitive xlc is not enough if the
   dnl user wants xlC, so we use case-insensitive grep instead.
-  if (test "x$compiler_brand_detected" = "xno"); then
-    is_ibm_xlc="`($CXX 2>&1) | egrep -i 'xlc'`"
-    if test "x$is_ibm_xlc" != "x"  ; then
-      AC_MSG_RESULT(<<< C++ compiler is IBM xlC >>>)
-      GXX_VERSION=ibm_xlc
-      compiler_brand_detected=yes
-    fi
-  fi
+  AS_IF([test "x$compiler_brand_detected" = "xno"],
+        [
+          is_ibm_xlc="`($CXX 2>&1) | egrep -i 'xlc'`"
+          AS_IF([test "x$is_ibm_xlc" != "x"],
+                [
+                  AC_MSG_RESULT(<<< C++ compiler is IBM xlC >>>)
+                  GXX_VERSION=ibm_xlc
+                  compiler_brand_detected=yes
+                ])
+        ])
 
   dnl Cray C++?
-  if (test "x$compiler_brand_detected" = "xno"); then
-    is_cray_cc="`($CXX -V 2>&1) | grep 'Cray '`"
-    if test "x$is_cray_cc" != "x" ; then
-      AC_MSG_RESULT(<<< C++ compiler is Cray C++ >>>)
-      GXX_VERSION=cray_cc
-      compiler_brand_detected=yes
-    fi
-  fi
+  AS_IF([test "x$compiler_brand_detected" = "xno"],
+        [
+          is_cray_cc="`($CXX -V 2>&1) | grep 'Cray '`"
+          AS_IF([test "x$is_cray_cc" != "x"],
+                [
+                  AC_MSG_RESULT(<<< C++ compiler is Cray C++ >>>)
+                  GXX_VERSION=cray_cc
+                  compiler_brand_detected=yes
+                ])
+        ])
 
   dnl Portland Group C++?
-  if (test "x$compiler_brand_detected" = "xno"); then
-    is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
-    if test "x$is_pgcc" != "x" ; then
-      AC_MSG_RESULT(<<< C++ compiler is Portland Group C++ >>>)
-      GXX_VERSION=portland_group
-      compiler_brand_detected=yes
-    fi
-  fi
+  AS_IF([test "x$compiler_brand_detected" = "xno"],
+        [
+          is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
+          AS_IF([test "x$is_pgcc" != "x"],
+          [
+            AC_MSG_RESULT(<<< C++ compiler is Portland Group C++ >>>)
+            GXX_VERSION=portland_group
+            compiler_brand_detected=yes
+          ])
+        ])
 
   dnl Could not recognize the compiler. Warn the user and continue.
-  if (test "x$compiler_brand_detected" = "xno"); then
-    AC_MSG_RESULT( WARNING:)
-    AC_MSG_RESULT( >>> Unrecognized compiler: "$CXX" <<<)
-    AC_MSG_RESULT( You will likely need to modify)
-    AC_MSG_RESULT( Make.common directly to specify)
-    AC_MSG_RESULT( proper compiler flags)
-    GXX_VERSION=unknown
-  fi
+  AS_IF([test "x$compiler_brand_detected" = "xno"],
+        [
+          AC_MSG_RESULT( WARNING:)
+          AC_MSG_RESULT( >>> Unrecognized compiler: "$CXX" <<<)
+          AC_MSG_RESULT( You will likely need to modify)
+          AC_MSG_RESULT( Make.common directly to specify)
+          AC_MSG_RESULT( proper compiler flags)
+          GXX_VERSION=unknown
+        ])
 ])
 
 
@@ -390,92 +358,69 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               AS_HELP_STRING([--enable-sanitize="opt dbg devel prof oprof"],
                              [turn on sanitizer flags for the given methods]),
               [for method in ${enableval} ; do
-                 # make sure each method specified makes sense
-                 case "${method}" in
-                     optimized|opt)      ;;
-                     debug|dbg)          ;;
-                     devel)              ;;
-                     profiling|pro|prof) ;;
-                     oprofile|oprof)     ;;
-                     *)
-                         AC_MSG_ERROR(bad value ${method} for --enable-sanitize)
-                         ;;
-                 esac
+                 dnl make sure each method specified makes sense
+                 AS_CASE("${method}",
+                         [optimized|opt|debug|dbg|devel|profiling|pro|prof|oprofile|oprof], [],
+                         [AC_MSG_ERROR(bad value ${method} for --enable-sanitize)])
                done
-               # If we made it here, the case statement didn't detect any errors
+               dnl If we made it here, the case statement didn't detect any errors
                SANITIZE_METHODS=${enableval}],
                [])
 
-  if test "x$SANITIZE_METHODS" != x; then
-    AC_MSG_RESULT([<<< Testing sanitizer flags for method(s) "$SANITIZE_METHODS" >>>])
+  AS_IF([test "x$SANITIZE_METHODS" != x],
+        [
+          AC_MSG_RESULT([<<< Testing sanitizer flags for method(s) "$SANITIZE_METHODS" >>>])
 
-    # Both Clang and GCC docs suggest using "-fsanitize=address -fno-omit-frame-pointer".
-    # The Clang documentation further suggests using "-O1 -g -fno-optimize-sibling-calls".
-    # Since these flags also work in GCC, we'll use them there as well...
-    COMMON_SANITIZE_OPTIONS="-fsanitize=address -fno-omit-frame-pointer -O1 -g -fno-optimize-sibling-calls"
+          dnl Both Clang and GCC docs suggest using "-fsanitize=address -fno-omit-frame-pointer".
+          dnl The Clang documentation further suggests using "-O1 -g -fno-optimize-sibling-calls".
+          dnl Since these flags also work in GCC, we'll use them there as well...
+          COMMON_SANITIZE_OPTIONS="-fsanitize=address -fno-omit-frame-pointer -O1 -g -fno-optimize-sibling-calls"
 
-    # Test the sanitizer flags.  Currently Clang and GCC are the only
-    # compilers that support the address sanitizer, and they use the
-    # same set of flags.  If the set of flags used by Clang and GCC ever
-    # diverges, we'll need to set up separate flags and test them in the
-    # case blocks below...  The LIBMESH_TEST_SANITIZE_FLAGS function sets
-    # the variable have_address_sanitizer to either "no" or "yes"
-    LIBMESH_TEST_SANITIZE_FLAGS([$COMMON_SANITIZE_OPTIONS])
+          dnl Test the sanitizer flags.  Currently Clang and GCC are the only
+          dnl compilers that support the address sanitizer, and they use the
+          dnl same set of flags.  If the set of flags used by Clang and GCC ever
+          dnl diverges, we'll need to set up separate flags and test them in the
+          dnl case blocks below...  The LIBMESH_TEST_SANITIZE_FLAGS function sets
+          dnl the variable have_address_sanitizer to either "no" or "yes"
+          LIBMESH_TEST_SANITIZE_FLAGS([$COMMON_SANITIZE_OPTIONS])
 
-    # Enable the address sanitizer stuff if the test code compiled
-    if test "x$have_address_sanitizer" = xyes; then
-      # As of clang 3.9.0 or so, we also need to pass the sanitize flag to the linker
-      # if it's being used during compiling. It seems that we do not need to pass all
-      # the flags above, just the sanitize flag itself.
-      libmesh_LDFLAGS="$libmesh_LDFLAGS -Wc,-fsanitize=address"
+          dnl Enable the address sanitizer stuff if the test code compiled
+          AS_IF([test "x$have_address_sanitizer" = xyes],
+                [
+                  dnl As of clang 3.9.0 or so, we also need to pass the sanitize flag to the linker
+                  dnl if it is being used during compiling. It seems that we do not need to pass all
+                  dnl the flags above, just the sanitize flag itself.
+                  libmesh_LDFLAGS="$libmesh_LDFLAGS -Wc,-fsanitize=address"
 
-      for method in ${SANITIZE_METHODS}; do
-          case "${method}" in
-              optimized|opt)
-                SANITIZE_OPT_FLAGS=$COMMON_SANITIZE_OPTIONS
-                ;;
-
-              debug|dbg)
-                SANITIZE_DBG_FLAGS=$COMMON_SANITIZE_OPTIONS
-                ;;
-
-              devel)
-                SANITIZE_DEVEL_FLAGS=$COMMON_SANITIZE_OPTIONS
-                ;;
-
-              profiling|pro|prof)
-                SANITIZE_PROF_FLAGS=$COMMON_SANITIZE_OPTIONS
-                ;;
-
-              oprofile|oprof)
-                SANITIZE_OPROF_FLAGS=$COMMON_SANITIZE_OPTIONS
-                ;;
-
-              *)
-                AC_MSG_ERROR(bad value ${method} for --enable-sanitize)
-                ;;
-          esac
-      done
-    fi
-  fi
+                  for method in ${SANITIZE_METHODS}; do
+                      AS_CASE("${method}",
+                              [optimized|opt],      [SANITIZE_OPT_FLAGS=$COMMON_SANITIZE_OPTIONS],
+                              [debug|dbg],          [SANITIZE_DBG_FLAGS=$COMMON_SANITIZE_OPTIONS],
+                              [devel],              [SANITIZE_DEVEL_FLAGS=$COMMON_SANITIZE_OPTIONS],
+                              [profiling|pro|prof], [SANITIZE_PROF_FLAGS=$COMMON_SANITIZE_OPTIONS],
+                              [oprofile|oprof],     [SANITIZE_OPROF_FLAGS=$COMMON_SANITIZE_OPTIONS],
+                              [AC_MSG_ERROR(bad value ${method} for --enable-sanitize)])
+                  done
+                ])
+        ])
 
   # in the case blocks below we may add GLIBCXX-specific pedantic debugging preprocessor
   # definitions. however, allow the knowing user to preclude that if they need to.
   AC_ARG_ENABLE(glibcxx-debugging,
                 [AS_HELP_STRING([--disable-glibcxx-debugging],
                                 [omit -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC even in dbg mode])],
-                [case "${enableval}" in
-                  yes)  enableglibcxxdebugging=yes ;;
-                  no)  enableglibcxxdebugging=no ;;
-                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-glibcxx-debugging) ;;
-                esac],
+                [AS_CASE("${enableval}",
+                         [yes], [enableglibcxxdebugging=yes],
+                         [no],  [enableglibcxxdebugging=no],
+                         [AC_MSG_ERROR(bad value ${enableval} for --enable-glibcxx-debugging)])],
                 [enableglibcxxdebugging=yes])
 
   # GLIBCXX debugging causes untold woes on mac machines - so disable it
-  if (test `uname` = "Darwin"); then
-    AC_MSG_RESULT(<<< Disabling GLIBCXX debugging on Darwin >>>)
-    enableglibcxxdebugging=no
-  fi
+  AS_IF([test `uname` = "Darwin"],
+        [
+          AC_MSG_RESULT(<<< Disabling GLIBCXX debugging on Darwin >>>)
+          enableglibcxxdebugging=no
+        ])
   AM_CONDITIONAL(LIBMESH_ENABLE_GLIBCXX_DEBUGGING, test x$enableglibcxxdebugging = xyes)
 
 
@@ -483,185 +428,165 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
   # our users' systems.  However, being able to override this allows
   # us to increase our unit test coverage.
   AC_ARG_ENABLE(glibcxx-debugging-cppunit,
-	 [AS_HELP_STRING([--enable-glibcxx-debugging-cppunit],
-	                 [Use GLIBCXX debugging flags for unit tests])],
-	 [case "${enableval}" in
-	   yes)  enableglibcxxdebuggingcppunit=yes ;;
-	    no)  enableglibcxxdebuggingcppunit=no ;;
- 	     *)  AC_MSG_ERROR(bad value ${enableval} for --enable-glibcxx-debugging-cppunit) ;;
-	  esac],
-	[enableglibcxxdebuggingcppunit=no])
+                [AS_HELP_STRING([--enable-glibcxx-debugging-cppunit],
+                [Use GLIBCXX debugging flags for unit tests])],
+                [AS_CASE("${enableval}",
+                         [yes], [enableglibcxxdebuggingcppunit=yes],
+                         [no],  [enableglibcxxdebuggingcppunit=no],
+                         [AC_MSG_ERROR(bad value ${enableval} for --enable-glibcxx-debugging-cppunit)])],
+                [enableglibcxxdebuggingcppunit=no])
 
   AM_CONDITIONAL(LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT, test x$enableglibcxxdebuggingcppunit = xyes)
 
 
   # First the flags for gcc compilers
-  if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
-    CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization"
-    CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -funroll-loops -fstrict-aliasing -Woverloaded-virtual -Wdisabled-optimization"
-    CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Woverloaded-virtual"
-    NODEPRECATEDFLAG="-Wno-deprecated"
-
-    CFLAGS_OPT="-O2 -funroll-loops -fstrict-aliasing"
-    CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -funroll-loops -fstrict-aliasing"
-    CFLAGS_DBG="-g -Wimplicit"
-    ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
-
-    if (test "x$enableglibcxxdebugging" = "xyes"); then
-      CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
-    fi
-
-    # GCC 4.6.3 warns about variadic macros but supports them just
-    # fine, so let's turn off that warning.
-    case "$GXX_VERSION" in
-      gcc4.6 | gcc5)
-        CXXFLAGS_OPT="$CXXFLAGS_OPT -Wno-variadic-macros"
-        CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wno-variadic-macros"
-        CXXFLAGS_DBG="$CXXFLAGS_DBG -Wno-variadic-macros"
-        ;;
-
-      *)
-        ;;
-    esac
-
-
-    # Set OS-specific flags for linkers & other stuff
-    case "$target" in
-
-      # For Solaris we need to pass a different flag to the linker for specifying the
-      # dynamic library search path and add -lrpcsvc to use XDR
-      *solaris*)
-          RPATHFLAG="-Wl,-R,"
-          LIBS="-lrpcsvc $LIBS"
-          ;;
-
-      *)
-          ;;
-    esac
-
-
-  else
-    # Non-gcc compilers
-
-    case "$GXX_VERSION" in
-      ibm_xlc)
-          CXXFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
-          CXXFLAGS_DBG="-qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
-          NODEPRECATEDFLAG=""
-          CFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10"
-          CFLAGS_DBG="-qansialias -g"
-          CFLAGS_DEVEL="$CFLAGS_DBG"
-          ;;
-
-      # All Intel ICC/ECC flavors
-      intel_*)
-
-        # Intel understands the gcc-like no-deprecated flag
-        NODEPRECATEDFLAG="-Wno-deprecated"
-
-        # Intel compilers use -qp for profiling
-        PROFILING_FLAGS="-qp"
-
-        # Intel options for annotated assembly
-        ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm -fsource-asm"
-
-        # The -g flag is all OProfile needs to produce annotations
-        OPROFILE_FLAGS="-g"
-
-        # Specific flags for specific versions
-        case "$GXX_VERSION" in
-
-          # Intel ICC >= v13.x
-          intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x)
-              # Disable some warning messages:
-              # #161: 'unrecognized #pragma
-              #       #pragma GCC diagnostic warning "-Wdeprecated-declarations"'
-              #       I don't understand this, pragmas for other compilers should
-              #       just be silently ignored, isn't that the whole point of pragmas?
-              # #175: 'subscript out of range'
-              #       FIN-S application code causes many false
-              #       positives with this
-              # #266: 'function declared implicitly'
-              #       Metis function "GKfree" caused this error
-              #       in almost every file.
-              # #488: 'template parameter "Scalar1" is not used in declaring the
-              #       parameter types of function template'
-              #       This warning was generated from one of the type_vector.h
-              #       constructors that uses some SFINAE tricks.
-              # #1476: 'field uses tail padding of a base class'
-              # #1505: 'size of class is affected by tail padding'
-              #        simply warns of a possible incompatibility with
-              #        the g++ ABI for this case
-              # #1572: 'floating-point equality and inequality comparisons are unreliable'
-              #        Well, duh, when the tested value is computed...  OK when it
-              #        was from an assignment.
-              PROFILING_FLAGS="-p"
-              CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
-              CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz"
-              CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
-              CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572 -wd488 -wd161"
-              CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
-              CFLAGS_DEVEL="$CFLAGS_DBG"
-              ;;
-
-          *)
-              AC_MSG_RESULT(Unknown Intel compiler, "$GXX_VERSION")
-              ;;
-        esac
-      ;;
-
-      portland_group)
-          CXXFLAGS_DBG="-g --no_using_std"
-          CXXFLAGS_OPT="-O2 --no_using_std -fast -Minform=severe"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
-
-          # PG C++ definitely doesn't understand -Wno-deprecated...
-          NODEPRECATEDFLAG=""
-
-          CFLAGS_DBG="-g"
-          CFLAGS_OPT="-O2"
-          CFLAGS_DEVEL="$CFLAGS_DBG"
-
-          # Disable exception handling if we don't use it
-          if test "$enableexceptions" = no ; then
-            CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
-            CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
-          fi
-          ;;
-
-      cray_cc)
-          CXXFLAGS_DBG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
-          CXXFLAGS_OPT="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
-          CXXFLAGS_DEVEL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
-          NODEPRECATEDFLAG=""
-          CFLAGS_DBG="-G n"
-          CFLAGS_OPT="-G n"
-          CFLAGS_DEVEL="-G n"
-          ;;
-
-      clang)
-          CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -Qunused-arguments -Wunused-parameter -Wunused"
-          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
-          CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
+  AS_IF([test "$GXX" = yes -a "x$REAL_GXX" != "x"],
+        [
+          CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization"
+          dnl devel flags are added on two lines since there are so many
+          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -funroll-loops -fstrict-aliasing -Woverloaded-virtual -Wdisabled-optimization"
+          CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Woverloaded-virtual"
           NODEPRECATEDFLAG="-Wno-deprecated"
 
-          CFLAGS_OPT="-O2 -Qunused-arguments -Wunused"
-          CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -fno-limit-debug-info -Wunused"
-          CFLAGS_DBG="-g -Wimplicit -Qunused-arguments -fno-limit-debug-info -Wunused"
-          ;;
+          CFLAGS_OPT="-O2 -funroll-loops -fstrict-aliasing"
+          CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -funroll-loops -fstrict-aliasing"
+          CFLAGS_DBG="-g -Wimplicit"
+          ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
 
-      *)
-          AC_MSG_RESULT(No specific options for this C++ compiler known)
-          CXXFLAGS_DBG="$CXXFLAGS"
-          CXXFLAGS_OPT="$CXXFLAGS"
-          CXXFLAGS_DEVEL="$CXXFLAGS"
-          NODEPRECATEDFLAG=""
+          AS_IF([test "x$enableglibcxxdebugging" = "xyes"],
+                [CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"])
 
-          CFLAGS_DBG="$CFLAGS"
-          CFLAGS_OPT="$CFLAGS"
-          CFLAGS_DEVEL="$CFLAGS"
-          ;;
-    esac
-  fi
+          # GCC 4.6.3 warns about variadic macros but supports them just
+          # fine, so let's turn off that warning.
+          AS_CASE("$GXX_VERSION",
+                  [gcc4.6 | gcc5], [CXXFLAGS_OPT="$CXXFLAGS_OPT -Wno-variadic-macros"
+                                    CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wno-variadic-macros"
+                                    CXXFLAGS_DBG="$CXXFLAGS_DBG -Wno-variadic-macros"])
+
+          dnl Set OS-specific flags for linkers & other stuff
+          dnl For Solaris we need to pass a different flag to the linker for specifying the
+          dnl dynamic library search path and add -lrpcsvc to use XDR
+          AS_CASE("$target",
+                  [*solaris*], [RPATHFLAG="-Wl,-R,"
+                                LIBS="-lrpcsvc $LIBS"])
+        ],
+        [
+    dnl Non-gcc compilers
+    AS_CASE("$GXX_VERSION",
+            [ibm_xlc], [
+                          CXXFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
+                          CXXFLAGS_DBG="-qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
+                          CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+                          NODEPRECATEDFLAG=""
+                          CFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10"
+                          CFLAGS_DBG="-qansialias -g"
+                          CFLAGS_DEVEL="$CFLAGS_DBG"
+                        ],
+
+            dnl All Intel ICC/ECC flavors
+            [intel_*], [
+                          dnl Intel understands the gcc-like no-deprecated flag
+                          NODEPRECATEDFLAG="-Wno-deprecated"
+
+                          dnl Intel compilers use -qp for profiling
+                          PROFILING_FLAGS="-qp"
+
+                          dnl Intel options for annotated assembly
+                          ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm -fsource-asm"
+
+                          dnl The -g flag is all OProfile needs to produce annotations
+                          OPROFILE_FLAGS="-g"
+
+                          dnl Disable some warning messages on Intel compilers:
+                          dnl 161:  unrecognized pragma GCC diagnostic warning "-Wdeprecated-declarations"
+                          dnl 175:  subscript out of range
+                          dnl       FIN-S application code causes many false
+                          dnl       positives with this
+                          dnl 266:  function declared implicitly
+                          dnl       Metis function "GKfree" caused this error
+                          dnl       in almost every file.
+                          dnl 488:  template parameter "Scalar1" is not used in declaring the
+                          dnl       parameter types of function template
+                          dnl       This warning was generated from one of the type_vector.h
+                          dnl       constructors that uses some SFINAE tricks.
+                          dnl 1476: field uses tail padding of a base class
+                          dnl 1505: size of class is affected by tail padding
+                          dnl       simply warns of a possible incompatibility with
+                          dnl       the g++ ABI for this case
+                          dnl 1572: floating-point equality and inequality comparisons are unreliable
+                          dnl       Well, duh, when the tested value is computed...  OK when it
+                          dnl       was from an assignment.
+                          AS_CASE("$GXX_VERSION",
+                                  [intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x],
+                                  [
+                                    PROFILING_FLAGS="-p"
+                                    CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
+                                    CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz"
+                                    CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
+                                    CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572 -wd488 -wd161"
+                                    CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
+                                    CFLAGS_DEVEL="$CFLAGS_DBG"
+                                  ],
+                                  [AC_MSG_RESULT(Unknown Intel compiler, "$GXX_VERSION")])
+                       ],
+
+            [portland_group], [
+                                CXXFLAGS_DBG="-g --no_using_std"
+                                CXXFLAGS_OPT="-O2 --no_using_std -fast -Minform=severe"
+                                CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
+
+                                dnl PG C++ definitely doesnt understand -Wno-deprecated...
+                                NODEPRECATEDFLAG=""
+
+                                CFLAGS_DBG="-g"
+                                CFLAGS_OPT="-O2"
+                                CFLAGS_DEVEL="$CFLAGS_DBG"
+
+                                dnl Disable exception handling if we dont use it
+                                AS_IF([test "$enableexceptions" = no],
+                                      [
+                                        CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
+                                        CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
+                                      ])
+                              ],
+
+            [cray_cc], [
+                         CXXFLAGS_DBG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+                         CXXFLAGS_OPT="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+                         CXXFLAGS_DEVEL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+                         NODEPRECATEDFLAG=""
+                         CFLAGS_DBG="-G n"
+                         CFLAGS_OPT="-G n"
+                         CFLAGS_DEVEL="-G n"
+                       ],
+
+            [clang], [
+                       CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -Qunused-arguments -Wunused-parameter -Wunused"
+                       dnl devel flags are added on two lines since there are so many
+                       CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long"
+                       CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
+                       dnl dbg flags are added on two lines since there are so many
+                       CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long"
+                       CXXFLAGS_DBG="$CXXFLAGS_DBG -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
+                       NODEPRECATEDFLAG="-Wno-deprecated"
+
+                       CFLAGS_OPT="-O2 -Qunused-arguments -Wunused"
+                       CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -fno-limit-debug-info -Wunused"
+                       CFLAGS_DBG="-g -Wimplicit -Qunused-arguments -fno-limit-debug-info -Wunused"
+                     ],
+
+            dnl default case
+            [
+              AC_MSG_RESULT(No specific options for this C++ compiler known)
+              CXXFLAGS_DBG="$CXXFLAGS"
+              CXXFLAGS_OPT="$CXXFLAGS"
+              CXXFLAGS_DEVEL="$CXXFLAGS"
+              NODEPRECATEDFLAG=""
+
+              CFLAGS_DBG="$CFLAGS"
+              CFLAGS_OPT="$CFLAGS"
+              CFLAGS_DEVEL="$CFLAGS"
+            ])
+  ])
 ])
