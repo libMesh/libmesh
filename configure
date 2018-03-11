@@ -7363,10 +7363,12 @@ esac
           CFLAGS_DEVEL="$CFLAGS_DBG"
 
           # Disable exception handling if we don't use it
-          if test "$enableexceptions" = no ; then
-            CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
-            CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
-          fi
+          if test "$enableexceptions" = no; then :
+
+                  CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
+                  CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
+
+fi
           ;;
 
       cray_cc)
