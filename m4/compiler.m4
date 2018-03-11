@@ -191,30 +191,31 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
     clang_version="`($CXX --version 2>&1)`"
     is_clang="`echo $clang_version | grep 'clang'`"
 
-    if test "x$is_clang" != "x" ; then
-      dnl Detect if clang is the version built by
-      dnl Apple, because then the version number means
-      dnl something different...
-      is_apple_clang="`echo $clang_version | grep 'Apple'`"
-      clang_vendor="clang"
-      AS_IF([test "x$is_apple_clang" != "x"],
-            [clang_vendor="Apple clang"])
+    AS_IF([test "x$is_clang" != "x"],
+          [
+            dnl Detect if clang is the version built by
+            dnl Apple, because then the version number means
+            dnl something different...
+            is_apple_clang="`echo $clang_version | grep 'Apple'`"
+            clang_vendor="clang"
+            AS_IF([test "x$is_apple_clang" != "x"],
+                  [clang_vendor="Apple clang"])
 
-      dnl If we have perl, we can also pull out the clang version number using regexes.
-      dnl Note that @S|@ is a quadrigraph for the dollar sign.
-      clang_major_minor=unknown
+            dnl If we have perl, we can also pull out the clang version number using regexes.
+            dnl Note that @S|@ is a quadrigraph for the dollar sign.
+            clang_major_minor=unknown
 
-      AS_IF([test "x$PERL" != "x"],
-            [
-              clang_major_minor=`echo $clang_version | $PERL -ne 'print @S|@1 if /version\s(\d+\.\d+)/'`
-              AS_IF([test "x$clang_major_minor" = "x"],
-                    [clang_major_minor=unknown])
-            ])
+            AS_IF([test "x$PERL" != "x"],
+                  [
+                    clang_major_minor=`echo $clang_version | $PERL -ne 'print @S|@1 if /version\s(\d+\.\d+)/'`
+                    AS_IF([test "x$clang_major_minor" = "x"],
+                          [clang_major_minor=unknown])
+                  ])
 
-      AC_MSG_RESULT([<<< C++ compiler is ${clang_vendor}, version ${clang_major_minor} >>>])
-      GXX_VERSION=clang
-      compiler_brand_detected=yes
-    fi
+            AC_MSG_RESULT([<<< C++ compiler is ${clang_vendor}, version ${clang_major_minor} >>>])
+            GXX_VERSION=clang
+            compiler_brand_detected=yes
+          ])
   fi
 
   dnl Intel's ICC C++ compiler?
