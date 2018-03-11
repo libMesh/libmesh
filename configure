@@ -5648,49 +5648,63 @@ fi
 
 fi
 
-              if (test "x$compiler_brand_detected" = "xno"); then
-    is_ibm_xlc="`($CXX 2>&1) | egrep -i 'xlc'`"
-    if test "x$is_ibm_xlc" != "x"  ; then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is IBM xlC >>>" >&5
+              if test "x$compiler_brand_detected" = "xno"; then :
+
+          is_ibm_xlc="`($CXX 2>&1) | egrep -i 'xlc'`"
+          if test "x$is_ibm_xlc" != "x"; then :
+
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is IBM xlC >>>" >&5
 $as_echo "<<< C++ compiler is IBM xlC >>>" >&6; }
-      GXX_VERSION=ibm_xlc
-      compiler_brand_detected=yes
-    fi
-  fi
+                  GXX_VERSION=ibm_xlc
+                  compiler_brand_detected=yes
 
-    if (test "x$compiler_brand_detected" = "xno"); then
-    is_cray_cc="`($CXX -V 2>&1) | grep 'Cray '`"
-    if test "x$is_cray_cc" != "x" ; then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Cray C++ >>>" >&5
+fi
+
+fi
+
+    if test "x$compiler_brand_detected" = "xno"; then :
+
+          is_cray_cc="`($CXX -V 2>&1) | grep 'Cray '`"
+          if test "x$is_cray_cc" != "x"; then :
+
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Cray C++ >>>" >&5
 $as_echo "<<< C++ compiler is Cray C++ >>>" >&6; }
-      GXX_VERSION=cray_cc
-      compiler_brand_detected=yes
-    fi
-  fi
+                  GXX_VERSION=cray_cc
+                  compiler_brand_detected=yes
 
-    if (test "x$compiler_brand_detected" = "xno"); then
-    is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
-    if test "x$is_pgcc" != "x" ; then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Portland Group C++ >>>" >&5
+fi
+
+fi
+
+    if test "x$compiler_brand_detected" = "xno"; then :
+
+          is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
+          if test "x$is_pgcc" != "x"; then :
+
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Portland Group C++ >>>" >&5
 $as_echo "<<< C++ compiler is Portland Group C++ >>>" >&6; }
-      GXX_VERSION=portland_group
-      compiler_brand_detected=yes
-    fi
-  fi
+            GXX_VERSION=portland_group
+            compiler_brand_detected=yes
 
-    if (test "x$compiler_brand_detected" = "xno"); then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: WARNING:" >&5
+fi
+
+fi
+
+    if test "x$compiler_brand_detected" = "xno"; then :
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: WARNING:" >&5
 $as_echo "WARNING:" >&6; }
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Unrecognized compiler: \"$CXX\" <<<" >&5
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Unrecognized compiler: \"$CXX\" <<<" >&5
 $as_echo ">>> Unrecognized compiler: \"$CXX\" <<<" >&6; }
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: You will likely need to modify" >&5
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: You will likely need to modify" >&5
 $as_echo "You will likely need to modify" >&6; }
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: Make.common directly to specify" >&5
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: Make.common directly to specify" >&5
 $as_echo "Make.common directly to specify" >&6; }
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: proper compiler flags" >&5
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: proper compiler flags" >&5
 $as_echo "proper compiler flags" >&6; }
-    GXX_VERSION=unknown
-  fi
+          GXX_VERSION=unknown
+
+fi
 
 
 
