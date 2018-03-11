@@ -7272,35 +7272,36 @@ fi
   # First the flags for gcc compilers
   if test "$GXX" = yes -a "x$REAL_GXX" != "x"; then :
 
-    CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization"
-    CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -funroll-loops -fstrict-aliasing -Woverloaded-virtual -Wdisabled-optimization"
-    CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Woverloaded-virtual"
-    NODEPRECATEDFLAG="-Wno-deprecated"
+          CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization"
+                    CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -funroll-loops -fstrict-aliasing -Woverloaded-virtual -Wdisabled-optimization"
+          CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Woverloaded-virtual"
+          NODEPRECATEDFLAG="-Wno-deprecated"
 
-    CFLAGS_OPT="-O2 -funroll-loops -fstrict-aliasing"
-    CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -funroll-loops -fstrict-aliasing"
-    CFLAGS_DBG="-g -Wimplicit"
-    ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
+          CFLAGS_OPT="-O2 -funroll-loops -fstrict-aliasing"
+          CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit -funroll-loops -fstrict-aliasing"
+          CFLAGS_DBG="-g -Wimplicit"
+          ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
 
-    if test "x$enableglibcxxdebugging" = "xyes"; then :
+          if test "x$enableglibcxxdebugging" = "xyes"; then :
   CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
 fi
 
-    # GCC 4.6.3 warns about variadic macros but supports them just
-    # fine, so let's turn off that warning.
-    case "$GXX_VERSION" in #(
+          # GCC 4.6.3 warns about variadic macros but supports them just
+          # fine, so let's turn off that warning.
+          case "$GXX_VERSION" in #(
   gcc4.6 | gcc5) :
     CXXFLAGS_OPT="$CXXFLAGS_OPT -Wno-variadic-macros"
-                              CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wno-variadic-macros"
-                              CXXFLAGS_DBG="$CXXFLAGS_DBG -Wno-variadic-macros" ;; #(
+                                    CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wno-variadic-macros"
+                                    CXXFLAGS_DBG="$CXXFLAGS_DBG -Wno-variadic-macros" ;; #(
   *) :
      ;;
 esac
 
-                case "$target" in #(
+                                        case "$target" in #(
   *solaris*) :
     RPATHFLAG="-Wl,-R,"
-                          LIBS="-lrpcsvc $LIBS" ;; #(
+                                LIBS="-lrpcsvc $LIBS" ;; #(
   *) :
      ;;
 esac
@@ -7376,8 +7377,10 @@ fi
   clang) :
 
                        CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -Qunused-arguments -Wunused-parameter -Wunused"
-                       CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
-                       CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
+                                              CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long"
+                       CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
+                                              CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long"
+                       CXXFLAGS_DBG="$CXXFLAGS_DBG -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
                        NODEPRECATEDFLAG="-Wno-deprecated"
 
                        CFLAGS_OPT="-O2 -Qunused-arguments -Wunused"
