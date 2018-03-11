@@ -7079,20 +7079,14 @@ $as_echo "#define HAVE_CXX11 1" >>confdefs.h
   # Check whether --enable-sanitize was given.
 if test "${enable_sanitize+set}" = set; then :
   enableval=$enable_sanitize; for method in ${enableval} ; do
-                 # make sure each method specified makes sense
-                 case "${method}" in
-                     optimized|opt)      ;;
-                     debug|dbg)          ;;
-                     devel)              ;;
-                     profiling|pro|prof) ;;
-                     oprofile|oprof)     ;;
-                     *)
-                         as_fn_error $? "bad value ${method} for --enable-sanitize" "$LINENO" 5
-                         ;;
-                 esac
+                                  case "${method}" in #(
+  optimized|opt|debug|dbg|devel|profiling|pro|prof|oprofile|oprof) :
+     ;; #(
+  *) :
+    as_fn_error $? "bad value ${method} for --enable-sanitize" "$LINENO" 5 ;;
+esac
                done
-               # If we made it here, the case statement didn't detect any errors
-               SANITIZE_METHODS=${enableval}
+                              SANITIZE_METHODS=${enableval}
 fi
 
 
