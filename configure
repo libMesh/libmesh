@@ -7246,11 +7246,14 @@ fi
   # us to increase our unit test coverage.
   # Check whether --enable-glibcxx-debugging-cppunit was given.
 if test "${enable_glibcxx_debugging_cppunit+set}" = set; then :
-  enableval=$enable_glibcxx_debugging_cppunit; case "${enableval}" in
-	   yes)  enableglibcxxdebuggingcppunit=yes ;;
-	    no)  enableglibcxxdebuggingcppunit=no ;;
- 	     *)  as_fn_error $? "bad value ${enableval} for --enable-glibcxx-debugging-cppunit" "$LINENO" 5 ;;
-	  esac
+  enableval=$enable_glibcxx_debugging_cppunit; case "${enableval}" in #(
+  yes) :
+    enableglibcxxdebuggingcppunit=yes ;; #(
+  no) :
+    enableglibcxxdebuggingcppunit=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-glibcxx-debugging-cppunit" "$LINENO" 5 ;;
+esac
 else
   enableglibcxxdebuggingcppunit=no
 fi
