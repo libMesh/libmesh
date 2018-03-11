@@ -552,10 +552,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           CFLAGS_DEVEL="$CFLAGS_DBG"
 
           # Disable exception handling if we don't use it
-          if test "$enableexceptions" = no ; then
-            CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
-            CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
-          fi
+          AS_IF([test "$enableexceptions" = no],
+                [
+                  CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
+                  CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
+                ])
           ;;
 
       cray_cc)
