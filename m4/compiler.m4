@@ -79,11 +79,10 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
   AC_ARG_ENABLE(fortran,
                 AS_HELP_STRING([--disable-fortran],
                                [build without Fortran language support]),
-                [case "${enableval}" in
-                  yes)  enablefortran=yes ;;
-                  no)  enablefortran=no ;;
-                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fortran) ;;
-                esac],
+                [AS_CASE("${enableval}",
+                         [yes], [enablefortran=yes],
+                         [no],  [enablefortran=no],
+                         [AC_MSG_ERROR(bad value ${enableval} for --enable-fortran)])],
                 [enablefortran=yes])
 
   AS_IF([test "x$enablefortran" = xyes],
