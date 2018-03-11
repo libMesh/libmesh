@@ -4850,11 +4850,14 @@ fi
      # -------------------------------------------------------------------
      # Check whether --enable-mpi was given.
 if test "${enable_mpi+set}" = set; then :
-  enableval=$enable_mpi; case "${enableval}" in
-                     yes)  enablempi=yes ;;
-                     no)  enablempi=no ;;
-                     *)  as_fn_error $? "bad value ${enableval} for --enable-mpi" "$LINENO" 5 ;;
-                   esac
+  enableval=$enable_mpi; case "${enableval}" in #(
+  yes) :
+    enablempi=yes ;; #(
+  no) :
+    enablempi=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-mpi" "$LINENO" 5 ;;
+esac
 else
   enablempi=yes
 fi
