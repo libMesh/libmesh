@@ -6280,11 +6280,14 @@ fi
   # --------------------------------------------------------------
   # Check whether --enable-fortran was given.
 if test "${enable_fortran+set}" = set; then :
-  enableval=$enable_fortran; case "${enableval}" in
-                  yes)  enablefortran=yes ;;
-                  no)  enablefortran=no ;;
-                  *)  as_fn_error $? "bad value ${enableval} for --enable-fortran" "$LINENO" 5 ;;
-                esac
+  enableval=$enable_fortran; case "${enableval}" in #(
+  yes) :
+    enablefortran=yes ;; #(
+  no) :
+    enablefortran=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-fortran" "$LINENO" 5 ;;
+esac
 else
   enablefortran=yes
 fi
