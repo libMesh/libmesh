@@ -7210,11 +7210,14 @@ fi
   # definitions. however, allow the knowing user to preclude that if they need to.
   # Check whether --enable-glibcxx-debugging was given.
 if test "${enable_glibcxx_debugging+set}" = set; then :
-  enableval=$enable_glibcxx_debugging; case "${enableval}" in
-                  yes)  enableglibcxxdebugging=yes ;;
-                  no)  enableglibcxxdebugging=no ;;
-                  *)  as_fn_error $? "bad value ${enableval} for --enable-glibcxx-debugging" "$LINENO" 5 ;;
-                esac
+  enableval=$enable_glibcxx_debugging; case "${enableval}" in #(
+  yes) :
+    enableglibcxxdebugging=yes ;; #(
+  no) :
+    enableglibcxxdebugging=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-glibcxx-debugging" "$LINENO" 5 ;;
+esac
 else
   enableglibcxxdebugging=yes
 fi
