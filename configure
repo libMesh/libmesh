@@ -7186,31 +7186,20 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
                                                                         libmesh_LDFLAGS="$libmesh_LDFLAGS -Wc,-fsanitize=address"
 
                   for method in ${SANITIZE_METHODS}; do
-                      case "${method}" in
-                          optimized|opt)
-                            SANITIZE_OPT_FLAGS=$COMMON_SANITIZE_OPTIONS
-                            ;;
-
-                          debug|dbg)
-                            SANITIZE_DBG_FLAGS=$COMMON_SANITIZE_OPTIONS
-                            ;;
-
-                          devel)
-                            SANITIZE_DEVEL_FLAGS=$COMMON_SANITIZE_OPTIONS
-                            ;;
-
-                          profiling|pro|prof)
-                            SANITIZE_PROF_FLAGS=$COMMON_SANITIZE_OPTIONS
-                            ;;
-
-                          oprofile|oprof)
-                            SANITIZE_OPROF_FLAGS=$COMMON_SANITIZE_OPTIONS
-                            ;;
-
-                          *)
-                            as_fn_error $? "bad value ${method} for --enable-sanitize" "$LINENO" 5
-                            ;;
-                      esac
+                      case "${method}" in #(
+  optimized|opt) :
+    SANITIZE_OPT_FLAGS=$COMMON_SANITIZE_OPTIONS ;; #(
+  debug|dbg) :
+    SANITIZE_DBG_FLAGS=$COMMON_SANITIZE_OPTIONS ;; #(
+  devel) :
+    SANITIZE_DEVEL_FLAGS=$COMMON_SANITIZE_OPTIONS ;; #(
+  profiling|pro|prof) :
+    SANITIZE_PROF_FLAGS=$COMMON_SANITIZE_OPTIONS ;; #(
+  oprofile|oprof) :
+    SANITIZE_OPROF_FLAGS=$COMMON_SANITIZE_OPTIONS ;; #(
+  *) :
+    as_fn_error $? "bad value ${method} for --enable-sanitize" "$LINENO" 5 ;;
+esac
                   done
 
 fi
