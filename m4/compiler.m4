@@ -470,20 +470,12 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
                               CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Wno-variadic-macros"
                               CXXFLAGS_DBG="$CXXFLAGS_DBG -Wno-variadic-macros"])
 
-    # Set OS-specific flags for linkers & other stuff
-    case "$target" in
-
-      # For Solaris we need to pass a different flag to the linker for specifying the
-      # dynamic library search path and add -lrpcsvc to use XDR
-      *solaris*)
-          RPATHFLAG="-Wl,-R,"
-          LIBS="-lrpcsvc $LIBS"
-          ;;
-
-      *)
-          ;;
-    esac
-
+    dnl Set OS-specific flags for linkers & other stuff
+    dnl For Solaris we need to pass a different flag to the linker for specifying the
+    dnl dynamic library search path and add -lrpcsvc to use XDR
+    AS_CASE("$target",
+            [*solaris*], [RPATHFLAG="-Wl,-R,"
+                          LIBS="-lrpcsvc $LIBS"])
 
   else
     # Non-gcc compilers
