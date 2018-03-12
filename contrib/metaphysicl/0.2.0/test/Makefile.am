@@ -1,5 +1,3 @@
-BUILT_SOURCES   = .license.stamp
-
 check_PROGRAMS  =
 check_PROGRAMS += compare_types_unit
 check_PROGRAMS += derivs_unit
@@ -161,12 +159,16 @@ if CODE_COVERAGE_ENABLED
   CLEANFILES += *.gcda *.gcno
 endif
 
+if METAPHYSICL_LICENSESTAMPEXISTS
+BUILT_SOURCES   = .license.stamp
+
 .license.stamp: $(top_srcdir)/LICENSE
 	$(top_srcdir)/src/common/lic_utils/update_license.pl $(top_srcdir)/LICENSE \
 	$(top_srcdir)/test/*.C
 	echo 'updated source license headers' >$@
 
 CLEANFILES += .license.stamp
+endif
 
 # Required for AX_AM_MACROS
 ###@INC_AMINCLUDE@

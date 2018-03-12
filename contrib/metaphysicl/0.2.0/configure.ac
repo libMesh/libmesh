@@ -110,6 +110,23 @@ DX_INIT_DOXYGEN(metaphysicl, doxygen/metaphysicl.dox, docs/doxygen)
 
 AC_CONFIG_FILES(doxygen/txt_common/about_vpath.page)
 
+dnl------------------------------------------
+dnl License stamping for non-dist builds
+dnl------------------------------------------
+
+# PB: Although the documentation says that ac_top_srcdir should be defined,
+#     it doesn't get activated until _AC_SRCDIRS gets called
+#     (used to be _AC_SRCPATHS), according to this thread:
+#     http://lists.gnu.org/archive/html/autoconf-patches/2003-02/msg00003.html
+#     My own hacking revealed that we could also do the following:
+#     TOP_SEARCH_DIR=$ac_pwd/$srcdir
+#     I'm not sure which will be more "future proof", but this is the alternative
+#     to using $(shell) calls in the Makefile.am which 1. requires
+#     GNU Make and 2. Causes automake to issue a warning
+_AC_SRCDIRS(.)
+ABS_TOP_SRC_DIR=$ac_abs_top_srcdir
+AM_CONDITIONAL(METAPHYSICL_LICENSESTAMPEXISTS, [test -f $ABS_TOP_SRC_DIR/src/common/lic_utils/update_license.pl])
+
 dnl-----------------------------------------------
 dnl Generate header files
 dnl-----------------------------------------------
