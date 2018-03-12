@@ -1608,11 +1608,8 @@ void DofMap::add_neighbors_to_send_list(MeshBase & mesh)
     }
 
   // We're now done with any merged coupling matrices we had to create.
-  for (std::set<CouplingMatrix *>::iterator
-         it  = temporary_coupling_matrices.begin(),
-         end = temporary_coupling_matrices.begin();
-       it != end; ++it)
-    delete *it;
+  for (auto & mat : temporary_coupling_matrices)
+    delete mat;
 
   //-------------------------------------------------------------------------
   // Our coupling functors added dofs from neighboring elements to the
