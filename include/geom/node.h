@@ -178,6 +178,12 @@ public:
    */
   void set_valence(unsigned int val);
 
+  /**
+   * Return which of pid1 and pid2 would be preferred by the current
+   * load-balancing heuristic applied to this node.
+   */
+  processor_id_type choose_processor_id(processor_id_type pid1, processor_id_type pid2) const;
+
 private:
 
   /**
@@ -349,9 +355,6 @@ void Node::set_valence (unsigned int)
 }
 
 #endif // #ifdef LIBMESH_ENABLE_NODE_VALENCE
-
-
-
 
 } // namespace libMesh
 
