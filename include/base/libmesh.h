@@ -38,9 +38,10 @@ class vtkMPIController;
 
 /**
  * The \p libMesh namespace provides an interface to certain functionality
- * in the library.  It provides a uniform \p init() method that
- * initializes any other dependent libraries (e.g. MPI or PETSC),
- * and a \p close() method for closing those libraries.  It also
+ * in the library.  Here, it provides a LibMeshInit class which uses
+ * the RAII (Resource Acquisition Is Initialization) idiom to ensure
+ * initialization of any other dependent libraries (e.g. MPI or PETSC),
+ * and to close those libraries when it goes out of scope.  It also
  * provides a centralized place for performance logging and other
  * functionality.
  */
@@ -55,9 +56,18 @@ namespace libMesh
  * destructor closes those libraries properly.
  *
  * For most users, a single LibMeshInit object should be created at
- * the start of your main() function.  This object replaces the
- * previous \code libMesh::init()/libMesh::close() \endcode methods,
- * which are now deprecated.
+ * the start of your main() function.
+ *
+ * All libMesh functionality should be used only when a LibMeshInit
+ * object exists.  Dependent library functionality, likewise, except
+ * in codes which manually initialize those libraries before
+ * LibMeshInit creation and finalize them after LibMeshInit
+ * destruction.
+ *
+ * Since "it is best not to perform much more than a return rc after
+ * calling MPI_Finalize", applications which want to do anything after
+ * LibMeshInit destruction should manage MPI initialization and
+ * finalization manually.
  */
 class LibMeshInit
 {
@@ -65,8 +75,14 @@ public:
 #ifdef LIBMESH_HAVE_MPI
   /**
    * Initialize the library for use, with the command line options
-   * provided.  This will e.g. call PetscInitialize if PETSC is
-   * available.  You must create a LibMeshInit object before using any
+   * provided.  This will e.g. call MPI_Init if MPI is available and
+   * enabled and has not already been initialized; similar
+   * initialization may take place for Petsc, Slepc, multithreading
+   * support, libMesh Singleton objects, the libMesh::out/err IO
+   * streams, and any libMesh handlers for floating-point exceptions,
+   * signals, and/or C++ aborts.
+   *
+   * You must create a LibMeshInit object before using any
    * of the library functionality.  This method may take an optional
    * parameter to use a user-specified MPI communicator.
    */
@@ -76,8 +92,22 @@ public:
   LibMeshInit(int argc, const char * const * argv);
 #endif
 
+  /**
+   * Destructor.  Cleans up libMesh Singleton objects, and thread
+   * manager if threading is in use.  Prints reference count and
+   * performance logging information if enabled.  Restores
+   * pre-LibMeshInit terminate handler and floating-point-exception
+   * handling.  Finalizes any of Slepc, Petsc, and MPI which were
+   * initialized by LibMeshInit.
+   */
   virtual ~LibMeshInit();
 
+  /**
+   * Returns the Communicator created by this libMesh object, which
+   * will be a compatibility shim if MPI is not enabled, or a wrapper
+   * for the user-input MPI_Comm if we were constructed with one, or a
+   * wrapper for MPI_COMM_WORLD by default.
+   */
   const Parallel::Communicator & comm() const { return _comm; }
 
   Parallel::Communicator & comm() { return _comm; }
