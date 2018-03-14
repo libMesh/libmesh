@@ -1,5 +1,3 @@
-BUILT_SOURCES   = .license.stamp
-
 #----------------------------------------
 # Programs and libraries we want to build
 #----------------------------------------
@@ -104,13 +102,14 @@ endif
 # Embedded license header support
 #---------------------------------
 
+if METAPHYSICL_LICENSESTAMPEXISTS
 STAMPED_FILES = $(libmetaphysicl_la_SOURCES) $(include_HEADERS) $(metaphysicl_version_SOURCES)
+
+BUILT_SOURCES = .license.stamp
 
 .license.stamp: $(top_srcdir)/LICENSE
 	$(top_srcdir)/src/common/lic_utils/update_license.pl -S=$(top_srcdir)/src $(top_srcdir)/LICENSE $(STAMPED_FILES)
 	echo 'updated source license headers' >$@
 
 CLEANFILES += .license.stamp
-
-EXTRA_DIST = common
-
+endif
