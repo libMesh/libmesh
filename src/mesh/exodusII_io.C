@@ -120,7 +120,8 @@ void ExodusII_IO::write_timestep_discontinuous (const std::string &fname,
 void ExodusII_IO::write_timestep_discontinuous (const std::string & /* fname */,
                                                 const EquationSystems & /* es */,
                                                 const int /* timestep */,
-                                                const Real /* time */)
+                                                const Real /* time */,
+                                                const std::set<std::string> * /*system_names*/)
 { libmesh_error(); }
 #endif
 
@@ -1135,7 +1136,8 @@ void ExodusII_IO::write_global_data (const std::vector<Number> &,
 void ExodusII_IO::write_timestep (const std::string &,
                                   const EquationSystems &,
                                   const int,
-                                  const Real)
+                                  const Real,
+                                  const std::set<std::string> *)
 {
   libmesh_error_msg("ERROR, ExodusII API is not defined.");
 }
