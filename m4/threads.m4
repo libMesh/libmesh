@@ -124,7 +124,7 @@ AC_DEFUN([ACX_BEST_THREAD],
       # If TBB was not enabled, but the user requested it, we treat that as an error:
       # we want to alert the user as soon as possible that their requested thread model
       # could not be configured correctly.
-      if (test $enabletbb = no); then
+      if (test "x$enabletbb" = "xno" -a "x$requested_thread_model" = "xtbb"); then
         AC_MSG_ERROR([requested threading model, TBB, could not be found.])
       fi
     fi
