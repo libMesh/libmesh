@@ -29,8 +29,6 @@ namespace libMesh
 template<typename T>
 void DenseVectorBase<T>::print_scientific (std::ostream & os, unsigned precision) const
 {
-#ifndef LIBMESH_BROKEN_IOSTREAM
-
   // save the initial format flags
   std::ios_base::fmtflags os_flags = os.flags();
 
@@ -44,16 +42,6 @@ void DenseVectorBase<T>::print_scientific (std::ostream & os, unsigned precision
 
   // reset the original format flags
   os.flags(os_flags);
-
-#else
-
-  // Print the matrix entries.
-  for (unsigned int i=0; i<this->size(); i++)
-    os << std::setprecision(precision)
-       << this->el(i)
-       << std::endl;
-
-#endif
 }
 
 
