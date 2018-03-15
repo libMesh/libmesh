@@ -141,6 +141,7 @@ TESTS = compare_types_unit$(EXEEXT) derivs_unit$(EXEEXT) \
 @VEXCL_ENABLED_TRUE@am__append_6 = $(VEXCL_LDFLAGS)
 @VEXCL_ENABLED_TRUE@am__append_7 = $(VEXCL_LIBS)
 @CODE_COVERAGE_ENABLED_TRUE@am__append_8 = *.gcda *.gcno
+@METAPHYSICL_LICENSESTAMPEXISTS_TRUE@am__append_9 = .license.stamp
 subdir = test
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/common/acx_pthread.m4 \
@@ -826,7 +827,6 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-BUILT_SOURCES = .license.stamp
 AM_CPPFLAGS = -I$(top_srcdir)/src/core/include \
 	-I$(top_srcdir)/src/graphs/include \
 	-I$(top_srcdir)/src/numerics/include \
@@ -882,7 +882,8 @@ testopt_unit_SOURCES = testopt_unit.C
 vector_navier_unit_SOURCES = vector_navier_unit.C navier_unit.h \
 	testing.h
 vector_pde_unit_SOURCES = vector_pde_unit.C pde_unit.h testing.h
-CLEANFILES = $(am__append_8) .license.stamp
+CLEANFILES = $(am__append_8) $(am__append_9)
+@METAPHYSICL_LICENSESTAMPEXISTS_TRUE@BUILT_SOURCES = .license.stamp
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -1669,10 +1670,10 @@ uninstall-am:
 .PRECIOUS: Makefile
 
 
-.license.stamp: $(top_srcdir)/LICENSE
-	$(top_srcdir)/src/common/lic_utils/update_license.pl $(top_srcdir)/LICENSE \
-	$(top_srcdir)/test/*.C
-	echo 'updated source license headers' >$@
+@METAPHYSICL_LICENSESTAMPEXISTS_TRUE@.license.stamp: $(top_srcdir)/LICENSE
+@METAPHYSICL_LICENSESTAMPEXISTS_TRUE@	$(top_srcdir)/src/common/lic_utils/update_license.pl $(top_srcdir)/LICENSE \
+@METAPHYSICL_LICENSESTAMPEXISTS_TRUE@	$(top_srcdir)/test/*.C
+@METAPHYSICL_LICENSESTAMPEXISTS_TRUE@	echo 'updated source license headers' >$@
 
 # Required for AX_AM_MACROS
 ###@INC_AMINCLUDE@
