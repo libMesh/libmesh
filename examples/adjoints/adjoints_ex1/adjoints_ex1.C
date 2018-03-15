@@ -285,6 +285,11 @@ int main (int argc, char ** argv)
   libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
                            "--enable-petsc, --enable-trilinos, or --enable-eigen");
 
+  // This example relies on exceptions to control which Partitioner gets built.
+#ifndef LIBMESH_ENABLE_EXCEPTIONS
+  libmesh_example_requires(false, "--enable-exceptions");
+#endif
+
   // Skip adaptive examples on a non-adaptive libMesh build
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_example_requires(false, "--enable-amr");
