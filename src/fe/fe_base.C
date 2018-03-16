@@ -1789,6 +1789,23 @@ compute_periodic_constraints (DofConstraints & constraints,
                   dof_map.dof_indices (neigh, neigh_dof_indices,
                                        variable_number);
 
+                  // We use neigh_dof_indices_all_variables in the case that the
+                  // periodic boundary condition involves mappings between multiple
+                  // variables.
+                  std::vector<std::vector<dof_id_type>> neigh_dof_indices_all_variables;
+                  if(periodic->has_transformation_matrix())
+                    {
+                      const std::set<unsigned int> & variables = periodic->get_variables();
+                      neigh_dof_indices_all_variables.resize(variables.size());
+                      unsigned int index = 0;
+                      for(unsigned int var : variables)
+                        {
+                          dof_map.dof_indices (neigh, neigh_dof_indices_all_variables[index],
+                                               var);
+                          index++;
+                        }
+                    }
+
                   const unsigned int n_qp = my_qface.n_points();
 
                   // Translate the quadrature points over to the
@@ -2337,8 +2354,33 @@ compute_periodic_constraints (DofConstraints & constraints,
                           if (std::abs(their_dof_value) < 10*TOLERANCE)
                             continue;
 
-                          constraint_row->insert(std::make_pair(their_dof_g,
-                                                                their_dof_value));
+                          if(!periodic->has_transformation_matrix())
+                            {
+                              constraint_row->insert(std::make_pair(their_dof_g,
+                                                                    their_dof_value));
+                            }
+                          else
+                            {
+                              // In this case the current variable is constrained in terms of other variables.
+                              // We assume that all variables in this constraint have the same FE type (this
+                              // is asserted below), and hence we can create the constraint row contribution
+                              // by multiplying their_dof_value by the corresponding row of the transformation
+                              // matrix.
+
+                              const std::set<unsigned int> & variables = periodic->get_variables();
+                              neigh_dof_indices_all_variables.resize(variables.size());
+                              unsigned int index = 0;
+                              for(unsigned int other_var : variables)
+                                {
+                                  libmesh_assert_msg(base_fe_type == dof_map.variable_type(other_var), "FE types must match for all variables involved in constraint");
+
+                                  Real var_weighting = periodic->get_transformation_matrix()(variable_number, other_var);
+                                  constraint_row->insert(std::make_pair(neigh_dof_indices_all_variables[index][i],
+                                                                        var_weighting*their_dof_value));
+                                  index++;
+                                }
+                            }
+
                         }
                     }
                 }

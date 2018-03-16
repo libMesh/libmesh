@@ -79,8 +79,6 @@ public:
   virtual std::unique_ptr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const libmesh_override;
 
 protected:
-  // One of these days we'll support rotated boundaries
-  // RealTensor rotation_matrix;
 
   // The vector which is added to points in myboundary
   // to produce corresponding points in pairedboundary
