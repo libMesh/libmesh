@@ -286,7 +286,7 @@ int main (int argc, char ** argv)
                            "--enable-petsc, --enable-trilinos, or --enable-eigen");
 
   // This example relies on exceptions to control which Partitioner gets built.
-#ifndef LIBMESH_ENABLE_EXAMPLES
+#ifndef LIBMESH_ENABLE_EXCEPTIONS
   libmesh_example_requires(false, "--enable-exceptions");
 #endif
 
