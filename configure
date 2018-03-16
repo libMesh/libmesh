@@ -36523,7 +36523,7 @@ $as_echo "$ac_cv_tls" >&6; }
       # If TBB was not enabled, but the user requested it, we treat that as an error:
       # we want to alert the user as soon as possible that their requested thread model
       # could not be configured correctly.
-      if (test $enabletbb = no); then
+      if (test "x$enabletbb" = "xno" -a "x$requested_thread_model" = "xtbb"); then
         as_fn_error $? "requested threading model, TBB, could not be found." "$LINENO" 5
       fi
     fi
