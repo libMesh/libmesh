@@ -64,9 +64,9 @@ public:
   CPPUNIT_TEST( testDofOwnerOnTri6 );
   CPPUNIT_TEST( testDofOwnerOnHex27 );
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
+#if defined(LIBMESH_ENABLE_CONSTRAINTS) && defined(LIBMESH_ENABLE_EXCEPTIONS)
   CPPUNIT_TEST( testCyclicConstraintDetection );
-#endif // LIBMESH_ENABLE_CONSTRAINTS
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -121,7 +121,7 @@ public:
   void testDofOwnerOnTri6()  { testDofOwner(TRI6); }
   void testDofOwnerOnHex27() { testDofOwner(HEX27); }
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
+#if defined(LIBMESH_ENABLE_CONSTRAINTS) && defined(LIBMESH_ENABLE_EXCEPTIONS)
   void testCyclicConstraintDetection()
   {
     Mesh mesh(*TestCommWorld);
@@ -141,7 +141,7 @@ public:
 
     CPPUNIT_ASSERT_THROW_MESSAGE("Cyclic constraint not detected", es.init(), libMesh::LogicError);
   }
-#endif // LIBMESH_ENABLE_CONSTRAINTS
+#endif
 
 };
 
