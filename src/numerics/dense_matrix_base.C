@@ -85,8 +85,6 @@ void DenseMatrixBase<T>::condense(const unsigned int iv,
 template<typename T>
 void DenseMatrixBase<T>::print_scientific (std::ostream & os, unsigned precision) const
 {
-#ifndef LIBMESH_BROKEN_IOSTREAM
-
   // save the initial format flags
   std::ios_base::fmtflags os_flags = os.flags();
 
@@ -104,22 +102,6 @@ void DenseMatrixBase<T>::print_scientific (std::ostream & os, unsigned precision
 
   // reset the original format flags
   os.flags(os_flags);
-
-#else
-
-  // Print the matrix entries.
-  for (unsigned int i=0; i<this->m(); i++)
-    {
-      for (unsigned int j=0; j<this->n(); j++)
-        os << std::setprecision(precision)
-           << this->el(i,j)
-           << " ";
-
-      os << std::endl;
-    }
-
-
-#endif
 }
 
 
