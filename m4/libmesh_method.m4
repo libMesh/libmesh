@@ -113,10 +113,11 @@ AC_DEFUN([LIBMESH_SET_METHODS],
               METHODS=${withval}],
              [
                # default METHOD is opt if not specified.
-               if (test "x${METHODS}" = x); then
-                 METHODS="dbg devel opt"
-                 AC_MSG_RESULT([No build methods specified, defaulting to "$METHODS"])
-               fi
+               AS_IF([test "x${METHODS}" = x],
+                     [
+                       METHODS="dbg devel opt"
+                       AC_MSG_RESULT([No build methods specified, defaulting to "$METHODS"])
+                     ])
              ])
 
  AC_MSG_RESULT([<<< Configuring libMesh with methods "$METHODS" >>>])
@@ -176,14 +177,13 @@ AC_DEFUN([LIBMESH_SET_METHODS],
 
  # conditionally compile selected methods
  for method in ${METHODS}; do
-     case "${method}" in
-       optimized|opt)      build_opt=yes   ;;
-       debug|dbg)          build_dbg=yes   ;;
-       devel)              build_devel=yes ;;
-       profiling|pro|prof) build_prof=yes  ;;
-       oprofile|oprof)     build_oprof=yes ;;
-       *)                  AC_MSG_ERROR(bad value ${method} for --with-methods) ;;
-     esac
+     AS_CASE("${method}",
+             [optimized|opt],      [build_opt=yes],
+             [debug|dbg],          [build_dbg=yes],
+             [devel],              [build_devel=yes],
+             [profiling|pro|prof], [build_prof=yes],
+             [oprofile|oprof],     [build_oprof=yes],
+             [AC_MSG_ERROR(bad value ${method} for --with-methods)])
  done
 
  AM_CONDITIONAL(LIBMESH_OPT_MODE,   test x$build_opt   = xyes)

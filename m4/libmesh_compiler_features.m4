@@ -68,17 +68,13 @@ enablegetpwuid_default=yes
 
 # We can't use getpwuid if pwd.h is not found.
 AC_CHECK_HEADERS(pwd.h, [have_pwd_h=yes], [have_pwd_h=no])
-if test "$have_pwd_h" = no ; then
-  enablegetpwuid_default=no
-fi
+AS_IF([test "$have_pwd_h" = no], [enablegetpwuid_default=no])
 
 # If the user configured with --enable-all-static, certain functions
 # like getpwuid cannot be used. You may see warnings like the
 # following from the linker:
 # warning: Using 'getpwuid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
-if test "$enableallstatic" = yes ; then
-  enablegetpwuid_default=no
-fi
+AS_IF([test "$enableallstatic" = yes], [enablegetpwuid_default=no])
 
 # Let the user override the default (at their own risk).
 AC_ARG_ENABLE(getpwuid,
@@ -87,11 +83,11 @@ AC_ARG_ENABLE(getpwuid,
               enablegetpwuid=$enableval,
               enablegetpwuid=$enablegetpwuid_default)
 
-if test "$enablegetpwuid" != no ; then
-  AC_DEFINE(HAVE_GETPWUID, 1,
-           [Flag indicating if the library should be built with calls to getpwuid()])
-  AC_MSG_RESULT(<<< Configuring library with getpwuid >>>)
-fi
+AS_IF([test "$enablegetpwuid" != no],
+      [
+        AC_DEFINE(HAVE_GETPWUID, 1, [Flag indicating if the library should be built with calls to getpwuid()])
+        AC_MSG_RESULT(<<< Configuring library with getpwuid >>>)
+      ])
 # --------------------------------------------------------------
 
 
@@ -105,11 +101,11 @@ AC_ARG_ENABLE(exceptions,
               enableexceptions=$enableval,
               enableexceptions=yes)
 
-if test "$enableexceptions" != no ; then
-  AC_DEFINE(ENABLE_EXCEPTIONS, 1,
-           [Flag indicating if the library should be built to throw C++ exceptions on unexpected errors])
-  AC_MSG_RESULT(<<< Configuring library with exception throwing support >>>)
-fi
+AS_IF([test "$enableexceptions" != no],
+      [
+        AC_DEFINE(ENABLE_EXCEPTIONS, 1, [Flag indicating if the library should be built to throw C++ exceptions on unexpected errors])
+        AC_MSG_RESULT(<<< Configuring library with exception throwing support >>>)
+      ])
 # --------------------------------------------------------------
 
 
@@ -125,11 +121,11 @@ AC_ARG_ENABLE(timestamps,
               enabletimestamps=$enableval,
               enabletimestamps=yes)
 
-if test "$enabletimestamps" != no ; then
-  AC_DEFINE(ENABLE_TIMESTAMPS, 1,
-           [Flag indicating if the library should be built with compile time and date timestamps])
-  AC_MSG_RESULT(<<< Configuring library with compile timestamps >>>)
-fi
+AS_IF([test "$enabletimestamps" != no],
+      [
+        AC_DEFINE(ENABLE_TIMESTAMPS, 1, [Flag indicating if the library should be built with compile time and date timestamps])
+        AC_MSG_RESULT(<<< Configuring library with compile timestamps >>>)
+      ])
 # --------------------------------------------------------------
 
 
@@ -200,16 +196,14 @@ AC_CHECK_HEADERS(sys/utsname.h)
 AC_ARG_ENABLE(unordered-containers,
               AS_HELP_STRING([--disable-unordered-containers],
                              [Use map/set instead of unordered_map/unordered_set (no longer supported)]),
-                             [case "${enableval}" in
-                               yes) enableunorderedcontainers=yes ;;
-                                no)  AC_MSG_ERROR(libMesh now requires unordered containers) ;;
-                                 *)   AC_MSG_ERROR(bad value ${enableval} for --disable-unordered-containers) ;;
-                              esac],
+              [AS_CASE("${enableval}",
+                       [yes], [enableunorderedcontainers=yes],
+                       [no],  [AC_MSG_ERROR(libMesh now requires unordered containers)],
+                       [AC_MSG_ERROR(bad value ${enableval} for --disable-unordered-containers)])],
               [enableunorderedcontainers=irrelevant])
 
-if (test $enableunorderedcontainers != irrelevant) ; then
-  AC_MSG_WARN([--enable/disable-unordered-containers are now deprecated])
-fi
+AS_IF([test $enableunorderedcontainers != irrelevant],
+      [AC_MSG_WARN([--enable/disable-unordered-containers are now deprecated])])
 enableunorderedcontainers=yes
 
 # The following routines, defined in unordered.m4, check to see if
@@ -232,9 +226,8 @@ AC_DEFINE(DEFINE_HASH_POINTERS,,[workaround for potentially missing hash<T*>])
 AX_CXX_DLOPEN
 
 dnl Set preprocessor macro if the test code succeeded
-if (test "$ac_cv_cxx_dlopen" = yes); then
-  AC_DEFINE(HAVE_DLOPEN, 1, [define if the compiler supports dlopen/dlsym/dlclose])
-fi
+AS_IF([test "$ac_cv_cxx_dlopen" = yes],
+      [AC_DEFINE(HAVE_DLOPEN, 1, [define if the compiler supports dlopen/dlsym/dlclose])])
 
 AX_CXX_GCC_ABI_DEMANGLE
 AX_CXX_GLIBC_BACKTRACE

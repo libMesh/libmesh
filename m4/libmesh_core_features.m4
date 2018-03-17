@@ -34,10 +34,11 @@ AC_ARG_ENABLE(unique-ptr,
               enableuniqueptr=$enableval,
               enableuniqueptr=irrelevant)
 
-if test "$enableuniqueptr" != irrelevant ; then
-  enableuniqueptr=yes
-  AC_MSG_WARN([--enable/disable-unique-ptr are now deprecated])
-fi
+AS_IF([test "$enableuniqueptr" != irrelevant],
+      [
+        enableuniqueptr=yes
+        AC_MSG_WARN([--enable/disable-unique-ptr are now deprecated])
+      ])
 
 # Keep #define and Makefile variables around for backwards compatibility.
 AC_SUBST(enableuniqueptr)
@@ -54,14 +55,15 @@ AC_ARG_ENABLE(warnings,
               enablewarnings=yes)
 
 AC_SUBST(enablewarnings)
-if test "$enablewarnings" != yes ; then
-  AC_MSG_RESULT([>>> INFO: Disabling library warnings <<<])
-  AC_MSG_RESULT([>>> Configuring library without warnings <<<])
-else
-  AC_MSG_RESULT([<<< Configuring library with warnings >>>])
-  AC_DEFINE(ENABLE_WARNINGS, 1,
-           [Flag indicating if the library should have warnings enabled])
-fi
+AS_IF([test "$enablewarnings" != yes],
+      [
+        AC_MSG_RESULT([>>> INFO: Disabling library warnings <<<])
+        AC_MSG_RESULT([>>> Configuring library without warnings <<<])
+      ],
+      [
+        AC_MSG_RESULT([<<< Configuring library with warnings >>>])
+        AC_DEFINE(ENABLE_WARNINGS, 1, [Flag indicating if the library should have warnings enabled])
+      ])
 # --------------------------------------------------------------
 
 
@@ -74,14 +76,15 @@ AC_ARG_ENABLE(deprecated,
               enabledeprecated=yes)
 
 AC_SUBST(enabledeprecated)
-if test "$enabledeprecated" != yes ; then
-  AC_MSG_RESULT([>>> INFO: Disabling library deprecated code <<<])
-  AC_MSG_RESULT([>>> Configuring library without deprecated code support <<<])
-else
-  AC_MSG_RESULT([<<< Configuring library with deprecated code support >>>])
-  AC_DEFINE(ENABLE_DEPRECATED, 1,
-           [Flag indicating if the library should support deprecated code])
-fi
+AS_IF([test "$enabledeprecated" != yes],
+      [
+        AC_MSG_RESULT([>>> INFO: Disabling library deprecated code <<<])
+        AC_MSG_RESULT([>>> Configuring library without deprecated code support <<<])
+      ],
+      [
+        AC_MSG_RESULT([<<< Configuring library with deprecated code support >>>])
+        AC_DEFINE(ENABLE_DEPRECATED, 1, [Flag indicating if the library should support deprecated code])
+      ])
 # --------------------------------------------------------------
 
 
@@ -94,11 +97,11 @@ AC_ARG_ENABLE(blocked-storage,
               enableblockedstorage=$enableval,
               enableblockedstorage=no)
 
-if test "$enableblockedstorage" != no ; then
-  AC_MSG_RESULT([<<< Configuring library to use blocked storage data structures >>>])
-  AC_DEFINE(ENABLE_BLOCKED_STORAGE, 1,
-           [Flag indicating if the library should use blocked matrix/vector storage])
-fi
+AS_IF([test "$enableblockedstorage" != no],
+      [
+        AC_MSG_RESULT([<<< Configuring library to use blocked storage data structures >>>])
+        AC_DEFINE(ENABLE_BLOCKED_STORAGE, 1, [Flag indicating if the library should use blocked matrix/vector storage])
+      ])
 # --------------------------------------------------------------
 
 
@@ -111,14 +114,15 @@ AC_ARG_ENABLE(default-comm-world,
               enabledefaultcommworld=no)
 
 AC_SUBST(enabledefaultcommworld)
-if test "$enabledefaultcommworld" != no ; then
-  AC_MSG_RESULT([>>> WARNING: using a legacy option <<<])
-  AC_MSG_RESULT([>>> Configuring library to enable a default libMesh::CommWorld <<<])
-else
-  AC_MSG_RESULT([<<< Configuring library to disable libMesh::CommWorld >>>])
-  AC_DEFINE(DISABLE_COMMWORLD, 1,
-           [Flag indicating if the library should disable libMesh::CommWorld])
-fi
+AS_IF([test "$enabledefaultcommworld" != no],
+      [
+        AC_MSG_RESULT([>>> WARNING: using a legacy option <<<])
+        AC_MSG_RESULT([>>> Configuring library to enable a default libMesh::CommWorld <<<])
+      ],
+      [
+        AC_MSG_RESULT([<<< Configuring library to disable libMesh::CommWorld >>>])
+        AC_DEFINE(DISABLE_COMMWORLD, 1, [Flag indicating if the library should disable libMesh::CommWorld])
+      ])
 # --------------------------------------------------------------
 
 
@@ -131,12 +135,12 @@ AC_ARG_ENABLE(legacy-include-paths,
               enablelegacyincludepaths=no)
 
 AC_SUBST(enablelegacyincludepaths)
-if test "$enablelegacyincludepaths" != no ; then
-  AC_MSG_RESULT([>>> WARNING: using a legacy option <<<])
-  AC_MSG_RESULT([>>> Configuring library to dump old header paths into include args <<<])
-else
-  AC_MSG_RESULT([<<< Configuring library to require ``include "libmesh/etc.h"'' style >>>])
-fi
+AS_IF([test "$enablelegacyincludepaths" != no],
+      [
+        AC_MSG_RESULT([>>> WARNING: using a legacy option <<<])
+        AC_MSG_RESULT([>>> Configuring library to dump old header paths into include args <<<])
+      ],
+      [AC_MSG_RESULT([<<< Configuring library to require ``include "libmesh/etc.h"'' style >>>])])
 # --------------------------------------------------------------
 
 
@@ -148,14 +152,15 @@ AC_ARG_ENABLE(legacy-using-namespace,
               enablelegacyusingnamespace=$enableval,
               enablelegacyusingnamespace=no)
 
-if test "$enablelegacyusingnamespace" != no ; then
-  AC_MSG_RESULT([>>> WARNING: using a legacy option <<<])
-  AC_MSG_RESULT([>>> Configuring library to dump names into global namespace <<<])
-else
-  AC_MSG_RESULT([<<< Configuring library to keep names in libMesh namespace >>>])
-  AC_DEFINE(REQUIRE_SEPARATE_NAMESPACE, 1,
-           [Flag indicating if the library should keep names in libMesh namespace])
-fi
+AS_IF([test "$enablelegacyusingnamespace" != no],
+      [
+        AC_MSG_RESULT([>>> WARNING: using a legacy option <<<])
+        AC_MSG_RESULT([>>> Configuring library to dump names into global namespace <<<])
+      ],
+      [
+        AC_MSG_RESULT([<<< Configuring library to keep names in libMesh namespace >>>])
+        AC_DEFINE(REQUIRE_SEPARATE_NAMESPACE, 1, [Flag indicating if the library should keep names in libMesh namespace])
+      ])
 # --------------------------------------------------------------
 
 
@@ -169,17 +174,16 @@ AC_ARG_WITH([boundary_id_bytes],
             [boundary_bytes="$withval"],
             [boundary_bytes=2])
 
-case "$boundary_bytes" in
-    1) AC_DEFINE(BOUNDARY_ID_BYTES, 1, [size of boundary_id]) ;;
-    2) AC_DEFINE(BOUNDARY_ID_BYTES, 2, [size of boundary_id]) ;;
-    4) AC_DEFINE(BOUNDARY_ID_BYTES, 4, [size of boundary_id]) ;;
-    8) AC_DEFINE(BOUNDARY_ID_BYTES, 8, [size of boundary_id]) ;;
-    *)
-      AC_MSG_RESULT([>>> unrecognized boundary_id size: $boundary_bytes - configuring size...2])
-      AC_DEFINE(BOUNDARY_ID_BYTES, 2, [size of boundary_id])
-      boundary_bytes=2
-      ;;
-esac
+AS_CASE("$boundary_bytes",
+        [1], [AC_DEFINE(BOUNDARY_ID_BYTES, 1, [size of boundary_id])],
+        [2], [AC_DEFINE(BOUNDARY_ID_BYTES, 2, [size of boundary_id])],
+        [4], [AC_DEFINE(BOUNDARY_ID_BYTES, 4, [size of boundary_id])],
+        [8], [AC_DEFINE(BOUNDARY_ID_BYTES, 8, [size of boundary_id])],
+        [
+          AC_MSG_RESULT([>>> unrecognized boundary_id size: $boundary_bytes - configuring size...2])
+          AC_DEFINE(BOUNDARY_ID_BYTES, 2, [size of boundary_id])
+          boundary_bytes=2
+        ])
 
 AC_MSG_RESULT([configuring size of boundary_id... $boundary_bytes])
 # -------------------------------------------------------------
@@ -195,17 +199,16 @@ AC_ARG_WITH([dof_id_bytes],
             [dof_bytes="$withval"],
             [dof_bytes=4])
 
-case "$dof_bytes" in
-    1) AC_DEFINE(DOF_ID_BYTES, 1, [size of dof_id]) ;;
-    2) AC_DEFINE(DOF_ID_BYTES, 2, [size of dof_id]) ;;
-    4) AC_DEFINE(DOF_ID_BYTES, 4, [size of dof_id]) ;;
-    8) AC_DEFINE(DOF_ID_BYTES, 8, [size of dof_id]) ;;
-    *)
-      AC_MSG_RESULT([>>> unrecognized dof_id size: $dof_bytes - configuring size...4])
-      AC_DEFINE(DOF_ID_BYTES, 4, [size of dof_id])
-      dof_bytes=4
-      ;;
-esac
+AS_CASE("$dof_bytes",
+        [1], [AC_DEFINE(DOF_ID_BYTES, 1, [size of dof_id])],
+        [2], [AC_DEFINE(DOF_ID_BYTES, 2, [size of dof_id])],
+        [4], [AC_DEFINE(DOF_ID_BYTES, 4, [size of dof_id])],
+        [8], [AC_DEFINE(DOF_ID_BYTES, 8, [size of dof_id])],
+        [
+          AC_MSG_RESULT([>>> unrecognized dof_id size: $dof_bytes - configuring size...4])
+          AC_DEFINE(DOF_ID_BYTES, 4, [size of dof_id])
+          dof_bytes=4
+        ])
 
 AC_MSG_RESULT([configuring size of dof_id... $dof_bytes])
 # -------------------------------------------------------------
@@ -221,17 +224,16 @@ AC_ARG_WITH([processor_id_bytes],
             [processor_bytes="$withval"],
             [processor_bytes=2])
 
-case "$processor_bytes" in
-    1) AC_DEFINE(PROCESSOR_ID_BYTES, 1, [size of processor_id]) ;;
-    2) AC_DEFINE(PROCESSOR_ID_BYTES, 2, [size of processor_id]) ;;
-    4) AC_DEFINE(PROCESSOR_ID_BYTES, 4, [size of processor_id]) ;;
-    8) AC_DEFINE(PROCESSOR_ID_BYTES, 8, [size of processor_id]) ;;
-    *)
-      AC_MSG_RESULT([>>> unrecognized processor_id size: $processor_bytes - configuring size...2])
-      AC_DEFINE(PROCESSOR_ID_BYTES, 2, [size of processor_id])
-      processor_bytes=2
-      ;;
-esac
+AS_CASE("$processor_bytes",
+        [1], [AC_DEFINE(PROCESSOR_ID_BYTES, 1, [size of processor_id])],
+        [2], [AC_DEFINE(PROCESSOR_ID_BYTES, 2, [size of processor_id])],
+        [4], [AC_DEFINE(PROCESSOR_ID_BYTES, 4, [size of processor_id])],
+        [8], [AC_DEFINE(PROCESSOR_ID_BYTES, 8, [size of processor_id])],
+        [
+          AC_MSG_RESULT([>>> unrecognized processor_id size: $processor_bytes - configuring size...2])
+          AC_DEFINE(PROCESSOR_ID_BYTES, 2, [size of processor_id])
+          processor_bytes=2
+        ])
 
 AC_MSG_RESULT([configuring size of processor_id... $processor_bytes])
 # -------------------------------------------------------------
@@ -247,17 +249,16 @@ AC_ARG_WITH([subdomain_id_bytes],
             [subdomain_bytes="$withval"],
             [subdomain_bytes=2])
 
-case "$subdomain_bytes" in
-    1) AC_DEFINE(SUBDOMAIN_ID_BYTES, 1, [size of subdomain_id]) ;;
-    2) AC_DEFINE(SUBDOMAIN_ID_BYTES, 2, [size of subdomain_id]) ;;
-    4) AC_DEFINE(SUBDOMAIN_ID_BYTES, 4, [size of subdomain_id]) ;;
-    8) AC_DEFINE(SUBDOMAIN_ID_BYTES, 8, [size of subdomain_id]) ;;
-    *)
-      AC_MSG_RESULT([>>> unrecognized subdomain_id size: $subdomain_bytes - configuring size...2])
-      AC_DEFINE(SUBDOMAIN_ID_BYTES, 2, [size of subdomain_id])
-      subdomain_bytes=2
-      ;;
-esac
+AS_CASE("$subdomain_bytes",
+        [1], [AC_DEFINE(SUBDOMAIN_ID_BYTES, 1, [size of subdomain_id])],
+        [2], [AC_DEFINE(SUBDOMAIN_ID_BYTES, 2, [size of subdomain_id])],
+        [4], [AC_DEFINE(SUBDOMAIN_ID_BYTES, 4, [size of subdomain_id])],
+        [8], [AC_DEFINE(SUBDOMAIN_ID_BYTES, 8, [size of subdomain_id])],
+        [
+          AC_MSG_RESULT([>>> unrecognized subdomain_id size: $subdomain_bytes - configuring size...2])
+          AC_DEFINE(SUBDOMAIN_ID_BYTES, 2, [size of subdomain_id])
+          subdomain_bytes=2
+        ])
 
 AC_MSG_RESULT([configuring size of subdomain_id... $subdomain_bytes])
 # -------------------------------------------------------------
@@ -291,18 +292,17 @@ AC_ARG_ENABLE(everything,
 AC_ARG_ENABLE(unique-id,
               AS_HELP_STRING([--enable-unique-id],
                              [build with unique id support]),
-              [case "${enableval}" in
-                yes)  enableuniqueid=yes ;;
-                no) enableuniqueid=no ;;
-                *) AC_MSG_ERROR(bad value ${enableval} for --enable-unique-id) ;;
-              esac],
+              [AS_CASE("${enableval}",
+                       [yes], [enableuniqueid=yes],
+                       [no],  [enableuniqueid=no],
+                       [AC_MSG_ERROR(bad value ${enableval} for --enable-unique-id)])],
               [enableuniqueid=$enableeverything])
 
-if test "$enableuniqueid" = yes ; then
-  AC_DEFINE(ENABLE_UNIQUE_ID, 1,
-           [Flag indicating if the library should be built with unique id support])
-  AC_MSG_RESULT(<<< Configuring library with unique id support >>>)
-fi
+AS_IF([test "$enableuniqueid" = yes],
+      [
+        AC_DEFINE(ENABLE_UNIQUE_ID, 1, [Flag indicating if the library should be built with unique id support])
+        AC_MSG_RESULT(<<< Configuring library with unique id support >>>)
+      ])
 # -------------------------------------------------------------
 
 
@@ -316,21 +316,19 @@ AC_ARG_WITH([unique_id_bytes],
             [unique_bytes="$withval"],
             [unique_bytes=8])
 
-case "$unique_bytes" in
-    1) AC_DEFINE(UNIQUE_ID_BYTES, 1, [size of unique_id]) ;;
-    2) AC_DEFINE(UNIQUE_ID_BYTES, 2, [size of unique_id]) ;;
-    4) AC_DEFINE(UNIQUE_ID_BYTES, 4, [size of unique_id]) ;;
-    8) AC_DEFINE(UNIQUE_ID_BYTES, 8, [size of unique_id]) ;;
-    *)
-      AC_MSG_RESULT([>>> unrecognized unique_id size: $unique_bytes - configuring size...8])
-      AC_DEFINE(UNIQUE_ID_BYTES, 8, [size of unique_id])
-      unique_bytes=8
-      ;;
-esac
+AS_CASE("$unique_bytes",
+        [1], [AC_DEFINE(UNIQUE_ID_BYTES, 1, [size of unique_id])],
+        [2], [AC_DEFINE(UNIQUE_ID_BYTES, 2, [size of unique_id])],
+        [4], [AC_DEFINE(UNIQUE_ID_BYTES, 4, [size of unique_id])],
+        [8], [AC_DEFINE(UNIQUE_ID_BYTES, 8, [size of unique_id])],
+        [
+          AC_MSG_RESULT([>>> unrecognized unique_id size: $unique_bytes - configuring size...8])
+          AC_DEFINE(UNIQUE_ID_BYTES, 8, [size of unique_id])
+          unique_bytes=8
+        ])
 
-if test "$enableuniqueid" = yes ; then
-   AC_MSG_RESULT([configuring size of unique_id... $unique_bytes])
-fi
+AS_IF([test "$enableuniqueid" = yes],
+      [AC_MSG_RESULT([configuring size of unique_id... $unique_bytes])])
 # -------------------------------------------------------------
 
 
@@ -344,11 +342,11 @@ AC_ARG_ENABLE(tracefiles,
               enabletracefiles=$enableval,
               enabletracefiles=$enableeverything)
 
-if test "$enabletracefiles" != no ; then
-  AC_DEFINE(ENABLE_TRACEFILES, 1,
-           [Flag indicating if the library should be built to write stack trace files on unexpected errors])
-  AC_MSG_RESULT(<<< Configuring library with stack trace file support >>>)
-fi
+AS_IF([test "$enabletracefiles" != no],
+      [
+        AC_DEFINE(ENABLE_TRACEFILES, 1, [Flag indicating if the library should be built to write stack trace files on unexpected errors])
+        AC_MSG_RESULT(<<< Configuring library with stack trace file support >>>)
+      ])
 # --------------------------------------------------------------
 
 
@@ -361,11 +359,11 @@ AC_ARG_ENABLE(amr,
               enableamr=$enableval,
               enableamr=yes)
 
-if test "$enableamr" != no ; then
-  AC_DEFINE(ENABLE_AMR, 1,
-           [Flag indicating if the library should be built with AMR support])
-  AC_MSG_RESULT(<<< Configuring library with AMR support >>>)
-fi
+AS_IF([test "$enableamr" != no],
+      [
+        AC_DEFINE(ENABLE_AMR, 1, [Flag indicating if the library should be built with AMR support])
+        AC_MSG_RESULT(<<< Configuring library with AMR support >>>)
+      ])
 # -------------------------------------------------------------
 
 
@@ -379,11 +377,11 @@ AC_ARG_ENABLE(vsmoother,
               enablevsmoother=$enableval,
               enablevsmoother=yes)
 
-if test "$enablevsmoother" != no ; then
-  AC_DEFINE(ENABLE_VSMOOTHER, 1,
-           [Flag indicating if the library should be built with variational smoother support])
-  AC_MSG_RESULT(<<< Configuring library with variational smoother support >>>)
-fi
+AS_IF([test "$enablevsmoother" != no],
+      [
+        AC_DEFINE(ENABLE_VSMOOTHER, 1, [Flag indicating if the library should be built with variational smoother support])
+        AC_MSG_RESULT(<<< Configuring library with variational smoother support >>>)
+      ])
 # -------------------------------------------------------------
 
 
@@ -397,11 +395,11 @@ AC_ARG_ENABLE(periodic,
               enableperiodic=$enableval,
               enableperiodic=yes)
 
-if test "$enableperiodic" != no ; then
-  AC_DEFINE(ENABLE_PERIODIC, 1,
-           [Flag indicating if the library should be built with periodic boundary condition support])
-  AC_MSG_RESULT(<<< Configuring library with periodic BC support >>>)
-fi
+AS_IF([test "$enableperiodic" != no],
+      [
+        AC_DEFINE(ENABLE_PERIODIC, 1, [Flag indicating if the library should be built with periodic boundary condition support])
+        AC_MSG_RESULT(<<< Configuring library with periodic BC support >>>)
+      ])
 # -------------------------------------------------------------
 
 
@@ -415,11 +413,11 @@ AC_ARG_ENABLE(dirichlet,
               enabledirichlet=$enableval,
               enabledirichlet=yes)
 
-if test "$enabledirichlet" != no ; then
-  AC_DEFINE(ENABLE_DIRICHLET, 1,
-           [Flag indicating if the library should be built with Dirichlet boundary constraint support])
-  AC_MSG_RESULT(<<< Configuring library with Dirichlet constraint support >>>)
-fi
+AS_IF([test "$enabledirichlet" != no],
+      [
+        AC_DEFINE(ENABLE_DIRICHLET, 1, [Flag indicating if the library should be built with Dirichlet boundary constraint support])
+        AC_MSG_RESULT(<<< Configuring library with Dirichlet constraint support >>>)
+      ])
 # -------------------------------------------------------------
 
 
@@ -433,11 +431,11 @@ AC_ARG_ENABLE(nodeconstraint,
               enablenodeconstraint=$enableval,
               enablenodeconstraint=$enableeverything)
 
-if test "$enablenodeconstraint" != no ; then
-  AC_DEFINE(ENABLE_NODE_CONSTRAINTS, 1,
-           [Flag indicating if the library should be built with node constraints support])
-  AC_MSG_RESULT(<<< Configuring library with node constraints support >>>)
-fi
+AS_IF([test "$enablenodeconstraint" != no],
+      [
+        AC_DEFINE(ENABLE_NODE_CONSTRAINTS, 1, [Flag indicating if the library should be built with node constraints support])
+        AC_MSG_RESULT(<<< Configuring library with node constraints support >>>)
+      ])
 # -------------------------------------------------------------
 
 
@@ -451,11 +449,11 @@ AC_ARG_ENABLE(parmesh,
               enableparmesh=$enableval,
               enableparmesh=no)
 
-if test "$enableparmesh" != no ; then
-  AC_DEFINE(ENABLE_PARMESH, 1,
-            [Flag indicating if the library should use the experimental ParallelMesh as its default Mesh type])
-  AC_MSG_RESULT(<<< Configuring library to use ParallelMesh >>>)
-fi
+AS_IF([test "$enableparmesh" != no],
+      [
+        AC_DEFINE(ENABLE_PARMESH, 1, [Flag indicating if the library should use the experimental ParallelMesh as its default Mesh type])
+        AC_MSG_RESULT(<<< Configuring library to use ParallelMesh >>>)
+      ])
 # -------------------------------------------------------------
 
 
@@ -469,11 +467,11 @@ AC_ARG_ENABLE(ghosted,
               enableghosted=$enableval,
               enableghosted=yes)
 
-if test "$enableghosted" != no ; then
-  AC_DEFINE(ENABLE_GHOSTED, 1,
-            [Flag indicating if the library should use ghosted local vectors])
-  AC_MSG_RESULT(<<< Configuring library to use ghosted local vectors >>>)
-fi
+AS_IF([test "$enableghosted" != no],
+      [
+        AC_DEFINE(ENABLE_GHOSTED, 1, [Flag indicating if the library should use ghosted local vectors])
+        AC_MSG_RESULT(<<< Configuring library to use ghosted local vectors >>>)
+      ])
 # -------------------------------------------------------------
 
 
@@ -488,11 +486,11 @@ AC_ARG_ENABLE(node-valence,
               enablenodevalence=$enableval,
               enablenodevalence=yes)
 
-if test "$enablenodevalence" != no ; then
-  AC_DEFINE(ENABLE_NODE_VALENCE, 1,
-            [Flag indicating if the library should compute and store node valence values])
-  AC_MSG_RESULT(<<< Configuring library to store node valence >>>)
-fi
+AS_IF([test "$enablenodevalence" != no],
+      [
+        AC_DEFINE(ENABLE_NODE_VALENCE, 1, [Flag indicating if the library should compute and store node valence values])
+        AC_MSG_RESULT(<<< Configuring library to store node valence >>>)
+      ])
 # -------------------------------------------------------------
 
 
@@ -512,18 +510,11 @@ AC_ARG_ENABLE(2D-only,
               enable2D=$enableval,
               enable2D=no)
 
-if test "$enable2D" != no ; then
-  AC_DEFINE(DIM, 2,
-           [Integer indicating the highest spatial dimension supported by libMesh])
-  AC_MSG_RESULT(<<< Configuring library for 1D/2D meshes only >>>)
-elif test "$enable1D" != no ; then
-  AC_DEFINE(DIM, 1,
-           [Integer indicating the highest spatial dimension supported by libMesh])
-  AC_MSG_RESULT(<<< Configuring library for 1D meshes only >>>)
-else
-  AC_DEFINE(DIM, 3,
-           [Integer indicating the highest spatial dimension supported by libMesh])
-fi
+AS_IF([test "$enable2D" != no], [AC_DEFINE(DIM, 2, [Integer indicating the highest spatial dimension supported by libMesh])
+                                 AC_MSG_RESULT(<<< Configuring library for 1D/2D meshes only >>>)],
+      [test "$enable1D" != no], [AC_DEFINE(DIM, 1, [Integer indicating the highest spatial dimension supported by libMesh])
+                                 AC_MSG_RESULT(<<< Configuring library for 1D meshes only >>>)],
+      [AC_DEFINE(DIM, 3, [Integer indicating the highest spatial dimension supported by libMesh])])
 # -------------------------------------------------------------
 
 
@@ -537,11 +528,11 @@ AC_ARG_ENABLE(pfem,
               enablepfem=$enableval,
               enablepfem=yes)
 
-if test "$enablepfem" != no ; then
-  AC_DEFINE(ENABLE_HIGHER_ORDER_SHAPES, 1,
-           [Flag indicating if the library should offer higher order p-FEM shapes])
-  AC_MSG_RESULT(<<< Configuring library with higher order p-FEM shapes >>>)
-fi
+AS_IF([test "$enablepfem" != no],
+      [
+        AC_DEFINE(ENABLE_HIGHER_ORDER_SHAPES, 1, [Flag indicating if the library should offer higher order p-FEM shapes])
+        AC_MSG_RESULT(<<< Configuring library with higher order p-FEM shapes >>>)
+      ])
 # -------------------------------------------------------------
 
 
@@ -555,11 +546,11 @@ AC_ARG_ENABLE(ifem,
               enableifem=$enableval,
               enableifem=$enableeverything)
 
-if test "$enableifem" != no ; then
-  AC_DEFINE(ENABLE_INFINITE_ELEMENTS, 1,
-           [Flag indicating if the library should be built with infinite elements])
-  AC_MSG_RESULT(<<< Configuring library with infinite elements >>>)
-fi
+AS_IF([test "$enableifem" != no],
+      [
+        AC_DEFINE(ENABLE_INFINITE_ELEMENTS, 1, [Flag indicating if the library should be built with infinite elements])
+        AC_MSG_RESULT(<<< Configuring library with infinite elements >>>)
+      ])
 
 AM_CONDITIONAL(LIBMESH_ENABLE_INFINITE_ELEMENTS, test x$enableifem != no )
 
@@ -576,11 +567,11 @@ AC_ARG_ENABLE(second,
               enablesecond=$enableval,
               enablesecond=yes)
 
-if test "$enablesecond" != no ; then
-  AC_DEFINE(ENABLE_SECOND_DERIVATIVES, 1,
-           [Flag indicating if the library should be built with second derivatives])
-  AC_MSG_RESULT(<<< Configuring library with second derivatives >>>)
-fi
+AS_IF([test "$enablesecond" != no],
+      [
+        AC_DEFINE(ENABLE_SECOND_DERIVATIVES, 1, [Flag indicating if the library should be built with second derivatives])
+        AC_MSG_RESULT(<<< Configuring library with second derivatives >>>)
+      ])
 # -------------------------------------------------------------
 
 
@@ -594,14 +585,14 @@ AC_ARG_ENABLE(xdr,
               enablexdr=$enableval,
               enablexdr=yes)
 
-if test "$enablexdr" != no ; then
+AS_IF([test "$enablexdr" != no],
+      [
    AC_CHECK_HEADERS(rpc/rpc.h,
                     [
                      AC_CHECK_FUNC(xdrstdio_create,
                                    [
-                                     AC_DEFINE(HAVE_XDR, 1,
-                                               [Flag indicating headers and libraries for XDR IO are available])
-                                     echo "<<< Configuring library with XDR support >>>"
+                                     AC_DEFINE(HAVE_XDR, 1, [Flag indicating headers and libraries for XDR IO are available])
+                                     AC_MSG_RESULT(<<< Configuring library with XDR support >>>)
                                    ],
                                    [enablexdr=no])
                     ],
@@ -610,15 +601,14 @@ if test "$enablexdr" != no ; then
                                        [
                                         AC_CHECK_FUNC(xdrstdio_create,
                                                       [
-                                                        AC_DEFINE(HAVE_XDR, 1,
-                                                                  [Flag indicating headers and libraries for XDR IO are available])
-                                                        echo "<<< Configuring library with XDR support >>>"
+                                                        AC_DEFINE(HAVE_XDR, 1, [Flag indicating headers and libraries for XDR IO are available])
+                                                        AC_MSG_RESULT(<<< Configuring library with XDR support >>>)
                                                       ],
                                                       [enablexdr=no])
                                        ],
                                        [enablexdr=no])
                      ])
-fi
+      ])
 # -------------------------------------------------------------
 
 
@@ -629,23 +619,21 @@ fi
 AC_ARG_ENABLE(complex,
               AS_HELP_STRING([--enable-complex],
                              [build to support complex-number solutions]),
-              [case "${enableval}" in
-                yes)  enablecomplex=yes ;;
-                no)  enablecomplex=no ;;
-                *)  AC_MSG_ERROR(bad value ${enableval} for --enable-complex) ;;
-              esac],
+              [AS_CASE("${enableval}",
+                       [yes], [enablecomplex=yes],
+                       [no],  [enablecomplex=no],
+                       [AC_MSG_ERROR(bad value ${enableval} for --enable-complex)])],
               [enablecomplex=no])
 
-if test "$enablecomplex" != no ; then
-  AC_DEFINE(USE_COMPLEX_NUMBERS, 1,
-     [Flag indicating if the library should be built using complex numbers])
-  AC_MSG_RESULT(<<< Configuring library with complex number support >>>)
-
-else
-  AC_DEFINE(USE_REAL_NUMBERS, 1,
-     [Flag indicating if the library should be built using real numbers])
-  AC_MSG_RESULT(<<< Configuring library with real number support >>>)
-fi
+AS_IF([test "$enablecomplex" != no],
+      [
+        AC_DEFINE(USE_COMPLEX_NUMBERS, 1, [Flag indicating if the library should be built using complex numbers])
+        AC_MSG_RESULT(<<< Configuring library with complex number support >>>)
+      ],
+      [
+        AC_DEFINE(USE_REAL_NUMBERS, 1, [Flag indicating if the library should be built using real numbers])
+        AC_MSG_RESULT(<<< Configuring library with real number support >>>)
+      ])
 
 AM_CONDITIONAL(LIBMESH_ENABLE_COMPLEX, test x$enablecomplex = xyes)
 # -------------------------------------------------------------
@@ -661,15 +649,12 @@ AC_ARG_ENABLE(reference-counting,
               enablerefct=$enableval,
               enablerefct=yes)
 
-if test "$enablerefct" != no ; then
-  if test "$ac_cv_cxx_rtti" = yes; then
-    AC_DEFINE(ENABLE_REFERENCE_COUNTING, 1,
-             [Flag indicating if the library should be built with reference counting support])
-    AC_MSG_RESULT(<<< Configuring library with reference counting support >>>)
-  else
-    AC_MSG_RESULT(<<< No RTTI: disabling reference counting support >>>)
-  fi
-fi
+AS_IF([test "x$enablerefct" != xno -a "x$ac_cv_cxx_rtti" = xyes],
+      [
+        AC_DEFINE(ENABLE_REFERENCE_COUNTING, 1, [Flag indicating if the library should be built with reference counting support])
+        AC_MSG_RESULT(<<< Configuring library with reference counting support >>>)
+      ],
+      [AC_MSG_RESULT(<<< No RTTI: disabling reference counting support >>>)])
 # -------------------------------------------------------------
 
 
@@ -683,11 +668,11 @@ AC_ARG_ENABLE(perflog,
               enableperflog=$enableval,
               enableperflog=$enableeverything)
 
-if test "$enableperflog" != no ; then
-  AC_DEFINE(ENABLE_PERFORMANCE_LOGGING, 1,
-           [Flag indicating if the library should be built with performance logging support])
-  AC_MSG_RESULT(<<< Configuring library with performance logging support >>>)
-fi
+AS_IF([test "$enableperflog" != no],
+      [
+        AC_DEFINE(ENABLE_PERFORMANCE_LOGGING, 1, [Flag indicating if the library should be built with performance logging support])
+        AC_MSG_RESULT(<<< Configuring library with performance logging support >>>)
+      ])
 # ------------------------------------------------------------
 
 
@@ -698,16 +683,14 @@ fi
 AC_ARG_ENABLE(examples,
               AS_HELP_STRING([--disable-examples],
                              [Do not compile, install, or test with example suite]),
-              [case "${enableval}" in
-                yes)  enableexamples=yes ;;
-                no)  enableexamples=no ;;
-                *)  AC_MSG_ERROR(bad value ${enableval} for --enable-examples) ;;
-              esac],
+              [AS_CASE("${enableval}",
+                       [yes], [enableexamples=yes],
+                       [no],  [enableexamples=no],
+                       [AC_MSG_ERROR(bad value ${enableval} for --enable-examples)])],
               [enableexamples=yes])
 
-if test "$enableexamples" = yes ; then
-  AC_MSG_RESULT(<<< Configuring library example suite support >>>)
-fi
+AS_IF([test "$enableexamples" = yes],
+      [AC_MSG_RESULT(<<< Configuring library example suite support >>>)])
 AM_CONDITIONAL(LIBMESH_ENABLE_EXAMPLES, test x$enableexamples = xyes)
 # ------------------------------------------------------------
 
