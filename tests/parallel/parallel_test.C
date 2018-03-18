@@ -400,18 +400,20 @@ public:
       TestCommWorld->size();
 
     std::vector<unsigned int> src_val(3), recv_val(3);
+    std::string recv_val_str;
 
     src_val[0] = 0;
     src_val[1] = 1;
     src_val[2] = 2;
 
-    Parallel::Request request;
+    Parallel::Request request, request_str;
 
     if (TestCommWorld->size() > 1)
       {
         // Default communication
         TestCommWorld->send_mode(Parallel::Communicator::DEFAULT);
 
+        // Numbers
         TestCommWorld->receive (procdown,
                                 recv_val,
                                 request);
@@ -425,6 +427,19 @@ public:
 
         for (std::size_t i=0; i<src_val.size(); i++)
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
+
+        // Strings
+        // Nonblocking
+        TestCommWorld->receive (procdown,
+                                recv_val_str,
+                                request_str);
+
+        TestCommWorld->send (procup,
+                             _number[0]);
+
+        Parallel::wait (request_str);
+
+        CPPUNIT_ASSERT_EQUAL( recv_val_str, _number[0] );
 
         // Synchronous communication
         TestCommWorld->send_mode(Parallel::Communicator::SYNCHRONOUS);
