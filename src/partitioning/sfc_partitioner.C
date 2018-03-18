@@ -89,39 +89,30 @@ void SFCPartitioner::partition_range(MeshBase & mesh,
   std::vector<int>    table  (n_range_elem);
 
   // Map the range's element ids into a contiguous range.
-  {
-    MeshBase::element_iterator it = beg;
-    dof_id_type el_num = 0;
+  dof_id_type el_num = 0;
 
-    for (; it != end; ++it)
-      {
-        libmesh_assert_less ((*it)->id(), forward_map.size());
-        libmesh_assert_less (el_num, reverse_map.size());
+  for (auto & elem : as_range(beg, end))
+    {
+      libmesh_assert_less (elem->id(), forward_map.size());
+      libmesh_assert_less (el_num, reverse_map.size());
 
-        forward_map[(*it)->id()] = el_num;
-        reverse_map[el_num] = *it;
-        el_num++;
-      }
-    libmesh_assert_equal_to (el_num, n_range_elem);
-  }
+      forward_map[elem->id()] = el_num;
+      reverse_map[el_num] = elem;
+      el_num++;
+    }
+  libmesh_assert_equal_to (el_num, n_range_elem);
 
   // Get the centroid for each range element.
-  {
-    MeshBase::element_iterator it = beg;
+  for (const auto & elem : as_range(beg, end))
+    {
+      libmesh_assert_less (elem->id(), forward_map.size());
 
-    for (; it != end; ++it)
-      {
-        const Elem * elem = *it;
+      const Point p = elem->centroid();
 
-        libmesh_assert_less (elem->id(), forward_map.size());
-
-        const Point p = elem->centroid();
-
-        x[forward_map[elem->id()]] = p(0);
-        y[forward_map[elem->id()]] = p(1);
-        z[forward_map[elem->id()]] = p(2);
-      }
-  }
+      x[forward_map[elem->id()]] = p(0);
+      y[forward_map[elem->id()]] = p(1);
+      z[forward_map[elem->id()]] = p(2);
+    }
 
   // We need an integer reference to pass to the Sfc interface.
   int size = static_cast<int>(n_range_elem);

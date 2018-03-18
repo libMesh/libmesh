@@ -1939,22 +1939,19 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
       // element id this is not necessarily guaranteed.
       std::sort (dof_bc_data.begin(), dof_bc_data.end());
 
-      MeshBase::const_element_iterator
-        it  = mesh.level_elements_begin(0),
-        end = mesh.level_elements_end(0);
-
       // Look for BCs in this block for all the level-0 elements we have
       // (not just local ones).  Do this by finding all the entries
       // in dof_bc_data whose elem_id match the ID of the current element.
       // We cannot rely on libmesh_nullptr neighbors at this point since the neighbor
       // data structure has not been initialized.
-      for (; it!=end; ++it)
+      for (const auto & elem :
+             as_range(mesh.level_elements_begin(0),
+                      mesh.level_elements_end(0)))
         {
-          std::pair<std::vector<DofBCData>::iterator,
-                    std::vector<DofBCData>::iterator> bounds =
+          auto bounds =
             std::equal_range (dof_bc_data.begin(),
                               dof_bc_data.end(),
-                              (*it)->id()
+                              elem->id()
 #if defined(__SUNPRO_CC) || defined(__PGI)
                               , CompareIntDofBCData()
 #endif
@@ -1962,24 +1959,24 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
 
           for (const auto & data : as_range(bounds))
             {
-              libmesh_assert_equal_to (data.dof_id, (*it)->id());
+              libmesh_assert_equal_to (data.dof_id, elem->id());
 
               if (bc_type == "side")
                 {
-                  libmesh_assert_less (data.side, (*it)->n_sides());
-                  boundary_info.add_side (*it, data.side, data.bc_id);
+                  libmesh_assert_less (data.side, elem->n_sides());
+                  boundary_info.add_side (elem, data.side, data.bc_id);
                 }
               else if (bc_type == "edge")
                 {
-                  libmesh_assert_less (data.side, (*it)->n_edges());
-                  boundary_info.add_edge (*it, data.side, data.bc_id);
+                  libmesh_assert_less (data.side, elem->n_edges());
+                  boundary_info.add_edge (elem, data.side, data.bc_id);
                 }
               else if (bc_type == "shellface")
                 {
                   // Shell face IDs can only be 0 or 1.
                   libmesh_assert_less(data.side, 2);
 
-                  boundary_info.add_shellface (*it, data.side, data.bc_id);
+                  boundary_info.add_shellface (elem, data.side, data.bc_id);
                 }
               else
                 {

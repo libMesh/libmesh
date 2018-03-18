@@ -130,12 +130,8 @@ void CentroidPartitioner::compute_centroids (MeshBase::element_iterator it,
 {
   _elem_centroids.clear();
 
-  for (; it != end; ++it)
-    {
-      Elem * elem = *it;
-
-      _elem_centroids.push_back(std::make_pair(elem->centroid(), elem));
-    }
+  for (auto & elem : as_range(it, end))
+    _elem_centroids.push_back(std::make_pair(elem->centroid(), elem));
 }
 
 

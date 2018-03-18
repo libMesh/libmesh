@@ -54,9 +54,8 @@ void LinearPartitioner::partition_range(MeshBase & mesh,
       const dof_id_type blksize = std::distance(it, end) / n;
 
       dof_id_type e = 0;
-      for ( ; it != end; ++it)
+      for (auto & elem : as_range(it, end))
         {
-          Elem * elem = *it;
           if ((e/blksize) < n)
             elem->processor_id() = cast_int<processor_id_type>(e/blksize);
           else
@@ -74,8 +73,8 @@ void LinearPartitioner::partition_range(MeshBase & mesh,
   // performance.
   else
     {
-      for (; it != end; ++it)
-        element_ids.insert((*it)->id());
+      for (const auto & elem : as_range(it, end))
+        element_ids.insert(elem->id());
 
       mesh.comm().set_union(element_ids);
 

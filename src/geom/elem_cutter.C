@@ -280,22 +280,14 @@ void ElemCutter::cut_2D (const Elem & elem,
   // _outside_mesh_2D->write ("out_" + name.str());
 
   // finally, add the elements to our lists.
-  {
-    _inside_elem.clear(); /**/ _outside_elem.clear();
+  _inside_elem.clear();
+  _outside_elem.clear();
 
-    MeshBase::const_element_iterator
-      it  = _inside_mesh_2D->elements_begin(),
-      end = _inside_mesh_2D->elements_end();
+  for (const auto & elem : _inside_mesh_2D->element_ptr_range())
+    _inside_elem.push_back (elem);
 
-    for (; it!=end; ++it)
-      _inside_elem.push_back (*it);
-
-    it  = _outside_mesh_2D->elements_begin();
-    end = _outside_mesh_2D->elements_end();
-
-    for (; it!=end; ++it)
-      _outside_elem.push_back (*it);
-  }
+  for (const auto & elem : _outside_mesh_2D->element_ptr_range())
+    _outside_elem.push_back (elem);
 
 #endif
 }
@@ -369,24 +361,16 @@ void ElemCutter::cut_3D (const Elem & elem,
   _outside_mesh_3D->write ("out_" + name.str());
 
   // finally, add the elements to our lists.
-  {
-    _inside_elem.clear(); /**/ _outside_elem.clear();
+  _inside_elem.clear();
+  _outside_elem.clear();
 
-    MeshBase::const_element_iterator
-      it  = _inside_mesh_3D->elements_begin(),
-      end = _inside_mesh_3D->elements_end();
+  for (const auto & elem : _inside_mesh_3D->element_ptr_range())
+    if (elem->volume() > std::numeric_limits<Real>::epsilon())
+      _inside_elem.push_back (elem);
 
-    for (; it!=end; ++it)
-      if ((*it)->volume() > std::numeric_limits<Real>::epsilon())
-        _inside_elem.push_back (*it);
-
-    it  = _outside_mesh_3D->elements_begin();
-    end = _outside_mesh_3D->elements_end();
-
-    for (; it!=end; ++it)
-      if ((*it)->volume() > std::numeric_limits<Real>::epsilon())
-        _outside_elem.push_back (*it);
-  }
+  for (const auto & elem : _outside_mesh_3D->element_ptr_range())
+    if (elem->volume() > std::numeric_limits<Real>::epsilon())
+      _outside_elem.push_back (elem);
 
 #endif
 }

@@ -107,13 +107,10 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
 
     libmesh_assert_equal_to (global_index.size(), n_range_elem);
 
-    MeshBase::element_iterator it = beg;
-    for (std::size_t cnt=0; it != end; ++it)
-      {
-        const Elem * elem = *it;
+    std::size_t cnt=0;
+    for (const auto & elem : as_range(beg, end))
+      global_index_map.insert (std::make_pair(elem->id(), global_index[cnt++]));
 
-        global_index_map.insert (std::make_pair(elem->id(), global_index[cnt++]));
-      }
     libmesh_assert_equal_to (global_index_map.size(), n_range_elem);
   }
 
@@ -124,41 +121,36 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
   typedef std::unordered_multimap<const Elem *, const Elem *> map_type;
   map_type interior_to_boundary_map;
 
-  {
-    MeshBase::element_iterator it = beg;
-    for (; it != end; ++it)
-      {
-        const Elem * elem = *it;
+  for (const auto & elem : as_range(beg, end))
+    {
+      // If we don't have an interior_parent then there's nothing
+      // to look us up.
+      if ((elem->dim() >= LIBMESH_DIM) ||
+          !elem->interior_parent())
+        continue;
 
-        // If we don't have an interior_parent then there's nothing
-        // to look us up.
-        if ((elem->dim() >= LIBMESH_DIM) ||
-            !elem->interior_parent())
-          continue;
+      // get all relevant interior elements
+      std::set<const Elem *> neighbor_set;
+      elem->find_interior_neighbors(neighbor_set);
 
-        // get all relevant interior elements
-        std::set<const Elem *> neighbor_set;
-        elem->find_interior_neighbors(neighbor_set);
-
-        std::set<const Elem *>::iterator n_it = neighbor_set.begin();
-        for (; n_it != neighbor_set.end(); ++n_it)
-          {
-            // FIXME - non-const versions of the std::set<const Elem
-            // *> returning methods would be nice
-            Elem * neighbor = const_cast<Elem *>(*n_it);
+      std::set<const Elem *>::iterator n_it = neighbor_set.begin();
+      for (; n_it != neighbor_set.end(); ++n_it)
+        {
+          // FIXME - non-const versions of the std::set<const Elem
+          // *> returning methods would be nice
+          Elem * neighbor = const_cast<Elem *>(*n_it);
 
 #if defined(LIBMESH_HAVE_UNORDERED_MULTIMAP) ||         \
   defined(LIBMESH_HAVE_TR1_UNORDERED_MULTIMAP) ||       \
   defined(LIBMESH_HAVE_HASH_MULTIMAP) ||                \
   defined(LIBMESH_HAVE_EXT_HASH_MULTIMAP)
-            interior_to_boundary_map.insert(std::make_pair(neighbor, elem));
+          interior_to_boundary_map.insert(std::make_pair(neighbor, elem));
 #else
-            interior_to_boundary_map.insert(interior_to_boundary_map.begin(),
-                                            std::make_pair(neighbor, elem));
+          interior_to_boundary_map.insert(interior_to_boundary_map.begin(),
+                                          std::make_pair(neighbor, elem));
 #endif
-          }
-      }
-  }
+        }
+    }
 
   // Data structure that Metis will fill up on processor 0 and broadcast.
   std::vector<Metis::idx_t> part(n_range_elem);
@@ -202,11 +194,8 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
 
         // (1) first pass - get the row sizes for each element by counting the number
         // of face neighbors.  Also populate the vwght array if necessary
-        MeshBase::element_iterator it = beg;
-        for (; it != end; ++it)
+        for (const auto & elem : as_range(beg, end))
           {
-            const Elem * elem = *it;
-
             const dof_id_type elem_global_index =
               global_index_map[elem->id()];
 
@@ -316,12 +305,8 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
         csr_graph.prepare_for_use();
 
         // (2) second pass - fill the compressed adjacency array
-        it = beg;
-
-        for (; it != end; ++it)
+        for (const auto & elem : as_range(beg, end))
           {
-            const Elem * elem = *it;
-
             const dof_id_type elem_global_index =
               global_index_map[elem->id()];
 
@@ -487,24 +472,19 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
   // Assign the returned processor ids.  The part array contains
   // the processor id for each active element, but in terms of
   // the contiguous indexing we defined above
-  {
-    MeshBase::element_iterator it = beg;
-    for (; it!=end; ++it)
-      {
-        Elem * elem = *it;
+  for (auto & elem : as_range(beg, end))
+    {
+      libmesh_assert (global_index_map.count(elem->id()));
 
-        libmesh_assert (global_index_map.count(elem->id()));
+      const dof_id_type elem_global_index =
+        global_index_map[elem->id()];
 
-        const dof_id_type elem_global_index =
-          global_index_map[elem->id()];
+      libmesh_assert_less (elem_global_index, part.size());
+      const processor_id_type elem_procid =
+        static_cast<processor_id_type>(part[elem_global_index]);
 
-        libmesh_assert_less (elem_global_index, part.size());
-        const processor_id_type elem_procid =
-          static_cast<processor_id_type>(part[elem_global_index]);
-
-        elem->processor_id() = elem_procid;
-      }
-  }
+      elem->processor_id() = elem_procid;
+    }
 #endif
 }
 

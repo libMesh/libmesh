@@ -503,26 +503,26 @@ void TecplotIO::write_binary (const std::string & fname,
     {
       // Copy the connectivity for this subdomain
       {
-        MeshBase::const_element_iterator       it  = the_mesh.active_subdomain_elements_begin (sbd_id);
-        const MeshBase::const_element_iterator end = the_mesh.active_subdomain_elements_end   (sbd_id);
-
         unsigned int n_subcells_in_subdomain=0;
 
-        for (; it != end; ++it)
-          n_subcells_in_subdomain += (*it)->n_sub_elem();
+        for (const auto & elem :
+               as_range(the_mesh.active_subdomain_elements_begin(sbd_id),
+                        the_mesh.active_subdomain_elements_end(sbd_id)))
+          n_subcells_in_subdomain += elem->n_sub_elem();
 
         // update the connectivity array to include only the elements in this subdomain
         tm.set_n_cells (n_subcells_in_subdomain);
 
         unsigned int te = 0;
 
-        for (it  = the_mesh.active_subdomain_elements_begin (sbd_id);
-             it != end; ++it)
+        for (const auto & elem :
+               as_range(the_mesh.active_subdomain_elements_begin(sbd_id),
+                        the_mesh.active_subdomain_elements_end(sbd_id)))
           {
             std::vector<dof_id_type> conn;
-            for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+            for (unsigned int se=0; se<elem->n_sub_elem(); se++)
               {
-                (*it)->connectivity(se, TECPLOT, conn);
+                elem->connectivity(se, TECPLOT, conn);
 
                 for (std::size_t node=0; node<conn.size(); node++)
                   tm.cd(node,te) = conn[node];

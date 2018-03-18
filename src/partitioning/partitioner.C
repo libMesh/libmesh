@@ -161,9 +161,8 @@ void Partitioner::single_partition_range (MeshBase::element_iterator it,
 {
   LOG_SCOPE("single_partition_range()", "Partitioner");
 
-  for ( ; it != end; ++it)
+  for (auto & elem : as_range(it, end))
     {
-      Elem * elem = *it;
       elem->processor_id() = 0;
 
       // Assign all this element's nodes to processor 0 as well.
@@ -227,10 +226,9 @@ void Partitioner::partition_unpartitioned_elements (MeshBase & mesh,
                                            MeshTools::create_bounding_box(mesh), it, end,
                                            global_indices);
 
-  for (dof_id_type cnt=0; it != end; ++it)
+  dof_id_type cnt=0;
+  for (auto & elem : as_range(it, end))
     {
-      Elem * elem = *it;
-
       libmesh_assert_less (cnt, global_indices.size());
       const dof_id_type global_index =
         global_indices[cnt++];
@@ -349,15 +347,11 @@ void Partitioner::set_parent_processor_ids(MeshBase & mesh)
                      DofObject::invalid_processor_id);
 
           // first build up local contributions to parent_processor_ids
-          MeshBase::element_iterator       not_it  = mesh.ancestor_elements_begin();
-          const MeshBase::element_iterator not_end = mesh.ancestor_elements_end();
-
           bool have_parent_in_block = false;
 
-          for ( ; not_it != not_end; ++not_it)
+          for (auto & parent : as_range(mesh.ancestor_elements_begin(),
+                                        mesh.ancestor_elements_end()))
             {
-              Elem * parent = *not_it;
-
               const dof_id_type parent_idx = parent->id();
               libmesh_assert_less (parent_idx, max_elem_id);
 
@@ -384,11 +378,9 @@ void Partitioner::set_parent_processor_ids(MeshBase & mesh)
 
           // and assign the ids, if we have a parent in this block.
           if (have_parent_in_block)
-            for (not_it = mesh.ancestor_elements_begin();
-                 not_it != not_end; ++not_it)
+            for (auto & parent : as_range(mesh.ancestor_elements_begin(),
+                                          mesh.ancestor_elements_end()))
               {
-                Elem * parent = *not_it;
-
                 const dof_id_type parent_idx = parent->id();
 
                 if ((parent_idx >= first_elem_id) &&
@@ -503,12 +495,9 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
 
   // And loop over the subactive elements, but don't reassign
   // nodes that are already active on another processor.
-  MeshBase::element_iterator       sub_it  = mesh.subactive_elements_begin();
-  const MeshBase::element_iterator sub_end = mesh.subactive_elements_end();
-
-  for ( ; sub_it != sub_end; ++sub_it)
+  for (auto & elem : as_range(mesh.subactive_elements_begin(),
+                              mesh.subactive_elements_end()))
     {
-      Elem * elem = *sub_it;
       libmesh_assert(elem);
 
       libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);
@@ -522,12 +511,9 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
   // nodes, *except* for the case of a parent with a subset of children which are
   // ghost elements.  In that case some of the parent nodes will not have been
   // properly handled yet
-  MeshBase::element_iterator       not_it  = mesh.not_active_elements_begin();
-  const MeshBase::element_iterator not_end = mesh.not_active_elements_end();
-
-  for ( ; not_it != not_end; ++not_it)
+  for (auto & elem : as_range(mesh.not_active_elements_begin(),
+                              mesh.not_active_elements_end()))
     {
-      Elem * elem = *not_it;
       libmesh_assert(elem);
 
       libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);
