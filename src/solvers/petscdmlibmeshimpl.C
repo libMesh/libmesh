@@ -513,7 +513,6 @@ PetscErrorCode DMlibMeshCreateFieldDecompositionDM(DM dm, PetscInt dnumber, Pets
     for (const auto & pr : (*ddlm->varids)) {
       ddlm->decomposition->push_back(std::set<unsigned int>());
       unsigned int vid = pr.second;
-      std::string vname = pr.first;
       (*ddlm->decomposition)[d].insert(vid);
       ++d;
     }
@@ -566,7 +565,6 @@ PetscErrorCode DMlibMeshCreateDomainDecompositionDM(DM dm, PetscInt dnumber, Pet
     for (const auto & pr : (*ddlm->blockids)) {
       ddlm->decomposition->push_back(std::set<unsigned int>());
       unsigned int bid = pr.second;
-      std::string bname = pr.first;
       (*ddlm->decomposition)[d].insert(bid);
       ++d;
     }
