@@ -294,11 +294,9 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt * len,
       if (!islist) continue;
       // Iterate only over this DM's blocks.
       for (const auto & pr : *(dlm->blockids)) {
-        MeshBase::const_element_iterator
-          el     = sys->get_mesh().active_local_subdomain_elements_begin(pr.second),
-          end_el = sys->get_mesh().active_local_subdomain_elements_end(pr.second);
-        for ( ; el != end_el; ++el) {
-          const Elem * elem = *el;
+        for (const auto & elem :
+               as_range(sys->get_mesh().active_local_subdomain_elements_begin(pr.second),
+                        sys->get_mesh().active_local_subdomain_elements_end(pr.second))) {
           //unsigned int e_subdomain = elem->subdomain_id();
           std::vector<numeric_index_type> evindices;
           // Get the degree of freedom indices for the given variable off the current element.
