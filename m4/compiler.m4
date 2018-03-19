@@ -157,7 +157,7 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
   AS_IF([test "x$is_intel_icc" != "x"],
         [REAL_GXX=""])
 
-  AS_IF([test "$GXX" = yes -a "x$REAL_GXX" != "x"],
+  AS_IF([test "$GXX" = "yes" && test "x$REAL_GXX" != "x"],
         [
           dnl find out the right version
           GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
@@ -440,7 +440,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 
 
   # First the flags for gcc compilers
-  AS_IF([test "$GXX" = yes -a "x$REAL_GXX" != "x"],
+  AS_IF([test "$GXX" = "yes" && test "x$REAL_GXX" != "x"],
         [
           CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization"
           dnl devel flags are added on two lines since there are so many

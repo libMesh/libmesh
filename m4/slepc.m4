@@ -23,7 +23,7 @@ AC_DEFUN([CONFIGURE_SLEPC],
 
           dnl Test to see if SLEPC_DIR and petscversion were set by user or
           dnl autodetection.  If not set, then disable slepc, print a message.
-          AS_IF([test "x$SLEPC_DIR" = x -o "x$petscversion" = x],
+          AS_IF([test "x$SLEPC_DIR" = "x" || test "x$petscversion" = "x"],
                 [
                   enableslepc=no
                   AC_MSG_RESULT(<<< SLEPc disabled.  Please set your "\$SLEPC_DIR" environment variable correctly to enable SLEPc. >>>)
@@ -60,14 +60,14 @@ AC_DEFUN([CONFIGURE_SLEPC],
             oldpetsc=no
 
             AS_IF([test $petscmajor -lt 3], [oldpetsc=yes])
-            AS_IF([test $petscmajor == 3 -a $petscminor -lt 4], [oldpetsc=yes])
+            AS_IF([test "$petscmajor" = "3" && test $petscminor -lt 4], [oldpetsc=yes])
 
             dnl If PETSc is old, warn if the full version numbers (including the subminor version number) don't match exactly.
-            AS_IF([test "$oldpetsc" = "yes" -a $slepcversion != $petscversion],
+            AS_IF([test "$oldpetsc" = "yes" && test "$slepcversion" != "$petscversion"],
                   [AC_MSG_RESULT([<<< WARNING: PETSc version $petscversion does not match SLEPc version $slepcversion >>>])])
 
             dnl For any PETSc version, warn if the major and minor version numbers don't match.
-            AS_IF([test $slepcmajor != $petscmajor -o $slepcminor != $petscminor],
+            AS_IF([test "$slepcmajor" != "$petscmajor" || test "$slepcminor" != "$petscminor"],
                   [AC_MSG_RESULT([<<< WARNING: PETSc version $petscmajor.$petscminor does not match SLEPc version $slepcmajor.$slepcminor >>>])])
 
             dnl OK, now we will create a temporary makefile to query SLEPc libs
@@ -81,7 +81,7 @@ AC_DEFUN([CONFIGURE_SLEPC],
                   [AC_MSG_RESULT([<<< SLEPc configuration failed.  Could not find slepcconf/slepc_variables file. >>>])
                    enableslepc=no])
 
-            AS_IF([test "x$enableslepc" = "xyes" -a "x$includefile" != "x"],
+            AS_IF([test "x$enableslepc" = "xyes" && test "x$includefile" != "x"],
                   [
                     AC_MSG_RESULT(<<< Querying SLEPc configuration from $includefile >>>)
                     printf '%s\n' "include $includefile" > Makefile_config_slepc

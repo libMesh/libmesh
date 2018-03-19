@@ -84,7 +84,7 @@ AC_DEFUN([CONFIGURE_PETSC],
             petscversion=$petscmajor.$petscminor.$petscsubminor
             petscmajorminor=$petscmajor.$petscminor.x
 
-            AS_IF([test $petscmajor = 2 -a "x$PETSC_ARCH" = x],
+            AS_IF([test "$petscmajor" = "2" && test "x$PETSC_ARCH" = "x"],
                   [
                     dnl PETSc config failed.  We will try MPI at the end of this function.
                     enablepetsc=no
@@ -131,12 +131,12 @@ AC_DEFUN([CONFIGURE_PETSC],
 
         # Figure out whether this PETSC_DIR is a PETSc source tree or an installed PETSc.
         AS_IF(dnl pre-3.6.0 non-installed PETSc
-              [test -r ${PETSC_DIR}/makefile -a -r ${PETSC_DIR}/${PETSC_ARCH}/conf/variables],
+              [test -r ${PETSC_DIR}/makefile && test -r ${PETSC_DIR}/${PETSC_ARCH}/conf/variables],
               [PREFIX_INSTALLED_PETSC=no
                PETSC_VARS_FILE=${PETSC_DIR}/${PETSC_ARCH}/conf/variables],
 
               dnl 3.6.0+ non-installed PETSc
-              [test -r ${PETSC_DIR}/makefile -a -r ${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/variables],
+              [test -r ${PETSC_DIR}/makefile && test -r ${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/variables],
               [PREFIX_INSTALLED_PETSC=no
                PETSC_VARS_FILE=${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/variables],
 
@@ -156,12 +156,12 @@ AC_DEFUN([CONFIGURE_PETSC],
               dnl for backwards compatibility.
 
               dnl pre-3.6.0 non-installed PETSc with invalid $PETSC_ARCH
-              [test -r ${PETSC_DIR}/makefile -a -r ${PETSC_DIR}/conf/variables],
+              [test -r ${PETSC_DIR}/makefile && test -r ${PETSC_DIR}/conf/variables],
               [PREFIX_INSTALLED_PETSC=no
                PETSC_VARS_FILE=${PETSC_DIR}/conf/variables],
 
               dnl 3.6.0+ non-installed PETSc with invalid $PETSC_ARCH
-              [test -r ${PETSC_DIR}/makefile -a -r ${PETSC_DIR}/lib/petsc/conf/variables],
+              [test -r ${PETSC_DIR}/makefile && test -r ${PETSC_DIR}/lib/petsc/conf/variables],
               [PREFIX_INSTALLED_PETSC=no
                PETSC_VARS_FILE=${PETSC_DIR}/lib/petsc/conf/variables],
 
@@ -170,7 +170,7 @@ AC_DEFUN([CONFIGURE_PETSC],
                enablepetsc=no])
 
         dnl Set some include and link variables by building and running temporary Makefiles.
-        AS_IF([test $enablepetsc != no -a $PREFIX_INSTALLED_PETSC = no],
+        AS_IF([test "$enablepetsc" != "no" && test "$PREFIX_INSTALLED_PETSC" = "no"],
               [
                 PETSCLINKLIBS=`make -s -C $PETSC_DIR getlinklibs`
                 PETSCINCLUDEDIRS=`make -s -C $PETSC_DIR getincludedirs`
@@ -299,7 +299,7 @@ AC_DEFUN([CONFIGURE_PETSC],
           AC_LANG_POP([C])
         ])
 
-        AS_IF([test $enablepetsc = no -a "$enablempi" != no],
+        AS_IF([test "x$enablepetsc" = "xno" && test "x$enablempi" != "xno"],
               [
                 dnl PETSc config failed.  Try MPI, unless directed otherwise
                 AC_MSG_RESULT(<<< PETSc disabled.  Will try configuring MPI now... >>>)
@@ -383,7 +383,7 @@ AC_DEFUN([CONFIGURE_PETSC],
 
   # If PETSc is not enabled, but it *was* required, error out now
   # instead of compiling libmesh in an invalid configuration.
-  AS_IF([test $enablepetsc = no -a $petscrequired = yes],
+  AS_IF([test "$enablepetsc" = "no" && test "$petscrequired" = "yes"],
         dnl We return error code 3 here, since 0 means success and 1 is
         dnl indistinguishable from other errors.  Ideally, all of the
         dnl AC_MSG_ERROR calls in our m4 files would return a different

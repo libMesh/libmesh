@@ -123,21 +123,21 @@ AS_IF([test $enablepetsc != no],
         dnl If PETSc is using 64-bit indices, make sure that
         dnl $dof_bytes==8, or else print an informative message and
         dnl disable PETSc.
-        AS_IF([test $petsc_use_64bit_indices -gt 0 -a $dof_bytes != 8],
+        AS_IF([test $petsc_use_64bit_indices -gt 0 && test "$dof_bytes" != "8"],
               [AC_MSG_ERROR([<<< PETSc is using 64-bit indices, you must configure libmesh with --with-dof-id-bytes=8. >>>])])
 
         dnl If PETSc is using 32-bit indices, make sure that
         dnl libmesh's $dof_bytes<=4.
-        AS_IF([test $petsc_use_64bit_indices = 0 -a $dof_bytes -gt 4],
+        AS_IF([test "$petsc_use_64bit_indices" = "0" && test $dof_bytes -gt 4],
               [AC_MSG_ERROR([<<< PETSc is using 32-bit indices, you must configure libmesh with --with-dof-id-bytes=<1|2|4>. >>>])])
 
         dnl Libmesh must use {complex,real} scalars when PETSc uses {complex,real} scalars.
         petsc_use_complex=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_USE_COMPLEX`
 
-        AS_IF([test $petsc_use_complex -gt 0 -a $enablecomplex = no],
+        AS_IF([test $petsc_use_complex -gt 0 && test "$enablecomplex" = "no"],
               [AC_MSG_ERROR([<<< PETSc was built with complex scalars, you must configure libmesh with --enable-complex. >>>])])
 
-        AS_IF([test $petsc_use_complex = 0 -a $enablecomplex = yes],
+        AS_IF([test "$petsc_use_complex" = "0" && test "$enablecomplex" = "yes"],
               [AC_MSG_ERROR([<<< PETSc was built with real scalars, you must configure libmesh with --disable-complex. >>>])])
       ])
 
