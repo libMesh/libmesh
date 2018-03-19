@@ -1803,15 +1803,20 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
   // Add the copied (now level-0) elements back to the mesh
   for (auto & new_elem : new_elements)
     {
+      // Save the original ID, because the act of adding the Elem can
+      // change new_elem's id!
+      dof_id_type orig_id = new_elem->id();
+
       Elem * added_elem = mesh.add_elem(new_elem);
 
       // If the Elem, as it was re-added to the mesh, now has a
       // different ID (this is unlikely, so it's just an assert)
       // the boundary information will no longer be correct.
-      libmesh_assert_equal_to (new_elem->id(), added_elem->id());
+      libmesh_assert_equal_to (orig_id, added_elem->id());
 
       // Avoid compiler warnings in opt mode.
       libmesh_ignore(added_elem);
+      libmesh_ignore(orig_id);
     }
 
   // Finally, also add back the saved boundary information
