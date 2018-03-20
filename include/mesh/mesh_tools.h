@@ -467,6 +467,16 @@ void libmesh_assert_valid_boundary_ids (const MeshBase & mesh);
 void libmesh_assert_valid_dof_ids (const MeshBase & mesh,
                                    unsigned int sysnum = libMesh::invalid_uint);
 
+/**
+ * A function for verifying that degree of freedom indexes are
+ * contiguous on each processors, as is required by libMesh numeric
+ * classes.
+ *
+ * Verify a particular system by specifying that system's number.
+ */
+void libmesh_assert_contiguous_dof_ids (const MeshBase & mesh,
+                                        unsigned int sysnum);
+
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
 /**
  * A function for verifying that unique ids match across processors.
@@ -502,6 +512,12 @@ void libmesh_assert_valid_procids (const MeshBase & mesh) {
   libmesh_assert_parallel_consistent_procids<DofObjectSubclass>(mesh);
   libmesh_assert_topology_consistent_procids<DofObjectSubclass>(mesh);
 }
+
+/**
+ * A function for verifying that processor assignment of nodes matches
+ * the heuristic specified in Node::choose_processor_id()
+ */
+void libmesh_assert_canonical_node_procids (const MeshBase & mesh);
 
 /**
  * A function for verifying that refinement flags on elements

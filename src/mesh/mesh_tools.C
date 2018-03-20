@@ -1337,6 +1337,7 @@ void libmesh_assert_valid_boundary_ids(const MeshBase & mesh)
     }
 }
 
+
 void libmesh_assert_valid_dof_ids(const MeshBase & mesh, unsigned int sysnum)
 {
   LOG_SCOPE("libmesh_assert_valid_dof_ids()", "MeshTools");
@@ -1361,6 +1362,48 @@ void libmesh_assert_valid_dof_ids(const MeshBase & mesh, unsigned int sysnum)
     assert_semiverify_dofobj(mesh.comm(),
                              mesh.query_node_ptr(i),
                              sysnum);
+}
+
+
+void libmesh_assert_contiguous_dof_ids(const MeshBase & mesh, unsigned int sysnum)
+{
+  LOG_SCOPE("libmesh_assert_contiguous_dof_ids()", "MeshTools");
+
+  if (mesh.n_processors() == 1)
+    return;
+
+  libmesh_parallel_only(mesh.comm());
+
+  dof_id_type min_dof_id = std::numeric_limits<dof_id_type>::max(),
+              max_dof_id = std::numeric_limits<dof_id_type>::min();
+
+  // Figure out what our local dof id range is
+  for (const auto * node : mesh.local_node_ptr_range())
+    {
+      for (unsigned int v=0, nvars = node->n_vars(sysnum);
+           v != nvars; ++v)
+        for (unsigned int c=0; c != node->n_comp(sysnum, v); ++c)
+          {
+            dof_id_type id = node->dof_number(sysnum, v, c);
+            min_dof_id = std::min (min_dof_id, id);
+            max_dof_id = std::max (max_dof_id, id);
+          }
+    }
+
+  // Make sure no other processors' ids are inside it
+  for (const auto * node : mesh.node_ptr_range())
+    {
+      if (node->processor_id() == mesh.processor_id())
+        continue;
+      for (unsigned int v=0, nvars = node->n_vars(sysnum);
+           v != nvars; ++v)
+        for (unsigned int c=0; c != node->n_comp(sysnum, v); ++c)
+          {
+            dof_id_type id = node->dof_number(sysnum, v, c);
+            libmesh_assert (id < min_dof_id ||
+                            id > max_dof_id);
+          }
+    }
 }
 
 
@@ -1563,26 +1606,21 @@ void libmesh_assert_parallel_consistent_procids<Node>(const MeshBase & mesh)
         continue;
 
       const Node * node = mesh.query_node_ptr(i);
+      const processor_id_type pid = node ? node->processor_id() : 0;
 
-      processor_id_type min_id =
-        node ? node->processor_id() :
-        std::numeric_limits<processor_id_type>::max();
-      mesh.comm().min(min_id);
-
-      processor_id_type max_id =
-        node ? node->processor_id() :
-        std::numeric_limits<processor_id_type>::min();
-      mesh.comm().max(max_id);
-
-      if (node)
-        {
-          libmesh_assert_equal_to (min_id, node->processor_id());
-          libmesh_assert_equal_to (max_id, node->processor_id());
-        }
-
-      if (min_id == mesh.processor_id())
-        libmesh_assert(node);
+      libmesh_assert(mesh.comm().semiverify (node ? &pid : libmesh_nullptr));
     }
+}
+
+
+void libmesh_assert_canonical_node_procids (const MeshBase & mesh)
+{
+  for (const auto & elem : mesh.active_element_ptr_range())
+    for (auto & node : elem->node_ref_range())
+      libmesh_assert_equal_to
+        (node.processor_id(),
+         node.choose_processor_id(node.processor_id(),
+                                  elem->processor_id()));
 }
 
 
@@ -1922,9 +1960,10 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
     }
 
   // We should still have consistent nodal processor ids coming out of
-  // this algorithm.
+  // this algorithm, but now they should be canonically correct too.
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_procids<Node>(mesh);
+  MeshTools::libmesh_assert_canonical_node_procids(mesh);
 #endif
 }
 
