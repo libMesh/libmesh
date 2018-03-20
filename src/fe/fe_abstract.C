@@ -965,9 +965,8 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
         continue;
 
       mesh.get_boundary_info().boundary_ids (elem, s, bc_ids);
-      for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+      for (const auto & boundary_id : bc_ids)
         {
-          const boundary_id_type boundary_id = *id_it;
           const PeriodicBoundaryBase * periodic = boundaries.boundary(boundary_id);
           if (periodic)
             {

@@ -335,22 +335,19 @@ void EquationSystems::_read_impl (const std::string & name,
 
       Xdr local_io (read_parallel_files ? local_file_name(this->processor_id(),name) : "", mode);
 
-      std::vector<std::pair<std::string, System *>>::iterator
-        pos = xda_systems.begin();
-
-      for (; pos != xda_systems.end(); ++pos)
+      for (auto & pr : xda_systems)
         if (read_legacy_format)
           {
             libmesh_deprecated();
 #ifdef LIBMESH_ENABLE_DEPRECATED
-            pos->second->read_legacy_data (io, read_additional_data);
+            pr.second->read_legacy_data (io, read_additional_data);
 #endif
           }
         else
           if (read_parallel_files)
-            pos->second->read_parallel_data<InValType>   (local_io, read_additional_data);
+            pr.second->read_parallel_data<InValType>   (local_io, read_additional_data);
           else
-            pos->second->read_serialized_data<InValType> (io, read_additional_data);
+            pr.second->read_serialized_data<InValType> (io, read_additional_data);
 
 
       // Undo the temporary numbering.
@@ -485,11 +482,9 @@ void EquationSystems::write(const std::string & name,
     const unsigned int proc_id = this->processor_id();
 
     unsigned int n_sys = 0;
-    for (std::map<std::string, System *>::const_iterator pos = _systems.begin();
-         pos != _systems.end(); ++pos)
-      {
-        if (! pos->second->hide_output()) n_sys++;
-      }
+    for (auto & pr : _systems)
+      if (!pr.second->hide_output())
+        n_sys++;
 
     // set the version number in the Xdr object
     io.set_version(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION,
@@ -517,17 +512,16 @@ void EquationSystems::write(const std::string & name,
         // Write the number of equation systems
         io.data (n_sys, "# No. of Equation Systems");
 
-        for (std::map<std::string, System *>::const_iterator pos = _systems.begin();
-             pos != _systems.end(); ++pos)
+        for (auto & pr : _systems)
           {
             // Ignore this system if it has been marked as hidden
-            if (pos->second->hide_output()) continue;
+            if (pr.second->hide_output()) continue;
 
             // 3.)
             // Write the name of the sys_num-th system
             {
-              const unsigned int sys_num = pos->second->number();
-              std::string sys_name       = pos->first;
+              const unsigned int sys_num = pr.second->number();
+              std::string sys_name       = pr.first;
 
               comment =  "# Name, System No. ";
               std::sprintf(buf, "%u", sys_num);
@@ -539,8 +533,8 @@ void EquationSystems::write(const std::string & name,
             // 4.)
             // Write the type of system handled
             {
-              const unsigned int sys_num = pos->second->number();
-              std::string sys_type       = pos->second->system_type();
+              const unsigned int sys_num = pr.second->number();
+              std::string sys_type       = pr.second->system_type();
 
               comment =  "# Type, System No. ";
               std::sprintf(buf, "%u", sys_num);
@@ -551,7 +545,7 @@ void EquationSystems::write(const std::string & name,
 
             // 5.) - 9.)
             // Let System::write_header() do the job
-            pos->second->write_header (io, version, write_additional_data);
+            pr.second->write_header (io, version, write_additional_data);
           }
       }
 
@@ -562,17 +556,16 @@ void EquationSystems::write(const std::string & name,
         // open a parallel buffer if warranted.
         Xdr local_io (write_parallel_files ? local_file_name(this->processor_id(),name) : "", mode);
 
-        for (std::map<std::string, System *>::const_iterator pos = _systems.begin();
-             pos != _systems.end(); ++pos)
+        for (auto & pr : _systems)
           {
             // Ignore this system if it has been marked as hidden
-            if (pos->second->hide_output()) continue;
+            if (pr.second->hide_output()) continue;
 
             // 10.) + 11.)
             if (write_parallel_files)
-              pos->second->write_parallel_data (local_io,write_additional_data);
+              pr.second->write_parallel_data (local_io,write_additional_data);
             else
-              pos->second->write_serialized_data (io,write_additional_data);
+              pr.second->write_serialized_data (io,write_additional_data);
           }
       }
   }

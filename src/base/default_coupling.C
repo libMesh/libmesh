@@ -91,14 +91,9 @@ void DefaultCoupling::operator()
 
   if (!this->_n_levels)
     {
-      for (MeshBase::const_element_iterator elem_it = range_begin;
-           elem_it != range_end; ++elem_it)
-        {
-          const Elem * const elem = *elem_it;
-
-          if (elem->processor_id() != p)
-            coupled_elements.insert (std::make_pair(elem,_dof_coupling));
-        }
+      for (const auto & elem : as_range(range_begin, range_end))
+        if (elem->processor_id() != p)
+          coupled_elements.insert (std::make_pair(elem,_dof_coupling));
       return;
     }
 
@@ -113,14 +108,9 @@ void DefaultCoupling::operator()
       next_elements_to_check.clear();
       elements_checked.insert(elements_to_check.begin(), elements_to_check.end());
 
-      for (set_type::const_iterator
-             elem_it  = elements_to_check.begin(),
-             elem_end = elements_to_check.end();
-           elem_it != elem_end; ++elem_it)
+      for (const auto & elem : elements_to_check)
         {
           std::vector<const Elem *> active_neighbors;
-
-          const Elem * const elem = *elem_it;
 
           if (elem->processor_id() != p)
             coupled_elements.insert (std::make_pair(elem,_dof_coupling));

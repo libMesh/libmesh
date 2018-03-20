@@ -330,16 +330,13 @@ void XdrIO::write_serialized_subdomain_names(Xdr & io) const
       // return writable references in mesh_base, it's possible for the user to leave some entity names
       // blank.  We can't write those to the XDA file.
       new_header_id_type n_subdomain_names = 0;
-      std::map<subdomain_id_type, std::string>::const_iterator it_end = subdomain_map.end();
-      for (std::map<subdomain_id_type, std::string>::const_iterator it = subdomain_map.begin(); it != it_end; ++it)
-        {
-          if (!it->second.empty())
-            {
-              n_subdomain_names++;
-              subdomain_ids.push_back(it->first);
-              subdomain_names.push_back(it->second);
-            }
-        }
+      for (const auto & pr : subdomain_map)
+        if (!pr.second.empty())
+          {
+            n_subdomain_names++;
+            subdomain_ids.push_back(pr.first);
+            subdomain_names.push_back(pr.second);
+          }
 
       io.data(n_subdomain_names, "# subdomain id to name map");
       // Write out the ids and names in two vectors
@@ -1082,16 +1079,13 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_bc
           for (auto s : elem->side_index_range())
             {
               boundary_info.boundary_ids (elem, s, bc_ids);
-              for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
-                {
-                  const boundary_id_type bc_id = *id_it;
-                  if (bc_id != BoundaryInfo::invalid_id)
-                    {
-                      xfer_bcs.push_back (n_local_level_0_elem);
-                      xfer_bcs.push_back (s) ;
-                      xfer_bcs.push_back (bc_id);
-                    }
-                }
+              for (const auto & bc_id : bc_ids)
+                if (bc_id != BoundaryInfo::invalid_id)
+                  {
+                    xfer_bcs.push_back (n_local_level_0_elem);
+                    xfer_bcs.push_back (s) ;
+                    xfer_bcs.push_back (bc_id);
+                  }
             }
         }
       else if (bc_type == "edge")
@@ -1099,16 +1093,13 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_bc
           for (auto e : elem->edge_index_range())
             {
               boundary_info.edge_boundary_ids (elem, e, bc_ids);
-              for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
-                {
-                  const boundary_id_type bc_id = *id_it;
-                  if (bc_id != BoundaryInfo::invalid_id)
-                    {
-                      xfer_bcs.push_back (n_local_level_0_elem);
-                      xfer_bcs.push_back (e) ;
-                      xfer_bcs.push_back (bc_id);
-                    }
-                }
+              for (const auto & bc_id : bc_ids)
+                if (bc_id != BoundaryInfo::invalid_id)
+                  {
+                    xfer_bcs.push_back (n_local_level_0_elem);
+                    xfer_bcs.push_back (e) ;
+                    xfer_bcs.push_back (bc_id);
+                  }
             }
         }
       else if (bc_type == "shellface")
@@ -1116,16 +1107,13 @@ void XdrIO::write_serialized_bcs_helper (Xdr & io, const new_header_id_type n_bc
           for (unsigned short sf=0; sf<2; sf++)
             {
               boundary_info.shellface_boundary_ids (elem, sf, bc_ids);
-              for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
-                {
-                  const boundary_id_type bc_id = *id_it;
-                  if (bc_id != BoundaryInfo::invalid_id)
-                    {
-                      xfer_bcs.push_back (n_local_level_0_elem);
-                      xfer_bcs.push_back (sf) ;
-                      xfer_bcs.push_back (bc_id);
-                    }
-                }
+              for (const auto & bc_id : bc_ids)
+                if (bc_id != BoundaryInfo::invalid_id)
+                  {
+                    xfer_bcs.push_back (n_local_level_0_elem);
+                    xfer_bcs.push_back (sf) ;
+                    xfer_bcs.push_back (bc_id);
+                  }
             }
         }
       else
@@ -1221,15 +1209,12 @@ void XdrIO::write_serialized_nodesets (Xdr & io, const new_header_id_type n_node
   for (const auto & node : mesh.local_node_ptr_range())
     {
       boundary_info.boundary_ids (node, nodeset_ids);
-      for (std::vector<boundary_id_type>::const_iterator id_it=nodeset_ids.begin(); id_it!=nodeset_ids.end(); ++id_it)
-        {
-          const boundary_id_type bc_id = *id_it;
-          if (bc_id != BoundaryInfo::invalid_id)
-            {
-              xfer_bcs.push_back (node->id());
-              xfer_bcs.push_back (bc_id);
-            }
-        }
+      for (const auto & bc_id : nodeset_ids)
+        if (bc_id != BoundaryInfo::invalid_id)
+          {
+            xfer_bcs.push_back (node->id());
+            xfer_bcs.push_back (bc_id);
+          }
     }
 
   xfer_bcs.push_back(n_node);
@@ -1285,16 +1270,13 @@ void XdrIO::write_serialized_bc_names (Xdr & io, const BoundaryInfo & info, bool
       // return writable references in boundary_info, it's possible for the user to leave some entity names
       // blank.  We can't write those to the XDA file.
       new_header_id_type n_boundary_names = 0;
-      std::map<boundary_id_type, std::string>::const_iterator it_end = boundary_map.end();
-      for (std::map<boundary_id_type, std::string>::const_iterator it = boundary_map.begin(); it != it_end; ++it)
-        {
-          if (!it->second.empty())
-            {
-              n_boundary_names++;
-              boundary_ids.push_back(it->first);
-              boundary_names.push_back(it->second);
-            }
-        }
+      for (const auto & pr : boundary_map)
+        if (!pr.second.empty())
+          {
+            n_boundary_names++;
+            boundary_ids.push_back(pr.first);
+            boundary_names.push_back(pr.second);
+          }
 
       if (is_sideset)
         io.data(n_boundary_names, "# sideset id to name map");
@@ -1957,22 +1939,19 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
       // element id this is not necessarily guaranteed.
       std::sort (dof_bc_data.begin(), dof_bc_data.end());
 
-      MeshBase::const_element_iterator
-        it  = mesh.level_elements_begin(0),
-        end = mesh.level_elements_end(0);
-
       // Look for BCs in this block for all the level-0 elements we have
       // (not just local ones).  Do this by finding all the entries
       // in dof_bc_data whose elem_id match the ID of the current element.
       // We cannot rely on libmesh_nullptr neighbors at this point since the neighbor
       // data structure has not been initialized.
-      for (; it!=end; ++it)
+      for (const auto & elem :
+             as_range(mesh.level_elements_begin(0),
+                      mesh.level_elements_end(0)))
         {
-          std::pair<std::vector<DofBCData>::iterator,
-                    std::vector<DofBCData>::iterator> bounds =
+          auto bounds =
             std::equal_range (dof_bc_data.begin(),
                               dof_bc_data.end(),
-                              (*it)->id()
+                              elem->id()
 #if defined(__SUNPRO_CC) || defined(__PGI)
                               , CompareIntDofBCData()
 #endif
@@ -1980,24 +1959,24 @@ void XdrIO::read_serialized_bcs_helper (Xdr & io, T, const std::string bc_type)
 
           for (const auto & data : as_range(bounds))
             {
-              libmesh_assert_equal_to (data.dof_id, (*it)->id());
+              libmesh_assert_equal_to (data.dof_id, elem->id());
 
               if (bc_type == "side")
                 {
-                  libmesh_assert_less (data.side, (*it)->n_sides());
-                  boundary_info.add_side (*it, data.side, data.bc_id);
+                  libmesh_assert_less (data.side, elem->n_sides());
+                  boundary_info.add_side (elem, data.side, data.bc_id);
                 }
               else if (bc_type == "edge")
                 {
-                  libmesh_assert_less (data.side, (*it)->n_edges());
-                  boundary_info.add_edge (*it, data.side, data.bc_id);
+                  libmesh_assert_less (data.side, elem->n_edges());
+                  boundary_info.add_edge (elem, data.side, data.bc_id);
                 }
               else if (bc_type == "shellface")
                 {
                   // Shell face IDs can only be 0 or 1.
                   libmesh_assert_less(data.side, 2);
 
-                  boundary_info.add_shellface (*it, data.side, data.bc_id);
+                  boundary_info.add_shellface (elem, data.side, data.bc_id);
                 }
               else
                 {

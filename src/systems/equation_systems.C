@@ -1135,16 +1135,14 @@ std::string EquationSystems::get_info () const
   //       oss << "  n_parameters()=" << this->n_parameters() << '\n';
   //       oss << "   Parameters:\n";
 
-  //       for (std::map<std::string, Real>::const_iterator
-  //      param = _parameters.begin(); param != _parameters.end();
-  //    ++param)
-  // oss << "    "
-  //     << "\""
-  //     << param->first
-  //     << "\""
-  //     << "="
-  //     << param->second
-  //     << '\n';
+  //       for (const auto & pr : _parameters)
+  //         oss << "    "
+  //             << "\""
+  //             << pr.first
+  //             << "\""
+  //             << "="
+  //             << pr.second
+  //             << '\n';
   //     }
 
   return oss.str();

@@ -203,13 +203,10 @@ void init_ref_elem_table()
   }
 
   // Read'em
-  for (FileMapType::const_iterator it=ref_elem_file.begin();
-       it != ref_elem_file.end(); ++it)
+  for (const auto & pr : ref_elem_file)
     {
-      std::istringstream stream(it->second);
-
-      read_ref_elem(it->first,
-                    stream);
+      std::istringstream stream(pr.second);
+      read_ref_elem(pr.first, stream);
     }
 }
 

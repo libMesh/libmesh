@@ -70,12 +70,11 @@ void ImplicitSystem::clear ()
 
   // clear any user-added matrices
   {
-    for (matrices_iterator pos = _matrices.begin();
-         pos != _matrices.end(); ++pos)
+    for (auto & pr : _matrices)
       {
-        pos->second->clear ();
-        delete pos->second;
-        pos->second = libmesh_nullptr;
+        pr.second->clear ();
+        delete pr.second;
+        pr.second = libmesh_nullptr;
       }
 
     _matrices.clear();
@@ -94,9 +93,8 @@ void ImplicitSystem::init_data ()
   Parent::init_data();
 
   // Clear any existing matrices
-  for (matrices_iterator pos = _matrices.begin();
-       pos != _matrices.end(); ++pos)
-    pos->second->clear();
+  for (auto & pr : _matrices)
+    pr.second->clear();
 
   // Initialize the matrices for the system
   this->init_matrices ();
@@ -121,10 +119,9 @@ void ImplicitSystem::init_matrices ()
   _can_add_matrices = false;
 
   // Tell the matrices about the dof map, and vice versa
-  for (matrices_iterator pos = _matrices.begin();
-       pos != _matrices.end(); ++pos)
+  for (auto & pr : _matrices)
     {
-      SparseMatrix<Number> & m = *(pos->second);
+      SparseMatrix<Number> & m = *(pr.second);
       libmesh_assert (!m.initialized());
 
       // We want to allow repeated init() on systems, but we don't
@@ -139,14 +136,12 @@ void ImplicitSystem::init_matrices ()
   dof_map.compute_sparsity (this->get_mesh());
 
   // Initialize matrices
-  for (matrices_iterator pos = _matrices.begin();
-       pos != _matrices.end(); ++pos)
-    pos->second->init ();
+  for (auto & pr : _matrices)
+    pr.second->init ();
 
   // Set the additional matrices to 0.
-  for (matrices_iterator pos = _matrices.begin();
-       pos != _matrices.end(); ++pos)
-    pos->second->zero ();
+  for (auto & pr : _matrices)
+    pr.second->zero ();
 }
 
 
@@ -160,11 +155,10 @@ void ImplicitSystem::reinit ()
   DofMap & dof_map = this->get_dof_map();
 
   // Clear the matrices
-  for (matrices_iterator pos = _matrices.begin();
-       pos != _matrices.end(); ++pos)
+  for (auto & pr : _matrices)
     {
-      pos->second->clear();
-      pos->second->attach_dof_map (dof_map);
+      pr.second->clear();
+      pr.second->attach_dof_map (dof_map);
     }
 
   // Clear the sparsity pattern
@@ -176,14 +170,12 @@ void ImplicitSystem::reinit ()
   dof_map.compute_sparsity (this->get_mesh());
 
   // Initialize matrices
-  for (matrices_iterator pos = _matrices.begin();
-       pos != _matrices.end(); ++pos)
-    pos->second->init ();
+  for (auto & pr : _matrices)
+    pr.second->init ();
 
   // Set the additional matrices to 0.
-  for (matrices_iterator pos = _matrices.begin();
-       pos != _matrices.end(); ++pos)
-    pos->second->zero ();
+  for (auto & pr : _matrices)
+    pr.second->zero ();
 }
 
 

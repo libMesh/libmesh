@@ -158,23 +158,19 @@ void query_ghosting_functors(const MeshBase & mesh,
 #endif
     mesh.active_pid_elements_end(pid);
 
-  std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
-  const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
-  for (; gf_it != gf_end; ++gf_it)
+  for (auto & gf :
+         as_range(mesh.ghosting_functors_begin(),
+                  mesh.ghosting_functors_end()))
     {
       GhostingFunctor::map_type elements_to_ghost;
-
-      GhostingFunctor * gf = *gf_it;
       libmesh_assert(gf);
       (*gf)(elem_it, elem_end, pid, elements_to_ghost);
 
       // We can ignore the CouplingMatrix in ->second, but we
       // need to ghost all the elements in ->first.
-      GhostingFunctor::map_type::iterator        etg_it = elements_to_ghost.begin();
-      const GhostingFunctor::map_type::iterator etg_end = elements_to_ghost.end();
-      for (; etg_it != etg_end; ++etg_it)
+      for (auto & pr : elements_to_ghost)
         {
-          const Elem * elem = etg_it->first;
+          const Elem * elem = pr.first;
           libmesh_assert(elem != remote_elem);
           connected_elements.insert(elem);
         }
@@ -200,11 +196,10 @@ void connect_children(const MeshBase & mesh,
   // Our XdrIO output needs inactive local elements to not have any
   // remote_elem children.  Let's make sure that doesn't happen.
   //
-  MeshBase::const_element_iterator       elem_it  = mesh.pid_elements_begin(pid);
-  const MeshBase::const_element_iterator elem_end = mesh.pid_elements_end(pid);
-  for (; elem_it != elem_end; ++elem_it)
+  for (const auto & elem :
+         as_range(mesh.pid_elements_begin(pid),
+                  mesh.pid_elements_end(pid)))
     {
-      const Elem * elem = *elem_it;
       if (elem->has_children())
         for (auto & child : elem->child_ref_range())
           if (&child != remote_elem)
@@ -940,15 +935,9 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
 
   const processor_id_type proc_id = mesh.processor_id();
   // Look for just-coarsened elements
-  MeshBase::element_iterator       it  =
-    mesh.flagged_pid_elements_begin(Elem::COARSEN, proc_id);
-  const MeshBase::element_iterator end =
-    mesh.flagged_pid_elements_end(Elem::COARSEN, proc_id);
-
-  for ( ; it != end; ++it)
+  for (auto elem : as_range(mesh.flagged_pid_elements_begin(Elem::COARSEN, proc_id),
+                            mesh.flagged_pid_elements_end(Elem::COARSEN, proc_id)))
     {
-      Elem * elem = *it;
-
       // If it's flagged for coarsening it had better have a parent
       libmesh_assert(elem->parent());
 
@@ -1002,23 +991,18 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
           const MeshBase::const_element_iterator elem_end =
             MeshBase::const_element_iterator(elemend, elemend, Predicates::NotNull<Elem * const *>());
 
-          std::set<GhostingFunctor *>::iterator        gf_it = mesh.ghosting_functors_begin();
-          const std::set<GhostingFunctor *>::iterator gf_end = mesh.ghosting_functors_end();
-          for (; gf_it != gf_end; ++gf_it)
+          for (auto & gf : as_range(mesh.ghosting_functors_begin(),
+                                    mesh.ghosting_functors_end()))
             {
               GhostingFunctor::map_type elements_to_ghost;
-
-              GhostingFunctor *gf = *gf_it;
               libmesh_assert(gf);
               (*gf)(elem_it, elem_end, p, elements_to_ghost);
 
               // We can ignore the CouplingMatrix in ->second, but we
               // need to ghost all the elements in ->first.
-              GhostingFunctor::map_type::iterator        etg_it = elements_to_ghost.begin();
-              const GhostingFunctor::map_type::iterator etg_end = elements_to_ghost.end();
-              for (; etg_it != etg_end; ++etg_it)
+              for (auto & pr : elements_to_ghost)
                 {
-                  const Elem * elem = etg_it->first;
+                  const Elem * elem = pr.first;
                   libmesh_assert(elem);
                   while (elem)
                     {
@@ -1802,11 +1786,8 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   std::set<const Elem *, CompareElemIdsByLevel> elements_to_keep;
 
   // Don't delete elements that we were explicitly told not to
-  for (std::set<Elem *>::iterator it = extra_ghost_elem_ids.begin();
-       it != extra_ghost_elem_ids.end(); ++it)
+  for (const auto & elem : extra_ghost_elem_ids)
     {
-      const Elem * elem = *it;
-
       std::vector<const Elem *> active_family;
 #ifdef LIBMESH_ENABLE_AMR
       if (!elem->subactive())
@@ -1845,25 +1826,21 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   unsigned int n_levels = MeshTools::n_levels(mesh);
 
   for (int l = n_levels - 1; l >= 0; --l)
-    {
-      MeshBase::element_iterator lev_elem_it = mesh.level_elements_begin(l),
-        lev_end     = mesh.level_elements_end(l);
-      for (; lev_elem_it != lev_end; ++lev_elem_it)
-        {
-          Elem * elem = *lev_elem_it;
-          libmesh_assert (elem);
-          // Make sure we don't leave any invalid pointers
-          const bool keep_me = elements_to_keep.count(elem);
+    for (auto & elem : as_range(mesh.level_elements_begin(l),
+                                mesh.level_elements_end(l)))
+      {
+        libmesh_assert (elem);
+        // Make sure we don't leave any invalid pointers
+        const bool keep_me = elements_to_keep.count(elem);
 
-          if (!keep_me)
-            elem->make_links_to_me_remote();
+        if (!keep_me)
+          elem->make_links_to_me_remote();
 
-          // delete_elem doesn't currently invalidate element
-          // iterators... that had better not change
-          if (!keep_me)
-            mesh.delete_elem(elem);
-        }
-    }
+        // delete_elem doesn't currently invalidate element
+        // iterators... that had better not change
+        if (!keep_me)
+          mesh.delete_elem(elem);
+      }
 
   // Delete all the nodes we have no reason to save
   for (auto & node : mesh.node_ptr_range())

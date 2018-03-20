@@ -177,9 +177,8 @@ Packing<const Node *>::pack (const Node * const & node,
 
   *data_out++ =(bcs.size());
 
-  for (std::vector<boundary_id_type>::iterator bc_it=bcs.begin();
-       bc_it != bcs.end(); ++bc_it)
-    *data_out++ =(*bc_it);
+  for (const auto & bid : bcs)
+    *data_out++ = bid;
 }
 
 

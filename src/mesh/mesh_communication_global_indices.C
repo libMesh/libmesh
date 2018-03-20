@@ -130,9 +130,8 @@ public:
   void operator() (const ConstNodeRange & range) const
   {
     std::size_t pos = range.first_idx();
-    for (ConstNodeRange::const_iterator it = range.begin(); it!=range.end(); ++it)
+    for (const auto & node : range)
       {
-        const Node * node = (*it);
         libmesh_assert(node);
         libmesh_assert_less (pos, _keys.size());
         _keys[pos++] = get_dofobject_key (node, _bbox);
@@ -143,9 +142,8 @@ public:
   void operator() (const ConstElemRange & range) const
   {
     std::size_t pos = range.first_idx();
-    for (ConstElemRange::const_iterator it = range.begin(); it!=range.end(); ++it)
+    for (const auto & elem : range)
       {
-        const Elem * elem = (*it);
         libmesh_assert(elem);
         libmesh_assert_less (pos, _keys.size());
         _keys[pos++] = get_dofobject_key (elem, _bbox);

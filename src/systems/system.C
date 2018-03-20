@@ -214,11 +214,11 @@ void System::clear ()
 
   // clear any user-added vectors
   {
-    for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
+    for (auto & pr : _vectors)
       {
-        pos->second->clear ();
-        delete pos->second;
-        pos->second = libmesh_nullptr;
+        pr.second->clear ();
+        delete pr.second;
+        pr.second = libmesh_nullptr;
       }
 
     _vectors.clear();
@@ -291,28 +291,28 @@ void System::init_data ()
   _is_initialized = true;
 
   // initialize & zero other vectors, if necessary
-  for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
+  for (auto & pr : _vectors)
     {
-      ParallelType type = _vector_types[pos->first];
+      ParallelType type = _vector_types[pr.first];
 
       if (type == GHOSTED)
         {
 #ifdef LIBMESH_ENABLE_GHOSTED
-          pos->second->init (this->n_dofs(), this->n_local_dofs(),
-                             _dof_map->get_send_list(), false,
-                             GHOSTED);
+          pr.second->init (this->n_dofs(), this->n_local_dofs(),
+                           _dof_map->get_send_list(), false,
+                           GHOSTED);
 #else
           libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
 #endif
         }
       else if (type == SERIAL)
         {
-          pos->second->init (this->n_dofs(), false, type);
+          pr.second->init (this->n_dofs(), false, type);
         }
       else
         {
           libmesh_assert_equal_to(type, PARALLEL);
-          pos->second->init (this->n_dofs(), this->n_local_dofs(), false, type);
+          pr.second->init (this->n_dofs(), this->n_local_dofs(), false, type);
         }
     }
 }
@@ -323,30 +323,30 @@ void System::restrict_vectors ()
 {
 #ifdef LIBMESH_ENABLE_AMR
   // Restrict the _vectors on the coarsened cells
-  for (vectors_iterator pos = _vectors.begin(); pos != _vectors.end(); ++pos)
+  for (auto & pr : _vectors)
     {
-      NumericVector<Number> * v = pos->second;
+      NumericVector<Number> * v = pr.second;
 
-      if (_vector_projections[pos->first])
+      if (_vector_projections[pr.first])
         {
-          this->project_vector (*v, this->vector_is_adjoint(pos->first));
+          this->project_vector (*v, this->vector_is_adjoint(pr.first));
         }
       else
         {
-          ParallelType type = _vector_types[pos->first];
+          ParallelType type = _vector_types[pr.first];
 
           if (type == GHOSTED)
             {
 #ifdef LIBMESH_ENABLE_GHOSTED
-              pos->second->init (this->n_dofs(), this->n_local_dofs(),
-                                 _dof_map->get_send_list(), false,
-                                 GHOSTED);
+              pr.second->init (this->n_dofs(), this->n_local_dofs(),
+                               _dof_map->get_send_list(), false,
+                               GHOSTED);
 #else
               libmesh_error_msg("Cannot initialize ghosted vectors when they are not enabled.");
 #endif
             }
           else
-            pos->second->init (this->n_dofs(), this->n_local_dofs(), false, type);
+            pr.second->init (this->n_dofs(), this->n_local_dofs(), false, type);
         }
     }
 
@@ -575,19 +575,18 @@ bool System::compare (const System & other_system,
   else
     {
       // compare other vectors
-      for (const_vectors_iterator pos = _vectors.begin();
-           pos != _vectors.end(); ++pos)
+      for (auto & pr : _vectors)
         {
           if (verbose)
             libMesh::out << "   comparing vector \""
-                         << pos->first << "\" ...";
+                         << pr.first << "\" ...";
 
           // assume they have the same name
           const NumericVector<Number> & other_system_vector =
-            other_system.get_vector(pos->first);
+            other_system.get_vector(pr.first);
 
-          ov_result.push_back(pos->second->compare (other_system_vector,
-                                                    threshold));
+          ov_result.push_back(pr.second->compare (other_system_vector,
+                                                  threshold));
 
           if (verbose)
             {
@@ -597,9 +596,7 @@ bool System::compare (const System & other_system,
                 libMesh::out << " first difference occurred at" << std::endl
                              << "   index = " << ov_result[ov_result.size()-1] << "." << std::endl;
             }
-
         }
-
     } // finished comparing additional vectors
 
 
@@ -1483,18 +1480,17 @@ Real System::calculate_norm(const NumericVector<Number> & v,
       const std::set<unsigned char> & elem_dims = _mesh.elem_dimensions();
 
       // Prepare finite elements for each dimension present in the mesh
-      for (std::set<unsigned char>::const_iterator d_it = elem_dims.begin();
-           d_it != elem_dims.end(); ++d_it)
+      for (const auto & dim : elem_dims)
         {
-          if (skip_dimensions && skip_dimensions->find(*d_it) != skip_dimensions->end())
+          if (skip_dimensions && skip_dimensions->find(dim) != skip_dimensions->end())
             continue;
 
           // Construct quadrature and finite element objects
-          q_rules[*d_it] = fe_type.default_quadrature_rule (*d_it);
-          fe_ptrs[*d_it] = FEBase::build(*d_it, fe_type);
+          q_rules[dim] = fe_type.default_quadrature_rule (dim);
+          fe_ptrs[dim] = FEBase::build(dim, fe_type);
 
           // Attach quadrature rule to FE object
-          fe_ptrs[*d_it]->attach_quadrature_rule (q_rules[*d_it].get());
+          fe_ptrs[dim]->attach_quadrature_rule (q_rules[dim].get());
         }
 
       std::vector<dof_id_type> dof_indices;

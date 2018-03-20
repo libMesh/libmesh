@@ -499,31 +499,30 @@ void TecplotIO::write_binary (const std::string & fname,
 
   // A zone for each subdomain
   bool firstzone=true;
-  for (std::set<subdomain_id_type>::const_iterator sbd_it=_subdomain_ids.begin();
-       sbd_it!=_subdomain_ids.end(); ++sbd_it)
+  for (const auto & sbd_id : _subdomain_ids)
     {
       // Copy the connectivity for this subdomain
       {
-        MeshBase::const_element_iterator       it  = the_mesh.active_subdomain_elements_begin (*sbd_it);
-        const MeshBase::const_element_iterator end = the_mesh.active_subdomain_elements_end   (*sbd_it);
-
         unsigned int n_subcells_in_subdomain=0;
 
-        for (; it != end; ++it)
-          n_subcells_in_subdomain += (*it)->n_sub_elem();
+        for (const auto & elem :
+               as_range(the_mesh.active_subdomain_elements_begin(sbd_id),
+                        the_mesh.active_subdomain_elements_end(sbd_id)))
+          n_subcells_in_subdomain += elem->n_sub_elem();
 
         // update the connectivity array to include only the elements in this subdomain
         tm.set_n_cells (n_subcells_in_subdomain);
 
         unsigned int te = 0;
 
-        for (it  = the_mesh.active_subdomain_elements_begin (*sbd_it);
-             it != end; ++it)
+        for (const auto & elem :
+               as_range(the_mesh.active_subdomain_elements_begin(sbd_id),
+                        the_mesh.active_subdomain_elements_end(sbd_id)))
           {
             std::vector<dof_id_type> conn;
-            for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+            for (unsigned int se=0; se<elem->n_sub_elem(); se++)
               {
-                (*it)->connectivity(se, TECPLOT, conn);
+                elem->connectivity(se, TECPLOT, conn);
 
                 for (std::size_t node=0; node<conn.size(); node++)
                   tm.cd(node,te) = conn[node];
@@ -543,7 +542,7 @@ void TecplotIO::write_binary (const std::string & fname,
           i_cell_max  = 0,
           j_cell_max  = 0,
           k_cell_max  = 0,
-          strand_id   = std::max(*sbd_it,static_cast<subdomain_id_type>(1)) + this->strand_offset(),
+          strand_id   = std::max(sbd_id, static_cast<subdomain_id_type>(1)) + this->strand_offset(),
           parent_zone = 0,
           is_block    = 1,
           num_face_connect   = 0,
@@ -559,7 +558,7 @@ void TecplotIO::write_binary (const std::string & fname,
         // zones will share from this one.
 
         // get the subdomain name from libMesh, if there is one.
-        std::string subdomain_name = the_mesh.subdomain_name(*sbd_it);
+        std::string subdomain_name = the_mesh.subdomain_name(sbd_id);
         std::ostringstream zone_name;
         zone_name << this->zone_title();
 
@@ -575,7 +574,7 @@ void TecplotIO::write_binary (const std::string & fname,
         else if (_subdomain_ids.size() > 1)
           {
             zone_name << "_";
-            zone_name << *sbd_it;
+            zone_name << sbd_id;
           }
 
         ierr = TECZNE112 (const_cast<char *>(zone_name.str().c_str()),

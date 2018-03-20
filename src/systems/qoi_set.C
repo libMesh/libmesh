@@ -46,15 +46,13 @@ unsigned int QoISet::size (const System & sys) const
 void QoISet::add_indices(const std::vector<unsigned int> & indices)
 {
   unsigned int max_size = 0;
-  for (std::vector<unsigned int>::const_iterator i = indices.begin();
-       i != indices.end(); ++i)
-    max_size = std::max(max_size, *i + 1);
+  for (const auto & i : indices)
+    max_size = std::max(max_size, i + 1);
 
   _indices.resize(max_size);
 
-  for (std::vector<unsigned int>::const_iterator i = indices.begin();
-       i != indices.end(); ++i)
-    _indices[*i] = true;
+  for (const auto & i : indices)
+    _indices[i] = true;
 }
 
 
@@ -62,9 +60,8 @@ void QoISet::add_indices(const std::vector<unsigned int> & indices)
 inline
 void QoISet::remove_indices(const std::vector<unsigned int> & indices)
 {
-  for (std::vector<unsigned int>::const_iterator i = indices.begin();
-       i != indices.end(); ++i)
-    _indices[*i] = false;
+  for (const auto & i : indices)
+    _indices[i] = false;
 }
 
 } // namespace libMesh

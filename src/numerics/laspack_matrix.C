@@ -68,11 +68,10 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph & s
     for (numeric_index_type row=0; row<n_rows; row++)
       {
         // insert the row indices
-        for (SparsityPattern::Row::const_iterator col = sparsity_pattern[row].begin();
-             col != sparsity_pattern[row].end(); ++col)
+        for (const auto & col : sparsity_pattern[row])
           {
             libmesh_assert (position != _csr.end());
-            *position = *col;
+            *position = col;
             ++position;
           }
 

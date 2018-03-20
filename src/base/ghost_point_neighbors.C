@@ -59,11 +59,8 @@ void GhostPointNeighbors::operator()
   // confusing the insert() calls later.
   CouplingMatrix * nullcm = libmesh_nullptr;
 
-  for (MeshBase::const_element_iterator elem_it = range_begin;
-       elem_it!=range_end; ++elem_it)
+  for (const auto & elem : as_range(range_begin, range_end))
     {
-      const Elem * elem = *elem_it;
-
       if (elem->processor_id() != p)
         coupled_elements.insert (std::make_pair(elem,nullcm));
 

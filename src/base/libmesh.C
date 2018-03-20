@@ -947,10 +947,10 @@ T command_line_value (const std::vector<std::string> & name, T value)
   libmesh_assert(command_line.get());
 
   // Check for multiple options (return the first that matches)
-  for (std::vector<std::string>::const_iterator i=name.begin(); i != name.end(); ++i)
-    if (command_line->have_variable(i->c_str()))
+  for (const auto & entry : name)
+    if (command_line->have_variable(entry.c_str()))
       {
-        value = (*command_line)(i->c_str(), value);
+        value = (*command_line)(entry.c_str(), value);
         break;
       }
 

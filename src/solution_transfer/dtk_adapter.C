@@ -57,11 +57,9 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int>> in_comm, EquationS
   {
     unsigned int i = 0;
 
-    for (std::set<unsigned int>::iterator it = semi_local_nodes.begin();
-         it != semi_local_nodes.end();
-         ++it)
+    for (const auto & id : semi_local_nodes)
       {
-        const Node & node = mesh.node_ref(*it);
+        const Node & node = mesh.node_ref(id);
 
         vertices[i] = node.id();
 
@@ -85,16 +83,13 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int>> in_comm, EquationS
   {
     unsigned int i = 0;
 
-    MeshBase::const_element_iterator end = mesh.local_elements_end();
-    for (MeshBase::const_element_iterator it = mesh.local_elements_begin();
-         it != end;
-         ++it)
+    for (const auto & elem : as_range(mesh.local_elements_begin(),
+                                      mesh.local_elements_end()))
       {
-        const Elem & elem = *(*it);
-        elements[i] = elem.id();
+        elements[i] = elem->id();
 
         for (unsigned int j=0; j<n_nodes_per_elem; j++)
-          connectivity[(j*n_local_elem)+i] = elem.node_id(j);
+          connectivity[(j*n_local_elem)+i] = elem->node_id(j);
 
         i++;
       }
@@ -211,7 +206,7 @@ DTKAdapter::update_variable_values(std::string var_name)
 
   unsigned int i=0;
   // Loop over the values (one for each node) and assign the value of this variable at each node
-  for (FieldContainerType::iterator it=values->begin(); it != values->end(); ++it)
+  for (const auto & value : *values)
     {
       unsigned int node_num = vertices[i];
       const Node & node = mesh.node_ref(node_num);
@@ -220,7 +215,7 @@ DTKAdapter::update_variable_values(std::string var_name)
         {
           // The 0 is for the component... this only works for LAGRANGE!
           dof_id_type dof = node.dof_number(sys->number(), var_num, 0);
-          sys->solution->set(dof, *it);
+          sys->solution->set(dof, value);
         }
 
       i++;
@@ -279,16 +274,9 @@ DTKAdapter::get_element_topology(const Elem * elem)
 void
 DTKAdapter::get_semi_local_nodes(std::set<unsigned int> & semi_local_nodes)
 {
-  MeshBase::const_element_iterator end = mesh.local_elements_end();
-  for (MeshBase::const_element_iterator it = mesh.local_elements_begin();
-       it != end;
-       ++it)
-    {
-      const Elem & elem = *(*it);
-
-      for (unsigned int j=0; j<elem.n_nodes(); j++)
-        semi_local_nodes.insert(elem.node_id(j));
-    }
+  for (const auto & elem : as_range(mesh.local_elements_begin(), mesh.local_elements_end()))
+    for (unsigned int j=0; j<elem->n_nodes(); j++)
+      semi_local_nodes.insert(elem->node_id(j));
 }
 
 } // namespace libMesh

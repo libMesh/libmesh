@@ -91,11 +91,9 @@ void DGFEMContext::neighbor_side_fe_reinit ()
   // the quadrature points on the current side
   std::vector<Point> qface_side_points;
   std::vector<Point> qface_neighbor_points;
-  std::map<FEType, std::unique_ptr<FEAbstract>>::iterator local_fe_end = _neighbor_side_fe.end();
-  for (std::map<FEType, std::unique_ptr<FEAbstract>>::iterator i = _neighbor_side_fe.begin();
-       i != local_fe_end; ++i)
+  for (auto & pr : _neighbor_side_fe)
     {
-      FEType neighbor_side_fe_type = i->first;
+      FEType neighbor_side_fe_type = pr.first;
       FEAbstract * side_fe = _side_fe[this->get_dim()][neighbor_side_fe_type].get();
       qface_side_points = side_fe->get_xyz();
 
@@ -105,7 +103,7 @@ void DGFEMContext::neighbor_side_fe_reinit ()
                                 qface_side_points,
                                 qface_neighbor_points);
 
-      i->second->reinit(&get_neighbor(), &qface_neighbor_points);
+      pr.second->reinit(&get_neighbor(), &qface_neighbor_points);
     }
 
   // Set boolean flag to indicate that the DG terms are active on this element

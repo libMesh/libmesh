@@ -189,8 +189,8 @@ void System::read_header (Xdr & io,
             std::vector<subdomain_id_type> domain_array;
             if (this->processor_id() == 0)
               io.data (domain_array);
-            for (std::vector<subdomain_id_type>::iterator it = domain_array.begin(); it != domain_array.end(); ++it)
-              domains.insert(*it);
+            for (const auto & id : domain_array)
+              domains.insert(id);
           }
         this->comm().broadcast(domains);
 
@@ -572,25 +572,23 @@ void System::read_parallel_data (Xdr & io,
       if (this->variable(var).type().family != SCALAR)
         {
           // First read the node DOF values
-          for (std::vector<const DofObject *>::const_iterator
-                 it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
-            for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+          for (const auto & node : ordered_nodes)
+            for (unsigned int comp=0; comp<node->n_comp(sys_num, var); comp++)
               {
-                libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
+                libmesh_assert_not_equal_to (node->dof_number(sys_num, var, comp),
                                              DofObject::invalid_id);
                 libmesh_assert_less (cnt, io_buffer.size());
-                this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+                this->solution->set(node->dof_number(sys_num, var, comp), io_buffer[cnt++]);
               }
 
           // Then read the element DOF values
-          for (std::vector<const DofObject *>::const_iterator
-                 it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
-            for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+          for (const auto & elem : ordered_elements)
+            for (unsigned int comp=0; comp<elem->n_comp(sys_num, var); comp++)
               {
-                libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
+                libmesh_assert_not_equal_to (elem->dof_number(sys_num, var, comp),
                                              DofObject::invalid_id);
                 libmesh_assert_less (cnt, io_buffer.size());
-                this->solution->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+                this->solution->set(elem->dof_number(sys_num, var, comp), io_buffer[cnt++]);
               }
         }
     }
@@ -661,25 +659,23 @@ void System::read_parallel_data (Xdr & io,
                   if (this->variable(var).type().family != SCALAR)
                     {
                       // First read the node DOF values
-                      for (std::vector<const DofObject *>::const_iterator
-                             it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
-                        for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+                      for (const auto & node : ordered_nodes)
+                        for (unsigned int comp=0; comp<node->n_comp(sys_num, var); comp++)
                           {
-                            libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
+                            libmesh_assert_not_equal_to (node->dof_number(sys_num, var, comp),
                                                          DofObject::invalid_id);
                             libmesh_assert_less (cnt, io_buffer.size());
-                            pos->second->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+                            pos->second->set(node->dof_number(sys_num, var, comp), io_buffer[cnt++]);
                           }
 
                       // Then read the element DOF values
-                      for (std::vector<const DofObject *>::const_iterator
-                             it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
-                        for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+                      for (const auto & elem : ordered_elements)
+                        for (unsigned int comp=0; comp<elem->n_comp(sys_num, var); comp++)
                           {
-                            libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
+                            libmesh_assert_not_equal_to (elem->dof_number(sys_num, var, comp),
                                                          DofObject::invalid_id);
                             libmesh_assert_less (cnt, io_buffer.size());
-                            pos->second->set((*it)->dof_number(sys_num, var, comp), io_buffer[cnt++]);
+                            pos->second->set(elem->dof_number(sys_num, var, comp), io_buffer[cnt++]);
                           }
                     }
                 }
@@ -835,8 +831,6 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
   // to write, and comps are all the components for said
   // vars on the object.
 
-  typedef std::vector<NumericVector<Number> *>::const_iterator vec_iterator_type;
-
   // variables to read.  Unless specified otherwise, defaults to _written_var_indices.
   std::vector<unsigned int> vars_to_read (_written_var_indices);
 
@@ -883,9 +877,8 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
       xfer_ids_size[block] += 2; // for each object, we send its id, as well as the total number of components for all variables
 
       dof_id_type n_comp_tot=0;
-      for (std::vector<unsigned int>::const_iterator var_it=vars_to_read.begin();
-           var_it!=vars_to_read.end(); ++var_it)
-        n_comp_tot += (*it)->n_comp(sys_num, *var_it); // for each variable, we will receive the nonzero components
+      for (const auto & var : vars_to_read)
+        n_comp_tot += (*it)->n_comp(sys_num, var); // for each variable, we will receive the nonzero components
 
       recv_vals_size[block] += n_comp_tot*num_vecs;
     }
@@ -926,9 +919,8 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 
               unsigned int n_comp_tot=0;
 
-              for (std::vector<unsigned int>::const_iterator var_it=vars_to_read.begin();
-                   var_it!=vars_to_read.end(); ++var_it)
-                n_comp_tot += (*it)->n_comp(sys_num,*var_it);
+              for (const auto & var : vars_to_read)
+                n_comp_tot += (*it)->n_comp(sys_num, var);
 
               ids.push_back (n_comp_tot*num_vecs);
             }
@@ -1095,29 +1087,24 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
             if (((*it)->id() >= first_object) && // object in [first_object,last_object)
                 ((*it)->id() <   last_object))
               // unpack & set the values
-              for (vec_iterator_type vec_it=vecs.begin(); vec_it!=vecs.end(); ++vec_it)
-                {
-                  NumericVector<Number> * vec(*vec_it);
+              for (auto & vec : vecs)
+                for (const auto & var : vars_to_read)
+                  {
+                    const unsigned int n_comp = (*it)->n_comp(sys_num, var);
 
-                  for (std::vector<unsigned int>::const_iterator var_it=vars_to_read.begin();
-                       var_it!=vars_to_read.end(); ++var_it)
-                    {
-                      const unsigned int n_comp = (*it)->n_comp(sys_num,*var_it);
-
-                      for (unsigned int comp=0; comp<n_comp; comp++, ++val_it)
-                        {
-                          const dof_id_type dof_index = (*it)->dof_number (sys_num, *var_it, comp);
-                          libmesh_assert (val_it != vals.end());
-                          if (vec)
-                            {
-                              libmesh_assert_greater_equal (dof_index, vec->first_local_index());
-                              libmesh_assert_less (dof_index, vec->last_local_index());
-                              //libMesh::out << "dof_index, *val_it = \t" << dof_index << ", " << *val_it << '\n';
-                              vec->set (dof_index, *val_it);
-                            }
-                        }
-                    }
-                }
+                    for (unsigned int comp=0; comp<n_comp; comp++, ++val_it)
+                      {
+                        const dof_id_type dof_index = (*it)->dof_number (sys_num, var, comp);
+                        libmesh_assert (val_it != vals.end());
+                        if (vec)
+                          {
+                            libmesh_assert_greater_equal (dof_index, vec->first_local_index());
+                            libmesh_assert_less (dof_index, vec->last_local_index());
+                            //libMesh::out << "dof_index, *val_it = \t" << dof_index << ", " << *val_it << '\n';
+                            vec->set (dof_index, *val_it);
+                          }
+                      }
+                  }
       }
 
       // processor 0 needs to make sure all replies have been handed off
@@ -1496,11 +1483,8 @@ void System::write_header (Xdr & io,
 
     if (write_additional_data)
       {
-        std::map<std::string, NumericVector<Number> *>::const_iterator
-          vec_pos = this->_vectors.begin();
         unsigned int cnt=0;
-
-        for (; vec_pos != this->_vectors.end(); ++vec_pos)
+        for (const auto & pr : _vectors)
           {
             // 9.)
             // write the name of the cnt-th additional vector
@@ -1508,7 +1492,7 @@ void System::write_header (Xdr & io,
             std::sprintf(buf, "%d", cnt++);
             comment += buf;
             comment += "th vector";
-            std::string vec_name = vec_pos->first;
+            std::string vec_name = pr.first;
 
             io.data (vec_name, comment.c_str());
           }
@@ -1586,26 +1570,23 @@ void System::write_parallel_data (Xdr & io,
     if (this->variable(var).type().family != SCALAR)
       {
         // First write the node DOF values
-        for (std::vector<const DofObject *>::const_iterator
-               it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
-          for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+        for (const auto & node : ordered_nodes)
+          for (unsigned int comp=0; comp<node->n_comp(sys_num, var); comp++)
             {
-              //libMesh::out << "(*it)->id()=" << (*it)->id() << std::endl;
-              libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
+              libmesh_assert_not_equal_to (node->dof_number(sys_num, var, comp),
                                            DofObject::invalid_id);
 
-              io_buffer.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));
+              io_buffer.push_back((*this->solution)(node->dof_number(sys_num, var, comp)));
             }
 
         // Then write the element DOF values
-        for (std::vector<const DofObject *>::const_iterator
-               it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
-          for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+        for (const auto & elem : ordered_elements)
+          for (unsigned int comp=0; comp<elem->n_comp(sys_num, var); comp++)
             {
-              libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
+              libmesh_assert_not_equal_to (elem->dof_number(sys_num, var, comp),
                                            DofObject::invalid_id);
 
-              io_buffer.push_back((*this->solution)((*it)->dof_number(sys_num, var, comp)));
+              io_buffer.push_back((*this->solution)(elem->dof_number(sys_num, var, comp)));
             }
       }
 
@@ -1643,37 +1624,33 @@ void System::write_parallel_data (Xdr & io,
   // Only write additional vectors if wanted
   if (write_additional_data)
     {
-      std::map<std::string, NumericVector<Number> *>::const_iterator
-        pos = _vectors.begin();
-
-      for (; pos != this->_vectors.end(); ++pos)
+      for (auto & pr : _vectors)
         {
-          io_buffer.clear(); io_buffer.reserve( pos->second->local_size());
+          io_buffer.clear();
+          io_buffer.reserve(pr.second->local_size());
 
           // Loop over each non-SCALAR variable and each node, and write out the value.
           for (unsigned int var=0; var<nv; var++)
             if (this->variable(var).type().family != SCALAR)
               {
                 // First write the node DOF values
-                for (std::vector<const DofObject *>::const_iterator
-                       it = ordered_nodes.begin(); it != ordered_nodes.end(); ++it)
-                  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+                for (const auto & node : ordered_nodes)
+                  for (unsigned int comp=0; comp<node->n_comp(sys_num, var); comp++)
                     {
-                      libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
+                      libmesh_assert_not_equal_to (node->dof_number(sys_num, var, comp),
                                                    DofObject::invalid_id);
 
-                      io_buffer.push_back((*pos->second)((*it)->dof_number(sys_num, var, comp)));
+                      io_buffer.push_back((*pr.second)(node->dof_number(sys_num, var, comp)));
                     }
 
                 // Then write the element DOF values
-                for (std::vector<const DofObject *>::const_iterator
-                       it = ordered_elements.begin(); it != ordered_elements.end(); ++it)
-                  for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
+                for (const auto & elem : ordered_elements)
+                  for (unsigned int comp=0; comp<elem->n_comp(sys_num, var); comp++)
                     {
-                      libmesh_assert_not_equal_to ((*it)->dof_number(sys_num, var, comp),
+                      libmesh_assert_not_equal_to (elem->dof_number(sys_num, var, comp),
                                                    DofObject::invalid_id);
 
-                      io_buffer.push_back((*pos->second)((*it)->dof_number(sys_num, var, comp)));
+                      io_buffer.push_back((*pr.second)(elem->dof_number(sys_num, var, comp)));
                     }
               }
 
@@ -1688,7 +1665,7 @@ void System::write_parallel_data (Xdr & io,
                     dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
 
                     for (std::size_t i=0; i<SCALAR_dofs.size(); i++)
-                      io_buffer.push_back((*pos->second)(SCALAR_dofs[i]));
+                      io_buffer.push_back((*pr.second)(SCALAR_dofs[i]));
                   }
               }
 
@@ -1702,7 +1679,7 @@ void System::write_parallel_data (Xdr & io,
             comment = "# System \"";
             comment += this->name();
             comment += "\" Additional Vector \"";
-            comment += pos->first;
+            comment += pr.first;
             comment += "\"";
           }
 
@@ -1858,8 +1835,6 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
   // to write, and comps are all the components for said
   // vars on the object.
 
-  typedef std::vector<const NumericVector<Number> *>::const_iterator vec_iterator_type;
-
   // We will write all variables unless requested otherwise.
   std::vector<unsigned int> vars_to_write(1, var_to_write);
 
@@ -1910,9 +1885,8 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
 
       unsigned int n_comp_tot=0;
 
-      for (std::vector<unsigned int>::const_iterator var_it=vars_to_write.begin();
-           var_it!=vars_to_write.end(); ++var_it)
-        n_comp_tot += (*it)->n_comp(sys_num, *var_it); // for each variable, we will store the nonzero components
+      for (const auto & var : vars_to_write)
+        n_comp_tot += (*it)->n_comp(sys_num, var); // for each variable, we will store the nonzero components
 
       send_vals_size[block] += n_comp_tot*num_vecs;
     }
@@ -1951,31 +1925,25 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
               {
                 unsigned int n_comp_tot=0;
 
-                for (std::vector<unsigned int>::const_iterator var_it=vars_to_write.begin();
-                     var_it!=vars_to_write.end(); ++var_it)
-                  n_comp_tot += (*it)->n_comp(sys_num,*var_it);
+                for (const auto & var : vars_to_write)
+                  n_comp_tot += (*it)->n_comp(sys_num, var);
 
                 ids.push_back (n_comp_tot*num_vecs); // even if 0 - processor 0 has no way of knowing otherwise...
               }
 
               // pack the values to send
-              for (vec_iterator_type vec_it=vecs.begin(); vec_it!=vecs.end(); ++vec_it)
-                {
-                  const NumericVector<Number> & vec(**vec_it);
+              for (const auto & vec : vecs)
+                for (const auto & var : vars_to_write)
+                  {
+                    const unsigned int n_comp = (*it)->n_comp(sys_num, var);
 
-                  for (std::vector<unsigned int>::const_iterator var_it=vars_to_write.begin();
-                       var_it!=vars_to_write.end(); ++var_it)
-                    {
-                      const unsigned int n_comp = (*it)->n_comp(sys_num,*var_it);
-
-                      for (unsigned int comp=0; comp<n_comp; comp++)
-                        {
-                          libmesh_assert_greater_equal ((*it)->dof_number(sys_num, *var_it, comp), vec.first_local_index());
-                          libmesh_assert_less ((*it)->dof_number(sys_num, *var_it, comp), vec.last_local_index());
-                          vals.push_back(vec((*it)->dof_number(sys_num, *var_it, comp)));
-                        }
-                    }
-                }
+                    for (unsigned int comp=0; comp<n_comp; comp++)
+                      {
+                        libmesh_assert_greater_equal ((*it)->dof_number(sys_num, var, comp), vec->first_local_index());
+                        libmesh_assert_less ((*it)->dof_number(sys_num, var, comp), vec->last_local_index());
+                        vals.push_back((*vec)((*it)->dof_number(sys_num, var, comp)));
+                      }
+                  }
             }
 
 #ifdef LIBMESH_HAVE_MPI

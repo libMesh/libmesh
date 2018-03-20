@@ -30,8 +30,8 @@ namespace libMesh
 
 PeriodicBoundaries::~PeriodicBoundaries()
 {
-  for (std::map<boundary_id_type, PeriodicBoundaryBase *>::iterator it = begin(); it != end(); ++it)
-    delete it->second;
+  for (auto & pr : *this)
+    delete pr.second;
 }
 
 

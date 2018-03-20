@@ -109,8 +109,7 @@ void FroIO::write (const std::string & fname)
         // Map the boundary ids into [1,n_bc_ids],
         // treat them one at a time.
         boundary_id_type bc_id=0;
-        for (std::set<boundary_id_type>::const_iterator id = bc_ids.begin();
-             id != bc_ids.end(); ++id)
+        for (const auto & id : bc_ids)
           {
             std::deque<dof_id_type> node_list;
 
@@ -119,7 +118,7 @@ void FroIO::write (const std::string & fname)
 
             // Get all sides on this element with the relevant BC id.
             for (std::size_t e=0; e<el.size(); e++)
-              if (il[e] == *id)
+              if (il[e] == id)
                 {
                   // need to build up node_list as a sorted array of edge nodes...
                   // for the following:

@@ -171,8 +171,8 @@ void
 ParameterVector::clear()
 {
   if (!_is_shallow_copy)
-    for (std::size_t i=0; i != _params.size(); ++i)
-      delete _params[i];
+    for (auto & param : _params)
+      delete param;
 
   _params.clear();
   _my_data.clear();

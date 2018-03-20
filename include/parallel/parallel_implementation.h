@@ -130,11 +130,11 @@ namespace Parallel {
   {                                                                     \
     static const bool has_min_max = Attributes<T>::has_min_max;         \
     static void set_lowest(cxxtype<T> & x) {                            \
-      for (typename cxxtype<T>::iterator i = x.begin(); i != x.end(); ++i) \
-        Attributes<T>::set_lowest(*i); }                                \
+      for (auto & val : x)                                              \
+        Attributes<T>::set_lowest(val); }                               \
     static void set_highest(cxxtype<T> & x) {                           \
-      for (typename cxxtype<T>::iterator i = x.begin(); i != x.end(); ++i) \
-        Attributes<T>::set_highest(*i); }                               \
+      for (auto & val : x)                                              \
+        Attributes<T>::set_highest(val); }                              \
   }
 
 
@@ -861,10 +861,8 @@ inline void Request::cleanup()
 #ifdef DEBUG
           // If we're done using this request, then we'd better have
           // done the work we waited for
-          for (std::vector<PostWaitWork *>::iterator i =
-                 post_wait_work->first.begin();
-               i != post_wait_work->first.end(); ++i)
-            libmesh_assert(!(*i));
+          for (const auto & item : post_wait_work->first)
+            libmesh_assert(!item);
 #endif
           delete post_wait_work;
           post_wait_work = libmesh_nullptr;
@@ -914,16 +912,14 @@ inline Status Request::wait ()
     (MPI_Wait (&_request, stat.get()));
 #endif
   if (post_wait_work)
-    for (std::vector<PostWaitWork *>::iterator i =
-           post_wait_work->first.begin();
-         i != post_wait_work->first.end(); ++i)
+    for (auto & item : post_wait_work->first)
       {
         // The user should never try to give us NULL work or try
         // to wait() twice.
-        libmesh_assert (*i);
-        (*i)->run();
-        delete (*i);
-        *i = libmesh_nullptr;
+        libmesh_assert (item);
+        item->run();
+        delete item;
+        item = libmesh_nullptr;
       }
 
   return stat;
@@ -3812,11 +3808,10 @@ inline void Communicator::broadcast(std::map<T1, T2> & data,
 
   if (root_id == this->rank())
     {
-      for (typename std::map<T1, T2>::const_iterator it = data.begin();
-           it != data.end(); ++it)
+      for (const auto & pr : data)
         {
-          pair_first.push_back(it->first);
-          pair_second.push_back(it->second);
+          pair_first.push_back(pr.first);
+          pair_second.push_back(pr.second);
         }
     }
   else

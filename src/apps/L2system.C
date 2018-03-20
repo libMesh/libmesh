@@ -29,13 +29,8 @@ using namespace libMesh;
 
 L2System::~L2System ()
 {
-  for (std::map<FEMContext *, FEMContext *>::const_iterator
-         it = input_contexts.begin();
-       it != input_contexts.end(); ++it)
-    {
-      FEMContext * c = it->second;
-      delete c;
-    }
+  for (auto & pr : input_contexts)
+    delete pr.second;
 }
 
 void L2System::init_data ()

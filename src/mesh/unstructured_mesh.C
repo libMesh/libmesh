@@ -242,18 +242,12 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
   LOG_SCOPE("find_neighbors()", "Mesh");
 
-  const element_iterator el_end = this->elements_end();
-
   //TODO:[BSK] This should be removed later?!
   if (reset_current_list)
-    for (element_iterator el = this->elements_begin(); el != el_end; ++el)
-      {
-        Elem * e = *el;
-        for (auto s : e->side_index_range())
-          if (e->neighbor_ptr(s) != remote_elem ||
-              reset_remote_elements)
-            e->set_neighbor(s, libmesh_nullptr);
-      }
+    for (const auto & e : this->element_ptr_range())
+      for (auto s : e->side_index_range())
+        if (e->neighbor_ptr(s) != remote_elem || reset_remote_elements)
+          e->set_neighbor(s, libmesh_nullptr);
 
   // Find neighboring elements by first finding elements
   // with identical side keys and then check to see if they
@@ -271,10 +265,8 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
 
 
-    for (element_iterator el = this->elements_begin(); el != el_end; ++el)
+    for (const auto & element : this->element_ptr_range())
       {
-        Elem * element = *el;
-
         for (auto ms : element->side_index_range())
           {
           next_side:
@@ -399,11 +391,9 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
   const unsigned int n_levels = MeshTools::n_levels(*this);
   for (unsigned int level = 1; level < n_levels; ++level)
     {
-      element_iterator end = this->level_elements_end(level);
-      for (element_iterator el = this->level_elements_begin(level);
-           el != end; ++el)
+      for (auto & current_elem : as_range(level_elements_begin(level),
+                                          level_elements_end(level)))
         {
-          Elem * current_elem = *el;
           libmesh_assert(current_elem);
           Elem * parent = current_elem->parent();
           libmesh_assert(parent);

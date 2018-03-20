@@ -298,17 +298,11 @@ void UnstructuredMesh::all_first_order ()
    */
   std::vector<bool> node_touched_by_me(this->max_node_id(), false);
 
-  /**
-   * Loop over the high-ordered elements.
-   * First make sure they _are_ indeed high-order, and then replace
-   * them with an equivalent first-order element.
-   */
-  element_iterator endit = elements_end();
-  for (element_iterator it = elements_begin();
-       it != endit; ++it)
+  // Loop over the high-ordered elements.
+  // First make sure they _are_ indeed high-order, and then replace
+  // them with an equivalent first-order element.
+  for (auto & so_elem : element_ptr_range())
     {
-      Elem * so_elem = *it;
-
       libmesh_assert(so_elem);
 
       /*
@@ -1423,10 +1417,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
             for (auto sn : elem->side_index_range())
               {
                 mesh.get_boundary_info().boundary_ids(elem, sn, bc_ids);
-                for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+                for (const auto & b_id : bc_ids)
                   {
-                    const boundary_id_type b_id = *id_it;
-
                     if (mesh_is_serial && b_id == BoundaryInfo::invalid_id)
                       continue;
 
@@ -1602,19 +1594,10 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
           weight.resize(mesh.n_nodes());
 
           {
-            /*
-             * Loop over the elements to calculate new node positions
-             */
-            MeshBase::element_iterator       el  = mesh.level_elements_begin(refinement_level);
-            const MeshBase::element_iterator end = mesh.level_elements_end(refinement_level);
-
-            for (; el != end; ++el)
+            // Loop over the elements to calculate new node positions
+            for (const auto & elem : as_range(mesh.level_elements_begin(refinement_level),
+                                              mesh.level_elements_end(refinement_level)))
               {
-                /*
-                 * Constant handle for the element
-                 */
-                const Elem * elem = *el;
-
                 /*
                  * We relax all nodes on level 0 first
                  * If the element is refined (level > 0), we interpolate the
@@ -1706,40 +1689,28 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
                 mesh.node_ref(nid) = new_positions[nid]/weight[nid];
           }
 
-          {
-            /*
-             * Now handle the additional second_order nodes by calculating
-             * their position based on the vertex positions
-             * we do a second loop over the level elements
-             */
-            MeshBase::element_iterator       el  = mesh.level_elements_begin(refinement_level);
-            const MeshBase::element_iterator end = mesh.level_elements_end(refinement_level);
+          // Now handle the additional second_order nodes by calculating
+          // their position based on the vertex positions
+          // we do a second loop over the level elements
+          for (auto & elem : as_range(mesh.level_elements_begin(refinement_level),
+                                      mesh.level_elements_end(refinement_level)))
+            {
+              const unsigned int son_begin = elem->n_vertices();
+              const unsigned int son_end   = elem->n_nodes();
+              for (unsigned int n=son_begin; n<son_end; n++)
+                {
+                  const unsigned int n_adjacent_vertices =
+                    elem->n_second_order_adjacent_vertices(n);
 
-            for (; el != end; ++el)
-              {
-                /*
-                 * Constant handle for the element
-                 */
-                const Elem * elem = *el;
-                const unsigned int son_begin = elem->n_vertices();
-                const unsigned int son_end   = elem->n_nodes();
-                for (unsigned int n=son_begin; n<son_end; n++)
-                  {
-                    const unsigned int n_adjacent_vertices =
-                      elem->n_second_order_adjacent_vertices(n);
+                  Point point;
+                  for (unsigned int v=0; v<n_adjacent_vertices; v++)
+                    point.add(elem->point( elem->second_order_adjacent_vertex(n,v) ));
 
-                    Point point;
-                    for (unsigned int v=0; v<n_adjacent_vertices; v++)
-                      point.add(elem->point( elem->second_order_adjacent_vertex(n,v) ));
-
-                    const dof_id_type id = elem->node_ptr(n)->id();
-                    mesh.node_ref(id) = point/n_adjacent_vertices;
-                  }
-              }
-          }
-
+                  const dof_id_type id = elem->node_ptr(n)->id();
+                  mesh.node_ref(id) = point/n_adjacent_vertices;
+                }
+            }
         } // refinement_level loop
-
     } // end iteration
 }
 
@@ -1803,17 +1774,13 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
             copy->set_neighbor(s, const_cast<RemoteElem *>(remote_elem));
 
           mesh.get_boundary_info().boundary_ids(elem, s, bc_ids);
-          for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
-            {
-              const boundary_id_type bc_id = *id_it;
-
-              if (bc_id != BoundaryInfo::invalid_id)
-                {
-                  saved_boundary_elements.push_back(copy);
-                  saved_bc_ids.push_back(bc_id);
-                  saved_bc_sides.push_back(s);
-                }
-            }
+          for (const auto & bc_id : bc_ids)
+            if (bc_id != BoundaryInfo::invalid_id)
+              {
+                saved_boundary_elements.push_back(copy);
+                saved_bc_ids.push_back(bc_id);
+                saved_bc_sides.push_back(s);
+              }
         }
 
 
@@ -1834,29 +1801,23 @@ void MeshTools::Modification::flatten(MeshBase & mesh)
     mesh.delete_elem(elem);
 
   // Add the copied (now level-0) elements back to the mesh
-  {
-    for (std::vector<Elem *>::iterator it = new_elements.begin();
-         it != new_elements.end();
-         ++it)
-      {
-#ifndef NDEBUG
-        dof_id_type orig_id = (*it)->id();
+  for (auto & new_elem : new_elements)
+    {
+      // Save the original ID, because the act of adding the Elem can
+      // change new_elem's id!
+      dof_id_type orig_id = new_elem->id();
 
-        // ugly mid-statement endif to avoid unused variable warnings
-        Elem * added_elem =
-#endif
-          mesh.add_elem(*it);
+      Elem * added_elem = mesh.add_elem(new_elem);
 
-#ifndef NDEBUG
-        dof_id_type added_id = added_elem->id();
-#endif
+      // If the Elem, as it was re-added to the mesh, now has a
+      // different ID (this is unlikely, so it's just an assert)
+      // the boundary information will no longer be correct.
+      libmesh_assert_equal_to (orig_id, added_elem->id());
 
-        // If the Elem, as it was re-added to the mesh, now has a
-        // different ID (this is unlikely, so it's just an assert)
-        // the boundary information will no longer be correct.
-        libmesh_assert_equal_to (orig_id, added_id);
-      }
-  }
+      // Avoid compiler warnings in opt mode.
+      libmesh_ignore(added_elem);
+      libmesh_ignore(orig_id);
+    }
 
   // Finally, also add back the saved boundary information
   for (std::size_t e=0; e<saved_boundary_elements.size(); ++e)

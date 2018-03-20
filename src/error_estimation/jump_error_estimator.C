@@ -158,11 +158,8 @@ void JumpErrorEstimator::estimate_error (const System & system,
       const std::set<unsigned char> & elem_dims =
         fine_context->elem_dimensions();
 
-      for (std::set<unsigned char>::const_iterator dim_it =
-             elem_dims.begin(); dim_it != elem_dims.end(); ++dim_it)
+      for (const auto & dim : elem_dims)
         {
-          const unsigned char dim = *dim_it;
-
           fine_context->get_side_fe( var, side_fe, dim );
 
           side_fe->get_xyz();

@@ -187,10 +187,9 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
   else
     {
       libmesh_assert(errors_per_cell);
-      for (ErrorMap::iterator i = errors_per_cell->begin();
-           i != errors_per_cell->end(); ++i)
+      for (const auto & pr : *errors_per_cell)
         {
-          ErrorVector * e = i->second;
+          ErrorVector * e = pr.second;
           e->clear();
           e->resize(mesh.max_elem_id(), 0.);
         }
@@ -675,18 +674,17 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems * _es,
     }
   else
     {
-      for (ErrorMap::iterator it = errors_per_cell->begin();
-           it != errors_per_cell->end(); ++it)
+      for (const auto & pr : *errors_per_cell)
         {
-          ErrorVector * e = it->second;
+          ErrorVector & e = *(pr.second);
           // First sum the vector of estimated error values
-          this->reduce_error(*e, es.comm());
+          this->reduce_error(e, es.comm());
 
           // Compute the square-root of each component.
           LOG_SCOPE("std::sqrt()", "UniformRefinementEstimator");
-          for (std::size_t i=0; i<e->size(); i++)
-            if ((*e)[i] != 0.)
-              (*e)[i] = std::sqrt((*e)[i]);
+          for (auto & val : e)
+            if (val != 0.)
+              val = std::sqrt(val);
         }
     }
 

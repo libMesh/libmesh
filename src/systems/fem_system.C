@@ -371,10 +371,9 @@ public:
     FEMContext & _femcontext = cast_ref<FEMContext &>(*con);
     _sys.init_context(_femcontext);
 
-    for (ConstElemRange::const_iterator elem_it = range.begin();
-         elem_it != range.end(); ++elem_it)
+    for (const auto & elem : range)
       {
-        Elem * el = const_cast<Elem *>(*elem_it);
+        Elem * el = const_cast<Elem *>(elem);
 
         _femcontext.pre_fe_reinit(_sys, el);
         _femcontext.elem_fe_reinit();
@@ -413,10 +412,9 @@ public:
     FEMContext & _femcontext = cast_ref<FEMContext &>(*con);
     _sys.init_context(_femcontext);
 
-    for (ConstElemRange::const_iterator elem_it = range.begin();
-         elem_it != range.end(); ++elem_it)
+    for (const auto & elem : range)
       {
-        Elem * el = const_cast<Elem *>(*elem_it);
+        Elem * el = const_cast<Elem *>(elem);
         _femcontext.pre_fe_reinit(_sys, el);
 
         // Optionally initialize all the interior FE objects on elem.
@@ -492,10 +490,9 @@ public:
     if (have_some_heterogenous_qoi_bc)
       _sys.init_context(_femcontext);
 
-    for (ConstElemRange::const_iterator elem_it = range.begin();
-         elem_it != range.end(); ++elem_it)
+    for (const auto & elem : range)
       {
-        Elem * el = const_cast<Elem *>(*elem_it);
+        Elem * el = const_cast<Elem *>(elem);
 
         _femcontext.pre_fe_reinit(_sys, el);
 
@@ -628,10 +625,9 @@ public:
     if (have_some_heterogenous_qoi_bc)
       _sys.init_context(_femcontext);
 
-    for (ConstElemRange::const_iterator elem_it = range.begin();
-         elem_it != range.end(); ++elem_it)
+    for (const auto & elem : range)
       {
-        Elem * el = const_cast<Elem *>(*elem_it);
+        Elem * el = const_cast<Elem *>(elem);
 
         _femcontext.pre_fe_reinit(_sys, el);
 
