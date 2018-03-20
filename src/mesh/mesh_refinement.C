@@ -160,19 +160,17 @@ Node * MeshRefinement::add_node(Elem & parent,
   const dof_id_type new_node_id =
     _new_nodes_map.find(bracketing_nodes);
 
-  // Return the node if it already exists, but first update the
-  // processor_id if the node is now going to be attached to the
-  // element of a processor which may take ownership of it.
+  // Return the node if it already exists.
+  //
+  // We'll leave the processor_id untouched in this case - if we're
+  // repartitioning later or if this is a new unpartitioned node,
+  // we'll update it then, and if not then we don't want to update it.
   if (new_node_id != DofObject::invalid_id)
-    {
-      Node * node = _mesh.node_ptr(new_node_id);
-      processor_id_type & pid = node->processor_id();
-      pid = node->choose_processor_id(pid, proc_id);
-      return node;
-    }
+    return _mesh.node_ptr(new_node_id);
 
-  // Otherwise we need to add a new node, with a default id and the
-  // requested processor_id.  Figure out where to add the point:
+  // Otherwise we need to add a new node.
+  //
+  // Figure out where to add the point:
 
   Point p; // defaults to 0,0,0
 
@@ -190,9 +188,15 @@ Node * MeshRefinement::add_node(Elem & parent,
         }
     }
 
+  // Although we're leaving new nodes unpartitioned at first, with a
+  // DistributedMesh we would need a default id based on the numbering
+  // scheme for the requested processor_id.
   Node * new_node = _mesh.add_point (p, DofObject::invalid_id, proc_id);
 
   libmesh_assert(new_node);
+
+  // But then we'll make sure this node is marked as unpartitioned.
+  new_node->processor_id() = DofObject::invalid_processor_id;
 
   // Add the node to the map.
   _new_nodes_map.add_node(*new_node, bracketing_nodes);
