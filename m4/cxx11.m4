@@ -31,14 +31,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MOVE],
         int one = 1, two = 2;
         move_swap(one,two);
     ]])],[
-        if (test "x$enablecxx11" = "xyes"); then
-          AC_MSG_RESULT(yes)
-          AC_DEFINE(HAVE_CXX11_MOVE, 1, [Flag indicating whether compiler supports std::move])
-          have_cxx11_move=yes
-        else
-          AC_MSG_RESULT([yes, but disabled.])
-          AC_DEFINE(HAVE_CXX11_MOVE_BUT_DISABLED, 1, [Compiler supports std::move, but it is disabled in libmesh])
-        fi
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_MOVE, 1, [Flag indicating whether compiler supports std::move])
+        have_cxx11_move=yes
     ],[
         AC_MSG_RESULT(no)
     ])
@@ -81,14 +76,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MOVE_CONSTRUCTORS],
         move_constructable m1;
         move_constructable m2(std::move(m1));
     ]])],[
-        if (test "x$enablecxx11" = "xyes"); then
-          AC_MSG_RESULT(yes)
-          AC_DEFINE(HAVE_CXX11_MOVE_CONSTRUCTORS, 1, [Flag indicating whether compiler supports move construction])
-          have_cxx11_move_constructors=yes
-        else
-          AC_MSG_RESULT([yes, but disabled.])
-          AC_DEFINE(HAVE_CXX11_MOVE_CONSTRUCTORS_BUT_DISABLED, 1, [Compiler supports move construction, but it is disabled in libmesh])
-        fi
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_MOVE_CONSTRUCTORS, 1, [Flag indicating whether compiler supports move construction])
+        have_cxx11_move_constructors=yes
     ],[
         AC_MSG_RESULT(no)
     ])
@@ -124,14 +114,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_RANGEFOR],
         std::vector<int> v(3);
         print(v);
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_RANGEFOR, 1, [Flag indicating whether compiler supports range-based for loops])
         have_cxx11_rangefor=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_RANGEFOR_BUT_DISABLED, 1, [Compiler supports range-based for loops, but it is disabled in libmesh])
-      fi
     ],[
         AC_MSG_RESULT(no)
     ])
@@ -159,14 +144,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_DECLTYPE],
         int a;
         decltype(a) b;
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_DECLTYPE, 1, [Flag indicating whether compiler supports decltype])
         have_cxx11_decltype=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_DECLTYPE_BUT_DISABLED, 1, [Compiler supports decltype, but it is disabled in libmesh])
-      fi
     ],[
         AC_MSG_RESULT(no)
     ])
@@ -196,14 +176,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_RVALUE_REFERENCES],
       // Call function that takes an rvalue reference.
       foo (bar());
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_RVALUE_REFERENCES, 1, [Flag indicating whether compiler supports rvalue references])
         have_cxx11_rvalue_references=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_RVALUE_REFERENCES_BUT_DISABLED, 1, [Compiler supports rvalue references, but they are disabled in libmesh])
-      fi
     ],[
         AC_MSG_RESULT(no)
     ])
@@ -231,14 +206,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_AUTO],
       int x = 5;
       auto y = x;
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_AUTO, 1, [Flag indicating whether compiler supports the auto keyword])
         have_cxx11_auto=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_AUTO_BUT_DISABLED, 1, [Compiler supports auto keyword, but it is disabled in libmesh])
-      fi
     ],[
         AC_MSG_RESULT(no)
     ])
@@ -273,14 +243,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_LAMBDA],
       // of a standard function pointer.  The result should be true.
       f ( [](int x) { return x > 3; } );
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_LAMBDA, 1, [Flag indicating whether compiler supports lambdas])
         have_cxx11_lambda=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_LAMBDA_BUT_DISABLED, 1, [Compiler supports lambdas, but they are disabled in libmesh])
-      fi
     ],[
         AC_MSG_RESULT(no)
     ])
@@ -309,14 +274,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_CONSTEXPR],
       // The compiler should compute "val" at compile time.
       const int val = multiply(10, 10);
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_CONSTEXPR, 1, [Flag indicating whether compiler supports constexpr])
         have_cxx11_constexpr=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_CONSTEXPR_BUT_DISABLED, 1, [Compiler supports constexpr, but it is disabled in libmesh])
-      fi
     ],[
         AC_MSG_RESULT(no)
     ])
@@ -352,14 +312,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS],
     ]], [[
       MyCheck<int> mc;
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_ALIAS_DECLARATIONS, 1, [Flag indicating whether compiler supports alias declarations])
         have_cxx11_alias_declarations=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_ALIAS_DECLARATIONS_BUT_DISABLED, 1, [Compiler supports alias declarations, but they are disabled in libmesh])
-      fi
     ],[
         AC_MSG_RESULT(no)
     ])
@@ -384,26 +339,13 @@ AC_DEFUN([LIBMESH_TEST_CXX11_SHARED_PTR],
 
     # Try compiling the test code in all methods requested by the user
     for method in ${METHODS}; do
-        case "${method}" in
-            optimized|opt)
-              CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_OPT $CPPFLAGS_OPT";;
-
-            debug|dbg)
-              CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_DBG $CPPFLAGS_DBG";;
-
-            devel)
-              CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_DEVEL $CPPFLAGS_DEVEL";;
-
-            profiling|pro|prof)
-              CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_PROF $CPPFLAGS_PROF";;
-
-            oprofile|oprof)
-              CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_OPROF $CPPFLAGS_OPROF";;
-
-            *)
-            AC_MSG_ERROR([bad value ${method} for --with-methods])
-            ;;
-        esac
+        AS_CASE("${method}",
+            [optimized|opt],      [CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_OPT $CPPFLAGS_OPT"],
+            [debug|dbg],          [CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_DBG $CPPFLAGS_DBG"],
+            [devel],              [CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_DEVEL $CPPFLAGS_DEVEL"],
+            [profiling|pro|prof], [CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_PROF $CPPFLAGS_PROF"],
+            [oprofile|oprof],     [CXXFLAGS="$saveCXXFLAGS $CXXFLAGS_OPROF $CPPFLAGS_OPROF"],
+            [AC_MSG_ERROR([bad value ${method} for --with-methods])])
 
         CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
@@ -420,13 +362,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_SHARED_PTR],
               std::shared_ptr<int> p3 (p2);
               p3.reset(new int);
           ]])],[
-            if (test "x$enablecxx11" = "xyes"); then
               have_cxx11_shared_ptr=yes
               AC_MSG_RESULT(yes)
-            else
-              have_cxx11_shared_ptr_but_disabled=yes
-              AC_MSG_RESULT([yes, but disabled.])
-            fi
           ],[
               have_cxx11_shared_ptr=no
               AC_MSG_RESULT(no)
@@ -478,14 +415,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_UNIQUE_PTR],
       std::unique_ptr<Foo> up(new Foo);
     } // Foo deleted when up goes out of scope
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_UNIQUE_PTR, 1, [Flag indicating whether compiler supports std::unique_ptr])
         have_cxx11_unique_ptr=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_UNIQUE_PTR_BUT_DISABLED, 1, [Compiler supports std::unique_ptr, but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -520,14 +452,9 @@ AC_DEFUN([LIBMESH_TEST_CXX14_MAKE_UNIQUE],
       std::unique_ptr<int> up = std::make_unique<int>(42);
     } // Foo deleted when up goes out of scope
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX14_MAKE_UNIQUE, 1, [Flag indicating whether compiler supports std::make_unique])
         have_cxx14_make_unique=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX14_MAKE_UNIQUE_BUT_DISABLED, 1, [Compiler supports std::make_unique, but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -571,14 +498,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MAKE_UNIQUE_WORKAROUND],
       std::unique_ptr<int> up = local::make_unique<int>(42);
     } // Foo deleted when up goes out of scope
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_MAKE_UNIQUE_WORKAROUND, 1, [Flag indicating whether compiler supports C++11 std::make_unique workaround])
         have_cxx11_make_unique_workaround=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_MAKE_UNIQUE_WORKAROUND_BUT_DISABLED, 1, [Compiler supports C++11 std::make_unique workaround, but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -617,14 +539,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_REGEX],
       std::regex_match("abc", integer_regex);
       std::regex_match("123", integer_regex);
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_REGEX, 1, [Flag indicating whether compiler supports std::regex])
         have_cxx11_regex=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_REGEX_BUT_DISABLED, 1, [Compiler supports std::regex, but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ],[
@@ -661,14 +578,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_OVERRIDE],
       virtual void f() override {}
       };
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_OVERRIDE, 1, [Flag indicating whether compiler supports the override keyword])
         have_cxx11_override=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_OVERRIDE_BUT_DISABLED, 1, [Compiler supports the override keyword, but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -698,14 +610,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_INITIALIZER_LIST],
     ]], [[
       std::vector<std::string> v = { "xyzzy", "plugh", "abracadabra" };
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_INITIALIZER_LIST, 1, [Flag indicating whether compiler supports initializer lists])
         have_cxx11_initializer_list=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_INITIALIZER_LIST_BUT_DISABLED, 1, [Compiler supports initializer lists, but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -743,14 +650,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_VARIADIC_TEMPLATES],
     ]], [[
       sum(1, 2, 3, 4, 5);
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_VARIADIC_TEMPLATES, 1, [Flag indicating whether compiler supports variadic templates])
         have_cxx11_variadic_templates=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_VARIADIC_TEMPLATES_BUT_DISABLED, 1, [Compiler supports variadic templates, but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -794,14 +696,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_THREAD],
       std::atomic_thread_fence(std::memory_order_acquire);
       std::atomic_thread_fence(std::memory_order_release);
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_THREAD, 1, [Flag indicating whether compiler supports std::thread])
         have_cxx11_thread=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_THREAD_BUT_DISABLED, 1, [Compiler supports std::thread, but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -856,14 +753,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_CONDITION_VARIABLE],
         }
       t.join();
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_CONDITION_VARIABLE, 1, [Flag indicating whether compiler supports std::condition_variable])
         have_cxx11_condition_variable=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_CONDITION_VARIABLE_BUT_DISABLED, 1, [Compiler supports std::condition_variable, but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -1009,14 +901,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TYPE_TRAITS],
       // std::aligned_union
       typedef std::aligned_union</*size of at least*/32, int, char, double>::type union_t;
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_TYPE_TRAITS, 1, [Flag indicating whether compiler supports <type_traits>])
         have_cxx11_type_traits=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_TYPE_TRAITS_BUT_DISABLED, 1, [Compiler supports <type_traits>, but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -1051,14 +938,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MATH_FUNCS],
     ]], [[
       double x = std::asinh(1.);
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_SINE, 1, [Flag indicating whether compiler supports std::asinh])
         have_cxx11_inverse_hyperbolic_sine=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_BUT_DISABLED, 1, [Compiler supports std::asinh, but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -1070,14 +952,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MATH_FUNCS],
     ]], [[
       double x = std::acosh(1.);
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE, 1, [Flag indicating whether compiler supports std::acosh])
         have_cxx11_inverse_hyperbolic_cosine=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_BUT_DISABLED, 1, [Compiler supports std::acosh, but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -1089,14 +966,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MATH_FUNCS],
     ]], [[
       double x = std::atanh(0.);
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT, 1, [Flag indicating whether compiler supports std::atanh])
         have_cxx11_inverse_hyperbolic_tangent=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_BUT_DISABLED, 1, [Compiler supports std::atanh, but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -1110,14 +982,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MATH_FUNCS],
       std::complex<double> z(0, -2);
       std::complex<double> x = std::asinh(z);
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX, 1, [Flag indicating whether compiler supports std::asinh(complex)])
         have_cxx11_inverse_hyperbolic_sine_complex=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_SINE_COMPLEX_BUT_DISABLED, 1, [Compiler supports std::asinh(complex), but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -1130,14 +997,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MATH_FUNCS],
       std::complex<double> z(0.5, 0);
       std::complex<double> x = std::acosh(z);
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX, 1, [Flag indicating whether compiler supports std::acosh(complex)])
         have_cxx11_inverse_hyperbolic_cosine_complex=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_COSINE_COMPLEX_BUT_DISABLED, 1, [Compiler supports std::acosh(complex), but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -1150,14 +1012,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MATH_FUNCS],
       std::complex<double> z(2, 0);
       std::complex<double> x = std::atanh(z);
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX, 1, [Flag indicating whether compiler supports std::atanh(complex)])
         have_cxx11_inverse_hyperbolic_tangent_complex=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_INVERSE_HYPERBOLIC_TANGENT_COMPLEX_BUT_DISABLED, 1, [Compiler supports std::atanh(complex), but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -1169,14 +1026,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MATH_FUNCS],
     ]], [[
       double val = std::erf(1.);
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_ERF, 1, [Flag indicating whether compiler supports std::erf])
         have_cxx11_erf=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_ERF_BUT_DISABLED, 1, [Compiler supports std::erf, but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -1215,14 +1067,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_DELETED_FUNCTIONS],
     };
     ]], [[
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_DELETED_FUNCTIONS, 1, [Flag indicating whether compiler supports f() = delete;])
         have_cxx11_deleted_functions=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_DELETED_FUNCTIONS_BUT_DISABLED, 1, [Compiler supports deleted functions, but they are disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -1470,14 +1317,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TO_STRING],
       // will produce the string "1e-40".
       std::string tiny = std::to_string(1.e-40);
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_TO_STRING, 1, [Flag indicating whether compiler supports std::to_string()])
         have_cxx11_to_string=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_TO_STRING_BUT_DISABLED, 1, [Compiler supports std::to_string(), but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])
@@ -1516,14 +1358,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_NOEXCEPT],
       throw MyException();
       return 0;
     ]])],[
-      if (test "x$enablecxx11" = "xyes"); then
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_NOEXCEPT, 1, [Flag indicating whether compiler supports noexcept])
         have_cxx11_noexcept=yes
-      else
-        AC_MSG_RESULT([yes, but disabled.])
-        AC_DEFINE(HAVE_CXX11_NOEXCEPT_BUT_DISABLED, 1, [Compiler supports noexcept, but it is disabled in libmesh])
-      fi
     ],[
       AC_MSG_RESULT(no)
     ])

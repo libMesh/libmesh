@@ -103,9 +103,8 @@ AM_MAINTAINER_MODE
 # create links for the example source files.
 # --------------------------------------------------------------
 AC_CHECK_FILE(src/base/libmesh.C, [libmesh_vpath_build=no], [libmesh_vpath_build=yes])
-if (test $libmesh_vpath_build = yes); then
-    AC_MSG_RESULT(<<< Configuring build directory for VPATH build >>>)
-fi
+AS_IF([test $libmesh_vpath_build = yes],
+      [AC_MSG_RESULT(<<< Configuring build directory for VPATH build >>>)])
 AM_CONDITIONAL(LIBMESH_VPATH_BUILD, test x$libmesh_vpath_build = xyes)
 
 # --------------------------------------------------------------
@@ -137,16 +136,14 @@ LIBMESH_SET_COMPILERS
 AC_ARG_ENABLE(cxx11,
               AC_HELP_STRING([--disable-cxx11],
                              [build without C++11 support (no longer supported!)]),
-                             [case "${enableval}" in
-                   yes) enablecxx11=yes ;;
-                   no)  AC_MSG_ERROR(libMesh now requires C++11) ;;
-                   *)   AC_MSG_ERROR(bad value ${enableval} for --disable-cxx11) ;;
-                   esac],
-                   [enablecxx11=irrelevant])
+              [AS_CASE("${enableval}",
+                       [yes], [enablecxx11=yes],
+                       [no],  [AC_MSG_ERROR(libMesh now requires C++11)],
+                       [AC_MSG_ERROR(bad value ${enableval} for --disable-cxx11)])],
+              [enablecxx11=irrelevant])
 
-if (test $enablecxx11 != irrelevant) ; then
-  AC_MSG_WARN([--enable/disable-cxx11 are now deprecated])
-fi
+AS_IF([test $enablecxx11 != irrelevant],
+      [AC_MSG_WARN([--enable/disable-cxx11 are now deprecated])])
 enablecxx11=yes
 
 # --------------------------------------------------------------
@@ -160,16 +157,14 @@ enablecxx11=yes
 AC_ARG_ENABLE(cxx11-required,
               AC_HELP_STRING([--enable-cxx11-required],
                              [Error if compiler does not support C++11]),
-                             [case "${enableval}" in
-                   yes) cxx11required=yes ;;
-                   no)  cxx11required=no ;;
-                   *)   AC_MSG_ERROR(bad value ${enableval} for --enable-cxx11-required) ;;
-                   esac],
-                   [cxx11required=irrelevant])
+              [AS_CASE("${enableval}",
+                       [yes], [cxx11required=yes],
+                       [no],  [cxx11required=no],
+                       [AC_MSG_ERROR(bad value ${enableval} for --enable-cxx11-required)])],
+              [cxx11required=irrelevant])
 
-if (test $cxx11required != irrelevant) ; then
-  AC_MSG_WARN([C++11 is now always required for libMesh])
-fi
+AS_IF([test $cxx11required != irrelevant],
+      [AC_MSG_WARN([C++11 is now always required for libMesh])])
 
 # --------------------------------------------------------------
 # Standard autoconf macro for determining the proper -std=c++11
@@ -204,31 +199,26 @@ LIBMESH_SET_METHODS
 # for internal use.
 # --------------------------------------------------------------
 LIBMESH_TEST_CXX11_AUTO
-if (test "x$have_cxx11_auto" != "xyes"); then
-  AC_MSG_ERROR([libMesh requires C++11 auto variable support])
-fi
+AS_IF([test "x$have_cxx11_auto" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 auto variable support])])
 
 LIBMESH_TEST_CXX11_RANGEFOR
-if (test "x$have_cxx11_rangefor" != "xyes"); then
-  AC_MSG_ERROR([libMesh requires C++11 ranged-for loop support])
-fi
+AS_IF([test "x$have_cxx11_rangefor" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 ranged-for loop support])])
 
 # Technically we require uniform initialization, but this is the
 # closest test we have
 LIBMESH_TEST_CXX11_INITIALIZER_LIST
-if (test "x$have_cxx11_initializer_list" != "xyes"); then
-  AC_MSG_ERROR([libMesh requires C++11 initializer list support])
-fi
+AS_IF([test "x$have_cxx11_initializer_list" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 initializer list support])])
 
 LIBMESH_TEST_CXX11_UNIQUE_PTR
-if (test "x$have_cxx11_unique_ptr" != "xyes"); then
-  AC_MSG_ERROR([libMesh requires C++11 std::unique_ptr support])
-fi
+AS_IF([test "x$have_cxx11_unique_ptr" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 std::unique_ptr support])])
 
 LIBMESH_TEST_CXX11_MAKE_UNIQUE_WORKAROUND
-if (test "x$have_cxx11_make_unique_workaround" != "xyes"); then
-  AC_MSG_ERROR([libMesh requires C++11 variadic template support])
-fi
+AS_IF([test "x$have_cxx11_make_unique_workaround" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 variadic template support])])
 
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
@@ -318,9 +308,8 @@ AC_SUBST(SED)
 # Not required to build libmesh, but we can install a config
 # file so that users can use 'pkg-config libmesh ...'
 # -------------------------------------------------------------
-if (test -z "$PKG_CONFIG"); then
-  AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
-fi
+AS_IF([test -z "$PKG_CONFIG"],
+      [AC_PATH_PROG(PKG_CONFIG, pkg-config, no)])
 # -------------------------------------------------------------
 
 
@@ -360,22 +349,21 @@ AC_SUBST(METHOD)
 # mpCC if it is there instead of xlC, but only do this
 # _after_ configure is finished using CXX!
 # --------------------------------------------------------------
-if test "$CXX" = xlC_r; then
-  #           Var   | look for | name if found | name if not | where
-  AC_CHECK_PROG(MPCXX,  mpCC_r,      mpCC_r,           $CXX,         $PATH)
-  CXX=$MPCXX
-  if test "$CXX" = mpCC_r; then
-    AC_MSG_RESULT(<<< Using $CXX instead of xlC_r to compile C++ >>>)
-  fi
-fi
-if test "$CXX" = xlC; then
-  #           Var   | look for | name if found | name if not | where
-  AC_CHECK_PROG(MPCXX,  mpCC,      mpCC,           $CXX,         $PATH)
-  CXX=$MPCXX
-  if test "$CXX" = mpCC; then
-    AC_MSG_RESULT(<<< Using $CXX instead of xlC to compile C++ >>>)
-  fi
-fi
+AS_IF([test "$CXX" = xlC_r],
+      [
+        AC_CHECK_PROG(MPCXX,mpCC_r,mpCC_r,$CXX,$PATH)
+        CXX=$MPCXX
+        AS_IF([test "$CXX" = mpCC_r],
+              [AC_MSG_RESULT(<<< Using $CXX instead of xlC_r to compile C++ >>>)])
+      ])
+
+AS_IF([test "$CXX" = xlC],
+      [
+        AC_CHECK_PROG(MPCXX,mpCC,mpCC,$CXX,$PATH)
+        CXX=$MPCXX
+        AS_IF([test "$CXX" = mpCC],
+              [AC_MSG_RESULT(<<< Using $CXX instead of xlC to compile C++ >>>)])
+      ])
 # --------------------------------------------------------------
 
 
@@ -404,93 +392,92 @@ LIBMESH_CONFIGURE_OPTIONAL_PACKAGES
 AX_SUMMARIZE_ENV
 
 # Each example gets a makefile
-if (test "x$enableexamples" = "xyes"); then
-   AC_CONFIG_FILES([
-                examples/introduction/introduction_ex1/Makefile
-                examples/introduction/introduction_ex2/Makefile
-                examples/introduction/introduction_ex3/Makefile
-                examples/introduction/introduction_ex4/Makefile
-                examples/introduction/introduction_ex5/Makefile
-                examples/adaptivity/adaptivity_ex1/Makefile
-                examples/adaptivity/adaptivity_ex2/Makefile
-                examples/adaptivity/adaptivity_ex3/Makefile
-                examples/adaptivity/adaptivity_ex4/Makefile
-                examples/adaptivity/adaptivity_ex5/Makefile
-                examples/adjoints/adjoints_ex1/Makefile
-                examples/adjoints/adjoints_ex2/Makefile
-                examples/adjoints/adjoints_ex3/Makefile
-                examples/adjoints/adjoints_ex4/Makefile
-                examples/adjoints/adjoints_ex5/Makefile
-                examples/adjoints/adjoints_ex6/Makefile
-                examples/eigenproblems/eigenproblems_ex1/Makefile
-                examples/eigenproblems/eigenproblems_ex2/Makefile
-                examples/eigenproblems/eigenproblems_ex3/Makefile
-                examples/fem_system/fem_system_ex1/Makefile
-                examples/fem_system/fem_system_ex2/Makefile
-                examples/fem_system/fem_system_ex3/Makefile
-                examples/fem_system/fem_system_ex4/Makefile
-                examples/solution_transfer/solution_transfer_ex1/Makefile
-                examples/miscellaneous/miscellaneous_ex1/Makefile
-                examples/miscellaneous/miscellaneous_ex2/Makefile
-                examples/miscellaneous/miscellaneous_ex3/Makefile
-                examples/miscellaneous/miscellaneous_ex4/Makefile
-                examples/miscellaneous/miscellaneous_ex5/Makefile
-                examples/miscellaneous/miscellaneous_ex6/Makefile
-                examples/miscellaneous/miscellaneous_ex7/Makefile
-                examples/miscellaneous/miscellaneous_ex8/Makefile
-                examples/miscellaneous/miscellaneous_ex9/Makefile
-                examples/miscellaneous/miscellaneous_ex10/Makefile
-                examples/miscellaneous/miscellaneous_ex11/Makefile
-                examples/miscellaneous/miscellaneous_ex12/Makefile
-                examples/miscellaneous/miscellaneous_ex13/Makefile
-                examples/miscellaneous/miscellaneous_ex14/Makefile
-                examples/optimization/optimization_ex1/Makefile
-                examples/optimization/optimization_ex2/Makefile
-                examples/subdomains/subdomains_ex1/Makefile
-                examples/subdomains/subdomains_ex2/Makefile
-                examples/subdomains/subdomains_ex3/Makefile
-                examples/systems_of_equations/systems_of_equations_ex1/Makefile
-                examples/systems_of_equations/systems_of_equations_ex2/Makefile
-                examples/systems_of_equations/systems_of_equations_ex3/Makefile
-                examples/systems_of_equations/systems_of_equations_ex4/Makefile
-                examples/systems_of_equations/systems_of_equations_ex5/Makefile
-                examples/systems_of_equations/systems_of_equations_ex6/Makefile
-                examples/systems_of_equations/systems_of_equations_ex7/Makefile
-                examples/systems_of_equations/systems_of_equations_ex8/Makefile
-                examples/reduced_basis/reduced_basis_ex1/Makefile
-                examples/reduced_basis/reduced_basis_ex2/Makefile
-                examples/reduced_basis/reduced_basis_ex3/Makefile
-                examples/reduced_basis/reduced_basis_ex4/Makefile
-                examples/reduced_basis/reduced_basis_ex5/Makefile
-                examples/reduced_basis/reduced_basis_ex6/Makefile
-                examples/reduced_basis/reduced_basis_ex7/Makefile
-                examples/transient/transient_ex1/Makefile
-                examples/transient/transient_ex2/Makefile
-                examples/vector_fe/vector_fe_ex1/Makefile
-                examples/vector_fe/vector_fe_ex2/Makefile
-                examples/vector_fe/vector_fe_ex3/Makefile
-                examples/vector_fe/vector_fe_ex4/Makefile
-                examples/Makefile
-                ])
-fi
+AS_IF([test "x$enableexamples" = "xyes"],
+      [
+        AC_CONFIG_FILES([examples/introduction/introduction_ex1/Makefile
+                         examples/introduction/introduction_ex2/Makefile
+                         examples/introduction/introduction_ex3/Makefile
+                         examples/introduction/introduction_ex4/Makefile
+                         examples/introduction/introduction_ex5/Makefile
+                         examples/adaptivity/adaptivity_ex1/Makefile
+                         examples/adaptivity/adaptivity_ex2/Makefile
+                         examples/adaptivity/adaptivity_ex3/Makefile
+                         examples/adaptivity/adaptivity_ex4/Makefile
+                         examples/adaptivity/adaptivity_ex5/Makefile
+                         examples/adjoints/adjoints_ex1/Makefile
+                         examples/adjoints/adjoints_ex2/Makefile
+                         examples/adjoints/adjoints_ex3/Makefile
+                         examples/adjoints/adjoints_ex4/Makefile
+                         examples/adjoints/adjoints_ex5/Makefile
+                         examples/adjoints/adjoints_ex6/Makefile
+                         examples/eigenproblems/eigenproblems_ex1/Makefile
+                         examples/eigenproblems/eigenproblems_ex2/Makefile
+                         examples/eigenproblems/eigenproblems_ex3/Makefile
+                         examples/fem_system/fem_system_ex1/Makefile
+                         examples/fem_system/fem_system_ex2/Makefile
+                         examples/fem_system/fem_system_ex3/Makefile
+                         examples/fem_system/fem_system_ex4/Makefile
+                         examples/solution_transfer/solution_transfer_ex1/Makefile
+                         examples/miscellaneous/miscellaneous_ex1/Makefile
+                         examples/miscellaneous/miscellaneous_ex2/Makefile
+                         examples/miscellaneous/miscellaneous_ex3/Makefile
+                         examples/miscellaneous/miscellaneous_ex4/Makefile
+                         examples/miscellaneous/miscellaneous_ex5/Makefile
+                         examples/miscellaneous/miscellaneous_ex6/Makefile
+                         examples/miscellaneous/miscellaneous_ex7/Makefile
+                         examples/miscellaneous/miscellaneous_ex8/Makefile
+                         examples/miscellaneous/miscellaneous_ex9/Makefile
+                         examples/miscellaneous/miscellaneous_ex10/Makefile
+                         examples/miscellaneous/miscellaneous_ex11/Makefile
+                         examples/miscellaneous/miscellaneous_ex12/Makefile
+                         examples/miscellaneous/miscellaneous_ex13/Makefile
+                         examples/miscellaneous/miscellaneous_ex14/Makefile
+                         examples/optimization/optimization_ex1/Makefile
+                         examples/optimization/optimization_ex2/Makefile
+                         examples/subdomains/subdomains_ex1/Makefile
+                         examples/subdomains/subdomains_ex2/Makefile
+                         examples/subdomains/subdomains_ex3/Makefile
+                         examples/systems_of_equations/systems_of_equations_ex1/Makefile
+                         examples/systems_of_equations/systems_of_equations_ex2/Makefile
+                         examples/systems_of_equations/systems_of_equations_ex3/Makefile
+                         examples/systems_of_equations/systems_of_equations_ex4/Makefile
+                         examples/systems_of_equations/systems_of_equations_ex5/Makefile
+                         examples/systems_of_equations/systems_of_equations_ex6/Makefile
+                         examples/systems_of_equations/systems_of_equations_ex7/Makefile
+                         examples/systems_of_equations/systems_of_equations_ex8/Makefile
+                         examples/reduced_basis/reduced_basis_ex1/Makefile
+                         examples/reduced_basis/reduced_basis_ex2/Makefile
+                         examples/reduced_basis/reduced_basis_ex3/Makefile
+                         examples/reduced_basis/reduced_basis_ex4/Makefile
+                         examples/reduced_basis/reduced_basis_ex5/Makefile
+                         examples/reduced_basis/reduced_basis_ex6/Makefile
+                         examples/reduced_basis/reduced_basis_ex7/Makefile
+                         examples/transient/transient_ex1/Makefile
+                         examples/transient/transient_ex2/Makefile
+                         examples/vector_fe/vector_fe_ex1/Makefile
+                         examples/vector_fe/vector_fe_ex2/Makefile
+                         examples/vector_fe/vector_fe_ex3/Makefile
+                         examples/vector_fe/vector_fe_ex4/Makefile
+                         examples/Makefile])
+     ])
 
 
 # hackery.  If we are supporting nested autoconf packages and we want to specify
 # additional arguments to be passed to those packages, do that here.
 # Specifically, we append libmesh_subpackage_arguments to ac_configure_args
 # before AC_OUTPUT recurses into our subpackages
-if (test "x$enablenested" = "xyes"); then
-  ac_configure_args_SAVE="$ac_configure_args"
-  ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX='$CXX' CC='$CC' F77='$F77' FC='$FC' CPPFLAGS='$HDF5_CPPFLAGS $CPPFLAGS' LIBS='$HDF5_LIBS $LIBS'"
-fi
+AS_IF([test "x$enablenested" = "xyes"],
+      [
+        ac_configure_args_SAVE="$ac_configure_args"
+        ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX='$CXX' CC='$CC' F77='$F77' FC='$FC' CPPFLAGS='$HDF5_CPPFLAGS $CPPFLAGS' LIBS='$HDF5_LIBS $LIBS'"
+      ])
 
 # Create output files. Also configures any subpackages
 AC_OUTPUT
 
 # end hackery
-if (test "x$enablenested" = "xyes"); then
-  ac_configure_args="$ac_configure_args_SAVE"
-fi
+AS_IF([test "x$enablenested" = "xyes"],
+      [ac_configure_args="$ac_configure_args_SAVE"])
 
 # Final summary
 AX_SUMMARIZE_CONFIG
