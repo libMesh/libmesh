@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 # Write pretty status message
 message_running() {
@@ -9,7 +9,7 @@ message_running() {
     options=$@
 
     echo "***************************************************************"
-    echo "* Running Example $example_name:" 
+    echo "* Running Example $example_name:"
     echo "*  $LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS"
     echo "***************************************************************"
     echo " "
@@ -26,7 +26,7 @@ message_done_running() {
 
     echo " "
     echo "***************************************************************"
-    echo "* Done Running Example $example_name:" 
+    echo "* Done Running Example $example_name:"
     echo "*  $LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS"
     echo "***************************************************************"
 }
@@ -45,9 +45,21 @@ run_example() {
 	else
 	    METHODS="$METHOD"
 	fi
-    fi             
-    
-    for method in ${METHODS}; do
+    fi
+
+    # Run executables from most-debugging-enabled to least-, so if
+    # there's a failure we get the most informative death possible
+    ORDERED_METHODS="dbg debug devel profiling pro prof oprofile oprof optimized opt"
+    MY_METHODS=""
+    for method in ${ORDERED_METHODS}; do
+        for mymethod in ${METHODS}; do
+            if (test "x${mymethod}" = "x${method}"); then
+                MY_METHODS="${MY_METHODS} ${mymethod}"
+            fi
+        done
+    done
+
+    for method in ${MY_METHODS}; do
 	
 	case "${method}" in
 	    optimized|opt)      executable=example-opt   ;;
