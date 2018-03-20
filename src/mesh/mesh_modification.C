@@ -665,9 +665,23 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
               so_elem->set_node(son) = so_node;
 
               // We need to ensure that the processor who should own a
-              // node *knows* they own the node.
-              if (so_node->processor_id() > lo_elem->processor_id())
-                so_node->processor_id() = lo_elem->processor_id();
+              // node *knows* they own the node.  And because
+              // Node::choose_processor_id() may depend on Node id,
+              // which may not yet be authoritative, we still have to
+              // use a dumb-but-id-independent partitioning heuristic.
+              processor_id_type chosen_pid =
+                std::min (so_node->processor_id(),
+                          lo_elem->processor_id());
+
+              // Plus, if we just discovered that we own this node,
+              // then on a distributed mesh we need to make sure to
+              // give it a valid id, not just a placeholder id!
+              if (!this->is_replicated() &&
+                  so_node->processor_id() != this->processor_id() &&
+                  chosen_pid == this->processor_id())
+                this->own_node(*so_node);
+
+              so_node->processor_id() = chosen_pid;
             }
         }
 
@@ -715,9 +729,11 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
   STOP_LOG("all_second_order()", "Mesh");
 
-  // In a DistributedMesh our ghost node processor ids may be bad,
+  // On a DistributedMesh our ghost node processor ids may be bad,
   // the ids of nodes touching remote elements may be inconsistent,
-  // and unique_ids of newly added non-local nodes remain unset.
+  // unique_ids of newly added non-local nodes remain unset, and our
+  // partitioning of new nodes may not be well balanced.
+  //
   // make_nodes_parallel_consistent() will fix all this.
   if (!this->is_serial())
     MeshCommunication().make_nodes_parallel_consistent (*this);
