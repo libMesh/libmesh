@@ -50,6 +50,7 @@ SUBDIRS = \
 	systems_of_equations/systems_of_equations_ex6 \
 	systems_of_equations/systems_of_equations_ex7 \
 	systems_of_equations/systems_of_equations_ex8 \
+	systems_of_equations/systems_of_equations_ex9 \
 	reduced_basis/reduced_basis_ex1 \
 	reduced_basis/reduced_basis_ex2 \
 	reduced_basis/reduced_basis_ex3 \

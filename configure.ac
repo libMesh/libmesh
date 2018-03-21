@@ -445,6 +445,7 @@ AS_IF([test "x$enableexamples" = "xyes"],
                          examples/systems_of_equations/systems_of_equations_ex6/Makefile
                          examples/systems_of_equations/systems_of_equations_ex7/Makefile
                          examples/systems_of_equations/systems_of_equations_ex8/Makefile
+                         examples/systems_of_equations/systems_of_equations_ex9/Makefile
                          examples/reduced_basis/reduced_basis_ex1/Makefile
                          examples/reduced_basis/reduced_basis_ex2/Makefile
                          examples/reduced_basis/reduced_basis_ex3/Makefile
@@ -460,6 +461,7 @@ AS_IF([test "x$enableexamples" = "xyes"],
                          examples/vector_fe/vector_fe_ex4/Makefile
                          examples/Makefile])
      ])
+
 
 
 # hackery.  If we are supporting nested autoconf packages and we want to specify
