@@ -70,7 +70,15 @@ const Elem * PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
   libmesh_assert (b);
   p = b->get_corresponding_pos(p);
 
-  return point_locator.operator()(p);
+  // If b->get_point_locator_subdomains() is non-empty, then we use it
+  // to restrict the subdomains that we search over to find the neighbor
+  const std::set<subdomain_id_type> * point_locator_subdomains = libmesh_nullptr;
+  if(!b->get_point_locator_subdomains().empty())
+    {
+      point_locator_subdomains = &b->get_point_locator_subdomains();
+    }
+
+  return point_locator.operator()(p, point_locator_subdomains);
 }
 
 } // namespace libMesh

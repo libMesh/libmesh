@@ -108,6 +108,20 @@ const std::set<unsigned int> & PeriodicBoundaryBase::get_variables() const
   return variables;
 }
 
+
+
+void PeriodicBoundaryBase::set_point_locator_subdomains(const std::set<subdomain_id_type> & point_locator_subdomains)
+{
+  _point_locator_subdomains = point_locator_subdomains;
+}
+
+
+
+const std::set<subdomain_id_type> & PeriodicBoundaryBase::get_point_locator_subdomains() const
+{
+  return _point_locator_subdomains;
+}
+
 } // namespace libMesh
 
 #endif // LIBMESH_ENABLE_PERIODIC

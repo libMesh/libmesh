@@ -127,6 +127,16 @@ public:
    */
   const std::set<unsigned int> & get_variables() const;
 
+  /**
+   * Set the PointLocator subdomains.
+   */
+  void set_point_locator_subdomains(const std::set<subdomain_id_type> & point_locator_subdomains);
+
+  /**
+   * Get the PointLocator subdomains.
+   */
+  const std::set<subdomain_id_type> & get_point_locator_subdomains() const;
+
 protected:
 
   /**
@@ -145,6 +155,14 @@ protected:
    * pointer is treated as equivalent to the identity matrix.
    */
   std::unique_ptr<DenseMatrix<Real>> _transformation_matrix;
+
+  /**
+   * Imposing a periodic boundary uses a PointLocator to match points on
+   * the two sides of the boundary. This set specifies the subdomains
+   * that the PointLocator searches over. If it is empty, then it is
+   * ignored and we search over all subdomains.
+   */
+  std::set<subdomain_id_type> _point_locator_subdomains;
 };
 
 } // namespace libmesh
