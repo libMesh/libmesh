@@ -129,6 +129,16 @@ public:
 
   /**
    * Set the PointLocator subdomains.
+   *
+   * Imposing a periodic boundary uses a PointLocator to match points on
+   * the two sides of the boundary. This set specifies the subdomains
+   * that the PointLocator searches over. If it is empty, then it is
+   * ignored and we search over all subdomains.
+   *
+   * The use of this setter is demonstrated in systems_of_equations_ex9
+   * in which we have a two distinct periodic boundary conditions which
+   * are on overlapping surfaces, and hence we need to specify subdomains
+   * to allow the PointLocator to find the relevant elements.
    */
   void set_point_locator_subdomains(const std::set<subdomain_id_type> & point_locator_subdomains);
 
@@ -157,10 +167,8 @@ protected:
   std::unique_ptr<DenseMatrix<Real>> _transformation_matrix;
 
   /**
-   * Imposing a periodic boundary uses a PointLocator to match points on
-   * the two sides of the boundary. This set specifies the subdomains
-   * that the PointLocator searches over. If it is empty, then it is
-   * ignored and we search over all subdomains.
+   * The set of subdomains that is used by the PointLocator associated
+   * with this boundary condition.
    */
   std::set<subdomain_id_type> _point_locator_subdomains;
 };
