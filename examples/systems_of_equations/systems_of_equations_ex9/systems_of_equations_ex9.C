@@ -112,7 +112,6 @@ public:
     set_variable(1);
     set_variable(2);
     set_transformation_matrix(get_rotation_matrix());
-    set_point_locator_subdomains(o.get_point_locator_subdomains());
   }
 
   /**
@@ -391,9 +390,6 @@ int main (int argc, char ** argv)
     AzimuthalPeriodicBoundary periodic_bc(center, axis, angle);
     periodic_bc.myboundary = 301;
     periodic_bc.pairedboundary = 302;
-    std::set<subdomain_id_type> point_locator_subdomains;
-    point_locator_subdomains.insert(1);
-    periodic_bc.set_point_locator_subdomains(point_locator_subdomains);
     system.get_dof_map().add_periodic_boundary(periodic_bc);
   }
   {
@@ -403,9 +399,6 @@ int main (int argc, char ** argv)
     AzimuthalPeriodicBoundary periodic_bc(center, axis, angle);
     periodic_bc.myboundary = 401;
     periodic_bc.pairedboundary = 402;
-    std::set<subdomain_id_type> point_locator_subdomains;
-    point_locator_subdomains.insert(101);
-    periodic_bc.set_point_locator_subdomains(point_locator_subdomains);
     system.get_dof_map().add_periodic_boundary(periodic_bc);
   }
 

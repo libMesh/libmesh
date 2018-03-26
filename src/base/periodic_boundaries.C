@@ -24,6 +24,7 @@
 #include "libmesh/point_locator_base.h"
 #include "libmesh/elem.h"
 #include "libmesh/periodic_boundary.h"
+#include "libmesh/mesh_base.h"
 
 namespace libMesh
 {
@@ -70,15 +71,28 @@ const Elem * PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
   libmesh_assert (b);
   p = b->get_corresponding_pos(p);
 
-  // If b->get_point_locator_subdomains() is non-empty, then we use it
-  // to restrict the subdomains that we search over to find the neighbor
-  const std::set<subdomain_id_type> * point_locator_subdomains = libmesh_nullptr;
-  if(!b->get_point_locator_subdomains().empty())
+  std::set<const Elem *> candidate_elements;
+  point_locator.operator()(p, candidate_elements);
+
+  // We might have found multiple elements, e.g. if two distinct periodic
+  // boundaries are overlapping (see systems_of_equations_ex9, for example).
+  // As a result, we need to search for the element that has boundary_id.
+  const MeshBase & mesh = point_locator.get_mesh();
+  for(const Elem * elem_it : candidate_elements)
     {
-      point_locator_subdomains = &b->get_point_locator_subdomains();
+      unsigned int s_neigh =
+        mesh.get_boundary_info().side_with_boundary_id(elem_it, b->pairedboundary);
+
+      // If s_neigh is not invalid then we have found an element that contains
+      // boundary_id, so return this element
+      if(s_neigh != libMesh::invalid_uint)
+        {
+          return elem_it;
+        }
     }
 
-  return point_locator.operator()(p, point_locator_subdomains);
+  libmesh_error_msg("Periodic boundary neighbor not found");
+  return libmesh_nullptr;
 }
 
 } // namespace libMesh
