@@ -96,6 +96,12 @@ void PointLocatorBase::unset_close_to_point_tol ()
 }
 
 
+const MeshBase & PointLocatorBase::get_mesh () const
+{
+  return _mesh;
+}
+
+
 const Node *
 PointLocatorBase::
 locate_node(const Point & p,
