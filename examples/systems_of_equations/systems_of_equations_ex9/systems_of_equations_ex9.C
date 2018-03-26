@@ -112,6 +112,7 @@ public:
     set_variable(1);
     set_variable(2);
     set_transformation_matrix(get_rotation_matrix());
+    set_point_locator_subdomains(o.get_point_locator_subdomains());
   }
 
   /**
@@ -312,9 +313,18 @@ public:
 
             // assemble \int_Omega f_i v_i \dx
             DenseVector<Number> f_vec(3);
-            f_vec(0) = 1.;
-            f_vec(1) = 1.;
-            f_vec(2) = 0.;
+            if(elem->subdomain_id() == 101)
+              {
+                f_vec(0) = 1.;
+                f_vec(1) = 1.;
+                f_vec(2) = 0.;
+              }
+            else if(elem->subdomain_id() == 1)
+              {
+                f_vec(0) = 0.36603;
+                f_vec(1) = 1.36603;
+                f_vec(2) = 0.;
+              }
             for (unsigned int dof_i=0; dof_i<n_var_dofs; dof_i++)
               for (unsigned int i=0; i<3; i++)
                 Fe_var[i](dof_i) += JxW[qp] * (f_vec(i) * phi[dof_i][qp]);
@@ -368,16 +378,36 @@ int main (int argc, char ** argv)
   LinearElasticity le(equation_systems);
   system.attach_assemble_object(le);
 
-  // Add an azimuthal periodic boundary
+  // Add two azimuthal periodic boundaries on two adjacent domains.
+  // We do this to show that the periodic boundary condition that
+  // we impose leads to a continuous solution across adjacent domains.
+  //
   // The angle specified below defines the mapping
   // from "pairedboundary" to "myboundary".
-  Point center(0., 0., 0.);
-  Point axis(0., 0., 1.);
-  Real angle = 2*libMesh::pi/12.0;
-  AzimuthalPeriodicBoundary periodic_bc(center, axis, angle);
-  periodic_bc.myboundary = 301;
-  periodic_bc.pairedboundary = 302;
-  system.get_dof_map().add_periodic_boundary(periodic_bc);
+  {
+    Point center(0., 0., 0.);
+    Point axis(0., 0., 1.);
+    Real angle = 2*libMesh::pi/12.0;
+    AzimuthalPeriodicBoundary periodic_bc(center, axis, angle);
+    periodic_bc.myboundary = 301;
+    periodic_bc.pairedboundary = 302;
+    std::set<subdomain_id_type> point_locator_subdomains;
+    point_locator_subdomains.insert(1);
+    periodic_bc.set_point_locator_subdomains(point_locator_subdomains);
+    system.get_dof_map().add_periodic_boundary(periodic_bc);
+  }
+  {
+    Point center(0., 0., 0.);
+    Point axis(0., 0., 1.);
+    Real angle = 2*libMesh::pi/12.0;
+    AzimuthalPeriodicBoundary periodic_bc(center, axis, angle);
+    periodic_bc.myboundary = 401;
+    periodic_bc.pairedboundary = 402;
+    std::set<subdomain_id_type> point_locator_subdomains;
+    point_locator_subdomains.insert(101);
+    periodic_bc.set_point_locator_subdomains(point_locator_subdomains);
+    system.get_dof_map().add_periodic_boundary(periodic_bc);
+  }
 
   std::vector<unsigned int> variables;
   variables.push_back(u_var);
@@ -386,6 +416,7 @@ int main (int argc, char ** argv)
   ZeroFunction<> zf;
   std::set<boundary_id_type> clamped_boundary_ids;
   clamped_boundary_ids.insert(300);
+  clamped_boundary_ids.insert(400);
   DirichletBoundary clamped_bc(clamped_boundary_ids, variables, zf);
   system.get_dof_map().add_dirichlet_boundary(clamped_bc);
 
