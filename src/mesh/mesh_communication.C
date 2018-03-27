@@ -1304,7 +1304,12 @@ struct SyncNodeIds
     for (std::size_t i=0; i != old_ids.size(); ++i)
       {
         const dof_id_type new_id = new_ids[i];
-        if (new_id != DofObject::invalid_id)
+
+        // If we asked for an id but there's no definitive id ready
+        // for us yet, then we can't quit trying to sync yet.
+        if (new_id == DofObject::invalid_id)
+          data_changed = true;
+        else
           {
             const dof_id_type old_id = old_ids[i];
 
