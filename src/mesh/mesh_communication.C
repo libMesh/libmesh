@@ -1437,10 +1437,11 @@ void MeshCommunication::make_node_ids_parallel_consistent (MeshBase & mesh)
 
   // We need to agree on which processor owns every node, but we can't
   // easily assert that here because we don't currently agree on which
-  // id every node has
-// #ifdef DEBUG
-  // MeshTools::libmesh_assert_parallel_consistent_procids<Node> (mesh);
-// #endif // DEBUG
+  // id every node has, and some of our temporary ids on unrelated
+  // nodes will "overlap".
+//#ifdef DEBUG
+//  MeshTools::libmesh_assert_parallel_consistent_procids<Node> (mesh);
+//#endif // DEBUG
 
   LOG_SCOPE ("make_node_ids_parallel_consistent()", "MeshCommunication");
 
