@@ -1438,6 +1438,67 @@ void libmesh_assert_valid_unique_ids(const MeshBase & mesh)
 }
 #endif
 
+void libmesh_assert_consistent_distributed(const MeshBase & mesh)
+{
+  libmesh_parallel_only(mesh.comm());
+
+  dof_id_type parallel_max_elem_id = mesh.max_elem_id();
+  mesh.comm().max(parallel_max_elem_id);
+
+  for (dof_id_type i=0; i != parallel_max_elem_id; ++i)
+    {
+      const Elem * elem = mesh.query_elem_ptr(i);
+      processor_id_type pid =
+        elem ? elem->processor_id() : DofObject::invalid_processor_id;
+      mesh.comm().min(pid);
+      libmesh_assert(elem || pid != mesh.processor_id());
+    }
+
+  dof_id_type parallel_max_node_id = mesh.max_node_id();
+  mesh.comm().max(parallel_max_node_id);
+
+  for (dof_id_type i=0; i != parallel_max_node_id; ++i)
+    {
+      const Node * node = mesh.query_node_ptr(i);
+      processor_id_type pid =
+        node ? node->processor_id() : DofObject::invalid_processor_id;
+      mesh.comm().min(pid);
+      libmesh_assert(node || pid != mesh.processor_id());
+    }
+}
+
+
+void libmesh_assert_consistent_distributed_nodes(const MeshBase & mesh)
+{
+  libmesh_parallel_only(mesh.comm());
+  auto locator = mesh.sub_point_locator();
+
+  dof_id_type parallel_max_elem_id = mesh.max_elem_id();
+  mesh.comm().max(parallel_max_elem_id);
+
+  for (dof_id_type i=0; i != parallel_max_elem_id; ++i)
+    {
+      const Elem * elem = mesh.query_elem_ptr(i);
+
+      const unsigned int my_n_nodes = elem ? elem->n_nodes() : 0;
+      unsigned int n_nodes = my_n_nodes;
+      mesh.comm().max(n_nodes);
+
+      if (n_nodes)
+        libmesh_assert(mesh.comm().semiverify(elem ? &my_n_nodes : libmesh_nullptr));
+
+      for (unsigned int n=0; n != n_nodes; ++n)
+        {
+          const Node * node = elem ? elem->node_ptr(n) : libmesh_nullptr;
+          processor_id_type pid =
+            node ? node->processor_id() : DofObject::invalid_processor_id;
+          mesh.comm().min(pid);
+          libmesh_assert(node || pid != mesh.processor_id());
+        }
+    }
+}
+
+
 template <>
 void libmesh_assert_topology_consistent_procids<Elem>(const MeshBase & mesh)
 {
@@ -1567,6 +1628,43 @@ void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
 }
 
 
+
+void libmesh_assert_parallel_consistent_new_node_procids(const MeshBase & mesh)
+{
+  LOG_SCOPE("libmesh_assert_parallel_consistent_new_node_procids()", "MeshTools");
+
+  if (mesh.n_processors() == 1)
+    return;
+
+  libmesh_parallel_only(mesh.comm());
+
+  // We want this test to hit every node when called even after nodes
+  // have been added asynchronously but before everything has been
+  // renumbered.
+  dof_id_type parallel_max_elem_id = mesh.max_elem_id();
+  mesh.comm().max(parallel_max_elem_id);
+
+  std::vector<bool> elem_touched_by_anyone(parallel_max_elem_id, false);
+
+  for (dof_id_type i=0; i != parallel_max_elem_id; ++i)
+    {
+      const Elem * elem = mesh.query_elem_ptr(i);
+
+      const unsigned int my_n_nodes = elem ? elem->n_nodes() : 0;
+      unsigned int n_nodes = my_n_nodes;
+      mesh.comm().max(n_nodes);
+
+      if (n_nodes)
+        libmesh_assert(mesh.comm().semiverify(elem ? &my_n_nodes : libmesh_nullptr));
+
+      for (unsigned int n=0; n != n_nodes; ++n)
+        {
+          const Node * node = elem ? elem->node_ptr(n) : libmesh_nullptr;
+          const processor_id_type pid = node ? node->processor_id() : 0;
+          libmesh_assert(mesh.comm().semiverify (node ? &pid : libmesh_nullptr));
+        }
+    }
+}
 
 template <>
 void libmesh_assert_parallel_consistent_procids<Node>(const MeshBase & mesh)

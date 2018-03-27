@@ -487,6 +487,28 @@ void libmesh_assert_valid_unique_ids (const MeshBase & mesh);
 #endif
 
 /**
+ * A function for verifying that distribution of dof objects is
+ * parallel consistent (every processor can see every node or element
+ * it owns)
+ */
+void libmesh_assert_consistent_distributed(const MeshBase & mesh);
+
+/**
+ * A function for verifying that distribution of nodes is parallel
+ * consistent (every processor can see every node it owns) even before
+ * node ids have been made consistent
+ */
+void libmesh_assert_consistent_distributed_nodes(const MeshBase & mesh);
+
+/**
+ * A function for verifying that processor assignment is parallel
+ * consistent (every processor agrees on the processor id of each node
+ * it can see) even on nodes which have not yet recieved consistent
+ * DofObject::id(), using element topology to identify matching nodes.
+ */
+void libmesh_assert_parallel_consistent_new_node_procids (const MeshBase & mesh);
+
+/**
  * A function for verifying that processor assignment is parallel
  * consistent (every processor agrees on the processor id of each dof
  * object it can see)
