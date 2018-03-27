@@ -1901,6 +1901,78 @@ namespace {
 
 typedef std::unordered_map<dof_id_type, processor_id_type> proc_id_map_type;
 
+struct SyncNodeSet
+{
+  typedef unsigned char datum; // bool but without bit twiddling issues
+
+  SyncNodeSet(std::unordered_set<const Node *> & _set,
+              MeshBase & _mesh) :
+    node_set(_set), mesh(_mesh) {}
+
+  std::unordered_set<const Node *> & node_set;
+
+  MeshBase & mesh;
+
+  // ------------------------------------------------------------
+  void gather_data (const std::vector<dof_id_type> & ids,
+                    std::vector<datum> & data)
+  {
+    // Find whether each requested node belongs in the set
+    data.resize(ids.size());
+
+    for (std::size_t i=0; i != ids.size(); ++i)
+      {
+        const dof_id_type id = ids[i];
+
+        // We'd better have every node we're asked for
+        Node * node = mesh.node_ptr(id);
+
+        // Return if the node is in the set.
+        data[i] = node_set.count(node);
+      }
+  }
+
+  // ------------------------------------------------------------
+  bool act_on_data (const std::vector<dof_id_type> & ids,
+                    std::vector<datum> in_set)
+  {
+    bool data_changed = false;
+
+    // Add nodes we've been informed of to our own set
+    for (std::size_t i=0; i != ids.size(); ++i)
+      {
+        if (in_set[i])
+          {
+            Node * node = mesh.node_ptr(ids[i]);
+            if (!node_set.count(node))
+              {
+                node_set.insert(node);
+                data_changed = true;
+              }
+          }
+      }
+
+    return data_changed;
+  }
+};
+
+
+struct NodesNotInSet
+{
+  NodesNotInSet(const std::unordered_set<const Node *> _set)
+    : node_set(_set) {}
+
+  bool operator() (const Node * node) const
+  {
+    if (node_set.count(node))
+      return false;
+    return true;
+  }
+
+  const std::unordered_set<const Node *> node_set;
+};
+
+
 struct SyncProcIdsFromMap
 {
   typedef processor_id_type datum;
@@ -1972,15 +2044,43 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   libmesh_assert (MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
                                     mesh.unpartitioned_elements_end()) == 0);
 
-  // Fix all nodes' processor ids.  Coarsening may have left us with
-  // nodes which are no longer touched by any elements of the same
-  // processor id, and for DofMap to work we need to fix that.
+  // Fix nodes' processor ids.  Coarsening may have left us with nodes
+  // which are no longer touched by any elements of the same processor
+  // id, and for DofMap to work we need to fix that.
 
   // This is harder now that libMesh no longer requires a distributed
   // mesh to ghost all nodal neighbors: it is possible for two active
   // elements on two different processors to share the same node in
   // such a way that neither processor knows the others' element
   // exists!
+
+  // While we're at it, if this mesh is configured to allow
+  // repartitioning, we'll repartition *all* the nodes' processor ids
+  // using the canonical Node heuristic, to try and improve DoF load
+  // balancing.  But if the mesh is disallowing repartitioning, we
+  // won't touch processor_id on any node where it's valid, regardless
+  // of whether or not it's canonical.
+  bool repartition_all_nodes = !mesh.skip_partitioning();
+  std::unordered_set<const Node *> valid_nodes;
+
+  // If we aren't allowed to repartition, then we're going to leave
+  // every node we can at its current processor_id, and *only*
+  // repartition the nodes whose current processor id is incompatible
+  // with DoFMap (because it doesn't touch an active element, e.g. due
+  // to coarsening)
+  if (!repartition_all_nodes)
+    {
+      for (const auto & elem : mesh.active_element_ptr_range())
+        for (const auto & node : elem->node_ref_range())
+          if (elem->processor_id() == node.processor_id())
+            valid_nodes.insert(&node);
+
+      SyncNodeSet syncv(valid_nodes, mesh);
+
+      Parallel::sync_node_data_by_element_id
+        (mesh, mesh.elements_begin(), mesh.elements_end(),
+         Parallel::SyncEverything(), Parallel::SyncEverything(), syncv);
+    }
 
   // We build up a set of compatible processor ids for each node
   proc_id_map_type new_proc_ids;
@@ -2076,12 +2176,23 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   Parallel::wait(push_requests);
 
   SyncProcIdsFromMap sync(new_proc_ids, mesh);
-  Parallel::sync_dofobject_data_by_id
-    (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync);
+  if (repartition_all_nodes)
+    Parallel::sync_dofobject_data_by_id
+      (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync);
+  else
+    {
+      NodesNotInSet nnis(valid_nodes);
+
+      Parallel::sync_dofobject_data_by_id
+        (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), nnis, sync);
+    }
 
   // And finally let's update the nodes we used to own.
   for (const auto & node : ex_local_nodes)
     {
+      if (valid_nodes.count(node))
+        continue;
+
       const dof_id_type id = node->id();
       const proc_id_map_type::iterator it = new_proc_ids.find(id);
       libmesh_assert(it != new_proc_ids.end());
@@ -2089,10 +2200,12 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
     }
 
   // We should still have consistent nodal processor ids coming out of
-  // this algorithm, but now they should be canonically correct too.
+  // this algorithm, but if we're allowed to repartition the mesh then
+  // they should be canonically correct too.
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_procids<Node>(mesh);
-  MeshTools::libmesh_assert_canonical_node_procids(mesh);
+  if (repartition_all_nodes)
+    MeshTools::libmesh_assert_canonical_node_procids(mesh);
 #endif
 }
 
