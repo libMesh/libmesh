@@ -1441,6 +1441,12 @@ void MeshCommunication::make_node_ids_parallel_consistent (MeshBase & mesh)
   Parallel::sync_node_data_by_element_id
     (mesh, mesh.elements_begin(), mesh.elements_end(),
      Parallel::SyncEverything(), Parallel::SyncEverything(), syncids);
+
+  // At this point, with both ids and processor ids synced, we can
+  // finally check for topological consistency of node processor ids.
+#ifdef DEBUG
+  MeshTools::libmesh_assert_topology_consistent_procids<Node> (mesh);
+#endif
 }
 
 
