@@ -1956,8 +1956,21 @@ struct SyncProcIdsFromMap
 
 void MeshTools::correct_node_proc_ids (MeshBase & mesh)
 {
+  LOG_SCOPE("correct_node_proc_ids()","MeshTools");
+
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
+
+  // We require all processors to agree on nodal processor ids before
+  // going into this algorithm.
+#ifdef DEBUG
+  MeshTools::libmesh_assert_parallel_consistent_procids<Node>(mesh);
+#endif
+
+  // If we have any unpartitioned elements at this
+  // stage there is a problem
+  libmesh_assert (MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
+                                    mesh.unpartitioned_elements_end()) == 0);
 
   // Fix all nodes' processor ids.  Coarsening may have left us with
   // nodes which are no longer touched by any elements of the same
@@ -1968,12 +1981,6 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   // elements on two different processors to share the same node in
   // such a way that neither processor knows the others' element
   // exists!
-
-  // We require all processors to agree on nodal processor ids before
-  // going into this algorithm.
-#ifdef DEBUG
-  MeshTools::libmesh_assert_parallel_consistent_procids<Node>(mesh);
-#endif
 
   // We build up a set of compatible processor ids for each node
   proc_id_map_type new_proc_ids;
