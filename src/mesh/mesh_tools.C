@@ -2077,9 +2077,8 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
 
       SyncNodeSet syncv(valid_nodes, mesh);
 
-      Parallel::sync_node_data_by_element_id
-        (mesh, mesh.elements_begin(), mesh.elements_end(),
-         Parallel::SyncEverything(), Parallel::SyncEverything(), syncv);
+      Parallel::sync_dofobject_data_by_id
+        (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), syncv);
     }
 
   // We build up a set of compatible processor ids for each node
