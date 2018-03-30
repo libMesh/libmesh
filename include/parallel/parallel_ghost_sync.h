@@ -66,11 +66,11 @@ void sync_dofobject_data_by_xyz(const Communicator &      comm,
 /**
  * Request data about a range of ghost dofobjects uniquely
  * identified by their id.  Fulfill requests with
- * sync.gather_data(const std::vector<unsigned int> & ids,
+ * sync.gather_data(const std::vector<dof_id_type> & ids,
  *                  std::vector<sync::datum> & data),
  * by resizing and setting the values of the data vector.
  * Respond to fulfillment with
- * sync.act_on_data(const std::vector<unsigned int> & ids,
+ * sync.act_on_data(const std::vector<dof_id_type> & ids,
  *                  std::vector<sync::datum> & data)
  * The user must define Parallel::StandardType<sync::datum> if
  * sync::datum isn't a built-in type.
