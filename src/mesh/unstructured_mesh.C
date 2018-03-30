@@ -87,9 +87,11 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
   libmesh_assert_equal_to (_is_prepared, other_mesh._is_prepared);
 
   // We're assuming the other mesh has proper element number ordering,
-  // so that we add parents before their children.
+  // so that we add parents before their children, and that the other
+  // mesh is consistently partitioned.
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_amr_elem_ids(other_mesh);
+  MeshTools::libmesh_assert_valid_procids<Node>(other_mesh);
 #endif
 
   //Copy in Nodes
