@@ -602,6 +602,19 @@ Node * DistributedMesh::add_point (const Point & p,
 }
 
 
+void DistributedMesh::own_node (Node & n)
+{
+  // This had better be a node in our mesh
+  libmesh_assert(_nodes[n.id()] == &n);
+
+  _nodes[n.id()] = libmesh_nullptr;
+
+  n.set_id(DofObject::invalid_id);
+  n.processor_id() = this->processor_id();
+
+  this->add_node(&n);
+}
+
 
 Node * DistributedMesh::add_node (Node * n)
 {
