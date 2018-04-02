@@ -35,6 +35,7 @@
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_ghost_sync.h"
+#include "libmesh/partitioner.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/sync_refinement_flags.h"
 
@@ -1584,6 +1585,9 @@ bool MeshRefinement::_refine_elements ()
       _mesh.libmesh_assert_valid_parallel_ids();
 #endif
     }
+
+  if (mesh_changed && _mesh.is_replicated())
+    Partitioner::set_node_processor_ids(_mesh);
 
   if (mesh_p_changed && !_mesh.is_replicated())
     {
