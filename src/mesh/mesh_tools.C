@@ -1449,7 +1449,14 @@ void libmesh_assert_parallel_consistent_procids<Elem>(const MeshBase & mesh)
 
   libmesh_parallel_only(mesh.comm());
 
-  dof_id_type parallel_max_elem_id = mesh.max_elem_id();
+  // Some code (looking at you, stitch_meshes) modifies DofObject ids
+  // without keeping max_elem_id()/max_node_id() consistent, but
+  // that's done in a safe way for performance reasons, so we'll play
+  // along and just figure out new max ids ourselves.
+  dof_id_type parallel_max_elem_id = 0;
+  for (const auto & elem : mesh.element_ptr_range())
+    parallel_max_elem_id = std::max(parallel_max_elem_id,
+                                    elem->id()+1);
   mesh.comm().max(parallel_max_elem_id);
 
   // Check processor ids for consistency between processors
@@ -1492,8 +1499,17 @@ void libmesh_assert_topology_consistent_procids<Node>(const MeshBase & mesh)
   libmesh_parallel_only(mesh.comm());
 
   // We want this test to be valid even when called even after nodes
-  // have been added asynchronously but before they're renumbered
-  dof_id_type parallel_max_node_id = mesh.max_node_id();
+  // have been added asynchronously but before they're renumbered.
+  //
+  // Plus, some code (looking at you, stitch_meshes) modifies
+  // DofObject ids without keeping max_elem_id()/max_node_id()
+  // consistent, but that's done in a safe way for performance
+  // reasons, so we'll play along and just figure out new max ids
+  // ourselves.
+  dof_id_type parallel_max_node_id = 0;
+  for (const auto & node : mesh.node_ptr_range())
+    parallel_max_node_id = std::max(parallel_max_node_id,
+                                    node->id()+1);
   mesh.comm().max(parallel_max_node_id);
 
   std::vector<bool> node_touched_by_me(parallel_max_node_id, false);
@@ -1535,7 +1551,16 @@ void libmesh_assert_parallel_consistent_procids<Node>(const MeshBase & mesh)
 
   // We want this test to be valid even when called even after nodes
   // have been added asynchronously but before they're renumbered
-  dof_id_type parallel_max_node_id = mesh.max_node_id();
+  //
+  // Plus, some code (looking at you, stitch_meshes) modifies
+  // DofObject ids without keeping max_elem_id()/max_node_id()
+  // consistent, but that's done in a safe way for performance
+  // reasons, so we'll play along and just figure out new max ids
+  // ourselves.
+  dof_id_type parallel_max_node_id = 0;
+  for (const auto & node : mesh.node_ptr_range())
+    parallel_max_node_id = std::max(parallel_max_node_id,
+                                    node->id()+1);
   mesh.comm().max(parallel_max_node_id);
 
   std::vector<bool> node_touched_by_anyone(parallel_max_node_id, false);
