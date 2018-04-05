@@ -356,10 +356,6 @@ int main (int argc, char ** argv)
 
   // Create a 3D mesh distributed across the default MPI communicator.
   Mesh mesh(init.comm());
-  mesh.read("systems_of_equations_ex9.exo");
-
-  // Print information about the mesh to the screen.
-  mesh.print_info();
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
@@ -369,17 +365,13 @@ int main (int argc, char ** argv)
   LinearImplicitSystem & system =
     equation_systems.add_system<LinearImplicitSystem> ("Elasticity");
 
-  // Add three displacement variables, u and v, to the system
-  unsigned int u_var = system.add_variable("u", FIRST, LAGRANGE);
-  unsigned int v_var = system.add_variable("v", FIRST, LAGRANGE);
-  unsigned int w_var = system.add_variable("w", FIRST, LAGRANGE);
-
-  LinearElasticity le(equation_systems);
-  system.attach_assemble_object(le);
-
   // Add two azimuthal periodic boundaries on two adjacent domains.
   // We do this to show that the periodic boundary condition that
   // we impose leads to a continuous solution across adjacent domains.
+  //
+  // We add the periodic boundaries *before* reading the Mesh, so
+  // that periodic neighbors will be retained when a DistributedMesh
+  // is distributed.
   //
   // The angle specified below defines the mapping
   // from "pairedboundary" to "myboundary".
@@ -401,6 +393,19 @@ int main (int argc, char ** argv)
     periodic_bc.pairedboundary = 402;
     system.get_dof_map().add_periodic_boundary(periodic_bc);
   }
+
+  mesh.read("systems_of_equations_ex9.exo");
+
+  // Print information about the mesh to the screen.
+  mesh.print_info();
+
+  // Add three displacement variables, u and v, to the system
+  unsigned int u_var = system.add_variable("u", FIRST, LAGRANGE);
+  unsigned int v_var = system.add_variable("v", FIRST, LAGRANGE);
+  unsigned int w_var = system.add_variable("w", FIRST, LAGRANGE);
+
+  LinearElasticity le(equation_systems);
+  system.attach_assemble_object(le);
 
   std::vector<unsigned int> variables;
   variables.push_back(u_var);
