@@ -281,7 +281,7 @@ public:
     std::unique_ptr<SparseMatrix<Number> > gold_mat_ptr =
       SparseMatrix<Number>::build(*TestCommWorld);
     SparseMatrix<Number> & gold_mat = *gold_mat_ptr;
-    gold_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs);
+    gold_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs_local);
 
     // construct the gold projection matrix using static node numbering as reference info
     for ( const auto & node : mesh.local_node_ptr_range() )
@@ -430,7 +430,7 @@ public:
     std::unique_ptr<SparseMatrix<Number> > gold_mat_ptr =
       SparseMatrix<Number>::build(*TestCommWorld);
     SparseMatrix<Number> & gold_mat = *gold_mat_ptr;
-    gold_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs);
+    gold_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs_local);
 
     // construct the gold projection matrix using static node numbering as reference info
     for ( const auto & node : mesh.local_node_ptr_range() )
@@ -608,7 +608,7 @@ public:
     std::unique_ptr<SparseMatrix<Number> > gold_mat_ptr =
       SparseMatrix<Number>::build(*TestCommWorld);
     SparseMatrix<Number> & gold_mat = *gold_mat_ptr;
-    gold_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs);
+    gold_mat.init(n_new_dofs, n_old_dofs, n_new_dofs_local, n_old_dofs_local);
 
     // construct the gold projection matrix using static node numbering as reference info
     for ( const auto & node : mesh.local_node_ptr_range() )
