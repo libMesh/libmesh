@@ -33,14 +33,22 @@ public:
 
   void testGetArray()
   {
-    unsigned int block_size  = 2;
+    unsigned int min_block_size  = 2;
 
     // a different size on each processor.
-    unsigned int local_size  = block_size;
+    unsigned int my_p = my_comm->rank();
+    unsigned int local_size  = (min_block_size + my_p);
     unsigned int global_size = 0;
+    unsigned int my_offset = 0;
 
     for (libMesh::processor_id_type p=0; p<my_comm->size(); p++)
-      global_size += (block_size + static_cast<unsigned int>(p));
+      {
+        const unsigned int p_size =
+          (min_block_size + static_cast<unsigned int>(p));
+        global_size += p_size;
+        if (p < my_p)
+          my_offset += p_size;
+      }
 
     PetscVector<Number> v(*my_comm, global_size, local_size);
 
@@ -55,7 +63,7 @@ public:
 
     // Check the values through the interface
     for (unsigned int i=0; i<local_size; i++)
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(std::abs(v(my_comm->rank()*2 + i)), i, TOLERANCE*TOLERANCE);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(std::abs(v(my_offset + i)), i, TOLERANCE*TOLERANCE);
 
     // Check that we can see the same thing with get_array_read
     const PetscScalar * read_only_values = v.get_array_read();
