@@ -1,3 +1,157 @@
+1.2.1 -> 1.3.0
+  * Weaken copy_node_and_elements partition assertion.
+  * Switch to "diagnostic push/pop" calls for GCC to ignore warnings.
+  * Fix performance issue and bugs in CouplingMatrix row iterators.
+  * Add --with-thread-model=openmp option, default to pthreads instead of TBB.
+  * Cache dof indices when computing sparsity (optimization).
+  * Temporarily skip running fem_system_ex2 due to changes in 3b4b2fb.
+  * Install the gzstream.h header along with the rest of libmesh.
+  * Update to latest nanoflann (pre-1.3.0).
+  * PetscNonlinearSolver:
+    - Allow user to provid separate fd and mffd evaluation functions.
+    - Use MatSNESMFSetReuseBase() API.
+  * Remove libmesh_experimental() from dg_fem_context.C.
+  * Make nested Parameters::Value public to allow use of the begin()/end() API.
+  * Remove update() call from FEMSystem::assembly(), call beforehand as necessary.
+  * Update LICENSE.txt file distributed with Metis.
+  * Add new shape quality metrics for QUAD4 elements.
+  * Remove many libmesh_error_msg("We'll never get here.") sections.
+  * Deprecate raw memory returning Preconditioner::build().
+  * Drop support for older compilers from DETERMINE_CXX_BRAND.
+  * JumpErrorEstimator fix for non-zero-norm SCALAR.
+  * Make LinearPartitioner DistributedMesh-compatible.
+  * Add System::projection_matrix() which uses MetaPhysicL.
+  * Add MetaPhysicL 0.2.0 to contrib.
+  * Avoid repeated function calls in old_dof_indices().
+  * Add support for detecting Intel 18.
+  * Break EquationSystems::reinit() into solutions and systems parts.
+  * Fix check in PetscVector<Complex>::localize_to_one().
+  * TypeNTensor:
+    - Add add_scaled() method.
+    - Add _coords data member.
+  * Add FEInterface::n_dofs_at_node_function().
+  * Add the as_range() utility for working with std:: multi containers.
+  * Fix unit test of writing vector and scalar variables in parallel.
+  * Infinite Elements:
+    - Enable second order infinite elements.
+    - Optimize contains_point() by avoiding inverse_map() calls.
+    - Change type of "current frequency" to Number.
+    - Add support for System::point_value().
+    - DistributedMesh fixes.
+    - Add miscellaneous_ex14 demonstrating infinite element use with complex frequencies.
+  * Use node_ref_range(), neighbor_ptr_range(), side_index_range(), etc. in loops.
+  * EigenSolver: don't always close() matrix before solve.
+  * Add --disable-deprecated configure option.
+  * Add support for SHELL8 elements, which are basically treated as QUAD8s.
+  * Avoid n_children() calls in for-loop bodies, use range-based loops.
+  * Add potential early return from refine_and_coarsen_elements().
+  * Add SparseMatrix::flux() API.
+  * Fix bug with XDR output of 64-bit int, long.
+  * Move libmesh library PATH to beginning of 'libmesh-config --libs'.
+  * Fix many documentation typos, spelling errors, etc.
+  * Add backward-compatible support for [[fallthrough]] attribute.
+  * Add Parallel::allgather(vector<string>) overload.
+  * TetGenIO: Update code for reading .ele files.
+  * Use the base class version of greedy_termination_test in RBEIMConstruction.
+  * Pass sanitizer flags when both compiling and linking.
+  * DofMap:
+    - Add dof_owner() search.
+    - Add semilocal_index().
+    - Add check for cyclic constraints.
+  * Disable dlopen(), getpwuid() when doing all-static linking.
+  * Mesh:
+    - Add is_serial_on_zero().
+    - Add set_distributed().
+    - Optimizations/bug fixes in stitch_meshes().
+    - Add various element_ptr_range(), node_ptr_range() to facilitate range-based for-loops.
+    - Fix constructor bug where _count_lower_dim_elems_in_point_locator was uninitialized.
+  * Add constructor to FEMContext for specifying extra_quadrature_order.
+  * Build system changes for compiling on Windows with MSys2.
+  * Write version to reduced basis Xdr headers.
+  * Avoid redundant init of old, older System vectors.
+  * Make SparseMatrix::close() non-const, avoid calling it on const objects.
+  * Set LIBMESH_HAVE_EXTERNAL_BOOST if an external boost is found.
+  * PerfLog:
+    - Add getter for underlying PerfLog data structure.
+    - Use const char * instead of std::string for speed.
+    - Add PerfData::pause_for().
+  * Fixes for coarsening of adaptively-refined DistributedMeshes.
+  * Add DenseVector(N, value) constructor.
+  * Improvements to src/apps/meshdiff.C
+  * Doxygen:
+    - Use \deprecated and \returns flags in documentation.
+    - Add client-side search boxes on Doxygen pages.
+  * Disallow renumbering when plotting ErrorVector.
+  * Fixes to AdjointRefinementErrorEstimator in FEMSystem with lift function.
+  * Add adjoints_ex6.
+  * Fixes in UnstructuredMesh::find_neighbors().
+  * Use new APIs in fem_system_ex1.
+  * Fparser
+    - Add support for "erf" in parsed function strings.
+    - Avoid race condition on asynchronous networked filesystems.
+    - Close file descriptors returned by mkstemp.
+    - Add registered derivatives to hash.
+  * Miscellaneous fixes for non-standard configurations.
+    - --disable-exodus
+    - --disable-amr
+    - --disable-fparser
+    - --disable-mpi
+    - --disable-optional
+    - --disable-exceptions
+  * C++11:
+    - LibMesh now requires a C++11-conforming compiler.
+    - The last C++03 commit is 613c152f0, tag:cpp03_final.
+    - Add configure test for std::erf().
+    - Add test for noexcept keyword.
+    - LIBMESH_BEST_UNORDERED_XYZ macros now required to be std::unordered_map,set etc.
+    - No space between nested closing template angle brackets.
+    - Replace UniquePtr with std::unique_ptr everywhere.
+    - Use libmesh_make_unique instead of 'new' where possible.
+    - Use containers of std::unique_ptrs where possible.
+  * Add StreamRedirector class to handle stream resetting with RAII, use in WhichNodeAmITest.
+  * Make build_cube() use ordered element ids for DistributedMesh.
+  * Fix BoundaryMesh unit test in parallel.
+  * Fix ReferenceCountedObject::operator=().
+  * Add ifdef'd move constructor to ReferenceCounter.
+  * Remove old, unused scripts from contrib/bin.
+  * Respect subdomains_relative_to set in BoundaryInfo::sync().
+  * Store string passed to libmesh_error_msg inside exception object.
+  * Disallow remote element removal during Mesh copy.
+  * Remove -Wunused-parameter from our CFLAGS list.
+  * Add optional Exodus file output to adjoints_ex*
+  * PetscDiffSolver: enforce constraints on current_local_solution to avoid PETSc locking issue.
+  * BoundingBox
+    - Add union_with(Point).
+    - MeshTools::create_nodal_bounding_box().
+    - Add MeshTools::create_local_bounding_box().
+    - Use nodal bounding box for Hilbert transformations.
+  * ExodusII_IO:
+    - Fix single-precision bug in write_timestep().
+    - Batch writing of subdomain, block, and sideset data to file.
+    - Fix copy_elemental_solution() in parallel.
+    - Add write_timestep_discontinuous().
+    - Turn off verbose output by default in debug mode.
+    - Add read_elemental_variable(), read_global_variable() interfaces.
+    - Add optional system_names arguments to write_timestep() methods.
+  * CheckpointIO:
+    - DistributedMesh fixes and additonal unit testing.
+    - Fix remote_elem child link handling.
+    - More robust extra_ghost_elem handling.
+    - The splitter unit tests require XDR.
+    - Put sideset/nodeset names in header.
+    - Fix read_remote_elem() in N->M case.
+    - Store integer data type in CheckpointIO files.
+    - Support changing the number of ghosted layers in Splitter.
+    - Changes to CheckpointIO filenaming scheme.
+    - Refactor mesh splitter app into a function.
+  * AbaqusIO: support more element types, optionally skip sideset generation.
+  * Elem:
+    - Add more total_family_tree_* methods.
+    - Add remove_links_to_me().
+    - Add which_node_am_i().
+    - Add raw_child_ptr() accessor.
+  * Fix assert in reduced_basis_ex4.
+
 1.2.0 -> 1.2.1
   * Bugfix/compatibility release.
   * Update bundled NetCDF from 4.3.1 -> 4.4.1.1.
