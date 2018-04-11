@@ -108,7 +108,7 @@ void ExodusII_IO::write_timestep_discontinuous (const std::string &fname,
                                                 const std::set<std::string> * system_names)
 {
   _timestep = timestep;
-  write_discontinuous_exodusII(fname,es,system_names);
+  write_discontinuous_equation_systems (fname,es,system_names);
 
   if (MeshOutput<MeshBase>::mesh().processor_id())
     return;
