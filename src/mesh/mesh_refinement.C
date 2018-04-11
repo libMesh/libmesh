@@ -1586,7 +1586,12 @@ bool MeshRefinement::_refine_elements ()
 #endif
     }
 
-  if (mesh_changed && _mesh.is_replicated())
+  // If we're refining a ReplicatedMesh, then we haven't yet assigned
+  // node processor ids.  But if we're refining a partitioned
+  // ReplicatedMesh, then we *need* to assign node processor ids.
+  if (mesh_changed && _mesh.is_replicated() &&
+      (_mesh.unpartitioned_elements_begin() ==
+       _mesh.unpartitioned_elements_end()))
     Partitioner::set_node_processor_ids(_mesh);
 
   if (mesh_p_changed && !_mesh.is_replicated())
