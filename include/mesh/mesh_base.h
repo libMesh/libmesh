@@ -771,9 +771,13 @@ public:
    * imbalances.  However you might still want to use this if the
    * communication and computation of the rebalance and repartition is
    * too high for your application.
+   *
+   * It is also possible, for backwards-compatibility purposes, to
+   * skip partitioning by resetting the partitioner() pointer for this
+   * mesh.
    */
   void skip_partitioning(bool skip) { _skip_partitioning = skip; }
-  bool skip_partitioning() const { return _skip_partitioning; }
+  bool skip_partitioning() const { return _skip_partitioning || !_partitioner.get(); }
 
   /**
    * Adds a functor which can specify ghosting requirements for use on
