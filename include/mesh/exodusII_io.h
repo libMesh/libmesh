@@ -202,7 +202,7 @@ public:
    */
   void write_nodal_data_discontinuous (const std::string &,
                                        const std::vector<Number> &,
-                                       const std::vector<std::string> &);
+                                       const std::vector<std::string> &) libmesh_override;
 
   /**
    * Write out global variables.

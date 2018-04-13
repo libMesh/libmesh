@@ -90,12 +90,30 @@ public:
                                        const std::set<std::string> * system_names=libmesh_nullptr);
 
   /**
+   * This method implements writing a mesh with discontinuous data to a
+   * specified file where the data is taken from the \p EquationSystems
+   * object.
+   */
+  virtual void write_discontinuous_equation_systems (const std::string &,
+                                                     const EquationSystems &,
+                                                     const std::set<std::string> * system_names=libmesh_nullptr);
+
+  /**
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
    */
   virtual void write_nodal_data (const std::string &,
                                  const std::vector<Number> &,
                                  const std::vector<std::string> &)
+  { libmesh_not_implemented(); }
+
+  /**
+   * This method implements writing a mesh with discontinuous data to a
+   * specified file where the nodal data and variables names are provided.
+   */
+  virtual void write_nodal_data_discontinuous (const std::string &,
+                                               const std::vector<Number> &,
+                                               const std::vector<std::string> &)
   { libmesh_not_implemented(); }
 
   /**
@@ -114,6 +132,15 @@ public:
   virtual void write_nodal_data (const std::string &,
                                  const NumericVector<Number> &,
                                  const std::vector<std::string> &);
+
+  /**
+   * This method should be overridden by output formats wanting to
+   * export discontinuous data.
+   */
+  virtual void write_nodal_data_discontinuous (const std::string &,
+                                               const NumericVector<Number> &,
+                                               const std::vector<std::string> &)
+  { libmesh_not_implemented(); }
 
   /**
    * Return/set the precision to use when writing ASCII files.
