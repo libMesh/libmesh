@@ -193,10 +193,21 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   error_per_cell.resize (mesh.max_elem_id(), 0.);
 
 #ifndef NDEBUG
-  // n_coarse_elem is only used in an assertion later so
-  // avoid declaring it unless asserts are active.
+  // These variables are only used in assertions later so
+  // avoid declaring them unless asserts are active.
   const dof_id_type n_coarse_elem = mesh.n_active_elem();
-#endif
+
+  dof_id_type local_dof_bearing_nodes = 0;
+  const unsigned int sysnum = system.number();
+  for (const auto * node : mesh.local_node_ptr_range())
+    for (unsigned int v=0, nvars = node->n_vars(sysnum);
+         v != nvars; ++v)
+      if (node->n_comp(sysnum, v))
+        {
+          local_dof_bearing_nodes++;
+          break;
+        }
+#endif // NDEBUG
 
   // Uniformly refine the mesh
   MeshRefinement mesh_refinement(mesh);
@@ -526,6 +537,22 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
   // but not necessarily the same number of elements since reinit() doesn't
   // always call contract()
   libmesh_assert_equal_to (n_coarse_elem, mesh.n_active_elem());
+
+  // We should have the same number of dof-bearing nodes as when we
+  // started
+#ifndef NDEBUG
+  dof_id_type final_local_dof_bearing_nodes = 0;
+  for (const auto * node : mesh.local_node_ptr_range())
+    for (unsigned int v=0, nvars = node->n_vars(sysnum);
+         v != nvars; ++v)
+      if (node->n_comp(sysnum, v))
+        {
+          final_local_dof_bearing_nodes++;
+          break;
+        }
+  libmesh_assert_equal_to (local_dof_bearing_nodes,
+                           final_local_dof_bearing_nodes);
+#endif // NDEBUG
 
   // Restore old solutions and clean up the heap
   system.project_solution_on_reinit() = old_projection_setting;
