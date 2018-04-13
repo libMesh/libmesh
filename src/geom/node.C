@@ -74,4 +74,33 @@ std::string Node::get_info () const
 }
 
 
+processor_id_type
+Node::choose_processor_id(processor_id_type pid1, processor_id_type pid2) const
+{
+  if (pid1 == DofObject::invalid_processor_id)
+    return pid2;
+
+  // Do we want the new load-balanced node partitioning heuristic
+  // instead of the default partitioner-friendlier heuristic?
+  static bool load_balanced_nodes =
+    libMesh::on_command_line ("--load_balanced_nodes");
+
+  // For better load balancing, we can use the min
+  // even-numberered nodes and the max for odd-numbered.
+  if (load_balanced_nodes)
+    {
+      if (this->id() % 2 &&
+          pid2 != DofObject::invalid_processor_id)
+        return std::max(pid1, pid2);
+      else
+        return std::min(pid1, pid2);
+    }
+
+  // Our default behavior, which puts too many nodes on lower MPI
+  // ranks but which keeps elements' nodes on the same partition more
+  // often, is simply:
+  return std::min(pid1, pid2);
+}
+
+
 } // namespace libMesh

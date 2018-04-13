@@ -1829,7 +1829,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
           if (it == new_proc_ids.end())
             new_proc_ids.insert(std::make_pair(id,pid));
           else
-            it->second = std::min(it->second, pid);
+            it->second = node.choose_processor_id(it->second, pid);
         }
     }
 
@@ -1886,7 +1886,10 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
           if (it == new_proc_ids.end())
             new_proc_ids.insert(std::make_pair(id,pid));
           else
-            it->second = std::min(it->second, pid);
+            {
+              const Node & node = mesh.node_ref(id);
+              it->second = node.choose_processor_id(it->second, pid);
+            }
         }
     }
 

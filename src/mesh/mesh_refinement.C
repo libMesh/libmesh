@@ -165,8 +165,8 @@ Node * MeshRefinement::add_node(Elem & parent,
   if (new_node_id != DofObject::invalid_id)
     {
       Node * node = _mesh.node_ptr(new_node_id);
-      if (proc_id < node->processor_id())
-        node->processor_id() = proc_id;
+      processor_id_type & pid = node->processor_id();
+      pid = node->choose_processor_id(pid, proc_id);
       return node;
     }
 
