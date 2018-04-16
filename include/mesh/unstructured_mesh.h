@@ -153,7 +153,11 @@ public:
    * Deep copy of another unstructured mesh class (used by subclass
    * copy constructors)
    */
-  virtual void copy_nodes_and_elements(const UnstructuredMesh & other_mesh, const bool skip_find_neighbors=false);
+  virtual void copy_nodes_and_elements (const UnstructuredMesh & other_mesh,
+                                        const bool skip_find_neighbors = false,
+                                        dof_id_type element_id_offset = 0,
+                                        dof_id_type node_id_offset = 0,
+                                        unique_id_type unique_id_offset = 0);
 
 
   /**
