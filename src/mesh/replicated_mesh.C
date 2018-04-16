@@ -1141,10 +1141,15 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
         }
     }
 
-
-
   dof_id_type node_delta = this->max_node_id();
   dof_id_type elem_delta = this->max_elem_id();
+
+  unique_id_type unique_delta =
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+    this->parallel_max_unique_id();
+#else
+    0;
+#endif
 
   // If other_mesh!=NULL, then we have to do a bunch of work
   // in order to copy it to this mesh
@@ -1152,20 +1157,8 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
     {
       LOG_SCOPE("stitch_meshes copying", "ReplicatedMesh");
 
-      // need to increment node and element IDs of other_mesh before copying to this mesh
-      for (auto & nd : other_mesh->node_ptr_range())
-        {
-          dof_id_type new_id = nd->id() + node_delta;
-          nd->set_id(new_id);
-        }
-
-      for (auto & el : other_mesh->element_ptr_range())
-        {
-          dof_id_type new_id = el->id() + elem_delta;
-          el->set_id(new_id);
-        }
-
-      // Also, increment the node_to_node_map and node_to_elems_map
+      // Increment the node_to_node_map and node_to_elems_map
+      // to account for id offsets
       for (auto & pr : node_to_node_map)
         pr.second += node_delta;
 
@@ -1175,24 +1168,9 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
       // Copy mesh data. If we skip the call to find_neighbors(), the lists
       // of neighbors will be copied verbatim from the other mesh
-      this->copy_nodes_and_elements(*other_mesh, skip_find_neighbors);
-
-      // Decrement node IDs of mesh to return to original state
-      for (auto & nd : other_mesh->node_ptr_range())
-        {
-          dof_id_type new_id = nd->id() - node_delta;
-          nd->set_id(new_id);
-        }
-
-      // Container to catch boundary IDs passed back from BoundaryInfo.
-      std::vector<boundary_id_type> bc_ids;
-
-      for (auto & other_elem : other_mesh->element_ptr_range())
-        {
-          // Decrement elem IDs of other_mesh to return it to original state
-          dof_id_type new_id = other_elem->id() - elem_delta;
-          other_elem->set_id(new_id);
-        }
+      this->copy_nodes_and_elements(*other_mesh, skip_find_neighbors,
+                                    elem_delta, node_delta,
+                                    unique_delta);
 
       // Copy BoundaryInfo from other_mesh too.  We do this via the
       // list APIs rather than element-by-element for speed.
