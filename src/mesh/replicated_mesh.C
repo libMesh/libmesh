@@ -1256,6 +1256,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
             // find the local node index that we want to update
             unsigned int local_node_index = el->local_node(other_node_id);
+            libmesh_assert_not_equal_to(local_node_index, libMesh::invalid_uint);
 
             // We also need to copy over the nodeset info here,
             // because the node will get deleted below
