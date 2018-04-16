@@ -189,6 +189,7 @@ public:
    * avoid warnings about hidden overloaded virtual functions.
    */
   using MeshOutput<MeshBase>::write_nodal_data;
+  using MeshOutput<MeshBase>::write_nodal_data_discontinuous;
 
   /**
    * Write out a nodal solution.

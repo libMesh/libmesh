@@ -134,15 +134,6 @@ public:
                                  const std::vector<std::string> &);
 
   /**
-   * This method should be overridden by output formats wanting to
-   * export discontinuous data.
-   */
-  virtual void write_nodal_data_discontinuous (const std::string &,
-                                               const NumericVector<Number> &,
-                                               const std::vector<std::string> &)
-  { libmesh_not_implemented(); }
-
-  /**
    * Return/set the precision to use when writing ASCII files.
    *
    * By default we use numeric_limits<Real>::digits10 + 2, which
