@@ -15,16 +15,14 @@ ac_cv_cxx_unordered_map,
  ac_cv_cxx_unordered_map=yes, ac_cv_cxx_unordered_map=no)
  AC_LANG_RESTORE
 ])
-if test "$ac_cv_cxx_unordered_map" = yes; then
-  AC_DEFINE(HAVE_STD_UNORDERED_MAP,1,
-            [define if the compiler supports std::unordered_map])
-  AC_DEFINE(BEST_UNORDERED_MAP,std::unordered_map,
-            [definition of the final detected unordered_map type])
-  AC_DEFINE(INCLUDE_UNORDERED_MAP,<unordered_map>,
-            [header file for the final detected unordered_map type])
-else
-  AC_MSG_ERROR([libMesh requires a working std::unordered_map implementation])
-fi
+
+AS_IF([test "$ac_cv_cxx_unordered_map" = "yes"],
+      [
+        AC_DEFINE(HAVE_STD_UNORDERED_MAP,1,[define if the compiler supports std::unordered_map])
+        AC_DEFINE(BEST_UNORDERED_MAP,std::unordered_map,[definition of the final detected unordered_map type])
+        AC_DEFINE(INCLUDE_UNORDERED_MAP,<unordered_map>,[header file for the final detected unordered_map type])
+      ],
+      [AC_MSG_ERROR([libMesh requires a working std::unordered_map implementation])])
 ])
 
 
@@ -48,16 +46,14 @@ ac_cv_cxx_unordered_multimap,
  ac_cv_cxx_unordered_multimap=yes, ac_cv_cxx_unordered_multimap=no)
  AC_LANG_RESTORE
 ])
-if test "$ac_cv_cxx_unordered_multimap" = yes; then
-  AC_DEFINE(HAVE_STD_UNORDERED_MULTIMAP,1,
-            [define if the compiler supports std::unordered_multimap])
-  AC_DEFINE(BEST_UNORDERED_MULTIMAP,std::unordered_multimap,
-            [definition of the final detected unordered_multimap type])
-  AC_DEFINE(INCLUDE_UNORDERED_MULTIMAP,<unordered_map>,
-            [header file for the final detected unordered_multimap type])
-else
-  AC_MSG_ERROR([libMesh requires a working std::unordered_multimap implementation])
-fi
+
+AS_IF([test "$ac_cv_cxx_unordered_multimap" = "yes"],
+      [
+        AC_DEFINE(HAVE_STD_UNORDERED_MULTIMAP,1,[define if the compiler supports std::unordered_multimap])
+        AC_DEFINE(BEST_UNORDERED_MULTIMAP,std::unordered_multimap,[definition of the final detected unordered_multimap type])
+        AC_DEFINE(INCLUDE_UNORDERED_MULTIMAP,<unordered_map>,[header file for the final detected unordered_multimap type])
+      ],
+      [AC_MSG_ERROR([libMesh requires a working std::unordered_multimap implementation])])
 ])
 
 
@@ -82,16 +78,14 @@ ac_cv_cxx_unordered_multiset,
  ac_cv_cxx_unordered_multiset=no)
  AC_LANG_RESTORE
 ])
-if test "$ac_cv_cxx_unordered_multiset" = yes; then
-  AC_DEFINE(HAVE_STD_UNORDERED_MULTISET,1,
-            [define if the compiler supports std::unordered_multiset])
-  AC_DEFINE(BEST_UNORDERED_MULTISET,std::unordered_multiset,
-            [definition of the final detected unordered_multiset type])
-  AC_DEFINE(INCLUDE_UNORDERED_MULTISET,<unordered_set>,
-            [header file for the final detected unordered_multiset type])
-else
-  AC_MSG_ERROR([libMesh requires a working std::unordered_multiset implementation])
-fi
+
+AS_IF([test "$ac_cv_cxx_unordered_multiset" = "yes"],
+      [
+        AC_DEFINE(HAVE_STD_UNORDERED_MULTISET,1,[define if the compiler supports std::unordered_multiset])
+        AC_DEFINE(BEST_UNORDERED_MULTISET,std::unordered_multiset,[definition of the final detected unordered_multiset type])
+        AC_DEFINE(INCLUDE_UNORDERED_MULTISET,<unordered_set>,[header file for the final detected unordered_multiset type])
+      ],
+      [AC_MSG_ERROR([libMesh requires a working std::unordered_multiset implementation])])
 ])
 
 
@@ -114,16 +108,14 @@ ac_cv_cxx_unordered_set,
  ac_cv_cxx_unordered_set=yes, ac_cv_cxx_unordered_set=no)
  AC_LANG_RESTORE
 ])
-if test "$ac_cv_cxx_unordered_set" = yes; then
-  AC_DEFINE(HAVE_STD_UNORDERED_SET,1,
-            [define if the compiler supports std::unordered_set])
-  AC_DEFINE(BEST_UNORDERED_SET,std::unordered_set,
-            [definition of the final detected unordered_set type])
-  AC_DEFINE(INCLUDE_UNORDERED_SET,<unordered_set>,
-            [header file for the final detected unordered_set type])
-else
-  AC_MSG_ERROR([libMesh requires a working std::unordered_set implementation])
-fi
+
+AS_IF([test "$ac_cv_cxx_unordered_set" = "yes"],
+      [
+        AC_DEFINE(HAVE_STD_UNORDERED_SET,1,[define if the compiler supports std::unordered_set])
+        AC_DEFINE(BEST_UNORDERED_SET,std::unordered_set,[definition of the final detected unordered_set type])
+        AC_DEFINE(INCLUDE_UNORDERED_SET,<unordered_set>,[header file for the final detected unordered_set type])
+      ],
+      [AC_MSG_ERROR([libMesh requires a working std::unordered_set implementation])])
 ])
 
 
@@ -152,16 +144,13 @@ ac_cv_cxx_hash,
  AC_LANG_RESTORE
 ])
 
-if test "$ac_cv_cxx_hash" = yes; then
-  AC_DEFINE(HAVE_STD_HASH,1,
-            [define if the compiler supports std::hash])
-  AC_DEFINE(BEST_HASH,std::hash,
-            [definition of the final detected hash type])
-  AC_DEFINE(INCLUDE_HASH,<functional>,
-            [header file for the final detected hash type])
-else
-  AC_MSG_ERROR([libMesh requires a working std::hash implementation])
-fi
+AS_IF([test "$ac_cv_cxx_hash" = "yes"],
+      [
+        AC_DEFINE(HAVE_STD_HASH,1,[define if the compiler supports std::hash])
+        AC_DEFINE(BEST_HASH,std::hash,[definition of the final detected hash type])
+        AC_DEFINE(INCLUDE_HASH,<functional>,[header file for the final detected hash type])
+      ],
+      [AC_MSG_ERROR([libMesh requires a working std::hash implementation])])
 ])
 
 

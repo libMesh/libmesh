@@ -649,7 +649,7 @@ AC_ARG_ENABLE(reference-counting,
               enablerefct=$enableval,
               enablerefct=yes)
 
-AS_IF([test "x$enablerefct" != xno -a "x$ac_cv_cxx_rtti" = xyes],
+AS_IF([test "x$enablerefct" != "xno" && test "x$ac_cv_cxx_rtti" = "xyes"],
       [
         AC_DEFINE(ENABLE_REFERENCE_COUNTING, 1, [Flag indicating if the library should be built with reference counting support])
         AC_MSG_RESULT(<<< Configuring library with reference counting support >>>)
