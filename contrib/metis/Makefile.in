@@ -862,8 +862,8 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-pkg_cppflags = -DLIBMESH_IS_COMPILING_METIS -I$(srcdir)/include \
-	-I$(srcdir)/GKlib -I$(srcdir)/libmetis \
+pkg_cppflags = -DLIBMESH_IS_COMPILING_METIS -DUSE_GKRAND \
+	-I$(srcdir)/include -I$(srcdir)/GKlib -I$(srcdir)/libmetis \
 	-I$(top_builddir)/include #for #include \
 	"libmesh/libmesh_config.h"
 pkg_sources = \
