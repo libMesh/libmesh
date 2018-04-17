@@ -15,21 +15,8 @@ can be used to define other memory allocation routines.
 
 #include <GKlib.h>
 
-/**
- * LIBMESH CHANGE: __thread is not portable across all platforms.  We detect
- * this using configure and set the appropriate value in LIBMESH_TLS, which is
- * defined in libmesh_config.h
- */
-#ifdef LIBMESH_IS_COMPILING_METIS
-#  include "libmesh/libmesh_config.h"
-#endif
-
 /* This is for the global mcore that tracks all heap allocations */
-#ifdef LIBMESH_TLS
-static LIBMESH_TLS gk_mcore_t *gkmcore = NULL;
-#else
-static gk_mcore_t *gkmcore = NULL;
-#endif
+static /*LIBMESH_TLS*/ gk_mcore_t *gkmcore = NULL;
 
 /*************************************************************************/
 /*! Define the set of memory allocation routines for each data type */
