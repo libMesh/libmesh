@@ -213,7 +213,7 @@ public:
    * and other_mesh and node IDs in the stitched mesh because the number of nodes (and hence
    * the node IDs) in the stitched mesh depend on how many nodes are stitched.
    */
-  void stitch_meshes (ReplicatedMesh & other_mesh,
+  void stitch_meshes (const ReplicatedMesh & other_mesh,
                       boundary_id_type this_mesh_boundary,
                       boundary_id_type other_mesh_boundary,
                       Real tol=TOLERANCE,
@@ -484,7 +484,7 @@ private:
    * Helper function for stitch_meshes and stitch_surfaces
    * that does the mesh stitching.
    */
-  void stitching_helper (ReplicatedMesh * other_mesh,
+  void stitching_helper (const ReplicatedMesh * other_mesh,
                          boundary_id_type boundary_id_1,
                          boundary_id_type boundary_id_2,
                          Real tol,

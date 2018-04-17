@@ -789,7 +789,7 @@ void ReplicatedMesh::fix_broken_node_and_element_numbering ()
 }
 
 
-void ReplicatedMesh::stitch_meshes (ReplicatedMesh & other_mesh,
+void ReplicatedMesh::stitch_meshes (const ReplicatedMesh & other_mesh,
                                     boundary_id_type this_mesh_boundary_id,
                                     boundary_id_type other_mesh_boundary_id,
                                     Real tol,
@@ -829,7 +829,7 @@ void ReplicatedMesh::stitch_surfaces (boundary_id_type boundary_id_1,
                    true);
 }
 
-void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
+void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
                                        boundary_id_type this_mesh_boundary_id,
                                        boundary_id_type other_mesh_boundary_id,
                                        Real tol,
@@ -870,9 +870,9 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
       std::set<dof_id_type> this_boundary_node_ids, other_boundary_node_ids;
       {
         // Make temporary fixed-size arrays for loop
-        boundary_id_type id_array[2]        = {this_mesh_boundary_id, other_mesh_boundary_id};
+        boundary_id_type id_array[2]         = {this_mesh_boundary_id, other_mesh_boundary_id};
         std::set<dof_id_type> * set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
-        ReplicatedMesh * mesh_array[2]           = {this, other_mesh};
+        const ReplicatedMesh * mesh_array[2] = {this, other_mesh};
 
         for (unsigned i=0; i<2; ++i)
           {
@@ -1003,7 +1003,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
           // Create and sort the vectors we will use to do the geometric searching
           {
             std::set<dof_id_type> * set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
-            ReplicatedMesh * mesh_array[2]           = {this, other_mesh};
+            const ReplicatedMesh * mesh_array[2] = {this, other_mesh};
             PointVector * vec_array[2]           = {&this_sorted_bndry_nodes, &other_sorted_bndry_nodes};
 
             for (unsigned i=0; i<2; ++i)
@@ -1075,7 +1075,7 @@ void ReplicatedMesh::stitching_helper (ReplicatedMesh * other_mesh,
 
               for (const auto & other_node_id : other_boundary_node_ids)
                 {
-                  Node & other_node = other_mesh->node_ref(other_node_id);
+                  const Node & other_node = other_mesh->node_ref(other_node_id);
 
                   Real node_distance = (this_node - other_node).norm();
 
