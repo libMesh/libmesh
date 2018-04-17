@@ -618,6 +618,14 @@ public:
   virtual void delete_node (Node * n) = 0;
 
   /**
+   * Takes ownership of node \p n on this partition of a distributed
+   * mesh, by setting n.processor_id() to this->processor_id(), as
+   * well as changing n.id() and moving it in the mesh's internal
+   * container to give it a new authoritative id.
+   */
+  virtual void own_node (Node &) {}
+
+  /**
    * Changes the id of node \p old_id, both by changing node(old_id)->id() and
    * by moving node(old_id) in the mesh's internal container.  No element with
    * the id \p new_id should already exist.
