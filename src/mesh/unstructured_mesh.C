@@ -71,7 +71,10 @@ UnstructuredMesh::UnstructuredMesh (unsigned char d) :
 
 
 void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_mesh,
-                                               const bool skip_find_neighbors)
+                                               const bool skip_find_neighbors,
+                                               dof_id_type element_id_offset,
+                                               dof_id_type node_id_offset,
+                                               unique_id_type unique_id_offset)
 {
   LOG_SCOPE("copy_nodes_and_elements()", "UnstructuredMesh");
 
@@ -84,9 +87,11 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
   libmesh_assert_equal_to (_is_prepared, other_mesh._is_prepared);
 
   // We're assuming the other mesh has proper element number ordering,
-  // so that we add parents before their children.
+  // so that we add parents before their children, and that the other
+  // mesh is consistently partitioned.
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_amr_elem_ids(other_mesh);
+  MeshTools::libmesh_assert_valid_procids<Node>(other_mesh);
 #endif
 
   //Copy in Nodes
@@ -100,10 +105,12 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
         Node * newn =
 #endif
-          this->add_point(*oldn, oldn->id(), oldn->processor_id());
+          this->add_point(*oldn, oldn->id() + node_id_offset,
+                          oldn->processor_id());
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-        newn->set_unique_id() = oldn->unique_id();
+        newn->set_unique_id() =
+          oldn->unique_id() + unique_id_offset;
 #endif
       }
   }
@@ -122,7 +129,8 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
       {
         // Build a new element
         Elem * newparent = old->parent() ?
-          this->elem_ptr(old->parent()->id()) : libmesh_nullptr;
+          this->elem_ptr(old->parent()->id() + element_id_offset) :
+          libmesh_nullptr;
         std::unique_ptr<Elem> ap = Elem::build(old->type(), newparent);
         Elem * el = ap.release();
 
@@ -157,16 +165,18 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 
         //Assign all the nodes
         for (auto i : el->node_index_range())
-          el->set_node(i) = this->node_ptr(old->node_id(i));
+          el->set_node(i) =
+            this->node_ptr(old->node_id(i) + node_id_offset);
 
         // And start it off in the same subdomain
         el->processor_id() = old->processor_id();
 
         // Give it the same element and unique ids
-        el->set_id(old->id());
+        el->set_id(old->id() + element_id_offset);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-        el->set_unique_id() = old->unique_id();
+        el->set_unique_id() =
+          old->unique_id() + unique_id_offset;
 #endif
 
         //Hold onto it

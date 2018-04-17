@@ -1440,12 +1440,26 @@ void MeshCommunication::make_node_ids_parallel_consistent (MeshBase & mesh)
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
+  // We need to agree on which processor owns every node, but we can't
+  // easily assert that here because we don't currently agree on which
+  // id every node has, and some of our temporary ids on unrelated
+  // nodes will "overlap".
+//#ifdef DEBUG
+//  MeshTools::libmesh_assert_parallel_consistent_procids<Node> (mesh);
+//#endif // DEBUG
+
   LOG_SCOPE ("make_node_ids_parallel_consistent()", "MeshCommunication");
 
   SyncNodeIds syncids(mesh);
   Parallel::sync_node_data_by_element_id
     (mesh, mesh.elements_begin(), mesh.elements_end(),
      Parallel::SyncEverything(), Parallel::SyncEverything(), syncids);
+
+  // At this point, with both ids and processor ids synced, we can
+  // finally check for topological consistency of node processor ids.
+#ifdef DEBUG
+  MeshTools::libmesh_assert_topology_consistent_procids<Node> (mesh);
+#endif
 }
 
 
@@ -1554,6 +1568,10 @@ struct SyncProcIds
       {
         Node & node = mesh.node_ref(ids[i]);
 
+        // We may not have ids synched when this synchronization is done, so we
+        // *can't* use id to load-balance processor id properly; we have to use
+        // the old heuristic of choosing the smallest valid processor id.
+        //
         // If someone tells us our node processor id is too low, then
         // they're wrong.  If they tell us our node processor id is
         // too high, then we're wrong.
