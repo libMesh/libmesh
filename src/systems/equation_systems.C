@@ -582,13 +582,15 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
   parallel_object_only();
 
   const unsigned int dim = _mesh.mesh_dimension();
-  const dof_id_type nn   = _mesh.n_nodes();
+  const dof_id_type max_nn   = _mesh.max_node_id();
 
-  // We'd better have a contiguous node numbering
-  libmesh_assert_equal_to (nn, _mesh.max_node_id());
-
-  // allocate storage to hold
-  // (number_of_nodes)*(number_of_variables) entries.
+  // allocate vector storage to hold
+  // (max_node_id)*(number_of_variables) entries.
+  //
+  // If node renumbering is disabled and adaptive coarsening has
+  // created gaps between node numbers, then this vector will be
+  // sparse.
+  //
   // We have to differentiate between between scalar and vector
   // variables. We intercept vector variables and treat each
   // component as a scalar variable (consistently with build_solution_names).
@@ -624,21 +626,35 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
     nv = n_scalar_vars + dim*n_vector_vars;
   }
 
-  // Get the number of local nodes
+  // Get the number of nodes to store locally.
   dof_id_type n_local_nodes = cast_int<dof_id_type>
     (std::distance(_mesh.local_nodes_begin(),
                    _mesh.local_nodes_end()));
 
+  // If node renumbering has been disabled, nodes may not be numbered
+  // contiguously, and the number of nodes might not match the
+  // max_node_id.  In this case we just do our best.
+  dof_id_type n_total_nodes = n_local_nodes;
+  _mesh.comm().sum(n_total_nodes);
+
+  const dof_id_type n_gaps = max_nn - n_total_nodes;
+  const dof_id_type gaps_per_processor = n_gaps / _mesh.comm().size();
+  const dof_id_type remainder_gaps = n_gaps % _mesh.comm().size();
+
+  n_local_nodes = n_local_nodes +      // Actual nodes
+                  gaps_per_processor + // Our even share of gaps
+                  (_mesh.comm().rank() < remainder_gaps); // Leftovers
+
   // Create a NumericVector to hold the parallel solution
   std::unique_ptr<NumericVector<Number>> parallel_soln_ptr = NumericVector<Number>::build(_communicator);
   NumericVector<Number> & parallel_soln = *parallel_soln_ptr;
-  parallel_soln.init(nn*nv, n_local_nodes*nv, false, PARALLEL);
+  parallel_soln.init(max_nn*nv, n_local_nodes*nv, false, PARALLEL);
 
   // Create a NumericVector to hold the "repeat_count" for each node - this is essentially
   // the number of elements contributing to that node's value
   std::unique_ptr<NumericVector<Number>> repeat_count_ptr = NumericVector<Number>::build(_communicator);
   NumericVector<Number> & repeat_count = *repeat_count_ptr;
-  repeat_count.init(nn*nv, n_local_nodes*nv, false, PARALLEL);
+  repeat_count.init(max_nn*nv, n_local_nodes*nv, false, PARALLEL);
 
   repeat_count.close();
 
@@ -761,8 +777,30 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
       var_num += nv_sys_split;
     } // end loop over systems
 
+  // Sum the nodal solution values and repeat counts.
   parallel_soln.close();
   repeat_count.close();
+
+  // If there were gaps in the node numbering, there will be
+  // corresponding zeros in the parallel_soln and repeat_count
+  // vectors.  We need to set those repeat_count entries to 1
+  // in order to avoid dividing by zero.
+  if (n_gaps)
+    {
+      for (numeric_index_type i=repeat_count.first_local_index();
+           i<repeat_count.last_local_index(); ++i)
+        {
+          // repeat_count entries are integral values but let's avoid a
+          // direct floating point comparison with 0 just in case some
+          // roundoff noise crept in during vector assembly?
+          if (std::abs(repeat_count(i)) < TOLERANCE)
+            repeat_count.set(i, 1.);
+        }
+
+      // Make sure the repeat_count vector is up-to-date on all
+      // processors.
+      repeat_count.close();
+    }
 
   // Divide to get the average value at the nodes
   parallel_soln /= repeat_count;

@@ -177,10 +177,7 @@ void XdrIO::write (const std::string & name)
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   new_header_id_type n_elem  = mesh.n_elem();
-  new_header_id_type n_nodes = mesh.n_nodes();
-
-  libmesh_assert(n_elem == mesh.n_elem());
-  libmesh_assert(n_nodes == mesh.n_nodes());
+  new_header_id_type max_node_id = mesh.max_node_id();
 
   new_header_id_type n_side_bcs = mesh.get_boundary_info().n_boundary_conds();
   new_header_id_type n_edge_bcs = mesh.get_boundary_info().n_edge_conds();
@@ -221,7 +218,7 @@ void XdrIO::write (const std::string & name)
       io.data (full_ver);
 
       io.data (n_elem,  "# number of elements");
-      io.data (n_nodes, "# number of nodes");
+      io.data (max_node_id, "# number of nodes"); // We'll write invalid coords into gaps
 
       io.data (this->boundary_condition_file_name(), "# boundary condition specification file");
       io.data (this->subdomain_map_file_name(),      "# subdomain id specification file");
@@ -262,7 +259,7 @@ void XdrIO::write (const std::string & name)
       this->write_serialized_connectivity (io, n_elem);
 
       // write the nodal locations
-      this->write_serialized_nodes (io, n_nodes);
+      this->write_serialized_nodes (io, max_node_id);
 
       // write the side boundary condition information
       this->write_serialized_side_bcs (io, n_side_bcs);
@@ -285,7 +282,7 @@ void XdrIO::write (const std::string & name)
       this->write_serialized_connectivity (io, n_elem);
 
       // write the nodal locations
-      this->write_serialized_nodes (io, n_nodes);
+      this->write_serialized_nodes (io, max_node_id);
 
       // write the side boundary condition information
       this->write_serialized_side_bcs (io, n_side_bcs);
@@ -713,11 +710,11 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
 
 
 
-void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
+void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type max_node_id) const
 {
   // convenient reference to our mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-  libmesh_assert_equal_to (n_nodes, mesh.n_nodes());
+  libmesh_assert_equal_to (max_node_id, mesh.max_node_id());
 
   std::vector<dof_id_type> xfer_ids;
   std::vector<Real> xfer_coords;
@@ -734,26 +731,22 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
 
   std::size_t n_written=0;
 
-  for (std::size_t blk=0, last_node=0; last_node<n_nodes; blk++)
+  for (std::size_t blk=0, last_node=0; last_node<max_node_id; blk++)
     {
       const std::size_t first_node = blk*io_blksize;
-      last_node = std::min((blk+1)*io_blksize, std::size_t(n_nodes));
+      last_node = std::min((blk+1)*io_blksize, std::size_t(max_node_id));
+
+      const std::size_t tot_id_size = last_node - first_node;
 
       // Build up the xfer buffers on each processor
       xfer_ids.clear();
       xfer_coords.clear();
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-      xfer_unique_ids.clear();
-#endif // LIBMESH_ENABLE_UNIQUE_ID
 
       for (const auto & node : mesh.local_node_ptr_range())
         if ((node->id() >= first_node) && // node in [first_node, last_node)
             (node->id() <  last_node))
           {
             xfer_ids.push_back(node->id());
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-            xfer_unique_ids.push_back(node->unique_id());
-#endif // LIBMESH_ENABLE_UNIQUE_ID
             xfer_coords.push_back((*node)(0));
 #if LIBMESH_DIM > 1
             xfer_coords.push_back((*node)(1));
@@ -775,16 +768,10 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
       // We will have lots of simultaneous receives if we are
       // processor 0, so let's use nonblocking receives.
       std::vector<Parallel::Request>
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-        unique_id_request_handles(this->n_processors()-1),
-#endif // LIBMESH_ENABLE_UNIQUE_ID
         id_request_handles(this->n_processors()-1),
         coord_request_handles(this->n_processors()-1);
 
       Parallel::MessageTag
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-        unique_id_tag = mesh.comm().get_unique_tag(1233),
-#endif // LIBMESH_ENABLE_UNIQUE_ID
         id_tag    = mesh.comm().get_unique_tag(1234),
         coord_tag = mesh.comm().get_unique_tag(1235);
 
@@ -795,17 +782,11 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
             {
               recv_ids[pid].resize(ids_size[pid]);
               recv_coords[pid].resize(ids_size[pid]*LIBMESH_DIM);
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-              recv_unique_ids[pid].resize(ids_size[pid]);
-#endif // LIBMESH_ENABLE_UNIQUE_ID
 
               if (pid == 0)
                 {
                   recv_ids[0] = xfer_ids;
                   recv_coords[0] = xfer_coords;
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-                  recv_unique_ids[0] = xfer_unique_ids;
-#endif // LIBMESH_ENABLE_UNIQUE_ID
                 }
               else
                 {
@@ -815,11 +796,6 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
                   this->comm().receive (pid, recv_coords[pid],
                                         coord_request_handles[pid-1],
                                         coord_tag);
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-                  this->comm().receive (pid, recv_unique_ids[pid],
-                                        unique_id_request_handles[pid-1],
-                                        unique_id_tag);
-#endif // LIBMESH_ENABLE_UNIQUE_ID
                 }
             }
         }
@@ -828,9 +804,6 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
           // Send -- do this on all other processors.
           this->comm().send(0, xfer_ids,    id_tag);
           this->comm().send(0, xfer_coords, coord_tag);
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-          this->comm().send(0, xfer_unique_ids, unique_id_tag);
-#endif // LIBMESH_ENABLE_UNIQUE_ID
         }
 
       // -------------------------------------------------------
@@ -842,42 +815,26 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
           // buffer sizes.
           Parallel::wait (id_request_handles);
           Parallel::wait (coord_request_handles);
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-          Parallel::wait (unique_id_request_handles);
-#endif // LIBMESH_ENABLE_UNIQUE_ID
-
-          // Write the coordinates in this block.
-          std::size_t tot_id_size=0;
 
           for (unsigned int pid=0; pid<this->n_processors(); pid++)
-            {
-              tot_id_size    += recv_ids[pid].size();
-              libmesh_assert_equal_to(recv_coords[pid].size(),
-                                      recv_ids[pid].size()*LIBMESH_DIM);
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-              libmesh_assert_equal_to
-                (recv_ids[pid].size(), recv_unique_ids[pid].size());
-#endif // LIBMESH_ENABLE_UNIQUE_ID
-            }
+            libmesh_assert_equal_to(recv_coords[pid].size(),
+                                    recv_ids[pid].size()*LIBMESH_DIM);
 
-          libmesh_assert_less_equal
-            (tot_id_size, std::min(io_blksize, std::size_t(n_nodes)));
+          // Write the coordinates in this block.
+          // Some of these coordinates may correspond to ids for which
+          // no node exists, if we have a discontiguous node
+          // numbering!
 
-          coords.resize (3*tot_id_size);
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-          unique_ids.resize(tot_id_size);
-#endif
+          // Write invalid values for unused node ids
+          coords.clear();
+          coords.resize (3*tot_id_size, std::numeric_limits<Real>::quiet_NaN());
 
           for (unsigned int pid=0; pid<this->n_processors(); pid++)
             for (std::size_t idx=0; idx<recv_ids[pid].size(); idx++)
               {
+                libmesh_assert_less_equal(first_node, recv_ids[pid][idx]);
                 const std::size_t local_idx = recv_ids[pid][idx] - first_node;
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-                libmesh_assert_less (local_idx, unique_ids.size());
-
-                unique_ids[local_idx] = recv_unique_ids[pid][idx];
-#endif
+                libmesh_assert_less(local_idx, tot_id_size);
 
                 libmesh_assert_less ((3*local_idx+2), coords.size());
                 libmesh_assert_less ((LIBMESH_DIM*idx+LIBMESH_DIM-1), recv_coords[pid].size());
@@ -903,7 +860,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
     }
 
   if (this->processor_id() == 0)
-    libmesh_assert_equal_to (n_written, n_nodes);
+    libmesh_assert_less_equal (n_written, max_node_id);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   // XDR unsigned char doesn't work as anticipated
@@ -917,14 +874,18 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   n_written = 0;
 
-  for (std::size_t blk=0, last_node=0; last_node<n_nodes; blk++)
+  for (std::size_t blk=0, last_node=0; last_node<max_node_id; blk++)
     {
       const std::size_t first_node = blk*io_blksize;
-      last_node = std::min((blk+1)*io_blksize, std::size_t(n_nodes));
+      last_node = std::min((blk+1)*io_blksize, std::size_t(max_node_id));
+
+      const std::size_t tot_id_size = last_node - first_node;
 
       // Build up the xfer buffers on each processor
       xfer_ids.clear();
+      xfer_ids.reserve(tot_id_size);
       xfer_unique_ids.clear();
+      xfer_unique_ids.reserve(tot_id_size);
 
       for (const auto & node : mesh.local_node_ptr_range())
         if ((node->id() >= first_node) && // node in [first_node, last_node)
@@ -995,25 +956,23 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
           Parallel::wait (unique_id_request_handles);
 
           // Write the unique ids in this block.
-          std::size_t tot_id_size=0;
-
           for (unsigned int pid=0; pid<this->n_processors(); pid++)
             {
-              tot_id_size    += recv_ids[pid].size();
               libmesh_assert_equal_to
                 (recv_ids[pid].size(), recv_unique_ids[pid].size());
             }
 
           libmesh_assert_less_equal
-            (tot_id_size, std::min(io_blksize, std::size_t(n_nodes)));
+            (tot_id_size, std::min(io_blksize, std::size_t(max_node_id)));
 
-          unique_ids.resize(tot_id_size);
+          unique_ids.clear();
+          unique_ids.resize(tot_id_size, unique_id_type(-1));
 
           for (unsigned int pid=0; pid<this->n_processors(); pid++)
             for (std::size_t idx=0; idx<recv_ids[pid].size(); idx++)
               {
+                libmesh_assert_less_equal(first_node, recv_ids[pid][idx]);
                 const std::size_t local_idx = recv_ids[pid][idx] - first_node;
-
                 libmesh_assert_less (local_idx, unique_ids.size());
 
                 unique_ids[local_idx] = recv_unique_ids[pid][idx];
@@ -1027,7 +986,7 @@ void XdrIO::write_serialized_nodes (Xdr & io, const dof_id_type n_nodes) const
     }
 
   if (this->processor_id() == 0)
-    libmesh_assert_equal_to (n_written, n_nodes);
+    libmesh_assert_less_equal (n_written, max_node_id);
 
 #endif // LIBMESH_ENABLE_UNIQUE_ID
 }
@@ -1798,6 +1757,9 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
           if (pos.first != pos.second) // we need this node.
             {
               libmesh_assert_equal_to (*pos.first, n);
+              libmesh_assert(!libmesh_isnan(coords[idx+0]));
+              libmesh_assert(!libmesh_isnan(coords[idx+1]));
+              libmesh_assert(!libmesh_isnan(coords[idx+2]));
               mesh.node_ref(cast_int<dof_id_type>(n)) =
                 Point (coords[idx+0],
                        coords[idx+1],
