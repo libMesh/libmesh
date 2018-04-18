@@ -1757,6 +1757,9 @@ void XdrIO::read_serialized_nodes (Xdr & io, const dof_id_type n_nodes)
           if (pos.first != pos.second) // we need this node.
             {
               libmesh_assert_equal_to (*pos.first, n);
+              libmesh_assert(!libmesh_isnan(coords[idx+0]));
+              libmesh_assert(!libmesh_isnan(coords[idx+1]));
+              libmesh_assert(!libmesh_isnan(coords[idx+2]));
               mesh.node_ref(cast_int<dof_id_type>(n)) =
                 Point (coords[idx+0],
                        coords[idx+1],
