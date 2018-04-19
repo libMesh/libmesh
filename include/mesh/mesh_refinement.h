@@ -300,8 +300,10 @@ public:
 
   /**
    * Add a node to the mesh.  The node should be node n of child c of
-   * parent Elem parent.  The processor_id is assigned to all newly
-   * created nodes.
+   * parent Elem parent.  The processor id \proc_id is used if
+   * necessary to help determine numbering of newly created nodes, but
+   * newly created nodes are left unpartitioned until a node
+   * partitionining sweep is done later.
    *
    * \returns A pointer to a suitable existing or newly-created node.
    */
