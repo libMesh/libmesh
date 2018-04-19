@@ -35,6 +35,7 @@
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_ghost_sync.h"
+#include "libmesh/partitioner.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/sync_refinement_flags.h"
 
@@ -1584,6 +1585,14 @@ bool MeshRefinement::_refine_elements ()
       _mesh.libmesh_assert_valid_parallel_ids();
 #endif
     }
+
+  // If we're refining a ReplicatedMesh, then we haven't yet assigned
+  // node processor ids.  But if we're refining a partitioned
+  // ReplicatedMesh, then we *need* to assign node processor ids.
+  if (mesh_changed && _mesh.is_replicated() &&
+      (_mesh.unpartitioned_elements_begin() ==
+       _mesh.unpartitioned_elements_end()))
+    Partitioner::set_node_processor_ids(_mesh);
 
   if (mesh_p_changed && !_mesh.is_replicated())
     {
