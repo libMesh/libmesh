@@ -275,7 +275,7 @@ public:
    * well as changing n.id() and moving it in the mesh's internal
    * container to give it a new authoritative id.
    */
-  virtual void own_node (Node & n);
+  virtual void own_node (Node & n) libmesh_override;
 
   virtual void delete_node (Node * n) libmesh_override;
   virtual void renumber_node (dof_id_type old_id, dof_id_type new_id) libmesh_override;
