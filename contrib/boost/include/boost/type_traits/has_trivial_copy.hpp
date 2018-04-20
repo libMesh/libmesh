@@ -9,6 +9,7 @@
 #ifndef BOOST_TT_HAS_TRIVIAL_COPY_HPP_INCLUDED
 #define BOOST_TT_HAS_TRIVIAL_COPY_HPP_INCLUDED
 
+#include <cstddef> // size_t
 #include <boost/type_traits/intrinsics.hpp>
 #include <boost/type_traits/is_pod.hpp>
 #include <boost/type_traits/is_reference.hpp>
@@ -27,8 +28,8 @@
 
 namespace boost {
 
-template <typename T> struct has_trivial_copy
-: public integral_constant<bool,
+template <typename T> struct has_trivial_copy 
+: public integral_constant<bool, 
 #ifdef BOOST_HAS_TRIVIAL_COPY
    BOOST_HAS_TRIVIAL_COPY(T) BOOST_TT_TRIVIAL_CONSTRUCT_FIX
 #else
@@ -49,7 +50,7 @@ template <> struct has_trivial_copy<void const volatile> : public false_type{};
 #endif
 
 template <class T> struct has_trivial_copy<T&> : public false_type{};
-#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
+#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) 
 template <class T> struct has_trivial_copy<T&&> : public false_type{};
 #endif
 

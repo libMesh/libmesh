@@ -62,8 +62,8 @@ struct enable_def_del
 ////        enable_defdel_call
 ////////////////////////////////////////
 
-//When 2nd is T[N], 1st(*)[N] shall be convertible to T(*)[N];
-//When 2nd is T[],  1st(*)[] shall be convertible to T(*)[];
+//When 2nd is T[N], 1st(*)[N] shall be convertible to T(*)[N]; 
+//When 2nd is T[],  1st(*)[] shall be convertible to T(*)[]; 
 //Otherwise, 1st* shall be convertible to 2nd*.
 
 template<class U, class T, class Type = bmupmu::nat>
@@ -156,7 +156,7 @@ struct default_delete
    //!   - If T is not an array type and U* is implicitly convertible to T*.
    //!   - If T is an array type and U* is a more CV qualified pointer to remove_extent<T>::type.
    template <class U>
-   BOOST_MOVE_DOC1ST(default_delete&,
+   BOOST_MOVE_DOC1ST(default_delete&, 
       typename bmupd::enable_def_del<U BOOST_MOVE_I T BOOST_MOVE_I default_delete &>::type)
       operator=(const default_delete<U>&) BOOST_NOEXCEPT
    {

@@ -72,15 +72,15 @@ template <
       std::size_t size_
     , std::size_t alignment_ = std::size_t(-1)
 >
-class aligned_storage :
+class aligned_storage : 
 #ifndef __BORLANDC__
-   private
+   private 
 #else
    public
 #endif
-   ::boost::detail::aligned_storage::aligned_storage_imp<size_, alignment_>
+   ::boost::detail::aligned_storage::aligned_storage_imp<size_, alignment_> 
 {
-
+ 
 public: // constants
 
     typedef ::boost::detail::aligned_storage::aligned_storage_imp<size_, alignment_> type;

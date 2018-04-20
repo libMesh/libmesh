@@ -16,7 +16,7 @@
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/type_traits/remove_cv.hpp>
 
-namespace boost
+namespace boost 
 {
 
    namespace detail
@@ -36,7 +36,7 @@ namespace boost
     public:
        typedef typename boost::detail::decay_imp<Ty, boost::is_array<Ty>::value, boost::is_function<Ty>::value>::type type;
     };
-
+    
 } // namespace boost
 
 

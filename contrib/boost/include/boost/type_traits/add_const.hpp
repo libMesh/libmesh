@@ -25,7 +25,7 @@ namespace boost {
 // references with MSVC6.
 #   pragma warning(push)
 #   pragma warning(disable:4181) // warning C4181: qualifier applied to reference type ignored
-#endif
+#endif 
 
    template <class T> struct add_const
    {
@@ -34,7 +34,7 @@ namespace boost {
 
 #if defined(BOOST_MSVC)
 #   pragma warning(pop)
-#endif
+#endif 
 
    template <class T> struct add_const<T&>
    {

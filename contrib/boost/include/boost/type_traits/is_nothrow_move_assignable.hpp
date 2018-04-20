@@ -29,7 +29,7 @@ template <class T> struct is_nothrow_move_assignable<T const> : public false_typ
 template <class T> struct is_nothrow_move_assignable<T volatile> : public false_type{};
 template <class T> struct is_nothrow_move_assignable<T const volatile> : public false_type{};
 template <class T> struct is_nothrow_move_assignable<T&> : public false_type{};
-#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
+#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) 
 template <class T> struct is_nothrow_move_assignable<T&&> : public false_type{};
 #endif
 

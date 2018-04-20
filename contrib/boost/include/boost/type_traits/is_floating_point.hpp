@@ -20,7 +20,7 @@ namespace boost {
    template<> struct is_floating_point<float> : public true_type{};
    template<> struct is_floating_point<double> : public true_type{};
    template<> struct is_floating_point<long double> : public true_type{};
-
+   
 #if defined(BOOST_HAS_FLOAT128)
    template<> struct is_floating_point<__float128> : public true_type{};
 #endif

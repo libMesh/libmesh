@@ -36,7 +36,7 @@
 //!
 //! Main differences from std::unique_ptr to avoid heavy dependencies,
 //! specially in C++03 compilers:
-//!   - <tt>operator < </tt> uses pointer <tt>operator < </tt>instead of <tt>std::less<common_type></tt>.
+//!   - <tt>operator < </tt> uses pointer <tt>operator < </tt>instead of <tt>std::less<common_type></tt>. 
 //!      This avoids dependencies on <tt>std::common_type</tt> and <tt>std::less</tt>
 //!      (<tt><type_traits>/<functional></tt> headers). In C++03 this avoid pulling Boost.Typeof and other
 //!      cascading dependencies. As in all Boost platforms <tt>operator <</tt> on raw pointers and
@@ -308,31 +308,31 @@ namespace movelib {
 
 //! A unique pointer is an object that owns another object and
 //! manages that other object through a pointer.
-//!
+//! 
 //! More precisely, a unique pointer is an object u that stores a pointer to a second object p and will dispose
 //! of p when u is itself destroyed (e.g., when leaving block scope). In this context, u is said to own p.
-//!
+//! 
 //! The mechanism by which u disposes of p is known as p's associated deleter, a function object whose correct
 //! invocation results in p's appropriate disposition (typically its deletion).
-//!
+//! 
 //! Let the notation u.p denote the pointer stored by u, and let u.d denote the associated deleter. Upon request,
 //! u can reset (replace) u.p and u.d with another pointer and deleter, but must properly dispose of its owned
 //! object via the associated deleter before such replacement is considered completed.
-//!
+//! 
 //! Additionally, u can, upon request, transfer ownership to another unique pointer u2. Upon completion of
 //! such a transfer, the following postconditions hold:
 //!   - u2.p is equal to the pre-transfer u.p,
 //!   - u.p is equal to nullptr, and
 //!   - if the pre-transfer u.d maintained state, such state has been transferred to u2.d.
-//!
+//! 
 //! As in the case of a reset, u2 must properly dispose of its pre-transfer owned object via the pre-transfer
 //! associated deleter before the ownership transfer is considered complete.
-//!
+//! 
 //! Each object of a type U instantiated from the unique_ptr template specified in this subclause has the strict
 //! ownership semantics, specified above, of a unique pointer. In partial satisfaction of these semantics, each
 //! such U is MoveConstructible and MoveAssignable, but is not CopyConstructible nor CopyAssignable.
 //! The template parameter T of unique_ptr may be an incomplete type.
-//!
+//! 
 //! The uses of unique_ptr include providing exception safety for dynamically allocated memory, passing
 //! ownership of dynamically allocated memory to a function, and returning dynamically allocated memory from
 //! a function.
@@ -388,7 +388,7 @@ class unique_ptr
    //! <b>Postconditions</b>: <tt>get() == nullptr</tt>. <tt>get_deleter()</tt> returns a reference to the stored deleter.
    //!
    //! <b>Remarks</b>: If this constructor is instantiated with a pointer type or reference type
-   //!   for the template argument D, the program is ill-formed.
+   //!   for the template argument D, the program is ill-formed.   
    BOOST_MOVE_FORCEINLINE BOOST_CONSTEXPR unique_ptr() BOOST_NOEXCEPT
       : m_data()
    {
@@ -399,7 +399,7 @@ class unique_ptr
    }
 
    //! <b>Effects</b>: Same as <tt>unique_ptr()</tt> (default constructor).
-   //!
+   //! 
    BOOST_MOVE_FORCEINLINE BOOST_CONSTEXPR unique_ptr(BOOST_MOVE_DOC0PTR(bmupd::nullptr_type)) BOOST_NOEXCEPT
       : m_data()
    {
@@ -412,7 +412,7 @@ class unique_ptr
    //! <b>Requires</b>: D shall satisfy the requirements of DefaultConstructible, and
    //!   that construction shall not throw an exception.
    //!
-   //! <b>Effects</b>: Constructs a unique_ptr which owns p, initializing the stored pointer
+   //! <b>Effects</b>: Constructs a unique_ptr which owns p, initializing the stored pointer 
    //!   with p and value initializing the stored deleter.
    //!
    //! <b>Postconditions</b>: <tt>get() == p</tt>. <tt>get_deleter()</tt> returns a reference to the stored deleter.
@@ -445,7 +445,7 @@ class unique_ptr
    //!
    //!
    //! <b>Requires</b>: Either
-   //!   - D is not an lvalue-reference type and d is an lvalue or const rvalue.
+   //!   - D is not an lvalue-reference type and d is an lvalue or const rvalue. 
    //!         D shall satisfy the requirements of CopyConstructible, and the copy constructor of D
    //!         shall not throw an exception. This unique_ptr will hold a copy of d.
    //!   - D is an lvalue-reference type and d is an lvalue. the type which D references need not be CopyConstructible nor
@@ -453,7 +453,7 @@ class unique_ptr
    //!
    //! <b>Effects</b>: Constructs a unique_ptr object which owns p, initializing the stored pointer with p and
    //!   initializing the deleter as described above.
-   //!
+   //! 
    //! <b>Postconditions</b>: <tt>get() == p</tt>. <tt>get_deleter()</tt> returns a reference to the stored deleter. If D is a
    //!   reference type then <tt>get_deleter()</tt> returns a reference to the lvalue d.
    //!
@@ -491,7 +491,7 @@ class unique_ptr
    //!
    //! <b>Effects</b>: Constructs a unique_ptr object which owns p, initializing the stored pointer with p and
    //!   initializing the deleter as described above.
-   //!
+   //! 
    //! <b>Postconditions</b>: <tt>get() == p</tt>. <tt>get_deleter()</tt> returns a reference to the stored deleter. If D is a
    //!   reference type then <tt>get_deleter()</tt> returns a reference to the lvalue d.
    //!
@@ -518,11 +518,11 @@ class unique_ptr
 
    //! <b>Requires</b>: If D is not a reference type, D shall satisfy the requirements of MoveConstructible.
    //! Construction of the deleter from an rvalue of type D shall not throw an exception.
-   //!
+   //! 
    //! <b>Effects</b>: Constructs a unique_ptr by transferring ownership from u to *this. If D is a reference type,
    //! this deleter is copy constructed from u's deleter; otherwise, this deleter is move constructed from u's
    //! deleter.
-   //!
+   //! 
    //! <b>Postconditions</b>: <tt>get()</tt> yields the value u.get() yielded before the construction. <tt>get_deleter()</tt>
    //! returns a reference to the stored deleter that was constructed from u.get_deleter(). If D is a
    //! reference type then <tt>get_deleter()</tt> and <tt>u.get_deleter()</tt> both reference the same lvalue deleter.
@@ -660,7 +660,7 @@ class unique_ptr
    //!
    BOOST_MOVE_FORCEINLINE BOOST_MOVE_DOC1ST(D&, typename bmupmu::add_lvalue_reference<D>::type)
       get_deleter() BOOST_NOEXCEPT
-   {  return m_data.deleter();  }
+   {  return m_data.deleter();  }   
 
    //! <b>Returns</b>: A reference to the stored deleter.
    //!
@@ -684,7 +684,7 @@ class unique_ptr
 
    //! <b>Postcondition</b>: <tt>get() == nullptr</tt>.
    //!
-   //! <b>Returns</b>: The value <tt>get()</tt> had at the start of the call to release.
+   //! <b>Returns</b>: The value <tt>get()</tt> had at the start of the call to release.   
    BOOST_MOVE_FORCEINLINE pointer release() BOOST_NOEXCEPT
    {
       const pointer tmp = m_data.m_p;
@@ -731,7 +731,7 @@ class unique_ptr
    {  this->reset(pointer());  }
 
    //! <b>Effects</b>: Same as <tt>reset()</tt>
-   //!
+   //! 
    void reset(BOOST_MOVE_DOC0PTR(bmupd::nullptr_type)) BOOST_NOEXCEPT
    {  this->reset(); }
 

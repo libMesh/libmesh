@@ -33,13 +33,13 @@ private:
 
    typedef typename remove_cv<T>::type t_no_cv;
    typedef typename conditional<
-      (::boost::is_unsigned<T>::value && ::boost::is_integral<T>::value
+      (::boost::is_unsigned<T>::value && ::boost::is_integral<T>::value 
       && ! ::boost::is_same<t_no_cv, char>::value
       && ! ::boost::is_same<t_no_cv, wchar_t>::value
       && ! ::boost::is_same<t_no_cv, bool>::value),
       T,
       typename conditional<
-         (::boost::is_integral<T>::value
+         (::boost::is_integral<T>::value 
          && ! ::boost::is_same<t_no_cv, char>::value
          && ! ::boost::is_same<t_no_cv, wchar_t>::value
          && ! ::boost::is_same<t_no_cv, bool>::value),
@@ -58,8 +58,8 @@ private:
 #if defined(BOOST_HAS_LONG_LONG)
 #ifdef BOOST_HAS_INT128
                      typename conditional<
-                        sizeof(t_no_cv) == sizeof(boost::ulong_long_type),
-                        boost::ulong_long_type,
+                        sizeof(t_no_cv) == sizeof(boost::ulong_long_type), 
+                        boost::ulong_long_type, 
                         boost::uint128_type
                      >::type
 #else
@@ -90,8 +90,8 @@ private:
 #if defined(BOOST_HAS_LONG_LONG)
 #ifdef BOOST_HAS_INT128
                      typename conditional<
-                        sizeof(t_no_cv) == sizeof(boost::ulong_long_type),
-                        boost::ulong_long_type,
+                        sizeof(t_no_cv) == sizeof(boost::ulong_long_type), 
+                        boost::ulong_long_type, 
                         boost::uint128_type
                      >::type
 #else
@@ -108,7 +108,7 @@ private:
          >::type
       >::type
    >::type base_integer_type;
-
+   
    // Add back any const qualifier:
    typedef typename conditional<
       is_const<T>::value,

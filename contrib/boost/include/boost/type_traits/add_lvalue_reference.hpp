@@ -12,7 +12,7 @@ namespace boost{
 
 template <class T> struct add_lvalue_reference
 {
-   typedef typename boost::add_reference<T>::type type;
+   typedef typename boost::add_reference<T>::type type; 
 };
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES

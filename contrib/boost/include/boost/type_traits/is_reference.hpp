@@ -1,6 +1,6 @@
 
-//  (C) Copyright Dave Abrahams, Steve Cleary, Beman Dawes,
-//      Howard Hinnant and John Maddock 2000, 2010.
+//  (C) Copyright Dave Abrahams, Steve Cleary, Beman Dawes, 
+//      Howard Hinnant and John Maddock 2000, 2010. 
 //  (C) Copyright Mat Marcus, Jesse Jones and Adobe Systems Inc 2001
 
 //  Use, modification and distribution are subject to the Boost Software License,
@@ -17,10 +17,10 @@
 
 namespace boost {
 
-template <class T> struct is_reference
-   : public
+template <class T> struct is_reference 
+   : public 
    integral_constant<
-      bool,
+      bool, 
       ::boost::is_lvalue_reference<T>::value || ::boost::is_rvalue_reference<T>::value>
 {};
 

@@ -12,7 +12,7 @@
 #include <boost/type_traits/is_pod.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/config.hpp>
-#include <cstddef>
+#include <cstddef> // size_t
 #include <boost/detail/workaround.hpp>
 
 #ifdef BOOST_MSVC
@@ -79,7 +79,7 @@ template <std::size_t Target> struct char_alignment<Target, false>{ typedef type
 }
 
 template <std::size_t Align>
-struct type_with_alignment
+struct type_with_alignment 
 {
    typedef typename boost::detail::char_alignment<Align, boost::alignment_of<char>::value >= Align>::type type;
 };
@@ -127,58 +127,58 @@ template<> struct is_pod< ::boost::tt_align_ns::a128> : public true_type{};
 // with suitable alignment.  This does mean however, that type_with_alignment<>
 // may return a type which cannot be passed through a function call
 // by value (and neither can any type containing such a type like
-// Boost.Optional).  However, this only happens when we have no choice
+// Boost.Optional).  However, this only happens when we have no choice 
 // in the matter because no other "ordinary" type is available.
 //
 namespace tt_align_ns {
-struct __declspec(align(8)) a8 {
-   char m[8];
+struct __declspec(align(8)) a8 { 
+   char m[8]; 
    typedef a8 type;
 };
-struct __declspec(align(16)) a16 {
-   char m[16];
+struct __declspec(align(16)) a16 { 
+   char m[16]; 
    typedef a16 type;
 };
-struct __declspec(align(32)) a32 {
-   char m[32];
+struct __declspec(align(32)) a32 { 
+   char m[32]; 
    typedef a32 type;
 };
-struct __declspec(align(64)) a64
-{
-   char m[64];
+struct __declspec(align(64)) a64 
+{ 
+   char m[64]; 
    typedef a64 type;
 };
-struct __declspec(align(128)) a128 {
-   char m[128];
+struct __declspec(align(128)) a128 { 
+   char m[128]; 
    typedef a128 type;
 };
 }
 
-template<> struct type_with_alignment<8>
-{
+template<> struct type_with_alignment<8>  
+{ 
    typedef boost::conditional<
       ::boost::alignment_of<boost::detail::max_align>::value < 8,
       tt_align_ns::a8,
       boost::detail::char_alignment<8, false> >::type t1;
-public:
+public: 
    typedef t1::type type;
 };
-template<> struct type_with_alignment<16>
-{
+template<> struct type_with_alignment<16> 
+{ 
    typedef boost::conditional<
       ::boost::alignment_of<boost::detail::max_align>::value < 16,
       tt_align_ns::a16,
       boost::detail::char_alignment<16, false> >::type t1;
-public:
+public: 
    typedef t1::type type;
 };
-template<> struct type_with_alignment<32>
-{
+template<> struct type_with_alignment<32> 
+{ 
    typedef boost::conditional<
       ::boost::alignment_of<boost::detail::max_align>::value < 32,
       tt_align_ns::a32,
       boost::detail::char_alignment<32, false> >::type t1;
-public:
+public: 
    typedef t1::type type;
 };
 template<> struct type_with_alignment<64> {
@@ -186,7 +186,7 @@ template<> struct type_with_alignment<64> {
       ::boost::alignment_of<boost::detail::max_align>::value < 64,
       tt_align_ns::a64,
       boost::detail::char_alignment<64, false> >::type t1;
-public:
+public: 
    typedef t1::type type;
 };
 template<> struct type_with_alignment<128> {
@@ -194,7 +194,7 @@ template<> struct type_with_alignment<128> {
       ::boost::alignment_of<boost::detail::max_align>::value < 128,
       tt_align_ns::a128,
       boost::detail::char_alignment<128, false> >::type t1;
-public:
+public: 
    typedef t1::type type;
 };
 

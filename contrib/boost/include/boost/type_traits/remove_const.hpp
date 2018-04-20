@@ -1,6 +1,6 @@
 
 //  (C) Copyright Dave Abrahams, Steve Cleary, Beman Dawes, Howard
-//  Hinnant & John Maddock 2000.
+//  Hinnant & John Maddock 2000.  
 //  Use, modification and distribution are subject to the Boost Software License,
 //  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt).
@@ -12,7 +12,7 @@
 #define BOOST_TT_REMOVE_CONST_HPP_INCLUDED
 
 #include <boost/config.hpp>
-#include <cstddef>
+#include <cstddef> // size_t
 #include <boost/detail/workaround.hpp>
 
 namespace boost {
