@@ -389,12 +389,22 @@ bool MeshRefinement::eliminate_unrefined_patches ()
   // pointers held by the Mesh.
   for (Elem * elem : _mesh.active_element_ptr_range())
     {
-      // First assume that we'll have to flag this element for both h
-      // and p refinement, then change our minds if we see any
-      // neighbors that are as coarse or coarser than us.
-      bool h_flag_me = true,
-        p_flag_me = true;
-
+      // First, see if there's any possibility we might have to flag
+      // this element for h and p refinement - do we have any visible
+      // neighbors?  Next we'll check to see if any of those neighbors
+      // are as coarse or coarser than us.
+      bool h_flag_me = false,
+           p_flag_me = false;
+      for (auto neighbor : elem->neighbor_ptr_range())
+        {
+          // Quit if the element is not a local boundary
+          if (neighbor != libmesh_nullptr && neighbor != remote_elem)
+            {
+              h_flag_me = true;
+              p_flag_me = true;
+              break;
+            }
+        }
 
       // Skip the element if it is already fully flagged for refinement
       if (elem->p_refinement_flag() == Elem::REFINE)
