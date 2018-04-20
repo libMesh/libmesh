@@ -11,6 +11,7 @@
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/remote_elem.h>
 #include <libmesh/replicated_mesh.h>
+#include <libmesh/node_elem.h>
 
 #include "test_comm.h"
 
@@ -35,6 +36,7 @@ public:
   CPPUNIT_TEST( testInit );
   CPPUNIT_TEST( testPostInitAddSystem );
   CPPUNIT_TEST( testPostInitAddElem );
+  CPPUNIT_TEST( testReinitWithNodeElem );
   CPPUNIT_TEST( testRefineThenReinitPreserveFlags );
 
   CPPUNIT_TEST_SUITE_END();
@@ -115,6 +117,22 @@ public:
     mesh.add_elem(e);
     mesh.prepare_for_use();
 
+    es.reinit();
+  }
+
+  void testReinitWithNodeElem()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_line (mesh, 10, 0., 1., EDGE2);
+    Elem* node_elem = mesh.add_elem (new NodeElem);
+    node_elem->set_node(0) = mesh.node_ptr(0);
+    mesh.prepare_for_use();
+
+    EquationSystems es(mesh);
+    System &sys = es.add_system<System> ("SimpleSystem");
+    sys.add_variable("u", CONSTANT, MONOMIAL);
+    es.init();
     es.reinit();
   }
 
