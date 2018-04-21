@@ -636,6 +636,10 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   std::vector<Number> soln;
   es.get_solution(soln, names);
 
+  // Also, store the list of subdomains on which each variable is active
+  std::vector<std::set<subdomain_id_type>> vars_active_subdomains;
+  es.get_vars_active_subdomains(names, vars_active_subdomains);
+
   if (soln.empty()) // If there is nothing to write just return
     return;
 
@@ -650,7 +654,9 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
 
   std::vector<std::string> complex_names = exio_helper->get_complex_names(names);
 
-  exio_helper->initialize_element_variables(complex_names);
+  std::vector<std::set<subdomain_id_type>> complex_vars_active_subdomains =
+    exio_helper->get_complex_vars_active_subdomains(vars_active_subdomains);
+  exio_helper->initialize_element_variables(complex_names, complex_vars_active_subdomains);
 
   unsigned int num_values = soln.size();
   unsigned int num_vars = names.size();
@@ -680,11 +686,11 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
         }
     }
 
-  exio_helper->write_element_values(mesh, complex_soln, _timestep);
+  exio_helper->write_element_values(mesh, complex_soln, _timestep, vars_active_subdomains);
 
 #else
-  exio_helper->initialize_element_variables(names);
-  exio_helper->write_element_values(mesh, soln, _timestep);
+  exio_helper->initialize_element_variables(names, vars_active_subdomains);
+  exio_helper->write_element_values(mesh, soln, _timestep, vars_active_subdomains);
 #endif
 }
 

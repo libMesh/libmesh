@@ -1704,7 +1704,8 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 
 
 
-void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> names)
+void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> names,
+                                                      std::vector<std::set<subdomain_id_type>> vars_active_subdomains)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
@@ -1730,18 +1731,21 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
 
   this->write_var_names(ELEMENTAL, names);
 
-  // Form the element variable truth table and send to Exodus.
-  // This tells which variables are written to which blocks,
-  // and can dramatically speed up writing element variables
-  //
-  // We really should initialize all entries in the truth table to 0
-  // and then loop over all subdomains, setting their entries to 1
-  // if a given variable exists on that subdomain.  However,
-  // we don't have that information, and the element variables
-  // passed to us are padded with zeroes for the blocks where
-  // they aren't defined.  To be consistent with that, fill
-  // the truth table with ones.
-  std::vector<int> truth_tab(num_elem_blk*num_elem_vars, 1);
+  // Use the truth table to indicate which subdomain/variable pairs are
+  // active according to vars_active_subdomains.
+  std::vector<int> truth_tab(num_elem_blk*num_elem_vars, 0);
+  for(unsigned int var_num=0; var_num<vars_active_subdomains.size(); var_num++)
+    {
+      for(auto block_id : vars_active_subdomains[var_num])
+        {
+          unsigned int block_index =
+            std::distance(block_ids.begin(), std::find(block_ids.begin(), block_ids.end(), block_id));
+
+          unsigned int truth_tab_index = block_index*num_elem_vars + var_num;
+          truth_tab[truth_tab_index] = 1;
+        }
+    }
+
   ex_err = exII::ex_put_elem_var_tab(ex_id,
                                      num_elem_blk,
                                      num_elem_vars,
@@ -1856,7 +1860,10 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 
 
 
-void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::vector<Real> & values, int timestep)
+void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh,
+                                              const std::vector<Real> & values,
+                                              int timestep,
+                                              std::vector<std::set<subdomain_id_type>> vars_active_subdomains)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
@@ -1885,8 +1892,15 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
       // The size of the subdomain map is the number of blocks.
       std::map<unsigned int, std::vector<unsigned int>>::iterator it = subdomain_map.begin();
 
+      const std::set<subdomain_id_type> & active_subdomains = vars_active_subdomains[i];
       for (unsigned int j=0; it!=subdomain_map.end(); ++it, ++j)
         {
+          // Skip any variable/subdomain pairs that are inactive
+          if(active_subdomains.find(it->first) == active_subdomains.end())
+          {
+            continue;
+          }
+
           const std::vector<unsigned int> & elem_nums = (*it).second;
           const unsigned int num_elems_this_block =
             cast_int<unsigned int>(elem_nums.size());
@@ -2063,6 +2077,28 @@ std::vector<std::string> ExodusII_IO_Helper::get_complex_names(const std::vector
     }
 
   return complex_names;
+}
+
+
+
+std::vector<std::set<subdomain_id_type>> ExodusII_IO_Helper::get_complex_vars_active_subdomains(
+  const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains) const
+{
+  auto it = vars_active_subdomains.begin();
+  auto it_end = vars_active_subdomains.end();
+
+  std::vector<std::set<subdomain_id_type>> complex_vars_active_subdomains;
+
+  for (; it != it_end; ++it)
+    {
+      // Push back the same data three times to match the tripling of the variables
+      // for the real, imag, and modulus for the complex-valued solution.
+      complex_vars_active_subdomains.push_back(*it);
+      complex_vars_active_subdomains.push_back(*it);
+      complex_vars_active_subdomains.push_back(*it);
+    }
+
+  return complex_vars_active_subdomains;
 }
 
 
