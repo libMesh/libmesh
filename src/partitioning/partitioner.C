@@ -581,6 +581,7 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
 
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_procids<Node>(mesh);
+  MeshTools::libmesh_assert_canonical_node_procids(mesh);
 #endif
 }
 
