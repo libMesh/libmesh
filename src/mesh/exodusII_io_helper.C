@@ -1887,6 +1887,7 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh,
   // For each variable, create a 'data' array which holds all the elemental variable
   // values *for a given block* on this processor, then write that data vector to file
   // before moving onto the next block.
+  libmesh_assert_equal_to(vars_active_subdomains.size(), static_cast<unsigned>(num_elem_vars));
   for (unsigned int i=0; i<static_cast<unsigned>(num_elem_vars); ++i)
     {
       // The size of the subdomain map is the number of blocks.

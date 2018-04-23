@@ -686,7 +686,7 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
         }
     }
 
-  exio_helper->write_element_values(mesh, complex_soln, _timestep, vars_active_subdomains);
+  exio_helper->write_element_values(mesh, complex_soln, _timestep, complex_vars_active_subdomains);
 
 #else
   exio_helper->initialize_element_variables(names, vars_active_subdomains);
