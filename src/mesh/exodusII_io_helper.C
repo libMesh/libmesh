@@ -1736,7 +1736,22 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
   std::vector<int> truth_tab(num_elem_blk*num_elem_vars, 0);
   for(unsigned int var_num=0; var_num<vars_active_subdomains.size(); var_num++)
     {
-      for(auto block_id : vars_active_subdomains[var_num])
+      // If the list of active subdomains is empty, it is interpreted as being
+      // active on *all* subdomains.
+      std::set<subdomain_id_type> var_active_subdomains;
+      if(vars_active_subdomains[var_num].empty())
+        {
+          for(unsigned int block_id=0; block_id<num_elem_blk; block_id++)
+            {
+              var_active_subdomains.insert(block_id);
+            }
+        }
+      else
+        {
+          var_active_subdomains = vars_active_subdomains[var_num];
+        }
+
+      for(auto block_id : var_active_subdomains)
         {
           unsigned int block_index =
             std::distance(block_ids.begin(), std::find(block_ids.begin(), block_ids.end(), block_id));
@@ -1896,11 +1911,14 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh,
       const std::set<subdomain_id_type> & active_subdomains = vars_active_subdomains[i];
       for (unsigned int j=0; it!=subdomain_map.end(); ++it, ++j)
         {
-          // Skip any variable/subdomain pairs that are inactive
-          if(active_subdomains.find(it->first) == active_subdomains.end())
-          {
-            continue;
-          }
+          // Skip any variable/subdomain pairs that are inactive.
+          // Note that if active_subdomains is empty, it is interpreted
+          // as being active on *all* subdomains.
+          if(!active_subdomains.empty())
+            if(active_subdomains.find(it->first) == active_subdomains.end())
+              {
+                continue;
+              }
 
           const std::vector<unsigned int> & elem_nums = (*it).second;
           const unsigned int num_elems_this_block =
