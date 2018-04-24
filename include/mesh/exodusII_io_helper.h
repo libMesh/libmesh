@@ -298,7 +298,7 @@ public:
    * Sets up the nodal variables
    */
   void initialize_element_variables(std::vector<std::string> names,
-                                    std::vector<std::set<subdomain_id_type>> vars_active_subdomains);
+                                    const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains);
 
   /**
    * Sets up the nodal variables

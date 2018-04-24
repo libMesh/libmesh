@@ -1705,7 +1705,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 
 
 void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> names,
-                                                      std::vector<std::set<subdomain_id_type>> vars_active_subdomains)
+                                                      const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
@@ -2108,13 +2108,13 @@ std::vector<std::set<subdomain_id_type>> ExodusII_IO_Helper::get_complex_vars_ac
 
   std::vector<std::set<subdomain_id_type>> complex_vars_active_subdomains;
 
-  for (; it != it_end; ++it)
+  for (auto it : vars_active_subdomains)
     {
       // Push back the same data three times to match the tripling of the variables
       // for the real, imag, and modulus for the complex-valued solution.
-      complex_vars_active_subdomains.push_back(*it);
-      complex_vars_active_subdomains.push_back(*it);
-      complex_vars_active_subdomains.push_back(*it);
+      complex_vars_active_subdomains.push_back(it);
+      complex_vars_active_subdomains.push_back(it);
+      complex_vars_active_subdomains.push_back(it);
     }
 
   return complex_vars_active_subdomains;
