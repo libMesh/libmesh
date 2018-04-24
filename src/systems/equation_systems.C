@@ -825,6 +825,38 @@ void EquationSystems::build_solution_vector (std::vector<Number> & soln,
 
 
 
+void EquationSystems::get_vars_active_subdomains(const std::vector<std::string> & names,
+                                                 std::vector<std::set<subdomain_id_type>> & vars_active_subdomains) const
+{
+  unsigned int var_num=0;
+
+  vars_active_subdomains.clear();
+  vars_active_subdomains.resize(names.size());
+
+  const_system_iterator       pos = _systems.begin();
+  const const_system_iterator end = _systems.end();
+
+  for (; pos != end; ++pos)
+    {
+      for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
+        {
+          std::string var_name = pos->second->variable_name(vn);
+
+          auto names_it = std::find(names.begin(), names.end(), var_name);
+          if(names_it != names.end())
+            {
+              const Variable & variable = pos->second->variable(vn);
+              const std::set<subdomain_id_type> & active_subdomains = variable.active_subdomains();
+              vars_active_subdomains[var_num++] = active_subdomains;
+            }
+        }
+    }
+
+  libmesh_assert_equal_to(var_num, names.size());
+}
+
+
+
 void EquationSystems::get_solution (std::vector<Number> & soln,
                                     std::vector<std::string> & names) const
 {

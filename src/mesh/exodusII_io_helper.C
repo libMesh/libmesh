@@ -1405,7 +1405,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   // to the corresponding discontinuous node index. This ordering must match the ordering
   // used in write_nodal_coordinates.
   std::map< std::pair<dof_id_type,unsigned int>, dof_id_type > discontinuous_node_indices;
-  if(use_discontinuous)
+  if (use_discontinuous)
   {
     dof_id_type node_counter = 1; // Exodus numbering is 1-based
     for (const auto & elem : mesh.active_element_ptr_range())
@@ -1704,7 +1704,8 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 
 
 
-void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> names)
+void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> names,
+                                                      const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
@@ -1730,18 +1731,36 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
 
   this->write_var_names(ELEMENTAL, names);
 
-  // Form the element variable truth table and send to Exodus.
-  // This tells which variables are written to which blocks,
-  // and can dramatically speed up writing element variables
-  //
-  // We really should initialize all entries in the truth table to 0
-  // and then loop over all subdomains, setting their entries to 1
-  // if a given variable exists on that subdomain.  However,
-  // we don't have that information, and the element variables
-  // passed to us are padded with zeroes for the blocks where
-  // they aren't defined.  To be consistent with that, fill
-  // the truth table with ones.
-  std::vector<int> truth_tab(num_elem_blk*num_elem_vars, 1);
+  // Use the truth table to indicate which subdomain/variable pairs are
+  // active according to vars_active_subdomains.
+  std::vector<int> truth_tab(num_elem_blk*num_elem_vars, 0);
+  for (unsigned int var_num=0; var_num<vars_active_subdomains.size(); var_num++)
+    {
+      // If the list of active subdomains is empty, it is interpreted as being
+      // active on *all* subdomains.
+      std::set<subdomain_id_type> var_active_subdomains;
+      if (vars_active_subdomains[var_num].empty())
+        {
+          for (auto block_id : block_ids)
+            {
+              var_active_subdomains.insert(block_id);
+            }
+        }
+      else
+        {
+          var_active_subdomains = vars_active_subdomains[var_num];
+        }
+
+      for (auto block_id : var_active_subdomains)
+        {
+          unsigned int block_index =
+            std::distance(block_ids.begin(), std::find(block_ids.begin(), block_ids.end(), block_id));
+
+          unsigned int truth_tab_index = block_index*num_elem_vars + var_num;
+          truth_tab[truth_tab_index] = 1;
+        }
+    }
+
   ex_err = exII::ex_put_elem_var_tab(ex_id,
                                      num_elem_blk,
                                      num_elem_vars,
@@ -1856,7 +1875,10 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 
 
 
-void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::vector<Real> & values, int timestep)
+void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh,
+                                              const std::vector<Real> & values,
+                                              int timestep,
+                                              const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
@@ -1880,13 +1902,24 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
   // For each variable, create a 'data' array which holds all the elemental variable
   // values *for a given block* on this processor, then write that data vector to file
   // before moving onto the next block.
+  libmesh_assert_equal_to(vars_active_subdomains.size(), static_cast<unsigned>(num_elem_vars));
   for (unsigned int i=0; i<static_cast<unsigned>(num_elem_vars); ++i)
     {
       // The size of the subdomain map is the number of blocks.
       std::map<unsigned int, std::vector<unsigned int>>::iterator it = subdomain_map.begin();
 
+      const std::set<subdomain_id_type> & active_subdomains = vars_active_subdomains[i];
       for (unsigned int j=0; it!=subdomain_map.end(); ++it, ++j)
         {
+          // Skip any variable/subdomain pairs that are inactive.
+          // Note that if active_subdomains is empty, it is interpreted
+          // as being active on *all* subdomains.
+          if (!active_subdomains.empty())
+            if (active_subdomains.find(it->first) == active_subdomains.end())
+              {
+                continue;
+              }
+
           const std::vector<unsigned int> & elem_nums = (*it).second;
           const unsigned int num_elems_this_block =
             cast_int<unsigned int>(elem_nums.size());
@@ -2063,6 +2096,25 @@ std::vector<std::string> ExodusII_IO_Helper::get_complex_names(const std::vector
     }
 
   return complex_names;
+}
+
+
+
+std::vector<std::set<subdomain_id_type>> ExodusII_IO_Helper::get_complex_vars_active_subdomains(
+  const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains) const
+{
+  std::vector<std::set<subdomain_id_type>> complex_vars_active_subdomains;
+
+  for (auto & s : vars_active_subdomains)
+    {
+      // Push back the same data three times to match the tripling of the variables
+      // for the real, imag, and modulus for the complex-valued solution.
+      complex_vars_active_subdomains.push_back(s);
+      complex_vars_active_subdomains.push_back(s);
+      complex_vars_active_subdomains.push_back(s);
+    }
+
+  return complex_vars_active_subdomains;
 }
 
 

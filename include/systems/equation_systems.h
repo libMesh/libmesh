@@ -304,6 +304,13 @@ public:
   build_parallel_solution_vector(const std::set<std::string> * system_names=libmesh_nullptr) const;
 
   /**
+   * Retrieve \p vars_active_subdomains, which indicates the active
+   * subdomains for each variable in \p names.
+   */
+  void get_vars_active_subdomains(const std::vector<std::string> & names,
+                                  std::vector<std::set<subdomain_id_type>> & vars_active_subdomains) const;
+
+  /**
    * Retrieve the solution data for CONSTANT MONOMIALs.  If \p names
    * is populated, only the variables corresponding to those names will
    * be retrieved.  This can be used to filter which variables are retrieved.
