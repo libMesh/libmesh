@@ -1878,7 +1878,7 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh,
                                               const std::vector<Real> & values,
                                               int timestep,
-                                              std::vector<std::set<subdomain_id_type>> vars_active_subdomains)
+                                              const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
 {
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;

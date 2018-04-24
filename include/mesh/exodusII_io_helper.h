@@ -321,7 +321,7 @@ public:
   void write_element_values(const MeshBase & mesh,
                             const std::vector<Real> & values,
                             int timestep,
-                            std::vector<std::set<subdomain_id_type>> vars_active_subdomains);
+                            const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains);
 
   /**
    * Writes the vector of values to a nodal variable.
