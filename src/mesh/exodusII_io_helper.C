@@ -2103,9 +2103,6 @@ std::vector<std::string> ExodusII_IO_Helper::get_complex_names(const std::vector
 std::vector<std::set<subdomain_id_type>> ExodusII_IO_Helper::get_complex_vars_active_subdomains(
   const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains) const
 {
-  auto it = vars_active_subdomains.begin();
-  auto it_end = vars_active_subdomains.end();
-
   std::vector<std::set<subdomain_id_type>> complex_vars_active_subdomains;
 
   for (auto it : vars_active_subdomains)
