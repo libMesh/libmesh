@@ -1405,7 +1405,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   // to the corresponding discontinuous node index. This ordering must match the ordering
   // used in write_nodal_coordinates.
   std::map< std::pair<dof_id_type,unsigned int>, dof_id_type > discontinuous_node_indices;
-  if(use_discontinuous)
+  if (use_discontinuous)
   {
     dof_id_type node_counter = 1; // Exodus numbering is 1-based
     for (const auto & elem : mesh.active_element_ptr_range())
@@ -1734,14 +1734,14 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
   // Use the truth table to indicate which subdomain/variable pairs are
   // active according to vars_active_subdomains.
   std::vector<int> truth_tab(num_elem_blk*num_elem_vars, 0);
-  for(unsigned int var_num=0; var_num<vars_active_subdomains.size(); var_num++)
+  for (unsigned int var_num=0; var_num<vars_active_subdomains.size(); var_num++)
     {
       // If the list of active subdomains is empty, it is interpreted as being
       // active on *all* subdomains.
       std::set<subdomain_id_type> var_active_subdomains;
-      if(vars_active_subdomains[var_num].empty())
+      if (vars_active_subdomains[var_num].empty())
         {
-          for(unsigned int block_id=0; block_id<num_elem_blk; block_id++)
+          for (auto block_id : block_ids)
             {
               var_active_subdomains.insert(block_id);
             }
@@ -1751,7 +1751,7 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
           var_active_subdomains = vars_active_subdomains[var_num];
         }
 
-      for(auto block_id : var_active_subdomains)
+      for (auto block_id : var_active_subdomains)
         {
           unsigned int block_index =
             std::distance(block_ids.begin(), std::find(block_ids.begin(), block_ids.end(), block_id));
@@ -1914,8 +1914,8 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh,
           // Skip any variable/subdomain pairs that are inactive.
           // Note that if active_subdomains is empty, it is interpreted
           // as being active on *all* subdomains.
-          if(!active_subdomains.empty())
-            if(active_subdomains.find(it->first) == active_subdomains.end())
+          if (!active_subdomains.empty())
+            if (active_subdomains.find(it->first) == active_subdomains.end())
               {
                 continue;
               }
