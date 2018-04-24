@@ -2105,13 +2105,13 @@ std::vector<std::set<subdomain_id_type>> ExodusII_IO_Helper::get_complex_vars_ac
 {
   std::vector<std::set<subdomain_id_type>> complex_vars_active_subdomains;
 
-  for (auto it : vars_active_subdomains)
+  for (auto & s : vars_active_subdomains)
     {
       // Push back the same data three times to match the tripling of the variables
       // for the real, imag, and modulus for the complex-valued solution.
-      complex_vars_active_subdomains.push_back(it);
-      complex_vars_active_subdomains.push_back(it);
-      complex_vars_active_subdomains.push_back(it);
+      complex_vars_active_subdomains.push_back(s);
+      complex_vars_active_subdomains.push_back(s);
+      complex_vars_active_subdomains.push_back(s);
     }
 
   return complex_vars_active_subdomains;
