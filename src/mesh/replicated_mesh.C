@@ -682,40 +682,18 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
     {
       // Loop over the nodes.  Note that there may
       // be nullptrs in the _nodes vector from the coarsening
-      // process.  Pack the nodes in to a contiguous array
-      // and then trim any excess.
+      // process.  libMesh code should support this by now.
+      // But if we find a node is orphaned, delete it!
+      for (auto & nd : _nodes)
+        if (nd != nullptr)
+          if (connected_nodes.find(nd) == connected_nodes.end())
+            {
+              this->get_boundary_info().remove (nd);
 
-      std::vector<Node *>::iterator in        = _nodes.begin();
-      std::vector<Node *>::iterator out_iter  = _nodes.begin();
-      const std::vector<Node *>::iterator end = _nodes.end();
-
-      for (; in != end; ++in)
-        if (*in != nullptr)
-          {
-            // This is a reference so that if we change the pointer it will change in the vector
-            Node * & nd = *in;
-
-            // If this node is still connected to an elem, put it in the list
-            if (connected_nodes.find(nd) != connected_nodes.end())
-              {
-                *out_iter = nd;
-                ++out_iter;
-
-                // Increment the node counter
-                nd->set_id (next_free_node++);
-              }
-            else // This node is orphaned, delete it!
-              {
-                this->get_boundary_info().remove (nd);
-
-                // delete the node
-                delete nd;
-                nd = nullptr;
-              }
-          }
-
-      // Erase any additional storage.  Whatever was
-      _nodes.erase (out_iter, end);
+              // delete the node
+              delete nd;
+              nd = nullptr;
+            }
     }
   else // We really DO want node renumbering
     {
@@ -748,10 +726,10 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
 
         _nodes.erase (nd, end);
       }
-    }
 
-  libmesh_assert_equal_to (next_free_elem, _elements.size());
-  libmesh_assert_equal_to (next_free_node, _nodes.size());
+      libmesh_assert_equal_to (next_free_elem, _elements.size());
+      libmesh_assert_equal_to (next_free_node, _nodes.size());
+    }
 
   this->update_parallel_id_counts();
 }
