@@ -6,6 +6,7 @@
 
 #include <libmesh/equation_systems.h>
 #include <libmesh/mesh.h>
+#include <libmesh/mesh_communication.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/exodusII_io.h>
@@ -93,7 +94,9 @@ public:
 
       ExodusII_IO exii(mesh);
 
-      exii.read("mesh_with_soln.e");
+      if (mesh.processor_id() == 0)
+        exii.read("mesh_with_soln.e");
+      MeshCommunication().broadcast(mesh);
       mesh.prepare_for_use();
 
       es.init();
