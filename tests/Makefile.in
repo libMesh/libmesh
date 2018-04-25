@@ -96,24 +96,24 @@ target_triplet = @target@
 
 check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5) $(am__EXEEXT_6)
-noinst_PROGRAMS = $(am__EXEEXT_7) $(am__EXEEXT_4) $(am__EXEEXT_5) \
-	$(am__EXEEXT_6)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_2 = unit_tests-opt
+noinst_PROGRAMS = $(am__EXEEXT_7) $(am__EXEEXT_3) $(am__EXEEXT_4) \
+	$(am__EXEEXT_5)
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
 # others segfault and/or hang.  By default we will not run
 # GLIBCXX-debugging builds with cppunit unless specificallly
 # configured to.
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__append_3 = unit_tests-dbg
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__append_4 = unit_tests-dbg
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__append_5 = unit_tests-dbg
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__append_2 = unit_tests-dbg
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__append_3 = unit_tests-dbg
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__append_4 = unit_tests-dbg
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_5 = unit_tests-devel
 @LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_6 = unit_tests-devel
-@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_7 = unit_tests-devel
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__append_7 = unit_tests-prof
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__append_8 = unit_tests-prof
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__append_9 = unit_tests-prof
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_9 = unit_tests-oprof
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_10 = unit_tests-oprof
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_11 = unit_tests-oprof
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_11 = unit_tests-opt
 
 ######################################################################
 #
@@ -170,12 +170,12 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES = run_unit_tests.sh
 CONFIG_CLEAN_VPATH_FILES =
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__EXEEXT_1 = unit_tests-opt$(EXEEXT)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__EXEEXT_3 = unit_tests-dbg$(EXEEXT)
-@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_4 = unit_tests-devel$(EXEEXT)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-prof$(EXEEXT)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_6 = unit_tests-oprof$(EXEEXT)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_1 = unit_tests-dbg$(EXEEXT)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_3 = unit_tests-devel$(EXEEXT)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = unit_tests-prof$(EXEEXT)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-oprof$(EXEEXT)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__EXEEXT_6 = unit_tests-opt$(EXEEXT)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@am__EXEEXT_7 = unit_tests-dbg$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
@@ -189,9 +189,10 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C test_comm.h \
 	fe/fe_xyz_test.C geom/elem_test.C geom/point_test.C \
 	geom/point_test.h geom/which_node_am_i_test.C mesh/all_tri.C \
 	mesh/boundary_mesh.C mesh/boundary_info.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
-	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
+	mesh/contains_point.C mesh/mesh_input.C \
+	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
+	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_vec_and_scalar.C \
 	numerics/composite_function_test.C \
@@ -237,6 +238,7 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	mesh/unit_tests_dbg-boundary_info.$(OBJEXT) \
 	mesh/unit_tests_dbg-checkpoint.$(OBJEXT) \
 	mesh/unit_tests_dbg-contains_point.$(OBJEXT) \
+	mesh/unit_tests_dbg-mesh_input.$(OBJEXT) \
 	mesh/unit_tests_dbg-mixed_dim_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-nodal_neighbors.$(OBJEXT) \
 	mesh/unit_tests_dbg-mesh_extruder.$(OBJEXT) \
@@ -289,9 +291,10 @@ am__unit_tests_devel_SOURCES_DIST = driver.C test_comm.h \
 	fe/fe_xyz_test.C geom/elem_test.C geom/point_test.C \
 	geom/point_test.h geom/which_node_am_i_test.C mesh/all_tri.C \
 	mesh/boundary_mesh.C mesh/boundary_info.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
-	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
+	mesh/contains_point.C mesh/mesh_input.C \
+	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
+	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_vec_and_scalar.C \
 	numerics/composite_function_test.C \
@@ -336,6 +339,7 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	mesh/unit_tests_devel-boundary_info.$(OBJEXT) \
 	mesh/unit_tests_devel-checkpoint.$(OBJEXT) \
 	mesh/unit_tests_devel-contains_point.$(OBJEXT) \
+	mesh/unit_tests_devel-mesh_input.$(OBJEXT) \
 	mesh/unit_tests_devel-mixed_dim_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_devel-nodal_neighbors.$(OBJEXT) \
 	mesh/unit_tests_devel-mesh_extruder.$(OBJEXT) \
@@ -385,9 +389,10 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C test_comm.h \
 	fe/fe_xyz_test.C geom/elem_test.C geom/point_test.C \
 	geom/point_test.h geom/which_node_am_i_test.C mesh/all_tri.C \
 	mesh/boundary_mesh.C mesh/boundary_info.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
-	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
+	mesh/contains_point.C mesh/mesh_input.C \
+	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
+	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_vec_and_scalar.C \
 	numerics/composite_function_test.C \
@@ -432,6 +437,7 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	mesh/unit_tests_oprof-boundary_info.$(OBJEXT) \
 	mesh/unit_tests_oprof-checkpoint.$(OBJEXT) \
 	mesh/unit_tests_oprof-contains_point.$(OBJEXT) \
+	mesh/unit_tests_oprof-mesh_input.$(OBJEXT) \
 	mesh/unit_tests_oprof-mixed_dim_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-nodal_neighbors.$(OBJEXT) \
 	mesh/unit_tests_oprof-mesh_extruder.$(OBJEXT) \
@@ -481,9 +487,10 @@ am__unit_tests_opt_SOURCES_DIST = driver.C test_comm.h \
 	fe/fe_xyz_test.C geom/elem_test.C geom/point_test.C \
 	geom/point_test.h geom/which_node_am_i_test.C mesh/all_tri.C \
 	mesh/boundary_mesh.C mesh/boundary_info.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
-	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
+	mesh/contains_point.C mesh/mesh_input.C \
+	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
+	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_vec_and_scalar.C \
 	numerics/composite_function_test.C \
@@ -528,6 +535,7 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	mesh/unit_tests_opt-boundary_info.$(OBJEXT) \
 	mesh/unit_tests_opt-checkpoint.$(OBJEXT) \
 	mesh/unit_tests_opt-contains_point.$(OBJEXT) \
+	mesh/unit_tests_opt-mesh_input.$(OBJEXT) \
 	mesh/unit_tests_opt-mixed_dim_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_opt-nodal_neighbors.$(OBJEXT) \
 	mesh/unit_tests_opt-mesh_extruder.$(OBJEXT) \
@@ -576,9 +584,10 @@ am__unit_tests_prof_SOURCES_DIST = driver.C test_comm.h \
 	fe/fe_xyz_test.C geom/elem_test.C geom/point_test.C \
 	geom/point_test.h geom/which_node_am_i_test.C mesh/all_tri.C \
 	mesh/boundary_mesh.C mesh/boundary_info.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
-	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
+	mesh/contains_point.C mesh/mesh_input.C \
+	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
+	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_vec_and_scalar.C \
 	numerics/composite_function_test.C \
@@ -623,6 +632,7 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	mesh/unit_tests_prof-boundary_info.$(OBJEXT) \
 	mesh/unit_tests_prof-checkpoint.$(OBJEXT) \
 	mesh/unit_tests_prof-contains_point.$(OBJEXT) \
+	mesh/unit_tests_prof-mesh_input.$(OBJEXT) \
 	mesh/unit_tests_prof-mixed_dim_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_prof-nodal_neighbors.$(OBJEXT) \
 	mesh/unit_tests_prof-mesh_extruder.$(OBJEXT) \
@@ -1090,9 +1100,10 @@ unit_tests_sources = driver.C test_comm.h stream_redirector.h \
 	fe/fe_xyz_test.C geom/elem_test.C geom/point_test.C \
 	geom/point_test.h geom/which_node_am_i_test.C mesh/all_tri.C \
 	mesh/boundary_mesh.C mesh/boundary_info.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/mixed_dim_mesh_test.C \
-	mesh/nodal_neighbors.C mesh/mesh_extruder.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
+	mesh/contains_point.C mesh/mesh_input.C \
+	mesh/mixed_dim_mesh_test.C mesh/nodal_neighbors.C \
+	mesh/mesh_extruder.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/mesh_function_dfem.C mesh/write_vec_and_scalar.C \
 	numerics/composite_function_test.C \
@@ -1113,10 +1124,6 @@ unit_tests_sources = driver.C test_comm.h stream_redirector.h \
 	systems/equation_systems_test.C systems/systems_test.C \
 	utils/point_locator_test.C utils/vectormap_test.C \
 	$(am__append_1)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_SOURCES = $(unit_tests_sources)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_LDADD = $(top_builddir)/libmesh_opt.la
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_SOURCES = $(unit_tests_sources)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
@@ -1133,6 +1140,10 @@ unit_tests_sources = driver.C test_comm.h stream_redirector.h \
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_LDADD = $(top_builddir)/libmesh_oprof.la
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_SOURCES = $(unit_tests_sources)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_LDADD = $(top_builddir)/libmesh_opt.la
 @LIBMESH_ENABLE_CPPUNIT_TRUE@TESTS = run_unit_tests.sh
 CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	$(am__append_12)
@@ -1256,6 +1267,8 @@ mesh/unit_tests_dbg-boundary_info.$(OBJEXT): mesh/$(am__dirstamp) \
 mesh/unit_tests_dbg-checkpoint.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-contains_point.$(OBJEXT): mesh/$(am__dirstamp) \
+	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_dbg-mesh_input.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-mixed_dim_mesh_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
@@ -1410,6 +1423,8 @@ mesh/unit_tests_devel-checkpoint.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-contains_point.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_devel-mesh_input.$(OBJEXT): mesh/$(am__dirstamp) \
+	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-mixed_dim_mesh_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-nodal_neighbors.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -1520,6 +1535,8 @@ mesh/unit_tests_oprof-boundary_info.$(OBJEXT): mesh/$(am__dirstamp) \
 mesh/unit_tests_oprof-checkpoint.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-contains_point.$(OBJEXT): mesh/$(am__dirstamp) \
+	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_oprof-mesh_input.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-mixed_dim_mesh_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
@@ -1632,6 +1649,8 @@ mesh/unit_tests_opt-checkpoint.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-contains_point.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_opt-mesh_input.$(OBJEXT): mesh/$(am__dirstamp) \
+	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-mixed_dim_mesh_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-nodal_neighbors.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -1742,6 +1761,8 @@ mesh/unit_tests_prof-boundary_info.$(OBJEXT): mesh/$(am__dirstamp) \
 mesh/unit_tests_prof-checkpoint.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-contains_point.$(OBJEXT): mesh/$(am__dirstamp) \
+	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_prof-mesh_input.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-mixed_dim_mesh_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
@@ -1931,6 +1952,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mapped_subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-nodal_neighbors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-slit_mesh_test.Po@am__quote@
@@ -1944,6 +1966,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mapped_subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-nodal_neighbors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-slit_mesh_test.Po@am__quote@
@@ -1957,6 +1980,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mapped_subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-nodal_neighbors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-slit_mesh_test.Po@am__quote@
@@ -1970,6 +1994,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mapped_subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-nodal_neighbors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-slit_mesh_test.Po@am__quote@
@@ -1983,6 +2008,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mapped_subdomain_partitioner_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_extruder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-nodal_neighbors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-slit_mesh_test.Po@am__quote@
@@ -2444,6 +2470,20 @@ mesh/unit_tests_dbg-contains_point.obj: mesh/contains_point.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/contains_point.C' object='mesh/unit_tests_dbg-contains_point.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-contains_point.obj `if test -f 'mesh/contains_point.C'; then $(CYGPATH_W) 'mesh/contains_point.C'; else $(CYGPATH_W) '$(srcdir)/mesh/contains_point.C'; fi`
+
+mesh/unit_tests_dbg-mesh_input.o: mesh/mesh_input.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mesh_input.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Tpo -c -o mesh/unit_tests_dbg-mesh_input.o `test -f 'mesh/mesh_input.C' || echo '$(srcdir)/'`mesh/mesh_input.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Tpo mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_input.C' object='mesh/unit_tests_dbg-mesh_input.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-mesh_input.o `test -f 'mesh/mesh_input.C' || echo '$(srcdir)/'`mesh/mesh_input.C
+
+mesh/unit_tests_dbg-mesh_input.obj: mesh/mesh_input.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mesh_input.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Tpo -c -o mesh/unit_tests_dbg-mesh_input.obj `if test -f 'mesh/mesh_input.C'; then $(CYGPATH_W) 'mesh/mesh_input.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_input.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Tpo mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_input.C' object='mesh/unit_tests_dbg-mesh_input.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-mesh_input.obj `if test -f 'mesh/mesh_input.C'; then $(CYGPATH_W) 'mesh/mesh_input.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_input.C'; fi`
 
 mesh/unit_tests_dbg-mixed_dim_mesh_test.o: mesh/mixed_dim_mesh_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mixed_dim_mesh_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Tpo -c -o mesh/unit_tests_dbg-mixed_dim_mesh_test.o `test -f 'mesh/mixed_dim_mesh_test.C' || echo '$(srcdir)/'`mesh/mixed_dim_mesh_test.C
@@ -3201,6 +3241,20 @@ mesh/unit_tests_devel-contains_point.obj: mesh/contains_point.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-contains_point.obj `if test -f 'mesh/contains_point.C'; then $(CYGPATH_W) 'mesh/contains_point.C'; else $(CYGPATH_W) '$(srcdir)/mesh/contains_point.C'; fi`
 
+mesh/unit_tests_devel-mesh_input.o: mesh/mesh_input.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mesh_input.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Tpo -c -o mesh/unit_tests_devel-mesh_input.o `test -f 'mesh/mesh_input.C' || echo '$(srcdir)/'`mesh/mesh_input.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Tpo mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_input.C' object='mesh/unit_tests_devel-mesh_input.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-mesh_input.o `test -f 'mesh/mesh_input.C' || echo '$(srcdir)/'`mesh/mesh_input.C
+
+mesh/unit_tests_devel-mesh_input.obj: mesh/mesh_input.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mesh_input.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Tpo -c -o mesh/unit_tests_devel-mesh_input.obj `if test -f 'mesh/mesh_input.C'; then $(CYGPATH_W) 'mesh/mesh_input.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_input.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Tpo mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_input.C' object='mesh/unit_tests_devel-mesh_input.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-mesh_input.obj `if test -f 'mesh/mesh_input.C'; then $(CYGPATH_W) 'mesh/mesh_input.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_input.C'; fi`
+
 mesh/unit_tests_devel-mixed_dim_mesh_test.o: mesh/mixed_dim_mesh_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mixed_dim_mesh_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Tpo -c -o mesh/unit_tests_devel-mixed_dim_mesh_test.o `test -f 'mesh/mixed_dim_mesh_test.C' || echo '$(srcdir)/'`mesh/mixed_dim_mesh_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Tpo mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Po
@@ -3956,6 +4010,20 @@ mesh/unit_tests_oprof-contains_point.obj: mesh/contains_point.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/contains_point.C' object='mesh/unit_tests_oprof-contains_point.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-contains_point.obj `if test -f 'mesh/contains_point.C'; then $(CYGPATH_W) 'mesh/contains_point.C'; else $(CYGPATH_W) '$(srcdir)/mesh/contains_point.C'; fi`
+
+mesh/unit_tests_oprof-mesh_input.o: mesh/mesh_input.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mesh_input.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Tpo -c -o mesh/unit_tests_oprof-mesh_input.o `test -f 'mesh/mesh_input.C' || echo '$(srcdir)/'`mesh/mesh_input.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Tpo mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_input.C' object='mesh/unit_tests_oprof-mesh_input.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-mesh_input.o `test -f 'mesh/mesh_input.C' || echo '$(srcdir)/'`mesh/mesh_input.C
+
+mesh/unit_tests_oprof-mesh_input.obj: mesh/mesh_input.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mesh_input.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Tpo -c -o mesh/unit_tests_oprof-mesh_input.obj `if test -f 'mesh/mesh_input.C'; then $(CYGPATH_W) 'mesh/mesh_input.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_input.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Tpo mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_input.C' object='mesh/unit_tests_oprof-mesh_input.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-mesh_input.obj `if test -f 'mesh/mesh_input.C'; then $(CYGPATH_W) 'mesh/mesh_input.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_input.C'; fi`
 
 mesh/unit_tests_oprof-mixed_dim_mesh_test.o: mesh/mixed_dim_mesh_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mixed_dim_mesh_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Tpo -c -o mesh/unit_tests_oprof-mixed_dim_mesh_test.o `test -f 'mesh/mixed_dim_mesh_test.C' || echo '$(srcdir)/'`mesh/mixed_dim_mesh_test.C
@@ -4713,6 +4781,20 @@ mesh/unit_tests_opt-contains_point.obj: mesh/contains_point.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-contains_point.obj `if test -f 'mesh/contains_point.C'; then $(CYGPATH_W) 'mesh/contains_point.C'; else $(CYGPATH_W) '$(srcdir)/mesh/contains_point.C'; fi`
 
+mesh/unit_tests_opt-mesh_input.o: mesh/mesh_input.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mesh_input.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Tpo -c -o mesh/unit_tests_opt-mesh_input.o `test -f 'mesh/mesh_input.C' || echo '$(srcdir)/'`mesh/mesh_input.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Tpo mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_input.C' object='mesh/unit_tests_opt-mesh_input.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-mesh_input.o `test -f 'mesh/mesh_input.C' || echo '$(srcdir)/'`mesh/mesh_input.C
+
+mesh/unit_tests_opt-mesh_input.obj: mesh/mesh_input.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mesh_input.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Tpo -c -o mesh/unit_tests_opt-mesh_input.obj `if test -f 'mesh/mesh_input.C'; then $(CYGPATH_W) 'mesh/mesh_input.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_input.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Tpo mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_input.C' object='mesh/unit_tests_opt-mesh_input.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-mesh_input.obj `if test -f 'mesh/mesh_input.C'; then $(CYGPATH_W) 'mesh/mesh_input.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_input.C'; fi`
+
 mesh/unit_tests_opt-mixed_dim_mesh_test.o: mesh/mixed_dim_mesh_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mixed_dim_mesh_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Tpo -c -o mesh/unit_tests_opt-mixed_dim_mesh_test.o `test -f 'mesh/mixed_dim_mesh_test.C' || echo '$(srcdir)/'`mesh/mixed_dim_mesh_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Tpo mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Po
@@ -5468,6 +5550,20 @@ mesh/unit_tests_prof-contains_point.obj: mesh/contains_point.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/contains_point.C' object='mesh/unit_tests_prof-contains_point.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-contains_point.obj `if test -f 'mesh/contains_point.C'; then $(CYGPATH_W) 'mesh/contains_point.C'; else $(CYGPATH_W) '$(srcdir)/mesh/contains_point.C'; fi`
+
+mesh/unit_tests_prof-mesh_input.o: mesh/mesh_input.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mesh_input.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Tpo -c -o mesh/unit_tests_prof-mesh_input.o `test -f 'mesh/mesh_input.C' || echo '$(srcdir)/'`mesh/mesh_input.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Tpo mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_input.C' object='mesh/unit_tests_prof-mesh_input.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-mesh_input.o `test -f 'mesh/mesh_input.C' || echo '$(srcdir)/'`mesh/mesh_input.C
+
+mesh/unit_tests_prof-mesh_input.obj: mesh/mesh_input.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mesh_input.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Tpo -c -o mesh/unit_tests_prof-mesh_input.obj `if test -f 'mesh/mesh_input.C'; then $(CYGPATH_W) 'mesh/mesh_input.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_input.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Tpo mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_input.C' object='mesh/unit_tests_prof-mesh_input.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-mesh_input.obj `if test -f 'mesh/mesh_input.C'; then $(CYGPATH_W) 'mesh/mesh_input.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_input.C'; fi`
 
 mesh/unit_tests_prof-mixed_dim_mesh_test.o: mesh/mixed_dim_mesh_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mixed_dim_mesh_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Tpo -c -o mesh/unit_tests_prof-mixed_dim_mesh_test.o `test -f 'mesh/mixed_dim_mesh_test.C' || echo '$(srcdir)/'`mesh/mixed_dim_mesh_test.C
