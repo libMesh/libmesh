@@ -101,8 +101,15 @@ public:
 
       es.init();
 
-      // Read the solution e into variable teste
+      // Read the solution e into variable teste.
+      //
+      // With complex numbers, we'll only bother reading the real
+      // part.
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+      exii.copy_elemental_solution(sys, "teste", "r_e");
+#else
       exii.copy_elemental_solution(sys, "teste", "e");
+#endif
 
       for (Real x = 1.L/6.L; x < 1; x += 1.L/3.L)
         for (Real y = 1.L/6.L; y < 1; y += 1.L/3.L)
