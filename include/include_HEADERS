@@ -264,6 +264,7 @@ include_HEADERS =  \
         numerics/wrapped_functor.h \
         numerics/zero_function.h \
         parallel/attributes.h \
+        parallel/communicator.h \
         parallel/data_type.h \
         parallel/libmesh_call_mpi.h \
         parallel/message_tag.h \
