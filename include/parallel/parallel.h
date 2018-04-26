@@ -29,6 +29,7 @@
 #include "libmesh/packing.h"
 #include "libmesh/parallel_only.h"
 #include "libmesh/post_wait_copy_buffer.h"
+#include "libmesh/post_wait_delete_buffer.h"
 #include "libmesh/post_wait_unpack_buffer.h"
 #include "libmesh/post_wait_work.h"
 #include "libmesh/request.h"
@@ -105,18 +106,6 @@ class FakeCommunicator
     static Communicator temp;
     return temp;
   }
-};
-
-
-// PostWaitWork specialization for freeing no-longer-needed buffers.
-template <typename Container>
-struct PostWaitDeleteBuffer : public PostWaitWork {
-  PostWaitDeleteBuffer(Container * buffer) : _buf(buffer) {}
-
-  virtual void run() libmesh_override { delete _buf; }
-
-private:
-  Container * _buf;
 };
 
 } // namespace Parallel

@@ -283,6 +283,7 @@ include_HEADERS =  \
         parallel/parallel_only.h \
         parallel/parallel_sort.h \
         parallel/post_wait_copy_buffer.h \
+        parallel/post_wait_delete_buffer.h \
         parallel/post_wait_unpack_buffer.h \
         parallel/post_wait_work.h \
         parallel/request.h \
