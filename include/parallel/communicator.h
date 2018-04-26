@@ -791,6 +791,34 @@ public:
 
 }; // class Communicator
 
+
+// ------------------------------------------------------------
+// Simple Communicator member functions
+
+inline
+void Communicator::reference_unique_tag(int tagvalue) const
+{
+  // This had better be an already-acquired tag.
+  libmesh_assert(used_tag_values.count(tagvalue));
+
+  used_tag_values[tagvalue]++;
+}
+
+
+inline
+void Communicator::dereference_unique_tag(int tagvalue) const
+{
+  // This had better be an already-acquired tag.
+  libmesh_assert(used_tag_values.count(tagvalue));
+
+  used_tag_values[tagvalue]--;
+  // If we don't have any more outstanding references, we
+  // don't even need to keep this tag in our "used" set.
+  if (!used_tag_values[tagvalue])
+    used_tag_values.erase(tagvalue);
+}
+
+
 } // namespace Parallel
 
 } // namespace libMesh
