@@ -263,6 +263,8 @@ include_HEADERS =  \
         numerics/wrapped_function.h \
         numerics/wrapped_functor.h \
         numerics/zero_function.h \
+        parallel/data_type.h \
+        parallel/libmesh_call_mpi.h \
         parallel/message_tag.h \
         parallel/parallel.h \
         parallel/parallel_algebra.h \

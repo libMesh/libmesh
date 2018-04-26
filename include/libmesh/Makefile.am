@@ -256,6 +256,8 @@ BUILT_SOURCES = \
         wrapped_function.h \
         wrapped_functor.h \
         zero_function.h \
+        data_type.h \
+        libmesh_call_mpi.h \
         message_tag.h \
         parallel.h \
         parallel_algebra.h \
@@ -1274,6 +1276,12 @@ wrapped_functor.h: $(top_srcdir)/include/numerics/wrapped_functor.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 zero_function.h: $(top_srcdir)/include/numerics/zero_function.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+data_type.h: $(top_srcdir)/include/parallel/data_type.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+libmesh_call_mpi.h: $(top_srcdir)/include/parallel/libmesh_call_mpi.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 message_tag.h: $(top_srcdir)/include/parallel/message_tag.h

@@ -20,6 +20,8 @@
 #define LIBMESH_PARALLEL_H
 
 // Parallel includes
+#include "libmesh/data_type.h"
+#include "libmesh/libmesh_call_mpi.h"
 #include "libmesh/message_tag.h"
 
 // libMesh Includes
@@ -108,67 +110,14 @@ namespace Parallel
  * Forward declarations of classes we will define later.
  */
 class Communicator;
-class DataType;
 class Request;
 class Status;
 
 #ifdef LIBMESH_HAVE_MPI
 
-/**
- * Macros to test MPI return values
- */
-#ifndef NDEBUG
-#define libmesh_assert_mpi_success(error_code)                          \
-  do                                                                    \
-    {                                                                   \
-      if (error_code != MPI_SUCCESS)                                    \
-        {                                                               \
-          char libmesh_mpi_error_string[MPI_MAX_ERROR_STRING+1];        \
-          int libmesh_mpi_error_string_len;                             \
-          MPI_Error_string(error_code, libmesh_mpi_error_string,        \
-                           &libmesh_mpi_error_string_len);              \
-          libmesh_assert_equal_to_msg(error_code, MPI_SUCCESS,          \
-                                      libmesh_mpi_error_string);        \
-        }                                                               \
-    }                                                                   \
-  while (0)
-
-#else
-
-#define libmesh_assert_mpi_success(error_code)  ((void) 0)
-
-#endif
-
-
-
-// Only catch MPI return values when asserts are active.
-#ifndef NDEBUG
-#define libmesh_call_mpi(mpi_call)                              \
-  do                                                            \
-    {                                                           \
-      unsigned int libmesh_mpi_error_code = mpi_call;           \
-      libmesh_assert_mpi_success (libmesh_mpi_error_code);      \
-    }                                                           \
-  while (0)
-
-#else
-
-#define libmesh_call_mpi(mpi_call)              \
-  do                                            \
-    {                                           \
-      mpi_call;                                 \
-    }                                           \
-  while (0)
-#endif
-
 
 
 //-------------------------------------------------------------------
-/**
- * Data types for communication
- */
-typedef MPI_Datatype data_type;
-
 /**
  * Request object for non-blocking I/O
  */
@@ -214,7 +163,6 @@ const unsigned int any_source =
 // These shouldn't actually be needed, but must be
 // unique types for function overloading to work
 // properly.
-struct data_type    { /* unsigned int t; */ };
 struct request      { /* unsigned int r; */ };
 struct status       { /* unsigned int s; */ };
 typedef int communicator; // Must match petsc-nompi definition
@@ -222,77 +170,6 @@ typedef int communicator; // Must match petsc-nompi definition
 const unsigned int any_source=0;
 #endif // LIBMESH_HAVE_MPI
 
-
-
-//-------------------------------------------------------------------
-/**
- * Encapsulates the MPI_Datatype.
- */
-class DataType
-{
-public:
-  DataType () : _datatype() {}
-
-  DataType (const DataType & other) :
-    _datatype(other._datatype)
-  {}
-
-  DataType (const data_type & type) :
-    _datatype(type)
-  {}
-
-#ifdef LIBMESH_HAVE_MPI
-  DataType (const DataType & other, unsigned int count)
-  {
-    // FIXME - if we nest an inner type here will we run into bug
-    // https://github.com/libMesh/libmesh/issues/631 again?
-    MPI_Type_contiguous(count, other._datatype, &_datatype);
-    this->commit();
-  }
-#else
-  DataType (const DataType &, unsigned int)
-  {
-  }
-#endif
-
-  DataType & operator = (const DataType & other)
-  { _datatype = other._datatype; return *this; }
-
-  DataType & operator = (const data_type & type)
-  { _datatype = type; return *this; }
-
-  operator const data_type & () const
-  { return _datatype; }
-
-  operator data_type & ()
-  { return _datatype; }
-
-  //     operator data_type const * () const
-  //     { return &_datatype; }
-
-  //     operator data_type * ()
-  //     { return &_datatype; }
-
-  void commit ()
-  {
-#ifdef LIBMESH_HAVE_MPI
-    libmesh_call_mpi
-      (MPI_Type_commit (&_datatype));
-#endif
-  }
-
-  void free ()
-  {
-#ifdef LIBMESH_HAVE_MPI
-    libmesh_call_mpi
-      (MPI_Type_free (&_datatype));
-#endif
-  }
-
-protected:
-
-  data_type _datatype;
-};
 
 
 //-------------------------------------------------------------------
