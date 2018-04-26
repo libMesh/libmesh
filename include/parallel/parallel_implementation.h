@@ -1883,8 +1883,6 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
   T * dataptr = buf.empty() ? libmesh_nullptr : const_cast<T *>(buf.data());
 
-  std::cerr<<"Sending: "<<buf.size()<<std::endl;
-
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
       MPI_Issend : MPI_Isend) (dataptr,
