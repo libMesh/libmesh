@@ -174,21 +174,10 @@ const unsigned int any_source=0;
 
 //-------------------------------------------------------------------
 
-#ifdef LIBMESH_HAVE_CXX11
-// A C++03-compatible replacement for std::false_type
-struct false_type
-{
-  static const bool value = false;
-  typedef bool value_type;
-  typedef false_type type;
-  operator value_type() const { return value; }
-};
-
 // Templated helper class to be used with static_assert.
 template<typename T>
-struct dependent_false : false_type
+struct dependent_false : std::false_type
 {};
-#endif
 
 /**
  * Templated class to provide the appropriate MPI datatype
@@ -200,11 +189,9 @@ struct dependent_false : false_type
 template <typename T>
 class StandardType : public DataType
 {
-#ifdef LIBMESH_HAVE_CXX11
   // Get a slightly better compiler diagnostic if we have C++11
   static_assert(dependent_false<T>::value,
                 "Only specializations of StandardType may be used, did you forget to include a header file (e.g. parallel_algebra.h)?");
-#endif
 
   /*
    * The unspecialized class is useless, so we make its constructor
@@ -226,11 +213,9 @@ private:
 template <typename T>
 class OpFunction
 {
-#ifdef LIBMESH_HAVE_CXX11
   // Get a slightly better compiler diagnostic if we have C++11
   static_assert(dependent_false<T>::value,
                 "Only specializations of OpFunction may be used, did you forget to include a header file (e.g. parallel_algebra.h)?");
-#endif
 
   /*
    * The unspecialized class defines none of these functions;
