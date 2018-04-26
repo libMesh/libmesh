@@ -19,6 +19,9 @@
 #ifndef LIBMESH_PARALLEL_H
 #define LIBMESH_PARALLEL_H
 
+// Parallel includes
+#include "libmesh/message_tag.h"
+
 // libMesh Includes
 #include "libmesh/libmesh_common.h" // libmesh_assert, cast_int
 #include "libmesh/libmesh_logging.h"
@@ -219,68 +222,6 @@ typedef int communicator; // Must match petsc-nompi definition
 const unsigned int any_source=0;
 #endif // LIBMESH_HAVE_MPI
 
-
-
-//-------------------------------------------------------------------
-/**
- * Encapsulates the MPI tag integers.
- */
-class MessageTag
-{
-public:
-
-  /**
-   * Invalid tag, to allow for default construction.
-   */
-  static const int invalid_tag = INT_MIN;
-
-  /**
-   * Explicit constructor, to discourage using "magic numbers"
-   * as tags.  Communicator::get_unique_tag is recommended instead.
-   */
-  explicit MessageTag(int tagvalue = invalid_tag)
-    : _tagvalue(tagvalue), _comm(libmesh_nullptr) {}
-
-  /**
-   * Copy constructor.  Helps Communicator do reference counting on
-   * unique tags
-   */
-  MessageTag(const MessageTag & other);
-
-  /**
-   * Destructor.  Helps Communicator do reference counting on unique
-   * tags
-   */
-  ~MessageTag();
-
-  int value() const {
-    return _tagvalue;
-  }
-
-private:
-  int _tagvalue;
-  const Communicator * _comm;
-
-  // Constructor for reference-counted unique tags
-  MessageTag(int tagvalue, const Communicator * comm)
-    : _tagvalue(tagvalue), _comm(comm) {}
-
-  // Let Communicator handle the reference counting
-  friend class Communicator;
-};
-
-
-//-------------------------------------------------------------------
-/**
- * Default message tag ids
- */
-#ifdef LIBMESH_HAVE_MPI
-const MessageTag any_tag = MessageTag(MPI_ANY_TAG);
-#else
-const MessageTag any_tag = MessageTag(-1);
-#endif
-
-const MessageTag no_tag = MessageTag(0);
 
 
 //-------------------------------------------------------------------

@@ -256,6 +256,7 @@ BUILT_SOURCES = \
         wrapped_function.h \
         wrapped_functor.h \
         zero_function.h \
+        message_tag.h \
         parallel.h \
         parallel_algebra.h \
         parallel_bin_sorter.h \
@@ -1273,6 +1274,9 @@ wrapped_functor.h: $(top_srcdir)/include/numerics/wrapped_functor.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 zero_function.h: $(top_srcdir)/include/numerics/zero_function.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+message_tag.h: $(top_srcdir)/include/parallel/message_tag.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel.h: $(top_srcdir)/include/parallel/parallel.h
