@@ -27,6 +27,7 @@
 #include "libmesh/op_function.h"
 #include "libmesh/parallel_only.h"
 #include "libmesh/post_wait_work.h"
+#include "libmesh/request.h"
 #include "libmesh/status.h"
 #include "libmesh/standard_type.h"
 
@@ -63,7 +64,6 @@ namespace Parallel
  * Forward declarations of classes we will define later.
  */
 class Communicator;
-class Request;
 class Status;
 
 #ifdef LIBMESH_HAVE_MPI
@@ -71,11 +71,6 @@ class Status;
 
 
 //-------------------------------------------------------------------
-/**
- * Request object for non-blocking I/O
- */
-typedef MPI_Request request;
-
 /**
  * Communicator object for talking with subsets of processors
  */
@@ -111,72 +106,10 @@ const unsigned int any_source =
 // These shouldn't actually be needed, but must be
 // unique types for function overloading to work
 // properly.
-struct request      { /* unsigned int r; */ };
 typedef int communicator; // Must match petsc-nompi definition
 
 const unsigned int any_source=0;
 #endif // LIBMESH_HAVE_MPI
-
-
-//-------------------------------------------------------------------
-/**
- * Encapsulates the MPI_Request
- */
-class Request
-{
-public:
-  Request ();
-
-  Request (const request & r);
-
-  Request (const Request & other);
-
-  void cleanup();
-
-  Request & operator = (const Request & other);
-
-  Request & operator = (const request & r);
-
-  ~Request ();
-
-  request * get() { return &_request; }
-
-  const request * get() const { return &_request; }
-
-  Status wait ();
-
-  bool test ();
-
-  bool test (status & status);
-
-  void add_prior_request(const Request & req);
-
-  void add_post_wait_work(PostWaitWork * work);
-
-private:
-  request _request;
-
-  // Breaking non-blocking sends into multiple requests can require chaining
-  // multiple requests into a single Request
-  std::unique_ptr<Request> _prior_request;
-
-  // post_wait_work->first is a vector of work to do after a wait
-  // finishes; post_wait_work->second is a reference count so that
-  // Request objects will behave roughly like a shared_ptr and be
-  // usable in STL containers
-  std::pair<std::vector <PostWaitWork * >, unsigned int> * post_wait_work;
-};
-
-/**
- * Wait for a non-blocking send or receive to finish
- */
-inline Status wait (Request & r) { return r.wait(); }
-
-/**
- * Wait for a non-blocking send or receive to finish
- */
-inline void wait (std::vector<Request> & r)
-{ for (std::size_t i=0; i<r.size(); i++) r[i].wait(); }
 
 
 /**

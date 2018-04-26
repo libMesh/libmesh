@@ -275,6 +275,7 @@ BUILT_SOURCES = \
         parallel_only.h \
         parallel_sort.h \
         post_wait_work.h \
+        request.h \
         standard_type.h \
         status.h \
         threads.h \
@@ -1339,6 +1340,9 @@ parallel_sort.h: $(top_srcdir)/include/parallel/parallel_sort.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 post_wait_work.h: $(top_srcdir)/include/parallel/post_wait_work.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+request.h: $(top_srcdir)/include/parallel/request.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 standard_type.h: $(top_srcdir)/include/parallel/standard_type.h
