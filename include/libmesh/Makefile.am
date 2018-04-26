@@ -259,6 +259,7 @@ BUILT_SOURCES = \
         data_type.h \
         libmesh_call_mpi.h \
         message_tag.h \
+        op_function.h \
         parallel.h \
         parallel_algebra.h \
         parallel_bin_sorter.h \
@@ -1287,6 +1288,9 @@ libmesh_call_mpi.h: $(top_srcdir)/include/parallel/libmesh_call_mpi.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 message_tag.h: $(top_srcdir)/include/parallel/message_tag.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+op_function.h: $(top_srcdir)/include/parallel/op_function.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel.h: $(top_srcdir)/include/parallel/parallel.h
