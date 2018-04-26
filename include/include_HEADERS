@@ -277,6 +277,7 @@ include_HEADERS =  \
         parallel/parallel_node.h \
         parallel/parallel_object.h \
         parallel/parallel_sort.h \
+        parallel/standard_type.h \
         parallel/threads.h \
         parallel/threads_allocators.h \
         parallel/threads_none.h \

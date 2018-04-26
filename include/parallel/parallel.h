@@ -23,6 +23,7 @@
 #include "libmesh/data_type.h"
 #include "libmesh/libmesh_call_mpi.h"
 #include "libmesh/message_tag.h"
+#include "libmesh/standard_type.h"
 
 // libMesh Includes
 #include "libmesh/libmesh_common.h" // libmesh_assert, cast_int
@@ -178,30 +179,6 @@ const unsigned int any_source=0;
 template<typename T>
 struct dependent_false : std::false_type
 {};
-
-/**
- * Templated class to provide the appropriate MPI datatype
- * for use with built-in C types or simple C++ constructions.
- *
- * More complicated data types may need to provide a pointer-to-T so
- * that we can use MPI_Address without constructing a new T.
- */
-template <typename T>
-class StandardType : public DataType
-{
-  // Get a slightly better compiler diagnostic if we have C++11
-  static_assert(dependent_false<T>::value,
-                "Only specializations of StandardType may be used, did you forget to include a header file (e.g. parallel_algebra.h)?");
-
-  /*
-   * The unspecialized class is useless, so we make its constructor
-   * private to catch mistakes at compile-time rather than link-time.
-   * Specializations should have a public constructor of the same
-   * form.
-   */
-private:
-  StandardType(const T * example = libmesh_nullptr);
-};
 
 /**
  * Templated class to provide the appropriate MPI reduction operations

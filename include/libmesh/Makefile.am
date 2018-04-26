@@ -271,6 +271,7 @@ BUILT_SOURCES = \
         parallel_node.h \
         parallel_object.h \
         parallel_sort.h \
+        standard_type.h \
         threads.h \
         threads_allocators.h \
         threads_none.h \
@@ -1321,6 +1322,9 @@ parallel_object.h: $(top_srcdir)/include/parallel/parallel_object.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_sort.h: $(top_srcdir)/include/parallel/parallel_sort.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+standard_type.h: $(top_srcdir)/include/parallel/standard_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 threads.h: $(top_srcdir)/include/parallel/threads.h
