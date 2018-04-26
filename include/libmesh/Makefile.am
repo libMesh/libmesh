@@ -277,6 +277,7 @@ BUILT_SOURCES = \
         parallel_only.h \
         parallel_sort.h \
         post_wait_copy_buffer.h \
+        post_wait_unpack_buffer.h \
         post_wait_work.h \
         request.h \
         standard_type.h \
@@ -1349,6 +1350,9 @@ parallel_sort.h: $(top_srcdir)/include/parallel/parallel_sort.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 post_wait_copy_buffer.h: $(top_srcdir)/include/parallel/post_wait_copy_buffer.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_unpack_buffer.h: $(top_srcdir)/include/parallel/post_wait_unpack_buffer.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 post_wait_work.h: $(top_srcdir)/include/parallel/post_wait_work.h

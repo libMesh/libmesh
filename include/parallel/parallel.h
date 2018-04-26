@@ -29,6 +29,7 @@
 #include "libmesh/packing.h"
 #include "libmesh/parallel_only.h"
 #include "libmesh/post_wait_copy_buffer.h"
+#include "libmesh/post_wait_unpack_buffer.h"
 #include "libmesh/post_wait_work.h"
 #include "libmesh/request.h"
 #include "libmesh/status.h"
@@ -104,25 +105,6 @@ class FakeCommunicator
     static Communicator temp;
     return temp;
   }
-};
-
-
-// PostWaitWork specialization for unpacking received buffers.
-template <typename Container, typename Context, typename OutputIter,
-          typename T>
-struct PostWaitUnpackBuffer : public PostWaitWork {
-  PostWaitUnpackBuffer(const Container & buffer, Context * context, OutputIter out) :
-    _buf(buffer), _context(context), _out(out) {}
-
-  virtual void run() libmesh_override {
-
-    Parallel::unpack_range(_buf, _context, _out, (T*)libmesh_nullptr);
-  }
-
-private:
-  const Container & _buf;
-  Context * _context;
-  OutputIter _out;
 };
 
 
