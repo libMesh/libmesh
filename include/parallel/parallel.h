@@ -65,20 +65,6 @@ namespace libMesh
 namespace Parallel
 {
 
-#ifdef LIBMESH_HAVE_MPI
-
-/**
- * Accept from any source
- */
-const unsigned int any_source =
-  static_cast<unsigned int>(MPI_ANY_SOURCE);
-
-#else
-
-const unsigned int any_source=0;
-
-#endif // LIBMESH_HAVE_MPI
-
 // FakeCommunicator for debugging inappropriate CommWorld uses
 class FakeCommunicator
 {

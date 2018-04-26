@@ -60,12 +60,20 @@ namespace Parallel
  */
 typedef MPI_Comm communicator;
 
+/**
+ * Processor id meaning "Accept from any source"
+ */
+const unsigned int any_source =
+  static_cast<unsigned int>(MPI_ANY_SOURCE);
+
 #else
 
 // These shouldn't actually be needed, but must be
 // unique types for function overloading to work
 // properly.
 typedef int communicator; // Must match petsc-nompi definition
+
+const unsigned int any_source=0;
 
 #endif // LIBMESH_HAVE_MPI
 
