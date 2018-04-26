@@ -26,6 +26,7 @@
 #include "libmesh/message_tag.h"
 #include "libmesh/op_function.h"
 #include "libmesh/parallel_only.h"
+#include "libmesh/post_wait_work.h"
 #include "libmesh/status.h"
 #include "libmesh/standard_type.h"
 
@@ -115,19 +116,6 @@ typedef int communicator; // Must match petsc-nompi definition
 
 const unsigned int any_source=0;
 #endif // LIBMESH_HAVE_MPI
-
-
-
-//-------------------------------------------------------------------
-/**
- * A class that can be subclassed to allow other code to
- * perform work after a MPI_Wait succeeds
- */
-struct PostWaitWork {
-  virtual ~PostWaitWork() {}
-
-  virtual void run() {}
-};
 
 
 //-------------------------------------------------------------------
