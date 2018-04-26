@@ -581,7 +581,9 @@ public:
                      std::vector<T> & recv) const;
 
   /**
-   * Gather overload for string types
+   * The gather overload for string types has an optional
+   * identical_buffer_sizes optimization for when all strings are the
+   * same length.
    */
   template <typename T>
   inline void gather(const unsigned int root_id,
@@ -624,7 +626,9 @@ public:
                         std::vector<T> & recv) const;
 
   /**
-   * AllGather overload for string types
+   * The allgather overload for string types has an optional
+   * identical_buffer_sizes optimization for when all strings are the
+   * same length.
    */
   template <typename T>
   inline void allgather(const std::basic_string<T> & send,
