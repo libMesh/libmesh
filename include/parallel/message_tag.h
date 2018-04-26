@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LIBMESH_MESSAGETAG_H
-#define LIBMESH_MESSAGETAG_H
+#ifndef LIBMESH_MESSAGE_TAG_H
+#define LIBMESH_MESSAGE_TAG_H
 
 // libMesh Includes
 #include "libmesh/libmesh_common.h"
@@ -105,4 +105,4 @@ const MessageTag no_tag = MessageTag(0);
 
 } // namespace libMesh
 
-#endif // LIBMESH_MESSAGETAG_H
+#endif // LIBMESH_MESSAGE_TAG_H
