@@ -26,6 +26,7 @@
 #include "libmesh/message_tag.h"
 #include "libmesh/op_function.h"
 #include "libmesh/parallel_only.h"
+#include "libmesh/status.h"
 #include "libmesh/standard_type.h"
 
 // libMesh Includes
@@ -75,11 +76,6 @@ class Status;
 typedef MPI_Request request;
 
 /**
- * Status object for querying messages
- */
-typedef MPI_Status status;
-
-/**
  * Communicator object for talking with subsets of processors
  */
 typedef MPI_Comm communicator;
@@ -115,57 +111,11 @@ const unsigned int any_source =
 // unique types for function overloading to work
 // properly.
 struct request      { /* unsigned int r; */ };
-struct status       { /* unsigned int s; */ };
 typedef int communicator; // Must match petsc-nompi definition
 
 const unsigned int any_source=0;
 #endif // LIBMESH_HAVE_MPI
 
-
-
-//-------------------------------------------------------------------
-/**
- * Encapsulates the MPI_Status struct.  Allows the source and size
- * of the message to be determined.
- */
-class Status
-{
-public:
-  Status ();
-
-  explicit Status (const data_type & type);
-
-  explicit Status (const status & status);
-
-  Status (const status    & status,
-          const data_type & type);
-
-  Status (const Status & status);
-
-  Status (const Status    & status,
-          const data_type & type);
-
-  status * get() { return &_status; }
-
-  status const * get() const { return &_status; }
-
-  int source () const;
-
-  int tag () const;
-
-  data_type & datatype () { return _datatype; }
-
-  const data_type & datatype () const { return _datatype; }
-
-  unsigned int size (const data_type & type) const;
-
-  unsigned int size () const;
-
-private:
-
-  status    _status;
-  data_type _datatype;
-};
 
 
 //-------------------------------------------------------------------
