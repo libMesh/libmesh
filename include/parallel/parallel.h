@@ -28,6 +28,7 @@
 #include "libmesh/op_function.h"
 #include "libmesh/packing.h"
 #include "libmesh/parallel_only.h"
+#include "libmesh/post_wait_copy_buffer.h"
 #include "libmesh/post_wait_work.h"
 #include "libmesh/request.h"
 #include "libmesh/status.h"
@@ -105,19 +106,6 @@ class FakeCommunicator
   }
 };
 
-// PostWaitWork specialization for copying from temporary to
-// output containers
-template <typename Container, typename OutputIter>
-struct PostWaitCopyBuffer : public PostWaitWork {
-  PostWaitCopyBuffer(const Container & buffer, const OutputIter out)
-    : _buf(buffer), _out(out) {}
-
-  virtual void run() libmesh_override { std::copy(_buf.begin(), _buf.end(), _out); }
-
-private:
-  const Container & _buf;
-  OutputIter _out;
-};
 
 // PostWaitWork specialization for unpacking received buffers.
 template <typename Container, typename Context, typename OutputIter,
