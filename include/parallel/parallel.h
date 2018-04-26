@@ -20,6 +20,7 @@
 #define LIBMESH_PARALLEL_H
 
 // Parallel includes
+#include "libmesh/attributes.h"
 #include "libmesh/data_type.h"
 #include "libmesh/libmesh_call_mpi.h"
 #include "libmesh/message_tag.h"
@@ -119,24 +120,6 @@ typedef int communicator; // Must match petsc-nompi definition
 
 const unsigned int any_source=0;
 #endif // LIBMESH_HAVE_MPI
-
-
-
-//-------------------------------------------------------------------
-
-/*
- * The unspecialized class gives default, lowest-common-denominator
- * attributes, for values which can't be used with Parallel min/max.
- * Specialized classes can set this to true, and should define
- * the lowest and highest values possible for the type.
- */
-template<typename T>
-struct Attributes
-{
-  static const bool has_min_max = false;
-  static void set_lowest(T &) {}
-  static void set_highest(T &) {}
-};
 
 
 
