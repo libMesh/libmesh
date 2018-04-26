@@ -29,10 +29,28 @@
 namespace libMesh {
 namespace Parallel {
 
-// First declare StandardType specializations so we can use them in anonymous
-// helper functions later
-
 #ifdef LIBMESH_HAVE_MPI
+
+/**
+ * Templated function to return the appropriate MPI datatype
+ * for use with built-in C types when combined with an int
+ */
+template <typename T>
+inline data_type dataplusint_type();
+
+/**
+ * Types combined with an int
+ */
+template <typename T>
+class DataPlusInt
+{
+public:
+  T val;
+  int rank;
+};
+
+// Declare StandardType specializations early so we can use them in
+// anonymous helper functions later
 
 #define LIBMESH_STANDARD_TYPE(cxxtype,mpitype)                          \
   template<>                                                            \
