@@ -37,20 +37,7 @@
 #include "libmesh/standard_type.h"
 
 // libMesh Includes
-#include "libmesh/libmesh_common.h" // libmesh_assert, cast_int
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/auto_ptr.h" // deprecated
-
-// C++ includes
-#include <cstddef>
-#include <climits>
-#include <iterator>
-#include <limits>
-#include <map>
-#include <set>
-#include <string>
-#include <vector>
-#include <memory>
+#include "libmesh/libmesh_common.h"
 
 namespace libMesh
 {

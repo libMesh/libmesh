@@ -24,7 +24,16 @@
 #include "libmesh_logging.h"
 
 // C++ includes
-#include <iterator> // iterator_traits
+#include <complex>
+#include <cstddef>
+#include <iterator>
+#include <limits>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace libMesh {
 namespace Parallel {
