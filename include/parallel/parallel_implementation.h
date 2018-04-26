@@ -1100,23 +1100,6 @@ inline void broadcast_packed_range (const Context * context1,
 // Parallel members
 
 inline
-MessageTag::~MessageTag()
-{
-  if (_comm)
-    _comm->dereference_unique_tag(_tagvalue);
-}
-
-
-inline
-MessageTag::MessageTag(const MessageTag & other)
-  : _tagvalue(other._tagvalue), _comm(other._comm)
-{
-  if (_comm)
-    _comm->reference_unique_tag(_tagvalue);
-}
-
-
-inline
 MessageTag Communicator::get_unique_tag(int tagvalue) const
 {
   if (used_tag_values.count(tagvalue))
