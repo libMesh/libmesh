@@ -263,6 +263,13 @@ include_HEADERS =  \
         numerics/wrapped_function.h \
         numerics/wrapped_functor.h \
         numerics/zero_function.h \
+        parallel/attributes.h \
+        parallel/communicator.h \
+        parallel/data_type.h \
+        parallel/libmesh_call_mpi.h \
+        parallel/message_tag.h \
+        parallel/op_function.h \
+        parallel/packing.h \
         parallel/parallel.h \
         parallel/parallel_algebra.h \
         parallel/parallel_bin_sorter.h \
@@ -273,7 +280,15 @@ include_HEADERS =  \
         parallel/parallel_implementation.h \
         parallel/parallel_node.h \
         parallel/parallel_object.h \
+        parallel/parallel_only.h \
         parallel/parallel_sort.h \
+        parallel/post_wait_copy_buffer.h \
+        parallel/post_wait_delete_buffer.h \
+        parallel/post_wait_unpack_buffer.h \
+        parallel/post_wait_work.h \
+        parallel/request.h \
+        parallel/standard_type.h \
+        parallel/status.h \
         parallel/threads.h \
         parallel/threads_allocators.h \
         parallel/threads_none.h \

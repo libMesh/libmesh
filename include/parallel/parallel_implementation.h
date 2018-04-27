@@ -24,279 +24,41 @@
 #include "libmesh_logging.h"
 
 // C++ includes
-#include <iterator> // iterator_traits
+#include <complex>
+#include <cstddef>
+#include <iterator>
+#include <limits>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace libMesh {
 namespace Parallel {
 
-// First declare StandardType specializations so we can use them in anonymous
-// helper functions later
-
 #ifdef LIBMESH_HAVE_MPI
 
-#define LIBMESH_STANDARD_TYPE(cxxtype,mpitype)                          \
-  template<>                                                            \
-  class StandardType<cxxtype> : public DataType                         \
-  {                                                                     \
-  public:                                                               \
-    explicit                                                            \
-      StandardType(const cxxtype * = libmesh_nullptr) : DataType(mpitype) {} \
-  }
+/**
+ * Templated function to return the appropriate MPI datatype
+ * for use with built-in C types when combined with an int
+ */
+template <typename T>
+inline data_type dataplusint_type();
 
-#define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)           \
-  template<>                                            \
-  class OpFunction<cxxtype>                             \
-  {                                                     \
-  public:                                               \
-    static MPI_Op max()          { return MPI_MAX; }    \
-    static MPI_Op min()          { return MPI_MIN; }    \
-    static MPI_Op sum()          { return MPI_SUM; }    \
-    static MPI_Op product()      { return MPI_PROD; }   \
-    static MPI_Op logical_and()  { return MPI_LAND; }   \
-    static MPI_Op bitwise_and()  { return MPI_BAND; }   \
-    static MPI_Op logical_or()   { return MPI_LOR; }    \
-    static MPI_Op bitwise_or()   { return MPI_BOR; }    \
-    static MPI_Op logical_xor()  { return MPI_LXOR; }   \
-    static MPI_Op bitwise_xor()  { return MPI_BXOR; }   \
-    static MPI_Op max_location() { return MPI_MAXLOC; } \
-    static MPI_Op min_location() { return MPI_MINLOC; } \
-  }
-
-#define LIBMESH_PARALLEL_FLOAT_OPS(cxxtype)             \
-  template<>                                            \
-  class OpFunction<cxxtype>                             \
-  {                                                     \
-  public:                                               \
-    static MPI_Op max()          { return MPI_MAX; }    \
-    static MPI_Op min()          { return MPI_MIN; }    \
-    static MPI_Op sum()          { return MPI_SUM; }    \
-    static MPI_Op product()      { return MPI_PROD; }   \
-    static MPI_Op max_location() { return MPI_MAXLOC; } \
-    static MPI_Op min_location() { return MPI_MINLOC; } \
-  }
-
-#else
-
-#define LIBMESH_STANDARD_TYPE(cxxtype,mpitype)                          \
-  template<>                                                            \
-  class StandardType<cxxtype> : public DataType                         \
-  {                                                                     \
-  public:                                                               \
-    explicit                                                            \
-      StandardType(const cxxtype * = libmesh_nullptr) : DataType() {}   \
-  }
-
-#define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)   \
-  template<>                                    \
-  class OpFunction<cxxtype>                     \
-  {                                             \
-  }
-
-#define LIBMESH_PARALLEL_FLOAT_OPS(cxxtype)     \
-  template<>                                    \
-  class OpFunction<cxxtype>                     \
-  {                                             \
-  }
-
-#endif
-
-#define LIBMESH_INT_TYPE(cxxtype,mpitype)                               \
-  LIBMESH_STANDARD_TYPE(cxxtype,mpitype);                               \
-  LIBMESH_PARALLEL_INTEGER_OPS(cxxtype);                                \
-                                                                        \
-  template<>                                                            \
-  struct Attributes<cxxtype>                                            \
-  {                                                                     \
-    static const bool has_min_max = true;                               \
-    static void set_lowest(cxxtype & x) { x = std::numeric_limits<cxxtype>::min(); } \
-    static void set_highest(cxxtype & x) { x = std::numeric_limits<cxxtype>::max(); } \
-  }
-
-#define LIBMESH_FLOAT_TYPE(cxxtype,mpitype)                             \
-  LIBMESH_STANDARD_TYPE(cxxtype,mpitype);                               \
-  LIBMESH_PARALLEL_FLOAT_OPS(cxxtype);                                  \
-                                                                        \
-  template<>                                                            \
-  struct Attributes<cxxtype>                                            \
-  {                                                                     \
-    static const bool has_min_max = true;                               \
-    static void set_lowest(cxxtype & x) { x = -std::numeric_limits<cxxtype>::infinity(); } \
-    static void set_highest(cxxtype & x) { x = std::numeric_limits<cxxtype>::infinity(); } \
-  }
-
-#define LIBMESH_CONTAINER_TYPE(cxxtype)                                 \
-  template<typename T>                                                  \
-  struct Attributes<cxxtype<T>>                                         \
-  {                                                                     \
-    static const bool has_min_max = Attributes<T>::has_min_max;         \
-    static void set_lowest(cxxtype<T> & x) {                            \
-      for (auto & val : x)                                              \
-        Attributes<T>::set_lowest(val); }                               \
-    static void set_highest(cxxtype<T> & x) {                           \
-      for (auto & val : x)                                              \
-        Attributes<T>::set_highest(val); }                              \
-  }
-
-
-LIBMESH_INT_TYPE(char,MPI_CHAR);
-#if MPI_VERSION > 1
-LIBMESH_INT_TYPE(signed char,MPI_SIGNED_CHAR);
-#endif
-LIBMESH_INT_TYPE(unsigned char,MPI_UNSIGNED_CHAR);
-LIBMESH_INT_TYPE(short int,MPI_SHORT);
-LIBMESH_INT_TYPE(unsigned short int,MPI_UNSIGNED_SHORT);
-LIBMESH_INT_TYPE(int,MPI_INT);
-LIBMESH_INT_TYPE(unsigned int,MPI_UNSIGNED);
-LIBMESH_INT_TYPE(long,MPI_LONG);
-LIBMESH_INT_TYPE(long long,MPI_LONG_LONG_INT);
-LIBMESH_INT_TYPE(unsigned long,MPI_UNSIGNED_LONG);
-#if MPI_VERSION > 1 || !defined(LIBMESH_HAVE_MPI)
-LIBMESH_INT_TYPE(unsigned long long,MPI_UNSIGNED_LONG_LONG);
-#else
-// MPI 1.0 did not have an unsigned long long type, so we have to use
-// MPI_UNSIGNED_LONG in this case.  If "unsigned long" and "unsigned
-// long long" are different sizes on your system, we detect this and
-// throw an error in dbg mode rather than communicating values
-// incorrectly.
-template<>
-class StandardType<unsigned long long> : public DataType
+/**
+ * Types combined with an int
+ */
+template <typename T>
+class DataPlusInt
 {
 public:
-  explicit
-  StandardType(const cxxtype * = libmesh_nullptr) :
-    DataType(MPI_UNSIGNED_LONG)
-  {
-    libmesh_assert_equal_to(sizeof(unsigned long long),
-                            sizeof(unsigned long));
-  }
+  T val;
+  int rank;
 };
-
-LIBMESH_PARALLEL_INTEGER_OPS(unsigned long long);                                \
-
-template<>
-struct Attributes<unsigned long long>
-{
-  static const bool has_min_max = true;
-  static void set_lowest(unsigned long long & x) { x = std::numeric_limits<unsigned long long>::min(); }
-  static void set_highest(unsigned long long & x) { x = std::numeric_limits<unsigned long long>::max(); }
-};
-#endif
-
-LIBMESH_FLOAT_TYPE(float,MPI_FLOAT);
-LIBMESH_FLOAT_TYPE(double,MPI_DOUBLE);
-LIBMESH_FLOAT_TYPE(long double,MPI_LONG_DOUBLE);
-LIBMESH_CONTAINER_TYPE(std::set);
-LIBMESH_CONTAINER_TYPE(std::vector);
-
-template<typename T1, typename T2>
-class StandardType<std::pair<T1, T2>> : public DataType
-{
-public:
-  explicit
-  StandardType(const std::pair<T1, T2> * example = libmesh_nullptr) {
-    // We need an example for MPI_Address to use
-    static const std::pair<T1, T2> p;
-    if (!example)
-      example = &p;
-
-#ifdef LIBMESH_HAVE_MPI
-
-    // Get the sub-data-types, and make sure they live long enough
-    // to construct the derived type
-    StandardType<T1> d1(&example->first);
-    StandardType<T2> d2(&example->second);
-
-#if MPI_VERSION == 1
-    // Use MPI_LB and MPI_UB here to workaround potential bugs from
-    // nested MPI_LB and MPI_UB in the specifications of d1 and/or d2:
-    // https://github.com/libMesh/libmesh/issues/631
-    MPI_Datatype types[] = { MPI_LB, (data_type)d1, (data_type)d2, MPI_UB };
-    int blocklengths[] = {1,1,1,1};
-    MPI_Aint displs[4];
-
-    libmesh_call_mpi
-      (MPI_Address (const_cast<std::pair<T1,T2> *>(example),
-                    &displs[0]));
-    libmesh_call_mpi
-      (MPI_Address (const_cast<T1*>(&example->first),
-                    &displs[1]));
-    libmesh_call_mpi
-      (MPI_Address (const_cast<T2*>(&example->second),
-                    &displs[2]));
-    libmesh_call_mpi
-      (MPI_Address (const_cast<std::pair<T1,T2> *>(example+1),
-                    &displs[3]));
-
-    displs[1] -= displs[0];
-    displs[2] -= displs[0];
-    displs[3] -= displs[0];
-    displs[0] = 0;
-
-    libmesh_call_mpi
-      (MPI_Type_struct (4, blocklengths, displs, types,
-                        &_datatype));
-
-#else
-    MPI_Datatype types[] = { (data_type)d1, (data_type)d2 };
-    int blocklengths[] = {1,1};
-    MPI_Aint displs[2], start;
-
-    libmesh_call_mpi
-      (MPI_Get_address (const_cast<std::pair<T1,T2> *>(example),
-                        &start));
-    libmesh_call_mpi
-      (MPI_Get_address (const_cast<T1*>(&example->first),
-                        &displs[0]));
-    libmesh_call_mpi
-      (MPI_Get_address (const_cast<T2*>(&example->second),
-                        &displs[1]));
-    displs[0] -= start;
-    displs[1] -= start;
-
-    // create a prototype structure
-    MPI_Datatype tmptype;
-    libmesh_call_mpi
-      (MPI_Type_create_struct (2, blocklengths, displs, types,
-                               &tmptype));
-    libmesh_call_mpi
-      (MPI_Type_commit (&tmptype));
-
-    // resize the structure type to account for padding, if any
-    libmesh_call_mpi
-      (MPI_Type_create_resized (tmptype, 0,
-                                sizeof(std::pair<T1,T2>),
-                                &_datatype));
-    libmesh_call_mpi
-      (MPI_Type_free (&tmptype));
-#endif
-
-    this->commit();
 
 #endif // LIBMESH_HAVE_MPI
-
-  }
-
-  StandardType(const StandardType<std::pair<T1, T2>> & t)
-  {
-#ifdef LIBMESH_HAVE_MPI
-    libmesh_call_mpi
-      (MPI_Type_dup (t._datatype, &_datatype));
-#endif
-  }
-
-  ~StandardType() { this->free(); }
-};
-
-template<typename T>
-class StandardType<std::complex<T>> : public DataType
-{
-public:
-  explicit
-  StandardType(const std::complex<T> * /*example*/ = libmesh_nullptr) :
-    DataType(StandardType<T>(libmesh_nullptr), 2) {}
-
-  ~StandardType() { this->free(); }
-};
 
 } // namespace Parallel
 
@@ -511,108 +273,6 @@ extern Communicator & Communicator_World;
 #endif
 
 
-/**
- * Helper function for range packing
- */
-template <typename Context, typename Iter>
-inline std::size_t packed_range_size (const Context * context,
-                                      Iter range_begin,
-                                      const Iter range_end)
-{
-  typedef typename std::iterator_traits<Iter>::value_type T;
-
-  std::size_t buffer_size = 0;
-  for (Iter range_count = range_begin;
-       range_count != range_end;
-       ++range_count)
-    {
-      buffer_size += Parallel::Packing<T>::packable_size(*range_count, context);
-    }
-  return buffer_size;
-}
-
-
-/**
- * Helper function for range packing
- */
-template <typename Context, typename buffertype, typename Iter>
-inline Iter pack_range (const Context * context,
-                        Iter range_begin,
-                        const Iter range_end,
-                        std::vector<buffertype> & buffer,
-                        // When we serialize into buffers, we need to use large buffers to optimize MPI
-                        // bandwidth, but not so large as to risk allocation failures.  max_buffer_size
-                        // is measured in number of buffer type entries; number of bytes may be 4 or 8
-                        // times larger depending on configuration.
-                        std::size_t approx_buffer_size)
-{
-  typedef typename std::iterator_traits<Iter>::value_type T;
-
-  // Count the total size of and preallocate buffer for efficiency.
-  // Prepare to stop early if the buffer would be too large.
-  std::size_t buffer_size = 0;
-  Iter range_stop = range_begin;
-  for (; range_stop != range_end && buffer_size < approx_buffer_size;
-       ++range_stop)
-    {
-      std::size_t next_buffer_size =
-        Parallel::Packing<T>::packable_size(*range_stop, context);
-      buffer_size += next_buffer_size;
-    }
-  buffer.reserve(buffer.size() + buffer_size);
-
-  // Pack the objects into the buffer
-  for (; range_begin != range_stop; ++range_begin)
-    {
-#ifndef NDEBUG
-      std::size_t old_size = buffer.size();
-#endif
-
-      Parallel::Packing<T>::pack
-        (*range_begin, back_inserter(buffer), context);
-
-#ifndef NDEBUG
-      unsigned int my_packable_size =
-        Parallel::Packing<T>::packable_size(*range_begin, context);
-      unsigned int my_packed_size =
-        Parallel::Packing<T>::packed_size (buffer.begin() + old_size);
-      libmesh_assert_equal_to (my_packable_size, my_packed_size);
-      libmesh_assert_equal_to (buffer.size(), old_size + my_packable_size);
-#endif
-    }
-
-  return range_stop;
-}
-
-
-
-/**
- * Helper function for range unpacking
- */
-template <typename Context, typename buffertype,
-          typename OutputIter, typename T>
-inline void unpack_range (const std::vector<buffertype> & buffer,
-                          Context * context,
-                          OutputIter out_iter,
-                          const T * /* output_type */)
-{
-  // Loop through the buffer and unpack each object, returning the
-  // object pointer via the output iterator
-  typename std::vector<buffertype>::const_iterator
-    next_object_start = buffer.begin();
-
-  while (next_object_start < buffer.end())
-    {
-      *out_iter++ = Parallel::Packing<T>::unpack(next_object_start, context);
-      next_object_start +=
-        Parallel::Packing<T>::packed_size(next_object_start);
-    }
-
-  // We should have used up the exact amount of data in the buffer
-  libmesh_assert (next_object_start == buffer.end());
-}
-
-
 inline Communicator::Communicator () :
 #ifdef LIBMESH_HAVE_MPI
   _communicator(MPI_COMM_SELF),
@@ -744,256 +404,6 @@ inline void Communicator::assign(const communicator & comm)
 #endif
   _send_mode = DEFAULT;
 }
-
-
-
-inline Status::Status () :
-  _status(),
-  _datatype()
-{}
-
-inline Status::Status (const data_type & type) :
-  _status(),
-  _datatype(type)
-{}
-
-inline Status::Status (const status & stat) :
-  _status(stat),
-  _datatype()
-{}
-
-inline Status::Status (const status & stat,
-                       const data_type & type) :
-  _status(stat),
-  _datatype(type)
-{}
-
-inline Status::Status (const Status & stat) :
-  _status(stat._status),
-  _datatype(stat._datatype)
-{}
-
-inline Status::Status (const Status    & stat,
-                       const data_type & type) :
-  _status(stat._status),
-  _datatype(type)
-{}
-
-inline int Status::source () const
-{
-#ifdef LIBMESH_HAVE_MPI
-  return _status.MPI_SOURCE;
-#else
-  return 0;
-#endif
-}
-
-inline int Status::tag () const
-{
-#ifdef LIBMESH_HAVE_MPI
-  return _status.MPI_TAG;
-#else
-  libmesh_not_implemented();
-  return 0;
-#endif
-}
-
-#ifdef LIBMESH_HAVE_MPI
-inline unsigned int Status::size (const data_type & type) const
-{
-  int msg_size;
-  libmesh_call_mpi
-    (MPI_Get_count (const_cast<MPI_Status*>(&_status), type,
-                    &msg_size));
-
-  libmesh_assert_greater_equal (msg_size, 0);
-  return msg_size;
-}
-#else
-inline unsigned int Status::size (const data_type &) const
-{
-  libmesh_not_implemented();
-  return 0;
-}
-#endif
-
-inline unsigned int Status::size () const
-{ return this->size (this->datatype()); }
-
-
-
-inline Request::Request () :
-#ifdef LIBMESH_HAVE_MPI
-  _request(MPI_REQUEST_NULL),
-#else
-  _request(),
-#endif
-  post_wait_work(libmesh_nullptr)
-{}
-
-inline Request::Request (const request & r) :
-  _request(r),
-  post_wait_work(libmesh_nullptr)
-{}
-
-inline Request::Request (const Request & other) :
-  _request(other._request),
-  post_wait_work(other.post_wait_work)
-{
-  if (other._prior_request.get())
-    _prior_request = std::unique_ptr<Request>
-      (new Request(*other._prior_request.get()));
-
-  // operator= should behave like a shared pointer
-  if (post_wait_work)
-    post_wait_work->second++;
-}
-
-inline void Request::cleanup()
-{
-  if (post_wait_work)
-    {
-      // Decrement the use count
-      post_wait_work->second--;
-
-      if (!post_wait_work->second)
-        {
-#ifdef DEBUG
-          // If we're done using this request, then we'd better have
-          // done the work we waited for
-          for (const auto & item : post_wait_work->first)
-            libmesh_assert(!item);
-#endif
-          delete post_wait_work;
-          post_wait_work = libmesh_nullptr;
-        }
-    }
-}
-
-inline Request & Request::operator = (const Request & other)
-{
-  this->cleanup();
-  _request = other._request;
-  post_wait_work = other.post_wait_work;
-
-  if (other._prior_request.get())
-    _prior_request = std::unique_ptr<Request>
-      (new Request(*other._prior_request.get()));
-
-  // operator= should behave like a shared pointer
-  if (post_wait_work)
-    post_wait_work->second++;
-
-  return *this;
-}
-
-inline Request & Request::operator = (const request & r)
-{
-  this->cleanup();
-  _request = r;
-  post_wait_work = libmesh_nullptr;
-  return *this;
-}
-
-inline Request::~Request () {
-  this->cleanup();
-}
-
-inline Status Request::wait ()
-{
-  LOG_SCOPE("wait()", "Parallel::Request");
-
-  if (_prior_request.get())
-    _prior_request->wait();
-
-  Status stat;
-#ifdef LIBMESH_HAVE_MPI
-  libmesh_call_mpi
-    (MPI_Wait (&_request, stat.get()));
-#endif
-  if (post_wait_work)
-    for (auto & item : post_wait_work->first)
-      {
-        // The user should never try to give us NULL work or try
-        // to wait() twice.
-        libmesh_assert (item);
-        item->run();
-        delete item;
-        item = libmesh_nullptr;
-      }
-
-  return stat;
-}
-
-inline bool Request::test ()
-{
-#ifdef LIBMESH_HAVE_MPI
-  int val=0;
-
-  // MPI_STATUS_IGNORE is from MPI-2; using it with some versions of
-  // MPICH may cause a crash:
-  // https://bugzilla.mcs.anl.gov/globus/show_bug.cgi?id=1798
-#if MPI_VERSION > 1
-  libmesh_call_mpi
-    (MPI_Test (&_request, &val, MPI_STATUS_IGNORE));
-#else
-  MPI_Status stat;
-  libmesh_call_mpi
-    (MPI_Test (&_request, &val, &stat));
-#endif
-
-  if (val)
-    {
-      libmesh_assert          (_request == MPI_REQUEST_NULL);
-      libmesh_assert_equal_to (val, 1);
-    }
-
-  return val;
-#else
-  return true;
-#endif
-}
-
-#ifdef LIBMESH_HAVE_MPI
-inline bool Request::test (status & stat)
-{
-  int val=0;
-
-  libmesh_call_mpi
-    (MPI_Test (&_request, &val, &stat));
-
-  return val;
-}
-#else
-inline bool Request::test (status &)
-{
-  return true;
-}
-#endif
-
-inline void Request::add_prior_request(const Request & req)
-{
-  // We're making a chain of prior requests, not a tree
-  libmesh_assert(!req._prior_request.get());
-
-  Request * new_prior_req = new Request(req);
-
-  // new_prior_req takes ownership of our existing _prior_request
-  new_prior_req->_prior_request.reset(this->_prior_request.release());
-
-  // Our _prior_request now manages the new resource we just set up
-  this->_prior_request.reset(new_prior_req);
-}
-
-inline void Request::add_post_wait_work(PostWaitWork * work)
-{
-  if (!post_wait_work)
-    post_wait_work = new
-      std::pair<std::vector <PostWaitWork * >, unsigned int>
-      (std::vector <PostWaitWork * >(), 1);
-  post_wait_work->first.push_back(work);
-}
-
 
 
 /**
@@ -1323,23 +733,6 @@ inline void broadcast_packed_range (const Context * context1,
 // Parallel members
 
 inline
-MessageTag::~MessageTag()
-{
-  if (_comm)
-    _comm->dereference_unique_tag(_tagvalue);
-}
-
-
-inline
-MessageTag::MessageTag(const MessageTag & other)
-  : _tagvalue(other._tagvalue), _comm(other._comm)
-{
-  if (_comm)
-    _comm->reference_unique_tag(_tagvalue);
-}
-
-
-inline
 MessageTag Communicator::get_unique_tag(int tagvalue) const
 {
   if (used_tag_values.count(tagvalue))
@@ -1361,31 +754,6 @@ MessageTag Communicator::get_unique_tag(int tagvalue) const
 
   return MessageTag(tagvalue, this);
 }
-
-
-inline
-void Communicator::reference_unique_tag(int tagvalue) const
-{
-  // This had better be an already-acquired tag.
-  libmesh_assert(used_tag_values.count(tagvalue));
-
-  used_tag_values[tagvalue]++;
-}
-
-
-inline
-void Communicator::dereference_unique_tag(int tagvalue) const
-{
-  // This had better be an already-acquired tag.
-  libmesh_assert(used_tag_values.count(tagvalue));
-
-  used_tag_values[tagvalue]--;
-  // If we don't have any more outstanding references, we
-  // don't even need to keep this tag in our "used" set.
-  if (!used_tag_values[tagvalue])
-    used_tag_values.erase(tagvalue);
-}
-
 
 #ifdef LIBMESH_HAVE_MPI
 template<>
@@ -2147,8 +1515,6 @@ inline void Communicator::send (const unsigned int dest_processor_id,
   LOG_SCOPE("send()", "Parallel");
 
   T * dataptr = buf.empty() ? libmesh_nullptr : const_cast<T *>(buf.data());
-
-  std::cerr<<"Sending: "<<buf.size()<<std::endl;
 
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?

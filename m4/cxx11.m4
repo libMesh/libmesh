@@ -768,6 +768,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_CONDITION_VARIABLE],
   ])
 
 
+
 AC_DEFUN([LIBMESH_TEST_CXX11_TYPE_TRAITS],
   [
     # This is designed to be an exhaustive test of the capabilities of
@@ -893,6 +894,8 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TYPE_TRAITS],
                 << std::is_same<long, std::common_type<char, short, int, long>::type>::value // std::common_type
                 << std::is_same<int, std::underlying_type<e1>::type>::value // std::underlying_type
                 << std::is_same<char, std::result_of<fn_ptr()>::type>::value // std::result_of
+                << std::false_type::value
+                << std::true_type::value
                 << std::endl;
 
       // std::aligned_storage

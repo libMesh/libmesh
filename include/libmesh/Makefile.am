@@ -256,6 +256,13 @@ BUILT_SOURCES = \
         wrapped_function.h \
         wrapped_functor.h \
         zero_function.h \
+        attributes.h \
+        communicator.h \
+        data_type.h \
+        libmesh_call_mpi.h \
+        message_tag.h \
+        op_function.h \
+        packing.h \
         parallel.h \
         parallel_algebra.h \
         parallel_bin_sorter.h \
@@ -267,7 +274,15 @@ BUILT_SOURCES = \
         parallel_implementation.h \
         parallel_node.h \
         parallel_object.h \
+        parallel_only.h \
         parallel_sort.h \
+        post_wait_copy_buffer.h \
+        post_wait_delete_buffer.h \
+        post_wait_unpack_buffer.h \
+        post_wait_work.h \
+        request.h \
+        standard_type.h \
+        status.h \
         threads.h \
         threads_allocators.h \
         threads_none.h \
@@ -1275,6 +1290,27 @@ wrapped_functor.h: $(top_srcdir)/include/numerics/wrapped_functor.h
 zero_function.h: $(top_srcdir)/include/numerics/zero_function.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+attributes.h: $(top_srcdir)/include/parallel/attributes.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+communicator.h: $(top_srcdir)/include/parallel/communicator.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+data_type.h: $(top_srcdir)/include/parallel/data_type.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+libmesh_call_mpi.h: $(top_srcdir)/include/parallel/libmesh_call_mpi.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+message_tag.h: $(top_srcdir)/include/parallel/message_tag.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+op_function.h: $(top_srcdir)/include/parallel/op_function.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+packing.h: $(top_srcdir)/include/parallel/packing.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 parallel.h: $(top_srcdir)/include/parallel/parallel.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1308,7 +1344,31 @@ parallel_node.h: $(top_srcdir)/include/parallel/parallel_node.h
 parallel_object.h: $(top_srcdir)/include/parallel/parallel_object.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+parallel_only.h: $(top_srcdir)/include/parallel/parallel_only.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 parallel_sort.h: $(top_srcdir)/include/parallel/parallel_sort.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_copy_buffer.h: $(top_srcdir)/include/parallel/post_wait_copy_buffer.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_delete_buffer.h: $(top_srcdir)/include/parallel/post_wait_delete_buffer.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_unpack_buffer.h: $(top_srcdir)/include/parallel/post_wait_unpack_buffer.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_work.h: $(top_srcdir)/include/parallel/post_wait_work.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+request.h: $(top_srcdir)/include/parallel/request.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+standard_type.h: $(top_srcdir)/include/parallel/standard_type.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+status.h: $(top_srcdir)/include/parallel/status.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 threads.h: $(top_srcdir)/include/parallel/threads.h

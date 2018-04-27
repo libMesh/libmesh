@@ -19,6 +19,8 @@
 
 // Local Includes
 #include "libmesh/preconditioner.h"
+
+#include "libmesh/auto_ptr.h"
 #include "libmesh/eigen_preconditioner.h"
 #include "libmesh/petsc_preconditioner.h"
 #include "libmesh/trilinos_preconditioner.h"
