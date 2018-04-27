@@ -58,57 +58,10 @@ public:
   int rank;
 };
 
-#define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)           \
-  template<>                                            \
-  class OpFunction<cxxtype>                             \
-  {                                                     \
-  public:                                               \
-    static MPI_Op max()          { return MPI_MAX; }    \
-    static MPI_Op min()          { return MPI_MIN; }    \
-    static MPI_Op sum()          { return MPI_SUM; }    \
-    static MPI_Op product()      { return MPI_PROD; }   \
-    static MPI_Op logical_and()  { return MPI_LAND; }   \
-    static MPI_Op bitwise_and()  { return MPI_BAND; }   \
-    static MPI_Op logical_or()   { return MPI_LOR; }    \
-    static MPI_Op bitwise_or()   { return MPI_BOR; }    \
-    static MPI_Op logical_xor()  { return MPI_LXOR; }   \
-    static MPI_Op bitwise_xor()  { return MPI_BXOR; }   \
-    static MPI_Op max_location() { return MPI_MAXLOC; } \
-    static MPI_Op min_location() { return MPI_MINLOC; } \
-  }
+#endif // LIBMESH_HAVE_MPI
 
-#define LIBMESH_PARALLEL_FLOAT_OPS(cxxtype)             \
-  template<>                                            \
-  class OpFunction<cxxtype>                             \
-  {                                                     \
-  public:                                               \
-    static MPI_Op max()          { return MPI_MAX; }    \
-    static MPI_Op min()          { return MPI_MIN; }    \
-    static MPI_Op sum()          { return MPI_SUM; }    \
-    static MPI_Op product()      { return MPI_PROD; }   \
-    static MPI_Op max_location() { return MPI_MAXLOC; } \
-    static MPI_Op min_location() { return MPI_MINLOC; } \
-  }
-
-#else
-
-#define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)   \
-  template<>                                    \
-  class OpFunction<cxxtype>                     \
-  {                                             \
-  }
-
-#define LIBMESH_PARALLEL_FLOAT_OPS(cxxtype)     \
-  template<>                                    \
-  class OpFunction<cxxtype>                     \
-  {                                             \
-  }
-
-#endif
 
 #define LIBMESH_INT_TYPE(cxxtype,mpitype)                               \
-  LIBMESH_PARALLEL_INTEGER_OPS(cxxtype);                                \
-                                                                        \
   template<>                                                            \
   struct Attributes<cxxtype>                                            \
   {                                                                     \
@@ -118,8 +71,6 @@ public:
   }
 
 #define LIBMESH_FLOAT_TYPE(cxxtype,mpitype)                             \
-  LIBMESH_PARALLEL_FLOAT_OPS(cxxtype);                                  \
-                                                                        \
   template<>                                                            \
   struct Attributes<cxxtype>                                            \
   {                                                                     \
