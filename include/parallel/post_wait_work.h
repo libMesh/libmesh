@@ -26,13 +26,25 @@ namespace Parallel
 {
 //-------------------------------------------------------------------
 /**
- * A class that can be subclassed to allow other code to
- * perform work after a MPI_Wait succeeds
+ * An abstract base class that can be subclassed to allow other code
+ * to perform work after a MPI_Wait succeeds.  This makes it possible
+ * to automatically schedule deserialization, cleanup, or other
+ * operations such that they automatically take place after an
+ * asynchronous I/O operation has completed.
+ *
+ * See PostWaitCopyBuffer, PostWaitDeleteBuffer, and
+ * PostWaitUnpackBuffer for examples of useful subclasses that are
+ * automatically employed by the library.  See the
+ * Request::add_post_wait_work method for documentation of how to use
+ * these subclasses.  See Communicator method implementations for
+ * examples of all this in use, including chaining of multiple
+ * PostWaitWork operations.
  */
 struct PostWaitWork {
   virtual ~PostWaitWork() {}
 
-  virtual void run() {}
+  // Do *something* after a communication wait has succeeded.
+  virtual void run() = 0;
 };
 
 } // namespace Parallel
