@@ -56,22 +56,6 @@ public:
   ReplicatedMesh (const Parallel::Communicator & comm_in,
                   unsigned char dim=1);
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
-  /**
-   * Constructor which takes \p dim, the dimension of the mesh.  The
-   * mesh dimension can be changed (and may automatically be changed
-   * by mesh generation/loading) later.
-   *
-   * \deprecated LIBMESH_DISABLE_COMMWORLD is now the default, use the
-   * constructor that takes a Parallel::Communicator instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  explicit
-  ReplicatedMesh (unsigned char dim=1);
-#endif
-#endif
-
-
   /**
    * Copy-constructor.  This should be able to take a
    * serial or parallel mesh.

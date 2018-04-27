@@ -85,8 +85,7 @@ public:
    * You have to initialize the matrix before usage with \p init(...).
    */
   explicit
-  PetscMatrix (const Parallel::Communicator & comm_in
-               LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  PetscMatrix (const Parallel::Communicator & comm_in);
 
   /**
    * Constructor.  Creates a PetscMatrix assuming you already have a
@@ -97,8 +96,7 @@ public:
    */
   explicit
   PetscMatrix (Mat m,
-               const Parallel::Communicator & comm_in
-               LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+               const Parallel::Communicator & comm_in);
 
   /**
    * Destructor. Free all memory, but do not release the memory of the

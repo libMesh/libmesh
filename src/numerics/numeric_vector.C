@@ -76,19 +76,6 @@ NumericVector<T>::build(const Parallel::Communicator & comm, const SolverPackage
 }
 
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
-#ifdef LIBMESH_ENABLE_DEPRECATED
-template <typename T>
-std::unique_ptr<NumericVector<T>>
-NumericVector<T>::build(const SolverPackage solver_package)
-{
-  libmesh_deprecated();
-  return NumericVector<T>::build(CommWorld, solver_package);
-}
-#endif
-#endif
-
-
 
 template <typename T>
 void NumericVector<T>::insert (const T * v,

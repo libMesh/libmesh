@@ -51,8 +51,7 @@ public:
   /**
    *  Constructor. Initializes Eigen data structures
    */
-  EigenSparseLinearSolver (const libMesh::Parallel::Communicator & comm_in
-                           LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  EigenSparseLinearSolver (const libMesh::Parallel::Communicator & comm_in);
 
   /**
    * Destructor.

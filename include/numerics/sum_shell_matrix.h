@@ -52,16 +52,14 @@ public:
    * allowed to be multiplied with a vector and will give the expected
    * result.
    */
-  SumShellMatrix (const Parallel::Communicator & comm_in
-                  LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  SumShellMatrix (const Parallel::Communicator & comm_in);
 
   /**
    * Constructor that passes a vector of shell matrices.
    */
   explicit
   SumShellMatrix (const std::vector<ShellMatrix<T> *> & mat,
-                  const Parallel::Communicator & comm_in
-                  LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                  const Parallel::Communicator & comm_in);
 
   /**
    * Destructor.

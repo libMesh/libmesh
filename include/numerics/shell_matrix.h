@@ -51,8 +51,7 @@ public:
   /**
    * Constructor; does nothing.
    */
-  ShellMatrix (const Parallel::Communicator & comm_in
-               LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  ShellMatrix (const Parallel::Communicator & comm_in);
 
   /**
    * Destructor.

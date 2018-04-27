@@ -77,8 +77,7 @@ public:
    * \p init(...).
    */
   explicit
-  SparseMatrix (const Parallel::Communicator & comm
-                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  SparseMatrix (const Parallel::Communicator & comm);
 
   /**
    * Destructor. Free all memory, but do not release the memory of the

@@ -53,8 +53,7 @@ public:
   /**
    *  Constructor. Initializes Petsc data structures
    */
-  SlepcEigenSolver(const Parallel::Communicator & comm_in
-                   LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  SlepcEigenSolver(const Parallel::Communicator & comm_in);
 
 
   /**

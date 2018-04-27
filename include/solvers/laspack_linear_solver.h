@@ -55,8 +55,7 @@ public:
   /**
    *  Constructor. Initializes Laspack data structures
    */
-  LaspackLinearSolver (const libMesh::Parallel::Communicator & comm
-                       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  LaspackLinearSolver (const libMesh::Parallel::Communicator & comm);
 
   /**
    * Destructor.

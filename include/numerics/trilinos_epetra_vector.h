@@ -106,8 +106,7 @@ public:
    * and to simply provide additional functionality with the EpetraVector.
    */
   EpetraVector(Epetra_Vector & v,
-               const Parallel::Communicator & comm
-               LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+               const Parallel::Communicator & comm);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow

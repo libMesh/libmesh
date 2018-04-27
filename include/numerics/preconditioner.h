@@ -75,7 +75,7 @@ public:
    * std::unique_ptr for safety.
    */
   static std::unique_ptr<Preconditioner<T>>
-  build_preconditioner(const libMesh::Parallel::Communicator & comm LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
+  build_preconditioner(const libMesh::Parallel::Communicator & comm,
                        const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
@@ -86,7 +86,7 @@ public:
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
   static Preconditioner<T> *
-  build(const libMesh::Parallel::Communicator & comm LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
+  build(const libMesh::Parallel::Communicator & comm,
         const SolverPackage solver_package = libMesh::default_solver_package());
 #endif
 

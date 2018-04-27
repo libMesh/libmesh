@@ -50,8 +50,7 @@ public:
   /**
    *  Constructor. Initializes EigenPreconditioner data structures
    */
-  EigenPreconditioner (const libMesh::Parallel::Communicator & comm_in
-                       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  EigenPreconditioner (const libMesh::Parallel::Communicator & comm_in);
 
   /**
    * Destructor.

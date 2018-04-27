@@ -72,36 +72,6 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
 }
 
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
-#ifdef LIBMESH_ENABLE_DEPRECATED
-MeshBase::MeshBase (unsigned char d) :
-  ParallelObject (CommWorld),
-  boundary_info  (new BoundaryInfo(*this)),
-  _n_parts       (1),
-  _is_prepared   (false),
-  _point_locator (),
-  _count_lower_dim_elems_in_point_locator(true),
-  _partitioner   (),
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  _next_unique_id(DofObject::invalid_unique_id),
-#endif
-  _skip_partitioning(libMesh::on_command_line("--skip-partitioning")),
-  _skip_renumber_nodes_and_elements(false),
-  _allow_remote_element_removal(true),
-  _spatial_dimension(d),
-  _default_ghosting(new GhostPointNeighbors(*this))
-{
-  libmesh_deprecated();
-  _elem_dims.insert(d);
-  _ghosting_functors.insert(_default_ghosting.get());
-  libmesh_assert_less_equal (LIBMESH_DIM, 3);
-  libmesh_assert_greater_equal (LIBMESH_DIM, d);
-  libmesh_assert (libMesh::initialized());
-}
-#endif
-#endif // !LIBMESH_DISABLE_COMMWORLD
-
-
 
 MeshBase::MeshBase (const MeshBase & other_mesh) :
   ParallelObject (other_mesh),

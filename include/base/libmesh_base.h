@@ -24,18 +24,6 @@
 
 namespace libMesh {
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
-/**
- * \returns The number of processors used in the current simulation.
- */
-processor_id_type n_processors();
-
-/**
- * \returns The index of the local processor.
- */
-processor_id_type processor_id();
-#endif
-
 /**
  * \returns The number of processors libMesh was initialized with.
  */
@@ -83,23 +71,6 @@ extern int _n_threads;
 
 // ------------------------------------------------------------
 // libMesh inline member functions
-#ifndef LIBMESH_DISABLE_COMMWORLD
-inline
-libMesh::processor_id_type libMesh::n_processors()
-{
-  return libMesh::global_n_processors();
-}
-
-
-
-inline
-libMesh::processor_id_type libMesh::processor_id()
-{
-  return libMesh::global_processor_id();
-}
-#endif // LIBMESH_DISABLE_COMMWORLD
-
-
 inline
 libMesh::processor_id_type libMesh::global_n_processors()
 {

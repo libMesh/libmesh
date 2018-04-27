@@ -116,21 +116,6 @@ public:
   build(const Parallel::Communicator & comm,
         const SolverPackage solver_package = libMesh::default_solver_package());
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
-  /**
-   * Builds a \p NumericVector on the processors in communicator
-   * CommWorld using the linear solver package specified by \p
-   * solver_package.
-   *
-   * \deprecated LIBMESH_DISABLE_COMMWORLD is now the default, use the
-   * build() method that takes a Parallel::Communicator instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  static std::unique_ptr<NumericVector<T>>
-  build(const SolverPackage solver_package = libMesh::default_solver_package());
-#endif
-#endif
-
   /**
    * \returns \p true if the vector has been initialized,
    * false otherwise.
