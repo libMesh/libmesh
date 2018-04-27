@@ -87,21 +87,34 @@ public:
 
   bool test (status & status);
 
+  // Breaking non-blocking sends into multiple requests can require
+  // chaining multiple requests into a single Request.  After using
+  // add_prior_request, any wait() on this request automatically
+  // begins with a wait() on a copy of the added Request \p req.
+  //
+  // The added request should not already have a prior request of its
+  // own.  However, if \p this request already has a prior, it will be
+  // moved to and thus invoked prior to the new prior request \p req.
   void add_prior_request(const Request & req);
 
+  // Objects of a PostWaitWork subclass can be added to this request,
+  // and they will automatically be run() after a wait() on this
+  // request completes.  The \p work object must be heap allocated,
+  // and will be deleted once \p this Request and any Request copies
+  // made from \p this have been cleaned up.
   void add_post_wait_work(PostWaitWork * work);
 
 private:
   request _request;
 
-  // Breaking non-blocking sends into multiple requests can require chaining
-  // multiple requests into a single Request
   std::unique_ptr<Request> _prior_request;
 
   // post_wait_work->first is a vector of work to do after a wait
   // finishes; post_wait_work->second is a reference count so that
   // Request objects will behave roughly like a shared_ptr and be
   // usable in STL containers
+  //
+  // FIXME - we require C++11 now, so we can be smarter about this.
   std::pair<std::vector <PostWaitWork * >, unsigned int> * post_wait_work;
 };
 
