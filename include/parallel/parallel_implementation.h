@@ -40,6 +40,21 @@ namespace Parallel {
 
 #ifdef LIBMESH_HAVE_MPI
 
+#if MPI_VERSION > 1
+/**
+ * Macros to do MPI_IN_PLACE when available or use a temporary buffer
+ * otherwise.
+ */
+#define LIBMESH_MPI_TEMP_BUF(declaration) ((void) 0)
+#define LIBMESH_MPI_IN_PLACE_OR(addr) MPI_IN_PLACE
+
+#else
+
+#define LIBMESH_MPI_TEMP_BUF(declaration) declaration
+#define LIBMESH_MPI_IN_PLACE_OR(addr) addr
+
+#endif
+
 /**
  * Templated function to return the appropriate MPI datatype
  * for use with built-in C types when combined with an int
@@ -950,10 +965,10 @@ inline void Communicator::min(T & r) const
     {
       LOG_SCOPE("min(scalar)", "Parallel");
 
-      T temp = r;
+      LIBMESH_MPI_TEMP_BUF(T temp = r);
       libmesh_call_mpi
-        (MPI_Allreduce (&temp, &r, 1, StandardType<T>(&temp),
-                        OpFunction<T>::min(),
+        (MPI_Allreduce (LIBMESH_MPI_IN_PLACE_OR(&temp), &r, 1,
+                        StandardType<T>(&r), OpFunction<T>::min(),
                         this->get()));
     }
 }
@@ -965,11 +980,10 @@ inline void Communicator::min(bool & r) const
     {
       LOG_SCOPE("min(bool)", "Parallel");
 
-      unsigned int tempsend = r;
-      unsigned int temp;
-
+      unsigned int temp = r;
+      LIBMESH_MPI_TEMP_BUF(unsigned int tempsend = r);
       libmesh_call_mpi
-        (MPI_Allreduce (&tempsend, &temp, 1,
+        (MPI_Allreduce (LIBMESH_MPI_IN_PLACE_OR(&tempsend), &temp, 1,
                         StandardType<unsigned int>(),
                         OpFunction<unsigned int>::min(),
                         this->get()));
@@ -987,10 +1001,11 @@ inline void Communicator::min(std::vector<T> & r) const
 
       libmesh_assert(this->verify(r.size()));
 
-      std::vector<T> temp(r);
+      LIBMESH_MPI_TEMP_BUF(std::vector<T> temp(r));
       libmesh_call_mpi
-        (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size()),
-                        StandardType<T>(&temp[0]),
+        (MPI_Allreduce (LIBMESH_MPI_IN_PLACE_OR(&temp[0]), &r[0],
+                        cast_int<int>(r.size()),
+                        StandardType<T>(&r[0]),
                         OpFunction<T>::min(),
                         this->get()));
     }
@@ -1142,12 +1157,12 @@ inline void Communicator::max(T & r) const
     {
       LOG_SCOPE("max(scalar)", "Parallel");
 
-      T temp;
+      LIBMESH_MPI_TEMP_BUF(T temp = r);
       libmesh_call_mpi
-        (MPI_Allreduce (&r, &temp, 1, StandardType<T>(&r),
+        (MPI_Allreduce (LIBMESH_MPI_IN_PLACE_OR(&temp), &r, 1,
+                        StandardType<T>(&r),
                         OpFunction<T>::max(),
                         this->get()));
-      r = temp;
     }
 }
 
@@ -1158,10 +1173,10 @@ inline void Communicator::max(bool & r) const
     {
       LOG_SCOPE("max(bool)", "Parallel");
 
-      unsigned int tempsend = r;
-      unsigned int temp;
+      unsigned int temp = r;
+      LIBMESH_MPI_TEMP_BUF(unsigned int tempsend = r);
       libmesh_call_mpi
-        (MPI_Allreduce (&tempsend, &temp, 1,
+        (MPI_Allreduce (LIBMESH_MPI_IN_PLACE_OR(&tempsend), &temp, 1,
                         StandardType<unsigned int>(),
                         OpFunction<unsigned int>::max(),
                         this->get()));
@@ -1179,10 +1194,11 @@ inline void Communicator::max(std::vector<T> & r) const
 
       libmesh_assert(this->verify(r.size()));
 
-      std::vector<T> temp(r);
+      LIBMESH_MPI_TEMP_BUF(std::vector<T> temp(r));
       libmesh_call_mpi
-        (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size()),
-                        StandardType<T>(&temp[0]),
+        (MPI_Allreduce (LIBMESH_MPI_IN_PLACE_OR(&temp[0]), &r[0],
+                        cast_int<int>(r.size()),
+                        StandardType<T>(&r[0]),
                         OpFunction<T>::max(),
                         this->get()));
     }
@@ -1339,9 +1355,10 @@ inline void Communicator::sum(T & r) const
     {
       LOG_SCOPE("sum()", "Parallel");
 
-      T temp = r;
+      LIBMESH_MPI_TEMP_BUF(T temp = r);
       libmesh_call_mpi
-        (MPI_Allreduce (&temp, &r, 1, StandardType<T>(&temp),
+        (MPI_Allreduce (LIBMESH_MPI_IN_PLACE_OR(&temp), &r, 1,
+                        StandardType<T>(&r),
                         OpFunction<T>::sum(),
                         this->get()));
     }
@@ -1357,10 +1374,11 @@ inline void Communicator::sum(std::vector<T> & r) const
 
       libmesh_assert(this->verify(r.size()));
 
-      std::vector<T> temp(r);
+      LIBMESH_MPI_TEMP_BUF(std::vector<T> temp(r));
       libmesh_call_mpi
-        (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size()),
-                        StandardType<T>(&temp[0]),
+        (MPI_Allreduce (LIBMESH_MPI_IN_PLACE_OR(&temp[0]), &r[0],
+                        cast_int<int>(r.size()),
+                        StandardType<T>(&r[0]),
                         OpFunction<T>::sum(),
                         this->get()));
     }
@@ -1376,9 +1394,10 @@ inline void Communicator::sum(std::complex<T> & r) const
     {
       LOG_SCOPE("sum()", "Parallel");
 
-      std::complex<T> temp(r);
+      LIBMESH_MPI_TEMP_BUF(std::complex<T> temp(r));
       libmesh_call_mpi
-        (MPI_Allreduce (&temp, &r, 2, StandardType<T>(),
+        (MPI_Allreduce (LIBMESH_MPI_IN_PLACE_OR(&temp), &r, 2,
+                        StandardType<T>(),
                         OpFunction<T>::sum(),
                         this->get()));
     }
@@ -1394,9 +1413,10 @@ inline void Communicator::sum(std::vector<std::complex<T>> & r) const
 
       libmesh_assert(this->verify(r.size()));
 
-      std::vector<std::complex<T>> temp(r);
+      LIBMESH_MPI_TEMP_BUF(std::vector<std::complex<T>> temp(r));
       libmesh_call_mpi
-        (MPI_Allreduce (&temp[0], &r[0], cast_int<int>(r.size() * 2),
+        (MPI_Allreduce (LIBMESH_MPI_IN_PLACE_OR(&temp[0]), &r[0],
+                        cast_int<int>(r.size() * 2),
                         StandardType<T>(libmesh_nullptr),
                         OpFunction<T>::sum(), this->get()));
     }
