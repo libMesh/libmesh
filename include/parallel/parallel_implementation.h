@@ -58,18 +58,6 @@ public:
   int rank;
 };
 
-// Declare StandardType specializations early so we can use them in
-// anonymous helper functions later
-
-#define LIBMESH_STANDARD_TYPE(cxxtype,mpitype)                          \
-  template<>                                                            \
-  class StandardType<cxxtype> : public DataType                         \
-  {                                                                     \
-  public:                                                               \
-    explicit                                                            \
-      StandardType(const cxxtype * = libmesh_nullptr) : DataType(mpitype) {} \
-  }
-
 #define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)           \
   template<>                                            \
   class OpFunction<cxxtype>                             \
@@ -104,15 +92,6 @@ public:
 
 #else
 
-#define LIBMESH_STANDARD_TYPE(cxxtype,mpitype)                          \
-  template<>                                                            \
-  class StandardType<cxxtype> : public DataType                         \
-  {                                                                     \
-  public:                                                               \
-    explicit                                                            \
-      StandardType(const cxxtype * = libmesh_nullptr) : DataType() {}   \
-  }
-
 #define LIBMESH_PARALLEL_INTEGER_OPS(cxxtype)   \
   template<>                                    \
   class OpFunction<cxxtype>                     \
@@ -128,7 +107,6 @@ public:
 #endif
 
 #define LIBMESH_INT_TYPE(cxxtype,mpitype)                               \
-  LIBMESH_STANDARD_TYPE(cxxtype,mpitype);                               \
   LIBMESH_PARALLEL_INTEGER_OPS(cxxtype);                                \
                                                                         \
   template<>                                                            \
@@ -140,7 +118,6 @@ public:
   }
 
 #define LIBMESH_FLOAT_TYPE(cxxtype,mpitype)                             \
-  LIBMESH_STANDARD_TYPE(cxxtype,mpitype);                               \
   LIBMESH_PARALLEL_FLOAT_OPS(cxxtype);                                  \
                                                                         \
   template<>                                                            \
@@ -180,23 +157,7 @@ LIBMESH_INT_TYPE(unsigned long,MPI_UNSIGNED_LONG);
 #if MPI_VERSION > 1 || !defined(LIBMESH_HAVE_MPI)
 LIBMESH_INT_TYPE(unsigned long long,MPI_UNSIGNED_LONG_LONG);
 #else
-// MPI 1.0 did not have an unsigned long long type, so we have to use
-// MPI_UNSIGNED_LONG in this case.  If "unsigned long" and "unsigned
-// long long" are different sizes on your system, we detect this and
-// throw an error in dbg mode rather than communicating values
-// incorrectly.
-template<>
-class StandardType<unsigned long long> : public DataType
-{
-public:
-  explicit
-  StandardType(const cxxtype * = libmesh_nullptr) :
-    DataType(MPI_UNSIGNED_LONG)
-  {
-    libmesh_assert_equal_to(sizeof(unsigned long long),
-                            sizeof(unsigned long));
-  }
-};
+// MPI 1.0 did not have an unsigned long long type...
 
 LIBMESH_PARALLEL_INTEGER_OPS(unsigned long long);                                \
 
@@ -214,116 +175,6 @@ LIBMESH_FLOAT_TYPE(double,MPI_DOUBLE);
 LIBMESH_FLOAT_TYPE(long double,MPI_LONG_DOUBLE);
 LIBMESH_CONTAINER_TYPE(std::set);
 LIBMESH_CONTAINER_TYPE(std::vector);
-
-template<typename T1, typename T2>
-class StandardType<std::pair<T1, T2>> : public DataType
-{
-public:
-  explicit
-  StandardType(const std::pair<T1, T2> * example = libmesh_nullptr) {
-    // We need an example for MPI_Address to use
-    static const std::pair<T1, T2> p;
-    if (!example)
-      example = &p;
-
-#ifdef LIBMESH_HAVE_MPI
-
-    // Get the sub-data-types, and make sure they live long enough
-    // to construct the derived type
-    StandardType<T1> d1(&example->first);
-    StandardType<T2> d2(&example->second);
-
-#if MPI_VERSION == 1
-    // Use MPI_LB and MPI_UB here to workaround potential bugs from
-    // nested MPI_LB and MPI_UB in the specifications of d1 and/or d2:
-    // https://github.com/libMesh/libmesh/issues/631
-    MPI_Datatype types[] = { MPI_LB, (data_type)d1, (data_type)d2, MPI_UB };
-    int blocklengths[] = {1,1,1,1};
-    MPI_Aint displs[4];
-
-    libmesh_call_mpi
-      (MPI_Address (const_cast<std::pair<T1,T2> *>(example),
-                    &displs[0]));
-    libmesh_call_mpi
-      (MPI_Address (const_cast<T1*>(&example->first),
-                    &displs[1]));
-    libmesh_call_mpi
-      (MPI_Address (const_cast<T2*>(&example->second),
-                    &displs[2]));
-    libmesh_call_mpi
-      (MPI_Address (const_cast<std::pair<T1,T2> *>(example+1),
-                    &displs[3]));
-
-    displs[1] -= displs[0];
-    displs[2] -= displs[0];
-    displs[3] -= displs[0];
-    displs[0] = 0;
-
-    libmesh_call_mpi
-      (MPI_Type_struct (4, blocklengths, displs, types,
-                        &_datatype));
-
-#else
-    MPI_Datatype types[] = { (data_type)d1, (data_type)d2 };
-    int blocklengths[] = {1,1};
-    MPI_Aint displs[2], start;
-
-    libmesh_call_mpi
-      (MPI_Get_address (const_cast<std::pair<T1,T2> *>(example),
-                        &start));
-    libmesh_call_mpi
-      (MPI_Get_address (const_cast<T1*>(&example->first),
-                        &displs[0]));
-    libmesh_call_mpi
-      (MPI_Get_address (const_cast<T2*>(&example->second),
-                        &displs[1]));
-    displs[0] -= start;
-    displs[1] -= start;
-
-    // create a prototype structure
-    MPI_Datatype tmptype;
-    libmesh_call_mpi
-      (MPI_Type_create_struct (2, blocklengths, displs, types,
-                               &tmptype));
-    libmesh_call_mpi
-      (MPI_Type_commit (&tmptype));
-
-    // resize the structure type to account for padding, if any
-    libmesh_call_mpi
-      (MPI_Type_create_resized (tmptype, 0,
-                                sizeof(std::pair<T1,T2>),
-                                &_datatype));
-    libmesh_call_mpi
-      (MPI_Type_free (&tmptype));
-#endif
-
-    this->commit();
-
-#endif // LIBMESH_HAVE_MPI
-
-  }
-
-  StandardType(const StandardType<std::pair<T1, T2>> & t)
-  {
-#ifdef LIBMESH_HAVE_MPI
-    libmesh_call_mpi
-      (MPI_Type_dup (t._datatype, &_datatype));
-#endif
-  }
-
-  ~StandardType() { this->free(); }
-};
-
-template<typename T>
-class StandardType<std::complex<T>> : public DataType
-{
-public:
-  explicit
-  StandardType(const std::complex<T> * /*example*/ = libmesh_nullptr) :
-    DataType(StandardType<T>(libmesh_nullptr), 2) {}
-
-  ~StandardType() { this->free(); }
-};
 
 } // namespace Parallel
 
