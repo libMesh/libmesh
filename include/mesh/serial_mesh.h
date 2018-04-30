@@ -39,25 +39,6 @@ public:
               unsigned char dim=1)
     : ReplicatedMesh(comm_in,dim) {}
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
-  /**
-   * Constructor which takes \p dim, the dimension of the mesh.  The
-   * mesh dimension can be changed (and may automatically be changed
-   * by mesh generation/loading) later.
-   *
-   * \deprecated LIBMESH_DISABLE_COMMWORLD is now the default, use the
-   * constructor that takes a Parallel::Communicator instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  explicit
-  SerialMesh (unsigned char dim=1)
-    : ReplicatedMesh(dim)
-  {
-    libmesh_deprecated();
-  }
-#endif
-#endif
-
   SerialMesh (const UnstructuredMesh & other_mesh) : ReplicatedMesh(other_mesh) {}
 
   virtual std::unique_ptr<MeshBase> clone () const libmesh_override

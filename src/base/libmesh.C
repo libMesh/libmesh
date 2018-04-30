@@ -192,25 +192,10 @@ extern SolverPackage _solver_package;
 // ------------------------------------------------------------
 // libMesh data initialization
 #ifdef LIBMESH_HAVE_MPI
-#ifndef LIBMESH_DISABLE_COMMWORLD
-MPI_Comm           COMM_WORLD = MPI_COMM_NULL;
-#endif
 MPI_Comm           GLOBAL_COMM_WORLD = MPI_COMM_NULL;
 #else
-#ifndef LIBMESH_DISABLE_COMMWORLD
-int                COMM_WORLD = 0;
-#endif
 int                GLOBAL_COMM_WORLD = 0;
 #endif
-
-#ifdef LIBMESH_DISABLE_COMMWORLD
-Parallel::FakeCommunicator CommWorld;
-Parallel::FakeCommunicator & Parallel::Communicator_World = CommWorld;
-#else
-Parallel::Communicator CommWorld;
-Parallel::Communicator & Parallel::Communicator_World = CommWorld;
-#endif
-
 
 OStreamProxy out(std::cout);
 OStreamProxy err(std::cerr);
@@ -459,11 +444,6 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       this->_comm = COMM_WORLD_IN;
 
       libMesh::GLOBAL_COMM_WORLD = COMM_WORLD_IN;
-
-#ifndef LIBMESH_DISABLE_COMMWORLD
-      libMesh::COMM_WORLD = COMM_WORLD_IN;
-      Parallel::Communicator_World = COMM_WORLD_IN;
-#endif
 
       //MPI_Comm_set_name not supported in at least SGI MPT's MPI implementation
       //MPI_Comm_set_name (libMesh::COMM_WORLD, "libMesh::COMM_WORLD");
@@ -813,9 +793,6 @@ LibMeshInit::~LibMeshInit()
   if (!libMesh::on_command_line ("--disable-mpi"))
     {
       this->_comm.clear();
-#ifndef LIBMESH_DISABLE_COMMWORLD
-      Parallel::Communicator_World.clear();
-#endif
 
       if (libmesh_initialized_mpi)
         {

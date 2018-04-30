@@ -39,58 +39,13 @@
 // libMesh Includes
 #include "libmesh/libmesh_common.h"
 
-namespace libMesh
-{
-
-/**
- * The Parallel namespace is for wrapper functions
- * for common general parallel synchronization tasks.
- *
- * For MPI 1.1 compatibility, temporary buffers are used
- * instead of MPI 2's MPI_IN_PLACE
- */
-namespace Parallel
-{
-
-// FakeCommunicator for debugging inappropriate CommWorld uses
-class FakeCommunicator
-{
-  operator Communicator & ()
-  {
-    libmesh_not_implemented();
-    static Communicator temp;
-    return temp;
-  }
-};
-
-} // namespace Parallel
-
-  /**
-   * The default libMesh communicator.
-   *
-   * If this communicator is disabled, we also disable it as a default
-   * argument to functions which accept a default communicator
-   * argument.  This should expose implicit uses of the default
-   * communicator as compile-time rather than run-time errors.
-   *
-   * The macro LIBMESH_CAN_DEFAULT_TO_COMMWORLD effects this
-   * functionality; it is empty (and so leaves arguments with no
-   * default value) if the default is disabled, and it sets something
-   * equal to the default otherwise.
-   */
-#ifdef LIBMESH_DISABLE_COMMWORLD
-extern Parallel::FakeCommunicator CommWorld;
-#define LIBMESH_CAN_DEFAULT_TO_COMMWORLD
-#else
-extern Parallel::Communicator CommWorld;
-#define LIBMESH_CAN_DEFAULT_TO_COMMWORLD = libMesh::CommWorld
-#endif
-
-} // namespace libMesh
-
 // Define all the implementations separately; users might want to look
 // through this file for APIs, and it's long enough already.
 
 #include "libmesh/parallel_implementation.h"
+
+// Define a years-deprecated old macro to support anyone still using
+// it.  Attn: anyone-still-using-it - stop!
+#define LIBMESH_CAN_DEFAULT_TO_COMMWORLD
 
 #endif // LIBMESH_PARALLEL_H

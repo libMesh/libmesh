@@ -130,23 +130,6 @@ ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
 
 
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
-#ifdef LIBMESH_ENABLE_DEPRECATED
-ReplicatedMesh::ReplicatedMesh (unsigned char d) :
-  UnstructuredMesh (d)
-{
-  libmesh_deprecated();
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  // In serial we just need to reset the next unique id to zero
-  // here in the constructor.
-  _next_unique_id = 0;
-#endif
-  _partitioner = libmesh_make_unique<MetisPartitioner>();
-}
-#endif
-#endif
-
-
 ReplicatedMesh::~ReplicatedMesh ()
 {
   this->clear();  // Free nodes and elements

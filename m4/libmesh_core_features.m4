@@ -106,27 +106,6 @@ AS_IF([test "$enableblockedstorage" != no],
 
 
 # --------------------------------------------------------------
-# default comm_world - now disabled by default
-# --------------------------------------------------------------
-AC_ARG_ENABLE(default-comm-world,
-              [AS_HELP_STRING([--enable-default-comm-world],[Provide global libMesh::CommWorld])],
-              enabledefaultcommworld=$enableval,
-              enabledefaultcommworld=no)
-
-AC_SUBST(enabledefaultcommworld)
-AS_IF([test "$enabledefaultcommworld" != no],
-      [
-        AC_MSG_RESULT([>>> WARNING: using a legacy option <<<])
-        AC_MSG_RESULT([>>> Configuring library to enable a default libMesh::CommWorld <<<])
-      ],
-      [
-        AC_MSG_RESULT([<<< Configuring library to disable libMesh::CommWorld >>>])
-        AC_DEFINE(DISABLE_COMMWORLD, 1, [Flag indicating if the library should disable libMesh::CommWorld])
-      ])
-# --------------------------------------------------------------
-
-
-# --------------------------------------------------------------
 # legacy include paths - disabled by default
 # --------------------------------------------------------------
 AC_ARG_ENABLE(legacy-include-paths,

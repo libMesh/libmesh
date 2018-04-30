@@ -108,8 +108,7 @@ public:
    * and to simply provide additional functionality with the PetscVector.
    */
   PetscVector(Vec v,
-              const Parallel::Communicator & comm_in
-              LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+              const Parallel::Communicator & comm_in);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow

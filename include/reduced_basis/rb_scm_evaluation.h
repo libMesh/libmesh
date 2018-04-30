@@ -57,8 +57,7 @@ public:
   /**
    * Constructor.
    */
-  RBSCMEvaluation (const Parallel::Communicator & comm
-                   LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  RBSCMEvaluation (const Parallel::Communicator & comm);
 
   /**
    * Destructor.

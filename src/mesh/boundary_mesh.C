@@ -33,18 +33,6 @@ BoundaryMesh::BoundaryMesh(const Parallel::Communicator & comm_in,
 
 
 
-#ifndef LIBMESH_DISABLE_COMMWORLD
-#ifdef LIBMESH_ENABLE_DEPRECATED
-BoundaryMesh::BoundaryMesh(unsigned char d) :
-  Mesh(d)
-{
-  libmesh_deprecated();
-}
-#endif
-#endif
-
-
-
 BoundaryMesh::~BoundaryMesh()
 {
   this->clear();

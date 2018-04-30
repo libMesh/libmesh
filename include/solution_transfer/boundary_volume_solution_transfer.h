@@ -47,7 +47,7 @@ namespace libMesh {
 class BoundaryVolumeSolutionTransfer : public SolutionTransfer
 {
 public:
-  BoundaryVolumeSolutionTransfer (const Parallel::Communicator & comm_in LIBMESH_CAN_DEFAULT_TO_COMMWORLD) :
+  BoundaryVolumeSolutionTransfer (const Parallel::Communicator & comm_in) :
     SolutionTransfer(comm_in)
   {}
 

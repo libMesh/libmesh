@@ -54,8 +54,7 @@ public:
   /**
    *  Constructor. Initializes Aztec data structures
    */
-  AztecLinearSolver (const libMesh::Parallel::Communicator & comm
-                     LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  AztecLinearSolver (const libMesh::Parallel::Communicator & comm);
 
   /**
    * Destructor.

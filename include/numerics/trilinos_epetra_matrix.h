@@ -73,8 +73,7 @@ public:
    *
    * You have to initialize the matrix before usage with \p init(...).
    */
-  EpetraMatrix (const Parallel::Communicator & comm
-                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  EpetraMatrix (const Parallel::Communicator & comm);
 
   /**
    * Constructor.  Creates a EpetraMatrix assuming you already have a
@@ -85,8 +84,7 @@ public:
    * with the EpetraMatrix.
    */
   EpetraMatrix (Epetra_FECrsMatrix * m,
-                const Parallel::Communicator & comm
-                LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+                const Parallel::Communicator & comm);
 
   /**
    * Destructor. Free all memory, but do not release the memory of the

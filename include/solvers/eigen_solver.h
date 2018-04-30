@@ -62,8 +62,7 @@ public:
   /**
    *  Constructor. Initializes Solver data structures
    */
-  EigenSolver (const Parallel::Communicator & comm_in
-               LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  EigenSolver (const Parallel::Communicator & comm_in);
 
   /**
    * Destructor.
@@ -74,8 +73,7 @@ public:
    * Builds an \p EigenSolver using the linear solver package specified by
    * \p solver_package
    */
-  static std::unique_ptr<EigenSolver<T>> build(const Parallel::Communicator & comm_in
-                                               LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
+  static std::unique_ptr<EigenSolver<T>> build(const Parallel::Communicator & comm_in,
                                                const SolverPackage solver_package = SLEPC_SOLVERS);
 
   /**
