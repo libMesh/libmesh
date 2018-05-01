@@ -408,7 +408,6 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 
       if (!flag)
         {
-#if MPI_VERSION > 1
           int mpi_thread_provided;
           const int mpi_thread_requested = libMesh::n_threads() > 1 ?
             MPI_THREAD_FUNNELED :
@@ -439,17 +438,6 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
               // libMesh::libMeshPrivateData::_n_threads = 1;
               // task_scheduler.reset (new Threads::task_scheduler_init(libMesh::n_threads()));
             }
-#else
-          if (libMesh::libMeshPrivateData::_n_threads > 1)
-            {
-              libmesh_warning("Warning: using MPI1 for threaded code.\n" <<
-                              "Be sure your library is funneled-thread-safe..." <<
-                              std::endl);
-            }
-
-          libmesh_call_mpi
-            (MPI_Init (&argc, const_cast<char ***>(&argv)));
-#endif
           libmesh_initialized_mpi = true;
         }
 
@@ -477,21 +465,12 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       // into a debugger with a proper stack when an MPI error occurs.
       if (libMesh::on_command_line ("--handle-mpi-errors"))
         {
-#if MPI_VERSION > 1
           libmesh_call_mpi
             (MPI_Comm_create_errhandler(libMesh_MPI_Handler, &libmesh_errhandler));
           libmesh_call_mpi
             (MPI_Comm_set_errhandler(libMesh::GLOBAL_COMM_WORLD, libmesh_errhandler));
           libmesh_call_mpi
             (MPI_Comm_set_errhandler(MPI_COMM_WORLD, libmesh_errhandler));
-#else
-          libmesh_call_mpi
-            (MPI_Errhandler_create(libMesh_MPI_Handler, &libmesh_errhandler));
-          libmesh_call_mpi
-            (MPI_Errhandler_set(libMesh::GLOBAL_COMM_WORLD, libmesh_errhandler));
-          libmesh_call_mpi
-            (MPI_Errhandler_set(MPI_COMM_WORLD, libmesh_errhandler));
-#endif // #if MPI_VERSION > 1
         }
     }
 
