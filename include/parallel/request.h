@@ -37,7 +37,7 @@ namespace Parallel
 {
 
 // Forward declarations
-class PostWaitWork;
+struct PostWaitWork;
 
 #ifdef LIBMESH_HAVE_MPI
 
