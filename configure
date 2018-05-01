@@ -855,7 +855,6 @@ LIBMESH_ENABLE_COMPLEX_TRUE
 LIBMESH_ENABLE_INFINITE_ELEMENTS_FALSE
 LIBMESH_ENABLE_INFINITE_ELEMENTS_TRUE
 enablelegacyincludepaths
-enabledefaultcommworld
 enabledeprecated
 enablewarnings
 enableuniqueptr
@@ -1159,7 +1158,6 @@ enable_unique_ptr
 enable_warnings
 enable_deprecated
 enable_blocked_storage
-enable_default_comm_world
 enable_legacy_include_paths
 enable_legacy_using_namespace
 with_boundary_id_bytes
@@ -1957,8 +1955,6 @@ Optional Features:
                           warnings
   --enable-blocked-storage
                           Support for blocked matrix/vector storage
-  --enable-default-comm-world
-                          Provide global libMesh::CommWorld
   --enable-legacy-include-paths
                           allow for e.g. #include "header.h" instead of
                           #include "libmesh/header.h"
@@ -30205,37 +30201,6 @@ if test "$enableblockedstorage" != no; then :
 $as_echo "<<< Configuring library to use blocked storage data structures >>>" >&6; }
 
 $as_echo "#define ENABLE_BLOCKED_STORAGE 1" >>confdefs.h
-
-
-fi
-# --------------------------------------------------------------
-
-
-# --------------------------------------------------------------
-# default comm_world - now disabled by default
-# --------------------------------------------------------------
-# Check whether --enable-default-comm-world was given.
-if test "${enable_default_comm_world+set}" = set; then :
-  enableval=$enable_default_comm_world; enabledefaultcommworld=$enableval
-else
-  enabledefaultcommworld=no
-fi
-
-
-
-if test "$enabledefaultcommworld" != no; then :
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> WARNING: using a legacy option <<<" >&5
-$as_echo ">>> WARNING: using a legacy option <<<" >&6; }
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> Configuring library to enable a default libMesh::CommWorld <<<" >&5
-$as_echo ">>> Configuring library to enable a default libMesh::CommWorld <<<" >&6; }
-
-else
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library to disable libMesh::CommWorld >>>" >&5
-$as_echo "<<< Configuring library to disable libMesh::CommWorld >>>" >&6; }
-
-$as_echo "#define DISABLE_COMMWORLD 1" >>confdefs.h
 
 
 fi
