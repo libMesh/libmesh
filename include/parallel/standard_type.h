@@ -100,9 +100,7 @@ private:
 #endif
 
 LIBMESH_STANDARD_TYPE(char,MPI_CHAR);
-#if MPI_VERSION > 1
 LIBMESH_STANDARD_TYPE(signed char,MPI_SIGNED_CHAR);
-#endif
 LIBMESH_STANDARD_TYPE(unsigned char,MPI_UNSIGNED_CHAR);
 LIBMESH_STANDARD_TYPE(short int,MPI_SHORT);
 LIBMESH_STANDARD_TYPE(unsigned short int,MPI_UNSIGNED_SHORT);
@@ -111,28 +109,7 @@ LIBMESH_STANDARD_TYPE(unsigned int,MPI_UNSIGNED);
 LIBMESH_STANDARD_TYPE(long,MPI_LONG);
 LIBMESH_STANDARD_TYPE(long long,MPI_LONG_LONG_INT);
 LIBMESH_STANDARD_TYPE(unsigned long,MPI_UNSIGNED_LONG);
-#if MPI_VERSION > 1 || !defined(LIBMESH_HAVE_MPI)
 LIBMESH_STANDARD_TYPE(unsigned long long,MPI_UNSIGNED_LONG_LONG);
-#else
-// MPI 1.0 did not have an unsigned long long type, so we have to use
-// MPI_UNSIGNED_LONG in this case.  If "unsigned long" and "unsigned
-// long long" are different sizes on your system, we detect this and
-// throw an error in dbg mode rather than communicating values
-// incorrectly.
-template<>
-class StandardType<unsigned long long> : public DataType
-{
-public:
-  explicit
-  StandardType(const cxxtype * = libmesh_nullptr) :
-    DataType(MPI_UNSIGNED_LONG)
-  {
-    libmesh_assert_equal_to(sizeof(unsigned long long),
-                            sizeof(unsigned long));
-  }
-};
-#endif
-
 LIBMESH_STANDARD_TYPE(float,MPI_FLOAT);
 LIBMESH_STANDARD_TYPE(double,MPI_DOUBLE);
 LIBMESH_STANDARD_TYPE(long double,MPI_LONG_DOUBLE);
@@ -155,37 +132,6 @@ public:
     StandardType<T1> d1(&example->first);
     StandardType<T2> d2(&example->second);
 
-#if MPI_VERSION == 1
-    // Use MPI_LB and MPI_UB here to workaround potential bugs from
-    // nested MPI_LB and MPI_UB in the specifications of d1 and/or d2:
-    // https://github.com/libMesh/libmesh/issues/631
-    MPI_Datatype types[] = { MPI_LB, (data_type)d1, (data_type)d2, MPI_UB };
-    int blocklengths[] = {1,1,1,1};
-    MPI_Aint displs[4];
-
-    libmesh_call_mpi
-      (MPI_Address (const_cast<std::pair<T1,T2> *>(example),
-                    &displs[0]));
-    libmesh_call_mpi
-      (MPI_Address (const_cast<T1*>(&example->first),
-                    &displs[1]));
-    libmesh_call_mpi
-      (MPI_Address (const_cast<T2*>(&example->second),
-                    &displs[2]));
-    libmesh_call_mpi
-      (MPI_Address (const_cast<std::pair<T1,T2> *>(example+1),
-                    &displs[3]));
-
-    displs[1] -= displs[0];
-    displs[2] -= displs[0];
-    displs[3] -= displs[0];
-    displs[0] = 0;
-
-    libmesh_call_mpi
-      (MPI_Type_struct (4, blocklengths, displs, types,
-                        &_datatype));
-
-#else
     MPI_Datatype types[] = { (data_type)d1, (data_type)d2 };
     int blocklengths[] = {1,1};
     MPI_Aint displs[2], start;
@@ -217,7 +163,6 @@ public:
                                 &_datatype));
     libmesh_call_mpi
       (MPI_Type_free (&tmptype));
-#endif
 
     this->commit();
 

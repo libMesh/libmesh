@@ -76,29 +76,7 @@ public:
 #ifdef LIBMESH_HAVE_MPI
         StandardType<T> T_type(&((*ex)(0)));
 
-#if MPI_VERSION == 1
-
-        int blocklengths[3] = {1, LIBMESH_DIM, 1};
-        MPI_Aint displs[3];
-        MPI_Datatype types[3] = {MPI_LB, T_type, MPI_UB};
-        MPI_Aint start, later;
-
-        libmesh_call_mpi
-          (MPI_Address(ex, &start));
-        displs[0] = 0;
-        libmesh_call_mpi
-          (MPI_Address(&((*ex)(0)), &later));
-        displs[1] = later - start;
-        libmesh_call_mpi
-          (MPI_Address((ex+1), &later));
-        displs[2] = later - start;
-
-        libmesh_call_mpi
-          (MPI_Type_struct (3, blocklengths, displs, types,
-                            &_static_type));
-
-#else // MPI_VERSION >= 2
-
+        // We require MPI-2 here:
         int blocklength = LIBMESH_DIM;
         MPI_Aint displs, start;
         MPI_Datatype tmptype, type = T_type;
@@ -122,7 +100,6 @@ public:
         libmesh_call_mpi
           (MPI_Type_create_resized (tmptype, 0, sizeof(TypeVector<T>),
                                     &_static_type));
-#endif
 
         libmesh_call_mpi
           (MPI_Type_commit (&_static_type));
@@ -160,29 +137,6 @@ public:
 #ifdef LIBMESH_HAVE_MPI
         StandardType<T> T_type(&((*ex)(0)));
 
-#if MPI_VERSION == 1
-
-        int blocklengths[3] = {1, LIBMESH_DIM, 1};
-        MPI_Aint displs[3];
-        MPI_Datatype types[3] = {MPI_LB, T_type, MPI_UB};
-        MPI_Aint start, later;
-
-        libmesh_call_mpi
-          (MPI_Address(ex, &start));
-        displs[0] = 0;
-        libmesh_call_mpi
-          (MPI_Address(&((*ex)(0)), &later));
-        displs[1] = later - start;
-        libmesh_call_mpi
-          (MPI_Address((ex+1), &later));
-        displs[2] = later - start;
-
-        libmesh_call_mpi
-          (MPI_Type_struct (3, blocklengths, displs, types,
-                            &_static_type));
-
-#else // MPI_VERSION >= 2
-
         int blocklength = LIBMESH_DIM;
         MPI_Aint displs, start;
         MPI_Datatype tmptype, type = T_type;
@@ -207,7 +161,6 @@ public:
           (MPI_Type_create_resized (tmptype, 0,
                                     sizeof(VectorValue<T>),
                                     &_static_type));
-#endif
 
         libmesh_call_mpi
           (MPI_Type_commit (&_static_type));
@@ -251,29 +204,6 @@ public:
 
         StandardType<Real> T_type(&((*ex)(0)));
 
-#if MPI_VERSION == 1
-
-        int blocklengths[3] = {1, LIBMESH_DIM, 1};
-        MPI_Aint displs[3];
-        MPI_Datatype types[3] = {MPI_LB, T_type, MPI_UB};
-        MPI_Aint start, later;
-
-        libmesh_call_mpi
-          (MPI_Address(ex, &start));
-        displs[0] = 0;
-        libmesh_call_mpi
-          (MPI_Address(&((*ex)(0)), &later));
-        displs[1] = later - start;
-        libmesh_call_mpi
-          (MPI_Address((ex+1), &later));
-        displs[2] = later - start;
-
-        libmesh_call_mpi
-          (MPI_Type_struct (3, blocklengths, displs, types,
-                            &_static_type));
-
-#else // MPI_VERSION >= 2
-
         int blocklength = LIBMESH_DIM;
         MPI_Aint displs, start;
         MPI_Datatype tmptype, type = T_type;
@@ -297,7 +227,6 @@ public:
         libmesh_call_mpi
           (MPI_Type_create_resized (tmptype, 0, sizeof(Point),
                                     &_static_type));
-#endif
 
         libmesh_call_mpi
           (MPI_Type_commit (&_static_type));
