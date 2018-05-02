@@ -740,10 +740,8 @@ void sync_node_data_by_element_id(MeshBase & mesh,
                                   const NodeCheckFunctor & node_check,
                                   SyncFunctor & sync)
 {
-  const Communicator & comm (mesh.comm());
-
   // This function must be run on all processors at once
-  libmesh_parallel_only(comm);
+  libmesh_parallel_only(mesh.comm());
 
   bool need_sync = false;
 
