@@ -153,7 +153,7 @@ void enableSEGV(bool on);
  * \returns \p true if the argument \p arg was specified on the command line,
  * \p false otherwise.
  */
-bool on_command_line (const std::string & arg);
+bool on_command_line (std::string arg);
 
 /**
  * \returns The value associated with name on the command line if it is specified,

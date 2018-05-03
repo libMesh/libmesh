@@ -873,12 +873,34 @@ void enableSEGV(bool on)
 
 
 
-bool on_command_line (const std::string & arg)
+bool on_command_line (std::string arg)
 {
   // Make sure the command line parser is ready for use
   libmesh_assert(command_line.get());
 
-  return command_line->search (arg);
+  // Users had better not be asking about an empty string
+  libmesh_assert(!arg.empty());
+
+  bool found_it = command_line->search(arg);
+
+  if (!found_it)
+    {
+      // Try with all dashes instead of underscores
+      std::replace(arg.begin(), arg.end(), '_', '-');
+      found_it = command_line->search(arg);
+    }
+
+  if (!found_it)
+    {
+      // OK, try with all underscores instead of dashes
+      auto name_begin = arg.begin();
+      while (*name_begin == '-')
+        ++name_begin;
+      std::replace(name_begin, arg.end(), '-', '_');
+      found_it = command_line->search(arg);
+    }
+
+  return found_it;
 }
 
 
