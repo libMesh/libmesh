@@ -152,6 +152,12 @@ void enableSEGV(bool on);
 /**
  * \returns \p true if the argument \p arg was specified on the command line,
  * \p false otherwise.
+ *
+ * For backwards compatibility with past option naming conventions,
+ * libMesh searches for the given argument first in its original form,
+ * then with all underscores changed to dashes, then with all dashes
+ * (except any leading dashes) changed to underscores, and returns
+ * true if any of the above finds a match.
  */
 bool on_command_line (std::string arg);
 
