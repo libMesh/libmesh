@@ -6,6 +6,9 @@
 
 #include <libmesh/getpot.h>
 
+// For command_line shim methods
+#include <libmesh/libmesh.h>
+
 // THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
 // std::auto_ptr, which in turn produces -Wdeprecated-declarations
 // warnings.  These can be ignored in GCC as long as we wrap the
@@ -26,6 +29,7 @@ public:
   CPPUNIT_TEST( testVariables );
   CPPUNIT_TEST( testSections );
   CPPUNIT_TEST( testSubSections );
+  CPPUNIT_TEST( testCommandLine );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -172,6 +176,23 @@ public:
       input.get_subsection_names("Section3");
 
     CPPUNIT_ASSERT(subsections3.empty());
+  }
+
+  void testCommandLine()
+  {
+    // Test whether the new dash/underscore agnosticism works
+    //
+    // This means the unit_tests-foo executable *must* be run with
+    // options equivalent to the asserted ones and without options
+    // equivalent to the anti-asserted ones.
+    CPPUNIT_ASSERT(libMesh::on_command_line("--option-with-underscores"));
+    CPPUNIT_ASSERT(libMesh::on_command_line("--option_with_underscores"));
+    CPPUNIT_ASSERT(libMesh::on_command_line("--option-with-dashes"));
+    CPPUNIT_ASSERT(libMesh::on_command_line("--option_with_dashes"));
+    CPPUNIT_ASSERT(!libMesh::on_command_line("--option-with-lies"));
+    CPPUNIT_ASSERT(!libMesh::on_command_line("--option_with_lies"));
+    CPPUNIT_ASSERT_EQUAL(libMesh::command_line_next("--option-with-underscores", 2), 3);
+    CPPUNIT_ASSERT_EQUAL(libMesh::command_line_next("--option_with_underscores", 2), 3);
   }
 
 };
