@@ -174,9 +174,15 @@ T command_line_value (const std::vector<std::string> &, T);
 /**
  * Use GetPot's search()/next() functions to get following arguments
  * from the command line.
+ *
+ * For backwards compatibility with past option naming conventions,
+ * libMesh searches for the given argument first in its original form,
+ * then with all underscores changed to dashes, then with all dashes
+ * (except any leading dashes) changed to underscores, and returns
+ * true if any of the above finds a match.
  */
 template <typename T>
-T command_line_next (const std::string &, T);
+T command_line_next (std::string name, T default_value);
 
 /**
  * \returns The array of values associated with name on the command line if it is specified,
