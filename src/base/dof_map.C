@@ -1680,7 +1680,7 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase & mesh) const
   bool implicit_neighbor_dofs =
     libMesh::on_command_line ("--implicit-neighbor-dofs");
 
-  // If the user specifies --implicit_neighbor_dofs 0, then
+  // If the user specifies --implicit-neighbor-dofs 0, then
   // presumably he knows what he is doing and we won't try to
   // automatically turn it on even when all the variables are
   // discontinuous.
@@ -1688,11 +1688,11 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase & mesh) const
     {
       // No flag provided defaults to 'true'
       int flag = 1;
-      flag = libMesh::command_line_next ("--implicit_neighbor_dofs", flag);
+      flag = libMesh::command_line_next ("--implicit-neighbor-dofs", flag);
 
       if (!flag)
         {
-          // The user said --implicit_neighbor_dofs 0, so he knows
+          // The user said --implicit-neighbor-dofs 0, so he knows
           // what he is doing and really doesn't want it.
           return false;
         }
