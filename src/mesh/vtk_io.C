@@ -235,6 +235,8 @@ void VTKIO::read (const std::string & name)
                       << mesh.mesh_dimension()                  \
                       << "D support.");
 #endif // LIBMESH_DIM < 3
+  
+  mesh.prepare_for_use();
 }
 
 
