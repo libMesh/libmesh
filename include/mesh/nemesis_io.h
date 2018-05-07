@@ -87,6 +87,18 @@ public:
                        const Real time);
 
   /**
+   * Specify the list of variables which should be included in the
+   * output (whitelist) If empty, then all variables will be present
+   * in the output.
+   *
+   * This interface is copied from ExodusII_IO since it was found to
+   * be useful there, but perhaps eventually these implementations
+   * could somehow be combined.
+   */
+  void set_output_variables(const std::vector<std::string> & output_variables,
+                            bool allow_empty = true);
+
+  /**
    * Output a nodal solution.
    */
   virtual void write_nodal_data (const std::string & fname,
@@ -152,6 +164,19 @@ private:
    */
   void prepare_to_write_nodal_data (const std::string & fname,
                                     const std::vector<std::string> & names);
+
+  /**
+   * The names of the variables to be output.
+   * If this is empty then all variables are output.
+   */
+  std::vector<std::string> _output_variables;
+
+  /**
+   * If true, _output_variables is allowed to remain empty.
+   * If false, if _output_variables is empty it will be populated with a complete list of all variables
+   * By default, calling set_output_variables() sets this flag to true, but it provides an override.
+   */
+  bool _allow_empty_variables;
 };
 
 

@@ -97,7 +97,8 @@ Nemesis_IO::Nemesis_IO (MeshBase & mesh,
   _timestep(1),
 #endif
   _verbose (false),
-  _append(false)
+  _append(false),
+  _allow_empty_variables(false)
 {
 }
 
@@ -127,6 +128,15 @@ void Nemesis_IO::verbose (bool set_verbosity)
 void Nemesis_IO::append(bool val)
 {
   _append = val;
+}
+
+
+
+void Nemesis_IO::set_output_variables(const std::vector<std::string> & output_variables,
+                                      bool allow_empty)
+{
+  _output_variables = output_variables;
+  _allow_empty_variables = allow_empty;
 }
 
 
