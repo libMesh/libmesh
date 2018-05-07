@@ -6,11 +6,10 @@ AC_DEFUN([CONFIGURE_TECIO],
   AC_ARG_ENABLE(tecio,
                 AS_HELP_STRING([--disable-tecio],
                                [build without Tecplot TecIO API support (from source)]),
-                [case "${enableval}" in
-                  yes)  enabletecio=yes ;;
-                  no)  enabletecio=no ;;
-                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-tecio) ;;
-                esac],
+                [AS_CASE("${enableval}",
+                         [yes], [enabletecio=yes],
+                         [no],  [enabletecio=no],
+                         [AC_MSG_ERROR(bad value ${enableval} for --enable-tecio)])],
                 [enabletecio=$enableoptional])
 
   AC_ARG_WITH(tecio-x11-include,
@@ -19,81 +18,64 @@ AC_DEFUN([CONFIGURE_TECIO],
               withteciox11inc=$withval,
               withteciox11inc=no)
 
-  # Start off with an empty TECIO_CPPFLAGS and possibly append to it.
+  dnl Start off with an empty TECIO_CPPFLAGS and possibly append to it.
   TECIO_CPPFLAGS=""
 
-  # Look for an X11 installation
-  if (test $enabletecio = yes); then
-    # If the user specified a path to look for X11 headers in, honor
-    # that and don't try to look elsewhere.  If the compilation fails
-    # then they must figure out why on their own.
-    if (test $withteciox11inc != no); then
-      TECIO_CPPFLAGS="-I$withteciox11inc"
+  dnl Look for an X11 installation
+  AS_IF([test "x$enabletecio" = "xyes"],
+        [
+          dnl If the user specified a path to look for X11 headers in, honor
+          dnl that and don't try to look elsewhere.  If the compilation fails
+          dnl then they must figure out why on their own.
+          AS_IF([test "x$withteciox11inc" != "xno"], [TECIO_CPPFLAGS="-I$withteciox11inc"],
+                dnl The user did not specify where to look, so see if the file
+                dnl exists in the usual Linux location...
+                [test -r /usr/include/X11/Intrinsic.h], [TECIO_CPPFLAGS="-I/usr/include"],
+                dnl ... and if not there, try the Mac (XQuartz) location.
+                [test -r /opt/X11/include/X11/Intrinsic.h], [TECIO_CPPFLAGS="-I/opt/X11/include"])
 
-    # The user did not specify where to look, so see if the file
-    # exists in the usual Linux location...
-    elif (test -r /usr/include/X11/Intrinsic.h); then
-      TECIO_CPPFLAGS="-I/usr/include"
+          dnl Print a status message
+          AS_IF([test "x$TECIO_CPPFLAGS" != "x"],
+                [AC_MSG_RESULT(<<< Testing X11 headers with $TECIO_CPPFLAGS >>>)])
 
-    # ... and if not there, try the Mac (XQuartz) location.
-    elif (test -r /opt/X11/include/X11/Intrinsic.h); then
-      TECIO_CPPFLAGS="-I/opt/X11/include"
-    fi
+          dnl Run AC_CHECK_HEADER to see if we can actually compile a test
+          dnl program with the TECIO_CPPFLAGS we determined.  If this doesn't
+          dnl work, we assume the X11 installation is not working and disable
+          dnl the tecio interface.
+          saved_CPPFLAGS=$CPPFLAGS
+          CPPFLAGS="$TECIO_CPPFLAGS $CPPFLAGS"
 
-    # Print a status message
-    if (test "x$TECIO_CPPFLAGS" != "x"); then
-      AC_MSG_RESULT(<<< Testing X11 headers with $TECIO_CPPFLAGS >>>)
-    fi
+          AC_CHECK_HEADER([X11/Intrinsic.h],
+                          [],
+                          [enabletecio=no])
 
-    # Run AC_CHECK_HEADER to see if we can actually compile a test
-    # program with the TECIO_CPPFLAGS we determined.  If this doesn't
-    # work, we assume the X11 installation is not working and disable
-    # the tecio interface.
-    saved_CPPFLAGS=$CPPFLAGS
-    CPPFLAGS="$TECIO_CPPFLAGS $CPPFLAGS"
+          dnl Restore original value of CPPFLAGS
+          CPPFLAGS=$saved_CPPFLAGS
+        ])
 
-    AC_CHECK_HEADER([X11/Intrinsic.h],
-                    [],
-                    [enabletecio=no])
+  dnl The TECIO API is distributed with libmesh, so we don't have to guess
+  dnl where it might be installed...
+  AS_IF([test "x$enabletecio" = "xyes"],
+        [
+          dnl Set tecio platform-specific compiler flags.
+          AS_CASE("${host_os}",
+                  [*linux*], [TECIO_CPPFLAGS="-DLINUX $TECIO_CPPFLAGS"
+                              AC_CHECK_SIZEOF([void *])
+                              AS_IF([test "x$ac_cv_sizeof_void_p" = "x8"], [TECIO_CPPFLAGS="-DLINUX64 $TECIO_CPPFLAGS"])],
+                  [*darwin*], [TECIO_CPPFLAGS="-DDARWIN -DLONGIS64 $TECIO_CPPFLAGS"],
+                  [AC_MSG_RESULT([>>> Unrecognized TecIO platform, see contrib/tecplot/tecio/Runmake for hints on how to extend <<<])])
 
-    # Restore original value of CPPFLAGS
-    CPPFLAGS=$saved_CPPFLAGS
-  fi
-
-  # The TECIO API is distributed with libmesh, so we don't have to guess
-  # where it might be installed...
-  if (test $enabletecio = yes); then
-
-    # Set tecio platform-specific compiler flags.
-    case "${host_os}" in
-      *linux*)
-        TECIO_CPPFLAGS="-DLINUX $TECIO_CPPFLAGS"
-        AC_CHECK_SIZEOF([void *])
-        if (test $ac_cv_sizeof_void_p = 8); then
-          TECIO_CPPFLAGS="-DLINUX64 $TECIO_CPPFLAGS"
-        fi
-        ;;
-
-      *darwin*)
-        TECIO_CPPFLAGS="-DDARWIN -DLONGIS64 $TECIO_CPPFLAGS"
-        ;;
-
-        *)
-          AC_MSG_RESULT([>>> Unrecognized TecIO platform, see contrib/tecplot/tecio/Runmake for hints on how to extend <<<])
-          ;;
-    esac
-
-
-     TECIO_INCLUDE="-I\$(top_srcdir)/contrib/tecplot/tecio/include"
-     AC_DEFINE(HAVE_TECPLOT_API, 1, [Flag indicating whether the library will be compiled with Tecplot TecIO API support])
-     AC_DEFINE(HAVE_TECPLOT_API_112, 1, [Flag indicating tecplot API understands newer features])
-     AC_MSG_RESULT(<<< Configuring library with Tecplot TecIO support >>>)
-     have_tecio=yes
-  else
-     TECIO_INCLUDE=""
-     enabletecio=no
-     have_tecio=no
-  fi
+           TECIO_INCLUDE="-I\$(top_srcdir)/contrib/tecplot/tecio/include"
+           AC_DEFINE(HAVE_TECPLOT_API, 1, [Flag indicating whether the library will be compiled with Tecplot TecIO API support])
+           AC_DEFINE(HAVE_TECPLOT_API_112, 1, [Flag indicating tecplot API understands newer features])
+           AC_MSG_RESULT(<<< Configuring library with Tecplot TecIO support >>>)
+           have_tecio=yes
+        ],
+        [
+          TECIO_INCLUDE=""
+          enabletecio=no
+          have_tecio=no
+        ])
 
   AC_SUBST(TECIO_INCLUDE)
   AC_SUBST(TECIO_CPPFLAGS)

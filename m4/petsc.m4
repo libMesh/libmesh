@@ -72,7 +72,6 @@ AC_DEFUN([CONFIGURE_PETSC],
 
     # Grab PETSc version and substitute into Makefile.
     # If version 2.x, also check that PETSC_ARCH is set
-    # This if-test used to be: if (test -r $PETSC_DIR/include/petsc.h) ; then
     AS_IF([test "$enablepetsc" !=  no],
           [
             dnl Some tricks to discover the version of petsc.

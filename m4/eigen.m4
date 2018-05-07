@@ -24,168 +24,131 @@ AC_DEFUN([CONFIGURE_EIGEN],
   AC_ARG_ENABLE(eigen,
                 AS_HELP_STRING([--disable-eigen],
                                [build without Eigen linear algebra support]),
-                [case "${enableval}" in
-                  yes)  enableeigen=yes ;;
-                  no)  enableeigen=no ;;
-                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-eigen) ;;
-                esac],
+                [AS_CASE("${enableval}",
+                         [yes], [enableeigen=yes],
+                         [no],  [enableeigen=no],
+                         [AC_MSG_ERROR(bad value ${enableval} for --enable-eigen)])],
                 [enableeigen=$enableoptional])
 
-  # package requirement; if not specified, the default is to assume that
-  # the package is optional
-
+  dnl package requirement; if not specified, the default is to assume that
+  dnl the package is optional
   is_package_required=ifelse([$2], ,no, $2 )
 
   install_internal_eigen=no
-  if (test x$enableeigen = xyes); then
+  AS_IF([test "x$enableeigen" = "xyes"],
+        [
+          dnl User-specific include path
+          AC_ARG_WITH(eigen-include,
+                      AS_HELP_STRING([--with-eigen-include=PATH],[Specify the path for EIGEN header files]),
+                      witheigeninc=$withval,
+                      witheigeninc=no)
 
-    # User-specific include path
-    AC_ARG_WITH(eigen-include,
-                AS_HELP_STRING([--with-eigen-include=PATH],[Specify the path for EIGEN header files]),
-                witheigeninc=$withval,
-                witheigeninc=no)
+          dnl Fall back on default paths to Eigen's include files
+          AS_IF([test "x$witheigeninc" != "xno"],                                        [EIGEN_INC="$witheigeninc"],
+                [test "x$EIGEN_INC" != "x" && test -f $EIGEN_INC/Eigen/Eigen],           [AS_ECHO(["Environment EIGEN_INC=$EIGEN_INC"])],
+                [test "x$EIGEN3_INCLUDE" != "x" && test -f $EIGEN3_INCLUDE/Eigen/Eigen], [EIGEN_INC=$EIGEN3_INCLUDE
+                                                                                          AS_ECHO(["Environment EIGEN3_INCLUDE=$EIGEN_INC"])],
+                [test "x$EIGEN_INCLUDE" != "x" && test -f $EIGEN_INCLUDE/Eigen/Eigen],   [EIGEN_INC=$EIGEN_INCLUDE
+                                                                                          AS_ECHO(["Environment EIGEN_INCLUDE=$EIGEN_INC"])],
+                [test -f /usr/include/eigen3/Eigen/Eigen],                               [EIGEN_INC="/usr/include/eigen3"
+                                                                                          AS_ECHO(["System EIGEN_INC=$EIGEN_INC"])],
+                [EIGEN_INC="/usr/include"
+                 AS_ECHO(["Testing EIGEN_INC=$EIGEN_INC"])])
 
-    # Fall back on default paths to Eigen's include files
-    if (test $witheigeninc != no); then
-      EIGEN_INC="$witheigeninc"
+          dnl Initialize Makefile/config.h substitution variables
+          EIGEN_INCLUDE=""
 
-    elif (test "x$EIGEN_INC" != x -a -f $EIGEN_INC/Eigen/Eigen); then
-      echo "Environment EIGEN_INC=$EIGEN_INC"
+          dnl Check for existence of a header file in the specified location.  Note: here
+          dnl we are checking for the header file "Eigen" in the Eigen directory.
+          AC_LANG_SAVE
+          AC_LANG_CPLUSPLUS
 
-    elif (test "x$EIGEN3_INCLUDE" != x -a -f $EIGEN3_INCLUDE/Eigen/Eigen); then
-      EIGEN_INC=$EIGEN3_INCLUDE
-      echo "Environment EIGEN3_INCLUDE=$EIGEN_INC"
+          externaleigenincFound=no;
+          AC_CHECK_HEADERS($EIGEN_INC/Eigen/Eigen, externaleigenincFound=yes)
 
-    elif (test "x$EIGEN_INCLUDE" != x -a -f $EIGEN_INCLUDE/Eigen/Eigen); then
-      EIGEN_INC=$EIGEN_INCLUDE
-      echo "Environment EIGEN_INCLUDE=$EIGEN_INC"
+          dnl Check to make sure the external header files are sufficiently up
+          dnl to date - this fixes our Eigen detection on Scientific Linux 6
+          AS_IF([test "x$externaleigenincFound" = "xyes"],
+                [
+                  enableeigenincFound=yes
+                  ac_eigen_save_CPPFLAGS="$CPPFLAGS"
+                  CPPFLAGS="-I${EIGEN_INC} ${CPPFLAGS}"
+                  AC_CHECK_HEADERS([Eigen/Dense],[],[enableeigenincFound=no])
+                  AS_IF([test "x$enableeigensparse" = "xyes"], [AC_CHECK_HEADERS([Eigen/Sparse],[],[enableeigenincFound=no])])
+                  CPPFLAGS="${ac_eigen_save_CPPFLAGS}"
+                ])
 
-    elif (test -f /usr/include/eigen3/Eigen/Eigen); then
-      EIGEN_INC="/usr/include/eigen3"
-      echo "System EIGEN_INC=$EIGEN_INC"
+          AS_IF([test "x$enableeigenincFound" = "xyes"],   [EIGEN_INCLUDE="-I$EIGEN_INC"],
+                [test -d $top_srcdir/contrib/eigen/eigen], [AC_MSG_RESULT([<<< external Eigen header files not found, using Eigen from ./contrib >>>])
+                                                            EIGEN_INC=$top_srcdir/contrib/eigen/eigen
+                                                            EIGEN_INCLUDE="-I\$(top_srcdir)/contrib/eigen/eigen"
+                                                            install_internal_eigen=yes],
+                [enableeigen=no])
 
-    else
-      EIGEN_INC="/usr/include"
-      echo "Testing EIGEN_INC=$EIGEN_INC"
-    fi
+          dnl OK, we have a usable eigen path, make sure the headers we want are good.
+          AS_IF([test "x$enableeigen" = "xyes"],
+                [
+                  ac_eigen_save_CPPFLAGS="$CPPFLAGS"
+                  CPPFLAGS="-I${EIGEN_INC} ${CPPFLAGS}"
 
-    # Initialize Makefile/config.h substitution variables
-    EIGEN_INCLUDE=""
+                  dnl Do not use cached results for the header checks
+                  AS_UNSET([ac_cv_header_Eigen_Dense])
+                  AS_UNSET([ac_cv_header_Eigen_Sparse])
 
-    # Check for existence of a header file in the specified location.  Note: here
-    # we are checking for the header file "Eigen" in the Eigen directory.
-    AC_LANG_SAVE
-    AC_LANG_CPLUSPLUS
+                  AC_CHECK_HEADERS([Eigen/Dense],[],[enableeigen=no])
 
-    externaleigenincFound=no;
-    AC_CHECK_HEADERS($EIGEN_INC/Eigen/Eigen, externaleigenincFound=yes)
+                  AS_IF([test "x$enableeigensparse" = "xyes"],
+                        [AC_CHECK_HEADERS([Eigen/Sparse],[],[enableeigen=no])])
 
-    # Check to make sure the external header files are sufficiently up
-    # to date - this fixes our Eigen detection on Scientific Linux 6
-    if (test x$externaleigenincFound = xyes); then
-      enableeigenincFound=yes
+                    dnl -----------------------
+                    dnl  Minimum version check
+                    dnl ----------------------
 
-      ac_eigen_save_CPPFLAGS="$CPPFLAGS"
-      CPPFLAGS="-I${EIGEN_INC} ${CPPFLAGS}"
+                    min_eigen_version=ifelse([$1], ,0.0.0, $1)
 
-      AC_CHECK_HEADERS([Eigen/Dense],[],[enableeigenincFound=no])
+                    dnl looking for major.minor.micro (which Eigen calls world.major.minor) style versioning
+                    MAJOR_VER=`echo $min_eigen_version | sed 's/^\([[0-9]]*\).*/\1/'`
+                    AS_IF([test "x${MAJOR_VER}" = "x"], [MAJOR_VER=0])
 
-      if (test x$enableeigensparse = xyes); then
-        AC_CHECK_HEADERS([Eigen/Sparse],[],[enableeigenincFound=no])
-      fi
+                    MINOR_VER=`echo $min_eigen_version | sed 's/^\([[0-9]]*\)\.\{0,1\}\([[0-9]]*\).*/\2/'`
+                    AS_IF([test "x${MINOR_VER}" = "x"], [MINOR_VER=0])
 
-      CPPFLAGS="${ac_eigen_save_CPPFLAGS}"
-    fi
+                    MICRO_VER=`echo $min_eigen_version | sed 's/^\([[0-9]]*\)\.\{0,1\}\([[0-9]]*\)\.\{0,1\}\([[0-9]]*\).*/\3/'`
+                    AS_IF([test "x${MICRO_VER}" = "x"], [MICRO_VER=0])
 
+                    AC_MSG_CHECKING(for eigen - version >= $min_eigen_version)
 
-    if (test x$enableeigenincFound = xyes); then
-      EIGEN_INCLUDE="-I$EIGEN_INC"
-    elif (test -d $top_srcdir/contrib/eigen/eigen); then
-      AC_MSG_RESULT([<<< external Eigen header files not found, using Eigen from ./contrib >>>])
-      EIGEN_INC=$top_srcdir/contrib/eigen/eigen
-      EIGEN_INCLUDE="-I\$(top_srcdir)/contrib/eigen/eigen"
-      install_internal_eigen=yes
-    else
-      enableeigen=no
-    fi
+                    AC_LANG_PUSH([C++])
+                    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+                    @%:@include "Eigen/Core"
+                        ]], [[
+                        @%:@if EIGEN_WORLD_VERSION > $MAJOR_VER
+                        @%:@elif (EIGEN_WORLD_VERSION >= $MAJOR_VER) && (EIGEN_MAJOR_VERSION > $MINOR_VER)
+                        @%:@elif (EIGEN_WORLD_VERSION >= $MAJOR_VER) && (EIGEN_MAJOR_VERSION >= $MINOR_VER) && (EIGEN_MINOR_VERSION >= $MICRO_VER)
+                        @%:@else
+                        @%:@  error version is too old
+                        @%:@endif
+                    ]])],[
+                        AC_MSG_RESULT(yes)
+                    ],[
+                        AC_MSG_RESULT(no)
+                        enableeigen=no
+                    ])
+                    AC_LANG_POP([C++])
 
+                    CPPFLAGS="${ac_eigen_save_CPPFLAGS}"
 
-    # OK, we have a usable eigen path, make sure the headers we want are good.
-    if (test x$enableeigen = xyes); then
-
-      ac_eigen_save_CPPFLAGS="$CPPFLAGS"
-      CPPFLAGS="-I${EIGEN_INC} ${CPPFLAGS}"
-
-      # Do not use cached results for the header checks
-      AS_UNSET([ac_cv_header_Eigen_Dense])
-      AS_UNSET([ac_cv_header_Eigen_Sparse])
-
-      AC_CHECK_HEADERS([Eigen/Dense],[],[enableeigen=no])
-
-      if (test x$enableeigensparse = xyes); then
-        AC_CHECK_HEADERS([Eigen/Sparse],[],[enableeigen=no])
-      fi
-
-        #-----------------------
-        # Minimum version check
-        #----------------------
-
-        min_eigen_version=ifelse([$1], ,0.0.0, $1)
-
-        # looking for major.minor.micro (which Eigen calls world.major.minor) style versioning
-
-        MAJOR_VER=`echo $min_eigen_version | sed 's/^\([[0-9]]*\).*/\1/'`
-        if test "x${MAJOR_VER}" = "x" ; then
-           MAJOR_VER=0
-        fi
-
-        MINOR_VER=`echo $min_eigen_version | sed 's/^\([[0-9]]*\)\.\{0,1\}\([[0-9]]*\).*/\2/'`
-        if test "x${MINOR_VER}" = "x" ; then
-           MINOR_VER=0
-        fi
-
-        MICRO_VER=`echo $min_eigen_version | sed 's/^\([[0-9]]*\)\.\{0,1\}\([[0-9]]*\)\.\{0,1\}\([[0-9]]*\).*/\3/'`
-        if test "x${MICRO_VER}" = "x" ; then
-           MICRO_VER=0
-        fi
-
-
-        AC_MSG_CHECKING(for eigen - version >= $min_eigen_version)
-
-        AC_LANG_PUSH([C++])
-        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-        @%:@include "Eigen/Core"
-            ]], [[
-            @%:@if EIGEN_WORLD_VERSION > $MAJOR_VER
-            @%:@elif (EIGEN_WORLD_VERSION >= $MAJOR_VER) && (EIGEN_MAJOR_VERSION > $MINOR_VER)
-            @%:@elif (EIGEN_WORLD_VERSION >= $MAJOR_VER) && (EIGEN_MAJOR_VERSION >= $MINOR_VER) && (EIGEN_MINOR_VERSION >= $MICRO_VER)
-            @%:@else
-            @%:@  error version is too old
-            @%:@endif
-        ]])],[
-            AC_MSG_RESULT(yes)
-        ],[
-            AC_MSG_RESULT(no)
-            enableeigen=no
+                  dnl if we survived, we really have Eigen
+                  AS_IF([test "x$enableeigen" = "xyes"],         [HAVE_EIGEN=1
+                                                                  AC_DEFINE(HAVE_EIGEN, 1, [Flag indicating whether the library will be compiled with Eigen support])
+                                                                  AC_MSG_RESULT(<<< Configuring library with Eigen support >>>)],
+                        [test "x$is_package_required" = "xyes"], [AC_MSG_ERROR([Your EIGEN version ($EIGEN_INC) does not meet the minimum versioning
+                                                                                requirements ($min_eigen_version).  Please use --with-eigen-include to
+                                                                                specify the location of an updated installation.])])
+                ])
+          AC_LANG_RESTORE
         ])
-        AC_LANG_POP([C++])
 
-        CPPFLAGS="${ac_eigen_save_CPPFLAGS}"
-
-      # if we survived, we really have Eigen
-      if (test x$enableeigen = xyes); then
-        HAVE_EIGEN=1
-        AC_DEFINE(HAVE_EIGEN, 1, [Flag indicating whether the library will be compiled with Eigen support])
-        AC_MSG_RESULT(<<< Configuring library with Eigen support >>>)
-      elif test "$is_package_required" = yes; then
-        AC_MSG_ERROR([Your EIGEN version ($EIGEN_INC) does not meet the minimum versioning
-                      requirements ($min_eigen_version).  Please use --with-eigen-include to
-                      specify the location of an updated installation.])
-      fi
-    fi
-    AC_LANG_RESTORE
-  fi
-
-  # Substitute the substitution variables
+  dnl Substitute the substitution variables
   AC_SUBST(EIGEN_INCLUDE)
 ])

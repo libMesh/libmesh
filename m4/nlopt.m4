@@ -10,15 +10,15 @@ AC_DEFUN([CONFIGURE_NLOPT],
   AC_ARG_ENABLE(nlopt,
                 AS_HELP_STRING([--disable-nlopt],
                                [build without NLOPT support]),
-                [case "${enableval}" in
-                  yes)  enablenlopt=yes ;;
-                  no)  enablenlopt=no ;;
-                  *)  AC_MSG_ERROR(bad value ${enableval} for --enable-nlopt) ;;
-                 esac],
+                [AS_CASE("${enableval}",
+                         [yes], [enablenlopt=yes],
+                         [no],  [enablenlopt=no],
+                         [AC_MSG_ERROR(bad value ${enableval} for --enable-nlopt)])],
                 [enablenlopt=$enableoptional])
 
 
-  if (test $enablenlopt = yes); then
+  AS_IF([test "x$enablenlopt" = "xyes"],
+        [
     # User-specific include path
     AC_ARG_WITH(nlopt-include,
                 AS_HELP_STRING([--with-nlopt-include=PATH],[Specify the path for NLOPT header files]),
@@ -32,28 +32,21 @@ AC_DEFUN([CONFIGURE_NLOPT],
                 withnloptlib=no)
 
     # Use NLOPT_DIR/include if it exists.
-    if (test $withnloptinc != no); then
-      NLOPT_INC="$withnloptinc"
-    elif test "x$NLOPT_DIR" != x -a -f $NLOPT_DIR/include/nlopt.h; then
-      NLOPT_INC="$NLOPT_DIR/include"
-    else
-      NLOPT_INC=""
-    fi
+    AS_IF([test $withnloptinc != no], [NLOPT_INC="$withnloptinc"],
+          [test "x$NLOPT_DIR" != "x" && test -f $NLOPT_DIR/include/nlopt.h], [NLOPT_INC="$NLOPT_DIR/include"],
+          [NLOPT_INC=""])
 
     # Use NLOPT_DIR/lib if it exists.
-    if (test $withnloptlib != no); then
-      NLOPT_LIB="$withnloptlib"
-    elif test "x$NLOPT_DIR" != x; then
-      NLOPT_LIB="$NLOPT_DIR/lib"
-    else
-      NLOPT_LIB=""
-    fi
+    AS_IF([test "x$withnloptlib" != "xno"], [NLOPT_LIB="$withnloptlib"],
+          [test "x$NLOPT_DIR" != "x"], [NLOPT_LIB="$NLOPT_DIR/lib"],
+          [NLOPT_LIB=""])
 
     # Initialize Makefile/config.h substitution variables
     NLOPT_INCLUDE=""
     NLOPT_LIBRARY=""
 
-    if (test $enablenlopt = yes); then
+    AS_IF([test "x$enablenlopt" = "xyes"],
+          [
       NLOPT_INCLUDE="-I$NLOPT_INC"
       NLOPT_LIBRARY="-L$NLOPT_LIB -lnlopt"
 
@@ -140,19 +133,18 @@ return 0;
       LIBS="$saveLIBS"
       AC_LANG_POP([C])
 
-      # If linking a test program succeeded, continue.
-      if (test x$enablenlopt = xyes); then
+      dnl If linking a test program succeeded, continue.
+      AS_IF([test "x$enablenlopt" = "xyes"],
+            [
+              dnl add the NLOPT_LIB dir to the linker run path if it is a directory
+              AS_IF([test "x$RPATHFLAG" != "x" && test -d $NLOPT_LIB],
+                    [NLOPT_LIBRARY="${RPATHFLAG}${NLOPT_LIB} $NLOPT_LIBRARY"])
 
-        # add the NLOPT_LIB dir to the linker run path if it is a directory
-        if (test "x$RPATHFLAG" != "x" -a -d $NLOPT_LIB); then
-          NLOPT_LIBRARY="${RPATHFLAG}${NLOPT_LIB} $NLOPT_LIBRARY"
-        fi
-
-        AC_DEFINE(HAVE_NLOPT, 1, [Flag indicating whether the library will be compiled with NLOPT support])
-        AC_MSG_RESULT(<<< Configuring library with NLOPT support >>>)
-      fi
-    fi
-  fi
+              AC_DEFINE(HAVE_NLOPT, 1, [Flag indicating whether the library will be compiled with NLOPT support])
+              AC_MSG_RESULT(<<< Configuring library with NLOPT support >>>)
+            ])
+          ])
+        ])
 
   # Substitute the substitution variables
   AC_SUBST(NLOPT_INCLUDE)
