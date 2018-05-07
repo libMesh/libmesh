@@ -31,7 +31,7 @@ namespace libMesh
 namespace Parallel
 {
 
-// PostWaitWork specialization for freeing no-longer-needed buffers.
+// PostWaitWork specialization for deleting no-longer-needed buffers.
 template <typename Container>
 struct PostWaitDeleteBuffer : public PostWaitWork {
   PostWaitDeleteBuffer(Container * buffer) : _buf(buffer) {}
