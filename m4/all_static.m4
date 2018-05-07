@@ -10,16 +10,19 @@ AC_DEFUN([AX_ALL_STATIC],
                 enableallstatic=$enableval,
                 enableallstatic=no)
 
-  if (test $enableallstatic = yes); then
-    if (test "x$libmesh_LDFLAGS" != x) ; then
-      # Append to whatever the user has for libmesh_LDFLAGS in their environment
-      libmesh_LDFLAGS="$libmesh_LDFLAGS -all-static"
-    else
-      # Set libmesh_LDFLAGS to -all-static
-      libmesh_LDFLAGS=-all-static
-    fi
+  AS_IF([test "x$enableallstatic" = "xyes"],
+        [
+          AS_IF([test "x$libmesh_LDFLAGS" != "x"],
+                [
+                  dnl Append to whatever the user has for libmesh_LDFLAGS in their environment
+                  libmesh_LDFLAGS="$libmesh_LDFLAGS -all-static"
+                ],
+                [
+                  dnl Set libmesh_LDFLAGS to -all-static
+                  libmesh_LDFLAGS=-all-static
+                ])
 
-    # Substitute into Makefiles where relevant.
-    AC_SUBST(libmesh_LDFLAGS)
-  fi
+          dnl Substitute into Makefiles where relevant.
+          AC_SUBST(libmesh_LDFLAGS)
+        ])
 ])
