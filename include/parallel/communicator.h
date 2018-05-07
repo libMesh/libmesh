@@ -331,6 +331,10 @@ public:
 
   /**
    * Blocking-send to one processor with user-defined type.
+   *
+   * If \p T is a container, container-of-containers, etc., then
+   * \p type should be the DataType of the underlying fixed-size
+   * entries in the container(s).
    */
   template <typename T>
   void send (const unsigned int dest_processor_id,
@@ -340,6 +344,10 @@ public:
 
   /**
    * Nonblocking-send to one processor with user-defined type.
+   *
+   * If \p T is a container, container-of-containers, etc., then
+   * \p type should be the DataType of the underlying fixed-size
+   * entries in the container(s).
    */
   template <typename T>
   void send (const unsigned int dest_processor_id,
@@ -367,6 +375,10 @@ public:
 
   /**
    * Blocking-receive from one processor with user-defined type.
+   *
+   * If \p T is a container, container-of-containers, etc., then
+   * \p type should be the DataType of the underlying fixed-size
+   * entries in the container(s).
    */
   template <typename T>
   Status receive (const unsigned int dest_processor_id,
@@ -376,6 +388,10 @@ public:
 
   /**
    * Nonblocking-receive from one processor with user-defined type.
+   *
+   * If \p T is a container, container-of-containers, etc., then
+   * \p type should be the DataType of the underlying fixed-size
+   * entries in the container(s).
    */
   template <typename T>
   void receive (const unsigned int dest_processor_id,
