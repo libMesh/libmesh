@@ -2511,7 +2511,8 @@ void Nemesis_IO_Helper::write_nodal_solution(const std::vector<Number> & values,
 
 void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & parallel_soln,
                                              const std::vector<std::string> & names,
-                                             int timestep)
+                                             int timestep,
+                                             const std::vector<std::string> & output_names)
 {
   int num_vars = cast_int<int>(names.size());
 
@@ -2519,6 +2520,12 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
 
   for (int c=0; c<num_vars; c++)
     {
+      // If we are not writing this variable, skip to the next loop
+      // iteration. This is needed to keep the indexing consistent
+      // with the ordering of parallel_soln.
+      if (std::find(output_names.begin(), output_names.end(), names[c]) == output_names.end())
+        continue;
+
       // Fill up a std::vector with the dofs for the current variable
       std::vector<numeric_index_type> required_indices(num_nodes);
 
@@ -2538,6 +2545,12 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
 
   for (int c=0; c<num_vars; c++)
     {
+      // If we are not writing this variable, skip to the next loop
+      // iteration. This is needed to keep the indexing consistent
+      // with the ordering of parallel_soln.
+      if (std::find(output_names.begin(), output_names.end(), names[c]) == output_names.end())
+        continue;
+
       // Fill up a std::vector with the dofs for the current variable
       std::vector<numeric_index_type> required_indices(num_nodes);
 

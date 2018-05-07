@@ -1348,11 +1348,21 @@ void Nemesis_IO::write_nodal_data (const std::string & base_filename,
 {
   LOG_SCOPE("write_nodal_data(parallel)", "Nemesis_IO");
 
-  this->prepare_to_write_nodal_data(base_filename, names);
+  // Only prepare and write nodal variables that are also in
+  // _output_variables, unless _output_variables is empty. This is the
+  // same logic that is in ExodusII_IO::write_nodal_data().
+  std::vector<std::string> output_names;
+
+  if (_allow_empty_variables || !_output_variables.empty())
+    output_names = _output_variables;
+  else
+    output_names = names;
+
+  this->prepare_to_write_nodal_data(base_filename, output_names);
 
   // Call the new version of write_nodal_solution() that takes a
   // NumericVector directly without localizing.
-  nemhelper->write_nodal_solution(parallel_soln, names, _timestep);
+  nemhelper->write_nodal_solution(parallel_soln, names, _timestep, output_names);
 }
 
 #else
