@@ -26,6 +26,7 @@
 // C++ includes
 #include <complex>
 #include <cstddef>
+#include <cstring> // memcpy
 #include <iterator>
 #include <limits>
 #include <map>
@@ -1374,6 +1375,147 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 }
 
 
+
+template <typename T>
+inline void Communicator::send (const unsigned int dest_processor_id,
+                                const std::vector<std::vector<T>> & buf,
+                                const MessageTag & tag) const
+{
+  this->send(dest_processor_id, buf,
+             StandardType<T>((buf.empty() || buf.front().empty()) ?
+                             libmesh_nullptr : &(buf.front().front())), tag);
+}
+
+
+
+template <typename T>
+inline void Communicator::send (const unsigned int dest_processor_id,
+                                const std::vector<std::vector<T>> & buf,
+                                Request & req,
+                                const MessageTag & tag) const
+{
+  this->send(dest_processor_id, buf,
+             StandardType<T>((buf.empty() || buf.front().empty()) ?
+                             libmesh_nullptr : &(buf.front().front())), req, tag);
+}
+
+
+
+template <typename T>
+inline void Communicator::send (const unsigned int dest_processor_id,
+                                const std::vector<std::vector<T>> & buf,
+                                const DataType & type,
+                                const MessageTag & tag) const
+{
+  LOG_SCOPE("send()", "Parallel");
+
+  const std::size_t n_vecs = buf.size();
+
+  // We'll do evil casts to pack metadata+data into the same buffer
+  const std::size_t headersize = (n_vecs+1) * (sizeof(std::size_t)/sizeof(T));
+
+  std::size_t datasize = 0;
+  for (auto & subvec : buf)
+    datasize += subvec.size();
+
+  const std::size_t fullsize = (headersize+datasize)*sizeof(T);
+
+  // Because of those evil casts we don't even want to trigger
+  // constructors/destructors
+  T * tempbuf = (T*)malloc(fullsize);
+
+  // Pack data into temporary buffer
+  std::size_t * headerbuf = reinterpret_cast<std::size_t*>(tempbuf);
+  T * databuf = tempbuf + headersize;
+
+  headerbuf[0] = n_vecs;
+  T * nextdatabuf = databuf;
+  for (std::size_t i=0; i != n_vecs; ++i)
+    {
+      const std::size_t sizei = buf[i].size();
+      headerbuf[i+1] = sizei;
+      if (sizei)
+        {
+          std::memcpy(reinterpret_cast<void*>(nextdatabuf),
+                      reinterpret_cast<const void*>(&buf[i][0]),
+                      sizei*sizeof(T));
+          nextdatabuf += sizei;
+        }
+    }
+
+  libmesh_call_mpi
+    (((this->send_mode() == SYNCHRONOUS) ?
+      MPI_Ssend : MPI_Send) (tempbuf,
+                             cast_int<int>(headersize+datasize),
+                             type,
+                             dest_processor_id,
+                             tag.value(),
+                             this->get()));
+
+  free(tempbuf);
+}
+
+
+
+template <typename T>
+inline void Communicator::send (const unsigned int dest_processor_id,
+                                const std::vector<std::vector<T>> & buf,
+                                const DataType & type,
+                                Request & req,
+                                const MessageTag & tag) const
+{
+  LOG_SCOPE("send()", "Parallel");
+
+  const std::size_t n_vecs = buf.size();
+
+  // We'll do evil casts to pack metadata+data into the same buffer
+  const std::size_t headersize = (n_vecs+1) * (sizeof(std::size_t)/sizeof(T));
+
+  std::size_t datasize = 0;
+  for (auto & subvec : buf)
+    datasize += subvec.size();
+
+  const std::size_t fullsize = (headersize+datasize)*sizeof(T);
+
+  // Because of those evil casts we don't even want to trigger
+  // constructors/destructors
+  T * tempbuf = (T*)malloc(fullsize);
+
+  // Pack data into temporary buffer
+  std::size_t * headerbuf = reinterpret_cast<std::size_t*>(tempbuf);
+  T * databuf = tempbuf + headersize;
+
+  headerbuf[0] = n_vecs;
+  T * nextdatabuf = databuf;
+  for (std::size_t i=0; i != n_vecs; ++i)
+    {
+      const std::size_t sizei = buf[i].size();
+      headerbuf[i+1] = sizei;
+      if (sizei)
+        {
+          std::memcpy(reinterpret_cast<void*>(nextdatabuf),
+                      reinterpret_cast<const void*>(&buf[i][0]),
+                      sizei*sizeof(T));
+          nextdatabuf += sizei;
+        }
+    }
+
+  // Make the Request::wait() handle deleting the buffer
+  req.add_post_wait_work
+    (new Parallel::PostWaitFreeBuffer<T> (tempbuf));
+
+  libmesh_call_mpi
+    (((this->send_mode() == SYNCHRONOUS) ?
+      MPI_Issend : MPI_Isend) (tempbuf,
+                               cast_int<int>(headersize+datasize),
+                               type,
+                               dest_processor_id,
+                               tag.value(),
+                               this->get(),
+                               req.get()));
+}
+
+
 template <typename Context, typename Iter>
 inline void Communicator::send_packed_range (const unsigned int dest_processor_id,
                                              const Context * context,
@@ -1770,6 +1912,102 @@ inline void Communicator::receive (const unsigned int src_processor_id,
                 cast_int<int>(buf.size()), type, src_processor_id,
                 tag.value(), this->get(), req.get()));
 }
+
+
+
+template <typename T>
+inline Status Communicator::receive (const unsigned int src_processor_id,
+                                     std::vector<std::vector<T>> & buf,
+                                     const MessageTag & tag) const
+{
+  return this->receive
+    (src_processor_id, buf,
+     StandardType<T>((buf.empty() || buf.front().empty()) ?
+                     libmesh_nullptr : &(buf.front().front())), tag);
+}
+
+
+
+template <typename T>
+inline void Communicator::receive (const unsigned int src_processor_id,
+                                   std::vector<std::vector<T>> & buf,
+                                   Request & req,
+                                   const MessageTag & tag) const
+{
+  this->receive (src_processor_id, buf,
+                 StandardType<T>((buf.empty() || buf.front().empty()) ?
+                                 libmesh_nullptr : &(buf.front().front())), req, tag);
+}
+
+
+
+template <typename T>
+inline Status Communicator::receive (const unsigned int src_processor_id,
+                                     std::vector<std::vector<T>> & buf,
+                                     const DataType & type,
+                                     const MessageTag & tag) const
+{
+  LOG_SCOPE("receive()", "Parallel");
+
+  // Get the status of the message, explicitly provide the
+  // datatype so we can later query the size
+  Status stat(this->probe(src_processor_id, tag), type);
+
+  // We did evil casts to pack metadata+data into the same buffer,
+  // so we want a C-style buffer which won't trigger constructors or
+  // destructors
+  const std::size_t stat_size = stat.size();
+  T * tempbuf = (T*)malloc(stat_size*sizeof(T));
+
+  // Use stat.source() and stat.tag() in the receive - if
+  // src_processor_id is or tag is "any" then we want to be sure we
+  // try to receive the same message we just probed.
+  libmesh_call_mpi
+    (MPI_Recv (tempbuf,
+               cast_int<int>(stat_size), type, stat.source(),
+               stat.tag(), this->get(), stat.get()));
+
+  libmesh_assert_equal_to (stat.size(), stat_size);
+
+  // Unpack temporary buffer
+  std::size_t * headerbuf = reinterpret_cast<std::size_t*>(tempbuf);
+  const std::size_t n_vecs = headerbuf[0];
+
+  const std::size_t headersize = (n_vecs+1) * (sizeof(std::size_t)/sizeof(T));
+  T * databuf = tempbuf + headersize;
+
+  // Check for any obvious insanity
+  libmesh_assert_less_equal(headersize, stat_size);
+
+  buf.resize(n_vecs);
+  T * nextdatabuf = databuf;
+  for (std::size_t i=0; i != n_vecs; ++i)
+    {
+      const std::size_t sizei = headerbuf[i+1];
+      libmesh_assert_less_equal
+        (nextdatabuf + sizei, tempbuf + stat_size);
+      buf[i].assign(nextdatabuf, nextdatabuf+sizei);
+      nextdatabuf += sizei;
+    }
+
+  free(tempbuf);
+
+  return stat;
+}
+
+
+
+// FIXME - non-blocking receive of vector-of-vectors is currently unimplemented
+/*
+template <typename T>
+inline void Communicator::receive (const unsigned int src_processor_id,
+                                   std::vector<std::vector<T>> & buf,
+                                   const DataType & type,
+                                   Request & req,
+                                   const MessageTag & tag) const
+{
+}
+*/
 
 
 template <typename Context, typename OutputIter, typename T>

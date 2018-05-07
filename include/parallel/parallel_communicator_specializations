@@ -118,6 +118,30 @@
                const MessageTag &tag=no_tag) const;
 
     template<typename T>
+    void send (const unsigned int dest_processor_id,
+               const std::vector<std::vector<T>> & buf,
+               const MessageTag &tag=no_tag) const;
+
+    template<typename T>
+    void send (const unsigned int dest_processor_id,
+               const std::vector<std::vector<T>> & buf,
+               Request &req,
+               const MessageTag &tag=no_tag) const;
+
+    template <typename T>
+    void send (const unsigned int dest_processor_id,
+               const std::vector<std::vector<T>> & buf,
+               const DataType &type,
+               const MessageTag &tag=no_tag) const;
+
+    template <typename T>
+    void send (const unsigned int dest_processor_id,
+               const std::vector<std::vector<T>> & buf,
+               const DataType &type,
+               Request &req,
+               const MessageTag &tag=no_tag) const;
+
+    template<typename T>
     Status receive (const unsigned int src_processor_id,
                     std::basic_string<T> &buf,
                     const MessageTag &tag=any_tag) const;
@@ -175,6 +199,33 @@
                   const DataType &type,
                   Request &req,
                   const MessageTag &tag=any_tag) const;
+
+    template<typename T>
+    Status receive (const unsigned int src_processor_id,
+                    std::vector<std::vector<T>> &buf,
+                    const MessageTag &tag=any_tag) const;
+
+    template<typename T>
+    void receive (const unsigned int src_processor_id,
+                  std::vector<std::vector<T>> &buf,
+                  Request &req,
+                  const MessageTag &tag=any_tag) const;
+
+    template <typename T>
+    Status receive (const unsigned int src_processor_id,
+                    std::vector<std::vector<T>> &buf,
+                    const DataType &type,
+                    const MessageTag &tag=any_tag) const;
+
+// FIXME - non-blocking receive of vector-of-vectors is currently unimplemented
+/*
+    template <typename T>
+    void receive (const unsigned int src_processor_id,
+                  std::vector<std::vector<T>> &buf,
+                  const DataType &type,
+                  Request &req,
+                  const MessageTag &tag=any_tag) const;
+*/
 
     template <typename T>
     void broadcast(std::basic_string<T> &data,
