@@ -131,122 +131,9 @@ inline void send_receive_vec_of_vec(const unsigned int dest_processor_id,
       return;
     }
 
-  // temporary buffers - these will be sized in bytes
-  // and manipulated with MPI_Pack and friends
-  std::vector<char> sendbuf, recvbuf;
-
-  // figure out how many bytes we need to pack all the data
-  int packedsize=0, sendsize=0;
-
-  // The outer buffer size
-  libmesh_call_mpi
-    (MPI_Pack_size (1,
-                    libMesh::Parallel::StandardType<unsigned int>(),
-                    comm.get(),
-                    &packedsize));
-
-  sendsize += packedsize;
-
-  for (std::size_t i=0; i<send.size(); i++)
-    {
-      // The size of the ith inner buffer
-      libmesh_call_mpi
-        (MPI_Pack_size (1,
-                        libMesh::Parallel::StandardType<unsigned int>(),
-                        comm.get(),
-                        &packedsize));
-
-      sendsize += packedsize;
-
-      // The data for each inner buffer
-      libmesh_call_mpi
-        (MPI_Pack_size (libMesh::cast_int<int>(send[i].size()),
-                        libMesh::Parallel::StandardType<T1>
-                        (send[i].empty() ? libmesh_nullptr : &send[i][0]),
-                        comm.get(),
-                        &packedsize));
-
-      sendsize += packedsize;
-    }
-
-  libmesh_assert (sendsize /* should at least be 1! */);
-  sendbuf.resize (sendsize);
-
-  // Pack the send buffer
-  int pos=0;
-
-  // ... the size of the outer buffer
-  sendsize = libMesh::cast_int<int>(send.size());
-
-  libmesh_call_mpi
-    (MPI_Pack (&sendsize, 1,
-               libMesh::Parallel::StandardType<unsigned int>(),
-               &sendbuf[0], libMesh::cast_int<int>(sendbuf.size()),
-               &pos, comm.get()));
-
-  for (std::size_t i=0; i<send.size(); i++)
-    {
-      // ... the size of the ith inner buffer
-      sendsize = libMesh::cast_int<int>(send[i].size());
-
-      libmesh_call_mpi
-        (MPI_Pack (&sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
-                   &sendbuf[0], libMesh::cast_int<int>(sendbuf.size()), &pos,
-                   comm.get()));
-
-      // ... the contents of the ith inner buffer
-      if (!send[i].empty())
-        libmesh_call_mpi
-          (MPI_Pack (const_cast<T1*>(&send[i][0]),
-                     libMesh::cast_int<int>(send[i].size()),
-                     libMesh::Parallel::StandardType<T1>(&send[i][0]),
-                     &sendbuf[0],
-                     libMesh::cast_int<int>(sendbuf.size()), &pos,
-                     comm.get()));
-    }
-
-  libmesh_assert_equal_to (static_cast<unsigned int>(pos), sendbuf.size());
-
   libMesh::Parallel::Request request;
-
-  comm.send (dest_processor_id, sendbuf, MPI_PACKED, request, send_tag);
-
-  comm.receive (source_processor_id, recvbuf, MPI_PACKED, recv_tag);
-
-  // Unpack the received buffer
-  libmesh_assert (!recvbuf.empty());
-  pos=0;
-  libmesh_call_mpi
-    (MPI_Unpack (&recvbuf[0], libMesh::cast_int<int>(recvbuf.size()), &pos,
-                 &sendsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
-                 comm.get()));
-
-  // ... size the outer buffer
-  recv.resize (sendsize);
-
-  for (std::size_t i=0; i<recv.size(); i++)
-    {
-      libmesh_call_mpi
-        (MPI_Unpack (&recvbuf[0],
-                     libMesh::cast_int<int>(recvbuf.size()), &pos,
-                     &sendsize, 1,
-                     libMesh::Parallel::StandardType<unsigned int>(),
-                     comm.get()));
-
-      // ... size the inner buffer
-      recv[i].resize (sendsize);
-
-      // ... unpack the inner buffer if it is not empty
-      if (!recv[i].empty())
-        libmesh_call_mpi
-          (MPI_Unpack (&recvbuf[0],
-                       libMesh::cast_int<int>(recvbuf.size()), &pos,
-                       &recv[i][0],
-                       libMesh::cast_int<int>(recv[i].size()),
-                       libMesh::Parallel::StandardType<T2>(&recv[i][0]),
-                       comm.get()));
-    }
-
+  comm.send (dest_processor_id, send, request, send_tag);
+  comm.receive (source_processor_id, recv, recv_tag);
   request.wait();
 }
 
@@ -1407,112 +1294,96 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 const DataType & type,
                                 const MessageTag & tag) const
 {
-  LOG_SCOPE("send()", "Parallel");
-
-  const std::size_t n_vecs = buf.size();
-
-  // We'll do evil casts to pack metadata+data into the same buffer
-  const std::size_t headersize = (n_vecs+1) * (sizeof(std::size_t)/sizeof(T));
-
-  std::size_t datasize = 0;
-  for (auto & subvec : buf)
-    datasize += subvec.size();
-
-  const std::size_t fullsize = (headersize+datasize)*sizeof(T);
-
-  // Because of those evil casts we don't even want to trigger
-  // constructors/destructors
-  T * tempbuf = (T*)malloc(fullsize);
-
-  // Pack data into temporary buffer
-  std::size_t * headerbuf = reinterpret_cast<std::size_t*>(tempbuf);
-  T * databuf = tempbuf + headersize;
-
-  headerbuf[0] = n_vecs;
-  T * nextdatabuf = databuf;
-  for (std::size_t i=0; i != n_vecs; ++i)
-    {
-      const std::size_t sizei = buf[i].size();
-      headerbuf[i+1] = sizei;
-      if (sizei)
-        {
-          std::memcpy(reinterpret_cast<void*>(nextdatabuf),
-                      reinterpret_cast<const void*>(&buf[i][0]),
-                      sizei*sizeof(T));
-          nextdatabuf += sizei;
-        }
-    }
-
-  libmesh_call_mpi
-    (((this->send_mode() == SYNCHRONOUS) ?
-      MPI_Ssend : MPI_Send) (tempbuf,
-                             cast_int<int>(headersize+datasize),
-                             type,
-                             dest_processor_id,
-                             tag.value(),
-                             this->get()));
-
-  free(tempbuf);
+  // We'll avoid redundant code (at the cost of using heap rather
+  // than stack buffer allocation) by reusing the non-blocking send
+  Request req;
+  this->send(dest_processor_id, buf, type, req, tag);
+  req.wait();
 }
 
 
 
 template <typename T>
 inline void Communicator::send (const unsigned int dest_processor_id,
-                                const std::vector<std::vector<T>> & buf,
+                                const std::vector<std::vector<T>> & send,
                                 const DataType & type,
                                 Request & req,
                                 const MessageTag & tag) const
 {
-  LOG_SCOPE("send()", "Parallel");
+  // temporary buffer - this will be sized in bytes
+  // and manipulated with MPI_Pack
+  std::vector<char> * sendbuf = new std::vector<char>();
 
-  const std::size_t n_vecs = buf.size();
+  // figure out how many bytes we need to pack all the data
+  int packedsize=0;
 
-  // We'll do evil casts to pack metadata+data into the same buffer
-  const std::size_t headersize = (n_vecs+1) * (sizeof(std::size_t)/sizeof(T));
+  // The outer buffer size
+  libmesh_call_mpi
+    (MPI_Pack_size (1,
+                    libMesh::Parallel::StandardType<unsigned int>(),
+                    this->get(),
+                    &packedsize));
 
-  std::size_t datasize = 0;
-  for (auto & subvec : buf)
-    datasize += subvec.size();
+  int sendsize = packedsize;
 
-  const std::size_t fullsize = (headersize+datasize)*sizeof(T);
+  const std::size_t n_vecs = send.size();
 
-  // Because of those evil casts we don't even want to trigger
-  // constructors/destructors
-  T * tempbuf = (T*)malloc(fullsize);
-
-  // Pack data into temporary buffer
-  std::size_t * headerbuf = reinterpret_cast<std::size_t*>(tempbuf);
-  T * databuf = tempbuf + headersize;
-
-  headerbuf[0] = n_vecs;
-  T * nextdatabuf = databuf;
-  for (std::size_t i=0; i != n_vecs; ++i)
+  for (std::size_t i = 0; i != n_vecs; ++i)
     {
-      const std::size_t sizei = buf[i].size();
-      headerbuf[i+1] = sizei;
-      if (sizei)
-        {
-          std::memcpy(reinterpret_cast<void*>(nextdatabuf),
-                      reinterpret_cast<const void*>(&buf[i][0]),
-                      sizei*sizeof(T));
-          nextdatabuf += sizei;
-        }
+      // The size of the ith inner buffer
+      libmesh_call_mpi
+        (MPI_Pack_size (1,
+                        libMesh::Parallel::StandardType<unsigned int>(),
+                        this->get(),
+                        &packedsize));
+
+      sendsize += packedsize;
+
+      // The data for each inner buffer
+      libmesh_call_mpi
+        (MPI_Pack_size (libMesh::cast_int<int>(send[i].size()), type,
+                        this->get(), &packedsize));
+
+      sendsize += packedsize;
     }
 
-  // Make the Request::wait() handle deleting the buffer
-  req.add_post_wait_work
-    (new Parallel::PostWaitFreeBuffer<T> (tempbuf));
+  libmesh_assert (sendsize /* should at least be 1! */);
+  sendbuf->resize (sendsize);
+
+  // Pack the send buffer
+  int pos=0;
+
+  // ... the size of the outer buffer
+  const int mpi_n_vecs = libMesh::cast_int<int>(n_vecs);
 
   libmesh_call_mpi
-    (((this->send_mode() == SYNCHRONOUS) ?
-      MPI_Issend : MPI_Isend) (tempbuf,
-                               cast_int<int>(headersize+datasize),
-                               type,
-                               dest_processor_id,
-                               tag.value(),
-                               this->get(),
-                               req.get()));
+    (MPI_Pack (&mpi_n_vecs, 1,
+               libMesh::Parallel::StandardType<unsigned int>(),
+               &(*sendbuf)[0], sendsize, &pos, this->get()));
+
+  for (std::size_t i = 0; i != n_vecs; ++i)
+    {
+      // ... the size of the ith inner buffer
+      const int subvec_size = libMesh::cast_int<int>(send[i].size());
+
+      libmesh_call_mpi
+        (MPI_Pack (&subvec_size, 1, libMesh::Parallel::StandardType<unsigned int>(),
+                   &(*sendbuf)[0], sendsize, &pos, this->get()));
+
+      // ... the contents of the ith inner buffer
+      if (!send[i].empty())
+        libmesh_call_mpi
+          (MPI_Pack (const_cast<T*>(&send[i][0]),
+                     libMesh::cast_int<int>(subvec_size), type,
+                     &(*sendbuf)[0], sendsize, &pos, this->get()));
+    }
+
+  libmesh_assert_equal_to (pos, sendsize);
+
+  req.add_post_wait_work
+    (new Parallel::PostWaitDeleteBuffer<std::vector<char>> (sendbuf));
+
+  this->send (dest_processor_id, *sendbuf, MPI_PACKED, req, tag);
 }
 
 
@@ -1943,54 +1814,49 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline Status Communicator::receive (const unsigned int src_processor_id,
-                                     std::vector<std::vector<T>> & buf,
+                                     std::vector<std::vector<T>> & recv,
                                      const DataType & type,
                                      const MessageTag & tag) const
 {
-  LOG_SCOPE("receive()", "Parallel");
+  // temporary buffer - this will be sized in bytes
+  // and manipulated with MPI_Unpack
+  std::vector<char> recvbuf;
 
-  // Get the status of the message, explicitly provide the
-  // datatype so we can later query the size
-  Status stat(this->probe(src_processor_id, tag), type);
+  Status stat = this->receive (src_processor_id, recvbuf, MPI_PACKED, tag);
 
-  // We did evil casts to pack metadata+data into the same buffer,
-  // so we want a C-style buffer which won't trigger constructors or
-  // destructors
-  const std::size_t stat_size = stat.size();
-  T * tempbuf = (T*)malloc(stat_size*sizeof(T));
+  // We should at least have one header datum, for outer vector size
+  libmesh_assert (!recvbuf.empty());
 
-  // Use stat.source() and stat.tag() in the receive - if
-  // src_processor_id is or tag is "any" then we want to be sure we
-  // try to receive the same message we just probed.
+  // Unpack the received buffer
+  int recvsize, pos=0;
   libmesh_call_mpi
-    (MPI_Recv (tempbuf,
-               cast_int<int>(stat_size), type, stat.source(),
-               stat.tag(), this->get(), stat.get()));
+    (MPI_Unpack (&recvbuf[0], libMesh::cast_int<int>(recvbuf.size()), &pos,
+                 &recvsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
+                 this->get()));
 
-  libmesh_assert_equal_to (stat.size(), stat_size);
+  // ... size the outer buffer
+  recv.resize (recvsize);
 
-  // Unpack temporary buffer
-  std::size_t * headerbuf = reinterpret_cast<std::size_t*>(tempbuf);
-  const std::size_t n_vecs = headerbuf[0];
-
-  const std::size_t headersize = (n_vecs+1) * (sizeof(std::size_t)/sizeof(T));
-  T * databuf = tempbuf + headersize;
-
-  // Check for any obvious insanity
-  libmesh_assert_less_equal(headersize, stat_size);
-
-  buf.resize(n_vecs);
-  T * nextdatabuf = databuf;
-  for (std::size_t i=0; i != n_vecs; ++i)
+  const std::size_t n_vecs = recvsize;
+  for (std::size_t i = 0; i != n_vecs; ++i)
     {
-      const std::size_t sizei = headerbuf[i+1];
-      libmesh_assert_less_equal
-        (nextdatabuf + sizei, tempbuf + stat_size);
-      buf[i].assign(nextdatabuf, nextdatabuf+sizei);
-      nextdatabuf += sizei;
-    }
+      int subvec_size;
 
-  free(tempbuf);
+      libmesh_call_mpi
+        (MPI_Unpack (&recvbuf[0], recvsize, &pos,
+                     &subvec_size, 1,
+                     libMesh::Parallel::StandardType<unsigned int>(),
+                     this->get()));
+
+      // ... size the inner buffer
+      recv[i].resize (subvec_size);
+
+      // ... unpack the inner buffer if it is not empty
+      if (!recv[i].empty())
+        libmesh_call_mpi
+          (MPI_Unpack (&recvbuf[0], recvsize, &pos, &recv[i][0],
+                       subvec_size, type, this->get()));
+    }
 
   return stat;
 }
