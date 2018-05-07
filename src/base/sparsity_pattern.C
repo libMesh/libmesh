@@ -23,6 +23,8 @@
 #include "libmesh/elem.h"
 #include "libmesh/ghosting_functor.h"
 #include "libmesh/sparsity_pattern.h"
+#include "libmesh/communicator.h"
+#include "libmesh/parallel_algebra.h"
 
 
 namespace libMesh
@@ -448,126 +450,167 @@ void Build::parallel_sync ()
   parallel_object_only();
   libmesh_assert(this->comm().verify(need_full_sparsity_pattern));
 
-  const dof_id_type n_global_dofs   = dof_map.n_dofs();
-  const dof_id_type n_dofs_on_proc  = dof_map.n_dofs_on_processor(this->processor_id());
-  const dof_id_type local_first_dof = dof_map.first_dof();
-  const dof_id_type local_end_dof   = dof_map.end_dof();
+  auto & comm = this->comm();
+  auto pid = comm.rank();
+  auto num_procs = comm.size();
 
-  // Trade sparsity rows with other processors
-  for (processor_id_type p=1; p != this->n_processors(); ++p)
+  auto dof_tag = comm.get_unique_tag(998);
+  auto row_tag = comm.get_unique_tag(9998);
+
+  const auto n_global_dofs   = dof_map.n_dofs();
+  const auto n_dofs_on_proc  = dof_map.n_dofs_on_processor(pid);
+  const auto local_first_dof = dof_map.first_dof();
+  const auto local_end_dof   = dof_map.end_dof();
+
+  // The data to send
+  std::map<processor_id_type, std::pair<std::vector<dof_id_type>, std::vector<Row>>> data_to_send;
+
+  // True/false if we're sending to that processor
+  std::vector<char> will_send_to(num_procs);
+
+  processor_id_type num_sends = 0;
+
+  // Loop over the nonlocal rows and transform them into the new datastructure
+  NonlocalGraph::iterator it = nonlocal_pattern.begin();
+  while (it != nonlocal_pattern.end())
+  {
+    const auto dof_id = it->first;
+    auto & row = it->second;
+
+    processor_id_type proc_id = 0;
+    while (dof_id >= dof_map.end_dof(proc_id))
+      proc_id++;
+
+    will_send_to[proc_id] = true;
+    num_sends++;
+
+    // rhs [] on purpose
+    auto & proc_data = data_to_send[proc_id];
+
+    proc_data.first.push_back(dof_id);
+
+    // Note this invalidates the data in nonlocal_pattern
+    proc_data.second.emplace_back(std::move(row));
+
+    // Might as well remove it since it's invalidated anyway
+    nonlocal_pattern.erase(it++);
+  }
+
+  // Tell everyone about where everyone will send to
+  comm.alltoall(will_send_to);
+
+  // will_send_to now represents who we'll receive from
+  // give it a good name
+  auto & will_receive_from = will_send_to;
+
+  std::vector<Parallel::Request> dof_sends(num_sends);
+  std::vector<Parallel::Request> row_sends(num_sends);
+
+  // Post all of the sends
+  processor_id_type current_send = 0;
+  for (auto & proc_data : data_to_send)
+  {
+    auto proc_id = proc_data.first;
+
+    auto & dofs = proc_data.second.first;
+    auto & rows = proc_data.second.second;
+
+    comm.send(proc_id, dofs, dof_sends[current_send], dof_tag);
+    comm.send(proc_id, rows, row_sends[current_send], row_tag);
+
+    current_send++;
+  }
+
+  // Figure out how many receives we're going to have and make a
+  // quick list of who's sending
+  processor_id_type num_receives = 0;
+  std::vector<processor_id_type> receiving_from;
+  for (processor_id_type proc_id = 0; proc_id < num_procs; proc_id++)
+  {
+    auto will = will_receive_from[proc_id];
+
+    if (will)
     {
-      // Push to processor procup while receiving from procdown
-      processor_id_type procup =
-        cast_int<processor_id_type>((this->processor_id() + p) %
-                                    this->n_processors());
-      processor_id_type procdown =
-        cast_int<processor_id_type>((this->n_processors() + this->processor_id() - p) %
-                                    this->n_processors());
-
-      // Pack the sparsity pattern rows to push to procup
-      std::vector<dof_id_type> pushed_row_ids,
-        pushed_row_ids_to_me;
-      std::vector<std::vector<dof_id_type>> pushed_rows,
-        pushed_rows_to_me;
-
-      // Move nonlocal row information to a structure to send it from;
-      // we don't need it in the map after that.
-      NonlocalGraph::iterator it = nonlocal_pattern.begin();
-      while (it != nonlocal_pattern.end())
-        {
-          const dof_id_type dof_id = it->first;
-          processor_id_type proc_id = 0;
-          while (dof_id >= dof_map.end_dof(proc_id))
-            proc_id++;
-
-          libmesh_assert (proc_id != this->processor_id());
-
-          if (proc_id == procup)
-            {
-              pushed_row_ids.push_back(dof_id);
-
-              // We can't just do the swap trick here, thanks to the
-              // differing vector allocators?
-              pushed_rows.push_back(std::vector<dof_id_type>());
-              pushed_rows.back().assign
-                (it->second.begin(), it->second.end());
-
-              nonlocal_pattern.erase(it++);
-            }
-          else
-            ++it;
-        }
-
-      this->comm().send_receive(procup, pushed_row_ids,
-                                procdown, pushed_row_ids_to_me);
-      this->comm().send_receive(procup, pushed_rows,
-                                procdown, pushed_rows_to_me);
-      pushed_row_ids.clear();
-      pushed_rows.clear();
-
-      const std::size_t n_rows = pushed_row_ids_to_me.size();
-      for (std::size_t i=0; i != n_rows; ++i)
-        {
-          const dof_id_type r = pushed_row_ids_to_me[i];
-          const dof_id_type my_r = r - local_first_dof;
-
-          std::vector<dof_id_type> & their_row = pushed_rows_to_me[i];
-
-          if (need_full_sparsity_pattern)
-            {
-              SparsityPattern::Row & my_row =
-                sparsity_pattern[my_r];
-
-              // They wouldn't have sent an empty row
-              libmesh_assert(!their_row.empty());
-
-              // We can end up with an empty row on a dof that touches our
-              // inactive elements but not our active ones
-              if (my_row.empty())
-                {
-                  my_row.assign (their_row.begin(),
-                                 their_row.end());
-                }
-              else
-                {
-                  my_row.insert (my_row.end(),
-                                 their_row.begin(),
-                                 their_row.end());
-
-                  // We cannot use SparsityPattern::sort_row() here because it expects
-                  // the [begin,middle) [middle,end) to be non-overlapping.  This is not
-                  // necessarily the case here, so use std::sort()
-                  std::sort (my_row.begin(), my_row.end());
-
-                  my_row.erase(std::unique (my_row.begin(), my_row.end()), my_row.end());
-                }
-
-              // fix the number of on and off-processor nonzeros in this row
-              n_nz[my_r] = n_oz[my_r] = 0;
-
-              for (std::size_t j=0; j<my_row.size(); j++)
-                if ((my_row[j] < local_first_dof) || (my_row[j] >= local_end_dof))
-                  n_oz[my_r]++;
-                else
-                  n_nz[my_r]++;
-            }
-          else
-            {
-              for (std::size_t j=0; j<their_row.size(); j++)
-                if ((their_row[j] < local_first_dof) || (their_row[j] >= local_end_dof))
-                  n_oz[my_r]++;
-                else
-                  n_nz[my_r]++;
-
-              n_nz[my_r] = std::min(n_nz[my_r], n_dofs_on_proc);
-              n_oz[my_r] = std::min(n_oz[my_r],
-                                    static_cast<dof_id_type>(n_global_dofs-n_nz[my_r]));
-            }
-        }
+      num_receives++;
+      receiving_from.push_back(proc_id);
     }
+  }
+
+  // Post the receives and handle the data
+  for (auto proc_id : receiving_from)
+  {
+    std::vector<dof_id_type> in_dofs;
+    std::vector<Row> in_rows;
+
+    // Receive dofs
+    comm.receive(proc_id, in_dofs, dof_tag);
+    comm.receive(proc_id, in_rows, row_tag);
+
+    const auto n_rows = in_dofs.size();
+    for (auto i = decltype(n_rows)(0); i != n_rows; ++i)
+    {
+      const auto r = in_dofs[i];
+      const auto my_r = r - local_first_dof;
+
+      auto & their_row = in_rows[i];
+
+      if (need_full_sparsity_pattern)
+      {
+        auto & my_row = sparsity_pattern[my_r];
+
+        // They wouldn't have sent an empty row
+        libmesh_assert(!their_row.empty());
+
+        // We can end up with an empty row on a dof that touches our
+        // inactive elements but not our active ones
+        if (my_row.empty())
+        {
+          my_row.assign (their_row.begin(), their_row.end());
+        }
+        else
+        {
+          my_row.insert (my_row.end(),
+                         their_row.begin(),
+                         their_row.end());
+
+          // We cannot use SparsityPattern::sort_row() here because it expects
+          // the [begin,middle) [middle,end) to be non-overlapping.  This is not
+          // necessarily the case here, so use std::sort()
+          std::sort (my_row.begin(), my_row.end());
+
+          my_row.erase(std::unique (my_row.begin(), my_row.end()), my_row.end());
+        }
+
+        // fix the number of on and off-processor nonzeros in this row
+        n_nz[my_r] = n_oz[my_r] = 0;
+
+        for (std::size_t j=0; j<my_row.size(); j++)
+          if ((my_row[j] < local_first_dof) || (my_row[j] >= local_end_dof))
+            n_oz[my_r]++;
+          else
+            n_nz[my_r]++;
+      }
+      else
+      {
+        for (std::size_t j=0; j<their_row.size(); j++)
+          if ((their_row[j] < local_first_dof) || (their_row[j] >= local_end_dof))
+            n_oz[my_r]++;
+          else
+            n_nz[my_r]++;
+
+        n_nz[my_r] = std::min(n_nz[my_r], n_dofs_on_proc);
+        n_oz[my_r] = std::min(n_oz[my_r],
+                              static_cast<dof_id_type>(n_global_dofs-n_nz[my_r]));
+      }
+    }
+  }
 
   // We should have sent everything at this point.
   libmesh_assert (nonlocal_pattern.empty());
+
+  // Make sure to cleanup requests
+  Parallel::wait(dof_sends);
+  Parallel::wait(row_sends);
 }
 
 
