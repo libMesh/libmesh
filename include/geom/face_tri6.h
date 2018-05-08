@@ -31,16 +31,23 @@ namespace libMesh
  * The \p Tri6 is an element in 2D composed of 6 nodes.
  * It is numbered like this:
  * \verbatim
- *   TRI6:  2
- *          o
- *         / \
- *        /   \
- *     5 o     o 4
- *      /       \
- *     /         \
- *    o-----o-----o
- *    0     3     1
+ *   TRI6:
+ *    2
+ *    o
+ *    |\
+ *    | \
+ *    |  \            eta
+ *    |   \            ^
+ *    |    \           |
+ *  5 o     o 4        |
+ *    |      \         o---> xi
+ *    |       \
+ *    |        \
+ *    o----o----o
+ *    0    3    1
  * \endverbatim
+ * (xi, eta) are the reference element coordinates associated with
+ * the given numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2002

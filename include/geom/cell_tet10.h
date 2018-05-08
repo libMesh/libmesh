@@ -35,14 +35,14 @@ namespace libMesh
  *              /|\
  *             / | \
  *         7  /  |  \9
- *           o   |   o
- *          /    |8   \
- *         /     o     \
- *        /    6 |      \
- *     0 o.....o.|.......o 2
- *        \      |      /
- *         \     |     /
- *          \    |    /
+ *           o   |   o              zeta
+ *          /    |8   \              ^
+ *         /     o     \             |
+ *        /    6 |      \            |
+ *     0 o.....o.|.......o 2         o---> eta
+ *        \      |      /             \
+ *         \     |     /               \
+ *          \    |    /                 xi (out of page)
  *         4 o   |   o 5
  *            \  |  /
  *             \ | /
@@ -50,6 +50,8 @@ namespace libMesh
  *               o
  *               1
  * \endverbatim
+ * (xi, eta, zeta) are the reference element coordinates associated with
+ * the given numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2002

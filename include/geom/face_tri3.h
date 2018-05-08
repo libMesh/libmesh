@@ -38,14 +38,16 @@ namespace libMesh
  *   TRI3:
  *    2
  *    o
- *    |\
- *    | \
- *    |  \
- *    |   \
- *    |    \
+ *    |\            eta
+ *    | \            ^
+ *    |  \           |
+ *    |   \          |
+ *    |    \         o---> xi
  *    o-----o
  *    0      1
  * \endverbatim
+ * (xi, eta) are the reference element coordinates associated with
+ * the given numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2002

@@ -33,14 +33,16 @@ namespace libMesh
  * \verbatim
  *          3     6     2
  *   QUAD8: o-----o-----o
- *          |           |
- *          |           |
- *        7 o           o 5
- *          |           |
- *          |           |
+ *          |           |           eta
+ *          |           |            ^
+ *        7 o           o 5          |
+ *          |           |            |
+ *          |           |            o---> xi
  *          o-----o-----o
  *          0     4     1
  * \endverbatim
+ * (xi, eta) are the reference element coordinates associated with
+ * the given numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2002
