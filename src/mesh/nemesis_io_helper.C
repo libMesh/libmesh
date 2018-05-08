@@ -2516,8 +2516,6 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
 {
   int num_vars = cast_int<int>(names.size());
 
-#ifndef LIBMESH_USE_COMPLEX_NUMBERS
-
   for (int c=0; c<num_vars; c++)
     {
       // If we are not writing this variable, skip to the next loop
@@ -2537,31 +2535,10 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
       std::vector<Number> local_soln;
       parallel_soln.localize(local_soln, required_indices);
 
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
       // Call the ExodusII_IO_Helper function to write the data.
       write_nodal_values(c+1, local_soln, timestep);
-    }
-
-#else // LIBMESH_USE_COMPLEX_NUMBERS
-
-  for (int c=0; c<num_vars; c++)
-    {
-      // If we are not writing this variable, skip to the next loop
-      // iteration. This is needed to keep the indexing consistent
-      // with the ordering of parallel_soln.
-      if (std::find(output_names.begin(), output_names.end(), names[c]) == output_names.end())
-        continue;
-
-      // Fill up a std::vector with the dofs for the current variable
-      std::vector<numeric_index_type> required_indices(num_nodes);
-
-      for (int i=0; i<num_nodes; i++)
-        required_indices[i] = this->exodus_node_num_to_libmesh[i]*num_vars + c;
-
-      // Get the dof values required to write just our local part of
-      // the solution vector.
-      std::vector<Number> local_soln;
-      parallel_soln.localize(local_soln, required_indices);
-
+#else
       // We have the local (complex) values. Now extract the real,
       // imaginary, and magnitude values from them.
       std::vector<Real> real_parts(num_nodes);
@@ -2579,11 +2556,8 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
       write_nodal_values(3*c+1, real_parts, timestep);
       write_nodal_values(3*c+2, imag_parts, timestep);
       write_nodal_values(3*c+3, magnitudes, timestep);
-    }
-
 #endif
-
-
+    }
 }
 
 
