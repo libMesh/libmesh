@@ -298,6 +298,10 @@ public:
   /**
    * Takes a parallel solution vector containing the node-major
    * solution vector for all variables and outputs it to the files.
+   * \param parallel_soln
+   * \param names A vector containing the names of _all_ variables in parallel_soln.
+   * \param timestep To be passed to the ExodusII_IO_Helper::write_nodal_values() function.
+   * \param output_names A vector containing the names of variables in parallel_soln that should actually be written (whitelist).
    *
    * \note This version of write_nodal_solution() is called by the
    * parallel version of Nemesis_IO::write_nodal_data(), which is
@@ -308,7 +312,8 @@ public:
    */
   void write_nodal_solution(const NumericVector<Number> & parallel_soln,
                             const std::vector<std::string> & names,
-                            int timestep);
+                            int timestep,
+                            const std::vector<std::string> & output_names);
 
   /**
    * Takes a solution vector containing the solution for all variables and outputs it to the files

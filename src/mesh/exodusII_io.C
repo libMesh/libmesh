@@ -765,22 +765,17 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
       // order of [num_vars * node_id + var_id]. We now copy the
       // proper solution values contiguously into "cur_soln",
       // removing the gaps.
-      {
-        MeshBase::const_node_iterator it = mesh.nodes_begin();
-        const MeshBase::const_node_iterator end = mesh.nodes_end();
-        for (; it != end; ++it)
-          {
-            const Node * node = *it;
-            dof_id_type idx = node->id()*num_vars + c;
+      for (const auto & node : mesh.node_ptr_range())
+        {
+          dof_id_type idx = node->id()*num_vars + c;
 #ifdef LIBMESH_USE_REAL_NUMBERS
-            cur_soln.push_back(soln[idx]);
+          cur_soln.push_back(soln[idx]);
 #else
-            real_parts.push_back(soln[idx].real());
-            imag_parts.push_back(soln[idx].imag());
-            magnitudes.push_back(std::abs(soln[idx]));
+          real_parts.push_back(soln[idx].real());
+          imag_parts.push_back(soln[idx].imag());
+          magnitudes.push_back(std::abs(soln[idx]));
 #endif
-          }
-      }
+        }
 
       // Finally, actually call the Exodus API to write to file.
 #ifdef LIBMESH_USE_REAL_NUMBERS
