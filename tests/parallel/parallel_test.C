@@ -41,6 +41,8 @@ public:
   CPPUNIT_TEST( testIsendRecv );
   CPPUNIT_TEST( testIrecvSend );
   CPPUNIT_TEST( testRecvIsendSets );
+  CPPUNIT_TEST( testRecvIsendVecVecs );
+  CPPUNIT_TEST( testSendRecvVecVecs );
   CPPUNIT_TEST( testSemiVerify );
   CPPUNIT_TEST( testSplit );
 
@@ -482,6 +484,87 @@ public:
           CPPUNIT_ASSERT ( recv_val.count(*it) );
 
         Parallel::wait (request);
+
+        recv_val.clear();
+      }
+  }
+
+
+
+  void testRecvIsendVecVecs ()
+  {
+    unsigned int procup = (TestCommWorld->rank() + 1) %
+      TestCommWorld->size();
+    unsigned int procdown = (TestCommWorld->size() +
+                             TestCommWorld->rank() - 1) %
+      TestCommWorld->size();
+
+    std::vector<std::vector<unsigned int> > src_val(3), recv_val;
+
+    src_val[0].push_back(4);  // Chosen by fair dice roll
+    src_val[2].push_back(procup);
+    src_val[2].push_back(TestCommWorld->rank());
+
+    Parallel::Request request;
+
+    if (TestCommWorld->size() > 1)
+      {
+        TestCommWorld->send (procup, src_val, request);
+
+        TestCommWorld->receive (procdown,
+                                recv_val);
+
+        CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
+
+        for (std::size_t i = 0; i != 3; ++i)
+          CPPUNIT_ASSERT_EQUAL ( src_val[i].size(), recv_val[i].size() );
+
+        CPPUNIT_ASSERT_EQUAL ( recv_val[0][0], static_cast<unsigned int> (4) );
+        CPPUNIT_ASSERT_EQUAL ( recv_val[2][0], static_cast<unsigned int> (TestCommWorld->rank()) );
+        CPPUNIT_ASSERT_EQUAL ( recv_val[2][1], procdown );
+
+        Parallel::wait (request);
+
+        recv_val.clear();
+      }
+  }
+
+
+  void testSendRecvVecVecs ()
+  {
+    unsigned int procup = (TestCommWorld->rank() + 1) %
+      TestCommWorld->size();
+    unsigned int procdown = (TestCommWorld->size() +
+                             TestCommWorld->rank() - 1) %
+      TestCommWorld->size();
+
+    // Any odd processor out does nothing
+    if ((TestCommWorld->size() % 2) && procup == 0)
+      return;
+
+    std::vector<std::vector<unsigned int> > src_val(3), recv_val;
+
+    src_val[0].push_back(4);  // Chosen by fair dice roll
+    src_val[2].push_back(procup);
+    src_val[2].push_back(TestCommWorld->rank());
+
+    // Other even numbered processors send
+    if (TestCommWorld->rank() % 2 == 0)
+      TestCommWorld->send (procup, src_val);
+    // Other odd numbered processors receive
+    else
+      {
+        TestCommWorld->receive (procdown,
+                                recv_val);
+
+        CPPUNIT_ASSERT_EQUAL ( src_val.size() , recv_val.size() );
+
+        for (std::size_t i = 0; i != 3; ++i)
+          CPPUNIT_ASSERT_EQUAL ( src_val[i].size(), recv_val[i].size() );
+
+        CPPUNIT_ASSERT_EQUAL ( recv_val[0][0], static_cast<unsigned int> (4) );
+        CPPUNIT_ASSERT_EQUAL ( recv_val[2][0], static_cast<unsigned int> (TestCommWorld->rank()) );
+        CPPUNIT_ASSERT_EQUAL ( recv_val[2][1], procdown );
 
         recv_val.clear();
       }

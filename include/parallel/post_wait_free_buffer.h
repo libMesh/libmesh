@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LIBMESH_POST_WAIT_DELETE_BUFFER_H
-#define LIBMESH_POST_WAIT_DELETE_BUFFER_H
+#ifndef LIBMESH_POST_WAIT_FREE_BUFFER_H
+#define LIBMESH_POST_WAIT_FREE_BUFFER_H
 
 // Parallel includes
 #include "libmesh/post_wait_work.h"
@@ -31,19 +31,19 @@ namespace libMesh
 namespace Parallel
 {
 
-// PostWaitWork specialization for deleting no-longer-needed buffers.
-template <typename Container>
-struct PostWaitDeleteBuffer : public PostWaitWork {
-  PostWaitDeleteBuffer(Container * buffer) : _buf(buffer) {}
+// PostWaitWork specialization for freeing no-longer-needed buffers.
+template <typename T>
+struct PostWaitFreeBuffer : public PostWaitWork {
+  PostWaitFreeBuffer(T * buffer) : _buf(buffer) {}
 
-  virtual void run() libmesh_override { delete _buf; }
+  virtual void run() libmesh_override { free(_buf); }
 
 private:
-  Container * _buf;
+  T * _buf;
 };
 
 } // namespace Parallel
 
 } // namespace libMesh
 
-#endif // LIBMESH_POST_WAIT_DELETE_BUFFER_H
+#endif // LIBMESH_POST_WAIT_FREE_BUFFER_H
