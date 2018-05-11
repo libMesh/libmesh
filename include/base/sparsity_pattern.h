@@ -47,7 +47,7 @@ class CouplingMatrix;
  */
 namespace SparsityPattern // use a namespace so member classes can be forward-declared.
 {
-typedef std::vector<dof_id_type/*, Threads::scalable_allocator<dof_id_type>*/> Row;
+typedef std::vector<dof_id_type, Threads::scalable_allocator<dof_id_type>> Row;
 class Graph : public std::vector<Row> {};
 
 class NonlocalGraph : public std::map<dof_id_type, Row> {};
