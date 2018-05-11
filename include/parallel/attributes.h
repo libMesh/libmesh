@@ -68,14 +68,13 @@ struct Attributes
   }
 
 #define LIBMESH_CONTAINER_TYPE(cxxtype)                                 \
-  template<typename T>                                                  \
-  struct Attributes<cxxtype<T>>                                         \
+  struct Attributes<cxxtype>                                         \
   {                                                                     \
     static const bool has_min_max = Attributes<T>::has_min_max;         \
-    static void set_lowest(cxxtype<T> & x) {                            \
+    static void set_lowest(cxxtype & x) {                            \
       for (auto & val : x)                                              \
         Attributes<T>::set_lowest(val); }                               \
-    static void set_highest(cxxtype<T> & x) {                           \
+    static void set_highest(cxxtype & x) {                           \
       for (auto & val : x)                                              \
         Attributes<T>::set_highest(val); }                              \
   }
@@ -96,8 +95,14 @@ LIBMESH_INT_TYPE(unsigned long long);
 LIBMESH_FLOAT_TYPE(float);
 LIBMESH_FLOAT_TYPE(double);
 LIBMESH_FLOAT_TYPE(long double);
-LIBMESH_CONTAINER_TYPE(std::set);
-LIBMESH_CONTAINER_TYPE(std::vector);
+
+#define LIBMESH_ATTRIBUTES_COMMA ,
+
+template <typename T, typename C, typename A>
+LIBMESH_CONTAINER_TYPE(std::set<T LIBMESH_ATTRIBUTES_COMMA C LIBMESH_ATTRIBUTES_COMMA A>);
+
+template <typename T, typename A>
+LIBMESH_CONTAINER_TYPE(std::vector<T LIBMESH_ATTRIBUTES_COMMA A>);
 
 } // namespace Parallel
 
