@@ -237,9 +237,9 @@ public:
    * of it's values on all processors.  Set each \p min_id entry to
    * the minimum rank where a corresponding minimum was found.
    */
-  template <typename T>
-  void minloc(std::vector<T> & r,
-              std::vector<unsigned int> & min_id) const;
+  template <typename T, typename A1, typename A2>
+  void minloc(std::vector<T,A1> & r,
+              std::vector<unsigned int,A2> & min_id) const;
 
   /**
    * Take a local variable and replace it with the maximum of it's values
@@ -262,9 +262,9 @@ public:
    * of it's values on all processors.  Set each \p min_id entry to
    * the minimum rank where a corresponding maximum was found.
    */
-  template <typename T>
-  void maxloc(std::vector<T> & r,
-              std::vector<unsigned int> & max_id) const;
+  template <typename T, typename A1, typename A2>
+  void maxloc(std::vector<T,A1> & r,
+              std::vector<unsigned int,A2> & max_id) const;
 
   /**
    * Take a local variable and replace it with the sum of it's values
@@ -591,20 +591,20 @@ public:
    * Take a vector of length comm.size(), and on processor root_id fill in
    * recv[processor_id] = the value of send on processor processor_id
    */
-  template <typename T>
+  template <typename T, typename A>
   inline void gather(const unsigned int root_id,
                      const T & send,
-                     std::vector<T> & recv) const;
+                     std::vector<T,A> & recv) const;
 
   /**
    * The gather overload for string types has an optional
    * identical_buffer_sizes optimization for when all strings are the
    * same length.
    */
-  template <typename T>
+  template <typename T, typename A>
   inline void gather(const unsigned int root_id,
                      const std::basic_string<T> & send,
-                     std::vector<std::basic_string<T>> & recv,
+                     std::vector<std::basic_string<T>,A> & recv,
                      const bool identical_buffer_sizes=false) const;
 
   /**
@@ -629,26 +629,26 @@ public:
    * on processor root_id. This function is collective and therefore
    * must be called by all processors in the Communicator.
    */
-  template <typename T>
+  template <typename T, typename A>
   inline void gather(const unsigned int root_id,
-                     std::vector<T> & r) const;
+                     std::vector<T,A> & r) const;
 
   /**
    * Take a vector of length \p this->size(), and fill in
    * \p recv[processor_id] = the value of \p send on that processor
    */
-  template <typename T>
+  template <typename T, typename A>
   inline void allgather(const T & send,
-                        std::vector<T> & recv) const;
+                        std::vector<T,A> & recv) const;
 
   /**
    * The allgather overload for string types has an optional
    * identical_buffer_sizes optimization for when all strings are the
    * same length.
    */
-  template <typename T>
+  template <typename T, typename A>
   inline void allgather(const std::basic_string<T> & send,
-                        std::vector<std::basic_string<T>> & recv,
+                        std::vector<std::basic_string<T>,A> & recv,
                         const bool identical_buffer_sizes=false) const;
 
   /**
@@ -675,15 +675,15 @@ public:
    * on each processor. This function is collective and therefore
    * must be called by all processors in the Communicator.
    */
-  template <typename T>
-  inline void allgather(std::vector<T> & r,
+  template <typename T, typename A>
+  inline void allgather(std::vector<T,A> & r,
                         const bool identical_buffer_sizes = false) const;
 
   /**
    * AllGather overload for vectors of string types
    */
-  template <typename T>
-  inline void allgather(std::vector<std::basic_string<T>> & r,
+  template <typename T, typename A>
+  inline void allgather(std::vector<std::basic_string<T>,A> & r,
                         const bool identical_buffer_sizes = false) const;
 
   //-------------------------------------------------------------------
@@ -691,8 +691,8 @@ public:
    * Take a vector of local variables and scatter the ith item to the ith
    * processor in the communicator. The result is saved into recv.
    */
-  template <typename T>
-  inline void scatter(const std::vector<T> & data,
+  template <typename T, typename A>
+  inline void scatter(const std::vector<T,A> & data,
                       T & recv,
                       const unsigned int root_id=0) const;
 
@@ -702,9 +702,9 @@ public:
    * multiple of the communicator size. The result is saved into recv buffer.
    * The recv buffer does not have to be sized prior to this operation.
    */
-  template <typename T>
-  inline void scatter(const std::vector<T> & data,
-                      std::vector<T> & recv,
+  template <typename T, typename A>
+  inline void scatter(const std::vector<T,A> & data,
+                      std::vector<T,A> & recv,
                       const unsigned int root_id=0) const;
 
   /**
@@ -713,10 +713,10 @@ public:
    * the number of items for each processor. The result is saved into recv buffer.
    * The recv buffer does not have to be sized prior to this operation.
    */
-  template <typename T>
-  inline void scatter(const std::vector<T> & data,
-                      const std::vector<int> counts,
-                      std::vector<T> & recv,
+  template <typename T, typename A1, typename A2>
+  inline void scatter(const std::vector<T,A1> & data,
+                      const std::vector<int,A2> counts,
+                      std::vector<T,A1> & recv,
                       const unsigned int root_id=0) const;
 
   /**
@@ -724,9 +724,9 @@ public:
    * to the ith processor in the communicator. The result is saved into recv buffer.
    * The recv buffer does not have to be sized prior to this operation.
    */
-  template <typename T>
-  inline void scatter(const std::vector<std::vector<T>> & data,
-                      std::vector<T> & recv,
+  template <typename T, typename A1, typename A2>
+  inline void scatter(const std::vector<std::vector<T,A1>,A2> & data,
+                      std::vector<T,A1> & recv,
                       const unsigned int root_id=0,
                       const bool identical_buffer_sizes=false) const;
 
@@ -757,8 +757,8 @@ public:
    * The jth entry on processor i is replaced with the ith entry
    * from processor j.
    */
-  template <typename T>
-  inline void alltoall(std::vector<T> & r) const;
+  template <typename T, typename A>
+  inline void alltoall(std::vector<T,A> & r) const;
 
   /**
    * Take a local value and broadcast it to all processors.
