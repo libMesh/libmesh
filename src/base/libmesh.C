@@ -940,32 +940,9 @@ T command_line_value (const std::vector<std::string> & name, T value)
 template <typename T>
 T command_line_next (std::string name, T value)
 {
-  // Make sure the command line parser is ready for use
-  libmesh_assert(command_line.get());
-
-  // Users had better not be asking about an empty string
-  libmesh_assert(!name.empty());
-
-  bool found_it = command_line->search(1, name.c_str());
-
-  if (found_it)
-    return command_line->next(value);
-
-  // Try with all dashes instead of underscores
-  std::replace(name.begin(), name.end(), '_', '-');
-  found_it = command_line->search(1, name.c_str());
-
-  if (found_it)
-    return command_line->next(value);
-
-  // OK, try with all underscores instead of dashes
-  auto name_begin = name.begin();
-  while (*name_begin == '-')
-    ++name_begin;
-  std::replace(name_begin, name.end(), '-', '_');
-  found_it = command_line->search(name);
-
-  if (found_it)
+  // on_command_line also puts the command_line cursor in the spot we
+  // need
+  if (on_command_line(name))
     return command_line->next(value);
 
   return value;
