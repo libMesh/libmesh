@@ -2708,12 +2708,10 @@ inline void Communicator::alltoall(std::vector<T,A> & buf) const
 
   libmesh_assert(this->verify(size_per_proc));
 
-  std::vector<T,A> tmp(buf);
-
-  StandardType<T> send_type(&tmp[0]);
+  StandardType<T> send_type(&buf[0]);
 
   libmesh_call_mpi
-    (MPI_Alltoall (&tmp[0], size_per_proc, send_type, &buf[0],
+    (MPI_Alltoall (MPI_IN_PLACE, size_per_proc, send_type, &buf[0],
                    size_per_proc, send_type, this->get()));
 }
 
