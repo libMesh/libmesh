@@ -1181,7 +1181,6 @@ enable_2D_only
 enable_pfem
 enable_ifem
 enable_second
-enable_xdr
 enable_complex
 enable_reference_counting
 enable_perflog
@@ -1189,6 +1188,7 @@ enable_examples
 enable_optional
 enable_strict_lgpl
 enable_nested
+enable_xdr
 enable_boost
 with_boost
 with_boost_libdir
@@ -1976,7 +1976,6 @@ Optional Features:
   --disable-pfem          build without support for higher p order FEM shapes
   --enable-ifem           build with infinite elements
   --disable-second        build without second derivatives support
-  --disable-xdr           build without XDR platform-independent binary I/O
   --enable-complex        build to support complex-number solutions
   --disable-reference-counting
                           build without reference counting support
@@ -1986,6 +1985,7 @@ Optional Features:
   --disable-strict-lgpl   Compile libmesh with even non-LGPL-compatible
                           contrib libraries
   --disable-nested        Do not use nested autoconf subpackages
+  --disable-xdr           build without XDR platform-independent binary I/O
   --disable-boost         build without either external or built-in BOOST
                           support
   --disable-petsc         build without PETSc iterative solver support
@@ -3147,73 +3147,6 @@ $as_echo "$ac_res" >&6; }
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_cxx_check_decl
-
-# ac_fn_cxx_check_func LINENO FUNC VAR
-# ------------------------------------
-# Tests whether FUNC exists, setting the cache variable VAR accordingly
-ac_fn_cxx_check_func ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
-$as_echo_n "checking for $2... " >&6; }
-if eval \${$3+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-/* Define $2 to an innocuous variant, in case <limits.h> declares $2.
-   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-#define $2 innocuous_$2
-
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char $2 (); below.
-    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-    <limits.h> exists even on freestanding compilers.  */
-
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
-#endif
-
-#undef $2
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char $2 ();
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined __stub_$2 || defined __stub___$2
-choke me
-#endif
-
-int
-main ()
-{
-return $2 ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  eval "$3=yes"
-else
-  eval "$3=no"
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-fi
-eval ac_res=\$$3
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-
-} # ac_fn_cxx_check_func
 
 # ac_fn_c_check_header_mongrel LINENO HEADER VAR INCLUDES
 # -------------------------------------------------------
@@ -30929,82 +30862,6 @@ fi
 
 
 
-# --------------------------------------------------------------
-# XDR binary IO support - enabled by default
-# --------------------------------------------------------------
-# Check whether --enable-xdr was given.
-if test "${enable_xdr+set}" = set; then :
-  enableval=$enable_xdr; enablexdr=$enableval
-else
-  enablexdr=yes
-fi
-
-
-if test "$enablexdr" != no; then :
-
-   for ac_header in rpc/rpc.h
-do :
-  ac_fn_cxx_check_header_mongrel "$LINENO" "rpc/rpc.h" "ac_cv_header_rpc_rpc_h" "$ac_includes_default"
-if test "x$ac_cv_header_rpc_rpc_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_RPC_RPC_H 1
-_ACEOF
-
-                     ac_fn_cxx_check_func "$LINENO" "xdrstdio_create" "ac_cv_func_xdrstdio_create"
-if test "x$ac_cv_func_xdrstdio_create" = xyes; then :
-
-
-$as_echo "#define HAVE_XDR 1" >>confdefs.h
-
-                                     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with XDR support >>>" >&5
-$as_echo "<<< Configuring library with XDR support >>>" >&6; }
-
-else
-  enablexdr=no
-fi
-
-
-else
-
-                      for ac_header in rpc/xdr.h
-do :
-  ac_fn_cxx_check_header_mongrel "$LINENO" "rpc/xdr.h" "ac_cv_header_rpc_xdr_h" "$ac_includes_default"
-if test "x$ac_cv_header_rpc_xdr_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_RPC_XDR_H 1
-_ACEOF
-
-                                        ac_fn_cxx_check_func "$LINENO" "xdrstdio_create" "ac_cv_func_xdrstdio_create"
-if test "x$ac_cv_func_xdrstdio_create" = xyes; then :
-
-
-$as_echo "#define HAVE_XDR 1" >>confdefs.h
-
-                                                        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with XDR support >>>" >&5
-$as_echo "<<< Configuring library with XDR support >>>" >&6; }
-
-else
-  enablexdr=no
-fi
-
-
-else
-  enablexdr=no
-fi
-
-done
-
-
-fi
-
-done
-
-
-fi
-# -------------------------------------------------------------
-
-
-
 # -------------------------------------------------------------
 # complex numbers -- disabled by default
 # -------------------------------------------------------------
@@ -31253,6 +31110,128 @@ esac
 else
   enablenested=$enableoptional
 fi
+
+
+
+# --------------------------------------------------------------
+# XDR binary IO support - enabled by default
+# This used to be tested in libmesh_core_features.m4 since your
+# system either had it or it didn't. Now it's possible for the
+# XDR headers to be in different places, so it's more convenient
+# to test for it here.
+# --------------------------------------------------------------
+# Check whether --enable-xdr was given.
+if test "${enable_xdr+set}" = set; then :
+  enableval=$enable_xdr; enablexdr=$enableval
+else
+  enablexdr=yes
+fi
+
+
+if test "$enablexdr" != no; then :
+
+            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for built-in XDR support" >&5
+$as_echo_n "checking for built-in XDR support... " >&6; }
+
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdio.h>
+                                   #include <rpc/rpc.h>
+                                   #include <rpc/xdr.h>
+int
+main ()
+{
+
+                                    XDR * xdr;
+                                    FILE * fp;
+                                    xdrstdio_create(xdr, fp, XDR_ENCODE);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_XDR 1" >>confdefs.h
+
+                   enablexdr=yes
+
+else
+
+                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+                   enablexdr=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+
+            if test "x$enablexdr" = "xno"; then :
+
+              { $as_echo "$as_me:${as_lineno-$LINENO}: checking for XDR support in /usr/include/tirpc" >&5
+$as_echo_n "checking for XDR support in /usr/include/tirpc... " >&6; }
+              old_CPPFLAGS="$CPPFLAGS"
+              old_LIBS="$LIBS"
+              CPPFLAGS="$CPPFLAGS -I/usr/include/tirpc"
+              LIBS="$LIBS -ltirpc"
+
+
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdio.h>
+                                   #include <rpc/rpc.h>
+                                   #include <rpc/xdr.h>
+int
+main ()
+{
+
+                                    XDR * xdr;
+                                    FILE * fp;
+                                    xdrstdio_create(xdr, fp, XDR_ENCODE);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+
+                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_XDR 1" >>confdefs.h
+
+                   enablexdr=yes
+
+else
+
+                   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+                   enablexdr=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+
+                            if test "x$enablexdr" = "xyes"; then :
+
+                      libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES -I/usr/include/tirpc"
+                      libmesh_optional_LIBS="$libmesh_optional_LIBS -ltirpc"
+
+fi
+
+                            CPPFLAGS="$old_CPPFLAGS"
+              LIBS="$old_LIBS"
+
+fi
+
+fi
+# -------------------------------------------------------------
+
 
 
 # -------------------------------------------------------------

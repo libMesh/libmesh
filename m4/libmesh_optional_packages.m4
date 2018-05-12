@@ -83,6 +83,53 @@ AC_ARG_ENABLE(nested,
                        [AC_MSG_ERROR(bad value ${enableval} for --enable-nested)])],
               [enablenested=$enableoptional])
 
+
+# --------------------------------------------------------------
+# XDR binary IO support - enabled by default
+# This used to be tested in libmesh_core_features.m4 since your
+# system either had it or it didn't. Now it's possible for the
+# XDR headers to be in different places, so it's more convenient
+# to test for it here.
+# --------------------------------------------------------------
+AC_ARG_ENABLE(xdr,
+              AS_HELP_STRING([--disable-xdr],
+                             [build without XDR platform-independent binary I/O]),
+              enablexdr=$enableval,
+              enablexdr=yes)
+
+AS_IF([test "$enablexdr" != no],
+      [
+      dnl Check whether the system/compiler has xdr.h in /usr/include and glibc.
+      AC_MSG_CHECKING([for built-in XDR support])
+      CONFIGURE_XDR
+
+      dnl Check for headers in /usr/include/tirpc. (Fedora 28 does this.)
+      AS_IF([test "x$enablexdr" = "xno"],
+            [
+              AC_MSG_CHECKING([for XDR support in /usr/include/tirpc])
+              old_CPPFLAGS="$CPPFLAGS"
+              old_LIBS="$LIBS"
+              CPPFLAGS="$CPPFLAGS -I/usr/include/tirpc"
+              LIBS="$LIBS -ltirpc"
+
+              CONFIGURE_XDR
+
+              dnl If that worked, append the required include paths and libraries as necessary.
+              AS_IF([test "x$enablexdr" = "xyes"],
+                    [
+                      libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES -I/usr/include/tirpc"
+                      libmesh_optional_LIBS="$libmesh_optional_LIBS -ltirpc"
+                    ])
+
+              dnl Reset flags after testing
+              CPPFLAGS="$old_CPPFLAGS"
+              LIBS="$old_LIBS"
+           ])
+      ])
+# -------------------------------------------------------------
+
+
+
 # -------------------------------------------------------------
 # Boost -- enabled by default
 # -------------------------------------------------------------

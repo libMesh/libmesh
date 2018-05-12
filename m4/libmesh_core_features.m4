@@ -555,43 +555,6 @@ AS_IF([test "$enablesecond" != no],
 
 
 
-# --------------------------------------------------------------
-# XDR binary IO support - enabled by default
-# --------------------------------------------------------------
-AC_ARG_ENABLE(xdr,
-              AS_HELP_STRING([--disable-xdr],
-                             [build without XDR platform-independent binary I/O]),
-              enablexdr=$enableval,
-              enablexdr=yes)
-
-AS_IF([test "$enablexdr" != no],
-      [
-   AC_CHECK_HEADERS(rpc/rpc.h,
-                    [
-                     AC_CHECK_FUNC(xdrstdio_create,
-                                   [
-                                     AC_DEFINE(HAVE_XDR, 1, [Flag indicating headers and libraries for XDR IO are available])
-                                     AC_MSG_RESULT(<<< Configuring library with XDR support >>>)
-                                   ],
-                                   [enablexdr=no])
-                    ],
-                    [
-                      AC_CHECK_HEADERS(rpc/xdr.h,
-                                       [
-                                        AC_CHECK_FUNC(xdrstdio_create,
-                                                      [
-                                                        AC_DEFINE(HAVE_XDR, 1, [Flag indicating headers and libraries for XDR IO are available])
-                                                        AC_MSG_RESULT(<<< Configuring library with XDR support >>>)
-                                                      ],
-                                                      [enablexdr=no])
-                                       ],
-                                       [enablexdr=no])
-                     ])
-      ])
-# -------------------------------------------------------------
-
-
-
 # -------------------------------------------------------------
 # complex numbers -- disabled by default
 # -------------------------------------------------------------
