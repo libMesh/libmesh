@@ -791,6 +791,49 @@ void ExodusII_IO::write_nodal_data (const std::string & fname,
 
 
 
+void ExodusII_IO::modify_and_write_nodal_data (ExodusII_IO & new_exii_io,
+                                               const std::string & fname,
+                                               const std::map<std::pair<int,std::string>, std::map<unsigned int,Real>> & new_nodal_vals)
+{
+  LOG_SCOPE("modify_and_write_nodal_data()", "ExodusII_IO");
+
+  if (MeshOutput<MeshBase>::mesh().processor_id())
+    return;
+
+  // Initialize exio_helper->nodal_var_names
+  get_nodal_var_names();
+
+  new_exii_io.write_nodal_data_common(fname, exio_helper->nodal_var_names, /*continuous=*/true);
+
+  for (int timestep=1; timestep<=exio_helper->num_time_steps; timestep++)
+    {
+      for (int var_index=0; var_index<exio_helper->num_nodal_vars; var_index++)
+        {
+          // Fill up exio_helper->nodal_var_values for var_index
+          const std::string & var_name = exio_helper->nodal_var_names[var_index];
+          exio_helper->read_nodal_var_values(var_name, timestep);
+
+          std::pair<int,std::string> index_pair;
+          index_pair.first = timestep;
+          index_pair.second = var_name;
+          auto it = new_nodal_vals.find(index_pair);
+          if (it != new_nodal_vals.end())
+            {
+              const std::map<unsigned int,Real> & vals = it->second;
+              for (auto vals_pair : vals)
+                {
+                  exio_helper->nodal_var_values[vals_pair.first] = vals_pair.second;
+                }
+            }
+
+          // Write out nodal_var_values
+          new_exii_io.exio_helper->write_nodal_values(var_index+1, exio_helper->nodal_var_values, timestep);
+        }
+    }
+}
+
+
+
 
 void ExodusII_IO::write_information_records (const std::vector<std::string> & records)
 {
