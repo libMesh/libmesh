@@ -26,6 +26,7 @@
 #include "libmesh/location_maps.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_algebra.h"
 
 
 namespace libMesh
@@ -257,10 +258,8 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
     }
 
   // Request sets to send to each processor
-  std::vector<std::vector<Real>>
-    requested_objs_x(comm.size()),
-    requested_objs_y(comm.size()),
-    requested_objs_z(comm.size());
+  std::vector<std::vector<Point>>
+    requested_objs_pt(comm.size());
   // Corresponding ids to keep track of
   std::vector<std::vector<dof_id_type>>
     requested_objs_id(comm.size());
@@ -270,9 +269,7 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
   for (processor_id_type p=0; p != comm.size(); ++p)
     if (p != comm.rank())
       {
-        requested_objs_x[p].reserve(ghost_objects_from_proc[p]);
-        requested_objs_y[p].reserve(ghost_objects_from_proc[p]);
-        requested_objs_z[p].reserve(ghost_objects_from_proc[p]);
+        requested_objs_pt[p].reserve(ghost_objects_from_proc[p]);
         requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
       }
   for (Iterator it = range_begin; it != range_end; ++it)
@@ -284,9 +281,7 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
         continue;
 
       Point p = location_map.point_of(*obj);
-      requested_objs_x[obj_procid].push_back(p(0));
-      requested_objs_y[obj_procid].push_back(p(1));
-      requested_objs_z[obj_procid].push_back(p(2));
+      requested_objs_pt[obj_procid].push_back(p);
       requested_objs_id[obj_procid].push_back(obj->id());
     }
 
@@ -301,23 +296,16 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
         cast_int<processor_id_type>
         ((comm.size() + comm.rank() - p) %
          comm.size());
-      std::vector<Real> request_to_fill_x,
-        request_to_fill_y,
-        request_to_fill_z;
-      comm.send_receive(procup, requested_objs_x[procup],
-                        procdown, request_to_fill_x);
-      comm.send_receive(procup, requested_objs_y[procup],
-                        procdown, request_to_fill_y);
-      comm.send_receive(procup, requested_objs_z[procup],
-                        procdown, request_to_fill_z);
+      std::vector<Point> request_to_fill;
+      comm.send_receive(procup, requested_objs_pt[procup],
+                        procdown, request_to_fill);
 
       // Find the local id of each requested object
-      std::vector<dof_id_type> request_to_fill_id(request_to_fill_x.size());
-      for (std::size_t i=0; i != request_to_fill_x.size(); ++i)
+      std::size_t fill_size = request_to_fill.size();
+      std::vector<dof_id_type> request_to_fill_id(fill_size);
+      for (std::size_t i=0; i != fill_size; ++i)
         {
-          Point pt(request_to_fill_x[i],
-                   request_to_fill_y[i],
-                   request_to_fill_z[i]);
+          Point pt = request_to_fill[i];
 
           // Look for this object in the multimap
           DofObjType * obj = location_map.find(pt);
@@ -338,7 +326,7 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
       std::vector<typename SyncFunctor::datum> received_data;
       comm.send_receive(procdown, data,
                         procup, received_data);
-      libmesh_assert_equal_to (requested_objs_x[procup].size(),
+      libmesh_assert_equal_to (requested_objs_pt[procup].size(),
                                received_data.size());
 
       // Let the user process the results
