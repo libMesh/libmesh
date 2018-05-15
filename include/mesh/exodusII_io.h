@@ -305,6 +305,14 @@ public:
   ExodusII_IO_Helper & get_exio_helper();
 #endif
 
+  /**
+   * This function factors out a bunch of code which is common to the
+   * write_nodal_data() and write_nodal_data_discontinuous() functions
+   */
+  void write_nodal_data_common(std::string fname,
+                               const std::vector<std::string> & names,
+                               bool continuous=true);
+
 private:
   /**
    * Only attempt to instantiate an ExodusII helper class
@@ -337,14 +345,6 @@ private:
    * If this is empty then all variables are output.
    */
   std::vector<std::string> _output_variables;
-
-  /**
-   * This function factors out a bunch of code which is common to the
-   * write_nodal_data() and write_nodal_data_discontinuous() functions
-   */
-  void write_nodal_data_common(std::string fname,
-                               const std::vector<std::string> & names,
-                               bool continuous=true);
 
   /**
    * If true, _output_variables is allowed to remain empty.
