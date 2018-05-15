@@ -3,7 +3,6 @@
 # these specific headers are required to build libMesh
 # but we do not want to install them!
 noinst_blacklist="base/libmesh_augment_std_namespace.h \
-mesh/exodusII_io_helper.h \
 mesh/nemesis_io_helper.h \
 numerics/laspack_matrix.h \
 numerics/laspack_vector.h \
