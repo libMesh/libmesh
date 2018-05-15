@@ -1043,6 +1043,11 @@ const std::vector<std::string> & ExodusII_IO::get_elem_var_names()
 
 ExodusII_IO_Helper & ExodusII_IO::get_exio_helper()
 {
+  // Provide a warning when accessing the helper object
+  // since it is a non-public API and is likely to see
+  // future API changes
+  libmesh_experimental();
+
   return *exio_helper;
 }
 
