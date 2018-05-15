@@ -465,10 +465,9 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
 
   // Request sets to send to each processor
   std::vector<std::vector<dof_id_type>>
-    requested_objs_id(comm.size()),
-    requested_objs_parent_id(comm.size());
-  std::vector<std::vector<unsigned char>>
-    requested_objs_child_num(comm.size());
+    requested_objs_id(comm.size());
+  std::vector<std::vector<std::pair<dof_id_type,unsigned char>>>
+    requested_objs_parent_id_child_num(comm.size());
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
@@ -476,8 +475,7 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
     if (p != comm.rank())
       {
         requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
-        requested_objs_parent_id[p].reserve(ghost_objects_from_proc[p]);
-        requested_objs_child_num[p].reserve(ghost_objects_from_proc[p]);
+        requested_objs_parent_id_child_num[p].reserve(ghost_objects_from_proc[p]);
       }
 
   for (Iterator it = range_begin; it != range_end; ++it)
@@ -492,10 +490,11 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
         continue;
 
       requested_objs_id[obj_procid].push_back(elem->id());
-      requested_objs_parent_id[obj_procid].push_back(parent->id());
-      requested_objs_child_num[obj_procid].push_back
-        (cast_int<unsigned char>
-         (parent->which_child_am_i(elem)));
+      requested_objs_parent_id_child_num[obj_procid].push_back
+        (std::make_pair
+         (parent->id(),
+          cast_int<unsigned char>
+            (parent->which_child_am_i(elem))));
     }
 
   // Trade requests with other processors
@@ -509,21 +508,18 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
         cast_int<processor_id_type>
         ((comm.size() + comm.rank() - p) %
          comm.size());
-      std::vector<dof_id_type>   request_to_fill_parent_id;
-      std::vector<unsigned char> request_to_fill_child_num;
-      comm.send_receive(procup, requested_objs_parent_id[procup],
-                        procdown, request_to_fill_parent_id);
-      comm.send_receive(procup, requested_objs_child_num[procup],
-                        procdown, request_to_fill_child_num);
+      std::vector<std::pair<dof_id_type, unsigned char>> request_to_fill;
+      comm.send_receive(procup, requested_objs_parent_id_child_num[procup],
+                        procdown, request_to_fill);
 
       // Find the id of each requested element
-      std::size_t request_size = request_to_fill_parent_id.size();
+      std::size_t request_size = request_to_fill.size();
       std::vector<dof_id_type> request_to_fill_id(request_size);
       for (std::size_t i=0; i != request_size; ++i)
         {
-          Elem & parent = mesh.elem_ref(request_to_fill_parent_id[i]);
+          Elem & parent = mesh.elem_ref(request_to_fill[i].first);
           libmesh_assert(parent.has_children());
-          Elem * child = parent.child_ptr(request_to_fill_child_num[i]);
+          Elem * child = parent.child_ptr(request_to_fill[i].second);
           libmesh_assert(child);
           libmesh_assert(child->active());
           request_to_fill_id[i] = child->id();
@@ -599,10 +595,8 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
   // Now repeat that iteration, filling request sets this time.
 
   // Request sets to send to each processor
-  std::vector<std::vector<dof_id_type>>
-    requested_objs_elem_id(comm.size());
-  std::vector<std::vector<unsigned char>>
-    requested_objs_node_num(comm.size());
+  std::vector<std::vector<std::pair<dof_id_type, unsigned char>>>
+    requested_objs_elem_id_node_num(comm.size());
 
   // Keep track of current local ids for each too
   std::vector<std::vector<dof_id_type>>
@@ -613,8 +607,7 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
   for (processor_id_type p=0; p != comm.size(); ++p)
     if (p != comm.rank())
       {
-        requested_objs_elem_id[p].reserve(ghost_objects_from_proc[p]);
-        requested_objs_node_num[p].reserve(ghost_objects_from_proc[p]);
+        requested_objs_elem_id_node_num[p].reserve(ghost_objects_from_proc[p]);
         requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
       }
 
@@ -640,9 +633,10 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
           const Node & node = elem->node_ref(n);
           const dof_id_type node_id = node.id();
 
-          requested_objs_elem_id[proc_id].push_back(elem_id);
-          requested_objs_node_num[proc_id].push_back
-            (cast_int<unsigned char>(n));
+          requested_objs_elem_id_node_num[proc_id].push_back
+            (std::make_pair
+             (elem_id,
+              cast_int<unsigned char>(n)));
           requested_objs_id[proc_id].push_back(node_id);
         }
     }
@@ -661,26 +655,21 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
 
       libmesh_assert_equal_to (requested_objs_id[procup].size(),
                                ghost_objects_from_proc[procup]);
-      libmesh_assert_equal_to (requested_objs_elem_id[procup].size(),
-                               ghost_objects_from_proc[procup]);
-      libmesh_assert_equal_to (requested_objs_node_num[procup].size(),
+      libmesh_assert_equal_to (requested_objs_elem_id_node_num[procup].size(),
                                ghost_objects_from_proc[procup]);
 
-      std::vector<dof_id_type>   request_to_fill_elem_id;
-      std::vector<unsigned char> request_to_fill_node_num;
-      comm.send_receive(procup, requested_objs_elem_id[procup],
-                        procdown, request_to_fill_elem_id);
-      comm.send_receive(procup, requested_objs_node_num[procup],
-                        procdown, request_to_fill_node_num);
+      std::vector<std::pair<dof_id_type,unsigned char>> request_to_fill;
+      comm.send_receive(procup, requested_objs_elem_id_node_num[procup],
+                        procdown, request_to_fill);
 
       // Find the id of each requested element
-      std::size_t request_size = request_to_fill_elem_id.size();
+      std::size_t request_size = request_to_fill.size();
       std::vector<dof_id_type> request_to_fill_id(request_size);
       for (std::size_t i=0; i != request_size; ++i)
         {
-          const Elem & elem = mesh.elem_ref(request_to_fill_elem_id[i]);
+          const Elem & elem = mesh.elem_ref(request_to_fill[i].first);
 
-          const unsigned int n = request_to_fill_node_num[i];
+          const unsigned int n = request_to_fill[i].second;
           libmesh_assert_less (n, elem.n_nodes());
 
           const Node & node = elem.node_ref(n);
@@ -700,7 +689,7 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
       std::vector<typename SyncFunctor::datum> received_data;
       comm.send_receive(procdown, data,
                         procup, received_data);
-      libmesh_assert_equal_to (requested_objs_elem_id[procup].size(),
+      libmesh_assert_equal_to (requested_objs_elem_id_node_num[procup].size(),
                                received_data.size());
 
       // Let the user process the results.  If any of the results
