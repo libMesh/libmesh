@@ -908,7 +908,7 @@ void DofMap::distribute_dofs (MeshBase & mesh)
   // By default distribute variables in a
   // var-major fashion, but allow run-time
   // specification
-  bool node_major_dofs = libMesh::on_command_line ("--node_major_dofs");
+  bool node_major_dofs = libMesh::on_command_line ("--node-major-dofs");
 
   // The DOF counter, will be incremented as we encounter
   // new degrees of freedom
@@ -1678,9 +1678,9 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase & mesh) const
   // If we were asked on the command line, then we need to
   // include sensitivities between neighbor degrees of freedom
   bool implicit_neighbor_dofs =
-    libMesh::on_command_line ("--implicit_neighbor_dofs");
+    libMesh::on_command_line ("--implicit-neighbor-dofs");
 
-  // If the user specifies --implicit_neighbor_dofs 0, then
+  // If the user specifies --implicit-neighbor-dofs 0, then
   // presumably he knows what he is doing and we won't try to
   // automatically turn it on even when all the variables are
   // discontinuous.
@@ -1688,11 +1688,11 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase & mesh) const
     {
       // No flag provided defaults to 'true'
       int flag = 1;
-      flag = libMesh::command_line_next ("--implicit_neighbor_dofs", flag);
+      flag = libMesh::command_line_next ("--implicit-neighbor-dofs", flag);
 
       if (!flag)
         {
-          // The user said --implicit_neighbor_dofs 0, so he knows
+          // The user said --implicit-neighbor-dofs 0, so he knows
           // what he is doing and really doesn't want it.
           return false;
         }

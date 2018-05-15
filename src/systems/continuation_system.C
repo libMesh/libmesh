@@ -60,7 +60,7 @@ ContinuationSystem::ContinuationSystem (EquationSystems & es,
   // Warn about using untested code
   libmesh_experimental();
 
-  if (libMesh::on_command_line("--solver_system_names"))
+  if (libMesh::on_command_line("--solver-system-names"))
     linear_solver->init((this->name()+"_").c_str());
   else
     linear_solver->init();

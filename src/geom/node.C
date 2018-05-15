@@ -83,7 +83,7 @@ Node::choose_processor_id(processor_id_type pid1, processor_id_type pid2) const
   // Do we want the new load-balanced node partitioning heuristic
   // instead of the default partitioner-friendlier heuristic?
   static bool load_balanced_nodes =
-    libMesh::on_command_line ("--load_balanced_nodes");
+    libMesh::on_command_line ("--load-balanced-nodes");
 
   // For better load balancing, we can use the min
   // even-numberered nodes and the max for odd-numbered.

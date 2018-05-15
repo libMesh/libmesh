@@ -7,5 +7,5 @@ for method in @METHODS@; do
 @LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@      continue;
 @LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@    fi
     echo $LIBMESH_RUN ./unit_tests-$method
-    $LIBMESH_RUN ./unit_tests-$method
+    $LIBMESH_RUN ./unit_tests-$method --option-with-dashes --option_with_underscores 3
 done

@@ -53,7 +53,7 @@ void TimeSolver::reinit ()
 
   libmesh_assert(this->linear_solver().get());
   this->linear_solver()->clear();
-  if (libMesh::on_command_line("--solver_system_names"))
+  if (libMesh::on_command_line("--solver-system-names"))
     this->linear_solver()->init((_system.name()+"_").c_str());
   else
     this->linear_solver()->init();
@@ -78,7 +78,7 @@ void TimeSolver::init_data ()
 {
   this->diff_solver()->init();
 
-  if (libMesh::on_command_line("--solver_system_names"))
+  if (libMesh::on_command_line("--solver-system-names"))
     this->linear_solver()->init((_system.name()+"_").c_str());
   else
     this->linear_solver()->init();

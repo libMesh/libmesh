@@ -152,13 +152,25 @@ void enableSEGV(bool on);
 /**
  * \returns \p true if the argument \p arg was specified on the command line,
  * \p false otherwise.
+ *
+ * For backwards compatibility with past option naming conventions,
+ * libMesh searches for the given argument first in its original form,
+ * then with all underscores changed to dashes, then with all dashes
+ * (except any leading dashes) changed to underscores, and returns
+ * true if any of the above finds a match.
+ *
+ * This routine manipulates the command_line cursor and should not be
+ * called concurrently with similar utilities in multiple threads.
  */
-bool on_command_line (const std::string & arg);
+bool on_command_line (std::string arg);
 
 /**
  * \returns The value associated with name on the command line if it is specified,
  * otherwise return the default, provided value.  A second template function is provided
  * to support recognizing multiple variations of a given option
+ *
+ * This routine manipulates the command_line cursor and should not be
+ * called concurrently with similar utilities in multiple threads.
  */
 template <typename T>
 T command_line_value (const std::string &, T);
@@ -168,13 +180,25 @@ T command_line_value (const std::vector<std::string> &, T);
 /**
  * Use GetPot's search()/next() functions to get following arguments
  * from the command line.
+ *
+ * For backwards compatibility with past option naming conventions,
+ * libMesh searches for the given argument first in its original form,
+ * then with all underscores changed to dashes, then with all dashes
+ * (except any leading dashes) changed to underscores, and returns
+ * true if any of the above finds a match.
+ *
+ * This routine manipulates the command_line cursor and should not be
+ * called concurrently with similar utilities in multiple threads.
  */
 template <typename T>
-T command_line_next (const std::string &, T);
+T command_line_next (std::string name, T default_value);
 
 /**
  * \returns The array of values associated with name on the command line if it is specified,
  * otherwise return the default, provided array.
+ *
+ * This routine manipulates the command_line cursor and should not be
+ * called concurrently with similar utilities in multiple threads.
  */
 template <typename T>
 void command_line_vector (const std::string &, std::vector<T> &);

@@ -1411,7 +1411,7 @@ LinearSolver<Number> * ImplicitSystem::get_linear_solver() const
   LinearSolver<Number> * new_solver =
     LinearSolver<Number>::build(this->comm()).release();
 
-  if (libMesh::on_command_line("--solver_system_names"))
+  if (libMesh::on_command_line("--solver-system-names"))
     new_solver->init((this->name()+"_").c_str());
   else
     new_solver->init();

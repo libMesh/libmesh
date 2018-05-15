@@ -340,7 +340,7 @@ void PetscDiffSolver::setup_petsc_data()
                          this, PETSC_NULL);
   LIBMESH_CHKERR(ierr);
 
-  if (libMesh::on_command_line("--solver_system_names"))
+  if (libMesh::on_command_line("--solver-system-names"))
     {
       ierr = SNESSetOptionsPrefix(_snes, (_system.name()+"_").c_str());
       LIBMESH_CHKERR(ierr);

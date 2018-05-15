@@ -159,7 +159,7 @@ void System::read_header (Xdr & io,
   // This will be true if the version string contains " with infinite elements"
   const bool read_ifem_info =
     (version.rfind(" with infinite elements") < version.size()) ||
-    libMesh::on_command_line ("--read_ifem_systems");
+    libMesh::on_command_line ("--read-ifem-systems");
 
 
   {
