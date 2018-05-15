@@ -27,6 +27,7 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_algebra.h"
+#include "libmesh/parallel_sync.h"
 
 
 namespace libMesh

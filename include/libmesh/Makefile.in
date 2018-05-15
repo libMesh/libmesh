@@ -572,12 +572,12 @@ BUILT_SOURCES = auto_ptr.h default_coupling.h dirichlet_boundaries.h \
 	parallel_conversion_utils.h parallel_elem.h \
 	parallel_ghost_sync.h parallel_hilbert.h parallel_histogram.h \
 	parallel_implementation.h parallel_node.h parallel_object.h \
-	parallel_only.h parallel_sort.h post_wait_copy_buffer.h \
-	post_wait_delete_buffer.h post_wait_free_buffer.h \
-	post_wait_unpack_buffer.h post_wait_work.h request.h \
-	standard_type.h status.h threads.h threads_allocators.h \
-	threads_none.h threads_pthread.h threads_tbb.h \
-	centroid_partitioner.h hilbert_sfc_partitioner.h \
+	parallel_only.h parallel_sort.h parallel_sync.h \
+	post_wait_copy_buffer.h post_wait_delete_buffer.h \
+	post_wait_free_buffer.h post_wait_unpack_buffer.h \
+	post_wait_work.h request.h standard_type.h status.h threads.h \
+	threads_allocators.h threads_none.h threads_pthread.h \
+	threads_tbb.h centroid_partitioner.h hilbert_sfc_partitioner.h \
 	linear_partitioner.h mapped_subdomain_partitioner.h \
 	metis_csr_graph.h metis_partitioner.h morton_sfc_partitioner.h \
 	parmetis_helper.h parmetis_partitioner.h partitioner.h \
@@ -1686,6 +1686,9 @@ parallel_only.h: $(top_srcdir)/include/parallel/parallel_only.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_sort.h: $(top_srcdir)/include/parallel/parallel_sort.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parallel_sync.h: $(top_srcdir)/include/parallel/parallel_sync.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 post_wait_copy_buffer.h: $(top_srcdir)/include/parallel/post_wait_copy_buffer.h
