@@ -204,6 +204,28 @@ void Request::add_post_wait_work(PostWaitWork * work)
   post_wait_work->first.push_back(work);
 }
 
+void wait (std::vector<Request> & r)
+{
+  for (std::size_t i=0; i<r.size(); i++) r[i].wait();
+}
+
+std::size_t waitany (std::vector<Request> & r)
+{
+  libmesh_assert(!r.empty());
+
+  int index = 0;
+#ifdef LIBMESH_HAVE_MPI
+  int r_size = cast_int<int>(r.size());
+  std::vector<request> raw(r_size);
+  for (int i=0; i != r_size; ++i)
+    raw[i] = *r[i].get();
+
+  libmesh_call_mpi
+    (MPI_Waitany(r_size, &raw[0], &index, MPI_STATUS_IGNORE));
+#endif
+
+  return index;
+}
 
 } // namespace Parallel
 
