@@ -199,6 +199,17 @@ public:
                                  const std::vector<std::string> &) libmesh_override;
 
   /**
+   * Copy data stored in exio_helper to \p new_exii_io, modify the data according to
+   * \p new_nodal_vals, and then use new_exii_io to write to disk.
+   *
+   * The map \p new_nodal_vals gives a map of index -> new nodal value for
+   * each (timestep,var_name) key.
+   */
+  void modify_and_write_nodal_data (ExodusII_IO & new_exii_io,
+                                    const std::string & fname,
+                                    const std::map<std::pair<int,std::string>, std::map<unsigned int,Real>> & new_nodal_vals);
+
+  /**
    * Write out a discontinuous nodal solution.
    */
   void write_nodal_data_discontinuous (const std::string &,
