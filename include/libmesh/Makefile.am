@@ -276,6 +276,7 @@ BUILT_SOURCES = \
         parallel_object.h \
         parallel_only.h \
         parallel_sort.h \
+        parallel_sync.h \
         post_wait_copy_buffer.h \
         post_wait_delete_buffer.h \
         post_wait_free_buffer.h \
@@ -1349,6 +1350,9 @@ parallel_only.h: $(top_srcdir)/include/parallel/parallel_only.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_sort.h: $(top_srcdir)/include/parallel/parallel_sort.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parallel_sync.h: $(top_srcdir)/include/parallel/parallel_sync.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 post_wait_copy_buffer.h: $(top_srcdir)/include/parallel/post_wait_copy_buffer.h
