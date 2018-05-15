@@ -298,6 +298,13 @@ public:
    */
   const std::vector<std::string> & get_nodal_var_names();
 
+#ifdef LIBMESH_HAVE_EXODUS_API
+  /**
+   * Return a reference to the ExodusII_IO_Helper object.
+   */
+  ExodusII_IO_Helper & get_exio_helper();
+#endif
+
 private:
   /**
    * Only attempt to instantiate an ExodusII helper class

@@ -1041,6 +1041,11 @@ const std::vector<std::string> & ExodusII_IO::get_elem_var_names()
   return exio_helper->elem_var_names;
 }
 
+ExodusII_IO_Helper & ExodusII_IO::get_exio_helper()
+{
+  return *exio_helper;
+}
+
 
 // LIBMESH_HAVE_EXODUS_API is not defined, declare error() versions of functions...
 #else
