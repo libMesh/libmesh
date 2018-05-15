@@ -259,20 +259,21 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
     }
 
   // Request sets to send to each processor
-  std::vector<std::vector<Point>>
-    requested_objs_pt(comm.size());
+  std::map<processor_id_type, std::vector<Point>>
+    requested_objs_pt;
   // Corresponding ids to keep track of
-  std::vector<std::vector<dof_id_type>>
-    requested_objs_id(comm.size());
+  std::map<processor_id_type, std::vector<dof_id_type>>
+    requested_objs_id;
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
   for (processor_id_type p=0; p != comm.size(); ++p)
-    if (p != comm.rank())
+    if (p != comm.rank() && ghost_objects_from_proc[p])
       {
         requested_objs_pt[p].reserve(ghost_objects_from_proc[p]);
         requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
       }
+
   for (Iterator it = range_begin; it != range_end; ++it)
     {
       DofObjType * obj = *it;
@@ -286,27 +287,17 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
       requested_objs_id[obj_procid].push_back(obj->id());
     }
 
-  // Trade requests with other processors
-  for (processor_id_type p=1; p != comm.size(); ++p)
+  auto gather_functor =
+    [&location_map, &sync]
+    (processor_id_type pid, const std::vector<Point> & pts,
+     std::vector<typename SyncFunctor::datum> & data)
     {
-      // Trade my requests with processor procup and procdown
-      const processor_id_type procup =
-        cast_int<processor_id_type>
-        ((comm.rank() + p) % comm.size());
-      const processor_id_type procdown =
-        cast_int<processor_id_type>
-        ((comm.size() + comm.rank() - p) %
-         comm.size());
-      std::vector<Point> request_to_fill;
-      comm.send_receive(procup, requested_objs_pt[procup],
-                        procdown, request_to_fill);
-
       // Find the local id of each requested object
-      std::size_t fill_size = request_to_fill.size();
-      std::vector<dof_id_type> request_to_fill_id(fill_size);
-      for (std::size_t i=0; i != fill_size; ++i)
+      std::size_t query_size = pts.size();
+      std::vector<dof_id_type> query_id(query_size);
+      for (std::size_t i=0; i != query_size; ++i)
         {
-          Point pt = request_to_fill[i];
+          Point pt = pts[i];
 
           // Look for this object in the multimap
           DofObjType * obj = location_map.find(pt);
@@ -316,23 +307,26 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
 
           // Return the object's correct processor id,
           // and our (correct if it's local) id for it.
-          request_to_fill_id[i] = obj->id();
+          query_id[i] = obj->id();
         }
 
       // Gather whatever data the user wants
-      std::vector<typename SyncFunctor::datum> data;
-      sync.gather_data(request_to_fill_id, data);
+      sync.gather_data(query_id, data);
+    };
 
-      // Trade back the results
-      std::vector<typename SyncFunctor::datum> received_data;
-      comm.send_receive(procdown, data,
-                        procup, received_data);
-      libmesh_assert_equal_to (requested_objs_pt[procup].size(),
-                               received_data.size());
-
+  auto action_functor =
+    [&sync, &requested_objs_id]
+    (processor_id_type pid, const std::vector<Point> &,
+     const std::vector<typename SyncFunctor::datum> & data)
+    {
       // Let the user process the results
-      sync.act_on_data(requested_objs_id[procup], received_data);
-    }
+      sync.act_on_data(requested_objs_id[pid], data);
+    };
+
+  // Trade requests with other processors
+  typename SyncFunctor::datum * ex = libmesh_nullptr;
+  pull_parallel_vector_data
+    (comm, requested_objs_pt, gather_functor, action_functor, ex);
 }
 
 
