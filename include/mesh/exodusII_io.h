@@ -298,6 +298,21 @@ public:
    */
   const std::vector<std::string> & get_nodal_var_names();
 
+#ifdef LIBMESH_HAVE_EXODUS_API
+  /**
+   * Return a reference to the ExodusII_IO_Helper object.
+   */
+  ExodusII_IO_Helper & get_exio_helper();
+#endif
+
+  /**
+   * This function factors out a bunch of code which is common to the
+   * write_nodal_data() and write_nodal_data_discontinuous() functions
+   */
+  void write_nodal_data_common(std::string fname,
+                               const std::vector<std::string> & names,
+                               bool continuous=true);
+
 private:
   /**
    * Only attempt to instantiate an ExodusII helper class
@@ -330,14 +345,6 @@ private:
    * If this is empty then all variables are output.
    */
   std::vector<std::string> _output_variables;
-
-  /**
-   * This function factors out a bunch of code which is common to the
-   * write_nodal_data() and write_nodal_data_discontinuous() functions
-   */
-  void write_nodal_data_common(std::string fname,
-                               const std::vector<std::string> & names,
-                               bool continuous=true);
 
   /**
    * If true, _output_variables is allowed to remain empty.

@@ -572,7 +572,6 @@ DISTCLEANFILES = libmesh_config.h
 # details which are not required for the public interface
 noinst_HEADERS = \
         base/libmesh_augment_std_namespace.h \
-        mesh/exodusII_io_helper.h \
         mesh/nemesis_io_helper.h \
         numerics/laspack_matrix.h \
         numerics/laspack_vector.h \
@@ -738,6 +737,7 @@ include_HEADERS = \
         mesh/distributed_mesh.h \
         mesh/ensight_io.h \
         mesh/exodusII_io.h \
+        mesh/exodusII_io_helper.h \
         mesh/fro_io.h \
         mesh/gmsh_io.h \
         mesh/gmv_io.h \
