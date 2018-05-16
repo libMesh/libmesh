@@ -1832,9 +1832,10 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
   libmesh_assert (!recvbuf.empty());
 
   // Unpack the received buffer
+  int bufsize = libMesh::cast_int<int>(recvbuf.size());
   int recvsize, pos=0;
   libmesh_call_mpi
-    (MPI_Unpack (&recvbuf[0], libMesh::cast_int<int>(recvbuf.size()), &pos,
+    (MPI_Unpack (&recvbuf[0], bufsize, &pos,
                  &recvsize, 1, libMesh::Parallel::StandardType<unsigned int>(),
                  this->get()));
 
@@ -1847,7 +1848,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
       int subvec_size;
 
       libmesh_call_mpi
-        (MPI_Unpack (&recvbuf[0], recvsize, &pos,
+        (MPI_Unpack (&recvbuf[0], bufsize, &pos,
                      &subvec_size, 1,
                      libMesh::Parallel::StandardType<unsigned int>(),
                      this->get()));
@@ -1858,7 +1859,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
       // ... unpack the inner buffer if it is not empty
       if (!recv[i].empty())
         libmesh_call_mpi
-          (MPI_Unpack (&recvbuf[0], recvsize, &pos, &recv[i][0],
+          (MPI_Unpack (&recvbuf[0], bufsize, &pos, &recv[i][0],
                        subvec_size, type, this->get()));
     }
 
