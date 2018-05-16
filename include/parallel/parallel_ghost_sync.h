@@ -373,16 +373,15 @@ void sync_dofobject_data_by_id(const Communicator & comm,
     }
 
   // Request sets to send to each processor
-  std::vector<std::vector<dof_id_type>>
-    requested_objs_id(comm.size());
+  std::map<processor_id_type, std::vector<dof_id_type>>
+    requested_objs_id;
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
   for (processor_id_type p=0; p != comm.size(); ++p)
-    if (p != comm.rank())
-      {
-        requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
-      }
+    if (p != comm.rank() && ghost_objects_from_proc[p])
+      requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
+
   for (Iterator it = range_begin; it != range_end; ++it)
     {
       DofObject * obj = *it;
@@ -398,35 +397,27 @@ void sync_dofobject_data_by_id(const Communicator & comm,
       requested_objs_id[obj_procid].push_back(obj->id());
     }
 
-  // Trade requests with other processors
-  for (processor_id_type p=1; p != comm.size(); ++p)
+  auto gather_functor =
+    [&sync]
+    (processor_id_type, const std::vector<dof_id_type> & ids,
+     std::vector<typename SyncFunctor::datum> & data)
     {
-      // Trade my requests with processor procup and procdown
-      const processor_id_type procup =
-        cast_int<processor_id_type>
-        ((comm.rank() + p) % comm.size());
-      const processor_id_type procdown =
-        cast_int<processor_id_type>
-        ((comm.size() + comm.rank() - p) %
-         comm.size());
-      std::vector<dof_id_type> request_to_fill_id;
-      comm.send_receive(procup, requested_objs_id[procup],
-                        procdown, request_to_fill_id);
+      sync.gather_data(ids, data);
+    };
 
-      // Gather whatever data the user wants
-      std::vector<typename SyncFunctor::datum> data;
-      sync.gather_data(request_to_fill_id, data);
-
-      // Trade back the results
-      std::vector<typename SyncFunctor::datum> received_data;
-      comm.send_receive(procdown, data,
-                        procup, received_data);
-      libmesh_assert_equal_to (requested_objs_id[procup].size(),
-                               received_data.size());
-
+  auto action_functor =
+    [&sync]
+    (processor_id_type, const std::vector<dof_id_type> & ids,
+     const std::vector<typename SyncFunctor::datum> & data)
+    {
       // Let the user process the results
-      sync.act_on_data(requested_objs_id[procup], received_data);
-    }
+      sync.act_on_data(ids, data);
+    };
+
+  // Trade requests with other processors
+  typename SyncFunctor::datum * ex = libmesh_nullptr;
+  pull_parallel_vector_data
+    (comm, requested_objs_id, gather_functor, action_functor, ex);
 }
 
 
