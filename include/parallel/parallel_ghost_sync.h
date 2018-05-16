@@ -442,23 +442,28 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
-      DofObject * obj = *it;
-      libmesh_assert (obj);
-      processor_id_type obj_procid = obj->processor_id();
-      if (obj_procid != DofObject::invalid_processor_id)
-        ghost_objects_from_proc[obj_procid]++;
+      Elem * elem = *it;
+      processor_id_type obj_procid = elem->processor_id();
+      if (obj_procid == comm.rank() ||
+          obj_procid == DofObject::invalid_processor_id)
+        continue;
+      const Elem * parent = elem->parent();
+      if (!parent || !elem->active())
+        continue;
+
+      ghost_objects_from_proc[obj_procid]++;
     }
 
   // Request sets to send to each processor
-  std::vector<std::vector<dof_id_type>>
-    requested_objs_id(comm.size());
-  std::vector<std::vector<std::pair<dof_id_type,unsigned char>>>
-    requested_objs_parent_id_child_num(comm.size());
+  std::map<processor_id_type, std::vector<dof_id_type>>
+    requested_objs_id;
+  std::map<processor_id_type, std::vector<std::pair<dof_id_type,unsigned char>>>
+    requested_objs_parent_id_child_num;
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
   for (processor_id_type p=0; p != comm.size(); ++p)
-    if (p != comm.rank())
+    if (p != comm.rank() && ghost_objects_from_proc[p])
       {
         requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
         requested_objs_parent_id_child_num[p].reserve(ghost_objects_from_proc[p]);
@@ -483,48 +488,44 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
             (parent->which_child_am_i(elem))));
     }
 
-  // Trade requests with other processors
-  for (processor_id_type p=1; p != comm.size(); ++p)
+  auto gather_functor =
+    [&mesh, &sync]
+    (processor_id_type,
+     const std::vector<std::pair<dof_id_type, unsigned char>> & parent_id_child_num,
+     std::vector<typename SyncFunctor::datum> & data)
     {
-      // Trade my requests with processor procup and procdown
-      const processor_id_type procup =
-        cast_int<processor_id_type>
-        ((comm.rank() + p) % comm.size());
-      const processor_id_type procdown =
-        cast_int<processor_id_type>
-        ((comm.size() + comm.rank() - p) %
-         comm.size());
-      std::vector<std::pair<dof_id_type, unsigned char>> request_to_fill;
-      comm.send_receive(procup, requested_objs_parent_id_child_num[procup],
-                        procdown, request_to_fill);
-
       // Find the id of each requested element
-      std::size_t request_size = request_to_fill.size();
-      std::vector<dof_id_type> request_to_fill_id(request_size);
-      for (std::size_t i=0; i != request_size; ++i)
+      std::size_t query_size = parent_id_child_num.size();
+      std::vector<dof_id_type> query_id(query_size);
+      for (std::size_t i=0; i != query_size; ++i)
         {
-          Elem & parent = mesh.elem_ref(request_to_fill[i].first);
+          Elem & parent = mesh.elem_ref(parent_id_child_num[i].first);
           libmesh_assert(parent.has_children());
-          Elem * child = parent.child_ptr(request_to_fill[i].second);
+          Elem * child = parent.child_ptr(parent_id_child_num[i].second);
           libmesh_assert(child);
           libmesh_assert(child->active());
-          request_to_fill_id[i] = child->id();
+          query_id[i] = child->id();
         }
 
       // Gather whatever data the user wants
-      std::vector<typename SyncFunctor::datum> data;
-      sync.gather_data(request_to_fill_id, data);
+      sync.gather_data(query_id, data);
+    };
 
-      // Trade back the results
-      std::vector<typename SyncFunctor::datum> received_data;
-      comm.send_receive(procdown, data,
-                        procup, received_data);
-      libmesh_assert_equal_to (requested_objs_id[procup].size(),
-                               received_data.size());
-
+  auto action_functor =
+    [&sync, &requested_objs_id]
+    (processor_id_type pid,
+     const std::vector<std::pair<dof_id_type, unsigned char>> &,
+     const std::vector<typename SyncFunctor::datum> & data)
+    {
       // Let the user process the results
-      sync.act_on_data(requested_objs_id[procup], received_data);
-    }
+      sync.act_on_data(requested_objs_id[pid], data);
+    };
+
+  // Trade requests with other processors
+  typename SyncFunctor::datum * ex = libmesh_nullptr;
+  pull_parallel_vector_data
+    (comm, requested_objs_parent_id_child_num, gather_functor,
+     action_functor, ex);
 }
 #else
 template <typename Iterator,
