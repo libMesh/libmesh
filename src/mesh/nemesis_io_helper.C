@@ -2528,7 +2528,7 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
       std::vector<numeric_index_type> required_indices(num_nodes);
 
       for (int i=0; i<num_nodes; i++)
-        required_indices[i] = this->exodus_node_num_to_libmesh[i]*num_vars + c;
+        required_indices[i] = static_cast<dof_id_type>(this->exodus_node_num_to_libmesh[i]) * num_vars + c;
 
       // Get the dof values required to write just our local part of
       // the solution vector.
