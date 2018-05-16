@@ -89,13 +89,13 @@ struct SyncNeighbors
   }
 
   void act_on_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> & neighbors) const
+                    const std::vector<datum> & neighbors) const
   {
     for (std::size_t i=0; i != ids.size(); ++i)
       {
         Elem & elem = mesh.elem_ref(ids[i]);
 
-        datum & new_neigh = neighbors[i];
+        const datum & new_neigh = neighbors[i];
 
         const unsigned int n_neigh = elem.n_neighbors();
         libmesh_assert_equal_to (n_neigh, new_neigh.size());
@@ -1246,7 +1246,7 @@ struct SyncIds
   }
 
   void act_on_data (const std::vector<dof_id_type> & old_ids,
-                    std::vector<datum> & new_ids) const
+                    const std::vector<datum> & new_ids) const
   {
     for (std::size_t i=0; i != old_ids.size(); ++i)
       if (old_ids[i] != new_ids[i])
@@ -1298,7 +1298,7 @@ struct SyncNodeIds
   }
 
   bool act_on_data (const std::vector<dof_id_type> & old_ids,
-                    std::vector<datum> & new_ids)
+                    const std::vector<datum> & new_ids)
   {
     bool data_changed = false;
     for (std::size_t i=0; i != old_ids.size(); ++i)
@@ -1374,7 +1374,7 @@ struct SyncPLevels
   }
 
   void act_on_data (const std::vector<dof_id_type> & old_ids,
-                    std::vector<datum> & new_p_levels) const
+                    const std::vector<datum> & new_p_levels) const
   {
     for (std::size_t i=0; i != old_ids.size(); ++i)
       {
@@ -1418,7 +1418,7 @@ struct SyncUniqueIds
   }
 
   void act_on_data (const std::vector<dof_id_type>& ids,
-                    std::vector<datum>& unique_ids) const
+                    const std::vector<datum>& unique_ids) const
   {
     for (std::size_t i=0; i != ids.size(); ++i)
       {
@@ -1559,7 +1559,7 @@ struct SyncProcIds
 
   // ------------------------------------------------------------
   bool act_on_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> proc_ids)
+                    const std::vector<datum> proc_ids)
   {
     bool data_changed = false;
 

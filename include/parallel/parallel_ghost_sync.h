@@ -756,7 +756,7 @@ struct SyncNodalPositions
 
   // Second required interface.  This function must do something with the data in
   // the data vector for the ids in the ids vector.
-  void act_on_data (const std::vector<dof_id_type> & ids, std::vector<datum> & data) const;
+  void act_on_data (const std::vector<dof_id_type> & ids, const std::vector<datum> & data) const;
 
   MeshBase & mesh;
 };

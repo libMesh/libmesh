@@ -73,14 +73,14 @@ struct SyncRefinementFlags
   }
 
   void act_on_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> & flags)
+                    const std::vector<datum> & flags)
   {
     for (std::size_t i=0; i != ids.size(); ++i)
       {
         Elem & elem = mesh.elem_ref(ids[i]);
 
         datum old_flag = (elem.*get_flag)();
-        datum & new_flag = flags[i];
+        datum new_flag = flags[i];
 
         if (old_flag != new_flag)
           {
