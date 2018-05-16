@@ -251,6 +251,7 @@ void push_parallel_vector_data(const Communicator & comm,
   processor_id_type num_sends = 0;
   for (auto & datapair : data)
     {
+      libmesh_assert_less(datapair.first, num_procs);
       will_send_to[datapair.first] = datapair.second.size();
       num_sends++;
     }
@@ -284,6 +285,7 @@ void push_parallel_vector_data(const Communicator & comm,
   for (auto & datapair : data)
     {
       processor_id_type destid = datapair.first;
+      libmesh_assert_less(destid, num_procs);
       auto & datum = datapair.second;
       Request sendreq;
       comm.send(destid, datum, datatype, sendreq);
@@ -462,6 +464,8 @@ void pull_parallel_vector_data(const Communicator & comm,
   for (auto & querypair : queries)
     {
       processor_id_type proc_id = querypair.first;
+      libmesh_assert_less(proc_id, comm.size());
+
       auto & querydata = querypair.second;
       Request req;
       auto & incoming_data = received_data[proc_id];
@@ -478,6 +482,7 @@ void pull_parallel_vector_data(const Communicator & comm,
       receive_reqs.erase(receive_reqs.begin() + completed);
       receive_procids.erase(receive_procids.begin() + completed);
 
+      libmesh_assert(queries.count(proc_id));
       act_on_data(proc_id, queries.at(proc_id), received_data[proc_id]);
       received_data.erase(proc_id);
     }
