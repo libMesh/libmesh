@@ -2,7 +2,19 @@
 
 set -e
 
-for method in @METHODS@; do
+# Run executables from most-debugging-enabled to least-, so if
+# there's a failure we get the most informative death possible
+ORDERED_METHODS="dbg debug devel profiling pro prof oprofile oprof optimized opt"
+
+for method in ${ORDERED_METHODS}; do
+    for mymethod in @METHODS@; do
+        if (test "x${mymethod}" = "x${method}"); then
+            MY_METHODS="${MY_METHODS} ${mymethod}"
+        fi
+    done
+done
+
+for method in ${MY_METHODS}; do
 @LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@    if [ "x$method" = "xdbg" ]; then
 @LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@      continue;
 @LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE@    fi
