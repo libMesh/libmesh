@@ -251,7 +251,12 @@ void push_parallel_vector_data(const Communicator & comm,
   processor_id_type num_sends = 0;
   for (auto & datapair : data)
     {
+      // Don't try to send anywhere that doesn't exist
       libmesh_assert_less(datapair.first, num_procs);
+
+      // Don't give us empty vectors to send
+      libmesh_assert_greater(datapair.second.size(), 0);
+
       will_send_to[datapair.first] = datapair.second.size();
       num_sends++;
     }
