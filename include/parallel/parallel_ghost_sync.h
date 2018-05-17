@@ -552,8 +552,6 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
 {
   const Communicator & comm (mesh.comm());
 
-  bool data_changed = false;
-
   // Count the objects to ask each processor about
   std::vector<dof_id_type>
     ghost_objects_from_proc(comm.size(), 0);
@@ -582,17 +580,17 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
   // Now repeat that iteration, filling request sets this time.
 
   // Request sets to send to each processor
-  std::vector<std::vector<std::pair<dof_id_type, unsigned char>>>
-    requested_objs_elem_id_node_num(comm.size());
+  std::map<dof_id_type, std::vector<std::pair<dof_id_type, unsigned char>>>
+    requested_objs_elem_id_node_num;
 
   // Keep track of current local ids for each too
-  std::vector<std::vector<dof_id_type>>
-    requested_objs_id(comm.size());
+  std::map<dof_id_type, std::vector<dof_id_type>>
+    requested_objs_id;
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
   for (processor_id_type p=0; p != comm.size(); ++p)
-    if (p != comm.rank())
+    if (p != comm.rank() && ghost_objects_from_proc[p])
       {
         requested_objs_elem_id_node_num[p].reserve(ghost_objects_from_proc[p]);
         requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
@@ -628,35 +626,20 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
         }
     }
 
-  // Trade requests with other processors
-  for (processor_id_type p=1; p != comm.size(); ++p)
+  auto gather_functor =
+    [&mesh, &sync]
+    (processor_id_type,
+     const std::vector<std::pair<dof_id_type, unsigned char>> & elem_id_node_num,
+     std::vector<typename SyncFunctor::datum> & data)
     {
-      // Trade my requests with processor procup and procdown
-      const processor_id_type procup =
-        cast_int<processor_id_type>
-        ((comm.rank() + p) % comm.size());
-      const processor_id_type procdown =
-        cast_int<processor_id_type>
-        ((comm.size() + comm.rank() - p) %
-         comm.size());
-
-      libmesh_assert_equal_to (requested_objs_id[procup].size(),
-                               ghost_objects_from_proc[procup]);
-      libmesh_assert_equal_to (requested_objs_elem_id_node_num[procup].size(),
-                               ghost_objects_from_proc[procup]);
-
-      std::vector<std::pair<dof_id_type,unsigned char>> request_to_fill;
-      comm.send_receive(procup, requested_objs_elem_id_node_num[procup],
-                        procdown, request_to_fill);
-
       // Find the id of each requested element
-      std::size_t request_size = request_to_fill.size();
-      std::vector<dof_id_type> request_to_fill_id(request_size);
+      std::size_t request_size = elem_id_node_num.size();
+      std::vector<dof_id_type> query_id(request_size);
       for (std::size_t i=0; i != request_size; ++i)
         {
-          const Elem & elem = mesh.elem_ref(request_to_fill[i].first);
+          const Elem & elem = mesh.elem_ref(elem_id_node_num[i].first);
 
-          const unsigned int n = request_to_fill[i].second;
+          const unsigned int n = elem_id_node_num[i].second;
           libmesh_assert_less (n, elem.n_nodes());
 
           const Node & node = elem.node_ref(n);
@@ -665,27 +648,34 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
           // syncing processor ids
           // libmesh_assert_equal_to (node->processor_id(), comm.rank());
 
-          request_to_fill_id[i] = node.id();
+          query_id[i] = node.id();
         }
 
       // Gather whatever data the user wants
-      std::vector<typename SyncFunctor::datum> data;
-      sync.gather_data(request_to_fill_id, data);
+      sync.gather_data(query_id, data);
+    };
 
-      // Trade back the results
-      std::vector<typename SyncFunctor::datum> received_data;
-      comm.send_receive(procdown, data,
-                        procup, received_data);
-      libmesh_assert_equal_to (requested_objs_elem_id_node_num[procup].size(),
-                               received_data.size());
+  bool data_changed = false;
 
+  auto action_functor =
+    [&sync, &requested_objs_id, &data_changed]
+    (processor_id_type pid,
+     const std::vector<std::pair<dof_id_type, unsigned char>> &,
+     const std::vector<typename SyncFunctor::datum> & data)
+    {
       // Let the user process the results.  If any of the results
-      // were different than what the user expected, then we'll
+      // were different than what the user expected, then we may
       // need to sync again just in case this processor has to
       // pass on the changes to yet another processor.
-      if (sync.act_on_data(requested_objs_id[procup], received_data))
+      if (sync.act_on_data(requested_objs_id[pid], data))
         data_changed = true;
-    }
+    };
+
+  // Trade requests with other processors
+  typename SyncFunctor::datum * ex = libmesh_nullptr;
+  pull_parallel_vector_data
+    (comm, requested_objs_elem_id_node_num, gather_functor,
+     action_functor, ex);
 
   comm.max(data_changed);
 
