@@ -247,6 +247,7 @@ void InfQuad4::connectivity(const unsigned int libmesh_dbg_var(sf),
         conn[1] = this->node_id(1);
         conn[2] = this->node_id(3);
         conn[3] = this->node_id(2);
+        return;
       }
     default:
       libmesh_error_msg("Unsupported IO package " << iop);
