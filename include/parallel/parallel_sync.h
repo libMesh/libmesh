@@ -159,6 +159,47 @@ void pull_parallel_vector_data(const Communicator & comm,
                                GatherFunctor & gather_data,
                                ActionFunctor & act_on_data);
 
+//------------------------------------------------------------------------
+// Parallel function overloads
+//
+
+/*
+ * A specialization for types that are harder to non-blocking receive.
+ */
+template <template <typename, typename, typename ...> class MapType,
+          typename KeyType,
+          typename ValueType,
+          typename A1,
+          typename A2,
+          typename ... ExtraTypes,
+          typename RequestContainer,
+          typename ActionFunctor>
+void push_parallel_vector_data(const Communicator & comm,
+                               const MapType<dof_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
+                               RequestContainer & reqs,
+                               ActionFunctor & act_on_data);
+
+
+
+/*
+ * A specialization for types that are harder to non-blocking receive.
+ */
+template <template <typename, typename, typename ...> class MapType,
+          typename KeyType,
+          typename ValueType,
+          typename A1,
+          typename A2,
+          typename ... ExtraTypes,
+          typename ActionFunctor>
+void push_parallel_vector_data(const Communicator & comm,
+                               const MapType<dof_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
+                               ActionFunctor & act_on_data);
+
+
+
+
+
+
 
 //------------------------------------------------------------------------
 // Parallel members
@@ -249,6 +290,77 @@ void push_parallel_vector_data(const Communicator & comm,
 }
 
 
+
+template <template <typename, typename, typename ...> class MapType,
+          typename ValueType,
+          typename A1,
+          typename A2,
+          typename ... ExtraTypes,
+          typename RequestContainer,
+          typename ActionFunctor>
+void push_parallel_vector_data(const Communicator & comm,
+                               const MapType<dof_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
+                               RequestContainer & reqs,
+                               ActionFunctor & act_on_data)
+{
+  // This function must be run on all processors at once
+  libmesh_parallel_only(comm);
+
+  processor_id_type num_procs = comm.size();
+
+  // Size of vectors to send to each procesor
+  std::vector<std::size_t> will_send_to(num_procs, 0);
+  processor_id_type num_sends = 0;
+  for (auto & datapair : data)
+    {
+      // Don't try to send anywhere that doesn't exist
+      libmesh_assert_less(datapair.first, num_procs);
+
+      // Don't give us empty vectors to send
+      libmesh_assert_greater(datapair.second.size(), 0);
+
+      will_send_to[datapair.first] = datapair.second.size();
+      num_sends++;
+    }
+
+  // Tell everyone about where everyone will send to
+  comm.alltoall(will_send_to);
+
+  // will_send_to now represents who we'll receive from
+  // give it a good name
+  auto & will_receive_from = will_send_to;
+
+  // We'll construct a datatype once for repeated use
+  StandardType<ValueType> datatype;
+
+  // Post all of the sends, non-blocking
+  for (auto & datapair : data)
+    {
+      processor_id_type destid = datapair.first;
+      libmesh_assert_less(destid, num_procs);
+      auto & datum = datapair.second;
+      Request sendreq;
+      comm.send(destid, datum, datatype, sendreq);
+      reqs.insert(reqs.end(), sendreq);
+    }
+
+  // Post all of the receives.
+  //
+  // Use blocking API here since we can't use the pre-sized
+  // non-blocking APIs with this data type.
+  //
+  // FIXME - implement Derek's API from #1684, switch to that!
+  for (processor_id_type proc_id = 0; proc_id < num_procs; proc_id++)
+    if (will_receive_from[proc_id])
+      {
+        std::vector<std::vector<ValueType,A1>,A2> received_data;
+        comm.receive(proc_id, received_data, datatype);
+        act_on_data(proc_id, received_data);
+      }
+}
+
+
+
 template <typename MapToVectors,
           typename ActionFunctor>
 void push_parallel_vector_data(const Communicator & comm,
@@ -261,6 +373,26 @@ void push_parallel_vector_data(const Communicator & comm,
 
   wait(requests);
 }
+
+
+
+template <template <typename, typename, typename ...> class MapType,
+          typename ValueType,
+          typename A1,
+          typename A2,
+          typename ... ExtraTypes,
+          typename ActionFunctor>
+void push_parallel_vector_data(const Communicator & comm,
+                               const MapType<dof_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
+                               ActionFunctor & act_on_data)
+{
+  std::vector<Request> requests;
+
+  push_parallel_vector_data(comm, data, requests, act_on_data);
+
+  wait(requests);
+}
+
 
 
 template <typename datum,
