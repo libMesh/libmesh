@@ -2518,11 +2518,17 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
 
   for (int c=0; c<num_vars; c++)
     {
-      // If we are not writing this variable, skip to the next loop
-      // iteration. This is needed to keep the indexing consistent
-      // with the ordering of parallel_soln.
-      if (std::find(output_names.begin(), output_names.end(), names[c]) == output_names.end())
+      // Find the position of names[c] in the output_names vector, if it exists.
+      auto pos = std::find(output_names.begin(), output_names.end(), names[c]);
+
+      // Skip names[c] if it's not supposed to be output.
+      if (pos == output_names.end())
         continue;
+
+      // Compute the (zero-based) index which determines which
+      // variable this will be as far as Nemesis is concerned.  This
+      // will be used below in the write_nodal_values() call.
+      auto variable_name_position = std::distance(output_names.begin(), pos);
 
       // Fill up a std::vector with the dofs for the current variable
       std::vector<numeric_index_type> required_indices(num_nodes);
@@ -2537,7 +2543,7 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
 
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
       // Call the ExodusII_IO_Helper function to write the data.
-      write_nodal_values(c+1, local_soln, timestep);
+      write_nodal_values(variable_name_position + 1, local_soln, timestep);
 #else
       // We have the local (complex) values. Now extract the real,
       // imaginary, and magnitude values from them.
@@ -2553,9 +2559,9 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
         }
 
       // Write the real, imaginary, and magnitude values to file.
-      write_nodal_values(3*c+1, real_parts, timestep);
-      write_nodal_values(3*c+2, imag_parts, timestep);
-      write_nodal_values(3*c+3, magnitudes, timestep);
+      write_nodal_values(3 * variable_name_position + 1, real_parts, timestep);
+      write_nodal_values(3 * variable_name_position + 2, imag_parts, timestep);
+      write_nodal_values(3 * variable_name_position + 3, magnitudes, timestep);
 #endif
     }
 }
