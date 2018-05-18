@@ -25,6 +25,7 @@
 
 // C++ includes
 #include <map>
+#include <type_traits>
 #include <vector>
 
 
@@ -192,13 +193,31 @@ void push_parallel_vector_data(const Communicator & comm,
   // give it a good name
   auto & will_receive_from = will_send_to;
 
+  // This function only works for "flat" data that we can pre-size
+  // receive buffers for: a map to vectors-of-standard-types, not e.g.
+  // vectors-of-vectors.
+  //
+  // Trying to instantiate a StandardType<T> gives us a compiler error
+  // where otherwise we would have had a runtime error.
+  //
+  // Creating a StandardType<T> manually also saves our APIs from
+  // having to do a bunch of automatic creations later.
+  //
+  // This object will be free'd before all non-blocking communications
+  // complete, but the MPI standard for MPI_Type_free specifies "Any
+  // communication that is currently using this datatype will
+  // complete normally." so we're cool.
+  typedef decltype(data.begin()->second.front()) ref_type;
+  typedef typename std::remove_reference<ref_type>::type nonref_type;
+  StandardType<typename std::remove_const<nonref_type>::type> datatype;
+
   // Post all of the sends, non-blocking
   for (auto & datapair : data)
     {
       processor_id_type destid = datapair.first;
       auto & datum = datapair.second;
       Request sendreq;
-      comm.send(destid, datum, sendreq);
+      comm.send(destid, datum, datatype, sendreq);
       reqs.insert(reqs.end(), sendreq);
     }
 
@@ -212,7 +231,7 @@ void push_parallel_vector_data(const Communicator & comm,
         Request req;
         auto & incoming_data = received_data[proc_id];
         incoming_data.resize(will_receive_from[proc_id]);
-        comm.receive(proc_id, incoming_data, req);
+        comm.receive(proc_id, incoming_data, datatype, req);
         receive_reqs.push_back(req);
         receive_procids.push_back(proc_id);
       }
