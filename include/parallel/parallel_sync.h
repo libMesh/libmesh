@@ -207,6 +207,22 @@ void push_parallel_vector_data(const Communicator & comm,
                                const MapType<dof_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
                                ActionFunctor & act_on_data);
 
+/*
+ * A specialization for types that are harder to non-blocking receive.
+ */
+template <typename datum,
+          typename A,
+          typename MapToVectors,
+          typename RequestContainer,
+          typename GatherFunctor,
+          typename ActionFunctor>
+void pull_parallel_vector_data(const Communicator & comm,
+                               const MapToVectors & queries,
+                               RequestContainer & reqs,
+                               GatherFunctor & gather_data,
+                               ActionFunctor & act_on_data,
+                               std::vector<datum,A> * example);
+
 
 
 
@@ -486,6 +502,63 @@ void pull_parallel_vector_data(const Communicator & comm,
   wait(requests);
 }
 
+
+template <typename datum,
+          typename A,
+          typename MapToVectors,
+          typename RequestContainer,
+          typename GatherFunctor,
+          typename ActionFunctor>
+void pull_parallel_vector_data(const Communicator & comm,
+                               const MapToVectors & queries,
+                               RequestContainer & reqs,
+                               GatherFunctor & gather_data,
+                               ActionFunctor & act_on_data,
+                               std::vector<datum,A> *)
+{
+  typedef typename MapToVectors::mapped_type query_type;
+
+  std::map<processor_id_type, std::vector<std::vector<datum,A>>>
+    response_data;
+  std::vector<Request> response_reqs;
+
+  auto gather_functor =
+    [&comm, &gather_data, &response_data, &response_reqs]
+    (processor_id_type pid, query_type query)
+    {
+      Request sendreq;
+      gather_data(pid, query, response_data[pid]);
+      comm.send(pid, response_data[pid], sendreq);
+      response_reqs.push_back(sendreq);
+    };
+
+  push_parallel_vector_data (comm, queries, reqs, gather_functor);
+
+  // Every outgoing query should now have an incoming response.
+  //
+  // Post all of the receives.
+  //
+  // Use blocking API here since we can't use the pre-sized
+  // non-blocking APIs with this data type.
+  //
+  // FIXME - implement Derek's API from #1684, switch to that!
+  std::vector<Request> receive_reqs;
+  std::vector<processor_id_type> receive_procids;
+  for (auto & querypair : queries)
+    {
+      processor_id_type proc_id = querypair.first;
+      libmesh_assert_less(proc_id, comm.size());
+
+      auto & querydata = querypair.second;
+
+      std::vector<std::vector<datum,A>> received_data;
+      comm.receive(proc_id, received_data);
+
+      act_on_data(proc_id, querydata, received_data);
+    }
+
+  wait(response_reqs);
+}
 
 
 } // namespace Parallel
