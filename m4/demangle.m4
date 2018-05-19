@@ -29,8 +29,6 @@ ac_cv_cxx_gcc_abi_demangle,
  ac_cv_cxx_gcc_abi_demangle=yes, ac_cv_cxx_gcc_abi_demangle=no)
  AC_LANG_RESTORE
 ])
-if test "$ac_cv_cxx_gcc_abi_demangle" = yes; then
-  AC_DEFINE(HAVE_GCC_ABI_DEMANGLE,1,
-            [define if the compiler supports GCC C++ ABI name demangling])
-fi
+AS_IF([test "x$ac_cv_cxx_gcc_abi_demangle" = "xyes"],
+      [AC_DEFINE(HAVE_GCC_ABI_DEMANGLE,1,[define if the compiler supports GCC C++ ABI name demangling])])
 ])

@@ -11,7 +11,7 @@ AC_ARG_WITH([mpi],
                            [Prefix where MPI is installed (MPIHOME)]),
             [MPI="$withval"],
             [
-              echo "note: MPI library path not given... trying prefix=$MPIHOME"
+              AS_ECHO(["note: MPI library path not given... trying prefix=$MPIHOME"])
               MPI=$MPIHOME
             ])
 
@@ -91,7 +91,7 @@ AS_IF([test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so],
                                            [Prefix where GM is installed (GMHOME)]),
                             [GM="$withval"],
                             [
-                              echo "note: GM library path not given... trying prefix=$MPIHOME"
+                              AS_ECHO(["note: GM library path not given... trying prefix=$MPIHOME"])
                               GM=$GMHOME
                             ])
 
@@ -144,7 +144,7 @@ AS_IF([test "x$MPI_IMPL" != x],
         dnl Ensure the compiler finds the header file...
         AS_IF([test -e $MPI_INCLUDES_PATH/mpi.h],
               [
-                echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+                AS_ECHO(["note: using $MPI_INCLUDES_PATH/mpi.h"])
                 tmpCPPFLAGS=$CPPFLAGS
                 AC_LANG_SAVE
                 AC_LANG_CPLUSPLUS
@@ -159,7 +159,7 @@ AS_IF([test "x$MPI_IMPL" != x],
               [test -e $MPI_INCLUDES_PATH/mpi/mpi.h],
               [
                 MPI_INCLUDES_PATH=$MPI_INCLUDES_PATH/mpi
-                echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+                AS_ECHO(["note: using $MPI_INCLUDES_PATH/mpi.h"])
                 tmpCPPFLAGS=$CPPFLAGS
                 AC_LANG_SAVE
                 AC_LANG_CPLUSPLUS

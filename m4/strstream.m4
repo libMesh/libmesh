@@ -21,8 +21,9 @@ ac_cv_cxx_have_strstream,
  ac_cv_cxx_have_strstream=yes, ac_cv_cxx_have_strstream=no)
  AC_LANG_RESTORE
 ])
-if test "$ac_cv_cxx_have_strstream" = yes; then
-  AC_DEFINE(HAVE_STRSTREAM,,[define if the compiler has the strstream header])
-  AC_DEFINE(HAVE_STRINGSTREAM,,[define if the compiler has stringstream functionality])
-fi
+AS_IF([test "x$ac_cv_cxx_have_strstream" = "xyes"],
+      [
+        AC_DEFINE(HAVE_STRSTREAM,,[define if the compiler has the strstream header])
+        AC_DEFINE(HAVE_STRINGSTREAM,,[define if the compiler has stringstream functionality])
+      ])
 ])

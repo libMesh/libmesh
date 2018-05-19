@@ -21,7 +21,6 @@ ac_cv_cxx_have_locale,
  ac_cv_cxx_have_locale=yes, ac_cv_cxx_have_locale=no)
  AC_LANG_RESTORE
 ])
-if test "$ac_cv_cxx_have_locale" = yes; then
-  AC_DEFINE(HAVE_LOCALE,,[define if the compiler has locale])
-fi
+AS_IF([test "x$ac_cv_cxx_have_locale" = "xyes"],
+      [AC_DEFINE(HAVE_LOCALE,,[define if the compiler has locale])])
 ])
