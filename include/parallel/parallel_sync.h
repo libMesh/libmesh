@@ -441,13 +441,15 @@ void pull_parallel_vector_data(const Communicator & comm,
     response_data, received_data;
   std::vector<Request> response_reqs;
 
+  StandardType<datum> datatype;
+
   auto gather_functor =
-    [&comm, &gather_data, &response_data, &response_reqs]
+    [&comm, &gather_data, &response_data, &response_reqs, &datatype]
     (processor_id_type pid, query_type query)
     {
       Request sendreq;
       gather_data(pid, query, response_data[pid]);
-      comm.send(pid, response_data[pid], sendreq);
+      comm.send(pid, response_data[pid], datatype, sendreq);
       response_reqs.push_back(sendreq);
     };
 
@@ -464,7 +466,7 @@ void pull_parallel_vector_data(const Communicator & comm,
       Request req;
       auto & incoming_data = received_data[proc_id];
       incoming_data.resize(querydata.size());
-      comm.receive(proc_id, incoming_data, req);
+      comm.receive(proc_id, incoming_data, datatype, req);
       receive_reqs.push_back(req);
       receive_procids.push_back(proc_id);
     }
