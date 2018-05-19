@@ -17,185 +17,162 @@ AC_DEFUN([AX_SUMMARIZE_CONFIG],
 [
 
 ######################################################################################
-echo
-echo '----------------------------------- SUMMARY -----------------------------------'
-echo
-echo Package version.................... : $PACKAGE-$VERSION
-echo
-echo C++ compiler type.................. : $GXX_VERSION
-echo C++ compiler....................... : $CXX
-echo C compiler......................... : $CC
-echo Fortran compiler................... : $FC
-echo Build Methods...................... : $METHODS
-echo " "
+AS_ECHO([])
+AS_ECHO(["----------------------------------- SUMMARY -----------------------------------"])
+AS_ECHO([])
+AS_ECHO(["Package version.................... : $PACKAGE-$VERSION"])
+AS_ECHO([])
+AS_ECHO(["C++ compiler type.................. : $GXX_VERSION"])
+AS_ECHO(["C++ compiler....................... : $CXX"])
+AS_ECHO(["C compiler......................... : $CC"])
+AS_ECHO(["Fortran compiler................... : $FC"])
+AS_ECHO(["Build Methods...................... : $METHODS"])
+AS_ECHO([])
 for method in ${METHODS}; do
-     case "${method}" in
-         opt)
-echo CPPFLAGS...\(opt\)................... : $CPPFLAGS_OPT $CPFLAGS
-echo CXXFLAGS...\(opt\)................... : $CXXFLAGS_OPT $CXXFLAGS
-echo CFLAGS.....\(opt\)................... : $CFLAGS_OPT $CFLAGS
-     ;;
-         devel)
-echo CPPFLAGS...\(devel\)................. : $CPPFLAGS_DEVEL $CPFLAGS
-echo CXXFLAGS...\(devel\)................. : $CXXFLAGS_DEVEL $CXXFLAGS
-echo CFLAGS.....\(devel\)................. : $CFLAGS_DEVEL $CFLAGS
-     ;;
-         dbg)
-echo CPPFLAGS...\(dbg\)................... : $CPPFLAGS_DBG $CPFLAGS
-echo CXXFLAGS...\(dbg\)................... : $CXXFLAGS_DBG $CXXFLAGS
-echo CFLAGS.....\(dbg\)................... : $CFLAGS_DBG $CFLAGS
-     ;;
-         prof)
-echo CPPFLAGS...\(prof\).................. : $CPPFLAGS_PROF $CPFLAGS
-echo CXXFLAGS...\(prof\).................. : $CXXFLAGS_PROF $CXXFLAGS
-echo CFLAGS.....\(prof\).................. : $CFLAGS_PROF $CFLAGS
-     ;;
-         oprof)
-echo CPPFLAGS...\(oprof\)................. : $CPPFLAGS_OPROF $CPFLAGS
-echo CXXFLAGS...\(oprof\)................. : $CXXFLAGS_OPROF $CXXFLAGS
-echo CFLAGS.....\(oprof\)................. : $CFLAGS_OPROF $CFLAGS
-     esac
-     echo " "
+     AS_CASE("${method}",
+             [opt],   [AS_ECHO(["CPPFLAGS...(opt)................... : $CPPFLAGS_OPT $CPFLAGS"])
+                       AS_ECHO(["CXXFLAGS...(opt)................... : $CXXFLAGS_OPT $CXXFLAGS"])
+                       AS_ECHO(["CFLAGS.....(opt)................... : $CFLAGS_OPT $CFLAGS"])],
+             [devel], [AS_ECHO(["CPPFLAGS...(devel)................. : $CPPFLAGS_DEVEL $CPFLAGS"])
+                       AS_ECHO(["CXXFLAGS...(devel)................. : $CXXFLAGS_DEVEL $CXXFLAGS"])
+                       AS_ECHO(["CFLAGS.....(devel)................. : $CFLAGS_DEVEL $CFLAGS"])],
+             [dbg],   [AS_ECHO(["CPPFLAGS...(dbg)................... : $CPPFLAGS_DBG $CPFLAGS"])
+                       AS_ECHO(["CXXFLAGS...(dbg)................... : $CXXFLAGS_DBG $CXXFLAGS"])
+                       AS_ECHO(["CFLAGS.....(dbg)................... : $CFLAGS_DBG $CFLAGS"])],
+             [prof],  [AS_ECHO(["CPPFLAGS...(prof).................. : $CPPFLAGS_PROF $CPFLAGS"])
+                       AS_ECHO(["CXXFLAGS...(prof).................. : $CXXFLAGS_PROF $CXXFLAGS"])
+                       AS_ECHO(["CFLAGS.....(prof).................. : $CFLAGS_PROF $CFLAGS"])],
+             [oprof], [AS_ECHO(["CPPFLAGS...(oprof)................. : $CPPFLAGS_OPROF $CPFLAGS"])
+                       AS_ECHO(["CXXFLAGS...(oprof)................. : $CXXFLAGS_OPROF $CXXFLAGS"])
+                       AS_ECHO(["CFLAGS.....(oprof)................. : $CFLAGS_OPROF $CFLAGS"])])
+
+     dnl blank line
+     AS_ECHO([])
 done
-echo Install dir........................ : $prefix
-echo Build user......................... : $USER
-echo Build host......................... : $BUILD_HOST
-echo Build architecture................. : $BUILD_ARCH
-echo Git revision....................... : $BUILD_VERSION
+AS_ECHO(["Install dir........................ : $prefix"])
+AS_ECHO(["Build user......................... : $USER"])
+AS_ECHO(["Build host......................... : $BUILD_HOST"])
+AS_ECHO(["Build architecture................. : $BUILD_ARCH"])
+AS_ECHO(["Git revision....................... : $BUILD_VERSION"])
 
-######################################################################################
-echo
-echo Library Features:
-echo '  library warnings................. :' $enablewarnings
-echo '  library deprecated code support.. :' $enabledeprecated
-echo '  adaptive mesh refinement......... :' $enableamr
-echo '  blocked matrix/vector storage.... :' $enableblockedstorage
-echo '  complex variables................ :' $enablecomplex
-echo '  example suite.................... :' $enableexamples
-echo '  ghosted vectors.................. :' $enableghosted
-echo '  high-order shape functions....... :' $enablepfem
-echo '  unique-id support................ :' $enableuniqueid
-echo '  id size (boundaries)............. :' $boundary_bytes bytes
-echo '  id size (dofs)................... :' $dof_bytes bytes
-if (test "x$enableuniqueid" = "xyes"); then
-echo '  id size (unique)................. :' $unique_bytes bytes
-fi
-echo '  id size (processors)............. :' $processor_bytes bytes
-echo '  id size (subdomains)............. :' $subdomain_bytes bytes
-echo '  infinite elements................ :' $enableifem
-echo '  Dirichlet constraints............ :' $enabledirichlet
-echo '  node constraints................. :' $enablenodeconstraint
-echo '  parallel mesh.................... :' $enableparmesh
-echo '  performance logging.............. :' $enableperflog
-echo '  periodic boundary conditions..... :' $enableperiodic
-echo '  reference counting............... :' $enablerefct
-echo '  shape function 2nd derivatives... :' $enablesecond
-echo '  stack trace files................ :' $enabletracefiles
-echo '  track node valence............... :' $enablenodevalence
-echo '  variational smoother............. :' $enablevsmoother
-echo '  xdr binary I/O................... :' $enablexdr
-if (test "x$enablelegacyincludepaths" = "xyes"); then
-echo '  non-prefixed include paths....... :' $enablelegacyincludepaths ***LEGACY FEATURE***
-fi
-if (test "x$enablelegacyusingnamespace" = "xyes"); then
-echo '  adding using namespace libMesh... :' $enablelegacyusingnamespace ***LEGACY FEATURE***
-fi
-if (test "x$enabledefaultcommworld" = "xyes"); then
-echo '  providing libMesh::CommWorld..... :' $enabledefaultcommworld ***LEGACY FEATURE***
-fi
+dnl Print out library features
+AS_ECHO([])
+AS_ECHO(["Library Features:"])
+AS_ECHO(["  library warnings................. : $enablewarnings"])
+AS_ECHO(["  library deprecated code support.. : $enabledeprecated"])
+AS_ECHO(["  adaptive mesh refinement......... : $enableamr"])
+AS_ECHO(["  blocked matrix/vector storage.... : $enableblockedstorage"])
+AS_ECHO(["  complex variables................ : $enablecomplex"])
+AS_ECHO(["  example suite.................... : $enableexamples"])
+AS_ECHO(["  ghosted vectors.................. : $enableghosted"])
+AS_ECHO(["  high-order shape functions....... : $enablepfem"])
+AS_ECHO(["  unique-id support................ : $enableuniqueid"])
+AS_ECHO(["  id size (boundaries)............. : $boundary_bytes bytes"])
+AS_ECHO(["  id size (dofs)................... : $dof_bytes bytes"])
+AS_IF([test "x$enableuniqueid" = "xyes"],
+      [AS_ECHO(["  id size (unique)................. : $unique_bytes bytes"])])
+AS_ECHO(["  id size (processors)............. : $processor_bytes bytes"])
+AS_ECHO(["  id size (subdomains)............. : $subdomain_bytes bytes"])
+AS_ECHO(["  infinite elements................ : $enableifem"])
+AS_ECHO(["  Dirichlet constraints............ : $enabledirichlet"])
+AS_ECHO(["  node constraints................. : $enablenodeconstraint"])
+AS_ECHO(["  parallel mesh.................... : $enableparmesh"])
+AS_ECHO(["  performance logging.............. : $enableperflog"])
+AS_ECHO(["  periodic boundary conditions..... : $enableperiodic"])
+AS_ECHO(["  reference counting............... : $enablerefct"])
+AS_ECHO(["  shape function 2nd derivatives... : $enablesecond"])
+AS_ECHO(["  stack trace files................ : $enabletracefiles"])
+AS_ECHO(["  track node valence............... : $enablenodevalence"])
+AS_ECHO(["  variational smoother............. : $enablevsmoother"])
+AS_ECHO(["  xdr binary I/O................... : $enablexdr"])
+AS_IF([test "x$enablelegacyincludepaths" = "xyes"],
+      [AS_ECHO(["  non-prefixed include paths....... : $enablelegacyincludepaths ***LEGACY FEATURE***"])])
+AS_IF([test "x$enablelegacyusingnamespace" = "xyes"],
+      [AS_ECHO(["  adding using namespace libMesh... : $enablelegacyusingnamespace ***LEGACY FEATURE***"])])
+AS_IF([test "x$enabledefaultcommworld" = "xyes"],
+      [AS_ECHO(["  providing libMesh::CommWorld..... : $enabledefaultcommworld ***LEGACY FEATURE***"])])
 
 
-
-######################################################################################
-if (test "x$enableoptional" = "xyes"); then
-  echo
-  echo Optional Packages:
-  echo '  'boost............................ : $enableboost
-  echo '  'capnproto........................ : $enablecapnproto
-  echo '  'cppunit.......................... : $enablecppunit
-  echo '  'curl............................. : $enablecurl
-#  if (test "x$enablecppunit" = "xyes"); then
-#  echo '     'CPPUNIT_CFLAGS................ : $CPPUNIT_CFLAGS
-#  echo '     'CPPUNIT_LIBS.................. : $CPPUNIT_LIBS
-#  fi
-  echo '  'eigen............................ : $enableeigen
-  echo '  'exodus........................... : $enableexodus
-  if (test "x$exodusversion" != "xno"); then
-  echo '     'version....................... : $exodusversion
-  fi
-  echo '  'fparser.......................... : $enablefparser
-  if (test "x$enablefparser" = "xyes" -a "x$enablefparserdevel" = "xno"); then
-  echo '     'build from version............ : release
-  fi
-  if (test "x$enablefparser" = "xyes" -a "x$enablefparserdevel" = "xyes"); then
-  echo '     'build from version............ : devel
-  fi
-  if (test "x$enablefparser" = "xyes" -a "x$enablefparserdebugging" = "xyes"); then
-  echo '     'fparser debugging............. : enabled
-  fi
-  echo '  'glpk............................. : $enableglpk
-  echo '  'gmv.............................. : $enablegmv
-  echo '  'gzstream......................... : $enablegz
-  echo '  'hdf5............................. : $enablehdf5
-  echo '  'laspack.......................... : $enablelaspack
-  echo '  'libhilbert....................... : $enablelibhilbert
-  echo '  'metis............................ : $enablemetis
-  echo '  'mpi.............................. : $enablempi
-  echo '  'nanoflann........................ : $enablenanoflann
-  echo '  'nemesis.......................... : $enablenemesis
-  if (test "x$nemesisversion" != "xno"); then
-  echo '     'version....................... : $nemesisversion
-  fi
-  echo '  'netcdf........................... : $enablenetcdf
-  if (test "x$netcdfversion" != "xno"); then
-  echo '     'version....................... : $netcdfversion
-  fi
-  echo '  'nlopt............................ : $enablenlopt
-  echo '  'parmetis......................... : $enableparmetis
-  echo '  'petsc............................ : $enablepetsc
-  if (test "x$enablepetsc" = "xyes"); then
-  echo '     'version....................... : $petscversion
-  fi
-  echo '  'qhull............................ : $enableqhull
-  echo '  'sfcurves......................... : $enablesfc
-  echo '  'slepc............................ : $enableslepc
-  if (test "x$enableslepc" = "xyes"); then
-  echo '     'version....................... : $slepcversion
-  fi
-  echo '  'thread model..................... : $found_thread_model
-  echo '  'c++ rtti ........................ : $ac_cv_cxx_rtti
-  echo '  'tecio............................ : $enabletecio
-  echo '  'tecplot...\(vendor binaries\)...... : $enabletecplot
-  echo '  'tetgen........................... : $enabletetgen
-  echo '  'triangle......................... : $enabletriangle
-  echo '  'trilinos......................... : $enabletrilinos
-  if (test "x$enabletrilinos" = "xyes"); then
-  echo '     'AztecOO....................... : $enableaztecoo
-  echo '     'NOX........................... : $enablenox
-  echo '     'ML............................ : $enableml
-  echo '     'Tpetra........................ : $enabletpetra
-  echo '     'DTK........................... : $enabledtk
-  echo '     'Ifpack........................ : $enableifpack
-  echo '     'Epetra........................ : $enableepetra
-  echo '     'EpetraExt..................... : $enableepetraext
-  fi
-  echo '  'vtk.............................. : $enablevtk
-  if (test "x$enablevtk" = "xyes"); then
-  echo '     'version....................... : $vtkversion
-  fi
-  echo
-  if (test "x$libmesh_optional_INCLUDES" != "x"); then
-  echo '  'libmesh_optional_INCLUDES........ : $libmesh_optional_INCLUDES
-  echo
-  fi
-  if (test "x$libmesh_optional_LIBS" != "x"); then
-  echo '  'libmesh_optional_LIBS............ : $libmesh_optional_LIBS
-  echo
-  fi
-fi
-echo '-------------------------------------------------------------------------------'
-
-echo Configure complete, now type \'make\' and then \'make install\'.
-echo
+dnl Print out which optional libraries have been configured.
+AS_IF([test "x$enableoptional" = "xyes"],
+      [
+        AS_ECHO([])
+        AS_ECHO(["Optional Packages:"])
+        AS_ECHO(["  boost............................ : $enableboost"])
+        AS_ECHO(["  capnproto........................ : $enablecapnproto"])
+        AS_ECHO(["  cppunit.......................... : $enablecppunit"])
+        AS_ECHO(["  curl............................. : $enablecurl"])
+        AS_ECHO(["  eigen............................ : $enableeigen"])
+        AS_ECHO(["  exodus........................... : $enableexodus"])
+        AS_IF([test "x$exodusversion" != "xno"],
+              [AS_ECHO(["     version....................... : $exodusversion"])])
+        AS_ECHO(["  fparser.......................... : $enablefparser"])
+        AS_IF([test "x$enablefparser" = "xyes" && test "x$enablefparserdevel" = "xno"],
+              [AS_ECHO(["     build from version............ : release"])])
+        AS_IF([test "x$enablefparser" = "xyes" && test "x$enablefparserdevel" = "xyes"],
+              [AS_ECHO(["     build from version............ : devel"])])
+        AS_IF([test "x$enablefparser" = "xyes" && test "x$enablefparserdebugging" = "xyes"],
+              [AS_ECHO(["     fparser debugging............. : enabled"])])
+        AS_ECHO(["  glpk............................. : $enableglpk"])
+        AS_ECHO(["  gmv.............................. : $enablegmv"])
+        AS_ECHO(["  gzstream......................... : $enablegz"])
+        AS_ECHO(["  hdf5............................. : $enablehdf5"])
+        AS_ECHO(["  laspack.......................... : $enablelaspack"])
+        AS_ECHO(["  libhilbert....................... : $enablelibhilbert"])
+        AS_ECHO(["  metis............................ : $enablemetis"])
+        AS_ECHO(["  mpi.............................. : $enablempi"])
+        AS_ECHO(["  nanoflann........................ : $enablenanoflann"])
+        AS_ECHO(["  nemesis.......................... : $enablenemesis"])
+        AS_IF([test "x$nemesisversion" != "xno"],
+              [AS_ECHO(["     version....................... : $nemesisversion"])])
+        AS_ECHO(["  netcdf........................... : $enablenetcdf"])
+        AS_IF([test "x$netcdfversion" != "xno"],
+              [AS_ECHO(["     version....................... : $netcdfversion"])])
+        AS_ECHO(["  nlopt............................ : $enablenlopt"])
+        AS_ECHO(["  parmetis......................... : $enableparmetis"])
+        AS_ECHO(["  petsc............................ : $enablepetsc"])
+        AS_IF([test "x$enablepetsc" = "xyes"],
+              [AS_ECHO(["     version....................... : $petscversion"])])
+        AS_ECHO(["  qhull............................ : $enableqhull"])
+        AS_ECHO(["  sfcurves......................... : $enablesfc"])
+        AS_ECHO(["  slepc............................ : $enableslepc"])
+        AS_IF([test "x$enableslepc" = "xyes"],
+              [AS_ECHO(["     version....................... : $slepcversion"])])
+        AS_ECHO(["  thread model..................... : $found_thread_model"])
+        AS_ECHO(["  c++ rtti ........................ : $ac_cv_cxx_rtti"])
+        AS_ECHO(["  tecio............................ : $enabletecio"])
+        AS_ECHO(["  tecplot...(vendor binaries)...... : $enabletecplot"])
+        AS_ECHO(["  tetgen........................... : $enabletetgen"])
+        AS_ECHO(["  triangle......................... : $enabletriangle"])
+        AS_ECHO(["  trilinos......................... : $enabletrilinos"])
+        AS_IF([test "x$enabletrilinos" = "xyes"],
+              [
+                AS_ECHO(["     AztecOO....................... : $enableaztecoo"])
+                AS_ECHO(["     NOX........................... : $enablenox"])
+                AS_ECHO(["     ML............................ : $enableml"])
+                AS_ECHO(["     Tpetra........................ : $enabletpetra"])
+                AS_ECHO(["     DTK........................... : $enabledtk"])
+                AS_ECHO(["     Ifpack........................ : $enableifpack"])
+                AS_ECHO(["     Epetra........................ : $enableepetra"])
+                AS_ECHO(["     EpetraExt..................... : $enableepetraext"])
+              ])
+        AS_ECHO(["  vtk.............................. : $enablevtk"])
+        AS_IF([test "x$enablevtk" = "xyes"],
+              [AS_ECHO(["     version....................... : $vtkversion"])])
+        AS_ECHO([])
+        AS_IF([test "x$libmesh_optional_INCLUDES" != "x"],
+              [
+                AS_ECHO(["  libmesh_optional_INCLUDES........ : $libmesh_optional_INCLUDES"])
+                AS_ECHO([])
+              ])
+        AS_IF([test "x$libmesh_optional_LIBS" != "x"],
+              [
+                AS_ECHO(["  libmesh_optional_LIBS............ : $libmesh_optional_LIBS"])
+                AS_ECHO([])
+              ])
+      ])
+AS_ECHO(["-------------------------------------------------------------------------------"])
+AS_ECHO(["Configure complete, now type 'make' and then 'make install'."])
+AS_ECHO([])
 
 ])

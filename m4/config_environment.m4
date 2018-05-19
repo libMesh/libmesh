@@ -31,35 +31,30 @@ BUILD_ARCH=${host}
 BUILD_HOST=${ac_hostname}
 BUILD_DATE=`date +'%F %H:%M'`
 
-# Determine method for querying Source code revisioning (assumes git)
-
+dnl Determine method for querying Source code revisioning (assumes git)
 AC_PATH_PROG(gitquery,git)
 
-if (test "x${gitquery}" = "x" -o ! -e $srcdir/.git) ; then
-   GIT_REVISION="external" #"cat $srcdir/dist_version"
-   GIT_CHECKOUT=false
-   BUILD_DEVSTATUS="External Release"
-else
-
-   #echo "git revision=`cd $srcdir ; ${gitquery} rev-parse HEAD`"
-   #echo "git branch=`cd $srcdir ; ${gitquery} branch | awk '/^\\* / { print $2 }'`"
-
-   GIT_REVISION="`cd $srcdir ; ${gitquery} rev-parse HEAD`"
-   GIT_CHECKOUT=true
-   BUILD_DEVSTATUS="Development Build"
-fi
+AS_IF([test "x${gitquery}" = "x" || test ! -e $srcdir/.git],
+      [
+        GIT_REVISION="external"
+        GIT_CHECKOUT=false
+        BUILD_DEVSTATUS="External Release"
+      ],
+      [
+        GIT_REVISION="`cd $srcdir ; ${gitquery} rev-parse HEAD`"
+        GIT_CHECKOUT=true
+        BUILD_DEVSTATUS="Development Build"
+      ])
 
 
 AC_SUBST(GIT_REVISION)
 AC_SUBST(BUILD_DEVSTATUS)
 AM_CONDITIONAL(GIT_CHECKOUT,test x${GIT_CHECKOUT} = xtrue )
 
-# Query current version.
-
+dnl Query current version.
 BUILD_VERSION=${GIT_REVISION}
 
-# Versioning info - check local developer version (if checked out)
-
+dnl Versioning info - check local developer version (if checked out)
 AC_DEFINE_UNQUOTED([BUILD_USER],     "${BUILD_USER}",     [The fine user who built the package])
 AC_DEFINE_UNQUOTED([BUILD_ARCH],     "${BUILD_ARCH}",     [Architecture of the build host])
 AC_DEFINE_UNQUOTED([BUILD_HOST],     "${BUILD_HOST}",     [Build host name])

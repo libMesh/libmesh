@@ -14,8 +14,6 @@ char** strings = backtrace_symbols(addresses, size);
  ac_cv_cxx_glibc_backtrace=yes, ac_cv_cxx_glibc_backtrace=no)
  AC_LANG_RESTORE
 ])
-if test "$ac_cv_cxx_glibc_backtrace" = yes; then
-  AC_DEFINE(HAVE_GLIBC_BACKTRACE,1,
-            [define if the compiler supports glibc backtrace])
-fi
+AS_IF([test "x$ac_cv_cxx_glibc_backtrace" = "xyes"],
+      [AC_DEFINE(HAVE_GLIBC_BACKTRACE,1, [define if the compiler supports glibc backtrace])])
 ])

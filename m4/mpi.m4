@@ -11,7 +11,7 @@ AC_ARG_WITH([mpi],
                            [Prefix where MPI is installed (MPIHOME)]),
             [MPI="$withval"],
             [
-              echo "note: MPI library path not given... trying prefix=$MPIHOME"
+              AS_ECHO(["note: MPI library path not given... trying prefix=$MPIHOME"])
               MPI=$MPIHOME
             ])
 
@@ -91,7 +91,7 @@ AS_IF([test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so],
                                            [Prefix where GM is installed (GMHOME)]),
                             [GM="$withval"],
                             [
-                              echo "note: GM library path not given... trying prefix=$MPIHOME"
+                              AS_ECHO(["note: GM library path not given... trying prefix=$MPIHOME"])
                               GM=$GMHOME
                             ])
 
@@ -139,52 +139,55 @@ AS_IF([test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so],
         LIBS=$tmpLIBS
       ])
 
-if (test "x$MPI_IMPL" != x) ; then
-
-  # Ensure the compiler finds the header file...
-  if test -e $MPI_INCLUDES_PATH/mpi.h; then
-    echo "note: using $MPI_INCLUDES_PATH/mpi.h"
-    tmpCPPFLAGS=$CPPFLAGS
-    AC_LANG_SAVE
-    AC_LANG_CPLUSPLUS
-    CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
-    AC_CHECK_HEADER([mpi.h],
-                    [AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])],
-                    [AC_MSG_RESULT([Could not compile in the MPI headers...]); enablempi=no])
-    MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
-    AC_LANG_RESTORE
-    CPPFLAGS=$tmpCPPFLAGS
-  elif test -e $MPI_INCLUDES_PATH/mpi/mpi.h; then
-    MPI_INCLUDES_PATH=$MPI_INCLUDES_PATH/mpi
-    echo "note: using $MPI_INCLUDES_PATH/mpi.h"
-    tmpCPPFLAGS=$CPPFLAGS
-    AC_LANG_SAVE
-    AC_LANG_CPLUSPLUS
-    CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
-    AC_CHECK_HEADER([mpi.h],
-                    [AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])],
-                    [AC_MSG_RESULT([Could not compile in the MPI headers...]); enablempi=no] )
-    MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
-    AC_LANG_RESTORE
-    CPPFLAGS=$tmpCPPFLAGS
-  else
-    AC_MSG_RESULT([Could not find MPI header <mpi.h>...])
-    enablempi=no
-  fi
-
-else
-
-  dnl no MPI install found, see if the compiler "natively" supports it by
-  dnl attempting to link a test application without any special flags.
-  AC_TRY_LINK([@%:@include <mpi.h>],
-                 [int np; MPI_Comm_size (MPI_COMM_WORLD, &np);],
-                 [
-                   MPI_IMPL="built-in"
-                   AC_MSG_RESULT( [$CXX Compiler Supports MPI] )
-                   AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])
-                 ],
-                 [AC_MSG_RESULT([$CXX Compiler Does NOT Support MPI...]); enablempi=no] )
-fi
+AS_IF([test "x$MPI_IMPL" != x],
+      [
+        dnl Ensure the compiler finds the header file...
+        AS_IF([test -e $MPI_INCLUDES_PATH/mpi.h],
+              [
+                AS_ECHO(["note: using $MPI_INCLUDES_PATH/mpi.h"])
+                tmpCPPFLAGS=$CPPFLAGS
+                AC_LANG_SAVE
+                AC_LANG_CPLUSPLUS
+                CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+                AC_CHECK_HEADER([mpi.h],
+                                [AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])],
+                                [AC_MSG_RESULT([Could not compile in the MPI headers...]); enablempi=no])
+                MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+                AC_LANG_RESTORE
+                CPPFLAGS=$tmpCPPFLAGS
+              ],
+              [test -e $MPI_INCLUDES_PATH/mpi/mpi.h],
+              [
+                MPI_INCLUDES_PATH=$MPI_INCLUDES_PATH/mpi
+                AS_ECHO(["note: using $MPI_INCLUDES_PATH/mpi.h"])
+                tmpCPPFLAGS=$CPPFLAGS
+                AC_LANG_SAVE
+                AC_LANG_CPLUSPLUS
+                CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+                AC_CHECK_HEADER([mpi.h],
+                                [AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])],
+                                [AC_MSG_RESULT([Could not compile in the MPI headers...]); enablempi=no] )
+                MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+                AC_LANG_RESTORE
+                CPPFLAGS=$tmpCPPFLAGS
+              ],
+              [
+                AC_MSG_RESULT([Could not find MPI header <mpi.h>...])
+                enablempi=no
+              ])
+      ],
+      [
+        dnl no MPI install found, see if the compiler "natively" supports it by
+        dnl attempting to link a test application without any special flags.
+        AC_TRY_LINK([@%:@include <mpi.h>],
+                    [int np; MPI_Comm_size (MPI_COMM_WORLD, &np);],
+                    [
+                       MPI_IMPL="built-in"
+                       AC_MSG_RESULT( [$CXX Compiler Supports MPI] )
+                       AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])
+                    ],
+                    [AC_MSG_RESULT([$CXX Compiler Does NOT Support MPI...]); enablempi=no])
+      ])
 
 dnl Save variables...
 AC_SUBST(MPI)

@@ -22,11 +22,13 @@ using namespace std;
  ac_cv_cxx_have_sstream=yes, ac_cv_cxx_have_sstream=no)
  AC_LANG_RESTORE
 ])
-if test "$ac_cv_cxx_have_sstream" = yes; then
-  AC_DEFINE(HAVE_SSTREAM,,[define if the compiler has the sstream header])
-  AC_DEFINE(HAVE_STRINGSTREAM,,[define if the compiler has stringstream functionality])
-else
-  dnl Some compilers implement strstream instead of sstream.  Check for it.
-  AC_CXX_HAVE_STRSTREAM
-fi
+AS_IF([test "x$ac_cv_cxx_have_sstream" = "xyes"],
+      [
+        AC_DEFINE(HAVE_SSTREAM,,[define if the compiler has the sstream header])
+        AC_DEFINE(HAVE_STRINGSTREAM,,[define if the compiler has stringstream functionality])
+      ],
+      [
+        dnl Some compilers implement strstream instead of sstream.  Check for it.
+        AC_CXX_HAVE_STRSTREAM
+      ])
 ])
