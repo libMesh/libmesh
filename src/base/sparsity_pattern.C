@@ -481,8 +481,11 @@ void Build::parallel_sync ()
     while (dof_id >= dof_map.end_dof(proc_id))
       proc_id++;
 
+    // Count the unique sends
+    if (!will_send_to[proc_id])
+      num_sends++;
+
     will_send_to[proc_id] = true;
-    num_sends++;
 
     // rhs [] on purpose
     auto & proc_data = data_to_send[proc_id];
