@@ -32,17 +32,19 @@ namespace libMesh
  * \verbatim
  *   TET4:
  *         3
- *         o
- *        /|\
- *       / | \
- *      /  |  \
- *   0 o...|...o 2
- *      \  |  /
- *       \ | /
- *        \|/
+ *         o                 zeta
+ *        /|\                 ^
+ *       / | \                |
+ *      /  |  \               |
+ *   0 o...|...o 2            o---> eta
+ *      \  |  /                \
+ *       \ | /                  \
+ *        \|/                    xi (out of page)
  *         o
  *         1
  * \endverbatim
+ * (xi, eta, zeta) are the reference element coordinates associated with
+ * the given numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2002

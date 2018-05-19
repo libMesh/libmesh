@@ -44,11 +44,11 @@ namespace libMesh
  *              12 o/    |    o 11
  *                //     |     \
  *               /o 9    o 10   \
- *              //       |       \
- *             //        |        \
- *          3 o/.......o.|........o 2
- *           ./       7  |       /
- *          ./           |      /
+ *              //       |       \          zeta
+ *             //        |        \          ^   eta (into page)
+ *          3 o/.......o.|........o 2        | /
+ *           ./       7  |       /           |/
+ *          ./           |      /            o---> xi
  *         ./            |     /
  *        ./             |    /
  *     8 o/              |   o 6
@@ -58,6 +58,8 @@ namespace libMesh
  *    o--------o---------o
  *    0        5         1
  * \endverbatim
+ * (xi, eta, zeta) are the reference element coordinates associated with
+ * the given numbering.
  *
  * \author John W. Peterson
  * \date 2014

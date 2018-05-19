@@ -31,18 +31,20 @@ namespace libMesh
  * It is numbered like this:
  * \verbatim
  *   HEX8: 7        6
- *         o--------o
- *        /:       /|
- *       / :      / |
- *    4 /  :   5 /  |
- *     o--------o   |
- *     |   o....|...o 2
+ *         o--------z
+ *        /:       /|         zeta
+ *       / :      / |          ^   eta (into page)
+ *    4 /  :   5 /  |          | /
+ *     o--------o   |          |/
+ *     |   o....|...o 2        o---> xi
  *     |  .3    |  /
  *     | .      | /
  *     |.       |/
  *     o--------o
  *     0        1
  * \endverbatim
+ * (xi, eta, zeta) are the reference element coordinates associated with
+ * the given numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2002

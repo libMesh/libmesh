@@ -33,14 +33,16 @@ namespace libMesh
  * \verbatim
  *          3           2
  *   QUAD4: o-----------o
- *          |           |
- *          |           |
- *          |           |
- *          |           |
- *          |           |
+ *          |           |           eta
+ *          |           |            ^
+ *          |           |            |
+ *          |           |            |
+ *          |           |            o---> xi
  *          o-----------o
  *          0           1
  * \endverbatim
+ * (xi, eta) are the reference element coordinates associated with
+ * the given numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2002

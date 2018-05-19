@@ -33,15 +33,17 @@ namespace libMesh
  *   PYRAMID5:
  *             o 4
  *           //|\
- *          // | \
- *         //  |  \
- *      3 o/...|...o 2
- *       ./    |  /
- *      ./     | /
+ *          // | \          zeta
+ *         //  |  \          ^   eta (into page)
+ *      3 o/...|...o 2       | /
+ *       ./    |  /          |/
+ *      ./     | /           o---> xi
  *     ./      |/
  *    o--------o
  *    0        1
  * \endverbatim
+ * (xi, eta, zeta) are the reference element coordinates associated with
+ * the given numbering.
  *
  * \author Benjamin S. Kirk
  * \date 2002
