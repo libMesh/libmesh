@@ -106,6 +106,11 @@ void push_parallel_vector_data(const Communicator & comm,
  * act_on_data(processor_id_type pid, const std::vector<id> & ids,
  *             const std::vector<datum> & data);
  *
+ * The example pointer may be null; it merely needs to be of the
+ * correct type.  It's just here because function overloading in C++
+ * is easy, whereas SFINAE is hard and partial template specialization
+ * of functions is impossible.
+ *
  * No guarantee about operation ordering is made - this function will
  * attempt to act on data in the order in which it is received.
  *
@@ -126,7 +131,8 @@ void pull_parallel_vector_data(const Communicator & comm,
                                const MapToVectors & queries,
                                RequestContainer & reqs,
                                GatherFunctor & gather_data,
-                               ActionFunctor & act_on_data);
+                               ActionFunctor & act_on_data,
+                               datum * example);
 
 /**
  * Send query vectors, receive and answer them with vectors of data,
@@ -144,6 +150,11 @@ void pull_parallel_vector_data(const Communicator & comm,
  * act_on_data(processor_id_type pid, const std::vector<id> & ids,
  *             const std::vector<datum> & data);
  *
+ * The example pointer may be null; it merely needs to be of the
+ * correct type.  It's just here because function overloading in C++
+ * is easy, whereas SFINAE is hard and partial template specialization
+ * of functions is impossible.
+ *
  * No guarantee about operation ordering is made - this function will
  * attempt to act on data in the order in which it is received.
  *
@@ -157,7 +168,8 @@ template <typename datum,
 void pull_parallel_vector_data(const Communicator & comm,
                                const MapToVectors & queries,
                                GatherFunctor & gather_data,
-                               ActionFunctor & act_on_data);
+                               ActionFunctor & act_on_data,
+                               datum * example);
 
 //------------------------------------------------------------------------
 // Parallel function overloads
@@ -404,7 +416,8 @@ void pull_parallel_vector_data(const Communicator & comm,
                                const MapToVectors & queries,
                                RequestContainer & reqs,
                                GatherFunctor & gather_data,
-                               ActionFunctor & act_on_data)
+                               ActionFunctor & act_on_data,
+                               datum *)
 {
   typedef typename MapToVectors::mapped_type query_type;
 
@@ -462,12 +475,13 @@ template <typename datum,
 void pull_parallel_vector_data(const Communicator & comm,
                                const MapToVectors & queries,
                                GatherFunctor & gather_data,
-                               ActionFunctor & act_on_data)
+                               ActionFunctor & act_on_data,
+                               datum * example)
 {
   std::vector<Request> requests;
 
-  pull_parallel_vector_data<datum>(comm, queries, requests,
-                                   gather_data, act_on_data);
+  pull_parallel_vector_data(comm, queries, requests, gather_data,
+                            act_on_data, example);
 
   wait(requests);
 }
