@@ -574,6 +574,7 @@ void pull_parallel_vector_data(const Communicator & comm,
       std::vector<std::vector<datum,A>> received_data;
       comm.receive(proc_id, received_data);
 
+      libmesh_assert(queries.count(proc_id));
       auto & querydata = queries.at(proc_id);
       act_on_data(proc_id, querydata, received_data);
     }
