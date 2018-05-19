@@ -365,6 +365,11 @@ void push_parallel_vector_data(const Communicator & comm,
   // give it a good name
   auto & will_receive_from = will_send_to;
 
+  processor_id_type n_receives = 0;
+  for (processor_id_type proc_id = 0; proc_id < num_procs; proc_id++)
+    if (will_receive_from[proc_id])
+      n_receives++;
+
   // We'll construct a datatype once for repeated use
   StandardType<ValueType> datatype;
 
@@ -385,13 +390,16 @@ void push_parallel_vector_data(const Communicator & comm,
   // non-blocking APIs with this data type.
   //
   // FIXME - implement Derek's API from #1684, switch to that!
-  for (processor_id_type proc_id = 0; proc_id < num_procs; proc_id++)
-    if (will_receive_from[proc_id])
-      {
-        std::vector<std::vector<ValueType,A1>,A2> received_data;
-        comm.receive(proc_id, received_data, datatype);
-        act_on_data(proc_id, received_data);
-      }
+  for (processor_id_type i = 0; i != n_receives; ++i)
+    {
+      Status stat(comm.probe(any_source));
+      const processor_id_type
+        proc_id = cast_int<processor_id_type>(stat.source());
+
+      std::vector<std::vector<ValueType,A1>,A2> received_data;
+      comm.receive(proc_id, received_data, datatype);
+      act_on_data(proc_id, received_data);
+    }
 }
 
 
@@ -556,16 +564,17 @@ void pull_parallel_vector_data(const Communicator & comm,
   // FIXME - implement Derek's API from #1684, switch to that!
   std::vector<Request> receive_reqs;
   std::vector<processor_id_type> receive_procids;
-  for (auto & querypair : queries)
+  for (std::size_t i = 0, n_queries = queries.size();
+       i != n_queries; ++i)
     {
-      processor_id_type proc_id = querypair.first;
-      libmesh_assert_less(proc_id, comm.size());
-
-      auto & querydata = querypair.second;
+      Status stat(comm.probe(any_source));
+      const processor_id_type
+        proc_id = cast_int<processor_id_type>(stat.source());
 
       std::vector<std::vector<datum,A>> received_data;
       comm.receive(proc_id, received_data);
 
+      auto & querydata = queries.at(proc_id);
       act_on_data(proc_id, querydata, received_data);
     }
 
