@@ -34,6 +34,7 @@
 #include "libmesh/mesh_tools.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_sync.h"
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/sparsity_pattern.h"
@@ -337,23 +338,14 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
         }
     }
 
-  std::vector<dof_id_type> objects_on_proc(this->n_processors(), 0);
-  this->comm().allgather(ghost_objects_from_proc[this->processor_id()],
-                         objects_on_proc);
-
-#ifdef DEBUG
-  for (processor_id_type p=0; p != this->n_processors(); ++p)
-    libmesh_assert_less_equal (ghost_objects_from_proc[p], objects_on_proc[p]);
-#endif
-
   // Request sets to send to each processor
-  std::vector<std::vector<dof_id_type>>
-    requested_ids(this->n_processors());
+  std::map<processor_id_type, std::vector<dof_id_type>>
+    requested_ids;
 
   // We know how many of our objects live on each processor, so
   // reserve() space for requests from each.
   for (processor_id_type p=0; p != this->n_processors(); ++p)
-    if (p != this->processor_id())
+    if (p != this->processor_id() && ghost_objects_from_proc[p])
       requested_ids[p].reserve(ghost_objects_from_proc[p]);
 
   for (it = objects_begin; it != objects_end; ++it)
@@ -367,32 +359,28 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
     libmesh_assert_equal_to (requested_ids[p].size(), ghost_objects_from_proc[p]);
 #endif
 
-  // Next set ghost object n_comps from other processors
-  for (processor_id_type p=1; p != this->n_processors(); ++p)
-    {
-      // Trade my requests with processor procup and procdown
-      processor_id_type procup =
-        cast_int<processor_id_type>((this->processor_id() + p) %
-                                    this->n_processors());
-      processor_id_type procdown =
-        cast_int<processor_id_type>((this->n_processors() +
-                                     this->processor_id() - p) %
-                                    this->n_processors());
-      std::vector<dof_id_type> request_to_fill;
-      this->comm().send_receive(procup, requested_ids[procup],
-                                procdown, request_to_fill);
+  typedef std::vector<dof_id_type> datum;
 
+  auto gather_functor =
+    [this, &mesh, &objects]
+    (processor_id_type,
+     const std::vector<dof_id_type> & ids,
+     std::vector<datum> & data)
+    {
       // Fill those requests
       const unsigned int
         sys_num      = this->sys_number(),
         n_var_groups = this->n_variable_groups();
 
-      std::vector<dof_id_type> ghost_data
-        (request_to_fill.size() * 2 * n_var_groups);
+      const std::size_t query_size = ids.size();
 
-      for (std::size_t i=0; i != request_to_fill.size(); ++i)
+      data.resize(query_size);
+      for (auto & d : data)
+        d.resize(2 * n_var_groups);
+
+      for (std::size_t i=0; i != query_size; ++i)
         {
-          DofObject * requested = (this->*objects)(mesh, request_to_fill[i]);
+          DofObject * requested = (this->*objects)(mesh, ids[i]);
           libmesh_assert(requested);
           libmesh_assert_equal_to (requested->processor_id(), this->processor_id());
           libmesh_assert_equal_to (requested->n_var_groups(sys_num), n_var_groups);
@@ -400,43 +388,50 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
             {
               unsigned int n_comp_g =
                 requested->n_comp_group(sys_num, vg);
-              ghost_data[i*2*n_var_groups+vg] = n_comp_g;
+              data[i][vg] = n_comp_g;
               dof_id_type my_first_dof = n_comp_g ?
                 requested->vg_dof_base(sys_num, vg) : 0;
               libmesh_assert_not_equal_to (my_first_dof, DofObject::invalid_id);
-              ghost_data[i*2*n_var_groups+n_var_groups+vg] = my_first_dof;
+              data[i][n_var_groups+vg] = my_first_dof;
             }
         }
+    };
 
-      // Trade back the results
-      std::vector<dof_id_type> filled_request;
-      this->comm().send_receive(procdown, ghost_data,
-                                procup, filled_request);
+  auto action_functor =
+    [this, &mesh, &objects]
+    (processor_id_type libmesh_dbg_var(pid),
+     const std::vector<dof_id_type> & ids,
+     const std::vector<datum> & data)
+    {
+      const unsigned int
+        sys_num      = this->sys_number(),
+        n_var_groups = this->n_variable_groups();
 
-      // And copy the id changes we've now been informed of
-      libmesh_assert_equal_to (filled_request.size(),
-                               requested_ids[procup].size() * 2 * n_var_groups);
-      for (std::size_t i=0; i != requested_ids[procup].size(); ++i)
+      // Copy the id changes we've now been informed of
+      for (std::size_t i=0, n_ids = ids.size(); i != n_ids; ++i)
         {
-          DofObject * requested = (this->*objects)(mesh, requested_ids[procup][i]);
+          DofObject * requested = (this->*objects)(mesh, ids[i]);
           libmesh_assert(requested);
-          libmesh_assert_equal_to (requested->processor_id(), procup);
+          libmesh_assert_equal_to (requested->processor_id(), pid);
           for (unsigned int vg=0; vg != n_var_groups; ++vg)
             {
               unsigned int n_comp_g =
-                cast_int<unsigned int>(filled_request[i*2*n_var_groups+vg]);
+                cast_int<unsigned int>(data[i][vg]);
               requested->set_n_comp_group(sys_num, vg, n_comp_g);
               if (n_comp_g)
                 {
-                  dof_id_type my_first_dof =
-                    filled_request[i*2*n_var_groups+n_var_groups+vg];
+                  dof_id_type my_first_dof = data[i][n_var_groups+vg];
                   libmesh_assert_not_equal_to (my_first_dof, DofObject::invalid_id);
                   requested->set_vg_dof_base
                     (sys_num, vg, my_first_dof);
                 }
             }
         }
-    }
+    };
+
+  datum * ex = libmesh_nullptr;
+  Parallel::pull_parallel_vector_data
+    (this->comm(), requested_ids, gather_functor, action_functor, ex);
 
 #ifdef DEBUG
   // Double check for invalid dofs
