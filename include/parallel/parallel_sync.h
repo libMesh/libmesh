@@ -132,7 +132,7 @@ void pull_parallel_vector_data(const Communicator & comm,
                                RequestContainer & reqs,
                                GatherFunctor & gather_data,
                                ActionFunctor & act_on_data,
-                               datum * example);
+                               const datum * example);
 
 /**
  * Send query vectors, receive and answer them with vectors of data,
@@ -169,7 +169,7 @@ void pull_parallel_vector_data(const Communicator & comm,
                                const MapToVectors & queries,
                                GatherFunctor & gather_data,
                                ActionFunctor & act_on_data,
-                               datum * example);
+                               const datum * example);
 
 //------------------------------------------------------------------------
 // Parallel function overloads
@@ -221,7 +221,7 @@ void pull_parallel_vector_data(const Communicator & comm,
                                RequestContainer & reqs,
                                GatherFunctor & gather_data,
                                ActionFunctor & act_on_data,
-                               std::vector<datum,A> * example);
+                               const std::vector<datum,A> * example);
 
 
 
@@ -448,7 +448,7 @@ void pull_parallel_vector_data(const Communicator & comm,
                                RequestContainer & reqs,
                                GatherFunctor & gather_data,
                                ActionFunctor & act_on_data,
-                               datum *)
+                               const datum *)
 {
   typedef typename MapToVectors::mapped_type query_type;
 
@@ -512,7 +512,7 @@ void pull_parallel_vector_data(const Communicator & comm,
                                const MapToVectors & queries,
                                GatherFunctor & gather_data,
                                ActionFunctor & act_on_data,
-                               datum * example)
+                               const datum * example)
 {
   std::vector<Request> requests;
 
@@ -534,7 +534,7 @@ void pull_parallel_vector_data(const Communicator & comm,
                                RequestContainer & reqs,
                                GatherFunctor & gather_data,
                                ActionFunctor & act_on_data,
-                               std::vector<datum,A> *)
+                               const std::vector<datum,A> *)
 {
   typedef typename MapToVectors::mapped_type query_type;
 
