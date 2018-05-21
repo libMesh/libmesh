@@ -2101,8 +2101,8 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
     }
 
   // Sort the new pids to push to each processor
-  std::vector<std::vector<std::pair<dof_id_type, processor_id_type>>>
-    ids_to_push(mesh.n_processors());
+  std::map<dof_id_type, std::vector<std::pair<dof_id_type, processor_id_type>>>
+    ids_to_push;
 
   for (const auto & node : mesh.node_ptr_range())
     {
@@ -2115,40 +2115,15 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
         ids_to_push[node->processor_id()].push_back(std::make_pair(id, pid));
     }
 
-  // Push using non-blocking I/O
-  std::vector<Parallel::Request> push_requests(mesh.n_processors());
-
-  for (processor_id_type p=1; p != mesh.n_processors(); ++p)
+  auto action_functor =
+    [& mesh, & new_proc_ids]
+    (processor_id_type,
+     const std::vector<std::pair<dof_id_type, processor_id_type>> & data)
     {
-      const processor_id_type procup =
-        cast_int<processor_id_type>
-        ((mesh.comm().rank() + p) % mesh.comm().size());
-
-      mesh.comm().send(procup, ids_to_push[procup], push_requests[procup]);
-    }
-
-  for (processor_id_type p=0; p != mesh.n_processors(); ++p)
-    {
-      const processor_id_type procdown =
-        cast_int<processor_id_type>
-        ((mesh.comm().size() + mesh.comm().rank() - p) %
-         mesh.comm().size());
-
-      std::vector<std::pair<dof_id_type, processor_id_type>>
-        ids_to_pull;
-
-      if (p)
-        mesh.comm().receive(procdown, ids_to_pull);
-      else
-        ids_to_pull.swap(ids_to_push[procdown]);
-
-      std::vector<std::pair<dof_id_type, processor_id_type>>::iterator
-        pulled_ids_it = ids_to_pull.begin(),
-        pulled_ids_end = ids_to_pull.end();
-      for (; pulled_ids_it != pulled_ids_end; ++pulled_ids_it)
+      for (auto & p : data)
         {
-          const dof_id_type id = pulled_ids_it->first;
-          const processor_id_type pid = pulled_ids_it->second;
+          const dof_id_type id = p.first;
+          const processor_id_type pid = p.second;
           const proc_id_map_type::iterator it = new_proc_ids.find(id);
           if (it == new_proc_ids.end())
             new_proc_ids.insert(std::make_pair(id,pid));
@@ -2158,7 +2133,13 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
               it->second = node.choose_processor_id(it->second, pid);
             }
         }
-    }
+    };
+
+  // Push using non-blocking I/O
+  std::vector<Parallel::Request> push_requests;
+
+  Parallel::push_parallel_vector_data
+    (mesh.comm(), ids_to_push, push_requests, action_functor);
 
   // Now new_proc_ids is correct for every node we used to own.  Let's
   // ask every other processor about the nodes they used to own.  But
