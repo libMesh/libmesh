@@ -464,6 +464,7 @@ void pull_parallel_vector_data(const Communicator & comm,
     {
       Request sendreq;
       gather_data(pid, query, response_data[pid]);
+      libmesh_assert_equal_to(query.size(), response_data[pid].size());
       comm.send(pid, response_data[pid], datatype, sendreq);
       response_reqs.push_back(sendreq);
     };
@@ -496,6 +497,8 @@ void pull_parallel_vector_data(const Communicator & comm,
       receive_procids.erase(receive_procids.begin() + completed);
 
       libmesh_assert(queries.count(proc_id));
+      libmesh_assert_equal_to(queries.at(proc_id).size(),
+                              received_data[proc_id].size());
       act_on_data(proc_id, queries.at(proc_id), received_data[proc_id]);
       received_data.erase(proc_id);
     }
@@ -548,6 +551,8 @@ void pull_parallel_vector_data(const Communicator & comm,
     {
       Request sendreq;
       gather_data(pid, query, response_data[pid]);
+      libmesh_assert_equal_to(query.size(),
+                              response_data[pid].size());
       comm.send(pid, response_data[pid], sendreq);
       response_reqs.push_back(sendreq);
     };
@@ -576,6 +581,7 @@ void pull_parallel_vector_data(const Communicator & comm,
 
       libmesh_assert(queries.count(proc_id));
       auto & querydata = queries.at(proc_id);
+      libmesh_assert_equal_to(querydata.size(), received_data.size());
       act_on_data(proc_id, querydata, received_data);
     }
 
