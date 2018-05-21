@@ -286,6 +286,10 @@ void push_parallel_vector_data(const Communicator & comm,
   typedef typename std::remove_reference<ref_type>::type nonref_type;
   StandardType<typename std::remove_const<nonref_type>::type> datatype;
 
+  // We'll grab a tag so we can overlap request sends and receives
+  // without confusing one for the other
+  MessageTag tag = comm.get_unique_tag(1225);
+
   // Post all of the sends, non-blocking
   for (auto & datapair : data)
     {
@@ -293,7 +297,7 @@ void push_parallel_vector_data(const Communicator & comm,
       libmesh_assert_less(destid, num_procs);
       auto & datum = datapair.second;
       Request sendreq;
-      comm.send(destid, datum, datatype, sendreq);
+      comm.send(destid, datum, datatype, sendreq, tag);
       reqs.insert(reqs.end(), sendreq);
     }
 
@@ -307,7 +311,7 @@ void push_parallel_vector_data(const Communicator & comm,
         Request req;
         auto & incoming_data = received_data[proc_id];
         incoming_data.resize(will_receive_from[proc_id]);
-        comm.receive(proc_id, incoming_data, datatype, req);
+        comm.receive(proc_id, incoming_data, datatype, req, tag);
         receive_reqs.push_back(req);
         receive_procids.push_back(proc_id);
       }
@@ -373,6 +377,10 @@ void push_parallel_vector_data(const Communicator & comm,
   // We'll construct a datatype once for repeated use
   StandardType<ValueType> datatype;
 
+  // We'll grab a tag so we can overlap request sends and receives
+  // without confusing one for the other
+  MessageTag tag = comm.get_unique_tag(1225);
+
   // Post all of the sends, non-blocking
   for (auto & datapair : data)
     {
@@ -380,7 +388,7 @@ void push_parallel_vector_data(const Communicator & comm,
       libmesh_assert_less(destid, num_procs);
       auto & datum = datapair.second;
       Request sendreq;
-      comm.send(destid, datum, datatype, sendreq);
+      comm.send(destid, datum, datatype, sendreq, tag);
       reqs.insert(reqs.end(), sendreq);
     }
 
@@ -397,7 +405,7 @@ void push_parallel_vector_data(const Communicator & comm,
         proc_id = cast_int<processor_id_type>(stat.source());
 
       std::vector<std::vector<ValueType,A1>,A2> received_data;
-      comm.receive(proc_id, received_data, datatype);
+      comm.receive(proc_id, received_data, datatype, tag);
       act_on_data(proc_id, received_data);
     }
 }
@@ -458,14 +466,18 @@ void pull_parallel_vector_data(const Communicator & comm,
 
   StandardType<datum> datatype;
 
+  // We'll grab a tag so we can overlap request sends and receives
+  // without confusing one for the other
+  MessageTag tag = comm.get_unique_tag(105);
+
   auto gather_functor =
-    [&comm, &gather_data, &response_data, &response_reqs, &datatype]
+    [&comm, &gather_data, &response_data, &response_reqs, &datatype, &tag]
     (processor_id_type pid, query_type query)
     {
       Request sendreq;
       gather_data(pid, query, response_data[pid]);
       libmesh_assert_equal_to(query.size(), response_data[pid].size());
-      comm.send(pid, response_data[pid], datatype, sendreq);
+      comm.send(pid, response_data[pid], datatype, sendreq, tag);
       response_reqs.push_back(sendreq);
     };
 
@@ -484,7 +496,7 @@ void pull_parallel_vector_data(const Communicator & comm,
       Request req;
       auto & incoming_data = received_data[proc_id];
       incoming_data.resize(querydata.size());
-      comm.receive(proc_id, incoming_data, datatype, req);
+      comm.receive(proc_id, incoming_data, datatype, req, tag);
       receive_reqs.push_back(req);
       receive_procids.push_back(proc_id);
     }
@@ -545,15 +557,19 @@ void pull_parallel_vector_data(const Communicator & comm,
     response_data;
   std::vector<Request> response_reqs;
 
+  // We'll grab a tag so we can overlap request sends and receives
+  // without confusing one for the other
+  MessageTag tag = comm.get_unique_tag(105);
+
   auto gather_functor =
-    [&comm, &gather_data, &response_data, &response_reqs]
+    [&comm, &gather_data, &response_data, &response_reqs, &tag]
     (processor_id_type pid, query_type query)
     {
       Request sendreq;
       gather_data(pid, query, response_data[pid]);
       libmesh_assert_equal_to(query.size(),
                               response_data[pid].size());
-      comm.send(pid, response_data[pid], sendreq);
+      comm.send(pid, response_data[pid], sendreq, tag);
       response_reqs.push_back(sendreq);
     };
 
@@ -577,7 +593,7 @@ void pull_parallel_vector_data(const Communicator & comm,
         proc_id = cast_int<processor_id_type>(stat.source());
 
       std::vector<std::vector<datum,A>> received_data;
-      comm.receive(proc_id, received_data);
+      comm.receive(proc_id, received_data, tag);
 
       libmesh_assert(queries.count(proc_id));
       auto & querydata = queries.at(proc_id);
