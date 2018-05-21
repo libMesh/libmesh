@@ -257,10 +257,18 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
       if ( level != 1 )
         {
           mesh.partitioner() = NULL;
+          START_LOG ("PDM_coarsen", "PetscDMWrapper");
           mesh_refinement.uniformly_coarsen(1);
+          STOP_LOG  ("PDM_coarsen", "PetscDMWrapper");
 
+          START_LOG ("PDM_dist_dof", "PetscDMWrapper");
           system.get_dof_map().distribute_dofs(mesh);
+          STOP_LOG  ("PDM_dist_dof", "PetscDMWrapper");
+
+          START_LOG ("PDM_cnstrnts", "PetscDMWrapper");
           system.reinit_constraints();
+          STOP_LOG  ("PDM_cnstrnts", "PetscDMWrapper");
+
         }
     } // End PETSc data structure creation
 
@@ -305,9 +313,17 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
   // DM structures created, now we need projection matrixes.
   // To prepare for projection creation go to second coarsest mesh so we can utilize
   // old_dof_indices information in the projection creation.
+  START_LOG ("PDM_refine", "PetscDMWrapper");
   mesh_refinement.uniformly_refine(1);
-  system.get_dof_map().distribute_dofs(mesh);;
+  STOP_LOG  ("PDM_refine", "PetscDMWrapper");
+
+  START_LOG ("PDM_dist_dof", "PetscDMWrapper");
+  system.get_dof_map().distribute_dofs(mesh);
+  STOP_LOG  ("PDM_dist_dof", "PetscDMWrapper");
+
+  START_LOG ("PDM_cnstrnts", "PetscDMWrapper");
   system.reinit_constraints();
+  STOP_LOG ("PDM_cnstrnts", "PetscDMWrapper");
 
   // Create the Interpolation Matrices between adjacent mesh levels
   for ( unsigned int i = 1 ; i < n_levels ; ++i )
@@ -335,7 +351,9 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
           //MatSetOption(_ctx_vec[i-1]->K_interp_ptr->mat(), MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
 
           // Compute the interpolation matrix and set K_interp_ptr
+          START_LOG ("PDM_proj_mat", "PetscDMWrapper");
           system.projection_matrix(*_ctx_vec[i-1]->K_interp_ptr);
+          STOP_LOG  ("PDM_proj_mat", "PetscDMWrapper");
 
           // Always close matrix that contains altered data
           _ctx_vec[i-1]->K_interp_ptr->close();
@@ -345,9 +363,19 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
       if ( i != n_levels - 1 )
         {
           mesh.partitioner() = NULL;
+
+          START_LOG ("PDM_refine", "PetscDMWrapper");
           mesh_refinement.uniformly_refine(1);
+          STOP_LOG  ("PDM_refine", "PetscDMWrapper");
+
+          START_LOG ("PDM_dist_dof", "PetscDMWrapper");
           system.get_dof_map().distribute_dofs(mesh);
+          STOP_LOG ("PDM_dist_dof", "PetscDMWrapper");
+
+          START_LOG ("PDM_cnstrnts", "PetscDMWrapper");
           system.reinit_constraints();
+          STOP_LOG  ("PDM_cnstrnts", "PetscDMWrapper");
+
         }
     } // End create transfer operators. System back at the finest grid
 
