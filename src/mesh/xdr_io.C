@@ -33,6 +33,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_sync.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/libmesh_logging.h"
@@ -649,8 +650,7 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
       // those parents may have been written by other processors (at this step),
       // so we need to gather them into our *_id_maps.
       {
-        std::vector<std::vector<dof_id_type>> requested_ids(this->n_processors());
-        std::vector<dof_id_type> request_to_fill;
+        std::map<dof_id_type, std::vector<dof_id_type>> requested_ids;
 
         it  = mesh.local_level_elements_begin(level);
         end = mesh.local_level_elements_end(level);
@@ -659,43 +659,48 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
           if (!child_id_map.count((*it)->id()))
             {
               libmesh_assert_not_equal_to ((*it)->parent()->processor_id(), this->processor_id());
-              requested_ids[(*it)->parent()->processor_id()].push_back((*it)->id());
+              const processor_id_type pid = (*it)->parent()->processor_id();
+              if (pid != this->processor_id())
+                requested_ids[pid].push_back((*it)->id());
             }
 
-        // Next set the child_ids
-        for (unsigned int p=1; p != this->n_processors(); ++p)
+        auto gather_functor =
+          [& child_id_map]
+          (processor_id_type libmesh_dbg_var(pid),
+           const std::vector<dof_id_type> & ids,
+           std::vector<dof_id_type> & data)
           {
-            // Trade my requests with processor procup and procdown
-            unsigned int procup = (this->processor_id() + p) %
-              this->n_processors();
-            unsigned int procdown = (this->n_processors() +
-                                     this->processor_id() - p) %
-              this->n_processors();
-
-            this->comm().send_receive(procup, requested_ids[procup],
-                                      procdown, request_to_fill);
+            const std::size_t ids_size = ids.size();
+            data.resize(ids_size);
 
             // Fill those requests by overwriting the requested ids
-            for (std::size_t i=0; i<request_to_fill.size(); i++)
+            for (std::size_t i=0; i != ids_size; i++)
               {
-                libmesh_assert (child_id_map.count(request_to_fill[i]));
-                libmesh_assert_equal_to (child_id_map[request_to_fill[i]].first, procdown);
+                libmesh_assert (child_id_map.count(ids[i]));
+                libmesh_assert_equal_to (child_id_map[ids[i]].first, pid);
 
-                request_to_fill[i] = child_id_map[request_to_fill[i]].second;
+                data[i] = child_id_map[ids[i]].second;
               }
+          };
 
-            // Trade back the results
-            std::vector<dof_id_type> filled_request;
-            this->comm().send_receive(procdown, request_to_fill,
-                                      procup, filled_request);
+        auto action_functor =
+          [& child_id_map]
+          (processor_id_type pid,
+           const std::vector<dof_id_type> & ids,
+           const std::vector<dof_id_type> & data)
+          {
+            std::size_t data_size = data.size();
 
-            libmesh_assert_equal_to (filled_request.size(), requested_ids[procup].size());
+            for (std::size_t i=0; i != data_size; i++)
+              child_id_map[ids[i]] =
+                std::make_pair (pid, data[i]);
+          };
 
-            for (std::size_t i=0; i<filled_request.size(); i++)
-              child_id_map[requested_ids[procup][i]] =
-                std::make_pair (procup,
-                                filled_request[i]);
-          }
+        // Trade ids back and forth
+        const dof_id_type * ex = libmesh_nullptr;
+        Parallel::pull_parallel_vector_data
+          (this->comm(), requested_ids, gather_functor, action_functor, ex);
+
         // overwrite the parent_id_map with the child_id_map, but
         // use std::map::swap() for efficiency.
         parent_id_map.swap(child_id_map);
