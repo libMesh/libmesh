@@ -27,6 +27,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_hilbert.h"
 #include "libmesh/parallel_sort.h"
+#include "libmesh/parallel_sync.h"
 #include "libmesh/elem.h"
 #include "libmesh/elem_range.h"
 #include "libmesh/node_range.h"
@@ -333,11 +334,12 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
     // Nodes first -- all nodes, not just local ones
     {
       // Request sets to send to each processor
-      std::vector<std::vector<Parallel::DofObjectKey>>
-        requested_ids (communicator.size());
-      // Results to gather from each processor
-      std::vector<std::vector<dof_id_type>>
-        filled_request (communicator.size());
+      std::map<dof_id_type, std::vector<Parallel::DofObjectKey>>
+        requested_ids;
+      // Results to gather from each processor - kept in a map so we
+      // do only one loop over nodes after all receives are done.
+      std::map<dof_id_type, std::vector<dof_id_type>>
+        filled_request;
 
       // build up list of requests
       for (const auto & node : mesh.node_ptr_range())
@@ -366,25 +368,25 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
       for (processor_id_type pid=0; pid<communicator.rank(); pid++)
         my_offset += node_bin_sizes[pid];
 
-      // start with pid=0, so that we will trade with ourself
-      for (processor_id_type pid=0; pid<communicator.size(); pid++)
+      auto gather_functor =
+        [
+#ifndef NDEBUG
+         & node_upper_bounds,
+         & communicator,
+#endif
+         & my_node_bin,
+         my_offset
+        ]
+        (processor_id_type,
+         const std::vector<Parallel::DofObjectKey> & keys,
+         std::vector<dof_id_type> & global_ids)
         {
-          // Trade my requests with processor procup and procdown
-          const processor_id_type procup = cast_int<processor_id_type>
-            ((communicator.rank() + pid) % communicator.size());
-          const processor_id_type procdown = cast_int<processor_id_type>
-            ((communicator.size() + communicator.rank() - pid) %
-             communicator.size());
-
-          std::vector<Parallel::DofObjectKey> request_to_fill;
-          communicator.send_receive(procup, requested_ids[procup],
-                                    procdown, request_to_fill);
-
           // Fill the requests
-          std::vector<dof_id_type> global_ids; /**/ global_ids.reserve(request_to_fill.size());
-          for (std::size_t idx=0; idx<request_to_fill.size(); idx++)
+          const std::size_t keys_size = keys.size();
+          global_ids.reserve(keys_size);
+          for (std::size_t idx=0; idx != keys_size; idx++)
             {
-              const Parallel::DofObjectKey & hi = request_to_fill[idx];
+              const Parallel::DofObjectKey & hi = keys[idx];
               libmesh_assert_less_equal (hi, node_upper_bounds[communicator.rank()]);
 
               // find the requested index in my node bin
@@ -397,19 +399,29 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
               // in my array, properly offset.
               global_ids.push_back(cast_int<dof_id_type>(std::distance(my_node_bin.begin(), pos) + my_offset));
             }
+        };
 
-          // and trade back
-          communicator.send_receive (procdown, global_ids,
-                                     procup,   filled_request[procup]);
-        }
+      auto action_functor =
+        [&filled_request]
+        (processor_id_type pid,
+         const std::vector<Parallel::DofObjectKey> &,
+         const std::vector<dof_id_type> & global_ids)
+        {
+          filled_request[pid] = global_ids;
+        };
+
+      // Trade requests with other processors
+      const dof_id_type * ex = libmesh_nullptr;
+      Parallel::pull_parallel_vector_data
+        (communicator, requested_ids, gather_functor, action_functor, ex);
 
       // We now have all the filled requests, so we can loop through our
       // nodes once and assign the global index to each one.
       {
-        std::vector<std::vector<dof_id_type>::const_iterator>
-          next_obj_on_proc; next_obj_on_proc.reserve(communicator.size());
-        for (processor_id_type pid=0; pid<communicator.size(); pid++)
-          next_obj_on_proc.push_back(filled_request[pid].begin());
+        std::map<dof_id_type, std::vector<dof_id_type>::const_iterator>
+          next_obj_on_proc;
+        for (auto & p : filled_request)
+          next_obj_on_proc[p.first] = p.second.begin();
 
         for (auto & node : mesh.node_ptr_range())
           {

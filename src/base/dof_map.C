@@ -356,7 +356,12 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
     }
 #ifdef DEBUG
   for (processor_id_type p=0; p != this->n_processors(); ++p)
-    libmesh_assert_equal_to (requested_ids[p].size(), ghost_objects_from_proc[p]);
+    {
+      if (ghost_objects_from_proc[p])
+        libmesh_assert_equal_to (requested_ids[p].size(), ghost_objects_from_proc[p]);
+      else
+        libmesh_assert(!requested_ids.count(p));
+    }
 #endif
 
   typedef std::vector<dof_id_type> datum;
