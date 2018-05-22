@@ -90,10 +90,16 @@ public:
     // Build the side list
     bi.build_side_list (element_id_list, side_list, bc_id_list);
 
+    // Test that the new vector-of-tuples API works equivalently.
+    auto bc_triples = bi.build_side_list();
+
     // Check that there are exactly 8 sides in the BoundaryInfo for a
     // replicated mesh
     if (mesh.is_serial())
-      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(8), element_id_list.size());
+      {
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(8), element_id_list.size());
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(8), bc_triples.size());
+      }
 
     // Let's test that we can remove them successfully.
     bi.remove_id(0);
@@ -115,14 +121,21 @@ public:
 
     // Build the side list again
     bi.build_side_list (element_id_list, side_list, bc_id_list);
+    bc_triples = bi.build_side_list();
 
     // Check that there are now exactly 6 sides left in the
     // BoundaryInfo on a replicated mesh
     if (mesh.is_serial())
-      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(6), element_id_list.size());
+      {
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(6), element_id_list.size());
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(6), bc_triples.size());
+      }
 
     // Check that the removed ID is really removed
     CPPUNIT_ASSERT(std::find(bc_id_list.begin(), bc_id_list.end(), 0) == bc_id_list.end());
+    typedef std::tuple<dof_id_type, unsigned short int, boundary_id_type> Tuple;
+    CPPUNIT_ASSERT(std::find_if(bc_triples.begin(), bc_triples.end(),
+                                [](const Tuple & t)->bool { return std::get<2>(t) == 0; }) == bc_triples.end());
 
     // Remove the same id again, make sure nothing changes.
     bi.remove_id(0);
@@ -136,9 +149,11 @@ public:
     bi.remove_id(2);
     bi.remove_id(3);
     bi.build_side_list (element_id_list, side_list, bc_id_list);
+    bc_triples = bi.build_side_list();
 
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), bi.n_boundary_ids());
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), element_id_list.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), bc_triples.size());
   }
 
   void testEdgeBoundaryConditions()
