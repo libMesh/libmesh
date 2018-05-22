@@ -556,7 +556,7 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
 
   auto action_functor =
     [& mesh]
-    (processor_id_type libmesh_dbg_var(pid),
+    (processor_id_type,
      const std::vector<dof_id_type> & ids,
      const std::vector<processor_id_type> & new_pids)
     {
