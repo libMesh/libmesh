@@ -1960,24 +1960,21 @@ void MeshTools::Modification::change_boundary_id (MeshBase & mesh,
   }
 
   {
-    // Build a list of all sides that have boundary IDs
-    std::vector<dof_id_type> elem_list;
-    std::vector<unsigned short int> side_list;
-    std::vector<boundary_id_type> bc_id_list;
-    bi.build_side_list (elem_list, side_list, bc_id_list);
+    // Build a list of (elem, side, bc) tuples.
+    auto bc_triples = bi.build_side_list();
 
     // Temporary vector to hold ids
     std::vector<boundary_id_type> bndry_ids;
 
     // For each side with the old_id...
-    for (std::size_t idx=0; idx<elem_list.size(); ++idx)
-      if (bc_id_list[idx] == old_id)
+    for (const auto & t : bc_triples)
+      if (std::get<2>(t) == old_id)
         {
           // Get the elem in question
-          const Elem * elem = mesh.elem_ptr(elem_list[idx]);
+          const Elem * elem = mesh.elem_ptr(std::get<0>(t));
 
           // The side of the elem in question
-          unsigned short int side = side_list[idx];
+          unsigned short int side = std::get<1>(t);
 
           // Get all the current IDs for the side in question.
           bi.boundary_ids(elem, side, bndry_ids);
