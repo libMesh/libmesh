@@ -740,19 +740,15 @@ void GmshIO::write_mesh (std::ostream & out_stream)
     // loop over the elements, writing out boundary faces
     if (n_boundary_faces)
       {
-        // Construct the list of boundary sides
-        std::vector<dof_id_type> element_id_list;
-        std::vector<unsigned short int> side_list;
-        std::vector<boundary_id_type> bc_id_list;
-
-        mesh.get_boundary_info().build_side_list(element_id_list, side_list, bc_id_list);
+        // Build a list of (elem, side, bc) tuples.
+        auto bc_triples = mesh.get_boundary_info().build_side_list();
 
         // Loop over these lists, writing data to the file.
-        for (std::size_t idx=0; idx<element_id_list.size(); ++idx)
+        for (const auto & t : bc_triples)
           {
-            const Elem & elem = mesh.elem_ref(element_id_list[idx]);
+            const Elem & elem = mesh.elem_ref(std::get<0>(t));
 
-            std::unique_ptr<const Elem> side = elem.build_side_ptr(side_list[idx]);
+            std::unique_ptr<const Elem> side = elem.build_side_ptr(std::get<1>(t));
 
             // Map from libmesh elem type to gmsh elem type.
             std::map<ElemType, ElementDefinition>::iterator def_it =
@@ -780,7 +776,7 @@ void GmshIO::write_mesh (std::ostream & out_stream)
             // 2 (geometric entity)
             // 3 (partition entity)
             out_stream << " 3 "
-                       << bc_id_list[idx]
+                       << std::get<2>(t)
                        << " 0 "
                        << elem.processor_id()+1
                        << " ";
