@@ -2101,7 +2101,7 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
     }
 
   // Sort the new pids to push to each processor
-  std::map<dof_id_type, std::vector<std::pair<dof_id_type, processor_id_type>>>
+  std::map<processor_id_type, std::vector<std::pair<dof_id_type, processor_id_type>>>
     ids_to_push;
 
   for (const auto & node : mesh.node_ptr_range())

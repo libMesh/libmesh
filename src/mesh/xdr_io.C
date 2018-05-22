@@ -650,7 +650,7 @@ void XdrIO::write_serialized_connectivity (Xdr & io, const dof_id_type libmesh_d
       // those parents may have been written by other processors (at this step),
       // so we need to gather them into our *_id_maps.
       {
-        std::map<dof_id_type, std::vector<dof_id_type>> requested_ids;
+        std::map<processor_id_type, std::vector<dof_id_type>> requested_ids;
 
         it  = mesh.local_level_elements_begin(level);
         end = mesh.local_level_elements_end(level);

@@ -434,7 +434,7 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
   //
   // The only remaining issue is what to do with unpartitioned nodes.  Since they are required
   // to live on all processors we can simply rely on ourselves to number them properly.
-  std::map<dof_id_type, std::vector<dof_id_type>>
+  std::map<processor_id_type, std::vector<dof_id_type>>
     requested_node_ids;
 
   // Loop over all the nodes, count the ones on each processor.  We can skip ourself
@@ -841,12 +841,12 @@ void Partitioner::assign_partitioning (const MeshBase & mesh, const std::vector<
   const dof_id_type n_active_local_elem = mesh.n_active_local_elem();
 #endif
 
-  std::map<dof_id_type, std::vector<dof_id_type>>
+  std::map<processor_id_type, std::vector<dof_id_type>>
     requested_ids;
 
   // Results to gather from each processor - kept in a map so we
   // do only one loop over elements after all receives are done.
-  std::map<dof_id_type, std::vector<processor_id_type>>
+  std::map<processor_id_type, std::vector<processor_id_type>>
     filled_request;
 
   for (auto & elem : mesh.active_element_ptr_range())

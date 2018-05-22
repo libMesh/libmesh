@@ -439,7 +439,7 @@ void DistributedVector<T>::localize (std::vector<T> & v_local,
   // We now fill in 'requested_ids' based on the indices.  Also keep
   // track of the local index (in the indices vector) for each of
   // these, since we need that when unpacking.
-  std::map<dof_id_type, std::vector<numeric_index_type>>
+  std::map<processor_id_type, std::vector<numeric_index_type>>
     requested_ids, local_requested_ids;
 
   // We'll use this typedef a couple of times below.
