@@ -1549,14 +1549,11 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
   std::vector<boundary_id_type> side_boundary_ids;
 
   {
-    std::vector<dof_id_type > el;
-    std::vector<unsigned short int > sl;
-    std::vector<boundary_id_type > il;
-
-    mesh.get_boundary_info().build_side_list(el, sl, il);
+    // Build a list of (elem, side, bc) tuples.
+    auto bc_triples = mesh.get_boundary_info().build_side_list();
 
     // Accumulate the vectors to pass into ex_put_side_set
-    for (std::size_t i=0; i<el.size(); i++)
+    for (const auto & t : bc_triples)
       {
         std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
@@ -1564,9 +1561,9 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
          * We need to build up active elements if AMR is enabled and add
          * them to the exodus sidesets instead of the potentially inactive "parent" elements
          */
-        mesh.elem_ref(el[i]).active_family_tree_by_side(family, sl[i], false);
+        mesh.elem_ref(std::get<0>(t)).active_family_tree_by_side(family, std::get<1>(t), false);
 #else
-        family.push_back(mesh.elem_ptr(el[i]));
+        family.push_back(mesh.elem_ptr(std::get<0>(t)));
 #endif
 
         for (std::size_t j=0; j<family.size(); ++j)
@@ -1576,8 +1573,8 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
             // Use the libmesh to exodus data structure map to get the proper sideset IDs
             // The data structure contains the "collapsed" contiguous ids
-            elem[il[i]].push_back(libmesh_elem_num_to_exodus[family[j]->id()]);
-            side[il[i]].push_back(conv.get_inverse_side_map(sl[i]));
+            elem[std::get<2>(t)].push_back(libmesh_elem_num_to_exodus[family[j]->id()]);
+            side[std::get<2>(t)].push_back(conv.get_inverse_side_map(std::get<1>(t)));
           }
       }
 
