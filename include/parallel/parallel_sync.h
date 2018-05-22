@@ -187,7 +187,7 @@ template <template <typename, typename, typename ...> class MapType,
           typename RequestContainer,
           typename ActionFunctor>
 void push_parallel_vector_data(const Communicator & comm,
-                               const MapType<dof_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
+                               const MapType<processor_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
                                RequestContainer & reqs,
                                ActionFunctor & act_on_data);
 
@@ -204,7 +204,7 @@ template <template <typename, typename, typename ...> class MapType,
           typename ... ExtraTypes,
           typename ActionFunctor>
 void push_parallel_vector_data(const Communicator & comm,
-                               const MapType<dof_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
+                               const MapType<processor_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
                                ActionFunctor & act_on_data);
 
 /*
@@ -338,7 +338,7 @@ template <template <typename, typename, typename ...> class MapType,
           typename RequestContainer,
           typename ActionFunctor>
 void push_parallel_vector_data(const Communicator & comm,
-                               const MapType<dof_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
+                               const MapType<processor_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
                                RequestContainer & reqs,
                                ActionFunctor & act_on_data)
 {
@@ -434,7 +434,7 @@ template <template <typename, typename, typename ...> class MapType,
           typename ... ExtraTypes,
           typename ActionFunctor>
 void push_parallel_vector_data(const Communicator & comm,
-                               const MapType<dof_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
+                               const MapType<processor_id_type, std::vector<std::vector<ValueType,A1>,A2>, ExtraTypes...> & data,
                                ActionFunctor & act_on_data)
 {
   std::vector<Request> requests;
