@@ -21,6 +21,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_sync.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/mesh_communication.h"
@@ -433,8 +434,8 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
   //
   // The only remaining issue is what to do with unpartitioned nodes.  Since they are required
   // to live on all processors we can simply rely on ourselves to number them properly.
-  std::vector<std::vector<dof_id_type>>
-    requested_node_ids(mesh.n_processors());
+  std::map<dof_id_type, std::vector<dof_id_type>>
+    requested_node_ids;
 
   // Loop over all the nodes, count the ones on each processor.  We can skip ourself
   std::vector<dof_id_type> ghost_nodes_from_proc(mesh.n_processors(), 0);
@@ -454,7 +455,8 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
   // We know how many objects live on each processor, so reserve()
   // space for each.
   for (processor_id_type pid=0; pid != mesh.n_processors(); ++pid)
-    requested_node_ids[pid].reserve(ghost_nodes_from_proc[pid]);
+    if (ghost_nodes_from_proc[pid])
+      requested_node_ids[pid].reserve(ghost_nodes_from_proc[pid]);
 
   // We need to get the new pid for each node from the processor
   // which *currently* owns the node.  We can safely skip ourself
@@ -465,7 +467,6 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
       if (current_pid != mesh.processor_id() &&
           current_pid != DofObject::invalid_processor_id)
         {
-          libmesh_assert_less (current_pid, requested_node_ids.size());
           libmesh_assert_less (requested_node_ids[current_pid].size(),
                                ghost_nodes_from_proc[current_pid]);
           requested_node_ids[current_pid].push_back(node->id());
@@ -530,23 +531,18 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
   // that we successfully reset their processor ids to something
   // valid.
 
-  // Next set node ids from other processors, excluding self
-  for (processor_id_type p=1; p != mesh.n_processors(); ++p)
+  auto gather_functor =
+    [& mesh]
+    (processor_id_type, const std::vector<dof_id_type> & ids,
+     std::vector<processor_id_type> & new_pids)
     {
-      // Trade my requests with processor procup and procdown
-      processor_id_type procup = cast_int<processor_id_type>
-        ((mesh.processor_id() + p) % mesh.n_processors());
-      processor_id_type procdown = cast_int<processor_id_type>
-        ((mesh.n_processors() + mesh.processor_id() - p) %
-         mesh.n_processors());
-      std::vector<dof_id_type> request_to_fill;
-      mesh.comm().send_receive(procup, requested_node_ids[procup],
-                               procdown, request_to_fill);
+      const std::size_t ids_size = ids.size();
+      new_pids.resize(ids_size);
 
       // Fill those requests in-place
-      for (std::size_t i=0; i != request_to_fill.size(); ++i)
+      for (std::size_t i=0; i != ids_size; ++i)
         {
-          Node & node = mesh.node_ref(request_to_fill[i]);
+          Node & node = mesh.node_ref(ids[i]);
           const processor_id_type new_pid = node.processor_id();
 
           // We may have an invalid processor_id() on nodes that have been
@@ -554,19 +550,21 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
           // themselves been removed.
           // libmesh_assert_not_equal_to (new_pid, DofObject::invalid_processor_id);
           // libmesh_assert_less (new_pid, mesh.n_partitions()); // this is the correct test --
-          request_to_fill[i] = new_pid;           //  the number of partitions may
-        }                                         //  not equal the number of processors
+          new_pids[i] = new_pid;                                 //  the number of partitions may
+        }                                                        //  not equal the number of processors
+    };
 
-      // Trade back the results
-      std::vector<dof_id_type> filled_request;
-      mesh.comm().send_receive(procdown, request_to_fill,
-                               procup,   filled_request);
-      libmesh_assert_equal_to (filled_request.size(), requested_node_ids[procup].size());
-
-      // And copy the id changes we've now been informed of
-      for (std::size_t i=0; i != filled_request.size(); ++i)
+  auto action_functor =
+    [& mesh]
+    (processor_id_type libmesh_dbg_var(pid),
+     const std::vector<dof_id_type> & ids,
+     const std::vector<processor_id_type> & new_pids)
+    {
+      const std::size_t ids_size = ids.size();
+      // Copy the pid changes we've now been informed of
+      for (std::size_t i=0; i != ids_size; ++i)
         {
-          Node & node = mesh.node_ref(requested_node_ids[procup][i]);
+          Node & node = mesh.node_ref(ids[i]);
 
           // this is the correct test -- the number of partitions may
           // not equal the number of processors
@@ -576,9 +574,13 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
           // that have not yet themselves been removed.
           // libmesh_assert_less (filled_request[i], mesh.n_partitions());
 
-          node.processor_id(cast_int<processor_id_type>(filled_request[i]));
+          node.processor_id(new_pids[i]);
         }
-    }
+    };
+
+  const processor_id_type * ex = libmesh_nullptr;
+  Parallel::pull_parallel_vector_data
+    (mesh.comm(), requested_node_ids, gather_functor, action_functor, ex);
 
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_procids<Node>(mesh);
