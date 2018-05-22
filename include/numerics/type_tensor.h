@@ -281,11 +281,13 @@ public:
   TypeTensor<T> operator * (const TypeTensor<T2> &) const;
 
   /**
-   * Multiply 2 tensors together, i.e. dyadic product,
+   * Multiply 2 tensors together to return a scalar, i.e.
    * \f$ \sum_{ij} A_{ij} B_{ij} \f$
    * The tensors may contain different numeric types.
+   * Also known as the "double inner product" or "double dot product"
+   * of tensors.
    *
-   * \returns A copy of the result, this tensor is unchanged.
+   * \returns The scalar-valued result, this tensor is unchanged.
    */
   template <typename T2>
   typename CompareTypes<T,T2>::supertype
