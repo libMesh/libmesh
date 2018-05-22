@@ -2088,6 +2088,22 @@ void BoundaryInfo::build_side_list (std::vector<dof_id_type> & el,
     }
 }
 
+
+
+std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
+BoundaryInfo::build_side_list() const
+{
+  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>> bc_triples;
+  bc_triples.reserve(_boundary_side_id.size());
+
+  for (const auto & pr : _boundary_side_id)
+    bc_triples.emplace_back(pr.first->id(), pr.second.first, pr.second.second);
+
+  return bc_triples;
+}
+
+
+
 void BoundaryInfo::build_active_side_list (std::vector<dof_id_type> & el,
                                            std::vector<unsigned short int> & sl,
                                            std::vector<boundary_id_type> & il) const
