@@ -700,6 +700,14 @@ public:
                                std::vector<boundary_id_type> &   bc_id_list) const;
 
   /**
+   * As above, but the library creates and fills in a vector of
+   * (elem-id, side-id, bc-id) triplets and returns it to the user,
+   * taking advantage of guaranteed RVO.
+   */
+  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
+  build_active_side_list () const;
+
+  /**
    * Creates a list of element numbers, edges, and boundary ids for those edges.
    *
    * On a ReplicatedMesh this will include all edges; on a

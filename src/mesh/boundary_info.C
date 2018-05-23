@@ -2125,6 +2125,8 @@ void BoundaryInfo::build_active_side_list (std::vector<dof_id_type> & el,
                                            std::vector<unsigned short int> & sl,
                                            std::vector<boundary_id_type> & il) const
 {
+  libmesh_deprecated();
+
   // Clear the input vectors, just in case they were used for
   // something else recently...
   el.clear();
@@ -2154,6 +2156,35 @@ void BoundaryInfo::build_active_side_list (std::vector<dof_id_type> & el,
           il.push_back (pos->second.second);
         }
     }
+}
+
+
+std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
+BoundaryInfo::build_active_side_list () const
+{
+  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>> bc_triples;
+  bc_triples.reserve(_boundary_side_id.size());
+
+  for (const auto & pr : _boundary_side_id)
+    {
+      // Don't add remote sides
+      if (pr.first->is_remote())
+        continue;
+
+      // Loop over the sides of possible children
+      std::vector<const Elem *> family;
+#ifdef LIBMESH_ENABLE_AMR
+      pr.first->active_family_tree_by_side(family, pr.second.first);
+#else
+      family.push_back(pr.first);
+#endif
+
+      // Populate the list items
+      for (const auto & elem : family)
+        bc_triples.emplace_back(elem->id(), pr.second.first, pr.second.second);
+    }
+
+  return bc_triples;
 }
 
 
