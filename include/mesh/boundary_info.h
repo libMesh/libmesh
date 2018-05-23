@@ -647,6 +647,16 @@ public:
                         std::vector<boundary_id_type> & bc_id_list) const;
 
   /**
+   * As above, but the library creates and fills in a vector of
+   * (node-id, bc-id) pairs and returns it to the user, taking
+   * advantage of guaranteed RVO. Note: we could use std::pairs for
+   * this, but for consistency with the other build_XYZ_list
+   * functions, we're using tuples.
+   */
+  std::vector<std::tuple<dof_id_type, boundary_id_type>>
+  build_node_list() const;
+
+  /**
    * Adds nodes with boundary ids based on the side's boundary
    * ids they are connected to.
    */
