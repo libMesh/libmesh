@@ -166,6 +166,25 @@ public:
   void get_principal_submatrix (unsigned int sub_m, DenseMatrix<T> & dest) const;
 
   /**
+   * Computes the outer (dyadic) product of two vectors and stores in (*this).
+   *
+   * The outer product of two real-valued vectors $\mathbf{a}$ and $\mathbf{b}$ is
+   * \f[
+   *   (\mathbf{a}\mathbf{b}^T)_{i,j} = \mathbf{a}_i \mathbf{b}_j .
+   * \f]
+   * The outer product of two complex-valued vectors $\mathbf{a}$ and $\mathbf{b}$ is
+   * \f[
+   *   (\mathbf{a}\mathbf{b}^H)_{i,j} = \mathbf{a}_i \mathbf{b}^*_j ,
+   * \f]
+   * where \f$H\f$ denotes the conjugate transpose of the vector and \f$*\f$
+   * denotes the complex conjugate.
+   *
+   * \param[in] a   Vector whose entries correspond to rows in the product matrix.
+   * \param[in] b   Vector whose entries correspond to columns in the product matrix.
+   */
+  void outer_product(const DenseVector<T> & a, const DenseVector<T> & b);
+
+  /**
    * Assignment operator.
    *
    * \returns A reference to *this.
