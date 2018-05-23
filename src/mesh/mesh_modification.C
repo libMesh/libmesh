@@ -1926,14 +1926,11 @@ void MeshTools::Modification::change_boundary_id (MeshBase & mesh,
   }
 
   {
-    // Build a list of (elem, side, bc) tuples.
-    auto bc_triples = bi.build_shellface_list();
-
     // Temporary vector to hold ids
     std::vector<boundary_id_type> bndry_ids;
 
-    // For each shellface with the old_id...
-    for (const auto & t : bc_triples)
+    // build_shellface_list returns a vector of (elem, side, bc) tuples.
+    for (const auto & t : bi.build_shellface_list())
       if (std::get<2>(t) == old_id)
         {
           // Get the elem in question
@@ -1957,14 +1954,11 @@ void MeshTools::Modification::change_boundary_id (MeshBase & mesh,
   }
 
   {
-    // Build a list of (elem, side, bc) tuples.
-    auto bc_triples = bi.build_side_list();
-
     // Temporary vector to hold ids
     std::vector<boundary_id_type> bndry_ids;
 
-    // For each side with the old_id...
-    for (const auto & t : bc_triples)
+    // build_side_list returns a vector of (elem, side, bc) tuples.
+    for (const auto & t : bi.build_side_list())
       if (std::get<2>(t) == old_id)
         {
           // Get the elem in question
