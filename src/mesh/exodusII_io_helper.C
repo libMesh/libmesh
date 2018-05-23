@@ -1650,17 +1650,13 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  std::vector<dof_id_type > nl;
-  std::vector<boundary_id_type > il;
-
-  mesh.get_boundary_info().build_node_list(nl, il);
-
   // Maps from nodeset id to the nodes
   std::map<boundary_id_type, std::vector<int>> node;
 
   // Accumulate the vectors to pass into ex_put_node_set
-  for (std::size_t i=0; i<nl.size(); i++)
-    node[il[i]].push_back(nl[i]+1);
+  // build_node_list() builds a list of (node-id, bc-id) tuples.
+  for (const auto & t : mesh.get_boundary_info().build_node_list())
+    node[std::get<1>(t)].push_back(std::get<0>(t) + 1);
 
   std::vector<boundary_id_type> node_boundary_ids;
   mesh.get_boundary_info().build_node_boundary_ids(node_boundary_ids);
