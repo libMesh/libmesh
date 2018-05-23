@@ -642,9 +642,14 @@ public:
    *
    * On a ReplicatedMesh this will include all nodes; on a
    * DistributedMesh only semilocal nodes will be included.
+   *
+   * \deprecated Use the version of build_node_list() below that
+   * returns a std::vector of tuples instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   void build_node_list (std::vector<dof_id_type> &      node_id_list,
                         std::vector<boundary_id_type> & bc_id_list) const;
+#endif
 
   /**
    * As above, but the library creates and fills in a vector of
@@ -673,12 +678,16 @@ public:
    *
    * On a ReplicatedMesh this will include all sides; on a
    * DistributedMesh only sides of semilocal elements will be
-   * included. This function is deprecated in favor of the version of
-   * build_side_list() below that returns a std::vector of tuples.
+   * included.
+   *
+   * \deprecated Use the version of build_side_list() below that
+   * returns a std::vector of tuples instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   void build_side_list (std::vector<dof_id_type> &        element_id_list,
                         std::vector<unsigned short int> & side_list,
                         std::vector<boundary_id_type> &   bc_id_list) const;
+#endif
 
   /**
    * As above, but the library creates and fills in a vector of
@@ -694,10 +703,15 @@ public:
    * On a ReplicatedMesh this will include all sides; on a
    * DistributedMesh only sides of semilocal elements will be
    * included.
+   *
+   * \deprecated Use the version of build_active_side_list() below
+   * that returns a std::vector of tuples instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   void build_active_side_list (std::vector<dof_id_type> &        element_id_list,
                                std::vector<unsigned short int> & side_list,
                                std::vector<boundary_id_type> &   bc_id_list) const;
+#endif
 
   /**
    * As above, but the library creates and fills in a vector of
@@ -713,10 +727,15 @@ public:
    * On a ReplicatedMesh this will include all edges; on a
    * DistributedMesh only edges of semilocal elements will be
    * included.
+   *
+   * \deprecated Use the version of build_edge_list() below
+   * that returns a std::vector of tuples instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   void build_edge_list (std::vector<dof_id_type> &        element_id_list,
                         std::vector<unsigned short int> & edge_list,
                         std::vector<boundary_id_type> &   bc_id_list) const;
+#endif
 
   /**
    * As above, but the library creates and fills in a vector of
@@ -732,10 +751,15 @@ public:
    * On a ReplicatedMesh this will include all shellfaces; on a
    * DistributedMesh only shellfaces of semilocal elements will be
    * included.
+   *
+   * \deprecated Use the version of build_shellface_list() below
+   * that returns a std::vector of tuples instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   void build_shellface_list (std::vector<dof_id_type> &        element_id_list,
                              std::vector<unsigned short int> & shellface_list,
                              std::vector<boundary_id_type> &   bc_id_list) const;
+#endif
 
   /**
    * As above, but the library creates and fills in a vector of

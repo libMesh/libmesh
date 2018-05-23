@@ -1809,6 +1809,7 @@ std::size_t BoundaryInfo::n_nodeset_conds () const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void BoundaryInfo::build_node_list (std::vector<dof_id_type> & nl,
                                     std::vector<boundary_id_type> & il) const
 {
@@ -1830,6 +1831,7 @@ void BoundaryInfo::build_node_list (std::vector<dof_id_type> & nl,
       il.push_back (pos->second);
     }
 }
+#endif
 
 
 std::vector<std::tuple<dof_id_type, boundary_id_type>>
@@ -2079,6 +2081,7 @@ void BoundaryInfo::build_side_list_from_node_list()
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void BoundaryInfo::build_side_list (std::vector<dof_id_type> & el,
                                     std::vector<unsigned short int> & sl,
                                     std::vector<boundary_id_type> & il) const
@@ -2104,7 +2107,7 @@ void BoundaryInfo::build_side_list (std::vector<dof_id_type> & el,
       il.push_back (pos->second.second);
     }
 }
-
+#endif
 
 
 std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
@@ -2121,6 +2124,7 @@ BoundaryInfo::build_side_list() const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void BoundaryInfo::build_active_side_list (std::vector<dof_id_type> & el,
                                            std::vector<unsigned short int> & sl,
                                            std::vector<boundary_id_type> & il) const
@@ -2157,6 +2161,7 @@ void BoundaryInfo::build_active_side_list (std::vector<dof_id_type> & el,
         }
     }
 }
+#endif
 
 
 std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
@@ -2188,6 +2193,7 @@ BoundaryInfo::build_active_side_list () const
 }
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void BoundaryInfo::build_edge_list (std::vector<dof_id_type> & el,
                                     std::vector<unsigned short int> & sl,
                                     std::vector<boundary_id_type> & il) const
@@ -2213,6 +2219,7 @@ void BoundaryInfo::build_edge_list (std::vector<dof_id_type> & el,
       il.push_back (pos->second.second);
     }
 }
+#endif
 
 
 std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
@@ -2228,6 +2235,7 @@ BoundaryInfo::build_edge_list() const
 }
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void BoundaryInfo::build_shellface_list (std::vector<dof_id_type> & el,
                                          std::vector<unsigned short int> & sl,
                                          std::vector<boundary_id_type> & il) const
@@ -2253,6 +2261,7 @@ void BoundaryInfo::build_shellface_list (std::vector<dof_id_type> & el,
       il.push_back (pos->second.second);
     }
 }
+#endif
 
 
 std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
