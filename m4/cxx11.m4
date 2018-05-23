@@ -45,6 +45,59 @@ AC_DEFUN([LIBMESH_TEST_CXX11_MOVE],
     AM_CONDITIONAL(HAVE_CXX11_MOVE, test x$have_cxx11_move == xyes)
   ])
 
+dnl Test C++11 std::tuple and several related helper functions.
+AC_DEFUN([LIBMESH_TEST_CXX11_TUPLE],
+  [
+    have_cxx11_tuple=no
+
+    AC_MSG_CHECKING(for C++11 std::tuple support)
+    AC_LANG_PUSH([C++])
+
+    dnl For this and all of the C++ standards tests: Save the original
+    dnl CXXFLAGS (if any) before appending the $switch determined by
+    dnl AX_CXX_COMPILE_STDCXX_11, and any compiler flags specified by
+    dnl the user in the libmesh_CXXFLAGS environment variable, letting
+    dnl that override everything else.
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <tuple>
+    @%:@include <map>
+    @%:@include <string>
+    ]], [[
+    // Test std::make_tuple
+    std::map<int, std::tuple<double, char, std::string>> students;
+    students[0] = std::make_tuple(3.8, 'A', "Lisa Simpson");
+    students[1] = std::make_tuple(2.9, 'C', "Milhouse Van Houten");
+
+    // Test templated std::get() method.
+    std::get<0>(students[0]);
+    std::get<1>(students[0]);
+    std::get<2>(students[0]);
+
+    // Test std::tie and std::ignore which are declared in the <tuple> header.
+    double gpa1;
+    std::string name1;
+    std::tie(gpa1, std::ignore, name1) = students[1];
+
+    // Test std::tuple_cat(), which combines together one or more
+    // objects, not necessarily tuples, into a single tuple.
+    auto t = std::tuple_cat(students[0], students[1], std::make_pair("foo", 42));
+    ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_TUPLE, 1, [Flag indicating whether compiler supports std::move])
+        have_cxx11_tuple=yes
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    dnl Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+
+    AM_CONDITIONAL(HAVE_CXX11_TUPLE, test x$have_cxx11_tuple == xyes)
+  ])
 
 dnl Properly implemented move constructors require rvalue references,
 dnl std::move, and noexcept, so this tests for all of those features.

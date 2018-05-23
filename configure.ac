@@ -220,6 +220,14 @@ LIBMESH_TEST_CXX11_MAKE_UNIQUE_WORKAROUND
 AS_IF([test "x$have_cxx11_make_unique_workaround" != "xyes"],
       [AC_MSG_ERROR([libMesh requires C++11 variadic template support])])
 
+LIBMESH_TEST_CXX11_TUPLE
+AS_IF([test "x$have_cxx11_tuple" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 std::tuple support])])
+
+LIBMESH_TEST_CXX11_LAMBDA
+AS_IF([test "x$have_cxx11_lambda" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 lambda support])])
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
@@ -228,7 +236,6 @@ LIBMESH_TEST_CXX11_MOVE
 LIBMESH_TEST_CXX11_MOVE_CONSTRUCTORS
 LIBMESH_TEST_CXX11_DECLTYPE
 LIBMESH_TEST_CXX11_RVALUE_REFERENCES
-LIBMESH_TEST_CXX11_LAMBDA
 LIBMESH_TEST_CXX11_CONSTEXPR
 LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS
 LIBMESH_TEST_CXX11_SHARED_PTR
