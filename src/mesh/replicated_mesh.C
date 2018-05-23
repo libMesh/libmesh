@@ -1190,18 +1190,11 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
           }
       }
 
-      {
-        std::vector<dof_id_type>        elem_id_list;
-        std::vector<unsigned short int> shellface_list;
-        std::vector<boundary_id_type>   bc_id_list;
+      for (const auto & t : other_boundary.build_shellface_list())
+        boundary.add_shellface(std::get<0>(t) + elem_delta,
+                               std::get<1>(t),
+                               std::get<2>(t));
 
-        other_boundary.build_shellface_list(elem_id_list, shellface_list, bc_id_list);
-        for (std::size_t i=0; i != elem_id_list.size(); ++i)
-          {
-            const dof_id_type our_id = elem_id_list[i] + elem_delta;
-            boundary.add_shellface(our_id, shellface_list[i], bc_id_list[i]);
-          }
-      }
     } // end if (other_mesh)
 
   // Finally, we need to "merge" the overlapping nodes
