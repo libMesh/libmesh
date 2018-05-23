@@ -1529,21 +1529,18 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase & pmesh)
     }
 
   // 7.) We also need to know the number of nodes which is in each of the nodesets, globally.
-  // There is probably a better way to do this...
-  std::vector<dof_id_type> boundary_node_list;
-  std::vector<boundary_id_type> boundary_node_boundary_id_list;
-  pmesh.get_boundary_info().build_node_list
-    (boundary_node_list, boundary_node_boundary_id_list);
+
+  // Build list of (node-id, bc-id) tuples.
+  typedef std::tuple<dof_id_type, boundary_id_type> Tuple;
+  std::vector<Tuple> bc_tuples = pmesh.get_boundary_info().build_node_list();
 
   if (verbose)
     {
       libMesh::out << "[" << this->processor_id() << "] boundary_node_list.size()="
-                   << boundary_node_list.size() << std::endl;
+                   << bc_tuples.size() << std::endl;
       libMesh::out << "[" << this->processor_id() << "] (boundary_node_id, boundary_id) = ";
-      for (std::size_t i=0; i<boundary_node_list.size(); ++i)
-        {
-          libMesh::out << "(" << boundary_node_list[i] << ", " << boundary_node_boundary_id_list[i] << ") ";
-        }
+      for (const auto & t : bc_tuples)
+        libMesh::out << "(" << std::get<0>(t) << ", " << std::get<1>(t) << ") ";
       libMesh::out << std::endl;
     }
 
@@ -1558,42 +1555,35 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase & pmesh)
   // that would give us duplicate entries when we do the parallel summation.
   // So instead, only count entries for nodes owned by this processor.
   // Start by getting rid of all non-local node entries from the vectors.
-  std::vector<dof_id_type>::iterator it_node=boundary_node_list.begin();
-  std::vector<boundary_id_type>::iterator it_id=boundary_node_boundary_id_list.begin();
+  std::vector<Tuple>::iterator
+    it = bc_tuples.begin(),
+    new_end = bc_tuples.end();
 
-  // New end iterators, to be updated as we find non-local IDs
-  std::vector<dof_id_type>::iterator new_node_list_end = boundary_node_list.end();
-  std::vector<boundary_id_type>::iterator new_boundary_id_list_end = boundary_node_boundary_id_list.end();
-  for ( ; it_node != new_node_list_end; )
+  while (it != new_end)
     {
-      if (pmesh.node_ptr( *it_node )->processor_id() != this->processor_id())
+      if (pmesh.node_ptr(std::get<0>(*it))->processor_id() != this->processor_id())
         {
           // Back up the new end iterators to prepare for swap
-          --new_node_list_end;
-          --new_boundary_id_list_end;
+          --new_end;
 
           // Swap places, the non-local node will now be "past-the-end"
-          std::swap (*it_node, *new_node_list_end);
-          std::swap (*it_id, *new_boundary_id_list_end);
+          std::swap(*it, *new_end);
         }
       else // node is local, go to next
-        {
-          ++it_node;
-          ++it_id;
-        }
+        ++it;
     }
 
-  // Erase from "new" end to old end on each vector.
-  boundary_node_list.erase(new_node_list_end, boundary_node_list.end());
-  boundary_node_boundary_id_list.erase(new_boundary_id_list_end, boundary_node_boundary_id_list.end());
+  // Erase from "new" end to old end.
+  bc_tuples.erase(new_end, bc_tuples.end());
 
   // Now we can do the local count for each ID...
   for (std::size_t i=0; i<global_nodeset_ids.size(); ++i)
     {
-      this->num_global_node_counts[i] = cast_int<int>
-        (std::count(boundary_node_boundary_id_list.begin(),
-                    boundary_node_boundary_id_list.end(),
-                    cast_int<boundary_id_type>(this->global_nodeset_ids[i])));
+      int id = this->global_nodeset_ids[i];
+      this->num_global_node_counts[i] =
+        cast_int<int>(std::count_if(bc_tuples.begin(),
+                                    bc_tuples.end(),
+                                    [id](const Tuple & t)->bool { return std::get<1>(t) == id; }));
     }
 
   // And finally we can sum them up
