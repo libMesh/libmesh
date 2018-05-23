@@ -1155,17 +1155,9 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
       BoundaryInfo & boundary = this->get_boundary_info();
       const BoundaryInfo & other_boundary = other_mesh->get_boundary_info();
 
-      {
-        std::vector<dof_id_type>      node_id_list;
-        std::vector<boundary_id_type> bc_id_list;
-
-        other_boundary.build_node_list(node_id_list, bc_id_list);
-        for (std::size_t i=0; i != node_id_list.size(); ++i)
-          {
-            const dof_id_type our_id = node_id_list[i] + node_delta;
-            boundary.add_node(our_id, bc_id_list[i]);
-          }
-      }
+      for (const auto & t : other_boundary.build_node_list())
+        boundary.add_node(std::get<0>(t) + node_delta,
+                          std::get<1>(t));
 
       for (const auto & t : other_boundary.build_side_list())
         boundary.add_side(std::get<0>(t) + elem_delta,
