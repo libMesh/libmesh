@@ -568,6 +568,21 @@ void DenseMatrix<T>::get_principal_submatrix (unsigned int sub_m,
 
 
 template<typename T>
+void DenseMatrix<T>::outer_product (const DenseVector<T> & a,
+                                    const DenseVector<T> & b)
+{
+  const unsigned int m = a.size();
+  const unsigned int n = b.size();
+
+  this->resize(m, n);
+  for (unsigned int i = 0; i < m; ++i)
+    for (unsigned int j = 0; j < n; ++j)
+      (*this)(i,j) = a(i) * libmesh_conj(b(j));
+}
+
+
+
+template<typename T>
 void DenseMatrix<T>::get_principal_submatrix (unsigned int sub_m, DenseMatrix<T> & dest) const
 {
   get_principal_submatrix(sub_m, sub_m, dest);
