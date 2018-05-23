@@ -864,18 +864,13 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
             // nodeset.
             if (mesh_array[i]->get_boundary_info().n_nodeset_conds() > 0)
               {
-                std::vector<numeric_index_type> node_id_list;
-                std::vector<boundary_id_type> bc_id_list;
-
-                // Get the list of nodes with associated boundary IDs
-                mesh_array[i]->get_boundary_info().build_node_list(node_id_list, bc_id_list);
-
-                for (std::size_t node_index=0; node_index<bc_id_list.size(); node_index++)
+                // build_node_list() returns a vector of (node-id, bc-id) tuples
+                for (const auto & t : mesh_array[i]->get_boundary_info().build_node_list())
                   {
-                    boundary_id_type node_bc_id = bc_id_list[node_index];
+                    boundary_id_type node_bc_id = std::get<1>(t);
                     if (node_bc_id == id_array[i])
                       {
-                        dof_id_type this_node_id = node_id_list[node_index];
+                        dof_id_type this_node_id = std::get<0>(t);
                         set_array[i]->insert( this_node_id );
 
                         // We need to set h_min to some value. It's too expensive to
