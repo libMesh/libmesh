@@ -710,6 +710,13 @@ public:
   void build_shellface_list (std::vector<dof_id_type> &        element_id_list,
                              std::vector<unsigned short int> & shellface_list,
                              std::vector<boundary_id_type> &   bc_id_list) const;
+  /**
+   * As above, but the library creates and fills in a vector of
+   * (elem-id, side-id, bc-id) triplets and returns it to the user,
+   * taking advantage of guaranteed RVO.
+   */
+  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
+  build_shellface_list() const;
 
   /**
    * \returns A set of the boundary ids which exist on semilocal parts
