@@ -1990,37 +1990,35 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
   // FIXME: We should build this list only one time!!  We already built it above, but we
   // did not have the libmesh to exodus node mapping at that time... for now we'll just
   // build it here again, hopefully it's small relative to the size of the entire mesh.
-  std::vector<dof_id_type> boundary_node_list;
-  std::vector<boundary_id_type> boundary_node_boundary_id_list;
-  mesh.get_boundary_info().build_node_list
-    (boundary_node_list, boundary_node_boundary_id_list);
+
+  // Build list of (node-id, bc-id) tuples.
+  typedef std::tuple<dof_id_type, boundary_id_type> Tuple;
+  std::vector<Tuple> bc_tuples = mesh.get_boundary_info().build_node_list();
 
   if (verbose)
     {
       libMesh::out << "[" << this->processor_id() << "] boundary_node_list.size()="
-                   << boundary_node_list.size() << std::endl;
+                   << bc_tuples.size() << std::endl;
       libMesh::out << "[" << this->processor_id() << "] (boundary_node_id, boundary_id) = ";
-      for (std::size_t i=0; i<boundary_node_list.size(); ++i)
-        {
-          libMesh::out << "(" << boundary_node_list[i] << ", " << boundary_node_boundary_id_list[i] << ") ";
-        }
+      for (const auto & t : bc_tuples)
+        libMesh::out << "(" << std::get<0>(t) << ", " << std::get<1>(t) << ") ";
       libMesh::out << std::endl;
     }
 
   // For each node in the node list, add it to the vector of node IDs for that
   // set for the local processor.  This will be used later when writing Exodus
   // nodesets.
-  for (std::size_t i=0; i<boundary_node_list.size(); ++i)
+  for (const auto & t : bc_tuples)
     {
       // Don't try to grab a reference to the vector unless the current node is attached
       // to a local element.  Otherwise, another processor will be responsible for writing it in its nodeset.
-      std::map<int, int>::iterator it = this->libmesh_node_num_to_exodus.find( boundary_node_list[i] );
+      std::map<int, int>::iterator it = this->libmesh_node_num_to_exodus.find(std::get<0>(t));
 
       if (it != this->libmesh_node_num_to_exodus.end())
         {
           // Get reference to the vector where this node ID will be inserted.  If it
           // doesn't yet exist, this will create it.
-          std::vector<int> & current_id_set = local_node_boundary_id_lists[ boundary_node_boundary_id_list[i] ];
+          std::vector<int> & current_id_set = local_node_boundary_id_lists[std::get<1>(t)];
 
           // Push back Exodus-mapped node ID for this set
           // TODO: reserve space in these vectors somehow.
