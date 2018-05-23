@@ -1425,49 +1425,32 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase & pmesh)
       libMesh::out << std::endl;
     }
 
-  // We also need global counts of sides in each of the sidesets.  Again, there may be a
-  // better way to do this...
-  std::vector<dof_id_type> bndry_elem_list;
-  std::vector<unsigned short int> bndry_side_list;
-  std::vector<boundary_id_type> bndry_id_list;
-  pmesh.get_boundary_info().build_side_list(bndry_elem_list, bndry_side_list, bndry_id_list);
+  // We also need global counts of sides in each of the sidesets.
+  // Build a list of (elem, side, bc) tuples.
+  typedef std::tuple<dof_id_type, unsigned short int, boundary_id_type> Tuple;
+  std::vector<Tuple> bc_triples = pmesh.get_boundary_info().build_side_list();
 
-  // Similarly to the nodes, we can't count any sides for elements which aren't local
-  std::vector<dof_id_type>::iterator it_elem=bndry_elem_list.begin();
-  std::vector<unsigned short>::iterator it_side=bndry_side_list.begin();
-  std::vector<boundary_id_type>::iterator it_id=bndry_id_list.begin();
+  // Iterators to the beginning and end of the current range.
+  std::vector<Tuple>::iterator
+    it = bc_triples.begin(),
+    new_end = bc_triples.end();
 
-  // New end iterators, to be updated as we find non-local IDs
-  std::vector<dof_id_type>::iterator new_bndry_elem_list_end = bndry_elem_list.end();
-  std::vector<unsigned short>::iterator new_bndry_side_list_end = bndry_side_list.end();
-  std::vector<boundary_id_type>::iterator new_bndry_id_list_end = bndry_id_list.end();
-
-  for ( ; it_elem != new_bndry_elem_list_end; )
+  while (it != new_end)
     {
-      if (pmesh.elem_ref(*it_elem).processor_id() != this->processor_id())
+      if (pmesh.elem_ref(std::get<0>(*it)).processor_id() != this->processor_id())
         {
           // Back up the new end iterators to prepare for swap
-          --new_bndry_elem_list_end;
-          --new_bndry_side_list_end;
-          --new_bndry_id_list_end;
+          --new_end;
 
           // Swap places, the non-local elem will now be "past-the-end"
-          std::swap (*it_elem, *new_bndry_elem_list_end);
-          std::swap (*it_side, *new_bndry_side_list_end);
-          std::swap (*it_id, *new_bndry_id_list_end);
+          std::swap (*it, *new_end);
         }
       else // elem is local, go to next
-        {
-          ++it_elem;
-          ++it_side;
-          ++it_id;
-        }
+        ++it;
     }
 
-  // Erase from "new" end to old end on each vector.
-  bndry_elem_list.erase(new_bndry_elem_list_end, bndry_elem_list.end());
-  bndry_side_list.erase(new_bndry_side_list_end, bndry_side_list.end());
-  bndry_id_list.erase(new_bndry_id_list_end, bndry_id_list.end());
+  // Erase from "new" end to old.
+  bc_triples.erase(new_end, bc_triples.end());
 
   this->num_global_side_counts.clear(); // Make sure we don't have any leftover information
   this->num_global_side_counts.resize(this->global_sideset_ids.size());
@@ -1475,10 +1458,11 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase & pmesh)
   // Get the count for each global sideset ID
   for (std::size_t i=0; i<global_sideset_ids.size(); ++i)
     {
-      this->num_global_side_counts[i] = cast_int<int>
-        (std::count(bndry_id_list.begin(),
-                    bndry_id_list.end(),
-                    cast_int<boundary_id_type>(this->global_sideset_ids[i])));
+      int id = global_sideset_ids[i];
+      this->num_global_side_counts[i] =
+        cast_int<int>(std::count_if(bc_triples.begin(),
+                                    bc_triples.end(),
+                                    [id](const Tuple & t)->bool { return std::get<2>(t) == id; }));
     }
 
   if (verbose)
