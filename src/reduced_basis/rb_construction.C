@@ -592,15 +592,10 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
   // where to impose the node-based terms.
   if (mesh.get_boundary_info().n_nodeset_conds() > 0)
     {
-      std::vector<numeric_index_type> node_id_list;
-      std::vector<boundary_id_type> bc_id_list;
-
-      // Get the list of nodes with boundary IDs
-      mesh.get_boundary_info().build_node_list(node_id_list, bc_id_list);
-
-      for (std::size_t i=0; i<node_id_list.size(); i++)
+      // build_node_list() returns a vector of (node-id, bc-id) tuples.
+      for (const auto & t : mesh.get_boundary_info().build_node_list())
         {
-          const Node & node = mesh.node_ref(node_id_list[i]);
+          const Node & node = mesh.node_ref(std::get<0>(t));
 
           // If node is on this processor, then all dofs on node are too
           // so we can do the add below safely
