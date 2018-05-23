@@ -701,6 +701,14 @@ public:
                         std::vector<boundary_id_type> &   bc_id_list) const;
 
   /**
+   * As above, but the library creates and fills in a vector of
+   * (elem-id, side-id, bc-id) triplets and returns it to the user,
+   * taking advantage of guaranteed RVO.
+   */
+  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
+  build_edge_list() const;
+
+  /**
    * Creates a list of element numbers, shellfaces, and boundary ids for those shellfaces.
    *
    * On a ReplicatedMesh this will include all shellfaces; on a
@@ -710,6 +718,7 @@ public:
   void build_shellface_list (std::vector<dof_id_type> &        element_id_list,
                              std::vector<unsigned short int> & shellface_list,
                              std::vector<boundary_id_type> &   bc_id_list) const;
+
   /**
    * As above, but the library creates and fills in a vector of
    * (elem-id, side-id, bc-id) triplets and returns it to the user,
