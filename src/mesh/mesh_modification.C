@@ -1862,20 +1862,15 @@ void MeshTools::Modification::change_boundary_id (MeshBase & mesh,
   BoundaryInfo & bi = mesh.get_boundary_info();
 
   {
-    // Build a list of all nodes that have boundary IDs
-    std::vector<dof_id_type> node_list;
-    std::vector<boundary_id_type> bc_id_list;
-    bi.build_node_list (node_list, bc_id_list);
-
     // Temporary vector to hold ids
     std::vector<boundary_id_type> bndry_ids;
 
-    // For each node with the old_id...
-    for (std::size_t idx=0; idx<node_list.size(); ++idx)
-      if (bc_id_list[idx] == old_id)
+    // build_node_list returns a vector of (node, bc) tuples.
+    for (const auto & t : bi.build_node_list())
+      if (std::get<1>(t) == old_id)
         {
           // Get the node in question
-          const Node * node = mesh.node_ptr(node_list[idx]);
+          const Node * node = mesh.node_ptr(std::get<0>(t));
 
           // Get all the current IDs for this node.
           bi.boundary_ids(node, bndry_ids);
