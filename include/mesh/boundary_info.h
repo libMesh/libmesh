@@ -663,7 +663,8 @@ public:
    *
    * On a ReplicatedMesh this will include all sides; on a
    * DistributedMesh only sides of semilocal elements will be
-   * included.
+   * included. This function is deprecated in favor of the version of
+   * build_side_list() below that returns a std::vector of tuples.
    */
   void build_side_list (std::vector<dof_id_type> &        element_id_list,
                         std::vector<unsigned short int> & side_list,
