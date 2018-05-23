@@ -1549,11 +1549,9 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
   std::vector<boundary_id_type> side_boundary_ids;
 
   {
-    // Build a list of (elem, side, bc) tuples.
-    auto bc_triples = mesh.get_boundary_info().build_side_list();
-
     // Accumulate the vectors to pass into ex_put_side_set
-    for (const auto & t : bc_triples)
+    // build_side_list() returns a vector of (elem, side, bc) tuples.
+    for (const auto & t : mesh.get_boundary_info().build_side_list())
       {
         std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
