@@ -20,8 +20,6 @@
 #ifndef LIBMESH_ENUM_INF_MAP_TYPE_H
 #define LIBMESH_ENUM_INF_MAP_TYPE_H
 
-// ------------------------------------------------------------
-// enum Order definition
 namespace libMesh {
 
 /**

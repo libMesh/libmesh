@@ -20,8 +20,6 @@
 #ifndef LIBMESH_ENUM_ORDER_H
 #define LIBMESH_ENUM_ORDER_H
 
-// ------------------------------------------------------------
-// enum Order definition
 namespace libMesh {
 
 /**

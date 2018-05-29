@@ -20,8 +20,6 @@
 #ifndef LIBMESH_ENUM_CONVERGENCE_FLAGS
 #define LIBMESH_ENUM_CONVERGENCE_FLAGS
 
-// ------------------------------------------------------------
-// enum ConvergenceFlags definition
 namespace libMesh {
 
 /**

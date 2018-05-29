@@ -20,8 +20,6 @@
 #ifndef LIBMESH_ENUM_EIGENSOLVER_TYPE_H
 #define LIBMESH_ENUM_EIGENSOLVER_TYPE_H
 
-// ------------------------------------------------------------
-// enum SolverType definition
 namespace libMesh {
 
 /**

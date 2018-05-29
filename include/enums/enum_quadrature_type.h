@@ -20,8 +20,6 @@
 #ifndef LIBMESH_ENUM_QUADRATURE_TYPE_H
 #define LIBMESH_ENUM_QUADRATURE_TYPE_H
 
-// ------------------------------------------------------------
-// enum QuadratureType definition
 namespace libMesh {
 
 /**

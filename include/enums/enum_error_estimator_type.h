@@ -34,6 +34,6 @@ enum ErrorEstimatorType : int {
                          WEIGHTED_PATCH_RECOVERY =  7,
                          UNIFORM_REFINEMENT      =  8};
 
-} // end namespace libMesh
+}
 
 #endif // LIBMESH_ENUM_ERROR_ESTIMATOR_TYPE_H

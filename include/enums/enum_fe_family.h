@@ -20,16 +20,14 @@
 #ifndef LIBMESH_ENUM_FE_FAMILY_H
 #define LIBMESH_ENUM_FE_FAMILY_H
 
-// ------------------------------------------------------------
-// enum FEFamily definition
 namespace libMesh {
 
 /**
  * \enum libMesh::FEFamily defines an \p enum for finite
  * element families.
  */
-// vanilla C0
 enum FEFamily : int {
+               // C0
                LAGRANGE     = 0,
                HIERARCHIC   = 1,
 

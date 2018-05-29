@@ -20,8 +20,6 @@
 #ifndef LIBMESH_ENUM_SUBSET_SOLVE_MODE_H
 #define LIBMESH_ENUM_SUBSET_SOLVE_MODE_H
 
-// ------------------------------------------------------------
-// enum SubsetSolveMode definition
 namespace libMesh {
 
 /**

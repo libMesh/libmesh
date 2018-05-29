@@ -20,8 +20,6 @@
 #ifndef LIBMESH_ENUM_POINT_LOCATOR_TYPE_H
 #define LIBMESH_ENUM_POINT_LOCATOR_TYPE_H
 
-// ------------------------------------------------------------
-// enum PointLocatorType definition
 namespace libMesh {
 
 /**

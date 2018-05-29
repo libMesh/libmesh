@@ -20,8 +20,6 @@
 #ifndef LIBMESH_ENUM_ELEM_TYPE_H
 #define LIBMESH_ENUM_ELEM_TYPE_H
 
-// ------------------------------------------------------------
-// enum ElemType definition
 namespace libMesh {
 
 /**

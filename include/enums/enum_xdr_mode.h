@@ -20,8 +20,6 @@
 #ifndef LIBMESH_ENUM_XDR_MODE_H
 #define LIBMESH_ENUM_XDR_MODE_H
 
-// ------------------------------------------------------------
-// enum XdrMode definition
 namespace libMesh {
 
 /**

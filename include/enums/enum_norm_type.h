@@ -20,16 +20,14 @@
 #ifndef LIBMESH_ENUM_NORM_TYPE_H
 #define LIBMESH_ENUM_NORM_TYPE_H
 
-// ------------------------------------------------------------
-// enum FEMNormType definition
 namespace libMesh {
 
 /**
  * \enum libMesh::FEMNormType defines an \p enum for norms
  * defined on vectors of finite element coefficients
  */
-// Hilbert norms and seminorms in FE space
 enum FEMNormType : int {
+                  // Hilbert norms and seminorms in FE space
                   L2              = 0,
                   H1              = 1,
                   H2              = 2,

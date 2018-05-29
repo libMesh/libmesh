@@ -21,8 +21,6 @@
 #define LIBMESH_ENUM_IO_PACKAGE_H
 
 
-// ------------------------------------------------------------
-// enum IOPackage definition
 namespace libMesh {
 
 /**

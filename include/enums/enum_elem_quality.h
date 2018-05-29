@@ -20,10 +20,9 @@
 #ifndef LIBMESH_ENUM_ELEM_QUALITY_H
 #define LIBMESH_ENUM_ELEM_QUALITY_H
 
-// ------------------------------------------------------------
-// enum ElemType definition
 namespace libMesh
 {
+
 /**
  * Defines an \p enum for element quality metrics.
  */

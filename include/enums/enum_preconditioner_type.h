@@ -20,8 +20,6 @@
 #ifndef LIBMESH_ENUM_PRECONDITIONER_TYPE_H
 #define LIBMESH_ENUM_PRECONDITIONER_TYPE_H
 
-// ------------------------------------------------------------
-// enum PreconditionerType definition
 namespace libMesh {
 
 /**
