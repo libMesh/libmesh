@@ -29,7 +29,11 @@ namespace libMesh {
  */
 enum XdrMODE : int
   {
-    UNKNOWN = -1, ENCODE=0, DECODE, WRITE, READ
+    UNKNOWN = -1,
+    ENCODE=0,
+    DECODE,
+    WRITE,
+    READ
   };
 }
 

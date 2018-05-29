@@ -30,38 +30,31 @@ enum FEFamily : int {
                // C0
                LAGRANGE     = 0,
                HIERARCHIC   = 1,
-
                // discontinuous, in local coordinates
                MONOMIAL      = 2,
                L2_HIERARCHIC = 6,
                L2_LAGRANGE   = 7,
-
                // higher-order
                BERNSTEIN    = 3,
                SZABAB       = 4,
-
                // discontinuous, in global coordinates
                XYZ          = 5,
-
                // infinite element stuff
                INFINITE_MAP = 11,     //   for 1/r-map
                JACOBI_20_00 = 12,     //   i_max = 19
                JACOBI_30_00 = 13,     //   i_max = 19
                LEGENDRE     = 14,     //   i_max = 19
-
                // C1 elements
                CLOUGH       = 21,
                HERMITE      = 22,
                SUBDIVISION  = 23,
-
                // A scalar variable that couples to
                // all other DOFs in the system
                SCALAR       = 31,
-
                // Vector-valued elements
                LAGRANGE_VEC = 41,
                NEDELEC_ONE  = 42,
-
+               // Invalid
                INVALID_FE   = 99};
 
 /**

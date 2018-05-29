@@ -45,7 +45,7 @@ enum SolverType : int {
                  RICHARDSON,
                  CHEBYSHEV,
                  SPARSELU,
-
+                 // Invalid
                  INVALID_SOLVER};
 }
 

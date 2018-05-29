@@ -40,7 +40,7 @@ enum PreconditionerType : int {
                          USER_PRECOND,
                          SHELL_PRECOND,
                          AMG_PRECOND,
-
+                         // Invalid
                          INVALID_PRECONDITIONER};
 }
 

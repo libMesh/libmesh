@@ -39,7 +39,6 @@ enum Order : int {
             EIGHTH       =  8,
             NINTH        =  9,
             TENTH        = 10,
-
             ELEVENTH     = 11,
             TWELFTH      = 12,
             THIRTEENTH   = 13,
@@ -51,7 +50,6 @@ enum Order : int {
             NINTEENTH    = 19, // deprecated
             NINETEENTH   = 19,
             TWENTIETH    = 20,
-
             TWENTYFIRST   = 21,
             TWENTYSECOND  = 22,
             TWENTYTHIRD   = 23,
@@ -62,7 +60,6 @@ enum Order : int {
             TWENTYEIGHTH  = 28,
             TWENTYNINTH   = 29,
             THIRTIETH     = 30,
-
             THIRTYFIRST   = 31,
             THIRTYSECOND  = 32,
             THIRTYTHIRD   = 33,
@@ -73,11 +70,10 @@ enum Order : int {
             THIRTYEIGHTH  = 38,
             THIRTYNINTH   = 39,
             FORTIETH     = 40,
-
             FORTYFIRST   = 41,
             FORTYSECOND  = 42,
             FORTYTHIRD   = 43,
-
+            // Invalid
             INVALID_ORDER};
 
 }

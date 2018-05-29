@@ -32,13 +32,7 @@ enum EigenSolverType : int {
                       ARNOLDI,
                       LANCZOS,
                       KRYLOVSCHUR,
-                      // SLEPc optional packages
-                      // EPSARPACK,
-                      // EPSLAPACK,
-                      // EPSBLZPACK,
-                      // EPSPLANSO,
-                      // EPSTRLAN,
-
+                      // Invalid
                       INVALID_EIGENSOLVER};
 
 /**
@@ -53,7 +47,7 @@ enum EigenProblemType : int {
                        GNHEP,
                        GHEP,
                        GHIEP,
-
+                       // Invalid
                        INVALID_EIGENPROBLEMTYPE};
 
 
@@ -72,6 +66,7 @@ enum PositionOfSpectrum : int {
                          LARGEST_IMAGINARY,
                          SMALLEST_IMAGINARY,
                          TARGET_IMAGINARY,
+                         // Invalid
                          INVALID_Postion_of_Spectrum,
                          INVALID_POSITION_OF_SPECTRUM};
 }

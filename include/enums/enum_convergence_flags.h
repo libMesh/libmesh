@@ -26,7 +26,7 @@ namespace libMesh {
  * Linear solver convergence flags (taken from the PETSc flags)
  */
 enum LinearConvergenceReason : int {
-  /* converged */
+  // converged
   CONVERGED_RTOL_NORMAL        =  1,
   CONVERGED_ATOL_NORMAL        =  9,
   CONVERGED_RTOL               =  2,
@@ -36,7 +36,7 @@ enum LinearConvergenceReason : int {
   CONVERGED_CG_CONSTRAINED     =  6,
   CONVERGED_STEP_LENGTH        =  7,
   CONVERGED_HAPPY_BREAKDOWN    =  8,
-  /* diverged */
+  // diverged
   DIVERGED_NULL                = -2,
   DIVERGED_ITS                 = -3,
   DIVERGED_DTOL                = -4,
@@ -47,9 +47,9 @@ enum LinearConvergenceReason : int {
   DIVERGED_NAN                 = -9,
   DIVERGED_INDEFINITE_MAT      = -10,
   DIVERGED_PCSETUP_FAILED      = -11,
-
+  // still running
   CONVERGED_ITERATING          =  0,
-
+  // Invalid
   UNKNOWN_FLAG                 = -128};
 }
 

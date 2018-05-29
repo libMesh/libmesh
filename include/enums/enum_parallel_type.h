@@ -30,7 +30,7 @@ enum ParallelType : int {
                    SERIAL,
                    PARALLEL,
                    GHOSTED,
-
+                   // Invalid
                    INVALID_PARALLELIZATION};
 }
 

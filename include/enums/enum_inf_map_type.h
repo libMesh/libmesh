@@ -30,6 +30,7 @@ enum InfMapType : int {
                  CARTESIAN=0,
                  SPHERICAL,
                  ELLIPSOIDAL,
+                 // Invalid
                  INVALID_INF_MAP};
 
 }
