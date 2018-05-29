@@ -27,7 +27,8 @@ namespace libMesh {
 /**
  * Defines an \p enum for preconditioner types
  */
-enum PreconditionerType {IDENTITY_PRECOND =0,
+enum PreconditionerType : int {
+                         IDENTITY_PRECOND =0,
                          JACOBI_PRECOND,
                          BLOCK_JACOBI_PRECOND,
                          SOR_PRECOND,

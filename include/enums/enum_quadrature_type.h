@@ -27,7 +27,8 @@ namespace libMesh {
 /**
  * Defines an \p enum for currently available quadrature rules.
  */
-enum QuadratureType {QGAUSS            = 0,
+enum QuadratureType : int {
+                     QGAUSS            = 0,
 
                      QJACOBI_1_0       = 1,
                      QJACOBI_2_0       = 2,

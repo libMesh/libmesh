@@ -29,7 +29,8 @@ namespace libMesh {
  * Fixing each label to a specific int, since \p InfFE and p refinement
  * may cast between them
  */
-enum Order {CONSTANT     =  0,
+enum Order : int {
+            CONSTANT     =  0,
             FIRST        =  1,
             SECOND       =  2,
             THIRD        =  3,

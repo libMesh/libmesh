@@ -29,7 +29,7 @@ namespace libMesh {
  * This allows for run-time switching between solver packages
  *
  */
-enum SolverPackage
+enum SolverPackage : int
   {
     PETSC_SOLVERS=0,
     TRILINOS_SOLVERS,

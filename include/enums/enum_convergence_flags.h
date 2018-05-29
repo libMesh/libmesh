@@ -27,7 +27,7 @@ namespace libMesh {
 /**
  * Linear solver convergence flags (taken from the PETSc flags)
  */
-enum LinearConvergenceReason {
+enum LinearConvergenceReason : int {
   /* converged */
   CONVERGED_RTOL_NORMAL        =  1,
   CONVERGED_ATOL_NORMAL        =  9,

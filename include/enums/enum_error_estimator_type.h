@@ -22,7 +22,8 @@
 
 namespace libMesh {
 
-enum ErrorEstimatorType {INVALID                 = -1,
+enum ErrorEstimatorType : int {
+                         INVALID                 = -1,
                          ADJOINT_REFINEMENT      =  0,
                          ADJOINT_RESIDUAL        =  1,
                          DISCONTINUITY_MEASURE   =  2,

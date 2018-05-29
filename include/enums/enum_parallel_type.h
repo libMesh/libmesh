@@ -27,7 +27,8 @@ namespace libMesh {
 /**
  * Defines an \p enum for parallel data structure types
  */
-enum ParallelType {AUTOMATIC=0,
+enum ParallelType : int {
+                   AUTOMATIC=0,
                    SERIAL,
                    PARALLEL,
                    GHOSTED,

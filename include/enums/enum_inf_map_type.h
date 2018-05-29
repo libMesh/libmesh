@@ -28,7 +28,8 @@ namespace libMesh {
  * \enum libMesh::InfMapType defines an \p enum for the
  * types of coordinate mappings available in infinite elements.
  */
-enum InfMapType {CARTESIAN=0,
+enum InfMapType : int {
+                 CARTESIAN=0,
                  SPHERICAL,
                  ELLIPSOIDAL,
                  INVALID_INF_MAP};

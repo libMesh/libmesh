@@ -29,7 +29,8 @@ namespace libMesh {
  * element families.
  */
 // vanilla C0
-enum FEFamily {LAGRANGE     = 0,
+enum FEFamily : int {
+               LAGRANGE     = 0,
                HIERARCHIC   = 1,
 
                // discontinuous, in local coordinates
@@ -69,7 +70,8 @@ enum FEFamily {LAGRANGE     = 0,
  * \enum libMesh::FEContinuity defines an \p enum for finite element
  * types to libmesh_assert a certain level (or type? Hcurl?) of continuity.
  */
-enum FEContinuity {DISCONTINUOUS,
+enum FEContinuity : int {
+                   DISCONTINUOUS,
                    C_ZERO,
                    C_ONE,
                    H_CURL};
@@ -78,7 +80,8 @@ enum FEContinuity {DISCONTINUOUS,
  * \enum libMesh::FEFieldType defines an \p enum for finite element
  * field types - i.e. is it a scalar element, vector, tensor, etc.
  */
-enum FEFieldType {TYPE_SCALAR = 0,
+enum FEFieldType : int {
+                  TYPE_SCALAR = 0,
                   TYPE_VECTOR};
 
 }

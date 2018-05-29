@@ -29,7 +29,8 @@ namespace libMesh {
  * defined on vectors of finite element coefficients
  */
 // Hilbert norms and seminorms in FE space
-enum FEMNormType {L2              = 0,
+enum FEMNormType : int {
+                  L2              = 0,
                   H1              = 1,
                   H2              = 2,
                   HCURL           = 3,

@@ -27,7 +27,8 @@ namespace libMesh {
 /**
  * Defines an \p enum for geometric element types.
  */
-enum ElemType {EDGE2=0,         // 0
+enum ElemType : int {
+               EDGE2=0,         // 0
                EDGE3,           // 1
                EDGE4,           // 2
 

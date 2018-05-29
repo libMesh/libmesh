@@ -31,7 +31,7 @@ namespace libMesh {
  * These enumerations give an easy way of selecting one or the
  * other.
  */
-enum IOPackage
+enum IOPackage : int
   {
     TECPLOT,
     GMV,

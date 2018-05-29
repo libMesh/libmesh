@@ -29,7 +29,8 @@ namespace libMesh {
  * of point locators (given a point with global coordinates,
  * locate the corresponding element in space) available in libMesh.
  */
-enum PointLocatorType {TREE = 0,
+enum PointLocatorType : int {
+                       TREE = 0,
                        TREE_ELEMENTS,
                        TREE_LOCAL_ELEMENTS,
                        INVALID_LOCATOR};

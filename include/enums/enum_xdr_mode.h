@@ -29,7 +29,7 @@ namespace libMesh {
  * \p READ, \p WRITE perform reading and writing in ASCII format,
  * and \p DECODE, \p ENCODE do the same in binary format.
  */
-enum XdrMODE
+enum XdrMODE : int
   {
     UNKNOWN = -1, ENCODE=0, DECODE, WRITE, READ
   };

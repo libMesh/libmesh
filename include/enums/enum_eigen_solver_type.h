@@ -27,7 +27,8 @@ namespace libMesh {
 /**
  * Defines an \p enum for iterative eigenproblem solver types
  */
-enum EigenSolverType {POWER=0,
+enum EigenSolverType : int {
+                      POWER=0,
                       LAPACK,
                       SUBSPACE,
                       ARNOLDI,
@@ -48,7 +49,8 @@ enum EigenSolverType {POWER=0,
  * non-Hermitian (NHEP), generalized non-Hermitian (GNHEP), or
  * generalized indefinite Hermitian (GHIEP).
  */
-enum EigenProblemType {NHEP=0,
+enum EigenProblemType : int {
+                       NHEP=0,
                        HEP,
                        GNHEP,
                        GHEP,
@@ -62,7 +64,8 @@ enum EigenProblemType {NHEP=0,
  * Defines an \p enum for the position of
  * the spectrum, i.e. the eigenvalues to be computed.
  */
-enum PositionOfSpectrum {LARGEST_MAGNITUDE=0,
+enum PositionOfSpectrum : int {
+                         LARGEST_MAGNITUDE=0,
                          SMALLEST_MAGNITUDE,
                          TARGET_MAGNITUDE,
                          LARGEST_REAL,

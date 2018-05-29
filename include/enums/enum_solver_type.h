@@ -27,7 +27,8 @@ namespace libMesh {
 /**
  * Defines an \p enum for iterative solver types
  */
-enum SolverType {CG=0,
+enum SolverType : int {
+                 CG=0,
                  CGN,
                  CGS,
                  CR,

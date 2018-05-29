@@ -27,7 +27,8 @@ namespace libMesh
 /**
  * Defines an \p enum for element quality metrics.
  */
-enum ElemQuality {ASPECT_RATIO=0,
+enum ElemQuality : int {
+                  ASPECT_RATIO=0,
                   SKEW,
                   SHEAR,
                   SHAPE,
