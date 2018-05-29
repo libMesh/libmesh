@@ -313,6 +313,9 @@
 /* Flag indicating whether compiler supports std::to_string() */
 #undef HAVE_CXX11_TO_STRING
 
+/* Flag indicating whether compiler supports std::move */
+#undef HAVE_CXX11_TUPLE
+
 /* Flag indicating whether compiler supports <type_traits> */
 #undef HAVE_CXX11_TYPE_TRAITS
 

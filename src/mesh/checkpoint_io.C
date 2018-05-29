@@ -609,15 +609,9 @@ void CheckpointIO::write_bcs (Xdr & io,
   // and our boundary info object
   const BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
-  std::vector<dof_id_type> full_element_id_list;
-  std::vector<uint16_t> full_side_list;
-  std::vector<boundary_id_type> full_bc_id_list;
-
-  boundary_info.build_side_list(full_element_id_list, full_side_list, full_bc_id_list);
-
-  std::size_t bc_size = full_element_id_list.size();
-  libmesh_assert_equal_to(bc_size, full_side_list.size());
-  libmesh_assert_equal_to(bc_size, full_bc_id_list.size());
+  // Build a list of (elem, side, bc) tuples.
+  auto bc_triples = boundary_info.build_side_list();
+  std::size_t bc_size = bc_triples.size();
 
   std::vector<largest_id_type> element_id_list;
   std::vector<uint16_t> side_list;
@@ -627,12 +621,12 @@ void CheckpointIO::write_bcs (Xdr & io,
   side_list.reserve(bc_size);
   bc_id_list.reserve(bc_size);
 
-  for (std::size_t i = 0; i != bc_size; ++i)
-    if (elements.count(mesh.elem_ptr(full_element_id_list[i])))
+  for (const auto & t : bc_triples)
+    if (elements.count(mesh.elem_ptr(std::get<0>(t))))
       {
-        element_id_list.push_back(full_element_id_list[i]);
-        side_list.push_back(full_side_list[i]);
-        bc_id_list.push_back(full_bc_id_list[i]);
+        element_id_list.push_back(std::get<0>(t));
+        side_list.push_back(std::get<1>(t));
+        bc_id_list.push_back(std::get<2>(t));
       }
 
 
@@ -654,13 +648,9 @@ void CheckpointIO::write_nodesets (Xdr & io,
   // and our boundary info object
   const BoundaryInfo & boundary_info = mesh.get_boundary_info();
 
-  std::vector<dof_id_type> full_node_id_list;
-  std::vector<boundary_id_type> full_bc_id_list;
-
-  boundary_info.build_node_list(full_node_id_list, full_bc_id_list);
-
-  std::size_t nodeset_size = full_node_id_list.size();
-  libmesh_assert_equal_to(nodeset_size, full_bc_id_list.size());
+  // Build a list of (node, bc) tuples
+  auto bc_tuples = boundary_info.build_node_list();
+  std::size_t nodeset_size = bc_tuples.size();
 
   std::vector<largest_id_type> node_id_list;
   std::vector<largest_id_type> bc_id_list;
@@ -668,11 +658,11 @@ void CheckpointIO::write_nodesets (Xdr & io,
   node_id_list.reserve(nodeset_size);
   bc_id_list.reserve(nodeset_size);
 
-  for (std::size_t i = 0; i != nodeset_size; ++i)
-    if (nodeset.count(mesh.node_ptr(full_node_id_list[i])))
+  for (const auto & t : bc_tuples)
+    if (nodeset.count(mesh.node_ptr(std::get<0>(t))))
       {
-        node_id_list.push_back(full_node_id_list[i]);
-        bc_id_list.push_back(full_bc_id_list[i]);
+        node_id_list.push_back(std::get<0>(t));
+        bc_id_list.push_back(std::get<1>(t));
       }
 
   io.data(node_id_list, "# node id list");

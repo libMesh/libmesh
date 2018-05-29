@@ -1425,49 +1425,32 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase & pmesh)
       libMesh::out << std::endl;
     }
 
-  // We also need global counts of sides in each of the sidesets.  Again, there may be a
-  // better way to do this...
-  std::vector<dof_id_type> bndry_elem_list;
-  std::vector<unsigned short int> bndry_side_list;
-  std::vector<boundary_id_type> bndry_id_list;
-  pmesh.get_boundary_info().build_side_list(bndry_elem_list, bndry_side_list, bndry_id_list);
+  // We also need global counts of sides in each of the sidesets.
+  // Build a list of (elem, side, bc) tuples.
+  typedef std::tuple<dof_id_type, unsigned short int, boundary_id_type> Tuple;
+  std::vector<Tuple> bc_triples = pmesh.get_boundary_info().build_side_list();
 
-  // Similarly to the nodes, we can't count any sides for elements which aren't local
-  std::vector<dof_id_type>::iterator it_elem=bndry_elem_list.begin();
-  std::vector<unsigned short>::iterator it_side=bndry_side_list.begin();
-  std::vector<boundary_id_type>::iterator it_id=bndry_id_list.begin();
+  // Iterators to the beginning and end of the current range.
+  std::vector<Tuple>::iterator
+    it = bc_triples.begin(),
+    new_end = bc_triples.end();
 
-  // New end iterators, to be updated as we find non-local IDs
-  std::vector<dof_id_type>::iterator new_bndry_elem_list_end = bndry_elem_list.end();
-  std::vector<unsigned short>::iterator new_bndry_side_list_end = bndry_side_list.end();
-  std::vector<boundary_id_type>::iterator new_bndry_id_list_end = bndry_id_list.end();
-
-  for ( ; it_elem != new_bndry_elem_list_end; )
+  while (it != new_end)
     {
-      if (pmesh.elem_ref(*it_elem).processor_id() != this->processor_id())
+      if (pmesh.elem_ref(std::get<0>(*it)).processor_id() != this->processor_id())
         {
           // Back up the new end iterators to prepare for swap
-          --new_bndry_elem_list_end;
-          --new_bndry_side_list_end;
-          --new_bndry_id_list_end;
+          --new_end;
 
           // Swap places, the non-local elem will now be "past-the-end"
-          std::swap (*it_elem, *new_bndry_elem_list_end);
-          std::swap (*it_side, *new_bndry_side_list_end);
-          std::swap (*it_id, *new_bndry_id_list_end);
+          std::swap (*it, *new_end);
         }
       else // elem is local, go to next
-        {
-          ++it_elem;
-          ++it_side;
-          ++it_id;
-        }
+        ++it;
     }
 
-  // Erase from "new" end to old end on each vector.
-  bndry_elem_list.erase(new_bndry_elem_list_end, bndry_elem_list.end());
-  bndry_side_list.erase(new_bndry_side_list_end, bndry_side_list.end());
-  bndry_id_list.erase(new_bndry_id_list_end, bndry_id_list.end());
+  // Erase from "new" end to old.
+  bc_triples.erase(new_end, bc_triples.end());
 
   this->num_global_side_counts.clear(); // Make sure we don't have any leftover information
   this->num_global_side_counts.resize(this->global_sideset_ids.size());
@@ -1475,10 +1458,11 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase & pmesh)
   // Get the count for each global sideset ID
   for (std::size_t i=0; i<global_sideset_ids.size(); ++i)
     {
-      this->num_global_side_counts[i] = cast_int<int>
-        (std::count(bndry_id_list.begin(),
-                    bndry_id_list.end(),
-                    cast_int<boundary_id_type>(this->global_sideset_ids[i])));
+      int id = global_sideset_ids[i];
+      this->num_global_side_counts[i] =
+        cast_int<int>(std::count_if(bc_triples.begin(),
+                                    bc_triples.end(),
+                                    [id](const Tuple & t)->bool { return std::get<2>(t) == id; }));
     }
 
   if (verbose)
@@ -1545,21 +1529,18 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase & pmesh)
     }
 
   // 7.) We also need to know the number of nodes which is in each of the nodesets, globally.
-  // There is probably a better way to do this...
-  std::vector<dof_id_type> boundary_node_list;
-  std::vector<boundary_id_type> boundary_node_boundary_id_list;
-  pmesh.get_boundary_info().build_node_list
-    (boundary_node_list, boundary_node_boundary_id_list);
+
+  // Build list of (node-id, bc-id) tuples.
+  typedef std::tuple<dof_id_type, boundary_id_type> Tuple;
+  std::vector<Tuple> bc_tuples = pmesh.get_boundary_info().build_node_list();
 
   if (verbose)
     {
       libMesh::out << "[" << this->processor_id() << "] boundary_node_list.size()="
-                   << boundary_node_list.size() << std::endl;
+                   << bc_tuples.size() << std::endl;
       libMesh::out << "[" << this->processor_id() << "] (boundary_node_id, boundary_id) = ";
-      for (std::size_t i=0; i<boundary_node_list.size(); ++i)
-        {
-          libMesh::out << "(" << boundary_node_list[i] << ", " << boundary_node_boundary_id_list[i] << ") ";
-        }
+      for (const auto & t : bc_tuples)
+        libMesh::out << "(" << std::get<0>(t) << ", " << std::get<1>(t) << ") ";
       libMesh::out << std::endl;
     }
 
@@ -1574,42 +1555,35 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase & pmesh)
   // that would give us duplicate entries when we do the parallel summation.
   // So instead, only count entries for nodes owned by this processor.
   // Start by getting rid of all non-local node entries from the vectors.
-  std::vector<dof_id_type>::iterator it_node=boundary_node_list.begin();
-  std::vector<boundary_id_type>::iterator it_id=boundary_node_boundary_id_list.begin();
+  std::vector<Tuple>::iterator
+    it = bc_tuples.begin(),
+    new_end = bc_tuples.end();
 
-  // New end iterators, to be updated as we find non-local IDs
-  std::vector<dof_id_type>::iterator new_node_list_end = boundary_node_list.end();
-  std::vector<boundary_id_type>::iterator new_boundary_id_list_end = boundary_node_boundary_id_list.end();
-  for ( ; it_node != new_node_list_end; )
+  while (it != new_end)
     {
-      if (pmesh.node_ptr( *it_node )->processor_id() != this->processor_id())
+      if (pmesh.node_ptr(std::get<0>(*it))->processor_id() != this->processor_id())
         {
           // Back up the new end iterators to prepare for swap
-          --new_node_list_end;
-          --new_boundary_id_list_end;
+          --new_end;
 
           // Swap places, the non-local node will now be "past-the-end"
-          std::swap (*it_node, *new_node_list_end);
-          std::swap (*it_id, *new_boundary_id_list_end);
+          std::swap(*it, *new_end);
         }
       else // node is local, go to next
-        {
-          ++it_node;
-          ++it_id;
-        }
+        ++it;
     }
 
-  // Erase from "new" end to old end on each vector.
-  boundary_node_list.erase(new_node_list_end, boundary_node_list.end());
-  boundary_node_boundary_id_list.erase(new_boundary_id_list_end, boundary_node_boundary_id_list.end());
+  // Erase from "new" end to old end.
+  bc_tuples.erase(new_end, bc_tuples.end());
 
   // Now we can do the local count for each ID...
   for (std::size_t i=0; i<global_nodeset_ids.size(); ++i)
     {
-      this->num_global_node_counts[i] = cast_int<int>
-        (std::count(boundary_node_boundary_id_list.begin(),
-                    boundary_node_boundary_id_list.end(),
-                    cast_int<boundary_id_type>(this->global_nodeset_ids[i])));
+      int id = this->global_nodeset_ids[i];
+      this->num_global_node_counts[i] =
+        cast_int<int>(std::count_if(bc_tuples.begin(),
+                                    bc_tuples.end(),
+                                    [id](const Tuple & t)->bool { return std::get<1>(t) == id; }));
     }
 
   // And finally we can sum them up
@@ -2016,37 +1990,35 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
   // FIXME: We should build this list only one time!!  We already built it above, but we
   // did not have the libmesh to exodus node mapping at that time... for now we'll just
   // build it here again, hopefully it's small relative to the size of the entire mesh.
-  std::vector<dof_id_type> boundary_node_list;
-  std::vector<boundary_id_type> boundary_node_boundary_id_list;
-  mesh.get_boundary_info().build_node_list
-    (boundary_node_list, boundary_node_boundary_id_list);
+
+  // Build list of (node-id, bc-id) tuples.
+  typedef std::tuple<dof_id_type, boundary_id_type> Tuple;
+  std::vector<Tuple> bc_tuples = mesh.get_boundary_info().build_node_list();
 
   if (verbose)
     {
       libMesh::out << "[" << this->processor_id() << "] boundary_node_list.size()="
-                   << boundary_node_list.size() << std::endl;
+                   << bc_tuples.size() << std::endl;
       libMesh::out << "[" << this->processor_id() << "] (boundary_node_id, boundary_id) = ";
-      for (std::size_t i=0; i<boundary_node_list.size(); ++i)
-        {
-          libMesh::out << "(" << boundary_node_list[i] << ", " << boundary_node_boundary_id_list[i] << ") ";
-        }
+      for (const auto & t : bc_tuples)
+        libMesh::out << "(" << std::get<0>(t) << ", " << std::get<1>(t) << ") ";
       libMesh::out << std::endl;
     }
 
   // For each node in the node list, add it to the vector of node IDs for that
   // set for the local processor.  This will be used later when writing Exodus
   // nodesets.
-  for (std::size_t i=0; i<boundary_node_list.size(); ++i)
+  for (const auto & t : bc_tuples)
     {
       // Don't try to grab a reference to the vector unless the current node is attached
       // to a local element.  Otherwise, another processor will be responsible for writing it in its nodeset.
-      std::map<int, int>::iterator it = this->libmesh_node_num_to_exodus.find( boundary_node_list[i] );
+      std::map<int, int>::iterator it = this->libmesh_node_num_to_exodus.find(std::get<0>(t));
 
       if (it != this->libmesh_node_num_to_exodus.end())
         {
           // Get reference to the vector where this node ID will be inserted.  If it
           // doesn't yet exist, this will create it.
-          std::vector<int> & current_id_set = local_node_boundary_id_lists[ boundary_node_boundary_id_list[i] ];
+          std::vector<int> & current_id_set = local_node_boundary_id_lists[std::get<1>(t)];
 
           // Push back Exodus-mapped node ID for this set
           // TODO: reserve space in these vectors somehow.

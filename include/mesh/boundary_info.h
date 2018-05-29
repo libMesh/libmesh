@@ -30,6 +30,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <tuple>
 
 namespace libMesh
 {
@@ -642,9 +643,24 @@ public:
    *
    * On a ReplicatedMesh this will include all nodes; on a
    * DistributedMesh only semilocal nodes will be included.
+   *
+   * \deprecated Use the version of build_node_list() below that
+   * returns a std::vector of tuples instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   void build_node_list (std::vector<dof_id_type> &      node_id_list,
                         std::vector<boundary_id_type> & bc_id_list) const;
+#endif
+
+  /**
+   * As above, but the library creates and fills in a vector of
+   * (node-id, bc-id) pairs and returns it to the user, taking
+   * advantage of guaranteed RVO. Note: we could use std::pairs for
+   * this, but for consistency with the other build_XYZ_list
+   * functions, we're using tuples.
+   */
+  std::vector<std::tuple<dof_id_type, boundary_id_type>>
+  build_node_list() const;
 
   /**
    * Adds nodes with boundary ids based on the side's boundary
@@ -664,20 +680,47 @@ public:
    * On a ReplicatedMesh this will include all sides; on a
    * DistributedMesh only sides of semilocal elements will be
    * included.
+   *
+   * \deprecated Use the version of build_side_list() below that
+   * returns a std::vector of tuples instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   void build_side_list (std::vector<dof_id_type> &        element_id_list,
                         std::vector<unsigned short int> & side_list,
                         std::vector<boundary_id_type> &   bc_id_list) const;
+#endif
+
+  /**
+   * As above, but the library creates and fills in a vector of
+   * (elem-id, side-id, bc-id) triplets and returns it to the user,
+   * taking advantage of guaranteed RVO.
+   */
+  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
+  build_side_list() const;
+
   /**
    * Creates a list of active element numbers, sides, and ids for those sides.
    *
    * On a ReplicatedMesh this will include all sides; on a
    * DistributedMesh only sides of semilocal elements will be
    * included.
+   *
+   * \deprecated Use the version of build_active_side_list() below
+   * that returns a std::vector of tuples instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   void build_active_side_list (std::vector<dof_id_type> &        element_id_list,
                                std::vector<unsigned short int> & side_list,
                                std::vector<boundary_id_type> &   bc_id_list) const;
+#endif
+
+  /**
+   * As above, but the library creates and fills in a vector of
+   * (elem-id, side-id, bc-id) triplets and returns it to the user,
+   * taking advantage of guaranteed RVO.
+   */
+  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
+  build_active_side_list () const;
 
   /**
    * Creates a list of element numbers, edges, and boundary ids for those edges.
@@ -685,10 +728,23 @@ public:
    * On a ReplicatedMesh this will include all edges; on a
    * DistributedMesh only edges of semilocal elements will be
    * included.
+   *
+   * \deprecated Use the version of build_edge_list() below
+   * that returns a std::vector of tuples instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   void build_edge_list (std::vector<dof_id_type> &        element_id_list,
                         std::vector<unsigned short int> & edge_list,
                         std::vector<boundary_id_type> &   bc_id_list) const;
+#endif
+
+  /**
+   * As above, but the library creates and fills in a vector of
+   * (elem-id, side-id, bc-id) triplets and returns it to the user,
+   * taking advantage of guaranteed RVO.
+   */
+  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
+  build_edge_list() const;
 
   /**
    * Creates a list of element numbers, shellfaces, and boundary ids for those shellfaces.
@@ -696,10 +752,23 @@ public:
    * On a ReplicatedMesh this will include all shellfaces; on a
    * DistributedMesh only shellfaces of semilocal elements will be
    * included.
+   *
+   * \deprecated Use the version of build_shellface_list() below
+   * that returns a std::vector of tuples instead.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   void build_shellface_list (std::vector<dof_id_type> &        element_id_list,
                              std::vector<unsigned short int> & shellface_list,
                              std::vector<boundary_id_type> &   bc_id_list) const;
+#endif
+
+  /**
+   * As above, but the library creates and fills in a vector of
+   * (elem-id, side-id, bc-id) triplets and returns it to the user,
+   * taking advantage of guaranteed RVO.
+   */
+  std::vector<std::tuple<dof_id_type, unsigned short int, boundary_id_type>>
+  build_shellface_list() const;
 
   /**
    * \returns A set of the boundary ids which exist on semilocal parts

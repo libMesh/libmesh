@@ -864,18 +864,13 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
             // nodeset.
             if (mesh_array[i]->get_boundary_info().n_nodeset_conds() > 0)
               {
-                std::vector<numeric_index_type> node_id_list;
-                std::vector<boundary_id_type> bc_id_list;
-
-                // Get the list of nodes with associated boundary IDs
-                mesh_array[i]->get_boundary_info().build_node_list(node_id_list, bc_id_list);
-
-                for (std::size_t node_index=0; node_index<bc_id_list.size(); node_index++)
+                // build_node_list() returns a vector of (node-id, bc-id) tuples
+                for (const auto & t : mesh_array[i]->get_boundary_info().build_node_list())
                   {
-                    boundary_id_type node_bc_id = bc_id_list[node_index];
+                    boundary_id_type node_bc_id = std::get<1>(t);
                     if (node_bc_id == id_array[i])
                       {
-                        dof_id_type this_node_id = node_id_list[node_index];
+                        dof_id_type this_node_id = std::get<0>(t);
                         set_array[i]->insert( this_node_id );
 
                         // We need to set h_min to some value. It's too expensive to
@@ -1160,56 +1155,25 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
       BoundaryInfo & boundary = this->get_boundary_info();
       const BoundaryInfo & other_boundary = other_mesh->get_boundary_info();
 
-      {
-        std::vector<dof_id_type>      node_id_list;
-        std::vector<boundary_id_type> bc_id_list;
+      for (const auto & t : other_boundary.build_node_list())
+        boundary.add_node(std::get<0>(t) + node_delta,
+                          std::get<1>(t));
 
-        other_boundary.build_node_list(node_id_list, bc_id_list);
-        for (std::size_t i=0; i != node_id_list.size(); ++i)
-          {
-            const dof_id_type our_id = node_id_list[i] + node_delta;
-            boundary.add_node(our_id, bc_id_list[i]);
-          }
-      }
+      for (const auto & t : other_boundary.build_side_list())
+        boundary.add_side(std::get<0>(t) + elem_delta,
+                          std::get<1>(t),
+                          std::get<2>(t));
 
-      {
-        std::vector<dof_id_type>        elem_id_list;
-        std::vector<unsigned short int> side_list;
-        std::vector<boundary_id_type>   bc_id_list;
+      for (const auto & t : other_boundary.build_edge_list())
+        boundary.add_edge(std::get<0>(t) + elem_delta,
+                          std::get<1>(t),
+                          std::get<2>(t));
 
-        other_boundary.build_side_list(elem_id_list, side_list, bc_id_list);
-        for (std::size_t i=0; i != elem_id_list.size(); ++i)
-          {
-            const dof_id_type our_id = elem_id_list[i] + elem_delta;
-            boundary.add_side(our_id, side_list[i], bc_id_list[i]);
-          }
-      }
+      for (const auto & t : other_boundary.build_shellface_list())
+        boundary.add_shellface(std::get<0>(t) + elem_delta,
+                               std::get<1>(t),
+                               std::get<2>(t));
 
-      {
-        std::vector<dof_id_type>        elem_id_list;
-        std::vector<unsigned short int> edge_list;
-        std::vector<boundary_id_type>   bc_id_list;
-
-        other_boundary.build_edge_list(elem_id_list, edge_list, bc_id_list);
-        for (std::size_t i=0; i != elem_id_list.size(); ++i)
-          {
-            const dof_id_type our_id = elem_id_list[i] + elem_delta;
-            boundary.add_edge(our_id, edge_list[i], bc_id_list[i]);
-          }
-      }
-
-      {
-        std::vector<dof_id_type>        elem_id_list;
-        std::vector<unsigned short int> shellface_list;
-        std::vector<boundary_id_type>   bc_id_list;
-
-        other_boundary.build_shellface_list(elem_id_list, shellface_list, bc_id_list);
-        for (std::size_t i=0; i != elem_id_list.size(); ++i)
-          {
-            const dof_id_type our_id = elem_id_list[i] + elem_delta;
-            boundary.add_shellface(our_id, shellface_list[i], bc_id_list[i]);
-          }
-      }
     } // end if (other_mesh)
 
   // Finally, we need to "merge" the overlapping nodes

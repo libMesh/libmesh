@@ -1549,14 +1549,9 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
   std::vector<boundary_id_type> side_boundary_ids;
 
   {
-    std::vector<dof_id_type > el;
-    std::vector<unsigned short int > sl;
-    std::vector<boundary_id_type > il;
-
-    mesh.get_boundary_info().build_side_list(el, sl, il);
-
     // Accumulate the vectors to pass into ex_put_side_set
-    for (std::size_t i=0; i<el.size(); i++)
+    // build_side_list() returns a vector of (elem, side, bc) tuples.
+    for (const auto & t : mesh.get_boundary_info().build_side_list())
       {
         std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
@@ -1564,9 +1559,9 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
          * We need to build up active elements if AMR is enabled and add
          * them to the exodus sidesets instead of the potentially inactive "parent" elements
          */
-        mesh.elem_ref(el[i]).active_family_tree_by_side(family, sl[i], false);
+        mesh.elem_ref(std::get<0>(t)).active_family_tree_by_side(family, std::get<1>(t), false);
 #else
-        family.push_back(mesh.elem_ptr(el[i]));
+        family.push_back(mesh.elem_ptr(std::get<0>(t)));
 #endif
 
         for (std::size_t j=0; j<family.size(); ++j)
@@ -1576,8 +1571,8 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
             // Use the libmesh to exodus data structure map to get the proper sideset IDs
             // The data structure contains the "collapsed" contiguous ids
-            elem[il[i]].push_back(libmesh_elem_num_to_exodus[family[j]->id()]);
-            side[il[i]].push_back(conv.get_inverse_side_map(sl[i]));
+            elem[std::get<2>(t)].push_back(libmesh_elem_num_to_exodus[family[j]->id()]);
+            side[std::get<2>(t)].push_back(conv.get_inverse_side_map(std::get<1>(t)));
           }
       }
 
@@ -1587,14 +1582,8 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
   {
     // add data for shell faces, if needed
 
-    std::vector<dof_id_type > el;
-    std::vector<unsigned short int > sl;
-    std::vector<boundary_id_type > il;
-
-    mesh.get_boundary_info().build_shellface_list(el, sl, il);
-
     // Accumulate the vectors to pass into ex_put_side_set
-    for (std::size_t i=0; i<el.size(); i++)
+    for (const auto & t : mesh.get_boundary_info().build_shellface_list())
       {
         std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
@@ -1602,9 +1591,9 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
          * We need to build up active elements if AMR is enabled and add
          * them to the exodus sidesets instead of the potentially inactive "parent" elements
          */
-        mesh.elem_ref(el[i]).active_family_tree_by_side(family, sl[i], false);
+        mesh.elem_ref(std::get<0>(t)).active_family_tree_by_side(family, std::get<1>(t), false);
 #else
-        family.push_back(mesh.elem_ptr(el[i]));
+        family.push_back(mesh.elem_ptr(std::get<0>(t)));
 #endif
 
         for (std::size_t j=0; j<family.size(); ++j)
@@ -1614,8 +1603,8 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
             // Use the libmesh to exodus data structure map to get the proper sideset IDs
             // The data structure contains the "collapsed" contiguous ids
-            elem[il[i]].push_back(libmesh_elem_num_to_exodus[family[j]->id()]);
-            side[il[i]].push_back(conv.get_inverse_shellface_map(sl[i]));
+            elem[std::get<2>(t)].push_back(libmesh_elem_num_to_exodus[family[j]->id()]);
+            side[std::get<2>(t)].push_back(conv.get_inverse_shellface_map(std::get<1>(t)));
           }
       }
 
@@ -1661,17 +1650,13 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
-  std::vector<dof_id_type > nl;
-  std::vector<boundary_id_type > il;
-
-  mesh.get_boundary_info().build_node_list(nl, il);
-
   // Maps from nodeset id to the nodes
   std::map<boundary_id_type, std::vector<int>> node;
 
   // Accumulate the vectors to pass into ex_put_node_set
-  for (std::size_t i=0; i<nl.size(); i++)
-    node[il[i]].push_back(nl[i]+1);
+  // build_node_list() builds a list of (node-id, bc-id) tuples.
+  for (const auto & t : mesh.get_boundary_info().build_node_list())
+    node[std::get<1>(t)].push_back(std::get<0>(t) + 1);
 
   std::vector<boundary_id_type> node_boundary_ids;
   mesh.get_boundary_info().build_node_boundary_ids(node_boundary_ids);
