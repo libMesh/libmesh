@@ -27,47 +27,47 @@ namespace libMesh {
  */
 enum ElemType : int {
                // 1D
-               EDGE2=0,         // 0
-               EDGE3,           // 1
-               EDGE4,           // 2
+               EDGE2 = 0,
+               EDGE3 = 1,
+               EDGE4 = 2,
                // 2D
-               TRI3,            // 3
-               TRI6,            // 4
-               QUAD4,           // 5
-               QUAD8,           // 6
-               QUAD9,           // 7
+               TRI3 = 3,
+               TRI6 = 4,
+               QUAD4 = 5,
+               QUAD8 = 6,
+               QUAD9 = 7,
                // 3D
-               TET4,            // 8
-               TET10,           // 9
-               HEX8,            // 10
-               HEX20,           // 11
-               HEX27,           // 12
-               PRISM6,          // 13
-               PRISM15,         // 14
-               PRISM18,         // 15
-               PYRAMID5,        // 16
-               PYRAMID13,       // 17
-               PYRAMID14,       // 18
+               TET4 = 8,
+               TET10 = 9,
+               HEX8 = 10,
+               HEX20 = 11,
+               HEX27 = 12,
+               PRISM6 = 13,
+               PRISM15 = 14,
+               PRISM18 = 15,
+               PYRAMID5 = 16,
+               PYRAMID13 = 17,
+               PYRAMID14 = 18,
                // Infinite Elems
-               INFEDGE2,        // 19
-               INFQUAD4,        // 20
-               INFQUAD6,        // 21
-               INFHEX8,         // 22
-               INFHEX16,        // 23
-               INFHEX18,        // 24
-               INFPRISM6,       // 25
-               INFPRISM12,      // 26
+               INFEDGE2 = 19,
+               INFQUAD4 = 20,
+               INFQUAD6 = 21,
+               INFHEX8 = 22,
+               INFHEX16 = 23,
+               INFHEX18 = 24,
+               INFPRISM6 = 25,
+               INFPRISM12 = 26,
                // 0D
-               NODEELEM,        // 27
+               NODEELEM = 27,
                // Miscellaneous Elems
-               REMOTEELEM,      // 28
-               TRI3SUBDIVISION, // 29
+               REMOTEELEM = 28,
+               TRI3SUBDIVISION = 29,
                // Shell Elems
-               TRISHELL3,       // 30
-               QUADSHELL4,      // 31
-               QUADSHELL8,      // 32
+               TRISHELL3 = 30,
+               QUADSHELL4 = 31,
+               QUADSHELL8 = 32,
                // Invalid
-               INVALID_ELEM};   // 33 - should always be last
+               INVALID_ELEM};   // should always be last
 }
 
 #endif
