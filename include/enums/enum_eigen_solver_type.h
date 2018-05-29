@@ -71,4 +71,4 @@ enum PositionOfSpectrum : int {
                          INVALID_POSITION_OF_SPECTRUM};
 }
 
-#endif // LIBMESH_ENUM_EIGENSOLVER_TYPE_H
+#endif

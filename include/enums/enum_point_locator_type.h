@@ -35,4 +35,4 @@ enum PointLocatorType : int {
                        INVALID_LOCATOR};
 }
 
-#endif // LIBMESH_ENUM_POINT_LOCATOR_TYPE_H
+#endif

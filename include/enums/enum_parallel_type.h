@@ -34,4 +34,4 @@ enum ParallelType : int {
                    INVALID_PARALLELIZATION};
 }
 
-#endif // LIBMESH_ENUM_PARALLEL_TYPE_H
+#endif

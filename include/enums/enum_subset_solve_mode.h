@@ -42,4 +42,4 @@ enum SubsetSolveMode : int {
 
 }
 
-#endif // LIBMESH_ENUM_SUBSET_SOLVE_MODE_H
+#endif

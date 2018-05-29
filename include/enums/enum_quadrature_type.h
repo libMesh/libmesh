@@ -42,4 +42,4 @@ enum QuadratureType : int {
                      INVALID_Q_RULE    = 127};
 }
 
-#endif // LIBMESH_ENUM_QUADRATURE_TYPE_H
+#endif

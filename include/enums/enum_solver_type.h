@@ -49,4 +49,4 @@ enum SolverType : int {
                  INVALID_SOLVER};
 }
 
-#endif // LIBMESH_ENUM_SOLVER_TYPE_H
+#endif

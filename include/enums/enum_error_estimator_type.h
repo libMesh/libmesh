@@ -36,4 +36,4 @@ enum ErrorEstimatorType : int {
 
 }
 
-#endif // LIBMESH_ENUM_ERROR_ESTIMATOR_TYPE_H
+#endif

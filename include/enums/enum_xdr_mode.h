@@ -37,4 +37,4 @@ enum XdrMODE : int
   };
 }
 
-#endif // LIBMESH_ENUM_XDR_MODE_H
+#endif

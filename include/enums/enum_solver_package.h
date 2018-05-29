@@ -40,4 +40,4 @@ enum SolverPackage : int
   };
 }
 
-#endif // LIBMESH_ENUM_SOLVER_PACKAGE_H
+#endif

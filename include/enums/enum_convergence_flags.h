@@ -53,4 +53,4 @@ enum LinearConvergenceReason : int {
   UNKNOWN_FLAG                 = -128};
 }
 
-#endif // LIBMESH_ENUM_CONVERGENCE_FLAGS
+#endif

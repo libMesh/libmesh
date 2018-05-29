@@ -35,4 +35,4 @@ enum InfMapType : int {
 
 }
 
-#endif // LIBMESH_ENUM_INF_MAP_TYPE_H
+#endif

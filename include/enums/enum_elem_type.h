@@ -70,4 +70,4 @@ enum ElemType : int {
                INVALID_ELEM};   // 33 - should always be last
 }
 
-#endif // LIBMESH_ENUM_ELEM_TYPE_H
+#endif

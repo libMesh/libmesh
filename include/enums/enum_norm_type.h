@@ -56,4 +56,4 @@ enum FEMNormType : int {
                   INVALID_NORM    = 42};
 }
 
-#endif // LIBMESH_ENUM_NORM_TYPE_H
+#endif

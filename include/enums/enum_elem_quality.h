@@ -45,4 +45,4 @@ enum ElemQuality : int {
                   JACOBIAN};
 }
 
-#endif // LIBMESH_ENUM_ELEM_QUALITY_H
+#endif

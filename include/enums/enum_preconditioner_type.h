@@ -44,4 +44,4 @@ enum PreconditionerType : int {
                          INVALID_PRECONDITIONER};
 }
 
-#endif // LIBMESH_ENUM_PRECONDITIONER_TYPE_H
+#endif
