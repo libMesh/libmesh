@@ -1043,23 +1043,6 @@ typedef FE<3,MONOMIAL> FEMonomial3D;
 
 }
 
-
-
-// ------------------------------------------------------------
-// FE class inline members
-template <unsigned int Dim, FEFamily T>
-inline
-FE<Dim,T>::FE (const FEType & fet) :
-  FEGenericBase<typename FEOutputType<T>::type> (Dim,fet),
-  last_side(INVALID_ELEM),
-  last_edge(libMesh::invalid_uint)
-{
-  // Sanity check.  Make sure the
-  // Family specified in the template instantiation
-  // matches the one in the FEType object
-  libmesh_assert_equal_to (T, this->get_family());
-}
-
 } // namespace libMesh
 
 #endif // LIBMESH_FE_H
