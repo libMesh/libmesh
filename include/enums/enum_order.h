@@ -47,7 +47,6 @@ enum Order : int {
             SIXTEENTH    = 16,
             SEVENTEENTH  = 17,
             EIGHTTEENTH  = 18,
-            NINTEENTH    = 19, // deprecated
             NINETEENTH   = 19,
             TWENTIETH    = 20,
             TWENTYFIRST   = 21,
