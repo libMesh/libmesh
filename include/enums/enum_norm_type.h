@@ -20,47 +20,45 @@
 #ifndef LIBMESH_ENUM_NORM_TYPE_H
 #define LIBMESH_ENUM_NORM_TYPE_H
 
-// ------------------------------------------------------------
-// enum FEMNormType definition
 namespace libMesh {
 
 /**
  * \enum libMesh::FEMNormType defines an \p enum for norms
  * defined on vectors of finite element coefficients
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum FEMNormType : int;
+ * reducing header file dependencies.
  */
-// Hilbert norms and seminorms in FE space
-enum FEMNormType {L2              = 0,
+enum FEMNormType : int {
+                  // Hilbert norms and seminorms in FE space
+                  L2              = 0,
                   H1              = 1,
                   H2              = 2,
                   HCURL           = 3,
                   HDIV            = 4,
-
                   L1              = 5,
                   L_INF           = 6,
-
                   H1_SEMINORM     = 10,
-
                   H2_SEMINORM     = 11,
-
+                  // Vector FE norms
                   HCURL_SEMINORM  = 12,
-
                   HDIV_SEMINORM   = 13,
-
+                  // Sobolev infinity seminorms
                   W1_INF_SEMINORM = 15,
                   W2_INF_SEMINORM = 16,
-
                   // discrete norms on coefficient vectors
                   DISCRETE_L1     = 20,
                   DISCRETE_L2     = 21,
                   DISCRETE_L_INF  = 22,
-
                   // Seminorms based on only individual gradient
                   // directional components
                   H1_X_SEMINORM    = 31,
                   H1_Y_SEMINORM    = 32,
                   H1_Z_SEMINORM    = 33,
-
+                  // Invalid
                   INVALID_NORM    = 42};
 }
 
-#endif // LIBMESH_ENUM_NORM_TYPE_H
+#endif

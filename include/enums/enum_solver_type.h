@@ -20,14 +20,18 @@
 #ifndef LIBMESH_ENUM_SOLVER_TYPE_H
 #define LIBMESH_ENUM_SOLVER_TYPE_H
 
-// ------------------------------------------------------------
-// enum SolverType definition
 namespace libMesh {
 
 /**
- * Defines an \p enum for iterative solver types
+ * Defines an \p enum for iterative solver types.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum SolverType : int;
+ * reducing header file dependencies.
  */
-enum SolverType {CG=0,
+enum SolverType : int {
+                 CG=0,
                  CGN,
                  CGS,
                  CR,
@@ -46,8 +50,8 @@ enum SolverType {CG=0,
                  RICHARDSON,
                  CHEBYSHEV,
                  SPARSELU,
-
+                 // Invalid
                  INVALID_SOLVER};
 }
 
-#endif // LIBMESH_ENUM_SOLVER_TYPE_H
+#endif

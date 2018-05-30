@@ -20,16 +20,18 @@
 #ifndef LIBMESH_ENUM_SOLVER_PACKAGE_H
 #define LIBMESH_ENUM_SOLVER_PACKAGE_H
 
-// ------------------------------------------------------------
-// enum SolverType definition
 namespace libMesh {
 
 /**
  * Defines an \p enum for various linear solver packages.
  * This allows for run-time switching between solver packages
  *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum SolverPackage : int;
+ * reducing header file dependencies.
  */
-enum SolverPackage
+enum SolverPackage : int
   {
     PETSC_SOLVERS=0,
     TRILINOS_SOLVERS,
@@ -37,9 +39,9 @@ enum SolverPackage
     SLEPC_SOLVERS,
     EIGEN_SOLVERS,
     NLOPT_SOLVERS,
-
+    // Invalid
     INVALID_SOLVER_PACKAGE
   };
 }
 
-#endif // LIBMESH_ENUM_SOLVER_PACKAGE_H
+#endif

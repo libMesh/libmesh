@@ -243,6 +243,9 @@
 /* Compiler supports final keyword, but it is disabled in libmesh */
 #undef HAVE_CXX11_FINAL_BUT_DISABLED
 
+/* Flag indicating whether compiler supports fixed type enumerations */
+#undef HAVE_CXX11_FIXED_TYPE_ENUM
+
 /* Flag indicating whether compiler supports initializer lists */
 #undef HAVE_CXX11_INITIALIZER_LIST
 

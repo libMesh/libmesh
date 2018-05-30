@@ -99,6 +99,41 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TUPLE],
     AM_CONDITIONAL(HAVE_CXX11_TUPLE, test x$have_cxx11_tuple == xyes)
   ])
 
+dnl Test C++11 fixed type enumerations.
+AC_DEFUN([LIBMESH_TEST_CXX11_FIXED_TYPE_ENUM],
+  [
+    have_cxx11_fixed_type_enum=no
+
+    AC_MSG_CHECKING(for C++11 fixed type enumeration support)
+    AC_LANG_PUSH([C++])
+
+    dnl For this and all of the C++ standards tests: Save the original
+    dnl CXXFLAGS (if any) before appending the $switch determined by
+    dnl AX_CXX_COMPILE_STDCXX_11, and any compiler flags specified by
+    dnl the user in the libmesh_CXXFLAGS environment variable, letting
+    dnl that override everything else.
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    enum Fruit : int {APPLE=0, ORANGE=1};
+    ]], [[
+    Fruit f = APPLE;
+    ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_FIXED_TYPE_ENUM, 1, [Flag indicating whether compiler supports fixed type enumerations])
+        have_cxx11_fixed_type_enum=yes
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    dnl Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+
+    AM_CONDITIONAL(HAVE_CXX11_FIXED_TYPE_ENUM, test x$have_cxx11_fixed_type_enum == xyes)
+  ])
+
 dnl Properly implemented move constructors require rvalue references,
 dnl std::move, and noexcept, so this tests for all of those features.
 AC_DEFUN([LIBMESH_TEST_CXX11_MOVE_CONSTRUCTORS],

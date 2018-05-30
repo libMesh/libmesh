@@ -20,21 +20,31 @@
 #ifndef LIBMESH_ENUM_SUBSET_SOLVE_MODE_H
 #define LIBMESH_ENUM_SUBSET_SOLVE_MODE_H
 
-// ------------------------------------------------------------
-// enum SubsetSolveMode definition
 namespace libMesh {
 
 /**
- * \enum SubsetSolveMode defines an \p enum for the
- * question what happens to the dofs outside the given subset when a
- * system is solved on a subset.
+ * \enum SubsetSolveMode defines an \p enum for the question what
+ * happens to the dofs outside the given subset when a system is
+ * solved on a subset.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum SubsetSolveMode : int;
+ * reducing header file dependencies.
  */
-enum SubsetSolveMode {
-  SUBSET_ZERO = 0, //!< Set dofs outside the subset to zero.
-  SUBSET_COPY_RHS, //!< Set dofs outside the subset to the value of the corresponding dofs of the right hand side.
-  SUBSET_DONT_TOUCH //!< Leaves dofs outside the subset unchanged.  This is fastest, but also most confusing because it abandons the property that the solution vector is (theoretically) independent of the initial guess.
+enum SubsetSolveMode : int {
+  // Set dofs outside the subset to zero.
+  SUBSET_ZERO = 0,
+  // Set dofs outside the subset to the value of the corresponding
+  // dofs of the right hand side.
+  SUBSET_COPY_RHS,
+  // Leaves dofs outside the subset unchanged.  This is fastest, but
+  // also most confusing because it abandons the property that the
+  // solution vector is (theoretically) independent of the initial
+  // guess.
+  SUBSET_DONT_TOUCH
 };
 
 }
 
-#endif // LIBMESH_ENUM_SUBSET_SOLVE_MODE_H
+#endif

@@ -22,7 +22,16 @@
 
 namespace libMesh {
 
-enum ErrorEstimatorType {INVALID                 = -1,
+/**
+ * Defines an \p enum for the different types of error estimators which are available.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum ErrorEstimatorType : int;
+ * reducing header file dependencies.
+ */
+enum ErrorEstimatorType : int {
+                         INVALID                 = -1,
                          ADJOINT_REFINEMENT      =  0,
                          ADJOINT_RESIDUAL        =  1,
                          DISCONTINUITY_MEASURE   =  2,
@@ -33,6 +42,6 @@ enum ErrorEstimatorType {INVALID                 = -1,
                          WEIGHTED_PATCH_RECOVERY =  7,
                          UNIFORM_REFINEMENT      =  8};
 
-} // end namespace libMesh
+}
 
-#endif // LIBMESH_ENUM_ERROR_ESTIMATOR_TYPE_H
+#endif

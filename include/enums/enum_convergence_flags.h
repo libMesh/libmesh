@@ -20,15 +20,18 @@
 #ifndef LIBMESH_ENUM_CONVERGENCE_FLAGS
 #define LIBMESH_ENUM_CONVERGENCE_FLAGS
 
-// ------------------------------------------------------------
-// enum ConvergenceFlags definition
 namespace libMesh {
 
 /**
- * Linear solver convergence flags (taken from the PETSc flags)
+ * Linear solver convergence flags (taken from the PETSc flags).
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum LinearConvergenceReason : int;
+ * reducing header file dependencies.
  */
-enum LinearConvergenceReason {
-  /* converged */
+enum LinearConvergenceReason : int {
+  // converged
   CONVERGED_RTOL_NORMAL        =  1,
   CONVERGED_ATOL_NORMAL        =  9,
   CONVERGED_RTOL               =  2,
@@ -38,7 +41,7 @@ enum LinearConvergenceReason {
   CONVERGED_CG_CONSTRAINED     =  6,
   CONVERGED_STEP_LENGTH        =  7,
   CONVERGED_HAPPY_BREAKDOWN    =  8,
-  /* diverged */
+  // diverged
   DIVERGED_NULL                = -2,
   DIVERGED_ITS                 = -3,
   DIVERGED_DTOL                = -4,
@@ -49,10 +52,10 @@ enum LinearConvergenceReason {
   DIVERGED_NAN                 = -9,
   DIVERGED_INDEFINITE_MAT      = -10,
   DIVERGED_PCSETUP_FAILED      = -11,
-
+  // still running
   CONVERGED_ITERATING          =  0,
-
+  // Invalid
   UNKNOWN_FLAG                 = -128};
 }
 
-#endif // LIBMESH_ENUM_CONVERGENCE_FLAGS
+#endif

@@ -20,19 +20,23 @@
 #ifndef LIBMESH_ENUM_PARALLEL_TYPE_H
 #define LIBMESH_ENUM_PARALLEL_TYPE_H
 
-// ------------------------------------------------------------
-// enum SolverType definition
 namespace libMesh {
 
 /**
- * Defines an \p enum for parallel data structure types
+ * Defines an \p enum for parallel data structure types.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum ParallelType : int;
+ * reducing header file dependencies.
  */
-enum ParallelType {AUTOMATIC=0,
+enum ParallelType : int {
+                   AUTOMATIC=0,
                    SERIAL,
                    PARALLEL,
                    GHOSTED,
-
+                   // Invalid
                    INVALID_PARALLELIZATION};
 }
 
-#endif // LIBMESH_ENUM_PARALLEL_TYPE_H
+#endif

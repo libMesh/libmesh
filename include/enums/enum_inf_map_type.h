@@ -20,19 +20,24 @@
 #ifndef LIBMESH_ENUM_INF_MAP_TYPE_H
 #define LIBMESH_ENUM_INF_MAP_TYPE_H
 
-// ------------------------------------------------------------
-// enum Order definition
 namespace libMesh {
 
 /**
  * \enum libMesh::InfMapType defines an \p enum for the
  * types of coordinate mappings available in infinite elements.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum InfMapType : int;
+ * reducing header file dependencies.
  */
-enum InfMapType {CARTESIAN=0,
+enum InfMapType : int {
+                 CARTESIAN=0,
                  SPHERICAL,
                  ELLIPSOIDAL,
+                 // Invalid
                  INVALID_INF_MAP};
 
 }
 
-#endif // LIBMESH_ENUM_INF_MAP_TYPE_H
+#endif

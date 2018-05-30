@@ -20,26 +20,24 @@
 #ifndef LIBMESH_ENUM_EIGENSOLVER_TYPE_H
 #define LIBMESH_ENUM_EIGENSOLVER_TYPE_H
 
-// ------------------------------------------------------------
-// enum SolverType definition
 namespace libMesh {
 
 /**
  * Defines an \p enum for iterative eigenproblem solver types
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum EigenSolverType : int;
+ * reducing header file dependencies.
  */
-enum EigenSolverType {POWER=0,
+enum EigenSolverType : int {
+                      POWER=0,
                       LAPACK,
                       SUBSPACE,
                       ARNOLDI,
                       LANCZOS,
                       KRYLOVSCHUR,
-                      // SLEPc optional packages
-                      // EPSARPACK,
-                      // EPSLAPACK,
-                      // EPSBLZPACK,
-                      // EPSPLANSO,
-                      // EPSTRLAN,
-
+                      // Invalid
                       INVALID_EIGENSOLVER};
 
 /**
@@ -47,13 +45,19 @@ enum EigenSolverType {POWER=0,
  * This can be Hermitian (HEP), generalized Hermitian (GHEP),
  * non-Hermitian (NHEP), generalized non-Hermitian (GNHEP), or
  * generalized indefinite Hermitian (GHIEP).
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum EigenProblemType : int;
+ * reducing header file dependencies.
  */
-enum EigenProblemType {NHEP=0,
+enum EigenProblemType : int {
+                       NHEP=0,
                        HEP,
                        GNHEP,
                        GHEP,
                        GHIEP,
-
+                       // Invalid
                        INVALID_EIGENPROBLEMTYPE};
 
 
@@ -61,8 +65,14 @@ enum EigenProblemType {NHEP=0,
 /**
  * Defines an \p enum for the position of
  * the spectrum, i.e. the eigenvalues to be computed.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum PositionOfSpectrum : int;
+ * reducing header file dependencies.
  */
-enum PositionOfSpectrum {LARGEST_MAGNITUDE=0,
+enum PositionOfSpectrum : int {
+                         LARGEST_MAGNITUDE=0,
                          SMALLEST_MAGNITUDE,
                          TARGET_MAGNITUDE,
                          LARGEST_REAL,
@@ -71,8 +81,9 @@ enum PositionOfSpectrum {LARGEST_MAGNITUDE=0,
                          LARGEST_IMAGINARY,
                          SMALLEST_IMAGINARY,
                          TARGET_IMAGINARY,
+                         // Invalid
                          INVALID_Postion_of_Spectrum,
                          INVALID_POSITION_OF_SPECTRUM};
 }
 
-#endif // LIBMESH_ENUM_EIGENSOLVER_TYPE_H
+#endif

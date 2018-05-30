@@ -20,16 +20,25 @@
 #ifndef LIBMESH_ENUM_ORDER_H
 #define LIBMESH_ENUM_ORDER_H
 
-// ------------------------------------------------------------
-// enum Order definition
 namespace libMesh {
 
 /**
  * \enum libMesh::Order defines an \p enum for polynomial orders.
  * Fixing each label to a specific int, since \p InfFE and p refinement
- * may cast between them
+ * may cast between them.
+ *
+ * \note It is possible to safely cast integral values larger than 43
+ * to Order, provided that the cast value fits in the range of int. A
+ * potential use case for such a cast is when employing the QGrid
+ * class at extremely high order.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum Order : int;
+ * reducing header file dependencies.
  */
-enum Order {CONSTANT     =  0,
+enum Order : int {
+            CONSTANT     =  0,
             FIRST        =  1,
             SECOND       =  2,
             THIRD        =  3,
@@ -40,7 +49,6 @@ enum Order {CONSTANT     =  0,
             EIGHTH       =  8,
             NINTH        =  9,
             TENTH        = 10,
-
             ELEVENTH     = 11,
             TWELFTH      = 12,
             THIRTEENTH   = 13,
@@ -49,10 +57,8 @@ enum Order {CONSTANT     =  0,
             SIXTEENTH    = 16,
             SEVENTEENTH  = 17,
             EIGHTTEENTH  = 18,
-            NINTEENTH    = 19, // deprecated
             NINETEENTH   = 19,
             TWENTIETH    = 20,
-
             TWENTYFIRST   = 21,
             TWENTYSECOND  = 22,
             TWENTYTHIRD   = 23,
@@ -63,7 +69,6 @@ enum Order {CONSTANT     =  0,
             TWENTYEIGHTH  = 28,
             TWENTYNINTH   = 29,
             THIRTIETH     = 30,
-
             THIRTYFIRST   = 31,
             THIRTYSECOND  = 32,
             THIRTYTHIRD   = 33,
@@ -74,13 +79,12 @@ enum Order {CONSTANT     =  0,
             THIRTYEIGHTH  = 38,
             THIRTYNINTH   = 39,
             FORTIETH     = 40,
-
             FORTYFIRST   = 41,
             FORTYSECOND  = 42,
             FORTYTHIRD   = 43,
-
+            // Invalid
             INVALID_ORDER};
 
 }
 
-#endif // LIBMESH_ENUM_ORDER_H
+#endif
