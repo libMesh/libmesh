@@ -23,9 +23,14 @@
 namespace libMesh {
 
 /**
- * \enum SubsetSolveMode defines an \p enum for the
- * question what happens to the dofs outside the given subset when a
- * system is solved on a subset.
+ * \enum SubsetSolveMode defines an \p enum for the question what
+ * happens to the dofs outside the given subset when a system is
+ * solved on a subset.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum SubsetSolveMode : int;
+ * reducing header file dependencies.
  */
 enum SubsetSolveMode : int {
   // Set dofs outside the subset to zero.

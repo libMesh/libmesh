@@ -23,7 +23,12 @@
 namespace libMesh {
 
 /**
- * Defines an \p enum for parallel data structure types
+ * Defines an \p enum for parallel data structure types.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum ParallelType : int;
+ * reducing header file dependencies.
  */
 enum ParallelType : int {
                    AUTOMATIC=0,

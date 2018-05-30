@@ -26,6 +26,11 @@ namespace libMesh {
  * \enum PointLocatorType defines an \p enum for the types
  * of point locators (given a point with global coordinates,
  * locate the corresponding element in space) available in libMesh.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum PointLocatorType : int;
+ * reducing header file dependencies.
  */
 enum PointLocatorType : int {
                        TREE = 0,

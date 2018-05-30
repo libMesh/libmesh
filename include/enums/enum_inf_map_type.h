@@ -25,6 +25,11 @@ namespace libMesh {
 /**
  * \enum libMesh::InfMapType defines an \p enum for the
  * types of coordinate mappings available in infinite elements.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum InfMapType : int;
+ * reducing header file dependencies.
  */
 enum InfMapType : int {
                  CARTESIAN=0,

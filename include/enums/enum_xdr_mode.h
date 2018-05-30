@@ -26,6 +26,11 @@ namespace libMesh {
  * Defines an \p enum for read/write mode in Xdr format.
  * \p READ, \p WRITE perform reading and writing in ASCII format,
  * and \p DECODE, \p ENCODE do the same in binary format.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum XdrMODE : int;
+ * reducing header file dependencies.
  */
 enum XdrMODE : int
   {

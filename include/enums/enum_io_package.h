@@ -28,6 +28,11 @@ namespace libMesh {
  * for the purposes of creating, reading, and writing mesh files.
  * These enumerations give an easy way of selecting one or the
  * other.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum IOPackage : int;
+ * reducing header file dependencies.
  */
 enum IOPackage : int
   {

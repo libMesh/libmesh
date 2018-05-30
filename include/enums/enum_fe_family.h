@@ -25,6 +25,11 @@ namespace libMesh {
 /**
  * \enum libMesh::FEFamily defines an \p enum for finite
  * element families.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum FEFamily : int;
+ * reducing header file dependencies.
  */
 enum FEFamily : int {
                // C0
@@ -60,6 +65,11 @@ enum FEFamily : int {
 /**
  * \enum libMesh::FEContinuity defines an \p enum for finite element
  * types to libmesh_assert a certain level (or type? Hcurl?) of continuity.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum FEContinuity : int;
+ * reducing header file dependencies.
  */
 enum FEContinuity : int {
                    DISCONTINUOUS,
@@ -70,6 +80,11 @@ enum FEContinuity : int {
 /**
  * \enum libMesh::FEFieldType defines an \p enum for finite element
  * field types - i.e. is it a scalar element, vector, tensor, etc.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum FEFieldType : int;
+ * reducing header file dependencies.
  */
 enum FEFieldType : int {
                   TYPE_SCALAR = 0,

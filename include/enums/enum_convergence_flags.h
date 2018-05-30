@@ -23,7 +23,12 @@
 namespace libMesh {
 
 /**
- * Linear solver convergence flags (taken from the PETSc flags)
+ * Linear solver convergence flags (taken from the PETSc flags).
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum LinearConvergenceReason : int;
+ * reducing header file dependencies.
  */
 enum LinearConvergenceReason : int {
   // converged

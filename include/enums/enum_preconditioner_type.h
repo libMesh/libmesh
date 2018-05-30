@@ -23,7 +23,12 @@
 namespace libMesh {
 
 /**
- * Defines an \p enum for preconditioner types
+ * Defines an \p enum for preconditioner types.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum PreconditionerType : int;
+ * reducing header file dependencies.
  */
 enum PreconditionerType : int {
                          IDENTITY_PRECOND =0,

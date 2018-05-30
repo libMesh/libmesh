@@ -24,6 +24,11 @@ namespace libMesh {
 
 /**
  * Defines an \p enum for iterative eigenproblem solver types
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum EigenSolverType : int;
+ * reducing header file dependencies.
  */
 enum EigenSolverType : int {
                       POWER=0,
@@ -40,6 +45,11 @@ enum EigenSolverType : int {
  * This can be Hermitian (HEP), generalized Hermitian (GHEP),
  * non-Hermitian (NHEP), generalized non-Hermitian (GNHEP), or
  * generalized indefinite Hermitian (GHIEP).
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum EigenProblemType : int;
+ * reducing header file dependencies.
  */
 enum EigenProblemType : int {
                        NHEP=0,
@@ -55,6 +65,11 @@ enum EigenProblemType : int {
 /**
  * Defines an \p enum for the position of
  * the spectrum, i.e. the eigenvalues to be computed.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum PositionOfSpectrum : int;
+ * reducing header file dependencies.
  */
 enum PositionOfSpectrum : int {
                          LARGEST_MAGNITUDE=0,

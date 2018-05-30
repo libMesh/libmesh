@@ -23,7 +23,12 @@
 namespace libMesh {
 
 /**
- * Defines an \p enum for iterative solver types
+ * Defines an \p enum for iterative solver types.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum SolverType : int;
+ * reducing header file dependencies.
  */
 enum SolverType : int {
                  CG=0,

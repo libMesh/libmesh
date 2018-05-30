@@ -25,6 +25,11 @@ namespace libMesh
 
 /**
  * Defines an \p enum for element quality metrics.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum ElemQuality : int;
+ * reducing header file dependencies.
  */
 enum ElemQuality : int {
                   ASPECT_RATIO=0,

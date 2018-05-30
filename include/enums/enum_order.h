@@ -25,10 +25,17 @@ namespace libMesh {
 /**
  * \enum libMesh::Order defines an \p enum for polynomial orders.
  * Fixing each label to a specific int, since \p InfFE and p refinement
- * may cast between them. Note that it is possible to safely cast
- * integral values larger than 43 to Order, provided that the cast
- * value fits in the range of int. A potential use case for such a
- * cast is when employing the QGrid class at extremely high order.
+ * may cast between them.
+ *
+ * \note It is possible to safely cast integral values larger than 43
+ * to Order, provided that the cast value fits in the range of int. A
+ * potential use case for such a cast is when employing the QGrid
+ * class at extremely high order.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum Order : int;
+ * reducing header file dependencies.
  */
 enum Order : int {
             CONSTANT     =  0,

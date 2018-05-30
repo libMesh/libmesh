@@ -25,6 +25,11 @@ namespace libMesh {
 /**
  * \enum libMesh::FEMNormType defines an \p enum for norms
  * defined on vectors of finite element coefficients
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum FEMNormType : int;
+ * reducing header file dependencies.
  */
 enum FEMNormType : int {
                   // Hilbert norms and seminorms in FE space

@@ -24,6 +24,11 @@ namespace libMesh {
 
 /**
  * Defines an \p enum for geometric element types.
+ *
+ * The fixed type, i.e. ": int", enumeration syntax used here allows
+ * this enum to be forward declared as
+ * enum ElemType : int;
+ * reducing header file dependencies.
  */
 enum ElemType : int {
                // 1D
