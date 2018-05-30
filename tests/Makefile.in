@@ -1145,7 +1145,7 @@ unit_tests_sources = driver.C test_comm.h stream_redirector.h \
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_LDADD = $(top_builddir)/libmesh_opt.la
 @LIBMESH_ENABLE_CPPUNIT_TRUE@TESTS = run_unit_tests.sh
 CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
-	$(am__append_12)
+	mesh_with_soln.e $(am__append_12)
 all: all-am
 
 .SUFFIXES:

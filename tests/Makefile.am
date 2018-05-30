@@ -186,7 +186,8 @@ endif
 
 CLEANFILES = cube_mesh.xda \
              slit_mesh.xda slit_solution.xda \
-	     out.e
+	     out.e \
+	     mesh_with_soln.e
 
 # CLEANFILES only applies to files, handle directories separately
 clean-local:
