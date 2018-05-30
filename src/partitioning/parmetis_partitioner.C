@@ -192,41 +192,12 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
 // Only need to compile these methods if ParMETIS is present
 #ifdef LIBMESH_HAVE_PARMETIS
 
-struct SyncLocalIDs
-{
-  typedef dof_id_type datum;
-
-  typedef std::unordered_map<dof_id_type, dof_id_type> map_type;
-
-  SyncLocalIDs(map_type & _id_map) : id_map(_id_map) {}
-
-  map_type & id_map;
-
-  void gather_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> & local_ids)
-  {
-    local_ids.resize(ids.size());
-
-    for (std::size_t i=0, imax = ids.size(); i != imax; ++i)
-      local_ids[i] = id_map[ids[i]];
-  }
-
-  void act_on_data (const std::vector<dof_id_type> & ids,
-                    const std::vector<datum> & local_ids)
-  {
-    for (std::size_t i=0, imax = local_ids.size(); i != imax; ++i)
-      id_map[ids[i]] = local_ids[i];
-  }
-};
-
-
 void ParmetisPartitioner::initialize (const MeshBase & mesh,
                                       const unsigned int n_sbdmns)
 {
   LOG_SCOPE("initialize()", "ParmetisPartitioner");
 
   const dof_id_type n_active_local_elem = mesh.n_active_local_elem();
-
   // Set parameters.
   _pmetis->wgtflag = 2;                                      // weights on vertices only
   _pmetis->ncon    = 1;                                      // one weight per vertex
@@ -249,13 +220,20 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
   _pmetis->options[2] = 15; // random seed (default)
   _pmetis->options[3] = 2;  // processor distribution and subdomain distribution are decoupled
 
-  // Find the number of active elements on each processor.  We cannot use
-  // mesh.n_active_elem_on_proc(pid) since that only returns the number of
-  // elements assigned to pid which are currently stored on the calling
-  // processor. This will not in general be correct for parallel meshes
-  // when (pid!=mesh.processor_id()).
-  _n_active_elem_on_proc.resize(mesh.n_processors());
-  mesh.comm().allgather(n_active_local_elem, _n_active_elem_on_proc);
+  // ParMetis expects the elements to be numbered in contiguous blocks
+  // by processor, i.e. [0, ne0), [ne0, ne0+ne1), ...
+  // Since we only partition active elements we should have no expectation
+  // that we currently have such a distribution.  So we need to create it.
+  // Also, at the same time we are going to map all the active elements into a globally
+  // unique range [0,n_active_elem) which is *independent* of the current partitioning.
+  // This can be fed to ParMetis as the initial partitioning of the subdomains (decoupled
+  // from the partitioning of the objects themselves).  This allows us to get the same
+  // resultant partitioning independent of the input partitioning.
+  libMesh::BoundingBox bbox =
+    MeshTools::create_bounding_box(mesh);
+
+  _find_global_index_by_pid_map(mesh);
+
 
   // count the total number of active elements in the mesh.  Note we cannot
   // use mesh.n_active_elem() in general since this only returns the number
@@ -277,19 +255,6 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
     }
   libmesh_assert_equal_to (_pmetis->vtxdist.back(), static_cast<Parmetis::idx_t>(n_active_elem));
 
-  // ParMetis expects the elements to be numbered in contiguous blocks
-  // by processor, i.e. [0, ne0), [ne0, ne0+ne1), ...
-  // Since we only partition active elements we should have no expectation
-  // that we currently have such a distribution.  So we need to create it.
-  // Also, at the same time we are going to map all the active elements into a globally
-  // unique range [0,n_active_elem) which is *independent* of the current partitioning.
-  // This can be fed to ParMetis as the initial partitioning of the subdomains (decoupled
-  // from the partitioning of the objects themselves).  This allows us to get the same
-  // resultant partitioning independent of the input partitioning.
-  libMesh::BoundingBox bbox =
-    MeshTools::create_bounding_box(mesh);
-
-  _global_index_by_pid_map.clear();
 
   // Maps active element ids into a contiguous range independent of partitioning.
   // (only needs local scope)
@@ -297,37 +262,6 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
 
   {
     std::vector<dof_id_type> global_index;
-
-    // create the mapping which is contiguous by processor
-    {
-      MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
-
-      MeshCommunication().find_local_indices (bbox, it, end,
-                                              _global_index_by_pid_map);
-    }
-
-    SyncLocalIDs sync(_global_index_by_pid_map);
-
-    Parallel::sync_dofobject_data_by_id
-      (mesh.comm(), mesh.active_elements_begin(), mesh.active_elements_end(), sync);
-
-    dof_id_type pid_offset=0;
-    for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
-      {
-        MeshBase::const_element_iterator       it  = mesh.active_pid_elements_begin(pid);
-        const MeshBase::const_element_iterator end = mesh.active_pid_elements_end(pid);
-
-        for (; it != end; ++it)
-          {
-            const Elem * elem = *it;
-            libmesh_assert_less (_global_index_by_pid_map[elem->id()], _n_active_elem_on_proc[pid]);
-
-            _global_index_by_pid_map[elem->id()] += pid_offset;
-          }
-
-        pid_offset += _n_active_elem_on_proc[pid];
-      }
 
     // create the unique mapping for all active elements independent of partitioning
     {

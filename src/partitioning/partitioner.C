@@ -25,6 +25,7 @@
 #include "libmesh/mesh_tools.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/parallel_ghost_sync.h"
 
 namespace libMesh
 {
@@ -583,6 +584,82 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
   MeshTools::libmesh_assert_valid_procids<Node>(mesh);
   MeshTools::libmesh_assert_canonical_node_procids(mesh);
 #endif
+}
+
+struct SyncLocalIDs
+{
+  typedef dof_id_type datum;
+
+  typedef std::unordered_map<dof_id_type, dof_id_type> map_type;
+
+  SyncLocalIDs(map_type & _id_map) : id_map(_id_map) {}
+
+  map_type & id_map;
+
+  void gather_data (const std::vector<dof_id_type> & ids,
+                    std::vector<datum> & local_ids)
+  {
+    local_ids.resize(ids.size());
+
+    for (std::size_t i=0, imax = ids.size(); i != imax; ++i)
+      local_ids[i] = id_map[ids[i]];
+  }
+
+  void act_on_data (const std::vector<dof_id_type> & ids,
+                    const std::vector<datum> & local_ids)
+  {
+    for (std::size_t i=0, imax = local_ids.size(); i != imax; ++i)
+      id_map[ids[i]] = local_ids[i];
+  }
+};
+
+void Partitioner::_find_global_index_by_pid_map(const MeshBase & mesh)
+{
+  const dof_id_type n_active_local_elem = mesh.n_active_local_elem();
+
+  // Find the number of active elements on each processor.  We cannot use
+  // mesh.n_active_elem_on_proc(pid) since that only returns the number of
+  // elements assigned to pid which are currently stored on the calling
+  // processor. This will not in general be correct for parallel meshes
+  // when (pid!=mesh.processor_id()).
+  _n_active_elem_on_proc.resize(mesh.n_processors());
+  mesh.comm().allgather(n_active_local_elem, _n_active_elem_on_proc);
+
+  libMesh::BoundingBox bbox =
+    MeshTools::create_bounding_box(mesh);
+
+  _global_index_by_pid_map.clear();
+
+  // create the mapping which is contiguous by processor
+  {
+    MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
+    const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
+
+    MeshCommunication().find_local_indices (bbox, it, end,
+                                              _global_index_by_pid_map);
+  }
+
+  SyncLocalIDs sync(_global_index_by_pid_map);
+
+  Parallel::sync_dofobject_data_by_id
+      (mesh.comm(), mesh.active_elements_begin(), mesh.active_elements_end(), sync);
+
+  dof_id_type pid_offset=0;
+  for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
+    {
+      MeshBase::const_element_iterator       it  = mesh.active_pid_elements_begin(pid);
+      const MeshBase::const_element_iterator end = mesh.active_pid_elements_end(pid);
+
+      for (; it != end; ++it)
+        {
+          const Elem * elem = *it;
+          libmesh_assert_less (_global_index_by_pid_map[elem->id()], _n_active_elem_on_proc[pid]);
+
+          _global_index_by_pid_map[elem->id()] += pid_offset;
+        }
+
+      pid_offset += _n_active_elem_on_proc[pid];
+    }
 }
 
 } // namespace libMesh

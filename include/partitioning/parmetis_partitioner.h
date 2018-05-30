@@ -106,20 +106,6 @@ private:
   void assign_partitioning (MeshBase & mesh);
 
   /**
-   * The number of active elements on each processor.
-   *
-   * \note ParMETIS requires that each processor have some active
-   * elements; it will abort if any processor passes a NULL _part
-   * array.
-   */
-  std::vector<dof_id_type> _n_active_elem_on_proc;
-
-  /**
-   * Maps active element ids into a contiguous range, as needed by ParMETIS.
-   */
-  std::unordered_map<dof_id_type, dof_id_type> _global_index_by_pid_map;
-
-  /**
    * Pointer to the Parmetis-specific data structures.  Lets us avoid
    * including parmetis.h here.
    */
