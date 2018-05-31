@@ -84,6 +84,11 @@ protected:
   virtual void _do_partition (MeshBase & mesh,
                               const unsigned int n) libmesh_override;
 
+  /**
+  * Build the graph.
+  */
+  virtual void build_graph (const MeshBase & mesh) libmesh_override;
+
 private:
 
   // These methods and data only need to be available if the
@@ -94,11 +99,6 @@ private:
    * Initialize data structures.
    */
   void initialize (const MeshBase & mesh, const unsigned int n_sbdmns);
-
-  /**
-   * Build the graph.
-   */
-  void build_graph (const MeshBase & mesh);
 
   /**
    * Assign the computed partitioning to the mesh.

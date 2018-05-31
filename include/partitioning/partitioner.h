@@ -217,6 +217,13 @@ protected:
    */
    virtual void _find_global_index_by_pid_map(const MeshBase & mesh);
 
+
+   /**
+    * Build a dual graph for partitioner
+    *
+    */
+  virtual void build_graph(const MeshBase & mesh);
+
   /**
    * The weights that might be used for partitioning.
    */
@@ -235,6 +242,13 @@ protected:
    * array.
    */
   std::vector<dof_id_type> _n_active_elem_on_proc;
+
+  /**
+   * A dual graph corresponds to the mesh, and it is typically used
+   * in paritioner. A vertex represents an element, and its neighbors are the
+   * element neighbors.
+   */
+  std::vector<std::vector<dof_id_type>> _dual_graph;
 };
 
 } // namespace libMesh

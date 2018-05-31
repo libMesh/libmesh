@@ -662,4 +662,163 @@ void Partitioner::_find_global_index_by_pid_map(const MeshBase & mesh)
     }
 }
 
+void Partitioner::build_graph (const MeshBase & mesh)
+{
+  LOG_SCOPE("build_graph()", "ParmetisPartitioner");
+
+  const dof_id_type n_active_local_elem  = mesh.n_active_local_elem();
+  // If we have boundary elements in this mesh, we want to account for
+  // the connectivity between them and interior elements.  We can find
+  // interior elements from boundary elements, but we need to build up
+  // a lookup map to do the reverse.
+  typedef std::unordered_multimap<const Elem *, const Elem *> map_type;
+  map_type interior_to_boundary_map;
+
+  for (const auto & elem : mesh.active_element_ptr_range())
+    {
+      // If we don't have an interior_parent then there's nothing to look us
+      // up.
+      if ((elem->dim() >= LIBMESH_DIM) ||
+          !elem->interior_parent())
+        continue;
+
+      // get all relevant interior elements
+      std::set<const Elem *> neighbor_set;
+      elem->find_interior_neighbors(neighbor_set);
+
+      std::set<const Elem *>::iterator n_it = neighbor_set.begin();
+      for (; n_it != neighbor_set.end(); ++n_it)
+        interior_to_boundary_map.insert(std::make_pair(*n_it, elem));
+    }
+
+#ifdef LIBMESH_ENABLE_AMR
+  std::vector<const Elem *> neighbors_offspring;
+#endif
+
+   dof_id_type first_local_elem = 0;
+   for (processor_id_type pid=0; pid < mesh.processor_id(); pid++)
+     first_local_elem += _n_active_elem_on_proc[pid];
+
+  _dual_graph.clear();
+  _dual_graph.resize(n_active_local_elem);
+
+  for (const auto & elem : mesh.active_local_element_ptr_range())
+    {
+      libmesh_assert (_global_index_by_pid_map.count(elem->id()));
+      const dof_id_type global_index_by_pid =
+        _global_index_by_pid_map[elem->id()];
+
+      const dof_id_type local_index =
+        global_index_by_pid - first_local_elem;
+      libmesh_assert_less (local_index, n_active_local_elem);
+
+      std::vector<dof_id_type> & graph_row = _dual_graph[local_index];
+
+      // Loop over the element's neighbors.  An element
+      // adjacency corresponds to a face neighbor
+      for (auto neighbor : elem->neighbor_ptr_range())
+        {
+          if (neighbor != libmesh_nullptr)
+            {
+              // If the neighbor is active treat it
+              // as a connection
+              if (neighbor->active())
+                {
+                  libmesh_assert(_global_index_by_pid_map.count(neighbor->id()));
+                  const dof_id_type neighbor_global_index_by_pid =
+                    _global_index_by_pid_map[neighbor->id()];
+
+                  graph_row.push_back(neighbor_global_index_by_pid);
+                }
+
+#ifdef LIBMESH_ENABLE_AMR
+
+              // Otherwise we need to find all of the
+              // neighbor's children that are connected to
+              // us and add them
+              else
+                {
+                  // The side of the neighbor to which
+                  // we are connected
+                  const unsigned int ns =
+                    neighbor->which_neighbor_am_i (elem);
+                  libmesh_assert_less (ns, neighbor->n_neighbors());
+
+                  // Get all the active children (& grandchildren, etc...)
+                  // of the neighbor
+
+                  // FIXME - this is the wrong thing, since we
+                  // should be getting the active family tree on
+                  // our side only.  But adding too many graph
+                  // links may cause hanging nodes to tend to be
+                  // on partition interiors, which would reduce
+                  // communication overhead for constraint
+                  // equations, so we'll leave it.
+
+                  neighbor->active_family_tree (neighbors_offspring);
+
+                  // Get all the neighbor's children that
+                  // live on that side and are thus connected
+                  // to us
+                  for (std::size_t nc=0; nc<neighbors_offspring.size(); nc++)
+                    {
+                      const Elem * child =
+                        neighbors_offspring[nc];
+
+                      // This does not assume a level-1 mesh.
+                      // Note that since children have sides numbered
+                      // coincident with the parent then this is a sufficient test.
+                      if (child->neighbor_ptr(ns) == elem)
+                        {
+                          libmesh_assert (child->active());
+                          libmesh_assert (_global_index_by_pid_map.count(child->id()));
+                          const dof_id_type child_global_index_by_pid =
+                            _global_index_by_pid_map[child->id()];
+
+                          graph_row.push_back(child_global_index_by_pid);
+                        }
+                    }
+                }
+
+#endif /* ifdef LIBMESH_ENABLE_AMR */
+
+
+            }
+        }
+
+      if ((elem->dim() < LIBMESH_DIM) &&
+          elem->interior_parent())
+        {
+          // get all relevant interior elements
+          std::set<const Elem *> neighbor_set;
+          elem->find_interior_neighbors(neighbor_set);
+
+          std::set<const Elem *>::iterator n_it = neighbor_set.begin();
+          for (; n_it != neighbor_set.end(); ++n_it)
+            {
+              // FIXME - non-const versions of the Elem set methods
+              // would be nice
+              Elem * neighbor = const_cast<Elem *>(*n_it);
+
+              const dof_id_type neighbor_global_index_by_pid =
+                _global_index_by_pid_map[neighbor->id()];
+
+              graph_row.push_back(neighbor_global_index_by_pid);
+            }
+        }
+
+      // Check for any boundary neighbors
+      for (const auto & pr : as_range(interior_to_boundary_map.equal_range(elem)))
+        {
+          const Elem * neighbor = pr.second;
+
+          const dof_id_type neighbor_global_index_by_pid =
+            _global_index_by_pid_map[neighbor->id()];
+
+          graph_row.push_back(neighbor_global_index_by_pid);
+        }
+    }
+
+}
+
 } // namespace libMesh
