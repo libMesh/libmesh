@@ -181,7 +181,9 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
                                        &mpi_comm);
 
   // Assign the returned processor ids
-  this->assign_partitioning (mesh);
+  static_assert(sizeof(dof_id_type) == sizeof(Parmetis::idx_t),
+                "libMesh and Parmetis integer sizes must match!");
+  this->assign_partitioning (mesh, reinterpret_cast<std::vector<dof_id_type> &> (_pmetis->part));
 
 #endif // #ifndef LIBMESH_HAVE_PARMETIS ... else ...
 
@@ -400,95 +402,6 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
 
   libmesh_assert_equal_to (_pmetis->xadj.size(), n_active_local_elem+1);
   libmesh_assert_equal_to (_pmetis->adjncy.size(), graph_size);
-}
-
-
-
-void ParmetisPartitioner::assign_partitioning (MeshBase & mesh)
-{
-  LOG_SCOPE("assign_partitioning()", "ParmetisPartitioner");
-
-  // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.comm());
-
-  const dof_id_type
-    first_local_elem = _pmetis->vtxdist[mesh.processor_id()];
-
-#ifndef NDEBUG
-  const dof_id_type n_active_local_elem = mesh.n_active_local_elem();
-#endif
-
-  std::vector<std::vector<dof_id_type>>
-    requested_ids(mesh.n_processors()),
-    requests_to_fill(mesh.n_processors());
-
-  for (auto & elem : mesh.active_element_ptr_range())
-    {
-      // we need to get the index from the owning processor
-      // (note we cannot assign it now -- we are iterating
-      // over elements again and this will be bad!)
-      libmesh_assert_less (elem->processor_id(), requested_ids.size());
-      requested_ids[elem->processor_id()].push_back(elem->id());
-    }
-
-  // Trade with all processors (including self) to get their indices
-  for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
-    {
-      // Trade my requests with processor procup and procdown
-      const processor_id_type procup = (mesh.processor_id() + pid) % mesh.n_processors();
-      const processor_id_type procdown = (mesh.n_processors() +
-                                          mesh.processor_id() - pid) % mesh.n_processors();
-
-      mesh.comm().send_receive (procup,   requested_ids[procup],
-                                procdown, requests_to_fill[procdown]);
-
-      // we can overwrite these requested ids in-place.
-      for (std::size_t i=0; i<requests_to_fill[procdown].size(); i++)
-        {
-          const dof_id_type requested_elem_index =
-            requests_to_fill[procdown][i];
-
-          libmesh_assert(_global_index_by_pid_map.count(requested_elem_index));
-
-          const dof_id_type global_index_by_pid =
-            _global_index_by_pid_map[requested_elem_index];
-
-          const dof_id_type local_index =
-            global_index_by_pid - first_local_elem;
-
-          libmesh_assert_less (local_index, _pmetis->part.size());
-          libmesh_assert_less (local_index, n_active_local_elem);
-
-          const unsigned int elem_procid =
-            static_cast<unsigned int>(_pmetis->part[local_index]);
-
-          libmesh_assert_less (elem_procid, static_cast<unsigned int>(_pmetis->nparts));
-
-          requests_to_fill[procdown][i] = elem_procid;
-        }
-
-      // Trade back
-      mesh.comm().send_receive (procdown, requests_to_fill[procdown],
-                                procup,   requested_ids[procup]);
-    }
-
-  // and finally assign the partitioning.
-  // note we are iterating in exactly the same order
-  // used to build up the request, so we can expect the
-  // required entries to be in the proper sequence.
-  std::vector<unsigned int> counters(mesh.n_processors(), 0);
-  for (auto & elem : mesh.active_element_ptr_range())
-    {
-      const processor_id_type current_pid = elem->processor_id();
-
-      libmesh_assert_less (counters[current_pid], requested_ids[current_pid].size());
-
-      const processor_id_type elem_procid =
-        requested_ids[current_pid][counters[current_pid]++];
-
-      libmesh_assert_less (elem_procid, static_cast<unsigned int>(_pmetis->nparts));
-      elem->processor_id() = elem_procid;
-    }
 }
 
 #endif // #ifdef LIBMESH_HAVE_PARMETIS

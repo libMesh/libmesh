@@ -225,6 +225,11 @@ protected:
   virtual void build_graph(const MeshBase & mesh);
 
   /**
+   * Assign the computed partitioning to the mesh.
+   */
+  void assign_partitioning (const MeshBase & mesh, const std::vector<dof_id_type> & parts);
+
+  /**
    * The weights that might be used for partitioning.
    */
   ErrorVector * _weights;

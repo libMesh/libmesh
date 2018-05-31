@@ -101,11 +101,6 @@ private:
   void initialize (const MeshBase & mesh, const unsigned int n_sbdmns);
 
   /**
-   * Assign the computed partitioning to the mesh.
-   */
-  void assign_partitioning (MeshBase & mesh);
-
-  /**
    * Pointer to the Parmetis-specific data structures.  Lets us avoid
    * including parmetis.h here.
    */
