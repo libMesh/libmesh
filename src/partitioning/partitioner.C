@@ -25,6 +25,7 @@
 #include "libmesh/mesh_tools.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/parallel_ghost_sync.h"
 
 namespace libMesh
 {
@@ -584,5 +585,332 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
   MeshTools::libmesh_assert_canonical_node_procids(mesh);
 #endif
 }
+
+struct SyncLocalIDs
+{
+  typedef dof_id_type datum;
+
+  typedef std::unordered_map<dof_id_type, dof_id_type> map_type;
+
+  SyncLocalIDs(map_type & _id_map) : id_map(_id_map) {}
+
+  map_type & id_map;
+
+  void gather_data (const std::vector<dof_id_type> & ids,
+                    std::vector<datum> & local_ids)
+  {
+    local_ids.resize(ids.size());
+
+    for (std::size_t i=0, imax = ids.size(); i != imax; ++i)
+      local_ids[i] = id_map[ids[i]];
+  }
+
+  void act_on_data (const std::vector<dof_id_type> & ids,
+                    const std::vector<datum> & local_ids)
+  {
+    for (std::size_t i=0, imax = local_ids.size(); i != imax; ++i)
+      id_map[ids[i]] = local_ids[i];
+  }
+};
+
+void Partitioner::_find_global_index_by_pid_map(const MeshBase & mesh)
+{
+  const dof_id_type n_active_local_elem = mesh.n_active_local_elem();
+
+  // Find the number of active elements on each processor.  We cannot use
+  // mesh.n_active_elem_on_proc(pid) since that only returns the number of
+  // elements assigned to pid which are currently stored on the calling
+  // processor. This will not in general be correct for parallel meshes
+  // when (pid!=mesh.processor_id()).
+  _n_active_elem_on_proc.resize(mesh.n_processors());
+  mesh.comm().allgather(n_active_local_elem, _n_active_elem_on_proc);
+
+  libMesh::BoundingBox bbox =
+    MeshTools::create_bounding_box(mesh);
+
+  _global_index_by_pid_map.clear();
+
+  // create the mapping which is contiguous by processor
+  {
+    MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
+    const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
+
+    MeshCommunication().find_local_indices (bbox, it, end,
+                                              _global_index_by_pid_map);
+  }
+
+  SyncLocalIDs sync(_global_index_by_pid_map);
+
+  Parallel::sync_dofobject_data_by_id
+      (mesh.comm(), mesh.active_elements_begin(), mesh.active_elements_end(), sync);
+
+  dof_id_type pid_offset=0;
+  for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
+    {
+      MeshBase::const_element_iterator       it  = mesh.active_pid_elements_begin(pid);
+      const MeshBase::const_element_iterator end = mesh.active_pid_elements_end(pid);
+
+      for (; it != end; ++it)
+        {
+          const Elem * elem = *it;
+          libmesh_assert_less (_global_index_by_pid_map[elem->id()], _n_active_elem_on_proc[pid]);
+
+          _global_index_by_pid_map[elem->id()] += pid_offset;
+        }
+
+      pid_offset += _n_active_elem_on_proc[pid];
+    }
+}
+
+void Partitioner::build_graph (const MeshBase & mesh)
+{
+  LOG_SCOPE("build_graph()", "ParmetisPartitioner");
+
+  const dof_id_type n_active_local_elem  = mesh.n_active_local_elem();
+  // If we have boundary elements in this mesh, we want to account for
+  // the connectivity between them and interior elements.  We can find
+  // interior elements from boundary elements, but we need to build up
+  // a lookup map to do the reverse.
+  typedef std::unordered_multimap<const Elem *, const Elem *> map_type;
+  map_type interior_to_boundary_map;
+
+  for (const auto & elem : mesh.active_element_ptr_range())
+    {
+      // If we don't have an interior_parent then there's nothing to look us
+      // up.
+      if ((elem->dim() >= LIBMESH_DIM) ||
+          !elem->interior_parent())
+        continue;
+
+      // get all relevant interior elements
+      std::set<const Elem *> neighbor_set;
+      elem->find_interior_neighbors(neighbor_set);
+
+      std::set<const Elem *>::iterator n_it = neighbor_set.begin();
+      for (; n_it != neighbor_set.end(); ++n_it)
+        interior_to_boundary_map.insert(std::make_pair(*n_it, elem));
+    }
+
+#ifdef LIBMESH_ENABLE_AMR
+  std::vector<const Elem *> neighbors_offspring;
+#endif
+
+   if (!_global_index_by_pid_map.size())
+     _find_global_index_by_pid_map(mesh);  
+
+   dof_id_type first_local_elem = 0;
+   for (processor_id_type pid=0; pid < mesh.processor_id(); pid++)
+     first_local_elem += _n_active_elem_on_proc[pid];
+
+  _dual_graph.clear();
+  _dual_graph.resize(n_active_local_elem);
+
+  for (const auto & elem : mesh.active_local_element_ptr_range())
+    {
+      libmesh_assert (_global_index_by_pid_map.count(elem->id()));
+      const dof_id_type global_index_by_pid =
+        _global_index_by_pid_map[elem->id()];
+
+      const dof_id_type local_index =
+        global_index_by_pid - first_local_elem;
+      libmesh_assert_less (local_index, n_active_local_elem);
+
+      std::vector<dof_id_type> & graph_row = _dual_graph[local_index];
+
+      // Loop over the element's neighbors.  An element
+      // adjacency corresponds to a face neighbor
+      for (auto neighbor : elem->neighbor_ptr_range())
+        {
+          if (neighbor != libmesh_nullptr)
+            {
+              // If the neighbor is active treat it
+              // as a connection
+              if (neighbor->active())
+                {
+                  libmesh_assert(_global_index_by_pid_map.count(neighbor->id()));
+                  const dof_id_type neighbor_global_index_by_pid =
+                    _global_index_by_pid_map[neighbor->id()];
+
+                  graph_row.push_back(neighbor_global_index_by_pid);
+                }
+
+#ifdef LIBMESH_ENABLE_AMR
+
+              // Otherwise we need to find all of the
+              // neighbor's children that are connected to
+              // us and add them
+              else
+                {
+                  // The side of the neighbor to which
+                  // we are connected
+                  const unsigned int ns =
+                    neighbor->which_neighbor_am_i (elem);
+                  libmesh_assert_less (ns, neighbor->n_neighbors());
+
+                  // Get all the active children (& grandchildren, etc...)
+                  // of the neighbor
+
+                  // FIXME - this is the wrong thing, since we
+                  // should be getting the active family tree on
+                  // our side only.  But adding too many graph
+                  // links may cause hanging nodes to tend to be
+                  // on partition interiors, which would reduce
+                  // communication overhead for constraint
+                  // equations, so we'll leave it.
+
+                  neighbor->active_family_tree (neighbors_offspring);
+
+                  // Get all the neighbor's children that
+                  // live on that side and are thus connected
+                  // to us
+                  for (std::size_t nc=0; nc<neighbors_offspring.size(); nc++)
+                    {
+                      const Elem * child =
+                        neighbors_offspring[nc];
+
+                      // This does not assume a level-1 mesh.
+                      // Note that since children have sides numbered
+                      // coincident with the parent then this is a sufficient test.
+                      if (child->neighbor_ptr(ns) == elem)
+                        {
+                          libmesh_assert (child->active());
+                          libmesh_assert (_global_index_by_pid_map.count(child->id()));
+                          const dof_id_type child_global_index_by_pid =
+                            _global_index_by_pid_map[child->id()];
+
+                          graph_row.push_back(child_global_index_by_pid);
+                        }
+                    }
+                }
+
+#endif /* ifdef LIBMESH_ENABLE_AMR */
+
+
+            }
+        }
+
+      if ((elem->dim() < LIBMESH_DIM) &&
+          elem->interior_parent())
+        {
+          // get all relevant interior elements
+          std::set<const Elem *> neighbor_set;
+          elem->find_interior_neighbors(neighbor_set);
+
+          std::set<const Elem *>::iterator n_it = neighbor_set.begin();
+          for (; n_it != neighbor_set.end(); ++n_it)
+            {
+              // FIXME - non-const versions of the Elem set methods
+              // would be nice
+              Elem * neighbor = const_cast<Elem *>(*n_it);
+
+              const dof_id_type neighbor_global_index_by_pid =
+                _global_index_by_pid_map[neighbor->id()];
+
+              graph_row.push_back(neighbor_global_index_by_pid);
+            }
+        }
+
+      // Check for any boundary neighbors
+      for (const auto & pr : as_range(interior_to_boundary_map.equal_range(elem)))
+        {
+          const Elem * neighbor = pr.second;
+
+          const dof_id_type neighbor_global_index_by_pid =
+            _global_index_by_pid_map[neighbor->id()];
+
+          graph_row.push_back(neighbor_global_index_by_pid);
+        }
+    }
+
+}
+
+void Partitioner::assign_partitioning (const MeshBase & mesh, const std::vector<dof_id_type> & parts)
+{
+  LOG_SCOPE("assign_partitioning()", "ParmetisPartitioner");
+
+  // This function must be run on all processors at once
+  libmesh_parallel_only(mesh.comm());
+
+  dof_id_type first_local_elem = 0;
+  for (processor_id_type pid=0; pid < mesh.processor_id(); pid++)
+    first_local_elem += _n_active_elem_on_proc[pid];
+
+#ifndef NDEBUG
+  const dof_id_type n_active_local_elem = mesh.n_active_local_elem();
+#endif
+
+  std::vector<std::vector<dof_id_type>>
+    requested_ids(mesh.n_processors()),
+    requests_to_fill(mesh.n_processors());
+
+  for (auto & elem : mesh.active_element_ptr_range())
+    {
+      // we need to get the index from the owning processor
+      // (note we cannot assign it now -- we are iterating
+      // over elements again and this will be bad!)
+      libmesh_assert_less (elem->processor_id(), requested_ids.size());
+      requested_ids[elem->processor_id()].push_back(elem->id());
+    }
+
+  // Trade with all processors (including self) to get their indices
+  for (processor_id_type pid=0; pid<mesh.n_processors(); pid++)
+    {
+      // Trade my requests with processor procup and procdown
+      const processor_id_type procup = (mesh.processor_id() + pid) % mesh.n_processors();
+      const processor_id_type procdown = (mesh.n_processors() +
+                                          mesh.processor_id() - pid) % mesh.n_processors();
+
+      mesh.comm().send_receive (procup,   requested_ids[procup],
+                                procdown, requests_to_fill[procdown]);
+
+      // we can overwrite these requested ids in-place.
+      for (std::size_t i=0; i<requests_to_fill[procdown].size(); i++)
+        {
+          const dof_id_type requested_elem_index =
+            requests_to_fill[procdown][i];
+
+          libmesh_assert(_global_index_by_pid_map.count(requested_elem_index));
+
+          const dof_id_type global_index_by_pid =
+            _global_index_by_pid_map[requested_elem_index];
+
+          const dof_id_type local_index =
+            global_index_by_pid - first_local_elem;
+
+          libmesh_assert_less (local_index, parts.size());
+          libmesh_assert_less (local_index, n_active_local_elem);
+
+          const unsigned int elem_procid =
+            static_cast<unsigned int>(parts[local_index]);
+
+          libmesh_assert_less (elem_procid, mesh.n_partitions());
+
+          requests_to_fill[procdown][i] = elem_procid;
+        }
+
+      // Trade back
+      mesh.comm().send_receive (procdown, requests_to_fill[procdown],
+                                procup,   requested_ids[procup]);
+    }
+
+  // and finally assign the partitioning.
+  // note we are iterating in exactly the same order
+  // used to build up the request, so we can expect the
+  // required entries to be in the proper sequence.
+  std::vector<unsigned int> counters(mesh.n_processors(), 0);
+  for (auto & elem : mesh.active_element_ptr_range())
+    {
+      const processor_id_type current_pid = elem->processor_id();
+
+      libmesh_assert_less (counters[current_pid], requested_ids[current_pid].size());
+
+      const processor_id_type elem_procid =
+        requested_ids[current_pid][counters[current_pid]++];
+
+      libmesh_assert_less (elem_procid, mesh.n_partitions());
+      elem->processor_id() = elem_procid;
+    }
+}
+
 
 } // namespace libMesh
