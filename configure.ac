@@ -232,6 +232,10 @@ LIBMESH_TEST_CXX11_FIXED_TYPE_ENUM
 AS_IF([test "x$have_cxx11_fixed_type_enum" != "xyes"],
       [AC_MSG_ERROR([libMesh requires C++11 fixed type enumeration support])])
 
+LIBMESH_TEST_CXX11_FIXED_TYPE_ENUM_FWD
+AS_IF([test "x$have_cxx11_fixed_type_enum_fwd" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 fixed type enumeration forward declaration support])])
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.

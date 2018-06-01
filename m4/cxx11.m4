@@ -134,6 +134,41 @@ AC_DEFUN([LIBMESH_TEST_CXX11_FIXED_TYPE_ENUM],
     AM_CONDITIONAL(HAVE_CXX11_FIXED_TYPE_ENUM, test x$have_cxx11_fixed_type_enum == xyes)
   ])
 
+dnl Test C++11 fixed type enumeration forward declarations.
+AC_DEFUN([LIBMESH_TEST_CXX11_FIXED_TYPE_ENUM_FWD],
+  [
+    have_cxx11_fixed_type_enum_fwd=no
+
+    AC_MSG_CHECKING(for C++11 fixed type enumeration forward declaration support)
+    AC_LANG_PUSH([C++])
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <iostream>
+    enum Foo : int;
+    void func(Foo f) { std::cout << f << std::endl; }
+    enum Foo : int { FOO0 = 0, FOO1 = 1, FOO2 = 2 };
+    ]], [[
+    func(FOO0);
+    func(FOO1);
+    func(FOO2);
+    ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_FIXED_TYPE_ENUM_FWD, 1, [Flag indicating whether compiler supports fixed type enumerations])
+        have_cxx11_fixed_type_enum_fwd=yes
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    dnl Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+
+    AM_CONDITIONAL(HAVE_CXX11_FIXED_TYPE_ENUM_FWD, test x$have_cxx11_fixed_type_enum_fwd == xyes)
+  ])
+
 dnl Properly implemented move constructors require rvalue references,
 dnl std::move, and noexcept, so this tests for all of those features.
 AC_DEFUN([LIBMESH_TEST_CXX11_MOVE_CONSTRUCTORS],
