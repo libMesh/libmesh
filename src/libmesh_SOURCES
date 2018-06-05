@@ -404,6 +404,7 @@ libmesh_SOURCES =  \
         src/systems/steady_system.C \
         src/systems/system.C \
         src/systems/system_io.C \
+        src/systems/system_norm.C \
         src/systems/system_projection.C \
         src/systems/system_subset.C \
         src/systems/system_subset_by_subdomain.C \
