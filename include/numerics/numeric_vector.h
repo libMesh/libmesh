@@ -31,6 +31,15 @@
 #include "libmesh/dense_subvector.h"
 #include "libmesh/dense_vector.h"
 
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum SolverPackage : int;
+}
+#else
+#include "libmesh/enum_solver_package.h"
+#endif
+
 // C++ includes
 #include <cstddef>
 #include <set>
@@ -47,7 +56,6 @@ template <typename T> class DenseVector;
 template <typename T> class DenseSubVector;
 template <typename T> class SparseMatrix;
 template <typename T> class ShellMatrix;
-enum SolverPackage : int;
 
 /**
  * Numeric vector. Provides a uniform interface

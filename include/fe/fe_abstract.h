@@ -31,6 +31,15 @@
 #include "libmesh/tensor_value.h"
 #endif
 
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum ElemType : int;
+}
+#else
+#include "libmesh/enum_elem_type.h"
+#endif
+
 // C++ includes
 #include <cstddef>
 #include <vector>
@@ -50,7 +59,6 @@ class Elem;
 class MeshBase;
 template <typename T> class NumericVector;
 class QBase;
-enum ElemType : int;
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
 class NodeConstraints;

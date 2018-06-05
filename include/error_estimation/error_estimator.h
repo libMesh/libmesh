@@ -25,6 +25,15 @@
 #include "libmesh/parallel.h"
 #include "libmesh/system_norm.h"
 
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum ErrorEstimatorType : int;
+}
+#else
+#include "libmesh/enum_error_estimator_type.h"
+#endif
+
 // C++ includes
 #include <cstddef>
 #include <map>
@@ -39,7 +48,6 @@ class ErrorVector;
 class EquationSystems;
 class System;
 template <typename T> class NumericVector;
-enum ErrorEstimatorType : int;
 
 /**
  * This class holds functions that will estimate the error

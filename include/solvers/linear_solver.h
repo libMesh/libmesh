@@ -28,6 +28,21 @@
 #include "libmesh/parallel_object.h"
 #include "libmesh/auto_ptr.h" // deprecated
 
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum SolverPackage : int;
+enum PreconditionerType : int;
+enum SolverType : int;
+enum LinearConvergenceReason : int;
+}
+#else
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/enum_preconditioner_type.h"
+#include "libmesh/enum_solver_type.h"
+#include "libmesh/enum_convergence_flags.h"
+#endif
+
 // C++ includes
 #include <cstddef>
 #include <vector>
@@ -43,10 +58,6 @@ template <typename T> class ShellMatrix;
 template <typename T> class Preconditioner;
 class System;
 class SolverConfiguration;
-enum SolverPackage : int;
-enum PreconditionerType : int;
-enum SolverType : int;
-enum LinearConvergenceReason : int;
 
 /**
  * This base class can be inherited from to provide interfaces to

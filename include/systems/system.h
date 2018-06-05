@@ -33,6 +33,15 @@
 #include "libmesh/tensor_value.h" // For point_hessian
 #include "libmesh/variable.h"
 
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum FEMNormType : int;
+}
+#else
+#include "libmesh/enum_norm_type.h"
+#endif
+
 // C++ includes
 #include <cstddef>
 #include <set>
@@ -61,7 +70,6 @@ typedef NumberVectorValue Gradient;
 class SystemSubset;
 class FEType;
 class SystemNorm;
-enum FEMNormType : int;
 
 /**
  * This is the base class for classes which contain

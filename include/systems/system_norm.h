@@ -23,14 +23,20 @@
 // Local includes
 #include "libmesh/libmesh_common.h" // for Real
 
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum FEMNormType : int;
+}
+#else
+#include "libmesh/enum_norm_type.h"
+#endif
+
 // C++ includes
 #include <vector>
 
 namespace libMesh
 {
-
-// Forward Declarations
-enum FEMNormType : int;
 
 /**
  * This class defines a norm/seminorm to be applied to a NumericVector which

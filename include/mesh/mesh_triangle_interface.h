@@ -28,6 +28,15 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh_serializer.h"
 
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum ElemType : int;
+}
+#else
+#include "libmesh/enum_elem_type.h"
+#endif
+
 // C++ includes
 #include <cstddef>
 #include <vector>
@@ -37,7 +46,6 @@ namespace libMesh
 
 // Forward Declarations
 class UnstructuredMesh;
-enum ElemType : int;
 
 /**
  * A C++ interface between LibMesh and the Triangle library written by

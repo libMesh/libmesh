@@ -31,6 +31,15 @@
 #include "libmesh/parallel_object.h"
 #include "libmesh/simple_range.h"
 
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum ElemType : int;
+}
+#else
+#include "libmesh/enum_elem_type.h"
+#endif
+
 // C++ Includes
 #include <cstddef>
 #include <string>
@@ -45,7 +54,6 @@ class GhostingFunctor;
 class Node;
 class Point;
 class Partitioner;
-enum ElemType : int;
 
 template <class MT>
 class MeshInput;

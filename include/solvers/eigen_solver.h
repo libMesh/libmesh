@@ -32,6 +32,18 @@
 #include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/enum_solver_package.h" // SLEPC_SOLVERS
 
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum EigenSolverType : int;
+enum EigenProblemType : int;
+enum PositionOfSpectrum : int;
+}
+#else
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/enum_eigen_solver_type.h"
+#endif
+
 // C++ includes
 #include <memory>
 
@@ -43,9 +55,6 @@ template <typename T> class SparseMatrix;
 template <typename T> class ShellMatrix;
 template <typename T> class NumericVector;
 class SolverConfiguration;
-enum EigenSolverType : int;
-enum EigenProblemType : int;
-enum PositionOfSpectrum : int;
 
 /**
  * This class provides an interface to solvers for eigenvalue

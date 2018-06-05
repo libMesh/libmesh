@@ -28,6 +28,15 @@
 #include "libmesh/enum_order.h" // INVALID_ORDER
 #include "libmesh/auto_ptr.h" // deprecated
 
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum QuadratureType : int;
+}
+#else
+#include "libmesh/enum_quadrature_type.h"
+#endif
+
 // C++ includes
 #include <vector>
 #include <string>
@@ -39,7 +48,6 @@ namespace libMesh
 
 // forward declarations
 class Elem;
-enum QuadratureType : int;
 
 /**
  * The \p QBase class provides the basic functionality from which

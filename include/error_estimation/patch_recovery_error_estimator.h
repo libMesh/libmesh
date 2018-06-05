@@ -26,6 +26,15 @@
 #include "libmesh/point.h"
 #include "libmesh/elem_range.h"
 
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum Order : int;
+}
+#else
+#include "libmesh/enum_order.h"
+#endif
+
 // C++ includes
 #include <cstddef>
 #include <vector>
@@ -35,7 +44,6 @@ namespace libMesh
 
 // Forward Declarations
 class Elem;
-enum Order : int;
 
 /**
  * This class implements the Patch Recovery error indicator.

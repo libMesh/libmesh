@@ -24,6 +24,15 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_output.h"
 
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum ElemType : int;
+}
+#else
+#include "libmesh/enum_elem_type.h"
+#endif
+
 // C++ includes
 #include <map>
 #include <string>
@@ -34,7 +43,6 @@ namespace libMesh
 
 // Forward declarations
 class EquationSystems;
-enum ElemType : int;
 
 /**
  * This class implements writing meshes and solutions in Ensight's Gold format.
