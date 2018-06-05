@@ -236,6 +236,10 @@ LIBMESH_TEST_CXX11_FIXED_TYPE_ENUM_FWD
 AS_IF([test "x$have_cxx11_fixed_type_enum_fwd" != "xyes"],
       [AC_MSG_ERROR([libMesh requires C++11 fixed type enumeration forward declaration support])])
 
+LIBMESH_TEST_CXX11_OVERRIDE
+AS_IF([test "x$have_cxx11_override" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 compiler support the override keyword])])
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
@@ -249,7 +253,6 @@ LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS
 LIBMESH_TEST_CXX11_SHARED_PTR
 LIBMESH_TEST_CXX14_MAKE_UNIQUE
 LIBMESH_TEST_CXX11_REGEX
-LIBMESH_TEST_CXX11_OVERRIDE
 LIBMESH_TEST_CXX11_VARIADIC_TEMPLATES
 LIBMESH_TEST_CXX11_THREAD
 LIBMESH_TEST_CXX11_CONDITION_VARIABLE
