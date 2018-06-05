@@ -84,6 +84,7 @@ protected:
   virtual void _do_partition (MeshBase & mesh,
                               const unsigned int n) libmesh_override;
 
+#ifdef LIBMESH_HAVE_PARMETIS
   /**
   * Build the graph.
   */
@@ -93,7 +94,6 @@ private:
 
   // These methods and data only need to be available if the
   // ParMETIS library is available.
-#ifdef LIBMESH_HAVE_PARMETIS
 
   /**
    * Initialize data structures.
