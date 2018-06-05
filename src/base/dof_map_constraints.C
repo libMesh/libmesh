@@ -3780,12 +3780,12 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
       DoF_RCSet   dof_request_set;
 
       // Request sets to send to each processor
-      std::vector<std::vector<dof_id_type>>
-        requested_dof_ids(this->n_processors());
+      std::map<processor_id_type, std::vector<dof_id_type>>
+        requested_dof_ids;
 
       // And the sizes of each
-      std::vector<dof_id_type>
-        dof_ids_on_proc(this->n_processors(), 0);
+      std::map<processor_id_type, dof_id_type>
+        dof_ids_on_proc;
 
       // Fill (and thereby sort and uniq!) the main request sets
       for (const auto & unexpanded_dof : unexpanded_dofs)
@@ -3834,9 +3834,9 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
           dof_ids_on_proc[proc_id]++;
         }
 
-      for (processor_id_type p = 0; p != this->n_processors(); ++p)
+      for (auto & pair : dof_ids_on_proc)
         {
-          requested_dof_ids[p].reserve(dof_ids_on_proc[p]);
+          requested_dof_ids[pair.first].reserve(pair.second);
         }
 
       // Prepare each processor's request set
@@ -3848,53 +3848,76 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
           requested_dof_ids[proc_id].push_back(i);
         }
 
-      // Now request constraint rows from other processors
-      for (processor_id_type p=1; p != this->n_processors(); ++p)
+      typedef std::vector<std::pair<dof_id_type, Real>> row_datum;
+
+      typedef std::vector<Number> rhss_datum;
+
+      auto row_gather_functor =
+        [this]
+        (processor_id_type,
+         const std::vector<dof_id_type> & ids,
+         std::vector<row_datum> & data)
         {
-          // Trade my requests with processor procup and procdown
-          processor_id_type procup =
-            cast_int<processor_id_type>((this->processor_id() + p) %
-                                        this->n_processors());
-          processor_id_type procdown =
-            cast_int<processor_id_type>((this->n_processors() +
-                                         this->processor_id() - p) %
-                                        this->n_processors());
-          std::vector<dof_id_type> dof_request_to_fill;
-
-          this->comm().send_receive(procup, requested_dof_ids[procup],
-                                    procdown, dof_request_to_fill);
-
           // Fill those requests
-          std::vector<std::vector<dof_id_type>> dof_row_keys(dof_request_to_fill.size());
+          const std::size_t query_size = ids.size();
 
-          std::vector<std::vector<Real>> dof_row_vals(dof_request_to_fill.size());
-          std::vector<Number> dof_row_rhss(dof_request_to_fill.size());
-          std::vector<std::vector<Number>>
-            dof_adj_rhss(max_qoi_num,
-                         std::vector<Number>(dof_request_to_fill.size()));
-          for (std::size_t i=0; i != dof_request_to_fill.size(); ++i)
+          data.resize(query_size);
+          for (std::size_t i=0; i != query_size; ++i)
             {
-              dof_id_type constrained = dof_request_to_fill[i];
+              dof_id_type constrained = ids[i];
               if (_dof_constraints.count(constrained))
                 {
                   DofConstraintRow & row = _dof_constraints[constrained];
                   std::size_t row_size = row.size();
-                  dof_row_keys[i].reserve(row_size);
-                  dof_row_vals[i].reserve(row_size);
+                  data[i].reserve(row_size);
                   for (const auto & j : row)
                     {
-                      dof_row_keys[i].push_back(j.first);
-                      dof_row_vals[i].push_back(j.second);
+                      data[i].push_back(j);
+
+                      // We should never have an invalid constraining
+                      // dof id
+                      libmesh_assert(j.first != DofObject::invalid_id);
 
                       // We should never have a 0 constraint
                       // coefficient; that's implicit via sparse
                       // constraint storage
                       libmesh_assert(j.second);
                     }
+                }
+              else
+                {
+                  // We have to distinguish "constraint with no
+                  // constraining dofs" (e.g. due to Dirichlet
+                  // constraint equations) from "no constraint".
+                  // We'll use invalid_id for the latter.
+                  data[i].push_back
+                    (std::make_pair(DofObject::invalid_id, Real(0)));
+                }
+            }
+        };
+
+      auto rhss_gather_functor =
+        [this,
+         max_qoi_num]
+        (processor_id_type,
+         const std::vector<dof_id_type> & ids,
+         std::vector<rhss_datum> & data)
+        {
+          // Fill those requests
+          const std::size_t query_size = ids.size();
+
+          data.resize(query_size);
+          for (std::size_t i=0; i != query_size; ++i)
+            {
+              dof_id_type constrained = ids[i];
+              data[i].clear();
+              if (_dof_constraints.count(constrained))
+                {
                   DofConstraintValueMap::const_iterator rhsit =
                     _primal_constraint_values.find(constrained);
-                  dof_row_rhss[i] = (rhsit == _primal_constraint_values.end()) ?
-                    0 : rhsit->second;
+                  data[i].push_back
+                    ((rhsit == _primal_constraint_values.end()) ?
+                     0 : rhsit->second);
 
                   for (unsigned int q = 0; q != max_qoi_num; ++q)
                     {
@@ -3902,67 +3925,75 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
                         _adjoint_constraint_values.find(q);
 
                       if (adjoint_map_it == _adjoint_constraint_values.end())
-                        continue;
+                        {
+                          data[i].push_back(0);
+                          continue;
+                        }
 
                       const DofConstraintValueMap & constraint_map =
                         adjoint_map_it->second;
 
                       DofConstraintValueMap::const_iterator rhsit =
                         constraint_map.find(constrained);
-                      dof_adj_rhss[q][i] = (rhsit == constraint_map.end()) ?
-                        0 : rhsit->second;
+                      data[i].push_back
+                        ((rhsit == constraint_map.end()) ?
+                         0 : rhsit->second);
                     }
                 }
-              else
-                {
-                  // Get NaN from Real, where it should exist, not
-                  // from Number, which may be std::complex, in which
-                  // case quiet_NaN() silently returns zero, rather
-                  // than sanely returning NaN or throwing an
-                  // exception or sending Stroustrup hate mail.
-                  dof_row_rhss[i] =
-                    std::numeric_limits<Real>::quiet_NaN();
+            }
+        };
 
-                  // Make sure we don't get caught by "!isnan(NaN)"
-                  // bugs again.
-                  libmesh_assert(libmesh_isnan(dof_row_rhss[i]));
+      auto row_action_functor =
+        [this,
+         & unexpanded_dofs]
+        (processor_id_type,
+         const std::vector<dof_id_type> & ids,
+         const std::vector<row_datum> & data)
+        {
+          // Add any new constraint rows we've found
+          const std::size_t query_size = ids.size();
+
+          for (std::size_t i=0; i != query_size; ++i)
+            {
+              const dof_id_type constrained = ids[i];
+
+              // An empty row is an constraint with an empty row; for
+              // no constraint we use a "no row" placeholder
+              if (data[i].empty())
+                {
+                  DofConstraintRow & row = _dof_constraints[constrained];
+                  row.clear();
+                }
+              else if (data[i][0].first != DofObject::invalid_id)
+                {
+                  DofConstraintRow & row = _dof_constraints[constrained];
+                  row.clear();
+                  for (auto & pair : data[i])
+                    row[pair.first] = pair.second;
+
+                  // And prepare to check for more recursive constraints
+                  unexpanded_dofs.insert(constrained);
                 }
             }
+        };
 
-          // Trade back the results
-          std::vector<std::vector<dof_id_type>> dof_filled_keys;
-          std::vector<std::vector<Real>> dof_filled_vals;
-          std::vector<Number> dof_filled_rhss;
-          std::vector<std::vector<Number>> adj_filled_rhss;
-          this->comm().send_receive(procdown, dof_row_keys,
-                                    procup, dof_filled_keys);
-          this->comm().send_receive(procdown, dof_row_vals,
-                                    procup, dof_filled_vals);
-          this->comm().send_receive(procdown, dof_row_rhss,
-                                    procup, dof_filled_rhss);
-          this->comm().send_receive(procdown, dof_adj_rhss,
-                                    procup, adj_filled_rhss);
+      auto rhss_action_functor =
+        [this,
+         max_qoi_num]
+        (processor_id_type,
+         const std::vector<dof_id_type> & ids,
+         const std::vector<rhss_datum> & data)
+        {
+          // Add rhs data for any new constraint rows we've found
+          const std::size_t query_size = ids.size();
 
-          libmesh_assert_equal_to (dof_filled_keys.size(), requested_dof_ids[procup].size());
-          libmesh_assert_equal_to (dof_filled_vals.size(), requested_dof_ids[procup].size());
-          libmesh_assert_equal_to (dof_filled_rhss.size(), requested_dof_ids[procup].size());
-#ifndef NDEBUG
-          for (std::size_t q=0; q != adj_filled_rhss.size(); ++q)
-            libmesh_assert_equal_to (adj_filled_rhss[q].size(), requested_dof_ids[procup].size());
-#endif
-
-          // Add any new constraint rows we've found
-          for (std::size_t i=0; i != requested_dof_ids[procup].size(); ++i)
+          for (std::size_t i=0; i != query_size; ++i)
             {
-              libmesh_assert_equal_to (dof_filled_keys[i].size(), dof_filled_vals[i].size());
-              if (!libmesh_isnan(dof_filled_rhss[i]))
+              if (!data[i].empty())
                 {
-                  dof_id_type constrained = requested_dof_ids[procup][i];
-                  DofConstraintRow & row = _dof_constraints[constrained];
-                  for (std::size_t j = 0; j != dof_filled_keys[i].size(); ++j)
-                    row[dof_filled_keys[i][j]] = dof_filled_vals[i][j];
-                  if (dof_filled_rhss[i] != Number(0))
-                    _primal_constraint_values[constrained] = dof_filled_rhss[i];
+                  dof_id_type constrained = ids[i];
+                  if (data[i][0] != Number(0))
+                    _primal_constraint_values[constrained] = data[i][0];
                   else
                     _primal_constraint_values.erase(constrained);
 
@@ -3972,7 +4003,7 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
                         _adjoint_constraint_values.find(q);
 
                       if ((adjoint_map_it == _adjoint_constraint_values.end()) &&
-                          adj_filled_rhss[q][constrained] == Number(0))
+                          data[i][q+1] == Number(0))
                         continue;
 
                       if (adjoint_map_it == _adjoint_constraint_values.end())
@@ -3982,19 +4013,28 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
                       DofConstraintValueMap & constraint_map =
                         adjoint_map_it->second;
 
-                      if (adj_filled_rhss[q][i] != Number(0))
+                      if (data[i][q+1] != Number(0))
                         constraint_map[constrained] =
-                          adj_filled_rhss[q][i];
+                          data[i][q+1];
                       else
                         constraint_map.erase(constrained);
                     }
-
-                  // And prepare to check for more recursive constraints
-                  if (!dof_filled_keys[i].empty())
-                    unexpanded_dofs.insert(constrained);
                 }
             }
-        }
+
+        };
+
+      // Now request constraint rows from other processors
+      row_datum * row_ex = libmesh_nullptr;
+      Parallel::pull_parallel_vector_data
+        (this->comm(), requested_dof_ids, row_gather_functor,
+         row_action_functor, row_ex);
+
+      // And request constraint right hand sides from other procesors
+      rhss_datum * rhs_ex = libmesh_nullptr;
+      Parallel::pull_parallel_vector_data
+        (this->comm(), requested_dof_ids, rhss_gather_functor,
+         rhss_action_functor, rhs_ex);
 
       // We have to keep recursing while the unexpanded set is
       // nonempty on *any* processor
