@@ -89,6 +89,31 @@ AS_IF([test "$enabledeprecated" != yes],
 
 
 # --------------------------------------------------------------
+# forward declared enumerations - enable by default
+# We want to prevent new library code from being added that
+# depends on including enum headers, but still give downstream
+# apps the ability to compile with the old headers for a
+# period of deprecation.
+# --------------------------------------------------------------
+AC_ARG_ENABLE(forward-declare-enums,
+              [AS_HELP_STRING([--disable-forward-declare-enums],[Directly include enumeration headers rather than forward declaring them])],
+              enablefwdenums=$enableval,
+              enablefwdenums=yes)
+
+AC_SUBST(enablefwdenums)
+AS_IF([test "$enablefwdenums" != yes],
+      [
+        AC_MSG_RESULT([>>> INFO: Forward declared enumerations are disabled <<<])
+        AC_MSG_RESULT([>>> Enumeration headers will be included directly <<<])
+      ],
+      [
+        AC_MSG_RESULT([<<< Configuring library with forward declared enumerations >>>])
+        AC_DEFINE(FORWARD_DECLARE_ENUMS, 1, [Flag indicating if the library uses forward declared enumerations])
+      ])
+# --------------------------------------------------------------
+
+
+# --------------------------------------------------------------
 # blocked matrix/vector storage - disabled by default.
 #   See http://sourceforge.net/mailarchive/forum.php?thread_name=B4613A7D-0033-43C7-A9DF-5A801217A097%40nasa.gov&forum_name=libmesh-devel
 # --------------------------------------------------------------
