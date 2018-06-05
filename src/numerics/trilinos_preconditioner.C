@@ -24,6 +24,7 @@
 #include "libmesh/trilinos_epetra_matrix.h"
 #include "libmesh/trilinos_epetra_vector.h"
 #include "libmesh/libmesh_common.h"
+#include "libmesh/enum_preconditioner_type.h"
 
 #include "libmesh/ignore_warnings.h"
 #ifdef LIBMESH_TRILINOS_HAVE_IFPACK

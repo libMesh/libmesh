@@ -328,22 +328,6 @@ private:
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-PetscLinearSolver<T>::PetscLinearSolver(const libMesh::Parallel::Communicator & comm_in) :
-  LinearSolver<T>(comm_in),
-  _restrict_solve_to_is(libmesh_nullptr),
-  _restrict_solve_to_is_complement(libmesh_nullptr),
-  _subset_solve_mode(SUBSET_ZERO)
-{
-  if (this->n_processors() == 1)
-    this->_preconditioner_type = ILU_PRECOND;
-  else
-    this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
-}
-
-
-
-template <typename T>
-inline
 PetscLinearSolver<T>::~PetscLinearSolver ()
 {
   this->clear ();

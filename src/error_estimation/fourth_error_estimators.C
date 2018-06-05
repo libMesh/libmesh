@@ -34,13 +34,29 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
 #include "libmesh/system.h"
-
 #include "libmesh/dense_vector.h"
 #include "libmesh/tensor_tools.h"
-
+#include "libmesh/enum_error_estimator_type.h"
+#include "libmesh/enum_norm_type.h"
 
 namespace libMesh
 {
+
+
+LaplacianErrorEstimator::LaplacianErrorEstimator() :
+  JumpErrorEstimator()
+{
+  error_norm = H2_SEMINORM;
+}
+
+
+
+ErrorEstimatorType
+LaplacianErrorEstimator::type() const
+{
+  return LAPLACIAN;
+}
+
 
 
 void

@@ -23,6 +23,7 @@
 #include "libmesh/petsc_nonlinear_solver.h"
 #include "libmesh/trilinos_nox_nonlinear_solver.h"
 #include "libmesh/solver_configuration.h"
+#include "libmesh/enum_solver_package.h"
 
 namespace libMesh
 {

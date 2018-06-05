@@ -23,7 +23,6 @@
 // Local Includes
 #include "libmesh/libmesh.h"
 #include "libmesh/bounding_box.h"
-#include "libmesh/enum_elem_type.h"
 #include "libmesh/id_types.h"
 #include "libmesh/mesh_base.h"
 
@@ -38,6 +37,7 @@ namespace libMesh
 // forward declarations
 class Sphere;
 class Elem;
+enum ElemType : int;
 
 /**
  * Utility functions for operations on a \p Mesh object.  Here is where

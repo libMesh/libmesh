@@ -38,6 +38,8 @@
 #include "libmesh/uniform_refinement_estimator.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/tensor_tools.h"
+#include "libmesh/enum_error_estimator_type.h"
+#include "libmesh/enum_norm_type.h"
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -46,6 +48,23 @@ namespace libMesh
 
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
+
+UniformRefinementEstimator::UniformRefinementEstimator() :
+    ErrorEstimator(),
+    number_h_refinements(1),
+    number_p_refinements(0)
+{
+  error_norm = H1;
+}
+
+
+
+ErrorEstimatorType UniformRefinementEstimator::type() const
+{
+  return UNIFORM_REFINEMENT;
+}
+
+
 void UniformRefinementEstimator::estimate_error (const System & _system,
                                                  ErrorVector & error_per_cell,
                                                  const NumericVector<Number> * solution_vector,

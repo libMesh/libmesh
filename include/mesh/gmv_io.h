@@ -24,7 +24,6 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_output.h"
 #include "libmesh/mesh_input.h"
-#include "libmesh/enum_elem_type.h"
 
 // C++ includes
 #include <map>
@@ -34,6 +33,7 @@ namespace libMesh
 
 // Forward declarations
 class MeshBase;
+enum ElemType : int;
 
 /**
  * This class implements writing meshes in the GMV format.

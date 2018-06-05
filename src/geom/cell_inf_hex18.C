@@ -20,8 +20,6 @@
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-// C++ includes
-
 // Local includes cont'd
 #include "libmesh/cell_inf_hex18.h"
 #include "libmesh/edge_edge3.h"
@@ -29,6 +27,8 @@
 #include "libmesh/face_quad9.h"
 #include "libmesh/face_inf_quad6.h"
 #include "libmesh/side.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -59,6 +59,11 @@ const unsigned int InfHex18::edge_nodes_map[8][3] =
 
 // ------------------------------------------------------------
 // InfHex18 class member functions
+
+Order InfHex18::default_order() const
+{
+  return SECOND;
+}
 
 bool InfHex18::is_vertex(const unsigned int i) const
 {

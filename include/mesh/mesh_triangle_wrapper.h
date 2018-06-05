@@ -25,7 +25,6 @@
 
 // Local Includes
 #include "libmesh/libmesh_common.h" // Real
-#include "libmesh/enum_elem_type.h" // For ElemType declaration below
 
 // C++ includes
 #include <cstddef>
@@ -34,6 +33,7 @@ namespace libMesh
 {
 // Forward declarations
 class UnstructuredMesh;
+enum ElemType : int;
 
 // Make sure Triangle uses our "Real" as its "REAL"
 typedef Real REAL;

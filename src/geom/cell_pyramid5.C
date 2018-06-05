@@ -16,14 +16,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/side.h"
 #include "libmesh/cell_pyramid5.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_quad4.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -101,6 +101,13 @@ bool Pyramid5::has_affine_map() const
   //  Point v = this->point(3) - this->point(0);
   //  return (v.relative_fuzzy_equals(this->point(2) - this->point(1)));
   return false;
+}
+
+
+
+Order Pyramid5::default_order() const
+{
+  return FIRST;
 }
 
 

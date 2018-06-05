@@ -32,6 +32,7 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/mesh_triangle_holes.h"
 #include "libmesh/mesh_triangle_wrapper.h"
+#include "libmesh/enum_elem_type.h"
 
 namespace libMesh
 {

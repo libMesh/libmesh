@@ -22,7 +22,7 @@
 #include "libmesh/error_vector.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/parallel.h"
-
+#include "libmesh/enum_error_estimator_type.h"
 
 
 

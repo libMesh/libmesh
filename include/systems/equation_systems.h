@@ -24,7 +24,6 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parameters.h"
 #include "libmesh/system.h"
-#include "libmesh/enum_xdr_mode.h"
 #include "libmesh/parallel_object.h"
 
 // HP aCC needs these for some reason
@@ -48,6 +47,7 @@ namespace libMesh
 // Forward Declarations
 class Elem;
 class MeshBase;
+enum XdrMODE : int;
 
 /**
  * This is the \p EquationSystems class.  It is in charge

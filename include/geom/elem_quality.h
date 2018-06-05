@@ -20,16 +20,16 @@
 #ifndef LIBMESH_ELEM_QUALITY_H
 #define LIBMESH_ELEM_QUALITY_H
 
-// Local includes
-#include "libmesh/enum_elem_type.h"
-#include "libmesh/enum_elem_quality.h"
-
 // C++ includes
 #include <vector>
 #include <string>
 
 namespace libMesh
 {
+
+// Forward declarations
+enum ElemType : int;
+enum ElemQuality : int;
 
 /**
  * A namespace for quality utility functions.

@@ -23,9 +23,6 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/enum_solver_package.h"
-#include "libmesh/enum_solver_type.h"
-#include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
@@ -40,6 +37,8 @@ namespace libMesh
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
+enum SolverPackage : int;
+enum PreconditionerType : int;
 
 /**
  * This class provides a uniform interface for preconditioners.  This base
@@ -160,18 +159,6 @@ protected:
 
 
 /*----------------------- inline functions ----------------------------------*/
-template <typename T>
-inline
-Preconditioner<T>::Preconditioner (const libMesh::Parallel::Communicator & comm_in) :
-  ParallelObject(comm_in),
-  _matrix(libmesh_nullptr),
-  _preconditioner_type (ILU_PRECOND),
-  _is_initialized      (false)
-{
-}
-
-
-
 template <typename T>
 inline
 Preconditioner<T>::~Preconditioner ()

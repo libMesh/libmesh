@@ -24,7 +24,6 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh_base.h"
-#include "libmesh/enum_solver_package.h"
 #include "libmesh/parallel.h"
 
 // C++ includes
@@ -48,6 +47,8 @@ class vtkMPIController;
 namespace libMesh
 {
 
+// Forward Declarations
+enum SolverPackage : int;
 
 /**
  * The \p LibMeshInit class, when constructed, initializes

@@ -17,11 +17,7 @@
 
 
 
-#include <sstream>
-#include <fstream>
-#include <string>
-#include <iomanip>
-
+// libMesh includes
 #include "libmesh/dof_map.h"
 #include "libmesh/ensight_io.h"
 #include "libmesh/equation_systems.h"
@@ -29,6 +25,13 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/system.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_elem_type.h"
+
+// C++ includes
+#include <sstream>
+#include <fstream>
+#include <string>
+#include <iomanip>
 
 namespace libMesh
 {

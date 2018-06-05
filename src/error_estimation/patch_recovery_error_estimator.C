@@ -40,9 +40,19 @@
 #include "libmesh/tensor_value.h"
 #include "libmesh/threads.h"
 #include "libmesh/tensor_tools.h"
+#include "libmesh/enum_error_estimator_type.h"
+#include "libmesh/enum_norm_type.h"
 
 namespace libMesh
 {
+
+ErrorEstimatorType PatchRecoveryErrorEstimator::type() const
+{
+  return PATCH_RECOVERY;
+}
+
+
+
 // Setter function for the patch_reuse flag
 void PatchRecoveryErrorEstimator::set_patch_reuse(bool patch_reuse_flag)
 {
@@ -51,6 +61,17 @@ void PatchRecoveryErrorEstimator::set_patch_reuse(bool patch_reuse_flag)
 
 //-----------------------------------------------------------------
 // PatchRecoveryErrorEstimator implementations
+PatchRecoveryErrorEstimator::PatchRecoveryErrorEstimator() :
+    ErrorEstimator(),
+    target_patch_size(20),
+    patch_growth_strategy(&Patch::add_local_face_neighbors),
+    patch_reuse(true)
+{
+  error_norm = H1_SEMINORM;
+}
+
+
+
 std::vector<Real> PatchRecoveryErrorEstimator::specpoly(const unsigned int dim,
                                                         const Order order,
                                                         const Point p,

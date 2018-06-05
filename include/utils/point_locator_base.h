@@ -24,7 +24,6 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/auto_ptr.h" // deprecated
-#include "libmesh/enum_point_locator_type.h"
 
 // C++ includes
 #include <cstddef>
@@ -41,7 +40,7 @@ class Point;
 class TreeBase;
 class Elem;
 class Node;
-
+enum PointLocatorType : int;
 
 
 /**

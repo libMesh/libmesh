@@ -27,10 +27,7 @@
 #include "libmesh/id_types.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/node.h"
-#include "libmesh/enum_elem_type.h"
-#include "libmesh/enum_elem_quality.h"
-#include "libmesh/enum_order.h"
-#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_elem_type.h" // INVALID_ELEM
 #include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/multi_predicates.h"
 #include "libmesh/pointer_to_pointer_iter.h"
@@ -59,6 +56,9 @@ class Elem;
 class PeriodicBoundaries;
 class PointLocatorBase;
 #endif
+enum ElemQuality : int;
+enum IOPackage : int;
+enum Order : int;
 
 /**
  * This is the base class from which all geometric element types are

@@ -23,6 +23,9 @@
 #include "libmesh/fe.h"
 #include "libmesh/fe_compute_data.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/enum_fe_family.h"
+#include "libmesh/enum_order.h"
+#include "libmesh/enum_elem_type.h"
 
 namespace libMesh
 {
@@ -33,6 +36,46 @@ FEInterface::FEInterface()
 {
   libmesh_error_msg("ERROR: Do not define an object of this type.");
 }
+
+
+
+#ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+bool
+FEInterface::is_InfFE_elem(const ElemType)
+{
+  return false;
+}
+
+#else
+
+bool
+FEInterface::is_InfFE_elem(const ElemType et)
+{
+
+  switch (et)
+    {
+    case INFEDGE2:
+    case INFQUAD4:
+    case INFQUAD6:
+    case INFHEX8:
+    case INFHEX16:
+    case INFHEX18:
+    case INFPRISM6:
+    case INFPRISM12:
+      {
+        return true;
+      }
+
+    default:
+      {
+        return false;
+      }
+    }
+}
+
+#endif //ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
 
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES

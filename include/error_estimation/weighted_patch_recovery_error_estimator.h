@@ -25,7 +25,6 @@
 
 // Local Includes
 #include "libmesh/elem_range.h"
-#include "libmesh/enum_order.h"
 #include "libmesh/error_estimator.h"
 #include "libmesh/fem_function_base.h"
 #include "libmesh/patch_recovery_error_estimator.h"
@@ -81,8 +80,7 @@ public:
   */
   std::vector<FEMFunctionBase<Number> *> weight_functions;
 
-  virtual ErrorEstimatorType type() const libmesh_override
-  { return WEIGHTED_PATCH_RECOVERY;}
+  virtual ErrorEstimatorType type() const libmesh_override;
 
 private:
 

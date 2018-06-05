@@ -15,20 +15,19 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// Local includes
 #include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-// C++ includes
-
-// Local includes cont'd
+// Local includes
 #include "libmesh/cell_inf_prism12.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/edge_inf_edge2.h"
 #include "libmesh/face_tri6.h"
 #include "libmesh/face_inf_quad6.h"
 #include "libmesh/side.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -101,7 +100,10 @@ bool InfPrism12::is_node_on_edge(const unsigned int n,
   return false;
 }
 
-
+Order InfPrism12::default_order() const
+{
+  return SECOND;
+}
 
 unsigned int InfPrism12::which_node_am_i(unsigned int side,
                                          unsigned int side_node) const

@@ -20,9 +20,9 @@
 // Open the mesh and solution file named on standard input, find all
 // variables therein, and output their norms and seminorms.
 #include "libmesh/libmesh.h"
-
 #include "libmesh/mesh.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/enum_norm_type.h"
 
 using namespace libMesh;
 

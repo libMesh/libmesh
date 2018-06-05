@@ -20,8 +20,6 @@
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-// C++ includes
-
 // Local includes cont'd
 #include "libmesh/cell_inf_hex16.h"
 #include "libmesh/edge_edge3.h"
@@ -29,6 +27,8 @@
 #include "libmesh/face_quad8.h"
 #include "libmesh/face_inf_quad6.h"
 #include "libmesh/side.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -102,6 +102,13 @@ bool InfHex16::is_node_on_edge(const unsigned int n,
     if (edge_nodes_map[e][i] == n)
       return true;
   return false;
+}
+
+
+
+Order InfHex16::default_order() const
+{
+  return SECOND;
 }
 
 

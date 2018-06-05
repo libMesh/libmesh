@@ -37,6 +37,8 @@
 #include "libmesh/partitioner.h"
 #include "libmesh/point_locator_base.h"
 #include "libmesh/threads.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/enum_point_locator_type.h"
 
 
 namespace libMesh

@@ -20,6 +20,7 @@
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/enum_elem_type.h"
 
 // For projection code:
 #include "libmesh/boundary_info.h"

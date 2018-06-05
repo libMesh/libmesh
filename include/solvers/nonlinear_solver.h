@@ -22,7 +22,6 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/enum_solver_package.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/libmesh.h"
@@ -41,6 +40,7 @@ template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class Preconditioner;
 class SolverConfiguration;
+enum SolverPackage : int;
 
 /**
  * This base class can be inherited from to provide interfaces to

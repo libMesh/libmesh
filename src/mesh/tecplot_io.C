@@ -29,6 +29,7 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/elem.h"
 #include "libmesh/parallel.h"
+#include "libmesh/enum_io_package.h"
 
 #ifdef LIBMESH_HAVE_TECPLOT_API
 extern "C" {

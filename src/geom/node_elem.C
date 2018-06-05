@@ -17,16 +17,19 @@
 
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/node_elem.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
 
 
-// Forward declarations
+Order NodeElem::default_order() const
+{
+  return FIRST;
+}
+
 
 
 void NodeElem::connectivity(const unsigned int,

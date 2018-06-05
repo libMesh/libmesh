@@ -129,7 +129,7 @@ public:
   /**
    * \returns SECOND.
    */
-  virtual Order default_order() const libmesh_override { return SECOND; }
+  virtual Order default_order() const libmesh_override;
 
   /**
    * \returns \p Tet10::side_nodes_map[side][side_node] after doing some range checking.

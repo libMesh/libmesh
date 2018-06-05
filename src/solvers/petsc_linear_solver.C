@@ -35,6 +35,9 @@
 #include "libmesh/system.h"
 #include "libmesh/petsc_auto_fieldsplit.h"
 #include "libmesh/solver_configuration.h"
+#include "libmesh/enum_preconditioner_type.h"
+#include "libmesh/enum_solver_type.h"
+#include "libmesh/enum_convergence_flags.h"
 
 namespace libMesh
 {
@@ -127,6 +130,21 @@ extern "C"
 } // end extern "C"
 
 /*----------------------- functions ----------------------------------*/
+template <typename T>
+PetscLinearSolver<T>::PetscLinearSolver(const libMesh::Parallel::Communicator & comm_in) :
+  LinearSolver<T>(comm_in),
+  _restrict_solve_to_is(libmesh_nullptr),
+  _restrict_solve_to_is_complement(libmesh_nullptr),
+  _subset_solve_mode(SUBSET_ZERO)
+{
+  if (this->n_processors() == 1)
+    this->_preconditioner_type = ILU_PRECOND;
+  else
+    this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
+}
+
+
+
 template <typename T>
 void PetscLinearSolver<T>::clear ()
 {

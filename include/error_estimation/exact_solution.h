@@ -21,7 +21,6 @@
 
 // Local Includes
 #include "libmesh/libmesh_common.h" // for Number
-#include "libmesh/enum_norm_type.h"
 
 // C++ includes
 #include <map>
@@ -47,6 +46,7 @@ typedef TensorValue<Number> NumberTensorValue;
 typedef NumberTensorValue   Tensor;
 typedef VectorValue<Number> NumberVectorValue;
 typedef NumberVectorValue   Gradient;
+enum FEMNormType : int;
 
 /**
  * This class handles the computation of the L2 and/or H1 error for

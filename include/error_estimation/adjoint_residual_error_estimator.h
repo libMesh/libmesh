@@ -109,8 +109,7 @@ public:
                                const NumericVector<Number> * solution_vector = libmesh_nullptr,
                                bool estimate_parent_error = false) libmesh_override;
 
-  virtual ErrorEstimatorType type() const libmesh_override
-  { return ADJOINT_RESIDUAL;}
+  virtual ErrorEstimatorType type() const libmesh_override;
 
 protected:
 

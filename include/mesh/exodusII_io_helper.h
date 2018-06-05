@@ -25,7 +25,6 @@
 // Local includes
 #include "libmesh/parallel_object.h"
 #include "libmesh/point.h"
-#include "libmesh/enum_elem_type.h"
 
 // C++ includes
 #include <iostream>
@@ -74,6 +73,7 @@ namespace libMesh
 
 // Forward declarations
 class MeshBase;
+enum ElemType : int;
 
 /**
  * This is the \p ExodusII_IO_Helper class.  This class hides the

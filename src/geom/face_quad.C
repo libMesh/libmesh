@@ -19,6 +19,7 @@
 #include "libmesh/face_quad.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/face_quad4.h"
+#include "libmesh/enum_elem_quality.h"
 
 // C++ includes
 #include <array>

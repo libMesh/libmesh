@@ -15,12 +15,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// C++ includes
-
 // Local includes
 #include "libmesh/side.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/face_quad4.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -120,6 +120,13 @@ bool Quad4::has_affine_map() const
 {
   Point v = this->point(3) - this->point(0);
   return (v.relative_fuzzy_equals(this->point(2) - this->point(1)));
+}
+
+
+
+Order Quad4::default_order() const
+{
+  return FIRST;
 }
 
 

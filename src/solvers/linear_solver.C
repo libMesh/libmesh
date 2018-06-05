@@ -29,12 +29,29 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/solver_configuration.h"
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/enum_preconditioner_type.h"
+#include "libmesh/enum_solver_type.h"
 
 namespace libMesh
 {
 
 //------------------------------------------------------------------
 // LinearSolver members
+template <typename T>
+LinearSolver<T>::LinearSolver (const libMesh::Parallel::Communicator & comm_in) :
+  ParallelObject       (comm_in),
+  _solver_type         (GMRES),
+  _preconditioner_type (ILU_PRECOND),
+  _is_initialized      (false),
+  _preconditioner      (libmesh_nullptr),
+  same_preconditioner  (false),
+  _solver_configuration(libmesh_nullptr)
+{
+}
+
+
+
 template <typename T>
 std::unique_ptr<LinearSolver<T>>
 LinearSolver<T>::build(const libMesh::Parallel::Communicator & comm,

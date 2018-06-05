@@ -22,11 +22,7 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/enum_convergence_flags.h"
-#include "libmesh/enum_solver_package.h"
-#include "libmesh/enum_solver_type.h"
-#include "libmesh/enum_preconditioner_type.h"
-#include "libmesh/enum_subset_solve_mode.h"
+#include "libmesh/enum_subset_solve_mode.h" // SUBSET_ZERO
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
@@ -47,6 +43,10 @@ template <typename T> class ShellMatrix;
 template <typename T> class Preconditioner;
 class System;
 class SolverConfiguration;
+enum SolverPackage : int;
+enum PreconditionerType : int;
+enum SolverType : int;
+enum LinearConvergenceReason : int;
 
 /**
  * This base class can be inherited from to provide interfaces to
@@ -299,21 +299,6 @@ protected:
 
 
 /*----------------------- inline functions ----------------------------------*/
-template <typename T>
-inline
-LinearSolver<T>::LinearSolver (const libMesh::Parallel::Communicator & comm_in) :
-  ParallelObject       (comm_in),
-  _solver_type         (GMRES),
-  _preconditioner_type (ILU_PRECOND),
-  _is_initialized      (false),
-  _preconditioner      (libmesh_nullptr),
-  same_preconditioner  (false),
-  _solver_configuration(libmesh_nullptr)
-{
-}
-
-
-
 template <typename T>
 inline
 LinearSolver<T>::~LinearSolver ()

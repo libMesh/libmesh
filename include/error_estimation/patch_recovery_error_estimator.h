@@ -22,7 +22,6 @@
 
 // Local Includes
 #include "libmesh/error_estimator.h"
-#include "libmesh/enum_order.h"
 #include "libmesh/patch.h"
 #include "libmesh/point.h"
 #include "libmesh/elem_range.h"
@@ -36,7 +35,7 @@ namespace libMesh
 
 // Forward Declarations
 class Elem;
-
+enum Order : int;
 
 /**
  * This class implements the Patch Recovery error indicator.
@@ -54,12 +53,7 @@ public:
    * seminorms should be supported now.  W1,p and W2,p norms would
    * be natural to support if any contributors make the effort.
    */
-  PatchRecoveryErrorEstimator() :
-    ErrorEstimator(),
-    target_patch_size(20),
-    patch_growth_strategy(&Patch::add_local_face_neighbors),
-    patch_reuse(true)
-  { error_norm = H1_SEMINORM; }
+  PatchRecoveryErrorEstimator();
 
   /**
    * Destructor.
@@ -94,8 +88,7 @@ public:
 
   void set_patch_reuse (bool);
 
-  virtual ErrorEstimatorType type() const libmesh_override
-  { return PATCH_RECOVERY;}
+  virtual ErrorEstimatorType type() const libmesh_override;
 
 protected:
 

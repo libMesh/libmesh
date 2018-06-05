@@ -23,7 +23,7 @@
 #include "libmesh/cell_hex.h"
 #include "libmesh/cell_hex8.h"
 #include "libmesh/face_quad4.h"
-
+#include "libmesh/enum_elem_quality.h"
 
 
 namespace libMesh

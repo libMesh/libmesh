@@ -27,8 +27,6 @@
 // Local includes
 #include "libmesh/preconditioner.h"
 #include "libmesh/libmesh_common.h"
-#include "libmesh/enum_solver_package.h"
-#include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/petsc_macro.h"
@@ -43,6 +41,7 @@ namespace libMesh
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
 template <typename T> class ShellMatrix;
+enum PreconditionerType : int;
 
 /**
  * This class provides an interface to the suite of preconditioners

@@ -19,6 +19,8 @@
 
 // Local includes
 #include "libmesh/edge_edge3.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -86,6 +88,13 @@ bool Edge3::has_affine_map() const
 {
   return (this->point(2).relative_fuzzy_equals
           ((this->point(0) + this->point(1))/2));
+}
+
+
+
+Order Edge3::default_order() const
+{
+  return SECOND;
 }
 
 

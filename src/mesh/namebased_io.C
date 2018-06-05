@@ -28,9 +28,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_communication.h"
-
 #include "libmesh/namebased_io.h"
-
 #include "libmesh/exodusII_io.h"
 #include "libmesh/gmv_io.h"
 #include "libmesh/tecplot_io.h"
@@ -47,9 +45,8 @@
 #include "libmesh/vtk_io.h"
 #include "libmesh/abaqus_io.h"
 #include "libmesh/checkpoint_io.h"
-
 #include "libmesh/equation_systems.h"
-
+#include "libmesh/enum_xdr_mode.h"
 
 
 namespace libMesh

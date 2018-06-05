@@ -16,13 +16,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/side.h"
 #include "libmesh/cell_hex20.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/face_quad8.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -138,6 +138,13 @@ bool Hex20::has_affine_map() const
     return false;
   // If all the above checks out, the map is affine
   return true;
+}
+
+
+
+Order Hex20::default_order() const
+{
+  return SECOND;
 }
 
 

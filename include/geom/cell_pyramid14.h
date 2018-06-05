@@ -134,7 +134,7 @@ public:
   /**
    * \returns SECOND.
    */
-  virtual Order default_order() const libmesh_override { return SECOND; }
+  virtual Order default_order() const libmesh_override;
 
   /**
    * Don't hide Pyramid::key() defined in the base class.

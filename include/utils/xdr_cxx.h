@@ -23,7 +23,7 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh.h"
-#include "libmesh/enum_xdr_mode.h"
+#include "libmesh/enum_xdr_mode.h" // READ, WRITE, etc.
 #include "libmesh/auto_ptr.h" // deprecated
 
 // C++ includes

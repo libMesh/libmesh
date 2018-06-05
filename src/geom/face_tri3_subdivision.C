@@ -15,11 +15,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// C++ includes
-
 // Local includes
 #include "libmesh/face_tri3_subdivision.h"
 #include "libmesh/mesh_subdivision_support.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -45,6 +44,14 @@ Tri3Subdivision::Tri3Subdivision(Elem * p) : Tri3(p), _subdivision_updated(true)
         }
     }
 }
+
+
+
+Order Tri3Subdivision::default_order() const
+{
+  return FOURTH;
+}
+
 
 
 void Tri3Subdivision::prepare_subdivision_properties()

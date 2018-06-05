@@ -49,11 +49,7 @@ public:
   /**
    * Constructor.  Sets the most common default parameter values.
    */
-  UniformRefinementEstimator() :
-    ErrorEstimator(),
-    number_h_refinements(1),
-    number_p_refinements(0)
-  { error_norm = H1; }
+  UniformRefinementEstimator();
 
   /**
    * Destructor.
@@ -108,8 +104,7 @@ public:
                                 const std::map<const System *, const NumericVector<Number> *> * solution_vectors = libmesh_nullptr,
                                 bool estimate_parent_error = false) libmesh_override;
 
-  virtual ErrorEstimatorType type() const libmesh_override
-  { return UNIFORM_REFINEMENT;}
+  virtual ErrorEstimatorType type() const libmesh_override;
 
   /**
    * How many h refinements to perform to get the fine grid

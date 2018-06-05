@@ -16,14 +16,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/side.h"
 #include "libmesh/cell_pyramid14.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/face_tri6.h"
 #include "libmesh/face_quad9.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -115,6 +115,13 @@ bool Pyramid14::has_affine_map() const
   // TODO: If the base is a parallelogram and all the triangular faces are planar,
   // the map should be linear, but I need to test this theory...
   return false;
+}
+
+
+
+Order Pyramid14::default_order() const
+{
+  return SECOND;
 }
 
 

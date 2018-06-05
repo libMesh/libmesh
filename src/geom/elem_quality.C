@@ -22,6 +22,9 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/elem_quality.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/enum_elem_quality.h"
+
 
 namespace libMesh
 {

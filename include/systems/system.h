@@ -23,10 +23,8 @@
 // Local Includes
 #include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/elem_range.h"
-#include "libmesh/enum_norm_type.h"
-#include "libmesh/enum_xdr_mode.h"
-#include "libmesh/enum_subset_solve_mode.h"
-#include "libmesh/enum_parallel_type.h"
+#include "libmesh/enum_subset_solve_mode.h" // SUBSET_ZERO
+#include "libmesh/enum_parallel_type.h" // PARALLEL
 #include "libmesh/fem_function_base.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parallel_object.h"
@@ -63,6 +61,7 @@ typedef NumberVectorValue Gradient;
 class SystemSubset;
 class FEType;
 class SystemNorm;
+enum FEMNormType : int;
 
 /**
  * This is the base class for classes which contain

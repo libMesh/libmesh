@@ -26,6 +26,7 @@
 #include "libmesh/point.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri6.h"
+#include "libmesh/enum_elem_type.h"
 
 namespace libMesh
 {

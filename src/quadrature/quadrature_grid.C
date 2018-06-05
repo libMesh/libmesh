@@ -16,10 +16,22 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// See the files:
+// libMesh includes
+#include "libmesh/quadrature_grid.h"
+#include "libmesh/enum_quadrature_type.h"
 
+namespace libMesh
+{
+
+QuadratureType QGrid::type() const
+{
+  return QGRID;
+}
+
+// See the files:
 // quadrature_grid_1D.C
 // quadrature_grid_2D.C
 // quadrature_grid_3D.C
-
 // for implementation.
+
+}

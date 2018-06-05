@@ -17,14 +17,11 @@
 
 
 
-// C++ includes
-
-
 // Local Includes
 #include "libmesh/point_locator_base.h"
 #include "libmesh/point_locator_tree.h"
-
 #include "libmesh/elem.h"
+#include "libmesh/enum_point_locator_type.h"
 
 namespace libMesh
 {

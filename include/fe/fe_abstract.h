@@ -24,7 +24,6 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/point.h"
 #include "libmesh/vector_value.h"
-#include "libmesh/enum_elem_type.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/fe_map.h"
@@ -51,6 +50,7 @@ class Elem;
 class MeshBase;
 template <typename T> class NumericVector;
 class QBase;
+enum ElemType : int;
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
 class NodeConstraints;

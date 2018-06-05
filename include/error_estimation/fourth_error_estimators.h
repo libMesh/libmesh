@@ -46,17 +46,14 @@ public:
    * Constructor.  Defaults to H2 seminorm; changes to error_norm are
    * ignored.
    */
-  LaplacianErrorEstimator() :
-    JumpErrorEstimator()
-  { error_norm = H2_SEMINORM; }
+  LaplacianErrorEstimator();
 
   /**
    * Destructor.
    */
   ~LaplacianErrorEstimator() {}
 
-  virtual ErrorEstimatorType type() const libmesh_override
-  { return LAPLACIAN;}
+  virtual ErrorEstimatorType type() const libmesh_override;
 
 protected:
 

@@ -20,11 +20,12 @@
 // arguments, open the output mesh, project that solution onto the
 // output mesh, and write a corresponding output solution file.
 
+// C++ includes
 #include <map>
 #include <string>
 
+// libMesh includes
 #include "libmesh/libmesh.h"
-
 #include "libmesh/dof_map.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/getpot.h"
@@ -33,6 +34,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/point.h"
 #include "libmesh/replicated_mesh.h"
+#include "libmesh/enum_xdr_mode.h"
 
 
 using namespace libMesh;

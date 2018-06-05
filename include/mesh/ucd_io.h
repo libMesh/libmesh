@@ -27,13 +27,13 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_input.h"
 #include "libmesh/mesh_output.h"
-#include "libmesh/enum_elem_type.h"
 
 namespace libMesh
 {
 
 // Forward declarations
 class MeshBase;
+enum ElemType : int;
 
 /**
  * This class implements reading & writing meshes in the AVS's UCD format.

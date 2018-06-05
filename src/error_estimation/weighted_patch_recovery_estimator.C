@@ -38,9 +38,20 @@
 #include "libmesh/tensor_value.h"
 #include "libmesh/threads.h"
 #include "libmesh/weighted_patch_recovery_error_estimator.h"
+#include "libmesh/enum_error_estimator_type.h"
+#include "libmesh/enum_order.h"
+#include "libmesh/enum_norm_type.h"
 
 namespace libMesh
 {
+
+ErrorEstimatorType WeightedPatchRecoveryErrorEstimator::type() const
+{
+  return WEIGHTED_PATCH_RECOVERY;
+}
+
+
+
 void WeightedPatchRecoveryErrorEstimator::estimate_error (const System & system,
                                                           ErrorVector & error_per_cell,
                                                           const NumericVector<Number> * solution_vector,

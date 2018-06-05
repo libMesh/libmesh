@@ -30,12 +30,28 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
 #include "libmesh/system.h"
-
 #include "libmesh/dense_vector.h"
 #include "libmesh/tensor_tools.h"
+#include "libmesh/enum_error_estimator_type.h"
+#include "libmesh/enum_norm_type.h"
 
 namespace libMesh
 {
+
+KellyErrorEstimator::KellyErrorEstimator() :
+  JumpErrorEstimator(),
+  _bc_function(libmesh_nullptr)
+{
+  error_norm = H1_SEMINORM;
+}
+
+
+
+ErrorEstimatorType
+KellyErrorEstimator::type() const
+{
+  return KELLY;
+}
 
 
 

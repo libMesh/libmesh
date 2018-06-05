@@ -20,8 +20,6 @@
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-// C++ includes
-
 // Local includes cont'd
 #include "libmesh/cell_inf_hex8.h"
 #include "libmesh/edge_edge2.h"
@@ -29,6 +27,8 @@
 #include "libmesh/face_quad4.h"
 #include "libmesh/face_inf_quad4.h"
 #include "libmesh/side.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -99,6 +99,15 @@ bool InfHex8::is_node_on_edge(const unsigned int n,
       return true;
   return false;
 }
+
+
+
+Order InfHex8::default_order() const
+{
+  return FIRST;
+}
+
+
 
 std::unique_ptr<Elem> InfHex8::build_side_ptr (const unsigned int i,
                                                bool proxy)

@@ -55,10 +55,7 @@ public:
    * pointer to libmesh_nullptr.  Defaults to L2 norm; changes to system norm are
    * ignored.
    */
-  DiscontinuityMeasure() :
-    JumpErrorEstimator(),
-    _bc_function(libmesh_nullptr)
-  { error_norm = L2; }
+  DiscontinuityMeasure();
 
   /**
    * Destructor.
@@ -72,8 +69,7 @@ public:
                                                                const Point & p,
                                                                const std::string & var_name));
 
-  virtual ErrorEstimatorType type() const libmesh_override
-  { return DISCONTINUITY_MEASURE;}
+  virtual ErrorEstimatorType type() const libmesh_override;
 
 protected:
 

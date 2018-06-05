@@ -27,6 +27,7 @@
 #include "libmesh/petsc_matrix.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/libmesh_common.h"
+#include "libmesh/enum_preconditioner_type.h"
 
 // PCBJacobiGetSubKSP was defined in petscksp.h in PETSc 2.3.3, 3.1.0
 #if PETSC_VERSION_LESS_THAN(3,1,0)

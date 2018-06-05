@@ -30,6 +30,8 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_elem_type.h"
 
 // Wrap everything in a GMVLib namespace and
 // use extern "C" to avoid name mangling.

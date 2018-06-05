@@ -25,7 +25,6 @@
 #ifdef LIBMESH_HAVE_TRIANGLE
 
 // Local Includes
-#include "libmesh/enum_elem_type.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh_serializer.h"
 
@@ -37,8 +36,8 @@ namespace libMesh
 {
 
 // Forward Declarations
-
 class UnstructuredMesh;
+enum ElemType : int;
 
 /**
  * A C++ interface between LibMesh and the Triangle library written by

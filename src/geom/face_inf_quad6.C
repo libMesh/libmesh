@@ -17,16 +17,17 @@
 
 
 
-// Local includes
 #include "libmesh/libmesh_config.h"
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-
-// Local includes cont'd
+// Local includes
 #include "libmesh/face_inf_quad6.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/side.h"
 #include "libmesh/edge_inf_edge2.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -105,6 +106,13 @@ const float InfQuad6::_embedding_matrix[2][6][6] =
 
 #endif
 
+
+
+
+Order InfQuad6::default_order() const
+{
+  return SECOND;
+}
 
 
 

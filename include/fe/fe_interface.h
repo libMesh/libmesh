@@ -22,10 +22,7 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/enum_elem_type.h"
 #include "libmesh/vector_value.h"
-#include "libmesh/enum_fe_family.h"
-#include "libmesh/enum_order.h"
 
 // C++ includes
 #include <map>
@@ -44,6 +41,10 @@ class FEType;
 class FEComputeData;
 class Point;
 class MeshBase;
+enum FEFamily : int;
+enum Order : int;
+enum FEFieldType : int;
+enum ElemType : int;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 class PeriodicBoundaries;
@@ -457,52 +458,6 @@ private:
 
 };
 
-
-
-
-
-// ------------------------------------------------------------
-// FEInterface class inline members
-#ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
-inline bool FEInterface::is_InfFE_elem(const ElemType)
-{
-  return false;
-}
-
-#else
-
-inline bool FEInterface::is_InfFE_elem(const ElemType et)
-{
-
-  switch (et)
-    {
-    case INFEDGE2:
-    case INFQUAD4:
-    case INFQUAD6:
-    case INFHEX8:
-    case INFHEX16:
-    case INFHEX18:
-    case INFPRISM6:
-    case INFPRISM12:
-      {
-        return true;
-      }
-
-    default:
-      {
-        return false;
-      }
-    }
-}
-
-#endif //ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
-
-
 } // namespace libMesh
-
-
-
 
 #endif // LIBMESH_FE_INTERFACE_H

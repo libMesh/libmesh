@@ -34,10 +34,6 @@ namespace libMesh
 // Forward Declarations
 class Point;
 
-
-
-
-
 /**
  * This class implements the Kelly error indicator
  * which is based on the flux jumps between elements.
@@ -69,10 +65,7 @@ public:
    * pointer to libmesh_nullptr.  Defaults to H1 seminorm; changes to system norm
    * are ignored.
    */
-  KellyErrorEstimator() :
-    JumpErrorEstimator(),
-    _bc_function(libmesh_nullptr)
-  { error_norm = H1_SEMINORM; }
+  KellyErrorEstimator();
 
   /**
    * Destructor.
@@ -86,8 +79,7 @@ public:
                                                           const Point & p,
                                                           const std::string & var_name));
 
-  virtual ErrorEstimatorType type() const libmesh_override
-  { return KELLY;}
+  virtual ErrorEstimatorType type() const libmesh_override;
 
 protected:
 

@@ -23,7 +23,6 @@
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/auto_ptr.h" // deprecated
-#include "libmesh/enum_order.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h" // libMesh::invalid_uint
 #include "libmesh/variable.h"
@@ -65,6 +64,7 @@ template <typename T> class DenseVector;
 template <typename T> class DenseMatrix;
 template <typename T> class SparseMatrix;
 template <typename T> class NumericVector;
+enum Order : int;
 
 
 

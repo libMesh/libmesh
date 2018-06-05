@@ -15,9 +15,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// C++ includes
-
-
 // Local includes
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
@@ -34,6 +31,7 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/raw_accessor.h"
 #include "libmesh/tensor_tools.h"
+#include "libmesh/enum_norm_type.h"
 
 namespace libMesh
 {

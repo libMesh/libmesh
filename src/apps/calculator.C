@@ -20,13 +20,13 @@
 // arguments, parse the function specified in a command line argument,
 // L2-project its value onto the mesh, and output the new solution.
 
+// C++ includes
 #include <map>
 #include <string>
 
+// libMesh includes
 #include "L2system.h"
-
 #include "libmesh/libmesh.h"
-
 #include "libmesh/dof_map.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/getpot.h"
@@ -36,6 +36,7 @@
 #include "libmesh/parsed_fem_function.h"
 #include "libmesh/point.h"
 #include "libmesh/steady_solver.h"
+#include "libmesh/enum_xdr_mode.h"
 
 
 using namespace libMesh;

@@ -20,8 +20,6 @@
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-// C++ includes
-
 // Local includes cont'd
 #include "libmesh/cell_inf_prism6.h"
 #include "libmesh/edge_edge2.h"
@@ -30,6 +28,8 @@
 #include "libmesh/side.h"
 #include "libmesh/face_inf_quad4.h"
 #include "libmesh/face_tri3.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -97,6 +97,14 @@ bool InfPrism6::is_node_on_edge(const unsigned int n,
       return true;
   return false;
 }
+
+
+
+Order InfPrism6::default_order() const
+{
+  return FIRST;
+}
+
 
 
 std::unique_ptr<Elem> InfPrism6::build_side_ptr (const unsigned int i,

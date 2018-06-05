@@ -24,7 +24,6 @@
 #include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/boundary_info.h"
 #include "libmesh/dof_object.h" // for invalid_processor_id
-#include "libmesh/enum_elem_type.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/multi_predicates.h"
 #include "libmesh/point_locator_base.h"
@@ -46,6 +45,7 @@ class GhostingFunctor;
 class Node;
 class Point;
 class Partitioner;
+enum ElemType : int;
 
 template <class MT>
 class MeshInput;

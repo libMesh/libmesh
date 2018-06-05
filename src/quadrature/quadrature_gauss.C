@@ -16,19 +16,24 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+// libMesh includes
 #include "libmesh/quadrature_gauss.h"
+#include "libmesh/enum_quadrature_type.h"
 
 namespace libMesh
 {
 
 // See the files:
-
 // quadrature_gauss_1D.C
 // quadrature_gauss_2D.C
 // quadrature_gauss_3D.C
-
 // for implementation of specific element types.
 
+
+QuadratureType QGauss::type() const
+{
+  return QGAUSS;
+}
 
 void QGauss::keast_rule(const Real rule_data[][4],
                         const unsigned int n_pts)
