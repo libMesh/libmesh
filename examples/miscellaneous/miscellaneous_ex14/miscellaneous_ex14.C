@@ -58,6 +58,7 @@
 // for the SlepcSolverConfiguration
 #include "libmesh/solver_configuration.h"
 #include "libmesh/slepc_eigen_solver.h"
+#include "libmesh/enum_eigen_solver_type.h"
 
 #ifdef LIBMESH_HAVE_SLEPC
 EXTERN_C_FOR_SLEPC_BEGIN

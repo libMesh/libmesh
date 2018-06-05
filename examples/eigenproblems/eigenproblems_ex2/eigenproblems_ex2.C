@@ -48,6 +48,7 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/enum_eigen_solver_type.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

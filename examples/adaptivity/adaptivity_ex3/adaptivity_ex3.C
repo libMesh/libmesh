@@ -75,6 +75,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/elem.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/enum_solver_package.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

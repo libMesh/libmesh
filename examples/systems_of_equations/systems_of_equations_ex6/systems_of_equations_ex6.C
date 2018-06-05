@@ -66,6 +66,7 @@
 #include "libmesh/solver_configuration.h"
 #include "libmesh/petsc_linear_solver.h"
 #include "libmesh/petsc_macro.h"
+#include "libmesh/enum_solver_package.h"
 
 #define x_scaling 1.3
 

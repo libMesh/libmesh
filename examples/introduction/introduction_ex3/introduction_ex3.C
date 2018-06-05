@@ -54,6 +54,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_solver_package.h"
 
 // Define the DofMap, which handles degree of freedom
 // indexing.

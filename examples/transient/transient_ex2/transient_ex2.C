@@ -46,6 +46,7 @@
 #include "libmesh/vtk_io.h"
 #include "libmesh/newmark_system.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/enum_solver_package.h"
 
 // Define the Finite Element object.
 #include "libmesh/fe.h"

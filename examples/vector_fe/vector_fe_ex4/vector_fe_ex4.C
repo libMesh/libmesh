@@ -33,12 +33,13 @@
 #include "libmesh/exact_solution.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/enum_norm_type.h"
 
 // The systems and solvers we may use
 #include "curl_curl_system.h"
 #include "libmesh/diff_solver.h"
 #include "libmesh/steady_solver.h"
-
 #include "solution_function.h"
 
 // Bring in everything from the libMesh namespace

@@ -38,6 +38,7 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/gmv_io.h"
+#include "libmesh/enum_solver_package.h"
 
 // Define the Finite Element object.
 #include "libmesh/fe.h"

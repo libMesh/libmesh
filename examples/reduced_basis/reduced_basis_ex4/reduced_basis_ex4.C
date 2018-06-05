@@ -47,6 +47,7 @@
 #include "libmesh/getpot.h"
 #include "libmesh/rb_data_serialization.h"
 #include "libmesh/rb_data_deserialization.h"
+#include "libmesh/enum_solver_package.h"
 
 #include "eim_classes.h"
 #include "rb_classes.h"

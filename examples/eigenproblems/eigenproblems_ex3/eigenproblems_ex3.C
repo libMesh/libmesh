@@ -68,6 +68,7 @@
 #include "libmesh/zero_function.h"
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/slepc_macro.h"
+#include "libmesh/enum_eigen_solver_type.h"
 
 #define BOUNDARY_ID 100
 

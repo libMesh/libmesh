@@ -57,6 +57,7 @@
 #include "libmesh/tensor_value.h"
 #include "libmesh/perf_log.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/enum_solver_package.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

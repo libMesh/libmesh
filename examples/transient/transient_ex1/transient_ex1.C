@@ -48,6 +48,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/exodusII_io.h"
+#include "libmesh/enum_solver_package.h"
 
 // This example will solve a linear transient system,
 // so we need to include the TransientLinearImplicitSystem definition.

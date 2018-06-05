@@ -65,6 +65,7 @@
 #include "libmesh/mesh_generation.h"
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/zero_function.h"
+#include "libmesh/enum_solver_package.h"
 
 // The nonlinear solver and system we will be using
 #include "libmesh/nonlinear_solver.h"

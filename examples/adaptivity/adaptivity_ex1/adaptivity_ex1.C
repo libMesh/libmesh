@@ -49,6 +49,7 @@
 #include "libmesh/error_vector.h"
 #include "libmesh/kelly_error_estimator.h"
 #include "libmesh/mesh_refinement.h"
+#include "libmesh/enum_solver_package.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

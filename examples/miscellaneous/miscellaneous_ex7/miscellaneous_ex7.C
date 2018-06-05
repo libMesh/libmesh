@@ -26,6 +26,9 @@
 // variational inequality solver through PetscDMNonlinearSolver
 // (available in PETSc-3.3.0 or above).
 
+// libmesh includes
+#include "libmesh/enum_solver_package.h"
+
 // Example include files
 #include "biharmonic.h"
 

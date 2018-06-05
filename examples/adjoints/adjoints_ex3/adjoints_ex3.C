@@ -67,24 +67,19 @@
 // Libmesh includes
 #include "libmesh/equation_systems.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
-
 #include "libmesh/twostep_time_solver.h"
 #include "libmesh/euler_solver.h"
 #include "libmesh/euler2_solver.h"
 #include "libmesh/steady_solver.h"
-
 #include "libmesh/newton_solver.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/petsc_diff_solver.h"
-
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_refinement.h"
-
 #include "libmesh/system.h"
 #include "libmesh/system_norm.h"
-
 #include "libmesh/adjoint_residual_error_estimator.h"
 #include "libmesh/const_fem_function.h"
 #include "libmesh/error_vector.h"
@@ -101,6 +96,8 @@
 #include "libmesh/uniform_refinement_estimator.h"
 #include "libmesh/qoi_set.h"
 #include "libmesh/weighted_patch_recovery_error_estimator.h"
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/enum_xdr_mode.h"
 
 // Local includes
 #include "coupled_system.h"
