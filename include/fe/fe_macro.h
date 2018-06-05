@@ -42,6 +42,7 @@
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 #define INSTANTIATE_SUBDIVISION_FE                                      \
+  template FE<2,SUBDIVISION>::FE(const FEType & fet); \
   template unsigned int FE<2,SUBDIVISION>::n_shape_functions () const;  \
   template void         FE<2,SUBDIVISION>::attach_quadrature_rule (QBase *); \
   template unsigned int FE<2,SUBDIVISION>::n_quadrature_points () const; \
@@ -52,6 +53,7 @@
 #else // LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 #define INSTANTIATE_SUBDIVISION_FE                                      \
+  template FE<2,SUBDIVISION>::FE(const FEType & fet);                     \
   template unsigned int FE<2,SUBDIVISION>::n_shape_functions () const;  \
   template void         FE<2,SUBDIVISION>::attach_quadrature_rule (QBase *); \
   template unsigned int FE<2,SUBDIVISION>::n_quadrature_points () const; \

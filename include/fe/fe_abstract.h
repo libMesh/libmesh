@@ -599,37 +599,6 @@ protected:
 
 };
 
-
-
-
-// ------------------------------------------------------------
-// FEAbstract class inline members
-inline
-FEAbstract::FEAbstract(const unsigned int d,
-                       const FEType & fet) :
-  _fe_map( FEMap::build(fet) ),
-  dim(d),
-  calculations_started(false),
-  calculate_phi(false),
-  calculate_dphi(false),
-  calculate_d2phi(false),
-  calculate_curl_phi(false),
-  calculate_div_phi(false),
-  calculate_dphiref(false),
-  fe_type(fet),
-  elem_type(INVALID_ELEM),
-  _p_level(0),
-  qrule(libmesh_nullptr),
-  shapes_on_quadrature(false)
-{
-}
-
-
-inline
-FEAbstract::~FEAbstract()
-{
-}
-
 } // namespace libMesh
 
 #endif // LIBMESH_FE_ABSTRACT_H

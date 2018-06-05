@@ -34,6 +34,7 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/tensor_value.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/enum_elem_type.h"
 
 namespace libMesh
 {

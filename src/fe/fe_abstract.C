@@ -37,9 +37,35 @@
 #include "libmesh/remote_elem.h"
 #include "libmesh/tensor_value.h"
 #include "libmesh/threads.h"
+#include "libmesh/enum_elem_type.h"
 
 namespace libMesh
 {
+
+FEAbstract::FEAbstract(const unsigned int d,
+                       const FEType & fet) :
+  _fe_map( FEMap::build(fet) ),
+  dim(d),
+  calculations_started(false),
+  calculate_phi(false),
+  calculate_dphi(false),
+  calculate_d2phi(false),
+  calculate_curl_phi(false),
+  calculate_div_phi(false),
+  calculate_dphiref(false),
+  fe_type(fet),
+  elem_type(INVALID_ELEM),
+  _p_level(0),
+  qrule(libmesh_nullptr),
+  shapes_on_quadrature(false)
+{
+}
+
+
+FEAbstract::~FEAbstract()
+{
+}
+
 
 std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
                                               const FEType & fet)
