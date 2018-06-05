@@ -36,7 +36,7 @@ template <typename T>
 struct PostWaitFreeBuffer : public PostWaitWork {
   PostWaitFreeBuffer(T * buffer) : _buf(buffer) {}
 
-  virtual void run() libmesh_override { free(_buf); }
+  virtual void run() override { free(_buf); }
 
 private:
   T * _buf;

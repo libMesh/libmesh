@@ -52,13 +52,13 @@ public:
   /**
    * \returns 3, the dimensionality of the object.
    */
-  virtual unsigned int dim () const libmesh_override { return 3; }
+  virtual unsigned int dim () const override { return 3; }
 
   /**
    * \returns A bounding box (not necessarily the minimal bounding box)
    * containing the geometric element.
    */
-  virtual BoundingBox loose_bounding_box () const libmesh_override;
+  virtual BoundingBox loose_bounding_box () const override;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -66,7 +66,7 @@ public:
    * \returns \p false.  All classes derived from \p Cell
    * are finite elements.
    */
-  virtual bool infinite () const libmesh_override { return false; }
+  virtual bool infinite () const override { return false; }
 
 #endif
 };

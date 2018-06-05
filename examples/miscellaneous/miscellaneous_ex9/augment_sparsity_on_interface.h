@@ -67,19 +67,19 @@ public:
   virtual void operator() (const MeshBase::const_element_iterator & range_begin,
                            const MeshBase::const_element_iterator & range_end,
                            processor_id_type p,
-                           map_type & coupled_elements) libmesh_override;
+                           map_type & coupled_elements) override;
 
   /**
    * Rebuild the cached _lower_to_upper map whenever our Mesh has
    * changed.
    */
-  virtual void mesh_reinit () libmesh_override;
+  virtual void mesh_reinit () override;
 
   /**
    * Update the cached _lower_to_upper map whenever our Mesh has been
    * redistributed.  We'll be lazy and just recalculate from scratch.
    */
-  virtual void redistribute () libmesh_override
+  virtual void redistribute () override
   { this->mesh_reinit(); }
 
 

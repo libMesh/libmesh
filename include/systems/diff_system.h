@@ -84,13 +84,13 @@ public:
    * Clear all the data structures associated with
    * the system.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * Reinitializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */
-  virtual void reinit () libmesh_override;
+  virtual void reinit () override;
 
   /**
    * Prepares \p matrix and \p rhs for matrix assembly.
@@ -102,13 +102,13 @@ public:
    * user must call \link update() \endlink before calling
    * this function.
    */
-  virtual void assemble () libmesh_override;
+  virtual void assemble () override;
 
   /**
    * \returns A pointer to a linear solver appropriate for use in
    * adjoint and/or sensitivity solves
    */
-  virtual LinearSolver<Number> * get_linear_solver() const libmesh_override;
+  virtual LinearSolver<Number> * get_linear_solver() const override;
 
   /**
    * \returns An integer corresponding to the upper iteration count
@@ -116,13 +116,13 @@ public:
    * be used in linear adjoint and/or sensitivity solves
    */
   virtual std::pair<unsigned int, Real>
-  get_linear_solve_parameters() const libmesh_override;
+  get_linear_solve_parameters() const override;
 
   /**
    * Releases a pointer to a linear solver acquired by
    * \p this->get_linear_solver()
    */
-  virtual void release_linear_solver(LinearSolver<Number> *) const libmesh_override;
+  virtual void release_linear_solver(LinearSolver<Number> *) const override;
 
   /**
    * Assembles a residual in \p rhs and/or a jacobian in \p matrix,
@@ -137,26 +137,26 @@ public:
   virtual void assembly (bool get_residual,
                          bool get_jacobian,
                          bool apply_heterogeneous_constraints = false,
-                         bool apply_no_constraints = false) libmesh_override = 0;
+                         bool apply_no_constraints = false) override = 0;
 
   /**
    * Invokes the solver associated with the system.  For steady state
    * solvers, this will find a root x where F(x) = 0.  For transient
    * solvers, this will integrate dx/dt = F(x).
    */
-  virtual void solve () libmesh_override;
+  virtual void solve () override;
 
   /**
    * This function sets the _is_adjoint boolean member of TimeSolver to
    * true and then calls the adjoint_solve in implicit system
    */
   virtual std::pair<unsigned int, Real>
-  adjoint_solve (const QoISet & qoi_indices = QoISet()) libmesh_override;
+  adjoint_solve (const QoISet & qoi_indices = QoISet()) override;
 
   /**
    * We don't allow systems to be attached to each other
    */
-  virtual std::unique_ptr<DifferentiablePhysics> clone_physics() libmesh_override
+  virtual std::unique_ptr<DifferentiablePhysics> clone_physics() override
   {
     libmesh_not_implemented();
     // dummy
@@ -166,7 +166,7 @@ public:
   /**
    * We don't allow systems to be attached to each other
    */
-  virtual std::unique_ptr<DifferentiableQoI> clone() libmesh_override
+  virtual std::unique_ptr<DifferentiableQoI> clone() override
   {
     libmesh_not_implemented();
     // dummy
@@ -388,7 +388,7 @@ protected:
    * dot_<varname> values so the user's element assembly function
    * can still treat the variable as a second order in time variable.
    */
-  virtual void init_data () libmesh_override;
+  virtual void init_data () override;
 
   /**
    * Helper function to add "velocity" variables that are cousins to

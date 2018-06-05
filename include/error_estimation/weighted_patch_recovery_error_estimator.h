@@ -72,7 +72,7 @@ public:
   virtual void estimate_error (const System & system,
                                ErrorVector & error_per_cell,
                                const NumericVector<Number> * solution_vector = libmesh_nullptr,
-                               bool estimate_parent_error = false) libmesh_override;
+                               bool estimate_parent_error = false) override;
 
   /**
      Vector of fem function base pointers, the user will fill this in
@@ -80,7 +80,7 @@ public:
   */
   std::vector<FEMFunctionBase<Number> *> weight_functions;
 
-  virtual ErrorEstimatorType type() const libmesh_override;
+  virtual ErrorEstimatorType type() const override;
 
 private:
 

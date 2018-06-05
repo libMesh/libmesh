@@ -82,12 +82,12 @@ public:
    * Clear all the data structures associated with
    * the system.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * Perform a standard "solve" of the system, without doing continuation.
    */
-  virtual void solve () libmesh_override;
+  virtual void solve () override;
 
   /**
    * Perform a continuation solve of the system.  In general, you can only
@@ -260,7 +260,7 @@ protected:
    * Initializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */
-  virtual void init_data () libmesh_override;
+  virtual void init_data () override;
 
   /**
    * There are (so far) two different vectors which may be assembled using the assembly routine:

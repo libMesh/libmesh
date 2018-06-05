@@ -67,51 +67,51 @@ public:
   /**
    * \returns 8.  The \p InfHex8 has 8 nodes.
    */
-  virtual unsigned int n_nodes() const libmesh_override { return 8; }
+  virtual unsigned int n_nodes() const override { return 8; }
 
   /**
    * \returns \p INFHEX8.
    */
-  virtual ElemType type() const libmesh_override { return INFHEX8; }
+  virtual ElemType type() const override { return INFHEX8; }
 
   /**
    * \returns 1.
    */
-  virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
+  virtual unsigned int n_sub_elem() const override { return 1; }
 
   /**
    * \returns \p true if the specified (local) node number is a vertex.
    */
-  virtual bool is_vertex(const unsigned int i) const libmesh_override;
+  virtual bool is_vertex(const unsigned int i) const override;
 
   /**
    * \returns \p true if the specified (local) node number is an edge.
    */
-  virtual bool is_edge(const unsigned int i) const libmesh_override;
+  virtual bool is_edge(const unsigned int i) const override;
 
   /**
    * \returns \p true if the specified (local) node number is a face.
    */
-  virtual bool is_face(const unsigned int i) const libmesh_override;
+  virtual bool is_face(const unsigned int i) const override;
 
   /**
    * \returns \p true if the specified (local) node number is on the
    * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const libmesh_override;
+                               const unsigned int s) const override;
 
   /**
    * \returns \p true if the specified (local) node number is on the
    * specified edge.
    */
   virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const libmesh_override;
+                               const unsigned int e) const override;
 
   /**
    * \returns FIRST.
    */
-  virtual Order default_order() const libmesh_override;
+  virtual Order default_order() const override;
 
   /**
    * \returns A \p QUAD4 built coincident with face 0, or an \p INFQUAD4
@@ -120,7 +120,7 @@ public:
    * \note that the \p std::unique_ptr<Elem> takes care of freeing memory.
    */
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy) libmesh_override;
+                                                bool proxy) override;
 
   /**
    * \returns An \p EDGE2 built coincident with edges 0 to 3, or an \p INFEDGE2
@@ -128,11 +128,11 @@ public:
    *
    * \note The \p std::unique_ptr<Elem> takes care of freeing memory.
    */
-  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int i) libmesh_override;
+  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int i) override;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type> & conn) const libmesh_override;
+                            std::vector<dof_id_type> & conn) const override;
 
   unsigned int vtk_element_type (const unsigned int) const
   { return 12; }
@@ -166,7 +166,7 @@ protected:
    */
   virtual float embedding_matrix (const unsigned int i,
                                   const unsigned int j,
-                                  const unsigned int k) const libmesh_override
+                                  const unsigned int k) const override
   { return _embedding_matrix[i][j][k]; }
 
   /**

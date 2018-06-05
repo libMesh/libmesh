@@ -84,15 +84,15 @@ public:
    */
   ~DenseVector() {}
 
-  virtual unsigned int size() const libmesh_override
+  virtual unsigned int size() const override
   {
     return cast_int<unsigned int>(_val.size());
   }
 
-  virtual bool empty() const libmesh_override
+  virtual bool empty() const override
   { return _val.empty(); }
 
-  virtual void zero() libmesh_override;
+  virtual void zero() override;
 
   /**
    * \returns Entry \p i of the vector as a const reference.
@@ -104,10 +104,10 @@ public:
    */
   T & operator() (const unsigned int i);
 
-  virtual T el(const unsigned int i) const libmesh_override
+  virtual T el(const unsigned int i) const override
   { return (*this)(i); }
 
-  virtual T & el(const unsigned int i) libmesh_override
+  virtual T & el(const unsigned int i) override
   { return (*this)(i); }
 
   /**

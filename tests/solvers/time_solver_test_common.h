@@ -88,7 +88,7 @@ public:
   //! Exact solution as a function of time t.
   virtual Number u( Real t ) =0;
 
-  virtual void init_data () libmesh_override
+  virtual void init_data () override
   {
     _u_var = this->add_variable ("u", FIRST, LAGRANGE);
     this->time_evolving(_u_var,1);
@@ -97,7 +97,7 @@ public:
 
   //! Note the nonlinear residual is F(u)-M(u)\dot{u}
   virtual bool element_time_derivative (bool request_jacobian,
-                                        DiffContext & context) libmesh_override
+                                        DiffContext & context) override
   {
     FEMContext & c = cast_ref<FEMContext &>(context);
     DenseSubVector<Number> & Fu = c.get_elem_residual(_u_var);
@@ -118,7 +118,7 @@ public:
 
   //! Note the nonlinear residual is F(u)-M(u)\dot{u}
   virtual bool mass_residual (bool request_jacobian,
-                              DiffContext & context) libmesh_override
+                              DiffContext & context) override
   {
     FEMContext & c = cast_ref<FEMContext &>(context);
     DenseSubVector<Number> & Fu = c.get_elem_residual(_u_var);
@@ -166,7 +166,7 @@ public:
     : FirstOrderScalarSystemBase(es, name_in, number_in)
   {}
 
-  virtual void init_data () libmesh_override
+  virtual void init_data () override
   {
     _u_var = this->add_variable ("u", FIRST, LAGRANGE);
     this->time_evolving(_u_var,2);
@@ -178,7 +178,7 @@ public:
 
   //! Note the nonlinear residual is M(u)\ddot{u} + C(u)\dot{u} + F(u)
   virtual bool damping_residual (bool request_jacobian,
-                                 DiffContext & context) libmesh_override
+                                 DiffContext & context) override
   {
     FEMContext & c = cast_ref<FEMContext &>(context);
     DenseSubVector<Number> & Fu = c.get_elem_residual(_u_var);
@@ -208,7 +208,7 @@ public:
   }
 
   virtual bool mass_residual (bool request_jacobian,
-                              DiffContext & context) libmesh_override
+                              DiffContext & context) override
   {
     FEMContext & c = cast_ref<FEMContext &>(context);
     DenseSubVector<Number> & Fu = c.get_elem_residual(_u_var);
@@ -256,7 +256,7 @@ public:
 
   //! Note the nonlinear residual is M(u)\dot{v} + C(u)v + F(u)
   virtual bool element_time_derivative (bool request_jacobian,
-                                        DiffContext & context) libmesh_override
+                                        DiffContext & context) override
   {
     FEMContext & c = cast_ref<FEMContext &>(context);
 
@@ -280,7 +280,7 @@ public:
 
   //! Note the nonlinear residual is M(u)\dot{v} + C(u)v + F(u)
   virtual bool damping_residual (bool request_jacobian,
-                                 DiffContext & context) libmesh_override
+                                 DiffContext & context) override
   {
     FEMContext & c = cast_ref<FEMContext &>(context);
 
@@ -314,7 +314,7 @@ public:
   }
 
   virtual bool mass_residual (bool request_jacobian,
-                              DiffContext & context) libmesh_override
+                              DiffContext & context) override
   {
     FEMContext & c = cast_ref<FEMContext &>(context);
 

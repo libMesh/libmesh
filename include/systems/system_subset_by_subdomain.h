@@ -108,7 +108,7 @@ public:
      * Method that decides whether a given subdomain id is included in
      * the subset or nor.
      */
-    virtual bool operator() (const subdomain_id_type & subdomain_id) const libmesh_override;
+    virtual bool operator() (const subdomain_id_type & subdomain_id) const override;
 
   protected:
     /**
@@ -152,7 +152,7 @@ public:
    * The result will contain local dofs on each processor only and
    * will not contain duplicates.
    */
-  virtual const std::vector<unsigned int> & dof_ids () const libmesh_override;
+  virtual const std::vector<unsigned int> & dof_ids () const override;
 
   /**
    * Initializes the class.  Will be called by the constructors.  Can

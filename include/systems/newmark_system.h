@@ -74,25 +74,25 @@ public:
    * Clear all the data structures associated with
    * the system.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * Reinitializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */
-  virtual void reinit () libmesh_override;
+  virtual void reinit () override;
 
   /**
    * Assemble the linear system.  Does not
    * actually call the solver.
    */
-  virtual void assemble () libmesh_override;
+  virtual void assemble () override;
 
   /**
    * \returns \p "Newmark".  Helps in identifying
    * the system type in an equation system file.
    */
-  virtual std::string system_type () const libmesh_override { return "Newmark"; }
+  virtual std::string system_type () const override { return "Newmark"; }
 
 
   //---------------------------------------------------------

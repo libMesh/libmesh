@@ -92,24 +92,24 @@ public:
    * The initialization function.  This method is used to
    * initialize internal data structures before a simulation begins.
    */
-  virtual void init () libmesh_override;
+  virtual void init () override;
 
   /**
    * The reinitialization function.  This method is used after
    * changes in the mesh
    */
-  virtual void reinit () libmesh_override;
+  virtual void reinit () override;
 
   /**
    * Implements the assembly of both matrices A and B, and calls
    * the EigenSolver to compute the eigenvalues.
    */
-  virtual void solve () libmesh_override;
+  virtual void solve () override;
 
   /**
    * It doesn't make sense to advance the timestep, so we shouldn't call this.
    */
-  virtual void advance_timestep () libmesh_override {}
+  virtual void advance_timestep () override {}
 
   /**
    * error convergence order against deltat is
@@ -122,31 +122,31 @@ public:
    * operator, depending on which is requested.
    */
   virtual bool element_residual (bool get_jacobian,
-                                 DiffContext &) libmesh_override;
+                                 DiffContext &) override;
 
   /**
    * Forms the jacobian of the boundary terms.
    */
   virtual bool side_residual (bool get_jacobian,
-                              DiffContext &) libmesh_override;
+                              DiffContext &) override;
 
   /**
    * Forms the jacobian of the nonlocal terms.
    */
   virtual bool nonlocal_residual (bool get_jacobian,
-                                  DiffContext &) libmesh_override;
+                                  DiffContext &) override;
 
   /**
    * \returns 0, but derived classes should override this function to
    * compute the size of the difference between successive solution
    * iterates ||u^{n+1} - u^{n}|| in some norm.
    */
-  virtual Real du (const SystemNorm &) const libmesh_override { return 0.; }
+  virtual Real du (const SystemNorm &) const override { return 0.; }
 
   /**
    * This is effectively a steady-state solver.
    */
-  virtual bool is_steady() const libmesh_override { return true; }
+  virtual bool is_steady() const override { return true; }
 
   /**
    * The EigenSolver object.  This is what actually

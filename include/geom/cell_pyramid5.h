@@ -64,69 +64,69 @@ public:
   /**
    * \returns \p PRYAMID.
    */
-  virtual ElemType type () const libmesh_override { return PYRAMID5; }
+  virtual ElemType type () const override { return PYRAMID5; }
 
   /**
    * \returns 1.
    */
-  virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
+  virtual unsigned int n_sub_elem() const override { return 1; }
 
   /**
    * \returns \p true if the specified (local) node number is a vertex.
    */
-  virtual bool is_vertex(const unsigned int i) const libmesh_override;
+  virtual bool is_vertex(const unsigned int i) const override;
 
   /**
    * \returns \p true if the specified (local) node number is an edge.
    */
-  virtual bool is_edge(const unsigned int i) const libmesh_override;
+  virtual bool is_edge(const unsigned int i) const override;
 
   /**
    * \returns \p true if the specified (local) node number is a face.
    */
-  virtual bool is_face(const unsigned int i) const libmesh_override;
+  virtual bool is_face(const unsigned int i) const override;
 
   /**
    * \returns \p true if the specified (local) node number is on the
    * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const libmesh_override;
+                               const unsigned int s) const override;
 
   /**
    * \returns \p true if the specified (local) node number is on the
    * specified edge.
    */
   virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const libmesh_override;
+                               const unsigned int e) const override;
 
   /**
    * \returns \p true if the element map is definitely affine within
    * numerical tolerances.
    */
-  virtual bool has_affine_map () const libmesh_override;
+  virtual bool has_affine_map () const override;
 
   /**
    * \returns FIRST.
    */
-  virtual Order default_order() const libmesh_override;
+  virtual Order default_order() const override;
 
   /**
    * Builds a \p QUAD4 or \p TRI3 built coincident with face i.
    * The \p std::unique_ptr<Elem> handles the memory aspect.
    */
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy) libmesh_override;
+                                                bool proxy) override;
 
   /**
    * Builds a \p EDGE2 built coincident with edge i.
    * The \p std::unique_ptr<Elem> handles the memory aspect.
    */
-  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int i) libmesh_override;
+  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int i) override;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type> & conn) const libmesh_override;
+                            std::vector<dof_id_type> & conn) const override;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
@@ -143,7 +143,7 @@ public:
   /**
    * Specialization for computing the volume of a pyramid.
    */
-  virtual Real volume () const libmesh_override;
+  virtual Real volume () const override;
 
 
 protected:
@@ -162,7 +162,7 @@ protected:
    */
   virtual float embedding_matrix (const unsigned int,
                                   const unsigned int,
-                                  const unsigned int) const libmesh_override
+                                  const unsigned int) const override
   { libmesh_not_implemented(); return 0.; }
 
   LIBMESH_ENABLE_TOPOLOGY_CACHES;

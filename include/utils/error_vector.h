@@ -78,13 +78,13 @@ public:
   /**
    * \returns The minimum nonzero value in the data set.
    */
-  virtual ErrorVectorReal minimum() const libmesh_override;
+  virtual ErrorVectorReal minimum() const override;
 
   /**
    * \returns The mean value of the data set. Ignores
    * zero values.
    */
-  virtual Real mean() const libmesh_override;
+  virtual Real mean() const override;
 
   /**
    * \returns The median (e.g. the middle) value of the data set,
@@ -93,14 +93,14 @@ public:
    * This function modifies the original data by sorting, so it can't
    * be called on const objects.  Source: GNU Scientific Library
    */
-  virtual Real median() libmesh_override;
+  virtual Real median() override;
 
   /**
    * A const version of the median function.
    * Requires twice the memory of original
    * data set but does not change the original.
    */
-  virtual Real median() const libmesh_override;
+  virtual Real median() const override;
 
   /**
    * \returns The variance of the data set ignoring inactive elements.
@@ -112,7 +112,7 @@ public:
    * The variance is normalized by N in this case.  Source: GNU
    * Scientific Library.
    */
-  virtual Real variance() const libmesh_override
+  virtual Real variance() const override
   { return this->variance(this->mean()); }
 
   /**
@@ -126,21 +126,21 @@ public:
    * \note The variance is equal to the standard deviation squared.
    * Source: GNU Scientific Library.
    */
-  virtual Real variance(const Real mean) const libmesh_override;
+  virtual Real variance(const Real mean) const override;
 
   /**
    * \returns A vector of dof_id_types which correspond
    * to the indices of every member of the data set
    * below the cutoff value cut ignoring inactive elements.
    */
-  virtual std::vector<dof_id_type> cut_below(Real cut) const libmesh_override;
+  virtual std::vector<dof_id_type> cut_below(Real cut) const override;
 
   /**
    * \returns A vector of dof_id_types which correspond
    * to the indices of every member of the data set
    * above the cutoff value cut ignoring inactive elements.
    */
-  virtual std::vector<dof_id_type> cut_above(Real cut) const libmesh_override;
+  virtual std::vector<dof_id_type> cut_above(Real cut) const override;
 
   /**
    * Plots a data file, of a type determined by looking at

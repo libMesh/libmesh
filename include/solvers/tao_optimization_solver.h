@@ -78,12 +78,12 @@ public:
   /**
    * Release all memory and clear data structures.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * Initialize data structures if not done so already.
    */
-  virtual void init () libmesh_override;
+  virtual void init () override;
 
   /**
    * \returns The raw PETSc Tao context pointer.
@@ -93,20 +93,20 @@ public:
   /**
    * Call the Tao solver.
    */
-  virtual void solve () libmesh_override;
+  virtual void solve () override;
 
   /**
    * Get the current values of dual variables associated with
    * inequality and equality constraints. The variables will
    * be stored in _system.lambda_eq and _system.lambda_ineq.
    */
-  virtual void get_dual_variables() libmesh_override;
+  virtual void get_dual_variables() override;
 
   /**
    * Prints a useful message about why the latest optimization solve
    * con(di)verged.
    */
-  virtual void print_converged_reason() libmesh_override;
+  virtual void print_converged_reason() override;
 
   /**
    * \returns The currently-available (or most recently obtained, if
@@ -114,7 +114,7 @@ public:
    *
    * Refer to Tao docs for the meaning of different TaoConvergedReason.
    */
-  virtual int get_converged_reason() libmesh_override;
+  virtual int get_converged_reason() override;
 
 protected:
 

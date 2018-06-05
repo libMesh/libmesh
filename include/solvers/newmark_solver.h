@@ -69,14 +69,14 @@ public:
    * UnsteadySolver::solve(), but adaptive mesh refinement and/or adaptive
    * time step selection may require some solve() steps to be repeated.
    */
-  virtual void advance_timestep () libmesh_override;
+  virtual void advance_timestep () override;
 
   /**
    * This method advances the adjoint solution to the previous
    * timestep, after an adjoint_solve() has been performed.  This will
    * be done before every UnsteadySolver::adjoint_solve().
    */
-  virtual void adjoint_advance_timestep () libmesh_override;
+  virtual void adjoint_advance_timestep () override;
 
   /**
    * This method uses the specified initial displacement and velocity
@@ -106,14 +106,14 @@ public:
   /**
    * Error convergence order: 2 for \f$\gamma=0.5\f$, 1 otherwise
    */
-  virtual Real error_order() const libmesh_override;
+  virtual Real error_order() const override;
 
   /**
    * This method solves for the solution at the next timestep.
    * Usually we will only need to solve one (non)linear system per timestep,
    * but more complex subclasses may override this.
    */
-  virtual void solve () libmesh_override;
+  virtual void solve () override;
 
   /**
    * This method uses the DifferentiablePhysics'
@@ -122,7 +122,7 @@ public:
    * it uses will depend on theta.
    */
   virtual bool element_residual (bool request_jacobian,
-                                 DiffContext &) libmesh_override;
+                                 DiffContext &) override;
 
   /**
    * This method uses the DifferentiablePhysics'
@@ -131,7 +131,7 @@ public:
    * What combination it uses will depend on theta.
    */
   virtual bool side_residual (bool request_jacobian,
-                              DiffContext &) libmesh_override;
+                              DiffContext &) override;
 
   /**
    * This method uses the DifferentiablePhysics'
@@ -140,7 +140,7 @@ public:
    * What combination it uses will depend on theta.
    */
   virtual bool nonlocal_residual (bool request_jacobian,
-                                  DiffContext &) libmesh_override;
+                                  DiffContext &) override;
 
 
   /**

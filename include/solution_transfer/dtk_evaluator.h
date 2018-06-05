@@ -66,7 +66,7 @@ public:
   DTKEvaluator(System & in_sys, std::string var_name);
 
   virtual FieldContainerType evaluate(const Teuchos::ArrayRCP<int> & elements,
-                                      const Teuchos::ArrayRCP<double> & coords) libmesh_override;
+                                      const Teuchos::ArrayRCP<double> & coords) override;
 
 protected:
   System & sys;

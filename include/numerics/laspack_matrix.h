@@ -78,7 +78,7 @@ public:
   /**
    * The \p LaspackMatrix needs the full sparsity pattern.
    */
-  virtual bool need_full_sparsity_pattern() const libmesh_override
+  virtual bool need_full_sparsity_pattern() const override
   { return true; }
 
   /**
@@ -86,7 +86,7 @@ public:
    * underlying matrix storage scheme how to map the \f$ (i,j) \f$
    * elements.
    */
-  virtual void update_sparsity_pattern (const SparsityPattern::Graph &) libmesh_override;
+  virtual void update_sparsity_pattern (const SparsityPattern::Graph &) override;
 
   virtual void init (const numeric_index_type m,
                      const numeric_index_type n,
@@ -94,38 +94,38 @@ public:
                      const numeric_index_type n_l,
                      const numeric_index_type nnz=30,
                      const numeric_index_type noz=10,
-                     const numeric_index_type blocksize=1) libmesh_override;
+                     const numeric_index_type blocksize=1) override;
 
-  virtual void init () libmesh_override;
+  virtual void init () override;
 
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
-  virtual void zero () libmesh_override;
+  virtual void zero () override;
 
-  virtual void close () libmesh_override { this->_closed = true; }
+  virtual void close () override { this->_closed = true; }
 
-  virtual numeric_index_type m () const libmesh_override;
+  virtual numeric_index_type m () const override;
 
-  virtual numeric_index_type n () const libmesh_override;
+  virtual numeric_index_type n () const override;
 
-  virtual numeric_index_type row_start () const libmesh_override;
+  virtual numeric_index_type row_start () const override;
 
-  virtual numeric_index_type row_stop () const libmesh_override;
+  virtual numeric_index_type row_stop () const override;
 
   virtual void set (const numeric_index_type i,
                     const numeric_index_type j,
-                    const T value) libmesh_override;
+                    const T value) override;
 
   virtual void add (const numeric_index_type i,
                     const numeric_index_type j,
-                    const T value) libmesh_override;
+                    const T value) override;
 
   virtual void add_matrix (const DenseMatrix<T> & dm,
                            const std::vector<numeric_index_type> & rows,
-                           const std::vector<numeric_index_type> & cols) libmesh_override;
+                           const std::vector<numeric_index_type> & cols) override;
 
   virtual void add_matrix (const DenseMatrix<T> & dm,
-                           const std::vector<numeric_index_type> & dof_indices) libmesh_override;
+                           const std::vector<numeric_index_type> & dof_indices) override;
 
   /**
    * Compute A += a*X for scalar \p a, matrix \p X.
@@ -134,22 +134,22 @@ public:
    * so a hand-coded version with hopefully acceptable performance
    * is provided.
    */
-  virtual void add (const T a, SparseMatrix<T> & X) libmesh_override;
+  virtual void add (const T a, SparseMatrix<T> & X) override;
 
   virtual T operator () (const numeric_index_type i,
-                         const numeric_index_type j) const libmesh_override;
+                         const numeric_index_type j) const override;
 
-  virtual Real l1_norm () const libmesh_override { libmesh_not_implemented(); return 0.; }
+  virtual Real l1_norm () const override { libmesh_not_implemented(); return 0.; }
 
-  virtual Real linfty_norm () const libmesh_override { libmesh_not_implemented(); return 0.; }
+  virtual Real linfty_norm () const override { libmesh_not_implemented(); return 0.; }
 
-  virtual bool closed() const libmesh_override { return _closed; }
+  virtual bool closed() const override { return _closed; }
 
-  virtual void print_personal(std::ostream & os=libMesh::out) const libmesh_override { this->print(os); }
+  virtual void print_personal(std::ostream & os=libMesh::out) const override { this->print(os); }
 
-  virtual void get_diagonal (NumericVector<T> & dest) const libmesh_override;
+  virtual void get_diagonal (NumericVector<T> & dest) const override;
 
-  virtual void get_transpose (SparseMatrix<T> & dest) const libmesh_override;
+  virtual void get_transpose (SparseMatrix<T> & dest) const override;
 
 private:
 

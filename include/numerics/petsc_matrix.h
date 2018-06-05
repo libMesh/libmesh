@@ -110,7 +110,7 @@ public:
                      const numeric_index_type n_l,
                      const numeric_index_type nnz=30,
                      const numeric_index_type noz=10,
-                     const numeric_index_type blocksize=1) libmesh_override;
+                     const numeric_index_type blocksize=1) override;
 
   /**
    * Initialize a PETSc matrix.
@@ -131,7 +131,7 @@ public:
              const std::vector<numeric_index_type> & n_oz,
              const numeric_index_type blocksize=1);
 
-  virtual void init () libmesh_override;
+  virtual void init () override;
 
   /**
    * Update the sparsity pattern based on \p dof_map, and set the matrix
@@ -140,45 +140,45 @@ public:
    */
   void update_preallocation_and_zero();
 
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
-  virtual void zero () libmesh_override;
+  virtual void zero () override;
 
-  virtual void zero_rows (std::vector<numeric_index_type> & rows, T diag_value = 0.0) libmesh_override;
+  virtual void zero_rows (std::vector<numeric_index_type> & rows, T diag_value = 0.0) override;
 
-  virtual void close () libmesh_override;
+  virtual void close () override;
 
-  virtual void flush () libmesh_override;
+  virtual void flush () override;
 
-  virtual numeric_index_type m () const libmesh_override;
+  virtual numeric_index_type m () const override;
 
-  virtual numeric_index_type n () const libmesh_override;
+  virtual numeric_index_type n () const override;
 
-  virtual numeric_index_type row_start () const libmesh_override;
+  virtual numeric_index_type row_start () const override;
 
-  virtual numeric_index_type row_stop () const libmesh_override;
+  virtual numeric_index_type row_stop () const override;
 
   virtual void set (const numeric_index_type i,
                     const numeric_index_type j,
-                    const T value) libmesh_override;
+                    const T value) override;
 
   virtual void add (const numeric_index_type i,
                     const numeric_index_type j,
-                    const T value) libmesh_override;
+                    const T value) override;
 
   virtual void add_matrix (const DenseMatrix<T> & dm,
                            const std::vector<numeric_index_type> & rows,
-                           const std::vector<numeric_index_type> & cols) libmesh_override;
+                           const std::vector<numeric_index_type> & cols) override;
 
   virtual void add_matrix (const DenseMatrix<T> & dm,
-                           const std::vector<numeric_index_type> & dof_indices) libmesh_override;
+                           const std::vector<numeric_index_type> & dof_indices) override;
 
   virtual void add_block_matrix (const DenseMatrix<T> & dm,
                                  const std::vector<numeric_index_type> & brows,
-                                 const std::vector<numeric_index_type> & bcols) libmesh_override;
+                                 const std::vector<numeric_index_type> & bcols) override;
 
   virtual void add_block_matrix (const DenseMatrix<T> & dm,
-                                 const std::vector<numeric_index_type> & dof_indices) libmesh_override
+                                 const std::vector<numeric_index_type> & dof_indices) override
   { this->add_block_matrix (dm, dof_indices, dof_indices); }
 
   /**
@@ -194,16 +194,16 @@ public:
    * \note \p X will be closed, if not already done, before performing
    * any work.
    */
-  virtual void add (const T a, SparseMatrix<T> & X) libmesh_override;
+  virtual void add (const T a, SparseMatrix<T> & X) override;
 
   virtual T operator () (const numeric_index_type i,
-                         const numeric_index_type j) const libmesh_override;
+                         const numeric_index_type j) const override;
 
-  virtual Real l1_norm () const libmesh_override;
+  virtual Real l1_norm () const override;
 
-  virtual Real linfty_norm () const libmesh_override;
+  virtual Real linfty_norm () const override;
 
-  virtual bool closed() const libmesh_override;
+  virtual bool closed() const override;
 
   /**
    * Print the contents of the matrix to the screen with the PETSc
@@ -211,13 +211,13 @@ public:
    * we have limited ourselves to one PETSc implementation for
    * writing.
    */
-  virtual void print_personal(std::ostream & os=libMesh::out) const libmesh_override;
+  virtual void print_personal(std::ostream & os=libMesh::out) const override;
 
-  virtual void print_matlab(const std::string & name = "") const libmesh_override;
+  virtual void print_matlab(const std::string & name = "") const override;
 
-  virtual void get_diagonal (NumericVector<T> & dest) const libmesh_override;
+  virtual void get_diagonal (NumericVector<T> & dest) const override;
 
-  virtual void get_transpose (SparseMatrix<T> & dest) const libmesh_override;
+  virtual void get_transpose (SparseMatrix<T> & dest) const override;
 
   /**
    * Swaps the internal data pointers of two PetscMatrices, no actual
@@ -250,7 +250,7 @@ protected:
   virtual void _get_submatrix(SparseMatrix<T> & submatrix,
                               const std::vector<numeric_index_type> & rows,
                               const std::vector<numeric_index_type> & cols,
-                              const bool reuse_submatrix) const libmesh_override;
+                              const bool reuse_submatrix) const override;
 
 private:
 

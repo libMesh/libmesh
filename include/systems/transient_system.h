@@ -79,14 +79,14 @@ public:
    * Clear all the data structures associated with
    * the system.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * \returns \p "Transient" prepended to T::system_type().
    * Helps in identifying the system type in an equation
    * system file.
    */
-  virtual std::string system_type () const libmesh_override;
+  virtual std::string system_type () const override;
 
 
   //-----------------------------------------------------------------
@@ -128,7 +128,7 @@ protected:
    * This method takes the data updated by \p update() and
    * makes it up-to-date on the current mesh.
    */
-  virtual void re_update () libmesh_override;
+  virtual void re_update () override;
 
 private:
 

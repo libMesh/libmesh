@@ -112,13 +112,13 @@ public:
   /**
    * Release all memory and clear data structures.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * Initialize data structures if not done so already.
    * May assign a name to the solver in some implementations
    */
-  virtual void init (const char * name = libmesh_nullptr) libmesh_override;
+  virtual void init (const char * name = libmesh_nullptr) override;
 
   /**
    * \returns The raw PETSc snes context pointer.
@@ -134,13 +134,13 @@ public:
          NumericVector<T> &,                    // Solution vector
          NumericVector<T> &,                    // Residual vector
          const double,                         // Stopping tolerance
-         const unsigned int) libmesh_override; // N. Iterations
+         const unsigned int) override; // N. Iterations
 
   /**
    * Prints a useful message about why the latest nonlinear solve
    * con(di)verged.
    */
-  virtual void print_converged_reason() libmesh_override;
+  virtual void print_converged_reason() override;
 
   /**
    * \returns The currently-available (or most recently obtained, if
@@ -154,14 +154,14 @@ public:
   /**
    * Get the total number of linear iterations done in the last solve
    */
-  virtual int get_total_linear_iterations() libmesh_override;
+  virtual int get_total_linear_iterations() override;
 
   /**
    * \returns The current nonlinear iteration number if called
    * *during* the solve(), for example by the user-specified residual
    * or Jacobian function.
    */
-  virtual unsigned get_current_nonlinear_iteration_number() const libmesh_override
+  virtual unsigned get_current_nonlinear_iteration_number() const override
   { return _current_nonlinear_iteration_number; }
 
   /**

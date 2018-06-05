@@ -80,12 +80,12 @@ public:
   virtual void read (const std::string & name,
                      void * mesh_data=libmesh_nullptr,
                      bool skip_renumber_nodes_and_elements=false,
-                     bool skip_find_neighbors=false) libmesh_override;
+                     bool skip_find_neighbors=false) override;
   /**
    * Write the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
    */
-  virtual void write (const std::string & name) libmesh_override;
+  virtual void write (const std::string & name) override;
 
   /**
    * Write to the file specified by \p name.  Attempts to figure out the
@@ -101,7 +101,7 @@ public:
    * example, a mesh consisting of \p Tet10 will be converted
    * to a mesh with \p Tet4 etc.
    */
-  virtual void all_first_order () libmesh_override;
+  virtual void all_first_order () override;
 
   /**
    * Converts a (conforming, non-refined) mesh with linear elements
@@ -114,7 +114,7 @@ public:
    * true (default), then \p Hex27 is built.  Otherwise, \p Hex20 is
    * built.  The same holds obviously for \p Quad4, \p Prism6, etc.
    */
-  virtual void all_second_order (const bool full_ordered=true) libmesh_override;
+  virtual void all_second_order (const bool full_ordered=true) override;
 
   /**
    * Generates a new mesh containing all the elements which
@@ -150,7 +150,7 @@ public:
    * Other functions from MeshBase requiring re-definition.
    */
   virtual void find_neighbors (const bool reset_remote_elements = false,
-                               const bool reset_current_list    = true) libmesh_override;
+                               const bool reset_current_list    = true) override;
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
@@ -158,7 +158,7 @@ public:
    * This removes all elements descended from currently active
    * elements in the mesh.
    */
-  virtual bool contract () libmesh_override;
+  virtual bool contract () override;
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 };

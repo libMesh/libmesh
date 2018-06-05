@@ -125,12 +125,12 @@ public:
    * Clear all the data structures associated with
    * the system.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * \returns A string indicating the type of the system.
    */
-  virtual std::string system_type () const libmesh_override;
+  virtual std::string system_type () const override;
 
   /**
    * Perform a "truth" solve, i.e. solve the finite element system at

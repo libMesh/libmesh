@@ -71,12 +71,12 @@ public:
    * You provide the basename, then LibMesh appends the ".size.rank"
    * depending on this->n_processors() and this->processor_id().
    */
-  virtual void read (const std::string & base_filename) libmesh_override;
+  virtual void read (const std::string & base_filename) override;
 
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string & base_filename) libmesh_override;
+  virtual void write (const std::string & base_filename) override;
 
   /**
    * Write one timestep's worth of the solution.
@@ -103,14 +103,14 @@ public:
    */
   virtual void write_nodal_data (const std::string & fname,
                                  const std::vector<Number> & soln,
-                                 const std::vector<std::string> & names) libmesh_override;
+                                 const std::vector<std::string> & names) override;
 
   /**
    * Output a nodal solution in parallel, without localizing the soln vector.
    */
   virtual void write_nodal_data (const std::string & fname,
                                  const NumericVector<Number> & parallel_soln,
-                                 const std::vector<std::string> & names) libmesh_override;
+                                 const std::vector<std::string> & names) override;
 
   /**
    * Set the flag indicating if we should be verbose.

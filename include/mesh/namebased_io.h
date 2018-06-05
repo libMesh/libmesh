@@ -63,12 +63,12 @@ public:
   /**
    * This method implements reading a mesh from a specified file.
    */
-  virtual void read (const std::string & mesh_file) libmesh_override;
+  virtual void read (const std::string & mesh_file) override;
 
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string & mesh_file) libmesh_override;
+  virtual void write (const std::string & mesh_file) override;
 
   /**
    * This method implements writing a mesh with data to a specified file
@@ -81,7 +81,7 @@ public:
    */
   virtual void write_equation_systems (const std::string & filename,
                                        const EquationSystems & es,
-                                       const std::set<std::string> * system_names=libmesh_nullptr) libmesh_override;
+                                       const std::set<std::string> * system_names=libmesh_nullptr) override;
 
   /**
    * Bring in base class functionality for name resolution and to
@@ -95,7 +95,7 @@ public:
    */
   virtual void write_nodal_data (const std::string &,
                                  const std::vector<Number> &,
-                                 const std::vector<std::string> &) libmesh_override;
+                                 const std::vector<std::string> &) override;
 
   // Certain mesh formats can support parallel I/O, including the
   // "new" Xdr format and the Nemesis format.

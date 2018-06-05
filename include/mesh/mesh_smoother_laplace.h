@@ -62,7 +62,7 @@ public:
    * function in this class which takes an int, using
    * a default value of 1.
    */
-  virtual void smooth() libmesh_override { this->smooth(1); }
+  virtual void smooth() override { this->smooth(1); }
 
   /**
    * The actual smoothing function, gets called whenever

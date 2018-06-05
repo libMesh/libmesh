@@ -62,7 +62,7 @@ public:
    */
   DenseVector<T> & parent () { return _parent_vector; }
 
-  virtual void zero() libmesh_override;
+  virtual void zero() override;
 
   /**
    * \returns The \p (i,j) element of the subvector as a const
@@ -75,16 +75,16 @@ public:
    */
   T & operator() (const unsigned int i);
 
-  virtual T el(const unsigned int i) const libmesh_override
+  virtual T el(const unsigned int i) const override
   { return (*this)(i); }
 
-  virtual T & el(const unsigned int i) libmesh_override
+  virtual T & el(const unsigned int i) override
   { return (*this)(i); }
 
-  virtual unsigned int size() const libmesh_override
+  virtual unsigned int size() const override
   { return _n; }
 
-  virtual bool empty() const libmesh_override
+  virtual bool empty() const override
   { return (_n == 0); }
 
   /**

@@ -2884,7 +2884,7 @@ SimpleRange<Elem::ConstNeighborPtrIter> Elem::neighbor_ptr_range() const
 #define LIBMESH_ENABLE_TOPOLOGY_CACHES                                  \
   virtual                                                               \
   std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char>>>>> & \
-  _get_bracketing_node_cache() const libmesh_override                   \
+  _get_bracketing_node_cache() const override                   \
   {                                                                     \
     static std::vector<std::vector<std::vector<std::vector<std::pair<unsigned char, unsigned char>>>>> c; \
     return c;                                                           \
@@ -2892,7 +2892,7 @@ SimpleRange<Elem::ConstNeighborPtrIter> Elem::neighbor_ptr_range() const
                                                                         \
   virtual                                                               \
   std::vector<std::vector<std::vector<signed char>>> &                  \
-  _get_parent_indices_cache() const libmesh_override                    \
+  _get_parent_indices_cache() const override                    \
   {                                                                     \
     static std::vector<std::vector<std::vector<signed char>>> c;        \
     return c;                                                           \

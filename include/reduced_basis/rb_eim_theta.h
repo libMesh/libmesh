@@ -53,7 +53,7 @@ public:
    * This entails solving the RB EIM approximation and picking
    * out the appropriate coefficient.
    */
-  virtual Number evaluate(const RBParameters & mu) libmesh_override;
+  virtual Number evaluate(const RBParameters & mu) override;
 
   /**
    * The RBEIMEvaluation object that this RBEIMTheta is based on.

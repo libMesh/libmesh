@@ -67,7 +67,7 @@ public:
    * Clear this RBEvaluation object. Delete the basis functions
    * and clear and extra data in subclasses.
    */
-  virtual void clear() libmesh_override;
+  virtual void clear() override;
 
   /**
    * Set the RBThetaExpansion object.

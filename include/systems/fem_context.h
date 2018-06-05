@@ -715,27 +715,27 @@ public:
    * and FE objects if there's a moving mesh present in the system such that
    * the mesh is deformed to its position at \f$ t_{\theta} \f$.
    */
-  virtual void elem_reinit(Real theta) libmesh_override;
+  virtual void elem_reinit(Real theta) override;
 
   /**
    * Resets the current time in the context. Additionally, reinitialize Elem
    * and FE objects if there's a moving mesh present in the system such that
    * the mesh is deformed to its position at \f$ t_{\theta} \f$.
    */
-  virtual void elem_side_reinit(Real theta) libmesh_override;
+  virtual void elem_side_reinit(Real theta) override;
 
   /**
    * Resets the current time in the context. Additionally, reinitialize Elem
    * and FE objects if there's a moving mesh present in the system such that
    * the mesh is deformed to its position at \f$ t_{\theta} \f$.
    */
-  virtual void elem_edge_reinit(Real theta) libmesh_override;
+  virtual void elem_edge_reinit(Real theta) override;
 
   /**
    * Gives derived classes the opportunity to reinitialize data needed
    * for nonlocal calculations at a new point within a timestep
    */
-  virtual void nonlocal_reinit(Real theta) libmesh_override;
+  virtual void nonlocal_reinit(Real theta) override;
 
   /**
    * Reinitializes local data vectors/matrices on the current geometric element

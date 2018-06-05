@@ -41,7 +41,7 @@ struct PostWaitCopyBuffer : public PostWaitWork {
   PostWaitCopyBuffer(const Container & buffer, const OutputIter out)
     : _buf(buffer), _out(out) {}
 
-  virtual void run() libmesh_override { std::copy(_buf.begin(), _buf.end(), _out); }
+  virtual void run() override { std::copy(_buf.begin(), _buf.end(), _out); }
 
 private:
   const Container & _buf;

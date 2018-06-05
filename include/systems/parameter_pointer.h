@@ -52,13 +52,13 @@ public:
   /**
    * Setter: change the value of the parameter we access.
    */
-  virtual void set (const T & new_value) libmesh_override
+  virtual void set (const T & new_value) override
   { libmesh_assert(_ptr); *_ptr = new_value; }
 
   /**
    * Getter: get the value of the parameter we access.
    */
-  virtual const T & get () const libmesh_override
+  virtual const T & get () const override
   { libmesh_assert(_ptr); return *_ptr; }
 
   /**
@@ -69,7 +69,7 @@ public:
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
   virtual ParameterAccessor<T> &
-  operator= (T * new_ptr) libmesh_override
+  operator= (T * new_ptr) override
   {
     libmesh_deprecated();
     _ptr = new_ptr;
@@ -80,7 +80,7 @@ public:
   /**
    * \returns A new copy of the accessor.
    */
-  virtual std::unique_ptr<ParameterAccessor<T>> clone() const libmesh_override
+  virtual std::unique_ptr<ParameterAccessor<T>> clone() const override
   {
     return libmesh_make_unique<ParameterPointer<T>>(_ptr);
   }

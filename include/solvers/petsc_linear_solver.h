@@ -114,14 +114,14 @@ public:
   /**
    * Release all memory and clear data structures.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * Initialize data structures if not done so already.
    * Assigns a name, which is turned into an underscore-separated
    * prefix for the underlying KSP object.
    */
-  virtual void init (const char * name = libmesh_nullptr) libmesh_override;
+  virtual void init (const char * name = libmesh_nullptr) override;
 
   /**
    * Initialize data structures if not done so already plus much more
@@ -137,7 +137,7 @@ public:
    * Since field names are applied to DoF numberings, this method must
    * be called again after any System reinit.
    */
-  virtual void init_names (const System &) libmesh_override;
+  virtual void init_names (const System &) override;
 
   /**
    * After calling this method, all successive solves will be
@@ -147,7 +147,7 @@ public:
    * \p NULL pointer.
    */
   virtual void restrict_solve_to (const std::vector<unsigned int> * const dofs,
-                                  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO) libmesh_override;
+                                  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO) override;
 
   /**
    * Call the Petsc solver.  It calls the method below, using the
@@ -158,7 +158,7 @@ public:
          NumericVector<T> & solution_in,
          NumericVector<T> & rhs_in,
          const double tol,
-         const unsigned int m_its) libmesh_override
+         const unsigned int m_its) override
   {
     return this->solve(matrix_in, matrix_in, solution_in, rhs_in, tol, m_its);
   }
@@ -173,7 +173,7 @@ public:
                  NumericVector<T> & solution_in,
                  NumericVector<T> & rhs_in,
                  const double tol,
-                 const unsigned int m_its) libmesh_override;
+                 const unsigned int m_its) override;
 
   /**
    * This method allows you to call a linear solver while specifying
@@ -197,7 +197,7 @@ public:
          NumericVector<T> & solution,
          NumericVector<T> & rhs,
          const double tol,
-         const unsigned int m_its) libmesh_override;
+         const unsigned int m_its) override;
 
   /**
    * This function solves a system whose matrix is a shell matrix.
@@ -207,7 +207,7 @@ public:
          NumericVector<T> & solution_in,
          NumericVector<T> & rhs_in,
          const double tol,
-         const unsigned int m_its) libmesh_override;
+         const unsigned int m_its) override;
 
   /**
    * This function solves a system whose matrix is a shell matrix, but
@@ -220,7 +220,7 @@ public:
          NumericVector<T> & solution_in,
          NumericVector<T> & rhs_in,
          const double tol,
-         const unsigned int m_its) libmesh_override;
+         const unsigned int m_its) override;
 
   /**
    * \returns The raw PETSc preconditioner context pointer.
@@ -257,7 +257,7 @@ public:
   /**
    * \returns The solver's convergence flag
    */
-  virtual LinearConvergenceReason get_converged_reason() const libmesh_override;
+  virtual LinearConvergenceReason get_converged_reason() const override;
 
 private:
 

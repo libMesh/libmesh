@@ -68,14 +68,14 @@ public:
    * Clear all the data structures associated with
    * the system.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * Prepares \p qoi for quantity of interest assembly, then calls
    * user qoi function.
    * Can be overridden in derived classes.
    */
-  virtual void assemble_qoi (const QoISet & qoi_indices = QoISet()) libmesh_override;
+  virtual void assemble_qoi (const QoISet & qoi_indices = QoISet()) override;
 
   /**
    * Prepares \p adjoint_rhs for quantity of interest derivative assembly,
@@ -84,18 +84,18 @@ public:
    */
   virtual void assemble_qoi_derivative (const QoISet & qoi_indices = QoISet(),
                                         bool include_liftfunc = true,
-                                        bool apply_constraints = true) libmesh_override;
+                                        bool apply_constraints = true) override;
 
   /**
    * Assembles & solves the linear system Ax=b.
    */
-  virtual void solve () libmesh_override;
+  virtual void solve () override;
 
   /**
    * \returns \p "Explicit".  Helps in identifying
    * the system type in an equation system file.
    */
-  virtual std::string system_type () const libmesh_override { return "Explicit"; }
+  virtual std::string system_type () const override { return "Explicit"; }
 
   /**
    * The system matrix.  Implicit systems are characterized by

@@ -75,12 +75,12 @@ public:
    * by cubit.  Works in 2D for \p TRIs, \p TRI6s, \p QUAD s, and \p QUAD9s.
    * Works in 3D for \p TET4s, \p TET10s, \p HEX8s, and \p HEX27s.
    */
-  virtual void read (const std::string & name) libmesh_override;
+  virtual void read (const std::string & name) override;
 
   /**
    * This method implements writing a mesh to a specified file.
    */
-  virtual void write (const std::string & fname) libmesh_override;
+  virtual void write (const std::string & fname) override;
 
   /**
    * Set the flag indicating if we should be verbose.
@@ -196,14 +196,14 @@ public:
    */
   virtual void write_nodal_data (const std::string &,
                                  const std::vector<Number> &,
-                                 const std::vector<std::string> &) libmesh_override;
+                                 const std::vector<std::string> &) override;
 
   /**
    * Write out a discontinuous nodal solution.
    */
   void write_nodal_data_discontinuous (const std::string &,
                                        const std::vector<Number> &,
-                                       const std::vector<std::string> &) libmesh_override;
+                                       const std::vector<std::string> &) override;
 
   /**
    * Write out global variables.

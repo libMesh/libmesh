@@ -54,7 +54,7 @@ public:
    */
   virtual void compute_face_map(int dim,
                                 const std::vector<Real> & qw,
-                                const Elem * side) libmesh_override;
+                                const Elem * side) override;
 
 }; // class FEXYZMap
 } // namespace libMesh

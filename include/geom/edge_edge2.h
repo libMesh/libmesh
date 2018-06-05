@@ -55,7 +55,7 @@ public:
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  virtual Point master_point (const unsigned int i) const libmesh_override
+  virtual Point master_point (const unsigned int i) const override
   {
     libmesh_assert_less(i, this->n_nodes());
     return Point(2.0f*i-1,0,0);
@@ -64,74 +64,74 @@ public:
   /**
    * \returns 1.
    */
-  virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
+  virtual unsigned int n_sub_elem() const override { return 1; }
 
   /**
    * \returns \p true if the specified (local) node number is a vertex.
    */
-  virtual bool is_vertex(const unsigned int i) const libmesh_override;
+  virtual bool is_vertex(const unsigned int i) const override;
 
   /**
    * \returns \p true if the specified (local) node number is an edge.
    */
-  virtual bool is_edge(const unsigned int i) const libmesh_override;
+  virtual bool is_edge(const unsigned int i) const override;
 
   /**
    * \returns \p true if the specified (local) node number is a face.
    */
-  virtual bool is_face(const unsigned int i) const libmesh_override;
+  virtual bool is_face(const unsigned int i) const override;
 
   /**
    * \returns \p true if the specified (local) node number is on the
    * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const libmesh_override;
+                               const unsigned int s) const override;
 
   /**
    * \returns \p true if the specified (local) node number is on the
    * specified edge (always true in 1D).
    */
   virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const libmesh_override;
+                               const unsigned int e) const override;
 
   /**
    * \returns \p true if the element map is definitely affine within
    * numerical tolerances.
    */
-  virtual bool has_affine_map () const libmesh_override { return true; }
+  virtual bool has_affine_map () const override { return true; }
 
   /**
    * \returns \p true if the Lagrange shape functions on this element
    * are linear.
    */
-  virtual bool is_linear () const libmesh_override { return true; }
+  virtual bool is_linear () const override { return true; }
 
   /**
    * \returns \p EDGE2.
    */
-  virtual ElemType type() const libmesh_override { return EDGE2; }
+  virtual ElemType type() const override { return EDGE2; }
 
   /**
    * \returns FIRST.
    */
-  virtual Order default_order() const libmesh_override;
+  virtual Order default_order() const override;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type> & conn) const libmesh_override;
+                            std::vector<dof_id_type> & conn) const override;
 
   /**
    * An optimized method for computing the length of a 2-node edge.
    */
-  virtual Real volume () const libmesh_override;
+  virtual Real volume () const override;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
    * \returns \p false.  This is a finite element.
    */
-  virtual bool infinite () const libmesh_override { return false; }
+  virtual bool infinite () const override { return false; }
 
 #endif
 
@@ -145,7 +145,7 @@ public:
    * element.  The id is not necessarily unique, but should be
    * close.
    */
-  virtual dof_id_type key () const libmesh_override;
+  virtual dof_id_type key () const override;
 
 protected:
 
@@ -163,7 +163,7 @@ protected:
    */
   virtual float embedding_matrix (const unsigned int i,
                                   const unsigned int j,
-                                  const unsigned int k) const libmesh_override
+                                  const unsigned int k) const override
   { return _embedding_matrix[i][j][k]; }
 
   /**

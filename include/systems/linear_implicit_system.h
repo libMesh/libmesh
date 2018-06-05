@@ -82,18 +82,18 @@ public:
    * Clear all the data structures associated with
    * the system.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * Initializes new data members of the system
    */
-  virtual void init_data () libmesh_override;
+  virtual void init_data () override;
 
   /**
    * Reinitializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */
-  virtual void reinit () libmesh_override;
+  virtual void reinit () override;
 
   /**
    * Prepares \p matrix and \p _dof_map for matrix assembly.
@@ -101,7 +101,7 @@ public:
    * use the \p assemble() in derived classes.
    * Should be overridden in derived classes.
    */
-  virtual void assemble () libmesh_override { ImplicitSystem::assemble(); }
+  virtual void assemble () override { ImplicitSystem::assemble(); }
 
   /**
    * After calling this method, any solve will be limited to the given
@@ -109,24 +109,24 @@ public:
    * being a \p NULL pointer.
    */
   virtual void restrict_solve_to (const SystemSubset * subset,
-                                  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO) libmesh_override;
+                                  const SubsetSolveMode subset_solve_mode=SUBSET_ZERO) override;
 
   /**
    * Assembles & solves the linear system A*x=b.
    */
-  virtual void solve () libmesh_override;
+  virtual void solve () override;
 
   /**
    * \returns A pointer to a linear solver appropriate for use in
    * adjoint and/or sensitivity solves
    */
-  virtual LinearSolver<Number> * get_linear_solver() const libmesh_override;
+  virtual LinearSolver<Number> * get_linear_solver() const override;
 
   /**
    * Releases a pointer to a linear solver acquired by
    * \p this->get_linear_solver()
    */
-  virtual void release_linear_solver(LinearSolver<Number> *) const libmesh_override;
+  virtual void release_linear_solver(LinearSolver<Number> *) const override;
 
   /**
    * Assembles a residual in \p rhs and/or a jacobian in \p matrix,
@@ -135,13 +135,13 @@ public:
   virtual void assembly(bool get_residual,
                         bool get_jacobian,
                         bool apply_heterogeneous_constraints = false,
-                        bool apply_no_constraints = false) libmesh_override;
+                        bool apply_no_constraints = false) override;
 
   /**
    * \returns \p "LinearImplicit".  Helps in identifying
    * the system type in an equation system file.
    */
-  virtual std::string system_type () const libmesh_override { return "LinearImplicit"; }
+  virtual std::string system_type () const override { return "LinearImplicit"; }
 
   /**
    * The \p LinearSolver defines the interface used to

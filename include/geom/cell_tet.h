@@ -54,7 +54,7 @@ public:
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  virtual Point master_point (const unsigned int i) const libmesh_override
+  virtual Point master_point (const unsigned int i) const override
   {
     libmesh_assert_less(i, this->n_nodes());
     return Point(_master_points[i][0],
@@ -65,33 +65,33 @@ public:
   /**
    * \returns 4.
    */
-  virtual unsigned int n_sides() const libmesh_override { return 4; }
+  virtual unsigned int n_sides() const override { return 4; }
 
   /**
    * \returns 4.  All tetrahedra have 4 vertices.
    */
-  virtual unsigned int n_vertices() const libmesh_override { return 4; }
+  virtual unsigned int n_vertices() const override { return 4; }
 
   /**
    * \returns 6.  All tetrahedra have 6 edges.
    */
-  virtual unsigned int n_edges() const libmesh_override { return 6; }
+  virtual unsigned int n_edges() const override { return 6; }
 
   /**
    * \returns 4.  All tetrahedra have 4 faces.
    */
-  virtual unsigned int n_faces() const libmesh_override { return 4; }
+  virtual unsigned int n_faces() const override { return 4; }
 
   /**
    * \returns 8.
    */
-  virtual unsigned int n_children() const libmesh_override { return 8; }
+  virtual unsigned int n_children() const override { return 8; }
 
   /**
    * \returns \p true if the specified edge is on the specified side.
    */
   virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const libmesh_override;
+                               const unsigned int s) const override;
 
   /**
    * Don't hide Elem::key() defined in the base class.
@@ -103,31 +103,31 @@ public:
    * The id is not necessarily unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
-  virtual dof_id_type key (const unsigned int s) const libmesh_override;
+  virtual dof_id_type key (const unsigned int s) const override;
 
   /**
    * \returns \p Tet4::side_nodes_map[side][side_node] after doing some range checking.
    */
   virtual unsigned int which_node_am_i(unsigned int side,
-                                       unsigned int side_node) const libmesh_override;
+                                       unsigned int side_node) const override;
 
   /**
    * \returns A primitive (3-noded) triangle for face i.
    */
-  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) libmesh_override;
+  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override;
 
   /**
    * \returns A quantitative assessment of element quality based on
    * the quality metric \p q specified by the user.
    */
-  virtual Real quality (const ElemQuality q) const libmesh_override;
+  virtual Real quality (const ElemQuality q) const override;
 
   /**
    * \returns The suggested quality bounds for the hex based on quality
    * measure \p q.  These are the values suggested by the CUBIT User's
    * Manual.
    */
-  virtual std::pair<Real, Real> qual_bounds (const ElemQuality q) const libmesh_override;
+  virtual std::pair<Real, Real> qual_bounds (const ElemQuality q) const override;
 
   /**
    * This enumeration keeps track of which diagonal is selected during
@@ -165,7 +165,7 @@ public:
    * But we want to cache topology data based on that matrix.  So we return a
    * "version number" based on the diagonal selection.
    */
-  virtual unsigned int embedding_matrix_version () const libmesh_override
+  virtual unsigned int embedding_matrix_version () const override
   {
     this->choose_diagonal();
     return this->diagonal_selection();

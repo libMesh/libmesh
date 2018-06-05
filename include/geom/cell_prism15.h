@@ -81,84 +81,84 @@ public:
   /**
    * \returns \p PRISM15.
    */
-  virtual ElemType type () const libmesh_override { return PRISM15; }
+  virtual ElemType type () const override { return PRISM15; }
 
   /**
    * \returns 15.
    */
-  virtual unsigned int n_nodes() const libmesh_override { return 15; }
+  virtual unsigned int n_nodes() const override { return 15; }
 
   /**
    * \returns 1.
    */
-  virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
+  virtual unsigned int n_sub_elem() const override { return 1; }
 
   /**
    * \returns \p true if the specified (local) node number is a vertex.
    */
-  virtual bool is_vertex(const unsigned int i) const libmesh_override;
+  virtual bool is_vertex(const unsigned int i) const override;
 
   /**
    * \returns \p true if the specified (local) node number is an edge.
    */
-  virtual bool is_edge(const unsigned int i) const libmesh_override;
+  virtual bool is_edge(const unsigned int i) const override;
 
   /**
    * \returns \p true if the specified (local) node number is a face.
    */
-  virtual bool is_face(const unsigned int i) const libmesh_override;
+  virtual bool is_face(const unsigned int i) const override;
 
   /**
    * \returns \p true if the specified (local) node number is on the
    * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const libmesh_override;
+                               const unsigned int s) const override;
 
   /**
    * \returns \p true if the specified (local) node number is on the
    * specified edge.
    */
   virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const libmesh_override;
+                               const unsigned int e) const override;
 
   /**
    * \returns \p true if the element map is definitely affine within
    * numerical tolerances.
    */
-  virtual bool has_affine_map () const libmesh_override;
+  virtual bool has_affine_map () const override;
 
   /**
    * \returns SECOND.
    */
-  virtual Order default_order() const libmesh_override;
+  virtual Order default_order() const override;
 
   /**
    * \returns \p Prism15::side_nodes_map[side][side_node] after doing some range checking.
    */
   virtual unsigned int which_node_am_i(unsigned int side,
-                                       unsigned int side_node) const libmesh_override;
+                                       unsigned int side_node) const override;
 
   /**
    * Builds a \p QUAD8 or \p TRI6 built coincident with face i.
    * The \p std::unique_ptr<Elem> handles the memory aspect.
    */
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy) libmesh_override;
+                                                bool proxy) override;
 
   /**
    * Builds a \p EDGE3 or \p INFEDGE2 coincident with edge i.
    * The \p std::unique_ptr<Elem> handles the memory aspect.
    */
-  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int i) libmesh_override;
+  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int i) override;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,
-                            std::vector<dof_id_type> & conn) const libmesh_override;
+                            std::vector<dof_id_type> & conn) const override;
   /**
    * \returns 2 for all \p n.
    */
-  virtual unsigned int n_second_order_adjacent_vertices (const unsigned int) const libmesh_override
+  virtual unsigned int n_second_order_adjacent_vertices (const unsigned int) const override
   { return 2; }
 
   /**
@@ -168,7 +168,7 @@ public:
    * \note \p n is counted as depicted above, \f$ 6 \le n < 15 \f$.
    */
   virtual unsigned short int second_order_adjacent_vertex (const unsigned int n,
-                                                           const unsigned int v) const libmesh_override;
+                                                           const unsigned int v) const override;
 
   /**
    * \returns The child number \p c and element-local index \p v of the
@@ -176,7 +176,7 @@ public:
    * elem.h for further details.
    */
   virtual std::pair<unsigned short int, unsigned short int>
-  second_order_child_vertex (const unsigned int n) const libmesh_override;
+  second_order_child_vertex (const unsigned int n) const override;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
@@ -193,7 +193,7 @@ public:
   /**
    * A specialization for computing the volume of a Prism15.
    */
-  virtual Real volume () const libmesh_override;
+  virtual Real volume () const override;
 
 protected:
 
@@ -211,7 +211,7 @@ protected:
    */
   virtual float embedding_matrix (const unsigned int i,
                                   const unsigned int j,
-                                  const unsigned int k) const libmesh_override
+                                  const unsigned int k) const override
   { return _embedding_matrix[i][j][k]; }
 
   /**

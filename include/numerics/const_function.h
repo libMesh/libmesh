@@ -50,19 +50,19 @@ public:
   }
 
   virtual Output operator() (const Point &,
-                             const Real = 0) libmesh_override
+                             const Real = 0) override
   { return _c; }
 
   virtual void operator() (const Point &,
                            const Real,
-                           DenseVector<Output> & output) libmesh_override
+                           DenseVector<Output> & output) override
   {
     unsigned int size = output.size();
     for (unsigned int i=0; i != size; ++i)
       output(i) = _c;
   }
 
-  virtual std::unique_ptr<FunctionBase<Output>> clone() const libmesh_override
+  virtual std::unique_ptr<FunctionBase<Output>> clone() const override
   {
     return std::unique_ptr<FunctionBase<Output>>
       (new ConstFunction<Output>(_c));

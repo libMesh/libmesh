@@ -94,7 +94,7 @@ public:
    * Reads in a matlab data file based on the string
    * you pass it.
    */
-  virtual void read (const std::string & name) libmesh_override;
+  virtual void read (const std::string & name) override;
 
 private:
   /**

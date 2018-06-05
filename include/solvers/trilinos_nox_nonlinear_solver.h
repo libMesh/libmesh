@@ -80,12 +80,12 @@ public:
   /**
    * Release all memory and clear data structures.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * Initialize data structures if not done so already.
    */
-  virtual void init (const char * name = libmesh_nullptr) libmesh_override;
+  virtual void init (const char * name = libmesh_nullptr) override;
 
   /**
    * Call the Nox solver.  It calls the method below, using the
@@ -96,11 +96,11 @@ public:
          NumericVector<T> &,                    // Solution vector
          NumericVector<T> &,                    // Residual vector
          const double,                          // Stopping tolerance
-         const unsigned int) libmesh_override;  // N. Iterations
+         const unsigned int) override;  // N. Iterations
   /**
    * Get the total number of linear iterations done in the last solve
    */
-  virtual int get_total_linear_iterations() libmesh_override;
+  virtual int get_total_linear_iterations() override;
 
   /**
    * \returns The current nonlinear iteration number if called
@@ -109,7 +109,7 @@ public:
    *
    * \note Not currently implemented for the NoxNonlinearSolver.
    */
-  virtual unsigned get_current_nonlinear_iteration_number() const libmesh_override
+  virtual unsigned get_current_nonlinear_iteration_number() const override
   { libmesh_not_implemented(); return 0; }
 
 private:

@@ -54,7 +54,7 @@ public:
   /**
    * This method implements reading a mesh from a specified file.
    */
-  virtual void read (const std::string & name) libmesh_override;
+  virtual void read (const std::string & name) override;
 
   /**
    * Default false. Set this flag to true if you want libmesh to

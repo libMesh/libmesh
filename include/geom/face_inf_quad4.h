@@ -63,63 +63,63 @@ public:
   /**
    * \returns 4.
    */
-  virtual unsigned int n_nodes() const libmesh_override { return 4; }
+  virtual unsigned int n_nodes() const override { return 4; }
 
   /**
    * \returns \p INFQUAD4.
    */
-  virtual ElemType type () const libmesh_override { return INFQUAD4; }
+  virtual ElemType type () const override { return INFQUAD4; }
 
   /**
    * \returns 1.
    */
-  virtual unsigned int n_sub_elem() const libmesh_override { return 1; }
+  virtual unsigned int n_sub_elem() const override { return 1; }
 
   /**
    * \returns \p true if the specified (local) node number is a vertex.
    */
-  virtual bool is_vertex(const unsigned int i) const libmesh_override;
+  virtual bool is_vertex(const unsigned int i) const override;
 
   /**
    * \returns \p true if the specified (local) node number is an edge.
    */
-  virtual bool is_edge(const unsigned int i) const libmesh_override;
+  virtual bool is_edge(const unsigned int i) const override;
 
   /**
    * \returns \p true if the specified (local) node number is a face.
    */
-  virtual bool is_face(const unsigned int i) const libmesh_override;
+  virtual bool is_face(const unsigned int i) const override;
 
   /**
    * \returns \p true if the specified (local) node number is on the
    * specified side.
    */
   virtual bool is_node_on_side(const unsigned int n,
-                               const unsigned int s) const libmesh_override;
+                               const unsigned int s) const override;
 
   /**
    * \returns \p true if the specified (local) node number is on the
    * specified edge (== is_node_on_side in 2D).
    */
   virtual bool is_node_on_edge(const unsigned int n,
-                               const unsigned int e) const libmesh_override
+                               const unsigned int e) const override
   { return this->is_node_on_side(n,e); }
 
   /**
    * \returns \p FIRST.
    */
-  virtual Order default_order() const libmesh_override;
+  virtual Order default_order() const override;
 
   /**
    * \returns An \p Edge2 for the base side, or an \p InfEdge2 for
    * the sides 1, 2.
    */
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy) libmesh_override;
+                                                bool proxy) override;
 
   virtual void connectivity(const unsigned int sf,
                             const IOPackage iop,
-                            std::vector<dof_id_type> & conn) const libmesh_override;
+                            std::vector<dof_id_type> & conn) const override;
 
   /**
    * \returns \p true when this element contains the point
@@ -127,7 +127,7 @@ public:
    * about the envelope can help avoiding slightly more
    * expensive computations.
    */
-  virtual bool contains_point (const Point & p, Real tol=TOLERANCE) const libmesh_override;
+  virtual bool contains_point (const Point & p, Real tol=TOLERANCE) const override;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
@@ -152,7 +152,7 @@ protected:
    */
   virtual float embedding_matrix (const unsigned int i,
                                   const unsigned int j,
-                                  const unsigned int k) const libmesh_override
+                                  const unsigned int k) const override
   { return _embedding_matrix[i][j][k]; }
 
   /**

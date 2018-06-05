@@ -69,7 +69,7 @@ public:
                                                                const Point & p,
                                                                const std::string & var_name));
 
-  virtual ErrorEstimatorType type() const libmesh_override;
+  virtual ErrorEstimatorType type() const override;
 
 protected:
 
@@ -77,13 +77,13 @@ protected:
    * An initialization function, for requesting specific data from the FE
    * objects
    */
-  virtual void init_context(FEMContext & c) libmesh_override;
+  virtual void init_context(FEMContext & c) override;
 
   /**
    * The function which calculates a normal derivative jump based error
    * term on an internal side
    */
-  virtual void internal_side_integration() libmesh_override;
+  virtual void internal_side_integration() override;
 
   /**
    * The function which calculates a normal derivative jump based error
@@ -91,7 +91,7 @@ protected:
    *
    * \returns \p true if the flux bc function is in fact defined on the current side.
    */
-  virtual bool boundary_side_integration() libmesh_override;
+  virtual bool boundary_side_integration() override;
 
   /**
    * Pointer to function that provides BC information.

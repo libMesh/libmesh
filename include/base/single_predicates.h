@@ -82,10 +82,10 @@ template <typename T>
 struct is_null : predicate<T>
 {
   virtual ~is_null() {}
-  virtual bool operator()(const T & it) const libmesh_override { return *it == libmesh_nullptr; }
+  virtual bool operator()(const T & it) const override { return *it == libmesh_nullptr; }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new is_null<T>(*this); }
+  virtual predicate<T> * clone() const override { return new is_null<T>(*this); }
 };
 
 /**
@@ -94,10 +94,10 @@ protected:
 template <typename T>
 struct not_null : is_null<T>
 {
-  virtual bool operator()(const T & it) const libmesh_override { return !is_null<T>::operator()(it); }
+  virtual bool operator()(const T & it) const override { return !is_null<T>::operator()(it); }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new not_null<T>(*this); }
+  virtual predicate<T> * clone() const override { return new not_null<T>(*this); }
 };
 
 
@@ -108,10 +108,10 @@ template <typename T>
 struct active : predicate<T>
 {
   virtual ~active() {}
-  virtual bool operator()(const T & it) const libmesh_override { return (*it)->active(); }
+  virtual bool operator()(const T & it) const override { return (*it)->active(); }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new active<T>(*this); }
+  virtual predicate<T> * clone() const override { return new active<T>(*this); }
 };
 
 /**
@@ -120,10 +120,10 @@ protected:
 template <typename T>
 struct not_active : active<T>
 {
-  virtual bool operator()(const T & it) const libmesh_override { return !active<T>::operator()(it); }
+  virtual bool operator()(const T & it) const override { return !active<T>::operator()(it); }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new not_active<T>(*this); }
+  virtual predicate<T> * clone() const override { return new not_active<T>(*this); }
 };
 
 
@@ -134,10 +134,10 @@ template <typename T>
 struct ancestor : predicate<T>
 {
   virtual ~ancestor() {}
-  virtual bool operator()(const T & it) const libmesh_override { return (*it)->ancestor(); }
+  virtual bool operator()(const T & it) const override { return (*it)->ancestor(); }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new ancestor<T>(*this); }
+  virtual predicate<T> * clone() const override { return new ancestor<T>(*this); }
 };
 
 /**
@@ -146,10 +146,10 @@ protected:
 template <typename T>
 struct not_ancestor : ancestor<T>
 {
-  virtual bool operator()(const T & it) const libmesh_override { return !ancestor<T>::operator()(it); }
+  virtual bool operator()(const T & it) const override { return !ancestor<T>::operator()(it); }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new not_ancestor<T>(*this); }
+  virtual predicate<T> * clone() const override { return new not_ancestor<T>(*this); }
 };
 
 
@@ -160,10 +160,10 @@ template <typename T>
 struct subactive : predicate<T>
 {
   virtual ~subactive() {}
-  virtual bool operator()(const T & it) const libmesh_override { return (*it)->subactive(); }
+  virtual bool operator()(const T & it) const override { return (*it)->subactive(); }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new subactive<T>(*this); }
+  virtual predicate<T> * clone() const override { return new subactive<T>(*this); }
 };
 
 /**
@@ -172,10 +172,10 @@ protected:
 template <typename T>
 struct not_subactive : subactive<T>
 {
-  virtual bool operator()(const T & it) const libmesh_override { return !subactive<T>::operator()(it); }
+  virtual bool operator()(const T & it) const override { return !subactive<T>::operator()(it); }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new not_subactive<T>(*this); }
+  virtual predicate<T> * clone() const override { return new not_subactive<T>(*this); }
 };
 
 
@@ -190,10 +190,10 @@ struct pid : predicate<T>
   virtual ~pid() {}
 
   // op()
-  virtual bool operator()(const T & it) const libmesh_override { return (*it)->processor_id() == _pid; }
+  virtual bool operator()(const T & it) const override { return (*it)->processor_id() == _pid; }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new pid<T>(*this); }
+  virtual predicate<T> * clone() const override { return new pid<T>(*this); }
   const processor_id_type _pid;
 };
 
@@ -213,10 +213,10 @@ struct bid : predicate<T>
   virtual ~bid() {}
 
   // op()
-  virtual bool operator()(const T & it) const libmesh_override;
+  virtual bool operator()(const T & it) const override;
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new bid<T>(*this); }
+  virtual predicate<T> * clone() const override { return new bid<T>(*this); }
   const boundary_id_type _bid;
   const BoundaryInfo & _bndry_info;
 };
@@ -235,10 +235,10 @@ struct bnd : predicate<T>
   virtual ~bnd() {}
 
   // op()
-  virtual bool operator()(const T & it) const libmesh_override;
+  virtual bool operator()(const T & it) const override;
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new bnd<T>(*this); }
+  virtual predicate<T> * clone() const override { return new bnd<T>(*this); }
   const BoundaryInfo & _bndry_info;
 };
 
@@ -255,10 +255,10 @@ struct semilocal_pid : predicate<T>
   virtual ~semilocal_pid() {}
 
   // op()
-  virtual bool operator()(const T & it) const libmesh_override { return (*it)->is_semilocal(_pid); }
+  virtual bool operator()(const T & it) const override { return (*it)->is_semilocal(_pid); }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new semilocal_pid<T>(*this); }
+  virtual predicate<T> * clone() const override { return new semilocal_pid<T>(*this); }
   const processor_id_type _pid;
 };
 
@@ -275,7 +275,7 @@ struct facelocal_pid : predicate<T>
   virtual ~facelocal_pid() {}
 
   // op()
-  virtual bool operator()(const T & it) const libmesh_override
+  virtual bool operator()(const T & it) const override
   {
     if ((*it)->processor_id() == _pid)
       return true;
@@ -286,7 +286,7 @@ struct facelocal_pid : predicate<T>
   }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new facelocal_pid<T>(*this); }
+  virtual predicate<T> * clone() const override { return new facelocal_pid<T>(*this); }
   const processor_id_type _pid;
 };
 
@@ -300,10 +300,10 @@ struct not_pid : pid<T>
 {
   not_pid(processor_id_type p) : pid<T>(p) {}
 
-  virtual bool operator()(const T & it) const libmesh_override { return !pid<T>::operator()(it); }
+  virtual bool operator()(const T & it) const override { return !pid<T>::operator()(it); }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new not_pid<T>(*this); }
+  virtual predicate<T> * clone() const override { return new not_pid<T>(*this); }
 };
 
 
@@ -318,10 +318,10 @@ struct elem_type : predicate<T>
   elem_type (ElemType t) : _elem_type(t) {}
   virtual ~elem_type() {}
 
-  virtual bool operator()(const T & it) const libmesh_override { return (*it)->type() == _elem_type; }
+  virtual bool operator()(const T & it) const override { return (*it)->type() == _elem_type; }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new elem_type<T>(*this); }
+  virtual predicate<T> * clone() const override { return new elem_type<T>(*this); }
   const ElemType _elem_type;
 };
 
@@ -339,10 +339,10 @@ struct flagged : predicate<T>
   flagged (unsigned char rflag) : _rflag(rflag) {}
   virtual ~flagged() {}
 
-  virtual bool operator()(const T & it) const libmesh_override { return (*it)->refinement_flag() == _rflag; }
+  virtual bool operator()(const T & it) const override { return (*it)->refinement_flag() == _rflag; }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new flagged<T>(*this); }
+  virtual predicate<T> * clone() const override { return new flagged<T>(*this); }
   const unsigned char _rflag;
 };
 #endif // LIBMESH_ENABLE_AMR
@@ -361,10 +361,10 @@ struct level : predicate<T>
   level (unsigned int l) : _level(l) {}
   virtual ~level() {}
 
-  virtual bool operator()(const T & it) const libmesh_override { return (*it)->level() == _level; }
+  virtual bool operator()(const T & it) const override { return (*it)->level() == _level; }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new level<T>(*this); }
+  virtual predicate<T> * clone() const override { return new level<T>(*this); }
   const unsigned int _level;
 };
 
@@ -379,10 +379,10 @@ struct not_level : level<T>
 {
   not_level(unsigned int l) : level<T>(l) {}
 
-  virtual bool operator()(const T & it) const libmesh_override { return !level<T>::operator()(it); }
+  virtual bool operator()(const T & it) const override { return !level<T>::operator()(it); }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new not_level<T>(*this); }
+  virtual predicate<T> * clone() const override { return new not_level<T>(*this); }
 };
 
 
@@ -395,13 +395,13 @@ template <typename T>
 struct null_neighbor : predicate<T>
 {
   virtual ~null_neighbor() {}
-  virtual bool operator()(const T & it) const libmesh_override
+  virtual bool operator()(const T & it) const override
   {
     return (*it)->on_boundary();
   }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new null_neighbor<T>(*this); }
+  virtual predicate<T> * clone() const override { return new null_neighbor<T>(*this); }
 };
 
 
@@ -417,13 +417,13 @@ template <typename T>
 struct boundary_side : predicate<T>
 {
   virtual ~boundary_side() {}
-  virtual bool operator()(const T & it) const libmesh_override
+  virtual bool operator()(const T & it) const override
   {
     return it.side_on_boundary();
   }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new boundary_side<T>(*this); }
+  virtual predicate<T> * clone() const override { return new boundary_side<T>(*this); }
 };
 
 /**
@@ -437,10 +437,10 @@ struct subdomain : predicate<T>
   virtual ~subdomain() {}
 
   // op()
-  virtual bool operator()(const T & it) const libmesh_override { return (*it)->subdomain_id() == _subdomain; }
+  virtual bool operator()(const T & it) const override { return (*it)->subdomain_id() == _subdomain; }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new subdomain<T>(*this); }
+  virtual predicate<T> * clone() const override { return new subdomain<T>(*this); }
   const subdomain_id_type _subdomain;
 };
 
@@ -456,10 +456,10 @@ struct subdomain_set : predicate<T>
   virtual ~subdomain_set() {}
 
   // op()
-  virtual bool operator()(const T & it) const libmesh_override { return _subdomain_set.count((*it)->subdomain_id()); }
+  virtual bool operator()(const T & it) const override { return _subdomain_set.count((*it)->subdomain_id()); }
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new subdomain_set<T>(*this); }
+  virtual predicate<T> * clone() const override { return new subdomain_set<T>(*this); }
   const std::set<subdomain_id_type> _subdomain_set;
 };
 
@@ -478,10 +478,10 @@ struct evaluable : predicate<T>
   virtual ~evaluable() {}
 
   // op()
-  virtual bool operator()(const T & it) const libmesh_override;
+  virtual bool operator()(const T & it) const override;
 
 protected:
-  virtual predicate<T> * clone() const libmesh_override { return new evaluable<T>(*this); }
+  virtual predicate<T> * clone() const override { return new evaluable<T>(*this); }
   const DofMap & _dof_map;
   unsigned int _var_num;
 };

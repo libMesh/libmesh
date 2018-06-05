@@ -93,7 +93,7 @@ public:
    * own and specifying the Trees::NODES method.  specifies the method
    * to use when building a \p PointLocator
    */
-  virtual void init () libmesh_override { this->init(Trees::NODES); }
+  virtual void init () override { this->init(Trees::NODES); }
 
   /**
    * The actual initialization process.  Takes an optional argument which
@@ -104,7 +104,7 @@ public:
   /**
    * Clears the function.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * \returns A new copy of the function.
@@ -115,14 +115,14 @@ public:
    * \note This implies the copy should not be used after the
    * original is destroyed.
    */
-  virtual std::unique_ptr<FunctionBase<Number>> clone () const libmesh_override;
+  virtual std::unique_ptr<FunctionBase<Number>> clone () const override;
 
   /**
    * \returns The value of variable 0 at point \p p and for \p time,
    * which defaults to zero.
    */
   Number operator() (const Point & p,
-                     const Real time=0.) libmesh_override;
+                     const Real time=0.) override;
 
   /**
    * \returns A map of values of variable 0 at point
@@ -168,7 +168,7 @@ public:
    */
   void operator() (const Point & p,
                    const Real time,
-                   DenseVector<Number> & output) libmesh_override;
+                   DenseVector<Number> & output) override;
 
   /**
    * Computes values at coordinate \p p and for time \p time,
