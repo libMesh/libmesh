@@ -19,6 +19,8 @@
 
 // Local includes
 #include "libmesh/edge_edge2.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -73,6 +75,15 @@ bool Edge2::is_node_on_edge(const unsigned int,
   libmesh_assert_equal_to (e, 0);
   return true;
 }
+
+
+
+Order Edge2::default_order() const
+{
+  return FIRST;
+}
+
+
 
 void Edge2::connectivity(const unsigned int libmesh_dbg_var(sc),
                          const IOPackage iop,

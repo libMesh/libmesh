@@ -21,8 +21,16 @@
 // Local includes
 #include <cstddef>         // for NULL with gcc 4.6.2 - I'm serious!
 #include "libmesh/libmesh_common.h"
-#include "libmesh/enum_elem_type.h"
 #include "libmesh/id_types.h"
+
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum ElemType : int;
+}
+#else
+#include "libmesh/enum_elem_type.h"
+#endif
 
 // C++ includes
 #include <vector>
@@ -34,7 +42,6 @@ namespace libMesh
 // Forward declarations
 class BoundaryInfo;
 class DofMap;
-
 
 /**
  * This file declares several predicates in the Predicates namespace.  They

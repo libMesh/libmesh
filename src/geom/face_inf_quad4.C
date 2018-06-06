@@ -17,18 +17,19 @@
 
 
 
-// Local includes
 #include "libmesh/libmesh_config.h"
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-
-// Local includes cont'd
+// Local includes
 #include "libmesh/face_inf_quad4.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/side.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/edge_inf_edge2.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -160,6 +161,13 @@ bool InfQuad4::contains_point (const Point & p, Real tol) const
     }
 }
 
+
+
+
+Order InfQuad4::default_order() const
+{
+  return FIRST;
+}
 
 
 

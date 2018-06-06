@@ -74,8 +74,9 @@
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/zero_function.h"
 #include "libmesh/dirichlet_boundaries.h"
+#include "libmesh/enum_solver_package.h"
 
-// local includes
+// example includes
 #include "augment_sparsity_on_interface.h"
 
 // define the boundary IDs in the mesh

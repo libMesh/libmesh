@@ -64,7 +64,7 @@ public:
   /**
    * \returns \p QGRID.
    */
-  virtual QuadratureType type() const libmesh_override { return QGRID; }
+  virtual QuadratureType type() const libmesh_override;
 
 
 private:

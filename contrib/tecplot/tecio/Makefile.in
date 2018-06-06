@@ -653,6 +653,7 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 enabledeprecated = @enabledeprecated@
+enablefwdenums = @enablefwdenums@
 enablelegacyincludepaths = @enablelegacyincludepaths@
 enablepetsc = @enablepetsc@
 enableuniqueptr = @enableuniqueptr@

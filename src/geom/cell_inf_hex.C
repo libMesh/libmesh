@@ -31,6 +31,7 @@
 #include "libmesh/face_inf_quad4.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/enum_elem_quality.h"
 
 namespace libMesh
 {

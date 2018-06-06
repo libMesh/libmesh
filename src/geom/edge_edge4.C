@@ -19,6 +19,8 @@
 
 // Local includes
 #include "libmesh/edge_edge4.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -90,6 +92,13 @@ bool Edge4::has_affine_map() const
       ((this->point(0) + this->point(1)*2.)/3.))
     return false;
   return true;
+}
+
+
+
+Order Edge4::default_order() const
+{
+  return THIRD;
 }
 
 

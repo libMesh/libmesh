@@ -54,7 +54,7 @@ public:
   /**
    * \returns \p QCLOUGH.
    */
-  virtual QuadratureType type() const libmesh_override { return QCLOUGH; }
+  virtual QuadratureType type() const libmesh_override;
 
 
 private:

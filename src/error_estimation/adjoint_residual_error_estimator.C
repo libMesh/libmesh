@@ -25,6 +25,7 @@
 #include "libmesh/system.h"
 #include "libmesh/system_norm.h"
 #include "libmesh/qoi_set.h"
+#include "libmesh/enum_error_estimator_type.h"
 
 // C++ includes
 #include <iostream>
@@ -43,6 +44,14 @@ AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :
   _dual_error_estimator(new PatchRecoveryErrorEstimator()),
   _qoi_set(QoISet())
 {
+}
+
+
+
+ErrorEstimatorType
+AdjointResidualErrorEstimator::type() const
+{
+  return ADJOINT_RESIDUAL;
 }
 
 

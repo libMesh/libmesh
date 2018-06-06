@@ -40,6 +40,7 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/partitioner.h"
+#include "libmesh/enum_order.h"
 
 namespace
 {

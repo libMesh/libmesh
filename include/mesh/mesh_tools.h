@@ -23,9 +23,17 @@
 // Local Includes
 #include "libmesh/libmesh.h"
 #include "libmesh/bounding_box.h"
-#include "libmesh/enum_elem_type.h"
 #include "libmesh/id_types.h"
 #include "libmesh/mesh_base.h"
+
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum ElemType : int;
+}
+#else
+#include "libmesh/enum_elem_type.h"
+#endif
 
 // C++ Includes
 #include <vector>

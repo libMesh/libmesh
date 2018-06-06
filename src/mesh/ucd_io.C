@@ -29,6 +29,8 @@
 #include "libmesh/cell_tet4.h"
 #include "libmesh/cell_hex8.h"
 #include "libmesh/cell_prism6.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_elem_type.h"
 
 #ifdef LIBMESH_HAVE_GZSTREAM
 # include "gzstream.h" // For reading/writing compressed streams

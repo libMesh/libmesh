@@ -32,6 +32,7 @@
 #include "libmesh/system.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/enum_elem_type.h"
 
 #ifdef DEBUG
 #include "libmesh/mesh_tools.h"  // for elem_types warning

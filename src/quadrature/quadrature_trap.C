@@ -16,10 +16,22 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// See the files:
+// libMesh includes
+#include "libmesh/quadrature_trap.h"
+#include "libmesh/enum_quadrature_type.h"
 
+namespace libMesh
+{
+
+QuadratureType QTrap::type() const
+{
+  return QTRAP;
+}
+
+// See the files:
 // quadrature_trap_1D.C
 // quadrature_trap_2D.C
 // quadrature_trap_3D.C
-
 // for implementation.
+
+}

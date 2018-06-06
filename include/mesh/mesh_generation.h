@@ -22,7 +22,7 @@
 
 // Local Includes
 #include "libmesh/libmesh.h"
-#include "libmesh/enum_elem_type.h"
+#include "libmesh/enum_elem_type.h" // INVALID_ELEM
 #include "libmesh/vector_value.h"
 #ifdef LIBMESH_HAVE_TRIANGLE
 #include "libmesh/mesh_triangle_interface.h"

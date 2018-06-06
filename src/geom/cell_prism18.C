@@ -16,14 +16,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/side.h"
 #include "libmesh/cell_prism18.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/face_quad9.h"
 #include "libmesh/face_tri6.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -135,6 +135,11 @@ bool Prism18::has_affine_map() const
 }
 
 
+
+Order Prism18::default_order() const
+{
+  return SECOND;
+}
 
 dof_id_type Prism18::key (const unsigned int s) const
 {

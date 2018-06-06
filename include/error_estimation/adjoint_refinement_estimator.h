@@ -54,17 +54,7 @@ public:
   /**
    * Constructor.  Sets the most common default parameter values.
    */
-  AdjointRefinementEstimator() :
-    ErrorEstimator(),
-    number_h_refinements(1),
-    number_p_refinements(0),
-    _residual_evaluation_physics(libmesh_nullptr),
-    _qoi_set(QoISet())
-  {
-    // We're not actually going to use error_norm; our norms are
-    // absolute values of QoI error.
-    error_norm = INVALID_NORM;
-  }
+  AdjointRefinementEstimator();
 
   /**
    * Destructor.
@@ -113,8 +103,7 @@ public:
     return computed_global_QoI_errors[qoi_index];
   }
 
-  virtual ErrorEstimatorType type() const
-  { return ADJOINT_REFINEMENT;}
+  virtual ErrorEstimatorType type() const;
 
   /**
    * How many h refinements to perform to get the fine grid

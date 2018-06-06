@@ -16,14 +16,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/side.h"
 #include "libmesh/cell_tet4.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/tensor_value.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -125,6 +125,11 @@ bool Tet4::is_node_on_side(const unsigned int n,
     if (side_nodes_map[s][i] == n)
       return true;
   return false;
+}
+
+Order Tet4::default_order() const
+{
+  return FIRST;
 }
 
 std::unique_ptr<Elem> Tet4::build_side_ptr (const unsigned int i,

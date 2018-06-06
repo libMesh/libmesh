@@ -24,7 +24,6 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/compare_types.h"
-#include "libmesh/enum_elem_type.h"
 #include "libmesh/fe_abstract.h"
 #include "libmesh/fe_transformation_base.h"
 #include "libmesh/point.h"

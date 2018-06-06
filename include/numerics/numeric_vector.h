@@ -24,13 +24,21 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/enum_parallel_type.h"
-#include "libmesh/enum_solver_package.h"
 #include "libmesh/id_types.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/dense_subvector.h"
 #include "libmesh/dense_vector.h"
+
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum SolverPackage : int;
+}
+#else
+#include "libmesh/enum_solver_package.h"
+#endif
 
 // C++ includes
 #include <cstddef>
@@ -48,7 +56,6 @@ template <typename T> class DenseVector;
 template <typename T> class DenseSubVector;
 template <typename T> class SparseMatrix;
 template <typename T> class ShellMatrix;
-
 
 /**
  * Numeric vector. Provides a uniform interface

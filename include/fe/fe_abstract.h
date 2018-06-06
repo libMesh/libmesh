@@ -24,12 +24,20 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/point.h"
 #include "libmesh/vector_value.h"
-#include "libmesh/enum_elem_type.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/fe_map.h"
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 #include "libmesh/tensor_value.h"
+#endif
+
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum ElemType : int;
+}
+#else
+#include "libmesh/enum_elem_type.h"
 #endif
 
 // C++ includes

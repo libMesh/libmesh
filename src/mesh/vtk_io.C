@@ -28,6 +28,7 @@
 #include "libmesh/system.h"
 #include "libmesh/node.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_io_package.h"
 
 #ifdef LIBMESH_HAVE_VTK
 

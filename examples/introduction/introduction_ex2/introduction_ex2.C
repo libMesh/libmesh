@@ -50,6 +50,7 @@
 //Basic include file needed for the mesh functionality.
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
+#include "libmesh/enum_xdr_mode.h"
 // Include file that defines various mesh generation utilities
 #include "libmesh/mesh_generation.h"
 // Include file that defines (possibly multiple) systems of equations.
@@ -58,6 +59,7 @@
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/transient_system.h"
 #include "libmesh/explicit_system.h"
+#include "libmesh/enum_solver_package.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

@@ -65,7 +65,7 @@ public:
   /**
    * \returns \p QGAUSS.
    */
-  virtual QuadratureType type() const libmesh_override { return QGAUSS; }
+  virtual QuadratureType type() const libmesh_override;
 
 
 private:

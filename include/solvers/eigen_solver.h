@@ -26,12 +26,23 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/enum_solver_package.h"
-#include "libmesh/enum_eigen_solver_type.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/auto_ptr.h" // deprecated
+#include "libmesh/enum_solver_package.h" // SLEPC_SOLVERS
+
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum EigenSolverType : int;
+enum EigenProblemType : int;
+enum PositionOfSpectrum : int;
+}
+#else
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/enum_eigen_solver_type.h"
+#endif
 
 // C++ includes
 #include <memory>
@@ -293,32 +304,6 @@ protected:
 
   bool _close_matrix_before_solve;
 };
-
-
-
-
-/*----------------------- inline functions ----------------------------------*/
-template <typename T>
-inline
-EigenSolver<T>::EigenSolver (const Parallel::Communicator & comm_in) :
-  ParallelObject(comm_in),
-  _eigen_solver_type    (ARNOLDI),
-  _eigen_problem_type   (NHEP),
-  _position_of_spectrum (LARGEST_MAGNITUDE),
-  _is_initialized       (false),
-  _solver_configuration(libmesh_nullptr),
-  _close_matrix_before_solve(true)
-{
-}
-
-
-
-template <typename T>
-inline
-EigenSolver<T>::~EigenSolver ()
-{
-  this->clear ();
-}
 
 } // namespace libMesh
 

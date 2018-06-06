@@ -37,12 +37,32 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/system.h"
 #include "libmesh/tensor_tools.h"
+#include "libmesh/enum_error_estimator_type.h"
+#include "libmesh/enum_norm_type.h"
 
 namespace libMesh
 {
 
 //-----------------------------------------------------------------
 // ErrorEstimator implementations
+ExactErrorEstimator::ExactErrorEstimator() :
+    ErrorEstimator(),
+    _exact_value(libmesh_nullptr),
+    _exact_deriv(libmesh_nullptr),
+    _exact_hessian(libmesh_nullptr),
+    _equation_systems_fine(libmesh_nullptr),
+    _extra_order(0)
+{
+  error_norm = H1;
+}
+
+
+ErrorEstimatorType ExactErrorEstimator::type() const
+{
+  return EXACT;
+}
+
+
 void ExactErrorEstimator::attach_exact_value (ValueFunctionPointer fptr)
 {
   libmesh_assert(fptr);

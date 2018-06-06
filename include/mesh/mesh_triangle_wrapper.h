@@ -25,7 +25,15 @@
 
 // Local Includes
 #include "libmesh/libmesh_common.h" // Real
-#include "libmesh/enum_elem_type.h" // For ElemType declaration below
+
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum ElemType : int;
+}
+#else
+#include "libmesh/enum_elem_type.h"
+#endif
 
 // C++ includes
 #include <cstddef>

@@ -111,7 +111,7 @@ public:
   /**
    * \returns \p QGRUNDMANN_MOLLER.
    */
-  virtual QuadratureType type() const libmesh_override { return QGRUNDMANN_MOLLER; }
+  virtual QuadratureType type() const libmesh_override;
 
 
 private:

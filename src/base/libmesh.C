@@ -25,7 +25,7 @@
 #include "libmesh/remote_elem.h"
 #include "libmesh/threads.h"
 #include "libmesh/print_trace.h"
-
+#include "libmesh/enum_solver_package.h"
 
 // C/C++ includes
 #include <iostream>

@@ -62,14 +62,7 @@ public:
    * Constructor.  Responsible for initializing the _bc_function function
    * pointer to libmesh_nullptr, and defaulting the norm type to H1.
    */
-  ExactErrorEstimator() :
-    ErrorEstimator(),
-    _exact_value(libmesh_nullptr),
-    _exact_deriv(libmesh_nullptr),
-    _exact_hessian(libmesh_nullptr),
-    _equation_systems_fine(libmesh_nullptr),
-    _extra_order(0)
-  { error_norm = H1; }
+  ExactErrorEstimator();
 
   /**
    * Destructor.
@@ -179,8 +172,7 @@ public:
                                const NumericVector<Number> * solution_vector = libmesh_nullptr,
                                bool estimate_parent_error = false) libmesh_override;
 
-  virtual ErrorEstimatorType type() const libmesh_override
-  { return EXACT;}
+  virtual ErrorEstimatorType type() const libmesh_override;
 
 private:
 

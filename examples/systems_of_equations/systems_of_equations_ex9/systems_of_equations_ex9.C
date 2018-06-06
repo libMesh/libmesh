@@ -63,6 +63,7 @@
 #include "libmesh/petsc_macro.h"
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/periodic_boundary.h"
+#include "libmesh/enum_solver_package.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

@@ -23,7 +23,6 @@
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/auto_ptr.h" // deprecated
-#include "libmesh/enum_order.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h" // libMesh::invalid_uint
 #include "libmesh/variable.h"
@@ -34,6 +33,15 @@
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/point.h"
+
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum Order : int;
+}
+#else
+#include "libmesh/enum_order.h"
+#endif
 
 // C++ Includes
 #include <algorithm>

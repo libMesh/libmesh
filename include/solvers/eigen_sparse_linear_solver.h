@@ -30,8 +30,8 @@
 #include "libmesh/linear_solver.h"
 #include "libmesh/eigen_sparse_vector.h"
 #include "libmesh/eigen_sparse_matrix.h"
+#include "libmesh/enum_convergence_flags.h" // The build_map() function uses these.
 
-// C++ includes
 
 namespace libMesh
 {

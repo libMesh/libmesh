@@ -21,13 +21,13 @@
 // differences between them.
 
 #include "libmesh/libmesh.h"
-
 #include "libmesh/mesh.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/exact_solution.h"
 #include "libmesh/mesh_function.h"
 #include "libmesh/namebased_io.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/enum_norm_type.h"
 
 using namespace libMesh;
 

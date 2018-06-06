@@ -52,8 +52,8 @@
 #include "libmesh/kelly_error_estimator.h"
 #include "libmesh/discontinuity_measure.h"
 #include "libmesh/string_to_enum.h"
-
 #include "libmesh/exact_solution.h"
+#include "libmesh/enum_solver_package.h"
 //#define QORDER TWENTYSIXTH
 
 // Bring in everything from the libMesh namespace

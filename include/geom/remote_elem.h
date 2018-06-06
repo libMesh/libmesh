@@ -163,7 +163,7 @@ public:
   { libmesh_not_implemented(); return std::unique_ptr<Elem>(); }
 
   virtual Order default_order () const libmesh_override
-  { libmesh_not_implemented(); return FIRST; }
+  { libmesh_not_implemented(); return static_cast<Order>(1); }
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

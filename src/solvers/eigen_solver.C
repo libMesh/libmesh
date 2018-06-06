@@ -24,6 +24,7 @@
 #include "libmesh/slepc_eigen_solver.h"
 #include "libmesh/solver_configuration.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/enum_eigen_solver_type.h"
 
 namespace libMesh
 {
@@ -31,6 +32,28 @@ namespace libMesh
 
 //------------------------------------------------------------------
 // EigenSolver members
+template <typename T>
+EigenSolver<T>::EigenSolver (const Parallel::Communicator & comm_in) :
+  ParallelObject(comm_in),
+  _eigen_solver_type    (ARNOLDI),
+  _eigen_problem_type   (NHEP),
+  _position_of_spectrum (LARGEST_MAGNITUDE),
+  _is_initialized       (false),
+  _solver_configuration(libmesh_nullptr),
+  _close_matrix_before_solve(true)
+{
+}
+
+
+
+template <typename T>
+EigenSolver<T>::~EigenSolver ()
+{
+  this->clear ();
+}
+
+
+
 template <typename T>
 std::unique_ptr<EigenSolver<T>>
 EigenSolver<T>::build(const Parallel::Communicator & comm,

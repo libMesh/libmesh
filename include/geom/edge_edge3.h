@@ -116,7 +116,7 @@ public:
   /**
    * \returns SECOND.
    */
-  virtual Order default_order() const libmesh_override { return SECOND; }
+  virtual Order default_order() const libmesh_override;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,

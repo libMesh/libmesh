@@ -119,7 +119,7 @@ public:
   /**
    * \returns FIRST.
    */
-  virtual Order default_order() const libmesh_override { return FIRST; }
+  virtual Order default_order() const libmesh_override;
 
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
                                                 bool proxy) libmesh_override;

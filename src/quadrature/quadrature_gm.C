@@ -18,16 +18,15 @@
 
 #include "libmesh/quadrature_gm.h"
 #include "libmesh/quadrature_gauss.h"
+#include "libmesh/enum_quadrature_type.h"
 
 namespace libMesh
 {
 
 // See also the file:
+// quadrature_gm_2D.C
 // quadrature_gm_3D.C
 // for additional implementation.
-
-
-
 
 // Constructor
 QGrundmann_Moller::QGrundmann_Moller(const unsigned int d,
@@ -39,6 +38,13 @@ QGrundmann_Moller::QGrundmann_Moller(const unsigned int d,
 // Destructor
 QGrundmann_Moller::~QGrundmann_Moller()
 {
+}
+
+
+
+QuadratureType QGrundmann_Moller::type() const
+{
+  return QGRUNDMANN_MOLLER;
 }
 
 

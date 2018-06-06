@@ -27,8 +27,6 @@
 // Local includes
 #include "libmesh/preconditioner.h"
 #include "libmesh/libmesh_common.h"
-#include "libmesh/enum_solver_package.h"
-#include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/auto_ptr.h" // deprecated
@@ -40,6 +38,15 @@
 #include "Epetra_FECrsMatrix.h"
 #include "Teuchos_ParameterList.hpp"
 #include "libmesh/restore_warnings.h"
+
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum PreconditionerType : int;
+}
+#else
+#include "libmesh/enum_preconditioner_type.h"
+#endif
 
 // C++ includes
 #include <cstddef>

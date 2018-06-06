@@ -16,14 +16,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/side.h"
 #include "libmesh/cell_prism6.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/face_quad4.h"
 #include "libmesh/face_tri3.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -112,6 +112,13 @@ bool Prism6::has_affine_map() const
       !v.relative_fuzzy_equals(this->point(5) - this->point(2)))
     return false;
   return true;
+}
+
+
+
+Order Prism6::default_order() const
+{
+  return FIRST;
 }
 
 

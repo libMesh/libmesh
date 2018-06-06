@@ -16,13 +16,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-
 // Local includes
 #include "libmesh/side.h"
 #include "libmesh/cell_tet10.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/face_tri6.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -149,6 +149,13 @@ bool Tet10::has_affine_map() const
       ((this->point(3) + this->point(2))/2))
     return false;
   return true;
+}
+
+
+
+Order Tet10::default_order() const
+{
+  return SECOND;
 }
 
 

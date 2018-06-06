@@ -17,7 +17,9 @@
 
 
 
+// libMesh includes
 #include "libmesh/quadrature_jacobi.h"
+#include "libmesh/enum_quadrature_type.h"
 
 namespace libMesh
 {

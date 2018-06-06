@@ -18,6 +18,7 @@
 
 // libMesh includes
 #include "libmesh/system_norm.h"
+#include "libmesh/enum_norm_type.h"
 
 namespace libMesh
 {

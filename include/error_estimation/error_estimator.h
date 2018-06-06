@@ -24,7 +24,15 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parallel.h"
 #include "libmesh/system_norm.h"
+
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum ErrorEstimatorType : int;
+}
+#else
 #include "libmesh/enum_error_estimator_type.h"
+#endif
 
 // C++ includes
 #include <cstddef>

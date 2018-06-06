@@ -57,6 +57,8 @@
 #include "libmesh/linear_solver.h"
 #include "libmesh/libmesh_nullptr.h"
 #include "libmesh/getpot.h"
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/enum_solver_type.h"
 
 // Eigen includes
 #ifdef LIBMESH_HAVE_EIGEN

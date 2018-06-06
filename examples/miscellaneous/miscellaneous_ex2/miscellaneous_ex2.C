@@ -50,6 +50,7 @@
 #include "libmesh/unv_io.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_xdr_mode.h"
 
 // Include FrequencySystem.  This class offers added functionality for
 // the solution of frequency-dependent systems.

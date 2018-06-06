@@ -97,7 +97,7 @@ public:
   /**
    * \returns SECOND.
    */
-  virtual Order default_order() const libmesh_override { return SECOND; }
+  virtual Order default_order() const libmesh_override;
 
   /**
    * \returns \p true if the specified (local) node number is a vertex.

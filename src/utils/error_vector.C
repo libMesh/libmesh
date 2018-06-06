@@ -23,7 +23,6 @@
 #include "libmesh/elem.h"
 #include "libmesh/error_vector.h"
 #include "libmesh/libmesh_logging.h"
-
 #include "libmesh/dof_map.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/explicit_system.h"
@@ -33,6 +32,7 @@
 #include "libmesh/tecplot_io.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/xdr_io.h"
+#include "libmesh/enum_xdr_mode.h"
 
 namespace libMesh
 {

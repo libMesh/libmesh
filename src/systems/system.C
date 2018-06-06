@@ -49,6 +49,7 @@
 #include "libmesh/tensor_value.h"
 #include "libmesh/vector_value.h"
 #include "libmesh/tensor_tools.h"
+#include "libmesh/enum_norm_type.h"
 
 namespace libMesh
 {

@@ -24,13 +24,21 @@
 #include "libmesh/auto_ptr.h" // deprecated
 #include "libmesh/boundary_info.h"
 #include "libmesh/dof_object.h" // for invalid_processor_id
-#include "libmesh/enum_elem_type.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/multi_predicates.h"
 #include "libmesh/point_locator_base.h"
 #include "libmesh/variant_filter_iterator.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/simple_range.h"
+
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum ElemType : int;
+}
+#else
+#include "libmesh/enum_elem_type.h"
+#endif
 
 // C++ Includes
 #include <cstddef>

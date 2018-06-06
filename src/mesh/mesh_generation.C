@@ -51,6 +51,7 @@
 #include "libmesh/node_elem.h"
 #include "libmesh/vector_value.h"
 #include "libmesh/function_base.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {

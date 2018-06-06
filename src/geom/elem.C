@@ -68,6 +68,9 @@
 #include "libmesh/reference_elem.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/threads.h"
+#include "libmesh/enum_elem_quality.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 #include "libmesh/mesh.h"

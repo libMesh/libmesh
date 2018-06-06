@@ -22,8 +22,6 @@
 // if SLEPc support is enabled.
 #if defined(LIBMESH_HAVE_SLEPC)
 
-// C++ includes
-
 // Local includes
 #include "libmesh/eigen_system.h"
 #include "libmesh/equation_systems.h"
@@ -31,6 +29,7 @@
 #include "libmesh/eigen_solver.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/enum_eigen_solver_type.h"
 
 namespace libMesh
 {

@@ -32,6 +32,7 @@
 #include "libmesh/shell_matrix.h"
 #include "libmesh/tensor_tools.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/enum_solver_package.h"
 
 namespace libMesh
 {

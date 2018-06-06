@@ -19,16 +19,27 @@
 
 // Local Includes
 #include "libmesh/preconditioner.h"
-
 #include "libmesh/auto_ptr.h"
 #include "libmesh/eigen_preconditioner.h"
 #include "libmesh/petsc_preconditioner.h"
 #include "libmesh/trilinos_preconditioner.h"
-
-
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/enum_preconditioner_type.h"
 
 namespace libMesh
 {
+
+template <typename T>
+inline
+Preconditioner<T>::Preconditioner (const libMesh::Parallel::Communicator & comm_in) :
+  ParallelObject(comm_in),
+  _matrix(libmesh_nullptr),
+  _preconditioner_type (ILU_PRECOND),
+  _is_initialized      (false)
+{
+}
+
+
 
 template <typename T>
 std::unique_ptr<Preconditioner<T>>

@@ -15,21 +15,18 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// Local includes
 #include "libmesh/libmesh_config.h"
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-
-// C++ includes
-// include <algorithm>
-
-// Local includes cont'd
+// Local includes
 #include "libmesh/cell_inf_prism.h"
 #include "libmesh/cell_inf_prism6.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_inf_quad4.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {

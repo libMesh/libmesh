@@ -69,6 +69,7 @@
 #include "libmesh/steady_solver.h"
 #include "libmesh/system_norm.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/enum_solver_package.h"
 
 // Error Estimator includes
 #include "libmesh/kelly_error_estimator.h"

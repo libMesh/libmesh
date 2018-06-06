@@ -43,6 +43,8 @@
 #include "libmesh/implicit_system.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/adjoint_refinement_estimator.h"
+#include "libmesh/enum_error_estimator_type.h"
+#include "libmesh/enum_norm_type.h"
 
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -67,6 +69,23 @@ namespace libMesh
 // Both a global QoI error estimate and element wise error indicators are included
 // Note that the element wise error indicators slightly over estimate the error in
 // each element
+
+AdjointRefinementEstimator::AdjointRefinementEstimator() :
+  ErrorEstimator(),
+  number_h_refinements(1),
+  number_p_refinements(0),
+  _residual_evaluation_physics(libmesh_nullptr),
+  _qoi_set(QoISet())
+{
+  // We're not actually going to use error_norm; our norms are
+  // absolute values of QoI error.
+  error_norm = INVALID_NORM;
+}
+
+ErrorEstimatorType AdjointRefinementEstimator::type() const
+{
+  return ADJOINT_REFINEMENT;
+}
 
 void AdjointRefinementEstimator::estimate_error (const System & _system,
                                                  ErrorVector & error_per_cell,

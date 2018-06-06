@@ -16,11 +16,22 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+// libMesh includes
+#include "libmesh/quadrature_simpson.h"
+#include "libmesh/enum_quadrature_type.h"
+
+namespace libMesh
+{
+
+QuadratureType QSimpson::type() const
+{
+  return QSIMPSON;
+}
 
 // See the files:
-
 // quadrature_simpson_1D.C
 // quadrature_simpson_2D.C
 // quadrature_simpson_3D.C
-
 // for implementation.
+
+}

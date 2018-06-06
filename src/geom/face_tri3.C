@@ -15,12 +15,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// C++ includes
-
 // Local includes
 #include "libmesh/side.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/face_tri3.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {
@@ -104,6 +104,11 @@ bool Tri3::is_node_on_side(const unsigned int n,
     if (side_nodes_map[s][i] == n)
       return true;
   return false;
+}
+
+Order Tri3::default_order() const
+{
+  return FIRST;
 }
 
 std::unique_ptr<Elem> Tri3::build_side_ptr (const unsigned int i,

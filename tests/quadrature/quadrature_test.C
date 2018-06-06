@@ -7,6 +7,7 @@
 #include <libmesh/quadrature.h>
 #include <libmesh/string_to_enum.h>
 #include <libmesh/utility.h>
+#include <libmesh/enum_quadrature_type.h>
 
 #include <iomanip>
 

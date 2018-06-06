@@ -24,6 +24,7 @@
 #include "libmesh/eigen_time_solver.h"
 #include "libmesh/eigen_solver.h"
 #include "libmesh/sparse_matrix.h"
+#include "libmesh/enum_eigen_solver_type.h"
 
 namespace libMesh
 {

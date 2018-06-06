@@ -16,17 +16,17 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+// libMesh includes
 #include "libmesh/quadrature_gauss_lobatto.h"
+#include "libmesh/enum_quadrature_type.h"
 
 namespace libMesh
 {
 
 // See the files:
-
 // quadrature_gauss_lobatto_1D.C
 // quadrature_gauss_lobatto_2D.C
 // quadrature_gauss_lobatto_3D.C
-
 // for implementation of specific element types.
 
 
@@ -48,5 +48,10 @@ QGaussLobatto::~QGaussLobatto()
 {
 }
 
+
+QuadratureType QGaussLobatto::type() const
+{
+  return QGAUSS_LOBATTO;
+}
 
 } // namespace libMesh

@@ -21,7 +21,15 @@
 
 // Local Includes
 #include "libmesh/libmesh_common.h" // for Number
+
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum FEMNormType : int;
+}
+#else
 #include "libmesh/enum_norm_type.h"
+#endif
 
 // C++ includes
 #include <map>

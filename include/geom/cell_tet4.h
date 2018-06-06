@@ -128,7 +128,7 @@ public:
   /**
    * \returns FIRST.
    */
-  virtual Order default_order() const libmesh_override { return FIRST; }
+  virtual Order default_order() const libmesh_override;
 
   /**
    * Builds a \p TRI3 built coincident with face i.

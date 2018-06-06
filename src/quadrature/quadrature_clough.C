@@ -16,10 +16,22 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// See the files:
+// libMesh includes
+#include "libmesh/quadrature_clough.h"
+#include "libmesh/enum_quadrature_type.h"
 
+namespace libMesh
+{
+
+QuadratureType QClough::type() const
+{
+  return QCLOUGH;
+}
+
+// See the files:
 // quadrature_clough_1D.C
 // quadrature_clough_2D.C
 // quadrature_clough_3D.C
-
 // for implementation.
+
+}

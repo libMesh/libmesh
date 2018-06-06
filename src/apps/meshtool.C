@@ -50,7 +50,7 @@
 #include "libmesh/perfmon.h"
 #include "libmesh/statistics.h"
 #include "libmesh/string_to_enum.h"
-
+#include "libmesh/enum_elem_quality.h"
 
 using namespace libMesh;
 

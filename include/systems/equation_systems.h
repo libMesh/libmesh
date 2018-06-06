@@ -24,8 +24,16 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parameters.h"
 #include "libmesh/system.h"
-#include "libmesh/enum_xdr_mode.h"
 #include "libmesh/parallel_object.h"
+
+#ifdef LIBMESH_FORWARD_DECLARE_ENUMS
+namespace libMesh
+{
+enum XdrMODE : int;
+}
+#else
+#include "libmesh/enum_xdr_mode.h"
+#endif
 
 // HP aCC needs these for some reason
 #ifdef __HP_aCC

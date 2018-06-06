@@ -44,6 +44,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/linear_implicit_system.h"
+#include "libmesh/enum_solver_package.h"
 
 // For systems of equations the DenseSubMatrix
 // and DenseSubVector provide convenient ways for

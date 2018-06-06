@@ -271,26 +271,6 @@ private:
 
 };
 
-
-/*----------------------- inline functions ----------------------------------*/
-template <typename T>
-inline
-SlepcEigenSolver<T>::SlepcEigenSolver (const Parallel::Communicator & comm_in) :
-  EigenSolver<T>(comm_in)
-{
-  this->_eigen_solver_type  = ARNOLDI;
-  this->_eigen_problem_type = NHEP;
-}
-
-
-
-template <typename T>
-inline
-SlepcEigenSolver<T>::~SlepcEigenSolver ()
-{
-  this->clear ();
-}
-
 } // namespace libMesh
 
 

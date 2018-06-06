@@ -20,13 +20,12 @@
 #include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-// C++ includes
-
 // Local includes cont'd
 #include "libmesh/face_inf_quad.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/edge_inf_edge2.h"
 #include "libmesh/face_inf_quad4.h"
+#include "libmesh/enum_elem_quality.h"
 
 namespace libMesh
 {

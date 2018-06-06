@@ -72,6 +72,7 @@
 
 // The definition of a geometric element
 #include "libmesh/elem.h"
+#include "libmesh/enum_solver_package.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

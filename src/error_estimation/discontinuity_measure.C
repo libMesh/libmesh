@@ -30,13 +30,30 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
 #include "libmesh/system.h"
-
 #include "libmesh/dense_vector.h"
 #include "libmesh/tensor_tools.h"
-
+#include "libmesh/enum_error_estimator_type.h"
+#include "libmesh/enum_norm_type.h"
 
 namespace libMesh
 {
+
+DiscontinuityMeasure::DiscontinuityMeasure() :
+  JumpErrorEstimator(),
+  _bc_function(libmesh_nullptr)
+{
+  error_norm = L2;
+}
+
+
+
+ErrorEstimatorType
+DiscontinuityMeasure::type() const
+{
+  return DISCONTINUITY_MEASURE;
+}
+
+
 
 void
 DiscontinuityMeasure::init_context(FEMContext & c)

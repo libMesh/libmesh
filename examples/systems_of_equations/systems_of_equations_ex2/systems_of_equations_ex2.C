@@ -63,6 +63,7 @@
 #include "libmesh/zero_function.h"
 #include "libmesh/const_function.h"
 #include "libmesh/parsed_function.h"
+#include "libmesh/enum_solver_package.h"
 
 // For systems of equations the DenseSubMatrix
 // and DenseSubVector provide convenient ways for

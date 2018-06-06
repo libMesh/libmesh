@@ -55,6 +55,7 @@
 #include "libmesh/nonlinear_solver.h"
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/petsc_macro.h"
+#include "libmesh/enum_solver_package.h"
 
 // Local includes
 #include "linear_elasticity_with_contact.h"

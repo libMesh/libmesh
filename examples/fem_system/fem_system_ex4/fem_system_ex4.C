@@ -44,6 +44,8 @@
 #include "libmesh/parsed_function.h"
 #include "libmesh/uniform_refinement_estimator.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/enum_norm_type.h"
 
 // The systems and solvers we may use
 #include "heatsystem.h"

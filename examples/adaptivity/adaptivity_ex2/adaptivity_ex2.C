@@ -51,8 +51,10 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
-
 #include "libmesh/getpot.h"
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/enum_xdr_mode.h"
+#include "libmesh/enum_norm_type.h"
 
 // This example will solve a linear transient system,
 // so we need to include the TransientLinearImplicitSystem definition.

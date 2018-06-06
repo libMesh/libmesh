@@ -72,7 +72,7 @@ public:
   /**
    * \returns FOURTH.
    */
-  virtual Order default_order() const libmesh_override { return FOURTH; }
+  virtual Order default_order() const libmesh_override;
 
   /**
    * Prepares the element for use by reordering the nodes such that

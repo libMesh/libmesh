@@ -108,7 +108,7 @@ public:
   /**
    * \returns \p FIRST.
    */
-  virtual Order default_order() const libmesh_override { return FIRST; }
+  virtual Order default_order() const libmesh_override;
 
   /**
    * \returns An \p Edge2 for the base side, or an \p InfEdge2 for

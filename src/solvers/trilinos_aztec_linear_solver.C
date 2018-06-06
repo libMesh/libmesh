@@ -22,20 +22,33 @@
 #ifdef LIBMESH_TRILINOS_HAVE_AZTECOO
 
 
-// C++ includes
-
 // Local Includes
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/trilinos_aztec_linear_solver.h"
 #include "libmesh/trilinos_epetra_matrix.h"
 #include "libmesh/trilinos_epetra_vector.h"
+#include "libmesh/enum_preconditioner_type.h"
+#include "libmesh/enum_solver_type.h"
+#include "libmesh/enum_convergence_flags.h"
 
 namespace libMesh
 {
 
 
 /*----------------------- functions ----------------------------------*/
+template <typename T>
+AztecLinearSolver<T>::AztecLinearSolver (const libMesh::Parallel::Communicator & comm) :
+  LinearSolver<T>(comm)
+{
+  if (this->n_processors() == 1)
+    this->_preconditioner_type = ILU_PRECOND;
+  else
+    this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
+}
+
+
+
 template <typename T>
 void AztecLinearSolver<T>::clear ()
 {

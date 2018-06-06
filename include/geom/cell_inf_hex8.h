@@ -111,7 +111,7 @@ public:
   /**
    * \returns FIRST.
    */
-  virtual Order default_order() const libmesh_override { return FIRST; }
+  virtual Order default_order() const libmesh_override;
 
   /**
    * \returns A \p QUAD4 built coincident with face 0, or an \p INFQUAD4

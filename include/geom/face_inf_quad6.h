@@ -109,7 +109,7 @@ public:
   /**
    * \returns \p SECOND.
    */
-  virtual Order default_order() const libmesh_override { return SECOND; }
+  virtual Order default_order() const libmesh_override;
 
   /**
    * Don't hide Elem::key() defined in the base class.

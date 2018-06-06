@@ -32,6 +32,7 @@
 #include "libmesh/transient_system.h"
 #include "libmesh/vtk_io.h"
 #include "libmesh/auto_ptr.h" // libmesh_make_unique
+#include "libmesh/enum_solver_package.h"
 
 #include <cstdio>
 #include <ctime>

@@ -17,7 +17,7 @@
 
 // Local includes
 #include "libmesh/single_predicates.h"
-
+#include "libmesh/enum_elem_type.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/mapvector.h"

@@ -37,6 +37,8 @@
 #include "libmesh/kelly_error_estimator.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/enum_solver_type.h"
 
 // The systems and solvers we may use
 #include "elasticity_system.h"

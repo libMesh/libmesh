@@ -45,6 +45,7 @@
 #include "libmesh/mesh_generation.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/enum_xdr_mode.h"
 
 // Define the Finite and Infinite Element object.
 #include "libmesh/fe.h"

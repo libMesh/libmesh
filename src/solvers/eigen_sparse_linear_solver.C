@@ -22,13 +22,13 @@
 #ifdef LIBMESH_HAVE_EIGEN
 
 
-// C++ includes
-
 // Local Includes
 #include "libmesh/eigen_sparse_linear_solver.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/solver_configuration.h"
+#include "libmesh/enum_preconditioner_type.h"
+#include "libmesh/enum_solver_type.h"
 
 // GMRES is an "unsupported" iterative solver in Eigen.
 #include <unsupported/Eigen/IterativeSolvers>
