@@ -1040,7 +1040,7 @@ void Nemesis_IO::read (const std::string & base_filename)
       // mesh, we would have to search the (unsorted) elem_list vector
       // for each entry!  We'll settle for doing some error checking instead.
       Elem * elem = mesh.elem_ptr
-        (my_elem_offset + 
+        (my_elem_offset +
          (nemhelper->elem_list[e]-1)/*Exodus numbering is 1-based!*/);
 
       // The side numberings in libmesh and exodus are not 1:1, so we need to map

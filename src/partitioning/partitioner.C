@@ -696,7 +696,7 @@ void Partitioner::build_graph (const MeshBase & mesh)
 #endif
 
    if (!_global_index_by_pid_map.size())
-     _find_global_index_by_pid_map(mesh);  
+     _find_global_index_by_pid_map(mesh);
 
    dof_id_type first_local_elem = 0;
    for (processor_id_type pid=0; pid < mesh.processor_id(); pid++)

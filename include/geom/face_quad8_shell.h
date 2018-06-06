@@ -29,7 +29,7 @@ namespace libMesh
  * "stub" class in order to differentiate between this class and other
  * classes when reading/writing Mesh files.
  *
- * \author Sylvain Vallaghe 
+ * \author Sylvain Vallaghe
  * \date 2017
  * \brief A 2D quadrilateral shell element with 8 nodes.
  */

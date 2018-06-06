@@ -815,7 +815,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
       key_send_tag = communicator.get_unique_tag(867),
       id_return_tag = communicator.get_unique_tag(5309);
 
-    // If we have lots of empty requests, an alltoall to communicate that fact may 
+    // If we have lots of empty requests, an alltoall to communicate that fact may
     // be cheaper than Nproc^2 individual sends.
     std::vector<unsigned char> request_non_empty(communicator.size());
     for (processor_id_type pid=0; pid<communicator.size(); pid++)
