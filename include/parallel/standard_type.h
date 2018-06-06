@@ -203,8 +203,8 @@ template <>
 struct BuildStandardTypeVector<0>
 {
   template<typename... Types>
-  static void build(std::vector<std::unique_ptr<DataType>> & out_vec,
-                    const std::tuple<Types...> & example) {}
+  static void build(std::vector<std::unique_ptr<DataType>> & /*out_vec*/,
+                    const std::tuple<Types...> & /*example*/) {}
 };
 
 template<std::size_t n_minus_i>
@@ -237,8 +237,8 @@ template<>
 struct FillDisplacementArray<0>
 {
   template <typename OutArray, typename... Types>
-  static void fill(OutArray & out,
-                   const std::tuple<Types...> & example) {}
+  static void fill(OutArray & /*out*/,
+                   const std::tuple<Types...> & /*example*/) {}
 };
 
 
