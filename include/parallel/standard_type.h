@@ -214,7 +214,7 @@ void BuildStandardTypeVector<n_minus_i>::build
    const std::tuple<Types...> & example)
 {
   typedef typename
-    std::tuple_element<sizeof...(Types)-n_minus_i, std::tuple<Types...>>::type 
+    std::tuple_element<sizeof...(Types)-n_minus_i, std::tuple<Types...>>::type
     ith_type;
   out_vec.push_back
     (new StandardType<ith_type>
