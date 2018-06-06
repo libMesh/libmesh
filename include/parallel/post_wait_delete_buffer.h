@@ -36,7 +36,7 @@ template <typename Container>
 struct PostWaitDeleteBuffer : public PostWaitWork {
   PostWaitDeleteBuffer(Container * buffer) : _buf(buffer) {}
 
-  virtual void run() libmesh_override { delete _buf; }
+  virtual void run() override { delete _buf; }
 
 private:
   Container * _buf;

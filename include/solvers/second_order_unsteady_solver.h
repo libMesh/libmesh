@@ -50,33 +50,33 @@ public:
    */
   virtual ~SecondOrderUnsteadySolver ();
 
-  virtual unsigned int time_order() const libmesh_override
+  virtual unsigned int time_order() const override
   { return 2; }
 
   /**
    * The initialization function.  This method is used to
    * initialize internal data structures before a simulation begins.
    */
-  virtual void init () libmesh_override;
+  virtual void init () override;
 
   /**
    * The data initialization function.  This method is used to
    * initialize internal data structures after the underlying System
    * has been initialized
    */
-  virtual void init_data () libmesh_override;
+  virtual void init_data () override;
 
   /**
    * The reinitialization function.  This method is used to
    * resize internal data vectors after a mesh change.
    */
-  virtual void reinit () libmesh_override;
+  virtual void reinit () override;
 
   /**
    * This method retrieves all the stored solutions at the current
    * system.time
    */
-  virtual void retrieve_timestep () libmesh_override;
+  virtual void retrieve_timestep () override;
 
   /**
    * Specify non-zero initial velocity. Should be called before solve().

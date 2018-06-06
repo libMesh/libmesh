@@ -72,7 +72,7 @@ public:
    * entirely.
    */
   virtual bool eulerian_residual (bool request_jacobian,
-                                  DiffContext & context) libmesh_override;
+                                  DiffContext & context) override;
 
   /**
    * Subtracts a mass vector contribution on \p elem from
@@ -89,7 +89,7 @@ public:
    * problems will need to reimplement this themselves.
    */
   virtual bool mass_residual (bool request_jacobian,
-                              DiffContext &) libmesh_override;
+                              DiffContext &) override;
 };
 
 

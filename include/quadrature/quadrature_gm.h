@@ -111,7 +111,7 @@ public:
   /**
    * \returns \p QGRUNDMANN_MOLLER.
    */
-  virtual QuadratureType type() const libmesh_override;
+  virtual QuadratureType type() const override;
 
 
 private:
@@ -120,19 +120,19 @@ private:
    * In 1D, simply use a Gauss rule.
    */
   virtual void init_1D (const ElemType,
-                        unsigned int = 0) libmesh_override;
+                        unsigned int = 0) override;
 
   /**
    * Initialize a 3D GM rule.  Only makes sense for Tets.
    */
   virtual void init_3D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) libmesh_override;
+                        unsigned int p_level=0) override;
 
   /**
    * Initialize a 2D GM rule.  Only makes sense for Tris.
    */
   virtual void init_2D (const ElemType _type=INVALID_ELEM,
-                        unsigned int p_level=0) libmesh_override;
+                        unsigned int p_level=0) override;
 
   /**
    * This routine is called from init_2D() and init_3D().  It actually

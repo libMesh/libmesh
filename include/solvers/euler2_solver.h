@@ -68,7 +68,7 @@ public:
   /**
    * Error convergence order: 2 for Crank-Nicolson, 1 otherwise
    */
-  virtual Real error_order() const libmesh_override;
+  virtual Real error_order() const override;
 
   /**
    * This method uses the DifferentiablePhysics'
@@ -77,7 +77,7 @@ public:
    * it uses will depend on theta.
    */
   virtual bool element_residual (bool request_jacobian,
-                                 DiffContext &) libmesh_override;
+                                 DiffContext &) override;
 
   /**
    * This method uses the DifferentiablePhysics'
@@ -86,7 +86,7 @@ public:
    * What combination it uses will depend on theta.
    */
   virtual bool side_residual (bool request_jacobian,
-                              DiffContext &) libmesh_override;
+                              DiffContext &) override;
 
   /**
    * This method uses the DifferentiablePhysics'
@@ -95,7 +95,7 @@ public:
    * What combination it uses will depend on theta.
    */
   virtual bool nonlocal_residual (bool request_jacobian,
-                                  DiffContext &) libmesh_override;
+                                  DiffContext &) override;
 
   /**
    * The value for the theta method to employ: 1.0 corresponds

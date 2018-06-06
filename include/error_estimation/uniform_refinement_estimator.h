@@ -76,7 +76,7 @@ public:
   virtual void estimate_error (const System & system,
                                ErrorVector & error_per_cell,
                                const NumericVector<Number> * solution_vector = libmesh_nullptr,
-                               bool estimate_parent_error = false) libmesh_override;
+                               bool estimate_parent_error = false) override;
 
   /**
    * Currently this function ignores the error_norm member variable,
@@ -89,7 +89,7 @@ public:
                                 ErrorVector & error_per_cell,
                                 const std::map<const System *, SystemNorm> & error_norms,
                                 const std::map<const System *, const NumericVector<Number> *> * solution_vectors = libmesh_nullptr,
-                                bool estimate_parent_error = false) libmesh_override;
+                                bool estimate_parent_error = false) override;
 
   /**
    * Currently this function ignores the component_scale member variable,
@@ -102,9 +102,9 @@ public:
   virtual void estimate_errors (const EquationSystems & equation_systems,
                                 ErrorMap & errors_per_cell,
                                 const std::map<const System *, const NumericVector<Number> *> * solution_vectors = libmesh_nullptr,
-                                bool estimate_parent_error = false) libmesh_override;
+                                bool estimate_parent_error = false) override;
 
-  virtual ErrorEstimatorType type() const libmesh_override;
+  virtual ErrorEstimatorType type() const override;
 
   /**
    * How many h refinements to perform to get the fine grid

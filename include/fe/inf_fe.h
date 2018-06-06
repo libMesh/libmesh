@@ -329,14 +329,14 @@ public:
   /**
    * \returns The continuity of the element.
    */
-  virtual FEContinuity get_continuity() const libmesh_override
+  virtual FEContinuity get_continuity() const override
   { return C_ZERO; }  // FIXME - is this true??
 
   /**
    * \returns \p true if the element's higher order shape functions are
    * hierarchic
    */
-  virtual bool is_hierarchic() const libmesh_override
+  virtual bool is_hierarchic() const override
   { return false; }  // FIXME - Inf FEs don't handle p elevation yet
 
   /**
@@ -402,7 +402,7 @@ public:
    */
   virtual void reinit (const Elem * elem,
                        const std::vector<Point> * const pts = libmesh_nullptr,
-                       const std::vector<Real> * const weights = libmesh_nullptr) libmesh_override;
+                       const std::vector<Real> * const weights = libmesh_nullptr) override;
 
   /**
    * Not implemented yet.  Reinitializes all the physical
@@ -413,7 +413,7 @@ public:
                        const unsigned int side,
                        const Real tolerance = TOLERANCE,
                        const std::vector<Point> * const pts = libmesh_nullptr,
-                       const std::vector<Real> * const weights = libmesh_nullptr) libmesh_override;
+                       const std::vector<Real> * const weights = libmesh_nullptr) override;
 
   /**
    * Not implemented yet.  Reinitializes all the physical
@@ -424,7 +424,7 @@ public:
                             const unsigned int edge,
                             const Real tolerance = TOLERANCE,
                             const std::vector<Point> * const pts = libmesh_nullptr,
-                            const std::vector<Real> * const weights = libmesh_nullptr) libmesh_override;
+                            const std::vector<Real> * const weights = libmesh_nullptr) override;
 
   /**
    * Computes the reference space quadrature points on the side of
@@ -434,7 +434,7 @@ public:
                          const Elem * /* side */,
                          const unsigned int /* s */,
                          const std::vector<Point> & /* reference_side_points */,
-                         std::vector<Point> & /* reference_points */) libmesh_override
+                         std::vector<Point> & /* reference_points */) override
   {
     libmesh_not_implemented();
   }
@@ -450,13 +450,13 @@ public:
    * and another for base integration, using the convenient
    * \p QBase::build() method.
    */
-  virtual void attach_quadrature_rule (QBase * q) libmesh_override;
+  virtual void attach_quadrature_rule (QBase * q) override;
 
   /**
    * \returns The number of shape functions associated with
    * this infinite element.
    */
-  virtual unsigned int n_shape_functions () const libmesh_override
+  virtual unsigned int n_shape_functions () const override
   { return _n_total_approx_sf; }
 
   /**
@@ -464,7 +464,7 @@ public:
    * to get an upper bound for the \p for loop in your simulation
    * for matrix assembly of the current element.
    */
-  virtual unsigned int n_quadrature_points () const libmesh_override
+  virtual unsigned int n_quadrature_points () const override
   { libmesh_assert(radial_qrule); return _n_total_qp; }
 
 
@@ -515,7 +515,7 @@ protected:
    * Do not use this derived member in \p InfFE<Dim,T_radial,T_map>.
    */
   virtual void init_base_shape_functions(const std::vector<Point> &,
-                                         const Elem *) libmesh_override
+                                         const Elem *) override
   { libmesh_not_implemented(); }
 
   /**
@@ -563,7 +563,7 @@ protected:
    * still should be usable for children. Therefore, keep
    * it protected.
    */
-  virtual void compute_shape_functions(const Elem *, const std::vector<Point> &) libmesh_override;
+  virtual void compute_shape_functions(const Elem *, const std::vector<Point> &) override;
 
 
 
@@ -786,7 +786,7 @@ private:
   /**
    * \returns \p false, currently not required.
    */
-  virtual bool shapes_need_reinit() const libmesh_override;
+  virtual bool shapes_need_reinit() const override;
 
   /**
    * When \p compute_node_indices_fast() is used, this static

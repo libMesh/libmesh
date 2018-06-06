@@ -64,7 +64,7 @@ public:
   /**
    * Write the mesh to the specified file.
    */
-  virtual void write(const std::string &) libmesh_override;
+  virtual void write(const std::string &) override;
 
   /**
    * Bring in base class functionality for name resolution and to
@@ -78,7 +78,7 @@ public:
    */
   virtual void write_nodal_data (const std::string &,
                                  const std::vector<Number> &,
-                                 const std::vector<std::string> &) libmesh_override;
+                                 const std::vector<std::string> &) override;
 
   /**
    * Set title of plot

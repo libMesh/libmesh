@@ -104,7 +104,7 @@ private:
   /**
    * \returns A new object of type Derived.
    */
-  virtual std::unique_ptr<Base> create () libmesh_override;
+  virtual std::unique_ptr<Base> create () override;
 };
 
 

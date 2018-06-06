@@ -342,7 +342,7 @@ public:
    * Clears all internal data structures and restores to a
    * pristine state.
    */
-  virtual void clear() libmesh_override;
+  virtual void clear() override;
 
   /**
    * Interpolate source data at target points.
@@ -350,7 +350,7 @@ public:
    */
   virtual void interpolate_field_data (const std::vector<std::string> & field_names,
                                        const std::vector<Point>  & tgt_pts,
-                                       std::vector<Number> & tgt_vals) const libmesh_override;
+                                       std::vector<Number> & tgt_vals) const override;
 };
 
 } // namespace libMesh

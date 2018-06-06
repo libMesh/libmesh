@@ -55,17 +55,17 @@ public:
    */
   virtual ~TensorShellMatrix ();
 
-  virtual numeric_index_type m () const libmesh_override;
+  virtual numeric_index_type m () const override;
 
-  virtual numeric_index_type n () const libmesh_override;
+  virtual numeric_index_type n () const override;
 
   virtual void vector_mult (NumericVector<T> & dest,
-                            const NumericVector<T> & arg) const libmesh_override;
+                            const NumericVector<T> & arg) const override;
 
   virtual void vector_mult_add (NumericVector<T> & dest,
-                                const NumericVector<T> & arg) const libmesh_override;
+                                const NumericVector<T> & arg) const override;
 
-  virtual void get_diagonal (NumericVector<T> & dest) const libmesh_override;
+  virtual void get_diagonal (NumericVector<T> & dest) const override;
 
 protected:
   /**

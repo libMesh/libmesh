@@ -70,7 +70,7 @@ public:
   void reparse (const std::string & expression);
 
   virtual Output operator() (const Point & p,
-                             const Real time = 0) libmesh_override;
+                             const Real time = 0) override;
 
   /**
    * Query if the automatic derivative generation was successful.
@@ -85,11 +85,11 @@ public:
 
   virtual void operator() (const Point & p,
                            const Real time,
-                           DenseVector<Output> & output) libmesh_override;
+                           DenseVector<Output> & output) override;
 
   virtual Output component (unsigned int i,
                             const Point & p,
-                            Real time) libmesh_override;
+                            Real time) override;
 
   const std::string & expression() { return _expression; }
 
@@ -98,7 +98,7 @@ public:
    */
   virtual Output & getVarAddress(const std::string & variable_name);
 
-  virtual std::unique_ptr<FunctionBase<Output>> clone() const libmesh_override;
+  virtual std::unique_ptr<FunctionBase<Output>> clone() const override;
 
   /**
    * \returns The value of an inline variable.

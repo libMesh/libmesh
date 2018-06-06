@@ -36,17 +36,17 @@ public:
 
   ~SlitFunc () {}
 
-  virtual void init_context (const FEMContext &) libmesh_override {}
+  virtual void init_context (const FEMContext &) override {}
 
   virtual std::unique_ptr<FEMFunctionBase<Number>>
-  clone () const libmesh_override
+  clone () const override
   {
     return libmesh_make_unique<SlitFunc>();
   }
 
   virtual Number operator() (const FEMContext & c,
                              const Point & p,
-                             const Real /*time*/ = 0.) libmesh_override
+                             const Real /*time*/ = 0.) override
   {
     const Real & x = p(0);
     const Real & y = p(1);
@@ -59,7 +59,7 @@ public:
   virtual void operator() (const FEMContext & c,
                            const Point & p,
                            const Real time,
-                           DenseVector<Number> & output) libmesh_override
+                           DenseVector<Number> & output) override
   {
     for (unsigned int i=0; i != output.size(); ++i)
       output(i) = (*this)(c, p, time);

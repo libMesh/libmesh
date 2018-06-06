@@ -223,23 +223,23 @@ public:
    * Clear all the data structures associated with
    * the system.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * Initializes new data members of the system.
    */
-  virtual void init_data () libmesh_override;
+  virtual void init_data () override;
 
   /**
    * Reinitializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */
-  virtual void reinit () libmesh_override;
+  virtual void reinit () override;
 
   /**
    * Solves the optimization problem.
    */
-  virtual void solve () libmesh_override;
+  virtual void solve () override;
 
   /**
    * Initialize storage for the equality constraints, and the
@@ -260,7 +260,7 @@ public:
    * \returns \p "Optimization".  Helps in identifying
    * the system type in an equation system file.
    */
-  virtual std::string system_type () const libmesh_override { return "Optimization"; }
+  virtual std::string system_type () const override { return "Optimization"; }
 
   /**
    * The \p OptimizationSolver that is used for performing the optimization.

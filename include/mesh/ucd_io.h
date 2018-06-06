@@ -77,13 +77,13 @@ public:
    * This method implements reading a mesh from a specified file
    * in UCD format.
    */
-  virtual void read (const std::string &) libmesh_override;
+  virtual void read (const std::string &) override;
 
   /**
    * This method implements writing a mesh to a specified file
    * in UCD format.
    */
-  virtual void write (const std::string &) libmesh_override;
+  virtual void write (const std::string &) override;
 
   /**
    * Bring in base class functionality for name resolution and to
@@ -97,7 +97,7 @@ public:
    */
   virtual void write_nodal_data(const std::string & fname,
                                 const std::vector<Number> & soln,
-                                const std::vector<std::string> & names) libmesh_override;
+                                const std::vector<std::string> & names) override;
 
 
 private:

@@ -74,11 +74,11 @@ public:
    */
   virtual ~PetscPreconditioner ();
 
-  virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) libmesh_override;
+  virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) override;
 
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
-  virtual void init () libmesh_override;
+  virtual void init () override;
 
   /**
    * \returns The PETSc PC object.  Can be useful for implementing

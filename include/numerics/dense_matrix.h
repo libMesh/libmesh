@@ -67,7 +67,7 @@ public:
   virtual ~DenseMatrix() {}
 
 
-  virtual void zero() libmesh_override;
+  virtual void zero() override;
 
   /**
    * \returns The \p (i,j) element of the matrix.
@@ -82,14 +82,14 @@ public:
                   const unsigned int j);
 
   virtual T el(const unsigned int i,
-               const unsigned int j) const libmesh_override
+               const unsigned int j) const override
   { return (*this)(i,j); }
 
   virtual T & el(const unsigned int i,
-                 const unsigned int j) libmesh_override
+                 const unsigned int j) override
   { return (*this)(i,j); }
 
-  virtual void left_multiply (const DenseMatrixBase<T> & M2) libmesh_override;
+  virtual void left_multiply (const DenseMatrixBase<T> & M2) override;
 
   /**
    * Left multiplies by the matrix \p M2 of different type
@@ -97,7 +97,7 @@ public:
   template <typename T2>
   void left_multiply (const DenseMatrixBase<T2> & M2);
 
-  virtual void right_multiply (const DenseMatrixBase<T> & M2) libmesh_override;
+  virtual void right_multiply (const DenseMatrixBase<T> & M2) override;
 
   /**
    * Right multiplies by the matrix \p M2 of different type

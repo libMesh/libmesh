@@ -61,7 +61,7 @@ public:
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
    */
-  virtual std::unique_ptr<Partitioner> clone () const libmesh_override
+  virtual std::unique_ptr<Partitioner> clone () const override
   {
     return libmesh_make_unique<ParmetisPartitioner>();
   }
@@ -76,19 +76,19 @@ protected:
    * then been adaptively refined) and repartitions it.
    */
   virtual void _do_repartition (MeshBase & mesh,
-                                const unsigned int n) libmesh_override;
+                                const unsigned int n) override;
 
   /**
    * Partition the \p MeshBase into \p n subdomains.
    */
   virtual void _do_partition (MeshBase & mesh,
-                              const unsigned int n) libmesh_override;
+                              const unsigned int n) override;
 
 #ifdef LIBMESH_HAVE_PARMETIS
   /**
   * Build the graph.
   */
-  virtual void build_graph (const MeshBase & mesh) libmesh_override;
+  virtual void build_graph (const MeshBase & mesh) override;
 
 private:
 

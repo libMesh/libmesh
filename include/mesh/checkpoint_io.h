@@ -99,7 +99,7 @@ public:
    * directory without the "-split[n]" suffix.  The number of splits will be determined
    * automatically by the number of processes being used for the mesh at the time of reading.
    */
-  virtual void read (const std::string & input_name) libmesh_override;
+  virtual void read (const std::string & input_name) override;
 
   /**
    * This method implements writing a mesh to a specified file.  If the mesh has been split
@@ -114,7 +114,7 @@ public:
    *
    * would create a directory named "foo.cpr-split42".
    */
-  virtual void write (const std::string & name) libmesh_override;
+  virtual void write (const std::string & name) override;
 
   /**
    * Used to remove a checkpoint directory and its corresponding files.  This effectively undoes

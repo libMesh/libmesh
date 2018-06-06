@@ -45,7 +45,7 @@ public:
   /**
    * \returns \p TRISHELL3.
    */
-  virtual ElemType type () const libmesh_override { return TRISHELL3; }
+  virtual ElemType type () const override { return TRISHELL3; }
 };
 
 } // namespace libMesh

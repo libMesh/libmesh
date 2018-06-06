@@ -84,11 +84,11 @@ public:
    */
   virtual ~TrilinosPreconditioner ();
 
-  virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) libmesh_override;
+  virtual void apply(const NumericVector<T> & x, NumericVector<T> & y) override;
 
-  virtual void clear () libmesh_override {}
+  virtual void clear () override {}
 
-  virtual void init () libmesh_override;
+  virtual void init () override;
 
   /**
    * Stores a copy of the ParameterList \p list internally.
@@ -130,16 +130,16 @@ protected:
   Teuchos::ParameterList _param_list;
 
   // Epetra_Operator interface
-  virtual int SetUseTranspose(bool UseTranspose) libmesh_override;
-  virtual int Apply(const Epetra_MultiVector & X, Epetra_MultiVector & Y) const libmesh_override;
-  virtual int ApplyInverse(const Epetra_MultiVector & r, Epetra_MultiVector & z) const libmesh_override;
-  virtual double NormInf() const libmesh_override;
-  virtual const char * Label() const libmesh_override;
-  virtual bool UseTranspose() const libmesh_override;
-  virtual bool HasNormInf() const libmesh_override;
-  virtual const Epetra_Comm & Comm() const libmesh_override;
-  virtual const Epetra_Map & OperatorDomainMap() const libmesh_override;
-  virtual const Epetra_Map & OperatorRangeMap() const libmesh_override;
+  virtual int SetUseTranspose(bool UseTranspose) override;
+  virtual int Apply(const Epetra_MultiVector & X, Epetra_MultiVector & Y) const override;
+  virtual int ApplyInverse(const Epetra_MultiVector & r, Epetra_MultiVector & z) const override;
+  virtual double NormInf() const override;
+  virtual const char * Label() const override;
+  virtual bool UseTranspose() const override;
+  virtual bool HasNormInf() const override;
+  virtual const Epetra_Comm & Comm() const override;
+  virtual const Epetra_Map & OperatorDomainMap() const override;
+  virtual const Epetra_Map & OperatorRangeMap() const override;
 };
 
 

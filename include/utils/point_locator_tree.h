@@ -83,7 +83,7 @@ public:
   /**
    * Clears the locator.  This function frees dynamic memory with "delete".
    */
-  virtual void clear() libmesh_override;
+  virtual void clear() override;
 
   /**
    * Initializes the locator, so that the \p operator() methods can
@@ -95,7 +95,7 @@ public:
    * Initializes the locator, so that the \p operator() methods can
    * be used.  This function allocates dynamic memory with "new".
    */
-  virtual void init() libmesh_override;
+  virtual void init() override;
 
   /**
    * Locates the element in which the point with global coordinates
@@ -105,7 +105,7 @@ public:
    * operator().
    */
   virtual const Elem * operator() (const Point & p,
-                                   const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const libmesh_override;
+                                   const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const override;
 
   /**
    * Locates a set of elements in proximity to the point with global coordinates
@@ -113,7 +113,7 @@ public:
    */
   virtual void operator() (const Point & p,
                            std::set<const Elem *> & candidate_elements,
-                           const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const libmesh_override;
+                           const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const override;
 
   /**
    * As a fallback option, it's helpful to be able to do a linear
@@ -143,14 +143,14 @@ public:
    * return a NULL pointer instead of crashing.  Per default, this
    * mode is off.
    */
-  virtual void enable_out_of_mesh_mode () libmesh_override;
+  virtual void enable_out_of_mesh_mode () override;
 
   /**
    * Disables out-of-mesh mode (default).  If asked to find a point
    * that is contained in no mesh at all, the point locator will now
    * crash.
    */
-  virtual void disable_out_of_mesh_mode () libmesh_override;
+  virtual void disable_out_of_mesh_mode () override;
 
   /**
    * Set the target bin size.

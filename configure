@@ -935,8 +935,6 @@ HAVE_CXX11_THREAD_FALSE
 HAVE_CXX11_THREAD_TRUE
 HAVE_CXX11_VARIADIC_TEMPLATES_FALSE
 HAVE_CXX11_VARIADIC_TEMPLATES_TRUE
-HAVE_CXX11_OVERRIDE_FALSE
-HAVE_CXX11_OVERRIDE_TRUE
 HAVE_CXX11_REGEX_FALSE
 HAVE_CXX11_REGEX_TRUE
 HAVE_CXX14_MAKE_UNIQUE_FALSE
@@ -955,6 +953,8 @@ HAVE_CXX11_MOVE_CONSTRUCTORS_FALSE
 HAVE_CXX11_MOVE_CONSTRUCTORS_TRUE
 HAVE_CXX11_MOVE_FALSE
 HAVE_CXX11_MOVE_TRUE
+HAVE_CXX11_OVERRIDE_FALSE
+HAVE_CXX11_OVERRIDE_TRUE
 HAVE_CXX11_FIXED_TYPE_ENUM_FWD_FALSE
 HAVE_CXX11_FIXED_TYPE_ENUM_FWD_TRUE
 HAVE_CXX11_FIXED_TYPE_ENUM_FALSE
@@ -8433,6 +8433,79 @@ if test "x$have_cxx11_fixed_type_enum_fwd" != "xyes"; then :
   as_fn_error $? "libMesh requires C++11 fixed type enumeration forward declaration support" "$LINENO" 5
 fi
 
+
+    have_cxx11_override=no
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 override keyword support" >&5
+$as_echo_n "checking for C++11 override keyword support... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+
+      struct Base {
+      virtual void f() {}
+      };
+      struct Child : public Base {
+      virtual void f() override {}
+      };
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_OVERRIDE 1" >>confdefs.h
+
+        have_cxx11_override=yes
+
+else
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+     if test x$have_cxx11_override == xyes; then
+  HAVE_CXX11_OVERRIDE_TRUE=
+  HAVE_CXX11_OVERRIDE_FALSE='#'
+else
+  HAVE_CXX11_OVERRIDE_TRUE='#'
+  HAVE_CXX11_OVERRIDE_FALSE=
+fi
+
+
+if test "x$have_cxx11_override" != "xyes"; then :
+  as_fn_error $? "libMesh requires C++11 compiler support the override keyword" "$LINENO" 5
+fi
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
@@ -9116,75 +9189,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 else
   HAVE_CXX11_REGEX_TRUE='#'
   HAVE_CXX11_REGEX_FALSE=
-fi
-
-
-
-    have_cxx11_override=no
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 override keyword support" >&5
-$as_echo_n "checking for C++11 override keyword support... " >&6; }
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-    old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
-
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-
-      struct Base {
-      virtual void f() {}
-      };
-      struct Child : public Base {
-      virtual void f() override {}
-      };
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-$as_echo "#define HAVE_CXX11_OVERRIDE 1" >>confdefs.h
-
-        have_cxx11_override=yes
-
-else
-
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-    # Reset the flags
-    CXXFLAGS="$old_CXXFLAGS"
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-     if test x$have_cxx11_override == xyes; then
-  HAVE_CXX11_OVERRIDE_TRUE=
-  HAVE_CXX11_OVERRIDE_FALSE='#'
-else
-  HAVE_CXX11_OVERRIDE_TRUE='#'
-  HAVE_CXX11_OVERRIDE_FALSE=
 fi
 
 
@@ -41550,6 +41554,10 @@ if test -z "${HAVE_CXX11_FIXED_TYPE_ENUM_FWD_TRUE}" && test -z "${HAVE_CXX11_FIX
   as_fn_error $? "conditional \"HAVE_CXX11_FIXED_TYPE_ENUM_FWD\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${HAVE_CXX11_OVERRIDE_TRUE}" && test -z "${HAVE_CXX11_OVERRIDE_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_OVERRIDE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${HAVE_CXX11_MOVE_TRUE}" && test -z "${HAVE_CXX11_MOVE_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX11_MOVE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -41584,10 +41592,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_REGEX_TRUE}" && test -z "${HAVE_CXX11_REGEX_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX11_REGEX\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${HAVE_CXX11_OVERRIDE_TRUE}" && test -z "${HAVE_CXX11_OVERRIDE_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_CXX11_OVERRIDE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_VARIADIC_TEMPLATES_TRUE}" && test -z "${HAVE_CXX11_VARIADIC_TEMPLATES_FALSE}"; then

@@ -56,7 +56,7 @@ public:
    * default DG terms are assumed to be inactive. DG terms are
    * only active if neighbor_side_fe_reinit is called.
    */
-  virtual void side_fe_reinit () libmesh_override;
+  virtual void side_fe_reinit () override;
 
   /**
    * Initialize neighbor side data needed to assemble DG terms.

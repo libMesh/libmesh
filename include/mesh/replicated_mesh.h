@@ -71,7 +71,7 @@ public:
   /**
    * Virtual copy-constructor, creates a copy of this mesh
    */
-  virtual std::unique_ptr<MeshBase> clone () const libmesh_override
+  virtual std::unique_ptr<MeshBase> clone () const override
   { return libmesh_make_unique<ReplicatedMesh>(*this); }
 
   /**
@@ -82,66 +82,66 @@ public:
   /**
    * Clear all internal data.
    */
-  virtual void clear() libmesh_override;
+  virtual void clear() override;
 
   /**
    * Remove NULL elements from arrays
    */
-  virtual void renumber_nodes_and_elements () libmesh_override;
+  virtual void renumber_nodes_and_elements () override;
 
-  virtual dof_id_type n_nodes () const libmesh_override
+  virtual dof_id_type n_nodes () const override
   { return cast_int<dof_id_type>(_nodes.size()); }
 
-  virtual dof_id_type parallel_n_nodes () const libmesh_override
+  virtual dof_id_type parallel_n_nodes () const override
   { return cast_int<dof_id_type>(_nodes.size()); }
 
-  virtual dof_id_type max_node_id () const libmesh_override
+  virtual dof_id_type max_node_id () const override
   { return cast_int<dof_id_type>(_nodes.size()); }
 
-  virtual void reserve_nodes (const dof_id_type nn) libmesh_override
+  virtual void reserve_nodes (const dof_id_type nn) override
   { _nodes.reserve (nn); }
 
-  virtual dof_id_type n_elem () const libmesh_override
+  virtual dof_id_type n_elem () const override
   { return cast_int<dof_id_type>(_elements.size()); }
 
-  virtual dof_id_type parallel_n_elem () const libmesh_override
+  virtual dof_id_type parallel_n_elem () const override
   { return cast_int<dof_id_type>(_elements.size()); }
 
-  virtual dof_id_type n_active_elem () const libmesh_override;
+  virtual dof_id_type n_active_elem () const override;
 
-  virtual dof_id_type max_elem_id () const libmesh_override
+  virtual dof_id_type max_elem_id () const override
   { return cast_int<dof_id_type>(_elements.size()); }
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  virtual unique_id_type parallel_max_unique_id () const libmesh_override;
+  virtual unique_id_type parallel_max_unique_id () const override;
 #endif
 
-  virtual void reserve_elem (const dof_id_type ne) libmesh_override
+  virtual void reserve_elem (const dof_id_type ne) override
   { _elements.reserve (ne); }
 
-  virtual void update_parallel_id_counts () libmesh_override;
+  virtual void update_parallel_id_counts () override;
 
-  virtual const Point & point (const dof_id_type i) const libmesh_override;
+  virtual const Point & point (const dof_id_type i) const override;
 
-  virtual const Node * node_ptr (const dof_id_type i) const libmesh_override;
-  virtual Node * node_ptr (const dof_id_type i) libmesh_override;
+  virtual const Node * node_ptr (const dof_id_type i) const override;
+  virtual Node * node_ptr (const dof_id_type i) override;
 
-  virtual const Node * query_node_ptr (const dof_id_type i) const libmesh_override;
-  virtual Node * query_node_ptr (const dof_id_type i) libmesh_override;
+  virtual const Node * query_node_ptr (const dof_id_type i) const override;
+  virtual Node * query_node_ptr (const dof_id_type i) override;
 
-  virtual const Elem * elem_ptr (const dof_id_type i) const libmesh_override;
-  virtual Elem * elem_ptr (const dof_id_type i) libmesh_override;
+  virtual const Elem * elem_ptr (const dof_id_type i) const override;
+  virtual Elem * elem_ptr (const dof_id_type i) override;
 
-  virtual const Elem * query_elem_ptr (const dof_id_type i) const libmesh_override;
-  virtual Elem * query_elem_ptr (const dof_id_type i) libmesh_override;
+  virtual const Elem * query_elem_ptr (const dof_id_type i) const override;
+  virtual Elem * query_elem_ptr (const dof_id_type i) override;
 
   /**
    * functions for adding /deleting nodes elements.
    */
   virtual Node * add_point (const Point & p,
                             const dof_id_type id = DofObject::invalid_id,
-                            const processor_id_type proc_id = DofObject::invalid_processor_id) libmesh_override;
-  virtual Node * add_node (Node * n) libmesh_override;
+                            const processor_id_type proc_id = DofObject::invalid_processor_id) override;
+  virtual Node * add_node (Node * n) override;
 
   /**
    * Insert \p Node \p n into the Mesh at a location consistent with
@@ -154,14 +154,14 @@ public:
    * which is only capable of appending nodes at the end of the nodes
    * storage.
    */
-  virtual Node * insert_node(Node * n) libmesh_override;
+  virtual Node * insert_node(Node * n) override;
 
-  virtual void delete_node (Node * n) libmesh_override;
-  virtual void renumber_node (dof_id_type old_id, dof_id_type new_id) libmesh_override;
-  virtual Elem * add_elem (Elem * e) libmesh_override;
-  virtual Elem * insert_elem (Elem * e) libmesh_override;
-  virtual void delete_elem (Elem * e) libmesh_override;
-  virtual void renumber_elem (dof_id_type old_id, dof_id_type new_id) libmesh_override;
+  virtual void delete_node (Node * n) override;
+  virtual void renumber_node (dof_id_type old_id, dof_id_type new_id) override;
+  virtual Elem * add_elem (Elem * e) override;
+  virtual Elem * insert_elem (Elem * e) override;
+  virtual void delete_elem (Elem * e) override;
+  virtual void renumber_elem (dof_id_type old_id, dof_id_type new_id) override;
 
   /**
    * There is no reason for a user to ever call this function.
@@ -169,7 +169,7 @@ public:
    * This function restores a previously broken element/node numbering such that
    * \p mesh.node_ref(n).id() == n.
    */
-  virtual void fix_broken_node_and_element_numbering () libmesh_override;
+  virtual void fix_broken_node_and_element_numbering () override;
 
   /**
    * Stitch \p other_mesh to this mesh so that this mesh is the union of the two meshes.
@@ -221,233 +221,233 @@ public:
   /**
    * Elem iterator accessor functions.
    */
-  virtual element_iterator elements_begin () libmesh_override;
-  virtual element_iterator elements_end () libmesh_override;
-  virtual const_element_iterator elements_begin() const libmesh_override;
-  virtual const_element_iterator elements_end() const libmesh_override;
-  virtual SimpleRange<element_iterator> element_ptr_range() libmesh_override { return {elements_begin(), elements_end()}; }
-  virtual SimpleRange<const_element_iterator> element_ptr_range() const libmesh_override  { return {elements_begin(), elements_end()}; }
+  virtual element_iterator elements_begin () override;
+  virtual element_iterator elements_end () override;
+  virtual const_element_iterator elements_begin() const override;
+  virtual const_element_iterator elements_end() const override;
+  virtual SimpleRange<element_iterator> element_ptr_range() override { return {elements_begin(), elements_end()}; }
+  virtual SimpleRange<const_element_iterator> element_ptr_range() const override  { return {elements_begin(), elements_end()}; }
 
-  virtual element_iterator active_elements_begin () libmesh_override;
-  virtual element_iterator active_elements_end () libmesh_override;
-  virtual const_element_iterator active_elements_begin() const libmesh_override;
-  virtual const_element_iterator active_elements_end() const libmesh_override;
-  virtual SimpleRange<element_iterator> active_element_ptr_range() libmesh_override { return {active_elements_begin(), active_elements_end()}; }
-  virtual SimpleRange<const_element_iterator> active_element_ptr_range() const libmesh_override  { return {active_elements_begin(), active_elements_end()}; }
+  virtual element_iterator active_elements_begin () override;
+  virtual element_iterator active_elements_end () override;
+  virtual const_element_iterator active_elements_begin() const override;
+  virtual const_element_iterator active_elements_end() const override;
+  virtual SimpleRange<element_iterator> active_element_ptr_range() override { return {active_elements_begin(), active_elements_end()}; }
+  virtual SimpleRange<const_element_iterator> active_element_ptr_range() const override  { return {active_elements_begin(), active_elements_end()}; }
 
-  virtual element_iterator ancestor_elements_begin () libmesh_override;
-  virtual element_iterator ancestor_elements_end () libmesh_override;
-  virtual const_element_iterator ancestor_elements_begin() const libmesh_override;
-  virtual const_element_iterator ancestor_elements_end() const libmesh_override;
+  virtual element_iterator ancestor_elements_begin () override;
+  virtual element_iterator ancestor_elements_end () override;
+  virtual const_element_iterator ancestor_elements_begin() const override;
+  virtual const_element_iterator ancestor_elements_end() const override;
 
-  virtual element_iterator subactive_elements_begin () libmesh_override;
-  virtual element_iterator subactive_elements_end () libmesh_override;
-  virtual const_element_iterator subactive_elements_begin() const libmesh_override;
-  virtual const_element_iterator subactive_elements_end() const libmesh_override;
+  virtual element_iterator subactive_elements_begin () override;
+  virtual element_iterator subactive_elements_end () override;
+  virtual const_element_iterator subactive_elements_begin() const override;
+  virtual const_element_iterator subactive_elements_end() const override;
 
-  virtual element_iterator not_active_elements_begin () libmesh_override;
-  virtual element_iterator not_active_elements_end () libmesh_override;
-  virtual const_element_iterator not_active_elements_begin() const libmesh_override;
-  virtual const_element_iterator not_active_elements_end() const libmesh_override;
+  virtual element_iterator not_active_elements_begin () override;
+  virtual element_iterator not_active_elements_end () override;
+  virtual const_element_iterator not_active_elements_begin() const override;
+  virtual const_element_iterator not_active_elements_end() const override;
 
-  virtual element_iterator not_ancestor_elements_begin () libmesh_override;
-  virtual element_iterator not_ancestor_elements_end () libmesh_override;
-  virtual const_element_iterator not_ancestor_elements_begin() const libmesh_override;
-  virtual const_element_iterator not_ancestor_elements_end() const libmesh_override;
+  virtual element_iterator not_ancestor_elements_begin () override;
+  virtual element_iterator not_ancestor_elements_end () override;
+  virtual const_element_iterator not_ancestor_elements_begin() const override;
+  virtual const_element_iterator not_ancestor_elements_end() const override;
 
-  virtual element_iterator not_subactive_elements_begin () libmesh_override;
-  virtual element_iterator not_subactive_elements_end () libmesh_override;
-  virtual const_element_iterator not_subactive_elements_begin() const libmesh_override;
-  virtual const_element_iterator not_subactive_elements_end() const libmesh_override;
+  virtual element_iterator not_subactive_elements_begin () override;
+  virtual element_iterator not_subactive_elements_end () override;
+  virtual const_element_iterator not_subactive_elements_begin() const override;
+  virtual const_element_iterator not_subactive_elements_end() const override;
 
-  virtual element_iterator local_elements_begin () libmesh_override;
-  virtual element_iterator local_elements_end () libmesh_override;
-  virtual const_element_iterator local_elements_begin () const libmesh_override;
-  virtual const_element_iterator local_elements_end () const libmesh_override;
+  virtual element_iterator local_elements_begin () override;
+  virtual element_iterator local_elements_end () override;
+  virtual const_element_iterator local_elements_begin () const override;
+  virtual const_element_iterator local_elements_end () const override;
 
-  virtual element_iterator semilocal_elements_begin () libmesh_override;
-  virtual element_iterator semilocal_elements_end () libmesh_override;
-  virtual const_element_iterator semilocal_elements_begin () const libmesh_override;
-  virtual const_element_iterator semilocal_elements_end () const libmesh_override;
+  virtual element_iterator semilocal_elements_begin () override;
+  virtual element_iterator semilocal_elements_end () override;
+  virtual const_element_iterator semilocal_elements_begin () const override;
+  virtual const_element_iterator semilocal_elements_end () const override;
 
-  virtual element_iterator active_semilocal_elements_begin () libmesh_override;
-  virtual element_iterator active_semilocal_elements_end () libmesh_override;
-  virtual const_element_iterator active_semilocal_elements_begin () const libmesh_override;
-  virtual const_element_iterator active_semilocal_elements_end () const libmesh_override;
+  virtual element_iterator active_semilocal_elements_begin () override;
+  virtual element_iterator active_semilocal_elements_end () override;
+  virtual const_element_iterator active_semilocal_elements_begin () const override;
+  virtual const_element_iterator active_semilocal_elements_end () const override;
 
-  virtual element_iterator facelocal_elements_begin () libmesh_override;
-  virtual element_iterator facelocal_elements_end () libmesh_override;
-  virtual const_element_iterator facelocal_elements_begin () const libmesh_override;
-  virtual const_element_iterator facelocal_elements_end () const libmesh_override;
+  virtual element_iterator facelocal_elements_begin () override;
+  virtual element_iterator facelocal_elements_end () override;
+  virtual const_element_iterator facelocal_elements_begin () const override;
+  virtual const_element_iterator facelocal_elements_end () const override;
 
-  virtual element_iterator not_local_elements_begin () libmesh_override;
-  virtual element_iterator not_local_elements_end () libmesh_override;
-  virtual const_element_iterator not_local_elements_begin () const libmesh_override;
-  virtual const_element_iterator not_local_elements_end () const libmesh_override;
+  virtual element_iterator not_local_elements_begin () override;
+  virtual element_iterator not_local_elements_end () override;
+  virtual const_element_iterator not_local_elements_begin () const override;
+  virtual const_element_iterator not_local_elements_end () const override;
 
-  virtual element_iterator active_local_elements_begin () libmesh_override;
-  virtual element_iterator active_local_elements_end () libmesh_override;
-  virtual const_element_iterator active_local_elements_begin () const libmesh_override;
-  virtual const_element_iterator active_local_elements_end () const libmesh_override;
-  virtual SimpleRange<element_iterator> active_local_element_ptr_range() libmesh_override { return {active_local_elements_begin(), active_local_elements_end()}; }
-  virtual SimpleRange<const_element_iterator> active_local_element_ptr_range() const libmesh_override  { return {active_local_elements_begin(), active_local_elements_end()}; }
+  virtual element_iterator active_local_elements_begin () override;
+  virtual element_iterator active_local_elements_end () override;
+  virtual const_element_iterator active_local_elements_begin () const override;
+  virtual const_element_iterator active_local_elements_end () const override;
+  virtual SimpleRange<element_iterator> active_local_element_ptr_range() override { return {active_local_elements_begin(), active_local_elements_end()}; }
+  virtual SimpleRange<const_element_iterator> active_local_element_ptr_range() const override  { return {active_local_elements_begin(), active_local_elements_end()}; }
 
-  virtual element_iterator active_not_local_elements_begin () libmesh_override;
-  virtual element_iterator active_not_local_elements_end () libmesh_override;
-  virtual const_element_iterator active_not_local_elements_begin () const libmesh_override;
-  virtual const_element_iterator active_not_local_elements_end () const libmesh_override;
+  virtual element_iterator active_not_local_elements_begin () override;
+  virtual element_iterator active_not_local_elements_end () override;
+  virtual const_element_iterator active_not_local_elements_begin () const override;
+  virtual const_element_iterator active_not_local_elements_end () const override;
 
-  virtual element_iterator level_elements_begin (unsigned int level) libmesh_override;
-  virtual element_iterator level_elements_end (unsigned int level) libmesh_override;
-  virtual const_element_iterator level_elements_begin (unsigned int level) const libmesh_override;
-  virtual const_element_iterator level_elements_end (unsigned int level) const libmesh_override;
+  virtual element_iterator level_elements_begin (unsigned int level) override;
+  virtual element_iterator level_elements_end (unsigned int level) override;
+  virtual const_element_iterator level_elements_begin (unsigned int level) const override;
+  virtual const_element_iterator level_elements_end (unsigned int level) const override;
 
-  virtual element_iterator not_level_elements_begin (unsigned int level) libmesh_override;
-  virtual element_iterator not_level_elements_end (unsigned int level) libmesh_override;
-  virtual const_element_iterator not_level_elements_begin (unsigned int level) const libmesh_override;
-  virtual const_element_iterator not_level_elements_end (unsigned int level) const libmesh_override;
+  virtual element_iterator not_level_elements_begin (unsigned int level) override;
+  virtual element_iterator not_level_elements_end (unsigned int level) override;
+  virtual const_element_iterator not_level_elements_begin (unsigned int level) const override;
+  virtual const_element_iterator not_level_elements_end (unsigned int level) const override;
 
-  virtual element_iterator local_level_elements_begin (unsigned int level) libmesh_override;
-  virtual element_iterator local_level_elements_end (unsigned int level) libmesh_override;
-  virtual const_element_iterator local_level_elements_begin (unsigned int level) const libmesh_override;
-  virtual const_element_iterator local_level_elements_end (unsigned int level) const libmesh_override;
+  virtual element_iterator local_level_elements_begin (unsigned int level) override;
+  virtual element_iterator local_level_elements_end (unsigned int level) override;
+  virtual const_element_iterator local_level_elements_begin (unsigned int level) const override;
+  virtual const_element_iterator local_level_elements_end (unsigned int level) const override;
 
-  virtual element_iterator local_not_level_elements_begin (unsigned int level) libmesh_override;
-  virtual element_iterator local_not_level_elements_end (unsigned int level) libmesh_override;
-  virtual const_element_iterator local_not_level_elements_begin (unsigned int level) const libmesh_override;
-  virtual const_element_iterator local_not_level_elements_end (unsigned int level) const libmesh_override;
+  virtual element_iterator local_not_level_elements_begin (unsigned int level) override;
+  virtual element_iterator local_not_level_elements_end (unsigned int level) override;
+  virtual const_element_iterator local_not_level_elements_begin (unsigned int level) const override;
+  virtual const_element_iterator local_not_level_elements_end (unsigned int level) const override;
 
-  virtual element_iterator pid_elements_begin (processor_id_type proc_id) libmesh_override;
-  virtual element_iterator pid_elements_end (processor_id_type proc_id) libmesh_override;
-  virtual const_element_iterator pid_elements_begin (processor_id_type proc_id) const libmesh_override;
-  virtual const_element_iterator pid_elements_end (processor_id_type proc_id) const libmesh_override;
+  virtual element_iterator pid_elements_begin (processor_id_type proc_id) override;
+  virtual element_iterator pid_elements_end (processor_id_type proc_id) override;
+  virtual const_element_iterator pid_elements_begin (processor_id_type proc_id) const override;
+  virtual const_element_iterator pid_elements_end (processor_id_type proc_id) const override;
 
-  virtual element_iterator type_elements_begin (ElemType type) libmesh_override;
-  virtual element_iterator type_elements_end (ElemType type) libmesh_override;
-  virtual const_element_iterator type_elements_begin (ElemType type) const libmesh_override;
-  virtual const_element_iterator type_elements_end (ElemType type) const libmesh_override;
+  virtual element_iterator type_elements_begin (ElemType type) override;
+  virtual element_iterator type_elements_end (ElemType type) override;
+  virtual const_element_iterator type_elements_begin (ElemType type) const override;
+  virtual const_element_iterator type_elements_end (ElemType type) const override;
 
-  virtual element_iterator active_type_elements_begin (ElemType type) libmesh_override;
-  virtual element_iterator active_type_elements_end (ElemType type) libmesh_override;
-  virtual const_element_iterator active_type_elements_begin (ElemType type) const libmesh_override;
-  virtual const_element_iterator active_type_elements_end (ElemType type) const libmesh_override;
+  virtual element_iterator active_type_elements_begin (ElemType type) override;
+  virtual element_iterator active_type_elements_end (ElemType type) override;
+  virtual const_element_iterator active_type_elements_begin (ElemType type) const override;
+  virtual const_element_iterator active_type_elements_end (ElemType type) const override;
 
-  virtual element_iterator active_pid_elements_begin (processor_id_type proc_id) libmesh_override;
-  virtual element_iterator active_pid_elements_end (processor_id_type proc_id) libmesh_override;
-  virtual const_element_iterator active_pid_elements_begin (processor_id_type proc_id) const libmesh_override;
-  virtual const_element_iterator active_pid_elements_end (processor_id_type proc_id) const libmesh_override;
+  virtual element_iterator active_pid_elements_begin (processor_id_type proc_id) override;
+  virtual element_iterator active_pid_elements_end (processor_id_type proc_id) override;
+  virtual const_element_iterator active_pid_elements_begin (processor_id_type proc_id) const override;
+  virtual const_element_iterator active_pid_elements_end (processor_id_type proc_id) const override;
 
-  virtual element_iterator unpartitioned_elements_begin () libmesh_override;
-  virtual element_iterator unpartitioned_elements_end () libmesh_override;
-  virtual const_element_iterator unpartitioned_elements_begin () const libmesh_override;
-  virtual const_element_iterator unpartitioned_elements_end () const libmesh_override;
+  virtual element_iterator unpartitioned_elements_begin () override;
+  virtual element_iterator unpartitioned_elements_end () override;
+  virtual const_element_iterator unpartitioned_elements_begin () const override;
+  virtual const_element_iterator unpartitioned_elements_end () const override;
 
-  virtual element_iterator active_unpartitioned_elements_begin () libmesh_override;
-  virtual element_iterator active_unpartitioned_elements_end () libmesh_override;
-  virtual const_element_iterator active_unpartitioned_elements_begin () const libmesh_override;
-  virtual const_element_iterator active_unpartitioned_elements_end () const libmesh_override;
+  virtual element_iterator active_unpartitioned_elements_begin () override;
+  virtual element_iterator active_unpartitioned_elements_end () override;
+  virtual const_element_iterator active_unpartitioned_elements_begin () const override;
+  virtual const_element_iterator active_unpartitioned_elements_end () const override;
 
-  virtual element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) libmesh_override;
-  virtual element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) libmesh_override;
-  virtual const_element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) const libmesh_override;
-  virtual const_element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) const libmesh_override;
+  virtual element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) override;
+  virtual element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) override;
+  virtual const_element_iterator active_local_subdomain_elements_begin (subdomain_id_type subdomain_id) const override;
+  virtual const_element_iterator active_local_subdomain_elements_end (subdomain_id_type subdomain_id) const override;
 
-  virtual element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) libmesh_override;
-  virtual element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id) libmesh_override;
-  virtual const_element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) const libmesh_override;
-  virtual const_element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id) const libmesh_override;
+  virtual element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) override;
+  virtual element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id) override;
+  virtual const_element_iterator active_subdomain_elements_begin (subdomain_id_type subdomain_id) const override;
+  virtual const_element_iterator active_subdomain_elements_end (subdomain_id_type subdomain_id) const override;
 
-  virtual element_iterator active_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) libmesh_override;
-  virtual element_iterator active_subdomain_set_elements_end (std::set<subdomain_id_type> ss) libmesh_override;
-  virtual const_element_iterator active_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) const libmesh_override;
-  virtual const_element_iterator active_subdomain_set_elements_end (std::set<subdomain_id_type> ss) const libmesh_override;
+  virtual element_iterator active_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) override;
+  virtual element_iterator active_subdomain_set_elements_end (std::set<subdomain_id_type> ss) override;
+  virtual const_element_iterator active_subdomain_set_elements_begin (std::set<subdomain_id_type> ss) const override;
+  virtual const_element_iterator active_subdomain_set_elements_end (std::set<subdomain_id_type> ss) const override;
 
-  virtual element_iterator ghost_elements_begin () libmesh_override;
-  virtual element_iterator ghost_elements_end () libmesh_override;
-  virtual const_element_iterator ghost_elements_begin () const libmesh_override;
-  virtual const_element_iterator ghost_elements_end () const libmesh_override;
+  virtual element_iterator ghost_elements_begin () override;
+  virtual element_iterator ghost_elements_end () override;
+  virtual const_element_iterator ghost_elements_begin () const override;
+  virtual const_element_iterator ghost_elements_end () const override;
 
   virtual element_iterator
   evaluable_elements_begin (const DofMap & dof_map,
-                            unsigned int var_num = libMesh::invalid_uint) libmesh_override;
+                            unsigned int var_num = libMesh::invalid_uint) override;
 
   virtual element_iterator
   evaluable_elements_end (const DofMap & dof_map,
-                          unsigned int var_num = libMesh::invalid_uint) libmesh_override;
+                          unsigned int var_num = libMesh::invalid_uint) override;
 
   virtual const_element_iterator
   evaluable_elements_begin (const DofMap & dof_map,
-                            unsigned int var_num = libMesh::invalid_uint) const libmesh_override;
+                            unsigned int var_num = libMesh::invalid_uint) const override;
 
   virtual const_element_iterator
   evaluable_elements_end (const DofMap & dof_map,
-                          unsigned int var_num = libMesh::invalid_uint) const libmesh_override;
+                          unsigned int var_num = libMesh::invalid_uint) const override;
 
 #ifdef LIBMESH_ENABLE_AMR
-  virtual element_iterator flagged_elements_begin (unsigned char rflag) libmesh_override;
-  virtual element_iterator flagged_elements_end (unsigned char rflag) libmesh_override;
-  virtual const_element_iterator flagged_elements_begin (unsigned char rflag) const libmesh_override;
-  virtual const_element_iterator flagged_elements_end (unsigned char rflag) const libmesh_override;
+  virtual element_iterator flagged_elements_begin (unsigned char rflag) override;
+  virtual element_iterator flagged_elements_end (unsigned char rflag) override;
+  virtual const_element_iterator flagged_elements_begin (unsigned char rflag) const override;
+  virtual const_element_iterator flagged_elements_end (unsigned char rflag) const override;
 
   virtual element_iterator flagged_pid_elements_begin (unsigned char rflag,
-                                                       processor_id_type pid) libmesh_override;
+                                                       processor_id_type pid) override;
   virtual element_iterator flagged_pid_elements_end (unsigned char rflag,
-                                                     processor_id_type pid) libmesh_override;
+                                                     processor_id_type pid) override;
   virtual const_element_iterator flagged_pid_elements_begin (unsigned char rflag,
-                                                             processor_id_type pid) const libmesh_override;
+                                                             processor_id_type pid) const override;
   virtual const_element_iterator flagged_pid_elements_end (unsigned char rflag,
-                                                           processor_id_type pid) const libmesh_override;
+                                                           processor_id_type pid) const override;
 #endif // LIBMESH_ENABLE_AMR
 
   /**
    * Node iterator accessor functions.
    */
-  virtual node_iterator nodes_begin () libmesh_override;
-  virtual node_iterator nodes_end () libmesh_override;
-  virtual const_node_iterator nodes_begin () const libmesh_override;
-  virtual const_node_iterator nodes_end () const libmesh_override;
-  virtual SimpleRange<node_iterator> node_ptr_range() libmesh_override { return {nodes_begin(), nodes_end()}; }
-  virtual SimpleRange<const_node_iterator> node_ptr_range() const libmesh_override { return {nodes_begin(), nodes_end()}; }
+  virtual node_iterator nodes_begin () override;
+  virtual node_iterator nodes_end () override;
+  virtual const_node_iterator nodes_begin () const override;
+  virtual const_node_iterator nodes_end () const override;
+  virtual SimpleRange<node_iterator> node_ptr_range() override { return {nodes_begin(), nodes_end()}; }
+  virtual SimpleRange<const_node_iterator> node_ptr_range() const override { return {nodes_begin(), nodes_end()}; }
 
-  virtual node_iterator active_nodes_begin () libmesh_override;
-  virtual node_iterator active_nodes_end () libmesh_override;
-  virtual const_node_iterator active_nodes_begin () const libmesh_override;
-  virtual const_node_iterator active_nodes_end () const libmesh_override;
+  virtual node_iterator active_nodes_begin () override;
+  virtual node_iterator active_nodes_end () override;
+  virtual const_node_iterator active_nodes_begin () const override;
+  virtual const_node_iterator active_nodes_end () const override;
 
-  virtual node_iterator local_nodes_begin () libmesh_override;
-  virtual node_iterator local_nodes_end () libmesh_override;
-  virtual const_node_iterator local_nodes_begin () const libmesh_override;
-  virtual const_node_iterator local_nodes_end () const libmesh_override;
-  virtual SimpleRange<node_iterator> local_node_ptr_range() libmesh_override { return {local_nodes_begin(), local_nodes_end()}; }
-  virtual SimpleRange<const_node_iterator> local_node_ptr_range() const libmesh_override { return {local_nodes_begin(), local_nodes_end()}; }
+  virtual node_iterator local_nodes_begin () override;
+  virtual node_iterator local_nodes_end () override;
+  virtual const_node_iterator local_nodes_begin () const override;
+  virtual const_node_iterator local_nodes_end () const override;
+  virtual SimpleRange<node_iterator> local_node_ptr_range() override { return {local_nodes_begin(), local_nodes_end()}; }
+  virtual SimpleRange<const_node_iterator> local_node_ptr_range() const override { return {local_nodes_begin(), local_nodes_end()}; }
 
-  virtual node_iterator pid_nodes_begin (processor_id_type proc_id) libmesh_override;
-  virtual node_iterator pid_nodes_end (processor_id_type proc_id) libmesh_override;
-  virtual const_node_iterator pid_nodes_begin (processor_id_type proc_id) const libmesh_override;
-  virtual const_node_iterator pid_nodes_end (processor_id_type proc_id) const libmesh_override;
+  virtual node_iterator pid_nodes_begin (processor_id_type proc_id) override;
+  virtual node_iterator pid_nodes_end (processor_id_type proc_id) override;
+  virtual const_node_iterator pid_nodes_begin (processor_id_type proc_id) const override;
+  virtual const_node_iterator pid_nodes_end (processor_id_type proc_id) const override;
 
-  virtual node_iterator bid_nodes_begin (boundary_id_type bndry_id) libmesh_override;
-  virtual node_iterator bid_nodes_end (boundary_id_type bndry_id) libmesh_override;
-  virtual const_node_iterator bid_nodes_begin (boundary_id_type bndry_id) const libmesh_override;
-  virtual const_node_iterator bid_nodes_end (boundary_id_type bndry_id) const libmesh_override;
+  virtual node_iterator bid_nodes_begin (boundary_id_type bndry_id) override;
+  virtual node_iterator bid_nodes_end (boundary_id_type bndry_id) override;
+  virtual const_node_iterator bid_nodes_begin (boundary_id_type bndry_id) const override;
+  virtual const_node_iterator bid_nodes_end (boundary_id_type bndry_id) const override;
 
-  virtual node_iterator bnd_nodes_begin () libmesh_override;
-  virtual node_iterator bnd_nodes_end () libmesh_override;
-  virtual const_node_iterator bnd_nodes_begin () const libmesh_override;
-  virtual const_node_iterator bnd_nodes_end () const libmesh_override;
+  virtual node_iterator bnd_nodes_begin () override;
+  virtual node_iterator bnd_nodes_end () override;
+  virtual const_node_iterator bnd_nodes_begin () const override;
+  virtual const_node_iterator bnd_nodes_end () const override;
 
   virtual node_iterator
   evaluable_nodes_begin (const DofMap & dof_map,
-                         unsigned int var_num = libMesh::invalid_uint) libmesh_override;
+                         unsigned int var_num = libMesh::invalid_uint) override;
   virtual node_iterator
   evaluable_nodes_end (const DofMap & dof_map,
-                       unsigned int var_num = libMesh::invalid_uint) libmesh_override;
+                       unsigned int var_num = libMesh::invalid_uint) override;
   virtual const_node_iterator
   evaluable_nodes_begin (const DofMap & dof_map,
-                         unsigned int var_num = libMesh::invalid_uint) const libmesh_override;
+                         unsigned int var_num = libMesh::invalid_uint) const override;
   virtual const_node_iterator
   evaluable_nodes_end (const DofMap & dof_map,
-                       unsigned int var_num = libMesh::invalid_uint) const libmesh_override;
+                       unsigned int var_num = libMesh::invalid_uint) const override;
 
 
 protected:

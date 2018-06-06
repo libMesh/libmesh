@@ -70,7 +70,7 @@ public:
    * Clear this TransientRBEvaluation object.
    * Override to also clear the M_q representors
    */
-  virtual void clear() libmesh_override;
+  virtual void clear() override;
 
   /**
    * Resize and clear the data vectors corresponding to the
@@ -80,14 +80,14 @@ public:
    * case.
    */
   virtual void resize_data_structures(const unsigned int Nmax,
-                                      bool resize_error_bound_data=true) libmesh_override;
+                                      bool resize_error_bound_data=true) override;
 
   /**
    * Perform online solve for current_params
    * with the N basis functions. Overridden
    * to perform a time-dependent solve.
    */
-  virtual Real rb_solve(unsigned int N) libmesh_override;
+  virtual Real rb_solve(unsigned int N) override;
 
   /**
    * If a solve has already been performed, then we cached some data
@@ -100,7 +100,7 @@ public:
    * \returns A scaling factor that we can use to provide a consistent
    * scaling of the RB error bound across different parameter values.
    */
-  virtual Real get_error_bound_normalization() libmesh_override;
+  virtual Real get_error_bound_normalization() override;
 
   /**
    * Specifies the residual scaling on the numerator to
@@ -114,7 +114,7 @@ public:
    * saved in RB_solution. This function uses the cached time-independent
    * data.
    */
-  virtual Real compute_residual_dual_norm(const unsigned int N) libmesh_override;
+  virtual Real compute_residual_dual_norm(const unsigned int N) override;
 
   /**
    * Compute the dual norm of the residual for the solution
@@ -137,7 +137,7 @@ public:
    * we may not need the representors any more.
    * Override to clear the M_q representors.
    */
-  virtual void clear_riesz_representors() libmesh_override;
+  virtual void clear_riesz_representors() override;
 
   /**
    * Write out all the data to text files in order to segregate the
@@ -146,7 +146,7 @@ public:
    * \note This is a legacy method, use RBDataSerialization instead.
    */
   virtual void legacy_write_offline_data_to_files(const std::string & directory_name = "offline_data",
-                                                  const bool write_binary_data=true) libmesh_override;
+                                                  const bool write_binary_data=true) override;
 
   /**
    * Read in the saved Offline reduced basis data
@@ -156,7 +156,7 @@ public:
    */
   virtual void legacy_read_offline_data_from_files(const std::string & directory_name = "offline_data",
                                                    bool read_error_bound_data=true,
-                                                   const bool read_binary_data=true) libmesh_override;
+                                                   const bool read_binary_data=true) override;
 
   //----------- PUBLIC DATA MEMBERS -----------//
 

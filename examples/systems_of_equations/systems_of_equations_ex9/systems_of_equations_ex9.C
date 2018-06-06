@@ -152,7 +152,7 @@ public:
    * define how one finds corresponding nodes on the periodic
    * boundary pair.
    */
-  virtual Point get_corresponding_pos(const Point & pt) const libmesh_override
+  virtual Point get_corresponding_pos(const Point & pt) const override
   {
     DenseVector<Real> translated_pt(3);
     for(unsigned int i=0; i<3; i++)
@@ -179,7 +179,7 @@ public:
    * store them in the underlying map, this class must be clone'able,
    * i.e. have a kind of virtual construction mechanism.
    */
-  virtual std::unique_ptr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const libmesh_override
+  virtual std::unique_ptr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const override
   {
     return libmesh_make_unique<AzimuthalPeriodicBoundary>(*this, t);
   }

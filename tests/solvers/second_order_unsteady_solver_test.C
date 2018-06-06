@@ -39,16 +39,16 @@ public:
     : SystemBase(es, name_in, number_in)
   {}
 
-  virtual Number F( FEMContext & /*context*/, unsigned int /*qp*/ ) libmesh_override
+  virtual Number F( FEMContext & /*context*/, unsigned int /*qp*/ ) override
   { return -2.71; }
 
-  virtual Number C( FEMContext & /*context*/, unsigned int /*qp*/ ) libmesh_override
+  virtual Number C( FEMContext & /*context*/, unsigned int /*qp*/ ) override
   { return 0.0; }
 
-  virtual Number M( FEMContext & /*context*/, unsigned int /*qp*/ ) libmesh_override
+  virtual Number M( FEMContext & /*context*/, unsigned int /*qp*/ ) override
   { return 3.14; }
 
-  virtual Number u( Real t ) libmesh_override
+  virtual Number u( Real t ) override
   { return 2.71/3.14*0.5*t*t; }
 };
 
@@ -63,16 +63,16 @@ public:
     : SystemBase(es, name_in, number_in)
   {}
 
-  virtual Number F( FEMContext & context, unsigned int /*qp*/ ) libmesh_override
+  virtual Number F( FEMContext & context, unsigned int /*qp*/ ) override
   { return -6.0*context.get_time()-2.0; }
 
-  virtual Number C( FEMContext & /*context*/, unsigned int /*qp*/ ) libmesh_override
+  virtual Number C( FEMContext & /*context*/, unsigned int /*qp*/ ) override
   { return 0.0; }
 
-  virtual Number M( FEMContext & /*context*/, unsigned int /*qp*/ ) libmesh_override
+  virtual Number M( FEMContext & /*context*/, unsigned int /*qp*/ ) override
   { return 1.0; }
 
-  virtual Number u( Real t ) libmesh_override
+  virtual Number u( Real t ) override
   { return t*t*t+t*t; }
 };
 
@@ -86,7 +86,7 @@ public:
 
 protected:
 
-  virtual void aux_time_solver_init( NewmarkSolver & time_solver ) libmesh_override
+  virtual void aux_time_solver_init( NewmarkSolver & time_solver ) override
   { time_solver.set_beta(_beta);
     time_solver.compute_initial_accel(); }
 

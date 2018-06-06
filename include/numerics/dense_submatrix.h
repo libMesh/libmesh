@@ -72,7 +72,7 @@ public:
    */
   DenseMatrix<T> & parent () { return _parent_matrix; }
 
-  virtual void zero() libmesh_override;
+  virtual void zero() override;
 
   /**
    * \returns The \p (i,j) element of the submatrix.
@@ -87,16 +87,16 @@ public:
                   const unsigned int j);
 
   virtual T el(const unsigned int i,
-               const unsigned int j) const libmesh_override
+               const unsigned int j) const override
   { return (*this)(i,j); }
 
   virtual T & el(const unsigned int i,
-                 const unsigned int j) libmesh_override
+                 const unsigned int j) override
   { return (*this)(i,j); }
 
-  virtual void left_multiply (const DenseMatrixBase<T> & M2) libmesh_override;
+  virtual void left_multiply (const DenseMatrixBase<T> & M2) override;
 
-  virtual void right_multiply (const DenseMatrixBase<T> & M3) libmesh_override;
+  virtual void right_multiply (const DenseMatrixBase<T> & M3) override;
 
   /**
    * Changes the location of the submatrix in the parent matrix.

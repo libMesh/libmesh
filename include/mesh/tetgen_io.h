@@ -67,13 +67,13 @@ public:
    * This method implements reading a mesh from a specified file
    * in TetGen format.
    */
-  virtual void read (const std::string &) libmesh_override;
+  virtual void read (const std::string &) override;
 
   /**
    * This method implements writing a mesh to a specified ".poly" file.
    * ".poly" files defines so called Piecewise Linear Complex (PLC).
    */
-  virtual void write (const std::string &) libmesh_override;
+  virtual void write (const std::string &) override;
 
   /**
    * Data structure to hold node attributes read in from file.

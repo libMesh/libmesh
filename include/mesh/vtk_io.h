@@ -90,7 +90,7 @@ public:
    */
   virtual void write_nodal_data (const std::string &,
                                  const std::vector<Number> &,
-                                 const std::vector<std::string> &) libmesh_override;
+                                 const std::vector<std::string> &) override;
 
   /**
    * This method implements reading a mesh from a specified file
@@ -100,7 +100,7 @@ public:
    * "available" when !LIBMESH_HAVE_VTK, however, it will throw a
    * runtime error.
    */
-  virtual void read (const std::string &) libmesh_override;
+  virtual void read (const std::string &) override;
 
   /**
    * Output the mesh without solutions to a .pvtu file.
@@ -109,7 +109,7 @@ public:
    * "available" when !LIBMESH_HAVE_VTK, however, it will throw a
    * runtime error.
    */
-  virtual void write (const std::string &) libmesh_override;
+  virtual void write (const std::string &) override;
 
 #ifdef LIBMESH_HAVE_VTK
 

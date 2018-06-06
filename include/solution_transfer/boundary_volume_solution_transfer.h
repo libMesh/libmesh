@@ -58,7 +58,7 @@ public:
    * volume mesh to a Variable in a System associated with the
    * corresponding BoundaryMesh, or vice-versa.
    */
-  virtual void transfer(const Variable & from_var, const Variable & to_var) libmesh_override;
+  virtual void transfer(const Variable & from_var, const Variable & to_var) override;
 
 private:
   /**

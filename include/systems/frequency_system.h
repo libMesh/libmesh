@@ -82,7 +82,7 @@ public:
    * The frequencies belong to the \p EquationSystems
    * object.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * The full clear method also clears the frequencies
@@ -95,12 +95,12 @@ public:
    * Assemble the linear system.  Does not
    * actually call the solver.
    */
-  virtual void assemble () libmesh_override;
+  virtual void assemble () override;
 
   /**
    * Solves the system for all frequencies.
    */
-  virtual void solve () libmesh_override;
+  virtual void solve () override;
 
   /**
    * Solves the linear system for the
@@ -117,7 +117,7 @@ public:
    * \returns \p "Frequency".  Helps in identifying
    * the system type in an equation system file.
    */
-  virtual std::string system_type () const libmesh_override { return "Frequency"; }
+  virtual std::string system_type () const override { return "Frequency"; }
 
 
   //--------------------------------------------------------
@@ -218,7 +218,7 @@ protected:
    * The frequencies have to be set prior to calling
    * \p init().
    */
-  virtual void init_data () libmesh_override;
+  virtual void init_data () override;
 
   /**
    * Sets the current frequency to the \p n-th entry in the vector

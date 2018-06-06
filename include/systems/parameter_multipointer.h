@@ -62,7 +62,7 @@ public:
    */
 #ifdef LIBMESH_ENABLE_DEPRECATED
   virtual ParameterAccessor<T> &
-  operator= (T * /* new_ptr */) libmesh_override
+  operator= (T * /* new_ptr */) override
   {
     libmesh_error();
     return *this;
@@ -72,7 +72,7 @@ public:
   /**
    * Setter: change the value of the parameter we access.
    */
-  virtual void set (const T & new_value) libmesh_override
+  virtual void set (const T & new_value) override
   {
     libmesh_assert(!_ptrs.empty());
 #ifndef NDEBUG
@@ -91,7 +91,7 @@ public:
   /**
    * Getter: get the value of the parameter we access.
    */
-  virtual const T & get () const libmesh_override
+  virtual const T & get () const override
   {
     libmesh_assert(!_ptrs.empty());
     T & val = *_ptrs[0];
@@ -107,7 +107,7 @@ public:
   /**
    * \returns A new copy of the accessor.
    */
-  virtual std::unique_ptr<ParameterAccessor<T>> clone() const libmesh_override
+  virtual std::unique_ptr<ParameterAccessor<T>> clone() const override
   {
     ParameterMultiPointer * pmp = new ParameterMultiPointer<T>();
     pmp->_ptrs = _ptrs;

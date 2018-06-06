@@ -75,7 +75,7 @@ public:
   /**
    * \returns \p QCOMPOSITE.
    */
-  virtual QuadratureType type() const libmesh_override { return QCOMPOSITE; }
+  virtual QuadratureType type() const override { return QCOMPOSITE; }
 
   /**
    * Overrides the base class init() function, and uses the ElemCutter to
@@ -83,7 +83,7 @@ public:
    */
   virtual void init (const Elem & elem,
                      const std::vector<Real> & vertex_distance_func,
-                     unsigned int p_level=0) libmesh_override;
+                     unsigned int p_level=0) override;
 
 private:
 

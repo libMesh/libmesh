@@ -75,23 +75,23 @@ public:
    */
   void reparse (const std::string & expression);
 
-  virtual void init_context (const FEMContext & c) libmesh_override;
+  virtual void init_context (const FEMContext & c) override;
 
-  virtual std::unique_ptr<FEMFunctionBase<Output>> clone () const libmesh_override;
+  virtual std::unique_ptr<FEMFunctionBase<Output>> clone () const override;
 
   virtual Output operator() (const FEMContext & c,
                              const Point & p,
-                             const Real time = 0.) libmesh_override;
+                             const Real time = 0.) override;
 
   void operator() (const FEMContext & c,
                    const Point & p,
                    const Real time,
-                   DenseVector<Output> & output) libmesh_override;
+                   DenseVector<Output> & output) override;
 
   virtual Output component(const FEMContext & c,
                            unsigned int i,
                            const Point & p,
-                           Real time=0.) libmesh_override;
+                           Real time=0.) override;
 
   const std::string & expression() { return _expression; }
 

@@ -81,18 +81,18 @@ public:
    */
   OutputVectorFunction _vector_fptr;
 
-  virtual void init () libmesh_override;
+  virtual void init () override;
 
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
-  virtual std::unique_ptr<FunctionBase<Output>> clone () const libmesh_override;
+  virtual std::unique_ptr<FunctionBase<Output>> clone () const override;
 
   virtual Output operator() (const Point & p,
-                             const Real time=0.) libmesh_override;
+                             const Real time=0.) override;
 
   virtual void operator() (const Point & p,
                            const Real time,
-                           DenseVector<Output> & output) libmesh_override;
+                           DenseVector<Output> & output) override;
 };
 
 

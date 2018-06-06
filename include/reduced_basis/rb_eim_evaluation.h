@@ -71,14 +71,14 @@ public:
   /**
    * Clear this object.
    */
-  virtual void clear() libmesh_override;
+  virtual void clear() override;
 
   /**
    * Resize the data structures for storing data associated
    * with this object.
    */
   virtual void resize_data_structures(const unsigned int Nmax,
-                                      bool resize_error_bound_data=true) libmesh_override;
+                                      bool resize_error_bound_data=true) override;
 
   /**
    * Attach the parametrized function that we will approximate
@@ -115,7 +115,7 @@ public:
    * solution coefficients in the member RB_solution.
    * \returns The EIM a posteriori error bound.
    */
-  virtual Real rb_solve(unsigned int N) libmesh_override;
+  virtual Real rb_solve(unsigned int N) override;
 
   /**
    * Calculate the EIM approximation for the given
@@ -128,7 +128,7 @@ public:
    * \returns A scaling factor that we can use to provide a consistent
    * scaling of the RB error bound across different parameter values.
    */
-  virtual Real get_error_bound_normalization() libmesh_override;
+  virtual Real get_error_bound_normalization() override;
 
   /**
    * Build a vector of RBTheta objects that accesses the components
@@ -156,7 +156,7 @@ public:
    * \note This is a legacy method, use RBDataSerialization instead.
    */
   virtual void legacy_write_offline_data_to_files(const std::string & directory_name = "offline_data",
-                                                  const bool write_binary_data=true) libmesh_override;
+                                                  const bool write_binary_data=true) override;
 
   /**
    * Read in the saved Offline reduced basis data
@@ -166,7 +166,7 @@ public:
    */
   virtual void legacy_read_offline_data_from_files(const std::string & directory_name = "offline_data",
                                                    bool read_error_bound_data=true,
-                                                   const bool read_binary_data=true) libmesh_override;
+                                                   const bool read_binary_data=true) override;
 
   //----------- PUBLIC DATA MEMBERS -----------//
 

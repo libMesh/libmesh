@@ -57,7 +57,7 @@ public:
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    */
-  virtual Point master_point (const unsigned int i) const libmesh_override
+  virtual Point master_point (const unsigned int i) const override
   {
     libmesh_assert_less(i, this->n_nodes());
     return Point(_master_points[i][0],
@@ -69,45 +69,45 @@ public:
    * \returns 5.  All pyramid-derivatives are guaranteed to have at
    * least 5 nodes.
    */
-  virtual unsigned int n_nodes() const libmesh_override { return 5; }
+  virtual unsigned int n_nodes() const override { return 5; }
 
   /**
    * \returns 5
    */
-  virtual unsigned int n_sides() const libmesh_override { return 5; }
+  virtual unsigned int n_sides() const override { return 5; }
 
   /**
    * \returns 5.  All pyramids have 5 vertices.
    */
-  virtual unsigned int n_vertices() const libmesh_override { return 5; }
+  virtual unsigned int n_vertices() const override { return 5; }
 
   /**
    * \returns 8.  All pyramids have 8 edges.
    */
-  virtual unsigned int n_edges() const libmesh_override { return 8; }
+  virtual unsigned int n_edges() const override { return 8; }
 
   /**
    * \returns 5.  All pyramids have 5 faces.
    */
-  virtual unsigned int n_faces() const libmesh_override { return 5; }
+  virtual unsigned int n_faces() const override { return 5; }
 
   /**
    * \returns 10.
    */
-  virtual unsigned int n_children() const libmesh_override { return 10; }
+  virtual unsigned int n_children() const override { return 10; }
 
   /**
    * \returns \p true if the specified child is on the
    * specified side.
    */
   virtual bool is_child_on_side(const unsigned int c,
-                                const unsigned int s) const libmesh_override;
+                                const unsigned int s) const override;
 
   /**
    * \returns \p true if the specified edge is on the specified side.
    */
   virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const libmesh_override;
+                               const unsigned int s) const override;
 
   /**
    * Don't hide Elem::key() defined in the base class.
@@ -119,19 +119,19 @@ public:
    * The id is not necessarily unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
-  virtual dof_id_type key (const unsigned int s) const libmesh_override;
+  virtual dof_id_type key (const unsigned int s) const override;
 
   /**
    * \returns \p Pyramid5::side_nodes_map[side][side_node] after doing some range checking.
    */
   virtual unsigned int which_node_am_i(unsigned int side,
-                                       unsigned int side_node) const libmesh_override;
+                                       unsigned int side_node) const override;
 
   /**
    * \returns A primitive triangle or quad for
    * face i.
    */
-  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) libmesh_override;
+  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override;
 
 
 protected:

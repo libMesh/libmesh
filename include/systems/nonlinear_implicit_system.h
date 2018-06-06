@@ -211,18 +211,18 @@ public:
    * Clear all the data structures associated with
    * the system.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * Reinitializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.
    */
-  virtual void reinit () libmesh_override;
+  virtual void reinit () override;
 
   /**
    * Assembles & solves the nonlinear system R(x) = 0.
    */
-  virtual void solve () libmesh_override;
+  virtual void solve () override;
 
   /**
    * \returns An integer corresponding to the upper iteration count
@@ -230,7 +230,7 @@ public:
    * be used in linear adjoint and/or sensitivity solves
    */
   virtual std::pair<unsigned int, Real>
-  get_linear_solve_parameters() const libmesh_override;
+  get_linear_solve_parameters() const override;
 
   /**
    * Assembles a residual in \p rhs and/or a jacobian in \p matrix,
@@ -239,13 +239,13 @@ public:
   virtual void assembly(bool get_residual,
                         bool get_jacobian,
                         bool apply_heterogeneous_constraints = false,
-                        bool apply_no_constraints = false) libmesh_override;
+                        bool apply_no_constraints = false) override;
 
   /**
    * \returns \p "NonlinearImplicit".  Helps in identifying
    * the system type in an equation system file.
    */
-  virtual std::string system_type () const libmesh_override { return "NonlinearImplicit"; }
+  virtual std::string system_type () const override { return "NonlinearImplicit"; }
 
   /**
    * The \p NonlinearSolver defines the default interface used to

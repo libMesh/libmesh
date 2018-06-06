@@ -87,7 +87,7 @@ public:
    */
   virtual ~FirstOrderUnsteadySolver (){}
 
-  virtual unsigned int time_order() const libmesh_override
+  virtual unsigned int time_order() const override
   { return 1; }
 
 protected:

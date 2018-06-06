@@ -52,25 +52,25 @@ public:
   /**
    * \returns 2, the dimensionality of the object.
    */
-  virtual unsigned int dim () const libmesh_override { return 2; }
+  virtual unsigned int dim () const override { return 2; }
 
   /**
    * \returns 0.  All 2D elements have no faces, just
    * edges.
    */
-  virtual unsigned int n_faces() const libmesh_override { return 0; }
+  virtual unsigned int n_faces() const override { return 0; }
 
   /**
    * build_side and build_edge are identical for faces.
    */
-  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int i) libmesh_override
+  virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int i) override
   { return build_side_ptr(i); }
 
   /**
    * is_edge_on_side is trivial in 2D.
    */
   virtual bool is_edge_on_side(const unsigned int e,
-                               const unsigned int s) const libmesh_override
+                               const unsigned int s) const override
   { return (e == s); }
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -79,7 +79,7 @@ public:
    * \returns \p false.  All classes derived from \p Face
    * are finite elements.
    */
-  virtual bool infinite () const libmesh_override { return false; }
+  virtual bool infinite () const override { return false; }
 
 #endif
 

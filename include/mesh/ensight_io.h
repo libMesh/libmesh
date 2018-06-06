@@ -115,7 +115,7 @@ public:
   /**
    * Calls this->write(0);
    */
-  virtual void write (const std::string & name) libmesh_override;
+  virtual void write (const std::string & name) override;
 
 private:
   // Represents the vectors that are used by the EnsightIO

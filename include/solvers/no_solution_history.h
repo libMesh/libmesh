@@ -49,17 +49,17 @@ public:
   /**
    * Virtual function store which we will be overriding
    */
-  virtual void store() libmesh_override;
+  virtual void store() override;
 
   /**
    * Virtual function retrieve which we will be overriding
    */
-  virtual void retrieve() libmesh_override;
+  virtual void retrieve() override;
 
   /**
    * Definition of the clone function needed for the setter function
    */
-  virtual std::unique_ptr<SolutionHistory > clone() const libmesh_override
+  virtual std::unique_ptr<SolutionHistory > clone() const override
   {
     return libmesh_make_unique<NoSolutionHistory>();
   }

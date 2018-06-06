@@ -66,12 +66,12 @@ public:
    * The reinitialization function.  This method is used after
    * changes in the mesh.
    */
-  virtual void reinit () libmesh_override;
+  virtual void reinit () override;
 
   /**
    * The initialization function.
    */
-  virtual void init () libmesh_override;
+  virtual void init () override;
 
   /**
    * The clear function. Called if we reinit or when we destroy this object.
@@ -83,7 +83,7 @@ public:
    * this method will depend on the PETSc SNES settings.
    * See the PETSc documentation for more details.
    */
-  virtual unsigned int solve () libmesh_override;
+  virtual unsigned int solve () override;
 
 protected:
 

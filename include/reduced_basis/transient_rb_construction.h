@@ -76,7 +76,7 @@ public:
    * Clear all the data structures associated with
    * the system.
    */
-  virtual void clear () libmesh_override;
+  virtual void clear () override;
 
   /**
    * Allocate all the data structures necessary for the construction
@@ -87,12 +87,12 @@ public:
    * sized.
    */
   virtual void initialize_rb_construction(bool skip_matrix_assembly=false,
-                                          bool skip_vector_assembly=false) libmesh_override;
+                                          bool skip_vector_assembly=false) override;
 
   /**
    * Perform a truth solve at the current parameter.
    */
-  virtual Real truth_solve(int write_interval) libmesh_override;
+  virtual Real truth_solve(int write_interval) override;
 
   /**
    * Train the reduced basis. Overridden so that we can set the
@@ -101,18 +101,18 @@ public:
    * projection error. Other calls to truth_solve generally do not
    * need to perform these projection calculations.
    */
-  virtual Real train_reduced_basis(const bool resize_rb_eval_data=true) libmesh_override;
+  virtual Real train_reduced_basis(const bool resize_rb_eval_data=true) override;
 
   /**
    * Read in the parameters from file and set up the system
    * accordingly.
    */
-  virtual void process_parameters_file (const std::string & parameters_filename) libmesh_override;
+  virtual void process_parameters_file (const std::string & parameters_filename) override;
 
   /**
    * Print out info that describes the current setup of this RBConstruction.
    */
-  virtual void print_info() libmesh_override;
+  virtual void print_info() override;
 
   /**
    * Function that indicates when to terminate the Greedy
@@ -120,18 +120,18 @@ public:
    */
   virtual bool greedy_termination_test(Real abs_greedy_error,
                                        Real initial_greedy_error,
-                                       int count) libmesh_override;
+                                       int count) override;
 
   /**
    * Assemble and store all the affine operators.
    * Override to assemble the mass matrix operators.
    */
-  virtual void assemble_all_affine_operators() libmesh_override;
+  virtual void assemble_all_affine_operators() override;
 
   /**
    * Override to assemble the L2 matrix as well.
    */
-  virtual void assemble_misc_matrices() libmesh_override;
+  virtual void assemble_misc_matrices() override;
 
   /**
    * Assemble the L2 matrix.
@@ -190,12 +190,12 @@ public:
   /**
    * Get a map that stores pointers to all of the matrices.
    */
-  virtual void get_all_matrices(std::map<std::string, SparseMatrix<Number> *> & all_matrices) libmesh_override;
+  virtual void get_all_matrices(std::map<std::string, SparseMatrix<Number> *> & all_matrices) override;
 
   /**
    * Assemble the truth system in the transient linear case.
    */
-  virtual void truth_assembly() libmesh_override;
+  virtual void truth_assembly() override;
 
   /**
    * Get/set max_truth_solves, the maximum number of RB
@@ -224,7 +224,7 @@ public:
    * Load the RB solution from the current time-level
    * into the libMesh solution vector.
    */
-  virtual void load_rb_solution() libmesh_override;
+  virtual void load_rb_solution() override;
 
   /**
    * Get the column of temporal_data corresponding to the current time level.
@@ -246,14 +246,14 @@ public:
    * to write out transient data too.
    */
   virtual void write_riesz_representors_to_files(const std::string & riesz_representors_dir,
-                                                 const bool write_binary_residual_representors) libmesh_override;
+                                                 const bool write_binary_residual_representors) override;
 
   /**
    * Write out all the Riesz representor data to files. Override
    * to read in transient data too.
    */
   virtual void read_riesz_representors_from_files(const std::string & riesz_representors_dir,
-                                                  const bool write_binary_residual_representors) libmesh_override;
+                                                  const bool write_binary_residual_representors) override;
 
 
   //----------- PUBLIC DATA MEMBERS -----------//
@@ -312,14 +312,14 @@ protected:
    * Helper function that actually allocates all the data
    * structures required by this class.
    */
-  virtual void allocate_data_structures() libmesh_override;
+  virtual void allocate_data_structures() override;
 
   /**
    * Override assemble_affine_expansion to also initialize
    * RB_ic_proj_rhs_all_N, if necessary.
    */
   virtual void assemble_affine_expansion(bool skip_matrix_assembly,
-                                         bool skip_vector_assembly) libmesh_override;
+                                         bool skip_vector_assembly) override;
 
   /**
    * This function imposes a truth initial condition,
@@ -332,7 +332,7 @@ protected:
    * Override to return the L2 product matrix for output
    * dual norm solves for transient state problems.
    */
-  virtual SparseMatrix<Number> & get_matrix_for_output_dual_solves() libmesh_override;
+  virtual SparseMatrix<Number> & get_matrix_for_output_dual_solves() override;
 
   /**
    * Initialize RB space by adding the truth initial condition
@@ -345,23 +345,23 @@ protected:
    * case we first perform a POD of the time-dependent "truth"
    * and then add a certain number of POD modes to the reduced basis.
    */
-  virtual void enrich_RB_space() libmesh_override;
+  virtual void enrich_RB_space() override;
 
   /**
    * Update the system after enriching the RB space.
    */
-  virtual void update_system() libmesh_override;
+  virtual void update_system() override;
 
   /**
    * Compute the reduced basis matrices for the current basis.
    */
-  virtual void update_RB_system_matrices() libmesh_override;
+  virtual void update_RB_system_matrices() override;
 
   /**
    * Compute the terms that are combined `online'
    * to determine the dual norm of the residual.
    */
-  virtual void update_residual_terms(bool compute_inner_products) libmesh_override;
+  virtual void update_residual_terms(bool compute_inner_products) override;
 
   /**
    * Set column k (i.e. the current time level) of temporal_data to the

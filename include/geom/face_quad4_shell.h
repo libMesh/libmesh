@@ -46,7 +46,7 @@ public:
   /**
    * \returns \p QUADSHELL4.
    */
-  virtual ElemType type () const libmesh_override { return QUADSHELL4; }
+  virtual ElemType type () const override { return QUADSHELL4; }
 };
 
 } // namespace libMesh

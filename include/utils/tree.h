@@ -64,17 +64,17 @@ public:
   /**
    * Prints the nodes.
    */
-  virtual void print_nodes(std::ostream & my_out=libMesh::out) const libmesh_override;
+  virtual void print_nodes(std::ostream & my_out=libMesh::out) const override;
 
   /**
    * Prints the nodes.
    */
-  virtual void print_elements(std::ostream & my_out=libMesh::out) const libmesh_override;
+  virtual void print_elements(std::ostream & my_out=libMesh::out) const override;
 
   /**
    * \returns The number of active bins.
    */
-  virtual unsigned int n_active_bins() const libmesh_override
+  virtual unsigned int n_active_bins() const override
   { return root.n_active_bins(); }
 
   /**
@@ -84,7 +84,7 @@ public:
    */
   virtual const Elem * find_element(const Point & p,
                                     const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr,
-                                    Real relative_tol = TOLERANCE) const libmesh_override;
+                                    Real relative_tol = TOLERANCE) const override;
 
   /**
    * \returns A pointer to the element containing point p,
