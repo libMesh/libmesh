@@ -75,7 +75,7 @@ public:
       sys.project_solution(x_plus_y, NULL, es.parameters);
 
       ExodusII_IO exii(mesh);
-      
+
       // Don't try to write element data as nodal data
       std::set<std::string> sys_list;
       exii.write_equation_systems("mesh_with_soln.e", es, &sys_list);

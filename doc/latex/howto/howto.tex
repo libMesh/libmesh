@@ -56,7 +56,7 @@ e.g.~\code{./myTestProgram -log\_summary}. Frequently used options are
 \subsection{Restart a model}
 \label{sec:restart}
 
-Restarting a model is done by loading a simulation, that has been stored with 
+Restarting a model is done by loading a simulation, that has been stored with
 \code{equation\_systems.write}. It is stored either in a ASCII-File or in the
 HDF format. It is read with  \code{equation\_systems.read}. (\exmp{2}).
 
@@ -90,7 +90,7 @@ Writing a the mesh together with the current solution is equally simple\\[1ex]
 \label{sec:add_vector}
 
 Add a new vector to a system with \code{system.add\_vector("myvec");}. \\ Upon
-mesh refinement, the vector can be projected onto the new mesh with 
+mesh refinement, the vector can be projected onto the new mesh with
 \code{system.project\_vector(system.get\_vector("myvec"));}.
 
 
@@ -111,9 +111,9 @@ the variables go out of scope before ending PetSc.
 
 \begin{lstlisting}
 libMesh::init (argc, argv);
-  { 
+  {
     Mesh mesh(3);
-  } 
+  }
 return libMesh::close();
 \end{lstlisting}
 
@@ -121,7 +121,7 @@ return libMesh::close();
 
 
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t
-%%% End: 
+%%% End:

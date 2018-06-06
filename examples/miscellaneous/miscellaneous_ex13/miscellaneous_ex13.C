@@ -179,7 +179,7 @@ int main (int argc, char ** argv)
 
     // Most DirichletBoundary users will want to supply a "locally
     // indexed" functor
-    DirichletBoundary dirichlet_bc 
+    DirichletBoundary dirichlet_bc
       (boundary_ids,
        std::vector<unsigned int>(variables, variables+3), zf,
        LOCAL_VARIABLE_ORDER);
