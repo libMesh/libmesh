@@ -289,7 +289,7 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
 
   auto gather_functor =
     [&location_map, &sync]
-    (processor_id_type pid, const std::vector<Point> & pts,
+    (processor_id_type /*pid*/, const std::vector<Point> & pts,
      std::vector<typename SyncFunctor::datum> & data)
     {
       // Find the local id of each requested object
