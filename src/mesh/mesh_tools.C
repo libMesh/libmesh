@@ -1934,7 +1934,7 @@ struct SyncNodeSet
 
   // ------------------------------------------------------------
   bool act_on_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> in_set)
+                    const std::vector<datum> in_set)
   {
     bool data_changed = false;
 
@@ -2012,7 +2012,7 @@ struct SyncProcIdsFromMap
 
   // ------------------------------------------------------------
   void act_on_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> proc_ids)
+                    const std::vector<datum> proc_ids)
   {
     // Set the node processor ids we've now been informed of
     for (std::size_t i=0; i != ids.size(); ++i)

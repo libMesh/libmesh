@@ -48,7 +48,7 @@ void SyncNodalPositions::gather_data (const std::vector<dof_id_type> & ids,
 
 
 void SyncNodalPositions::act_on_data (const std::vector<dof_id_type> & ids,
-                                      std::vector<datum> & data) const
+                                      const std::vector<datum> & data) const
 {
   for (std::size_t i=0; i<ids.size(); ++i)
     {

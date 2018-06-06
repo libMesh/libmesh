@@ -124,10 +124,15 @@ private:
 inline Status wait (Request & r) { return r.wait(); }
 
 /**
- * Wait for a non-blocking send or receive to finish
+ * Wait for all non-blocking operations to finish
  */
-inline void wait (std::vector<Request> & r)
-{ for (std::size_t i=0; i<r.size(); i++) r[i].wait(); }
+void wait (std::vector<Request> & r);
+
+/**
+ * Wait for at least one non-blocking operation to finish.  Return the
+ * index of the request which completed.
+ */
+std::size_t waitany (std::vector<Request> & r);
 
 
 } // namespace Parallel

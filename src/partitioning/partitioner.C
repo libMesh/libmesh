@@ -597,7 +597,7 @@ struct SyncLocalIDs
   map_type & id_map;
 
   void gather_data (const std::vector<dof_id_type> & ids,
-                    std::vector<datum> & local_ids)
+                    std::vector<datum> & local_ids) const
   {
     local_ids.resize(ids.size());
 
