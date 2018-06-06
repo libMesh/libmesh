@@ -231,7 +231,7 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/error_estimation/kelly_error_estimator.C \
 	src/error_estimation/patch_recovery_error_estimator.C \
 	src/error_estimation/uniform_refinement_estimator.C \
-	src/error_estimation/weighted_patch_recovery_estimator.C \
+	src/error_estimation/weighted_patch_recovery_error_estimator.C \
 	src/fe/fe.C src/fe/fe_abstract.C src/fe/fe_base.C \
 	src/fe/fe_bernstein.C src/fe/fe_bernstein_shape_0D.C \
 	src/fe/fe_bernstein_shape_1D.C src/fe/fe_bernstein_shape_2D.C \
@@ -528,7 +528,7 @@ am__objects_1 = src/base/libmesh_dbg_la-default_coupling.lo \
 	src/error_estimation/libmesh_dbg_la-kelly_error_estimator.lo \
 	src/error_estimation/libmesh_dbg_la-patch_recovery_error_estimator.lo \
 	src/error_estimation/libmesh_dbg_la-uniform_refinement_estimator.lo \
-	src/error_estimation/libmesh_dbg_la-weighted_patch_recovery_estimator.lo \
+	src/error_estimation/libmesh_dbg_la-weighted_patch_recovery_error_estimator.lo \
 	src/fe/libmesh_dbg_la-fe.lo \
 	src/fe/libmesh_dbg_la-fe_abstract.lo \
 	src/fe/libmesh_dbg_la-fe_base.lo \
@@ -959,7 +959,7 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/error_estimation/kelly_error_estimator.C \
 	src/error_estimation/patch_recovery_error_estimator.C \
 	src/error_estimation/uniform_refinement_estimator.C \
-	src/error_estimation/weighted_patch_recovery_estimator.C \
+	src/error_estimation/weighted_patch_recovery_error_estimator.C \
 	src/fe/fe.C src/fe/fe_abstract.C src/fe/fe_base.C \
 	src/fe/fe_bernstein.C src/fe/fe_bernstein_shape_0D.C \
 	src/fe/fe_bernstein_shape_1D.C src/fe/fe_bernstein_shape_2D.C \
@@ -1255,7 +1255,7 @@ am__objects_2 = src/base/libmesh_devel_la-default_coupling.lo \
 	src/error_estimation/libmesh_devel_la-kelly_error_estimator.lo \
 	src/error_estimation/libmesh_devel_la-patch_recovery_error_estimator.lo \
 	src/error_estimation/libmesh_devel_la-uniform_refinement_estimator.lo \
-	src/error_estimation/libmesh_devel_la-weighted_patch_recovery_estimator.lo \
+	src/error_estimation/libmesh_devel_la-weighted_patch_recovery_error_estimator.lo \
 	src/fe/libmesh_devel_la-fe.lo \
 	src/fe/libmesh_devel_la-fe_abstract.lo \
 	src/fe/libmesh_devel_la-fe_base.lo \
@@ -1683,7 +1683,7 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/error_estimation/kelly_error_estimator.C \
 	src/error_estimation/patch_recovery_error_estimator.C \
 	src/error_estimation/uniform_refinement_estimator.C \
-	src/error_estimation/weighted_patch_recovery_estimator.C \
+	src/error_estimation/weighted_patch_recovery_error_estimator.C \
 	src/fe/fe.C src/fe/fe_abstract.C src/fe/fe_base.C \
 	src/fe/fe_bernstein.C src/fe/fe_bernstein_shape_0D.C \
 	src/fe/fe_bernstein_shape_1D.C src/fe/fe_bernstein_shape_2D.C \
@@ -1979,7 +1979,7 @@ am__objects_3 = src/base/libmesh_oprof_la-default_coupling.lo \
 	src/error_estimation/libmesh_oprof_la-kelly_error_estimator.lo \
 	src/error_estimation/libmesh_oprof_la-patch_recovery_error_estimator.lo \
 	src/error_estimation/libmesh_oprof_la-uniform_refinement_estimator.lo \
-	src/error_estimation/libmesh_oprof_la-weighted_patch_recovery_estimator.lo \
+	src/error_estimation/libmesh_oprof_la-weighted_patch_recovery_error_estimator.lo \
 	src/fe/libmesh_oprof_la-fe.lo \
 	src/fe/libmesh_oprof_la-fe_abstract.lo \
 	src/fe/libmesh_oprof_la-fe_base.lo \
@@ -2407,7 +2407,7 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/error_estimation/kelly_error_estimator.C \
 	src/error_estimation/patch_recovery_error_estimator.C \
 	src/error_estimation/uniform_refinement_estimator.C \
-	src/error_estimation/weighted_patch_recovery_estimator.C \
+	src/error_estimation/weighted_patch_recovery_error_estimator.C \
 	src/fe/fe.C src/fe/fe_abstract.C src/fe/fe_base.C \
 	src/fe/fe_bernstein.C src/fe/fe_bernstein_shape_0D.C \
 	src/fe/fe_bernstein_shape_1D.C src/fe/fe_bernstein_shape_2D.C \
@@ -2703,7 +2703,7 @@ am__objects_4 = src/base/libmesh_opt_la-default_coupling.lo \
 	src/error_estimation/libmesh_opt_la-kelly_error_estimator.lo \
 	src/error_estimation/libmesh_opt_la-patch_recovery_error_estimator.lo \
 	src/error_estimation/libmesh_opt_la-uniform_refinement_estimator.lo \
-	src/error_estimation/libmesh_opt_la-weighted_patch_recovery_estimator.lo \
+	src/error_estimation/libmesh_opt_la-weighted_patch_recovery_error_estimator.lo \
 	src/fe/libmesh_opt_la-fe.lo \
 	src/fe/libmesh_opt_la-fe_abstract.lo \
 	src/fe/libmesh_opt_la-fe_base.lo \
@@ -3130,7 +3130,7 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/default_coupling.C \
 	src/error_estimation/kelly_error_estimator.C \
 	src/error_estimation/patch_recovery_error_estimator.C \
 	src/error_estimation/uniform_refinement_estimator.C \
-	src/error_estimation/weighted_patch_recovery_estimator.C \
+	src/error_estimation/weighted_patch_recovery_error_estimator.C \
 	src/fe/fe.C src/fe/fe_abstract.C src/fe/fe_base.C \
 	src/fe/fe_bernstein.C src/fe/fe_bernstein_shape_0D.C \
 	src/fe/fe_bernstein_shape_1D.C src/fe/fe_bernstein_shape_2D.C \
@@ -3426,7 +3426,7 @@ am__objects_5 = src/base/libmesh_prof_la-default_coupling.lo \
 	src/error_estimation/libmesh_prof_la-kelly_error_estimator.lo \
 	src/error_estimation/libmesh_prof_la-patch_recovery_error_estimator.lo \
 	src/error_estimation/libmesh_prof_la-uniform_refinement_estimator.lo \
-	src/error_estimation/libmesh_prof_la-weighted_patch_recovery_estimator.lo \
+	src/error_estimation/libmesh_prof_la-weighted_patch_recovery_error_estimator.lo \
 	src/fe/libmesh_prof_la-fe.lo \
 	src/fe/libmesh_prof_la-fe_abstract.lo \
 	src/fe/libmesh_prof_la-fe_base.lo \
@@ -4860,7 +4860,7 @@ libmesh_SOURCES = \
         src/error_estimation/kelly_error_estimator.C \
         src/error_estimation/patch_recovery_error_estimator.C \
         src/error_estimation/uniform_refinement_estimator.C \
-        src/error_estimation/weighted_patch_recovery_estimator.C \
+        src/error_estimation/weighted_patch_recovery_error_estimator.C \
         src/fe/fe.C \
         src/fe/fe_abstract.C \
         src/fe/fe_base.C \
@@ -5728,7 +5728,7 @@ src/error_estimation/libmesh_dbg_la-patch_recovery_error_estimator.lo:  \
 src/error_estimation/libmesh_dbg_la-uniform_refinement_estimator.lo:  \
 	src/error_estimation/$(am__dirstamp) \
 	src/error_estimation/$(DEPDIR)/$(am__dirstamp)
-src/error_estimation/libmesh_dbg_la-weighted_patch_recovery_estimator.lo:  \
+src/error_estimation/libmesh_dbg_la-weighted_patch_recovery_error_estimator.lo:  \
 	src/error_estimation/$(am__dirstamp) \
 	src/error_estimation/$(DEPDIR)/$(am__dirstamp)
 src/fe/$(am__dirstamp):
@@ -6849,7 +6849,7 @@ src/error_estimation/libmesh_devel_la-patch_recovery_error_estimator.lo:  \
 src/error_estimation/libmesh_devel_la-uniform_refinement_estimator.lo:  \
 	src/error_estimation/$(am__dirstamp) \
 	src/error_estimation/$(DEPDIR)/$(am__dirstamp)
-src/error_estimation/libmesh_devel_la-weighted_patch_recovery_estimator.lo:  \
+src/error_estimation/libmesh_devel_la-weighted_patch_recovery_error_estimator.lo:  \
 	src/error_estimation/$(am__dirstamp) \
 	src/error_estimation/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_devel_la-fe.lo: src/fe/$(am__dirstamp) \
@@ -7896,7 +7896,7 @@ src/error_estimation/libmesh_oprof_la-patch_recovery_error_estimator.lo:  \
 src/error_estimation/libmesh_oprof_la-uniform_refinement_estimator.lo:  \
 	src/error_estimation/$(am__dirstamp) \
 	src/error_estimation/$(DEPDIR)/$(am__dirstamp)
-src/error_estimation/libmesh_oprof_la-weighted_patch_recovery_estimator.lo:  \
+src/error_estimation/libmesh_oprof_la-weighted_patch_recovery_error_estimator.lo:  \
 	src/error_estimation/$(am__dirstamp) \
 	src/error_estimation/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_oprof_la-fe.lo: src/fe/$(am__dirstamp) \
@@ -8943,7 +8943,7 @@ src/error_estimation/libmesh_opt_la-patch_recovery_error_estimator.lo:  \
 src/error_estimation/libmesh_opt_la-uniform_refinement_estimator.lo:  \
 	src/error_estimation/$(am__dirstamp) \
 	src/error_estimation/$(DEPDIR)/$(am__dirstamp)
-src/error_estimation/libmesh_opt_la-weighted_patch_recovery_estimator.lo:  \
+src/error_estimation/libmesh_opt_la-weighted_patch_recovery_error_estimator.lo:  \
 	src/error_estimation/$(am__dirstamp) \
 	src/error_estimation/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_opt_la-fe.lo: src/fe/$(am__dirstamp) \
@@ -9986,7 +9986,7 @@ src/error_estimation/libmesh_prof_la-patch_recovery_error_estimator.lo:  \
 src/error_estimation/libmesh_prof_la-uniform_refinement_estimator.lo:  \
 	src/error_estimation/$(am__dirstamp) \
 	src/error_estimation/$(DEPDIR)/$(am__dirstamp)
-src/error_estimation/libmesh_prof_la-weighted_patch_recovery_estimator.lo:  \
+src/error_estimation/libmesh_prof_la-weighted_patch_recovery_error_estimator.lo:  \
 	src/error_estimation/$(am__dirstamp) \
 	src/error_estimation/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_prof_la-fe.lo: src/fe/$(am__dirstamp) \
@@ -11608,7 +11608,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_dbg_la-kelly_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_dbg_la-patch_recovery_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_dbg_la-uniform_refinement_estimator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_dbg_la-weighted_patch_recovery_estimator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_dbg_la-weighted_patch_recovery_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_devel_la-adjoint_refinement_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_devel_la-adjoint_residual_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_devel_la-discontinuity_measure.Plo@am__quote@
@@ -11623,7 +11623,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_devel_la-kelly_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_devel_la-patch_recovery_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_devel_la-uniform_refinement_estimator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_devel_la-weighted_patch_recovery_estimator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_devel_la-weighted_patch_recovery_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_oprof_la-adjoint_refinement_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_oprof_la-adjoint_residual_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_oprof_la-discontinuity_measure.Plo@am__quote@
@@ -11638,7 +11638,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_oprof_la-kelly_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_oprof_la-patch_recovery_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_oprof_la-uniform_refinement_estimator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_oprof_la-weighted_patch_recovery_estimator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_oprof_la-weighted_patch_recovery_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_opt_la-adjoint_refinement_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_opt_la-adjoint_residual_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_opt_la-discontinuity_measure.Plo@am__quote@
@@ -11653,7 +11653,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_opt_la-kelly_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_opt_la-patch_recovery_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_opt_la-uniform_refinement_estimator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_opt_la-weighted_patch_recovery_estimator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_opt_la-weighted_patch_recovery_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_prof_la-adjoint_refinement_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_prof_la-adjoint_residual_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_prof_la-discontinuity_measure.Plo@am__quote@
@@ -11668,7 +11668,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_prof_la-kelly_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_prof_la-patch_recovery_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_prof_la-uniform_refinement_estimator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_prof_la-weighted_patch_recovery_estimator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/error_estimation/$(DEPDIR)/libmesh_prof_la-weighted_patch_recovery_error_estimator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_dbg_la-fe.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_dbg_la-fe_abstract.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_dbg_la-fe_base.Plo@am__quote@
@@ -13882,12 +13882,12 @@ src/error_estimation/libmesh_dbg_la-uniform_refinement_estimator.lo: src/error_e
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/error_estimation/libmesh_dbg_la-uniform_refinement_estimator.lo `test -f 'src/error_estimation/uniform_refinement_estimator.C' || echo '$(srcdir)/'`src/error_estimation/uniform_refinement_estimator.C
 
-src/error_estimation/libmesh_dbg_la-weighted_patch_recovery_estimator.lo: src/error_estimation/weighted_patch_recovery_estimator.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/error_estimation/libmesh_dbg_la-weighted_patch_recovery_estimator.lo -MD -MP -MF src/error_estimation/$(DEPDIR)/libmesh_dbg_la-weighted_patch_recovery_estimator.Tpo -c -o src/error_estimation/libmesh_dbg_la-weighted_patch_recovery_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_estimator.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/error_estimation/$(DEPDIR)/libmesh_dbg_la-weighted_patch_recovery_estimator.Tpo src/error_estimation/$(DEPDIR)/libmesh_dbg_la-weighted_patch_recovery_estimator.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/error_estimation/weighted_patch_recovery_estimator.C' object='src/error_estimation/libmesh_dbg_la-weighted_patch_recovery_estimator.lo' libtool=yes @AMDEPBACKSLASH@
+src/error_estimation/libmesh_dbg_la-weighted_patch_recovery_error_estimator.lo: src/error_estimation/weighted_patch_recovery_error_estimator.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/error_estimation/libmesh_dbg_la-weighted_patch_recovery_error_estimator.lo -MD -MP -MF src/error_estimation/$(DEPDIR)/libmesh_dbg_la-weighted_patch_recovery_error_estimator.Tpo -c -o src/error_estimation/libmesh_dbg_la-weighted_patch_recovery_error_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_error_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_error_estimator.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/error_estimation/$(DEPDIR)/libmesh_dbg_la-weighted_patch_recovery_error_estimator.Tpo src/error_estimation/$(DEPDIR)/libmesh_dbg_la-weighted_patch_recovery_error_estimator.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/error_estimation/weighted_patch_recovery_error_estimator.C' object='src/error_estimation/libmesh_dbg_la-weighted_patch_recovery_error_estimator.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/error_estimation/libmesh_dbg_la-weighted_patch_recovery_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_estimator.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/error_estimation/libmesh_dbg_la-weighted_patch_recovery_error_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_error_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_error_estimator.C
 
 src/fe/libmesh_dbg_la-fe.lo: src/fe/fe.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/fe/libmesh_dbg_la-fe.lo -MD -MP -MF src/fe/$(DEPDIR)/libmesh_dbg_la-fe.Tpo -c -o src/fe/libmesh_dbg_la-fe.lo `test -f 'src/fe/fe.C' || echo '$(srcdir)/'`src/fe/fe.C
@@ -16857,12 +16857,12 @@ src/error_estimation/libmesh_devel_la-uniform_refinement_estimator.lo: src/error
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/error_estimation/libmesh_devel_la-uniform_refinement_estimator.lo `test -f 'src/error_estimation/uniform_refinement_estimator.C' || echo '$(srcdir)/'`src/error_estimation/uniform_refinement_estimator.C
 
-src/error_estimation/libmesh_devel_la-weighted_patch_recovery_estimator.lo: src/error_estimation/weighted_patch_recovery_estimator.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/error_estimation/libmesh_devel_la-weighted_patch_recovery_estimator.lo -MD -MP -MF src/error_estimation/$(DEPDIR)/libmesh_devel_la-weighted_patch_recovery_estimator.Tpo -c -o src/error_estimation/libmesh_devel_la-weighted_patch_recovery_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_estimator.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/error_estimation/$(DEPDIR)/libmesh_devel_la-weighted_patch_recovery_estimator.Tpo src/error_estimation/$(DEPDIR)/libmesh_devel_la-weighted_patch_recovery_estimator.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/error_estimation/weighted_patch_recovery_estimator.C' object='src/error_estimation/libmesh_devel_la-weighted_patch_recovery_estimator.lo' libtool=yes @AMDEPBACKSLASH@
+src/error_estimation/libmesh_devel_la-weighted_patch_recovery_error_estimator.lo: src/error_estimation/weighted_patch_recovery_error_estimator.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/error_estimation/libmesh_devel_la-weighted_patch_recovery_error_estimator.lo -MD -MP -MF src/error_estimation/$(DEPDIR)/libmesh_devel_la-weighted_patch_recovery_error_estimator.Tpo -c -o src/error_estimation/libmesh_devel_la-weighted_patch_recovery_error_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_error_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_error_estimator.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/error_estimation/$(DEPDIR)/libmesh_devel_la-weighted_patch_recovery_error_estimator.Tpo src/error_estimation/$(DEPDIR)/libmesh_devel_la-weighted_patch_recovery_error_estimator.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/error_estimation/weighted_patch_recovery_error_estimator.C' object='src/error_estimation/libmesh_devel_la-weighted_patch_recovery_error_estimator.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/error_estimation/libmesh_devel_la-weighted_patch_recovery_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_estimator.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/error_estimation/libmesh_devel_la-weighted_patch_recovery_error_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_error_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_error_estimator.C
 
 src/fe/libmesh_devel_la-fe.lo: src/fe/fe.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/fe/libmesh_devel_la-fe.lo -MD -MP -MF src/fe/$(DEPDIR)/libmesh_devel_la-fe.Tpo -c -o src/fe/libmesh_devel_la-fe.lo `test -f 'src/fe/fe.C' || echo '$(srcdir)/'`src/fe/fe.C
@@ -19832,12 +19832,12 @@ src/error_estimation/libmesh_oprof_la-uniform_refinement_estimator.lo: src/error
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/error_estimation/libmesh_oprof_la-uniform_refinement_estimator.lo `test -f 'src/error_estimation/uniform_refinement_estimator.C' || echo '$(srcdir)/'`src/error_estimation/uniform_refinement_estimator.C
 
-src/error_estimation/libmesh_oprof_la-weighted_patch_recovery_estimator.lo: src/error_estimation/weighted_patch_recovery_estimator.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/error_estimation/libmesh_oprof_la-weighted_patch_recovery_estimator.lo -MD -MP -MF src/error_estimation/$(DEPDIR)/libmesh_oprof_la-weighted_patch_recovery_estimator.Tpo -c -o src/error_estimation/libmesh_oprof_la-weighted_patch_recovery_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_estimator.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/error_estimation/$(DEPDIR)/libmesh_oprof_la-weighted_patch_recovery_estimator.Tpo src/error_estimation/$(DEPDIR)/libmesh_oprof_la-weighted_patch_recovery_estimator.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/error_estimation/weighted_patch_recovery_estimator.C' object='src/error_estimation/libmesh_oprof_la-weighted_patch_recovery_estimator.lo' libtool=yes @AMDEPBACKSLASH@
+src/error_estimation/libmesh_oprof_la-weighted_patch_recovery_error_estimator.lo: src/error_estimation/weighted_patch_recovery_error_estimator.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/error_estimation/libmesh_oprof_la-weighted_patch_recovery_error_estimator.lo -MD -MP -MF src/error_estimation/$(DEPDIR)/libmesh_oprof_la-weighted_patch_recovery_error_estimator.Tpo -c -o src/error_estimation/libmesh_oprof_la-weighted_patch_recovery_error_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_error_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_error_estimator.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/error_estimation/$(DEPDIR)/libmesh_oprof_la-weighted_patch_recovery_error_estimator.Tpo src/error_estimation/$(DEPDIR)/libmesh_oprof_la-weighted_patch_recovery_error_estimator.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/error_estimation/weighted_patch_recovery_error_estimator.C' object='src/error_estimation/libmesh_oprof_la-weighted_patch_recovery_error_estimator.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/error_estimation/libmesh_oprof_la-weighted_patch_recovery_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_estimator.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/error_estimation/libmesh_oprof_la-weighted_patch_recovery_error_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_error_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_error_estimator.C
 
 src/fe/libmesh_oprof_la-fe.lo: src/fe/fe.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/fe/libmesh_oprof_la-fe.lo -MD -MP -MF src/fe/$(DEPDIR)/libmesh_oprof_la-fe.Tpo -c -o src/fe/libmesh_oprof_la-fe.lo `test -f 'src/fe/fe.C' || echo '$(srcdir)/'`src/fe/fe.C
@@ -22807,12 +22807,12 @@ src/error_estimation/libmesh_opt_la-uniform_refinement_estimator.lo: src/error_e
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/error_estimation/libmesh_opt_la-uniform_refinement_estimator.lo `test -f 'src/error_estimation/uniform_refinement_estimator.C' || echo '$(srcdir)/'`src/error_estimation/uniform_refinement_estimator.C
 
-src/error_estimation/libmesh_opt_la-weighted_patch_recovery_estimator.lo: src/error_estimation/weighted_patch_recovery_estimator.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/error_estimation/libmesh_opt_la-weighted_patch_recovery_estimator.lo -MD -MP -MF src/error_estimation/$(DEPDIR)/libmesh_opt_la-weighted_patch_recovery_estimator.Tpo -c -o src/error_estimation/libmesh_opt_la-weighted_patch_recovery_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_estimator.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/error_estimation/$(DEPDIR)/libmesh_opt_la-weighted_patch_recovery_estimator.Tpo src/error_estimation/$(DEPDIR)/libmesh_opt_la-weighted_patch_recovery_estimator.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/error_estimation/weighted_patch_recovery_estimator.C' object='src/error_estimation/libmesh_opt_la-weighted_patch_recovery_estimator.lo' libtool=yes @AMDEPBACKSLASH@
+src/error_estimation/libmesh_opt_la-weighted_patch_recovery_error_estimator.lo: src/error_estimation/weighted_patch_recovery_error_estimator.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/error_estimation/libmesh_opt_la-weighted_patch_recovery_error_estimator.lo -MD -MP -MF src/error_estimation/$(DEPDIR)/libmesh_opt_la-weighted_patch_recovery_error_estimator.Tpo -c -o src/error_estimation/libmesh_opt_la-weighted_patch_recovery_error_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_error_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_error_estimator.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/error_estimation/$(DEPDIR)/libmesh_opt_la-weighted_patch_recovery_error_estimator.Tpo src/error_estimation/$(DEPDIR)/libmesh_opt_la-weighted_patch_recovery_error_estimator.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/error_estimation/weighted_patch_recovery_error_estimator.C' object='src/error_estimation/libmesh_opt_la-weighted_patch_recovery_error_estimator.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/error_estimation/libmesh_opt_la-weighted_patch_recovery_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_estimator.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/error_estimation/libmesh_opt_la-weighted_patch_recovery_error_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_error_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_error_estimator.C
 
 src/fe/libmesh_opt_la-fe.lo: src/fe/fe.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/fe/libmesh_opt_la-fe.lo -MD -MP -MF src/fe/$(DEPDIR)/libmesh_opt_la-fe.Tpo -c -o src/fe/libmesh_opt_la-fe.lo `test -f 'src/fe/fe.C' || echo '$(srcdir)/'`src/fe/fe.C
@@ -25782,12 +25782,12 @@ src/error_estimation/libmesh_prof_la-uniform_refinement_estimator.lo: src/error_
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/error_estimation/libmesh_prof_la-uniform_refinement_estimator.lo `test -f 'src/error_estimation/uniform_refinement_estimator.C' || echo '$(srcdir)/'`src/error_estimation/uniform_refinement_estimator.C
 
-src/error_estimation/libmesh_prof_la-weighted_patch_recovery_estimator.lo: src/error_estimation/weighted_patch_recovery_estimator.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/error_estimation/libmesh_prof_la-weighted_patch_recovery_estimator.lo -MD -MP -MF src/error_estimation/$(DEPDIR)/libmesh_prof_la-weighted_patch_recovery_estimator.Tpo -c -o src/error_estimation/libmesh_prof_la-weighted_patch_recovery_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_estimator.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/error_estimation/$(DEPDIR)/libmesh_prof_la-weighted_patch_recovery_estimator.Tpo src/error_estimation/$(DEPDIR)/libmesh_prof_la-weighted_patch_recovery_estimator.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/error_estimation/weighted_patch_recovery_estimator.C' object='src/error_estimation/libmesh_prof_la-weighted_patch_recovery_estimator.lo' libtool=yes @AMDEPBACKSLASH@
+src/error_estimation/libmesh_prof_la-weighted_patch_recovery_error_estimator.lo: src/error_estimation/weighted_patch_recovery_error_estimator.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/error_estimation/libmesh_prof_la-weighted_patch_recovery_error_estimator.lo -MD -MP -MF src/error_estimation/$(DEPDIR)/libmesh_prof_la-weighted_patch_recovery_error_estimator.Tpo -c -o src/error_estimation/libmesh_prof_la-weighted_patch_recovery_error_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_error_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_error_estimator.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/error_estimation/$(DEPDIR)/libmesh_prof_la-weighted_patch_recovery_error_estimator.Tpo src/error_estimation/$(DEPDIR)/libmesh_prof_la-weighted_patch_recovery_error_estimator.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/error_estimation/weighted_patch_recovery_error_estimator.C' object='src/error_estimation/libmesh_prof_la-weighted_patch_recovery_error_estimator.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/error_estimation/libmesh_prof_la-weighted_patch_recovery_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_estimator.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/error_estimation/libmesh_prof_la-weighted_patch_recovery_error_estimator.lo `test -f 'src/error_estimation/weighted_patch_recovery_error_estimator.C' || echo '$(srcdir)/'`src/error_estimation/weighted_patch_recovery_error_estimator.C
 
 src/fe/libmesh_prof_la-fe.lo: src/fe/fe.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/fe/libmesh_prof_la-fe.lo -MD -MP -MF src/fe/$(DEPDIR)/libmesh_prof_la-fe.Tpo -c -o src/fe/libmesh_prof_la-fe.lo `test -f 'src/fe/fe.C' || echo '$(srcdir)/'`src/fe/fe.C
