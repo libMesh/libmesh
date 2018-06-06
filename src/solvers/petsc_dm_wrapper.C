@@ -169,6 +169,10 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
   MeshBase & mesh = system.get_mesh();   // Convenience
   MeshRefinement mesh_refinement(mesh); // Used for swapping between grids
 
+  // Theres no need for these code paths while traversing the hierarchy
+  mesh.allow_renumbering(false);
+  mesh.partitioner() = NULL;
+
   // First walk over the active local elements and see how many maximum MG levels we can construct
   unsigned int n_levels = 0;
   for ( auto & elem : mesh.active_local_element_ptr_range() )
@@ -253,10 +257,8 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
       CHKERRABORT(system.comm().get(), ierr);
 
       // Uniformly coarsen if not the coarsest grid and distribute dof info.
-      // We dont repartition because we are assuming an initially load balanced grid
       if ( level != 1 )
         {
-          mesh.partitioner() = NULL;
           START_LOG ("PDM_coarsen", "PetscDMWrapper");
           mesh_refinement.uniformly_coarsen(1);
           STOP_LOG  ("PDM_coarsen", "PetscDMWrapper");
@@ -362,8 +364,6 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
       // Move to next grid to make next projection
       if ( i != n_levels - 1 )
         {
-          mesh.partitioner() = NULL;
-
           START_LOG ("PDM_refine", "PetscDMWrapper");
           mesh_refinement.uniformly_refine(1);
           STOP_LOG  ("PDM_refine", "PetscDMWrapper");
