@@ -69,6 +69,17 @@ public:
   ReplicatedMesh (const ReplicatedMesh & other_mesh);
 
   /**
+   * Move-constructor.
+   */
+  ReplicatedMesh(ReplicatedMesh &&) = default;
+
+  /**
+   * Copy and move assignment are not allowed.
+   */
+  ReplicatedMesh & operator= (const ReplicatedMesh &) = delete;
+  ReplicatedMesh & operator= (ReplicatedMesh &&) = delete;
+
+  /**
    * Virtual copy-constructor, creates a copy of this mesh
    */
   virtual std::unique_ptr<MeshBase> clone () const override

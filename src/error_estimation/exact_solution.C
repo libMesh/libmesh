@@ -66,9 +66,8 @@ ExactSolution::ExactSolution(const EquationSystems & es) :
 }
 
 
-ExactSolution::~ExactSolution()
-{
-}
+ExactSolution::ExactSolution(ExactSolution &&) = default;
+ExactSolution::~ExactSolution() = default;
 
 
 void ExactSolution::attach_reference_solution (const EquationSystems * es_fine)
