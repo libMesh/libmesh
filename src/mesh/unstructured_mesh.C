@@ -65,10 +65,11 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 {
   LOG_SCOPE("copy_nodes_and_elements()", "UnstructuredMesh");
 
-  // We expect to have at least as many processors as the other mesh
-  // is partitioned into, so that our partitioning will still be
-  // consistent afterwards.
-  libmesh_assert_greater_equal (_n_parts, other_mesh._n_parts);
+  // If we are partitioned into fewer parts than the incoming mesh,
+  // then we need to "wrap" the other Mesh's processor ids to fit
+  // within our range. This can happen, for example, while stitching
+  // ReplicatedMeshes with small numbers of elements in parallel...
+  bool wrap_proc_ids = (_n_parts < other_mesh._n_parts);
 
   // We're assuming our subclass data needs no copy
   libmesh_assert_equal_to (_is_prepared, other_mesh._is_prepared);
@@ -88,12 +89,16 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
 
     for (const auto & oldn : other_mesh.node_ptr_range())
       {
+        processor_id_type added_pid =
+          wrap_proc_ids ? oldn->processor_id() % _n_parts : oldn->processor_id();
+
         // Add new nodes in old node Point locations
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
         Node * newn =
 #endif
-          this->add_point(*oldn, oldn->id() + node_id_offset,
-                          oldn->processor_id());
+          this->add_point(*oldn,
+                          oldn->id() + node_id_offset,
+                          added_pid);
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
         newn->set_unique_id() =
@@ -155,8 +160,8 @@ void UnstructuredMesh::copy_nodes_and_elements(const UnstructuredMesh & other_me
           el->set_node(i) =
             this->node_ptr(old->node_id(i) + node_id_offset);
 
-        // And start it off in the same subdomain
-        el->processor_id() = old->processor_id();
+        // And start it off with the same processor id (mod _n_parts).
+        el->processor_id() = (wrap_proc_ids ? old->processor_id() % _n_parts : old->processor_id());
 
         // Give it the same element and unique ids
         el->set_id(old->id() + element_id_offset);
