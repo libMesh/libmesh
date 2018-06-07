@@ -35,6 +35,8 @@
 #include "libmesh/getpot.h"
 #include "libmesh/parallel.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/enum_eigen_solver_type.h"
+
 // For creating a directory
 #include <sys/types.h>
 #include <sys/stat.h>
