@@ -2945,6 +2945,10 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
   bool unexpanded_set_nonempty = !unexpanded_nodes.empty();
   this->comm().max(unexpanded_set_nonempty);
 
+  // We may be receiving packed_range sends out of order with
+  // parallel_sync tags, so make sure they're received correctly.
+  Parallel::MessageTag range_tag = this->comm().get_unique_tag(14142);
+
   while (unexpanded_set_nonempty)
     {
       // Let's make sure we don't lose sync in this loop.
@@ -2954,8 +2958,8 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
       Node_RCSet node_request_set;
 
       // Request sets to send to each processor
-      std::vector<std::vector<dof_id_type>>
-        requested_node_ids(this->n_processors());
+      std::map<processor_id_type, std::vector<dof_id_type>>
+        requested_node_ids;
 
       // And the sizes of each
       std::vector<dof_id_type>
@@ -2991,60 +2995,57 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
         }
 
       for (processor_id_type p = 0; p != this->n_processors(); ++p)
-        requested_node_ids[p].reserve(node_ids_on_proc[p]);
+        if (node_ids_on_proc[p])
+          requested_node_ids[p].reserve(node_ids_on_proc[p]);
 
       // Prepare each processor's request set
       for (const auto & node : node_request_set)
         requested_node_ids[node->processor_id()].push_back(node->id());
 
-      // Now request constraint rows from other processors
-      for (processor_id_type p=1; p != this->n_processors(); ++p)
+      typedef std::vector<std::pair<dof_id_type, Real>> row_datum;
+
+      // We may need to send nodes ahead of data about them
+      std::vector<Parallel::Request> packed_range_sends;
+
+      auto node_row_gather_functor =
+        [this,
+         & mesh,
+         & packed_range_sends,
+         & range_tag]
+        (processor_id_type pid,
+         const std::vector<dof_id_type> & ids,
+         std::vector<row_datum> & data)
         {
-          // Trade my requests with processor procup and procdown
-          processor_id_type procup =
-            cast_int<processor_id_type>((this->processor_id() + p) %
-                                        this->n_processors());
-          processor_id_type procdown =
-            cast_int<processor_id_type>((this->n_processors() +
-                                         this->processor_id() - p) %
-                                        this->n_processors());
-          std::vector<dof_id_type> node_request_to_fill;
-
-          this->comm().send_receive(procup, requested_node_ids[procup],
-                                    procdown, node_request_to_fill);
-
-          // Fill those requests
-          std::vector<std::vector<dof_id_type>>
-            node_row_keys(node_request_to_fill.size());
-          std::vector<std::vector<Real>>
-            node_row_vals(node_request_to_fill.size());
-          std::vector<Point>
-            node_row_rhss(node_request_to_fill.size());
+          // Do we need to keep track of requested nodes to send
+          // later?
+          const bool dist_mesh = !mesh.is_serial();
 
           // FIXME - this could be an unordered set, given a
           // hash<pointers> specialization
           std::set<const Node *> nodes_requested;
 
-          for (std::size_t i=0; i != node_request_to_fill.size(); ++i)
+          // Fill those requests
+          const std::size_t query_size = ids.size();
+
+          data.resize(query_size);
+          for (std::size_t i=0; i != query_size; ++i)
             {
-              dof_id_type constrained_id = node_request_to_fill[i];
+              dof_id_type constrained_id = ids[i];
               const Node * constrained_node = mesh.node_ptr(constrained_id);
               if (_node_constraints.count(constrained_node))
                 {
                   const NodeConstraintRow & row = _node_constraints[constrained_node].first;
                   std::size_t row_size = row.size();
-                  node_row_keys[i].reserve(row_size);
-                  node_row_vals[i].reserve(row_size);
+                  data[i].reserve(row_size);
                   for (const auto & j : row)
                     {
                       const Node * node = j.first;
-                      node_row_keys[i].push_back(node->id());
-                      node_row_vals[i].push_back(j.second);
+                      data[i].push_back(std::make_pair(node->id(), j.second));
 
                       // If we're not sure whether our send
                       // destination already has this node, let's give
                       // it a copy.
-                      if (node->processor_id() != procdown)
+                      if (node->processor_id() != pid && dist_mesh)
                         nodes_requested.insert(node);
 
                       // We can have 0 nodal constraint
@@ -3053,56 +3054,140 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
                       // might.
                       // libmesh_assert(j.second);
                     }
-                  node_row_rhss[i] = _node_constraints[constrained_node].second;
+                }
+              else
+                {
+                  // We have to distinguish "constraint with no
+                  // constraining nodes" (e.g. due to user node
+                  // constraint equations) from "no constraint".
+                  // We'll use invalid_id for the latter.
+                  data[i].push_back
+                    (std::make_pair(DofObject::invalid_id, Real(0)));
                 }
             }
 
-          // Trade back the results
-          std::vector<std::vector<dof_id_type>> node_filled_keys;
-          std::vector<std::vector<Real>> node_filled_vals;
-          std::vector<Point> node_filled_rhss;
-
-          this->comm().send_receive(procdown, node_row_keys,
-                                    procup, node_filled_keys);
-          this->comm().send_receive(procdown, node_row_vals,
-                                    procup, node_filled_vals);
-          this->comm().send_receive(procdown, node_row_rhss,
-                                    procup, node_filled_rhss);
-
-          // Constraining nodes might not even exist on our subset of
-          // a distributed mesh, so let's make them exist.
-          if (!mesh.is_serial())
-            this->comm().send_receive_packed_range
-              (procdown, &mesh, nodes_requested.begin(), nodes_requested.end(),
-               procup,   &mesh, mesh_inserter_iterator<Node>(mesh),
-               (Node**)libmesh_nullptr);
-
-          libmesh_assert_equal_to (node_filled_keys.size(), requested_node_ids[procup].size());
-          libmesh_assert_equal_to (node_filled_vals.size(), requested_node_ids[procup].size());
-          libmesh_assert_equal_to (node_filled_rhss.size(), requested_node_ids[procup].size());
-
-          for (std::size_t i=0; i != requested_node_ids[procup].size(); ++i)
+          // Constraining nodes might not even exist on our
+          // correspondant's subset of a distributed mesh, so let's
+          // make them exist.
+          if (dist_mesh)
             {
-              libmesh_assert_equal_to (node_filled_keys[i].size(), node_filled_vals[i].size());
-              if (!node_filled_keys[i].empty())
+              packed_range_sends.push_back(Parallel::Request());
+              this->comm().send_packed_range
+                (pid, &mesh, nodes_requested.begin(), nodes_requested.end(),
+                 packed_range_sends.back(), range_tag);
+            }
+        };
+
+      typedef Point node_rhs_datum;
+
+      auto node_rhs_gather_functor =
+        [this,
+         & mesh]
+        (processor_id_type,
+         const std::vector<dof_id_type> & ids,
+         std::vector<node_rhs_datum> & data)
+        {
+          // Fill those requests
+          const std::size_t query_size = ids.size();
+
+          data.resize(query_size);
+          for (std::size_t i=0; i != query_size; ++i)
+            {
+              dof_id_type constrained_id = ids[i];
+              const Node * constrained_node = mesh.node_ptr(constrained_id);
+              if (_node_constraints.count(constrained_node))
+                data[i] = _node_constraints[constrained_node].second;
+              else
+                data[i](0) = std::numeric_limits<Real>::quiet_NaN();
+            }
+        };
+
+      auto node_row_action_functor =
+        [this,
+         & mesh,
+         & range_tag,
+         & unexpanded_nodes]
+        (processor_id_type pid,
+         const std::vector<dof_id_type> & ids,
+         const std::vector<row_datum> & data)
+        {
+          // Before we act on any new constraint rows, we may need to
+          // make sure we have all the nodes involved!
+          if (!mesh.is_serial())
+            this->comm().receive_packed_range
+              (pid, &mesh, mesh_inserter_iterator<Node>(mesh),
+               (Node**)libmesh_nullptr, range_tag);
+
+          // Add any new constraint rows we've found
+          const std::size_t query_size = ids.size();
+
+          for (std::size_t i=0; i != query_size; ++i)
+            {
+              const dof_id_type constrained_id = ids[i];
+
+              // An empty row is an constraint with an empty row; for
+              // no constraint we use a "no row" placeholder
+              if (data[i].empty())
                 {
-                  dof_id_type constrained_id = requested_node_ids[procup][i];
                   const Node * constrained_node = mesh.node_ptr(constrained_id);
                   NodeConstraintRow & row = _node_constraints[constrained_node].first;
-                  for (std::size_t j = 0; j != node_filled_keys[i].size(); ++j)
+                  row.clear();
+                }
+              else if (data[i][0].first != DofObject::invalid_id)
+                {
+                  const Node * constrained_node = mesh.node_ptr(constrained_id);
+                  NodeConstraintRow & row = _node_constraints[constrained_node].first;
+                  row.clear();
+                  for (auto & pair : data[i])
                     {
                       const Node * key_node =
-                        mesh.node_ptr(node_filled_keys[i][j]);
+                        mesh.node_ptr(pair.first);
                       libmesh_assert(key_node);
-                      row[key_node] = node_filled_vals[i][j];
+                      row[key_node] = pair.second;
                     }
-                  _node_constraints[constrained_node].second = node_filled_rhss[i];
 
                   // And prepare to check for more recursive constraints
                   unexpanded_nodes.insert(constrained_node);
                 }
             }
-        }
+        };
+
+      auto node_rhs_action_functor =
+        [this,
+         & mesh]
+        (processor_id_type,
+         const std::vector<dof_id_type> & ids,
+         const std::vector<node_rhs_datum> & data)
+        {
+          // Add rhs data for any new node constraint rows we've found
+          const std::size_t query_size = ids.size();
+
+          for (std::size_t i=0; i != query_size; ++i)
+            {
+              dof_id_type constrained_id = ids[i];
+              const Node * constrained_node = mesh.node_ptr(constrained_id);
+              NodeConstraintRow & row = _node_constraints[constrained_node].first;
+
+              if (!libmesh_isnan(data[i](0)))
+                _node_constraints[constrained_node].second = data[i];
+              else
+                _node_constraints.erase(constrained_node);
+            }
+        };
+
+      // Now request node constraint rows from other processors
+      row_datum * node_row_ex = libmesh_nullptr;
+      Parallel::pull_parallel_vector_data
+        (this->comm(), requested_node_ids, node_row_gather_functor,
+         node_row_action_functor, node_row_ex);
+
+      // And request node constraint right hand sides from other procesors
+      node_rhs_datum * node_rhs_ex = libmesh_nullptr;
+      Parallel::pull_parallel_vector_data
+        (this->comm(), requested_node_ids, node_rhs_gather_functor,
+         node_rhs_action_functor, node_rhs_ex);
+
+      Parallel::wait(packed_range_sends);
 
       // We have to keep recursing while the unexpanded set is
       // nonempty on *any* processor
