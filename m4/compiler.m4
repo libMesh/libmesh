@@ -274,7 +274,7 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
   dnl Portland Group C++?
   AS_IF([test "x$compiler_brand_detected" = "xno"],
         [
-          is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
+          is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group\|PGI'`"
           AS_IF([test "x$is_pgcc" != "x"],
           [
             AC_MSG_RESULT(<<< C++ compiler is Portland Group C++ >>>)
