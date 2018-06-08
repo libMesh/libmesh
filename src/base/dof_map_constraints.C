@@ -3166,7 +3166,6 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
             {
               dof_id_type constrained_id = ids[i];
               const Node * constrained_node = mesh.node_ptr(constrained_id);
-              NodeConstraintRow & row = _node_constraints[constrained_node].first;
 
               if (!libmesh_isnan(data[i](0)))
                 _node_constraints[constrained_node].second = data[i];
