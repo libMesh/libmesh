@@ -543,6 +543,9 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
                                 CFLAGS_OPT="-O2"
                                 CFLAGS_DEVEL="$CFLAGS_DBG"
 
+                                dnl The -g flag is all OProfile needs to produce annotations
+                                OPROFILE_FLAGS="-g"
+
                                 dnl Disable exception handling if we dont use it
                                 AS_IF([test "$enableexceptions" = no],
                                       [
