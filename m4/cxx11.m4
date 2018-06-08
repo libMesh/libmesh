@@ -3,48 +3,6 @@ dnl Tests for various C++11 features.  These will probably only work
 dnl if they are run after the autoconf test that sets -std=c++11.
 dnl ----------------------------------------------------------------
 
-AC_DEFUN([LIBMESH_TEST_CXX11_MOVE],
-  [
-    have_cxx11_move=no
-
-    AC_MSG_CHECKING(for C++11 std::move support)
-    AC_LANG_PUSH([C++])
-
-    # For this and all of the C++ standards tests: Save the original
-    # CXXFLAGS (if any) before appending the $switch determined by
-    # AX_CXX_COMPILE_STDCXX_11, and any compiler flags specified by
-    # the user in the libmesh_CXXFLAGS environment variable, letting
-    # that override everything else.
-    old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
-
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-    @%:@include <utility>
-    template <class T>
-    void move_swap(T& a, T& b)
-    {
-      T tmp(std::move(a));
-      a = std::move(b);
-      b = std::move(tmp);
-    }
-    ]], [[
-        int one = 1, two = 2;
-        move_swap(one,two);
-    ]])],[
-        AC_MSG_RESULT(yes)
-        AC_DEFINE(HAVE_CXX11_MOVE, 1, [Flag indicating whether compiler supports std::move])
-        have_cxx11_move=yes
-    ],[
-        AC_MSG_RESULT(no)
-    ])
-
-    # Reset the flags
-    CXXFLAGS="$old_CXXFLAGS"
-    AC_LANG_POP([C++])
-
-    AM_CONDITIONAL(HAVE_CXX11_MOVE, test x$have_cxx11_move == xyes)
-  ])
-
 dnl Test C++11 std::tuple and several related helper functions.
 AC_DEFUN([LIBMESH_TEST_CXX11_TUPLE],
   [
@@ -1206,6 +1164,40 @@ AC_DEFUN([LIBMESH_TEST_CXX11_DELETED_FUNCTIONS],
   ])
 
 
+AC_DEFUN([LIBMESH_TEST_CXX11_DEFAULTED_FUNCTIONS],
+  [
+    have_cxx11_defaulted_functions=no
+
+    AC_MSG_CHECKING(for C++11 defaulted functions support)
+    AC_LANG_PUSH([C++])
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    class Foo
+    {
+      Foo(const Foo &) = default;
+      ~Foo();
+    };
+    Foo::~Foo() = default;
+    ]], [[
+    ]])],[
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_CXX11_DEFAULTED_FUNCTIONS, 1, [Flag indicating whether compiler supports defaulted functions])
+        have_cxx11_defaulted_functions=yes
+    ],[
+      AC_MSG_RESULT(no)
+    ])
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
+
+    AM_CONDITIONAL(HAVE_CXX11_DEFAULTED_FUNCTIONS, test x$have_cxx11_defaulted_functions == xyes)
+  ])
+
+
 AC_DEFUN([LIBMESH_TEST_CXX11_FINAL],
   [
     have_cxx11_final=no
@@ -1453,45 +1445,4 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TO_STRING],
     AC_LANG_POP([C++])
 
     AM_CONDITIONAL(HAVE_CXX11_TO_STRING, test x$have_cxx11_to_string == xyes)
-  ])
-
-
-
-AC_DEFUN([LIBMESH_TEST_CXX11_NOEXCEPT],
-  [
-    have_cxx11_noexcept=no
-
-    AC_MSG_CHECKING(for C++11 noexcept support)
-    AC_LANG_PUSH([C++])
-
-    old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
-
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-      @%:@include <stdexcept>
-
-      class MyException : public std::exception
-      {
-      public:
-        virtual const char * what() const noexcept
-        {
-          return "MyException description";
-        }
-      };
-    ]], [[
-      throw MyException();
-      return 0;
-    ]])],[
-        AC_MSG_RESULT(yes)
-        AC_DEFINE(HAVE_CXX11_NOEXCEPT, 1, [Flag indicating whether compiler supports noexcept])
-        have_cxx11_noexcept=yes
-    ],[
-      AC_MSG_RESULT(no)
-    ])
-
-    # Reset the flags
-    CXXFLAGS="$old_CXXFLAGS"
-    AC_LANG_POP([C++])
-
-    AM_CONDITIONAL(HAVE_CXX11_NOEXCEPT, test x$have_cxx11_noexcept == xyes)
   ])
