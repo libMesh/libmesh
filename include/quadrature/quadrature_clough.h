@@ -41,15 +41,20 @@ public:
   /**
    * Constructor.  Declares the order of the quadrature rule.
    */
-  QClough (const unsigned int _dim,
-           const Order _order=INVALID_ORDER) :
-    QBase(_dim, _order)
+  QClough (unsigned int dim,
+           Order order=INVALID_ORDER) :
+    QBase(dim, order)
   {}
 
   /**
-   * Destructor.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this simple class.
    */
-  ~QClough() {}
+  QClough (const QClough &) = default;
+  QClough (QClough &&) = default;
+  QClough & operator= (const QClough &) = default;
+  QClough & operator= (QClough &&) = default;
+  virtual ~QClough() = default;
 
   /**
    * \returns \p QCLOUGH.

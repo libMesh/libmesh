@@ -51,15 +51,20 @@ public:
   /**
    * Constructor.  Declares the order of the quadrature rule.
    */
-  QGrid (const unsigned int _dim,
-         const Order _order=INVALID_ORDER) :
-    QBase(_dim, _order)
+  QGrid (unsigned int dim,
+         Order order=INVALID_ORDER) :
+    QBase(dim, order)
   {}
 
   /**
-   * Destructor.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this simple class.
    */
-  ~QGrid() {}
+  QGrid (const QGrid &) = default;
+  QGrid (QGrid &&) = default;
+  QGrid & operator= (const QGrid &) = default;
+  QGrid & operator= (QGrid &&) = default;
+  virtual ~QGrid() = default;
 
   /**
    * \returns \p QGRID.

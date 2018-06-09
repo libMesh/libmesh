@@ -62,13 +62,20 @@ public:
   /**
    * Constructor.  Declares the order of the quadrature rule.
    */
-  QMonomial (const unsigned int _dim,
-             const Order _order=INVALID_ORDER);
+  QMonomial (unsigned int dim,
+             Order order=INVALID_ORDER) :
+    QBase(dim,order)
+  {}
 
   /**
-   * Destructor.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this simple class.
    */
-  ~QMonomial();
+  QMonomial (const QMonomial &) = default;
+  QMonomial (QMonomial &&) = default;
+  QMonomial & operator= (const QMonomial &) = default;
+  QMonomial & operator= (QMonomial &&) = default;
+  virtual ~QMonomial() = default;
 
   /**
    * \returns \p QMONOMIAL.

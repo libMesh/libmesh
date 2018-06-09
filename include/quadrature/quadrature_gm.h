@@ -100,13 +100,20 @@ public:
   /**
    * Constructor.  Declares the order of the quadrature rule.
    */
-  QGrundmann_Moller (const unsigned int _dim,
-                     const Order _order=INVALID_ORDER);
+  QGrundmann_Moller (unsigned int dim,
+                     Order order=INVALID_ORDER) :
+    QBase(dim,order)
+  {}
 
   /**
-   * Destructor.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this simple class.
    */
-  ~QGrundmann_Moller();
+  QGrundmann_Moller (const QGrundmann_Moller &) = default;
+  QGrundmann_Moller (QGrundmann_Moller &&) = default;
+  QGrundmann_Moller & operator= (const QGrundmann_Moller &) = default;
+  QGrundmann_Moller & operator= (QGrundmann_Moller &&) = default;
+  virtual ~QGrundmann_Moller() = default;
 
   /**
    * \returns \p QGRUNDMANN_MOLLER.

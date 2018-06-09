@@ -29,18 +29,6 @@ namespace libMesh
 // quadrature_monomial_3D.C
 // for implementation of specific element types.
 
-// Constructor
-QMonomial::QMonomial(const unsigned int d,
-                     const Order o) : QBase(d,o)
-{
-}
-
-
-// Destructor
-QMonomial::~QMonomial()
-{
-}
-
 QuadratureType QMonomial::type() const
 {
   return QMONOMIAL;

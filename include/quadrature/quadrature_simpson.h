@@ -49,18 +49,23 @@ public:
    * to be smart and return, thinking it had already done the work.
    */
   explicit
-  QSimpson (const unsigned int _dim,
-            const Order o=THIRD) :
-    QBase(_dim, o)
+  QSimpson (unsigned int dim,
+            Order order=THIRD) :
+    QBase(dim, order)
   {
     if (_dim == 1)
       init(EDGE2);
   }
 
   /**
-   * Destructor. Empty.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this simple class.
    */
-  ~QSimpson() {}
+  QSimpson (const QSimpson &) = default;
+  QSimpson (QSimpson &&) = default;
+  QSimpson & operator= (const QSimpson &) = default;
+  QSimpson & operator= (QSimpson &&) = default;
+  virtual ~QSimpson() = default;
 
   /**
    * \returns \p QSIMPSON.

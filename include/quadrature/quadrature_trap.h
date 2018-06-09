@@ -49,18 +49,23 @@ public:
    * to be smart and return, thinking it had already done the work.
    */
   explicit
-  QTrap (const unsigned int _dim,
-         const Order o=FIRST) :
-    QBase(_dim,o)
+  QTrap (unsigned int dim,
+         Order order=FIRST) :
+    QBase(dim,order)
   {
     if (_dim == 1)
       init(EDGE2);
   }
 
   /**
-   * Destructor. Empty.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this simple class.
    */
-  ~QTrap() {}
+  QTrap (const QTrap &) = default;
+  QTrap (QTrap &&) = default;
+  QTrap & operator= (const QTrap &) = default;
+  QTrap & operator= (QTrap &&) = default;
+  virtual ~QTrap() = default;
 
   /**
    * \returns \p QTRAP.

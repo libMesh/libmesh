@@ -30,24 +30,6 @@ namespace libMesh
 // quadrature_conical_3D.C
 // for additional implementation.
 
-
-
-
-// Constructor
-QConical::QConical(const unsigned int d,
-                   const Order o) : QBase(d,o)
-{
-}
-
-
-
-// Destructor
-QConical::~QConical()
-{
-}
-
-
-
 QuadratureType QConical::type() const
 {
   return QCONICAL;

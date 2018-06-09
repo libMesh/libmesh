@@ -67,15 +67,20 @@ protected:
    * Constructor. Protected to prevent instantiation of this base
    * class.  Use the build() method instead.
    */
-  QBase (const unsigned int _dim,
-         const Order _order=INVALID_ORDER);
+  QBase (unsigned int dim,
+         Order order=INVALID_ORDER);
 
 public:
 
   /**
-   * Destructor.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this simple class.
    */
-  virtual ~QBase() {}
+  QBase (const QBase &) = default;
+  QBase (QBase &&) = default;
+  QBase & operator= (const QBase &) = default;
+  QBase & operator= (QBase &&) = default;
+  virtual ~QBase() = default;
 
   /**
    * \returns The quadrature type in derived classes.
@@ -317,13 +322,13 @@ protected:
   /**
    * The spatial dimension of the quadrature rule.
    */
-  const unsigned int _dim;
+  unsigned int _dim;
 
   /**
    * The polynomial order which the quadrature rule is capable of
    * integrating exactly.
    */
-  const Order _order;
+  Order _order;
 
   /**
    * The type of element for which the current values have been
@@ -356,8 +361,8 @@ protected:
 // QBase class members
 
 inline
-QBase::QBase(const unsigned int d,
-             const Order o) :
+QBase::QBase(unsigned int d,
+             Order o) :
   allow_rules_with_negative_weights(true),
   _dim(d),
   _order(o),

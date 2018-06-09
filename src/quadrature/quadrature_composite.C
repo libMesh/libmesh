@@ -33,8 +33,8 @@ namespace libMesh
 
 
 template <class QSubCell>
-QComposite<QSubCell>::QComposite(const unsigned int d,
-                                 const Order o) :
+QComposite<QSubCell>::QComposite(unsigned int d,
+                                 Order o) :
   QSubCell(d,o), // explicitly call base class constructor
   _q_subcell(d,o),
   _lagrange_fe(FEBase::build (d, FEType (FIRST, LAGRANGE)))
@@ -51,12 +51,6 @@ QComposite<QSubCell>::QComposite(const unsigned int d,
 
   _lagrange_fe->attach_quadrature_rule (&_q_subcell);
 }
-
-
-
-template <class QSubCell>
-QComposite<QSubCell>::~QComposite()
-{}
 
 
 
