@@ -28,20 +28,6 @@ namespace libMesh
 // quadrature_gm_3D.C
 // for additional implementation.
 
-// Constructor
-QGrundmann_Moller::QGrundmann_Moller(const unsigned int d,
-                                     const Order o) : QBase(d,o)
-{
-}
-
-
-// Destructor
-QGrundmann_Moller::~QGrundmann_Moller()
-{
-}
-
-
-
 QuadratureType QGrundmann_Moller::type() const
 {
   return QGRUNDMANN_MOLLER;

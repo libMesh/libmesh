@@ -47,13 +47,20 @@ public:
   /**
    * Constructor.  Declares the order of the quadrature rule.
    */
-  QConical (const unsigned int _dim,
-            const Order _order=INVALID_ORDER);
+  QConical (unsigned int d,
+            Order o=INVALID_ORDER) :
+    QBase(d,o)
+  {}
 
   /**
-   * Destructor.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this simple class.
    */
-  ~QConical();
+  QConical (const QConical &) = default;
+  QConical (QConical &&) = default;
+  QConical & operator= (const QConical &) = default;
+  QConical & operator= (QConical &&) = default;
+  virtual ~QConical() = default;
 
   /**
    * \returns The QuadratureType for this class.

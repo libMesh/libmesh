@@ -64,13 +64,18 @@ public:
   /**
    * Constructor.  Declares the order of the quadrature rule.
    */
-  QComposite (const unsigned int _dim,
-              const Order _order=INVALID_ORDER);
+  QComposite (unsigned int dim,
+              Order order=INVALID_ORDER);
 
   /**
-   * Destructor.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this simple class.
    */
-  ~QComposite();
+  QComposite (const QComposite &) = default;
+  QComposite (QComposite &&) = default;
+  QComposite & operator= (const QComposite &) = default;
+  QComposite & operator= (QComposite &&) = default;
+  virtual ~QComposite() = default;
 
   /**
    * \returns \p QCOMPOSITE.

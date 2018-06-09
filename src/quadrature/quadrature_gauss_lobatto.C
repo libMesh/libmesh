@@ -43,12 +43,6 @@ QGaussLobatto::QGaussLobatto(const unsigned int d,
 }
 
 
-
-QGaussLobatto::~QGaussLobatto()
-{
-}
-
-
 QuadratureType QGaussLobatto::type() const
 {
   return QGAUSS_LOBATTO;

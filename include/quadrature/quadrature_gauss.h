@@ -49,8 +49,8 @@ public:
    * however if we called the function with INVALID_ELEM it would try
    * to be smart and return, thinking it had already done the work.
    */
-  QGauss (const unsigned int _dim,
-          const Order _order=INVALID_ORDER) :
+  QGauss (unsigned int _dim,
+          Order _order=INVALID_ORDER) :
     QBase(_dim, _order)
   {
     if (_dim == 1)
@@ -58,9 +58,14 @@ public:
   }
 
   /**
-   * Destructor.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this simple class.
    */
-  ~QGauss() {}
+  QGauss (const QGauss &) = default;
+  QGauss (QGauss &&) = default;
+  QGauss & operator= (const QGauss &) = default;
+  QGauss & operator= (QGauss &&) = default;
+  virtual ~QGauss() = default;
 
   /**
    * \returns \p QGAUSS.
