@@ -58,9 +58,18 @@ public:
   DiscontinuityMeasure();
 
   /**
-   * Destructor.
+   * This class cannot be (default) copy constructed/assigned because
+   * its base class has unique_ptr members.
    */
-  ~DiscontinuityMeasure() {}
+  DiscontinuityMeasure (const DiscontinuityMeasure &) = delete;
+  DiscontinuityMeasure & operator= (const DiscontinuityMeasure &) = delete;
+
+  /**
+   * Defaulted move ctor, move assignment operator, and destructor.
+   */
+  DiscontinuityMeasure (DiscontinuityMeasure &&) = default;
+  DiscontinuityMeasure & operator= (DiscontinuityMeasure &&) = default;
+  virtual ~DiscontinuityMeasure() = default;
 
   /**
    * Register a user function to use in computing the essential BCs.

@@ -78,10 +78,19 @@ public:
   }
 
   /**
-   * Destructor.
+   * This class cannot be (default) copy constructed/assigned because
+   * it has unique_ptr members. Explicitly deleting these functions is
+   * the best way to document this fact.
    */
-  virtual ~HPCoarsenTest() {}
+  HPCoarsenTest (const HPCoarsenTest &) = delete;
+  HPCoarsenTest & operator= (const HPCoarsenTest &) = delete;
 
+  /**
+   * Defaulted move ctor, move assignment operator, and destructor.
+   */
+  HPCoarsenTest (HPCoarsenTest &&) = default;
+  HPCoarsenTest & operator= (HPCoarsenTest &&) = default;
+  virtual ~HPCoarsenTest() = default;
 
   /**
    * This pure virtual function must be redefined

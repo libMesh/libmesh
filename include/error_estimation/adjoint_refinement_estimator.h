@@ -38,7 +38,7 @@ namespace libMesh
 {
 
 /**
- * This class implements a ``brute force'' goal-oriented error
+ * This class implements a "brute force" goal-oriented error
  * estimator which computes an estimate of error in a quantity of
  * interest based on the residual of the current coarse grid primal
  * solution as weighted against an adjoint solution on a uniformly
@@ -57,9 +57,14 @@ public:
   AdjointRefinementEstimator();
 
   /**
-   * Destructor.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this class.
    */
-  ~AdjointRefinementEstimator() {}
+  AdjointRefinementEstimator (const AdjointRefinementEstimator &) = default;
+  AdjointRefinementEstimator (AdjointRefinementEstimator &&) = default;
+  AdjointRefinementEstimator & operator= (const AdjointRefinementEstimator &) = default;
+  AdjointRefinementEstimator & operator= (AdjointRefinementEstimator &&) = default;
+  virtual ~AdjointRefinementEstimator() = default;
 
   /**
    * Access to the QoISet (default: weight all QoIs equally) to use

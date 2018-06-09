@@ -68,9 +68,18 @@ public:
   KellyErrorEstimator();
 
   /**
-   * Destructor.
+   * This class cannot be (default) copy constructed/assigned because
+   * its base class has unique_ptr members.
    */
-  ~KellyErrorEstimator() {}
+  KellyErrorEstimator (const KellyErrorEstimator &) = delete;
+  KellyErrorEstimator & operator= (const KellyErrorEstimator &) = delete;
+
+  /**
+   * Defaulted move ctor, move assignment operator, and destructor.
+   */
+  KellyErrorEstimator (KellyErrorEstimator &&) = default;
+  KellyErrorEstimator & operator= (KellyErrorEstimator &&) = default;
+  virtual ~KellyErrorEstimator() = default;
 
   /**
    * Register a user function to use in computing the flux BCs.

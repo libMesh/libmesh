@@ -59,10 +59,14 @@ public:
   }
 
   /**
-   * Destructor.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this simple class.
    */
-  virtual ~HPSingularity () {}
-
+  HPSingularity (const HPSingularity &) = default;
+  HPSingularity (HPSingularity &&) = default;
+  HPSingularity & operator= (const HPSingularity &) = default;
+  HPSingularity & operator= (HPSingularity &&) = default;
+  virtual ~HPSingularity() = default;
 
   /**
    * This pure virtual function must be redefined

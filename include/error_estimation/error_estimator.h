@@ -69,14 +69,17 @@ public:
    * Constructor.  Empty.  Derived classes should reset error_norm as
    * appropriate.
    */
-  ErrorEstimator() :
-    error_norm()
-  {}
+  ErrorEstimator() = default;
 
   /**
-   * Destructor.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this simple class.
    */
-  virtual ~ErrorEstimator() {}
+  ErrorEstimator (const ErrorEstimator &) = default;
+  ErrorEstimator (ErrorEstimator &&) = default;
+  ErrorEstimator & operator= (const ErrorEstimator &) = default;
+  ErrorEstimator & operator= (ErrorEstimator &&) = default;
+  virtual ~ErrorEstimator() = default;
 
 
   /**

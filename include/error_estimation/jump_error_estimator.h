@@ -63,10 +63,19 @@ public:
       coarse_error(0) {}
 
   /**
-   * Destructor.
+   * This class cannot be (default) copy constructed/assigned because
+   * it has unique_ptr members. Explicitly deleting these functions is
+   * the best way to document this fact.
    */
-  virtual ~JumpErrorEstimator() {}
+  JumpErrorEstimator (const JumpErrorEstimator &) = delete;
+  JumpErrorEstimator & operator= (const JumpErrorEstimator &) = delete;
 
+  /**
+   * Defaulted move ctor, move assignment operator, and destructor.
+   */
+  JumpErrorEstimator (JumpErrorEstimator &&) = default;
+  JumpErrorEstimator & operator= (JumpErrorEstimator &&) = default;
+  virtual ~JumpErrorEstimator() = default;
 
   /**
    * This function uses the derived class's jump error

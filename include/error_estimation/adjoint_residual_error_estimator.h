@@ -57,9 +57,19 @@ public:
   AdjointResidualErrorEstimator();
 
   /**
-   * Destructor.
+   * This class cannot be (default) copy constructed/assigned because
+   * it has unique_ptr members. Explicitly deleting these functions is
+   * the best way to document this fact.
    */
-  ~AdjointResidualErrorEstimator() {}
+  AdjointResidualErrorEstimator (const AdjointResidualErrorEstimator &) = delete;
+  AdjointResidualErrorEstimator & operator= (const AdjointResidualErrorEstimator &) = delete;
+
+  /**
+   * Defaulted move ctor, move assignment operator, and destructor.
+   */
+  AdjointResidualErrorEstimator (AdjointResidualErrorEstimator &&) = default;
+  AdjointResidualErrorEstimator & operator= (AdjointResidualErrorEstimator &&) = default;
+  virtual ~AdjointResidualErrorEstimator() = default;
 
   /**
    * Access to the "subestimator" (default: PatchRecovery) to use on
