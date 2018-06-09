@@ -94,12 +94,6 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> & norms,
     }
 }
 
-SystemNorm::SystemNorm(const SystemNorm & s) :
-  _norms(s._norms), _weights(s._weights), _weights_sq(s._weights_sq)
-{
-}
-
-
 bool SystemNorm::is_discrete() const
 {
   libmesh_assert (!_norms.empty());
