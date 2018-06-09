@@ -92,6 +92,25 @@ public:
   MeshBase (const MeshBase & other_mesh);
 
   /**
+   * Move-constructor - this function is defaulted out-of-line (in the
+   * C file) to play nicely with our forward declarations.
+   */
+  MeshBase(MeshBase &&);
+
+  /**
+   * Copy and move assignment are not allowed because MeshBase
+   * subclasses manually manage memory (Elems and Nodes) and therefore
+   * the default versions of these operators would leak memory.  Since
+   * we don't want to maintain non-default copy and move assignment
+   * operators at this time, the safest and most self-documenting
+   * approach is to delete them.
+   *
+   * If you need to copy a Mesh, use the clone() method.
+   */
+  MeshBase & operator= (const MeshBase &) = delete;
+  MeshBase & operator= (MeshBase &&) = delete;
+
+  /**
    * Virtual "copy constructor"
    */
   virtual std::unique_ptr<MeshBase> clone() const = 0;
@@ -1467,15 +1486,6 @@ protected:
    * it can create and interact with \p BoundaryMesh.
    */
   friend class BoundaryInfo;
-
-private:
-  /**
-   *  The default shallow assignment operator is a very bad idea, so
-   *  we'll make it a compile-time error to try and do it from other
-   *  classes and a link-time error to try and do it from this class.
-   *  Use clone() if necessary.
-   */
-  MeshBase & operator= (const MeshBase & other);
 };
 
 

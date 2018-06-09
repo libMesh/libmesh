@@ -93,7 +93,6 @@ protected:
 #endif
   }
 
-#ifdef LIBMESH_HAVE_CXX11_MOVE_CONSTRUCTORS
   /**
    * Move constructor, must be declared noexcept.
    */
@@ -106,7 +105,6 @@ protected:
 
 #endif
   }
-#endif
 
   /**
    * Copy assignment operator does nothing - we're copying an

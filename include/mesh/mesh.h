@@ -69,9 +69,17 @@ public:
   Mesh (const UnstructuredMesh & other_mesh) : DefaultMesh(other_mesh) {}
 
   /**
-   * Destructor.
+   * Default copy/move constructors and destructor.
    */
-  ~Mesh() {}
+  Mesh(const Mesh &) = default;
+  Mesh(Mesh &&) = default;
+  ~Mesh() = default;
+
+  /**
+   * Copy and move assignment are not allowed.
+   */
+  Mesh & operator= (const Mesh &) = delete;
+  Mesh & operator= (Mesh &&) = delete;
 };
 
 

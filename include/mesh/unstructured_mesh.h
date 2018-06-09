@@ -59,6 +59,22 @@ public:
                     unsigned char dim=1);
 
   /**
+   * UnstructuredMesh uses a defaulted copy constructor.
+   */
+  UnstructuredMesh(const UnstructuredMesh &) = default;
+
+  /**
+   * Move-constructor.
+   */
+  UnstructuredMesh(UnstructuredMesh &&) = default;
+
+  /**
+   * Copy and move assignment are not allowed.
+   */
+  UnstructuredMesh & operator= (const UnstructuredMesh &) = delete;
+  UnstructuredMesh & operator= (UnstructuredMesh &&) = delete;
+
+  /**
    * Destructor.
    */
   virtual ~UnstructuredMesh();

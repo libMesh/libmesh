@@ -73,6 +73,17 @@ public:
   DistributedMesh (const DistributedMesh & other_mesh);
 
   /**
+   * Move-constructor.
+   */
+  DistributedMesh(DistributedMesh &&) = default;
+
+  /**
+   * Copy and move assignment are not allowed.
+   */
+  DistributedMesh & operator= (const DistributedMesh &) = delete;
+  DistributedMesh & operator= (DistributedMesh &&) = delete;
+
+  /**
    * Virtual copy-constructor, creates a copy of this mesh
    */
   virtual std::unique_ptr<MeshBase> clone () const override

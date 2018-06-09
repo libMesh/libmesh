@@ -234,6 +234,9 @@
 /* Flag indicating whether compiler supports decltype */
 #undef HAVE_CXX11_DECLTYPE
 
+/* Flag indicating whether compiler supports defaulted functions */
+#undef HAVE_CXX11_DEFAULTED_FUNCTIONS
+
 /* Flag indicating whether compiler supports f() = delete; */
 #undef HAVE_CXX11_DELETED_FUNCTIONS
 
@@ -280,14 +283,8 @@
    */
 #undef HAVE_CXX11_MAKE_UNIQUE_WORKAROUND
 
-/* Flag indicating whether compiler supports std::move */
-#undef HAVE_CXX11_MOVE
-
 /* Flag indicating whether compiler supports move construction */
 #undef HAVE_CXX11_MOVE_CONSTRUCTORS
-
-/* Flag indicating whether compiler supports noexcept */
-#undef HAVE_CXX11_NOEXCEPT
 
 /* Flag indicating whether compiler supports nullptr */
 #undef HAVE_CXX11_NULLPTR

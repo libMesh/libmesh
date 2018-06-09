@@ -110,6 +110,10 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 
 
 
+MeshBase::MeshBase(MeshBase &&) = default;
+
+
+
 MeshBase::~MeshBase()
 {
   this->clear();
@@ -265,7 +269,8 @@ void MeshBase::clear ()
   _is_prepared = false;
 
   // Clear boundary information
-  this->get_boundary_info().clear();
+  if (boundary_info)
+    boundary_info->clear();
 
   // Clear element dimensions
   _elem_dims.clear();

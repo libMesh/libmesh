@@ -240,12 +240,22 @@ LIBMESH_TEST_CXX11_OVERRIDE
 AS_IF([test "x$have_cxx11_override" != "xyes"],
       [AC_MSG_ERROR([libMesh requires C++11 compiler support the override keyword])])
 
+LIBMESH_TEST_CXX11_MOVE_CONSTRUCTORS
+AS_IF([test "x$have_cxx11_move_constructors" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 move constructor support])])
+
+LIBMESH_TEST_CXX11_DELETED_FUNCTIONS
+AS_IF([test "x$have_cxx11_deleted_functions" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 deleted function support])])
+
+LIBMESH_TEST_CXX11_DEFAULTED_FUNCTIONS
+AS_IF([test "x$have_cxx11_defaulted_functions" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires C++11 defaulted function support])])
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
 # --------------------------------------------------------------
-LIBMESH_TEST_CXX11_MOVE
-LIBMESH_TEST_CXX11_MOVE_CONSTRUCTORS
 LIBMESH_TEST_CXX11_DECLTYPE
 LIBMESH_TEST_CXX11_RVALUE_REFERENCES
 LIBMESH_TEST_CXX11_CONSTEXPR
@@ -258,11 +268,9 @@ LIBMESH_TEST_CXX11_THREAD
 LIBMESH_TEST_CXX11_CONDITION_VARIABLE
 LIBMESH_TEST_CXX11_TYPE_TRAITS
 LIBMESH_TEST_CXX11_MATH_FUNCS
-LIBMESH_TEST_CXX11_DELETED_FUNCTIONS
 LIBMESH_TEST_CXX11_FINAL
 LIBMESH_TEST_CXX11_NULLPTR
 LIBMESH_TEST_CXX11_TO_STRING
-LIBMESH_TEST_CXX11_NOEXCEPT
 LIBMESH_TEST_CXX17_FALLTHROUGH_ATTRIBUTE
 
 #-----------------------------------------------------
