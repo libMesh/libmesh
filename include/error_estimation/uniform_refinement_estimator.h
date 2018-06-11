@@ -52,10 +52,14 @@ public:
   UniformRefinementEstimator();
 
   /**
-   * Destructor.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this simple class.
    */
-  ~UniformRefinementEstimator() {}
-
+  UniformRefinementEstimator (const UniformRefinementEstimator &) = default;
+  UniformRefinementEstimator (UniformRefinementEstimator &&) = default;
+  UniformRefinementEstimator & operator= (const UniformRefinementEstimator &) = default;
+  UniformRefinementEstimator & operator= (UniformRefinementEstimator &&) = default;
+  virtual ~UniformRefinementEstimator() = default;
 
   /**
    * This function does uniform refinements and a

@@ -64,10 +64,14 @@ public:
   PatchRecoveryErrorEstimator();
 
   /**
-   * Destructor.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this class.
    */
-  ~PatchRecoveryErrorEstimator() {}
-
+  PatchRecoveryErrorEstimator (const PatchRecoveryErrorEstimator &) = default;
+  PatchRecoveryErrorEstimator (PatchRecoveryErrorEstimator &&) = default;
+  PatchRecoveryErrorEstimator & operator= (const PatchRecoveryErrorEstimator &) = default;
+  PatchRecoveryErrorEstimator & operator= (PatchRecoveryErrorEstimator &&) = default;
+  virtual ~PatchRecoveryErrorEstimator() = default;
 
   /**
    * This function uses the Patch Recovery error

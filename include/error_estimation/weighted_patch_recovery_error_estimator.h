@@ -54,14 +54,17 @@ public:
    * seminorms should be supported now.  W1,p and W2,p norms would
    * be natural to support if any contributors make the effort.
    */
-  WeightedPatchRecoveryErrorEstimator() :
-    PatchRecoveryErrorEstimator()
-  {}
+  WeightedPatchRecoveryErrorEstimator() = default;
 
   /**
-   * Destructor.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this class.
    */
-  ~WeightedPatchRecoveryErrorEstimator() {}
+  WeightedPatchRecoveryErrorEstimator (const WeightedPatchRecoveryErrorEstimator &) = default;
+  WeightedPatchRecoveryErrorEstimator (WeightedPatchRecoveryErrorEstimator &&) = default;
+  WeightedPatchRecoveryErrorEstimator & operator= (const WeightedPatchRecoveryErrorEstimator &) = default;
+  WeightedPatchRecoveryErrorEstimator & operator= (WeightedPatchRecoveryErrorEstimator &&) = default;
+  virtual ~WeightedPatchRecoveryErrorEstimator() = default;
 
   /**
    * This function uses the Patch Recovery error
@@ -75,9 +78,9 @@ public:
                                bool estimate_parent_error = false) override;
 
   /**
-     Vector of fem function base pointers, the user will fill this in
-     with pointers to the appropriate weight functions
-  */
+   * Vector of fem function base pointers, the user will fill this in
+   * with pointers to the appropriate weight functions.
+   */
   std::vector<FEMFunctionBase<Number> *> weight_functions;
 
   virtual ErrorEstimatorType type() const override;

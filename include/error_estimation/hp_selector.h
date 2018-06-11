@@ -52,13 +52,17 @@ public:
   /**
    * Constructor.
    */
-  HPSelector() {}
+  HPSelector() = default;
 
   /**
-   * Destructor.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this simple class.
    */
-  virtual ~HPSelector() {}
-
+  HPSelector (const HPSelector &) = default;
+  HPSelector (HPSelector &&) = default;
+  HPSelector & operator= (const HPSelector &) = default;
+  HPSelector & operator= (HPSelector &&) = default;
+  virtual ~HPSelector() = default;
 
   /**
    * This pure virtual function must be redefined

@@ -65,9 +65,19 @@ public:
   ExactErrorEstimator();
 
   /**
-   * Destructor.
+   * This class cannot be (default) copy constructed/assigned because
+   * it has containers of unique_ptrs. Explicitly deleting these functions is
+   * the best way to document this fact.
    */
-  ~ExactErrorEstimator() {}
+  ExactErrorEstimator (const ExactErrorEstimator &) = delete;
+  ExactErrorEstimator & operator= (const ExactErrorEstimator &) = delete;
+
+  /**
+   * Defaulted move ctor, move assignment operator, and destructor.
+   */
+  ExactErrorEstimator (ExactErrorEstimator &&) = default;
+  ExactErrorEstimator & operator= (ExactErrorEstimator &&) = default;
+  virtual ~ExactErrorEstimator() = default;
 
   /**
    * Clone and attach arbitrary functors which compute the exact

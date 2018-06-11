@@ -98,9 +98,14 @@ public:
              std::vector<std::vector<Real>> & weights);
 
   /**
-   * Copy Constructor
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this simple class.
    */
-  SystemNorm(const SystemNorm & s);
+  SystemNorm (const SystemNorm &) = default;
+  SystemNorm (SystemNorm &&) = default;
+  SystemNorm & operator= (const SystemNorm &) = default;
+  SystemNorm & operator= (SystemNorm &&) = default;
+  virtual ~SystemNorm() = default;
 
   /**
    * \returns \p true if this is purely a discrete norm

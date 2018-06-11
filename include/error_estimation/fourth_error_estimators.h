@@ -48,10 +48,20 @@ public:
    */
   LaplacianErrorEstimator();
 
+
   /**
-   * Destructor.
+   * This class cannot be (default) copy constructed/assigned because
+   * its base class has unique_ptr members.
    */
-  ~LaplacianErrorEstimator() {}
+  LaplacianErrorEstimator (const LaplacianErrorEstimator &) = delete;
+  LaplacianErrorEstimator & operator= (const LaplacianErrorEstimator &) = delete;
+
+  /**
+   * Defaulted move ctor, move assignment operator, and destructor.
+   */
+  LaplacianErrorEstimator (LaplacianErrorEstimator &&) = default;
+  LaplacianErrorEstimator & operator= (LaplacianErrorEstimator &&) = default;
+  virtual ~LaplacianErrorEstimator() = default;
 
   virtual ErrorEstimatorType type() const override;
 
