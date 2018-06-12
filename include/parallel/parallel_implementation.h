@@ -239,20 +239,6 @@ inline Communicator & Communicator::operator= (const communicator & comm)
   return *this;
 }
 
-// Disallowed copy constructor
-inline Communicator::Communicator (const Communicator &) :
-#ifdef LIBMESH_HAVE_MPI
-  _communicator(MPI_COMM_NULL),
-#endif
-  _rank(0),
-  _size(1),
-  _send_mode(DEFAULT),
-  used_tag_values(),
-  _I_duped_it(false)
-{
-  libmesh_not_implemented();
-}
-
 inline void Communicator::assign(const communicator & comm)
 {
   _communicator = comm;
