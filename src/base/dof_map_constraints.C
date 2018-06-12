@@ -3463,10 +3463,10 @@ void DofMap::scatter_constraints(MeshBase & mesh)
 
   std::map<processor_id_type,
           std::vector<std::vector<std::pair<dof_id_type, Real>>>>
-    pushed_keys_vals;
+    pushed_keys_vals, pushed_keys_vals_to_me;
 
   std::map<processor_id_type, std::vector<std::pair<dof_id_type, Number>>>
-    pushed_ids_rhss;
+    pushed_ids_rhss, pushed_ids_rhss_to_me;
 
   for (auto & pid_id_pair : pushed_ids)
     {
@@ -3523,9 +3523,9 @@ void DofMap::scatter_constraints(MeshBase & mesh)
   // Pack the node constraint rows and rhss to push
   std::map<processor_id_type,
           std::vector<std::vector<std::pair<dof_id_type,Real>>>>
-    pushed_node_keys_vals;
+    pushed_node_keys_vals, pushed_node_keys_vals_to_me;
   std::map<processor_id_type, std::vector<std::pair<dof_id_type, Point>>>
-    pushed_node_ids_offsets;
+    pushed_node_ids_offsets, pushed_node_ids_offsets_to_me;
   std::map<processor_id_type, std::set<const Node *>> pushed_nodes;
 
   for (auto & pid_id_pair : pushed_node_ids)
@@ -3586,26 +3586,20 @@ void DofMap::scatter_constraints(MeshBase & mesh)
                                     this->n_processors());
 
       // Trade pushed dof constraint rows
-      std::vector<std::vector<std::pair<dof_id_type,Real>>>
-        pushed_keys_vals_to_me;
-      std::vector<std::pair<dof_id_type, Number>> pushed_ids_rhss_to_me;
       this->comm().send_receive(procup, pushed_keys_vals[procup],
-                                procdown, pushed_keys_vals_to_me);
+                                procdown, pushed_keys_vals_to_me[procdown]);
       this->comm().send_receive(procup, pushed_ids_rhss[procup],
-                                procdown, pushed_ids_rhss_to_me);
+                                procdown, pushed_ids_rhss_to_me[procdown]);
       libmesh_assert_equal_to
-        (pushed_ids_rhss_to_me.size(), pushed_keys_vals_to_me.size());
+        (pushed_ids_rhss_to_me[procdown].size(),
+         pushed_keys_vals_to_me[procdown].size());
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       // Trade pushed node constraint rows
-      std::vector<std::vector<std::pair<dof_id_type,Real>>>
-        pushed_node_keys_vals_to_me;
-      std::vector<std::pair<dof_id_type, Point>>
-        pushed_node_ids_offsets_to_me;
       this->comm().send_receive(procup, pushed_node_keys_vals[procup],
-                                procdown, pushed_node_keys_vals_to_me);
+                                procdown, pushed_node_keys_vals_to_me[procdown]);
       this->comm().send_receive(procup, pushed_node_ids_offsets[procup],
-                                procdown, pushed_node_ids_offsets_to_me);
+                                procdown, pushed_node_ids_offsets_to_me[procdown]);
 
       // Constraining nodes might not even exist on our subset of
       // a distributed mesh, so let's make them exist.
@@ -3616,27 +3610,27 @@ void DofMap::scatter_constraints(MeshBase & mesh)
            (Node**)libmesh_nullptr);
 
       libmesh_assert_equal_to
-        (pushed_node_ids_offsets_to_me.size(),
-         pushed_node_keys_vals_to_me.size());
+        (pushed_node_ids_offsets_to_me[procdown].size(),
+         pushed_node_keys_vals_to_me[procdown].size());
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
       // Add the dof constraints that I've been sent
-      for (std::size_t i = 0; i != pushed_ids_rhss_to_me.size(); ++i)
+      for (std::size_t i = 0; i != pushed_ids_rhss_to_me[procdown].size(); ++i)
         {
-          dof_id_type constrained = pushed_ids_rhss_to_me[i].first;
+          dof_id_type constrained = pushed_ids_rhss_to_me[procdown][i].first;
 
           // If we don't already have a constraint for this dof,
           // add the one we were sent
           if (!this->is_constrained_dof(constrained))
             {
               DofConstraintRow & row = _dof_constraints[constrained];
-              for (auto & key_val : pushed_keys_vals_to_me[i])
+              for (auto & key_val : pushed_keys_vals_to_me[procdown][i])
                 {
                   row[key_val.first] = key_val.second;
                 }
-              if (pushed_ids_rhss_to_me[i].second != Number(0))
+              if (pushed_ids_rhss_to_me[procdown][i].second != Number(0))
                 _primal_constraint_values[constrained] =
-                  pushed_ids_rhss_to_me[i].second;
+                  pushed_ids_rhss_to_me[procdown][i].second;
               else
                 _primal_constraint_values.erase(constrained);
             }
@@ -3644,9 +3638,9 @@ void DofMap::scatter_constraints(MeshBase & mesh)
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       // Add the node constraints that I've been sent
-      for (std::size_t i = 0; i != pushed_node_ids_offsets_to_me.size(); ++i)
+      for (std::size_t i = 0; i != pushed_node_ids_offsets_to_me[procdown].size(); ++i)
         {
-          dof_id_type constrained_id = pushed_node_ids_offsets_to_me[i].first;
+          dof_id_type constrained_id = pushed_node_ids_offsets_to_me[procdown][i].first;
 
           // If we don't already have a constraint for this node,
           // add the one we were sent
@@ -3654,13 +3648,13 @@ void DofMap::scatter_constraints(MeshBase & mesh)
           if (!this->is_constrained_node(constrained))
             {
               NodeConstraintRow & row = _node_constraints[constrained].first;
-              for (auto & key_val : pushed_node_keys_vals_to_me[i])
+              for (auto & key_val : pushed_node_keys_vals_to_me[procdown][i])
                 {
                   const Node * key_node = mesh.node_ptr(key_val.first);
                   row[key_node] = key_val.second;
                 }
               _node_constraints[constrained].second =
-                pushed_node_ids_offsets_to_me[i].second;
+                pushed_node_ids_offsets_to_me[procdown][i].second;
             }
         }
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
