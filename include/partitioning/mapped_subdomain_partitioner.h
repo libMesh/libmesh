@@ -46,7 +46,17 @@ public:
   /**
    * Constructor.
    */
-  MappedSubdomainPartitioner () {}
+  MappedSubdomainPartitioner () = default;
+
+  /**
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this class.
+   */
+  MappedSubdomainPartitioner (const MappedSubdomainPartitioner &) = default;
+  MappedSubdomainPartitioner (MappedSubdomainPartitioner &&) = default;
+  MappedSubdomainPartitioner & operator= (const MappedSubdomainPartitioner &) = default;
+  MappedSubdomainPartitioner & operator= (MappedSubdomainPartitioner &&) = default;
+  virtual ~MappedSubdomainPartitioner() = default;
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.

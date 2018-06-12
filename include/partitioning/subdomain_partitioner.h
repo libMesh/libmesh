@@ -64,6 +64,21 @@ public:
   SubdomainPartitioner ();
 
   /**
+   * This class contains a unique_ptr member, so it can't be default
+   * copy constructed or assigned.
+   */
+  SubdomainPartitioner (const SubdomainPartitioner &) = delete;
+  SubdomainPartitioner & operator= (const SubdomainPartitioner &) = delete;
+
+  /**
+   * Move ctor, move assignment operator, and destructor are
+   * all explicitly defaulted for this class.
+   */
+  SubdomainPartitioner (SubdomainPartitioner &&) = default;
+  SubdomainPartitioner & operator= (SubdomainPartitioner &&) = default;
+  virtual ~SubdomainPartitioner() = default;
+
+  /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
    */
   virtual std::unique_ptr<Partitioner> clone () const override

@@ -56,9 +56,14 @@ public:
   Partitioner () : _weights(libmesh_nullptr) {}
 
   /**
-   * Destructor. Virtual so that we can derive from this class.
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this class.
    */
-  virtual ~Partitioner() {}
+  Partitioner (const Partitioner &) = default;
+  Partitioner (Partitioner &&) = default;
+  Partitioner & operator= (const Partitioner &) = default;
+  Partitioner & operator= (Partitioner &&) = default;
+  virtual ~Partitioner() = default;
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.

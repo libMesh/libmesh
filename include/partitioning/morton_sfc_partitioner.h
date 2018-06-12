@@ -47,6 +47,16 @@ public:
   }
 
   /**
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this class.
+   */
+  MortonSFCPartitioner (const MortonSFCPartitioner &) = default;
+  MortonSFCPartitioner (MortonSFCPartitioner &&) = default;
+  MortonSFCPartitioner & operator= (const MortonSFCPartitioner &) = default;
+  MortonSFCPartitioner & operator= (MortonSFCPartitioner &&) = default;
+  virtual ~MortonSFCPartitioner() = default;
+
+  /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
    */
   virtual std::unique_ptr<Partitioner> clone () const override

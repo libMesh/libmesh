@@ -68,9 +68,7 @@ ParmetisPartitioner::ParmetisPartitioner()
 
 
 
-ParmetisPartitioner::~ParmetisPartitioner()
-{
-}
+ParmetisPartitioner::~ParmetisPartitioner() = default;
 
 
 

@@ -42,7 +42,17 @@ public:
   /**
    * Constructor.
    */
-  MetisPartitioner () {}
+  MetisPartitioner () = default;
+
+  /**
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this class.
+   */
+  MetisPartitioner (const MetisPartitioner &) = default;
+  MetisPartitioner (MetisPartitioner &&) = default;
+  MetisPartitioner & operator= (const MetisPartitioner &) = default;
+  MetisPartitioner & operator= (MetisPartitioner &&) = default;
+  virtual ~MetisPartitioner() = default;
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.

@@ -44,7 +44,17 @@ public:
   /**
    * Constructor.
    */
-  LinearPartitioner () {}
+  LinearPartitioner () = default;
+
+  /**
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this class.
+   */
+  LinearPartitioner (const LinearPartitioner &) = default;
+  LinearPartitioner (LinearPartitioner &&) = default;
+  LinearPartitioner & operator= (const LinearPartitioner &) = default;
+  LinearPartitioner & operator= (LinearPartitioner &&) = default;
+  virtual ~LinearPartitioner() = default;
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
