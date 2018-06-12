@@ -25,11 +25,20 @@
 #include "libmesh/quadrature_simpson.h"
 #include "libmesh/quadrature_composite.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_quadrature_type.h"
 
 
 
 namespace libMesh
 {
+
+
+template <class QSubCell>
+QuadratureType QComposite<QSubCell>::type() const
+{
+  return QCOMPOSITE;
+}
+
 
 
 template <class QSubCell>
