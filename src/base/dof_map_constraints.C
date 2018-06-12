@@ -3427,6 +3427,10 @@ void DofMap::scatter_constraints(MeshBase & mesh)
   if (!has_constraints)
     return;
 
+  // We may be receiving packed_range sends out of order with
+  // parallel_sync tags, so make sure they're received correctly.
+  Parallel::MessageTag range_tag = this->comm().get_unique_tag(1414);
+
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   std::map<processor_id_type, std::set<dof_id_type>> pushed_node_ids;
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
@@ -3468,37 +3472,47 @@ void DofMap::scatter_constraints(MeshBase & mesh)
   std::map<processor_id_type, std::vector<std::pair<dof_id_type, Number>>>
     pushed_ids_rhss, pushed_ids_rhss_to_me;
 
-  for (auto & pid_id_pair : pushed_ids)
+  auto gather_ids =
+    [this,
+     & pushed_ids,
+     & pushed_keys_vals,
+     & pushed_ids_rhss]
+    ()
     {
-      const processor_id_type pid = pid_id_pair.first;
-      const std::set<dof_id_type>
-        & pid_ids = pid_id_pair.second;
-
-      const std::size_t ids_size = pid_ids.size();
-      std::vector<std::vector<std::pair<dof_id_type, Real>>> &
-        keys_vals = pushed_keys_vals[pid];
-      std::vector<std::pair<dof_id_type,Number>> &
-        ids_rhss = pushed_ids_rhss[pid];
-      keys_vals.resize(ids_size);
-      ids_rhss.resize(ids_size);
-
-      std::size_t push_i;
-      std::set<dof_id_type>::const_iterator it;
-      for (push_i = 0, it = pid_ids.begin();
-           it != pid_ids.end(); ++push_i, ++it)
+      for (auto & pid_id_pair : pushed_ids)
         {
-          const dof_id_type constrained = *it;
-          DofConstraintRow & row = _dof_constraints[constrained];
-          keys_vals[push_i].assign(row.begin(), row.end());
+          const processor_id_type pid = pid_id_pair.first;
+          const std::set<dof_id_type>
+            & pid_ids = pid_id_pair.second;
 
-          DofConstraintValueMap::const_iterator rhsit =
-            _primal_constraint_values.find(constrained);
-          ids_rhss[push_i].first = constrained;
-          ids_rhss[push_i].second =
-            (rhsit == _primal_constraint_values.end()) ?
-            0 : rhsit->second;
+          const std::size_t ids_size = pid_ids.size();
+          std::vector<std::vector<std::pair<dof_id_type, Real>>> &
+            keys_vals = pushed_keys_vals[pid];
+          std::vector<std::pair<dof_id_type,Number>> &
+            ids_rhss = pushed_ids_rhss[pid];
+          keys_vals.resize(ids_size);
+          ids_rhss.resize(ids_size);
+
+          std::size_t push_i;
+          std::set<dof_id_type>::const_iterator it;
+          for (push_i = 0, it = pid_ids.begin();
+               it != pid_ids.end(); ++push_i, ++it)
+            {
+              const dof_id_type constrained = *it;
+              DofConstraintRow & row = _dof_constraints[constrained];
+              keys_vals[push_i].assign(row.begin(), row.end());
+
+              DofConstraintValueMap::const_iterator rhsit =
+                _primal_constraint_values.find(constrained);
+              ids_rhss[push_i].first = constrained;
+              ids_rhss[push_i].second =
+                (rhsit == _primal_constraint_values.end()) ?
+                0 : rhsit->second;
+            }
         }
-    }
+    };
+
+  gather_ids();
 
   auto ids_rhss_action_functor =
     [& pushed_ids_rhss_to_me]
@@ -3521,6 +3535,48 @@ void DofMap::scatter_constraints(MeshBase & mesh)
     (this->comm(), pushed_ids_rhss, ids_rhss_action_functor);
   Parallel::push_parallel_vector_data
     (this->comm(), pushed_keys_vals, keys_vals_action_functor);
+
+  // Now work on traded dof constraint rows
+  auto receive_dof_constraints =
+    [this,
+     & pushed_ids_rhss_to_me,
+     & pushed_keys_vals_to_me]
+    ()
+    {
+      for (auto & pid_id_pair : pushed_ids_rhss_to_me)
+        {
+          const processor_id_type pid = pid_id_pair.first;
+          const auto & ids_rhss = pid_id_pair.second;
+          const auto & keys_vals = pushed_keys_vals_to_me[pid];
+
+          libmesh_assert_equal_to
+            (ids_rhss.size(), keys_vals.size());
+
+          // Add the dof constraints that I've been sent
+          for (std::size_t i = 0, size = ids_rhss.size(); i != size; ++i)
+            {
+              dof_id_type constrained = ids_rhss[i].first;
+
+              // If we don't already have a constraint for this dof,
+              // add the one we were sent
+              if (!this->is_constrained_dof(constrained))
+                {
+                  DofConstraintRow & row = _dof_constraints[constrained];
+                  for (auto & key_val : keys_vals[i])
+                    {
+                      row[key_val.first] = key_val.second;
+                    }
+                  if (ids_rhss[i].second != Number(0))
+                    _primal_constraint_values[constrained] =
+                      ids_rhss[i].second;
+                  else
+                    _primal_constraint_values.erase(constrained);
+                }
+            }
+        }
+    };
+
+  receive_dof_constraints();
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   // Collect the node constraints to push to each processor
@@ -3615,65 +3671,41 @@ void DofMap::scatter_constraints(MeshBase & mesh)
     (this->comm(), pushed_node_ids_offsets, node_ids_offsets_action_functor);
   Parallel::push_parallel_vector_data
     (this->comm(), pushed_node_keys_vals, node_keys_vals_action_functor);
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
-  // Now work on traded constraint rows
-  for (processor_id_type p = 0; p != this->n_processors(); ++p)
+  // Constraining nodes might not even exist on our subset of a
+  // distributed mesh, so let's make them exist.
+  std::vector<Parallel::Request> send_requests;
+  if (!mesh.is_serial())
     {
-      // Push to processor procup while receiving from procdown
-      processor_id_type procup =
-        cast_int<processor_id_type>((this->processor_id() + p) %
-                                    this->n_processors());
-      processor_id_type procdown =
-        cast_int<processor_id_type>((this->n_processors() +
-                                     this->processor_id() - p) %
-                                    this->n_processors());
+      for (auto & pid_id_pair : pushed_node_ids_offsets)
+        {
+          const processor_id_type pid = pid_id_pair.first;
+          send_requests.push_back(Parallel::Request());
+          this->comm().send_packed_range
+            (pid, &mesh,
+             pushed_nodes[pid].begin(), pushed_nodes[pid].end(),
+             send_requests.back(), range_tag);
+        }
+    }
+
+  for (auto & pid_id_pair : pushed_node_ids_offsets_to_me)
+    {
+      const processor_id_type pid = pid_id_pair.first;
+      const auto & ids_offsets = pid_id_pair.second;
+      const auto & keys_vals = pushed_node_keys_vals_to_me[pid];
 
       libmesh_assert_equal_to
-        (pushed_ids_rhss_to_me[procdown].size(),
-         pushed_keys_vals_to_me[procdown].size());
+        (ids_offsets.size(), keys_vals.size());
 
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-      // Constraining nodes might not even exist on our subset of
-      // a distributed mesh, so let's make them exist.
       if (!mesh.is_serial())
-        this->comm().send_receive_packed_range
-          (procup, &mesh, pushed_nodes[procup].begin(), pushed_nodes[procup].end(),
-           procdown, &mesh, mesh_inserter_iterator<Node>(mesh),
+        this->comm().receive_packed_range
+          (pid, &mesh, mesh_inserter_iterator<Node>(mesh),
            (Node**)libmesh_nullptr);
 
-      libmesh_assert_equal_to
-        (pushed_node_ids_offsets_to_me[procdown].size(),
-         pushed_node_keys_vals_to_me[procdown].size());
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
-
-      // Add the dof constraints that I've been sent
-      for (std::size_t i = 0; i != pushed_ids_rhss_to_me[procdown].size(); ++i)
-        {
-          dof_id_type constrained = pushed_ids_rhss_to_me[procdown][i].first;
-
-          // If we don't already have a constraint for this dof,
-          // add the one we were sent
-          if (!this->is_constrained_dof(constrained))
-            {
-              DofConstraintRow & row = _dof_constraints[constrained];
-              for (auto & key_val : pushed_keys_vals_to_me[procdown][i])
-                {
-                  row[key_val.first] = key_val.second;
-                }
-              if (pushed_ids_rhss_to_me[procdown][i].second != Number(0))
-                _primal_constraint_values[constrained] =
-                  pushed_ids_rhss_to_me[procdown][i].second;
-              else
-                _primal_constraint_values.erase(constrained);
-            }
-        }
-
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       // Add the node constraints that I've been sent
-      for (std::size_t i = 0; i != pushed_node_ids_offsets_to_me[procdown].size(); ++i)
+      for (std::size_t i = 0, size = ids_offsets.size(); i != size; ++i)
         {
-          dof_id_type constrained_id = pushed_node_ids_offsets_to_me[procdown][i].first;
+          dof_id_type constrained_id = ids_offsets[i].first;
 
           // If we don't already have a constraint for this node,
           // add the one we were sent
@@ -3681,17 +3713,20 @@ void DofMap::scatter_constraints(MeshBase & mesh)
           if (!this->is_constrained_node(constrained))
             {
               NodeConstraintRow & row = _node_constraints[constrained].first;
-              for (auto & key_val : pushed_node_keys_vals_to_me[procdown][i])
+              for (auto & key_val : keys_vals[i])
                 {
                   const Node * key_node = mesh.node_ptr(key_val.first);
                   row[key_node] = key_val.second;
                 }
               _node_constraints[constrained].second =
-                pushed_node_ids_offsets_to_me[procdown][i].second;
+                ids_offsets[i].second;
             }
         }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
     }
+
+  Parallel::wait(send_requests);
+
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   // Next we need to push constraints to processors which don't own
   // the constrained dof, don't own the constraining dof, but own an
@@ -3754,91 +3789,20 @@ void DofMap::scatter_constraints(MeshBase & mesh)
         }
     }
 
-  // One last trade of constraint rows
-  for (processor_id_type p = 0; p != this->n_processors(); ++p)
-    {
-      // Push to processor procup while receiving from procdown
-      processor_id_type procup =
-        cast_int<processor_id_type>((this->processor_id() + p) %
-                                    this->n_processors());
-      processor_id_type procdown =
-        cast_int<processor_id_type>((this->n_processors() +
-                                     this->processor_id() - p) %
-                                    this->n_processors());
+  pushed_ids_rhss.clear();
+  pushed_ids_rhss_to_me.clear();
+  pushed_keys_vals.clear();
+  pushed_keys_vals_to_me.clear();
 
-      // Pack the dof constraint rows and rhs's to push to procup
-      const std::size_t pushed_ids_size = pushed_ids.count(procup) ? pushed_ids[procup].size() : 0;
-      std::vector<std::vector<dof_id_type>> pushed_keys(pushed_ids_size);
-      std::vector<std::vector<Real>> pushed_vals(pushed_ids_size);
-      std::vector<Number> pushed_rhss(pushed_ids_size);
+  gather_ids();
 
-      // As long as we're declaring them outside the loop, let's initialize them too!
-      std::set<dof_id_type>::const_iterator pushed_ids_iter;
-      std::size_t push_i = 0;
-      if (pushed_ids_size)
-        for (pushed_ids_iter = pushed_ids[procup].begin();
-             pushed_ids_iter != pushed_ids[procup].end(); ++push_i, ++pushed_ids_iter)
-          {
-            const dof_id_type constrained = *pushed_ids_iter;
-            DofConstraintRow & row = _dof_constraints[constrained];
-            std::size_t row_size = row.size();
-            pushed_keys[push_i].reserve(row_size);
-            pushed_vals[push_i].reserve(row_size);
-            for (const auto & j : row)
-              {
-                pushed_keys[push_i].push_back(j.first);
-                pushed_vals[push_i].push_back(j.second);
-              }
+  // Trade pushed dof constraint rows
+  Parallel::push_parallel_vector_data
+    (this->comm(), pushed_ids_rhss, ids_rhss_action_functor);
+  Parallel::push_parallel_vector_data
+    (this->comm(), pushed_keys_vals, keys_vals_action_functor);
 
-            DofConstraintValueMap::const_iterator rhsit =
-              _primal_constraint_values.find(constrained);
-            pushed_rhss[push_i] = (rhsit == _primal_constraint_values.end()) ?
-              0 : rhsit->second;
-          }
-
-      // Trade pushed dof constraint rows
-      std::vector<dof_id_type> pushed_ids_from_me
-        (pushed_ids[procup].begin(), pushed_ids[procup].end());
-      std::vector<dof_id_type> pushed_ids_to_me;
-      std::vector<std::vector<dof_id_type>> pushed_keys_to_me;
-      std::vector<std::vector<Real>> pushed_vals_to_me;
-      std::vector<Number> pushed_rhss_to_me;
-      this->comm().send_receive(procup, pushed_ids_from_me,
-                                procdown, pushed_ids_to_me);
-      this->comm().send_receive(procup, pushed_keys,
-                                procdown, pushed_keys_to_me);
-      this->comm().send_receive(procup, pushed_vals,
-                                procdown, pushed_vals_to_me);
-      this->comm().send_receive(procup, pushed_rhss,
-                                procdown, pushed_rhss_to_me);
-      libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_keys_to_me.size());
-      libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_vals_to_me.size());
-      libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_rhss_to_me.size());
-
-      // Add the dof constraints that I've been sent
-      for (std::size_t i = 0; i != pushed_ids_to_me.size(); ++i)
-        {
-          libmesh_assert_equal_to (pushed_keys_to_me[i].size(), pushed_vals_to_me[i].size());
-
-          dof_id_type constrained = pushed_ids_to_me[i];
-
-          // If we don't already have a constraint for this dof,
-          // add the one we were sent
-          if (!this->is_constrained_dof(constrained))
-            {
-              DofConstraintRow & row = _dof_constraints[constrained];
-              for (std::size_t j = 0; j != pushed_keys_to_me[i].size(); ++j)
-                {
-                  row[pushed_keys_to_me[i][j]] = pushed_vals_to_me[i][j];
-                }
-
-              if (pushed_rhss_to_me[i] != Number(0))
-                _primal_constraint_values[constrained] = pushed_rhss_to_me[i];
-              else
-                _primal_constraint_values.erase(constrained);
-            }
-        }
-    }
+  receive_dof_constraints();
 
   // Finally, we need to handle the case of remote dof coupling.  If a
   // processor's element is coupled to a ghost element, then the
