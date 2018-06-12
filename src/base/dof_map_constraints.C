@@ -3500,6 +3500,28 @@ void DofMap::scatter_constraints(MeshBase & mesh)
         }
     }
 
+  auto ids_rhss_action_functor =
+    [& pushed_ids_rhss_to_me]
+    (processor_id_type pid,
+     const std::vector<std::pair<dof_id_type, Number>> & data)
+    {
+      pushed_ids_rhss_to_me[pid] = data;
+    };
+
+  auto keys_vals_action_functor =
+    [& pushed_keys_vals_to_me]
+    (processor_id_type pid,
+     const std::vector<std::vector<std::pair<dof_id_type, Real>>> & data)
+    {
+      pushed_keys_vals_to_me[pid] = data;
+    };
+
+  // Trade pushed dof constraint rows
+  Parallel::push_parallel_vector_data
+    (this->comm(), pushed_ids_rhss, ids_rhss_action_functor);
+  Parallel::push_parallel_vector_data
+    (this->comm(), pushed_keys_vals, keys_vals_action_functor);
+
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   // Collect the node constraints to push to each processor
   for (auto & i : _node_constraints)
@@ -3571,9 +3593,31 @@ void DofMap::scatter_constraints(MeshBase & mesh)
           ids_offsets[push_i].second = _node_constraints[constrained].second;
         }
     }
+
+  auto node_ids_offsets_action_functor =
+    [& pushed_node_ids_offsets_to_me]
+    (processor_id_type pid,
+     const std::vector<std::pair<dof_id_type, Point>> & data)
+    {
+      pushed_node_ids_offsets_to_me[pid] = data;
+    };
+
+  auto node_keys_vals_action_functor =
+    [& pushed_node_keys_vals_to_me]
+    (processor_id_type pid,
+     const std::vector<std::vector<std::pair<dof_id_type, Real>>> & data)
+    {
+      pushed_node_keys_vals_to_me[pid] = data;
+    };
+
+  // Trade pushed node constraint rows
+  Parallel::push_parallel_vector_data
+    (this->comm(), pushed_node_ids_offsets, node_ids_offsets_action_functor);
+  Parallel::push_parallel_vector_data
+    (this->comm(), pushed_node_keys_vals, node_keys_vals_action_functor);
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
-  // Now trade constraint rows
+  // Now work on traded constraint rows
   for (processor_id_type p = 0; p != this->n_processors(); ++p)
     {
       // Push to processor procup while receiving from procdown
@@ -3585,22 +3629,11 @@ void DofMap::scatter_constraints(MeshBase & mesh)
                                      this->processor_id() - p) %
                                     this->n_processors());
 
-      // Trade pushed dof constraint rows
-      this->comm().send_receive(procup, pushed_keys_vals[procup],
-                                procdown, pushed_keys_vals_to_me[procdown]);
-      this->comm().send_receive(procup, pushed_ids_rhss[procup],
-                                procdown, pushed_ids_rhss_to_me[procdown]);
       libmesh_assert_equal_to
         (pushed_ids_rhss_to_me[procdown].size(),
          pushed_keys_vals_to_me[procdown].size());
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-      // Trade pushed node constraint rows
-      this->comm().send_receive(procup, pushed_node_keys_vals[procup],
-                                procdown, pushed_node_keys_vals_to_me[procdown]);
-      this->comm().send_receive(procup, pushed_node_ids_offsets[procup],
-                                procdown, pushed_node_ids_offsets_to_me[procdown]);
-
       // Constraining nodes might not even exist on our subset of
       // a distributed mesh, so let's make them exist.
       if (!mesh.is_serial())
