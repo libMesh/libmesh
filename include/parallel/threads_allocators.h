@@ -32,7 +32,7 @@
 
 // C++ includes
 #include <memory> // for std::allocator
-#include <cstddef>
+#include <cstddef> // std::ptrdiff_t
 
 namespace libMesh
 {
@@ -62,7 +62,7 @@ public:
   //     typedef const T & const_reference;  // so we can't typedef a reference to void.
   typedef T value_type;
   typedef size_t size_type;
-  typedef ptrdiff_t difference_type;
+  typedef std::ptrdiff_t difference_type;
 
   template<typename U>
   struct rebind
@@ -101,7 +101,7 @@ public:
   //     typedef const T & const_reference;  // so we can't typedef a reference to void.
   typedef T value_type;
   typedef size_t size_type;
-  typedef ptrdiff_t difference_type;
+  typedef std::ptrdiff_t difference_type;
 
   template<typename U>
   struct rebind
