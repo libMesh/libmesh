@@ -290,23 +290,31 @@ void push_parallel_vector_data(const Communicator & comm,
   // without confusing one for the other
   MessageTag tag = comm.get_unique_tag(1225);
 
+  MapToVectors received_data;
+
   // Post all of the sends, non-blocking
   for (auto & datapair : data)
     {
       processor_id_type destid = datapair.first;
       libmesh_assert_less(destid, num_procs);
       auto & datum = datapair.second;
-      Request sendreq;
-      comm.send(destid, datum, datatype, sendreq, tag);
-      reqs.insert(reqs.end(), sendreq);
+
+      // Just act on data if the user requested a send-to-self
+      if (destid == comm.rank())
+        act_on_data(destid, datum);
+      else
+        {
+          Request sendreq;
+          comm.send(destid, datum, datatype, sendreq, tag);
+          reqs.insert(reqs.end(), sendreq);
+        }
     }
 
   // Post all of the receives, non-blocking
   std::vector<Request> receive_reqs;
   std::vector<processor_id_type> receive_procids;
-  MapToVectors received_data;
   for (processor_id_type proc_id = 0; proc_id < num_procs; proc_id++)
-    if (will_receive_from[proc_id])
+    if (will_receive_from[proc_id] && proc_id != comm.rank())
       {
         Request req;
         auto & incoming_data = received_data[proc_id];
@@ -387,9 +395,19 @@ void push_parallel_vector_data(const Communicator & comm,
       processor_id_type destid = datapair.first;
       libmesh_assert_less(destid, num_procs);
       auto & datum = datapair.second;
-      Request sendreq;
-      comm.send(destid, datum, datatype, sendreq, tag);
-      reqs.insert(reqs.end(), sendreq);
+
+      // Just act on data if the user requested a send-to-self
+      if (destid == comm.rank())
+        {
+          act_on_data(destid, datum);
+          n_receives--;
+        }
+      else
+        {
+          Request sendreq;
+          comm.send(destid, datum, datatype, sendreq, tag);
+          reqs.insert(reqs.end(), sendreq);
+        }
     }
 
   // Post all of the receives.
@@ -474,11 +492,16 @@ void pull_parallel_vector_data(const Communicator & comm,
     [&comm, &gather_data, &response_data, &response_reqs, &datatype, &tag]
     (processor_id_type pid, query_type query)
     {
-      Request sendreq;
       gather_data(pid, query, response_data[pid]);
       libmesh_assert_equal_to(query.size(), response_data[pid].size());
-      comm.send(pid, response_data[pid], datatype, sendreq, tag);
-      response_reqs.push_back(sendreq);
+
+      // Just act on data later if the user requested a send-to-self
+      if (pid != comm.rank())
+        {
+          Request sendreq;
+          comm.send(pid, response_data[pid], datatype, sendreq, tag);
+          response_reqs.push_back(sendreq);
+        }
     };
 
   push_parallel_vector_data (comm, queries, reqs, gather_functor);
@@ -492,13 +515,23 @@ void pull_parallel_vector_data(const Communicator & comm,
       processor_id_type proc_id = querypair.first;
       libmesh_assert_less(proc_id, comm.size());
 
-      auto & querydata = querypair.second;
-      Request req;
-      auto & incoming_data = received_data[proc_id];
-      incoming_data.resize(querydata.size());
-      comm.receive(proc_id, incoming_data, datatype, req, tag);
-      receive_reqs.push_back(req);
-      receive_procids.push_back(proc_id);
+      if (proc_id == comm.rank())
+        {
+          libmesh_assert(queries.count(proc_id));
+          libmesh_assert_equal_to(queries.at(proc_id).size(),
+                                  response_data.at(proc_id).size());
+          act_on_data(proc_id, queries.at(proc_id), response_data.at(proc_id));
+        }
+      else
+        {
+          auto & querydata = querypair.second;
+          Request req;
+          auto & incoming_data = received_data[proc_id];
+          incoming_data.resize(querydata.size());
+          comm.receive(proc_id, incoming_data, datatype, req, tag);
+          receive_reqs.push_back(req);
+          receive_procids.push_back(proc_id);
+        }
     }
 
   while(receive_reqs.size())
@@ -562,15 +595,25 @@ void pull_parallel_vector_data(const Communicator & comm,
   MessageTag tag = comm.get_unique_tag(105);
 
   auto gather_functor =
-    [&comm, &gather_data, &response_data, &response_reqs, &tag]
+    [&comm, &gather_data, &act_on_data,
+     &response_data, &response_reqs, &tag]
     (processor_id_type pid, query_type query)
     {
-      Request sendreq;
       gather_data(pid, query, response_data[pid]);
       libmesh_assert_equal_to(query.size(),
                               response_data[pid].size());
-      comm.send(pid, response_data[pid], sendreq, tag);
-      response_reqs.push_back(sendreq);
+
+      // Just act on data if the user requested a send-to-self
+      if (pid == comm.rank())
+        {
+          act_on_data(pid, query, response_data[pid]);
+        }
+      else
+        {
+          Request sendreq;
+          comm.send(pid, response_data[pid], sendreq, tag);
+          response_reqs.push_back(sendreq);
+        }
     };
 
   push_parallel_vector_data (comm, queries, reqs, gather_functor);
@@ -585,7 +628,8 @@ void pull_parallel_vector_data(const Communicator & comm,
   // FIXME - implement Derek's API from #1684, switch to that!
   std::vector<Request> receive_reqs;
   std::vector<processor_id_type> receive_procids;
-  for (std::size_t i = 0, n_queries = queries.size();
+  for (std::size_t i = 0,
+       n_queries = queries.size() - queries.count(comm.rank());
        i != n_queries; ++i)
     {
       Status stat(comm.probe(any_source));
