@@ -35,8 +35,6 @@
 #include "libmesh/laspack_vector.h"
 #include "libmesh/laspack_matrix.h"
 
-// C++ includes
-
 namespace libMesh
 {
 

@@ -68,19 +68,24 @@ public:
               Order order=INVALID_ORDER);
 
   /**
+   * This class contains a unique_ptr member, so it can't be default
+   * copy constructed or assigned.
+   */
+  QComposite (const QComposite &) = delete;
+  QComposite & operator= (const QComposite &) = delete;
+
+  /**
    * Copy/move ctor, copy/move assignment operator, and destructor are
    * all explicitly defaulted for this simple class.
    */
-  QComposite (const QComposite &) = default;
   QComposite (QComposite &&) = default;
-  QComposite & operator= (const QComposite &) = default;
   QComposite & operator= (QComposite &&) = default;
   virtual ~QComposite() = default;
 
   /**
    * \returns \p QCOMPOSITE.
    */
-  virtual QuadratureType type() const override { return QCOMPOSITE; }
+  virtual QuadratureType type() const override;
 
   /**
    * Overrides the base class init() function, and uses the ElemCutter to
