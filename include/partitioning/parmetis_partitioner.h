@@ -49,15 +49,15 @@ class ParmetisPartitioner : public Partitioner
 public:
 
   /**
-   * Constructor.
+   * Default and copy ctors.
    */
   ParmetisPartitioner ();
+  ParmetisPartitioner (const ParmetisPartitioner & other);
 
   /**
    * This class contains a unique_ptr member, so it can't be default
-   * copy constructed or assigned.
+   * copy assigned.
    */
-  ParmetisPartitioner (const ParmetisPartitioner &) = delete;
   ParmetisPartitioner & operator= (const ParmetisPartitioner &) = delete;
 
   /**
@@ -78,7 +78,7 @@ public:
    */
   virtual std::unique_ptr<Partitioner> clone () const override
   {
-    return libmesh_make_unique<ParmetisPartitioner>();
+    return libmesh_make_unique<ParmetisPartitioner>(*this);
   }
 
 

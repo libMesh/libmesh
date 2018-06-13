@@ -68,6 +68,15 @@ ParmetisPartitioner::ParmetisPartitioner()
 
 
 
+ParmetisPartitioner::ParmetisPartitioner (const ParmetisPartitioner & other)
+#ifdef LIBMESH_HAVE_PARMETIS
+  : _pmetis(libmesh_make_unique<ParmetisHelper>(*(other._pmetis)))
+#endif
+{
+}
+
+
+
 ParmetisPartitioner::~ParmetisPartitioner() = default;
 
 
