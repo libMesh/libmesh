@@ -55,9 +55,14 @@ class ParmetisHelper
 {
 public:
   /**
-   * Constructor.
+   * Defaulted constructors, assignment operators, and destructor.
    */
-  ParmetisHelper () {}
+  ParmetisHelper () = default;
+  ParmetisHelper (const ParmetisHelper &) = default;
+  ParmetisHelper (ParmetisHelper &&) = default;
+  ParmetisHelper & operator= (const ParmetisHelper &) = default;
+  ParmetisHelper & operator= (ParmetisHelper &&) = default;
+  ~ParmetisHelper () = default;
 
 #ifdef LIBMESH_HAVE_PARMETIS
 

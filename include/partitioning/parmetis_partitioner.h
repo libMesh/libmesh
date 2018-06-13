@@ -49,21 +49,36 @@ class ParmetisPartitioner : public Partitioner
 public:
 
   /**
-   * Constructor.
+   * Default and copy ctors.
    */
   ParmetisPartitioner ();
+  ParmetisPartitioner (const ParmetisPartitioner & other);
 
   /**
-   * Destructor.
+   * This class contains a unique_ptr member, so it can't be default
+   * copy assigned.
    */
-  ~ParmetisPartitioner ();
+  ParmetisPartitioner & operator= (const ParmetisPartitioner &) = delete;
+
+  /**
+   * Move ctor, move assignment operator, and destructor are
+   * all explicitly inline-defaulted for this class.
+   */
+  ParmetisPartitioner (ParmetisPartitioner &&) = default;
+  ParmetisPartitioner & operator= (ParmetisPartitioner &&) = default;
+
+  /**
+   * The destructor is out-of-line-defaulted to play nice with forward
+   * declarations.
+   */
+  virtual ~ParmetisPartitioner();
 
   /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
    */
   virtual std::unique_ptr<Partitioner> clone () const override
   {
-    return libmesh_make_unique<ParmetisPartitioner>();
+    return libmesh_make_unique<ParmetisPartitioner>(*this);
   }
 
 

@@ -68,11 +68,21 @@ public:
   CentroidPartitioner (const CentroidSortMethod sm=X) : _sort_method(sm) {}
 
   /**
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this class.
+   */
+  CentroidPartitioner (const CentroidPartitioner &) = default;
+  CentroidPartitioner (CentroidPartitioner &&) = default;
+  CentroidPartitioner & operator= (const CentroidPartitioner &) = default;
+  CentroidPartitioner & operator= (CentroidPartitioner &&) = default;
+  virtual ~CentroidPartitioner() = default;
+
+  /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
    */
   virtual std::unique_ptr<Partitioner> clone () const override
   {
-    return libmesh_make_unique<CentroidPartitioner>(sort_method());
+    return libmesh_make_unique<CentroidPartitioner>(*this);
   }
 
   /**

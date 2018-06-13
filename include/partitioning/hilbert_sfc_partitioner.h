@@ -47,11 +47,21 @@ public:
   }
 
   /**
+   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * all explicitly defaulted for this class.
+   */
+  HilbertSFCPartitioner (const HilbertSFCPartitioner &) = default;
+  HilbertSFCPartitioner (HilbertSFCPartitioner &&) = default;
+  HilbertSFCPartitioner & operator= (const HilbertSFCPartitioner &) = default;
+  HilbertSFCPartitioner & operator= (HilbertSFCPartitioner &&) = default;
+  virtual ~HilbertSFCPartitioner() = default;
+
+  /**
    * \returns A copy of this partitioner wrapped in a smart pointer.
    */
   virtual std::unique_ptr<Partitioner> clone () const override
   {
-    return libmesh_make_unique<HilbertSFCPartitioner>();
+    return libmesh_make_unique<HilbertSFCPartitioner>(*this);
   }
 
 protected:
