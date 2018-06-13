@@ -101,6 +101,20 @@ public:
   explicit Communicator (const communicator & comm);
 
   /*
+   * Don't use copy construction or assignment, just copy by reference
+   * or pointer - it's too hard to keep a common used_tag_values if
+   * each communicator is shared by more than one Communicator
+   */
+  Communicator (const Communicator &) = delete;
+  Communicator & operator= (const Communicator &) = delete;
+
+  /*
+   * Move constructor and assignment operator
+   */
+  Communicator (Communicator &&) = default;
+  Communicator & operator= (Communicator &&) = default;
+
+  /*
    * NON-VIRTUAL destructor
    */
   ~Communicator ();
@@ -162,11 +176,6 @@ public:
   enum SendMode { DEFAULT=0, SYNCHRONOUS };
 
 private:
-
-  // Don't use the copy constructor, just copy by reference or
-  // pointer - it's too hard to keep a common used_tag_values if
-  // each communicator is shared by more than one Communicator
-  explicit Communicator (const Communicator &);
 
   /**
    * Utility function for setting our member variables from an MPI
@@ -806,33 +815,6 @@ public:
 #include "libmesh/parallel_communicator_specializations"
 
 }; // class Communicator
-
-
-// ------------------------------------------------------------
-// Simple Communicator member functions
-
-inline
-void Communicator::reference_unique_tag(int tagvalue) const
-{
-  // This had better be an already-acquired tag.
-  libmesh_assert(used_tag_values.count(tagvalue));
-
-  used_tag_values[tagvalue]++;
-}
-
-
-inline
-void Communicator::dereference_unique_tag(int tagvalue) const
-{
-  // This had better be an already-acquired tag.
-  libmesh_assert(used_tag_values.count(tagvalue));
-
-  used_tag_values[tagvalue]--;
-  // If we don't have any more outstanding references, we
-  // don't even need to keep this tag in our "used" set.
-  if (!used_tag_values[tagvalue])
-    used_tag_values.erase(tagvalue);
-}
 
 
 } // namespace Parallel
