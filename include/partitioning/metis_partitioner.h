@@ -40,14 +40,10 @@ class MetisPartitioner : public Partitioner
 public:
 
   /**
-   * Constructor.
+   * Ctors, assignment operators, and destructor are all explicitly
+   * defaulted for this class.
    */
   MetisPartitioner () = default;
-
-  /**
-   * Copy/move ctor, copy/move assignment operator, and destructor are
-   * all explicitly defaulted for this class.
-   */
   MetisPartitioner (const MetisPartitioner &) = default;
   MetisPartitioner (MetisPartitioner &&) = default;
   MetisPartitioner & operator= (const MetisPartitioner &) = default;

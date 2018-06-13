@@ -44,14 +44,10 @@ class MappedSubdomainPartitioner : public Partitioner
 public:
 
   /**
-   * Constructor.
+   * Ctors, assignment operators, and destructor are all explicitly
+   * defaulted for this class.
    */
   MappedSubdomainPartitioner () = default;
-
-  /**
-   * Copy/move ctor, copy/move assignment operator, and destructor are
-   * all explicitly defaulted for this class.
-   */
   MappedSubdomainPartitioner (const MappedSubdomainPartitioner &) = default;
   MappedSubdomainPartitioner (MappedSubdomainPartitioner &&) = default;
   MappedSubdomainPartitioner & operator= (const MappedSubdomainPartitioner &) = default;

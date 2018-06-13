@@ -42,14 +42,10 @@ class LinearPartitioner : public Partitioner
 public:
 
   /**
-   * Constructor.
-   */
-  LinearPartitioner () = default;
-
-  /**
-   * Copy/move ctor, copy/move assignment operator, and destructor are
+   * Ctors, assignment operators, and destructor are
    * all explicitly defaulted for this class.
    */
+  LinearPartitioner () = default;
   LinearPartitioner (const LinearPartitioner &) = default;
   LinearPartitioner (LinearPartitioner &&) = default;
   LinearPartitioner & operator= (const LinearPartitioner &) = default;
