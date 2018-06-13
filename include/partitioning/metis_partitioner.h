@@ -59,7 +59,7 @@ public:
    */
   virtual std::unique_ptr<Partitioner> clone () const override
   {
-    return libmesh_make_unique<MetisPartitioner>();
+    return libmesh_make_unique<MetisPartitioner>(*this);
   }
 
   virtual void attach_weights(ErrorVector * weights) override { _weights = weights; }

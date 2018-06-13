@@ -61,7 +61,7 @@ public:
    */
   virtual std::unique_ptr<Partitioner> clone () const override
   {
-    return libmesh_make_unique<LinearPartitioner>();
+    return libmesh_make_unique<LinearPartitioner>(*this);
   }
 
   /**

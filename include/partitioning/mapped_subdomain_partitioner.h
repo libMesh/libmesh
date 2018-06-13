@@ -63,7 +63,7 @@ public:
    */
   virtual std::unique_ptr<Partitioner> clone () const override
   {
-    return libmesh_make_unique<MappedSubdomainPartitioner>();
+    return libmesh_make_unique<MappedSubdomainPartitioner>(*this);
   }
 
   /**
