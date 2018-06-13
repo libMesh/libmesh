@@ -57,17 +57,17 @@ class SubdomainPartitioner : public Partitioner
 public:
 
   /**
-   * Constructor, default initializes the internal Partitioner object
-   * to a MetisPartitioner so the class is usable, although this type
-   * can be customized later.
+   * Constructors. The default ctor initializes the internal
+   * Partitioner object to a MetisPartitioner so the class is usable,
+   * although this type can be customized later.
    */
   SubdomainPartitioner ();
+  SubdomainPartitioner (const SubdomainPartitioner & other);
 
   /**
    * This class contains a unique_ptr member, so it can't be default
-   * copy constructed or assigned.
+   * copy assigned.
    */
-  SubdomainPartitioner (const SubdomainPartitioner &) = delete;
   SubdomainPartitioner & operator= (const SubdomainPartitioner &) = delete;
 
   /**
@@ -83,7 +83,7 @@ public:
    */
   virtual std::unique_ptr<Partitioner> clone () const override
   {
-    return libmesh_make_unique<SubdomainPartitioner>();
+    return libmesh_make_unique<SubdomainPartitioner>(*this);
   }
 
   /**

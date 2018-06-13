@@ -31,6 +31,12 @@ SubdomainPartitioner::SubdomainPartitioner () :
 {}
 
 
+SubdomainPartitioner::SubdomainPartitioner (const SubdomainPartitioner & other) :
+  chunks(other.chunks),
+  _internal_partitioner(other._internal_partitioner->clone())
+{}
+
+
 void SubdomainPartitioner::_do_partition (MeshBase & mesh,
                                           const unsigned int n)
 {
