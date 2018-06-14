@@ -279,6 +279,7 @@ BUILT_SOURCES = \
         parallel_sync.h \
         post_wait_copy_buffer.h \
         post_wait_delete_buffer.h \
+        post_wait_dereference_tag.h \
         post_wait_free_buffer.h \
         post_wait_unpack_buffer.h \
         post_wait_work.h \
@@ -1359,6 +1360,9 @@ post_wait_copy_buffer.h: $(top_srcdir)/include/parallel/post_wait_copy_buffer.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 post_wait_delete_buffer.h: $(top_srcdir)/include/parallel/post_wait_delete_buffer.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+post_wait_dereference_tag.h: $(top_srcdir)/include/parallel/post_wait_dereference_tag.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 post_wait_free_buffer.h: $(top_srcdir)/include/parallel/post_wait_free_buffer.h
