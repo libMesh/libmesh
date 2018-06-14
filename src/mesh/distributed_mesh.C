@@ -24,6 +24,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_sync.h"
 #include "libmesh/parmetis_partitioner.h"
 
 namespace libMesh
@@ -1029,23 +1030,15 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
   // for non-local object ids
 
   // Request sets to send to each processor
-  std::vector<std::vector<dof_id_type>>
-    requested_ids(this->n_processors());
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  std::vector<std::vector<unique_id_type>>
-    requested_unique_ids(this->n_processors());
-#endif
+  std::map<processor_id_type, std::vector<dof_id_type>>
+    requested_ids;
 
   // We know how many objects live on each processor, so reserve() space for
   // each.
   for (processor_id_type p=0; p != this->n_processors(); ++p)
-    if (p != this->processor_id())
+    if (p != this->processor_id() && ghost_objects_from_proc[p])
       {
         requested_ids[p].reserve(ghost_objects_from_proc[p]);
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-        requested_unique_ids[p].reserve(ghost_objects_from_proc[p]);
-#endif
       }
 
   end = objects.end();
@@ -1055,88 +1048,114 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
       if (obj->processor_id() == this->processor_id())
         obj->set_id(next_id++);
       else if (obj->processor_id() != DofObject::invalid_processor_id)
-        {
-          requested_ids[obj->processor_id()].push_back(obj->id());
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-          // It's possible to have an invalid id for dofs not owned by this process.
-          // We'll assert that they match on the receiving end.
-          requested_unique_ids[obj->processor_id()].push_back(obj->valid_unique_id() ? obj-> unique_id() : DofObject::invalid_unique_id);
-#endif
-        }
+        requested_ids[obj->processor_id()].push_back(obj->id());
     }
 
   // Next set ghost object ids from other processors
-  if (this->n_processors() > 1)
+
+  auto gather_functor =
+    [
+#ifndef NDEBUG
+     this,
+     &first_object_on_proc,
+     &objects_on_proc,
+#endif
+     &objects]
+    (processor_id_type, const std::vector<dof_id_type> & ids,
+     std::vector<dof_id_type> & new_ids)
     {
-      for (processor_id_type p=1; p != this->n_processors(); ++p)
+      std::size_t ids_size = ids.size();
+      new_ids.resize(ids_size);
+
+      for (std::size_t i=0; i != ids_size; ++i)
         {
-          // Trade my requests with processor procup and procdown
-          processor_id_type procup = cast_int<processor_id_type>
-            ((this->processor_id() + p) % this->n_processors());
-          processor_id_type procdown = cast_int<processor_id_type>
-            ((this->n_processors() + this->processor_id() - p) %
-             this->n_processors());
-          std::vector<dof_id_type> request_to_fill;
-          this->comm().send_receive(procup, requested_ids[procup],
-                                    procdown, request_to_fill);
+          T * obj = objects[ids[i]];
+          libmesh_assert(obj);
+          libmesh_assert_equal_to (obj->processor_id(), this->processor_id());
+          new_ids[i] = obj->id();
 
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-          std::vector<unique_id_type> unique_request_to_fill;
-          this->comm().send_receive(procup, requested_unique_ids[procup],
-                                    procdown, unique_request_to_fill);
-          std::vector<unique_id_type> new_unique_ids(unique_request_to_fill.size());
-#endif
-
-          // Fill those requests
-          std::vector<dof_id_type> new_ids(request_to_fill.size());
-          for (std::size_t i=0; i != request_to_fill.size(); ++i)
-            {
-              T * obj = objects[request_to_fill[i]];
-              libmesh_assert(obj);
-              libmesh_assert_equal_to (obj->processor_id(), this->processor_id());
-              new_ids[i] = obj->id();
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-              new_unique_ids[i] = obj->valid_unique_id() ? obj->unique_id() : DofObject::invalid_unique_id;
-#endif
-
-              libmesh_assert_greater_equal (new_ids[i],
-                                            first_object_on_proc[this->processor_id()]);
-              libmesh_assert_less (new_ids[i],
-                                   first_object_on_proc[this->processor_id()] +
-                                   objects_on_proc[this->processor_id()]);
-            }
-
-          // Trade back the results
-          std::vector<dof_id_type> filled_request;
-          this->comm().send_receive(procdown, new_ids,
-                                    procup, filled_request);
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-          std::vector<unique_id_type> unique_filled_request;
-          this->comm().send_receive(procdown, new_unique_ids,
-                                    procup, unique_filled_request);
-#endif
-
-          // And copy the id changes we've now been informed of
-          for (std::size_t i=0; i != filled_request.size(); ++i)
-            {
-              T * obj = objects[requested_ids[procup][i]];
-              libmesh_assert (obj);
-              libmesh_assert_equal_to (obj->processor_id(), procup);
-              libmesh_assert_greater_equal (filled_request[i],
-                                            first_object_on_proc[procup]);
-              libmesh_assert_less (filled_request[i],
-                                   first_object_on_proc[procup] +
-                                   objects_on_proc[procup]);
-              obj->set_id(filled_request[i]);
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-              if (!obj->valid_unique_id() && unique_filled_request[i] != DofObject::invalid_unique_id)
-                obj->set_unique_id() = unique_filled_request[i];
-#endif
-            }
+          libmesh_assert_greater_equal (new_ids[i],
+                                        first_object_on_proc[this->processor_id()]);
+          libmesh_assert_less (new_ids[i],
+                               first_object_on_proc[this->processor_id()] +
+                               objects_on_proc[this->processor_id()]);
         }
-    }
+    };
+
+  auto action_functor =
+    [
+#ifndef NDEBUG
+     this,
+     &first_object_on_proc,
+     &objects_on_proc,
+#endif
+     &objects]
+    (processor_id_type libmesh_dbg_var(pid),
+     const std::vector<dof_id_type> & ids,
+     const std::vector<dof_id_type> & data)
+    {
+      // Copy the id changes we've now been informed of
+      for (std::size_t i=0, ids_size = ids.size(); i != ids_size; ++i)
+        {
+          T * obj = objects[ids[i]];
+          libmesh_assert (obj);
+          libmesh_assert_equal_to (obj->processor_id(), pid);
+          libmesh_assert_greater_equal (data[i],
+                                        first_object_on_proc[pid]);
+          libmesh_assert_less (data[i],
+                               first_object_on_proc[pid] +
+                               objects_on_proc[pid]);
+          obj->set_id(data[i]);
+        }
+    };
+
+  const dof_id_type * ex = libmesh_nullptr;
+  Parallel::pull_parallel_vector_data
+    (this->comm(), requested_ids, gather_functor, action_functor, ex);
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  auto unique_gather_functor =
+    [
+#ifndef NDEBUG
+     this,
+#endif
+     &objects]
+    (processor_id_type, const std::vector<dof_id_type> & ids,
+     std::vector<unique_id_type> & data)
+    {
+      std::size_t ids_size = ids.size();
+      data.resize(ids_size);
+
+      for (std::size_t i=0; i != ids_size; ++i)
+        {
+          T * obj = objects[ids[i]];
+          libmesh_assert(obj);
+          libmesh_assert_equal_to (obj->processor_id(), this->processor_id());
+          data[i] = obj->valid_unique_id() ? obj->unique_id() : DofObject::invalid_unique_id;
+        }
+    };
+
+  auto unique_action_functor =
+    [&objects]
+    (processor_id_type libmesh_dbg_var(pid),
+     const std::vector<dof_id_type> & ids,
+     const std::vector<unique_id_type> & data)
+    {
+      for (std::size_t i=0, ids_size = ids.size(); i != ids_size; ++i)
+        {
+          T * obj = objects[ids[i]];
+          libmesh_assert (obj);
+          libmesh_assert_equal_to (obj->processor_id(), pid);
+          if (!obj->valid_unique_id() && data[i] != DofObject::invalid_unique_id)
+            obj->set_unique_id() = (data[i]);
+        }
+    };
+
+  const unique_id_type * unique_ex = libmesh_nullptr;
+  Parallel::pull_parallel_vector_data
+    (this->comm(), requested_ids, unique_gather_functor,
+     unique_action_functor, unique_ex);
+#endif
 
   // Next set unpartitioned object ids
   next_id = 0;

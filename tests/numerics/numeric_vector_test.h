@@ -17,6 +17,8 @@
 #define NUMERICVECTORTEST                       \
   CPPUNIT_TEST( testLocalize );                 \
   CPPUNIT_TEST( testLocalizeBase );             \
+  CPPUNIT_TEST( testLocalizeIndices );          \
+  CPPUNIT_TEST( testLocalizeIndicesBase );      \
   CPPUNIT_TEST( testLocalizeToOne );            \
   CPPUNIT_TEST( testLocalizeToOneBase );
 
@@ -83,6 +85,59 @@ public:
     }
   }
 
+
+  template <class Base, class Derived>
+  void LocalizeIndices()
+  {
+    unsigned int block_size  = 10;
+
+    // a different size on each processor.
+    unsigned int local_size  = block_size +
+      static_cast<unsigned int>(my_comm->rank());
+    unsigned int global_size = 0;
+
+    for (libMesh::processor_id_type p=0; p<my_comm->size(); p++)
+      global_size += (block_size + static_cast<unsigned int>(p));
+
+    {
+      auto v_ptr = libmesh_make_unique<Derived>(*my_comm, global_size, local_size);
+      Base & v = *v_ptr;
+
+      // Let's try pulling the same number of entries from each processor
+      std::vector<libMesh::Number> values(block_size * my_comm->size());
+      std::vector<libMesh::dof_id_type> indices;
+      indices.reserve(block_size * my_comm->size());
+
+      const libMesh::dof_id_type
+        first = v.first_local_index(),
+        last  = v.last_local_index();
+
+      for (libMesh::dof_id_type n=first; n != last; n++)
+        v.set (n, static_cast<libMesh::Number>(n));
+      v.close();
+
+      libMesh::dof_id_type end_index = 0;
+      for (libMesh::processor_id_type p=0; p<my_comm->size(); p++)
+        {
+          end_index += block_size + p;
+          for (unsigned int j = 0; j != block_size; ++j)
+            indices.push_back(end_index-j-1);
+        }
+
+      v.localize(values, indices);
+
+      end_index = 0;
+      for (libMesh::processor_id_type p=0; p<my_comm->size(); p++)
+        {
+          end_index += block_size + p;
+          for (unsigned int j = 0; j != block_size; ++j)
+            CPPUNIT_ASSERT_DOUBLES_EQUAL(libMesh::libmesh_real(values[p*block_size+j]),
+                                         libMesh::libmesh_real(end_index-j-1),
+                                         libMesh::TOLERANCE*libMesh::TOLERANCE);
+        }
+    }
+  }
+
   void testLocalize()
   {
     Localize<DerivedClass,DerivedClass>();
@@ -101,6 +156,16 @@ public:
   void testLocalizeToOneBase()
   {
     Localize<libMesh::NumericVector<libMesh::Number>,DerivedClass>(true);
+  }
+
+  void testLocalizeIndices()
+  {
+    LocalizeIndices<DerivedClass,DerivedClass >();
+  }
+
+  void testLocalizeIndicesBase()
+  {
+    LocalizeIndices<libMesh::NumericVector<libMesh::Number>,DerivedClass>();
   }
 };
 

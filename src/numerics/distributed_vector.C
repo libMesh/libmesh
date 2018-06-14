@@ -29,6 +29,7 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/dense_subvector.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_sync.h"
 #include "libmesh/tensor_tools.h"
 
 namespace libMesh
@@ -438,9 +439,8 @@ void DistributedVector<T>::localize (std::vector<T> & v_local,
   // We now fill in 'requested_ids' based on the indices.  Also keep
   // track of the local index (in the indices vector) for each of
   // these, since we need that when unpacking.
-  std::vector<std::vector<numeric_index_type>>
-    requested_ids(this->n_processors()),
-    local_requested_ids(this->n_processors());
+  std::map<processor_id_type, std::vector<numeric_index_type>>
+    requested_ids, local_requested_ids;
 
   // We'll use this typedef a couple of times below.
   typedef typename std::vector<numeric_index_type>::iterator iter_t;
@@ -462,53 +462,50 @@ void DistributedVector<T>::localize (std::vector<T> & v_local,
       local_requested_ids[on_proc].push_back(i);
     }
 
-  // First trade indices, then trade values with all other processors.
-  for (processor_id_type pid=0; pid<this->n_processors(); pid++)
+  auto gather_functor =
+    [this]
+    (processor_id_type, const std::vector<dof_id_type> & ids,
+     std::vector<T> & values)
     {
-      // Another data structure which holds the ids that other processors request us to fill.
-      std::vector<numeric_index_type> requests_for_me_to_fill;
-
-      // Trade my requests with processor procup and procdown
-      const processor_id_type procup = (this->processor_id() + pid) % this->n_processors();
-      const processor_id_type procdown = (this->n_processors() + this->processor_id() - pid) % this->n_processors();
-
-      this->comm().send_receive (procup,   requested_ids[procup],
-                                 procdown, requests_for_me_to_fill);
-
       // The first send/receive we did was for indices, the second one will be
       // for corresponding floating point values, so create storage for that now...
-      std::vector<T> values_to_send(requests_for_me_to_fill.size());
+      const std::size_t ids_size = ids.size();
+      values.resize(ids_size);
 
-      for (std::size_t i=0; i<requests_for_me_to_fill.size(); i++)
+      for (std::size_t i=0; i != ids_size; i++)
         {
           // The index of the requested value
-          const numeric_index_type requested_index = requests_for_me_to_fill[i];
+          const numeric_index_type requested_index = ids[i];
 
           // Transform into local numbering, and get requested value.
-          values_to_send[i] = _values[requested_index - _first_local_index];
+          values[i] = _values[requested_index - _first_local_index];
         }
+    };
 
-      // Send the values we were supposed to send, receive the values
-      // we were supposed to receive.
-      std::vector<T> values_to_receive(requested_ids[procup].size());
-      this->comm().send_receive (procdown, values_to_send,
-                                 procup,   values_to_receive);
-
-      // Error checking: make sure that requested_ids[procup] is same
-      // length as values_to_receive.
-      if (requested_ids[procup].size() != values_to_receive.size())
-        libmesh_error_msg("Requested " << requested_ids[procup].size() << " values, but received " << values_to_receive.size() << " values.");
-
+  auto action_functor =
+    [& v_local, & local_requested_ids]
+    (processor_id_type pid,
+     const std::vector<dof_id_type> &,
+     const std::vector<T> & values)
+    {
       // Now write the received values to the appropriate place(s) in v_local
-      for (std::size_t i=0; i<values_to_receive.size(); i++)
+      for (std::size_t i=0, vsize = values.size(); i != vsize; i++)
         {
+          libmesh_assert(local_requested_ids.count(pid));
+          libmesh_assert_less(i, local_requested_ids[pid].size());
+
           // Get the index in v_local where this value needs to be inserted.
-          numeric_index_type local_requested_index = local_requested_ids[procup][i];
+          const numeric_index_type local_requested_index =
+            local_requested_ids[pid][i];
 
           // Actually set the value in v_local
-          v_local[local_requested_index] = values_to_receive[i];
+          v_local[local_requested_index] = values[i];
         }
-    }
+    };
+
+  const T * ex = libmesh_nullptr;
+  Parallel::pull_parallel_vector_data
+    (this->comm(), requested_ids, gather_functor, action_functor, ex);
 }
 
 

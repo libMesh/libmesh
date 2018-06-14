@@ -580,11 +580,11 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
   // Now repeat that iteration, filling request sets this time.
 
   // Request sets to send to each processor
-  std::map<dof_id_type, std::vector<std::pair<dof_id_type, unsigned char>>>
+  std::map<processor_id_type, std::vector<std::pair<dof_id_type, unsigned char>>>
     requested_objs_elem_id_node_num;
 
   // Keep track of current local ids for each too
-  std::map<dof_id_type, std::vector<dof_id_type>>
+  std::map<processor_id_type, std::vector<dof_id_type>>
     requested_objs_id;
 
   // We know how many objects live on each processor, so reserve()
