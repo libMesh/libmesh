@@ -77,6 +77,12 @@ public:
     Hex(Hex27::n_nodes(), p, _nodelinks_data)
   {}
 
+  Hex27 (Hex27 &&) = delete;
+  Hex27 (const Hex27 &) = delete;
+  Hex27 & operator= (const Hex27 &) = delete;
+  Hex27 & operator= (Hex27 &&) = delete;
+  virtual ~Hex27() = default;
+
   /**
    * \returns \p HEX27.
    */

@@ -80,6 +80,12 @@ public:
     Pyramid(Pyramid14::n_nodes(), p, _nodelinks_data)
   {}
 
+  Pyramid14 (Pyramid14 &&) = delete;
+  Pyramid14 (const Pyramid14 &) = delete;
+  Pyramid14 & operator= (const Pyramid14 &) = delete;
+  Pyramid14 & operator= (Pyramid14 &&) = delete;
+  virtual ~Pyramid14() = default;
+
   /**
    * \returns 14.
    */

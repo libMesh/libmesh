@@ -54,6 +54,12 @@ public:
     Elem (nn, ns, p, elemlinkdata, nodelinkdata)
   {}
 
+  InfCell (InfCell &&) = delete;
+  InfCell (const InfCell &) = delete;
+  InfCell & operator= (const InfCell &) = delete;
+  InfCell & operator= (InfCell &&) = delete;
+  virtual ~InfCell() = default;
+
   /**
    * \returns 3, the dimensionality of the object.
    */

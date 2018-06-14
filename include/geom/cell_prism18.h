@@ -78,6 +78,12 @@ public:
     Prism(Prism18::n_nodes(), p, _nodelinks_data)
   {}
 
+  Prism18 (Prism18 &&) = delete;
+  Prism18 (const Prism18 &) = delete;
+  Prism18 & operator= (const Prism18 &) = delete;
+  Prism18 & operator= (Prism18 &&) = delete;
+  virtual ~Prism18() = default;
+
   /**
    * \returns \p PRISM18.
    */

@@ -61,6 +61,12 @@ public:
   InfQuad6 (Elem * p=libmesh_nullptr):
     InfQuad(InfQuad6::n_nodes(), p, _nodelinks_data) {}
 
+  InfQuad6 (InfQuad6 &&) = delete;
+  InfQuad6 (const InfQuad6 &) = delete;
+  InfQuad6 & operator= (const InfQuad6 &) = delete;
+  InfQuad6 & operator= (InfQuad6 &&) = delete;
+  virtual ~InfQuad6() = default;
+
   /**
    * \returns 6.
    */

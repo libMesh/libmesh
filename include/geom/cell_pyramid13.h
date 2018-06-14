@@ -77,6 +77,12 @@ public:
     Pyramid(Pyramid13::n_nodes(), p, _nodelinks_data)
   {}
 
+  Pyramid13 (Pyramid13 &&) = delete;
+  Pyramid13 (const Pyramid13 &) = delete;
+  Pyramid13 & operator= (const Pyramid13 &) = delete;
+  Pyramid13 & operator= (Pyramid13 &&) = delete;
+  virtual ~Pyramid13() = default;
+
   /**
    * \returns 13.
    */

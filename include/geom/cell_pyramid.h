@@ -53,6 +53,12 @@ public:
       this->set_interior_parent(libmesh_nullptr);
   }
 
+  Pyramid (Pyramid &&) = delete;
+  Pyramid (const Pyramid &) = delete;
+  Pyramid & operator= (const Pyramid &) = delete;
+  Pyramid & operator= (Pyramid &&) = delete;
+  virtual ~Pyramid() = default;
+
   /**
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.

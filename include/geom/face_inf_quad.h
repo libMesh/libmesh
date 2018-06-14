@@ -71,6 +71,12 @@ public:
       this->set_interior_parent(libmesh_nullptr);
   }
 
+  InfQuad (InfQuad &&) = delete;
+  InfQuad (const InfQuad &) = delete;
+  InfQuad & operator= (const InfQuad &) = delete;
+  InfQuad & operator= (InfQuad &&) = delete;
+  virtual ~InfQuad() = default;
+
   /**
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.

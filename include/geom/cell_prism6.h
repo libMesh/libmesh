@@ -61,6 +61,12 @@ public:
     Prism(Prism6::n_nodes(), p, _nodelinks_data)
   {}
 
+  Prism6 (Prism6 &&) = delete;
+  Prism6 (const Prism6 &) = delete;
+  Prism6 & operator= (const Prism6 &) = delete;
+  Prism6 & operator= (Prism6 &&) = delete;
+  virtual ~Prism6() = default;
+
   /**
    * \returns \p PRISM6.
    */

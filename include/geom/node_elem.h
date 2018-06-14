@@ -51,6 +51,12 @@ public:
       this->set_interior_parent(libmesh_nullptr);
   }
 
+  NodeElem (NodeElem &&) = delete;
+  NodeElem (const NodeElem &) = delete;
+  NodeElem & operator= (const NodeElem &) = delete;
+  NodeElem & operator= (NodeElem &&) = delete;
+  virtual ~NodeElem() = default;
+
   /**
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.

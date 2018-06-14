@@ -62,6 +62,12 @@ public:
     Tet(Tet4::n_nodes(), p, _nodelinks_data)
   {}
 
+  Tet4 (Tet4 &&) = delete;
+  Tet4 (const Tet4 &) = delete;
+  Tet4 & operator= (const Tet4 &) = delete;
+  Tet4 & operator= (Tet4 &&) = delete;
+  virtual ~Tet4() = default;
+
   /**
    * \returns \p TET4.
    */

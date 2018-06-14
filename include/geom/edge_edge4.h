@@ -52,6 +52,12 @@ public:
   Edge4 (Elem * p=libmesh_nullptr) :
     Edge(Edge4::n_nodes(), p, _nodelinks_data) {}
 
+  Edge4 (Edge4 &&) = delete;
+  Edge4 (const Edge4 &) = delete;
+  Edge4 & operator= (const Edge4 &) = delete;
+  Edge4 & operator= (Edge4 &&) = delete;
+  virtual ~Edge4() = default;
+
   /**
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.

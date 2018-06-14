@@ -49,6 +49,12 @@ public:
         Node ** nodelinkdata) :
     Elem(nn, ns, p, elemlinkdata, nodelinkdata) {}
 
+  Face (Face &&) = delete;
+  Face (const Face &) = delete;
+  Face & operator= (const Face &) = delete;
+  Face & operator= (Face &&) = delete;
+  virtual ~Face() = default;
+
   /**
    * \returns 2, the dimensionality of the object.
    */

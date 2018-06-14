@@ -62,6 +62,12 @@ public:
       this->set_interior_parent(libmesh_nullptr);
   }
 
+  Tri (Tri &&) = delete;
+  Tri (const Tri &) = delete;
+  Tri & operator= (const Tri &) = delete;
+  Tri & operator= (Tri &&) = delete;
+  virtual ~Tri() = default;
+
   /**
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.

@@ -61,6 +61,12 @@ public:
       this->set_interior_parent(libmesh_nullptr);
   }
 
+  Quad (Quad &&) = delete;
+  Quad (const Quad &) = delete;
+  Quad & operator= (const Quad &) = delete;
+  Quad & operator= (Quad &&) = delete;
+  virtual ~Quad() = default;
+
   /**
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.

@@ -66,6 +66,12 @@ public:
     InfPrism(InfPrism6::n_nodes(), p, _nodelinks_data)
   {}
 
+  InfPrism6 (InfPrism6 &&) = delete;
+  InfPrism6 (const InfPrism6 &) = delete;
+  InfPrism6 & operator= (const InfPrism6 &) = delete;
+  InfPrism6 & operator= (InfPrism6 &&) = delete;
+  virtual ~InfPrism6() = default;
+
   /**
    * \returns 6.  The \p InfPrism6 has 6 nodes.
    */

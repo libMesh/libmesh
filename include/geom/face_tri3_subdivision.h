@@ -52,6 +52,12 @@ public:
    */
   Tri3Subdivision(Elem * p);
 
+  Tri3Subdivision (Tri3Subdivision &&) = delete;
+  Tri3Subdivision (const Tri3Subdivision &) = delete;
+  Tri3Subdivision & operator= (const Tri3Subdivision &) = delete;
+  Tri3Subdivision & operator= (Tri3Subdivision &&) = delete;
+  virtual ~Tri3Subdivision() = default;
+
   /**
    * \returns \p TRI3SUBDIVISION.
    */

@@ -63,8 +63,14 @@ private:
   { this->set_id(remote_elem_id); }
 
 public:
+
+  RemoteElem (RemoteElem &&) = delete;
+  RemoteElem (const RemoteElem &) = delete;
+  RemoteElem & operator= (const RemoteElem &) = delete;
+  RemoteElem & operator= (RemoteElem &&) = delete;
+
   /**
-   * Destructor.
+   * Sets remote_elem to nullptr.
    */
   virtual ~RemoteElem();
 

@@ -67,6 +67,12 @@ public:
         (ParentType::side_nodes_map[_side_number][n]);
   }
 
+  Side (Side &&) = delete;
+  Side (const Side &) = delete;
+  Side & operator= (const Side &) = delete;
+  Side & operator= (Side &&) = delete;
+  virtual ~Side() = default;
+
   /**
    * Setting a side node changes the node on the parent.
    */

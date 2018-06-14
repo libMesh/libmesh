@@ -60,6 +60,12 @@ public:
   InfEdge2 (Elem * p=libmesh_nullptr) :
     Edge(InfEdge2::n_nodes(), p, _nodelinks_data) {}
 
+  InfEdge2 (InfEdge2 &&) = delete;
+  InfEdge2 (const InfEdge2 &) = delete;
+  InfEdge2 & operator= (const InfEdge2 &) = delete;
+  InfEdge2 & operator= (InfEdge2 &&) = delete;
+  virtual ~InfEdge2() = default;
+
   /**
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
