@@ -214,15 +214,57 @@ std::size_t waitany (std::vector<Request> & r)
   libmesh_assert(!r.empty());
 
   int index = 0;
-#ifdef LIBMESH_HAVE_MPI
   int r_size = cast_int<int>(r.size());
   std::vector<request> raw(r_size);
   for (int i=0; i != r_size; ++i)
-    raw[i] = *r[i].get();
+    {
+      Request * root = &r[i];
+      // If we have prior requests, we need to complete the first one
+      // first
+      while (root->_prior_request.get())
+        root = root->_prior_request.get();
+      raw[i] = *root->get();
+    }
 
-  libmesh_call_mpi
-    (MPI_Waitany(r_size, &raw[0], &index, MPI_STATUS_IGNORE));
+  bool only_priors_completed = false;
+
+  Request * next;
+
+  do
+    {
+#ifdef LIBMESH_HAVE_MPI
+      libmesh_call_mpi
+        (MPI_Waitany(r_size, &raw[0], &index, MPI_STATUS_IGNORE));
 #endif
+
+      Request * completed = &r[index];
+      next = completed;
+
+      // If we completed a prior request, we're not really done yet,
+      // so find the next in that line to try again.
+      while (completed->_prior_request.get())
+        {
+          only_priors_completed = true;
+          next = completed;
+          completed = completed->_prior_request.get();
+        }
+
+      // Do any post-wait work for the completed request
+      if (completed->post_wait_work)
+        for (auto & item : completed->post_wait_work->first)
+          {
+            // The user should never try to give us NULL work or try
+            // to wait() twice.
+            libmesh_assert (item);
+            item->run();
+            delete item;
+            item = libmesh_nullptr;
+          }
+
+      next->_prior_request.reset(libmesh_nullptr);
+      raw[index] = *next->get();
+
+    } while(only_priors_completed);
 
   return index;
 }
