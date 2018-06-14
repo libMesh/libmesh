@@ -73,8 +73,10 @@ AC_REQUIRE([AC_CANONICAL_HOST])
 AC_REQUIRE([AC_PROG_SED])
 AC_REQUIRE([AX_COMPILER_VENDOR])
 
-AC_ARG_WITH(gcc-arch, [AS_HELP_STRING([--with-gcc-arch=<arch>], [use architecture <arch> for gcc -march/-mtune, instead of guessing])],
-            ax_gcc_arch=$withval, ax_gcc_arch=yes)
+AC_ARG_WITH(gcc-arch,
+            [AS_HELP_STRING([--with-gcc-arch=<arch>], [use architecture <arch> for gcc -march/-mtune, instead of guessing])],
+            ax_gcc_arch=$withval,
+            ax_gcc_arch=yes)
 
 AC_MSG_CHECKING([for gcc architecture flag])
 AC_MSG_RESULT([])

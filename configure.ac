@@ -126,6 +126,37 @@ AC_SUBST(PERL)
 # --------------------------------------------------------------
 LIBMESH_SET_COMPILERS
 
+# By default we do not set any -march flag, but this can be turned on
+# by configuring with --enable-march
+AC_ARG_ENABLE(march,
+              AC_HELP_STRING([--enable-march],
+                             [Determine the correct -march flag for this system]),
+              [AS_CASE("${enableval}",
+                       [yes], [enablemarch=yes],
+                       [no],  [enablemarch=no],
+                       [AC_MSG_ERROR(bad value ${enableval} for --enable-march)])],
+              [enablemarch=no])
+
+# Set the value of the cache variable $ax_cv_gcc_archflag based
+# on the current architecture. For the first argument:
+# [yes] = generate portable code (-mtune)
+# [no]  = generate architecture-specific code (-march)
+# This script is specifc to GCC; the flags it determines might not
+# work for other compilers. There is also an optional third
+# argument which controls what happens when determining an arch flag
+# fails, we don't do anything in that case.
+AS_IF([test "x$enablemarch" != "xno"],
+      [
+        AX_GCC_ARCHFLAG([no],
+                        [
+                          dnl Action if success - append $ax_cv_gcc_archflag to CXXFLAGS flags for
+                          dnl optimized and devel METHODS. I don't think it is needed with -O0 when
+                          dnl debugging.
+                          CXXFLAGS_OPT="$CXXFLAGS_OPT $ax_cv_gcc_archflag"
+                          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $ax_cv_gcc_archflag"
+                        ])
+      ])
+
 # --------------------------------------------------------------
 # Allow the user to explicitly turn off C++11 support by saying
 # --disable-cxx11?  This is no longer supported.
