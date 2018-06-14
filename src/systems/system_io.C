@@ -1822,6 +1822,8 @@ std::size_t System::write_serialized_blocked_dof_objects (const std::vector<cons
                                                           Xdr & io,
                                                           const unsigned int var_to_write) const
 {
+  parallel_object_only();
+
   //-------------------------------------------------------
   // General order: (IO format 0.7.4 & greater)
   //
