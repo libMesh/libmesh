@@ -5619,7 +5619,7 @@ fi
 
     if test "x$compiler_brand_detected" = "xno"; then :
 
-          is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
+          is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group\|PGI'`"
           if test "x$is_pgcc" != "x"; then :
 
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Portland Group C++ >>>" >&5
@@ -7327,6 +7327,8 @@ esac
                                 CFLAGS_OPT="-O2"
                                 CFLAGS_DEVEL="$CFLAGS_DBG"
 
+                                                                OPROFILE_FLAGS="-g"
+
                                                                 if test "$enableexceptions" = no; then :
 
                                         CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
@@ -7627,17 +7629,17 @@ $as_echo "<<< Configuring libMesh with methods \"$METHODS\" >>>" >&6; }
  build_prof=no
  build_oprof=no
 
-  CPPFLAGS_OPT="$CPPFLAGS_OPT $libmesh_CPPFLAGS"
- CXXFLAGS_OPT="$CXXFLAGS_OPT $libmesh_CXXFLAGS"
- CFLAGS_OPT="$CFLAGS_OPT $libmesh_CFLAGS"
+  CPPFLAGS_OPT="$CPPFLAGS_OPT $libmesh_CPPFLAGS $CPPFLAGS"
+ CXXFLAGS_OPT="$CXXFLAGS_OPT $libmesh_CXXFLAGS $CXXFLAGS"
+ CFLAGS_OPT="$CFLAGS_OPT $libmesh_CFLAGS $CFLAGS"
 
- CPPFLAGS_DBG="$CPPFLAGS_DBG $libmesh_CPPFLAGS"
- CXXFLAGS_DBG="$CXXFLAGS_DBG $libmesh_CXXFLAGS"
- CFLAGS_DBG="$CFLAGS_DBG $libmesh_CFLAGS"
+ CPPFLAGS_DBG="$CPPFLAGS_DBG $libmesh_CPPFLAGS $CPPFLAGS"
+ CXXFLAGS_DBG="$CXXFLAGS_DBG $libmesh_CXXFLAGS $CXXFLAGS"
+ CFLAGS_DBG="$CFLAGS_DBG $libmesh_CFLAGS $CFLAGS"
 
- CPPFLAGS_DEVEL="$CPPFLAGS_DEVEL $libmesh_CPPFLAGS"
- CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $libmesh_CXXFLAGS"
- CFLAGS_DEVEL="$CFLAGS_DEVEL $libmesh_CFLAGS"
+ CPPFLAGS_DEVEL="$CPPFLAGS_DEVEL $libmesh_CPPFLAGS $CPPFLAGS"
+ CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $libmesh_CXXFLAGS $CXXFLAGS"
+ CFLAGS_DEVEL="$CFLAGS_DEVEL $libmesh_CFLAGS $CFLAGS"
 
   CPPFLAGS_PROF="$CPPFLAGS_OPT"
  CXXFLAGS_PROF="$CXXFLAGS_OPT $PROFILING_FLAGS"

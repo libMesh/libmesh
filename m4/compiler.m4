@@ -274,7 +274,7 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
   dnl Portland Group C++?
   AS_IF([test "x$compiler_brand_detected" = "xno"],
         [
-          is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
+          is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group\|PGI'`"
           AS_IF([test "x$is_pgcc" != "x"],
           [
             AC_MSG_RESULT(<<< C++ compiler is Portland Group C++ >>>)
@@ -542,6 +542,9 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
                                 CFLAGS_DBG="-g"
                                 CFLAGS_OPT="-O2"
                                 CFLAGS_DEVEL="$CFLAGS_DBG"
+
+                                dnl The -g flag is all OProfile needs to produce annotations
+                                OPROFILE_FLAGS="-g"
 
                                 dnl Disable exception handling if we dont use it
                                 AS_IF([test "$enableexceptions" = no],
