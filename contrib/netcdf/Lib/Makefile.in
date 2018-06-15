@@ -100,7 +100,11 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/all_static.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
+	$(top_srcdir)/m4/ax_check_compile_flag.m4 \
+	$(top_srcdir)/m4/ax_compiler_vendor.m4 \
 	$(top_srcdir)/m4/ax_cxx_compile_stdcxx_11.m4 \
+	$(top_srcdir)/m4/ax_gcc_archflag.m4 \
+	$(top_srcdir)/m4/ax_gcc_x86_cpuid.m4 \
 	$(top_srcdir)/m4/ax_openmp.m4 $(top_srcdir)/m4/ax_pthread.m4 \
 	$(top_srcdir)/m4/ax_split_version.m4 \
 	$(top_srcdir)/m4/ax_tls.m4 $(top_srcdir)/m4/backtrace.m4 \
@@ -507,6 +511,7 @@ PETSC_DIR = @PETSC_DIR@
 PETSC_FC_INCLUDES = @PETSC_FC_INCLUDES@
 PKG_CONFIG = @PKG_CONFIG@
 PROFILING_FLAGS = @PROFILING_FLAGS@
+PRTDIAG = @PRTDIAG@
 PTHREAD_CC = @PTHREAD_CC@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
