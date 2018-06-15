@@ -532,15 +532,15 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
                        ],
 
             [portland_group], [
-                                CXXFLAGS_DBG="-g --no_using_std"
-                                CXXFLAGS_OPT="-O2 --no_using_std -fast -Minform=severe"
+                                CXXFLAGS_DBG="$CXXFLAGS_DBG -g --no_using_std"
+                                CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 --no_using_std -fast -Minform=severe"
                                 CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
 
                                 dnl PG C++ definitely doesnt understand -Wno-deprecated...
                                 NODEPRECATEDFLAG=""
 
-                                CFLAGS_DBG="-g"
-                                CFLAGS_OPT="-O2"
+                                CFLAGS_DBG="$CFLAGS_DBG -g"
+                                CFLAGS_OPT="$CFLAGS_OPT -O2"
                                 CFLAGS_DEVEL="$CFLAGS_DBG"
 
                                 dnl Disable exception handling if we dont use it
