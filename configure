@@ -198,6 +198,7 @@ test -x / || exit 1"
   as_lineno_2=";as_suggested=$as_suggested$LINENO;as_suggested=$as_suggested" as_lineno_2a=\$LINENO
   eval 'test \"x\$as_lineno_1'\$as_run'\" != \"x\$as_lineno_2'\$as_run'\" &&
   test \"x\`expr \$as_lineno_1'\$as_run' + 1\`\" = \"x\$as_lineno_2'\$as_run'\"' || exit 1
+test \$(( 1 + 1 )) = 2 || exit 1
 
   test -n \"\${ZSH_VERSION+set}\${BASH_VERSION+set}\" || (
     ECHO='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
@@ -205,8 +206,7 @@ test -x / || exit 1"
     ECHO=\$ECHO\$ECHO\$ECHO\$ECHO\$ECHO\$ECHO
     PATH=/empty FPATH=/empty; export PATH FPATH
     test \"X\`printf %s \$ECHO\`\" = \"X\$ECHO\" \\
-      || test \"X\`print -r -- \$ECHO\`\" = \"X\$ECHO\" ) || exit 1
-test \$(( 1 + 1 )) = 2 || exit 1"
+      || test \"X\`print -r -- \$ECHO\`\" = \"X\$ECHO\" ) || exit 1"
   if (eval "$as_required") 2>/dev/null; then :
   as_have_required=yes
 else
@@ -895,7 +895,6 @@ LD
 FGREP
 EGREP
 GREP
-SED
 LIBTOOL
 HAVE_DOUBLE_UNDERSCORE_ATTRIBUTE_FALLTHROUGH_FALSE
 HAVE_DOUBLE_UNDERSCORE_ATTRIBUTE_FALLTHROUGH_TRUE
@@ -1011,6 +1010,8 @@ LIBMESH_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE
 LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE
 LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE
 HAVE_CXX11
+PRTDIAG
+SED
 ac_ct_F77
 FFLAGS
 F77
@@ -1135,6 +1136,8 @@ with_cc
 enable_fortran
 with_fc
 with_f77
+enable_march
+with_gcc_arch
 enable_cxx11
 enable_cxx11_required
 enable_sanitize
@@ -1924,6 +1927,7 @@ Optional Features:
   --disable-dependency-tracking
                           speeds up one-time build
   --disable-fortran       build without Fortran language support
+  --enable-march          Determine the correct -march flag for this system
   --disable-cxx11         build without C++11 support (no longer supported!)
   --enable-cxx11-required Error if compiler does not support C++11
   --enable-sanitize="opt dbg devel prof oprof"
@@ -2049,6 +2053,8 @@ Optional Packages:
   --with-cc=CC            C compiler to use
   --with-fc=FC            Fortran compiler to use
   --with-f77=F77          Fortran compiler to use
+  --with-gcc-arch=<arch>  use architecture <arch> for gcc -march/-mtune,
+                          instead of guessing
   --with-methods=METHODS  methods used to build libMesh
                           (opt,dbg,devel,prof,oprof)
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
@@ -2397,6 +2403,48 @@ fi
 
 } # ac_fn_f77_try_compile
 
+# ac_fn_c_try_run LINENO
+# ----------------------
+# Try to link conftest.$ac_ext, and return whether this succeeded. Assumes
+# that executables *can* be run.
+ac_fn_c_try_run ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  if { { ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_link") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } && { ac_try='./conftest$ac_exeext'
+  { { case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }; then :
+  ac_retval=0
+else
+  $as_echo "$as_me: program exited with status $ac_status" >&5
+       $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+       ac_retval=$ac_status
+fi
+  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+  as_fn_set_status $ac_retval
+
+} # ac_fn_c_try_run
+
 # ac_fn_cxx_try_run LINENO
 # ------------------------
 # Try to link conftest.$ac_ext, and return whether this succeeded. Assumes
@@ -2552,48 +2600,6 @@ fi
   as_fn_set_status $ac_retval
 
 } # ac_fn_c_try_cpp
-
-# ac_fn_c_try_run LINENO
-# ----------------------
-# Try to link conftest.$ac_ext, and return whether this succeeded. Assumes
-# that executables *can* be run.
-ac_fn_c_try_run ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  if { { ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-$as_echo "$ac_try_echo"; } >&5
-  (eval "$ac_link") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } && { ac_try='./conftest$ac_exeext'
-  { { case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-$as_echo "$ac_try_echo"; } >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; }; then :
-  ac_retval=0
-else
-  $as_echo "$as_me: program exited with status $ac_status" >&5
-       $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-       ac_retval=$ac_status
-fi
-  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-  as_fn_set_status $ac_retval
-
-} # ac_fn_c_try_run
 
 # ac_fn_c_check_func LINENO FUNC VAR
 # ----------------------------------
@@ -6703,6 +6709,569 @@ $as_echo ">>> Disabling Fortran language support per user request <<<" >&6; }
 fi
 
 
+# By default we do not set any -march flag, but this can be turned on
+# by configuring with --enable-march
+# Check whether --enable-march was given.
+if test "${enable_march+set}" = set; then :
+  enableval=$enable_march; case "${enableval}" in #(
+  yes) :
+    enablemarch=yes ;; #(
+  no) :
+    enablemarch=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-march" "$LINENO" 5 ;;
+esac
+else
+  enablemarch=no
+fi
+
+
+# Set the value of the cache variable $ax_cv_gcc_archflag based
+# on the current architecture. For the first argument:
+# [yes] = generate portable code (-mtune)
+# [no]  = generate architecture-specific code (-march)
+# This script is specifc to GCC; the flags it determines might not
+# work for other compilers. There is also an optional third
+# argument which controls what happens when determining an arch flag
+# fails, we don't do anything in that case.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for a sed that does not truncate output" >&5
+$as_echo_n "checking for a sed that does not truncate output... " >&6; }
+if ${ac_cv_path_SED+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+            ac_script=s/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/
+     for ac_i in 1 2 3 4 5 6 7; do
+       ac_script="$ac_script$as_nl$ac_script"
+     done
+     echo "$ac_script" 2>/dev/null | sed 99q >conftest.sed
+     { ac_script=; unset ac_script;}
+     if test -z "$SED"; then
+  ac_path_SED_found=false
+  # Loop through the user's path and test for each of PROGNAME-LIST
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_prog in sed gsed; do
+    for ac_exec_ext in '' $ac_executable_extensions; do
+      ac_path_SED="$as_dir/$ac_prog$ac_exec_ext"
+      as_fn_executable_p "$ac_path_SED" || continue
+# Check for GNU ac_path_SED and select it if it is found.
+  # Check for GNU $ac_path_SED
+case `"$ac_path_SED" --version 2>&1` in
+*GNU*)
+  ac_cv_path_SED="$ac_path_SED" ac_path_SED_found=:;;
+*)
+  ac_count=0
+  $as_echo_n 0123456789 >"conftest.in"
+  while :
+  do
+    cat "conftest.in" "conftest.in" >"conftest.tmp"
+    mv "conftest.tmp" "conftest.in"
+    cp "conftest.in" "conftest.nl"
+    $as_echo '' >> "conftest.nl"
+    "$ac_path_SED" -f conftest.sed < "conftest.nl" >"conftest.out" 2>/dev/null || break
+    diff "conftest.out" "conftest.nl" >/dev/null 2>&1 || break
+    as_fn_arith $ac_count + 1 && ac_count=$as_val
+    if test $ac_count -gt ${ac_path_SED_max-0}; then
+      # Best one so far, save it but keep looking for a better one
+      ac_cv_path_SED="$ac_path_SED"
+      ac_path_SED_max=$ac_count
+    fi
+    # 10*(2^10) chars as input seems more than enough
+    test $ac_count -gt 10 && break
+  done
+  rm -f conftest.in conftest.tmp conftest.nl conftest.out;;
+esac
+
+      $ac_path_SED_found && break 3
+    done
+  done
+  done
+IFS=$as_save_IFS
+  if test -z "$ac_cv_path_SED"; then
+    as_fn_error $? "no acceptable sed could be found in \$PATH" "$LINENO" 5
+  fi
+else
+  ac_cv_path_SED=$SED
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_path_SED" >&5
+$as_echo "$ac_cv_path_SED" >&6; }
+ SED="$ac_cv_path_SED"
+  rm -f conftest.sed
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++ compiler vendor" >&5
+$as_echo_n "checking for C++ compiler vendor... " >&6; }
+if ${ax_cv_cxx_compiler_vendor+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+    # note: don't check for gcc first since some other compilers define __GNUC__
+  vendors="intel:     __ICC,__ECC,__INTEL_COMPILER
+           ibm:       __xlc__,__xlC__,__IBMC__,__IBMCPP__
+           pathscale: __PATHCC__,__PATHSCALE__
+           clang:     __clang__
+           cray:      _CRAYC
+           fujitsu:   __FUJITSU
+           sdcc:      SDCC, __SDCC
+           gnu:       __GNUC__
+           sun:       __SUNPRO_C,__SUNPRO_CC
+           hp:        __HP_cc,__HP_aCC
+           dec:       __DECC,__DECCXX,__DECC_VER,__DECCXX_VER
+           borland:   __BORLANDC__,__CODEGEARC__,__TURBOC__
+           comeau:    __COMO__
+           kai:       __KCC
+           lcc:       __LCC__
+           sgi:       __sgi,sgi
+           microsoft: _MSC_VER
+           metrowerks: __MWERKS__
+           watcom:    __WATCOMC__
+           portland:  __PGI
+           tcc:       __TINYC__
+           unknown:   UNKNOWN"
+  for ventest in $vendors; do
+    case $ventest in
+      *:) vendor=$ventest; continue ;;
+      *)  vencpp="defined("`echo $ventest | sed 's/,/) || defined(/g'`")" ;;
+    esac
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+      #if !($vencpp)
+        thisisanerror;
+      #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  break
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  done
+  ax_cv_cxx_compiler_vendor=`echo $vendor | cut -d: -f1`
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_cxx_compiler_vendor" >&5
+$as_echo "$ax_cv_cxx_compiler_vendor" >&6; }
+
+
+if test "x$enablemarch" != "xno"; then :
+
+
+
+
+
+
+
+# Check whether --with-gcc-arch was given.
+if test "${with_gcc_arch+set}" = set; then :
+  withval=$with_gcc_arch; ax_gcc_arch=$withval
+else
+  ax_gcc_arch=yes
+fi
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gcc architecture flag" >&5
+$as_echo_n "checking for gcc architecture flag... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: " >&5
+$as_echo "" >&6; }
+if ${ax_cv_gcc_archflag+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+ax_cv_gcc_archflag="unknown"
+
+if test "$GCC" = yes; then
+
+if test "x$ax_gcc_arch" = xyes; then
+ax_gcc_arch=""
+if test "$cross_compiling" = no; then
+case $host_cpu in
+  i[3456]86*|x86_64*|amd64*) # use cpuid codes
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for x86 cpuid 0 output" >&5
+$as_echo_n "checking for x86 cpuid 0 output... " >&6; }
+if ${ax_cv_gcc_x86_cpuid_0+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test "$cross_compiling" = yes; then :
+  ax_cv_gcc_x86_cpuid_0=unknown
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdio.h>
+int
+main ()
+{
+
+     int op = 0, level = 0, eax, ebx, ecx, edx;
+     FILE *f;
+      __asm__ __volatile__ ("xchg %%ebx, %1\n"
+        "cpuid\n"
+        "xchg %%ebx, %1\n"
+        : "=a" (eax), "=r" (ebx), "=c" (ecx), "=d" (edx)
+        : "a" (op), "2" (level));
+
+     f = fopen("conftest_cpuid", "w"); if (!f) return 1;
+     fprintf(f, "%x:%x:%x:%x\n", eax, ebx, ecx, edx);
+     fclose(f);
+     return 0;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  ax_cv_gcc_x86_cpuid_0=`cat conftest_cpuid`; rm -f conftest_cpuid
+else
+  ax_cv_gcc_x86_cpuid_0=unknown; rm -f conftest_cpuid
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_gcc_x86_cpuid_0" >&5
+$as_echo "$ax_cv_gcc_x86_cpuid_0" >&6; }
+ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for x86 cpuid 1 output" >&5
+$as_echo_n "checking for x86 cpuid 1 output... " >&6; }
+if ${ax_cv_gcc_x86_cpuid_1+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test "$cross_compiling" = yes; then :
+  ax_cv_gcc_x86_cpuid_1=unknown
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdio.h>
+int
+main ()
+{
+
+     int op = 1, level = 0, eax, ebx, ecx, edx;
+     FILE *f;
+      __asm__ __volatile__ ("xchg %%ebx, %1\n"
+        "cpuid\n"
+        "xchg %%ebx, %1\n"
+        : "=a" (eax), "=r" (ebx), "=c" (ecx), "=d" (edx)
+        : "a" (op), "2" (level));
+
+     f = fopen("conftest_cpuid", "w"); if (!f) return 1;
+     fprintf(f, "%x:%x:%x:%x\n", eax, ebx, ecx, edx);
+     fclose(f);
+     return 0;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  ax_cv_gcc_x86_cpuid_1=`cat conftest_cpuid`; rm -f conftest_cpuid
+else
+  ax_cv_gcc_x86_cpuid_1=unknown; rm -f conftest_cpuid
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_gcc_x86_cpuid_1" >&5
+$as_echo "$ax_cv_gcc_x86_cpuid_1" >&6; }
+ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+
+     case $ax_cv_gcc_x86_cpuid_0 in
+       *:756e6547:6c65746e:49656e69) # Intel
+          case $ax_cv_gcc_x86_cpuid_1 in
+            *5[4578]?:*:*:*) ax_gcc_arch="pentium-mmx pentium" ;;
+            *5[123]?:*:*:*) ax_gcc_arch=pentium ;;
+            *0?61?:*:*:*|?61?:*:*:*|61?:*:*:*) ax_gcc_arch=pentiumpro ;;
+            *0?6[356]?:*:*:*|?6[356]?:*:*:*|6[356]?:*:*:*) ax_gcc_arch="pentium2 pentiumpro" ;;
+            *0?6[78ab]?:*:*:*|?6[78ab]?:*:*:*|6[78ab]?:*:*:*) ax_gcc_arch="pentium3 pentiumpro" ;;
+            *0?6[9d]?:*:*:*|?6[9d]?:*:*:*|6[9d]?:*:*:*|*1?65?:*:*:*) ax_gcc_arch="pentium-m pentium3 pentiumpro" ;;
+            *0?6e?:*:*:*|?6e?:*:*:*|6e?:*:*:*) ax_gcc_arch="yonah pentium-m pentium3 pentiumpro" ;;
+            *0?6f?:*:*:*|?6f?:*:*:*|6f?:*:*:*|*1?66?:*:*:*) ax_gcc_arch="core2 pentium-m pentium3 pentiumpro" ;;
+            *1?6[7d]?:*:*:*) ax_gcc_arch="penryn core2 pentium-m pentium3 pentiumpro" ;;
+            *1?6[aef]?:*:*:*|*2?6e?:*:*:*) ax_gcc_arch="nehalem corei7 core2 pentium-m pentium3 pentiumpro" ;;
+            *2?6[5cf]?:*:*:*) ax_gcc_arch="westmere corei7 core2 pentium-m pentium3 pentiumpro" ;;
+            *2?6[ad]?:*:*:*) ax_gcc_arch="sandybridge corei7-avx corei7 core2 pentium-m pentium3 pentiumpro" ;;
+            *3?6[ae]?:*:*:*) ax_gcc_arch="ivybridge core-avx-i corei7-avx corei7 core2 pentium-m pentium3 pentiumpro" ;;
+            *3?6[cf]?:*:*:*|*4?6[56]?:*:*:*) ax_gcc_arch="haswell core-avx2 core-avx-i corei7-avx corei7 core2 pentium-m pentium3 pentiumpro" ;;
+            *3?6d?:*:*:*|*4?6[7f]?:*:*:*|*5?66?:*:*:*) ax_gcc_arch="broadwell core-avx2 core-avx-i corei7-avx corei7 core2 pentium-m pentium3 pentiumpro" ;;
+            *1?6c?:*:*:*|*2?6[67]?:*:*:*|*3?6[56]?:*:*:*) ax_gcc_arch="bonnell atom core2 pentium-m pentium3 pentiumpro" ;;
+            *3?67?:*:*:*|*[45]?6[ad]?:*:*:*) ax_gcc_arch="silvermont atom core2 pentium-m pentium3 pentiumpro" ;;
+            *000?f[012]?:*:*:*|?f[012]?:*:*:*|f[012]?:*:*:*) ax_gcc_arch="pentium4 pentiumpro" ;;
+            *000?f[346]?:*:*:*|?f[346]?:*:*:*|f[346]?:*:*:*) ax_gcc_arch="nocona prescott pentium4 pentiumpro" ;;
+            # fallback
+            *5??:*:*:*) ax_gcc_arch=pentium ;;
+            *??6??:*:*:*) ax_gcc_arch="core2 pentiumpro" ;;
+            *6??:*:*:*) ax_gcc_arch=pentiumpro ;;
+            *00??f??:*:*:*|??f??:*:*:*|?f??:*:*:*|f??:*:*:*) ax_gcc_arch="pentium4 pentiumpro" ;;
+          esac ;;
+       *:68747541:444d4163:69746e65) # AMD
+          case $ax_cv_gcc_x86_cpuid_1 in
+            *5[67]?:*:*:*) ax_gcc_arch=k6 ;;
+            *5[8]?:*:*:*) ax_gcc_arch="k6-2 k6" ;;
+            *5[9d]?:*:*:*) ax_gcc_arch="k6-3 k6" ;;
+            *6[12]?:*:*:*) ax_gcc_arch="athlon k7" ;;
+            *6[34]?:*:*:*) ax_gcc_arch="athlon-tbird k7" ;;
+            *6[678a]?:*:*:*) ax_gcc_arch="athlon-xp athlon-4 athlon k7" ;;
+            *000?f[4578bcef]?:*:*:*|?f[4578bcef]?:*:*:*|f[4578bcef]?:*:*:*|*001?f[4578bcf]?:*:*:*|1?f[4578bcf]?:*:*:*) ax_gcc_arch="athlon64 k8" ;;
+            *002?f[13457bcf]?:*:*:*|2?f[13457bcf]?:*:*:*|*004?f[138bcf]?:*:*:*|4?f[138bcf]?:*:*:*|*005?f[df]?:*:*:*|5?f[df]?:*:*:*|*006?f[8bcf]?:*:*:*|6?f[8bcf]?:*:*:*|*007?f[cf]?:*:*:*|7?f[cf]?:*:*:*|*00c?f1?:*:*:*|c?f1?:*:*:*|*020?f3?:*:*:*|20?f3?:*:*:*) ax_gcc_arch="athlon64-sse3 k8-sse3 athlon64 k8" ;;
+            *010?f[245689a]?:*:*:*|10?f[245689a]?:*:*:*|*030?f1?:*:*:*|30?f1?:*:*:*) ax_gcc_arch="barcelona amdfam10 k8" ;;
+            *050?f[12]?:*:*:*|50?f[12]?:*:*:*) ax_gcc_arch="btver1 amdfam10 k8" ;;
+            *060?f1?:*:*:*|60?f1?:*:*:*) ax_gcc_arch="bdver1 amdfam10 k8" ;;
+            *060?f2?:*:*:*|60?f2?:*:*:*|*061?f[03]?:*:*:*|61?f[03]?:*:*:*) ax_gcc_arch="bdver2 bdver1 amdfam10 k8" ;;
+            *063?f0?:*:*:*|63?f0?:*:*:*) ax_gcc_arch="bdver3 bdver2 bdver1 amdfam10 k8" ;;
+            *07[03]?f0?:*:*:*|7[03]?f0?:*:*:*) ax_gcc_arch="btver2 btver1 amdfam10 k8" ;;
+            # fallback
+            *0[13]??f??:*:*:*|[13]??f??:*:*:*) ax_gcc_arch="barcelona amdfam10 k8" ;;
+            *020?f??:*:*:*|20?f??:*:*:*) ax_gcc_arch="athlon64-sse3 k8-sse3 athlon64 k8" ;;
+            *05??f??:*:*:*|5??f??:*:*:*) ax_gcc_arch="btver1 amdfam10 k8" ;;
+            *060?f??:*:*:*|60?f??:*:*:*) ax_gcc_arch="bdver1 amdfam10 k8" ;;
+            *061?f??:*:*:*|61?f??:*:*:*) ax_gcc_arch="bdver2 bdver1 amdfam10 k8" ;;
+            *06??f??:*:*:*|6??f??:*:*:*) ax_gcc_arch="bdver3 bdver2 bdver1 amdfam10 k8" ;;
+            *070?f??:*:*:*|70?f??:*:*:*) ax_gcc_arch="btver2 btver1 amdfam10 k8" ;;
+            *???f??:*:*:*) ax_gcc_arch="amdfam10 k8" ;;
+          esac ;;
+        *:746e6543:736c7561:48727561) # IDT / VIA (Centaur)
+           case $ax_cv_gcc_x86_cpuid_1 in
+             *54?:*:*:*) ax_gcc_arch=winchip-c6 ;;
+             *5[89]?:*:*:*) ax_gcc_arch=winchip2 ;;
+             *66?:*:*:*) ax_gcc_arch=winchip2 ;;
+             *6[78]?:*:*:*) ax_gcc_arch=c3 ;;
+             *6[9adf]?:*:*:*) ax_gcc_arch="c3-2 c3" ;;
+           esac ;;
+     esac
+     if test x"$ax_gcc_arch" = x; then # fallback
+       case $host_cpu in
+         i586*) ax_gcc_arch=pentium ;;
+         i686*) ax_gcc_arch=pentiumpro ;;
+       esac
+     fi
+     ;;
+
+  sparc*)
+     # Extract the first word of "prtdiag", so it can be a program name with args.
+set dummy prtdiag; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_PRTDIAG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $PRTDIAG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PRTDIAG="$PRTDIAG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="$PATH:/usr/platform/`uname -i`/sbin/:/usr/platform/`uname -m`/sbin/"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_PRTDIAG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_PRTDIAG" && ac_cv_path_PRTDIAG="prtdiag"
+  ;;
+esac
+fi
+PRTDIAG=$ac_cv_path_PRTDIAG
+if test -n "$PRTDIAG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PRTDIAG" >&5
+$as_echo "$PRTDIAG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+     cputype=`(((grep cpu /proc/cpuinfo | cut -d: -f2) ; ($PRTDIAG -v |grep -i sparc) ; grep -i cpu /var/run/dmesg.boot ) | head -n 1) 2> /dev/null`
+     cputype=`echo "$cputype" | tr -d ' -' | $SED 's/SPARCIIi/SPARCII/' |tr $as_cr_LETTERS $as_cr_letters`
+     case $cputype in
+         *ultrasparciv*) ax_gcc_arch="ultrasparc4 ultrasparc3 ultrasparc v9" ;;
+         *ultrasparciii*) ax_gcc_arch="ultrasparc3 ultrasparc v9" ;;
+         *ultrasparc*) ax_gcc_arch="ultrasparc v9" ;;
+         *supersparc*|*tms390z5[05]*) ax_gcc_arch="supersparc v8" ;;
+         *hypersparc*|*rt62[056]*) ax_gcc_arch="hypersparc v8" ;;
+         *cypress*) ax_gcc_arch=cypress ;;
+     esac ;;
+
+  alphaev5) ax_gcc_arch=ev5 ;;
+  alphaev56) ax_gcc_arch=ev56 ;;
+  alphapca56) ax_gcc_arch="pca56 ev56" ;;
+  alphapca57) ax_gcc_arch="pca57 pca56 ev56" ;;
+  alphaev6) ax_gcc_arch=ev6 ;;
+  alphaev67) ax_gcc_arch=ev67 ;;
+  alphaev68) ax_gcc_arch="ev68 ev67" ;;
+  alphaev69) ax_gcc_arch="ev69 ev68 ev67" ;;
+  alphaev7) ax_gcc_arch="ev7 ev69 ev68 ev67" ;;
+  alphaev79) ax_gcc_arch="ev79 ev7 ev69 ev68 ev67" ;;
+
+  powerpc*)
+     cputype=`((grep cpu /proc/cpuinfo | head -n 1 | cut -d: -f2 | cut -d, -f1 | $SED 's/ //g') ; /usr/bin/machine ; /bin/machine; grep CPU /var/run/dmesg.boot | head -n 1 | cut -d" " -f2) 2> /dev/null`
+     cputype=`echo $cputype | $SED -e 's/ppc//g;s/ *//g'`
+     case $cputype in
+       *750*) ax_gcc_arch="750 G3" ;;
+       *740[0-9]*) ax_gcc_arch="$cputype 7400 G4" ;;
+       *74[4-5][0-9]*) ax_gcc_arch="$cputype 7450 G4" ;;
+       *74[0-9][0-9]*) ax_gcc_arch="$cputype G4" ;;
+       *970*) ax_gcc_arch="970 G5 power4";;
+       *POWER4*|*power4*|*gq*) ax_gcc_arch="power4 970";;
+       *POWER5*|*power5*|*gr*|*gs*) ax_gcc_arch="power5 power4 970";;
+       603ev|8240) ax_gcc_arch="$cputype 603e 603";;
+       *) ax_gcc_arch=$cputype ;;
+     esac
+     ax_gcc_arch="$ax_gcc_arch powerpc"
+     ;;
+  aarch64)
+     cpuimpl=`grep 'CPU implementer' /proc/cpuinfo 2> /dev/null | cut -d: -f2 | tr -d " " | head -n 1`
+     cpuarch=`grep 'CPU architecture' /proc/cpuinfo 2> /dev/null | cut -d: -f2 | tr -d " " | head -n 1`
+     cpuvar=`grep 'CPU variant' /proc/cpuinfo 2> /dev/null | cut -d: -f2 | tr -d " " | head -n 1`
+     case $cpuimpl in
+       0x42) case $cpuarch in
+               8) case $cpuvar in
+                    0x0) ax_gcc_arch="thunderx2t99 vulcan armv8.1-a armv8-a+lse armv8-a native" ;;
+                  esac
+                  ;;
+             esac
+             ;;
+       0x43) case $cpuarch in
+               8) case $cpuvar in
+                    0x0) ax_gcc_arch="thunderx armv8-a native" ;;
+                    0x1) ax_gcc_arch="thunderx+lse armv8.1-a armv8-a+lse armv8-a native" ;;
+                  esac
+                  ;;
+             esac
+             ;;
+      esac
+      ;;
+esac
+fi # not cross-compiling
+fi # guess arch
+
+if test "x$ax_gcc_arch" != x -a "x$ax_gcc_arch" != xno; then
+if test "xno" = xyes; then # if we require portable code
+  flag_prefixes="-mtune="
+  if test "x$ax_cv_cxx_compiler_vendor" = xclang; then flag_prefixes="-march="; fi
+  # -mcpu=$arch and m$arch generate nonportable code on every arch except
+  # x86.  And some other arches (e.g. Alpha) don't accept -mtune.  Grrr.
+  case $host_cpu in i*86|x86_64*|amd64*) flag_prefixes="$flag_prefixes -mcpu= -m";; esac
+else
+  flag_prefixes="-march= -mcpu= -m"
+fi
+for flag_prefix in $flag_prefixes; do
+  for arch in $ax_gcc_arch; do
+    flag="$flag_prefix$arch"
+    as_CACHEVAR=`$as_echo "ax_cv_check_cxxflags__$flag" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C++ compiler accepts $flag" >&5
+$as_echo_n "checking whether C++ compiler accepts $flag... " >&6; }
+if eval \${$as_CACHEVAR+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ax_check_save_flags=$CXXFLAGS
+  CXXFLAGS="$CXXFLAGS  $flag"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  eval "$as_CACHEVAR=yes"
+else
+  eval "$as_CACHEVAR=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CXXFLAGS=$ax_check_save_flags
+fi
+eval ac_res=\$$as_CACHEVAR
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
+  if test "x$ax_cv_cxx_compiler_vendor" = xclang; then
+      if test "xno" = xyes; then
+        if test "x$flag" = "x-march=$arch"; then flag=-mtune=$arch; fi
+      fi
+    fi; ax_cv_gcc_archflag=$flag; break
+else
+  :
+fi
+
+  done
+  test "x$ax_cv_gcc_archflag" = xunknown || break
+done
+fi
+
+fi # $GCC=yes
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gcc architecture flag" >&5
+$as_echo_n "checking for gcc architecture flag... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_gcc_archflag" >&5
+$as_echo "$ax_cv_gcc_archflag" >&6; }
+if test "x$ax_cv_gcc_archflag" = xunknown; then
+  :
+else
+
+                                                                                                        CXXFLAGS_OPT="$CXXFLAGS_OPT $ax_cv_gcc_archflag"
+                          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $ax_cv_gcc_archflag"
+
+fi
+
+
+fi
+
 # --------------------------------------------------------------
 # Allow the user to explicitly turn off C++11 support by saying
 # --disable-cxx11?  This is no longer supported.
@@ -6764,7 +7333,6 @@ fi
 # flag for the current compiler.  Adds the result to CXXFLAGS if
 # one is found.  See ax_cxx_compile_stdcxx_11.m4 for details.
 # --------------------------------------------------------------
-
     ax_cxx_compile_cxx11_required=true
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -7379,7 +7947,6 @@ fi
 # Checks for code coverage
 # this must be done after we look for our own compilers
 #------------------------------------------------------
-
 
 
 
