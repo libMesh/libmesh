@@ -169,6 +169,11 @@ public:
   static void set_node_processor_ids(MeshBase & mesh);
 
   /**
+  * Evenly assign nodes on the partitioning interface
+  */
+  static void set_node_processor_ids_on_interface(MeshBase & mesh);
+
+  /**
    * Attach weights that can be used for partitioning.  This ErrorVector should be
    * _exactly_ the same on every processor and should have mesh->max_elem_id()
    * entries.

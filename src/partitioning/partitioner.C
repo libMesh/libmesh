@@ -405,6 +405,64 @@ void Partitioner::set_parent_processor_ids(MeshBase & mesh)
 #endif // LIBMESH_ENABLE_AMR
 }
 
+void Partitioner::set_node_processor_ids_on_interface(MeshBase & mesh)
+{
+  // This function must be run on all processors at once
+  libmesh_parallel_only(mesh.comm());
+
+  std::map<std::pair<processor_id_type, processor_id_type>, std::set<dof_id_type>> processor_pair_to_nodes;
+  // Loop over all the active elements
+  for (auto & elem : mesh.active_element_ptr_range())
+    {
+      libmesh_assert(elem);
+
+      libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);
+
+      std::set<dof_id_type> mynodes;
+      std::set<dof_id_type> neighbor_nodes;
+      std::vector<dof_id_type> common_nodes;
+      auto n_nodes = elem->n_nodes();
+
+      for (unsigned int inode = 0; inode < n_nodes; inode++)
+        mynodes.insert(elem->node_id(inode));
+
+      for (auto i = decltype(elem->n_neighbors())(0); i < elem->n_neighbors(); ++i)
+      {
+        auto neigh = elem->neighbor(i);
+        if (neigh && neigh->processor_id() != elem->processor_id())
+        {
+          neighbor_nodes.clear();
+          common_nodes.clear();
+          auto neigh_n_nodes = neigh->n_nodes();
+          for (unsigned int inode = 0; inode < neigh_n_nodes; inode++)
+            neighbor_nodes.insert(neigh->node_id(inode));
+
+          std::set_intersection(mynodes.begin(), mynodes.end(),
+                            neighbor_nodes.begin(), neighbor_nodes.end(),
+                            std::back_inserter(common_nodes));
+
+          auto & map_set = processor_pair_to_nodes[std::make_pair(std::min(elem->processor_id(), neigh->processor_id()), std::max(elem->processor_id(), neigh->processor_id()))];
+          for (auto global_node_id: common_nodes)
+            map_set.insert(global_node_id);
+        }
+      }
+
+    }
+
+    for (auto & pmap: processor_pair_to_nodes)
+    {
+      unsigned int n_own_nodes = pmap.second.size()/2, i = 0;
+
+      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++, i++)
+      {
+        auto & node = mesh.node_ref(*it);
+        if (i <= n_own_nodes)
+          node.processor_id() = pmap.first.first;
+        else
+          node.processor_id() = pmap.first.second;
+      }
+    }
+}
 
 
 void Partitioner::set_node_processor_ids(MeshBase & mesh)
@@ -491,6 +549,12 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
           pid = node.choose_processor_id(pid, elem->processor_id());
         }
     }
+
+  static bool load_balanced_nodes =
+      libMesh::on_command_line ("--load-balanced-nodes-wo-node-id");
+      
+  if (load_balanced_nodes)
+   set_node_processor_ids_on_interface(mesh);
 
   // And loop over the subactive elements, but don't reassign
   // nodes that are already active on another processor.
@@ -584,7 +648,7 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
 
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_procids<Node>(mesh);
-  MeshTools::libmesh_assert_canonical_node_procids(mesh);
+  //MeshTools::libmesh_assert_canonical_node_procids(mesh);
 #endif
 }
 

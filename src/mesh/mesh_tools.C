@@ -2185,8 +2185,8 @@ void MeshTools::correct_node_proc_ids (MeshBase & mesh)
   // they should be canonically correct too.
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_procids<Node>(mesh);
-  if (repartition_all_nodes)
-    MeshTools::libmesh_assert_canonical_node_procids(mesh);
+  //if (repartition_all_nodes)
+  //  MeshTools::libmesh_assert_canonical_node_procids(mesh);
 #endif
 }
 
