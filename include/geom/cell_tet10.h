@@ -69,6 +69,12 @@ public:
     Tet(Tet10::n_nodes(), p, _nodelinks_data)
   {}
 
+  Tet10 (Tet10 &&) = delete;
+  Tet10 (const Tet10 &) = delete;
+  Tet10 & operator= (const Tet10 &) = delete;
+  Tet10 & operator= (Tet10 &&) = delete;
+  virtual ~Tet10() = default;
+
   /**
    * \returns \p TET10.
    */

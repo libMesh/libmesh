@@ -60,6 +60,12 @@ public:
   InfQuad4 (Elem * p=libmesh_nullptr) :
     InfQuad(InfQuad4::n_nodes(), p, _nodelinks_data) {}
 
+  InfQuad4 (InfQuad4 &&) = delete;
+  InfQuad4 (const InfQuad4 &) = delete;
+  InfQuad4 & operator= (const InfQuad4 &) = delete;
+  InfQuad4 & operator= (InfQuad4 &&) = delete;
+  virtual ~InfQuad4() = default;
+
   /**
    * \returns 4.
    */

@@ -70,6 +70,12 @@ public:
     InfPrism(InfPrism12::n_nodes(), p, _nodelinks_data)
   {}
 
+  InfPrism12 (InfPrism12 &&) = delete;
+  InfPrism12 (const InfPrism12 &) = delete;
+  InfPrism12 & operator= (const InfPrism12 &) = delete;
+  InfPrism12 & operator= (InfPrism12 &&) = delete;
+  virtual ~InfPrism12() = default;
+
   /**
    * \returns 12.  The \p InfPrism12 has 12 nodes.
    */

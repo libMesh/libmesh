@@ -117,6 +117,20 @@ protected:
 public:
 
   /**
+   * Elems are responsible for allocating and deleting their children
+   * during refinement, so they cannot be (default) copied or
+   * assigned. We therefore explicitly delete these operations.  Note
+   * that because _children is a C-style array, an Elem cannot even be
+   * safely default move-constructed (we would have to maintain a
+   * custom move constructor that explicitly sets _children to nullptr
+   * to do this safely).
+   */
+  Elem (Elem &&) = delete;
+  Elem (const Elem &) = delete;
+  Elem & operator= (const Elem &) = delete;
+  Elem & operator= (Elem &&) = delete;
+
+  /**
    * Destructor.  Frees all the memory associated with the element.
    */
   virtual ~Elem();

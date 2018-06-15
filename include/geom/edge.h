@@ -52,6 +52,12 @@ public:
       this->set_interior_parent(libmesh_nullptr);
   }
 
+  Edge (Edge &&) = delete;
+  Edge (const Edge &) = delete;
+  Edge & operator= (const Edge &) = delete;
+  Edge & operator= (Edge &&) = delete;
+  virtual ~Edge() = default;
+
   /**
    * \returns 1, the dimensionality of the object.
    */

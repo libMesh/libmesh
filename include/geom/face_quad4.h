@@ -59,6 +59,12 @@ public:
   Quad4 (Elem * p=libmesh_nullptr) :
     Quad(Quad4::n_nodes(), p, _nodelinks_data) {}
 
+  Quad4 (Quad4 &&) = delete;
+  Quad4 (const Quad4 &) = delete;
+  Quad4 & operator= (const Quad4 &) = delete;
+  Quad4 & operator= (Quad4 &&) = delete;
+  virtual ~Quad4() = default;
+
   /**
    * \returns \p QUAD4.
    */

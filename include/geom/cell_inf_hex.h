@@ -59,6 +59,12 @@ public:
       this->set_interior_parent(libmesh_nullptr);
   }
 
+  InfHex (InfHex &&) = delete;
+  InfHex (const InfHex &) = delete;
+  InfHex & operator= (const InfHex &) = delete;
+  InfHex & operator= (InfHex &&) = delete;
+  virtual ~InfHex() = default;
+
   /**
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.

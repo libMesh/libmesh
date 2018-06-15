@@ -55,6 +55,12 @@ public:
     InfCell(nn, InfPrism::n_sides(), p, _elemlinks_data, nodelinkdata)
   {}
 
+  InfPrism (InfPrism &&) = delete;
+  InfPrism (const InfPrism &) = delete;
+  InfPrism & operator= (const InfPrism &) = delete;
+  InfPrism & operator= (InfPrism &&) = delete;
+  virtual ~InfPrism() = default;
+
   /**
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.

@@ -79,6 +79,12 @@ public:
     InfHex(InfHex16::n_nodes(), p, _nodelinks_data)
   {}
 
+  InfHex16 (InfHex16 &&) = delete;
+  InfHex16 (const InfHex16 &) = delete;
+  InfHex16 & operator= (const InfHex16 &) = delete;
+  InfHex16 & operator= (InfHex16 &&) = delete;
+  virtual ~InfHex16() = default;
+
   /**
    * \returns 16.  The \p InfHex16 has 16 nodes.
    */

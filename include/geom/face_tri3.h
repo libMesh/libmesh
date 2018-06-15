@@ -64,6 +64,12 @@ public:
   Tri3 (Elem * p=libmesh_nullptr) :
     Tri(Tri3::n_nodes(), p, _nodelinks_data) {}
 
+  Tri3 (Tri3 &&) = delete;
+  Tri3 (const Tri3 &) = delete;
+  Tri3 & operator= (const Tri3 &) = delete;
+  Tri3 & operator= (Tri3 &&) = delete;
+  virtual ~Tri3() = default;
+
   /**
    * \returns \p TRI3.
    */

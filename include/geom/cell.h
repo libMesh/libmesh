@@ -49,6 +49,12 @@ public:
         Node ** nodelinkdata) :
     Elem (nn, ns, p, elemlinkdata, nodelinkdata) {}
 
+  Cell (Cell &&) = delete;
+  Cell (const Cell &) = delete;
+  Cell & operator= (const Cell &) = delete;
+  Cell & operator= (Cell &&) = delete;
+  virtual ~Cell() = default;
+
   /**
    * \returns 3, the dimensionality of the object.
    */

@@ -62,6 +62,12 @@ public:
     Hex(Hex8::n_nodes(), p, _nodelinks_data)
   {}
 
+  Hex8 (Hex8 &&) = delete;
+  Hex8 (const Hex8 &) = delete;
+  Hex8 & operator= (const Hex8 &) = delete;
+  Hex8 & operator= (Hex8 &&) = delete;
+  virtual ~Hex8() = default;
+
   /**
    * \returns \p HEX8.
    */

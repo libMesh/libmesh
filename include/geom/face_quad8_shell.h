@@ -43,6 +43,12 @@ public:
   QuadShell8 (Elem * p=libmesh_nullptr) :
     Quad8(p) {}
 
+  QuadShell8 (QuadShell8 &&) = delete;
+  QuadShell8 (const QuadShell8 &) = delete;
+  QuadShell8 & operator= (const QuadShell8 &) = delete;
+  QuadShell8 & operator= (QuadShell8 &&) = delete;
+  virtual ~QuadShell8() = default;
+
   /**
    * \returns \p QUADSHELL8.
    */

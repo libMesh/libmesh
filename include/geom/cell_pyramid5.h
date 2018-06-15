@@ -61,6 +61,12 @@ public:
     Pyramid(Pyramid5::n_nodes(), p, _nodelinks_data)
   {}
 
+  Pyramid5 (Pyramid5 &&) = delete;
+  Pyramid5 (const Pyramid5 &) = delete;
+  Pyramid5 & operator= (const Pyramid5 &) = delete;
+  Pyramid5 & operator= (Pyramid5 &&) = delete;
+  virtual ~Pyramid5() = default;
+
   /**
    * \returns \p PRYAMID.
    */

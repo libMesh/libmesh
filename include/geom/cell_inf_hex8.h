@@ -64,6 +64,12 @@ public:
     InfHex(InfHex8::n_nodes(), p, _nodelinks_data)
   {}
 
+  InfHex8 (InfHex8 &&) = delete;
+  InfHex8 (const InfHex8 &) = delete;
+  InfHex8 & operator= (const InfHex8 &) = delete;
+  InfHex8 & operator= (InfHex8 &&) = delete;
+  virtual ~InfHex8() = default;
+
   /**
    * \returns 8.  The \p InfHex8 has 8 nodes.
    */

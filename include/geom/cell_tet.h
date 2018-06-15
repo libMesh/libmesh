@@ -50,6 +50,12 @@ public:
       this->set_interior_parent(libmesh_nullptr);
   }
 
+  Tet (Tet &&) = delete;
+  Tet (const Tet &) = delete;
+  Tet & operator= (const Tet &) = delete;
+  Tet & operator= (Tet &&) = delete;
+  virtual ~Tet() = default;
+
   /**
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.

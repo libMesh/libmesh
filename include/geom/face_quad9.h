@@ -59,6 +59,12 @@ public:
   Quad9 (Elem * p=libmesh_nullptr) :
     Quad(Quad9::n_nodes(), p, _nodelinks_data) {}
 
+  Quad9 (Quad9 &&) = delete;
+  Quad9 (const Quad9 &) = delete;
+  Quad9 & operator= (const Quad9 &) = delete;
+  Quad9 & operator= (Quad9 &&) = delete;
+  virtual ~Quad9() = default;
+
   /**
    * \returns \p QUAD9.
    */

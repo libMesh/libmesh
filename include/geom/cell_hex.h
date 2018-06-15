@@ -49,6 +49,11 @@ public:
       this->set_interior_parent(libmesh_nullptr);
   }
 
+  Hex (Hex &&) = delete;
+  Hex (const Hex &) = delete;
+  Hex & operator= (const Hex &) = delete;
+  Hex & operator= (Hex &&) = delete;
+  virtual ~Hex() = default;
 
   /**
    * \returns The \p Point associated with local \p Node \p i,

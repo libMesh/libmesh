@@ -49,6 +49,12 @@ public:
       this->set_interior_parent(libmesh_nullptr);
   }
 
+  Prism (Prism &&) = delete;
+  Prism (const Prism &) = delete;
+  Prism & operator= (const Prism &) = delete;
+  Prism & operator= (Prism &&) = delete;
+  virtual ~Prism() = default;
+
   /**
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
