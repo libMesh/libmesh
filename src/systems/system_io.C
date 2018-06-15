@@ -1112,6 +1112,8 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
         Parallel::wait(reply_requests);
     }
 
+  Parallel::wait(id_requests);
+
   return n_read_values;
 }
 
