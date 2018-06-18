@@ -29,6 +29,7 @@
 #include <cstddef>
 #include <memory>
 #include <unordered_map>
+#include <queue>
 
 namespace libMesh
 {
@@ -172,6 +173,11 @@ public:
   * Evenly assign nodes on the partitioning interface
   */
   static void set_node_processor_ids_on_interface(MeshBase & mesh);
+
+  /**
+  * Setup node id using queue
+  */
+  static void set_node_processor_ids_on_interface_using_queue(MeshBase & mesh);
 
   /**
    * Attach weights that can be used for partitioning.  This ErrorVector should be

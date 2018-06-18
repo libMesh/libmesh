@@ -464,6 +464,112 @@ void Partitioner::set_node_processor_ids_on_interface(MeshBase & mesh)
     }
 }
 
+void Partitioner::set_node_processor_ids_on_interface_using_queue(MeshBase & mesh)
+{
+  // This function must be run on all processors at once
+  libmesh_parallel_only(mesh.comm());
+
+  std::map<std::pair<processor_id_type, processor_id_type>, std::set<dof_id_type>> processor_pair_to_nodes;
+  // Loop over all the active elements
+  for (auto & elem : mesh.active_element_ptr_range())
+    {
+      libmesh_assert(elem);
+
+      libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);
+
+      std::set<dof_id_type> mynodes;
+      std::set<dof_id_type> neighbor_nodes;
+      std::vector<dof_id_type> common_nodes;
+      auto n_nodes = elem->n_nodes();
+
+      for (unsigned int inode = 0; inode < n_nodes; inode++)
+        mynodes.insert(elem->node_id(inode));
+
+      for (auto i = decltype(elem->n_neighbors())(0); i < elem->n_neighbors(); ++i)
+      {
+        auto neigh = elem->neighbor(i);
+        if (neigh && neigh->processor_id() != elem->processor_id())
+        {
+          neighbor_nodes.clear();
+          common_nodes.clear();
+          auto neigh_n_nodes = neigh->n_nodes();
+          for (unsigned int inode = 0; inode < neigh_n_nodes; inode++)
+            neighbor_nodes.insert(neigh->node_id(inode));
+
+          std::set_intersection(mynodes.begin(), mynodes.end(),
+                            neighbor_nodes.begin(), neighbor_nodes.end(),
+                            std::back_inserter(common_nodes));
+
+          auto & map_set = processor_pair_to_nodes[std::make_pair(std::min(elem->processor_id(), neigh->processor_id()), std::max(elem->processor_id(), neigh->processor_id()))];
+          for (auto global_node_id: common_nodes)
+            map_set.insert(global_node_id);
+        }
+      }
+
+    }
+
+   std::vector<std::vector<const Elem *>> nodes_to_elem_map;
+
+   MeshTools::build_nodes_to_elem_map(mesh, nodes_to_elem_map);
+
+   std::vector<const Node *>  neighbors;
+   std::set<dof_id_type> neighbors_order;
+   std::vector<dof_id_type> common_nodes;
+   std::queue<dof_id_type> nodes_queue;
+   std::set<dof_id_type> visted_nodes;
+
+    for (auto & pmap: processor_pair_to_nodes)
+    {
+      unsigned int n_own_nodes = pmap.second.size()/2;
+
+      visted_nodes.clear();
+      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++)
+      {
+        mesh.node_ref(*it).processor_id() = pmap.first.second;
+
+        if (visted_nodes.find(*it) != visted_nodes.end()) continue;
+        else
+        {
+          nodes_queue.push(*it);
+          visted_nodes.insert(*it);
+          if (visted_nodes.size() >= n_own_nodes) break;
+
+        }
+
+        while (!nodes_queue.empty())
+        {
+          auto & node = mesh.node_ref(nodes_queue.front());
+          nodes_queue.pop();
+
+          neighbors.clear();
+          MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
+          neighbors_order.clear();
+          for (auto & neighbor: neighbors)
+            neighbors_order.insert(neighbor->id());
+
+          common_nodes.clear();
+          std::set_intersection(pmap.second.begin(), pmap.second.end(),
+                         neighbors_order.begin(), neighbors_order.end(),
+                              std::back_inserter(common_nodes));
+
+          for (auto node: common_nodes)
+            if (visted_nodes.find(node) == visted_nodes.end())
+            {
+              nodes_queue.push(node);
+              visted_nodes.insert(node);
+              if (visted_nodes.size() >= n_own_nodes) goto queue_done;
+            }
+
+          if (visted_nodes.size() >= n_own_nodes) goto queue_done;
+        }
+
+      }
+     queue_done:
+      for (auto node: visted_nodes)
+        mesh.node_ref(node).processor_id() = pmap.first.first;
+    }
+}
+
 
 void Partitioner::set_node_processor_ids(MeshBase & mesh)
 {
@@ -550,11 +656,17 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
         }
     }
 
-  static bool load_balanced_nodes =
+  bool load_balanced_nodes =
       libMesh::on_command_line ("--load-balanced-nodes-wo-node-id");
-      
+
   if (load_balanced_nodes)
    set_node_processor_ids_on_interface(mesh);
+
+  bool load_balanced_nodes_queue =
+       libMesh::on_command_line ("--load-balanced-nodes-queue");
+
+  if (load_balanced_nodes_queue)
+    set_node_processor_ids_on_interface_using_queue(mesh);
 
   // And loop over the subactive elements, but don't reassign
   // nodes that are already active on another processor.
