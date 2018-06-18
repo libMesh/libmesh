@@ -652,8 +652,18 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* Flag indicating whether or not PETSc was configured with CHACO support */
+#undef PETSC_HAVE_CHACO
+
 /* Flag indicating whether or not PETSc was configured with MUMPS support */
 #undef PETSC_HAVE_MUMPS
+
+/* Flag indicating whether or not PETSc was configured with PARTY support */
+#undef PETSC_HAVE_PARTY
+
+/* Flag indicating whether or not PETSc was configured with PTSCOTCH support
+   */
+#undef PETSC_HAVE_PTSCOTCH
 
 /* Flag indicating whether or not PETSc was configured with SuperLU_dist
    support */
