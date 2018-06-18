@@ -418,7 +418,7 @@ void push_parallel_vector_data(const Communicator & comm,
   // FIXME - implement Derek's API from #1684, switch to that!
   for (processor_id_type i = 0; i != n_receives; ++i)
     {
-      Status stat(comm.probe(any_source));
+      Status stat(comm.probe(any_source, tag));
       const processor_id_type
         proc_id = cast_int<processor_id_type>(stat.source());
 
@@ -632,7 +632,7 @@ void pull_parallel_vector_data(const Communicator & comm,
        n_queries = queries.size() - queries.count(comm.rank());
        i != n_queries; ++i)
     {
-      Status stat(comm.probe(any_source));
+      Status stat(comm.probe(any_source, tag));
       const processor_id_type
         proc_id = cast_int<processor_id_type>(stat.source());
 
