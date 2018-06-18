@@ -123,7 +123,10 @@ Status Request::wait ()
   LOG_SCOPE("wait()", "Parallel::Request");
 
   if (_prior_request.get())
-    _prior_request->wait();
+    {
+      _prior_request->wait();
+      _prior_request.reset(libmesh_nullptr);
+    }
 
   Status stat;
 #ifdef LIBMESH_HAVE_MPI
@@ -131,15 +134,18 @@ Status Request::wait ()
     (MPI_Wait (&_request, stat.get()));
 #endif
   if (post_wait_work)
-    for (auto & item : post_wait_work->first)
-      {
-        // The user should never try to give us NULL work or try
-        // to wait() twice.
-        libmesh_assert (item);
-        item->run();
-        delete item;
-        item = libmesh_nullptr;
-      }
+    {
+      for (auto & item : post_wait_work->first)
+        {
+          // The user should never try to give us NULL work or try
+          // to wait() twice.
+          libmesh_assert (item);
+          item->run();
+          delete item;
+          item = libmesh_nullptr;
+        }
+      post_wait_work->first.clear();
+    }
 
   return stat;
 }
