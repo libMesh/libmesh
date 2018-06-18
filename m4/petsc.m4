@@ -96,6 +96,9 @@ AC_DEFUN([CONFIGURE_PETSC],
             petsc_have_superlu_dist=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_SUPERLU_DIST`
             petsc_have_mumps=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_MUMPS`
             petsc_have_metis=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_METIS`
+            petsc_have_chaco=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_CHACO`
+            petsc_have_party=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PARTY`
+            petsc_have_ptscotch=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PTSCOTCH`
           ],
           [enablepetsc=no])
 
@@ -358,6 +361,18 @@ AC_DEFUN([CONFIGURE_PETSC],
           # Set a #define if PETSc was built with MUMPS support
           AS_IF([test $petsc_have_mumps -gt 0],
                 [AC_DEFINE(PETSC_HAVE_MUMPS, 1, [Flag indicating whether or not PETSc was configured with MUMPS support])])
+
+          # Set a #define if PETSc was built with Chaco support
+          AS_IF([test $petsc_have_chaco -gt 0],
+                [AC_DEFINE(PETSC_HAVE_CHACO, 1, [Flag indicating whether or not PETSc was configured with CHACO support])])
+
+          # Set a #define if PETSc was built with Party support
+          AS_IF([test $petsc_have_party -gt 0],
+                [AC_DEFINE(PETSC_HAVE_PARTY, 1, [Flag indicating whether or not PETSc was configured with PARTY support])])
+
+          # Set a #define if PETSc was built with PTScotch support
+          AS_IF([test $petsc_have_ptscotch -gt 0],
+                [AC_DEFINE(PETSC_HAVE_PTSCOTCH, 1, [Flag indicating whether or not PETSc was configured with PTSCOTCH support])])
 
           AC_SUBST(PETSC_ARCH) # Note: may be empty...
           AC_SUBST(PETSC_DIR)
