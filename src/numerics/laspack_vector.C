@@ -106,7 +106,7 @@ NumericVector<T> & LaspackVector<T>::operator -= (const NumericVector<T> & v)
 
 
 template <typename T>
-NumericVector<T> & LaspackVector<T>::operator /= (NumericVector<T> & v)
+NumericVector<T> & LaspackVector<T>::operator /= (const NumericVector<T> & v)
 {
   libmesh_assert_equal_to(size(), v.size());
 

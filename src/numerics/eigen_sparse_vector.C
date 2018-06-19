@@ -107,7 +107,7 @@ NumericVector<T> & EigenSparseVector<T>::operator -= (const NumericVector<T> & v
 
 
 template <typename T>
-NumericVector<T> & EigenSparseVector<T>::operator /= (NumericVector<T> & v_in)
+NumericVector<T> & EigenSparseVector<T>::operator /= (const NumericVector<T> & v_in)
 {
   libmesh_assert (this->closed());
   libmesh_assert_equal_to(size(), v_in.size());

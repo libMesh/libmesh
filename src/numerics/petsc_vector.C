@@ -423,7 +423,7 @@ void PetscVector<T>::scale (const T factor_in)
 }
 
 template <typename T>
-NumericVector<T> & PetscVector<T>::operator /= (NumericVector<T> & v)
+NumericVector<T> & PetscVector<T>::operator /= (const NumericVector<T> & v)
 {
   PetscErrorCode ierr = 0;
 

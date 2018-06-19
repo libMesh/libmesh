@@ -393,7 +393,7 @@ public:
    *
    * \returns A reference to *this.
    */
-  virtual NumericVector<T> & operator /= (NumericVector<T> & /*v*/) = 0;
+  virtual NumericVector<T> & operator /= (const NumericVector<T> & /*v*/) = 0;
 
   /**
    * Computes the pointwise reciprocal,
