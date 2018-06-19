@@ -84,8 +84,17 @@ private:
     composite_outer.attach_subfunction
       (ConstFunction<Real>(3), index_sets[2]);
 
+    // Test that move ctor works. Note that composite_outer should not
+    // be used for anything once it has been moved from!
+    CompositeFunction<Real> composite_outer_copy1(std::move(composite_outer));
+
+    // Test that move assignment also works. The first copy should not be
+    // used again after being move assigned.
+    CompositeFunction<Real> composite_outer_copy2;
+    composite_outer_copy2 = std::move(composite_outer_copy1);
+
     DenseVector<Real> test_two(8);
-    composite_outer(Point(0), 0, test_two);
+    composite_outer_copy2(Point(0), 0, test_two);
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL(test_two(0), 3, 1.e-12);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(test_two(2), 3, 1.e-12);
