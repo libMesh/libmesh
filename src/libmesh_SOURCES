@@ -229,7 +229,6 @@ libmesh_SOURCES =  \
         src/mesh/unv_io.C \
         src/mesh/vtk_io.C \
         src/mesh/xdr_io.C \
-        src/numerics/analytic_function.C \
         src/numerics/coupling_matrix.C \
         src/numerics/dense_matrix.C \
         src/numerics/dense_matrix_base.C \
@@ -242,7 +241,6 @@ libmesh_SOURCES =  \
         src/numerics/eigen_preconditioner.C \
         src/numerics/eigen_sparse_matrix.C \
         src/numerics/eigen_sparse_vector.C \
-        src/numerics/function_base.C \
         src/numerics/laspack_matrix.C \
         src/numerics/laspack_vector.C \
         src/numerics/numeric_vector.C \
