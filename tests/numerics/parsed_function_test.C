@@ -53,24 +53,34 @@ private:
   {
     ParsedFunction<Number> x2("x*2");
 
+    // Test that the copy constructor works
+    ParsedFunction<Number> x2_copy(x2);
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL
-      (libmesh_real(x2(Point(0.5,1.5,2.5))), 1.0, TOLERANCE*TOLERANCE);
+      (libmesh_real(x2_copy(Point(0.5,1.5,2.5))), 1.0, TOLERANCE*TOLERANCE);
 
     ParsedFunction<Number> xy8("x*y*8");
 
+    // Test that the move ctor works
+    ParsedFunction<Number> xy8_stolen(std::move(xy8));
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL
-      (libmesh_real(xy8(Point(0.5,1.5,2.5))), 6.0, TOLERANCE*TOLERANCE);
+      (libmesh_real(xy8_stolen(Point(0.5,1.5,2.5))), 6.0, TOLERANCE*TOLERANCE);
   }
 
   void testInlineGetter()
   {
     ParsedFunction<Number> ax2("a:=4.5;a*x*2");
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL
-      (libmesh_real(ax2(Point(0.25,0.25,0.25))), 2.25, TOLERANCE*TOLERANCE);
+    // Test whether move assignment works.
+    ParsedFunction<Number> ax2_stolen("x");
+    ax2_stolen = std::move(ax2);
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL
-      (libmesh_real(ax2.get_inline_value("a")), 4.5, TOLERANCE*TOLERANCE);
+      (libmesh_real(ax2_stolen(Point(0.25,0.25,0.25))), 2.25, TOLERANCE*TOLERANCE);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL
+      (libmesh_real(ax2_stolen.get_inline_value("a")), 4.5, TOLERANCE*TOLERANCE);
 
     ParsedFunction<Number> cxy8
       ("a := 4 ; b := a/2+1; c:=b-a+3.5; c*x*2*y*4");
