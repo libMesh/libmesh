@@ -179,6 +179,12 @@ public:
   */
   static void set_node_processor_ids_on_interface_using_queue(MeshBase & mesh);
 
+
+  /**
+  * Setup node id using queue
+  */
+  static void set_node_processor_ids_on_interface_using_petscpartition(MeshBase & mesh);
+
   /**
    * Attach weights that can be used for partitioning.  This ErrorVector should be
    * _exactly_ the same on every processor and should have mesh->max_elem_id()

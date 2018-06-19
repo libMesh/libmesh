@@ -522,6 +522,10 @@ void Partitioner::set_node_processor_ids_on_interface_using_queue(MeshBase & mes
     {
       unsigned int n_own_nodes = pmap.second.size()/2;
 
+      // Initialize node assignment
+      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++)
+        mesh.node_ref(*it).processor_id() = pmap.first.second;
+
       visted_nodes.clear();
       for (auto it = pmap.second.begin(); it != pmap.second.end(); it++)
       {
@@ -567,6 +571,138 @@ void Partitioner::set_node_processor_ids_on_interface_using_queue(MeshBase & mes
      queue_done:
       for (auto node: visted_nodes)
         mesh.node_ref(node).processor_id() = pmap.first.first;
+    }
+}
+
+#include "petscmat.h"
+
+void Partitioner::set_node_processor_ids_on_interface_using_petscpartition(MeshBase & mesh)
+{
+  // This function must be run on all processors at once
+  libmesh_parallel_only(mesh.comm());
+
+  std::map<std::pair<processor_id_type, processor_id_type>, std::set<dof_id_type>> processor_pair_to_nodes;
+  // Loop over all the active elements
+  for (auto & elem : mesh.active_element_ptr_range())
+    {
+      libmesh_assert(elem);
+
+      libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);
+
+      std::set<dof_id_type> mynodes;
+      std::set<dof_id_type> neighbor_nodes;
+      std::vector<dof_id_type> common_nodes;
+      auto n_nodes = elem->n_nodes();
+
+      for (unsigned int inode = 0; inode < n_nodes; inode++)
+        mynodes.insert(elem->node_id(inode));
+
+      for (auto i = decltype(elem->n_neighbors())(0); i < elem->n_neighbors(); ++i)
+      {
+        auto neigh = elem->neighbor(i);
+        if (neigh && neigh->processor_id() != elem->processor_id())
+        {
+          neighbor_nodes.clear();
+          common_nodes.clear();
+          auto neigh_n_nodes = neigh->n_nodes();
+          for (unsigned int inode = 0; inode < neigh_n_nodes; inode++)
+            neighbor_nodes.insert(neigh->node_id(inode));
+
+          std::set_intersection(mynodes.begin(), mynodes.end(),
+                            neighbor_nodes.begin(), neighbor_nodes.end(),
+                            std::back_inserter(common_nodes));
+
+          auto & map_set = processor_pair_to_nodes[std::make_pair(std::min(elem->processor_id(), neigh->processor_id()), std::max(elem->processor_id(), neigh->processor_id()))];
+          for (auto global_node_id: common_nodes)
+            map_set.insert(global_node_id);
+        }
+      }
+
+    }
+
+   std::vector<std::vector<const Elem *>> nodes_to_elem_map;
+
+   MeshTools::build_nodes_to_elem_map(mesh, nodes_to_elem_map);
+
+   std::vector<const Node *>  neighbors;
+   std::set<dof_id_type> neighbors_order;
+   std::vector<dof_id_type> common_nodes;
+   std::queue<dof_id_type> nodes_queue;
+
+   std::vector<PetscInt> rows;
+   std::vector<PetscInt> cols;
+
+   std::map<dof_id_type, dof_id_type> global_to_local;
+
+   for (auto & pmap: processor_pair_to_nodes)
+    {
+      unsigned int i = 0;
+
+      rows.clear();
+      rows.resize(pmap.second.size()+1);
+      cols.clear();
+      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++)
+        global_to_local[*it] = i++;
+
+      i = 0;
+      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++, i++)
+      {
+        auto & node = mesh.node_ref(*it);
+        neighbors.clear();
+        MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
+        neighbors_order.clear();
+        for (auto & neighbor: neighbors)
+          neighbors_order.insert(neighbor->id());
+
+        common_nodes.clear();
+        std::set_intersection(pmap.second.begin(), pmap.second.end(),
+                         neighbors_order.begin(), neighbors_order.end(),
+                              std::back_inserter(common_nodes));
+
+       rows[i+1] = rows[i] +  common_nodes.size();
+
+       for (auto node : common_nodes)
+         cols.push_back(global_to_local[node]);
+      }
+#if LIBMESH_HAVE_PETSC
+    Mat adj;
+    MatPartitioning part;
+    IS is;
+    PetscInt local_size;
+    PetscInt *adj_i, *adj_j;
+    const PetscInt *indices;
+    PetscCalloc1(rows.size(), &adj_i);
+    PetscCalloc1(cols.size(), &adj_j);
+    for (PetscInt ii=0; ii<rows.size(); ii++)
+      adj_i[ii] = rows[ii];
+
+    for (PetscInt ii=0; ii<rows.size(); ii++)
+      adj_j[ii] = cols[ii];
+
+    MatCreateMPIAdj(PETSC_COMM_SELF, pmap.second.size(), pmap.second.size(), adj_i, adj_j,nullptr,&adj);
+    MatPartitioningCreate(PETSC_COMM_SELF,&part);
+    MatPartitioningSetAdjacency(part,adj);
+    MatPartitioningSetType(part,"ptscotch");
+    MatPartitioningSetFromOptions(part);
+    MatPartitioningApply(part,&is);
+
+    MatDestroy(&adj);
+    MatPartitioningDestroy(&part);
+
+    ISGetLocalSize(is, &local_size);
+    ISGetIndices(is, &indices);
+    i = 0;
+    for (auto it = pmap.second.begin(); it != pmap.second.end(); it++, i++)
+    {
+      auto & node = mesh.node_ref(*it);
+      if (indices[i])
+        node.processor_id() = pmap.first.second;
+      else
+        node.processor_id() = pmap.first.first;
+    }
+    ISRestoreIndices(is, &indices);
+    ISDestroy(&is);
+#endif
     }
 }
 
@@ -668,6 +804,12 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
   if (load_balanced_nodes_queue)
     set_node_processor_ids_on_interface_using_queue(mesh);
 
+  bool load_balanced_nodes_partition =
+      libMesh::on_command_line ("--load_balanced_nodes_partition");
+
+  if (load_balanced_nodes_partition)
+    set_node_processor_ids_on_interface_using_petscpartition(mesh);
+
   // And loop over the subactive elements, but don't reassign
   // nodes that are already active on another processor.
   for (auto & elem : as_range(mesh.subactive_elements_begin(),
@@ -763,6 +905,8 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
   //MeshTools::libmesh_assert_canonical_node_procids(mesh);
 #endif
 }
+
+
 
 struct SyncLocalIDs
 {
