@@ -68,6 +68,19 @@ public:
       _parameters = &sys.get_equation_systems().parameters;
   }
 
+  /**
+   * The move/copy ctor and destructor are defaulted for this class.
+   */
+  WrappedFunction (WrappedFunction &&) = default;
+  WrappedFunction (const WrappedFunction &) = default;
+  virtual ~WrappedFunction () = default;
+
+  /**
+   * This class contains a const reference so it can't be assigned.
+   */
+  WrappedFunction & operator= (const WrappedFunction &) = delete;
+  WrappedFunction & operator= (WrappedFunction &&) = delete;
+
   virtual std::unique_ptr<FunctionBase<Output>> clone () const override;
 
   virtual Output operator() (const Point & p,

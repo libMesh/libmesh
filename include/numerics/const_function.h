@@ -49,6 +49,15 @@ public:
     this->_is_time_dependent = false;
   }
 
+  /**
+   * The 5 special functions can be defaulted for this class.
+   */
+  ConstFunction (ConstFunction &&) = default;
+  ConstFunction (const ConstFunction &) = default;
+  ConstFunction & operator= (const ConstFunction &) = default;
+  ConstFunction & operator= (ConstFunction &&) = default;
+  virtual ~ConstFunction () = default;
+
   virtual Output operator() (const Point &,
                              const Real = 0) override
   { return _c; }

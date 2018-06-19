@@ -65,6 +65,15 @@ public:
                   const std::vector<Output> * initial_vals=libmesh_nullptr);
 
   /**
+   * The 5 special functions can be defaulted for this class.
+   */
+  ParsedFunction (ParsedFunction &&) = default;
+  ParsedFunction (const ParsedFunction &) = default;
+  ParsedFunction & operator= (const ParsedFunction &) = default;
+  ParsedFunction & operator= (ParsedFunction &&) = default;
+  virtual ~ParsedFunction () = default;
+
+  /**
    * Re-parse with new expression.
    */
   void reparse (const std::string & expression);
@@ -694,6 +703,16 @@ public:
   {
     libmesh_not_implemented();
   }
+
+  /**
+   * When !LIBMESH_HAVE_FPARSER, this class is not implemented, so
+   * let's make that explicit by deleting the special functions.
+   */
+  ParsedFunction (ParsedFunction &&) = delete;
+  ParsedFunction (const ParsedFunction &) = delete;
+  ParsedFunction & operator= (const ParsedFunction &) = delete;
+  ParsedFunction & operator= (ParsedFunction &&) = delete;
+  virtual ~ParsedFunction () = default;
 
   virtual Output operator() (const Point &,
                              const Real /* time */ = 0)

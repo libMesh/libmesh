@@ -72,9 +72,13 @@ protected:
 public:
 
   /**
-   * Destructor.
+   * The 5 special functions can be defaulted for this class.
    */
-  virtual ~FunctionBase ();
+  FunctionBase (FunctionBase &&) = default;
+  FunctionBase (const FunctionBase &) = default;
+  FunctionBase & operator= (const FunctionBase &) = default;
+  FunctionBase & operator= (FunctionBase &&) = default;
+  virtual ~FunctionBase () = default;
 
   /**
    * The actual initialization process.
@@ -191,14 +195,6 @@ FunctionBase<Output>::FunctionBase (const FunctionBase * master) :
   _master             (master),
   _initialized        (false),
   _is_time_dependent  (true) // Assume we are time-dependent until the user says otherwise
-{
-}
-
-
-
-template<typename Output>
-inline
-FunctionBase<Output>::~FunctionBase ()
 {
 }
 

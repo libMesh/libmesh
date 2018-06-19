@@ -64,10 +64,13 @@ public:
   AnalyticFunction (OutputVectorFunction fptr);
 
   /**
-   * Destructor.
+   * The 5 special functions can be defaulted for this class.
    */
-  ~AnalyticFunction ();
-
+  AnalyticFunction (AnalyticFunction &&) = default;
+  AnalyticFunction (const AnalyticFunction &) = default;
+  AnalyticFunction & operator= (const AnalyticFunction &) = default;
+  AnalyticFunction & operator= (AnalyticFunction &&) = default;
+  virtual ~AnalyticFunction () = default;
 
   /**
    * Pointer to user-provided function that computes
@@ -144,14 +147,6 @@ AnalyticFunction<Output>::AnalyticFunction (OutputVectorFunction fptr) :
 {
   libmesh_assert(fptr);
   this->_initialized = true;
-}
-
-
-
-template <typename Output>
-inline
-AnalyticFunction<Output>::~AnalyticFunction ()
-{
 }
 
 

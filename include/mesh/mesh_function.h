@@ -84,6 +84,20 @@ public:
                 const FunctionBase<Number> * master=libmesh_nullptr);
 
   /**
+   * This class is sometimes responsible for cleaning up the
+   * _point_locator, so it can't be default (shallow) copy constructed
+   * or move constructed.
+   */
+  MeshFunction (MeshFunction &&) = delete;
+  MeshFunction (const MeshFunction &) = delete;
+
+  /**
+   * This class contains const references so it can't be assigned.
+   */
+  MeshFunction & operator= (const MeshFunction &) = delete;
+  MeshFunction & operator= (MeshFunction &&) = delete;
+
+  /**
    * Destructor.
    */
   ~MeshFunction ();
