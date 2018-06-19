@@ -918,6 +918,10 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                tag.value(),
                                this->get(),
                                req.get()));
+
+  // The MessageTag should stay registered for the Request lifetime
+  req.add_post_wait_work
+    (new Parallel::PostWaitDereferenceTag(tag));
 }
 
 
@@ -962,6 +966,10 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                tag.value(),
                                this->get(),
                                req.get()));
+
+  // The MessageTag should stay registered for the Request lifetime
+  req.add_post_wait_work
+    (new Parallel::PostWaitDereferenceTag(tag));
 }
 
 
@@ -1087,6 +1095,10 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                tag.value(),
                                this->get(),
                                req.get()));
+
+  // The MessageTag should stay registered for the Request lifetime
+  req.add_post_wait_work
+    (new Parallel::PostWaitDereferenceTag(tag));
 }
 
 
@@ -1455,6 +1467,10 @@ inline void Communicator::receive (const unsigned int src_processor_id,
   libmesh_call_mpi
     (MPI_Irecv (&buf, 1, StandardType<T>(&buf), src_processor_id,
                 tag.value(), this->get(), req.get()));
+
+  // The MessageTag should stay registered for the Request lifetime
+  req.add_post_wait_work
+    (new Parallel::PostWaitDereferenceTag(tag));
 }
 
 
@@ -1610,6 +1626,10 @@ inline void Communicator::receive (const unsigned int src_processor_id,
     (MPI_Irecv (buf.empty() ? libmesh_nullptr : &buf[0],
                 cast_int<int>(buf.size()), type, src_processor_id,
                 tag.value(), this->get(), req.get()));
+
+  // The MessageTag should stay registered for the Request lifetime
+  req.add_post_wait_work
+    (new Parallel::PostWaitDereferenceTag(tag));
 }
 
 

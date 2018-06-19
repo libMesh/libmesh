@@ -67,6 +67,24 @@ public:
   MessageTag(const MessageTag & other);
 
   /**
+   * Move constructor.  Helps Communicator do reference counting on
+   * unique tags
+   */
+  MessageTag(MessageTag && other);
+
+  /**
+   * Copy assignment operator.  Helps Communicator do reference
+   * counting on unique tags
+   */
+  MessageTag & operator = (const MessageTag & other);
+
+  /**
+   * Move assignment operator.  Helps Communicator do reference
+   * counting on unique tags
+   */
+  MessageTag & operator = (MessageTag && other);
+
+  /**
    * Destructor.  Helps Communicator do reference counting on unique
    * tags
    */

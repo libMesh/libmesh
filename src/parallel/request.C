@@ -123,7 +123,10 @@ Status Request::wait ()
   LOG_SCOPE("wait()", "Parallel::Request");
 
   if (_prior_request.get())
-    _prior_request->wait();
+    {
+      _prior_request->wait();
+      _prior_request.reset(libmesh_nullptr);
+    }
 
   Status stat;
 #ifdef LIBMESH_HAVE_MPI
@@ -131,15 +134,18 @@ Status Request::wait ()
     (MPI_Wait (&_request, stat.get()));
 #endif
   if (post_wait_work)
-    for (auto & item : post_wait_work->first)
-      {
-        // The user should never try to give us NULL work or try
-        // to wait() twice.
-        libmesh_assert (item);
-        item->run();
-        delete item;
-        item = libmesh_nullptr;
-      }
+    {
+      for (auto & item : post_wait_work->first)
+        {
+          // The user should never try to give us NULL work or try
+          // to wait() twice.
+          libmesh_assert (item);
+          item->run();
+          delete item;
+          item = libmesh_nullptr;
+        }
+      post_wait_work->first.clear();
+    }
 
   return stat;
 }
@@ -206,7 +212,8 @@ void Request::add_post_wait_work(PostWaitWork * work)
 
 void wait (std::vector<Request> & r)
 {
-  for (std::size_t i=0; i<r.size(); i++) r[i].wait();
+  for (std::size_t i=0; i<r.size(); i++)
+    r[i].wait();
 }
 
 std::size_t waitany (std::vector<Request> & r)
@@ -214,15 +221,57 @@ std::size_t waitany (std::vector<Request> & r)
   libmesh_assert(!r.empty());
 
   int index = 0;
-#ifdef LIBMESH_HAVE_MPI
   int r_size = cast_int<int>(r.size());
   std::vector<request> raw(r_size);
   for (int i=0; i != r_size; ++i)
-    raw[i] = *r[i].get();
+    {
+      Request * root = &r[i];
+      // If we have prior requests, we need to complete the first one
+      // first
+      while (root->_prior_request.get())
+        root = root->_prior_request.get();
+      raw[i] = *root->get();
+    }
 
-  libmesh_call_mpi
-    (MPI_Waitany(r_size, &raw[0], &index, MPI_STATUS_IGNORE));
+  bool only_priors_completed = false;
+
+  Request * next;
+
+  do
+    {
+#ifdef LIBMESH_HAVE_MPI
+      libmesh_call_mpi
+        (MPI_Waitany(r_size, &raw[0], &index, MPI_STATUS_IGNORE));
 #endif
+
+      Request * completed = &r[index];
+      next = completed;
+
+      // If we completed a prior request, we're not really done yet,
+      // so find the next in that line to try again.
+      while (completed->_prior_request.get())
+        {
+          only_priors_completed = true;
+          next = completed;
+          completed = completed->_prior_request.get();
+        }
+
+      // Do any post-wait work for the completed request
+      if (completed->post_wait_work)
+        for (auto & item : completed->post_wait_work->first)
+          {
+            // The user should never try to give us NULL work or try
+            // to wait() twice.
+            libmesh_assert (item);
+            item->run();
+            delete item;
+            item = libmesh_nullptr;
+          }
+
+      next->_prior_request.reset(libmesh_nullptr);
+      raw[index] = *next->get();
+
+    } while(only_priors_completed);
 
   return index;
 }
