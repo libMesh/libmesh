@@ -162,11 +162,11 @@ NumericVector<T> & DistributedVector<T>::operator -= (const NumericVector<T> & v
 
 
 template <typename T>
-NumericVector<T> & DistributedVector<T>::operator /= (NumericVector<T> & v)
+NumericVector<T> & DistributedVector<T>::operator /= (const NumericVector<T> & v)
 {
   libmesh_assert_equal_to(size(), v.size());
 
-  DistributedVector<T> & v_vec = cast_ref<DistributedVector<T> &>(v);
+  const DistributedVector<T> & v_vec = cast_ref<const DistributedVector<T> &>(v);
 
   std::size_t val_size = _values.size();
 
