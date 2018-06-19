@@ -698,6 +698,7 @@ void Nemesis_IO::read (const std::string & base_filename)
     Utility::deallocate (node_ownership);
   }
 
+  Parallel::wait (needed_nodes_requests);
   Parallel::wait (requested_nodes_requests);
   requested_node_idxs.clear();
 
