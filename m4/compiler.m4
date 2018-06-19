@@ -274,7 +274,7 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
   dnl Portland Group C++?
   AS_IF([test "x$compiler_brand_detected" = "xno"],
         [
-          is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
+          is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group\|PGI'`"
           AS_IF([test "x$is_pgcc" != "x"],
           [
             AC_MSG_RESULT(<<< C++ compiler is Portland Group C++ >>>)
@@ -532,15 +532,15 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
                        ],
 
             [portland_group], [
-                                CXXFLAGS_DBG="-g --no_using_std"
-                                CXXFLAGS_OPT="-O2 --no_using_std -fast -Minform=severe"
+                                CXXFLAGS_DBG="$CXXFLAGS_DBG -g --no_using_std"
+                                CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 --no_using_std -fast -Minform=severe"
                                 CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
 
                                 dnl PG C++ definitely doesnt understand -Wno-deprecated...
                                 NODEPRECATEDFLAG=""
 
-                                CFLAGS_DBG="-g"
-                                CFLAGS_OPT="-O2"
+                                CFLAGS_DBG="$CFLAGS_DBG -g"
+                                CFLAGS_OPT="$CFLAGS_OPT -O2"
                                 CFLAGS_DEVEL="$CFLAGS_DBG"
 
                                 dnl Disable exception handling if we dont use it
