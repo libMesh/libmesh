@@ -3700,7 +3700,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
       if (!mesh.is_serial())
         this->comm().receive_packed_range
           (pid, &mesh, mesh_inserter_iterator<Node>(mesh),
-           (Node**)libmesh_nullptr);
+           (Node**)libmesh_nullptr, range_tag);
 
       // Add the node constraints that I've been sent
       for (std::size_t i = 0, size = ids_offsets.size(); i != size; ++i)
