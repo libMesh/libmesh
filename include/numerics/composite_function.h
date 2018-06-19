@@ -45,13 +45,25 @@ class CompositeFunction : public FunctionBase<Output>
 {
 public:
   explicit
-  CompositeFunction () {}
+  CompositeFunction () = default;
 
-  ~CompositeFunction ()
-  {
-    for (auto & f : subfunctions)
-      delete f;
-  }
+  /**
+   * This class can be default move constructed and assigned.
+   */
+  CompositeFunction (CompositeFunction &&) = default;
+  CompositeFunction & operator= (CompositeFunction &&) = default;
+
+  /**
+   * This class contains unique_ptr members so it can't be default
+   * copied or assigned.
+   */
+  CompositeFunction (const CompositeFunction &) = delete;
+  CompositeFunction & operator= (const CompositeFunction &) = delete;
+
+  /**
+   * The subfunctions vector is automatically cleaned up.
+   */
+  virtual ~CompositeFunction () = default;
 
   /**
    * Attach a new subfunction, along with a map from the indices of
@@ -64,7 +76,7 @@ public:
     const unsigned int subfunction_index = subfunctions.size();
     libmesh_assert_equal_to(subfunctions.size(), index_maps.size());
 
-    subfunctions.push_back(f.clone().release());
+    subfunctions.push_back(f.clone());
     index_maps.push_back(index_map);
 
     unsigned int max_index =
@@ -164,7 +176,7 @@ public:
 
 private:
   // list of functions which fill in our values
-  std::vector<FunctionBase<Output> *> subfunctions;
+  std::vector<std::unique_ptr<FunctionBase<Output>>> subfunctions;
 
   // for each function, list of which global indices it fills in
   std::vector<std::vector<unsigned int>> index_maps;
