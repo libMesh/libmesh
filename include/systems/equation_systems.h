@@ -322,9 +322,23 @@ public:
    * Retrieve the solution data for CONSTANT MONOMIALs.  If \p names
    * is populated, only the variables corresponding to those names will
    * be retrieved.  This can be used to filter which variables are retrieved.
+   *
+   * \deprecated Call the more appropriately-named build_elemental_solution_vector()
+   * instead.
    */
-  void get_solution( std::vector<Number> & soln,
+  void get_solution (std::vector<Number> & soln,
                      std::vector<std::string> & names) const;
+
+  /**
+   * Retrieve the solution data for CONSTANT MONOMIALs.  If \p names
+   * is populated, only the variables corresponding to those names will
+   * be retrieved.  This can be used to filter which variables are retrieved.
+   *
+   * This is the more appropriately-named replacement for the get_solution()
+   * function defined above.
+   */
+  void build_elemental_solution_vector (std::vector<Number> & soln,
+                                        std::vector<std::string> & names) const;
 
   /**
    * Fill the input vector \p soln with solution values.  The
