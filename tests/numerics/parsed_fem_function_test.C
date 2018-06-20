@@ -141,13 +141,19 @@ private:
       {
         ParsedFEMFunction<Number> x2(*sys, "x2");
 
+        // Test that copy constructor works
+        ParsedFEMFunction<Number> x2_copy(x2);
+
         CPPUNIT_ASSERT_DOUBLES_EQUAL
-          (libmesh_real(x2(*c,Point(0.5,0.5,0.5))), 1.0, TOLERANCE*TOLERANCE);
+          (libmesh_real(x2_copy(*c,Point(0.5,0.5,0.5))), 1.0, TOLERANCE*TOLERANCE);
 
         ParsedFEMFunction<Number> xy8(*sys, "x2*y4");
 
+        // Test that move constructor works
+        ParsedFEMFunction<Number> xy8_stolen(std::move(xy8));
+
         CPPUNIT_ASSERT_DOUBLES_EQUAL
-          (libmesh_real(xy8(*c,Point(0.5,0.5,0.5))), 2.0, TOLERANCE*TOLERANCE);
+          (libmesh_real(xy8_stolen(*c,Point(0.5,0.5,0.5))), 2.0, TOLERANCE*TOLERANCE);
       }
   }
 
@@ -158,6 +164,12 @@ private:
         c->get_elem().processor_id() == TestCommWorld->rank())
       {
         ParsedFEMFunction<Number> c2(*sys, "grad_x_x2");
+
+        // Test that copy/move assignment fails to compile. Note:
+        // ParsedFEMFunction is neither move-assignable nor
+        // copy-assignable because it contains a const reference.
+        // ParsedFEMFunction<Number> c2_assigned(*sys, "grad_y_xyz");
+        // c2_assigned = c2;
 
         CPPUNIT_ASSERT_DOUBLES_EQUAL
           (libmesh_real(c2(*c,Point(0.35,0.45,0.55))), 2.0, TOLERANCE*TOLERANCE);
