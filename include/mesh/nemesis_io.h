@@ -113,6 +113,15 @@ public:
                                  const std::vector<std::string> & names) override;
 
   /**
+   * Write out element solution in parallel, without localizing the solution vector.
+   *
+   * \note Unlike write_nodal_data(), this function is not virtual and
+   * it does not override anything from the base class. This design is
+   * similar to the function by the same name in ExodusII_IO.
+   */
+  void write_element_data (const EquationSystems & es);
+
+  /**
    * Set the flag indicating if we should be verbose.
    */
   void verbose (bool set_verbosity);

@@ -31,6 +31,9 @@
 #include "libmesh/utility.h" // is_sorted, deallocate
 #include "libmesh/boundary_info.h"
 #include "libmesh/mesh_communication.h"
+#include "libmesh/fe_type.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/numeric_vector.h"
 
 namespace libMesh
 {
@@ -1373,6 +1376,60 @@ void Nemesis_IO::write_nodal_data (const std::string &,
                                    const std::vector<std::string> &)
 {
   libmesh_error_msg("ERROR, Nemesis API is not defined.");
+}
+
+#endif
+
+
+
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
+void Nemesis_IO::write_element_data (const EquationSystems & es)
+{
+  if (!nemhelper->opened_for_writing)
+    libmesh_error_msg("ERROR, Nemesis file must be initialized before outputting elemental variables.");
+
+  // To be (possibly) filled with a filtered list of variable names to output.
+  std::vector<std::string> names;
+
+  // If _output_variables is populated, only output the monomials which are
+  // also in the _output_variables vector.
+  if (_output_variables.size() > 0)
+    {
+      std::vector<std::string> monomials;
+      const FEType type(CONSTANT, MONOMIAL);
+
+      // Create a list of monomial variable names
+      es.build_variable_names(monomials, &type);
+
+      // Filter that list against the _output_variables list.  Note: if names is still empty after
+      // all this filtering, all the monomial variables will be gathered
+      for (const auto & var : monomials)
+        if (std::find(_output_variables.begin(), _output_variables.end(), var) != _output_variables.end())
+          names.push_back(var);
+    }
+
+  // Build the parallel elemental solution vector. The 'names' vector
+  // will also be updated with the variable's names that were actually
+  // written to the vector.
+  std::unique_ptr<NumericVector<Number>> parallel_soln =
+    es.build_parallel_elemental_solution_vector(names);
+
+  // build_parallel_elemental_solution_vector() can return a nullptr,
+  // in which case there are no constant monomial variables to write,
+  // and we can just return.
+  if (!parallel_soln)
+    return;
+
+  // TODO: get the dofs required on each processor for each variable
+  // and localize just that part of the parallel_soln vector.
+}
+
+#else
+
+void Nemesis_IO::write_element_data (const EquationSystems &)
+{
+  libmesh_not_implemented();
 }
 
 #endif
