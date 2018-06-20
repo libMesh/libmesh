@@ -1419,10 +1419,19 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   // in which case there are no constant monomial variables to write,
   // and we can just return.
   if (!parallel_soln)
-    return;
+    {
+      if (_verbose)
+        libMesh::out << "No CONSTANT, MONOMIAL data to be written." << std::endl;
+      return;
+    }
 
   // TODO: get the dofs required on each processor for each variable
   // and localize just that part of the parallel_soln vector.
+  if (_verbose)
+    {
+      libMesh::out << "parallel_soln->size()= " << parallel_soln->size() << std::endl;
+      libMesh::out << "parallel_soln->local_size()= " << parallel_soln->local_size() << std::endl;
+    }
 }
 
 #else
