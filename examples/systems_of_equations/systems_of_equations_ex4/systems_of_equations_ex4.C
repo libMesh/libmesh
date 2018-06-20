@@ -306,7 +306,7 @@ void assemble_elasticity(EquationSystems & es,
 
       {
         for (auto side : elem->side_index_range())
-          if (elem->neighbor_ptr(side) == libmesh_nullptr)
+          if (elem->neighbor_ptr(side) == nullptr)
             {
               const std::vector<std::vector<Real>> & phi_face = fe_face->get_phi();
               const std::vector<Real> & JxW_face = fe_face->get_JxW();

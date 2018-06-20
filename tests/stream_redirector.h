@@ -15,7 +15,7 @@ public:
   StreamRedirector()
     : _errbuf(libMesh::err.rdbuf())
   {
-    libMesh::err.rdbuf(libmesh_nullptr);
+    libMesh::err.rdbuf(nullptr);
   }
 
   /**

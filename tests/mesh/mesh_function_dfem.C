@@ -148,14 +148,14 @@ public:
 
     // test interior point
     std::set<const Elem *> int_cand;
-    (*_point_locator)(interior, int_cand, libmesh_nullptr);
+    (*_point_locator)(interior, int_cand, nullptr);
     CPPUNIT_ASSERT (int_cand.size() == 1);
     for (std::set<const Elem *>::iterator it = int_cand.begin(); it != int_cand.end(); ++it)
       CPPUNIT_ASSERT ((*it)->id() == 1);
 
     // test interior point
     std::set<const Elem *> face_cand;
-    (*_point_locator)(face, face_cand, libmesh_nullptr);
+    (*_point_locator)(face, face_cand, nullptr);
     CPPUNIT_ASSERT (face_cand.size() == 2);
     int array[2] = {0, 0};
     for (std::set<const Elem *>::iterator it = face_cand.begin(); it != face_cand.end(); ++it)

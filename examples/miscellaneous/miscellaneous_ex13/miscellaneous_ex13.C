@@ -55,7 +55,6 @@
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/zero_function.h"
 #include "libmesh/linear_solver.h"
-#include "libmesh/libmesh_nullptr.h"
 #include "libmesh/getpot.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_solver_type.h"
@@ -249,7 +248,7 @@ int main (int argc, char ** argv)
   if (distributed_load==0)
     {
       // Find the node nearest point C.
-      Node * node_C = libmesh_nullptr;
+      Node * node_C = nullptr;
       Point point_C(0, 3, 3);
       {
         Real nearest_dist_sq = std::numeric_limits<Real>::max();

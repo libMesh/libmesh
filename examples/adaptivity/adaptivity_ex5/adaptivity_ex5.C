@@ -553,9 +553,9 @@ void init_cd (EquationSystems & es,
   es.parameters.set<Real> ("time") = system.time = 0;
 
   if (parsed_solution.get())
-    system.project_solution(parsed_solution.get(), libmesh_nullptr);
+    system.project_solution(parsed_solution.get(), nullptr);
   else
-    system.project_solution(exact_value, libmesh_nullptr, es.parameters);
+    system.project_solution(exact_value, nullptr, es.parameters);
 }
 
 

@@ -331,7 +331,7 @@ int main (int argc, char ** argv)
       // Factory failures are *verbose* in parallel; let's silence
       // cerr temporarily.
       auto oldbuf = libMesh::err.rdbuf();
-      libMesh::err.rdbuf(libmesh_nullptr);
+      libMesh::err.rdbuf(nullptr);
       try
         {
           // Many partitioners won't work on a distributed Mesh, and

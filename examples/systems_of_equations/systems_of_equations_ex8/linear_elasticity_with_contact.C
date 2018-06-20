@@ -149,7 +149,7 @@ void LinearElasticityWithContact::initialize_contact_load_paths()
   _lambdas.clear();
   for (const auto & elem : mesh.active_element_ptr_range())
     for (auto side : elem->side_index_range())
-      if (elem->neighbor_ptr(side) == libmesh_nullptr)
+      if (elem->neighbor_ptr(side) == nullptr)
         {
           bool on_lower_contact_surface =
             mesh.get_boundary_info().has_boundary_id (elem, side, CONTACT_BOUNDARY_LOWER);
@@ -174,7 +174,7 @@ void LinearElasticityWithContact::initialize_contact_load_paths()
                       }
                   }
             }
-        } // end if neighbor(side_) != libmesh_nullptr
+        } // end if neighbor(side_) != nullptr
 
   // In this example, we expect the number of upper and lower nodes to match
   libmesh_assert(nodes_on_lower_surface.size() == nodes_on_upper_surface.size());

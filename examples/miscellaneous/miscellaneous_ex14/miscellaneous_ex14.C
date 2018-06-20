@@ -426,7 +426,7 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
       dof_map.dof_indices (elem, dof_indices);
 
       // unifyging finite and infinite elements
-      FEBase * cfe = libmesh_nullptr;
+      FEBase * cfe = nullptr;
 
       if (elem->infinite())
         {

@@ -582,7 +582,7 @@ void assemble_shell (EquationSystems & es,
       for (auto s : elem->side_index_range())
         {
           const Tri3Subdivision * nb_elem = static_cast<const Tri3Subdivision *> (elem->neighbor_ptr(s));
-          if (nb_elem == libmesh_nullptr || nb_elem->is_ghost())
+          if (nb_elem == nullptr || nb_elem->is_ghost())
             continue;
 
           /*

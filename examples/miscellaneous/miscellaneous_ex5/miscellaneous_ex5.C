@@ -271,7 +271,7 @@ void assemble_ellipticdg(EquationSystems & es,
       // side MUST live on a boundary of the domain.
       for (auto side : elem->side_index_range())
         {
-          if (elem->neighbor_ptr(side) == libmesh_nullptr)
+          if (elem->neighbor_ptr(side) == nullptr)
             {
               // Pointer to the element face
               fe_elem_face->reinit(elem, side);

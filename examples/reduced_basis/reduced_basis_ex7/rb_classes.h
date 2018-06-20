@@ -127,13 +127,13 @@ public:
     // For efficiency, we should prerequest all
     // the data we will need to build the
     // linear system before doing an element loop.
-    FEBase * elem_fe = libmesh_nullptr;
+    FEBase * elem_fe = nullptr;
     c.get_element_fe(p_var, elem_fe);
     elem_fe->get_JxW();
     elem_fe->get_phi();
     elem_fe->get_dphi();
 
-    FEBase * side_fe = libmesh_nullptr;
+    FEBase * side_fe = nullptr;
     c.get_side_fe(p_var, side_fe);
     side_fe->get_JxW();
     side_fe->get_phi();

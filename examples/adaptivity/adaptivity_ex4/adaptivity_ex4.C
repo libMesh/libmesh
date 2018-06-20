@@ -842,7 +842,7 @@ void assemble_biharmonic(EquationSystems & es,
         // If the element has no neighbor on a side then that
         // side MUST live on a boundary of the domain.
         for (auto s : elem->side_index_range())
-          if (elem->neighbor_ptr(s) == libmesh_nullptr)
+          if (elem->neighbor_ptr(s) == nullptr)
             {
               // The value of the shape functions at the quadrature
               // points.

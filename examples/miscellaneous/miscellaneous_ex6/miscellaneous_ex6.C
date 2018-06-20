@@ -277,7 +277,7 @@ void add_cube_convex_hull_to_mesh(MeshBase & mesh,
 
   for (auto & elem : cube_mesh.element_ptr_range())
     for (auto s : elem->side_index_range())
-      if (elem->neighbor(s) == libmesh_nullptr)
+      if (elem->neighbor(s) == nullptr)
         {
           // Add the node IDs of this side to the set
           std::unique_ptr<Elem> side = elem->side(s);

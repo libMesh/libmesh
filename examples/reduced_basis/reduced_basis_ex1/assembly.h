@@ -43,7 +43,7 @@ struct A0 : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    FEBase * elem_fe = libmesh_nullptr;
+    FEBase * elem_fe = nullptr;
     c.get_element_fe(u_var, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
@@ -73,7 +73,7 @@ struct A1 : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    FEBase * elem_fe = libmesh_nullptr;
+    FEBase * elem_fe = nullptr;
     c.get_element_fe(u_var, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
@@ -102,7 +102,7 @@ struct A2 : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    FEBase * elem_fe = libmesh_nullptr;
+    FEBase * elem_fe = nullptr;
     c.get_element_fe(u_var, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
@@ -131,7 +131,7 @@ struct F0 : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    FEBase * elem_fe = libmesh_nullptr;
+    FEBase * elem_fe = nullptr;
     c.get_element_fe(u_var, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
@@ -166,7 +166,7 @@ struct OutputAssembly : ElemAssembly
   {
     const unsigned int u_var = 0;
 
-    FEBase * elem_fe = libmesh_nullptr;
+    FEBase * elem_fe = nullptr;
     c.get_element_fe(u_var, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();

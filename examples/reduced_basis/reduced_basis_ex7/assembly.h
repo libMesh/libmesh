@@ -91,7 +91,7 @@ struct AcousticsInnerProduct : ElemAssembly
   {
     const unsigned int p_var = 0;
 
-    FEBase * elem_fe = libmesh_nullptr;
+    FEBase * elem_fe = nullptr;
     c.get_element_fe(p_var, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
@@ -121,7 +121,7 @@ struct A0 : ElemAssembly
   {
     const unsigned int p_var = 0;
 
-    FEBase * elem_fe = libmesh_nullptr;
+    FEBase * elem_fe = nullptr;
     c.get_element_fe(p_var, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
@@ -150,7 +150,7 @@ struct A1 : ElemAssembly
   {
     const unsigned int p_var = 0;
 
-    FEBase * elem_fe = libmesh_nullptr;
+    FEBase * elem_fe = nullptr;
     c.get_element_fe(p_var, elem_fe);
 
     const std::vector<Real> & JxW = elem_fe->get_JxW();
@@ -178,7 +178,7 @@ struct A2 : ElemAssembly
       {
         const unsigned int p_var = 0;
 
-        FEBase * side_fe = libmesh_nullptr;
+        FEBase * side_fe = nullptr;
         c.get_side_fe(p_var, side_fe);
 
         const std::vector<Real> & JxW_face = side_fe->get_JxW();
@@ -207,7 +207,7 @@ struct A3 : ElemAssembly
       {
         const unsigned int p_var = 0;
 
-        FEBase * side_fe = libmesh_nullptr;
+        FEBase * side_fe = nullptr;
         c.get_side_fe(p_var, side_fe);
 
         const std::vector<Real> & JxW_face = side_fe->get_JxW();
@@ -236,7 +236,7 @@ struct F0 : ElemAssembly
       {
         const unsigned int p_var = 0;
 
-        FEBase * side_fe = libmesh_nullptr;
+        FEBase * side_fe = nullptr;
         c.get_side_fe(p_var, side_fe);
 
         const std::vector<Real> & JxW_face = side_fe->get_JxW();
@@ -264,7 +264,7 @@ struct Output0 : ElemAssembly
       {
         const unsigned int p_var = 0;
 
-        FEBase * side_fe = libmesh_nullptr;
+        FEBase * side_fe = nullptr;
         c.get_side_fe(p_var, side_fe);
 
         const std::vector<Real> & JxW_face = side_fe->get_JxW();

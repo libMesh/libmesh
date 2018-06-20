@@ -435,7 +435,7 @@ void assemble_helmholtz(EquationSystems & es,
       // If the element has no neighbor on a side then that
       // side MUST live on a boundary of the domain.
       for (auto side : elem->side_index_range())
-        if (elem->neighbor_ptr(side) == libmesh_nullptr)
+        if (elem->neighbor_ptr(side) == nullptr)
           {
             LOG_SCOPE("damping", "assemble_helmholtz");
 
