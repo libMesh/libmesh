@@ -557,8 +557,8 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
   // neighbors.  In some cases this requires us to store "ghost elements" -
   // elements that belong to other processors but we store to provide
   // data structure consistency.  Also, it is assumed that any element
-  // with a NULL neighbor resides on a physical domain boundary.  So,
-  // even our "ghost elements" must have non-NULL neighbors.  To handle
+  // with a nullptr neighbor resides on a physical domain boundary.  So,
+  // even our "ghost elements" must have non-nullptr neighbors.  To handle
   // this the concept of "RemoteElem" is used - a special construct which
   // is used to denote that an element has a face neighbor, but we do
   // not actually store detailed information about that neighbor.  This
@@ -566,12 +566,12 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
   //
   // So when this method is called we should have only local elements.
   // These local elements will then find neighbors among the local
-  // element set.  After this is completed, any element with a NULL
+  // element set.  After this is completed, any element with a nullptr
   // neighbor has either (i) a face on the physical boundary of the mesh,
   // or (ii) a neighboring element which lives on a remote processor.
   // To handle case (ii), we communicate the global node indices connected
   // to all such faces to our neighboring processors.  They then send us
-  // all their elements with a NULL neighbor that are connected to any
+  // all their elements with a nullptr neighbor that are connected to any
   // of the nodes in our list.
   //------------------------------------------------------------------
 
@@ -586,7 +586,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
   Parallel::MessageTag
     element_neighbors_tag = mesh.comm().get_unique_tag(31416);
 
-  // Now any element with a NULL neighbor either
+  // Now any element with a nullptr neighbor either
   // (i) lives on the physical domain boundary, or
   // (ii) lives on an inter-processor boundary.
   // We will now gather all the elements from adjacent processors
@@ -605,7 +605,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
     cast_int<processor_id_type>(adjacent_processors.size());
 
   //-------------------------------------------------------------------------
-  // Let's build a list of all nodes which live on NULL-neighbor sides.
+  // Let's build a list of all nodes which live on nullptr-neighbor sides.
   // For simplicity, we will use a set to build the list, then transfer
   // it to a vector for communication.
   std::vector<dof_id_type> my_interface_node_list;
@@ -618,10 +618,10 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
       {
         libmesh_assert(elem);
 
-        if (elem->on_boundary()) // denotes *any* side has a NULL neighbor
+        if (elem->on_boundary()) // denotes *any* side has a nullptr neighbor
           {
             my_interface_elements.push_back(elem); // add the element, but only once, even
-            // if there are multiple NULL neighbors
+            // if there are multiple nullptr neighbors
             for (auto s : elem->side_index_range())
               if (elem->neighbor_ptr(s) == nullptr)
                 {

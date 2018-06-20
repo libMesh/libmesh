@@ -177,7 +177,7 @@ public:
    * Jacobian \f$ J(X) \f$ of the nonlinear system at the input
    * iterate \f$ X \f$.
    *
-   * \note Either \p R or \p J could be \p NULL.
+   * \note Either \p R or \p J could be \p nullptr.
    */
   void (* matvec) (const NumericVector<Number> & X,
                    NumericVector<Number> * R,
@@ -189,7 +189,7 @@ public:
    * Jacobian \f$ J(X) \f$ of the nonlinear system at the input
    * iterate \f$ X \f$.
    *
-   * \note Either \p R or \p J could be \p NULL.
+   * \note Either \p R or \p J could be \p nullptr.
    */
   NonlinearImplicitSystem::ComputeResidualandJacobian * residual_and_jacobian_object;
 

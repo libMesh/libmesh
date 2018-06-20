@@ -454,7 +454,7 @@ void RBConstruction::allocate_data_structures()
   Aq_vector.resize(get_rb_theta_expansion().get_n_A_terms());
   Fq_vector.resize(get_rb_theta_expansion().get_n_F_terms());
 
-  // Resize the Fq_representors and initialize each to NULL
+  // Resize the Fq_representors and initialize each to nullptr.
   // These are basis independent and hence stored here, whereas
   // the Aq_representors are stored in RBEvaluation
   Fq_representor.resize(get_rb_theta_expansion().get_n_F_terms());

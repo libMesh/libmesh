@@ -803,7 +803,7 @@ bool UnstructuredMesh::contract ()
             libmesh_assert(el->parent());
 
             // Delete the element
-            // This just sets a pointer to NULL, and doesn't
+            // This just sets a pointer to nullptr, and doesn't
             // invalidate any iterators
             this->delete_elem(el);
 
@@ -820,7 +820,7 @@ bool UnstructuredMesh::contract ()
           }
       }
 
-  // Strip any newly-created NULL voids out of the element array
+  // Strip any newly-created nullptr voids out of the element array
   this->renumber_nodes_and_elements();
 
   // FIXME: Need to understand why deleting subactive children

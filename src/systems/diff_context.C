@@ -102,7 +102,7 @@ DiffContext::~DiffContext ()
 
 void DiffContext::set_deltat_pointer(Real * dt)
 {
-  // We may actually want to be able to set this pointer to NULL, so
+  // We may actually want to be able to set this pointer to nullptr, so
   // don't report an error for that.
   _deltat = dt;
 }

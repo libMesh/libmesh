@@ -121,7 +121,7 @@ public:
    * Constructor.  The subset will consist of those dofs which are
    * associated to at least one mesh element that has a subdomain id
    * contained in the \p subdomain_selection.  If \p var_nums is not a
-   * \p NULL pointer, dofs that are associated to a variable number
+   * \p nullptr, dofs that are associated to a variable number
    * that is not contained in \p var_nums will not contain to the
    * subset, no matter what elements they belong to.
    */
@@ -133,7 +133,7 @@ public:
    * Constructor.  The subset will consist of those dofs which are
    * associated to at least one mesh element that has a subdomain id
    * contained in the set \p subdomain_ids.  If \p var_nums is not a
-   * \p NULL pointer, dofs that are associated to a variable number
+   * \p nullptr, dofs that are associated to a variable number
    * that is not contained in \p var_nums will not contain to the
    * subset, no matter what elements they belong to.
    */
@@ -176,14 +176,14 @@ protected:
 
   /**
    * Sets \p _var_nums to either a copy of \p var_nums or, if that is
-   * \p NULL, a set of all variable numbers that occur in the system.
+   * \p nullptr, a set of all variable numbers that occur in the system.
    */
   void set_var_nums (const std::set<unsigned int> * const var_nums);
 
   /**
    * The set of all variable numbers that are contained in the subset.
    * This will be set by the constructor to either a copy of its \p
-   * var_nums argument or, if that is \p NULL, a set of all variable
+   * var_nums argument or, if that is \p nullptr, a set of all variable
    * numbers that occur in the system.
    */
   std::set<unsigned int> _var_nums;

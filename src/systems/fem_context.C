@@ -1754,7 +1754,7 @@ void FEMContext::set_elem( const Elem * e )
 {
   this->_elem = e;
 
-  // If e is NULL, we assume it's SCALAR and set _elem_dim to 0.
+  // If e is nullptr, we assume it's SCALAR and set _elem_dim to 0.
   this->_elem_dim = this->_elem ? this->_elem->dim() : 0;
 }
 
@@ -1763,7 +1763,7 @@ void FEMContext::_update_time_from_system(Real theta)
   // Update the "time" variable based on the value of theta.  For this
   // to work, we need to know the value of deltat, a pointer to which is now
   // stored by our parent DiffContext class.  Note: get_deltat_value() will
-  // assert in debug mode if the requested pointer is NULL.
+  // assert in debug mode if the requested pointer is nullptr.
   const Real deltat = this->get_deltat_value();
 
   this->set_time(theta*(this->get_system_time() + deltat) + (1.-theta)*this->get_system_time());

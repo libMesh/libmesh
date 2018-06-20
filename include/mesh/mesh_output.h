@@ -55,7 +55,7 @@ class MeshOutput
 protected:
 
   /**
-   * Default constructor. Will set the _obj to NULL, effectively
+   * Default constructor. Will set the _obj to nullptr, effectively
    * rendering this object useless.
    */
   explicit

@@ -121,7 +121,7 @@ public:
    * fails to find an element that contains \p p, for example.
    * Optionally specify a "close to point" tolerance to use in
    * the linear search.
-   * Return NULL if no element is found.
+   * Return nullptr if no element is found.
    */
   const Elem * perform_linear_search(const Point & p,
                                      const std::set<subdomain_id_type> * allowed_subdomains,
@@ -140,7 +140,7 @@ public:
   /**
    * Enables out-of-mesh mode.  In this mode, if asked to find a point
    * that is contained in no mesh at all, the point locator will
-   * return a NULL pointer instead of crashing.  Per default, this
+   * return nullptr instead of crashing.  Per default, this
    * mode is off.
    */
   virtual void enable_out_of_mesh_mode () override;

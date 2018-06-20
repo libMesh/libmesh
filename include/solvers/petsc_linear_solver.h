@@ -144,7 +144,7 @@ public:
    * restricted to the given set of dofs, which must contain local
    * dofs on each processor only and not contain any duplicates.  This
    * mode can be disabled by calling this method with \p dofs being a
-   * \p NULL pointer.
+   * \p nullptr.
    */
   virtual void restrict_solve_to (const std::vector<unsigned int> * const dofs,
                                   const SubsetSolveMode subset_solve_mode=SUBSET_ZERO) override;
@@ -293,7 +293,7 @@ private:
   KSP _ksp;
 
   /**
-   * PETSc index set containing the dofs on which to solve (\p NULL
+   * PETSc index set containing the dofs on which to solve (\p nullptr
    * means solve on all dofs).
    */
   IS _restrict_solve_to_is;

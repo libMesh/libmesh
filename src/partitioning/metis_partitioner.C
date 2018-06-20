@@ -218,7 +218,7 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                   {
                     // If the neighbor is active, but is not in the
                     // range of elements being partitioned, treat it
-                    // as a NULL neighbor.
+                    // as a nullptr neighbor.
                     if (neighbor->active() && !global_index_map.count(neighbor->id()))
                       continue;
 
@@ -320,7 +320,7 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                   {
                     // If the neighbor is active, but is not in the
                     // range of elements being partitioned, treat it
-                    // as a NULL neighbor.
+                    // as a nullptr neighbor.
                     if (neighbor->active() && !global_index_map.count(neighbor->id()))
                       continue;
 

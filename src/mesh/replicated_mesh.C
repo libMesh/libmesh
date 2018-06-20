@@ -362,7 +362,7 @@ void ReplicatedMesh::delete_elem(Elem * e)
   // delete the element
   delete e;
 
-  // explicitly NULL the pointer
+  // explicitly zero the pointer
   *pos = nullptr;
 }
 
@@ -428,7 +428,7 @@ Node * ReplicatedMesh::add_point (const Point & p,
         _nodes[id] = n;
     }
 
-  // better not pass back a NULL pointer.
+  // better not pass back a nullptr.
   libmesh_assert (n);
 
   return n;
@@ -532,7 +532,7 @@ void ReplicatedMesh::delete_node(Node * n)
   // delete the node
   delete n;
 
-  // explicitly NULL the pointer
+  // explicitly zero the pointer
   *pos = nullptr;
 }
 
@@ -614,7 +614,7 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
   std::unordered_set<Node *> connected_nodes;
 
   // Loop over the elements.  Note that there may
-  // be NULLs in the _elements vector from the coarsening
+  // be nullptrs in the _elements vector from the coarsening
   // process.  Pack the elements in to a contiguous array
   // and then trim any excess.
   {
@@ -672,7 +672,7 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
         }
 
     // Erase any additional storage. These elements have been
-    // copied into NULL voids by the procedure above, and are
+    // copied into nullptr voids by the procedure above, and are
     // thus repeated and unnecessary.
     _elements.erase (out_iter, end);
   }
@@ -681,7 +681,7 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
   if (_skip_renumber_nodes_and_elements)
     {
       // Loop over the nodes.  Note that there may
-      // be NULLs in the _nodes vector from the coarsening
+      // be nullptrs in the _nodes vector from the coarsening
       // process.  Pack the nodes in to a contiguous array
       // and then trim any excess.
 
@@ -832,7 +832,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
   // Mapping between all side keys in this mesh and elements+side numbers relevant to the boundary in this mesh as well.
   map_type side_to_elem_map;
 
-  // If there is only one mesh (i.e. other_mesh==NULL), then loop over this mesh twice
+  // If there is only one mesh (i.e. other_mesh == nullptr), then loop over this mesh twice
   if (!other_mesh)
     {
       other_mesh = this;
@@ -1129,7 +1129,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
     0;
 #endif
 
-  // If other_mesh!=NULL, then we have to do a bunch of work
+  // If other_mesh != nullptr, then we have to do a bunch of work
   // in order to copy it to this mesh
   if (this!=other_mesh)
     {
@@ -1233,7 +1233,7 @@ void ReplicatedMesh::stitching_helper (const ReplicatedMesh * other_mesh,
   // and fix their lists of neighbors.
   // This is done according to the following steps:
   //   1. Loop over all copied elements adjacent to the boundary using node_to_elems_map (trying to avoid duplicates)
-  //   2. Look at all their sides with a NULL neighbor and update them using side_to_elem_map if necessary
+  //   2. Look at all their sides with a nullptr neighbor and update them using side_to_elem_map if necessary
   //   3. Update the corresponding side in side_to_elem_map as well
   if (skip_find_neighbors)
     {

@@ -161,7 +161,7 @@ public:
 protected:
 
   /**
-   * Const pointer to our master, initialized to \p NULL.
+   * Const pointer to our master, initialized to \p nullptr.
    * There may be cases where multiple functions are required,
    * but to save memory, one master handles some centralized
    * data.

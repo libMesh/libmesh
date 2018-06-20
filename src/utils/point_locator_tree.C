@@ -231,7 +231,7 @@ const Elem * PointLocatorTree::operator() (const Point & p,
           // No element seems to contain this point.  In theory, our
           // tree now correctly handles curved elements.  In
           // out-of-mesh mode this is sometimes expected, and we can
-          // just return NULL without searching further.  Out of
+          // just return nullptr without searching further.  Out of
           // out-of-mesh mode, something must have gone wrong.
           libmesh_assert_equal_to (_out_of_mesh_mode, true);
 

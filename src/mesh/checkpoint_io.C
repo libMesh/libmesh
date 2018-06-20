@@ -1149,8 +1149,7 @@ void CheckpointIO::read_remote_elem (Xdr & io, bool libmesh_dbg_var(expect_all_r
       // We'd like to assert that no child pointer already exists to
       // be overwritten by remote_elem, but Elem doesn't actually have
       // an API that will return a child pointer without asserting
-      // that it isn't NULL
-      //
+      // that it isn't nullptr.
       const Elem * child = elem.raw_child_ptr(child_numbers[i]);
 
       if (!child)

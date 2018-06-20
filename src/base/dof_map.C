@@ -1915,7 +1915,7 @@ void DofMap::extract_local_vector (const NumericVector<Number> & Ug,
 void DofMap::dof_indices (const Elem * const elem,
                           std::vector<dof_id_type> & di) const
 {
-  // We now allow elem==NULL to request just SCALAR dofs
+  // We now allow elem==nullptr to request just SCALAR dofs
   // libmesh_assert(elem);
 
   // If we are asking for current indices on an element, it ought to
@@ -2010,7 +2010,7 @@ void DofMap::dof_indices (const Elem * const elem,
                           const unsigned int vn,
                           int p_level) const
 {
-  // We now allow elem==NULL to request just SCALAR dofs
+  // We now allow elem==nullptr to request just SCALAR dofs
   // libmesh_assert(elem);
 
   LOG_SCOPE("dof_indices()", "DofMap");
@@ -2081,7 +2081,7 @@ void DofMap::dof_indices (const Elem * const elem,
 void DofMap::dof_indices (const Node * const node,
                           std::vector<dof_id_type> & di) const
 {
-  // We allow node==NULL to request just SCALAR dofs
+  // We allow node==nullptr to request just SCALAR dofs
   // libmesh_assert(elem);
 
   LOG_SCOPE("dof_indices(Node)", "DofMap");
@@ -2127,7 +2127,7 @@ void DofMap::dof_indices (const Node * const node,
       return;
     }
 
-  // We allow node==NULL to request just SCALAR dofs
+  // We allow node==nullptr to request just SCALAR dofs
   // libmesh_assert(elem);
 
   LOG_SCOPE("dof_indices(Node)", "DofMap");

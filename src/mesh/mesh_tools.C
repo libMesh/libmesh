@@ -1879,7 +1879,7 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase & mesh,
                 my_neighbor = elem->neighbor_ptr(n)->id();
 
               // But wait - if we haven't set remote_elem links yet then
-              // some NULL links on ghost elements might be
+              // some nullptr links on ghost elements might be
               // future-remote_elem links, so we can't verify those.
               if (!assert_valid_remote_elems &&
                   !elem->neighbor_ptr(n) &&

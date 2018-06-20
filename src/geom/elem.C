@@ -930,7 +930,7 @@ Elem * Elem::topological_neighbor (const unsigned int i,
 
   if (pb)
     {
-      // Since the neighbor is NULL it must be on a boundary. We need
+      // Since the neighbor is nullptr it must be on a boundary. We need
       // see if this is a periodic boundary in which case it will have a
       // topological neighbor
       std::vector<boundary_id_type> bc_ids;
@@ -972,7 +972,7 @@ const Elem * Elem::topological_neighbor (const unsigned int i,
 
   if (pb)
     {
-      // Since the neighbor is NULL it must be on a boundary. We need
+      // Since the neighbor is nullptr it must be on a boundary. We need
       // see if this is a periodic boundary in which case it will have a
       // topological neighbor
       std::vector<boundary_id_type> bc_ids;

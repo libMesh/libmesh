@@ -433,7 +433,7 @@ public:
    * geometry is correctly repositioned when evaluating element residuals.
    *
    * Currently \p sys must be \p *this for a tightly coupled moving
-   * mesh problem or NULL to stop mesh movement; loosely coupled
+   * mesh problem or nullptr to stop mesh movement; loosely coupled
    * moving mesh problems are not implemented.
    *
    * This code is experimental.  "Trust but verify, and not in that
@@ -443,14 +443,14 @@ public:
 
   /**
    * \returns A const reference to the system with variables corresponding to
-   * mesh nodal coordinates, or NULL if the mesh is fixed.
+   * mesh nodal coordinates, or nullptr if the mesh is fixed.
    * Useful for ALE calculations.
    */
   const System * get_mesh_system() const;
 
   /**
    * \returns A reference to the system with variables corresponding to
-   * mesh nodal coordinates, or NULL if the mesh is fixed.
+   * mesh nodal coordinates, or nullptr if the mesh is fixed.
    */
   System * get_mesh_system();
 

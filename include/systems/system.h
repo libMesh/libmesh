@@ -308,7 +308,7 @@ public:
   /**
    * After calling this method, any solve will be restricted to the
    * given subdomain.  To disable this mode, call this method with \p
-   * subset being a \p NULL pointer.
+   * subset being a \p nullptr.
    */
   virtual void restrict_solve_to (const SystemSubset * subset,
                                   const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
@@ -346,7 +346,7 @@ public:
 
   /**
    * Solves the adjoint system, for the specified qoi indices, or for
-   * every qoi if \p qoi_indices is NULL.  Must be overridden in
+   * every qoi if \p qoi_indices is nullptr.  Must be overridden in
    * derived systems.
    *
    * \returns A pair with the total number of linear iterations
@@ -795,27 +795,27 @@ public:
 
   /**
    * \returns A const pointer to the vector if this \p System has a
-   * vector associated with the given name, \p NULL otherwise.
+   * vector associated with the given name, \p nullptr otherwise.
    */
   const NumericVector<Number> * request_vector (const std::string & vec_name) const;
 
   /**
    * \returns A pointer to the vector if this \p System has a
-   * vector associated with the given name, \p NULL otherwise.
+   * vector associated with the given name, \p nullptr otherwise.
    */
   NumericVector<Number> * request_vector (const std::string & vec_name);
 
   /**
    * \returns A const pointer to this system's additional vector
    * number \p vec_num (where the vectors are counted starting with
-   * 0), or \p NULL if the system has no such vector.
+   * 0), or \p nullptr if the system has no such vector.
    */
   const NumericVector<Number> * request_vector (const unsigned int vec_num) const;
 
   /**
    * \returns A writable pointer to this system's additional
    * vector number \p vec_num (where the vectors are counted starting
-   * with 0), or \p NULL if the system has no such vector.
+   * with 0), or \p nullptr if the system has no such vector.
    */
   NumericVector<Number> * request_vector (const unsigned int vec_num);
 

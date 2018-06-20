@@ -115,7 +115,7 @@ public:
 
   /**
    * \returns A pointer to a Node with global coordinates \p p or \p
-   * NULL if no such Node can be found.
+   * nullptr if no such Node can be found.
    *
    * Virtual subclasses can override for efficiency, but the base
    * class has a default implementation that works based on element
@@ -143,7 +143,7 @@ public:
   /**
    * Enables out-of-mesh mode.  In this mode, if asked to find a point
    * that is contained in no mesh at all, the point locator will
-   * return a NULL pointer instead of crashing.  Per default, this
+   * return a nullptr instead of crashing.  Per default, this
    * mode is off.
    */
   virtual void enable_out_of_mesh_mode () = 0;
@@ -179,7 +179,7 @@ public:
 
 protected:
   /**
-   * Const pointer to our master, initialized to \p NULL if none
+   * Const pointer to our master, initialized to \p nullptr if none
    * given.  When using multiple PointLocators, one can be assigned
    * master and be in charge of something that all can have access to.
    */

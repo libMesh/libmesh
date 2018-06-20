@@ -2272,7 +2272,7 @@ inline void Communicator::allgather(std::vector<T,A> & r,
   StandardType<T> send_type(&r[0]);
 
   // and get the data from the remote processors.
-  // Pass NULL if our vector is empty.
+  // Pass nullptr if our vector is empty.
   libmesh_call_mpi
     (MPI_Allgatherv (r_src.empty() ? nullptr : &r_src[0], mysize,
                      send_type, &r[0], &sendlengths[0],
@@ -2343,7 +2343,7 @@ inline void Communicator::allgather(std::vector<std::basic_string<T>,A> & r,
     return;
 
   // Get the concatenated data from the remote processors.
-  // Pass NULL if our vector is empty.
+  // Pass nullptr if our vector is empty.
   std::vector<T> concat(globalsize);
 
   // We may have concat_src.empty(), but we know concat has at least
@@ -2375,7 +2375,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
 {
   libmesh_assert_less (root_id, this->size());
 
-  // Do not allow the root_id to scatter a NULL vector.
+  // Do not allow the root_id to scatter a nullptr vector.
   // That would leave recv in an indeterminate state.
   libmesh_assert (this->rank() != root_id || this->size() == data.size());
 
@@ -2665,7 +2665,7 @@ inline void Communicator::broadcast (std::vector<T,A> & data,
   LOG_SCOPE("broadcast()", "Parallel");
 
   // and get the data from the remote processors.
-  // Pass NULL if our vector is empty.
+  // Pass nullptr if our vector is empty.
   T * data_ptr = data.empty() ? nullptr : &data[0];
 
   libmesh_call_mpi

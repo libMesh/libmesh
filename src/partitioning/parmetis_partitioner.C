@@ -146,7 +146,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
         all_have_enough_elements = false;
 
     // Parmetis will not work unless each processor has some
-    // elements. Specifically, it will abort when passed a NULL
+    // elements. Specifically, it will abort when passed a nullptr
     // partition array on *any* of the processors.
     if (!all_have_enough_elements)
       {

@@ -868,7 +868,7 @@ void RBEvaluation::legacy_read_offline_data_from_files(const std::string & direc
 
   // Resize basis_functions even if we don't read them in so that
   // get_n_bfs() returns the correct value. Initialize the pointers
-  // to NULL
+  // to nullptr.
   basis_functions.clear();
   set_n_basis_functions(n_bfs);
 }
@@ -1025,7 +1025,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
       // Allocate storage for each vector
       for (std::size_t i=0; i<vectors.size(); i++)
         {
-          // vectors should all be NULL, otherwise we get a memory leak when
+          // vectors should all be nullptr, otherwise we get a memory leak when
           // we create the new vectors in RBEvaluation::read_in_vectors.
           if (vectors[i])
             libmesh_error_msg("Non-nullptr vector passed to read_in_vectors_from_multiple_files");

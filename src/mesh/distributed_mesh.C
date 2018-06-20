@@ -193,7 +193,7 @@ dof_id_type DistributedMesh::parallel_max_elem_id() const
     rend = _elements.rend();
 
   // Look for the maximum element id.  Search backwards through
-  // elements so we can break out early.  Beware of NULL entries that
+  // elements so we can break out early.  Beware of nullptr entries that
   // haven't yet been cleared from _elements.
   for (; rit != rend; ++rit)
     if (rit->second)
@@ -251,7 +251,7 @@ dof_id_type DistributedMesh::parallel_max_node_id() const
     rend = _nodes.rend();
 
   // Look for the maximum element id.  Search backwards through
-  // elements so we can break out early.  Beware of NULL entries that
+  // elements so we can break out early.  Beware of nullptr entries that
   // haven't yet been cleared from _elements.
   for (; rit != rend; ++rit)
     if (rit->second)
@@ -384,7 +384,7 @@ Elem * DistributedMesh::query_elem_ptr (const dof_id_type i)
 
 Elem * DistributedMesh::add_elem (Elem * e)
 {
-  // Don't try to add NULLs!
+  // Don't try to add nullptrs!
   libmesh_assert(e);
 
   // Trying to add an existing element is a no-op
@@ -427,7 +427,7 @@ Elem * DistributedMesh::add_elem (Elem * e)
 
 #ifndef NDEBUG
     // We need a const mapvector so we don't inadvertently create
-    // NULL entries when testing for non-NULL ones
+    // nullptr entries when testing for non-nullptr ones
     const mapvector<Elem *, dof_id_type> & const_elements = _elements;
 #endif
     libmesh_assert(!const_elements[_next_free_unpartitioned_elem_id]);
@@ -530,7 +530,7 @@ void DistributedMesh::delete_elem(Elem * e)
 
   //_elements.erase(e->id());
 
-  // Instead, we set it to NULL for now
+  // Instead, we set it to nullptr for now
 
   _elements[e->id()] = nullptr;
 
@@ -594,7 +594,7 @@ void DistributedMesh::own_node (Node & n)
 
 Node * DistributedMesh::add_node (Node * n)
 {
-  // Don't try to add NULLs!
+  // Don't try to add nullptrs!
   libmesh_assert(n);
 
   // Trying to add an existing node is a no-op
@@ -637,7 +637,7 @@ Node * DistributedMesh::add_node (Node * n)
 
 #ifndef NDEBUG
     // We need a const mapvector so we don't inadvertently create
-    // NULL entries when testing for non-NULL ones
+    // nullptr entries when testing for non-nullptr ones
     const mapvector<Node *,dof_id_type> & const_nodes = _nodes;
 #endif
     libmesh_assert(!const_nodes[_next_free_unpartitioned_node_id]);
@@ -715,7 +715,7 @@ void DistributedMesh::delete_node(Node * n)
 
   //_nodes.erase(n->id());
 
-  // Instead, we set it to NULL for now
+  // Instead, we set it to nullptr for now
 
   _nodes[n->id()] = nullptr;
 
@@ -863,7 +863,7 @@ void DistributedMesh::libmesh_assert_valid_parallel_object_ids(const mapvector<T
 
   for (dof_id_type i=0; i != pmax_id; ++i)
     {
-      T * obj = objects[i]; // Returns NULL if there's no map entry
+      T * obj = objects[i]; // Returns nullptr if there's no map entry
 
       // Local lookups by id should return the requested object
       libmesh_assert(!obj || obj->id() == i);
@@ -884,7 +884,7 @@ void DistributedMesh::libmesh_assert_valid_parallel_object_ids(const mapvector<T
       this->comm().min(min_procid);
 
       // Either:
-      // 1.) I own this elem (min_procid == this->processor_id()) *and* I have a valid pointer to it (obj != NULL)
+      // 1.) I own this elem (min_procid == this->processor_id()) *and* I have a valid pointer to it (obj != nullptr)
       // or
       // 2.) I don't own this elem (min_procid != this->processor_id()).  (In this case I may or may not have a valid pointer to it.)
 
@@ -926,7 +926,7 @@ void DistributedMesh::libmesh_assert_valid_parallel_p_levels () const
 
   for (dof_id_type i=0; i != pmax_elem_id; ++i)
     {
-      Elem * el = _elements[i]; // Returns NULL if there's no map entry
+      Elem * el = _elements[i]; // Returns nullptr if there's no map entry
 
       unsigned int p_level = el ?  (el->p_level()) : libMesh::invalid_uint;
 
@@ -949,7 +949,7 @@ void DistributedMesh::libmesh_assert_valid_parallel_flags () const
 
   for (dof_id_type i=0; i != pmax_elem_id; ++i)
     {
-      Elem * el = _elements[i]; // Returns NULL if there's no map entry
+      Elem * el = _elements[i]; // Returns nullptr if there's no map entry
 
       unsigned int refinement_flag   = el ?
         static_cast<unsigned int> (el->refinement_flag()) : libMesh::invalid_uint;
@@ -990,7 +990,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
     {
       T * obj = *it;
 
-      // Remove any NULL container entries while we're here,
+      // Remove any nullptr container entries while we're here,
       // being careful not to invalidate our iterator
       if (!*it)
         objects.erase(it++);
@@ -1174,13 +1174,13 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
   for (it = objects.begin(); it != end;)
     {
       T * obj = *it;
-      if (obj) // don't try shuffling already-NULL entries
+      if (obj) // don't try shuffling already-nullptr entries
         {
           T * next = objects[obj->id()];
           // If we have to move this object
           if (next != obj)
             {
-              // NULL out its original position for now
+              // nullptr out its original position for now
               // (our shuffling may put another object there shortly)
               *it = nullptr;
 
@@ -1198,7 +1198,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
               objects[obj->id()] = obj;
             }
         }
-      // Remove any container entries that were left as NULL,
+      // Remove any container entries that were left as nullptr,
       // being careful not to invalidate our iterator
       if (!*it)
         objects.erase(it++);
@@ -1239,7 +1239,7 @@ void DistributedMesh::renumber_nodes_and_elements ()
       }
   }
 
-  // Nodes not connected to any local elements, and NULL node entries
+  // Nodes not connected to any local elements, and nullptr node entries
   // in our container, are deleted
   {
     node_iterator_imp  it = _nodes.begin();
@@ -1387,7 +1387,7 @@ void DistributedMesh::delete_remote_elements()
   libmesh_assert_equal_to (this->max_elem_id(), this->parallel_max_elem_id());
 
   // Now make sure the containers actually shrink - strip
-  // any newly-created NULL voids out of the element array
+  // any newly-created nullptr voids out of the element array
   mapvector<Elem *,dof_id_type>::veclike_iterator e_it        = _elements.begin();
   const mapvector<Elem *,dof_id_type>::veclike_iterator e_end = _elements.end();
   for (; e_it != e_end;)

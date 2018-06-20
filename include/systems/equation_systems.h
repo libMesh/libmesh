@@ -271,7 +271,7 @@ public:
    * Fill the input vector \p var_names with the names
    * of the variables for each system. If \p type is passed,
    * only variables of the specified type will be populated.
-   * If systems_names!=NULL, only include names from the
+   * If systems_names!=nullptr, only include names from the
    * specified systems.
    */
   void build_variable_names (std::vector<std::string> & var_names,
@@ -294,7 +294,7 @@ public:
    * Fill the input vector \p soln with solution values.  The
    * entries will be in variable-major format (corresponding to
    * the names from \p build_variable_names()).
-   * If systems_names!=NULL, only include data from the
+   * If systems_names!=nullptr, only include data from the
    * specified systems.
    */
   void build_solution_vector (std::vector<Number> & soln,
@@ -330,7 +330,7 @@ public:
    * Fill the input vector \p soln with solution values.  The
    * entries will be in variable-major format (corresponding to
    * the names from \p build_variable_names()).
-   * If systems_names!=NULL, only include data from the
+   * If systems_names!=nullptr, only include data from the
    * specified systems.
    */
   void build_discontinuous_solution_vector (std::vector<Number> & soln,

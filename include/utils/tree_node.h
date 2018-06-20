@@ -40,8 +40,8 @@ class Elem;
 
 /**
  * This class defines a node on a tree.  A tree node
- * contains a pointer to its parent (NULL if the node is
- * the root) and pointers to its children (NULL if the
+ * contains a pointer to its parent (nullptr if the node is
+ * the root) and pointers to its children (nullptr if the
  * node is active.
  *
  * \author Daniel Dreyer
@@ -54,7 +54,7 @@ class TreeNode
 public:
   /**
    * Constructor.  Takes a pointer to this node's
-   * parent.  The pointer should only be NULL
+   * parent.  The pointer should only be nullptr
    * for the top-level (root) node.
    */
   TreeNode (const MeshBase & m,

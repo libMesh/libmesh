@@ -230,7 +230,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue & origin_x,
 
       // Finally, create const Node * in the inner_boundary_nodes
       // vector.  Reserve, not resize (otherwise, the push_back
-      // would append the interesting nodes, while NULL-nodes
+      // would append the interesting nodes, while nullptr-nodes
       // live in the resize'd area...
       inner_boundary_nodes->reserve (unique_size);
       inner_boundary_nodes->clear();

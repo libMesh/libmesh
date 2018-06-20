@@ -137,7 +137,7 @@ Status Request::wait ()
     {
       for (auto & item : post_wait_work->first)
         {
-          // The user should never try to give us NULL work or try
+          // The user should never try to give us non-existent work or try
           // to wait() twice.
           libmesh_assert (item);
           item->run();
@@ -260,7 +260,7 @@ std::size_t waitany (std::vector<Request> & r)
       if (completed->post_wait_work)
         for (auto & item : completed->post_wait_work->first)
           {
-            // The user should never try to give us NULL work or try
+            // The user should never try to give us non-existent work or try
             // to wait() twice.
             libmesh_assert (item);
             item->run();

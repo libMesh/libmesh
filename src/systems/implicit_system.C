@@ -288,9 +288,9 @@ SparseMatrix<Number> & ImplicitSystem::get_matrix (const std::string & mat_name)
 void ImplicitSystem::add_system_matrix ()
 {
   // Possible that we cleared the _matrices but
-  // forgot to NULL-out the matrix?
-  if (_matrices.empty()) matrix = nullptr;
-
+  // forgot to update the matrix pointer?
+  if (_matrices.empty())
+    matrix = nullptr;
 
   // Only need to add the matrix if it isn't there
   // already!

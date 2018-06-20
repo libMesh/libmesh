@@ -2509,7 +2509,7 @@ ExodusII_IO_Helper::NamesData::NamesData(size_t n_strings, size_t string_length)
     {
       data_table[i].resize(string_length + 1);
 
-      // NULL-terminate these strings, just to be safe.
+      // Properly terminate these C-style strings, just to be safe.
       data_table[i][0] = '\0';
 
       // Set pointer into the data_table

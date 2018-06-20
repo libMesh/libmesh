@@ -848,7 +848,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
           // Get pointers to the elements of interest and its parent.
           const Elem * parent = elem->parent();
 
-          // This can't happen...  Only level-0 elements have NULL
+          // This can't happen...  Only level-0 elements have nullptr
           // parents, and no level-0 elements can be at a higher
           // level than their neighbors!
           libmesh_assert(parent);

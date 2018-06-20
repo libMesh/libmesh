@@ -538,9 +538,8 @@ const Elem * TreeNode<N>::find_element_in_children (const Point & p,
   // If we get here we have searched all our children.
   // Since this process was started at the root node then
   // we have searched all the elements in the tree without
-  // success.  So, we should return NULL since at this point
+  // success.  So, we should return nullptr since at this point
   // _no_ elements in the tree claim to contain point p.
-
   return nullptr;
 }
 

@@ -118,7 +118,7 @@ protected:
 
 
 /**
- * Used to iterate over NULL entries in a container.
+ * Used to iterate over nullptr entries in a container.
  */
 template <typename T>
 struct IsNull : abstract_multi_predicate<T>
@@ -133,7 +133,7 @@ struct IsNull : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL entries in a container.
+ * Used to iterate over non-nullptr entries in a container.
  */
 template <typename T>
 struct NotNull : abstract_multi_predicate<T>
@@ -148,7 +148,7 @@ struct NotNull : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, active entries in a container.
+ * Used to iterate over non-nullptr, active entries in a container.
  */
 template <typename T>
 struct Active : abstract_multi_predicate<T>
@@ -164,7 +164,7 @@ struct Active : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, inactive entries in a container.
+ * Used to iterate over non-nullptr, inactive entries in a container.
  */
 template <typename T>
 struct NotActive : abstract_multi_predicate<T>
@@ -181,7 +181,7 @@ struct NotActive : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, entries that have children (i.e. are
+ * Used to iterate over non-nullptr, entries that have children (i.e. are
  * ancestors) in a container.
  */
 template <typename T>
@@ -199,7 +199,7 @@ struct Ancestor : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, entries that have no children (i.e. are not
+ * Used to iterate over non-nullptr, entries that have no children (i.e. are not
  * ancestors) in a container.
  */
 template <typename T>
@@ -217,7 +217,7 @@ struct NotAncestor : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, subactive entries (i.e. has no
+ * Used to iterate over non-nullptr, subactive entries (i.e. has no
  * active children) in a container.
  */
 template <typename T>
@@ -235,7 +235,7 @@ struct SubActive : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, non-subactive entries (i.e. has one
+ * Used to iterate over non-nullptr, non-subactive entries (i.e. has one
  * or more active children) in a container.
  */
 template <typename T>
@@ -252,7 +252,7 @@ struct NotSubActive : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, local entries (i.e. owned by the
+ * Used to iterate over non-nullptr, local entries (i.e. owned by the
  * current processor) in a container.
  */
 template <typename T>
@@ -268,7 +268,7 @@ struct Local : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, semi-local entries (i.e. are not
+ * Used to iterate over non-nullptr, semi-local entries (i.e. are not
  * subactive and have are owned by an attached processor) in a
  * container.
  *
@@ -290,7 +290,7 @@ struct Local : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, active, non sub-active, semi-local
+ * Used to iterate over non-nullptr, active, non sub-active, semi-local
  * elements in a container.
  */
 template <typename T>
@@ -308,7 +308,7 @@ struct ActiveSemiLocal : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, face-local entries (i.e. are not
+ * Used to iterate over non-nullptr, face-local entries (i.e. are not
  * subactive and are on or have a neighbor on processor my_pid) in a
  * container.
  */
@@ -327,7 +327,7 @@ struct FaceLocal : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, non-local entries in a
+ * Used to iterate over non-nullptr, non-local entries in a
  * container.
  */
 template <typename T>
@@ -343,7 +343,7 @@ struct NotLocal : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, active, non-local entries in a
+ * Used to iterate over non-nullptr, active, non-local entries in a
  * container.
  */
 template <typename T>
@@ -360,7 +360,7 @@ struct ActiveNotLocal : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, elements of a given geometric type.
+ * Used to iterate over non-nullptr, elements of a given geometric type.
  */
 template <typename T>
 struct Type : abstract_multi_predicate<T>
@@ -375,7 +375,7 @@ struct Type : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, active elements of a given geometric type.
+ * Used to iterate over non-nullptr, active elements of a given geometric type.
  */
 template <typename T>
 struct ActiveType : abstract_multi_predicate<T>
@@ -392,7 +392,7 @@ struct ActiveType : abstract_multi_predicate<T>
 
 #ifdef LIBMESH_ENABLE_AMR
 /**
- * Used to iterate over non-NULL, elements with a given refinement
+ * Used to iterate over non-nullptr, elements with a given refinement
  * flag.
  */
 template <typename T>
@@ -408,7 +408,7 @@ struct Flagged : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, elements with a given refinement
+ * Used to iterate over non-nullptr, elements with a given refinement
  * flag belonging to a given processor.
  */
 template <typename T>
@@ -428,7 +428,7 @@ struct FlaggedPID : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, active elements owned by a given
+ * Used to iterate over non-nullptr, active elements owned by a given
  * processor.
  */
 template <typename T>
@@ -447,7 +447,7 @@ struct ActivePID : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, active, local elements owned by a
+ * Used to iterate over non-nullptr, active, local elements owned by a
  * given processor.
  */
 template <typename T>
@@ -466,7 +466,7 @@ struct ActiveLocal : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL elements owned by a given processor.
+ * Used to iterate over non-nullptr elements owned by a given processor.
  */
 template <typename T>
 struct PID : abstract_multi_predicate<T>
@@ -481,7 +481,7 @@ struct PID : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL elements on the boundary with a given
+ * Used to iterate over non-nullptr elements on the boundary with a given
  * ID.
  */
 template <typename T>
@@ -497,7 +497,7 @@ struct BID : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL elements on the boundary.
+ * Used to iterate over non-nullptr elements on the boundary.
  */
 template <typename T>
 struct BND : abstract_multi_predicate<T>
@@ -512,7 +512,7 @@ struct BND : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL elements *not* owned by a given
+ * Used to iterate over non-nullptr elements *not* owned by a given
  * processor.
  */
 template <typename T>
@@ -528,7 +528,7 @@ struct NotPID : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL elements of a specified (refinement) level.
+ * Used to iterate over non-nullptr elements of a specified (refinement) level.
  */
 template <typename T>
 struct Level : abstract_multi_predicate<T>
@@ -543,7 +543,7 @@ struct Level : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL elements *not* of a specified
+ * Used to iterate over non-nullptr elements *not* of a specified
  * (refinement) level.
  */
 template <typename T>
@@ -559,7 +559,7 @@ struct NotLevel : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL local elements with a specified
+ * Used to iterate over non-nullptr local elements with a specified
  * (refinement) level.
  */
 template <typename T>
@@ -577,7 +577,7 @@ struct LocalLevel : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL local elements *not* of a specified
+ * Used to iterate over non-nullptr local elements *not* of a specified
  * (refinement) level.
  */
 template <typename T>
@@ -595,7 +595,7 @@ struct LocalNotLevel : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, active elements which are on the
+ * Used to iterate over non-nullptr, active elements which are on the
  * boundary.
  */
 template <typename T>
@@ -627,7 +627,7 @@ struct BoundarySide : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, active elements with a given PID on
+ * Used to iterate over non-nullptr, active elements with a given PID on
  * a given subdomain.
  */
 template <typename T>
@@ -646,7 +646,7 @@ struct ActiveLocalSubdomain : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, active elements on a given
+ * Used to iterate over non-nullptr, active elements on a given
  * subdomain.
  */
 template <typename T>
@@ -663,7 +663,7 @@ struct ActiveSubdomain : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL, active elements whose
+ * Used to iterate over non-nullptr, active elements whose
  * subdomains are in a user-specified set.
  */
 template <typename T>
@@ -680,7 +680,7 @@ struct ActiveSubdomainSet : abstract_multi_predicate<T>
 
 
 /**
- * Used to iterate over non-NULL elements not owned by a given
+ * Used to iterate over non-nullptr elements not owned by a given
  * processor but semi-local to that processor, i.e. ghost elements.
  */
 template <typename T>

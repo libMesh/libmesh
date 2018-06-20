@@ -163,7 +163,7 @@ void TetGenWrapper::set_switches(const std::string & s)
                       << sizeof(buffer)                               \
                       << " not large enough to hold TetGen switches.");
 
-  // Copy the string, don't forget to NULL-terminate!
+  // Copy the string, don't forget to terminate!
   buffer[ s.copy( buffer , sizeof( buffer ) - 1 ) ] = '\0' ;
 
   if (!tetgen_be.parse_commandline(buffer))

@@ -96,7 +96,7 @@ void ExplicitSystem::solve ()
 void ExplicitSystem::add_system_rhs ()
 {
   // Possible that we cleared the _vectors but
-  // forgot to NULL-out the rhs?
+  // forgot to update the rhs pointer?
   if (this->n_vectors() == 0)
     rhs = nullptr;
 

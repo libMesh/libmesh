@@ -122,12 +122,12 @@ protected:
    * elements in the Mesh to see if they comprise a convex hull,
    * that is:
    * - If they are all TRI3 elements
-   * - They all have non-NULL neighbors
+   * - They all have non-nullptr neighbors
    *
    * \returns
    * - 0 if the mesh forms a valid convex hull
    * - 1 if a non-TRI3 element is found
-   * - 2 if an element with a NULL-neighbor is found
+   * - 2 if an element with a nullptr-neighbor is found
    */
   unsigned check_hull_integrity();
 

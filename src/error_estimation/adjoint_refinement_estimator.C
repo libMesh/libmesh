@@ -355,7 +355,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
       // Skip this QoI if not in the QoI Set
       if (_qoi_set.has_index(j))
         {
-          // If we have a NULL residual evaluation physics pointer, we
+          // If we have a nullptr residual evaluation physics pointer, we
           // assume the user's formulation is consistent from mesh to
           // mesh, so we have Galerkin orthogonality and we can get
           // better indicator results by subtracting a coarse adjoint.

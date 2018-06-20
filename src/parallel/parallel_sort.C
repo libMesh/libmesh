@@ -238,7 +238,7 @@ void Sort<KeyType,IdxType>::communicate_bins()
       // Enough storage to hold all bin contributions
       void * recvbuf = (dest.empty()) ? nullptr : &dest[0];
 
-      // If the sendbuf is NULL, make sure we aren't claiming to send something.
+      // If the sendbuf is nullptr, make sure we aren't claiming to send something.
       if (sendbuf == nullptr && _local_bin_sizes[i] != 0)
         libmesh_error_msg("Error: invalid MPI_Gatherv call constructed!");
 
@@ -334,7 +334,7 @@ void Sort<Parallel::DofObjectKey,unsigned int>::communicate_bins()
       // Enough storage to hold all bin contributions
       void * recvbuf = (dest.empty()) ? nullptr : &dest[0];
 
-      // If the sendbuf is NULL, make sure we aren't claiming to send something.
+      // If the sendbuf is nullptr, make sure we aren't claiming to send something.
       if (sendbuf == nullptr && _local_bin_sizes[i] != 0)
         libmesh_error_msg("Error: invalid MPI_Gatherv call constructed!");
 

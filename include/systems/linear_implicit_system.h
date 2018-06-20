@@ -106,7 +106,7 @@ public:
   /**
    * After calling this method, any solve will be limited to the given
    * subset.  To disable this mode, call this method with \p subset
-   * being a \p NULL pointer.
+   * being a \p nullptr.
    */
   virtual void restrict_solve_to (const SystemSubset * subset,
                                   const SubsetSolveMode subset_solve_mode=SUBSET_ZERO) override;
@@ -168,7 +168,7 @@ public:
    * you register your shell matrix using this function, calling \p
    * solve() will no longer use the \p matrix member but the
    * registered shell matrix instead.  You can reset this behaviour to
-   * its original state by supplying a \p NULL pointer to this
+   * its original state by supplying a \p nullptr to this
    * function.
    */
   void attach_shell_matrix (ShellMatrix<Number> * shell_matrix);
@@ -180,7 +180,7 @@ public:
 
   /**
    * \returns A pointer to the currently attached shell matrix, if any,
-   * or \p NULL else.
+   * otherwise \p nullptr.
    */
   ShellMatrix<Number> * get_shell_matrix() { return _shell_matrix; }
 
@@ -198,12 +198,12 @@ protected:
   Real _final_linear_residual;
 
   /**
-   * User supplies shell matrix or \p NULL if no shell matrix is used.
+   * User supplies shell matrix or \p nullptr if no shell matrix is used.
    */
   ShellMatrix<Number> * _shell_matrix;
 
   /**
-   * The current subset on which to solve (or \p NULL if none).
+   * The current subset on which to solve (or \p nullptr if none).
    */
   const SystemSubset * _subset;
 

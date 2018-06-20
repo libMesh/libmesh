@@ -448,7 +448,7 @@ void MeshBase::partition (const unsigned int n_parts)
       libmesh_assert (this->is_serial());
       partitioner()->partition (*this, n_parts);
     }
-  // NULL partitioner means don't repartition; skip_partitioning()
+  // A nullptr partitioner means don't repartition; skip_partitioning()
   // checks on this.
   // Non-serial meshes may not be ready for repartitioning here.
   else if (!skip_partitioning())

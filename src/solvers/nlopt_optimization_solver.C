@@ -155,7 +155,7 @@ void __libmesh_nlopt_equality_constraints(unsigned m,
       for (unsigned i=0; i<m; ++i)
         result[i] = (*sys.C_eq)(i);
 
-      // If gradient != NULL, then the Jacobian matrix of the equality
+      // If gradient != nullptr, then the Jacobian matrix of the equality
       // constraints has been requested.  The incoming 'gradient'
       // array is of length m*n and d(c_i)/d(x_j) = gradient[n*i+j].
       if (gradient)
@@ -242,7 +242,7 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
       for (unsigned i=0; i<m; ++i)
         result[i] = (*sys.C_ineq)(i);
 
-      // If gradient != NULL, then the Jacobian matrix of the equality
+      // If gradient != nullptr, then the Jacobian matrix of the equality
       // constraints has been requested.  The incoming 'gradient'
       // array is of length m*n and d(c_i)/d(x_j) = gradient[n*i+j].
       if (gradient)

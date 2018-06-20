@@ -121,7 +121,7 @@ public:
   unsigned char number_p_refinements;
 
   /**
-   * \returns A pointer to the DifferentiablePhysics object or \p NULL if
+   * \returns A pointer to the DifferentiablePhysics object or \p nullptr if
    * no external Physics object is attached.
    */
   DifferentiablePhysics * get_residual_evaluation_physics()

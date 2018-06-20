@@ -296,11 +296,11 @@ public:
 
   /**
    * \returns A const pointer to the \f$ i^{th} \f$ neighbor of this
-   * element, or \p NULL if \p MeshBase::find_neighbors() has not been
+   * element, or \p nullptr if \p MeshBase::find_neighbors() has not been
    * called.
    *
    * \note If \p MeshBase::find_neighbors() has been called and this
-   * function still returns \p NULL, then the side is on a boundary of
+   * function still returns \p nullptr, then the side is on a boundary of
    * the domain.
    */
   const Elem * neighbor_ptr (unsigned int i) const;
@@ -381,19 +381,19 @@ public:
 
   /**
    * \returns If \p elem is a neighbor of a child of this element, a
-   * pointer to that child, otherwise \p NULL.
+   * pointer to that child, otherwise \p nullptr.
    */
   Elem * child_neighbor (Elem * elem);
 
   /**
    * \returns If \p elem is a neighbor of a child of this element, a
-   * pointer to that child, otherwise \p NULL.
+   * pointer to that child, otherwise \p nullptr.
    */
   const Elem * child_neighbor (const Elem * elem) const;
 
   /**
    * \returns \p true if this element has a side coincident
-   * with a boundary (indicated by a \p NULL neighbor), \p false
+   * with a boundary (indicated by a \p nullptr neighbor), \p false
    * otherwise.
    */
   bool on_boundary () const;
@@ -549,7 +549,7 @@ public:
    * processor.  Local elements are required to have valid neighbors,
    * and these ghost elements may have remote neighbors for data
    * structure consistency.  The use of remote elements helps ensure
-   * that any element we may access has a \p NULL neighbor only if it
+   * that any element we may access has a \p nullptr neighbor only if it
    * lies on the physical boundary of the domain.
    */
   virtual bool is_remote () const
@@ -996,13 +996,13 @@ public:
   bool is_ancestor_of(const Elem * descendant) const;
 
   /**
-   * \returns A const pointer to the element's parent, or \p NULL if
+   * \returns A const pointer to the element's parent, or \p nullptr if
    * the element was not created via refinement.
    */
   const Elem * parent () const;
 
   /**
-   * \returns A pointer to the element's parent, or \p NULL if
+   * \returns A pointer to the element's parent, or \p nullptr if
    * the element was not created via refinement.
    */
   Elem * parent ();
@@ -1123,7 +1123,7 @@ public:
   /**
    * \returns The refinement level of the current element.
    *
-   * If the element's parent is \p NULL then by convention it is at
+   * If the element's parent is \p nullptr then by convention it is at
    * level 0, otherwise it is simply at one level greater than its
    * parent.
    */
@@ -1627,7 +1627,7 @@ protected:
 public:
 
   /**
-   * Replaces this element with \p NULL for all of its neighbors.
+   * Replaces this element with \p nullptr for all of its neighbors.
    * This is useful when deleting an element.
    */
   void nullify_neighbors ();
@@ -2196,7 +2196,7 @@ inline
 bool Elem::on_boundary () const
 {
   // By convention, the element is on the boundary
-  // if it has a NULL neighbor.
+  // if it has a nullptr neighbor.
   return this->has_neighbor(nullptr);
 }
 
@@ -2796,7 +2796,7 @@ public:
 
   // Consults the parent Elem to determine if the side
   // is a boundary side.  Note: currently side N is a
-  // boundary side if neighbor N is NULL.  Be careful,
+  // boundary side if neighbor N is nullptr.  Be careful,
   // this could possibly change in the future?
   bool side_on_boundary() const
   {

@@ -1221,7 +1221,7 @@ public:
   /**
    * Constructor.  Allocates enough storage to hold n_strings of
    * length string_length.  (Actually allocates string_length+1 characters
-   * per string to account for the trailing NULL character.)
+   * per string to account for the trailing '\0' character.)
    */
   explicit
   NamesData(size_t n_strings, size_t string_length);

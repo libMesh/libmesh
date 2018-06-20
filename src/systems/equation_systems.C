@@ -913,7 +913,7 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
   if (!nv)
     return;
 
-  // We can handle the case where there are NULLs in the Elem vector
+  // We can handle the case where there are nullptrs in the Elem vector
   // by just having extra zeros in the solution vector.
   numeric_index_type parallel_soln_global_size = ne*nv;
 

@@ -879,7 +879,7 @@ private:
 
   /**
    * Helper method for finding consistent maps of interior to boundary
-   * dof_object ids.  Either node_id_map or side_id_map can be NULL,
+   * dof_object ids.  Either node_id_map or side_id_map can be nullptr,
    * in which case it will not be filled.
    */
   void _find_id_maps (const std::set<boundary_id_type> & requested_boundary_ids,

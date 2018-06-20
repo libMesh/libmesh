@@ -627,7 +627,7 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
                   // Grab the node pointer from the mesh for this ID
                   Node * node = the_mesh.node_ptr(libmesh_global_node_id);
 
-                  // If node_ptr() returns NULL, it may mean we have not yet read the
+                  // If node_ptr() returns nullptr, it may mean we have not yet read the
                   // *Nodes section, though I assumed that always came before the *Elements section...
                   if (node == nullptr)
                     libmesh_error_msg("Error!  Mesh::node_ptr() returned nullptr.  Either no node exists with ID " \

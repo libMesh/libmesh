@@ -219,7 +219,7 @@ public:
 
   /**
    * Verify that a local pointer points to the same value on all
-   * processors where it is not NULL.
+   * processors where it is not nullptr.
    * Containers must have the same value in every entry.
    */
   template <typename T>

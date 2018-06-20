@@ -102,7 +102,7 @@ void TriangleInterface::triangulate()
   // Regardless of whether we added additional points, the set of points to
   // triangulate is now sitting in the mesh.
 
-  // If the holes vector is non-NULL (and non-empty) we need to determine
+  // If the holes vector is non-nullptr (and non-empty) we need to determine
   // the number of additional points which the holes will add to the
   // triangulation.
   unsigned int n_hole_points = 0;
@@ -239,7 +239,7 @@ void TriangleInterface::triangulate()
   // p ~ Triangulates a Planar Straight Line Graph
   //     If the `p' switch is used, `segmentlist' must point to a list of
   //     segments, `numberofsegments' must be properly set, and
-  //     `segmentmarkerlist' must either be set to NULL (in which case all
+  //     `segmentmarkerlist' must either be set to nullptr (in which case all
   //     markers default to zero), or must point to a list of markers.
   // D ~ Conforming Delaunay: use this switch if you want all triangles
   //     in the mesh to be Delaunay, and not just constrained Delaunay

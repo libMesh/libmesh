@@ -955,7 +955,7 @@ public:
 
   /**
    * Set a NumericVector to be used in place of current_local_solution
-   * for calculating elem_solution.  Set to NULL to restore the
+   * for calculating elem_solution.  Set to nullptr to restore the
    * current_local_solution behavior.  Advanced DifferentiableSystem
    * specific capabilities will only be enabled in the
    * current_local_solution case.

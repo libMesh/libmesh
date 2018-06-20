@@ -159,7 +159,7 @@ public:
    * restricted to the given set of dofs, which must contain local
    * dofs on each processor only and not contain any duplicates.  This
    * mode can be disabled by calling this method with \p dofs being a
-   * \p NULL pointer.
+   * \p nullptr.
    */
   virtual void restrict_solve_to (const std::vector<unsigned int> * const dofs,
                                   const SubsetSolveMode subset_solve_mode=SUBSET_ZERO);
