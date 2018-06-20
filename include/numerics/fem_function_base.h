@@ -51,15 +51,18 @@ protected:
   /**
    * Constructor.
    */
-  FEMFunctionBase () {}
+  FEMFunctionBase () = default;
 
 public:
 
   /**
-   * Destructor.
+   * The 5 special functions can be defaulted for this class.
    */
-  virtual ~FEMFunctionBase () {}
-
+  FEMFunctionBase (FEMFunctionBase &&) = default;
+  FEMFunctionBase (const FEMFunctionBase &) = default;
+  FEMFunctionBase & operator= (const FEMFunctionBase &) = default;
+  FEMFunctionBase & operator= (FEMFunctionBase &&) = default;
+  virtual ~FEMFunctionBase () = default;
 
   /**
    * Prepares a context object for use.
