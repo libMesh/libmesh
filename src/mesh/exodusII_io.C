@@ -633,7 +633,7 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
 
   // If we pass in a list of names to "get_solution" it'll filter the variables coming back
   std::vector<Number> soln;
-  es.get_solution(soln, names);
+  es.build_elemental_solution_vector(soln, names);
 
   // Also, store the list of subdomains on which each variable is active
   std::vector<std::set<subdomain_id_type>> vars_active_subdomains;
