@@ -1382,7 +1382,7 @@ void FEMSystem::mesh_position_get()
   // This function makes no sense unless we've already picked out some
   // variable(s) to reflect mesh position coordinates
   if (!_mesh_sys)
-    libmesh_error_msg("_mesh_sys was NULL!");
+    libmesh_error_msg("_mesh_sys was nullptr!");
 
   // We currently assume mesh variables are in our own system
   if (_mesh_sys != this)

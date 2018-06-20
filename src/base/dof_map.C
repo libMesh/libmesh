@@ -816,7 +816,7 @@ void DofMap::clear()
   //
   // But it would be inconsistent to leave our coupling settings
   // through a clear()...
-  _dof_coupling = NULL;
+  _dof_coupling = nullptr;
 
   // Reset ghosting functor statuses
   {

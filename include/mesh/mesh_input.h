@@ -50,7 +50,7 @@ class MeshInput
 protected:
 
   /**
-   * Default constructor. Will set the _obj to NULL, effectively
+   * Default constructor. Will set the _obj to nullptr, effectively
    * rendering this object useless.
    */
   explicit
@@ -169,7 +169,7 @@ inline
 MT & MeshInput<MT>::mesh ()
 {
   if (_obj == nullptr)
-    libmesh_error_msg("ERROR: _obj should not be NULL!");
+    libmesh_error_msg("ERROR: _obj should not be nullptr!");
   return *_obj;
 }
 

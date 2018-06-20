@@ -300,7 +300,7 @@ void assemble_1D(EquationSystems & es,
       // have 2 sides.
       for (auto s : elem->side_index_range())
         {
-          // If this element has a NULL neighbor, then it is on the edge of the
+          // If this element has a nullptr neighbor, then it is on the edge of the
           // mesh and we need to enforce a boundary condition using the penalty
           // method.
           if (elem->neighbor_ptr(s) == nullptr)

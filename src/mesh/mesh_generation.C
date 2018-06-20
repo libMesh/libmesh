@@ -145,7 +145,7 @@ class GaussLobattoRedistributionFunction : public FunctionBase<Real>
 {
 public:
   /**
-   * Constructor class base class ctor with NULL master.
+   * Constructor.
    */
   GaussLobattoRedistributionFunction(unsigned int nx,
                                      Real xmin,

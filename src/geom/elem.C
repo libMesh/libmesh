@@ -2521,7 +2521,7 @@ std::string Elem::get_info () const
       if (this->neighbor_ptr(s))
         oss << this->neighbor_ptr(s)->id() << '\n';
       else
-        oss << "NULL\n";
+        oss << "nullptr\n";
     }
 
   oss << "   hmin()=" << this->hmin()
@@ -2535,7 +2535,7 @@ std::string Elem::get_info () const
   if (this->parent())
     oss << this->parent()->id() << '\n';
   else
-    oss << "NULL\n";
+    oss << "nullptr\n";
   oss << "   level()=" << this->level()
       << ", p_level()=" << this->p_level()                         << '\n'
 #ifdef LIBMESH_ENABLE_AMR

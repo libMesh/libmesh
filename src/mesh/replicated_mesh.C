@@ -459,7 +459,7 @@ Node * ReplicatedMesh::add_node (Node * n)
 Node * ReplicatedMesh::insert_node(Node * n)
 {
   if (!n)
-    libmesh_error_msg("Error, attempting to insert NULL node.");
+    libmesh_error_msg("Error, attempting to insert nullptr node.");
 
   if (n->id() == DofObject::invalid_id)
     libmesh_error_msg("Error, cannot insert node with invalid id.");

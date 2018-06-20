@@ -41,7 +41,7 @@ void DefaultCoupling::set_dof_coupling(const CouplingMatrix * dof_coupling)
   if (dof_coupling && dof_coupling->empty())
     {
       libmesh_deprecated();
-      _dof_coupling = NULL;
+      _dof_coupling = nullptr;
     }
   else
     _dof_coupling = dof_coupling;

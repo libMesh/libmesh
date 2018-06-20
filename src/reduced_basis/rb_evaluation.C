@@ -1028,7 +1028,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
           // vectors should all be NULL, otherwise we get a memory leak when
           // we create the new vectors in RBEvaluation::read_in_vectors.
           if (vectors[i])
-            libmesh_error_msg("Non-NULL vector passed to read_in_vectors_from_multiple_files");
+            libmesh_error_msg("Non-nullptr vector passed to read_in_vectors_from_multiple_files");
 
           vectors[i] = NumericVector<Number>::build(sys.comm());
 

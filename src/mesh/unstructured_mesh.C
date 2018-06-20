@@ -367,7 +367,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
    * Here we look at all of the child elements which
    * don't already have valid neighbors.
    *
-   * If a child element has a NULL neighbor it is
+   * If a child element has a nullptr neighbor it is
    * either because it is on the boundary or because
    * its neighbor is at a different level.  In the
    * latter case we must get the neighbor from the

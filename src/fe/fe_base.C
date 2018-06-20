@@ -1732,7 +1732,7 @@ compute_periodic_constraints (DofConstraints & constraints,
               const Elem * neigh = boundaries.neighbor(boundary_id, *point_locator, elem, s);
 
               if (neigh == nullptr)
-                libmesh_error_msg("PeriodicBoundaries point locator object returned NULL!");
+                libmesh_error_msg("PeriodicBoundaries point locator object returned nullptr!");
 
               // periodic (and possibly h refinement) constraints:
               // constrain dofs shared between

@@ -812,7 +812,7 @@ void PetscVector<T>::localize (std::vector<T> & v_local,
   ierr = VecScatterCreate(_vec,
                           /*src is=*/is,
                           /*dest vec=*/dest,
-                          /*dest is=*/NULL,
+                          /*dest is=*/PETSC_NULL,
                           &scatter);
   LIBMESH_CHKERR(ierr);
 
