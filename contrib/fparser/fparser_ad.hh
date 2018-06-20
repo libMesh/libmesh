@@ -16,6 +16,16 @@ public:
   virtual ~FunctionParserADBase();
 
   /**
+   * This class manages its own memory, so the compiler-generated copy
+   * assignment, move assignment, and move constructor implementations
+   * are not safe to use.  We therefore explicitly delete them so they
+   * can't be called accidentally.
+   */
+  FunctionParserADBase (FunctionParserADBase &&) = delete;
+  FunctionParserADBase & operator= (const FunctionParserADBase &) = delete;
+  FunctionParserADBase & operator= (FunctionParserADBase &&) = delete;
+
+  /**
    * auto-differentiate for var
    */
   int AutoDiff(const std::string & var_name);
