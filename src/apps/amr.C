@@ -231,7 +231,7 @@ void assemble(EquationSystems & es,
       if (dim == 3)
         {
           for (auto side : elem->side_index_range())
-            if (elem->neighbor_ptr(side) == libmesh_nullptr)
+            if (elem->neighbor_ptr(side) == nullptr)
               {
                 fe_face->reinit (elem, side);
 

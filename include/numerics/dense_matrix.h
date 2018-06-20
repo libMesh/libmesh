@@ -659,8 +659,8 @@ private:
    */
   void _evd_lapack(DenseVector<T> & lambda_real,
                    DenseVector<T> & lambda_imag,
-                   DenseMatrix<T> * VL = libmesh_nullptr,
-                   DenseMatrix<T> * VR = libmesh_nullptr);
+                   DenseMatrix<T> * VL = nullptr,
+                   DenseMatrix<T> * VR = nullptr);
 
   /**
    * Array used to store pivot indices.  May be used by whatever

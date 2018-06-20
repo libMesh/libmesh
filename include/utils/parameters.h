@@ -321,7 +321,7 @@ void Parameters::clear () // since this is inline we must define it
       Parameters::iterator it = _values.begin();
 
       delete it->second;
-      it->second = libmesh_nullptr;
+      it->second = nullptr;
 
       _values.erase(it);
     }
@@ -409,9 +409,9 @@ bool Parameters::have_parameter (const std::string & name) const
 
   if (it != _values.end())
 #ifdef LIBMESH_HAVE_RTTI
-    if (dynamic_cast<const Parameter<T> *>(it->second) != libmesh_nullptr)
+    if (dynamic_cast<const Parameter<T> *>(it->second) != nullptr)
 #else // LIBMESH_HAVE_RTTI
-      if (cast_ptr<const Parameter<T> *>(it->second) != libmesh_nullptr)
+      if (cast_ptr<const Parameter<T> *>(it->second) != nullptr)
 #endif // LIBMESH_HAVE_RTTI
         return true;
 
@@ -479,7 +479,7 @@ void Parameters::remove (const std::string & name)
   if (it != _values.end())
     {
       delete it->second;
-      it->second = libmesh_nullptr;
+      it->second = nullptr;
 
       _values.erase(it);
     }
@@ -498,7 +498,7 @@ unsigned int Parameters::n_parameters () const
   const Parameters::const_iterator vals_end = _values.end();
 
   for (; it != vals_end; ++it)
-    if (dynamic_cast<Parameter<T> *>(it->second) != libmesh_nullptr)
+    if (dynamic_cast<Parameter<T> *>(it->second) != nullptr)
       cnt++;
 
   return cnt;

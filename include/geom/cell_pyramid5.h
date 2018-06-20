@@ -57,7 +57,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Pyramid5 (Elem * p=libmesh_nullptr) :
+  Pyramid5 (Elem * p=nullptr) :
     Pyramid(Pyramid5::n_nodes(), p, _nodelinks_data)
   {}
 

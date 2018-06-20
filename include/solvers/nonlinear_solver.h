@@ -100,7 +100,7 @@ public:
    * Initialize data structures if not done so already.
    * May assign a name to the solver in some implementations
    */
-  virtual void init (const char * name = libmesh_nullptr) = 0;
+  virtual void init (const char * name = nullptr) = 0;
 
   /**
    * Solves the nonlinear system.
@@ -385,25 +385,25 @@ template <typename T>
 inline
 NonlinearSolver<T>::NonlinearSolver (sys_type & s) :
   ParallelObject               (s),
-  residual                     (libmesh_nullptr),
-  residual_object              (libmesh_nullptr),
-  fd_residual_object           (libmesh_nullptr),
-  mffd_residual_object         (libmesh_nullptr),
-  jacobian                     (libmesh_nullptr),
-  jacobian_object              (libmesh_nullptr),
-  matvec                       (libmesh_nullptr),
-  residual_and_jacobian_object (libmesh_nullptr),
-  bounds                       (libmesh_nullptr),
-  bounds_object                (libmesh_nullptr),
-  nullspace                    (libmesh_nullptr),
-  nullspace_object             (libmesh_nullptr),
-  transpose_nullspace          (libmesh_nullptr),
-  transpose_nullspace_object   (libmesh_nullptr),
-  nearnullspace                (libmesh_nullptr),
-  nearnullspace_object         (libmesh_nullptr),
-  user_presolve                (libmesh_nullptr),
-  postcheck                    (libmesh_nullptr),
-  postcheck_object             (libmesh_nullptr),
+  residual                     (nullptr),
+  residual_object              (nullptr),
+  fd_residual_object           (nullptr),
+  mffd_residual_object         (nullptr),
+  jacobian                     (nullptr),
+  jacobian_object              (nullptr),
+  matvec                       (nullptr),
+  residual_and_jacobian_object (nullptr),
+  bounds                       (nullptr),
+  bounds_object                (nullptr),
+  nullspace                    (nullptr),
+  nullspace_object             (nullptr),
+  transpose_nullspace          (nullptr),
+  transpose_nullspace_object   (nullptr),
+  nearnullspace                (nullptr),
+  nearnullspace_object         (nullptr),
+  user_presolve                (nullptr),
+  postcheck                    (nullptr),
+  postcheck_object             (nullptr),
   max_nonlinear_iterations(0),
   max_function_evaluations(0),
   absolute_residual_tolerance(0),
@@ -416,8 +416,8 @@ NonlinearSolver<T>::NonlinearSolver (sys_type & s) :
   converged(false),
   _system(s),
   _is_initialized (false),
-  _preconditioner (libmesh_nullptr),
-  _solver_configuration(libmesh_nullptr)
+  _preconditioner (nullptr),
+  _solver_configuration(nullptr)
 {
 }
 

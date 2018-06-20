@@ -85,7 +85,7 @@ public:
    * with continuous derivatives.
    */
   void project_initial_rate(FunctionBase<Number> * f,
-                            FunctionBase<Gradient> * g = libmesh_nullptr);
+                            FunctionBase<Gradient> * g = nullptr);
 
   /**
    * \returns The solution rate at the previous time step, \f$\dot{u}_n\f$,

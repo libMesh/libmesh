@@ -506,7 +506,7 @@ void CheckpointIO::write_connectivity (Xdr & io,
       elem_data[3] = elem->subdomain_id();
 
 #ifdef LIBMESH_ENABLE_AMR
-      if (elem->parent() != libmesh_nullptr)
+      if (elem->parent() != nullptr)
         {
           elem_data[4] = elem->parent()->id();
           elem_data[5] = elem->parent()->which_child_am_i(elem);
@@ -1032,7 +1032,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
 
       Elem * parent =
         (parent_id == DofObject::invalid_processor_id) ?
-        libmesh_nullptr : mesh.elem_ptr(parent_id);
+        nullptr : mesh.elem_ptr(parent_id);
 
       if (!parent)
         libmesh_assert_equal_to

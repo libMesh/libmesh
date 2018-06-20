@@ -805,17 +805,17 @@ static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
   if (_sys->nonlinear_solver->matvec && _sys->nonlinear_solver->residual_and_jacobian_object)
     libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
-  if (_sys->nonlinear_solver->residual != libmesh_nullptr)
+  if (_sys->nonlinear_solver->residual != nullptr)
     _sys->nonlinear_solver->residual(*(_sys->current_local_solution.get()), R, *_sys);
 
-  else if (_sys->nonlinear_solver->residual_object != libmesh_nullptr)
+  else if (_sys->nonlinear_solver->residual_object != nullptr)
     _sys->nonlinear_solver->residual_object->residual(*(_sys->current_local_solution.get()), R, *_sys);
 
-  else if (_sys->nonlinear_solver->matvec   != libmesh_nullptr)
-    _sys->nonlinear_solver->matvec(*(_sys->current_local_solution.get()), &R, libmesh_nullptr, *_sys);
+  else if (_sys->nonlinear_solver->matvec   != nullptr)
+    _sys->nonlinear_solver->matvec(*(_sys->current_local_solution.get()), &R, nullptr, *_sys);
 
-  else if (_sys->nonlinear_solver->residual_and_jacobian_object != libmesh_nullptr)
-    _sys->nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian(*(_sys->current_local_solution.get()), &R, libmesh_nullptr, *_sys);
+  else if (_sys->nonlinear_solver->residual_and_jacobian_object != nullptr)
+    _sys->nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian(*(_sys->current_local_solution.get()), &R, nullptr, *_sys);
 
   else
     libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
@@ -885,17 +885,17 @@ static PetscErrorCode DMlibMeshJacobian(
   if (sys.nonlinear_solver->matvec && sys.nonlinear_solver->residual_and_jacobian_object)
     libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
-  if (sys.nonlinear_solver->jacobian != libmesh_nullptr)
+  if (sys.nonlinear_solver->jacobian != nullptr)
     sys.nonlinear_solver->jacobian(*(sys.current_local_solution.get()), the_pc, sys);
 
-  else if (sys.nonlinear_solver->jacobian_object != libmesh_nullptr)
+  else if (sys.nonlinear_solver->jacobian_object != nullptr)
     sys.nonlinear_solver->jacobian_object->jacobian(*(sys.current_local_solution.get()), the_pc, sys);
 
-  else if (sys.nonlinear_solver->matvec != libmesh_nullptr)
-    sys.nonlinear_solver->matvec(*(sys.current_local_solution.get()), libmesh_nullptr, &the_pc, sys);
+  else if (sys.nonlinear_solver->matvec != nullptr)
+    sys.nonlinear_solver->matvec(*(sys.current_local_solution.get()), nullptr, &the_pc, sys);
 
-  else if (sys.nonlinear_solver->residual_and_jacobian_object != libmesh_nullptr)
-    sys.nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian(*(sys.current_local_solution.get()), libmesh_nullptr, &the_pc, sys);
+  else if (sys.nonlinear_solver->residual_and_jacobian_object != nullptr)
+    sys.nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian(*(sys.current_local_solution.get()), nullptr, &the_pc, sys);
 
   else
     libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
@@ -950,9 +950,9 @@ static PetscErrorCode DMVariableBounds_libMesh(DM dm, Vec xl, Vec xu)
   ierr = VecSet(xl, PETSC_NINFINITY);CHKERRQ(ierr);
   ierr = VecSet(xu, PETSC_INFINITY);CHKERRQ(ierr);
 #endif
-  if (sys.nonlinear_solver->bounds != libmesh_nullptr)
+  if (sys.nonlinear_solver->bounds != nullptr)
     sys.nonlinear_solver->bounds(XL,XU,sys);
-  else if (sys.nonlinear_solver->bounds_object != libmesh_nullptr)
+  else if (sys.nonlinear_solver->bounds_object != nullptr)
     sys.nonlinear_solver->bounds_object->bounds(XL,XU, sys);
   else
     SETERRQ(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "No bounds calculation in this libMesh object");

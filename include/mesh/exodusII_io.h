@@ -163,7 +163,7 @@ public:
    */
   void write_discontinuous_exodusII (const std::string & name,
                                      const EquationSystems & es,
-                                     const std::set<std::string> * system_names=libmesh_nullptr);
+                                     const std::set<std::string> * system_names=nullptr);
 
   /**
    * Writes a discontinuous solution at a specific timestep
@@ -177,7 +177,7 @@ public:
                                      const EquationSystems &es,
                                      const int timestep,
                                      const Real time,
-                                     const std::set<std::string> * system_names=libmesh_nullptr);
+                                     const std::set<std::string> * system_names=nullptr);
 
   /**
    * Write out element solution.
@@ -228,7 +228,7 @@ public:
                        const EquationSystems & es,
                        const int timestep,
                        const Real time,
-                       const std::set<std::string> * system_names=libmesh_nullptr);
+                       const std::set<std::string> * system_names=nullptr);
 
   /**
    * Sets the list of variable names to be included in the output.

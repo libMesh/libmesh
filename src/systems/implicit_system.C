@@ -43,7 +43,7 @@ ImplicitSystem::ImplicitSystem (EquationSystems & es,
                                 const unsigned int number_in) :
 
   Parent            (es, name_in, number_in),
-  matrix            (libmesh_nullptr),
+  matrix            (nullptr),
   zero_out_matrix_and_rhs(true),
   _can_add_matrices (true)
 {
@@ -74,7 +74,7 @@ void ImplicitSystem::clear ()
       {
         pr.second->clear ();
         delete pr.second;
-        pr.second = libmesh_nullptr;
+        pr.second = nullptr;
       }
 
     _matrices.clear();
@@ -239,7 +239,7 @@ const SparseMatrix<Number> * ImplicitSystem::request_matrix (const std::string &
   const_matrices_iterator pos = _matrices.find (mat_name);
 
   if (pos == _matrices.end())
-    return libmesh_nullptr;
+    return nullptr;
 
   return pos->second;
 }
@@ -252,7 +252,7 @@ SparseMatrix<Number> * ImplicitSystem::request_matrix (const std::string & mat_n
   matrices_iterator pos = _matrices.find (mat_name);
 
   if (pos == _matrices.end())
-    return libmesh_nullptr;
+    return nullptr;
 
   return pos->second;
 }
@@ -289,12 +289,12 @@ void ImplicitSystem::add_system_matrix ()
 {
   // Possible that we cleared the _matrices but
   // forgot to NULL-out the matrix?
-  if (_matrices.empty()) matrix = libmesh_nullptr;
+  if (_matrices.empty()) matrix = nullptr;
 
 
   // Only need to add the matrix if it isn't there
   // already!
-  if (matrix == libmesh_nullptr)
+  if (matrix == nullptr)
     matrix = &(this->add_matrix ("System Matrix"));
 
   libmesh_assert(matrix);

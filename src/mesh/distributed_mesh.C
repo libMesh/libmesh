@@ -306,7 +306,7 @@ const Node * DistributedMesh::query_node_ptr (const dof_id_type i) const
       return n;
     }
 
-  return libmesh_nullptr;
+  return nullptr;
 }
 
 
@@ -322,7 +322,7 @@ Node * DistributedMesh::query_node_ptr (const dof_id_type i)
       return n;
     }
 
-  return libmesh_nullptr;
+  return nullptr;
 }
 
 
@@ -360,7 +360,7 @@ const Elem * DistributedMesh::query_elem_ptr (const dof_id_type i) const
       return e;
     }
 
-  return libmesh_nullptr;
+  return nullptr;
 }
 
 
@@ -376,7 +376,7 @@ Elem * DistributedMesh::query_elem_ptr (const dof_id_type i)
       return e;
     }
 
-  return libmesh_nullptr;
+  return nullptr;
 }
 
 
@@ -532,7 +532,7 @@ void DistributedMesh::delete_elem(Elem * e)
 
   // Instead, we set it to NULL for now
 
-  _elements[e->id()] = libmesh_nullptr;
+  _elements[e->id()] = nullptr;
 
   // delete the element
   delete e;
@@ -583,7 +583,7 @@ void DistributedMesh::own_node (Node & n)
   // This had better be a node in our mesh
   libmesh_assert(_nodes[n.id()] == &n);
 
-  _nodes[n.id()] = libmesh_nullptr;
+  _nodes[n.id()] = nullptr;
 
   n.set_id(DofObject::invalid_id);
   n.processor_id() = this->processor_id();
@@ -717,7 +717,7 @@ void DistributedMesh::delete_node(Node * n)
 
   // Instead, we set it to NULL for now
 
-  _nodes[n->id()] = libmesh_nullptr;
+  _nodes[n->id()] = nullptr;
 
   // delete the node
   delete n;
@@ -872,13 +872,13 @@ void DistributedMesh::libmesh_assert_valid_parallel_object_ids(const mapvector<T
 #ifndef NDEBUG
       const dof_id_type dofid = obj && obj->valid_id() ?
         obj->id() : DofObject::invalid_id;
-      libmesh_assert(this->comm().semiverify(obj ? &dofid : libmesh_nullptr));
+      libmesh_assert(this->comm().semiverify(obj ? &dofid : nullptr));
 #endif
 
       // All processors with an object should agree on processor id
       const dof_id_type procid = obj && obj->valid_processor_id() ?
         obj->processor_id() : DofObject::invalid_processor_id;
-      libmesh_assert(this->comm().semiverify(obj ? &procid : libmesh_nullptr));
+      libmesh_assert(this->comm().semiverify(obj ? &procid : nullptr));
 
       dof_id_type min_procid = procid;
       this->comm().min(min_procid);
@@ -901,7 +901,7 @@ void DistributedMesh::libmesh_assert_valid_parallel_object_ids(const mapvector<T
 #if defined(LIBMESH_ENABLE_UNIQUE_ID) && !defined(NDEBUG)
       // All processors with an object should agree on unique id
       const unique_id_type uniqueid = obj ? obj->unique_id() : 0;
-      libmesh_assert(this->comm().semiverify(obj ? &uniqueid : libmesh_nullptr));
+      libmesh_assert(this->comm().semiverify(obj ? &uniqueid : nullptr));
 #endif
     }
 }
@@ -931,7 +931,7 @@ void DistributedMesh::libmesh_assert_valid_parallel_p_levels () const
       unsigned int p_level = el ?  (el->p_level()) : libMesh::invalid_uint;
 
       // All processors with an active element should agree on p level
-      libmesh_assert(this->comm().semiverify((el && el->active()) ? &p_level : libmesh_nullptr));
+      libmesh_assert(this->comm().semiverify((el && el->active()) ? &p_level : nullptr));
     }
 #endif
 }
@@ -956,11 +956,11 @@ void DistributedMesh::libmesh_assert_valid_parallel_flags () const
       unsigned int p_refinement_flag = el ?
         static_cast<unsigned int> (el->p_refinement_flag()) : libMesh::invalid_uint;
 
-      libmesh_assert(this->comm().semiverify(el ? &refinement_flag : libmesh_nullptr));
+      libmesh_assert(this->comm().semiverify(el ? &refinement_flag : nullptr));
 
       // p refinement flags aren't always kept correct on inactive
       // ghost elements
-      libmesh_assert(this->comm().semiverify((el && el->active()) ? &p_refinement_flag : libmesh_nullptr));
+      libmesh_assert(this->comm().semiverify((el && el->active()) ? &p_refinement_flag : nullptr));
     }
 #endif // LIBMESH_ENABLE_AMR
 }
@@ -1109,7 +1109,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
         }
     };
 
-  const dof_id_type * ex = libmesh_nullptr;
+  const dof_id_type * ex = nullptr;
   Parallel::pull_parallel_vector_data
     (this->comm(), requested_ids, gather_functor, action_functor, ex);
 
@@ -1151,7 +1151,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
         }
     };
 
-  const unique_id_type * unique_ex = libmesh_nullptr;
+  const unique_id_type * unique_ex = nullptr;
   Parallel::pull_parallel_vector_data
     (this->comm(), requested_ids, unique_gather_functor,
      unique_action_functor, unique_ex);
@@ -1182,7 +1182,7 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
             {
               // NULL out its original position for now
               // (our shuffling may put another object there shortly)
-              *it = libmesh_nullptr;
+              *it = nullptr;
 
               // There may already be another object with this id that
               // needs to be moved itself
@@ -1319,7 +1319,7 @@ void DistributedMesh::fix_broken_node_and_element_numbering ()
       end = nodes.end();
 
     for (; it != end; ++it)
-      if (it->second != libmesh_nullptr)
+      if (it->second != nullptr)
         it->second->set_id() = it->first;
   }
 
@@ -1330,7 +1330,7 @@ void DistributedMesh::fix_broken_node_and_element_numbering ()
       end = elems.end();
 
     for (; it != end; ++it)
-      if (it->second != libmesh_nullptr)
+      if (it->second != nullptr)
         it->second->set_id() = it->first;
   }
 }

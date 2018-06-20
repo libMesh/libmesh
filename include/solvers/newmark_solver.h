@@ -93,7 +93,7 @@ public:
    * with continuous derivatives.
    */
   void project_initial_accel (FunctionBase<Number> * f,
-                              FunctionBase<Gradient> * g = libmesh_nullptr);
+                              FunctionBase<Gradient> * g = nullptr);
 
   /**
    * Allow the user to (re)set whether the initial acceleration is available.

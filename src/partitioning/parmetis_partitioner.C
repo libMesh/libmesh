@@ -170,22 +170,22 @@ void ParmetisPartitioner::_do_repartition (MeshBase & mesh,
   // Call the ParMETIS adaptive repartitioning method.  This respects the
   // original partitioning when computing the new partitioning so as to
   // minimize the required data redistribution.
-  Parmetis::ParMETIS_V3_AdaptiveRepart(_pmetis->vtxdist.empty() ? libmesh_nullptr : &_pmetis->vtxdist[0],
-                                       _pmetis->xadj.empty()    ? libmesh_nullptr : &_pmetis->xadj[0],
-                                       _pmetis->adjncy.empty()  ? libmesh_nullptr : &_pmetis->adjncy[0],
-                                       _pmetis->vwgt.empty()    ? libmesh_nullptr : &_pmetis->vwgt[0],
-                                       vsize.empty()            ? libmesh_nullptr : &vsize[0],
-                                       libmesh_nullptr,
+  Parmetis::ParMETIS_V3_AdaptiveRepart(_pmetis->vtxdist.empty() ? nullptr : &_pmetis->vtxdist[0],
+                                       _pmetis->xadj.empty()    ? nullptr : &_pmetis->xadj[0],
+                                       _pmetis->adjncy.empty()  ? nullptr : &_pmetis->adjncy[0],
+                                       _pmetis->vwgt.empty()    ? nullptr : &_pmetis->vwgt[0],
+                                       vsize.empty()            ? nullptr : &vsize[0],
+                                       nullptr,
                                        &_pmetis->wgtflag,
                                        &_pmetis->numflag,
                                        &_pmetis->ncon,
                                        &_pmetis->nparts,
-                                       _pmetis->tpwgts.empty()  ? libmesh_nullptr : &_pmetis->tpwgts[0],
-                                       _pmetis->ubvec.empty()   ? libmesh_nullptr : &_pmetis->ubvec[0],
+                                       _pmetis->tpwgts.empty()  ? nullptr : &_pmetis->tpwgts[0],
+                                       _pmetis->ubvec.empty()   ? nullptr : &_pmetis->ubvec[0],
                                        &itr,
                                        &_pmetis->options[0],
                                        &_pmetis->edgecut,
-                                       _pmetis->part.empty()    ? libmesh_nullptr : &_pmetis->part[0],
+                                       _pmetis->part.empty()    ? nullptr : &_pmetis->part[0],
                                        &mpi_comm);
 
   // Assign the returned processor ids

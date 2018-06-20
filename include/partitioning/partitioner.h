@@ -53,7 +53,7 @@ public:
   /**
    * Constructor.
    */
-  Partitioner () : _weights(libmesh_nullptr) {}
+  Partitioner () : _weights(nullptr) {}
 
   /**
    * Copy/move ctor, copy/move assignment operator, and destructor are

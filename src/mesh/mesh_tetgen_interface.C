@@ -406,7 +406,7 @@ unsigned TetGenMeshInterface::check_hull_integrity()
 
       for (auto neigh : elem->neighbor_ptr_range())
         {
-          if (neigh == libmesh_nullptr)
+          if (neigh == nullptr)
             {
               // libmesh_error_msg("ERROR: Non-convex hull, cannot be tetrahedralized.");
               return 2;

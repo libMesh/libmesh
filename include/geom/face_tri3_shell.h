@@ -39,7 +39,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  TriShell3 (Elem * p=libmesh_nullptr) :
+  TriShell3 (Elem * p=nullptr) :
     Tri3(p) {}
 
   TriShell3 (TriShell3 &&) = delete;

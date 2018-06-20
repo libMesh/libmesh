@@ -69,7 +69,7 @@ public:
   /**
    * Initialize data structures if not done so already.
    */
-  virtual void init (const char * name=libmesh_nullptr) override;
+  virtual void init (const char * name=nullptr) override;
 
   /**
    * Call the Aztec solver.  It calls the method below, using the

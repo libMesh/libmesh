@@ -380,7 +380,7 @@ void PerfData::start ()
 {
   this->count++;
   this->called_recursively++;
-  gettimeofday (&(this->tstart), libmesh_nullptr);
+  gettimeofday (&(this->tstart), nullptr);
   this->tstart_incl_sub = this->tstart;
 }
 
@@ -389,7 +389,7 @@ void PerfData::start ()
 inline
 void PerfData::restart ()
 {
-  gettimeofday (&(this->tstart), libmesh_nullptr);
+  gettimeofday (&(this->tstart), nullptr);
 }
 
 
@@ -410,7 +410,7 @@ double PerfData::stop_or_pause(const bool do_stop)
     tstart_tv_sec  = this->tstart.tv_sec,
     tstart_tv_usec = this->tstart.tv_usec;
 
-  gettimeofday (&(this->tstart), libmesh_nullptr);
+  gettimeofday (&(this->tstart), nullptr);
 
   const double elapsed_time = (static_cast<double>(this->tstart.tv_sec  - tstart_tv_sec) +
                                static_cast<double>(this->tstart.tv_usec - tstart_tv_usec)*1.e-6);
@@ -433,7 +433,7 @@ double PerfData::stop_or_pause(const bool do_stop)
 inline
 double PerfData::pause_for(PerfData & other)
 {
-  gettimeofday (&(other.tstart), libmesh_nullptr);
+  gettimeofday (&(other.tstart), nullptr);
 
   const double elapsed_time = (static_cast<double>(other.tstart.tv_sec  - this->tstart.tv_sec) +
                                static_cast<double>(other.tstart.tv_usec - this->tstart.tv_usec)*1.e-6);
@@ -520,7 +520,7 @@ double PerfLog::get_elapsed_time () const
 {
   struct timeval tnow;
 
-  gettimeofday (&tnow, libmesh_nullptr);
+  gettimeofday (&tnow, nullptr);
 
   const double elapsed_time = (static_cast<double>(tnow.tv_sec  - tstart.tv_sec) +
                                static_cast<double>(tnow.tv_usec - tstart.tv_usec)*1.e-6);

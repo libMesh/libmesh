@@ -127,7 +127,7 @@ template <typename Output>
 AnalyticFunction<Output>::AnalyticFunction (OutputFunction fptr) :
   FunctionBase<Output> (),
   _number_fptr (fptr),
-  _vector_fptr (libmesh_nullptr)
+  _vector_fptr (nullptr)
 {
   libmesh_assert(fptr);
   this->_initialized = true;
@@ -139,7 +139,7 @@ template <typename Output>
 inline
 AnalyticFunction<Output>::AnalyticFunction (OutputVectorFunction fptr) :
   FunctionBase<Output> (),
-  _number_fptr (libmesh_nullptr),
+  _number_fptr (nullptr),
   _vector_fptr (fptr)
 {
   libmesh_assert(fptr);
@@ -160,7 +160,7 @@ template <typename Output>
 void AnalyticFunction<Output>::init ()
 {
   // dumb double-test
-  libmesh_assert ((_number_fptr != libmesh_nullptr) || (_vector_fptr != libmesh_nullptr));
+  libmesh_assert ((_number_fptr != nullptr) || (_vector_fptr != nullptr));
 
   // definitely ready
   this->_initialized = true;
@@ -173,8 +173,8 @@ inline
 void AnalyticFunction<Output>::clear ()
 {
   // We probably need a method to reset these later...
-  _number_fptr = libmesh_nullptr;
-  _vector_fptr = libmesh_nullptr;
+  _number_fptr = nullptr;
+  _vector_fptr = nullptr;
 
   // definitely not ready
   this->_initialized = false;

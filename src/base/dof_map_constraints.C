@@ -359,7 +359,7 @@ private:
 
     // The gradients of the shape functions at the quadrature
     // points on the child element.
-    const std::vector<std::vector<OutputGradient>> * dphi = libmesh_nullptr;
+    const std::vector<std::vector<OutputGradient>> * dphi = nullptr;
 
     const FEContinuity cont = fe->get_continuity();
 
@@ -1706,7 +1706,7 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Num
       (C.n() == elem_dofs.size())) // It the matrix is constrained
     {
       // We may have rhs values to use later
-      const DofConstraintValueMap * rhs_values = libmesh_nullptr;
+      const DofConstraintValueMap * rhs_values = nullptr;
       if (qoi_index < 0)
         rhs_values = &_primal_constraint_values;
       else
@@ -1810,7 +1810,7 @@ void DofMap::heterogenously_constrain_element_vector (const DenseMatrix<Number> 
       (C.n() == elem_dofs.size())) // It the matrix is constrained
     {
       // We may have rhs values to use later
-      const DofConstraintValueMap * rhs_values = libmesh_nullptr;
+      const DofConstraintValueMap * rhs_values = nullptr;
       if (qoi_index < 0)
         rhs_values = &_primal_constraint_values;
       else
@@ -2063,8 +2063,8 @@ void DofMap::enforce_constraints_exactly (const System & system,
   if (!v)
     v = system.solution.get();
 
-  NumericVector<Number> * v_local  = libmesh_nullptr; // will be initialized below
-  NumericVector<Number> * v_global = libmesh_nullptr; // will be initialized below
+  NumericVector<Number> * v_local  = nullptr; // will be initialized below
+  NumericVector<Number> * v_global = nullptr; // will be initialized below
   std::unique_ptr<NumericVector<Number>> v_built;
   if (v->type() == SERIAL)
     {
@@ -2153,8 +2153,8 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
 
   LOG_SCOPE("enforce_adjoint_constraints_exactly()", "DofMap");
 
-  NumericVector<Number> * v_local  = libmesh_nullptr; // will be initialized below
-  NumericVector<Number> * v_global = libmesh_nullptr; // will be initialized below
+  NumericVector<Number> * v_local  = nullptr; // will be initialized below
+  NumericVector<Number> * v_global = nullptr; // will be initialized below
   std::unique_ptr<NumericVector<Number>> v_built;
   if (v.type() == SERIAL)
     {
@@ -2200,7 +2200,7 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
     adjoint_constraint_map_it = _adjoint_constraint_values.find(q);
   const DofConstraintValueMap * constraint_map =
     (adjoint_constraint_map_it == _adjoint_constraint_values.end()) ?
-    libmesh_nullptr : &adjoint_constraint_map_it->second;
+    nullptr : &adjoint_constraint_map_it->second;
 
   for (const auto & pr : _dof_constraints)
     {
@@ -2484,7 +2484,7 @@ void DofMap::build_constraint_matrix_and_vector (DenseMatrix<Number> & C,
   if (!dof_set.empty() ||  // case 1: constrained in terms of other DOFs
       !called_recursively) // case 2: constrained in terms of our own DOFs
     {
-      const DofConstraintValueMap * rhs_values = libmesh_nullptr;
+      const DofConstraintValueMap * rhs_values = nullptr;
       if (qoi_index < 0)
         rhs_values = &_primal_constraint_values;
       else
@@ -3116,7 +3116,7 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
           if (!mesh.is_serial())
             this->comm().receive_packed_range
               (pid, &mesh, mesh_inserter_iterator<Node>(mesh),
-               (Node**)libmesh_nullptr, range_tag);
+               (Node**)nullptr, range_tag);
 
           // Add any new constraint rows we've found
           const std::size_t query_size = ids.size();
@@ -3175,13 +3175,13 @@ void DofMap::allgather_recursive_constraints(MeshBase & mesh)
         };
 
       // Now request node constraint rows from other processors
-      row_datum * node_row_ex = libmesh_nullptr;
+      row_datum * node_row_ex = nullptr;
       Parallel::pull_parallel_vector_data
         (this->comm(), requested_node_ids, node_row_gather_functor,
          node_row_action_functor, node_row_ex);
 
       // And request node constraint right hand sides from other procesors
-      node_rhs_datum * node_rhs_ex = libmesh_nullptr;
+      node_rhs_datum * node_rhs_ex = nullptr;
       Parallel::pull_parallel_vector_data
         (this->comm(), requested_node_ids, node_rhs_gather_functor,
          node_rhs_action_functor, node_rhs_ex);
@@ -3700,7 +3700,7 @@ void DofMap::scatter_constraints(MeshBase & mesh)
       if (!mesh.is_serial())
         this->comm().receive_packed_range
           (pid, &mesh, mesh_inserter_iterator<Node>(mesh),
-           (Node**)libmesh_nullptr, range_tag);
+           (Node**)nullptr, range_tag);
 
       // Add the node constraints that I've been sent
       for (std::size_t i = 0, size = ids_offsets.size(); i != size; ++i)
@@ -4116,13 +4116,13 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
         };
 
       // Now request constraint rows from other processors
-      row_datum * row_ex = libmesh_nullptr;
+      row_datum * row_ex = nullptr;
       Parallel::pull_parallel_vector_data
         (this->comm(), requested_dof_ids, row_gather_functor,
          row_action_functor, row_ex);
 
       // And request constraint right hand sides from other procesors
-      rhss_datum * rhs_ex = libmesh_nullptr;
+      rhss_datum * rhs_ex = nullptr;
       Parallel::pull_parallel_vector_data
         (this->comm(), requested_dof_ids, rhss_gather_functor,
          rhss_action_functor, rhs_ex);
@@ -4384,7 +4384,7 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase & periodic_bounda
   // See if we already have a periodic boundary associated myboundary...
   PeriodicBoundaryBase * existing_boundary = _periodic_boundaries->boundary(periodic_boundary.myboundary);
 
-  if (existing_boundary == libmesh_nullptr)
+  if (existing_boundary == nullptr)
     {
       // ...if not, clone the input (and its inverse) and add them to the PeriodicBoundaries object
       PeriodicBoundaryBase * boundary = periodic_boundary.clone().release();

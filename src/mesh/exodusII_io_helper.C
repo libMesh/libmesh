@@ -487,7 +487,7 @@ void ExodusII_IO_Helper::read_node_num_map ()
   node_num_map.resize(num_nodes);
 
   ex_err = exII::ex_get_node_num_map (ex_id,
-                                      node_num_map.empty() ? libmesh_nullptr : &node_num_map[0]);
+                                      node_num_map.empty() ? nullptr : &node_num_map[0]);
 
   EX_CHECK_ERR(ex_err, "Error retrieving nodal number map.");
   message("Nodal numbering map retrieved successfully.");
@@ -515,7 +515,7 @@ void ExodusII_IO_Helper::read_block_info()
   block_ids.resize(num_elem_blk);
   // Get all element block IDs.
   ex_err = exII::ex_get_elem_blk_ids(ex_id,
-                                     block_ids.empty() ? libmesh_nullptr : &block_ids[0]);
+                                     block_ids.empty() ? nullptr : &block_ids[0]);
   // Usually, there is only one
   // block since there is only
   // one type of element.
@@ -637,7 +637,7 @@ void ExodusII_IO_Helper::read_elem_num_map ()
   elem_num_map.resize(num_elem);
 
   ex_err = exII::ex_get_elem_num_map (ex_id,
-                                      elem_num_map.empty() ? libmesh_nullptr : &elem_num_map[0]);
+                                      elem_num_map.empty() ? nullptr : &elem_num_map[0]);
 
   EX_CHECK_ERR(ex_err, "Error retrieving element number map.");
   message("Element numbering map retrieved successfully.");
@@ -1039,10 +1039,10 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
     {
       ex_err = exII::ex_get_elem_block(ex_id,
                                        block_ids[i],
-                                       libmesh_nullptr,
+                                       nullptr,
                                        &num_elem_this_blk,
-                                       libmesh_nullptr,
-                                       libmesh_nullptr);
+                                       nullptr,
+                                       nullptr);
       EX_CHECK_ERR(ex_err, "Error getting number of elements in block.");
 
       std::vector<Real> block_elem_var_values(num_elem);
@@ -1292,16 +1292,16 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
         z_single(z.begin(), z.end());
 
       ex_err = exII::ex_put_coord(ex_id,
-                                  x_single.empty() ? libmesh_nullptr : &x_single[0],
-                                  y_single.empty() ? libmesh_nullptr : &y_single[0],
-                                  z_single.empty() ? libmesh_nullptr : &z_single[0]);
+                                  x_single.empty() ? nullptr : &x_single[0],
+                                  y_single.empty() ? nullptr : &y_single[0],
+                                  z_single.empty() ? nullptr : &z_single[0]);
     }
   else
     {
       ex_err = exII::ex_put_coord(ex_id,
-                                  x.empty() ? libmesh_nullptr : &x[0],
-                                  y.empty() ? libmesh_nullptr : &y[0],
-                                  z.empty() ? libmesh_nullptr : &z[0]);
+                                  x.empty() ? nullptr : &x[0],
+                                  y.empty() ? nullptr : &y[0],
+                                  z.empty() ? nullptr : &z[0]);
     }
 
 
@@ -1633,7 +1633,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
           sets[i].num_distribution_factor = 0;
           sets[i].entry_list = &elem[ss_id][0];
           sets[i].extra_list = &side[ss_id][0];
-          sets[i].distribution_factor_list = libmesh_nullptr;
+          sets[i].distribution_factor_list = nullptr;
         }
 
       ex_err = exII::ex_put_sets(ex_id, side_boundary_ids.size(), &sets[0]);
@@ -2135,9 +2135,9 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
                               ARRAY_LENGTH(nodeelem_node_map),
                               nodeelem_node_map, // inverse node map same as forward node map
                               ARRAY_LENGTH(nodeelem_node_map),
-                              libmesh_nullptr, // NODELEM doesn't have any edges
+                              nullptr, // NODELEM doesn't have any edges
                               0,
-                              libmesh_nullptr,
+                              nullptr,
                               0,
                               NODEELEM, "SPHERE");
         return conv;

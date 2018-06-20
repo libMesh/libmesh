@@ -37,9 +37,9 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
                   const FunctionBase<Gradient> * g_in) :
   b(b_in),
   variables(variables_in),
-  f(f_in ? f_in->clone() : libmesh_nullptr),
-  g(g_in ? g_in->clone() : libmesh_nullptr),
-  f_system(libmesh_nullptr)
+  f(f_in ? f_in->clone() : nullptr),
+  g(g_in ? g_in->clone() : nullptr),
+  f_system(nullptr)
 {
   libmesh_assert(f);
   f->init();
@@ -55,7 +55,7 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
                   VariableIndexing type) :
   b(b_in),
   variables(variables_in),
-  f_system(libmesh_nullptr)
+  f_system(nullptr)
 {
   if (type == LOCAL_VARIABLE_ORDER)
     {
@@ -78,7 +78,7 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
                   VariableIndexing type) :
   b(b_in),
   variables(variables_in),
-  f_system(libmesh_nullptr)
+  f_system(nullptr)
 {
   if (type == LOCAL_VARIABLE_ORDER)
     {
@@ -109,8 +109,8 @@ DirichletBoundary(const std::set<boundary_id_type> & b_in,
                   const FEMFunctionBase<Gradient> * g_in) :
   b(b_in),
   variables(variables_in),
-  f_fem(f_in ? f_in->clone() : libmesh_nullptr),
-  g_fem(g_in ? g_in->clone() : libmesh_nullptr),
+  f_fem(f_in ? f_in->clone() : nullptr),
+  g_fem(g_in ? g_in->clone() : nullptr),
   f_system(&f_sys_in)
 {
   libmesh_assert(f_fem);
@@ -171,10 +171,10 @@ DirichletBoundary::
 DirichletBoundary(const DirichletBoundary & d_in) :
   b(d_in.b),
   variables(d_in.variables),
-  f(d_in.f ? d_in.f->clone() : libmesh_nullptr),
-  g(d_in.g ? d_in.g->clone() : libmesh_nullptr),
-  f_fem(d_in.f_fem ? d_in.f_fem->clone() : libmesh_nullptr),
-  g_fem(d_in.g_fem ? d_in.g_fem->clone() : libmesh_nullptr),
+  f(d_in.f ? d_in.f->clone() : nullptr),
+  g(d_in.g ? d_in.g->clone() : nullptr),
+  f_fem(d_in.f_fem ? d_in.f_fem->clone() : nullptr),
+  g_fem(d_in.g_fem ? d_in.g_fem->clone() : nullptr),
   f_system(d_in.f_system)
 {
   libmesh_assert(f || f_fem);

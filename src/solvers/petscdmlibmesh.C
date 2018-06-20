@@ -33,7 +33,7 @@
 #define __FUNCT__ "DMlibMeshSetSystem"
 PetscErrorCode DMlibMeshSetSystem(DM dm, libMesh::NonlinearImplicitSystem & sys)
 {
-  PetscErrorCode (*f)(DM,libMesh::NonlinearImplicitSystem &) = libmesh_nullptr;
+  PetscErrorCode (*f)(DM,libMesh::NonlinearImplicitSystem &) = nullptr;
   PetscErrorCode ierr;
 
   PetscFunctionBegin;
@@ -52,7 +52,7 @@ PetscErrorCode DMlibMeshSetSystem(DM dm, libMesh::NonlinearImplicitSystem & sys)
 #define __FUNCT__ "DMlibMeshGetSystem"
 PetscErrorCode DMlibMeshGetSystem(DM dm, libMesh::NonlinearImplicitSystem *& sys)
 {
-  PetscErrorCode (*f)(DM,libMesh::NonlinearImplicitSystem *&) = libmesh_nullptr;
+  PetscErrorCode (*f)(DM,libMesh::NonlinearImplicitSystem *&) = nullptr;
   PetscErrorCode ierr;
 
   PetscFunctionBegin;

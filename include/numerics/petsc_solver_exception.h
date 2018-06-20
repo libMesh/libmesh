@@ -43,7 +43,7 @@ public:
     const char * text;
     // This is one scenario where we don't catch the error code
     // returned by a PETSc function :)
-    PetscErrorMessage(error_code, &text, libmesh_nullptr);
+    PetscErrorMessage(error_code, &text, nullptr);
     what_message = text;
   }
 };

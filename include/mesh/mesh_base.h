@@ -893,7 +893,7 @@ public:
    * implemented in derived classes.
    */
   virtual void read  (const std::string & name,
-                      void * mesh_data=libmesh_nullptr,
+                      void * mesh_data=nullptr,
                       bool skip_renumber_nodes_and_elements=false,
                       bool skip_find_neighbors=false) = 0;
   virtual void write (const std::string & name) = 0;

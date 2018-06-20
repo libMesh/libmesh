@@ -47,12 +47,12 @@ Request::Request () :
 #else
   _request(),
 #endif
-  post_wait_work(libmesh_nullptr)
+  post_wait_work(nullptr)
 {}
 
 Request::Request (const request & r) :
   _request(r),
-  post_wait_work(libmesh_nullptr)
+  post_wait_work(nullptr)
 {}
 
 Request::Request (const Request & other) :
@@ -84,7 +84,7 @@ void Request::cleanup()
             libmesh_assert(!item);
 #endif
           delete post_wait_work;
-          post_wait_work = libmesh_nullptr;
+          post_wait_work = nullptr;
         }
     }
 }
@@ -110,7 +110,7 @@ Request & Request::operator = (const request & r)
 {
   this->cleanup();
   _request = r;
-  post_wait_work = libmesh_nullptr;
+  post_wait_work = nullptr;
   return *this;
 }
 
@@ -125,7 +125,7 @@ Status Request::wait ()
   if (_prior_request.get())
     {
       _prior_request->wait();
-      _prior_request.reset(libmesh_nullptr);
+      _prior_request.reset(nullptr);
     }
 
   Status stat;
@@ -142,7 +142,7 @@ Status Request::wait ()
           libmesh_assert (item);
           item->run();
           delete item;
-          item = libmesh_nullptr;
+          item = nullptr;
         }
       post_wait_work->first.clear();
     }
@@ -265,10 +265,10 @@ std::size_t waitany (std::vector<Request> & r)
             libmesh_assert (item);
             item->run();
             delete item;
-            item = libmesh_nullptr;
+            item = nullptr;
           }
 
-      next->_prior_request.reset(libmesh_nullptr);
+      next->_prior_request.reset(nullptr);
       raw[index] = *next->get();
 
     } while(only_priors_completed);

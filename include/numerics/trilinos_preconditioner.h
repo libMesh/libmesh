@@ -150,8 +150,8 @@ template <typename T>
 inline
 TrilinosPreconditioner<T>::TrilinosPreconditioner (const libMesh::Parallel::Communicator & comm) :
   Preconditioner<T>(comm),
-  _prec(libmesh_nullptr),
-  _mat(libmesh_nullptr)
+  _prec(nullptr),
+  _mat(nullptr)
 {
 }
 

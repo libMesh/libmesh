@@ -275,8 +275,8 @@ public:
    * specified systems.
    */
   void build_variable_names (std::vector<std::string> & var_names,
-                             const FEType * type=libmesh_nullptr,
-                             const std::set<std::string> * system_names=libmesh_nullptr) const;
+                             const FEType * type=nullptr,
+                             const std::set<std::string> * system_names=nullptr) const;
 
   /**
    * Fill the input vector \p soln with the solution values for the
@@ -298,7 +298,7 @@ public:
    * specified systems.
    */
   void build_solution_vector (std::vector<Number> & soln,
-                              const std::set<std::string> * system_names=libmesh_nullptr) const;
+                              const std::set<std::string> * system_names=nullptr) const;
 
   /**
    * A version of build_solution_vector which is appropriate for
@@ -309,7 +309,7 @@ public:
    * get the local values they need to write on each processor.
    */
   std::unique_ptr<NumericVector<Number>>
-  build_parallel_solution_vector(const std::set<std::string> * system_names=libmesh_nullptr) const;
+  build_parallel_solution_vector(const std::set<std::string> * system_names=nullptr) const;
 
   /**
    * Retrieve \p vars_active_subdomains, which indicates the active
@@ -334,7 +334,7 @@ public:
    * specified systems.
    */
   void build_discontinuous_solution_vector (std::vector<Number> & soln,
-                                            const std::set<std::string> * system_names=libmesh_nullptr) const;
+                                            const std::set<std::string> * system_names=nullptr) const;
 
   /**
    * Read & initialize the systems from disk using the XDR data format.
@@ -587,7 +587,7 @@ template <typename T_sys>
 inline
 T_sys & EquationSystems::add_system (const std::string & name)
 {
-  T_sys * ptr = libmesh_nullptr;
+  T_sys * ptr = nullptr;
 
   if (!_systems.count(name))
     {

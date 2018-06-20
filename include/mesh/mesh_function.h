@@ -67,7 +67,7 @@ public:
                 const NumericVector<Number> & vec,
                 const DofMap & dof_map,
                 const std::vector<unsigned int> & vars,
-                const FunctionBase<Number> * master=libmesh_nullptr);
+                const FunctionBase<Number> * master=nullptr);
 
   /**
    * Constructor for mesh based functions with a number
@@ -81,7 +81,7 @@ public:
                 const NumericVector<Number> & vec,
                 const DofMap & dof_map,
                 const unsigned int var,
-                const FunctionBase<Number> * master=libmesh_nullptr);
+                const FunctionBase<Number> * master=nullptr);
 
   /**
    * Destructor.
@@ -208,7 +208,7 @@ public:
   void gradient (const Point & p,
                  const Real time,
                  std::vector<Gradient> & output,
-                 const std::set<subdomain_id_type> * subdomain_ids = libmesh_nullptr);
+                 const std::set<subdomain_id_type> * subdomain_ids = nullptr);
 
   /**
    * Similar to gradient, but with the difference
@@ -238,7 +238,7 @@ public:
   void hessian (const Point & p,
                 const Real time,
                 std::vector<Tensor> & output,
-                const std::set<subdomain_id_type> * subdomain_ids = libmesh_nullptr);
+                const std::set<subdomain_id_type> * subdomain_ids = nullptr);
 
   /**
    * \returns The current \p PointLocator object, for use elsewhere.
@@ -296,7 +296,7 @@ protected:
    * Helper function to reduce code duplication
    */
   const Elem * find_element(const Point & p,
-                            const std::set<subdomain_id_type> * subdomain_ids = libmesh_nullptr) const;
+                            const std::set<subdomain_id_type> * subdomain_ids = nullptr) const;
 
   /**
    * \returns All elements that are close to a point \p p.
@@ -305,7 +305,7 @@ protected:
    * is on the boundary.
    */
   std::set<const Elem *> find_elements(const Point & p,
-                                       const std::set<subdomain_id_type> * subdomain_ids = libmesh_nullptr) const;
+                                       const std::set<subdomain_id_type> * subdomain_ids = nullptr) const;
 
   /**
    * The equation systems handler, from which

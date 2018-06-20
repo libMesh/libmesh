@@ -680,7 +680,7 @@ void FESubdivision::reinit(const Elem * elem,
   this->determine_calculations();
 
   // no custom quadrature support
-  libmesh_assert(pts == libmesh_nullptr);
+  libmesh_assert(pts == nullptr);
   libmesh_assert(qrule);
   qrule->init(elem->type());
 

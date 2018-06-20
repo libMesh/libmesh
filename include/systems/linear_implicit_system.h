@@ -174,9 +174,9 @@ public:
   void attach_shell_matrix (ShellMatrix<Number> * shell_matrix);
 
   /**
-   * Detaches a shell matrix.  Same as \p attach_shell_matrix(libmesh_nullptr).
+   * Detaches a shell matrix.  Same as \p attach_shell_matrix(nullptr).
    */
-  void detach_shell_matrix () { attach_shell_matrix(libmesh_nullptr); }
+  void detach_shell_matrix () { attach_shell_matrix(nullptr); }
 
   /**
    * \returns A pointer to the currently attached shell matrix, if any,

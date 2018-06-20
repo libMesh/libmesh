@@ -925,7 +925,7 @@ Elem * Elem::topological_neighbor (const unsigned int i,
   libmesh_assert_less (i, this->n_neighbors());
 
   Elem * neighbor_i = this->neighbor_ptr(i);
-  if (neighbor_i != libmesh_nullptr)
+  if (neighbor_i != nullptr)
     return neighbor_i;
 
   if (pb)
@@ -954,7 +954,7 @@ Elem * Elem::topological_neighbor (const unsigned int i,
           }
     }
 
-  return libmesh_nullptr;
+  return nullptr;
 }
 
 
@@ -967,7 +967,7 @@ const Elem * Elem::topological_neighbor (const unsigned int i,
   libmesh_assert_less (i, this->n_neighbors());
 
   const Elem * neighbor_i = this->neighbor_ptr(i);
-  if (neighbor_i != libmesh_nullptr)
+  if (neighbor_i != nullptr)
     return neighbor_i;
 
   if (pb)
@@ -992,7 +992,7 @@ const Elem * Elem::topological_neighbor (const unsigned int i,
           }
     }
 
-  return libmesh_nullptr;
+  return nullptr;
 }
 
 
@@ -1173,7 +1173,7 @@ void Elem::make_links_to_me_local(unsigned int n)
                        neigh_family_member->neighbor_ptr(nn)->is_ancestor_of(this))) ||
                      (neigh_family_member->neighbor_ptr(nn) == remote_elem) ||
                      ((this->refinement_flag() == JUST_REFINED) &&
-                      (this->parent() != libmesh_nullptr) &&
+                      (this->parent() != nullptr) &&
                       (neigh_family_member->neighbor_ptr(nn) == this->parent())));
 #else
       libmesh_assert((neigh_family_member->neighbor_ptr(nn) == this) ||
@@ -1335,13 +1335,13 @@ void Elem::remove_links_to_me()
                   unsigned int my_s = n->which_neighbor_am_i(this);
                   libmesh_assert_less (my_s, n->n_neighbors());
                   libmesh_assert_equal_to (n->neighbor_ptr(my_s), this);
-                  n->set_neighbor(my_s, libmesh_nullptr);
+                  n->set_neighbor(my_s, nullptr);
                 }
 #else
               unsigned int my_s = neigh->which_neighbor_am_i(this);
               libmesh_assert_less (my_s, neigh->n_neighbors());
               libmesh_assert_equal_to (neigh->neighbor(my_s), this);
-              neigh->set_neighbor(my_s, libmesh_nullptr);
+              neigh->set_neighbor(my_s, nullptr);
 #endif
             }
 #ifdef LIBMESH_ENABLE_AMR
@@ -1381,7 +1381,7 @@ void Elem::remove_links_to_me()
                   unsigned int my_s = n->which_neighbor_am_i(this);
                   libmesh_assert_less (my_s, n->n_neighbors());
                   libmesh_assert_equal_to (n->neighbor_ptr(my_s), this);
-                  n->set_neighbor(my_s, libmesh_nullptr);
+                  n->set_neighbor(my_s, nullptr);
                 }
             }
 #endif
@@ -1501,17 +1501,17 @@ void Elem::add_child (Elem * elem)
 {
   const unsigned int nc = this->n_children();
 
-  if (_children == libmesh_nullptr)
+  if (_children == nullptr)
     {
       _children = new Elem *[nc];
 
       for (unsigned int c = 0; c != nc; c++)
-        this->set_child(c, libmesh_nullptr);
+        this->set_child(c, nullptr);
     }
 
   for (unsigned int c = 0; c != nc; c++)
     {
-      if (this->_children[c] == libmesh_nullptr || this->_children[c] == remote_elem)
+      if (this->_children[c] == nullptr || this->_children[c] == remote_elem)
         {
           libmesh_assert_equal_to (this, elem->parent());
           this->set_child(c, elem);
@@ -1532,10 +1532,10 @@ void Elem::add_child (Elem * elem, unsigned int c)
       _children = new Elem *[nc];
 
       for (unsigned int i = 0; i != nc; i++)
-        this->set_child(i, libmesh_nullptr);
+        this->set_child(i, nullptr);
     }
 
-  libmesh_assert (this->_children[c] == libmesh_nullptr || this->child_ptr(c) == remote_elem);
+  libmesh_assert (this->_children[c] == nullptr || this->child_ptr(c) == remote_elem);
   libmesh_assert (elem == remote_elem || this == elem->parent());
 
   this->set_child(c, elem);
@@ -2577,8 +2577,8 @@ void Elem::nullify_neighbors ()
             {
               const unsigned int w_n_a_i = current_neighbor->which_neighbor_am_i(this);
               libmesh_assert_less (w_n_a_i, current_neighbor->n_neighbors());
-              current_neighbor->set_neighbor(w_n_a_i, libmesh_nullptr);
-              this->set_neighbor(n, libmesh_nullptr);
+              current_neighbor->set_neighbor(w_n_a_i, nullptr);
+              this->set_neighbor(n, nullptr);
             }
         }
     }

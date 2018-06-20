@@ -97,7 +97,7 @@ public:
   DirichletBoundary(const std::set<boundary_id_type> & b_in,
                     const std::vector<unsigned int> & variables_in,
                     const FunctionBase<Number> * f_in,
-                    const FunctionBase<Gradient> * g_in = libmesh_nullptr);
+                    const FunctionBase<Gradient> * g_in = nullptr);
 
   /**
    * Constructor for a boundary from reference-to-functor.
@@ -131,7 +131,7 @@ public:
                     const std::vector<unsigned int> & variables_in,
                     const System & f_sys_in,
                     const FEMFunctionBase<Number> * f_in,
-                    const FEMFunctionBase<Gradient> * g_in = libmesh_nullptr);
+                    const FEMFunctionBase<Gradient> * g_in = nullptr);
 
   /**
    * Constructor for a system-variable-order boundary from

@@ -57,9 +57,9 @@ public:
 private:
   RemoteElem () : Elem(0,
                        0,
-                       libmesh_nullptr,
+                       nullptr,
                        _elemlinks_data,
-                       libmesh_nullptr)
+                       nullptr)
   { this->set_id(remote_elem_id); }
 
 public:

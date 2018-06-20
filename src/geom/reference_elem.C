@@ -67,7 +67,7 @@ public:
     for (std::size_t e=0; e<elem_list.size(); e++)
       {
         delete elem_list[e];
-        elem_list[e] = libmesh_nullptr;
+        elem_list[e] = nullptr;
       }
 
     elem_list.clear();
@@ -75,7 +75,7 @@ public:
     for (std::size_t n=0; n<node_list.size(); n++)
       {
         delete node_list[n];
-        node_list[n] = libmesh_nullptr;
+        node_list[n] = nullptr;
       }
 
     node_list.clear();
@@ -87,14 +87,14 @@ public:
 
 // singleton object, dynamically created and then
 // removed at program exit
-SingletonCache * singleton_cache = libmesh_nullptr;
+SingletonCache * singleton_cache = nullptr;
 
 
 
 void read_ref_elem (const ElemType type_in,
                     std::istream & in)
 {
-  libmesh_assert (singleton_cache != libmesh_nullptr);
+  libmesh_assert (singleton_cache != nullptr);
 
   std::string dummy;
   unsigned int n_elem, n_nodes, elem_type_read, nn;
@@ -153,7 +153,7 @@ void read_ref_elem (const ElemType type_in,
 void init_ref_elem_table()
 {
   // outside mutex - if this pointer is set, we can trust it.
-  if (singleton_cache != libmesh_nullptr)
+  if (singleton_cache != nullptr)
     return;
 
   // playing with fire here - lock before touching shared
@@ -162,7 +162,7 @@ void init_ref_elem_table()
 
   // inside mutex - pointer may have changed while waiting
   // for the lock to acquire, check it again.
-  if (singleton_cache != libmesh_nullptr)
+  if (singleton_cache != nullptr)
     return;
 
   // OK, if we get here we have the lock and we are not
@@ -252,7 +252,7 @@ const Elem & get (const ElemType type_in)
 
   // Throw an error if the user asked for an ElemType that we don't
   // have a reference element for.
-  if (ref_elem_map[base_type] == libmesh_nullptr || type_in == INVALID_ELEM)
+  if (ref_elem_map[base_type] == nullptr || type_in == INVALID_ELEM)
     libmesh_error_msg("No reference elem data available for ElemType " << type_in << " = " << Utility::enum_to_string(type_in) << ".");
 
   return *ref_elem_map[base_type];

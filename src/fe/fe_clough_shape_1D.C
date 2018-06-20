@@ -33,7 +33,7 @@ using namespace libMesh;
 // Keep track of which element was most recently used to generate
 // cached data
 static dof_id_type old_elem_id = DofObject::invalid_id;
-static const Elem * old_elem_ptr = libmesh_nullptr;
+static const Elem * old_elem_ptr = nullptr;
 
 // Coefficient naming: d(1)d(2n) is the coefficient of the
 // global shape function corresponding to value 1 in terms of the

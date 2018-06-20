@@ -257,8 +257,8 @@ void Nemesis_IO_Helper::get_elem_map()
 
   nemesis_err_flag =
     Nemesis::ne_get_elem_map(ex_id,
-                             elem_mapi.empty() ? libmesh_nullptr : &elem_mapi[0],
-                             elem_mapb.empty() ? libmesh_nullptr : &elem_mapb[0],
+                             elem_mapi.empty() ? nullptr : &elem_mapi[0],
+                             elem_mapb.empty() ? nullptr : &elem_mapb[0],
                              this->processor_id()
                              );
   EX_CHECK_ERR(nemesis_err_flag, "Error reading element maps!");
@@ -289,9 +289,9 @@ void Nemesis_IO_Helper::get_node_map()
 
   nemesis_err_flag =
     Nemesis::ne_get_node_map(ex_id,
-                             node_mapi.empty() ? libmesh_nullptr : &node_mapi[0],
-                             node_mapb.empty() ? libmesh_nullptr : &node_mapb[0],
-                             node_mape.empty() ? libmesh_nullptr : &node_mape[0],
+                             node_mapi.empty() ? nullptr : &node_mapi[0],
+                             node_mapb.empty() ? nullptr : &node_mapb[0],
+                             node_mape.empty() ? nullptr : &node_mape[0],
                              this->processor_id()
                              );
   EX_CHECK_ERR(nemesis_err_flag, "Error reading node maps!");
@@ -327,10 +327,10 @@ void Nemesis_IO_Helper::get_cmap_params()
 
   nemesis_err_flag =
     Nemesis::ne_get_cmap_params(ex_id,
-                                node_cmap_ids.empty()       ? libmesh_nullptr : &node_cmap_ids[0],
-                                node_cmap_node_cnts.empty() ? libmesh_nullptr : &node_cmap_node_cnts[0],
-                                elem_cmap_ids.empty()       ? libmesh_nullptr : &elem_cmap_ids[0],
-                                elem_cmap_elem_cnts.empty() ? libmesh_nullptr : &elem_cmap_elem_cnts[0],
+                                node_cmap_ids.empty()       ? nullptr : &node_cmap_ids[0],
+                                node_cmap_node_cnts.empty() ? nullptr : &node_cmap_node_cnts[0],
+                                elem_cmap_ids.empty()       ? nullptr : &elem_cmap_ids[0],
+                                elem_cmap_elem_cnts.empty() ? nullptr : &elem_cmap_elem_cnts[0],
                                 this->processor_id());
   EX_CHECK_ERR(nemesis_err_flag, "Error reading cmap parameters!");
 
@@ -641,9 +641,9 @@ void Nemesis_IO_Helper::put_node_map(std::vector<int> & node_mapi_in,
 {
   nemesis_err_flag =
     Nemesis::ne_put_node_map(ex_id,
-                             node_mapi_in.empty() ? libmesh_nullptr : &node_mapi_in[0],
-                             node_mapb_in.empty() ? libmesh_nullptr : &node_mapb_in[0],
-                             node_mape_in.empty() ? libmesh_nullptr : &node_mape_in[0], // Don't take address of empty vector...
+                             node_mapi_in.empty() ? nullptr : &node_mapi_in[0],
+                             node_mapb_in.empty() ? nullptr : &node_mapb_in[0],
+                             node_mape_in.empty() ? nullptr : &node_mape_in[0], // Don't take address of empty vector...
                              this->processor_id());
 
   EX_CHECK_ERR(nemesis_err_flag, "Error writing Nemesis internal and border node maps to file!");
@@ -678,8 +678,8 @@ void Nemesis_IO_Helper::put_elem_map(std::vector<int> & elem_mapi_in,
 {
   nemesis_err_flag =
     Nemesis::ne_put_elem_map(ex_id,
-                             elem_mapi_in.empty() ? libmesh_nullptr : &elem_mapi_in[0],
-                             elem_mapb_in.empty() ? libmesh_nullptr : &elem_mapb_in[0],
+                             elem_mapi_in.empty() ? nullptr : &elem_mapi_in[0],
+                             elem_mapb_in.empty() ? nullptr : &elem_mapb_in[0],
                              this->processor_id());
 
   EX_CHECK_ERR(nemesis_err_flag, "Error writing Nemesis internal and border element maps to file!");
@@ -1301,7 +1301,7 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
       // Loop over element's neighbors, see if it has a neighbor which is off-processor
       for (auto n : elem->side_index_range())
         {
-          if (elem->neighbor_ptr(n) != libmesh_nullptr)
+          if (elem->neighbor_ptr(n) != nullptr)
             {
               unsigned neighbor_proc_id = elem->neighbor_ptr(n)->processor_id();
 
@@ -1832,7 +1832,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
 
           // But we can get away with writing e.g. HEX8 and INFHEX8 in
           // the same block...
-          libmesh_assert_equal_to (elem.n_nodes(), Elem::build(conv.get_canonical_type(), libmesh_nullptr)->n_nodes());
+          libmesh_assert_equal_to (elem.n_nodes(), Elem::build(conv.get_canonical_type(), nullptr)->n_nodes());
 
           for (unsigned int j=0; j < static_cast<unsigned int>(this->num_nodes_per_elem); j++)
             {
@@ -2345,10 +2345,10 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool /*us
     }
   else // Does the Exodus API want us to write empty nodal coordinates?
     {
-      ex_err = exII::ex_put_coord(ex_id, libmesh_nullptr, libmesh_nullptr, libmesh_nullptr);
+      ex_err = exII::ex_put_coord(ex_id, nullptr, nullptr, nullptr);
       EX_CHECK_ERR(ex_err, "Error writing empty node coordinates");
 
-      ex_err = exII::ex_put_node_num_map(ex_id, libmesh_nullptr);
+      ex_err = exII::ex_put_node_num_map(ex_id, nullptr);
       EX_CHECK_ERR(ex_err, "Error writing empty node num map");
     }
 }
@@ -2430,7 +2430,7 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discont
 
       // Only call this once, not in the loop above!
       ex_err = exII::ex_put_elem_num_map(ex_id,
-                                         exodus_elem_num_to_libmesh.empty() ? libmesh_nullptr : &exodus_elem_num_to_libmesh[0]);
+                                         exodus_elem_num_to_libmesh.empty() ? nullptr : &exodus_elem_num_to_libmesh[0]);
       EX_CHECK_ERR(ex_err, "Error writing element map");
 
       // Write the element block names to file.

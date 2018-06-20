@@ -129,7 +129,7 @@ template <class MT>
 inline
 MeshInput<MT>::MeshInput (const bool is_parallel_format) :
   elems_of_dimension(),
-  _obj (libmesh_nullptr),
+  _obj (nullptr),
   _is_parallel_format(is_parallel_format)
 {
 }
@@ -168,7 +168,7 @@ template <class MT>
 inline
 MT & MeshInput<MT>::mesh ()
 {
-  if (_obj == libmesh_nullptr)
+  if (_obj == nullptr)
     libmesh_error_msg("ERROR: _obj should not be NULL!");
   return *_obj;
 }

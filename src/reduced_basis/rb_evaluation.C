@@ -47,7 +47,7 @@ RBEvaluation::RBEvaluation (const Parallel::Communicator & comm_in)
   ParallelObject(comm_in),
   evaluate_RB_error_bound(true),
   compute_RB_inner_product(false),
-  rb_theta_expansion(libmesh_nullptr)
+  rb_theta_expansion(nullptr)
 {
 
 }

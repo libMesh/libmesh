@@ -489,7 +489,7 @@ public:
    * in the \p parameters argument.
    */
   void project_solution (FunctionBase<Number> * f,
-                         FunctionBase<Gradient> * g = libmesh_nullptr) const;
+                         FunctionBase<Gradient> * g = nullptr) const;
 
   /**
    * Projects arbitrary functions onto the current solution.
@@ -501,7 +501,7 @@ public:
    * in the \p parameters argument.
    */
   void project_solution (FEMFunctionBase<Number> * f,
-                         FEMFunctionBase<Gradient> * g = libmesh_nullptr) const;
+                         FEMFunctionBase<Gradient> * g = nullptr) const;
 
   /**
    * Projects arbitrary functions onto the current solution.
@@ -537,7 +537,7 @@ public:
    */
   void project_vector (NumericVector<Number> & new_vector,
                        FunctionBase<Number> * f,
-                       FunctionBase<Gradient> * g = libmesh_nullptr,
+                       FunctionBase<Gradient> * g = nullptr,
                        int is_adjoint = -1) const;
 
   /**
@@ -555,7 +555,7 @@ public:
    */
   void project_vector (NumericVector<Number> & new_vector,
                        FEMFunctionBase<Number> * f,
-                       FEMFunctionBase<Gradient> * g = libmesh_nullptr,
+                       FEMFunctionBase<Gradient> * g = nullptr,
                        int is_adjoint = -1) const;
 
   /**
@@ -592,7 +592,7 @@ public:
   void boundary_project_solution (const std::set<boundary_id_type> & b,
                                   const std::vector<unsigned int> & variables,
                                   FunctionBase<Number> * f,
-                                  FunctionBase<Gradient> * g = libmesh_nullptr);
+                                  FunctionBase<Gradient> * g = nullptr);
 
   /**
    * Projects arbitrary boundary functions onto a vector of degree of
@@ -633,7 +633,7 @@ public:
                                 const std::vector<unsigned int> & variables,
                                 NumericVector<Number> & new_vector,
                                 FunctionBase<Number> * f,
-                                FunctionBase<Gradient> * g = libmesh_nullptr,
+                                FunctionBase<Gradient> * g = nullptr,
                                 int is_adjoint = -1) const;
 
   /**
@@ -1084,7 +1084,7 @@ public:
    */
   unsigned int add_variable (const std::string & var,
                              const FEType & type,
-                             const std::set<subdomain_id_type> * const active_subdomains = libmesh_nullptr);
+                             const std::set<subdomain_id_type> * const active_subdomains = nullptr);
 
   /**
    * Adds the variable \p var to the list of variables
@@ -1094,7 +1094,7 @@ public:
   unsigned int add_variable (const std::string & var,
                              const Order order = FIRST,
                              const FEFamily = LAGRANGE,
-                             const std::set<subdomain_id_type> * const active_subdomains = libmesh_nullptr);
+                             const std::set<subdomain_id_type> * const active_subdomains = nullptr);
 
   /**
    * Adds the variable \p var to the list of variables
@@ -1104,7 +1104,7 @@ public:
    */
   unsigned int add_variables (const std::vector<std::string> & vars,
                               const FEType & type,
-                              const std::set<subdomain_id_type> * const active_subdomains = libmesh_nullptr);
+                              const std::set<subdomain_id_type> * const active_subdomains = nullptr);
 
   /**
    * Adds the variable \p var to the list of variables
@@ -1114,7 +1114,7 @@ public:
   unsigned int add_variables (const std::vector<std::string> & vars,
                               const Order order = FIRST,
                               const FEFamily = LAGRANGE,
-                              const std::set<subdomain_id_type> * const active_subdomains = libmesh_nullptr);
+                              const std::set<subdomain_id_type> * const active_subdomains = nullptr);
 
   /**
    * Return a constant reference to \p Variable \p var.
@@ -1203,7 +1203,7 @@ public:
   Real calculate_norm(const NumericVector<Number> & v,
                       unsigned int var,
                       FEMNormType norm_type,
-                      std::set<unsigned int> * skip_dimensions=libmesh_nullptr) const;
+                      std::set<unsigned int> * skip_dimensions=nullptr) const;
 
   /**
    * \returns A norm of the vector \p v, using \p component_norm and \p
@@ -1211,7 +1211,7 @@ public:
    */
   Real calculate_norm(const NumericVector<Number> & v,
                       const SystemNorm & norm,
-                      std::set<unsigned int> * skip_dimensions=libmesh_nullptr) const;
+                      std::set<unsigned int> * skip_dimensions=nullptr) const;
 
   /**
    * Reads the basic data header for this System.

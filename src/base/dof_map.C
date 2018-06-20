@@ -128,7 +128,7 @@ DofMap::build_sparsity (const MeshBase & mesh) const
 DofMap::DofMap(const unsigned int number,
                MeshBase & mesh) :
   ParallelObject (mesh.comm()),
-  _dof_coupling(libmesh_nullptr),
+  _dof_coupling(nullptr),
   _error_on_cyclic_constraint(false),
   _variables(),
   _variable_groups(),
@@ -139,17 +139,17 @@ DofMap::DofMap(const unsigned int number,
   _end_df(),
   _first_scalar_df(),
   _send_list(),
-  _augment_sparsity_pattern(libmesh_nullptr),
-  _extra_sparsity_function(libmesh_nullptr),
-  _extra_sparsity_context(libmesh_nullptr),
-  _augment_send_list(libmesh_nullptr),
-  _extra_send_list_function(libmesh_nullptr),
-  _extra_send_list_context(libmesh_nullptr),
+  _augment_sparsity_pattern(nullptr),
+  _extra_sparsity_function(nullptr),
+  _extra_sparsity_context(nullptr),
+  _augment_send_list(nullptr),
+  _extra_send_list_function(nullptr),
+  _extra_send_list_context(nullptr),
   _default_coupling(new DefaultCoupling()),
   _default_evaluating(new DefaultCoupling()),
   need_full_sparsity_pattern(false),
-  _n_nz(libmesh_nullptr),
-  _n_oz(libmesh_nullptr),
+  _n_nz(nullptr),
+  _n_oz(nullptr),
   _n_dfs(0),
   _n_SCALAR_dofs(0)
 #ifdef LIBMESH_ENABLE_AMR
@@ -434,7 +434,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
         }
     };
 
-  datum * ex = libmesh_nullptr;
+  datum * ex = nullptr;
   Parallel::pull_parallel_vector_data
     (this->comm(), requested_ids, gather_functor, action_functor, ex);
 
@@ -525,7 +525,7 @@ void DofMap::reinit(MeshBase & mesh)
         {
           Node & node = elem->node_ref(n);
 
-          if (node.old_dof_object == libmesh_nullptr)
+          if (node.old_dof_object == nullptr)
             if (node.has_dofs(sys_num))
               node.set_old_dof_object();
         }
@@ -1470,7 +1470,7 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
                       if (temp_it != temporary_coupling_matrices.end())
                         temporary_coupling_matrices.erase(temp_it);
 
-                      existing_it->second = libmesh_nullptr;
+                      existing_it->second = nullptr;
                     }
                 }
               // else we have a nullptr already, then we have a full
@@ -1782,8 +1782,8 @@ void DofMap::clear_sparsity()
       delete _n_nz;
       delete _n_oz;
     }
-  _n_nz = libmesh_nullptr;
-  _n_oz = libmesh_nullptr;
+  _n_nz = nullptr;
+  _n_oz = nullptr;
 }
 
 

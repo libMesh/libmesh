@@ -485,7 +485,7 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
     mesh.comm().receive_packed_range (Parallel::any_source,
                                       &mesh,
                                       mesh_inserter_iterator<Node>(mesh),
-                                      (Node**)libmesh_nullptr,
+                                      (Node**)nullptr,
                                       nodestag);
 
   // Receive elements.
@@ -495,7 +495,7 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
     mesh.comm().receive_packed_range (Parallel::any_source,
                                       &mesh,
                                       mesh_inserter_iterator<Elem>(mesh),
-                                      (Elem**)libmesh_nullptr,
+                                      (Elem**)nullptr,
                                       elemstag);
 
   // Wait for all sends to complete
@@ -623,7 +623,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
             my_interface_elements.push_back(elem); // add the element, but only once, even
             // if there are multiple NULL neighbors
             for (auto s : elem->side_index_range())
-              if (elem->neighbor_ptr(s) == libmesh_nullptr)
+              if (elem->neighbor_ptr(s) == nullptr)
                 {
                   std::unique_ptr<const Elem> side(elem->build_side_ptr(s));
 
@@ -853,7 +853,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
           mesh.comm().receive_packed_range (source_pid_idx,
                                             &mesh,
                                             mesh_inserter_iterator<Node>(mesh),
-                                            (Node**)libmesh_nullptr,
+                                            (Node**)nullptr,
                                             element_neighbors_tag);
         }
       //------------------------------------------------------------------
@@ -865,7 +865,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
           mesh.comm().receive_packed_range (source_pid_idx,
                                             &mesh,
                                             mesh_inserter_iterator<Elem>(mesh),
-                                            (Elem**)libmesh_nullptr,
+                                            (Elem**)nullptr,
                                             element_neighbors_tag);
         }
       //------------------------------------------------------------------
@@ -1049,7 +1049,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
         (Parallel::any_source,
          &mesh,
          mesh_inserter_iterator<Node>(mesh),
-         (Node**)libmesh_nullptr,
+         (Node**)nullptr,
          nodestag);
     }
 
@@ -1059,7 +1059,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
         (Parallel::any_source,
          &mesh,
          mesh_inserter_iterator<Elem>(mesh),
-         (Elem**)libmesh_nullptr,
+         (Elem**)nullptr,
          elemstag);
     }
 

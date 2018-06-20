@@ -139,7 +139,7 @@ public:
   void write_discontinuous_gmv (const std::string & name,
                                 const EquationSystems & es,
                                 const bool write_partitioning,
-                                const std::set<std::string> * system_names=libmesh_nullptr) const;
+                                const std::set<std::string> * system_names=nullptr) const;
 
 
   /**
@@ -149,8 +149,8 @@ public:
    * (without subcells).
    */
   void write_ascii_new_impl (const std::string &,
-                             const std::vector<Number> * = libmesh_nullptr,
-                             const std::vector<std::string> * = libmesh_nullptr);
+                             const std::vector<Number> * = nullptr,
+                             const std::vector<std::string> * = nullptr);
 
   /**
    * Takes a vector of cell-centered data to be plotted.
@@ -181,8 +181,8 @@ private:
    * (using subcells) which was the default in libMesh-0.4.3-rc2.
    */
   void write_ascii_old_impl (const std::string &,
-                             const std::vector<Number> * = libmesh_nullptr,
-                             const std::vector<std::string> * = libmesh_nullptr);
+                             const std::vector<Number> * = nullptr,
+                             const std::vector<std::string> * = nullptr);
 
   /**
    * This method implements writing a mesh with nodal data to a
@@ -190,8 +190,8 @@ private:
    * provided.
    */
   void write_binary (const std::string &,
-                     const std::vector<Number> * = libmesh_nullptr,
-                     const std::vector<std::string> * = libmesh_nullptr);
+                     const std::vector<Number> * = nullptr,
+                     const std::vector<std::string> * = nullptr);
 
   /**
    * Flag to write binary data.

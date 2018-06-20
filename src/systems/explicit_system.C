@@ -33,7 +33,7 @@ ExplicitSystem::ExplicitSystem (EquationSystems & es,
                                 const std::string & name_in,
                                 const unsigned int number_in) :
   Parent (es, name_in, number_in),
-  rhs(libmesh_nullptr)
+  rhs(nullptr)
 
 {
   // Add the system RHS.
@@ -98,12 +98,12 @@ void ExplicitSystem::add_system_rhs ()
   // Possible that we cleared the _vectors but
   // forgot to NULL-out the rhs?
   if (this->n_vectors() == 0)
-    rhs = libmesh_nullptr;
+    rhs = nullptr;
 
 
   // Only need to add the rhs if it isn't there
   // already!
-  if (rhs == libmesh_nullptr)
+  if (rhs == nullptr)
     rhs = &(this->add_vector ("RHS Vector", false));
 
   libmesh_assert(rhs);

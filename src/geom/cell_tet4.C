@@ -449,7 +449,7 @@ float Tet4::embedding_matrix (const unsigned int i,
 //   for (unsigned int nc=0; nc<child->n_nodes(); nc++)
 //     {
 //       /* Unassign the current node.  */
-//       child->set_node(nc) = libmesh_nullptr;
+//       child->set_node(nc) = nullptr;
 //
 //       /* We have to find the correct new node now.  We know
 //  that it exists somewhere.  We make use of the fact

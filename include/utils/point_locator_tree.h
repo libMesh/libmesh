@@ -57,7 +57,7 @@ public:
    * use the master's tree.
    */
   PointLocatorTree (const MeshBase & mesh,
-                    const PointLocatorBase * master = libmesh_nullptr);
+                    const PointLocatorBase * master = nullptr);
 
 
   /**
@@ -73,7 +73,7 @@ public:
    */
   PointLocatorTree (const MeshBase & mesh,
                     const Trees::BuildType build_type,
-                    const PointLocatorBase * master = libmesh_nullptr);
+                    const PointLocatorBase * master = nullptr);
 
   /**
    * Destructor.
@@ -105,7 +105,7 @@ public:
    * operator().
    */
   virtual const Elem * operator() (const Point & p,
-                                   const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const override;
+                                   const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const override;
 
   /**
    * Locates a set of elements in proximity to the point with global coordinates
@@ -113,7 +113,7 @@ public:
    */
   virtual void operator() (const Point & p,
                            std::set<const Elem *> & candidate_elements,
-                           const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const override;
+                           const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const override;
 
   /**
    * As a fallback option, it's helpful to be able to do a linear

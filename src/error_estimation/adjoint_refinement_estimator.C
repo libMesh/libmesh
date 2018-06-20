@@ -74,7 +74,7 @@ AdjointRefinementEstimator::AdjointRefinementEstimator() :
   ErrorEstimator(),
   number_h_refinements(1),
   number_p_refinements(0),
-  _residual_evaluation_physics(libmesh_nullptr),
+  _residual_evaluation_physics(nullptr),
   _qoi_set(QoISet())
 {
   // We're not actually going to use error_norm; our norms are
@@ -125,7 +125,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
           system.get_dof_map().has_adjoint_dirichlet_boundaries(j))
         {
           // Next, we are going to build up the residual for evaluating the flux QoI
-          NumericVector<Number> * coarse_residual = libmesh_nullptr;
+          NumericVector<Number> * coarse_residual = nullptr;
 
           // The definition of a flux QoI is R(u^h, L) where R is the residual as defined
           // by a conservation law. Therefore, if we are using stabilization, the
@@ -266,7 +266,7 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
           coarse_adjoints.emplace_back(std::move(coarse_adjoint));
         }
       else
-        coarse_adjoints.emplace_back(libmesh_nullptr);
+        coarse_adjoints.emplace_back(nullptr);
     }
 
   // Next, we are going to build up the residual for evaluating the

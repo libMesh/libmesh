@@ -411,12 +411,12 @@ EpetraVector<T>::EpetraVector (const Parallel::Communicator & comm,
   _destroy_vec_on_exit(true),
   myFirstID_(0),
   myNumIDs_(0),
-  myCoefs_(libmesh_nullptr),
-  nonlocalIDs_(libmesh_nullptr),
-  nonlocalElementSize_(libmesh_nullptr),
+  myCoefs_(nullptr),
+  nonlocalIDs_(nullptr),
+  nonlocalElementSize_(nullptr),
   numNonlocalIDs_(0),
   allocatedNonlocalLength_(0),
-  nonlocalCoefs_(libmesh_nullptr),
+  nonlocalCoefs_(nullptr),
   last_edit(0),
   ignoreNonLocalEntries_(false)
 {
@@ -434,12 +434,12 @@ EpetraVector<T>::EpetraVector (const Parallel::Communicator & comm,
   _destroy_vec_on_exit(true),
   myFirstID_(0),
   myNumIDs_(0),
-  myCoefs_(libmesh_nullptr),
-  nonlocalIDs_(libmesh_nullptr),
-  nonlocalElementSize_(libmesh_nullptr),
+  myCoefs_(nullptr),
+  nonlocalIDs_(nullptr),
+  nonlocalElementSize_(nullptr),
   numNonlocalIDs_(0),
   allocatedNonlocalLength_(0),
-  nonlocalCoefs_(libmesh_nullptr),
+  nonlocalCoefs_(nullptr),
   last_edit(0),
   ignoreNonLocalEntries_(false)
 
@@ -459,12 +459,12 @@ EpetraVector<T>::EpetraVector (const Parallel::Communicator & comm,
   _destroy_vec_on_exit(true),
   myFirstID_(0),
   myNumIDs_(0),
-  myCoefs_(libmesh_nullptr),
-  nonlocalIDs_(libmesh_nullptr),
-  nonlocalElementSize_(libmesh_nullptr),
+  myCoefs_(nullptr),
+  nonlocalIDs_(nullptr),
+  nonlocalElementSize_(nullptr),
   numNonlocalIDs_(0),
   allocatedNonlocalLength_(0),
-  nonlocalCoefs_(libmesh_nullptr),
+  nonlocalCoefs_(nullptr),
   last_edit(0),
   ignoreNonLocalEntries_(false)
 {
@@ -482,12 +482,12 @@ EpetraVector<T>::EpetraVector(Epetra_Vector & v,
   _destroy_vec_on_exit(false),
   myFirstID_(0),
   myNumIDs_(0),
-  myCoefs_(libmesh_nullptr),
-  nonlocalIDs_(libmesh_nullptr),
-  nonlocalElementSize_(libmesh_nullptr),
+  myCoefs_(nullptr),
+  nonlocalIDs_(nullptr),
+  nonlocalElementSize_(nullptr),
   numNonlocalIDs_(0),
   allocatedNonlocalLength_(0),
-  nonlocalCoefs_(libmesh_nullptr),
+  nonlocalCoefs_(nullptr),
   last_edit(0),
   ignoreNonLocalEntries_(false)
 {
@@ -525,12 +525,12 @@ EpetraVector<T>::EpetraVector (const Parallel::Communicator & comm,
   _destroy_vec_on_exit(true),
   myFirstID_(0),
   myNumIDs_(0),
-  myCoefs_(libmesh_nullptr),
-  nonlocalIDs_(libmesh_nullptr),
-  nonlocalElementSize_(libmesh_nullptr),
+  myCoefs_(nullptr),
+  nonlocalIDs_(nullptr),
+  nonlocalElementSize_(nullptr),
   numNonlocalIDs_(0),
   allocatedNonlocalLength_(0),
-  nonlocalCoefs_(libmesh_nullptr),
+  nonlocalCoefs_(nullptr),
   last_edit(0),
   ignoreNonLocalEntries_(false)
 {
@@ -673,7 +673,7 @@ void EpetraVector<T>::clear ()
       if (this->_destroy_vec_on_exit)
         {
           delete _vec;
-          _vec = libmesh_nullptr;
+          _vec = nullptr;
         }
 
       // But we currently always own our own _map

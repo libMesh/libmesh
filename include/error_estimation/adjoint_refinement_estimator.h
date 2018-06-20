@@ -96,7 +96,7 @@ public:
    */
   virtual void estimate_error (const System & system,
                                ErrorVector & error_per_cell,
-                               const NumericVector<Number> * solution_vector = libmesh_nullptr,
+                               const NumericVector<Number> * solution_vector = nullptr,
                                bool estimate_parent_error = false);
 
   /**
@@ -137,7 +137,7 @@ protected:
 
   /**
    * Pointer to object to use for physics assembly evaluations.
-   * Defaults to libmesh_nullptr for backwards compatibility.
+   * Defaults to nullptr for backwards compatibility.
    */
   DifferentiablePhysics * _residual_evaluation_physics;
 

@@ -76,8 +76,8 @@ extern "C" {
 #  include "libmesh/libmesh_augment_std_namespace.h"
 #endif
 
-// Make sure the C++03 compatible libmesh_nullptr is available
-// throughout the library.
+// Make sure the libmesh_nullptr define is available for backwards
+// compatibility, although we no longer use it in the library.
 #include "libmesh/libmesh_nullptr.h"
 
 namespace libMesh

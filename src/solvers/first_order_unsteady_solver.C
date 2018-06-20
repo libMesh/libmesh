@@ -46,7 +46,7 @@ bool FirstOrderUnsteadySolver::compute_second_order_eqns(bool compute_jacobian, 
       libmesh_assert( context.get_system().variable(var).type() ==
                       context.get_system().variable(dot_var).type() );
 
-      FEBase * elem_fe = libmesh_nullptr;
+      FEBase * elem_fe = nullptr;
       context.get_element_fe( var, elem_fe );
 
       const std::vector<Real> & JxW = elem_fe->get_JxW();

@@ -81,7 +81,7 @@ public:
   GenericProjector (const GenericProjector & in) :
     system(in.system),
     master_f(in.master_f),
-    master_g(in.master_g ? new GFunctor(*in.master_g) : libmesh_nullptr),
+    master_g(in.master_g ? new GFunctor(*in.master_g) : nullptr),
     g_was_copied(in.master_g),
     master_action(in.master_action),
     variables(in.variables)
@@ -207,14 +207,14 @@ class OldSolutionBase
 {
 public:
   OldSolutionBase(const libMesh::System & sys_in) :
-    last_elem(libmesh_nullptr),
+    last_elem(nullptr),
     sys(sys_in),
     old_context(sys_in)
   {
   }
 
   OldSolutionBase(const OldSolutionBase & in) :
-    last_elem(libmesh_nullptr),
+    last_elem(nullptr),
     sys(in.sys),
     old_context(sys)
   {
@@ -231,7 +231,7 @@ public:
     // Loop over variables, to prerequest
     for (unsigned int var=0; var!=sys.n_vars(); ++var)
       {
-        FEBase * fe = libmesh_nullptr;
+        FEBase * fe = nullptr;
         const std::set<unsigned char> & elem_dims =
           old_context.elem_dimensions();
 
@@ -592,9 +592,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
   for (const auto & var : variables)
     {
       // FIXME: Need to generalize this to vector-valued elements. [PB]
-      FEBase * fe = libmesh_nullptr;
-      FEBase * side_fe = libmesh_nullptr;
-      FEBase * edge_fe = libmesh_nullptr;
+      FEBase * fe = nullptr;
+      FEBase * side_fe = nullptr;
+      FEBase * edge_fe = nullptr;
 
       const std::set<unsigned char> & elem_dims =
         context.elem_dimensions();
@@ -724,9 +724,9 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
             }
 #endif // LIBMESH_ENABLE_AMR
 
-          FEBase * fe = libmesh_nullptr;
-          FEBase * side_fe = libmesh_nullptr;
-          FEBase * edge_fe = libmesh_nullptr;
+          FEBase * fe = nullptr;
+          FEBase * side_fe = nullptr;
+          FEBase * edge_fe = nullptr;
 
           context.get_element_fe( var, fe, dim );
           if (fe->get_fe_type().family == SCALAR)
@@ -1016,7 +1016,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 fe->get_phi() :
 #endif
                 edge_fe->get_phi();
-              const std::vector<std::vector<RealGradient>> * dphi = libmesh_nullptr;
+              const std::vector<std::vector<RealGradient>> * dphi = nullptr;
               if (cont == C_ONE)
                 dphi =
 #ifdef LIBMESH_ENABLE_AMR
@@ -1191,7 +1191,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
                 fe->get_phi() :
 #endif // LIBMESH_ENABLE_AMR
                 side_fe->get_phi();
-              const std::vector<std::vector<RealGradient>> * dphi = libmesh_nullptr;
+              const std::vector<std::vector<RealGradient>> * dphi = nullptr;
               if (cont == C_ONE)
                 dphi =
 #ifdef LIBMESH_ENABLE_AMR
@@ -1357,7 +1357,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::operator()
               const std::vector<Real> & JxW = fe->get_JxW();
 
               const std::vector<std::vector<Real>> & phi = fe->get_phi();
-              const std::vector<std::vector<RealGradient>> * dphi = libmesh_nullptr;
+              const std::vector<std::vector<RealGradient>> * dphi = nullptr;
               if (cont == C_ONE)
                 dphi = &(fe->get_dphi());
 

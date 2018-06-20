@@ -578,7 +578,7 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
         }
     };
 
-  const processor_id_type * ex = libmesh_nullptr;
+  const processor_id_type * ex = nullptr;
   Parallel::pull_parallel_vector_data
     (mesh.comm(), requested_node_ids, gather_functor, action_functor, ex);
 
@@ -723,7 +723,7 @@ void Partitioner::build_graph (const MeshBase & mesh)
       // adjacency corresponds to a face neighbor
       for (auto neighbor : elem->neighbor_ptr_range())
         {
-          if (neighbor != libmesh_nullptr)
+          if (neighbor != nullptr)
             {
               // If the neighbor is active treat it
               // as a connection
@@ -905,7 +905,7 @@ void Partitioner::assign_partitioning (const MeshBase & mesh, const std::vector<
     };
 
   // Trade requests with other processors
-  const processor_id_type * ex = libmesh_nullptr;
+  const processor_id_type * ex = nullptr;
   Parallel::pull_parallel_vector_data
     (mesh.comm(), requested_ids, gather_functor, action_functor, ex);
 

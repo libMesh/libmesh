@@ -692,7 +692,7 @@ void lagrange_compute_constraints (DofConstraints & constraints,
   // Look at the element faces.  Check to see if we need to
   // build constraints.
   for (auto s : elem->side_index_range())
-    if (elem->neighbor_ptr(s) != libmesh_nullptr &&
+    if (elem->neighbor_ptr(s) != nullptr &&
         elem->neighbor_ptr(s) != remote_elem)
       if (elem->neighbor_ptr(s)->level() < elem->level()) // constrain dofs shared between
         {                                                 // this element and ones coarser

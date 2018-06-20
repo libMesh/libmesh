@@ -90,8 +90,8 @@ std::unique_ptr<std::ofstream> _ofstream;
 // If std::cout and std::cerr are redirected, we need to
 // be a little careful and save the original streambuf objects,
 // replacing them in the destructor before program termination.
-std::streambuf * out_buf (libmesh_nullptr);
-std::streambuf * err_buf (libmesh_nullptr);
+std::streambuf * out_buf (nullptr);
+std::streambuf * err_buf (nullptr);
 
 std::unique_ptr<libMesh::Threads::task_scheduler_init> task_scheduler;
 #if defined(LIBMESH_HAVE_MPI)
@@ -498,14 +498,14 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       // which it does in the versions we've checked.
       if (!SlepcInitializeCalled)
         {
-          ierr = SlepcInitialize  (&argc, const_cast<char ***>(&argv), libmesh_nullptr, libmesh_nullptr);
+          ierr = SlepcInitialize  (&argc, const_cast<char ***>(&argv), nullptr, nullptr);
           CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
           libmesh_initialized_slepc = true;
         }
 # else
       if (libmesh_initialized_petsc)
         {
-          ierr = PetscInitialize (&argc, const_cast<char ***>(&argv), libmesh_nullptr, libmesh_nullptr);
+          ierr = PetscInitialize (&argc, const_cast<char ***>(&argv), nullptr, nullptr);
           CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
         }
 # endif
@@ -612,7 +612,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   // not to via the --keep-cout command-line argument.
   if (libMesh::global_processor_id() != 0)
     if (!libMesh::on_command_line ("--keep-cout"))
-      libMesh::out.rdbuf (libmesh_nullptr);
+      libMesh::out.rdbuf (nullptr);
 
   // Similarly, the user can request to drop cerr on all non-0 ranks.
   // By default, errors are printed on all ranks, but this can lead to
@@ -620,7 +620,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   // testing, which this option is designed to support.
   if (libMesh::global_processor_id() != 0)
     if (libMesh::on_command_line ("--drop-cerr"))
-      libMesh::err.rdbuf (libmesh_nullptr);
+      libMesh::err.rdbuf (nullptr);
 
   // Check command line to override printing
   // of reference count information.
@@ -822,9 +822,9 @@ void enableFPE(bool on)
       sigemptyset (&new_action.sa_mask);
       new_action.sa_flags = SA_SIGINFO;
 
-      sigaction (SIGFPE, libmesh_nullptr, &old_action);
+      sigaction (SIGFPE, nullptr, &old_action);
       if (old_action.sa_handler != SIG_IGN)
-        sigaction (SIGFPE, &new_action, libmesh_nullptr);
+        sigaction (SIGFPE, &new_action, nullptr);
 #endif
     }
   else
@@ -864,7 +864,7 @@ void enableSEGV(bool on)
   else if (was_on)
     {
       was_on = false;
-      sigaction (SIGSEGV, &old_action, libmesh_nullptr);
+      sigaction (SIGSEGV, &old_action, nullptr);
     }
 #else
   libmesh_error_msg("System call sigaction not supported.");

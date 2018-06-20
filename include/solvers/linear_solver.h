@@ -104,7 +104,7 @@ public:
    * Initialize data structures if not done so already.
    * May assign a name to the solver in some implementations
    */
-  virtual void init (const char * name = libmesh_nullptr) = 0;
+  virtual void init (const char * name = nullptr) = 0;
 
   /**
    * Apply names to the system to be solved.  For most packages this

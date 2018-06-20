@@ -214,7 +214,7 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
             // adjacency corresponds to a face neighbor
             for (auto neighbor : elem->neighbor_ptr_range())
               {
-                if (neighbor != libmesh_nullptr)
+                if (neighbor != nullptr)
                   {
                     // If the neighbor is active, but is not in the
                     // range of elements being partitioned, treat it
@@ -316,7 +316,7 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
             // adjacency corresponds to a face neighbor
             for (auto neighbor : elem->neighbor_ptr_range())
               {
-                if (neighbor != libmesh_nullptr)
+                if (neighbor != nullptr)
                   {
                     // If the neighbor is active, but is not in the
                     // range of elements being partitioned, treat it
@@ -439,12 +439,12 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                                         &csr_graph.offsets[0],
                                         &csr_graph.vals[0],
                                         &vwgt[0],
-                                        libmesh_nullptr,
-                                        libmesh_nullptr,
+                                        nullptr,
+                                        nullptr,
                                         &nparts,
-                                        libmesh_nullptr,
-                                        libmesh_nullptr,
-                                        libmesh_nullptr,
+                                        nullptr,
+                                        nullptr,
+                                        nullptr,
                                         &edgecut,
                                         &part[0]);
 
@@ -455,12 +455,12 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
                                    &csr_graph.offsets[0],
                                    &csr_graph.vals[0],
                                    &vwgt[0],
-                                   libmesh_nullptr,
-                                   libmesh_nullptr,
+                                   nullptr,
+                                   nullptr,
                                    &nparts,
-                                   libmesh_nullptr,
-                                   libmesh_nullptr,
-                                   libmesh_nullptr,
+                                   nullptr,
+                                   nullptr,
+                                   nullptr,
                                    &edgecut,
                                    &part[0]);
 

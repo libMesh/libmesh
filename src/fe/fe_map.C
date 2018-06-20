@@ -1414,7 +1414,7 @@ void FEMap::compute_map(const unsigned int dim,
   else
     {
       // All other FE use only the nodes of elem itself
-      elem_nodes.resize(elem->n_nodes(), libmesh_nullptr);
+      elem_nodes.resize(elem->n_nodes(), nullptr);
       for (unsigned int i=0; i<elem->n_nodes(); i++)
         elem_nodes[i] = elem->node_ptr(i);
     }

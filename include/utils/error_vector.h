@@ -59,7 +59,7 @@ public:
    * ErrorVector will assume that all 0.0 error values correspond to inactive
    * elements and all non-zero error values correspond to active elements.
    */
-  ErrorVector(dof_id_type i=0, MeshBase * mesh = libmesh_nullptr) :
+  ErrorVector(dof_id_type i=0, MeshBase * mesh = nullptr) :
     StatisticsVector<ErrorVectorReal> (i),
     _mesh(mesh)
   {}

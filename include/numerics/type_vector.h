@@ -97,7 +97,7 @@ protected:
   TypeVector (const Scalar x,
               typename
               boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
-              const Scalar>::type * sfinae = libmesh_nullptr);
+              const Scalar>::type * sfinae = nullptr);
 
 public:
 

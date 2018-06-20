@@ -324,7 +324,7 @@ void sync_dofobject_data_by_xyz(const Communicator & comm,
     };
 
   // Trade requests with other processors
-  typename SyncFunctor::datum * ex = libmesh_nullptr;
+  typename SyncFunctor::datum * ex = nullptr;
   pull_parallel_vector_data
     (comm, requested_objs_pt, gather_functor, action_functor, ex);
 }
@@ -415,7 +415,7 @@ void sync_dofobject_data_by_id(const Communicator & comm,
     };
 
   // Trade requests with other processors
-  typename SyncFunctor::datum * ex = libmesh_nullptr;
+  typename SyncFunctor::datum * ex = nullptr;
   pull_parallel_vector_data
     (comm, requested_objs_id, gather_functor, action_functor, ex);
 }
@@ -522,7 +522,7 @@ void sync_element_data_by_parent_id(MeshBase &       mesh,
     };
 
   // Trade requests with other processors
-  typename SyncFunctor::datum * ex = libmesh_nullptr;
+  typename SyncFunctor::datum * ex = nullptr;
   pull_parallel_vector_data
     (comm, requested_objs_parent_id_child_num, gather_functor,
      action_functor, ex);
@@ -672,7 +672,7 @@ bool sync_node_data_by_element_id_once(MeshBase & mesh,
     };
 
   // Trade requests with other processors
-  typename SyncFunctor::datum * ex = libmesh_nullptr;
+  typename SyncFunctor::datum * ex = nullptr;
   pull_parallel_vector_data
     (comm, requested_objs_elem_id_node_num, gather_functor,
      action_functor, ex);

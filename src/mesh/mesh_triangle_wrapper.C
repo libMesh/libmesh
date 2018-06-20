@@ -33,33 +33,33 @@ namespace libMesh
 
 void TriangleWrapper::init(TriangleWrapper::triangulateio & t)
 {
-  t.pointlist                    = static_cast<REAL*>(libmesh_nullptr);
-  t.pointattributelist           = static_cast<REAL*>(libmesh_nullptr);
-  t.pointmarkerlist              = static_cast<int *>(libmesh_nullptr);
+  t.pointlist                    = static_cast<REAL*>(nullptr);
+  t.pointattributelist           = static_cast<REAL*>(nullptr);
+  t.pointmarkerlist              = static_cast<int *>(nullptr);
   t.numberofpoints               = 0 ;
   t.numberofpointattributes      = 0 ;
 
-  t.trianglelist                 = static_cast<int *>(libmesh_nullptr);
-  t.triangleattributelist        = static_cast<REAL*>(libmesh_nullptr);
-  t.trianglearealist             = static_cast<REAL*>(libmesh_nullptr);
-  t.neighborlist                 = static_cast<int *>(libmesh_nullptr);
+  t.trianglelist                 = static_cast<int *>(nullptr);
+  t.triangleattributelist        = static_cast<REAL*>(nullptr);
+  t.trianglearealist             = static_cast<REAL*>(nullptr);
+  t.neighborlist                 = static_cast<int *>(nullptr);
   t.numberoftriangles            = 0;
   t.numberofcorners              = 0;
   t.numberoftriangleattributes   = 0;
 
-  t.segmentlist                  = static_cast<int *>(libmesh_nullptr);
-  t.segmentmarkerlist            = static_cast<int *>(libmesh_nullptr);
+  t.segmentlist                  = static_cast<int *>(nullptr);
+  t.segmentmarkerlist            = static_cast<int *>(nullptr);
   t.numberofsegments             = 0;
 
-  t.holelist                     = static_cast<REAL*>(libmesh_nullptr);
+  t.holelist                     = static_cast<REAL*>(nullptr);
   t.numberofholes                = 0;
 
-  t.regionlist                   = static_cast<REAL*>(libmesh_nullptr);
+  t.regionlist                   = static_cast<REAL*>(nullptr);
   t.numberofregions              = 0;
 
-  t.edgelist                     = static_cast<int *>(libmesh_nullptr);
-  t.edgemarkerlist               = static_cast<int *>(libmesh_nullptr);
-  t.normlist                     = static_cast<REAL*>(libmesh_nullptr);
+  t.edgelist                     = static_cast<int *>(nullptr);
+  t.edgemarkerlist               = static_cast<int *>(nullptr);
+  t.normlist                     = static_cast<REAL*>(nullptr);
   t.numberofedges                = 0;
 }
 

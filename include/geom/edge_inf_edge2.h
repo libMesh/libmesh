@@ -57,7 +57,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  InfEdge2 (Elem * p=libmesh_nullptr) :
+  InfEdge2 (Elem * p=nullptr) :
     Edge(InfEdge2::n_nodes(), p, _nodelinks_data) {}
 
   InfEdge2 (InfEdge2 &&) = delete;

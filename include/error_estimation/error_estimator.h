@@ -87,7 +87,7 @@ public:
    * in derived classes to compute the error for each
    * active element and place it in the "error_per_cell" vector.
    *
-   * If solution_vector is not libmesh_nullptr, the estimator will
+   * If solution_vector is not nullptr, the estimator will
    * (if able) attempt to estimate an error in that field
    * instead of in system.solution.
    *
@@ -97,7 +97,7 @@ public:
    */
   virtual void estimate_error (const System & system,
                                ErrorVector & error_per_cell,
-                               const NumericVector<Number> * solution_vector = libmesh_nullptr,
+                               const NumericVector<Number> * solution_vector = nullptr,
                                bool estimate_parent_error = false) = 0;
 
   /**
@@ -114,7 +114,7 @@ public:
   virtual void estimate_errors (const EquationSystems & equation_systems,
                                 ErrorVector & error_per_cell,
                                 const std::map<const System *, SystemNorm> & error_norms,
-                                const std::map<const System *, const NumericVector<Number> *> * solution_vectors = libmesh_nullptr,
+                                const std::map<const System *, const NumericVector<Number> *> * solution_vectors = nullptr,
                                 bool estimate_parent_error = false);
 
   /**
@@ -137,7 +137,7 @@ public:
    */
   virtual void estimate_errors (const EquationSystems & equation_systems,
                                 ErrorMap & errors_per_cell,
-                                const std::map<const System *, const NumericVector<Number> *> * solution_vectors = libmesh_nullptr,
+                                const std::map<const System *, const NumericVector<Number> *> * solution_vectors = nullptr,
                                 bool estimate_parent_error = false);
 
   /**
