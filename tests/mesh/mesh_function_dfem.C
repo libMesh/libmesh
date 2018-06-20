@@ -186,7 +186,7 @@ public:
     sys.add_variable("u", CONSTANT, MONOMIAL);
 
     es.init();
-    sys.project_solution(position_function, NULL, es.parameters);
+    sys.project_solution(position_function, nullptr, es.parameters);
 
     std::vector<unsigned int> variables;
     sys.get_all_variable_numbers(variables);
@@ -254,7 +254,7 @@ public:
     sys.add_variable("u", FIRST, LAGRANGE);
 
     es.init();
-    sys.project_solution(position_function2, NULL, es.parameters);
+    sys.project_solution(position_function2, nullptr, es.parameters);
 
     std::vector<unsigned int> variables;
     sys.get_all_variable_numbers(variables);
