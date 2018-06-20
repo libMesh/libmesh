@@ -626,10 +626,9 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
 
       // Filter that list against the _output_variables list.  Note: if names is still empty after
       // all this filtering, all the monomial variables will be gathered
-      std::vector<std::string>::iterator it = monomials.begin();
-      for (; it!=monomials.end(); ++it)
-        if (std::find(_output_variables.begin(), _output_variables.end(), *it) != _output_variables.end())
-          names.push_back(*it);
+      for (const auto & var : monomials)
+        if (std::find(_output_variables.begin(), _output_variables.end(), var) != _output_variables.end())
+          names.push_back(var);
     }
 
   // If we pass in a list of names to "get_solution" it'll filter the variables coming back
