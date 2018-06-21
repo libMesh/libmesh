@@ -2541,6 +2541,18 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
 
 
 
+void
+Nemesis_IO_Helper::write_element_values(const MeshBase & /*mesh*/,
+                                        const NumericVector<Number> & /*parallel_soln*/,
+                                        int /*timestep*/,
+                                        const std::vector<std::set<subdomain_id_type>> & /*vars_active_subdomains*/)
+{
+  if (verbose)
+    libMesh::out << "Called Nemesis_IO_Helper::write_element_values()" << std::endl;
+}
+
+
+
 std::string Nemesis_IO_Helper::construct_nemesis_filename(const std::string & base_filename)
 {
   // Build a filename for this processor.  This code is cut-n-pasted from the read function

@@ -1453,6 +1453,13 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   // table" to the Exodus file. Not sure if this will work for
   // Nemesis...
   nemhelper->initialize_element_variables(names, vars_active_subdomains);
+
+  // Call (non-virtual) function to write the elemental data in
+  // parallel.  This function is named similarly to the corresponding
+  // function in the Exodus helper, but it has a different calling
+  // sequence and is not virtual or an override.
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+  nemhelper->write_element_values(mesh, *parallel_soln, _timestep, vars_active_subdomains);
 }
 
 #else
