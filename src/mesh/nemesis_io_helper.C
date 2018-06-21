@@ -2553,6 +2553,19 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & /*mesh*/,
 
   // The goal is to eventually call exII::ex_put_elem_var for each
   // variable on each subdomain where it is active.
+
+  // For each variable in names
+  //   For each subdomain,
+  //     For each active, local element
+  //       ...
+
+  libMesh::out << "libmesh_elem_ids on this processor = ";
+  for (dof_id_type i=0; i<this->exodus_elem_num_to_libmesh.size(); ++i)
+    {
+      dof_id_type libmesh_elem_id = this->exodus_elem_num_to_libmesh[i];
+      libMesh::out << libmesh_elem_id << " ";
+    }
+  libMesh::out << std::endl;
 }
 
 
