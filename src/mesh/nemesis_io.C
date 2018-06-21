@@ -1309,20 +1309,19 @@ void Nemesis_IO::prepare_to_write_nodal_data (const std::string & fname,
           if ((mesh.get_boundary_info().n_edge_conds() > 0) && _verbose)
             libmesh_warning("Warning: Mesh contains edge boundary IDs, but these "
                             "are not supported by the ExodusII format.");
-
-          // If we don't have any nodes written out on this processor,
-          // Exodus seems to like us better if we don't try to write out any
-          // variable names too...
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-
-          std::vector<std::string> complex_names = nemhelper->get_complex_names(names);
-
-          nemhelper->initialize_nodal_variables(complex_names);
-#else
-          nemhelper->initialize_nodal_variables(names);
-#endif
         }
     }
+
+  // Even if we were already open for writing, we might not have
+  // initialized the nodal variable names yet. Even if we did, it
+  // should not hurt to call this twice because the routine sets a
+  // flag the first time it is called.
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  std::vector<std::string> complex_names = nemhelper->get_complex_names(names);
+  nemhelper->initialize_nodal_variables(complex_names);
+#else
+  nemhelper->initialize_nodal_variables(names);
+#endif
 }
 
 #else
