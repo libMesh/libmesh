@@ -170,20 +170,30 @@ public:
   static void set_node_processor_ids(MeshBase & mesh);
 
   /**
-  * Evenly assign nodes on the partitioning interface
-  */
-  static void set_node_processor_ids_on_interface(MeshBase & mesh);
+   * On the partitioning interface, a surface is shared by two and only two processors.
+   * Try to find which pair of processors corresponds to which surfaces, and store their
+   * nodes.
+   */
+  static void processor_pairs_to_interface_nodes(MeshBase & mesh, std::map<std::pair<processor_id_type, processor_id_type>, std::set<dof_id_type>> & processor_pair_to_nodes);
 
   /**
-  * Setup node id using queue
+  * Nodes on the partitioning interface is linearly assigned to
+  * each pair of processors
   */
-  static void set_node_processor_ids_on_interface_using_queue(MeshBase & mesh);
+  static void set_interface_node_processor_ids_linear(MeshBase & mesh);
+
+  /**
+  * Nodes on the partitioning interface is clustered into two groups BFS (Breadth First Search)scheme
+  * for per pair of processors
+  */
+  static void set_interface_node_processor_ids_BFS(MeshBase & mesh);
 
 
   /**
-  * Setup node id using queue
+  * Nodes on the partitioning interface is partitioned into two groups using a PETSc partitioner
+  * for each pair of processors
   */
-  static void set_node_processor_ids_on_interface_using_petscpartition(MeshBase & mesh);
+  static void set_interface_node_processor_ids_petscpartitioner(MeshBase & mesh);
 
   /**
    * Attach weights that can be used for partitioning.  This ErrorVector should be
