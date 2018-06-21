@@ -2543,7 +2543,7 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
 
 void
 Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
-                                        const NumericVector<Number> & /*parallel_soln*/,
+                                        const NumericVector<Number> & parallel_soln,
                                         const std::vector<std::string> & names,
                                         int /*timestep*/,
                                         const std::vector<std::set<subdomain_id_type>> & /*vars_active_subdomains*/)
@@ -2554,9 +2554,9 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
   // The goal is to eventually call exII::ex_put_elem_var for each
   // variable on each subdomain where it is active.
 
-  // For each variable in names
+  // For each variable in names,
   //   For each subdomain,
-  //     For each active, local element
+  //     For each element that we wrote to the Nemesis file,
   //       ...
 
   // The total number of elements in the mesh. We need this for
@@ -2565,6 +2565,15 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
 
   for (unsigned int v=0; v<names.size(); ++v)
     {
+      // We may have written elements for different subdomains, and
+      // num_elem should include the total number of elements written.
+      std::size_t num_elem = this->exodus_elem_num_to_libmesh.size();
+
+      // We'll reserve enough space in required_indices to hold all
+      // num_elem, but we might not actually need this much space...
+      std::vector<numeric_index_type> required_indices;
+      required_indices.reserve(num_elem);
+
       libMesh::out << "(libmesh_elem_id, required_index) on this processor for variable " << names[v] << " = ";
       for (dof_id_type i=0; i<this->exodus_elem_num_to_libmesh.size(); ++i)
         {
@@ -2574,7 +2583,19 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
           dof_id_type required_index = (v * parallel_n_elem) + libmesh_elem_id;
 
           libMesh::out << "(" << libmesh_elem_id << ", " << required_index << ") ";
+
+          required_indices.push_back(required_index);
         }
+      libMesh::out << std::endl;
+
+      // Now that the list of required_indices is built, we can
+      // localize just the part we need to the current processor.
+      std::vector<Number> local_soln;
+      parallel_soln.localize(local_soln, required_indices);
+
+      libMesh::out << "Values to be written on this processor for variable " << names[v] << " = ";
+      for (const auto & val : local_soln)
+        libMesh::out << val << " ";
       libMesh::out << std::endl;
     }
 }
