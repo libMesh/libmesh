@@ -1204,9 +1204,8 @@ void Nemesis_IO::write (const std::string & base_filename)
   // data, while "appending" is really intended to add data to an
   // existing file.  If we're verbose, print a message to this effect.
   if (_append && _verbose)
-    libMesh::out << "Warning: Appending in Nemesis_IO::write() does not make sense.\n"
-                 << "Creating a new file instead!"
-                 << std::endl;
+    libmesh_warning("Warning: Appending in Nemesis_IO::write() does not make sense.\n"
+                    "Creating a new file instead!");
 
   nemhelper->create(nemesis_filename);
 
@@ -1234,11 +1233,8 @@ void Nemesis_IO::write (const std::string & base_filename)
   nemhelper->ex_err = exII::ex_update(nemhelper->ex_id);
 
   if ((mesh.get_boundary_info().n_edge_conds() > 0) && _verbose)
-    {
-      libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
-                   << "are not supported by the Nemesis format."
-                   << std::endl;
-    }
+    libmesh_warning("Warning: Mesh contains edge boundary IDs, but these "
+                    "are not supported by the Nemesis format.");
 }
 
 #else
@@ -1311,11 +1307,8 @@ void Nemesis_IO::prepare_to_write_nodal_data (const std::string & fname,
           nemhelper->write_sidesets(mesh);
 
           if ((mesh.get_boundary_info().n_edge_conds() > 0) && _verbose)
-            {
-              libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
-                           << "are not supported by the ExodusII format."
-                           << std::endl;
-            }
+            libmesh_warning("Warning: Mesh contains edge boundary IDs, but these "
+                            "are not supported by the ExodusII format.");
 
           // If we don't have any nodes written out on this processor,
           // Exodus seems to like us better if we don't try to write out any
