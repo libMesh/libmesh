@@ -2551,8 +2551,24 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
   if (verbose)
     libMesh::out << "Called Nemesis_IO_Helper::write_element_values()" << std::endl;
 
-  // The goal is to eventually call exII::ex_put_elem_var(ex_id, timestep, v+1, block_id, num_elem, &local_soln) for each
-  // variable on each subdomain where it is active.
+  // The goal is to eventually call
+  // exII::ex_put_elem_var(ex_id, timestep, v+1, block_id, num_elem, &local_soln)
+  // for each variable on each subdomain where it is active.
+
+  // Construct a map from subdomain_id -> [element ids] for each of the elements
+  // we are responsible for.
+  std::map<subdomain_id_type, std::vector<dof_id_type>> subdomain_map;
+  for (dof_id_type i=0; i<this->exodus_elem_num_to_libmesh.size(); ++i)
+    {
+      // Look up the elem id for exdous element i.
+      dof_id_type libmesh_elem_id = this->exodus_elem_num_to_libmesh[i];
+
+      // Get a pointer to that Elem from the Mesh.
+      const Elem * elem = mesh.elem_ptr(libmesh_elem_id);
+
+      // Add this elem id to the list of ids for this subdomain.
+      subdomain_map[elem->subdomain_id()].push_back(elem->id());
+    }
 
   // For each variable in names,
   //   For each subdomain,
