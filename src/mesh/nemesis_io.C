@@ -1424,6 +1424,29 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
       libMesh::out << "parallel_soln->size()= " << parallel_soln->size() << std::endl;
       libMesh::out << "parallel_soln->local_size()= " << parallel_soln->local_size() << std::endl;
     }
+
+  // Store the list of subdomains on which each variable *that we are
+  // going to plot* is active. Note: if any of these sets is _empty_,
+  // the variable in question is active on _all_ subdomains.
+  std::vector<std::set<subdomain_id_type>> vars_active_subdomains;
+  es.get_vars_active_subdomains(names, vars_active_subdomains);
+
+  if (_verbose)
+    {
+      unsigned idx=0;
+      for (const auto & s : vars_active_subdomains)
+        {
+          libMesh::out << "Active subdomains for variable " << names[idx++] << ": " << std::endl;
+          if (s.empty())
+            libMesh::out << "all" << std::endl;
+          else
+            {
+              for (const auto & sbd : s)
+                libMesh::out << sbd << " ";
+            }
+          libMesh::out << std::endl;
+        }
+    }
 }
 
 #else
