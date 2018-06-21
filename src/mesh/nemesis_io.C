@@ -1459,7 +1459,11 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   // function in the Exodus helper, but it has a different calling
   // sequence and is not virtual or an override.
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
-  nemhelper->write_element_values(mesh, *parallel_soln, _timestep, vars_active_subdomains);
+  nemhelper->write_element_values(mesh,
+                                  *parallel_soln,
+                                  names,
+                                  _timestep,
+                                  vars_active_subdomains);
 }
 
 #else

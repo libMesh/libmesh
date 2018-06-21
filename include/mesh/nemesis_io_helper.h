@@ -328,6 +328,7 @@ public:
    */
   void write_element_values(const MeshBase & mesh,
                             const NumericVector<Number> & parallel_soln,
+                            const std::vector<std::string> & names,
                             int timestep,
                             const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains);
 

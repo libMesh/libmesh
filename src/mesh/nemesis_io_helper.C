@@ -2544,11 +2544,15 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
 void
 Nemesis_IO_Helper::write_element_values(const MeshBase & /*mesh*/,
                                         const NumericVector<Number> & /*parallel_soln*/,
+                                        const std::vector<std::string> & /*names*/,
                                         int /*timestep*/,
                                         const std::vector<std::set<subdomain_id_type>> & /*vars_active_subdomains*/)
 {
   if (verbose)
     libMesh::out << "Called Nemesis_IO_Helper::write_element_values()" << std::endl;
+
+  // The goal is to eventually call exII::ex_put_elem_var for each
+  // variable on each subdomain where it is active.
 }
 
 
