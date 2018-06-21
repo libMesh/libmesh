@@ -192,7 +192,7 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
   // Only construct however many levels were requested if something was actually requested
   if ( usr_requested_mg_lvls != 0 )
     {
-      // Dont request more than avail num levels, require at least 2 levels
+      // Dont request more than avail num levels on mesh, require at least 2 levels
       libmesh_assert_less_equal( (unsigned int)usr_requested_mg_lvls, n_levels );
       libmesh_assert( usr_requested_mg_lvls > 1 );
 
@@ -266,11 +266,6 @@ void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
           START_LOG ("PDM_dist_dof", "PetscDMWrapper");
           system.get_dof_map().distribute_dofs(mesh);
           STOP_LOG  ("PDM_dist_dof", "PetscDMWrapper");
-
-          START_LOG ("PDM_cnstrnts", "PetscDMWrapper");
-          system.reinit_constraints();
-          STOP_LOG  ("PDM_cnstrnts", "PetscDMWrapper");
-
         }
     } // End PETSc data structure creation
 
