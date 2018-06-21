@@ -2546,14 +2546,10 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                         const NumericVector<Number> & parallel_soln,
                                         const std::vector<std::string> & names,
                                         int timestep,
-                                        const std::vector<std::set<subdomain_id_type>> & /*vars_active_subdomains*/)
+                                        const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
 {
   if (verbose)
     libMesh::out << "Called Nemesis_IO_Helper::write_element_values()" << std::endl;
-
-  // The goal is to eventually call
-  // exII::ex_put_elem_var(ex_id, timestep, v+1, block_id, num_elem, &local_soln)
-  // for each variable on each subdomain where it is active.
 
   // Construct a map from subdomain_id -> [element ids] for each of the elements
   // we are responsible for.
@@ -2570,58 +2566,46 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
       subdomain_map[elem->subdomain_id()].push_back(elem->id());
     }
 
-  // For each variable in names,
-  //   For each subdomain,
-  //     For each element that we wrote to the Nemesis file,
-  //       ...
-
   // The total number of elements in the mesh. We need this for
   // indexing into parallel_soln.
   dof_id_type parallel_n_elem = mesh.parallel_n_elem();
 
+  // For each variable in names,
+  //   For each subdomain in subdomain_map,
+  //     If this (subdomain, variable) combination is active
+  //       For each element that we wrote to the Nemesis file,
+  //         ...
   for (unsigned int v=0; v<names.size(); ++v)
     {
-      // We may have written elements for different subdomains, and
-      // num_elem should include the total number of elements written.
-      std::size_t num_elem = this->exodus_elem_num_to_libmesh.size();
+      // Get list of active subdomains for variable v
+      const auto & active_subdomains = vars_active_subdomains[v];
 
-      // We'll reserve enough space in required_indices to hold all
-      // num_elem, but we might not actually need this much space...
-      std::vector<numeric_index_type> required_indices;
-      required_indices.reserve(num_elem);
-
-      libMesh::out << "(libmesh_elem_id, required_index) on this processor for variable " << names[v] << " = ";
-      for (dof_id_type i=0; i<this->exodus_elem_num_to_libmesh.size(); ++i)
+      for (const auto & pr : subdomain_map)
         {
-          dof_id_type libmesh_elem_id = this->exodus_elem_num_to_libmesh[i];
+          subdomain_id_type sbd_id = pr.first;
+          const std::vector<dof_id_type> & elem_ids = pr.second;
 
-          // Convert libmesh_elem_id into a required index.
-          dof_id_type required_index = (v * parallel_n_elem) + libmesh_elem_id;
+          // Possibly skip this (variable, subdomain) combination
+          if (active_subdomains.empty() || active_subdomains.count(sbd_id))
+            {
+              std::vector<numeric_index_type> required_indices;
+              required_indices.reserve(elem_ids.size());
 
-          libMesh::out << "(" << libmesh_elem_id << ", " << required_index << ") ";
+              for (const auto & id : elem_ids)
+                required_indices.push_back(v * parallel_n_elem + id);
 
-          required_indices.push_back(required_index);
+              std::vector<Number> local_soln;
+              parallel_soln.localize(local_soln, required_indices);
+
+              ex_err = exII::ex_put_elem_var(ex_id,
+                                             timestep,
+                                             static_cast<int>(v+1),
+                                             static_cast<int>(sbd_id),
+                                             static_cast<int>(local_soln.size()),
+                                             &local_soln[0]);
+              EX_CHECK_ERR(ex_err, "Error writing element values.");
+            }
         }
-      libMesh::out << std::endl;
-
-      // Now that the list of required_indices is built, we can
-      // localize just the part we need to the current processor.
-      std::vector<Number> local_soln;
-      parallel_soln.localize(local_soln, required_indices);
-
-      libMesh::out << "Values to be written on this processor for variable " << names[v] << " = ";
-      for (const auto & val : local_soln)
-        libMesh::out << val << " ";
-      libMesh::out << std::endl;
-
-      // Write local_soln values to file.
-      ex_err = exII::ex_put_elem_var(ex_id,
-                                     timestep,
-                                     static_cast<int>(v+1),
-                                     0, // FIXME: block ids are zero-based, but we should call the this->get_block_id(j) helper function in practice!
-                                     static_cast<int>(local_soln.size()),
-                                     &local_soln[0]);
-      EX_CHECK_ERR(ex_err, "Error writing element values.");
     } // end loop over vars
 
   ex_err = exII::ex_update(ex_id);
