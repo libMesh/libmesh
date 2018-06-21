@@ -1447,6 +1447,12 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
           libMesh::out << std::endl;
         }
     }
+
+  // Call function (defined in the Exodus helper) that writes the
+  // elemental variable names. This also apparently writes a "truth
+  // table" to the Exodus file. Not sure if this will work for
+  // Nemesis...
+  nemhelper->initialize_element_variables(names, vars_active_subdomains);
 }
 
 #else
