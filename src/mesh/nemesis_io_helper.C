@@ -2545,13 +2545,13 @@ void
 Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                         const NumericVector<Number> & parallel_soln,
                                         const std::vector<std::string> & names,
-                                        int /*timestep*/,
+                                        int timestep,
                                         const std::vector<std::set<subdomain_id_type>> & /*vars_active_subdomains*/)
 {
   if (verbose)
     libMesh::out << "Called Nemesis_IO_Helper::write_element_values()" << std::endl;
 
-  // The goal is to eventually call exII::ex_put_elem_var for each
+  // The goal is to eventually call exII::ex_put_elem_var(ex_id, timestep, v+1, block_id, num_elem, &local_soln) for each
   // variable on each subdomain where it is active.
 
   // For each variable in names,
@@ -2597,7 +2597,19 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
       for (const auto & val : local_soln)
         libMesh::out << val << " ";
       libMesh::out << std::endl;
-    }
+
+      // Write local_soln values to file.
+      ex_err = exII::ex_put_elem_var(ex_id,
+                                     timestep,
+                                     static_cast<int>(v+1),
+                                     0, // FIXME: block ids are zero-based, but we should call the this->get_block_id(j) helper function in practice!
+                                     static_cast<int>(local_soln.size()),
+                                     &local_soln[0]);
+      EX_CHECK_ERR(ex_err, "Error writing element values.");
+    } // end loop over vars
+
+  ex_err = exII::ex_update(ex_id);
+  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
 }
 
 
