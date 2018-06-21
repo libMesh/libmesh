@@ -2542,9 +2542,9 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
 
 
 void
-Nemesis_IO_Helper::write_element_values(const MeshBase & /*mesh*/,
+Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                         const NumericVector<Number> & /*parallel_soln*/,
-                                        const std::vector<std::string> & /*names*/,
+                                        const std::vector<std::string> & names,
                                         int /*timestep*/,
                                         const std::vector<std::set<subdomain_id_type>> & /*vars_active_subdomains*/)
 {
@@ -2559,13 +2559,24 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & /*mesh*/,
   //     For each active, local element
   //       ...
 
-  libMesh::out << "libmesh_elem_ids on this processor = ";
-  for (dof_id_type i=0; i<this->exodus_elem_num_to_libmesh.size(); ++i)
+  // The total number of elements in the mesh. We need this for
+  // indexing into parallel_soln.
+  dof_id_type parallel_n_elem = mesh.parallel_n_elem();
+
+  for (unsigned int v=0; v<names.size(); ++v)
     {
-      dof_id_type libmesh_elem_id = this->exodus_elem_num_to_libmesh[i];
-      libMesh::out << libmesh_elem_id << " ";
+      libMesh::out << "(libmesh_elem_id, required_index) on this processor for variable " << names[v] << " = ";
+      for (dof_id_type i=0; i<this->exodus_elem_num_to_libmesh.size(); ++i)
+        {
+          dof_id_type libmesh_elem_id = this->exodus_elem_num_to_libmesh[i];
+
+          // Convert libmesh_elem_id into a required index.
+          dof_id_type required_index = (v * parallel_n_elem) + libmesh_elem_id;
+
+          libMesh::out << "(" << libmesh_elem_id << ", " << required_index << ") ";
+        }
+      libMesh::out << std::endl;
     }
-  libMesh::out << std::endl;
 }
 
 
