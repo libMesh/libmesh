@@ -38,7 +38,7 @@ namespace libMesh
  * \date 2014
  * \brief Implements 1D and 2/3D tensor product Gauss-Lobatto quadrature rules.
  */
-class QGaussLobatto libmesh_final : public QBase
+class QGaussLobatto final : public QBase
 {
 public:
 

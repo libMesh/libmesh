@@ -93,7 +93,7 @@ namespace libMesh
  * \date 2008
  * \brief Implements the quadrature rules of Grundmann and Moller in 2D and 3D.
  */
-class QGrundmann_Moller libmesh_final : public QBase
+class QGrundmann_Moller final : public QBase
 {
 public:
 

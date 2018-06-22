@@ -65,7 +65,7 @@ namespace libMesh
  * \date 2002
  * \brief A 3D hexahedral element with 27 nodes.
  */
-class Hex27 libmesh_final : public Hex
+class Hex27 final : public Hex
 {
 public:
 

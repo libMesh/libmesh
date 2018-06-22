@@ -48,7 +48,7 @@ template <typename T> class SparseMatrix;
  * \date 2002
  */
 template <typename T>
-class EigenSparseVector libmesh_final : public NumericVector<T>
+class EigenSparseVector final : public NumericVector<T>
 {
 public:
 

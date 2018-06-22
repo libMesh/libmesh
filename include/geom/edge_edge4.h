@@ -41,7 +41,7 @@ namespace libMesh
  * \date 2005
  * \brief A 1D geometric element with 4 nodes.
  */
-class Edge4 libmesh_final : public Edge
+class Edge4 final : public Edge
 {
 public:
 

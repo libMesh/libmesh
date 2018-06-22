@@ -34,7 +34,7 @@ namespace libMesh
  * \date 2005
  * \brief Implements quadrature rules for Clough-Tocher macroelements.
  */
-class QClough libmesh_final : public QBase
+class QClough final : public QBase
 {
 public:
 

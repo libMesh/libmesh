@@ -55,7 +55,7 @@ namespace libMesh
  * \date 2008
  * \brief Implements quadrature rules for non-tensor polynomials.
  */
-class QMonomial libmesh_final : public QBase
+class QMonomial final : public QBase
 {
 public:
 

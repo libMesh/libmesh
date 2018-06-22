@@ -53,7 +53,7 @@ template <typename T> class LaspackLinearSolver;
  * \date 2003
  */
 template <typename T>
-class LaspackMatrix libmesh_final : public SparseMatrix<T>
+class LaspackMatrix final : public SparseMatrix<T>
 {
 
 public:

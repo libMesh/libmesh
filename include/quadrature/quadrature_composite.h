@@ -49,7 +49,7 @@ namespace libMesh
  * \brief A quadrature rule for subdivided elements.
  */
 template <class QSubCell>
-class QComposite libmesh_final : public QSubCell
+class QComposite final : public QSubCell
 {
 public:
 

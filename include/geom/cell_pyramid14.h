@@ -68,7 +68,7 @@ namespace libMesh
  * \date 2013
  * \brief A 3D pyramid element with 14 nodes.
  */
-class Pyramid14 libmesh_final : public Pyramid
+class Pyramid14 final : public Pyramid
 {
 public:
 

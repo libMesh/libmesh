@@ -49,7 +49,7 @@ namespace libMesh
  * \date 2002
  * \brief A 3D pyramid element with 5 nodes.
  */
-class Pyramid5 libmesh_final : public Pyramid
+class Pyramid5 final : public Pyramid
 {
 public:
 

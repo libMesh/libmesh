@@ -50,7 +50,7 @@ namespace libMesh
  * \date 2002
  * \brief A 3D hexahedral element with 8 nodes.
  */
-class Hex8 libmesh_final : public Hex
+class Hex8 final : public Hex
 {
 public:
 
