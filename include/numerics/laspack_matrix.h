@@ -70,10 +70,15 @@ public:
   LaspackMatrix (const Parallel::Communicator & comm);
 
   /**
-   * Destructor. Free all memory, but do not release the memory of the
-   * sparsity structure.
+   * This class manages a C-style struct (QMatrix) manually, so we
+   * don't want to allow any automatic copy/move functions to be
+   * generated, and we can't default the destructor.
    */
-  ~LaspackMatrix ();
+  LaspackMatrix (LaspackMatrix &&) = delete;
+  LaspackMatrix (const LaspackMatrix &) = delete;
+  LaspackMatrix & operator= (const LaspackMatrix &) = delete;
+  LaspackMatrix & operator= (LaspackMatrix &&) = delete;
+  virtual ~LaspackMatrix ();
 
   /**
    * The \p LaspackMatrix needs the full sparsity pattern.
