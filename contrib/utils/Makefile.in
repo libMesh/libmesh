@@ -52,7 +52,7 @@ clobber: clean
 	@rm -f $(target)
 
 distclean: clean
-	@rm -rf *.o .libs .depend
+	@rm -rf *.o .libs
 
 echo:
 	@echo srcfiles = $(srcfiles)
@@ -74,18 +74,5 @@ complete: $(wildcard *.in)
 	@echo "***************************************************************"
 	@echo "* Done Running App " $(notdir $(target))
 	@echo "***************************************************************"
-
-gmv:
-	@$(MAKE) -C $(LIBMESH_DIR)/roy/meshplot/ meshplot-$(METHOD)
-	@for file in out.mesh.*; do ${LIBMESH_RUN} $(LIBMESH_DIR)/roy/meshplot/meshplot-$(METHOD) $$file out.soln.$${file##out.mesh.} out.gmv.$${file:9:4}; done
-
-# include the dependency list
--include .depend
-
-#
-# Dependencies
-#
-.depend: $(srcfiles) $(LIBMESH_DIR)/include/libmesh/*.h
-	@$(perl) $(LIBMESH_DIR)/contrib/bin/make_dependencies.pl -I. $(foreach i, $(LIBMESH_DIR)/include $(wildcard $(LIBMESH_DIR)/include/*), -I$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
 
 ###############################################################################
