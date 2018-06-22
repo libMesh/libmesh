@@ -54,9 +54,14 @@ protected:
 
 public:
   /**
-   * Destructor. Empty.
+   * The 5 special functions can be defaulted for this class, as it
+   * does not manage any memory itself.
    */
-  virtual ~DenseMatrixBase() {}
+  DenseMatrixBase (DenseMatrixBase &&) = default;
+  DenseMatrixBase (const DenseMatrixBase &) = default;
+  DenseMatrixBase & operator= (const DenseMatrixBase &) = default;
+  DenseMatrixBase & operator= (DenseMatrixBase &&) = default;
+  virtual ~DenseMatrixBase() = default;
 
   /**
    * Set every element in the matrix to 0.  You must redefine

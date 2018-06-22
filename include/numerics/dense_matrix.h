@@ -62,10 +62,14 @@ public:
               const unsigned int new_n=0);
 
   /**
-   * Destructor.  Empty.
+   * The 5 special functions can be defaulted for this class, as it
+   * does not manage any memory itself.
    */
-  virtual ~DenseMatrix() {}
-
+  DenseMatrix (DenseMatrix &&) = default;
+  DenseMatrix (const DenseMatrix &) = default;
+  DenseMatrix & operator= (const DenseMatrix &) = default;
+  DenseMatrix & operator= (DenseMatrix &&) = default;
+  virtual ~DenseMatrix() = default;
 
   virtual void zero() override;
 
@@ -183,13 +187,6 @@ public:
    * \param[in] b   Vector whose entries correspond to columns in the product matrix.
    */
   void outer_product(const DenseVector<T> & a, const DenseVector<T> & b);
-
-  /**
-   * Assignment operator.
-   *
-   * \returns A reference to *this.
-   */
-  DenseMatrix<T> & operator = (const DenseMatrix<T> & other_matrix);
 
   /**
    * Assignment-from-other-matrix-type operator.
@@ -813,21 +810,6 @@ void DenseMatrix<T>::zero()
   _decomposition_type = NONE;
 
   std::fill (_val.begin(), _val.end(), static_cast<T>(0));
-}
-
-
-
-template<typename T>
-inline
-DenseMatrix<T> & DenseMatrix<T>::operator = (const DenseMatrix<T> & other_matrix)
-{
-  this->_m = other_matrix._m;
-  this->_n = other_matrix._n;
-
-  _val                = other_matrix._val;
-  _decomposition_type = other_matrix._decomposition_type;
-
-  return *this;
 }
 
 
