@@ -246,9 +246,6 @@
 /* Flag indicating whether compiler supports f() final; */
 #undef HAVE_CXX11_FINAL
 
-/* Compiler supports final keyword, but it is disabled in libmesh */
-#undef HAVE_CXX11_FINAL_BUT_DISABLED
-
 /* Flag indicating whether compiler supports fixed type enumerations */
 #undef HAVE_CXX11_FIXED_TYPE_ENUM
 
@@ -289,9 +286,6 @@
 /* Flag indicating whether compiler supports nullptr */
 #undef HAVE_CXX11_NULLPTR
 
-/* Compiler supports nullptr, but it is disabled in libmesh */
-#undef HAVE_CXX11_NULLPTR_BUT_DISABLED
-
 /* Flag indicating whether compiler supports the override keyword */
 #undef HAVE_CXX11_OVERRIDE
 
@@ -306,9 +300,6 @@
 
 /* Flag indicating whether compiler supports std::shared_ptr */
 #undef HAVE_CXX11_SHARED_PTR
-
-/* Compiler supports std::shared_ptr, but it is disabled in libmesh */
-#undef HAVE_CXX11_SHARED_PTR_BUT_DISABLED
 
 /* Flag indicating whether compiler supports std::thread */
 #undef HAVE_CXX11_THREAD
