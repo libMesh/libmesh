@@ -53,9 +53,14 @@ public:
                  const unsigned int n=0);
 
   /**
-   * Destructor.  Does nothing.
+   * The 5 special functions can be defaulted for this class, as it
+   * does not manage any memory itself.
    */
-  virtual ~DenseSubVector() {}
+  DenseSubVector (DenseSubVector &&) = default;
+  DenseSubVector (const DenseSubVector &) = default;
+  DenseSubVector & operator= (const DenseSubVector &) = default;
+  DenseSubVector & operator= (DenseSubVector &&) = default;
+  virtual ~DenseSubVector() = default;
 
   /**
    * \returns A reference to the parent vector.
