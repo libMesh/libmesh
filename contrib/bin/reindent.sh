@@ -20,15 +20,6 @@ if [ -z $EMACS ]; then
 fi
 
 for i in $*; do
-  # Even the most recent version of Emacs (25.1.50.1 at the time of this
-  # writing) fails to properly indent classes which have been marked
-  # "libmesh_final", presumably because this is our own macro which is
-  # not valid C++.  It does, however, properly indent classes marked as
-  # "final".  So, a possible workaround is to text-replace
-  # "libmesh_final" with "final" before doing the indentation, and then
-  # swap it back again afterward.
-  perl -pli -e 's/ libmesh_final : / \/\*\*\/ : /g' $i
-
   # Print name of file we are working on
   echo "Indenting $i"
 
@@ -44,8 +35,6 @@ for i in $*; do
     --eval="(c-set-offset 'innamespace 0)" \
     --eval="(indent-region (point-min) (point-max) nil)" \
     -f save-buffer &> /dev/null
-
-  perl -pli -e 's/ \/\*\*\/ : / libmesh_final : /g' $i
 done
 
 
