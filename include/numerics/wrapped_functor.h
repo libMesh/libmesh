@@ -53,6 +53,20 @@ public:
     : _func(func.clone())
   { }
 
+  /**
+   * This class can't be copy constructed or assigned because it
+   * contains a unique_ptr member.
+   */
+  WrappedFunctor (const WrappedFunctor &) = delete;
+  WrappedFunctor & operator= (const WrappedFunctor &) = delete;
+
+  /**
+   * The remaining 5 special functions can be defaulted.
+   */
+  WrappedFunctor (WrappedFunctor &&) = default;
+  WrappedFunctor & operator= (WrappedFunctor &&) = default;
+  virtual ~WrappedFunctor () = default;
+
   virtual std::unique_ptr<FEMFunctionBase<Output>> clone () const override
   {
     return std::unique_ptr<FEMFunctionBase<Output>>

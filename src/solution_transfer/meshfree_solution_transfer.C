@@ -47,6 +47,19 @@ public:
     _mutex(mutex)
   {}
 
+  /**
+   * The move/copy ctor and destructor are defaulted for this class.
+   */
+  MeshlessInterpolationFunction (MeshlessInterpolationFunction &&) = default;
+  MeshlessInterpolationFunction (const MeshlessInterpolationFunction &) = default;
+  virtual ~MeshlessInterpolationFunction () = default;
+
+  /**
+   * This class contains const references so it can't be assigned.
+   */
+  MeshlessInterpolationFunction & operator= (const MeshlessInterpolationFunction &) = delete;
+  MeshlessInterpolationFunction & operator= (MeshlessInterpolationFunction &&) = delete;
+
   void init () {}
   void clear () {}
 

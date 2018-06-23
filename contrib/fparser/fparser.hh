@@ -112,6 +112,12 @@ class FunctionParserBase
     FunctionParserBase(const FunctionParserBase&);
     FunctionParserBase& operator=(const FunctionParserBase&);
 
+    // This class manages its own memory via reference counting, so the
+    // compiler-generated move constructor and move assignment operator
+    // are not safe to use. By explicitly deleting them we can prevent
+    // users from assuming this class can be moved when it really can't.
+    FunctionParserBase (FunctionParserBase &&) = delete;
+    FunctionParserBase & operator= (FunctionParserBase &&) = delete;
 
     void ForceDeepCopy();
 

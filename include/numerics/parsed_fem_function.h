@@ -66,9 +66,23 @@ public:
                      const std::vector<Output> * initial_vals=libmesh_nullptr);
 
   /**
-   * Destructor.
+   * This class contains a const reference so it can't be copy or move-assigned.
    */
-  virtual ~ParsedFEMFunction () {}
+  ParsedFEMFunction & operator= (const ParsedFEMFunction &) = delete;
+  ParsedFEMFunction & operator= (ParsedFEMFunction &&) = delete;
+
+  /**
+   * The remaining 5 special functions can be safely defaulted.
+   *
+   * \note The underlying FunctionParserBase class has a copy
+   * constructor, so this class should be default-constructible.  And,
+   * although FunctionParserBase's move constructor is deleted, _this_
+   * class should still be move-constructible because
+   * FunctionParserBase only appears in a vector.
+   */
+  ParsedFEMFunction (const ParsedFEMFunction &) = default;
+  ParsedFEMFunction (ParsedFEMFunction &&) = default;
+  virtual ~ParsedFEMFunction () = default;
 
   /**
    * Re-parse with new expression.

@@ -65,6 +65,32 @@ public:
                   const std::vector<Output> * initial_vals=libmesh_nullptr);
 
   /**
+   * This class cannot be (default) copy assigned because the
+   * underlying FunctionParserADBase class does not define a custom
+   * copy assignment operator, and manually manages memory.
+   */
+  ParsedFunction & operator= (const ParsedFunction &) = delete;
+
+  /**
+   * The remaining special functions can be defaulted for this class.
+   *
+   * \note Despite the fact that the underlying FunctionParserADBase
+   * class is not move-assignable or move-constructible, it is still
+   * possible for _this_ class to be move-assigned and
+   * move-constructed, because FunctionParserADBase objects only
+   * appear within std::vectors in this class, and std::vectors can
+   * generally still be move-assigned and move-constructed even when
+   * their contents cannot. There are some allocator-specific
+   * exceptions to this, but it should be guaranteed to work for
+   * std::allocator in C++14 and beyond. See also:
+   * https://stackoverflow.com/q/42051917/659433
+   */
+  ParsedFunction (const ParsedFunction &) = default;
+  ParsedFunction (ParsedFunction &&) = default;
+  ParsedFunction & operator= (ParsedFunction &&) = default;
+  virtual ~ParsedFunction () = default;
+
+  /**
    * Re-parse with new expression.
    */
   void reparse (const std::string & expression);
@@ -694,6 +720,16 @@ public:
   {
     libmesh_not_implemented();
   }
+
+  /**
+   * When !LIBMESH_HAVE_FPARSER, this class is not implemented, so
+   * let's make that explicit by deleting the special functions.
+   */
+  ParsedFunction (ParsedFunction &&) = delete;
+  ParsedFunction (const ParsedFunction &) = delete;
+  ParsedFunction & operator= (const ParsedFunction &) = delete;
+  ParsedFunction & operator= (ParsedFunction &&) = delete;
+  virtual ~ParsedFunction () = default;
 
   virtual Output operator() (const Point &,
                              const Real /* time */ = 0)

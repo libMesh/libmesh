@@ -10,6 +10,7 @@
 #include <libmesh/dense_vector.h>
 #include <libmesh/parsed_function.h>
 #include <libmesh/zero_function.h>
+#include <libmesh/analytic_function.h>
 
 // THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
 // std::auto_ptr, which in turn produces -Wdeprecated-declarations
@@ -64,10 +65,17 @@ private:
 
     {
       CompositeFunction<Real> composite_inner;
-      composite_inner.attach_subfunction
-        (ConstFunction<Real>(1), index_sets[0]);
-      composite_inner.attach_subfunction
-        (ConstFunction<Real>(2), index_sets[1]);
+
+      // Test that ConstFunction copy construction works.
+      ConstFunction<Real> cf_one(1);
+      ConstFunction<Real> cf_one_copy(cf_one);
+      composite_inner.attach_subfunction (cf_one_copy, index_sets[0]);
+
+      // Test that ConstFunction move construction works.
+      ConstFunction<Real> cf_two(2);
+      ConstFunction<Real> cf_two_move(std::move(cf_two));
+      composite_inner.attach_subfunction (cf_two_move, index_sets[1]);
+
       composite_outer.attach_subfunction
         (composite_inner, index_sets[3]);
 
@@ -81,11 +89,25 @@ private:
       CPPUNIT_ASSERT_DOUBLES_EQUAL(test_one(3), 1, 1.e-12);
       CPPUNIT_ASSERT_DOUBLES_EQUAL(test_one(4), 1, 1.e-12);
     }
-    composite_outer.attach_subfunction
-      (ConstFunction<Real>(3), index_sets[2]);
+    // Test that ConstFunction copy- and move-assignment works.
+    ConstFunction<Real> cf_three(3);
+    ConstFunction<Real> cf_three_copy_assign(0);
+    ConstFunction<Real> cf_three_move_assign(0);
+    cf_three_copy_assign = cf_three;
+    cf_three_move_assign = std::move(cf_three_copy_assign);
+    composite_outer.attach_subfunction(cf_three_move_assign, index_sets[2]);
+
+    // Test that move ctor works. Note that composite_outer should not
+    // be used for anything once it has been moved from!
+    CompositeFunction<Real> composite_outer_copy1(std::move(composite_outer));
+
+    // Test that move assignment also works. The first copy should not be
+    // used again after being move assigned.
+    CompositeFunction<Real> composite_outer_copy2;
+    composite_outer_copy2 = std::move(composite_outer_copy1);
 
     DenseVector<Real> test_two(8);
-    composite_outer(Point(0), 0, test_two);
+    composite_outer_copy2(Point(0), 0, test_two);
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL(test_two(0), 3, 1.e-12);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(test_two(2), 3, 1.e-12);
@@ -105,11 +127,16 @@ private:
     // for each
     ParsedFunction<Real> no_t("x*2+y^2-tanh(z)+atan(x-y)");
     ParsedFunction<Real> no_t2("x*2+y^2+z^2");
+
     ZeroFunction<Real> zero;
 
     ParsedFunction<Real> xyt("x+y+t");
-    ParsedFunction<Real> x2y2t2("x*2+y^2+t^2");
 
+    // Test constructing AnalyticFunction with lambda.
+    auto af_lambda =
+      [](const Point & p, const Real t) -> Real
+      { return p(0)*p(0) + p(1)*p(1) + t*t; };
+    AnalyticFunction<Real> x2y2t2(af_lambda);
 
     std::vector<unsigned int> index_set(1,0);
 
@@ -127,7 +154,12 @@ private:
 
       // Composite should still be time-dependent
       index_set[0] = 2;
-      composite.attach_subfunction(x2y2t2, index_set);
+
+      // Test AnalyticFunction copy ctor and copy assignment
+      AnalyticFunction<Real> x2y2t2_copy1(x2y2t2);
+      AnalyticFunction<Real> x2y2t2_copy2([](const Point &, const Real) -> Real { return 0; });
+      x2y2t2_copy2 = x2y2t2_copy1;
+      composite.attach_subfunction(x2y2t2_copy2, index_set);
       CPPUNIT_ASSERT(composite.is_time_dependent());
     }
 
@@ -147,7 +179,15 @@ private:
 
       // Composite should still be time-dependent
       index_set[0] = 2;
-      composite.attach_subfunction(x2y2t2, index_set);
+
+      // Test AnalyticFunction move ctor and move assignment. Note: we
+      // first copy and then steal the copy's resources to avoid
+      // messing with any later tests of "x2y2t2".
+      AnalyticFunction<Real> x2y2t2_copy(x2y2t2);
+      AnalyticFunction<Real> x2y2t2_move1(std::move(x2y2t2_copy));
+      AnalyticFunction<Real> x2y2t2_move2([](const Point &, const Real) -> Real { return 0; });
+      x2y2t2_move2 = std::move(x2y2t2_move1);
+      composite.attach_subfunction(x2y2t2_move2, index_set);
       CPPUNIT_ASSERT(composite.is_time_dependent());
     }
 
