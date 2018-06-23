@@ -626,15 +626,14 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
 
       // Filter that list against the _output_variables list.  Note: if names is still empty after
       // all this filtering, all the monomial variables will be gathered
-      std::vector<std::string>::iterator it = monomials.begin();
-      for (; it!=monomials.end(); ++it)
-        if (std::find(_output_variables.begin(), _output_variables.end(), *it) != _output_variables.end())
-          names.push_back(*it);
+      for (const auto & var : monomials)
+        if (std::find(_output_variables.begin(), _output_variables.end(), var) != _output_variables.end())
+          names.push_back(var);
     }
 
   // If we pass in a list of names to "get_solution" it'll filter the variables coming back
   std::vector<Number> soln;
-  es.get_solution(soln, names);
+  es.build_elemental_solution_vector(soln, names);
 
   // Also, store the list of subdomains on which each variable is active
   std::vector<std::set<subdomain_id_type>> vars_active_subdomains;
@@ -891,9 +890,8 @@ void ExodusII_IO::write (const std::string & fname)
   // data, while "appending" is really intended to add data to an
   // existing file.  If we're verbose, print a message to this effect.
   if (_append && _verbose)
-    libMesh::out << "Warning: Appending in ExodusII_IO::write() does not make sense.\n"
-                 << "Creating a new file instead!"
-                 << std::endl;
+    libmesh_warning("Warning: Appending in ExodusII_IO::write() does not make sense.\n"
+                    "Creating a new file instead!");
 
   exio_helper->create(fname);
   exio_helper->initialize(fname,mesh);
@@ -903,11 +901,8 @@ void ExodusII_IO::write (const std::string & fname)
   exio_helper->write_nodesets(mesh);
 
   if ((mesh.get_boundary_info().n_edge_conds() > 0) && _verbose)
-    {
-      libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
-                   << "are not supported by the ExodusII format."
-                   << std::endl;
-    }
+    libmesh_warning("Warning: Mesh contains edge boundary IDs, but these "
+                    "are not supported by the ExodusII format.");
 }
 
 
@@ -1007,11 +1002,8 @@ void ExodusII_IO::write_nodal_data_common(std::string fname,
           exio_helper->write_nodesets(mesh);
 
           if ((mesh.get_boundary_info().n_edge_conds() > 0) && _verbose)
-            {
-              libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
-                           << "are not supported by the ExodusII format."
-                           << std::endl;
-            }
+            libmesh_warning("Warning: Mesh contains edge boundary IDs, but these "
+                            "are not supported by the ExodusII format.");
 
           exio_helper->initialize_nodal_variables(names);
         }

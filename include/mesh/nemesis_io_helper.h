@@ -323,6 +323,16 @@ public:
                             int timestep);
 
   /**
+   * Writes the vector of elemental variable values, one variable and
+   * one subdomain at a time.
+   */
+  void write_element_values(const MeshBase & mesh,
+                            const NumericVector<Number> & parallel_soln,
+                            const std::vector<std::string> & names,
+                            int timestep,
+                            const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains);
+
+  /**
    * Given base_filename, foo.e, constructs the Nemesis filename
    * foo.e.X.Y, where X=n. CPUs and Y=processor ID
    */

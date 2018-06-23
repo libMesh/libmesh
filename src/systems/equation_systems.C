@@ -860,6 +860,35 @@ void EquationSystems::get_vars_active_subdomains(const std::vector<std::string> 
 void EquationSystems::get_solution (std::vector<Number> & soln,
                                     std::vector<std::string> & names) const
 {
+  libmesh_deprecated();
+  this->build_elemental_solution_vector(soln, names);
+}
+
+
+
+void
+EquationSystems::build_elemental_solution_vector (std::vector<Number> & soln,
+                                                  std::vector<std::string> & names) const
+{
+  // Call the parallel version of this function
+  std::unique_ptr<NumericVector<Number>> parallel_soln =
+    this->build_parallel_elemental_solution_vector(names);
+
+  // Localize into 'soln', provided that parallel_soln is not empty.
+  // Note: parallel_soln will be empty in the event that none of the
+  // input names were CONSTANT, MONOMIAL variables or there were
+  // simply no CONSTANT, MONOMIAL variables in the EquationSystems
+  // object.
+  soln.clear();
+  if (parallel_soln)
+    parallel_soln->localize_to_one(soln);
+}
+
+
+
+std::unique_ptr<NumericVector<Number>>
+EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::string> & names) const
+{
   // This function must be run on all processors at once
   parallel_object_only();
 
@@ -875,7 +904,6 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
   std::vector<std::string> filter_names = names;
   bool is_filter_names = !filter_names.empty();
 
-  soln.clear();
   names.clear();
 
   const FEType type(CONSTANT, MONOMIAL);
@@ -911,7 +939,7 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
 
   // If there are no variables to write out don't do anything...
   if (!nv)
-    return;
+    return std::unique_ptr<NumericVector<Number>>(nullptr);
 
   // We can handle the case where there are NULLs in the Elem vector
   // by just having extra zeros in the solution vector.
@@ -996,8 +1024,7 @@ void EquationSystems::get_solution (std::vector<Number> & soln,
     } // end loop over systems
 
   parallel_soln.close();
-
-  parallel_soln.localize_to_one(soln);
+  return std::unique_ptr<NumericVector<Number>>(parallel_soln_ptr.release());
 }
 
 

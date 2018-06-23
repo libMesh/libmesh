@@ -2541,6 +2541,79 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
 
 
 
+void
+Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
+                                        const NumericVector<Number> & parallel_soln,
+                                        const std::vector<std::string> & names,
+                                        int timestep,
+                                        const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
+{
+  if (verbose)
+    libMesh::out << "Called Nemesis_IO_Helper::write_element_values()" << std::endl;
+
+  // Construct a map from subdomain_id -> [element ids] for each of the elements
+  // we are responsible for.
+  std::map<subdomain_id_type, std::vector<dof_id_type>> subdomain_map;
+  for (dof_id_type i=0; i<this->exodus_elem_num_to_libmesh.size(); ++i)
+    {
+      // Look up the elem id for exdous element i.
+      dof_id_type libmesh_elem_id = this->exodus_elem_num_to_libmesh[i];
+
+      // Get a pointer to that Elem from the Mesh.
+      const Elem * elem = mesh.elem_ptr(libmesh_elem_id);
+
+      // Add this elem id to the list of ids for this subdomain.
+      subdomain_map[elem->subdomain_id()].push_back(elem->id());
+    }
+
+  // The total number of elements in the mesh. We need this for
+  // indexing into parallel_soln.
+  dof_id_type parallel_n_elem = mesh.parallel_n_elem();
+
+  // For each variable in names,
+  //   For each subdomain in subdomain_map,
+  //     If this (subdomain, variable) combination is active
+  //       For each element that we wrote to the Nemesis file,
+  //         ...
+  for (unsigned int v=0; v<names.size(); ++v)
+    {
+      // Get list of active subdomains for variable v
+      const auto & active_subdomains = vars_active_subdomains[v];
+
+      for (const auto & pr : subdomain_map)
+        {
+          subdomain_id_type sbd_id = pr.first;
+          const std::vector<dof_id_type> & elem_ids = pr.second;
+
+          // Possibly skip this (variable, subdomain) combination
+          if (active_subdomains.empty() || active_subdomains.count(sbd_id))
+            {
+              std::vector<numeric_index_type> required_indices;
+              required_indices.reserve(elem_ids.size());
+
+              for (const auto & id : elem_ids)
+                required_indices.push_back(v * parallel_n_elem + id);
+
+              std::vector<Number> local_soln;
+              parallel_soln.localize(local_soln, required_indices);
+
+              ex_err = exII::ex_put_elem_var(ex_id,
+                                             timestep,
+                                             static_cast<int>(v+1),
+                                             static_cast<int>(sbd_id),
+                                             static_cast<int>(local_soln.size()),
+                                             &local_soln[0]);
+              EX_CHECK_ERR(ex_err, "Error writing element values.");
+            }
+        }
+    } // end loop over vars
+
+  ex_err = exII::ex_update(ex_id);
+  EX_CHECK_ERR(ex_err, "Error flushing buffers to file.");
+}
+
+
+
 std::string Nemesis_IO_Helper::construct_nemesis_filename(const std::string & base_filename)
 {
   // Build a filename for this processor.  This code is cut-n-pasted from the read function

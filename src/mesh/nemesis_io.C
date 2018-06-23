@@ -31,6 +31,9 @@
 #include "libmesh/utility.h" // is_sorted, deallocate
 #include "libmesh/boundary_info.h"
 #include "libmesh/mesh_communication.h"
+#include "libmesh/fe_type.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/numeric_vector.h"
 
 namespace libMesh
 {
@@ -1201,9 +1204,8 @@ void Nemesis_IO::write (const std::string & base_filename)
   // data, while "appending" is really intended to add data to an
   // existing file.  If we're verbose, print a message to this effect.
   if (_append && _verbose)
-    libMesh::out << "Warning: Appending in Nemesis_IO::write() does not make sense.\n"
-                 << "Creating a new file instead!"
-                 << std::endl;
+    libmesh_warning("Warning: Appending in Nemesis_IO::write() does not make sense.\n"
+                    "Creating a new file instead!");
 
   nemhelper->create(nemesis_filename);
 
@@ -1231,11 +1233,8 @@ void Nemesis_IO::write (const std::string & base_filename)
   nemhelper->ex_err = exII::ex_update(nemhelper->ex_id);
 
   if ((mesh.get_boundary_info().n_edge_conds() > 0) && _verbose)
-    {
-      libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
-                   << "are not supported by the Nemesis format."
-                   << std::endl;
-    }
+    libmesh_warning("Warning: Mesh contains edge boundary IDs, but these "
+                    "are not supported by the Nemesis format.");
 }
 
 #else
@@ -1308,25 +1307,21 @@ void Nemesis_IO::prepare_to_write_nodal_data (const std::string & fname,
           nemhelper->write_sidesets(mesh);
 
           if ((mesh.get_boundary_info().n_edge_conds() > 0) && _verbose)
-            {
-              libMesh::out << "Warning: Mesh contains edge boundary IDs, but these "
-                           << "are not supported by the ExodusII format."
-                           << std::endl;
-            }
-
-          // If we don't have any nodes written out on this processor,
-          // Exodus seems to like us better if we don't try to write out any
-          // variable names too...
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-
-          std::vector<std::string> complex_names = nemhelper->get_complex_names(names);
-
-          nemhelper->initialize_nodal_variables(complex_names);
-#else
-          nemhelper->initialize_nodal_variables(names);
-#endif
+            libmesh_warning("Warning: Mesh contains edge boundary IDs, but these "
+                            "are not supported by the ExodusII format.");
         }
     }
+
+  // Even if we were already open for writing, we might not have
+  // initialized the nodal variable names yet. Even if we did, it
+  // should not hurt to call this twice because the routine sets a
+  // flag the first time it is called.
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  std::vector<std::string> complex_names = nemhelper->get_complex_names(names);
+  nemhelper->initialize_nodal_variables(complex_names);
+#else
+  nemhelper->initialize_nodal_variables(names);
+#endif
 }
 
 #else
@@ -1373,6 +1368,84 @@ void Nemesis_IO::write_nodal_data (const std::string &,
                                    const std::vector<std::string> &)
 {
   libmesh_error_msg("ERROR, Nemesis API is not defined.");
+}
+
+#endif
+
+
+
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+
+void Nemesis_IO::write_element_data (const EquationSystems & es)
+{
+  if (!nemhelper->opened_for_writing)
+    libmesh_error_msg("ERROR, Nemesis file must be initialized before outputting elemental variables.");
+
+  // To be (possibly) filled with a filtered list of variable names to output.
+  std::vector<std::string> names;
+
+  // If _output_variables is populated, only output the monomials which are
+  // also in the _output_variables vector.
+  if (_output_variables.size() > 0)
+    {
+      std::vector<std::string> monomials;
+      const FEType type(CONSTANT, MONOMIAL);
+
+      // Create a list of monomial variable names
+      es.build_variable_names(monomials, &type);
+
+      // Filter that list against the _output_variables list.  Note: if names is still empty after
+      // all this filtering, all the monomial variables will be gathered
+      for (const auto & var : monomials)
+        if (std::find(_output_variables.begin(), _output_variables.end(), var) != _output_variables.end())
+          names.push_back(var);
+    }
+
+  // Build the parallel elemental solution vector. The 'names' vector
+  // will also be updated with the variable's names that were actually
+  // written to the vector.
+  std::unique_ptr<NumericVector<Number>> parallel_soln =
+    es.build_parallel_elemental_solution_vector(names);
+
+  // build_parallel_elemental_solution_vector() can return a nullptr,
+  // in which case there are no constant monomial variables to write,
+  // and we can just return.
+  if (!parallel_soln)
+    {
+      if (_verbose)
+        libMesh::out << "No CONSTANT, MONOMIAL data to be written." << std::endl;
+      return;
+    }
+
+  // Store the list of subdomains on which each variable *that we are
+  // going to plot* is active. Note: if any of these sets is _empty_,
+  // the variable in question is active on _all_ subdomains.
+  std::vector<std::set<subdomain_id_type>> vars_active_subdomains;
+  es.get_vars_active_subdomains(names, vars_active_subdomains);
+
+  // Call function (defined in the Exodus helper) that writes the
+  // elemental variable names. This also apparently writes a "truth
+  // table" to the Exodus file. Not sure if this will work for
+  // Nemesis...
+  nemhelper->initialize_element_variables(names, vars_active_subdomains);
+
+  // Call (non-virtual) function to write the elemental data in
+  // parallel.  This function is named similarly to the corresponding
+  // function in the Exodus helper, but it has a different calling
+  // sequence and is not virtual or an override.
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+  nemhelper->write_element_values(mesh,
+                                  *parallel_soln,
+                                  names,
+                                  _timestep,
+                                  vars_active_subdomains);
+}
+
+#else
+
+void Nemesis_IO::write_element_data (const EquationSystems &)
+{
+  libmesh_not_implemented();
 }
 
 #endif

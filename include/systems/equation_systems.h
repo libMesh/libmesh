@@ -322,9 +322,42 @@ public:
    * Retrieve the solution data for CONSTANT MONOMIALs.  If \p names
    * is populated, only the variables corresponding to those names will
    * be retrieved.  This can be used to filter which variables are retrieved.
+   *
+   * \deprecated Call the more appropriately-named build_elemental_solution_vector()
+   * instead.
    */
-  void get_solution( std::vector<Number> & soln,
+  void get_solution (std::vector<Number> & soln,
                      std::vector<std::string> & names) const;
+
+  /**
+   * Retrieve the solution data for CONSTANT MONOMIALs.  If \p names
+   * is populated, only the variables corresponding to those names will
+   * be retrieved.  This can be used to filter which variables are retrieved.
+   *
+   * This is the more appropriately-named replacement for the get_solution()
+   * function defined above.
+   */
+  void build_elemental_solution_vector (std::vector<Number> & soln,
+                                        std::vector<std::string> & names) const;
+
+  /**
+   * Builds a parallel vector of CONSTANT MONOMIAL solution values
+   * corresponding to the entries in the input 'names' vector.  This
+   * vector is approximately uniformly distributed across all of the
+   * available processors.
+   *
+   * The related function build_elemental_solution_vector() is
+   * implemented by calling this function and then calling
+   * localize_to_one() on the resulting vector.
+   *
+   * \returns A nullptr (if no CONSTANT, MONOMIAL variables exist on
+   * the system) or a std::unique_ptr to a var-major numeric vector of
+   * total length n_elem * n_vars ordered according to:
+   * [u0, u1, ... uN, v0, v1, ... vN, w0, w1, ... wN]
+   * for constant monomial variables (u, v, w) on a mesh with N elements.
+   */
+  std::unique_ptr<NumericVector<Number>>
+  build_parallel_elemental_solution_vector (std::vector<std::string> & names) const;
 
   /**
    * Fill the input vector \p soln with solution values.  The
