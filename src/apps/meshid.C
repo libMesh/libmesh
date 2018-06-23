@@ -26,7 +26,6 @@
 #include <stdlib.h> // rand, srand
 
 #include "libmesh/libmesh_config.h"
-#include "libmesh/libmesh_nullptr.h"
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
@@ -249,7 +248,7 @@ void gen_random_string(std::string & s, const int len)
     "abcdefghijklmnopqrstuvwxyz";
 
   // Seed the random number generator with the current time
-  srand( static_cast<unsigned>(time(libmesh_nullptr)) );
+  srand( static_cast<unsigned>(time(nullptr)) );
 
   s.resize(len);
   for (int i = 0; i < len; ++i)

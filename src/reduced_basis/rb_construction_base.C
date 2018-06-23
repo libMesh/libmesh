@@ -270,7 +270,7 @@ void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vect
   std::map<std::string, std::unique_ptr<NumericVector<Number>>>::iterator it           = training_parameters.begin();
   std::map<std::string, std::unique_ptr<NumericVector<Number>>>::const_iterator it_end = training_parameters.end();
   for ( ; it != it_end; ++it)
-    it->second.reset(libmesh_nullptr);
+    it->second.reset(nullptr);
 
   // Get the number of local and global training parameters
   numeric_index_type n_local_training_samples  =
@@ -450,7 +450,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
     std::map<std::string, std::unique_ptr<NumericVector<Number>>>::const_iterator it_end = training_parameters_in.end();
 
     for ( ; it != it_end; ++it)
-      it->second.reset(libmesh_nullptr);
+      it->second.reset(nullptr);
   }
 
   // Initialize training_parameters_in

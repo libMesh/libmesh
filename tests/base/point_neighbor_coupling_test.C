@@ -82,7 +82,7 @@ public:
 
     // This just re-sets the default; real users may want a real
     // coupling matrix instead.
-    point_neighbor_coupling.set_dof_coupling(NULL);
+    point_neighbor_coupling.set_dof_coupling(nullptr);
 
     point_neighbor_coupling.set_n_levels(3);
 
@@ -106,7 +106,7 @@ public:
                                        elem_type);
 
     es.init();
-    sys.project_solution(cubic_point_neighbor_coupling_test, NULL, es.parameters);
+    sys.project_solution(cubic_point_neighbor_coupling_test, nullptr, es.parameters);
 
     for (const auto & elem : mesh.active_local_element_ptr_range())
       for (unsigned int s1=0; s1 != elem->n_neighbors(); ++s1)

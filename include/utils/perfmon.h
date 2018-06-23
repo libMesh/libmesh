@@ -82,7 +82,7 @@ inline
 void
 PerfMon::reset ()
 {
-  gettimeofday (&the_time_start, libmesh_nullptr);
+  gettimeofday (&the_time_start, nullptr);
 
 #ifdef HAVE_PAPI_H
   Papi::PAPI_flops (&rtime, & ptime, &flpins, &mflops);
@@ -95,7 +95,7 @@ inline
 double
 PerfMon::print (std::string msg, std::ostream & my_out)
 {
-  gettimeofday (&the_time_stop, libmesh_nullptr);
+  gettimeofday (&the_time_stop, nullptr);
 
 #ifdef HAVE_PAPI_H
   Papi::PAPI_flops (&rtime, & ptime, &flpins, &mflops);

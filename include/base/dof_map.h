@@ -360,7 +360,7 @@ public:
                                                    std::vector<dof_id_type> & n_nz,
                                                    std::vector<dof_id_type> & n_oz,
                                                    void *),
-                                      void * context = libmesh_nullptr)
+                                      void * context = nullptr)
   { _extra_sparsity_function = func; _extra_sparsity_context = context; }
 
   /**
@@ -380,7 +380,7 @@ public:
    * send_list with extra entries.
    */
   void attach_extra_send_list_function(void (*func)(std::vector<dof_id_type> &, void *),
-                                       void * context = libmesh_nullptr)
+                                       void * context = nullptr)
   { _extra_send_list_function = func; _extra_send_list_context = context; }
 
   /**
@@ -935,10 +935,10 @@ public:
    * entry is the maximum absolute error on a constrained DoF and whose second
    * entry is the maximum relative error.  Useful for debugging purposes.
    *
-   * If \p v == libmesh_nullptr, the system solution vector is tested.
+   * If \p v == nullptr, the system solution vector is tested.
    */
   std::pair<Real, Real> max_constraint_error(const System & system,
-                                             NumericVector<Number> * v = libmesh_nullptr) const;
+                                             NumericVector<Number> * v = nullptr) const;
 
 #endif // LIBMESH_ENABLE_CONSTRAINTS
 
@@ -1082,7 +1082,7 @@ public:
    * solver's solutions do not satisfy your DoF constraints to a tight enough
    * tolerance.
    *
-   * If \p v == libmesh_nullptr, the system solution vector is constrained
+   * If \p v == nullptr, the system solution vector is constrained
    *
    * If \p homogeneous == true, heterogeneous constraints are enforced
    * as if they were homogeneous.  This might be appropriate for e.g. a
@@ -1090,7 +1090,7 @@ public:
    * heterogeneously-constrained solutions.
    */
   void enforce_constraints_exactly (const System & system,
-                                    NumericVector<Number> * v = libmesh_nullptr,
+                                    NumericVector<Number> * v = nullptr,
                                     bool homogeneous = false) const;
 
   /**

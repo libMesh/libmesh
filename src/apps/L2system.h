@@ -31,7 +31,7 @@ public:
            const std::string & name,
            const unsigned int number)
   : libMesh::FEMSystem(es, name, number),
-    input_system(NULL),
+    input_system(nullptr),
     _fe_family("LAGRANGE"),
     _fe_order(1) {}
 

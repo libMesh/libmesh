@@ -97,7 +97,7 @@ public:
    * \returns A pointer the values associated with the node \p node,
    * as read in by the read_dataset() method.
    *
-   * If no values exist for the node in question, a libmesh_nullptr is
+   * If no values exist for the node in question, a nullptr is
    * returned instead.  It is up to the user to check the return value
    * before using it.
    */

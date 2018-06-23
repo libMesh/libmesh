@@ -178,7 +178,7 @@ public:
   dof_id_type renumber_dof_objects (mapvector<T *,dof_id_type> &);
 
   /**
-   * Remove NULL elements from arrays
+   * Remove nullptr elements from arrays.
    */
   virtual void renumber_nodes_and_elements () override;
 

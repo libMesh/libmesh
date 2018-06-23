@@ -425,7 +425,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
     write_variable = true;
 
   // 2.) solution data
-  if ((solution_names != libmesh_nullptr) && (v != libmesh_nullptr))
+  if ((solution_names != nullptr) && (v != nullptr))
     write_variable = true;
 
   // 3.) cell-centered data
@@ -436,7 +436,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
     out_stream << "variable\n";
 
   //   if ((this->p_levels() && mesh_max_p_level) ||
-  //     ((solution_names != libmesh_nullptr) && (v != libmesh_nullptr)))
+  //     ((solution_names != nullptr) && (v != nullptr)))
   //     out_stream << "variable\n";
 
   // optionally write the polynomial degree information
@@ -494,7 +494,7 @@ void GMVIO::write_ascii_new_impl (const std::string & fname,
 
 
   // optionally write the data
-  if ((solution_names != libmesh_nullptr) && (v != libmesh_nullptr))
+  if ((solution_names != nullptr) && (v != nullptr))
     {
       const unsigned int n_vars = solution_names->size();
 
@@ -1090,7 +1090,7 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
     write_variable = true;
 
   // 2.) solution data
-  if ((solution_names != libmesh_nullptr) && (v != libmesh_nullptr))
+  if ((solution_names != nullptr) && (v != nullptr))
     write_variable = true;
 
   // 3.) cell-centered data
@@ -1155,8 +1155,8 @@ void GMVIO::write_ascii_old_impl (const std::string & fname,
 
 
   // optionally write the data
-  if ((solution_names != libmesh_nullptr) &&
-      (v != libmesh_nullptr))
+  if ((solution_names != nullptr) &&
+      (v != nullptr))
     {
       const unsigned int n_vars =
         cast_int<unsigned int>(solution_names->size());
@@ -1414,7 +1414,7 @@ void GMVIO::write_binary (const std::string & fname,
     write_variable = true;
 
   // 2.) solution data
-  if ((solution_names != libmesh_nullptr) && (vec != libmesh_nullptr))
+  if ((solution_names != nullptr) && (vec != nullptr))
     write_variable = true;
 
   //   // 3.) cell-centered data - unsupported
@@ -1460,8 +1460,8 @@ void GMVIO::write_binary (const std::string & fname,
 
 
   // optionally write the data
-  if ((solution_names != libmesh_nullptr) &&
-      (vec != libmesh_nullptr))
+  if ((solution_names != nullptr) &&
+      (vec != nullptr))
     {
       std::vector<float> temp(mesh.n_nodes());
 
@@ -1566,7 +1566,7 @@ void GMVIO::write_discontinuous_gmv (const std::string & name,
   // Get a reference to the mesh
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  es.build_variable_names  (solution_names, libmesh_nullptr, system_names);
+  es.build_variable_names  (solution_names, nullptr, system_names);
   es.build_discontinuous_solution_vector (v, system_names);
 
   // These are parallel_only functions

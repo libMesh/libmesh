@@ -44,7 +44,7 @@ void Patch::find_face_neighbors(std::set<const Elem *> & new_neighbors)
     {
       const Elem * elem = *it;
       for (auto neighbor : elem->neighbor_ptr_range())
-        if (neighbor != libmesh_nullptr)        // we have a neighbor on this side
+        if (neighbor != nullptr)        // we have a neighbor on this side
           {
 #ifdef LIBMESH_ENABLE_AMR
             if (!neighbor->active())          // the neighbor is *not* active,

@@ -44,7 +44,7 @@ public:
    * Constructor.
    */
   SiblingCoupling() :
-    _dof_coupling(libmesh_nullptr) {}
+    _dof_coupling(nullptr) {}
 
   // Change coupling matrix after construction
   void set_dof_coupling(const CouplingMatrix * dof_coupling)

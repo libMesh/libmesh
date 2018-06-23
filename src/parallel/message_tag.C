@@ -50,7 +50,7 @@ MessageTag::MessageTag(MessageTag && other)
   : _tagvalue(other._tagvalue), _comm(other._comm)
 {
   // I stole your tag reference!
-  other._comm = libmesh_nullptr;
+  other._comm = nullptr;
 }
 
 
@@ -78,7 +78,7 @@ MessageTag & MessageTag::operator= (MessageTag && other)
   _comm = other._comm;
 
   // I stole your tag reference!
-  other._comm = libmesh_nullptr;
+  other._comm = nullptr;
 
   return *this;
 }

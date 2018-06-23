@@ -91,7 +91,7 @@ public:
                                        elem_type);
 
     es.init();
-    sys.project_solution(cubic_test, NULL, es.parameters);
+    sys.project_solution(cubic_test, nullptr, es.parameters);
 
     for (Real x = 0.1; x < 1; x += 0.2)
       {
@@ -116,7 +116,7 @@ public:
                                          elem_type);
 
     es.init();
-    sys.project_solution(cubic_test, NULL, es.parameters);
+    sys.project_solution(cubic_test, nullptr, es.parameters);
 
     for (Real x = 0.1; x < 1; x += 0.2)
       for (Real y = 0.1; y < 1; y += 0.2)
@@ -142,7 +142,7 @@ public:
                                        elem_type);
 
     es.init();
-    sys.project_solution(cubic_test, NULL, es.parameters);
+    sys.project_solution(cubic_test, nullptr, es.parameters);
 
     for (Real x = 0.1; x < 1; x += 0.2)
       for (Real y = 0.1; y < 1; y += 0.2)
@@ -171,7 +171,7 @@ public:
                                        elem_type);
 
     es.init();
-    sys.project_solution(cubic_test, NULL, es.parameters);
+    sys.project_solution(cubic_test, nullptr, es.parameters);
 
     std::vector<unsigned int> variables;
     sys.get_all_variable_numbers(variables);

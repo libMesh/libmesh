@@ -690,9 +690,9 @@ public:
       side_map_size(sm_size),
       inverse_side_map(ism),
       inverse_side_map_size(ism_size),
-      shellface_map(libmesh_nullptr),
+      shellface_map(nullptr),
       shellface_map_size(0),
-      inverse_shellface_map(libmesh_nullptr),
+      inverse_shellface_map(nullptr),
       inverse_shellface_map_size(0),
       shellface_index_offset(0),
       canonical_type(ct),
@@ -1221,7 +1221,7 @@ public:
   /**
    * Constructor.  Allocates enough storage to hold n_strings of
    * length string_length.  (Actually allocates string_length+1 characters
-   * per string to account for the trailing NULL character.)
+   * per string to account for the trailing '\0' character.)
    */
   explicit
   NamesData(size_t n_strings, size_t string_length);

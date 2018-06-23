@@ -494,7 +494,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
         }
 #endif
 
-      libmesh_assert (!level || elem->parent() != libmesh_nullptr);
+      libmesh_assert (!level || elem->parent() != nullptr);
       libmesh_assert (!level || elem->parent()->id() == parent_id);
       libmesh_assert (!level || elem->parent()->child_ptr(which_child_am_i) == elem);
 #endif
@@ -629,7 +629,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
       // We don't already have the element, so we need to create it.
 
       // Find the parent if necessary
-      Elem * parent = libmesh_nullptr;
+      Elem * parent = nullptr;
 #ifdef LIBMESH_ENABLE_AMR
       // Find a child element's parent
       if (level > 0)

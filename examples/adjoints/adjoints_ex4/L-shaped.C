@@ -37,14 +37,14 @@ void LaplaceSystem::init_context(DiffContext & context)
 
   // Now make sure we have requested all the data
   // we need to build the linear system.
-  FEBase * elem_fe = libmesh_nullptr;
+  FEBase * elem_fe = nullptr;
   c.get_element_fe(0, elem_fe);
   elem_fe->get_JxW();
   elem_fe->get_phi();
   elem_fe->get_dphi();
   elem_fe->get_xyz();
 
-  FEBase * side_fe = libmesh_nullptr;
+  FEBase * side_fe = nullptr;
   c.get_side_fe(0, side_fe);
 
   side_fe->get_JxW();
@@ -66,7 +66,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
-  FEBase * elem_fe = libmesh_nullptr;
+  FEBase * elem_fe = nullptr;
   c.get_element_fe(0, elem_fe);
 
   // Element Jacobian * quadrature weights for interior integration
@@ -119,7 +119,7 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
 
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
-  FEBase * side_fe = libmesh_nullptr;
+  FEBase * side_fe = nullptr;
   c.get_side_fe(0, side_fe);
 
   // Element Jacobian * quadrature weights for interior integration

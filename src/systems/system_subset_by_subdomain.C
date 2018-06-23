@@ -100,7 +100,7 @@ set_var_nums (const std::set<unsigned int> * const var_nums)
 {
   _var_nums.clear();
 
-  if (var_nums != libmesh_nullptr)
+  if (var_nums != nullptr)
     _var_nums = *var_nums;
 
   else

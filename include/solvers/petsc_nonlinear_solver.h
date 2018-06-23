@@ -118,7 +118,7 @@ public:
    * Initialize data structures if not done so already.
    * May assign a name to the solver in some implementations
    */
-  virtual void init (const char * name = libmesh_nullptr) override;
+  virtual void init (const char * name = nullptr) override;
 
   /**
    * \returns The raw PETSc snes context pointer.

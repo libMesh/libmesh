@@ -67,8 +67,8 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
 
       for (auto & node : _mesh.local_node_ptr_range())
         {
-          if (node == libmesh_nullptr)
-            libmesh_error_msg("[" << _mesh.processor_id() << "]: Node iterator returned NULL pointer.");
+          if (node == nullptr)
+            libmesh_error_msg("[" << _mesh.processor_id() << "]: Node iterator returned nullptr.");
 
           // leave the boundary intact
           // Only relocate the nodes which are vertices of an element
@@ -172,7 +172,7 @@ void LaplaceMeshSmoother::init()
               // boundary or for which the current element's
               // id is greater than its neighbor's.
               // Sides get only built once.
-              if ((elem->neighbor_ptr(s) == libmesh_nullptr) ||
+              if ((elem->neighbor_ptr(s) == nullptr) ||
                   (elem->id() > elem->neighbor_ptr(s)->id()))
                 {
                   std::unique_ptr<const Elem> side(elem->build_side_ptr(s));
@@ -191,7 +191,7 @@ void LaplaceMeshSmoother::init()
 
         for (auto & elem : _mesh.active_local_element_ptr_range())
           for (auto f : elem->side_index_range()) // Loop over faces
-            if ((elem->neighbor_ptr(f) == libmesh_nullptr) ||
+            if ((elem->neighbor_ptr(f) == nullptr) ||
                 (elem->id() > elem->neighbor_ptr(f)->id()))
               {
                 // We need a full (i.e. non-proxy) element for the face, since we will

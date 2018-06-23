@@ -486,13 +486,13 @@ public:
   virtual Node * node_ptr (const dof_id_type i) = 0;
 
   /**
-   * \returns A pointer to the \f$ i^{th} \f$ node, or \p NULL if no such
+   * \returns A pointer to the \f$ i^{th} \f$ node, or \p nullptr if no such
    * node exists in this processor's mesh data structure.
    */
   virtual const Node * query_node_ptr (const dof_id_type i) const = 0;
 
   /**
-   * \returns A writable pointer to the \f$ i^{th} \f$ node, or \p NULL if
+   * \returns A writable pointer to the \f$ i^{th} \f$ node, or \p nullptr if
    * no such node exists in this processor's mesh data structure.
    */
   virtual Node * query_node_ptr (const dof_id_type i) = 0;
@@ -557,19 +557,19 @@ public:
 #endif
 
   /**
-   * \returns A pointer to the \f$ i^{th} \f$ element, or NULL if no
+   * \returns A pointer to the \f$ i^{th} \f$ element, or nullptr if no
    * such element exists in this processor's mesh data structure.
    */
   virtual const Elem * query_elem_ptr (const dof_id_type i) const = 0;
 
   /**
-   * \returns A writable pointer to the \f$ i^{th} \f$ element, or NULL
+   * \returns A writable pointer to the \f$ i^{th} \f$ element, or nullptr
    * if no such element exists in this processor's mesh data structure.
    */
   virtual Elem * query_elem_ptr (const dof_id_type i) = 0;
 
   /**
-   * \returns A pointer to the \f$ i^{th} \f$ element, or NULL if no
+   * \returns A pointer to the \f$ i^{th} \f$ element, or nullptr if no
    * such element exists in this processor's mesh data structure.
    *
    * \deprecated Use the less confusingly-named query_elem_ptr() instead.
@@ -583,7 +583,7 @@ public:
 #endif
 
   /**
-   * \returns A writable pointer to the \f$ i^{th} \f$ element, or NULL
+   * \returns A writable pointer to the \f$ i^{th} \f$ element, or nullptr
    * if no such element exists in this processor's mesh data structure.
    *
    * \deprecated Use the less confusingly-named query_elem_ptr() instead.
@@ -687,7 +687,7 @@ public:
   /**
    * Locate element face (edge in 2D) neighbors.  This is done with the help
    * of a \p std::map that functions like a hash table.
-   * After this routine is called all the elements with a \p NULL neighbor
+   * After this routine is called all the elements with a \p nullptr neighbor
    * pointer are guaranteed to be on the boundary.  Thus this routine is
    * useful for automatically determining the boundaries of the domain.
    * If reset_remote_elements is left to false, remote neighbor links are not
@@ -893,7 +893,7 @@ public:
    * implemented in derived classes.
    */
   virtual void read  (const std::string & name,
-                      void * mesh_data=libmesh_nullptr,
+                      void * mesh_data=nullptr,
                       bool skip_renumber_nodes_and_elements=false,
                       bool skip_find_neighbors=false) = 0;
   virtual void write (const std::string & name) = 0;

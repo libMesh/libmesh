@@ -73,7 +73,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Pyramid13 (Elem * p=libmesh_nullptr) :
+  Pyramid13 (Elem * p=nullptr) :
     Pyramid(Pyramid13::n_nodes(), p, _nodelinks_data)
   {}
 

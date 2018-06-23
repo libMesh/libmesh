@@ -73,7 +73,7 @@ public:
                                            0., 1., 0., 1.);
 
       es.init();
-      sys.project_solution(x_plus_y, NULL, es.parameters);
+      sys.project_solution(x_plus_y, nullptr, es.parameters);
 
       ExodusII_IO exii(mesh);
 

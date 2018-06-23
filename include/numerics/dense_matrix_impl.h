@@ -836,7 +836,7 @@ void DenseMatrix<T>::evd_left(DenseVector<T> & lambda_real,
                               DenseMatrix<T> & VL)
 {
   // We use the LAPACK eigenvalue problem implementation
-  _evd_lapack(lambda_real, lambda_imag, &VL, libmesh_nullptr);
+  _evd_lapack(lambda_real, lambda_imag, &VL, nullptr);
 }
 
 
@@ -847,7 +847,7 @@ void DenseMatrix<T>::evd_right(DenseVector<T> & lambda_real,
                                DenseMatrix<T> & VR)
 {
   // We use the LAPACK eigenvalue problem implementation
-  _evd_lapack(lambda_real, lambda_imag, libmesh_nullptr, &VR);
+  _evd_lapack(lambda_real, lambda_imag, nullptr, &VR);
 }
 
 

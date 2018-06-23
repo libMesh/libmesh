@@ -27,7 +27,7 @@ public:
   ~FEMParameters();
 
   void read(GetPot & input,
-            const std::vector<std::string> * other_variable_names = libmesh_nullptr);
+            const std::vector<std::string> * other_variable_names = nullptr);
 
   // Parameters applicable to entire EquationSystems:
 

@@ -35,7 +35,7 @@ DiffContext::DiffContext (const System & sys) :
   elem_solution_accel_derivative(1.),
   fixed_solution_derivative(0.),
   _dof_indices_var(sys.n_vars()),
-  _deltat(libmesh_nullptr),
+  _deltat(nullptr),
   _system(sys),
   _is_adjoint(false)
 {
@@ -102,7 +102,7 @@ DiffContext::~DiffContext ()
 
 void DiffContext::set_deltat_pointer(Real * dt)
 {
-  // We may actually want to be able to set this pointer to NULL, so
+  // We may actually want to be able to set this pointer to nullptr, so
   // don't report an error for that.
   _deltat = dt;
 }

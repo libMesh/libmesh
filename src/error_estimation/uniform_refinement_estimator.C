@@ -73,11 +73,11 @@ void UniformRefinementEstimator::estimate_error (const System & _system,
   LOG_SCOPE("estimate_error()", "UniformRefinementEstimator");
   std::map<const System *, const NumericVector<Number> *> solution_vectors;
   solution_vectors[&_system] = solution_vector;
-  this->_estimate_error (libmesh_nullptr,
+  this->_estimate_error (nullptr,
                          &_system,
                          &error_per_cell,
-                         libmesh_nullptr,
-                         libmesh_nullptr,
+                         nullptr,
+                         nullptr,
                          &solution_vectors,
                          estimate_parent_error);
 }
@@ -90,9 +90,9 @@ void UniformRefinementEstimator::estimate_errors (const EquationSystems & _es,
 {
   LOG_SCOPE("estimate_errors()", "UniformRefinementEstimator");
   this->_estimate_error (&_es,
-                         libmesh_nullptr,
+                         nullptr,
                          &error_per_cell,
-                         libmesh_nullptr,
+                         nullptr,
                          &error_norms,
                          solution_vectors,
                          estimate_parent_error);
@@ -105,10 +105,10 @@ void UniformRefinementEstimator::estimate_errors (const EquationSystems & _es,
 {
   LOG_SCOPE("estimate_errors()", "UniformRefinementEstimator");
   this->_estimate_error (&_es,
-                         libmesh_nullptr,
-                         libmesh_nullptr,
+                         nullptr,
+                         nullptr,
                          &errors_per_cell,
-                         libmesh_nullptr,
+                         nullptr,
                          solution_vectors,
                          estimate_parent_error);
 }

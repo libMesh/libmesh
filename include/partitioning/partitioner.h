@@ -53,7 +53,7 @@ public:
   /**
    * Constructor.
    */
-  Partitioner () : _weights(libmesh_nullptr) {}
+  Partitioner () : _weights(nullptr) {}
 
   /**
    * Copy/move ctor, copy/move assignment operator, and destructor are
@@ -248,7 +248,7 @@ protected:
    * The number of active elements on each processor.
    *
    * \note ParMETIS requires that each processor have some active
-   * elements; it will abort if any processor passes a NULL _part
+   * elements; it will abort if any processor passes a nullptr _part
    * array.
    */
   std::vector<dof_id_type> _n_active_elem_on_proc;

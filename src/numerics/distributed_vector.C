@@ -503,7 +503,7 @@ void DistributedVector<T>::localize (std::vector<T> & v_local,
         }
     };
 
-  const T * ex = libmesh_nullptr;
+  const T * ex = nullptr;
   Parallel::pull_parallel_vector_data
     (this->comm(), requested_ids, gather_functor, action_functor, ex);
 }

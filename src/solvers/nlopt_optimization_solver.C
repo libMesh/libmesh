@@ -62,7 +62,7 @@ double __libmesh_nlopt_objective(unsigned n,
   sys.update();
 
   Real objective;
-  if (solver->objective_object != libmesh_nullptr)
+  if (solver->objective_object != nullptr)
     {
       objective =
         solver->objective_object->objective(
@@ -76,7 +76,7 @@ double __libmesh_nlopt_objective(unsigned n,
   // If the gradient has been requested, fill it in
   if (gradient)
     {
-      if (solver->gradient_object != libmesh_nullptr)
+      if (solver->gradient_object != nullptr)
         {
           solver->gradient_object->gradient(
                                             *(sys.current_local_solution), *(sys.rhs), sys);
@@ -155,7 +155,7 @@ void __libmesh_nlopt_equality_constraints(unsigned m,
       for (unsigned i=0; i<m; ++i)
         result[i] = (*sys.C_eq)(i);
 
-      // If gradient != NULL, then the Jacobian matrix of the equality
+      // If gradient != nullptr, then the Jacobian matrix of the equality
       // constraints has been requested.  The incoming 'gradient'
       // array is of length m*n and d(c_i)/d(x_j) = gradient[n*i+j].
       if (gradient)
@@ -242,7 +242,7 @@ void __libmesh_nlopt_inequality_constraints(unsigned m,
       for (unsigned i=0; i<m; ++i)
         result[i] = (*sys.C_ineq)(i);
 
-      // If gradient != NULL, then the Jacobian matrix of the equality
+      // If gradient != nullptr, then the Jacobian matrix of the equality
       // constraints has been requested.  The incoming 'gradient'
       // array is of length m*n and d(c_i)/d(x_j) = gradient[n*i+j].
       if (gradient)
@@ -289,7 +289,7 @@ template <typename T>
 NloptOptimizationSolver<T>::NloptOptimizationSolver (OptimizationSystem & system_in)
   :
   OptimizationSolver<T>(system_in),
-  _opt(libmesh_nullptr),
+  _opt(nullptr),
   _result(NLOPT_SUCCESS),
   _iteration_count(0),
   _constraints_tolerance(1.e-8)

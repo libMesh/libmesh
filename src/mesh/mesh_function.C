@@ -51,7 +51,7 @@ MeshFunction::MeshFunction (const EquationSystems & eqn_systems,
   _vector              (vec),
   _dof_map             (dof_map),
   _system_vars         (vars),
-  _point_locator       (libmesh_nullptr),
+  _point_locator       (nullptr),
   _out_of_mesh_mode    (false),
   _out_of_mesh_value   ()
 {
@@ -70,7 +70,7 @@ MeshFunction::MeshFunction (const EquationSystems & eqn_systems,
   _vector              (vec),
   _dof_map             (dof_map),
   _system_vars         (1,var),
-  _point_locator       (libmesh_nullptr),
+  _point_locator       (nullptr),
   _out_of_mesh_mode    (false),
   _out_of_mesh_value   ()
 {
@@ -88,7 +88,7 @@ MeshFunction::MeshFunction (const EquationSystems & eqn_systems,
 MeshFunction::~MeshFunction ()
 {
   // only delete the point locator when we are the master
-  if (this->_master == libmesh_nullptr)
+  if (this->_master == nullptr)
     delete this->_point_locator;
 }
 
@@ -113,13 +113,13 @@ void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
    * point locator) or this object is the master
    * (build the point locator  on our own).
    */
-  if (this->_master != libmesh_nullptr)
+  if (this->_master != nullptr)
     {
       // we aren't the master
       const MeshFunction * master =
         cast_ptr<const MeshFunction *>(this->_master);
 
-      if (master->_point_locator == libmesh_nullptr)
+      if (master->_point_locator == nullptr)
         libmesh_error_msg("ERROR: When the master-servant concept is used, the master has to be initialized first!");
 
       else
@@ -148,10 +148,10 @@ void
 MeshFunction::clear ()
 {
   // only delete the point locator when we are the master
-  if ((this->_point_locator != libmesh_nullptr) && (this->_master == libmesh_nullptr))
+  if ((this->_point_locator != nullptr) && (this->_master == nullptr))
     {
       delete this->_point_locator;
-      this->_point_locator = libmesh_nullptr;
+      this->_point_locator = nullptr;
     }
   this->_initialized = false;
 }
@@ -237,7 +237,7 @@ void MeshFunction::operator() (const Point & p,
                                const Real time,
                                DenseVector<Number> & output)
 {
-  this->operator() (p, time, output, libmesh_nullptr);
+  this->operator() (p, time, output, nullptr);
 }
 
 void MeshFunction::operator() (const Point & p,
@@ -333,7 +333,7 @@ void MeshFunction::discontinuous_value (const Point & p,
                                         const Real time,
                                         std::map<const Elem *, DenseVector<Number>> & output)
 {
-  this->discontinuous_value (p, time, output, libmesh_nullptr);
+  this->discontinuous_value (p, time, output, nullptr);
 }
 
 
@@ -503,7 +503,7 @@ void MeshFunction::discontinuous_gradient (const Point & p,
                                            const Real time,
                                            std::map<const Elem *, std::vector<Gradient>> & output)
 {
-  this->discontinuous_gradient (p, time, output, libmesh_nullptr);
+  this->discontinuous_gradient (p, time, output, nullptr);
 }
 
 
@@ -670,7 +670,7 @@ const Elem * MeshFunction::find_element(const Point & p,
      the point locator.  Since this is time consuming, enable it only
      in debug mode.  */
 #ifdef DEBUG
-  if (this->_master != libmesh_nullptr)
+  if (this->_master != nullptr)
     {
       const MeshFunction * master =
         cast_ptr<const MeshFunction *>(this->_master);
@@ -693,7 +693,7 @@ const Elem * MeshFunction::find_element(const Point & p,
       // look for a local element containing the point
       std::set<const Elem *> point_neighbors;
       element->find_point_neighbors(p, point_neighbors);
-      element = libmesh_nullptr;
+      element = nullptr;
       std::set<const Elem *>::const_iterator       it  = point_neighbors.begin();
       const std::set<const Elem *>::const_iterator end = point_neighbors.end();
       for (; it != end; ++it)
@@ -719,7 +719,7 @@ std::set<const Elem *> MeshFunction::find_elements(const Point & p,
      the point locator.  Since this is time consuming, enable it only
      in debug mode.  */
 #ifdef DEBUG
-  if (this->_master != libmesh_nullptr)
+  if (this->_master != nullptr)
     {
       const MeshFunction * master =
         cast_ptr<const MeshFunction *>(this->_master);

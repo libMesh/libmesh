@@ -56,7 +56,7 @@ void HeatSystem::init_context(DiffContext & context)
     {
       const unsigned char dim = *dim_it;
 
-      FEBase * fe = libmesh_nullptr;
+      FEBase * fe = nullptr;
 
       c.get_element_fe(T_var, fe, dim);
 
@@ -81,7 +81,7 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
   const unsigned int dim = c.get_elem().dim();
-  FEBase * fe = libmesh_nullptr;
+  FEBase * fe = nullptr;
   c.get_element_fe(T_var, fe, dim);
 
   // Element Jacobian * quadrature weights for interior integration

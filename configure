@@ -902,10 +902,6 @@ HAVE_CXX17_FALLTHROUGH_ATTRIBUTE_FALSE
 HAVE_CXX17_FALLTHROUGH_ATTRIBUTE_TRUE
 HAVE_CXX11_TO_STRING_FALSE
 HAVE_CXX11_TO_STRING_TRUE
-HAVE_CXX11_NULLPTR_WORKAROUND_FALSE
-HAVE_CXX11_NULLPTR_WORKAROUND_TRUE
-HAVE_CXX11_NULLPTR_FALSE
-HAVE_CXX11_NULLPTR_TRUE
 HAVE_CXX11_FINAL_FALSE
 HAVE_CXX11_FINAL_TRUE
 HAVE_CXX11_ERF_FALSE
@@ -944,6 +940,8 @@ HAVE_CXX11_RVALUE_REFERENCES_FALSE
 HAVE_CXX11_RVALUE_REFERENCES_TRUE
 HAVE_CXX11_DECLTYPE_FALSE
 HAVE_CXX11_DECLTYPE_TRUE
+HAVE_CXX11_NULLPTR_FALSE
+HAVE_CXX11_NULLPTR_TRUE
 HAVE_CXX11_DEFAULTED_FUNCTIONS_FALSE
 HAVE_CXX11_DEFAULTED_FUNCTIONS_TRUE
 HAVE_CXX11_DELETED_FUNCTIONS_FALSE
@@ -9297,6 +9295,91 @@ if test "x$have_cxx11_defaulted_functions" != "xyes"; then :
   as_fn_error $? "libMesh requires C++11 defaulted function support" "$LINENO" 5
 fi
 
+
+    have_cxx11_nullptr=no
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 nullptr support" >&5
+$as_echo_n "checking for C++11 nullptr support... " >&6; }
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
+
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include <cstddef>
+    void f(int * pi) {}
+    void f(double * pd) {}
+    void f(std::nullptr_t nullp) {}
+
+int
+main ()
+{
+
+    // would be ambiguous without void f(nullptr_t)
+    f(nullptr);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+      if test "x$enablecxx11" = "xyes"; then :
+
+              { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_CXX11_NULLPTR 1" >>confdefs.h
+
+              have_cxx11_nullptr=yes
+
+else
+
+              { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
+$as_echo "yes, but disabled." >&6; }
+
+$as_echo "#define HAVE_CXX11_NULLPTR_BUT_DISABLED 1" >>confdefs.h
+
+
+fi
+
+else
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    # Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+     if test x$have_cxx11_nullptr == xyes; then
+  HAVE_CXX11_NULLPTR_TRUE=
+  HAVE_CXX11_NULLPTR_FALSE='#'
+else
+  HAVE_CXX11_NULLPTR_TRUE='#'
+  HAVE_CXX11_NULLPTR_FALSE=
+fi
+
+
+if test "x$have_cxx11_nullptr" != "xyes"; then :
+  as_fn_error $? "libMesh requires the C++11 nullptr keyword" "$LINENO" 5
+fi
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
@@ -10815,170 +10898,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 else
   HAVE_CXX11_FINAL_TRUE='#'
   HAVE_CXX11_FINAL_FALSE=
-fi
-
-
-
-    have_cxx11_nullptr=no
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++11 nullptr support" >&5
-$as_echo_n "checking for C++11 nullptr support... " >&6; }
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-    old_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
-
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-    #include <cstddef>
-    void f(int * pi) {}
-    void f(double * pd) {}
-    void f(std::nullptr_t nullp) {}
-
-int
-main ()
-{
-
-    // would be ambiguous without void f(nullptr_t)
-    f(nullptr);
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-      if test "x$enablecxx11" = "xyes"; then :
-
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-$as_echo "#define HAVE_CXX11_NULLPTR 1" >>confdefs.h
-
-              have_cxx11_nullptr=yes
-
-else
-
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, but disabled." >&5
-$as_echo "yes, but disabled." >&6; }
-
-$as_echo "#define HAVE_CXX11_NULLPTR_BUT_DISABLED 1" >>confdefs.h
-
-
-fi
-
-else
-
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-    # Reset the flags
-    CXXFLAGS="$old_CXXFLAGS"
-    ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-    # Test the nullptr workaround if we don't have the real nullptr
-    if test "x$have_cxx11_nullptr" != "xyes"; then :
-
-            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for C++03 compatible nullptr workaround" >&5
-$as_echo_n "checking for C++03 compatible nullptr workaround... " >&6; }
-            ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-            const class my_nullptr_t
-            {
-            public:
-              // convertible to any type of null non-member pointer...
-              template<class T>
-              inline operator T * () const { return 0; }
-
-              // or any type of null member pointer...
-              template<class C, class T>
-              inline operator T C::*() const { return 0; }
-
-            private:
-              // Can't take address of nullptr
-              void operator & () const;
-            } my_nullptr = {};
-
-            void f(int) {}
-            void f(double *) {}
-
-
-int
-main ()
-{
-
-            // Test that it works the same way as NULL.
-            int * p = my_nullptr;
-
-            // Test that the compiler can disambiguate the call correctly.
-            f(my_nullptr);
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-$as_echo "#define HAVE_CXX11_NULLPTR_WORKAROUND 1" >>confdefs.h
-
-              have_cxx11_nullptr_workaround=yes
-
-else
-
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-            ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-fi
-
-     if test x$have_cxx11_nullptr == xyes; then
-  HAVE_CXX11_NULLPTR_TRUE=
-  HAVE_CXX11_NULLPTR_FALSE='#'
-else
-  HAVE_CXX11_NULLPTR_TRUE='#'
-  HAVE_CXX11_NULLPTR_FALSE=
-fi
-
-     if test x$have_cxx11_nullptr_workaround == xyes; then
-  HAVE_CXX11_NULLPTR_WORKAROUND_TRUE=
-  HAVE_CXX11_NULLPTR_WORKAROUND_FALSE='#'
-else
-  HAVE_CXX11_NULLPTR_WORKAROUND_TRUE='#'
-  HAVE_CXX11_NULLPTR_WORKAROUND_FALSE=
 fi
 
 
@@ -42087,6 +42006,10 @@ if test -z "${HAVE_CXX11_DEFAULTED_FUNCTIONS_TRUE}" && test -z "${HAVE_CXX11_DEF
   as_fn_error $? "conditional \"HAVE_CXX11_DEFAULTED_FUNCTIONS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${HAVE_CXX11_NULLPTR_TRUE}" && test -z "${HAVE_CXX11_NULLPTR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CXX11_NULLPTR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${HAVE_CXX11_DECLTYPE_TRUE}" && test -z "${HAVE_CXX11_DECLTYPE_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX11_DECLTYPE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -42161,14 +42084,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_FINAL_TRUE}" && test -z "${HAVE_CXX11_FINAL_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_CXX11_FINAL\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${HAVE_CXX11_NULLPTR_TRUE}" && test -z "${HAVE_CXX11_NULLPTR_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_CXX11_NULLPTR\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${HAVE_CXX11_NULLPTR_WORKAROUND_TRUE}" && test -z "${HAVE_CXX11_NULLPTR_WORKAROUND_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_CXX11_NULLPTR_WORKAROUND\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CXX11_TO_STRING_TRUE}" && test -z "${HAVE_CXX11_TO_STRING_FALSE}"; then

@@ -153,7 +153,7 @@ void JumpErrorEstimator::estimate_error (const System & system,
         continue;
 
       // FIXME: Need to generalize this to vector-valued elements. [PB]
-      FEBase * side_fe = libmesh_nullptr;
+      FEBase * side_fe = nullptr;
 
       const std::set<unsigned char> & elem_dims =
         fine_context->elem_dimensions();
@@ -201,7 +201,7 @@ void JumpErrorEstimator::estimate_error (const System & system,
           // Loop over the neighbors of the parent
           for (auto n_p : parent->side_index_range())
             {
-              if (parent->neighbor_ptr(n_p) != libmesh_nullptr) // parent has a neighbor here
+              if (parent->neighbor_ptr(n_p) != nullptr) // parent has a neighbor here
                 {
                   // Find the active neighbors in this direction
                   std::vector<const Elem *> active_neighbors;
@@ -292,14 +292,14 @@ void JumpErrorEstimator::estimate_error (const System & system,
       // Loop over the neighbors of element e
       for (auto n_e : e->side_index_range())
         {
-          if ((e->neighbor_ptr(n_e) != libmesh_nullptr) ||
+          if ((e->neighbor_ptr(n_e) != nullptr) ||
               integrate_boundary_sides)
             {
               fine_context->side = n_e;
               fine_context->side_fe_reinit();
             }
 
-          if (e->neighbor_ptr(n_e) != libmesh_nullptr) // e is not on the boundary
+          if (e->neighbor_ptr(n_e) != nullptr) // e is not on the boundary
             {
               const Elem * f           = e->neighbor_ptr(n_e);
               const dof_id_type f_id = f->id();
@@ -335,7 +335,7 @@ void JumpErrorEstimator::estimate_error (const System & system,
                         this->coarse_n_flux_faces_increment();
                     }
                 } // end if (case1 || case2)
-            } // if (e->neighbor(n_e) != libmesh_nullptr)
+            } // if (e->neighbor(n_e) != nullptr)
 
           // Otherwise, e is on the boundary.  If it happens to
           // be on a Dirichlet boundary, we need not do anything.
@@ -361,7 +361,7 @@ void JumpErrorEstimator::estimate_error (const System & system,
 
               if (scale_by_n_flux_faces && found_boundary_flux)
                 n_flux_faces[fine_context->get_elem().id()]++;
-            } // end if (e->neighbor_ptr(n_e) == libmesh_nullptr)
+            } // end if (e->neighbor_ptr(n_e) == nullptr)
         } // end loop over neighbors
     } // End loop over active local elements
 
@@ -428,14 +428,14 @@ JumpErrorEstimator::reinit_sides ()
   unsigned int dim = fine_context->get_elem().dim();
   libmesh_assert_equal_to(dim, coarse_context->get_elem().dim());
 
-  FEBase * fe_fine = libmesh_nullptr;
+  FEBase * fe_fine = nullptr;
   fine_context->get_side_fe( 0, fe_fine, dim );
 
   // Get the physical locations of the fine element quadrature points
   std::vector<Point> qface_point = fe_fine->get_xyz();
 
   // Find the master quadrature point locations on the coarse element
-  FEBase * fe_coarse = libmesh_nullptr;
+  FEBase * fe_coarse = nullptr;
   coarse_context->get_side_fe( 0, fe_coarse, dim );
 
   std::vector<Point> qp_coarse;

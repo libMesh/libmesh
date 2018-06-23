@@ -41,7 +41,7 @@ struct PostWaitUnpackBuffer : public PostWaitWork {
 
   virtual void run() override {
 
-    Parallel::unpack_range(_buf, _context, _out, (T*)libmesh_nullptr);
+    Parallel::unpack_range(_buf, _context, _out, (T*)nullptr);
   }
 
 private:

@@ -39,10 +39,10 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
                                         const std::vector<Point> * const pts,
                                         const std::vector<Real> * const weights)
 {
-  if (weights != libmesh_nullptr)
+  if (weights != nullptr)
     libmesh_not_implemented_msg("ERROR: User-specified weights for infinite elements are not implemented!");
 
-  if (pts != libmesh_nullptr)
+  if (pts != nullptr)
     libmesh_not_implemented_msg("ERROR: User-specified points for infinite elements are not implemented!");
 
   // We don't do this for 1D elements!
@@ -111,7 +111,7 @@ void InfFE<Dim,T_radial,T_base>::edge_reinit(const Elem *,
   //libmesh_assert_not_equal_to (Dim, 1);
   libmesh_not_implemented_msg("ERROR: Edge conditions for infinite elements not implemented!");
 
-  if (pts != libmesh_nullptr)
+  if (pts != nullptr)
     libmesh_not_implemented_msg("ERROR: User-specified points for infinite elements not implemented!");
 }
 

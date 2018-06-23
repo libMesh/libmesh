@@ -827,7 +827,7 @@ void GmshIO::write_post (const std::string & fname,
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
   //  write the data
-  if ((solution_names != libmesh_nullptr) && (v != libmesh_nullptr))
+  if ((solution_names != nullptr) && (v != nullptr))
     {
       const unsigned int n_vars =
         cast_int<unsigned int>(solution_names->size());

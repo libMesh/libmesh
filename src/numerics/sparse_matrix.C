@@ -44,7 +44,7 @@ namespace libMesh
 template <typename T>
 SparseMatrix<T>::SparseMatrix (const Parallel::Communicator & comm_in) :
   ParallelObject(comm_in),
-  _dof_map(libmesh_nullptr),
+  _dof_map(nullptr),
   _is_initialized(false)
 {}
 

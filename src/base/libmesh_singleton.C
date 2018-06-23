@@ -104,7 +104,7 @@ void Singleton::cleanup ()
     {
       libmesh_assert (item);
       delete item;
-      item = libmesh_nullptr;
+      item = nullptr;
     }
 
   singleton_cache.clear();

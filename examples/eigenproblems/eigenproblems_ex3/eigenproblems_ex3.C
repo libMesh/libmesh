@@ -165,7 +165,7 @@ int main (int argc, char ** argv)
   // see, so we loop over all elements, not just local elements.
   for (const auto & elem : mesh.element_ptr_range())
     for (auto side : elem->side_index_range())
-      if (elem->neighbor_ptr (side) == NULL)
+      if (elem->neighbor_ptr (side) == nullptr)
         mesh.get_boundary_info().add_side(elem, side, BOUNDARY_ID);
 
   // Print information about the mesh to the screen.

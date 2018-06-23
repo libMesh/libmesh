@@ -836,14 +836,14 @@ void DenseMatrix<T>::_evd_lapack (DenseVector<T> & lambda_real,
   std::vector<T> & lambda_imag_val = lambda_imag.get_values();
 
   // Set up eigenvector storage if necessary.
-  T * VR_ptr = libmesh_nullptr;
+  T * VR_ptr = nullptr;
   if (VR)
     {
       VR->resize(N, N);
       VR_ptr = &(VR->get_values()[0]);
     }
 
-  T * VL_ptr = libmesh_nullptr;
+  T * VL_ptr = nullptr;
   if (VL)
     {
       VL->resize(N, N);

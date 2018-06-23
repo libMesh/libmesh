@@ -56,7 +56,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Quad9 (Elem * p=libmesh_nullptr) :
+  Quad9 (Elem * p=nullptr) :
     Quad(Quad9::n_nodes(), p, _nodelinks_data) {}
 
   Quad9 (Quad9 &&) = delete;

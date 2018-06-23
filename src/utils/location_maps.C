@@ -141,7 +141,7 @@ T * LocationMap<T>::find(const Point & p,
         }
     }
 
-  return libmesh_nullptr;
+  return nullptr;
 }
 
 

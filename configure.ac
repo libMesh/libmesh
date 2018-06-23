@@ -283,6 +283,10 @@ LIBMESH_TEST_CXX11_DEFAULTED_FUNCTIONS
 AS_IF([test "x$have_cxx11_defaulted_functions" != "xyes"],
       [AC_MSG_ERROR([libMesh requires C++11 defaulted function support])])
 
+LIBMESH_TEST_CXX11_NULLPTR
+AS_IF([test "x$have_cxx11_nullptr" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires the C++11 nullptr keyword])])
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
@@ -300,7 +304,6 @@ LIBMESH_TEST_CXX11_CONDITION_VARIABLE
 LIBMESH_TEST_CXX11_TYPE_TRAITS
 LIBMESH_TEST_CXX11_MATH_FUNCS
 LIBMESH_TEST_CXX11_FINAL
-LIBMESH_TEST_CXX11_NULLPTR
 LIBMESH_TEST_CXX11_TO_STRING
 LIBMESH_TEST_CXX17_FALLTHROUGH_ATTRIBUTE
 

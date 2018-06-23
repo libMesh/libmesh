@@ -36,7 +36,7 @@ void AugmentSparsityOnInterface::mesh_reinit ()
 
   for (const auto & elem : _mesh.active_element_ptr_range())
     for (auto side : elem->side_index_range())
-      if (elem->neighbor_ptr(side) == libmesh_nullptr)
+      if (elem->neighbor_ptr(side) == nullptr)
         {
           if (_mesh.get_boundary_info().has_boundary_id(elem, side, _crack_boundary_lower))
             {
@@ -138,7 +138,7 @@ void AugmentSparsityOnInterface::operator()
 {
   libmesh_assert(this->_initialized);
 
-  const CouplingMatrix * const null_mat = libmesh_nullptr;
+  const CouplingMatrix * const null_mat = nullptr;
 
   for (MeshBase::const_element_iterator elem_it = range_begin;
        elem_it != range_end; ++elem_it)
@@ -149,7 +149,7 @@ void AugmentSparsityOnInterface::operator()
         coupled_elements.insert (std::make_pair(elem, null_mat));
 
       for (auto side : elem->side_index_range())
-        if (elem->neighbor_ptr(side) == libmesh_nullptr)
+        if (elem->neighbor_ptr(side) == nullptr)
           {
             ElementSideMap::const_iterator ltu_it =
               _lower_to_upper.find(std::make_pair(elem, side));

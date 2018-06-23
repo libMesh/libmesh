@@ -401,8 +401,8 @@ public:
    * \p elem.
    */
   virtual void reinit (const Elem * elem,
-                       const std::vector<Point> * const pts = libmesh_nullptr,
-                       const std::vector<Real> * const weights = libmesh_nullptr) override;
+                       const std::vector<Point> * const pts = nullptr,
+                       const std::vector<Real> * const weights = nullptr) override;
 
   /**
    * Not implemented yet.  Reinitializes all the physical
@@ -412,8 +412,8 @@ public:
   virtual void reinit (const Elem * elem,
                        const unsigned int side,
                        const Real tolerance = TOLERANCE,
-                       const std::vector<Point> * const pts = libmesh_nullptr,
-                       const std::vector<Real> * const weights = libmesh_nullptr) override;
+                       const std::vector<Point> * const pts = nullptr,
+                       const std::vector<Real> * const weights = nullptr) override;
 
   /**
    * Not implemented yet.  Reinitializes all the physical
@@ -423,8 +423,8 @@ public:
   virtual void edge_reinit (const Elem * elem,
                             const unsigned int edge,
                             const Real tolerance = TOLERANCE,
-                            const std::vector<Point> * const pts = libmesh_nullptr,
-                            const std::vector<Real> * const weights = libmesh_nullptr) override;
+                            const std::vector<Point> * const pts = nullptr,
+                            const std::vector<Real> * const weights = nullptr) override;
 
   /**
    * Computes the reference space quadrature points on the side of
@@ -524,7 +524,7 @@ protected:
    * order changes, are initialized here.
    */
   void init_radial_shape_functions(const Elem * inf_elem,
-                                   const std::vector<Point> * radial_pts = libmesh_nullptr);
+                                   const std::vector<Point> * radial_pts = nullptr);
 
   /**
    * Initialize all the data fields like \p weight, \p mode,

@@ -98,7 +98,7 @@ public:
    * optionally using a non-zero relative tolerance for searches.
    */
   virtual const Elem * find_element(const Point & p,
-                                    const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr,
+                                    const std::set<subdomain_id_type> * allowed_subdomains = nullptr,
                                     Real relative_tol = TOLERANCE) const = 0;
 
 protected:

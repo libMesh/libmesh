@@ -100,7 +100,7 @@ class Elem;
  * We return variable-stuff-sets as pointers to CouplingMatrix.  That
  * way, in the common case where the user cares about all variables and
  * couple to all variables, all the functor needs to return for
- * variable-number-sets and variable-number-pair-sets is a NULL (which
+ * variable-number-sets and variable-number-pair-sets is nullptr (which
  * as in other libMesh APIs will be interpreted and documented to mean
  * the full set). In the common case where the user wants coupling
  * between elements to match coupling within elements, the functor can

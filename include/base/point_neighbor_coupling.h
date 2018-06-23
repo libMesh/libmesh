@@ -46,11 +46,11 @@ public:
    * Constructor.
    */
   PointNeighborCoupling() :
-    _dof_coupling(libmesh_nullptr),
+    _dof_coupling(nullptr),
 #ifdef LIBMESH_ENABLE_PERIODIC
-    _periodic_bcs(libmesh_nullptr),
+    _periodic_bcs(nullptr),
 #endif
-    _mesh(libmesh_nullptr),
+    _mesh(nullptr),
     _n_levels(0)
   {}
 

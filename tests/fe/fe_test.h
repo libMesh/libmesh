@@ -106,7 +106,7 @@ public:
       elem_end = _mesh->active_local_elements_end();
 
     if (elem_it == elem_end)
-      _elem = libmesh_nullptr;
+      _elem = nullptr;
     else
       _elem = *elem_it;
 

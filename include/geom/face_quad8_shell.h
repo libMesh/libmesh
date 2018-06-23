@@ -40,7 +40,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  QuadShell8 (Elem * p=libmesh_nullptr) :
+  QuadShell8 (Elem * p=nullptr) :
     Quad8(p) {}
 
   QuadShell8 (QuadShell8 &&) = delete;

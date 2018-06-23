@@ -229,8 +229,8 @@ void ElemCutter::cut_2D (const Elem & elem,
 
   std::cout << "Inside cut face element!\n";
 
-  libmesh_assert (_inside_mesh_2D.get()  != libmesh_nullptr);
-  libmesh_assert (_outside_mesh_2D.get() != libmesh_nullptr);
+  libmesh_assert (_inside_mesh_2D.get()  != nullptr);
+  libmesh_assert (_outside_mesh_2D.get() != nullptr);
 
   _inside_mesh_2D->clear();
   _outside_mesh_2D->clear();
@@ -309,8 +309,8 @@ void ElemCutter::cut_3D (const Elem & elem,
 
   std::cout << "Inside cut cell element!\n";
 
-  libmesh_assert (_inside_mesh_3D.get()  != libmesh_nullptr);
-  libmesh_assert (_outside_mesh_3D.get() != libmesh_nullptr);
+  libmesh_assert (_inside_mesh_3D.get()  != nullptr);
+  libmesh_assert (_outside_mesh_3D.get() != nullptr);
 
   _inside_mesh_3D->clear();
   _outside_mesh_3D->clear();

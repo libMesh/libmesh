@@ -37,8 +37,8 @@ namespace libMesh
 PointLocatorTree::PointLocatorTree (const MeshBase & mesh,
                                     const PointLocatorBase * master) :
   PointLocatorBase (mesh,master),
-  _tree            (libmesh_nullptr),
-  _element         (libmesh_nullptr),
+  _tree            (nullptr),
+  _element         (nullptr),
   _out_of_mesh_mode(false),
   _target_bin_size (200),
   _build_type(Trees::NODES)
@@ -52,8 +52,8 @@ PointLocatorTree::PointLocatorTree (const MeshBase & mesh,
                                     const Trees::BuildType build_type,
                                     const PointLocatorBase * master) :
   PointLocatorBase (mesh,master),
-  _tree            (libmesh_nullptr),
-  _element         (libmesh_nullptr),
+  _tree            (nullptr),
+  _element         (nullptr),
   _out_of_mesh_mode(false),
   _target_bin_size (200),
   _build_type(build_type)
@@ -73,14 +73,14 @@ PointLocatorTree::~PointLocatorTree ()
 void PointLocatorTree::clear ()
 {
   // only delete the tree when we are the master
-  if (this->_tree != libmesh_nullptr)
+  if (this->_tree != nullptr)
     {
-      if (this->_master == libmesh_nullptr)
+      if (this->_master == nullptr)
         // we own the tree
         delete this->_tree;
       else
         // someone else owns and therefore deletes the tree
-        this->_tree = libmesh_nullptr;
+        this->_tree = nullptr;
 
       // make sure operator () throws an assertion
       this->_initialized = false;
@@ -120,7 +120,7 @@ void PointLocatorTree::init (Trees::BuildType build_type)
       // initialized before.
       _build_type = build_type;
 
-      if (this->_master == libmesh_nullptr)
+      if (this->_master == nullptr)
         {
           LOG_SCOPE("init(no master)", "PointLocatorTree");
 
@@ -181,7 +181,7 @@ void PointLocatorTree::init (Trees::BuildType build_type)
       // Suppose the interpolators are used concurrently
       // at different locations in the mesh, then it makes quite
       // sense to have unique start elements.
-      this->_element = libmesh_nullptr;
+      this->_element = nullptr;
     }
 
   // ready for take-off
@@ -198,15 +198,15 @@ const Elem * PointLocatorTree::operator() (const Point & p,
   LOG_SCOPE("operator()", "PointLocatorTree");
 
   // If we're provided with an allowed_subdomains list and have a cached element, make sure it complies
-  if (allowed_subdomains && this->_element && !allowed_subdomains->count(this->_element->subdomain_id())) this->_element = libmesh_nullptr;
+  if (allowed_subdomains && this->_element && !allowed_subdomains->count(this->_element->subdomain_id())) this->_element = nullptr;
 
   // First check the element from last time before asking the tree
-  if (this->_element==libmesh_nullptr || !(this->_element->contains_point(p)))
+  if (this->_element==nullptr || !(this->_element->contains_point(p)))
     {
       // ask the tree
       this->_element = this->_tree->find_element (p,allowed_subdomains);
 
-      if (this->_element == libmesh_nullptr)
+      if (this->_element == nullptr)
         {
           // If we haven't found the element, we may want to do a linear
           // search using a tolerance.
@@ -231,7 +231,7 @@ const Elem * PointLocatorTree::operator() (const Point & p,
           // No element seems to contain this point.  In theory, our
           // tree now correctly handles curved elements.  In
           // out-of-mesh mode this is sometimes expected, and we can
-          // just return NULL without searching further.  Out of
+          // just return nullptr without searching further.  Out of
           // out-of-mesh mode, something must have gone wrong.
           libmesh_assert_equal_to (_out_of_mesh_mode, true);
 
@@ -298,7 +298,7 @@ const Elem * PointLocatorTree::perform_linear_search(const Point & p,
         }
     }
 
-  return libmesh_nullptr;
+  return nullptr;
 }
 
 

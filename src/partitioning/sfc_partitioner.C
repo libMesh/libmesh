@@ -81,7 +81,7 @@ void SFCPartitioner::partition_range(MeshBase & mesh,
 
   // the reverse_map maps the contiguous ids back
   // to active elements
-  std::vector<Elem *> reverse_map (n_range_elem, libmesh_nullptr);
+  std::vector<Elem *> reverse_map (n_range_elem, nullptr);
 
   std::vector<double> x      (n_range_elem);
   std::vector<double> y      (n_range_elem);

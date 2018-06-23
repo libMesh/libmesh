@@ -75,7 +75,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  InfHex18 (Elem * p=libmesh_nullptr) :
+  InfHex18 (Elem * p=nullptr) :
     InfHex(InfHex18::n_nodes(), p, _nodelinks_data)
   {}
 

@@ -61,8 +61,8 @@ class ParsedFunction : public FunctionBase<Output>
 public:
   explicit
   ParsedFunction (const std::string & expression,
-                  const std::vector<std::string> * additional_vars=libmesh_nullptr,
-                  const std::vector<Output> * initial_vals=libmesh_nullptr);
+                  const std::vector<std::string> * additional_vars=nullptr,
+                  const std::vector<Output> * initial_vals=nullptr);
 
   /**
    * This class cannot be (default) copy assigned because the
@@ -715,8 +715,8 @@ class ParsedFunction : public FunctionBase<Output>
 {
 public:
   ParsedFunction (const std::string & /* expression */,
-                  const std::vector<std::string> * = libmesh_nullptr,
-                  const std::vector<Output> * = libmesh_nullptr) : _dummy(0)
+                  const std::vector<std::string> * = nullptr,
+                  const std::vector<Output> * = nullptr) : _dummy(0)
   {
     libmesh_not_implemented();
   }

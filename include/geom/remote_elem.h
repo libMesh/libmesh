@@ -35,7 +35,7 @@ namespace libMesh
  * not exist on the local processor, the ghost element's neighbors
  * are set to point to the singleton RemoteElement instead.
  * Library code can then distinguish between such elements and
- * boundary elements (with NULL neighbors).
+ * boundary elements (with nullptr neighbors).
  *
  * \author Roy H. Stogner
  * \date 2007
@@ -57,9 +57,9 @@ public:
 private:
   RemoteElem () : Elem(0,
                        0,
-                       libmesh_nullptr,
+                       nullptr,
                        _elemlinks_data,
-                       libmesh_nullptr)
+                       nullptr)
   { this->set_id(remote_elem_id); }
 
 public:
@@ -197,7 +197,7 @@ public:
 protected:
 
   /**
-   * Data for link to (NULL!) parent.
+   * Data for link to (nullptr!) parent.
    */
   Elem * _elemlinks_data[1];
 };

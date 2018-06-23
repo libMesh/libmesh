@@ -41,7 +41,7 @@ PeriodicBoundaryBase * PeriodicBoundaries::boundary(boundary_id_type id)
 {
   iterator i = this->find(id);
   if (i == this->end())
-    return libmesh_nullptr;
+    return nullptr;
   return i->second;
 }
 
@@ -51,7 +51,7 @@ const PeriodicBoundaryBase * PeriodicBoundaries::boundary(boundary_id_type id) c
 {
   const_iterator i = this->find(id);
   if (i == this->end())
-    return libmesh_nullptr;
+    return nullptr;
   return i->second;
 }
 
@@ -92,7 +92,7 @@ const Elem * PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
     }
 
   libmesh_error_msg("Periodic boundary neighbor not found");
-  return libmesh_nullptr;
+  return nullptr;
 }
 
 } // namespace libMesh

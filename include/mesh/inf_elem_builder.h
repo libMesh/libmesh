@@ -107,7 +107,7 @@ public:
                               const bool y_sym = false,
                               const bool z_sym = false,
                               const bool be_verbose = false,
-                              std::vector<const Node *> * inner_boundary_nodes = libmesh_nullptr);
+                              std::vector<const Node *> * inner_boundary_nodes = nullptr);
 
 
 
@@ -122,7 +122,7 @@ private:
                        const bool z_sym = false,
                        const bool be_verbose = false,
                        std::set<std::pair<dof_id_type,
-                       unsigned int>> * inner_faces = libmesh_nullptr);
+                       unsigned int>> * inner_faces = nullptr);
   /**
    * Reference to the mesh we're building infinite
    * elements for.

@@ -241,7 +241,7 @@ inline bool Communicator::semiverify(const bool * r) const
       return this->semiverify(&rnew);
     }
 
-  const unsigned char * rptr = libmesh_nullptr;
+  const unsigned char * rptr = nullptr;
   return this->semiverify(rptr);
 }
 
@@ -253,7 +253,7 @@ inline bool Communicator::semiverify(const std::vector<T,A> * r) const
   if (this->size() > 1 && Attributes<T>::has_min_max == true)
     {
       std::size_t rsize = r ? r->size() : 0;
-      std::size_t * psize = r ? &rsize : libmesh_nullptr;
+      std::size_t * psize = r ? &rsize : nullptr;
 
       if (!this->semiverify(psize))
         return false;
@@ -311,7 +311,7 @@ inline bool Communicator::semiverify(const std::string * r) const
   if (this->size() > 1)
     {
       std::size_t rsize = r ? r->size() : 0;
-      std::size_t * psize = r ? &rsize : libmesh_nullptr;
+      std::size_t * psize = r ? &rsize : nullptr;
 
       if (!this->semiverify(psize))
         return false;
@@ -328,7 +328,7 @@ inline bool Communicator::semiverify(const std::string * r) const
             temp.push_back((*r)[i]);
         }
 
-      std::vector<short int> * ptemp = r ? &temp: libmesh_nullptr;
+      std::vector<short int> * ptemp = r ? &temp: nullptr;
 
       return this->semiverify(ptemp);
     }
@@ -790,7 +790,7 @@ inline void Communicator::sum(std::vector<std::complex<T>,A> & r) const
       libmesh_call_mpi
         (MPI_Allreduce (MPI_IN_PLACE, &r[0],
                         cast_int<int>(r.size() * 2),
-                        StandardType<T>(libmesh_nullptr),
+                        StandardType<T>(nullptr),
                         OpFunction<T>::sum(), this->get()));
     }
 }
@@ -885,7 +885,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 {
   LOG_SCOPE("send()", "Parallel");
 
-  T * dataptr = buf.empty() ? libmesh_nullptr : const_cast<T *>(buf.data());
+  T * dataptr = buf.empty() ? nullptr : const_cast<T *>(buf.data());
 
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -907,7 +907,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 {
   LOG_SCOPE("send()", "Parallel");
 
-  T * dataptr = buf.empty() ? libmesh_nullptr : const_cast<T *>(buf.data());
+  T * dataptr = buf.empty() ? nullptr : const_cast<T *>(buf.data());
 
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
@@ -980,7 +980,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 const MessageTag & tag) const
 {
   this->send(dest_processor_id, buf,
-             StandardType<T>(buf.empty() ? libmesh_nullptr : &(*buf.begin())), tag);
+             StandardType<T>(buf.empty() ? nullptr : &(*buf.begin())), tag);
 }
 
 
@@ -992,7 +992,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 const MessageTag & tag) const
 {
   this->send(dest_processor_id, buf,
-             StandardType<T>(buf.empty() ? libmesh_nullptr : &(*buf.begin())), req, tag);
+             StandardType<T>(buf.empty() ? nullptr : &(*buf.begin())), req, tag);
 }
 
 
@@ -1040,7 +1040,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 const MessageTag & tag) const
 {
   this->send(dest_processor_id, buf,
-             StandardType<T>(buf.empty() ? libmesh_nullptr : &buf.front()), tag);
+             StandardType<T>(buf.empty() ? nullptr : &buf.front()), tag);
 }
 
 
@@ -1052,7 +1052,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
                                 const MessageTag & tag) const
 {
   this->send(dest_processor_id, buf,
-             StandardType<T>(buf.empty() ? libmesh_nullptr : &buf.front()), req, tag);
+             StandardType<T>(buf.empty() ? nullptr : &buf.front()), req, tag);
 }
 
 
@@ -1067,7 +1067,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
-      MPI_Ssend : MPI_Send) (buf.empty() ? libmesh_nullptr : const_cast<T*>(&buf[0]),
+      MPI_Ssend : MPI_Send) (buf.empty() ? nullptr : const_cast<T*>(&buf[0]),
                              cast_int<int>(buf.size()),
                              type,
                              dest_processor_id,
@@ -1088,7 +1088,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
   libmesh_call_mpi
     (((this->send_mode() == SYNCHRONOUS) ?
-      MPI_Issend : MPI_Isend) (buf.empty() ? libmesh_nullptr : const_cast<T*>(&buf[0]),
+      MPI_Issend : MPI_Isend) (buf.empty() ? nullptr : const_cast<T*>(&buf[0]),
                                cast_int<int>(buf.size()),
                                type,
                                dest_processor_id,
@@ -1110,7 +1110,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 {
   this->send(dest_processor_id, buf,
              StandardType<T>((buf.empty() || buf.front().empty()) ?
-                             libmesh_nullptr : &(buf.front().front())), tag);
+                             nullptr : &(buf.front().front())), tag);
 }
 
 
@@ -1123,7 +1123,7 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 {
   this->send(dest_processor_id, buf,
              StandardType<T>((buf.empty() || buf.front().empty()) ?
-                             libmesh_nullptr : &(buf.front().front())), req, tag);
+                             nullptr : &(buf.front().front())), req, tag);
 }
 
 
@@ -1482,7 +1482,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 {
   return this->receive
     (src_processor_id, buf,
-     StandardType<T>(buf.empty() ? libmesh_nullptr : &(*buf.begin())), tag);
+     StandardType<T>(buf.empty() ? nullptr : &(*buf.begin())), tag);
 }
 
 
@@ -1499,7 +1499,7 @@ inline void Communicator::receive (const unsigned int src_processor_id,
                                    const MessageTag & tag) const
 {
   this->receive (src_processor_id, buf,
-                 StandardType<T>(buf.empty() ? libmesh_nullptr : &(*buf.begin())), req, tag);
+                 StandardType<T>(buf.empty() ? nullptr : &(*buf.begin())), req, tag);
 }
 #endif // 0
 
@@ -1567,7 +1567,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
 {
   return this->receive
     (src_processor_id, buf,
-     StandardType<T>(buf.empty() ? libmesh_nullptr : &(*buf.begin())), tag);
+     StandardType<T>(buf.empty() ? nullptr : &(*buf.begin())), tag);
 }
 
 
@@ -1579,7 +1579,7 @@ inline void Communicator::receive (const unsigned int src_processor_id,
                                    const MessageTag & tag) const
 {
   this->receive (src_processor_id, buf,
-                 StandardType<T>(buf.empty() ? libmesh_nullptr : &(*buf.begin())), req, tag);
+                 StandardType<T>(buf.empty() ? nullptr : &(*buf.begin())), req, tag);
 }
 
 
@@ -1602,7 +1602,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
   // src_processor_id is or tag is "any" then we want to be sure we
   // try to receive the same message we just probed.
   libmesh_call_mpi
-    (MPI_Recv (buf.empty() ? libmesh_nullptr : &buf[0],
+    (MPI_Recv (buf.empty() ? nullptr : &buf[0],
                cast_int<int>(buf.size()), type, stat.source(),
                stat.tag(), this->get(), stat.get()));
 
@@ -1623,7 +1623,7 @@ inline void Communicator::receive (const unsigned int src_processor_id,
   LOG_SCOPE("receive()", "Parallel");
 
   libmesh_call_mpi
-    (MPI_Irecv (buf.empty() ? libmesh_nullptr : &buf[0],
+    (MPI_Irecv (buf.empty() ? nullptr : &buf[0],
                 cast_int<int>(buf.size()), type, src_processor_id,
                 tag.value(), this->get(), req.get()));
 
@@ -1642,7 +1642,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
   return this->receive
     (src_processor_id, buf,
      StandardType<T>((buf.empty() || buf.front().empty()) ?
-                     libmesh_nullptr : &(buf.front().front())), tag);
+                     nullptr : &(buf.front().front())), tag);
 }
 
 
@@ -1655,7 +1655,7 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 {
   this->receive (src_processor_id, buf,
                  StandardType<T>((buf.empty() || buf.front().empty()) ?
-                                 libmesh_nullptr : &(buf.front().front())), req, tag);
+                                 nullptr : &(buf.front().front())), req, tag);
 }
 
 
@@ -1896,7 +1896,7 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
     }
 
   const T* example = sendvec.empty() ?
-    (recv.empty() ? libmesh_nullptr : &recv[0]) : &sendvec[0];
+    (recv.empty() ? nullptr : &recv[0]) : &sendvec[0];
 
   // Call the user-defined type version with automatic
   // type conversion based on template argument:
@@ -1921,9 +1921,9 @@ inline void Communicator::send_receive(const unsigned int dest_processor_id,
   // Call the user-defined type version with automatic
   // type conversion based on template argument:
   this->send_receive (dest_processor_id, sendvec,
-                      StandardType<T1>(sendvec.empty() ? libmesh_nullptr : &sendvec[0]),
+                      StandardType<T1>(sendvec.empty() ? nullptr : &sendvec[0]),
                       source_processor_id, recv,
-                      StandardType<T2>(recv.empty() ? libmesh_nullptr : &recv[0]),
+                      StandardType<T2>(recv.empty() ? nullptr : &recv[0]),
                       send_tag, recv_tag);
 }
 
@@ -2012,7 +2012,7 @@ inline void Communicator::gather(const unsigned int root_id,
 
       libmesh_call_mpi
         (MPI_Gather(const_cast<T*>(&sendval), 1, send_type,
-                    recv.empty() ? libmesh_nullptr : &recv[0], 1, send_type,
+                    recv.empty() ? nullptr : &recv[0], 1, send_type,
                     root_id, this->get()));
     }
   else
@@ -2066,7 +2066,7 @@ inline void Communicator::gather(const unsigned int root_id,
       libmesh_call_mpi
         (MPI_Gatherv (const_cast<T*>(&sendval[0]),
                       mysize, StandardType<T>(),
-                      this->rank() == root_id ? &r[0] : libmesh_nullptr,
+                      this->rank() == root_id ? &r[0] : nullptr,
                       &sendlengths[0], &displacements[0],
                       StandardType<T>(), root_id, this->get()));
 
@@ -2126,8 +2126,8 @@ inline void Communicator::gather(const unsigned int root_id,
 
   // and get the data from the remote processors
   libmesh_call_mpi
-    (MPI_Gatherv (r_src.empty() ? libmesh_nullptr : &r_src[0], mysize,
-                  StandardType<T>(), r.empty() ? libmesh_nullptr : &r[0],
+    (MPI_Gatherv (r_src.empty() ? nullptr : &r_src[0], mysize,
+                  StandardType<T>(), r.empty() ? nullptr : &r[0],
                   &sendlengths[0], &displacements[0],
                   StandardType<T>(), root_id, this->get()));
 }
@@ -2205,7 +2205,7 @@ inline void Communicator::allgather(const std::basic_string<T> & sendval,
 
   // and get the data from the remote processors.
   libmesh_call_mpi
-    (MPI_Allgatherv (const_cast<T*>(mysize ? &sendval[0] : libmesh_nullptr),
+    (MPI_Allgatherv (const_cast<T*>(mysize ? &sendval[0] : nullptr),
                      mysize, StandardType<T>(),
                      &r[0], &sendlengths[0], &displacements[0],
                      StandardType<T>(), this->get()));
@@ -2272,9 +2272,9 @@ inline void Communicator::allgather(std::vector<T,A> & r,
   StandardType<T> send_type(&r[0]);
 
   // and get the data from the remote processors.
-  // Pass NULL if our vector is empty.
+  // Pass nullptr if our vector is empty.
   libmesh_call_mpi
-    (MPI_Allgatherv (r_src.empty() ? libmesh_nullptr : &r_src[0], mysize,
+    (MPI_Allgatherv (r_src.empty() ? nullptr : &r_src[0], mysize,
                      send_type, &r[0], &sendlengths[0],
                      &displacements[0], send_type, this->get()));
 }
@@ -2343,7 +2343,7 @@ inline void Communicator::allgather(std::vector<std::basic_string<T>,A> & r,
     return;
 
   // Get the concatenated data from the remote processors.
-  // Pass NULL if our vector is empty.
+  // Pass nullptr if our vector is empty.
   std::vector<T> concat(globalsize);
 
   // We may have concat_src.empty(), but we know concat has at least
@@ -2352,7 +2352,7 @@ inline void Communicator::allgather(std::vector<std::basic_string<T>,A> & r,
 
   libmesh_call_mpi
     (MPI_Allgatherv (concat_src.empty() ?
-                     libmesh_nullptr : &concat_src[0], myconcatsize,
+                     nullptr : &concat_src[0], myconcatsize,
                      send_type, &concat[0], &concat_sizes[0],
                      &displacements[0], send_type, this->get()));
 
@@ -2375,7 +2375,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
 {
   libmesh_assert_less (root_id, this->size());
 
-  // Do not allow the root_id to scatter a NULL vector.
+  // Do not allow the root_id to scatter a nullptr vector.
   // That would leave recv in an indeterminate state.
   libmesh_assert (this->rank() != root_id || this->size() == data.size());
 
@@ -2389,7 +2389,7 @@ void Communicator::scatter(const std::vector<T,A> & data,
 
   LOG_SCOPE("scatter()", "Parallel");
 
-  T * data_ptr = const_cast<T*>(data.empty() ? libmesh_nullptr : &data[0]);
+  T * data_ptr = const_cast<T*>(data.empty() ? nullptr : &data[0]);
 
   libmesh_call_mpi
     (MPI_Scatter (data_ptr, 1, StandardType<T>(data_ptr),
@@ -2425,8 +2425,8 @@ void Communicator::scatter(const std::vector<T,A> & data,
   this->broadcast(recv_buffer_size);
   recv.resize(recv_buffer_size);
 
-  T * data_ptr = const_cast<T*>(data.empty() ? libmesh_nullptr : &data[0]);
-  T * recv_ptr = recv.empty() ? libmesh_nullptr : &recv[0];
+  T * data_ptr = const_cast<T*>(data.empty() ? nullptr : &data[0]);
+  T * recv_ptr = recv.empty() ? nullptr : &recv[0];
 
   libmesh_call_mpi
     (MPI_Scatter (data_ptr, recv_buffer_size, StandardType<T>(data_ptr),
@@ -2475,9 +2475,9 @@ void Communicator::scatter(const std::vector<T,A1> & data,
   this->scatter(counts, recv_buffer_size, root_id);
   recv.resize(recv_buffer_size);
 
-  T * data_ptr = const_cast<T*>(data.empty() ? libmesh_nullptr : &data[0]);
-  int * count_ptr = const_cast<int*>(counts.empty() ? libmesh_nullptr : &counts[0]);
-  T * recv_ptr = recv.empty() ? libmesh_nullptr : &recv[0];
+  T * data_ptr = const_cast<T*>(data.empty() ? nullptr : &data[0]);
+  int * count_ptr = const_cast<int*>(counts.empty() ? nullptr : &counts[0]);
+  T * recv_ptr = recv.empty() ? nullptr : &recv[0];
 
   // Scatter the non-uniform chunks
   libmesh_call_mpi
@@ -2665,8 +2665,8 @@ inline void Communicator::broadcast (std::vector<T,A> & data,
   LOG_SCOPE("broadcast()", "Parallel");
 
   // and get the data from the remote processors.
-  // Pass NULL if our vector is empty.
-  T * data_ptr = data.empty() ? libmesh_nullptr : &data[0];
+  // Pass nullptr if our vector is empty.
+  T * data_ptr = data.empty() ? nullptr : &data[0];
 
   libmesh_call_mpi
     (MPI_Bcast (data_ptr, cast_int<int>(data.size()),
@@ -2858,7 +2858,7 @@ inline void Communicator::broadcast_packed_range(const Context * context1,
 
       if (this->rank() != root_id)
         Parallel::unpack_range
-          (buffer, context2, out_iter, (T*)libmesh_nullptr);
+          (buffer, context2, out_iter, (T*)nullptr);
     } while (true);  // break above when we reach buffer_size==0
 }
 
@@ -3195,7 +3195,7 @@ inline void Communicator::gather_packed_range(const unsigned int root_id,
       this->gather(root_id, buffer);
 
       Parallel::unpack_range
-        (buffer, context, out_iter, (T*)(libmesh_nullptr));
+        (buffer, context, out_iter, (T*)(nullptr));
 
       nonempty_range = (range_begin != range_end);
       this->max(nonempty_range);
@@ -3229,7 +3229,7 @@ inline void Communicator::allgather_packed_range(Context * context,
       libmesh_assert(buffer.size());
 
       Parallel::unpack_range
-        (buffer, context, out_iter, (T*)libmesh_nullptr);
+        (buffer, context, out_iter, (T*)nullptr);
 
       nonempty_range = (range_begin != range_end);
       this->max(nonempty_range);

@@ -57,7 +57,7 @@ FEAbstract::FEAbstract(const unsigned int d,
   fe_type(fet),
   elem_type(INVALID_ELEM),
   _p_level(0),
-  qrule(libmesh_nullptr),
+  qrule(nullptr),
   shapes_on_quadrature(false)
 {
 }
@@ -840,7 +840,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
   // Look at the element faces.  Check to see if we need to
   // build constraints.
   for (auto s : elem->side_index_range())
-    if (elem->neighbor_ptr(s) != libmesh_nullptr &&
+    if (elem->neighbor_ptr(s) != nullptr &&
         elem->neighbor_ptr(s) != remote_elem)
       if (elem->neighbor_ptr(s)->level() < elem->level()) // constrain dofs shared between
         {                                                 // this element and ones coarser
@@ -848,7 +848,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
           // Get pointers to the elements of interest and its parent.
           const Elem * parent = elem->parent();
 
-          // This can't happen...  Only level-0 elements have NULL
+          // This can't happen...  Only level-0 elements have nullptr
           // parents, and no level-0 elements can be at a higher
           // level than their neighbors!
           libmesh_assert(parent);

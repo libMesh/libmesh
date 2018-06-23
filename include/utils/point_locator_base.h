@@ -84,7 +84,7 @@ public:
    */
   static std::unique_ptr<PointLocatorBase> build (PointLocatorType t,
                                                   const MeshBase & mesh,
-                                                  const PointLocatorBase * master = libmesh_nullptr);
+                                                  const PointLocatorBase * master = nullptr);
 
   /**
    * Clears the \p PointLocator.
@@ -103,7 +103,7 @@ public:
    * the subdomains searched.
    */
   virtual const Elem * operator() (const Point & p,
-                                   const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const = 0;
+                                   const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const = 0;
 
   /**
    * Locates a set of elements in proximity to the point with global coordinates
@@ -111,11 +111,11 @@ public:
    */
   virtual void operator() (const Point & p,
                            std::set<const Elem *> & candidate_elements,
-                           const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr) const = 0;
+                           const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const = 0;
 
   /**
    * \returns A pointer to a Node with global coordinates \p p or \p
-   * NULL if no such Node can be found.
+   * nullptr if no such Node can be found.
    *
    * Virtual subclasses can override for efficiency, but the base
    * class has a default implementation that works based on element
@@ -131,7 +131,7 @@ public:
    */
   virtual const Node *
   locate_node (const Point & p,
-               const std::set<subdomain_id_type> * allowed_subdomains = libmesh_nullptr,
+               const std::set<subdomain_id_type> * allowed_subdomains = nullptr,
                Real tol = TOLERANCE) const;
 
   /**
@@ -143,7 +143,7 @@ public:
   /**
    * Enables out-of-mesh mode.  In this mode, if asked to find a point
    * that is contained in no mesh at all, the point locator will
-   * return a NULL pointer instead of crashing.  Per default, this
+   * return a nullptr instead of crashing.  Per default, this
    * mode is off.
    */
   virtual void enable_out_of_mesh_mode () = 0;
@@ -179,7 +179,7 @@ public:
 
 protected:
   /**
-   * Const pointer to our master, initialized to \p NULL if none
+   * Const pointer to our master, initialized to \p nullptr if none
    * given.  When using multiple PointLocators, one can be assigned
    * master and be in charge of something that all can have access to.
    */

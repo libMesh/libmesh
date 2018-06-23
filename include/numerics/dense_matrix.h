@@ -651,7 +651,7 @@ private:
 
   /**
    * Computes the eigenvalues of the matrix using the Lapack routine
-   * "DGEEV".  If VR and/or VL are non-NULL, then the matrix of right
+   * "DGEEV".  If VR and/or VL are not nullptr, then the matrix of right
    * and/or left eigenvectors is also computed and returned by this
    * function.
    *
@@ -659,8 +659,8 @@ private:
    */
   void _evd_lapack(DenseVector<T> & lambda_real,
                    DenseVector<T> & lambda_imag,
-                   DenseMatrix<T> * VL = libmesh_nullptr,
-                   DenseMatrix<T> * VR = libmesh_nullptr);
+                   DenseMatrix<T> * VL = nullptr,
+                   DenseMatrix<T> * VR = nullptr);
 
   /**
    * Array used to store pivot indices.  May be used by whatever

@@ -36,12 +36,12 @@ void DefaultCoupling::set_dof_coupling(const CouplingMatrix * dof_coupling)
   // We used to treat an empty 0x0 _dof_coupling matrix as if it
   // were an NxN all-ones matrix.  We'd like to stop supporting this
   // behavior, but for now we'll just warn about it, while supporting
-  // it via the preferred mechanism: a NULL _dof_coupling
+  // it via the preferred mechanism: a nullptr _dof_coupling
   // matrix pointer is interpreted as a full coupling matrix.
   if (dof_coupling && dof_coupling->empty())
     {
       libmesh_deprecated();
-      _dof_coupling = NULL;
+      _dof_coupling = nullptr;
     }
   else
     _dof_coupling = dof_coupling;

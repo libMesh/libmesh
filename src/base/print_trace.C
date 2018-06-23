@@ -255,7 +255,7 @@ std::string demangle(const char * name)
   // Actually do the demangling
   char * demangled_name = abi::__cxa_demangle(name, 0, 0, &status);
 
-  // If demangling returns non-NULL, save the result in a string.
+  // If demangling returns non-nullptr, save the result in a string.
   if (demangled_name)
     ret = demangled_name;
 

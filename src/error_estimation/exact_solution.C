@@ -38,7 +38,7 @@ namespace libMesh
 
 ExactSolution::ExactSolution(const EquationSystems & es) :
   _equation_systems(es),
-  _equation_systems_fine(libmesh_nullptr),
+  _equation_systems_fine(nullptr),
   _extra_order(0)
 {
   // Initialize the _errors data structure which holds all
@@ -97,7 +97,7 @@ void ExactSolution::attach_exact_value (ValueFunctionPointer fptr)
     }
 
   // If we're using exact values, we're not using a fine grid solution
-  _equation_systems_fine = libmesh_nullptr;
+  _equation_systems_fine = nullptr;
 }
 
 
@@ -108,7 +108,7 @@ void ExactSolution::attach_exact_values (const std::vector<FunctionBase<Number> 
   _exact_values.clear();
 
   for (auto ptr : f)
-    _exact_values.emplace_back(ptr ? ptr->clone() : libmesh_nullptr);
+    _exact_values.emplace_back(ptr ? ptr->clone() : nullptr);
 }
 
 
@@ -138,7 +138,7 @@ void ExactSolution::attach_exact_deriv (GradientFunctionPointer gptr)
     }
 
   // If we're using exact values, we're not using a fine grid solution
-  _equation_systems_fine = libmesh_nullptr;
+  _equation_systems_fine = nullptr;
 }
 
 
@@ -149,7 +149,7 @@ void ExactSolution::attach_exact_derivs (const std::vector<FunctionBase<Gradient
   _exact_derivs.clear();
 
   for (auto ptr : g)
-    _exact_derivs.emplace_back(ptr ? ptr->clone() : libmesh_nullptr);
+    _exact_derivs.emplace_back(ptr ? ptr->clone() : nullptr);
 }
 
 
@@ -179,7 +179,7 @@ void ExactSolution::attach_exact_hessian (HessianFunctionPointer hptr)
     }
 
   // If we're using exact values, we're not using a fine grid solution
-  _equation_systems_fine = libmesh_nullptr;
+  _equation_systems_fine = nullptr;
 }
 
 
@@ -190,7 +190,7 @@ void ExactSolution::attach_exact_hessians (std::vector<FunctionBase<Tensor> *> h
   _exact_hessians.clear();
 
   for (auto ptr : h)
-    _exact_hessians.emplace_back(ptr ? ptr->clone() : libmesh_nullptr);
+    _exact_hessians.emplace_back(ptr ? ptr->clone() : nullptr);
 }
 
 
@@ -612,11 +612,11 @@ void ExactSolution::_compute_error(const std::string & sys_name,
 
       // The value of the shape function curls at the quadrature points
       // Only computed for vector-valued elements
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape>> * curl_values = libmesh_nullptr;
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape>> * curl_values = nullptr;
 
       // The value of the shape function divergences at the quadrature points
       // Only computed for vector-valued elements
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence>> * div_values = libmesh_nullptr;
+      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence>> * div_values = nullptr;
 
       if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
         {

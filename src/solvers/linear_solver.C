@@ -44,9 +44,9 @@ LinearSolver<T>::LinearSolver (const libMesh::Parallel::Communicator & comm_in) 
   _solver_type         (GMRES),
   _preconditioner_type (ILU_PRECOND),
   _is_initialized      (false),
-  _preconditioner      (libmesh_nullptr),
+  _preconditioner      (nullptr),
   same_preconditioner  (false),
-  _solver_configuration(libmesh_nullptr)
+  _solver_configuration(nullptr)
 {
 }
 
@@ -136,7 +136,7 @@ void
 LinearSolver<T>::restrict_solve_to(const std::vector<unsigned int> * const dofs,
                                    const SubsetSolveMode /*subset_solve_mode*/)
 {
-  if (dofs != libmesh_nullptr)
+  if (dofs != nullptr)
     libmesh_not_implemented();
 }
 

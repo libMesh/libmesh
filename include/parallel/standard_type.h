@@ -73,7 +73,7 @@ class StandardType : public DataType
    * form.
    */
 private:
-  StandardType(const T * example = libmesh_nullptr);
+  StandardType(const T * example = nullptr);
 };
 
 
@@ -89,7 +89,7 @@ private:
   {                                                                     \
   public:                                                               \
     explicit                                                            \
-      StandardType(const cxxtype * = libmesh_nullptr) : DataType(mpitype) {} \
+      StandardType(const cxxtype * = nullptr) : DataType(mpitype) {} \
   }
 
 #else
@@ -100,7 +100,7 @@ private:
   {                                                                     \
   public:                                                               \
     explicit                                                            \
-      StandardType(const cxxtype * = libmesh_nullptr) : DataType() {}   \
+      StandardType(const cxxtype * = nullptr) : DataType() {}   \
   }
 
 #endif
@@ -125,7 +125,7 @@ class StandardType<std::pair<T1, T2>> : public DataType
 {
 public:
   explicit
-  StandardType(const std::pair<T1, T2> * example = libmesh_nullptr) {
+  StandardType(const std::pair<T1, T2> * example = nullptr) {
     // We need an example for MPI_Address to use
     static const std::pair<T1, T2> p;
     if (!example)
@@ -263,7 +263,7 @@ class StandardType<std::tuple<Types...>> : public DataType
 {
 public:
   explicit
-  StandardType(const std::tuple<Types...> * example = libmesh_nullptr) {
+  StandardType(const std::tuple<Types...> * example = nullptr) {
     // We need an example for MPI_Address to use
     static const std::tuple<Types...> t;
     if (!example)
@@ -332,8 +332,8 @@ class StandardType<std::complex<T>> : public DataType
 {
 public:
   explicit
-  StandardType(const std::complex<T> * /*example*/ = libmesh_nullptr) :
-    DataType(StandardType<T>(libmesh_nullptr), 2) {}
+  StandardType(const std::complex<T> * /*example*/ = nullptr) :
+    DataType(StandardType<T>(nullptr), 2) {}
 
   ~StandardType() { this->free(); }
 };

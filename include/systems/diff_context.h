@@ -624,7 +624,7 @@ protected:
 private:
 
   /**
-   * Default NULL, can optionally be used to point to a timestep value
+   * Defaults to nullptr, can optionally be used to point to a timestep value
    * in the System-derived class responsible for creating this DiffContext.
    *
    * In DiffSystem's build_context() function, is assigned to point to
@@ -632,7 +632,7 @@ private:
    *
    * Accessible via public get_deltat()/set_deltat() methods of this class.
    *
-   * Always test for NULL before using!
+   * Always test for nullptr before using!
    */
   Real * _deltat;
 

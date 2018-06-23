@@ -411,7 +411,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
         };
 
       // Trade requests with other processors
-      const dof_id_type * ex = libmesh_nullptr;
+      const dof_id_type * ex = nullptr;
       Parallel::pull_parallel_vector_data
         (communicator, requested_ids, gather_functor, action_functor, ex);
 
@@ -527,7 +527,7 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
         };
 
       // Trade requests with other processors
-      const dof_id_type * ex = libmesh_nullptr;
+      const dof_id_type * ex = nullptr;
       Parallel::pull_parallel_vector_data
         (communicator, requested_ids, gather_functor, action_functor, ex);
 
@@ -926,7 +926,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
       filled_request[pid] = global_ids;
     };
 
-  const dof_id_type * ex = libmesh_nullptr;
+  const dof_id_type * ex = nullptr;
   Parallel::pull_parallel_vector_data
     (communicator, requested_ids, gather_functor, action_functor, ex);
 

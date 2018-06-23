@@ -145,7 +145,7 @@ class GaussLobattoRedistributionFunction : public FunctionBase<Real>
 {
 public:
   /**
-   * Constructor class base class ctor with NULL master.
+   * Constructor.
    */
   GaussLobattoRedistributionFunction(unsigned int nx,
                                      Real xmin,
@@ -156,7 +156,7 @@ public:
                                      unsigned int nz=0,
                                      Real zmin=0,
                                      Real zmax=0) :
-    FunctionBase<Real>(libmesh_nullptr)
+    FunctionBase<Real>(nullptr)
   {
     _nelem.resize(3);
     _nelem[0] = nx;
@@ -1911,7 +1911,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
 
       for (const auto & elem : mesh.active_element_ptr_range())
         for (auto s : elem->side_index_range())
-          if (elem->neighbor_ptr(s) == libmesh_nullptr || (mesh.mesh_dimension() == 2 && !flat))
+          if (elem->neighbor_ptr(s) == nullptr || (mesh.mesh_dimension() == 2 && !flat))
             {
               std::unique_ptr<Elem> side(elem->build_side_ptr(s));
 
@@ -1951,7 +1951,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
       // And pop to the boundary again...
       for (const auto & elem : mesh.active_element_ptr_range())
         for (auto s : elem->side_index_range())
-          if (elem->neighbor_ptr(s) == libmesh_nullptr)
+          if (elem->neighbor_ptr(s) == nullptr)
             {
               std::unique_ptr<Elem> side(elem->build_side_ptr(s));
 
@@ -2364,7 +2364,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
   t.triangulation_type() = TriangleInterface::PSLG;
   t.elem_type()          = type;
 
-  if (holes != libmesh_nullptr)
+  if (holes != nullptr)
     t.attach_hole_list(holes);
 
   // Triangulate!
@@ -2375,7 +2375,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
   // hole boundary elements get the same ID, 4.
   for (auto & elem : mesh.element_ptr_range())
     for (auto s : elem->side_index_range())
-      if (elem->neighbor_ptr(s) == libmesh_nullptr)
+      if (elem->neighbor_ptr(s) == nullptr)
         {
           std::unique_ptr<const Elem> side (elem->build_side_ptr(s));
 

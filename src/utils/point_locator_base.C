@@ -119,7 +119,7 @@ locate_node(const Point & p,
           return elem->node_ptr(n);
     }
 
-  return libmesh_nullptr;
+  return nullptr;
 }
 
 } // namespace libMesh

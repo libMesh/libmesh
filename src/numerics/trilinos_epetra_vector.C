@@ -906,13 +906,13 @@ void EpetraVector<T>::destroyNonlocalData()
   if (allocatedNonlocalLength_ > 0) {
     delete [] nonlocalIDs_;
     delete [] nonlocalElementSize_;
-    nonlocalIDs_ = libmesh_nullptr;
-    nonlocalElementSize_ = libmesh_nullptr;
+    nonlocalIDs_ = nullptr;
+    nonlocalElementSize_ = nullptr;
     for (int i=0; i<numNonlocalIDs_; ++i) {
       delete [] nonlocalCoefs_[i];
     }
     delete [] nonlocalCoefs_;
-    nonlocalCoefs_ = libmesh_nullptr;
+    nonlocalCoefs_ = nullptr;
     numNonlocalIDs_ = 0;
     allocatedNonlocalLength_ = 0;
   }

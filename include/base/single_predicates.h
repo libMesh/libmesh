@@ -19,9 +19,11 @@
 #define LIBMESH_SINGLE_PREDICATES_H
 
 // Local includes
-#include <cstddef>         // for NULL with gcc 4.6.2 - I'm serious!
 #include "libmesh/libmesh_common.h"
 #include "libmesh/id_types.h"
+
+// C++ includes
+#include <cstddef>
 
 #ifdef LIBMESH_FORWARD_DECLARE_ENUMS
 namespace libMesh
@@ -76,20 +78,20 @@ protected:
 
 
 /**
- * \returns \p true if the underlying pointer is NULL.
+ * \returns \p true if the underlying pointer is nullptr.
  */
 template <typename T>
 struct is_null : predicate<T>
 {
   virtual ~is_null() {}
-  virtual bool operator()(const T & it) const override { return *it == libmesh_nullptr; }
+  virtual bool operator()(const T & it) const override { return *it == nullptr; }
 
 protected:
   virtual predicate<T> * clone() const override { return new is_null<T>(*this); }
 };
 
 /**
- * \returns \p true if the pointer is not NULL.
+ * \returns \p true if the pointer is not nullptr.
  */
 template <typename T>
 struct not_null : is_null<T>
@@ -389,7 +391,7 @@ protected:
 
 
 /**
- * \returns \p true if the pointer has any \p NULL neighbors.
+ * \returns \p true if the pointer has any \p nullptr neighbors.
  */
 template <typename T>
 struct null_neighbor : predicate<T>

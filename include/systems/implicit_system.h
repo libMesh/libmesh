@@ -312,14 +312,14 @@ public:
 
   /**
    * \returns A const pointer to this system's additional matrix
-   * named \p mat_name, or \p NULL if no matrix by that name
+   * named \p mat_name, or \p nullptr if no matrix by that name
    * exists.
    */
   const SparseMatrix<Number> * request_matrix (const std::string & mat_name) const;
 
   /**
    * \returns A writable pointer to this system's additional matrix
-   * named \p mat_name, or \p NULL if no matrix by that name
+   * named \p mat_name, or \p nullptr if no matrix by that name
    * exists.
    */
   SparseMatrix<Number> * request_matrix (const std::string & mat_name);

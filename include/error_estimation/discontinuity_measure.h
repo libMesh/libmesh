@@ -52,7 +52,7 @@ public:
 
   /**
    * Constructor.  Responsible for initializing the _bc_function function
-   * pointer to libmesh_nullptr.  Defaults to L2 norm; changes to system norm are
+   * pointer to nullptr.  Defaults to L2 norm; changes to system norm are
    * ignored.
    */
   DiscontinuityMeasure();

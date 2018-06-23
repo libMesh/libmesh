@@ -181,7 +181,7 @@ private:
   UnstructuredMesh & _mesh;
 
   /**
-   * A pointer to a vector of Hole*s.  If this is NULL, there
+   * A pointer to a vector of Hole*s.  If this is nullptr, there
    * are no holes!
    */
   const std::vector<Hole*> * _holes;

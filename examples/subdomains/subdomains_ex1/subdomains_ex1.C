@@ -564,7 +564,7 @@ void assemble_poisson(EquationSystems & es,
             // is different from 1, the side is also located on the
             // boundary.
             for (auto side : elem->side_index_range())
-              if ((elem->neighbor_ptr(side) == libmesh_nullptr) ||
+              if ((elem->neighbor_ptr(side) == nullptr) ||
                   (elem->neighbor_ptr(side)->subdomain_id()!=1))
                 {
 

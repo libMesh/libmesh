@@ -479,7 +479,7 @@ TreeNode<N>::find_element (const Point & p,
               return elem;
 
       // The point was not found in any element
-      return libmesh_nullptr;
+      return nullptr;
     }
   else
     return this->find_element_in_children(p,allowed_subdomains,
@@ -508,7 +508,7 @@ const Elem * TreeNode<N>::find_element_in_children (const Point & p,
           children[c]->find_element(p,allowed_subdomains,
                                     relative_tol);
 
-        if (e != libmesh_nullptr)
+        if (e != nullptr)
           return e;
 
         // If we get here then a child that bounds the
@@ -531,17 +531,16 @@ const Elem * TreeNode<N>::find_element_in_children (const Point & p,
           children[c]->find_element(p,allowed_subdomains,
                                     relative_tol);
 
-        if (e != libmesh_nullptr)
+        if (e != nullptr)
           return e;
       }
 
   // If we get here we have searched all our children.
   // Since this process was started at the root node then
   // we have searched all the elements in the tree without
-  // success.  So, we should return NULL since at this point
+  // success.  So, we should return nullptr since at this point
   // _no_ elements in the tree claim to contain point p.
-
-  return libmesh_nullptr;
+  return nullptr;
 }
 
 

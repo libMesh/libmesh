@@ -337,7 +337,7 @@ void RBEIMEvaluation::legacy_write_out_interpolation_points_elem(const std::stri
       std::map<dof_id_type,dof_id_type>::iterator id_it = elem_id_map.find(old_elem_id);
       if (id_it == elem_id_map.end())
         {
-          Elem * new_elem = Elem::build(old_elem->type(), /*parent*/ libmesh_nullptr).release();
+          Elem * new_elem = Elem::build(old_elem->type(), /*parent*/ nullptr).release();
           new_elem->subdomain_id() = old_elem->subdomain_id();
 
           // Assign all the nodes

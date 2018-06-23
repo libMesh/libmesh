@@ -298,7 +298,7 @@ public:
 
     // Find elem_bottom again if we have it (it may have been deleted
     // in a DistributedMesh or renumbered in theory)
-    elem_bottom = NULL;
+    elem_bottom = nullptr;
     for (unsigned int e = 0; e != mesh.max_elem_id(); ++e)
       {
         Elem *elem = mesh.query_elem_ptr(e);

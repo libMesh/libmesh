@@ -68,7 +68,7 @@ void MeshOutput<MT>::write_equation_systems (const std::string & fname,
 
   // Build the list of variable names that will be written.
   std::vector<std::string> names;
-  es.build_variable_names  (names, libmesh_nullptr, system_names);
+  es.build_variable_names  (names, nullptr, system_names);
 
   if (!_is_parallel_format)
     {
@@ -129,7 +129,7 @@ void MeshOutput<MT>::write_discontinuous_equation_systems (const std::string & f
 
   // Build the list of variable names that will be written.
   std::vector<std::string> names;
-  es.build_variable_names  (names, libmesh_nullptr, system_names);
+  es.build_variable_names  (names, nullptr, system_names);
 
   if (!_is_parallel_format)
     {

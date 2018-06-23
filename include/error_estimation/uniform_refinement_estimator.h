@@ -79,7 +79,7 @@ public:
    */
   virtual void estimate_error (const System & system,
                                ErrorVector & error_per_cell,
-                               const NumericVector<Number> * solution_vector = libmesh_nullptr,
+                               const NumericVector<Number> * solution_vector = nullptr,
                                bool estimate_parent_error = false) override;
 
   /**
@@ -92,7 +92,7 @@ public:
   virtual void estimate_errors (const EquationSystems & equation_systems,
                                 ErrorVector & error_per_cell,
                                 const std::map<const System *, SystemNorm> & error_norms,
-                                const std::map<const System *, const NumericVector<Number> *> * solution_vectors = libmesh_nullptr,
+                                const std::map<const System *, const NumericVector<Number> *> * solution_vectors = nullptr,
                                 bool estimate_parent_error = false) override;
 
   /**
@@ -105,7 +105,7 @@ public:
    */
   virtual void estimate_errors (const EquationSystems & equation_systems,
                                 ErrorMap & errors_per_cell,
-                                const std::map<const System *, const NumericVector<Number> *> * solution_vectors = libmesh_nullptr,
+                                const std::map<const System *, const NumericVector<Number> *> * solution_vectors = nullptr,
                                 bool estimate_parent_error = false) override;
 
   virtual ErrorEstimatorType type() const override;
@@ -130,7 +130,7 @@ protected:
                                 ErrorVector * error_per_cell,
                                 std::map<std::pair<const System *, unsigned int>, ErrorVector *> * errors_per_cell,
                                 const std::map<const System *, SystemNorm > * error_norms,
-                                const std::map<const System *, const NumericVector<Number> *> * solution_vectors = libmesh_nullptr,
+                                const std::map<const System *, const NumericVector<Number> *> * solution_vectors = nullptr,
                                 bool estimate_parent_error = false);
 };
 

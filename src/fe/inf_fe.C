@@ -120,7 +120,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
   base_fe->get_xyz();
   base_fe->determine_calculations();
 
-  if (pts == libmesh_nullptr)
+  if (pts == nullptr)
     {
       libmesh_assert(base_fe->qrule);
       libmesh_assert_equal_to (base_fe->qrule, base_qrule.get());
@@ -204,7 +204,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       this->compute_shape_functions (inf_elem,base_fe->qrule->get_points());
     }
 
-  else // if pts != libmesh_nullptr
+  else // if pts != nullptr
     {
       // update the elem_type
       elem_type = inf_elem->type();
@@ -276,7 +276,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
       this->combine_base_radial (inf_elem);
 
       // weights
-      if (weights != libmesh_nullptr)
+      if (weights != nullptr)
         {
           this->_fe_map->compute_map (this->dim, *weights, inf_elem, this->calculate_d2phi);
         }

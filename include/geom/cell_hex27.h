@@ -73,7 +73,7 @@ public:
    * Constructor.  By default this element has no parent.
    */
   explicit
-  Hex27 (Elem * p=libmesh_nullptr) :
+  Hex27 (Elem * p=nullptr) :
     Hex(Hex27::n_nodes(), p, _nodelinks_data)
   {}
 

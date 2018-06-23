@@ -506,7 +506,7 @@ void CheckpointIO::write_connectivity (Xdr & io,
       elem_data[3] = elem->subdomain_id();
 
 #ifdef LIBMESH_ENABLE_AMR
-      if (elem->parent() != libmesh_nullptr)
+      if (elem->parent() != nullptr)
         {
           elem_data[4] = elem->parent()->id();
           elem_data[5] = elem->parent()->which_child_am_i(elem);
@@ -1032,7 +1032,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
 
       Elem * parent =
         (parent_id == DofObject::invalid_processor_id) ?
-        libmesh_nullptr : mesh.elem_ptr(parent_id);
+        nullptr : mesh.elem_ptr(parent_id);
 
       if (!parent)
         libmesh_assert_equal_to
@@ -1149,8 +1149,7 @@ void CheckpointIO::read_remote_elem (Xdr & io, bool libmesh_dbg_var(expect_all_r
       // We'd like to assert that no child pointer already exists to
       // be overwritten by remote_elem, but Elem doesn't actually have
       // an API that will return a child pointer without asserting
-      // that it isn't NULL
-      //
+      // that it isn't nullptr.
       const Elem * child = elem.raw_child_ptr(child_numbers[i]);
 
       if (!child)

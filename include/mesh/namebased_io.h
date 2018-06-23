@@ -81,7 +81,7 @@ public:
    */
   virtual void write_equation_systems (const std::string & filename,
                                        const EquationSystems & es,
-                                       const std::set<std::string> * system_names=libmesh_nullptr) override;
+                                       const std::set<std::string> * system_names=nullptr) override;
 
   /**
    * Bring in base class functionality for name resolution and to

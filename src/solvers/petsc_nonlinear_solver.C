@@ -166,17 +166,17 @@ extern "C"
     if (rc.solver->matvec && rc.solver->residual_and_jacobian_object)
       libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
-    if (rc.solver->residual != libmesh_nullptr)
+    if (rc.solver->residual != nullptr)
       rc.solver->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
 
-    else if (rc.solver->residual_object != libmesh_nullptr)
+    else if (rc.solver->residual_object != nullptr)
       rc.solver->residual_object->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
 
-    else if (rc.solver->matvec != libmesh_nullptr)
-      rc.solver->matvec (*rc.sys.current_local_solution.get(), &R, libmesh_nullptr, rc.sys);
+    else if (rc.solver->matvec != nullptr)
+      rc.solver->matvec (*rc.sys.current_local_solution.get(), &R, nullptr, rc.sys);
 
-    else if (rc.solver->residual_and_jacobian_object != libmesh_nullptr)
-      rc.solver->residual_and_jacobian_object->residual_and_jacobian (*rc.sys.current_local_solution.get(), &R, libmesh_nullptr, rc.sys);
+    else if (rc.solver->residual_and_jacobian_object != nullptr)
+      rc.solver->residual_and_jacobian_object->residual_and_jacobian (*rc.sys.current_local_solution.get(), &R, nullptr, rc.sys);
 
     else
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
@@ -208,10 +208,10 @@ extern "C"
     if (rc.solver->_zero_out_residual)
       R.zero();
 
-    if (rc.solver->fd_residual_object != libmesh_nullptr)
+    if (rc.solver->fd_residual_object != nullptr)
       rc.solver->fd_residual_object->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
 
-    else if (rc.solver->residual_object != libmesh_nullptr)
+    else if (rc.solver->residual_object != nullptr)
       rc.solver->residual_object->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
 
     else
@@ -245,10 +245,10 @@ extern "C"
     if (rc.solver->_zero_out_residual)
       R.zero();
 
-    if (rc.solver->mffd_residual_object != libmesh_nullptr)
+    if (rc.solver->mffd_residual_object != nullptr)
       rc.solver->mffd_residual_object->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
 
-    else if (rc.solver->residual_object != libmesh_nullptr)
+    else if (rc.solver->residual_object != nullptr)
       rc.solver->residual_object->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
 
     else
@@ -351,17 +351,17 @@ extern "C"
     if (solver->matvec && solver->residual_and_jacobian_object)
       libmesh_error_msg("ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
-    if (solver->jacobian != libmesh_nullptr)
+    if (solver->jacobian != nullptr)
       solver->jacobian(*sys.current_local_solution.get(), PC, sys);
 
-    else if (solver->jacobian_object != libmesh_nullptr)
+    else if (solver->jacobian_object != nullptr)
       solver->jacobian_object->jacobian(*sys.current_local_solution.get(), PC, sys);
 
-    else if (solver->matvec != libmesh_nullptr)
-      solver->matvec(*sys.current_local_solution.get(), libmesh_nullptr, &PC, sys);
+    else if (solver->matvec != nullptr)
+      solver->matvec(*sys.current_local_solution.get(), nullptr, &PC, sys);
 
-    else if (solver->residual_and_jacobian_object != libmesh_nullptr)
-      solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), libmesh_nullptr, &PC, sys);
+    else if (solver->residual_and_jacobian_object != nullptr)
+      solver->residual_and_jacobian_object->residual_and_jacobian (*sys.current_local_solution.get(), nullptr, &PC, sys);
 
     else
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");

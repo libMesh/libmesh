@@ -60,7 +60,7 @@ public:
 
   /**
    * Constructor.  Responsible for initializing the _bc_function function
-   * pointer to libmesh_nullptr, and defaulting the norm type to H1.
+   * pointer to nullptr, and defaulting the norm type to H1.
    */
   ExactErrorEstimator();
 
@@ -179,7 +179,7 @@ public:
    */
   virtual void estimate_error (const System & system,
                                ErrorVector & error_per_cell,
-                               const NumericVector<Number> * solution_vector = libmesh_nullptr,
+                               const NumericVector<Number> * solution_vector = nullptr,
                                bool estimate_parent_error = false) override;
 
   virtual ErrorEstimatorType type() const override;

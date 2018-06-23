@@ -88,7 +88,7 @@ public:
                                        elem_type);
 
     es.init();
-    sys.project_solution(cubic_default_coupling_test, NULL, es.parameters);
+    sys.project_solution(cubic_default_coupling_test, nullptr, es.parameters);
 
     for (const auto & elem : mesh.active_local_element_ptr_range())
       for (unsigned int s1=0; s1 != elem->n_neighbors(); ++s1)

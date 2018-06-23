@@ -69,16 +69,16 @@ System::System (EquationSystems & es,
   current_local_solution            (NumericVector<Number>::build(this->comm())),
   time                              (0.),
   qoi                               (0),
-  _init_system_function             (libmesh_nullptr),
-  _init_system_object               (libmesh_nullptr),
-  _assemble_system_function         (libmesh_nullptr),
-  _assemble_system_object           (libmesh_nullptr),
-  _constrain_system_function        (libmesh_nullptr),
-  _constrain_system_object          (libmesh_nullptr),
-  _qoi_evaluate_function            (libmesh_nullptr),
-  _qoi_evaluate_object              (libmesh_nullptr),
-  _qoi_evaluate_derivative_function (libmesh_nullptr),
-  _qoi_evaluate_derivative_object   (libmesh_nullptr),
+  _init_system_function             (nullptr),
+  _init_system_object               (nullptr),
+  _assemble_system_function         (nullptr),
+  _assemble_system_object           (nullptr),
+  _constrain_system_function        (nullptr),
+  _constrain_system_object          (nullptr),
+  _qoi_evaluate_function            (nullptr),
+  _qoi_evaluate_object              (nullptr),
+  _qoi_evaluate_derivative_function (nullptr),
+  _qoi_evaluate_derivative_object   (nullptr),
   _dof_map                          (new DofMap(number_in, es.get_mesh())),
   _equation_systems                 (es),
   _mesh                             (es.get_mesh()),
@@ -123,17 +123,17 @@ System::~System ()
   // but a good habit.
   _init_system_function =
     _assemble_system_function =
-    _constrain_system_function = libmesh_nullptr;
+    _constrain_system_function = nullptr;
 
-  _qoi_evaluate_function = libmesh_nullptr;
-  _qoi_evaluate_derivative_function =  libmesh_nullptr;
+  _qoi_evaluate_function = nullptr;
+  _qoi_evaluate_derivative_function =  nullptr;
 
-  // libmesh_nullptr-out user-provided objects.
-  _init_system_object             = libmesh_nullptr;
-  _assemble_system_object         = libmesh_nullptr;
-  _constrain_system_object        = libmesh_nullptr;
-  _qoi_evaluate_object            = libmesh_nullptr;
-  _qoi_evaluate_derivative_object = libmesh_nullptr;
+  // nullptr-out user-provided objects.
+  _init_system_object             = nullptr;
+  _assemble_system_object         = nullptr;
+  _constrain_system_object        = nullptr;
+  _qoi_evaluate_object            = nullptr;
+  _qoi_evaluate_derivative_object = nullptr;
 
   // Clear data
   // Note: although clear() is virtual, C++ only calls
@@ -219,7 +219,7 @@ void System::clear ()
       {
         pr.second->clear ();
         delete pr.second;
-        pr.second = libmesh_nullptr;
+        pr.second = nullptr;
       }
 
     _vectors.clear();
@@ -452,7 +452,7 @@ void System::re_update ()
 void System::restrict_solve_to (const SystemSubset * subset,
                                 const SubsetSolveMode /*subset_solve_mode*/)
 {
-  if (subset != libmesh_nullptr)
+  if (subset != nullptr)
     libmesh_not_implemented();
 }
 
@@ -717,7 +717,7 @@ const NumericVector<Number> * System::request_vector (const std::string & vec_na
   const_vectors_iterator pos = _vectors.find(vec_name);
 
   if (pos == _vectors.end())
-    return libmesh_nullptr;
+    return nullptr;
 
   return pos->second;
 }
@@ -729,7 +729,7 @@ NumericVector<Number> * System::request_vector (const std::string & vec_name)
   vectors_iterator pos = _vectors.find(vec_name);
 
   if (pos == _vectors.end())
-    return libmesh_nullptr;
+    return nullptr;
 
   return pos->second;
 }
@@ -747,7 +747,7 @@ const NumericVector<Number> * System::request_vector (const unsigned int vec_num
       ++v;
     }
   if (v==v_end)
-    return libmesh_nullptr;
+    return nullptr;
   return v->second;
 }
 
@@ -764,7 +764,7 @@ NumericVector<Number> * System::request_vector (const unsigned int vec_num)
       ++v;
     }
   if (v==v_end)
-    return libmesh_nullptr;
+    return nullptr;
   return v->second;
 }
 
@@ -1113,7 +1113,7 @@ unsigned int System::add_variable (const std::string & var,
       // get a pointer to their subdomain restriction, if any.
       const std::set<subdomain_id_type> * const
         their_active_subdomains (vg.implicitly_active() ?
-                                 libmesh_nullptr : &vg.active_subdomains());
+                                 nullptr : &vg.active_subdomains());
 
       // Different types?
       if (vg.type() != type)
@@ -1191,7 +1191,7 @@ unsigned int System::add_variables (const std::vector<std::string> & vars,
   const unsigned int next_first_component = this->n_components();
 
   // Add the variable group to the list
-  _variable_groups.push_back((active_subdomains == libmesh_nullptr) ?
+  _variable_groups.push_back((active_subdomains == nullptr) ?
                              VariableGroup(this, vars, curr_n_vars,
                                            next_first_component, type) :
                              VariableGroup(this, vars, curr_n_vars,
@@ -1520,7 +1520,7 @@ Real System::calculate_norm(const NumericVector<Number> & v,
           libmesh_assert(qrule);
 
           const std::vector<Real> &               JxW = fe->get_JxW();
-          const std::vector<std::vector<Real>> * phi = libmesh_nullptr;
+          const std::vector<std::vector<Real>> * phi = nullptr;
           if (norm_type == H1 ||
               norm_type == H2 ||
               norm_type == L2 ||
@@ -1528,14 +1528,14 @@ Real System::calculate_norm(const NumericVector<Number> & v,
               norm_type == L_INF)
             phi = &(fe->get_phi());
 
-          const std::vector<std::vector<RealGradient>> * dphi = libmesh_nullptr;
+          const std::vector<std::vector<RealGradient>> * dphi = nullptr;
           if (norm_type == H1 ||
               norm_type == H2 ||
               norm_type == H1_SEMINORM ||
               norm_type == W1_INF_SEMINORM)
             dphi = &(fe->get_dphi());
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          const std::vector<std::vector<RealTensor>> *   d2phi = libmesh_nullptr;
+          const std::vector<std::vector<RealTensor>> *   d2phi = nullptr;
           if (norm_type == H2 ||
               norm_type == H2_SEMINORM ||
               norm_type == W2_INF_SEMINORM)
@@ -1728,13 +1728,13 @@ void System::attach_init_function (void fptr(EquationSystems & es,
 {
   libmesh_assert(fptr);
 
-  if (_init_system_object != libmesh_nullptr)
+  if (_init_system_object != nullptr)
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both initialization function and object!"
                    << std::endl;
 
-      _init_system_object = libmesh_nullptr;
+      _init_system_object = nullptr;
     }
 
   _init_system_function = fptr;
@@ -1744,13 +1744,13 @@ void System::attach_init_function (void fptr(EquationSystems & es,
 
 void System::attach_init_object (System::Initialization & init_in)
 {
-  if (_init_system_function != libmesh_nullptr)
+  if (_init_system_function != nullptr)
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both initialization object and function!"
                    << std::endl;
 
-      _init_system_function = libmesh_nullptr;
+      _init_system_function = nullptr;
     }
 
   _init_system_object = &init_in;
@@ -1763,13 +1763,13 @@ void System::attach_assemble_function (void fptr(EquationSystems & es,
 {
   libmesh_assert(fptr);
 
-  if (_assemble_system_object != libmesh_nullptr)
+  if (_assemble_system_object != nullptr)
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both assembly function and object!"
                    << std::endl;
 
-      _assemble_system_object = libmesh_nullptr;
+      _assemble_system_object = nullptr;
     }
 
   _assemble_system_function = fptr;
@@ -1779,13 +1779,13 @@ void System::attach_assemble_function (void fptr(EquationSystems & es,
 
 void System::attach_assemble_object (System::Assembly & assemble_in)
 {
-  if (_assemble_system_function != libmesh_nullptr)
+  if (_assemble_system_function != nullptr)
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both assembly object and function!"
                    << std::endl;
 
-      _assemble_system_function = libmesh_nullptr;
+      _assemble_system_function = nullptr;
     }
 
   _assemble_system_object = &assemble_in;
@@ -1798,13 +1798,13 @@ void System::attach_constraint_function(void fptr(EquationSystems & es,
 {
   libmesh_assert(fptr);
 
-  if (_constrain_system_object != libmesh_nullptr)
+  if (_constrain_system_object != nullptr)
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both constraint function and object!"
                    << std::endl;
 
-      _constrain_system_object = libmesh_nullptr;
+      _constrain_system_object = nullptr;
     }
 
   _constrain_system_function = fptr;
@@ -1814,13 +1814,13 @@ void System::attach_constraint_function(void fptr(EquationSystems & es,
 
 void System::attach_constraint_object (System::Constraint & constrain)
 {
-  if (_constrain_system_function != libmesh_nullptr)
+  if (_constrain_system_function != nullptr)
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both constraint object and function!"
                    << std::endl;
 
-      _constrain_system_function = libmesh_nullptr;
+      _constrain_system_function = nullptr;
     }
 
   _constrain_system_object = &constrain;
@@ -1834,13 +1834,13 @@ void System::attach_QOI_function(void fptr(EquationSystems &,
 {
   libmesh_assert(fptr);
 
-  if (_qoi_evaluate_object != libmesh_nullptr)
+  if (_qoi_evaluate_object != nullptr)
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both QOI function and object!"
                    << std::endl;
 
-      _qoi_evaluate_object = libmesh_nullptr;
+      _qoi_evaluate_object = nullptr;
     }
 
   _qoi_evaluate_function = fptr;
@@ -1850,13 +1850,13 @@ void System::attach_QOI_function(void fptr(EquationSystems &,
 
 void System::attach_QOI_object (QOI & qoi_in)
 {
-  if (_qoi_evaluate_function != libmesh_nullptr)
+  if (_qoi_evaluate_function != nullptr)
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both QOI object and function!"
                    << std::endl;
 
-      _qoi_evaluate_function = libmesh_nullptr;
+      _qoi_evaluate_function = nullptr;
     }
 
   _qoi_evaluate_object = &qoi_in;
@@ -1869,13 +1869,13 @@ void System::attach_QOI_derivative(void fptr(EquationSystems &, const std::strin
 {
   libmesh_assert(fptr);
 
-  if (_qoi_evaluate_derivative_object != libmesh_nullptr)
+  if (_qoi_evaluate_derivative_object != nullptr)
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both QOI derivative function and object!"
                    << std::endl;
 
-      _qoi_evaluate_derivative_object = libmesh_nullptr;
+      _qoi_evaluate_derivative_object = nullptr;
     }
 
   _qoi_evaluate_derivative_function = fptr;
@@ -1885,13 +1885,13 @@ void System::attach_QOI_derivative(void fptr(EquationSystems &, const std::strin
 
 void System::attach_QOI_derivative_object (QOIDerivative & qoi_derivative)
 {
-  if (_qoi_evaluate_derivative_function != libmesh_nullptr)
+  if (_qoi_evaluate_derivative_function != nullptr)
     {
       libmesh_here();
       libMesh::out << "WARNING:  Cannot specify both QOI derivative object and function!"
                    << std::endl;
 
-      _qoi_evaluate_derivative_function = libmesh_nullptr;
+      _qoi_evaluate_derivative_function = nullptr;
     }
 
   _qoi_evaluate_derivative_object = &qoi_derivative;
@@ -1903,11 +1903,11 @@ void System::user_initialization ()
 {
   // Call the user-provided initialization function,
   // if it was provided
-  if (_init_system_function != libmesh_nullptr)
+  if (_init_system_function != nullptr)
     this->_init_system_function (_equation_systems, this->name());
 
   // ...or the user-provided initialization object.
-  else if (_init_system_object != libmesh_nullptr)
+  else if (_init_system_object != nullptr)
     this->_init_system_object->initialize();
 }
 
@@ -1917,11 +1917,11 @@ void System::user_assembly ()
 {
   // Call the user-provided assembly function,
   // if it was provided
-  if (_assemble_system_function != libmesh_nullptr)
+  if (_assemble_system_function != nullptr)
     this->_assemble_system_function (_equation_systems, this->name());
 
   // ...or the user-provided assembly object.
-  else if (_assemble_system_object != libmesh_nullptr)
+  else if (_assemble_system_object != nullptr)
     this->_assemble_system_object->assemble();
 }
 
@@ -1931,11 +1931,11 @@ void System::user_constrain ()
 {
   // Call the user-provided constraint function,
   // if it was provided
-  if (_constrain_system_function!= libmesh_nullptr)
+  if (_constrain_system_function!= nullptr)
     this->_constrain_system_function(_equation_systems, this->name());
 
   // ...or the user-provided constraint object.
-  else if (_constrain_system_object != libmesh_nullptr)
+  else if (_constrain_system_object != nullptr)
     this->_constrain_system_object->constrain();
 }
 
@@ -1945,11 +1945,11 @@ void System::user_QOI (const QoISet & qoi_indices)
 {
   // Call the user-provided quantity of interest function,
   // if it was provided
-  if (_qoi_evaluate_function != libmesh_nullptr)
+  if (_qoi_evaluate_function != nullptr)
     this->_qoi_evaluate_function(_equation_systems, this->name(), qoi_indices);
 
   // ...or the user-provided QOI function object.
-  else if (_qoi_evaluate_object != libmesh_nullptr)
+  else if (_qoi_evaluate_object != nullptr)
     this->_qoi_evaluate_object->qoi(qoi_indices);
 }
 
@@ -1961,13 +1961,13 @@ void System::user_QOI_derivative(const QoISet & qoi_indices,
 {
   // Call the user-provided quantity of interest derivative,
   // if it was provided
-  if (_qoi_evaluate_derivative_function != libmesh_nullptr)
+  if (_qoi_evaluate_derivative_function != nullptr)
     this->_qoi_evaluate_derivative_function
       (_equation_systems, this->name(), qoi_indices, include_liftfunc,
        apply_constraints);
 
   // ...or the user-provided QOI derivative function object.
-  else if (_qoi_evaluate_derivative_object != libmesh_nullptr)
+  else if (_qoi_evaluate_derivative_object != nullptr)
     this->_qoi_evaluate_derivative_object->qoi_derivative
       (qoi_indices, include_liftfunc, apply_constraints);
 }

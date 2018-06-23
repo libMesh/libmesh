@@ -238,11 +238,11 @@ void System::project_vector (const NumericVector<Number> & old_v,
 #ifdef LIBMESH_ENABLE_AMR
 
   // Resize the new vector and get a serial version.
-  NumericVector<Number> * new_vector_ptr = libmesh_nullptr;
+  NumericVector<Number> * new_vector_ptr = nullptr;
   std::unique_ptr<NumericVector<Number>> new_vector_built;
   NumericVector<Number> * local_old_vector;
   std::unique_ptr<NumericVector<Number>> local_old_vector_built;
-  const NumericVector<Number> * old_vector_ptr = libmesh_nullptr;
+  const NumericVector<Number> * old_vector_ptr = nullptr;
 
   ConstElemRange active_local_elem_range
     (this->get_mesh().active_local_elements_begin(),
@@ -508,7 +508,7 @@ eval_at_point(const FEMContext & c,
     return 0;
 
   // Get finite element object
-  FEGenericBase<Real> * fe = libmesh_nullptr;
+  FEGenericBase<Real> * fe = nullptr;
   this->old_context.get_element_fe<Real>
     (i, fe, this->old_context.get_elem_dim());
 
@@ -553,7 +553,7 @@ eval_at_point(const FEMContext & c,
     return 0;
 
   // Get finite element object
-  FEGenericBase<Real> * fe = libmesh_nullptr;
+  FEGenericBase<Real> * fe = nullptr;
   this->old_context.get_element_fe<Real>
     (i, fe, this->old_context.get_elem_dim());
 
@@ -866,7 +866,7 @@ void System::project_vector (NumericVector<Number> & new_vector,
       this->project_vector(new_vector, &f_fem, &g_fem, is_adjoint);
     }
   else
-    this->project_vector(new_vector, &f_fem, libmesh_nullptr, is_adjoint);
+    this->project_vector(new_vector, &f_fem, nullptr, is_adjoint);
 }
 
 
@@ -913,7 +913,7 @@ void System::project_vector (NumericVector<Number> & new_vector,
   else
     Threads::parallel_for
       (active_local_range,
-       FEMProjector(*this, fw, libmesh_nullptr, setter, vars));
+       FEMProjector(*this, fw, nullptr, setter, vars));
 
   // Also, load values into the SCALAR dofs
   // Note: We assume that all SCALAR dofs are on the
@@ -1234,7 +1234,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
 
       // The gradients of the shape functions at the quadrature
       // points on the child element.
-      const std::vector<std::vector<RealGradient>> * dphi = libmesh_nullptr;
+      const std::vector<std::vector<RealGradient>> * dphi = nullptr;
 
       const FEContinuity cont = fe->get_continuity();
 

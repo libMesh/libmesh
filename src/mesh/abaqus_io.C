@@ -441,7 +441,7 @@ void AbaqusIO::read_nodes(std::string nset_name)
   // We need to duplicate some of the read_ids code if this *NODE
   // section also defines an NSET.  We'll set up the id_storage
   // pointer and push back IDs into this vector in the loop below...
-  std::vector<dof_id_type> * id_storage = libmesh_nullptr;
+  std::vector<dof_id_type> * id_storage = nullptr;
   if (nset_name != "")
     id_storage = &(_nodeset_ids[nset_name]);
 
@@ -627,10 +627,10 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
                   // Grab the node pointer from the mesh for this ID
                   Node * node = the_mesh.node_ptr(libmesh_global_node_id);
 
-                  // If node_ptr() returns NULL, it may mean we have not yet read the
+                  // If node_ptr() returns nullptr, it may mean we have not yet read the
                   // *Nodes section, though I assumed that always came before the *Elements section...
-                  if (node == libmesh_nullptr)
-                    libmesh_error_msg("Error!  Mesh returned NULL Node pointer.  Either no node exists with ID " \
+                  if (node == nullptr)
+                    libmesh_error_msg("Error!  Mesh::node_ptr() returned nullptr.  Either no node exists with ID " \
                                       << libmesh_global_node_id         \
                                       << " or perhaps this input file has *Elements defined before *Nodes?");
 
@@ -748,7 +748,7 @@ void AbaqusIO::read_ids(std::string set_name, container_t & container)
         {
           // If no conversion can be performed by strtol, 0 is returned.
           //
-          // If endptr is not NULL, strtol() stores the address of the
+          // If endptr is not nullptr, strtol() stores the address of the
           // first invalid character in *endptr.  If there were no
           // digits at all, however, strtol() stores the original
           // value of str in *endptr.
@@ -935,8 +935,8 @@ void AbaqusIO::assign_boundary_node_ids()
           // Get node pointer from the mesh
           Node * node = the_mesh.node_ptr(libmesh_global_node_id);
 
-          if (node == libmesh_nullptr)
-            libmesh_error_msg("Error! Mesh returned NULL node pointer!");
+          if (node == nullptr)
+            libmesh_error_msg("Error! Mesh::node_ptr() returned nullptr!");
 
           // Add this node with the current_id (which is determined by the
           // alphabetical ordering of the map) to the BoundaryInfo object

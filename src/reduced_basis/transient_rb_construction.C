@@ -65,7 +65,7 @@ TransientRBConstruction::TransientRBConstruction (EquationSystems & es,
     init_filename(""),
     POD_tol(-1.),
     max_truth_solves(-1),
-    L2_assembly(libmesh_nullptr)
+    L2_assembly(nullptr)
 {
   // Indicate that we need to compute the RB
   // inner product matrix in this case
@@ -347,7 +347,7 @@ void TransientRBConstruction::assemble_L2_matrix(SparseMatrix<Number> * input_ma
   add_scaled_matrix_and_vector(1.,
                                L2_assembly,
                                input_matrix,
-                               libmesh_nullptr,
+                               nullptr,
                                false, /* symmetrize */
                                apply_dirichlet_bc);
 }
@@ -477,7 +477,7 @@ void TransientRBConstruction::assemble_Mq_matrix(unsigned int q, SparseMatrix<Nu
   add_scaled_matrix_and_vector(1.,
                                &trans_assembly_expansion.get_M_assembly(q),
                                input_matrix,
-                               libmesh_nullptr,
+                               nullptr,
                                false, /* symmetrize */
                                apply_dirichlet_bc);
 }
@@ -1367,7 +1367,7 @@ void TransientRBConstruction::read_riesz_representors_from_files(const std::stri
   for (std::size_t i=0; i<trans_rb_eval.M_q_representor.size(); ++i)
     for (std::size_t j=0; j<trans_rb_eval.M_q_representor[i].size(); ++j)
       {
-        if (trans_rb_eval.M_q_representor[i][j] != libmesh_nullptr)
+        if (trans_rb_eval.M_q_representor[i][j] != nullptr)
           libmesh_error_msg("Error, must delete existing M_q_representor before reading in from file.");
       }
 

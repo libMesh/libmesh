@@ -96,7 +96,7 @@ public:
   virtual void clear() override;
 
   /**
-   * Remove NULL elements from arrays
+   * Remove nullptr elements from arrays
    */
   virtual void renumber_nodes_and_elements () override;
 
@@ -157,7 +157,7 @@ public:
   /**
    * Insert \p Node \p n into the Mesh at a location consistent with
    * n->id(), allocating extra storage if necessary.  Throws an error if:
-   * .) n==NULL
+   * .) n==nullptr
    * .) n->id() == DofObject::invalid_id
    * .) A node already exists in position n->id().
    *
