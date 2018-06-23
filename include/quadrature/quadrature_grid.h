@@ -44,7 +44,7 @@ namespace libMesh
  * \date 2005
  * \brief Implements grid-based quadrature rules suitable for non-smooth functions.
  */
-class QGrid libmesh_final : public QBase
+class QGrid final : public QBase
 {
 public:
 

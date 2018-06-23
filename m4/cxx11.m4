@@ -411,7 +411,6 @@ AC_DEFUN([LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS],
 AC_DEFUN([LIBMESH_TEST_CXX11_SHARED_PTR],
   [
     have_cxx11_shared_ptr=init
-    have_cxx11_shared_ptr_but_disabled=init
 
     AC_LANG_PUSH([C++])
 
@@ -459,10 +458,6 @@ AC_DEFUN([LIBMESH_TEST_CXX11_SHARED_PTR],
     dnl Only set the header file variable if our flag was set to 'yes'.
     AS_IF([test "x$have_cxx11_shared_ptr" = "xyes"],
           [AC_DEFINE(HAVE_CXX11_SHARED_PTR, 1, [Flag indicating whether compiler supports std::shared_ptr])])
-
-    dnl If the test compilation succeeded, but we have disabled C++11, set a different #define.
-    AS_IF([test "x$have_cxx11_shared_ptr_but_disabled" = "xyes"],
-          [AC_DEFINE(HAVE_CXX11_SHARED_PTR_BUT_DISABLED, 1, [Compiler supports std::shared_ptr, but it is disabled in libmesh])])
 
     AC_LANG_POP([C++])
 
@@ -1201,7 +1196,6 @@ AC_DEFUN([LIBMESH_TEST_CXX11_DEFAULTED_FUNCTIONS],
 AC_DEFUN([LIBMESH_TEST_CXX11_FINAL],
   [
     have_cxx11_final=no
-    have_cxx11_final_but_disabled=no
 
     AC_MSG_CHECKING(for C++11 'final' keyword support)
     AC_LANG_PUSH([C++])
@@ -1222,9 +1216,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_FINAL],
     };
     ]], [[
     ]])],[
-      AS_IF([test "x$enablecxx11" = "xyes"],
-            [have_cxx11_final=yes],
-            [have_cxx11_final_but_disabled=yes])
+      have_cxx11_final=yes
     ],[
       have_cxx11_final=no
     ])
@@ -1243,9 +1235,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_FINAL],
               # If this code compiles, 'final' is not working correctly.
               have_cxx11_final=no
             ],[
-              AS_IF([test "x$enablecxx11" = "xyes"],
-                    [have_cxx11_final=yes],
-                    [have_cxx11_final_but_disabled=yes])
+              have_cxx11_final=yes
             ])
           ])
 
@@ -1267,9 +1257,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_FINAL],
               # If this code compiles, 'final' is not working correctly.
               have_cxx11_final=no
             ],[
-              AS_IF([test "x$enablecxx11" = "xyes"],
-                    [have_cxx11_final=yes],
-                    [have_cxx11_final_but_disabled=yes])
+              have_cxx11_final=yes
             ])
           ])
 
@@ -1295,9 +1283,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_FINAL],
               # If this code compiles, 'final' is not working correctly.
               have_cxx11_final=no
             ],[
-              AS_IF([test "x$enablecxx11" = "xyes"],
-                    [have_cxx11_final=yes],
-                    [have_cxx11_final_but_disabled=yes])
+              have_cxx11_final=yes
             ])
           ])
 
@@ -1306,11 +1292,6 @@ AC_DEFUN([LIBMESH_TEST_CXX11_FINAL],
           [
             AC_MSG_RESULT(yes)
             AC_DEFINE(HAVE_CXX11_FINAL, 1, [Flag indicating whether compiler supports f() final;])
-          ],
-          [test "x$have_cxx11_final_but_disabled" = "xyes"],
-          [
-            AC_MSG_RESULT([yes, but disabled.])
-            AC_DEFINE(HAVE_CXX11_FINAL_BUT_DISABLED, 1, [Compiler supports final keyword, but it is disabled in libmesh])
           ],
           [AC_MSG_RESULT(no)])
 
@@ -1341,16 +1322,9 @@ AC_DEFUN([LIBMESH_TEST_CXX11_NULLPTR],
     // would be ambiguous without void f(nullptr_t)
     f(nullptr);
     ]])],[
-      AS_IF([test "x$enablecxx11" = "xyes"],
-            [
-              AC_MSG_RESULT(yes)
-              AC_DEFINE(HAVE_CXX11_NULLPTR, 1, [Flag indicating whether compiler supports nullptr])
-              have_cxx11_nullptr=yes
-            ],
-            [
-              AC_MSG_RESULT([yes, but disabled.])
-              AC_DEFINE(HAVE_CXX11_NULLPTR_BUT_DISABLED, 1, [Compiler supports nullptr, but it is disabled in libmesh])
-            ])
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_CXX11_NULLPTR, 1, [Flag indicating whether compiler supports nullptr])
+      have_cxx11_nullptr=yes
     ],[
       AC_MSG_RESULT(no)
     ])

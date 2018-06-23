@@ -61,7 +61,7 @@ template <typename T> class SparseMatrix;
  * \brief NumericVector interface to PETSc Vec.
  */
 template <typename T>
-class PetscVector libmesh_final : public NumericVector<T>
+class PetscVector final : public NumericVector<T>
 {
 public:
 

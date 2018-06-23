@@ -46,7 +46,7 @@ namespace libMesh
  * \date 2003
  * \brief Implements 1D Gauss-Jacobi quadrature rules of various orders.
  */
-class QJacobi libmesh_final : public QBase
+class QJacobi final : public QBase
 {
 public:
 

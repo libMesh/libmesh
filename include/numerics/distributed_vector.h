@@ -49,7 +49,7 @@ namespace libMesh
  * \date 2003
  */
 template <typename T>
-class DistributedVector libmesh_final : public NumericVector<T>
+class DistributedVector final : public NumericVector<T>
 {
 public:
 

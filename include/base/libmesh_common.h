@@ -567,19 +567,13 @@ inline Tnew libmesh_cast_int (Told oldvar)
 // a C++11 compiler that supports this keyword.
 #define libmesh_override override
 
-// Define C++03 backwards-compatible function deletion keyword.
-#ifdef LIBMESH_HAVE_CXX11_DELETED_FUNCTIONS
+// libmesh_delete is simply a synonym for '=delete' as we now require
+// a C++11 compiler that supports this keyword.
 #define libmesh_delete =delete
-#else
-#define libmesh_delete
-#endif
 
-// Define C++03 backwards-compatible final keyword.
-#ifdef LIBMESH_HAVE_CXX11_FINAL
+// libmesh_final is simply a synonym for 'final' as we now require
+// a C++11 compiler that supports this keyword.
 #define libmesh_final final
-#else
-#define libmesh_final
-#endif
 
 // Define backwards-compatible fallthrough attribute.  We could
 // eventually also add support for other compiler-specific fallthrough

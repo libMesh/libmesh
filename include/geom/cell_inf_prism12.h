@@ -58,7 +58,7 @@ namespace libMesh
  * \date 2002
  * \brief A 3D infinite prismatic element with 12 nodes.
  */
-class InfPrism12 libmesh_final : public InfPrism
+class InfPrism12 final : public InfPrism
 {
 public:
 

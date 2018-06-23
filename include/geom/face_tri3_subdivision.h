@@ -37,7 +37,7 @@ namespace libMesh
  * \date 2014
  * \brief A surface shell element used in mechanics calculations.
  */
-class Tri3Subdivision libmesh_final : public Tri3
+class Tri3Subdivision final : public Tri3
 {
 public:
 

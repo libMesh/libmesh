@@ -40,7 +40,7 @@ namespace libMesh
  * \date 2008
  * \brief Conical product quadrature rules for Tri and Tet elements.
  */
-class QConical libmesh_final : public QBase
+class QConical final : public QBase
 {
 public:
 

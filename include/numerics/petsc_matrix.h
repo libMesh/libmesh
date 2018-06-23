@@ -71,7 +71,7 @@ template <typename T> class DenseMatrix;
  * \brief SparseMatrix interface to PETSc Mat.
  */
 template <typename T>
-class PetscMatrix libmesh_final : public SparseMatrix<T>
+class PetscMatrix final : public SparseMatrix<T>
 {
 public:
   /**

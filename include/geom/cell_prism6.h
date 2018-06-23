@@ -49,7 +49,7 @@ namespace libMesh
  * \date 2002
  * \brief A 3D prismatic element with 6 nodes.
  */
-class Prism6 libmesh_final : public Prism
+class Prism6 final : public Prism
 {
 public:
 
