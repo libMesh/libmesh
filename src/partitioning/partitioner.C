@@ -706,6 +706,7 @@ void Partitioner::build_graph (const MeshBase & mesh)
 
   _dual_graph.clear();
   _dual_graph.resize(n_active_local_elem);
+  _local_id_to_elem.resize(n_active_local_elem);
 
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
@@ -718,6 +719,9 @@ void Partitioner::build_graph (const MeshBase & mesh)
       libmesh_assert_less (local_index, n_active_local_elem);
 
       std::vector<dof_id_type> & graph_row = _dual_graph[local_index];
+
+      // Save this off to make it easy to index later
+      _local_id_to_elem[local_index] = elem;
 
       // Loop over the element's neighbors.  An element
       // adjacency corresponds to a face neighbor

@@ -259,6 +259,9 @@ protected:
    * element neighbors.
    */
   std::vector<std::vector<dof_id_type>> _dual_graph;
+
+
+  std::vector<Elem *> _local_id_to_elem;
 };
 
 } // namespace libMesh
