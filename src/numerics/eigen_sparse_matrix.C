@@ -167,14 +167,6 @@ EigenSparseMatrix<T>::EigenSparseMatrix (const Parallel::Communicator & comm_in)
 
 
 template <typename T>
-EigenSparseMatrix<T>::~EigenSparseMatrix ()
-{
-  this->clear ();
-}
-
-
-
-template <typename T>
 void EigenSparseMatrix<T>::clear ()
 {
   _mat.resize(0,0);

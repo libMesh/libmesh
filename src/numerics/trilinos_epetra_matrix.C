@@ -277,8 +277,12 @@ void EpetraMatrix<T>::get_transpose (SparseMatrix<T> & dest) const
   // Make sure the SparseMatrix passed in is really a EpetraMatrix
   EpetraMatrix<T> & epetra_dest = cast_ref<EpetraMatrix<T> &>(dest);
 
+  // We currently only support calling get_transpose() with ourself
+  // as the destination. Previously, this called the default copy
+  // constructor which was not safe because this class manually
+  // manages memory.
   if (&epetra_dest != this)
-    epetra_dest = *this;
+    libmesh_not_implemented();
 
   epetra_dest._use_transpose = !epetra_dest._use_transpose;
   epetra_dest._mat->SetUseTranspose(epetra_dest._use_transpose);

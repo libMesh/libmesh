@@ -99,10 +99,15 @@ public:
                const Parallel::Communicator & comm_in);
 
   /**
-   * Destructor. Free all memory, but do not release the memory of the
-   * sparsity structure.
+   * This class manages a C-style struct (Mat) manually, so we
+   * don't want to allow any automatic copy/move functions to be
+   * generated, and we can't default the destructor.
    */
-  ~PetscMatrix ();
+  PetscMatrix (PetscMatrix &&) = delete;
+  PetscMatrix (const PetscMatrix &) = delete;
+  PetscMatrix & operator= (const PetscMatrix &) = delete;
+  PetscMatrix & operator= (PetscMatrix &&) = delete;
+  virtual ~PetscMatrix ();
 
   virtual void init (const numeric_index_type m,
                      const numeric_index_type n,

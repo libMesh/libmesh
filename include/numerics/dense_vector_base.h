@@ -42,14 +42,19 @@ class DenseVectorBase
 {
 public:
   /**
-   * Constructor.  Empty.
+   * Constructor.
    */
-  DenseVectorBase() {}
+  DenseVectorBase() = default;
 
   /**
-   * Destructor.  Does nothing.
+   * The 5 special functions can be defaulted for this class, as it
+   * does not manage any memory itself.
    */
-  virtual ~DenseVectorBase() {}
+  DenseVectorBase (DenseVectorBase &&) = default;
+  DenseVectorBase (const DenseVectorBase &) = default;
+  DenseVectorBase & operator= (const DenseVectorBase &) = default;
+  DenseVectorBase & operator= (DenseVectorBase &&) = default;
+  virtual ~DenseVectorBase() = default;
 
   /**
    * Set every element in the vector to 0.  Needs to
@@ -98,7 +103,6 @@ public:
    * decimal places in scientific notation.
    */
   void print_scientific(std::ostream & os, unsigned precision=8) const;
-
 };
 
 } // namespace libMesh

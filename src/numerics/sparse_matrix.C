@@ -50,13 +50,6 @@ SparseMatrix<T>::SparseMatrix (const Parallel::Communicator & comm_in) :
 
 
 
-// Destructor
-template <typename T>
-SparseMatrix<T>::~SparseMatrix ()
-{}
-
-
-
 
 // default implementation is to fall back to non-blocked method
 template <typename T>

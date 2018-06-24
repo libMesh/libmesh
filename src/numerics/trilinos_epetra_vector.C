@@ -347,23 +347,12 @@ template <typename T>
 NumericVector<T> &
 EpetraVector<T>::operator = (const NumericVector<T> & v_in)
 {
-  const EpetraVector<T> * v = cast_ptr<const EpetraVector<T> *>(&v_in);
-
-  *this = *v;
-
-  return *this;
-}
-
-
-
-template <typename T>
-EpetraVector<T> &
-EpetraVector<T>::operator = (const EpetraVector<T> & v)
-{
-  (*_vec) = *v._vec;
-
-  // FIXME - what about our communications data?
-
+  // This function could be implemented in terms of the copy
+  // assignment operator (see other NumericVector subclasses) but that
+  // function is currently deleted so calling this function is an error.
+  // const EpetraVector<T> * v = cast_ptr<const EpetraVector<T> *>(&v_in);
+  // *this = *v;
+  libmesh_not_implemented();
   return *this;
 }
 

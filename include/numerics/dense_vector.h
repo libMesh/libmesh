@@ -80,9 +80,14 @@ public:
   DenseVector (const std::vector<T2> & other_vector);
 
   /**
-   * Destructor.  Does nothing.
+   * The 5 special functions can be defaulted for this class, as it
+   * does not manage any memory itself.
    */
-  ~DenseVector() {}
+  DenseVector (DenseVector &&) = default;
+  DenseVector (const DenseVector &) = default;
+  DenseVector & operator= (const DenseVector &) = default;
+  DenseVector & operator= (DenseVector &&) = default;
+  virtual ~DenseVector() = default;
 
   virtual unsigned int size() const override
   {

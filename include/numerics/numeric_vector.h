@@ -106,13 +106,26 @@ public:
                  const std::vector<numeric_index_type> & ghost,
                  const ParallelType ptype = AUTOMATIC);
 
-public:
+  /**
+   * This _looks_ like a copy assignment operator, but note that,
+   * unlike normal copy assignment operators, it is pure virtual. This
+   * function should be overridden in derived classes so that they can
+   * be copied correctly via references to the base class. This design
+   * usually isn't a good idea in general, but in this context it
+   * works because we usually don't have a mix of different kinds of
+   * NumericVectors active in the library at a single time.
+   *
+   * \returns A reference to *this as the base type.
+   */
+  virtual NumericVector<T> & operator= (const NumericVector<T> & v) = 0;
 
   /**
-   * Destructor, deallocates memory. Made virtual to allow
-   * for derived classes to behave properly.
+   * The 5 special functions can be defaulted for this class, as it
+   * does not manage any memory itself.
    */
-  virtual ~NumericVector ();
+  NumericVector (NumericVector &&) = default;
+  NumericVector (const NumericVector &) = default;
+  NumericVector & operator= (NumericVector &&) = default;
 
   /**
    * Builds a \p NumericVector on the processors in communicator
@@ -222,13 +235,6 @@ public:
    * \returns A reference to *this.
    */
   virtual NumericVector<T> & operator= (const T s) = 0;
-
-  /**
-   * Sets (*this)(i) = v(i) for each entry of the vector.
-   *
-   * \returns A reference to *this as the base type.
-   */
-  virtual NumericVector<T> & operator= (const NumericVector<T> & v) = 0;
 
   /**
    * Sets (*this)(i) = v(i) for each entry of the vector.
@@ -775,15 +781,6 @@ NumericVector<T>::NumericVector (const Parallel::Communicator & comm_in,
 {
   libmesh_not_implemented(); // Abstract base class!
   // init(n, n_local, ghost, false, ptype);
-}
-
-
-
-template <typename T>
-inline
-NumericVector<T>::~NumericVector ()
-{
-  clear ();
 }
 
 

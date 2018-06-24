@@ -68,10 +68,14 @@ public:
   EigenSparseMatrix (const Parallel::Communicator & comm);
 
   /**
-   * Destructor. Free all memory, but do not release the memory of the
-   * sparsity structure.
+   * The 5 special functions can be defaulted for this class, as it
+   * does not manage any memory itself.
    */
-  ~EigenSparseMatrix ();
+  EigenSparseMatrix (EigenSparseMatrix &&) = default;
+  EigenSparseMatrix (const EigenSparseMatrix &) = default;
+  EigenSparseMatrix & operator= (const EigenSparseMatrix &) = default;
+  EigenSparseMatrix & operator= (EigenSparseMatrix &&) = default;
+  virtual ~EigenSparseMatrix () = default;
 
   /**
    * Convenient typedefs

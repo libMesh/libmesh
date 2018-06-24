@@ -87,9 +87,14 @@ public:
                 const Parallel::Communicator & comm);
 
   /**
-   * Destructor. Free all memory, but do not release the memory of the
-   * sparsity structure.
+   * This class manages the lifetime of an Epetra_FECrsMatrix
+   * manually, so we don't want to allow any automatic copy/move
+   * functions to be generated, and we can't default the destructor.
    */
+  EpetraMatrix (EpetraMatrix &&) = delete;
+  EpetraMatrix (const EpetraMatrix &) = delete;
+  EpetraMatrix & operator= (const EpetraMatrix &) = delete;
+  EpetraMatrix & operator= (EpetraMatrix &&) = delete;
   virtual ~EpetraMatrix ();
 
   /**

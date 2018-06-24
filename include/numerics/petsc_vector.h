@@ -111,10 +111,21 @@ public:
               const Parallel::Communicator & comm_in);
 
   /**
-   * Destructor, deallocates memory. Made virtual to allow
-   * for derived classes to behave properly.
+   * Copy assignment operator.
+   * Calls VecCopy after performing various checks.
+   * \returns A reference to *this as the derived type.
    */
-  ~PetscVector ();
+  PetscVector<T> & operator= (const PetscVector<T> & v);
+
+  /**
+   * This class manages a C-style struct (Vec) manually, so we
+   * don't want to allow any automatic copy/move functions to be
+   * generated, and we can't default the destructor.
+   */
+  PetscVector (PetscVector &&) = delete;
+  PetscVector (const PetscVector &) = delete;
+  PetscVector & operator= (PetscVector &&) = delete;
+  virtual ~PetscVector ();
 
   virtual void close () override;
 
@@ -149,13 +160,6 @@ public:
   virtual NumericVector<T> & operator= (const NumericVector<T> & v) override;
 
   virtual NumericVector<T> & operator= (const std::vector<T> & v) override;
-
-  /**
-   * Sets (*this)(i) = v(i) for each entry of the vector.
-   *
-   * \returns A reference to *this as the derived type.
-   */
-  PetscVector<T> & operator= (const PetscVector<T> & v);
 
   virtual Real min () const override;
 

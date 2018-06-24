@@ -89,10 +89,22 @@ public:
                      const ParallelType ptype = AUTOMATIC);
 
   /**
-   * Destructor, deallocates memory. Made virtual to allow
-   * for derived classes to behave properly.
+   * Copy assignment operator. We cannot default this (although it
+   * essentially implements the default behavior) because the
+   * compiler-generated default attempts to automatically call the
+   * base class (NumericVector) copy assignment operator, which we
+   * have chosen to make pure virtual for other design reasons.
    */
-  ~DistributedVector ();
+  DistributedVector & operator= (const DistributedVector &);
+
+  /**
+   * The 5 special functions can be defaulted for this class, as it
+   * does not manage any memory itself.
+   */
+  DistributedVector (DistributedVector &&) = default;
+  DistributedVector (const DistributedVector &) = default;
+  DistributedVector & operator= (DistributedVector &&) = default;
+  virtual ~DistributedVector () = default;
 
   virtual void close () override;
 
@@ -125,13 +137,6 @@ public:
   virtual NumericVector<T> & operator= (const T s) override;
 
   virtual NumericVector<T> & operator= (const NumericVector<T> & v) override;
-
-  /**
-   * Sets (*this)(i) = v(i) for each entry of the vector.
-   *
-   * \returns A reference to *this as the derived type.
-   */
-  DistributedVector<T> & operator= (const DistributedVector<T> & v);
 
   virtual NumericVector<T> & operator= (const std::vector<T> & v) override;
 
@@ -300,15 +305,6 @@ DistributedVector<T>::DistributedVector (const Parallel::Communicator & comm_in,
   : NumericVector<T>(comm_in, ptype)
 {
   this->init(n, n_local, ghost, false, ptype);
-}
-
-
-
-template <typename T>
-inline
-DistributedVector<T>::~DistributedVector ()
-{
-  this->clear ();
 }
 
 

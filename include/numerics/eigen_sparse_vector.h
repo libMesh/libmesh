@@ -88,10 +88,20 @@ public:
                      const ParallelType = AUTOMATIC);
 
   /**
-   * Destructor, deallocates memory. Made virtual to allow
-   * for derived classes to behave properly.
+   * Copy assignment operator. Does some state checks before copying
+   * the underlying Eigen data type.
+   * \returns A reference to *this as the derived type.
    */
-  ~EigenSparseVector ();
+  EigenSparseVector<T> & operator= (const EigenSparseVector<T> & v);
+
+  /**
+   * The 5 special functions can be defaulted for this class, as it
+   * does not manage any memory itself.
+   */
+  EigenSparseVector (EigenSparseVector &&) = default;
+  EigenSparseVector (const EigenSparseVector &) = default;
+  EigenSparseVector & operator= (EigenSparseVector &&) = default;
+  virtual ~EigenSparseVector () = default;
 
   /**
    * Convenient typedefs
@@ -129,13 +139,6 @@ public:
   virtual NumericVector<T> & operator= (const T s) override;
 
   virtual NumericVector<T> & operator= (const NumericVector<T> & v) override;
-
-  /**
-   * Sets (*this)(i) = v(i) for each entry of the vector.
-   *
-   * \returns A reference to *this as the derived type.
-   */
-  EigenSparseVector<T> & operator= (const EigenSparseVector<T> & v);
 
   virtual NumericVector<T> & operator= (const std::vector<T> & v) override;
 
@@ -293,15 +296,6 @@ EigenSparseVector<T>::EigenSparseVector (const Parallel::Communicator & comm_in,
   : NumericVector<T>(comm_in, ptype)
 {
   this->init(N, n_local, ghost, false, ptype);
-}
-
-
-
-template <typename T>
-inline
-EigenSparseVector<T>::~EigenSparseVector ()
-{
-  this->clear ();
 }
 
 
