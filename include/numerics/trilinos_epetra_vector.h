@@ -109,10 +109,15 @@ public:
                const Parallel::Communicator & comm);
 
   /**
-   * Destructor, deallocates memory. Made virtual to allow
-   * for derived classes to behave properly.
+   * This class manages the lifetime of an Epetra_Vector manually, so
+   * we don't want to allow any automatic copy/move functions to be
+   * generated, and we can't default the destructor.
    */
-  ~EpetraVector ();
+  EpetraVector (EpetraVector &&) = delete;
+  EpetraVector (const EpetraVector &) = delete;
+  EpetraVector & operator= (const EpetraVector &) = delete;
+  EpetraVector & operator= (EpetraVector &&) = delete;
+  virtual ~EpetraVector ();
 
   virtual void close () override;
 
@@ -145,13 +150,6 @@ public:
   virtual NumericVector<T> & operator= (const T s) override;
 
   virtual NumericVector<T> & operator= (const NumericVector<T> & v) override;
-
-  /**
-   * Sets (*this)(i) = v(i) for each entry of the vector.
-   *
-   * \returns A reference to *this as the derived type.
-   */
-  EpetraVector<T> & operator= (const EpetraVector<T> & v);
 
   virtual NumericVector<T> & operator= (const std::vector<T> & v) override;
 

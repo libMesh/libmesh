@@ -93,10 +93,21 @@ public:
                  const ParallelType = AUTOMATIC);
 
   /**
-   * Destructor, deallocates memory. Made virtual to allow
-   * for derived classes to behave properly.
+   * Copy assignment operator.
+   * Calls Asgn_VV() to assign the contents of one vector to another.
+   * \returns A reference to *this as the derived type.
    */
-  ~LaspackVector ();
+  LaspackVector<T> & operator= (const LaspackVector<T> & v);
+
+  /**
+   * This class manages a C-style struct (QVector) manually, so we
+   * don't want to allow any automatic copy/move functions to be
+   * generated, and we can't default the destructor.
+   */
+  LaspackVector (LaspackVector &&) = delete;
+  LaspackVector (const LaspackVector &) = delete;
+  LaspackVector & operator= (LaspackVector &&) = delete;
+  virtual ~LaspackVector ();
 
   virtual void close () override;
 
@@ -129,13 +140,6 @@ public:
   virtual NumericVector<T> & operator= (const T s) override;
 
   virtual NumericVector<T> & operator= (const NumericVector<T> & v) override;
-
-  /**
-   * Sets (*this)(i) = v(i) for each entry of the vector.
-   *
-   * \returns A reference to *this as the derived type.
-   */
-  LaspackVector<T> & operator= (const LaspackVector<T> & v);
 
   virtual NumericVector<T> & operator= (const std::vector<T> & v) override;
 
