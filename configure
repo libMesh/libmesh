@@ -32746,6 +32746,7 @@ fi
             petsc_have_chaco=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_CHACO`
             petsc_have_party=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PARTY`
             petsc_have_ptscotch=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PTSCOTCH`
+            petsc_have_parmetis=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PARMETIS`
 
 else
   enablepetsc=no
@@ -35114,6 +35115,13 @@ fi
           if test $petsc_have_ptscotch -gt 0; then :
 
 $as_echo "#define PETSC_HAVE_PTSCOTCH 1" >>confdefs.h
+
+fi
+
+          # Set a #define if PETSc was built with ParMETIS support
+          if test $petsc_have_parmetis -gt 0; then :
+
+$as_echo "#define PETSC_HAVE_PARMETIS 1" >>confdefs.h
 
 fi
 

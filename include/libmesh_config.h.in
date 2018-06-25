@@ -646,6 +646,10 @@
 /* Flag indicating whether or not PETSc was configured with MUMPS support */
 #undef PETSC_HAVE_MUMPS
 
+/* Flag indicating whether or not PETSc was configured with ParMETIS support
+   */
+#undef PETSC_HAVE_PARMETIS
+
 /* Flag indicating whether or not PETSc was configured with PARTY support */
 #undef PETSC_HAVE_PARTY
 
