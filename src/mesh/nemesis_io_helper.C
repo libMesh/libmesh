@@ -2604,8 +2604,13 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
     }
 
   // Construct a map from subdomain_id -> [element ids] for each of the elements
-  // we are responsible for.
+  // we are responsible for. Note: we start by initializing the subdomain_map with
+  // the same (global) list of subdomain ids on all processors so that the processors
+  // execute the loop below in the same order.
   std::map<subdomain_id_type, std::vector<dof_id_type>> subdomain_map;
+  for (const auto & id : global_elem_blk_ids)
+    subdomain_map[id].clear();
+
   for (dof_id_type i=0; i<this->exodus_elem_num_to_libmesh.size(); ++i)
     {
       // Look up the elem id for exdous element i.
