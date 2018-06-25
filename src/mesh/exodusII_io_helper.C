@@ -1739,6 +1739,15 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
       else
         current_set = vars_active_subdomains[var_num];
 
+      // Print the ids in current_set
+      if (verbose)
+        {
+          libMesh::out << "In ExodusII_IO_Helper::initialize_element_variables(), current_set = ";
+          for (const auto & id : current_set)
+            libMesh::out << id << " ";
+          libMesh::out << std::endl;
+        }
+
       // Find index into the truth table for each id in current_set.
       for (auto block_id : current_set)
         {
