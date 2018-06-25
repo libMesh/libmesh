@@ -2542,6 +2542,34 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
 
 
 void
+Nemesis_IO_Helper::initialize_element_variables(std::vector<std::string> names,
+                                                const std::vector<std::set<subdomain_id_type>> & /*vars_active_subdomains*/)
+{
+  // Quick return if there are no element variables to write
+  if (names.size() == 0)
+    return;
+
+  // Quick return if we have already called this function
+  if (_elem_vars_initialized)
+    return;
+
+  // Be sure that variables in the file match what we are asking for
+  if (num_elem_vars > 0)
+    {
+      this->check_existing_vars(ELEMENTAL, names, this->elem_var_names);
+      return;
+    }
+
+  // Set the flag so we can skip this stuff on subsequent calls to
+  // initialize_element_variables()
+  _elem_vars_initialized = true;
+
+  this->write_var_names(ELEMENTAL, names);
+}
+
+
+
+void
 Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                         const NumericVector<Number> & parallel_soln,
                                         const std::vector<std::string> & names,

@@ -1440,10 +1440,18 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
         }
     }
 
-  // Call function (defined in the Exodus helper) that writes the
-  // elemental variable names. This also apparently writes a "truth
-  // table" to the Exodus file. Not sure if this will work for
-  // Nemesis...
+  // Call the Nemesis version of initialize_element_variables().
+  //
+  // The Exodus helper version of this function writes an incorrect
+  // truth table in parallel that somehow does not account for the
+  // case where a subdomain does not appear on one or more of the
+  // processors. So, for now we are doing that function's work
+  // manually, but a long term solution might be to make that function
+  // virtual in the Exodus helper and then override it in the Nemesis
+  // helper.
+  //
+  // TODO: Figure out how to do the "truth_tab" optimization in
+  // Nemesis as well, as we will likely want that for efficiency.
   nemhelper->initialize_element_variables(names, vars_active_subdomains);
 
   // Call (non-virtual) function to write the elemental data in

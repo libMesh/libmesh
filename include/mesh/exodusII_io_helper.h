@@ -305,8 +305,8 @@ public:
   /**
    * Sets up the nodal variables
    */
-  void initialize_element_variables(std::vector<std::string> names,
-                                    const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains);
+  virtual void initialize_element_variables(std::vector<std::string> names,
+                                            const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains);
 
   /**
    * Sets up the nodal variables
@@ -600,6 +600,19 @@ public:
   void read_var_names(ExodusVarType type);
 
 protected:
+  /**
+   * When appending: during initialization, check that variable names
+   * in the file match those you attempt to initialize with.
+   */
+  void check_existing_vars(ExodusVarType type, std::vector<std::string> & names, std::vector<std::string> & names_from_file);
+
+  /**
+   * Wraps calls to exII::ex_put_var_names() and exII::ex_put_var_param().
+   * The enumeration controls whether nodal, elemental, or global
+   * variable names are read and which class members are filled in.
+   */
+  void write_var_names(ExodusVarType type, std::vector<std::string> & names);
+
   // If true, whenever there is an I/O operation, only perform if if we are on processor 0.
   bool _run_only_on_proc0;
 
@@ -628,19 +641,6 @@ protected:
   bool _single_precision;
 
 private:
-
-  /**
-   * Wraps calls to exII::ex_put_var_names() and exII::ex_put_var_param().
-   * The enumeration controls whether nodal, elemental, or global
-   * variable names are read and which class members are filled in.
-   */
-  void write_var_names(ExodusVarType type, std::vector<std::string> & names);
-
-  /**
-   * When appending: during initialization, check that variable names
-   * in the file match those you attempt to initialize with.
-   */
-  void check_existing_vars(ExodusVarType type, std::vector<std::string> & names, std::vector<std::string> & names_from_file);
 
   /**
    * read_var_names() dispatches to this function.
