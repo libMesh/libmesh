@@ -1724,20 +1724,14 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
     {
       // If the list of active subdomains is empty, it is interpreted as being
       // active on *all* subdomains.
-      std::set<subdomain_id_type> var_active_subdomains;
+      std::set<subdomain_id_type> current_set;
       if (vars_active_subdomains[var_num].empty())
-        {
-          for (auto block_id : block_ids)
-            {
-              var_active_subdomains.insert(block_id);
-            }
-        }
+        for (auto block_id : block_ids)
+          current_set.insert(block_id);
       else
-        {
-          var_active_subdomains = vars_active_subdomains[var_num];
-        }
+        current_set = vars_active_subdomains[var_num];
 
-      for (auto block_id : var_active_subdomains)
+      for (auto block_id : current_set)
         {
           unsigned int block_index =
             std::distance(block_ids.begin(), std::find(block_ids.begin(), block_ids.end(), block_id));
