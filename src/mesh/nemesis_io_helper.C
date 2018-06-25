@@ -2543,7 +2543,7 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
 
 void
 Nemesis_IO_Helper::initialize_element_variables(std::vector<std::string> names,
-                                                const std::vector<std::set<subdomain_id_type>> & /*vars_active_subdomains*/)
+                                                const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
 {
   // Quick return if there are no element variables to write
   if (names.size() == 0)
@@ -2565,6 +2565,24 @@ Nemesis_IO_Helper::initialize_element_variables(std::vector<std::string> names,
   _elem_vars_initialized = true;
 
   this->write_var_names(ELEMENTAL, names);
+
+  // Write element truth table. First, we check for an important
+  // special case where the truth table is just all 1's, i.e. every
+  // elemental variable we're writing is active on every subdomain.
+  // This occurs when every std::set in vars_active_subdomains is
+  // empty().
+  if (std::find_if(vars_active_subdomains.begin(),
+                   vars_active_subdomains.end(),
+                   [](const std::set<subdomain_id_type> & s)
+                   { return !s.empty(); }) == vars_active_subdomains.end())
+    {
+      std::vector<int> truth_tab(num_elem_blk * num_elem_vars, 1);
+      ex_err = exII::ex_put_elem_var_tab(ex_id,
+                                         num_elem_blk,
+                                         num_elem_vars,
+                                         &truth_tab[0]);
+      EX_CHECK_ERR(ex_err, "Error writing element truth table.");
+    }
 }
 
 
