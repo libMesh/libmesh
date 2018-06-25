@@ -440,7 +440,7 @@ void Partitioner::processor_pairs_to_interface_nodes(MeshBase & mesh, std::map<s
     for (auto i = decltype(elem->n_neighbors())(0); i < elem->n_neighbors(); ++i)
     {
       auto neigh = elem->neighbor(i);
-      if (neigh && neigh->processor_id() != elem->processor_id())
+      if (neigh && !neigh->is_remote() && neigh->processor_id() != elem->processor_id())
       {
         neighbor_nodes.clear();
         common_nodes.clear();
