@@ -1731,10 +1731,15 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
       else
         current_set = vars_active_subdomains[var_num];
 
+      // Find index into the truth table for each id in current_set.
       for (auto block_id : current_set)
         {
+          auto it = std::find(block_ids.begin(), block_ids.end(), block_id);
+          if (it == block_ids.end())
+            libmesh_error_msg("ExodusII_IO_Helper: block id " << block_id << " not found in block_ids.");
+
           unsigned int block_index =
-            std::distance(block_ids.begin(), std::find(block_ids.begin(), block_ids.end(), block_id));
+            std::distance(block_ids.begin(), it);
 
           unsigned int truth_tab_index = block_index*num_elem_vars + var_num;
           truth_tab[truth_tab_index] = 1;
