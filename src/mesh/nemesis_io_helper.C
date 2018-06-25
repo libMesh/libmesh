@@ -2656,13 +2656,21 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
               std::vector<Number> local_soln;
               parallel_soln.localize(local_soln, required_indices);
 
-              ex_err = exII::ex_put_elem_var(ex_id,
-                                             timestep,
-                                             static_cast<int>(v+1),
-                                             static_cast<int>(sbd_id),
-                                             static_cast<int>(local_soln.size()),
-                                             &local_soln[0]);
-              EX_CHECK_ERR(ex_err, "Error writing element values.");
+              // It's possible that there's nothing for us to write:
+              // we may not be responsible for any elements on the
+              // current subdomain.  We did still have to participate
+              // in the localize() call above, however, since it is a
+              // collective.
+              if (local_soln.size())
+                {
+                  ex_err = exII::ex_put_elem_var(ex_id,
+                                                 timestep,
+                                                 static_cast<int>(v+1),
+                                                 static_cast<int>(sbd_id),
+                                                 static_cast<int>(local_soln.size()),
+                                                 &local_soln[0]);
+                  EX_CHECK_ERR(ex_err, "Error writing element values.");
+                }
             }
         }
     } // end loop over vars
