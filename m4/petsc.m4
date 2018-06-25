@@ -99,6 +99,7 @@ AC_DEFUN([CONFIGURE_PETSC],
             petsc_have_chaco=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_CHACO`
             petsc_have_party=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PARTY`
             petsc_have_ptscotch=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PTSCOTCH`
+            petsc_have_parmetis=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PARMETIS`
           ],
           [enablepetsc=no])
 
@@ -373,6 +374,10 @@ AC_DEFUN([CONFIGURE_PETSC],
           # Set a #define if PETSc was built with PTScotch support
           AS_IF([test $petsc_have_ptscotch -gt 0],
                 [AC_DEFINE(PETSC_HAVE_PTSCOTCH, 1, [Flag indicating whether or not PETSc was configured with PTSCOTCH support])])
+
+          # Set a #define if PETSc was built with ParMETIS support
+          AS_IF([test $petsc_have_parmetis -gt 0],
+                [AC_DEFINE(PETSC_HAVE_PARMETIS, 1, [Flag indicating whether or not PETSc was configured with ParMETIS support])])
 
           AC_SUBST(PETSC_ARCH) # Note: may be empty...
           AC_SUBST(PETSC_DIR)
