@@ -1407,6 +1407,13 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   std::unique_ptr<NumericVector<Number>> parallel_soln =
     es.build_parallel_elemental_solution_vector(names);
 
+  // Print the local and global sizes of the parallel_soln vector.
+  if (_verbose)
+    {
+      libMesh::out << "parallel_soln->size()= " << parallel_soln->size() << std::endl;
+      libMesh::out << "parallel_soln->local_size()= " << parallel_soln->local_size() << std::endl;
+    }
+
   // build_parallel_elemental_solution_vector() can return a nullptr,
   // in which case there are no constant monomial variables to write,
   // and we can just return.

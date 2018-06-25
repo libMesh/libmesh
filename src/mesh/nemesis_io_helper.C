@@ -2595,7 +2595,13 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                         const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
 {
   if (verbose)
-    libMesh::out << "Called Nemesis_IO_Helper::write_element_values()" << std::endl;
+    {
+      libMesh::out << "Called Nemesis_IO_Helper::write_element_values()" << std::endl;
+      libMesh::out << "Global list of subdomain ids: ";
+      for (const auto & id : global_elem_blk_ids)
+        libMesh::out << id << " ";
+      libMesh::out << std::endl;
+    }
 
   // Construct a map from subdomain_id -> [element ids] for each of the elements
   // we are responsible for.
