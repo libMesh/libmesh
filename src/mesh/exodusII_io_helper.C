@@ -1717,6 +1717,14 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
 
   this->write_var_names(ELEMENTAL, names);
 
+  if (verbose)
+    {
+      libMesh::out << "In ExodusII_IO_Helper::initialize_element_variables(), block_ids = ";
+      for (const auto & id : block_ids)
+        libMesh::out << id << " ";
+      libMesh::out << std::endl;
+    }
+
   // Use the truth table to indicate which subdomain/variable pairs are
   // active according to vars_active_subdomains.
   std::vector<int> truth_tab(num_elem_blk*num_elem_vars, 0);
