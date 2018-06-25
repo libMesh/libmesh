@@ -2588,6 +2588,8 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
           // Possibly skip this (variable, subdomain) combination
           if (active_subdomains.empty() || active_subdomains.count(sbd_id))
             {
+              libMesh::out << "var index = " << v << ", var = " << names[v] << ", subodmain = " << sbd_id << ", elem_ids.size() = " << elem_ids.size() << std::endl;
+
               std::vector<numeric_index_type> required_indices;
               required_indices.reserve(elem_ids.size());
 

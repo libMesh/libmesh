@@ -1423,6 +1423,23 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   std::vector<std::set<subdomain_id_type>> vars_active_subdomains;
   es.get_vars_active_subdomains(names, vars_active_subdomains);
 
+  // Print which subdomains each variable is active on.
+  if (_verbose)
+    {
+      for (unsigned int v=0; v<vars_active_subdomains.size(); ++v)
+        {
+          libMesh::out << "Variable " << names[v] << " is active on: ";
+          if (vars_active_subdomains[v].empty())
+            libMesh::out << "all" << std::endl;
+          else
+            {
+              for (const auto & id : vars_active_subdomains[v])
+                libMesh::out << id << " ";
+              libMesh::out << std::endl;
+            }
+        }
+    }
+
   // Call function (defined in the Exodus helper) that writes the
   // elemental variable names. This also apparently writes a "truth
   // table" to the Exodus file. Not sure if this will work for

@@ -1747,6 +1747,25 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
         }
     }
 
+  // Print the truth table we've built.
+  if (verbose)
+    {
+      libMesh::out << "truth_tab = " << std::endl;
+
+      // Print 1 dimensional table
+      // for (const auto & entry : truth_tab)
+      //   libMesh::out << entry << " ";
+      // libMesh::out << std::endl;
+
+      // Print 2 dimensional table
+      for (unsigned int blk=0; blk<static_cast<unsigned int>(num_elem_blk); ++blk)
+        {
+          for (unsigned int var=0; var<static_cast<unsigned int>(num_elem_vars); ++var)
+            libMesh::out << truth_tab[num_elem_vars*blk + var] << " ";
+          libMesh::out << std::endl;
+        }
+    }
+
   ex_err = exII::ex_put_elem_var_tab(ex_id,
                                      num_elem_blk,
                                      num_elem_vars,
