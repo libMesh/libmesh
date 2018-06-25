@@ -2566,23 +2566,33 @@ Nemesis_IO_Helper::initialize_element_variables(std::vector<std::string> names,
 
   this->write_var_names(ELEMENTAL, names);
 
-  // Write element truth table. First, we check for an important
-  // special case where the truth table is just all 1's, i.e. every
-  // elemental variable we're writing is active on every subdomain.
-  // This occurs when every std::set in vars_active_subdomains is
-  // empty().
-  if (std::find_if(vars_active_subdomains.begin(),
-                   vars_active_subdomains.end(),
-                   [](const std::set<subdomain_id_type> & s)
-                   { return !s.empty(); }) == vars_active_subdomains.end())
+  // Create a truth table from global_elem_blk_ids and the information
+  // in vars_active_subdomains. Create a truth table of
+  // size global_elem_blk_ids.size() * names.size().
+  std::vector<int> truth_tab(global_elem_blk_ids.size() * names.size());
+  for (unsigned int blk=0; blk<global_elem_blk_ids.size(); ++blk)
+    for (unsigned int var=0; var<names.size(); ++var)
+      if (vars_active_subdomains[var].empty() || vars_active_subdomains[var].count(global_elem_blk_ids[blk]))
+        truth_tab[names.size()*blk + var] = 1;
+
+  // Debugging info: print the truth table.
+  if (verbose)
     {
-      std::vector<int> truth_tab(num_elem_blk * num_elem_vars, 1);
-      ex_err = exII::ex_put_elem_var_tab(ex_id,
-                                         num_elem_blk,
-                                         num_elem_vars,
-                                         &truth_tab[0]);
-      EX_CHECK_ERR(ex_err, "Error writing element truth table.");
+      for (unsigned int blk=0; blk<global_elem_blk_ids.size(); ++blk)
+        {
+          for (unsigned int var=0; var<names.size(); ++var)
+            libMesh::out << truth_tab[names.size()*blk + var] << " ";
+
+          libMesh::out << std::endl;
+        }
     }
+
+  // Write truth table to file.
+  ex_err = exII::ex_put_elem_var_tab(ex_id,
+                                     global_elem_blk_ids.size(),
+                                     names.size(),
+                                     &truth_tab[0]);
+  EX_CHECK_ERR(ex_err, "Error writing element truth table.");
 }
 
 
@@ -2630,8 +2640,8 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
   // For each variable in names,
   //   For each subdomain in subdomain_map,
   //     If this (subdomain, variable) combination is active
-  //       For each element that we wrote to the Nemesis file,
-  //         ...
+  //       Extract our values into local_soln (localize is a collective)
+  //       Write local_soln to file
   for (unsigned int v=0; v<names.size(); ++v)
     {
       // Get list of active subdomains for variable v
