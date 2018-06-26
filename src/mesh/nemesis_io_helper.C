@@ -2575,18 +2575,6 @@ Nemesis_IO_Helper::initialize_element_variables(std::vector<std::string> names,
       if (vars_active_subdomains[var].empty() || vars_active_subdomains[var].count(global_elem_blk_ids[blk]))
         truth_tab[names.size()*blk + var] = 1;
 
-  // Debugging info: print the truth table.
-  if (verbose)
-    {
-      for (unsigned int blk=0; blk<global_elem_blk_ids.size(); ++blk)
-        {
-          for (unsigned int var=0; var<names.size(); ++var)
-            libMesh::out << truth_tab[names.size()*blk + var] << " ";
-
-          libMesh::out << std::endl;
-        }
-    }
-
   // Write truth table to file.
   ex_err = exII::ex_put_elem_var_tab(ex_id,
                                      global_elem_blk_ids.size(),
@@ -2604,15 +2592,6 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                         int timestep,
                                         const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
 {
-  if (verbose)
-    {
-      libMesh::out << "Called Nemesis_IO_Helper::write_element_values()" << std::endl;
-      libMesh::out << "Global list of subdomain ids: ";
-      for (const auto & id : global_elem_blk_ids)
-        libMesh::out << id << " ";
-      libMesh::out << std::endl;
-    }
-
   // Construct a map from subdomain_id -> [element ids] for each of the elements
   // we are responsible for. Note: we start by initializing the subdomain_map with
   // the same (global) list of subdomain ids on all processors so that the processors
@@ -2655,8 +2634,6 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
           // Possibly skip this (variable, subdomain) combination
           if (active_subdomains.empty() || active_subdomains.count(sbd_id))
             {
-              libMesh::out << "var index = " << v << ", var = " << names[v] << ", subodmain = " << sbd_id << ", elem_ids.size() = " << elem_ids.size() << std::endl;
-
               std::vector<numeric_index_type> required_indices;
               required_indices.reserve(elem_ids.size());
 

@@ -1407,13 +1407,6 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   std::unique_ptr<NumericVector<Number>> parallel_soln =
     es.build_parallel_elemental_solution_vector(names);
 
-  // Print the local and global sizes of the parallel_soln vector.
-  if (_verbose)
-    {
-      libMesh::out << "parallel_soln->size()= " << parallel_soln->size() << std::endl;
-      libMesh::out << "parallel_soln->local_size()= " << parallel_soln->local_size() << std::endl;
-    }
-
   // build_parallel_elemental_solution_vector() can return a nullptr,
   // in which case there are no constant monomial variables to write,
   // and we can just return.
@@ -1430,35 +1423,13 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   std::vector<std::set<subdomain_id_type>> vars_active_subdomains;
   es.get_vars_active_subdomains(names, vars_active_subdomains);
 
-  // Print which subdomains each variable is active on.
-  if (_verbose)
-    {
-      for (unsigned int v=0; v<vars_active_subdomains.size(); ++v)
-        {
-          libMesh::out << "Variable " << names[v] << " is active on: ";
-          if (vars_active_subdomains[v].empty())
-            libMesh::out << "all" << std::endl;
-          else
-            {
-              for (const auto & id : vars_active_subdomains[v])
-                libMesh::out << id << " ";
-              libMesh::out << std::endl;
-            }
-        }
-    }
-
   // Call the Nemesis version of initialize_element_variables().
   //
   // The Exodus helper version of this function writes an incorrect
   // truth table in parallel that somehow does not account for the
   // case where a subdomain does not appear on one or more of the
-  // processors. So, for now we are doing that function's work
-  // manually, but a long term solution might be to make that function
-  // virtual in the Exodus helper and then override it in the Nemesis
-  // helper.
-  //
-  // TODO: Figure out how to do the "truth_tab" optimization in
-  // Nemesis as well, as we will likely want that for efficiency.
+  // processors. So, we override that function's behavior in the
+  // Nemesis helper.
   nemhelper->initialize_element_variables(names, vars_active_subdomains);
 
   // Call (non-virtual) function to write the elemental data in

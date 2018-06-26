@@ -1717,14 +1717,6 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
 
   this->write_var_names(ELEMENTAL, names);
 
-  if (verbose)
-    {
-      libMesh::out << "In ExodusII_IO_Helper::initialize_element_variables(), block_ids = ";
-      for (const auto & id : block_ids)
-        libMesh::out << id << " ";
-      libMesh::out << std::endl;
-    }
-
   // Use the truth table to indicate which subdomain/variable pairs are
   // active according to vars_active_subdomains.
   std::vector<int> truth_tab(num_elem_blk*num_elem_vars, 0);
@@ -1739,15 +1731,6 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
       else
         current_set = vars_active_subdomains[var_num];
 
-      // Print the ids in current_set
-      if (verbose)
-        {
-          libMesh::out << "In ExodusII_IO_Helper::initialize_element_variables(), current_set = ";
-          for (const auto & id : current_set)
-            libMesh::out << id << " ";
-          libMesh::out << std::endl;
-        }
-
       // Find index into the truth table for each id in current_set.
       for (auto block_id : current_set)
         {
@@ -1760,25 +1743,6 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
 
           unsigned int truth_tab_index = block_index*num_elem_vars + var_num;
           truth_tab[truth_tab_index] = 1;
-        }
-    }
-
-  // Print the truth table we've built.
-  if (verbose)
-    {
-      libMesh::out << "truth_tab = " << std::endl;
-
-      // Print 1 dimensional table
-      // for (const auto & entry : truth_tab)
-      //   libMesh::out << entry << " ";
-      // libMesh::out << std::endl;
-
-      // Print 2 dimensional table
-      for (unsigned int blk=0; blk<static_cast<unsigned int>(num_elem_blk); ++blk)
-        {
-          for (unsigned int var=0; var<static_cast<unsigned int>(num_elem_vars); ++var)
-            libMesh::out << truth_tab[num_elem_vars*blk + var] << " ";
-          libMesh::out << std::endl;
         }
     }
 
