@@ -194,7 +194,8 @@ void Partitioner::partition_unpartitioned_elements (MeshBase & mesh,
 
   // the unpartitioned elements must exist on all processors. If the range is empty on one
   // it is empty on all, and we can quit right here.
-  if (!n_unpartitioned_elements) return;
+  if (!n_unpartitioned_elements)
+    return;
 
   // find the target subdomain sizes
   std::vector<dof_id_type> subdomain_bounds(mesh.n_processors());
@@ -409,7 +410,9 @@ void Partitioner::set_parent_processor_ids(MeshBase & mesh)
 #endif // LIBMESH_ENABLE_AMR
 }
 
-void Partitioner::processor_pairs_to_interface_nodes(MeshBase & mesh, std::map<std::pair<processor_id_type, processor_id_type>, std::set<dof_id_type>> & processor_pair_to_nodes)
+void
+Partitioner::processor_pairs_to_interface_nodes(MeshBase & mesh,
+                                                std::map<std::pair<processor_id_type, processor_id_type>, std::set<dof_id_type>> & processor_pair_to_nodes)
 {
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
@@ -422,42 +425,43 @@ void Partitioner::processor_pairs_to_interface_nodes(MeshBase & mesh, std::map<s
 
   // Loop over all the active elements
   for (auto & elem : mesh.active_element_ptr_range())
-  {
-    libmesh_assert(elem);
-
-    libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);
-
-    auto n_nodes = elem->n_nodes();
-
-    // prepare data for this element
-    mynodes.clear();
-    neighbor_nodes.clear();
-    common_nodes.clear();
-
-    for (unsigned int inode = 0; inode < n_nodes; inode++)
-      mynodes.insert(elem->node_id(inode));
-
-    for (auto i = decltype(elem->n_neighbors())(0); i < elem->n_neighbors(); ++i)
     {
-      auto neigh = elem->neighbor(i);
-      if (neigh && !neigh->is_remote() && neigh->processor_id() != elem->processor_id())
-      {
-        neighbor_nodes.clear();
-        common_nodes.clear();
-        auto neigh_n_nodes = neigh->n_nodes();
-        for (unsigned int inode = 0; inode < neigh_n_nodes; inode++)
-          neighbor_nodes.insert(neigh->node_id(inode));
+      libmesh_assert(elem);
 
-        std::set_intersection(mynodes.begin(), mynodes.end(),
-                            neighbor_nodes.begin(), neighbor_nodes.end(),
-                            std::back_inserter(common_nodes));
+      libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);
 
-        auto & map_set = processor_pair_to_nodes[std::make_pair(std::min(elem->processor_id(), neigh->processor_id()), std::max(elem->processor_id(), neigh->processor_id()))];
-        for (auto global_node_id: common_nodes)
-          map_set.insert(global_node_id);
-      }
+      auto n_nodes = elem->n_nodes();
+
+      // prepare data for this element
+      mynodes.clear();
+      neighbor_nodes.clear();
+      common_nodes.clear();
+
+      for (unsigned int inode = 0; inode < n_nodes; inode++)
+        mynodes.insert(elem->node_id(inode));
+
+      for (auto i = decltype(elem->n_neighbors())(0); i < elem->n_neighbors(); ++i)
+        {
+          auto neigh = elem->neighbor(i);
+          if (neigh && !neigh->is_remote() && neigh->processor_id() != elem->processor_id())
+            {
+              neighbor_nodes.clear();
+              common_nodes.clear();
+              auto neigh_n_nodes = neigh->n_nodes();
+              for (unsigned int inode = 0; inode < neigh_n_nodes; inode++)
+                neighbor_nodes.insert(neigh->node_id(inode));
+
+              std::set_intersection(mynodes.begin(), mynodes.end(),
+                                    neighbor_nodes.begin(), neighbor_nodes.end(),
+                                    std::back_inserter(common_nodes));
+
+              auto & map_set = processor_pair_to_nodes[std::make_pair(std::min(elem->processor_id(), neigh->processor_id()),
+                                                                      std::max(elem->processor_id(), neigh->processor_id()))];
+              for (auto global_node_id : common_nodes)
+                map_set.insert(global_node_id);
+            }
+        }
     }
-  }
 }
 
 void Partitioner::set_interface_node_processor_ids_linear(MeshBase & mesh)
@@ -469,19 +473,19 @@ void Partitioner::set_interface_node_processor_ids_linear(MeshBase & mesh)
 
   processor_pairs_to_interface_nodes(mesh, processor_pair_to_nodes);
 
-  for (auto & pmap: processor_pair_to_nodes)
-  {
-    unsigned int n_own_nodes = pmap.second.size()/2, i = 0;
-
-    for (auto it = pmap.second.begin(); it != pmap.second.end(); it++, i++)
+  for (auto & pmap : processor_pair_to_nodes)
     {
-      auto & node = mesh.node_ref(*it);
-      if (i <= n_own_nodes)
-        node.processor_id() = pmap.first.first;
-      else
-        node.processor_id() = pmap.first.second;
+      unsigned int n_own_nodes = pmap.second.size()/2, i = 0;
+
+      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++, i++)
+        {
+          auto & node = mesh.node_ref(*it);
+          if (i <= n_own_nodes)
+            node.processor_id() = pmap.first.first;
+          else
+            node.processor_id() = pmap.first.second;
+        }
     }
-  }
 }
 
 void Partitioner::set_interface_node_processor_ids_BFS(MeshBase & mesh)
@@ -503,58 +507,62 @@ void Partitioner::set_interface_node_processor_ids_BFS(MeshBase & mesh)
   std::queue<dof_id_type> nodes_queue;
   std::set<dof_id_type> visted_nodes;
 
-  for (auto & pmap: processor_pair_to_nodes)
-  {
-    unsigned int n_own_nodes = pmap.second.size()/2;
-
-    // Initialize node assignment
-    for (auto it = pmap.second.begin(); it != pmap.second.end(); it++)
-      mesh.node_ref(*it).processor_id() = pmap.first.second;
-
-    visted_nodes.clear();
-    for (auto it = pmap.second.begin(); it != pmap.second.end(); it++)
+  for (auto & pmap : processor_pair_to_nodes)
     {
-      mesh.node_ref(*it).processor_id() = pmap.first.second;
+      unsigned int n_own_nodes = pmap.second.size()/2;
 
-      if (visted_nodes.find(*it) != visted_nodes.end()) continue;
-      else
-      {
-        nodes_queue.push(*it);
-        visted_nodes.insert(*it);
-        if (visted_nodes.size() >= n_own_nodes) break;
-      }
+      // Initialize node assignment
+      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++)
+        mesh.node_ref(*it).processor_id() = pmap.first.second;
 
-      while (!nodes_queue.empty())
-      {
-        auto & node = mesh.node_ref(nodes_queue.front());
-        nodes_queue.pop();
+      visted_nodes.clear();
+      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++)
+        {
+          mesh.node_ref(*it).processor_id() = pmap.first.second;
 
-        neighbors.clear();
-        MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
-        neighbors_order.clear();
-        for (auto & neighbor: neighbors)
-          neighbors_order.insert(neighbor->id());
+          if (visted_nodes.find(*it) != visted_nodes.end())
+            continue;
+          else
+            {
+              nodes_queue.push(*it);
+              visted_nodes.insert(*it);
+              if (visted_nodes.size() >= n_own_nodes)
+                break;
+            }
 
-        common_nodes.clear();
-        std::set_intersection(pmap.second.begin(), pmap.second.end(),
-                         neighbors_order.begin(), neighbors_order.end(),
-                              std::back_inserter(common_nodes));
+          while (!nodes_queue.empty())
+            {
+              auto & node = mesh.node_ref(nodes_queue.front());
+              nodes_queue.pop();
 
-        for (auto node: common_nodes)
-          if (visted_nodes.find(node) == visted_nodes.end())
-          {
-            nodes_queue.push(node);
-            visted_nodes.insert(node);
-            if (visted_nodes.size() >= n_own_nodes) goto queue_done;
-          }
+              neighbors.clear();
+              MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
+              neighbors_order.clear();
+              for (auto & neighbor : neighbors)
+                neighbors_order.insert(neighbor->id());
 
-        if (visted_nodes.size() >= n_own_nodes) goto queue_done;
+              common_nodes.clear();
+              std::set_intersection(pmap.second.begin(), pmap.second.end(),
+                                    neighbors_order.begin(), neighbors_order.end(),
+                                    std::back_inserter(common_nodes));
+
+              for (auto node : common_nodes)
+                if (visted_nodes.find(node) == visted_nodes.end())
+                  {
+                    nodes_queue.push(node);
+                    visted_nodes.insert(node);
+                    if (visted_nodes.size() >= n_own_nodes)
+                      goto queue_done;
+                  }
+
+              if (visted_nodes.size() >= n_own_nodes)
+                goto queue_done;
+            }
         }
-    }
     queue_done:
-    for (auto node: visted_nodes)
-      mesh.node_ref(node).processor_id() = pmap.first.first;
-  }
+      for (auto node : visted_nodes)
+        mesh.node_ref(node).processor_id() = pmap.first.first;
+    }
 }
 
 void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & mesh)
@@ -580,78 +588,78 @@ void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & m
 
   std::map<dof_id_type, dof_id_type> global_to_local;
 
-  for (auto & pmap: processor_pair_to_nodes)
-  {
-    unsigned int i = 0;
-
-    rows.clear();
-    rows.resize(pmap.second.size()+1);
-    cols.clear();
-    for (auto it = pmap.second.begin(); it != pmap.second.end(); it++)
-      global_to_local[*it] = i++;
-
-    i = 0;
-    for (auto it = pmap.second.begin(); it != pmap.second.end(); it++, i++)
+  for (auto & pmap : processor_pair_to_nodes)
     {
-      auto & node = mesh.node_ref(*it);
-      neighbors.clear();
-      MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
-      neighbors_order.clear();
-      for (auto & neighbor: neighbors)
-        neighbors_order.insert(neighbor->id());
+      unsigned int i = 0;
 
-      common_nodes.clear();
-      std::set_intersection(pmap.second.begin(), pmap.second.end(),
-                         neighbors_order.begin(), neighbors_order.end(),
-                              std::back_inserter(common_nodes));
+      rows.clear();
+      rows.resize(pmap.second.size()+1);
+      cols.clear();
+      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++)
+        global_to_local[*it] = i++;
 
-      rows[i+1] = rows[i] +  common_nodes.size();
+      i = 0;
+      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++, i++)
+        {
+          auto & node = mesh.node_ref(*it);
+          neighbors.clear();
+          MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
+          neighbors_order.clear();
+          for (auto & neighbor : neighbors)
+            neighbors_order.insert(neighbor->id());
 
-      for (auto node : common_nodes)
-         cols.push_back(global_to_local[node]);
+          common_nodes.clear();
+          std::set_intersection(pmap.second.begin(), pmap.second.end(),
+                                neighbors_order.begin(), neighbors_order.end(),
+                                std::back_inserter(common_nodes));
+
+          rows[i+1] = rows[i] +  common_nodes.size();
+
+          for (auto node : common_nodes)
+            cols.push_back(global_to_local[node]);
+        }
+
+      Mat adj;
+      MatPartitioning part;
+      IS is;
+      PetscInt local_size, rows_size, cols_size;
+      PetscInt *adj_i, *adj_j;
+      const PetscInt *indices;
+      PetscCalloc1(rows.size(), &adj_i);
+      PetscCalloc1(cols.size(), &adj_j);
+      rows_size = rows.size();
+      for (PetscInt ii=0; ii<rows_size; ii++)
+        adj_i[ii] = rows[ii];
+
+      cols_size = cols.size();
+      for (PetscInt ii=0; ii<cols_size; ii++)
+        adj_j[ii] = cols[ii];
+
+      MatCreateMPIAdj(PETSC_COMM_SELF, pmap.second.size(), pmap.second.size(), adj_i, adj_j,nullptr,&adj);
+      MatPartitioningCreate(PETSC_COMM_SELF,&part);
+      MatPartitioningSetAdjacency(part,adj);
+      MatPartitioningSetNParts(part,2);
+      PetscObjectSetOptionsPrefix((PetscObject)part, "balance_");
+      MatPartitioningSetFromOptions(part);
+      MatPartitioningApply(part,&is);
+
+      MatDestroy(&adj);
+      MatPartitioningDestroy(&part);
+
+      ISGetLocalSize(is, &local_size);
+      ISGetIndices(is, &indices);
+      i = 0;
+      for (auto it = pmap.second.begin(); it != pmap.second.end(); it++, i++)
+        {
+          auto & node = mesh.node_ref(*it);
+          if (indices[i])
+            node.processor_id() = pmap.first.second;
+          else
+            node.processor_id() = pmap.first.first;
+        }
+      ISRestoreIndices(is, &indices);
+      ISDestroy(&is);
     }
-
-    Mat adj;
-    MatPartitioning part;
-    IS is;
-    PetscInt local_size, rows_size, cols_size;
-    PetscInt *adj_i, *adj_j;
-    const PetscInt *indices;
-    PetscCalloc1(rows.size(), &adj_i);
-    PetscCalloc1(cols.size(), &adj_j);
-    rows_size = rows.size();
-    for (PetscInt ii=0; ii<rows_size; ii++)
-      adj_i[ii] = rows[ii];
-
-    cols_size = cols.size();
-    for (PetscInt ii=0; ii<cols_size; ii++)
-      adj_j[ii] = cols[ii];
-
-    MatCreateMPIAdj(PETSC_COMM_SELF, pmap.second.size(), pmap.second.size(), adj_i, adj_j,nullptr,&adj);
-    MatPartitioningCreate(PETSC_COMM_SELF,&part);
-    MatPartitioningSetAdjacency(part,adj);
-    MatPartitioningSetNParts(part,2);
-    PetscObjectSetOptionsPrefix((PetscObject)part, "balance_");
-    MatPartitioningSetFromOptions(part);
-    MatPartitioningApply(part,&is);
-
-    MatDestroy(&adj);
-    MatPartitioningDestroy(&part);
-
-    ISGetLocalSize(is, &local_size);
-    ISGetIndices(is, &indices);
-    i = 0;
-    for (auto it = pmap.second.begin(); it != pmap.second.end(); it++, i++)
-    {
-      auto & node = mesh.node_ref(*it);
-      if (indices[i])
-        node.processor_id() = pmap.first.second;
-      else
-        node.processor_id() = pmap.first.first;
-    }
-    ISRestoreIndices(is, &indices);
-    ISDestroy(&is);
-  }
 #else
   libmesh_error_msg("PETSc is required");
 #endif
