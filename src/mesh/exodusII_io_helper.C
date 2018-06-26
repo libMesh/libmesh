@@ -1724,23 +1724,22 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
     {
       // If the list of active subdomains is empty, it is interpreted as being
       // active on *all* subdomains.
-      std::set<subdomain_id_type> var_active_subdomains;
+      std::set<subdomain_id_type> current_set;
       if (vars_active_subdomains[var_num].empty())
-        {
-          for (auto block_id : block_ids)
-            {
-              var_active_subdomains.insert(block_id);
-            }
-        }
+        for (auto block_id : block_ids)
+          current_set.insert(block_id);
       else
-        {
-          var_active_subdomains = vars_active_subdomains[var_num];
-        }
+        current_set = vars_active_subdomains[var_num];
 
-      for (auto block_id : var_active_subdomains)
+      // Find index into the truth table for each id in current_set.
+      for (auto block_id : current_set)
         {
+          auto it = std::find(block_ids.begin(), block_ids.end(), block_id);
+          if (it == block_ids.end())
+            libmesh_error_msg("ExodusII_IO_Helper: block id " << block_id << " not found in block_ids.");
+
           unsigned int block_index =
-            std::distance(block_ids.begin(), std::find(block_ids.begin(), block_ids.end(), block_id));
+            std::distance(block_ids.begin(), it);
 
           unsigned int truth_tab_index = block_index*num_elem_vars + var_num;
           truth_tab[truth_tab_index] = 1;

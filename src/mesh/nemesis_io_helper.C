@@ -2542,18 +2542,64 @@ void Nemesis_IO_Helper::write_nodal_solution(const NumericVector<Number> & paral
 
 
 void
+Nemesis_IO_Helper::initialize_element_variables(std::vector<std::string> names,
+                                                const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
+{
+  // Quick return if there are no element variables to write
+  if (names.size() == 0)
+    return;
+
+  // Quick return if we have already called this function
+  if (_elem_vars_initialized)
+    return;
+
+  // Be sure that variables in the file match what we are asking for
+  if (num_elem_vars > 0)
+    {
+      this->check_existing_vars(ELEMENTAL, names, this->elem_var_names);
+      return;
+    }
+
+  // Set the flag so we can skip this stuff on subsequent calls to
+  // initialize_element_variables()
+  _elem_vars_initialized = true;
+
+  this->write_var_names(ELEMENTAL, names);
+
+  // Create a truth table from global_elem_blk_ids and the information
+  // in vars_active_subdomains. Create a truth table of
+  // size global_elem_blk_ids.size() * names.size().
+  std::vector<int> truth_tab(global_elem_blk_ids.size() * names.size());
+  for (unsigned int blk=0; blk<global_elem_blk_ids.size(); ++blk)
+    for (unsigned int var=0; var<names.size(); ++var)
+      if (vars_active_subdomains[var].empty() || vars_active_subdomains[var].count(global_elem_blk_ids[blk]))
+        truth_tab[names.size()*blk + var] = 1;
+
+  // Write truth table to file.
+  ex_err = exII::ex_put_elem_var_tab(ex_id,
+                                     global_elem_blk_ids.size(),
+                                     names.size(),
+                                     &truth_tab[0]);
+  EX_CHECK_ERR(ex_err, "Error writing element truth table.");
+}
+
+
+
+void
 Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                         const NumericVector<Number> & parallel_soln,
                                         const std::vector<std::string> & names,
                                         int timestep,
                                         const std::vector<std::set<subdomain_id_type>> & vars_active_subdomains)
 {
-  if (verbose)
-    libMesh::out << "Called Nemesis_IO_Helper::write_element_values()" << std::endl;
-
   // Construct a map from subdomain_id -> [element ids] for each of the elements
-  // we are responsible for.
+  // we are responsible for. Note: we start by initializing the subdomain_map with
+  // the same (global) list of subdomain ids on all processors so that the processors
+  // execute the loop below in the same order.
   std::map<subdomain_id_type, std::vector<dof_id_type>> subdomain_map;
+  for (const auto & id : global_elem_blk_ids)
+    subdomain_map[id].clear();
+
   for (dof_id_type i=0; i<this->exodus_elem_num_to_libmesh.size(); ++i)
     {
       // Look up the elem id for exdous element i.
@@ -2573,8 +2619,8 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
   // For each variable in names,
   //   For each subdomain in subdomain_map,
   //     If this (subdomain, variable) combination is active
-  //       For each element that we wrote to the Nemesis file,
-  //         ...
+  //       Extract our values into local_soln (localize is a collective)
+  //       Write local_soln to file
   for (unsigned int v=0; v<names.size(); ++v)
     {
       // Get list of active subdomains for variable v
@@ -2597,13 +2643,21 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
               std::vector<Number> local_soln;
               parallel_soln.localize(local_soln, required_indices);
 
-              ex_err = exII::ex_put_elem_var(ex_id,
-                                             timestep,
-                                             static_cast<int>(v+1),
-                                             static_cast<int>(sbd_id),
-                                             static_cast<int>(local_soln.size()),
-                                             &local_soln[0]);
-              EX_CHECK_ERR(ex_err, "Error writing element values.");
+              // It's possible that there's nothing for us to write:
+              // we may not be responsible for any elements on the
+              // current subdomain.  We did still have to participate
+              // in the localize() call above, however, since it is a
+              // collective.
+              if (local_soln.size())
+                {
+                  ex_err = exII::ex_put_elem_var(ex_id,
+                                                 timestep,
+                                                 static_cast<int>(v+1),
+                                                 static_cast<int>(sbd_id),
+                                                 static_cast<int>(local_soln.size()),
+                                                 &local_soln[0]);
+                  EX_CHECK_ERR(ex_err, "Error writing element values.");
+                }
             }
         }
     } // end loop over vars

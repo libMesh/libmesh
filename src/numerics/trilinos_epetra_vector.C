@@ -345,7 +345,7 @@ EpetraVector<T>::operator = (const T s_in)
 
 template <typename T>
 NumericVector<T> &
-EpetraVector<T>::operator = (const NumericVector<T> & v_in)
+EpetraVector<T>::operator = (const NumericVector<T> & /*v_in*/)
 {
   // This function could be implemented in terms of the copy
   // assignment operator (see other NumericVector subclasses) but that

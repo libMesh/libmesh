@@ -1423,10 +1423,13 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   std::vector<std::set<subdomain_id_type>> vars_active_subdomains;
   es.get_vars_active_subdomains(names, vars_active_subdomains);
 
-  // Call function (defined in the Exodus helper) that writes the
-  // elemental variable names. This also apparently writes a "truth
-  // table" to the Exodus file. Not sure if this will work for
-  // Nemesis...
+  // Call the Nemesis version of initialize_element_variables().
+  //
+  // The Exodus helper version of this function writes an incorrect
+  // truth table in parallel that somehow does not account for the
+  // case where a subdomain does not appear on one or more of the
+  // processors. So, we override that function's behavior in the
+  // Nemesis helper.
   nemhelper->initialize_element_variables(names, vars_active_subdomains);
 
   // Call (non-virtual) function to write the elemental data in
