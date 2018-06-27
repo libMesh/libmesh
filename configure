@@ -2030,7 +2030,8 @@ Optional Features:
   --disable-glpk          build without GLPK support
   --disable-nlopt         build without NLOPT support
   --disable-capnproto     build without Cap'n Proto support
-  --disable-hdf5          build without HDF5 support
+  --enable-hdf5           build libmesh with HDF5 support, the selected HDF5
+                          must be compatible with contrib/netcdf
   --disable-netcdf        build without netCDF binary I/O
   --disable-exodus        build without ExodusII API support
   --enable-exodus-fortran build with ExodusII Fortran API support
@@ -39830,7 +39831,7 @@ if test "${enable_hdf5+set}" = set; then :
     as_fn_error $? "bad value ${enableval} for --enable-hdf5" "$LINENO" 5 ;;
 esac
 else
-  enablehdf5=$enableoptional
+  enablehdf5=no
 fi
 
 
