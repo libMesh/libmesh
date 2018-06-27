@@ -107,6 +107,8 @@ public:
   virtual bool is_node_on_side(const unsigned int n,
                                const unsigned int s) const override;
 
+  virtual std::vector<unsigned int> nodes_on_side(const unsigned int s) const override;
+
   /**
    * \returns \p true if the specified (local) node number is on the
    * specified edge.

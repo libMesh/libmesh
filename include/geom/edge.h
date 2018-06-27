@@ -156,6 +156,7 @@ public:
   virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int) override
   { libmesh_not_implemented(); return std::unique_ptr<Elem>(); }
 
+  virtual std::vector<unsigned int> nodes_on_side(const unsigned int s) const override;
 
 protected:
 

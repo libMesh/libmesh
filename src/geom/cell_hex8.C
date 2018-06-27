@@ -87,6 +87,14 @@ bool Hex8::is_node_on_side(const unsigned int n,
   return false;
 }
 
+std::vector<unsigned>
+Hex8::nodes_on_side(const unsigned int s) const
+{
+  libmesh_assert_less(s, n_sides());
+  return {side_nodes_map[s],
+          side_nodes_map[s] + sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0])};
+}
+
 bool Hex8::is_node_on_edge(const unsigned int n,
                            const unsigned int e) const
 {

@@ -714,6 +714,11 @@ public:
                                const unsigned int s) const = 0;
 
   /**
+   * \returns the (local) node numbers on the specified side
+   */
+  virtual std::vector<unsigned int> nodes_on_side(const unsigned int /*s*/) const = 0;
+
+  /**
    * \returns \p true if the specified (local) node number is on the
    * specified edge.
    */

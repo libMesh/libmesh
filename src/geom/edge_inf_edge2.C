@@ -59,6 +59,13 @@ bool InfEdge2::is_node_on_side(const unsigned int n,
   return (s == n);
 }
 
+std::vector<unsigned>
+InfEdge2::nodes_on_side(const unsigned int s) const
+{
+  libmesh_assert_less(s, 1);
+  return {s};
+}
+
 bool InfEdge2::is_node_on_edge(const unsigned int,
                                const unsigned int libmesh_dbg_var(e)) const
 {

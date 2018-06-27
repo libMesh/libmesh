@@ -127,6 +127,14 @@ bool Tet4::is_node_on_side(const unsigned int n,
   return false;
 }
 
+std::vector<unsigned>
+Tet4::nodes_on_side(const unsigned int s) const
+{
+  libmesh_assert_less(s, n_sides());
+  return {side_nodes_map[s],
+          side_nodes_map[s] + sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0])};
+}
+
 Order Tet4::default_order() const
 {
   return FIRST;

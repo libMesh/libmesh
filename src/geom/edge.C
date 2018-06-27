@@ -80,6 +80,11 @@ unsigned int Edge::opposite_node(const unsigned int node_in,
   return 1 - node_in;
 }
 
-
+std::vector<unsigned>
+Edge::nodes_on_side(const unsigned int s) const
+{
+  libmesh_assert_less(s, 2);
+  return {s};
+}
 
 } // namespace libMesh
