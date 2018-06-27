@@ -976,14 +976,11 @@ void Partitioner::build_graph (const MeshBase & mesh)
   std::vector<const Elem *> neighbors_offspring;
 #endif
 
-   bool need_global_index_by_pid_map =
-     !_global_index_by_pid_map.size() ||
-     _global_index_by_pid_map.size() != mesh.n_active_elem();
-
-   mesh.comm().max(need_global_index_by_pid_map);
-
-   if (need_global_index_by_pid_map)
-     _find_global_index_by_pid_map(mesh);
+   // This is costly, and we only need to do it if the mesh has
+   // changed since we last partitioned... but the mesh probably has
+   // changed since we last partitioned, and if it hasn't we don't
+   // have a reliable way to be sure of that.
+   _find_global_index_by_pid_map(mesh);
 
    dof_id_type first_local_elem = 0;
    for (processor_id_type pid=0; pid < mesh.processor_id(); pid++)
