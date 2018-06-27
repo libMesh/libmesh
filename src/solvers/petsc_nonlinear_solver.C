@@ -896,6 +896,10 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   // (petsc/petsc@154060b), so this code block should be safe to use
   // in 3.5.0 and later.
 #if !PETSC_VERSION_LESS_THAN(3,5,0)
+#if !PETSC_VERSION_LESS_THAN(3,6,0)
+  ierr = SNESSetSolution(_snes, x->vec());
+  LIBMESH_CHKERR(ierr);
+#endif
   ierr = SNESSetUp(_snes);
   LIBMESH_CHKERR(ierr);
 
