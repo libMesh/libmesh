@@ -1085,7 +1085,6 @@ DistributedMesh::renumber_dof_objects(mapvector<T *, dof_id_type> & objects)
   auto action_functor =
     [
 #ifndef NDEBUG
-     this,
      &first_object_on_proc,
      &objects_on_proc,
 #endif

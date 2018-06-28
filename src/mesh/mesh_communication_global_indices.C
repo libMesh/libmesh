@@ -833,8 +833,8 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
 #ifndef NDEBUG
      & upper_bounds,
      & communicator,
-#endif
      & bbox,
+#endif
      & my_bin,
        my_offset
     ]
