@@ -33,7 +33,14 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Pyramid14 class static member initializations
-const unsigned int Pyramid14::side_nodes_map[5][9] =
+const int Pyramid14::num_nodes;
+const int Pyramid14::num_sides;
+const int Pyramid14::num_edges;
+const int Pyramid14::num_children;
+const int Pyramid14::nodes_per_side;
+const int Pyramid14::nodes_per_edge;
+
+const unsigned int Pyramid14::side_nodes_map[Pyramid14::num_sides][Pyramid14::nodes_per_side] =
   {
     {0, 1, 4, 5, 10,  9, 99, 99, 99}, // Side 0 (front)
     {1, 2, 4, 6, 11, 10, 99, 99, 99}, // Side 1 (right)
@@ -42,7 +49,7 @@ const unsigned int Pyramid14::side_nodes_map[5][9] =
     {0, 3, 2, 1,  8,  7,  6,  5, 13}  // Side 4 (base)
   };
 
-const unsigned int Pyramid14::edge_nodes_map[8][3] =
+const unsigned int Pyramid14::edge_nodes_map[Pyramid14::num_edges][Pyramid14::nodes_per_edge] =
   {
     {0, 1,  5}, // Edge 0
     {1, 2,  6}, // Edge 1
@@ -92,31 +99,26 @@ bool Pyramid14::is_node_on_side(const unsigned int n,
                                 const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 9; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(side_nodes_map[s]),
+                   std::end(side_nodes_map[s]),
+                   n) != std::end(side_nodes_map[s]);
 }
 
 std::vector<unsigned>
 Pyramid14::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  std::vector<unsigned int> nodes(side_nodes_map[s],
-                                  side_nodes_map[s] +
-                                      sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0]));
-  nodes.erase(std::remove(nodes.begin(), nodes.end(), 99), nodes.end());
-  return nodes;
+  auto trim = (s == 4) ? 0 : 3;
+  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s]) - trim};
 }
 
 bool Pyramid14::is_node_on_edge(const unsigned int n,
                                 const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 3; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(edge_nodes_map[e]),
+                   std::end(edge_nodes_map[e]),
+                   n) != std::end(edge_nodes_map[e]);
 }
 
 

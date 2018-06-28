@@ -36,7 +36,14 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // InfHex16 class static member initializations
-const unsigned int InfHex16::side_nodes_map[5][8] =
+const int InfHex16::num_nodes;
+const int InfHex16::num_sides;
+const int InfHex16::num_edges;
+const int InfHex16::num_children;
+const int InfHex16::nodes_per_side;
+const int InfHex16::nodes_per_edge;
+
+const unsigned int InfHex16::side_nodes_map[InfHex16::num_sides][InfHex16::nodes_per_side] =
   {
     { 0, 1, 2, 3, 8, 9, 10, 11},   // Side 0
     { 0, 1, 4, 5, 8, 12, 99, 99},  // Side 1
@@ -45,7 +52,7 @@ const unsigned int InfHex16::side_nodes_map[5][8] =
     { 3, 0, 7, 4, 11, 15, 99, 99}  // Side 4
   };
 
-const unsigned int InfHex16::edge_nodes_map[8][3] =
+const unsigned int InfHex16::edge_nodes_map[InfHex16::num_edges][InfHex16::nodes_per_edge] =
   {
     {0, 1,  8}, // Edge 0
     {1, 2,  9}, // Edge 1
@@ -88,31 +95,26 @@ bool InfHex16::is_node_on_side(const unsigned int n,
                                const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 8; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(side_nodes_map[s]),
+                   std::end(side_nodes_map[s]),
+                   n) != std::end(side_nodes_map[s]);
 }
 
 std::vector<unsigned>
 InfHex16::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  std::vector<unsigned int> nodes(side_nodes_map[s],
-                                  side_nodes_map[s] +
-                                      sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0]));
-  nodes.erase(std::remove(nodes.begin(), nodes.end(), 99), nodes.end());
-  return nodes;
+  auto trim = (s == 0) ? 0 : 2;
+  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s]) - trim};
 }
 
 bool InfHex16::is_node_on_edge(const unsigned int n,
                                const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 3; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(edge_nodes_map[e]),
+                   std::end(edge_nodes_map[e]),
+                   n) != std::end(edge_nodes_map[e]);
 }
 
 
@@ -130,7 +132,7 @@ unsigned int InfHex16::which_node_am_i(unsigned int side,
   libmesh_assert_less (side, this->n_sides());
 
   // Never more than 8 nodes per side.
-  libmesh_assert_less (side_node, 8);
+  libmesh_assert_less (side_node, InfHex16::nodes_per_side);
 
   // Some sides have 6 nodes.
   libmesh_assert(side == 0 || side_node < 6);
@@ -289,7 +291,7 @@ InfHex16::second_order_child_vertex (const unsigned int n) const
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float InfHex16::_embedding_matrix[4][16][16] =
+const float InfHex16::_embedding_matrix[InfHex16::num_children][InfHex16::num_nodes][InfHex16::num_nodes] =
   {
     // embedding matrix for child 0
     {

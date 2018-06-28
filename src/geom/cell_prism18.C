@@ -32,7 +32,14 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Prism18 class static member initializations
-const unsigned int Prism18::side_nodes_map[5][9] =
+const int Prism18::num_nodes;
+const int Prism18::num_sides;
+const int Prism18::num_edges;
+const int Prism18::num_children;
+const int Prism18::nodes_per_side;
+const int Prism18::nodes_per_edge;
+
+const unsigned int Prism18::side_nodes_map[Prism18::num_sides][Prism18::nodes_per_side] =
   {
     {0, 2, 1,  8,  7,  6, 99, 99, 99}, // Side 0
     {0, 1, 4,  3,  6, 10, 12,  9, 15}, // Side 1
@@ -41,7 +48,7 @@ const unsigned int Prism18::side_nodes_map[5][9] =
     {3, 4, 5, 12, 13, 14, 99, 99, 99}  // Side 4
   };
 
-const unsigned int Prism18::edge_nodes_map[9][3] =
+const unsigned int Prism18::edge_nodes_map[Prism18::num_edges][Prism18::nodes_per_edge] =
   {
     {0, 1,  6}, // Edge 0
     {1, 2,  7}, // Edge 1
@@ -85,31 +92,26 @@ bool Prism18::is_node_on_side(const unsigned int n,
                               const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 9; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(side_nodes_map[s]),
+                   std::end(side_nodes_map[s]),
+                   n) != std::end(side_nodes_map[s]);
 }
 
 std::vector<unsigned>
 Prism18::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  std::vector<unsigned int> nodes(side_nodes_map[s],
-                                  side_nodes_map[s] +
-                                      sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0]));
-  nodes.erase(std::remove(nodes.begin(), nodes.end(), 99), nodes.end());
-  return nodes;
+  auto trim = (s > 0 && s < 4) ? 0 : 3;
+  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s]) - trim};
 }
 
 bool Prism18::is_node_on_edge(const unsigned int n,
                               const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 3; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(edge_nodes_map[e]),
+                   std::end(edge_nodes_map[e]),
+                   n) != std::end(edge_nodes_map[e]);
 }
 
 
@@ -814,7 +816,7 @@ Real Prism18::volume () const
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Prism18::_embedding_matrix[8][18][18] =
+const float Prism18::_embedding_matrix[Prism18::num_children][Prism18::num_nodes][Prism18::num_nodes] =
   {
     // embedding matrix for child 0
     {

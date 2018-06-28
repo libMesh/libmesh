@@ -73,7 +73,7 @@ public:
   /**
    * \returns 8.  The \p InfHex8 has 8 nodes.
    */
-  virtual unsigned int n_nodes() const override { return 8; }
+  virtual unsigned int n_nodes() const override { return num_nodes; }
 
   /**
    * \returns \p INFHEX8.
@@ -146,16 +146,26 @@ public:
   { return 12; }
 
   /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
-   * element node numbers.
+   * Geometric constants for InfHex8.
    */
-  static const unsigned int side_nodes_map[5][4];
+  static const int num_nodes = 8;
+  static const int num_sides = 5;
+  static const int num_edges = 8;
+  static const int num_children = 4;
+  static const int nodes_per_side = 4;
+  static const int nodes_per_edge = 2;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
    * element node numbers.
    */
-  static const unsigned int edge_nodes_map[8][2];
+  static const unsigned int side_nodes_map[num_sides][nodes_per_side];
+
+  /**
+   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
+   * element node numbers.
+   */
+  static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
 
 
 protected:
@@ -163,7 +173,7 @@ protected:
   /**
    * Data for links to nodes.
    */
-  Node * _nodelinks_data[8];
+  Node * _nodelinks_data[num_nodes];
 
 
 
@@ -181,7 +191,7 @@ protected:
    * Matrix that computes new nodal locations/solution values
    * from current nodes/solution.
    */
-  static const float _embedding_matrix[4][8][8];
+  static const float _embedding_matrix[num_children][num_nodes][num_nodes];
 
   LIBMESH_ENABLE_TOPOLOGY_CACHES;
 

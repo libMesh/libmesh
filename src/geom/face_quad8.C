@@ -30,7 +30,12 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Quad8 class static member initializations
-const unsigned int Quad8::side_nodes_map[4][3] =
+const int Quad8::num_nodes;
+const int Quad8::num_sides;
+const int Quad8::num_children;
+const int Quad8::nodes_per_side;
+
+const unsigned int Quad8::side_nodes_map[Quad8::num_sides][Quad8::nodes_per_side] =
   {
     {0, 1, 4}, // Side 0
     {1, 2, 5}, // Side 1
@@ -41,7 +46,7 @@ const unsigned int Quad8::side_nodes_map[4][3] =
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Quad8::_embedding_matrix[4][8][8] =
+const float Quad8::_embedding_matrix[Quad8::num_children][Quad8::num_nodes][Quad8::num_nodes] =
   {
     // embedding matrix for child 0
     {
@@ -126,18 +131,16 @@ bool Quad8::is_node_on_side(const unsigned int n,
                             const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 3; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(side_nodes_map[s]),
+                   std::end(side_nodes_map[s]),
+                   n) != std::end(side_nodes_map[s]);
 }
 
 std::vector<unsigned>
 Quad8::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  return {side_nodes_map[s],
-          side_nodes_map[s] + sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0])};
+  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
 }
 
 bool Quad8::has_affine_map() const
@@ -204,7 +207,7 @@ unsigned int Quad8::which_node_am_i(unsigned int side,
                                     unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
-  libmesh_assert_less (side_node, 3);
+  libmesh_assert_less (side_node, Quad8::nodes_per_side);
 
   return Quad8::side_nodes_map[side][side_node];
 }

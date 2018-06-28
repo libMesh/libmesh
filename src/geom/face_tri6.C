@@ -30,7 +30,12 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Tri6 class static member initializations
-const unsigned int Tri6::side_nodes_map[3][3] =
+const int Tri6::num_nodes;
+const int Tri6::num_sides;
+const int Tri6::num_children;
+const int Tri6::nodes_per_side;
+
+const unsigned int Tri6::side_nodes_map[Tri6::num_sides][Tri6::nodes_per_side] =
   {
     {0, 1, 3}, // Side 0
     {1, 2, 4}, // Side 1
@@ -40,7 +45,7 @@ const unsigned int Tri6::side_nodes_map[3][3] =
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Tri6::_embedding_matrix[4][6][6] =
+const float Tri6::_embedding_matrix[Tri6::num_children][Tri6::num_nodes][Tri6::num_nodes] =
   {
     // embedding matrix for child 0
     {
@@ -117,18 +122,16 @@ bool Tri6::is_node_on_side(const unsigned int n,
                            const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 3; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(side_nodes_map[s]),
+                   std::end(side_nodes_map[s]),
+                   n) != std::end(side_nodes_map[s]);
 }
 
 std::vector<unsigned>
 Tri6::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  return {side_nodes_map[s],
-          side_nodes_map[s] + sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0])};
+  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
 }
 
 bool Tri6::has_affine_map() const
@@ -188,7 +191,7 @@ unsigned int Tri6::which_node_am_i(unsigned int side,
                                    unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
-  libmesh_assert_less (side_node, 3);
+  libmesh_assert_less (side_node, Tri6::nodes_per_side);
 
   return Tri6::side_nodes_map[side][side_node];
 }
@@ -426,7 +429,7 @@ unsigned short int Tri6::second_order_adjacent_vertex (const unsigned int n,
 
 
 
-const unsigned short int Tri6::_second_order_adjacent_vertices[3][2] =
+const unsigned short int Tri6::_second_order_adjacent_vertices[Tri6::num_sides][2] =
   {
     {0, 1}, // vertices adjacent to node 3
     {1, 2}, // vertices adjacent to node 4
@@ -447,7 +450,7 @@ Tri6::second_order_child_vertex (const unsigned int n) const
 
 
 
-const unsigned short int Tri6::_second_order_vertex_child_number[6] =
+const unsigned short int Tri6::_second_order_vertex_child_number[Tri6::num_nodes] =
   {
     99,99,99, // Vertices
     0,1,0     // Edges
@@ -455,7 +458,7 @@ const unsigned short int Tri6::_second_order_vertex_child_number[6] =
 
 
 
-const unsigned short int Tri6::_second_order_vertex_child_index[6] =
+const unsigned short int Tri6::_second_order_vertex_child_index[Tri6::num_nodes] =
   {
     99,99,99, // Vertices
     1,2,2     // Edges

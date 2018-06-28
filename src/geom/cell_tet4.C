@@ -32,7 +32,14 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Tet4 class static member initializations
-const unsigned int Tet4::side_nodes_map[4][3] =
+const int Tet4::num_nodes;
+const int Tet4::num_sides;
+const int Tet4::num_edges;
+const int Tet4::num_children;
+const int Tet4::nodes_per_side;
+const int Tet4::nodes_per_edge;
+
+const unsigned int Tet4::side_nodes_map[Tet4::num_sides][Tet4::nodes_per_side] =
   {
     {0, 2, 1}, // Side 0
     {0, 1, 3}, // Side 1
@@ -40,7 +47,7 @@ const unsigned int Tet4::side_nodes_map[4][3] =
     {2, 0, 3}  // Side 3
   };
 
-const unsigned int Tet4::edge_nodes_map[6][2] =
+const unsigned int Tet4::edge_nodes_map[Tet4::num_edges][Tet4::nodes_per_edge] =
   {
     {0, 1}, // Edge 0
     {1, 2}, // Edge 1
@@ -73,10 +80,9 @@ bool Tet4::is_node_on_edge(const unsigned int n,
                            const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 2; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(edge_nodes_map[e]),
+                   std::end(edge_nodes_map[e]),
+                   n) != std::end(edge_nodes_map[e]);
 }
 
 
@@ -121,18 +127,16 @@ bool Tet4::is_node_on_side(const unsigned int n,
                            const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 3; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(side_nodes_map[s]),
+                   std::end(side_nodes_map[s]),
+                   n) != std::end(side_nodes_map[s]);
 }
 
 std::vector<unsigned>
 Tet4::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  return {side_nodes_map[s],
-          side_nodes_map[s] + sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0])};
+  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
 }
 
 Order Tet4::default_order() const
@@ -213,7 +217,7 @@ void Tet4::connectivity(const unsigned int libmesh_dbg_var(sc),
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Tet4::_embedding_matrix[8][4][4] =
+const float Tet4::_embedding_matrix[Tet4::num_children][Tet4::num_nodes][Tet4::num_nodes] =
   {
     // embedding matrix for child 0
     {

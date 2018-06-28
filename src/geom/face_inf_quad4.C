@@ -38,7 +38,12 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // InfQuad4 class static member initializations
-const unsigned int InfQuad4::side_nodes_map[3][2] =
+const int InfQuad4::num_nodes;
+const int InfQuad4::num_sides;
+const int InfQuad4::num_children;
+const int InfQuad4::nodes_per_side;
+
+const unsigned int InfQuad4::side_nodes_map[InfQuad4::num_sides][InfQuad4::nodes_per_side] =
   {
     {0, 1}, // Side 0
     {1, 3}, // Side 1
@@ -49,7 +54,7 @@ const unsigned int InfQuad4::side_nodes_map[3][2] =
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float InfQuad4::_embedding_matrix[2][4][4] =
+const float InfQuad4::_embedding_matrix[InfQuad4::num_children][InfQuad4::num_nodes][InfQuad4::num_nodes] =
   {
     // embedding matrix for child 0
     {
@@ -99,18 +104,16 @@ bool InfQuad4::is_node_on_side(const unsigned int n,
                                const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 2; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(side_nodes_map[s]),
+                   std::end(side_nodes_map[s]),
+                   n) != std::end(side_nodes_map[s]);
 }
 
 std::vector<unsigned>
 InfQuad4::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  return {side_nodes_map[s],
-          side_nodes_map[s] + sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0])};
+  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
 }
 
 bool InfQuad4::contains_point (const Point & p, Real tol) const

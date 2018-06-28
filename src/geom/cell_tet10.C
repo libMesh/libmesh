@@ -31,7 +31,14 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Tet10 class static member initializations
-const unsigned int Tet10::side_nodes_map[4][6] =
+const int Tet10::num_nodes;
+const int Tet10::num_sides;
+const int Tet10::num_edges;
+const int Tet10::num_children;
+const int Tet10::nodes_per_side;
+const int Tet10::nodes_per_edge;
+
+const unsigned int Tet10::side_nodes_map[Tet10::num_sides][Tet10::nodes_per_side] =
   {
     {0, 2, 1, 6, 5, 4}, // Side 0
     {0, 1, 3, 4, 8, 7}, // Side 1
@@ -39,7 +46,7 @@ const unsigned int Tet10::side_nodes_map[4][6] =
     {2, 0, 3, 6, 7, 9}  // Side 3
   };
 
-const unsigned int Tet10::edge_nodes_map[6][3] =
+const unsigned int Tet10::edge_nodes_map[Tet10::num_edges][Tet10::nodes_per_edge] =
   {
     {0, 1, 4}, // Edge 0
     {1, 2, 5}, // Edge 1
@@ -77,28 +84,25 @@ bool Tet10::is_node_on_side(const unsigned int n,
                             const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  for (unsigned int i = 0; i != 6; ++i)
-    if (side_nodes_map[s][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(side_nodes_map[s]),
+                   std::end(side_nodes_map[s]),
+                   n) != std::end(side_nodes_map[s]);
 }
 
 std::vector<unsigned>
 Tet10::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  return {side_nodes_map[s],
-          side_nodes_map[s] + sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0])};
+  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
 }
 
 bool Tet10::is_node_on_edge(const unsigned int n,
                             const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
-  for (unsigned int i = 0; i != 3; ++i)
-    if (edge_nodes_map[e][i] == n)
-      return true;
-  return false;
+  return std::find(std::begin(edge_nodes_map[e]),
+                   std::end(edge_nodes_map[e]),
+                   n) != std::end(edge_nodes_map[e]);
 }
 
 
@@ -172,7 +176,7 @@ unsigned int Tet10::which_node_am_i(unsigned int side,
                                     unsigned int side_node) const
 {
   libmesh_assert_less (side, this->n_sides());
-  libmesh_assert_less (side_node, 6);
+  libmesh_assert_less (side_node, Tet10::nodes_per_side);
 
   return Tet10::side_nodes_map[side][side_node];
 }
@@ -513,7 +517,7 @@ const unsigned short int Tet10::_second_order_adjacent_vertices[6][2] =
 
 #ifdef LIBMESH_ENABLE_AMR
 
-const float Tet10::_embedding_matrix[8][10][10] =
+const float Tet10::_embedding_matrix[Tet10::num_children][Tet10::num_nodes][Tet10::num_nodes] =
   {
     // embedding matrix for child 0
     {
