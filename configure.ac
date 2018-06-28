@@ -291,11 +291,14 @@ LIBMESH_TEST_CXX11_FINAL
 AS_IF([test "x$have_cxx11_final" != "xyes"],
       [AC_MSG_ERROR([libMesh requires the C++11 final keyword])])
 
+LIBMESH_TEST_CXX11_DECLTYPE
+AS_IF([test "x$have_cxx11_decltype" != "xyes"],
+      [AC_MSG_ERROR([libMesh requires the C++11 decltype keyword])])
+
 # --------------------------------------------------------------
 # Test for optional modern C++ features, which libMesh offers shims
 # for and/or which libMesh applications may want to selectively use.
 # --------------------------------------------------------------
-LIBMESH_TEST_CXX11_DECLTYPE
 LIBMESH_TEST_CXX11_RVALUE_REFERENCES
 LIBMESH_TEST_CXX11_CONSTEXPR
 LIBMESH_TEST_CXX11_ALIAS_DECLARATIONS
