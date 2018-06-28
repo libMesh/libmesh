@@ -833,16 +833,19 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
 #ifndef NDEBUG
      & upper_bounds,
      & communicator,
-     & bbox,
 #endif
+     & bbox,
      & my_bin,
        my_offset
     ]
     (processor_id_type, const std::vector<Parallel::DofObjectKey> & keys,
      std::vector<dof_id_type> & global_ids)
     {
-      const std::size_t keys_size = keys.size();
+      // Ignore unused lambda capture warnings in devel mode
+      libmesh_ignore(bbox);
+
       // Fill the requests
+      const std::size_t keys_size = keys.size();
       global_ids.clear();
       global_ids.reserve(keys_size);
       for (std::size_t idx=0; idx != keys_size; idx++)
