@@ -140,7 +140,13 @@ bool Quad9::is_node_on_side(const unsigned int n,
   return false;
 }
 
-
+std::vector<unsigned>
+Quad9::nodes_on_side(const unsigned int s) const
+{
+  libmesh_assert_less(s, n_sides());
+  return {side_nodes_map[s],
+          side_nodes_map[s] + sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0])};
+}
 
 bool Quad9::has_affine_map() const
 {

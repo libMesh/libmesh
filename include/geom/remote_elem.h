@@ -143,6 +143,12 @@ public:
                                const unsigned int) const override
   { libmesh_not_implemented(); return false; }
 
+  virtual std::vector<unsigned int> nodes_on_side(const unsigned int) const override
+  {
+    libmesh_not_implemented();
+    return {0};
+  }
+
   virtual bool is_child_on_side(const unsigned int,
                                 const unsigned int) const override
   { libmesh_not_implemented(); return false; }

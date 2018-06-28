@@ -77,6 +77,17 @@ bool InfQuad6::is_node_on_side(const unsigned int n,
   return false;
 }
 
+std::vector<unsigned>
+InfQuad6::nodes_on_side(const unsigned int s) const
+{
+  libmesh_assert_less(s, n_sides());
+  std::vector<unsigned int> nodes(side_nodes_map[s],
+                                  side_nodes_map[s] +
+                                      sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0]));
+  nodes.erase(std::remove(nodes.begin(), nodes.end(), 99), nodes.end());
+  return nodes;
+}
+
 #ifdef LIBMESH_ENABLE_AMR
 
 const float InfQuad6::_embedding_matrix[2][6][6] =
