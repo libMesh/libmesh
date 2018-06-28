@@ -95,8 +95,11 @@ std::vector<unsigned>
 Prism18::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  return {side_nodes_map[s],
-          side_nodes_map[s] + sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0])};
+  std::vector<unsigned int> nodes(side_nodes_map[s],
+                                  side_nodes_map[s] +
+                                      sizeof(side_nodes_map[s]) / sizeof(side_nodes_map[s][0]));
+  nodes.erase(std::remove(nodes.begin(), nodes.end(), 99), nodes.end());
+  return nodes;
 }
 
 bool Prism18::is_node_on_edge(const unsigned int n,
