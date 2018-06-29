@@ -35186,7 +35186,7 @@ fi
 fi
 
   # If PETSc + Hypre is required, throw an error if we don't have it.
-  if test "x$petschyprerequired" = "xyes" && test $petsc_have_hypre -gt 0; then :
+  if test "x$petschyprerequired" = "xyes" && test $petsc_have_hypre -eq 0; then :
   as_fn_error 4 "*** PETSc with Hypre was not found, but --enable-petsc-hypre-required was specified." "$LINENO" 5
 fi
 
