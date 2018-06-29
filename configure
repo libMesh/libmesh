@@ -9569,10 +9569,6 @@ if test "x$have_cxx11_final" != "xyes"; then :
   as_fn_error $? "libMesh requires the C++11 final keyword" "$LINENO" 5
 fi
 
-# --------------------------------------------------------------
-# Test for optional modern C++ features, which libMesh offers shims
-# for and/or which libMesh applications may want to selectively use.
-# --------------------------------------------------------------
 
     have_cxx11_decltype=no
 
@@ -9591,6 +9587,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
+        #include <vector>
 
 int
 main ()
@@ -9598,6 +9595,9 @@ main ()
 
         int a;
         decltype(a) b;
+        std::vector<int> vec(10);
+        for (auto i = decltype(vec.size())(0); i < vec.size(); ++i)
+          vec[i] += i;
 
   ;
   return 0;
@@ -9638,6 +9638,14 @@ else
 fi
 
 
+if test "x$have_cxx11_decltype" != "xyes"; then :
+  as_fn_error $? "libMesh requires the C++11 decltype keyword" "$LINENO" 5
+fi
+
+# --------------------------------------------------------------
+# Test for optional modern C++ features, which libMesh offers shims
+# for and/or which libMesh applications may want to selectively use.
+# --------------------------------------------------------------
 
     have_cxx11_rvalue_references=no
 

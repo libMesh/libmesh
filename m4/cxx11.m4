@@ -221,9 +221,13 @@ AC_DEFUN([LIBMESH_TEST_CXX11_DECLTYPE],
     CXXFLAGS="$CXXFLAGS $switch $libmesh_CXXFLAGS"
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+        @%:@include <vector>
     ]], [[
         int a;
         decltype(a) b;
+        std::vector<int> vec(10);
+        for (auto i = decltype(vec.size())(0); i < vec.size(); ++i)
+          vec[i] += i;
     ]])],[
         AC_MSG_RESULT(yes)
         AC_DEFINE(HAVE_CXX11_DECLTYPE, 1, [Flag indicating whether compiler supports decltype])
