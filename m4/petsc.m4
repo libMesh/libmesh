@@ -85,6 +85,10 @@ AC_DEFUN([CONFIGURE_PETSC],
                     [enablepetsc=no])
     AC_LANG_POP
 
+    dnl We now have a -gt check for this that occurs at the end of the file, so make sure
+    dnl it is initialized to some sensible value to avoid syntax errors.
+    petsc_have_hypre=0
+
     # Grab PETSc version and substitute into Makefile.
     # If version 2.x, also check that PETSC_ARCH is set
     AS_IF([test "$enablepetsc" !=  no],
@@ -115,6 +119,7 @@ AC_DEFUN([CONFIGURE_PETSC],
             petsc_have_party=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PARTY`
             petsc_have_ptscotch=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PTSCOTCH`
             petsc_have_parmetis=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_PARMETIS`
+            petsc_have_hypre=`cat ${PETSC_DIR}/include/petscconf.h ${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h 2>/dev/null | grep -c PETSC_HAVE_HYPRE`
           ],
           [enablepetsc=no])
 
@@ -230,21 +235,6 @@ AC_DEFUN([CONFIGURE_PETSC],
           # We sometimes need the full CC_INCLUDES to access a
           # PETSc-snooped MPI
           PETSCINCLUDEDIRS="$PETSCINCLUDEDIRS $PETSC_CC_INCLUDES"
-
-          # Check for Hypre
-          petsc_have_hypre=no
-          AS_IF([test -r $PETSC_DIR/bmake/$PETSC_ARCH/petscconf], dnl 2.3.x
-                [HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/bmake/$PETSC_ARCH/petscconf`],
-                [test -r $PETSC_DIR/$PETSC_ARCH/conf/petscvariables], dnl 3.0.x
-                [HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/$PETSC_ARCH/conf/petscvariables`],
-                [test -r $PETSC_DIR/conf/petscvariables], dnl 3.0.x
-                [HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/conf/petscvariables`],
-                [test -r $PETSC_DIR/lib/petsc/conf/petscvariables], dnl 3.6.x
-                [HYPRE_LIB=`grep "HYPRE_LIB" $PETSC_DIR/lib/petsc/conf/petscvariables`])
-
-          AS_IF([test "x$HYPRE_LIB" != x],
-                [petsc_have_hypre=yes
-                 AC_MSG_RESULT(<<< Configuring library with Hypre support >>>)])
 
           # Try to compile a trivial PETSc program to check our
           # configuration... this should handle cases where we slipped
@@ -408,7 +398,7 @@ AC_DEFUN([CONFIGURE_PETSC],
           AS_IF([test "x$PETSC_MPI" != x],
                 [AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])])
 
-          AS_IF([test "x$petsc_have_hypre" = "xyes"],
+          AS_IF([test $petsc_have_hypre -gt 0],
                 [AC_DEFINE(HAVE_PETSC_HYPRE, 1, [Flag indicating whether or not PETSc was compiled with Hypre support])])
 
           AC_DEFINE(HAVE_PETSC, 1, [Flag indicating whether or not PETSc is available])
@@ -427,6 +417,6 @@ AC_DEFUN([CONFIGURE_PETSC],
         [AC_MSG_ERROR([*** PETSc was not found, but --enable-petsc-required was specified.], 3)])
 
   # If PETSc + Hypre is required, throw an error if we don't have it.
-  AS_IF([test "x$petschyprerequired" = "xyes" && test "x$petsc_have_hypre" != "xyes"],
+  AS_IF([test "x$petschyprerequired" = "xyes" && test $petsc_have_hypre -eq 0],
         [AC_MSG_ERROR([*** PETSc with Hypre was not found, but --enable-petsc-hypre-required was specified.], 4)])
 ])
